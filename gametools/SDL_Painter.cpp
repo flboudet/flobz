@@ -3,10 +3,12 @@
 
 // #define DEBUG
 
-SDL_Painter::SDL_Painter(SDL_Surface *gameScreen, SDL_Surface *bg)
+extern SDL_Surface *display;
+
+SDL_Painter::SDL_Painter(IIM_Surface *gameScreen, IIM_Surface *bg)
   : gameScreen(gameScreen), backGround(bg), nbElts(0), nbPrev(0) {}
 
-void SDL_Painter::requestDraw(SDL_Surface *surf, SDL_Rect *where)
+void SDL_Painter::requestDraw(IIM_Surface *surf, SDL_Rect *where)
 {
 #ifdef DEBUG
   if (nbElts >= MAX_PAINT_ELTS) {
@@ -159,11 +161,11 @@ void SDL_Painter::draw(SDL_Surface *surf)
 
   for (int r=0; r<nbRects; ++r) {
     SDL_SetClipRect(surf, &rectToUpdate[r]);
-    SDL_BlitSurface(backGround, &rectToUpdate[r], surf, &rectToUpdate[r]);
+    SDL_BlitSurface(backGround->surf, &rectToUpdate[r], surf, &rectToUpdate[r]);
     for (int i=0; i<nbElts; ++i) {
       // Afficher ces elements.
       SDL_Rect rect = onScreenElts[i].rect;
-      SDL_BlitSurface(onScreenElts[i].surf, NULL,
+      SDL_BlitSurface(onScreenElts[i].surf->surf, NULL,
                       surf, &rect);
     }
   }
@@ -192,9 +194,9 @@ void SDL_Painter::redrawAll(SDL_Surface *surf)
   SDL_SetClipRect(surf, NULL);
 
   // Draw everything.
-  SDL_BlitSurface(backGround, NULL, surf, NULL);
+  SDL_BlitSurface(backGround->surf, NULL, surf, NULL);
   for (int i=0; i<nbElts; ++i) {
-    SDL_BlitSurface(onScreenElts[i].surf, NULL,
+    SDL_BlitSurface(onScreenElts[i].surf->surf, NULL,
         surf, &onScreenElts[i].rect);
   }
 

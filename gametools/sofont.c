@@ -5,7 +5,7 @@
 struct _SOFONT
 {
 	int     height;
-	SDL_Surface *picture;
+	IIM_Surface *picture;
 	int    *CharPos;
 	int    *Spacing;
 
@@ -57,8 +57,8 @@ SoFont_new ()
 void
 SoFont_free (SoFont * font)
 {
-	if (font->picture)
-		SDL_FreeSurface (font->picture);
+/*	if (font->picture)
+		SDL_FreeSurface (font->picture); */
 	if (font->CharPos)
 		free (font->CharPos);
 	if (font->Spacing)
@@ -250,8 +250,8 @@ SoFont_DoStartNewChar (SoFont * font, Sint32 x)
 {
 	if (!font->picture)
 		return 0;
-	return SoFontGetPixel (font->picture, x, 0) ==
-		SDL_MapRGB (font->picture->format, 255, 0, 255);
+	return SoFontGetPixel (font->picture->surf, x, 0) ==
+		SDL_MapRGB (font->picture->surf->format, 255, 0, 255);
 }
 
 void
@@ -263,7 +263,7 @@ SoFont_CleanSurface (SoFont * font)
 	if (!font->picture)
 		return;
 
-	pix = SDL_MapRGB (font->picture->format, 255, 0, 255);
+	pix = SDL_MapRGB (font->picture->surf->format, 255, 0, 255);
 
 	while (x < font->picture->w) {
 		y = 0;
@@ -271,8 +271,8 @@ SoFont_CleanSurface (SoFont * font)
 //touch - or even care about - the very top pixel row.
 //    while(y < picture->h)
 //    {
-		if (SoFontGetPixel (font->picture, x, y) == pix)
-			SoFontSetPixel (font->picture, x, y, font->background);
+		if (SoFontGetPixel (font->picture->surf, x, y) == pix)
+			SoFontSetPixel (font->picture->surf, x, y, font->background);
 //      y++;
 //    }
 		x++;
@@ -281,7 +281,7 @@ SoFont_CleanSurface (SoFont * font)
 
 
 int
-SoFont_load (SoFont * font, SDL_Surface * FontSurface)
+SoFont_load (SoFont * font, IIM_Surface * FontSurface)
 {
 	int     x = 0, i = 0, p = 0, s = 0;
 	int     cursBegin = 0;
@@ -317,8 +317,8 @@ SoFont_load (SoFont * font, SDL_Surface * FontSurface)
 	_CharPos[i++] = font->picture->w;
 
 	font->max_i = START_CHAR + i - 1;
-	font->background = SoFontGetPixel (font->picture, 0, font->height);
-	SDL_SetColorKey (font->picture, SDL_SRCCOLORKEY, font->background);
+	font->background = SoFontGetPixel (font->picture->surf, 0, font->height);
+	SDL_SetColorKey (font->picture->surf, SDL_SRCCOLORKEY, font->background);
 	SoFont_CleanSurface (font);
 
 	font->CharPos = (int *) malloc (i * sizeof (int));
@@ -345,12 +345,12 @@ SoFont_load (SoFont * font, SDL_Surface * FontSurface)
 		return 1;										// No bar in this font!
 
 	if (font->background ==
-			SoFontGetPixel (font->picture, font->CharPos['|' - START_CHAR],
+			SoFontGetPixel (font->picture->surf, font->CharPos['|' - START_CHAR],
 											font->height / 2)) {
 		// Up to the first | color
 		for (cursBegin = 0; cursBegin <= SoFont_TextWidth (font, "|");
 				 cursBegin++)
-				if (font->background != SoFontGetPixel (font->picture,
+				if (font->background != SoFontGetPixel (font->picture->surf,
 																								font->CharPos['|' -
 																															START_CHAR] +
 																								cursBegin, font->height / 2))
@@ -358,7 +358,7 @@ SoFont_load (SoFont * font, SDL_Surface * FontSurface)
 		// Up to the end of the | color
 		for (cursWidth = 0; cursWidth <= SoFont_TextWidth (font, "|");
 				 cursWidth++)
-				if (font->background == SoFontGetPixel (font->picture,
+				if (font->background == SoFontGetPixel (font->picture->surf,
 																								font->CharPos['|' -
 																															START_CHAR] +
 																								cursBegin + cursWidth,
@@ -369,7 +369,7 @@ SoFont_load (SoFont * font, SDL_Surface * FontSurface)
 		// Up to the end of the | color
 		for (cursWidth = 0; cursWidth <= SoFont_TextWidth (font, "|");
 				 cursWidth++)
-				if (font->background == SoFontGetPixel (font->picture,
+				if (font->background == SoFontGetPixel (font->picture->surf,
 																								font->CharPos['|' -
 																															START_CHAR] +
 																								cursWidth, font->height / 2))
@@ -379,6 +379,14 @@ SoFont_load (SoFont * font, SDL_Surface * FontSurface)
 	// image format changes.
 
 	return 1;
+}
+
+void
+SoFont_Refresh(SoFont * font)
+{
+	font->background = SoFontGetPixel (font->picture->surf, 0, font->height);
+	SDL_SetColorKey (font->picture->surf, SDL_SRCCOLORKEY, font->background);
+	SoFont_CleanSurface (font);
 }
 
 void
@@ -413,7 +421,7 @@ SoFont_PutString (SoFont * font, SDL_Surface * Surface, int x, int y,
 			x += font->Spacing[ofs];
 			if (clip)
 				sdcRects (&srcrect, &dstrect, *clip);
-			SDL_BlitSurface (font->picture, &srcrect, Surface, &dstrect);
+			SDL_BlitSurface (font->picture->surf, &srcrect, Surface, &dstrect);
 			i++;
 		}
 		else
@@ -461,7 +469,7 @@ SoFont_PutStringWithCursor (SoFont * font, SDL_Surface * Surface, int xs,
 		dstrect.y = y;
 		if (clip)
 			sdcRects (&srcrect, &dstrect, *clip);
-		SDL_BlitSurface (font->picture, &srcrect, Surface, &dstrect);
+		SDL_BlitSurface (font->picture->surf, &srcrect, Surface, &dstrect);
 	}
 	// Then the text:
 	SoFont_PutString (font, Surface, xs, y, text, clip);

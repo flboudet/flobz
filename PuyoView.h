@@ -2,11 +2,10 @@
 #define _PUYOVIEW
 
 #include "glSDL.h"
-/*<SDL/SDL.h>
-#include <SDL/SDL_image.h>*/
 #include "PuyoGame.h"
 #include "PuyoIA.h"
 #include "PuyoCommander.h"
+#include "IosImgProcess.h"
 
 #define TSIZE 32
 #define ASIZE 32
@@ -16,7 +15,8 @@
 #define ESIZE 32
 #define FSIZE 16
 
-extern SDL_Surface *display, *image;
+extern SDL_Surface *display;
+extern IIM_Surface *image;
 
 class PuyoAnimation {
   public:
@@ -51,8 +51,8 @@ class PuyoView : public virtual PuyoDelegate {
     void puyoWillVanish(PuyoPuyo *puyo);
     void gameLost();
     void scheduleAnimations(int tickCount);
-    static SDL_Surface *getSurfaceForState(PuyoState state);
-    SDL_Surface *getSurfaceForPuyo(PuyoPuyo *puyo);
+    static IIM_Surface *getSurfaceForState(PuyoState state);
+    IIM_Surface *getSurfaceForPuyo(PuyoPuyo *puyo);
     PuyoGame *getAttachedGame() const { return attachedGame; }
     // normalement c'est prive
     int xOffset, yOffset, nXOffset, nYOffset;

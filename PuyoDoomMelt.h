@@ -21,13 +21,14 @@
 #define _PUYODOOMMELT
 
 #include "glSDL.h"
+#include "IosImgProcess.h"
 
 typedef struct _DoomMelt DoomMelt;
 
 DoomMelt *doom_melt_new    (void);
 void      doom_melt_delete (DoomMelt *_this);
 void      doom_melt_update (DoomMelt *_this);
-void      doom_melt_start  (DoomMelt *_this, SDL_Surface *surf);
+void      doom_melt_start  (DoomMelt *_this, IIM_Surface *surf);
 void      doom_melt_display(DoomMelt *_this, SDL_Surface *display);
 
 #endif /*_PUYODOOMMELT*/

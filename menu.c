@@ -11,7 +11,7 @@ struct _MENU
   MenuItems items;
   int     active_item;
   int     nb_items;
-  SDL_Surface * menuselector;
+  IIM_Surface * menuselector;
   
   int     sep_size;
 
@@ -30,7 +30,7 @@ void    menu_update_hauteur (Menu * menu);
 
 
   Menu   *
-menu_new (MenuItems items,SDL_Surface * selimage)
+menu_new (MenuItems items,IIM_Surface * selimage)
 {
   Menu   *m = (Menu *)malloc (sizeof (Menu));
 
@@ -203,7 +203,7 @@ void menu_draw (Menu * menu, SDL_Surface * surf)
             {
               rect.x = center - 150; rect.w = menu->menuselector->w;
               rect.y = hauteur - 3; rect.h = menu->menuselector->h;
-              SDL_BlitSurface (menu->menuselector, NULL, surf, &rect);
+              SDL_BlitSurface (menu->menuselector->surf, NULL, surf, &rect);
             }
           }
 

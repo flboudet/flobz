@@ -12,6 +12,7 @@
 #include "InputManager.h"
 #include "HiScores.h"
 #include "PuyoDoomMelt.h"
+#include "IosImgProcess.h"
 
 #ifndef DATADIR
 extern char *DATADIR;
@@ -104,49 +105,17 @@ char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
   "The Duke","Jeko","--------" };
 
 
-extern SDL_Surface *display, *image, *gameScreen;
-SDL_Surface *menuBGImage = 0;
+extern SDL_Surface *display;
+extern IIM_Surface *image, *gameScreen;
+IIM_Surface *menuBGImage = 0;
 PuyoCommander *theCommander;
 
 const int cycle_duration = 20;
 
-static bool fullscreen = true;
-static bool useGL = false;
+extern bool fullscreen;
+extern bool useGL;
 static bool sound = true;
 static bool fx = true;
-
-SDL_Surface * IMG_Load_DisplayFormat (const char *fname)
-{
-  char path[1024];
-  SDL_Surface *tmpsurf, *retsurf;
-  sprintf(path, "%s/gfx/%s", DATADIR, fname);
-
-  tmpsurf = IMG_Load (path);
-  if (tmpsurf==0) {
-    fprintf(stderr,"Could not load %s\n", path);
-    exit(1);
-  }
-  retsurf = SDL_DisplayFormat (tmpsurf);
-  SDL_FreeSurface (tmpsurf);
-  return retsurf;
-}
-
-SDL_Surface * IMG_Load_DisplayFormatAlpha (const char *fname)
-{
-  char path[1024];
-  SDL_Surface *tmpsurf, *retsurf;
-  sprintf(path, "%s/gfx/%s", DATADIR, fname);
-
-  tmpsurf = IMG_Load (path);
-  if (tmpsurf==0) {
-    fprintf(stderr,"Could not load %s\n", path);
-    exit(1);
-  }
-  retsurf = SDL_DisplayFormatAlpha (tmpsurf);
-  SDL_SetAlpha (retsurf, SDL_SRCALPHA | SDL_RLEACCEL, SDL_ALPHA_OPAQUE);
-  SDL_FreeSurface (tmpsurf);
-  return retsurf;
-}
 
 #define SINGLE_PLAYER_GAME "Single Player Game"
 #define TWO_PLAYERS_GAME "Two Players Game"
@@ -181,7 +150,7 @@ main_menu_load (SoFont * font)
     menu_items_set_font_for (main_menu, "About FloboPuyo", font);
     menu_items_set_font_for (main_menu, "Quit", font);
     loaded = 1;
-    menuBGImage = IMG_Load_DisplayFormat("MenuBackground.jpg");
+    menuBGImage = IIM_Load_DisplayFormat("MenuBackground.jpg");
   }
 
   return main_menu;
@@ -565,7 +534,7 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   SDL_Delay(500);
   fullscreen = GetBoolPreference(kFullScreen,fs);
 #ifdef HAVE_OPENGL
-  useGL      = GetBoolPreference(kOpenGL,0);
+  useGL      = GetBoolPreference(kOpenGL,false);
 #endif
   sound = GetBoolPreference(kMusic,snd);
   fx = GetBoolPreference(kAudioFX,audio);
@@ -620,13 +589,13 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   SDL_ShowCursor(SDL_DISABLE);
 
   smallFont = SoFont_new();
-  SoFont_load (smallFont, IMG_Load_DisplayFormatAlpha ("font4b.png"));
+  SoFont_load (smallFont, IIM_Load_DisplayFormatAlpha ("font4b.png"));
   menuFont = SoFont_new();
-  SoFont_load (menuFont, IMG_Load_DisplayFormatAlpha ("font3b.png"));
+  SoFont_load (menuFont, IIM_Load_DisplayFormatAlpha ("font3b.png"));
   darkFont = SoFont_new();
-  SoFont_load (darkFont, IMG_Load_DisplayFormatAlpha ("fontdark.png"));
+  SoFont_load (darkFont, IIM_Load_DisplayFormatAlpha ("fontdark.png"));
 
-  SDL_Surface * menuselector = IMG_Load_DisplayFormatAlpha("menusel.png");
+  IIM_Surface * menuselector = IIM_Load_DisplayFormatAlpha("menusel.png");
 
   mainMenu = menu_new(main_menu_load(menuFont),menuselector);
   gameOver1PMenu = menu_new(gameover_1p_menu_load(menuFont, smallFont),menuselector);
@@ -952,13 +921,26 @@ void PuyoCommander::optionMenuLoop(PuyoDrawable *d)
           if (menu_active_is (optionMenu, kFullScreen)) {
             fullscreen  = menu_switch_on_off(optionMenu, kFullScreen);
             SetBoolPreference(kFullScreen,fullscreen);
-            SDL_WM_ToggleFullScreen(display);
-            /* display = SDL_SetVideoMode( 640, 480, 0,  SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0)|(useGL?SDL_GLSDL:0)); */
+            SDL_QuitSubSystem(SDL_INIT_VIDEO);
+            SDL_Delay(50);
+            SDL_InitSubSystem(SDL_INIT_VIDEO);
+            display = SDL_SetVideoMode( 640, 480, 0,  SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0)|(useGL?SDL_GLSDL:0));
+            IIM_ReConvertAll();
+            SoFont_Refresh(menuFont);
+            SoFont_Refresh(smallFont);
+            SoFont_Refresh(darkFont);
           }
           if (menu_active_is (optionMenu, kOpenGL)) {
-            fullscreen  = menu_switch_on_off(optionMenu, kOpenGL);
+            useGL       = menu_switch_on_off(optionMenu, kOpenGL);
             SetBoolPreference(kOpenGL,useGL);
-            /* display = SDL_SetVideoMode( 640, 480, 0,  SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0)|(useGL?SDL_GLSDL:0)); */
+            SDL_QuitSubSystem(SDL_INIT_VIDEO);
+            SDL_Delay(50);
+            SDL_InitSubSystem(SDL_INIT_VIDEO);
+            display = SDL_SetVideoMode( 640, 480, 0,  SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0)|(useGL?SDL_GLSDL:0));
+            IIM_ReConvertAll();
+            SoFont_Refresh(menuFont);
+            SoFont_Refresh(smallFont);
+            SoFont_Refresh(darkFont);
           }
           if (menu_active_is (optionMenu, kMusic)) {
             sound = menu_switch_on_off(optionMenu, kMusic);
@@ -1349,7 +1331,7 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
       starter->draw();
     }
     else {
-      SDL_BlitSurface (menuBGImage, NULL, display, NULL);
+      SDL_BlitSurface (menuBGImage->surf, NULL, display, NULL);
       scrolling_text_draw(scrollingText, display, 460);
     }
 

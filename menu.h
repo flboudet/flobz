@@ -5,6 +5,7 @@
 
 #include "menuitems.h"
 #include "audio.h"
+#include "IosImgProcess.h"
 
 /// MENU
 ///
@@ -17,7 +18,7 @@ typedef struct _MENU Menu;
 ///------------------------------
 
 /// alloue un nouveau gestionnaire de menu
-Menu   * menu_new (MenuItems items, SDL_Surface * selimage);
+Menu   * menu_new (MenuItems items, IIM_Surface * selimage);
 
 /// retourne 1 si l'item actif est it_name
 int     menu_active_is (Menu * menu, const char *it_name);

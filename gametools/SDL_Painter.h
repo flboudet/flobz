@@ -3,26 +3,26 @@
 
 #define MAX_PAINT_ELTS 0x800
 
-#include "glSDL.h"
+#include "IosImgProcess.h"
 
 struct DrawElt {
-  SDL_Surface *surf;
+  IIM_Surface *surf;
   SDL_Rect     rect;
 };
       
 class SDL_Painter
 {
   public:
-      SDL_Surface *backGround;
-      SDL_Surface *gameScreen;
-      SDL_Surface *display;
+      IIM_Surface *backGround;
+      IIM_Surface *gameScreen;
+/*      SDL_Surface *display; */
 
-      SDL_Painter(SDL_Surface *gameScreen = NULL, SDL_Surface *bg = NULL);
-      void requestDraw(SDL_Surface *surf, SDL_Rect *where);
+      SDL_Painter(IIM_Surface *gameScreen = NULL, IIM_Surface *bg = NULL);
+      void requestDraw(IIM_Surface *surf, SDL_Rect *where);
       void draw(SDL_Surface *surf);
       void redrawAll(SDL_Surface *surf);
-      void draw()      { draw(gameScreen); }
-      void redrawAll() { redrawAll(gameScreen); }
+      void draw()      { draw(gameScreen->surf); }
+      void redrawAll() { redrawAll(gameScreen->surf); }
 
   private:
 

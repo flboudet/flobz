@@ -63,8 +63,6 @@ class PuyoCommander
 
 };
 
-SDL_Surface * IMG_Load_DisplayFormat (const char *path);
-SDL_Surface * IMG_Load_DisplayFormatAlpha (const char *path);
 
 extern SDL_Surface *display;
 extern class PuyoCommander *theCommander;

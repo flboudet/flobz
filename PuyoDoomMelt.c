@@ -52,7 +52,7 @@ static void _column_think (column_t *column, int *isFinished);
 
 struct _DoomMelt {
   column_t     columns[NUM_COLS];
-  SDL_Surface *surf;
+  IIM_Surface *surf;
   int          isFinished;
 };
 
@@ -70,7 +70,7 @@ void doom_melt_delete (DoomMelt *_this)
   free(_this);
 }
 
-void doom_melt_start (DoomMelt *_this, SDL_Surface *surf)
+void doom_melt_start (DoomMelt *_this, IIM_Surface *surf)
 {
   _this->surf       = surf;
   _this->isFinished = 0;
@@ -94,7 +94,7 @@ void doom_melt_display(DoomMelt *_this, SDL_Surface *display)
   {
     int i = 0;
     for (; i < NUM_COLS; i++)
-    _column_draw(&_this->columns[i], _this->surf, display);
+    _column_draw(&_this->columns[i], _this->surf->surf, display);
   }
 }
 

@@ -12,23 +12,24 @@
 #include "SDL_Painter.h"
 SDL_Painter painter;
 
-SDL_Surface *display, *background, *fallingBlue, *fallingRed, *fallingGreen, *fallingViolet, *fallingYellow, *neutral;
-SDL_Surface *gameScreen;
-SDL_Surface *bigNeutral;
-SDL_Surface *shrinkingPuyo[5][5];
-SDL_Surface *explodingPuyo[5][5];
-SDL_Surface *grid;
-SDL_Surface *speedImg;
-SDL_Surface *speedBlackImg;
-SDL_Surface *puyoEyes;
-SDL_Surface *puyoEye[3];
-SDL_Surface *puyoEyesSwirl[4];
+SDL_Surface *display;
+IIM_Surface *background, *fallingBlue, *fallingRed, *fallingGreen, *fallingViolet, *fallingYellow, *neutral;
+IIM_Surface *gameScreen;
+IIM_Surface *bigNeutral;
+IIM_Surface *shrinkingPuyo[5][5];
+IIM_Surface *explodingPuyo[5][5];
+IIM_Surface *grid;
+IIM_Surface *speedImg;
+IIM_Surface *speedBlackImg;
+IIM_Surface *puyoEyes;
+IIM_Surface *puyoEye[3];
+IIM_Surface *puyoEyesSwirl[4];
 
-SDL_Surface *puyoCircle[32];
+IIM_Surface *puyoCircle[32];
 
-SDL_Surface *puyoShadow;
-SDL_Surface *puyoFaces[5][16];
-SDL_Surface *live[4];
+IIM_Surface *puyoShadow;
+IIM_Surface *puyoFaces[5][16];
+IIM_Surface *live[4];
 
 const char *p1name;
 const char *p2name;
@@ -84,7 +85,7 @@ static char PuyoGroupImageIndex[2][2][2][2] =
 };
 
 static const int NB_PERSO_STATE = 2;
-SDL_Surface *perso[2];
+IIM_Surface *perso[2];
 int currentPerso = 0;
 
 class AnimatedPuyo : public PuyoPuyo {
@@ -135,7 +136,7 @@ public:
         int j = this->getPuyoY();
         PuyoAnimation *animation = getCurrentAnimation();
         if ((animation == NULL) || (animation->isFinished())) {
-            SDL_Surface *currentSurface = attachedView->getSurfaceForPuyo(this);
+            IIM_Surface *currentSurface = attachedView->getSurfaceForPuyo(this);
             if (currentSurface != NULL) {
                 drect.x = (i*TSIZE) + attachedView->xOffset;
                 drect.y = (j*TSIZE) + attachedView->yOffset;
@@ -221,7 +222,7 @@ void NeutralAnimation::draw(int semiMove)
 
 class TurningAnimation : public PuyoAnimation {
 public:
-    TurningAnimation(PuyoPuyo *companionPuyo, int vector, int xOffset, int yOffset, SDL_Surface *companionSurface, bool counterclockwise)
+    TurningAnimation(PuyoPuyo *companionPuyo, int vector, int xOffset, int yOffset, IIM_Surface *companionSurface, bool counterclockwise)
     {
         /*
 		 switch (vector) {
@@ -306,7 +307,7 @@ private:
     int X, Y, companionVector, cpt;
     float angle;
     float step;
-    SDL_Surface *targetSurface;
+    IIM_Surface *targetSurface;
     bool counterclockwise;
 };
 
@@ -364,7 +365,7 @@ private:
     int xOffset, yOffset, step;
     int X, Y;
 	int bouncing;
-    SDL_Surface *puyoFace;
+    IIM_Surface *puyoFace;
 };
 
 class VanishAnimation : public PuyoAnimation {
@@ -432,7 +433,7 @@ public:
         }
     }
 private:
-    SDL_Surface *puyoFace;
+    IIM_Surface *puyoFace;
     int xOffset, yOffset;
     int X, Y, iter, color;
 };
@@ -458,7 +459,7 @@ void PuyoView::setEnemyGame(PuyoGame *enemyGame)
 	this->enemyGame = enemyGame;
 }
 
-SDL_Surface *PuyoView::getSurfaceForState(PuyoState state)
+IIM_Surface *PuyoView::getSurfaceForState(PuyoState state)
 {
 	switch (state) {
 		case PUYO_BLUE:
@@ -500,7 +501,7 @@ SDL_Surface *PuyoView::getSurfaceForState(PuyoState state)
 	}
 }
 
-SDL_Surface *PuyoView::getSurfaceForPuyo(PuyoPuyo *puyo)
+IIM_Surface *PuyoView::getSurfaceForPuyo(PuyoPuyo *puyo)
 {
     int i = puyo->getPuyoX();
     int j = puyo->getPuyoY();
@@ -539,7 +540,7 @@ void PuyoView::render(PuyoPuyo *puyo)
     int j = puyo->getPuyoY();
     PuyoAnimation *animation = ((AnimatedPuyo *)puyo)->getCurrentAnimation();
     if (animation == NULL) {
-        SDL_Surface *currentSurface = getSurfaceForPuyo(puyo);
+        IIM_Surface *currentSurface = getSurfaceForPuyo(puyo);
         if (currentSurface != NULL) {
             drect.x = (i*TSIZE) + xOffset;
             drect.y = (j*TSIZE) + yOffset;
@@ -635,7 +636,7 @@ void PuyoView::render()
 	drect.w = TSIZE;
 	drect.h = TSIZE * 2;
 	// Drawing next puyos
-	SDL_Surface *currentSurface = getSurfaceForState(attachedGame->getNextFalling());
+	IIM_Surface *currentSurface = getSurfaceForState(attachedGame->getNextFalling());
 	if (currentSurface != NULL) {
 		drect.x = nXOffset;
 		drect.y = nYOffset + TSIZE;
@@ -762,9 +763,9 @@ static void loadShrinkXplode(void)
     {
         char f[20];
         sprintf(f,"Shrink%d.png", j);
-        shrinkingPuyo[j-1][3] = IMG_Load_DisplayFormatAlpha(f);
+        shrinkingPuyo[j-1][3] = IIM_Load_DisplayFormatAlpha(f);
         sprintf(f,"Explode%d.png", j);
-        explodingPuyo[j-1][3] = IMG_Load_DisplayFormatAlpha(f);
+        explodingPuyo[j-1][3] = IIM_Load_DisplayFormatAlpha(f);
     }
     
     loadShrinkXplode2(0,-65.0f);
@@ -801,70 +802,70 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
   savePointsA = 0;
   savePointsB = 0;
   
-	background    = IMG_Load_DisplayFormat(BACKGROUND[theme]);
+	background    = IIM_Load_DisplayFormat(BACKGROUND[theme]);
     
 	painter.backGround = background;
 	if (painter.gameScreen == NULL)
 	{
-		SDL_PixelFormat *fmt = background->format;
-		SDL_Surface *tmp = SDL_CreateRGBSurface(background->flags,
+		SDL_PixelFormat *fmt = background->surf->format;
+		SDL_Surface *tmp = SDL_CreateRGBSurface(background->surf->flags,
 												background->w, background->h, 32,
 												fmt->Rmask, fmt->Gmask,
 												fmt->Bmask, fmt->Amask);
-		gameScreen = painter.gameScreen = SDL_DisplayFormat(tmp);
+		gameScreen = painter.gameScreen = IIM_RegisterImg(SDL_DisplayFormat(tmp), false);
 		SDL_FreeSurface(tmp);
 	}
-	painter.display = display;
-	painter.redrawAll(painter.gameScreen);
+	painter.redrawAll(painter.gameScreen->surf);
 
 	static bool firstTime = true;
 	if (firstTime) {
-		fallingViolet = IMG_Load_DisplayFormatAlpha("v0.png");
-		fallingRed   = iim_surface_shift_hue(fallingViolet, 100.0f);
-		fallingBlue = iim_surface_shift_hue(fallingViolet, -65.0f);
-		fallingGreen    = iim_surface_shift_hue(fallingViolet, -150.0f);
-		fallingYellow  = iim_surface_shift_hue(fallingViolet, 140.0f);
-		neutral       = IMG_Load_DisplayFormatAlpha("Neutral.png");
-		bigNeutral    = IMG_Load_DisplayFormatAlpha("BigNeutral.png");
-    speedImg      = IMG_Load_DisplayFormatAlpha("speed.png");
-    speedBlackImg = IMG_Load_DisplayFormatAlpha("speed_black.png");
+		fallingViolet = IIM_Load_DisplayFormatAlpha("v0.png");
+		fallingRed    = iim_surface_shift_hue(fallingViolet, 100.0f);
+		fallingBlue   = iim_surface_shift_hue(fallingViolet, -65.0f);
+		fallingGreen  = iim_surface_shift_hue(fallingViolet, -150.0f);
+		fallingYellow = iim_surface_shift_hue(fallingViolet, 140.0f);
+		neutral       = IIM_Load_DisplayFormatAlpha("Neutral.png");
+		bigNeutral    = IIM_Load_DisplayFormatAlpha("BigNeutral.png");
+    speedImg      = IIM_Load_DisplayFormatAlpha("speed.png");
+    speedBlackImg = IIM_Load_DisplayFormatAlpha("speed_black.png");
 		
-                SDL_Surface * tmpsurf = IMG_Load_DisplayFormatAlpha("circle.png");
-		for (int i = 0 ; i < 32 ; i++) puyoCircle[i] = iim_surface_set_value(tmpsurf,sin(3.14f/2.0f+i*3.14f/64.0f)*0.6f+0.2f);
-                SDL_FreeSurface(tmpsurf);
+    IIM_Surface * tmpsurf = IIM_Load_DisplayFormatAlpha("circle.png");
+		for (int i = 0 ; i < 32 ; i++)
+      puyoCircle[i] = iim_surface_set_value(tmpsurf,sin(3.14f/2.0f+i*3.14f/64.0f)*0.6f+0.2f);
+    IIM_Free(tmpsurf);
         loadShrinkXplode();
         
-        puyoShadow = IMG_Load_DisplayFormatAlpha("Shadow.png");
-        puyoEye[0] = IMG_Load_DisplayFormatAlpha("eye0.png");
-        puyoEye[1] = IMG_Load_DisplayFormatAlpha("eye1.png");
-        puyoEye[2] = IMG_Load_DisplayFormatAlpha("eye2.png");
+        puyoShadow = IIM_Load_DisplayFormatAlpha("Shadow.png");
+        puyoEye[0] = IIM_Load_DisplayFormatAlpha("eye0.png");
+        puyoEye[1] = IIM_Load_DisplayFormatAlpha("eye1.png");
+        puyoEye[2] = IIM_Load_DisplayFormatAlpha("eye2.png");
         puyoEyes = puyoEye[0];
-        puyoEyesSwirl[0] = IMG_Load_DisplayFormatAlpha("twirleye0.png");
-        puyoEyesSwirl[1] = IMG_Load_DisplayFormatAlpha("twirleye1.png");
-        puyoEyesSwirl[2] = IMG_Load_DisplayFormatAlpha("twirleye2.png");
-        puyoEyesSwirl[3] = IMG_Load_DisplayFormatAlpha("twirleye3.png");
+        puyoEyesSwirl[0] = IIM_Load_DisplayFormatAlpha("twirleye0.png");
+        puyoEyesSwirl[1] = IIM_Load_DisplayFormatAlpha("twirleye1.png");
+        puyoEyesSwirl[2] = IIM_Load_DisplayFormatAlpha("twirleye2.png");
+        puyoEyesSwirl[3] = IIM_Load_DisplayFormatAlpha("twirleye3.png");
         
-        puyoFaces[0][0] = IMG_Load_DisplayFormatAlpha("v0.png");
-        puyoFaces[0][1] = IMG_Load_DisplayFormatAlpha("v1a.png");
-        puyoFaces[0][2] = IMG_Load_DisplayFormatAlpha("v1b.png");
-        puyoFaces[0][3] = IMG_Load_DisplayFormatAlpha("v1c.png");
-        puyoFaces[0][4] = IMG_Load_DisplayFormatAlpha("v1d.png");
-        puyoFaces[0][5] = IMG_Load_DisplayFormatAlpha("v2ab.png");
-        puyoFaces[0][6] = IMG_Load_DisplayFormatAlpha("v2ac.png");
-        puyoFaces[0][7] = IMG_Load_DisplayFormatAlpha("v2ad.png");
-        puyoFaces[0][8] = IMG_Load_DisplayFormatAlpha("v2bc.png");
-        puyoFaces[0][9] = IMG_Load_DisplayFormatAlpha("v2bd.png");
-        puyoFaces[0][10] = IMG_Load_DisplayFormatAlpha("v2cd.png");
-        puyoFaces[0][11] = IMG_Load_DisplayFormatAlpha("v3abc.png");
-        puyoFaces[0][12] = IMG_Load_DisplayFormatAlpha("v3abd.png");
-        puyoFaces[0][13] = IMG_Load_DisplayFormatAlpha("v3acd.png");
-        puyoFaces[0][14] = IMG_Load_DisplayFormatAlpha("v3bcd.png");
-        puyoFaces[0][15] = IMG_Load_DisplayFormatAlpha("v4abcd.png");
+        puyoFaces[0][0] = IIM_Load_DisplayFormatAlpha("v0.png");
+        puyoFaces[0][1] = IIM_Load_DisplayFormatAlpha("v1a.png");
+        puyoFaces[0][2] = IIM_Load_DisplayFormatAlpha("v1b.png");
+        puyoFaces[0][3] = IIM_Load_DisplayFormatAlpha("v1c.png");
+        puyoFaces[0][4] = IIM_Load_DisplayFormatAlpha("v1d.png");
+        puyoFaces[0][5] = IIM_Load_DisplayFormatAlpha("v2ab.png");
+        puyoFaces[0][6] = IIM_Load_DisplayFormatAlpha("v2ac.png");
+        puyoFaces[0][7] = IIM_Load_DisplayFormatAlpha("v2ad.png");
+        puyoFaces[0][8] = IIM_Load_DisplayFormatAlpha("v2bc.png");
+        puyoFaces[0][9] = IIM_Load_DisplayFormatAlpha("v2bd.png");
+        puyoFaces[0][10] = IIM_Load_DisplayFormatAlpha("v2cd.png");
+        puyoFaces[0][11] = IIM_Load_DisplayFormatAlpha("v3abc.png");
+        puyoFaces[0][12] = IIM_Load_DisplayFormatAlpha("v3abd.png");
+        puyoFaces[0][13] = IIM_Load_DisplayFormatAlpha("v3acd.png");
+        puyoFaces[0][14] = IIM_Load_DisplayFormatAlpha("v3bcd.png");
+        puyoFaces[0][15] = IIM_Load_DisplayFormatAlpha("v4abcd.png");
 		
-		live[0] = IMG_Load_DisplayFormatAlpha("0live.png");
-		live[1] = IMG_Load_DisplayFormatAlpha("1live.png");
-		live[2] = IMG_Load_DisplayFormatAlpha("2live.png");
-		live[3] = IMG_Load_DisplayFormatAlpha("3live.png");
+		live[0] = IIM_Load_DisplayFormatAlpha("0live.png");
+		live[1] = IIM_Load_DisplayFormatAlpha("1live.png");
+		live[2] = IIM_Load_DisplayFormatAlpha("2live.png");
+		live[3] = IIM_Load_DisplayFormatAlpha("3live.png");
 		
 		for (int i = 0 ; i < 16 ; i++) {
 			puyoFaces[1][i] = iim_surface_shift_hue(puyoFaces[0][i], 100);
@@ -879,7 +880,7 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
 			puyoFaces[4][i] = iim_surface_shift_hue(puyoFaces[0][i], 140);
 		}
 		
-		grid          = IMG_Load_DisplayFormatAlpha("grid.png");
+		grid          = IIM_Load_DisplayFormatAlpha("grid.png");
 		firstTime = false;
 	}
     
@@ -894,8 +895,8 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
 	
 	if (aiLeft) {
 		randomPlayer = new PuyoIA(aiType, aiLevel, attachedGameA);
-		perso[0] = IMG_Load_DisplayFormatAlpha("perso1_1.png");
-		perso[1] = IMG_Load_DisplayFormatAlpha("perso1_2.png");
+		perso[0] = IIM_Load_DisplayFormatAlpha("perso1_1.png");
+		perso[1] = IIM_Load_DisplayFormatAlpha("perso1_2.png");
 	}
 	else {
 		randomPlayer = 0;
@@ -1360,7 +1361,7 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
 	commander->hideGameOver();
 	if (randomPlayer) {
 		for (int i=0; i<NB_PERSO_STATE; ++i)
-			SDL_FreeSurface(perso[i]);
+			IIM_Free(perso[i]);
 	}
 	SDL_SetClipRect(display,NULL);
 }
@@ -1368,7 +1369,7 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
 void PuyoStarter::draw()
 {
 	if (stopRendering) {
-		SDL_BlitSurface(painter.gameScreen,NULL,display,NULL);
+		SDL_BlitSurface(painter.gameScreen->surf,NULL,display,NULL);
 	}
 	else {
 		SDL_Rect drect;
@@ -1407,7 +1408,7 @@ void PuyoStarter::draw()
 			painter.requestDraw(live[lives], &drect);
 		}
 		
-		painter.draw(painter.gameScreen);
+		painter.draw(painter.gameScreen->surf);
 	}
   char text[256];
   if (!randomPlayer)
@@ -1447,11 +1448,11 @@ void PuyoStarter::draw()
   drectBlack.y = 50;
   drectBlack.h = speedBlackRect.h;
   
-  SDL_BlitSurface(speedBlackImg,&speedBlackRect,display,&drectBlack);
+  SDL_BlitSurface(speedBlackImg->surf,&speedBlackRect,display,&drectBlack);
   if (stopRendering)
-    SDL_BlitSurface(speedBlackImg,&speedRect,display,&drect);
+    SDL_BlitSurface(speedBlackImg->surf,&speedRect,display,&drect);
   else
-    SDL_BlitSurface(speedImg,&speedRect,display,&drect);
+    SDL_BlitSurface(speedImg->surf,&speedRect,display,&drect);
 
   SoFont *fontBl = NULL;
   if ((blinkingPointsA % 2) == 0)

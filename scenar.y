@@ -3,6 +3,7 @@
 #include "glSDL.h"
 #include <string.h>
 #include "PuyoCommander.h"
+#include "IosImgProcess.h"
 #include "PuyoStory.h"
 #include "SDL_prim.h"
 #include "sofont.h"
@@ -11,8 +12,8 @@ int yylex(void);
 void yyerror(char *);
 extern int linenum;
 
-static SDL_Surface *first_layer = 0;
-static SDL_Surface *back_layer  = 0;
+static IIM_Surface *first_layer = 0;
+static IIM_Surface *back_layer  = 0;
 
 float dec_vectorx;
 float dec_vectory;
@@ -67,29 +68,29 @@ void draw_scenar()
       drect.y = (short)decy;
       drect.w = back_layer->w;
       drect.h = back_layer->h;
-      SDL_BlitSurface(back_layer,NULL,display,&drect);
+      SDL_BlitSurface(back_layer->surf,NULL,display,&drect);
       drect.x = (short)decx;
       drect.y = (short)decy - back_layer->h;
       drect.w = back_layer->w;
       drect.h = back_layer->h;
-      SDL_BlitSurface(back_layer,NULL,display,&drect);
+      SDL_BlitSurface(back_layer->surf,NULL,display,&drect);
       drect.x = (short)decx - back_layer->w;
       drect.y = (short)decy - back_layer->h;
       drect.w = back_layer->w;
       drect.h = back_layer->h;
-      SDL_BlitSurface(back_layer,NULL,display,&drect);
+      SDL_BlitSurface(back_layer->surf,NULL,display,&drect);
       drect.x = (short)decx;
       drect.y = (short)decy;
       drect.w = back_layer->w;
       drect.h = back_layer->h;
-      SDL_BlitSurface(back_layer,NULL,display,&drect);
+      SDL_BlitSurface(back_layer->surf,NULL,display,&drect);
   }
   if (first_layer) {
       drect.x = 0;
       drect.y = display->h - first_layer->h;
       drect.w = first_layer->w;
       drect.h = first_layer->h;
-      SDL_BlitSurface(first_layer,NULL,display,&drect);
+      SDL_BlitSurface(first_layer->surf,NULL,display,&drect);
   }
   if (txt_w>0) {
       SDL_fillCircle(display, txt_x, txt_y+txt_r, txt_r, 0xffffffff);
@@ -142,8 +143,8 @@ prologue: {
     linenum=1;
 };
 epilogue: {
-   if(first_layer) { SDL_FreeSurface(first_layer); first_layer=0; }
-   if(back_layer)  { SDL_FreeSurface(back_layer);  back_layer=0;  }
+   if(first_layer) { IIM_Free(first_layer); first_layer=0; }
+   if(back_layer)  { IIM_Free(back_layer);  back_layer=0;  }
 };
 
 instructions: instructions instruction
@@ -151,12 +152,12 @@ instructions: instructions instruction
 
 instruction:
         FOREGROUND STRING         {
-          if(first_layer) { SDL_FreeSurface(first_layer); first_layer=0; }
-          first_layer = IMG_Load_DisplayFormatAlpha($2);
+          if(first_layer) { IIM_Free(first_layer); first_layer=0; }
+          first_layer = IIM_Load_DisplayFormatAlpha($2);
         }
         |BACKGROUND STRING         {
-          if(back_layer)  { SDL_FreeSurface(back_layer);  back_layer=0;  }
-          back_layer = IMG_Load_DisplayFormatAlpha($2);
+          if(back_layer)  { IIM_Free(back_layer);  back_layer=0;  }
+          back_layer = IIM_Load_DisplayFormatAlpha($2);
         }
         |VECTOR INTEGER COMMA INTEGER {
           dec_vectorx = 0.01f * $2;
