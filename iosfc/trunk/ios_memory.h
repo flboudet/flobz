@@ -246,7 +246,7 @@ namespace ios_fc {
                 return buf;
             }
 
-            inline void concat(const Buffer<T> &buf) const {
+            inline void concat(const VoidBuffer &buf) const {
                 int ssize = size();
                 grow(buf.size());
                 Memory::memcpy(ptr() + ssize, buf.ptr(), buf.size());
