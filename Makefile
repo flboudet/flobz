@@ -208,7 +208,9 @@ install: flobopuyo
 	chmod a+rx ${INSTALL_BINDIR}/flobopuyo
 
 flobopuyo-static: prelude  ${OBJFILES}
-	@echo "[flobopuyo-static]" && g++ $(CFLAGS) -o flobopuyo-static ${OBJFILES} iosfc/*.o\
+	@make -C iosfc object
+	@make -C styrolyse object
+	@echo "[flobopuyo-static]" && g++ $(CFLAGS) -o flobopuyo-static ${OBJFILES} iosfc/*.o styrolyse/*.o styrolyse/goomsl/goomsl*.o \
         /sw/lib/libSDL_mixer.a /sw/lib/libSDL_net.a /sw/lib/libvorbisfile.a /sw/lib/libvorbis.a /sw/lib/libogg.a /sw/lib/libsmpeg.a /sw/lib/libSDL_image.a /sw/lib/libjpeg.a /sw/lib/libpng.a -lz `$(SDL_CONFIG) --static-libs`
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
