@@ -1,4 +1,13 @@
 <init>
+  float @PuyoAgitation = 8.0 # lower is less
+  float @GrandmaGoOut = 450.0
+  float @SaucerArrive = 250.0
+  float @SaucerLeave  = 650.0
+  float @HaloOn  = 350.0
+  float @HaloOff = 550.0
+
+  int   @activateHalo  = 0
+
   Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
   Display @dgrandma = [new_display: x=0.0 y=0.0 width=443.0  height=480.0]
 
@@ -6,6 +15,21 @@
   Sprite @bg      = [new_sprite_simple: image="story/bg_intro3.jpg" x=0.0 y=0.0]
   Sprite @saucer  = [new_sprite_simple: image="story/saucer.png" x=-150.0 y=165.0]
   Sprite @grandma = [new_sprite: image="story/grandma-frame1-small.png" x=483.0 y=320.0 curframe=0.0 framespeed=1.0 nbframes=2.0]
+  
+  # Halo of the saucer
+  Sprite @halo = [new_sprite: image="story/halo_frame1.png" x=640.0 y=480.0 curframe=0.0 framespeed=1.0 nbframes=2.0]
+
+  # Puyos
+  Sprite @vpuyo1 = [new_sprite: image="story/puyo-v-frame1.png" x=145.0 y=380.0 curframe=0.0 framespeed=1.0 nbframes=@PuyoAgitation]
+  Sprite @rpuyo1 = [new_sprite: image="story/puyo-r-frame1.png" x=175.0 y=382.0 curframe=1.0 framespeed=1.0 nbframes=@PuyoAgitation]
+  Sprite @gpuyo1 = [new_sprite: image="story/puyo-g-frame1.png" x=155.0 y=390.0 curframe=2.0 framespeed=1.0 nbframes=@PuyoAgitation]
+  Sprite @bpuyo1 = [new_sprite: image="story/puyo-b-frame1.png" x=187.0 y=393.0 curframe=3.0 framespeed=1.0 nbframes=@PuyoAgitation]
+  Sprite @ypuyo1 = [new_sprite: image="story/puyo-y-frame1.png" x=197.0 y=397.0 curframe=1.0 framespeed=1.0 nbframes=@PuyoAgitation]
+  Sprite @rpuyo2 = [new_sprite: image="story/puyo-r-frame1.png" x=135.0 y=400.0 curframe=0.0 framespeed=1.0 nbframes=@PuyoAgitation]
+  Sprite @vpuyo2 = [new_sprite: image="story/puyo-v-frame1.png" x=175.0 y=402.0 curframe=1.0 framespeed=1.0 nbframes=@PuyoAgitation]
+  Sprite @bpuyo2 = [new_sprite: image="story/puyo-b-frame1.png" x=117.0 y=406.0 curframe=2.0 framespeed=1.0 nbframes=@PuyoAgitation]
+  Sprite @gpuyo2 = [new_sprite: image="story/puyo-g-frame1.png" x=102.0 y=410.0 curframe=3.0 framespeed=1.0 nbframes=@PuyoAgitation]
+  Sprite @ypuyo2 = [new_sprite: image="story/puyo-y-frame1.png" x=177.0 y=415.0 curframe=2.0 framespeed=1.0 nbframes=@PuyoAgitation]
 
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
@@ -15,32 +39,82 @@
 
   sprite::@grandma display=@dgrandma
 
+  (@fcycle < @HaloOff)? for i in (@vpuyo1 @rpuyo1 @gpuyo1 @bpuyo1 @ypuyo1) do sprite::i display=@display
+  for i in (@rpuyo2 @vpuyo2 @bpuyo2 @gpuyo2 @ypuyo2) do sprite::i display=@display
+
+  (@activateHalo = 1)? sprite::@halo display=@display
+
+
+<green_puyo_update: Sprite &this>
+  &this.image = "story/puyo-g-frame1.png"
+  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "story/puyo-g-frame2.png"
+
+<red_puyo_update: Sprite &this>
+  &this.image = "story/puyo-r-frame1.png"
+  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "story/puyo-r-frame2.png"
+
+<violet_puyo_update: Sprite &this>
+  &this.image = "story/puyo-v-frame1.png"
+  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "story/puyo-v-frame2.png"
+
+<blue_puyo_update: Sprite &this>
+  &this.image = "story/puyo-b-frame1.png"
+  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "story/puyo-b-frame2.png"
+
+<yellow_puyo_update: Sprite &this>
+  &this.image = "story/puyo-y-frame1.png"
+  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "story/puyo-y-frame2.png"
+
+
 <update>
   # Update function: called every animation cycle
 
-  float GrandmaGoOut = 300.0
-  float SaucerArrive = 150.0
-  float SaucerLeave  = 600.0
-
   # Move the grandma
-  move::@grandma fcycle=GrandmaGoOut      x=483.0 y=320.0
-  move::@grandma fcycle=GrandmaGoOut+50.0 x=380.0 y=320.0
-  move::@grandma fcycle=GrandmaGoOut+75.0 x=340.0 y=350.0
+  move::@grandma fcycle=@GrandmaGoOut      x=483.0 y=320.0
+  move::@grandma fcycle=@GrandmaGoOut+50.0 x=380.0 y=320.0
+  move::@grandma fcycle=@GrandmaGoOut+75.0 x=340.0 y=350.0
 
   # Move the flying saucer
   float fx = -115.0
   float fy = -5.0
-  float fcycle = SaucerArrive
-  while fcycle < SaucerLeave do {
+  float fcycle = @SaucerArrive
+  while fcycle < @SaucerLeave do {
     move::@saucer fcycle=fcycle x=fx y=165.0+fy
     fcycle += 10.0
-    (fx < 150.0)? fx += 25.0
+    (fx < 120.0)? fx += 25.0
     fy = (0.0-fy) * 0.9
+  }
+
+  # Update the halo
+  @halo.pos.x = @saucer.pos.x - 26.0
+  @halo.pos.y = @saucer.pos.y + 31.0
+  (@fcycle >= @HaloOn)?  @activateHalo = 1
+  (@fcycle >= @HaloOff)? @activateHalo = 0
+
+  # Aspirate puyos when halo is on
+  (@activateHalo = 1)? {
+    Sprite i
+    for i in (@vpuyo1 @rpuyo1 @gpuyo1 @bpuyo1 @ypuyo1) do move::i fcycle=@HaloOff x=@halo.pos.x+74.0 y=@halo.pos.y
   }
 
   # Frames of grandma animation
   @grandma.image = "story/grandma-frame1-small.png"
   (@grandma.curframe >= 1.0)? @grandma.image = "story/grandma-frame2-small.png"
 
-  (@fcycle > 620.0)? @finished = 1
+  # Frames of halo animation
+  @halo.image = "story/halo_frame1.png"
+  (@halo.curframe >= 1.0)? @halo.image = "story/halo_frame2.png"
+
+  violet_puyo_update::@vpuyo1
+  violet_puyo_update::@vpuyo2
+  red_puyo_update::@rpuyo1
+  red_puyo_update::@rpuyo2
+  green_puyo_update::@gpuyo1
+  green_puyo_update::@gpuyo2
+  blue_puyo_update::@bpuyo1
+  blue_puyo_update::@bpuyo2
+  yellow_puyo_update::@ypuyo1
+  yellow_puyo_update::@ypuyo2
+
+  (@fcycle > 700.0)? @finished = 1
 
