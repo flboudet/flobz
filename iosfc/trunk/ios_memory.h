@@ -45,6 +45,9 @@
 
 namespace ios_fc {
 
+    /**
+     * Overide memory management methods to allow easy debugging.
+     */
     class Memory {
 		public:
 #ifdef DEBUG_MEMORY
@@ -62,6 +65,9 @@ namespace ios_fc {
 #endif
     };
 
+    /**
+     * simulate a (void*) pointer. provide garbage collection!
+     */
     class VoidBuffer {
 
         protected:
@@ -89,23 +95,26 @@ namespace ios_fc {
 
         public:
 
+            /**
+             * Build a VoidBuffer with initial size.
+             */
             inline VoidBuffer (int size = 0) : offset(0) {
                 init_ptr(size);
             }
 
+            /**
+             * Build a VoidBuffer by duplicating an existing one.
+             */
             inline VoidBuffer (const VoidBuffer &buf)
                 : p(buf.p),offset(0)
-			{
+            {
               init_ptr(buf.size());
               Memory::memcpy(ptr(), buf.ptr(), size());
             }
 
-            inline VoidBuffer (VoidBuffer &buf,int offset=0)
-                : p(buf.p),offset(buf.offset + offset)
-			{
-                ++ p->nb;
-            }
-
+            /**
+             * Build a VoidBuffer from an non-ios_fc buffer.
+             */
             inline VoidBuffer (const void *data,int len) : offset(0) {
                 init_ptr (len);
                 Memory::memcpy (p->ptr,data,len);
@@ -144,16 +153,28 @@ namespace ios_fc {
                 VoidBuffer::realloc(VoidBuffer::size() - size);}
 
             inline operator void* () const {return ptr();}
+
             template <typename T>
             inline operator T*    () const {return (T*)ptr();}
 
-            inline const VoidBuffer operator +  (int offset) const {
-                return VoidBuffer(*this,offset);
+            inline const VoidBuffer &operator -= (int offset) {
+                this->offset-=offset;
+                return *this;
+            }
+            inline const VoidBuffer operator -  (int offset) const {
+                VoidBuffer buf(*this);
+                buf -= offset;
+                return buf;
             }
 
             inline const VoidBuffer &operator += (int offset) {
                 this->offset+=offset;
-				return *this;
+                return *this;
+            }
+            inline const VoidBuffer operator +  (int offset) const {
+                VoidBuffer buf(*this);
+                buf += offset;
+                return buf;
             }
 
             inline int getOffset() const { return offset; }
@@ -167,6 +188,14 @@ namespace ios_fc {
         private:
             Ptr *p;
             int offset;
+
+            inline VoidBuffer (VoidBuffer &buf, int offset) {
+              printf ("DO NOT USE THIS (%s::%d)\n", __FILE__, __LINE__);
+            }
+
+            inline VoidBuffer (const VoidBuffer &buf, int offset) {
+              printf ("DO NOT USE THIS (%s::%d)\n", __FILE__, __LINE__);
+            }
     };
 
 	// DO NOT STORE OBJECT IN BUFFER, just pointers or primitive types.
@@ -179,8 +208,7 @@ namespace ios_fc {
             inline Buffer (const VoidBuffer &buf) : VoidBuffer(buf) {}
             inline Buffer (      VoidBuffer &buf) : VoidBuffer(buf) {}
             inline Buffer (const Buffer<T>&buf)   : VoidBuffer(buf) {}
-            inline Buffer (      Buffer<T>&buf,int offset = 0)
-              : VoidBuffer(buf,offset) {}
+            inline Buffer (      Buffer<T>&buf)   : VoidBuffer(buf) {}
 
             inline const Buffer<T> operator=(const Buffer<T>&buf) {
               VoidBuffer::operator=(buf);
@@ -208,10 +236,24 @@ namespace ios_fc {
             inline int size() const {return VoidBuffer::size() / sizeof(T);}
 
             inline operator T* () const {return ptr();}
-            inline const Buffer<T>  operator +  (int offset) const {return Buffer<T>(*this,offset);}
+            inline const Buffer<T>& operator -= (int offset) {
+				VoidBuffer::operator-=(offset*sizeof(T));
+				return *this;
+            }
+            inline const Buffer<T>  operator -  (int offset) const {
+                Buffer<T> buf(*this);
+                buf -= offset;
+                return buf;
+            }
+
             inline const Buffer<T>& operator += (int offset) {
 				VoidBuffer::operator+=(offset*sizeof(T));
 				return *this;
+            }
+            inline const Buffer<T>  operator +  (int offset) const {
+                Buffer<T> buf(*this);
+                buf += offset;
+                return buf;
             }
 
 #ifdef DEBUG_MEMORY
@@ -223,6 +265,16 @@ namespace ios_fc {
 #endif
 			inline T  get(int i) const          {return this->operator[](i);}
 			inline T &get(int i)                {return this->operator[](i);}
+
+        private:
+            /* deprecated */
+            inline Buffer (      Buffer<T>&buf,int offset) {
+              printf ("DO NOT USE THIS (%s::%d)\n", __FILE__, __LINE__);
+            }
+            inline Buffer (const Buffer<T>&buf,int offset) {
+              *(char*)0=0;
+              printf ("DO NOT USE THIS (%s::%d)\n", __FILE__, __LINE__);
+            }
     };
 
 	// DO NOT STORE OBJECT IN BUFFER, just pointers or primitive types.
