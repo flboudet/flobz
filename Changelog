@@ -1,4 +1,9 @@
 Since version 0.13:
+
+Abstract:
+GUI and in-game animations improvement, a new sound track and many interresting additions make this new release far more polished than the previous one.
+
+Detail:
 - Improved game control settings
 - Added key repetition
 - Made the "main puyo" more visible by blinking
