@@ -43,7 +43,6 @@ void PuyoNetworkStarter::run(int score1, int score2, int lives, int point1, int 
     message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameStart);
     message->addString  (PuyoMessage::NAME,   p1name);
     message->send();
-    delete message;
     
     while ((!netgame_started) && (!gameAborted)) {
         SDL_Event event;
@@ -53,6 +52,8 @@ void PuyoNetworkStarter::run(int score1, int score2, int lives, int point1, int 
         commander->updateAll(this);
     }
     if (!gameAborted)
+        message->send();
+        delete message;
         PuyoStarter::run(score1, score2, lives, point1, point2);
 }
 
