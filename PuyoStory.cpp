@@ -84,6 +84,11 @@ PuyoStory::PuyoStory(PuyoCommander *com, int num) : num(num), commander(com)
 {
     char scriptPath[1024];
     sprintf(scriptPath, "%s/story/story%d.gsl",dataFolder, num);
+    FILE *test = fopen(scriptPath, "r");
+    if (test == NULL) {
+        sprintf(scriptPath, "%s/story/storyz.gsl",dataFolder);
+    }
+    else fclose(test);
     currentStory = styrolyse_new(scriptPath, client_new());
     sstory = createStorySurface();
 }
