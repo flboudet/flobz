@@ -1,3 +1,28 @@
+/* FloboPuyo
+ * Copyright (C) 2004
+ *   Florent Boudet        <flobo@ios-software.com>,
+ *   Jean-Christophe Hoelt <jeko@ios-software.com>,
+ *   Guillaume Borios      <gyom@ios-software.com>
+ *
+ * iOS Software <http://www.ios-software.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ *
+ */
+
 #include "IosVector.h"
 
 #ifdef _WIN32
@@ -90,146 +115,148 @@ public:
 
 class PuyoGame {
 public:
-  virtual ~PuyoGame() {}
-  virtual void setDelegate(PuyoDelegate *delegate) = 0;
-  virtual void cycle() = 0;
-/*  
-  // Get the state of the puyo at the indicated coordinates
-  PuyoState getPuyoCellAt(int X, int Y) const;
-  */
-  // Get the puyo at the indicated coordinates
-  virtual PuyoPuyo *getPuyoAt(int X, int Y) const = 0;
-  
-  // List access to the PuyoPuyo objects
-  virtual int getPuyoCount() const = 0;
-  virtual PuyoPuyo *getPuyoAtIndex(int index) const = 0;
-  
-  virtual void moveLeft() = 0;
-  virtual void moveRight() = 0;
-  virtual void rotate(bool left) = 0;
-  virtual void rotateLeft() = 0;
-  virtual void rotateRight() = 0;
-  
-  virtual PuyoState getNextFalling() = 0;
-  virtual PuyoState getNextCompanion() = 0;
-  
-  virtual PuyoState getCompanionState() const = 0;
-  virtual PuyoState getFallingState() const = 0;
-  virtual int getFallingX() const = 0;
-  virtual int getFallingY() const = 0;
-/*
-  int getCompanionX() const { return companionPuyo->getPuyoX(); }
-  int getCompanionY() const { return companionPuyo->getPuyoY(); }
-  int getFallingCompanionX() const;
-  int getFallingCompanionY() const;
-  */
-  virtual int getFallingCompanionDir() const = 0;
-  virtual PuyoPuyo *getFallingPuyo() const = 0;
-
-  virtual void increaseNeutralPuyos(int incr) = 0;
-  virtual int getNeutralPuyos() const = 0;
-  virtual void dropNeutrals() = 0;
-  virtual bool isGameRunning() const = 0;
-  virtual bool isEndOfCycle() const = 0;
-  virtual int getColumnHeigth(int colNum) const = 0;
-  virtual int getMaxColumnHeight() const = 0;
-  virtual int getSamePuyoAround(int X, int Y, PuyoState color) = 0;
-  virtual int getSemiMove() const = 0;
-  
-  virtual int getPoints() const = 0;
-  int points;
+    PuyoGame(PuyoFactory *attachedFactory);
+    PuyoGame();
+    virtual ~PuyoGame() {}
+    virtual void setDelegate(PuyoDelegate *delegate);
+    virtual void cycle() = 0;
+    /*  
+        // Get the state of the puyo at the indicated coordinates
+        PuyoState getPuyoCellAt(int X, int Y) const;
+    */
+    // Get the puyo at the indicated coordinates
+    virtual PuyoPuyo *getPuyoAt(int X, int Y) const = 0;
+    
+    // List access to the PuyoPuyo objects
+    virtual int getPuyoCount() const = 0;
+    virtual PuyoPuyo *getPuyoAtIndex(int index) const = 0;
+    
+    virtual void moveLeft() {}
+    virtual void moveRight() {}
+    virtual void rotate(bool left) {}
+    virtual void rotateLeft() {}
+    virtual void rotateRight() {}
+    
+    virtual PuyoState getNextFalling() = 0;
+    virtual PuyoState getNextCompanion() = 0;
+    
+    virtual PuyoState getCompanionState() const = 0;
+    virtual PuyoState getFallingState() const = 0;
+    virtual int getFallingX() const = 0;
+    virtual int getFallingY() const = 0;
+    /*
+        int getCompanionX() const { return companionPuyo->getPuyoX(); }
+     int getCompanionY() const { return companionPuyo->getPuyoY(); }
+     int getFallingCompanionX() const;
+     int getFallingCompanionY() const;
+     */
+    virtual int getFallingCompanionDir() const = 0;
+    virtual PuyoPuyo *getFallingPuyo() const = 0;
+    
+    virtual void increaseNeutralPuyos(int incr) = 0;
+    virtual int getNeutralPuyos() const = 0;
+    virtual void dropNeutrals() = 0;
+    virtual bool isGameRunning() const = 0;
+    virtual bool isEndOfCycle() const = 0;
+    virtual int getColumnHeigth(int colNum) const = 0;
+    virtual int getMaxColumnHeight() const = 0;
+    virtual int getSamePuyoAround(int X, int Y, PuyoState color) = 0;
+    virtual int getSemiMove() const = 0;
+    
+    virtual int getPoints() const = 0;
+    int points;
+protected:
+    PuyoDelegate *delegate;
+    PuyoFactory *attachedFactory;
 };
 
 class PuyoLocalGame : public PuyoGame {
 public:
-  PuyoLocalGame(PuyoRandomSystem *attachedRandom, PuyoFactory *attachedFactory);
-  PuyoLocalGame(PuyoRandomSystem *attachedRandom);
-  virtual ~PuyoLocalGame();
-  void setDelegate(PuyoDelegate *delegate);
-  void cycle();
-  
-  // Get the state of the puyo at the indicated coordinates
-  PuyoState getPuyoCellAt(int X, int Y) const;
-  // Get the puyo at the indicated coordinates
-  PuyoPuyo *getPuyoAt(int X, int Y) const;
-  
-  // List access to the PuyoPuyo objects
-  int getPuyoCount() const;
-  PuyoPuyo *getPuyoAtIndex(int index) const;
-  
-  void moveLeft();
-  void moveRight();
-  void rotate(bool left);
-  void rotateLeft();
-  void rotateRight();
-  PuyoState getNextFalling();
-  PuyoState getNextCompanion();
-  PuyoState getCompanionState() const { return companionPuyo->getPuyoState(); }
-  PuyoState getFallingState() const { return fallingPuyo->getPuyoState(); }
-
-  int getFallingX() const { return fallingPuyo->getPuyoX(); }
-  int getFallingY() const { return fallingPuyo->getPuyoY(); }
-  int getCompanionX() const { return companionPuyo->getPuyoX(); }
-  int getCompanionY() const { return companionPuyo->getPuyoY(); }
-  int getFallingCompanionX() const;
-  int getFallingCompanionY() const;
-  int getFallingCompanionDir() const { return fallingCompanion; }
-  PuyoPuyo *getFallingPuyo() const { return fallingPuyo; }
-
-  void increaseNeutralPuyos(int incr);
-  int getNeutralPuyos() const;
-  void dropNeutrals();
-  bool isGameRunning() const { return gameRunning; }
-  bool isEndOfCycle() const { return endOfCycle; }
-  int getColumnHeigth(int colNum) const;
-  int getMaxColumnHeight() const;
-  int getSamePuyoAround(int X, int Y, PuyoState color);
-
-  int getSemiMove() const { return semiMove; }
-  int getPoints() const { return points; }
-
- private:
-  void InitGame(PuyoRandomSystem *attachedRandom);
-  // Set the state of the puyo at the indicated coordinates (not recommanded)
-  void setPuyoCellAt(int X, int Y, PuyoState value);
-  // Set the puyo at the indicated coordinates
-  void setPuyoAt(int X, int Y, PuyoPuyo *newPuyo);
-  
-  void setFallingAtTop(bool gameConstruction = false);
-  int getFallY(int X, int Y) const;
-  void cycleEnding();
-  void markPuyoAt(int X, int Y, PuyoState color, bool includeNeutral);
-  void deleteMarkedPuyosAt(int X, int Y);
-  int removePuyos();
-  void notifyReductions();
-  
-  bool gameRunning;
-  bool endOfCycle;
-  
-  // The falling is the puyo you couldn't control,
-  // whereas you can make the companion turn around the falling puyo
-  PuyoPuyo *fallingPuyo, *companionPuyo;
-  int fallingX, fallingY;
-  
-  // Position of the companion is relative of the falling puyo
-  // 0 = up 1 = left 2 = down 3 = up
-  unsigned char fallingCompanion;
-  
-  PuyoPuyo *puyoCells[PUYODIMX * (PUYODIMY+1)];
-  PuyoRandomSystem *attachedRandom;
-  int sequenceNr;
-  int neutralPuyos;
-  PuyoDelegate *delegate;
-  PuyoFactory *attachedFactory;
-  int phase;
-  int semiMove;
-  
-  // This is not really a puyo, it is instead an indicator for the edges of the game
-  PuyoPuyo *unmoveablePuyo;
-  
-  // We are keeping a list of current puyos
-  IosVector puyoVector;
-  int nbFalled;
+    PuyoLocalGame(PuyoRandomSystem *attachedRandom, PuyoFactory *attachedFactory);
+    PuyoLocalGame(PuyoRandomSystem *attachedRandom);
+    virtual ~PuyoLocalGame();
+    void cycle();
+    
+    // Get the state of the puyo at the indicated coordinates
+    PuyoState getPuyoCellAt(int X, int Y) const;
+    // Get the puyo at the indicated coordinates
+    PuyoPuyo *getPuyoAt(int X, int Y) const;
+    
+    // List access to the PuyoPuyo objects
+    int getPuyoCount() const;
+    PuyoPuyo *getPuyoAtIndex(int index) const;
+    
+    void moveLeft();
+    void moveRight();
+    void rotate(bool left);
+    void rotateLeft();
+    void rotateRight();
+    PuyoState getNextFalling();
+    PuyoState getNextCompanion();
+    PuyoState getCompanionState() const { return companionPuyo->getPuyoState(); }
+    PuyoState getFallingState() const { return fallingPuyo->getPuyoState(); }
+    
+    int getFallingX() const { return fallingPuyo->getPuyoX(); }
+    int getFallingY() const { return fallingPuyo->getPuyoY(); }
+    int getCompanionX() const { return companionPuyo->getPuyoX(); }
+    int getCompanionY() const { return companionPuyo->getPuyoY(); }
+    int getFallingCompanionX() const;
+    int getFallingCompanionY() const;
+    int getFallingCompanionDir() const { return fallingCompanion; }
+    PuyoPuyo *getFallingPuyo() const { return fallingPuyo; }
+    
+    void increaseNeutralPuyos(int incr);
+    int getNeutralPuyos() const;
+    void dropNeutrals();
+    bool isGameRunning() const { return gameRunning; }
+    bool isEndOfCycle() const { return endOfCycle; }
+    int getColumnHeigth(int colNum) const;
+    int getMaxColumnHeight() const;
+    int getSamePuyoAround(int X, int Y, PuyoState color);
+    
+    int getSemiMove() const { return semiMove; }
+    int getPoints() const { return points; }
+    
+private:
+    void InitGame(PuyoRandomSystem *attachedRandom);
+    // Set the state of the puyo at the indicated coordinates (not recommanded)
+    void setPuyoCellAt(int X, int Y, PuyoState value);
+    // Set the puyo at the indicated coordinates
+    void setPuyoAt(int X, int Y, PuyoPuyo *newPuyo);
+    
+    void setFallingAtTop(bool gameConstruction = false);
+    int getFallY(int X, int Y) const;
+    void cycleEnding();
+    void markPuyoAt(int X, int Y, PuyoState color, bool includeNeutral);
+    void deleteMarkedPuyosAt(int X, int Y);
+    int removePuyos();
+    void notifyReductions();
+    
+    bool gameRunning;
+    bool endOfCycle;
+    
+    // The falling is the puyo you couldn't control,
+    // whereas you can make the companion turn around the falling puyo
+    PuyoPuyo *fallingPuyo, *companionPuyo;
+    int fallingX, fallingY;
+    
+    // Position of the companion is relative of the falling puyo
+    // 0 = up 1 = left 2 = down 3 = up
+    unsigned char fallingCompanion;
+    
+    PuyoPuyo *puyoCells[PUYODIMX * (PUYODIMY+1)];
+    PuyoRandomSystem *attachedRandom;
+    int sequenceNr;
+    int neutralPuyos;
+    int phase;
+    int semiMove;
+    
+    // This is not really a puyo, it is instead an indicator for the edges of the game
+    PuyoPuyo *unmoveablePuyo;
+    
+    // We are keeping a list of current puyos
+    IosVector puyoVector;
+    int nbFalled;
 };
 
 #endif // PUYOGAME_H

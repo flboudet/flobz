@@ -96,16 +96,32 @@ void PuyoPuyo::setPuyoXY(int X, int Y)
   }
 }
 
-PuyoLocalGame::PuyoLocalGame(PuyoRandomSystem *attachedRandom,
-		   PuyoFactory *attachedFactory)
+// PuyoGame implementation
+PuyoGame::PuyoGame()
 {
-  this->attachedFactory = attachedFactory;
+    attachedFactory = new PuyoDefaultFactory();
+    delegate = NULL;
+}
+
+PuyoGame::PuyoGame(PuyoFactory *attachedFactory) : attachedFactory(attachedFactory)
+{
+    delegate = NULL;
+}
+
+void PuyoGame::setDelegate(PuyoDelegate *delegate)
+{
+	this->delegate = delegate;
+}
+
+// PuyoLocalGame implementation
+PuyoLocalGame::PuyoLocalGame(PuyoRandomSystem *attachedRandom,
+		   PuyoFactory *attachedFactory) : PuyoGame(attachedFactory)
+{
   InitGame(attachedRandom);
 }
 
-PuyoLocalGame::PuyoLocalGame(PuyoRandomSystem *attachedRandom)
+PuyoLocalGame::PuyoLocalGame(PuyoRandomSystem *attachedRandom) : PuyoGame()
 {
-  attachedFactory = new PuyoDefaultFactory();
   InitGame(attachedRandom);
 }
 
@@ -126,8 +142,8 @@ void PuyoLocalGame::InitGame(PuyoRandomSystem *attachedRandom)
 	sequenceNr = 0;
     semiMove = 0;
 	neutralPuyos = 0;
-	delegate = NULL;
-        endOfCycle = false;
+	
+    endOfCycle = false;
 	gameRunning = true;
 	setFallingAtTop(true);
   points = 0;
@@ -136,11 +152,6 @@ void PuyoLocalGame::InitGame(PuyoRandomSystem *attachedRandom)
 PuyoLocalGame::~PuyoLocalGame()
 {
     delete unmoveablePuyo;
-}
-
-void PuyoLocalGame::setDelegate(PuyoDelegate *delegate)
-{
-	this->delegate = delegate;
 }
 
 void PuyoLocalGame::cycle()

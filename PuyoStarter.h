@@ -25,6 +25,7 @@ private:
     PuyoGame *attachedGameA, *attachedGameB;
     PuyoIA *randomPlayer;
     PuyoGameFactory *attachedGameFactory;
+    PuyoGameFactory *attachedNetworkGameFactory;
     PuyoRandomSystem attachedRandom;
     int tickCounts;
     int lives;

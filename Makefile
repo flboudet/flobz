@@ -57,7 +57,8 @@ HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h\
         PuyoGame.h PuyoAnimations.h AnimatedPuyo.h PuyoIA.h PuyoPlayer.h     \
         PuyoStory.h PuyoView.h SDL_prim.h audio.h menu.h menuitems.h         \
         preferences.h scrollingtext.h sofont.h SDL_Painter.h PuyoVersion.h   \
-        InputManager.h GameControls.h HiScores.h IosImgProcess.h PuyoStarter.h
+        InputManager.h GameControls.h HiScores.h  PuyoNetworkView.h          \
+        IosImgProcess.h PuyoStarter.h PuyoNetworkGame.h
 
 
 OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o        \
@@ -66,7 +67,7 @@ OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o        \
           menu.o menuitems.o audio.o scrollingtext.o preferences.o           \
           PuyoStory.o SDL_Painter.o InputManager.o GameControls.o            \
           PuyoDoomMelt.o IosImgProcess.o corona32.o corona.o corona_palette.o\
-	  PuyoStarter.o PuyoNetworkView.o
+	  PuyoStarter.o PuyoNetworkView.o PuyoNetworkGame.o
 
 
 ################
