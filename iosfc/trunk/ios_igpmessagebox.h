@@ -25,6 +25,7 @@
 
 #include "ios_messagebox.h"
 #include "ios_igpclient.h"
+#include "ios_dirigeable.h"
 
 namespace ios_fc {
 
@@ -40,6 +41,7 @@ public:
     void sendBuffer(VoidBuffer out, bool reliable, int igpDestIdent);
     void onMessage(VoidBuffer message, int origIdent, int destIdent);
     void bind(int igpIdent) { destIdent = igpIdent; }
+    void bind(PeerAddress addr); // a revoir
  private:
     IGPClient igpClient;
     int sendSerialID;
