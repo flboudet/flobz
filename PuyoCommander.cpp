@@ -44,13 +44,17 @@ class MainMenu : public PuyoScreen {
     }
 };
 
-
-void SinglePlayerGame::action() {
+/**
+ * Launches a single player game
+ */
+void SinglePlayerGame::action()
+{
   PuyoStarter *starter = new PuyoSinglePlayerStarter(theCommander, 5, FLOBO, 0);
   theCommander->mainMenu->remove();
   theCommander->loop->add(starter);
   starter->run(0,0,0,0,0);
   theCommander->loop->add(theCommander->mainMenu);
+  starter->kill();
 }
 
 void PuyoCommander::run()

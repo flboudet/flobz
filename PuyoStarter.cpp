@@ -706,7 +706,7 @@ void PuyoStarter::run(int _score1, int _score2, int lives, int point1, int point
                       default:
                         break;
                     }
-                } // !Paused
+                } // Game is paused
                     else {
                         GameControlEvent controlEvent;
                         getControlEvent(event, &controlEvent);
@@ -740,6 +740,7 @@ void PuyoStarter::run(int _score1, int _score2, int lives, int point1, int point
                     }
             } else // Not GameIsRunning
             {
+              quit = 1;
               /*
                 if (randomPlayer) {
                     if (rightPlayerWin()) {
