@@ -67,7 +67,7 @@ void UdpPuncherClient::onMessage(Message &message)
                     Dirigeable *dirPeerMsg2 = dynamic_cast<Dirigeable *>(peerMsg2);
                     peerMsg2->addString("CONNERIE", "Salut le monde local!");
                     peerMsg2->addInt("TYPE", 2);
-                    dirPeerMsg2->setPeerAddress(peerAddress);
+                    dirPeerMsg2->setPeerAddress(localPeerAddress);
                     peerMsg2->send();
                     delete peerMsg2;
                     mbox->idle();
