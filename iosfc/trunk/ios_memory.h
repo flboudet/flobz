@@ -110,10 +110,16 @@ namespace ios_fc {
              * @param buf Buffer to duplicate.
              */
             inline VoidBuffer (const VoidBuffer &buf)
-                : p(buf.p),offset(0)
+                : offset(0)
             {
               init_ptr(buf.size());
               Memory::memcpy(ptr(), buf.ptr(), size());
+            }
+            
+            inline VoidBuffer (VoidBuffer &buf)
+                : p(buf.p), offset(0)
+            {
+                p->nb ++;
             }
 
             /**
@@ -226,7 +232,7 @@ namespace ios_fc {
                 this->offset+=offset;
                 return *this;
             }
-            inline const VoidBuffer operator +  (int offset) const {
+            inline const VoidBuffer operator + (int offset) const {
                 VoidBuffer buf(*this);
                 buf += offset;
                 return buf;
