@@ -7,6 +7,9 @@
 #include "audio.h"
 #include "IosImgProcess.h"
 
+#include "SDL_Painter.h"
+SDL_Painter painter;
+
 SDL_Surface *display, *background, *fallingBlue, *fallingRed, *fallingGreen, *fallingViolet, *fallingYellow, *neutral;
 SDL_Surface *bigNeutral;
 SDL_Surface *shrinkingPuyo[5][5];
@@ -14,10 +17,10 @@ SDL_Surface *explodingPuyo[5][5];
 SDL_Surface *grid;
 SDL_Surface *puyoEyes;
 SDL_Surface *puyoEye[3];
-SDL_Rect recList[4];
 
 SDL_Surface *puyoShadow;
 SDL_Surface *puyoFaces[5][16];
+
 static char PuyoGroupImageIndex[2][2][2][2] =
 { {  // empty bottom
     {  // empty right
@@ -65,62 +68,6 @@ static char PuyoGroupImageIndex[2][2][2][2] =
   }
 };
 
-class SDL_Painter {
-      struct DrawElt {
-          SDL_Surface *surf;
-          SDL_Rect     rect;
-      };
-  public:
-      
-      SDL_Painter(SDL_Surface *gameScreen = NULL, SDL_Surface *bg = NULL)
-            : gameScreen(gameScreen), backGround(bg), nbElts(0), nbPrev(0) {}
-
-      void requestDraw(SDL_Surface *surf, SDL_Rect *where)
-      {
-          DrawElt elt;
-          elt.surf = surf;
-          elt.rect = *where;
-          onScreenElts[nbElts++] = elt;
-      }
-      
-      void performDraw()
-      {
-          // Draw what is necessary...
-          
-          // Remember what is on screen...
-          nbPrev = nbElts;
-          while(nbElts--)
-              onScreenPrev[nbElts] = onScreenElts[nbElts];
-      }
-      
-      void redrawAll()
-      {
-          // Draw everything.
-          SDL_BlitSurface(backGround, NULL, gameScreen, NULL);
-          for (int i=0; i<nbElts; ++i) {
-              SDL_BlitSurface(onScreenElts[i].surf, &onScreenElts[i].rect,
-                              gameScreen, NULL);
-          }
-          
-          // Remember what is on screen...
-          nbPrev = nbElts;
-          while(nbElts--)
-              onScreenPrev[nbElts] = onScreenElts[nbElts];
-      }    
-
-      SDL_Surface *backGround;
-      SDL_Surface *gameScreen;
-
-  private:
-      int nbElts;
-      int nbPrev;
-      DrawElt onScreenElts[0x800];
-      DrawElt onScreenPrev[0x800];
-};    
-
-SDL_Painter painter;
-
-
 static const int NB_PERSO_STATE = 2;
 SDL_Surface *perso[2];
 int currentPerso = 0;
@@ -156,7 +103,7 @@ void NeutralAnimation::draw(int semiMove)
 	drect.y = currentY;
 	drect.w = neutral->w;
 	drect.h = neutral->h;
-	SDL_BlitSurface(neutral, NULL, display, &drect);
+  painter.requestDraw(neutral, &drect);
 }
 
 class TurningAnimation : public PuyoAnimation {
@@ -218,22 +165,22 @@ public:
             case 0:
                 drect.x = (short)(X - offsetB);
                 drect.y += (short)(Y + offsetA - TSIZE);
-                SDL_BlitSurface(targetSurface, NULL, display, &drect);
+                painter.requestDraw(targetSurface, &drect);
                 break;
             case 1:
                 drect.x = (short)(X - offsetA + TSIZE);
                 drect.y += (short)(Y - offsetB);
-                SDL_BlitSurface(targetSurface, NULL, display, &drect);
+                painter.requestDraw(targetSurface, &drect);
                 break;
             case 2:
                 drect.x = (short)(X + offsetB);
                 drect.y += (short)(Y - offsetA + TSIZE);
-                SDL_BlitSurface(targetSurface, NULL, display, &drect);
+                painter.requestDraw(targetSurface, &drect);
                 break;
             case 3:
                 drect.x = (short)(X + offsetA - TSIZE);
                 drect.y += (short)(Y + offsetB);
-                SDL_BlitSurface(targetSurface, NULL, display, &drect);
+                painter.requestDraw(targetSurface, &drect);
                 break;
                 
             case -3:
@@ -241,9 +188,6 @@ public:
                 drect.y += (short)(Y + offsetA - TSIZE);
                 break;
         }
-                
-
-        //SDL_BlitSurface(targetSurface, NULL, display, &drect);
     }
 private:
     PuyoPuyo *companionPuyo;
@@ -256,7 +200,6 @@ private:
 };
 
 static const int BOUNCING_OFFSET_NUM = 12;
-//static const int BOUNCING_OFFSET[] = { -1, -2, -1,  0, -3,-5, -3,  0,  -5, -9, -5, 0 };
 static const int BOUNCING_OFFSET[] = { -1, -3, -5, -4, -2, 0, -6, -9, -11, -9, -6, 0 };
 
 class FallingAnimation : public PuyoAnimation {
@@ -273,10 +216,6 @@ public:
 		bouncing = BOUNCING_OFFSET_NUM - 1;
 		if (originY == puyo->getPuyoY()) {
 			bouncing = -1;
-			//int color = puyo->getPuyoState();
-			//if (color > PUYO_EMPTY)
-			//	color -= PUYO_BLUE;
-			//puyoFace = shrinkingPuyo[1][color];
 		}
     }
     void cycle()
@@ -305,8 +244,8 @@ public:
                 // drect.y = -semiMove() * TSIZE / 2;
                 drect.w = puyoFace->w;
                 drect.h = puyoFace->h;
-                SDL_BlitSurface(puyoFace, NULL, display, &drect);
-                SDL_BlitSurface(puyoEyes, NULL, display, &drect);
+                painter.requestDraw(puyoFace, &drect);
+                painter.requestDraw(puyoEyes, &drect);
         }
     }
 private:
@@ -346,8 +285,8 @@ public:
                 drect.y = Y;
                 drect.w = puyoFace->w;
                 drect.h = puyoFace->h;
-                SDL_BlitSurface(puyoFace, NULL, display, &drect);
-                SDL_BlitSurface(puyoEyes, NULL, display, &drect);
+                painter.requestDraw(puyoFace, &drect);
+                painter.requestDraw(puyoEyes, &drect);
             }
         }
         else {
@@ -360,22 +299,22 @@ public:
                 int iter2 = iter - 10;
                 int shrinkingImage = (iter - 10) / 4;
                 if (shrinkingImage < 4) {
-                    SDL_BlitSurface(shrinkingPuyo[shrinkingImage][color], NULL, display, &drect);
+                    painter.requestDraw(shrinkingPuyo[shrinkingImage][color], &drect);
                     int xrectY = Y + (int)(2.5 * pow(iter - 16, 2) - 108);
                     xrect.w = explodingPuyo[shrinkingImage][color]->w;
                     xrect.h = explodingPuyo[shrinkingImage][color]->h;
                     xrect.x = X - iter2 * iter2;
                     xrect.y = xrectY;
-                    SDL_BlitSurface(explodingPuyo[shrinkingImage][color], NULL, display, &xrect);
+                    painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
                     xrect.x = X - iter2;
                     xrect.y = xrectY + iter2;
-                    SDL_BlitSurface(explodingPuyo[shrinkingImage][color], NULL, display, &xrect);
+                    painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
                     xrect.x = X + iter2;
                     xrect.y = xrectY + iter2;
-                    SDL_BlitSurface(explodingPuyo[shrinkingImage][color], NULL, display, &xrect);
+                    painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
                     xrect.x = X + iter2 * iter2;
                     xrect.y = xrectY;
-                    SDL_BlitSurface(explodingPuyo[shrinkingImage][color], NULL, display, &xrect);
+                    painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
                 }
             }
         }
@@ -490,18 +429,18 @@ void PuyoView::render(PuyoPuyo *puyo)
                 drect.y -= attachedGame->getSemiMove() * TSIZE / 2;
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;
-            SDL_BlitSurface(currentSurface, NULL, display, &drect);
+            painter.requestDraw(currentSurface, &drect);
             
             while (puyoEyeState[i][j] >= 750) puyoEyeState[i][j] -= 750;
             int eyePhase = puyoEyeState[i][j];
             if (eyePhase < 5) 
-                SDL_BlitSurface(puyoEye[1], NULL, display, &drect);
+                painter.requestDraw(puyoEye[1], &drect);
             else if (eyePhase < 15) 
-                SDL_BlitSurface(puyoEye[2], NULL, display, &drect);
+                painter.requestDraw(puyoEye[2], &drect);
             else if (eyePhase < 20) 
-                SDL_BlitSurface(puyoEye[1], NULL, display, &drect);
+                painter.requestDraw(puyoEye[1], &drect);
             else
-                SDL_BlitSurface(puyoEye[0], NULL, display, &drect);
+                painter.requestDraw(puyoEye[0], &drect);
         }
     }
     else {
@@ -539,8 +478,6 @@ void PuyoView::render()
 	vrect.w = TSIZE * PUYODIMX;
 	vrect.h = TSIZE * PUYODIMY;
     SDL_SetClipRect(display, &vrect);
-	//SDL_BlitSurface(background, &drect, display, &drect);
-	//SDL_FillRect(display, &drect, 1000);
     for (int i = 0 ; i < PUYODIMX ; i++) {
         for (int j = 0 ; j < PUYODIMY ; j++) {
             puyoEyeState[i][j]++;
@@ -552,7 +489,7 @@ void PuyoView::render()
                     drect.y -= attachedGame->getSemiMove() * TSIZE / 2;
                 drect.w = puyoShadow->w;
                 drect.h = puyoShadow->h;
-                SDL_BlitSurface(puyoShadow, NULL, display, &drect);
+                painter.requestDraw(puyoShadow, &drect);
             }
         }
     }
@@ -575,8 +512,8 @@ void PuyoView::render()
 		drect.y = nYOffset;
 		drect.w = currentSurface->w;
 		drect.h = currentSurface->h;
-		SDL_BlitSurface(currentSurface, NULL, display, &drect);
-        SDL_BlitSurface(puyoEyes, NULL, display, &drect);
+		painter.requestDraw(currentSurface, &drect);
+    painter.requestDraw(puyoEyes, &drect);
 	}
 	currentSurface = getSurfaceForState(attachedGame->getNextCompanion());
 	if (currentSurface != NULL) {
@@ -584,8 +521,8 @@ void PuyoView::render()
 		drect.y = nYOffset + TSIZE;
 		drect.w = currentSurface->w;
 		drect.h = currentSurface->h;
-		SDL_BlitSurface(currentSurface, NULL, display, &drect);
-        SDL_BlitSurface(puyoEyes, NULL, display, &drect);
+		painter.requestDraw(currentSurface, &drect);
+    painter.requestDraw(puyoEyes, &drect);
 	}
 }
 
@@ -609,7 +546,7 @@ void PuyoView::renderNeutral()
     drect.y = yOffset + 3 + TSIZE;
     drect.w = bigNeutral->w;
     drect.h = bigNeutral->h;
-    SDL_BlitSurface(bigNeutral, NULL, display, &drect);
+    painter.requestDraw(bigNeutral, &drect);
     drect_x += bigNeutral->w - compressor;
   }
   for (int cpt = 0 ; cpt < numNeutral ; cpt++) {
@@ -617,7 +554,7 @@ void PuyoView::renderNeutral()
     drect.y = yOffset + 3 + TSIZE;
     drect.w = neutral->w;
     drect.h = neutral->h;
-    SDL_BlitSurface(neutral, NULL, display, &drect);
+    painter.requestDraw(neutral, &drect);
     drect_x += neutral->w - compressor;
   }
 }
@@ -726,22 +663,22 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel)
 	painter.backGround = background;
 	if (painter.gameScreen == NULL)
 	{
-		SDL_PixelFormat *fmt = background->format;
-        SDL_Surface *tmp = SDL_CreateRGBSurface(background->flags,
-                                    background->w, background->h, 32,
-                                    fmt->Rmask, fmt->Gmask,
-                                    fmt->Bmask, fmt->Amask);
-		painter.gameScreen = SDL_DisplayFormat(tmp);
-        SDL_FreeSurface(tmp);
-    }
+    SDL_PixelFormat *fmt = background->format;
+    SDL_Surface *tmp = SDL_CreateRGBSurface(background->flags,
+        background->w, background->h, 32,
+        fmt->Rmask, fmt->Gmask,
+        fmt->Bmask, fmt->Amask);
+    painter.gameScreen = SDL_DisplayFormat(tmp);
+    SDL_FreeSurface(tmp);
+  }
 	
-	fallingViolet = IMG_Load_DisplayFormatAlpha("v0.png");
-        fallingRed   = iim_surface_shift_hue(fallingViolet, 100.0f);
-        fallingBlue = iim_surface_shift_hue(fallingViolet, -65.0f);
-        fallingGreen    = iim_surface_shift_hue(fallingViolet, -150.0f);
-        fallingYellow  = iim_surface_shift_hue(fallingViolet, 140.0f);
-        neutral       = IMG_Load_DisplayFormatAlpha("Neutral.png");
-	bigNeutral    = IMG_Load_DisplayFormatAlpha("BigNeutral.png");
+  fallingViolet = IMG_Load_DisplayFormatAlpha("v0.png");
+  fallingRed   = iim_surface_shift_hue(fallingViolet, 100.0f);
+  fallingBlue = iim_surface_shift_hue(fallingViolet, -65.0f);
+  fallingGreen    = iim_surface_shift_hue(fallingViolet, -150.0f);
+  fallingYellow  = iim_surface_shift_hue(fallingViolet, 140.0f);
+  neutral       = IMG_Load_DisplayFormatAlpha("Neutral.png");
+  bigNeutral    = IMG_Load_DisplayFormatAlpha("BigNeutral.png");
 
         loadShrinkXplode();
         
@@ -808,26 +745,6 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel)
 
 	areaA->setEnemyGame(attachedGameB);
 	areaB->setEnemyGame(attachedGameA);
-
-	recList[0].x = CSIZE;
-	recList[0].y = BSIZE;
-	recList[0].w = PUYODIMX*TSIZE;
-	recList[0].h = PUYODIMY*TSIZE;
-
-	recList[1].x = CSIZE + PUYODIMX*TSIZE + DSIZE;
-	recList[1].y = BSIZE;
-	recList[1].w = PUYODIMX*TSIZE;
-	recList[1].h = PUYODIMY*TSIZE;
-
-	recList[2].x = CSIZE + PUYODIMX*TSIZE + FSIZE;
-	recList[2].y = BSIZE+ESIZE;
-	recList[2].w = TSIZE;
-	recList[2].h = 2*TSIZE;
-
-	recList[3].x = CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE;
-	recList[3].y = BSIZE+ESIZE;
-	recList[3].w = TSIZE;
-	recList[3].h = 2*TSIZE;
 }
 
 PuyoStarter::~PuyoStarter()
@@ -837,24 +754,6 @@ PuyoStarter::~PuyoStarter()
 	delete attachedGameA;
 	delete attachedGameB;
 	SDL_FreeSurface(fallingBlue);
-}
-
-extern "C"
-Uint32 myCallback(Uint32 interval, void *tickCounts)
-{
-	SDL_Event event;
-	
-	(* (int *)tickCounts)++;
-	event.user.type = SDL_USEREVENT;
-	event.user.code = 0;
-	SDL_PushEvent(&event);
-	
-	if ((* (int *)tickCounts) % 10 == 0) {
-		event.user.type = SDL_USEREVENT;
-		event.user.code = 1;
-		SDL_PushEvent(&event);
-	}
-	return interval;
 }
 
 void PuyoStarter::run(int score1, int score2, int lives)
@@ -964,14 +863,7 @@ void PuyoStarter::run(int score1, int score2, int lives)
 	    attachedGameB->cycle();
             if (attachedGameB->isEndOfCycle())
               downIsDown = false;
-	    //areaA->render();
-	    //areaB->render();
-	    //SDL_Flip(display);
 	  } else {
-	    //SDL_BlitSurface(background, NULL, display, &drect);
-	    //	    areaA->scheduleAnimations(tickCounts);
-	    //      areaB->scheduleAnimations(tickCounts);
-	    //SDL_UpdateRects(display, 4, recList);
 	    if (downIsDown) {
 	      attachedGameB->cycle();
               if (attachedGameB->isEndOfCycle())
@@ -1068,28 +960,31 @@ void PuyoStarter::run(int score1, int score2, int lives)
 void PuyoStarter::draw()
 {
   SDL_Rect drect;
-  SDL_BlitSurface (background, NULL, display, NULL);
+
   areaA->render();
   areaB->render();
+  
   drect.x = 21;
   drect.y = -1;
   drect.w = grid->w;
   drect.h = grid->h;
-  SDL_BlitSurface (grid, NULL, display, &drect);
+  painter.requestDraw(grid, &drect);
   drect.x = 407;
   drect.y = -1;
   drect.w = grid->w;
   drect.h = grid->h;
-  SDL_BlitSurface (grid, NULL, display, &drect);
+  painter.requestDraw(grid, &drect);
+
   areaA->renderNeutral();
   areaB->renderNeutral();
-  if ((randomPlayer)&&(currentPerso>=0)) {
-//      drect.x = 120 - perso[currentPerso]->w/2;
-//      drect.y = 200 - perso[currentPerso]->h/2;
-      drect.x = 320 - perso[currentPerso]->w/2;
-      drect.y = 280 - perso[currentPerso]->h/2;
-      drect.w = perso[currentPerso]->w;
-      drect.h = perso[currentPerso]->h;
-      SDL_BlitSurface (perso[currentPerso], NULL, display, &drect);
+  if ((randomPlayer)&&(currentPerso>=0))
+  {
+    drect.x = 320 - perso[currentPerso]->w/2;
+    drect.y = 280 - perso[currentPerso]->h/2;
+    drect.w = perso[currentPerso]->w;
+    drect.h = perso[currentPerso]->h;
+    painter.requestDraw(perso[currentPerso], &drect);
   }
+  painter.draw();
+  SDL_BlitSurface(painter.gameScreen, NULL, display, NULL);
 }

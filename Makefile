@@ -13,11 +13,11 @@ CXX=g++
 CFLAGS=`$(SDL_CONFIG) --cflags` -O3 -I/sw/include -g -DUSE_AUDIO
 HFILES= IosException.h IosImgProcess.h IosVector.h PuyoCommander.h PuyoGame.h \
         PuyoIA.h PuyoPlayer.h PuyoStory.h PuyoView.h SDL_prim.h audio.h menu.h \
-				menuitems.h preferences.h scrollingtext.h sofont.h
+				menuitems.h preferences.h scrollingtext.h sofont.h SDL_Painter.h
 
 OBJFILES= SDL_prim.o scenar.y.o scenar.l.o PuyoCommander.o IosException.o \
 					IosVector.o main.o PuyoGame.o PuyoView.o PuyoIA.o sofont.o \
-					menu.o menuitems.o audio.o scrollingtext.o preferences.o PuyoStory.o
+					menu.o menuitems.o audio.o scrollingtext.o preferences.o PuyoStory.o SDL_Painter.o
 
 all: prelude ${OBJFILES}
 	@echo "[flobopuyo]" && g++ $(CFLAGS) -o flobopuyo `$(SDL_CONFIG) --cflags --static-libs` -lSDL_mixer -lSDL_image ${OBJFILES}
@@ -47,6 +47,7 @@ main.o:main.cpp ${HFILES}
 preferences.o:preferences.c ${HFILES}
 scenar.l.o:scenar.l.c ${HFILES}
 scenar.y.o:scenar.y.c ${HFILES}
+SDL_Painter.o:SDL_Painter.cpp SDL_Painter.h
 audio.o:audio.c audio.h
 menu.o:menu.c menu.h menuitems.h
 menuitems.o:menuitems.c menu.h menuitems.h
