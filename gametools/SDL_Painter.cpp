@@ -25,7 +25,6 @@ void SDL_Painter::draw()
 
 void SDL_Painter::redrawAll()
 {
-  printf("nb = %d\n", nbElts);
   // Draw everything.
   SDL_BlitSurface(backGround, NULL, gameScreen, NULL);
   for (int i=0; i<nbElts; ++i) {
