@@ -2,6 +2,7 @@
 #include <math.h>
 #include <unistd.h>
 #include "PuyoView.h"
+#include "PuyoAnimations.h"
 #include "PuyoIA.h"
 #include "PuyoGame.h"
 #include "audio.h"
@@ -186,257 +187,7 @@ class AnimatedPuyoFactory : public PuyoFactory {
   }
 };
 
-PuyoAnimation::PuyoAnimation()
-{
-	finishedFlag = false;
-}
 
-bool PuyoAnimation::isFinished()
-{
-	return finishedFlag;
-}
-
-NeutralAnimation::NeutralAnimation(int X, int Y, int xOffset, int yOffset)
-{
-	this->X = (X*TSIZE) + xOffset;
-	this->Y = (Y*TSIZE) + yOffset;
-	this->currentY = yOffset;
-}
-
-void NeutralAnimation::cycle()
-{
-	currentY += 16;
-	if (currentY >= Y)
-		finishedFlag = true;
-}
-
-void NeutralAnimation::draw(int semiMove)
-{
-	SDL_Rect drect;
-	drect.x = X;
-	drect.y = currentY;
-	drect.w = neutral->w;
-	drect.h = neutral->h;
-	painter.requestDraw(neutral, &drect);
-}
-
-class TurningAnimation : public PuyoAnimation {
-public:
-    TurningAnimation(PuyoPuyo *companionPuyo, int vector, int xOffset, int yOffset, IIM_Surface *companionSurface, bool counterclockwise)
-    {
-        /*
-		 switch (vector) {
-			 case 0:
-				 X = ((x-1)*TSIZE) + xOffset;
-				 Y = (y*TSIZE) + yOffset;
-				 break;
-			 case 1:
-				 X = (x*TSIZE) + xOffset;
-				 Y = ((y-1)*TSIZE) + yOffset;
-				 break;
-			 case 2:
-				 X = ((x+1)*TSIZE) + xOffset;
-				 Y = (y*TSIZE) + yOffset;
-				 break;
-			 case 3:
-				 X = (x*TSIZE) + xOffset;
-				 Y = ((y+1)*TSIZE) + yOffset;
-				 break;
-		 }
-         */
-		this->counterclockwise = counterclockwise;
-        companionVector = vector;
-        targetSurface = companionSurface;
-        this->companionPuyo = companionPuyo;
-        cpt = 0;
-        angle = 0;
-        step = (3.14 / 2) / 4;
-        this->xOffset = xOffset;
-        this->yOffset = yOffset;
-    }
-    void cycle()
-    {
-        cpt++;
-        angle += step;
-        if (cpt == 4)
-            finishedFlag = true;
-    }
-    void draw(int semiMove)
-    {
-        if (targetSurface == NULL)
-            return;
-        X = (companionPuyo->getPuyoX()*TSIZE) + xOffset;
-        Y = (companionPuyo->getPuyoY()*TSIZE) + yOffset;
-        
-        float offsetA = sin(angle) * TSIZE;
-        float offsetB = cos(angle) * TSIZE * (counterclockwise ? -1 : 1);
-        SDL_Rect drect, drect2;
-        drect.w = targetSurface->w;
-        drect.h = targetSurface->h;
-        drect.y = -semiMove * TSIZE / 2;
-        switch (companionVector) {
-            case 0:
-                drect.x = (short)(X - offsetB);
-                drect.y += (short)(Y + offsetA - TSIZE);
-                break;
-            case 1:
-                drect.x = (short)(X - offsetA + TSIZE);
-                drect.y += (short)(Y - offsetB);
-                break;
-            case 2:
-                drect.x = (short)(X + offsetB);
-                drect.y += (short)(Y - offsetA + TSIZE);
-                break;
-            case 3:
-                drect.x = (short)(X + offsetA - TSIZE);
-                drect.y += (short)(Y + offsetB);
-                break;
-                
-            case -3:
-                drect.x = (short)(X + offsetB);
-                drect.y += (short)(Y + offsetA - TSIZE);
-                break;
-        }
-        drect2 = drect;
-        painter.requestDraw(targetSurface, &drect);
-        painter.requestDraw(puyoEyes, &drect2);
-    }
-private:
-    PuyoPuyo *companionPuyo;
-    int xOffset, yOffset;
-    int X, Y, companionVector, cpt;
-    float angle;
-    float step;
-    IIM_Surface *targetSurface;
-    bool counterclockwise;
-};
-
-static const int BOUNCING_OFFSET_NUM = 12;
-static const int BOUNCING_OFFSET[] = { -1, -3, -5, -4, -2, 0, -6, -9, -11, -9, -6, 0 };
-
-class FallingAnimation : public PuyoAnimation {
-public:
-    FallingAnimation(PuyoPuyo *puyo, int originY, int xOffset, int yOffset, int step)
-    {
-        attachedPuyo  = puyo;
-        this->xOffset = xOffset;
-        this->yOffset = yOffset;
-        this->step    = step;
-        this->X  = (puyo->getPuyoX()*TSIZE) + xOffset;
-        this->Y  = (originY*TSIZE) + yOffset;
-        puyoFace = PuyoView::getSurfaceForState(puyo->getPuyoState());
-		bouncing = BOUNCING_OFFSET_NUM - 1;
-		if (originY == puyo->getPuyoY()) {
-			bouncing = -1;
-		}
-    }
-    void cycle()
-    {
-        Y += step;
-        if (Y >= (attachedPuyo->getPuyoY()*TSIZE) + yOffset)
-		{
-			bouncing--;
-			if (bouncing < 0) {
-				finishedFlag = true;
-				audio_sound_play(sound_bam1);
-			}
-			else {
-				if (BOUNCING_OFFSET[bouncing] == 0)
-					audio_sound_play(sound_bam1);
-			}
-			Y = (attachedPuyo->getPuyoY()*TSIZE) + yOffset;
-		}
-    }
-    void draw(int semiMove)
-    {
-        if (puyoFace) {
-			SDL_Rect drect;
-			drect.x = X;
-			drect.y = Y + (bouncing>=0?BOUNCING_OFFSET[bouncing]:0);
-			// drect.y = -semiMove() * TSIZE / 2;
-			drect.w = puyoFace->w;
-			drect.h = puyoFace->h;
-			painter.requestDraw(puyoFace, &drect);
-			if (puyoFace != neutral) painter.requestDraw(puyoEyesSwirl[(bouncing/2)%4], &drect);
-        }
-    }
-private:
-    PuyoPuyo *attachedPuyo;
-    int xOffset, yOffset, step;
-    int X, Y;
-	int bouncing;
-    IIM_Surface *puyoFace;
-};
-
-class VanishAnimation : public PuyoAnimation {
-public:
-    VanishAnimation(PuyoPuyo *puyo, int xOffset, int yOffset)
-    {
-        puyoFace = PuyoView::getSurfaceForState(puyo->getPuyoState());
-        this->xOffset = xOffset;
-        this->yOffset = yOffset;
-        this->X = (puyo->getPuyoX()*TSIZE) + xOffset;
-        this->Y = (puyo->getPuyoY()*TSIZE) + yOffset;
-        this->color = puyo->getPuyoState();
-        if (color > PUYO_EMPTY)
-			color -= PUYO_BLUE;
-        iter = 0;
-    }
-    void cycle()
-    {
-        iter ++;
-        if (iter == 50)
-            finishedFlag = true;
-    }
-    void draw(int semiMove)
-    {
-        if (iter < 10) {
-            if (puyoFace && (iter % 2 == 0)) {
-                SDL_Rect drect;
-                drect.x = X;
-                drect.y = Y;
-                drect.w = puyoFace->w;
-                drect.h = puyoFace->h;
-                painter.requestDraw(puyoFace, &drect);
-                if (puyoFace != neutral) painter.requestDraw(puyoEyes, &drect);
-                
-            }
-        }
-        else {
-            if (puyoFace) {
-                SDL_Rect drect, xrect;
-                drect.x = X;
-                drect.y = Y;// + (2.5 * pow(iter - 16, 2) - 108);
-					drect.w = puyoFace->w;
-					drect.h = puyoFace->h;
-					int iter2 = iter - 10;
-					int shrinkingImage = (iter - 10) / 4;
-					if (shrinkingImage < 4) {
-						painter.requestDraw(shrinkingPuyo[shrinkingImage][color], &drect);
-						int xrectY = Y + (int)(2.5 * pow(iter - 16, 2) - 108);
-						xrect.w = explodingPuyo[shrinkingImage][color]->w;
-						xrect.h = explodingPuyo[shrinkingImage][color]->h;
-						xrect.x = X - iter2 * iter2;
-						xrect.y = xrectY;
-						painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
-						xrect.x = X - iter2;
-						xrect.y = xrectY + iter2;
-						painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
-						xrect.x = X + iter2;
-						xrect.y = xrectY + iter2;
-						painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
-						xrect.x = X + iter2 * iter2;
-						xrect.y = xrectY;
-						painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
-					}
-            }
-        }
-    }
-private:
-    IIM_Surface *puyoFace;
-    int xOffset, yOffset;
-    int X, Y, iter, color;
-};
 
 PuyoView::PuyoView(PuyoGame *attachedGame, int xOffset, int yOffset, int nXOffset, int nYOffset)
 {
@@ -447,11 +198,6 @@ PuyoView::PuyoView(PuyoGame *attachedGame, int xOffset, int yOffset, int nXOffse
 	this->nYOffset = nYOffset;
 	gameRunning = true;
 	enemyGame = NULL;
-	for (int i = 0 ; i < PUYODIMX ; i++)
-		for (int j = 0 ; j < PUYODIMY ; j++) {
-			animationBoard[i][j] = NULL;
-			puyoEyeState[i][j] = (i+1) * (j+1) * 1234;
-		}
 }
 
 void PuyoView::setEnemyGame(PuyoGame *enemyGame)
@@ -526,68 +272,6 @@ IIM_Surface *PuyoView::getSurfaceForPuyo(PuyoPuyo *puyo)
 			return getSurfaceForState(currentPuyo);
     }
 }
-#ifdef AVIRER
-void PuyoView::render(PuyoPuyo *puyo)
-{
-    static unsigned int smallTicksCount = 0;
-
-    int mainX = attachedGame->getFallingX();
-    int mainY = attachedGame->getFallingY();
-    bool falling  = attachedGame->getFallingState() < PUYO_EMPTY;
-    
-    SDL_Rect drect;
-    int i = puyo->getPuyoX();
-    int j = puyo->getPuyoY();
-    PuyoAnimation *animation = ((AnimatedPuyo *)puyo)->getCurrentAnimation();
-    if (animation == NULL) {
-        IIM_Surface *currentSurface = getSurfaceForPuyo(puyo);
-        if (currentSurface != NULL) {
-            drect.x = (i*TSIZE) + xOffset;
-            drect.y = (j*TSIZE) + yOffset;
-            if (puyo->getPuyoState() < PUYO_EMPTY)
-                drect.y -= attachedGame->getSemiMove() * TSIZE / 2;
-            drect.w = currentSurface->w;
-            drect.h = currentSurface->h;
-            painter.requestDraw(currentSurface, &drect);
-            
-            /* Main puyo show */
-            if (falling && (mainX == i) && (mainY == j))
-                painter.requestDraw(puyoCircle[(smallTicksCount++ >> 2) & 0x1F], &drect);
-            
-            if (currentSurface != neutral) {
-				while (puyoEyeState[i][j] >= 750) puyoEyeState[i][j] -= 750;
-				int eyePhase = puyoEyeState[i][j];
-				if (eyePhase < 5) 
-					painter.requestDraw(puyoEye[1], &drect);
-				else if (eyePhase < 15) 
-					painter.requestDraw(puyoEye[2], &drect);
-				else if (eyePhase < 20) 
-					painter.requestDraw(puyoEye[1], &drect);
-				else
-					painter.requestDraw(puyoEye[0], &drect);
-            }
-        }
-    }
-    else {
-        if (animation->isFinished()) {
-            ((AnimatedPuyo *)puyo)->removeCurrentAnimation();
-            render(puyo);
-        } else {
-            animation->draw(attachedGame->getSemiMove());
-        }
-    }
-}
-#endif
-
-#ifdef AVIRER
-void PuyoView::cycleAnimation(PuyoPuyo *puyo)
-{
-	PuyoAnimation *animation = (PuyoAnimation *)(puyo->getAttachedObject());
-	if ((animation != NULL) && (!animation->isFinished()))
-		animation->cycle();
-}
-
-#endif
 
 void PuyoView::cycleAnimation()
 {
@@ -608,7 +292,6 @@ void PuyoView::render()
 	vrect.h = TSIZE * PUYODIMY;
     for (int i = 0 ; i < PUYODIMX ; i++) {
         for (int j = 0 ; j < PUYODIMY ; j++) {
-            puyoEyeState[i][j]++;
             AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAt(i, j));
             if ((currentPuyo != NULL) && (getSurfaceForPuyo(currentPuyo) != neutral) && (currentPuyo->getCurrentAnimation() == NULL)) {
                 drect.x = xOffset + i * TSIZE;

@@ -1,3 +1,28 @@
+/* FloboPuyo
+ * Copyright (C) 2004
+ *   Florent Boudet        <flobo@ios-software.com>,
+ *   Jean-Christophe Hoelt <jeko@ios-software.com>,
+ *   Guillaume Borios      <gborios@ios-software.com>
+ *
+ * iOS Software <http://ios.free.fr>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ *
+ */
+
 #ifndef _PUYOVIEW
 #define _PUYOVIEW
 
@@ -18,24 +43,7 @@
 extern SDL_Surface *display;
 extern IIM_Surface *image;
 
-class PuyoAnimation {
-  public:
-    PuyoAnimation();
-    bool isFinished();
-    virtual void cycle() = 0;
-    virtual void draw(int semiMove) = 0;
-  protected:
-    bool finishedFlag;
-};
 
-class NeutralAnimation : public PuyoAnimation {
-  public:
-    NeutralAnimation(int X, int Y, int xOffset, int yOffset);
-    void cycle();
-    void draw(int semiMove);
-  private:
-    int X, Y, currentY;
-};
 
 class PuyoView : public virtual PuyoDelegate {
   public:
@@ -57,14 +65,9 @@ class PuyoView : public virtual PuyoDelegate {
     // normalement c'est prive
     int xOffset, yOffset, nXOffset, nYOffset;
   private:
-    void render(PuyoPuyo *puyo);
     void cycleAnimation(PuyoPuyo *puyo);
     bool gameRunning;
     PuyoGame *attachedGame, *enemyGame;
-
-    PuyoAnimation *animationBoard[PUYODIMX][PUYODIMY];
-    // A virer
-    int puyoEyeState[PUYODIMX][PUYODIMY];
 };
 
 class PuyoStarter : public PuyoDrawable {
