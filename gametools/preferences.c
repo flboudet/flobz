@@ -14,7 +14,7 @@
 
 #include <CoreFoundation/CoreFoundation.h>
 
-void SetIntPreference(char * name, int value)
+void SetIntPreference(const char * name, int value)
 {
     CFStringRef nom = CFStringCreateWithCString (NULL,name,CFStringGetSystemEncoding());
     if (nom != NULL)
@@ -30,7 +30,7 @@ void SetIntPreference(char * name, int value)
     }
 }
 
-void SetBoolPreference(char * name, int value)
+void SetBoolPreference(const char * name, int value)
 {
     CFStringRef nom = CFStringCreateWithCString (NULL,name,CFStringGetSystemEncoding());
     if (nom != NULL)
@@ -41,7 +41,7 @@ void SetBoolPreference(char * name, int value)
     }
 }
 
-int GetIntPreference(char * name, int defaut)
+int GetIntPreference(const char * name, int defaut)
 {
     int retour = defaut;
     
@@ -66,7 +66,7 @@ int GetIntPreference(char * name, int defaut)
     return retour;
 }
 
-int GetBoolPreference(char * name, int defaut)
+int GetBoolPreference(const char * name, int defaut)
 {
     int retour = defaut;
     
@@ -90,6 +90,48 @@ int GetBoolPreference(char * name, int defaut)
     
     return retour;
 }
+
+void SetStrPreference (const char *name, const char *value)
+{
+    CFStringRef nom = CFStringCreateWithCString (NULL,name,CFStringGetSystemEncoding());
+    if (nom != NULL)
+    {
+        CFStringRef val = CFStringCreateWithCString (NULL,value,CFStringGetSystemEncoding());
+        if (val != NULL)
+        {
+            CFPreferencesSetAppValue (nom,val,kCFPreferencesCurrentApplication);
+            (void)CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
+            CFRelease(val);
+        }
+        CFRelease(nom);
+    }
+}
+
+void GetStrPreference (const char *name, char *out, const char *defaut, const int bufferSize)
+{
+    if ((out==NULL) || (name==NULL)) return;
+    
+    if (defaut != NULL) strncpy(out,defaut,bufferSize);
+    else out[0]=0;
+
+    CFStringRef nom = CFStringCreateWithCString (NULL,name,CFStringGetSystemEncoding());
+    
+    if (nom != NULL)
+    {
+        CFStringRef value = (CFStringRef)CFPreferencesCopyAppValue(nom,kCFPreferencesCurrentApplication);
+        
+        if (value != NULL)
+        {
+            if (CFGetTypeID(value) == CFStringGetTypeID ())
+            {
+                if ((!CFStringGetCString (value, out, bufferSize, CFStringGetSystemEncoding())) && (defaut != NULL))
+                    strcpy(out,defaut);
+            }
+            CFRelease(value);
+        }
+        CFRelease(nom);
+    }    
+}    
 
 #else /* Not __APPLE__ */
 
@@ -166,7 +208,7 @@ int GetIntPreference(const char *name, int defaut)
 {
   char var[256];
   var[0] = 0;
-  GetStrPreference(name,var,NULL);
+  GetStrPreference(name,var,NULL,256);
   if (var[0]) return atoi(var);
   return defaut;
 }
@@ -201,14 +243,16 @@ void SetStrPreference (const char *name, const char *value)
     fclose(prefs);
 }
 
-/* Get preferences */
-void GetStrPreference (const char *name, char *out, const char *defaut)
+
+void GetStrPreference (const char *name, char *out, const char *defaut, const int bufferSize)
 {
     char * key, *copiedfile;
     int tmplen;
 
-    if (defaut != NULL)
-      strcpy(out,defaut);
+    if ((out==NULL) || (name==NULL)) return;
+    
+    if (defaut != NULL) strncpy(out,defaut,bufferSize);
+    else out[0]=0;
     
     if (file==NULL) fetchFile();
     if (file==NULL) return;
@@ -223,7 +267,7 @@ void GetStrPreference (const char *name, char *out, const char *defaut)
     {
         if (strncmp(key, tmp, tmplen) == 0)
         {
-            strcpy(out, key+tmplen);
+            strcpy(out, ((key+tmplen)<bufferSize)?(key+tmplen):bufferSize);
             free(copiedfile);
             return;
         }
