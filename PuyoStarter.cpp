@@ -342,7 +342,7 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
         attachedNetworkGameFactory = new PuyoNetworkGameFactory(&attachedRandom, *mbox);
         areaA = new PuyoView(attachedNetworkGameFactory, 1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
         areaB = new PuyoNetworkView(attachedGameFactory, 1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, mbox);
-
+        sleep(10);
     }
     
     
