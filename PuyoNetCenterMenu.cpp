@@ -24,6 +24,7 @@
  */
 
 #include "PuyoNetCenterMenu.h"
+#include "PuyoNetworkStarter.h"
 
 NetCenterMenu::NetCenterChatArea::NetCenterChatArea(int height)
     : height(height), lines(new (HBox *)[height]), names(new (Text *)[height]), texts(new (Text *)[height])
@@ -49,6 +50,19 @@ void NetCenterMenu::NetCenterChatArea::addChat(String name, String text)
     requestDraw();
 }
 
+void NetCenterMenu::NetCenterPlayerList::addNewPlayer(String playerName, PeerAddress playerAddress)
+{
+    PlayerEntry *newEntry = new PlayerEntry(playerName, playerAddress, new PlayerSelectedAction(targetMenu, playerAddress));
+    entries.add(newEntry);
+    add(newEntry);
+}
+
+void NetCenterMenu::NetCenterPlayerList::PlayerSelectedAction::action()
+{
+    printf("ZZZ\n");
+    targetMenu->playerSelected(address);
+}
+
 class SayAction : public Action {
 public:
     SayAction(PuyoNetGameCenter *netCenter, Text *message) : netCenter(netCenter), message(message) {}
@@ -61,7 +75,8 @@ private:
     Text *message;
 };
 
-NetCenterMenu::NetCenterMenu(PuyoNetGameCenter *netCenter) : netCenter(netCenter)
+NetCenterMenu::NetCenterMenu(PuyoNetGameCenter *netCenter)
+    : netCenter(netCenter), chatArea(8), playerList(this)
 {
     cycled = new NetCenterCycled(this);
     netCenter->addListener(this);
@@ -87,18 +102,16 @@ void NetCenterMenu::build()
     HBox *screenCenter = new HBox();
     
     VBox *chatBox = new VBox();
-    chatArea = new NetCenterChatArea(10);
     EditFieldWithLabel *sayField = new EditFieldWithLabel("Say:", "");
     SayAction *say = new SayAction(netCenter, sayField->getEditField());
     sayField->getEditField()->setAction(ON_START, say);
-    chatBox->add(chatArea);
+    chatBox->add(&chatArea);
     chatBox->add(sayField);
     
-    playerList = new VBox();
-    playerList->add(new Text("Players"));
+    playerList.add(new Text("Players"));
     
     screenCenter->add(chatBox);
-    screenCenter->add(playerList);
+    screenCenter->add(&playerList);
     
     add(screenCenter);
     add(new Button("Exit", new PopScreenAction()));
@@ -107,11 +120,30 @@ void NetCenterMenu::build()
 void NetCenterMenu::onChatMessage(const String &msgAuthor, const String &msg)
 {
     printf("%s:%s\n", (const char *)msgAuthor, (const char *)msg);
-    chatArea->addChat(msgAuthor, msg);
+    chatArea.addChat(msgAuthor, msg);
 }
 
-void NetCenterMenu::onPlayerConnect(int playerIndex)
+void NetCenterMenu::onPlayerConnect(String playerName, PeerAddress playerAddress)
 {
-    printf("Connect: %s\n", (const char *)(netCenter->getPeerNameAtIndex(playerIndex)));
-    playerList->add(new Text(netCenter->getPeerNameAtIndex(playerIndex)));
+    //printf("Connect: %s\n", (const char *)(netCenter->getPeerNameAtIndex(playerIndex)));
+    playerList.addNewPlayer(playerName, playerAddress);
 }
+
+void NetCenterMenu::gameInvitationAgainst(String playerName, PeerAddress playerAddress)
+{
+    netCenter->acceptInvitationWith(playerAddress);
+}
+
+void NetCenterMenu::gameGrantedWithMessagebox(MessageBox *mbox)
+{
+    PuyoStarter *starter = new PuyoNetworkStarter(theCommander, 0, mbox);
+    starter->run(0,0,0,0,0);
+    GameUIDefaults::SCREEN_STACK->push(starter);
+}
+
+void NetCenterMenu::playerSelected(PeerAddress playerAddress)
+{
+    printf("Click joueur\n");
+    netCenter->requestGameWith(playerAddress);
+}
+

@@ -44,7 +44,7 @@ void PuyoNetGameCenter::connectPeer(PeerAddress addr, const String name)
     }
     peers.add(new GamerPeer(name, addr));
     for (int i = 0, j = listeners.size() ; i < j ; i++) {
-        listeners[i]->onPlayerConnect(peers.size() - 1);
+        listeners[i]->onPlayerConnect(name, addr);
     }
 }
 
@@ -65,3 +65,26 @@ String PuyoNetGameCenter::getPeerNameAtIndex(int i) const
 {
     return peers[i]->name;
 }
+
+void PuyoNetGameCenter::requestGameWith(PeerAddress addr)
+{
+    GamerPeer *myPeer = getPeerForAddress(addr);
+    requestGameWithPeer(myPeer->name, myPeer->address);
+}
+
+void PuyoNetGameCenter::acceptInvitationWith(PeerAddress addr)
+{
+    GamerPeer *myPeer = getPeerForAddress(addr);
+    acceptInvitationWithPeer(myPeer->name, myPeer->address);
+}
+
+PuyoNetGameCenter::GamerPeer *PuyoNetGameCenter::getPeerForAddress(PeerAddress addr)
+{
+    for (int i = 0 ; i < peers.size() ; i++) {
+        if (peers[i]->address == addr) {
+            return peers[i];
+        }
+    }
+    return NULL;
+}
+

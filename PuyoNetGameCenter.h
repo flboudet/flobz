@@ -28,18 +28,23 @@
 
 #include "ios_memory.h"
 #include "ios_dirigeable.h"
+#include "ios_messagebox.h"
 
 using namespace ios_fc;
 
 class PuyoNetGameCenterListener {
 public:
     virtual void onChatMessage(const String &msgAuthor, const String &msg) = 0;
-    virtual void onPlayerConnect(int playerIndex) = 0;
+    virtual void onPlayerConnect(String playerName, PeerAddress playerAddress) = 0;
+    virtual void gameInvitationAgainst(String playerName, PeerAddress playerAddress) = 0;
+    virtual void gameGrantedWithMessagebox(MessageBox *mbox) = 0;
 };
 
 class PuyoNetGameCenter {
 public:
     virtual void sendMessage(const String msgText) = 0;
+    void requestGameWith(PeerAddress addr);
+    void acceptInvitationWith(PeerAddress addr);
     virtual void idle() = 0;
     String getPeerNameAtIndex(int i) const;
     void addListener(PuyoNetGameCenterListener *r) { listeners.add(r); }
@@ -50,6 +55,9 @@ protected:
     AdvancedBuffer<PuyoNetGameCenterListener *> listeners;
     class GamerPeer;
     AdvancedBuffer<GamerPeer *> peers;
+    GamerPeer *getPeerForAddress(PeerAddress addr);
+    virtual void requestGameWithPeer(String playerName, PeerAddress addr) = 0;
+    virtual void acceptInvitationWithPeer(String playerName, PeerAddress addr) = 0;
 };
 
 #endif // _PUYONETGAMECENTER_H

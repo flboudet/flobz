@@ -59,6 +59,36 @@ void PuyoInternetGameCenter::sendMessage(const String msgText)
     delete msg;
 }
 
+void PuyoInternetGameCenter::requestGameWithPeer(String playerName, PeerAddress addr)
+{
+    Message *msg = mbox.createMessage();
+    msg->addBoolProperty("RELIABLE", true);
+    msg->addInt("CMD", PUYO_IGP_GAME_REQUEST);
+    msg->addString("ORGNAME", name);
+    msg->addString("DSTNAME", playerName);
+    Dirigeable *dirNew = dynamic_cast<Dirigeable *>(msg);
+    dirNew->setPeerAddress(addr);
+    msg->send();
+    delete msg;
+}
+
+void PuyoInternetGameCenter::acceptInvitationWithPeer(String playerName, PeerAddress addr)
+{
+    Message *msg = mbox.createMessage();
+    msg->addBoolProperty("RELIABLE", true);
+    msg->addInt("CMD", PUYO_IGP_GAME_ACCEPT);
+    msg->addString("ORGNAME", name);
+    msg->addString("DSTNAME", playerName);
+    Dirigeable *dirNew = dynamic_cast<Dirigeable *>(msg);
+    dirNew->setPeerAddress(addr);
+    msg->send();
+    delete msg;
+    mbox.bind(addr);
+    for (int i = 0, j = listeners.size() ; i < j ; i++) {
+        listeners[i]->gameGrantedWithMessagebox(&mbox);
+    }
+}
+
 void PuyoInternetGameCenter::idle()
 {
     static int idleCount = 0;
@@ -88,6 +118,25 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
             {
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
                 disconnectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"));
+            }
+            break;
+        case PUYO_IGP_GAME_REQUEST:
+            {
+                printf("Une partie contre %s?\n", (const char *)msg.getString("ORGNAME"));
+                Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
+                for (int i = 0, j = listeners.size() ; i < j ; i++) {
+                    listeners[i]->gameInvitationAgainst(msg.getString("ORGNAME"), dir.getPeerAddress());
+                }
+            }
+            break;
+        case PUYO_IGP_GAME_ACCEPT:
+            {
+                printf("%s accepte la partie!\n", (const char *)msg.getString("ORGNAME"));
+                Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
+                mbox.bind(dir.getPeerAddress());
+                for (int i = 0, j = listeners.size() ; i < j ; i++) {
+                    listeners[i]->gameGrantedWithMessagebox(&mbox);
+                }
             }
             break;
         default:

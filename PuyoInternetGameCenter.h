@@ -37,6 +37,9 @@ public:
     void sendMessage(const String msgText);
     void idle();
     void onMessage(Message &msg);
+protected:
+    void requestGameWithPeer(String playerName, PeerAddress addr);
+    void acceptInvitationWithPeer(String playerName, PeerAddress addr);
 private:
     void sendAliveMessage();
     

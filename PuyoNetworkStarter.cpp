@@ -25,17 +25,51 @@
 
 #include "PuyoNetworkStarter.h"
 #include "PuyoMessageDef.h"
+#include "PuyoNetworkView.h"
+#include "PuyoNetworkGame.h"
 
 extern const char *p1name;
 extern const char *p2name;
 
+extern IIM_Surface *perso[2];
+
+class PuyoNetworkGameFactory : public PuyoGameFactory {
+public:
+    PuyoNetworkGameFactory(PuyoRandomSystem *attachedRandom, MessageBox &msgBox): attachedRandom(attachedRandom), msgBox(msgBox) {}
+    PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory) {
+        return new PuyoNetworkGame(attachedPuyoFactory, msgBox);
+    }
+private:
+    PuyoRandomSystem *attachedRandom;
+    MessageBox &msgBox;
+};
+
 PuyoNetworkStarter::PuyoNetworkStarter(PuyoCommander *commander, int theme, ios_fc::MessageBox *mbox)
-: PuyoStarter(commander, false, 0, RANDOM, theme, mbox)
+: PuyoStarter(commander, theme), mbox(mbox)
 {
+    attachedGameFactory = new PuyoLocalGameFactory(&attachedRandom);
+    attachedNetworkGameFactory = new PuyoNetworkGameFactory(&attachedRandom, *mbox);
+    areaA = new PuyoView(attachedNetworkGameFactory, &attachedThemeManager,
+                         1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
+    areaB = new PuyoNetworkView(attachedGameFactory, &attachedThemeManager,
+                                1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, mbox);
+    //SDL_Delay(10000);
+    
+    
+    attachedGameA = areaA->getAttachedGame();
+    attachedGameB = areaB->getAttachedGame();
+    
+    randomPlayer = 0;
+    perso[0] = NULL;
+    
+    areaA->setEnemyGame(attachedGameB);
+    areaB->setEnemyGame(attachedGameA);
+
     netgame_started = false;
     mbox->addListener(this);
 }
 
+/*
 void PuyoNetworkStarter::run(int score1, int score2, int lives, int point1, int point2)
 {
     // Network game startup synchronization
@@ -58,6 +92,37 @@ void PuyoNetworkStarter::run(int score1, int score2, int lives, int point1, int 
         message->send();
         delete message;
         PuyoStarter::run(score1, score2, lives, point1, point2);
+}*/
+
+void PuyoNetworkStarter::cycle()
+{
+    static bool once = true;
+    static bool once_started = true;
+    if (once) {
+        once = false;
+        // Network game startup synchronization
+        ios_fc::Message *message = mbox->createMessage();
+        message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameStart);
+        message->addString  (PuyoMessage::NAME,   p1name);
+        message->addBoolProperty("RELIABLE", true);
+        message->send();
+    }
+    
+    if (mbox != NULL)
+        mbox->idle();
+    
+    if (netgame_started) {
+        if (once_started) {
+            // We send the message twice
+            ios_fc::Message *message = mbox->createMessage();
+            message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameStart);
+            message->addString  (PuyoMessage::NAME,   p1name);
+            message->addBoolProperty("RELIABLE", true);
+            message->send();
+            once_started = false;
+        }
+        PuyoStarter::cycle();
+    }
 }
 
 void PuyoNetworkStarter::backPressed()

@@ -70,7 +70,7 @@ protected:
 
 class PuyoStarter : public PuyoPureStarter { // , public virtual IdleComponent {
 public:
-    PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType, int theme, ios_fc::MessageBox *mbox = NULL);
+    PuyoStarter(PuyoCommander *commander, int theme);
     virtual ~PuyoStarter();
     
     virtual void run(int score1, int score2, int lives, int point1, int point2);
@@ -101,10 +101,19 @@ protected:
     int gameSpeed;
     
     int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
-    ios_fc::MessageBox *mbox;
     AnimatedPuyoThemeManager attachedThemeManager;
     int quit;
     bool gameover;
+};
+
+class PuyoLocalGameFactory : public PuyoGameFactory {
+public:
+    PuyoLocalGameFactory(PuyoRandomSystem *attachedRandom): attachedRandom(attachedRandom) {}
+    PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory) {
+        return new PuyoLocalGame(attachedRandom, attachedPuyoFactory);
+    }
+private:
+    PuyoRandomSystem *attachedRandom;
 };
 
 #endif // _PUYOSTARTER

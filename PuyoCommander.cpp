@@ -94,8 +94,8 @@ void SinglePlayerGameAction::action()
  */
 void NetGameAction::action()
 {
-  UDPMessageBox mbox("127.0.0.1", 6581, 6581);
-  PuyoStarter *starter = new PuyoNetworkStarter(theCommander, 0, &mbox);
+  UDPMessageBox *mbox = new UDPMessageBox("127.0.0.1", 6581, 6581);
+  PuyoStarter *starter = new PuyoNetworkStarter(theCommander, 0, mbox);
   starter->run(0,0,0,0,0);
   GameUIDefaults::SCREEN_STACK->push(starter);
 }

@@ -25,8 +25,24 @@
 
 #include "PuyoTwoPlayerStarter.h"
 
+extern IIM_Surface *perso[2];
+
 PuyoTwoPlayerStarter::PuyoTwoPlayerStarter(PuyoCommander *commander, int theme)
-: PuyoStarter(commander, false, 0, RANDOM, theme)
+: PuyoStarter(commander, theme)
 {
+    attachedGameFactory = new PuyoLocalGameFactory(&attachedRandom);
+    areaA = new PuyoView(attachedGameFactory, &attachedThemeManager,
+                         1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
+    areaB = new PuyoView(attachedGameFactory, &attachedThemeManager,
+                         1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE);
+    
+    attachedGameA = areaA->getAttachedGame();
+    attachedGameB = areaB->getAttachedGame();
+    
+    randomPlayer = 0;
+    perso[0] = NULL;
+    
+    areaA->setEnemyGame(attachedGameB);
+    areaB->setEnemyGame(attachedGameA);
 }
 

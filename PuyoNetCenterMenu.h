@@ -35,8 +35,11 @@ public:
     NetCenterMenu(PuyoNetGameCenter *netCenter);
     void build();
     void onChatMessage(const String &msgAuthor, const String &msg);
-    void onPlayerConnect(int playerIndex);
+    void onPlayerConnect(String playerName, PeerAddress playerAddress);
+    void gameInvitationAgainst(String playerName, PeerAddress playerAddress);
+    void gameGrantedWithMessagebox(MessageBox *mbox);
     void cycle();
+    void playerSelected(PeerAddress playerAddress);
     void idle(double currentTime);
 private:
     class NetCenterCycled : public CycledComponent {
@@ -47,22 +50,47 @@ private:
             netCenter->cycle();
         }
     };
-    class NetCenterChatArea;
-    NetCenterChatArea *chatArea;
+    class NetCenterChatArea : public VBox {
+    public:
+        NetCenterChatArea::NetCenterChatArea(int height);
+        void addChat(String name, String text);
+    private:
+            int height;
+        HBox **lines;
+        Text **names;
+        Text **texts;
+    };
+    class NetCenterPlayerList : public VBox {
+    public:
+        NetCenterPlayerList(NetCenterMenu *targetMenu) : targetMenu(targetMenu) {}
+        void addNewPlayer(String playerName, PeerAddress playerAddress);
+    private:
+        class PlayerSelectedAction : public Action {
+        public:
+            PlayerSelectedAction(NetCenterMenu *targetMenu, PeerAddress address)
+             : targetMenu(targetMenu), address(address) {}
+            void action();
+        private:
+            NetCenterMenu *targetMenu;
+            PeerAddress address;
+        };
+        class PlayerEntry : public Button {
+        public:
+            PlayerEntry(String playerName, PeerAddress playerAddress, Action *action)
+                : Button(playerName, action), playerAddress(playerAddress), action(action) {}
+            ~PlayerEntry() { delete action; }
+            PeerAddress playerAddress;
+        private:
+            Action *action;
+        };
+        Vector<PlayerEntry> entries;
+        NetCenterMenu *targetMenu;
+    };
+    
+    NetCenterChatArea chatArea;
+    NetCenterPlayerList playerList;
     NetCenterCycled *cycled;
     PuyoNetGameCenter *netCenter;
-    VBox *playerList;
-};
-
-class NetCenterMenu::NetCenterChatArea : public VBox {
-public:
-    NetCenterChatArea::NetCenterChatArea(int height);
-    void addChat(String name, String text);
-private:
-    int height;
-    HBox **lines;
-    Text **names;
-    Text **texts;
 };
 
 #endif // _PUYONETCENTERMENU

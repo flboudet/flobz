@@ -187,28 +187,6 @@ static void loadShrinkXplode(void)
     loadShrinkXplode2(4,140.0f);
 }
 
-
-class PuyoLocalGameFactory : public PuyoGameFactory {
-public:
-    PuyoLocalGameFactory(PuyoRandomSystem *attachedRandom): attachedRandom(attachedRandom) {}
-    PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory) {
-        return new PuyoLocalGame(attachedRandom, attachedPuyoFactory);
-    }
-private:
-    PuyoRandomSystem *attachedRandom;
-};
-
-class PuyoNetworkGameFactory : public PuyoGameFactory {
-public:
-    PuyoNetworkGameFactory(PuyoRandomSystem *attachedRandom, MessageBox &msgBox): attachedRandom(attachedRandom), msgBox(msgBox) {}
-    PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory) {
-        return new PuyoNetworkGame(attachedPuyoFactory, msgBox);
-    }
-private:
-    PuyoRandomSystem *attachedRandom;
-    MessageBox &msgBox;
-};
-
 void PuyoStarter::draw(SDL_Surface *surf) const {
   const_cast<PuyoStarter*>(this)->draw();
 }
@@ -322,7 +300,7 @@ void PuyoStarter::draw()
 }
 
 
-PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType, int theme, MessageBox *mbox):PuyoPureStarter(commander), mbox(mbox)
+PuyoStarter::PuyoStarter(PuyoCommander *commander, int theme):PuyoPureStarter(commander)
 {
     tickCounts = 0;
     
@@ -371,40 +349,6 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
         grid          = IIM_Load_DisplayFormatAlpha("grid.png");
         firstTime = false;
     }
-    
-    if (mbox == NULL) {
-        attachedGameFactory = new PuyoLocalGameFactory(&attachedRandom);
-        areaA = new PuyoView(attachedGameFactory, &attachedThemeManager,
-			     1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
-        areaB = new PuyoView(attachedGameFactory, &attachedThemeManager,
-			     1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE);
-    }
-    else {
-        attachedGameFactory = new PuyoLocalGameFactory(&attachedRandom);
-        attachedNetworkGameFactory = new PuyoNetworkGameFactory(&attachedRandom, *mbox);
-        areaA = new PuyoView(attachedNetworkGameFactory, &attachedThemeManager,
-			     1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
-        areaB = new PuyoNetworkView(attachedGameFactory, &attachedThemeManager,
-				    1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, mbox);
-        //SDL_Delay(10000);
-    }
-    
-    
-    attachedGameA = areaA->getAttachedGame();
-    attachedGameB = areaB->getAttachedGame();
-    
-    if (aiLeft) {
-        randomPlayer = new PuyoIA(aiType, aiLevel, areaA);
-        perso[0] = IIM_Load_DisplayFormatAlpha("perso1_1.png");
-        perso[1] = IIM_Load_DisplayFormatAlpha("perso1_2.png");
-    }
-    else {
-        randomPlayer = 0;
-        perso[0] = NULL;
-    }
-    
-    areaA->setEnemyGame(attachedGameB);
-    areaB->setEnemyGame(attachedGameA);
 }
 
 PuyoStarter::~PuyoStarter()
@@ -883,9 +827,6 @@ void PuyoStarter::cycle()
                     }
                 }
             }
-            // Provisoire
-            if (mbox != NULL)
-                mbox->idle();
             requestDraw();
     }
     else {
