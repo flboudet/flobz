@@ -17,11 +17,22 @@
   float @GrandmaDied      = 960.0
   int   @EtText3Start     = 1020
   int   @EtText3End       = 1190
-  float @KaoriArrives     = 1210.0
-  float @KaoriStops       = 1260.0
-  float @PlanKaoriStarts  = 1310.0
-  float @SaucerLeave      = 1360.0
-  float @EndOfScenar      = 1610.0
+  int   @KaoriText1Start  = 1200
+  int   @KaoriText1End    = 1300
+  float @KaoriArrives     = 1310.0
+  float @KaoriStops       = 1360.0
+  float @PlanKaoriStarts  = 1400.0
+  int   @KaoriText2Start  = 1410
+  int   @KaoriText2End    = 1540
+  int   @EtText4Start     = 1560
+  int   @EtText4End       = 1880
+  float @SaucerLeave      = 1900.0
+  int   @KaoriText3Start  = 1930
+  int   @KaoriText4Start  = 2100
+  int   @KaoriText5Start  = 2250
+  int   @KaoriText5End    = 2390
+  float @PlanKaoriEnds    = 2410.0
+  float @EndOfScenar      = 2500.0
 
   // Differents Plans
   int @PlanLarge = 1
@@ -57,34 +68,35 @@
   Sprite @ypuyo2 = [new_sprite: image="puyo-y-frame1.png" x=177.0 y=415.0 curframe=2.9 framespeed=0.1 nbframes=@PuyoAgitation]
 
   Balloon @offTalk = [new_balloon: image="balloon1.png" x=200.0 y=10.0 text_x=40.0 text_y=15.0]
-  Balloon @etTalk  = [new_balloon: image="balloon1l.png" x=50.0 y=120.0 text_x=40.0 text_y=15.0]
-  Balloon @gmTalk  = [new_balloon: image="balloon1r.png" x=250.0 y=100.0 text_x=24.0 text_y=15.0]
+  Balloon @lTalk  = [new_balloon: image="balloon1l.png" x=50.0 y=120.0 text_x=40.0 text_y=15.0]
+  Balloon @rTalk  = [new_balloon: image="balloon1r.png" x=250.0 y=100.0 text_x=24.0 text_y=15.0]
 
 <sprite_list>
   // Call the 'sprite' function for each sprite you want to update/draw
   // This also allows you to specify the drawing order
-  Sprite i
+  Sprite  i
+  Balloon b
 
   (@planCurrent = @PlanLarge)? {
     sprite::@bg display=@display
 
     (@fcycle >= @LaserGun)? (@fcycle <= @GrandmaDied)? sprite::@laser display=@display
 
-    for i in (@saucer @dog) do sprite::i display=@display
+    for i in (@saucer @dog)    do sprite::i display=@display
     for i in (@grandma @kaori) do sprite::i display=@dgrandma
 
-    (@fcycle < @HaloOff)? for i in (@vpuyo1 @rpuyo1 @gpuyo1 @bpuyo1 @ypuyo1) do sprite::i display=@display
+    (@fcycle < @HaloOff)? {
+      for i in (@vpuyo1 @rpuyo1 @gpuyo1 @bpuyo1 @ypuyo1) do sprite::i display=@display
+    }
     for i in (@rpuyo2 @vpuyo2 @bpuyo2 @gpuyo2 @ypuyo2) do sprite::i display=@display
 
     (@activateHalo = 1)? sprite::@halo display=@display
-    Balloon b
-    for b in (@etTalk @offTalk @gmTalk) do balloon::b display=@display
+    for b in (@lTalk @offTalk @rTalk) do balloon::b display=@display
   }
 
   (@planCurrent = @PlanKaori)? {
-    sprite::@bg     display=@display
-    sprite::@kaori  display=@display
-    sprite::@saucer display=@display
+    for i in (@bg @kaori @saucer) do sprite::i display=@display
+    for b in (@lTalk @rTalk)      do balloon::b display=@display
   }
 
 
@@ -112,13 +124,20 @@
 <update>
   // Update function: called every animation cycle
   (@fcycle > @PlanKaoriStarts)? @planCurrent = @PlanKaori
+  (@fcycle > @PlanKaoriEnds)?   @planCurrent = @PlanLarge
 
   // 
-  string txt1 = "Somewhere in the mountains of\nPuyoLand,\nOn a cold dark night of spring..."
-  string txt2 = "- HERE THEY ARE CAPT'N!!!\n- Yes boy. Let's do the job now."
-  string txt3 = "@!?!#&****!\ngrrrrrrrr\nGRRRRRRRR"
-  string txt4 = "\n- WHAT???"
-  string txt5 = "- HA HA HA\n- nice shot,\n   boy."
+  string txt1 =  "Somewhere in the mountains of\nPuyoLand,\nOn a cold dark night of spring..."
+  string txt2 =  "- HERE THEY ARE CAPT'N!!!\n- Yes boy. Let's do the job now."
+  string txt3 =  "@!?!#&****!\ngrrrrrrrr\nGRRRRRRRR"
+  string txt4 =  "\n- WHAT???"
+  string txt5 =  "- HA HA HA\n- nice shot,\n   boy."
+  string txt6 =  "Grandma!\nNoooooo!"
+  string txt7 =  " You will pay for that,\n Space Molluscs!!"
+  string txt8 =  "- She does not look nice, CAPT'N!\n  AND LAZER'S BATTERY IS EMPTY.\n  Holy Wzahrrzah, HELP US!!\n\n- Set sails, boy!"
+  string txt9 =  "Ah Ah! You flee, CHICKENS!\nAre you afraid or what!?"
+  string txt10 = " I will follow you to hell\n if I need to.... But.."
+  string txt11 = " ..BUT I WILL BE AVENGED!!"
 
   (@planCurrent = @PlanLarge)? {
     @bg.image = "bg_intro3.jpg"
@@ -128,17 +147,22 @@
     // Texts
     (@cycle = 1)?              show_balloon_with_text::@offTalk text=txt1
     (@cycle = @IntroTextEnd)?  hide_balloon::@offTalk
-    (@cycle = @EtText1Start)?  show_balloon_with_text::@etTalk text=txt2
-    (@cycle = @EtText1End)?    hide_balloon::@etTalk
-    (@cycle = @GrandmaTextStart)? show_balloon_with_text::@gmTalk text=txt3
+    (@cycle = @EtText1Start)?  show_balloon_with_text::@lTalk text=txt2
+    (@cycle = @EtText1End)?    hide_balloon::@lTalk
+    (@cycle = @GrandmaTextStart)? show_balloon_with_text::@rTalk text=txt3
     (@cycle = @EtText2Start)?  {
-      hide_balloon::@gmTalk
-      @etTalk = [new_balloon: image="balloon1r.png" x=50.0 y=10.0 text_x=24.0 text_y=15.0]
-      show_balloon_with_text::@etTalk text=txt4
+      hide_balloon::@rTalk
+      @lTalk = [new_balloon: image="balloon1r.png" x=50.0 y=10.0 text_x=24.0 text_y=15.0]
+      show_balloon_with_text::@lTalk text=txt4
     }
-    (@cycle = @EtText2End)?   hide_balloon::@etTalk
-    (@cycle = @EtText3Start)? show_balloon_with_text::@etTalk text=txt5
-    (@cycle = @EtText3End)?   hide_balloon::@etTalk
+    (@cycle = @EtText2End)?   hide_balloon::@lTalk
+    (@cycle = @EtText3Start)? show_balloon_with_text::@lTalk text=txt5
+    (@cycle = @EtText3End)?   hide_balloon::@lTalk
+    (@cycle = @KaoriText1Start)? {
+      @rTalk.image.pos.x += 30.0
+      show_balloon_with_text::@rTalk text=txt6
+    }
+    (@cycle = @KaoriText1End)?   hide_balloon::@rTalk
 
     // Move the grandma
     move::@grandma fcycle=@GrandmaGoOut      x=483.0 y=320.0
@@ -150,7 +174,10 @@
     move::@kaori   fcycle=@KaoriArrives      x=483.0 y=330.0
     move::@kaori   fcycle=@KaoriStops - 15.0 x=370.0 y=330.0
     move::@kaori   fcycle=@KaoriStops        x=349.0 y=354.0
-    (@fcycle = @KaoriStops)? @kaori.pos.x = 331.0
+    (@fcycle > @KaoriStops)? {
+      @kaori.pos.x = 331.0
+      @kaori.pos.y = 354.0
+    }
 
     // Move the flying saucer
     float fx = -115.0
@@ -219,8 +246,37 @@
     @bg.image = "bluebkgnd.jpg"
     @kaori.image = "kaori-small-sad.png"
     @kaori.pos.y = 250.0
-    @saucer.pos.x = 40.0
-    @saucer.pos.y = 50.0
+  
+    // Texts
+    (@cycle = @KaoriText2Start)? {
+      @rTalk = [new_balloon: image="balloon2r.png" x=200.0 y=00.0 text_x=54.0 text_y=15.0]
+      show_balloon_with_text::@rTalk text=txt7
+    }
+    (@cycle = @KaoriText2End)? hide_balloon::@rTalk
+    (@cycle = @EtText4Start)? {
+      @lTalk = [new_balloon: image="balloon2l.png" x=10.0 y=105.0 text_x=18.0 text_y=45.0]
+      show_balloon_with_text::@lTalk text=txt8
+    }
+    (@cycle = @EtText4End)? hide_balloon::@lTalk
+    (@cycle = @KaoriText3Start)? show_balloon_with_text::@rTalk text=txt9
+    (@cycle = @KaoriText4Start)? show_balloon_with_text::@rTalk text=txt10
+    (@cycle = @KaoriText5Start)? show_balloon_with_text::@rTalk text=txt11
+    (@cycle = @KaoriText5End)?   hide_balloon::@rTalk
+
+    // Saucer's moves
+    (@fcycle < @PlanKaoriStarts + 2.0)? {
+      @saucer.pos.x = 40.0
+      @saucer.pos.y = 30.0
+    }
+
+    float fy = -4.0
+    float fcycle = @PlanKaoriStarts
+    while fcycle < @SaucerLeave do {
+      move::@saucer fcycle=fcycle x=40.0 y=30.0+fy
+      fcycle += 20.0
+      fy = 0.0-fy
+    }
+    move::@saucer fcycle=@SaucerLeave + 30.0 x=-100.0 y=50.0
   }
 
   (@fcycle > @EndOfScenar)? @finished = 1
