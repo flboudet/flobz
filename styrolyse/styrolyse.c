@@ -5,6 +5,8 @@
 #include <string.h>
 #include "goomsl_hash.h"
 
+extern char *dataFolder;
+
 struct _Styrolyse {
 
   char fname[512];
@@ -96,9 +98,12 @@ void styrolyse_execute(Styrolyse *_this, int mode)
 
 void styrolyse_reload(Styrolyse *_this)
 {
+    char scriptPath[1024];
+    sprintf(scriptPath, "%s/story/styrolyse.gsl",dataFolder);
+    
     char *fbuffer;
     if (!_this->gsl) return;
-    fbuffer = gsl_init_buffer("styrolyse.gsl");
+    fbuffer = gsl_init_buffer(scriptPath);
     gsl_append_file_to_buffer(_this->fname, &fbuffer);
     gsl_compile(_this->gsl,fbuffer);
     bind(_this->gsl);

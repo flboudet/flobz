@@ -1,0 +1,20 @@
+<init>
+  # Init function: called when script is loaded
+  Sprite @sprite = [new_sprite: image="story/b1.png" x=-92.0 y=200.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
+
+<sprite_list>
+  # Call the 'sprite' function for each sprite you want to update/draw
+  # This also allows you to specify the drawing order
+  sprite::@sprite
+
+<update>
+  # Update function: called every animation cycle
+
+  @sprite.image = "story/b1.png"
+  (@sprite.curframe > 1.0)? @sprite.image = "story/b2.png"
+  (@sprite.curframe > 2.0)? @sprite.image = "story/b3.png"
+  (@sprite.curframe > 3.0)? @sprite.image = "story/b4.png"
+
+  move::@sprite fcycle=300.0 x=640.0 y=200.0
+  (@fcycle > 300.0)? @finished = 1
+

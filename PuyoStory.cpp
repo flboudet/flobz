@@ -1,9 +1,7 @@
 #include "PuyoStory.h"
 #include "PuyoCommander.h"
 
-#ifndef DATADIR
-extern char *DATADIR;
-#endif
+extern char *dataFolder;
 
 SDL_Surface *sstory;
 
@@ -38,7 +36,9 @@ static SDL_Surface * createStorySurface()
 /* Implementation of the Styrolyse Client */
 static void *loadImage (StyrolyseClient *_this, const char *path)
 {
-  SDL_Surface *surf = IMG_Load(path);
+  char imgPath[1024];
+  sprintf(imgPath, "%s/%s",dataFolder, path);
+  SDL_Surface *surf = IMG_Load(imgPath);
   return surf;
 }
 
@@ -68,7 +68,9 @@ StyrolyseClient *client_new()
 
 PuyoStory::PuyoStory(PuyoCommander *com, int num) : num(num), commander(com)
 {
-    currentStory = styrolyse_new("demo.gsl", client_new());
+    char scriptPath[1024];
+    sprintf(scriptPath, "%s/story/story%d.gsl",dataFolder, num);
+    currentStory = styrolyse_new(scriptPath, client_new());
     sstory = createStorySurface();
 }
 
