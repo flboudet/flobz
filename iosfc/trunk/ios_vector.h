@@ -25,38 +25,17 @@
 #include "ios_memory.h"
 
 namespace ios_fc {
-/*
-
-THIS CLASS IS DEFINED IN IOS_MEMORY.H (see AdvancedBuffer)
-
-(We should remove this file probably....)
-   
-class Vector {
-public:
-	Vector();
-	Vector(const int size);
-	~Vector();
-	void addElement(void *element);
-	void * getElementAt(const int index) const;
-	void removeElementAt(const int index);
-	void removeElement(void *element);
-	void removeAllElements();
-	int getSize() const;
-	int getCapacity() const;
-	void dumpVector() const;
-private:
-	void **vectorData;
-	static const int vectorInitialSize = 10;
-	static const int vectorSizeIncrement = 10;
-	int vectorCapacity;
-	int vectorSize;
-	
-	void increaseVectorSize();
-};
-*/
+    
 template <typename T>
 class Vector : public AdvancedBuffer<T *>
-{};
+{
+    public:
+        Vector<T> dup() const {
+            Vector<T> buf;
+            for (int i=0; i<this->size(); ++i) buf.add(this->get(i));
+            return buf;
+        }
+};
 
 template <typename T>
 class SelfVector : public AdvancedBuffer<T *>

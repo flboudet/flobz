@@ -420,10 +420,10 @@ namespace ios_fc {
 
             inline const AdvancedBuffer<T>  operator +  (int offset) const { return AdvancedBuffer<T>(*this,offset); }
             inline const AdvancedBuffer<T>& operator += (int offset) {
-				used -= offset;
-				Buffer<T>::operator+=(offset);
-				return *this;
-			}
+                used -= offset;
+                Buffer<T>::operator+=(offset);
+                return *this;
+            }
 
         private:
             int granularity;
@@ -433,11 +433,12 @@ namespace ios_fc {
     template <typename T>
     class Stack {
         public:
-            Stack(int granularity) : buffer(granularity) {}
+            Stack(int granularity = 64) : buffer(granularity) {}
             void push(T t) {buffer.add(t);}
             const T pop()  { T t = buffer.last(); buffer.remove(); return t; }
             const T top() const { return buffer.last(); }
             T &top()       { return buffer.last(); }
+            int  size()    { return buffer.size(); }
 
         private:
             AdvancedBuffer<T> buffer;
