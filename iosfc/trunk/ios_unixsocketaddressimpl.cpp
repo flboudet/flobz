@@ -39,6 +39,12 @@ UnixSocketAddressImpl::UnixSocketAddressImpl(in_addr_t address) : address(addres
 {
 }
 
+bool UnixSocketAddressImpl::operator == (const SocketAddressImpl &a) const
+{
+    const UnixSocketAddressImpl &comp = dynamic_cast<const UnixSocketAddressImpl &>(a);
+    return (address == comp.address);
+}
+
 SocketAddressImpl * UnixSocketAddressFactory::createSocketAddress(String hostName)
 {
     return new UnixSocketAddressImpl(hostName);

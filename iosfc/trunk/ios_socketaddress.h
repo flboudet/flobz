@@ -31,8 +31,14 @@ namespace ios_fc {
         SocketAddressImpl() : usage(0) {}
         inline int getUsage() const { return usage; }
         inline void incrementUsage() { usage++; }
-        inline void decrementUsage() { usage--; }
+        inline void decrementUsage() {
+            usage--;
+            if (usage < 1) {
+                delete(this);
+            }
+        }
         virtual ~SocketAddressImpl() {}
+        virtual bool operator == (const SocketAddressImpl &) const = 0;
     private:
         int usage;
     };
@@ -47,11 +53,15 @@ namespace ios_fc {
         SocketAddress(String hostName) { impl = factory->createSocketAddress(hostName); impl->incrementUsage(); }
         SocketAddress(SocketAddressImpl *impl) { this->impl = impl; impl->incrementUsage(); }
         SocketAddress(const SocketAddress &s) : impl(s.impl) { impl->incrementUsage(); }
-        ~SocketAddress() {
+        ~SocketAddress() { impl->decrementUsage(); }
+        SocketAddress & operator = (const SocketAddress &a) {
             impl->decrementUsage();
-            if (impl->getUsage() == 0)
-                delete impl;
+            impl = a.impl;
+            impl->incrementUsage();
         }
+        bool operator == (const SocketAddress &a) const {
+            return (*impl == *(a.impl));
+        } 
         SocketAddressImpl *getImpl() const { return impl; }
         static void setFactory(SocketAddressFactory *factory) { SocketAddress::factory = factory; }
     private:
