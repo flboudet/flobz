@@ -52,7 +52,7 @@
 
   (@fond2.pos.x >  -640.0)? move::@fond2 fcycle=@targetCycle2 x= -640.0 y=0.0
   (@fond2.pos.x <= -640.0)? {
-    @fond2.pos.x     = 0.0
+    @fond2.pos.x     = 640.0
     @targetCycle2 += 100.0
   }
   
