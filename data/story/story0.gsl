@@ -3,21 +3,25 @@
   float @PuyoAgitation = 8.0 # lower is less
 
   // Tempo du scenario
-  int   @IntroTextEnd     = 200
-  int   @EtText1Start     = 250
-  int   @EtText1End       = 380
-  float @SaucerArrive  = 400.0
-  float @HaloOn        = 500.0
-  float @GrandmaGoOut  = 600.0
-  int   @GrandmaTextStart = 610
-  float @HaloOff       = 700.0
-  float @LaserGun      = 740.0
-  float @GrandmaDied   = 750.0
-  float @KaoriArrives  = 850.0
-  float @KaoriStops    = 900.0
-  float @PlanKaoriStarts = 950.0
-  float @SaucerLeave   = 1000.0
-  float @EndOfScenar   = 1250.0
+  int   @IntroTextEnd     = 225
+  int   @EtText1Start     = 275
+  int   @EtText1End       = 420
+  float @SaucerArrive     = 440.0
+  float @HaloOn           = 540.0
+  float @GrandmaGoOut     = 640.0
+  int   @GrandmaTextStart = 720
+  int   @EtText2Start     = 840
+  float @HaloOff          = 850.0
+  int   @EtText2End       = 910
+  float @LaserGun         = 930.0
+  float @GrandmaDied      = 940.0
+  int   @EtText3Start     = 1000
+  int   @EtText3End       = 1170
+  float @KaoriArrives     = 1190.0
+  float @KaoriStops       = 1240.0
+  float @PlanKaoriStarts  = 1290.0
+  float @SaucerLeave      = 1340.0
+  float @EndOfScenar      = 1590.0
 
   // Differents Plans
   int @PlanLarge = 1
@@ -54,7 +58,7 @@
 
   Balloon @offTalk = [new_balloon: image="balloon1.png" x=200.0 y=10.0 text_x=40.0 text_y=15.0]
   Balloon @etTalk  = [new_balloon: image="balloon1l.png" x=50.0 y=120.0 text_x=40.0 text_y=15.0]
-  Balloon @gmTalk  = [new_balloon: image="balloon1r.png" x=220.0 y=100.0 text_x=24.0 text_y=15.0]
+  Balloon @gmTalk  = [new_balloon: image="balloon1r.png" x=250.0 y=100.0 text_x=24.0 text_y=15.0]
 
 <sprite_list>
   // Call the 'sprite' function for each sprite you want to update/draw
@@ -109,14 +113,17 @@
   // Update function: called every animation cycle
   (@fcycle > @PlanKaoriStarts)? @planCurrent = @PlanKaori
 
+  // 
+  string txt1 = "Somewhere in the mountains of\nPuyoLand,\nOn a cold dark night of spring..."
+  string txt2 = "- HERE THEY ARE CAPT'N!!!\n- Yes boy. Let's do the job now."
+  string txt3 = "@!?!#&****!\ngrrrrrrrr\nGRRRRRRRR"
+  string txt4 = "\n- WHAT???"
+  string txt5 = "- HA HA HA\n- nice shot,\n   boy."
+
   (@planCurrent = @PlanLarge)? {
     @bg.image = "bg_intro3.jpg"
     @bg.pos.x = 0.0
     @bg.pos.y = 0.0
-
-    string txt1 = "Somewhere in the mountains of\nPuyoLand,\nOn a cold dark night of spring..."
-    string txt2 = "- HERE THEY ARE CAPT'N !!!\n- Yes boy. Let's do the job now."
-    string txt3 = "@!?!#&****!\ngrrrrrrrr\nGRRRRRRR"
 
     // Texts
     (@cycle = 1)?              show_balloon_with_text::@offTalk text=txt1
@@ -124,7 +131,14 @@
     (@cycle = @EtText1Start)?  show_balloon_with_text::@etTalk text=txt2
     (@cycle = @EtText1End)?    hide_balloon::@etTalk
     (@cycle = @GrandmaTextStart)? show_balloon_with_text::@gmTalk text=txt3
-    (@fcycle > @GrandmaDied)?  hide_balloon::@gmTalk
+    (@cycle = @EtText2Start)?  {
+      hide_balloon::@gmTalk
+      @etTalk = [new_balloon: image="balloon1r.png" x=50.0 y=10.0 text_x=24.0 text_y=15.0]
+      show_balloon_with_text::@etTalk text=txt4
+    }
+    (@cycle = @EtText2End)?   hide_balloon::@etTalk
+    (@cycle = @EtText3Start)? show_balloon_with_text::@etTalk text=txt5
+    (@cycle = @EtText3End)?   hide_balloon::@etTalk
 
     // Move the grandma
     move::@grandma fcycle=@GrandmaGoOut      x=483.0 y=320.0
