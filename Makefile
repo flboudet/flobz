@@ -13,13 +13,13 @@ CXX=g++
 CFLAGS=`$(SDL_CONFIG) --cflags` -O3 -I/sw/include -DUSE_AUDIO
 CXXFLAGS=${CFLAGS}
 
-HFILES= IosException.h IosImgProcess.h IosVector.h PuyoCommander.h PuyoGame.h \
+HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h PuyoGame.h \
         PuyoIA.h PuyoPlayer.h PuyoStory.h PuyoView.h SDL_prim.h audio.h menu.h \
 				menuitems.h preferences.h scrollingtext.h sofont.h SDL_Painter.h PuyoVersion.h \
 				InputManager.h GameControls.h
 
 
-OBJFILES= SDL_prim.o scenar.y.o scenar.l.o PuyoCommander.o IosException.o \
+OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o IosException.o \
 					IosVector.o main.o PuyoGame.o PuyoVersion.o PuyoView.o PuyoIA.o sofont.o \
 					menu.o menuitems.o audio.o scrollingtext.o preferences.o PuyoStory.o SDL_Painter.o \
 					InputManager.o GameControls.o
@@ -45,13 +45,14 @@ prelude:
 %.o:%.cpp
 	@echo "[$@]" && $(CXX) $(CFLAGS) -DDATADIR=${DATADIR} -c $< 2>> WARNINGS || (cat WARNINGS && false)
 
+HiScores.o:HiScores.cpp HiScores.h preferences.h
 PuyoCommander.o:PuyoCommander.cpp ${HFILES}
 PuyoGame.o:PuyoGame.cpp ${HFILES}
 PuyoIA.o:PuyoIA.cpp ${HFILES}
 PuyoStory.o:PuyoStory.cpp ${HFILES}
 PuyoView.o:PuyoView.cpp ${HFILES}
 main.o:main.cpp ${HFILES}
-preferences.o:preferences.c ${HFILES}
+preferences.o:preferences.c preferences.h
 scenar.l.o:scenar.l.c ${HFILES}
 scenar.y.o:scenar.y.c ${HFILES}
 InputManager.o:InputManager.cpp ${HFILES}
@@ -98,7 +99,7 @@ bundle_name = FloboPuyo.app
 flobopuyo-static:SDL_prim.o
 	bison -y -d -o scenar.y.c scenar.y
 	flex -oscenar.l.c scenar.l
-	g++ -DMACOSX $(CFLAGS) -o flobopuyo-static  SDL_prim.o PuyoCommander.cpp InputManager.cpp GameControls.cpp IosException.cpp IosVector.cpp main.cpp PuyoGame.cpp PuyoView.cpp PuyoIA.cpp PuyoVersion.c sofont.c menu.c menuitems.c audio.c scrollingtext.c preferences.c SDL_Painter.cpp PuyoStory.cpp scenar.y.c scenar.l.c /sw/lib/libSDL_mixer.a /sw/lib/libvorbisfile.a /sw/lib/libvorbis.a /sw/lib/libogg.a /sw/lib/libsmpeg.a /sw/lib/libSDL_image.a /sw/lib/libjpeg.a /sw/lib/libpng.a -lz `$(SDL_CONFIG) --cflags --static-libs`
+	g++ -DMACOSX $(CFLAGS) -o flobopuyo-static  HiScores.cpp SDL_prim.o PuyoCommander.cpp InputManager.cpp GameControls.cpp IosException.cpp IosVector.cpp main.cpp PuyoGame.cpp PuyoView.cpp PuyoIA.cpp PuyoVersion.c sofont.c menu.c menuitems.c audio.c scrollingtext.c preferences.c SDL_Painter.cpp PuyoStory.cpp scenar.y.c scenar.l.c /sw/lib/libSDL_mixer.a /sw/lib/libvorbisfile.a /sw/lib/libvorbis.a /sw/lib/libogg.a /sw/lib/libsmpeg.a /sw/lib/libSDL_image.a /sw/lib/libjpeg.a /sw/lib/libpng.a -lz `$(SDL_CONFIG) --cflags --static-libs`
 
 # /sw/lib/libvorbis.a   
 
