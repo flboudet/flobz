@@ -677,7 +677,7 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel)
     SDL_FreeSurface(tmp);
   }
   painter.display = display;
-  painter.redrawAll(display);
+  painter.redrawAll(painter.gameScreen);
 	
   fallingViolet = IMG_Load_DisplayFormatAlpha("v0.png");
   fallingRed   = iim_surface_shift_hue(fallingViolet, 100.0f);
@@ -910,7 +910,7 @@ void PuyoStarter::run(int score1, int score2, int lives)
           else
             sprintf(score, "Score  : %d - %d", score1, score2);
           commander->showGameOver();
-          SDL_BlitSurface(display,NULL,painter.gameScreen,NULL);
+          //SDL_BlitSurface(display,NULL,painter.gameScreen,NULL);
           menu_set_value(commander->gameOverMenu, "Winner: ", winner);
           menu_set_value(commander->gameOverMenu, "Current", score);
         }
@@ -997,8 +997,8 @@ void PuyoStarter::draw()
     drect.h = perso[currentPerso]->h;
     painter.requestDraw(perso[currentPerso], &drect);
   }
-  if (menu_visible(commander->gameOverMenu))
+  //if (menu_visible(commander->gameOverMenu))
     painter.draw(painter.gameScreen);
-  else
-    painter.draw(display);
+  //else
+    //painter.draw(display);
 }

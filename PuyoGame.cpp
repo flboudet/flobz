@@ -332,7 +332,7 @@ void PuyoGame::dropNeutrals()
         cycleNeutral = neutralPuyos;
       for (int i = 0 ; i < cycleNeutral ; i++) {
         int posX = fallingTable[cycleNeutral-1][i];
-        int posY = getFallY(posX, 1);
+        int posY = getFallY(posX, 2);
         neutralPuyos -= 1;
         if (getPuyoCellAt(posX, posY) != PUYO_EMPTY)
             continue;
