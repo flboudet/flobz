@@ -69,4 +69,19 @@ void UDPMessage::setPeerAddress(PeerAddress newPeerAddress)
     else throw Exception("Incompatible peer address type!");
 }
 
+void UDPMessage::addPeerAddress(const String key, const PeerAddress &value)
+{
+    UDPPeerAddressImpl *peerAddressImpl = dynamic_cast<UDPPeerAddressImpl *>(value.getImpl());
+    if (peerAddressImpl != NULL) {
+        // TODO
+    }
+    else throw Exception("Incompatible peer address type!");
+}
+
+PeerAddress UDPMessage::getPeerAddress(const String key)
+{
+    // TODO
+    return peerAddress;
+}
+
 };

@@ -70,6 +70,8 @@ public:
     virtual PeerAddress getPeerAddress() = 0;
     virtual PeerAddress getBroadcastAddress() = 0;
     virtual void setPeerAddress(PeerAddress) = 0;
+    virtual void addPeerAddress(const String key, const PeerAddress &value) = 0;
+    virtual PeerAddress getPeerAddress(const String key) = 0;
 };
 
 class SessionListener {

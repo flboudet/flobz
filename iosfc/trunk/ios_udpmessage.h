@@ -18,6 +18,8 @@ namespace ios_fc {
         PeerAddress getPeerAddress();
         PeerAddress getBroadcastAddress();
         void setPeerAddress(PeerAddress);
+        void addPeerAddress(const String key, const PeerAddress &value);
+        PeerAddress getPeerAddress(const String key);
     private:
         class UDPPeerAddressImpl;
         UDPMessageBox &owner;

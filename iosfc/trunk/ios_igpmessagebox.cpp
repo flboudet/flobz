@@ -35,6 +35,8 @@ namespace ios_fc {
         PeerAddress getPeerAddress();
         PeerAddress getBroadcastAddress();
         void setPeerAddress(PeerAddress);
+        void addPeerAddress(const String key, const PeerAddress &value);
+        PeerAddress getPeerAddress(const String key);
     private:
         class IgpPeerAddressImpl;
         IgpMessageBox &owner;
@@ -89,6 +91,20 @@ namespace ios_fc {
             igpPeerIdent = newPeerAddressImpl->getIgpIdent();
         }
         else throw Exception("Incompatible peer address type!");
+    }
+    
+    void IgpMessage::addPeerAddress(const String key, const PeerAddress &value)
+    {
+        IgpPeerAddressImpl *peerAddressImpl = dynamic_cast<IgpPeerAddressImpl *>(value.getImpl());
+        if (peerAddressImpl != NULL) {
+            addInt(key, peerAddressImpl->getIgpIdent());
+        }
+        else throw Exception("Incompatible peer address type!");
+    }
+    
+    PeerAddress IgpMessage::getPeerAddress(const String key)
+    {
+        return PeerAddress(new IgpPeerAddressImpl(getInt(key)));
     }
     
     IgpMessageBox::IgpMessageBox(const String hostName, int portID) : igpClient(hostName, portID), sendSerialID(0)
