@@ -47,14 +47,14 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
 
     message->addInt     (PuyoMessage::TYPE,   kGameState);
     message->addString  (PuyoMessage::NAME,   p1name);
-    message->addBool    ("PAUSE",  paused);
+    message->addBool    (PuyoMessage::PAUSED, paused);
     message->addIntArray(PuyoMessage::PUYOS,  buffer);
-    message->addInt     ("SCORE",  attachedGame->getPoints());
-    message->addInt     ("NEXT_F", attachedGame->getNextFalling());
-    message->addInt     ("NEXT_C", attachedGame->getNextCompanion());
+    message->addInt     (PuyoMessage::SCORE,  attachedGame->getPoints());
+    message->addInt     (PuyoMessage::NEXT_F, attachedGame->getNextFalling());
+    message->addInt     (PuyoMessage::NEXT_C, attachedGame->getNextCompanion());
     
-    message->addIntArray("AddNeutrals", neutralsBuffer);
-    message->addBool    ("DidEndCycle", didEndCycle);
+    message->addIntArray(PuyoMessage::ADD_NEUTRALS,  neutralsBuffer);
+    message->addBool    (PuyoMessage::DID_END_CYCLE, didEndCycle);
     
     // clear des infos ayant ete envoyee
     neutralsBuffer.clear();
