@@ -1,4 +1,4 @@
-#include <strings.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "preferences.h"
@@ -7,7 +7,7 @@
 static hiscore HS[kHiScoresNumber];
 static bool loaded = false;
 
-hiscore * getHiscores(void)
+hiscore * getHiscores(const char * const defaultNames[kHiScoresNumber])
 {
   if (loaded==true) return HS;
 
@@ -18,8 +18,8 @@ hiscore * getHiscores(void)
   {
     sprintf(HSIDS,"HSS%2d",i);
     sprintf(HSIDN,"HSN%2d",i);
-    GetStrPreference(HSIDN,HS[i].name,"Nobody",kHiScoreNameLenght);      
-    HS[i].score = GetIntPreference(HSIDS,0);
+    GetStrPreference(HSIDN,HS[i].name,defaultNames[i],kHiScoreNameLenght+1);      
+    HS[i].score = GetIntPreference(HSIDS,(kHiScoresNumber-i) * 10000);
   }
   loaded = true;
   
@@ -42,7 +42,8 @@ int setHiScore(int score, const char * name)
     return retour;
   }
 
-  strncpy(tmp->name,name,kHiScoreNameLenght-1);
+  strncpy(tmp->name,name,kHiScoreNameLenght);
+  tmp->name[kHiScoreNameLenght]=0;
   tmp->score = score;
 
   char HSIDN[6];
