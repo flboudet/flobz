@@ -49,9 +49,11 @@ bool PuyoAnimation::isFinished()
 
 
 /* Neutral falling animation */
-IIM_Surface *NeutralAnimation::neutral = PuyoView::getSurfaceForState(PUYO_NEUTRAL);
+IIM_Surface *NeutralAnimation::neutral = NULL;
 NeutralAnimation::NeutralAnimation(int X, int Y, int xOffset, int yOffset)
 {
+    if (neutral == NULL)
+        neutral = PuyoView::getSurfaceForState(PUYO_NEUTRAL);
 	this->X = (X*TSIZE) + xOffset;
 	this->Y = (Y*TSIZE) + yOffset;
 	this->currentY = yOffset;

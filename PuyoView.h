@@ -58,7 +58,6 @@ class PuyoView : public virtual PuyoDelegate {
     void puyoDidFall(PuyoPuyo *puyo, int originX, int originY);
     void puyoWillVanish(PuyoPuyo *puyo);
     void gameLost();
-    void scheduleAnimations(int tickCount);
     static IIM_Surface *getSurfaceForState(PuyoState state);
     IIM_Surface *getSurfaceForPuyo(PuyoPuyo *puyo);
     PuyoGame *getAttachedGame() const { return attachedGame; }

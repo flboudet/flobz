@@ -14,13 +14,13 @@ CFLAGS=`$(SDL_CONFIG) --cflags` -g -I/sw/include -DUSE_AUDIO=1 # -DHAVE_OPENGL=1
 CXXFLAGS=${CFLAGS}
 
 HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h PuyoGame.h PuyoAnimations.h \
-        PuyoIA.h PuyoPlayer.h PuyoStory.h PuyoView.h SDL_prim.h audio.h menu.h \
+        AnimatedPuyo.h PuyoIA.h PuyoPlayer.h PuyoStory.h PuyoView.h SDL_prim.h audio.h menu.h \
 				menuitems.h preferences.h scrollingtext.h sofont.h SDL_Painter.h PuyoVersion.h \
 				InputManager.h GameControls.h HiScores.h IosImgProcess.h
 
 
 OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o IosException.o \
-					IosVector.o main.o PuyoGame.o PuyoVersion.o PuyoView.o PuyoAnimations.o PuyoIA.o sofont.o \
+					IosVector.o main.o PuyoGame.o PuyoVersion.o PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o sofont.o \
 					menu.o menuitems.o audio.o scrollingtext.o preferences.o PuyoStory.o SDL_Painter.o \
 					InputManager.o GameControls.o PuyoDoomMelt.o glSDL.o IosImgProcess.o
 
@@ -52,6 +52,8 @@ PuyoGame.o:PuyoGame.cpp ${HFILES}
 PuyoIA.o:PuyoIA.cpp ${HFILES}
 PuyoStory.o:PuyoStory.cpp ${HFILES}
 PuyoView.o:PuyoView.cpp ${HFILES}
+AnimatedPuyo.o: AnimatedPuyo.cpp ${HFILES}
+PuyoAnimations.o: PuyoAnimations.cpp ${HFILES}
 main.o:main.cpp ${HFILES}
 preferences.o:preferences.c preferences.h
 scenar.l.o:scenar.l.c ${HFILES}

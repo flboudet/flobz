@@ -507,14 +507,14 @@ void PuyoGame::deleteMarkedPuyosAt(int X, int Y)
 	PuyoState currentPuyo = getPuyoCellAt(X, Y);
   puyoVector.removeElement(getPuyoAt(X, Y));
   if (getPuyoAt(X,Y) == companionPuyo) {
-    delete (getPuyoAt(X, Y));
+    attachedFactory->deletePuyo(getPuyoAt(X, Y));
     companionPuyo = NULL;
   }
   else if (getPuyoAt(X,Y) == fallingPuyo) {
-    delete (getPuyoAt(X, Y));
+    attachedFactory->deletePuyo(getPuyoAt(X, Y));
     fallingPuyo = NULL;
   } else {
-    delete (getPuyoAt(X, Y));
+    attachedFactory->deletePuyo(getPuyoAt(X, Y));
   }
   setPuyoAt(X, Y, NULL);
 	if (getPuyoCellAt(X-1, Y) == currentPuyo)
@@ -532,17 +532,17 @@ void PuyoGame::deleteMarkedPuyosAt(int X, int Y)
     }
     if (getPuyoCellAt(X+1, Y) == PUYO_NEUTRAL) {
         puyoVector.removeElement(getPuyoAt(X+1, Y));
-        delete (getPuyoAt(X+1, Y));
+        attachedFactory->deletePuyo(getPuyoAt(X+1, Y));
         setPuyoAt(X+1, Y, NULL);
     }
     if (getPuyoCellAt(X, Y-1) == PUYO_NEUTRAL) {
         puyoVector.removeElement(getPuyoAt(X, Y-1));
-        delete (getPuyoAt(X, Y-1));
+        attachedFactory->deletePuyo(getPuyoAt(X, Y-1));
         setPuyoAt(X, Y-1, NULL);
     }
     if (getPuyoCellAt(X, Y+1) == PUYO_NEUTRAL) {
         puyoVector.removeElement(getPuyoAt(X, Y+1));
-        delete (getPuyoAt(X, Y+1));
+        attachedFactory->deletePuyo(getPuyoAt(X, Y+1));
         setPuyoAt(X, Y+1, NULL);
     }
 }

@@ -61,6 +61,7 @@ private:
 class PuyoFactory {
  public:
   virtual PuyoPuyo *createPuyo(PuyoState state) = 0;
+  virtual void deletePuyo(PuyoPuyo *target) { delete target; }
 };
 
 class PuyoDefaultFactory : public PuyoFactory {
