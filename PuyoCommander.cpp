@@ -965,7 +965,7 @@ mml_fin:
   menu_hide (optionMenu);
 }
 
-void PuyoCommander::backLoop(Menu *menu)
+void PuyoCommander::backLoop(Menu *menu, PuyoDrawable *starter)
 {
     menu_show(menu);
     while (1) {
@@ -986,7 +986,7 @@ void PuyoCommander::backLoop(Menu *menu)
             }
         }
         
-        updateAll(NULL);
+        updateAll(starter);
     }
 mml_fin:
         menu_hide (menu);
@@ -1135,6 +1135,8 @@ mml_play:
     score1 += myStarter.leftPlayerWin();
     score2 += myStarter.rightPlayerWin();
     currentMusicTheme = (currentMusicTheme + 1) % NB_MUSIC_THEME;
+    updateHighScoresMenu();
+    backLoop(highScoresMenu, &myStarter);
   }
 
   SetStrPreference("Player1 Name", player1Name);
@@ -1232,6 +1234,8 @@ mml_play:
     myStarter.run(score1, score2, lives);
     score1 += myStarter.leftPlayerWin();
     score2 += myStarter.rightPlayerWin();
+    updateHighScoresMenu();
+    backLoop(highScoresMenu, &myStarter);
     if (!myStarter.rightPlayerWin())
       lives--;
     else {

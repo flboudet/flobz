@@ -26,7 +26,7 @@ class PuyoCommander
   bool changeControlLoop(int controlIndex, PuyoDrawable *starter);
   void controlsMenuLoop(PuyoDrawable *d);
   void optionMenuLoop(PuyoDrawable *d = NULL);
-  void backLoop(Menu *menu);
+  void backLoop(Menu *menu, PuyoDrawable *starter = NULL);
   void startSingleGameLoop();
   void startTwoPlayerGameLoop();
   void enterStringLoop(Menu *menu, const char *kItem, char out[256]);
@@ -38,6 +38,8 @@ class PuyoCommander
   Menu *nextLevelMenu;
   Menu *finishedMenu;
   Menu *looserMenu;
+  Menu *highScoresMenu;
+  void updateHighScoresMenu();
 
   SoFont *smallFont;
   SoFont *darkFont;
@@ -50,7 +52,6 @@ class PuyoCommander
   Menu *optionMenu;
   Menu *controlsMenu;
   Menu *rulesMenu;
-  Menu *highScoresMenu;
   Menu *aboutMenu;
   ScrollingText *scrollingText;
   unsigned int cycle, start_time;
@@ -58,7 +59,6 @@ class PuyoCommander
   static const int player1Joystick = 1;
   static const int player2Joystick = 0;
 
-  void updateHighScoresMenu();
 };
 
 SDL_Surface * IMG_Load_DisplayFormat (const char *path);
