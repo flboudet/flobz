@@ -66,11 +66,14 @@ class PuyoStarter : public PuyoDrawable {
   public:
     PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType, int theme);
     virtual ~PuyoStarter();
-    void run(int score1, int score2, int lives);
+    void run(int score1, int score2, int lives, int point1, int point2);
     void draw();
 
     bool leftPlayerWin() const  { return attachedGameA->isGameRunning(); }
     bool rightPlayerWin() const { return attachedGameB->isGameRunning(); }
+
+    int leftPlayerPoints() const { return attachedGameA->getPoints(); }
+    int rightPlayerPoints() const { return attachedGameB->getPoints(); }
     
   private:
     PuyoCommander *commander;

@@ -19,14 +19,15 @@ extern char *DATADIR;
 extern const char *p1name;
 extern const char *p2name;
 extern int GAME_ACCEL;
+extern int gameLevel;
 
 char *kYouDidIt = "You Dit It!!!";
-char *kNextLevel = "Next Level:\t";
+char *kNextLevel = "Next:\t\t";
 char *kLooser = "Looser!!!";
-char *kCurrentLevel = "Current Level:\t";
-char *kContinueLeft = "Continue Left:\t";
+char *kCurrentLevel = "Level:\t\t";
+char *kContinueLeft = "Continues:\t\t";
 char *kGameOver = "Game Over!!!";
-char *kYouGotToLevel = "You get to level";
+char *kYouGotToLevel = "You Get To ";
 char *kHitActionToContinue = "Hit Action to continue...";
 char *kHitActionForMenu = "Hit Action for menu...";
 char *kContinue    = "Continue?";
@@ -39,16 +40,16 @@ char *kPlayerName  = "Player Name:\t";
 char *kPlayer1Name  = "P1 Name:\t";
 char *kPlayer2Name  = "P2 Name:\t";
 
-static const char *k01 = " 1\t\t";
-static const char *k02 = " 2\t\t";
-static const char *k03 = " 3\t\t";
-static const char *k04 = " 4\t\t";
-static const char *k05 = " 5\t\t";
-static const char *k06 = " 6\t\t";
-static const char *k07 = " 7\t\t";
-static const char *k08 = " 8\t\t";
-static const char *k09 = " 9\t\t";
-static const char *k10 = "10\t\t";
+static const char *k01 = " 1 - ";
+static const char *k02 = " 2 - ";
+static const char *k03 = " 3 - ";
+static const char *k04 = " 4 - ";
+static const char *k05 = " 5 - ";
+static const char *k06 = " 6 - ";
+static const char *k07 = " 7 - ";
+static const char *k08 = " 8 - ";
+static const char *k09 = " 9 - ";
+static const char *k10 = "10 - ";
 
 char *kHighScores  = "Hall of Fame";
 
@@ -95,7 +96,7 @@ static char *kAbout06 = "\t\tGuillaume 'gyom' Borios";
 static char *kAbout07 = "Beta Goddess:\t\t";
 static char *kAbout08 = "\t\tTania";
 
-static char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
+char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
   "Satanas", "Doctor X", "Tanya", "Mr Gyom",
   "The Duke","Jeko","--------" };
 
@@ -731,13 +732,16 @@ mml_fin:
   menu_hide (menu);
 }
   
-void PuyoCommander::updateHighScoresMenu()
+void PuyoCommander::updateHighScoresMenu(int newOne)
 {
   hiscore *scores = getHiScores();
   char tmp[256];
 #define PAS_DE_COMMENTAIRES(X,kXX) \
-  sprintf(tmp, "%s - %d", scores[X].name, scores[X].score); \
-  menu_set_value(highScoresMenu,kXX,tmp);
+  if (newOne == X)  \
+    sprintf(tmp, "%s\t** %d", scores[X].name, scores[X].score); \
+  else \
+    sprintf(tmp, "%s\t%d", scores[X].name, scores[X].score); \
+  menu_set_value(highScoresMenu,kXX,tmp,0);
 
   PAS_DE_COMMENTAIRES(0,k01);
   PAS_DE_COMMENTAIRES(1,k02);
@@ -1067,8 +1071,8 @@ void PuyoCommander::startTwoPlayerGameLoop()
 
   GetStrPreference("Player1 Name", player1Name, "Player 1");
   GetStrPreference("Player2 Name", player2Name, "Player 2");
-  menu_set_value(twoPlayerGameMenu, kPlayer1Name, player1Name);
-  menu_set_value(twoPlayerGameMenu, kPlayer2Name, player2Name);
+  menu_set_value(twoPlayerGameMenu, kPlayer1Name, player1Name, 0);
+  menu_set_value(twoPlayerGameMenu, kPlayer2Name, player2Name, 0);
 
   while (!menu_active_is(twoPlayerGameMenu,kLevelMedium))
     menu_next_item(twoPlayerGameMenu);  
@@ -1116,11 +1120,14 @@ mml_play:
   menu_hide (twoPlayerGameMenu);
 
   GAME_ACCEL = 2000;
+  gameLevel = 1;
   if (menu_active_is (twoPlayerGameMenu, kLevelMedium)) {
     GAME_ACCEL = 1500;
+    gameLevel = 2;
   }
   else if (menu_active_is (twoPlayerGameMenu, kLevelHard)) {
-    GAME_ACCEL = 1250;
+    GAME_ACCEL = 1000;
+    gameLevel = 3;
   }
 
   int score1 = 0;
@@ -1136,12 +1143,10 @@ mml_play:
     p1name = player1Name;
     p2name = player2Name;
     GAME_ACCEL = 1500;
-    myStarter.run(score1, score2, 0);
+    myStarter.run(score1, score2, 0, 0, 0);
     score1 += myStarter.leftPlayerWin();
     score2 += myStarter.rightPlayerWin();
     currentMusicTheme = (currentMusicTheme + 1) % NB_MUSIC_THEME;
-    updateHighScoresMenu();
-    backLoop(highScoresMenu, &myStarter);
   }
 
   SetStrPreference("Player1 Name", player1Name);
@@ -1167,7 +1172,7 @@ void PuyoCommander::startSingleGameLoop()
       defaultName[0] += 'A' - 'a';
     
   GetStrPreference("Player Name", playerName, defaultName);
-  menu_set_value(singleGameMenu, kPlayerName, playerName);
+  menu_set_value(singleGameMenu, kPlayerName, playerName, 0);
 
   while (!menu_active_is(singleGameMenu,kLevelMedium))
     menu_next_item(singleGameMenu);  
@@ -1214,14 +1219,17 @@ mml_play:
 
   SelIA *ia = &(ia1[0]);
 
+  gameLevel = 1;
   GAME_ACCEL = 2000;
   if (menu_active_is (singleGameMenu, kLevelMedium)) {
     ia = &(ia2[0]);
     GAME_ACCEL = 1500;
+    gameLevel = 2;
   }
   else if (menu_active_is (singleGameMenu, kLevelHard)) {
     ia = &(ia3[0]);
-    GAME_ACCEL = 1250;
+    GAME_ACCEL = 1000;
+    gameLevel = 3;
   }
   
   int score1 = 0;
@@ -1237,34 +1245,53 @@ mml_play:
     menu_next_item(gameOver2PMenu);
   gameOverMenu = nextLevelMenu;
 
+  int lastPoints = 0;
   int currentMusicTheme = 0;
   audio_music_switch_theme(currentMusicTheme);
   
-  while (menu_active_is(gameOverMenu, "YES") && (lives >= 0)) {
-    
+  int fini = 0;  
+  while (!fini)
+  {
     PuyoStory myStory(this, score2+1);
     myStory.loop();
     PuyoStarter myStarter(this, true, ia[score2].level, ia[score2].type, currentMusicTheme);
     p1name = playerName;
     p2name = AI_NAMES[score2];
-    myStarter.run(score1, score2, lives);
+    myStarter.run(score1, score2, lives, lastPoints, 0);
+    lastPoints = myStarter.rightPlayerPoints();
     score1 += myStarter.leftPlayerWin();
     score2 += myStarter.rightPlayerWin();
-    updateHighScoresMenu();
-    backLoop(highScoresMenu, &myStarter);
     if (!myStarter.rightPlayerWin())
       lives--;
     else {
       currentMusicTheme = (currentMusicTheme + 1) % NB_MUSIC_THEME;
       audio_music_switch_theme(currentMusicTheme);
     }
-    
+
     if (ia[score2].level == 0) {
-      break;
+      lastPoints += 100000;
+      if (menu_active_is (singleGameMenu, kLevelMedium))
+        lastPoints += 150000;
+      if (menu_active_is (singleGameMenu, kLevelHard))
+        lastPoints += 250000;
+      fini = 1;
+    }
+  
+    if (!(menu_active_is(gameOverMenu, "YES") && (lives >= 0)))
+      fini = 1;
+  
+    if (fini)
+    {
+      audio_music_start(0);
+      int newOne = setHiScore(lastPoints, p1name);
+      if (newOne >= 0)
+      {
+        updateHighScoresMenu(newOne);
+        backLoop(highScoresMenu, &myStarter);
+      }
     }
   }
   SetStrPreference("Player Name", playerName);
-  audio_music_start(0);
 }
 
 void PuyoCommander::updateAll(PuyoDrawable *starter)

@@ -305,7 +305,8 @@ void PuyoGame::setPuyoAt(int X, int Y, PuyoPuyo *newPuyo)
 void PuyoGame::dropNeutrals()
 {
   if (neutralPuyos < 0) {
-    points -= neutralPuyos * 1000;
+    extern int gameLevel;
+    points -= gameLevel * neutralPuyos * 1000;
   }
 
     while (neutralPuyos > 0)
@@ -634,7 +635,8 @@ void PuyoGame::cycleEnding()
 	  phase++;
 	}
   
-  points += 100 + (phase>0?phase-1:0) * 5000;
+  extern int gameLevel;
+  points += gameLevel * 100 + gameLevel * (phase>0?phase-1:0) * 5000;
   
 	neutralPuyos -= score;
 	if (score == 0)

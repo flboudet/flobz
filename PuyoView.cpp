@@ -32,6 +32,7 @@ const char *p1name;
 const char *p2name;
 
 int GAME_ACCEL = 1250;
+int gameLevel;
 
 static char PuyoGroupImageIndex[2][2][2][2] =
 { {  // empty bottom
@@ -843,7 +844,7 @@ PuyoStarter::~PuyoStarter()
 #define repeatCondition(A) keysDown[A]++; if (((keysDown[A]-FPKEY_DELAY)>0) && ((keysDown[A]-FPKEY_DELAY)%FPKEY_REPEAT == 0)) 
 
 
-void PuyoStarter::run(int score1, int score2, int lives)
+void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
 {
 	this->lives = lives;
   this->score1 = score1;
@@ -855,6 +856,8 @@ void PuyoStarter::run(int score1, int score2, int lives)
 	int keysDown[FPKEY_keyNumber] = {0,0,0,0,0,0,0,0,0,0};
 
   gameSpeed = 20;
+  attachedGameB->points = point1;
+  attachedGameA->points = point2;
   
 	if (!randomPlayer) {
 		int sc1=score1,sc2=score2;
@@ -1019,6 +1022,23 @@ void PuyoStarter::run(int score1, int score2, int lives)
                   keysDown[FPKEY_P2_TurnLeft] = 0;
                   keysDown[FPKEY_P2_TurnRight] = 0;
                 }
+
+                switch (gameLevel)
+                {
+                  case 1:
+                    attachedGameB->points += 1;
+                    attachedGameA->points += 1;
+                    break;
+                  case 2:
+                    attachedGameB->points += 5;
+                    attachedGameA->points += 5;
+                    break;
+                  case 3:
+                    attachedGameB->points += 10;
+                    attachedGameA->points += 10;
+                    break;
+                }
+                
                 if (attachedGameA->getPoints()/50000 > savePointsA/50000)
                   blinkingPointsA = 10;
                 if (attachedGameB->getPoints()/50000 > savePointsB/50000)
@@ -1156,20 +1176,21 @@ void PuyoStarter::run(int score1, int score2, int lives)
               }
               else if (commander->gameOverMenu == commander->nextLevelMenu) {
                 char level[256];
-                sprintf(level, "%d, vs %s", score2+1, p2name);
+                extern char *AI_NAMES[];
+                sprintf(level, "Stage %d... Vs %s", score2+1, AI_NAMES[score2]);
                 menu_set_value(commander->gameOverMenu, kNextLevel, level);
               }
               else if (commander->gameOverMenu == commander->looserMenu) {
                 char level[256];
                 char cont[256];
-                sprintf(level, "%d, vs %s", score2+1, p2name);
-                sprintf(cont, "%d", lives);
+                sprintf(level, "Stage %d... Vs %s", score2+1, p2name);
+                sprintf(cont, "%d Left", lives);
                 menu_set_value(commander->gameOverMenu, kCurrentLevel, level);
                 menu_set_value(commander->gameOverMenu, kContinueLeft, cont);
               }
               else if (commander->gameOverMenu == commander->gameOver1PMenu) {
                 char level[256];
-                sprintf(level, "%d (vs %s)", score2+1, p2name);
+                sprintf(level, "Stage %d... Vs %s", score2+1, p2name);
                 menu_set_value(commander->gameOverMenu, kYouGotToLevel, level);
               }
               commander->showGameOver();
@@ -1221,7 +1242,9 @@ void PuyoStarter::run(int score1, int score2, int lives)
 			event.user.type = SDL_USEREVENT;
 			event.user.code = 0;
 			SDL_PushEvent(&event);
-			if (tickCounts % gameSpeed == 0) { // Vitesse du jeu
+      // Vitesse du jeu
+			if (tickCounts % (gameSpeed + 5 * (3 - gameLevel)) == 0)
+      {
 				event.user.type = SDL_USEREVENT;
 				event.user.code = 1;
 				SDL_PushEvent(&event);
@@ -1241,9 +1264,6 @@ void PuyoStarter::run(int score1, int score2, int lives)
 			SDL_FreeSurface(perso[i]);
 	}
 	SDL_SetClipRect(display,NULL);
-  if (!randomPlayer)
-    setHiScore(attachedGameA->getPoints(), p2name);
-  setHiScore(attachedGameB->getPoints(), p1name);
 }
 
 void PuyoStarter::draw()

@@ -111,6 +111,7 @@ public:
 
   int getSemiMove() const { return semiMove; }
   int getPoints() const { return points; }
+  int points;
 
  private:
   // Set the state of the puyo at the indicated coordinates (not recommanded)
@@ -151,7 +152,6 @@ public:
   
   // We are keeping a list of current puyos
   IosVector puyoVector;
-  int points;
   int nbFalled;
 };
 

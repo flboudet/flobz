@@ -39,7 +39,7 @@ class PuyoCommander
   Menu *finishedMenu;
   Menu *looserMenu;
   Menu *highScoresMenu;
-  void updateHighScoresMenu();
+  void updateHighScoresMenu(int newOne = -1);
 
   SoFont *smallFont;
   SoFont *darkFont;
