@@ -22,7 +22,7 @@ OBJFILES= SDL_prim.o scenar.y.o scenar.l.o PuyoCommander.o IosException.o \
 					menu.o menuitems.o audio.o scrollingtext.o preferences.o PuyoStory.o SDL_Painter.o
 
 all: prelude ${OBJFILES}
-	@echo "[flobopuyo]" && g++ $(CFLAGS) -o flobopuyo `$(SDL_CONFIG) --cflags --static-libs` -lSDL_mixer -lSDL_image ${OBJFILES}
+	@echo "[flobopuyo]" && g++ $(CFLAGS) -o flobopuyo `$(SDL_CONFIG) --cflags --libs` -lSDL_mixer -lSDL_image ${OBJFILES}
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
 	@[ "x`cat WARNINGS | wc -l`" != "x0" ] && echo -e "--------------------------------------\n There have been some warnings:\n" && cat WARNINGS && rm -f WARNINGS && echo "--------------------------------------" || true
