@@ -1,4 +1,3 @@
-$ ./configure
 $ make
 
 Some options are available on top of the Makefile.

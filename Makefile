@@ -65,7 +65,7 @@ scenar.y.c:scenar.y ${HFILES}
 	@echo "[$@]" && bison -y -d -o scenar.y.c scenar.y
 
 clean:
-	rm -f *~ scenar.y.c scenar.y.h scenar.l.c *.o flobopuyo
+	rm -f *~ scenar.y.c scenar.y.h scenar.l.c *.o flobopuyo* WARNINGS
 
 #_install: ${OBJFILES}
 #	g++ $(CFLAGS) -o flobopuyo `$(SDL_CONFIG) --cflags --static-libs` -lSDL_mixer -lSDL_image ${OBJFILES}
