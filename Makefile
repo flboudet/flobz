@@ -27,6 +27,12 @@ OBJFILES= HiScores.o PuyoCommander.o        \
           PuyoStarter.o PuyoSinglePlayerStarter.o PuyoTwoPlayerStarter.o     \
           PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o PuyoMenu.o PuyoNetworkMenu.o AnimatedPuyoTheme.o
 
+DEPDIR = .deps
+df = $(DEPDIR)/$(*F)
+
+MAKEDEPEND = gcc -MM $(CFLAGS) -o $(df).d $<
+# MAKEDEPEND = touch $*.d && makedepend $(CPPFLAGS) -f $*.d $<
+
 all: prelude flobopuyo
 
 flobopuyo: ${OBJFILES}
@@ -48,9 +54,21 @@ prelude:
 	@echo "Compiling with LDFLAGS=$(LDFLAGS)"
 
 %.o:%.c
+	@mkdir -p $(DEPDIR);\
+	$(MAKEDEPEND); \
+	cp $(df).d $(df).P; \
+	sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+	-e '/^$$/ d' -e 's/$$/ :/' < $(df).d >> $(df).P; \
+	rm -f $(df).d
 	@echo "[$@]" && $(CC) $(CFLAGS) -c $< 2>> WARNINGS || (cat WARNINGS && false)
 
 %.o:%.cpp
+	@mkdir -p $(DEPDIR);\
+	$(MAKEDEPEND); \
+	cp $(df).d $(df).P; \
+	sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+	-e '/^$$/ d' -e 's/$$/ :/' < $(df).d >> $(df).P; \
+	rm -f $(df).d
 	@echo "[$@]" && $(CXX) $(CFLAGS) -c $< 2>> WARNINGS || (cat WARNINGS && false)
 
 PuyoDoomMelt.o:PuyoDoomMelt.c ${HFILES}
@@ -137,3 +155,7 @@ win-package: flobopuyo
 	cp COPYING $(WINZIP_NAME)
 	cp $(WINSDLRUNTIME)/*.dll $(WINZIP_NAME)
 	zip -r $(WINZIP_NAME) $(WINZIP_NAME)
+
+.PHONY: all clean
+
+-include $(SRCS:%.cpp=$(DEPDIR)/%.P)
