@@ -1,0 +1,20 @@
+Since version 0.13:
+- Improved game control settings
+- Added key repetition
+- Made the "main puyo" more visible by blinking
+- Added score board and hall of fame
+- Added a new music and game theme
+- Added some sound effects
+- Added OpenGL support
+- Added a useless effect (corona) in the about menu
+- Improved in-game animations
+- Improved menu appearance
+- Added a useless effect (corona) in the about menu
+- Fixed eye blinking problem on rotating puyo
+- Fixed a bug when rotating left in a single column
+- Fixed Windows sound and fullscreen mode
+- Improved the end of game detection
+- Inverted the puyo orientation when they fall
+- Version in about
+- Improved the Makefile
+- Added a changelog
