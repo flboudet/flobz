@@ -1175,9 +1175,6 @@ void PuyoCommander::onMessage(Message &message)
 {
     int msgType = message.getInt(PuyoMessage::TYPE);
     switch (msgType) {
-        case PuyoMessage::kGameStart:
- 	    netgame_started = true;
-            break;
         default:
             break;
     }
@@ -1240,7 +1237,6 @@ mml_play:
 
   if (mbox) delete mbox;
   mbox = new UDPMessageBox(ipAddress, 6581, 6581);
-  netgame_started = false;
   mbox->addListener(this);
   
   GAME_ACCEL = 2000;
@@ -1268,17 +1264,6 @@ mml_play:
     p2name = playerName;
     GAME_ACCEL = 1500;
     doom_melt_start(melt, menuBGImage);
-    
-    // creation du message
-    Message *message = mbox->createMessage();
-    message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameStart);
-    message->addString  (PuyoMessage::NAME,   p1name);
-    message->send();
-    delete message;
-    
-    while (!netgame_started)
-        updateAll(&myStarter);
-    netgame_started = false;
     
     myStarter.run(score1, score2, 0, 0, 0);
     score1 += myStarter.leftPlayerWin();

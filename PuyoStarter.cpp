@@ -63,6 +63,91 @@ extern Menu *menu_pause;
 static char *BACKGROUND[NB_MUSIC_THEME] = { "Background.jpg", "BackgroundDark.jpg" };
 extern IIM_Surface *background, *fallingBlue, *fallingRed, *fallingGreen, *fallingViolet, *fallingYellow, *neutral;
 
+PuyoPureStarter::PuyoPureStarter(PuyoCommander *commander) : commander(commander)
+{
+    paused = false;
+    stopRendering = false;
+    gameAborted = false;
+}
+
+PuyoPureStarter::~PuyoPureStarter()
+{
+}
+
+void PuyoPureStarter::handleEvent(SDL_Event &event)
+{
+    /* Check for usual events */
+    GameControlEvent controlEvent;
+    getControlEvent(event, &controlEvent);
+    switch (controlEvent.cursorEvent) {
+        case GameControlEvent::kStart:
+            startPressed();
+            break;
+        case GameControlEvent::kBack:
+            backPressed();
+            break;
+        default:
+            break;
+    }
+    /* Check for SDL special events */
+    if(event.type == SDL_QUIT) {
+        if (menu_active_is(commander->gameOverMenu, "YES"))
+            menu_next_item(commander->gameOverMenu);
+        //quit = 1;
+        exit(0);
+    }
+}
+
+void PuyoPureStarter::startPressed()
+{
+    //if (gameover) {
+        //if (menu_active_is(commander->gameOverMenu, "NO"))
+        //    menu_next_item(commander->gameOverMenu);
+        //quit = true;
+    //}
+}
+
+void PuyoPureStarter::backPressed()
+{
+/*
+    if (!gameover) {
+        if (!paused) {
+            menu_show(menu_pause);
+            paused = true;
+            stopRender();
+        }
+        else {
+            paused = false;
+            restartRender();
+            menu_hide(menu_pause);
+        }
+    }
+    else {
+        if (menu_active_is(commander->gameOverMenu, "NO"))
+            menu_next_item(commander->gameOverMenu);
+        quit = 1;
+    }
+    */
+}
+    
+void PuyoPureStarter::stopRender()
+{
+    this->stopRendering = true;
+    iim_surface_convert_to_gray(painter.gameScreen);
+}
+
+
+void PuyoPureStarter::restartRender()
+{
+    this->stopRendering = false;
+    painter.redrawAll();
+}
+
+
+
+
+
+
 static void loadShrinkXplode2(int i, float dec)
 {
     for (int j=1;j<=4;++j)
@@ -110,19 +195,6 @@ private:
     PuyoRandomSystem *attachedRandom;
     MessageBox &msgBox;
 };
-
-void PuyoStarter::stopRender()
-{
-    this->stopRendering = true;
-    iim_surface_convert_to_gray(painter.gameScreen);
-}
-
-
-void PuyoStarter::restartRender()
-{
-    this->stopRendering = false;
-    painter.redrawAll();
-}
 
 void PuyoStarter::draw()
 {
@@ -233,12 +305,9 @@ void PuyoStarter::draw()
 }
 
 
-PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType, int theme, MessageBox *mbox):mbox(mbox)
+PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType, int theme, MessageBox *mbox):PuyoPureStarter(commander), mbox(mbox)
 {
-    this->stopRendering = false;
-    this->paused = false;
     tickCounts = 0;
-    this->commander = commander;
     
     blinkingPointsA = 0;
     blinkingPointsB = 0;
@@ -393,7 +462,6 @@ PuyoStarter::~PuyoStarter()
 #define FPKEY_P2_TurnRight  9
 
 #define repeatCondition(A) keysDown[A]++; if (((keysDown[A]-FPKEY_DELAY)>0) && ((keysDown[A]-FPKEY_DELAY)%FPKEY_REPEAT == 0)) 
-
 
 void PuyoStarter::run(int _score1, int _score2, int lives, int point1, int point2)
 {

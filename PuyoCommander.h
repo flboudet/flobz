@@ -76,7 +76,6 @@ class PuyoCommander : public MessageListener
   int      *corona_screen;
   Corona32 *corona;
   MessageBox *mbox;
-  bool netgame_started;
 };
 
 

@@ -24,8 +24,56 @@
  */
 
 #include "PuyoNetworkStarter.h"
+#include "PuyoMessageDef.h"
+
+extern const char *p1name;
+extern const char *p2name;
 
 PuyoNetworkStarter::PuyoNetworkStarter(PuyoCommander *commander, int theme, ios_fc::MessageBox *mbox)
 : PuyoStarter(commander, false, 0, RANDOM, theme, mbox)
 {
+    netgame_started = false;
+    mbox->addListener(this);
+}
+
+void PuyoNetworkStarter::run(int score1, int score2, int lives, int point1, int point2)
+{
+    // Network game startup synchronization
+    ios_fc::Message *message = mbox->createMessage();
+    message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameStart);
+    message->addString  (PuyoMessage::NAME,   p1name);
+    message->send();
+    delete message;
+    
+    while ((!netgame_started) && (!gameAborted)) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event) == 1) {
+            handleEvent(event);
+        }
+        commander->updateAll(this);
+    }
+    if (!gameAborted)
+        PuyoStarter::run(score1, score2, lives, point1, point2);
+}
+
+void PuyoNetworkStarter::backPressed()
+{
+    if (netgame_started) {
+        PuyoStarter::backPressed();
+    }
+    else {
+        gameAborted = true;
+    }
+}
+
+void PuyoNetworkStarter::onMessage(Message &message)
+{
+    int msgType = message.getInt(PuyoMessage::TYPE);
+    switch (msgType) {
+        case PuyoMessage::kGameStart:
+ 	    netgame_started = true;
+            break;
+        default:
+            break;
+    }
 }

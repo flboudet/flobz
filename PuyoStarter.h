@@ -31,28 +31,40 @@
 #ifndef _PUYOSTARTER
 #define _PUYOSTARTER
 
-#ifdef POURPLUSTARD
-class PuyoStarter : public PuyoDrawable {
+// Le PuyoStarter moderne
+class PuyoPureStarter : public PuyoDrawable {
 public:
-    PuyoStarter(PuyoCommander *commander);
-    virtual ~PuyoStarter();
-    virtual void run(int score1, int score2, int lives, int point1, int point2);
-    virtual void draw();
+    PuyoPureStarter(PuyoCommander *commander);
+    virtual ~PuyoPureStarter();
+    virtual void run(int score1, int score2, int lives, int point1, int point2) = 0;
+    virtual void draw() = 0;
+    virtual void handleEvent(SDL_Event &event);
     
-    virtual bool leftPlayerWin() const  { return attachedGameA->isGameRunning(); }
-    virtual bool rightPlayerWin() const { return attachedGameB->isGameRunning(); }
+    virtual void startPressed();
+    virtual void backPressed();
     
-    virtual int leftPlayerPoints() const { return attachedGameA->getPoints(); }
-    virtual int rightPlayerPoints() const { return attachedGameB->getPoints(); }
+    //virtual bool leftPlayerWin() const  { return attachedGameA->isGameRunning(); }
+    //virtual bool rightPlayerWin() const { return attachedGameB->isGameRunning(); }
     
-private:
+    //virtual int leftPlayerPoints() const { return attachedGameA->getPoints(); }
+    //virtual int rightPlayerPoints() const { return attachedGameB->getPoints(); }
+    
+protected:
+    PuyoCommander *commander;
+    bool paused;
+    bool stopRendering;
+    bool gameAborted;
+    
+    void stopRender();
+    void restartRender();
 };
-#endif
 
-class PuyoStarter : public PuyoDrawable {
+
+class PuyoStarter : public PuyoPureStarter {
 public:
     PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType, int theme, ios_fc::MessageBox *mbox = NULL);
     virtual ~PuyoStarter();
+    
     virtual void run(int score1, int score2, int lives, int point1, int point2);
     virtual void draw();
     
@@ -62,8 +74,7 @@ public:
     virtual int leftPlayerPoints() const { return attachedGameA->getPoints(); }
     virtual int rightPlayerPoints() const { return attachedGameB->getPoints(); }
     
-private:
-        PuyoCommander *commander;
+protected:
     PuyoView *areaA, *areaB;
     PuyoGame *attachedGameA, *attachedGameB;
     PuyoIA *randomPlayer;
@@ -74,12 +85,7 @@ private:
     int lives;
     int score1;
     int score2;
-    bool stopRendering;
-    bool paused;
     int gameSpeed;
-    
-    void stopRender();
-    void restartRender();
     
     int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
     ios_fc::MessageBox *mbox;
