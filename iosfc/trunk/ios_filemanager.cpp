@@ -52,6 +52,7 @@ static FileLoader *findHandler(const String &type)
     if (loaders[i]->isSupportedType(type))
       return loaders[i];
   }
+  return NULL;
 }
 
 
