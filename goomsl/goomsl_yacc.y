@@ -269,6 +269,7 @@
     static void gsl_declare_var(GoomHash *ns, const char *name, int type, void *space)
     {
         char type_of[256];
+        if (name[0] == '@') ns = currentGoomSL->vars;
 
         if (space == NULL) {
           switch (type) {

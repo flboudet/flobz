@@ -16,7 +16,7 @@ static char string[1024];
 
 DIGIT    [0-9]
 XDIGIT   [0-9a-f]
-ID       [a-zA-Z_][a-zA-Z0-9_\.]*
+ID       [a-zA-Z_@][a-zA-Z0-9_\.]*
 
 %S C_COMMENT
 %S LINE_COMMENT
