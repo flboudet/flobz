@@ -61,6 +61,7 @@ private:
     Message *createStateMessage(bool paused);
     AdvancedBuffer<int> neutralsBuffer;
     AdvancedBuffer<int> compTurnBuffer;
+    AdvancedBuffer<int> didFallBuffer;
     bool didEndCycle;
 };
 

@@ -21,6 +21,7 @@ static const char *ADD_NEUTRALS = "ADD_NEUTRALS";
 static const char *DID_END_CYCLE = "DID_END_CYCLE";
 static const char *SEMI_MOVE = "SEMI_MOVE";
 static const char *COMPANION_TURN = "COMPANION_TURN";
+static const char *DID_FALL = "DID_FALL";
 
 };
 
