@@ -6,12 +6,19 @@
 namespace ios_fc {
 
   UDPMessage::UDPMessage(int serialID/*, const UDPMessageBox &owner*/)
-  {}
+  {
+    addInt("SERIAL_ID", serialID);
+  }
+
   UDPMessage::UDPMessage(const Buffer<char> serialized/*, const UDPMessageBox &owner*/)
-  {}
+  {
+  }
   
   UDPMessage::~UDPMessage()
-  {}
+  {
+    for (int i=0;i<serialized.size();++i)
+      delete serialized[i];
+  }
 
   bool UDPMessage::isReliable() const
   {
@@ -20,7 +27,7 @@ namespace ios_fc {
   
   int  UDPMessage::getSerialID() const
   {
-    return 1;
+    return getInt("SERIAL_ID");
   }
   
   void UDPMessage::send() const
