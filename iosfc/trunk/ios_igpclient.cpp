@@ -26,61 +26,44 @@
 #include "ios_igpclient.h"
 #include "ios_exception.h"
 #include "ios_igpdatagram.h"
+#include "ios_udpmessagebox.h"
 
 namespace ios_fc {
 
-IGPClient::IGPClient(String hostName, int portID) : enabled(false), clientSocket(hostName, portID)
+IGPClient::IGPClient(String hostName, int portID) : enabled(false), mbox(new UDPMessageBox(hostName, 0, portID))
 {
-    IGPDatagram::ClientMsgAutoAssignIDDatagram datagram;
-    clientSocket.getOutputStream()->streamWrite(datagram.serialize());
+    mbox->addListener(this);
+    IGPDatagram::ClientMsgAutoAssignIDDatagram datagram(mbox->createMessage());
+    datagram.getMessage()->send();
 }
 
-IGPClient::IGPClient(String hostName, int portID, int igpIdent) : enabled(false), clientSocket(hostName, portID)
+IGPClient::IGPClient(String hostName, int portID, int igpIdent) : enabled(false), mbox(new UDPMessageBox(hostName, 0, portID))
 {
-    IGPDatagram::ClientMsgAssignIDDatagram datagram(igpIdent);
-    clientSocket.getOutputStream()->streamWrite(datagram.serialize());
+    mbox->addListener(this);
+    IGPDatagram::ClientMsgAssignIDDatagram datagram(mbox->createMessage(), igpIdent);
+    datagram.getMessage()->send();
+}
+
+IGPClient::~IGPClient()
+{
+    delete mbox;
 }
 
 void IGPClient::sendMessage(int igpID, VoidBuffer message)
 {
-    IGPDatagram::ClientMsgToClientDatagram datagram(igpID, message);
-    clientSocket.getOutputStream()->streamWrite(datagram.serialize());
+    IGPDatagram::ClientMsgToClientDatagram datagram(mbox->createMessage(), igpID, message);
+    datagram.getMessage()->send();
 }
 
 void IGPClient::idle()
 {
-    InputStream *input = clientSocket.getInputStream();
-    /*int available = input->streamAvailable();
-    if (available > 0) {
-        VoidBuffer data(available);
-        input->streamRead(data);
-        IGPDatagram message(data);
-        switch (message.getMsgIdent()) {
-        case IGPDatagram::ServerMsgInformID: {
-            IGPDatagram::ServerMsgInformIDDatagram informIDMessage(message);
-            igpIdent = informIDMessage.getIgpIdent();
-            enabled = true;
-            printf("Obtenu info sur id: %d\n", informIDMessage.getIgpIdent());
-            break;
-        }
-        case IGPDatagram::ServerMsgToClient: {
-            IGPDatagram::ServerMsgToClientDatagram msgReceived(message);
-            printf("Notification clients\n");
-            for (int i = 0, j = listeners.size() ; i < j ; i++) {
-                IGPClientMessageListener *currentListener = listeners[i];
-                currentListener->onMessage(msgReceived.getMessage(), msgReceived.getIgpOriginIdent(), msgReceived.getIgpDestinationIdent());
-            }
-            break;
-        }
-        default:
-            break;
-        }
-    }*/
-    int available = input->streamAvailable();
-    while (available > 0) {
-        printf("***Disponible:%d (%d)***\n", available, available-8);
-        IGPDatagram message(input);
-        switch (message.getMsgIdent()) {
+    mbox->idle();
+}
+
+void IGPClient::onMessage(Message &rawMsg)
+{
+    IGPDatagram message(&rawMsg);
+    switch (message.getMsgIdent()) {
         case IGPDatagram::ServerMsgInformID: {
             IGPDatagram::ServerMsgInformIDDatagram informIDMessage(message);
             igpIdent = informIDMessage.getIgpIdent();
@@ -93,14 +76,12 @@ void IGPClient::idle()
             //printf("Notification clients\n");
             for (int i = 0, j = listeners.size() ; i < j ; i++) {
                 IGPClientMessageListener *currentListener = listeners[i];
-                currentListener->onMessage(msgReceived.getMessage(), msgReceived.getIgpOriginIdent(), msgReceived.getIgpDestinationIdent());
+                currentListener->onMessage(msgReceived.getIgpMessage(), msgReceived.getIgpOriginIdent(), msgReceived.getIgpDestinationIdent());
             }
             break;
         }
         default:
             break;
-        }
-        available = input->streamAvailable();
     }
 }
 

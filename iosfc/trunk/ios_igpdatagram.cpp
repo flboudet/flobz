@@ -28,49 +28,20 @@
 
 namespace ios_fc {
 
-IGPDatagram::IGPDatagram(VoidBuffer data) : msgSize(0), message(data)
+const char IGPDatagram::MSGIDENT[] = "CMD";
+const char IGPDatagram::IGPIDENT[] = "ID";
+const char IGPDatagram::IGPORIGIDENT[] = "OID";
+const char IGPDatagram::IGPDESTIDENT[] = "DID";
+const char IGPDatagram::IGPMSG[] = "MSG";
+
+IGPDatagram::IGPDatagram(Message *data) : message(data)
 {
-    msgIdent = readBigEndianIntFromMessage(0);
-    msgSize = readBigEndianIntFromMessage(4);
-    if (msgSize + 8 > message.size()) {
-        printf("Message incomplet!");
-    }
+    msgIdent = message->getInt(MSGIDENT);
 }
 
-IGPDatagram::IGPDatagram(IGPMsgIdent ident, int msgSize) : msgSize(msgSize), message(msgSize + 8)
+IGPDatagram::IGPDatagram(Message *data, IGPMsgIdent ident) : message(data), msgIdent(ident)
 {
-    msgIdent = ident;
+    message->addInt(MSGIDENT, ident);
 }
-
-IGPDatagram::IGPDatagram(InputStream *stream) : msgSize(0), message(8)
-{
-    int bytesRead = 0;
-    //while (bytesRead < 8) {
-        int readResult = stream->streamRead(message, 8 - bytesRead);
-        bytesRead += readResult;
-        printf("Lu: %d bytes\n", readResult);
-    //}
-    msgIdent = readBigEndianIntFromMessage(0);
-    msgSize = readBigEndianIntFromMessage(4);
-    printf("Taille message:%d ident:%d\n", msgSize, msgIdent);
-    //printf("Addr msg:%x ; addr msg+1:%x\n", message.ptr(), (message+1).ptr());
-    if (msgSize > 0) {
-        message.realloc(msgSize + 8);
-        int bytesRead = 0;
-        while (bytesRead < msgSize) {
-            int readResult = stream->streamRead(message + 8 + bytesRead, msgSize-bytesRead);
-            bytesRead += readResult;
-            printf("Lu: %d bytes\n", readResult);
-        }
-    }
-}
-
-VoidBuffer IGPDatagram::serialize()
-{
-    writeBigEndianIntToMessage(msgIdent, 0);
-    writeBigEndianIntToMessage(msgSize, 4);
-    return message;
-}
-
 
 };

@@ -26,7 +26,7 @@
 #ifndef _IGPCLIENT_H
 #define _IGPCLIENT_H
 
-#include "ios_socket.h"
+#include "ios_messagebox.h"
 #include "ios_memory.h"
 
 namespace ios_fc {
@@ -36,18 +36,20 @@ public:
     virtual void onMessage(VoidBuffer message, int igpOriginIdent, int igpDestinationIdent) = 0;
 };
 
-class IGPClient {
+class IGPClient : public MessageListener {
 public:
     IGPClient(String hostName, int portID);
     IGPClient(String hostName, int portID, int igpIdent);
+    virtual ~IGPClient();
     void sendMessage(int igpID, VoidBuffer message);
     void idle();
     void addListener(IGPClientMessageListener *);
     void removeListener(IGPClientMessageListener *);
+    void onMessage(Message &);
 private:
     bool enabled;
     int igpIdent;
-    Socket clientSocket;
+    MessageBox *mbox;
     AdvancedBuffer<IGPClientMessageListener*> listeners;
 };
 
