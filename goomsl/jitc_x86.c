@@ -31,7 +31,7 @@ struct {
   {"mm4",4}, {"mm5",5}, {"mm6",6}, {"mm7",7}, {NULL,0}
 };
 
-static void modrm(JitcX86Env *jitc, int opcode, IParam *iparam)
+void modrm(JitcX86Env *jitc, int opcode, IParam *iparam)
 {
   int dest = 0;
   int src  = 1;
@@ -73,10 +73,43 @@ static void modrm(JitcX86Env *jitc, int opcode, IParam *iparam)
     exit(1);
   }
   else {
-    JITC_ADD_UCHAR(jitc, opcode + direction);
+    if (opcode < 0x100)
+      JITC_ADD_UCHAR(jitc, opcode + direction);
+    else {
+      JITC_ADD_UCHAR(jitc, (opcode>>8)&0xff);
+      JITC_ADD_UCHAR(jitc, (opcode&0xff)/* + direction*/);
+    }
     JITC_ADD_UCHAR(jitc, byte);
     if (need32)
       JITC_ADD_UINT(jitc, int32);
+  }
+}
+      
+static void imul_like_modrm_1param(JitcX86Env *jitc, int opcode, int digit, IParam *iparam)
+{
+  if (iparam[0].id == PARAM_REG)
+  {
+    JITC_ADD_UCHAR(jitc, opcode);
+    JITC_MODRM(jitc, 0x03, digit, iparam[0].reg);
+    return;
+  }
+  if (iparam[0].id == PARAM_dispREG) {
+    JITC_ADD_UCHAR(jitc, opcode);
+    if (iparam[0].disp == 0)
+    {
+      JITC_MODRM(jitc, 0x00, digit, iparam[0].reg);
+    }
+    else if ((iparam[0].disp & 0xff) == iparam[0].disp)
+    {
+      JITC_MODRM(jitc, 0x01, digit, iparam[0].reg);
+      JITC_ADD_UCHAR(jitc, iparam[0].disp);
+    }
+    else
+    {
+      JITC_MODRM(jitc, 0x02, digit, iparam[0].reg);
+      JITC_ADD_UINT(jitc, iparam[0].disp);
+    }
+    return;
   }
 }
 
@@ -85,11 +118,30 @@ static void modrm(JitcX86Env *jitc, int opcode, IParam *iparam)
       JITC_ADD_UCHAR(jitc, opcode + iparam[dest].reg); \
       JITC_ADD_UINT (jitc, (int)iparam[src].i); }
 
+typedef struct {
+  char *name;
+  int opcode;
+  int opcode_reg_int;
+  int digit_reg_int;
+  int opcode_eax_int;
+} AddLikeInstr;
+
+static AddLikeInstr addLike[] = {
+  { "add",  0x01,   0x81, 0x00, 0x05 },
+  { "and",  0x21,   0x81, 0x04, 0x25 },
+  { "cmp",  0x39,   0x81, 0x07, 0x3D },
+  { "imul", 0x0FAF, 0x69, 0x00    -1 },
+  { NULL,       -1,   -1,   -1,   -1 }
+};
+
 /**
  * Check all kind of known instruction... perform special optimisations..
  */
 static void jitc_add_op(JitcX86Env *jitc, char *op, IParam *iparam, int nbParams)
 {
+  int i;
+
+  /* MOV */
   if (strcmp(op,"mov") == 0)
   {
     if ((iparam[0].id == PARAM_REG) && (iparam[1].id == PARAM_INT)) {
@@ -103,28 +155,74 @@ static void jitc_add_op(JitcX86Env *jitc, char *op, IParam *iparam, int nbParams
     }
     else
       modrm(jitc, 0x89, iparam);
+    return;
   }
-  else if (strcmp(op,"add") == 0)
+
+  /* IMUL */
+  if (strcmp(op, "imul") == 0) {
+    if (nbParams == 1) {
+      imul_like_modrm_1param(jitc, 0xf7, 0x05, iparam);
+      return;
+    }
+  }
+
+  /* IDIV */
+  if (strcmp(op, "idiv") == 0) {
+    if (nbParams == 1) {
+      imul_like_modrm_1param(jitc, 0xf7, 0x07, iparam);
+      return;
+    }
+  }
+
+  /* INC */
+  if (strcmp(op, "inc") == 0) {
+    if (iparam[0].id == PARAM_REG) {
+      JITC_ADD_UCHAR(jitc, 0x40 + iparam[0].reg);
+      return;
+    }
+    imul_like_modrm_1param(jitc, 0xff, 0x00, iparam);
+    return;
+  }
+
+  /* DEC */
+  if (strcmp(op, "dec") == 0) {
+    if (iparam[0].id == PARAM_REG) {
+      JITC_ADD_UCHAR(jitc, 0x48 + iparam[0].reg);
+      return;
+    }
+    imul_like_modrm_1param(jitc, 0xff, 0x01, iparam);
+    return;
+  }
+    
+  /* ADD LIKE */
+  for (i=0;addLike[i].name;++i)
   {
-    if ((iparam[0].id == PARAM_REG) && (iparam[1].id == PARAM_INT)) {
-      if (iparam[0].reg == EAX) {
-        JITC_ADD_UCHAR(jitc, 0x05);
-        JITC_ADD_UINT(jitc,  iparam[1].i);
+    if (strcmp(op,addLike[i].name) == 0)
+    {
+      if ((iparam[0].id == PARAM_REG) && (iparam[1].id == PARAM_INT)) {
+        if ((iparam[0].reg == EAX) && (addLike[i].opcode_eax_int>=0)) {
+          JITC_ADD_UCHAR(jitc, addLike[i].opcode_eax_int);
+          JITC_ADD_UINT(jitc,  iparam[1].i);
+          return;
+        }
+        else {
+          JITC_ADD_UCHAR(jitc, addLike[i].opcode_reg_int);
+          JITC_MODRM(jitc,     0x03, addLike[i].digit_reg_int, iparam[0].reg);
+          JITC_ADD_UINT(jitc,  iparam[1].i);
+          return;
+        }
       }
       else {
-        JITC_ADD_UCHAR(jitc, 0x81);
-        JITC_MODRM(jitc,     0x03, 0x00, iparam[0].reg);
-        JITC_ADD_UINT(jitc,  iparam[1].i);
+        modrm(jitc, addLike[i].opcode, iparam);
+        return;
       }
     }
-    else {
-      modrm(jitc, 0x01, iparam);
-    }
   }
-  else {
-    fprintf(stderr, "JITC_x86: Invalid Operation\n");
-    exit(1);
-  }
+
+  /* BSWAP : 0F C8+rd */
+  
+  fprintf(stderr, "JITC_x86: Invalid Operation\n");
+  exit(1);
 }
 
 /**
@@ -138,6 +236,9 @@ void jitc_add(JitcX86Env *jitc, const char *_instr, ...)
   IParam iparam[16];
   va_list ap;
   strcpy(instr,_instr);
+
+  printf("\n|--> %s : ", _instr);
+  
   op = strtok(instr, " ,");
   if (!op) return;
 
@@ -169,18 +270,21 @@ void jitc_add(JitcX86Env *jitc, const char *_instr, ...)
         iparam[i].id  = PARAM_REG;
         iparam[i].reg = RegsName[r].reg;
       }
-      if (sscanf(sparam[i], "$d[%s]", regname) > 0) {
-        if (strcmp(regname, RegsName[r].name) == 0) {
-          iparam[i].id   = PARAM_dispREG;
-          iparam[i].reg  = RegsName[r].reg;
-          iparam[i].disp = va_arg(ap, int);
+      else
+      {
+        if (sscanf(sparam[i], "$d[%3s]", regname) > 0) {
+          if (strcmp(regname, RegsName[r].name) == 0) {
+            iparam[i].id   = PARAM_dispREG;
+            iparam[i].reg  = RegsName[r].reg;
+            iparam[i].disp = va_arg(ap, int);
+          }
         }
-      }
-      if (sscanf(sparam[i], "[%3s]", regname) > 0) {
-        if (strcmp(regname, RegsName[r].name) == 0) {
-          iparam[i].id   = PARAM_dispREG;
-          iparam[i].reg  = RegsName[r].reg;
-          iparam[i].disp = 0;
+        if (sscanf(sparam[i], "[%3s]", regname) > 0) {
+          if (strcmp(regname, RegsName[r].name) == 0) {
+            iparam[i].id   = PARAM_dispREG;
+            iparam[i].reg  = RegsName[r].reg;
+            iparam[i].disp = 0;
+          }
         }
       }
     }
@@ -192,6 +296,7 @@ void jitc_add(JitcX86Env *jitc, const char *_instr, ...)
   va_end(ap);
 
   jitc_add_op(jitc, op, &(iparam[0]), nbParam);
+  printf("\n");
 }
 
 JitcX86Env *jitc_x86_env_new(int memory_size) {
