@@ -107,8 +107,7 @@ public:
 private:
     int xOffset, yOffset, step;
     int X, Y;
-	int bouncing;
-    IIM_Surface *puyoFace;
+    int bouncing;
     static const int BOUNCING_OFFSET_NUM;
     static const int BOUNCING_OFFSET[];
 };

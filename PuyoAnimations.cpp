@@ -32,8 +32,6 @@
 
 /* not clean, but basta */
 extern SDL_Painter painter;
-extern IIM_Surface *puyoEyes;
-extern IIM_Surface *puyoEye[3];
 extern IIM_Surface *puyoEyesSwirl[4];
 extern IIM_Surface *shrinkingPuyo[5][5];
 extern IIM_Surface *explodingPuyo[5][5];
@@ -199,7 +197,6 @@ FallingAnimation::FallingAnimation(AnimatedPuyo &puyo, int originY, int xOffset,
     this->step    = 0/*step*/;
     this->X  = (attachedPuyo.getPuyoX()*TSIZE) + xOffset;
     this->Y  = (originY*TSIZE) + yOffset;
-    puyoFace = PuyoView::getSurfaceForState(attachedPuyo.getPuyoState());
     bouncing = BOUNCING_OFFSET_NUM - 1;
     if (originY == attachedPuyo.getPuyoY()) {
         bouncing = -1;
@@ -228,17 +225,14 @@ void FallingAnimation::cycle()
 
 void FallingAnimation::draw(int semiMove)
 {
-    if (puyoFace) {
-        SDL_Rect drect;
-        drect.x = X;
-        drect.y = Y + (bouncing>=0?BOUNCING_OFFSET[bouncing]:0);
-        // drect.y = -semiMove() * TSIZE / 2;
-        drect.w = puyoFace->w;
-        drect.h = puyoFace->h;
-        painter.requestDraw(puyoFace, &drect);
-        if (attachedPuyo.getPuyoState() != PUYO_NEUTRAL)
-            painter.requestDraw(puyoEyesSwirl[(bouncing/2)%4], &drect);
-    }
+    SDL_Rect drect;
+    drect.x = X;
+    int coordY = Y + (bouncing>=0?BOUNCING_OFFSET[bouncing]:0);
+    attachedPuyo.renderAt(X, coordY);
+
+    // TODO : Reactiver le EyeSwirl !
+    //if (attachedPuyo.getPuyoState() != PUYO_NEUTRAL)
+    //   painter.requestDraw(puyoEyesSwirl[(bouncing/2)%4], &drect);
 }
 
 /* Puyo exploding and vanishing animation */
@@ -396,13 +390,6 @@ void SmoothBounceAnimation::cycle()
 
 void SmoothBounceAnimation::draw(int semiMove)
 {
-    /*SDL_Rect drect;
-    IIM_Surface *puyoFace = PuyoView::getSurfaceForState(attachedPuyo.getPuyoState());
-    drect.x = origX;
-    drect.y = origY + bounceOffset;
-    drect.w = puyoFace->w;
-    drect.h = puyoFace->h;
-    painter.requestDraw(puyoFace, &drect);*/
     attachedPuyo.renderAt(origX, origY + bounceOffset);
 }
 
