@@ -37,6 +37,7 @@ PuyoInternetGameCenter::PuyoInternetGameCenter(const String hostName, int portNu
 
 void PuyoInternetGameCenter::sendAliveMessage()
 {
+    int prevBound = mbox.getBound();
     mbox.bind(1);
     Message *msg = mbox.createMessage();
     msg->addBoolProperty("RELIABLE", true);
@@ -44,11 +45,13 @@ void PuyoInternetGameCenter::sendAliveMessage()
     msg->addString("NAME", name);
     msg->send();
     delete msg;
+    mbox.bind(prevBound);
 }
 
 void PuyoInternetGameCenter::sendMessage(const String msgText)
 {
     printf("Envoi du msg:%s\n", (const char *)msgText);
+    int prevBound = mbox.getBound();
     mbox.bind(1);
     Message *msg = mbox.createMessage();
     msg->addBoolProperty("RELIABLE", true);
@@ -57,6 +60,7 @@ void PuyoInternetGameCenter::sendMessage(const String msgText)
     msg->addString("MSG", msgText);
     msg->send();
     delete msg;
+    mbox.bind(prevBound);
 }
 
 void PuyoInternetGameCenter::requestGameWithPeer(String playerName, PeerAddress addr)
@@ -102,25 +106,26 @@ void PuyoInternetGameCenter::idle()
 void PuyoInternetGameCenter::onMessage(Message &msg)
 {
     printf("Cool, un msg!\n");
-    switch (msg.getInt("CMD")) {
-        case PUYO_IGP_CHAT:
-            for (int i = 0, j = listeners.size() ; i < j ; i++) {
-                listeners[i]->onChatMessage(msg.getString("NAME"), msg.getString("MSG"));
-            }
-            break;
-        case PUYO_IGP_CONNECT:
+    try {
+        switch (msg.getInt("CMD")) {
+            case PUYO_IGP_CHAT:
+                for (int i = 0, j = listeners.size() ; i < j ; i++) {
+                    listeners[i]->onChatMessage(msg.getString("NAME"), msg.getString("MSG"));
+                }
+                break;
+            case PUYO_IGP_CONNECT:
             {
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
                 connectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"));
             }
-            break;
-        case PUYO_IGP_DISCONNECT:
+                break;
+            case PUYO_IGP_DISCONNECT:
             {
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
                 disconnectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"));
             }
-            break;
-        case PUYO_IGP_GAME_REQUEST:
+                break;
+            case PUYO_IGP_GAME_REQUEST:
             {
                 printf("Une partie contre %s?\n", (const char *)msg.getString("ORGNAME"));
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
@@ -128,8 +133,8 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
                     listeners[i]->gameInvitationAgainst(msg.getString("ORGNAME"), dir.getPeerAddress());
                 }
             }
-            break;
-        case PUYO_IGP_GAME_ACCEPT:
+                break;
+            case PUYO_IGP_GAME_ACCEPT:
             {
                 printf("%s accepte la partie!\n", (const char *)msg.getString("ORGNAME"));
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
@@ -138,9 +143,13 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
                     listeners[i]->gameGrantedWithMessagebox(&mbox);
                 }
             }
-            break;
-        default:
-            break;
+                break;
+            default:
+                break;
+        }
+    }
+    catch (Exception e) {
+        printf("Message invalide 3!\n");
     }
 }
 

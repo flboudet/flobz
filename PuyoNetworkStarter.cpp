@@ -100,6 +100,7 @@ void PuyoNetworkStarter::cycle()
     static bool once_started = true;
     if (once) {
         once = false;
+        printf("Message de synchro!\n");
         // Network game startup synchronization
         ios_fc::Message *message = mbox->createMessage();
         message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameStart);
@@ -114,6 +115,7 @@ void PuyoNetworkStarter::cycle()
     if (netgame_started) {
         if (once_started) {
             // We send the message twice
+            printf("Message de synchro 2!\n");
             ios_fc::Message *message = mbox->createMessage();
             message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameStart);
             message->addString  (PuyoMessage::NAME,   p1name);
@@ -137,12 +139,17 @@ void PuyoNetworkStarter::backPressed()
 
 void PuyoNetworkStarter::onMessage(Message &message)
 {
-    int msgType = message.getInt(PuyoMessage::TYPE);
-    switch (msgType) {
-        case PuyoMessage::kGameStart:
- 	    netgame_started = true;
-            break;
-        default:
-            break;
+    try {
+        int msgType = message.getInt(PuyoMessage::TYPE);
+        switch (msgType) {
+            case PuyoMessage::kGameStart:
+                netgame_started = true;
+                break;
+            default:
+                break;
+        }
+    }
+    catch (Exception e) {
+        printf("Message invalide!\n");
     }
 }

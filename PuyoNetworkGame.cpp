@@ -51,17 +51,22 @@ PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBo
 
 void PuyoNetworkGame::onMessage(Message &message)
 {
-    int msgType = message.getInt(TYPE);
-    switch (msgType) {
-        case kGameState:
-            synchronizeState(message);
-            break;
-        case kGameOver:
-            gameRunning = false;
-            delegate->gameLost();
-            break;
-        default:
-            break;
+    try {
+        int msgType = message.getInt(TYPE);
+        switch (msgType) {
+            case kGameState:
+                synchronizeState(message);
+                break;
+            case kGameOver:
+                gameRunning = false;
+                delegate->gameLost();
+                break;
+            default:
+                break;
+        }
+    }
+    catch (Exception e) {
+        printf("Message invalide 2!\n");
     }
 }
 
