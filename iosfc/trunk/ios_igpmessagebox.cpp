@@ -80,7 +80,7 @@ namespace ios_fc {
 
     void IgpMessageBox::sendBuffer(VoidBuffer out)
     {
-        igpClient.sendMessage(25, out);
+        igpClient.sendMessage(destIdent, out);
     }
     
     void IgpMessageBox::onMessage(VoidBuffer message, int origIdent, int destIdent)

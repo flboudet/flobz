@@ -39,9 +39,11 @@ public:
     virtual Message * createMessage();
     void sendBuffer(VoidBuffer out);
     void onMessage(VoidBuffer message, int origIdent, int destIdent);
+    void bind(int igpIdent) { destIdent = igpIdent; }
  private:
     IGPClient igpClient;
     int sendSerialID;
+    int destIdent;
 };
 
 };
