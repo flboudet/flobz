@@ -36,7 +36,8 @@ public:
     ~KnownPeer();
     void sendQueue();
     void idle();
-    void handleMessage(UDPMessage &message);
+    void handleMessage(UDPMessage &message, int messageSerialID);
+    void handleAck(int messageSerialID);
     PeerAddress address;
     UDPRawMessage *waitingForAckMessage;
     AdvancedBuffer<UDPRawMessage*> outQueue;
@@ -139,21 +140,9 @@ void UDPMessageBox::KnownPeer::idle()
     }
 }
 
-void UDPMessageBox::KnownPeer::handleMessage(UDPMessage &incomingMessage)
+void UDPMessageBox::KnownPeer::handleMessage(UDPMessage &incomingMessage, int messageSerialID)
 {
-    int messageSerialID = incomingMessage.getSerialID();
-    
     cycleSinceLastMessage = 0;
-    
-    if (waitingForAckMessage != NULL) {
-        // If the incoming message is the ACK for the waitingForAckMessage, do what must be done
-        if (waitingForAckMessage->getSerialID() == -messageSerialID) {
-            delete waitingForAckMessage;
-            waitingForAckMessage = NULL;
-            sendQueue();
-            return;
-        }
-    }
     
     // Handle message with inconsistent serial ID
     if ((messageSerialID >= 0) && (messageSerialID < receiveSerialID)) {
@@ -171,8 +160,6 @@ void UDPMessageBox::KnownPeer::handleMessage(UDPMessage &incomingMessage)
         acknowledgeMessage.send();
     }
     
-    
-    
     // Drop if message has been received twice  or has come after the next one
     if (messageSerialID <= receiveSerialID) {
         // Message dropped
@@ -181,6 +168,19 @@ void UDPMessageBox::KnownPeer::handleMessage(UDPMessage &incomingMessage)
         receiveSerialID = messageSerialID;
         // Give the message to every listener
         owner.warnListeners(incomingMessage);
+    }
+}
+
+void UDPMessageBox::KnownPeer::handleAck(int messageSerialID)
+{
+    if (waitingForAckMessage != NULL) {
+        // If the incoming message is the ACK for the waitingForAckMessage, do what must be done
+        if (waitingForAckMessage->getSerialID() == -messageSerialID) {
+            delete waitingForAckMessage;
+            waitingForAckMessage = NULL;
+            sendQueue();
+            return;
+        }
     }
 }
 
@@ -211,8 +211,7 @@ void UDPMessageBox::idle()
     
     // Known peers idle task
     for (int i = 0, j = knownPeers.size() ; i < j ; i++) {
-        KnownPeer *currentPeer = knownPeers[i];
-        currentPeer->idle();
+        knownPeers[i]->idle();
     }
     
     while (socket->available()) {
@@ -222,13 +221,23 @@ void UDPMessageBox::idle()
                 UDPMessage incomingMessage(Buffer<char>((char *)(receivedDatagram.getMessage()), receivedDatagram.getSize()), *this, receivedDatagram.getAddress(), receivedDatagram.getPortNum());
                 
                 int messageSerialID = incomingMessage.getSerialID();
-                KnownPeer *currentPeer = findPeer(incomingMessage.getPeerAddress());
-                if (currentPeer == NULL) {
-                    currentPeer = new KnownPeer(incomingMessage.getPeerAddress(),
-                                                messageSerialID <= 0 ? 0 : messageSerialID - 1,
-                                                *this);
+                
+                // ACK message MUST be handled here, because sender address might not be the same as replier one
+                if (messageSerialID < 0) {
+                    for (int i = 0, j = knownPeers.size() ; i < j ; i++) {
+                        knownPeers[i]->handleAck(messageSerialID);
+                    }
                 }
-                currentPeer->handleMessage(incomingMessage);
+                // Else give the message to the known peer
+                else {
+                    KnownPeer *currentPeer = findPeer(incomingMessage.getPeerAddress());
+                    if (currentPeer == NULL) {
+                        currentPeer = new KnownPeer(incomingMessage.getPeerAddress(),
+                                                    messageSerialID <= 0 ? 0 : messageSerialID - 1,
+                                                    *this);
+                    }
+                    currentPeer->handleMessage(incomingMessage, messageSerialID);
+                }
             }
         }
         catch (UDPMessage::InvalidMessageException e) {
