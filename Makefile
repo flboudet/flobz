@@ -10,16 +10,19 @@ SDL_CONFIG=sdl-config
 CC=g++
 CXX=g++
 
-CFLAGS=`$(SDL_CONFIG) --cflags` -O3 -I/sw/include -DUSE_AUDIO
+CFLAGS=`$(SDL_CONFIG) --cflags` -O0 -I/sw/include -DUSE_AUDIO -g
 CXXFLAGS=${CFLAGS}
 
 HFILES= IosException.h IosImgProcess.h IosVector.h PuyoCommander.h PuyoGame.h \
         PuyoIA.h PuyoPlayer.h PuyoStory.h PuyoView.h SDL_prim.h audio.h menu.h \
-				menuitems.h preferences.h scrollingtext.h sofont.h SDL_Painter.h PuyoVersion.h
+				menuitems.h preferences.h scrollingtext.h sofont.h SDL_Painter.h PuyoVersion.h \
+				InputManager.h GameControls.h
+				
 
 OBJFILES= SDL_prim.o scenar.y.o scenar.l.o PuyoCommander.o IosException.o \
 					IosVector.o main.o PuyoGame.o PuyoVersion.o PuyoView.o PuyoIA.o sofont.o \
-					menu.o menuitems.o audio.o scrollingtext.o preferences.o PuyoStory.o SDL_Painter.o
+					menu.o menuitems.o audio.o scrollingtext.o preferences.o PuyoStory.o SDL_Painter.o \
+					InputManager.o GameControls.o
 
 all: prelude flobopuyo
 
@@ -51,6 +54,8 @@ main.o:main.cpp ${HFILES}
 preferences.o:preferences.c ${HFILES}
 scenar.l.o:scenar.l.c ${HFILES}
 scenar.y.o:scenar.y.c ${HFILES}
+InputManager.o:InputManager.cpp ${HFILES}
+GameControls.o:GameControls.cpp ${HFILES}
 SDL_Painter.o:SDL_Painter.cpp SDL_Painter.h
 audio.o:audio.c audio.h
 menu.o:menu.c menu.h menuitems.h

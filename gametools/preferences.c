@@ -101,7 +101,6 @@ int GetBoolPreference(char * name, int defaut)
 
 static const char * prefsfile = ".flobopuyorc";
 static const char * sep = "\n\r";
-static const char * equ = "=%d";
 
 static char * file = NULL;
 static char * home = NULL;
@@ -145,12 +144,34 @@ static void fetchFile(void)
 }
 
 
-void SetBoolPreference(char * name, int value)
+void SetBoolPreference(const char *name, int value)
 {
     SetIntPreference(name, value);
 }
 
-void SetIntPreference(char * name, int value)
+void SetIntPreference(const char *name, int value)
+{
+  char var[256];
+  sprintf(var,"%d",value);
+  SetStrPreference(name,var);
+}
+
+
+int GetBoolPreference(const char *name, int defaut)
+{
+    return GetIntPreference(name,defaut)?true:false;
+}
+
+int GetIntPreference(const char *name, int defaut)
+{
+  char var[256];
+  var[0] = 0;
+  GetStrPreference(name,var,NULL);
+  if (var[0]) return atoi(var);
+  return defaut;
+}
+
+void SetStrPreference (const char *name, const char *value)
 {
     char * key;
     FILE * prefs;
@@ -175,46 +196,43 @@ void SetIntPreference(char * name, int value)
         file = NULL;
     }
     
-    fprintf(prefs,"%s=%d\n",name,value);
+    fprintf(prefs,"%s=%s\n",name,value);
     
     fclose(prefs);
 }
 
-
-int GetBoolPreference(char * name, int defaut)
-{
-    return GetIntPreference(name,defaut)?true:false;
-}
-
-int GetIntPreference(char * name, int defaut)
+/* Get preferences */
+void GetStrPreference (const char *name, char *out, const char *defaut)
 {
     char * key, *copiedfile;
+    int tmplen;
+
+    if (defaut != NULL)
+      strcpy(out,defaut);
     
     if (file==NULL) fetchFile();
-    if (file==NULL) return defaut;
+    if (file==NULL) return;
     
-    char * tmp = (char *)malloc(strlen(name)+strlen(equ)+1);
-    strcpy(tmp,name);
-    strcat(tmp,equ);
+    char tmp[256];
+    sprintf(tmp,"%s=",name);
+    tmplen = strlen(tmp);
 
     copiedfile = strdup(file);
     
     for (key = strtok(copiedfile, sep); key; key = strtok(NULL, sep))
     {
-        int j;
-
-        if (sscanf(key,tmp,&j)!=0)
+        if (strncmp(key, tmp, tmplen) == 0)
         {
-            free(tmp);
+            strcpy(out, key+tmplen);
             free(copiedfile);
-            return j;
+            return;
         }
     }
     free(copiedfile);
-    free(tmp);
     
-    return defaut;
+    return;
 }
+
 
 #endif /* Not __APPLE__ */
 

@@ -9,11 +9,13 @@
 
 
 /* Set preferences */
-void SetBoolPreference(char*name,int value);
-void SetIntPreference(char*name,int value);
+void SetBoolPreference(const char *name,int value);
+void SetIntPreference (const char *name, int value);
+void SetStrPreference (const char *name, const char *value);
 
 
 /* Get preferences */
-int GetBoolPreference(char * name, int defaut);
-int GetIntPreference(char * name, int defaut);
+int  GetBoolPreference(const char *name, int defaut);
+int  GetIntPreference (const char *name, int defaut);
+void GetStrPreference (const char *name, char *out, const char *defaut);
 

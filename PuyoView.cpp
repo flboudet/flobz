@@ -867,319 +867,327 @@ void PuyoStarter::run(int score1, int score2, int lives)
 		else
 			currentPerso = 1;
 		
-		while (SDL_PollEvent(&event) == 1)
-		{
-			if (attachedGameA->isGameRunning() &&
-				attachedGameB->isGameRunning()) {
-				if (!paused) {
-					
-					GameControlEvent controlEvent;
-					commander->getControlEvent(event, &controlEvent);
-					switch (controlEvent.gameEvent) {
-						case GameControlEvent::kPlayer1Left:
-							if (randomPlayer == 0) {
-                                                            attachedGameA->moveLeft();
-                                                            if (attachedGameA->isEndOfCycle()) keysDown[FPKEY_P1_Left] = 0;
-                                                            else keysDown[FPKEY_P1_Left]++; 
-							}
-							break;
-						case GameControlEvent::kPlayer1Right:
-							if (randomPlayer == 0) {
-                                                            attachedGameA->moveRight();
-                                                            if (attachedGameA->isEndOfCycle()) keysDown[FPKEY_P1_Right] = 0;
-                                                            else keysDown[FPKEY_P1_Right]++; 
-							}
-							break;
-						case GameControlEvent::kPlayer1TurnLeft:
-							if (randomPlayer == 0) {
-                                                            attachedGameA->rotateLeft();
-                                                            if (attachedGameA->isEndOfCycle()) keysDown[FPKEY_P1_TurnLeft] = 0;
-                                                            else keysDown[FPKEY_P1_TurnLeft]++; 
-							}
-							break;
-						case GameControlEvent::kPlayer1TurnRight:
-							if (randomPlayer == 0) {
-                                                            attachedGameA->rotateRight();
-                                                            if (attachedGameA->isEndOfCycle()) keysDown[FPKEY_P1_TurnRight] = 0;
-                                                            else keysDown[FPKEY_P1_TurnRight]++;
-							}
-							break;
-						case GameControlEvent::kPlayer1Down:
-							if (randomPlayer == 0) {
-                                                            attachedGameA->cycle();
-                                                            if (attachedGameA->isEndOfCycle()) keysDown[FPKEY_P1_Down] = 0;
-                                                            else keysDown[FPKEY_P1_Down]++;
-							}
-							break;
-						case GameControlEvent::kPlayer1DownUp:
-							if (randomPlayer == 0) keysDown[FPKEY_P1_Down] = 0;
-							break;
-						case GameControlEvent::kPlayer1LeftUp:
-							if (randomPlayer == 0) keysDown[FPKEY_P1_Left] = 0;
-							break;
-						case GameControlEvent::kPlayer1RightUp:
-							if (randomPlayer == 0) keysDown[FPKEY_P1_Right] = 0;
-							break;
-						case GameControlEvent::kPlayer1TurnLeftUp:
-							if (randomPlayer == 0) keysDown[FPKEY_P1_TurnLeft] = 0;
-							break;
-						case GameControlEvent::kPlayer1TurnRightUp:
-							if (randomPlayer == 0) keysDown[FPKEY_P1_TurnRight] = 0;
-							break;
+    while (SDL_PollEvent(&event) == 1)
+    {
+      if (attachedGameA->isGameRunning() &&
+          attachedGameB->isGameRunning()) {
+        if (!paused) {
 
-						case GameControlEvent::kPlayer2Left:
-                                                    attachedGameB->moveLeft();
-                                                    if (attachedGameB->isEndOfCycle()) keysDown[FPKEY_P2_Left] = 0;
-                                                    else keysDown[FPKEY_P2_Left]++;
-							break;
-						case GameControlEvent::kPlayer2Right:
-                                                    attachedGameB->moveRight();
-                                                    if (attachedGameB->isEndOfCycle()) keysDown[FPKEY_P2_Right] = 0;
-                                                    else keysDown[FPKEY_P2_Right]++;
-							break;
-						case GameControlEvent::kPlayer2TurnLeft:
-                                                    attachedGameB->rotateLeft();
-                                                    if (attachedGameB->isEndOfCycle()) keysDown[FPKEY_P2_TurnLeft] = 0;
-                                                    else keysDown[FPKEY_P2_TurnLeft]++;
-							break;
-						case GameControlEvent::kPlayer2TurnRight:
-                                                    attachedGameB->rotateRight();
-                                                    if (attachedGameB->isEndOfCycle()) keysDown[FPKEY_P2_TurnRight] = 0;
-                                                    else keysDown[FPKEY_P2_TurnRight]++;
-							break;
-						case GameControlEvent::kPlayer2Down:
-                                                    attachedGameB->cycle();
-                                                    if (attachedGameB->isEndOfCycle()) keysDown[FPKEY_P2_Down] = 0;
-                                                    else keysDown[FPKEY_P2_Down]++;
-							break;
-						case GameControlEvent::kPlayer2DownUp:
-                                                    keysDown[FPKEY_P2_Down] = 0;
-							break;
-						case GameControlEvent::kPlayer2LeftUp:
-                                                    keysDown[FPKEY_P2_Left] = 0;
-							break;
-						case GameControlEvent::kPlayer2RightUp:
-                                                    keysDown[FPKEY_P2_Right] = 0;
-							break;
-						case GameControlEvent::kPlayer2TurnLeftUp:
-                                                    keysDown[FPKEY_P2_TurnLeft] = 0;
-							break;
-						case GameControlEvent::kPlayer2TurnRightUp:
-                                                    keysDown[FPKEY_P2_TurnRight] = 0;
-							break;
-						default:
-							break;
-					}
-					
-					switch (event.type) {
-						case SDL_USEREVENT:
-							if (randomPlayer)
-								randomPlayer->cycle();
-							if (event.user.code == 1) {
-								drect.x = 0;
-								drect.y = 0;
-								drect.w = 640;
-								drect.h = 480;
-								attachedGameA->cycle();
-								if (attachedGameA->isEndOfCycle()) {
-									keysDown[FPKEY_P1_Down] = 0;
-									keysDown[FPKEY_P1_Left] = 0;
-									keysDown[FPKEY_P1_Right] = 0;
-									keysDown[FPKEY_P1_TurnLeft] = 0;
-									keysDown[FPKEY_P1_TurnRight] = 0;
-								}
-								attachedGameB->cycle();
-								if (attachedGameB->isEndOfCycle()) {
-									keysDown[FPKEY_P2_Down] = 0;
-									keysDown[FPKEY_P2_Left] = 0;
-									keysDown[FPKEY_P2_Right] = 0;
-									keysDown[FPKEY_P2_TurnLeft] = 0;
-									keysDown[FPKEY_P2_TurnRight] = 0;
-								}
-							} else {
-								if (keysDown[FPKEY_P2_Down]) {
-									attachedGameB->cycle();
-									if (attachedGameB->isEndOfCycle())
-										keysDown[FPKEY_P2_Down] = 0;
-								}
-								if (keysDown[FPKEY_P2_Left]) {
-									repeatCondition(FPKEY_P2_Left) attachedGameB->moveLeft();
-									if (attachedGameB->isEndOfCycle())
-										keysDown[FPKEY_P2_Left] = 0;
-								}
-								if (keysDown[FPKEY_P2_Right]) {
-									repeatCondition(FPKEY_P2_Right) attachedGameB->moveRight();
-									if (attachedGameB->isEndOfCycle())
-										keysDown[FPKEY_P2_Right] = 0;
-								}
-								if (keysDown[FPKEY_P2_TurnLeft]) {
-									repeatCondition(FPKEY_P2_TurnLeft) attachedGameB->rotateLeft();
-									if (attachedGameB->isEndOfCycle())
-										keysDown[FPKEY_P2_TurnLeft] = 0;
-								}
-								if (keysDown[FPKEY_P2_TurnRight]) {
-									repeatCondition(FPKEY_P2_TurnRight) attachedGameB->rotateRight();
-									if (attachedGameB->isEndOfCycle())
-										keysDown[FPKEY_P2_TurnRight] = 0;
-								}
+          GameControlEvent controlEvent;
+          getControlEvent(event, &controlEvent);
 
-								if (keysDown[FPKEY_P1_Down]) {
-									attachedGameA->cycle();
-									if (attachedGameA->isEndOfCycle())
-										keysDown[FPKEY_P1_Down] = 0;
-								}
-								if (keysDown[FPKEY_P1_Left]) {
-									repeatCondition(FPKEY_P1_Left) attachedGameA->moveLeft();
-									if (attachedGameA->isEndOfCycle())
-										keysDown[FPKEY_P1_Left] = 0;
-								}
-								if (keysDown[FPKEY_P1_Right]) {
-									repeatCondition(FPKEY_P1_Right) attachedGameA->moveRight();
-									if (attachedGameA->isEndOfCycle())
-										keysDown[FPKEY_P1_Right] = 0;
-								}
-								if (keysDown[FPKEY_P1_TurnLeft]) {
-									repeatCondition(FPKEY_P1_TurnLeft) attachedGameA->rotateLeft();
-									if (attachedGameA->isEndOfCycle())
-										keysDown[FPKEY_P1_TurnLeft] = 0;
-								}
-								if (keysDown[FPKEY_P1_TurnRight]) {
-									repeatCondition(FPKEY_P1_TurnRight) attachedGameA->rotateRight();
-									if (attachedGameA->isEndOfCycle())
-										keysDown[FPKEY_P1_TurnRight] = 0;
-								}
-							}
-								break;
-						default:
-							break;
-					}
-				} // !Paused
-				else {
-					GameControlEvent controlEvent;
-					commander->getControlEvent(event, &controlEvent);
-					switch (controlEvent.cursorEvent) {
-						case GameControlEvent::kUp:
-							menu_prev_item(menu_pause);
-							break;
-						case GameControlEvent::kDown:
-							menu_next_item(menu_pause);
-							break;
-						case GameControlEvent::kStart:
-							if (menu_active_is(menu_pause, kContinueGame)) {
-								paused = false;
-								restartRender();
-								menu_hide(menu_pause);
-							}
-							if (menu_active_is(menu_pause, kAbortGame)) {
-								if (menu_active_is(commander->gameOverMenu, "YES"))
-									menu_next_item(commander->gameOverMenu);
-								quit = 1;
-								menu_hide(menu_pause);
-							}
-							if (menu_active_is(menu_pause, kOptions)) {
-								menu_hide (menu_pause);
-								commander->optionMenuLoop(this);
-								menu_show (menu_pause);
-							}
-							break;
-					}
-				}
-			} else // Not GameIsRunning
-			{
-				if (randomPlayer) {
-					if (rightPlayerWin()) {
-						if (score2 == 7)
-							commander->gameOverMenu = commander->finishedMenu;
-						else
-							commander->gameOverMenu = commander->nextLevelMenu;
-					}
-					else {
-						if (lives == 0) {
-							commander->gameOverMenu = commander->gameOver1PMenu;
-						}
-						else {
-							commander->gameOverMenu = commander->looserMenu;
-						}
-					}
-				}
-				else {
-					commander->gameOverMenu = commander->gameOver2PMenu;
-				}
-				
-				if (!menu_visible(commander->gameOverMenu)) {
-					
-					char *lname[] = { "Fanzy", "Bob the Killer", "Big Rabbit", "Flying Saucer",
-						"Satanas", "Doctor X", "Tanya", "Master Gyom, King of the Puyos",
-						"X","Y","Z" };
-					
-					if (leftPlayerWin()) score1++;
-					else if (rightPlayerWin()) score2++;
-					
-					if (commander->gameOverMenu == commander->gameOver2PMenu) {
-						char winner[256];
-						char score[256];
-						sprintf(winner,"%d Wins!!!",(leftPlayerWin()?1:2));
-						sprintf(score, "%d - %d", score1, score2);
-						menu_set_value(commander->gameOverMenu, kPlayer, winner);
-						menu_set_value(commander->gameOverMenu, kScore,  score);
-					}
-					else if (commander->gameOverMenu == commander->nextLevelMenu) {
-						char level[256];
-						sprintf(level, "%d, vs. %s", score2+1, lname[score2]);
-						menu_set_value(commander->gameOverMenu, kNextLevel, level);
-					}
-					else if (commander->gameOverMenu == commander->looserMenu) {
-						char level[256];
-						char cont[256];
-						sprintf(level, "%d, vs. %s", score2+1, lname[score2]);
-						sprintf(cont, "%d", lives);
-						menu_set_value(commander->gameOverMenu, kCurrentLevel, level);
-						menu_set_value(commander->gameOverMenu, kContinueLeft, cont);
-					}
-					else if (commander->gameOverMenu == commander->gameOver1PMenu) {
-						char level[256];
-						sprintf(level, "%d (vs. %s)", score2+1, lname[score2]);
-						menu_set_value(commander->gameOverMenu, kYouGotToLevel, level);
-					}
-					commander->showGameOver();
-					stopRender();
-				} // GameOver Visible
-			}
-			GameControlEvent controlEvent2;
-			commander->getControlEvent(event, &controlEvent2);
-			switch (controlEvent2.cursorEvent) {
-				case GameControlEvent::kStart:
-					if (gameover)
-					{
-						if (menu_active_is(commander->gameOverMenu, "NO"))
-							menu_next_item(commander->gameOverMenu);
-						quit = 1;
-					}
-					break;
-				case GameControlEvent::kBack:
-					if (!gameover) {
-						if (!paused) {
-							menu_show(menu_pause);
-							paused = true;
-							stopRender();
-						}
-						else {
-							paused = false;
-							restartRender();
-							menu_hide(menu_pause);
-						}
-					}
-					break;
-				default:
-					break;
-			}
-			if(event.type == SDL_QUIT) {
-				if (menu_active_is(commander->gameOverMenu, "YES"))
-					menu_next_item(commander->gameOverMenu);
-				quit = 1;
-				exit(0);
-			}
-		}
+          if (controlEvent.isUp)
+          {
+            switch (controlEvent.gameEvent) {
+              case GameControlEvent::kPlayer1Down:
+                if (randomPlayer == 0) keysDown[FPKEY_P1_Down] = 0;
+                break;
+              case GameControlEvent::kPlayer1Left:
+                if (randomPlayer == 0) keysDown[FPKEY_P1_Left] = 0;
+                break;
+              case GameControlEvent::kPlayer1Right:
+                if (randomPlayer == 0) keysDown[FPKEY_P1_Right] = 0;
+                break;
+              case GameControlEvent::kPlayer1TurnLeft:
+                if (randomPlayer == 0) keysDown[FPKEY_P1_TurnLeft] = 0;
+                break;
+              case GameControlEvent::kPlayer1TurnRight:
+                if (randomPlayer == 0) keysDown[FPKEY_P1_TurnRight] = 0;
+                break;
+
+              case GameControlEvent::kPlayer2Down:
+                keysDown[FPKEY_P2_Down] = 0;
+                break;
+              case GameControlEvent::kPlayer2Left:
+                keysDown[FPKEY_P2_Left] = 0;
+                break;
+              case GameControlEvent::kPlayer2Right:
+                keysDown[FPKEY_P2_Right] = 0;
+                break;
+              case GameControlEvent::kPlayer2TurnLeft:
+                keysDown[FPKEY_P2_TurnLeft] = 0;
+                break;
+              case GameControlEvent::kPlayer2TurnRight:
+                keysDown[FPKEY_P2_TurnRight] = 0;
+                break;
+            }
+          }
+          else
+            switch (controlEvent.gameEvent) {
+              case GameControlEvent::kPlayer1Left:
+                if (randomPlayer == 0) {
+                  attachedGameA->moveLeft();
+                  if (attachedGameA->isEndOfCycle()) keysDown[FPKEY_P1_Left] = 0;
+                  else keysDown[FPKEY_P1_Left]++; 
+                }
+                break;
+              case GameControlEvent::kPlayer1Right:
+                if (randomPlayer == 0) {
+                  attachedGameA->moveRight();
+                  if (attachedGameA->isEndOfCycle()) keysDown[FPKEY_P1_Right] = 0;
+                  else keysDown[FPKEY_P1_Right]++; 
+                }
+                break;
+              case GameControlEvent::kPlayer1TurnLeft:
+                if (randomPlayer == 0) {
+                  attachedGameA->rotateLeft();
+                  if (attachedGameA->isEndOfCycle()) keysDown[FPKEY_P1_TurnLeft] = 0;
+                  else keysDown[FPKEY_P1_TurnLeft]++; 
+                }
+                break;
+              case GameControlEvent::kPlayer1TurnRight:
+                if (randomPlayer == 0) {
+                  attachedGameA->rotateRight();
+                  if (attachedGameA->isEndOfCycle()) keysDown[FPKEY_P1_TurnRight] = 0;
+                  else keysDown[FPKEY_P1_TurnRight]++;
+                }
+                break;
+              case GameControlEvent::kPlayer1Down:
+                if (randomPlayer == 0) {
+                  attachedGameA->cycle();
+                  if (attachedGameA->isEndOfCycle()) keysDown[FPKEY_P1_Down] = 0;
+                  else keysDown[FPKEY_P1_Down]++;
+                }
+                break;
+
+              case GameControlEvent::kPlayer2Left:
+                attachedGameB->moveLeft();
+                if (attachedGameB->isEndOfCycle()) keysDown[FPKEY_P2_Left] = 0;
+                else keysDown[FPKEY_P2_Left]++;
+                break;
+              case GameControlEvent::kPlayer2Right:
+                attachedGameB->moveRight();
+                if (attachedGameB->isEndOfCycle()) keysDown[FPKEY_P2_Right] = 0;
+                else keysDown[FPKEY_P2_Right]++;
+                break;
+              case GameControlEvent::kPlayer2TurnLeft:
+                attachedGameB->rotateLeft();
+                if (attachedGameB->isEndOfCycle()) keysDown[FPKEY_P2_TurnLeft] = 0;
+                else keysDown[FPKEY_P2_TurnLeft]++;
+                break;
+              case GameControlEvent::kPlayer2TurnRight:
+                attachedGameB->rotateRight();
+                if (attachedGameB->isEndOfCycle()) keysDown[FPKEY_P2_TurnRight] = 0;
+                else keysDown[FPKEY_P2_TurnRight]++;
+                break;
+              case GameControlEvent::kPlayer2Down:
+                attachedGameB->cycle();
+                if (attachedGameB->isEndOfCycle()) keysDown[FPKEY_P2_Down] = 0;
+                else keysDown[FPKEY_P2_Down]++;
+                break;
+              default:
+                break;
+            }
+
+          switch (event.type) {
+            case SDL_USEREVENT:
+              if (randomPlayer)
+                randomPlayer->cycle();
+              if (event.user.code == 1) {
+                drect.x = 0;
+                drect.y = 0;
+                drect.w = 640;
+                drect.h = 480;
+                attachedGameA->cycle();
+                if (attachedGameA->isEndOfCycle()) {
+                  keysDown[FPKEY_P1_Down] = 0;
+                  keysDown[FPKEY_P1_Left] = 0;
+                  keysDown[FPKEY_P1_Right] = 0;
+                  keysDown[FPKEY_P1_TurnLeft] = 0;
+                  keysDown[FPKEY_P1_TurnRight] = 0;
+                }
+                attachedGameB->cycle();
+                if (attachedGameB->isEndOfCycle()) {
+                  keysDown[FPKEY_P2_Down] = 0;
+                  keysDown[FPKEY_P2_Left] = 0;
+                  keysDown[FPKEY_P2_Right] = 0;
+                  keysDown[FPKEY_P2_TurnLeft] = 0;
+                  keysDown[FPKEY_P2_TurnRight] = 0;
+                }
+              } else {
+                if (keysDown[FPKEY_P2_Down]) {
+                  attachedGameB->cycle();
+                  if (attachedGameB->isEndOfCycle())
+                    keysDown[FPKEY_P2_Down] = 0;
+                }
+                if (keysDown[FPKEY_P2_Left]) {
+                  repeatCondition(FPKEY_P2_Left) attachedGameB->moveLeft();
+                  if (attachedGameB->isEndOfCycle())
+                    keysDown[FPKEY_P2_Left] = 0;
+                }
+                if (keysDown[FPKEY_P2_Right]) {
+                  repeatCondition(FPKEY_P2_Right) attachedGameB->moveRight();
+                  if (attachedGameB->isEndOfCycle())
+                    keysDown[FPKEY_P2_Right] = 0;
+                }
+                if (keysDown[FPKEY_P2_TurnLeft]) {
+                  repeatCondition(FPKEY_P2_TurnLeft) attachedGameB->rotateLeft();
+                  if (attachedGameB->isEndOfCycle())
+                    keysDown[FPKEY_P2_TurnLeft] = 0;
+                }
+                if (keysDown[FPKEY_P2_TurnRight]) {
+                  repeatCondition(FPKEY_P2_TurnRight) attachedGameB->rotateRight();
+                  if (attachedGameB->isEndOfCycle())
+                    keysDown[FPKEY_P2_TurnRight] = 0;
+                }
+
+                if (keysDown[FPKEY_P1_Down]) {
+                  attachedGameA->cycle();
+                  if (attachedGameA->isEndOfCycle())
+                    keysDown[FPKEY_P1_Down] = 0;
+                }
+                if (keysDown[FPKEY_P1_Left]) {
+                  repeatCondition(FPKEY_P1_Left) attachedGameA->moveLeft();
+                  if (attachedGameA->isEndOfCycle())
+                    keysDown[FPKEY_P1_Left] = 0;
+                }
+                if (keysDown[FPKEY_P1_Right]) {
+                  repeatCondition(FPKEY_P1_Right) attachedGameA->moveRight();
+                  if (attachedGameA->isEndOfCycle())
+                    keysDown[FPKEY_P1_Right] = 0;
+                }
+                if (keysDown[FPKEY_P1_TurnLeft]) {
+                  repeatCondition(FPKEY_P1_TurnLeft) attachedGameA->rotateLeft();
+                  if (attachedGameA->isEndOfCycle())
+                    keysDown[FPKEY_P1_TurnLeft] = 0;
+                }
+                if (keysDown[FPKEY_P1_TurnRight]) {
+                  repeatCondition(FPKEY_P1_TurnRight) attachedGameA->rotateRight();
+                  if (attachedGameA->isEndOfCycle())
+                    keysDown[FPKEY_P1_TurnRight] = 0;
+                }
+              }
+              break;
+            default:
+              break;
+          }
+        } // !Paused
+        else {
+          GameControlEvent controlEvent;
+          getControlEvent(event, &controlEvent);
+          switch (controlEvent.cursorEvent) {
+            case GameControlEvent::kUp:
+              menu_prev_item(menu_pause);
+              break;
+            case GameControlEvent::kDown:
+              menu_next_item(menu_pause);
+              break;
+            case GameControlEvent::kStart:
+              if (menu_active_is(menu_pause, kContinueGame)) {
+                paused = false;
+                restartRender();
+                menu_hide(menu_pause);
+              }
+              if (menu_active_is(menu_pause, kAbortGame)) {
+                if (menu_active_is(commander->gameOverMenu, "YES"))
+                  menu_next_item(commander->gameOverMenu);
+                quit = 1;
+                menu_hide(menu_pause);
+              }
+              if (menu_active_is(menu_pause, kOptions)) {
+                menu_hide (menu_pause);
+                commander->optionMenuLoop(this);
+                menu_show (menu_pause);
+              }
+              break;
+          }
+        }
+      } else // Not GameIsRunning
+          {
+            if (randomPlayer) {
+              if (rightPlayerWin()) {
+                if (score2 == 7)
+                  commander->gameOverMenu = commander->finishedMenu;
+                else
+                  commander->gameOverMenu = commander->nextLevelMenu;
+              }
+              else {
+                if (lives == 0) {
+                  commander->gameOverMenu = commander->gameOver1PMenu;
+                }
+                else {
+                  commander->gameOverMenu = commander->looserMenu;
+                }
+              }
+            }
+            else {
+              commander->gameOverMenu = commander->gameOver2PMenu;
+            }
+
+            if (!menu_visible(commander->gameOverMenu)) {
+
+              char *lname[] = { "Fanzy", "Bob the Killer", "Big Rabbit", "Flying Saucer",
+                "Satanas", "Doctor X", "Tanya", "Master Gyom, King of the Puyos",
+                "X","Y","Z" };
+
+              if (leftPlayerWin()) score1++;
+              else if (rightPlayerWin()) score2++;
+
+              if (commander->gameOverMenu == commander->gameOver2PMenu) {
+                char winner[256];
+                char score[256];
+                sprintf(winner,"%d Wins!!!",(leftPlayerWin()?1:2));
+                sprintf(score, "%d - %d", score1, score2);
+                menu_set_value(commander->gameOverMenu, kPlayer, winner);
+                menu_set_value(commander->gameOverMenu, kScore,  score);
+              }
+              else if (commander->gameOverMenu == commander->nextLevelMenu) {
+                char level[256];
+                sprintf(level, "%d, vs. %s", score2+1, lname[score2]);
+                menu_set_value(commander->gameOverMenu, kNextLevel, level);
+              }
+              else if (commander->gameOverMenu == commander->looserMenu) {
+                char level[256];
+                char cont[256];
+                sprintf(level, "%d, vs. %s", score2+1, lname[score2]);
+                sprintf(cont, "%d", lives);
+                menu_set_value(commander->gameOverMenu, kCurrentLevel, level);
+                menu_set_value(commander->gameOverMenu, kContinueLeft, cont);
+              }
+              else if (commander->gameOverMenu == commander->gameOver1PMenu) {
+                char level[256];
+                sprintf(level, "%d (vs. %s)", score2+1, lname[score2]);
+                menu_set_value(commander->gameOverMenu, kYouGotToLevel, level);
+              }
+              commander->showGameOver();
+              stopRender();
+            } // GameOver Visible
+          }
+      GameControlEvent controlEvent2;
+      getControlEvent(event, &controlEvent2);
+      switch (controlEvent2.cursorEvent) {
+        case GameControlEvent::kStart:
+          if (gameover)
+          {
+            if (menu_active_is(commander->gameOverMenu, "NO"))
+              menu_next_item(commander->gameOverMenu);
+            quit = 1;
+          }
+          break;
+        case GameControlEvent::kBack:
+          if (!gameover) {
+            if (!paused) {
+              menu_show(menu_pause);
+              paused = true;
+              stopRender();
+            }
+            else {
+              paused = false;
+              restartRender();
+              menu_hide(menu_pause);
+            }
+          }
+          break;
+        default:
+          break;
+      }
+      if(event.type == SDL_QUIT) {
+        if (menu_active_is(commander->gameOverMenu, "YES"))
+          menu_next_item(commander->gameOverMenu);
+        quit = 1;
+        exit(0);
+      }
+    }
 		commander->updateAll(this);
 		
 		if (!paused) {

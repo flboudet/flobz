@@ -4,51 +4,7 @@
 #include "sofont.h"
 #include "menu.h"
 #include "scrollingtext.h"
-
-const int JOYSTICK_THRESHOLD = 15000;
-
-typedef struct GameControlEvent {
-    enum {
-        kGameNone,
-        kPauseGame,
-        kPlayer1Left,
-        kPlayer1Right,
-        kPlayer1TurnLeft,
-        kPlayer1TurnRight,
-        kPlayer1Down,
-        kPlayer1LeftUp,
-        kPlayer1RightUp,
-        kPlayer1TurnLeftUp,
-        kPlayer1TurnRightUp,
-        kPlayer1DownUp,
-        kPlayer2Left,
-        kPlayer2Right,
-        kPlayer2TurnLeft,
-        kPlayer2TurnRight,
-        kPlayer2Down,
-        kPlayer2LeftUp,
-        kPlayer2RightUp,
-        kPlayer2TurnLeftUp,
-        kPlayer2TurnRightUp,
-        kPlayer2DownUp
-    } gameEvent;
-    enum {
-        kCursorNone,
-        kUp,
-        kDown,
-        kLeft,
-        kRight,
-        kStart,
-        kBack,
-        kQuit
-    } cursorEvent;
-} GameControlEvent;
-
-typedef enum {
-    kNegativeAxis = -1,
-    kNullAxis = 0,
-    kPositiveAxis = 1
-} AxisPosition;
+#include "GameControls.h"
 
 class PuyoDrawable
 {
@@ -67,16 +23,12 @@ class PuyoCommander
   void showGameOver() { menu_show(gameOverMenu); }
   void hideGameOver() { menu_hide(gameOverMenu); }
 
-  bool changeControlLoop(SDL_keysym *keySym, PuyoDrawable *starter);
+  bool changeControlLoop(int controlIndex, PuyoDrawable *starter);
   void controlsMenuLoop(PuyoDrawable *d);
   void optionMenuLoop(PuyoDrawable *d = NULL);
   void backLoop(Menu *menu);
   void startSingleGameLoop();
 
-  void initControllers();
-  void closeControllers();
-  void getControlEvent(SDL_Event e, GameControlEvent *result);
-  
   Menu *gameOverMenu;
   
   Menu *gameOver2PMenu;
@@ -96,12 +48,9 @@ class PuyoCommander
   Menu *aboutMenu;
   ScrollingText *scrollingText;
   unsigned int cycle, start_time;
-  
-  SDL_Joystick *joystick[16];
-  int numJoysticks;
-  static const int player1Joystick = 0;
-  static const int player2Joystick = 1;
-  AxisPosition axis[16][16];
+
+  static const int player1Joystick = 1;
+  static const int player2Joystick = 0;
 };
 
 SDL_Surface * IMG_Load_DisplayFormat (const char *path);
