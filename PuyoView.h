@@ -32,6 +32,7 @@
 #include "PuyoCommander.h"
 #include "IosImgProcess.h"
 #include "PuyoAnimations.h"
+#include "AnimatedPuyo.h"
 
 #define TSIZE 32
 #define ASIZE 32
@@ -48,7 +49,7 @@ extern IIM_Surface *image;
 
 class PuyoView : public virtual PuyoDelegate {
   public:
-    PuyoView(PuyoGame *attachedGame, int xOffset, int yOffset, int nXOffset, int nYOffset);
+    PuyoView(PuyoRandomSystem *attachedRandom, int xOffset, int yOffset, int nXOffset, int nYOffset);
     void setEnemyGame(PuyoGame *enemyGame);
     void render();
     void renderNeutral();
@@ -67,6 +68,7 @@ class PuyoView : public virtual PuyoDelegate {
   private:
     void cycleAnimation(PuyoPuyo *puyo);
     bool gameRunning;
+    AnimatedPuyoFactory attachedPuyoFactory;
     PuyoGame *attachedGame, *enemyGame;
 };
 

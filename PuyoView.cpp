@@ -39,9 +39,6 @@ const char *p2name;
 int GAME_ACCEL = 1250;
 int gameLevel;
 
-// A revoir
-static AnimatedPuyoFactory animatedPuyoFactory;
-
 static char PuyoGroupImageIndex[2][2][2][2] =
 { {  // empty bottom
 {  // empty right
@@ -94,10 +91,11 @@ IIM_Surface *perso[2];
 int currentPerso = 0;
 
 
-
-PuyoView::PuyoView(PuyoGame *attachedGame, int xOffset, int yOffset, int nXOffset, int nYOffset)
+PuyoView::PuyoView(PuyoRandomSystem *attachedRandom, int xOffset, int yOffset, int nXOffset, int nYOffset)
 {
-	this->attachedGame = attachedGame;
+	attachedGame = new PuyoGame(attachedRandom, &attachedPuyoFactory);
+    attachedGame->setDelegate(this);
+    
 	this->xOffset = xOffset;
 	this->yOffset = yOffset - TSIZE;
 	this->nXOffset = nXOffset;
@@ -196,6 +194,7 @@ void PuyoView::cycleAnimation()
 		  (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
 		currentPuyo->cycleAnimation();
 	}
+    attachedPuyoFactory.cycleWalhalla();
 }
 
 void PuyoView::render()
@@ -230,7 +229,7 @@ void PuyoView::render()
         currentPuyo->render(painter, this);
     }
     // drawing the walhalla
-    animatedPuyoFactory.renderWalhalla(painter, this);
+    attachedPuyoFactory.renderWalhalla(painter, this);
     
 	drect.x = nXOffset;
 	drect.y = nYOffset;
@@ -471,8 +470,12 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
 		fprintf(stderr, "IMG_Load error:%s\n", SDL_GetError());
 		exit(-1);
 	}
-	attachedGameA = new PuyoGame(&attachedRandom, &animatedPuyoFactory);
-	attachedGameB = new PuyoGame(&attachedRandom, &animatedPuyoFactory);
+    
+    areaA = new PuyoView(&attachedRandom, 1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
+	areaB = new PuyoView(&attachedRandom, 1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE);
+
+	attachedGameA = areaA->getAttachedGame();
+	attachedGameB = areaB->getAttachedGame();
 	
 	if (aiLeft) {
 		randomPlayer = new PuyoIA(aiType, aiLevel, attachedGameA);
@@ -483,13 +486,6 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
 		randomPlayer = 0;
 		perso[0] = NULL;
 	}
-	
-	areaA = new PuyoView(attachedGameA, 1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
-	areaB = new PuyoView(attachedGameB, 1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE);
-
-	
-	attachedGameA->setDelegate(areaA);
-	attachedGameB->setDelegate(areaB);
 	
 	areaA->setEnemyGame(attachedGameB);
 	areaB->setEnemyGame(attachedGameA);
@@ -918,7 +914,6 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
 		if (!paused) {
 			areaA->cycleAnimation();
 			areaB->cycleAnimation();
-			animatedPuyoFactory.cycleWalhalla();
             
 			tickCounts++;
 			event.user.type = SDL_USEREVENT;

@@ -24,6 +24,7 @@
  */
  
 #include "AnimatedPuyo.h"
+#include "PuyoView.h"
 
 // crade, mais basta
 extern IIM_Surface *puyoCircle[32];

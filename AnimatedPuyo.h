@@ -28,9 +28,10 @@
 
 #include "SDL_Painter.h"
 #include "PuyoGame.h"
-#include "PuyoView.h"
 #include "PuyoAnimations.h"
 #include "IosVector.h"
+
+class PuyoView;
 
 class AnimatedPuyo : public PuyoPuyo {
 public:
