@@ -5,14 +5,14 @@ CPP  = g++.exe
 CC   = gcc.exe
 WINDRES = windres.exe
 RES  = 
-OBJ  = ../audio.o ../IosException.o ../IosVector.o ../main.o ../menu.o ../menuitems.o ../preferences.o ../PuyoCommander.o ../PuyoGame.o ../PuyoIA.o ../PuyoStory.o ../PuyoView.o ../scrollingtext.o ../SDL_prim.o ../sofont.o ../scenar.l.o ../scenar.y.o $(RES)
-LINKOBJ  = ../audio.o ../IosException.o ../IosVector.o ../main.o ../menu.o ../menuitems.o ../preferences.o ../PuyoCommander.o ../PuyoGame.o ../PuyoIA.o ../PuyoStory.o ../PuyoView.o ../scrollingtext.o ../SDL_prim.o ../sofont.o ../scenar.l.o ../scenar.y.o $(RES)
-LIBS =  -L"D:/programs/dev-cpp5-beta9/lib" -mwindows -lmingw32 -lSDLmain -lSDL -lSDL_image -lSDL_mixer  
-INCS =  -I"D:/programs/dev-cpp5-beta9/include" 
-CXXINCS =  -I"D:/programs/dev-cpp5-beta9/include/c++/3.3.1"  -I"D:/programs/dev-cpp5-beta9/include/c++/3.3.1/mingw32"  -I"D:/programs/dev-cpp5-beta9/include/c++/3.3.1/backward"  -I"D:/programs/dev-cpp5-beta9/lib/gcc-lib/mingw32/3.3.1/include"  -I"D:/programs/dev-cpp5-beta9/include" 
+OBJ  = ../audio.o ../IosException.o ../IosVector.o ../main.o ../menu.o ../menuitems.o ../preferences.o ../PuyoCommander.o ../PuyoGame.o ../PuyoIA.o ../PuyoStory.o ../PuyoView.o ../scrollingtext.o ../SDL_prim.o ../sofont.o ../scenar.l.o ../scenar.y.o ../AnimatedPuyo.o ../corona_palette.o ../corona32.o ../GameControls.o ../glSDL.o ../HiScores.o ../InputManager.o ../IosImgProcess.o ../PuyoAnimations.o ../PuyoDoomMelt.o ../PuyoLock.o ../PuyoStarter.o ../PuyoVersion.o ../corona.o ../SDL_Painter.o $(RES)
+LINKOBJ  = ../audio.o ../IosException.o ../IosVector.o ../main.o ../menu.o ../menuitems.o ../preferences.o ../PuyoCommander.o ../PuyoGame.o ../PuyoIA.o ../PuyoStory.o ../PuyoView.o ../scrollingtext.o ../SDL_prim.o ../sofont.o ../scenar.l.o ../scenar.y.o ../AnimatedPuyo.o ../corona_palette.o ../corona32.o ../GameControls.o ../glSDL.o ../HiScores.o ../InputManager.o ../IosImgProcess.o ../PuyoAnimations.o ../PuyoDoomMelt.o ../PuyoLock.o ../PuyoStarter.o ../PuyoVersion.o ../corona.o ../SDL_Painter.o $(RES)
+LIBS =  -L"C:/Home/ST05519/Dev-Cpp/lib" -mwindows -lmingw32 -lSDLmain -lSDL -lSDL_mixer -lSDL_image  
+INCS =  -I"C:/Home/ST05519/Dev-Cpp/include" 
+CXXINCS =  -I"C:/Home/ST05519/Dev-Cpp/include/c++/3.3.1"  -I"C:/Home/ST05519/Dev-Cpp/include/c++/3.3.1/mingw32"  -I"C:/Home/ST05519/Dev-Cpp/include/c++/3.3.1/backward"  -I"C:/Home/ST05519/Dev-Cpp/lib/gcc-lib/mingw32/3.3.1/include"  -I"C:/Home/ST05519/Dev-Cpp/include" 
 BIN  = FloboPuyo.exe
-CXXFLAGS = $(CXXINCS) -DYY_NEVER_INTERACTIVE=1 -DUSE_AUDIO=1  
-CFLAGS = $(INCS) -DYY_NEVER_INTERACTIVE=1 -DUSE_AUDIO=1  
+CXXFLAGS = $(CXXINCS) -DYY_NEVER_INTERACTIVE=1 -DUSE_AUDIO=1   -fexpensive-optimizations -O3
+CFLAGS = $(INCS) -DYY_NEVER_INTERACTIVE=1 -DUSE_AUDIO=1   -fexpensive-optimizations -O3
 
 .PHONY: all all-before all-after clean clean-custom
 
@@ -75,3 +75,48 @@ $(BIN): $(OBJ)
 
 ../scenar.y.o: ../scenar.y.c
 	$(CPP) -c ../scenar.y.c -o ../scenar.y.o $(CXXFLAGS)
+
+../AnimatedPuyo.o: ../AnimatedPuyo.cpp
+	$(CPP) -c ../AnimatedPuyo.cpp -o ../AnimatedPuyo.o $(CXXFLAGS)
+
+../corona_palette.o: ../corona_palette.cpp
+	$(CPP) -c ../corona_palette.cpp -o ../corona_palette.o $(CXXFLAGS)
+
+../corona32.o: ../corona32.cpp
+	$(CPP) -c ../corona32.cpp -o ../corona32.o $(CXXFLAGS)
+
+../GameControls.o: ../GameControls.cpp
+	$(CPP) -c ../GameControls.cpp -o ../GameControls.o $(CXXFLAGS)
+
+../glSDL.o: ../glSDL.c
+	$(CPP) -c ../glSDL.c -o ../glSDL.o $(CXXFLAGS)
+
+../HiScores.o: ../HiScores.cpp
+	$(CPP) -c ../HiScores.cpp -o ../HiScores.o $(CXXFLAGS)
+
+../InputManager.o: ../InputManager.cpp
+	$(CPP) -c ../InputManager.cpp -o ../InputManager.o $(CXXFLAGS)
+
+../IosImgProcess.o: ../IosImgProcess.cpp
+	$(CPP) -c ../IosImgProcess.cpp -o ../IosImgProcess.o $(CXXFLAGS)
+
+../PuyoAnimations.o: ../PuyoAnimations.cpp
+	$(CPP) -c ../PuyoAnimations.cpp -o ../PuyoAnimations.o $(CXXFLAGS)
+
+../PuyoDoomMelt.o: ../PuyoDoomMelt.c
+	$(CPP) -c ../PuyoDoomMelt.c -o ../PuyoDoomMelt.o $(CXXFLAGS)
+
+../PuyoLock.o: ../PuyoLock.cpp
+	$(CPP) -c ../PuyoLock.cpp -o ../PuyoLock.o $(CXXFLAGS)
+
+../PuyoStarter.o: ../PuyoStarter.cpp
+	$(CPP) -c ../PuyoStarter.cpp -o ../PuyoStarter.o $(CXXFLAGS)
+
+../PuyoVersion.o: ../PuyoVersion.c
+	$(CPP) -c ../PuyoVersion.c -o ../PuyoVersion.o $(CXXFLAGS)
+
+../corona.o: ../corona.cpp
+	$(CPP) -c ../corona.cpp -o ../corona.o $(CXXFLAGS)
+
+../SDL_Painter.o: ../SDL_Painter.cpp
+	$(CPP) -c ../SDL_Painter.cpp -o ../SDL_Painter.o $(CXXFLAGS)
