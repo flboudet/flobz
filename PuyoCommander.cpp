@@ -559,7 +559,8 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   int audio_volume = GetIntPreference(kAudioVolume, 80);
 
   initGameControls();
-#ifdef __linux__
+//#ifdef __linux__
+#if 0
   /* This Hack Allows Hardware Surface on Linux */
   if (fullscreen)
     setenv("SDL_VIDEODRIVER","dga",0);
