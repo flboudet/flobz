@@ -156,7 +156,7 @@ void UDPMessageBox::KnownPeer::handleMessage(UDPMessage &incomingMessage)
     }
     
     // Handle message with inconsistent serial ID
-    if ((messageSerialID >= 0) && (messageSerialID <= receiveSerialID)) {
+    if ((messageSerialID >= 0) && (messageSerialID < receiveSerialID)) {
         // peer reset
         if ((messageSerialID <= 10) || (receiveSerialID - messageSerialID > 10)) {
             printf("Peer reset!\n");
@@ -178,6 +178,7 @@ void UDPMessageBox::KnownPeer::handleMessage(UDPMessage &incomingMessage)
         // Message dropped
     }
     else {
+        receiveSerialID = messageSerialID;
         // Give the message to every listener
         owner.warnListeners(incomingMessage);
     }

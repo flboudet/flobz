@@ -7,16 +7,19 @@
 #include <unistd.h>
 namespace ios_fc {
 
-class IgpMessageListener : public MessageListener {
+class IgpMessageListener : public MessageListener, public SessionListener {
 public:
     IgpMessageListener(MessageBox &mbox) : mbox(mbox), currentAutoIgpIdent(firstAutoIgpIdent) {}
     void onMessage(Message &message);
+    void onPeerConnect(const PeerAddress &address);
+    void onPeerDisconnect(const PeerAddress &address);
+private:
     int getUniqueIGPId();
     bool igpIdValidAndUnique(int igpIdent);
     class PeerRecord;
     PeerRecord *getPeer(int igpIdent) const;
     Message *createMessage() { return mbox.createMessage(); }
-private:
+    
     static const int firstAutoIgpIdent;
     MessageBox &mbox;
     int currentAutoIgpIdent;
@@ -28,7 +31,12 @@ const int IgpMessageListener::firstAutoIgpIdent = 32768;
 
 class IgpMessageListener::PeerRecord {
 public:
-    PeerRecord(PeerAddress address, IgpMessageListener *pool) : address(address), pool(pool), valid(false) {}
+    PeerRecord(PeerAddress address, IgpMessageListener *pool) : address(address), pool(pool), valid(false) {
+        pool->knownPeers.add(this);
+    }
+    ~PeerRecord() {
+        pool->knownPeers.remove(this);
+    }
     inline PeerAddress getAddress() const { return address; }
     void datagramReceived(IGPDatagram &message);
     inline int getIgpIdent() const { return igpID; }
@@ -129,7 +137,6 @@ void IgpMessageListener::onMessage(Message &data)
     PeerRecord *currentPeer = findPeer(msgAddress);
     if (currentPeer == NULL) {
         currentPeer = new PeerRecord(msgAddress, this);
-        knownPeers.add(currentPeer);
         printf("Nouveau peer !\n");
     }
     
@@ -162,6 +169,18 @@ IgpMessageListener::PeerRecord *IgpMessageListener::getPeer(int igpIdent) const
     return NULL;
 }
 
+void IgpMessageListener::onPeerConnect(const PeerAddress &address)
+{
+    printf("Ca me fait une belle jambe!\n");
+}
+
+void IgpMessageListener::onPeerDisconnect(const PeerAddress &address)
+{
+    printf("Cool, une deconnection IGP!\n");
+    PeerRecord *disconnectedPeer = findPeer(address);
+    delete disconnectedPeer;
+}
+    
 }
 
 using namespace ios_fc;
@@ -174,6 +193,7 @@ int main()
     IgpMessageListener listener(messageBox);
     
     messageBox.addListener(&listener);
+    messageBox.addSessionListener(&listener);
     serverSelector.addSelectable(&serverSocket);
     
     try {
