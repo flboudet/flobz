@@ -37,9 +37,13 @@ class MainMenuScreen : public ScreenVBox
   public:
     MainMenuScreen(GameLoop *loop) : ScreenVBox(loop, 0,0,640,480)
     {
+      setBackground(IIM_Load_DisplayFormat("Background.jpg"));
+      // load a font
       SoFont *font = SoFont_new();
-      SoFont_load(font, IIM_Load_DisplayFormatAlpha("font4b.png"));
-      add(new TextWidget(font, "FloboPuyo"));
+      SoFont_load(font, IIM_Load_DisplayFormatAlpha("font3b.png"));
+      // add some title
+      for (int i=1; i<=10; ++i)
+        add(new TextWidget(font, String("FloboPuyo #") + i));
     }
 };
 

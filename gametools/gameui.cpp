@@ -150,10 +150,27 @@ namespace gameui {
   
   ScreenVBox::ScreenVBox(GameLoop *loop, float x, float y, float width, float height) : VBoxWidget(loop)
   {
-    setPosition(Vec3(x + DEFAULT_SPACING, y + DEFAULT_SPACING, 1.0f));
-    setSize(Vec3(width - DEFAULT_SPACING * 2, height - DEFAULT_SPACING * 2, 1.0f));
+    setPosition(Vec3(x, y, 1.0f));
+    setSize(Vec3(width, height, 1.0f));
   }
 
+  void ScreenVBox::setBackground(IIM_Surface *bg)
+  {
+    this->bg = bg;
+  }
+
+  void ScreenVBox::draw(SDL_Surface *surface) const
+  {
+    if (bg) {
+      SDL_Rect rect;
+      rect.x = (Sint16)getPosition().x;
+      rect.y = (Sint16)getPosition().y;
+      rect.w = (Uint16)getSize().x;
+      rect.h = (Uint16)getSize().y;
+      SDL_BlitSurface(bg->surf, NULL, surface, &rect);
+    }
+    VBoxWidget::draw(surface);
+  }
 
   //
   // TextWidget

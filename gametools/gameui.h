@@ -122,6 +122,11 @@ namespace gameui {
   class ScreenVBox : public VBoxWidget {
     public:
       ScreenVBox(GameLoop *loop, float x, float y, float width, float height);
+      void setBackground(IIM_Surface *bg);
+      void draw(SDL_Surface *surface) const;
+
+    private:
+      IIM_Surface *bg;
   };
 
 

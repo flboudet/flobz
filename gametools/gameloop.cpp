@@ -130,6 +130,7 @@ void GameLoop::add(GameComponent *gc)
 
 void GameLoop::run()
 {
+  draw();
   while (!finished)
   {
     double currentTime = 0.001 * (double)SDL_GetTicks();
