@@ -92,10 +92,9 @@ public:
     void cycle();
     void draw(int semiMove);
 private:
-    int X, Y, companionVector, cpt;
+    int companionVector, cpt;
     float angle;
     float step;
-    IIM_Surface *targetSurface;
     bool counterclockwise;
 };
 

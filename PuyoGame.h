@@ -72,7 +72,7 @@ class PuyoPuyo {
 public:
     PuyoPuyo(PuyoState state);
     virtual ~PuyoPuyo() {};
-    PuyoState getPuyoState();
+    PuyoState getPuyoState() const;
     void setPuyoState(PuyoState state);
     bool PuyoPuyo::isFalling();
     int getPuyoX() const;

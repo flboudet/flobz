@@ -127,8 +127,7 @@ void AnimatedPuyo::renderAt(int X, int Y)
     if (currentSurface != NULL) {
         drect.x = X;
         drect.y = Y;
-        if (this->getPuyoState() < PUYO_EMPTY)
-            drect.y -= attachedGame->getSemiMove() * TSIZE / 2;
+        
         drect.w = currentSurface->w;
         drect.h = currentSurface->h;
         painter.requestDraw(currentSurface, &drect);
@@ -160,11 +159,11 @@ int AnimatedPuyo::getScreenCoordinateX() const
 
 int AnimatedPuyo::getScreenCoordinateY() const
 {
+    if (getPuyoState() < PUYO_EMPTY)
+        if (attachedView->getAttachedGame()->getSemiMove())
+            return attachedView->getScreenCoordinateY(getPuyoY()) -  TSIZE / 2;
     return attachedView->getScreenCoordinateY(getPuyoY());
 }
-
-
-
 
 AnimatedPuyoFactory::AnimatedPuyoFactory(PuyoView *attachedView)
 {

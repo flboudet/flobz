@@ -145,7 +145,6 @@ TurningAnimation::TurningAnimation(AnimatedPuyo &companionPuyo, int vector,
 {
     this->counterclockwise = counterclockwise;
     companionVector = vector;
-    targetSurface = attachedPuyo.getAttachedView()->getSurfaceForPuyo(&attachedPuyo);
     cpt = 0;
     angle = 0;
     step = (3.14 / 2) / 4;
@@ -164,43 +163,36 @@ void TurningAnimation::cycle()
 
 void TurningAnimation::draw(int semiMove)
 {
-    if (targetSurface == NULL)
-        return;
-    X = attachedPuyo.getScreenCoordinateX();
-    Y = attachedPuyo.getScreenCoordinateY();
-    
+    int X = attachedPuyo.getScreenCoordinateX();
+    int Y = attachedPuyo.getScreenCoordinateY();
     float offsetA = sin(angle) * TSIZE;
     float offsetB = cos(angle) * TSIZE * (counterclockwise ? -1 : 1);
-    SDL_Rect drect, drect2;
-    drect.w = targetSurface->w;
-    drect.h = targetSurface->h;
-    drect.y = -semiMove * TSIZE / 2;
+    int ax, ay;
+
     switch (companionVector) {
         case 0:
-            drect.x = (short)(X - offsetB);
-            drect.y += (short)(Y + offsetA - TSIZE);
+            ax = (short)(X - offsetB);
+            ay = (short)(Y + offsetA - TSIZE);
             break;
         case 1:
-            drect.x = (short)(X - offsetA + TSIZE);
-            drect.y += (short)(Y - offsetB);
+            ax = (short)(X - offsetA + TSIZE);
+            ay = (short)(Y - offsetB);
             break;
         case 2:
-            drect.x = (short)(X + offsetB);
-            drect.y += (short)(Y - offsetA + TSIZE);
+            ax = (short)(X + offsetB);
+            ay = (short)(Y - offsetA + TSIZE);
             break;
         case 3:
-            drect.x = (short)(X + offsetA - TSIZE);
-            drect.y += (short)(Y + offsetB);
+            ax = (short)(X + offsetA - TSIZE);
+            ay = (short)(Y + offsetB);
             break;
             
         case -3:
-            drect.x = (short)(X + offsetB);
-            drect.y += (short)(Y + offsetA - TSIZE);
+            ax = (short)(X + offsetB);
+            ay = (short)(Y + offsetA - TSIZE);
             break;
     }
-    drect2 = drect;
-    painter.requestDraw(targetSurface, &drect);
-    painter.requestDraw(puyoEyes, &drect2);
+    attachedPuyo.renderAt(ax, ay);
 }
 
 /* Puyo falling and bouncing animation */

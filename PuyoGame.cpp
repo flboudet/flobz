@@ -61,7 +61,7 @@ bool PuyoPuyo::isFalling()
     return (state < PUYO_EMPTY);
 }
 
-PuyoState PuyoPuyo::getPuyoState()
+PuyoState PuyoPuyo::getPuyoState() const
 {
     if (this != NULL)
         return state;
