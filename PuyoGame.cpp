@@ -310,8 +310,9 @@ void PuyoGame::setPuyoAt(int X, int Y, PuyoPuyo *newPuyo)
 
 void PuyoGame::dropNeutrals()
 {
-  points -= neutralPuyos * 1000;
-  if (points < 0) points = 0;
+  if (neutralPuyos < 0) {
+    points -= neutralPuyos * 1000;
+  }
 
     while (neutralPuyos > 0) {
       int cycleNeutral;

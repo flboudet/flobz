@@ -27,11 +27,10 @@ SDL_Surface *puyoShadow;
 SDL_Surface *puyoFaces[5][16];
 SDL_Surface *live[4];
 
-static char *AI_NAMES[] = { "Fanzy", "Bob the Killer", "Big Rabbit", "Flying Saucer",
-  "Satanas", "Doctor X", "Tanya", "Master Gyom, King of the Puyos",
-  "X","Y","Z" };
+const char *p1name;
+const char *p2name;
 
-#define GAME_ACCEL 1250
+int GAME_ACCEL = 1250;
 
 static char PuyoGroupImageIndex[2][2][2][2] =
 { {  // empty bottom
@@ -732,9 +731,9 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
     speedImg      = IMG_Load_DisplayFormatAlpha("speed.png");
     speedBlackImg = IMG_Load_DisplayFormatAlpha("speed_black.png");
 		
-                puyoCircle[0] = IMG_Load_DisplayFormatAlpha("circle.png");
-		for (int i = 1 ; i < 32 ; i++) puyoCircle[i] = iim_surface_shift_hue(puyoCircle[i-1],11.25f);
-                    
+                SDL_Surface * tmpsurf = IMG_Load_DisplayFormatAlpha("circle.png");
+		for (int i = 0 ; i < 32 ; i++) puyoCircle[i] = iim_surface_set_value(tmpsurf,sin(3.14f/2.0f+i*3.14f/64.0f)*0.6f+0.2f);
+                SDL_FreeSurface(tmpsurf);
         loadShrinkXplode();
         
         puyoShadow = IMG_Load_DisplayFormatAlpha("Shadow.png");
@@ -1019,9 +1018,9 @@ void PuyoStarter::run(int score1, int score2, int lives)
                   keysDown[FPKEY_P2_TurnLeft] = 0;
                   keysDown[FPKEY_P2_TurnRight] = 0;
                 }
-                if (attachedGameA->getPoints()%50000 < savePointsA%50000)
+                if (attachedGameA->getPoints()/50000 > savePointsA/50000)
                   blinkingPointsA = 10;
-                if (attachedGameB->getPoints()%50000 < savePointsB%50000)
+                if (attachedGameB->getPoints()/50000 > savePointsB/50000)
                   blinkingPointsB = 10;
 
                 if (blinkingPointsA > 0)
@@ -1156,20 +1155,20 @@ void PuyoStarter::run(int score1, int score2, int lives)
               }
               else if (commander->gameOverMenu == commander->nextLevelMenu) {
                 char level[256];
-                sprintf(level, "%d, vs. %s", score2+1, AI_NAMES[score2]);
+                sprintf(level, "%d, vs %s", score2+1, p2name);
                 menu_set_value(commander->gameOverMenu, kNextLevel, level);
               }
               else if (commander->gameOverMenu == commander->looserMenu) {
                 char level[256];
                 char cont[256];
-                sprintf(level, "%d, vs. %s", score2+1, AI_NAMES[score2]);
+                sprintf(level, "%d, vs %s", score2+1, p2name);
                 sprintf(cont, "%d", lives);
                 menu_set_value(commander->gameOverMenu, kCurrentLevel, level);
                 menu_set_value(commander->gameOverMenu, kContinueLeft, cont);
               }
               else if (commander->gameOverMenu == commander->gameOver1PMenu) {
                 char level[256];
-                sprintf(level, "%d (vs. %s)", score2+1, AI_NAMES[score2]);
+                sprintf(level, "%d (vs %s)", score2+1, p2name);
                 menu_set_value(commander->gameOverMenu, kYouGotToLevel, level);
               }
               commander->showGameOver();
@@ -1297,12 +1296,10 @@ void PuyoStarter::draw()
     SoFont_CenteredString_XY (commander->smallFont, display,
                               590, 460, text, NULL);
   }
-  else
-  {
-    SoFont *font = (stopRendering?commander->darkFont:commander->menuFont);
-    SoFont_CenteredString_XY (font, display,
-                              130, 460,   AI_NAMES[score2], NULL);
-  }
+
+  SoFont *font = (stopRendering?commander->darkFont:commander->menuFont);
+  SoFont_CenteredString_XY (font, display, 510, 460,   p1name, NULL);
+  SoFont_CenteredString_XY (font, display, 130, 460,   p2name, NULL);
 
   int gameSpeedCpy = gameSpeed;
   if (gameSpeed == 1) gameSpeedCpy = 0;

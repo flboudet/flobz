@@ -266,6 +266,35 @@ static SDL_Surface *iim_surface_shift_hue(SDL_Surface *src, float hue_offset)
   return ret2;
 }
 
+static SDL_Surface *iim_surface_set_value(SDL_Surface *src, float value)
+{
+  SDL_PixelFormat *fmt = src->format;
+  SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
+                                          fmt->Rmask, fmt->Gmask,
+                                          fmt->Bmask, fmt->Amask);
+  SDL_LockSurface(src);
+  SDL_LockSurface(ret);
+  for (int y=src->h; y--;)
+    {
+      for (int x=src->w; x--;)
+	{
+	  RGBA rgba = iim_surface_get_rgba(src,x,y);
+	  HSVA hsva = iim_rgba2hsva(rgba);
+	  hsva.value = value;
+	  if (hsva.value > 1.0f) hsva.value = 1.0f;
+	  if (hsva.value < 0.0f) hsva.value = 0.0f;
+	  rgba = iim_hsva2rgba(hsva);
+	  iim_surface_set_rgba(ret,x,y,rgba);
+	}
+    }
+  SDL_UnlockSurface(src);
+  SDL_UnlockSurface(ret);
+  SDL_Surface *ret2 = SDL_DisplayFormatAlpha(ret);
+  SDL_SetAlpha(ret2, SDL_SRCALPHA | SDL_RLEACCEL, SDL_ALPHA_OPAQUE);
+  SDL_FreeSurface(ret);
+  return ret2;
+}
+
 static void iim_surface_convert_to_gray(SDL_Surface *src)
 {
   SDL_PixelFormat *fmt = src->format;

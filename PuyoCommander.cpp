@@ -15,6 +15,10 @@
 extern char *DATADIR;
 #endif
 
+extern const char *p1name;
+extern const char *p2name;
+extern int GAME_ACCEL;
+
 char *kYouDidIt = "You Dit It!!!";
 char *kNextLevel = "Next Level:";
 char *kLooser = "Looser!!!";
@@ -30,6 +34,9 @@ char *kAbortGame   = "Abort Game";
 char *kOptions     = "Options";
 char *kPlayer      = "Player";
 char *kScore       = "Score:";
+char *kPlayerName  = "Player Name:";
+char *kPlayer1Name  = "P1 Name:";
+char *kPlayer2Name  = "P2 Name:";
 
 static char *kMusicVolume = "MusicVolume";
 static char *kAudioVolume = "AudioVolume";
@@ -47,17 +54,17 @@ static char *kLevelEasy   = "Easy";
 static char *kLevelMedium = "Medium";
 static char *kLevelHard   = "Hard";
 
-static char *kPlayer1Left  = "P1  Left:";
-static char *kPlayer1Right = "P1 Right:";
-static char *kPlayer1Down  = "P1  Down:";
-static char *kPlayer1Clockwise        = "P1 Turn L:";
-static char *kPlayer1Counterclockwise = "P1 Turn R:";
+static char *kPlayer1Left  = "P2  Left:";
+static char *kPlayer1Right = "P2 Right:";
+static char *kPlayer1Down  = "P2  Down:";
+static char *kPlayer1Clockwise        = "P2 Turn L:";
+static char *kPlayer1Counterclockwise = "P2 Turn R:";
 
-static char *kPlayer2Left   = "P2  Left:";
-static char *kPlayer2Right  = "P2 Right:";
-static char *kPlayer2Down   = "P2  Down:";
-static char *kPlayer2Clockwise        = "P2 Turn L:";
-static char *kPlayer2Counterclockwise = "P2 Turn R:";
+static char *kPlayer2Left   = "P1  Left:";
+static char *kPlayer2Right  = "P1 Right:";
+static char *kPlayer2Down   = "P1  Down:";
+static char *kPlayer2Clockwise        = "P1 Turn L:";
+static char *kPlayer2Counterclockwise = "P1 Turn R:";
 
 static char *kRules01 = "Puyos are fancy smiling bubbles...";
 static char *kRules02 = "But they can really be invading sometimes!";
@@ -154,17 +161,19 @@ main_menu_load (SoFont * font)
 }
 
 
-MenuItems single_game_menu_load (SoFont *font, SoFont *small_font)
+MenuItems two_player_game_menu_load (SoFont *font, SoFont *small_font)
 {
   static MenuItemsTab go_menu =
   {
+    MENUITEM(kPlayer1Name),
+    MENUITEM(kPlayer2Name),
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
     MENUITEM_INACTIVE(kGameLevel),
     MENUITEM_BLANKLINE,
-    MENUITEM_BLANKLINE,
     MENUITEM(kLevelEasy),
-    MENUITEM_BLANKLINE,
     MENUITEM(kLevelMedium),
-    MENUITEM_BLANKLINE,
     MENUITEM(kLevelHard),
     MENUITEM_END
   };
@@ -172,6 +181,31 @@ MenuItems single_game_menu_load (SoFont *font, SoFont *small_font)
   menu_items_set_font_for(go_menu, kLevelEasy,   font);
   menu_items_set_font_for(go_menu, kLevelMedium, font);
   menu_items_set_font_for(go_menu, kLevelHard,   font);
+  menu_items_set_font_for(go_menu, kPlayer1Name, font);
+  menu_items_set_font_for(go_menu, kPlayer2Name, font);
+  return go_menu;
+}
+
+MenuItems single_game_menu_load (SoFont *font, SoFont *small_font)
+{
+  static MenuItemsTab go_menu =
+  {
+    MENUITEM(kPlayerName),
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(kGameLevel),
+    MENUITEM_BLANKLINE,
+    MENUITEM(kLevelEasy),
+    MENUITEM(kLevelMedium),
+    MENUITEM(kLevelHard),
+    MENUITEM_END
+  };
+  menu_items_set_font_for(go_menu, kGameLevel,   font);
+  menu_items_set_font_for(go_menu, kLevelEasy,   font);
+  menu_items_set_font_for(go_menu, kLevelMedium, font);
+  menu_items_set_font_for(go_menu, kLevelHard,   font);
+  menu_items_set_font_for(go_menu, kPlayerName,  font);
   return go_menu;
 }
 
@@ -392,17 +426,17 @@ MenuItems controls_menu_load (SoFont *font, SoFont *small_font)
     //MENUITEM("Player 1 Joystick"),
     //MENUITEM("Player 2 Joystick"),
     MENUITEM_BLANKLINE,
-    MENUITEM(kPlayer1Left),
-    MENUITEM(kPlayer1Right),
-    MENUITEM(kPlayer1Down),
-    MENUITEM(kPlayer1Clockwise),
-    MENUITEM(kPlayer1Counterclockwise),
-    MENUITEM_BLANKLINE,
     MENUITEM(kPlayer2Left),
     MENUITEM(kPlayer2Right),
     MENUITEM(kPlayer2Down),
     MENUITEM(kPlayer2Clockwise),
     MENUITEM(kPlayer2Counterclockwise),
+    MENUITEM_BLANKLINE,
+    MENUITEM(kPlayer1Left),
+    MENUITEM(kPlayer1Right),
+    MENUITEM(kPlayer1Down),
+    MENUITEM(kPlayer1Clockwise),
+    MENUITEM(kPlayer1Counterclockwise),
     MENUITEM_BLANKLINE,
     MENUITEM("Back"),
     MENUITEM_END
@@ -533,6 +567,7 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   rulesMenu = menu_new(rules_menu_load(menuFont),menuselector);
   aboutMenu = menu_new(about_menu_load(menuFont),menuselector);
   singleGameMenu = menu_new(single_game_menu_load(menuFont,smallFont),menuselector);
+  twoPlayerGameMenu = menu_new(two_player_game_menu_load(menuFont,smallFont),menuselector);
   if (menu_pause == NULL) menu_pause = menu_new(pause_menu_load(menuFont),menuselector);
   menu_set_sounds (optionMenu,     sound_pop, sound_slide);
   menu_set_sounds (controlsMenu,   sound_pop, sound_slide);
@@ -609,22 +644,8 @@ void PuyoCommander::run()
                         menu_show (menu);
                     }
                     if (menu_active_is (menu, TWO_PLAYERS_GAME)) {
-                        int score1 = 0;
-                        int score2 = 0;
                         menu_hide (menu);
-                        gameOverMenu = gameOver2PMenu;
-                        int currentMusicTheme = 0;
-                        if (menu_active_is(gameOverMenu, "NO"))
-                            menu_next_item(gameOverMenu);
-                        while (menu_active_is(gameOverMenu, "YES")) {
-                            menu_next_item(gameOverMenu);
-                            PuyoStarter myStarter(this,false,0,RANDOM,currentMusicTheme);
-                            audio_music_switch_theme(currentMusicTheme);
-                            myStarter.run(score1, score2, 0);
-                            score1 += myStarter.leftPlayerWin();
-                            score2 += myStarter.rightPlayerWin();
-                            currentMusicTheme = (currentMusicTheme + 1) % NB_MUSIC_THEME;
-                        }
+                        startTwoPlayerGameLoop();
                         menu_show (menu);
                         audio_music_start(0);
                     }
@@ -885,6 +906,153 @@ mml_fin:
         menu_hide (menu);
 }
 
+void PuyoCommander::enterStringLoop(Menu *menu, const char *kItem, char out[256])
+{
+  int len = 0;
+  char prevValue[256];
+  strcpy(prevValue, menu_get_value (menu, kItem));
+  out[0] = '_';
+  out[1] = 0;
+  menu_set_value(menu, kItem, "_");
+
+  while (1)
+  {
+    SDL_Event e;
+    
+    while (SDL_PollEvent (&e)) {
+      GameControlEvent controlEvent;
+      getControlEvent(e, &controlEvent);
+      switch (controlEvent.cursorEvent) {
+        case GameControlEvent::kQuit:
+          exit(0);
+          break;
+        case GameControlEvent::kStart:
+          out[len] = 0;
+          menu_set_value(menu, kItem, out);
+          menu_validate (menu);
+          return;
+        case GameControlEvent::kBack:
+          strcpy(out, prevValue);
+          menu_set_value(menu, kItem, prevValue);
+          return;
+      }
+      switch (e.type) {
+        case SDL_KEYDOWN:
+          {
+            if ( (e.key.keysym.unicode & 0xFF80) == 0 ) {
+              char ch;
+              ch = e.key.keysym.unicode & 0x7F;
+
+              if ((ch >= 'a') && (ch <= 'z'))
+              {
+                if ((len == 0) || (out[len-1] == ' '))
+                  ch = ch - 'a' + 'A';
+              }
+              else if (!((ch >= 'A') && (ch <= 'Z')) || (ch != ' '))
+                ch = 0;
+
+              if (ch && (len < 10)) {
+                out[len++] = ch;
+                out[len]   = '_';
+                out[len+1] = 0;
+              }
+            }
+            if ((e.key.keysym.sym == SDLK_BACKSPACE) && (len > 0))
+            {
+              out[len] = 0;
+              out[--len] = '_';
+            }
+            menu_set_value(menu, kItem, out, 0);
+          }
+          break;
+      }
+    }
+    updateAll(NULL);
+  }
+}
+
+
+void PuyoCommander::startTwoPlayerGameLoop()
+{
+  char player1Name[256];
+  char player2Name[256];
+
+  strcpy(player1Name, "Player 1");
+  strcpy(player2Name, "Player 2");
+  menu_set_value(twoPlayerGameMenu, kPlayer1Name, player1Name);
+  menu_set_value(twoPlayerGameMenu, kPlayer2Name, player2Name);
+
+  menu_show(twoPlayerGameMenu);
+  while (1) {
+    SDL_Event e;
+
+    while (SDL_PollEvent (&e)) {
+      GameControlEvent controlEvent;
+        getControlEvent(e, &controlEvent);
+        switch (controlEvent.cursorEvent) {
+            case GameControlEvent::kQuit:
+                exit(0);
+                break;
+            case GameControlEvent::kDown:
+                menu_next_item (twoPlayerGameMenu);
+                break;
+            case GameControlEvent::kUp:
+                menu_prev_item (twoPlayerGameMenu);
+                break;
+            case GameControlEvent::kStart:
+                menu_validate (twoPlayerGameMenu);
+                if (menu_active_is(twoPlayerGameMenu,kPlayer2Name)) {
+                  enterStringLoop(twoPlayerGameMenu,kPlayer2Name,player2Name);
+                  menu_next_item (twoPlayerGameMenu);
+                }
+                else if (menu_active_is(twoPlayerGameMenu,kPlayer1Name)) {
+                  enterStringLoop(twoPlayerGameMenu,kPlayer1Name,player1Name);
+                  menu_next_item (twoPlayerGameMenu);
+                }
+                else
+                  goto mml_play;
+                break;
+            case GameControlEvent::kBack:
+                menu_hide(twoPlayerGameMenu);
+                return;
+                break;
+        }
+    }
+    updateAll(NULL);
+  }
+  
+mml_play:
+  menu_hide (twoPlayerGameMenu);
+
+  GAME_ACCEL = 2000;
+  if (menu_active_is (twoPlayerGameMenu, kLevelMedium)) {
+    GAME_ACCEL = 1500;
+  }
+  else if (menu_active_is (twoPlayerGameMenu, kLevelHard)) {
+    GAME_ACCEL = 1250;
+  }
+
+  int score1 = 0;
+  int score2 = 0;
+  gameOverMenu = gameOver2PMenu;
+  int currentMusicTheme = 0;
+  if (menu_active_is(gameOverMenu, "NO"))
+    menu_next_item(gameOverMenu);
+  while (menu_active_is(gameOverMenu, "YES")) {
+    menu_next_item(gameOverMenu);
+    PuyoStarter myStarter(this,false,0,RANDOM,currentMusicTheme);
+    audio_music_switch_theme(currentMusicTheme);
+    p1name = player1Name;
+    p2name = player2Name;
+    GAME_ACCEL = 1500;
+    myStarter.run(score1, score2, 0);
+    score1 += myStarter.leftPlayerWin();
+    score2 += myStarter.rightPlayerWin();
+    currentMusicTheme = (currentMusicTheme + 1) % NB_MUSIC_THEME;
+  }
+}
+
+
 struct SelIA {
   IA_Type type;
   int level;
@@ -892,6 +1060,10 @@ struct SelIA {
 
 void PuyoCommander::startSingleGameLoop()
 {
+  char playerName[256];
+  strcpy(playerName, "HUMAN"); /* TODO: Charger/Sauver dans les prefs */
+  menu_set_value(singleGameMenu, kPlayerName, playerName);
+  
   menu_show(singleGameMenu);
   while (1) {
     SDL_Event e;
@@ -911,7 +1083,10 @@ void PuyoCommander::startSingleGameLoop()
                 break;
             case GameControlEvent::kStart:
                 menu_validate (singleGameMenu);
-                goto mml_play;
+                if (menu_active_is(singleGameMenu,kPlayerName))
+                  enterStringLoop(singleGameMenu,kPlayerName,playerName);
+                else
+                  goto mml_play;
                 break;
             case GameControlEvent::kBack:
                 menu_hide(singleGameMenu);
@@ -925,16 +1100,25 @@ void PuyoCommander::startSingleGameLoop()
 mml_play:
   menu_hide (singleGameMenu);
 
-  SelIA ia1[] = { {RANDOM, 250}, {FLOBO, 250}, {FLOBO, 150}, {FLOBO, 100}, {FLOBO,  60}, {JEKO, 250}, {TANIA, 220}, {FLOBO, 32}, {RANDOM,0} };
-  SelIA ia2[] = { {FLOBO,  120}, {JEKO , 110}, {TANIA, 100}, {FLOBO,  50}, {GYOM , 120}, {TANIA, 60}, {JEKO,   50}, {GYOM,  60}, {RANDOM,0} };
-  SelIA ia3[] = { {TANIA,  100}, {JEKO ,  80}, {GYOM ,  80}, {JEKO,   50}, {TANIA,  30}, {GYOM,  30}, {GYOM,   20}, {GYOM,  10}, {RANDOM,0} };
+  static char *AI_NAMES[] = { "Fanzy", "Bob the Killer", "Big Rabbit", "Flying Saucer",
+    "Satanas", "Doctor X", "Tanya", "Master Gyom, King of the Puyos",
+    "X","Y","Z" };
+
+  SelIA ia1[] = { {RANDOM, 350}, {FLOBO, 350}, {FLOBO, 250}, {FLOBO, 180}, {FLOBO,  90}, {JEKO, 350}, {TANIA, 320}, {FLOBO, 62}, {RANDOM,0} };
+  SelIA ia2[] = { {FLOBO,  190}, {JEKO , 180}, {TANIA, 160}, {FLOBO,  90}, {GYOM , 210}, {TANIA, 90}, {JEKO,   80}, {GYOM,  90}, {RANDOM,0} };
+  SelIA ia3[] = { {TANIA,  130}, {JEKO , 100}, {GYOM ,  90}, {JEKO,   80}, {TANIA,  60}, {GYOM,  60}, {GYOM,   40}, {GYOM,  30}, {RANDOM,0} };
 
   SelIA *ia = &(ia1[0]);
 
-  if (menu_active_is (singleGameMenu, kLevelMedium))
+  GAME_ACCEL = 2000;
+  if (menu_active_is (singleGameMenu, kLevelMedium)) {
     ia = &(ia2[0]);
-  else if (menu_active_is (singleGameMenu, kLevelHard))
+    GAME_ACCEL = 1500;
+  }
+  else if (menu_active_is (singleGameMenu, kLevelHard)) {
     ia = &(ia3[0]);
+    GAME_ACCEL = 1250;
+  }
   
   int score1 = 0;
   int score2 = 0;
@@ -957,6 +1141,8 @@ mml_play:
     PuyoStory myStory(this, score2+1);
     myStory.loop();
     PuyoStarter myStarter(this, true, ia[score2].level, ia[score2].type, currentMusicTheme);
+    p1name = playerName;
+    p2name = AI_NAMES[score2];
     myStarter.run(score1, score2, lives);
     score1 += myStarter.leftPlayerWin();
     score2 += myStarter.rightPlayerWin();
@@ -986,6 +1172,7 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
   menu_update (rulesMenu, display);
   menu_update (aboutMenu, display);
   menu_update (singleGameMenu, display);
+  menu_update (twoPlayerGameMenu, display);
   menu_update (menu_pause,display);
   scrolling_text_update(scrollingText, display);
 
@@ -1011,6 +1198,7 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
     menu_draw (rulesMenu, display);
     menu_draw (aboutMenu, display);
     menu_draw (singleGameMenu, display);
+    menu_draw (twoPlayerGameMenu, display);
     menu_draw(menu_pause,display);
     SDL_Flip (display);
   }

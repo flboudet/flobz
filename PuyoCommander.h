@@ -28,6 +28,8 @@ class PuyoCommander
   void optionMenuLoop(PuyoDrawable *d = NULL);
   void backLoop(Menu *menu);
   void startSingleGameLoop();
+  void startTwoPlayerGameLoop();
+  void enterStringLoop(Menu *menu, const char *kItem, char out[256]);
 
   Menu *gameOverMenu;
   
@@ -44,6 +46,7 @@ class PuyoCommander
  private:
   Menu *mainMenu;
   Menu *singleGameMenu;
+  Menu *twoPlayerGameMenu;
   Menu *optionMenu;
   Menu *controlsMenu;
   Menu *rulesMenu;

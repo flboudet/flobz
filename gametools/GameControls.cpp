@@ -125,29 +125,29 @@ ret_false:
 
 void saveControls()
 {
-    SetIntPreference("P1Left",             keyControls[kPlayer1LeftControl]->id());
-    SetIntPreference("P1Right",            keyControls[kPlayer1RightControl]->id());
-    SetIntPreference("P1Down",             keyControls[kPlayer1DownControl]->id());
-    SetIntPreference("P1Clockwise",        keyControls[kPlayer1ClockwiseControl]->id());
-    SetIntPreference("P1Counterclockwise", keyControls[kPlayer1CounterclockwiseControl]->id());
+    SetIntPreference("v50_P1Left",             keyControls[kPlayer1LeftControl]->id());
+    SetIntPreference("v50_P1Right",            keyControls[kPlayer1RightControl]->id());
+    SetIntPreference("v50_P1Down",             keyControls[kPlayer1DownControl]->id());
+    SetIntPreference("v50_P1Clockwise",        keyControls[kPlayer1ClockwiseControl]->id());
+    SetIntPreference("v50_P1Counterclockwise", keyControls[kPlayer1CounterclockwiseControl]->id());
     
-    SetStrPreference("P1LeftS",             keyControls[kPlayer1LeftControl]->name());
-    SetStrPreference("P1RightS",            keyControls[kPlayer1RightControl]->name());
-    SetStrPreference("P1DownS",             keyControls[kPlayer1DownControl]->name());
-    SetStrPreference("P1ClockwiseS",        keyControls[kPlayer1ClockwiseControl]->name());
-    SetStrPreference("P1CounterclockwiseS", keyControls[kPlayer1CounterclockwiseControl]->name());
+    SetStrPreference("v50_P1LeftS",             keyControls[kPlayer1LeftControl]->name());
+    SetStrPreference("v50_P1RightS",            keyControls[kPlayer1RightControl]->name());
+    SetStrPreference("v50_P1DownS",             keyControls[kPlayer1DownControl]->name());
+    SetStrPreference("v50_P1ClockwiseS",        keyControls[kPlayer1ClockwiseControl]->name());
+    SetStrPreference("v50_P1CounterclockwiseS", keyControls[kPlayer1CounterclockwiseControl]->name());
     
-    SetIntPreference("P2Left",             keyControls[kPlayer2LeftControl]->id());
-    SetIntPreference("P2Right",            keyControls[kPlayer2RightControl]->id());
-    SetIntPreference("P2Down",             keyControls[kPlayer2DownControl]->id());
-    SetIntPreference("P2Clockwise",        keyControls[kPlayer2ClockwiseControl]->id());
-    SetIntPreference("P2Counterclockwise", keyControls[kPlayer2CounterclockwiseControl]->id());
+    SetIntPreference("v50_P2Left",             keyControls[kPlayer2LeftControl]->id());
+    SetIntPreference("v50_P2Right",            keyControls[kPlayer2RightControl]->id());
+    SetIntPreference("v50_P2Down",             keyControls[kPlayer2DownControl]->id());
+    SetIntPreference("v50_P2Clockwise",        keyControls[kPlayer2ClockwiseControl]->id());
+    SetIntPreference("v50_P2Counterclockwise", keyControls[kPlayer2CounterclockwiseControl]->id());
 
-    SetStrPreference("P2LeftS",             keyControls[kPlayer2LeftControl]->name());
-    SetStrPreference("P2RightS",            keyControls[kPlayer2RightControl]->name());
-    SetStrPreference("P2DownS",             keyControls[kPlayer2DownControl]->name());
-    SetStrPreference("P2ClockwiseS",        keyControls[kPlayer2ClockwiseControl]->name());
-    SetStrPreference("P2CounterclockwiseS", keyControls[kPlayer2CounterclockwiseControl]->name());
+    SetStrPreference("v50_P2LeftS",             keyControls[kPlayer2LeftControl]->name());
+    SetStrPreference("v50_P2RightS",            keyControls[kPlayer2RightControl]->name());
+    SetStrPreference("v50_P2DownS",             keyControls[kPlayer2DownControl]->name());
+    SetStrPreference("v50_P2ClockwiseS",        keyControls[kPlayer2ClockwiseControl]->name());
+    SetStrPreference("v50_P2CounterclockwiseS", keyControls[kPlayer2CounterclockwiseControl]->name());
 }
 
 void loadControls()

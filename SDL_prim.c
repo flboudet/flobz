@@ -96,9 +96,9 @@ void __slow_SDL_blendPixel( SDL_Surface *surf, int x, int y, Uint32 clr,
 		SDL_GetRGB(clr, surf->format, &r, &g, &b);
 		SDL_GetRGB(*p, surf->format, &r2, &g2, &b2);
 
-		r = (Uint8)(r2 + ( r - r2 ) * ( alpha / 255.0 ));
-		g = (Uint8)(g2 + ( g - g2 ) * ( alpha / 255.0 ));
-		b = (Uint8)(b2 + ( b - b2 ) * ( alpha / 255.0 ));
+		r = r2 + ( r - r2 ) * ( alpha / 255.0 );
+		g = g2 + ( g - g2 ) * ( alpha / 255.0 );
+		b = b2 + ( b - b2 ) * ( alpha / 255.0 );
 
 		clr = SDL_MapRGB(surf->format, r, g, b);
 
@@ -232,7 +232,7 @@ void SDL_drawLine_TG( SDL_Surface *surf, int x, int y, int x2, int y2,
 		__SDL_PRIM_LOCKSURFACE(surf)
 
 	for (; *a != *a2; *a += da) {
-		*b = (int)floor(realb + 0.5);
+		*b = floor(realb + 0.5);
 
 		if (flags & SDL_TG_ANTIALIAS) {
 			aa = (realb + 0.5 - *b) * alpha;
@@ -436,9 +436,9 @@ void SDL_drawCircle_TG( SDL_Surface *surf, int x1, int y1, int r, Uint32 clr,
 			}
 
 			aatmp = sqrt((float)r2p - x*x);
-			y = (int)aatmp;
+			y = aatmp;
 			aatmp = aatmp - (int)aatmp;
-			aa = (int)(aatmp * alpha);
+			aa = aatmp * alpha;
 			x++;
 		} else {
 			/*
@@ -645,7 +645,7 @@ void SDL_drawTriangle_TG(SDL_Surface *surf, int x1, int y1, int x2, int y2,
 
 	for (i = 0; i <= 1; i++) {
 		if ((a1 == x1 && a1 != a2) || (a1 != x1 && a1 - 1 != a2)) {
-			for (x = (int)a1; x <= (int)a2; x++) {
+			for (x = a1; x <= a2; x++) {
 				if (flags & SDL_TG_FILL) {
 					c = ((int)b1 < (int)b2) ? 1 : -1;
 					for (y = (int)b1; (c > 0 ? y <= (int)b2 : y >= (int)b2); y += c) {

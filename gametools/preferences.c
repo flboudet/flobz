@@ -119,7 +119,7 @@ void GetStrPreference (const char *name, char *out, const char *defaut, const in
     if (nom != NULL)
     {
         CFStringRef value = (CFStringRef)CFPreferencesCopyAppValue(nom,kCFPreferencesCurrentApplication);
-        
+
         if (value != NULL)
         {
             if (CFGetTypeID(value) == CFStringGetTypeID ())
