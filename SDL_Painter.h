@@ -1,29 +1,34 @@
 #ifndef _SDL_PAINTER_H
 #define _SDL_PAINTER_H
 
+#define MAX_PAINT_ELTS 0x800
+
 #include <SDL/SDL.h>
 
+struct DrawElt {
+  SDL_Surface *surf;
+  SDL_Rect     rect;
+};
+      
 class SDL_Painter
 {
-      struct DrawElt {
-          SDL_Surface *surf;
-          SDL_Rect     rect;
-      };
-      
   public:
       SDL_Painter(SDL_Surface *gameScreen = NULL, SDL_Surface *bg = NULL);
       void requestDraw(SDL_Surface *surf, SDL_Rect *where);
-      void draw();
-      void redrawAll();
+      void draw(SDL_Surface *surf);
+      void redrawAll(SDL_Surface *surf);
 
       SDL_Surface *backGround;
       SDL_Surface *gameScreen;
+      SDL_Surface *display;
 
   private:
+
       int nbElts;
       int nbPrev;
-      DrawElt onScreenElts[0x800];
-      DrawElt onScreenPrev[0x800];
+      DrawElt onScreenElts[MAX_PAINT_ELTS];
+      DrawElt onScreenPrev[MAX_PAINT_ELTS];
+      void storeScreenContent(SDL_Surface *surf);
 }; 
 
 #endif
