@@ -7,6 +7,9 @@
 #include "GameControls.h"
 #include "PuyoDoomMelt.h"
 
+#include "corona32.h"
+#define CORONA_HEIGHT 120
+
 class PuyoDrawable
 {
   public:
@@ -63,7 +66,10 @@ class PuyoCommander
 
   static const int player1Joystick = 1;
   static const int player2Joystick = 0;
-
+  
+  int      *corona_screen;
+  Corona32 *corona;
+  
 };
 
 

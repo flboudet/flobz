@@ -547,6 +547,7 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   int init_flags = SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK;
 
   SDL_Delay(500);
+  corona = NULL;
   fullscreen = GetBoolPreference(kFullScreen,fs);
 #ifdef HAVE_OPENGL
   useGL      = GetBoolPreference(kOpenGL,false);
@@ -1006,13 +1007,8 @@ mml_fin:
   menu_hide (optionMenu);
 }
 
-#include "corona32.h"
-#define CORONA_HEIGHT 120
-
 void PuyoCommander::backLoop(Menu *menu, PuyoDrawable *starter)
 {
-    Corona32 *corona = NULL;
-    int      *corona_screen;
 
     if (menu == aboutMenu) {
         corona = corona32_new();
@@ -1038,26 +1034,7 @@ void PuyoCommander::backLoop(Menu *menu, PuyoDrawable *starter)
                     break;
             }
         }
-        
-        if (corona)
-        {
-            short frequency[2][512];
-            for (int i=0; i<512; ++i) { // Generate random sound.
-                frequency[0][i] = rand();
-                frequency[1][i] = rand();
-            }
-            corona32_update(corona, SDL_GetTicks(), frequency);
-            corona32_displayRGBA(corona, corona_screen);
-            SDL_Surface *tmpsurf =
-              SDL_CreateRGBSurfaceFrom (corona_screen, 640, CORONA_HEIGHT,
-                                        32, 640*4,
-                                        0x00ff0000, 0x0000ff00, 0x000000ff,
-                                        0xff000000);
-            updateAll(starter, tmpsurf);
-            SDL_FreeSurface (tmpsurf);
-        }
-        else
-            updateAll(starter);
+        updateAll(starter);
     }
 mml_fin:
     menu_hide (menu);
@@ -1065,6 +1042,7 @@ mml_fin:
     {
         corona32_delete(corona);
         free(corona_screen);
+        corona = NULL;
     }
 }
 
@@ -1401,6 +1379,28 @@ void PuyoCommander::updateAll(PuyoDrawable *starter, SDL_Surface *extra_surf)
       SDL_BlitSurface (menuBGImage->surf, NULL, display, NULL);
     }
 
+    if (corona)
+    {
+        short frequency[2][512];
+        for (int i=0; i<512; ++i) { // Generate random sound.
+            frequency[0][i] = rand();
+            frequency[1][i] = rand();
+        }
+        corona32_update(corona, SDL_GetTicks(), frequency);
+        corona32_displayRGBA(corona, corona_screen);
+        SDL_Surface *tmpsurf =
+            SDL_CreateRGBSurfaceFrom (corona_screen, 640, CORONA_HEIGHT,
+                                      32, 640*4,
+                                      0x00ff0000, 0x0000ff00, 0x000000ff,
+                                      0xff000000);
+        SDL_Rect rect;
+        rect.x = 0;
+        rect.y = 480 - tmpsurf->h;
+        rect.w = tmpsurf->w;
+        rect.h = tmpsurf->h;
+        SDL_BlitSurface(tmpsurf, NULL, display, &rect);
+        SDL_FreeSurface (tmpsurf);
+    }
     if (extra_surf)
     {
         SDL_Rect rect;
