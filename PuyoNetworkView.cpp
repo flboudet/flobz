@@ -58,44 +58,42 @@ Message *PuyoNetworkView::createStateMessage(bool paused) const
     return message;
 }
 
+void PuyoNetworkView::sendStateMessage(bool paused) const
+{
+    Message *message = createStateMessage(paused);
+    message->send();
+    delete message;
+}
+
+
 void PuyoNetworkView::cycleGame() 
 {
     PuyoView::cycleGame();
-    Message *message = createStateMessage();
-    message->send();
-    delete message;
+    sendStateMessage();
 }
 
 void PuyoNetworkView::moveLeft()
 {
     PuyoView::moveLeft();
-    Message *message = createStateMessage();
-    message->send();
-    delete message;
+    sendStateMessage();
 }
 
 void PuyoNetworkView::moveRight()
 {
     PuyoView::moveRight();
-    Message *message = createStateMessage();
-    message->send();
-    delete message;
+    sendStateMessage();
 }
 
 void PuyoNetworkView::rotateLeft()
 {
     PuyoView::rotateLeft();
-    Message *message = createStateMessage();
-    message->send();
-    delete message;
+    sendStateMessage();
 }
 
 void PuyoNetworkView::rotateRight()
 {
     PuyoView::rotateRight();
-    Message *message = createStateMessage();
-    message->send();
-    delete message;
+    sendStateMessage();
 }
 
 // PuyoDelegate methods
@@ -105,7 +103,7 @@ void PuyoNetworkView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex)
     Message *message = mbox->createMessage();
     message->addInt     ("TYPE",   kAddNeutrals);
     message->addString  ("NAME",   p1name);
-    message->addInt     ("NUMBER", neutralIndex);
+    message->addInt     ("INDEX",  neutralIndex);
     message->addBoolProperty("RELIABLE", true);
     message->send();
     delete message;

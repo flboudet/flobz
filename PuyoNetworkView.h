@@ -50,9 +50,12 @@ class PuyoNetworkView : public PuyoView {
     void puyoDidFall(PuyoPuyo *puyo, int originX, int originY);
     void puyoWillVanish(IosVector &puyoGroup, int groupNum, int phase);
     void gameLost();
+    
+    void sendStateMessage(bool paused = false) const;
+    
 private:
     MessageBox *mbox;
-    Message *createStateMessage(bool paused = false) const;
+    Message *createStateMessage(bool paused) const;
 };
 
 #endif // _PUYONETWORKVIEW
