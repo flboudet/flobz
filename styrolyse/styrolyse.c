@@ -35,6 +35,10 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
   const char *path = GSL_LOCAL_PTR  (gsl, local, "&this.image");
   int         x    = GSL_LOCAL_FLOAT(gsl, local, "&this.pos.x");
   int         y    = GSL_LOCAL_FLOAT(gsl, local, "&this.pos.y");
+  int        dx    = GSL_LOCAL_FLOAT(gsl, local, "display.x");
+  int        dy    = GSL_LOCAL_FLOAT(gsl, local, "display.y");
+  int        dw    = GSL_LOCAL_FLOAT(gsl, local, "display.width");
+  int        dh    = GSL_LOCAL_FLOAT(gsl, local, "display.height");
   HashValue  *img  = goom_hash_get(styrolyse->images, path);
   void       *data = NULL;
   if (img == NULL) {
@@ -49,12 +53,12 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
     printf("'%s' not loaded\n", path);
     return;
   }
-  styrolyse->client->drawImage(styrolyse->client, data, x, y);
+  styrolyse->client->drawImage(styrolyse->client, data, x+dx, y+dy, dx, dy, dw, dh);
 }
 
 /**/
 
-static void bind(GoomSL *gsl)
+static void sbind(GoomSL *gsl)
 {
   gsl_bind_function(gsl, "say",   sprite_say);
   gsl_bind_function(gsl, "draw",  sprite_draw);
@@ -99,14 +103,13 @@ void styrolyse_execute(Styrolyse *_this, int mode)
 void styrolyse_reload(Styrolyse *_this)
 {
     char scriptPath[1024];
-    sprintf(scriptPath, "%s/story/styrolyse.gsl",dataFolder);
-    
     char *fbuffer;
     if (!_this->gsl) return;
+    sprintf(scriptPath, "%s/story/styrolyse.gsl", dataFolder);
     fbuffer = gsl_init_buffer(scriptPath);
     gsl_append_file_to_buffer(_this->fname, &fbuffer);
     gsl_compile(_this->gsl,fbuffer);
-    bind(_this->gsl);
+    sbind(_this->gsl);
     free(fbuffer);
     styrolyse_execute(_this, 0);
 }

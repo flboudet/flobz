@@ -39,6 +39,12 @@ struct <Sprite:
   float  framespeed,
   float  nbframes>
 
+struct <Display:
+  float x,
+  float y,
+  float width,
+  float height>
+
 <new_sprite: float x, float y, string image, float curframe, float framespeed, float nbframes> : Sprite
   new_sprite.pos.x     = x
   new_sprite.pos.y     = y
@@ -50,16 +56,24 @@ struct <Sprite:
   new_sprite.framespeed = framespeed
   new_sprite.nbframes  = nbframes
 
+<new_sprite_simple: float x, float y, string image> : Sprite
+  new_sprite_simple = [new_sprite: x=x y=y image=image curframe=0.0 framespeed=1.0 nbframes=1.0]
+
 <move: Sprite &this, float fcycle, float x, float y>
   &this.dest.x = x
   &this.dest.y = y
   &this.dcycle = fcycle
 
+external <say:  Sprite &this, string text>
+external <draw: Sprite &this, Display display>
 
-external <say:  Sprite &this,  string text>
-external <draw: Sprite &this>
+<new_display: float x, float y, float width, float height> : Display
+  new_display.x = x
+  new_display.y = y
+  new_display.width  = width
+  new_display.height = height
 
-<sprite: Sprite &this>
+<sprite: Sprite &this, Display display>
 
   float diff = &this.dcycle - @fcycle
   (@mode = UPDATE)? {
@@ -73,6 +87,6 @@ external <draw: Sprite &this>
     while &this.curframe >= &this.nbframes do &this.curframe -= &this.nbframes
   }
   (@mode = DRAW)? {
-    draw::&this
+    draw::&this display=display
   }
 

@@ -43,12 +43,18 @@ static void *loadImage (StyrolyseClient *_this, const char *path)
 }
 
 
-static void  drawImage (StyrolyseClient *_this, void *image, int x, int y)
+static void  drawImage (StyrolyseClient *_this, void *image, int x, int y,
+                 int clipx, int clipy, int clipw, int cliph)
 {
   SDL_Surface *surf = (SDL_Surface*)image;
-  SDL_Rect  rect;
+  SDL_Rect  rect, cliprect;
   rect.x = x;
   rect.y = y;
+  cliprect.x = clipx;
+  cliprect.y = clipy;
+  cliprect.w = clipw;
+  cliprect.h = cliph;
+  SDL_SetClipRect(sstory, &cliprect);
   SDL_BlitSurface(surf, NULL, sstory, &rect);
 }
 
