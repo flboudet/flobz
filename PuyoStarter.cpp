@@ -30,6 +30,7 @@
 
 #include "SDL_Painter.h"
 #include "IosImgProcess.h"
+#include "audio.h"
 
 using namespace ios_fc;
 
@@ -51,10 +52,10 @@ int gameLevel;
 int GAME_ACCEL = 1250;
 static const int NB_PERSO_STATE = 2;
 
-const char *p1name;
-const char *p2name;
+const char *p1name = "Player1";
+const char *p2name = "Player2";
 
-extern Menu *menu_pause;
+/*extern Menu *menu_pause; */
 static char *BACKGROUND[NB_MUSIC_THEME] = { "Background.jpg", "BackgroundDark.jpg" };
 extern IIM_Surface *background, *neutral;
 
@@ -86,9 +87,9 @@ void PuyoPureStarter::handleEvent(SDL_Event &event)
     }
     /* Check for SDL special events */
     if(event.type == SDL_QUIT) {
-        if (menu_active_is(commander->gameOverMenu, "YES"))
+/*        if (menu_active_is(commander->gameOverMenu, "YES"))
             menu_next_item(commander->gameOverMenu);
-        //quit = 1;
+        //quit = 1;*/
         exit(0);
     }
 }
@@ -190,6 +191,10 @@ private:
     PuyoRandomSystem *attachedRandom;
     MessageBox &msgBox;
 };
+
+void PuyoStarter::draw(SDL_Surface *surf) const {
+  const_cast<PuyoStarter*>(this)->draw();
+}
 
 void PuyoStarter::draw()
 {
@@ -705,7 +710,7 @@ void PuyoStarter::run(int _score1, int _score2, int lives, int point1, int point
                     else {
                         GameControlEvent controlEvent;
                         getControlEvent(event, &controlEvent);
-                        switch (controlEvent.cursorEvent) {
+/*                        switch (controlEvent.cursorEvent) {
                             case GameControlEvent::kUp:
                                 menu_prev_item(menu_pause);
                                 break;
@@ -731,9 +736,11 @@ void PuyoStarter::run(int _score1, int _score2, int lives, int point1, int point
                                 }
                                 break;
                         }
+                                */
                     }
             } else // Not GameIsRunning
             {
+              /*
                 if (randomPlayer) {
                     if (rightPlayerWin()) {
                         if ((_score2 == 7) && (rightPlayerWin()))
@@ -789,21 +796,22 @@ void PuyoStarter::run(int _score1, int _score2, int lives, int point1, int point
                     commander->showGameOver();
                     stopRender();
                 } // GameOver Visible
+                */
             }
                 GameControlEvent controlEvent2;
                 getControlEvent(event, &controlEvent2);
                 switch (controlEvent2.cursorEvent) {
                     case GameControlEvent::kStart:
-                        if (gameover)
+/*                        if (gameover)
                         {
                             if (menu_active_is(commander->gameOverMenu, "NO"))
                                 menu_next_item(commander->gameOverMenu);
                             quit = 1;
-                        }
+                        }*/
                         break;
                     case GameControlEvent::kBack:
                         if (!gameover) {
-                            if (!paused) {
+/*                            if (!paused) {
                                 menu_show(menu_pause);
                                 paused = true;
                                 stopRender();
@@ -812,21 +820,23 @@ void PuyoStarter::run(int _score1, int _score2, int lives, int point1, int point
                                 paused = false;
                                 restartRender();
                                 menu_hide(menu_pause);
-                            }
+                            }*/
                         }
                         else {
+                          /*
                             if (menu_active_is(commander->gameOverMenu, "NO"))
                                 menu_next_item(commander->gameOverMenu);
                             quit = 1;
+                            */
                         }
                         break;
                     default:
                         break;
                 }
                 if(event.type == SDL_QUIT) {
-                    if (menu_active_is(commander->gameOverMenu, "YES"))
+/*                    if (menu_active_is(commander->gameOverMenu, "YES"))
                         menu_next_item(commander->gameOverMenu);
-                    quit = 1;
+                    quit = 1;*/
                     exit(0);
                 }
         }
@@ -853,7 +863,7 @@ void PuyoStarter::run(int _score1, int _score2, int lives, int point1, int point
                     }
                 }
             }
-            
+            requestDraw();
     }
 	commander->hideGameOver();
 	if (randomPlayer) {

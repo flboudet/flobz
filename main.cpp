@@ -92,8 +92,6 @@ int main(int argc, char *argv[])
     }
     
     PuyoCommander commander( fs, snd, fx );
-
-    
-  commander.run();
-  return 0;
+    commander.run();
+    return 0;
 }

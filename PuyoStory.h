@@ -8,7 +8,7 @@
 #include "PuyoCommander.h"
 extern int NB_STORIES;
 
-class PuyoStory : public PuyoDrawable {
+class PuyoStory : public DrawableComponent {
   public:
     PuyoStory(PuyoCommander *com, int num);
     virtual ~PuyoStory();

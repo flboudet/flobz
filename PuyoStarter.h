@@ -33,7 +33,7 @@
 #define _PUYOSTARTER
 
 // Le PuyoStarter moderne
-class PuyoPureStarter : public PuyoDrawable {
+class PuyoPureStarter : public DrawableComponent {
 public:
     PuyoPureStarter(PuyoCommander *commander);
     virtual ~PuyoPureStarter();
@@ -68,6 +68,7 @@ public:
     
     virtual void run(int score1, int score2, int lives, int point1, int point2);
     virtual void draw();
+    void draw(SDL_Surface *surf) const;
     
     virtual bool leftPlayerWin() const  { return attachedGameA->isGameRunning(); }
     virtual bool rightPlayerWin() const { return attachedGameB->isGameRunning(); }

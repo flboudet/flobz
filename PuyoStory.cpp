@@ -100,9 +100,10 @@ PuyoStory::~PuyoStory()
 
 void PuyoStory::loop()
 {
-    while (!styrolyse_finished(currentStory)) {
+  // TODO: UNCOMMENT ALL!
+/*    while (!styrolyse_finished(currentStory)) {
         styrolyse_update(currentStory);
-/*        SDL_FillRect(sstory,  NULL, 0);*/
+//        SDL_FillRect(sstory,  NULL, 0);
         commander->updateAll(this);
 
         SDL_Event e;
@@ -124,6 +125,7 @@ void PuyoStory::loop()
             }
         }
     }
+*/
 }
 
 void PuyoStory::draw()
