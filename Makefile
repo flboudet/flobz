@@ -9,13 +9,14 @@ ENABLE_AUDIO=true
 ENABLE_OPENGL=false
 ENABLE_DGA=false
 
-DEBUG_MODE=false
+DEBUG_MODE=true
 
 # Unix/Linux settings
 PREFIX=/usr/local
 DATADIR=$(PREFIX)/share/games/flobopuyo
 INSTALL_BINDIR=$(DESTDIR)/$(PREFIX)/games
 INSTALL_DATADIR=$(DESTDIR)/$(DATADIR)
+IOSFC_DIR=iosfc
 
 # Mac settings
 macimage_name=FloBoPuyo\ $(VERSION)
@@ -44,7 +45,7 @@ SDL_CONFIG=sdl-config
 CC=g++
 CXX=g++
 
-CFLAGS= -DDATADIR=\"${DATADIR}\"
+CFLAGS= -DDATADIR=\"${DATADIR}\" -I${IOSFC_DIR}
 LDFLAGS=
 
 ifneq ($(PLATFORM), $(CYGWIN_VERSION))
@@ -65,7 +66,7 @@ OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o        \
           menu.o menuitems.o audio.o scrollingtext.o preferences.o           \
           PuyoStory.o SDL_Painter.o InputManager.o GameControls.o            \
           PuyoDoomMelt.o IosImgProcess.o corona32.o corona.o corona_palette.o\
-	  PuyoStarter.o
+	  PuyoStarter.o PuyoNetworkView.o
 
 
 ################
@@ -78,7 +79,7 @@ endif
 # Win32
 ifeq ($(PLATFORM), $(CYGWIN_VERSION))
 CFLAGS:=$(CFLAGS) -mno-cygwin -mwindows -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE) 
-LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
+LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_net -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
 endif
 
 ifeq ($(ENABLE_AUDIO), true)
@@ -110,7 +111,8 @@ CXXFLAGS=${CFLAGS}
 all: prelude flobopuyo
 
 flobopuyo: ${OBJFILES}
-	@echo "[flobopuyo]" && g++ $(CFLAGS) $(LDFLAGS) -o flobopuyo -lSDL_mixer -lSDL_image ${OBJFILES}
+	@make -C iosfc object
+	@echo "[flobopuyo]" && g++ $(CFLAGS) $(LDFLAGS) -o flobopuyo -lSDL_net -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
 	@[ "x`cat WARNINGS | wc -l`" != "x0" ] && echo -e "--------------------------------------\n There have been some warnings:\n" && cat WARNINGS && rm -f WARNINGS && echo "--------------------------------------" || true
@@ -170,6 +172,7 @@ scenar.y.c:scenar.y ${HFILES}
 	@echo "[$@]" && bison -y -d -o scenar.y.c scenar.y
 
 clean:
+	make -C iosfc clean
 	rm -f *~ scenar.y.c scenar.y.h scenar.l.c *.o flobopuyo* WARNINGS
 	rm -rf .xvpics data/.xvpics    data/*/.xvpics
 	rm -rf $(bundle_name)

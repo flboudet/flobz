@@ -1,8 +1,11 @@
 #include "PuyoStarter.h"
 #include "PuyoView.h"
+#include "PuyoNetworkView.h"
 
 #include "SDL_Painter.h"
 #include "IosImgProcess.h"
+
+using namespace ios_fc;
 
 extern SDL_Painter painter;
 
@@ -60,6 +63,16 @@ static void loadShrinkXplode(void)
     loadShrinkXplode2(4,140.0f);
 }
 
+
+class PuyoLocalGameFactory : public PuyoGameFactory {
+public:
+    PuyoLocalGameFactory(PuyoRandomSystem *attachedRandom): attachedRandom(attachedRandom) {}
+    PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory) {
+        return new PuyoGame(attachedRandom, attachedPuyoFactory);
+    }
+private:
+    PuyoRandomSystem *attachedRandom;
+};
 
 void PuyoStarter::stopRender()
 {
@@ -183,7 +196,7 @@ void PuyoStarter::draw()
 }
 
 
-PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType, int theme)
+PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType, int theme, MessageBox *mbox)
 {
     this->stopRendering = false;
     this->paused = false;
@@ -282,9 +295,18 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
         fprintf(stderr, "IMG_Load error:%s\n", SDL_GetError());
         exit(-1);
     }
+    if (mbox == NULL) {
+        attachedGameFactory = new PuyoLocalGameFactory(&attachedRandom);
+        areaA = new PuyoView(attachedGameFactory, 1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
+        areaB = new PuyoView(attachedGameFactory, 1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE);
+    }
+    else {
+        attachedGameFactory = new PuyoLocalGameFactory(&attachedRandom);
+        areaA = new PuyoView(attachedGameFactory, 1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
+        areaB = new PuyoNetworkView(attachedGameFactory, 1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, mbox);
+
+    }
     
-    areaA = new PuyoView(&attachedRandom, 1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
-    areaB = new PuyoView(&attachedRandom, 1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE);
     
     attachedGameA = areaA->getAttachedGame();
     attachedGameB = areaB->getAttachedGame();
@@ -309,6 +331,7 @@ PuyoStarter::~PuyoStarter()
     delete areaB;
     delete attachedGameA;
     delete attachedGameB;
+    delete attachedGameFactory;
     //	SDL_FreeSurface(fallingBlue);
 }
 

@@ -96,10 +96,10 @@ static char PuyoGroupImageIndex[2][2][2][2] =
 
 
 
-PuyoView::PuyoView(PuyoRandomSystem *attachedRandom, int xOffset, int yOffset, int nXOffset, int nYOffset)
+PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory, int xOffset, int yOffset, int nXOffset, int nYOffset)
 :attachedPuyoFactory(this), attachedPainter(painter)
 {
-	attachedGame = new PuyoGame(attachedRandom, &attachedPuyoFactory);
+	attachedGame = attachedPuyoGameFactory->createPuyoGame(&attachedPuyoFactory);
     attachedGame->setDelegate(this);
     
 	this->xOffset = xOffset;

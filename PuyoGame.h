@@ -53,7 +53,10 @@ public:
     void setFlag() { flag = true; }
     void unsetFlag() { flag = false; }
     bool getFlag() const { return flag; }
+    int getID() const { return puyoID; }
 private:
+    int puyoID;
+    static int lastID;
     PuyoState state;
     int X, Y;
     bool flag;

@@ -1,13 +1,14 @@
 #include "PuyoGame.h"
 #include "PuyoIA.h"
 #include "PuyoCommander.h"
+#include "ios_messagebox.h"
 
 #ifndef _PUYOSTARTER
 #define _PUYOSTARTER
 
 class PuyoStarter : public PuyoDrawable {
 public:
-    PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType, int theme);
+    PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType, int theme, ios_fc::MessageBox *mbox = NULL);
     virtual ~PuyoStarter();
     void run(int score1, int score2, int lives, int point1, int point2);
     void draw();
@@ -23,6 +24,7 @@ private:
     PuyoView *areaA, *areaB;
     PuyoGame *attachedGameA, *attachedGameB;
     PuyoIA *randomPlayer;
+    PuyoGameFactory *attachedGameFactory;
     PuyoRandomSystem attachedRandom;
     int tickCounts;
     int lives;

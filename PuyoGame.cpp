@@ -48,10 +48,12 @@ PuyoState PuyoRandomSystem::getPuyoForSequence(int sequence)
 		return (PuyoState)(int)(sequenceItems.getElementAt(sequence));
 }
 
+int PuyoPuyo::lastID = 0;
 PuyoPuyo::PuyoPuyo(PuyoState state)
 {
     this->state = state;
     X = 0; Y = 0;
+    puyoID = lastID++;
 }
 
 bool PuyoPuyo::isFalling()

@@ -43,23 +43,27 @@
 extern SDL_Surface *display;
 extern IIM_Surface *image;
 
+class PuyoGameFactory {
+public:
+    virtual PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory) = 0;
+};
 
-
-class PuyoView : public virtual PuyoDelegate {
+class PuyoView : public PuyoDelegate {
   public:
-    PuyoView(PuyoRandomSystem *attachedRandom, int xOffset, int yOffset, int nXOffset, int nYOffset);
+    PuyoView(PuyoGameFactory *attachedPuyoGameFactory, int xOffset, int yOffset, int nXOffset, int nYOffset);
+    virtual ~PuyoView() {}
     void setEnemyGame(PuyoGame *enemyGame);
     void render();
     void renderNeutral();
     void cycleAnimation();
-    void cycleGame();
+    virtual void cycleGame();
     void allowCycle() { cycleAllowance++; }
     void disallowCycle() { cycleAllowance--; }
     
-    void moveLeft();
-    void moveRight();
-    void rotateLeft();
-    void rotateRight();
+    virtual void moveLeft();
+    virtual void moveRight();
+    virtual void rotateLeft();
+    virtual void rotateRight();
 
     static IIM_Surface *getSurfaceForState(PuyoState state);
     IIM_Surface *getSurfaceForPuyo(PuyoPuyo *puyo);
@@ -77,7 +81,7 @@ class PuyoView : public virtual PuyoDelegate {
     void puyoWillVanish(IosVector &puyoGroup, int groupNum, int phase);
     void gameLost();
     
-  private:
+  protected:
     bool cycleAllowed();
     bool skippedCycle;
     bool gameRunning;
