@@ -466,7 +466,6 @@ namespace gameui {
             editionMode = false;
         }
         else if (event->sdl_event.type == SDL_KEYDOWN) {
-            printf("Touche SDL!\n");
             String newValue = getValue();
             newValue[newValue.length() - 1] = event->sdl_event.key.keysym.sym;
             newValue += "_";

@@ -48,7 +48,8 @@ class MainMenu : public PuyoScreen {
 };
 
 class NetworkGameMenu : public PuyoScreen {
-  public: void build();
+  public:
+    void build();
 };
 
 void MainMenu::build() {
@@ -58,9 +59,13 @@ void MainMenu::build() {
 }
 
 void NetworkGameMenu::build() {
-  add(new Button("GO!", new NetGameAction));
-  add(new EditField("Player"));
+  HBox *box = new HBox();
+  box->add(new Text("Player name:"));
+  box->add(new EditField("Player"));
+  add(new Text("Network Game"));
+  add(box);
   add(new Button("Cancel", new PopScreenAction()));
+  add(new Button("Start!", new NetGameAction));
 }
 
 /**
