@@ -24,25 +24,21 @@ static SDL_Surface * createStorySurface()
   amask = 0x00000000;
 #endif
 
-  tmpsurf = SDL_CreateRGBSurface(SDL_SWSURFACE, 640, 480, 32,
+  sstory = SDL_CreateRGBSurface(SDL_SWSURFACE, 640, 480, 32,
                                rmask, gmask, bmask, amask);
-  sstory = SDL_DisplayFormat (tmpsurf);
-  SDL_FreeSurface (tmpsurf);
-  
   if(sstory == NULL) {
     fprintf(stderr, "CreateRGBSurface failed: %s", SDL_GetError());
     exit(1);
   }
-  return sstory;
+  tmpsurf = SDL_DisplayFormat(sstory);
+  SDL_FreeSurface(sstory);
+  return tmpsurf;
 }
 
 /* Implementation of the Styrolyse Client */
 static void *loadImage (StyrolyseClient *_this, const char *path)
 {
-  //char imgPath[1024];
-  //sprintf(imgPath, "%s/%s",dataFolder, path);
-  IIM_Surface *surf = IIM_Load_DisplayFormatAlpha(path);
-  return surf;
+  return IIM_Load_DisplayFormatAlpha(path);
 }
 
 
@@ -92,13 +88,29 @@ void PuyoStory::loop()
 {
     while (!styrolyse_finished(currentStory)) {
         styrolyse_update(currentStory);
-        SDL_FillRect(sstory,  NULL, 0);
-        styrolyse_draw(currentStory);
+/*        SDL_FillRect(sstory,  NULL, 0);*/
         commander->updateAll(this);
+
+        SDL_Event e;
+        while (SDL_PollEvent (&e)) {
+            GameControlEvent controlEvent;
+            getControlEvent(e, &controlEvent);
+            
+            switch (controlEvent.cursorEvent) {
+                case GameControlEvent::kQuit:
+                  exit(0);
+                case GameControlEvent::kStart:
+                case GameControlEvent::kBack:
+                    return;
+                default:
+                    break;
+            }
+        }
     }
 }
 
 void PuyoStory::draw()
 {
-    SDL_BlitSurface(sstory, NULL, display, NULL);
+  styrolyse_draw(currentStory);
+  SDL_BlitSurface(sstory, NULL, display, NULL);
 }

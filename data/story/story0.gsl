@@ -1,22 +1,46 @@
 <init>
-  Display @display = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+  Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+  Display @dgrandma = [new_display: x=0.0 y=0.0 width=443.0  height=480.0]
 
   # Init function: called when script is loaded
-  Sprite @sprite = [new_sprite: image="story/b1.png" x=-92.0 y=200.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
+  Sprite @bg      = [new_sprite_simple: image="story/bg_intro3.jpg" x=0.0 y=0.0]
+  Sprite @saucer  = [new_sprite_simple: image="story/saucer.png" x=-150.0 y=165.0]
+  Sprite @grandma = [new_sprite: image="story/grandma-frame1-small.png" x=483.0 y=320.0 curframe=0.0 framespeed=1.0 nbframes=2.0]
 
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
   # This also allows you to specify the drawing order
-  sprite::@sprite display=@display
+  Sprite i
+  for i in (@bg @saucer) do sprite::i display=@display
+
+  sprite::@grandma display=@dgrandma
 
 <update>
   # Update function: called every animation cycle
 
-  @sprite.image = "story/b1.png"
-  (@sprite.curframe > 1.0)? @sprite.image = "story/b2.png"
-  (@sprite.curframe > 2.0)? @sprite.image = "story/b3.png"
-  (@sprite.curframe > 3.0)? @sprite.image = "story/b4.png"
+  float GrandmaGoOut = 300.0
+  float SaucerArrive = 150.0
+  float SaucerLeave  = 600.0
 
-  move::@sprite fcycle=300.0 x=640.0 y=200.0
-  (@fcycle > 300.0)? @finished = 1
+  # Move the grandma
+  move::@grandma fcycle=GrandmaGoOut      x=483.0 y=320.0
+  move::@grandma fcycle=GrandmaGoOut+50.0 x=380.0 y=320.0
+  move::@grandma fcycle=GrandmaGoOut+75.0 x=340.0 y=350.0
+
+  # Move the flying saucer
+  float fx = -115.0
+  float fy = -5.0
+  float fcycle = SaucerArrive
+  while fcycle < SaucerLeave do {
+    move::@saucer fcycle=fcycle x=fx y=165.0+fy
+    fcycle += 10.0
+    (fx < 150.0)? fx += 25.0
+    fy = (0.0-fy) * 0.9
+  }
+
+  # Frames of grandma animation
+  @grandma.image = "story/grandma-frame1-small.png"
+  (@grandma.curframe >= 1.0)? @grandma.image = "story/grandma-frame2-small.png"
+
+  (@fcycle > 620.0)? @finished = 1
 
