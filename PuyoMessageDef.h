@@ -19,6 +19,7 @@ static const char *NEXT_F = "NEXT_F";
 static const char *NEXT_C = "NEXT_C";
 static const char *ADD_NEUTRALS = "ADD_NEUTRALS";
 static const char *DID_END_CYCLE = "DID_END_CYCLE";
+static const char *SEMI_MOVE = "SEMI_MOVE";
 
 };
 

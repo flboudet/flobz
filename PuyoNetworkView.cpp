@@ -52,6 +52,7 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
     message->addInt     (PuyoMessage::SCORE,  attachedGame->getPoints());
     message->addInt     (PuyoMessage::NEXT_F, attachedGame->getNextFalling());
     message->addInt     (PuyoMessage::NEXT_C, attachedGame->getNextCompanion());
+    message->addInt     (PuyoMessage::SEMI_MOVE, attachedGame->getSemiMove());
     
     message->addIntArray(PuyoMessage::ADD_NEUTRALS,  neutralsBuffer);
     message->addBool    (PuyoMessage::DID_END_CYCLE, didEndCycle);
