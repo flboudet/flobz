@@ -48,7 +48,7 @@ static char *kPlayer2Clockwise = "Player 2 Turn Clockwise:";
 static char *kPlayer2Counterclockwise = "Player 2 Turn Counterclockwise:";
 
 static char *kRules01 = "Puyos are fancy smiling bubbles...";
-static char *kRules02 = "But they can really be invading sometimes !";
+static char *kRules02 = "But they can really be invading sometimes!";
 static char *kRules03 = "Send them away by making groups of 4 or more.";
 static char *kRules04 = "Try to make large groups, or many at the same time";
 static char *kRules05 = "to send more bad ghost Puyos to your opponent.";
@@ -60,7 +60,7 @@ static char *kAbout04 = "X Men:                                    ";
 static char *kAbout05 = "          Jean-Christophe 'jeko' Hoelt";
 static char *kAbout06 = "                   Guillaume 'gyom' Borios";
 static char *kAbout07 = "Beta Goddess:                        ";
-static char *kAbout08 = "                                           Tanya";
+static char *kAbout08 = "                                           Tania";
 
 extern SDL_Surface *display, *image;
 static SDL_Surface *menuBGImage = 0;
