@@ -47,23 +47,20 @@ static char *kPlayer2Down = "Player 2 Down:";
 static char *kPlayer2Clockwise = "Player 2 Turn Clockwise:";
 static char *kPlayer2Counterclockwise = "Player 2 Turn Counterclockwise:";
 
-static char *kRules01 = "A puyo is a small colored 'smiley'.. Your goal:";
-static char *kRules02 = "Create blobs of 4 or more puyos having the same color.";
-static char *kRules03 = "Each turn you are given 2 new puyos to drop.";
-static char *kRules04 = "Try to make large blobs, or many at the same time";
-static char *kRules05 = "to give some bad grey puyos to your oponent.";
-
-static char *kRules10 = "Left player uses s,d,f,e to move.";
-static char *kRules11 = "Right player uses the arrows to move.";
+static char *kRules01 = "Puyos are fancy smiling bubbles...";
+static char *kRules02 = "But they can really be invading sometimes !";
+static char *kRules03 = "Send them away by making groups of 4 or more.";
+static char *kRules04 = "Try to make large groups, or many at the same time";
+static char *kRules05 = "to send more bad ghost Puyos to your opponent.";
 
 static char *kAbout01 = "FloboPuyo is an iOS-software production.";
-static char *kAbout02 = "Main work:                              ";
-static char *kAbout03 = "                 Florent 'flobo' Boudet ";
-static char *kAbout04 = "Menus / Small Patches:";
-static char *kAbout05 = "            Jean-Christophe 'jeko' Hoelt";
-static char *kAbout06 = "Beta Testing:";
-static char *kAbout07 = "                   the iOS-software team";
-static char *kAbout08 = "                        (and friends...)";
+static char *kAbout02 = "Puyo's world Meta God :          ";
+static char *kAbout03 = "                     Florent 'flobo' Boudet";
+static char *kAbout04 = "X Men:                                    ";
+static char *kAbout05 = "          Jean-Christophe 'jeko' Hoelt";
+static char *kAbout06 = "                   Guillaume 'gyom' Borios";
+static char *kAbout07 = "Beta Goddess:                        ";
+static char *kAbout08 = "                                           Tanya";
 
 extern SDL_Surface *display, *image;
 static SDL_Surface *menuBGImage = 0;
@@ -373,9 +370,6 @@ MenuItems rules_menu_load (SoFont *font) {
     MENUITEM_INACTIVE(kRules04),
     MENUITEM_INACTIVE(kRules05),
     MENUITEM_BLANKLINE,
-    MENUITEM_INACTIVE(kRules10),
-    MENUITEM_INACTIVE(kRules11),
-    MENUITEM_BLANKLINE,
     MENUITEM("Back"),
     MENUITEM_END
   };
@@ -384,8 +378,6 @@ MenuItems rules_menu_load (SoFont *font) {
   menu_items_set_font_for(option_menu, kRules03, font);
   menu_items_set_font_for(option_menu, kRules04, font);
   menu_items_set_font_for(option_menu, kRules05, font);
-  menu_items_set_font_for(option_menu, kRules10, font);
-  menu_items_set_font_for(option_menu, kRules11, font);
 
   return option_menu;
 }
@@ -400,8 +392,8 @@ MenuItems about_menu_load (SoFont *font)
     MENUITEM_BLANKLINE,
     MENUITEM_INACTIVE(kAbout04),
     MENUITEM_INACTIVE(kAbout05),
-    MENUITEM_BLANKLINE,
     MENUITEM_INACTIVE(kAbout06),
+    MENUITEM_BLANKLINE,
     MENUITEM_INACTIVE(kAbout07),
     MENUITEM_INACTIVE(kAbout08),
     MENUITEM_BLANKLINE,
@@ -578,11 +570,12 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   menu_set_sounds (singleGameMenu, sound_pop, sound_slide);
 
   scrollingText = scrolling_text_new(
-    "Welcome to the wonderful world of FloboPuyo !!! Enjoy its nice graphics, "
-    "happy music and entertaining gameplay... "
-    "Will you be able to finish all levels of the Single Player Mode ?? "
-    "Will you beat the BIG BOSS ??? Have a try, "
-    "I wish you good luck for that.", smallFont);
+    "Welcome to the wonderful world of FloboPuyo !!!  Enjoy its nice graphics, "
+    "happy music and entertaining gameplay...  "
+    "Will you be able to defeat all of the mighty players ?  "
+    "Will you beat the Puyo Gods ???  Have a try !  "
+    "We wish you good luck.                                                    "
+    "                                Hello from PuyoLand !", smallFont);
   theCommander = this;
 }
 
