@@ -12,6 +12,8 @@ ENABLE_DGA=false
 DEBUG_MODE=true
 MORE_DEBUG=false
 
+PRGNAME=flobopuyo
+
 # Unix/Linux settings
 PREFIX=/usr/local
 DATADIR=$(PREFIX)/share/games/flobopuyo
@@ -48,6 +50,7 @@ VERSION=$(shell grep "\#define FLOBOPUYOVERSION" PuyoVersion.c  | cut -d "\"" -f
 SDL_CONFIG=sdl-config
 CC=g++
 CXX=g++
+STRIP=strip
 
 CFLAGS= -DDATADIR=\"${DATADIR}\" -I${IOSFC_DIR}
 LDFLAGS=
@@ -78,6 +81,8 @@ else
 ifeq ($(PLATFORM), crossmingw32)
   CC=i586-mingw32msvc-g++
   CXX=i586-mingw32msvc-g++
+  PRGNAME=flobopuyo.exe
+  STRIP=i586-mingw32msvc-strip
   CFLAGS:=$(CFLAGS) -mno-cygwin -mwindows -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE)  -I$(WINSDLINCLUDE)/SDL
   LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_net -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
 else
@@ -126,12 +131,12 @@ all: prelude flobopuyo
 
 flobopuyo: ${OBJFILES}
 	@make -C iosfc object
-	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o flobopuyo -lSDL_net -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o
+	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) -lSDL_net -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
 	@[ "x`cat WARNINGS | wc -l`" != "x0" ] && echo -e "--------------------------------------\n There have been some warnings:\n" && cat WARNINGS && rm -f WARNINGS && echo "--------------------------------------" || true
 	@echo
-	@echo " Type ./flobopuyo to play."
+	@echo " Type ./$(PRGNAME) to play."
 	@echo "--------------------------------------"
 
 prelude:
@@ -187,7 +192,7 @@ scenar.y.c:scenar.y ${HFILES}
 
 clean:
 	make -C iosfc clean
-	rm -rf *~ scenar.y.c scenar.y.h scenar.l.c *.o flobopuyo* WARNINGS
+	rm -rf *~ scenar.y.c scenar.y.h scenar.l.c *.o flobopuyo* $(PRGNAME) WARNINGS
 	rm -rf .xvpics data/.xvpics    data/*/.xvpics
 	rm -rf $(bundle_name)
 	rm -rf $(macimage_name)
@@ -195,7 +200,7 @@ clean:
 	rm -f  .DS_Store */.DS_Store */*/.DS_Store .gdb_history
 
 install: flobopuyo
-	strip flobopuyo
+	$(STRIP) $(PRGNAME)
 	mkdir -p ${INSTALL_BINDIR}
 	mkdir -p ${INSTALL_DATADIR}
 	cp -r data/* ${INSTALL_DATADIR}
@@ -204,7 +209,7 @@ install: flobopuyo
 	chmod a+rx ${INSTALL_DATADIR}/gfx
 	chmod a+rx ${INSTALL_DATADIR}/story
 	chmod -R a+r ${INSTALL_DATADIR}
-	cp ./flobopuyo ${INSTALL_BINDIR}/flobopuyo
+	cp ./$(PRGNAME) ${INSTALL_BINDIR}/flobopuyo
 	chmod a+rx ${INSTALL_BINDIR}/flobopuyo
 
 flobopuyo-static: prelude  ${OBJFILES}
@@ -224,7 +229,7 @@ bundle: flobopuyo-static
 	rm -rf $(bundle_name)/Contents/Resources/data/CVS $(bundle_name)/Contents/Resources/data/*/CVS
 	rm -rf $(bundle_name)/Contents/Resources/data/.xvpics $(bundle_name)/Contents/Resources/data/*/.xvpics
 	rm -f $(bundle_name)/Contents/Resources/data/.DS_Store $(bundle_name)/Contents/Resources/data/*/.DS_Store
-	strip $(bundle_name)/Contents/MacOS/flobopuyo
+	$(STRIP) $(bundle_name)/Contents/MacOS/flobopuyo
 
 mac-package: bundle
 	mkdir -p $(macimage_name)
@@ -234,6 +239,7 @@ mac-package: bundle
 	hdiutil internet-enable $(macimage_name).dmg
 
 win-package: flobopuyo
+	$(STRIP) $(PRGNAME)
 	mkdir -p $(WINZIP_NAME)
 	cp -r data $(WINZIP_NAME)
 	cp flobopuyo.exe $(WINZIP_NAME)
