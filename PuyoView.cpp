@@ -696,6 +696,8 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
   painter.display = display;
   painter.redrawAll(painter.gameScreen);
 	
+  static bool firstTime = true;
+  if (firstTime) {
   fallingViolet = IMG_Load_DisplayFormatAlpha("v0.png");
   fallingRed   = iim_surface_shift_hue(fallingViolet, 100.0f);
   fallingBlue = iim_surface_shift_hue(fallingViolet, -65.0f);
@@ -752,6 +754,9 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
 	}
 
     grid          = IMG_Load_DisplayFormatAlpha("grid.png");
+    firstTime = false;
+  }
+    
 	if (fallingBlue == NULL)
 	{
 		fprintf(stderr, "IMG_Load error:%s\n", SDL_GetError());
@@ -786,7 +791,7 @@ PuyoStarter::~PuyoStarter()
 	delete areaB;
 	delete attachedGameA;
 	delete attachedGameB;
-	SDL_FreeSurface(fallingBlue);
+//	SDL_FreeSurface(fallingBlue);
 }
 
 void PuyoStarter::run(int score1, int score2, int lives)
