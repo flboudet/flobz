@@ -481,24 +481,25 @@ void PuyoView::render()
 	vrect.y = yOffset;
 	vrect.w = TSIZE * PUYODIMX;
 	vrect.h = TSIZE * PUYODIMY;
-    /* TODO : Le nouveau systeme ne permet pas de faire des cliprect, a contourner */
-    //SDL_SetClipRect(display, &vrect);
     for (int i = 0 ; i < PUYODIMX ; i++) {
         for (int j = 0 ; j < PUYODIMY ; j++) {
             puyoEyeState[i][j]++;
             PuyoPuyo *currentPuyo = attachedGame->getPuyoAt(i, j);
             if ((currentPuyo != NULL) && (getSurfaceForPuyo(currentPuyo) != neutral) && (currentPuyo->getAttachedObject() == NULL)) {
-                drect.x = xOffset + i * TSIZE -5;
-                drect.y = yOffset + j * TSIZE -5;
+                drect.x = xOffset + i * TSIZE;
+                drect.y = yOffset + j * TSIZE;
                 if (currentPuyo->getPuyoState() < PUYO_EMPTY)
                     drect.y -= attachedGame->getSemiMove() * TSIZE / 2;
                 drect.w = puyoShadow->w;
                 drect.h = puyoShadow->h;
+                if (drect.y + drect.h > vrect.y + vrect.h)
+                  drect.h -= (drect.y + drect.h - vrect.y - vrect.h);
+                if (drect.x + drect.w > vrect.x + vrect.w)
+                  drect.w -= (drect.x + drect.w - vrect.x - vrect.w);
                 painter.requestDraw(puyoShadow, &drect);
             }
         }
     }
-    //SDL_SetClipRect(display, NULL);
     
 	for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
         PuyoPuyo *currentPuyo = attachedGame->getPuyoAtIndex(i);
@@ -509,8 +510,7 @@ void PuyoView::render()
 	drect.y = nYOffset;
 	drect.w = TSIZE;
 	drect.h = TSIZE * 2;
-	//SDL_FillRect(display, &drect, 1000);
-    // Drawing next puyos
+  // Drawing next puyos
 	SDL_Surface *currentSurface = getSurfaceForState(attachedGame->getNextFalling());
 	if (currentSurface != NULL) {
 		drect.x = nXOffset;

@@ -26,7 +26,7 @@ static inline bool isEqual(DrawElt &d1, DrawElt &d2)
     && (d1.rect.h == d2.rect.h);
 }
 
-static inline bool isEqual(SDL_Rect &r1, SDL_Rect &r2)
+static inline bool isEqual(const SDL_Rect &r1, const SDL_Rect &r2)
 {
   return (r1.x == r2.x)
     && (r1.y == r2.y)
@@ -34,72 +34,90 @@ static inline bool isEqual(SDL_Rect &r1, SDL_Rect &r2)
     && (r1.h == r2.h);
 }
 
-static inline bool isInside(SDL_Rect &r1, SDL_Rect &r2)
+static inline bool isInside(const SDL_Rect &r1, const SDL_Rect &r2)
 {
   return (r1.x > r2.x) && (r1.x + r1.w < r2.x + r2.w)
       && (r1.y > r2.y) && (r1.y + r1.h < r2.y + r2.h);
 }
 
+static inline int addRectToList(SDL_Rect rectList[MAX_PAINT_ELTS], int nbRect, const SDL_Rect &rect)
+{
+	for (int r=0; r<nbRect; ++r)
+  {
+    // rectangle deja contenu dans un autre...
+    if (isInside(rect, rectList[r]) || isEqual(rect, rectList[r]))
+      return nbRect;
+    if (isInside(rectList[r], rect)) {
+      rectList[r] = rect;
+      return nbRect;
+    }
+    // rectangle colle a un autre: on etend l'autre.
+    if ((rect.y == rectList[r].y) && (rect.h == rectList[r].h)) { // voisin horizontal
+      if (rect.x == rectList[r].x + rectList[r].w) {
+        rectList[r].w += rect.w;
+        return nbRect;
+      }
+      if (rectList[r].x == rect.x + rect.w) {
+        rectList[r].x = rect.x;
+        rectList[r].w += rect.w;
+        return nbRect;
+      }
+    }
+    if ((rect.x == rectList[r].x) && (rect.w == rectList[r].w)) { // voisin vertical
+      if (rect.y == rectList[r].y + rectList[r].h) {
+        rectList[r].h += rect.h;
+        return nbRect;
+      }
+      if (rectList[r].y == rect.y + rect.h) {
+        rectList[r].y = rect.y;
+        rectList[r].h += rect.h;
+        return nbRect;
+      }
+    }
+  }
+  rectList[nbRect] = rect;
+  return nbRect + 1;
+}
+
 void SDL_Painter::draw(SDL_Surface *surf)
 {
-  SDL_Rect rectToUpdate1[MAX_PAINT_ELTS]; // liste brute des rectangles.
-  SDL_Rect rectToUpdate2[MAX_PAINT_ELTS]; // liste videe des rect en trop.
-  int nbRects1 = 0;
-  int nbRects2 = 0;
+  SDL_Rect rectToUpdate[MAX_PAINT_ELTS]; // liste des zones a reafficher.
+  int nbRects = 0;
 
-  bool findMatchElts[MAX_PAINT_ELTS];
   bool findMatchPrev[MAX_PAINT_ELTS];
 
-  for (int i=0; i<nbElts; ++i)
-    findMatchElts[i] = false;
   for (int j=0; j<nbPrev; ++j)
     findMatchPrev[j] = false;
 
   // Chercher les differences entre la liste actuelle et l'ancienne,
   // les stocker dans une liste.
   for (int i=0; i<nbElts; ++i) {
+    bool findMatchElts = false;
     for (int j=0; j<nbPrev; ++j) {
       if (isEqual(onScreenElts[i], onScreenPrev[j])) {
-        findMatchElts[i] = true;
+        findMatchElts = true;
         findMatchPrev[j] = true;
       }
     }
+    // Nouvel elements: ajouter une zone a reafficher.
+    if (!findMatchElts)
+      nbRects = addRectToList(rectToUpdate, nbRects, onScreenElts[i].rect);
   }
 
-  // Creer la liste des rectangles a reafficher.
-  for (int i=0; i<nbElts; ++i) {
-    if (!findMatchElts[i])
-      rectToUpdate1[nbRects1++] = onScreenElts[i].rect;
-  }
+  // Reafficher aussi les zones des elements ayant disparus.
   for (int j=0; j<nbPrev; ++j) {
     if (!findMatchPrev[j])
-      rectToUpdate1[nbRects1++] = onScreenPrev[j].rect;
-  }
-
-  // Optimisation de la liste de rectangles.
-  for (int r1=0; r1<nbRects1; ++r1) {
-    bool inside = false;
-    for (int r2=0; r2<nbRects1; ++r2) {
-      if (r1 == r2) continue;
-      if (isInside(rectToUpdate1[r1],rectToUpdate1[r2])
-          || ((r1>r2) && isEqual(rectToUpdate1[r1],rectToUpdate1[r2])))
-      {
-        inside = true;
-        break;
-      }
-    }
-    if (!inside)
-      rectToUpdate2[nbRects2++] = rectToUpdate1[r1];
+      nbRects = addRectToList(rectToUpdate, nbRects, onScreenPrev[j].rect);
   }
 
   // Pour chaque rectangle
   // Chercher les elements de la liste actuelle qui intersectent
-  //  (question, peut-t'on assumer que SDL fait ca aussi bien que nous ?)
-  // Afficher ces elements.
-  for (int r=0; r<nbRects2; ++r) {
-    SDL_SetClipRect(surf, &rectToUpdate2[r]);
-    SDL_BlitSurface(backGround, &rectToUpdate2[r], surf, &rectToUpdate2[r]);
+  //  (note: j'assume que SDL fait ca aussi bien que nous)
+  for (int r=0; r<nbRects; ++r) {
+    SDL_SetClipRect(surf, &rectToUpdate[r]);
+    SDL_BlitSurface(backGround, &rectToUpdate[r], surf, &rectToUpdate[r]);
     for (int i=0; i<nbElts; ++i) {
+      // Afficher ces elements.
       SDL_Rect rect = onScreenElts[i].rect;
       SDL_BlitSurface(onScreenElts[i].surf, NULL,
                       surf, &rect);
