@@ -39,13 +39,13 @@ PuyoRandomSystem::PuyoRandomSystem()
 
 PuyoState PuyoRandomSystem::getPuyoForSequence(int sequence)
 {
-	if (sequenceItems.getSize() <= sequence) {
+	if (sequenceItems.size() <= sequence) {
 		int newItem = (random() % 5) + PUYO_FALLINGBLUE;
-		sequenceItems.addElement((void *)newItem);
+		sequenceItems.add(newItem);
 		return (PuyoState)newItem;
 	}
 	else
-		return (PuyoState)(int)(sequenceItems.getElementAt(sequence));
+		return (PuyoState)(sequenceItems[sequence]);
 }
 
 int PuyoPuyo::lastID = 0;
@@ -215,12 +215,12 @@ PuyoPuyo *PuyoLocalGame::getPuyoAt(int X, int Y) const
 // List access to the PuyoPuyo objects
 int PuyoLocalGame::getPuyoCount() const
 {
-    return puyoVector.getSize();
+    return puyoVector.size();
 }
 
 PuyoPuyo *PuyoLocalGame::getPuyoAtIndex(int index) const
 {
-    return (PuyoPuyo *)(puyoVector.getElementAt(index));
+    return puyoVector[index];
 }
 
 void PuyoLocalGame::moveLeft()
@@ -366,7 +366,7 @@ void PuyoLocalGame::dropNeutrals()
             continue;
         // Creating a new neutral puyo
         PuyoPuyo *newNeutral = attachedFactory->createPuyo(PUYO_NEUTRAL);
-        puyoVector.addElement(newNeutral);
+        puyoVector.add(newNeutral);
         setPuyoAt(posX, posY, newNeutral);
         if (delegate != NULL)
           delegate->gameDidAddNeutral(newNeutral, idNeutral++);
@@ -398,8 +398,8 @@ void PuyoLocalGame::setFallingAtTop(bool gameConstruction)
   companionPuyo = attachedFactory->createPuyo(attachedRandom->getPuyoForSequence(sequenceNr++));
   fallingPuyo->setPuyoXY(fallingX, fallingY);
   companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
-  puyoVector.addElement(fallingPuyo);
-  puyoVector.addElement(companionPuyo);
+  puyoVector.add(fallingPuyo);
+  puyoVector.add(companionPuyo);
 
   endOfCycle = false;
   semiMove = 0;
@@ -533,7 +533,7 @@ void PuyoLocalGame::markPuyoAt(int X, int Y, PuyoState color, bool includeNeutra
 void PuyoLocalGame::deleteMarkedPuyosAt(int X, int Y)
 {
 	PuyoState currentPuyo = getPuyoCellAt(X, Y);
-  puyoVector.removeElement(getPuyoAt(X, Y));
+  puyoVector.remove(getPuyoAt(X, Y));
   if (getPuyoAt(X,Y) == companionPuyo) {
     attachedFactory->deletePuyo(getPuyoAt(X, Y));
     companionPuyo = NULL;
@@ -554,22 +554,22 @@ void PuyoLocalGame::deleteMarkedPuyosAt(int X, int Y)
 	if (getPuyoCellAt(X, Y+1) == currentPuyo)
 		deleteMarkedPuyosAt(X, Y+1);
     if (getPuyoCellAt(X-1, Y) == PUYO_NEUTRAL) {
-        puyoVector.removeElement(getPuyoAt(X-1, Y));
+        puyoVector.remove(getPuyoAt(X-1, Y));
         attachedFactory->deletePuyo(getPuyoAt(X-1, Y));
         setPuyoAt(X-1, Y, NULL);
     }
     if (getPuyoCellAt(X+1, Y) == PUYO_NEUTRAL) {
-        puyoVector.removeElement(getPuyoAt(X+1, Y));
+        puyoVector.remove(getPuyoAt(X+1, Y));
         attachedFactory->deletePuyo(getPuyoAt(X+1, Y));
         setPuyoAt(X+1, Y, NULL);
     }
     if (getPuyoCellAt(X, Y-1) == PUYO_NEUTRAL) {
-        puyoVector.removeElement(getPuyoAt(X, Y-1));
+        puyoVector.remove(getPuyoAt(X, Y-1));
         attachedFactory->deletePuyo(getPuyoAt(X, Y-1));
         setPuyoAt(X, Y-1, NULL);
     }
     if (getPuyoCellAt(X, Y+1) == PUYO_NEUTRAL) {
-        puyoVector.removeElement(getPuyoAt(X, Y+1));
+        puyoVector.remove(getPuyoAt(X, Y+1));
         attachedFactory->deletePuyo(getPuyoAt(X, Y+1));
         setPuyoAt(X, Y+1, NULL);
     }

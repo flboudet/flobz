@@ -25,7 +25,7 @@ OBJFILES= HiScores.o PuyoCommander.o        \
           menu.o menuitems.o audio.o PuyoStory.o \
           PuyoDoomMelt.o corona32.o corona.o corona_palette.o\
           PuyoStarter.o PuyoSinglePlayerStarter.o PuyoTwoPlayerStarter.o     \
-          PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o PuyoMenu.o PuyoNetworkMenu.o
+          PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o PuyoMenu.o PuyoNetworkMenu.o AnimatedPuyoTheme.o
 
 all: prelude flobopuyo
 

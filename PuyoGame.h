@@ -23,6 +23,9 @@
  *
  */
 
+#include "ios_memory.h"
+using namespace ios_fc;
+
 #include "IosVector.h"
 
 #ifdef _WIN32
@@ -61,7 +64,7 @@ public:
 	PuyoRandomSystem();
 	PuyoState getPuyoForSequence(int sequence);
 private:
-	IosVector sequenceItems;
+	AdvancedBuffer<int> sequenceItems;
 };
 
 // A PuyoPuyo is an entity of the game
@@ -255,7 +258,7 @@ private:
     PuyoPuyo *unmoveablePuyo;
     
     // We are keeping a list of current puyos
-    IosVector puyoVector;
+    AdvancedBuffer<PuyoPuyo *> puyoVector;
     int nbFalled;
 };
 

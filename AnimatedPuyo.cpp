@@ -25,12 +25,15 @@
  
 #include "AnimatedPuyo.h"
 #include "PuyoView.h"
+#include "AnimatedPuyoTheme.h"
 
 // crade, mais basta
-extern IIM_Surface *puyoCircle[32][5];
-extern IIM_Surface *puyoEye[3];
+extern IIM_Surface *neutral;
 
-AnimatedPuyo::AnimatedPuyo(PuyoState state, PuyoView *attachedView) : PuyoPuyo(state)
+AnimatedPuyoThemeManager *globalThemeManager = NULL;
+
+AnimatedPuyo::AnimatedPuyo(PuyoState state, AnimatedPuyoThemeManager *themeManager, PuyoView *attachedView)
+    : PuyoPuyo(state), attachedTheme(themeManager->getThemeForState(state))
 {
     puyoEyeState = random() % 700;
     visibilityFlag = true;
@@ -113,8 +116,14 @@ void AnimatedPuyo::renderAt(int X, int Y)
     bool falling  = attachedGame->getFallingState() < PUYO_EMPTY;
     
     SDL_Rect drect;
+    IIM_Surface *currentSurface;
     
-    IIM_Surface *currentSurface = attachedView->getSurfaceForPuyo(this);
+    if (getPuyoState() == PUYO_NEUTRAL) {
+        currentSurface = neutral;
+    }
+    else {
+        currentSurface = attachedTheme->getPuyoSurfaceForValence(attachedView->getValenceForPuyo(this));
+    }
     if (currentSurface != NULL) {
         drect.x = X;
         drect.y = Y;
@@ -126,20 +135,20 @@ void AnimatedPuyo::renderAt(int X, int Y)
         
         /* Main puyo show */
         if (falling && (this == attachedGame->getFallingPuyo()))
-            painter.requestDraw(puyoCircle[(smallTicksCount >> 2) & 0x1F][this->getPuyoState()], &drect);
+            painter.requestDraw(attachedTheme->getCircleSurfaceForIndex((smallTicksCount >> 2) & 0x1F), &drect);
         
         /* Eye management */
         if (getPuyoState() != PUYO_NEUTRAL) {
             while (puyoEyeState >= 750) puyoEyeState -= 750;
             int eyePhase = puyoEyeState;
             if (eyePhase < 5)
-                painter.requestDraw(puyoEye[1], &drect);
+                painter.requestDraw(attachedTheme->getEyeSurfaceForIndex(1), &drect);
             else if (eyePhase < 15)
-                painter.requestDraw(puyoEye[2], &drect);
+                painter.requestDraw(attachedTheme->getEyeSurfaceForIndex(2), &drect);
             else if (eyePhase < 20)
-                painter.requestDraw(puyoEye[1], &drect);
+                painter.requestDraw(attachedTheme->getEyeSurfaceForIndex(1), &drect);
             else
-                painter.requestDraw(puyoEye[0], &drect);
+                painter.requestDraw(attachedTheme->getEyeSurfaceForIndex(0), &drect);
         }
     }
 }
@@ -159,6 +168,9 @@ int AnimatedPuyo::getScreenCoordinateY() const
 
 AnimatedPuyoFactory::AnimatedPuyoFactory(PuyoView *attachedView)
 {
+    // Crade, mais besoin pour l'instant
+    if (globalThemeManager == NULL)
+        globalThemeManager = new AnimatedPuyoThemeManager;
     this->attachedView = attachedView;
 }
 
@@ -173,7 +185,7 @@ AnimatedPuyoFactory::~AnimatedPuyoFactory()
 
 PuyoPuyo *AnimatedPuyoFactory::createPuyo(PuyoState state)
 {
-    return new AnimatedPuyo(state, attachedView);
+    return new AnimatedPuyo(state, globalThemeManager, attachedView);
 }
 
 void AnimatedPuyoFactory::deletePuyo(PuyoPuyo *target)

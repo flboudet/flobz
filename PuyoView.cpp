@@ -159,7 +159,7 @@ IIM_Surface *PuyoView::getSurfaceForState(PuyoState state)
 	}
 }
 
-IIM_Surface *PuyoView::getSurfaceForPuyo(PuyoPuyo *puyo)
+int PuyoView::getValenceForPuyo(PuyoPuyo *puyo) const
 {
     int i = puyo->getPuyoX();
     int j = puyo->getPuyoY();
@@ -168,17 +168,23 @@ IIM_Surface *PuyoView::getSurfaceForPuyo(PuyoPuyo *puyo)
     AnimatedPuyo *right = (AnimatedPuyo *)(attachedGame->getPuyoAt(i+1, j));
     AnimatedPuyo *up    = (AnimatedPuyo *)(attachedGame->getPuyoAt(i, j-1));
     AnimatedPuyo *left  = (AnimatedPuyo *)(attachedGame->getPuyoAt(i-1, j));
-
+    
     PuyoState downState = (down == NULL)   || (down->isRenderingAnimation())  ? PUYO_EMPTY  : down->getPuyoState();
     PuyoState rightState = (right == NULL) || (right->isRenderingAnimation()) ? PUYO_EMPTY  : right->getPuyoState();
     PuyoState upState = (up == NULL)       || (up->isRenderingAnimation())    ? PUYO_EMPTY  : up->getPuyoState();
     PuyoState leftState = (left == NULL)   || (left->isRenderingAnimation())  ? PUYO_EMPTY  : left->getPuyoState();
     
-    int currentIndex = PuyoGroupImageIndex
+    return PuyoGroupImageIndex
 		[downState == currentPuyoState  ? 1 : 0]
 		[rightState == currentPuyoState ? 1 : 0]
 		[upState == currentPuyoState    ? 1 : 0]
 		[leftState == currentPuyoState  ? 1 : 0];
+}
+
+IIM_Surface *PuyoView::getSurfaceForPuyo(PuyoPuyo *puyo)
+{
+    int currentIndex = getValenceForPuyo(puyo);
+    PuyoState currentPuyoState = puyo->getPuyoState();
     switch (currentPuyoState) {
 		case PUYO_VIOLET:
 			return puyoFaces[0][currentIndex];

@@ -32,10 +32,12 @@
 #include "IosVector.h"
 
 class PuyoView;
+class AnimatedPuyoTheme;
+class AnimatedPuyoThemeManager;
 
 class AnimatedPuyo : public PuyoPuyo {
 public:
-    AnimatedPuyo(PuyoState state, PuyoView *attachedView);
+    AnimatedPuyo(PuyoState state, AnimatedPuyoThemeManager *themeManager, PuyoView *attachedView);
     virtual ~AnimatedPuyo();
     void addAnimation(PuyoAnimation *animation);
     PuyoAnimation * getCurrentAnimation() const;
@@ -55,6 +57,7 @@ private:
     unsigned int smallTicksCount;
     bool visibilityFlag;
     PuyoView *attachedView;
+    const AnimatedPuyoTheme *attachedTheme;
 };
 
 

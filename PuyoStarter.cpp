@@ -45,7 +45,6 @@ IIM_Surface *gameScreen;
 IIM_Surface *shrinkingPuyo[5][5];
 IIM_Surface *explodingPuyo[5][5];
 extern IIM_Surface *bigNeutral;
-IIM_Surface *puyoCircle[32][5];
 extern IIM_Surface *puyoShadow;
 IIM_Surface *puyoEye[3];
 extern IIM_Surface *puyoEyes;
@@ -359,20 +358,6 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
         speedImg      = IIM_Load_DisplayFormatAlpha("speed.png");
         speedBlackImg = IIM_Load_DisplayFormatAlpha("speed_black.png");
 
-        IIM_Surface * tmpsurf[5] = {IIM_Load_DisplayFormatAlpha("horizontal.png"),
-          IIM_Load_DisplayFormatAlpha("cross.png"),
-          IIM_Load_DisplayFormatAlpha("vertical.png"),
-          IIM_Load_DisplayFormatAlpha("circle.png"),
-          IIM_Load_DisplayFormatAlpha("square.png")};
-
-        for (int i = 0 ; i < 32 ; i++) {
-          for (int j= 0 ; j < 5 ; j++) {
-            puyoCircle[i][j] = iim_surface_set_value(tmpsurf[j],sin(3.14f/2.0f+i*3.14f/64.0f)*0.6f+0.2f);
-          }
-        }
-        for ( int i = 0 ; i < 5 ; i++ ) {
-          IIM_Free(tmpsurf[i]);
-        }
         loadShrinkXplode();
         
         puyoShadow = IIM_Load_DisplayFormatAlpha("Shadow.png");

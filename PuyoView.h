@@ -66,6 +66,7 @@ class PuyoView : public PuyoDelegate {
     virtual void rotateRight();
 
     static IIM_Surface *getSurfaceForState(PuyoState state);
+    int PuyoView::getValenceForPuyo(PuyoPuyo *puyo) const;
     IIM_Surface *getSurfaceForPuyo(PuyoPuyo *puyo);
     PuyoGame *getAttachedGame() const { return attachedGame; }
     SDL_Painter & getPainter() const { return attachedPainter; }
