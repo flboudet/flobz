@@ -12,6 +12,9 @@ int main(int c, char **v)
     jitc_add(jitc, "mov [$d], ebx",  &i);
     jitc_add(jitc, "mov ecx,  [$d]", &i);
     jitc_add(jitc, "mov [$d], $d",   &i, 0xdeadbeaf);
+    jitc_add(jitc, "mov eax,  $d",   1);
+    jitc_add(jitc, "add eax,  $d",   2);
+    jitc_add(jitc, "add eax,  eax");
 
     JITC_FLD_pIMM32(jitc,&i);
     JITC_FSTP_pIMM32(jitc,&j);

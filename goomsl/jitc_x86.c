@@ -51,8 +51,9 @@ static void modrm(JitcX86Env *jitc, int opcode, IParam *iparam)
     exit(1);
   }
 
-  if (iparam[dest].id == PARAM_REG)
+  if (iparam[dest].id == PARAM_REG) {
     byte = ((int)JITC_MOD_REG_REG << 6) | (iparam[src].reg << 3) | (iparam[0].reg);
+  }
 
   else if (iparam[dest].id == PARAM_dispREG)
   {
@@ -89,7 +90,7 @@ static void modrm(JitcX86Env *jitc, int opcode, IParam *iparam)
  */
 static void jitc_add_op(JitcX86Env *jitc, char *op, IParam *iparam, int nbParams)
 {
-  if (!strcmp(op,"mov"))
+  if (strcmp(op,"mov") == 0)
   {
     if ((iparam[0].id == PARAM_REG) && (iparam[1].id == PARAM_INT)) {
       INSTR_1bReg_IMM32(0xb8,0,1);
@@ -102,6 +103,23 @@ static void jitc_add_op(JitcX86Env *jitc, char *op, IParam *iparam, int nbParams
     }
     else
       modrm(jitc, 0x89, iparam);
+  }
+  else if (strcmp(op,"add") == 0)
+  {
+    if ((iparam[0].id == PARAM_REG) && (iparam[1].id == PARAM_INT)) {
+      if (iparam[0].reg == EAX) {
+        JITC_ADD_UCHAR(jitc, 0x05);
+        JITC_ADD_UINT(jitc,  iparam[1].i);
+      }
+      else {
+        JITC_ADD_UCHAR(jitc, 0x81);
+        JITC_MODRM(jitc,     0x03, 0x00, iparam[0].reg);
+        JITC_ADD_UINT(jitc,  iparam[1].i);
+      }
+    }
+    else {
+      modrm(jitc, 0x01, iparam);
+    }
   }
   else {
     fprintf(stderr, "JITC_x86: Invalid Operation\n");
