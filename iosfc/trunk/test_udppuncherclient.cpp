@@ -70,7 +70,7 @@ using namespace ios_fc;
 int main(int argc, char *argv[])
 {
     UdpPuncherClient toto(argv[1], 5432);;
-    toto.punch("testpool");
+    toto.punch(argv[2]);
     while (1) {
         sleep(1);
         toto.idle();
