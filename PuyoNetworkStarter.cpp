@@ -53,6 +53,7 @@ void PuyoNetworkStarter::run(int score1, int score2, int lives, int point1, int 
         commander->updateAll(this);
     }
     if (!gameAborted)
+        // We send the message twice
         message->send();
         delete message;
         PuyoStarter::run(score1, score2, lives, point1, point2);
