@@ -174,7 +174,7 @@ clean:
 	rm -rf $(bundle_name)
 	rm -rf $(macimage_name)
 	rm -f  $(macimage_name).dmg
-	rm -f  .DS_Store data/.DS_Store data/*/.DS_Store .gdb_history
+	rm -f  .DS_Store */.DS_Store */*/.DS_Store .gdb_history
 
 install: flobopuyo
 	strip flobopuyo
