@@ -68,8 +68,9 @@ public:
     virtual int getSemiMove() const;
 private:
     void synchronizeState(Message &message);
+    void setPuyoAt(int X, int Y, PuyoPuyo *newPuyo);
     PuyoPuyo *findPuyo(int puyoID);
-    
+    PuyoPuyo *puyoCells[PUYODIMX * (PUYODIMY+1)];
     PuyoState nextFalling, nextCompanion;
     PuyoPuyo *fakePuyo;
     MessageBox &msgBox;

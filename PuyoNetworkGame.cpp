@@ -42,6 +42,11 @@ PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBo
     semiMove = 0;
     neutralPuyos = 0;
     sentBadPuyos = 0;
+    for (int i = 0 ; i < PUYODIMX ; i++) {
+		for (int j = 0 ; j <= PUYODIMY ; j++) {
+            setPuyoAt(i, j, NULL);
+		}
+	}
 }
 
 void PuyoNetworkGame::onMessage(Message &message)
@@ -77,7 +82,8 @@ void PuyoNetworkGame::synchronizeState(Message &message)
             currentPuyo->setPuyoState((PuyoState)(puyos[i+1]));
         }
         currentPuyo->setFlag();
-        currentPuyo->setPuyoXY(puyos[i+2], puyos[i+3]);
+        setPuyoAt(currentPuyo->getPuyoX(), currentPuyo->getPuyoY(), NULL);
+        setPuyoAt(puyos[i+2], puyos[i+3], currentPuyo);
         i += 4;
     }
     
@@ -87,7 +93,9 @@ void PuyoNetworkGame::synchronizeState(Message &message)
             currentPuyo->unsetFlag();
         }
         else {
+            setPuyoAt(currentPuyo->getPuyoX(), currentPuyo->getPuyoY(), NULL);
             puyoVector.removeElementAt(i);
+            attachedFactory->deletePuyo(currentPuyo);
         }
     }
     
@@ -140,9 +148,16 @@ void PuyoNetworkGame::cycle()
 
 PuyoPuyo *PuyoNetworkGame::getPuyoAt(int X, int Y) const
 {
-    return NULL;
+    return puyoCells[X + Y * PUYODIMX];
 }
-  
+
+void PuyoNetworkGame::setPuyoAt(int X, int Y, PuyoPuyo *newPuyo)
+{
+    puyoCells[X + Y * PUYODIMX] = newPuyo;
+    if (newPuyo != NULL)
+        newPuyo->setPuyoXY(X, Y);
+}
+
 // List access to the PuyoPuyo objects
 int PuyoNetworkGame::getPuyoCount() const
 {
