@@ -65,6 +65,11 @@ Datagram DatagramSocket::receive(VoidBuffer buffer)
     return impl->receive(buffer);
 }
 
+int DatagramSocket::available() const
+{
+    return impl->available();
+}
+
 SelectableImpl *DatagramSocket::getSelectableImpl() const
 {
     return sImpl;

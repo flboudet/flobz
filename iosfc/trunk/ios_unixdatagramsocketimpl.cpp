@@ -25,7 +25,8 @@
 
 #include "ios_unixdatagramsocketimpl.h"
 #include "ios_unixsocketaddressimpl.h"
-#include "unistd.h"
+#include <unistd.h>
+#include <sys/ioctl.h>
 
 namespace ios_fc {
 
@@ -74,6 +75,15 @@ Datagram UnixDatagramSocketImpl::receive(VoidBuffer buffer)
         throw Exception("Reception error");
     
     return Datagram(SocketAddress(new UnixSocketAddressImpl(resultAddress.sin_addr.s_addr)), resultAddress.sin_port, buffer, res);
+}
+
+int UnixDatagramSocketImpl::available() const
+{
+    int result = 0;
+	if (ioctl(socketFd, FIONREAD, &result) == -1) {
+		throw Exception("IosSocketStream: ioctl error");
+	}
+	return result;
 }
 
 UnixDatagramSocketImpl::~UnixDatagramSocketImpl()

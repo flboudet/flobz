@@ -4,7 +4,6 @@
 
 #include "ios_udpmessagebox.h"
 using namespace ios_fc;
-#include "SDL.h"
 
 class PuyoNetwork : public MessageListener
 {

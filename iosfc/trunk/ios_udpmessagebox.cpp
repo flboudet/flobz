@@ -66,7 +66,6 @@ void UDPMessageBox::idle()
 {
     char receiveData[2048];
     Buffer<char> receiveBuffer(receiveData, 2048);
-    int bufferSize;
     
     // Resend the waitingForAckMessage when it has reached its timeout
     if (waitingForAckMessage != NULL) {
@@ -77,11 +76,11 @@ void UDPMessageBox::idle()
         }
     }
     
-    do {
+    while (socket.available()) {
         Datagram receivedDatagram = socket.receive(receiveBuffer);
         try {
-            if (bufferSize > 0) {
-                UDPMessage incomingMessage(receiveBuffer, *this);
+            if (receivedDatagram.getSize() > 0) {
+                UDPMessage incomingMessage(Buffer<char>((char *)(receivedDatagram.getMessage()), receivedDatagram.getSize()), *this);
                 
                 int messageSerialID = incomingMessage.getSerialID();
                 
@@ -119,7 +118,7 @@ void UDPMessageBox::idle()
             printf("Message dropped : %s\n", (const char *)receiveBuffer);
             // Do nothing
         }
-    } while (bufferSize != 0);
+    }
 }
 
 void UDPMessageBox::sendUDP(Buffer<char> buffer, int id, bool reliable)

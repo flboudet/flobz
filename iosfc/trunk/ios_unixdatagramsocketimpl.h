@@ -41,9 +41,9 @@ namespace ios_fc {
         void create(int localPortNum);
         void send(Datagram &sendDatagram);
         Datagram receive(VoidBuffer buffer);
+        int available() const;
         SelectableImpl *getSelectableImpl() { return this; }
         int getFd() { return socketFd; }
-    
     private:
         int socketFd;
         struct sockaddr_in boundAddr;
