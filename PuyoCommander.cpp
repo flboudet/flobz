@@ -47,9 +47,22 @@ class MainMenu : public PuyoScreen {
   public: void build();
 };
 
+class LANGameMenu : public PuyoScreen {
+  public:
+    void build();
+};
+
+class InternetGameMenu : public PuyoScreen {
+  public:
+    void build();
+};
+
 class NetworkGameMenu : public PuyoScreen {
   public:
     void build();
+  private:
+    LANGameMenu lanGameMenu;
+    InternetGameMenu internetGameMenu;
 };
 
 void MainMenu::build() {
@@ -68,6 +81,23 @@ public:
 };
 
 void NetworkGameMenu::build() {
+  internetGameMenu.build();
+  lanGameMenu.build();
+  add(new Text("Network Game"));
+  add(new Button("LAN Game", new PushScreenAction(&lanGameMenu)));
+  add(new Button("Internet Game", new PushScreenAction(&internetGameMenu)));
+  add(new Button("Cancel", new PopScreenAction()));
+}
+
+void LANGameMenu::build() {
+  add(new Text("Network Game"));
+  add(new EditFieldWithLabel("Player name:", "toto"));
+  add(new EditFieldWithLabel("Server name:", "127.0.0.1"));
+  add(new Button("Start!", new NetGameAction));
+  add(new Button("Cancel", new PopScreenAction()));
+}
+
+void InternetGameMenu::build() {
   add(new Text("Network Game"));
   add(new EditFieldWithLabel("Player name:", "toto"));
   add(new EditFieldWithLabel("Server name:", "127.0.0.1"));
