@@ -672,16 +672,16 @@ void PuyoStarter::restartRender()
 
 
 extern Menu *menu_pause;
+static char *BACKGROUND[NB_MUSIC_THEME] = { "Background.jpg", "BackgroundDark.jpg" };
 
-
-PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType)
+PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType, int theme)
 {
   this->stopRendering = false;
   this->paused = false;
   tickCounts = 0;
   this->commander = commander;
 
-	background    = IMG_Load_DisplayFormat("Background.jpg");
+	background    = IMG_Load_DisplayFormat(BACKGROUND[theme]);
 	painter.backGround = background;
 	if (painter.gameScreen == NULL)
 	{
@@ -775,8 +775,8 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
     perso[0] = NULL;
   }
 
-	areaA = new PuyoView(attachedGameA, CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
-	areaB = new PuyoView(attachedGameB, CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE);
+	areaA = new PuyoView(attachedGameA, 1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
+	areaB = new PuyoView(attachedGameB, 1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE);
         
 	attachedGameA->setDelegate(areaA);
 	attachedGameB->setDelegate(areaB);

@@ -717,7 +717,7 @@ void PuyoCommander::run()
                             menu_next_item(gameOverMenu);
                         while (menu_active_is(gameOverMenu, "YES")) {
                             menu_next_item(gameOverMenu);
-                            PuyoStarter myStarter(this,false,0,RANDOM);
+                            PuyoStarter myStarter(this,false,0,RANDOM,currentMusicTheme);
                             audio_music_switch_theme(currentMusicTheme);
                             myStarter.run(score1, score2, 0);
                             score1 += myStarter.leftPlayerWin();
@@ -1084,7 +1084,7 @@ mml_play:
     
     PuyoStory myStory(this, score2+1);
     myStory.loop();
-    PuyoStarter myStarter(this, true, ia[score2].level, ia[score2].type);
+    PuyoStarter myStarter(this, true, ia[score2].level, ia[score2].type, currentMusicTheme);
     myStarter.run(score1, score2, lives);
     score1 += myStarter.leftPlayerWin();
     score2 += myStarter.rightPlayerWin();
