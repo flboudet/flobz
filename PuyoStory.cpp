@@ -7,7 +7,7 @@ SDL_Surface *sstory;
 
 static SDL_Surface * createStorySurface()
 {
-  SDL_Surface *sstory;
+  SDL_Surface *sstory, *tmpsurf;
   Uint32 rmask, gmask, bmask, amask;
 
   /* SDL interprets each pixel as a 32-bit number, so our masks must depend
@@ -24,8 +24,11 @@ static SDL_Surface * createStorySurface()
   amask = 0x00000000;
 #endif
 
-  sstory = SDL_CreateRGBSurface(SDL_SWSURFACE, 640, 480, 32,
+  tmpsurf = SDL_CreateRGBSurface(SDL_SWSURFACE, 640, 480, 32,
                                rmask, gmask, bmask, amask);
+  sstory = SDL_DisplayFormat (tmpsurf);
+  SDL_FreeSurface (tmpsurf);
+  
   if(sstory == NULL) {
     fprintf(stderr, "CreateRGBSurface failed: %s", SDL_GetError());
     exit(1);
@@ -36,9 +39,9 @@ static SDL_Surface * createStorySurface()
 /* Implementation of the Styrolyse Client */
 static void *loadImage (StyrolyseClient *_this, const char *path)
 {
-  char imgPath[1024];
-  sprintf(imgPath, "%s/%s",dataFolder, path);
-  SDL_Surface *surf = IMG_Load(imgPath);
+  //char imgPath[1024];
+  //sprintf(imgPath, "%s/%s",dataFolder, path);
+  IIM_Surface *surf = IIM_Load_DisplayFormatAlpha(path);
   return surf;
 }
 
@@ -46,7 +49,7 @@ static void *loadImage (StyrolyseClient *_this, const char *path)
 static void  drawImage (StyrolyseClient *_this, void *image, int x, int y,
                  int clipx, int clipy, int clipw, int cliph)
 {
-  SDL_Surface *surf = (SDL_Surface*)image;
+  IIM_Surface *surf = (IIM_Surface*)image;
   SDL_Rect  rect, cliprect;
   rect.x = x;
   rect.y = y;
@@ -55,12 +58,12 @@ static void  drawImage (StyrolyseClient *_this, void *image, int x, int y,
   cliprect.w = clipw;
   cliprect.h = cliph;
   SDL_SetClipRect(sstory, &cliprect);
-  SDL_BlitSurface(surf, NULL, sstory, &rect);
+  SDL_BlitSurface(surf->surf, NULL, sstory, &rect);
 }
 
 static void  freeImage (StyrolyseClient *_this, void *image)
 {
-  SDL_FreeSurface((SDL_Surface*)image);
+  IIM_Free((IIM_Surface*)image);
 }
 
 static StyrolyseClient client;
