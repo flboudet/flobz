@@ -41,7 +41,7 @@ public:
     void removeListener(MessageListener *);
     virtual Message * createMessage() = 0;
 protected:
-    Vector<MessageListener*> listeners;
+    Vector<MessageListener> listeners;
 };
 
 };

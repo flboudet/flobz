@@ -8,6 +8,7 @@
 #include "ios_hash.h"
 #include "ios_message.h"
 #include "ios_udpmessage.h"
+#include "ios_vector.h"
 
 #include <stdlib.h>
 
