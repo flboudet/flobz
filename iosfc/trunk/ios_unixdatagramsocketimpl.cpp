@@ -125,7 +125,7 @@ void UnixDatagramSocketImpl::connect(SocketAddress addr, int portNum)
     connectAddr.sin_family = AF_INET;
     connectAddr.sin_addr.s_addr = htonl(impl->getAddress());
     connectAddr.sin_port = htons(portNum);
-    if (::connect(socketFd, (struct sockaddr *) &connectAddr, sizeof(connectAddr)) == -1) {
+    if (::connect(socketFd, (struct sockaddr *) &connectAddr, (socklen_t)sizeof(connectAddr)) == -1) {
         throw Exception("Socket connect error");
     }
     isConnected = true;
@@ -147,7 +147,7 @@ void UnixDatagramSocketImpl::disconnect()
 SocketAddress UnixDatagramSocketImpl::getSocketAddress() const
 {
     struct sockaddr_in name;
-    int namelen = sizeof(struct sockaddr_in);
+    socklen_t namelen = sizeof(struct sockaddr_in);
     
     int result = getsockname(socketFd, (struct sockaddr *) &name, &namelen);
     if (result != 0) {
@@ -159,7 +159,7 @@ SocketAddress UnixDatagramSocketImpl::getSocketAddress() const
 int UnixDatagramSocketImpl::getSocketPortNum() const
 {
     struct sockaddr_in name;
-    int namelen = sizeof(struct sockaddr_in);
+    socklen_t namelen = sizeof(struct sockaddr_in);
     
     int result = getsockname(socketFd, (struct sockaddr *) &name, &namelen);
     if (result != 0) {
