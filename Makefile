@@ -16,7 +16,7 @@ HFILES= HiScores.h IosException.h gametools/IosImgProcess.h IosVector.h PuyoComm
 				gametools/sofont.h gametools/SDL_Painter.h  \
         gametools/InputManager.h gametools/GameControls.h \
 				HiScores.h  PuyoNetworkView.h          \
-        PuyoStarter.h PuyoNetworkGame.h PuyoMenu.h PuyoNetworkMenu.h
+        PuyoStarter.h PuyoNetworkGame.h # PuyoMenu.h PuyoNetworkMenu.h
 
 
 OBJFILES= HiScores.o PuyoCommander.o        \
@@ -25,7 +25,9 @@ OBJFILES= HiScores.o PuyoCommander.o        \
           menu.o menuitems.o audio.o PuyoStory.o \
           PuyoDoomMelt.o corona32.o corona.o corona_palette.o\
           PuyoStarter.o PuyoSinglePlayerStarter.o PuyoTwoPlayerStarter.o     \
-          PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o PuyoMenu.o PuyoNetworkMenu.o AnimatedPuyoTheme.o
+          PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o \
+					AnimatedPuyoTheme.o
+				 	#PuyoMenu.o PuyoNetworkMenu.o
 
 DEPDIR = .deps
 df = $(DEPDIR)/$(*F)
