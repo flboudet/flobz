@@ -5,11 +5,16 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#define SERVERCYCLEMS 10
+#define POOLTTLMS 10000
+#define POOLTTLTICKS POOLTTLMS/SERVERCYCLEMS
+
 namespace ios_fc {
 
 class UdpPuncher : public MessageListener {
 public:
     UdpPuncher(MessageBox *mbox) : mbox(mbox) {}
+    void idle();
     void onMessage(Message &message);
 private:
     class PunchPool;
@@ -20,8 +25,10 @@ private:
 class UdpPuncher::PunchPool {
 public:
     PunchPool(const String punchPoolName, const PeerAddress creatorAddress, const PeerAddress creatorLocalAddress)
-        : punchPoolName(punchPoolName), creatorAddress(creatorAddress), creatorLocalAddress(creatorLocalAddress) {}
+        : punchPoolName(punchPoolName), timeToLive(POOLTTLTICKS),
+          creatorAddress(creatorAddress), creatorLocalAddress(creatorLocalAddress) {}
     inline const String getPunchPoolName() const { return punchPoolName; }
+    int timeToLive;
     void dispatchInformations(const PeerAddress guestAddress, const PeerAddress guestLocalAddress, MessageBox *mbox);
 private:
     const String punchPoolName;
@@ -55,6 +62,21 @@ void UdpPuncher::PunchPool::dispatchInformations(const PeerAddress guestAddress,
     delete peerBMsg;
 }
 
+void UdpPuncher::idle()
+{
+    mbox->idle();
+    // handle abandonned pools deletion
+    for (int i = pools.size()-1 ; i >= 0 ; i--) {
+        PunchPool *currentPool = pools[i];
+        currentPool->timeToLive--;
+        if (currentPool->timeToLive <= 0) {
+            printf("pool %s: TTL expired!\n", (const char *)(currentPool->getPunchPoolName()));
+            pools.remove(currentPool);
+            delete currentPool;
+        }
+    }
+}
+
 void UdpPuncher::onMessage(Message &message)
 {
     Dirigeable &dirMsg = dynamic_cast<Dirigeable &>(message);
@@ -62,10 +84,13 @@ void UdpPuncher::onMessage(Message &message)
     printf("Message pool %s!\n", (const char *)punchPoolName);
     
     // Search if the pool exists
-    for (int i = 0 ; i < pools.size() ; i++) {
+    for (int i = pools.size()-1 ; i >= 0 ; i--) {
         if (pools[i]->getPunchPoolName() == punchPoolName) {
+            PunchPool *currentPool = pools[i];
             printf("Pool found!\n");
-            pools[i]->dispatchInformations(dirMsg.getPeerAddress(), dirMsg.getPeerAddress("LPEER"), mbox);
+            currentPool->dispatchInformations(dirMsg.getPeerAddress(), dirMsg.getPeerAddress("LPEER"), mbox);
+            pools.remove(currentPool);
+            delete currentPool;
             return;
         }
     }
@@ -91,7 +116,7 @@ int main()
         while (true) {
             serverSelector.select(10);
             try {
-                messageBox.idle();
+                puncher.idle();
             }
             catch (ios_fc::Exception e) {
                 e.printMessage();
