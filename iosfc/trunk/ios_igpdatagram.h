@@ -71,13 +71,16 @@ private:
 
 class IGPDatagram::ClientMsgAutoAssignIDDatagram : public IGPDatagram {
 public:
-    ClientMsgAutoAssignIDDatagram(Message *data) : IGPDatagram(data, ClientMsgAutoAssignID) {}
+    ClientMsgAutoAssignIDDatagram(Message *data) : IGPDatagram(data, ClientMsgAutoAssignID) {
+        message->addBoolProperty("RELIABLE", true);
+    }
 };
 
 class IGPDatagram::ClientMsgAssignIDDatagram : public IGPDatagram {
 public:
     ClientMsgAssignIDDatagram(Message *data, int igpIdent) : IGPDatagram(data, ClientMsgAssignID) {
         message->addInt(IGPIDENT, igpIdent);
+        message->addBoolProperty("RELIABLE", true);
     }
     ClientMsgAssignIDDatagram(IGPDatagram &datagram) : IGPDatagram(datagram) {
         igpIdent = message->getInt(IGPIDENT);
@@ -89,13 +92,16 @@ private:
 
 class IGPDatagram::ClientMsgGetIDDatagram : public IGPDatagram {
 public:
-    ClientMsgGetIDDatagram(Message *data) : IGPDatagram(data, ClientMsgGetID) {}
+    ClientMsgGetIDDatagram(Message *data) : IGPDatagram(data, ClientMsgGetID) {
+        message->addBoolProperty("RELIABLE", true);
+    }
 };
 
 class IGPDatagram::ServerMsgInformIDDatagram : public IGPDatagram {
 public:
     ServerMsgInformIDDatagram(Message *data, int igpIdent) : IGPDatagram(data, ServerMsgInformID), igpIdent(igpIdent) {
         message->addInt(IGPIDENT, igpIdent);
+        message->addBoolProperty("RELIABLE", true);
     }
     ServerMsgInformIDDatagram(IGPDatagram &datagram) : IGPDatagram(datagram) {
         igpIdent = message->getInt(IGPIDENT);
@@ -107,9 +113,10 @@ private:
 
 class IGPDatagram::ClientMsgToClientDatagram : public IGPDatagram {
 public:
-    ClientMsgToClientDatagram(Message *data, int igpIdent, VoidBuffer msg) : IGPDatagram(data, ClientMsgToClient), igpIdent(igpIdent), msg(msg) {
+    ClientMsgToClientDatagram(Message *data, int igpIdent, VoidBuffer msg, bool reliable) : IGPDatagram(data, ClientMsgToClient), igpIdent(igpIdent), msg(msg) {
         message->addInt(IGPIDENT, igpIdent);
         message->addCharArray(IGPMSG, this->msg);
+        message->addBoolProperty("RELIABLE", reliable);
     }
     ClientMsgToClientDatagram(IGPDatagram &datagram) : IGPDatagram(datagram), msg(message->getCharArray(IGPMSG)) {
         igpIdent = message->getInt(IGPIDENT);
@@ -123,11 +130,12 @@ private:
 
 class IGPDatagram::ServerMsgToClientDatagram : public IGPDatagram {
 public:
-    ServerMsgToClientDatagram(Message *data, int igpOrigIdent, int igpDestIdent, VoidBuffer msg)
+    ServerMsgToClientDatagram(Message *data, int igpOrigIdent, int igpDestIdent, VoidBuffer msg, bool reliable)
     : IGPDatagram(data, ServerMsgToClient), igpIdent(igpOrigIdent), igpDestIdent(igpDestIdent), msg(msg) {
         message->addInt(IGPORIGIDENT, igpIdent);
         message->addInt(IGPDESTIDENT, igpDestIdent);
         message->addCharArray(IGPMSG, this->msg);
+        message->addBoolProperty("RELIABLE", reliable);
     }
     ServerMsgToClientDatagram(IGPDatagram &datagram) : IGPDatagram(datagram), msg(message->getCharArray(IGPMSG)) {
         igpIdent = message->getInt(IGPORIGIDENT);

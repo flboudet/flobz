@@ -50,7 +50,7 @@ namespace ios_fc {
   
     void IgpMessage::sendBuffer(Buffer<char> out) const
     {
-        owner.sendBuffer(out);
+        owner.sendBuffer(out, isReliable());
     }
     
     
@@ -78,9 +78,9 @@ namespace ios_fc {
         return new IgpMessage(++sendSerialID, *this);
     }
 
-    void IgpMessageBox::sendBuffer(VoidBuffer out)
+    void IgpMessageBox::sendBuffer(VoidBuffer out, bool reliable)
     {
-        igpClient.sendMessage(destIdent, out);
+        igpClient.sendMessage(destIdent, out, reliable);
     }
     
     void IgpMessageBox::onMessage(VoidBuffer message, int origIdent, int destIdent)

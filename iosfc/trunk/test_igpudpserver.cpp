@@ -83,9 +83,14 @@ void IgpMessageListener::PeerRecord::datagramReceived(IGPDatagram &message)
         break;
     case IGPDatagram::ClientMsgToClient: {
         IGPDatagram::ClientMsgToClientDatagram msgReceived(message);
+        bool reliable = false;
+        Message *rawmsg = msgReceived.getMessage();
+        if (rawmsg->hasBoolProperty("RELIABLE"))
+            reliable = rawmsg->getBoolProperty("RELIABLE");
         IGPDatagram::ServerMsgToClientDatagram msgToSend(pool->createMessage(),
                                                         igpID, msgReceived.getIgpIdent(),
-                                                        msgReceived.getIgpMessage());
+                                                        msgReceived.getIgpMessage(),
+                                                        reliable);
         PeerRecord *destPeer = pool->getPeer(msgReceived.getIgpIdent());
         if (destPeer != NULL) {
             Dirigeable *msg = dynamic_cast<Dirigeable *>(msgToSend.getMessage());

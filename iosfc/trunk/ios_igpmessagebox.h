@@ -37,7 +37,7 @@ public:
     virtual ~IgpMessageBox();
     virtual void idle();
     virtual Message * createMessage();
-    void sendBuffer(VoidBuffer out);
+    void sendBuffer(VoidBuffer out, bool reliable);
     void onMessage(VoidBuffer message, int origIdent, int destIdent);
     void bind(int igpIdent) { destIdent = igpIdent; }
  private:

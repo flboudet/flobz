@@ -49,9 +49,9 @@ IGPClient::~IGPClient()
     delete mbox;
 }
 
-void IGPClient::sendMessage(int igpID, VoidBuffer message)
+void IGPClient::sendMessage(int igpID, VoidBuffer message, bool reliable)
 {
-    IGPDatagram::ClientMsgToClientDatagram datagram(mbox->createMessage(), igpID, message);
+    IGPDatagram::ClientMsgToClientDatagram datagram(mbox->createMessage(), igpID, message, reliable);
     datagram.getMessage()->send();
 }
 

@@ -41,7 +41,7 @@ public:
     IGPClient(String hostName, int portID);
     IGPClient(String hostName, int portID, int igpIdent);
     virtual ~IGPClient();
-    void sendMessage(int igpID, VoidBuffer message);
+    void sendMessage(int igpID, VoidBuffer message, bool reliable);
     void idle();
     void addListener(IGPClientMessageListener *);
     void removeListener(IGPClientMessageListener *);
