@@ -120,6 +120,7 @@ external <draw: Sprite &this, Display display>
   set_text::&this text=text
 
 <balloon: Balloon &this, Display display>
+  Vec2 displayPos
   (@mode = UPDATE)? {
     sprite::&this.image
       &this.alpha += &this.delta_alpha
@@ -129,6 +130,8 @@ external <draw: Sprite &this, Display display>
   (@mode = DRAW)? {
     (&this.alpha > 0.5)? {
       sprite::&this.image display=display
-      put_text: text=&this.text pos=&this.image.pos + &this.text_pos
+      displayPos.x = display.x
+      displayPos.y = display.y
+      put_text: text=&this.text pos=&this.image.pos + &this.text_pos + displayPos
     }
   }
