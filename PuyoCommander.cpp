@@ -6,6 +6,9 @@
 #include "preferences.h"
 #include "audio.h"
 #include "PuyoSinglePlayerStarter.h"
+
+#include "PuyoNetworkStarter.h"
+#include "ios_udpmessagebox.h"
 using namespace gameui;
 
 PuyoCommander *theCommander = NULL;
@@ -56,6 +59,7 @@ void MainMenu::build() {
 
 void NetworkGameMenu::build() {
   add(new Button("GO!", new NetGameAction));
+  add(new EditField("Player"));
   add(new Button("Cancel", new PopScreenAction()));
 }
 
@@ -76,9 +80,12 @@ void SinglePlayerGameAction::action()
  */
 void NetGameAction::action()
 {
-//  PuyoStarter *starter = new PuyoNetworkStarter(...);
-//  theCommander->mainMenu->hide();
-  printf("NetGameAction::action() = TODO\n");
+  UDPMessageBox mbox("127.0.0.1", 6581, 6581);
+  PuyoStarter *starter = new PuyoNetworkStarter(theCommander, 0, &mbox);
+  GameUIDefaults::SCREEN_STACK->push(starter);
+  starter->run(0,0,0,0,0);
+  GameUIDefaults::SCREEN_STACK->pop();
+  starter->kill();
 }
 
 void PuyoCommander::run()

@@ -50,6 +50,7 @@ void PuyoNetworkStarter::run(int score1, int score2, int lives, int point1, int 
         while (SDL_PollEvent(&event) == 1) {
             handleEvent(event);
         }
+        mbox->idle();
         commander->updateAll(this);
     }
     if (!gameAborted)

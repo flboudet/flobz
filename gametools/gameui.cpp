@@ -343,6 +343,11 @@ namespace gameui {
     setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
   }
 
+  void Text::setValue(String value)
+  {
+    label = value;
+  }
+  
   void Text::draw(SDL_Surface *screen) const
   {
     SoFont_PutString(font, screen, (int)getPosition().x, (int)getPosition().y, (const char*)label, NULL);
@@ -412,6 +417,76 @@ namespace gameui {
       
 
   void Button::giveFocus() {
+    Text::giveFocus();
+    font = fontActive;
+    requestDraw();
+  }
+  
+  //
+  // EditField
+  //
+  
+  void EditField::init(SoFont *fontActive, SoFont *fontInactive)
+  {
+    if (fontInactive == NULL) fontInactive = GameUIDefaults::FONT_INACTIVE;
+    if (fontActive == NULL)   fontActive = GameUIDefaults::FONT;
+    
+    this->fontActive   = fontActive;
+    this->fontInactive = fontInactive;
+
+    font = fontInactive;
+    editionMode = false;
+  }
+  
+  EditField::EditField(const String &defaultText)
+    : Text(defaultText, NULL)
+  {
+    init(NULL,NULL);
+    //setAction(ON_START, action);
+  }
+  
+  void EditField::eventOccured(GameControlEvent *event)
+  {
+    if (event->isUp)
+      return;
+
+    if (event->cursorEvent == GameControlEvent::kStart) {
+        editionMode = !editionMode;
+        if (editionMode == true) {
+            previousValue = getValue();
+            setValue("_");
+        }
+        else {
+            setValue(getValue().substring(0, getValue().length() - 1));
+        }
+    }
+    else if (editionMode == true) {
+        if (event->cursorEvent == GameControlEvent::kBack) {
+            setValue(previousValue);
+            editionMode = false;
+        }
+        else if (event->sdl_event.type == SDL_KEYDOWN) {
+            printf("Touche SDL!\n");
+            String newValue = getValue();
+            newValue[newValue.length() - 1] = event->sdl_event.key.keysym.sym;
+            newValue += "_";
+            setValue(newValue);
+        }
+    }
+    else {
+      if (isDirectionEvent(event))
+        lostFocus();
+    }
+  }
+  
+  void EditField::lostFocus() {
+    Text::lostFocus();
+    font = fontInactive;
+    requestDraw();
+  }
+      
+
+  void EditField::giveFocus() {
     Text::giveFocus();
     font = fontActive;
     requestDraw();

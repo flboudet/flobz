@@ -204,7 +204,8 @@ namespace gameui {
   class Text : public Widget {
     public:
       Text(const String &label, SoFont *font = NULL);
-
+      void setValue(String value);
+      String getValue() const { return label; }
     protected:
       void draw(SDL_Surface *screen) const;
       SoFont *font;
@@ -228,6 +229,24 @@ namespace gameui {
       SoFont *fontActive;
       SoFont *fontInactive;
 
+      void init(SoFont *fontActive, SoFont *fontInactive);
+  };
+  
+  
+  class EditField : public Text {
+    public:
+      EditField(const String &defaultText);
+
+      void eventOccured(GameControlEvent *event);
+
+      void lostFocus();
+      void giveFocus();
+      
+    private:
+      SoFont *fontActive;
+      SoFont *fontInactive;
+      bool editionMode;
+      String previousValue;
       void init(SoFont *fontActive, SoFont *fontInactive);
   };
 
