@@ -3,6 +3,8 @@ SRCS=ios_exception.cpp ios_stream.cpp ios_hash.cpp ios_memory.cpp ios_message.cp
 CPPFLAGS=-g `sdl-config --cflags`  -Wall
 CXX=g++
 
+OBJECTS=${SRCS:%.cpp=%.o}
+
 # mingw32 cross-compilation (works great in debian testing)
 ifeq ($(PLATFORM), crossmingw32)
   CXX=i586-mingw32msvc-g++
@@ -17,9 +19,10 @@ df = $(DEPDIR)/$(*F)
 MAKEDEPEND = gcc -MM $(CPPFLAGS) -o $(df).d $<
 # MAKEDEPEND = touch $*.d && makedepend $(CPPFLAGS) -f $*.d $<
 
-all: object
+all: ${OBJECTS}
+	ar -cru iosfc.la ${OBJECTS}
 
-object:${SRCS:%.cpp=%.o}
+object: ${OBJECTS}
 
 %.o : %.cpp
 	@mkdir -p $(DEPDIR);\
