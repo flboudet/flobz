@@ -1,4 +1,5 @@
 #include "ios_udpmessagebox.h"
+#include "ios_udpmessage.h"
 #include <unistd.h>
 
 namespace ios_fc {
@@ -41,17 +42,19 @@ void UdpPuncherClient::onMessage(Message &message)
         case 1:
             printf("Pool peer address\n");
             {
-	      for (int i = 0 ; i < 1000 ; i++) {
-		Message *peerMsg = mbox->createMessage();
-		Dirigeable *dirPeerMsg = dynamic_cast<Dirigeable *>(peerMsg);
-		peerMsg->addString("CONNERIE", "Salut le monde!");
-		peerMsg->addInt("TYPE", 2);
-		dirPeerMsg->setPeerAddress(dirMsg.getPeerAddress("PEER"));
-		peerMsg->send();
-		delete peerMsg;
-		mbox->idle();
-		usleep(1000);
-	      }
+                UDPPeerAddress peerAddress = dirMsg.getPeerAddress("PEER");
+                printf("Peer: %s:%d\n", (const char *)(peerAddress.getSocketAddress().asString()), peerAddress.getPortNum());
+                for (int i = 0 ; i < 1000 ; i++) {
+                    Message *peerMsg = mbox->createMessage();
+                    Dirigeable *dirPeerMsg = dynamic_cast<Dirigeable *>(peerMsg);
+                    peerMsg->addString("CONNERIE", "Salut le monde!");
+                    peerMsg->addInt("TYPE", 2);
+                    dirPeerMsg->setPeerAddress(peerAddress);
+                    peerMsg->send();
+                    delete peerMsg;
+                    mbox->idle();
+                    usleep(10000);
+                }
             }
             break;
         case 2:

@@ -84,4 +84,22 @@ PeerAddress UDPMessage::getPeerAddress(const String key)
     return PeerAddress(new UDPPeerAddressImpl(SocketAddress(getString(key + "_A")), getInt(key + "_PN")));
 }
 
+SocketAddress UDPPeerAddress::getSocketAddress() const
+{
+    UDPMessage::UDPPeerAddressImpl *peerAddressImpl = dynamic_cast<UDPMessage::UDPPeerAddressImpl *>(getImpl());
+    if (peerAddressImpl != NULL) {
+        return peerAddressImpl->getAddress();
+    }
+    else throw Exception("Incompatible peer address type!");
+}
+
+int UDPPeerAddress::getPortNum() const
+{
+    UDPMessage::UDPPeerAddressImpl *peerAddressImpl = dynamic_cast<UDPMessage::UDPPeerAddressImpl *>(getImpl());
+    if (peerAddressImpl != NULL) {
+        return peerAddressImpl->getPortNum();
+    }
+    else throw Exception("Incompatible peer address type!");
+}
+        
 };

@@ -20,13 +20,20 @@ namespace ios_fc {
         void setPeerAddress(PeerAddress);
         void addPeerAddress(const String key, const PeerAddress &value);
         PeerAddress getPeerAddress(const String key);
-    private:
         class UDPPeerAddressImpl;
+    private:
         UDPMessageBox &owner;
         UDPPeerAddressImpl *peerAddressImpl;
         PeerAddress peerAddress;
     };
     
+    class UDPPeerAddress : public PeerAddress {
+    public:
+        UDPPeerAddress(PeerAddressImpl *impl) : PeerAddress(impl) {}
+        UDPPeerAddress(const PeerAddress &a) : PeerAddress(a) {}
+        SocketAddress getSocketAddress() const;
+        int getPortNum() const;
+    };
 };
 
 #endif
