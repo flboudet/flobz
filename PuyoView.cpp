@@ -699,7 +699,12 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
 	this->paused = false;
 	tickCounts = 0;
 	this->commander = commander;
-	
+    
+  blinkingPointsA = 0;
+  blinkingPointsB = 0;
+  savePointsA = 0;
+  savePointsB = 0;
+  
 	background    = IMG_Load_DisplayFormat(BACKGROUND[theme]);
 	painter.backGround = background;
 	if (painter.gameScreen == NULL)
@@ -1014,6 +1019,22 @@ void PuyoStarter::run(int score1, int score2, int lives)
                   keysDown[FPKEY_P2_TurnLeft] = 0;
                   keysDown[FPKEY_P2_TurnRight] = 0;
                 }
+                if (attachedGameA->getPoints()%50000 < savePointsA%50000)
+                  blinkingPointsA = 10;
+                if (attachedGameB->getPoints()%50000 < savePointsB%50000)
+                  blinkingPointsB = 10;
+
+                if (blinkingPointsA > 0)
+                  blinkingPointsA--;
+                if (blinkingPointsB > 0)
+                  blinkingPointsB--;
+
+                savePointsB = attachedGameB->getPoints();
+                savePointsA = attachedGameA->getPoints();
+
+                if (savePointsA < 50000) blinkingPointsA=0;
+                if (savePointsB < 50000) blinkingPointsB=0;
+
               } else {
                 if (keysDown[FPKEY_P2_Down]) {
                   attachedGameB->cycle();
@@ -1311,11 +1332,23 @@ void PuyoStarter::draw()
     SDL_BlitSurface(speedBlackImg,&speedRect,display,&drect);
   else
     SDL_BlitSurface(speedImg,&speedRect,display,&drect);
-  
+
+  SoFont *fontBl = NULL;
+  if ((blinkingPointsA % 2) == 0)
+    fontBl = commander->smallFont;
+  else
+    fontBl = commander->menuFont;
+
   sprintf(text, "<< %d", attachedGameA->getPoints());
-  SoFont_CenteredString_XY (commander->smallFont, display,
+  SoFont_CenteredString_XY (fontBl, display,
                             300, 380,   text, NULL);
+  
+  if ((blinkingPointsB % 2) == 0)
+    fontBl = commander->smallFont;
+  else
+    fontBl = commander->menuFont;
+
   sprintf(text, "%d >>", attachedGameB->getPoints());
-  SoFont_CenteredString_XY (commander->smallFont, display,
+  SoFont_CenteredString_XY (fontBl, display,
                             340, 395, text, NULL);
 }
