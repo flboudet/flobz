@@ -33,7 +33,7 @@ namespace ios_fc {
 class UDPMessageBox;
 class UDPRawMessage;
 
-class UDPMessageBox : public MessageBox {
+class UDPMessageBox : public MessageBox, SessionManager {
 public:
     UDPMessageBox(String address, int localPort, int remotePort);
     UDPMessageBox(DatagramSocket *socket);
@@ -41,15 +41,33 @@ public:
     void idle();
     Message * createMessage();
     void sendUDP(Buffer<char> buffer, int id, bool reliable, PeerAddress peerAddr, SocketAddress addr, int portNum);
+    
+    // Session manager
+    void addSessionListener(SessionListener *l);
+    void removeSessionListener(SessionListener *l);
+    
+    // Accessors
+    inline int getCyclesBeforeResendingReliable() const { return cyclesBeforeResendingReliable; }
+    inline int getCyclesBeforeReliableTimeout() const { return cyclesBeforeReliableTimeout; }
+    inline int getCyclesBeforePeerTimeout() const { return cyclesBeforePeerTimeout; }
 private:
     struct KnownPeer;
     KnownPeer *findPeer(PeerAddress address);
+    // For KnownPeers
+    void warnListeners(Message &message);
+    
     SocketAddress defaultAddress;
     int defaultPort;
     DatagramSocket *socket;
     int sendSerialID;
     AdvancedBuffer<KnownPeer*> knownPeers;
+    // UDP Messagebox parameters
     int cyclesBeforeResendingReliable;
+    int cyclesBeforeReliableTimeout;
+    int cyclesBeforePeerTimeout;
+    
+    // Session manager
+    AdvancedBuffer<SessionListener *> sessionListeners;
 };
 
 };

@@ -72,6 +72,18 @@ public:
     virtual void setPeerAddress(PeerAddress) = 0;
 };
 
+class SessionListener {
+public:
+    virtual void onPeerConnect(const PeerAddress &address) = 0;
+    virtual void onPeerDisconnect(const PeerAddress &address) = 0;
+};
+
+class SessionManager {
+public:
+    virtual void addSessionListener(SessionListener *) = 0;
+    virtual void removeSessionListener(SessionListener *) = 0;
+};
+
 }
 
 #endif // _IOS_DIRIGEABLE_H

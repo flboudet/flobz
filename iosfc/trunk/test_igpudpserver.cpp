@@ -178,7 +178,7 @@ int main()
     
     try {
         while (true) {
-            serverSelector.select(100000);
+            serverSelector.select(10);
             try {
                 messageBox.idle();
             }

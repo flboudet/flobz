@@ -26,6 +26,13 @@ UDPMessage::UDPMessage(int serialID, UDPMessageBox &owner, SocketAddress address
 {
 }
 
+UDPMessage::UDPMessage(int serialID, UDPMessageBox &owner, const PeerAddress &address)
+    : StandardMessage(serialID), owner(owner),
+      peerAddress(address)
+{
+    peerAddressImpl = static_cast<UDPPeerAddressImpl *>(address.getImpl());
+}
+
 UDPMessage::~UDPMessage()
 {
 }

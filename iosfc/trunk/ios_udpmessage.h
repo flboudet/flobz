@@ -10,6 +10,7 @@ namespace ios_fc {
     class UDPMessage : public StandardMessage, public Dirigeable {
     public:
         UDPMessage(int serialID, UDPMessageBox &owner, SocketAddress address, int port);
+        UDPMessage(int serialID, UDPMessageBox &owner, const PeerAddress &address);
         UDPMessage(const Buffer<char> serialized, UDPMessageBox &owner, SocketAddress address, int port) throw(InvalidMessageException);
         virtual ~UDPMessage();
         void sendBuffer(Buffer<char> out) const;
