@@ -1028,15 +1028,17 @@ void PuyoStarter::run(int score1, int score2, int lives)
           }
           break;
         case GameControlEvent::kBack:
-          if (!paused) {
+          if (!gameover) {
+            if (!paused) {
               menu_show(menu_pause);
               paused = true;
               stopRender();
-          }
-          else {
+            }
+            else {
               paused = false;
               restartRender();
               menu_hide(menu_pause);
+            }
           }
           break;
         default:
