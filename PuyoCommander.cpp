@@ -1101,7 +1101,7 @@ mml_play:
   menu_hide (singleGameMenu);
 
   static char *AI_NAMES[] = { "Fanzy", "Bob the Killer", "Big Rabbit", "Flying Saucer",
-    "Satanas", "Doctor X", "Tanya", "Master Gyom, King of the Puyos",
+    "Satanas", "Doctor X", "Tanya", "Master Gyom",
     "X","Y","Z" };
 
   SelIA ia1[] = { {RANDOM, 350}, {FLOBO, 350}, {FLOBO, 250}, {FLOBO, 180}, {FLOBO,  90}, {JEKO, 350}, {TANIA, 320}, {FLOBO, 62}, {RANDOM,0} };
