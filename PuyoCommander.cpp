@@ -702,9 +702,9 @@ void PuyoCommander::run()
     
     audio_music_start (0);
     
-    /*  PuyoStory *introStory = new PuyoStory(this, 0);
+    PuyoStory *introStory = new PuyoStory(this, 0);
     introStory->loop();
-    delete introStory; */
+    delete introStory;
     
     menu_show (menu);
     

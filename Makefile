@@ -52,7 +52,7 @@ CC=g++
 CXX=g++
 STRIP=strip
 
-CFLAGS= -DDATADIR=\"${DATADIR}\" -I${IOSFC_DIR}
+CFLAGS= -DDATADIR=\"${DATADIR}\" -I${IOSFC_DIR} -Istyrolyse
 LDFLAGS=
 
 HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h\
@@ -63,7 +63,7 @@ HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h\
         IosImgProcess.h PuyoStarter.h PuyoNetworkGame.h
 
 
-OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o        \
+OBJFILES= SDL_prim.o HiScores.o PuyoCommander.o        \
           IosException.o IosVector.o main.o PuyoGame.o PuyoVersion.o         \
           PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o sofont.o       \
           menu.o menuitems.o audio.o scrollingtext.o preferences.o           \
@@ -133,7 +133,7 @@ all: prelude flobopuyo
 flobopuyo: ${OBJFILES}
 	@make -C iosfc object
 	@make -C styrolyse object
-	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) -lSDL_net -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o
+	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) -lSDL_net -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o styrolyse/*.o styrolyse/goomsl/goomsl*.o
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
 	@[ "x`cat WARNINGS | wc -l`" != "x0" ] && echo -e "--------------------------------------\n There have been some warnings:\n" && cat WARNINGS && rm -f WARNINGS && echo "--------------------------------------" || true
@@ -164,8 +164,6 @@ AnimatedPuyo.o: AnimatedPuyo.cpp ${HFILES}
 PuyoAnimations.o: PuyoAnimations.cpp ${HFILES}
 main.o:main.cpp ${HFILES}
 preferences.o:preferences.c preferences.h
-scenar.l.o:scenar.l.c ${HFILES}
-scenar.y.o:scenar.y.c ${HFILES}
 InputManager.o:InputManager.cpp ${HFILES}
 GameControls.o:GameControls.cpp ${HFILES}
 IosImgProcess.o:IosImgProcess.cpp ${HFILES}
@@ -186,11 +184,6 @@ SDL_prim.o:SDL_prim.c
 corona.o:corona.cpp
 corona32.o:corona32.cpp
 corona_palette.o:corona_palette.cpp	
-
-scenar.l.c:scenar.l ${HFILES}
-	@echo "[$@]" && flex -oscenar.l.c scenar.l
-scenar.y.c:scenar.y ${HFILES}
-	@echo "[$@]" && bison -y -d -o scenar.y.c scenar.y
 
 clean:
 	make -C iosfc clean

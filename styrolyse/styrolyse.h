@@ -1,8 +1,8 @@
 #ifndef _STYROLYSE_H
 #define _STYROLYSE_H
 
-#if __cplusplus__
-extern "C" {
+#ifdef __cplusplus
+extern "C"{
 #endif
 
 /* #define USE_SDL */
@@ -25,7 +25,7 @@ void styrolyse_draw(Styrolyse *_this);
 
 int  styrolyse_current_cycle(Styrolyse *_this);
 
-#if __cplusplus__
+#ifdef __cplusplus
 };
 #endif
 
