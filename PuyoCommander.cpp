@@ -58,14 +58,21 @@ void MainMenu::build() {
   add(new Button(kExit,    new ExitAction));
 }
 
+class EditFieldWithLabel : public HBox {
+public:
+  EditFieldWithLabel(String label, String defaultValue)
+  {
+    add(new Text(label));
+    add(new EditField(defaultValue));
+  }
+};
+
 void NetworkGameMenu::build() {
-  HBox *box = new HBox();
-  box->add(new Text("Player name:"));
-  box->add(new EditField("Player"));
   add(new Text("Network Game"));
-  add(box);
-  add(new Button("Cancel", new PopScreenAction()));
+  add(new EditFieldWithLabel("Player name:", "toto"));
+  add(new EditFieldWithLabel("Server name:", "127.0.0.1"));
   add(new Button("Start!", new NetGameAction));
+  add(new Button("Cancel", new PopScreenAction()));
 }
 
 /**
