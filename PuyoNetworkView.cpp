@@ -28,7 +28,7 @@
 enum {
     kGameState   = 0,
     kGameOver    = 1,
-    kAddNeutrals = 2
+    kAddNeutral  = 2
 };
 
 extern char *p1name;
@@ -100,13 +100,8 @@ void PuyoNetworkView::rotateRight()
 void PuyoNetworkView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex)
 {
     PuyoView::gameDidAddNeutral(neutralPuyo, neutralIndex);
-    Message *message = mbox->createMessage();
-    message->addInt     ("TYPE",   kAddNeutrals);
-    message->addString  ("NAME",   p1name);
-    message->addInt     ("INDEX",  neutralIndex);
-    message->addBoolProperty("RELIABLE", true);
-    message->send();
-    delete message;
+    neutralsBuffer.add(neutralPuyo->getID());
+    neutralsBuffer.add(neutralIndex);
 }
 
 void PuyoNetworkView::gameDidEndCycle()

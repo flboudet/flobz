@@ -56,6 +56,7 @@ class PuyoNetworkView : public PuyoView {
 private:
     MessageBox *mbox;
     Message *createStateMessage(bool paused) const;
+    AdvancedBuffer<int> neutralsBuffer;
 };
 
 #endif // _PUYONETWORKVIEW
