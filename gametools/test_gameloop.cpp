@@ -13,7 +13,7 @@ class A : public CycledComponent, DrawableComponent
     }
   }
 
-  void draw() {
+  void draw(SDL_Surface *surf) const {
     printf("A::draw\n");
   }
 };

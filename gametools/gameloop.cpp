@@ -40,9 +40,9 @@ void DrawableComponent::requestDraw()
   _drawRequested = true;
 }
 
-void DrawableComponent::doDraw()
+void DrawableComponent::doDraw(SDL_Surface *screen)
 {
-  draw();
+  draw(screen);
   _drawRequested = false;
 }
 
@@ -141,7 +141,32 @@ void GameLoop::run()
 
 void GameLoop::idle(double currentTime)
 {
-  for (int i = 0; i < idles.size(); ++i) {
+  int i;
+  
+  // 1- process events
+  SDL_Event e;
+  while (SDL_PollEvent (&e)) {
+    GameControlEvent controlEvent;
+    getControlEvent(e, &controlEvent);
+    for (i = 0; i < idles.size(); ++i) {
+      idles[i]->onEvent(&controlEvent);
+    }
+  }
+  
+  // 2- check components to remove/kill
+  for (i = 0; i < components.size(); ++i) {
+    GameComponent *gc = components[i];
+    if (gc->removeMe()) {
+      components.remove(gc);
+      idles.remove(dynamic_cast<IdleComponent*>(gc));
+      drawables.remove(dynamic_cast<DrawableComponent*>(gc));
+      if (gc->killMe())
+        delete gc;
+    }
+  }
+  
+  // 3- call idles
+  for (i = 0; i < idles.size(); ++i) {
     idles[i]->idle(currentTime);
   }
 }
@@ -167,7 +192,8 @@ bool GameLoop::isLate(double currentTime) const
 void GameLoop::draw()
 {
   for (int i = 0; i < drawables.size(); ++i) {
-    drawables[i]->doDraw();
+    drawables[i]->doDraw(getSurface());
   }
+  SDL_Flip(getSurface());
 }
 

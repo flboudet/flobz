@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 
-extern char *dataFolder;
+char *dataFolder = ".";
 
 
 /** Image loading... free... conversion */

@@ -38,7 +38,7 @@
 #include "SDL_Painter.h"
 SDL_Painter painter;
 
-SDL_Surface *display;
+extern SDL_Surface *display;
 IIM_Surface *background, *fallingBlue, *fallingRed, *fallingGreen, *fallingViolet, *fallingYellow, *neutral;
 IIM_Surface *bigNeutral;
 IIM_Surface *puyoEyes;

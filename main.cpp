@@ -10,7 +10,7 @@
 char *DATADIR = "data";
 #endif
 
-char *dataFolder = "data";
+extern char *dataFolder;
 
 #ifdef MACOSX
 const char *bundleDataPath = "/Contents/Resources/data";
@@ -86,6 +86,7 @@ int main(int argc, char *argv[])
         if (strcmp(argv[i],"-nofx") == 0) fx = false;
     }
     
+    dataFolder = "data";
     if (!fileExists("data/gfx/v0.png")) {
         dataFolder = DATADIR;
     }

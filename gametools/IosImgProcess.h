@@ -58,4 +58,8 @@ void          IIM_Free(IIM_Surface *img);
 IIM_Surface * IIM_RegisterImg(SDL_Surface *img, bool isAlpha);
 void          IIM_ReConvertAll(void);
 
+
+extern char *dataFolder;
+
+
 #endif

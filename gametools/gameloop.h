@@ -1,5 +1,7 @@
 #include "ios_fc.h"
 #include <SDL.h>
+#include "GameControls.h"
+
 using namespace ios_fc;
 
 class GameComponent {
@@ -23,11 +25,11 @@ class DrawableComponent : public virtual GameComponent
   public:
     DrawableComponent();
     bool drawRequested() const;
-    void doDraw();
+    void doDraw(SDL_Surface *screen) ;
 
   protected:
     void requestDraw();
-    virtual void draw() {}
+    virtual void draw(SDL_Surface *screen) const {}
 
   private:
     bool _drawRequested;
@@ -40,6 +42,9 @@ class IdleComponent : public virtual GameComponent
 
     /// return true if you want the GameLoop to skip some frames.
     virtual bool isLate(double currentTime) const { return false; }
+    
+    /// perform some computation if you're interested in events.
+    virtual void onEvent(GameControlEvent *event) {}
 };
 
 
@@ -98,7 +103,7 @@ class GameLoop : public IdleComponent, DrawableComponent
 
   private:
     SDL_Surface *surface;
-    SelfVector<GameComponent> components;
+    Vector<GameComponent>     components;
     Vector<DrawableComponent> drawables;
     Vector<IdleComponent>     idles;
     bool finished;

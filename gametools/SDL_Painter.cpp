@@ -1,9 +1,9 @@
 #include "SDL_Painter.h"
 #include <stdlib.h>
 
-// #define DEBUG
+#undef DEBUG
 
-extern SDL_Surface *display;
+SDL_Surface *display;
 
 SDL_Painter::SDL_Painter(IIM_Surface *gameScreen, IIM_Surface *bg)
   : gameScreen(gameScreen), backGround(bg), nbElts(0), nbPrev(0) {}

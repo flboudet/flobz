@@ -5,135 +5,36 @@
 ###############
 # Settings
 
-ENABLE_AUDIO=true
-ENABLE_OPENGL=false
-ENABLE_DGA=false
+ROOT_DIR=.
 
-DEBUG_MODE=true
-MORE_DEBUG=true
+include config
 
-PRGNAME=flobopuyo
-
-# Unix/Linux settings
-PREFIX=/usr/local
-DATADIR=$(PREFIX)/share/games/flobopuyo
-INSTALL_BINDIR=$(DESTDIR)/$(PREFIX)/games
-INSTALL_DATADIR=$(DESTDIR)/$(DATADIR)
-IOSFC_DIR=iosfc
-
-# Mac settings
-macimage_name=FloBoPuyo\ $(VERSION)
-bundle_name=FloboPuyo.app
-
-# Win32 settings
-CYGWIN_VERSION=CYGWIN_NT-5.1
-WINZIP_NAME=flobopuyowin32
-WINSDLINCLUDE=/home/$(USER)/SDL-1.2.7/include
-WINSDLDEVLIBS=/home/$(USER)/SDL-1.2.7/lib
-WINSDLRUNTIME=/home/$(USER)/SDL-1.2.7/lib
-#
-##########
-
-
-##############
-# Autodetection
-
-ifndef PLATFORM
-PLATFORM=$(shell uname -s)
-endif
-
-
-VERSION=$(shell grep "\#define FLOBOPUYOVERSION" PuyoVersion.c  | cut -d "\"" -f 2)
-#
-##############
-
-SDL_CONFIG=sdl-config
-CC=g++
-CXX=g++
-STRIP=strip
-
-CFLAGS= -DDATADIR=\"${DATADIR}\" -I${IOSFC_DIR} -Istyrolyse
-LDFLAGS=
-
-HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h\
+HFILES= HiScores.h IosException.h gametools/IosImgProcess.h IosVector.h PuyoCommander.h\
         PuyoGame.h PuyoAnimations.h AnimatedPuyo.h PuyoIA.h PuyoPlayer.h     \
-        PuyoStory.h PuyoView.h audio.h menu.h menuitems.h         \
-        preferences.h scrollingtext.h sofont.h SDL_Painter.h PuyoVersion.h   \
-        InputManager.h GameControls.h HiScores.h  PuyoNetworkView.h          \
-        IosImgProcess.h PuyoStarter.h PuyoNetworkGame.h PuyoMenu.h PuyoNetworkMenu.h
+        PuyoStory.h PuyoView.h audio.h menu.h menuitems.h PuyoVersion.h  \
+        gametools/preferences.h gametools/scrollingtext.h \
+				gametools/sofont.h gametools/SDL_Painter.h  \
+        gametools/InputManager.h gametools/GameControls.h \
+				HiScores.h  PuyoNetworkView.h          \
+        PuyoStarter.h PuyoNetworkGame.h PuyoMenu.h PuyoNetworkMenu.h
 
 
 OBJFILES= HiScores.o PuyoCommander.o        \
           IosException.o IosVector.o main.o PuyoGame.o PuyoVersion.o         \
-          PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o sofont.o       \
-          menu.o menuitems.o audio.o scrollingtext.o preferences.o           \
-          PuyoStory.o SDL_Painter.o InputManager.o GameControls.o            \
-          PuyoDoomMelt.o IosImgProcess.o corona32.o corona.o corona_palette.o\
+          PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o    \
+          menu.o menuitems.o audio.o PuyoStory.o \
+          PuyoDoomMelt.o corona32.o corona.o corona_palette.o\
           PuyoStarter.o PuyoSinglePlayerStarter.o PuyoTwoPlayerStarter.o     \
           PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o PuyoMenu.o PuyoNetworkMenu.o
 
-
-# Autodetected cygwin platform
-ifeq ($(PLATFORM), $(CYGWIN_VERSION))
-  CFLAGS:=$(CFLAGS) -mno-cygwin -mwindows -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE)
-  LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_net -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
-else
-# mingw32 cross-compilation (works great in debian testing)
-ifeq ($(PLATFORM), crossmingw32)
-  CC=i586-mingw32msvc-g++
-  CXX=i586-mingw32msvc-g++
-  PRGNAME=flobopuyo.exe
-  STRIP=i586-mingw32msvc-strip
-  CFLAGS:=$(CFLAGS) -mno-cygwin -mwindows -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE)  -I$(WINSDLINCLUDE)/SDL
-  LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_net -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
-else
-# more traditional unix platform
-CFLAGS:=$(CFLAGS) `$(SDL_CONFIG) --cflags`
-LDFLAGS:=$(LDFLAGS) `$(SDL_CONFIG) --cflags --libs`
-#small additions for Darwin (we assume SDL was installed with Fink)
-ifeq ($(PLATFORM), Darwin)
-CFLAGS:=$(CFLAGS) -I/sw/include -DMACOSX -UDATADIR
-endif
-endif
-endif
-
-
-ifeq ($(ENABLE_AUDIO), true)
-CFLAGS:=$(CFLAGS) -DUSE_AUDIO=1
-OBJFILES:=$(OBJFILES)
-endif
-
-ifeq ($(ENABLE_OPENGL), true)
-CFLAGS:=$(CFLAGS) -DHAVE_OPENGL=1
-OBJFILES:=$(OBJFILES) glSDL.o
-ifeq ($(PLATFORM), Linux)
-LDFLAGS:=$(LDFLAGS) -lGL
-endif
-endif
-
-ifeq ($(ENABLE_DGA), true)
-ifeq ($(PLATFORM), Linux)
-CFLAGS:=$(CFLAGS) -DUSE_DGA=1
-endif
-endif
-
-ifeq ($(DEBUG_MODE), true)
-CFLAGS:=$(CFLAGS) -g
-LDFLAGS:=$(LDFLAGS) -g
-endif
-
-ifeq ($(MORE_DEBUG), true)
-CFLAGS:=$(CFLAGS) -DDEBUG=1
-endif
-
-CXXFLAGS=${CFLAGS}
-
+					
 all: prelude flobopuyo
 
 flobopuyo: ${OBJFILES}
 	@make -C iosfc object
+	@make -C gametools
 	@make -C styrolyse object
-	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) -lSDL_net -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o styrolyse/*.o styrolyse/goomsl/goomsl*.o
+	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) -lSDL_net -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o gametools/*.o styrolyse/*.o styrolyse/goomsl/goomsl*.o
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
 	@[ "x`cat WARNINGS | wc -l`" != "x0" ] && echo -e "--------------------------------------\n There have been some warnings:\n" && cat WARNINGS && rm -f WARNINGS && echo "--------------------------------------" || true
@@ -154,7 +55,7 @@ prelude:
 	@echo "[$@]" && $(CXX) $(CFLAGS) -c $< 2>> WARNINGS || (cat WARNINGS && false)
 
 PuyoDoomMelt.o:PuyoDoomMelt.c ${HFILES}
-HiScores.o:HiScores.cpp HiScores.h preferences.h
+HiScores.o:HiScores.cpp HiScores.h ${HFILES}
 PuyoCommander.o:PuyoCommander.cpp ${HFILES}
 PuyoGame.o:PuyoGame.cpp ${HFILES}
 PuyoIA.o:PuyoIA.cpp ${HFILES}
@@ -163,16 +64,9 @@ PuyoView.o:PuyoView.cpp ${HFILES}
 AnimatedPuyo.o: AnimatedPuyo.cpp ${HFILES}
 PuyoAnimations.o: PuyoAnimations.cpp ${HFILES}
 main.o:main.cpp ${HFILES}
-preferences.o:preferences.c preferences.h
-InputManager.o:InputManager.cpp ${HFILES}
-GameControls.o:GameControls.cpp ${HFILES}
-IosImgProcess.o:IosImgProcess.cpp ${HFILES}
-SDL_Painter.o:SDL_Painter.cpp SDL_Painter.h
 audio.o:audio.c audio.h
 menu.o:menu.c menu.h menuitems.h
 menuitems.o:menuitems.c menu.h menuitems.h
-scrollingtext.o:scrollingtext.c
-sofont.o:sofont.c
 IosException.o:IosException.cpp
 IosVector.o:IosVector.cpp
 glSDL.o:glSDL.c
@@ -184,6 +78,7 @@ corona_palette.o:corona_palette.cpp
 
 clean:
 	make -C iosfc clean
+	make -C gametools clean
 	rm -rf *~ *.o flobopuyo* $(PRGNAME) WARNINGS
 	rm -rf .xvpics data/.xvpics    data/*/.xvpics
 	rm -rf $(bundle_name)
