@@ -22,6 +22,8 @@
 #ifndef _IOS_VECTOR_H
 #define _IOS_VECTOR_H
 
+#include "ios_memory.h"
+
 namespace ios_fc {
 /*
 
@@ -52,7 +54,36 @@ private:
 	void increaseVectorSize();
 };
 */
-#define Vector AdvancedBuffer
+template <typename T>
+class Vector : public AdvancedBuffer<T *>
+{};
+
+template <typename T>
+class SelfVector : public AdvancedBuffer<T *>
+{
+    public:
+    ~SelfVector() {
+        for (int i=0; i < this->size(); ++i)
+            delete this->get(i);
+    }
+    
+    inline int  remove(const T *t)
+    {
+      // WARNING: I do this cause I know AdvancedBuffer's implementation...
+      // (this is bad)
+      int i = AdvancedBuffer<T*>::remove(t);
+      delete this->get(this->size());
+      return i;
+    }
+    
+    inline void remove()
+    {
+      AdvancedBuffer<T*>::remove();
+      // WARNING: I do this cause I know AdvancedBuffer's implementation...
+      // (this is bad)
+      delete this->get(this->size());
+    }
+};
 
 };
 
