@@ -67,7 +67,6 @@ class PuyoCommander
  private:
   // SoFont *menuFont;
   // SoFont *smallFont;
-  Menu *changeControlMenu;
   Menu *mainMenu;
   Menu *singleGameMenu;
   Menu *optionMenu;

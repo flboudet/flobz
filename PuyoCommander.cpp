@@ -22,8 +22,6 @@ static char *kLevelEasy   = "Easy";
 static char *kLevelMedium = "Medium";
 static char *kLevelHard   = "Hard";
 
-static char *kChangeKey   = "Press any key to change the control";
-
 static char *kPlayer1Left = "Player 1 Left:";
 static char *kPlayer1Right = "Player 1 Right:";
 static char *kPlayer1Down = "Player 1 Down:";
@@ -403,17 +401,6 @@ MenuItems controls_menu_load (SoFont *font, SoFont *small_font)
   return controls_menu;
 }
 
-MenuItems change_controls_menu_load (SoFont *font, SoFont *small_font)
-{
-  static MenuItemsTab controls_menu = {
-    MENUITEM(kChangeKey),
-    MENUITEM_BLANKLINE,
-    MENUITEM_END
-  };
-  menu_items_set_font_for(controls_menu,  kChangeKey, font);
-  return controls_menu;
-}
-
 PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
 {
   int init_flags = SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK;
@@ -423,6 +410,18 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   sound = GetBoolPreference(kMusic,snd);
   fx = GetBoolPreference(kAudioFX,audio);
 
+   keyControls[kPlayer1LeftControl] = (SDLKey)GetIntPreference("P1Left",  keyControls[kPlayer1LeftControl]);
+   keyControls[kPlayer1RightControl] = (SDLKey)GetIntPreference("P1Right",  keyControls[kPlayer1RightControl]);
+   keyControls[kPlayer1DownControl] = (SDLKey)GetIntPreference("P1Down",  keyControls[kPlayer1DownControl]);
+   keyControls[kPlayer1ClockwiseControl] = (SDLKey)GetIntPreference("P1Clockwise",  keyControls[kPlayer1ClockwiseControl]);
+   keyControls[kPlayer1CounterclockwiseControl] = (SDLKey)GetIntPreference("P1Counterclockwise",  keyControls[kPlayer1CounterclockwiseControl]);
+   
+   keyControls[kPlayer2LeftControl] = (SDLKey)GetIntPreference("P2Left",  keyControls[kPlayer2LeftControl]);
+   keyControls[kPlayer2RightControl] = (SDLKey)GetIntPreference("P2Right",  keyControls[kPlayer2RightControl]);
+   keyControls[kPlayer2DownControl] = (SDLKey)GetIntPreference("P2Down",  keyControls[kPlayer2DownControl]);
+   keyControls[kPlayer2ClockwiseControl] = (SDLKey)GetIntPreference("P2Clockwise",  keyControls[kPlayer2ClockwiseControl]);
+   keyControls[kPlayer2CounterclockwiseControl] = (SDLKey)GetIntPreference("P2Counterclockwise",  keyControls[kPlayer2CounterclockwiseControl]);
+   
 #ifdef __linux__
   /* This Hack Allows Hardware Surface on Linux */
   setenv("SDL_VIDEODRIVER","dga",0);
@@ -475,7 +474,6 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   mainMenu = menu_new(main_menu_load(menuFont),menuselector);
   gameOverMenu = menu_new(gameover_menu_load(menuFont, smallFont),menuselector);
   optionMenu = menu_new(options_menu_load(menuFont, smallFont),menuselector);
-  changeControlMenu = menu_new(change_controls_menu_load(menuFont, smallFont),menuselector);
   controlsMenu = menu_new(controls_menu_load(menuFont, smallFont),menuselector);
   rulesMenu = menu_new(rules_menu_load(menuFont),menuselector);
   aboutMenu = menu_new(about_menu_load(menuFont),menuselector);
@@ -753,7 +751,18 @@ void PuyoCommander::controlsMenuLoop()
         updateAll(NULL);
     }
 mml_fin:
-        menu_hide (controlsMenu);
+    SetIntPreference("P1Left", keyControls[kPlayer1LeftControl]);
+    SetIntPreference("P1Right", keyControls[kPlayer1RightControl]);
+    SetIntPreference("P1Down", keyControls[kPlayer1DownControl]);
+    SetIntPreference("P1Clockwise", keyControls[kPlayer1ClockwiseControl]);
+    SetIntPreference("P1Counterclockwise", keyControls[kPlayer1CounterclockwiseControl]);
+    
+    SetIntPreference("P2Left", keyControls[kPlayer2LeftControl]);
+    SetIntPreference("P2Right", keyControls[kPlayer2RightControl]);
+    SetIntPreference("P2Down", keyControls[kPlayer2DownControl]);
+    SetIntPreference("P2Clockwise", keyControls[kPlayer2ClockwiseControl]);
+    SetIntPreference("P2Counterclockwise", keyControls[kPlayer2CounterclockwiseControl]);
+    menu_hide (controlsMenu);
 }
 
 void PuyoCommander::optionMenuLoop()
@@ -916,7 +925,6 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
   menu_update (mainMenu, display);
   menu_update (gameOverMenu, display);
   menu_update (optionMenu, display);
-  menu_update (changeControlMenu, display);
   menu_update (controlsMenu, display);
   menu_update (rulesMenu, display);
   menu_update (aboutMenu, display);
@@ -941,7 +949,6 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
     menu_draw (mainMenu, display);
     menu_draw (gameOverMenu, display);
     menu_draw (optionMenu, display);
-    menu_draw (changeControlMenu, display);
     menu_draw (controlsMenu, display);
     menu_draw (rulesMenu, display);
     menu_draw (aboutMenu, display);
