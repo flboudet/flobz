@@ -247,9 +247,10 @@ namespace ios_fc {
             }
 
             inline void concat(const VoidBuffer &buf) const {
-                int ssize = size();
+                int dsize = size();
+                int ssize = buf.size();
                 grow(buf.size());
-                Memory::memcpy(ptr() + ssize, buf.ptr(), buf.size());
+                Memory::memcpy(ptr() + dsize, buf.ptr(), ssize());
             }
 
         private:
