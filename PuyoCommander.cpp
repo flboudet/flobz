@@ -85,10 +85,8 @@ void LANGameMenu::build() {
 void SinglePlayerGameAction::action()
 {
   PuyoStarter *starter = new PuyoSinglePlayerStarter(theCommander, 5, FLOBO, 0);
-  GameUIDefaults::SCREEN_STACK->push(starter);
   starter->run(0,0,0,0,0);
-  GameUIDefaults::SCREEN_STACK->pop();
-  starter->kill();
+  GameUIDefaults::SCREEN_STACK->push(starter);
 }
 
 /**
@@ -98,18 +96,17 @@ void NetGameAction::action()
 {
   UDPMessageBox mbox("127.0.0.1", 6581, 6581);
   PuyoStarter *starter = new PuyoNetworkStarter(theCommander, 0, &mbox);
-  GameUIDefaults::SCREEN_STACK->push(starter);
   starter->run(0,0,0,0,0);
-  GameUIDefaults::SCREEN_STACK->pop();
-  starter->kill();
+  GameUIDefaults::SCREEN_STACK->push(starter);
 }
 
 void PuyoCommander::run()
 {
   GameUIDefaults::SCREEN_STACK->push(mainMenu);
-  while(1) {
+  GameUIDefaults::GAME_LOOP->run();
+/*  while(1) {
     updateAll(NULL);
-  }
+  }*/
 }
 
 void PuyoCommander::initMenus()

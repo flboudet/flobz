@@ -59,15 +59,32 @@ const char *p2name = "Player2";
 static char *BACKGROUND[NB_MUSIC_THEME] = { "Background.jpg", "BackgroundDark.jpg" };
 extern IIM_Surface *background, *neutral;
 
+class PuyoCycled : public CycledComponent
+{
+  public:
+    PuyoPureStarter *starter;
+    
+    PuyoCycled(PuyoPureStarter *starter) : CycledComponent(0.02), starter(starter) {}
+    void cycle() {
+      starter->cycle();
+    }
+};
+
 PuyoPureStarter::PuyoPureStarter(PuyoCommander *commander) : Screen(0,0,640,480), commander(commander)
 {
     paused = false;
     stopRendering = false;
     gameAborted = false;
+    cycled = new PuyoCycled(this);
 }
 
 PuyoPureStarter::~PuyoPureStarter()
 {
+}
+
+void PuyoPureStarter::idle(double currentTime)
+{
+  cycled->idle(currentTime);
 }
 
 void PuyoPureStarter::handleEvent(SDL_Event &event)
@@ -801,7 +818,6 @@ void PuyoStarter::run(int _score1, int _score2, int lives, int point1, int point
     this->score1 = _score1;
     this->score2 = _score2;
 //    SDL_Rect drect;
-    SDL_Event event;
     quit = 0;
     SDL_EnableUNICODE(1);
     
@@ -819,8 +835,12 @@ void PuyoStarter::run(int _score1, int _score2, int lives, int point1, int point
         attachedGameA->cycle();
         attachedGameB->cycle();
     }
-    
-    while (!quit) {
+}
+
+void PuyoStarter::cycle()
+{
+    if (!quit) {
+        SDL_Event event;
         bool left_danger = (attachedGameA->getMaxColumnHeight() > PUYODIMY - 5);
         bool right_danger = (attachedGameB->getMaxColumnHeight() > PUYODIMY - 5);
         bool danger = left_danger || right_danger;
@@ -840,7 +860,7 @@ void PuyoStarter::run(int _score1, int _score2, int lives, int point1, int point
         else
             currentPerso = 1;
         
-            commander->updateAll(this);
+//            commander->updateAll(this);
             if (!paused) {
                 areaA->cycleAnimation();
                 areaB->cycleAnimation();
@@ -868,9 +888,13 @@ void PuyoStarter::run(int _score1, int _score2, int lives, int point1, int point
                 mbox->idle();
             requestDraw();
     }
-	if (randomPlayer) {
-            for (int i=0; i<NB_PERSO_STATE; ++i)
-                IIM_Free(perso[i]);
-	}
-	SDL_SetClipRect(display,NULL);
+    else {
+      if (randomPlayer) {
+        for (int i=0; i<NB_PERSO_STATE; ++i)
+          IIM_Free(perso[i]);
+      }
+      GameUIDefaults::SCREEN_STACK->pop();
+      kill();
+      SDL_SetClipRect(display,NULL);
+    }
 }

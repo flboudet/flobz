@@ -32,6 +32,8 @@
 #ifndef _PUYOSTARTER
 #define _PUYOSTARTER
 
+class PuyoCycled;
+
 // Le PuyoStarter moderne
 class PuyoPureStarter : public Screen { //DrawableComponent {
 public:
@@ -43,6 +45,9 @@ public:
     
     virtual void startPressed();
     virtual void backPressed();
+
+    virtual void cycle() = 0;
+    void idle(double currentTime);
     
     //virtual bool leftPlayerWin() const  { return attachedGameA->isGameRunning(); }
     //virtual bool rightPlayerWin() const { return attachedGameB->isGameRunning(); }
@@ -58,6 +63,8 @@ protected:
     
     void stopRender();
     void restartRender();
+
+    PuyoCycled *cycled;
 };
 
 
@@ -67,6 +74,8 @@ public:
     virtual ~PuyoStarter();
     
     virtual void run(int score1, int score2, int lives, int point1, int point2);
+    void cycle();
+    
     virtual void draw();
     void draw(SDL_Surface *surf) const;
     

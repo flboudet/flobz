@@ -128,6 +128,8 @@ void GameLoop::add(GameComponent *gc)
     idles.add(ic);
 }
 
+#include <unistd.h>
+
 void GameLoop::run()
 {
   draw();
@@ -137,6 +139,7 @@ void GameLoop::run()
     idle(currentTime);
     if (!isLate(currentTime) && drawRequested())
       draw();
+    usleep(1);
   }
 }
 

@@ -22,7 +22,7 @@
  *
  *
  */
-
+/*
 #include <stdlib.h>
 #include "PuyoMenu.h"
 #include "InputManager.h"
@@ -311,4 +311,4 @@ void PuyoMenu::addSeparator()
 {
     addItem("---", NULL, true);
 }
-
+*/
