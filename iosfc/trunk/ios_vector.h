@@ -25,7 +25,7 @@
 namespace ios_fc {
 /*
 
-THIS CLASS IS DEFINED IN IOS_MEMORY.H
+THIS CLASS IS DEFINED IN IOS_MEMORY.H (see AdvancedBuffer)
 
 (We should remove this file probably....)
    
