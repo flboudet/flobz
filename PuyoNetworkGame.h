@@ -34,6 +34,7 @@ using namespace ios_fc;
 class PuyoNetworkGame : public PuyoGame, MessageListener {
 public:
     PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox);
+    ~PuyoNetworkGame();
     
     virtual void onMessage(Message &);
     

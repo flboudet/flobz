@@ -30,10 +30,15 @@
 
 using namespace PuyoMessage;
 
+PuyoNetworkGame::~PuyoNetworkGame()
+{
+  msgBox.removeListener(this);
+}
+
 PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox) : PuyoGame(attachedFactory), msgBox(msgBox)
 {
     fakePuyo = attachedFactory->createPuyo(PUYO_FALLINGRED);
-    msgBox.addListener(*this);
+    msgBox.addListener(this);
     semiMove = 0;
     neutralPuyos = 0;
     sentBadPuyos = 0;

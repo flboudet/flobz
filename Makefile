@@ -5,7 +5,7 @@
 ###############
 # Settings
 
-ENABLE_AUDIO=true
+ENABLE_AUDIO=false
 ENABLE_OPENGL=false
 ENABLE_DGA=false
 

@@ -168,7 +168,7 @@ IIM_Surface *PuyoView::getSurfaceForPuyo(PuyoPuyo *puyo)
     AnimatedPuyo *right = (AnimatedPuyo *)(attachedGame->getPuyoAt(i+1, j));
     AnimatedPuyo *up    = (AnimatedPuyo *)(attachedGame->getPuyoAt(i, j-1));
     AnimatedPuyo *left  = (AnimatedPuyo *)(attachedGame->getPuyoAt(i-1, j));
-    
+
     PuyoState downState = (down == NULL)   || (down->isRenderingAnimation())  ? PUYO_EMPTY  : down->getPuyoState();
     PuyoState rightState = (right == NULL) || (right->isRenderingAnimation()) ? PUYO_EMPTY  : right->getPuyoState();
     PuyoState upState = (up == NULL)       || (up->isRenderingAnimation())    ? PUYO_EMPTY  : up->getPuyoState();
@@ -273,8 +273,12 @@ void PuyoView::render()
     for (int i = 0 ; i < PUYODIMX ; i++) {
         for (int j = 0 ; j < PUYODIMY ; j++) {
             AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAt(i, j));
-            if ((currentPuyo != NULL) && (displayFallings || !currentPuyo->isFalling()) && (getSurfaceForPuyo(currentPuyo) != neutral)
-                && (currentPuyo->getVisible()) && (currentPuyo->isRenderingAnimation() == false)) {
+            if ((currentPuyo != NULL)
+                && (displayFallings || !currentPuyo->isFalling())
+                && (getSurfaceForPuyo(currentPuyo) != neutral)
+                && (currentPuyo->getVisible())
+                && (currentPuyo->isRenderingAnimation() == false))
+            {
                 drect.x = xOffset + i * TSIZE;
                 drect.y = yOffset + j * TSIZE;
                 if (currentPuyo->getPuyoState() < PUYO_EMPTY)
@@ -282,9 +286,9 @@ void PuyoView::render()
                 drect.w = puyoShadow->w;
                 drect.h = puyoShadow->h;
                 if (drect.y + drect.h > vrect.y + vrect.h)
-					drect.h -= (drect.y + drect.h - vrect.y - vrect.h);
+                    drect.h -= (drect.y + drect.h - vrect.y - vrect.h);
                 if (drect.x + drect.w > vrect.x + vrect.w)
-					drect.w -= (drect.x + drect.w - vrect.x - vrect.w);
+                    drect.w -= (drect.x + drect.w - vrect.x - vrect.w);
                 attachedPainter.requestDraw(puyoShadow, &drect);
             }
         }
