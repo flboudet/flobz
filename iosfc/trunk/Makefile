@@ -2,8 +2,16 @@ OBJ=ios_exception.o ios_hash.o ios_memory.o ios_message.o ios_udpmessage.o ios_m
 TOBJ=test_udpmessagebox.o
 CPPFLAGS=-g `sdl-config --cflags`  -Wall
 
+# mingw32 cross-compilation (works great in debian testing)
+ifeq ($(PLATFORM), crossmingw32)
+  CC=i586-mingw32msvc-g++
+  CXX=i586-mingw32msvc-g++
+  WINSDLINCLUDE=/home/$(USER)/SDL-1.2.7/include
+  CPPFLAGS=-g -mno-cygwin -mwindows -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE)  -I$(WINSDLINCLUDE)/SDL  -Wall
+endif
+
 all:${OBJ} ${TOBJ}
-	g++ `sdl-config --cflags` -o test ${OBJ} ${TOBJ} `sdl-config --libs` -lSDL_net
+	$(CXX) `sdl-config --cflags` -o test ${OBJ} ${TOBJ} `sdl-config --libs` -lSDL_net
 
 object:${OBJ}
 
