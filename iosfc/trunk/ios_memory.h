@@ -250,7 +250,7 @@ namespace ios_fc {
                 int dsize = size();
                 int ssize = buf.size();
                 grow(buf.size());
-                Memory::memcpy(ptr() + dsize, buf.ptr(), ssize());
+                Memory::memcpy((char*)ptr() + dsize, buf.ptr(), ssize);
             }
 
         private:
