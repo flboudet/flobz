@@ -54,6 +54,8 @@ static const char *k08 = " 8 - ";
 static const char *k09 = " 9 - ";
 static const char *k10 = "10 - ";
 
+static const char *kMustRestart1 = "Major Video Mode Change...";
+static const char *kMustRestart2 = "This will take effect next time you restart Flobo Puyo.";
 char *kHighScores  = "Hall of Fame";
 
 static char *kMusicVolume = "MusicVolume";
@@ -424,6 +426,24 @@ MenuItems about_menu_load (SoFont *font)
   return option_menu;
 }
 
+MenuItems must_restart_menu_load (SoFont *font)
+{
+  static MenuItemsTab option_menu = {
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(kMustRestart1),
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(kMustRestart2),
+    MENUITEM_BLANKLINE,
+    MENUITEM("Back"),
+    MENUITEM_END
+  };
+  menu_items_set_font_for(option_menu, kMustRestart1, font);
+  menu_items_set_font_for(option_menu, kMustRestart2, font);
+  return option_menu;
+}
+
 MenuItems options_menu_load (SoFont *font, SoFont *small_font)
 {
   static MenuItemsTab option_menu = {
@@ -543,12 +563,12 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   int audio_volume = GetIntPreference(kAudioVolume, 80);
 
   initGameControls();
-#ifdef __linux___
+#ifdef __linux__
   /* This Hack Allows Hardware Surface on Linux */
-  setenv("SDL_VIDEODRIVER","dga",0);
+  if (fullscreen)
+    setenv("SDL_VIDEODRIVER","dga",0);
 
   if (SDL_Init(init_flags) < 0) {
-    printf(":-( Could not use DGA.\n");
     setenv("SDL_VIDEODRIVER","x11",1);
     if (SDL_Init(init_flags) < 0) {
       fprintf(stderr, "SDL initialisation error:  %s\n", SDL_GetError());
@@ -556,9 +576,8 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
     }
   }
   else {
-    fullscreen = fs = true;
-    printf(":-) DGA Available !\n");
-    SDL_WM_GrabInput(SDL_GRAB_ON);
+    if (fullscreen)
+      SDL_WM_GrabInput(SDL_GRAB_ON);
   }
 #else
   if ( SDL_Init(init_flags) < 0 ) {
@@ -604,14 +623,17 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   looserMenu     = menu_new(looser_1p_menu_load(menuFont, smallFont),menuselector);
   finishedMenu   = menu_new(finished_1p_menu_load(menuFont, smallFont),menuselector);
   gameOverMenu   = gameOver2PMenu;
-  optionMenu = menu_new(options_menu_load(menuFont, smallFont),menuselector);
-  controlsMenu = menu_new(controls_menu_load(menuFont, smallFont),menuselector);
-  rulesMenu = menu_new(rules_menu_load(menuFont),menuselector);
+  optionMenu     = menu_new(options_menu_load(menuFont, smallFont),menuselector);
+  controlsMenu   = menu_new(controls_menu_load(menuFont, smallFont),menuselector);
+  rulesMenu      = menu_new(rules_menu_load(menuFont),menuselector);
   highScoresMenu = menu_new(high_scores_menu_load(menuFont),menuselector);
-  aboutMenu = menu_new(about_menu_load(menuFont),menuselector);
-  singleGameMenu = menu_new(single_game_menu_load(menuFont,smallFont),menuselector);
+  aboutMenu      = menu_new(about_menu_load(menuFont),menuselector);
+  singleGameMenu    = menu_new(single_game_menu_load(menuFont,smallFont),menuselector);
   twoPlayerGameMenu = menu_new(two_player_game_menu_load(menuFont,smallFont),menuselector);
+  mustRestartMenu   = menu_new(must_restart_menu_load(menuFont),menuselector); 
+
   if (menu_pause == NULL) menu_pause = menu_new(pause_menu_load(menuFont),menuselector);
+
   menu_set_sounds (optionMenu,     sound_pop, sound_slide);
   menu_set_sounds (controlsMenu,   sound_pop, sound_slide);
   menu_set_sounds (mainMenu,       sound_pop, sound_slide);
@@ -921,26 +943,31 @@ void PuyoCommander::optionMenuLoop(PuyoDrawable *d)
           if (menu_active_is (optionMenu, kFullScreen)) {
             fullscreen  = menu_switch_on_off(optionMenu, kFullScreen);
             SetBoolPreference(kFullScreen,fullscreen);
-            SDL_QuitSubSystem(SDL_INIT_VIDEO);
-            SDL_Delay(50);
-            SDL_InitSubSystem(SDL_INIT_VIDEO);
-            display = SDL_SetVideoMode( 640, 480, 0,  SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0)|(useGL?SDL_GLSDL:0));
-            IIM_ReConvertAll();
-            SoFont_Refresh(menuFont);
-            SoFont_Refresh(smallFont);
-            SoFont_Refresh(darkFont);
+            if (useGL)
+            {
+              menu_hide(optionMenu);
+              backLoop(mustRestartMenu,d);
+              menu_show(optionMenu);
+            }
+            else
+            {
+              SDL_QuitSubSystem(SDL_INIT_VIDEO);
+              SDL_InitSubSystem(SDL_INIT_VIDEO);
+              display = SDL_SetVideoMode(640, 480, 0,
+                                         SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF
+                                         |(fullscreen?SDL_FULLSCREEN:0)|(useGL?SDL_GLSDL:0));
+              /* IIM_ReConvertAll();
+              SoFont_Refresh(menuFont);
+              SoFont_Refresh(smallFont);
+              SoFont_Refresh(darkFont); */
+            }
           }
           if (menu_active_is (optionMenu, kOpenGL)) {
-            useGL       = menu_switch_on_off(optionMenu, kOpenGL);
-            SetBoolPreference(kOpenGL,useGL);
-            SDL_QuitSubSystem(SDL_INIT_VIDEO);
-            SDL_Delay(50);
-            SDL_InitSubSystem(SDL_INIT_VIDEO);
-            display = SDL_SetVideoMode( 640, 480, 0,  SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0)|(useGL?SDL_GLSDL:0));
-            IIM_ReConvertAll();
-            SoFont_Refresh(menuFont);
-            SoFont_Refresh(smallFont);
-            SoFont_Refresh(darkFont);
+            bool useGL2 = menu_switch_on_off(optionMenu, kOpenGL);
+            SetBoolPreference(kOpenGL,useGL2);
+            menu_hide(optionMenu);
+            backLoop(mustRestartMenu,d);
+            menu_show(optionMenu);
           }
           if (menu_active_is (optionMenu, kMusic)) {
             sound = menu_switch_on_off(optionMenu, kMusic);
@@ -1314,6 +1341,7 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
   menu_update (rulesMenu, display);
   menu_update (highScoresMenu, display);
   menu_update (aboutMenu, display);
+  menu_update (mustRestartMenu, display);
   menu_update (singleGameMenu, display);
   menu_update (twoPlayerGameMenu, display);
   menu_update (menu_pause,display);
@@ -1342,6 +1370,7 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
     menu_draw (rulesMenu, display);
     menu_draw (highScoresMenu, display);
     menu_draw (aboutMenu, display);
+    menu_draw (mustRestartMenu, display);
     menu_draw (singleGameMenu, display);
     menu_draw (twoPlayerGameMenu, display);
     menu_draw(menu_pause,display);

@@ -55,6 +55,7 @@ class PuyoCommander
   Menu *controlsMenu;
   Menu *rulesMenu;
   Menu *aboutMenu;
+  Menu *mustRestartMenu;
   ScrollingText *scrollingText;
   unsigned int cycle, start_time;
 
