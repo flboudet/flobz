@@ -36,8 +36,10 @@ public:
     virtual ~IgpMessageBox();
     virtual void idle();
     virtual Message * createMessage();
+    void sendBuffer(Buffer<char> out) const;
  private:
     Socket *sock;
+    int sendSerialID;
 };
 
 };
