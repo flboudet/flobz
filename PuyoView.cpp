@@ -17,6 +17,7 @@ SDL_Surface *explodingPuyo[5][5];
 SDL_Surface *grid;
 SDL_Surface *puyoEyes;
 SDL_Surface *puyoEye[3];
+SDL_Surface *puyoEyesSwirl[4];
 
 SDL_Surface *puyoShadow;
 SDL_Surface *puyoFaces[5][16];
@@ -245,7 +246,7 @@ public:
                 drect.w = puyoFace->w;
                 drect.h = puyoFace->h;
                 painter.requestDraw(puyoFace, &drect);
-                if (puyoFace != neutral) painter.requestDraw(puyoEyes, &drect);
+                if (puyoFace != neutral) painter.requestDraw(puyoEyesSwirl[(bouncing/2)%4], &drect);
         }
     }
 private:
@@ -287,6 +288,7 @@ public:
                 drect.h = puyoFace->h;
                 painter.requestDraw(puyoFace, &drect);
                 if (puyoFace != neutral) painter.requestDraw(puyoEyes, &drect);
+                
             }
         }
         else {
@@ -690,6 +692,10 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel)
         puyoEye[1] = IMG_Load_DisplayFormatAlpha("eye1.png");
         puyoEye[2] = IMG_Load_DisplayFormatAlpha("eye2.png");
         puyoEyes = puyoEye[0];
+        puyoEyesSwirl[0] = IMG_Load_DisplayFormatAlpha("twirleye0.png");
+        puyoEyesSwirl[1] = IMG_Load_DisplayFormatAlpha("twirleye1.png");
+        puyoEyesSwirl[2] = IMG_Load_DisplayFormatAlpha("twirleye2.png");
+        puyoEyesSwirl[3] = IMG_Load_DisplayFormatAlpha("twirleye3.png");
         
         puyoFaces[0][0] = IMG_Load_DisplayFormatAlpha("v0.png");
         puyoFaces[0][1] = IMG_Load_DisplayFormatAlpha("v1a.png");
