@@ -146,7 +146,7 @@ public:
     virtual int getFallingX() const = 0;
     virtual int getFallingY() const = 0;
     /*
-        int getCompanionX() const { return companionPuyo->getPuyoX(); }
+     int getCompanionX() const { return companionPuyo->getPuyoX(); }
      int getCompanionY() const { return companionPuyo->getPuyoY(); }
      int getFallingCompanionX() const;
      int getFallingCompanionY() const;
@@ -155,16 +155,16 @@ public:
     virtual PuyoPuyo *getFallingPuyo() const = 0;
     
     virtual void increaseNeutralPuyos(int incr) = 0;
-    virtual int getNeutralPuyos() const = 0;
+    virtual int  getNeutralPuyos() const = 0;
     virtual void dropNeutrals() = 0;
     virtual bool isGameRunning() const = 0;
     virtual bool isEndOfCycle() const = 0;
-    virtual int getColumnHeigth(int colNum) const = 0;
-    virtual int getMaxColumnHeight() const = 0;
-    virtual int getSamePuyoAround(int X, int Y, PuyoState color) = 0;
-    virtual int getSemiMove() const = 0;
+    virtual int  getColumnHeigth(int colNum) const = 0;
+    virtual int  getMaxColumnHeight() const = 0;
+    virtual int  getSamePuyoAround(int X, int Y, PuyoState color) = 0;
+    virtual int  getSemiMove() const = 0;
     
-    virtual int getPoints()  { return points; }
+    virtual int  getPoints()  { return points; }
     int points;
 protected:
     PuyoDelegate *delegate;

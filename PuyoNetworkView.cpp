@@ -119,6 +119,13 @@ void PuyoNetworkView::gameDidEndCycle()
 {
     PuyoView::gameDidEndCycle();
     didEndCycle = true;
+    Message *message = mbox->createMessage();
+    message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kBadPuyos);
+    message->addString  (PuyoMessage::NAME,   p1name);
+    message->addInt     (PuyoMessage::SCORE,  attachedGame->getPoints());
+    message->addBoolProperty("RELIABLE", true);
+    message->send();
+    delete message;
 }
 
 void PuyoNetworkView::companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise)
@@ -148,7 +155,7 @@ void PuyoNetworkView::gameLost()
     Message *message = mbox->createMessage();
     message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameOver);
     message->addString  (PuyoMessage::NAME,   p1name);
-    message->addInt     (PuyoMessage::SCORE,  attachedGame->getPoints());
+    message->addInt     (PuyoMessage::NUMBER, attachedGame->getNeutralPuyos());
     message->addBoolProperty("RELIABLE", true);
     message->send();
     delete message;
