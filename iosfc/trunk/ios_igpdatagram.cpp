@@ -28,7 +28,7 @@
 
 namespace ios_fc {
 
-IGPDatagram::IGPDatagram(VoidBuffer data) : message(data)
+IGPDatagram::IGPDatagram(VoidBuffer data) : msgSize(0), message(data)
 {
     msgIdent = readBigEndianIntFromMessage(0);
     msgSize = readBigEndianIntFromMessage(4);
@@ -42,11 +42,32 @@ IGPDatagram::IGPDatagram(IGPMsgIdent ident, int msgSize) : msgSize(msgSize), mes
     msgIdent = ident;
 }
 
+IGPDatagram::IGPDatagram(InputStream *stream) : msgSize(0), message(8)
+{
+    stream->streamRead(message);
+    msgIdent = readBigEndianIntFromMessage(0);
+    msgSize = readBigEndianIntFromMessage(4);
+    printf("Taille message:%d\n", msgSize);
+    if (msgSize > 0) {
+        int bytesRead = 0;
+        while (bytesRead < msgSize) {
+            VoidBuffer content(msgSize-bytesRead);
+            int readResult = stream->streamRead(content);
+            bytesRead += readResult;
+            if (content.size() > readResult)
+                content.reduce(content.size() - readResult);
+            message.concat(content);
+            printf("Lu: %d bytes\n", readResult);
+        }
+    }
+}
+
 VoidBuffer IGPDatagram::serialize()
 {
     writeBigEndianIntToMessage(msgIdent, 0);
     writeBigEndianIntToMessage(msgSize, 4);
     return message;
 }
+
 
 };

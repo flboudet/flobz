@@ -50,7 +50,7 @@ void IGPClient::sendMessage(int igpID, VoidBuffer message)
 void IGPClient::idle()
 {
     InputStream *input = clientSocket.getInputStream();
-    int available = input->streamAvailable();
+    /*int available = input->streamAvailable();
     if (available > 0) {
         VoidBuffer data(available);
         input->streamRead(data);
@@ -75,6 +75,32 @@ void IGPClient::idle()
         default:
             break;
         }
+    }*/
+    int available = input->streamAvailable();
+    while (available > 0) {
+        printf("***Disponible:%d (%d)***\n", available, available-8);
+        IGPDatagram message(input);
+        switch (message.getMsgIdent()) {
+        case IGPDatagram::ServerMsgInformID: {
+            IGPDatagram::ServerMsgInformIDDatagram informIDMessage(message);
+            igpIdent = informIDMessage.getIgpIdent();
+            enabled = true;
+            printf("Obtenu info sur id: %d\n", informIDMessage.getIgpIdent());
+            break;
+        }
+        case IGPDatagram::ServerMsgToClient: {
+            IGPDatagram::ServerMsgToClientDatagram msgReceived(message);
+            //printf("Notification clients\n");
+            for (int i = 0, j = listeners.size() ; i < j ; i++) {
+                IGPClientMessageListener *currentListener = listeners[i];
+                currentListener->onMessage(msgReceived.getMessage(), msgReceived.getIgpOriginIdent(), msgReceived.getIgpDestinationIdent());
+            }
+            break;
+        }
+        default:
+            break;
+        }
+        available = input->streamAvailable();
     }
 }
 

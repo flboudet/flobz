@@ -26,6 +26,7 @@
 #ifndef _IGPDATAGRAM_H
 #define _IGPDATAGRAM_H
 
+#include "ios_stream.h"
 #include "ios_memory.h"
 
 namespace ios_fc {
@@ -42,7 +43,8 @@ public:
         ServerMsgToClient
     };
     IGPDatagram(VoidBuffer data);
-    IGPDatagram(IGPDatagram &datagram) : message(datagram.message), msgSize(datagram.msgSize),  msgIdent(msgIdent), complete(complete) {}
+    IGPDatagram(InputStream *stream);
+    IGPDatagram(IGPDatagram &datagram) : msgSize(datagram.msgSize), message(datagram.message),  msgIdent(msgIdent), complete(complete) {}
     virtual ~IGPDatagram() {}
     VoidBuffer serialize();
     int getMsgIdent() const { return msgIdent; }

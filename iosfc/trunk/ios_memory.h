@@ -589,7 +589,7 @@ void ios_fc::Memory::memcpy (void *dest, const void *src, int len) {
     int idst = findMemoryBlock(dest);
 //    int isrc = findMemoryBlock(src);
 
-    if (idst < 0) fprintf(stderr, "SPURIOUS memcpy destination");
+//    if (idst < 0) fprintf(stderr, "SPURIOUS memcpy destination");
 //    if (isrc < 0) fprintf(stderr, "SPURIOUS memcpy src");
     
     ::memcpy(dest,src,len);
