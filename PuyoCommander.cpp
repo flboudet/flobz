@@ -61,8 +61,8 @@ static char *kMusicVolume = "MusicVolume";
 static char *kAudioVolume = "AudioVolume";
 
 char *kCongratulations = "Congratulations!!!";
-char *kPuyosInvasion   = "You stopped Puyo's invasion.\n"
-                         "Peace on Earth is restored!!";
+char *kPuyosInvasion   = "                        You stopped Puyo's invasion.\n"
+                         "                         Peace on Earth is restored!!";
 
 static char *kAudioFX     = "Audio FX\t";
 static char *kMusic       = "Music\t";
@@ -1351,7 +1351,13 @@ void PuyoCommander::updateAll(PuyoDrawable *starter, SDL_Surface *extra_surf)
 
   // mise a jour
   menu_update (mainMenu, display);
-  menu_update (gameOverMenu, display);
+
+  menu_update(gameOver2PMenu, display);
+  menu_update(gameOver1PMenu, display);
+  menu_update(nextLevelMenu, display);
+  menu_update(finishedMenu, display);
+  menu_update(looserMenu, display);
+  
   menu_update (optionMenu, display);
   menu_update (controlsMenu, display);
   menu_update (rulesMenu, display);
@@ -1415,7 +1421,11 @@ void PuyoCommander::updateAll(PuyoDrawable *starter, SDL_Surface *extra_surf)
       scrolling_text_draw(scrollingText, display, 460);
 
     menu_draw (mainMenu, display);
-    menu_draw (gameOverMenu, display);
+    menu_draw(gameOver2PMenu, display);
+    menu_draw(gameOver1PMenu, display);
+    menu_draw(nextLevelMenu, display);
+    menu_draw(finishedMenu, display);
+    menu_draw(looserMenu, display);
     menu_draw (optionMenu, display);
     menu_draw (controlsMenu, display);
     menu_draw (rulesMenu, display);

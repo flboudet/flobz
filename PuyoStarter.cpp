@@ -334,11 +334,11 @@ PuyoStarter::~PuyoStarter()
 #define repeatCondition(A) keysDown[A]++; if (((keysDown[A]-FPKEY_DELAY)>0) && ((keysDown[A]-FPKEY_DELAY)%FPKEY_REPEAT == 0)) 
 
 
-void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
+void PuyoStarter::run(int _score1, int _score2, int lives, int point1, int point2)
 {
     this->lives = lives;
-    this->score1 = score1;
-    this->score2 = score2;
+    this->score1 = _score1;
+    this->score2 = _score2;
     SDL_Rect drect;
     SDL_Event event;
     int quit = 0;
@@ -386,6 +386,7 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
                 attachedGameB->isGameRunning()) {
                 if (!paused) {
                     
+                    /* Check for usual events */
                     GameControlEvent controlEvent;
                     getControlEvent(event, &controlEvent);
                     
@@ -425,7 +426,7 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
                                 break;
                         }
                     }
-                    else
+                    else {
                         switch (controlEvent.gameEvent) {
                             case GameControlEvent::kPlayer1Left:
                                 if (randomPlayer == 0) {
@@ -491,119 +492,134 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
                             default:
                                 break;
                         }
-                            
-                            switch (event.type) {
-                                case SDL_USEREVENT:
-                                    if (randomPlayer)
-                                        randomPlayer->cycle();
-                                    if (event.user.code == 1) {
-                                        drect.x = 0;
-                                        drect.y = 0;
-                                        drect.w = 640;
-                                        drect.h = 480;
-                                        
-                                        if (attachedGameA->isEndOfCycle()) {
-                                            keysDown[FPKEY_P1_Down] = 0;
-                                            keysDown[FPKEY_P1_TurnLeft] = 0;
-                                            keysDown[FPKEY_P1_TurnRight] = 0;
-                                        }
-                                        
-                                        areaA->cycleGame(); // a voir
-                                        
-                                        if (attachedGameB->isEndOfCycle()) {
-                                            keysDown[FPKEY_P2_Down] = 0;
-                                            keysDown[FPKEY_P2_TurnLeft] = 0;
-                                            keysDown[FPKEY_P2_TurnRight] = 0;
-                                        }
-                                        areaB->cycleGame(); // a voir
-                                        
-                                        switch (gameLevel)
-                                        {
-                                            case 1:
-                                                attachedGameB->points += 1;
-                                                attachedGameA->points += 1;
-                                                break;
-                                            case 2:
-                                                attachedGameB->points += 5;
-                                                attachedGameA->points += 5;
-                                                break;
-                                            case 3:
-                                                attachedGameB->points += 10;
-                                                attachedGameA->points += 10;
-                                                break;
-                                        }
-                                        
-                                        if (attachedGameA->getPoints()/50000 > savePointsA/50000)
-                                            blinkingPointsA = 10;
-                                        if (attachedGameB->getPoints()/50000 > savePointsB/50000)
-                                            blinkingPointsB = 10;
-                                        
-                                        if (blinkingPointsA > 0)
-                                            blinkingPointsA--;
-                                        if (blinkingPointsB > 0)
-                                            blinkingPointsB--;
-                                        
-                                        savePointsB = attachedGameB->getPoints();
-                                        savePointsA = attachedGameA->getPoints();
-                                        
-                                        if (savePointsA < 50000) blinkingPointsA=0;
-                                        if (savePointsB < 50000) blinkingPointsB=0;
-                                        
-                                    } else {
-                                        if (keysDown[FPKEY_P2_Down]) {
-                                            if (attachedGameB->isEndOfCycle())
-                                                keysDown[FPKEY_P2_Down] = 0;
-                                            else
-                                                areaB->cycleGame(); // a voir
-                                        }
-                                        if (keysDown[FPKEY_P2_Left]) {
-                                            repeatCondition(FPKEY_P2_Left) areaB->moveLeft();
-                                        }
-                                        if (keysDown[FPKEY_P2_Right]) {
-                                            repeatCondition(FPKEY_P2_Right) areaB->moveRight();
-                                        }
-                                        if (keysDown[FPKEY_P2_TurnLeft]) {
-                                            repeatCondition(FPKEY_P2_TurnLeft) areaB->rotateLeft();
-                                            if (attachedGameB->isEndOfCycle())
-                                                keysDown[FPKEY_P2_TurnLeft] = 0;
-                                        }
-                                        if (keysDown[FPKEY_P2_TurnRight]) {
-                                            repeatCondition(FPKEY_P2_TurnRight) areaB->rotateRight();
-                                            if (attachedGameB->isEndOfCycle())
-                                                keysDown[FPKEY_P2_TurnRight] = 0;
-                                        }
-                                        
-                                        if (keysDown[FPKEY_P1_Down]) {
-                                            if (attachedGameA->isEndOfCycle())
-                                                keysDown[FPKEY_P1_Down] = 0;
-                                            else
-                                                areaA->cycleGame(); // a voir
-                                        }
-                                        if (keysDown[FPKEY_P1_Left]) {
-                                            repeatCondition(FPKEY_P1_Left) areaA->moveLeft();
-                                            if (attachedGameA->isEndOfCycle())
-                                                keysDown[FPKEY_P1_Left] = 0;
-                                        }
-                                        if (keysDown[FPKEY_P1_Right]) {
-                                            repeatCondition(FPKEY_P1_Right) areaA->moveRight();
-                                            if (attachedGameA->isEndOfCycle())
-                                                keysDown[FPKEY_P1_Right] = 0;
-                                        }
-                                        if (keysDown[FPKEY_P1_TurnLeft]) {
-                                            repeatCondition(FPKEY_P1_TurnLeft) areaA->rotateLeft();
-                                            if (attachedGameA->isEndOfCycle())
-                                                keysDown[FPKEY_P1_TurnLeft] = 0;
-                                        }
-                                        if (keysDown[FPKEY_P1_TurnRight]) {
-                                            repeatCondition(FPKEY_P1_TurnRight) areaA->rotateRight();
-                                            if (attachedGameA->isEndOfCycle())
-                                                keysDown[FPKEY_P1_TurnRight] = 0;
-                                        }
-                                    }
-                                        break;
-                                default:
-                                    break;
-                            }
+                    }
+                    
+                    switch (event.type) {
+                      case SDL_USEREVENT:
+                        if (randomPlayer)
+                          randomPlayer->cycle();
+                        if (event.user.code == 1) {
+                          drect.x = 0;
+                          drect.y = 0;
+                          drect.w = 640;
+                          drect.h = 480;
+
+                          if (attachedGameA->isEndOfCycle()) {
+                            keysDown[FPKEY_P1_Down] = 0;
+                            keysDown[FPKEY_P1_TurnLeft] = 0;
+                            keysDown[FPKEY_P1_TurnRight] = 0;
+                          }
+
+                          areaA->cycleGame(); // a voir
+
+                          if (attachedGameB->isEndOfCycle()) {
+                            keysDown[FPKEY_P2_Down] = 0;
+                            keysDown[FPKEY_P2_TurnLeft] = 0;
+                            keysDown[FPKEY_P2_TurnRight] = 0;
+                          }
+                          areaB->cycleGame(); // a voir
+
+                          switch (gameLevel)
+                          {
+                            case 1:
+                              attachedGameB->points += 1;
+                              attachedGameA->points += 1;
+                              break;
+                            case 2:
+                              attachedGameB->points += 5;
+                              attachedGameA->points += 5;
+                              break;
+                            case 3:
+                              attachedGameB->points += 10;
+                              attachedGameA->points += 10;
+                              break;
+                          }
+
+                          if (attachedGameA->getPoints()/50000 > savePointsA/50000)
+                            blinkingPointsA = 10;
+                          if (attachedGameB->getPoints()/50000 > savePointsB/50000)
+                            blinkingPointsB = 10;
+
+                          if (blinkingPointsA > 0)
+                            blinkingPointsA--;
+                          if (blinkingPointsB > 0)
+                            blinkingPointsB--;
+
+                          savePointsB = attachedGameB->getPoints();
+                          savePointsA = attachedGameA->getPoints();
+
+                          if (savePointsA < 50000) blinkingPointsA=0;
+                          if (savePointsB < 50000) blinkingPointsB=0;
+
+                        } else {
+                          if (keysDown[FPKEY_P2_Down]) {
+                            if (attachedGameB->isEndOfCycle())
+                              keysDown[FPKEY_P2_Down] = 0;
+                            else
+                              areaB->cycleGame(); // a voir
+                          }
+                          if (keysDown[FPKEY_P2_Left]) {
+                            repeatCondition(FPKEY_P2_Left) areaB->moveLeft();
+                          }
+                          if (keysDown[FPKEY_P2_Right]) {
+                            repeatCondition(FPKEY_P2_Right) areaB->moveRight();
+                          }
+                          if (keysDown[FPKEY_P2_TurnLeft]) {
+                            repeatCondition(FPKEY_P2_TurnLeft) areaB->rotateLeft();
+                            if (attachedGameB->isEndOfCycle())
+                              keysDown[FPKEY_P2_TurnLeft] = 0;
+                          }
+                          if (keysDown[FPKEY_P2_TurnRight]) {
+                            repeatCondition(FPKEY_P2_TurnRight) areaB->rotateRight();
+                            if (attachedGameB->isEndOfCycle())
+                              keysDown[FPKEY_P2_TurnRight] = 0;
+                          }
+
+                          if (keysDown[FPKEY_P1_Down]) {
+                            if (attachedGameA->isEndOfCycle())
+                              keysDown[FPKEY_P1_Down] = 0;
+                            else
+                              areaA->cycleGame(); // a voir
+                          }
+                          if (keysDown[FPKEY_P1_Left]) {
+                            repeatCondition(FPKEY_P1_Left) areaA->moveLeft();
+                            if (attachedGameA->isEndOfCycle())
+                              keysDown[FPKEY_P1_Left] = 0;
+                          }
+                          if (keysDown[FPKEY_P1_Right]) {
+                            repeatCondition(FPKEY_P1_Right) areaA->moveRight();
+                            if (attachedGameA->isEndOfCycle())
+                              keysDown[FPKEY_P1_Right] = 0;
+                          }
+                          if (keysDown[FPKEY_P1_TurnLeft]) {
+                            repeatCondition(FPKEY_P1_TurnLeft) areaA->rotateLeft();
+                            if (attachedGameA->isEndOfCycle())
+                              keysDown[FPKEY_P1_TurnLeft] = 0;
+                          }
+                          if (keysDown[FPKEY_P1_TurnRight]) {
+                            repeatCondition(FPKEY_P1_TurnRight) areaA->rotateRight();
+                            if (attachedGameA->isEndOfCycle())
+                              keysDown[FPKEY_P1_TurnRight] = 0;
+                          }
+                        }
+                        break;
+                      case SDL_KEYDOWN:
+                        /* check for cheat-codes */
+                        static int cheatcode = 0;
+                        if (event.key.keysym.sym == SDLK_k) cheatcode  = 0;
+                        if (event.key.keysym.sym == SDLK_i) cheatcode += 1;
+                        if (event.key.keysym.sym == SDLK_e) cheatcode += 10;
+                        if (event.key.keysym.sym == SDLK_f) cheatcode += 100;
+                        if (event.key.keysym.sym == SDLK_t) cheatcode += 1000;
+                        if (event.key.keysym.sym == SDLK_l) cheatcode += 10000;
+                        if (cheatcode == 31111) {
+                          attachedGameA->increaseNeutralPuyos(PUYODIMX * 12);
+                          attachedGameA->dropNeutrals();
+                          attachedGameA->increaseNeutralPuyos(PUYODIMX * 12);
+                        }
+                      default:
+                        break;
+                    }
                 } // !Paused
                     else {
                         GameControlEvent controlEvent;
@@ -639,7 +655,7 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
             {
                 if (randomPlayer) {
                     if (rightPlayerWin()) {
-                        if (score2 == 7)
+                        if ((_score2 == 7) && (rightPlayerWin()))
                             commander->gameOverMenu = commander->finishedMenu;
                         else
                             commander->gameOverMenu = commander->nextLevelMenu;
@@ -659,8 +675,8 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
                 
                 if (!menu_visible(commander->gameOverMenu)) {
                     
-                    if (leftPlayerWin()) score1++;
-                    else if (rightPlayerWin()) score2++;
+                    if (leftPlayerWin()) score1 = _score1 + 1;
+                    else if (rightPlayerWin()) score2 = _score2 + 1;
                     
                     if (commander->gameOverMenu == commander->gameOver2PMenu) {
                         char winner[256];
@@ -716,6 +732,11 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
                                 restartRender();
                                 menu_hide(menu_pause);
                             }
+                        }
+                        else {
+                            if (menu_active_is(commander->gameOverMenu, "NO"))
+                                menu_next_item(commander->gameOverMenu);
+                            quit = 1;
                         }
                         break;
                     default:
