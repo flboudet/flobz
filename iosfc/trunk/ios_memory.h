@@ -97,6 +97,8 @@ namespace ios_fc {
 
             /**
              * Build a VoidBuffer with initial size.
+             *
+             * @param size Initial size.
              */
             inline VoidBuffer (int size = 0) : offset(0) {
                 init_ptr(size);
@@ -104,6 +106,8 @@ namespace ios_fc {
 
             /**
              * Build a VoidBuffer by duplicating an existing one.
+             *
+             * @param buf Buffer to duplicate.
              */
             inline VoidBuffer (const VoidBuffer &buf)
                 : p(buf.p),offset(0)
@@ -114,12 +118,20 @@ namespace ios_fc {
 
             /**
              * Build a VoidBuffer from an non-ios_fc buffer.
+             *
+             * @param data Pointer to the buffer.
+             * @param len  Size of the buffer.
              */
             inline VoidBuffer (const void *data,int len) : offset(0) {
                 init_ptr (len);
                 Memory::memcpy (p->ptr,data,len);
             }
 
+            /**
+             * Gives a copy of a VoidBuffer, sharing the datas.
+             *
+             * @param vb Buffer to copy.
+             */
 			inline const VoidBuffer &operator= (VoidBuffer &vb) {
 				unregPtr();
 				p      = vb.p;
@@ -128,6 +140,11 @@ namespace ios_fc {
 				return *this;
 			}
 
+            /**
+             * Gives a copy of a VoidBuffer, duplicating the datas.
+             *
+             * @param vb Buffer to duplicate.
+             */
 			inline const VoidBuffer &operator= (const VoidBuffer &vb) {
                 unregPtr();
                 init_ptr(vb.size());
@@ -135,28 +152,63 @@ namespace ios_fc {
                 return *this;
             }
 
+            /**
+             * Destructor.
+             */
             inline ~VoidBuffer () {
 				unregPtr();
             }
 
+            /**
+             * Returns the pointer to the datas.
+             */
             inline void *ptr()  const { return (void*)((char*)p->ptr + offset); }
+
+            /**
+             * Returns the size of the buffer in byte.
+             */
             inline int   size() const { return p->size - offset; }
 
+            /**
+             * Changes the size of the buffer.
+             *
+             * @param size New size of the buffer.
+             */
             inline void  realloc (int size) {
                 p->size = size + offset;
                 p->ptr = Memory::realloc(p->ptr, p->size);
             }
+
+            /**
+             * Increase the size of the buffer.
+             *
+             * @param size Number of bytes to add after the existing ones.
+             */
             inline void  grow    (int size) {
                 VoidBuffer::realloc(VoidBuffer::size() + size);
             }
+            /**
+             * Decrease the size of the buffer.
+             *
+             * @param size Number of bytes to remove at the end of the buffer.
+             */
             inline void  reduce  (int size) {
                 VoidBuffer::realloc(VoidBuffer::size() - size);}
 
+            /**
+             * Cast to void *
+             */
             inline operator void* () const {return ptr();}
 
+            /**
+             * Cast to something else
+             */
             template <typename T>
             inline operator T*    () const {return (T*)ptr();}
 
+            /**
+             * Change the start address of the buffer.
+             */
             inline const VoidBuffer &operator -= (int offset) {
                 this->offset-=offset;
                 return *this;
@@ -167,6 +219,9 @@ namespace ios_fc {
                 return buf;
             }
 
+            /**
+             * Change the start address of the buffer.
+             */
             inline const VoidBuffer &operator += (int offset) {
                 this->offset+=offset;
                 return *this;
