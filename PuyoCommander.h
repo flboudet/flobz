@@ -16,12 +16,20 @@ typedef struct GameControlEvent {
         kPlayer1TurnLeft,
         kPlayer1TurnRight,
         kPlayer1Down,
+        kPlayer1LeftUp,
+        kPlayer1RightUp,
+        kPlayer1TurnLeftUp,
+        kPlayer1TurnRightUp,
         kPlayer1DownUp,
         kPlayer2Left,
         kPlayer2Right,
         kPlayer2TurnLeft,
         kPlayer2TurnRight,
         kPlayer2Down,
+        kPlayer2LeftUp,
+        kPlayer2RightUp,
+        kPlayer2TurnLeftUp,
+        kPlayer2TurnRightUp,
         kPlayer2DownUp
     } gameEvent;
     enum {

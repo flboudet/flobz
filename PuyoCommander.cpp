@@ -1277,28 +1277,45 @@ void PuyoCommander::getControlEvent(SDL_Event e, GameControlEvent *result)
                 result->gameEvent = GameControlEvent::kPlayer1Left;
             if (sym == keyControls[kPlayer1RightControl])
                 result->gameEvent = GameControlEvent::kPlayer1Right;
-            if (sym == keyControls[kPlayer1DownControl])
-                result->gameEvent = GameControlEvent::kPlayer1Down;
             if (sym == keyControls[kPlayer1ClockwiseControl])
                 result->gameEvent = GameControlEvent::kPlayer1TurnRight;
             if (sym == keyControls[kPlayer1CounterclockwiseControl])
                 result->gameEvent = GameControlEvent::kPlayer1TurnLeft;
+            if (sym == keyControls[kPlayer1DownControl])
+                result->gameEvent = GameControlEvent::kPlayer1Down;
             
             if (sym == keyControls[kPlayer2LeftControl])
                 result->gameEvent = GameControlEvent::kPlayer2Left;
             if (sym == keyControls[kPlayer2RightControl])
                 result->gameEvent = GameControlEvent::kPlayer2Right;
-            if (sym == keyControls[kPlayer2DownControl])
-                result->gameEvent = GameControlEvent::kPlayer2Down;
             if (sym == keyControls[kPlayer2ClockwiseControl])
                 result->gameEvent = GameControlEvent::kPlayer2TurnRight;
             if (sym == keyControls[kPlayer2CounterclockwiseControl])
                 result->gameEvent = GameControlEvent::kPlayer2TurnLeft;
+            if (sym == keyControls[kPlayer2DownControl])
+                result->gameEvent = GameControlEvent::kPlayer2Down;
             break;
         case SDL_KEYUP:
             sym = e.key.keysym.sym;
+            if (sym == keyControls[kPlayer1LeftControl])
+                result->gameEvent = GameControlEvent::kPlayer1LeftUp;
+            if (sym == keyControls[kPlayer1RightControl])
+                result->gameEvent = GameControlEvent::kPlayer1RightUp;
+            if (sym == keyControls[kPlayer1ClockwiseControl])
+                result->gameEvent = GameControlEvent::kPlayer1TurnRightUp;
+            if (sym == keyControls[kPlayer1CounterclockwiseControl])
+                result->gameEvent = GameControlEvent::kPlayer1TurnLeftUp;
             if (sym == keyControls[kPlayer1DownControl])
                 result->gameEvent = GameControlEvent::kPlayer1DownUp;
+
+            if (sym == keyControls[kPlayer2LeftControl])
+                result->gameEvent = GameControlEvent::kPlayer2LeftUp;
+            if (sym == keyControls[kPlayer2RightControl])
+                result->gameEvent = GameControlEvent::kPlayer2RightUp;
+            if (sym == keyControls[kPlayer2ClockwiseControl])
+                result->gameEvent = GameControlEvent::kPlayer2TurnRightUp;
+            if (sym == keyControls[kPlayer2CounterclockwiseControl])
+                result->gameEvent = GameControlEvent::kPlayer2TurnLeftUp;
             if (sym == keyControls[kPlayer2DownControl])
                 result->gameEvent = GameControlEvent::kPlayer2DownUp;
             break;
