@@ -18,6 +18,7 @@ class GameComponent {
   protected:
     bool _kill;
     bool _remove;
+    friend class GameLoop;
 };
 
 class DrawableComponent : public virtual GameComponent
@@ -95,8 +96,6 @@ class GameLoop : public IdleComponent, DrawableComponent
     bool isLate(double currentTime) const;
 
     SDL_Surface *getSurface() const { return surface; }
-
-  protected:
     void setSurface(SDL_Surface *surface) {
       this->surface = surface;
     }

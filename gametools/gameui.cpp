@@ -2,11 +2,12 @@
 
 namespace gameui {
 
-  GameUIEnum GameUIDefaults::CONTAINER_POLICY = USE_MAX_SIZE;
-  float      GameUIDefaults::SPACING          = 16.0f;
-  SoFont    *GameUIDefaults::FONT          = SoFont_new();
-  SoFont    *GameUIDefaults::FONT_INACTIVE = SoFont_new();
-  GameLoop  *GameUIDefaults::GAME_LOOP     = NULL;
+  GameUIEnum   GameUIDefaults::CONTAINER_POLICY = USE_MAX_SIZE;
+  float        GameUIDefaults::SPACING          = 16.0f;
+  SoFont      *GameUIDefaults::FONT           = SoFont_new();
+  SoFont      *GameUIDefaults::FONT_INACTIVE  = SoFont_new();
+  GameLoop    *GameUIDefaults::GAME_LOOP      = new GameLoop();
+  ScreenStack *GameUIDefaults::SCREEN_STACK   = new ScreenStack();
 
   //
   // Widget
@@ -296,19 +297,19 @@ namespace gameui {
   // ScreenVBox
   //
   
-  ScreenVBox::ScreenVBox(float x, float y, float width, float height, GameLoop *loop) : VBox(loop)
+  Screen::Screen(float x, float y, float width, float height, GameLoop *loop) : VBox(loop)
   {
     setPosition(Vec3(x, y, 1.0f));
     setSize(Vec3(width, height, 1.0f));
     giveFocus();
   }
 
-  void ScreenVBox::setBackground(IIM_Surface *bg)
+  void Screen::setBackground(IIM_Surface *bg)
   {
     this->bg = bg;
   }
 
-  void ScreenVBox::draw(SDL_Surface *surface) const
+  void Screen::draw(SDL_Surface *surface) const
   {
     if (bg) {
       SDL_Rect rect;
@@ -321,8 +322,9 @@ namespace gameui {
     VBox::draw(surface);
   }
   
-  void ScreenVBox::onEvent(GameControlEvent *event)
+  void Screen::onEvent(GameControlEvent *event)
   {
+    if (!isVisible()) return;
     VBox::eventOccured(event);
     VBox::giveFocus();
     requestDraw();
@@ -420,6 +422,65 @@ namespace gameui {
   Separator::Separator(float width, float height)
   {
     setPreferedSize(Vec3(width, height, 1.0));
+  }
+
+  //
+  // ScreenStack
+  //
+
+  void ScreenStack::checkLoop() {
+    if (loop == NULL)
+      loop = GameUIDefaults::GAME_LOOP;
+  }
+
+  ScreenStack::ScreenStack(GameLoop *loop)
+  {
+    this->loop = loop;
+  }
+  
+  void ScreenStack::push(Screen *screen) {
+    checkLoop();
+    if (stack.size() > 0) {
+      stack.top()->hide();
+    }
+    screen->show();
+    stack.push(screen);
+    loop->add(screen);
+  }
+
+  void ScreenStack::pop() {
+    stack.top()->remove();
+    stack.top()->hide();
+    stack.pop();
+    stack.top()->show();
+  }
+
+  //
+  // PushScreenAction
+  //
+  PushScreenAction::PushScreenAction(Screen *screen, ScreenStack *stack)
+  {
+    if (stack == NULL) stack = GameUIDefaults::SCREEN_STACK;
+    this->stack = stack;
+    this->screen = screen;
+  }
+  
+  void PushScreenAction::action() {
+    stack->push(screen);
+  }
+  
+  //
+  // PopScreenAction
+  //
+  PopScreenAction::PopScreenAction(ScreenStack *stack)
+  {
+    if (stack == NULL) stack = GameUIDefaults::SCREEN_STACK;
+    this->stack = stack;
+  }
+  
+  void PopScreenAction::action()
+  {
+    stack->pop();
   }
 
 };

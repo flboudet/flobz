@@ -16,12 +16,13 @@ namespace gameui {
   class VBox;
   class Text;
   class GameUIDefaults;
-  class ScreenVBox;
+  class Screen;
   class Button;
   class Separator;
   class Action;
+  class ScreenStack;
 
-
+  
   enum GameUIEnum {
     USE_MAX_SIZE = 0,
     USE_MIN_SIZE,
@@ -38,11 +39,12 @@ namespace gameui {
 
   class GameUIDefaults {
     public:
-      static GameUIEnum CONTAINER_POLICY;
-      static float      SPACING;
-      static SoFont     *FONT;
-      static SoFont     *FONT_INACTIVE;
-      static GameLoop   *GAME_LOOP;
+      static GameUIEnum   CONTAINER_POLICY;
+      static float        SPACING;
+      static SoFont      *FONT;
+      static SoFont      *FONT_INACTIVE;
+      static GameLoop    *GAME_LOOP;
+      static ScreenStack *SCREEN_STACK;
   };
 
 
@@ -62,6 +64,7 @@ namespace gameui {
 
       virtual void hide()   { hidden = true;  }
       virtual void show()   { hidden = false; }
+      bool isVisible()      { return !hidden; }
 
       virtual bool hasFocus() const { return false; }
       virtual void event(const GameControlEvent &event) const    { }
@@ -129,6 +132,10 @@ namespace gameui {
   };
 
 
+  class SingleContainer : public WidgetContainer {
+  };
+
+
   class Box : public WidgetContainer {
     public:
       Box(GameLoop *loop = NULL);
@@ -181,12 +188,13 @@ namespace gameui {
   };
 
 
-  class ScreenVBox : public VBox, IdleComponent {
+  class Screen : public VBox, IdleComponent {
     public:
-      ScreenVBox(float x, float y, float width, float height, GameLoop *loop = NULL);
+      Screen(float x, float y, float width, float height, GameLoop *loop = NULL);
       void setBackground(IIM_Surface *bg);
       void draw(SDL_Surface *surface) const;
       void onEvent(GameControlEvent *event);
+      void remove() { IdleComponent::remove(); }
 
     private:
       IIM_Surface *bg;
@@ -228,6 +236,49 @@ namespace gameui {
     public:
       Separator(float width, float height);
   };
+
+
+  // Manage a stack of screens.
+  class ScreenStack
+  {
+    public:
+      ScreenStack(GameLoop *loop = NULL);
+      ~ScreenStack() {}
+
+      void push(Screen *screen);
+      void pop();
+
+    private:
+      Stack<Screen*> stack;
+      GameLoop *loop;
+
+      void checkLoop();
+  };
+
+
+  class PushScreenAction : public Action
+  {
+    public:
+      PushScreenAction(Screen *screen, ScreenStack *stack = NULL);
+      virtual ~PushScreenAction() {}
+      void action();
+      
+    private:
+      ScreenStack *stack;
+      Screen      *screen;
+  };
+
+  class PopScreenAction : public Action
+  {
+    public:
+      PopScreenAction(ScreenStack *stack = NULL);
+      virtual ~PopScreenAction() {}
+      void action();
+
+    private:
+      ScreenStack *stack;
+  };
+
 
 };
 

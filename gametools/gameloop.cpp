@@ -143,32 +143,40 @@ void GameLoop::run()
 void GameLoop::idle(double currentTime)
 {
   int i;
+
+  Vector<IdleComponent> idlesCpy = idles.dup();
+  Vector<GameComponent> componentsCpy = components.dup();
   
   // 1- process events
   SDL_Event e;
   while (SDL_PollEvent (&e)) {
     GameControlEvent controlEvent;
     getControlEvent(e, &controlEvent);
-    for (i = 0; i < idles.size(); ++i) {
-      idles[i]->onEvent(&controlEvent);
+    for (i = 0; i < idlesCpy.size(); ++i) {
+      idlesCpy[i]->onEvent(&controlEvent);
+    }
+    if (controlEvent.cursorEvent == GameControlEvent::kQuit) {
+      SDL_Quit();
+      exit(0);
     }
   }
   
-  // 2- check components to remove/kill
-  for (i = 0; i < components.size(); ++i) {
-    GameComponent *gc = components[i];
+  // 2- call idles
+  for (i = 0; i < idlesCpy.size(); ++i) {
+    idlesCpy[i]->idle(currentTime);
+  }
+  
+  // 3- check components to remove/kill
+  for (i = 0; i < componentsCpy.size(); ++i) {
+    GameComponent *gc = componentsCpy[i];
     if (gc->removeMe()) {
+      gc->_remove = false;
       components.remove(gc);
       idles.remove(dynamic_cast<IdleComponent*>(gc));
       drawables.remove(dynamic_cast<DrawableComponent*>(gc));
       if (gc->killMe())
         delete gc;
     }
-  }
-  
-  // 3- call idles
-  for (i = 0; i < idles.size(); ++i) {
-    idles[i]->idle(currentTime);
   }
 }
 
