@@ -69,7 +69,7 @@ struct PosEvaluator {
     if ( (f_color == c_color) && ( (c_x==f_x) || (c_y==f_y) ) ) score += IAPuyoValue;
 
     /* Si l'un des deux puyos est vraiment tres haut => vraiment pas bien ! */
-    if ((f_y < 1) && (c_y < 1)) score -= 1000;
+    if ((f_y < 2) && (c_y < 2)) score -= 1000;
 
     /* Si les deux puyos sont suffisament bas => mode attaque ! */
     if ((f_y >= IAHeightAgressivity) && (c_y >= IAHeightAgressivity))
