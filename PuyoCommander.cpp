@@ -4,7 +4,8 @@
 #include <string.h>
 #include "glSDL.h"
 #include "PuyoCommander.h"
-#include "PuyoStarter.h"
+#include "PuyoSinglePlayerStarter.h"
+#include "PuyoTwoPlayerStarter.h"
 #include "PuyoNetworkStarter.h"
 #include "PuyoVersion.h"
 #include "PuyoStory.h"
@@ -1366,7 +1367,7 @@ mml_play:
     menu_next_item(gameOverMenu);
   while (menu_active_is(gameOverMenu, "YES")) {
     menu_next_item(gameOverMenu);
-    PuyoStarter myStarter(this,false,0,RANDOM,currentMusicTheme);
+    PuyoTwoPlayerStarter myStarter(this, currentMusicTheme);
     audio_music_switch_theme(currentMusicTheme);
     p1name = player1Name;
     p2name = player2Name;
@@ -1483,7 +1484,7 @@ mml_play:
   {
     PuyoStory myStory(this, score2+1);
     myStory.loop();
-    PuyoStarter myStarter(this, true, ia[score2].level, ia[score2].type, currentMusicTheme);
+    PuyoSinglePlayerStarter myStarter(this, ia[score2].level, ia[score2].type, currentMusicTheme);
     p1name = playerName;
     p2name = AI_NAMES[score2];
     doom_melt_start(melt, menuBGImage);
