@@ -2,6 +2,10 @@
 #include <math.h>
 #include <stdlib.h>
 
+#ifndef DATADIR
+extern char *DATADIR;
+#endif
+
 /** Image loading... free... conversion */
 
 bool fullscreen = true;

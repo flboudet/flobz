@@ -8,12 +8,11 @@ ENABLE_OPENGL=false
 #BINDIR=/usr/games/
 DATADIR=\"data\"
 
-# SDL_CONFIG=/home/jeko/opt/bin/sdl-config
 SDL_CONFIG=sdl-config
 CC=g++
 CXX=g++
 
-CFLAGS=`$(SDL_CONFIG) --cflags` -g -I/sw/include
+CFLAGS=`$(SDL_CONFIG) --cflags` -g -I/sw/include -DDATADIR=${DATADIR}
 
 
 
@@ -33,7 +32,7 @@ OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o        \
 
 PLATFORM=$(shell uname -s)
 ifeq ($(PLATFORM), Darwin)
-CFLAGS:=$(CFLAGS) -DMACOSX
+CFLAGS:=$(CFLAGS) -DMACOSX -UDATADIR
 endif
 
 ifeq ($(ENABLE_AUDIO), true)
@@ -62,12 +61,13 @@ flobopuyo: ${OBJFILES}
 prelude:
 	@rm -f WARNINGS
 	@touch WARNINGS
+	@echo "Compiling with CFLAGS=$(CFLAGS)"
 
 %.o:%.c
-	@echo "[$@]" && $(CC) $(CFLAGS) -DDATADIR=${DATADIR} -c $< 2>> WARNINGS || (cat WARNINGS && false)
+	@echo "[$@]" && $(CC) $(CFLAGS) -c $< 2>> WARNINGS || (cat WARNINGS && false)
 
 %.o:%.cpp
-	@echo "[$@]" && $(CXX) $(CFLAGS) -DDATADIR=${DATADIR} -c $< 2>> WARNINGS || (cat WARNINGS && false)
+	@echo "[$@]" && $(CXX) $(CFLAGS) -c $< 2>> WARNINGS || (cat WARNINGS && false)
 
 PuyoDoomMelt.o:PuyoDoomMelt.c ${HFILES}
 HiScores.o:HiScores.cpp HiScores.h preferences.h
@@ -94,10 +94,10 @@ sofont.o:sofont.c
 IosException.o:IosException.cpp
 IosVector.o:IosVector.cpp
 glSDL.o:glSDL.c
-	@echo "[$@]" && $(CC) $(CFLAGS) -DDATADIR=${DATADIR} -c $< 2>> EXT_WARNINGS
+	@echo "[$@]" && $(CC) $(CFLAGS) -c $< 2>> EXT_WARNINGS
 	@rm -f EXT_WARNINGS
 SDL_prim.o:SDL_prim.c
-	@echo "[$@]" && $(CC) $(CFLAGS) -DDATADIR=${DATADIR} -c $< 2>> EXT_WARNINGS
+	@echo "[$@]" && $(CC) $(CFLAGS) -c $< 2>> EXT_WARNINGS
 	@rm -f EXT_WARNINGS
 corona.o:corona.cpp
 corona32.o:corona32.cpp
@@ -131,7 +131,7 @@ clean:
 
 bundle_name = FloboPuyo.app
 
-flobopuyo-static:${OBJFILES}
+flobopuyo-static: prelude  ${OBJFILES}
 	@echo "[flobopuyo-static]" && g++ $(CFLAGS) -o flobopuyo-static ${OBJFILES}\
         /sw/lib/libSDL_mixer.a /sw/lib/libvorbisfile.a /sw/lib/libvorbis.a /sw/lib/libogg.a /sw/lib/libsmpeg.a /sw/lib/libSDL_image.a /sw/lib/libjpeg.a /sw/lib/libpng.a -lz `$(SDL_CONFIG) --static-libs`
 	@echo "--------------------------------------"
