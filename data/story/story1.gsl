@@ -1,8 +1,48 @@
 <init>
+
+  // Timing
+  float @kaoriAbsoluteMax = 200.0
+  float @dogAbsoluteMax = 0.0
+  float @kaoriMax = @kaoriAbsoluteMax
+  float @dogMax = @dogAbsoluteMax
+  float @kaoriSpeed = 0.0
+  float @dogSpeed   = 0.0
+
+  int @dogIdle = 0
+  int @dogTalking = 1
+  int @dogAngry = 2
+  int @dogState = @dogIdle
+
+  int @kaoriIdle = 0
+  int @kaoriTalking = 1
+  int @kaoriAngry = 2
+  int @kaoriState = @kaoriIdle
+
+  string @txt1 = "Where do you think\nyou are going,\nKaori?"
+  string @txt2 = "I must to the forrest,\nto chase them and\nrescue the puyos!"
+  string @txt3 = "You are going nowhere,\nGrandma's orders!"
+  string @txt4 = "The forrest is a place\ntoo dangerous for you!"
+  string @txt5 = "Get out of my way,\nyou bastard!"
+  string @txt6 = "You'll have to fight me first!"
+
+  int @balloonExposure = 100
+  int @balloon1on = 50
+  int @balloon1off = @balloon1on + @balloonExposure
+  int @balloon2on = @balloon1off + 50
+  int @balloon2off = @balloon2on + 2*@balloonExposure
+  int @balloon3on = @balloon2off + 50
+  int @balloon3off = @balloon3on + @balloonExposure
+  int @balloon4on = @balloon3off
+  int @balloon4off = @balloon4on + @balloonExposure
+  int @balloon5on = @balloon4off + 50
+  int @balloon5off = @balloon5on + @balloonExposure
+  int @balloon6on = @balloon5off + 50
+  int @balloon6off = @balloon6on + @balloonExposure
+
   # Init function: called when script is loaded
   Display @display = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
-  Display @movingDisplay = [new_display: x=350.0 y=0.0 width=640.0 height=480.0]
-  Display @dogDisplay = [new_display: x=-100.0 y=0.0 width=640.0 height=480.0]
+  Display @movingDisplay = [new_display: x=550.0 y=0.0 width=640.0 height=480.0]
+  Display @dogDisplay = [new_display: x=-420.0 y=0.0 width=800.0 height=480.0]
 
   Sprite @head =  [new_sprite: image="kaori.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
   Sprite @eyes =  [new_sprite: image="eyes.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
@@ -14,6 +54,9 @@
   Sprite @dogEyes =  [new_sprite: image="dogbigeyes1.png" x=183.0 y=119.0 curframe=0.0 framespeed=0.1 nbframes=10.0]
   float @targetCycle = 100.0
   float @targetCycle2 = 50.0
+
+  Balloon @dogTalk  = [new_balloon: image="balloon1l.png" x=320.0 y=350.0 text_x=40.0 text_y=15.0]
+  Balloon @kaoriTalk  = [new_balloon: image="balloon1l.png" x=0.0 y=350.0 text_x=40.0 text_y=15.0]
 
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
@@ -27,22 +70,106 @@
   sprite::@dogMouth display=@dogDisplay
   sprite::@dogEyes display=@dogDisplay
 
+  balloon::@dogTalk display=@dogDisplay
+  balloon::@kaoriTalk display=@movingDisplay
+
 <update>
   # Update function: called every animation cycle
 
-  @mouth.image = "mouthsmall.png"
-  (@mouth.curframe > 1.0)? @mouth.image = "happymouth.png"
-  (@mouth.curframe > 2.0)? @mouth.image = "evilmouth.png"
-  (@mouth.curframe > 3.0)? @mouth.image = "happymouth.png"
-
-  @dogEyes.image = "dogbigeyes2.png"
-  (@fcycle < 220.0)? {
-    @dogEyes.image = "mouthsmall.png"
-    (@dogEyes.curframe > 9.0)? @dogEyes.image = "dogbigeyes1.png"
+  (@cycle = 0) ? {
+    @dogSpeed = 5.0
+    @dogMax = -100.0
+    @kaoriMax = 250.0
   }
 
-  @dogMouth.image = "dogbigmouth3.png"
-  (@fcycle > 150.0)? {
+  (@cycle = @balloon1on)? {
+    @dogState = @dogTalking
+    show_balloon_with_text::@dogTalk text=@txt1
+  }
+
+  (@cycle = @balloon1off)? {
+    @kaoriSpeed = 5.0
+    hide_balloon::@dogTalk
+    @dogState = @dogIdle
+  }
+
+  (@cycle = @balloon2on)? {
+    @kaoriState = @kaoriTalking
+    show_balloon_with_text::@kaoriTalk text=@txt2
+  }
+
+  (@cycle = @balloon2off)? {
+    hide_balloon::@kaoriTalk
+    @kaoriState = @kaoriIdle
+  }
+
+  (@cycle = @balloon3on)? {
+    @dogState = @dogTalking
+    show_balloon_with_text::@dogTalk text=@txt3
+  }
+
+  (@cycle = @balloon3off)? {
+    hide_balloon::@dogTalk
+    @dogState = @dogIdle
+  }
+
+  (@cycle = @balloon4on)? {
+    @dogState = @dogTalking
+    show_balloon_with_text::@dogTalk text=@txt4
+  }
+
+  (@cycle = @balloon4off)? {
+    hide_balloon::@dogTalk
+    @dogState = @dogIdle
+  }
+
+  (@cycle = @balloon5on)? {
+    @kaoriState = @kaoriTalking
+    show_balloon_with_text::@kaoriTalk text=@txt5
+    @kaoriSpeed = 1.0
+    @kaoriMax = @kaoriAbsoluteMax
+    @dogSpeed = -0.3
+  }
+
+  (@cycle = @balloon5off)? {
+    hide_balloon::@kaoriTalk
+    @kaoriState = @kaoriIdle
+    @dogSpeed = 1.0
+    @dogMax = @dogAbsoluteMax
+    @kaoriSpeed = -0.5
+  }
+
+  (@cycle = @balloon6on)? {
+    @dogState = @dogTalking
+    show_balloon_with_text::@dogTalk text=@txt6
+  }
+
+  (@cycle = @balloon6on + 50)? @dogState = @dogAngry
+
+  (@cycle = @balloon6off)? {
+    hide_balloon::@dogTalk
+  }
+
+  (@cycle > @balloon6off)? {
+    (@dogDisplay.x >= @dogMax)? @kaoriSpeed = 0.0
+  }
+
+  // Kaori states management
+  @mouth.image = "mouthsmall.png"
+  (@kaoriState = @kaoriTalking)? {
+    (@mouth.curframe > 1.0)? @mouth.image = "happymouth.png"
+    (@mouth.curframe > 2.0)? @mouth.image = "evilmouth.png"
+    (@mouth.curframe > 3.0)? @mouth.image = "happymouth.png"
+  }
+
+  // Dog states management
+  @dogEyes.image = "dogbigeyes2.png"
+  (@dogState < @dogAngry)? {
+    @dogMouth.image = "dogbigmouth3.png"
+    @dogEyes.image = "null.png"
+    (@dogEyes.curframe > 9.0)? @dogEyes.image = "dogbigeyes1.png"
+  }
+  (@dogState = @dogTalking)? {
     @dogMouth.image = "dogbigmouth1.png"
     (@dogMouth.curframe > 1.0)? @dogMouth.image = "dogbigmouth2.png"
   }
@@ -58,7 +185,13 @@
     @fond2.pos.x     = 640.0
     @targetCycle2 += 100.0
   }
-  
-  @movingDisplay.x -= 0.5
-  @dogDisplay.x += 0.1
-  (@movingDisplay.x <= 200.0)? @finished = 1
+
+  // Moving displays when appropriate
+  @movingDisplay.x -= @kaoriSpeed
+  @dogDisplay.x += @dogSpeed
+  (@movingDisplay.x < @kaoriMax)?
+    @movingDisplay.x = @kaoriMax
+  (@dogDisplay.x > @dogMax)?
+    @dogDisplay.x = @dogMax
+
+  (@cycle = @balloon6off + 100)? @finished = 1
