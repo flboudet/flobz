@@ -2,9 +2,9 @@
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
- *   Guillaume Borios      <gborios@ios-software.com>
+ *   Guillaume Borios      <gyom@ios-software.com>
  *
- * iOS Software <http://ios.free.fr>
+ * iOS Software <http://www.ios-software.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

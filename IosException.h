@@ -1,6 +1,6 @@
 /* Ultimate Othello 1678
  * Copyright (C) 2002  Florent Boudet <flobo@ifrance.com>
- * iOS Software <http://ios.free.fr>
+ * iOS Software <http://www.ios-software.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
