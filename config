@@ -1,0 +1,106 @@
+ENABLE_AUDIO=true
+ENABLE_OPENGL=false
+ENABLE_DGA=false
+
+DEBUG_MODE=true
+MORE_DEBUG=true
+
+PRGNAME=flobopuyo
+
+# Unix/Linux settings
+PREFIX=/usr/local
+DATADIR=$(PREFIX)/share/games/flobopuyo
+INSTALL_BINDIR=$(DESTDIR)/$(PREFIX)/games
+INSTALL_DATADIR=$(DESTDIR)/$(DATADIR)
+IOSFC_DIR=iosfc
+GAMETOOLS_DIR=gametools
+
+# Mac settings
+macimage_name=FloBoPuyo\ $(VERSION)
+bundle_name=FloboPuyo.app
+
+# Win32 settings
+CYGWIN_VERSION=CYGWIN_NT-5.1
+WINZIP_NAME=flobopuyowin32
+WINSDLINCLUDE=/home/$(USER)/SDL-1.2.7/include
+WINSDLDEVLIBS=/home/$(USER)/SDL-1.2.7/lib
+WINSDLRUNTIME=/home/$(USER)/SDL-1.2.7/lib
+#
+##########
+
+
+##############
+# Autodetection
+
+ifndef PLATFORM
+PLATFORM=$(shell uname -s)
+endif
+
+
+VERSION=$(shell grep "\#define FLOBOPUYOVERSION" PuyoVersion.c  | cut -d "\"" -f 2)
+#
+##############
+
+SDL_CONFIG=sdl-config
+CC=g++
+CXX=g++
+STRIP=strip
+
+CFLAGS= -DDATADIR=\"${DATADIR}\" -I${ROOT_DIR}/${GAMETOOLS_DIR} -I${ROOT_DIR}/${IOSFC_DIR} -I${ROOT_DIR} -I. -I${ROOT_DIR}/styrolyse
+LDFLAGS=
+
+# Autodetected cygwin platform
+ifeq ($(PLATFORM), $(CYGWIN_VERSION))
+  CFLAGS:=$(CFLAGS) -mno-cygwin -mwindows -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE)
+  LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_net -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
+else
+# mingw32 cross-compilation (works great in debian testing)
+ifeq ($(PLATFORM), crossmingw32)
+  CC=i586-mingw32msvc-g++
+  CXX=i586-mingw32msvc-g++
+  PRGNAME=flobopuyo.exe
+  STRIP=i586-mingw32msvc-strip
+  CFLAGS:=$(CFLAGS) -mno-cygwin -mwindows -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE)  -I$(WINSDLINCLUDE)/SDL
+  LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_net -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
+else
+# more traditional unix platform
+CFLAGS:=$(CFLAGS) `$(SDL_CONFIG) --cflags`
+LDFLAGS:=$(LDFLAGS) `$(SDL_CONFIG) --cflags --libs`
+#small additions for Darwin (we assume SDL was installed with Fink)
+ifeq ($(PLATFORM), Darwin)
+CFLAGS:=$(CFLAGS) -I/sw/include -DMACOSX -UDATADIR
+endif
+endif
+endif
+
+
+ifeq ($(ENABLE_AUDIO), true)
+CFLAGS:=$(CFLAGS) -DUSE_AUDIO=1
+OBJFILES:=$(OBJFILES)
+endif
+
+ifeq ($(ENABLE_OPENGL), true)
+CFLAGS:=$(CFLAGS) -DHAVE_OPENGL=1
+OBJFILES:=$(OBJFILES) glSDL.o
+ifeq ($(PLATFORM), Linux)
+LDFLAGS:=$(LDFLAGS) -lGL
+endif
+endif
+
+ifeq ($(ENABLE_DGA), true)
+ifeq ($(PLATFORM), Linux)
+CFLAGS:=$(CFLAGS) -DUSE_DGA=1
+endif
+endif
+
+ifeq ($(DEBUG_MODE), true)
+CFLAGS:=$(CFLAGS) -g
+LDFLAGS:=$(LDFLAGS) -g
+endif
+
+ifeq ($(MORE_DEBUG), true)
+CFLAGS:=$(CFLAGS) -DDEBUG=1
+endif
+
+CXXFLAGS=${CFLAGS}
+
