@@ -990,19 +990,19 @@ mml_play:
   SelIA ia2[] = { {FLOBO,  120}, {JEKO , 110}, {TANIA, 100}, {FLOBO,  50}, {GYOM , 120}, {TANIA, 60}, {JEKO,   50}, {GYOM,  60}, {RANDOM,0} };
   SelIA ia3[] = { {TANIA,  100}, {JEKO ,  80}, {GYOM ,  80}, {JEKO,   50}, {TANIA,  30}, {GYOM,  30}, {GYOM,   20}, {GYOM,  10}, {RANDOM,0} };
 
-  SelIA *ia = ia1;
+  SelIA *ia = &(ia1[0]);
 
   if (menu_active_is (singleGameMenu, kLevelMedium))
-    ia = ia2;
+    ia = &(ia2[0]);
   else if (menu_active_is (singleGameMenu, kLevelHard))
-    ia = ia3;
+    ia = &(ia3[0]);
     
   int score1 = 0;
   int score2 = 0;
   int lives  = 3;
-  if (menu_active_is(looserMenu    , "NO"))
+  if (menu_active_is(looserMenu   ,  "NO"))
     menu_next_item(looserMenu);
-  if (menu_active_is(nextLevelMenu, "NO"))
+  if (menu_active_is(nextLevelMenu,  "NO"))
     menu_next_item(nextLevelMenu);
   if (menu_active_is(gameOver2PMenu, "NO"))
     menu_next_item(gameOver2PMenu);
@@ -1072,12 +1072,9 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
 
 void PuyoCommander::initControllers()
 {
-    printf("%i joysticks were found.\n\n", SDL_NumJoysticks() );
-    printf("The names of the joysticks are:\n");
     numJoysticks = SDL_NumJoysticks();
     for( int i=0 ; i < numJoysticks ; i++ ) 
     {
-        printf("    %s\n", SDL_JoystickName(i));
         joystick[i] = SDL_JoystickOpen(i);
     }
   SDL_JoystickEventState(SDL_ENABLE);

@@ -20,7 +20,7 @@ struct PosEvaluator {
              int IASecondLevelPuyoValue,
              int IAConstructorLevel,
              int IAHeightAgressivity,
-             int IAHeightFactor)
+             int IAHeightFactor, int myRand)
   {
     int f_y = 0;
     int c_x = 0;
@@ -69,7 +69,7 @@ struct PosEvaluator {
     if ( (f_color == c_color) && ( (c_x==f_x) || (c_y==f_y) ) ) score += IAPuyoValue;
 
     /* Si l'un des deux puyos est vraiment tres haut => vraiment pas bien ! */
-    if ((f_y < 2) && (c_y < 2)) score -= 1000;
+    if ((f_y < 2) || (c_y < 2)) score -= 1000;
 
     /* Si les deux puyos sont suffisament bas => mode attaque ! */
     if ((f_y >= IAHeightAgressivity) && (c_y >= IAHeightAgressivity))
@@ -164,6 +164,7 @@ struct PosEvaluator {
       }
     }
 
+    score += myRand;
     return score;
   }
     
@@ -285,16 +286,21 @@ void PuyoIA::cycle()
                 for (int i=PUYODIMX*4-3; i>=0; --i)
                 {
                     if ((f_color == PUYO_EMPTY)||(c_color==PUYO_EMPTY)) return;
+                    int myRand = 0;
+
+                    if (type == FLOBO) {
+                        myRand = (int) ((double)IAPuyoValue*2*(double)random()/(RAND_MAX+1.0));
+                    }
+                    else if (type == JEKO) {
+                        myRand = (int) ((double)IAPuyoValue*(double)random()/(RAND_MAX+1.0)/2.0);
+                    }
+                    
 
                     /* IAPuyoValue / IASecondLevelPuyoValue / IAConstructorLevel / IAHeightAgressivity / IAHeightFactor */
                     int val = evaluator[i].update(attachedGame, f_color, c_color,
-                            IAPuyoValue, IASecondLevelPuyoValue, IAConstructorLevel, IAHeightAgressivity, IAHeightFactor);
-                    if (type == FLOBO) {
-                        val += (int) ((double)IAPuyoValue*2*rand()/(RAND_MAX+1.0));
-                    }
-                    else if (type == JEKO) {
-                        val += (int) ((double)IAPuyoValue*rand()/(RAND_MAX+1.0)/2.0);
-                    }
+                            IAPuyoValue, IASecondLevelPuyoValue, IAConstructorLevel, IAHeightAgressivity, IAHeightFactor,
+                            myRand);
+                    
                     if (val >= max) max = val;
                 }
                 

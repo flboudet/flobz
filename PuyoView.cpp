@@ -159,7 +159,6 @@ public:
         float offsetA = sin(angle) * TSIZE;
         float offsetB = cos(angle) * TSIZE * (counterclockwise ? -1 : 1);
         SDL_Rect drect;
-        //fprintf(stderr, "%x\n", targetSurface);
         drect.w = targetSurface->w;
         drect.h = targetSurface->h;
         drect.y = -semiMove * TSIZE / 2;
@@ -992,34 +991,30 @@ void PuyoStarter::run(int score1, int score2, int lives)
           stopRender();
         } // GameOver Visible
       }
-      switch (event.type) {
-        case SDL_KEYDOWN:
-          switch (event.key.keysym.sym) {
-            case SDLK_y:
-            case SDLK_RETURN:
-              if (gameover)
-              {
-                if (menu_active_is(commander->gameOverMenu, "NO"))
-                  menu_next_item(commander->gameOverMenu);
-                quit = 1;
-              }
-              break;
-            case SDLK_n:
-              if (!gameover) break;
-            case SDLK_ESCAPE:
-              if (menu_active_is(commander->gameOverMenu, "YES"))
-                menu_next_item(commander->gameOverMenu);
-              quit = 1;
-              break;
-            default:
-              break;
+      GameControlEvent controlEvent2;
+      commander->getControlEvent(event, &controlEvent2);
+      switch (controlEvent2.cursorEvent) {
+        case GameControlEvent::kStart:
+          if (gameover)
+          {
+            if (menu_active_is(commander->gameOverMenu, "NO"))
+              menu_next_item(commander->gameOverMenu);
+            quit = 1;
           }
           break;
-        case SDL_QUIT:	/* SDL_QUIT event (window close) */
+        case GameControlEvent::kBack:
+          if (menu_active_is(commander->gameOverMenu, "YES"))
+            menu_next_item(commander->gameOverMenu);
           quit = 1;
           break;
         default:
           break;
+      }
+      if(event.type == SDL_QUIT) {
+          if (menu_active_is(commander->gameOverMenu, "YES"))
+            menu_next_item(commander->gameOverMenu);
+          quit = 1;
+          exit(0);
       }
     }
     commander->updateAll(this);
