@@ -103,21 +103,27 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     Buffer<int> addNeutrals= message.getIntArray(ADD_NEUTRALS);
     if (addNeutrals.size() > 0) {
        if (delegate != NULL) {
-            delegate->gameDidAddNeutral(findPuyo(addNeutrals[0]), addNeutrals[1]);
+            for (int i = 0, j = addNeutrals.size() ; i < j ; i += 2) {
+                delegate->gameDidAddNeutral(findPuyo(addNeutrals[i]), addNeutrals[i+1]);
+            }
         }
     }
     
     Buffer<int> turnBuffer= message.getIntArray(COMPANION_TURN);
     if (turnBuffer.size() > 0) {
         if (delegate != NULL) {
-            delegate->companionDidTurn(findPuyo(turnBuffer[0]), turnBuffer[1], turnBuffer[2]);
+            for (int i = 0, j = turnBuffer.size() ; i < j ; i += 3) {
+                delegate->companionDidTurn(findPuyo(turnBuffer[i]), turnBuffer[i+1], turnBuffer[i+2]);
+            }
         }
     }
     
     Buffer<int> didFall= message.getIntArray(DID_FALL);
     if (didFall.size() > 0) {
        if (delegate != NULL) {
-            delegate->puyoDidFall(findPuyo(didFall[0]), didFall[1], didFall[2]);
+            for (int i = 0, j = didFall.size() ; i < j ; i += 3) {
+                delegate->puyoDidFall(findPuyo(didFall[i]), didFall[i+1], didFall[i+2]);
+            }
         }
     }
     
