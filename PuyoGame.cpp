@@ -458,7 +458,7 @@ int PuyoGame::getSamePuyoAround(int X, int Y, PuyoState color)
           marked[X][Y+1] = 1;
           nFound++;
       }
-      if ((X+1>PUYODIMX) && !marked[X+1][Y] && (getPuyoCellAt(X+1,Y) == color)) {
+      if ((X+1<PUYODIMX) && !marked[X+1][Y] && (getPuyoCellAt(X+1,Y) == color)) {
           again = true;
           mx[nFound] = X+1;
           my[nFound] = Y;

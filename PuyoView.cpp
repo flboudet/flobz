@@ -791,7 +791,7 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel)
 	attachedGameB = new PuyoGame(&attachedRandom);
 
   if (aiLeft) {
-    randomPlayer = new PuyoIA(CASTOR, aiLevel, attachedGameA);
+    randomPlayer = new PuyoIA(POLLUX, aiLevel, attachedGameA);
     perso[0] = IMG_Load_DisplayFormatAlpha("perso1_1.png");
     perso[1] = IMG_Load_DisplayFormatAlpha("perso1_2.png");
   }

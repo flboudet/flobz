@@ -5,7 +5,8 @@
 
 enum IA_Type {
   RANDOM,
-  CASTOR
+  CASTOR,
+  POLLUX
 };
 
 class PuyoIA : public virtual PuyoPlayer {
