@@ -23,11 +23,13 @@ class InputSwitch
     inline bool isDown() const { return !isup; }
 
     /* Meta-Informations about the switch */
-    virtual bool isArrowUp()   const { return false; }
-    virtual bool isArrowDown() const { return false; }
-    virtual bool isValidate()  const { return false; }
-    virtual bool isCancel()    const { return false; }
-    virtual bool isPause()     const { return false; }
+    virtual bool isArrowUp()    const { return false; }
+    virtual bool isArrowDown()  const { return false; }
+    virtual bool isArrowLeft()  const { return false; }
+    virtual bool isArrowRight() const { return false; }
+    virtual bool isValidate()   const { return false; }
+    virtual bool isCancel()     const { return false; }
+    virtual bool isPause()      const { return false; }
 
   private:
     bool isup;
@@ -49,6 +51,8 @@ class KeyInputSwitch : public InputSwitch
 
     virtual bool isArrowUp()   const;
     virtual bool isArrowDown() const;
+    virtual bool isArrowLeft()  const;
+    virtual bool isArrowRight() const;
     virtual bool isValidate()  const;
     virtual bool isCancel()    const;
     virtual bool isPause()     const;
@@ -89,6 +93,8 @@ class JoystickAxisSwitch : public InputSwitch
 
     virtual bool isArrowUp()   const;
     virtual bool isArrowDown() const;
+    virtual bool isArrowLeft()  const;
+    virtual bool isArrowRight() const;
 };
 
 class InputFromIDAndName : public InputSwitch

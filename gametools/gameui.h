@@ -1,6 +1,7 @@
 #ifndef GAMEUI_H
 #define GAMEUI_H
 
+#include "SDL_Painter.h"
 #include "GameControls.h"
 #include "ios_fc.h"
 #include "vec3.h"
@@ -61,8 +62,8 @@ namespace gameui {
       // default behaviour is to lost the focus
       virtual void eventOccured(GameControlEvent *event);
 
-      void giveFocus()       { focus = true;  }
-      void lostFocus()       { focus = false; }
+      virtual void giveFocus()       { focus = true;  }
+      virtual void lostFocus()       { focus = false; }
       bool haveFocus() const { return focus;  }
       
     protected:
@@ -116,11 +117,23 @@ namespace gameui {
       void setPolicy(GameUIEnum policy);
       void arrangeWidgets();
 
+      void eventOccured(GameControlEvent *event);
+      void giveFocus();
+      void lostFocus();
+
     protected:
       virtual float getSortingAxe(const Vec3 &v3) const = 0;
       virtual void setSortingAxe(Vec3 &v3, float value) = 0;
+      virtual bool isPrevEvent(GameControlEvent *event) const = 0;
+      virtual bool isNextEvent(GameControlEvent *event) const = 0;
+      virtual bool isOtherDirection(GameControlEvent *event) const = 0;
 
       GameUIEnum policy;
+      int        activeWidget;
+
+    private:
+      void setActiveWidget(int i);
+      bool giveFocusToActiveWidget();
   };
 
 
@@ -129,8 +142,24 @@ namespace gameui {
       VBox(GameLoop *loop = NULL) : Box(loop) {}
 
     protected:
-      virtual float getSortingAxe(const Vec3 &v3) const        { return v3.y;  }
-      virtual void  setSortingAxe(Vec3 &v3, float value)       { v3.y = value; }
+      float getSortingAxe(const Vec3 &v3) const        { return v3.y;  }
+      void  setSortingAxe(Vec3 &v3, float value)       { v3.y = value; }
+      bool isPrevEvent(GameControlEvent *event) const;
+      bool isNextEvent(GameControlEvent *event) const;
+      bool isOtherDirection(GameControlEvent *event) const;
+  };
+
+
+  class HBox : public Box {
+    public:
+      HBox(GameLoop *loop = NULL) : Box(loop) {}
+
+    protected:
+      float getSortingAxe(const Vec3 &v3) const        { return v3.x;  }
+      void  setSortingAxe(Vec3 &v3, float value)       { v3.x = value; }
+      bool isPrevEvent(GameControlEvent *event) const;
+      bool isNextEvent(GameControlEvent *event) const;
+      bool isOtherDirection(GameControlEvent *event) const;
   };
 
 
@@ -158,19 +187,21 @@ namespace gameui {
       String label;
   };
 
-/*
+
   class Button : public Text {
     public:
       Button(const String &label, SoFont *fontActive = NULL, SoFont *fontInactive = NULL);
 
-    protected:
-      void draw(SDL_Surface *screen) const;
+      void eventOccured(GameControlEvent *event);
 
+      void lostFocus();
+      void giveFocus();
+      
     private:
       SoFont *fontActive;
       SoFont *fontInactive;
   };
-*/
+
 
   class Separator : public Widget {
     public:

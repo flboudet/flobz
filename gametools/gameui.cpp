@@ -114,6 +114,7 @@ namespace gameui {
   Box::Box(GameLoop *loop) : WidgetContainer(loop)
   {
     setPolicy(GameUIDefaults::CONTAINER_POLICY);
+    activeWidget = 0;
   }
 
   void Box::setPolicy(GameUIEnum policy)
@@ -164,6 +165,128 @@ namespace gameui {
     }
   }
   
+  void Box::eventOccured(GameControlEvent *event)
+  {
+    if (event->isUp)
+      return;
+
+    if (activeWidget < 0) activeWidget = 0;
+    if (activeWidget >= getNumberOfChilds())
+      activeWidget = getNumberOfChilds() - 1;
+ 
+    Widget *child = getChild(activeWidget);
+    child->giveFocus();
+    child->eventOccured(event);
+
+    if (child->haveFocus()) return;
+    int direction = 0;
+    
+    if (isPrevEvent(event))
+      direction = -1;
+    else if (isNextEvent(event))
+      direction = 1;
+    else {
+      if (isOtherDirection(event))
+        lostFocus();
+      return;
+    }
+
+    bool childHaveFocus;    
+    do {
+      activeWidget += direction;
+      if (activeWidget < 0) {
+        setActiveWidget(0);
+        lostFocus();
+        return;
+      }
+      if (activeWidget >= getNumberOfChilds()) {
+        setActiveWidget(getNumberOfChilds() - 1);
+        lostFocus();
+        return;
+      }
+      childHaveFocus = giveFocusToActiveWidget();
+    }
+    while (!childHaveFocus);
+  }
+
+  void Box::setActiveWidget(int i)
+  {
+    activeWidget = i;
+    if (activeWidget < 0)
+      activeWidget = 0;
+    if (activeWidget >= getNumberOfChilds())
+      activeWidget = getNumberOfChilds() - 1;
+    giveFocusToActiveWidget();
+   }
+
+  bool Box::giveFocusToActiveWidget()
+  {
+    GameControlEvent ev;
+    ev.cursorEvent = GameControlEvent::kCursorNone;
+    ev.gameEvent   = GameControlEvent::kGameNone;
+    ev.isUp        = false;
+
+    Widget *child = getChild(activeWidget);
+    child->giveFocus();
+    child->eventOccured(&ev);
+    return child->haveFocus();
+  }
+    
+  void Box::giveFocus()
+  {
+    WidgetContainer::giveFocus();
+    if (getNumberOfChilds() > 0) {
+      Widget *child = getChild(activeWidget);
+      child->giveFocus();
+    }
+  }
+  
+  void Box::lostFocus()
+  {
+    WidgetContainer::lostFocus();
+    if (getNumberOfChilds() > 0) {
+      Widget *child = getChild(activeWidget);
+      child->lostFocus();
+    }
+  }
+  
+
+  //
+  // HBox
+  // 
+  bool HBox::isPrevEvent(GameControlEvent *event) const
+  {
+    return event->cursorEvent == GameControlEvent::kLeft;
+  }
+  
+  bool HBox::isNextEvent(GameControlEvent *event) const
+  {
+    return event->cursorEvent == GameControlEvent::kRight;
+  }
+  
+  bool HBox::isOtherDirection(GameControlEvent *event) const
+  {
+    return (event->cursorEvent == GameControlEvent::kUp)
+      ||   (event->cursorEvent == GameControlEvent::kDown);
+  }
+
+
+  //
+  // VBox
+  //
+  bool VBox::isPrevEvent(GameControlEvent *event) const
+  {
+    return event->cursorEvent == GameControlEvent::kUp;
+  }
+  bool VBox::isNextEvent(GameControlEvent *event) const
+  {
+    return event->cursorEvent == GameControlEvent::kDown;
+  }
+  bool VBox::isOtherDirection(GameControlEvent *event) const
+  {
+    return (event->cursorEvent == GameControlEvent::kRight)
+      ||   (event->cursorEvent == GameControlEvent::kLeft);
+  }
 
   //
   // ScreenVBox
@@ -173,6 +296,7 @@ namespace gameui {
   {
     setPosition(Vec3(x, y, 1.0f));
     setSize(Vec3(width, height, 1.0f));
+    giveFocus();
   }
 
   void ScreenVBox::setBackground(IIM_Surface *bg)
@@ -196,11 +320,14 @@ namespace gameui {
   void ScreenVBox::onEvent(GameControlEvent *event)
   {
     VBox::eventOccured(event);
+    VBox::giveFocus();
+    requestDraw();
   }
 
   //
   // Text
   // 
+
   Text::Text(const String &label, SoFont *font)
     : font(font), label(label)
   {
@@ -213,6 +340,53 @@ namespace gameui {
     SoFont_PutString(font, screen, (int)getPosition().x, (int)getPosition().y, (const char*)label, NULL);
   }
 
+  //
+  // Button
+  // 
+
+  Button::Button(const String &label, SoFont *fontActive, SoFont *fontInactive)
+    : Text(label, fontInactive)
+  {
+    if (fontInactive == NULL) fontInactive = GameUIDefaults::FONT_INACTIVE;
+    if (fontActive == NULL)   fontActive = GameUIDefaults::FONT;
+    
+    this->fontActive   = fontActive;
+    this->fontInactive = fontInactive;
+
+    font = fontInactive;
+  }
+
+  void Button::eventOccured(GameControlEvent *event)
+  {
+    if (event->isUp)
+      return;
+    
+    if (event->cursorEvent == GameControlEvent::kUp)
+      lostFocus();
+    if (event->cursorEvent == GameControlEvent::kRight)
+      lostFocus();
+    if (event->cursorEvent == GameControlEvent::kLeft)
+      lostFocus();
+    if (event->cursorEvent == GameControlEvent::kDown)
+      lostFocus();
+  }
+
+  void Button::lostFocus() {
+    Text::lostFocus();
+    font = fontInactive;
+    requestDraw();
+  }
+      
+
+  void Button::giveFocus() {
+    Text::giveFocus();
+    font = fontActive;
+    requestDraw();
+  }
+  
+  //
+  // Separator
+  //
 
   Separator::Separator(float width, float height)
   {

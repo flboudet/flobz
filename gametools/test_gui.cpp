@@ -1,7 +1,6 @@
 #include "gameui.h"
 using namespace gameui;
 
-extern SDL_Surface *display;
 
 class ExitComponent : public IdleComponent
 {
@@ -15,6 +14,7 @@ class ExitComponent : public IdleComponent
   }
 };
 
+
 class PuyoLoop : public GameLoop
 {
   public:
@@ -25,6 +25,7 @@ class PuyoLoop : public GameLoop
     }
 };
 
+
 class MainMenuScreen : public ScreenVBox
 {
   public:
@@ -33,10 +34,23 @@ class MainMenuScreen : public ScreenVBox
       setBackground(IIM_Load_DisplayFormat("Background.jpg"));
 
       // add some title
-      for (int i=1; i<=10; ++i)
-        add(new Text(String("FloboPuyo #") + i));
+      for (int i=1; i<=2; ++i)
+        add(new Button(String("FloboPuyo #") + i));
+      
+      HBox *box1 = new HBox;
+      VBox *box2 = new VBox;
+      add(box1);
+      box1->add(new Button("Left"));
+      box1->add(new Button("Middle"));
+      box1->add(box2);
+      box2->add(new Button("Right-Up"));
+      box2->add(new Button("Right-Down"));
+      
+      for (int i=6; i<=7; ++i)
+        add(new Button(String("FloboPuyo #") + i));
     }
 };
+
 
 int main()
 {

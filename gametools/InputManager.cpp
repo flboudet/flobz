@@ -111,6 +111,12 @@ bool KeyInputSwitch::isArrowUp()   const {
 bool KeyInputSwitch::isArrowDown() const {
   return keysym == SDLK_DOWN;
 }
+bool KeyInputSwitch::isArrowLeft() const {
+  return keysym == SDLK_LEFT;
+}
+bool KeyInputSwitch::isArrowRight() const {
+  return keysym == SDLK_RIGHT;
+}
 bool KeyInputSwitch::isValidate()  const {
   return keysym == SDLK_RETURN;
 }
@@ -172,6 +178,12 @@ bool JoystickAxisSwitch::isArrowUp()   const {
 }
 bool JoystickAxisSwitch::isArrowDown() const {
   return (axis == 1) && (maximum);
+}
+bool JoystickAxisSwitch::isArrowLeft()   const {
+  return (axis == 0) && (!maximum);
+}
+bool JoystickAxisSwitch::isArrowRight() const {
+  return (axis == 0) && (maximum);
 }
 /** EVENT HANDLERS */
 

@@ -5,6 +5,8 @@
 
 #include "IosImgProcess.h"
 
+extern SDL_Surface *display;
+
 struct DrawElt {
   IIM_Surface *surf;
   SDL_Rect     rect;
