@@ -18,6 +18,7 @@ namespace gameui {
     {
       for (int i = 0; i < GAMEUIENUM_LAST; ++i)
         actions[i] = NULL;
+      requestDraw();
     }
 
   void Widget::draw(SDL_Surface *screen, bool force) const

@@ -27,7 +27,7 @@
 #include "PuyoNetworkStarter.h"
 
 NetCenterMenu::NetCenterChatArea::NetCenterChatArea(int height)
-    : height(height), lines(new (HBox *)[height]), names(new (Text *)[height]), texts(new (Text *)[height])
+    : height(height), lines(new (HBox *[height])), names(new (Text *[height])), texts(new (Text *[height]))
 {
     for (int i = 0 ; i < height ; i++) {
         lines[i] = new HBox;
