@@ -21,26 +21,44 @@
 
 #include "ios_igpmessagebox.h"
 #include "ios_standardmessage.h"
+#include "ios_dirigeable.h"
 
 namespace ios_fc {
 
-    class IgpMessage : public StandardMessage {
+    class IgpMessage : public StandardMessage, public Dirigeable {
     public:
-        IgpMessage(int serialID, IgpMessageBox &owner);
-        IgpMessage(const Buffer<char> serialized, IgpMessageBox &owner) throw(InvalidMessageException);
+        IgpMessage(int serialID, IgpMessageBox &owner, int igpPeerIdent);
+        IgpMessage(const Buffer<char> serialized, IgpMessageBox &owner, int igpPeerIdent) throw(InvalidMessageException);
         virtual ~IgpMessage();
         void sendBuffer(Buffer<char> out) const;
-        
+        // Dirigeable
+        PeerAddress getPeerAddress();
+        PeerAddress getBroadcastAddress();
+        void setPeerAddress(PeerAddress);
     private:
+        class IgpPeerAddressImpl;
         IgpMessageBox &owner;
+        int igpPeerIdent;
     };
 
-    IgpMessage::IgpMessage(int serialID, IgpMessageBox &owner) : StandardMessage(serialID), owner(owner)
+    class IgpMessage::IgpPeerAddressImpl : public PeerAddressImpl {
+    public:
+        IgpPeerAddressImpl(int igpIdent) : igpIdent(igpIdent) {}
+        virtual bool operator == (const PeerAddressImpl &a) const {
+            const IgpPeerAddressImpl &comp = dynamic_cast<const IgpPeerAddressImpl &>(a);
+            return (comp.igpIdent == igpIdent);
+        }
+        inline int getIgpIdent() const { return igpIdent; }
+    private:
+        int igpIdent;
+    };
+    
+    IgpMessage::IgpMessage(int serialID, IgpMessageBox &owner, int igpPeerIdent) : StandardMessage(serialID), owner(owner), igpPeerIdent(igpPeerIdent)
     {
     }
 
-    IgpMessage::IgpMessage(const Buffer<char> serialized, IgpMessageBox &owner) throw(InvalidMessageException)
-    : StandardMessage(serialized), owner(owner)
+    IgpMessage::IgpMessage(const Buffer<char> serialized, IgpMessageBox &owner, int igpPeerIdent) throw(InvalidMessageException)
+    : StandardMessage(serialized), owner(owner), igpPeerIdent(igpPeerIdent)
     {
     }
     
@@ -50,9 +68,28 @@ namespace ios_fc {
   
     void IgpMessage::sendBuffer(Buffer<char> out) const
     {
-        owner.sendBuffer(out, isReliable());
+        owner.sendBuffer(out, isReliable(), igpPeerIdent);
     }
     
+    // Dirigeable
+    PeerAddress IgpMessage::getPeerAddress()
+    {
+        return PeerAddress(new IgpPeerAddressImpl(igpPeerIdent));
+    }
+    
+    PeerAddress IgpMessage::getBroadcastAddress()
+    {
+        return PeerAddress(new IgpPeerAddressImpl(0));
+    }
+    
+    void IgpMessage::setPeerAddress(PeerAddress newPeerAddress)
+    {
+        IgpPeerAddressImpl *newPeerAddressImpl = dynamic_cast<IgpPeerAddressImpl *>(newPeerAddress.getImpl());
+        if (newPeerAddressImpl != NULL) {
+            igpPeerIdent = newPeerAddressImpl->getIgpIdent();
+        }
+        else throw Exception("Incompatible peer address type!");
+    }
     
     IgpMessageBox::IgpMessageBox(const String hostName, int portID) : igpClient(hostName, portID), sendSerialID(0)
     {
@@ -75,18 +112,18 @@ namespace ios_fc {
 
     Message * IgpMessageBox::createMessage()
     {
-        return new IgpMessage(++sendSerialID, *this);
+        return new IgpMessage(++sendSerialID, *this, destIdent);
     }
 
-    void IgpMessageBox::sendBuffer(VoidBuffer out, bool reliable)
+    void IgpMessageBox::sendBuffer(VoidBuffer out, bool reliable, int igpDestIdent)
     {
-        igpClient.sendMessage(destIdent, out, reliable);
+        igpClient.sendMessage(igpDestIdent, out, reliable);
     }
     
     void IgpMessageBox::onMessage(VoidBuffer message, int origIdent, int destIdent)
     {
         try {
-            IgpMessage incomingMessage(message, *this);
+            IgpMessage incomingMessage(message, *this, origIdent);
             for (int i = 0, j = listeners.size() ; i < j ; i++) {
                 MessageListener *currentListener = listeners[i];
                 currentListener->onMessage(incomingMessage);
