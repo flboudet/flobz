@@ -13,14 +13,16 @@ struct DrawElt {
 class SDL_Painter
 {
   public:
+      SDL_Surface *backGround;
+      SDL_Surface *gameScreen;
+      SDL_Surface *display;
+
       SDL_Painter(SDL_Surface *gameScreen = NULL, SDL_Surface *bg = NULL);
       void requestDraw(SDL_Surface *surf, SDL_Rect *where);
       void draw(SDL_Surface *surf);
       void redrawAll(SDL_Surface *surf);
-
-      SDL_Surface *backGround;
-      SDL_Surface *gameScreen;
-      SDL_Surface *display;
+      void draw()      { draw(gameScreen); }
+      void redrawAll() { redrawAll(gameScreen); }
 
   private:
 

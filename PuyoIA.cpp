@@ -55,16 +55,10 @@ struct PosEvaluator {
     f_y = PUYODIMY - f_y - 1;
     c_y = PUYODIMY - c_y - 1;
 
-//#define toto(X,Y) (game->getPuyoAt(X,Y))->getPuyoState()     
-//(printf("  - %2d %2d %2d\n",toto(c_x-1,c_y-1),toto(c_x,c_y-1),toto(c_x+1,c_y-1)));
-//(printf("  - %2d %2d %2d\n",toto(c_x-1,c_y  ),toto(c_x,c_y  ),toto(c_x+1,c_y)));
-//(printf("  - %2d %2d %2d\n",toto(c_x-1,c_y+1),toto(c_x,c_y+1),toto(c_x+1,c_y+1)));
-
-
     /* Si l'un des deux puyos est tout en haut => pire cas ! */
     if ((f_y < 0) || (c_y < 0))
     {
-      score = -5000;
+      score = -10000;
       return score;
     }
 
@@ -220,9 +214,54 @@ PuyoState PuyoIA::extractColor(PuyoState A) const
 
 void PuyoIA::cycle()
 {
+    int IAPuyoValue = 100;
+    int IASecondLevelPuyoValue = 30;
+    int IAConstructorLevel = 3;
+    int IAHeightAgressivity = 6;
+    int IAHeightFactor = 2;
+
     switch (type) {
-        case CASTOR:
-        case POLLUX:
+        case GYOM:
+            break;
+        case TANIA:
+            IAConstructorLevel = 1;
+            IAHeightAgressivity = 9;
+            break;
+        case JEKO:
+            IAConstructorLevel = 1;
+            IAHeightAgressivity = 3;
+            IAHeightFactor = 1;
+            break;
+        case FLOBO:
+            IAConstructorLevel = 0; 
+            IAHeightAgressivity = 0xffff; // Inhibits agressivity.
+            IAHeightFactor = 0;
+            IAPuyoValue = 50;
+            IASecondLevelPuyoValue = 0;
+            break;
+        default:
+            break;
+    }
+
+    switch (type) {
+            
+        case RANDOM:
+            switch (random() % 50) {
+                case 0:
+                    attachedGame->rotateLeft();
+                    break;
+                case 1:
+                    attachedGame->moveLeft();
+                    break;
+                case 2:
+                    attachedGame->moveRight();
+                    break;
+                default:
+                    break;
+            }
+            break;
+
+        default:
         {
             if (!firstLine && (attachedGame->getFallingY() == 1) && (choosenMove != -1))
                 choosenMove = -1;
@@ -248,7 +287,14 @@ void PuyoIA::cycle()
                     if ((f_color == PUYO_EMPTY)||(c_color==PUYO_EMPTY)) return;
 
                     /* IAPuyoValue / IASecondLevelPuyoValue / IAConstructorLevel / IAHeightAgressivity / IAHeightFactor */
-                    int val = evaluator[i].update(attachedGame, f_color, c_color,100,30,3,6,2);
+                    int val = evaluator[i].update(attachedGame, f_color, c_color,
+                            IAPuyoValue, IASecondLevelPuyoValue, IAConstructorLevel, IAHeightAgressivity, IAHeightFactor);
+                    if (type == FLOBO) {
+                        val += (int) ((double)IAPuyoValue*2*rand()/(RAND_MAX+1.0));
+                    }
+                    else if (type == JEKO) {
+                        val += (int) ((double)IAPuyoValue*rand()/(RAND_MAX+1.0)/2.0);
+                    }
                     if (val >= max) max = val;
                 }
                 
@@ -258,45 +304,28 @@ void PuyoIA::cycle()
                     if (evaluator[i].score == max) {
                         nbKeep ++;
                         evaluator[i].keep = true;
-                        //fprintf(stderr,"!");
                     }
                     else evaluator[i].keep = false;
-                    //fprintf(stderr,"s:%d ",evaluator[i].score);
                 }
 
-                //fprintf(stderr,"\nMax : %d / nb to keep : %d ",max,nbKeep);
-                int tmp = 1 + ((random() / 7) % nbKeep);
+                if (nbKeep > 0) {
+                    int tmp = 1 + ((random() / 7) % nbKeep);
 
-                for (int i=PUYODIMX*4-3; i>=0; --i)
-                {
-                    if (evaluator[i].keep)
+                    for (int i=PUYODIMX*4-3; i>=0; --i)
                     {
-                        if (tmp == 1)
+                        if (evaluator[i].keep)
                         {
-                            //fprintf(stderr,"\nchoice : %d/%d (%d)\n",i,nbKeep,evaluator[i].score);
-                            choosenMove = i;
-                            break;
+                            if (tmp == 1)
+                            {
+                                //fprintf(stderr,"\nchoice : %d/%d (%d)\n",i,nbKeep,evaluator[i].score);
+                                choosenMove = i;
+                                break;
+                            }
+                            tmp--;
                         }
-                        tmp--;
                     }
                 }
             }
         }
-            break;
-            
-        case RANDOM:
-            switch (random() % 50) {
-                case 0:
-                    attachedGame->rotateLeft();
-                    break;
-                case 1:
-                    attachedGame->moveLeft();
-                    break;
-                case 2:
-                    attachedGame->moveRight();
-                    break;
-                default:
-                    break;
-            }
     } 
 }

@@ -21,6 +21,7 @@ SDL_Surface *puyoEyesSwirl[4];
 
 SDL_Surface *puyoShadow;
 SDL_Surface *puyoFaces[5][16];
+SDL_Surface *live[4];
 
 static char PuyoGroupImageIndex[2][2][2][2] =
 { {  // empty bottom
@@ -658,9 +659,22 @@ static void loadShrinkXplode(void)
     loadShrinkXplode2(4,140.0f);
 }
 
-
-PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel)
+void PuyoStarter::stopRender()
 {
+  this->stopRendering = true;
+  iim_surface_convert_to_gray(painter.gameScreen);
+}
+
+void PuyoStarter::restartRender()
+{
+  this->stopRendering = false;
+  painter.redrawAll();
+}
+
+PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType)
+{
+  this->stopRendering = false;
+  this->paused = false;
   tickCounts = 0;
   this->commander = commander;
 
@@ -716,6 +730,11 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel)
         puyoFaces[0][14] = IMG_Load_DisplayFormatAlpha("v3bcd.png");
         puyoFaces[0][15] = IMG_Load_DisplayFormatAlpha("v4abcd.png");
     
+  live[0] = IMG_Load_DisplayFormatAlpha("0live.png");
+  live[1] = IMG_Load_DisplayFormatAlpha("1live.png");
+  live[2] = IMG_Load_DisplayFormatAlpha("2live.png");
+  live[3] = IMG_Load_DisplayFormatAlpha("3live.png");
+
 	for (int i = 0 ; i < 16 ; i++) {
 	  puyoFaces[1][i] = iim_surface_shift_hue(puyoFaces[0][i], 100);
 	}
@@ -739,7 +758,7 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel)
 	attachedGameB = new PuyoGame(&attachedRandom);
 
   if (aiLeft) {
-    randomPlayer = new PuyoIA(POLLUX, aiLevel, attachedGameA);
+    randomPlayer = new PuyoIA(aiType, aiLevel, attachedGameA);
     perso[0] = IMG_Load_DisplayFormatAlpha("perso1_1.png");
     perso[1] = IMG_Load_DisplayFormatAlpha("perso1_2.png");
   }
@@ -769,6 +788,7 @@ PuyoStarter::~PuyoStarter()
 
 void PuyoStarter::run(int score1, int score2, int lives)
 {
+  this->lives = lives;
   SDL_Rect drect;
   SDL_Event event;
   int quit = 0;
@@ -791,7 +811,7 @@ void PuyoStarter::run(int score1, int score2, int lives)
     bool right_danger = (attachedGameB->getMaxColumnHeight() > PUYODIMY - 4);
     bool danger = left_danger || right_danger;
     bool gameover = (!attachedGameA->isGameRunning() || !attachedGameB->isGameRunning());
-    
+
     if (gameover)
       audio_music_start(3);
     else if (danger)
@@ -804,167 +824,219 @@ void PuyoStarter::run(int score1, int score2, int lives)
     else
       currentPerso = 1;
 
-    while (SDL_PollEvent(&event) == 1) {
+    while (SDL_PollEvent(&event) == 1)
+    {
       if (attachedGameA->isGameRunning() &&
-	  attachedGameB->isGameRunning()) {
+          attachedGameB->isGameRunning()) {
+        if (!paused) {
 
-    GameControlEvent controlEvent;
-    commander->getControlEvent(event, &controlEvent);
-    switch (controlEvent.gameEvent) {
-        case GameControlEvent::kPlayer1Left:
-            if (randomPlayer == 0)
+          GameControlEvent controlEvent;
+          commander->getControlEvent(event, &controlEvent);
+          switch (controlEvent.gameEvent) {
+            case GameControlEvent::kPauseGame:
+              paused = true;
+              stopRender();
+              break;
+            case GameControlEvent::kPlayer1Left:
+              if (randomPlayer == 0)
                 attachedGameA->moveLeft();
-            break;
-        case GameControlEvent::kPlayer1Right:
-            if (randomPlayer == 0)
+              break;
+            case GameControlEvent::kPlayer1Right:
+              if (randomPlayer == 0)
                 attachedGameA->moveRight();
-            break;
-        case GameControlEvent::kPlayer1TurnLeft:
-            if (randomPlayer == 0)
+              break;
+            case GameControlEvent::kPlayer1TurnLeft:
+              if (randomPlayer == 0)
                 attachedGameA->rotateLeft();
-            break;
-        case GameControlEvent::kPlayer1TurnRight:
-            if (randomPlayer == 0)
+              break;
+            case GameControlEvent::kPlayer1TurnRight:
+              if (randomPlayer == 0)
                 attachedGameA->rotateRight();
-            break;
-        case GameControlEvent::kPlayer1Down:
-            if (randomPlayer == 0) {
+              break;
+            case GameControlEvent::kPlayer1Down:
+              if (randomPlayer == 0) {
                 attachedGameA->cycle();
                 if (attachedGameA->isEndOfCycle())
-                    downLeftIsDown = false;
+                  downLeftIsDown = false;
                 else
-                    downLeftIsDown = true;
-            }
-            break;
-        case GameControlEvent::kPlayer1DownUp:
-            if (randomPlayer == 0)
+                  downLeftIsDown = true;
+              }
+              break;
+            case GameControlEvent::kPlayer1DownUp:
+              if (randomPlayer == 0)
                 downLeftIsDown = false;
-            break;
-        case GameControlEvent::kPlayer2Left:
-            attachedGameB->moveLeft();
-            break;
-        case GameControlEvent::kPlayer2Right:
-            attachedGameB->moveRight();
-            break;
-        case GameControlEvent::kPlayer2TurnLeft:
-            attachedGameB->rotateLeft();
-            break;
-        case GameControlEvent::kPlayer2TurnRight:
-            attachedGameB->rotateRight();
-            break;
-        case GameControlEvent::kPlayer2Down:
-            attachedGameB->cycle();
-            if (attachedGameB->isEndOfCycle())
-                downIsDown = false;
-            else
-                downIsDown = true;
-            break;
-        case GameControlEvent::kPlayer2DownUp:
-            downIsDown = false;
-            break;
-        default:
-            break;
-    }
-
-	switch (event.type) {
-	case SDL_USEREVENT:
-          if (randomPlayer)
-        	  randomPlayer->cycle();
-	  if (event.user.code == 1) {
-	    drect.x = 0;
-	    drect.y = 0;
-	    drect.w = 640;
-	    drect.h = 480;
-	    attachedGameA->cycle();
-            if (attachedGameA->isEndOfCycle())
-              downLeftIsDown = false;
-	    attachedGameB->cycle();
-            if (attachedGameB->isEndOfCycle())
-              downIsDown = false;
-	  } else {
-	    if (downIsDown) {
-	      attachedGameB->cycle();
+              break;
+            case GameControlEvent::kPlayer2Left:
+              attachedGameB->moveLeft();
+              break;
+            case GameControlEvent::kPlayer2Right:
+              attachedGameB->moveRight();
+              break;
+            case GameControlEvent::kPlayer2TurnLeft:
+              attachedGameB->rotateLeft();
+              break;
+            case GameControlEvent::kPlayer2TurnRight:
+              attachedGameB->rotateRight();
+              break;
+            case GameControlEvent::kPlayer2Down:
+              attachedGameB->cycle();
               if (attachedGameB->isEndOfCycle())
                 downIsDown = false;
-            }
-	    if (downLeftIsDown) {
-	      attachedGameA->cycle();
-              if (attachedGameA->isEndOfCycle())
-                downLeftIsDown = false;
-            }
-	  }
-	  break;
-	default:
-	  break;
-	}
-      } else {
-        if (!menu_visible(commander->gameOverMenu)) {
-          const char *winner = 0;
-          char score[256];
-          if (leftPlayerWin())
-            if (rightPlayerWin())
-              winner = "Draw Game";
-            else {
-              winner = "Left Player";
-              score1 ++;
-            }
-          else {
-            winner = "Right Player";
-            score2 ++;
+              else
+                downIsDown = true;
+              break;
+            case GameControlEvent::kPlayer2DownUp:
+              downIsDown = false;
+              break;
+            default:
+              break;
           }
-          if (randomPlayer)
-            sprintf(score, "Level  : %d  ( %d Lives Left )", score2 + 1, lives);
-          else
-            sprintf(score, "Score  : %d - %d", score1, score2);
-          commander->showGameOver();
-          //SDL_BlitSurface(display,NULL,painter.gameScreen,NULL);
-          menu_set_value(commander->gameOverMenu, "Winner: ", winner);
-          menu_set_value(commander->gameOverMenu, "Current", score);
+
+          switch (event.type) {
+            case SDL_USEREVENT:
+              if (randomPlayer)
+                randomPlayer->cycle();
+              if (event.user.code == 1) {
+                drect.x = 0;
+                drect.y = 0;
+                drect.w = 640;
+                drect.h = 480;
+                attachedGameA->cycle();
+                if (attachedGameA->isEndOfCycle())
+                  downLeftIsDown = false;
+                attachedGameB->cycle();
+                if (attachedGameB->isEndOfCycle())
+                  downIsDown = false;
+              } else {
+                if (downIsDown) {
+                  attachedGameB->cycle();
+                  if (attachedGameB->isEndOfCycle())
+                    downIsDown = false;
+                }
+                if (downLeftIsDown) {
+                  attachedGameA->cycle();
+                  if (attachedGameA->isEndOfCycle())
+                    downLeftIsDown = false;
+                }
+              }
+              break;
+            default:
+              break;
+          }
+        } // !Paused
+        else {
+          GameControlEvent controlEvent;
+          commander->getControlEvent(event, &controlEvent);
+          switch (controlEvent.gameEvent) {
+            case GameControlEvent::kPauseGame:
+              paused = false;
+              restartRender();
+              break;
+          }
         }
+      } else // Not GameIsRunning
+      {
+        if (randomPlayer) {
+          if (rightPlayerWin()) {
+            commander->gameOverMenu = commander->nextLevelMenu;
+          }
+          else {
+            if (lives == 0) {
+              commander->gameOverMenu = commander->gameOver1PMenu;
+            }
+            else {
+              commander->gameOverMenu = commander->looserMenu;
+            }
+          }
+        }
+        else {
+          commander->gameOverMenu = commander->gameOver2PMenu;
+        }
+        
+        if (!menu_visible(commander->gameOverMenu)) {
+
+          char *lname[] = { "Fanzy", "Bob the Killer", "Big Rabbit", "Flying Saucer",
+            "Satanas", "Doctor X", "Tanya", "Master Gyom, King of the Puyos",
+            "X","Y","Z" };
+
+          if (leftPlayerWin()) score1++;
+          else if (rightPlayerWin()) score2++;
+
+          if (commander->gameOverMenu == commander->gameOver2PMenu) {
+            char winner[256];
+            char score[256];
+            sprintf(winner,"%d Wins!!!",(leftPlayerWin()?1:2));
+            sprintf(score, "%d - %d", score1, score2);
+            menu_set_value(commander->gameOverMenu, kPlayer, winner);
+            menu_set_value(commander->gameOverMenu, kScore,  score);
+          }
+          else if (commander->gameOverMenu == commander->nextLevelMenu) {
+            char level[256];
+            sprintf(level, "%d, vs. %s", score2+1, lname[score2]);
+            menu_set_value(commander->gameOverMenu, kNextLevel, level);
+          }
+          else if (commander->gameOverMenu == commander->looserMenu) {
+            char level[256];
+            char cont[256];
+            sprintf(level, "%d, vs. %s", score2+1, lname[score2]);
+            sprintf(cont, "%d", lives);
+            menu_set_value(commander->gameOverMenu, kCurrentLevel, level);
+            menu_set_value(commander->gameOverMenu, kContinueLeft, cont);
+          }
+          else if (commander->gameOverMenu == commander->gameOver1PMenu) {
+            char level[256];
+            sprintf(level, "%d (vs. %s)", score2+1, lname[score2]);
+            menu_set_value(commander->gameOverMenu, kYouGotToLevel, level);
+          }
+          commander->showGameOver();
+          stopRender();
+        } // GameOver Visible
       }
       switch (event.type) {
-      case SDL_KEYDOWN:
-	switch (event.key.keysym.sym) {
-	case SDLK_y:
-	case SDLK_RETURN:
-    if (gameover)
-    {
-      if (menu_active_is(commander->gameOverMenu, "NO"))
-        menu_next_item(commander->gameOverMenu);
-      quit = 1;
-    }
-	break;
-	case SDLK_n:
-    if (!gameover) break;
-  case SDLK_ESCAPE:
-    if (menu_active_is(commander->gameOverMenu, "YES"))
-      menu_next_item(commander->gameOverMenu);
-    quit = 1;
-	  break;
-	default:
-	  break;
-	}
-	break;
-      case SDL_QUIT:	/* SDL_QUIT event (window close) */
-	quit = 1;
-	break;
-      default:
-	break;
+        case SDL_KEYDOWN:
+          switch (event.key.keysym.sym) {
+            case SDLK_y:
+            case SDLK_RETURN:
+              if (gameover)
+              {
+                if (menu_active_is(commander->gameOverMenu, "NO"))
+                  menu_next_item(commander->gameOverMenu);
+                quit = 1;
+              }
+              break;
+            case SDLK_n:
+              if (!gameover) break;
+            case SDLK_ESCAPE:
+              if (menu_active_is(commander->gameOverMenu, "YES"))
+                menu_next_item(commander->gameOverMenu);
+              quit = 1;
+              break;
+            default:
+              break;
+          }
+          break;
+        case SDL_QUIT:	/* SDL_QUIT event (window close) */
+          quit = 1;
+          break;
+        default:
+          break;
       }
     }
     commander->updateAll(this);
 
-    areaA->cycleAnimation();
-    areaB->cycleAnimation();
+    if (!paused) {
+      areaA->cycleAnimation();
+      areaB->cycleAnimation();
 
-    tickCounts++;
-    event.user.type = SDL_USEREVENT;
-    event.user.code = 0;
-    SDL_PushEvent(&event);
-    if (tickCounts % 20 == 0) { // Vitesse du jeu
+      tickCounts++;
       event.user.type = SDL_USEREVENT;
-      event.user.code = 1;
+      event.user.code = 0;
       SDL_PushEvent(&event);
+      if (tickCounts % 20 == 0) { // Vitesse du jeu
+        event.user.type = SDL_USEREVENT;
+        event.user.code = 1;
+        SDL_PushEvent(&event);
+      }
     }
 
   }
@@ -978,34 +1050,46 @@ void PuyoStarter::run(int score1, int score2, int lives)
 
 void PuyoStarter::draw()
 {
-  SDL_Rect drect;
-
-  areaA->render();
-  areaB->render();
-  
-  drect.x = 21;
-  drect.y = -1;
-  drect.w = grid->w;
-  drect.h = grid->h;
-  painter.requestDraw(grid, &drect);
-  drect.x = 407;
-  drect.y = -1;
-  drect.w = grid->w;
-  drect.h = grid->h;
-  painter.requestDraw(grid, &drect);
-
-  areaA->renderNeutral();
-  areaB->renderNeutral();
-  if ((randomPlayer)&&(currentPerso>=0))
-  {
-    drect.x = 320 - perso[currentPerso]->w/2;
-    drect.y = 280 - perso[currentPerso]->h/2;
-    drect.w = perso[currentPerso]->w;
-    drect.h = perso[currentPerso]->h;
-    painter.requestDraw(perso[currentPerso], &drect);
+  if (stopRendering) {
+    SDL_BlitSurface(painter.gameScreen,NULL,display,NULL);
   }
-  //if (menu_visible(commander->gameOverMenu))
+  else {
+    SDL_Rect drect;
+
+    areaA->render();
+    areaB->render();
+
+    drect.x = 21;
+    drect.y = -1;
+    drect.w = grid->w;
+    drect.h = grid->h;
+    painter.requestDraw(grid, &drect);
+    drect.x = 407;
+    drect.y = -1;
+    drect.w = grid->w;
+    drect.h = grid->h;
+    painter.requestDraw(grid, &drect);
+
+    areaA->renderNeutral();
+    areaB->renderNeutral();
+    if ((randomPlayer)&&(currentPerso>=0))
+    {
+      drect.x = 320 - perso[currentPerso]->w/2;
+      drect.y = 280 - perso[currentPerso]->h/2;
+      drect.w = perso[currentPerso]->w;
+      drect.h = perso[currentPerso]->h;
+      painter.requestDraw(perso[currentPerso], &drect);
+    }
+
+    if ((randomPlayer)&&(lives>=0)&&(lives<=3))
+    {
+      drect.x = painter.gameScreen->w / 2 - live[lives]->w / 2;
+      drect.y = 436;
+      drect.w = live[lives]->w;
+      drect.h = live[lives]->h;
+      painter.requestDraw(live[lives], &drect);
+    }
+
     painter.draw(painter.gameScreen);
-  //else
-    //painter.draw(display);
+  }
 }

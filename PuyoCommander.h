@@ -10,6 +10,7 @@
 typedef struct GameControlEvent {
     enum {
         kGameNone,
+        kPauseGame,
         kPlayer1Left,
         kPlayer1Right,
         kPlayer1TurnLeft,
@@ -64,6 +65,11 @@ class PuyoCommander
   
   Menu *gameOverMenu;
   
+  Menu *gameOver2PMenu;
+  Menu *gameOver1PMenu;
+  Menu *nextLevelMenu;
+  Menu *looserMenu;
+
  private:
   // SoFont *menuFont;
   // SoFont *smallFont;
@@ -85,5 +91,17 @@ SDL_Surface * IMG_Load_DisplayFormatAlpha (const char *path);
 
 extern SDL_Surface *display;
 extern class PuyoCommander *theCommander;
+
+extern char *kYouDidIt;
+extern char *kNextLevel;
+extern char *kLooser;
+extern char *kCurrentLevel;
+extern char *kContinueLeft;
+extern char *kGameOver;
+extern char *kYouGotToLevel;
+extern char *kHitActionToContinue;
+extern char *kContinue;
+extern char *kPlayer;
+extern char *kScore;
 
 #endif // _PUYOCOMMANDER

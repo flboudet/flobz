@@ -64,7 +64,7 @@ class PuyoView : public virtual PuyoDelegate {
 
 class PuyoStarter : public PuyoDrawable {
   public:
-    PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel);
+    PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType);
     virtual ~PuyoStarter();
     void run(int score1, int score2, int lives);
     void draw();
@@ -78,6 +78,12 @@ class PuyoStarter : public PuyoDrawable {
     PuyoIA *randomPlayer;
     PuyoRandomSystem attachedRandom;
     int tickCounts;
+    int lives;
+    bool stopRendering;
+    bool paused;
+
+    void stopRender();
+    void restartRender();
 };
 
 #endif // _PUYOVIEW

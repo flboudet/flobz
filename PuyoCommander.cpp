@@ -13,6 +13,19 @@
 extern char *DATADIR;
 #endif
 
+char *kYouDidIt = "You Dit It!!!";
+char *kNextLevel = "Next Level:";
+char *kLooser = "Looser!!!";
+char *kCurrentLevel = "Current Level:";
+char *kContinueLeft = "Continue Left:";
+char *kGameOver = "Game Over!!!";
+char *kYouGotToLevel = "You get to level";
+char *kHitActionToContinue = "Hit action to continue...";
+char *kHitActionForMenu = "Hit action for menu...";
+char *kContinue    = "Continue? (y/n)";
+char *kPlayer      = "Player";
+char *kScore       = "Score:";
+
 static char *kAudioFX     = "Audio FX";
 static char *kMusic       = "Music";
 static char *kFullScreen  = "FullScreen";
@@ -247,7 +260,7 @@ MenuItems single_game_menu_load (SoFont *font, SoFont *small_font)
   return go_menu;
 }
 
-MenuItems gameover_menu_load (SoFont *font, SoFont *small_font)
+MenuItems gameover_2p_menu_load (SoFont *font, SoFont *small_font)
 {
   static MenuItemsTab go_menu = {
     MENUITEM_BLANKLINE,
@@ -255,23 +268,98 @@ MenuItems gameover_menu_load (SoFont *font, SoFont *small_font)
     MENUITEM_BLANKLINE,
     MENUITEM_BLANKLINE,
     MENUITEM_BLANKLINE,
-    MENUITEM_INACTIVE("Game Over!!!"),
+    MENUITEM_INACTIVE(kPlayer),
     MENUITEM_BLANKLINE,
     MENUITEM_BLANKLINE,
-    MENUITEM_INACTIVE("Winner: "),
-    MENUITEM_BLANKLINE,
-    MENUITEM_INACTIVE("Current"),
+    MENUITEM_INACTIVE(kScore),
     MENUITEM_BLANKLINE,
     MENUITEM_BLANKLINE,
-    MENUITEM_INACTIVE("Continue? (y/n)"),
+    MENUITEM_INACTIVE(kContinue),
     MENUITEM("YES"),
     MENUITEM("NO"),
     MENUITEM_END
   };
-  menu_items_set_font_for(go_menu, "Game Over!!!",    font);
-  menu_items_set_font_for(go_menu, "Winner: ",  small_font);
-  menu_items_set_font_for(go_menu, "Current",   small_font);
-  menu_items_set_font_for(go_menu, "Continue? (y/n)", font);
+  menu_items_set_font_for(go_menu, kPlayer,    font);
+  menu_items_set_font_for(go_menu, kScore,     font);
+  menu_items_set_font_for(go_menu, kContinue,  font);
+  return go_menu;
+}
+
+MenuItems nextlevel_1p_menu_load (SoFont *font, SoFont *small_font)
+{
+  static MenuItemsTab go_menu = {
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(kYouDidIt),
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(kNextLevel),
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(kHitActionToContinue),
+    MENUITEM("YES"),
+    MENUITEM("NO"),
+    MENUITEM_END
+  };
+  menu_items_set_font_for(go_menu, kYouDidIt,  font);
+  menu_items_set_font_for(go_menu, kNextLevel, font);
+  menu_items_set_font_for(go_menu, kHitActionToContinue, small_font);
+  return go_menu;
+}
+
+MenuItems looser_1p_menu_load (SoFont *font, SoFont *small_font)
+{
+  static MenuItemsTab go_menu = {
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(kLooser),
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(kCurrentLevel),
+    MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(kContinueLeft),
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(kHitActionToContinue),
+    MENUITEM("YES"),
+    MENUITEM("NO"),
+    MENUITEM_END
+  };
+  menu_items_set_font_for(go_menu, kLooser,  font);
+  menu_items_set_font_for(go_menu, kCurrentLevel, font);
+  menu_items_set_font_for(go_menu, kContinueLeft, font);
+  menu_items_set_font_for(go_menu, kHitActionToContinue, small_font);
+  return go_menu;
+}
+
+MenuItems gameover_1p_menu_load (SoFont *font, SoFont *small_font)
+{
+  static MenuItemsTab go_menu = {
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(kGameOver),
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(kYouGotToLevel),
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(kHitActionForMenu),
+    MENUITEM("YES"),
+    MENUITEM("NO"),
+    MENUITEM_END
+  };
+  menu_items_set_font_for(go_menu, kGameOver,    font);
+  menu_items_set_font_for(go_menu, kYouGotToLevel, font);
+  menu_items_set_font_for(go_menu, kHitActionForMenu,  small_font);
   return go_menu;
 }
 
@@ -472,7 +560,11 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   SDL_Surface * menuselector = IMG_Load_DisplayFormatAlpha("menusel.png");
 
   mainMenu = menu_new(main_menu_load(menuFont),menuselector);
-  gameOverMenu = menu_new(gameover_menu_load(menuFont, smallFont),menuselector);
+  gameOver1PMenu = menu_new(gameover_1p_menu_load(menuFont, smallFont),menuselector);
+  gameOver2PMenu = menu_new(gameover_2p_menu_load(menuFont, smallFont),menuselector);
+  nextLevelMenu  = menu_new(nextlevel_1p_menu_load(menuFont, smallFont),menuselector);
+  looserMenu     = menu_new(looser_1p_menu_load(menuFont, smallFont),menuselector);
+  gameOverMenu   = gameOver2PMenu;
   optionMenu = menu_new(options_menu_load(menuFont, smallFont),menuselector);
   controlsMenu = menu_new(controls_menu_load(menuFont, smallFont),menuselector);
   rulesMenu = menu_new(rules_menu_load(menuFont),menuselector);
@@ -555,11 +647,12 @@ void PuyoCommander::run()
                         int score1 = 0;
                         int score2 = 0;
                         menu_hide (menu);
+                        gameOverMenu = gameOver2PMenu;
                         if (menu_active_is(gameOverMenu, "NO"))
                             menu_next_item(gameOverMenu);
                         while (menu_active_is(gameOverMenu, "YES")) {
                             menu_next_item(gameOverMenu);
-                            PuyoStarter myStarter(this,false,0);
+                            PuyoStarter myStarter(this,false,0,RANDOM);
                             myStarter.run(score1, score2, 0);
                             score1 += myStarter.leftPlayerWin();
                             score2 += myStarter.rightPlayerWin();
@@ -853,6 +946,11 @@ mml_fin:
         menu_hide (menu);
 }
 
+struct SelIA {
+  IA_Type type;
+  int level;
+};
+
 void PuyoCommander::startSingleGameLoop()
 {
   menu_show(singleGameMenu);
@@ -887,30 +985,39 @@ void PuyoCommander::startSingleGameLoop()
   
 mml_play:
   menu_hide (singleGameMenu);
-  int divisor = 1;
+
+  SelIA ia1[] = { {RANDOM, 250}, {FLOBO, 250}, {FLOBO, 150}, {FLOBO, 100}, {FLOBO,  60}, {JEKO, 250}, {TANIA, 220}, {FLOBO, 32}, {RANDOM,0} };
+  SelIA ia2[] = { {FLOBO,  120}, {JEKO , 110}, {TANIA, 100}, {FLOBO,  50}, {GYOM , 120}, {TANIA, 60}, {JEKO,   50}, {GYOM,  60}, {RANDOM,0} };
+  SelIA ia3[] = { {TANIA,  100}, {JEKO ,  80}, {GYOM ,  80}, {JEKO,   50}, {TANIA,  30}, {GYOM,  30}, {GYOM,   20}, {GYOM,  10}, {RANDOM,0} };
+
+  SelIA *ia = ia1;
+
   if (menu_active_is (singleGameMenu, kLevelMedium))
-    divisor = 2;
+    ia = ia2;
   else if (menu_active_is (singleGameMenu, kLevelHard))
-    divisor = 4;
+    ia = ia3;
     
-  int levelArray[] = { 250, 150, 100, 60, 45, 32, 25, 20, 15, 12, 10, 0 };
   int score1 = 0;
   int score2 = 0;
   int lives  = 3;
-  if (menu_active_is(gameOverMenu, "NO"))
-    menu_next_item(gameOverMenu);
+  if (menu_active_is(looserMenu    , "NO"))
+    menu_next_item(looserMenu);
+  if (menu_active_is(nextLevelMenu, "NO"))
+    menu_next_item(nextLevelMenu);
+  if (menu_active_is(gameOver2PMenu, "NO"))
+    menu_next_item(gameOver2PMenu);
+  gameOverMenu = nextLevelMenu;
   while (menu_active_is(gameOverMenu, "YES") && (lives >= 0)) {
-    menu_next_item(gameOverMenu);
     PuyoStory myStory(this, score2+1);
     myStory.loop();
-    PuyoStarter myStarter(this, true, levelArray[score2] / divisor);
+    PuyoStarter myStarter(this, true, ia[score2].level, ia[score2].type);
     myStarter.run(score1, score2, lives);
     score1 += myStarter.leftPlayerWin();
     score2 += myStarter.rightPlayerWin();
     if (!myStarter.rightPlayerWin())
       lives--;
-    if (levelArray[score2] == 0) {
-      printf("YOU FINISHED THE GAME ! ! ! !\n");
+    if (ia[score2].level == 0) {
+      printf("YOU FINISHED THE GAME ! ! ! !\n"); // TODO: faire un truc au moins...
       break;
     }
   }
@@ -1073,6 +1180,9 @@ void PuyoCommander::getControlEvent(SDL_Event e, GameControlEvent *result)
                     break;
                 case SDLK_ESCAPE:
                     result->cursorEvent = GameControlEvent::kBack;
+                    break;
+                case SDLK_p:
+                    result->gameEvent = GameControlEvent::kPauseGame;
                     break;
                 default:
                     break;

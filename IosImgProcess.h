@@ -32,7 +32,7 @@ static RGBA iim_surface_get_rgba(SDL_Surface *surface, Uint32 x, Uint32 y)
 {
   Uint32 temp, pixel;
   RGBA result;
-  int index = x*4 + y*surface->pitch;
+  int index = x*surface->format->BytesPerPixel + y*surface->pitch;
   SDL_PixelFormat *fmt = surface->format;
   pixel=*(Uint32*)((char*)surface->pixels+index);
 
@@ -63,12 +63,52 @@ static RGBA iim_surface_get_rgba(SDL_Surface *surface, Uint32 x, Uint32 y)
   return result;
 }
 
+static Uint8 iim_rgba2gray(RGBA col)
+{
+  unsigned int level;
+  level  = col.red;
+  level += col.green;
+  level += col.blue;
+  level /= 3; // Volontairement assombrie.
+  return level;
+}
+
+/* pre: SDL_Locked(surface) */
+static void iim_surface_set_rgb(SDL_Surface *surface,
+                                Uint32 x, Uint32 y, RGBA c)
+{
+  Uint32 temp, pixel;
+  int index = x*surface->format->BytesPerPixel + y*surface->pitch;
+  SDL_PixelFormat *fmt = surface->format;
+  temp = ~(fmt->Rmask | fmt->Gmask | fmt->Bmask);
+
+  pixel = *(Uint32*)((char*)surface->pixels+index);
+  pixel &= temp;
+
+  /* Get Red component */
+  temp = c.red >> fmt->Rloss;
+  temp = temp  << fmt->Rshift;
+  pixel |= temp;
+
+  /* Get Green component */
+  temp = c.green >> fmt->Gloss;
+  temp = temp    << fmt->Gshift;
+  pixel |= temp;
+
+  /* Get Blue component */
+  temp = c.blue >> fmt->Bloss;
+  temp = temp   << fmt->Bshift;
+  pixel |= temp;
+
+  *(Uint32*)((char*)surface->pixels+index) = pixel;
+}
+
 /* pre: SDL_Locked(surface) */
 static void iim_surface_set_rgba(SDL_Surface *surface,
                                  Uint32 x, Uint32 y, RGBA c)
 {
   Uint32 temp, pixel = 0;
-  int index = x*4 + y*surface->pitch;
+  int index = x*surface->format->BytesPerPixel + y*surface->pitch;
   SDL_PixelFormat *fmt = surface->format;
 
   /* Get Red component */
@@ -224,4 +264,21 @@ static SDL_Surface *iim_surface_shift_hue(SDL_Surface *src, float hue_offset)
 	SDL_SetAlpha(ret2, SDL_SRCALPHA | SDL_RLEACCEL, SDL_ALPHA_OPAQUE);
 	SDL_FreeSurface(ret);
   return ret2;
+}
+
+static void iim_surface_convert_to_gray(SDL_Surface *src)
+{
+  SDL_PixelFormat *fmt = src->format;
+  SDL_LockSurface(src);
+  for (int y=src->h; y--;)
+  {
+    for (int x=src->w; x--;)
+    {
+      RGBA rgba = iim_surface_get_rgba(src,x,y);
+      Uint8 l = iim_rgba2gray(rgba);
+      rgba.red = rgba.blue = rgba.green = l;
+      iim_surface_set_rgb(src,x,y,rgba);
+    }
+  }
+  SDL_UnlockSurface(src);
 }
