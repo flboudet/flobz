@@ -680,9 +680,8 @@ void PuyoCommander::run()
                         goto mml_fin;
                     if (menu_active_is (menu, "Options")) {
                         menu_hide (menu);
-                        optionMenuLoop();
+                        optionMenuLoop(NULL);
                         menu_show (menu);
-                        
                     }
                     if (menu_active_is (menu, "Rules")) {
                         menu_hide(menu);
@@ -779,7 +778,7 @@ void getKeyName(SDLKey sym, char *keyName)
     keyName[1] = 0;
 }
 
-void PuyoCommander::controlsMenuLoop()
+void PuyoCommander::controlsMenuLoop(PuyoDrawable *d)
 {
   char newKeyName[250];
   
@@ -897,7 +896,7 @@ void PuyoCommander::controlsMenuLoop()
             }
         }
         
-        updateAll(NULL);
+        updateAll(d);
     }
 mml_fin:
     SetIntPreference("P1Left", keyControls[kPlayer1LeftControl]);
@@ -914,7 +913,7 @@ mml_fin:
     menu_hide (controlsMenu);
 }
 
-void PuyoCommander::optionMenuLoop()
+void PuyoCommander::optionMenuLoop(PuyoDrawable *d)
 {
   menu_show(optionMenu);
     while (1) {
@@ -957,7 +956,7 @@ void PuyoCommander::optionMenuLoop()
                     }
                     if (menu_active_is (optionMenu, kControls)) {
                         menu_hide (optionMenu);
-                        controlsMenuLoop();
+                        controlsMenuLoop(d);
                         menu_show(optionMenu);
                     }
                     break;
@@ -969,7 +968,7 @@ void PuyoCommander::optionMenuLoop()
             }
         }
         
-        updateAll(NULL);
+        updateAll(d);
     }
 mml_fin:
         menu_hide (optionMenu);

@@ -949,7 +949,7 @@ void PuyoStarter::run(int score1, int score2, int lives)
               }
               if (menu_active_is(menu_pause, kOptions)) {
                 menu_hide (menu_pause);
-                commander->optionMenuLoop();
+                commander->optionMenuLoop(this);
                 menu_show (menu_pause);
               }
               break;

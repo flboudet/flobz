@@ -54,8 +54,8 @@ class PuyoCommander
   void hideGameOver() { menu_hide(gameOverMenu); }
 
   bool changeControlLoop(SDL_keysym *keySym);
-  void controlsMenuLoop();
-  void optionMenuLoop();
+  void controlsMenuLoop(PuyoDrawable *d);
+  void optionMenuLoop(PuyoDrawable *d = NULL);
   void backLoop(Menu *menu);
   void startSingleGameLoop();
 
