@@ -1,16 +1,19 @@
 #include "gameui.h"
 
-#define DEFAULT_CONTAINER_POLICY USE_MAX_SIZE
-#define DEFAULT_SPACING          16.0f
-
 namespace gameui {
+
+  GameUIEnum GameUIDefaults::CONTAINER_POLICY = USE_MAX_SIZE;
+  float      GameUIDefaults::SPACING          = 16.0f;
+  SoFont    *GameUIDefaults::FONT          = SoFont_new();
+  SoFont    *GameUIDefaults::FONT_INACTIVE = SoFont_new();
+  GameLoop  *GameUIDefaults::GAME_LOOP     = NULL;
 
   //
   // Widget
   // 
   Widget::Widget(WidgetContainer *parent)
     : parent(parent), preferedSize(0,0,0), size(0,0,0),
-    position(0,0,0), hidden(false)
+    position(0,0,0), hidden(false), focus(false)
     {}
 
   void Widget::draw(SDL_Surface *screen, bool force) const
@@ -18,12 +21,19 @@ namespace gameui {
     if ((force || drawRequested()) && !hidden)
       draw(screen);
   }
+  
+  void Widget::eventOccured(GameControlEvent *event)
+  {
+    lostFocus();
+  }
 
   //
   // WidgetContainer
   // 
 
-  WidgetContainer::WidgetContainer(GameLoop *loop) : loop(loop) {}
+  WidgetContainer::WidgetContainer(GameLoop *loop) : loop(loop) {
+    if (loop == NULL) this->loop = GameUIDefaults::GAME_LOOP;
+  }
 
   void WidgetContainer::add (Widget *child)    
   { 
@@ -99,20 +109,20 @@ namespace gameui {
   }
 
   // 
-  // BoxWidget
+  // Box
   // 
-  BoxWidget::BoxWidget(GameLoop *loop) : WidgetContainer(loop)
+  Box::Box(GameLoop *loop) : WidgetContainer(loop)
   {
-    setPolicy(DEFAULT_CONTAINER_POLICY);
+    setPolicy(GameUIDefaults::CONTAINER_POLICY);
   }
 
-  void BoxWidget::setPolicy(GameUIEnum policy)
+  void Box::setPolicy(GameUIEnum policy)
   {
     this->policy = policy;
     arrangeWidgets();
   }
 
-  void BoxWidget::arrangeWidgets()
+  void Box::arrangeWidgets()
   {
     if (getNumberOfChilds() == 0) return;
 
@@ -121,7 +131,8 @@ namespace gameui {
       case USE_MAX_SIZE:
         {
           float height = getSortingAxe(getSize());
-          float heightPerChild = (height + DEFAULT_SPACING) / getNumberOfChilds() - DEFAULT_SPACING;
+          float heightPerChild = (height + GameUIDefaults::SPACING) / getNumberOfChilds()
+            - GameUIDefaults::SPACING;
           Vec3 size     = getSize();
           setSortingAxe(size, heightPerChild);
           Vec3 position = getPosition();
@@ -129,9 +140,19 @@ namespace gameui {
 
           for (int i = 0; i < getNumberOfChilds(); ++i) {
             Widget *child = getChild(i);
-            child->setSize(size);
-            child->setPosition(position);
-            axePos += heightPerChild + DEFAULT_SPACING;
+            if (!child->getPreferedSize().is_zero()) {
+              // center the widget if we know its size
+              Vec3 csize = size - child->getPreferedSize();
+              Vec3 cpos  = position + csize / 2.0;
+              child->setSize(child->getPreferedSize());
+              child->setPosition(cpos);
+            }
+            else {
+              // else give him all the space he want.
+              child->setSize(size);
+              child->setPosition(position);
+            }
+            axePos += heightPerChild + GameUIDefaults::SPACING;
             setSortingAxe(position, axePos);
           }
         }
@@ -148,7 +169,7 @@ namespace gameui {
   // ScreenVBox
   //
   
-  ScreenVBox::ScreenVBox(GameLoop *loop, float x, float y, float width, float height) : VBoxWidget(loop)
+  ScreenVBox::ScreenVBox(float x, float y, float width, float height, GameLoop *loop) : VBox(loop)
   {
     setPosition(Vec3(x, y, 1.0f));
     setSize(Vec3(width, height, 1.0f));
@@ -169,21 +190,34 @@ namespace gameui {
       rect.h = (Uint16)getSize().y;
       SDL_BlitSurface(bg->surf, NULL, surface, &rect);
     }
-    VBoxWidget::draw(surface);
+    VBox::draw(surface);
+  }
+  
+  void ScreenVBox::onEvent(GameControlEvent *event)
+  {
+    VBox::eventOccured(event);
   }
 
   //
-  // TextWidget
+  // Text
   // 
-  TextWidget::TextWidget(SoFont *font, const String &label)
+  Text::Text(const String &label, SoFont *font)
     : font(font), label(label)
   {
-    setPreferedSize(Vec3(SoFont_TextWidth(font, label), SoFont_FontHeight(font), 1.0));
+    if (font == NULL) this->font = GameUIDefaults::FONT;
+    setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
   }
 
-  void TextWidget::draw(SDL_Surface *screen) const
+  void Text::draw(SDL_Surface *screen) const
   {
     SoFont_PutString(font, screen, (int)getPosition().x, (int)getPosition().y, (const char*)label, NULL);
   }
+
+
+  Separator::Separator(float width, float height)
+  {
+    setPreferedSize(Vec3(width, height, 1.0));
+  }
+
 };
 

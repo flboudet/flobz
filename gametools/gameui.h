@@ -8,13 +8,12 @@
 #include "gameloop.h"
 
 namespace gameui {
-  
 
   class Widget;
   class WidgetContainer;
-  class BoxWidget;
-  class VBoxWidget;
-  class TextWidget;
+  class Box;
+  class VBox;
+  class Text;
 
 
   enum GameUIEnum {
@@ -23,12 +22,20 @@ namespace gameui {
   };
 
 
+  class GameUIDefaults {
+    public:
+      static GameUIEnum CONTAINER_POLICY;
+      static float      SPACING;
+      static SoFont     *FONT;
+      static SoFont     *FONT_INACTIVE;
+      static GameLoop   *GAME_LOOP;
+  };
 
 
   class Widget : public DrawableComponent {
     
       friend class WidgetContainer;
-      friend class BoxWidget;
+      friend class Box;
       
     public:
       Widget(WidgetContainer *parent = NULL);
@@ -51,6 +58,13 @@ namespace gameui {
       Vec3 getPosition() const           { return position; }
       Vec3 getSize() const               { return size; }
 
+      // default behaviour is to lost the focus
+      virtual void eventOccured(GameControlEvent *event);
+
+      void giveFocus()       { focus = true;  }
+      void lostFocus()       { focus = false; }
+      bool haveFocus() const { return focus;  }
+      
     protected:
       // To be implemented on each widgets
       virtual void draw(SDL_Surface *screen) const { };
@@ -66,12 +80,13 @@ namespace gameui {
       Vec3    size;
       Vec3    position;
       bool    hidden;
+      bool    focus;
   };
 
 
   class WidgetContainer : public Widget {
     public:
-      WidgetContainer(GameLoop *loop);
+      WidgetContainer(GameLoop *loop = NULL);
       void add (Widget *child);
       void remove (Widget *child);
       GameLoop *getGameLoop();
@@ -95,9 +110,9 @@ namespace gameui {
   };
 
 
-  class BoxWidget : public WidgetContainer {
+  class Box : public WidgetContainer {
     public:
-      BoxWidget(GameLoop *loop);
+      Box(GameLoop *loop = NULL);
       void setPolicy(GameUIEnum policy);
       void arrangeWidgets();
 
@@ -109,9 +124,9 @@ namespace gameui {
   };
 
 
-  class VBoxWidget : public BoxWidget {
+  class VBox : public Box {
     public:
-      VBoxWidget(GameLoop *loop) : BoxWidget(loop) {}
+      VBox(GameLoop *loop = NULL) : Box(loop) {}
 
     protected:
       virtual float getSortingAxe(const Vec3 &v3) const        { return v3.y;  }
@@ -119,27 +134,47 @@ namespace gameui {
   };
 
 
-  class ScreenVBox : public VBoxWidget {
+  class ScreenVBox : public VBox, IdleComponent {
     public:
-      ScreenVBox(GameLoop *loop, float x, float y, float width, float height);
+      ScreenVBox(float x, float y, float width, float height, GameLoop *loop = NULL);
       void setBackground(IIM_Surface *bg);
       void draw(SDL_Surface *surface) const;
+      void onEvent(GameControlEvent *event);
 
     private:
       IIM_Surface *bg;
   };
 
 
-  class TextWidget : public Widget {
+  class Text : public Widget {
     public:
-      TextWidget(SoFont *font, const String &label);
+      Text(const String &label, SoFont *font = NULL);
+
+    protected:
+      void draw(SDL_Surface *screen) const;
+      SoFont *font;
+      
+    private:
+      String label;
+  };
+
+/*
+  class Button : public Text {
+    public:
+      Button(const String &label, SoFont *fontActive = NULL, SoFont *fontInactive = NULL);
 
     protected:
       void draw(SDL_Surface *screen) const;
 
     private:
-      SoFont *font;
-      String label;
+      SoFont *fontActive;
+      SoFont *fontInactive;
+  };
+*/
+
+  class Separator : public Widget {
+    public:
+      Separator(float width, float height);
   };
 
 };
