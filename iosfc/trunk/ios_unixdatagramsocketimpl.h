@@ -43,7 +43,11 @@ namespace ios_fc {
         void send(Datagram &sendDatagram);
         Datagram receive(VoidBuffer buffer);
         int available() const;
+        void connect(SocketAddress addr, int portNum);
+        void disconnect();
         SocketAddress getBroadcastAddress() const { return broadcastAddress; }
+        SocketAddress getSocketAddress() const;
+        int getSocketPortNum() const;
         SelectableImpl *getSelectableImpl() { return this; }
         int getFd() { return socketFd; }
     private:
@@ -51,6 +55,9 @@ namespace ios_fc {
         struct sockaddr_in boundAddr;
         bool hasBroadcast;
         SocketAddress broadcastAddress;
+        bool isConnected;
+        SocketAddress connectedAddress;
+        int connectedPort;
     };
 
     class UnixDatagramSocketFactory : public DatagramSocketFactory {

@@ -18,12 +18,18 @@ UdpPuncherClient::UdpPuncherClient(String hostName, int portNum)
   : mbox(new UDPMessageBox(hostName, 0, portNum))
 {
     mbox->addListener(this);
+    //printf("GetSocketAddress(): %s\n", (const char *)(mbox->getSocketAddress().asString()));
+    //printf("GetSocketPortNum(): %d\n", mbox->getDatagramSocket()->getSocketPortNum());
 }
 
 void UdpPuncherClient::punch(const String punchPoolName)
 {
     Message *punchMsg = mbox->createMessage();
+    Dirigeable *dirPunchMsg = dynamic_cast<Dirigeable *>(punchMsg);
+    UDPPeerAddress localPeer(mbox->getSocketAddress(), mbox->getDatagramSocket()->getSocketPortNum());
+    
     punchMsg->addString("PPOOL", punchPoolName);
+    dirPunchMsg->addPeerAddress("LPEER", localPeer);
     punchMsg->addBoolProperty("RELIABLE", true);
     punchMsg->send();
     delete punchMsg;
@@ -43,8 +49,11 @@ void UdpPuncherClient::onMessage(Message &message)
             printf("Pool peer address\n");
             {
                 UDPPeerAddress peerAddress = dirMsg.getPeerAddress("PEER");
-                printf("Peer: %s:%d\n", (const char *)(peerAddress.getSocketAddress().asString()), peerAddress.getPortNum());
-                for (int i = 0 ; i < 1000 ; i++) {
+                UDPPeerAddress localPeerAddress = dirMsg.getPeerAddress("LPEER");
+                printf("Peer:  %s:%d\n", (const char *)(peerAddress.getSocketAddress().asString()), peerAddress.getPortNum());
+                printf("LPeer: %s:%d\n", (const char *)(localPeerAddress.getSocketAddress().asString()), localPeerAddress.getPortNum());
+                mbox->getDatagramSocket()->disconnect();
+                for (int i = 0 ; i < 500 ; i++) {
                     Message *peerMsg = mbox->createMessage();
                     Dirigeable *dirPeerMsg = dynamic_cast<Dirigeable *>(peerMsg);
                     peerMsg->addString("CONNERIE", "Salut le monde!");
@@ -52,6 +61,15 @@ void UdpPuncherClient::onMessage(Message &message)
                     dirPeerMsg->setPeerAddress(peerAddress);
                     peerMsg->send();
                     delete peerMsg;
+                    mbox->idle();
+                    usleep(10000);
+                    Message *peerMsg2 = mbox->createMessage();
+                    Dirigeable *dirPeerMsg2 = dynamic_cast<Dirigeable *>(peerMsg2);
+                    peerMsg2->addString("CONNERIE", "Salut le monde local!");
+                    peerMsg2->addInt("TYPE", 2);
+                    dirPeerMsg2->setPeerAddress(peerAddress);
+                    peerMsg2->send();
+                    delete peerMsg2;
                     mbox->idle();
                     usleep(10000);
                 }

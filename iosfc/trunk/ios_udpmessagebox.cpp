@@ -194,6 +194,7 @@ UDPMessageBox::UDPMessageBox(const String address,
     cyclesBeforeReliableTimeout = 2000;
     cyclesBeforePeerTimeout = 2000;
     socket = new DatagramSocket(localPort);
+    socket->connect(defaultAddress, remotePort);
 }
 
 UDPMessageBox::UDPMessageBox(DatagramSocket *socket)

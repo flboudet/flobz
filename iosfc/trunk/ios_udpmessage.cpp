@@ -84,6 +84,11 @@ PeerAddress UDPMessage::getPeerAddress(const String key)
     return PeerAddress(new UDPPeerAddressImpl(SocketAddress(getString(key + "_A")), getInt(key + "_PN")));
 }
 
+UDPPeerAddress::UDPPeerAddress(const SocketAddress &addr, int portNum)
+    : PeerAddress(new UDPMessage::UDPPeerAddressImpl(addr, portNum))
+{
+}
+
 SocketAddress UDPPeerAddress::getSocketAddress() const
 {
     UDPMessage::UDPPeerAddressImpl *peerAddressImpl = dynamic_cast<UDPMessage::UDPPeerAddressImpl *>(getImpl());

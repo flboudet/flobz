@@ -35,7 +35,8 @@
 namespace ios_fc {
 
 UnixDatagramSocketImpl::UnixDatagramSocketImpl()
-    : broadcastAddress(new UnixSocketAddressImpl(INADDR_BROADCAST))
+    : broadcastAddress(new UnixSocketAddressImpl(INADDR_BROADCAST)),
+      connectedAddress(new UnixSocketAddressImpl(INADDR_ANY))
 {
 }
 
@@ -62,22 +63,28 @@ void UnixDatagramSocketImpl::create(int localPortNum)
     if (setsockopt(socketFd, SOL_SOCKET, SO_BROADCAST, (const void *)&optval, sizeof(int)) != -1) {
         hasBroadcast = true;
     }
+    isConnected = false;
 }
 
 void UnixDatagramSocketImpl::send(Datagram &sendDatagram)
 {
-    UnixSocketAddressImpl *impl = dynamic_cast<UnixSocketAddressImpl *>(sendDatagram.getAddress().getImpl());
-    if (impl == NULL)
-        throw Exception("Dest address is not compatible with datagramsocket implementation");
-    
-    struct sockaddr_in outAddr;
-    bzero((char *) &outAddr, sizeof(outAddr));
-    outAddr.sin_family = AF_INET;
-    outAddr.sin_addr.s_addr = htonl(impl->getAddress());
-    outAddr.sin_port = htons(sendDatagram.getPortNum());
-    
-    sendto(socketFd, sendDatagram.getMessage(), sendDatagram.getSize(), 0,
-             (struct sockaddr *) &outAddr, sizeof(outAddr));
+    if (!isConnected) {
+        UnixSocketAddressImpl *impl = dynamic_cast<UnixSocketAddressImpl *>(sendDatagram.getAddress().getImpl());
+        if (impl == NULL)
+            throw Exception("Dest address is not compatible with datagramsocket implementation");
+        
+        struct sockaddr_in outAddr;
+        bzero((char *) &outAddr, sizeof(outAddr));
+        outAddr.sin_family = AF_INET;
+        outAddr.sin_addr.s_addr = htonl(impl->getAddress());
+        outAddr.sin_port = htons(sendDatagram.getPortNum());
+        
+        sendto(socketFd, sendDatagram.getMessage(), sendDatagram.getSize(), 0,
+               (struct sockaddr *) &outAddr, sizeof(outAddr));
+    }
+    else {
+        ::send(socketFd, sendDatagram.getMessage(), sendDatagram.getSize(), 0);
+    }
 }
 
 Datagram UnixDatagramSocketImpl::receive(VoidBuffer buffer)
@@ -90,6 +97,12 @@ Datagram UnixDatagramSocketImpl::receive(VoidBuffer buffer)
         throw Exception("Reception error");
     
     return Datagram(SocketAddress(new UnixSocketAddressImpl(ntohl(resultAddress.sin_addr.s_addr))), ntohs(resultAddress.sin_port), buffer, res);
+/*
+    int res = recv(socketFd, buffer.ptr(), buffer.size(), 0);
+    if (res == -1)
+        throw Exception("Reception error");
+    return Datagram(connectedAddress, ntohs(connectedPort), buffer, res);
+    */
 }
 
 int UnixDatagramSocketImpl::available() const
@@ -99,6 +112,60 @@ int UnixDatagramSocketImpl::available() const
 		throw Exception("IosSocketStream: ioctl error");
 	}
 	return result;
+}
+
+void UnixDatagramSocketImpl::connect(SocketAddress addr, int portNum)
+{
+    UnixSocketAddressImpl *impl = dynamic_cast<UnixSocketAddressImpl *>(addr.getImpl());
+    if (impl == NULL)
+        throw Exception("Address is not compatible with datagramsocket implementation");
+    
+    struct sockaddr_in connectAddr;
+    bzero((char *) &connectAddr, sizeof(connectAddr));
+    connectAddr.sin_family = AF_INET;
+    connectAddr.sin_addr.s_addr = htonl(impl->getAddress());
+    connectAddr.sin_port = htons(portNum);
+    if (::connect(socketFd, (struct sockaddr *) &connectAddr, sizeof(connectAddr)) == -1) {
+        throw Exception("Socket connect error");
+    }
+    isConnected = true;
+    connectedAddress = addr;
+    connectedPort = portNum;
+}
+
+void UnixDatagramSocketImpl::disconnect()
+{
+    struct sockaddr_in connectAddr;
+    bzero((char *) &connectAddr, sizeof(connectAddr));
+    connectAddr.sin_family = AF_INET;
+    connectAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    connectAddr.sin_port = htons(0);
+    ::connect(socketFd, (struct sockaddr *) &connectAddr, sizeof(connectAddr));
+    isConnected = false;
+}
+
+SocketAddress UnixDatagramSocketImpl::getSocketAddress() const
+{
+    struct sockaddr_in name;
+    int namelen = sizeof(struct sockaddr_in);
+    
+    int result = getsockname(socketFd, (struct sockaddr *) &name, &namelen);
+    if (result != 0) {
+        throw Exception("getsockname error");
+    }
+    return SocketAddress(new UnixSocketAddressImpl(ntohl(name.sin_addr.s_addr)));
+}
+
+int UnixDatagramSocketImpl::getSocketPortNum() const
+{
+    struct sockaddr_in name;
+    int namelen = sizeof(struct sockaddr_in);
+    
+    int result = getsockname(socketFd, (struct sockaddr *) &name, &namelen);
+    if (result != 0) {
+        throw Exception("getsockname error");
+    }
+    return ntohs(name.sin_port);
 }
 
 UnixDatagramSocketImpl::~UnixDatagramSocketImpl()

@@ -70,9 +70,29 @@ int DatagramSocket::available() const
     return impl->available();
 }
 
+void DatagramSocket::connect(SocketAddress addr, int portNum)
+{
+    impl->connect(addr, portNum);
+}
+
+void DatagramSocket::disconnect()
+{
+    impl->disconnect();
+}
+
 SocketAddress DatagramSocket::getBroadcastAddress() const
 {
     return impl->getBroadcastAddress();
+}
+
+SocketAddress DatagramSocket::getSocketAddress() const
+{
+    return impl->getSocketAddress();
+}
+
+int DatagramSocket::getSocketPortNum() const
+{
+    return impl->getSocketPortNum();
 }
 
 SelectableImpl *DatagramSocket::getSelectableImpl() const

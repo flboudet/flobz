@@ -31,6 +31,7 @@ namespace ios_fc {
     public:
         UDPPeerAddress(PeerAddressImpl *impl) : PeerAddress(impl) {}
         UDPPeerAddress(const PeerAddress &a) : PeerAddress(a) {}
+        UDPPeerAddress(const SocketAddress &addr, int portNum);
         SocketAddress getSocketAddress() const;
         int getPortNum() const;
     };

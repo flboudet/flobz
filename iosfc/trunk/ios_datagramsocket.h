@@ -52,7 +52,11 @@ namespace ios_fc {
         virtual Datagram receive(VoidBuffer buffer) = 0;
         virtual SelectableImpl *getSelectableImpl() = 0;
         virtual SocketAddress getBroadcastAddress() const = 0;
+        virtual SocketAddress getSocketAddress() const = 0;
+        virtual int getSocketPortNum() const = 0;
         virtual int available() const = 0;
+        virtual void connect(SocketAddress addr, int portNum) = 0;
+        virtual void disconnect() = 0;
     };
     
     class DatagramSocketFactory {
@@ -70,7 +74,11 @@ namespace ios_fc {
         virtual void send(Datagram &sendDatagam);
         virtual Datagram receive(VoidBuffer buffer);
         virtual int available() const;
+        virtual void connect(SocketAddress addr, int portNum);
+        virtual void disconnect();
         SocketAddress getBroadcastAddress() const;
+        SocketAddress getSocketAddress() const;
+        int getSocketPortNum() const;
         static void setFactory(DatagramSocketFactory *factory) { DatagramSocket::factory = factory; }
         
         // Selectable implementation

@@ -19,16 +19,16 @@ private:
 
 class UdpPuncher::PunchPool {
 public:
-    PunchPool(const String punchPoolName, const PeerAddress creatorAddress)
-        : punchPoolName(punchPoolName), creatorAddress(creatorAddress) {}
+    PunchPool(const String punchPoolName, const PeerAddress creatorAddress, const PeerAddress creatorLocalAddress)
+        : punchPoolName(punchPoolName), creatorAddress(creatorAddress), creatorLocalAddress(creatorLocalAddress) {}
     inline const String getPunchPoolName() const { return punchPoolName; }
-    void dispatchInformations(const PeerAddress guestAddress, MessageBox *mbox);
+    void dispatchInformations(const PeerAddress guestAddress, const PeerAddress guestLocalAddress, MessageBox *mbox);
 private:
     const String punchPoolName;
-    const PeerAddress creatorAddress;
+    const PeerAddress creatorAddress, creatorLocalAddress;
 };
 
-void UdpPuncher::PunchPool::dispatchInformations(const PeerAddress guestAddress, MessageBox *mbox)
+void UdpPuncher::PunchPool::dispatchInformations(const PeerAddress guestAddress, const PeerAddress guestLocalAddress, MessageBox *mbox)
 {
     // Message for the pool creator
     Message *peerAMsg = mbox->createMessage();
@@ -37,6 +37,7 @@ void UdpPuncher::PunchPool::dispatchInformations(const PeerAddress guestAddress,
     peerAMsg->addString("PPOOL", punchPoolName);
     peerAMsg->addBoolProperty("RELIABLE", true);
     dirAMsg->addPeerAddress("PEER", guestAddress);
+    dirAMsg->addPeerAddress("LPEER", guestLocalAddress);
     dirAMsg->setPeerAddress(creatorAddress);
     peerAMsg->send();
     delete peerAMsg;
@@ -48,6 +49,7 @@ void UdpPuncher::PunchPool::dispatchInformations(const PeerAddress guestAddress,
     peerBMsg->addString("PPOOL", punchPoolName);
     peerBMsg->addBoolProperty("RELIABLE", true);
     dirBMsg->addPeerAddress("PEER", creatorAddress);
+    dirBMsg->addPeerAddress("LPEER", creatorLocalAddress);
     dirBMsg->setPeerAddress(guestAddress);
     peerBMsg->send();
     delete peerBMsg;
@@ -63,12 +65,12 @@ void UdpPuncher::onMessage(Message &message)
     for (int i = 0 ; i < pools.size() ; i++) {
         if (pools[i]->getPunchPoolName() == punchPoolName) {
             printf("Pool found!\n");
-            pools[i]->dispatchInformations(dirMsg.getPeerAddress(), mbox);
+            pools[i]->dispatchInformations(dirMsg.getPeerAddress(), dirMsg.getPeerAddress("LPEER"), mbox);
             return;
         }
     }
     // Else let's create the pool
-    pools.add(new PunchPool(punchPoolName, dirMsg.getPeerAddress()));
+    pools.add(new PunchPool(punchPoolName, dirMsg.getPeerAddress(), dirMsg.getPeerAddress("LPEER")));
 }
 
 };

@@ -42,6 +42,8 @@ public:
     Message * createMessage();
     void sendUDP(Buffer<char> buffer, int id, bool reliable, PeerAddress peerAddr, SocketAddress addr, int portNum);
     SocketAddress getBroadcastAddress() const { return socket->getBroadcastAddress(); }
+    SocketAddress getSocketAddress() const { return socket->getSocketAddress(); }
+    DatagramSocket *getDatagramSocket() const { return socket; }
     // Session manager
     void addSessionListener(SessionListener *l);
     void removeSessionListener(SessionListener *l);
