@@ -73,7 +73,7 @@ struct <Display:
     &this.dcycle = fcycle
   }
 
-external <say:  Sprite &this, string text>
+external <put_text: string text, Vec2 pos>
 external <draw: Sprite &this, Display display>
 
 <new_display: float x, float y, float width, float height> : Display
@@ -115,6 +115,10 @@ external <draw: Sprite &this, Display display>
 <set_text: Balloon &this, string text>
   &this.text = text
 
+<show_balloon_with_text: Balloon &this, string text>
+  show_balloon::&this
+  set_text::&this text=text
+
 <balloon: Balloon &this, Display display>
   (@mode = UPDATE)? {
     sprite::&this.image
@@ -125,6 +129,6 @@ external <draw: Sprite &this, Display display>
   (@mode = DRAW)? {
     (&this.alpha > 0.5)? {
       sprite::&this.image display=display
-      
+      put_text: text=&this.text pos=&this.image.pos + &this.text_pos
     }
   }
