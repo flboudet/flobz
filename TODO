@@ -13,4 +13,5 @@
 #Alignement in menus
 #Support d'OpenGL
 Net Play
-Explosions trop rapides qd on accelere les cycles (fleche du bas)
+#Explosions trop rapides qd on accelere les cycles (fleche du bas)
+Ameliorer ce putain de makefile (cible statique pour mac, et surtout ne pas compiler glsdl quand opengl est desactive, c'est une horreur a compiler sur les becanes qui n'ont pas opengl installe, et eventuellement gerer mieux les dependances)
