@@ -815,7 +815,9 @@ void PuyoStarter::run(int score1, int score2, int lives)
     bool danger = left_danger || right_danger;
     bool gameover = (!attachedGameA->isGameRunning() || !attachedGameB->isGameRunning());
 
-    if (gameover)
+    /*if (paused)
+      audio_music_start(0);
+    else */if (gameover)
       audio_music_start(3);
     else if (danger)
       audio_music_start(2);
@@ -957,7 +959,10 @@ void PuyoStarter::run(int score1, int score2, int lives)
       {
         if (randomPlayer) {
           if (rightPlayerWin()) {
-            commander->gameOverMenu = commander->nextLevelMenu;
+            if (score2 == 0)
+              commander->gameOverMenu = commander->finishedMenu;
+            else
+              commander->gameOverMenu = commander->nextLevelMenu;
           }
           else {
             if (lives == 0) {

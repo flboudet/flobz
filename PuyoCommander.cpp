@@ -29,6 +29,10 @@ char *kOptions     = "Options";
 char *kPlayer      = "Player";
 char *kScore       = "Score:";
 
+char *kCongratulations = "Congratulations!!!";
+char *kPuyosInvasion   = "You stopped Puyo's invasion.\n"
+                         "Peace on Earth is restored!!";
+
 static char *kAudioFX     = "Audio FX";
 static char *kMusic       = "Music";
 static char *kFullScreen  = "FullScreen";
@@ -83,7 +87,7 @@ typedef struct SdlKeyName {
 } SdlKeyName;
 
 static const SdlKeyName sdlKeyDictionnary[] = {
-    { SDLK_UNKNOWN,   "Not assigned"},
+    { SDLK_UNKNOWN,   "Not Assigned"},
     { SDLK_BACKSPACE, "Backspace"  },
     { SDLK_TAB,       "Tab"        },
     { SDLK_CLEAR,     "Clear"      },
@@ -102,15 +106,15 @@ static const SdlKeyName sdlKeyDictionnary[] = {
     { SDLK_KP7,       "KP 7"       },
     { SDLK_KP8,       "KP 8"       },
     { SDLK_KP9,       "KP 9"       },
-    { SDLK_UP,        "Up arrow"   },
-    { SDLK_DOWN,      "Down arrow" },
-    { SDLK_LEFT,      "Left arrow" },
-    { SDLK_RIGHT,     "Right arrow"},
+    { SDLK_UP,        "Up Arrow"   },
+    { SDLK_DOWN,      "Down Arrow" },
+    { SDLK_LEFT,      "Left Arrow" },
+    { SDLK_RIGHT,     "Right Arrow"},
     { SDLK_INSERT,    "Insert"     },
     { SDLK_HOME,      "Home"       },
     { SDLK_END,       "End"        },
-    { SDLK_PAGEUP,     "Page up"   },
-    { SDLK_PAGEDOWN,   "Page down" },
+    { SDLK_PAGEUP,     "Page Up"   },
+    { SDLK_PAGEDOWN,   "Page Down" },
     { SDLK_F1,         "F1"        },
     { SDLK_F2,         "F2"        },
     { SDLK_F3,         "F3"        },
@@ -126,22 +130,22 @@ static const SdlKeyName sdlKeyDictionnary[] = {
     { SDLK_F13,        "F13"       },
     { SDLK_F14,        "F14"       },
     { SDLK_F15,        "F15"       },
-    { SDLK_NUMLOCK,    "Num lock"  },
-    { SDLK_CAPSLOCK,   "Caps lock" },
-    { SDLK_SCROLLOCK,  "Scroll lock"},
-    { SDLK_RSHIFT,     "Right shift"},
-    { SDLK_LSHIFT,     "Left shift" },
-    { SDLK_RCTRL,     "Right ctrl" },
-    { SDLK_LCTRL,     "Left ctrl" },
-    { SDLK_RALT,     "Right alt" },
-    { SDLK_LALT,     "Left alt" },
-    { SDLK_RMETA,     "Right meta" },
-    { SDLK_LMETA,     "Left meta" },
-    { SDLK_RSUPER,     "Right windows" },
-    { SDLK_LSUPER,     "Left windows" },
-    { SDLK_MODE,     "Mode shift" },
+    { SDLK_NUMLOCK,    "Num Lock"  },
+    { SDLK_CAPSLOCK,   "Caps Lock" },
+    { SDLK_SCROLLOCK,  "Scroll Lock"},
+    { SDLK_RSHIFT,     "Right Shift"},
+    { SDLK_LSHIFT,     "Left Shift" },
+    { SDLK_RCTRL,     "Right Ctrl" },
+    { SDLK_LCTRL,     "Left Ctrl" },
+    { SDLK_RALT,     "Right Alt" },
+    { SDLK_LALT,     "Left Alt" },
+    { SDLK_RMETA,     "Right Meta" },
+    { SDLK_LMETA,     "Left Meta" },
+    { SDLK_RSUPER,     "Right Windows" },
+    { SDLK_LSUPER,     "Left Windows" },
+    { SDLK_MODE,     "Mode Shift" },
     { SDLK_HELP,     "Help" },
-    { SDLK_PRINT,     "Print screen" },
+    { SDLK_PRINT,     "Print Screen" },
     { SDLK_SYSREQ,     "Sys Rq" },
     { SDLK_BREAK,     "Break" },
     { SDLK_MENU,     "Menu" },
@@ -282,6 +286,31 @@ MenuItems gameover_2p_menu_load (SoFont *font, SoFont *small_font)
   menu_items_set_font_for(go_menu, kPlayer,    font);
   menu_items_set_font_for(go_menu, kScore,     font);
   menu_items_set_font_for(go_menu, kContinue,  font);
+  return go_menu;
+}
+
+MenuItems finished_1p_menu_load (SoFont *font, SoFont *small_font)
+{
+  static MenuItemsTab go_menu = {
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(kCongratulations),
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(kPuyosInvasion),
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(kHitActionForMenu),
+    MENUITEM("YES"),
+    MENUITEM("NO"),
+    MENUITEM_END
+  };
+  menu_items_set_font_for(go_menu, kCongratulations,  font);
+  menu_items_set_font_for(go_menu, kPuyosInvasion, font);
+  menu_items_set_font_for(go_menu, kHitActionForMenu, small_font);
   return go_menu;
 }
 
@@ -586,6 +615,7 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   gameOver2PMenu = menu_new(gameover_2p_menu_load(menuFont, smallFont),menuselector);
   nextLevelMenu  = menu_new(nextlevel_1p_menu_load(menuFont, smallFont),menuselector);
   looserMenu     = menu_new(looser_1p_menu_load(menuFont, smallFont),menuselector);
+  finishedMenu   = menu_new(finished_1p_menu_load(menuFont, smallFont),menuselector);
   gameOverMenu   = gameOver2PMenu;
   optionMenu = menu_new(options_menu_load(menuFont, smallFont),menuselector);
   controlsMenu = menu_new(controls_menu_load(menuFont, smallFont),menuselector);
@@ -753,26 +783,26 @@ void PuyoCommander::controlsMenuLoop()
   char newKeyName[250];
   
   getKeyName(keyControls[kPlayer1LeftControl], newKeyName);
-  menu_set_value(controlsMenu, kPlayer1Left, newKeyName);
+  menu_set_value(controlsMenu, kPlayer1Left, newKeyName,0);
   getKeyName(keyControls[kPlayer1RightControl], newKeyName);
-  menu_set_value(controlsMenu, kPlayer1Right, newKeyName);
+  menu_set_value(controlsMenu, kPlayer1Right, newKeyName,0);
   getKeyName(keyControls[kPlayer1DownControl], newKeyName);
-  menu_set_value(controlsMenu, kPlayer1Down, newKeyName);
+  menu_set_value(controlsMenu, kPlayer1Down, newKeyName,0);
   getKeyName(keyControls[kPlayer1ClockwiseControl], newKeyName);
-  menu_set_value(controlsMenu, kPlayer1Clockwise, newKeyName);
+  menu_set_value(controlsMenu, kPlayer1Clockwise, newKeyName,0);
   getKeyName(keyControls[kPlayer1CounterclockwiseControl], newKeyName);
-  menu_set_value(controlsMenu, kPlayer1Counterclockwise, newKeyName);
+  menu_set_value(controlsMenu, kPlayer1Counterclockwise, newKeyName,0);
   
   getKeyName(keyControls[kPlayer2LeftControl], newKeyName);
-  menu_set_value(controlsMenu, kPlayer2Left, newKeyName);
+  menu_set_value(controlsMenu, kPlayer2Left, newKeyName,0);
   getKeyName(keyControls[kPlayer2RightControl], newKeyName);
-  menu_set_value(controlsMenu, kPlayer2Right, newKeyName);
+  menu_set_value(controlsMenu, kPlayer2Right, newKeyName,0);
   getKeyName(keyControls[kPlayer2DownControl], newKeyName);
-  menu_set_value(controlsMenu, kPlayer2Down, newKeyName);
+  menu_set_value(controlsMenu, kPlayer2Down, newKeyName,0);
   getKeyName(keyControls[kPlayer2ClockwiseControl], newKeyName);
-  menu_set_value(controlsMenu, kPlayer2Clockwise, newKeyName);
+  menu_set_value(controlsMenu, kPlayer2Clockwise, newKeyName,0);
   getKeyName(keyControls[kPlayer2CounterclockwiseControl], newKeyName);
-  menu_set_value(controlsMenu, kPlayer2Counterclockwise, newKeyName);
+  menu_set_value(controlsMenu, kPlayer2Counterclockwise, newKeyName,1);
   
   menu_show(controlsMenu);
     while (1) {
@@ -1025,6 +1055,8 @@ mml_play:
   int score1 = 0;
   int score2 = 0;
   int lives  = 3;
+  if (menu_active_is(finishedMenu,  "NO"))
+    menu_next_item(finishedMenu);
   if (menu_active_is(looserMenu   ,  "NO"))
     menu_next_item(looserMenu);
   if (menu_active_is(nextLevelMenu,  "NO"))

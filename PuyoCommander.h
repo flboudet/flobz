@@ -68,6 +68,7 @@ class PuyoCommander
   Menu *gameOver2PMenu;
   Menu *gameOver1PMenu;
   Menu *nextLevelMenu;
+  Menu *finishedMenu;
   Menu *looserMenu;
 
  private:

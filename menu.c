@@ -332,8 +332,9 @@ menu_get_value (Menu * menu, const char *name)
 }
 
   void
-menu_set_value (Menu * menu, const char *name, const char *value)
+menu_set_value (Menu * menu, const char *name, const char *value, int doValide)
 {
   menu_items_set_value_for (menu->items, name, value);
-  menu_validate (menu);
+  if (doValide)
+    menu_validate (menu);
 }

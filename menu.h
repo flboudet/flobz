@@ -65,6 +65,6 @@ const char *menu_get_active_item_string (Menu * menu);
 const char *menu_get_value (Menu * menu, const char *name);
 
 /// affecte la valeur de l'item name */
-void    menu_set_value (Menu * menu, const char *name, const char *value);
+void    menu_set_value (Menu * menu, const char *name, const char *value, int doValidate=1);
 
 #endif /* _menu_H */
