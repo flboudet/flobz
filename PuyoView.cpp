@@ -31,7 +31,7 @@ static char *AI_NAMES[] = { "Fanzy", "Bob the Killer", "Big Rabbit", "Flying Sau
   "Satanas", "Doctor X", "Tanya", "Master Gyom, King of the Puyos",
   "X","Y","Z" };
 
-#define GAME_ACCEL 500
+#define GAME_ACCEL 1250
 
 static char PuyoGroupImageIndex[2][2][2][2] =
 { {  // empty bottom
@@ -819,7 +819,7 @@ PuyoStarter::~PuyoStarter()
 }
 
 
-#define FPKEY_REPEAT        6
+#define FPKEY_REPEAT        7
 #define FPKEY_DELAY         5
 
 #define FPKEY_keyNumber     10
