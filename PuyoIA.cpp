@@ -10,122 +10,177 @@
 
 
 struct PosEvaluator {
-    int c_direction;
-    int f_x;
-    int score;
-    bool keep;
+  int c_direction;
+  int f_x;
+  int score;
+  bool keep;
+
+  int update(PuyoGame *game, PuyoState f_color, PuyoState c_color,
+             int IAPuyoValue,
+             int IASecondLevelPuyoValue,
+             int IAConstructorLevel,
+             int IAHeightAgressivity,
+             int IAHeightFactor)
+  {
+    int f_y = 0;
+    int c_x = 0;
+    int c_y = 0;
     
-    int update(PuyoGame *game, PuyoState f_color, PuyoState c_color, bool deep)
+    if (f_color == PUYO_EMPTY) return 0;
+    if (c_color == PUYO_EMPTY) return 0;
+    
+    /* Calcul de la posisition finale des deux puyos */
+    switch (c_direction) {
+    case UP:
+        f_y = game->getColumnHeigth(f_x);
+        c_x = f_x;
+        c_y = f_y + 1;
+        break;
+    case DOWN:
+      c_y = game->getColumnHeigth(f_x);
+      c_x = f_x;
+      f_y = c_y + 1;
+      break;
+    case RIGHT:
+      f_y = game->getColumnHeigth(f_x);
+      c_x = f_x + 1;
+      c_y = game->getColumnHeigth(f_x + 1);
+      break;
+    case LEFT:
+      f_y = game->getColumnHeigth(f_x);
+      c_x = f_x - 1;
+      c_y = game->getColumnHeigth(f_x - 1);
+      break;
+    }
+    f_y = PUYODIMY - f_y - 1;
+    c_y = PUYODIMY - c_y - 1;
+
+//#define toto(X,Y) (game->getPuyoAt(X,Y))->getPuyoState()     
+//(printf("  - %2d %2d %2d\n",toto(c_x-1,c_y-1),toto(c_x,c_y-1),toto(c_x+1,c_y-1)));
+//(printf("  - %2d %2d %2d\n",toto(c_x-1,c_y  ),toto(c_x,c_y  ),toto(c_x+1,c_y)));
+//(printf("  - %2d %2d %2d\n",toto(c_x-1,c_y+1),toto(c_x,c_y+1),toto(c_x+1,c_y+1)));
+
+
+    /* Si l'un des deux puyos est tout en haut => pire cas ! */
+    if ((f_y < 0) || (c_y < 0))
     {
-        int f_y = 0;
-        int c_x = 0;
-        int c_y = 0;
-        
-        if (f_color == PUYO_EMPTY) return 0;
-        if (c_color == PUYO_EMPTY) return 0;
-        
-        switch (c_direction) {
-            case UP:
-                f_y = game->getColumnHeigth(f_x);
-                c_x = f_x;
-                c_y = f_y + 1;
-                break;
-            case DOWN:
-                c_y = game->getColumnHeigth(f_x);
-                c_x = f_x;
-                f_y = c_y + 1;
-                break;
-            case RIGHT:
-                f_y = game->getColumnHeigth(f_x);
-                c_x = f_x + 1;
-                c_y = game->getColumnHeigth(f_x + 1);
-                break;
-            case LEFT:
-                f_y = game->getColumnHeigth(f_x);
-                c_x = f_x - 1;
-                c_y = game->getColumnHeigth(f_x - 1);
-                break;
-        }
-        f_y = PUYODIMY - f_y - 1;
-        c_y = PUYODIMY - c_y - 1;
-        
-//#define toto(X,Y) (game->getPuyoAt(X,Y))->getPuyoState()
-        
-        if ((f_y >= 6) && (c_y >= 6)) {
-            score = 
-            game->getSamePuyoAround(f_x, f_y, f_color)*10
-            + game->getSamePuyoAround(c_x, c_y, c_color)*10;
-            if (deep)
-            {
-		if (c_y < PUYODIMY-1) {
-                    if ((c_x<(PUYODIMX - 1)) && (c_color == (game->getPuyoAt(c_x+1,c_y))->getPuyoState())) {
-                        PuyoState cColorA = (game->getPuyoAt(c_x+1,c_y+1))->getPuyoState();
-                        if ((c_color!=cColorA) && (cColorA>5) && (cColorA<11) && (cColorA == (game->getPuyoAt(c_x+1,c_y-1))->getPuyoState())) {
-                            score += game->getSamePuyoAround(c_x+1, c_y, cColorA)*3;
-                            //(printf("1 - x %d / y %d - s %d - C %d/%d/%d\n",c_x,c_y,score,c_color,f_color,cColorA));
-                            //(printf("  - %2d %2d %2d\n",toto(c_x-1,c_y-1),toto(c_x,c_y-1),toto(c_x+1,c_y-1)));
-                            //(printf("  - %2d %2d %2d\n",toto(c_x-1,c_y  ),toto(c_x,c_y  ),toto(c_x+1,c_y)));
-                            //(printf("  - %2d %2d %2d\n",toto(c_x-1,c_y+1),toto(c_x,c_y+1),toto(c_x+1,c_y+1)));
-                        }
-                    }
-                    
-                    if ((c_x>0) && (c_color == (game->getPuyoAt(c_x-1,c_y))->getPuyoState())) {
-                        PuyoState cColorB = (game->getPuyoAt(c_x-1,c_y+1))->getPuyoState();
-                        if ((c_color!=cColorB) && (cColorB>5) && (cColorB<11) && (cColorB == (game->getPuyoAt(c_x-1,c_y-1))->getPuyoState())) {
-                            score += game->getSamePuyoAround(c_x-1, c_y, cColorB)*3;
-                            //(printf("3 - x %d / y %d - s %d - C %d/%d/%d\n",c_x,c_y,score,c_color,f_color,cColorB));
-                            //(printf("  - %2d %2d %2d\n",toto(c_x-1,c_y-1),toto(c_x,c_y-1),toto(c_x+1,c_y-1)));
-                            //(printf("  - %2d %2d %2d\n",toto(c_x-1,c_y  ),toto(c_x,c_y  ),toto(c_x+1,c_y)));
-                            //(printf("  - %2d %2d %2d\n",toto(c_x-1,c_y+1),toto(c_x,c_y+1),toto(c_x+1,c_y+1)));
-                        }
-                    }
-		}
-                
-		if (f_y < PUYODIMY-1) {
-                    if ((f_x<(PUYODIMX - 1)) && (f_color == (game->getPuyoAt(f_x+1,f_y))->getPuyoState())) {
-                        PuyoState fColorA = (game->getPuyoAt(f_x+1,f_y+1))->getPuyoState();
-                        if ((f_color!=fColorA) && (fColorA>5) && (fColorA<11) && (fColorA == (game->getPuyoAt(f_x+1,f_y-1))->getPuyoState())) {
-                            score += game->getSamePuyoAround(f_x+1, f_y, fColorA)*3;
-                            //(printf("2 - x %d / y %d - s %d - C %d/%d/%d\n",f_x,f_y,score,f_color,c_color,fColorA));
-                            //(printf("  - %2d %2d %2d\n",toto(f_x-1,f_y-1),toto(f_x,f_y-1),toto(f_x+1,f_y-1)));
-                            //(printf("  - %2d %2d %2d\n",toto(f_x-1,f_y  ),toto(f_x,f_y  ),toto(f_x+1,f_y)));
-                            //(printf("  - %2d %2d %2d\n",toto(f_x-1,f_y+1),toto(f_x,f_y+1),toto(f_x+1,f_y+1)));
-                        }
-                    }
-                    
-                    
-                    if ((f_x>0) && (f_color == (game->getPuyoAt(f_x-1,f_y))->getPuyoState())) {
-                        PuyoState fColorB = (game->getPuyoAt(f_x-1,f_y+1))->getPuyoState();
-                        if ((f_color!=fColorB) && (fColorB>5) && (fColorB<11) && (fColorB == (game->getPuyoAt(f_x-1,f_y-1))->getPuyoState())) {
-                            score += game->getSamePuyoAround(f_x-1, f_y, fColorB)*3;
-                            //(printf("4 - x %d / y %d - s %d - C %d/%d/%d\n",f_x,f_y,score,f_color,c_color,fColorB));
-                            //(printf("  - %2d %2d %2d\n",toto(f_x-1,f_y-1),toto(f_x,f_y-1),toto(f_x+1,f_y-1)));
-                            //(printf("  - %2d %2d %2d\n",toto(f_x-1,f_y  ),toto(f_x,f_y  ),toto(f_x+1,f_y)));
-                            //(printf("  - %2d %2d %2d\n",toto(f_x-1,f_y+1),toto(f_x,f_y+1),toto(f_x+1,f_y+1)));
-                        }
-                    }
-		}
-		score += f_y+c_y;
-            }
-        }
-        else if ((f_y >= 0) && (c_y >= 0))
+      score = -5000;
+      return score;
+    }
+
+    /* On favorise les cas ou on regroupe les couleurs ! */
+    score = (game->getSamePuyoAround(f_x, f_y, f_color) + game->getSamePuyoAround(c_x, c_y, c_color) )*IAPuyoValue;
+
+    /* On favorise les cas ou on ne separe pas deux puyos de couleurs identiques qui tombent ! */
+    if ( (f_color == c_color) && ( (c_x==f_x) || (c_y==f_y) ) ) score += IAPuyoValue;
+
+    /* Si l'un des deux puyos est vraiment tres haut => vraiment pas bien ! */
+    if ((f_y < 1) && (c_y < 1)) score -= 1000;
+
+    /* Si les deux puyos sont suffisament bas => mode attaque ! */
+    if ((f_y >= IAHeightAgressivity) && (c_y >= IAHeightAgressivity))
+    {
+      /* On va defavoriser les cas ou on fait des trops petites constructions : */
+      PuyoState aboveStateF, aboveStateC;
+	  bool F,C;
+
+	  /* Main puyo may only make a block of 4 */
+      aboveStateF = (c_direction == UP) ? c_color : PUYO_EMPTY;
+	  F = ((game->getSamePuyoAround(f_x, f_y, f_color) + ((aboveStateF == f_color)?1:0)) == 4);
+
+	  /* Companion puyo may only make a block of 4 */
+      aboveStateC = (c_direction == DOWN) ? f_color : PUYO_EMPTY;
+	  C = ((game->getSamePuyoAround(c_x, c_y, c_color) + ((aboveStateC == c_color)?1:0)) == 4);
+
+      if ((F || C) && !(F && C))
+      {
+         score -= IAConstructorLevel*IAPuyoValue;
+         /* fprintf(stderr,"--o--"); */
+      }
+    }
+
+    /* On favorise les cas ou les puyos sont envoyes le plus bas possible */
+    score += (f_y+c_y)*IAHeightFactor;
+
+    /* On favorise les regroupements verticaux apres demolition : */
+
+    /* xx2 */
+    /* xx3 Favoriser le cas ou on pose un '3' au milieu pour que les '2' se groupent apres destruction du '3' */
+    /* 152 */
+
+    /* xx2 */
+    /* x43 Favoriser aussi un peu le cas ou on pose un '5' sur le '4' */
+    /* 152 */
+
+    /* Puyo companion */
+    if (c_y < PUYODIMY-1) /* Si on est pas completement en bas */
+    {
+      if ((c_x<(PUYODIMX - 1)) && (c_color == (game->getPuyoAt(c_x+1,c_y))->getPuyoState())) /* Test du pattern a droite */
+      {
+        PuyoState cColorA = (game->getPuyoAt(c_x+1,c_y+1))->getPuyoState();
+        if ((c_color!=cColorA) && (cColorA>5) && (cColorA<11) && (cColorA == (game->getPuyoAt(c_x+1,c_y-1))->getPuyoState()))
         {
-            score = -1000
-            + game->getSamePuyoAround(f_x, f_y, f_color)*10
-            + game->getSamePuyoAround(c_x, c_y, c_color)*10;
-            if (deep) score += f_y+c_y;
-	}
-        else
-            score = -50000;
-        return score;
+          score += game->getSamePuyoAround(c_x+1, c_y, cColorA)*IASecondLevelPuyoValue;
+        }
+      }
+                    
+      if ((c_x>0) && (c_color == (game->getPuyoAt(c_x-1,c_y))->getPuyoState())) /* Test du pattern a gauche */
+      {
+        PuyoState cColorB = (game->getPuyoAt(c_x-1,c_y+1))->getPuyoState();
+        if ((c_color!=cColorB) && (cColorB>5) && (cColorB<11) && (cColorB == (game->getPuyoAt(c_x-1,c_y-1))->getPuyoState()))
+        {
+          score += game->getSamePuyoAround(c_x-1, c_y, cColorB)*IASecondLevelPuyoValue;
+        }
+      }
     }
-    
-    void init(int col, int dir)
+    if (c_y < PUYODIMY-2) /* Si on est pas trop en bas */
     {
-        f_x = col;
-        c_direction = dir;
+      if (c_color == (game->getPuyoAt(c_x,c_y+2))->getPuyoState())
+      {
+        score += game->getSamePuyoAround(c_x, c_y+2, c_color)*IASecondLevelPuyoValue;
+      }
     }
-    PosEvaluator() { f_x = c_direction = 0; }
+                
+    /* Puyo principal */
+    if (f_y < PUYODIMY-1)  /* Si on est pas completement en bas */
+    {
+      if ((f_x<(PUYODIMX - 1)) && (f_color == (game->getPuyoAt(f_x+1,f_y))->getPuyoState())) /* Test du pattern a droite */
+      {
+        PuyoState fColorA = (game->getPuyoAt(f_x+1,f_y+1))->getPuyoState();
+        if ((f_color!=fColorA) && (fColorA>5) && (fColorA<11) && (fColorA == (game->getPuyoAt(f_x+1,f_y-1))->getPuyoState()))
+        {
+          score += game->getSamePuyoAround(f_x+1, f_y, fColorA)*IASecondLevelPuyoValue;
+        }
+      }
+                                  
+      if ((f_x>0) && (f_color == (game->getPuyoAt(f_x-1,f_y))->getPuyoState())) /* Test du pattern a gauche */
+      {
+        PuyoState fColorB = (game->getPuyoAt(f_x-1,f_y+1))->getPuyoState();
+        if ((f_color!=fColorB) && (fColorB>5) && (fColorB<11) && (fColorB == (game->getPuyoAt(f_x-1,f_y-1))->getPuyoState()))
+        {
+          score += game->getSamePuyoAround(f_x-1, f_y, fColorB)*IASecondLevelPuyoValue;
+        }
+      }
+    }
+    if (f_y < PUYODIMY-2) /* Si on est pas trop en bas */
+    {
+      if (f_color == (game->getPuyoAt(f_x,f_y+2))->getPuyoState())
+      {
+        score += game->getSamePuyoAround(f_x, f_y+2, f_color)*IASecondLevelPuyoValue;
+      }
+    }
+
+    return score;
+  }
+    
+  void init(int col, int dir)
+  {
+    f_x = col;
+    c_direction = dir;
+  }
+
+  PosEvaluator() { f_x = c_direction = 0; }
+
 };
 
 PuyoIA::PuyoIA(IA_Type type, int level, PuyoGame *targetGame)
@@ -182,10 +237,6 @@ void PuyoIA::cycle()
                     attachedGame->moveLeft();
                 else
                     attachedGame->cycle();
-                
-                //if ((attachedGame->getFallingY() == 0) && (choosenMove != -1)) choosenMove = -1;
-                /*if (PUYODIMY - attachedGame->getColumnHeigth(evaluator[choosenMove].f_x) - 1
-                    < attachedGame->getFallingY()) choosenMove = -1;*/
             }
             else if (choosenMove == -1) 
             {
@@ -195,8 +246,10 @@ void PuyoIA::cycle()
                 for (int i=PUYODIMX*4-3; i>=0; --i)
                 {
                     if ((f_color == PUYO_EMPTY)||(c_color==PUYO_EMPTY)) return;
-                    int val = evaluator[i].update(attachedGame, f_color, c_color, type == POLLUX);
-                    if (val > max) max = val;
+
+                    /* IAPuyoValue / IASecondLevelPuyoValue / IAConstructorLevel / IAHeightAgressivity / IAHeightFactor */
+                    int val = evaluator[i].update(attachedGame, f_color, c_color,100,30,3,6,2);
+                    if (val >= max) max = val;
                 }
                 
                 int nbKeep = 0;
@@ -205,20 +258,22 @@ void PuyoIA::cycle()
                     if (evaluator[i].score == max) {
                         nbKeep ++;
                         evaluator[i].keep = true;
-                        //(printf("!");
+                        //fprintf(stderr,"!");
                     }
                     else evaluator[i].keep = false;
-                    //(printf("s:%d ",evaluator[i].score));
+                    //fprintf(stderr,"s:%d ",evaluator[i].score);
                 }
-                
+
+                //fprintf(stderr,"\nMax : %d / nb to keep : %d ",max,nbKeep);
                 int tmp = 1 + ((random() / 7) % nbKeep);
+
                 for (int i=PUYODIMX*4-3; i>=0; --i)
                 {
                     if (evaluator[i].keep)
                     {
                         if (tmp == 1)
                         {
-                            //(printf("\nchoice : %d/%d (%d)\n",i,nbKeep,evaluator[i].score));
+                            //fprintf(stderr,"\nchoice : %d/%d (%d)\n",i,nbKeep,evaluator[i].score);
                             choosenMove = i;
                             break;
                         }
