@@ -23,17 +23,22 @@
 #include <string.h>
 #include "ios_udpmessagebox.h"
 #include "ios_udpmessage.h"
+#include "ios_socketaddress.h"
 
 namespace ios_fc {
 
 class UDPRawMessage {
 public:
-    UDPRawMessage(Buffer<char> buf, int msgid, int reliableFlag, IosDatagramSocket &sock) : id(msgid), reliable(reliableFlag), socket(sock) {
+    UDPRawMessage(Buffer<char> buf, int msgid, int reliableFlag,
+		  SocketAddress &address, int port, DatagramSocket &sock)
+      : id(msgid), reliable(reliableFlag),
+	address(address), port(port), socket(sock) {
         buffer = buf;
     }
     virtual ~UDPRawMessage() {}
     void send() {
-        socket.socketSend(buffer, buffer.size());
+        Datagram datagramToSend(address, port, buffer, buffer.size());
+        socket.send(datagramToSend);
     }
     bool isReliable() const { return reliable; }
     int getSerialID() const { return id; }
@@ -41,11 +46,15 @@ private:
     Buffer<char> buffer;
     int id;
     bool reliable;
-    IosDatagramSocket &socket;
+    SocketAddress address;
+    int port;
+    DatagramSocket &socket;
 };
 
 
-UDPMessageBox::UDPMessageBox(const String address, int localPort, int remotePort) : socket(address, localPort, remotePort)
+UDPMessageBox::UDPMessageBox(const String address,
+			     int localPort, int remotePort)
+  : defaultAddress(address), defaultPort(remotePort), socket(localPort)
 {
     sendSerialID = 0;
     receiveSerialID = 0;
@@ -55,7 +64,8 @@ UDPMessageBox::UDPMessageBox(const String address, int localPort, int remotePort
 
 void UDPMessageBox::idle()
 {
-    char receiveBuffer[2048];
+    char receiveData[2048];
+    Buffer<char> receiveBuffer(receiveData, 2048);
     int bufferSize;
     
     // Resend the waitingForAckMessage when it has reached its timeout
@@ -68,11 +78,10 @@ void UDPMessageBox::idle()
     }
     
     do {
-        socket.socketReceive(&receiveBuffer, bufferSize);
-        
+        Datagram receivedDatagram = socket.receive(receiveBuffer);
         try {
             if (bufferSize > 0) {
-                UDPMessage incomingMessage(Buffer<char>(receiveBuffer, bufferSize), *this);
+                UDPMessage incomingMessage(receiveBuffer, *this);
                 
                 int messageSerialID = incomingMessage.getSerialID();
                 
@@ -107,7 +116,7 @@ void UDPMessageBox::idle()
         }
         catch (UDPMessage::InvalidMessageException e) {
             receiveBuffer[2047] = 0;
-            printf("Message dropped : %s\n", receiveBuffer);
+            printf("Message dropped : %s\n", (const char *)receiveBuffer);
             // Do nothing
         }
     } while (bufferSize != 0);
@@ -115,7 +124,8 @@ void UDPMessageBox::idle()
 
 void UDPMessageBox::sendUDP(Buffer<char> buffer, int id, bool reliable)
 {
-    UDPRawMessage *rawMessage = new UDPRawMessage(buffer, id, reliable, socket);
+    UDPRawMessage *rawMessage = new UDPRawMessage(buffer, id, reliable,
+						  defaultAddress, defaultPort, socket);
     
     // Service messages must be sent imediately
     if (id <= 0) {

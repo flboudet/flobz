@@ -24,7 +24,8 @@
 
 #include "ios_memory.h"
 #include "ios_messagebox.h"
-#include "IosDatagramSocket.h"
+#include "ios_datagramsocket.h"
+#include "ios_socketaddress.h"
 
 namespace ios_fc {
 
@@ -39,7 +40,9 @@ public:
     Message * createMessage();
     void sendUDP(Buffer<char> buffer, int id, bool reliable);
 private:
-    IosDatagramSocket socket;
+    SocketAddress defaultAddress;
+    int defaultPort;
+    DatagramSocket socket;
     int sendSerialID, receiveSerialID;
     int cyclesBeforeResendingReliable;
     int waitingForAckTimeout;
