@@ -41,6 +41,7 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
         buffer.add(currentPuyo->getPuyoY());
     }
     neutralsBuffer.flush();
+    compTurnBuffer.flush();
         
     // creation du message
     Message *message = mbox->createMessage();
@@ -55,10 +56,12 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
     message->addInt     (PuyoMessage::SEMI_MOVE, attachedGame->getSemiMove());
     
     message->addIntArray(PuyoMessage::ADD_NEUTRALS,  neutralsBuffer);
+    message->addIntArray(PuyoMessage::COMPANION_TURN,compTurnBuffer);
     message->addBool    (PuyoMessage::DID_END_CYCLE, didEndCycle);
     
     // clear des infos ayant ete envoyee
     neutralsBuffer.clear();
+    compTurnBuffer.clear();
     didEndCycle = false;
     return message;
 }
@@ -118,6 +121,9 @@ void PuyoNetworkView::gameDidEndCycle()
 void PuyoNetworkView::companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise)
 {
     PuyoView::companionDidTurn(companionPuyo, companionVector, counterclockwise);
+    compTurnBuffer.add(companionPuyo->getID());
+    compTurnBuffer.add(companionVector);
+    compTurnBuffer.add(counterclockwise);
 }
 
 void PuyoNetworkView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY)

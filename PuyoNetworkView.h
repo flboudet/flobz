@@ -60,6 +60,7 @@ private:
     MessageBox *mbox;
     Message *createStateMessage(bool paused);
     AdvancedBuffer<int> neutralsBuffer;
+    AdvancedBuffer<int> compTurnBuffer;
     bool didEndCycle;
 };
 
