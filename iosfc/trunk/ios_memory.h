@@ -93,7 +93,14 @@ namespace ios_fc {
                 init_ptr(size);
             }
 
-            inline VoidBuffer (const VoidBuffer &buf,int offset=0)
+            inline VoidBuffer (const VoidBuffer &buf)
+                : p(buf.p),offset(0)
+			{
+              init_ptr(buf.size());
+              Memory::memcpy(ptr(), buf.ptr(), size());
+            }
+
+            inline VoidBuffer (VoidBuffer &buf,int offset=0)
                 : p(buf.p),offset(buf.offset + offset)
 			{
                 ++ p->nb;
@@ -104,13 +111,20 @@ namespace ios_fc {
                 Memory::memcpy (p->ptr,data,len);
             }
 
-			inline const VoidBuffer &operator= (const VoidBuffer &vb) {
+			inline const VoidBuffer &operator= (VoidBuffer &vb) {
 				unregPtr();
 				p      = vb.p;
 				offset = vb.offset;
 				++ p->nb;
 				return *this;
 			}
+
+			inline const VoidBuffer &operator= (const VoidBuffer &vb) {
+                unregPtr();
+                init_ptr(vb.size());
+                Memory::memcpy(ptr(), vb.ptr(), size());
+                return *this;
+            }
 
             inline ~VoidBuffer () {
 				unregPtr();
@@ -144,6 +158,12 @@ namespace ios_fc {
 
             inline int getOffset() const { return offset; }
 
+            inline VoidBuffer dup() const {
+                VoidBuffer buf(size());
+                Memory::memcpy(buf.ptr(), ptr(), size());
+                return buf;
+            }
+
         private:
             Ptr *p;
             int offset;
@@ -155,14 +175,22 @@ namespace ios_fc {
 
         public:
             inline Buffer (int size = 0)          : VoidBuffer(size * sizeof(T)) {}
-            inline Buffer (const VoidBuffer &buf) : VoidBuffer(buf) {}
             inline Buffer (const T *data,int len) : VoidBuffer(data,len*sizeof(T)) {}
-            inline Buffer (const Buffer<T>&buf,int offset = 0) : VoidBuffer(buf,offset) {}
+            inline Buffer (const VoidBuffer &buf) : VoidBuffer(buf) {}
+            inline Buffer (      VoidBuffer &buf) : VoidBuffer(buf) {}
+            inline Buffer (const Buffer<T>&buf)   : VoidBuffer(buf) {}
+            inline Buffer (      Buffer<T>&buf,int offset = 0)
+              : VoidBuffer(buf,offset) {}
 
-			inline const Buffer<T> operator=(const Buffer<T>&buf) {
-				VoidBuffer::operator=(buf);
-				return *this;
-			}
+            inline const Buffer<T> operator=(const Buffer<T>&buf) {
+              VoidBuffer::operator=(buf);
+              return *this;
+            }
+
+            inline const Buffer<T> operator=(Buffer<T>&buf) {
+              VoidBuffer::operator=(buf);
+              return *this;
+            }
 
             inline ~Buffer () {}
 
@@ -203,9 +231,18 @@ namespace ios_fc {
 
         public:
             inline AdvancedBuffer(int granularity = 64) : Buffer<T>(granularity),granularity(granularity),used(0) {}
-            inline AdvancedBuffer(const AdvancedBuffer<T>&buf, int offset=0)
+            inline AdvancedBuffer(      AdvancedBuffer<T>&buf, int offset=0)
                 : Buffer<T>(buf,offset), granularity(buf.granularity), used(buf.used - offset) {}
+            inline AdvancedBuffer(const AdvancedBuffer<T>&buf)
+                : Buffer<T>(buf), granularity(buf.granularity), used(buf.used) {}
 			
+			inline const AdvancedBuffer<T> operator=(      AdvancedBuffer<T>&buf) {
+				Buffer<T>::operator=(buf);
+				granularity = buf.granularity;
+				used = buf.used;
+				return *this;
+			}
+
 			inline const AdvancedBuffer<T> operator=(const AdvancedBuffer<T>&buf) {
 				Buffer<T>::operator=(buf);
 				granularity = buf.granularity;
