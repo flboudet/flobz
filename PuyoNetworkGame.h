@@ -74,6 +74,7 @@ private:
     MessageBox &msgBox;
     IosVector puyoVector;
     int semiMove;
+    int neutralPuyos, sentBadPuyos;
 };
 
 

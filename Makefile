@@ -9,7 +9,7 @@ ENABLE_AUDIO=true
 ENABLE_OPENGL=false
 ENABLE_DGA=false
 
-DEBUG_MODE=false
+DEBUG_MODE=true
 MORE_DEBUG=false
 
 # Unix/Linux settings

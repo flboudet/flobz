@@ -35,6 +35,8 @@ PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBo
     fakePuyo = attachedFactory->createPuyo(PUYO_FALLINGRED);
     msgBox.addListener(*this);
     semiMove = 0;
+    neutralPuyos = 0;
+    sentBadPuyos = 0;
 }
 
 void PuyoNetworkGame::onMessage(Message &message)
@@ -100,10 +102,20 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     }
     
     Buffer<int> didFall= message.getIntArray(DID_FALL);
-    if (addNeutrals.size() > 0) {
+    if (didFall.size() > 0) {
        if (delegate != NULL) {
             delegate->puyoDidFall(findPuyo(didFall[0]), didFall[1], didFall[2]);
         }
+    }
+    
+    int badPuyos = message.getInt(NUMBER_BAD_PUYOS);
+    if (badPuyos > sentBadPuyos) {
+        neutralPuyos = sentBadPuyos - badPuyos;
+        if (delegate != NULL) {
+            delegate->gameDidEndCycle();
+        }
+        neutralPuyos = 0;
+        sentBadPuyos = badPuyos;
     }
 }
 
@@ -183,7 +195,7 @@ void PuyoNetworkGame::increaseNeutralPuyos(int incr)
 
 int PuyoNetworkGame::getNeutralPuyos() const
 {
-    return 0;
+    return neutralPuyos;
 }
 
 void PuyoNetworkGame::dropNeutrals()
