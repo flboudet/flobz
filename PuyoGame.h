@@ -77,7 +77,7 @@ class PuyoDefaultFactory : public PuyoFactory {
 
 class PuyoDelegate {
 public:
-  virtual void gameDidAddNeutral(PuyoPuyo *neutralPuyo) = 0;
+  virtual void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex) = 0;
   virtual void companionDidTurn(PuyoPuyo *companionPuyo,
 				int companionVector,
 				bool counterclockwise) = 0;

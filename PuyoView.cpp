@@ -280,10 +280,10 @@ void PuyoView::renderNeutral()
 	}
 }
 
-void PuyoView::gameDidAddNeutral(PuyoPuyo *neutralPuyo) {
+void PuyoView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex) {
     int x = neutralPuyo->getPuyoX();
     int y = neutralPuyo->getPuyoY();
-    ((AnimatedPuyo *)neutralPuyo)->addAnimation(new NeutralAnimation(x, y, xOffset, yOffset));
+    ((AnimatedPuyo *)neutralPuyo)->addAnimation(new NeutralAnimation(x, y, neutralIndex * 4, xOffset, yOffset));
 }
 
 void PuyoView::companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise)
@@ -303,7 +303,7 @@ void PuyoView::puyoWillVanish(IosVector &puyoGroup)
     AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
     for (int i = 0, j = puyoGroup.getSize() ; i < j ; i++) {
         AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(puyoGroup.getElementAt(i));
-        currentPuyo->addAnimation(new VanishAnimation(currentPuyo, i*10 , xOffset, yOffset, synchronizer));
+        currentPuyo->addAnimation(new VanishAnimation(currentPuyo, i*2 , xOffset, yOffset, synchronizer));
     }
 }
 

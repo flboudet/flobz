@@ -56,20 +56,28 @@ bool PuyoAnimation::isEnabled() const
 
 /* Neutral falling animation */
 IIM_Surface *NeutralAnimation::neutral = NULL;
-NeutralAnimation::NeutralAnimation(int X, int Y, int xOffset, int yOffset)
+NeutralAnimation::NeutralAnimation(int X, int Y, int delay, int xOffset, int yOffset)
 {
     if (neutral == NULL)
         neutral = PuyoView::getSurfaceForState(PUYO_NEUTRAL);
 	this->X = (X*TSIZE) + xOffset;
 	this->Y = (Y*TSIZE) + yOffset;
 	this->currentY = yOffset;
+    step = 0;
+    this->delay = delay;
 }
 
 void NeutralAnimation::cycle()
 {
-	currentY += 16;
-	if (currentY >= Y)
-		finishedFlag = true;
+    if (delay >=0) {
+        delay--;
+    }
+    else {
+        currentY += step;
+        step += 0.5;
+        if (currentY >= Y)
+            finishedFlag = true;
+    }
 }
 
 void NeutralAnimation::draw(int semiMove)
@@ -192,7 +200,7 @@ FallingAnimation::FallingAnimation(PuyoPuyo *puyo, int originY, int xOffset, int
     attachedPuyo  = puyo;
     this->xOffset = xOffset;
     this->yOffset = yOffset;
-    this->step    = step;
+    this->step    = 0/*step*/;
     this->X  = (puyo->getPuyoX()*TSIZE) + xOffset;
     this->Y  = (originY*TSIZE) + yOffset;
     puyoFace = PuyoView::getSurfaceForState(puyo->getPuyoState());
@@ -204,7 +212,7 @@ FallingAnimation::FallingAnimation(PuyoPuyo *puyo, int originY, int xOffset, int
 
 void FallingAnimation::cycle()
 {
-    Y += step;
+    Y += step++;
     if (Y >= (attachedPuyo->getPuyoY()*TSIZE) + yOffset)
     {
         bouncing--;
@@ -269,7 +277,7 @@ void VanishAnimation::cycle()
     else if (synchronizer->isSynchronized()) {
         enabled = true;
         iter ++;
-        if (iter == 55) {
+        if (iter == 55 + delay) {
             finishedFlag = true;
         }
     }
@@ -277,7 +285,7 @@ void VanishAnimation::cycle()
 
 void VanishAnimation::draw(int semiMove)
 {
-    if (iter < 10) {
+    if (iter < (10 + delay)) {
         if (puyoFace && (iter % 2 == 0)) {
             SDL_Rect drect;
             drect.x = X;
@@ -296,11 +304,11 @@ void VanishAnimation::draw(int semiMove)
             drect.y = Y;// + (2.5 * pow(iter - 16, 2) - 108);
                 drect.w = puyoFace->w;
                 drect.h = puyoFace->h;
-                int iter2 = iter - 10;
-                int shrinkingImage = (iter - 10) / 4;
+                int iter2 = iter - 10 - delay;
+                int shrinkingImage = (iter - 10 - delay) / 4;
                 if (shrinkingImage < 4) {
                     painter.requestDraw(shrinkingPuyo[shrinkingImage][color], &drect);
-                    int xrectY = Y + (int)(2.5 * pow(iter - 16, 2) - 108);
+                    int xrectY = Y + (int)(2.5 * pow(iter - 16 - delay, 2) - 108);
                     xrect.w = explodingPuyo[shrinkingImage][color]->w;
                     xrect.h = explodingPuyo[shrinkingImage][color]->h;
                     xrect.x = X - iter2 * iter2;

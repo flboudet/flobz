@@ -10,7 +10,7 @@ SDL_CONFIG=sdl-config
 CC=g++
 CXX=g++
 
-CFLAGS=`$(SDL_CONFIG) --cflags` -g -I/sw/include -DUSE_AUDIO=1 # -DHAVE_OPENGL=1
+CFLAGS=`$(SDL_CONFIG) --cflags` -g -I/sw/include -DUSE_AUDIO=1  -DHAVE_OPENGL=1
 CXXFLAGS=${CFLAGS}
 
 HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h PuyoGame.h PuyoAnimations.h \

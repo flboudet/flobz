@@ -62,12 +62,14 @@ private:
 /* Neutral falling animation */
 class NeutralAnimation : public PuyoAnimation {
   public:
-    NeutralAnimation(int X, int Y, int xOffset, int yOffset);
+    NeutralAnimation(int X, int Y, int delay, int xOffset, int yOffset);
     void cycle();
     void draw(int semiMove);
   private:
     static IIM_Surface *neutral;
     int X, Y, currentY;
+    float step;
+    int delay;
 };
 
 /* Companion turning around main puyo animation */

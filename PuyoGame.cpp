@@ -322,6 +322,7 @@ void PuyoGame::dropNeutrals()
     points -= gameLevel * neutralPuyos * 1000;
   }
 
+    int idNeutral = 0;
     while (neutralPuyos > 0)
     {
       int cycleNeutral;
@@ -341,7 +342,7 @@ void PuyoGame::dropNeutrals()
         puyoVector.addElement(newNeutral);
         setPuyoAt(posX, posY, newNeutral);
         if (delegate != NULL)
-          delegate->gameDidAddNeutral(newNeutral);
+          delegate->gameDidAddNeutral(newNeutral, idNeutral++);
       }
     }
     neutralPuyos = 0;
