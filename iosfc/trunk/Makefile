@@ -1,4 +1,4 @@
-SRCS=ios_exception.cpp ios_stream.cpp ios_hash.cpp ios_memory.cpp ios_message.cpp ios_standardmessage.cpp ios_udpmessage.cpp ios_messagebox.cpp ios_udpmessagebox.cpp  ios_datagramsocket.cpp ios_unixdatagramsocketimpl.cpp ios_unixsocketaddressimpl.cpp ios_igpmessagebox.cpp ios_socket.cpp ios_unixsocketimpl.cpp ios_igpclient.cpp ios_igpdatagram.cpp
+SRCS=ios_exception.cpp ios_stream.cpp ios_hash.cpp ios_memory.cpp ios_message.cpp ios_standardmessage.cpp ios_udpmessage.cpp ios_messagebox.cpp ios_udpmessagebox.cpp  ios_datagramsocket.cpp ios_unixdatagramsocketimpl.cpp ios_unixsocketaddressimpl.cpp ios_igpmessagebox.cpp ios_socket.cpp ios_unixsocketimpl.cpp ios_igpclient.cpp ios_igpdatagram.cpp ios_filemanager.cpp
 
 CPPFLAGS=-g `sdl-config --cflags`  -Wall
 CXX=g++
@@ -36,3 +36,4 @@ clean:
 .PHONY: all object clean
 
 -include $(SRCS:%.cpp=$(DEPDIR)/%.P)
+# DO NOT DELETE

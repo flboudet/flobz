@@ -349,13 +349,13 @@ namespace ios_fc {
 
         private:
             /* deprecated */
-            inline Buffer (      Buffer<T>&buf,int offset) {
+/*            inline Buffer (      Buffer<T>&buf,int offset) {
               printf ("DO NOT USE THIS (%s::%d)\n", __FILE__, __LINE__);
             }
             inline Buffer (const Buffer<T>&buf,int offset) {
               *(char*)0=0;
               printf ("DO NOT USE THIS (%s::%d)\n", __FILE__, __LINE__);
-            }
+            }*/
     };
 
 	// DO NOT STORE OBJECT IN BUFFER, just pointers or primitive types.
@@ -479,8 +479,20 @@ namespace ios_fc {
             String operator+(float f)  const { return concat<float>("%f", f); }
             String operator+(double d) const { return concat<double>("%g", d); }
 
+            bool operator==(const char *s) const {
+                return !strcmp(buffer, s);
+            }
+
             bool operator==(const String &s) const {
                 return !strcmp(buffer, s.buffer);
+            }
+
+            bool operator!=(const String &s) const {
+              return strcmp(buffer, s.buffer);
+            }
+
+            bool operator!=(const char *s) const {
+              return strcmp(buffer, s);
             }
 
             const String& operator+=(const String &s) {
@@ -537,6 +549,21 @@ namespace ios_fc {
             char &operator[] (int i)       { return buffer[i]; }
             
             inline int getOffset() const { return buffer.getOffset(); }
+            
+/*            inline AdvancedBuffer<String*> tokenize(char delim)
+            {
+              Vector<String> vector;
+              int prev = 0;
+              int _size = size();
+              int i = 0;
+              for (; i<_size; ++i)
+                if (buffer[i] == delim) {
+                  vector.add(new String(substring(prev, i)));
+                  prev = i + 1;
+                }
+              vector.add = new String(substring(prev, i));
+              return vector;
+            }*/
             
         protected:
             Buffer<char> buffer;
