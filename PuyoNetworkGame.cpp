@@ -148,6 +148,8 @@ void PuyoNetworkGame::cycle()
 
 PuyoPuyo *PuyoNetworkGame::getPuyoAt(int X, int Y) const
 {
+    if ((X >= PUYODIMX) || (Y >= PUYODIMY) || (X < 0) || (Y < 0))
+		return NULL;
     return puyoCells[X + Y * PUYODIMX];
 }
 
