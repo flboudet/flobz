@@ -1,14 +1,19 @@
 <init>
   # Init function: called when script is loaded
-  Display @display = [new_display: x=280.0 y=0.0 width=640.0 height=480.0]
-  Sprite @head =  [new_sprite: image="story/kaori.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
-  Sprite @eyes =  [new_sprite: image="story/eyes.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
-  Sprite @mouth =  [new_sprite: image="story/mouthsmall.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=4.0]
+  Display @display = [new_display: x=200.0 y=0.0 width=640.0 height=480.0]
+  Sprite @head =  [new_sprite: image="story/kaori.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
+  Sprite @eyes =  [new_sprite: image="story/eyes.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
+  Sprite @mouth =  [new_sprite: image="story/mouthsmall.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=4.0]
+  Sprite @fond =  [new_sprite: image="story/bluebkgnd.jpg" x=640.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
+  Sprite @fond2 =  [new_sprite: image="story/bluebkgnd.jpg" x=0.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
+  float @targetCycle = 100.0
+  float @targetCycle2 = 50.0
 
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
   # This also allows you to specify the drawing order
-  # sprite::@sprite2
+  sprite::@fond display=@display
+  sprite::@fond2 display=@display
   sprite::@head display=@display
   sprite::@eyes display=@display
   sprite::@mouth display=@display
@@ -21,7 +26,16 @@
   (@mouth.curframe > 2.0)? @mouth.image = "story/evilmouth.png"
   (@mouth.curframe > 3.0)? @mouth.image = "story/happymouth.png"
 
-  #move::@sprite fcycle=300.0 x=640.0 y=200.0
-  #move::@sprite2 fcycle=50.0 x=350.0 y=100.0
-  (@fcycle > 300.0)? @finished = 1
+  (@fond.pos.x >  -640.0)? move::@fond fcycle=@targetCycle x=-640.0 y=0.0
+  (@fond.pos.x <= -640.0)? {
+    @fond.pos.x     = 640.0
+    @targetCycle += 100.0
+  }
 
+  (@fond2.pos.x >  -640.0)? move::@fond2 fcycle=@targetCycle2 x= -640.0 y=0.0
+  (@fond2.pos.x <= -640.0)? {
+    @fond2.pos.x     = 0.0
+    @targetCycle2 += 100.0
+  }
+
+  (@fcycle > 600.0)? @finished = 1
