@@ -6,8 +6,7 @@ namespace PuyoMessage {
 
 enum {
     kGameState   = 0,
-    kGameOver    = 1,
-    kBadPuyos    = 2
+    kGameOver    = 1
 };
 
 static const char *TYPE          = "TYPE";
@@ -22,7 +21,7 @@ static const char *DID_END_CYCLE = "DID_END_CYCLE";
 static const char *SEMI_MOVE     = "SEMI_MOVE";
 static const char *COMPANION_TURN = "COMPANION_TURN";
 static const char *DID_FALL      = "DID_FALL";
-static const char *NUMBER        = "NUMBER";
+static const char *NUMBER_BAD_PUYOS = "NUMBER_BAD_PUYOS";
 
 };
 

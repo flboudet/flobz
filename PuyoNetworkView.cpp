@@ -59,13 +59,12 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
     message->addIntArray(PuyoMessage::ADD_NEUTRALS,  neutralsBuffer);
     message->addIntArray(PuyoMessage::COMPANION_TURN,compTurnBuffer);
     message->addIntArray(PuyoMessage::DID_FALL,      didFallBuffer);
-    message->addBool    (PuyoMessage::DID_END_CYCLE, didEndCycle);
+    message->addInt     (PuyoMessage::NUMBER_BAD_PUYOS, badPuyos);
     
     // clear des infos ayant ete envoyee
     neutralsBuffer.clear();
     compTurnBuffer.clear();
     didFallBuffer.clear();
-    didEndCycle = false;
     return message;
 }
 
@@ -118,14 +117,8 @@ void PuyoNetworkView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex)
 void PuyoNetworkView::gameDidEndCycle()
 {
     PuyoView::gameDidEndCycle();
-    didEndCycle = true;
-    Message *message = mbox->createMessage();
-    message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kBadPuyos);
-    message->addString  (PuyoMessage::NAME,   p1name);
-    message->addInt     (PuyoMessage::SCORE,  attachedGame->getPoints());
-    message->addBoolProperty("RELIABLE", true);
-    message->send();
-    delete message;
+    if (attachedGame->getNeutralPuyos() > 0)
+        badPuyos += attachedGame->getNeutralPuyos();
 }
 
 void PuyoNetworkView::companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise)
@@ -155,7 +148,6 @@ void PuyoNetworkView::gameLost()
     Message *message = mbox->createMessage();
     message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameOver);
     message->addString  (PuyoMessage::NAME,   p1name);
-    message->addInt     (PuyoMessage::NUMBER, attachedGame->getNeutralPuyos());
     message->addBoolProperty("RELIABLE", true);
     message->send();
     delete message;

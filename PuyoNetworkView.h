@@ -37,7 +37,7 @@ class PuyoNetworkView : public PuyoView {
     PuyoNetworkView(PuyoGameFactory *attachedPuyoGameFactory, int xOffset, int yOffset,
                     int nXOffset, int nYOffset, MessageBox *mbox)
         : PuyoView(attachedPuyoGameFactory, xOffset, yOffset, nXOffset, nYOffset),
-          mbox(mbox),didEndCycle(false) {}
+          mbox(mbox),badPuyos(0) {}
         
     void cycleGame();
     
@@ -62,7 +62,7 @@ private:
     AdvancedBuffer<int> neutralsBuffer;
     AdvancedBuffer<int> compTurnBuffer;
     AdvancedBuffer<int> didFallBuffer;
-    bool didEndCycle;
+    int badPuyos;
 };
 
 #endif // _PUYONETWORKVIEW
