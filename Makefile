@@ -36,7 +36,10 @@ WINSDLRUNTIME=/home/$(USER)/SDL-1.2.7/lib
 ##############
 # Autodetection
 
+ifndef PLATFORM
 PLATFORM=$(shell uname -s)
+endif
+
 
 VERSION=$(shell grep "\#define FLOBOPUYOVERSION" PuyoVersion.c  | cut -d "\"" -f 2)
 #
@@ -48,11 +51,6 @@ CXX=g++
 
 CFLAGS= -DDATADIR=\"${DATADIR}\" -I${IOSFC_DIR}
 LDFLAGS=
-
-ifneq ($(PLATFORM), $(CYGWIN_VERSION))
-CFLAGS:=$(CFLAGS) `$(SDL_CONFIG) --cflags` -I/sw/include
-LDFLAGS:=$(LDFLAGS) `$(SDL_CONFIG) --cflags --libs`
-endif
 
 HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h\
         PuyoGame.h PuyoAnimations.h AnimatedPuyo.h PuyoIA.h PuyoPlayer.h     \
@@ -71,18 +69,28 @@ OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o        \
 	  PuyoStarter.o PuyoNetworkView.o PuyoNetworkGame.o
 
 
-################
-# Mac OS X
+# Autodetected cygwin platform
+ifeq ($(PLATFORM), $(CYGWIN_VERSION))
+  CFLAGS:=$(CFLAGS) -mno-cygwin -mwindows -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE)
+  LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_net -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
+else
+# mingw32 cross-compilation (works great in debian testing)
+ifeq ($(PLATFORM), crossmingw32)
+  CC=i586-mingw32msvc-g++
+  CXX=i586-mingw32msvc-g++
+  CFLAGS:=$(CFLAGS) -mno-cygwin -mwindows -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE)  -I$(WINSDLINCLUDE)/SDL
+  LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_net -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
+else
+# more traditional unix platform
+CFLAGS:=$(CFLAGS) `$(SDL_CONFIG) --cflags`
+LDFLAGS:=$(LDFLAGS) `$(SDL_CONFIG) --cflags --libs`
+#small additions for Darwin (we assume SDL was installed with Fink)
 ifeq ($(PLATFORM), Darwin)
-CFLAGS:=$(CFLAGS) -DMACOSX -UDATADIR
+CFLAGS:=$(CFLAGS) -I/sw/include -DMACOSX -UDATADIR
+endif
+endif
 endif
 
-################
-# Win32
-ifeq ($(PLATFORM), $(CYGWIN_VERSION))
-CFLAGS:=$(CFLAGS) -mno-cygwin -mwindows -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE) 
-LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_net -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
-endif
 
 ifeq ($(ENABLE_AUDIO), true)
 CFLAGS:=$(CFLAGS) -DUSE_AUDIO=1
@@ -118,7 +126,7 @@ all: prelude flobopuyo
 
 flobopuyo: ${OBJFILES}
 	@make -C iosfc object
-	@echo "[flobopuyo]" && g++ $(CFLAGS) $(LDFLAGS) -o flobopuyo -lSDL_net -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o
+	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o flobopuyo -lSDL_net -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
 	@[ "x`cat WARNINGS | wc -l`" != "x0" ] && echo -e "--------------------------------------\n There have been some warnings:\n" && cat WARNINGS && rm -f WARNINGS && echo "--------------------------------------" || true
@@ -179,7 +187,7 @@ scenar.y.c:scenar.y ${HFILES}
 
 clean:
 	make -C iosfc clean
-	rm -f *~ scenar.y.c scenar.y.h scenar.l.c *.o flobopuyo* WARNINGS
+	rm -rf *~ scenar.y.c scenar.y.h scenar.l.c *.o flobopuyo* WARNINGS
 	rm -rf .xvpics data/.xvpics    data/*/.xvpics
 	rm -rf $(bundle_name)
 	rm -rf $(macimage_name)
