@@ -657,6 +657,9 @@ void PuyoCommander::run()
     Menu   *menu = mainMenu;
     
     cycle = 0;
+    lastRenderedCycle = 0;
+    maxFrameDrop = 10;
+    
     start_time = SDL_GetTicks ();
     
     audio_music_start (0);
@@ -1388,8 +1391,9 @@ void PuyoCommander::updateAll(PuyoDrawable *starter, SDL_Surface *extra_surf)
   cycle++;
   now = SDL_GetTicks ();
 
-  if (now < (start_time + cycle * cycle_duration)) {
-
+  if ((now < (start_time + cycle * cycle_duration)) || (cycle - lastRenderedCycle > maxFrameDrop)) {
+    lastRenderedCycle = cycle;
+    
     if (starter) {
       starter->draw();
     }

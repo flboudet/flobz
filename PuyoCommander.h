@@ -58,6 +58,8 @@ class PuyoCommander
   Menu *mustRestartMenu;
   ScrollingText *scrollingText;
   unsigned int cycle, start_time;
+  unsigned int lastRenderedCycle;
+  unsigned int maxFrameDrop;
 
   static const int player1Joystick = 1;
   static const int player2Joystick = 0;
