@@ -103,5 +103,8 @@ extern char *kHitActionToContinue;
 extern char *kContinue;
 extern char *kPlayer;
 extern char *kScore;
+extern char *kContinueGame;
+extern char *kAbortGame;
+extern char *kOptions;
 
 #endif // _PUYOCOMMANDER

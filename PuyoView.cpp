@@ -670,6 +670,10 @@ void PuyoStarter::restartRender()
   painter.redrawAll();
 }
 
+
+extern Menu *menu_pause;
+
+
 PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType)
 {
   this->stopRendering = false;
@@ -832,10 +836,6 @@ void PuyoStarter::run(int score1, int score2, int lives)
           GameControlEvent controlEvent;
           commander->getControlEvent(event, &controlEvent);
           switch (controlEvent.gameEvent) {
-            case GameControlEvent::kPauseGame:
-              paused = true;
-              stopRender();
-              break;
             case GameControlEvent::kPlayer1Left:
               if (randomPlayer == 0)
                 attachedGameA->moveLeft();
@@ -926,10 +926,30 @@ void PuyoStarter::run(int score1, int score2, int lives)
         else {
           GameControlEvent controlEvent;
           commander->getControlEvent(event, &controlEvent);
-          switch (controlEvent.gameEvent) {
-            case GameControlEvent::kPauseGame:
-              paused = false;
-              restartRender();
+          switch (controlEvent.cursorEvent) {
+            case GameControlEvent::kUp:
+              menu_prev_item(menu_pause);
+              break;
+            case GameControlEvent::kDown:
+              menu_next_item(menu_pause);
+              break;
+            case GameControlEvent::kStart:
+              if (menu_active_is(menu_pause, kContinueGame)) {
+                paused = false;
+                restartRender();
+                menu_hide(menu_pause);
+              }
+              if (menu_active_is(menu_pause, kAbortGame)) {
+                if (menu_active_is(commander->gameOverMenu, "YES"))
+                  menu_next_item(commander->gameOverMenu);
+                quit = 1;
+                menu_hide(menu_pause);
+              }
+              if (menu_active_is(menu_pause, kOptions)) {
+                menu_hide (menu_pause);
+                commander->optionMenuLoop();
+                menu_show (menu_pause);
+              }
               break;
           }
         }
@@ -1003,9 +1023,16 @@ void PuyoStarter::run(int score1, int score2, int lives)
           }
           break;
         case GameControlEvent::kBack:
-          if (menu_active_is(commander->gameOverMenu, "YES"))
-            menu_next_item(commander->gameOverMenu);
-          quit = 1;
+          if (!paused) {
+              menu_show(menu_pause);
+              paused = true;
+              stopRender();
+          }
+          else {
+              paused = false;
+              restartRender();
+              menu_hide(menu_pause);
+          }
           break;
         default:
           break;

@@ -23,6 +23,9 @@ char *kYouGotToLevel = "You get to level";
 char *kHitActionToContinue = "Hit Action to continue...";
 char *kHitActionForMenu = "Hit Action for menu...";
 char *kContinue    = "Continue?";
+char *kContinueGame= "Continue Game";
+char *kAbortGame   = "Abort Game";
+char *kOptions     = "Options";
 char *kPlayer      = "Player";
 char *kScore       = "Score:";
 
@@ -481,6 +484,33 @@ MenuItems controls_menu_load (SoFont *font, SoFont *small_font)
   return controls_menu;
 }
 
+Menu *menu_pause = NULL;
+
+MenuItems pause_menu_load (SoFont * font)
+{
+  static MenuItemsTab main_menu = {
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM (kContinueGame),
+    MENUITEM_BLANKLINE,
+    MENUITEM (kOptions),
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM (kAbortGame),
+    MENUITEM_END
+  };
+  static int loaded = 0;
+
+  if (!loaded) {
+    menu_items_set_font_for (main_menu, kContinueGame, font);
+    menu_items_set_font_for (main_menu, kOptions, font);
+    menu_items_set_font_for (main_menu, kAbortGame, font);
+    loaded = 1;
+  }
+
+  return main_menu;
+}
+
 PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
 {
   int init_flags = SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK;
@@ -562,12 +592,14 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   rulesMenu = menu_new(rules_menu_load(menuFont),menuselector);
   aboutMenu = menu_new(about_menu_load(menuFont),menuselector);
   singleGameMenu = menu_new(single_game_menu_load(menuFont,smallFont),menuselector);
+  if (menu_pause == NULL) menu_pause = menu_new(pause_menu_load(menuFont),menuselector);
   menu_set_sounds (optionMenu,     sound_pop, sound_slide);
-  menu_set_sounds (controlsMenu,     sound_pop, sound_slide);
+  menu_set_sounds (controlsMenu,   sound_pop, sound_slide);
   menu_set_sounds (mainMenu,       sound_pop, sound_slide);
   menu_set_sounds (rulesMenu,      sound_pop, sound_slide);
   menu_set_sounds (aboutMenu,      sound_pop, sound_slide);
   menu_set_sounds (singleGameMenu, sound_pop, sound_slide);
+  menu_set_sounds (menu_pause    , sound_pop, sound_slide);
 
   scrollingText = scrolling_text_new(
     "Welcome to the wonderful world of FloboPuyo !!!  Enjoy its nice graphics, "
@@ -1029,6 +1061,7 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
   menu_update (rulesMenu, display);
   menu_update (aboutMenu, display);
   menu_update (singleGameMenu, display);
+  menu_update (menu_pause,display);
   scrolling_text_update(scrollingText, display);
 
   // affichage eventuel (pourrait ne pas avoir lieu de tps en tps si machine
@@ -1053,6 +1086,7 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
     menu_draw (rulesMenu, display);
     menu_draw (aboutMenu, display);
     menu_draw (singleGameMenu, display);
+    menu_draw(menu_pause,display);
     SDL_Flip (display);
   }
 
