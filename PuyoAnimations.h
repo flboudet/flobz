@@ -112,7 +112,7 @@ private:
 class VanishAnimation : public PuyoAnimation {
 public:
     VanishAnimation(PuyoPuyo *puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer);
-    ~VanishAnimation();
+    virtual ~VanishAnimation();
     void cycle();
     void draw(int semiMove);
 private:
@@ -122,6 +122,19 @@ private:
     AnimationSynchronizer *synchronizer;
     bool once;
     int delay;
+};
+
+class VanishSoundAnimation : public PuyoAnimation {
+public:
+    VanishSoundAnimation(int phase, AnimationSynchronizer *synchronizer);
+    virtual ~VanishSoundAnimation();
+    void cycle();
+    void draw(int semiMove);
+private:
+    int phase;
+    int step;
+    bool once;
+    AnimationSynchronizer *synchronizer;
 };
 
 #endif // _PUYOANIMATIONS

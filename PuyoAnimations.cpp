@@ -73,10 +73,12 @@ void NeutralAnimation::cycle()
         delay--;
     }
     else {
-        currentY += step;
+        currentY += (int)step;
         step += 0.5;
-        if (currentY >= Y)
+        if (currentY >= Y) {
+            audio_sound_play(sound_bim[random() % 2]);
             finishedFlag = true;
+        }
     }
 }
 
@@ -143,6 +145,9 @@ TurningAnimation::TurningAnimation(PuyoPuyo *companionPuyo,
 
 void TurningAnimation::cycle()
 {
+    if (cpt == 0) {
+        audio_sound_play(sound_fff);
+    }
     cpt++;
     angle += step;
     if (cpt == 4)
@@ -277,7 +282,10 @@ void VanishAnimation::cycle()
     else if (synchronizer->isSynchronized()) {
         enabled = true;
         iter ++;
-        if (iter == 55 + delay) {
+        //if (iter == delay + 10) {
+        //    audio_sound_play(sound_splash[0]);
+        //}
+        if (iter == 30/* + delay*/) {
             finishedFlag = true;
         }
     }
@@ -328,3 +336,37 @@ void VanishAnimation::draw(int semiMove)
     }
 }
 
+VanishSoundAnimation::VanishSoundAnimation(int phase, AnimationSynchronizer *synchronizer)
+{
+    once = false;
+    step = 0;
+    this->phase = phase;
+    this->synchronizer = synchronizer;
+    synchronizer->incrementUsage();
+    synchronizer->push();
+}
+
+VanishSoundAnimation::~VanishSoundAnimation()
+{
+    synchronizer->decrementUsage();
+}
+
+void VanishSoundAnimation::cycle()
+{
+    if (once == false) {
+        once = true;
+        synchronizer->pop();
+    }
+    else if (synchronizer->isSynchronized()) {
+        step++;
+        if (step == 1) {
+            audio_sound_play(sound_splash[phase>7?7:phase]);
+            finishedFlag = true;
+        }
+    }
+}
+
+void VanishSoundAnimation::draw(int semiMove)
+{
+    // do nothing
+}

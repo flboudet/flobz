@@ -189,16 +189,37 @@ IIM_Surface *PuyoView::getSurfaceForPuyo(PuyoPuyo *puyo)
 
 void PuyoView::cycleAnimation()
 {
+    // Cycling every puyo's animation
 	for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
 		AnimatedPuyo *currentPuyo =
-		  (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
+        (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
 		currentPuyo->cycleAnimation();
 	}
+    // Cycling dead puyo's animations
     attachedPuyoFactory.cycleWalhalla();
+    
+    // Cycling view's animations
+    if (viewAnimations.getSize() > 0) {
+        PuyoAnimation *currentAnimation = (PuyoAnimation *)(viewAnimations.getElementAt(0));
+        if (currentAnimation->isFinished()) {
+            viewAnimations.removeElementAt(0);
+            delete currentAnimation;
+        }
+        else {
+            currentAnimation->cycle();
+        }
+    }
+    
+    if (attachedGame->isEndOfCycle()) {
+        while (attachedGame->isEndOfCycle() && cycleAllowed()) {
+            attachedGame->cycle();
+        }
+    }
 }
 
 void PuyoView::render()
 {
+    
 	SDL_Rect drect;
     SDL_Rect vrect;
 	vrect.x = xOffset;
@@ -254,6 +275,14 @@ void PuyoView::render()
 		painter.requestDraw(currentSurface, &drect);
 		if (currentSurface != neutral) painter.requestDraw(puyoEyes, &drect);
 	}
+    
+    // Drawing the view animation
+    if (viewAnimations.getSize() > 0) {
+        PuyoAnimation *currentAnimation = (PuyoAnimation *)(viewAnimations.getElementAt(0));
+        if (!currentAnimation->isFinished()) {
+            currentAnimation->draw(0);
+        }
+    }
 }
 
 void PuyoView::renderNeutral()
@@ -307,12 +336,25 @@ void PuyoView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY)
     ((AnimatedPuyo *)puyo)->addAnimation(new FallingAnimation(puyo, originY, xOffset, yOffset, 16));
 }
 
-void PuyoView::puyoWillVanish(IosVector &puyoGroup)
+void PuyoView::puyoWillVanish(IosVector &puyoGroup, int groupNum, int phase)
 {
     AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
+    viewAnimations.addElement(new VanishSoundAnimation(phase, synchronizer));
     for (int i = 0, j = puyoGroup.getSize() ; i < j ; i++) {
         AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(puyoGroup.getElementAt(i));
         currentPuyo->addAnimation(new VanishAnimation(currentPuyo, i*2 , xOffset, yOffset, synchronizer));
+    }
+    // A revoir
+    if (groupNum == 0) {
+        if (phase>=2) {
+            audio_sound_play(sound_yahoohoo3[(int)((float)NB_YAHOOHOO3 * random()/(RAND_MAX+1.0))]);
+        }
+        if (phase==1) {
+            audio_sound_play(sound_yahoohoo2[(int)((float)NB_YAHOOHOO2 * random()/(RAND_MAX+1.0))]);
+        }
+        else {
+            audio_sound_play(sound_yahoohoo1[(int)((float)NB_YAHOOHOO1 * random()/(RAND_MAX+1.0))]);
+        }
     }
 }
 
@@ -323,6 +365,21 @@ void PuyoView::gameDidEndCycle()
 			enemyGame->increaseNeutralPuyos(- attachedGame->getNeutralPuyos());
 	}
 }
+
+bool PuyoView::cycleAllowed()
+{
+    if (attachedGame->isEndOfCycle()) {
+        for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
+            AnimatedPuyo *currentPuyo =
+            (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
+            if (currentPuyo->getCurrentAnimation() != NULL) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 
 void PuyoView::gameLost()
 {
@@ -643,7 +700,7 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
                 break;
               case GameControlEvent::kPlayer1Down:
                 if (randomPlayer == 0) {
-                  attachedGameA->cycle();
+                  //attachedGameA->cycle(); desact flobo
                   if (attachedGameA->isEndOfCycle()) keysDown[FPKEY_P1_Down] = 0;
                   else keysDown[FPKEY_P1_Down]++;
                 }
@@ -670,7 +727,7 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
                 else keysDown[FPKEY_P2_TurnRight]++;
                 break;
               case GameControlEvent::kPlayer2Down:
-                attachedGameB->cycle();
+                //attachedGameB->cycle(); desact flobo
                 if (attachedGameB->isEndOfCycle()) keysDown[FPKEY_P2_Down] = 0;
                 else keysDown[FPKEY_P2_Down]++;
                 break;
@@ -687,18 +744,22 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
                 drect.y = 0;
                 drect.w = 640;
                 drect.h = 480;
-                attachedGameA->cycle();
+                
                 if (attachedGameA->isEndOfCycle()) {
                   keysDown[FPKEY_P1_Down] = 0;
                   keysDown[FPKEY_P1_TurnLeft] = 0;
                   keysDown[FPKEY_P1_TurnRight] = 0;
                 }
-                attachedGameB->cycle();
+                else
+                    attachedGameA->cycle(); // a voir
+                  
                 if (attachedGameB->isEndOfCycle()) {
                   keysDown[FPKEY_P2_Down] = 0;
                   keysDown[FPKEY_P2_TurnLeft] = 0;
                   keysDown[FPKEY_P2_TurnRight] = 0;
                 }
+                else
+                  attachedGameB->cycle(); // a voir
 
                 switch (gameLevel)
                 {
@@ -734,9 +795,10 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
 
               } else {
                 if (keysDown[FPKEY_P2_Down]) {
-                  attachedGameB->cycle();
                   if (attachedGameB->isEndOfCycle())
                     keysDown[FPKEY_P2_Down] = 0;
+                  else
+                    attachedGameB->cycle(); // a voir
                 }
                 if (keysDown[FPKEY_P2_Left]) {
                   repeatCondition(FPKEY_P2_Left) attachedGameB->moveLeft();
@@ -756,9 +818,10 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
                 }
 
                 if (keysDown[FPKEY_P1_Down]) {
-                  attachedGameA->cycle();
                   if (attachedGameA->isEndOfCycle())
                     keysDown[FPKEY_P1_Down] = 0;
+                  else
+                    attachedGameA->cycle(); // a voir
                 }
                 if (keysDown[FPKEY_P1_Left]) {
                   repeatCondition(FPKEY_P1_Left) attachedGameA->moveLeft();
@@ -919,18 +982,18 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
 			event.user.type = SDL_USEREVENT;
 			event.user.code = 0;
 			SDL_PushEvent(&event);
-      // Vitesse du jeu
+            // Vitesse du jeu
 			if (tickCounts % (gameSpeed + 5 * (3 - gameLevel)) == 0)
-      {
+            {
 				event.user.type = SDL_USEREVENT;
 				event.user.code = 1;
 				SDL_PushEvent(&event);
-        if (!paused) {
-          if ((tickCounts > GAME_ACCEL) && (gameSpeed > 1)) {
-            tickCounts = 0;
-            gameSpeed--;
-          }
-        }
+                if (!paused) {
+                    if ((tickCounts > GAME_ACCEL) && (gameSpeed > 1)) {
+                        tickCounts = 0;
+                        gameSpeed--;
+                    }
+                }
 			}
 		}
 		

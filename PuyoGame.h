@@ -49,8 +49,6 @@ public:
     int getPuyoX() const;
     int getPuyoY() const;
     void setPuyoXY(int X, int Y);
-    void setAttachedObject(void *object);
-    void *getAttachedObject();
     void setFlag() { flag = true; }
     void unsetFlag() { flag = false; }
     bool getFlag() const { return flag; }
@@ -58,7 +56,6 @@ private:
     PuyoState state;
     int X, Y;
     bool flag;
-    void *attachedObject;
 };
 
 // The puyos must be created by a factory to ensure custom puyo creation
@@ -82,7 +79,7 @@ public:
 				int companionVector,
 				bool counterclockwise) = 0;
   virtual void puyoDidFall(PuyoPuyo *puyo, int originX, int originY) = 0;
-  virtual void puyoWillVanish(IosVector &puyoGroup) = 0;
+  virtual void puyoWillVanish(IosVector &puyoGroup, int groupNum, int phase) = 0;
   virtual void gameDidEndCycle() = 0;
   virtual void gameLost() = 0;
 };

@@ -13,6 +13,7 @@ Sound  *sound_yahoohoo1[NB_YAHOOHOO1];
 Sound  *sound_yahoohoo2[NB_YAHOOHOO2];
 Sound  *sound_yahoohoo3[NB_YAHOOHOO3];
 Sound  *sound_splash[8];
+Sound  *sound_bim[2];
 
 
 #ifdef USE_AUDIO
@@ -90,6 +91,9 @@ audio_init ()
 	sound_splash[5] = CustomMix_LoadWAV (DATADIR, "splash6.wav",72);
 	sound_splash[6] = CustomMix_LoadWAV (DATADIR, "splash7.wav",72);
 	sound_splash[7] = CustomMix_LoadWAV (DATADIR, "splash8.wav",72);
+    
+    sound_bim[0] = CustomMix_LoadWAV (DATADIR, "bim1.wav",72);
+    sound_bim[1] = CustomMix_LoadWAV (DATADIR, "bim2.wav",72);
 
   music[0] = CustomMix_LoadMUS (DATADIR, "flobopuyo_menu.xm");
 	music[1] = CustomMix_LoadMUS (DATADIR, "flobopuyo_game1.xm");

@@ -27,7 +27,6 @@ PuyoPuyo::PuyoPuyo(PuyoState state)
 {
     this->state = state;
     X = 0; Y = 0;
-    attachedObject = NULL;
 }
 
 PuyoState PuyoPuyo::getPuyoState()
@@ -64,20 +63,6 @@ void PuyoPuyo::setPuyoXY(int X, int Y)
     this->X = X; this->Y = Y;
   }
 }
-
-void PuyoPuyo::setAttachedObject(void *object)
-{
-  if (this != NULL)
-    attachedObject = object;
-}
-
-void *PuyoPuyo::getAttachedObject()
-{
-  if (this != NULL)
-    return attachedObject;
-  return NULL;
-}
-
 
 PuyoGame::PuyoGame(PuyoRandomSystem *attachedRandom,
 		   PuyoFactory *attachedFactory)
@@ -226,7 +211,6 @@ void PuyoGame::rotate(bool left)
     if (endOfCycle) {
         return;
     }
-    audio_sound_play(sound_fff);
     unsigned char backupCompanion = fallingCompanion;
     /*int backupX = fallingX;
     int backupY = fallingY;*/
@@ -607,6 +591,7 @@ void PuyoGame::notifyReductions()
         getPuyoAtIndex(i)->unsetFlag();
     }
     // Search for groupped puyos
+    int puyoGroupNumber = 0;
     for (int j = 0 ; j < PUYODIMY ; j++) {
 		for (int i = 0 ; i <= PUYODIMX ; i++) {
             PuyoPuyo *puyoToMark = getPuyoAt(i, j);
@@ -635,7 +620,7 @@ void PuyoGame::notifyReductions()
                     if (removedPuyos.getSize() >= 4) {
                         markPuyoAt(i, j, initialPuyoState, false);
                         if (delegate != NULL)
-                            delegate->puyoWillVanish(removedPuyos);
+                            delegate->puyoWillVanish(removedPuyos, puyoGroupNumber++, phase);
                     }
                     else {
                         markPuyoAt(i, j, initialPuyoState, false);
@@ -650,17 +635,11 @@ void PuyoGame::cycleEnding()
 {
   static int cmpt = 0;
 	int score = removePuyos();
+    
 	if (score >= 4) {
+    #ifdef DESACTIVE
     audio_sound_play(sound_splash[phase>7?7:phase]);
-    if (phase>=2) {
-      audio_sound_play(sound_yahoohoo3[(int)((float)NB_YAHOOHOO3 * random()/(RAND_MAX+1.0))]);
-    }
-    if (phase==1) {
-      audio_sound_play(sound_yahoohoo2[(int)((float)NB_YAHOOHOO2 * random()/(RAND_MAX+1.0))]);
-    }
-    else {
-      audio_sound_play(sound_yahoohoo1[(int)((float)NB_YAHOOHOO1 * random()/(RAND_MAX+1.0))]);
-    }
+    #endif
     score -= 3;
 	  if (phase > 0) {
 	    neutralPuyos -= PUYODIMX;

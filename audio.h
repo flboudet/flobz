@@ -22,6 +22,7 @@ extern Sound *sound_yahoohoo1[NB_YAHOOHOO1];
 extern Sound *sound_yahoohoo2[NB_YAHOOHOO2];
 extern Sound *sound_yahoohoo3[NB_YAHOOHOO3];
 extern Sound *sound_splash[8];
+extern Sound  *sound_bim[2];
 
 void    audio_init ();
 void    audio_music_start (int num);
