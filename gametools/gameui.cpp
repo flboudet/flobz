@@ -25,7 +25,7 @@ namespace gameui {
     if (/*(force || drawRequested()) && */ !hidden)
       draw(screen);
   }
-  
+
   void Widget::eventOccured(GameControlEvent *event)
   {
     lostFocus();
@@ -112,7 +112,7 @@ namespace gameui {
     Widget::setSize(v3);
     arrangeWidgets();
   }
-  
+
   void WidgetContainer::setPosition(const Vec3 &v3)
   {
     Widget::setPosition(v3);
@@ -193,7 +193,7 @@ namespace gameui {
 
     if (activeWidget >= getNumberOfChilds())
       activeWidget = getNumberOfChilds() - 1;
-    
+
     if (activeWidget < 0) {
       lostFocus();
       return;
@@ -205,7 +205,7 @@ namespace gameui {
 
     if (child->haveFocus()) return;
     int direction = 0;
-    
+
     if (isPrevEvent(event))
       direction = -1;
     else if (isNextEvent(event))
@@ -243,7 +243,7 @@ namespace gameui {
     if (activeWidget >= getNumberOfChilds())
       activeWidget = getNumberOfChilds() - 1;
     giveFocusToActiveWidget();
-   }
+  }
 
   bool Box::giveFocusToActiveWidget()
   {
@@ -257,7 +257,7 @@ namespace gameui {
     child->eventOccured(&ev);
     return child->haveFocus();
   }
-    
+
   void Box::giveFocus()
   {
     WidgetContainer::giveFocus();
@@ -266,7 +266,7 @@ namespace gameui {
       child->giveFocus();
     }
   }
-  
+
   void Box::lostFocus()
   {
     WidgetContainer::lostFocus();
@@ -275,7 +275,7 @@ namespace gameui {
       child->lostFocus();
     }
   }
-  
+
 
   //
   // HBox
@@ -284,12 +284,12 @@ namespace gameui {
   {
     return event->cursorEvent == GameControlEvent::kLeft;
   }
-  
+
   bool HBox::isNextEvent(GameControlEvent *event) const
   {
     return event->cursorEvent == GameControlEvent::kRight;
   }
-  
+
   bool HBox::isOtherDirection(GameControlEvent *event) const
   {
     return (event->cursorEvent == GameControlEvent::kUp)
@@ -317,7 +317,7 @@ namespace gameui {
   //
   // ScreenVBox
   //
-  
+
   Screen::Screen(float x, float y, float width, float height, GameLoop *loop) : VBox(loop), bg(NULL)
   {
     setPosition(Vec3(x, y, 1.0f));
@@ -342,7 +342,7 @@ namespace gameui {
     }
     VBox::draw(surface);
   }
-  
+
   void Screen::onEvent(GameControlEvent *event)
   {
     if (!isVisible()) return;
@@ -357,16 +357,19 @@ namespace gameui {
 
   Text::Text(const String &label, SoFont *font)
     : font(font), label(label)
-  {
-    if (font == NULL) this->font = GameUIDefaults::FONT;
-    setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
-  }
+    {
+      if (font == NULL) this->font = GameUIDefaults::FONT;
+      setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
+    }
 
   void Text::setValue(String value)
   {
     label = value;
+    setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
+    if (parent)
+      parent->arrangeWidgets();
   }
-  
+
   void Text::draw(SDL_Surface *screen) const
   {
     SoFont_PutString(font, screen, (int)getPosition().x, (int)getPosition().y, (const char*)label, NULL);
@@ -380,7 +383,7 @@ namespace gameui {
   {
     if (fontInactive == NULL) fontInactive = GameUIDefaults::FONT_INACTIVE;
     if (fontActive == NULL)   fontActive = GameUIDefaults::FONT;
-    
+
     this->fontActive   = fontActive;
     this->fontInactive = fontInactive;
 
@@ -390,16 +393,16 @@ namespace gameui {
 
   Button::Button(const String &label, SoFont *fontActive, SoFont *fontInactive)
     : Text(label, fontInactive)
-  {
-    init(fontActive, fontInactive);
-  }
+    {
+      init(fontActive, fontInactive);
+    }
 
   Button::Button(const String &label, Action *action)
     : Text(label, NULL)
-  {
-    init(NULL,NULL);
-    setAction(ON_START, action);
-  }
+    {
+      init(NULL,NULL);
+      setAction(ON_START, action);
+    }
 
   static bool isDirectionEvent(GameControlEvent *event)
   {
@@ -413,7 +416,7 @@ namespace gameui {
       return true;
     return false;
   }
-  
+
   void Button::eventOccured(GameControlEvent *event)
   {
     if (event->isUp)
@@ -434,23 +437,23 @@ namespace gameui {
     font = fontInactive;
     requestDraw();
   }
-      
+
 
   void Button::giveFocus() {
     Text::giveFocus();
     font = fontActive;
     requestDraw();
   }
-  
+
   //
   // EditField
   //
-  
+
   void EditField::init(SoFont *fontActive, SoFont *fontInactive)
   {
     if (fontInactive == NULL) fontInactive = GameUIDefaults::FONT_INACTIVE;
     if (fontActive == NULL)   fontActive = GameUIDefaults::FONT;
-    
+
     this->fontActive   = fontActive;
     this->fontInactive = fontInactive;
 
@@ -459,47 +462,80 @@ namespace gameui {
 
     setFocusable(true);
   }
-  
+
   EditField::EditField(const String &defaultText)
     : Text(defaultText, NULL)
-  {
-    init(NULL,NULL);
-    //setAction(ON_START, action);
-  }
-  
+    {
+      init(NULL,NULL);
+      //setAction(ON_START, action);
+    }
+
   void EditField::eventOccured(GameControlEvent *event)
   {
     if (event->isUp)
       return;
 
     if (event->cursorEvent == GameControlEvent::kStart) {
-        editionMode = !editionMode;
-        if (editionMode == true) {
-            previousValue = getValue();
-            setValue("_");
-        }
-        else {
-            setValue(getValue().substring(0, getValue().length() - 1));
-        }
+      editionMode = !editionMode;
+      if (editionMode == true) {
+        previousValue = getValue();
+        setValue("_");
+      }
+      else {
+        setValue(getValue().substring(0, getValue().length() - 1));
+      }
     }
     else if (editionMode == true) {
-        if (event->cursorEvent == GameControlEvent::kBack) {
-            setValue(previousValue);
-            editionMode = false;
+      if (event->cursorEvent == GameControlEvent::kBack) {
+        setValue(previousValue);
+        editionMode = false;
+      }
+      else if (event->sdl_event.type == SDL_KEYDOWN) {
+        SDL_Event e = event->sdl_event;
+        char ch = 0;
+        if (e.key.keysym.sym == SDLK_PERIOD)
+          ch = e.key.keysym.sym;
+        if (e.key.keysym.sym == SDLK_SLASH)
+          ch = e.key.keysym.sym;
+        if (e.key.keysym.sym == SDLK_MINUS)
+          ch = e.key.keysym.sym;
+        if (e.key.keysym.sym == SDLK_COLON)
+          ch = e.key.keysym.sym;
+
+        if ((e.key.keysym.sym >= SDLK_KP0) && (e.key.keysym.sym <= SDLK_KP9))
+          ch = e.key.keysym.sym - SDLK_KP0 + '0';
+        if (e.key.keysym.sym == SDLK_KP_PERIOD)
+          ch = '.';
+
+        if ((e.key.keysym.sym >= SDLK_0) && (e.key.keysym.sym <= SDLK_9))
+          ch = e.key.keysym.sym;
+
+        if ((e.key.keysym.sym >= SDLK_a) && (e.key.keysym.sym <= SDLK_z))
+          ch = e.key.keysym.sym;
+
+        if (e.key.keysym.sym == SDLK_SPACE)
+          ch = ' ';
+
+        if (e.key.keysym.sym == SDLK_BACKSPACE && (getValue().length() > 1)) {
+          String newValue = getValue().substring(0, getValue().length() - 2);
+          newValue += "_";
+          setValue(newValue);
         }
-        else if (event->sdl_event.type == SDL_KEYDOWN) {
-            String newValue = getValue();
-            newValue[newValue.length() - 1] = event->sdl_event.key.keysym.sym;
-            newValue += "_";
-            setValue(newValue);
+
+        if (ch) {
+          String newValue = getValue();
+          newValue[newValue.length() - 1] = ch;
+          newValue += "_";
+          setValue(newValue);
         }
+      }
     }
     else {
       if (isDirectionEvent(event))
         lostFocus();
     }
   }
-  
+
   void EditField::lostFocus() {
     Text::lostFocus();
     font = fontInactive;
@@ -511,18 +547,18 @@ namespace gameui {
     font = fontActive;
     requestDraw();
   }
-  
-  
+
+
   //
   // EditFieldWithLabel
   //
-  
+
   EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue)
   {
     add(new Text(label));
     add(new EditField(defaultValue));
   }
-  
+
   //
   // Separator
   //
@@ -545,7 +581,7 @@ namespace gameui {
   {
     this->loop = loop;
   }
-  
+
   void ScreenStack::push(Screen *screen) {
     checkLoop();
     if (stack.size() > 0) {
@@ -572,11 +608,11 @@ namespace gameui {
     this->stack = stack;
     this->screen = screen;
   }
-  
+
   void PushScreenAction::action() {
     stack->push(screen);
   }
-  
+
   //
   // PopScreenAction
   //
@@ -585,7 +621,7 @@ namespace gameui {
     if (stack == NULL) stack = GameUIDefaults::SCREEN_STACK;
     this->stack = stack;
   }
-  
+
   void PopScreenAction::action()
   {
     stack->pop();
