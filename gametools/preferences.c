@@ -207,7 +207,7 @@ int GetIntPreference(char * name, int defaut)
         {
             free(tmp);
             free(copiedfile);
-            return j?true:false;
+            return j;
         }
     }
     free(copiedfile);

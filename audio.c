@@ -164,9 +164,13 @@ audio_set_music_on_off (int on)
 #ifdef USE_AUDIO
   if (!sound_supported) return;
 	if (on) {
-    while (Mix_FadingMusic() == MIX_FADING_OUT) SDL_Delay(100);
-    if (music[currentMus])
-      Mix_FadeInMusic (music[currentMus], -1, 1000);
+            if (Mix_PausedMusic()) Mix_ResumeMusic();
+                else
+                {
+                    while (Mix_FadingMusic() == MIX_FADING_OUT) SDL_Delay(100);
+                }
+                if (music[currentMus])
+                    Mix_FadeInMusic (music[currentMus], -1, 1000);
 	}
 	else {
     while (Mix_FadingMusic() == MIX_FADING_IN) SDL_Delay(100);
