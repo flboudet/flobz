@@ -17,7 +17,7 @@ HFILES= IosException.h IosImgProcess.h IosVector.h PuyoCommander.h PuyoGame.h \
         PuyoIA.h PuyoPlayer.h PuyoStory.h PuyoView.h SDL_prim.h audio.h menu.h \
 				menuitems.h preferences.h scrollingtext.h sofont.h SDL_Painter.h PuyoVersion.h \
 				InputManager.h GameControls.h
-				
+
 
 OBJFILES= SDL_prim.o scenar.y.o scenar.l.o PuyoCommander.o IosException.o \
 					IosVector.o main.o PuyoGame.o PuyoVersion.o PuyoView.o PuyoIA.o sofont.o \
@@ -34,14 +34,14 @@ flobopuyo: ${OBJFILES}
 	@echo
 	@echo " Type ./flobopuyo to play."
 	@echo "--------------------------------------"
-	
+
 prelude:
 	@rm -f WARNINGS
 	@touch WARNINGS
 
 %.o:%.c
 	@echo "[$@]" && $(CC) $(CFLAGS) -DDATADIR=${DATADIR} -c $< 2>> WARNINGS || (cat WARNINGS && false)
-	
+
 %.o:%.cpp
 	@echo "[$@]" && $(CXX) $(CFLAGS) -DDATADIR=${DATADIR} -c $< 2>> WARNINGS || (cat WARNINGS && false)
 
@@ -96,7 +96,7 @@ bundle_name = FloboPuyo.app
 flobopuyo-static:SDL_prim.o
 	bison -y -d -o scenar.y.c scenar.y
 	flex -oscenar.l.c scenar.l
-	g++ -DMACOSX $(CFLAGS) -o flobopuyo-static  SDL_prim.o PuyoCommander.cpp IosException.cpp IosVector.cpp main.cpp PuyoGame.cpp PuyoView.cpp PuyoIA.cpp PuyoVersion.c sofont.c menu.c menuitems.c audio.c scrollingtext.c preferences.c SDL_Painter.cpp PuyoStory.cpp scenar.y.c scenar.l.c /sw/lib/libSDL_mixer.a /sw/lib/libvorbisfile.a /sw/lib/libvorbis.a /sw/lib/libogg.a /sw/lib/libsmpeg.a /sw/lib/libSDL_image.a /sw/lib/libjpeg.a /sw/lib/libpng.a -lz `$(SDL_CONFIG) --cflags --static-libs`
+	g++ -DMACOSX $(CFLAGS) -o flobopuyo-static  SDL_prim.o PuyoCommander.cpp InputManager.cpp GameControls.cpp IosException.cpp IosVector.cpp main.cpp PuyoGame.cpp PuyoView.cpp PuyoIA.cpp PuyoVersion.c sofont.c menu.c menuitems.c audio.c scrollingtext.c preferences.c SDL_Painter.cpp PuyoStory.cpp scenar.y.c scenar.l.c /sw/lib/libSDL_mixer.a /sw/lib/libvorbisfile.a /sw/lib/libvorbis.a /sw/lib/libogg.a /sw/lib/libsmpeg.a /sw/lib/libSDL_image.a /sw/lib/libjpeg.a /sw/lib/libpng.a -lz `$(SDL_CONFIG) --cflags --static-libs`
 
 # /sw/lib/libvorbis.a   
 
