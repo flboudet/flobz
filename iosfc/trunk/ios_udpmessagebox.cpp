@@ -176,6 +176,7 @@ void UDPMessageBox::KnownPeer::handleAck(int messageSerialID)
     if (waitingForAckMessage != NULL) {
         // If the incoming message is the ACK for the waitingForAckMessage, do what must be done
         if (waitingForAckMessage->getSerialID() == -messageSerialID) {
+            cycleSinceLastMessage = 0;
             delete waitingForAckMessage;
             waitingForAckMessage = NULL;
             sendQueue();
