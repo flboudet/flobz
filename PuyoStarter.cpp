@@ -233,7 +233,7 @@ void PuyoStarter::draw()
 }
 
 
-PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType, int theme, MessageBox *mbox)
+PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType, int theme, MessageBox *mbox):mbox(mbox)
 {
     this->stopRendering = false;
     this->paused = false;
@@ -342,7 +342,7 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
         attachedNetworkGameFactory = new PuyoNetworkGameFactory(&attachedRandom, *mbox);
         areaA = new PuyoView(attachedNetworkGameFactory, 1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
         areaB = new PuyoNetworkView(attachedGameFactory, 1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, mbox);
-        SDL_Delay(10000);
+        //SDL_Delay(10000);
     }
     
     
@@ -811,7 +811,9 @@ void PuyoStarter::run(int _score1, int _score2, int lives, int point1, int point
                 }
         }
             commander->updateAll(this);
-            
+            if (mbox != NULL) {
+                mbox->idle();
+            }
             if (!paused) {
                 areaA->cycleAnimation();
                 areaB->cycleAnimation();

@@ -38,7 +38,6 @@ PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBo
 
 void PuyoNetworkGame::onMessage(Message &message)
 {
-     printf("msg\n");
     int msgType = message.getInt(TYPE);
     switch (msgType) {
         case kGameState:

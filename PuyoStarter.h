@@ -39,6 +39,7 @@ private:
     void restartRender();
     
     int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
+    ios_fc::MessageBox *mbox;
 };
 
 #endif // _PUYOSTARTER
