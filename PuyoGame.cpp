@@ -96,20 +96,20 @@ void PuyoPuyo::setPuyoXY(int X, int Y)
   }
 }
 
-PuyoGame::PuyoGame(PuyoRandomSystem *attachedRandom,
+PuyoLocalGame::PuyoLocalGame(PuyoRandomSystem *attachedRandom,
 		   PuyoFactory *attachedFactory)
 {
   this->attachedFactory = attachedFactory;
   InitGame(attachedRandom);
 }
 
-PuyoGame::PuyoGame(PuyoRandomSystem *attachedRandom)
+PuyoLocalGame::PuyoLocalGame(PuyoRandomSystem *attachedRandom)
 {
   attachedFactory = new PuyoDefaultFactory();
   InitGame(attachedRandom);
 }
 
-void PuyoGame::InitGame(PuyoRandomSystem *attachedRandom)
+void PuyoLocalGame::InitGame(PuyoRandomSystem *attachedRandom)
 {
   nbFalled = 0;
 	int i, j;
@@ -133,17 +133,17 @@ void PuyoGame::InitGame(PuyoRandomSystem *attachedRandom)
   points = 0;
 }
 
-PuyoGame::~PuyoGame()
+PuyoLocalGame::~PuyoLocalGame()
 {
     delete unmoveablePuyo;
 }
 
-void PuyoGame::setDelegate(PuyoDelegate *delegate)
+void PuyoLocalGame::setDelegate(PuyoDelegate *delegate)
 {
 	this->delegate = delegate;
 }
 
-void PuyoGame::cycle()
+void PuyoLocalGame::cycle()
 {
   if (!gameRunning)
     return;
@@ -179,7 +179,7 @@ void PuyoGame::cycle()
 }
 
 // Get the state of the puyo at the indicated coordinates
-PuyoState PuyoGame::getPuyoCellAt(int X, int Y) const
+PuyoState PuyoLocalGame::getPuyoCellAt(int X, int Y) const
 {
     PuyoPuyo *thePuyo = getPuyoAt(X, Y);
     if (thePuyo)
@@ -188,7 +188,7 @@ PuyoState PuyoGame::getPuyoCellAt(int X, int Y) const
 }
 
 // Get the puyo at the indicated coordinates
-PuyoPuyo *PuyoGame::getPuyoAt(int X, int Y) const
+PuyoPuyo *PuyoLocalGame::getPuyoAt(int X, int Y) const
 {
     if ((X >= PUYODIMX) || (Y >= PUYODIMY) || (X < 0) || (Y < 0))
 		return unmoveablePuyo;
@@ -202,17 +202,17 @@ PuyoPuyo *PuyoGame::getPuyoAt(int X, int Y) const
 }
 
 // List access to the PuyoPuyo objects
-int PuyoGame::getPuyoCount() const
+int PuyoLocalGame::getPuyoCount() const
 {
     return puyoVector.getSize();
 }
 
-PuyoPuyo *PuyoGame::getPuyoAtIndex(int index) const
+PuyoPuyo *PuyoLocalGame::getPuyoAtIndex(int index) const
 {
     return (PuyoPuyo *)(puyoVector.getElementAt(index));
 }
 
-void PuyoGame::moveLeft()
+void PuyoLocalGame::moveLeft()
 {
     if (endOfCycle) {
 		return;
@@ -226,7 +226,7 @@ void PuyoGame::moveLeft()
     companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
 }
 
-void PuyoGame::moveRight()
+void PuyoLocalGame::moveRight()
 {
     if (endOfCycle) {
 		return;
@@ -238,7 +238,7 @@ void PuyoGame::moveRight()
     companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
 }
 
-void PuyoGame::rotate(bool left)
+void PuyoLocalGame::rotate(bool left)
 {
     if (endOfCycle) {
         return;
@@ -282,32 +282,32 @@ void PuyoGame::rotate(bool left)
     
 }
 
-void PuyoGame::rotateLeft()
+void PuyoLocalGame::rotateLeft()
 {
     rotate(true);
 }
 
-void PuyoGame::rotateRight()
+void PuyoLocalGame::rotateRight()
 {
     rotate(false);
 }
 
-PuyoState PuyoGame::getNextFalling()
+PuyoState PuyoLocalGame::getNextFalling()
 {
 	return attachedRandom->getPuyoForSequence(sequenceNr);
 }
 
-PuyoState PuyoGame::getNextCompanion()
+PuyoState PuyoLocalGame::getNextCompanion()
 {
 	return attachedRandom->getPuyoForSequence(sequenceNr+1);
 }
 
-void PuyoGame::increaseNeutralPuyos(int incr)
+void PuyoLocalGame::increaseNeutralPuyos(int incr)
 {
 	neutralPuyos += incr;
 }
 
-int PuyoGame::getNeutralPuyos() const
+int PuyoLocalGame::getNeutralPuyos() const
 {
 	return neutralPuyos;
 }
@@ -315,7 +315,7 @@ int PuyoGame::getNeutralPuyos() const
 
 
 // Set the state of the puyo at the indicated coordinates (not recommanded)
-void PuyoGame::setPuyoCellAt(int X, int Y, PuyoState value)
+void PuyoLocalGame::setPuyoCellAt(int X, int Y, PuyoState value)
 {
 	/*if ((X > PUYODIMX) || (Y > PUYODIMY))
 		return;*/
@@ -324,14 +324,14 @@ void PuyoGame::setPuyoCellAt(int X, int Y, PuyoState value)
 };
 
 // Set the puyo at the indicated coordinates
-void PuyoGame::setPuyoAt(int X, int Y, PuyoPuyo *newPuyo)
+void PuyoLocalGame::setPuyoAt(int X, int Y, PuyoPuyo *newPuyo)
 {
     puyoCells[X + Y * PUYODIMX] = newPuyo;
     if (newPuyo != NULL)
         newPuyo->setPuyoXY(X, Y);
 }
 
-void PuyoGame::dropNeutrals()
+void PuyoLocalGame::dropNeutrals()
 {
   if (neutralPuyos < 0) {
     extern int gameLevel;
@@ -364,7 +364,7 @@ void PuyoGame::dropNeutrals()
     neutralPuyos = 0;
 }
 
-void PuyoGame::setFallingAtTop(bool gameConstruction)
+void PuyoLocalGame::setFallingAtTop(bool gameConstruction)
 {
   if (delegate != NULL)
     delegate->gameDidEndCycle();
@@ -395,7 +395,7 @@ void PuyoGame::setFallingAtTop(bool gameConstruction)
   phase = 0;
 }
 
-int PuyoGame::getFallingCompanionX() const
+int PuyoLocalGame::getFallingCompanionX() const
 {
 	if (fallingCompanion == 1)
 		return fallingX - 1;
@@ -404,7 +404,7 @@ int PuyoGame::getFallingCompanionX() const
 	return fallingX;
 }
 
-int PuyoGame::getFallingCompanionY() const
+int PuyoLocalGame::getFallingCompanionY() const
 {
 	if (fallingCompanion == 0)
 		return fallingY + 1;
@@ -413,7 +413,7 @@ int PuyoGame::getFallingCompanionY() const
 	return fallingY;
 }
 
-int PuyoGame::getFallY(int X, int Y) const
+int PuyoLocalGame::getFallY(int X, int Y) const
 {
 	int result = Y + 1;
 	while (getPuyoCellAt(X, result) == PUYO_EMPTY)
@@ -421,7 +421,7 @@ int PuyoGame::getFallY(int X, int Y) const
 	return result - 1;
 }
 
-int PuyoGame::getColumnHeigth(int colNum) const
+int PuyoLocalGame::getColumnHeigth(int colNum) const
 {
   int result = 0;
   for (int i = 0 ; i < PUYODIMY ; i++) {
@@ -431,7 +431,7 @@ int PuyoGame::getColumnHeigth(int colNum) const
   return result;
 }
 
-int PuyoGame::getMaxColumnHeight() const
+int PuyoLocalGame::getMaxColumnHeight() const
 {
   int max = 0;
   for (int i=0;i<PUYODIMX;++i) {
@@ -441,7 +441,7 @@ int PuyoGame::getMaxColumnHeight() const
   return max;
 }
 
-int PuyoGame::getSamePuyoAround(int X, int Y, PuyoState color)
+int PuyoLocalGame::getSamePuyoAround(int X, int Y, PuyoState color)
 {
   char marked[PUYODIMX][PUYODIMY];
   int  mx[PUYODIMY*PUYODIMX];
@@ -494,7 +494,7 @@ int PuyoGame::getSamePuyoAround(int X, int Y, PuyoState color)
   return nFound;
 }
 
-void PuyoGame::markPuyoAt(int X, int Y, PuyoState color, bool includeNeutral)
+void PuyoLocalGame::markPuyoAt(int X, int Y, PuyoState color, bool includeNeutral)
 {
 	PuyoState currentPuyo = getPuyoCellAt(X, Y);
 	setPuyoCellAt(X, Y, color);
@@ -519,7 +519,7 @@ void PuyoGame::markPuyoAt(int X, int Y, PuyoState color, bool includeNeutral)
 }
 
 // delete the marked puyos and the neutral next to them
-void PuyoGame::deleteMarkedPuyosAt(int X, int Y)
+void PuyoLocalGame::deleteMarkedPuyosAt(int X, int Y)
 {
 	PuyoState currentPuyo = getPuyoCellAt(X, Y);
   puyoVector.removeElement(getPuyoAt(X, Y));
@@ -564,7 +564,7 @@ void PuyoGame::deleteMarkedPuyosAt(int X, int Y)
     }
 }
 
-int PuyoGame::removePuyos()
+int PuyoLocalGame::removePuyos()
 {
 	int globalRemovedPuyos = 0;
 	/* First, we will mark all the puyos that need to be removed */
@@ -614,7 +614,7 @@ int PuyoGame::removePuyos()
 }
 
 
-void PuyoGame::notifyReductions()
+void PuyoLocalGame::notifyReductions()
 {
     IosVector removedPuyos;
     
@@ -663,7 +663,7 @@ void PuyoGame::notifyReductions()
 	}
 }
 
-void PuyoGame::cycleEnding()
+void PuyoLocalGame::cycleEnding()
 {
   static int cmpt = 0;
 	int score = removePuyos();

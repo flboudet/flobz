@@ -68,7 +68,7 @@ class PuyoLocalGameFactory : public PuyoGameFactory {
 public:
     PuyoLocalGameFactory(PuyoRandomSystem *attachedRandom): attachedRandom(attachedRandom) {}
     PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory) {
-        return new PuyoGame(attachedRandom, attachedPuyoFactory);
+        return new PuyoLocalGame(attachedRandom, attachedPuyoFactory);
     }
 private:
     PuyoRandomSystem *attachedRandom;

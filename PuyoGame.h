@@ -90,9 +90,61 @@ public:
 
 class PuyoGame {
 public:
-  PuyoGame(PuyoRandomSystem *attachedRandom, PuyoFactory *attachedFactory);
-  PuyoGame(PuyoRandomSystem *attachedRandom);
-  virtual ~PuyoGame();
+  virtual ~PuyoGame() {}
+  virtual void setDelegate(PuyoDelegate *delegate) = 0;
+  virtual void cycle() = 0;
+/*  
+  // Get the state of the puyo at the indicated coordinates
+  PuyoState getPuyoCellAt(int X, int Y) const;
+  */
+  // Get the puyo at the indicated coordinates
+  virtual PuyoPuyo *getPuyoAt(int X, int Y) const = 0;
+  
+  // List access to the PuyoPuyo objects
+  virtual int getPuyoCount() const = 0;
+  virtual PuyoPuyo *getPuyoAtIndex(int index) const = 0;
+  
+  virtual void moveLeft() = 0;
+  virtual void moveRight() = 0;
+  virtual void rotate(bool left) = 0;
+  virtual void rotateLeft() = 0;
+  virtual void rotateRight() = 0;
+  
+  virtual PuyoState getNextFalling() = 0;
+  virtual PuyoState getNextCompanion() = 0;
+  
+  virtual PuyoState getCompanionState() const = 0;
+  virtual PuyoState getFallingState() const = 0;
+  virtual int getFallingX() const = 0;
+  virtual int getFallingY() const = 0;
+/*
+  int getCompanionX() const { return companionPuyo->getPuyoX(); }
+  int getCompanionY() const { return companionPuyo->getPuyoY(); }
+  int getFallingCompanionX() const;
+  int getFallingCompanionY() const;
+  */
+  virtual int getFallingCompanionDir() const = 0;
+  virtual PuyoPuyo *getFallingPuyo() const = 0;
+
+  virtual void increaseNeutralPuyos(int incr) = 0;
+  virtual int getNeutralPuyos() const = 0;
+  virtual void dropNeutrals() = 0;
+  virtual bool isGameRunning() const = 0;
+  virtual bool isEndOfCycle() const = 0;
+  virtual int getColumnHeigth(int colNum) const = 0;
+  virtual int getMaxColumnHeight() const = 0;
+  virtual int getSamePuyoAround(int X, int Y, PuyoState color) = 0;
+  virtual int getSemiMove() const = 0;
+  
+  virtual int getPoints() const = 0;
+  int points;
+};
+
+class PuyoLocalGame : public PuyoGame {
+public:
+  PuyoLocalGame(PuyoRandomSystem *attachedRandom, PuyoFactory *attachedFactory);
+  PuyoLocalGame(PuyoRandomSystem *attachedRandom);
+  virtual ~PuyoLocalGame();
   void setDelegate(PuyoDelegate *delegate);
   void cycle();
   
@@ -135,7 +187,6 @@ public:
 
   int getSemiMove() const { return semiMove; }
   int getPoints() const { return points; }
-  int points;
 
  private:
   void InitGame(PuyoRandomSystem *attachedRandom);

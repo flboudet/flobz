@@ -43,7 +43,7 @@ char *kScore       = "Score:\t";
 char *kPlayerName  = "Player Name:\t";
 char *kPlayer1Name  = "P1 Name:\t";
 char *kPlayer2Name  = "P2 Name:\t";
-char *kIpAddress    = "IP Address:\t";
+char *kIpAddress    = "IP Address: ";
 
 
 static const char *k01 = " 1 - ";
