@@ -20,9 +20,9 @@ char *kCurrentLevel = "Current Level:";
 char *kContinueLeft = "Continue Left:";
 char *kGameOver = "Game Over!!!";
 char *kYouGotToLevel = "You get to level";
-char *kHitActionToContinue = "Hit action to continue...";
-char *kHitActionForMenu = "Hit action for menu...";
-char *kContinue    = "Continue? (y/n)";
+char *kHitActionToContinue = "Hit Action to continue...";
+char *kHitActionForMenu = "Hit Action for menu...";
+char *kContinue    = "Continue?";
 char *kPlayer      = "Player";
 char *kScore       = "Score:";
 
