@@ -9,6 +9,7 @@
 #include "ios_message.h"
 #include "ios_udpmessage.h"
 #include "ios_vector.h"
+// #include "ios_urlhandler.h"
 
 #include <stdlib.h>
 
@@ -25,6 +26,8 @@ namespace ios_fc {
     inline float frand(float f) {
         return f * ((float)::rand() / RAND_MAX);
     }
+
+#define DBG_PRINT(txt) fprintf(stderr, txt);
 };
 
 #endif
