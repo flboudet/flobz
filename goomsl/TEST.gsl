@@ -1,0 +1,138 @@
+// Includes
+
+#include stdlib.gsl
+
+// Declaration des fonctions
+
+  declare <test_loop: int start, int end> 
+  declare <test_expressions>
+  declare <test_of_tests>
+  declare <test_strings>
+  declare <test_function: int p1, int p2, int p3> : int
+  declare <test_vector>
+
+// Code
+
+<main>
+  test_expressions
+  test_of_tests
+  test_loop: start=1 end=10
+  print: msg="Test Function: OK if 666=%d\n" argi=[test_function: p1=600 p2=60 p3=6]
+  test_strings
+  test_vector
+  
+<test_strings>
+
+  string str1 = "Salut!"
+  string str2 = "Salut!"
+  string bob  = str1
+
+  (str1 = bob)?          print: msg="OK:     str1 = bob\n"
+  (not str1 = bob)?      print: msg="FAILED: str1 = bob\n"
+
+  (not str2 = bob)?      print: msg="OK:     not str2 = bob\n"
+  (str2 = bob)?          print: msg="FAILED: not str2 = bob\n"
+
+  (not str1 = "Salut!")? print: msg="OK:     not str1 = \"Salut\"\n"
+  (str1 = "Salut!")?     print: msg="FAILED: not str1 = \"Salut\"\n"
+
+<test_expressions>
+
+  print: msg="Test des expressions\n"
+  
+  int i = 1 + 1
+  (i = 2)?     print: msg="OK:     i = 1 + 1 = 2\n"
+  (not i = 2)? print: msg="FAILED: i = 1 + 1 = %d\n" argi=i
+
+  int j = 2 * 2
+  (j = 4)?     print: msg="OK:     j = i * 2 = 4\n"
+  (not j = 4)? print: msg="FAILED: j = i * 2 = %d\n" argi=j
+
+  i = 10 + j * j
+  (i = 26)?     print: msg="OK:     i = 10 + j * j = 26\n"
+  (not i = 26)? print: msg="FAILED: i = 10 + j * j = %d\n" argi=i
+
+<test_of_tests>
+
+  print: msg="Test des tests\n"
+  int i = 1
+  int j = 2
+  
+  (1 < 2)?      print: msg="OK:     1 < 2\n"
+  (not 1 < 2)?  print: msg="FAILED: 1 < 2\n"
+  
+  (i > 0)?      print: msg="OK:     i > 0\n"
+  (not i > 0)?  print: msg="FAILED: i > 0\n"
+
+  (3*j/2 = 3)?   print: msg="OK:     =3\n"
+  (not 3*j/2=3)? print: msg="FAILED: =%d\n" argi=3*j/2
+
+  ((3*j)/3 = 2)?     print: msg="OK:     =2\n"
+  (not (3*j)/3 = 2)? print: msg="FAILED: =%d\n" argi=(300*j)/3
+
+  (i+i+i*2+1 = j+i*2+1)?     print: msg="OK:     =...\n"
+  (not i+i+i*2+1 = j+i*2+1)? print: msg="FAILED: =...\n"
+
+  int j=1
+  (not 1 = j+1)? print: msg="OK:     not\n"
+  (1 = j+1)?     print: msg="FAILED: found 1=%d\n" argi=j+1
+
+  (1 <= 2)?      print: msg="OK:     1 <= 2\n"
+  (not 1 <= 2)?  print: msg="FAILED: 1 <= 2\n"
+  
+  (1 <= 1)?      print: msg="OK:     1 <= 1\n"
+  (not 1 <= 1)?  print: msg="FAILED: 1 <= 1\n"
+  
+  (not 1 <= 0)?  print: msg="OK:     not 1 <= 0\n"
+  (1 <= 0)?      print: msg="FAILED: not 1 <= 0\n"
+
+  (0 != 1)?      print: msg="OK:     0 != 1\n"
+  (not 0 != 1)?  print: msg="FAILED: 0 != 1\n"
+  
+
+<test_loop: int start, int end>
+
+  print: msg="Test loop\n"
+  print: msg="  start=%d\n" argi=start
+  print: msg="  end  =%d\n" argi=end
+  
+  while start < end do {
+		start += 1
+	}
+  (start = end)?     print: msg="OK:     test_loop\n"
+  (not start = end)? print: msg="FAILED: test_loop\n"
+
+<test_function: int p1, int p2, int p3>
+
+  test_function = p1 + p2 + p3
+  print: msg="  Message in test_function, must appears only 1 time.\n"
+
+<test_vector>
+
+  print: msg="Test vector\n"
+ 
+  struct <Vec3: int x, int y, int z>
+  struct <Cube: Vec3 vec1, Vec3 vec2, Vec3 vec3>
+
+  Vec3 vector
+  Cube cube1
+  Cube cube2
+
+  vector.x     = 2
+  cube1.vec1.x = 3
+  cube1.vec1.y = 4
+  cube1.vec2   = vector
+  cube2        = cube1 + cube1 * cube1
+ 
+  (vector.x = 2)?      print: msg="OK: Test1\n"
+  (cube1.vec1.x = 3)?  print: msg="OK: Test2\n"
+  (cube1.vec2.x = 2)?  print: msg="OK: Test3\n"
+  (cube2.vec1.x = 12)? print: msg="OK: Test4\n"
+  (cube2.vec1.y = 20)? print: msg="OK: Test5\n"
+
+  (not vector.x = 2)?      print: msg="FAILED: Test1\n"
+  (not cube1.vec1.x = 3)?  print: msg="FAILED: Test2\n"
+  (not cube1.vec2.x = 2)?  print: msg="FAILED: Test3\n"
+  (not cube2.vec1.x = 12)? print: msg="FAILED: Test4\n"
+  (not cube2.vec1.y = 20)? print: msg="FAILED: Test5\n"
+

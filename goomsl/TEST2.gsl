@@ -1,0 +1,5 @@
+#include stdlib.gsl
+
+<main>
+  int i = 3
+  print: msg="= %d\n" argi=400/8
