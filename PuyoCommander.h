@@ -19,6 +19,8 @@ class PuyoDrawable
     virtual void draw() = 0;
 };
 
+class PuyoNetworkGameMenuScreen;
+
 class PuyoCommander : public MessageListener
 {
  public:
@@ -37,6 +39,7 @@ class PuyoCommander : public MessageListener
   void startSingleGameLoop();
   void startTwoPlayerGameLoop();
   void startNetGameLoop();
+  void startLANGame(int level, char *playerName, char *ipAddress);
   void enterStringLoop(Menu *menu, const char *kItem, char out[256], int maxlen = 10);
   void onMessage(Message &message);
   
@@ -57,7 +60,6 @@ class PuyoCommander : public MessageListener
 
  private:
   Menu *mainMenu;
-  Menu *netGameMenu;
   Menu *singleGameMenu;
   Menu *twoPlayerGameMenu;
   Menu *optionMenu;
@@ -76,6 +78,9 @@ class PuyoCommander : public MessageListener
   int      *corona_screen;
   Corona32 *corona;
   MessageBox *mbox;
+  IIM_Surface * menuselector;
+  
+  PuyoNetworkGameMenuScreen *networkGameMenu;
 };
 
 

@@ -15,6 +15,7 @@
 #include "PuyoDoomMelt.h"
 #include "IosImgProcess.h"
 #include "PuyoNetworkView.h"
+#include "PuyoNetworkMenu.h"
 
 #ifndef DATADIR
 extern char *DATADIR;
@@ -188,31 +189,6 @@ MenuItems two_player_game_menu_load (SoFont *font, SoFont *small_font)
   menu_items_set_font_for(go_menu, kLevelHard,   font);
   menu_items_set_font_for(go_menu, kPlayer1Name, font);
   menu_items_set_font_for(go_menu, kPlayer2Name, font);
-  return go_menu;
-}
-
-MenuItems net_game_menu_load (SoFont *font, SoFont *small_font)
-{
-  static MenuItemsTab go_menu =
-  {
-    MENUITEM(kPlayerName),
-    MENUITEM(kIpAddress),
-    MENUITEM_BLANKLINE,
-    MENUITEM_BLANKLINE,
-    MENUITEM_BLANKLINE,
-    MENUITEM_INACTIVE(kGameLevel),
-    MENUITEM_BLANKLINE,
-    MENUITEM(kLevelEasy),
-    MENUITEM(kLevelMedium),
-    MENUITEM(kLevelHard),
-    MENUITEM_END
-  };
-  menu_items_set_font_for(go_menu, kGameLevel,   font);
-  menu_items_set_font_for(go_menu, kLevelEasy,   font);
-  menu_items_set_font_for(go_menu, kLevelMedium, font);
-  menu_items_set_font_for(go_menu, kLevelHard,   font);
-  menu_items_set_font_for(go_menu, kPlayerName, font);
-  menu_items_set_font_for(go_menu, kIpAddress, font);
   return go_menu;
 }
 
@@ -580,6 +556,7 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   int init_flags = SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK;
 
   SDL_Delay(500);
+  
   corona = NULL;
   fullscreen = GetBoolPreference(kFullScreen,fs);
 #ifdef HAVE_OPENGL
@@ -648,8 +625,10 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   darkFont = storyFont = SoFont_new();
   SoFont_load (darkFont, IIM_Load_DisplayFormatAlpha ("fontdark.png"));
 
-  IIM_Surface * menuselector = IIM_Load_DisplayFormatAlpha("menusel.png");
+  menuselector = IIM_Load_DisplayFormatAlpha("menusel.png");
 
+  networkGameMenu = new PuyoNetworkGameMenuScreen(menuFont, menuselector, *this, display);
+  
   mainMenu = menu_new(main_menu_load(menuFont),menuselector);
   gameOver1PMenu = menu_new(gameover_1p_menu_load(menuFont, smallFont),menuselector);
   gameOver2PMenu = menu_new(gameover_2p_menu_load(menuFont, smallFont),menuselector);
@@ -664,7 +643,6 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   aboutMenu      = menu_new(about_menu_load(menuFont),menuselector);
   singleGameMenu    = menu_new(single_game_menu_load(menuFont,smallFont),menuselector);
   twoPlayerGameMenu = menu_new(two_player_game_menu_load(menuFont,smallFont),menuselector);
-  netGameMenu = menu_new(net_game_menu_load(menuFont,smallFont),menuselector);
   mustRestartMenu   = menu_new(must_restart_menu_load(menuFont),menuselector); 
 
   if (menu_pause == NULL) menu_pause = menu_new(pause_menu_load(menuFont),menuselector);
@@ -675,7 +653,6 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   menu_set_sounds (rulesMenu,      sound_pop, sound_slide);
   menu_set_sounds (highScoresMenu, sound_pop, sound_slide);
   menu_set_sounds (aboutMenu,      sound_pop, sound_slide);
-  menu_set_sounds (netGameMenu, sound_pop, sound_slide);
   menu_set_sounds (singleGameMenu, sound_pop, sound_slide);
   menu_set_sounds (twoPlayerGameMenu, sound_pop, sound_slide);
   menu_set_sounds (menu_pause    , sound_pop, sound_slide);
@@ -759,7 +736,8 @@ void PuyoCommander::run()
                     }
                     if (menu_active_is (menu, NET_GAME)) {
                         menu_hide (menu);
-                        startNetGameLoop();
+                        networkGameMenu->run();
+                        //startNetGameLoop();
                         menu_show (menu);
                         audio_music_start(0);
                     }
@@ -1182,102 +1160,49 @@ void PuyoCommander::onMessage(Message &message)
     }
 }
 
-void PuyoCommander::startNetGameLoop()
-{
-  char playerName[256];
-  char ipAddress[256];
-
-  GetStrPreference("Player Name", playerName, "Player 1");
-  GetStrPreference("IP Address", ipAddress,   "");
-  menu_set_value(netGameMenu, kPlayerName, playerName, 0);
-  menu_set_value(netGameMenu, kIpAddress,  ipAddress, 0);
-
-  while (!menu_active_is(netGameMenu,kLevelMedium))
-    menu_next_item(netGameMenu);  
-
-  menu_show(netGameMenu);
-  while (1) {
-    SDL_Event e;
-
-    while (SDL_PollEvent (&e)) {
-      GameControlEvent controlEvent;
-        getControlEvent(e, &controlEvent);
-        switch (controlEvent.cursorEvent) {
-            case GameControlEvent::kQuit:
-                exit(0);
-                break;
-            case GameControlEvent::kDown:
-                menu_next_item (netGameMenu);
-                break;
-            case GameControlEvent::kUp:
-                menu_prev_item (netGameMenu);
-                break;
-            case GameControlEvent::kStart:
-                menu_validate (netGameMenu);
-                if (menu_active_is(netGameMenu,kPlayerName)) {
-                  enterStringLoop(netGameMenu,kPlayerName,playerName);
-                  menu_next_item (netGameMenu);
-                }
-                else if (menu_active_is(netGameMenu,kIpAddress)) {
-                  enterStringLoop(netGameMenu,kIpAddress,ipAddress, 60);
-                  menu_next_item (netGameMenu);
-                }
-                else
-                  goto mml_play;
-                break;
-            case GameControlEvent::kBack:
-                menu_hide(netGameMenu);
-                return;
-                break;
-        }
-    }
-    updateAll(NULL);
-  }
-  
-mml_play:
-  menu_hide (netGameMenu);
-
-  if (mbox) delete mbox;
-  mbox = new UDPMessageBox(ipAddress, 6581, 6581);
-  mbox->addListener(this);
-  
-  GAME_ACCEL = 2000;
-  gameLevel = 1;
-  if (menu_active_is (netGameMenu, kLevelMedium)) {
-    GAME_ACCEL = 1500;
-    gameLevel = 2;
-  }
-  else if (menu_active_is (netGameMenu, kLevelHard)) {
-    GAME_ACCEL = 1000;
-    gameLevel = 3;
-  }
-
-  int score1 = 0;
-  int score2 = 0;
-  gameOverMenu = gameOver2PMenu;
-  int currentMusicTheme = 0;
-  if (menu_active_is(gameOverMenu, "NO"))
-    menu_next_item(gameOverMenu);
-  while (menu_active_is(gameOverMenu, "YES")) {
-    menu_next_item(gameOverMenu);
-    PuyoNetworkStarter myStarter(this, currentMusicTheme, mbox);
-    audio_music_switch_theme(currentMusicTheme);
-    p1name = playerName;
-    p2name = playerName;
-    GAME_ACCEL = 1500;
-    doom_melt_start(melt, menuBGImage);
+void PuyoCommander::startLANGame(int level, char *playerName, char *ipAddress)
+{    
+    if (mbox) delete mbox;
+    mbox = new UDPMessageBox(ipAddress, 6581, 6581);
+    mbox->addListener(this);
     
-    myStarter.run(score1, score2, 0, 0, 0);
-    score1 += myStarter.leftPlayerWin();
-    score2 += myStarter.rightPlayerWin();
-    currentMusicTheme = (currentMusicTheme + 1) % NB_MUSIC_THEME;
-  }
-
-  SetStrPreference("Player Name", playerName);
-  SetStrPreference("IP Address", ipAddress);
-  doom_melt_start(melt, gameScreen);
-  if (mbox) delete mbox;
-  mbox = NULL;
+    GAME_ACCEL = 2000;
+    gameLevel = 1;
+    if (level == 1) {
+        GAME_ACCEL = 1500;
+        gameLevel = 2;
+    }
+    else if (level == 2) {
+        GAME_ACCEL = 1000;
+        gameLevel = 3;
+    }
+    
+    int score1 = 0;
+    int score2 = 0;
+    gameOverMenu = gameOver2PMenu;
+    int currentMusicTheme = 0;
+    if (menu_active_is(gameOverMenu, "NO"))
+        menu_next_item(gameOverMenu);
+    while (menu_active_is(gameOverMenu, "YES")) {
+        menu_next_item(gameOverMenu);
+        PuyoNetworkStarter myStarter(this, currentMusicTheme, mbox);
+        audio_music_switch_theme(currentMusicTheme);
+        p1name = playerName;
+        p2name = playerName;
+        GAME_ACCEL = 1500;
+        doom_melt_start(melt, menuBGImage);
+        
+        myStarter.run(score1, score2, 0, 0, 0);
+        score1 += myStarter.leftPlayerWin();
+        score2 += myStarter.rightPlayerWin();
+        currentMusicTheme = (currentMusicTheme + 1) % NB_MUSIC_THEME;
+    }
+    
+    SetStrPreference("Player Name", playerName);
+    SetStrPreference("IP Address", ipAddress);
+    doom_melt_start(melt, gameScreen);
+    if (mbox) delete mbox;
+    mbox = NULL;
 }
 
 void PuyoCommander::startTwoPlayerGameLoop()
@@ -1537,8 +1462,8 @@ void PuyoCommander::updateAll(PuyoDrawable *starter, SDL_Surface *extra_surf)
   menu_update (mustRestartMenu, display);
   menu_update (singleGameMenu, display);
   menu_update (twoPlayerGameMenu, display);
-  menu_update (netGameMenu, display);
   menu_update (menu_pause,display);
+  networkGameMenu->update();
   scrolling_text_update(scrollingText, display);
   doom_melt_update(melt);
   
@@ -1605,11 +1530,11 @@ void PuyoCommander::updateAll(PuyoDrawable *starter, SDL_Surface *extra_surf)
     menu_draw (rulesMenu, display);
     menu_draw (highScoresMenu, display);
     menu_draw (aboutMenu, display);
-    menu_draw (netGameMenu, display);
     menu_draw (mustRestartMenu, display);
     menu_draw (singleGameMenu, display);
     menu_draw (twoPlayerGameMenu, display);
     menu_draw(menu_pause,display);
+    networkGameMenu->render();
     doom_melt_display(melt, display);
     SDL_Flip (display);
   }
