@@ -6,6 +6,7 @@
 #include "scrollingtext.h"
 
 
+
 typedef struct GameControlEvent {
     enum {
         kGameNone,
@@ -51,6 +52,8 @@ class PuyoCommander
   void showGameOver() { menu_show(gameOverMenu); }
   void hideGameOver() { menu_hide(gameOverMenu); }
 
+  bool changeControlLoop(SDL_keysym *keySym);
+  void controlsMenuLoop();
   void optionMenuLoop();
   void backLoop(Menu *menu);
   void startSingleGameLoop();
@@ -64,9 +67,11 @@ class PuyoCommander
  private:
   // SoFont *menuFont;
   // SoFont *smallFont;
+  Menu *changeControlMenu;
   Menu *mainMenu;
   Menu *singleGameMenu;
   Menu *optionMenu;
+  Menu *controlsMenu;
   Menu *rulesMenu;
   Menu *aboutMenu;
   ScrollingText *scrollingText;

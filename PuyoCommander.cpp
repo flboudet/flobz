@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
+#include <string.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include "PuyoCommander.h"
@@ -20,6 +21,20 @@ static char *kGameLevel   = "Choose Game Level";
 static char *kLevelEasy   = "Easy";
 static char *kLevelMedium = "Medium";
 static char *kLevelHard   = "Hard";
+
+static char *kChangeKey   = "Press any key to change the control";
+
+static char *kPlayer1Left = "Player 1 Left:";
+static char *kPlayer1Right = "Player 1 Right:";
+static char *kPlayer1Down = "Player 1 Down:";
+static char *kPlayer1Clockwise = "Player 1 Turn Clockwise:";
+static char *kPlayer1Counterclockwise = "Player 1 Turn Counterclockwise:";
+
+static char *kPlayer2Left = "Player 2 Left:";
+static char *kPlayer2Right = "Player 2 Right:";
+static char *kPlayer2Down = "Player 2 Down:";
+static char *kPlayer2Clockwise = "Player 2 Turn Clockwise:";
+static char *kPlayer2Counterclockwise = "Player 2 Turn Counterclockwise:";
 
 static char *kRules01 = "A puyo is a small colored 'smiley'.. Your goal:";
 static char *kRules02 = "Create blobs of 4 or more puyos having the same color.";
@@ -49,6 +64,99 @@ const int cycle_duration = 20;
 static bool fullscreen = true;
 static bool sound = true;
 static bool fx = true;
+
+
+typedef struct SdlKeyName {
+    SDLKey key;
+    char name[50];
+} SdlKeyName;
+
+static const SdlKeyName sdlKeyDictionnary[] = {
+    { SDLK_UNKNOWN,   "Not assigned"},
+    { SDLK_BACKSPACE, "Backspace"  },
+    { SDLK_TAB,       "Tab"        },
+    { SDLK_CLEAR,     "Clear"      },
+    { SDLK_RETURN,    "Return"     },
+    { SDLK_PAUSE,     "Pause"      },
+    { SDLK_ESCAPE,    "Escape"     },
+    { SDLK_SPACE,     "Space"      },
+    { SDLK_DELETE,    "Delete"     },
+    { SDLK_KP0,       "KP 0"       },
+    { SDLK_KP1,       "KP 1"       },
+    { SDLK_KP2,       "KP 2"       },
+    { SDLK_KP3,       "KP 3"       },
+    { SDLK_KP4,       "KP 4"       },
+    { SDLK_KP5,       "KP 5"       },
+    { SDLK_KP6,       "KP 6"       },
+    { SDLK_KP7,       "KP 7"       },
+    { SDLK_KP8,       "KP 8"       },
+    { SDLK_KP9,       "KP 9"       },
+    { SDLK_UP,        "Up arrow"   },
+    { SDLK_DOWN,      "Down arrow" },
+    { SDLK_LEFT,      "Left arrow" },
+    { SDLK_RIGHT,     "Right arrow"},
+    { SDLK_INSERT,    "Insert"     },
+    { SDLK_HOME,      "Home"       },
+    { SDLK_END,       "End"        },
+    { SDLK_PAGEUP,     "Page up"   },
+    { SDLK_PAGEDOWN,   "Page down" },
+    { SDLK_F1,         "F1"        },
+    { SDLK_F2,         "F2"        },
+    { SDLK_F3,         "F3"        },
+    { SDLK_F4,         "F4"        },
+    { SDLK_F5,         "F5"        },
+    { SDLK_F6,         "F6"        },
+    { SDLK_F7,         "F7"        },
+    { SDLK_F8,         "F8"        },
+    { SDLK_F9,         "F9"        },
+    { SDLK_F10,        "F10"       },
+    { SDLK_F11,        "F11"       },
+    { SDLK_F12,        "F12"       },
+    { SDLK_F13,        "F13"       },
+    { SDLK_F14,        "F14"       },
+    { SDLK_F15,        "F15"       },
+    { SDLK_NUMLOCK,    "Num lock"  },
+    { SDLK_CAPSLOCK,   "Caps lock" },
+    { SDLK_SCROLLOCK,  "Scroll lock"},
+    { SDLK_RSHIFT,     "Right shift"},
+    { SDLK_LSHIFT,     "Left shift" },
+    { SDLK_RCTRL,     "Right ctrl" },
+    { SDLK_LCTRL,     "Left ctrl" },
+    { SDLK_RALT,     "Right alt" },
+    { SDLK_LALT,     "Left alt" },
+    { SDLK_RMETA,     "Right meta" },
+    { SDLK_LMETA,     "Left meta" },
+    { SDLK_RSUPER,     "Right windows" },
+    { SDLK_LSUPER,     "Left windows" },
+    { SDLK_MODE,     "Mode shift" },
+    { SDLK_HELP,     "Help" },
+    { SDLK_PRINT,     "Print screen" },
+    { SDLK_SYSREQ,     "Sys Rq" },
+    { SDLK_BREAK,     "Break" },
+    { SDLK_MENU,     "Menu" },
+    { SDLK_POWER,     "Power" },
+    { SDLK_EURO,     "Euro" }
+};
+
+static const int sdlKeyDictionnarySize = sizeof(sdlKeyDictionnary) / sizeof(SdlKeyName);
+
+enum {
+    kPlayer1LeftControl             = 0,
+    kPlayer1RightControl            = 1,
+    kPlayer1DownControl             = 2,
+    kPlayer1ClockwiseControl        = 3,
+    kPlayer1CounterclockwiseControl = 4,
+    kPlayer2LeftControl             = 5,
+    kPlayer2RightControl            = 6,
+    kPlayer2DownControl             = 7,
+    kPlayer2ClockwiseControl        = 8,
+    kPlayer2CounterclockwiseControl = 9
+};
+
+static SDLKey keyControls[10] = {
+    SDLK_LEFT, SDLK_RIGHT, SDLK_DOWN, SDLK_UNKNOWN, SDLK_UP,
+    SDLK_s, SDLK_f, SDLK_d, SDLK_UNKNOWN, SDLK_e
+};
 
 SDL_Surface * IMG_Load_DisplayFormat (const char *fname)
 {
@@ -254,6 +362,58 @@ MenuItems options_menu_load (SoFont *font, SoFont *small_font)
   return option_menu;
 }
 
+MenuItems controls_menu_load (SoFont *font, SoFont *small_font)
+{
+  static MenuItemsTab controls_menu = {
+    //MENUITEM("Player 1 Joystick"),
+    //MENUITEM("Player 2 Joystick"),
+    MENUITEM_BLANKLINE,
+    MENUITEM(kPlayer1Left),
+    MENUITEM(kPlayer1Right),
+    MENUITEM(kPlayer1Down),
+    MENUITEM(kPlayer1Clockwise),
+    MENUITEM(kPlayer1Counterclockwise),
+    MENUITEM_BLANKLINE,
+    MENUITEM(kPlayer2Left),
+    MENUITEM(kPlayer2Right),
+    MENUITEM(kPlayer2Down),
+    MENUITEM(kPlayer2Clockwise),
+    MENUITEM(kPlayer2Counterclockwise),
+    MENUITEM_BLANKLINE,
+    MENUITEM("Back"),
+    MENUITEM_END
+  };
+  //menu_items_set_font_for(controls_menu,  "Player 1 Joystick", font);
+  
+  menu_items_set_font_for(controls_menu,  kPlayer1Left, font);
+  menu_items_set_font_for(controls_menu,  kPlayer1Right, font);
+  menu_items_set_font_for(controls_menu,  kPlayer1Down, font);
+  menu_items_set_font_for(controls_menu,  kPlayer1Clockwise, font);
+  menu_items_set_font_for(controls_menu,  kPlayer1Counterclockwise, font);
+  
+  menu_items_set_font_for(controls_menu,  kPlayer2Left, font);
+  menu_items_set_font_for(controls_menu,  kPlayer2Right, font);
+  menu_items_set_font_for(controls_menu,  kPlayer2Down, font);
+  menu_items_set_font_for(controls_menu,  kPlayer2Clockwise, font);
+  menu_items_set_font_for(controls_menu,  kPlayer2Counterclockwise, font);
+  
+  menu_items_set_font_for(controls_menu,  "Back", font);
+ //menu_items_set_value_for(controls_menu, "Player 1 Joystick", SDL_JoystickName(0));
+  //menu_items_set_value_for(controls_menu, kPlayer1Left, "s");
+  return controls_menu;
+}
+
+MenuItems change_controls_menu_load (SoFont *font, SoFont *small_font)
+{
+  static MenuItemsTab controls_menu = {
+    MENUITEM(kChangeKey),
+    MENUITEM_BLANKLINE,
+    MENUITEM_END
+  };
+  menu_items_set_font_for(controls_menu,  kChangeKey, font);
+  return controls_menu;
+}
+
 PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
 {
   int init_flags = SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK;
@@ -315,10 +475,13 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   mainMenu = menu_new(main_menu_load(menuFont),menuselector);
   gameOverMenu = menu_new(gameover_menu_load(menuFont, smallFont),menuselector);
   optionMenu = menu_new(options_menu_load(menuFont, smallFont),menuselector);
+  changeControlMenu = menu_new(change_controls_menu_load(menuFont, smallFont),menuselector);
+  controlsMenu = menu_new(controls_menu_load(menuFont, smallFont),menuselector);
   rulesMenu = menu_new(rules_menu_load(menuFont),menuselector);
   aboutMenu = menu_new(about_menu_load(menuFont),menuselector);
   singleGameMenu = menu_new(single_game_menu_load(menuFont,smallFont),menuselector);
   menu_set_sounds (optionMenu,     sound_pop, sound_slide);
+  menu_set_sounds (controlsMenu,     sound_pop, sound_slide);
   menu_set_sounds (mainMenu,       sound_pop, sound_slide);
   menu_set_sounds (rulesMenu,      sound_pop, sound_slide);
   menu_set_sounds (aboutMenu,      sound_pop, sound_slide);
@@ -420,6 +583,179 @@ mml_fin:
   menu_hide (menu);
 }
 
+bool PuyoCommander::changeControlLoop(SDL_keysym *keySym)
+{
+    bool keyPressed = false;
+    while (1) {
+        SDL_Event e;
+        
+        while (SDL_PollEvent (&e)) {
+            GameControlEvent controlEvent;
+            getControlEvent(e, &controlEvent);
+            
+            switch (controlEvent.cursorEvent) {
+                case GameControlEvent::kQuit:
+                    exit(0);
+                    goto mml_fin;
+                    break;
+                case GameControlEvent::kBack:
+                    goto mml_fin;
+                    break;
+                default:
+                    break;
+            }
+            switch (e.type) {
+                case SDL_KEYDOWN:
+                    memcpy((void *)keySym, (void *)&(e.key.keysym), sizeof(SDL_keysym));
+                    keyPressed = true;
+                    goto mml_fin;
+                    break;
+                default:
+                    break;
+            }
+        }
+        updateAll(NULL);
+    }
+mml_fin:
+    return keyPressed;
+}
+
+void getKeyName(SDLKey sym, char *keyName)
+{
+    for (int i = 0 ; i < sdlKeyDictionnarySize ; i++) {
+        if (sdlKeyDictionnary[i].key == sym) {
+            strcpy(keyName, sdlKeyDictionnary[i].name);
+            return;
+        }
+    }
+    keyName[0] = (char)sym;
+    keyName[1] = 0;
+}
+
+void PuyoCommander::controlsMenuLoop()
+{
+  char newKeyName[250];
+  
+  getKeyName(keyControls[kPlayer1LeftControl], newKeyName);
+  menu_set_value(controlsMenu, kPlayer1Left, newKeyName);
+  getKeyName(keyControls[kPlayer1RightControl], newKeyName);
+  menu_set_value(controlsMenu, kPlayer1Right, newKeyName);
+  getKeyName(keyControls[kPlayer1DownControl], newKeyName);
+  menu_set_value(controlsMenu, kPlayer1Down, newKeyName);
+  getKeyName(keyControls[kPlayer1ClockwiseControl], newKeyName);
+  menu_set_value(controlsMenu, kPlayer1Clockwise, newKeyName);
+  getKeyName(keyControls[kPlayer1CounterclockwiseControl], newKeyName);
+  menu_set_value(controlsMenu, kPlayer1Counterclockwise, newKeyName);
+  
+  getKeyName(keyControls[kPlayer2LeftControl], newKeyName);
+  menu_set_value(controlsMenu, kPlayer2Left, newKeyName);
+  getKeyName(keyControls[kPlayer2RightControl], newKeyName);
+  menu_set_value(controlsMenu, kPlayer2Right, newKeyName);
+  getKeyName(keyControls[kPlayer2DownControl], newKeyName);
+  menu_set_value(controlsMenu, kPlayer2Down, newKeyName);
+  getKeyName(keyControls[kPlayer2ClockwiseControl], newKeyName);
+  menu_set_value(controlsMenu, kPlayer2Clockwise, newKeyName);
+  getKeyName(keyControls[kPlayer2CounterclockwiseControl], newKeyName);
+  menu_set_value(controlsMenu, kPlayer2Counterclockwise, newKeyName);
+  
+  menu_show(controlsMenu);
+    while (1) {
+        SDL_Event e;
+        
+        while (SDL_PollEvent (&e)) {
+            char *chosenControl = NULL;
+            int chosenControlIndex;
+            GameControlEvent controlEvent;
+            getControlEvent(e, &controlEvent);
+            
+            switch (controlEvent.cursorEvent) {
+                case GameControlEvent::kQuit:
+                    exit(0);
+                    goto mml_fin;
+                    break;
+                case GameControlEvent::kUp:
+                    menu_prev_item (controlsMenu);
+                    break;
+                case GameControlEvent::kDown:
+                    menu_next_item (controlsMenu);
+                    break;
+                case GameControlEvent::kStart:
+                    menu_validate (controlsMenu);
+                    if (menu_active_is (controlsMenu, "Back"))
+                        goto mml_fin;
+                        
+                    if (menu_active_is (controlsMenu, kPlayer1Left)) {
+                        chosenControl = kPlayer1Left;
+                        chosenControlIndex = kPlayer1LeftControl;
+                    }
+                    if (menu_active_is (controlsMenu, kPlayer1Right)) {
+                        chosenControl = kPlayer1Right;
+                        chosenControlIndex = kPlayer1RightControl;
+                    }
+                    if (menu_active_is (controlsMenu, kPlayer1Down)) {
+                        chosenControl = kPlayer1Down;
+                        chosenControlIndex = kPlayer1DownControl;
+                    }
+                    if (menu_active_is (controlsMenu, kPlayer1Clockwise)) {
+                        chosenControl = kPlayer1Clockwise;
+                        chosenControlIndex = kPlayer1ClockwiseControl;
+                    }
+                    if (menu_active_is (controlsMenu, kPlayer1Counterclockwise)) {
+                        chosenControl = kPlayer1Counterclockwise;
+                        chosenControlIndex = kPlayer1CounterclockwiseControl;
+                    }
+                    
+                    if (menu_active_is (controlsMenu, kPlayer2Left)) {
+                        chosenControl = kPlayer2Left;
+                        chosenControlIndex = kPlayer2LeftControl;
+                    }
+                    if (menu_active_is (controlsMenu, kPlayer2Right)) {
+                        chosenControl = kPlayer2Right;
+                        chosenControlIndex = kPlayer2RightControl;
+                    }
+                    if (menu_active_is (controlsMenu, kPlayer2Down)) {
+                        chosenControl = kPlayer2Down;
+                        chosenControlIndex = kPlayer2DownControl;
+                    }
+                    if (menu_active_is (controlsMenu, kPlayer2Clockwise)) {
+                        chosenControl = kPlayer2Clockwise;
+                        chosenControlIndex = kPlayer2ClockwiseControl;
+                    }
+                    if (menu_active_is (controlsMenu, kPlayer2Counterclockwise)) {
+                        chosenControl = kPlayer2Counterclockwise;
+                        chosenControlIndex = kPlayer2CounterclockwiseControl;
+                    }
+                        
+                    if (chosenControl != NULL) {
+                        char prevValue[255];
+                        strcpy(prevValue, menu_get_value (controlsMenu, chosenControl));
+                        menu_set_value(controlsMenu, chosenControl, "<Press a key>");
+                        SDL_keysym keySym;
+                        if (changeControlLoop(&keySym)) {
+                            getKeyName(keySym.sym, newKeyName);
+                            menu_set_value(controlsMenu, chosenControl, newKeyName);
+                            keyControls[chosenControlIndex] = keySym.sym;
+                            menu_next_item (controlsMenu);
+                        }
+                        else {
+                            menu_set_value(controlsMenu, chosenControl, prevValue);
+                        }
+                    }
+                    break;
+                case GameControlEvent::kBack:
+                    goto mml_fin;
+                    break;
+                default:
+                    break;
+            }
+        }
+        
+        updateAll(NULL);
+    }
+mml_fin:
+        menu_hide (controlsMenu);
+}
+
 void PuyoCommander::optionMenuLoop()
 {
   menu_show(optionMenu);
@@ -460,6 +796,11 @@ void PuyoCommander::optionMenuLoop()
                         fx = menu_switch_on_off(optionMenu, kAudioFX);
                         SetBoolPreference(kAudioFX,fx);
                         audio_set_sound_on_off(fx);
+                    }
+                    if (menu_active_is (optionMenu, kControls)) {
+                        menu_hide (optionMenu);
+                        controlsMenuLoop();
+                        menu_show(optionMenu);
                     }
                     break;
                 case GameControlEvent::kBack:
@@ -575,6 +916,8 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
   menu_update (mainMenu, display);
   menu_update (gameOverMenu, display);
   menu_update (optionMenu, display);
+  menu_update (changeControlMenu, display);
+  menu_update (controlsMenu, display);
   menu_update (rulesMenu, display);
   menu_update (aboutMenu, display);
   menu_update (singleGameMenu, display);
@@ -598,6 +941,8 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
     menu_draw (mainMenu, display);
     menu_draw (gameOverMenu, display);
     menu_draw (optionMenu, display);
+    menu_draw (changeControlMenu, display);
+    menu_draw (controlsMenu, display);
     menu_draw (rulesMenu, display);
     menu_draw (aboutMenu, display);
     menu_draw (singleGameMenu, display);
@@ -613,9 +958,12 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
 
 void PuyoCommander::initControllers()
 {
+    printf("%i joysticks were found.\n\n", SDL_NumJoysticks() );
+    printf("The names of the joysticks are:\n");
     numJoysticks = SDL_NumJoysticks();
     for( int i=0 ; i < numJoysticks ; i++ ) 
     {
+        printf("    %s\n", SDL_JoystickName(i));
         joystick[i] = SDL_JoystickOpen(i);
     }
   SDL_JoystickEventState(SDL_ENABLE);
@@ -631,6 +979,7 @@ void PuyoCommander::closeControllers()
 
 void PuyoCommander::getControlEvent(SDL_Event e, GameControlEvent *result)
 {
+    SDLKey sym;
     result->gameEvent = GameControlEvent::kGameNone;
     result->cursorEvent = GameControlEvent::kCursorNone;
     
@@ -708,17 +1057,9 @@ void PuyoCommander::getControlEvent(SDL_Event e, GameControlEvent *result)
             switch (e.key.keysym.sym) {
                 case SDLK_DOWN:
                     result->cursorEvent = GameControlEvent::kDown;
-                    result->gameEvent = GameControlEvent::kPlayer2Down;
                     break;
                 case SDLK_UP:
                     result->cursorEvent = GameControlEvent::kUp;
-                    result->gameEvent = GameControlEvent::kPlayer2TurnLeft;
-                    break;
-                case SDLK_LEFT:
-                    result->gameEvent = GameControlEvent::kPlayer2Left;
-                    break;
-                case SDLK_RIGHT:
-                    result->gameEvent = GameControlEvent::kPlayer2Right;
                     break;
                 case SDLK_RETURN:
                     result->cursorEvent = GameControlEvent::kStart;
@@ -726,33 +1067,38 @@ void PuyoCommander::getControlEvent(SDL_Event e, GameControlEvent *result)
                 case SDLK_ESCAPE:
                     result->cursorEvent = GameControlEvent::kBack;
                     break;
-                case SDLK_s:
-                    result->gameEvent = GameControlEvent::kPlayer1Left;
-                    break;
-                case SDLK_f:
-                    result->gameEvent = GameControlEvent::kPlayer1Right;
-                    break;
-                case SDLK_e:
-                    result->gameEvent = GameControlEvent::kPlayer1TurnLeft;
-                    break;
-                case SDLK_d:
-                    result->gameEvent = GameControlEvent::kPlayer1Down;
-                    break;
                 default:
                     break;
             }
+            sym = e.key.keysym.sym;
+            if (sym == keyControls[kPlayer1LeftControl])
+                result->gameEvent = GameControlEvent::kPlayer1Left;
+            if (sym == keyControls[kPlayer1RightControl])
+                result->gameEvent = GameControlEvent::kPlayer1Right;
+            if (sym == keyControls[kPlayer1DownControl])
+                result->gameEvent = GameControlEvent::kPlayer1Down;
+            if (sym == keyControls[kPlayer1ClockwiseControl])
+                result->gameEvent = GameControlEvent::kPlayer1TurnRight;
+            if (sym == keyControls[kPlayer1CounterclockwiseControl])
+                result->gameEvent = GameControlEvent::kPlayer1TurnLeft;
+            
+            if (sym == keyControls[kPlayer2LeftControl])
+                result->gameEvent = GameControlEvent::kPlayer2Left;
+            if (sym == keyControls[kPlayer2RightControl])
+                result->gameEvent = GameControlEvent::kPlayer2Right;
+            if (sym == keyControls[kPlayer2DownControl])
+                result->gameEvent = GameControlEvent::kPlayer2Down;
+            if (sym == keyControls[kPlayer2ClockwiseControl])
+                result->gameEvent = GameControlEvent::kPlayer2TurnRight;
+            if (sym == keyControls[kPlayer2CounterclockwiseControl])
+                result->gameEvent = GameControlEvent::kPlayer2TurnLeft;
             break;
         case SDL_KEYUP:
-            switch (e.key.keysym.sym) {
-                case SDLK_DOWN:
-                    result->gameEvent = GameControlEvent::kPlayer2DownUp;
-                    break;
-                case SDLK_d:
-                    result->gameEvent = GameControlEvent::kPlayer1DownUp;
-                    break;
-                default:
-                    break;
-            }
+            sym = e.key.keysym.sym;
+            if (sym == keyControls[kPlayer1DownControl])
+                result->gameEvent = GameControlEvent::kPlayer1DownUp;
+            if (sym == keyControls[kPlayer2DownControl])
+                result->gameEvent = GameControlEvent::kPlayer2DownUp;
             break;
     }
 }
