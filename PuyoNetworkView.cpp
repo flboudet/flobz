@@ -26,7 +26,9 @@
 #include "PuyoNetworkView.h"
 
 enum {
-    kGameState = 0
+    kGameState   = 0,
+    kGameOver    = 1,
+    kAddNeutrals = 2
 };
 
 extern char *p1name;
@@ -46,10 +48,13 @@ Message *PuyoNetworkView::createStateMessage(bool paused) const
         buffer.add(currentPuyo->getPuyoY());
     }
     
-    message->addInt     ("TYPE",  kGameState);
-    message->addString  ("NAME",  p1name);
-    message->addBool    ("PAUSE", paused);
-    message->addIntArray("PUYOS", buffer);
+    message->addInt     ("TYPE",   kGameState);
+    message->addString  ("NAME",   p1name);
+    message->addBool    ("PAUSE",  paused);
+    message->addIntArray("PUYOS",  buffer);
+    message->addInt     ("SCORE",  attachedGame->getPoints());
+    message->addInt     ("NEXT_F", attachedGame->getNextFalling());
+    message->addInt     ("NEXT_C", attachedGame->getNextCompanion());
     return message;
 }
 
@@ -97,6 +102,13 @@ void PuyoNetworkView::rotateRight()
 void PuyoNetworkView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex)
 {
     PuyoView::gameDidAddNeutral(neutralPuyo, neutralIndex);
+    Message *message = mbox->createMessage();
+    message->addInt     ("TYPE",   kAddNeutrals);
+    message->addString  ("NAME",   p1name);
+    message->addInt     ("NUMBER", neutralIndex);
+    message->addBoolProperty("RELIABLE", true);
+    message->send();
+    delete message;
 }
 
 void PuyoNetworkView::gameDidEndCycle()
@@ -122,5 +134,12 @@ void PuyoNetworkView::puyoWillVanish(IosVector &puyoGroup, int groupNum, int pha
 void PuyoNetworkView::gameLost()
 {
     PuyoView::gameLost();
+    Message *message = mbox->createMessage();
+    message->addInt     ("TYPE",   kGameOver);
+    message->addString  ("NAME",   p1name);
+    message->addInt     ("SCORE",  attachedGame->getPoints());
+    message->addBoolProperty("RELIABLE", true);
+    message->send();
+    delete message;
 }
 
