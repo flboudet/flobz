@@ -201,8 +201,6 @@ void PuyoCommander::updateAll(DrawableComponent *starter, SDL_Surface *extra_sur
   loop->idle(currentTime);
   if (!loop->isLate(currentTime) && loop->drawRequested()) {
     loop->draw();
-/*    if (starter)
-      starter->doDraw(display);*/
   }
 }
 

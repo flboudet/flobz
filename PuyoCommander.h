@@ -26,8 +26,6 @@ class PuyoCommander : public MessageListener
 
     void updateAll(DrawableComponent *starter, SDL_Surface *extra_surf = NULL);
 
-    void showGameOver() {}
-    void hideGameOver() {}
     /*
        bool changeControlLoop(int controlIndex, PuyoDrawable *starter);
        void controlsMenuLoop(PuyoDrawable *d);

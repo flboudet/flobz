@@ -61,7 +61,7 @@ protected:
 };
 
 
-class PuyoStarter : public PuyoPureStarter {
+class PuyoStarter : public PuyoPureStarter, public virtual IdleComponent {
 public:
     PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType, int theme, ios_fc::MessageBox *mbox = NULL);
     virtual ~PuyoStarter();
@@ -75,6 +75,8 @@ public:
     
     virtual int leftPlayerPoints() const { return attachedGameA->getPoints(); }
     virtual int rightPlayerPoints() const { return attachedGameB->getPoints(); }
+   
+    void onEvent(GameControlEvent *event);
     
 protected:
     PuyoView *areaA, *areaB;
@@ -92,6 +94,8 @@ protected:
     int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
     ios_fc::MessageBox *mbox;
     AnimatedPuyoThemeManager attachedThemeManager;
+    int quit;
+    bool gameover;
 };
 
 #endif // _PUYOSTARTER
