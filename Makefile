@@ -23,6 +23,9 @@ bundle_name=FloboPuyo.app
 # Win32 settings
 CYGWIN_VERSION=CYGWIN_NT-5.1
 WINZIP_NAME=flobopuyowin32
+WINSDLINCLUDE=/home/flobo/SDL/SDL-1.2.7/include
+WINSDLDEVLIBS=/home/flobo/SDL/SDL-1.2.7/lib
+WINSDLRUNTIME=/home/flobo/SDL/sdl-runtime/lib
 #
 ##########
 
@@ -72,8 +75,8 @@ endif
 ################
 # Win32
 ifeq ($(PLATFORM), $(CYGWIN_VERSION))
-CFLAGS:=$(CFLAGS) -mno-cygwin -DWIN32 -DYY_NEVER_INTERACTIVE=1 -Iwin32/include
-LDFLAGS:=$(LDFLAGS) -lmingw32 -Lwin32 -ljpeg -lzlib -lpng1 -lSDL_image -lSDL_mixer -lSDL -lSDLmain
+CFLAGS:=$(CFLAGS) -mno-cygwin -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE)
+LDFLAGS:=$(LDFLAGS) -lmingw32 -L$(WINSDLDEVLIBS) -ljpeg -lzlib -lpng1 -lSDL_image -lSDL_mixer -lSDL -lSDLmain
 endif
 
 ifeq ($(ENABLE_AUDIO), true)
@@ -106,6 +109,7 @@ prelude:
 	@rm -f WARNINGS
 	@touch WARNINGS
 	@echo "Compiling with CFLAGS=$(CFLAGS)"
+	@echo "Compiling with LDFLAGS=$(LDFLAGS)"
 
 %.o:%.c
 	@echo "[$@]" && $(CC) $(CFLAGS) -c $< 2>> WARNINGS || (cat WARNINGS && false)
@@ -204,5 +208,5 @@ win-package: flobopuyo
 	cp -r data $(WINZIP_NAME)
 	cp flobopuyo.exe $(WINZIP_NAME)
 	cp COPYING $(WINZIP_NAME)
-	cp win32/*.dll $(WINZIP_NAME)
+	cp $(WINSDLRUNTIME)/*.dll $(WINZIP_NAME)
 	zip -r $(WINZIP_NAME) $(WINZIP_NAME)

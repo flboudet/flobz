@@ -62,7 +62,7 @@ audio_init ()
   int i;
 
 	sound_supported =
-    (Mix_OpenAudio (MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 256) == 0);
+    (Mix_OpenAudio (MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024) == 0);
 
   if (!sound_supported) return;
 
