@@ -21,6 +21,7 @@ static const char *DID_END_CYCLE = "DID_END_CYCLE";
 static const char *SEMI_MOVE     = "SEMI_MOVE";
 static const char *COMPANION_TURN = "COMPANION_TURN";
 static const char *DID_FALL       = "DID_FALL";
+static const char *WILL_VANISH    = "WILL_VANISH";
 static const char *CURRENT_NEUTRALS = "CURRENT_NEUTRALS";
 static const char *NUMBER_BAD_PUYOS = "NUMBER_BAD_PUYOS";
 

@@ -127,6 +127,25 @@ void PuyoNetworkGame::synchronizeState(Message &message)
         }
     }
     
+    Buffer<int> willVanish= message.getIntArray(WILL_VANISH);
+    if (willVanish.size() > 0) {
+       if (delegate != NULL) {
+            int i = 0;
+            IosVector temporaryGroup;
+            while (i < willVanish.size()) {
+                temporaryGroup.removeAllElements();
+                int numPhase = willVanish[i++];
+                int groupNumber = willVanish[i++];
+                int numberOfPuyosInGroup = willVanish[i++];
+                for (int index = 0 ; index < numberOfPuyosInGroup ; index++) {
+                    temporaryGroup.addElement(findPuyo(willVanish[i + index]));
+                }
+                delegate->puyoWillVanish(temporaryGroup, groupNumber, numPhase);
+                i += numberOfPuyosInGroup;
+            }
+        }
+    }
+    
     int badPuyos = message.getInt(NUMBER_BAD_PUYOS);
     if (badPuyos > sentBadPuyos) {
         neutralPuyos = sentBadPuyos - badPuyos;

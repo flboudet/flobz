@@ -43,6 +43,7 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
     neutralsBuffer.flush();
     compTurnBuffer.flush();
     didFallBuffer.flush();
+    willVanishBuffer.flush();
         
     // creation du message
     Message *message = mbox->createMessage();
@@ -60,12 +61,14 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
     message->addIntArray(PuyoMessage::ADD_NEUTRALS,  neutralsBuffer);
     message->addIntArray(PuyoMessage::COMPANION_TURN,compTurnBuffer);
     message->addIntArray(PuyoMessage::DID_FALL,      didFallBuffer);
+    message->addIntArray(PuyoMessage::WILL_VANISH,   willVanishBuffer);
     message->addInt     (PuyoMessage::NUMBER_BAD_PUYOS, badPuyos);
     
     // clear des infos ayant ete envoyee
     neutralsBuffer.clear();
     compTurnBuffer.clear();
     didFallBuffer.clear();
+    willVanishBuffer.clear();
     return message;
 }
 
@@ -141,10 +144,14 @@ void PuyoNetworkView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY)
 void PuyoNetworkView::puyoWillVanish(IosVector &puyoGroup, int groupNum, int phase)
 {
     PuyoView::puyoWillVanish(puyoGroup, groupNum, phase);
-    /*for (int = 0; i < puyoGroup.getSize(); ++i)
+    willVanishBuffer.add(phase);
+    willVanishBuffer.add(groupNum);
+    willVanishBuffer.add(puyoGroup.getSize());
+    for (int i = 0 ; i < puyoGroup.getSize() ; i++)
     {
-        willVanish();
-    }*/
+        PuyoPuyo *currentPuyo = (PuyoPuyo *)puyoGroup.getElementAt(i);
+        willVanishBuffer.add(currentPuyo->getID());
+    }
 }
 
 void PuyoNetworkView::gameLost()

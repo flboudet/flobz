@@ -62,6 +62,7 @@ private:
     AdvancedBuffer<int> neutralsBuffer;
     AdvancedBuffer<int> compTurnBuffer;
     AdvancedBuffer<int> didFallBuffer;
+    AdvancedBuffer<int> willVanishBuffer;
     int badPuyos;
 };
 
