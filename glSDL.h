@@ -311,7 +311,7 @@ glSDL_TexInfo *glSDL_GetTexInfo(SDL_Surface *surface);
 #endif
 
 /* Some extra overloading for common external lib calls... */
-#include "SDL_image.h"
+#include "SDL/SDL_image.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -24,9 +24,9 @@ bundle_name=FloboPuyo.app
 # Win32 settings
 CYGWIN_VERSION=CYGWIN_NT-5.1
 WINZIP_NAME=flobopuyowin32
-WINSDLINCLUDE=/home/flobo/SDL/SDL-1.2.7/include
-WINSDLDEVLIBS=/home/flobo/SDL/SDL-1.2.7/lib
-WINSDLRUNTIME=/home/flobo/SDL/sdl-runtime/lib
+WINSDLINCLUDE=/home/$(USER)/SDL-1.2.7/include
+WINSDLDEVLIBS=/home/$(USER)/SDL-1.2.7/lib
+WINSDLRUNTIME=/home/$(USER)/SDL-1.2.7/lib
 #
 ##########
 
@@ -64,7 +64,8 @@ OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o        \
           PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o sofont.o       \
           menu.o menuitems.o audio.o scrollingtext.o preferences.o           \
           PuyoStory.o SDL_Painter.o InputManager.o GameControls.o            \
-          PuyoDoomMelt.o IosImgProcess.o corona32.o corona.o corona_palette.o PuyoStarter.o
+          PuyoDoomMelt.o IosImgProcess.o corona32.o corona.o corona_palette.o\
+	  PuyoStarter.o
 
 
 ################
@@ -76,8 +77,8 @@ endif
 ################
 # Win32
 ifeq ($(PLATFORM), $(CYGWIN_VERSION))
-CFLAGS:=$(CFLAGS) -mno-cygwin -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE)
-LDFLAGS:=$(LDFLAGS) -lmingw32 -L$(WINSDLDEVLIBS) -ljpeg -lzlib -lpng1 -lSDL_image -lSDL_mixer -lSDL -lSDLmain
+CFLAGS:=$(CFLAGS) -mno-cygwin -mwindows -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE) 
+LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
 endif
 
 ifeq ($(ENABLE_AUDIO), true)

@@ -1345,6 +1345,8 @@ mml_play:
   doom_melt_start(melt, gameScreen);
 }
 
+#define TIME_TOLERANCE 5
+
 void PuyoCommander::updateAll(PuyoDrawable *starter, SDL_Surface *extra_surf)
 {
   Uint32  now = 0;
@@ -1375,7 +1377,9 @@ void PuyoCommander::updateAll(PuyoDrawable *starter, SDL_Surface *extra_surf)
   cycle++;
   now = SDL_GetTicks ();
 
-  if ((now < (start_time + cycle * cycle_duration)) || (cycle - lastRenderedCycle > maxFrameDrop)) {
+  if ((now < (start_time + (cycle + TIME_TOLERANCE) * cycle_duration))
+                  || (cycle - lastRenderedCycle > maxFrameDrop))
+  {
     lastRenderedCycle = cycle;
     
     if (starter) {
@@ -1441,8 +1445,8 @@ void PuyoCommander::updateAll(PuyoDrawable *starter, SDL_Surface *extra_surf)
 
   // delay si machine trop rapide
   now = SDL_GetTicks ();
-  if (now < (start_time + cycle * cycle_duration))
-    SDL_Delay ((start_time + cycle * cycle_duration) - now);
+  if (now < (start_time + (cycle - TIME_TOLERANCE) * cycle_duration))
+    SDL_Delay ((start_time + (cycle - TIME_TOLERANCE) * cycle_duration) - now);
 }
 
 

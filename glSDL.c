@@ -30,6 +30,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#define HAS_SDL_OPENGL_H 1
+
 #if HAS_SDL_OPENGL_H
 #include "SDL_opengl.h"
 #else
