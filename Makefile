@@ -6,22 +6,43 @@
 # Settings
 
 ENABLE_AUDIO=true
-ENABLE_OPENGL=true
+ENABLE_OPENGL=false
+
+DEBUG_MODE=false
 
 DATADIR=\"data\"
 
 # Mac settings
-macimage_name = FloBoPuyo\ $(VERSION)
-bundle_name = FloboPuyo.app
+macimage_name=FloBoPuyo\ $(VERSION)
+bundle_name=FloboPuyo.app
 
+# Win32 settings
+CYGWIN_VERSION=CYGWIN_NT-5.1
+WINZIP_NAME=flobopuyowin32
 #
 ##########
+
+
+##############
+# Autodetection
+
+PLATFORM=$(shell uname -s)
+
+VERSION=$(shell grep "\#define FLOBOPUYOVERSION" PuyoVersion.c  | cut -d "\"" -f 2)
+#
+##############
 
 SDL_CONFIG=sdl-config
 CC=g++
 CXX=g++
 
-CFLAGS=`$(SDL_CONFIG) --cflags` -g -I/sw/include -DDATADIR=${DATADIR}
+CFLAGS= -DDATADIR=${DATADIR}
+LDFLAGS=
+
+ifneq ($(PLATFORM), $(CYGWIN_VERSION))
+CFLAGS:=$(CFLAGS) `$(SDL_CONFIG) --cflags` -I/sw/include
+LDFLAGS:=$(LDFLAGS) `$(SDL_CONFIG) --cflags --libs`
+endif
 
 HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h\
         PuyoGame.h PuyoAnimations.h AnimatedPuyo.h PuyoIA.h PuyoPlayer.h     \
@@ -37,18 +58,18 @@ OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o        \
           PuyoStory.o SDL_Painter.o InputManager.o GameControls.o            \
           PuyoDoomMelt.o IosImgProcess.o corona32.o corona.o corona_palette.o PuyoStarter.o
 
-##############
-# Autodetection
 
-PLATFORM=$(shell uname -s)
-
-VERSION=$(shell grep "\#define FLOBOPUYOVERSION" PuyoVersion.c  | cut -d "\"" -f 2)
-#
-##############
-
-
+################
+# Mac OS X
 ifeq ($(PLATFORM), Darwin)
 CFLAGS:=$(CFLAGS) -DMACOSX -UDATADIR
+endif
+
+################
+# Win32
+ifeq ($(PLATFORM), $(CYGWIN_VERSION))
+CFLAGS:=$(CFLAGS) -mno-cygwin -DWIN32 -DYY_NEVER_INTERACTIVE=1 -Iwin32/include
+LDFLAGS:=$(LDFLAGS) -lmingw32 -Lwin32 -ljpeg -lzlib -lpng1 -lSDL_image -lSDL_mixer -lSDL -lSDLmain
 endif
 
 ifeq ($(ENABLE_AUDIO), true)
@@ -69,7 +90,7 @@ CXXFLAGS=${CFLAGS}
 all: prelude flobopuyo
 
 flobopuyo: ${OBJFILES}
-	@echo "[flobopuyo]" && g++ $(CFLAGS) $(LDFLAGS) -o flobopuyo `$(SDL_CONFIG) --cflags --libs` -lSDL_mixer -lSDL_image ${OBJFILES}
+	@echo "[flobopuyo]" && g++ $(CFLAGS) $(LDFLAGS) -o flobopuyo -lSDL_mixer -lSDL_image ${OBJFILES}
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
 	@[ "x`cat WARNINGS | wc -l`" != "x0" ] && echo -e "--------------------------------------\n There have been some warnings:\n" && cat WARNINGS && rm -f WARNINGS && echo "--------------------------------------" || true
@@ -161,4 +182,10 @@ mac-package: bundle
 	hdiutil create -srcfolder $(macimage_name) $(macimage_name).dmg
 	hdiutil internet-enable $(macimage_name).dmg
 
-
+win-package: flobopuyo
+	mkdir -p $(WINZIP_NAME)
+	cp -r data $(WINZIP_NAME)
+	cp flobopuyo.exe $(WINZIP_NAME)
+	cp COPYING $(WINZIP_NAME)
+	cp win32/*.dll $(WINZIP_NAME)
+	zip -r $(WINZIP_NAME) $(WINZIP_NAME)
