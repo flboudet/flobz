@@ -250,6 +250,12 @@ namespace gameui {
   };
 
 
+  class EditFieldWithLabel : public HBox {
+  public:
+    EditFieldWithLabel(String label, String defaultValue);
+  };
+
+
   class Separator : public Widget {
     public:
       Separator(float width, float height);

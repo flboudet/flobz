@@ -26,8 +26,7 @@ OBJFILES= HiScores.o PuyoCommander.o        \
           PuyoDoomMelt.o corona32.o corona.o corona_palette.o\
           PuyoStarter.o PuyoSinglePlayerStarter.o PuyoTwoPlayerStarter.o     \
           PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o \
-					AnimatedPuyoTheme.o
-				 	#PuyoMenu.o PuyoNetworkMenu.o
+          AnimatedPuyoTheme.o PuyoNetworkMenu.o
 
 DEPDIR = .deps
 df = $(DEPDIR)/$(*F)
@@ -38,9 +37,9 @@ MAKEDEPEND = gcc -MM $(CFLAGS) -o $(df).d $<
 all: prelude flobopuyo
 
 flobopuyo: ${OBJFILES}
-	@make -C iosfc object
-	@make -C gametools
-	@make -C styrolyse object
+	+make -C iosfc object
+	+make -C gametools
+	+make -C styrolyse object
 	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) -lSDL_net -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o gametools/*.o styrolyse/*.o styrolyse/goomsl/goomsl*.o
 	@echo "--------------------------------------"
 	@echo " Compilation finished"

@@ -26,53 +26,12 @@
 #ifndef _PUYONETWORKMENU
 #define _PUYONETWORKMENU
 
-#include "PuyoMenu.h"
+#include "gameui.h"
+#include "PuyoCommander.h"
 
-// LAN Game Screen
-class PuyoLanGameMenu : public PuyoMenu
-{
-public:
-    PuyoLanGameMenu(PuyoMenuScreen *parentScreen, SoFont * font, IIM_Surface * menuselector, PuyoCommander &commander, SDL_Surface *display);
-    void itemSelected(int itemNumber);
-};
-
-class PuyoLanGameMenuScreen : public PuyoMenuScreen
-{
-public:
-    PuyoLanGameMenuScreen(SoFont * font, IIM_Surface * menuselector, PuyoCommander &commander, SDL_Surface *display);
-};
-
-// Internet Game Screen
-class PuyoInternetGameMenu : public PuyoMenu
-{
-public:
-    PuyoInternetGameMenu(PuyoMenuScreen *parentScreen, SoFont * font, IIM_Surface * menuselector, PuyoCommander &commander, SDL_Surface *display);
-    void itemSelected(int itemNumber);
-};
-
-class PuyoInternetGameMenuScreen : public PuyoMenuScreen
-{
-public:
-    PuyoInternetGameMenuScreen(SoFont * font, IIM_Surface * menuselector, PuyoCommander &commander, SDL_Surface *display);
-};
-
-// Network Game Screen
-class PuyoNetworkGameMenu : public PuyoMenu
-{
-public:
-    PuyoNetworkGameMenu(PuyoMenuScreen *parentScreen, SoFont * font, IIM_Surface * menuselector, PuyoCommander &commander, SDL_Surface *display);
-    void itemSelected(int itemNumber);
-    virtual void render();
-    virtual void update();
-private:
-    PuyoLanGameMenuScreen *lanGameMenuScreen;
-    PuyoInternetGameMenuScreen *internetGameMenuScreen;
-};
-
-class PuyoNetworkGameMenuScreen : public PuyoMenuScreen
-{
-public:
-    PuyoNetworkGameMenuScreen(SoFont * font, IIM_Surface * menuselector, PuyoCommander &commander, SDL_Surface *display);
+class InternetGameMenu : public PuyoScreen {
+  public:
+    void build();
 };
 
 #endif // _PUYONETWORKMENU

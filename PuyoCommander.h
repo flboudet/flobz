@@ -16,7 +16,12 @@
 using namespace ios_fc;
 using namespace gameui;
 
-class PuyoScreen;
+class PuyoScreen : public Screen {
+  public:
+    PuyoScreen();
+    virtual ~PuyoScreen() {}
+    virtual void build() = 0;
+};
 
 class PuyoCommander : public MessageListener
 {

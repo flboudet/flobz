@@ -1,4 +1,4 @@
-ENABLE_AUDIO=false
+ENABLE_AUDIO=true
 ENABLE_OPENGL=false
 ENABLE_DGA=false
 

@@ -8,6 +8,7 @@
 #include "PuyoSinglePlayerStarter.h"
 
 #include "PuyoNetworkStarter.h"
+#include "PuyoNetworkMenu.h"
 #include "ios_udpmessagebox.h"
 using namespace gameui;
 
@@ -36,23 +37,13 @@ class NetGameAction : public Action {
 /*
  * THE MENUS
  */
-class PuyoScreen : public Screen {
-  public:
-    PuyoScreen() : Screen(0,0,WIDTH,HEIGHT) { setBackground(menuBG); }
-    virtual ~PuyoScreen() {}
-    virtual void build() = 0;
-};
+PuyoScreen::PuyoScreen() : Screen(0,0,WIDTH,HEIGHT) { setBackground(menuBG); }
 
 class MainMenu : public PuyoScreen {
   public: void build();
 };
 
 class LANGameMenu : public PuyoScreen {
-  public:
-    void build();
-};
-
-class InternetGameMenu : public PuyoScreen {
   public:
     void build();
 };
@@ -71,15 +62,6 @@ void MainMenu::build() {
   add(new Button(kExit,    new ExitAction));
 }
 
-class EditFieldWithLabel : public HBox {
-public:
-  EditFieldWithLabel(String label, String defaultValue)
-  {
-    add(new Text(label));
-    add(new EditField(defaultValue));
-  }
-};
-
 void NetworkGameMenu::build() {
   internetGameMenu.build();
   lanGameMenu.build();
@@ -90,15 +72,7 @@ void NetworkGameMenu::build() {
 }
 
 void LANGameMenu::build() {
-  add(new Text("Network Game"));
-  add(new EditFieldWithLabel("Player name:", "toto"));
-  add(new EditFieldWithLabel("Server name:", "127.0.0.1"));
-  add(new Button("Start!", new NetGameAction));
-  add(new Button("Cancel", new PopScreenAction()));
-}
-
-void InternetGameMenu::build() {
-  add(new Text("Network Game"));
+  add(new Text("LAN Game"));
   add(new EditFieldWithLabel("Player name:", "toto"));
   add(new EditFieldWithLabel("Server name:", "127.0.0.1"));
   add(new Button("Start!", new NetGameAction));

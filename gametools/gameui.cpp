@@ -491,6 +491,17 @@ namespace gameui {
     requestDraw();
   }
   
+  
+  //
+  // EditFieldWithLabel
+  //
+  
+  EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue)
+  {
+    add(new Text(label));
+    add(new EditField(defaultValue));
+  }
+  
   //
   // Separator
   //
