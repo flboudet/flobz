@@ -288,7 +288,6 @@ void VanishAnimation::cycle()
         else if (iter == 50 + delay) {
             finishedFlag = true;
             attachedPuyo.setVisible(false);
-            attachedPuyo.getAttachedView()->allowCycle();
         }
     }
 }

@@ -214,7 +214,7 @@ void PuyoView::cycleAnimation()
     }
 
     // If there is a skipped cycle to do, do it
-    if (skippedCycle && attachedGame->isGameRunning() && cycleAllowed()) {
+    if ((skippedCycle || attachedGame->isEndOfCycle()) && attachedGame->isGameRunning() && cycleAllowed()) {
         attachedGame->cycle();
         skippedCycle = false;
     }
