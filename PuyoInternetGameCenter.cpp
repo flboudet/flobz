@@ -48,6 +48,7 @@ void PuyoInternetGameCenter::sendAliveMessage()
 
 void PuyoInternetGameCenter::sendMessage(const String msgText)
 {
+    printf("Envoi du msg:%s\n", (const char *)msgText);
     mbox.bind(1);
     Message *msg = mbox.createMessage();
     msg->addBoolProperty("RELIABLE", true);
@@ -60,8 +61,12 @@ void PuyoInternetGameCenter::sendMessage(const String msgText)
 
 void PuyoInternetGameCenter::idle()
 {
+    static int idleCount = 0;
     mbox.idle();
-    sendAliveMessage();
+    if (idleCount++ == 50) { // a revoir
+        idleCount = 0;
+        sendAliveMessage();
+    }
 }
 
 void PuyoInternetGameCenter::onMessage(Message &msg)

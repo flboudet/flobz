@@ -463,11 +463,12 @@ namespace gameui {
     setFocusable(true);
   }
 
-  EditField::EditField(const String &defaultText)
+  EditField::EditField(const String &defaultText,  Action *action)
     : Text(defaultText, NULL)
     {
       init(NULL,NULL);
-      //setAction(ON_START, action);
+      if (action != NULL)
+        setAction(ON_START, action);
     }
 
   void EditField::eventOccured(GameControlEvent *event)
@@ -483,6 +484,9 @@ namespace gameui {
       }
       else {
         setValue(getValue().substring(0, getValue().length() - 1));
+        Action *action = getAction(ON_START);
+        if (action)
+            action->action();
       }
     }
     else if (editionMode == true) {
@@ -553,10 +557,11 @@ namespace gameui {
   // EditFieldWithLabel
   //
 
-  EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue)
+  EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, Action *action)
   {
     add(new Text(label));
-    add(new EditField(defaultValue));
+    editField = new EditField(defaultValue, action);
+    add(editField);
   }
 
   //

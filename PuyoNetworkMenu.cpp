@@ -53,23 +53,92 @@ public:
     String content;
 };
 
-class NetCenterMenu : public PuyoScreen {
+class NetCenterMenu : public PuyoScreen, PuyoNetGameCenterListener {
 public:
     NetCenterMenu(PuyoNetGameCenter *netCenter);
     void build();
+    void onChatMessage(const String &msgAuthor, const String &msg);
+    void cycle();
     void idle(double currentTime);
 private:
+    class NetCenterCycled : public CycledComponent {
+    public:
+        NetCenterMenu *netCenter;
+        NetCenterCycled(NetCenterMenu *netCenter) : CycledComponent(0.02), netCenter(netCenter) {}
+        void cycle() {
+            netCenter->cycle();
+        }
+    };
+    class NetCenterChatArea;
+    NetCenterChatArea *chatArea;
+    NetCenterCycled *cycled;
     PuyoNetGameCenter *netCenter;
 };
 
+class NetCenterMenu::NetCenterChatArea : public VBox {
+public:
+    NetCenterChatArea::NetCenterChatArea(int height);
+    void addChat(String name, String text);
+private:
+    int height;
+    HBox **lines;
+    Text **names;
+    Text **texts;
+};
+
+NetCenterMenu::NetCenterChatArea::NetCenterChatArea(int height)
+    : height(height), lines(new (HBox *)[height]), names(new (Text *)[height]), texts(new (Text *)[height])
+{
+    for (int i = 0 ; i < height ; i++) {
+        lines[i] = new HBox;
+        names[i] = new Text("");
+        texts[i] = new Text("");
+        lines[i]->add(names[i]);
+        lines[i]->add(texts[i]);
+        add(lines[i]);
+    }
+}
+
+void NetCenterMenu::NetCenterChatArea::addChat(String name, String text)
+{
+    for (int i = 0 ; i < height-1 ; i++) {
+        names[i]->setValue(names[i+1]->getValue());
+        texts[i]->setValue(texts[i+1]->getValue());
+        //names[i]->requestDraw();
+        //texts[i]->requestDraw();
+    }
+    names[height-1]->setValue(name);
+    texts[height-1]->setValue(text);
+    //names[height-1]->requestDraw();
+    //texts[height-1]->requestDraw();
+    requestDraw();
+}
+
 class PushNetCenterMenuAction : public Action {
 public:
+    PushNetCenterMenuAction(Text *serverName, Text *userName) : serverName(serverName), userName(userName) {}
     void action() {
-        PuyoInternetGameCenter *gameCenter = new PuyoInternetGameCenter("durandal.homeunix.com", 4567, "flobo");
+        PuyoInternetGameCenter *gameCenter = new PuyoInternetGameCenter(serverName->getValue(),
+                                                                        4567, userName->getValue());
         NetCenterMenu *newNetCenterMenu = new NetCenterMenu(gameCenter);
         newNetCenterMenu->build();
         (GameUIDefaults::SCREEN_STACK)->push(newNetCenterMenu);
     }
+private:
+    Text *serverName;
+    Text *userName;
+};
+
+class SayAction : public Action {
+public:
+    SayAction(PuyoNetGameCenter *netCenter, Text *message) : netCenter(netCenter), message(message) {}
+    void action() {
+        printf("Message: %s\n", (const char *)message->getValue());
+        netCenter->sendMessage(message->getValue());
+    }
+private:
+    PuyoNetGameCenter *netCenter;
+    Text *message;
 };
 
 HttpDocument::HttpHeaderElement::HttpHeaderElement(String rawElement)
@@ -186,6 +255,7 @@ void InternetGameMenu::build() {
     serverSelectionPanel = new HBox;
     serverSelectionPanel->add(new Text("Select a server:"));
     serverListPanel = new VBox;
+    EditFieldWithLabel *playerName, *serverName;
     
     for (int i = 0 ; i < servers.getNumServer() ; i++) {
         serverListPanel->add (new Button(servers.getServerNameAtIndex(i),
@@ -196,24 +266,47 @@ void InternetGameMenu::build() {
     serverSelectionPanel->add(serverListPanel);
     
     add(new Text("Internet Game"));
-    add(new EditFieldWithLabel("Player name:", "toto"));
+    playerName = new EditFieldWithLabel("Player name:", "toto");
+    serverName = new EditFieldWithLabel("Server name:", "durandal.homeunix.com");
+    add(playerName);
     add(serverSelectionPanel);
-    add(new Button("Join", new PushNetCenterMenuAction()));
+    add(serverName);
+    add(new Button("Join", new PushNetCenterMenuAction(serverName->getEditField(), playerName->getEditField())));
     add(new Button("Cancel", new PopScreenAction()));
 }
 
 NetCenterMenu::NetCenterMenu(PuyoNetGameCenter *netCenter) : netCenter(netCenter)
 {
+    cycled = new NetCenterCycled(this);
+    netCenter->addListener(this);
 }
 
 void NetCenterMenu::idle(double currentTime)
 {
+    cycled->idle(currentTime);
+}
+
+void NetCenterMenu::cycle()
+{
     //PuyoScreen::idle(currentTime);
+    //printf("Idle\n");
     netCenter->idle();
 }
 
 void NetCenterMenu::build()
 {
+    EditFieldWithLabel *sayField = new EditFieldWithLabel("Say:", "");
+    SayAction *say = new SayAction(netCenter, sayField->getEditField());
+    sayField->getEditField()->setAction(ON_START, say);
+    chatArea = new NetCenterChatArea(10);
     add(new Text("Network Game Center"));
+    add(chatArea);
+    add(sayField);
     add(new Button("Exit", new PopScreenAction()));
+}
+
+void NetCenterMenu::onChatMessage(const String &msgAuthor, const String &msg)
+{
+    printf("%s:%s\n", (const char *)msgAuthor, (const char *)msg);
+    chatArea->addChat(msgAuthor, msg);
 }

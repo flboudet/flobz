@@ -241,7 +241,7 @@ namespace gameui {
   
   class EditField : public Text {
     public:
-      EditField(const String &defaultText);
+      EditField(const String &defaultText, Action *action = NULL);
 
       void eventOccured(GameControlEvent *event);
 
@@ -259,7 +259,10 @@ namespace gameui {
 
   class EditFieldWithLabel : public HBox {
   public:
-    EditFieldWithLabel(String label, String defaultValue);
+    EditFieldWithLabel(String label, String defaultValue, Action *action = NULL);
+    EditField * getEditField() const { return editField; }
+  private:
+    EditField *editField;
   };
 
 
