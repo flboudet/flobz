@@ -176,7 +176,8 @@ void blitSurface8To32(unsigned char *byteSurf, int *colorSurf, int palette[256],
 void paletteToRGBA(int dest[256], const Palette src)
 {
   for (int i=0; i<256; ++i) {
-    dest[i] = ((int)i << 24) | ((int)src[i].rgbRed << 16) | ((int)src[i].rgbGreen << 8) | (int)src[i].rgbBlue;
+    int alpha = (i<128?i*2:255);
+    dest[i] = (alpha << 24) | ((int)src[i].rgbRed << 16) | ((int)src[i].rgbGreen << 8) | (int)src[i].rgbBlue;
 /*    dest[i] = ((int)i << 24) | ((int)src[i].rgbRed << 0) | ((int)src[i].rgbGreen << 8) | ((int)src[i].rgbBlue << 16); */
   }
 }
