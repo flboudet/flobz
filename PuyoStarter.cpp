@@ -45,7 +45,7 @@ IIM_Surface *gameScreen;
 IIM_Surface *shrinkingPuyo[5][5];
 IIM_Surface *explodingPuyo[5][5];
 extern IIM_Surface *bigNeutral;
-IIM_Surface *puyoCircle[32];
+IIM_Surface *puyoCircle[32][5];
 extern IIM_Surface *puyoShadow;
 IIM_Surface *puyoEye[3];
 extern IIM_Surface *puyoEyes;
@@ -331,20 +331,48 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
     
     static bool firstTime = true;
     if (firstTime) {
-        fallingViolet = IIM_Load_DisplayFormatAlpha("v0.png");
-        fallingRed    = iim_surface_shift_hue(fallingViolet, 100.0f);
-        fallingBlue   = iim_surface_shift_hue(fallingViolet, -65.0f);
-        fallingGreen  = iim_surface_shift_hue(fallingViolet, -150.0f);
-        fallingYellow = iim_surface_shift_hue(fallingViolet, 140.0f);
+
+        IIM_Surface *fallingCross, *fallingCircle, *fallingVCircle, *fallingHCircle,*fallingSquare;
+        fallingCircle  = IIM_Load_DisplayFormatAlpha("v0.png");
+        fallingSquare  = IIM_Load_DisplayFormatAlpha("c0.png");
+        fallingCross   = IIM_Load_DisplayFormatAlpha("s0.png");
+        fallingVCircle = IIM_Load_DisplayFormatAlpha("o0.png");
+        fallingHCircle = IIM_Load_DisplayFormatAlpha("p0.png");
+        fallingViolet = iim_surface_shift_hue(fallingCircle, 0.0f);
+        fallingRed    = iim_surface_shift_hue(fallingCross, 100.0f);
+        fallingBlue   = iim_surface_shift_hue(fallingHCircle, -65.0f);
+        fallingGreen  = iim_surface_shift_hue(fallingVCircle, -150.0f);
+        fallingYellow = iim_surface_shift_hue(fallingSquare, 140.0f);
+/*        fallingViolet = iim_surface_shift_hue(fallingSquare, 0.0f);
+        fallingRed    = iim_surface_shift_hue(fallingSquare, 100.0f);
+        fallingBlue   = iim_surface_shift_hue(fallingSquare, -65.0f);
+        fallingGreen  = iim_surface_shift_hue(fallingSquare, -150.0f);
+        fallingYellow = iim_surface_shift_hue(fallingSquare, 140.0f);*/
+        IIM_Free(fallingCircle);
+        IIM_Free(fallingSquare);
+        IIM_Free(fallingCross);
+        IIM_Free(fallingHCircle);
+        IIM_Free(fallingVCircle);
+
         neutral       = IIM_Load_DisplayFormatAlpha("Neutral.png");
         bigNeutral    = IIM_Load_DisplayFormatAlpha("BigNeutral.png");
         speedImg      = IIM_Load_DisplayFormatAlpha("speed.png");
         speedBlackImg = IIM_Load_DisplayFormatAlpha("speed_black.png");
-        
-        IIM_Surface * tmpsurf = IIM_Load_DisplayFormatAlpha("circle.png");
-        for (int i = 0 ; i < 32 ; i++)
-            puyoCircle[i] = iim_surface_set_value(tmpsurf,sin(3.14f/2.0f+i*3.14f/64.0f)*0.6f+0.2f);
-        IIM_Free(tmpsurf);
+
+        IIM_Surface * tmpsurf[5] = {IIM_Load_DisplayFormatAlpha("horizontal.png"),
+          IIM_Load_DisplayFormatAlpha("cross.png"),
+          IIM_Load_DisplayFormatAlpha("vertical.png"),
+          IIM_Load_DisplayFormatAlpha("circle.png"),
+          IIM_Load_DisplayFormatAlpha("square.png")};
+
+        for (int i = 0 ; i < 32 ; i++) {
+          for (int j= 0 ; j < 5 ; j++) {
+            puyoCircle[i][j] = iim_surface_set_value(tmpsurf[j],sin(3.14f/2.0f+i*3.14f/64.0f)*0.6f+0.2f);
+          }
+        }
+        for ( int i = 0 ; i < 5 ; i++ ) {
+          IIM_Free(tmpsurf[i]);
+        }
         loadShrinkXplode();
         
         puyoShadow = IIM_Load_DisplayFormatAlpha("Shadow.png");
@@ -374,22 +402,60 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
         puyoFaces[0][14] = IIM_Load_DisplayFormatAlpha("v3bcd.png");
         puyoFaces[0][15] = IIM_Load_DisplayFormatAlpha("v4abcd.png");
         
+        puyoFaces[1][0] = IIM_Load_DisplayFormatAlpha("c0.png");
+        puyoFaces[1][1] = IIM_Load_DisplayFormatAlpha("c1a.png");
+        puyoFaces[1][2] = IIM_Load_DisplayFormatAlpha("c1b.png");
+        puyoFaces[1][3] = IIM_Load_DisplayFormatAlpha("c1c.png");
+        puyoFaces[1][4] = IIM_Load_DisplayFormatAlpha("c1d.png");
+        puyoFaces[1][5] = IIM_Load_DisplayFormatAlpha("c2ab.png");
+        puyoFaces[1][6] = IIM_Load_DisplayFormatAlpha("c2ac.png");
+        puyoFaces[1][7] = IIM_Load_DisplayFormatAlpha("c2ad.png");
+        puyoFaces[1][8] = IIM_Load_DisplayFormatAlpha("c2bc.png");
+        puyoFaces[1][9] = IIM_Load_DisplayFormatAlpha("c2bd.png");
+        puyoFaces[1][10] = IIM_Load_DisplayFormatAlpha("c2cd.png");
+        puyoFaces[1][11] = IIM_Load_DisplayFormatAlpha("c3abc.png");
+        puyoFaces[1][12] = IIM_Load_DisplayFormatAlpha("c3abd.png");
+        puyoFaces[1][13] = IIM_Load_DisplayFormatAlpha("c3acd.png");
+        puyoFaces[1][14] = IIM_Load_DisplayFormatAlpha("c3bcd.png");
+        puyoFaces[1][15] = IIM_Load_DisplayFormatAlpha("c4abcd.png");
+        
+        puyoFaces[2][0] = IIM_Load_DisplayFormatAlpha("p0.png");
+        puyoFaces[2][1] = IIM_Load_DisplayFormatAlpha("p1a.png");
+        puyoFaces[2][2] = IIM_Load_DisplayFormatAlpha("p1b.png");
+        puyoFaces[2][3] = IIM_Load_DisplayFormatAlpha("p1c.png");
+        puyoFaces[2][4] = IIM_Load_DisplayFormatAlpha("p1d.png");
+        puyoFaces[2][5] = IIM_Load_DisplayFormatAlpha("p2ab.png");
+        puyoFaces[2][6] = IIM_Load_DisplayFormatAlpha("p2ac.png");
+        puyoFaces[2][7] = IIM_Load_DisplayFormatAlpha("p2ad.png");
+        puyoFaces[2][8] = IIM_Load_DisplayFormatAlpha("p2bc.png");
+        puyoFaces[2][9] = IIM_Load_DisplayFormatAlpha("p2bd.png");
+        puyoFaces[2][10] = IIM_Load_DisplayFormatAlpha("p2cd.png");
+        puyoFaces[2][11] = IIM_Load_DisplayFormatAlpha("p3abc.png");
+        puyoFaces[2][12] = IIM_Load_DisplayFormatAlpha("p3abd.png");
+        puyoFaces[2][13] = IIM_Load_DisplayFormatAlpha("p3acd.png");
+        puyoFaces[2][14] = IIM_Load_DisplayFormatAlpha("p3bcd.png");
+        puyoFaces[2][15] = IIM_Load_DisplayFormatAlpha("p4abcd.png");
+        
         live[0] = IIM_Load_DisplayFormatAlpha("0live.png");
         live[1] = IIM_Load_DisplayFormatAlpha("1live.png");
         live[2] = IIM_Load_DisplayFormatAlpha("2live.png");
         live[3] = IIM_Load_DisplayFormatAlpha("3live.png");
         
         for (int i = 0 ; i < 16 ; i++) {
-            puyoFaces[1][i] = iim_surface_shift_hue(puyoFaces[0][i], 100);
+            IIM_Surface *tmp = puyoFaces[2][i];
+            puyoFaces[2][i] = iim_surface_shift_hue(tmp, -65);
+            IIM_Free(tmp);
         }
         for (int i = 0 ; i < 16 ; i++) {
-            puyoFaces[2][i] = iim_surface_shift_hue(puyoFaces[0][i], -65);
+            puyoFaces[3][i] = iim_surface_shift_hue(puyoFaces[1][i], -150);
         }
         for (int i = 0 ; i < 16 ; i++) {
-            puyoFaces[3][i] = iim_surface_shift_hue(puyoFaces[0][i], -150);
+            puyoFaces[4][i] = iim_surface_shift_hue(puyoFaces[1][i], 140);
         }
         for (int i = 0 ; i < 16 ; i++) {
-            puyoFaces[4][i] = iim_surface_shift_hue(puyoFaces[0][i], 140);
+            IIM_Surface *tmp = puyoFaces[1][i];
+            puyoFaces[1][i] = iim_surface_shift_hue(tmp, 100);
+            IIM_Free(tmp);
         }
         
         grid          = IIM_Load_DisplayFormatAlpha("grid.png");

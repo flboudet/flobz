@@ -27,7 +27,7 @@
 #include "PuyoView.h"
 
 // crade, mais basta
-extern IIM_Surface *puyoCircle[32];
+extern IIM_Surface *puyoCircle[32][5];
 extern IIM_Surface *puyoEye[3];
 
 AnimatedPuyo::AnimatedPuyo(PuyoState state, PuyoView *attachedView) : PuyoPuyo(state)
@@ -113,7 +113,7 @@ void AnimatedPuyo::render()
             
             /* Main puyo show */
             if (falling && (this == attachedGame->getFallingPuyo()))
-                painter.requestDraw(puyoCircle[(smallTicksCount >> 2) & 0x1F], &drect);
+                painter.requestDraw(puyoCircle[(smallTicksCount >> 2) & 0x1F][this->getPuyoState()], &drect);
             
             /* Eye management */
             if (getPuyoState() != PUYO_NEUTRAL) {
