@@ -24,11 +24,31 @@
  */
 
 #include "PuyoNetworkGame.h"
+#include "PuyoMessageDef.h"
 #include <stdlib.h>
 
-PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox) : PuyoGame(attachedFactory)
+
+PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox) : PuyoGame(attachedFactory), msgBox(msgBox)
 {
     fakePuyo = attachedFactory->createPuyo(PUYO_FALLINGRED);
+    msgBox.addListener(*this);
+}
+
+void PuyoNetworkGame::onMessage(Message &message)
+{
+    int msgType = message.getInt("TYPE");
+    switch (msgType) {
+        case kGameState:
+            synchronizeState(message);
+            break;
+        default:
+            break;
+    }
+}
+
+void PuyoNetworkGame::synchronizeState(Message &message)
+{
+    points = message.getInt("SCORE");
 }
 
 void PuyoNetworkGame::cycle()
@@ -133,8 +153,4 @@ int PuyoNetworkGame::getSemiMove() const
 {
     return 0;
 }
-  
-int PuyoNetworkGame::getPoints() const
-{
-    return 0;
-}
+

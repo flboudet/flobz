@@ -163,7 +163,7 @@ public:
     virtual int getSamePuyoAround(int X, int Y, PuyoState color) = 0;
     virtual int getSemiMove() const = 0;
     
-    virtual int getPoints() const = 0;
+    virtual int getPoints()  { return points; }
     int points;
 protected:
     PuyoDelegate *delegate;
@@ -215,7 +215,6 @@ public:
     int getSamePuyoAround(int X, int Y, PuyoState color);
     
     int getSemiMove() const { return semiMove; }
-    int getPoints() const { return points; }
     
 private:
     void InitGame(PuyoRandomSystem *attachedRandom);

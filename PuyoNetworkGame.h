@@ -31,9 +31,12 @@
 
 using namespace ios_fc;
 
-class PuyoNetworkGame : public PuyoGame {
+class PuyoNetworkGame : public PuyoGame, MessageListener {
 public:
     PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox);
+    
+    virtual void onMessage(Message &);
+    
     virtual void cycle();
     
     virtual PuyoPuyo *getPuyoAt(int X, int Y) const;
@@ -62,10 +65,11 @@ public:
     virtual int getMaxColumnHeight() const;
     virtual int getSamePuyoAround(int X, int Y, PuyoState color);
     virtual int getSemiMove() const;
-    
-    virtual int getPoints() const;
 private:
+    void synchronizeState(Message &message);
+    
     PuyoPuyo *fakePuyo;
+    MessageBox &msgBox;
 };
 
 
