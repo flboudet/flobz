@@ -12,9 +12,7 @@
 #include "HiScores.h"
 #include "PuyoDoomMelt.h"
 #include "IosImgProcess.h"
-
-#include "ios_udpmessagebox.h"
-using namespace ios_fc;
+#include "PuyoNetworkView.h"
 
 #ifndef DATADIR
 extern char *DATADIR;
@@ -686,6 +684,7 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
     "Will you beat the Puyo Gods ???  Have a try !  "
     "We wish you good luck.                                                    "
     "                                Hello from PuyoLand !", smallFont);
+  mbox = NULL;
   theCommander = this;
 }
 
@@ -1170,6 +1169,17 @@ void PuyoCommander::enterStringLoop(Menu *menu, const char *kItem, char out[256]
   }
 }
 
+void PuyoCommander::onMessage(Message &message)
+{
+    int msgType = message.getInt(PuyoMessage::TYPE);
+    switch (msgType) {
+        case PuyoMessage::kGameStart:
+ 	    netgame_started = true;
+            break;
+        default:
+            break;
+    }
+}
 
 void PuyoCommander::startNetGameLoop()
 {
@@ -1226,8 +1236,11 @@ void PuyoCommander::startNetGameLoop()
 mml_play:
   menu_hide (netGameMenu);
 
-  UDPMessageBox mbox(ipAddress, 6581, 6581);
-
+  if (mbox) delete mbox;
+  mbox = new UDPMessageBox(ipAddress, 6581, 6581);
+  netgame_started = false;
+  mbox->addListener(this);
+  
   GAME_ACCEL = 2000;
   gameLevel = 1;
   if (menu_active_is (netGameMenu, kLevelMedium)) {
@@ -1247,12 +1260,24 @@ mml_play:
     menu_next_item(gameOverMenu);
   while (menu_active_is(gameOverMenu, "YES")) {
     menu_next_item(gameOverMenu);
-    PuyoStarter myStarter(this,false,0,RANDOM,currentMusicTheme, &mbox);
+    PuyoStarter myStarter(this,false,0,RANDOM,currentMusicTheme, mbox);
     audio_music_switch_theme(currentMusicTheme);
     p1name = playerName;
     p2name = playerName;
     GAME_ACCEL = 1500;
     doom_melt_start(melt, menuBGImage);
+    
+    // creation du message
+    Message *message = mbox->createMessage();
+    message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameStart);
+    message->addString  (PuyoMessage::NAME,   p1name);
+    message->send();
+    delete message;
+    
+    while (!netgame_started)
+        updateAll(&myStarter);
+    netgame_started = false;
+    
     myStarter.run(score1, score2, 0, 0, 0);
     score1 += myStarter.leftPlayerWin();
     score2 += myStarter.rightPlayerWin();
@@ -1262,6 +1287,8 @@ mml_play:
   SetStrPreference("Player Name", playerName);
   SetStrPreference("IP Address", ipAddress);
   doom_melt_start(melt, gameScreen);
+  if (mbox) delete mbox;
+  mbox = NULL;
 }
 
 void PuyoCommander::startTwoPlayerGameLoop()
@@ -1505,6 +1532,7 @@ void PuyoCommander::updateAll(PuyoDrawable *starter, SDL_Surface *extra_surf)
 
   // mise a jour
   menu_update (mainMenu, display);
+  if (mbox) mbox->idle();
 
   menu_update(gameOver2PMenu, display);
   menu_update(gameOver1PMenu, display);

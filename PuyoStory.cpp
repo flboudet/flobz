@@ -20,20 +20,8 @@ PuyoStory::~PuyoStory()
 
 void PuyoStory::loop()
 {
-    theStory = this;
-    if (num==0) {
-        char temp[1024];
-        sprintf(temp, "%s/story/intro.txt", DATADIR);
-        launch_scenar(temp);
-    }
-    else {
-      char stories[1024];
-      sprintf(stories, "%s/story%d.txt", DATADIR, num);
-      launch_scenar(stories);
-    }
 }
 
 void PuyoStory::draw()
 {
-    draw_scenar();
 }

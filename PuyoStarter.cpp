@@ -811,9 +811,6 @@ void PuyoStarter::run(int _score1, int _score2, int lives, int point1, int point
                 }
         }
             commander->updateAll(this);
-            if (mbox != NULL) {
-                mbox->idle();
-            }
             if (!paused) {
                 areaA->cycleAnimation();
                 areaB->cycleAnimation();

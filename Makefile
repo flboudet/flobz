@@ -131,6 +131,7 @@ all: prelude flobopuyo
 
 flobopuyo: ${OBJFILES}
 	@make -C iosfc object
+	@make -C styrolyse object
 	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) -lSDL_net -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o
 	@echo "--------------------------------------"
 	@echo " Compilation finished"

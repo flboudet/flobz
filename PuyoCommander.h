@@ -7,6 +7,9 @@
 #include "GameControls.h"
 #include "PuyoDoomMelt.h"
 
+#include "ios_udpmessagebox.h"
+using namespace ios_fc;
+
 #include "corona32.h"
 #define CORONA_HEIGHT 120
 
@@ -16,7 +19,7 @@ class PuyoDrawable
     virtual void draw() = 0;
 };
 
-class PuyoCommander
+class PuyoCommander : public MessageListener
 {
  public:
   PuyoCommander(bool fullscreen,bool sound, bool audio);
@@ -35,7 +38,8 @@ class PuyoCommander
   void startTwoPlayerGameLoop();
   void startNetGameLoop();
   void enterStringLoop(Menu *menu, const char *kItem, char out[256], int maxlen = 10);
-
+  void onMessage(Message &message);
+  
   Menu *gameOverMenu;
   
   Menu *gameOver2PMenu;
@@ -71,7 +75,8 @@ class PuyoCommander
   
   int      *corona_screen;
   Corona32 *corona;
-  
+  MessageBox *mbox;
+  bool netgame_started;
 };
 
 

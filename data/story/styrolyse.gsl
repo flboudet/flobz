@@ -1,0 +1,78 @@
+int    @freq
+string @background
+int    @lastID
+int    @cycle
+float  @fcycle
+int    @finished
+
+int    @mode
+int    INIT   = 0
+int    UPDATE = 1
+int    DRAW   = 2
+
+(@mode = INIT)? {
+  @finished = 0
+  @cycle  = 0
+  @fcycle = 0.0
+  init
+}
+
+(@mode = UPDATE)? {
+  update
+  sprite_list
+  @cycle  += 1
+  @fcycle += 1.0
+}
+
+(@mode = DRAW)? sprite_list
+
+struct <Vec2:
+  float x,
+  float y>
+
+struct <Sprite:
+  Vec2   pos,
+  Vec2   dest,
+  float  dcycle,
+  string image,
+  float  curframe,
+  float  framespeed,
+  float  nbframes>
+
+<new_sprite: float x, float y, string image, float curframe, float framespeed, float nbframes> : Sprite
+  new_sprite.pos.x     = x
+  new_sprite.pos.y     = y
+  new_sprite.dest.x    = x
+  new_sprite.dest.y    = y
+  new_sprite.dcycle    = 0.0
+  new_sprite.image     = image
+  new_sprite.curframe  = curframe
+  new_sprite.framespeed = framespeed
+  new_sprite.nbframes  = nbframes
+
+<move: Sprite &this, float fcycle, float x, float y>
+  &this.dest.x = x
+  &this.dest.y = y
+  &this.dcycle = fcycle
+
+
+external <say:  Sprite &this,  string text>
+external <draw: Sprite &this>
+
+<sprite: Sprite &this>
+
+  float diff = &this.dcycle - @fcycle
+  (@mode = UPDATE)? {
+    (diff >= 1.0)? {
+      Vec2 speed = (&this.dest - &this.pos)
+      speed.x   /= diff
+      speed.y   /= diff
+      &this.pos += speed
+    }
+    &this.curframe += &this.framespeed
+    while &this.curframe >= &this.nbframes do &this.curframe -= &this.nbframes
+  }
+  (@mode = DRAW)? {
+    draw::&this
+  }
+
