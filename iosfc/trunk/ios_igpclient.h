@@ -1,5 +1,5 @@
 /**
- * iosfc::IGPDatagram: contains an object for handling IGP messages.
+ * iosfc::IGPClient: a reusable class to communicate with an IGP server
  * 
  * This file is part of the iOS Foundation Classes project.
  *
@@ -23,30 +23,34 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
  */
 
-#include "ios_igpdatagram.h"
+#ifndef _IGPCLIENT_H
+#define _IGPCLIENT_H
+
+#include "ios_socket.h"
 #include "ios_memory.h"
 
 namespace ios_fc {
 
-IGPDatagram::IGPDatagram(VoidBuffer data) : message(data)
-{
-    msgIdent = readBigEndianIntFromMessage(0);
-    msgSize = readBigEndianIntFromMessage(4);
-    if (msgSize + 8 > message.size()) {
-        printf("Message incomplet!");
-    }
-}
+class IGPClientMessageListener {
+public:
+    virtual void onMessage(VoidBuffer message, int igpOriginIdent, int igpDestinationIdent) = 0;
+};
 
-IGPDatagram::IGPDatagram(IGPMsgIdent ident, int msgSize) : msgSize(msgSize), message(msgSize + 8)
-{
-    msgIdent = ident;
-}
-
-VoidBuffer IGPDatagram::serialize()
-{
-    writeBigEndianIntToMessage(msgIdent, 0);
-    writeBigEndianIntToMessage(msgSize, 4);
-    return message;
-}
+class IGPClient {
+public:
+    IGPClient(String hostName, int portID);
+    IGPClient(String hostName, int portID, int igpIdent);
+    void sendMessage(int igpID, VoidBuffer message);
+    void idle();
+    void addListener(IGPClientMessageListener *);
+    void removeListener(IGPClientMessageListener *);
+private:
+    bool enabled;
+    int igpIdent;
+    Socket clientSocket;
+    AdvancedBuffer<IGPClientMessageListener*> listeners;
+};
 
 };
+
+#endif // _IGPCLIENT_H

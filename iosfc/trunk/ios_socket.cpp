@@ -27,8 +27,8 @@ namespace ios_fc {
 class DefaultSocket : public SocketImpl {
 public:
     void create(const String hostName, int portID) {}
-    InputStream *getInputStream() { throwError(); }
-    OutputStream *getOutputStream() { throwError(); }
+    InputStream *getInputStream() { throwError(); return NULL; }
+    OutputStream *getOutputStream() { throwError(); return NULL; }
     SelectableImpl *getSelectableImpl() { return NULL; }
 private:
     void throwError() const { throw Exception("Invalid socket, no socket backend set"); }

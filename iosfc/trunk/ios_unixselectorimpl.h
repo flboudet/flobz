@@ -23,6 +23,7 @@
 #define _IOSUNIXSELECTORIMPL
 
 #include "ios_selector.h"
+#include <sys/types.h>
 #include <sys/select.h>
 
 namespace ios_fc {

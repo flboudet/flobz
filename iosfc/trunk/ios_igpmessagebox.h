@@ -24,21 +24,23 @@
 #define _IOS_IGPMESSAGEBOX_H
 
 #include "ios_messagebox.h"
-#include "ios_socket.h"
+#include "ios_igpclient.h"
 
 namespace ios_fc {
 
 // IGP stands for Ios Gateway Protocol
 
-class IgpMessageBox : public MessageBox {
+class IgpMessageBox : public MessageBox, IGPClientMessageListener {
 public:
     IgpMessageBox(const String hostName, int portID);
+    IgpMessageBox(const String hostName, int portID, int igpIdent);
     virtual ~IgpMessageBox();
     virtual void idle();
     virtual Message * createMessage();
-    void sendBuffer(Buffer<char> out) const;
+    void sendBuffer(VoidBuffer out);
+    void onMessage(VoidBuffer message, int origIdent, int destIdent);
  private:
-    Socket *sock;
+    IGPClient igpClient;
     int sendSerialID;
 };
 

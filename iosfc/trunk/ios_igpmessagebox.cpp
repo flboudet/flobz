@@ -39,6 +39,11 @@ namespace ios_fc {
     {
     }
 
+    IgpMessage::IgpMessage(const Buffer<char> serialized, IgpMessageBox &owner) throw(InvalidMessageException)
+    : StandardMessage(serialized), owner(owner)
+    {
+    }
+    
     IgpMessage::~IgpMessage()
     {
     }
@@ -49,19 +54,23 @@ namespace ios_fc {
     }
     
     
-    IgpMessageBox::IgpMessageBox(const String hostName, int portID)
+    IgpMessageBox::IgpMessageBox(const String hostName, int portID) : igpClient(hostName, portID), sendSerialID(0)
     {
-        sock = new Socket(hostName, portID);
-        sendSerialID = 0;
+        igpClient.addListener(this);
+    }
+    
+    IgpMessageBox::IgpMessageBox(const String hostName, int portID, int igpIdent) : igpClient(hostName, portID, igpIdent), sendSerialID(0)
+    {
+        igpClient.addListener(this);
     }
 
     IgpMessageBox::~IgpMessageBox()
     {
-        delete sock;
     }
 
     void IgpMessageBox::idle()
     {
+        igpClient.idle();
     }
 
     Message * IgpMessageBox::createMessage()
@@ -69,10 +78,23 @@ namespace ios_fc {
         return new IgpMessage(++sendSerialID, *this);
     }
 
-    void IgpMessageBox::sendBuffer(Buffer<char> out) const
+    void IgpMessageBox::sendBuffer(VoidBuffer out)
     {
-        sock->getOutputStream()->streamWrite(out);
+        igpClient.sendMessage(25, out);
     }
     
+    void IgpMessageBox::onMessage(VoidBuffer message, int origIdent, int destIdent)
+    {
+        try {
+            IgpMessage incomingMessage(message, *this);
+            for (int i = 0, j = listeners.size() ; i < j ; i++) {
+                MessageListener *currentListener = listeners[i];
+                currentListener->onMessage(incomingMessage);
+            }
+        }
+        catch (Exception e) {
+            e.printMessage();
+        }
+    }
 };
 

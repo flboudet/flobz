@@ -37,7 +37,6 @@ public:
         ClientMsgAssignID,
         ClientMsgGetID,
         ClientMsgToClient,
-        ClientMsgBroadcast,
         ServerMsgInformID,
         ServerMsgBadRequest,
         ServerMsgToClient
@@ -51,6 +50,8 @@ public:
     class ServerMsgInformIDDatagram;
     class ClientMsgGetIDDatagram;
     class ClientMsgToClientDatagram;
+    class ServerMsgToClientDatagram;
+    class ClientMsgAssignIDDatagram;
 protected:
     IGPDatagram(IGPMsgIdent ident, int msgSize);
     Buffer<char> message;
@@ -60,8 +61,8 @@ protected:
         message[offset + 2] = (integer & 0x0000FF00) >> 8;
         message[offset + 3] = (integer & 0x000000FF);
     }
-    inline int readBigEndianIntFromMessage(int offset) {
-        return (message[offset] << 24) | (message[offset + 1] << 16) | (message[offset + 2] << 8) | message[offset + 3];
+    inline int readBigEndianIntFromMessage(int offset) const {
+        return ((unsigned char)message[offset] << 24) | ((unsigned char)message[offset + 1] << 16) | ((unsigned char)message[offset + 2] << 8) | (unsigned char)message[offset + 3];
     }
 private:
     int msgSize;
@@ -72,6 +73,19 @@ private:
 class IGPDatagram::ClientMsgAutoAssignIDDatagram : public IGPDatagram {
 public:
     ClientMsgAutoAssignIDDatagram() : IGPDatagram(ClientMsgAutoAssignID, 0) {}
+};
+
+class IGPDatagram::ClientMsgAssignIDDatagram : public IGPDatagram {
+public:
+    ClientMsgAssignIDDatagram(int igpIdent) : IGPDatagram(ClientMsgAssignID, 4) {
+        writeBigEndianIntToMessage(igpIdent, 8);
+    }
+    ClientMsgAssignIDDatagram(IGPDatagram &datagram) : IGPDatagram(datagram) {
+        igpIdent = readBigEndianIntFromMessage(8);
+    }
+    int getIgpIdent() const { return igpIdent; }
+private:
+    int igpIdent;
 };
 
 class IGPDatagram::ClientMsgGetIDDatagram : public IGPDatagram {
@@ -96,20 +110,43 @@ class IGPDatagram::ClientMsgToClientDatagram : public IGPDatagram {
 public:
     ClientMsgToClientDatagram(int igpIdent, VoidBuffer msg) : IGPDatagram(ClientMsgToClient, 4 + msg.size()), igpIdent(igpIdent) {
         writeBigEndianIntToMessage(igpIdent, 8);
-        printf("Taille message src: %d\n", message.size());
         Memory::memcpy((char *)(message.ptr()) + 12, msg.ptr(), msg.size());
     }
     ClientMsgToClientDatagram(IGPDatagram &datagram) : IGPDatagram(datagram) {
         igpIdent = readBigEndianIntFromMessage(8);
     }
     VoidBuffer getMessage() const {
-        printf("test:%c\n", *((char *)(message.ptr()) + 12));
-        return VoidBuffer(message, 12);
-        //return ios_fc::VoidBuffer("hello", 5);
-    }//return VoidBuffer(message, 12); }
+        VoidBuffer result(message);
+        result += 12;
+        return result;
+        //return message + 12;
+    }
     int getIgpIdent() const { return igpIdent; }
 private:
     int igpIdent;
+};
+
+class IGPDatagram::ServerMsgToClientDatagram : public IGPDatagram {
+public:
+    ServerMsgToClientDatagram(int igpOrigIdent, int igpDestIdent, VoidBuffer msg) : IGPDatagram(ServerMsgToClient, 8 + msg.size()), igpIdent(igpIdent), igpDestIdent(igpDestIdent) {
+        writeBigEndianIntToMessage(igpOrigIdent, 8);
+        writeBigEndianIntToMessage(igpDestIdent, 12);
+        Memory::memcpy((char *)(message.ptr()) + 16, msg.ptr(), msg.size());
+    }
+    ServerMsgToClientDatagram(IGPDatagram &datagram) : IGPDatagram(datagram) {
+        igpIdent = readBigEndianIntFromMessage(8);
+        igpDestIdent = readBigEndianIntFromMessage(12);
+    }
+    VoidBuffer getMessage() const {
+        VoidBuffer result(message);
+        result += 16;
+        return result;
+        //return message + 16;
+    }
+    int getIgpOriginIdent() const { return igpIdent; }
+    int getIgpDestinationIdent() const { return igpDestIdent; }
+private:
+    int igpIdent, igpDestIdent;
 };
 
 };

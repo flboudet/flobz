@@ -11,6 +11,7 @@ public:
     IGPServerConnection(IGPServerPortManager *pool);
     ~IGPServerConnection();
     void connectionMade();
+    inline int getIgpIdent() const { return igpID; }
 protected:
     void dataReceived(VoidBuffer data);
 private:
@@ -22,16 +23,26 @@ private:
 
 class IGPServerPortManager : public ios_fc::StandardServerPortManager {
 public:
+    IGPServerPortManager();
     void registerConnection(IGPServerConnection *connection);
     void unregisterConnection(IGPServerConnection *connection);
     int getUniqueIGPId();
+    bool igpIdValidAndUnique(int igpIdent);
+    IGPServerConnection *getConnection(int igpIdent) const;
 protected:
     // ServerPortManager implementation
     ServerConnection *createConnection();
 private:
+    static const int firstAutoIgpIdent;
+    int currentAutoIgpIdent;
     AdvancedBuffer<IGPServerConnection *> connections;
 };
 
+const int IGPServerPortManager::firstAutoIgpIdent = 32768;
+
+IGPServerPortManager::IGPServerPortManager() : currentAutoIgpIdent(firstAutoIgpIdent)
+{
+}
 
 ServerConnection *IGPServerPortManager::createConnection()
 {
@@ -50,7 +61,27 @@ void IGPServerPortManager::unregisterConnection(IGPServerConnection *connection)
 
 int IGPServerPortManager::getUniqueIGPId()
 {
-    return 3;
+    return currentAutoIgpIdent++;
+}
+
+bool IGPServerPortManager::igpIdValidAndUnique(int igpIdent)
+{
+    if ((igpIdent <= 0) || (igpIdent >= firstAutoIgpIdent))
+        return false;
+    for (int i = 0, j = connections.size() ; i < j ; i++) {
+        if (igpIdent == connections[i]->getIgpIdent())
+            return false;
+    }
+    return true;
+}
+
+IGPServerConnection *IGPServerPortManager::getConnection(int igpIdent) const
+{
+    for (int i = 0, j = connections.size() ; i < j ; i++) {
+        if (igpIdent == connections[i]->getIgpIdent())
+            return connections[i];
+    }
+    return NULL;
 }
 
 IGPServerConnection::IGPServerConnection(IGPServerPortManager *pool) : pool(pool)
@@ -75,21 +106,43 @@ void IGPServerConnection::dataReceived(VoidBuffer data)
     IGPDatagram message(data);
     switch (message.getMsgIdent()) {
     case IGPDatagram::ClientMsgAutoAssignID:
-        printf("Auto-assign ID\n");
         igpID = pool->getUniqueIGPId();
+        printf("Auto-assign ID:%d\n", igpID);
         valid=true;
         sendIGPIdent();
         break;
+    case IGPDatagram::ClientMsgAssignID: {
+        IGPDatagram::ClientMsgAssignIDDatagram msgReceived(message);
+        printf("Assign ID\n");
+        if (pool->igpIdValidAndUnique(msgReceived.getIgpIdent())) {
+            valid=true;
+            igpID = msgReceived.getIgpIdent();
+            sendIGPIdent();
+        }
+        else {
+            printf("Adresse igp invalide:%d\n", msgReceived.getIgpIdent());
+        }
+        break;
+    }
     case IGPDatagram::ClientMsgGetID:
         sendIGPIdent();
         break;
     case IGPDatagram::ClientMsgToClient: {
-        IGPDatagram::ClientMsgToClientDatagram msgToSend(message);
-        Buffer<char> str(msgToSend.getMessage());
-        str.grow(1);
-        str[str.size() - 1] = 0;
-        printf("Message to %d: %c\n", msgToSend.getIgpIdent(), str[0]);
-        break;}
+        IGPDatagram::ClientMsgToClientDatagram msgReceived(message);
+        IGPDatagram::ServerMsgToClientDatagram msgToSend(igpID, msgReceived.getIgpIdent(), msgReceived.getMessage());
+        IGPServerConnection *destConnection = pool->getConnection(msgReceived.getIgpIdent());
+        if (destConnection != NULL) {
+            destConnection->clientSocket->getOutputStream()->streamWrite(msgToSend.serialize());
+        }
+        else {
+            printf("DEST not found!!!\n");
+        }
+        //Buffer<char> str(msgToSend.getMessage());
+        //str.grow(1);
+        //str[str.size() - 1] = 0;
+        //printf("Message to %d: %s\n", msgToSend.getIgpIdent(), (const char *)str);
+        break;
+    }
     default:
         break;
     }
