@@ -27,7 +27,6 @@ OBJFILES= HiScores.o PuyoCommander.o        \
           PuyoStarter.o PuyoSinglePlayerStarter.o PuyoTwoPlayerStarter.o     \
           PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o PuyoMenu.o PuyoNetworkMenu.o
 
-					
 all: prelude flobopuyo
 
 flobopuyo: ${OBJFILES}
@@ -37,7 +36,7 @@ flobopuyo: ${OBJFILES}
 	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) -lSDL_net -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o gametools/*.o styrolyse/*.o styrolyse/goomsl/goomsl*.o
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
-	@[ "x`cat WARNINGS | wc -l`" != "x0" ] && echo -e "--------------------------------------\n There have been some warnings:\n" && cat WARNINGS && rm -f WARNINGS && echo "--------------------------------------" || true
+	@[ -s WARNINGS ] && echo -e "--------------------------------------\n There have been some warnings:\n" && cat WARNINGS && rm -f WARNINGS && echo "--------------------------------------" || true
 	@echo
 	@echo " Type ./$(PRGNAME) to play."
 	@echo "--------------------------------------"
@@ -77,14 +76,14 @@ corona32.o:corona32.cpp
 corona_palette.o:corona_palette.cpp	
 
 clean:
-	make -C iosfc clean
-	make -C gametools clean
 	rm -rf *~ *.o flobopuyo* $(PRGNAME) WARNINGS
 	rm -rf .xvpics data/.xvpics    data/*/.xvpics
 	rm -rf $(bundle_name)
 	rm -rf $(macimage_name)
 	rm -f  $(macimage_name).dmg
 	rm -f  .DS_Store */.DS_Store */*/.DS_Store .gdb_history
+	make -C iosfc clean
+	make -C gametools clean
 
 install: flobopuyo
 	$(STRIP) $(PRGNAME)
@@ -101,9 +100,12 @@ install: flobopuyo
 
 flobopuyo-static: prelude  ${OBJFILES}
 	@make -C iosfc object
+	@make -C gametools
 	@make -C styrolyse object
-	@echo "[flobopuyo-static]" && g++ $(CFLAGS) -o flobopuyo-static ${OBJFILES} iosfc/*.o styrolyse/*.o styrolyse/goomsl/goomsl*.o \
+	@echo "[flobopuyo-static]" && g++ $(CFLAGS) -o flobopuyo-static ${OBJFILES} iosfc/*.o gametools/*.o styrolyse/*.o styrolyse/goomsl/goomsl*.o \
         /sw/lib/libSDL_mixer.a /sw/lib/libSDL_net.a /sw/lib/libvorbisfile.a /sw/lib/libvorbis.a /sw/lib/libogg.a /sw/lib/libsmpeg.a /sw/lib/libSDL_image.a /sw/lib/libjpeg.a /sw/lib/libpng.a -lz `$(SDL_CONFIG) --static-libs`
+	@echo "--------------------------------------"
+	@[ -s WARNINGS ] && echo -e "--------------------------------------\n There have been some warnings:\n" && cat WARNINGS && rm -f WARNINGS && echo "--------------------------------------" || true
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
 
