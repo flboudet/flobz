@@ -1068,6 +1068,9 @@ void PuyoCommander::startTwoPlayerGameLoop()
   menu_set_value(twoPlayerGameMenu, kPlayer1Name, player1Name);
   menu_set_value(twoPlayerGameMenu, kPlayer2Name, player2Name);
 
+  while (!menu_active_is(twoPlayerGameMenu,kLevelMedium))
+    menu_next_item(twoPlayerGameMenu);  
+
   menu_show(twoPlayerGameMenu);
   while (1) {
     SDL_Event e;
@@ -1155,6 +1158,9 @@ void PuyoCommander::startSingleGameLoop()
 
   GetStrPreference("Player1 Name", playerName, "Ugh");
   menu_set_value(singleGameMenu, kPlayerName, playerName);
+
+  while (!menu_active_is(singleGameMenu,kLevelMedium))
+    menu_next_item(singleGameMenu);  
   
   menu_show(singleGameMenu);
   while (1) {
