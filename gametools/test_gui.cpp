@@ -51,8 +51,7 @@ class MainMenuScreen : public ScreenVBox
     }
 };
 
-
-int main()
+int main(int argc, char *argv[])
 {
   // Init SDL
   SDL_Init(SDL_INIT_VIDEO|SDL_INIT_JOYSTICK);
