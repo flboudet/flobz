@@ -88,6 +88,8 @@ class PuyoStarter : public PuyoDrawable {
 
     void stopRender();
     void restartRender();
+
+    int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
 };
 
 #endif // _PUYOVIEW
