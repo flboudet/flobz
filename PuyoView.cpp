@@ -43,8 +43,6 @@ IIM_Surface *background, *fallingBlue, *fallingRed, *fallingGreen, *fallingViole
 IIM_Surface *bigNeutral;
 IIM_Surface *puyoEyes;
 IIM_Surface *puyoFaces[5][16];
-IIM_Surface *puyoShadow;
-
 
 
 static char PuyoGroupImageIndex[2][2][2][2] =
@@ -276,28 +274,9 @@ void PuyoView::render()
         
         bool displayFallings = this->cycleAllowed();
 
-    for (int i = 0 ; i < PUYODIMX ; i++) {
-        for (int j = 0 ; j < PUYODIMY ; j++) {
-            AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAt(i, j));
-            if ((currentPuyo != NULL)
-                && (displayFallings || !currentPuyo->isFalling())
-                && (getSurfaceForPuyo(currentPuyo) != neutral)
-                && (currentPuyo->getVisible())
-                && (currentPuyo->isRenderingAnimation() == false))
-            {
-                drect.x = xOffset + i * TSIZE;
-                drect.y = yOffset + j * TSIZE;
-                if (currentPuyo->getPuyoState() < PUYO_EMPTY)
-                    drect.y -= attachedGame->getSemiMove() * TSIZE / 2;
-                drect.w = puyoShadow->w;
-                drect.h = puyoShadow->h;
-                if (drect.y + drect.h > vrect.y + vrect.h)
-                    drect.h -= (drect.y + drect.h - vrect.y - vrect.h);
-                if (drect.x + drect.w > vrect.x + vrect.w)
-                    drect.w -= (drect.x + drect.w - vrect.x - vrect.w);
-                attachedPainter.requestDraw(puyoShadow, &drect);
-            }
-        }
+    for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
+        AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
+        if (displayFallings || !currentPuyo->isFalling()) currentPuyo->renderShadow();
     }
  	for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
         AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));

@@ -152,6 +152,31 @@ void AnimatedPuyo::renderAt(int X, int Y)
     }
 }
 
+void AnimatedPuyo::renderShadow()
+{
+    if (!isRenderingAnimation()) {
+        renderShadowAt(getScreenCoordinateX(), getScreenCoordinateY());
+    }
+}
+
+void AnimatedPuyo::renderShadowAt(int X, int Y)
+{
+    if (getPuyoState() != PUYO_NEUTRAL) {
+        IIM_Surface *currentSurface;
+        currentSurface = attachedTheme->getShadowSurface();
+        if (currentSurface != NULL) {
+            SDL_Rect drect;
+            SDL_Painter &painter = attachedView->getPainter();
+            drect.x = X;
+            drect.y = Y;
+            
+            drect.w = currentSurface->w;
+            drect.h = currentSurface->h;
+            painter.requestDraw(currentSurface, &drect);
+        }
+    }
+}
+
 int AnimatedPuyo::getScreenCoordinateX() const
 {
     return attachedView->getScreenCoordinateX(getPuyoX());

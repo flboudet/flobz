@@ -36,11 +36,13 @@ public:
     IIM_Surface *getPuyoSurfaceForValence(int valence) const;
     IIM_Surface *getEyeSurfaceForIndex(int index) const;
     IIM_Surface *getCircleSurfaceForIndex(int index) const;
+    IIM_Surface *getShadowSurface() const;
     static IIM_Surface *loadWithPrefix(const char *prefix, const char *suffix);
 private:
     IIM_Surface *puyoFaces[16];
     IIM_Surface *puyoEyes[3];
     IIM_Surface *puyoCircles[32];
+    IIM_Surface *shadowSurface;
 };
 
 class AnimatedPuyoThemeManager {

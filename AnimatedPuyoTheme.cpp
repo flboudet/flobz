@@ -94,6 +94,7 @@ AnimatedPuyoTheme::AnimatedPuyoTheme(const char *prefix, int hueShift, const cha
         puyoCircles[i] = iim_surface_set_value(tmpCircle, sin(3.14f/2.0f+i*3.14f/64.0f)*0.6f+0.2f);
     }
     IIM_Free(tmpCircle);
+    shadowSurface = IIM_Load_DisplayFormatAlpha("Shadow.png");
 }
 
 IIM_Surface *AnimatedPuyoTheme::getPuyoSurfaceForValence(int valence) const
@@ -111,3 +112,7 @@ IIM_Surface *AnimatedPuyoTheme::getCircleSurfaceForIndex(int index) const
     return puyoCircles[index];
 }
 
+IIM_Surface *AnimatedPuyoTheme::getShadowSurface() const
+{
+    return shadowSurface;
+}

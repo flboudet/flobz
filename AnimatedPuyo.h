@@ -45,6 +45,8 @@ public:
     void cycleAnimation();
     void render();
     void renderAt(int X, int Y);
+    void renderShadow();
+    void renderShadowAt(int X, int Y);
     bool isRenderingAnimation() const;
     void setVisible(bool flag) { visibilityFlag = flag; }
     bool getVisible() const { return visibilityFlag; }

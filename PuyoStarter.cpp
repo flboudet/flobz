@@ -45,7 +45,6 @@ IIM_Surface *gameScreen;
 IIM_Surface *shrinkingPuyo[5][5];
 IIM_Surface *explodingPuyo[5][5];
 extern IIM_Surface *bigNeutral;
-extern IIM_Surface *puyoShadow;
 IIM_Surface *puyoEye[3];
 extern IIM_Surface *puyoEyes;
 IIM_Surface *puyoEyesSwirl[4];
@@ -360,7 +359,6 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
 
         loadShrinkXplode();
         
-        puyoShadow = IIM_Load_DisplayFormatAlpha("Shadow.png");
         puyoEye[0] = IIM_Load_DisplayFormatAlpha("eye0.png");
         puyoEye[1] = IIM_Load_DisplayFormatAlpha("eye1.png");
         puyoEye[2] = IIM_Load_DisplayFormatAlpha("eye2.png");
