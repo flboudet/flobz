@@ -35,30 +35,37 @@ namespace ios_fc {
 
 void UnixSocketImpl::create(const String hostName, int portID)
 {
-	struct hostent *hp;
-	/* go find out about the desired host machine */
-	if ((hp = gethostbyname2(hostName, AF_INET)) == 0) {
-		//if ((hp = gethostbyaddr(hostName, 32, 0)) == 0)
-			throw Exception("IosSocket: gethostbyname error");
-	}
+    struct hostent *hp;
+    /* go find out about the desired host machine */
+    if ((hp = gethostbyname2(hostName, AF_INET)) == 0) {
+        //if ((hp = gethostbyaddr(hostName, 32, 0)) == 0)
+        throw Exception("IosSocket: gethostbyname error");
+    }
 
-	/* fill in the socket structure with host information */
-	memset(&pin, 0, sizeof(pin));
-	pin.sin_family = AF_INET;
-	pin.sin_addr.s_addr = ((struct in_addr *)(hp->h_addr))->s_addr;
-	pin.sin_port = htons(portID);
+    /* fill in the socket structure with host information */
+    memset(&pin, 0, sizeof(pin));
+    pin.sin_family = AF_INET;
+    pin.sin_addr.s_addr = ((struct in_addr *)(hp->h_addr))->s_addr;
+    pin.sin_port = htons(portID);
 
-	/* grab an Internet domain socket */
-	if ((socketID = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-		throw Exception("IosSocket: Socket creation failed");
-	}
+    /* grab an Internet domain socket */
+    if ((socketID = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+        throw Exception("IosSocket: Socket creation failed");
+    }
 
-	/* connect to PORT on HOST */
-	if (connect(socketID,(struct sockaddr *)  &pin, sizeof(pin)) == -1) {
-		throw Exception("IosSocket: Socket connection failed");
-	}
-	inputStream = new SocketInputStream(socketID);
-	outputStream = new SocketOutputStream(socketID);
+    /* connect to PORT on HOST */
+    if (connect(socketID,(struct sockaddr *)  &pin, sizeof(pin)) == -1) {
+        throw Exception("IosSocket: Socket connection failed");
+    }
+    inputStream = new SocketInputStream(socketID);
+    outputStream = new SocketOutputStream(socketID);
+}
+
+void UnixSocketImpl::create(int fd)
+{
+    socketID = fd;
+    inputStream = new SocketInputStream(socketID);
+    outputStream = new SocketOutputStream(socketID);
 }
 
 UnixSocketImpl::~UnixSocketImpl()

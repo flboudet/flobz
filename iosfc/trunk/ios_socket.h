@@ -24,11 +24,9 @@
 
 #include "ios_stream.h"
 #include "ios_memory.h"
+#include "ios_selectable.h"
 
 namespace ios_fc {
-    
-    typedef InputStream SelectableInputStream;
-    typedef OutputStream SelectableOutputStream;
     
     class SocketImpl {
     public:
@@ -37,9 +35,7 @@ namespace ios_fc {
         virtual void create(const String hostName, int portID) = 0;
         virtual InputStream *getInputStream() = 0;
         virtual OutputStream *getOutputStream() = 0;
-    private:
-        SelectableInputStream *inputStream;
-        SelectableOutputStream *outputStream;
+        virtual SelectableImpl *getSelectableImpl() = 0;
     };
     
     class SocketFactory {
@@ -47,16 +43,21 @@ namespace ios_fc {
         virtual SocketImpl * createSocket() = 0;
     };
     
-    class Socket {
+    class Socket : public Selectable {
     public:
         Socket(const String hostName, int portID);
+        Socket(SocketImpl *impl);
         virtual ~Socket();
-        virtual InputStream *getInputStream();
-        virtual OutputStream *getOutputStream();
+        virtual InputStream *getInputStream() const;
+        virtual OutputStream *getOutputStream() const;
         static void setFactory(SocketFactory *factory) { Socket::factory = factory; }
+        
+        // Selectable implementation
+        SelectableImpl *getSelectableImpl() const;
     private:
         static SocketFactory *factory;
         SocketImpl *impl;
+        SelectableImpl *sImpl;
     };
 };
 #endif // _IOSSOCKET

@@ -23,6 +23,7 @@
 #define _UNIXSOCKETIMPL
 
 #include "ios_socket.h"
+#include "ios_unixselectorimpl.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -30,9 +31,10 @@
 
 namespace ios_fc {
 
-class UnixSocketImpl : public SocketImpl {
+class UnixSocketImpl : public SocketImpl, UnixSelectableImpl {
 public:
 	virtual void create(String hostName, int portID);
+        void create(int fd);
 	virtual ~UnixSocketImpl();
 
 	InputStream *getInputStream();
@@ -40,6 +42,9 @@ public:
         
 	void socketSend(const void *buffer, int size);
 	void socketReceive(void *buffer, int size);
+        
+        SelectableImpl *getSelectableImpl() { return this; }
+        int getFd() { return socketID; }
 
 private:
 

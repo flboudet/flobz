@@ -18,64 +18,53 @@
  *
  *
  */
-
-#include "ios_socket.h"
-#include "ios_exception.h"
+ 
+#include "ios_serversocket.h"
 
 namespace ios_fc {
 
-class DefaultSocket : public SocketImpl {
+class DefaultServerSocketImpl : public ServerSocketImpl {
 public:
-    void create(const String hostName, int portID) {}
-    InputStream *getInputStream() { throwError(); }
-    OutputStream *getOutputStream() { throwError(); }
+    void create(int portID) {}
+    Socket *acceptClient() { throwError(); }
     SelectableImpl *getSelectableImpl() { return NULL; }
 private:
-    void throwError() const { throw Exception("Invalid socket, no socket backend set"); }
+    void throwError() { throw Exception("Invalid socket, no socket backend set"); }
 };
 
-class DefaultSocketFactory : public SocketFactory {
+class DefaultServerSocketFactory : public ServerSocketFactory {
 public:
-    SocketImpl * createSocket() {
-        return new DefaultSocket();
+    ServerSocketImpl * createServerSocket() {
+        return new DefaultServerSocketImpl();
     }
 };
 
-DefaultSocketFactory defaultSocketFactory;
+DefaultServerSocketFactory defaultServerSocketFactory;
 
 #ifdef DISABLED
-SocketFactory *Socket::factory = &defaultSocketFactory;
+ServerSocketFactory *ServerSocket::factory = &defaultServerSocketFactory;
 #endif
 
-Socket::Socket(const String hostName, int portID)
+ServerSocket::ServerSocket(int portID) : portID(portID)
 {
-    impl = factory->createSocket();
-    impl->create(hostName, portID);
+    impl = factory->createServerSocket();
+    impl->create(portID);
     sImpl = impl->getSelectableImpl();
 }
 
-Socket::Socket(SocketImpl *impl) : impl(impl)
-{
-}
-
-Socket::~Socket()
+ServerSocket::~ServerSocket()
 {
     delete impl;
 }
 
-InputStream *Socket::getInputStream() const
-{
-    return impl->getInputStream();
+Socket *ServerSocket::acceptClient() {
+    return impl->acceptClient();
 }
 
-OutputStream *Socket::getOutputStream() const
-{
-    return impl->getOutputStream();
-}
-
-SelectableImpl *Socket::getSelectableImpl() const
+SelectableImpl *ServerSocket::getSelectableImpl() const
 {
     return sImpl;
 }
 
-}
+};
+
