@@ -47,7 +47,9 @@ public:
     virtual void backPressed();
 
     virtual void cycle() = 0;
+
     void idle(double currentTime);
+    bool isLate(double currentTime) const;
     
     //virtual bool leftPlayerWin() const  { return attachedGameA->isGameRunning(); }
     //virtual bool rightPlayerWin() const { return attachedGameB->isGameRunning(); }

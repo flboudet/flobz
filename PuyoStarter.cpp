@@ -87,6 +87,11 @@ void PuyoPureStarter::idle(double currentTime)
   cycled->idle(currentTime);
 }
 
+bool PuyoPureStarter::isLate(double currentTime) const
+{
+  return cycled->isLate(currentTime);
+}
+
 void PuyoPureStarter::handleEvent(SDL_Event &event)
 {
     /* Check for usual events */
@@ -390,9 +395,6 @@ void PuyoStarter::onEvent(GameControlEvent *cevent)
   if (attachedGameA->isGameRunning() &&
       attachedGameB->isGameRunning()) {
     if (!paused) {
-
-      /* Check for usual events */
-//      getControlEvent(event, &controlEvent);
 
       if (controlEvent.isUp)
       {
@@ -828,6 +830,7 @@ void PuyoStarter::cycle()
                 }
             }
             requestDraw();
+            // printf("cycle()\n");
     }
     else {
       if (randomPlayer) {

@@ -63,13 +63,12 @@ class CycledComponent : public virtual IdleComponent
     int    getCycleNumber() const;
 
     void idle(double currentTime);
+    bool isLate(double currentTime) const;
 
     void setPause(bool paused);
     bool getPause() const;
 
     void reset();
-
-    bool isLate(double currentTime) const;
     
   private:
     double cycleTime;

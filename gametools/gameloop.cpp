@@ -46,6 +46,8 @@ void DrawableComponent::doDraw(SDL_Surface *screen)
   _drawRequested = false;
 }
 
+// CYCLE COMPONENT
+
 CycledComponent::CycledComponent(double cycleTime)
 {
   this->cycleTime = cycleTime;
@@ -68,6 +70,8 @@ double CycledComponent::getCycleTime() const
   return cycleTime;
 }
 
+#define time_tolerence 0.25
+
 void   CycledComponent::idle(double currentTime)
 {
   if (cycleNumber < -0.5) {
@@ -75,9 +79,9 @@ void   CycledComponent::idle(double currentTime)
     cycleNumber = 0.0;
   }
   
-  bool requireCycle = (currentTime > firstCycleTime + cycleTime * cycleNumber);
+  bool requireCycle = (currentTime + time_tolerence > firstCycleTime + cycleTime * cycleNumber);
 
-  if (requireCycle && !paused) {
+  if (requireCycle && (!paused)) {
     cycleNumber += 1.0;
     cycle();
   }
@@ -101,8 +105,6 @@ void CycledComponent::reset()
   paused = false;
 }
 
-#define time_tolerence 0.5
-
 bool CycledComponent::isLate(double currentTime) const
 {
   if (cycleNumber < 0.0)
@@ -111,6 +113,7 @@ bool CycledComponent::isLate(double currentTime) const
   return (currentTime > idealTime + time_tolerence);
 }
 
+// GAME LOOP
 
 GameLoop::GameLoop() {
   finished = false;
@@ -132,14 +135,31 @@ void GameLoop::add(GameComponent *gc)
 
 void GameLoop::run()
 {
+  static int tot_dropped = 0;
+  static int tot_cycle   = 0;
+  
   draw();
   while (!finished)
   {
     double currentTime = getCurrentTime();
-    idle(currentTime);
-    if (!isLate(currentTime) && drawRequested())
-      draw();
-    usleep(1);
+    idle(getCurrentTime());
+    if (drawRequested()) {
+      if (!isLate(getCurrentTime()))
+        draw();
+      else
+        tot_dropped ++;
+    }
+
+    tot_cycle ++;
+    if  (tot_cycle == 100) {
+      printf("%d%% Frames Dropped\n", tot_dropped);
+      tot_dropped = tot_cycle = 0;
+    }
+
+//    if (!isLate(getCurrentTime())) {
+      SDL_Delay(10);
+//      printf("DELAY()\n");
+//    }
   }
 }
 

@@ -7,9 +7,6 @@
 
 ROOT_DIR=.
 
-include config
-
-
 OBJFILES= HiScores.o PuyoCommander.o        \
           IosException.o IosVector.o main.o PuyoGame.o PuyoVersion.o         \
           PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o    \
@@ -19,6 +16,8 @@ OBJFILES= HiScores.o PuyoCommander.o        \
           PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o \
           AnimatedPuyoTheme.o PuyoNetworkMenu.o PuyoNetCenterMenu.o \
           PuyoNetGameCenter.o PuyoInternetGameCenter.o
+					
+include config
 
 DEPDIR = .deps
 df = $(DEPDIR)/$(*F)
