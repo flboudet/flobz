@@ -57,14 +57,11 @@ bool Animation::isEnabled() const
 
 
 /* Neutral falling animation */
-IIM_Surface *NeutralAnimation::neutral = NULL;
 NeutralAnimation::NeutralAnimation(AnimatedPuyo &puyo, int delay, AnimationSynchronizer *synchronizer) : PuyoAnimation(puyo)
 {
-    if (neutral == NULL)
-        neutral = PuyoView::getSurfaceForState(PUYO_NEUTRAL);
-	this->X = attachedPuyo.getScreenCoordinateX();
-	this->Y = attachedPuyo.getScreenCoordinateY();
-	this->currentY = attachedPuyo.getAttachedView()->getScreenCoordinateY(0);
+    this->X = attachedPuyo.getScreenCoordinateX();
+    this->Y = attachedPuyo.getScreenCoordinateY();
+    this->currentY = attachedPuyo.getAttachedView()->getScreenCoordinateY(0);
     step = 0;
     this->delay = delay;
     attachedPuyo.getAttachedView()->disallowCycle();
@@ -97,12 +94,7 @@ void NeutralAnimation::cycle()
 
 void NeutralAnimation::draw(int semiMove)
 {
-	SDL_Rect drect;
-	drect.x = X;
-	drect.y = currentY;
-	drect.w = neutral->w;
-	drect.h = neutral->h;
-	painter.requestDraw(neutral, &drect);
+    attachedPuyo.renderAt(X, currentY);
 }
 
 /* Animation synchronization helper */

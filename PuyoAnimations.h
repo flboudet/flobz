@@ -77,7 +77,6 @@ class NeutralAnimation : public PuyoAnimation {
     void cycle();
     void draw(int semiMove);
   private:
-    static IIM_Surface *neutral;
     int X, Y, currentY;
     float step;
     int delay;
