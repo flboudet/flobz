@@ -44,7 +44,7 @@ private:
     int cyclesBeforeResendingReliable;
     int waitingForAckTimeout;
     UDPRawMessage *waitingForAckMessage;
-    Vector outQueue;
+    Vector<UDPRawMessage*> outQueue;
     void sendQueue();
 };
 

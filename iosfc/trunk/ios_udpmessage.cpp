@@ -98,7 +98,10 @@ namespace ios_fc {
   UDPMessage::UDPMessage(const Buffer<char> raw, UDPMessageBox &owner)  throw(InvalidMessageException)
     : owner(owner)
   {
-    String sraw((const char *)raw);
+    Buffer<char> tmp_buf = raw.dup();
+    tmp_buf.grow(1);
+    tmp_buf[raw.size()] = 0;
+    String sraw((const char *)tmp_buf);
     int    start = 0;
     int    end   = 0;
    

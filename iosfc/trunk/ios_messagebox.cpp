@@ -23,8 +23,12 @@
 
 namespace ios_fc {
 
-void MessageBox::addListener(MessageListener &newListener) {
-    listeners.addElement(&newListener);
+void MessageBox::addListener(MessageListener *newListener) {
+    listeners.add(newListener);
+}
+
+void MessageBox::removeListener(MessageListener *listener) {
+    listeners.remove(listener);
 }
 
 };

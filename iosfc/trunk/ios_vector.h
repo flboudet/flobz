@@ -23,7 +23,7 @@
 #define _IOS_VECTOR_H
 
 namespace ios_fc {
-
+/*
 class Vector {
 public:
 	Vector();
@@ -46,6 +46,8 @@ private:
 	
 	void increaseVectorSize();
 };
+*/
+#define Vector AdvancedBuffer
 
 };
 

@@ -10,7 +10,7 @@ class PuyoNetwork : public MessageListener
 {
   public:
     PuyoNetwork(MessageBox *mbox) : mbox(mbox) {
-      mbox->addListener(*this);
+      mbox->addListener(this);
     }
     
     void onMessage(Message &message) {

@@ -98,8 +98,8 @@ void UDPMessageBox::idle()
                 else {
                     // Give the message to every listener
                     receiveSerialID = messageSerialID;
-                    for (int i = 0, j = listeners.getSize() ; i < j ; i++) {
-                        MessageListener *currentListener = (MessageListener *)(listeners.getElementAt(i));
+                    for (int i = 0, j = listeners.size() ; i < j ; i++) {
+                        MessageListener *currentListener = listeners[i];
                         currentListener->onMessage(incomingMessage);
                     }
                 }
@@ -123,16 +123,16 @@ void UDPMessageBox::sendUDP(Buffer<char> buffer, int id, bool reliable)
         return;
     }
     
-    outQueue.addElement(rawMessage);
+    outQueue.add(rawMessage);
     sendQueue();
 }
 
 void UDPMessageBox::sendQueue()
 {
-    while ((waitingForAckMessage == NULL) && (outQueue.getSize() > 0)) {
-        UDPRawMessage *currentMessage = (UDPRawMessage *)(outQueue.getElementAt(0));
+    while ((waitingForAckMessage == NULL) && (outQueue.size() > 0)) {
+        UDPRawMessage *currentMessage = outQueue[0];
         currentMessage->send();
-        outQueue.removeElementAt(0);
+        outQueue.remove(currentMessage);
         if (currentMessage->isReliable()) {
             waitingForAckMessage = currentMessage;
             waitingForAckTimeout = cyclesBeforeResendingReliable;

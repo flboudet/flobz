@@ -37,10 +37,11 @@ class MessageBox {
 public:
     virtual ~MessageBox() {}
     virtual void idle() = 0;
-    void addListener(MessageListener &);
+    void addListener(MessageListener *);
+    void removeListener(MessageListener *);
     virtual Message * createMessage() = 0;
 protected:
-    Vector listeners;
+    Vector<MessageListener*> listeners;
 };
 
 };

@@ -36,7 +36,7 @@
 #include <cstring>
 #include <cstdio>
 
-//#define DEBUG_MEMORY
+#define DEBUG_MEMORY
 
 //
 // important note for users:
