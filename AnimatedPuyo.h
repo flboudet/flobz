@@ -74,6 +74,7 @@ public:
 private:
     IosVector puyoWalhalla;
     PuyoView *attachedView;
+    AnimatedPuyoThemeManager *attachedThemeManager;
 };
 
 #endif // _ANIMATEDPUYO

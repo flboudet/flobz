@@ -34,9 +34,12 @@ using namespace ios_fc;
 
 class PuyoNetworkView : public PuyoView {
   public:
-    PuyoNetworkView(PuyoGameFactory *attachedPuyoGameFactory, int xOffset, int yOffset,
+    PuyoNetworkView(PuyoGameFactory *attachedPuyoGameFactory,
+		    AnimatedPuyoThemeManager *attachedPuyoThemeManager,
+		    int xOffset, int yOffset,
                     int nXOffset, int nYOffset, MessageBox *mbox)
-        : PuyoView(attachedPuyoGameFactory, xOffset, yOffset, nXOffset, nYOffset),
+        : PuyoView(attachedPuyoGameFactory, attachedPuyoThemeManager,
+		   xOffset, yOffset, nXOffset, nYOffset),
           mbox(mbox),badPuyos(0) {}
         
     void cycleGame();

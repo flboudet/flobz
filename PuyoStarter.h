@@ -27,6 +27,7 @@
 #include "PuyoIA.h"
 #include "PuyoCommander.h"
 #include "ios_messagebox.h"
+#include "AnimatedPuyoTheme.h"
 
 #ifndef _PUYOSTARTER
 #define _PUYOSTARTER
@@ -89,6 +90,7 @@ protected:
     
     int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
     ios_fc::MessageBox *mbox;
+    AnimatedPuyoThemeManager attachedThemeManager;
 };
 
 #endif // _PUYOSTARTER

@@ -97,6 +97,27 @@ AnimatedPuyoTheme::AnimatedPuyoTheme(const char *prefix, int hueShift, const cha
     shadowSurface = IIM_Load_DisplayFormatAlpha("Shadow.png");
 }
 
+AnimatedPuyoTheme::~AnimatedPuyoTheme()
+{
+  for (int i = 0 ; i < 15 ; i++) {
+    if (puyoFaces[i] != NULL) {
+      IIM_Free(puyoFaces[i]);
+    }
+  }
+  for (int i = 0 ; i < 3 ; i++) {
+    if (puyoEyes[i] != NULL) {
+      IIM_Free(puyoEyes[i]);
+    }
+  }
+  for (int i = 0 ; i < 32 ; i++) {
+    if (puyoCircles[i] != NULL) {
+      IIM_Free(puyoCircles[i]);
+    }
+  }
+  if (shadowSurface != NULL)
+    IIM_Free(shadowSurface);
+}
+
 IIM_Surface *AnimatedPuyoTheme::getPuyoSurfaceForValence(int valence) const
 {
     return puyoFaces[valence];

@@ -30,8 +30,6 @@
 // crade, mais basta
 extern IIM_Surface *neutral;
 
-AnimatedPuyoThemeManager *globalThemeManager = NULL;
-
 AnimatedPuyo::AnimatedPuyo(PuyoState state, AnimatedPuyoThemeManager *themeManager, PuyoView *attachedView)
     : PuyoPuyo(state), attachedTheme(themeManager->getThemeForState(state))
 {
@@ -191,11 +189,9 @@ int AnimatedPuyo::getScreenCoordinateY() const
 }
 
 AnimatedPuyoFactory::AnimatedPuyoFactory(PuyoView *attachedView)
+  : attachedView(attachedView)
 {
-    // Crade, mais besoin pour l'instant
-    if (globalThemeManager == NULL)
-        globalThemeManager = new AnimatedPuyoThemeManager;
-    this->attachedView = attachedView;
+    this->attachedThemeManager = attachedView->getPuyoThemeManager();
 }
 
 AnimatedPuyoFactory::~AnimatedPuyoFactory()
@@ -209,7 +205,7 @@ AnimatedPuyoFactory::~AnimatedPuyoFactory()
 
 PuyoPuyo *AnimatedPuyoFactory::createPuyo(PuyoState state)
 {
-    return new AnimatedPuyo(state, globalThemeManager, attachedView);
+    return new AnimatedPuyo(state, attachedThemeManager, attachedView);
 }
 
 void AnimatedPuyoFactory::deletePuyo(PuyoPuyo *target)

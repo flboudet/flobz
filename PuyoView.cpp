@@ -94,8 +94,11 @@ static char PuyoGroupImageIndex[2][2][2][2] =
 
 
 
-PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory, int xOffset, int yOffset, int nXOffset, int nYOffset)
-:attachedPuyoFactory(this), attachedPainter(painter)
+PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
+		   AnimatedPuyoThemeManager *attachedPuyoThemeManager,
+		   int xOffset, int yOffset, int nXOffset, int nYOffset)
+  :attachedThemeManager(attachedPuyoThemeManager),
+   attachedPuyoFactory(this), attachedPainter(painter)
 {
 	attachedGame = attachedPuyoGameFactory->createPuyoGame(&attachedPuyoFactory);
     attachedGame->setDelegate(this);
@@ -290,23 +293,27 @@ void PuyoView::render()
 	drect.w = TSIZE;
 	drect.h = TSIZE * 2;
 	// Drawing next puyos
-	IIM_Surface *currentSurface = getSurfaceForState(attachedGame->getNextFalling());
+	const AnimatedPuyoTheme *nextPuyoTheme =
+	  attachedThemeManager->getThemeForState(attachedGame->getNextFalling());
+	IIM_Surface *currentSurface = nextPuyoTheme->getPuyoSurfaceForValence(0);
 	if (currentSurface != NULL) {
 		drect.x = nXOffset;
 		drect.y = nYOffset + TSIZE;
 		drect.w = currentSurface->w;
 		drect.h = currentSurface->h;
 		attachedPainter.requestDraw(currentSurface, &drect);
-		if (currentSurface != neutral) attachedPainter.requestDraw(puyoEyes, &drect);
+		attachedPainter.requestDraw(nextPuyoTheme->getEyeSurfaceForIndex(0), &drect);
 	}
-	currentSurface = getSurfaceForState(attachedGame->getNextCompanion());
+	const AnimatedPuyoTheme *nextCompanionTheme =
+	  attachedThemeManager->getThemeForState(attachedGame->getNextCompanion());
+	currentSurface = nextCompanionTheme->getPuyoSurfaceForValence(0);
 	if (currentSurface != NULL) {
 		drect.x = nXOffset;
 		drect.y = nYOffset;
 		drect.w = currentSurface->w;
 		drect.h = currentSurface->h;
 		attachedPainter.requestDraw(currentSurface, &drect);
-		if (currentSurface != neutral) attachedPainter.requestDraw(puyoEyes, &drect);
+		attachedPainter.requestDraw(nextCompanionTheme->getEyeSurfaceForIndex(0), &drect);
 	}
     
     // Drawing the view animation

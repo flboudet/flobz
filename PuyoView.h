@@ -31,6 +31,7 @@
 #include "IosImgProcess.h"
 #include "PuyoAnimations.h"
 #include "AnimatedPuyo.h"
+#include "AnimatedPuyoTheme.h"
 
 #define TSIZE 32
 #define ASIZE 32
@@ -50,7 +51,9 @@ public:
 
 class PuyoView : public PuyoDelegate {
   public:
-    PuyoView(PuyoGameFactory *attachedPuyoGameFactory, int xOffset, int yOffset, int nXOffset, int nYOffset);
+    PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
+	     AnimatedPuyoThemeManager *attachedPuyoThemeManager,
+	     int xOffset, int yOffset, int nXOffset, int nYOffset);
     virtual ~PuyoView() {}
     void setEnemyGame(PuyoGame *enemyGame);
     void render();
@@ -74,6 +77,8 @@ class PuyoView : public PuyoDelegate {
     int getScreenCoordinateX(int X) const { return X * TSIZE + xOffset; }
     int getScreenCoordinateY(int Y) const { return Y * TSIZE + yOffset; }
     
+    AnimatedPuyoThemeManager *getPuyoThemeManager() const { return attachedThemeManager; }
+
     // PuyoDelegate methods
     void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex);
     void gameDidEndCycle();
@@ -88,6 +93,7 @@ class PuyoView : public PuyoDelegate {
     bool gameRunning;
     int xOffset, yOffset;
     int nXOffset, nYOffset;
+    AnimatedPuyoThemeManager *attachedThemeManager;
     AnimatedPuyoFactory attachedPuyoFactory;
     PuyoGame *attachedGame, *enemyGame;
     IosVector viewAnimations;

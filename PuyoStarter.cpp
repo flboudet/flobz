@@ -491,14 +491,18 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
     }
     if (mbox == NULL) {
         attachedGameFactory = new PuyoLocalGameFactory(&attachedRandom);
-        areaA = new PuyoView(attachedGameFactory, 1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
-        areaB = new PuyoView(attachedGameFactory, 1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE);
+        areaA = new PuyoView(attachedGameFactory, &attachedThemeManager,
+			     1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
+        areaB = new PuyoView(attachedGameFactory, &attachedThemeManager,
+			     1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE);
     }
     else {
         attachedGameFactory = new PuyoLocalGameFactory(&attachedRandom);
         attachedNetworkGameFactory = new PuyoNetworkGameFactory(&attachedRandom, *mbox);
-        areaA = new PuyoView(attachedNetworkGameFactory, 1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
-        areaB = new PuyoNetworkView(attachedGameFactory, 1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, mbox);
+        areaA = new PuyoView(attachedNetworkGameFactory, &attachedThemeManager,
+			     1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
+        areaB = new PuyoNetworkView(attachedGameFactory, &attachedThemeManager,
+				    1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, mbox);
         //SDL_Delay(10000);
     }
     

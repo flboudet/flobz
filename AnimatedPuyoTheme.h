@@ -33,6 +33,7 @@
 class AnimatedPuyoTheme {
 public:
     AnimatedPuyoTheme(const char *prefix, int hueShift, const char *eyePrefix);
+    virtual ~AnimatedPuyoTheme();
     IIM_Surface *getPuyoSurfaceForValence(int valence) const;
     IIM_Surface *getEyeSurfaceForIndex(int index) const;
     IIM_Surface *getCircleSurfaceForIndex(int index) const;
