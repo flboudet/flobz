@@ -152,8 +152,8 @@ enum {
 };
 
 static SDLKey keyControls[10] = {
-    SDLK_LEFT, SDLK_RIGHT, SDLK_DOWN, SDLK_UNKNOWN, SDLK_UP,
-    SDLK_s, SDLK_f, SDLK_d, SDLK_UNKNOWN, SDLK_e
+    SDLK_s, SDLK_f, SDLK_d, SDLK_UNKNOWN, SDLK_e,
+    SDLK_LEFT, SDLK_RIGHT, SDLK_DOWN, SDLK_UNKNOWN, SDLK_UP
 };
 
 SDL_Surface * IMG_Load_DisplayFormat (const char *fname)

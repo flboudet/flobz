@@ -812,26 +812,33 @@ void PuyoStarter::run(int score1, int score2, int lives)
     commander->getControlEvent(event, &controlEvent);
     switch (controlEvent.gameEvent) {
         case GameControlEvent::kPlayer1Left:
-            attachedGameA->moveLeft();
+            if (randomPlayer == 0)
+                attachedGameA->moveLeft();
             break;
         case GameControlEvent::kPlayer1Right:
-            attachedGameA->moveRight();
+            if (randomPlayer == 0)
+                attachedGameA->moveRight();
             break;
         case GameControlEvent::kPlayer1TurnLeft:
-            attachedGameA->rotateLeft();
+            if (randomPlayer == 0)
+                attachedGameA->rotateLeft();
             break;
         case GameControlEvent::kPlayer1TurnRight:
-            attachedGameA->rotateRight();
+            if (randomPlayer == 0)
+                attachedGameA->rotateRight();
             break;
         case GameControlEvent::kPlayer1Down:
-            attachedGameA->cycle();
-            if (attachedGameA->isEndOfCycle())
-                downLeftIsDown = false;
-            else
-                downLeftIsDown = true;
+            if (randomPlayer == 0) {
+                attachedGameA->cycle();
+                if (attachedGameA->isEndOfCycle())
+                    downLeftIsDown = false;
+                else
+                    downLeftIsDown = true;
+            }
             break;
         case GameControlEvent::kPlayer1DownUp:
-            downLeftIsDown = false;
+            if (randomPlayer == 0)
+                downLeftIsDown = false;
             break;
         case GameControlEvent::kPlayer2Left:
             attachedGameB->moveLeft();
