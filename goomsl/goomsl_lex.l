@@ -72,8 +72,9 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
 <INITIAL>"false"                 { strncpy(yylval.strValue, "0", 2047);    return LTYPE_INTEGER; }
 <INITIAL>{ID}                    { strncpy(yylval.strValue, yytext, 2047); return LTYPE_VAR;     }
 <INITIAL>{DIGIT}+                { strncpy(yylval.strValue, yytext, 2047); return LTYPE_INTEGER; }
+<INITIAL>\'.\'                   { sprintf(yylval.strValue, "%d", (int)yytext[1]); return LTYPE_INTEGER; }
 <INITIAL>"0x"{XDIGIT}+           { strncpy(yylval.strValue, yytext, 2047); return LTYPE_INTEGER; }
-<INITIAL>"-"?{DIGIT}+"."{DIGIT}* { strncpy(yylval.strValue, yytext, 2047); return LTYPE_FLOAT;   }
+<INITIAL>{DIGIT}+"."{DIGIT}*     { strncpy(yylval.strValue, yytext, 2047); return LTYPE_FLOAT;   }
 <INITIAL>{DIGIT}+"%"             { sprintf(yylval.strValue, "%3.2f", atof(yytext)/100.0f); return LTYPE_FLOAT; }
 <INITIAL>"+="                    { return PLUS_EQ; }
 <INITIAL>"*="                    { return MUL_EQ; }

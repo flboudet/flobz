@@ -1291,18 +1291,59 @@ GoomHash *gsl_globals(GoomSL *_this)
   return _this->vars;
 }
 
+
+/**
+ * Some native external functions
+ */
+static void ext_charAt(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+  char *string = GSL_LOCAL_PTR(gsl, local, "value");
+  int   index  = GSL_LOCAL_INT(gsl, local, "index");
+  GSL_GLOBAL_INT(gsl, "charAt") = 0;
+  if (string == NULL) {
+    return;
+  }
+  if (index < strlen(string))
+    GSL_GLOBAL_INT(gsl, "charAt") = string[index];
+}
+
+static void ext_i2f(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+  int i = GSL_LOCAL_INT(gsl, local, "value");
+  GSL_GLOBAL_FLOAT(gsl, "i2f") = i;
+}
+
+static void ext_f2i(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+  float f = GSL_LOCAL_FLOAT(gsl, local, "value");
+  GSL_GLOBAL_INT(gsl, "f2i") = f;
+}
+
+/**
+ *
+ */
 void gsl_compile(GoomSL *_currentGoomSL, const char *script)
 { /* {{{ */
+  char *script_and_externals;
+  static const char *sBinds =
+    "external <charAt: string value, int index> : int\n"
+    "external <f2i: float value> : int\n"
+    "external <i2f: int value> : float\n";
+
 #ifdef VERBOSE
   printf("\n=== Starting Compilation ===\n");
 #endif
+
+  script_and_externals = malloc(strlen(script) + strlen(sBinds) + 2);
+  strcpy(script_and_externals, sBinds);
+  strcat(script_and_externals, script);
 
   /* 0- reset */
   currentGoomSL = _currentGoomSL;
   reset_scanner(currentGoomSL);
 
   /* 1- create the syntaxic tree */
-  yy_scan_string(script);
+  yy_scan_string(script_and_externals);
   yyparse();
 
   /* 2- generate code */
@@ -1314,6 +1355,12 @@ void gsl_compile(GoomSL *_currentGoomSL, const char *script)
   /* 4- optimize code */
   gsl_create_fast_iflow();
 
+  /* 5- bind a few internal functions */
+  gsl_bind_function(currentGoomSL, "charAt", ext_charAt);
+  gsl_bind_function(currentGoomSL, "f2i", ext_f2i);
+  gsl_bind_function(currentGoomSL, "i2f", ext_i2f);
+  free(script_and_externals);
+  
 #ifdef VERBOSE
   printf("=== Compilation done. # of lines: %d. # of instr: %d ===\n", currentGoomSL->num_lines, currentGoomSL->iflow->number);
 #endif

@@ -568,6 +568,44 @@
         precommit_expr(sub,"sub",INSTR_SUB);
     } /* }}} */
 
+    /* NEG */
+    static NodeType *new_neg(NodeType *expr) { /* {{{ */
+        NodeType *zeroConst = NULL;
+        if (expr->type == CONST_INT_NODE)
+          zeroConst = new_constInt("0", currentGoomSL->num_lines);
+        else if (expr->type == CONST_FLOAT_NODE)
+          zeroConst = new_constFloat("0.0", currentGoomSL->num_lines);
+        else if (expr->type == CONST_PTR_NODE) {
+          fprintf(stderr, "ERROR: Line %d, Could not negate const pointer.\n",
+            currentGoomSL->num_lines);
+          exit(1);
+        }
+        else {
+            int type = gsl_type_of_var(expr->vnamespace, expr->str);
+            if (type == INSTR_FLOAT)
+              zeroConst = new_constFloat("0.0", currentGoomSL->num_lines);
+            else if (type == INSTR_PTR) {
+              fprintf(stderr, "ERROR: Line %d, Could not negate pointer.\n",
+                currentGoomSL->num_lines);
+              exit(1);
+            }
+            else if (type == INSTR_INT)
+              zeroConst = new_constInt("0", currentGoomSL->num_lines);
+            else if (type == -1) {
+                fprintf(stderr, "ERROR: Line %d, Could not find variable '%s'\n",
+                        expr->line_number, expr->unode.opr.op[0]->str);
+                exit(1);
+            }
+            else { /* type is a struct_id */
+                fprintf(stderr, "ERROR: Line %d, Could not negate struct '%s'\n",
+                        expr->line_number, expr->str);
+                exit(1);
+            }
+        }
+        return new_expr2("sub", OPR_SUB, zeroConst, expr);
+    }
+    /* }}} */
+
     /* MUL */
     static NodeType *new_mul(NodeType *expr1, NodeType *expr2) { /* {{{ */
         return new_expr2("mul", OPR_MUL, expr1, expr2);
@@ -1304,7 +1342,7 @@ expression: LTYPE_VAR   { $$ = new_var($1,currentGoomSL->num_lines); }
           | expression '/' expression { $$ = new_div($1,$3); } 
           | expression '+' expression { $$ = new_add($1,$3); } 
           | expression '-' expression { $$ = new_sub($1,$3); } 
-          | '-' expression            { $$ = new_sub(new_constInt("0",currentGoomSL->num_lines),$2);} 
+          | '-' expression            { $$ = new_neg($2);    }
           | '(' expression ')'        { $$ = $2; }
           | func_call_expression      { $$ = $1; }
           ;
