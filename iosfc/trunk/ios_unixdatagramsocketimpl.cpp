@@ -57,7 +57,7 @@ void UnixDatagramSocketImpl::send(Datagram &sendDatagram)
     struct sockaddr_in outAddr;
     bzero((char *) &outAddr, sizeof(outAddr));
     outAddr.sin_family = AF_INET;
-    outAddr.sin_addr.s_addr = ((struct in_addr *)(impl->getHostEnt()->h_addr))->s_addr;
+    outAddr.sin_addr.s_addr = impl->getAddress();
     outAddr.sin_port = htons(sendDatagram.getPortNum());
     
     sendto(socketFd, sendDatagram.getMessage(), sendDatagram.getSize(), 0,
@@ -73,7 +73,7 @@ Datagram UnixDatagramSocketImpl::receive(VoidBuffer buffer)
     if (res == -1)
         throw Exception("Reception error");
     
-    return Datagram(SocketAddress("localhost"), resultAddress.sin_port, buffer, res);
+    return Datagram(SocketAddress(new UnixSocketAddressImpl(resultAddress.sin_addr.s_addr)), resultAddress.sin_port, buffer, res);
 }
 
 UnixDatagramSocketImpl::~UnixDatagramSocketImpl()

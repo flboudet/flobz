@@ -28,7 +28,13 @@ namespace ios_fc {
 
     class SocketAddressImpl {
     public:
+        SocketAddressImpl() : usage(0) {}
+        inline int getUsage() const { return usage; }
+        inline void incrementUsage() { usage++; }
+        inline void decrementUsage() { usage--; }
         virtual ~SocketAddressImpl() {}
+    private:
+        int usage;
     };
 
     class SocketAddressFactory {
@@ -38,9 +44,10 @@ namespace ios_fc {
 
     class SocketAddress {
     public:
-        SocketAddress(String hostName) { impl = factory->createSocketAddress(hostName); }
-        SocketAddress(SocketAddressImpl *impl) { this->impl = impl; }
-	SocketAddressImpl *getImpl() const { return impl; }
+        SocketAddress(String hostName) { impl = factory->createSocketAddress(hostName); impl->incrementUsage(); }
+        SocketAddress(SocketAddressImpl *impl) { this->impl = impl; impl->incrementUsage(); }
+        ~SocketAddress() { impl->decrementUsage(); if (impl->getUsage() == 0) delete impl; }
+        SocketAddressImpl *getImpl() const { return impl; }
         static void setFactory(SocketAddressFactory *factory) { SocketAddress::factory = factory; }
     private:
         static SocketAddressFactory *factory;

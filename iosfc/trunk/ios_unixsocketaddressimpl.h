@@ -23,6 +23,7 @@
 #define _IOSUNIXSOCKETADDRESSIMPL
 
 #include <netdb.h>
+#include <netinet/in.h>
 #include "ios_memory.h"
 #include "ios_socketaddress.h"
 
@@ -31,9 +32,10 @@ namespace ios_fc {
     class UnixSocketAddressImpl : public SocketAddressImpl {
     public:
         UnixSocketAddressImpl(String hostName);
-	struct hostent *getHostEnt() const { return address; }
+        UnixSocketAddressImpl(in_addr_t address);
+        in_addr_t getAddress() const { return address; }
     private:
-	struct hostent *address;
+        in_addr_t address;
     };
 
     class UnixSocketAddressFactory : public SocketAddressFactory {

@@ -26,10 +26,17 @@ namespace ios_fc {
 
 UnixSocketAddressImpl::UnixSocketAddressImpl(String hostName)
 {
+    struct hostent *ht;
+    
     /* go find out about the desired host machine */
-    if ((address = gethostbyname(hostName)) == 0) {
+    if ((ht = gethostbyname(hostName)) == 0) {
         throw Exception("IosSocketAddress: gethostbyname error");
     }
+    address = ((struct in_addr *)(ht->h_addr))->s_addr;
+}
+
+UnixSocketAddressImpl::UnixSocketAddressImpl(in_addr_t address) : address(address)
+{
 }
 
 SocketAddressImpl * UnixSocketAddressFactory::createSocketAddress(String hostName)
