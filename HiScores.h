@@ -7,6 +7,8 @@ typedef struct hiscore {
   int  score;
 } hiscore;
 
-hiscore * getHiscores(const char * const defaultNames[kHiScoresNumber]);
+void initHiScores(const char * const defaultNames[kHiScoresNumber]);
+
+hiscore * getHiScores(void);
 
 int setHiScore(int score, const char * name);
