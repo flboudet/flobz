@@ -99,6 +99,11 @@ CFLAGS:=$(CFLAGS) -DUSE_DGA=1
 endif
 endif
 
+ifeq ($(DEBUG), true)
+CFLAGS:=$(CFLAGS) -DDEBUG=1 -g
+LDFLAGS:=$(LDFLAGS) -g
+endif
+
 CXXFLAGS=${CFLAGS}
 
 all: prelude flobopuyo
