@@ -446,9 +446,7 @@ MenuItems must_restart_menu_load (SoFont *font)
 MenuItems options_menu_load (SoFont *font, SoFont *small_font)
 {
   static MenuItemsTab option_menu = {
-#ifndef _WIN32
     MENUITEM(kFullScreen),
-#endif
 #ifdef HAVE_OPENGL
     MENUITEM(kOpenGL),
 #endif
@@ -465,10 +463,8 @@ MenuItems options_menu_load (SoFont *font, SoFont *small_font)
   menu_items_set_font_for(option_menu,  kAudioFX, font);
   menu_items_set_font_for(option_menu,  kControls, font);
   menu_items_set_font_for(option_menu,  "Back", font);
-#ifndef _WIN32
   menu_items_set_font_for(option_menu,  kFullScreen, font);
   menu_items_set_value_for(option_menu, kFullScreen, fullscreen?"ON":"OFF");
-#endif
 #ifdef HAVE_OPENGL
   menu_items_set_font_for(option_menu,  kOpenGL, font);
   menu_items_set_value_for(option_menu, kOpenGL, useGL?"ON":"OFF");
@@ -952,11 +948,17 @@ void PuyoCommander::optionMenuLoop(PuyoDrawable *d)
             }
             else
             {
-              SDL_QuitSubSystem(SDL_INIT_VIDEO);
-              SDL_InitSubSystem(SDL_INIT_VIDEO);
-              display = SDL_SetVideoMode(640, 480, 0,
-                                         SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF
-                                         |(fullscreen?SDL_FULLSCREEN:0)|(useGL?SDL_GLSDL:0));
+#ifdef _WIN32
+                menu_hide(optionMenu);
+                backLoop(mustRestartMenu,d);
+                menu_show(optionMenu);
+#else
+                SDL_QuitSubSystem(SDL_INIT_VIDEO);
+                SDL_InitSubSystem(SDL_INIT_VIDEO);
+                display = SDL_SetVideoMode(640, 480, 0,
+                                           SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF
+                                           |(fullscreen?SDL_FULLSCREEN:0)|(useGL?SDL_GLSDL:0));
+#endif
               /* IIM_ReConvertAll();
               SoFont_Refresh(menuFont);
               SoFont_Refresh(smallFont);
