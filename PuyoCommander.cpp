@@ -939,24 +939,24 @@ void PuyoCommander::enterStringLoop(Menu *menu, const char *kItem, char out[256]
       switch (e.type) {
         case SDL_KEYDOWN:
           {
-            if ( (e.key.keysym.unicode & 0xFF80) == 0 ) {
-              char ch;
-              ch = e.key.keysym.unicode & 0x7F;
+            char ch = 0;
+            if ((e.key.keysym.sym >= SDLK_a) && (e.key.keysym.sym <= SDLK_z))
+              ch = e.key.keysym.sym;
 
-              if ((ch >= 'a') && (ch <= 'z'))
-              {
-                if ((len == 0) || (out[len-1] == ' '))
-                  ch = ch - 'a' + 'A';
-              }
-              else if (!((ch >= 'A') && (ch <= 'Z')) || (ch != ' '))
-                ch = 0;
-
-              if (ch && (len < 10)) {
-                out[len++] = ch;
-                out[len]   = '_';
-                out[len+1] = 0;
-              }
+            if ((ch >= 'a') && (ch <= 'z')) {
+              if ((len == 0) || (out[len-1] == ' '))
+                ch = ch - 'a' + 'A';
             }
+
+            if (e.key.keysym.sym == SDLK_SPACE)
+              ch = ' ';
+
+            if ((ch!=0) && (len < 10)) {
+              out[len++] = ch;
+              out[len]   = '_';
+              out[len+1] = 0;
+            }
+
             if ((e.key.keysym.sym == SDLK_BACKSPACE) && (len > 0))
             {
               out[len] = 0;
