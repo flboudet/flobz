@@ -1,4 +1,4 @@
-OBJ=ios_exception.o ios_hash.o ios_memory.o ios_message.o test.o
+OBJ=ios_exception.o ios_hash.o ios_memory.o ios_message.o ios_udpmessage.o test.o
 
 all:${OBJ}
 	g++ -o test *.o

@@ -5,11 +5,24 @@ namespace ios_fc {
 
   class UDPMessage : public Message {
     public:
-      UDPMessage(int serialID/*, const UDPMessageBox &owner*/) {}
-      UDPMessage(const Buffer<char> serialized/*, const UDPMessageBox &owner*/) {}
-      bool isReliable() const  {return false;}
-      int  getSerialID() const {return 1;}
-      void send() const {}
+      UDPMessage(int serialID/*, const UDPMessageBox &owner*/);
+      UDPMessage(const Buffer<char> serialized/*, const UDPMessageBox &owner*/);
+      virtual ~UDPMessage();
+      
+      bool isReliable() const;
+      int  getSerialID() const;
+      void send() const;
+
+      void addInt       (const String key, int value);
+      void addBool      (const String key, bool value);
+      void addString    (const String key, const String value);
+      void addIntArray  (const String key, const Buffer<int> value);
+      void addByteArray (const String key, const Buffer<char> value);
+
+    private:
+      AdvancedBuffer<String *> serialized;
+
+      const Buffer<char> serialize() const;
   };
 
 };

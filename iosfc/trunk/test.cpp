@@ -5,9 +5,11 @@ int main(int argc, char **argv)
 {
   try {
     UDPMessage msg(1);
-    msg.addInt("time", 1540);
 
-    printf("time = %d\n", msg.getInt("time"));
+    msg.addInt("time", 1540);
+    msg.addBool("pause", false);
+    msg.send();
+
     return 0;
   }
   catch (Message::DataException e) {
