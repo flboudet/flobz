@@ -10,6 +10,7 @@
 #include "PuyoStory.h"
 #include "preferences.h"
 #include "InputManager.h"
+#include "HiScores.h"
 
 #ifndef DATADIR
 extern char *DATADIR;
@@ -37,6 +38,19 @@ char *kScore       = "Score:";
 char *kPlayerName  = "Player Name:";
 char *kPlayer1Name  = "P1 Name:";
 char *kPlayer2Name  = "P2 Name:";
+
+static const char *k01 = "01";
+static const char *k02 = "02";
+static const char *k03 = "03";
+static const char *k04 = "04";
+static const char *k05 = "05";
+static const char *k06 = "06";
+static const char *k07 = "07";
+static const char *k08 = "08";
+static const char *k09 = "09";
+static const char *k10 = "10";
+
+char *kHighScores  = "Hall of Fame";
 
 static char *kMusicVolume = "MusicVolume";
 static char *kAudioVolume = "AudioVolume";
@@ -80,6 +94,11 @@ static char *kAbout05 = "          Jean-Christophe 'jeko' Hoelt";
 static char *kAbout06 = "                   Guillaume 'gyom' Borios";
 static char *kAbout07 = "Beta Goddess:                        ";
 static char *kAbout08 = "                                           Tania";
+
+static char *AI_NAMES[] = { "Fanzy", "Bob the Killer", "Big Rabbit", "Flying Saucer",
+  "Satanas", "Doctor X", "Tanya", "Master Gyom",
+  "--------","--------","--------" };
+
 
 extern SDL_Surface *display, *image;
 static SDL_Surface *menuBGImage = 0;
@@ -138,6 +157,7 @@ main_menu_load (SoFont * font)
     MENUITEM_BLANKLINE,
     MENUITEM ("Options"),
     MENUITEM_BLANKLINE,
+    MENUITEM (kHighScores),
     MENUITEM ("Rules"),
     MENUITEM ("About FloboPuyo"),
     MENUITEM_BLANKLINE,
@@ -149,6 +169,7 @@ main_menu_load (SoFont * font)
   if (!loaded) {
     menu_items_set_font_for (main_menu, SINGLE_PLAYER_GAME, font);
     menu_items_set_font_for (main_menu, TWO_PLAYERS_GAME, font);
+    menu_items_set_font_for (main_menu, kHighScores, font);
     menu_items_set_font_for (main_menu, "Options", font);
     menu_items_set_font_for (main_menu, "Rules", font);
     menu_items_set_font_for (main_menu, "About FloboPuyo", font);
@@ -359,13 +380,48 @@ MenuItems rules_menu_load (SoFont *font) {
   return option_menu;
 }
 
+MenuItems high_scores_menu_load (SoFont *font)
+{
+  static MenuItemsTab option_menu =
+  {
+    MENUITEM_INACTIVE(kHighScores),
+    MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(k01),
+    MENUITEM_INACTIVE(k02),
+    MENUITEM_INACTIVE(k03),
+    MENUITEM_INACTIVE(k04),
+    MENUITEM_INACTIVE(k05),
+    MENUITEM_INACTIVE(k06),
+    MENUITEM_INACTIVE(k07),
+    MENUITEM_INACTIVE(k08),
+    MENUITEM_INACTIVE(k09),
+    MENUITEM_INACTIVE(k10),
+    MENUITEM_BLANKLINE,
+    MENUITEM("Back"),
+    MENUITEM_END
+  };
+  menu_items_set_font_for(option_menu, kHighScores, font);
+  menu_items_set_font_for(option_menu, k01, font);
+  menu_items_set_font_for(option_menu, k02, font);
+  menu_items_set_font_for(option_menu, k03, font);
+  menu_items_set_font_for(option_menu, k04, font);
+  menu_items_set_font_for(option_menu, k05, font);
+  menu_items_set_font_for(option_menu, k06, font);
+  menu_items_set_font_for(option_menu, k07, font);
+  menu_items_set_font_for(option_menu, k08, font);
+  menu_items_set_font_for(option_menu, k09, font);
+  menu_items_set_font_for(option_menu, k10, font);
+
+  return option_menu;
+}
+
 MenuItems about_menu_load (SoFont *font)
 {
   static MenuItemsTab option_menu = {
     MENUITEM_INACTIVE(kAbout01),
     MENUITEM_BLANKLINE,
-      MENUITEM_INACTIVE(kVersion),
-      MENUITEM_BLANKLINE,
+    MENUITEM_INACTIVE(kVersion),
+    MENUITEM_BLANKLINE,
     MENUITEM_INACTIVE(kAbout02),
     MENUITEM_INACTIVE(kAbout03),
     MENUITEM_BLANKLINE,
@@ -565,6 +621,7 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   optionMenu = menu_new(options_menu_load(menuFont, smallFont),menuselector);
   controlsMenu = menu_new(controls_menu_load(menuFont, smallFont),menuselector);
   rulesMenu = menu_new(rules_menu_load(menuFont),menuselector);
+  highScoresMenu = menu_new(high_scores_menu_load(menuFont),menuselector);
   aboutMenu = menu_new(about_menu_load(menuFont),menuselector);
   singleGameMenu = menu_new(single_game_menu_load(menuFont,smallFont),menuselector);
   twoPlayerGameMenu = menu_new(two_player_game_menu_load(menuFont,smallFont),menuselector);
@@ -573,8 +630,10 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   menu_set_sounds (controlsMenu,   sound_pop, sound_slide);
   menu_set_sounds (mainMenu,       sound_pop, sound_slide);
   menu_set_sounds (rulesMenu,      sound_pop, sound_slide);
+  menu_set_sounds (highScoresMenu, sound_pop, sound_slide);
   menu_set_sounds (aboutMenu,      sound_pop, sound_slide);
   menu_set_sounds (singleGameMenu, sound_pop, sound_slide);
+  menu_set_sounds (twoPlayerGameMenu, sound_pop, sound_slide);
   menu_set_sounds (menu_pause    , sound_pop, sound_slide);
 
   scrollingText = scrolling_text_new(
@@ -628,6 +687,12 @@ void PuyoCommander::run()
                         optionMenuLoop(NULL);
                         menu_show (menu);
                     }
+                    if (menu_active_is (menu, kHighScores)) {
+                        menu_hide(menu);
+                        updateHighScoresMenu();
+                        backLoop(highScoresMenu);
+                        menu_show(menu);
+                    }
                     if (menu_active_is (menu, "Rules")) {
                         menu_hide(menu);
                         backLoop(rulesMenu);
@@ -662,37 +727,57 @@ void PuyoCommander::run()
 mml_fin:
   menu_hide (menu);
 }
+  
+void PuyoCommander::updateHighScoresMenu()
+{
+  hiscore *scores = getHiscores();
+  char tmp[256];
+#define PAS_DE_COMMENTAIRES(X,kXX) \
+  sprintf(tmp, "%06d   %10s", scores[X].score, scores[X].name); \
+  menu_set_value(highScoresMenu,kXX,tmp);
+
+  PAS_DE_COMMENTAIRES(0,k01);
+  PAS_DE_COMMENTAIRES(1,k02);
+  PAS_DE_COMMENTAIRES(2,k03);
+  PAS_DE_COMMENTAIRES(3,k04);
+  PAS_DE_COMMENTAIRES(4,k05);
+  PAS_DE_COMMENTAIRES(5,k06);
+  PAS_DE_COMMENTAIRES(6,k07);
+  PAS_DE_COMMENTAIRES(7,k08);
+  PAS_DE_COMMENTAIRES(8,k09);
+  PAS_DE_COMMENTAIRES(9,k10);
+}
 
 bool PuyoCommander::changeControlLoop(int controlIndex, PuyoDrawable *starter)
 {
-    bool keyPressed = false;
-    while (1) {
-        SDL_Event e;
-        
-        while (SDL_PollEvent (&e)) {
-            GameControlEvent controlEvent;
-            bool tryOk = tryChangeControl(controlIndex, e, &controlEvent);
-            
-            switch (controlEvent.cursorEvent) {
-                case GameControlEvent::kQuit:
-                    exit(0);
-                    goto mml_fin;
-                    break;
-                case GameControlEvent::kBack:
-                    goto mml_fin;
-                    break;
-                default:
-                    break;
-            }
-            if (tryOk) {
-              keyPressed = true;
-              goto mml_fin;
-            }
-        }
-        updateAll(starter);
+  bool keyPressed = false;
+  while (1) {
+    SDL_Event e;
+
+    while (SDL_PollEvent (&e)) {
+      GameControlEvent controlEvent;
+      bool tryOk = tryChangeControl(controlIndex, e, &controlEvent);
+
+      switch (controlEvent.cursorEvent) {
+        case GameControlEvent::kQuit:
+          exit(0);
+          goto mml_fin;
+          break;
+        case GameControlEvent::kBack:
+          goto mml_fin;
+          break;
+        default:
+          break;
+      }
+      if (tryOk) {
+        keyPressed = true;
+        goto mml_fin;
+      }
     }
+    updateAll(starter);
+  }
 mml_fin:
-    return keyPressed;
+  return keyPressed;
 }
 
 void PuyoCommander::controlsMenuLoop(PuyoDrawable *d)
@@ -821,62 +906,62 @@ mml_fin:
 void PuyoCommander::optionMenuLoop(PuyoDrawable *d)
 {
   menu_show(optionMenu);
-    while (1) {
-        SDL_Event e;
-        
-        while (SDL_PollEvent (&e)) {
-            GameControlEvent controlEvent;
-            getControlEvent(e, &controlEvent);
-            
-            switch (controlEvent.cursorEvent) {
-                case GameControlEvent::kQuit:
-                    exit(0);
-                    goto mml_fin;
-                    break;
-                case GameControlEvent::kUp:
-                    menu_prev_item (optionMenu);
-                    break;
-                case GameControlEvent::kDown:
-                    menu_next_item (optionMenu);
-                    break;
-                case GameControlEvent::kStart:
-                    menu_validate (optionMenu);
-                    if (menu_active_is (optionMenu, "Back"))
-                        goto mml_fin;
-                    if (menu_active_is (optionMenu, kFullScreen)) {
-                        fullscreen  = menu_switch_on_off(optionMenu, kFullScreen);
-                        SetBoolPreference(kFullScreen,fullscreen);
-                        display = SDL_SetVideoMode( 640, 480, 0,  SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));
-                    }
-                    if (menu_active_is (optionMenu, kMusic)) {
-                        sound = menu_switch_on_off(optionMenu, kMusic);
-                        SetBoolPreference(kMusic,sound);
-                        audio_set_music_on_off(sound);
-                        if (sound) audio_music_start(0);
-                    }
-                    if (menu_active_is (optionMenu, kAudioFX)) {
-                        fx = menu_switch_on_off(optionMenu, kAudioFX);
-                        SetBoolPreference(kAudioFX,fx);
-                        audio_set_sound_on_off(fx);
-                    }
-                    if (menu_active_is (optionMenu, kControls)) {
-                        menu_hide (optionMenu);
-                        controlsMenuLoop(d);
-                        menu_show(optionMenu);
-                    }
-                    break;
-                case GameControlEvent::kBack:
-                    goto mml_fin;
-                    break;
-                default:
-                    break;
-            }
-        }
-        
-        updateAll(d);
+  while (1) {
+    SDL_Event e;
+
+    while (SDL_PollEvent (&e)) {
+      GameControlEvent controlEvent;
+      getControlEvent(e, &controlEvent);
+
+      switch (controlEvent.cursorEvent) {
+        case GameControlEvent::kQuit:
+          exit(0);
+          goto mml_fin;
+          break;
+        case GameControlEvent::kUp:
+          menu_prev_item (optionMenu);
+          break;
+        case GameControlEvent::kDown:
+          menu_next_item (optionMenu);
+          break;
+        case GameControlEvent::kStart:
+          menu_validate (optionMenu);
+          if (menu_active_is (optionMenu, "Back"))
+            goto mml_fin;
+          if (menu_active_is (optionMenu, kFullScreen)) {
+            fullscreen  = menu_switch_on_off(optionMenu, kFullScreen);
+            SetBoolPreference(kFullScreen,fullscreen);
+            display = SDL_SetVideoMode( 640, 480, 0,  SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));
+          }
+          if (menu_active_is (optionMenu, kMusic)) {
+            sound = menu_switch_on_off(optionMenu, kMusic);
+            SetBoolPreference(kMusic,sound);
+            audio_set_music_on_off(sound);
+            if (sound) audio_music_start(0);
+          }
+          if (menu_active_is (optionMenu, kAudioFX)) {
+            fx = menu_switch_on_off(optionMenu, kAudioFX);
+            SetBoolPreference(kAudioFX,fx);
+            audio_set_sound_on_off(fx);
+          }
+          if (menu_active_is (optionMenu, kControls)) {
+            menu_hide (optionMenu);
+            controlsMenuLoop(d);
+            menu_show(optionMenu);
+          }
+          break;
+        case GameControlEvent::kBack:
+          goto mml_fin;
+          break;
+        default:
+          break;
+      }
     }
+
+    updateAll(d);
+  }
 mml_fin:
-        menu_hide (optionMenu);
+  menu_hide (optionMenu);
 }
 
 void PuyoCommander::backLoop(Menu *menu)
@@ -977,8 +1062,8 @@ void PuyoCommander::startTwoPlayerGameLoop()
   char player1Name[256];
   char player2Name[256];
 
-  strcpy(player1Name, "Player 1");
-  strcpy(player2Name, "Player 2");
+  GetStrPreference("Player1 Name", player1Name, "Ugh");
+  GetStrPreference("Player2 Name", player2Name, "Arf");
   menu_set_value(twoPlayerGameMenu, kPlayer1Name, player1Name);
   menu_set_value(twoPlayerGameMenu, kPlayer2Name, player2Name);
 
@@ -1050,6 +1135,9 @@ mml_play:
     score2 += myStarter.rightPlayerWin();
     currentMusicTheme = (currentMusicTheme + 1) % NB_MUSIC_THEME;
   }
+
+  SetStrPreference("Player1 Name", player1Name);
+  SetStrPreference("Player2 Name", player2Name);
 }
 
 
@@ -1061,7 +1149,8 @@ struct SelIA {
 void PuyoCommander::startSingleGameLoop()
 {
   char playerName[256];
-  strcpy(playerName, "HUMAN"); /* TODO: Charger/Sauver dans les prefs */
+
+  GetStrPreference("Player1 Name", playerName, "Ugh");
   menu_set_value(singleGameMenu, kPlayerName, playerName);
   
   menu_show(singleGameMenu);
@@ -1099,10 +1188,6 @@ void PuyoCommander::startSingleGameLoop()
   
 mml_play:
   menu_hide (singleGameMenu);
-
-  static char *AI_NAMES[] = { "Fanzy", "Bob the Killer", "Big Rabbit", "Flying Saucer",
-    "Satanas", "Doctor X", "Tanya", "Master Gyom",
-    "X","Y","Z" };
 
   SelIA ia1[] = { {RANDOM, 350}, {FLOBO, 350}, {FLOBO, 250}, {FLOBO, 180}, {FLOBO,  90}, {JEKO, 350}, {TANIA, 320}, {FLOBO, 62}, {RANDOM,0} };
   SelIA ia2[] = { {FLOBO,  190}, {JEKO , 180}, {TANIA, 160}, {FLOBO,  90}, {GYOM , 210}, {TANIA, 90}, {JEKO,   80}, {GYOM,  90}, {RANDOM,0} };
@@ -1157,6 +1242,7 @@ mml_play:
       break;
     }
   }
+  SetStrPreference("Player1 Name", playerName);
   audio_music_start(0);
 }
 
@@ -1170,6 +1256,7 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
   menu_update (optionMenu, display);
   menu_update (controlsMenu, display);
   menu_update (rulesMenu, display);
+  menu_update (highScoresMenu, display);
   menu_update (aboutMenu, display);
   menu_update (singleGameMenu, display);
   menu_update (twoPlayerGameMenu, display);
@@ -1196,6 +1283,7 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
     menu_draw (optionMenu, display);
     menu_draw (controlsMenu, display);
     menu_draw (rulesMenu, display);
+    menu_draw (highScoresMenu, display);
     menu_draw (aboutMenu, display);
     menu_draw (singleGameMenu, display);
     menu_draw (twoPlayerGameMenu, display);

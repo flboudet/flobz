@@ -50,12 +50,15 @@ class PuyoCommander
   Menu *optionMenu;
   Menu *controlsMenu;
   Menu *rulesMenu;
+  Menu *highScoresMenu;
   Menu *aboutMenu;
   ScrollingText *scrollingText;
   unsigned int cycle, start_time;
 
   static const int player1Joystick = 1;
   static const int player2Joystick = 0;
+
+  void updateHighScoresMenu();
 };
 
 SDL_Surface * IMG_Load_DisplayFormat (const char *path);
