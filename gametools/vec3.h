@@ -155,9 +155,31 @@ public:
     }
 };
 
-struct Vec2 {
-    float x,y;
+class Vec2 : public Vec3
+{
+  public:
+    Vec2(float x = 0.0f, float y = 0.0f) : Vec3(x,y,0.0f) {}
+    Vec2(const Vec3 &v3) : Vec3(v3.x,v3.y,0.0f) {}
+
+    void set(float x, float y) {
+      this->x = x;
+      this->y = y;
+    }
+
+    float getX() const { return x; }
+    float getY() const { return y; }
+
+    float getDirection() {
+      Vec2 v = normalized();
+      // calculate the angle from a unit vector
+      if( v.x<0 ) return (float)3.1415f - (float)asin(v.y);
+      return (float)asin(v.y);
+    }
 };
+
+static inline Vec2 average(const Vec2 &v1, const Vec2 &v2) {
+  return Vec2((v1.x + v2.x) * 0.5f, (v1.y + v2.y) * 0.5f);
+}
 
 static const Vec3 X_AXIS(1.0f,0.0f,0.0f);
 static const Vec3 Y_AXIS(0.0f,1.0f,0.0f);

@@ -100,6 +100,10 @@ class GameLoop : public IdleComponent, DrawableComponent
       this->surface = surface;
     }
 
+    double getCurrentTime() const {
+      return 0.001 * (double)SDL_GetTicks();
+    }
+    
   private:
     SDL_Surface *surface;
     Vector<GameComponent>     components;

@@ -40,6 +40,10 @@ IIM_Surface * IIM_Load_DisplayFormatAlpha (const char *fname)
     exit(1);
   }
   retsurf = SDL_DisplayFormatAlpha (tmpsurf);
+  if (!retsurf) {
+    perror("Texture converion failed (is Display initialized?)\n");
+    exit(1);
+  }
   SDL_SetAlpha (retsurf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
   SDL_FreeSurface (tmpsurf);
   return IIM_RegisterImg(retsurf, true);
@@ -60,11 +64,15 @@ void IIM_Free(IIM_Surface *img)
 
 IIM_Surface * IIM_RegisterImg(SDL_Surface *img, bool isAlpha)
 {
-  imgList[imgListSize].isAlpha = isAlpha;
-  imgList[imgListSize].surf    = img;
-  imgList[imgListSize].w       = img->w;
-  imgList[imgListSize].h       = img->h;
-  return &(imgList[imgListSize++]);
+  IIM_Surface *_this = &imgList[imgListSize++];
+  _this->isAlpha = isAlpha;
+  _this->surf    = img;
+  _this->w       = img->w;
+  _this->h       = img->h;
+  for (int i=0; i<36; ++i)
+    _this->rotated[i] = NULL;
+  _this->rotated[0] = _this;
+  return _this;
 }
 
 void IIM_ReConvertAll(void)
@@ -317,6 +325,9 @@ RGBA iim_hsva2rgba(HSVA c)
   return ret;
 }
 
+/**
+ * Shift the hue of a surface
+ */
 IIM_Surface *iim_surface_shift_hue(IIM_Surface *isrc, float hue_offset)
 {
   SDL_Surface *src = isrc->surf;
@@ -351,6 +362,9 @@ IIM_Surface *iim_surface_shift_hue(IIM_Surface *isrc, float hue_offset)
   return IIM_RegisterImg(ret2, true);
 }
 
+/**
+ * Change the value (luminosity) of each pixel in a surface
+ */
 IIM_Surface *iim_surface_set_value(IIM_Surface *isrc, float value)
 {
   SDL_Surface *src = isrc->surf;
@@ -381,6 +395,66 @@ IIM_Surface *iim_surface_set_value(IIM_Surface *isrc, float value)
   return IIM_RegisterImg(ret2, true);
 }
 
+/**
+ * rotate a surface into a surface of the same size (may lost datas)
+ */
+IIM_Surface *iim_rotate(IIM_Surface *isrc, int degrees)
+{
+    SDL_Surface *src = isrc->surf;
+    SDL_PixelFormat *fmt = src->format;
+    SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
+                                            fmt->Rmask, fmt->Gmask,
+                                            fmt->Bmask, fmt->Amask);
+    float radians = degrees * 3.1415f / 180.0f;
+    float cosa    = cos(radians);
+    float sina    = sin(radians);
+    float cx = src->w / 2;
+    float cy = src->h / 2;
+    SDL_LockSurface(src);
+    SDL_LockSurface(ret);
+    for (int y=src->h; y--;)
+    {
+        for (int x=src->w; x--;)
+        {
+            float vx  = (float)x - cx;
+            float vy  = (float)y - cy;
+            float fromX = (cosa * vx - sina * vy) + cx;
+            float fromY = (sina * vx + cosa * vy) + cy;
+            RGBA rgba = {0,0,0,0};
+            if ((fromX>=0)&&(fromY>=0)&&(fromX<src->w)&&(fromY<src->h-1)) {
+
+              float ix = floor(fromX);
+              float iy = floor(fromY);
+
+              float ex = fromX - ix;
+              float ey = fromY - iy;
+              float mex = 1.0f - ex;
+              float mey = 1.0f - ey;
+
+              int iix = (int)ix;
+              int iiy = (int)iy;
+
+              RGBA c11 = iim_surface_get_rgba(src,iix,iiy);
+              RGBA c12 = iim_surface_get_rgba(src,iix,iiy+1);
+              RGBA c21 = iim_surface_get_rgba(src,iix+1,iiy);
+              RGBA c22 = iim_surface_get_rgba(src,iix+1,iiy+1);
+
+              rgba.red = (int)(mex*mey*c11.red + mex*ey*c12.red + ex*mey*c21.red + ex*ey*c22.red);
+              rgba.green = (int)(mex*mey*c11.green + mex*ey*c12.green + ex*mey*c21.green + ex*ey*c22.green);
+              rgba.blue = (int)(mex*mey*c11.blue + mex*ey*c12.blue + ex*mey*c21.blue + ex*ey*c22.blue);
+              rgba.alpha = (int)(mex*mey*c11.alpha + mex*ey*c12.alpha + ex*mey*c21.alpha + ex*ey*c22.alpha);
+            }
+            iim_surface_set_rgba(ret,x,y,rgba);
+        }
+    }
+    SDL_UnlockSurface(src);
+    SDL_UnlockSurface(ret);
+    SDL_Surface *ret2 = SDL_DisplayFormatAlpha(ret);
+    SDL_SetAlpha(ret2, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
+    SDL_FreeSurface(ret);
+    return IIM_RegisterImg(ret2, true);
+}
+
 void iim_surface_convert_to_gray(IIM_Surface *isrc)
 {
   SDL_Surface *src = isrc->surf;
@@ -400,3 +474,29 @@ void iim_surface_convert_to_gray(IIM_Surface *isrc)
   isrc->surf = SDL_DisplayFormat(src);
   SDL_FreeSurface(src);
 }
+
+
+void IIM_BlitSurface(IIM_Surface *src, IIM_Rect *src_rect, SDL_Surface *dst, SDL_Rect *dst_rect)
+{
+  SDL_BlitSurface(src->surf, src_rect, dst, dst_rect);
+}
+
+void IIM_BlitRotatedSurfaceCentered(IIM_Surface *src, int degrees, SDL_Surface *dst, int x, int y)
+{
+  while (degrees < 0) degrees+=8640;
+  degrees /= 10;
+  degrees %= 36;
+  if (!src->rotated[degrees]) {
+    // Generated rotated image.
+    src->rotated[degrees] = iim_rotate(src, degrees * 10);
+  }
+  x -= src->w/2;
+  y -= src->h/2;
+  IIM_Rect rect;
+  rect.x = x;
+  rect.y = y;
+  rect.w = src->w;
+  rect.h = src->h;
+  IIM_BlitSurface(src->rotated[degrees], NULL, dst, &rect);
+}
+

@@ -178,7 +178,9 @@ namespace gameui {
     if (activeWidget < 0) activeWidget = 0;
     if (activeWidget >= getNumberOfChilds())
       activeWidget = getNumberOfChilds() - 1;
- 
+    
+    if (activeWidget < 0) return;
+
     Widget *child = getChild(activeWidget);
     child->giveFocus();
     child->eventOccured(event);
@@ -297,7 +299,7 @@ namespace gameui {
   // ScreenVBox
   //
   
-  Screen::Screen(float x, float y, float width, float height, GameLoop *loop) : VBox(loop)
+  Screen::Screen(float x, float y, float width, float height, GameLoop *loop) : VBox(loop), bg(NULL)
   {
     setPosition(Vec3(x, y, 1.0f));
     setSize(Vec3(width, height, 1.0f));

@@ -41,12 +41,15 @@ void iim_surface_set_rgba(SDL_Surface *surface,
 HSVA iim_rgba2hsva(RGBA c);
 RGBA iim_hsva2rgba(HSVA c);
 
-typedef struct {
+typedef struct _IIM_Surface {
   SDL_Surface *surf;
   int w;
   int h;
   bool isAlpha;
+  struct _IIM_Surface *rotated[36];
 } IIM_Surface;
+
+#define IIM_Rect SDL_Rect
 
 IIM_Surface *iim_surface_shift_hue(IIM_Surface *src, float hue_offset);
 IIM_Surface *iim_surface_set_value(IIM_Surface *src, float value);
@@ -58,6 +61,8 @@ void          IIM_Free(IIM_Surface *img);
 IIM_Surface * IIM_RegisterImg(SDL_Surface *img, bool isAlpha);
 void          IIM_ReConvertAll(void);
 
+void IIM_BlitSurface(IIM_Surface *src, IIM_Rect *src_rect, SDL_Surface *dst, SDL_Rect *dst_rect);
+void IIM_BlitRotatedSurfaceCentered(IIM_Surface *src, int degrees, SDL_Surface *dst, int x, int y);
 
 extern char *dataFolder;
 

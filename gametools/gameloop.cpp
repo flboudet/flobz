@@ -133,7 +133,7 @@ void GameLoop::run()
   draw();
   while (!finished)
   {
-    double currentTime = 0.001 * (double)SDL_GetTicks();
+    double currentTime = getCurrentTime();
     idle(currentTime);
     if (!isLate(currentTime) && drawRequested())
       draw();
