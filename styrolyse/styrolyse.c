@@ -52,7 +52,7 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
 
 /**/
 
-void bind(GoomSL *gsl)
+static void bind(GoomSL *gsl)
 {
   gsl_bind_function(gsl, "say",   sprite_say);
   gsl_bind_function(gsl, "draw",  sprite_draw);
