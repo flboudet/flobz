@@ -52,7 +52,7 @@ private:
 	public:
 		SocketInputStream(int fdesc);
 		int streamAvailable();
-		int streamRead(VoidBuffer buffer);
+		int streamRead(VoidBuffer buffer, int size);
 	private:
 			int socketID;
 	};
@@ -60,7 +60,7 @@ private:
 	class SocketOutputStream : public OutputStream {
 	public:
 		SocketOutputStream(int fdesc);
-		int streamWrite(VoidBuffer buffer);
+		int streamWrite(VoidBuffer buffer, int size);
 	private:
 		int socketID;
 	};

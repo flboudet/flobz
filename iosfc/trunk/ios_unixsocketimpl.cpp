@@ -125,9 +125,8 @@ int UnixSocketImpl::SocketInputStream::streamAvailable()
 	return result;
 }
 
-int UnixSocketImpl::SocketInputStream::streamRead(VoidBuffer buffer)
+int UnixSocketImpl::SocketInputStream::streamRead(VoidBuffer buffer, int size)
 {
-    int size = buffer.size();
 	int opResult = read(socketID, buffer.ptr(), size);
 	if ((opResult == 0) && (size > 0)) {
 		throw Exception("IosSocket: Socket disconnected");
@@ -147,9 +146,8 @@ UnixSocketImpl::SocketOutputStream::SocketOutputStream(int fdesc)
 	socketID = fdesc;
 }
 
-int UnixSocketImpl::SocketOutputStream::streamWrite(VoidBuffer buffer)
+int UnixSocketImpl::SocketOutputStream::streamWrite(VoidBuffer buffer, int size)
 {
-    int size = buffer.size();
 	int opResult = write(socketID, buffer.ptr(), size);
 	if ((opResult == 0) && (size > 0)) {
 		throw Exception("IosSocket: Socket disconnected");

@@ -10,6 +10,10 @@
 
 namespace ios_fc {
 
+int InputStream::streamRead(VoidBuffer buffer) {
+    streamRead(buffer, buffer.size());
+}
+
 void InputStream::streamReadAll (VoidBuffer buf) {
 	static const int step = 256;
 	int nb = step;
@@ -23,6 +27,11 @@ void InputStream::streamReadAll (VoidBuffer buf) {
 		}
 	}
 	buf.reduce(step);
+}
+
+int OutputStream::streamWrite(VoidBuffer buffer)
+{
+    streamWrite(buffer, buffer.size());
 }
 
 };

@@ -47,9 +47,16 @@ namespace ios_fc {
 
             /**
              * Read datas from stream.
+             * @param buffer the buffer to store datas
+             * @param size the size to read into buffer
+             */
+            virtual int streamRead(VoidBuffer buffer, int size) = 0;
+            
+            /**
+             * Read datas from stream.
              * @param buffer the buffer to store datas (buffer.size() octets will be read)
              */
-            virtual int streamRead(VoidBuffer buffer) = 0;
+            virtual int streamRead(VoidBuffer buffer);
 
             /**
              * Read all the datas from the stream till its end.
@@ -67,9 +74,16 @@ namespace ios_fc {
 
             /**
              * Write datas to stream.
-             * @param buffer the buffer to store datas (buffer.size() octets will be read)
+             * @param buffer the buffer to store datas
+             * @param size the size to write to the stream
              */
-            virtual int streamWrite(VoidBuffer buffer) = 0;
+            virtual int streamWrite(VoidBuffer buffer, int size) = 0;
+            
+            /**
+             * Write datas to stream.
+             * @param buffer the buffer where are the datas to write (buffer.size() octets will be written)
+             */
+            virtual int streamWrite(VoidBuffer buffer);
     };
 
 };
