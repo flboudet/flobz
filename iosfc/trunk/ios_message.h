@@ -27,16 +27,19 @@ class Message
     virtual void addBool      (const String key, bool value);
     virtual void addString    (const String key, const String value);
     virtual void addIntArray  (const String key, const Buffer<int> value);
+    virtual void addCharArray (const String key, const Buffer<char> value);
 
     bool hasInt       (const String key) const;
     bool hasBool      (const String key) const;
     bool hasString    (const String key) const;
     bool hasIntArray  (const String key) const;
+    bool hasCharArray (const String key) const;
 
-    int                getInt      (const String key) const throw(DataException);
-    bool               getBool     (const String key) const throw(DataException);
-    const String       getString   (const String key) const throw(DataException);
-    const Buffer<int>  getIntArray (const String key) const throw(DataException);
+    int                getInt       (const String key) const throw(DataException);
+    bool               getBool      (const String key) const throw(DataException);
+    const String       getString    (const String key) const throw(DataException);
+    const Buffer<int>  getIntArray  (const String key) const throw(DataException);
+    const Buffer<char> getCharArray (const String key) const throw(DataException);
 
     virtual void addIntProperty   (const String key, const int value);
     virtual void addBoolProperty  (const String key, const bool property);
@@ -48,6 +51,9 @@ class Message
     bool getBoolProperty  (const String key) const throw(PropertyException);
 
     virtual void send() const = 0;
+
+    //virtual void setPeer(PeerAddress paddress) const = 0;
+    //virtual PeerAddress setPeer() const = 0;
 
   protected:
     Message();

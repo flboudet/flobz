@@ -8,6 +8,7 @@ namespace ios_fc {
   static const String BOOLEAN    = "B";
   static const String STRING     = "S";
   static const String INT_ARRAY  = "A";
+  static const String CHAR_ARRAY  = "C";
   static const String PARAM_INTEGER = "PI";
   static const String PARAM_BOOLEAN = "PB";
   
@@ -68,6 +69,20 @@ namespace ios_fc {
     for (int i=0;i<value.size();++i)
     {
       s->operator+=(String(",") + value[i]);
+    }
+    serialized.add(s);
+  }
+  
+  void StandardMessage::addCharArray(const String key, const Buffer<char> value)
+  {
+    Message::addCharArray(key,value);
+    String *s = new String(key + ":" + CHAR_ARRAY + ":" + value.size() + ",");
+    for (int i=0;i<value.size();++i)
+    {
+      static const char *hex16[16] =
+        { "0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f" };
+      s->operator+=(hex16[(value[i] >> 4) & 0x0f]);
+      s->operator+=(hex16[value[i] & 0x0f]);
     }
     serialized.add(s);
   }
@@ -143,6 +158,26 @@ namespace ios_fc {
           buffer[i] = atoi(value.substring(index));
         }
         addIntArray(key, buffer);
+      }
+      else if (type == CHAR_ARRAY) {
+        Buffer<char> buffer(atoi(value));
+        int index = 0;
+        while(value[index] && (value[index] != ',')) index++;
+        if (value[index] == 0)
+            throw InvalidMessageException();
+        if (value.size() - index != buffer.size() * 2 + 1)
+            throw InvalidMessageException();
+        for (int i=0; i<buffer.size(); i++) {
+          char c1, c2;
+          c1 = value[++index];
+          c2 = value[++index];
+          if ((c1 >= '0') && (c1 <= '9')) c1 -= '0';
+          else c1 -= ('a' - 10);
+          if ((c2 >= '0') && (c2 <= '9')) c2 -= '0';
+          else c2 -= ('a' - 10);
+          buffer[i] = (c1 << 4) | c2;
+        }
+        addCharArray(key, buffer);
       }
 
       if (sraw[end] == 0) { checkMessage(); return; }

@@ -20,12 +20,12 @@ namespace ios_fc {
       bool isReliable() const;
       int  getSerialID() const;
       void send() const;
-      virtual void sendBuffer(Buffer<char> out) const = 0;
 
       void addInt       (const String key, int value);
       void addBool      (const String key, bool value);
       void addString    (const String key, const String value);
       void addIntArray  (const String key, const Buffer<int> value);
+      void addCharArray (const String key, const Buffer<char> value);
 
       void addIntProperty   (const String key, const int value);
       void addBoolProperty  (const String key, const bool property);
@@ -33,6 +33,8 @@ namespace ios_fc {
       const Buffer<char> serialize() const;
       
     private:
+      virtual void sendBuffer(Buffer<char> out) const {}
+
       AdvancedBuffer<String *> serialized;
       void checkMessage() throw(InvalidMessageException);
   };

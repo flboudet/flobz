@@ -8,7 +8,8 @@ enum ValueType {
   INTEGER = 1,
   BOOLEAN = 2,
   STRING  = 3,
-  INT_ARRAY = 4
+  INT_ARRAY = 4,
+  CHAR_ARRAY = 5
 };
   
 class ValueInterface
@@ -51,6 +52,11 @@ class ValueIntArray : public Value<Buffer<int> > {
     ValueIntArray(const Buffer<int> array) : Value<Buffer<int> >(array, INT_ARRAY) {}
 };
 
+class ValueCharArray : public Value<Buffer<char> > {
+  public:
+    ValueCharArray(const Buffer<char> array) : Value<Buffer<char> >(array, CHAR_ARRAY) {}
+};
+
 /* class Message */
 
 Message::Message()
@@ -80,6 +86,11 @@ void Message::addString    (const String key, const String value)
 void Message::addIntArray  (const String key, const Buffer<int> value)
 {
   datas.put(key, new ValueIntArray(value));
+}
+
+void Message::addCharArray  (const String key, const Buffer<char> value)
+{
+  datas.put(key, new ValueCharArray(value));
 }
 
 void Message::addIntProperty   (const String key, const int value)
@@ -132,6 +143,11 @@ bool Message::hasIntArray  (const String key) const
   return datas.get(key) != NULL;
 }
     
+bool Message::hasCharArray  (const String key) const
+{
+  return datas.get(key) != NULL;
+}
+    
 
 int Message::getInt      (const String key) const throw(DataException)
 {
@@ -175,6 +191,17 @@ const Buffer<int> Message::getIntArray (const String key) const throw(DataExcept
     throw DataException(key + " is not an IntArray");
 
   return val_intarray->getValue();
+}
+
+const Buffer<char> Message::getCharArray (const String key) const throw(DataException)
+{
+  ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, CHAR_ARRAY, "CharArray");
+
+  ValueCharArray* val_chararray = dynamic_cast<ValueCharArray*>(val_interface);
+  if (val_chararray == NULL)
+    throw DataException(key + " is not a CharArray");
+
+  return val_chararray->getValue();
 }
 
 
