@@ -29,8 +29,6 @@ class PuyoCommander : public MessageListener
     PuyoCommander(bool fullscreen, bool sound, bool audio);
     void run();
 
-    void updateAll(DrawableComponent *starter, SDL_Surface *extra_surf = NULL);
-
     /*
        bool changeControlLoop(int controlIndex, PuyoDrawable *starter);
        void controlsMenuLoop(PuyoDrawable *d);

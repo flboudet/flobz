@@ -104,9 +104,6 @@ void PuyoCommander::run()
 {
   GameUIDefaults::SCREEN_STACK->push(mainMenu);
   GameUIDefaults::GAME_LOOP->run();
-/*  while(1) {
-    updateAll(NULL);
-  }*/
 }
 
 void PuyoCommander::initMenus()
@@ -240,17 +237,6 @@ void PuyoCommander::loadPreferences(bool fs, bool snd, bool audio)
 #endif
   sound = GetBoolPreference(kMusic,snd);
   fx = GetBoolPreference(kAudioFX,audio);
-}
-
-
-
-void PuyoCommander::updateAll(DrawableComponent *starter, SDL_Surface *extra_surf)
-{
-  double currentTime = loop->getCurrentTime();
-  loop->idle(currentTime);
-  if (!loop->isLate(currentTime) && loop->drawRequested()) {
-    loop->draw();
-  }
 }
 
 void PuyoCommander::onMessage(Message &msb) {}
