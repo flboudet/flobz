@@ -95,8 +95,8 @@ static char *kAbout06 = "                   Guillaume 'gyom' Borios";
 static char *kAbout07 = "Beta Goddess:                        ";
 static char *kAbout08 = "                                           Tania";
 
-static char *AI_NAMES[] = { "Fanzy", "Gizmo", "Big Rabbit", "Flying Saucer",
-  "Satanas", "Doctor X", "Tanya", "Master Gyom",
+static char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
+  "Satanas", "Doctor X", "Tanya", "Mr Gyom",
   "The Duke","Jeko","--------" };
 
 
@@ -387,6 +387,8 @@ MenuItems high_scores_menu_load (SoFont *font)
   {
     MENUITEM_INACTIVE(kHighScores),
     MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
+    MENUITEM_BLANKLINE,
     MENUITEM_INACTIVE(k01),
     MENUITEM_INACTIVE(k02),
     MENUITEM_INACTIVE(k03),
@@ -397,7 +399,6 @@ MenuItems high_scores_menu_load (SoFont *font)
     MENUITEM_INACTIVE(k08),
     MENUITEM_INACTIVE(k09),
     MENUITEM_INACTIVE(k10),
-    MENUITEM_BLANKLINE,
     MENUITEM("Back"),
     MENUITEM_END
   };
@@ -584,6 +585,7 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
 #endif
 
   initControllers();
+  initHiScores(AI_NAMES);
   
   audio_init();
   audio_music_start(0);
@@ -731,7 +733,7 @@ mml_fin:
   
 void PuyoCommander::updateHighScoresMenu()
 {
-  hiscore *scores = getHiscores(AI_NAMES);
+  hiscore *scores = getHiScores();
   char tmp[256];
 #define PAS_DE_COMMENTAIRES(X,kXX) \
   sprintf(tmp, "%s - %d", scores[X].name, scores[X].score); \
