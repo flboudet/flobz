@@ -58,6 +58,7 @@ namespace ios_fc {
             impl->decrementUsage();
             impl = a.impl;
             impl->incrementUsage();
+            return *this;
         }
         bool operator == (const SocketAddress &a) const {
             return (*impl == *(a.impl));
