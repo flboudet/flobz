@@ -1,7 +1,7 @@
 #ifndef PUYOPLAYER_H
 #define PUYOPLAYER_H
 
-#include "Puyoview.h"
+#include "PuyoView.h"
 #include "PuyoGame.h"
 
 class PuyoPlayer {

@@ -3,9 +3,9 @@
 # July 2004
 
 ENABLE_AUDIO=true
-ENABLE_OPENGL=false
+ENABLE_OPENGL=true
 
-#BINDIR=/usr/games/
+
 DATADIR=\"data\"
 
 SDL_CONFIG=sdl-config
@@ -13,8 +13,6 @@ CC=g++
 CXX=g++
 
 CFLAGS=`$(SDL_CONFIG) --cflags` -g -I/sw/include -DDATADIR=${DATADIR}
-
-
 
 HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h\
         PuyoGame.h PuyoAnimations.h AnimatedPuyo.h PuyoIA.h PuyoPlayer.h     \
@@ -37,12 +35,15 @@ endif
 
 ifeq ($(ENABLE_AUDIO), true)
 CFLAGS:=$(CFLAGS) -DUSE_AUDIO=1
-OBJFILES:=$(OBJFILES) glSDL.o
+OBJFILES:=$(OBJFILES)
 endif
 
 ifeq ($(ENABLE_OPENGL), true)
 CFLAGS:=$(CFLAGS) -DHAVE_OPENGL=1
 OBJFILES:=$(OBJFILES) glSDL.o
+ifeq ($(PLATFORM), Linux)
+LDFLAGS:=$(LDFLAGS) -lGL
+endif
 endif
 
 CXXFLAGS=${CFLAGS}
@@ -50,7 +51,7 @@ CXXFLAGS=${CFLAGS}
 all: prelude flobopuyo
 
 flobopuyo: ${OBJFILES}
-	@echo "[flobopuyo]" && g++ $(CFLAGS) -o flobopuyo `$(SDL_CONFIG) --cflags --libs` -lSDL_mixer -lSDL_image ${OBJFILES}
+	@echo "[flobopuyo]" && g++ $(CFLAGS) $(LDFLAGS) -o flobopuyo `$(SDL_CONFIG) --cflags --libs` -lSDL_mixer -lSDL_image ${OBJFILES}
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
 	@[ "x`cat WARNINGS | wc -l`" != "x0" ] && echo -e "--------------------------------------\n There have been some warnings:\n" && cat WARNINGS && rm -f WARNINGS && echo "--------------------------------------" || true
@@ -113,21 +114,6 @@ clean:
 	rm -rf .xvpics data/.xvpics    data/*/.xvpics
 	rm -rf FloboPuyo.app
 	rm -f  .DS_Store data/.DS_Store data/*/.DS_Store .gdb_history
-
-#_install: ${OBJFILES}
-#	g++ $(CFLAGS) -o flobopuyo `$(SDL_CONFIG) --cflags --static-libs` -lSDL_mixer -lSDL_image ${OBJFILES}
-
-#install: _install
-#	strip --strip-all flobopuyo
-#	mkdir -p ${DATADIR}
-#	cp -r data/* ${DATADIR}
-#	chmod a+rx ${DATADIR}
-#	chmod a+rx ${DATADIR}/sfx
-#	chmod a+rx ${DATADIR}/gfx
-#	chmod a+rx ${DATADIR}/story
-#	chmod -R a+r ${DATADIR}
-#	cp ./flobopuyo ${BINDIR}/flobopuyo
-#	chmod a+rx ${BINDIR}/flobopuyo
 
 bundle_name = FloboPuyo.app
 
