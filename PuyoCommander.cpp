@@ -97,7 +97,7 @@ static char *kAbout08 = "                                           Tania";
 
 static char *AI_NAMES[] = { "Fanzy", "Bob the Killer", "Big Rabbit", "Flying Saucer",
   "Satanas", "Doctor X", "Tanya", "Master Gyom",
-  "--------","--------","--------" };
+  "The Duke","Jeko","--------" };
 
 
 extern SDL_Surface *display, *image;
@@ -158,6 +158,7 @@ main_menu_load (SoFont * font)
     MENUITEM ("Options"),
     MENUITEM_BLANKLINE,
     MENUITEM (kHighScores),
+    MENUITEM_BLANKLINE,
     MENUITEM ("Rules"),
     MENUITEM ("About FloboPuyo"),
     MENUITEM_BLANKLINE,
