@@ -311,7 +311,7 @@ void Corona::drawReflected()
 void Corona::blurImage()
 {
   for (int y = 1; y < m_real_height - 1; ++y) {
-    m_image[y * m_width] = 0;
+    m_real_image[y * m_width] = 0;
     for (int x = 1; x < m_width - 1; ++x) {
       int n = x + y * m_width;
       int val = m_real_image[n + 1];
