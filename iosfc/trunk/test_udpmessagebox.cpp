@@ -17,6 +17,12 @@ class PuyoNetwork : public MessageListener
       if (message.getString("type") == String("play")) {
         printf("%s wants to play !\n", (const char*)message.getString("name"));
       }
+      if (message.getString("type") == String("pok")) {
+        printf("%s is ok to play !\n", (const char*)message.getString("name"));
+      }
+      if (message.getString("type") == String("pnok")) {
+        printf("%s doesn't want to play !\n", (const char*)message.getString("name"));
+      }
     }
 
     void idle() {
