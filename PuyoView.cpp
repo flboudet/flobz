@@ -245,7 +245,7 @@ public:
                 drect.w = puyoFace->w;
                 drect.h = puyoFace->h;
                 painter.requestDraw(puyoFace, &drect);
-                painter.requestDraw(puyoEyes, &drect);
+                if (puyoFace != neutral) painter.requestDraw(puyoEyes, &drect);
         }
     }
 private:
@@ -286,7 +286,7 @@ public:
                 drect.w = puyoFace->w;
                 drect.h = puyoFace->h;
                 painter.requestDraw(puyoFace, &drect);
-                painter.requestDraw(puyoEyes, &drect);
+                if (puyoFace != neutral) painter.requestDraw(puyoEyes, &drect);
             }
         }
         else {
@@ -431,6 +431,7 @@ void PuyoView::render(PuyoPuyo *puyo)
             drect.h = currentSurface->h;
             painter.requestDraw(currentSurface, &drect);
             
+            if (currentSurface != neutral) {
             while (puyoEyeState[i][j] >= 750) puyoEyeState[i][j] -= 750;
             int eyePhase = puyoEyeState[i][j];
             if (eyePhase < 5) 
@@ -441,6 +442,7 @@ void PuyoView::render(PuyoPuyo *puyo)
                 painter.requestDraw(puyoEye[1], &drect);
             else
                 painter.requestDraw(puyoEye[0], &drect);
+            }
         }
     }
     else {
@@ -477,14 +479,15 @@ void PuyoView::render()
 	vrect.y = yOffset;
 	vrect.w = TSIZE * PUYODIMX;
 	vrect.h = TSIZE * PUYODIMY;
-    SDL_SetClipRect(display, &vrect);
+    /* TODO : Le nouveau systeme ne permet pas de faire des cliprect, a contourner */
+    //SDL_SetClipRect(display, &vrect);
     for (int i = 0 ; i < PUYODIMX ; i++) {
         for (int j = 0 ; j < PUYODIMY ; j++) {
             puyoEyeState[i][j]++;
             PuyoPuyo *currentPuyo = attachedGame->getPuyoAt(i, j);
-            if ((currentPuyo != NULL) && (currentPuyo->getAttachedObject() == NULL)) {
-                drect.x = xOffset + i * TSIZE + 10;
-                drect.y = yOffset + j * TSIZE + 10;
+            if ((currentPuyo != NULL) && (getSurfaceForPuyo(currentPuyo) != neutral) && (currentPuyo->getAttachedObject() == NULL)) {
+                drect.x = xOffset + i * TSIZE -5;
+                drect.y = yOffset + j * TSIZE -5;
                 if (currentPuyo->getPuyoState() < PUYO_EMPTY)
                     drect.y -= attachedGame->getSemiMove() * TSIZE / 2;
                 drect.w = puyoShadow->w;
@@ -493,7 +496,7 @@ void PuyoView::render()
             }
         }
     }
-    SDL_SetClipRect(display, NULL);
+    //SDL_SetClipRect(display, NULL);
     
 	for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
         PuyoPuyo *currentPuyo = attachedGame->getPuyoAtIndex(i);
@@ -513,7 +516,7 @@ void PuyoView::render()
 		drect.w = currentSurface->w;
 		drect.h = currentSurface->h;
 		painter.requestDraw(currentSurface, &drect);
-    painter.requestDraw(puyoEyes, &drect);
+    if (currentSurface != neutral) painter.requestDraw(puyoEyes, &drect);
 	}
 	currentSurface = getSurfaceForState(attachedGame->getNextCompanion());
 	if (currentSurface != NULL) {
@@ -522,7 +525,7 @@ void PuyoView::render()
 		drect.w = currentSurface->w;
 		drect.h = currentSurface->h;
 		painter.requestDraw(currentSurface, &drect);
-    painter.requestDraw(puyoEyes, &drect);
+    if (currentSurface != neutral) painter.requestDraw(puyoEyes, &drect);
 	}
 }
 
