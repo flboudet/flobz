@@ -402,6 +402,10 @@ namespace ios_fc {
                 return -1;
             }
             inline void remove() { used--; }
+            inline void removeAt(int i) {
+                this->get(i) = this->get(size()-1);
+                used--;
+            }
             
             inline int capacity() const { return Buffer<T>::size(); }
             inline int size()     const { return used; }
