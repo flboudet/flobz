@@ -27,6 +27,7 @@
 #include "PuyoMessageDef.h"
 #include <stdlib.h>
 
+using namespace PuyoMessage;
 
 PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox) : PuyoGame(attachedFactory), msgBox(msgBox)
 {
@@ -36,7 +37,7 @@ PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBo
 
 void PuyoNetworkGame::onMessage(Message &message)
 {
-    int msgType = message.getInt("TYPE");
+    int msgType = message.getInt(TYPE);
     switch (msgType) {
         case kGameState:
             synchronizeState(message);
