@@ -52,9 +52,6 @@ class Message
 
     virtual void send() const = 0;
 
-    //virtual void setPeer(PeerAddress paddress) const = 0;
-    //virtual PeerAddress setPeer() const = 0;
-
   protected:
     Message();
     

@@ -66,8 +66,7 @@ namespace ios_fc {
   {
     Message::addIntArray(key,value);
     String *s = new String(key + ":" + INT_ARRAY + ":" + value.size());
-    for (int i=0;i<value.size();++i)
-    {
+    for (int i=0;i<value.size();++i) {
       s->operator+=(String(",") + value[i]);
     }
     serialized.add(s);

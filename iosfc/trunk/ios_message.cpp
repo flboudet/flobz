@@ -63,9 +63,14 @@ Message::Message()
 {
 }
 
+class DeleteAction : public HashMapAction {
+  public:
+    void action(HashValue *value) { delete value->ptr; }
+};
+
 Message::~Message()
 {
-  /* TODO: delete hashmap content */
+  datas.foreach(new DeleteAction);
 }
 
 void Message::addInt       (const String key, int value)

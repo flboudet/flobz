@@ -36,7 +36,7 @@
 #include <cstring>
 #include <cstdio>
 
-#define DEBUG_MEMORY
+// #define DEBUG_MEMORY
 
 //
 // important note for users:
@@ -76,7 +76,7 @@ namespace ios_fc {
                 int size;
                 int nb;
             };
-#ifdef DEBUG_MEMORY
+#ifdef DEBUG
             inline void init_ptr (int size);
 #else
             inline void init_ptr (int size) {
@@ -337,7 +337,7 @@ namespace ios_fc {
                 return buf;
             }
 
-#ifdef DEBUG_MEMORY
+#ifdef DEBUG
             inline T operator[] (int i) const;
             inline T &operator[] (int i);
 #else
@@ -534,7 +534,7 @@ namespace ios_fc {
             }
 
             String substring(int first, int last) const {
-#ifdef DEBUG_MEMORY
+#ifdef DEBUG
                 if (last < first) fprintf(stderr, "BAD SUBSTRING. %d >= %d\n", first, last);
                 if (last > size()) fprintf(stderr, "BAD SUBSTRING %d > size(%d)\n", last, size());
 #endif
@@ -646,7 +646,10 @@ void ios_fc::Memory::free (void *ptr) {
     
     ::free(ptr);
 }
-            
+
+#endif
+
+#ifdef DEBUG
 template<typename T>
     inline T ios_fc::Buffer<T>::operator[] (int i) const {
         if ((i>=0)&&(i<size()))

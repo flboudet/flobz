@@ -55,6 +55,12 @@ void ios_hash_iput_int  (IosHash *_this, int key, int i);
 void ios_hash_iput_float(IosHash *_this, int key, float f);
 void ios_hash_iput_ptr  (IosHash *_this, int key, void *ptr);
 
+
+class HashMapAction {
+  public:
+    virtual void action(HashValue *value) = 0;
+};
+
 // A Hashmap where keys are strings.
 class HashMap {
     private:
@@ -70,6 +76,8 @@ class HashMap {
         HashValue *get     (const char *key) const { return ios_hash_get(hash, key);      }
         HashValue *get_like(const char *key) const { return ios_hash_get_like(hash, key); }
         void       remove  (const char *key)       { ios_hash_remove(hash, key);          }
+
+        void foreach(HashMapAction *action);
 };
 
 // A Hashmap where keys are ints.

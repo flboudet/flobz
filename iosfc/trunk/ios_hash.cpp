@@ -274,4 +274,18 @@ void ios_hash_iput_ptr(IosHash *_this, int key, void *ptr) {
     ios_hash_iput(_this,key,value);
 }
 
+void ios_hash_foreach(IosHashEntry *entry, HashMapAction *action)
+{
+  if (entry == NULL) return;
+  action->action(&entry->value);
+  ios_hash_foreach(entry->lower, action);
+  ios_hash_foreach(entry->upper, action);
+}
+
+void HashMap::foreach(HashMapAction *action)
+{
+  ios_hash_foreach(hash->root, action);
+}
+
 };
+
