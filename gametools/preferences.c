@@ -14,6 +14,22 @@
 
 #include <CoreFoundation/CoreFoundation.h>
 
+void SetIntPreference(char * name, int value)
+{
+    CFStringRef nom = CFStringCreateWithCString (NULL,name,CFStringGetSystemEncoding());
+    if (nom != NULL)
+    {
+        CFNumberRef aValue = CFNumberCreate(NULL,kCFNumberIntType,&value);
+        if (aValue != NULL)
+        {
+            CFPreferencesSetAppValue (nom,aValue,kCFPreferencesCurrentApplication);
+            (void)CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
+            CFRelease(aValue);
+        }
+        CFRelease(nom);
+    }
+}
+
 void SetBoolPreference(char * name, int value)
 {
     CFStringRef nom = CFStringCreateWithCString (NULL,name,CFStringGetSystemEncoding());
@@ -25,9 +41,34 @@ void SetBoolPreference(char * name, int value)
     }
 }
 
+int GetIntPreference(char * name, int defaut)
+{
+    int retour = defaut;
+    
+    CFStringRef nom = CFStringCreateWithCString (NULL,name,CFStringGetSystemEncoding());
+    
+    if (nom != NULL)
+    {
+        CFNumberRef value = (CFNumberRef)CFPreferencesCopyAppValue(nom,kCFPreferencesCurrentApplication);
+        
+        if (value != NULL)
+        {
+           if (CFGetTypeID(value) == CFNumberGetTypeID ())
+           {
+            if (CFNumberGetValue (value, kCFNumberIntType,&retour) == false);
+            retour = defaut;
+           }
+            CFRelease(value);
+        }        
+        CFRelease(nom);
+    }
+    
+    return retour;
+}
+
 int GetBoolPreference(char * name, int defaut)
 {
-    int retour;
+    int retour = defaut;
     
     CFStringRef nom = CFStringCreateWithCString (NULL,name,CFStringGetSystemEncoding());
     
@@ -35,17 +76,16 @@ int GetBoolPreference(char * name, int defaut)
     {
         CFStringRef value = (CFStringRef)CFPreferencesCopyAppValue(nom,kCFPreferencesCurrentApplication);
     
-        if ((value != NULL) && (CFGetTypeID(value) == CFGetTypeID(CFSTR("YES"))))
+        if (value != NULL)
         {
-            retour = (CFStringCompare(value, CFSTR("YES"), kCFCompareCaseInsensitive) == kCFCompareEqualTo) ? 1 : 0;
-            
+            if (CFGetTypeID(value) == CFStringGetTypeID ())
+            {
+                retour = (CFStringCompare(value, CFSTR("YES"), kCFCompareCaseInsensitive) == kCFCompareEqualTo) ? 1 : 0;
+            }
             CFRelease(value);
         }
-        else retour = defaut;
-        
         CFRelease(nom);
     }
-    else retour = defaut;
     
     
     return retour;
@@ -104,7 +144,13 @@ static void fetchFile(void)
     fclose(prefs);
 }
 
+
 void SetBoolPreference(char * name, int value)
+{
+    SetIntPreference(name, value);
+}
+
+void SetIntPreference(char * name, int value)
 {
     char * key;
     FILE * prefs;
@@ -136,6 +182,11 @@ void SetBoolPreference(char * name, int value)
 
 
 int GetBoolPreference(char * name, int defaut)
+{
+    return GetIntPreference(name,defaut)?true:false;
+}
+
+int GetIntPreference(char * name, int defaut)
 {
     char * key, *copiedfile;
     
