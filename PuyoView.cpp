@@ -317,13 +317,16 @@ void PuyoView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY)
     ((AnimatedPuyo *)puyo)->addAnimation(new FallingAnimation(*(AnimatedPuyo *)puyo, originY, xOffset, yOffset, 16));
 }
 
-void PuyoView::puyoWillVanish(IosVector &puyoGroup, int groupNum, int phase)
+void PuyoView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase)
 {
     AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
     viewAnimations.addElement(new VanishSoundAnimation(phase, synchronizer));
-    for (int i = 0, j = puyoGroup.getSize() ; i < j ; i++) {
-        AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(puyoGroup.getElementAt(i));
-        currentPuyo->addAnimation(new VanishAnimation(*currentPuyo, i*2 , xOffset, yOffset, synchronizer));
+    for (int i = 0, j = puyoGroup.size() ; i < j ; i++) {
+        AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(puyoGroup[i]);
+        if (currentPuyo->getPuyoState() != PUYO_NEUTRAL)
+            currentPuyo->addAnimation(new VanishAnimation(*currentPuyo, i*2 , xOffset, yOffset, synchronizer));
+        else
+            currentPuyo->addAnimation(new NeutralPopAnimation(*currentPuyo, i*2, synchronizer));
     }
     // A revoir
     if (groupNum == 0) {

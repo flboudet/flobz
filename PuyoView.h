@@ -82,7 +82,7 @@ class PuyoView : public PuyoDelegate {
     void gameDidEndCycle();
     void companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise);
     void puyoDidFall(PuyoPuyo *puyo, int originX, int originY);
-    void puyoWillVanish(IosVector &puyoGroup, int groupNum, int phase);
+    void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase);
     void gameLost();
     
   protected:

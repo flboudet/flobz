@@ -344,6 +344,8 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
         live[2] = IIM_Load_DisplayFormatAlpha("2live.png");
         live[3] = IIM_Load_DisplayFormatAlpha("3live.png");
         
+        NeutralPopAnimation::initResources();
+        
         grid          = IIM_Load_DisplayFormatAlpha("grid.png");
         firstTime = false;
     }

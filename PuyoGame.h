@@ -26,8 +26,6 @@
 #include "ios_memory.h"
 using namespace ios_fc;
 
-#include "IosVector.h"
-
 #ifdef _WIN32
 #define srandom srand
 #define random rand
@@ -70,25 +68,44 @@ private:
 // A PuyoPuyo is an entity of the game
 class PuyoPuyo {
 public:
-    PuyoPuyo(PuyoState state);
+    PuyoPuyo(PuyoState state) : state(state), X(0), Y(0), puyoID(lastID++), flag(false), bmark(false) {}
     virtual ~PuyoPuyo() {};
-    PuyoState getPuyoState() const;
-    void setPuyoState(PuyoState state);
-    bool PuyoPuyo::isFalling();
-    int getPuyoX() const;
-    int getPuyoY() const;
-    void setPuyoXY(int X, int Y);
-    void setFlag() { flag = true; }
-    void unsetFlag() { flag = false; }
-    bool getFlag() const { return flag; }
-    int getID() const { return puyoID; }
-    void setID(int id) { puyoID = id; }
+    inline PuyoState getPuyoState() const {
+        if (this != NULL)
+            return state;
+        return PUYO_EMPTY;
+    }
+    inline void setPuyoState(PuyoState state) { if (this != NULL) this->state = state; }
+    inline bool PuyoPuyo::isFalling() { return (state < PUYO_EMPTY); }
+    inline int getPuyoX() const {
+        if (this != NULL)
+            return X;
+        return 0;
+    }
+    inline int getPuyoY() const {
+        if (this != NULL)
+            return Y;
+        return 0;
+    }
+    inline void setPuyoXY(int X, int Y) {
+        if (this != NULL)
+            this->X = X; this->Y = Y;
+    }
+    inline void setFlag() { flag = true; }
+    inline void unsetFlag() { flag = false; }
+    inline bool getFlag() const { return flag; }
+    inline int getID() const { return puyoID; }
+    inline void setID(int id) { puyoID = id; }
+    inline void mark() { if (this != NULL) bmark = true; }
+    inline void unmark() { if (this != NULL) bmark = false; }
+    inline void setMark(bool pmark) { if (this != NULL) bmark = pmark; }
+    inline bool isMarked() const { if (this != NULL) return bmark; return false; }
 private:
     int puyoID;
     static int lastID;
     PuyoState state;
     int X, Y;
-    bool flag;
+    bool flag, bmark;
 };
 
 // The puyos must be created by a factory to ensure custom puyo creation
@@ -112,7 +129,7 @@ public:
 				int companionVector,
 				bool counterclockwise) = 0;
   virtual void puyoDidFall(PuyoPuyo *puyo, int originX, int originY) = 0;
-  virtual void puyoWillVanish(IosVector &puyoGroup, int groupNum, int phase) = 0;
+  virtual void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase) = 0;
   virtual void gameDidEndCycle() = 0;
   virtual void gameLost() = 0;
 };
@@ -230,7 +247,7 @@ private:
     void setFallingAtTop(bool gameConstruction = false);
     int getFallY(int X, int Y) const;
     void cycleEnding();
-    void markPuyoAt(int X, int Y, PuyoState color, bool includeNeutral);
+    void markPuyoAt(int X, int Y, bool mark, bool includeNeutral);
     void deleteMarkedPuyosAt(int X, int Y);
     int removePuyos();
     void notifyReductions();

@@ -140,6 +140,21 @@ private:
     AnimationSynchronizer *synchronizer;
 };
 
+class NeutralPopAnimation : public PuyoAnimation {
+public:
+    NeutralPopAnimation(AnimatedPuyo &puyo, int delay, AnimationSynchronizer *synchronizer);
+    virtual ~NeutralPopAnimation();
+    void cycle();
+    void draw(int semiMove);
+    static void initResources();
+private:
+    AnimationSynchronizer *synchronizer;
+    int iter, delay;
+    bool once;
+    int X, Y;
+    static IIM_Surface *neutralPop[3];
+};
+
 class SmoothBounceAnimation : public PuyoAnimation {
 public:
     SmoothBounceAnimation(AnimatedPuyo &puyo, AnimationSynchronizer *synchronizer);

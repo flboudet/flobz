@@ -74,7 +74,7 @@ private:
     PuyoState nextFalling, nextCompanion;
     PuyoPuyo *fakePuyo;
     MessageBox &msgBox;
-    IosVector puyoVector;
+    AdvancedBuffer<PuyoPuyo *> puyoVector;
     int semiMove;
     int neutralPuyos, sentBadPuyos;
 };

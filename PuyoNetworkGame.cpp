@@ -76,7 +76,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
         if (currentPuyo == NULL) {
             currentPuyo = attachedFactory->createPuyo((PuyoState)(puyos[i+1]));
             currentPuyo->setID(currentPuyoID);
-            puyoVector.addElement(currentPuyo);
+            puyoVector.add(currentPuyo);
         }
         else {
             currentPuyo->setPuyoState((PuyoState)(puyos[i+1]));
@@ -87,14 +87,14 @@ void PuyoNetworkGame::synchronizeState(Message &message)
         i += 4;
     }
     
-    for (int i = puyoVector.getSize() - 1 ; i >= 0 ; i--) {
-        PuyoPuyo *currentPuyo = (PuyoPuyo *)(puyoVector.getElementAt(i));
+    for (int i = puyoVector.size() - 1 ; i >= 0 ; i--) {
+        PuyoPuyo *currentPuyo = puyoVector[i];
         if (currentPuyo->getFlag()) {
             currentPuyo->unsetFlag();
         }
         else {
             setPuyoAt(currentPuyo->getPuyoX(), currentPuyo->getPuyoY(), NULL);
-            puyoVector.removeElementAt(i);
+            puyoVector.removeAt(i);
             attachedFactory->deletePuyo(currentPuyo);
         }
     }
@@ -131,14 +131,14 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     if (willVanish.size() > 0) {
        if (delegate != NULL) {
             int i = 0;
-            IosVector temporaryGroup;
+            AdvancedBuffer<PuyoPuyo *> temporaryGroup;
             while (i < willVanish.size()) {
-                temporaryGroup.removeAllElements();
+                temporaryGroup.clear();
                 int numPhase = willVanish[i++];
                 int groupNumber = willVanish[i++];
                 int numberOfPuyosInGroup = willVanish[i++];
                 for (int index = 0 ; index < numberOfPuyosInGroup ; index++) {
-                    temporaryGroup.addElement(findPuyo(willVanish[i + index]));
+                    temporaryGroup.add(findPuyo(willVanish[i + index]));
                 }
                 delegate->puyoWillVanish(temporaryGroup, groupNumber, numPhase);
                 i += numberOfPuyosInGroup;
@@ -159,8 +159,8 @@ void PuyoNetworkGame::synchronizeState(Message &message)
 
 PuyoPuyo *PuyoNetworkGame::findPuyo(int puyoID)
 {
-    for (int i = 0, j = puyoVector.getSize() ; i < j ; i++) {
-        PuyoPuyo *currentPuyo = (PuyoPuyo *)(puyoVector.getElementAt(i));
+    for (int i = 0, j = puyoVector.size() ; i < j ; i++) {
+        PuyoPuyo *currentPuyo = puyoVector[i];
         if (currentPuyo->getID() == puyoID)
             return currentPuyo;
     }
@@ -188,12 +188,12 @@ void PuyoNetworkGame::setPuyoAt(int X, int Y, PuyoPuyo *newPuyo)
 // List access to the PuyoPuyo objects
 int PuyoNetworkGame::getPuyoCount() const
 {
-    return puyoVector.getSize();
+    return puyoVector.size();
 }
 
 PuyoPuyo *PuyoNetworkGame::getPuyoAtIndex(int index) const
 {
-    return (PuyoPuyo *)(puyoVector.getElementAt(index));
+    return puyoVector[index];
 }
   
 PuyoState PuyoNetworkGame::getNextFalling()

@@ -350,6 +350,65 @@ void VanishSoundAnimation::draw(int semiMove)
     // do nothing
 }
 
+NeutralPopAnimation::NeutralPopAnimation(AnimatedPuyo &puyo, int delay, AnimationSynchronizer *synchronizer)
+    : PuyoAnimation(puyo), synchronizer(synchronizer), iter(0), delay(delay), once(false),
+      X(attachedPuyo.getScreenCoordinateX()), Y(attachedPuyo.getScreenCoordinateY())
+{
+    synchronizer->push();
+    synchronizer->incrementUsage();
+    enabled = false;
+}
+
+NeutralPopAnimation::~NeutralPopAnimation()
+{
+    synchronizer->decrementUsage();
+}
+
+void NeutralPopAnimation::cycle()
+{
+    if (once == false) {
+        once = true;
+        synchronizer->pop();
+    }
+    else if (synchronizer->isSynchronized()) {
+        iter ++;
+        if (iter == 17 + delay) {
+            audio_sound_play(sound_pop);
+            enabled = true;
+        }
+        else if (iter == 30 + delay) {
+            attachedPuyo.setVisible(false);
+            finishedFlag = true;
+        }
+    }
+}
+
+void NeutralPopAnimation::draw(int semiMove)
+{
+    SDL_Rect drect, xrect;
+    drect.x = X;
+    drect.y = Y;
+    drect.w = neutralPop[0]->w;
+    drect.h = neutralPop[0]->h;
+    if (iter - delay < 20) {
+        painter.requestDraw(neutralPop[0], &drect);
+    }
+    else if (iter - delay < 23) {
+        painter.requestDraw(neutralPop[1], &drect);
+    }
+    else if (iter - delay < 26) {
+        painter.requestDraw(neutralPop[2], &drect);
+    }
+}
+
+IIM_Surface *NeutralPopAnimation::neutralPop[3];
+void NeutralPopAnimation::initResources()
+{
+    neutralPop[0] = IIM_Load_DisplayFormatAlpha("explneutr01.png");
+    neutralPop[1] = IIM_Load_DisplayFormatAlpha("explneutr02.png");
+    neutralPop[2] = IIM_Load_DisplayFormatAlpha("explneutr03.png");
+}
+
 SmoothBounceAnimation::SmoothBounceAnimation(AnimatedPuyo &puyo, AnimationSynchronizer *synchronizer) : PuyoAnimation(puyo)
 {
     bounceOffset = 0;

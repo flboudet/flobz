@@ -141,15 +141,15 @@ void PuyoNetworkView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY)
     didFallBuffer.add(originY);
 }
 
-void PuyoNetworkView::puyoWillVanish(IosVector &puyoGroup, int groupNum, int phase)
+void PuyoNetworkView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase)
 {
     PuyoView::puyoWillVanish(puyoGroup, groupNum, phase);
     willVanishBuffer.add(phase);
     willVanishBuffer.add(groupNum);
-    willVanishBuffer.add(puyoGroup.getSize());
-    for (int i = 0 ; i < puyoGroup.getSize() ; i++)
+    willVanishBuffer.add(puyoGroup.size());
+    for (int i = 0 ; i < puyoGroup.size() ; i++)
     {
-        PuyoPuyo *currentPuyo = (PuyoPuyo *)puyoGroup.getElementAt(i);
+        PuyoPuyo *currentPuyo = puyoGroup[i];
         willVanishBuffer.add(currentPuyo->getID());
     }
 }

@@ -49,52 +49,6 @@ PuyoState PuyoRandomSystem::getPuyoForSequence(int sequence)
 }
 
 int PuyoPuyo::lastID = 0;
-PuyoPuyo::PuyoPuyo(PuyoState state)
-{
-    this->state = state;
-    X = 0; Y = 0;
-    puyoID = lastID++;
-}
-
-bool PuyoPuyo::isFalling()
-{
-    return (state < PUYO_EMPTY);
-}
-
-PuyoState PuyoPuyo::getPuyoState() const
-{
-    if (this != NULL)
-        return state;
-    return PUYO_EMPTY;
-}
-
-void PuyoPuyo::setPuyoState(PuyoState state)
-{
-  if (this != NULL)
-  this->state = state;
-}
-
-int PuyoPuyo::getPuyoX() const
-{
-  if (this != NULL)
-    return X;
-  return 0;
-}
-
-int PuyoPuyo::getPuyoY() const
-{
-  if (this != NULL)
-    return Y;
-  return 0;
-}
-
-void PuyoPuyo::setPuyoXY(int X, int Y)
-{
-  if (this != NULL)
-  {
-    this->X = X; this->Y = Y;
-  }
-}
 
 // PuyoGame implementation
 PuyoGame::PuyoGame()
@@ -505,34 +459,36 @@ int PuyoLocalGame::getSamePuyoAround(int X, int Y, PuyoState color)
   return nFound;
 }
 
-void PuyoLocalGame::markPuyoAt(int X, int Y, PuyoState color, bool includeNeutral)
+void PuyoLocalGame::markPuyoAt(int X, int Y, bool mark, bool includeNeutral)
 {
-	PuyoState currentPuyo = getPuyoCellAt(X, Y);
-	setPuyoCellAt(X, Y, color);
-	if (getPuyoCellAt(X-1, Y) == currentPuyo)
-		markPuyoAt(X-1, Y, color, includeNeutral);
-	if (getPuyoCellAt(X+1, Y) == currentPuyo)
-		markPuyoAt(X+1, Y, color, includeNeutral);
-	if (getPuyoCellAt(X, Y-1) == currentPuyo)
-		markPuyoAt(X, Y-1, color, includeNeutral);
-	if (getPuyoCellAt(X, Y+1) == currentPuyo)
-		markPuyoAt(X, Y+1, color, includeNeutral);
+    PuyoPuyo *currentPuyo = getPuyoAt(X, Y);
+    if (currentPuyo->isMarked() == mark)
+        return;
+	PuyoState currentPuyoState = getPuyoCellAt(X, Y);
+	currentPuyo->setMark(mark);
+	if (getPuyoCellAt(X-1, Y) == currentPuyoState)
+		markPuyoAt(X-1, Y, mark, includeNeutral);
+	if (getPuyoCellAt(X+1, Y) == currentPuyoState)
+		markPuyoAt(X+1, Y, mark, includeNeutral);
+	if (getPuyoCellAt(X, Y-1) == currentPuyoState)
+		markPuyoAt(X, Y-1, mark, includeNeutral);
+	if (getPuyoCellAt(X, Y+1) == currentPuyoState)
+		markPuyoAt(X, Y+1, mark, includeNeutral);
 	if (includeNeutral) {
 		if (getPuyoCellAt(X-1, Y) == PUYO_NEUTRAL)
-			setPuyoCellAt(X-1, Y, color);
+			getPuyoAt(X-1, Y)->setMark(mark);
 		if (getPuyoCellAt(X+1, Y) == PUYO_NEUTRAL)
-			setPuyoCellAt(X+1, Y, color);
+			getPuyoAt(X+1, Y)->setMark(mark);
 		if (getPuyoCellAt(X, Y-1) == PUYO_NEUTRAL)
-			setPuyoCellAt(X, Y-1, color);
+			getPuyoAt(X, Y-1)->setMark(mark);
 		if (getPuyoCellAt(X, Y+1) == PUYO_NEUTRAL)
-			setPuyoCellAt(X, Y+1, color);
+			getPuyoAt(X, Y+1)->setMark(mark);
 	}
 }
 
 // delete the marked puyos and the neutral next to them
 void PuyoLocalGame::deleteMarkedPuyosAt(int X, int Y)
 {
-	PuyoState currentPuyo = getPuyoCellAt(X, Y);
   puyoVector.remove(getPuyoAt(X, Y));
   if (getPuyoAt(X,Y) == companionPuyo) {
     attachedFactory->deletePuyo(getPuyoAt(X, Y));
@@ -545,13 +501,13 @@ void PuyoLocalGame::deleteMarkedPuyosAt(int X, int Y)
     attachedFactory->deletePuyo(getPuyoAt(X, Y));
   }
   setPuyoAt(X, Y, NULL);
-	if (getPuyoCellAt(X-1, Y) == currentPuyo)
+	if (getPuyoAt(X-1, Y)->isMarked())
 		deleteMarkedPuyosAt(X-1, Y);
-	if (getPuyoCellAt(X+1, Y) == currentPuyo)
+	if (getPuyoAt(X+1, Y)->isMarked())
 		deleteMarkedPuyosAt(X+1, Y);
-	if (getPuyoCellAt(X, Y-1) == currentPuyo)
+	if (getPuyoAt(X, Y-1)->isMarked())
 		deleteMarkedPuyosAt(X, Y-1);
-	if (getPuyoCellAt(X, Y+1) == currentPuyo)
+	if (getPuyoAt(X, Y+1)->isMarked())
 		deleteMarkedPuyosAt(X, Y+1);
     if (getPuyoCellAt(X-1, Y) == PUYO_NEUTRAL) {
         puyoVector.remove(getPuyoAt(X-1, Y));
@@ -584,25 +540,22 @@ int PuyoLocalGame::removePuyos()
 			PuyoState currentPuyo = getPuyoCellAt(i, j);
 			if ((currentPuyo >= PUYO_BLUE) && (currentPuyo <= PUYO_YELLOW)) {
 				int removedPuyos = 0;
-				markPuyoAt(i, j, PUYO_MARKED, false);
-				for (int u = 0 ; u < PUYODIMX ; u++) {
-					for (int v = 0 ; v <= PUYODIMY ; v++) {
-						if (getPuyoCellAt(u, v) == PUYO_MARKED) {
-							removedPuyos++;
-						}
-					}
-				}
+				markPuyoAt(i, j, true, false);
+                for (int u = 0, v = puyoVector.size() ; u < v ; u++) {
+                    if (puyoVector[u]->isMarked()) {
+                        removedPuyos++;
+                    }
+                }
 				//printf("Removed for %d, %d : %d\n", i, j, removedPuyos);
 				if (removedPuyos >= 4) {
 					globalRemovedPuyos += removedPuyos;
 					deleteMarkedPuyosAt(i, j);
 				}
 				else
-					markPuyoAt(i, j, currentPuyo, false);
+					markPuyoAt(i, j, false, false);
 			}
 		}
 	}
-    
 	/* Next we make the other puyos fall */
     for (int i = 0 ; i < PUYODIMX ; i++) {
         for (int j = PUYODIMY - 1 ; j > 0 ; j--) {
@@ -620,15 +573,13 @@ int PuyoLocalGame::removePuyos()
             }
         }
     }
-    
 	return globalRemovedPuyos;
 }
 
 
 void PuyoLocalGame::notifyReductions()
 {
-    IosVector removedPuyos;
-    
+    AdvancedBuffer<PuyoPuyo *> removedPuyos;
     // Clearing every puyo's flag
     for (int i = 0, j = getPuyoCount() ; i < j ; i++) {
         getPuyoAtIndex(i)->unsetFlag();
@@ -643,30 +594,28 @@ void PuyoLocalGame::notifyReductions()
                 PuyoState initialPuyoState = puyoToMark->getPuyoState();
                 // I really would have liked to skip this stupid test
                 if ((initialPuyoState >= PUYO_BLUE) && (initialPuyoState <= PUYO_YELLOW)) {
-                    markPuyoAt(i, j, PUYO_MARKED, false);
-                    
+                    markPuyoAt(i, j, true, true);
+
                     // Collecting every marked puyo in a vector
-                    removedPuyos.removeAllElements();
-                    for (int u = 0 ; u < PUYODIMX ; u++) {
-                        for (int v = 0 ; v <= PUYODIMY ; v++) {
-                            PuyoPuyo *markedPuyo = getPuyoAt(u, v);
-                            if (markedPuyo->getPuyoState() == PUYO_MARKED) {
-                                // mark the puyo so we wont'do the job twice
-                                markedPuyo->setFlag();
-                                removedPuyos.addElement(markedPuyo);
-                            }
+                    removedPuyos.clear();
+                    int removedCount = 0;
+                    for (int u = 0, v = puyoVector.size() ; u < v ; u++) {
+                        PuyoPuyo *markedPuyo = puyoVector[u];
+                        if (markedPuyo->isMarked()) {
+                            markedPuyo->setFlag();
+                            removedPuyos.add(markedPuyo);
+                            if (markedPuyo->getPuyoState() != PUYO_NEUTRAL)
+                                removedCount++;
                         }
                     }
-                    
-                    
                     // If there is more than 4 puyo in the group, let's notify it
-                    if (removedPuyos.getSize() >= 4) {
-                        markPuyoAt(i, j, initialPuyoState, false);
+                    if (removedCount >= 4) {
+                        markPuyoAt(i, j, false, true);
                         if (delegate != NULL)
                             delegate->puyoWillVanish(removedPuyos, puyoGroupNumber++, phase);
                     }
                     else {
-                        markPuyoAt(i, j, initialPuyoState, false);
+                        markPuyoAt(i, j, false, true);
                     }
                 }
 			}
