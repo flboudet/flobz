@@ -244,7 +244,6 @@ void FallingAnimation::draw(int semiMove)
 /* Puyo exploding and vanishing animation */
 VanishAnimation::VanishAnimation(AnimatedPuyo &puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer) : PuyoAnimation(puyo)
 {
-    puyoFace = PuyoView::getSurfaceForState(attachedPuyo.getPuyoState());
     this->xOffset = xOffset;
     this->yOffset = yOffset;
     this->X = (attachedPuyo.getPuyoX()*TSIZE) + xOffset;
@@ -289,44 +288,35 @@ void VanishAnimation::cycle()
 void VanishAnimation::draw(int semiMove)
 {
     if (iter < (10 + delay)) {
-        if (puyoFace && (iter % 2 == 0)) {
-            SDL_Rect drect;
-            drect.x = X;
-            drect.y = Y;
-            drect.w = puyoFace->w;
-            drect.h = puyoFace->h;
-            painter.requestDraw(puyoFace, &drect);
-            if (color != PUYO_NEUTRAL)
-                painter.requestDraw(puyoEyes, &drect);
+        if (iter % 2 == 0) {
+            attachedPuyo.renderAt(X, Y);
         }
     }
     else {
-        if (puyoFace) {
-            SDL_Rect drect, xrect;
-            drect.x = X;
-            drect.y = Y;// + (2.5 * pow(iter - 16, 2) - 108);
-                drect.w = puyoFace->w;
-                drect.h = puyoFace->h;
-                int iter2 = iter - 10 - delay;
-                int shrinkingImage = (iter - 10 - delay) / 4;
-                if (shrinkingImage < 4) {
-                    painter.requestDraw(shrinkingPuyo[shrinkingImage][color], &drect);
-                    int xrectY = Y + (int)(2.5 * pow(iter - 16 - delay, 2) - 108);
-                    xrect.w = explodingPuyo[shrinkingImage][color]->w;
-                    xrect.h = explodingPuyo[shrinkingImage][color]->h;
-                    xrect.x = X - iter2 * iter2;
-                    xrect.y = xrectY;
-                    painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
-                    xrect.x = X - iter2;
-                    xrect.y = xrectY + iter2;
-                    painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
-                    xrect.x = X + iter2;
-                    xrect.y = xrectY + iter2;
-                    painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
-                    xrect.x = X + iter2 * iter2;
-                    xrect.y = xrectY;
-                    painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
-                }
+        SDL_Rect drect, xrect;
+        drect.x = X;
+        drect.y = Y;// + (2.5 * pow(iter - 16, 2) - 108);
+        drect.w = shrinkingPuyo[0][0]->w;
+        drect.h = shrinkingPuyo[0][0]->h;
+        int iter2 = iter - 10 - delay;
+        int shrinkingImage = (iter - 10 - delay) / 4;
+        if (shrinkingImage < 4) {
+            painter.requestDraw(shrinkingPuyo[shrinkingImage][color], &drect);
+            int xrectY = Y + (int)(2.5 * pow(iter - 16 - delay, 2) - 108);
+            xrect.w = explodingPuyo[shrinkingImage][color]->w;
+            xrect.h = explodingPuyo[shrinkingImage][color]->h;
+            xrect.x = X - iter2 * iter2;
+            xrect.y = xrectY;
+            painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
+            xrect.x = X - iter2;
+            xrect.y = xrectY + iter2;
+            painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
+            xrect.x = X + iter2;
+            xrect.y = xrectY + iter2;
+            painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
+            xrect.x = X + iter2 * iter2;
+            xrect.y = xrectY;
+            painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
         }
     }
 }

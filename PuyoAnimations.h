@@ -121,7 +121,6 @@ public:
     void cycle();
     void draw(int semiMove);
 private:
-    IIM_Surface *puyoFace;
     int xOffset, yOffset;
     int X, Y, iter, color;
     AnimationSynchronizer *synchronizer;
