@@ -152,6 +152,7 @@ public:
   // We are keeping a list of current puyos
   IosVector puyoVector;
   int points;
+  int nbFalled;
 };
 
 #endif // PUYOGAME_H

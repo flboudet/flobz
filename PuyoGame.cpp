@@ -5,14 +5,7 @@
 #include <SDL/SDL.h>
 
 
-static int fallingTable[PUYODIMX][PUYODIMX] = {
-{2},
-{1, 4},
-{0, 3, 5},
-{0, 2, 4, 5},
-{0, 1, 3, 4, 5},
-{0, 1, 2, 3, 4, 5}
-};
+static int fallingTable[PUYODIMX] = {0, 3, 1, 4, 2, 5};
 
 PuyoRandomSystem::PuyoRandomSystem()
 {
@@ -88,6 +81,7 @@ void *PuyoPuyo::getAttachedObject()
 
 PuyoGame::PuyoGame(PuyoRandomSystem *attachedRandom)
 {
+  nbFalled = 0;
 	int i, j;
     unmoveablePuyo = new PuyoPuyo(PUYO_UNMOVEABLE);
 	for (i = 0 ; i < PUYODIMX ; i++) {
@@ -314,14 +308,16 @@ void PuyoGame::dropNeutrals()
     points -= neutralPuyos * 1000;
   }
 
-    while (neutralPuyos > 0) {
+    while (neutralPuyos > 0)
+    {
       int cycleNeutral;
       if (neutralPuyos >=  PUYODIMX)
         cycleNeutral = PUYODIMX;
       else
         cycleNeutral = neutralPuyos;
-      for (int i = 0 ; i < cycleNeutral ; i++) {
-        int posX = fallingTable[cycleNeutral-1][i];
+      for (int i = 0 ; i < cycleNeutral ; i++)
+      {
+        int posX = fallingTable[(nbFalled++) % PUYODIMX];
         int posY = getFallY(posX, 2);
         neutralPuyos -= 1;
         if (getPuyoCellAt(posX, posY) != PUYO_EMPTY)
