@@ -3,7 +3,7 @@
 
 #define MAX_PAINT_ELTS 0x800
 
-#include <SDL/SDL.h>
+#include "glSDL.h"
 
 struct DrawElt {
   SDL_Surface *surf;

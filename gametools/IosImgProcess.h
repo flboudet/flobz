@@ -258,8 +258,8 @@ static SDL_Surface *iim_surface_shift_hue(SDL_Surface *src, float hue_offset)
       iim_surface_set_rgba(ret,x,y,rgba);
     }
   }
-  SDL_UnlockSurface(src);
   SDL_UnlockSurface(ret);
+  SDL_UnlockSurface(src);
   SDL_Surface *ret2 = SDL_DisplayFormatAlpha(ret);
 	SDL_SetAlpha(ret2, SDL_SRCALPHA | SDL_RLEACCEL, SDL_ALPHA_OPAQUE);
 	SDL_FreeSurface(ret);

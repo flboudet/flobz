@@ -2,8 +2,8 @@
 #include <math.h>
 #include <unistd.h>
 #include <string.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include "glSDL.h"
+/* #include <SDL/SDL_image.h> */
 #include "PuyoCommander.h"
 #include "PuyoView.h"
 #include "PuyoVersion.h"
@@ -65,6 +65,7 @@ char *kPuyosInvasion   = "You stopped Puyo's invasion.\n"
 static char *kAudioFX     = "Audio FX\t";
 static char *kMusic       = "Music\t";
 static char *kFullScreen  = "FullScreen\t";
+static char *kOpenGL      = "Use OpenGL\t";
 static char *kControls    = "Change controls...";
 static char *kGameLevel   = "Choose Game Level";
 static char *kLevelEasy   = "Easy";
@@ -110,6 +111,7 @@ PuyoCommander *theCommander;
 const int cycle_duration = 20;
 
 static bool fullscreen = true;
+static bool useGL = false;
 static bool sound = true;
 static bool fx = true;
 
@@ -459,6 +461,9 @@ MenuItems options_menu_load (SoFont *font, SoFont *small_font)
 #ifndef _WIN32
     MENUITEM(kFullScreen),
 #endif
+#ifdef HAVE_OPENGL
+    MENUITEM(kOpenGL),
+#endif
     MENUITEM_BLANKLINE,
     MENUITEM(kMusic),
     MENUITEM(kAudioFX),
@@ -475,6 +480,10 @@ MenuItems options_menu_load (SoFont *font, SoFont *small_font)
 #ifndef _WIN32
   menu_items_set_font_for(option_menu,  kFullScreen, font);
   menu_items_set_value_for(option_menu, kFullScreen, fullscreen?"ON":"OFF");
+#endif
+#ifdef HAVE_OPENGL
+  menu_items_set_font_for(option_menu,  kOpenGL, font);
+  menu_items_set_value_for(option_menu, kOpenGL, useGL?"ON":"OFF");
 #endif
   menu_items_set_value_for(option_menu, kMusic,      sound?"ON":"OFF");
   menu_items_set_value_for(option_menu, kAudioFX,    fx?"ON":"OFF");
@@ -555,6 +564,9 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
 
   SDL_Delay(500);
   fullscreen = GetBoolPreference(kFullScreen,fs);
+#ifdef HAVE_OPENGL
+  useGL      = GetBoolPreference(kOpenGL,0);
+#endif
   sound = GetBoolPreference(kMusic,snd);
   fx = GetBoolPreference(kAudioFX,audio);
 
@@ -562,8 +574,7 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   int audio_volume = GetIntPreference(kAudioVolume, 80);
 
   initGameControls();
-   
-#ifdef __linux__
+#ifdef __linux___
   /* This Hack Allows Hardware Surface on Linux */
   setenv("SDL_VIDEODRIVER","dga",0);
 
@@ -599,7 +610,7 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   audio_set_volume(audio_volume);
   audio_music_set_volume(music_volume);
 
-  display = SDL_SetVideoMode( 640, 480, 0,  SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));
+  display = SDL_SetVideoMode( 640, 480, 0,  SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0)|(useGL?SDL_GLSDL:0));
   if ( display == NULL ) {
     fprintf(stderr, "SDL_SetVideoMode error: %s\n",
             SDL_GetError());
@@ -941,7 +952,13 @@ void PuyoCommander::optionMenuLoop(PuyoDrawable *d)
           if (menu_active_is (optionMenu, kFullScreen)) {
             fullscreen  = menu_switch_on_off(optionMenu, kFullScreen);
             SetBoolPreference(kFullScreen,fullscreen);
-            display = SDL_SetVideoMode( 640, 480, 0,  SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));
+            SDL_WM_ToggleFullScreen(display);
+            /* display = SDL_SetVideoMode( 640, 480, 0,  SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0)|(useGL?SDL_GLSDL:0)); */
+          }
+          if (menu_active_is (optionMenu, kOpenGL)) {
+            fullscreen  = menu_switch_on_off(optionMenu, kOpenGL);
+            SetBoolPreference(kOpenGL,useGL);
+            /* display = SDL_SetVideoMode( 640, 480, 0,  SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0)|(useGL?SDL_GLSDL:0)); */
           }
           if (menu_active_is (optionMenu, kMusic)) {
             sound = menu_switch_on_off(optionMenu, kMusic);

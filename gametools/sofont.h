@@ -40,7 +40,7 @@
 #ifndef __SOFONT_H
 #define __SOFONT_H
 
-#include <SDL/SDL.h>
+#include "glSDL.h"
 
 typedef struct _SOFONT SoFont;
 

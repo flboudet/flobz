@@ -1,7 +1,7 @@
 #ifndef _GAME_CONT_H
 #define _GAME_CONT_H
 
-#include <SDL/SDL.h>
+#include "glSDL.h"
 #include "InputManager.h"
 
 typedef struct GameControlEvent {

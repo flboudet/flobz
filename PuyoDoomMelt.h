@@ -20,7 +20,7 @@
 #ifndef _PUYODOOMMELT
 #define _PUYODOOMMELT
 
-#include <SDL/SDL.h>
+#include "glSDL.h"
 
 typedef struct _DoomMelt DoomMelt;
 

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "PuyoGame.h"
 #include "audio.h"
-#include <SDL/SDL.h>
+#include "glSDL.h"
 
 
 static int fallingTable[PUYODIMX] = {0, 3, 1, 4, 2, 5};

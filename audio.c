@@ -16,7 +16,7 @@ Sound  *sound_splash[8];
 
 
 #ifdef USE_AUDIO
-#include <SDL/SDL.h>
+#include "glSDL.h"
 static Mix_Music *music[4];
 
 static char *MUSIC_THEME[2][4] = {

@@ -1,6 +1,6 @@
 %{
 #include <stdio.h>
-#include <SDL/SDL.h>
+#include "glSDL.h"
 #include <string.h>
 #include "PuyoCommander.h"
 #include "PuyoStory.h"

@@ -6,7 +6,7 @@
 /// SCROLLING TEXT
 
 #include "sofont.h"
-#include <SDL/SDL.h>
+#include "glSDL.h"
 
 typedef struct _SCROLLING_TEXT ScrollingText;
 

@@ -10,7 +10,7 @@ SDL_CONFIG=sdl-config
 CC=g++
 CXX=g++
 
-CFLAGS=`$(SDL_CONFIG) --cflags` -g -I/sw/include -DUSE_AUDIO
+CFLAGS=`$(SDL_CONFIG) --cflags` -g -I/sw/include -DUSE_AUDIO=1 # -DHAVE_OPENGL=1
 CXXFLAGS=${CFLAGS}
 
 HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h PuyoGame.h \
@@ -22,12 +22,12 @@ HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h Pu
 OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o IosException.o \
 					IosVector.o main.o PuyoGame.o PuyoVersion.o PuyoView.o PuyoIA.o sofont.o \
 					menu.o menuitems.o audio.o scrollingtext.o preferences.o PuyoStory.o SDL_Painter.o \
-					InputManager.o GameControls.o PuyoDoomMelt.o
+					InputManager.o GameControls.o PuyoDoomMelt.o glSDL.o
 
 all: prelude flobopuyo
 
 flobopuyo: ${OBJFILES}
-	@echo "[flobopuyo]" && g++ $(CFLAGS) -o flobopuyo `$(SDL_CONFIG) --cflags --libs` -lSDL_mixer -lSDL_image ${OBJFILES}
+	@echo "[flobopuyo]" && g++ $(CFLAGS) -o flobopuyo `$(SDL_CONFIG) --cflags --libs` -lSDL_mixer -lSDL_image -lGL ${OBJFILES}
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
 	@[ "x`cat WARNINGS | wc -l`" != "x0" ] && echo -e "--------------------------------------\n There have been some warnings:\n" && cat WARNINGS && rm -f WARNINGS && echo "--------------------------------------" || true
@@ -66,6 +66,9 @@ scrollingtext.o:scrollingtext.c
 sofont.o:sofont.c
 IosException.o:IosException.cpp
 IosVector.o:IosVector.cpp
+glSDL.o:glSDL.c
+	@echo "[$@]" && $(CC) $(CFLAGS) -DDATADIR=${DATADIR} -c $< 2>> EXT_WARNINGS
+	@rm -f EXT_WARNINGS
 SDL_prim.o:SDL_prim.c
 	@echo "[$@]" && $(CC) $(CFLAGS) -DDATADIR=${DATADIR} -c $< 2>> EXT_WARNINGS
 	@rm -f EXT_WARNINGS

@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include <SDL/SDL.h>
+#include "glSDL.h"
 
 /*
  * SDL_prim drawing flags

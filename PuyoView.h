@@ -1,8 +1,9 @@
 #ifndef _PUYOVIEW
 #define _PUYOVIEW
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include "glSDL.h"
+/*<SDL/SDL.h>
+#include <SDL/SDL_image.h>*/
 #include "PuyoGame.h"
 #include "PuyoIA.h"
 #include "PuyoCommander.h"
