@@ -128,7 +128,7 @@ private:
 
 class IGPDatagram::ServerMsgToClientDatagram : public IGPDatagram {
 public:
-    ServerMsgToClientDatagram(int igpOrigIdent, int igpDestIdent, VoidBuffer msg) : IGPDatagram(ServerMsgToClient, 8 + msg.size()), igpIdent(igpIdent), igpDestIdent(igpDestIdent) {
+    ServerMsgToClientDatagram(int igpOrigIdent, int igpDestIdent, VoidBuffer msg) : IGPDatagram(ServerMsgToClient, 8 + msg.size()), igpIdent(igpOrigIdent), igpDestIdent(igpDestIdent) {
         writeBigEndianIntToMessage(igpOrigIdent, 8);
         writeBigEndianIntToMessage(igpDestIdent, 12);
         Memory::memcpy((char *)(message.ptr()) + 16, msg.ptr(), msg.size());
