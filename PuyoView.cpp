@@ -6,6 +6,7 @@
 #include "PuyoGame.h"
 #include "audio.h"
 #include "IosImgProcess.h"
+#include "HiScores.h"
 
 #include "SDL_Painter.h"
 SDL_Painter painter;
@@ -1240,6 +1241,9 @@ void PuyoStarter::run(int score1, int score2, int lives)
 			SDL_FreeSurface(perso[i]);
 	}
 	SDL_SetClipRect(display,NULL);
+  if (!randomPlayer)
+    setHiScore(attachedGameA->getPoints(), p2name);
+  setHiScore(attachedGameB->getPoints(), p1name);
 }
 
 void PuyoStarter::draw()
