@@ -84,6 +84,7 @@ public:
   
   void moveLeft();
   void moveRight();
+  void rotate(bool left);
   void rotateLeft();
   void rotateRight();
   PuyoState getNextFalling();

@@ -213,76 +213,59 @@ void PuyoGame::moveRight()
     companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
 }
 
-void PuyoGame::rotateLeft()
+void PuyoGame::rotate(bool left)
 {
     if (endOfCycle) {
-		return;
-	}
+        return;
+    }
     audio_sound_play(sound_fff);
-	unsigned char backupCompanion = fallingCompanion;
-	/*int backupX = fallingX;
-	int backupY = fallingY;*/
-	int newX, newY;
+    unsigned char backupCompanion = fallingCompanion;
+    /*int backupX = fallingX;
+    int backupY = fallingY;*/
+    int newX, newY;
     bool moved = true;
-	fallingCompanion = (unsigned char)(4 + fallingCompanion - 1) % 4;
-	unsigned char newCompanion = fallingCompanion;
-	int newCompanionX = getFallingCompanionX();
-	int newCompanionY = getFallingCompanionY();
-	fallingCompanion = backupCompanion;
-	if (((fallingY<0)&&(fallingX>0)&&(fallingX<PUYODIMX-1))||(getPuyoCellAt(newCompanionX, newCompanionY) > PUYO_EMPTY)) {
-		newX = fallingX + (fallingX - newCompanionX);
-		newY = fallingY + (fallingY  - newCompanionY);
-		if ((fallingY >= 0) && (getPuyoCellAt(newX, newY) > PUYO_EMPTY)) {
-      moved = false;
-		}
-		else {
-			fallingCompanion = newCompanion;
-			fallingX = newX;
-			fallingY = newY;
-		}
-	}
-	else
-		fallingCompanion = newCompanion;
-    fallingPuyo->setPuyoXY(fallingX, fallingY);
+    fallingCompanion = (unsigned char)(fallingCompanion + (left?3:1)) % 4;
+    unsigned char newCompanion = fallingCompanion;
+    int newCompanionX = getFallingCompanionX();
+    int newCompanionY = getFallingCompanionY();
+    fallingCompanion = backupCompanion;
+    if (getPuyoCellAt(newCompanionX, newCompanionY) > PUYO_EMPTY) {
+        //if (((fallingY<0)&&(fallingX>0)&&(fallingX<PUYODIMX-1))||(getPuyoCellAt(newCompanionX, newCompanionY) > PUYO_EMPTY)) {
+        newX = fallingX + (fallingX - newCompanionX);
+        newY = fallingY + (fallingY - newCompanionY);
+        //        if ((fallingY >= 0) && (getPuyoCellAt(newX, newY) > PUYO_EMPTY)) {
+        if (getPuyoCellAt(newX, newY) > PUYO_EMPTY) {
+            moved = false;
+        }
+        else {
+            fallingCompanion = newCompanion;
+            fallingX = newX;
+            if (fallingY != newY)
+            {
+                semiMove = 0;
+                fallingY = newY;
+            }
+            fallingPuyo->setPuyoXY(fallingX, fallingY);
+        }
+        }
+    else
+        fallingCompanion = newCompanion;
+    
     companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
     
     if ((delegate != NULL) && (moved))
-        delegate->companionDidTurn(companionPuyo, fallingCompanion, false);
+        delegate->companionDidTurn(companionPuyo, fallingCompanion, !left);
+    
+}
+
+void PuyoGame::rotateLeft()
+{
+    rotate(true);
 }
 
 void PuyoGame::rotateRight()
 {
-    if (endOfCycle) {
-		return;
-	}
-    audio_sound_play(sound_fff);
-	unsigned char backupCompanion = fallingCompanion;
-	int backupX = fallingX;
-	int backupY = fallingY;
-    bool moved = true;
-	fallingCompanion = (unsigned char)(fallingCompanion + 1) % 4;
-	unsigned char newCompanion = fallingCompanion;
-	int newCompanionX = getFallingCompanionX();
-	int newCompanionY = getFallingCompanionY();
-	fallingCompanion = backupCompanion;
-	if (((fallingY<0)&&(fallingX>0)&&(fallingX<PUYODIMX-1))||(getPuyoCellAt(newCompanionX, newCompanionY) > PUYO_EMPTY)) {
-		fallingX += (fallingX - newCompanionX);
-		fallingY += (fallingY  - newCompanionY);
-		if ((fallingY >= 0) && (getPuyoCellAt(fallingX, fallingY) > PUYO_EMPTY)) {
-			fallingX = backupX;
-			fallingY = backupY;
-            moved = false;
-		}
-		else
-			fallingCompanion = newCompanion;
-	}
-	else
-		fallingCompanion = newCompanion;
-    fallingPuyo->setPuyoXY(fallingX, fallingY);
-    companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
-    
-    if ((delegate != NULL) && (moved))
-        delegate->companionDidTurn(companionPuyo, fallingCompanion, true);
+    rotate(false);
 }
 
 PuyoState PuyoGame::getNextFalling()

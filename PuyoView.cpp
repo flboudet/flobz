@@ -158,7 +158,7 @@ public:
         
         float offsetA = sin(angle) * TSIZE;
         float offsetB = cos(angle) * TSIZE * (counterclockwise ? -1 : 1);
-        SDL_Rect drect;
+        SDL_Rect drect, drect2;
         drect.w = targetSurface->w;
         drect.h = targetSurface->h;
         drect.y = -semiMove * TSIZE / 2;
@@ -166,22 +166,18 @@ public:
             case 0:
                 drect.x = (short)(X - offsetB);
                 drect.y += (short)(Y + offsetA - TSIZE);
-                painter.requestDraw(targetSurface, &drect);
                 break;
             case 1:
                 drect.x = (short)(X - offsetA + TSIZE);
                 drect.y += (short)(Y - offsetB);
-                painter.requestDraw(targetSurface, &drect);
                 break;
             case 2:
                 drect.x = (short)(X + offsetB);
                 drect.y += (short)(Y - offsetA + TSIZE);
-                painter.requestDraw(targetSurface, &drect);
                 break;
             case 3:
                 drect.x = (short)(X + offsetA - TSIZE);
                 drect.y += (short)(Y + offsetB);
-                painter.requestDraw(targetSurface, &drect);
                 break;
                 
             case -3:
@@ -189,6 +185,9 @@ public:
                 drect.y += (short)(Y + offsetA - TSIZE);
                 break;
         }
+        drect2 = drect;
+        painter.requestDraw(targetSurface, &drect);
+        painter.requestDraw(puyoEyes, &drect2);
     }
 private:
     PuyoPuyo *companionPuyo;
@@ -514,7 +513,7 @@ void PuyoView::render()
 	SDL_Surface *currentSurface = getSurfaceForState(attachedGame->getNextFalling());
 	if (currentSurface != NULL) {
 		drect.x = nXOffset;
-		drect.y = nYOffset;
+		drect.y = nYOffset + TSIZE;
 		drect.w = currentSurface->w;
 		drect.h = currentSurface->h;
 		painter.requestDraw(currentSurface, &drect);
@@ -523,7 +522,7 @@ void PuyoView::render()
 	currentSurface = getSurfaceForState(attachedGame->getNextCompanion());
 	if (currentSurface != NULL) {
 		drect.x = nXOffset;
-		drect.y = nYOffset + TSIZE;
+		drect.y = nYOffset;
 		drect.w = currentSurface->w;
 		drect.h = currentSurface->h;
 		painter.requestDraw(currentSurface, &drect);

@@ -53,7 +53,7 @@ class PuyoCommander
   void showGameOver() { menu_show(gameOverMenu); }
   void hideGameOver() { menu_hide(gameOverMenu); }
 
-  bool changeControlLoop(SDL_keysym *keySym);
+  bool changeControlLoop(SDL_keysym *keySym, PuyoDrawable *starter);
   void controlsMenuLoop(PuyoDrawable *d);
   void optionMenuLoop(PuyoDrawable *d = NULL);
   void backLoop(Menu *menu);

@@ -741,7 +741,7 @@ mml_fin:
   menu_hide (menu);
 }
 
-bool PuyoCommander::changeControlLoop(SDL_keysym *keySym)
+bool PuyoCommander::changeControlLoop(SDL_keysym *keySym, PuyoDrawable *starter)
 {
     bool keyPressed = false;
     while (1) {
@@ -772,7 +772,7 @@ bool PuyoCommander::changeControlLoop(SDL_keysym *keySym)
                     break;
             }
         }
-        updateAll(NULL);
+        updateAll(starter);
     }
 mml_fin:
     return keyPressed;
@@ -889,7 +889,7 @@ void PuyoCommander::controlsMenuLoop(PuyoDrawable *d)
                         strcpy(prevValue, menu_get_value (controlsMenu, chosenControl));
                         menu_set_value(controlsMenu, chosenControl, "<Press a key>");
                         SDL_keysym keySym;
-                        if (changeControlLoop(&keySym)) {
+                        if (changeControlLoop(&keySym, d)) {
                             getKeyName(keySym.sym, newKeyName);
                             menu_set_value(controlsMenu, chosenControl, newKeyName);
                             keyControls[chosenControlIndex] = keySym.sym;
@@ -1155,7 +1155,7 @@ void PuyoCommander::initControllers()
     numJoysticks = SDL_NumJoysticks();
     for( int i=0 ; i < numJoysticks ; i++ ) 
     {
-        joystick[i] = SDL_JoystickOpen(i);
+        joystick[numJoysticks - i - 1] = SDL_JoystickOpen(i);
     }
   SDL_JoystickEventState(SDL_ENABLE);
 }
