@@ -1278,7 +1278,6 @@ mml_play:
 
   int lastPoints = 0;
   int currentMusicTheme = 0;
-  audio_music_switch_theme(currentMusicTheme);
   
   int fini = 0;  
   while (!fini)
@@ -1289,6 +1288,7 @@ mml_play:
     p1name = playerName;
     p2name = AI_NAMES[score2];
     doom_melt_start(melt, menuBGImage);
+    audio_music_switch_theme(currentMusicTheme);
     myStarter.run(score1, score2, lives, lastPoints, 0);
     lastPoints = myStarter.rightPlayerPoints();
     score1 += myStarter.leftPlayerWin();
@@ -1296,10 +1296,7 @@ mml_play:
     if (!myStarter.rightPlayerWin())
       lives--;
     else {
-      if (!menu_active_is(gameOverMenu, "YES")) {
-        currentMusicTheme = (currentMusicTheme + 1) % NB_MUSIC_THEME;
-        audio_music_switch_theme(currentMusicTheme);
-      }
+      currentMusicTheme = (currentMusicTheme + 1) % NB_MUSIC_THEME;
     }
 
     if (ia[score2].level == 0) {
