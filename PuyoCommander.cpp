@@ -576,6 +576,9 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
       SDL_WM_GrabInput(SDL_GRAB_ON);
   }
 #else
+#ifdef WIN32
+  _putenv("SDL_VIDEODRIVER=windib");
+#endif
   if ( SDL_Init(init_flags) < 0 ) {
     fprintf(stderr, "SDL initialisation error:  %s\n", SDL_GetError());
     exit(1);
@@ -1345,7 +1348,7 @@ mml_play:
   doom_melt_start(melt, gameScreen);
 }
 
-#define TIME_TOLERANCE 5
+#define TIME_TOLERANCE 4
 
 void PuyoCommander::updateAll(PuyoDrawable *starter, SDL_Surface *extra_surf)
 {
@@ -1445,8 +1448,11 @@ void PuyoCommander::updateAll(PuyoDrawable *starter, SDL_Surface *extra_surf)
 
   // delay si machine trop rapide
   now = SDL_GetTicks ();
-  if (now < (start_time + (cycle - TIME_TOLERANCE) * cycle_duration))
-    SDL_Delay ((start_time + (cycle - TIME_TOLERANCE) * cycle_duration) - now);
+  if (now < (start_time + cycle * cycle_duration)) {
+    int ttw = ((start_time + cycle * cycle_duration) - now);
+    ttw /= 2;
+    SDL_Delay (ttw);
+  }
 }
 
 
