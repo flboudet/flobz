@@ -2,6 +2,9 @@
 # author: iOS-Software
 # July 2004
 
+ENABLE_AUDIO=true
+ENABLE_OPENGL=false
+
 #BINDIR=/usr/games/
 DATADIR=\"data\"
 
@@ -10,20 +13,40 @@ SDL_CONFIG=sdl-config
 CC=g++
 CXX=g++
 
-CFLAGS=`$(SDL_CONFIG) --cflags` -g -I/sw/include -DUSE_AUDIO=1  -DHAVE_OPENGL=1
+CFLAGS=`$(SDL_CONFIG) --cflags` -g -I/sw/include
+
+
+
+HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h\
+        PuyoGame.h PuyoAnimations.h AnimatedPuyo.h PuyoIA.h PuyoPlayer.h     \
+        PuyoStory.h PuyoView.h SDL_prim.h audio.h menu.h menuitems.h         \
+        preferences.h scrollingtext.h sofont.h SDL_Painter.h PuyoVersion.h   \
+        InputManager.h GameControls.h HiScores.h IosImgProcess.h
+
+
+OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o        \
+          IosException.o IosVector.o main.o PuyoGame.o PuyoVersion.o         \
+          PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o sofont.o       \
+          menu.o menuitems.o audio.o scrollingtext.o preferences.o           \
+          PuyoStory.o SDL_Painter.o InputManager.o GameControls.o            \
+          PuyoDoomMelt.o IosImgProcess.o corona32.o corona.o corona_palette.o
+
+PLATFORM=$(shell uname -s)
+ifeq ($(PLATFORM), Darwin)
+CFLAGS:=$(CFLAGS) -DMACOSX
+endif
+
+ifeq ($(ENABLE_AUDIO), true)
+CFLAGS:=$(CFLAGS) -DUSE_AUDIO=1
+OBJFILES:=$(OBJFILES) glSDL.o
+endif
+
+ifeq ($(ENABLE_OPENGL), true)
+CFLAGS:=$(CFLAGS) -DHAVE_OPENGL=1
+OBJFILES:=$(OBJFILES) glSDL.o
+endif
+
 CXXFLAGS=${CFLAGS}
-
-HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h PuyoGame.h PuyoAnimations.h \
-        AnimatedPuyo.h PuyoIA.h PuyoPlayer.h PuyoStory.h PuyoView.h SDL_prim.h audio.h menu.h \
-				menuitems.h preferences.h scrollingtext.h sofont.h SDL_Painter.h PuyoVersion.h \
-				InputManager.h GameControls.h HiScores.h IosImgProcess.h
-
-
-OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o IosException.o \
-					IosVector.o main.o PuyoGame.o PuyoVersion.o PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o sofont.o \
-					menu.o menuitems.o audio.o scrollingtext.o preferences.o PuyoStory.o SDL_Painter.o \
-					InputManager.o GameControls.o PuyoDoomMelt.o glSDL.o IosImgProcess.o \
-					corona32.o corona.o corona_palette.o
 
 all: prelude flobopuyo
 
@@ -107,7 +130,14 @@ clean:
 #	chmod a+rx ${BINDIR}/flobopuyo
 
 bundle_name = FloboPuyo.app
-flobopuyo-static:SDL_prim.o
+
+flobopuyo-static:${OBJFILES}
+	@echo "[flobopuyo-static]" && g++ $(CFLAGS) -o flobopuyo-static ${OBJFILES}\
+        /sw/lib/libSDL_mixer.a /sw/lib/libvorbisfile.a /sw/lib/libvorbis.a /sw/lib/libogg.a /sw/lib/libsmpeg.a /sw/lib/libSDL_image.a /sw/lib/libjpeg.a /sw/lib/libpng.a -lz `$(SDL_CONFIG) --static-libs`
+	@echo "--------------------------------------"
+	@echo " Compilation finished"
+
+flobopuyo-staticz:SDL_prim.o
 	bison -y -d -o scenar.y.c scenar.y
 	flex -oscenar.l.c scenar.l
 	g++ -DMACOSX $(CFLAGS) -o flobopuyo-static  IosImgProcess.cpp HiScores.cpp SDL_prim.o PuyoCommander.cpp InputManager.cpp GameControls.cpp IosException.cpp IosVector.cpp main.cpp PuyoGame.cpp PuyoView.cpp PuyoIA.cpp PuyoVersion.c sofont.c menu.c menuitems.c audio.c scrollingtext.c preferences.c SDL_Painter.cpp PuyoStory.cpp scenar.y.c scenar.l.c /sw/lib/libSDL_mixer.a /sw/lib/libvorbisfile.a /sw/lib/libvorbis.a /sw/lib/libogg.a /sw/lib/libsmpeg.a /sw/lib/libSDL_image.a /sw/lib/libjpeg.a /sw/lib/libpng.a -lz `$(SDL_CONFIG) --cflags --static-libs`

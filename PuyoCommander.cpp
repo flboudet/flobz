@@ -3,7 +3,6 @@
 #include <unistd.h>
 #include <string.h>
 #include "glSDL.h"
-/* #include <SDL/SDL_image.h> */
 #include "PuyoCommander.h"
 #include "PuyoView.h"
 #include "PuyoVersion.h"
@@ -589,6 +588,7 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   initControllers();
   initHiScores(AI_NAMES);
   
+#ifdef USE_AUDIO
   audio_init();
   audio_music_start(0);
   if (sound==false) Mix_PauseMusic();
@@ -597,6 +597,7 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
 
   audio_set_volume(audio_volume);
   audio_music_set_volume(music_volume);
+#endif
 
   display = SDL_SetVideoMode( 640, 480, 0,  SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0)|(useGL?SDL_GLSDL:0));
   if ( display == NULL ) {
