@@ -105,7 +105,9 @@ void StandardServerPortManager::deconnectionFromSocket(Socket *client)
 void StandardServerConnection::dataReceived()
 {
     InputStream *input = clientSocket->getInputStream();
-    VoidBuffer data = input->streamRead(input->streamAvailable());
+    VoidBuffer data(input->streamAvailable());
+    input->streamRead(data);
+    dataReceived(data);
 }
 
 

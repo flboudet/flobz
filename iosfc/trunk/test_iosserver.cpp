@@ -5,7 +5,7 @@ class MyConnection : public ios_fc::StandardServerConnection {
 public:
   void connectionMade();
 protected:
-  void dataReceived(ios_fc::VoidBuffer *data);
+  void dataReceived(ios_fc::VoidBuffer data);
 };
 
 class MyPortManager : public ios_fc::StandardServerPortManager {
@@ -21,11 +21,15 @@ ios_fc::ServerConnection *MyPortManager::createConnection()
 
 void MyConnection::connectionMade()
 {
-  //  clientSocket->getOutputStream()->streamWrite(ios_fc::Buffer<char>("Hello\n"));
+  clientSocket->getOutputStream()->streamWrite(ios_fc::VoidBuffer("Hello\n", 6));
 }
 
-void MyConnection::dataReceived(ios_fc::VoidBuffer *data)
+void MyConnection::dataReceived(ios_fc::VoidBuffer data)
 {
+    ios_fc::Buffer<char> str(data);
+    str.grow(1);
+    str[str.size() - 1] = 0;
+    printf("Donnees recues: %s\n", (const char *)str);
 }
 
 int main()

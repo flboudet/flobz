@@ -43,7 +43,7 @@ class StandardServerConnection : public ServerConnection {
 public:
     void dataReceived();
 protected:
-    virtual void dataReceived(VoidBuffer *data) = 0;
+    virtual void dataReceived(VoidBuffer data) = 0;
 };
 
 class ServerPortManager {
