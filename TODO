@@ -1,6 +1,5 @@
 In game menu background wrong when changing keys while playing
 Correct the joystick 1P/2P fonctionality
-Puyos should not pop if in the "extra" row
 #Make puyos fall from 3rd column instead of 4th
 #Should not be able to play if the "falling row" is full
 #Invert th puyos orientation when they fall
@@ -8,6 +7,7 @@ Eye blinking pb when the puyos rotate?
 Make the "main puyo" visible compared to the companion
 Score board
 Net Play
-When puyos are get up because of rotation, semi-move pb
+When puyos are going up because of rotation, semi-move pb
 Key repetition
 Puyos poping should add neutrals puyos to the oponent, not remove from your neutrals?
+Bug when rotating in a single column
