@@ -111,8 +111,17 @@ namespace ios_fc {
 
       if (type == INTEGER) addInt(key, atoi(value));
       else if (type == BOOLEAN) addBool(key, atoi(value));
-      else if (type == STRING) addBool(key, value);
-      /* TODO... le reste... */
+      else if (type == STRING) addString(key, value);
+      else if (type == INT_ARRAY) {
+        Buffer<int> buffer(atoi(value));
+        int index = 0;
+        for (int i=0; i<buffer.size(); ++i) {
+          while(value[index] != ',') index++;
+          index++;
+          buffer[i] = atoi(value.substring(index));
+        }
+        addIntArray(key, buffer);
+      }
 
       if (sraw[end] == 0) return;
       end   = end + 1;

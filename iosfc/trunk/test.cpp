@@ -18,6 +18,9 @@ int main(int argc, char **argv)
     
     msg.send();
 
+    UDPMessage test(serialized);
+    printf("\nBIS\n%s\n", (const char *)test.serialize());
+
     return 0;
   }
   catch (Message::DataException e) {
