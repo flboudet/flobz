@@ -33,6 +33,7 @@ public:
     virtual void addSelectable(Selectable *s) = 0;
     virtual void removeSelectable(Selectable *s) = 0;
     virtual void selectImpl() = 0;
+    virtual void selectImpl(int timeout) = 0;
     virtual Buffer<Selectable *> getSelected() = 0;
 };
 
@@ -48,6 +49,7 @@ public:
     void addSelectable(Selectable *s);
     void removeSelectable(Selectable *s);
     void select();
+    void select(int timeout);
     Buffer<Selectable *> getSelected();
 private:
     static SelectorFactory *factory;

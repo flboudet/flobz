@@ -40,8 +40,10 @@ public:
     virtual void addSelectable(Selectable *s);
     virtual void removeSelectable(Selectable *s);
     virtual void selectImpl();
+    virtual void selectImpl(int timeout);
     virtual Buffer<Selectable *> getSelected();
 private:
+    void doSelect(struct timeval *timeout);
     AdvancedBuffer<Selectable *> selectableList;
     fd_set readfds;
 };

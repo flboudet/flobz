@@ -4,7 +4,7 @@
 #include "ios_igpdatagram.h"
 #include "ios_dirigeable.h"
 #include <stdio.h>
-
+#include <unistd.h>
 namespace ios_fc {
 
 class IgpMessageListener : public MessageListener {
@@ -130,7 +130,7 @@ void IgpMessageListener::onMessage(Message &data)
     if (currentPeer == NULL) {
         currentPeer = new PeerRecord(msgAddress, this);
         knownPeers.add(currentPeer);
-        //printf("Nouveau peer !\n");
+        printf("Nouveau peer !\n");
     }
     
     IGPDatagram message(&data);
@@ -178,8 +178,13 @@ int main()
     
     try {
         while (true) {
-            serverSelector.select();
-            messageBox.idle();
+            serverSelector.select(100000);
+            try {
+                messageBox.idle();
+            }
+            catch (ios_fc::Exception e) {
+                e.printMessage();
+            }
         }
     }
     catch (ios_fc::Exception e) {

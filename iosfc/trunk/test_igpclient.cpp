@@ -14,13 +14,13 @@ public:
     }
 };
 
-int main()
+int main(int argc, char *argv[])
 {
     int count = 0;
     printf("Hello World!\n");
     try {
         //Socket::setFactory(&unixSocketFactory);
-        ios_fc::IGPClient client("localhost", 4567, 25);
+        ios_fc::IGPClient client(argv[1], 4567, 25);
         MyListener myListener;
         client.addListener(&myListener);
 	while (true) {
@@ -28,7 +28,7 @@ int main()
             sleep(1);
             count++;
             if (count == 3) {
-                client.sendMessage(25, ios_fc::VoidBuffer("hello", 5));
+                client.sendMessage(25, ios_fc::VoidBuffer("hello", 5), true);
             }
         }
         //ios_fc::OutputStream *output = testSocket.getOutputStream();

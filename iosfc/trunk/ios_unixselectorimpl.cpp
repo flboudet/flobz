@@ -50,12 +50,25 @@ void UnixSelectorImpl::removeSelectable(Selectable *s)
 
 void UnixSelectorImpl::selectImpl()
 {
+    doSelect(NULL);
+}
+
+void UnixSelectorImpl::selectImpl(int timeout)
+{
+    struct timeval tval;
+    tval.tv_sec = (timeout / 1000);
+    tval.tv_usec = (timeout % 1000) * 1000;
+    doSelect(&tval);
+}
+
+void UnixSelectorImpl::doSelect(struct timeval *timeout)
+{
     FD_ZERO(&readfds);
     for (int i = 0, j = selectableList.size() ; i < j ; i++) {
         UnixSelectableImpl *impl = static_cast<UnixSelectableImpl *>(selectableList[i]->getSelectableImpl());
         FD_SET(impl->getFd(), &readfds);
     }
-    if (select(FD_SETSIZE, &readfds, NULL, NULL, NULL) == -1)
+    if (select(FD_SETSIZE, &readfds, NULL, NULL, timeout) == -1)
         throw Exception("IosSystemStreamSelect error");
 }
 

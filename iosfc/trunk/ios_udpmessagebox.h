@@ -26,6 +26,7 @@
 #include "ios_messagebox.h"
 #include "ios_datagramsocket.h"
 #include "ios_socketaddress.h"
+#include "ios_dirigeable.h"
 
 namespace ios_fc {
 
@@ -41,14 +42,17 @@ public:
     Message * createMessage();
     void sendUDP(Buffer<char> buffer, int id, bool reliable, SocketAddress addr, int portNum);
 private:
+    struct KnownPeer;
+    KnownPeer *findPeer(PeerAddress address);
     SocketAddress defaultAddress;
     int defaultPort;
     DatagramSocket *socket;
-    int sendSerialID, receiveSerialID;
+    int sendSerialID;
+    AdvancedBuffer<KnownPeer*> knownPeers;
     int cyclesBeforeResendingReliable;
     int waitingForAckTimeout;
     UDPRawMessage *waitingForAckMessage;
-    Vector<UDPRawMessage*> outQueue;
+    AdvancedBuffer<UDPRawMessage*> outQueue;
     void sendQueue();
 };
 

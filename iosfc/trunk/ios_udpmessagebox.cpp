@@ -27,6 +27,11 @@
 
 namespace ios_fc {
 
+struct UDPMessageBox::KnownPeer {
+    PeerAddress address;
+    int receiveSerialID;
+};
+
 class UDPRawMessage {
 public:
     UDPRawMessage(Buffer<char> buf, int msgid, int reliableFlag,
@@ -57,7 +62,6 @@ UDPMessageBox::UDPMessageBox(const String address,
   : defaultAddress(address), defaultPort(remotePort)
 {
     sendSerialID = 0;
-    receiveSerialID = 0;
     waitingForAckMessage = NULL;
     cyclesBeforeResendingReliable = 10;
     socket = new DatagramSocket(localPort);
@@ -67,7 +71,6 @@ UDPMessageBox::UDPMessageBox(DatagramSocket *socket)
     : defaultAddress("localhost"), defaultPort(0), socket(socket)
 {
     sendSerialID = 0;
-    receiveSerialID = 0;
     waitingForAckMessage = NULL;
     cyclesBeforeResendingReliable = 10;
 }
@@ -93,6 +96,14 @@ void UDPMessageBox::idle()
                 UDPMessage incomingMessage(Buffer<char>((char *)(receivedDatagram.getMessage()), receivedDatagram.getSize()), *this, receivedDatagram.getAddress(), receivedDatagram.getPortNum());
                 
                 int messageSerialID = incomingMessage.getSerialID();
+                KnownPeer *currentPeer = findPeer(incomingMessage.getPeerAddress());
+                if (currentPeer == NULL) {
+                    currentPeer = new KnownPeer;
+                    currentPeer->address = incomingMessage.getPeerAddress();
+                    currentPeer->receiveSerialID = messageSerialID - 1;
+                    knownPeers.add(currentPeer);
+                }
+                int &receiveSerialID = currentPeer->receiveSerialID;
                 
                 // We should acknowledge every reliable message
                 if (incomingMessage.isReliable()) {
@@ -168,6 +179,17 @@ Message * UDPMessageBox::createMessage()
     newMessage = new UDPMessage(++sendSerialID, *this,
 				defaultAddress, defaultPort);
     return newMessage;
+}
+
+UDPMessageBox::KnownPeer *UDPMessageBox::findPeer(PeerAddress address)
+{
+    for (int i = 0, j = knownPeers.size() ; i < j ; i++) {
+        KnownPeer *currentPeer = knownPeers[i];
+        if (currentPeer->address == address) {
+            return currentPeer;
+        }
+    }
+    return NULL;
 }
 
 };

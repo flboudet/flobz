@@ -48,6 +48,11 @@ void Selector::select()
     impl->selectImpl();
 }
 
+void Selector::select(int timeout)
+{
+    impl->selectImpl(timeout);
+}
+
 Buffer<Selectable *> Selector::getSelected()
 {
     return impl->getSelected();
