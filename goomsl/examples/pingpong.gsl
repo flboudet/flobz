@@ -1,0 +1,16 @@
+struct <pingpong: int value, int step>
+
+<pingpong: pingpong this, int step, int min, int max> : pingpong
+
+  (this.step = 0)? this.step = step
+  this.value += this.step
+  (this.value > max)? {
+    this.value = max
+    this.step =  0 - step
+  }
+  (this.value < min)? {
+    this.value = min
+    this.step = step
+  }
+  pingpong = this
+

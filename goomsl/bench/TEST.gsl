@@ -1,0 +1,13 @@
+#include stdlib.gsl
+declare <loop: int start, int end>
+
+loop: start=1 end=100000000
+
+
+<loop: int start, int end>
+
+  while start < end do {
+		start += 1
+	}
+  print: msg="%d\n" argi=start
+ 

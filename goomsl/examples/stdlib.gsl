@@ -1,0 +1,15 @@
+external <print:string msg,string args,int argi,float argf>
+external <read_integer> : int
+external <read_line> : string
+external <random: int max> : int
+external <srandom>
+external <strcmp: string s1, string s2> : int
+external <free: ptr pointer>
+
+external <ptc_open: int width, int height, string title> : int
+external <ptc_close>
+external <ptc_update>
+external <ptc_set_pixel: int x, int y, int color>
+external <ptc_get_pixel: int x, int y> : int
+
+main

@@ -1,0 +1,17 @@
+TEST
+made on this loop:
+
+a=0
+b=100000000
+while a<b
+do
+  a = a + 1
+end
+
+RESULT
+Ruby:   2 min 30 sec
+Python: 1 min 39 sec
+Perl:   1 min 25 sec
+Meta:   7 min  0 sec
+GSL:    0 min 11 sec
+C:      0 min  1 sec

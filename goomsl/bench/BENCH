@@ -1,0 +1,61 @@
+==== BENCHING LOOPS ====
+model name      : AMD Duron(tm) Processor 
+cpu MHz         : 1010.594
+Sun Aug 15 00:25:20 CEST 2004
+==== C version ====
+user    0m0.506s
+==== GoomSL version with JITC ====
+user    0m0.657s
+==== GoomSL version without JITC ===
+user    0m12.500s
+
+
+==== BENCHING LOOPS ====
+model name      : Pentium III (Coppermine)
+cpu MHz         : 702.068
+Fri Jul 23 16:04:19 CEST 2004
+==== C version ====
+user    0m1.028s
+==== GoomSL version ====
+user    0m15.694s
+
+
+==== BENCHING LOOPS ====
+model name      : Pentium III (Coppermine)
+cpu MHz         : 702.068
+Fri Jul 23 11:33:31 CEST 2004
+==== C version ====
+user    0m1.019s
+==== GoomSL version ====
+user    0m20.661s
+
+
+==== BENCHING LOOPS ====
+model name      : Pentium III (Coppermine)
+cpu MHz         : 702.068
+Fri Jul 23 10:58:20 CEST 2004
+==== C version ====
+user    0m1.019s
+==== GoomSL version ====
+user    0m25.604s
+
+
+==== BENCHING LOOPS ====
+model name      : Pentium III (Coppermine)
+cpu MHz         : 702.068
+Fri Jul 23 10:55:12 CEST 2004
+==== C version ====
+user    0m1.020s
+==== GoomSL version ====
+user    0m26.331s
+
+
+==== BENCHING LOOPS ====
+model name      : Pentium III (Coppermine)
+cpu MHz         : 702.068
+Thu Jul 22 18:53:56 CEST 2004
+==== C version ====
+user    0m1.020s
+==== GoomSL version ====
+user    0m27.500s
+

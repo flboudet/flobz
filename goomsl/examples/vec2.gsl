@@ -1,0 +1,11 @@
+struct <Vec2: int x, int y>
+
+<Vec2: int x, int y> : Vec2
+  Vec2.x = x
+  Vec2.y = y
+
+<distance: Vec2 p1, Vec2 p2> : int
+  p1 -= p2
+  p1 *= p1
+  distance = p1.x + p1.y
+

@@ -1,0 +1,106 @@
+#include stdlib.gsl
+#include pingpong.gsl
+#include vec2.gsl
+
+struct <FX:
+  Vec2 c1,
+  Vec2 c2,
+  Vec2 c3,
+  int width,
+  int height>
+
+declare <launch:  FX fx>
+declare <animate: FX fx> : FX
+
+
+<init_fx> : FX
+
+// Size of the window
+  init_fx.width  = 400
+  init_fx.height = 240
+
+// Center of the circles
+  init_fx.c1 = [Vec2: x=70 y=70]
+  init_fx.c2 = [Vec2: x=init_fx.width-70 y=70]
+  init_fx.c3 = [Vec2: x=200 y=170]
+
+
+<main>
+
+  srandom
+
+  FX fx = [init_fx]
+
+  int status_ok = [ptc_open: width=fx.width height=fx.height title="GSL Demo App"]
+  (status_ok = true)?  launch: fx=fx
+  (status_ok = false)? error
+
+
+<launch: FX fx>
+
+  print: msg="Alright: Launching Demo!\n"
+
+
+  while true = true do
+  {
+    fx = [animate: fx=fx]
+    ptc_update
+  }
+
+
+<error>
+
+  print: msg="Error: Could not open display.\n"
+
+
+<animate: FX fx> : FX
+
+  // Makes the circle move randomly
+  
+  ([random: max=2] = 0)? fx.c3.x += 5
+  ([random: max=2] = 0)? fx.c3.x -= 5
+  ([random: max=2] = 0)? fx.c2.y += 5
+  ([random: max=2] = 0)? fx.c2.y -= 5
+  ([random: max=2] = 0)? fx.c1.y += 5
+  ([random: max=2] = 0)? fx.c1.y -= 5
+
+  // Ensure the circles doesn't leave the screen
+
+  (fx.c1.y > fx.height)? fx.c1.y = 0
+  (fx.c1.y < 0)?         fx.c1.y = fx.height
+  (fx.c2.y > fx.height)? fx.c2.y = 0
+  (fx.c2.y < 0)?         fx.c2.y = fx.height
+  (fx.c3.x > fx.width)?  fx.c3.x = 0
+  (fx.c3.x < 0)?         fx.c3.x = fx.width
+
+  // Update the threshold
+
+  pingpong threshold
+  threshold = [pingpong: this=threshold min=0 max=10000 step=100]
+
+  // Put mostly random pixels
+ 
+  int nbLoop = 1000
+  while nbLoop > 0 do
+  {
+    nbLoop -= 1
+    Vec2 p1 = [Vec2: x=[random: max=fx.width] y=[random: max=fx.height]]
+    int color = [random: max=0xfffffff]
+
+    int dist1 = [distance: p1=p1 p2=fx.c1] / 1000
+    int dist2 = [distance: p1=p1 p2=fx.c2] / 1000
+    int dist3 = [distance: p1=p1 p2=fx.c3] / 1000
+
+    int rnd = [random: max=dist1*dist2*dist3]
+    (rnd > threshold.value)? {
+       ptc_set_pixel: x=p1.x y=p1.y color=color
+       ptc_set_pixel: x=(fx.width-p1.x-1) y=(fx.height-p1.y-1) color=color
+    }
+    (rnd <= threshold.value)? {
+       ptc_set_pixel: x=p1.x y=p1.y color=0
+       ptc_set_pixel: x=(fx.width-p1.x-1) y=(fx.height-p1.y-1) color=0
+    }
+  }
+
+  animate = fx
+
