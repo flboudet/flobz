@@ -27,10 +27,15 @@ Styrolyse *styrolyse = NULL;
 
 void put_text(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
+  char txt[1024];
   int         x    = GSL_LOCAL_FLOAT(gsl, local, "pos.x");
   int         y    = GSL_LOCAL_FLOAT(gsl, local, "pos.y");
   const char *text = GSL_LOCAL_PTR  (gsl, local, "text");
-  styrolyse->client->putText(styrolyse->client,x,y,text);
+  int         i    = GSL_LOCAL_FLOAT(gsl, local, "text_index");
+  if (i>sizeof(txt)-1) i=sizeof(txt)-1;
+  strncpy(txt,text,i);
+  txt[i]=0;
+  styrolyse->client->putText(styrolyse->client,x,y,txt);
 }
 
 void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)

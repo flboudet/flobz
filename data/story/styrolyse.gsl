@@ -44,7 +44,8 @@ struct <Balloon:
   string text,
   float alpha,
   float delta_alpha,
-  Vec2 text_pos>
+  Vec2 text_pos,
+  float text_index>
 
 struct <Display:
   float x,
@@ -73,7 +74,7 @@ struct <Display:
     &this.dcycle = fcycle
   }
 
-external <put_text: string text, Vec2 pos>
+external <put_text: string text, Vec2 pos, float text_index>
 external <draw: Sprite &this, Display display>
 
 <new_display: float x, float y, float width, float height> : Display
@@ -114,6 +115,7 @@ external <draw: Sprite &this, Display display>
 
 <set_text: Balloon &this, string text>
   &this.text = text
+  &this.text_index = 0.0
 
 <show_balloon_with_text: Balloon &this, string text>
   show_balloon::&this
@@ -123,15 +125,16 @@ external <draw: Sprite &this, Display display>
   Vec2 displayPos
   (@mode = UPDATE)? {
     sprite::&this.image
-      &this.alpha += &this.delta_alpha
-      (&this.alpha < 0.0)? &this.alpha = 0.0
-      (&this.alpha > 1.0)? &this.alpha = 1.0
+    &this.alpha += &this.delta_alpha
+    (&this.alpha < 0.0)? &this.alpha = 0.0
+    (&this.alpha > 1.0)? &this.alpha = 1.0
+    &this.text_index += 0.5
   }
   (@mode = DRAW)? {
     (&this.alpha > 0.5)? {
       sprite::&this.image display=display
       displayPos.x = display.x
       displayPos.y = display.y
-      put_text: text=&this.text pos=&this.image.pos + &this.text_pos + displayPos
+      put_text: text=&this.text pos=&this.image.pos + &this.text_pos + displayPos text_index=&this.text_index
     }
   }

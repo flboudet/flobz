@@ -29,10 +29,10 @@
   float @SaucerLeave      = 1900.0
   int   @KaoriText3Start  = 1930
   int   @KaoriText4Start  = 2100
-  int   @KaoriText5Start  = 2250
-  int   @KaoriText5End    = 2390
-  float @PlanKaoriEnds    = 2410.0
-  float @EndOfScenar      = 2500.0
+  int   @KaoriText5Start  = 2270
+  int   @KaoriText5End    = 2410
+  float @PlanKaoriEnds    = 2430.0
+  float @EndOfScenar      = 2540.0
 
   // Differents Plans
   int @PlanLarge = 1

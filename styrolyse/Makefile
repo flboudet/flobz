@@ -19,6 +19,7 @@ gsl:
 	make -C ${GSL_DIR} object
 
 main.o: main.c
+styrolyse.o:styrolyse.c
 
 clean:
 	rm -f ${GSL_OBJ} ${OBJ} *~
