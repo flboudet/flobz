@@ -22,7 +22,7 @@
  *
  *
  */
- 
+
 #include "PuyoNetworkView.h"
 
 enum {
@@ -31,17 +31,13 @@ enum {
 
 extern char *p1name;
 
-void PuyoNetworkView::cycleGame() 
+Message *PuyoNetworkView::createStateMessage(bool paused) const
 {
-    PuyoView::cycleGame();
-    Message *currentMessage = mbox->createMessage();
-    currentMessage->addInt("TYPE", kGameState);
-    currentMessage->addBool("PAUSE", false);
-    currentMessage->addString("NAME", p1name);
-    
+    Message *message = mbox->createMessage();
+
     int puyoCount = attachedGame->getPuyoCount();
     AdvancedBuffer<int> buffer(puyoCount * 4);
-    
+
     for (int i = 0 ; i < puyoCount ; i++) {
         PuyoPuyo *currentPuyo = attachedGame->getPuyoAtIndex(i);
         buffer.add(currentPuyo->getID());
@@ -49,32 +45,52 @@ void PuyoNetworkView::cycleGame()
         buffer.add(currentPuyo->getPuyoX());
         buffer.add(currentPuyo->getPuyoY());
     }
-    currentMessage->addIntArray("PUYOS", buffer);
     
-    currentMessage->send();
-    delete currentMessage;
-    //  int getPuyoCount() const;
-    //  PuyoPuyo *getPuyoAtIndex(int index) const;
+    message->addInt     ("TYPE",  kGameState);
+    message->addString  ("NAME",  p1name);
+    message->addBool    ("PAUSE", paused);
+    message->addIntArray("PUYOS", buffer);
+    return message;
 }
-    
+
+void PuyoNetworkView::cycleGame() 
+{
+    PuyoView::cycleGame();
+    Message *message = createStateMessage();
+    message->send();
+    delete message;
+}
+
 void PuyoNetworkView::moveLeft()
 {
     PuyoView::moveLeft();
+    Message *message = createStateMessage();
+    message->send();
+    delete message;
 }
 
 void PuyoNetworkView::moveRight()
 {
     PuyoView::moveRight();
+    Message *message = createStateMessage();
+    message->send();
+    delete message;
 }
 
 void PuyoNetworkView::rotateLeft()
 {
     PuyoView::rotateLeft();
+    Message *message = createStateMessage();
+    message->send();
+    delete message;
 }
 
 void PuyoNetworkView::rotateRight()
 {
     PuyoView::rotateRight();
+    Message *message = createStateMessage();
+    message->send();
+    delete message;
 }
 
 // PuyoDelegate methods

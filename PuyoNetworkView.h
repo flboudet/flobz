@@ -52,6 +52,7 @@ class PuyoNetworkView : public PuyoView {
     void gameLost();
 private:
     MessageBox *mbox;
+    Message *createStateMessage(bool paused = false) const;
 };
 
 #endif // _PUYONETWORKVIEW
