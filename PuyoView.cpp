@@ -199,7 +199,7 @@ void PuyoView::render()
     for (int i = 0 ; i < PUYODIMX ; i++) {
         for (int j = 0 ; j < PUYODIMY ; j++) {
             AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAt(i, j));
-            if ((currentPuyo != NULL) && (getSurfaceForPuyo(currentPuyo) != neutral) && (currentPuyo->getCurrentAnimation() == NULL)) {
+            if ((currentPuyo != NULL) && (getSurfaceForPuyo(currentPuyo) != neutral) && (currentPuyo->isRenderingAnimation() == false)) {
                 drect.x = xOffset + i * TSIZE;
                 drect.y = yOffset + j * TSIZE;
                 if (currentPuyo->getPuyoState() < PUYO_EMPTY)
