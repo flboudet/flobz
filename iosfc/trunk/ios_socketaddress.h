@@ -46,6 +46,7 @@ namespace ios_fc {
     public:
         SocketAddress(String hostName) { impl = factory->createSocketAddress(hostName); impl->incrementUsage(); }
         SocketAddress(SocketAddressImpl *impl) { this->impl = impl; impl->incrementUsage(); }
+        SocketAddress(const SocketAddress &s) : impl(s.impl) { impl->incrementUsage(); }
         ~SocketAddress() { impl->decrementUsage(); if (impl->getUsage() == 0) delete impl; }
         SocketAddressImpl *getImpl() const { return impl; }
         static void setFactory(SocketAddressFactory *factory) { SocketAddress::factory = factory; }
