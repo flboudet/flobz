@@ -10,6 +10,8 @@ goomsl: ${OBJ}
 	make -C TinyPTC
 	gcc ${LIBS} -g -o goomsl TinyPTC/*.o *.o
 
+object: ${OBJ}
+
 goomsl_lex.c:goomsl_lex.l goomsl_yacc.c
 	lex -ogoomsl_lex.c goomsl_lex.l
 
