@@ -24,6 +24,7 @@
  */
 
 #include "PuyoNetworkMenu.h"
+#include "PuyoInternetGameCenter.h"
 #include "preferences.h"
 #include "ios_socket.h"
 #include "ios_standardmessage.h"
@@ -50,6 +51,25 @@ public:
     HttpHeaderElement(String rawElement);
     String name;
     String content;
+};
+
+class NetCenterMenu : public PuyoScreen {
+public:
+    NetCenterMenu(PuyoNetGameCenter *netCenter);
+    void build();
+    void idle(double currentTime);
+private:
+    PuyoNetGameCenter *netCenter;
+};
+
+class PushNetCenterMenuAction : public Action {
+public:
+    void action() {
+        PuyoInternetGameCenter *gameCenter = new PuyoInternetGameCenter("durandal.homeunix.com", 4567, "flobo");
+        NetCenterMenu *newNetCenterMenu = new NetCenterMenu(gameCenter);
+        newNetCenterMenu->build();
+        (GameUIDefaults::SCREEN_STACK)->push(newNetCenterMenu);
+    }
 };
 
 HttpDocument::HttpHeaderElement::HttpHeaderElement(String rawElement)
@@ -178,6 +198,22 @@ void InternetGameMenu::build() {
     add(new Text("Internet Game"));
     add(new EditFieldWithLabel("Player name:", "toto"));
     add(serverSelectionPanel);
+    add(new Button("Join", new PushNetCenterMenuAction()));
     add(new Button("Cancel", new PopScreenAction()));
 }
 
+NetCenterMenu::NetCenterMenu(PuyoNetGameCenter *netCenter) : netCenter(netCenter)
+{
+}
+
+void NetCenterMenu::idle(double currentTime)
+{
+    //PuyoScreen::idle(currentTime);
+    netCenter->idle();
+}
+
+void NetCenterMenu::build()
+{
+    add(new Text("Network Game Center"));
+    add(new Button("Exit", new PopScreenAction()));
+}

@@ -9,15 +9,6 @@ ROOT_DIR=.
 
 include config
 
-HFILES= HiScores.h IosException.h gametools/IosImgProcess.h IosVector.h PuyoCommander.h\
-        PuyoGame.h PuyoAnimations.h AnimatedPuyo.h PuyoIA.h PuyoPlayer.h     \
-        PuyoStory.h PuyoView.h audio.h menu.h menuitems.h PuyoVersion.h  \
-        gametools/preferences.h gametools/scrollingtext.h \
-				gametools/sofont.h gametools/SDL_Painter.h  \
-        gametools/InputManager.h gametools/GameControls.h \
-				HiScores.h  PuyoNetworkView.h          \
-        PuyoStarter.h PuyoNetworkGame.h # PuyoMenu.h PuyoNetworkMenu.h
-
 
 OBJFILES= HiScores.o PuyoCommander.o        \
           IosException.o IosVector.o main.o PuyoGame.o PuyoVersion.o         \
@@ -26,7 +17,7 @@ OBJFILES= HiScores.o PuyoCommander.o        \
           PuyoDoomMelt.o corona32.o corona.o corona_palette.o\
           PuyoStarter.o PuyoSinglePlayerStarter.o PuyoTwoPlayerStarter.o     \
           PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o \
-          AnimatedPuyoTheme.o PuyoNetworkMenu.o
+          AnimatedPuyoTheme.o PuyoNetworkMenu.o PuyoNetGameCenter.o PuyoInternetGameCenter.o
 
 DEPDIR = .deps
 df = $(DEPDIR)/$(*F)
