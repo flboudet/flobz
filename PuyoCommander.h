@@ -5,7 +5,7 @@
 #include "menu.h"
 #include "scrollingtext.h"
 
-
+const int JOYSTICK_THRESHOLD = 15000;
 
 typedef struct GameControlEvent {
     enum {
@@ -43,6 +43,12 @@ typedef struct GameControlEvent {
         kQuit
     } cursorEvent;
 } GameControlEvent;
+
+typedef enum {
+    kNegativeAxis = -1,
+    kNullAxis = 0,
+    kPositiveAxis = 1
+} AxisPosition;
 
 class PuyoDrawable
 {
@@ -95,7 +101,7 @@ class PuyoCommander
   int numJoysticks;
   static const int player1Joystick = 0;
   static const int player2Joystick = 1;
-  bool axis[16][16];
+  AxisPosition axis[16][16];
 };
 
 SDL_Surface * IMG_Load_DisplayFormat (const char *path);

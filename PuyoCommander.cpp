@@ -1158,6 +1158,10 @@ void PuyoCommander::initControllers()
         joystick[numJoysticks - i - 1] = SDL_JoystickOpen(i);
     }
   SDL_JoystickEventState(SDL_ENABLE);
+  
+  for (int i = 0 ; i < 16 ; i++)
+    for (int j = 0 ; j < 16 ; j++)
+        axis[i][j] = kNullAxis;
 }
 
 void PuyoCommander::closeControllers()
@@ -1182,28 +1186,53 @@ void PuyoCommander::getControlEvent(SDL_Event e, GameControlEvent *result)
             switch (e.jbutton.button) {
                 case 0:
                     result->cursorEvent = GameControlEvent::kStart;
-                    if (e.jbutton.which == 0) {
+                    if (e.jbutton.which == player1Joystick) {
                         result->gameEvent = GameControlEvent::kPlayer1TurnLeft;
                     }
-                    else {
+                    else if (e.jbutton.which == player2Joystick) {
                         result->gameEvent = GameControlEvent::kPlayer2TurnLeft;
                     }
                     break;
                 case 1:
-                    result->cursorEvent = GameControlEvent::kBack;
-                    if (e.jbutton.which == 0) {
+                    if (e.jbutton.which == player1Joystick) {
                         result->gameEvent = GameControlEvent::kPlayer1TurnRight;
                     }
-                    else {
+                    else if (e.jbutton.which == player2Joystick) {
                         result->gameEvent = GameControlEvent::kPlayer2TurnRight;
+                    }
+                    break;
+                case 2:
+                    result->cursorEvent = GameControlEvent::kBack;
+                    break;
+            }
+            break;
+         case SDL_JOYBUTTONUP:
+            switch (e.jbutton.button) {
+                case 0:
+                    if (e.jbutton.which == player1Joystick) {
+                        result->gameEvent = GameControlEvent::kPlayer1TurnLeftUp;
+                    }
+                    else if (e.jbutton.which == player2Joystick) {
+                        result->gameEvent = GameControlEvent::kPlayer2TurnLeftUp;
+                    }
+                    break;
+                case 1:
+                    if (e.jbutton.which == player1Joystick) {
+                        result->gameEvent = GameControlEvent::kPlayer1TurnRightUp;
+                    }
+                    else if (e.jbutton.which == player2Joystick) {
+                        result->gameEvent = GameControlEvent::kPlayer2TurnRightUp;
                     }
                     break;
             }
             break;
         case SDL_JOYAXISMOTION:
-            if ((e.jaxis.value < -3200) || (e.jaxis.value > 3200)) {
-                if (axis[e.jaxis.which][e.jaxis.axis] == false) {
-                    axis[e.jaxis.which][e.jaxis.axis] = true;
+            if ((e.jaxis.value < -JOYSTICK_THRESHOLD) || (e.jaxis.value > JOYSTICK_THRESHOLD)) {
+                if (axis[e.jaxis.which][e.jaxis.axis] == kNullAxis) {
+                    if (e.jaxis.value < 0)
+                        axis[e.jaxis.which][e.jaxis.axis] = kNegativeAxis;
+                    else
+                        axis[e.jaxis.which][e.jaxis.axis] = kPositiveAxis;
                     if (e.jaxis.axis == 0) {
                         if (e.jaxis.value < 0) {
                             result->cursorEvent = GameControlEvent::kLeft;
@@ -1240,9 +1269,22 @@ void PuyoCommander::getControlEvent(SDL_Event e, GameControlEvent *result)
                     }
                 }
             }
-            else {
-                axis[e.jaxis.which][e.jaxis.axis] = false;
-                if (e.jaxis.axis == 1) {
+            else { // Axis in neutral position
+                if (e.jaxis.axis == 0) {
+                    if (e.jaxis.which == player1Joystick) {
+                        if (axis[player1Joystick][0] == kNegativeAxis)
+                            result->gameEvent = GameControlEvent::kPlayer1LeftUp;
+                        else if (axis[player1Joystick][0] == kPositiveAxis)
+                            result->gameEvent = GameControlEvent::kPlayer1RightUp;
+                    }
+                    else if (e.jaxis.which == player2Joystick) {
+                        if (axis[player2Joystick][0] == kNegativeAxis)
+                            result->gameEvent = GameControlEvent::kPlayer2LeftUp;
+                        else if (axis[player2Joystick][0] == kPositiveAxis)
+                        result->gameEvent = GameControlEvent::kPlayer2RightUp;
+                    }
+                }
+                else if (e.jaxis.axis == 1) {
                     if (e.jaxis.which == player1Joystick) {
                         result->gameEvent = GameControlEvent::kPlayer1DownUp;
                     }
@@ -1250,6 +1292,7 @@ void PuyoCommander::getControlEvent(SDL_Event e, GameControlEvent *result)
                         result->gameEvent = GameControlEvent::kPlayer2DownUp;
                     }
                 }
+                axis[e.jaxis.which][e.jaxis.axis] = kNullAxis;
             }
             break;
         case SDL_KEYDOWN:
