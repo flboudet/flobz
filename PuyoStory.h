@@ -10,9 +10,11 @@ class PuyoStory : public PuyoDrawable {
     virtual ~PuyoStory();
     void loop();
     void draw();
+
+    PuyoCommander *commander;
+
   private:
     int num;
-    PuyoCommander *commander;
 };
 
 #endif

@@ -22,7 +22,6 @@ static int txt_x,txt_y,txt_w,txt_h,txt_r;
 static char txt[1024];
 
 extern PuyoStory *theStory;
-extern SoFont *darkFont;
 
 void loop_scenar(int time)
 {
@@ -107,7 +106,7 @@ void draw_scenar()
       drect.w = txt_w+2*txt_r+1;
       drect.h = txt_h-2*txt_r;
       SDL_FillRect(display,&drect,0xffffffff);
-      SoFont_PutString(darkFont,display,txt_x,txt_y+10,txt,NULL);
+      SoFont_PutString(theStory->commander->darkFont,display,txt_x,txt_y+10,txt,NULL);
   }
 }
 

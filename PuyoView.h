@@ -80,6 +80,8 @@ class PuyoStarter : public PuyoDrawable {
     PuyoRandomSystem attachedRandom;
     int tickCounts;
     int lives;
+    int score1;
+    int score2;
     bool stopRendering;
     bool paused;
 

@@ -106,6 +106,7 @@ PuyoGame::PuyoGame(PuyoRandomSystem *attachedRandom)
         endOfCycle = false;
 	gameRunning = true;
 	setFallingAtTop(true);
+  points = 0;
 }
 
 PuyoGame::~PuyoGame()
@@ -309,6 +310,8 @@ void PuyoGame::setPuyoAt(int X, int Y, PuyoPuyo *newPuyo)
 
 void PuyoGame::dropNeutrals()
 {
+  points -= neutralPuyos * 1000;
+
     while (neutralPuyos > 0) {
       int cycleNeutral;
       if (neutralPuyos >=  PUYODIMX)
@@ -632,6 +635,9 @@ void PuyoGame::cycleEnding()
     }
 	  phase++;
 	}
+  
+  points += 100 + (phase>0?phase-1:0) * 5000;
+  
 	neutralPuyos -= score;
 	if (score == 0)
 		setFallingAtTop();

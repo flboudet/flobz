@@ -77,7 +77,6 @@ static char *kAbout08 = "                                           Tania";
 extern SDL_Surface *display, *image;
 static SDL_Surface *menuBGImage = 0;
 PuyoCommander *theCommander;
-SoFont *smallFont,*menuFont,*darkFont;
 
 const int cycle_duration = 20;
 

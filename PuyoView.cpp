@@ -25,6 +25,11 @@ SDL_Surface *puyoShadow;
 SDL_Surface *puyoFaces[5][16];
 SDL_Surface *live[4];
 
+static char *AI_NAMES[] = { "Fanzy", "Bob the Killer", "Big Rabbit", "Flying Saucer",
+  "Satanas", "Doctor X", "Tanya", "Master Gyom, King of the Puyos",
+  "X","Y","Z" };
+
+
 static char PuyoGroupImageIndex[2][2][2][2] =
 { {  // empty bottom
 {  // empty right
@@ -706,7 +711,7 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
 	}
 	painter.display = display;
 	painter.redrawAll(painter.gameScreen);
-	        
+
 	static bool firstTime = true;
 	if (firstTime) {
 		fallingViolet = IMG_Load_DisplayFormatAlpha("v0.png");
@@ -831,6 +836,8 @@ PuyoStarter::~PuyoStarter()
 void PuyoStarter::run(int score1, int score2, int lives)
 {
 	this->lives = lives;
+  this->score1 = score1;
+  this->score2 = score2;
 	SDL_Rect drect;
 	SDL_Event event;
 	int quit = 0;
@@ -1116,10 +1123,6 @@ void PuyoStarter::run(int score1, int score2, int lives)
 
             if (!menu_visible(commander->gameOverMenu)) {
 
-              char *lname[] = { "Fanzy", "Bob the Killer", "Big Rabbit", "Flying Saucer",
-                "Satanas", "Doctor X", "Tanya", "Master Gyom, King of the Puyos",
-                "X","Y","Z" };
-
               if (leftPlayerWin()) score1++;
               else if (rightPlayerWin()) score2++;
 
@@ -1133,20 +1136,20 @@ void PuyoStarter::run(int score1, int score2, int lives)
               }
               else if (commander->gameOverMenu == commander->nextLevelMenu) {
                 char level[256];
-                sprintf(level, "%d, vs. %s", score2+1, lname[score2]);
+                sprintf(level, "%d, vs. %s", score2+1, AI_NAMES[score2]);
                 menu_set_value(commander->gameOverMenu, kNextLevel, level);
               }
               else if (commander->gameOverMenu == commander->looserMenu) {
                 char level[256];
                 char cont[256];
-                sprintf(level, "%d, vs. %s", score2+1, lname[score2]);
+                sprintf(level, "%d, vs. %s", score2+1, AI_NAMES[score2]);
                 sprintf(cont, "%d", lives);
                 menu_set_value(commander->gameOverMenu, kCurrentLevel, level);
                 menu_set_value(commander->gameOverMenu, kContinueLeft, cont);
               }
               else if (commander->gameOverMenu == commander->gameOver1PMenu) {
                 char level[256];
-                sprintf(level, "%d (vs. %s)", score2+1, lname[score2]);
+                sprintf(level, "%d (vs. %s)", score2+1, AI_NAMES[score2]);
                 menu_set_value(commander->gameOverMenu, kYouGotToLevel, level);
               }
               commander->showGameOver();
@@ -1258,4 +1261,26 @@ void PuyoStarter::draw()
 		
 		painter.draw(painter.gameScreen);
 	}
+  char text[256];
+  if (!randomPlayer)
+  {
+    sprintf(text, "Win %d", score1);
+    SoFont_CenteredString_XY (commander->smallFont, display,
+                              50, 460,   text, NULL);
+    sprintf(text, "Win %d", score2);
+    SoFont_CenteredString_XY (commander->smallFont, display,
+                              590, 460, text, NULL);
+  }
+  else
+  {
+    SoFont *font = (stopRendering?commander->darkFont:commander->menuFont);
+    SoFont_CenteredString_XY (font, display,
+                              130, 460,   AI_NAMES[score2], NULL);
+  }
+  sprintf(text, "<< %d", attachedGameA->getPoints());
+  SoFont_CenteredString_XY (commander->smallFont, display,
+                            300, 380,   text, NULL);
+  sprintf(text, "%d >>", attachedGameB->getPoints());
+  SoFont_CenteredString_XY (commander->smallFont, display,
+                            340, 395, text, NULL);
 }

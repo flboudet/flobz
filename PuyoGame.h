@@ -110,6 +110,7 @@ public:
   int getSamePuyoAround(int X, int Y, PuyoState color);
 
   int getSemiMove() const { return semiMove; }
+  int getPoints() const { return points; }
 
  private:
   // Set the state of the puyo at the indicated coordinates (not recommanded)
@@ -150,6 +151,7 @@ public:
   
   // We are keeping a list of current puyos
   IosVector puyoVector;
+  int points;
 };
 
 #endif // PUYOGAME_H
