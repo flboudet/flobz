@@ -32,9 +32,9 @@ class ServerConnection {
 public:
     virtual ~ServerConnection() {}
     void initialize(Socket *client) { clientSocket = client; }
-    virtual void connectionMade() = 0;
-    virtual void dataReceived() = 0;
-    virtual void connectionLost() = 0;
+    virtual void connectionMade() {}
+    virtual void dataReceived() {}
+    virtual void connectionLost() {}
  protected:
     Socket *clientSocket;
 };
@@ -42,6 +42,7 @@ public:
 class StandardServerConnection : public ServerConnection {
 public:
     void dataReceived();
+protected:
     virtual void dataReceived(VoidBuffer *data) = 0;
 };
 
@@ -57,7 +58,7 @@ public:
      void connectionFromSocket(Socket *client);
      void dataFromSocket(Socket *client);
      void deconnectionFromSocket(Socket *client);
-private:
+protected:
      virtual ServerConnection *createConnection() = 0;
  };
 

@@ -1,28 +1,32 @@
 #include "ios_server.h"
 #include <stdio.h>
 
-class MyPortManager : public ios_fc::ServerPortManager {
+class MyConnection : public ios_fc::StandardServerConnection {
 public:
-  void connectionFromSocket(ios_fc::Socket *client);
-  void dataFromSocket(ios_fc::Socket *client);
-  void deconnectionFromSocket(ios_fc::Socket *client);
+  void connectionMade();
+protected:
+  void dataReceived(ios_fc::VoidBuffer *data);
 };
 
-void MyPortManager::connectionFromSocket(ios_fc::Socket *client)
+class MyPortManager : public ios_fc::StandardServerPortManager {
+protected:
+  ios_fc::ServerConnection *createConnection();
+};
+
+
+ios_fc::ServerConnection *MyPortManager::createConnection()
 {
-  printf("New conection\n");
+  return new MyConnection();
 }
 
-void MyPortManager::dataFromSocket(ios_fc::Socket *client)
+void MyConnection::connectionMade()
 {
-  printf("New data\n");
+  //  clientSocket->getOutputStream()->streamWrite(ios_fc::Buffer<char>("Hello\n"));
 }
 
-void MyPortManager::deconnectionFromSocket(ios_fc::Socket *client)
+void MyConnection::dataReceived(ios_fc::VoidBuffer *data)
 {
-  printf("Deconnection\n");
 }
-
 
 int main()
 {
