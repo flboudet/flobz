@@ -30,10 +30,10 @@ namespace ios_fc {
 
 // IGP stands for Ios Gateway Protocol
 
-class IgpMessageBox {
+class IgpMessageBox : public MessageBox {
 public:
     IgpMessageBox(const String hostName, int portID);
-    virtual ~MessageBox();
+    virtual ~IgpMessageBox();
     virtual void idle();
     virtual Message * createMessage();
  private:

@@ -1,4 +1,4 @@
-OBJ=ios_exception.o ios_hash.o ios_memory.o ios_message.o ios_udpmessage.o ios_messagebox.o ios_udpmessagebox.o  IosDatagramSocket.o
+OBJ=ios_exception.o ios_hash.o ios_memory.o ios_message.o ios_standardmessage.o ios_udpmessage.o ios_messagebox.o ios_udpmessagebox.o  IosDatagramSocket.o
 TOBJ=test_udpmessagebox.o
 CPPFLAGS=-g `sdl-config --cflags`  -Wall
 
