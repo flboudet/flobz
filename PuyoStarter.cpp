@@ -45,10 +45,7 @@ IIM_Surface *gameScreen;
 IIM_Surface *shrinkingPuyo[5][5];
 IIM_Surface *explodingPuyo[5][5];
 extern IIM_Surface *bigNeutral;
-IIM_Surface *puyoEye[3];
-extern IIM_Surface *puyoEyes;
 IIM_Surface *puyoEyesSwirl[4];
-extern IIM_Surface *puyoFaces[5][16];
 
 int gameLevel;
 int GAME_ACCEL = 1250;
@@ -59,7 +56,7 @@ const char *p2name;
 
 extern Menu *menu_pause;
 static char *BACKGROUND[NB_MUSIC_THEME] = { "Background.jpg", "BackgroundDark.jpg" };
-extern IIM_Surface *background, *fallingBlue, *fallingRed, *fallingGreen, *fallingViolet, *fallingYellow, *neutral;
+extern IIM_Surface *background, *neutral;
 
 PuyoPureStarter::PuyoPureStarter(PuyoCommander *commander) : commander(commander)
 {
@@ -330,28 +327,6 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
     static bool firstTime = true;
     if (firstTime) {
 
-        IIM_Surface *fallingCross, *fallingCircle, *fallingVCircle, *fallingHCircle,*fallingSquare;
-        fallingCircle  = IIM_Load_DisplayFormatAlpha("v0.png");
-        fallingSquare  = IIM_Load_DisplayFormatAlpha("c0.png");
-        fallingCross   = IIM_Load_DisplayFormatAlpha("g0.png");
-        fallingHCircle = IIM_Load_DisplayFormatAlpha("h0.png");
-        fallingVCircle = IIM_Load_DisplayFormatAlpha("p0.png");
-        fallingViolet = iim_surface_shift_hue(fallingCircle, 0.0f);
-        fallingRed    = iim_surface_shift_hue(fallingCross, 100.0f);
-        fallingBlue   = iim_surface_shift_hue(fallingVCircle, -65.0f);
-        fallingGreen  = iim_surface_shift_hue(fallingHCircle, -150.0f);
-        fallingYellow = iim_surface_shift_hue(fallingSquare, 140.0f);
-/*        fallingViolet = iim_surface_shift_hue(fallingSquare, 0.0f);
-        fallingRed    = iim_surface_shift_hue(fallingSquare, 100.0f);
-        fallingBlue   = iim_surface_shift_hue(fallingSquare, -65.0f);
-        fallingGreen  = iim_surface_shift_hue(fallingSquare, -150.0f);
-        fallingYellow = iim_surface_shift_hue(fallingSquare, 140.0f);*/
-        IIM_Free(fallingCircle);
-        IIM_Free(fallingSquare);
-        IIM_Free(fallingCross);
-        IIM_Free(fallingHCircle);
-        IIM_Free(fallingVCircle);
-
         neutral       = IIM_Load_DisplayFormatAlpha("Neutral.png");
         bigNeutral    = IIM_Load_DisplayFormatAlpha("BigNeutral.png");
         speedImg      = IIM_Load_DisplayFormatAlpha("speed.png");
@@ -359,136 +334,20 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
 
         loadShrinkXplode();
         
-        puyoEye[0] = IIM_Load_DisplayFormatAlpha("eye0.png");
-        puyoEye[1] = IIM_Load_DisplayFormatAlpha("eye1.png");
-        puyoEye[2] = IIM_Load_DisplayFormatAlpha("eye2.png");
-        puyoEyes = puyoEye[0];
         puyoEyesSwirl[0] = IIM_Load_DisplayFormatAlpha("twirleye0.png");
         puyoEyesSwirl[1] = IIM_Load_DisplayFormatAlpha("twirleye1.png");
         puyoEyesSwirl[2] = IIM_Load_DisplayFormatAlpha("twirleye2.png");
         puyoEyesSwirl[3] = IIM_Load_DisplayFormatAlpha("twirleye3.png");
-        
-        puyoFaces[0][0] = IIM_Load_DisplayFormatAlpha("v0.png");
-        puyoFaces[0][1] = IIM_Load_DisplayFormatAlpha("v1a.png");
-        puyoFaces[0][2] = IIM_Load_DisplayFormatAlpha("v1b.png");
-        puyoFaces[0][3] = IIM_Load_DisplayFormatAlpha("v1c.png");
-        puyoFaces[0][4] = IIM_Load_DisplayFormatAlpha("v1d.png");
-        puyoFaces[0][5] = IIM_Load_DisplayFormatAlpha("v2ab.png");
-        puyoFaces[0][6] = IIM_Load_DisplayFormatAlpha("v2ac.png");
-        puyoFaces[0][7] = IIM_Load_DisplayFormatAlpha("v2ad.png");
-        puyoFaces[0][8] = IIM_Load_DisplayFormatAlpha("v2bc.png");
-        puyoFaces[0][9] = IIM_Load_DisplayFormatAlpha("v2bd.png");
-        puyoFaces[0][10] = IIM_Load_DisplayFormatAlpha("v2cd.png");
-        puyoFaces[0][11] = IIM_Load_DisplayFormatAlpha("v3abc.png");
-        puyoFaces[0][12] = IIM_Load_DisplayFormatAlpha("v3abd.png");
-        puyoFaces[0][13] = IIM_Load_DisplayFormatAlpha("v3acd.png");
-        puyoFaces[0][14] = IIM_Load_DisplayFormatAlpha("v3bcd.png");
-        puyoFaces[0][15] = IIM_Load_DisplayFormatAlpha("v4abcd.png");
-        
-        puyoFaces[4][0] = IIM_Load_DisplayFormatAlpha("c0.png");
-        puyoFaces[4][1] = IIM_Load_DisplayFormatAlpha("c1a.png");
-        puyoFaces[4][2] = IIM_Load_DisplayFormatAlpha("c1b.png");
-        puyoFaces[4][3] = IIM_Load_DisplayFormatAlpha("c1c.png");
-        puyoFaces[4][4] = IIM_Load_DisplayFormatAlpha("c1d.png");
-        puyoFaces[4][5] = IIM_Load_DisplayFormatAlpha("c2ab.png");
-        puyoFaces[4][6] = IIM_Load_DisplayFormatAlpha("c2ac.png");
-        puyoFaces[4][7] = IIM_Load_DisplayFormatAlpha("c2ad.png");
-        puyoFaces[4][8] = IIM_Load_DisplayFormatAlpha("c2bc.png");
-        puyoFaces[4][9] = IIM_Load_DisplayFormatAlpha("c2bd.png");
-        puyoFaces[4][10] = IIM_Load_DisplayFormatAlpha("c2cd.png");
-        puyoFaces[4][11] = IIM_Load_DisplayFormatAlpha("c3abc.png");
-        puyoFaces[4][12] = IIM_Load_DisplayFormatAlpha("c3abd.png");
-        puyoFaces[4][13] = IIM_Load_DisplayFormatAlpha("c3acd.png");
-        puyoFaces[4][14] = IIM_Load_DisplayFormatAlpha("c3bcd.png");
-        puyoFaces[4][15] = IIM_Load_DisplayFormatAlpha("c4abcd.png");
-        
-        puyoFaces[2][0] = IIM_Load_DisplayFormatAlpha("p0.png");
-        puyoFaces[2][1] = IIM_Load_DisplayFormatAlpha("p1a.png");
-        puyoFaces[2][2] = IIM_Load_DisplayFormatAlpha("p1b.png");
-        puyoFaces[2][3] = IIM_Load_DisplayFormatAlpha("p1c.png");
-        puyoFaces[2][4] = IIM_Load_DisplayFormatAlpha("p1d.png");
-        puyoFaces[2][5] = IIM_Load_DisplayFormatAlpha("p2ab.png");
-        puyoFaces[2][6] = IIM_Load_DisplayFormatAlpha("p2ac.png");
-        puyoFaces[2][7] = IIM_Load_DisplayFormatAlpha("p2ad.png");
-        puyoFaces[2][8] = IIM_Load_DisplayFormatAlpha("p2bc.png");
-        puyoFaces[2][9] = IIM_Load_DisplayFormatAlpha("p2bd.png");
-        puyoFaces[2][10] = IIM_Load_DisplayFormatAlpha("p2cd.png");
-        puyoFaces[2][11] = IIM_Load_DisplayFormatAlpha("p3abc.png");
-        puyoFaces[2][12] = IIM_Load_DisplayFormatAlpha("p3abd.png");
-        puyoFaces[2][13] = IIM_Load_DisplayFormatAlpha("p3acd.png");
-        puyoFaces[2][14] = IIM_Load_DisplayFormatAlpha("p3bcd.png");
-        puyoFaces[2][15] = IIM_Load_DisplayFormatAlpha("p4abcd.png");
-        
-        puyoFaces[3][0] = IIM_Load_DisplayFormatAlpha("h0.png");
-        puyoFaces[3][1] = IIM_Load_DisplayFormatAlpha("h1a.png");
-        puyoFaces[3][2] = IIM_Load_DisplayFormatAlpha("h1b.png");
-        puyoFaces[3][3] = IIM_Load_DisplayFormatAlpha("h1c.png");
-        puyoFaces[3][4] = IIM_Load_DisplayFormatAlpha("h1d.png");
-        puyoFaces[3][5] = IIM_Load_DisplayFormatAlpha("h2ab.png");
-        puyoFaces[3][6] = IIM_Load_DisplayFormatAlpha("h2ac.png");
-        puyoFaces[3][7] = IIM_Load_DisplayFormatAlpha("h2ad.png");
-        puyoFaces[3][8] = IIM_Load_DisplayFormatAlpha("h2bc.png");
-        puyoFaces[3][9] = IIM_Load_DisplayFormatAlpha("h2bd.png");
-        puyoFaces[3][10] = IIM_Load_DisplayFormatAlpha("h2cd.png");
-        puyoFaces[3][11] = IIM_Load_DisplayFormatAlpha("h3abc.png");
-        puyoFaces[3][12] = IIM_Load_DisplayFormatAlpha("h3abd.png");
-        puyoFaces[3][13] = IIM_Load_DisplayFormatAlpha("h3acd.png");
-        puyoFaces[3][14] = IIM_Load_DisplayFormatAlpha("h3bcd.png");
-        puyoFaces[3][15] = IIM_Load_DisplayFormatAlpha("h4abcd.png");
-        
-        puyoFaces[1][0] = IIM_Load_DisplayFormatAlpha("g0.png");
-        puyoFaces[1][1] = IIM_Load_DisplayFormatAlpha("g1a.png");
-        puyoFaces[1][2] = IIM_Load_DisplayFormatAlpha("g1b.png");
-        puyoFaces[1][3] = IIM_Load_DisplayFormatAlpha("g1c.png");
-        puyoFaces[1][4] = IIM_Load_DisplayFormatAlpha("g1d.png");
-        puyoFaces[1][5] = IIM_Load_DisplayFormatAlpha("g2ab.png");
-        puyoFaces[1][6] = IIM_Load_DisplayFormatAlpha("g2ac.png");
-        puyoFaces[1][7] = IIM_Load_DisplayFormatAlpha("g2ad.png");
-        puyoFaces[1][8] = IIM_Load_DisplayFormatAlpha("g2bc.png");
-        puyoFaces[1][9] = IIM_Load_DisplayFormatAlpha("g2bd.png");
-        puyoFaces[1][10] = IIM_Load_DisplayFormatAlpha("g2cd.png");
-        puyoFaces[1][11] = IIM_Load_DisplayFormatAlpha("g3abc.png");
-        puyoFaces[1][12] = IIM_Load_DisplayFormatAlpha("g3abd.png");
-        puyoFaces[1][13] = IIM_Load_DisplayFormatAlpha("g3acd.png");
-        puyoFaces[1][14] = IIM_Load_DisplayFormatAlpha("g3bcd.png");
-        puyoFaces[1][15] = IIM_Load_DisplayFormatAlpha("g4abcd.png");
-
 
         live[0] = IIM_Load_DisplayFormatAlpha("0live.png");
         live[1] = IIM_Load_DisplayFormatAlpha("1live.png");
         live[2] = IIM_Load_DisplayFormatAlpha("2live.png");
         live[3] = IIM_Load_DisplayFormatAlpha("3live.png");
         
-        for (int i = 0 ; i < 16 ; i++) {
-            IIM_Surface *tmp = puyoFaces[1][i];
-            puyoFaces[1][i] = iim_surface_shift_hue(tmp, 100);
-            IIM_Free(tmp);
-        }
-        for (int i = 0 ; i < 16 ; i++) {
-            IIM_Surface *tmp = puyoFaces[2][i];
-            puyoFaces[2][i] = iim_surface_shift_hue(tmp, -65);
-            IIM_Free(tmp);
-        }
-        for (int i = 0 ; i < 16 ; i++) {
-            IIM_Surface *tmp = puyoFaces[3][i];
-            puyoFaces[3][i] = iim_surface_shift_hue(tmp, -150);
-            IIM_Free (tmp);
-        }
-        for (int i = 0 ; i < 16 ; i++) {
-            IIM_Surface *tmp = puyoFaces[4][i];
-            puyoFaces[4][i] = iim_surface_shift_hue(tmp, 140);
-            IIM_Free (tmp);
-        }
-        
         grid          = IIM_Load_DisplayFormatAlpha("grid.png");
         firstTime = false;
     }
     
-    if (fallingBlue == NULL)
-    {
-        fprintf(stderr, "IMG_Load error:%s\n", SDL_GetError());
-        exit(-1);
-    }
     if (mbox == NULL) {
         attachedGameFactory = new PuyoLocalGameFactory(&attachedRandom);
         areaA = new PuyoView(attachedGameFactory, &attachedThemeManager,
@@ -531,7 +390,6 @@ PuyoStarter::~PuyoStarter()
     delete attachedGameA;
     delete attachedGameB;
     delete attachedGameFactory;
-    //	SDL_FreeSurface(fallingBlue);
 }
 
 

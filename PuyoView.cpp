@@ -39,11 +39,8 @@
 SDL_Painter painter;
 
 extern SDL_Surface *display;
-IIM_Surface *background, *fallingBlue, *fallingRed, *fallingGreen, *fallingViolet, *fallingYellow, *neutral;
+IIM_Surface *background, *neutral;
 IIM_Surface *bigNeutral;
-IIM_Surface *puyoEyes;
-IIM_Surface *puyoFaces[5][16];
-
 
 static char PuyoGroupImageIndex[2][2][2][2] =
 { {  // empty bottom
@@ -118,48 +115,6 @@ void PuyoView::setEnemyGame(PuyoGame *enemyGame)
 	this->enemyGame = enemyGame;
 }
 
-IIM_Surface *PuyoView::getSurfaceForState(PuyoState state)
-{
-	switch (state) {
-		case PUYO_BLUE:
-			return fallingBlue;
-			break;
-		case PUYO_RED:
-			return fallingRed;
-			break;
-		case PUYO_GREEN:
-			return fallingGreen;
-			break;
-		case PUYO_VIOLET:
-			return fallingViolet;
-			break;
-		case PUYO_YELLOW:
-			return fallingYellow;
-			break;
-		case PUYO_FALLINGBLUE:
-			return fallingBlue;
-			break;
-		case PUYO_FALLINGRED:
-			return fallingRed;
-			break;
-		case PUYO_FALLINGGREEN:
-			return fallingGreen;
-			break;
-		case PUYO_FALLINGVIOLET:
-			return fallingViolet;
-			break;
-		case PUYO_FALLINGYELLOW:
-			return fallingYellow;
-			break;
-		case PUYO_NEUTRAL:
-			return neutral;
-			break;
-		default:
-			return NULL;
-			break;
-	}
-}
-
 int PuyoView::getValenceForPuyo(PuyoPuyo *puyo) const
 {
     int i = puyo->getPuyoX();
@@ -180,26 +135,6 @@ int PuyoView::getValenceForPuyo(PuyoPuyo *puyo) const
 		[rightState == currentPuyoState ? 1 : 0]
 		[upState == currentPuyoState    ? 1 : 0]
 		[leftState == currentPuyoState  ? 1 : 0];
-}
-
-IIM_Surface *PuyoView::getSurfaceForPuyo(PuyoPuyo *puyo)
-{
-    int currentIndex = getValenceForPuyo(puyo);
-    PuyoState currentPuyoState = puyo->getPuyoState();
-    switch (currentPuyoState) {
-		case PUYO_VIOLET:
-			return puyoFaces[0][currentIndex];
-		case PUYO_RED:
-			return puyoFaces[1][currentIndex];
-		case PUYO_BLUE:
-			return puyoFaces[2][currentIndex];
-		case PUYO_GREEN:
-			return puyoFaces[3][currentIndex];
-		case PUYO_YELLOW:
-			return puyoFaces[4][currentIndex];
-		default:
-			return getSurfaceForState(currentPuyoState);
-    }
 }
 
 void PuyoView::cycleAnimation()
