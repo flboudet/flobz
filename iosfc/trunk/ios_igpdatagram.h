@@ -49,7 +49,14 @@ public:
     class ClientMsgAutoAssignIDDatagram;
     class ServerMsgInformIDDatagram;
 protected:
-    IGPDatagram(IGPMsgIdent ident, VoidBuffer message);
+    IGPDatagram(IGPMsgIdent ident, int msgSize);
+    Buffer<char> message;
+    inline void writeBigEndianIntToMessage(int integer, int offset) {
+        message[offset]     = (integer & 0xFF000000) >> 24;
+        message[offset + 1] = (integer & 0x00FF0000) >> 16;
+        message[offset + 2] = (integer & 0x0000FF00) >> 8;
+        message[offset + 3] = (integer & 0x000000FF);
+    }
 private:
     int msgSize;
     int msgIdent;
@@ -58,12 +65,14 @@ private:
 
 class IGPDatagram::ClientMsgAutoAssignIDDatagram : public IGPDatagram {
 public:
-    ClientMsgAutoAssignIDDatagram() : IGPDatagram(ClientMsgAutoAssignID, VoidBuffer()) {}
+    ClientMsgAutoAssignIDDatagram() : IGPDatagram(ClientMsgAutoAssignID, 0) {}
 };
 
 class IGPDatagram::ServerMsgInformIDDatagram : public IGPDatagram {
 public:
-    ServerMsgInformIDDatagram(int igpIdent) : IGPDatagram(ServerMsgInformID, VoidBuffer()) {}
+    ServerMsgInformIDDatagram(int igpIdent) : IGPDatagram(ServerMsgInformID, 4) {
+        writeBigEndianIntToMessage(igpIdent, 8);
+    }
 };
 
 };
