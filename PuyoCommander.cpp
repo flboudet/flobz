@@ -9,6 +9,7 @@
 using namespace gameui;
 
 PuyoCommander *theCommander = NULL;
+IIM_Surface   *menuBG       = NULL;
 SoFont *storyFont;
 #define WIDTH  640
 #define HEIGHT 480
@@ -21,9 +22,12 @@ class ExitAction : public Action {
     void action() { SDL_Quit(); exit(0); }
 };
 
-class SinglePlayerGame : public Action {
-  public:
-    void action();
+class SinglePlayerGameAction : public Action {
+  public: void action();
+};
+
+class NetGameAction : public Action {
+  public: void action();
 };
 
 /*
@@ -31,35 +35,53 @@ class SinglePlayerGame : public Action {
  */
 class PuyoScreen : public Screen {
   public:
-    PuyoScreen() : Screen(0,0,WIDTH,HEIGHT) {}
+    PuyoScreen() : Screen(0,0,WIDTH,HEIGHT) { setBackground(menuBG); }
     virtual ~PuyoScreen() {}
     virtual void build() = 0;
 };
 
 class MainMenu : public PuyoScreen {
-  public:
-    void build() {
-      add(new Button(kSinglePlayerGame, new SinglePlayerGame));
-      add(new Button(kExit, new ExitAction));
-    }
+  public: void build();
 };
+
+class NetworkGameMenu : public PuyoScreen {
+  public: void build();
+};
+
+void MainMenu::build() {
+  add(new Button(kSinglePlayerGame, new SinglePlayerGameAction));
+  add(new Button(kNetGame, new PushScreenAction(theCommander->netGameMenu)));
+  add(new Button(kExit,    new ExitAction));
+}
+
+void NetworkGameMenu::build() {
+  add(new Button("(Temporary) GO!", new NetGameAction));
+}
 
 /**
  * Launches a single player game
  */
-void SinglePlayerGame::action()
+void SinglePlayerGameAction::action()
 {
   PuyoStarter *starter = new PuyoSinglePlayerStarter(theCommander, 5, FLOBO, 0);
-  theCommander->mainMenu->remove();
-  theCommander->loop->add(starter);
+  GameUIDefaults::SCREEN_STACK->push(starter);
   starter->run(0,0,0,0,0);
-  theCommander->loop->add(theCommander->mainMenu);
+  GameUIDefaults::SCREEN_STACK->pop();
   starter->kill();
+}
+
+/**
+ * Launches a network game
+ */
+void NetGameAction::action()
+{
+//  PuyoStarter *starter = new PuyoNetworkStarter(...);
+//  theCommander->mainMenu->hide();
 }
 
 void PuyoCommander::run()
 {
-  loop->add(mainMenu);
+  GameUIDefaults::SCREEN_STACK->push(mainMenu);
   while(1) {
     updateAll(NULL);
   }
@@ -67,11 +89,14 @@ void PuyoCommander::run()
 
 void PuyoCommander::initMenus()
 {
+  menuBG = IIM_Load_DisplayFormat("MenuBackground.jpg");
   // Create the structures.
-  mainMenu = new MainMenu;
+  mainMenu    = new MainMenu;
+  netGameMenu = new NetworkGameMenu;
 
   // Build the menus.
   mainMenu->build();
+  netGameMenu->build();
 }
 
 /* Build the PuyoCommander */

@@ -33,7 +33,7 @@
 #define _PUYOSTARTER
 
 // Le PuyoStarter moderne
-class PuyoPureStarter : public DrawableComponent {
+class PuyoPureStarter : public Screen { //DrawableComponent {
 public:
     PuyoPureStarter(PuyoCommander *commander);
     virtual ~PuyoPureStarter();
@@ -61,7 +61,7 @@ protected:
 };
 
 
-class PuyoStarter : public PuyoPureStarter, public virtual IdleComponent {
+class PuyoStarter : public PuyoPureStarter { // , public virtual IdleComponent {
 public:
     PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType, int theme, ios_fc::MessageBox *mbox = NULL);
     virtual ~PuyoStarter();

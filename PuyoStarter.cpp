@@ -59,7 +59,7 @@ const char *p2name = "Player2";
 static char *BACKGROUND[NB_MUSIC_THEME] = { "Background.jpg", "BackgroundDark.jpg" };
 extern IIM_Surface *background, *neutral;
 
-PuyoPureStarter::PuyoPureStarter(PuyoCommander *commander) : commander(commander)
+PuyoPureStarter::PuyoPureStarter(PuyoCommander *commander) : Screen(0,0,640,480), commander(commander)
 {
     paused = false;
     stopRendering = false;
@@ -840,7 +840,6 @@ void PuyoStarter::run(int _score1, int _score2, int lives, int point1, int point
         else
             currentPerso = 1;
         
-//        while (SDL_PollEvent(&event) == 1)
             commander->updateAll(this);
             if (!paused) {
                 areaA->cycleAnimation();
@@ -866,7 +865,6 @@ void PuyoStarter::run(int _score1, int _score2, int lives, int point1, int point
             }
             requestDraw();
     }
-	//commander->hideGameOver();
 	if (randomPlayer) {
             for (int i=0; i<NB_PERSO_STATE; ++i)
                 IIM_Free(perso[i]);

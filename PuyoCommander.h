@@ -48,7 +48,10 @@ class PuyoCommander : public MessageListener
 
   private:
 
-    friend class SinglePlayerGame;
+    friend class SinglePlayerGameAction;
+    friend class NetGameAction;
+    friend class MainMenu;
+    friend class NetworkGameMenu;
 
     void loadPreferences(bool fs, bool snd, bool audio);
     void initSDL();
@@ -59,7 +62,7 @@ class PuyoCommander : public MessageListener
 
     MessageBox *mbox;
     GameLoop   *loop;
-    PuyoScreen *mainMenu;
+    PuyoScreen *mainMenu, *netGameMenu;
 
     bool sound;
     bool fx;
