@@ -51,7 +51,7 @@ void gsl_read_integer(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
   char buffer[256];
   fgets(buffer,255,stdin);
-  GSL_GLOBAL_INT(gsl,global,"read_integer") = strtol(buffer,NULL,0);
+  GSL_GLOBAL_INT(gsl,"read_integer") = strtol(buffer,NULL,0);
 }
 
 void gsl_read_line(GoomSL *gsl, GoomHash *global, GoomHash *local)
@@ -62,13 +62,13 @@ void gsl_read_line(GoomSL *gsl, GoomHash *global, GoomHash *local)
   ret = gsl_malloc(gsl, strlen(buffer)+1);
   buffer[strlen(buffer)-1] = 0;
   strcpy(gsl_get_ptr(gsl,ret), buffer);
-  GSL_GLOBAL_INT(gsl,global,"read_line") = ret;
+  GSL_GLOBAL_INT(gsl,"read_line") = ret;
 }
 
 void gsl_random(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
   int max        = GSL_LOCAL_INT(gsl,local,"max");
-  GSL_GLOBAL_INT(gsl,global,"random") = (int) ((double)max*rand()/(RAND_MAX+1.0));
+  GSL_GLOBAL_INT(gsl,"random") = (int) ((double)max*rand()/(RAND_MAX+1.0));
 }
 
 void gsl_srandom(GoomSL *gsl, GoomHash *global, GoomHash *local)
@@ -80,7 +80,7 @@ void gsl_strcmp(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
   char *str1 = GSL_LOCAL_PTR(gsl,local,"s1");
   char *str2 = GSL_LOCAL_PTR(gsl,local,"s2");
-  GSL_GLOBAL_INT(gsl,global,"strcmp") = strcmp(str1,str2);
+  GSL_GLOBAL_INT(gsl,"strcmp") = strcmp(str1,str2);
 }
 
 void gsl_ext_free(GoomSL *gsl, GoomHash *global, GoomHash *local)
@@ -104,7 +104,7 @@ void gsl_ptc_open(GoomSL *gsl, GoomHash *global, GoomHash *local)
   /*  *(int*)ret->ptr = ptc_open (title, width, height); */
   if (ret)
     pixel = malloc(sizeof(int) * width * height);
-  GSL_GLOBAL_INT(gsl, global, "ptc_open") = ret;
+  GSL_GLOBAL_INT(gsl, "ptc_open") = ret;
 }
 
 void gsl_ptc_close(GoomSL *gsl, GoomHash *global, GoomHash *local)
@@ -138,7 +138,7 @@ void gsl_ptc_get_pixel(GoomSL *gsl, GoomHash *global, GoomHash *local)
   int x   = GSL_LOCAL_INT(gsl,local,"x");
   int y   = GSL_LOCAL_INT(gsl,local,"y");
   /* HashValue *ret = goom_hash_get(global,"ptc_get_pixel"); */
-  GSL_GLOBAL_INT(gsl, global, "ptc_get_pixel") = pixel[x+y*width];
+  GSL_GLOBAL_INT(gsl, "ptc_get_pixel") = pixel[x+y*width];
   /* *(int*)ret->ptr  = pixel[x+y*width]; */
 }
 

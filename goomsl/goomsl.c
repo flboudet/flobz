@@ -6,7 +6,7 @@
 #include "goomsl_private.h"
 #include "goomsl_yacc.h"
 
-/* #define TRACE_SCRIPT */
+/*#define TRACE_SCRIPT*/
 
  /* {{{ definition of the instructions number */
 #define INSTR_SETI_VAR_INTEGER     1
@@ -1285,6 +1285,11 @@ static void gsl_create_fast_iflow(void)
 
 void yy_scan_string(const char *str);
 void yyparse(void);
+
+GoomHash *gsl_globals(GoomSL *_this)
+{
+  return _this->vars;
+}
 
 void gsl_compile(GoomSL *_currentGoomSL, const char *script)
 { /* {{{ */

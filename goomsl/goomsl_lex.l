@@ -16,7 +16,7 @@ static char string[1024];
 
 DIGIT    [0-9]
 XDIGIT   [0-9a-f]
-ID       [a-zA-Z_@][a-zA-Z0-9_\.]*
+ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
 
 %S C_COMMENT
 %S LINE_COMMENT
@@ -66,12 +66,14 @@ ID       [a-zA-Z_@][a-zA-Z0-9_\.]*
 <INITIAL>"not"                   { return NOT;      }
 <INITIAL>"while"                 { return WHILE;    } 
 <INITIAL>"do"                    { return DO;       }
+<INITIAL>"for"                   { return FOR;      }
+<INITIAL>"in"                    { return IN;       }
 <INITIAL>"true"                  { strncpy(yylval.strValue, "1", 2047);    return LTYPE_INTEGER; }
 <INITIAL>"false"                 { strncpy(yylval.strValue, "0", 2047);    return LTYPE_INTEGER; }
 <INITIAL>{ID}                    { strncpy(yylval.strValue, yytext, 2047); return LTYPE_VAR;     }
 <INITIAL>{DIGIT}+                { strncpy(yylval.strValue, yytext, 2047); return LTYPE_INTEGER; }
 <INITIAL>"0x"{XDIGIT}+           { strncpy(yylval.strValue, yytext, 2047); return LTYPE_INTEGER; }
-<INITIAL>{DIGIT}+"."{DIGIT}*     { strncpy(yylval.strValue, yytext, 2047); return LTYPE_FLOAT;   }
+<INITIAL>"-"?{DIGIT}+"."{DIGIT}* { strncpy(yylval.strValue, yytext, 2047); return LTYPE_FLOAT;   }
 <INITIAL>{DIGIT}+"%"             { sprintf(yylval.strValue, "%3.2f", atof(yytext)/100.0f); return LTYPE_FLOAT; }
 <INITIAL>"+="                    { return PLUS_EQ; }
 <INITIAL>"*="                    { return MUL_EQ; }

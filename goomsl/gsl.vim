@@ -21,7 +21,7 @@ syn case match
 syn sync lines=250
 
 syn keyword gslOperator	mod not
-syn keyword gslRepeat	do while
+syn keyword gslRepeat	do while for in
 syn keyword gslStatement	declare external
 syn keyword gslType		int float ptr string boolean false true
 syn keyword gslTodo             TODO contained

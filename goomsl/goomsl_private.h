@@ -43,6 +43,8 @@
 #define OPR_DIV_EQ 19
 #define OPR_CALL_EXPR 20
 #define OPR_AFFECT_LIST 21
+#define OPR_FOREACH 22
+#define OPR_VAR_LIST 23
 
 /* }}} */
 

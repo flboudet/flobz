@@ -1,5 +1,8 @@
 #include stdlib.gsl
 
 <main>
-  int i = 3
-  print: msg="= %d\n" argi=400/8
+  int i
+  int x = 12
+  int y = 13
+  for i in (x y) do print: msg="i = %d\n" argi=i
+

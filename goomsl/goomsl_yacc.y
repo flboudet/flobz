@@ -11,7 +11,7 @@
     #include "goomsl_private.h"
 
 #define STRUCT_ALIGNMENT 16
-/* #define VERBOSE */
+/* #define VERBOSE  */
 
     int yylex(void);
     void yyerror(char *);
@@ -269,7 +269,7 @@
     static void gsl_declare_var(GoomHash *ns, const char *name, int type, void *space)
     {
         char type_of[256];
-        if (name[0] == '@') ns = currentGoomSL->vars;
+        if (name[0] == '@') { ns = currentGoomSL->vars; }
 
         if (space == NULL) {
           switch (type) {
@@ -326,12 +326,6 @@
     {
         gsl_declare_var(currentGoomSL->vars, name, INSTR_PTR, NULL);
     }
-#if 0
-    static void gsl_struct_decl_global(const char *str_name, const char *name)
-    {
-        gsl_struct_decl(currentGoomSL->vars,str_name,name);
-    }
-#endif
     static void gsl_struct_decl_global_from_id(const char *name, int id)
     {
         gsl_declare_var(currentGoomSL->vars, name, id, NULL);
@@ -435,7 +429,7 @@
     /* DIV_EQ */
     static NodeType *new_div_eq(NodeType *lvalue, NodeType *expression) /* {{{ */
     {
-        NodeType *set = new_op("div_eq", OPR_PLUS_EQ, 2);
+        NodeType *set = new_op("div_eq", OPR_DIV_EQ, 2);
         set->unode.opr.op[0] = lvalue;
         set->unode.opr.op[1] = expression;
         return set;
@@ -727,6 +721,62 @@
         GSL_PUT_JNZERO(start_while,node->line_number);
     } /* }}} */
 
+    /* FOR EACH */
+    static NodeType *new_static_foreach(NodeType *var, NodeType *var_list, NodeType *instr) { /* {{{ */
+        NodeType *node = new_op("for", OPR_FOREACH, 3);
+        node->unode.opr.op[0] = var;
+        node->unode.opr.op[1] = var_list;
+        node->unode.opr.op[2] = instr;
+        node->line_number = currentGoomSL->num_lines;
+        return node;
+    }
+    static void commit_foreach(NodeType *node)
+    {
+        NodeType *cur = node->unode.opr.op[1];
+        char tmp_func[256], tmp_loop[256];
+        int lbl = allocateLabel();
+        sprintf(tmp_func, "|foreach_func_%d|", lbl);
+        sprintf(tmp_loop, "|foreach_loop_%d|", lbl);
+
+        GSL_PUT_JUMP(tmp_loop, node->line_number);
+        GSL_PUT_LABEL(tmp_func, node->line_number);
+
+        precommit_node(node->unode.opr.op[2]);
+        commit_node(node->unode.opr.op[2], 0);
+
+        currentGoomSL->instr = gsl_instr_init(currentGoomSL, "ret", INSTR_RET, 1, node->line_number);
+        gsl_instr_add_param(currentGoomSL->instr, "|dummy|", TYPE_LABEL);
+#ifdef VERBOSE
+        printf("ret\n");
+#endif
+        
+        GSL_PUT_LABEL(tmp_loop, node->line_number);
+        
+        while (cur != NULL)
+        {
+          NodeType *x, *var;
+
+          /* 1: x=var */
+          x   = nodeClone(node->unode.opr.op[0]);
+          var = nodeClone(cur->unode.opr.op[0]);
+          commit_node(new_set(x, var),0);
+          
+          /* 2: instr */
+          currentGoomSL->instr = gsl_instr_init(currentGoomSL, "call", INSTR_CALL, 1, node->line_number);
+          gsl_instr_add_param(currentGoomSL->instr, tmp_func, TYPE_LABEL);
+#ifdef VERBOSE
+          printf("call %s\n", tmp_func);
+#endif
+          
+          /* 3: var=x */
+          x   = nodeClone(node->unode.opr.op[0]);
+          var = cur->unode.opr.op[0];
+          commit_node(new_set(var, x),0);
+          cur = cur->unode.opr.op[1];
+        }
+        nodeFree(node->unode.opr.op[0]);
+    } /* }}} */
+
     /* IF */
     static NodeType *new_if(NodeType *expression, NodeType *instr) { /* {{{ */
         NodeType *node = new_op("if", OPR_IF, 2);
@@ -785,6 +835,60 @@
 #endif
     } /* }}} */
     
+    /* AFFECTATION LIST */
+    static NodeType *new_affec_list(NodeType *set, NodeType *next) /* {{{ */
+    {
+      NodeType *node = new_op("affect_list", OPR_AFFECT_LIST, 2);
+      node->unode.opr.op[0] = set;
+      node->unode.opr.op[1] = next;
+      return node;
+    }
+    static NodeType *new_affect_list_after(NodeType *affect_list)
+    {
+      NodeType *ret  = NULL;
+      NodeType *cur  =  affect_list;
+      while(cur != NULL) {
+        NodeType *set  = cur->unode.opr.op[0];
+        NodeType *next = cur->unode.opr.op[1];
+        NodeType *lvalue     = set->unode.opr.op[0];
+        NodeType *expression = set->unode.opr.op[1];
+        if ((lvalue->str[0] == '&') && (expression->type == VAR_NODE)) {
+          NodeType *nset = new_set(nodeClone(expression), nodeClone(lvalue));
+          ret  = new_affec_list(nset, ret);
+        }
+        cur = next;
+      }
+      return ret;
+    }
+    static void commit_affect_list(NodeType *node)
+    {
+      NodeType *cur = node;
+      while(cur != NULL) {
+        NodeType *set = cur->unode.opr.op[0];
+        precommit_node(set->unode.opr.op[0]);
+        precommit_node(set->unode.opr.op[1]);
+        cur = cur->unode.opr.op[1];
+      }
+      cur = node;
+      while(cur != NULL) {
+        NodeType *set = cur->unode.opr.op[0];
+        commit_node(set,0);
+        cur = cur->unode.opr.op[1];
+      }
+    } /* }}} */
+
+    /* VAR LIST */
+    static NodeType *new_var_list(NodeType *var, NodeType *next) /* {{{ */
+    {
+      NodeType *node = new_op("var_list", OPR_VAR_LIST, 2);
+      node->unode.opr.op[0] = var;
+      node->unode.opr.op[1] = next;
+      return node;
+    }
+    static void commit_var_list(NodeType *node)
+    {
+    } /* }}} */
+
     /* FUNCTION CALL */
     static NodeType *new_call(const char *name, NodeType *affect_list) { /* {{{ */
         HashValue *fval;
@@ -818,45 +922,24 @@
         }
     }
     static void commit_ext_call(NodeType *node) {
+        NodeType *alafter = new_affect_list_after(node->unode.opr.op[0]);
         commit_node(node->unode.opr.op[0],0);
         currentGoomSL->instr = gsl_instr_init(currentGoomSL, "extcall", INSTR_EXT_CALL, 1, node->line_number);
         gsl_instr_add_param(currentGoomSL->instr, node->str, TYPE_VAR);
 #ifdef VERBOSE
         printf("extcall %s\n", node->str);
 #endif
+        commit_node(alafter,0);
     }
     static void commit_call(NodeType *node) {
+        NodeType *alafter = new_affect_list_after(node->unode.opr.op[0]);
         commit_node(node->unode.opr.op[0],0);
         currentGoomSL->instr = gsl_instr_init(currentGoomSL, "call", INSTR_CALL, 1, node->line_number);
         gsl_instr_add_param(currentGoomSL->instr, node->str, TYPE_LABEL);
 #ifdef VERBOSE
         printf("call %s\n", node->str);
 #endif
-    } /* }}} */
-
-    /* AFFECTATION LIST */
-    static NodeType *new_affec_list(NodeType *set, NodeType *next) /* {{{ */
-    {
-      NodeType *node = new_op("affect_list", OPR_AFFECT_LIST, 2);
-      node->unode.opr.op[0] = set;
-      node->unode.opr.op[1] = next;
-      return node;
-    }
-    static void commit_affect_list(NodeType *node)
-    {
-      NodeType *cur = node;
-      while(cur != NULL) {
-        NodeType *set = cur->unode.opr.op[0];
-        precommit_node(set->unode.opr.op[0]);
-        precommit_node(set->unode.opr.op[1]);
-        cur = cur->unode.opr.op[1];
-      }
-      cur = node;
-      while(cur != NULL) {
-        NodeType *set = cur->unode.opr.op[0];
-        commit_node(set,0);
-        cur = cur->unode.opr.op[1];
-      }
+        commit_node(alafter,0);
     } /* }}} */
 
     /** **/
@@ -968,6 +1051,8 @@
                     case OPR_LOW:           commit_low(node); break;
                     case OPR_NOT:           commit_not(node); break;
                     case OPR_AFFECT_LIST:   commit_affect_list(node); break;
+                    case OPR_FOREACH:       commit_foreach(node); break;
+                    case OPR_VAR_LIST:      commit_var_list(node); break;
 #ifdef VERBOSE
                     case EMPTY_NODE:        printf("NOP\n"); break;
 #endif
@@ -1089,11 +1174,12 @@
 %token <strValue>   LTYPE_VAR
 %token <strValue>   LTYPE_PTR
 
-%token PTR_TK INT_TK FLOAT_TK DECLARE EXTERNAL WHILE DO NOT PLUS_EQ SUB_EQ DIV_EQ MUL_EQ SUP_EQ LOW_EQ NOT_EQ STRUCT
+%token PTR_TK INT_TK FLOAT_TK DECLARE EXTERNAL WHILE DO NOT PLUS_EQ SUB_EQ DIV_EQ MUL_EQ SUP_EQ LOW_EQ NOT_EQ STRUCT FOR IN
 
 %type <intValue> return_type
 %type <nPtr> expression constValue instruction test func_call func_call_expression
 %type <nPtr> start_block affectation_list affectation_in_list affectation declaration
+%type <nPtr> var_list_content var_list
 %type <strValue> task_name ext_task_name 
 %type <namespace> leave_namespace
 %type <gsl_struct> struct_members
@@ -1198,6 +1284,13 @@ instruction: affectation '\n' { $$ = $1; }
            | LTYPE_VAR SUB_EQ expression  { $$ = new_sub_eq(new_var($1,currentGoomSL->num_lines),$3); }
            | LTYPE_VAR MUL_EQ expression  { $$ = new_mul_eq(new_var($1,currentGoomSL->num_lines),$3); }
            | LTYPE_VAR DIV_EQ expression  { $$ = new_div_eq(new_var($1,currentGoomSL->num_lines),$3); }
+           | FOR LTYPE_VAR IN var_list DO instruction { $$ = new_static_foreach(new_var($2, currentGoomSL->num_lines), $4, $6); }
+           ;
+
+var_list: '(' var_list_content ')'      { $$ = $2; }
+        ;
+var_list_content: LTYPE_VAR             { $$ = new_var_list(new_var($1,currentGoomSL->num_lines), NULL); }
+           | LTYPE_VAR var_list_content { $$ = new_var_list(new_var($1,currentGoomSL->num_lines), $2);   }
            ;
 
 affectation: LTYPE_VAR '=' expression { $$ = new_set(new_var($1,currentGoomSL->num_lines),$3); } ;
@@ -1249,6 +1342,10 @@ affectation_list: affectation_in_list affectation_list     { $$ = new_affec_list
 affectation_in_list: LTYPE_VAR '=' leave_namespace expression {
                               gsl_reenternamespace($3);
                               $$ = new_set(new_var($1,currentGoomSL->num_lines),$4);
+                            }
+                   | ':' leave_namespace expression {
+                              gsl_reenternamespace($2);
+                              $$ = new_set(new_var("&this", currentGoomSL->num_lines),$3);
                             }
                    ;
 
