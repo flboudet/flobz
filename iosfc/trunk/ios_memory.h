@@ -596,7 +596,8 @@ void ios_fc::Memory::memcpy (void *dest, const void *src, int len) {
     
     if (len<0) IOS_ERROR ("Bad memcpy");
 
-    int idst = findMemoryBlock(dest);
+    int idst;
+    idst = findMemoryBlock(dest);
 //    int isrc = findMemoryBlock(src);
 
 //    if (idst < 0) fprintf(stderr, "SPURIOUS memcpy destination");

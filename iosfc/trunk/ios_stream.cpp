@@ -11,7 +11,7 @@
 namespace ios_fc {
 
 int InputStream::streamRead(VoidBuffer buffer) {
-    streamRead(buffer, buffer.size());
+    return streamRead(buffer, buffer.size());
 }
 
 void InputStream::streamReadAll (VoidBuffer buf) {
@@ -31,7 +31,7 @@ void InputStream::streamReadAll (VoidBuffer buf) {
 
 int OutputStream::streamWrite(VoidBuffer buffer)
 {
-    streamWrite(buffer, buffer.size());
+    return streamWrite(buffer, buffer.size());
 }
 
 };
