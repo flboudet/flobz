@@ -10,6 +10,8 @@
 char *DATADIR = "data";
 #endif
 
+char *dataFolder = "data";
+
 #ifdef MACOSX
 const char *bundleDataPath = "/Contents/Resources/data";
 void show(CFStringRef formatString, ...) {
@@ -31,6 +33,16 @@ void show(CFStringRef formatString, ...) {
     CFRelease(resultString);
 }
 #endif
+
+bool fileExists(char *path)
+{
+    FILE *f;
+    f = fopen(path, "r");
+    if (f == NULL)
+        return false;
+    fclose(f);
+    return true;
+}
 
 int main(int argc, char *argv[])
 {
@@ -70,6 +82,10 @@ int main(int argc, char *argv[])
         if (strcmp(argv[i],"-win") == 0) fs = false;
         if (strcmp(argv[i],"-quiet") == 0) snd = false;
         if (strcmp(argv[i],"-nofx") == 0) fx = false;
+    }
+    
+    if (!fileExists("data/gfx/v0.png")) {
+        dataFolder = DATADIR;
     }
     
     PuyoCommander commander( fs, snd, fx );

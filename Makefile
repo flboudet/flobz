@@ -10,7 +10,11 @@ ENABLE_OPENGL=false
 
 DEBUG_MODE=false
 
-DATADIR=\"data\"
+# Unix/Linux settings
+PREFIX=/usr/local
+DATADIR=$(PREFIX)/share/games/flobopuyo
+INSTALL_BINDIR=$(DESTDIR)/$(PREFIX)/games
+INSTALL_DATADIR=$(DESTDIR)/$(DATADIR)
 
 # Mac settings
 macimage_name=FloBoPuyo\ $(VERSION)
@@ -36,7 +40,7 @@ SDL_CONFIG=sdl-config
 CC=g++
 CXX=g++
 
-CFLAGS= -DDATADIR=${DATADIR}
+CFLAGS= -DDATADIR=\"${DATADIR}\"
 LDFLAGS=
 
 ifneq ($(PLATFORM), $(CYGWIN_VERSION))
@@ -155,6 +159,19 @@ clean:
 	rm -rf $(macimage_name)
 	rm -f  $(macimage_name).dmg
 	rm -f  .DS_Store data/.DS_Store data/*/.DS_Store .gdb_history
+
+install: flobopuyo
+	strip flobopuyo
+	mkdir -p ${INSTALL_BINDIR}
+	mkdir -p ${INSTALL_DATADIR}
+	cp -r data/* ${INSTALL_DATADIR}
+	chmod a+rx ${INSTALL_DATADIR}
+	chmod a+rx ${INSTALL_DATADIR}/sfx
+	chmod a+rx ${INSTALL_DATADIR}/gfx
+	chmod a+rx ${INSTALL_DATADIR}/story
+	chmod -R a+r ${INSTALL_DATADIR}
+	cp ./flobopuyo ${INSTALL_BINDIR}/flobopuyo
+	chmod a+rx ${INSTALL_BINDIR}/flobopuyo
 
 flobopuyo-static: prelude  ${OBJFILES}
 	@echo "[flobopuyo-static]" && g++ $(CFLAGS) -o flobopuyo-static ${OBJFILES}\

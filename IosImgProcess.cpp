@@ -2,9 +2,9 @@
 #include <math.h>
 #include <stdlib.h>
 
-#ifndef DATADIR
-extern char *DATADIR;
-#endif
+
+extern char *dataFolder;
+
 
 /** Image loading... free... conversion */
 
@@ -18,7 +18,7 @@ IIM_Surface * IIM_Load_DisplayFormat (const char *fname)
 {
   char path[1024];
   SDL_Surface *tmpsurf, *retsurf;
-  sprintf(path, "%s/gfx/%s", DATADIR, fname);
+  sprintf(path, "%s/gfx/%s", dataFolder, fname);
   tmpsurf = IMG_Load (path);
   if (tmpsurf==0) {
     fprintf(stderr,"Could not load %s\n", path);
@@ -33,7 +33,7 @@ IIM_Surface * IIM_Load_DisplayFormatAlpha (const char *fname)
 {
   char path[1024];
   SDL_Surface *tmpsurf, *retsurf;
-  sprintf(path, "%s/gfx/%s", DATADIR, fname);
+  sprintf(path, "%s/gfx/%s", dataFolder, fname);
   tmpsurf = IMG_Load (path);
   if (tmpsurf==0) {
     fprintf(stderr,"Could not load %s\n", path);

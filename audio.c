@@ -1,9 +1,7 @@
 #include <string.h>
 #include "audio.h"
 
-#ifndef DATADIR
-extern char *DATADIR;
-#endif
+extern char *dataFolder;
 
 Sound  *sound_pop;
 Sound  *sound_slide;
@@ -36,7 +34,7 @@ static Sound *CustomMix_LoadWAV(char *path, char *fileName, int volume)
     Sound *result;
     char temp[1024];
     if (!sound_supported) return NULL;
-    sprintf(temp, "%s/sfx/%s", DATADIR, fileName);
+    sprintf(temp, "%s/sfx/%s", dataFolder, fileName);
     result = Mix_LoadWAV(temp);
     if (result)
       Mix_VolumeChunk (result, volume);
@@ -48,7 +46,7 @@ static Mix_Music *CustomMix_LoadMUS(char *path, char *fileName)
     Mix_Music *result;
     char temp[1024];
     if (!sound_supported) return NULL;
-    sprintf(temp, "%s/sfx/%s", DATADIR, fileName);
+    sprintf(temp, "%s/sfx/%s", dataFolder, fileName);
     result = Mix_LoadMUS(temp);
     return result;
 }
@@ -68,37 +66,37 @@ audio_init ()
 
   if (!sound_supported) return;
 
-	sound_pop   = CustomMix_LoadWAV (DATADIR, "pop.wav", 30);
-	sound_bam1  = CustomMix_LoadWAV (DATADIR, "bam1.wav", 12);
-	sound_fff   = CustomMix_LoadWAV (DATADIR, "fff.wav", 48);
-	sound_slide = CustomMix_LoadWAV (DATADIR, "slide.wav", 128);
+	sound_pop   = CustomMix_LoadWAV (dataFolder, "pop.wav", 30);
+	sound_bam1  = CustomMix_LoadWAV (dataFolder, "bam1.wav", 12);
+	sound_fff   = CustomMix_LoadWAV (dataFolder, "fff.wav", 48);
+	sound_slide = CustomMix_LoadWAV (dataFolder, "slide.wav", 128);
 
   sound_yahoohoo1[0] = NULL;
-  sound_yahoohoo1[1] = CustomMix_LoadWAV (DATADIR, "yahoohoo.wav", 50);
-  sound_yahoohoo1[2] = CustomMix_LoadWAV (DATADIR, "woho.wav", 32);
-  sound_yahoohoo1[3] = CustomMix_LoadWAV (DATADIR, "pastaga.wav", 70);
+  sound_yahoohoo1[1] = CustomMix_LoadWAV (dataFolder, "yahoohoo.wav", 50);
+  sound_yahoohoo1[2] = CustomMix_LoadWAV (dataFolder, "woho.wav", 32);
+  sound_yahoohoo1[3] = CustomMix_LoadWAV (dataFolder, "pastaga.wav", 70);
 
   sound_yahoohoo2[0] = sound_yahoohoo1[2];
-  sound_yahoohoo2[1] = CustomMix_LoadWAV (DATADIR, "woo.wav", 45);
+  sound_yahoohoo2[1] = CustomMix_LoadWAV (dataFolder, "woo.wav", 45);
   
-  sound_yahoohoo3[0] = CustomMix_LoadWAV (DATADIR, "applose.wav", 96);
+  sound_yahoohoo3[0] = CustomMix_LoadWAV (dataFolder, "applose.wav", 96);
 
-  sound_splash[0] = CustomMix_LoadWAV (DATADIR, "splash1.wav",72);
-	sound_splash[1] = CustomMix_LoadWAV (DATADIR, "splash2.wav",72);
-	sound_splash[2] = CustomMix_LoadWAV (DATADIR, "splash3.wav",72);
-	sound_splash[3] = CustomMix_LoadWAV (DATADIR, "splash4.wav",72);
-	sound_splash[4] = CustomMix_LoadWAV (DATADIR, "splash5.wav",72);
-	sound_splash[5] = CustomMix_LoadWAV (DATADIR, "splash6.wav",72);
-	sound_splash[6] = CustomMix_LoadWAV (DATADIR, "splash7.wav",72);
-	sound_splash[7] = CustomMix_LoadWAV (DATADIR, "splash8.wav",72);
+  sound_splash[0] = CustomMix_LoadWAV (dataFolder, "splash1.wav",72);
+	sound_splash[1] = CustomMix_LoadWAV (dataFolder, "splash2.wav",72);
+	sound_splash[2] = CustomMix_LoadWAV (dataFolder, "splash3.wav",72);
+	sound_splash[3] = CustomMix_LoadWAV (dataFolder, "splash4.wav",72);
+	sound_splash[4] = CustomMix_LoadWAV (dataFolder, "splash5.wav",72);
+	sound_splash[5] = CustomMix_LoadWAV (dataFolder, "splash6.wav",72);
+	sound_splash[6] = CustomMix_LoadWAV (dataFolder, "splash7.wav",72);
+	sound_splash[7] = CustomMix_LoadWAV (dataFolder, "splash8.wav",72);
     
-    sound_bim[0] = CustomMix_LoadWAV (DATADIR, "bim1.wav",72);
-    sound_bim[1] = CustomMix_LoadWAV (DATADIR, "bim2.wav",72);
+    sound_bim[0] = CustomMix_LoadWAV (dataFolder, "bim1.wav",72);
+    sound_bim[1] = CustomMix_LoadWAV (dataFolder, "bim2.wav",72);
 
-  music[0] = CustomMix_LoadMUS (DATADIR, "flobopuyo_menu.xm");
-	music[1] = CustomMix_LoadMUS (DATADIR, "flobopuyo_game1.xm");
-	music[2] = CustomMix_LoadMUS (DATADIR, "flobopuyo_game2.xm");
-	music[3] = CustomMix_LoadMUS (DATADIR, "flobopuyo_gameover.xm");
+  music[0] = CustomMix_LoadMUS (dataFolder, "flobopuyo_menu.xm");
+	music[1] = CustomMix_LoadMUS (dataFolder, "flobopuyo_game1.xm");
+	music[2] = CustomMix_LoadMUS (dataFolder, "flobopuyo_game2.xm");
+	music[3] = CustomMix_LoadMUS (dataFolder, "flobopuyo_gameover.xm");
 
 	Mix_QuerySpec (&audio_rate, &audio_format, &audio_channels);
 
@@ -216,7 +214,7 @@ void    audio_music_switch_theme(int theme_number)
   
   for (i=0; i<4; ++i) {
       themusic[i] = music[i];
-      music[i] = CustomMix_LoadMUS (DATADIR, MUSIC_THEME[theme_number][i]);
+      music[i] = CustomMix_LoadMUS (dataFolder, MUSIC_THEME[theme_number][i]);
   }
 
   Mix_HaltMusic();
