@@ -589,6 +589,7 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   
   audio_init();
   audio_music_start(0);
+  if (sound==false) Mix_PauseMusic();
   audio_set_music_on_off(sound);
   audio_set_sound_on_off(fx);
 
