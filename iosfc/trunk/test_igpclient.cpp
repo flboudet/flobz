@@ -10,7 +10,7 @@ public:
         ios_fc::Buffer<char> str(message);
         str.grow(1);
         str[str.size() - 1] = 0;
-        printf("Message reçu de %d: %s\n", igpOriginIdent, (const char *)message);
+        printf("Message reçu de %d: taille:%d data:%s\n", igpOriginIdent, message.size(), (const char *)message);
     }
 };
 

@@ -56,12 +56,14 @@ protected:
     IGPDatagram(IGPMsgIdent ident, int msgSize);
     Buffer<char> message;
     inline void writeBigEndianIntToMessage(int integer, int offset) {
+        //printf("write offset:%d | %.2x %.2x %.2x %.2x\n", offset, (unsigned char)((integer & 0xFF000000) >> 24), (unsigned char)((integer & 0x00FF0000) >> 16), (unsigned char)((integer & 0x0000FF00) >> 8), (unsigned char)(integer & 0x000000FF));
         message[offset]     = (integer & 0xFF000000) >> 24;
         message[offset + 1] = (integer & 0x00FF0000) >> 16;
         message[offset + 2] = (integer & 0x0000FF00) >> 8;
         message[offset + 3] = (integer & 0x000000FF);
     }
     inline int readBigEndianIntFromMessage(int offset) const {
+        //printf("read offset:%d | %.2x %.2x %.2x %.2x\n", offset, (unsigned char)message[offset], (unsigned char)message[offset+1], (unsigned char)message[offset+2], (unsigned char)message[offset+3]);
         return ((unsigned char)message[offset] << 24) | ((unsigned char)message[offset + 1] << 16) | ((unsigned char)message[offset + 2] << 8) | (unsigned char)message[offset + 3];
     }
 private:
@@ -116,10 +118,10 @@ public:
         igpIdent = readBigEndianIntFromMessage(8);
     }
     VoidBuffer getMessage() const {
-        VoidBuffer result(message);
-        result += 12;
-        return result;
-        //return message + 12;
+        //VoidBuffer result(message);
+        //result += 12;
+        //return result;
+        return message + 12;
     }
     int getIgpIdent() const { return igpIdent; }
 private:
@@ -138,10 +140,10 @@ public:
         igpDestIdent = readBigEndianIntFromMessage(12);
     }
     VoidBuffer getMessage() const {
-        VoidBuffer result(message);
-        result += 16;
-        return result;
-        //return message + 16;
+        //VoidBuffer result(message);
+        //result += 16;
+        //return result;
+        return message + 16;
     }
     int getIgpOriginIdent() const { return igpIdent; }
     int getIgpDestinationIdent() const { return igpDestIdent; }

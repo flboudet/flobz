@@ -29,7 +29,7 @@ void MyConnection::dataReceived(ios_fc::VoidBuffer data)
     ios_fc::Buffer<char> str(data);
     str.grow(1);
     str[str.size() - 1] = 0;
-    printf("Donnees recues: %s\n", (const char *)str);
+    printf("Donnees recues: taille:%d data:%s\n", data.size(), (const char *)str);
 }
 
 int main()
