@@ -52,8 +52,11 @@ public:
     void push();
     void pop();
     bool isSynchronized();
+    void incrementUsage();
+    void decrementUsage();
 private:
     int currentCounter;
+    int currentUsage;
 };
 
 /* Neutral falling animation */
@@ -106,7 +109,8 @@ private:
 /* Puyo exploding and vanishing animation */
 class VanishAnimation : public PuyoAnimation {
 public:
-    VanishAnimation(PuyoPuyo *puyo, int xOffset, int yOffset, AnimationSynchronizer *synchronizer);
+    VanishAnimation(PuyoPuyo *puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer);
+    ~VanishAnimation();
     void cycle();
     void draw(int semiMove);
 private:
@@ -115,6 +119,7 @@ private:
     int X, Y, iter, color;
     AnimationSynchronizer *synchronizer;
     bool once;
+    int delay;
 };
 
 #endif // _PUYOANIMATIONS

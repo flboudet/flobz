@@ -298,9 +298,13 @@ void PuyoView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY)
     ((AnimatedPuyo *)puyo)->addAnimation(new FallingAnimation(puyo, originY, xOffset, yOffset, 16));
 }
 
-void PuyoView::puyoWillVanish(PuyoPuyo *puyo)
+void PuyoView::puyoWillVanish(IosVector &puyoGroup)
 {
-    ((AnimatedPuyo *)puyo)->addAnimation(new VanishAnimation(puyo, xOffset, yOffset, &synchronizer));
+    AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
+    for (int i = 0, j = puyoGroup.getSize() ; i < j ; i++) {
+        AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(puyoGroup.getElementAt(i));
+        currentPuyo->addAnimation(new VanishAnimation(currentPuyo, i*10 , xOffset, yOffset, synchronizer));
+    }
 }
 
 void PuyoView::gameDidEndCycle()

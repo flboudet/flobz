@@ -86,6 +86,7 @@ void NeutralAnimation::draw(int semiMove)
 AnimationSynchronizer::AnimationSynchronizer()
 {
     currentCounter = 0;
+    currentUsage = 0;
 }
 
 void AnimationSynchronizer::push()
@@ -102,7 +103,18 @@ bool AnimationSynchronizer::isSynchronized()
 {
     return (currentCounter <= 0);
 }
-    
+
+void AnimationSynchronizer::incrementUsage()
+{
+    currentUsage++;
+}
+
+void AnimationSynchronizer::decrementUsage()
+{
+    currentUsage--;
+    if (currentUsage == 0)
+        delete this;
+}
 
 /* Companion turning around main puyo animation */
 TurningAnimation::TurningAnimation(PuyoPuyo *companionPuyo,
@@ -224,7 +236,7 @@ void FallingAnimation::draw(int semiMove)
 }
 
 /* Puyo exploding and vanishing animation */
-VanishAnimation::VanishAnimation(PuyoPuyo *puyo, int xOffset, int yOffset, AnimationSynchronizer *synchronizer)
+VanishAnimation::VanishAnimation(PuyoPuyo *puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer)
 {
     puyoFace = PuyoView::getSurfaceForState(puyo->getPuyoState());
     this->xOffset = xOffset;
@@ -238,7 +250,14 @@ VanishAnimation::VanishAnimation(PuyoPuyo *puyo, int xOffset, int yOffset, Anima
     once = false;
     enabled = false;
     this->synchronizer = synchronizer;
+    synchronizer->incrementUsage();
     synchronizer->push();
+    this->delay = delay;
+}
+
+VanishAnimation::~VanishAnimation()
+{
+    synchronizer->decrementUsage();
 }
 
 void VanishAnimation::cycle()
@@ -250,8 +269,9 @@ void VanishAnimation::cycle()
     else if (synchronizer->isSynchronized()) {
         enabled = true;
         iter ++;
-        if (iter == 55)
+        if (iter == 55) {
             finishedFlag = true;
+        }
     }
 }
 

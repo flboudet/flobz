@@ -599,26 +599,47 @@ int PuyoGame::removePuyos()
 
 void PuyoGame::notifyReductions()
 {
-    for (int i = 0 ; i < PUYODIMX ; i++) {
-		for (int j = 0 ; j <= PUYODIMY ; j++) {
-			PuyoState currentPuyo = getPuyoCellAt(i, j);
-			if ((currentPuyo >= PUYO_BLUE) && (currentPuyo <= PUYO_YELLOW)) {
-				int removedPuyos = 0;
-				markPuyoAt(i, j, PUYO_MARKED, false);
-				for (int u = 0 ; u < PUYODIMX ; u++) {
-					for (int v = 0 ; v <= PUYODIMY ; v++) {
-						if (getPuyoCellAt(u, v) == PUYO_MARKED) {
-                            removedPuyos++;
-						}
-					}
-				}
-                if (removedPuyos >= 4) {
-                    markPuyoAt(i, j, currentPuyo, false);
-                    if (delegate != NULL)
-                        delegate->puyoWillVanish(getPuyoAt(i, j));
+    IosVector removedPuyos;
+    
+    // Clearing every puyo's flag
+    for (int i = 0, j = getPuyoCount() ; i < j ; i++) {
+        getPuyoAtIndex(i)->unsetFlag();
+    }
+    // Search for groupped puyos
+    for (int j = 0 ; j < PUYODIMY ; j++) {
+		for (int i = 0 ; i <= PUYODIMX ; i++) {
+            PuyoPuyo *puyoToMark = getPuyoAt(i, j);
+            // If the puyo exists and is not flagged, then
+            if ((puyoToMark != NULL) && (! puyoToMark->getFlag())) {
+                PuyoState initialPuyoState = puyoToMark->getPuyoState();
+                // I really would have liked to skip this stupid test
+                if ((initialPuyoState >= PUYO_BLUE) && (initialPuyoState <= PUYO_YELLOW)) {
+                    markPuyoAt(i, j, PUYO_MARKED, false);
+                    
+                    // Collecting every marked puyo in a vector
+                    removedPuyos.removeAllElements();
+                    for (int u = 0 ; u < PUYODIMX ; u++) {
+                        for (int v = 0 ; v <= PUYODIMY ; v++) {
+                            PuyoPuyo *markedPuyo = getPuyoAt(u, v);
+                            if (markedPuyo->getPuyoState() == PUYO_MARKED) {
+                                // mark the puyo so we wont'do the job twice
+                                markedPuyo->setFlag();
+                                removedPuyos.addElement(markedPuyo);
+                            }
+                        }
+                    }
+                    
+                    
+                    // If there is more than 4 puyo in the group, let's notify it
+                    if (removedPuyos.getSize() >= 4) {
+                        markPuyoAt(i, j, initialPuyoState, false);
+                        if (delegate != NULL)
+                            delegate->puyoWillVanish(removedPuyos);
+                    }
+                    else {
+                        markPuyoAt(i, j, initialPuyoState, false);
+                    }
                 }
-                else
-                    markPuyoAt(i, j, currentPuyo, false);
 			}
 		}
 	}

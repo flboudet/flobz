@@ -51,9 +51,13 @@ public:
     void setPuyoXY(int X, int Y);
     void setAttachedObject(void *object);
     void *getAttachedObject();
+    void setFlag() { flag = true; }
+    void unsetFlag() { flag = false; }
+    bool getFlag() const { return flag; }
 private:
     PuyoState state;
     int X, Y;
+    bool flag;
     void *attachedObject;
 };
 
@@ -78,7 +82,7 @@ public:
 				int companionVector,
 				bool counterclockwise) = 0;
   virtual void puyoDidFall(PuyoPuyo *puyo, int originX, int originY) = 0;
-  virtual void puyoWillVanish(PuyoPuyo *puyo) = 0;
+  virtual void puyoWillVanish(IosVector &puyoGroup) = 0;
   virtual void gameDidEndCycle() = 0;
   virtual void gameLost() = 0;
 };

@@ -57,7 +57,7 @@ class PuyoView : public virtual PuyoDelegate {
     void gameDidEndCycle();
     void companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise);
     void puyoDidFall(PuyoPuyo *puyo, int originX, int originY);
-    void puyoWillVanish(PuyoPuyo *puyo);
+    void puyoWillVanish(IosVector &puyoGroup);
     void gameLost();
     static IIM_Surface *getSurfaceForState(PuyoState state);
     IIM_Surface *getSurfaceForPuyo(PuyoPuyo *puyo);
@@ -68,8 +68,6 @@ class PuyoView : public virtual PuyoDelegate {
     void cycleAnimation(PuyoPuyo *puyo);
     bool gameRunning;
     PuyoGame *attachedGame, *enemyGame;
-    // temporary
-    AnimationSynchronizer synchronizer;
 };
 
 class PuyoStarter : public PuyoDrawable {
