@@ -55,6 +55,8 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
     message->addInt     ("SCORE",  attachedGame->getPoints());
     message->addInt     ("NEXT_F", attachedGame->getNextFalling());
     message->addInt     ("NEXT_C", attachedGame->getNextCompanion());
+    
+    neutralsBuffer.flush();
     message->addIntArray("AddNeutrals", neutralsBuffer);
     neutralsBuffer.clear();
     
