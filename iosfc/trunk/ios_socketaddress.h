@@ -39,6 +39,7 @@ namespace ios_fc {
         }
         virtual ~SocketAddressImpl() {}
         virtual bool operator == (const SocketAddressImpl &) const = 0;
+	virtual String asString() const = 0;
     private:
         int usage;
     };
@@ -64,6 +65,7 @@ namespace ios_fc {
             return (*impl == *(a.impl));
         } 
         SocketAddressImpl *getImpl() const { return impl; }
+	String asString() const { return impl->asString(); }
         static void setFactory(SocketAddressFactory *factory) { SocketAddress::factory = factory; }
     private:
         static SocketAddressFactory *factory;

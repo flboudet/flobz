@@ -32,7 +32,7 @@ UnixSocketAddressImpl::UnixSocketAddressImpl(String hostName)
     if ((ht = gethostbyname(hostName)) == 0) {
         throw Exception("IosSocketAddress: gethostbyname error");
     }
-    address = ((struct in_addr *)(ht->h_addr))->s_addr;
+    address = ntohl(((struct in_addr *)(ht->h_addr))->s_addr);
 }
 
 UnixSocketAddressImpl::UnixSocketAddressImpl(in_addr_t address) : address(address)
@@ -43,6 +43,19 @@ bool UnixSocketAddressImpl::operator == (const SocketAddressImpl &a) const
 {
     const UnixSocketAddressImpl &comp = dynamic_cast<const UnixSocketAddressImpl &>(a);
     return (address == comp.address);
+}
+
+String UnixSocketAddressImpl::asString() const
+{
+  String result;
+  result += (int)((address & 0xFF000000) >> 24);
+  result += ".";
+  result += (int)((address & 0x00FF0000) >> 16);
+  result += ".";
+  result += (int)((address & 0x0000FF00) >> 8);
+  result += ".";
+  result += (int)(address & 0x000000FF);
+  return result;
 }
 
 SocketAddressImpl * UnixSocketAddressFactory::createSocketAddress(String hostName)
