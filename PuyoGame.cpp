@@ -356,25 +356,17 @@ void PuyoGame::setFallingAtTop(bool gameConstruction)
 
   if (!gameConstruction) {
     dropNeutrals();
-    //for (int x=0;x<PUYODIMX;++x) {
-        if (getPuyoCellAt((PUYODIMX-1)/2, 2) != PUYO_EMPTY) {
+        if (getPuyoCellAt((PUYODIMX-1)/2, 1) != PUYO_EMPTY) {
             gameRunning = false;
             if (delegate != NULL)
                 delegate->gameLost();
             return;
         }
-    //}
-//    if ((getPuyoCellAt(PUYODIMX/2, 0) != PUYO_EMPTY)
-//        || (getPuyoCellAt(PUYODIMX/2, 1) != PUYO_EMPTY)) {
-//      gameRunning = false;
-//      if (delegate != NULL)
-//        delegate->gameLost();
-//    }
   }
 
   // Creating the new falling puyo and its companion
   fallingX = (PUYODIMX-1)/2;
-  fallingY = 2;
+  fallingY = 1;
   fallingCompanion = 2;
   fallingPuyo = new PuyoPuyo(attachedRandom->getPuyoForSequence(sequenceNr++));
   companionPuyo = new PuyoPuyo(attachedRandom->getPuyoForSequence(sequenceNr++));
@@ -384,6 +376,7 @@ void PuyoGame::setFallingAtTop(bool gameConstruction)
   puyoVector.addElement(companionPuyo);
 
   endOfCycle = false;
+  semiMove = 0;
   phase = 0;
 }
 

@@ -169,20 +169,20 @@ audio_set_music_on_off (int on)
 {
 #ifdef USE_AUDIO
   if (!sound_supported) return;
-	if (on) {
-            if (Mix_PausedMusic()) Mix_ResumeMusic();
-                else
-                {
-                    while (Mix_FadingMusic() == MIX_FADING_OUT) SDL_Delay(100);
-                }
-                if (music[currentMus])
-                    Mix_FadeInMusic (music[currentMus], -1, 1000);
-	}
-	else {
-    while (Mix_FadingMusic() == MIX_FADING_IN) SDL_Delay(100);
-		Mix_FadeOutMusic (1000);
-	}
-  music_on = on;
+    if (on) {
+        if (Mix_PausedMusic()) Mix_ResumeMusic();
+        else
+        {
+            while (Mix_FadingMusic() == MIX_FADING_OUT) SDL_Delay(100);
+        }
+        if (music[currentMus])
+            Mix_FadeInMusic (music[currentMus], -1, 1000);
+    }
+    else {
+        while (Mix_FadingMusic() == MIX_FADING_IN) SDL_Delay(100);
+        Mix_FadeOutMusic (1000);
+    }
+    music_on = on;
 #endif
 }
 
@@ -207,9 +207,21 @@ void    audio_music_switch_theme(int theme_number)
 #ifdef USE_AUDIO
   int i;
   if (!sound_supported) return;
+  
+  Mix_Music * themusic[4];
+  
   for (i=0; i<4; ++i) {
-    Mix_FreeMusic(music[i]);
-    music[i] = CustomMix_LoadMUS (DATADIR, MUSIC_THEME[theme_number][i]);
+      themusic[i] = music[i];
+      music[i] = CustomMix_LoadMUS (DATADIR, MUSIC_THEME[theme_number][i]);
   }
+
+  Mix_HaltMusic();
+  
+  for (i=0; i<4; ++i) {
+    Mix_FreeMusic(themusic[i]);
+  }
+
+ // Mix_PlayMusic();
+
 #endif
 }
