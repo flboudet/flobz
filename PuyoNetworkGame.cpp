@@ -66,6 +66,9 @@ void PuyoNetworkGame::synchronizeState(Message &message)
             currentPuyo->setID(currentPuyoID);
             puyoVector.addElement(currentPuyo);
         }
+        else {
+            currentPuyo->setPuyoState(puyos[i+1]);
+        }
         currentPuyo->setFlag();
         currentPuyo->setPuyoXY(puyos[i+2], puyos[i+3]);
         i += 4;
