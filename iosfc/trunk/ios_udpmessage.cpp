@@ -133,7 +133,9 @@ namespace ios_fc {
         Buffer<int> buffer(atoi(value));
         int index = 0;
         for (int i=0; i<buffer.size(); ++i) {
-          while(value[index] != ',') index++;
+          while(value[index] && (value[index] != ',')) index++;
+          if (value[index] == 0)
+            throw InvalidMessageException();
           index++;
           buffer[i] = atoi(value.substring(index));
         }
