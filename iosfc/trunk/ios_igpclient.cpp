@@ -30,14 +30,14 @@
 
 namespace ios_fc {
 
-IGPClient::IGPClient(String hostName, int portID) : enabled(false), mbox(new UDPMessageBox(hostName, 0, portID)), keepAliveCounter(0)
+IGPClient::IGPClient(String hostName, int portID) : enabled(false), mbox(new UDPMessageBox(hostName, 0, portID)), igpKeepAliveCounter(0)
 {
     mbox->addListener(this);
     IGPDatagram::ClientMsgAutoAssignIDDatagram datagram(mbox->createMessage());
     datagram.getMessage()->send();
 }
 
-IGPClient::IGPClient(String hostName, int portID, int igpIdent) : enabled(false), mbox(new UDPMessageBox(hostName, 0, portID))
+IGPClient::IGPClient(String hostName, int portID, int igpIdent) : enabled(false), mbox(new UDPMessageBox(hostName, 0, portID)), igpKeepAliveCounter(0)
 {
     mbox->addListener(this);
     IGPDatagram::ClientMsgAssignIDDatagram datagram(mbox->createMessage(), igpIdent);
@@ -57,11 +57,11 @@ void IGPClient::sendMessage(int igpID, VoidBuffer message, bool reliable)
 
 void IGPClient::idle()
 {
-    keepAliveCounter++;
-    if (keepAliveCounter == 100) {
+    igpKeepAliveCounter++;
+    if (igpKeepAliveCounter == 100) {
         IGPDatagram::ClientMsgKeepAliveDatagram datagram(mbox->createMessage());
         datagram.getMessage()->send();
-        keepAliveCounter = 0;
+        igpKeepAliveCounter = 0;
     }
     mbox->idle();
 }

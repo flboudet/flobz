@@ -51,7 +51,7 @@ private:
     int igpIdent;
     MessageBox *mbox;
     AdvancedBuffer<IGPClientMessageListener*> listeners;
-    int keepAliveCounter;
+    int igpKeepAliveCounter;
 };
 
 };
