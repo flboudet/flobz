@@ -300,7 +300,7 @@ void PuyoView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY)
 
 void PuyoView::puyoWillVanish(PuyoPuyo *puyo)
 {
-    ((AnimatedPuyo *)puyo)->addAnimation(new VanishAnimation(puyo, xOffset, yOffset));
+    ((AnimatedPuyo *)puyo)->addAnimation(new VanishAnimation(puyo, xOffset, yOffset, &synchronizer));
 }
 
 void PuyoView::gameDidEndCycle()

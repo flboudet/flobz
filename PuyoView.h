@@ -31,6 +31,7 @@
 #include "PuyoIA.h"
 #include "PuyoCommander.h"
 #include "IosImgProcess.h"
+#include "PuyoAnimations.h"
 
 #define TSIZE 32
 #define ASIZE 32
@@ -67,6 +68,8 @@ class PuyoView : public virtual PuyoDelegate {
     void cycleAnimation(PuyoPuyo *puyo);
     bool gameRunning;
     PuyoGame *attachedGame, *enemyGame;
+    // temporary
+    AnimationSynchronizer synchronizer;
 };
 
 class PuyoStarter : public PuyoDrawable {

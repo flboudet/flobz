@@ -76,6 +76,28 @@ void NeutralAnimation::draw(int semiMove)
 	painter.requestDraw(neutral, &drect);
 }
 
+/* Animation synchronization helper */
+AnimationSynchronizer::AnimationSynchronizer()
+{
+    currentCounter = 0;
+}
+
+void AnimationSynchronizer::push()
+{
+    currentCounter++;
+}
+
+void AnimationSynchronizer::pop()
+{
+    currentCounter--;
+}
+
+bool AnimationSynchronizer::isSynchronized()
+{
+    return (currentCounter <= 0);
+}
+    
+
 /* Companion turning around main puyo animation */
 TurningAnimation::TurningAnimation(PuyoPuyo *companionPuyo,
                                    int vector, int xOffset, int yOffset,
@@ -196,7 +218,7 @@ void FallingAnimation::draw(int semiMove)
 }
 
 /* Puyo exploding and vanishing animation */
-VanishAnimation::VanishAnimation(PuyoPuyo *puyo, int xOffset, int yOffset)
+VanishAnimation::VanishAnimation(PuyoPuyo *puyo, int xOffset, int yOffset, AnimationSynchronizer *synchronizer)
 {
     puyoFace = PuyoView::getSurfaceForState(puyo->getPuyoState());
     this->xOffset = xOffset;
@@ -207,13 +229,22 @@ VanishAnimation::VanishAnimation(PuyoPuyo *puyo, int xOffset, int yOffset)
     if (color > PUYO_EMPTY)
         color -= PUYO_BLUE;
     iter = 0;
+    once = false;
+    this->synchronizer = synchronizer;
+    synchronizer->push();
 }
 
 void VanishAnimation::cycle()
 {
-    iter ++;
-    if (iter == 50)
-        finishedFlag = true;
+    if (once == false) {
+        once = true;
+        synchronizer->pop();
+    }
+    else if (synchronizer->isSynchronized()) {
+        iter ++;
+        if (iter == 55)
+            finishedFlag = true;
+    }
 }
 
 void VanishAnimation::draw(int semiMove)

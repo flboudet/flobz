@@ -43,6 +43,17 @@ class PuyoAnimation {
     bool finishedFlag;
 };
 
+/* Animation synchronization helper */
+class AnimationSynchronizer {
+public:
+    AnimationSynchronizer();
+    void push();
+    void pop();
+    bool isSynchronized();
+private:
+    int currentCounter;
+};
+
 /* Neutral falling animation */
 class NeutralAnimation : public PuyoAnimation {
   public:
@@ -93,13 +104,15 @@ private:
 /* Puyo exploding and vanishing animation */
 class VanishAnimation : public PuyoAnimation {
 public:
-    VanishAnimation(PuyoPuyo *puyo, int xOffset, int yOffset);
+    VanishAnimation(PuyoPuyo *puyo, int xOffset, int yOffset, AnimationSynchronizer *synchronizer);
     void cycle();
     void draw(int semiMove);
 private:
     IIM_Surface *puyoFace;
     int xOffset, yOffset;
     int X, Y, iter, color;
+    AnimationSynchronizer *synchronizer;
+    bool once;
 };
 
 #endif // _PUYOANIMATIONS
