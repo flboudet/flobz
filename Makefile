@@ -6,11 +6,11 @@
 # Settings
 
 ENABLE_AUDIO=true
-ENABLE_OPENGL=true
+ENABLE_OPENGL=false
 ENABLE_DGA=false
 
 DEBUG_MODE=true
-MORE_DEBUG=false
+MORE_DEBUG=true
 
 PRGNAME=flobopuyo
 
@@ -57,13 +57,13 @@ LDFLAGS=
 
 HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h\
         PuyoGame.h PuyoAnimations.h AnimatedPuyo.h PuyoIA.h PuyoPlayer.h     \
-        PuyoStory.h PuyoView.h SDL_prim.h audio.h menu.h menuitems.h         \
+        PuyoStory.h PuyoView.h audio.h menu.h menuitems.h         \
         preferences.h scrollingtext.h sofont.h SDL_Painter.h PuyoVersion.h   \
         InputManager.h GameControls.h HiScores.h  PuyoNetworkView.h          \
         IosImgProcess.h PuyoStarter.h PuyoNetworkGame.h PuyoMenu.h PuyoNetworkMenu.h
 
 
-OBJFILES= SDL_prim.o HiScores.o PuyoCommander.o        \
+OBJFILES= HiScores.o PuyoCommander.o        \
           IosException.o IosVector.o main.o PuyoGame.o PuyoVersion.o         \
           PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o sofont.o       \
           menu.o menuitems.o audio.o scrollingtext.o preferences.o           \
@@ -178,16 +178,13 @@ IosVector.o:IosVector.cpp
 glSDL.o:glSDL.c
 	@echo "[$@]" && $(CC) $(CFLAGS) -c $< 2>> EXT_WARNINGS
 	@rm -f EXT_WARNINGS
-SDL_prim.o:SDL_prim.c
-	@echo "[$@]" && $(CC) $(CFLAGS) -c $< 2>> EXT_WARNINGS
-	@rm -f EXT_WARNINGS
 corona.o:corona.cpp
 corona32.o:corona32.cpp
 corona_palette.o:corona_palette.cpp	
 
 clean:
 	make -C iosfc clean
-	rm -rf *~ scenar.y.c scenar.y.h scenar.l.c *.o flobopuyo* $(PRGNAME) WARNINGS
+	rm -rf *~ *.o flobopuyo* $(PRGNAME) WARNINGS
 	rm -rf .xvpics data/.xvpics    data/*/.xvpics
 	rm -rf $(bundle_name)
 	rm -rf $(macimage_name)
