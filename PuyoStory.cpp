@@ -109,7 +109,7 @@ void PuyoStory::loop()
         while (SDL_PollEvent (&e)) {
             GameControlEvent controlEvent;
             getControlEvent(e, &controlEvent);
-            
+ 
             switch (controlEvent.cursorEvent) {
                 case GameControlEvent::kQuit:
                   exit(0);

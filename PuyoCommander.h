@@ -39,7 +39,7 @@ class PuyoCommander : public MessageListener
   void startSingleGameLoop();
   void startTwoPlayerGameLoop();
   void startNetGameLoop();
-  void startLANGame(int level, char *playerName, char *ipAddress);
+  void startLANGame(int level, const char *playerName, const char *ipAddress);
   void enterStringLoop(Menu *menu, const char *kItem, char out[256], int maxlen = 10);
   void onMessage(Message &message);
   

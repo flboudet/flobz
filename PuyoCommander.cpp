@@ -1160,7 +1160,7 @@ void PuyoCommander::onMessage(Message &message)
     }
 }
 
-void PuyoCommander::startLANGame(int level, char *playerName, char *ipAddress)
+void PuyoCommander::startLANGame(int level, const char *playerName, const char *ipAddress)
 {    
     if (mbox) delete mbox;
     mbox = new UDPMessageBox(ipAddress, 6581, 6581);
