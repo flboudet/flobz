@@ -92,6 +92,7 @@ int currentPerso = 0;
 
 
 PuyoView::PuyoView(PuyoRandomSystem *attachedRandom, int xOffset, int yOffset, int nXOffset, int nYOffset)
+:attachedPuyoFactory(this), attachedPainter(painter)
 {
 	attachedGame = new PuyoGame(attachedRandom, &attachedPuyoFactory);
     attachedGame->setDelegate(this);
@@ -103,6 +104,7 @@ PuyoView::PuyoView(PuyoRandomSystem *attachedRandom, int xOffset, int yOffset, i
 	gameRunning = true;
 	enemyGame = NULL;
     skippedCycle = false;
+    cycleAllowance = 0;
 }
 
 void PuyoView::setEnemyGame(PuyoGame *enemyGame)
@@ -210,21 +212,24 @@ void PuyoView::cycleAnimation()
             currentAnimation->cycle();
         }
     }
-    
-    if (attachedGame->isEndOfCycle() && skippedCycle) {
-        while (attachedGame->isEndOfCycle() && attachedGame->isGameRunning() && cycleAllowed()) {
-            attachedGame->cycle();
-        }
+
+    // If there is a skipped cycle to do, do it
+    if (skippedCycle && attachedGame->isGameRunning() && cycleAllowed()) {
+        attachedGame->cycle();
+        skippedCycle = false;
     }
 }
 
 void PuyoView::cycleGame()
 {
-    if (!attachedGame->isEndOfCycle()) {
+    // If we are not allowed to cycle the game, mark it
+    if (cycleAllowed()) {
         skippedCycle = false;
         attachedGame->cycle();
     }
-    else skippedCycle = true;
+    else {
+        skippedCycle = true;
+    }
 }
 
 void PuyoView::render()
@@ -251,17 +256,17 @@ void PuyoView::render()
 					drect.h -= (drect.y + drect.h - vrect.y - vrect.h);
                 if (drect.x + drect.w > vrect.x + vrect.w)
 					drect.w -= (drect.x + drect.w - vrect.x - vrect.w);
-                painter.requestDraw(puyoShadow, &drect);
+                attachedPainter.requestDraw(puyoShadow, &drect);
             }
         }
     }
     
 	for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
         AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
-        currentPuyo->render(painter, this);
+        currentPuyo->render();
     }
     // drawing the walhalla
-    attachedPuyoFactory.renderWalhalla(painter, this);
+    attachedPuyoFactory.renderWalhalla();
     
 	drect.x = nXOffset;
 	drect.y = nYOffset;
@@ -274,8 +279,8 @@ void PuyoView::render()
 		drect.y = nYOffset + TSIZE;
 		drect.w = currentSurface->w;
 		drect.h = currentSurface->h;
-		painter.requestDraw(currentSurface, &drect);
-		if (currentSurface != neutral) painter.requestDraw(puyoEyes, &drect);
+		attachedPainter.requestDraw(currentSurface, &drect);
+		if (currentSurface != neutral) attachedPainter.requestDraw(puyoEyes, &drect);
 	}
 	currentSurface = getSurfaceForState(attachedGame->getNextCompanion());
 	if (currentSurface != NULL) {
@@ -283,8 +288,8 @@ void PuyoView::render()
 		drect.y = nYOffset;
 		drect.w = currentSurface->w;
 		drect.h = currentSurface->h;
-		painter.requestDraw(currentSurface, &drect);
-		if (currentSurface != neutral) painter.requestDraw(puyoEyes, &drect);
+		attachedPainter.requestDraw(currentSurface, &drect);
+		if (currentSurface != neutral) attachedPainter.requestDraw(puyoEyes, &drect);
 	}
     
     // Drawing the view animation
@@ -316,7 +321,7 @@ void PuyoView::renderNeutral()
 		drect.y = yOffset + 3 + TSIZE;
 		drect.w = bigNeutral->w;
 		drect.h = bigNeutral->h;
-		painter.requestDraw(bigNeutral, &drect);
+		attachedPainter.requestDraw(bigNeutral, &drect);
 		drect_x += bigNeutral->w - compressor;
 	}
 	for (int cpt = 0 ; cpt < numNeutral ; cpt++) {
@@ -324,7 +329,7 @@ void PuyoView::renderNeutral()
 		drect.y = yOffset + 3 + TSIZE;
 		drect.w = neutral->w;
 		drect.h = neutral->h;
-		painter.requestDraw(neutral, &drect);
+		attachedPainter.requestDraw(neutral, &drect);
 		drect_x += neutral->w - compressor;
 	}
 }
@@ -332,19 +337,18 @@ void PuyoView::renderNeutral()
 void PuyoView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex) {
     int x = neutralPuyo->getPuyoX();
     int y = neutralPuyo->getPuyoY();
-    ((AnimatedPuyo *)neutralPuyo)->addAnimation(new NeutralAnimation(x, y, neutralIndex * 4, xOffset, yOffset));
+    ((AnimatedPuyo *)neutralPuyo)->addAnimation(new NeutralAnimation(*((AnimatedPuyo *)neutralPuyo), neutralIndex * 4));
 }
 
 void PuyoView::companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise)
 {
-    ((AnimatedPuyo *)companionPuyo)->addAnimation(new TurningAnimation(companionPuyo, companionVector,
-								       xOffset, yOffset,
-								       getSurfaceForState(companionPuyo->getPuyoState()), counterclockwise));
+    ((AnimatedPuyo *)companionPuyo)->addAnimation(new TurningAnimation(*(AnimatedPuyo *)companionPuyo,
+                                                                       companionVector, counterclockwise));
 }
 
 void PuyoView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY)
 {
-    ((AnimatedPuyo *)puyo)->addAnimation(new FallingAnimation(puyo, originY, xOffset, yOffset, 16));
+    ((AnimatedPuyo *)puyo)->addAnimation(new FallingAnimation(*(AnimatedPuyo *)puyo, originY, xOffset, yOffset, 16));
 }
 
 void PuyoView::puyoWillVanish(IosVector &puyoGroup, int groupNum, int phase)
@@ -353,7 +357,7 @@ void PuyoView::puyoWillVanish(IosVector &puyoGroup, int groupNum, int phase)
     viewAnimations.addElement(new VanishSoundAnimation(phase, synchronizer));
     for (int i = 0, j = puyoGroup.getSize() ; i < j ; i++) {
         AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(puyoGroup.getElementAt(i));
-        currentPuyo->addAnimation(new VanishAnimation(currentPuyo, i*2 , xOffset, yOffset, synchronizer));
+        currentPuyo->addAnimation(new VanishAnimation(*currentPuyo, i*2 , xOffset, yOffset, synchronizer));
     }
     // A revoir
     if (groupNum == 0) {
@@ -379,15 +383,8 @@ void PuyoView::gameDidEndCycle()
 
 bool PuyoView::cycleAllowed()
 {
-    if (attachedGame->isEndOfCycle()) {
-        for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
-            AnimatedPuyo *currentPuyo =
-            (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
-            if (currentPuyo->getCurrentAnimation() != NULL) {
-                return false;
-            }
-        }
-    }
+    if (cycleAllowance < 0)
+        return false;
     return true;
 }
 

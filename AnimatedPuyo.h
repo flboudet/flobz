@@ -35,34 +35,39 @@ class PuyoView;
 
 class AnimatedPuyo : public PuyoPuyo {
 public:
-    AnimatedPuyo(PuyoState state);
+    AnimatedPuyo(PuyoState state, PuyoView *attachedView);
     virtual ~AnimatedPuyo();
     void addAnimation(PuyoAnimation *animation);
     PuyoAnimation * getCurrentAnimation() const;
     void removeCurrentAnimation();
     void cycleAnimation();
-    void render(SDL_Painter &painter, PuyoView *attachedView);
+    void render();
     bool isRenderingAnimation() const;
     void setVisible(bool flag) { visibilityFlag = flag; }
     bool getVisible() const { return visibilityFlag; }
+    PuyoView *getAttachedView() const { return attachedView; }
+    int getScreenCoordinateX() const;
+    int getScreenCoordinateY() const;
 private:
     IosVector animationQueue;
     int puyoEyeState;
     unsigned int smallTicksCount;
     bool visibilityFlag;
+    PuyoView *attachedView;
 };
 
 
 class AnimatedPuyoFactory : public PuyoFactory {
 public:
-    AnimatedPuyoFactory();
+    AnimatedPuyoFactory(PuyoView *attachedView);
     virtual ~AnimatedPuyoFactory();
     virtual PuyoPuyo *createPuyo(PuyoState state);
     virtual void deletePuyo(PuyoPuyo *target);
-    void renderWalhalla(SDL_Painter &painter, PuyoView *attachedView);
+    void renderWalhalla();
     void cycleWalhalla();
 private:
     IosVector puyoWalhalla;
+    PuyoView *attachedView;
 };
 
 #endif // _ANIMATEDPUYO

@@ -55,24 +55,36 @@ class PuyoView : public virtual PuyoDelegate {
     void renderNeutral();
     void cycleAnimation();
     void cycleGame();
+    void allowCycle() { cycleAllowance++; }
+    void disallowCycle() { cycleAllowance--; }
+    
+    static IIM_Surface *getSurfaceForState(PuyoState state);
+    IIM_Surface *getSurfaceForPuyo(PuyoPuyo *puyo);
+    PuyoGame *getAttachedGame() const { return attachedGame; }
+    SDL_Painter & getPainter() const { return attachedPainter; }
+    
+    int getScreenCoordinateX(int X) const { return X * TSIZE + xOffset; }
+    int getScreenCoordinateY(int Y) const { return Y * TSIZE + yOffset; }
+    
+    // PuyoDelegate methods
     void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex);
     void gameDidEndCycle();
     void companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise);
     void puyoDidFall(PuyoPuyo *puyo, int originX, int originY);
     void puyoWillVanish(IosVector &puyoGroup, int groupNum, int phase);
     void gameLost();
-    static IIM_Surface *getSurfaceForState(PuyoState state);
-    IIM_Surface *getSurfaceForPuyo(PuyoPuyo *puyo);
-    PuyoGame *getAttachedGame() const { return attachedGame; }
-    // normalement c'est prive
-    int xOffset, yOffset, nXOffset, nYOffset;
+    
   private:
     bool cycleAllowed();
     bool skippedCycle;
     bool gameRunning;
+    int xOffset, yOffset;
+    int nXOffset, nYOffset;
     AnimatedPuyoFactory attachedPuyoFactory;
     PuyoGame *attachedGame, *enemyGame;
     IosVector viewAnimations;
+    int cycleAllowance;
+    SDL_Painter &attachedPainter;
 };
 
 class PuyoStarter : public PuyoDrawable {

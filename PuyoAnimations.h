@@ -35,16 +35,24 @@
 class AnimatedPuyo;
 
 /* Abstract Animation class */
-class PuyoAnimation {
-  public:
-    PuyoAnimation();
+class Animation {
+public:
+    Animation();
     bool isFinished() const;
     bool isEnabled() const;
     virtual void cycle() = 0;
     virtual void draw(int semiMove) = 0;
-  protected:
+protected:
     bool finishedFlag;
     bool enabled;
+};
+
+/* Abstract animation class for puyos */
+class PuyoAnimation : public Animation{
+public:
+    PuyoAnimation(AnimatedPuyo &puyo):attachedPuyo(puyo) {}
+protected:
+    AnimatedPuyo &attachedPuyo;
 };
 
 /* Animation synchronization helper */
@@ -64,7 +72,7 @@ private:
 /* Neutral falling animation */
 class NeutralAnimation : public PuyoAnimation {
   public:
-    NeutralAnimation(int X, int Y, int delay, int xOffset, int yOffset);
+    NeutralAnimation(AnimatedPuyo &puyo, int delay);
     void cycle();
     void draw(int semiMove);
   private:
@@ -77,15 +85,11 @@ class NeutralAnimation : public PuyoAnimation {
 /* Companion turning around main puyo animation */
 class TurningAnimation : public PuyoAnimation {
 public:
-    TurningAnimation(PuyoPuyo *companionPuyo,
-                     int vector, int xOffset, int yOffset,
-                     IIM_Surface *companionSurface,
-                     bool counterclockwise);
+    TurningAnimation(AnimatedPuyo &companionPuyo,
+                     int vector, bool counterclockwise);
     void cycle();
     void draw(int semiMove);
 private:
-    PuyoPuyo *companionPuyo;
-    int xOffset, yOffset;
     int X, Y, companionVector, cpt;
     float angle;
     float step;
@@ -96,12 +100,11 @@ private:
 /* Puyo falling and bouncing animation */
 class FallingAnimation : public PuyoAnimation {
 public:
-    FallingAnimation(PuyoPuyo *puyo,
+    FallingAnimation(AnimatedPuyo &puyo,
                      int originY, int xOffset, int yOffset, int step);
     void cycle();
     void draw(int semiMove);
 private:
-        PuyoPuyo *attachedPuyo;
     int xOffset, yOffset, step;
     int X, Y;
 	int bouncing;
@@ -113,12 +116,11 @@ private:
 /* Puyo exploding and vanishing animation */
 class VanishAnimation : public PuyoAnimation {
 public:
-    VanishAnimation(AnimatedPuyo *puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer);
+    VanishAnimation(AnimatedPuyo &puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer);
     virtual ~VanishAnimation();
     void cycle();
     void draw(int semiMove);
 private:
-    AnimatedPuyo *puyo;
     IIM_Surface *puyoFace;
     int xOffset, yOffset;
     int X, Y, iter, color;
@@ -127,7 +129,7 @@ private:
     int delay;
 };
 
-class VanishSoundAnimation : public PuyoAnimation {
+class VanishSoundAnimation : public Animation {
 public:
     VanishSoundAnimation(int phase, AnimationSynchronizer *synchronizer);
     virtual ~VanishSoundAnimation();

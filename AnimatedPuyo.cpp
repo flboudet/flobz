@@ -30,10 +30,11 @@
 extern IIM_Surface *puyoCircle[32];
 extern IIM_Surface *puyoEye[3];
 
-AnimatedPuyo::AnimatedPuyo(PuyoState state) : PuyoPuyo(state)
+AnimatedPuyo::AnimatedPuyo(PuyoState state, PuyoView *attachedView) : PuyoPuyo(state)
 {
     puyoEyeState = random() % 700;
     visibilityFlag = true;
+    this->attachedView = attachedView;
 }
 
 AnimatedPuyo::~AnimatedPuyo()
@@ -84,8 +85,10 @@ bool AnimatedPuyo::isRenderingAnimation() const
     return animation->isEnabled();
 }
 
-void AnimatedPuyo::render(SDL_Painter &painter, PuyoView *attachedView)
+void AnimatedPuyo::render()
 {
+    SDL_Painter &painter = attachedView->getPainter();
+    
     puyoEyeState++;
     if (attachedView == NULL)
         return;
@@ -96,14 +99,12 @@ void AnimatedPuyo::render(SDL_Painter &painter, PuyoView *attachedView)
     bool falling  = attachedGame->getFallingState() < PUYO_EMPTY;
     
     SDL_Rect drect;
-    int i = this->getPuyoX();
-    int j = this->getPuyoY();
     PuyoAnimation *animation = getCurrentAnimation();
     if (!isRenderingAnimation()) {
         IIM_Surface *currentSurface = attachedView->getSurfaceForPuyo(this);
         if (currentSurface != NULL) {
-            drect.x = (i*TSIZE) + attachedView->xOffset;
-            drect.y = (j*TSIZE) + attachedView->yOffset;
+            drect.x = getScreenCoordinateX();
+            drect.y = getScreenCoordinateY();
             if (this->getPuyoState() < PUYO_EMPTY)
                 drect.y -= attachedGame->getSemiMove() * TSIZE / 2;
             drect.w = currentSurface->w;
@@ -136,11 +137,22 @@ void AnimatedPuyo::render(SDL_Painter &painter, PuyoView *attachedView)
     }
 }
 
-
-
-
-AnimatedPuyoFactory::AnimatedPuyoFactory()
+int AnimatedPuyo::getScreenCoordinateX() const
 {
+    return attachedView->getScreenCoordinateX(getPuyoX());
+}
+
+int AnimatedPuyo::getScreenCoordinateY() const
+{
+    return attachedView->getScreenCoordinateY(getPuyoY());
+}
+
+
+
+
+AnimatedPuyoFactory::AnimatedPuyoFactory(PuyoView *attachedView)
+{
+    this->attachedView = attachedView;
 }
 
 AnimatedPuyoFactory::~AnimatedPuyoFactory()
@@ -154,7 +166,7 @@ AnimatedPuyoFactory::~AnimatedPuyoFactory()
 
 PuyoPuyo *AnimatedPuyoFactory::createPuyo(PuyoState state)
 {
-    return new AnimatedPuyo(state);
+    return new AnimatedPuyo(state, attachedView);
 }
 
 void AnimatedPuyoFactory::deletePuyo(PuyoPuyo *target)
@@ -163,11 +175,11 @@ void AnimatedPuyoFactory::deletePuyo(PuyoPuyo *target)
 }
 
 
-void AnimatedPuyoFactory::renderWalhalla(SDL_Painter &painter, PuyoView *attachedView)
+void AnimatedPuyoFactory::renderWalhalla()
 {
     for (int i = puyoWalhalla.getSize() - 1 ; i >= 0 ; i--) {
         AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(puyoWalhalla.getElementAt(i));
-        currentPuyo->render(painter, attachedView);
+        currentPuyo->render();
     }
 }
 

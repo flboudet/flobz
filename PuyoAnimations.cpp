@@ -38,18 +38,18 @@ extern IIM_Surface *shrinkingPuyo[5][5];
 extern IIM_Surface *explodingPuyo[5][5];
 
 /* Base class implementation */
-PuyoAnimation::PuyoAnimation()
+Animation::Animation()
 {
     finishedFlag = false;
     enabled = true;
 }
 
-bool PuyoAnimation::isFinished() const
+bool Animation::isFinished() const
 {
     return finishedFlag;
 }
 
-bool PuyoAnimation::isEnabled() const
+bool Animation::isEnabled() const
 {
     return enabled;
 }
@@ -57,15 +57,16 @@ bool PuyoAnimation::isEnabled() const
 
 /* Neutral falling animation */
 IIM_Surface *NeutralAnimation::neutral = NULL;
-NeutralAnimation::NeutralAnimation(int X, int Y, int delay, int xOffset, int yOffset)
+NeutralAnimation::NeutralAnimation(AnimatedPuyo &puyo, int delay) : PuyoAnimation(puyo)
 {
     if (neutral == NULL)
         neutral = PuyoView::getSurfaceForState(PUYO_NEUTRAL);
-	this->X = (X*TSIZE) + xOffset;
-	this->Y = (Y*TSIZE) + yOffset;
-	this->currentY = yOffset;
+	this->X = attachedPuyo.getScreenCoordinateX();
+	this->Y = attachedPuyo.getScreenCoordinateY();
+	this->currentY = attachedPuyo.getAttachedView()->getScreenCoordinateY(0);
     step = 0;
     this->delay = delay;
+    attachedPuyo.getAttachedView()->disallowCycle();
 }
 
 void NeutralAnimation::cycle()
@@ -79,6 +80,7 @@ void NeutralAnimation::cycle()
         if (currentY >= Y) {
             audio_sound_play(sound_bim[random() % 2]);
             finishedFlag = true;
+            attachedPuyo.getAttachedView()->allowCycle();
         }
     }
 }
@@ -128,20 +130,15 @@ void AnimationSynchronizer::decrementUsage()
 }
 
 /* Companion turning around main puyo animation */
-TurningAnimation::TurningAnimation(PuyoPuyo *companionPuyo,
-                                   int vector, int xOffset, int yOffset,
-                                   IIM_Surface *companionSurface,
-                                   bool counterclockwise)
+TurningAnimation::TurningAnimation(AnimatedPuyo &companionPuyo, int vector,
+                                   bool counterclockwise) : PuyoAnimation(companionPuyo)
 {
     this->counterclockwise = counterclockwise;
     companionVector = vector;
-    targetSurface = companionSurface;
-    this->companionPuyo = companionPuyo;
+    targetSurface = attachedPuyo.getAttachedView()->getSurfaceForPuyo(&attachedPuyo);
     cpt = 0;
     angle = 0;
     step = (3.14 / 2) / 4;
-    this->xOffset = xOffset;
-    this->yOffset = yOffset;
 }
 
 void TurningAnimation::cycle()
@@ -159,8 +156,8 @@ void TurningAnimation::draw(int semiMove)
 {
     if (targetSurface == NULL)
         return;
-    X = (companionPuyo->getPuyoX()*TSIZE) + xOffset;
-    Y = (companionPuyo->getPuyoY()*TSIZE) + yOffset;
+    X = attachedPuyo.getScreenCoordinateX();
+    Y = attachedPuyo.getScreenCoordinateY();
     
     float offsetA = sin(angle) * TSIZE;
     float offsetB = cos(angle) * TSIZE * (counterclockwise ? -1 : 1);
@@ -201,36 +198,37 @@ void TurningAnimation::draw(int semiMove)
 const int FallingAnimation::BOUNCING_OFFSET_NUM = 12;
 const int FallingAnimation::BOUNCING_OFFSET[] = { -1, -3, -5, -4, -2, 0, -6, -9, -11, -9, -6, 0 };
 
-FallingAnimation::FallingAnimation(PuyoPuyo *puyo, int originY, int xOffset, int yOffset, int step)
+FallingAnimation::FallingAnimation(AnimatedPuyo &puyo, int originY, int xOffset, int yOffset, int step) : PuyoAnimation(puyo)
 {
-    attachedPuyo  = puyo;
     this->xOffset = xOffset;
     this->yOffset = yOffset;
     this->step    = 0/*step*/;
-    this->X  = (puyo->getPuyoX()*TSIZE) + xOffset;
+    this->X  = (attachedPuyo.getPuyoX()*TSIZE) + xOffset;
     this->Y  = (originY*TSIZE) + yOffset;
-    puyoFace = PuyoView::getSurfaceForState(puyo->getPuyoState());
+    puyoFace = PuyoView::getSurfaceForState(attachedPuyo.getPuyoState());
     bouncing = BOUNCING_OFFSET_NUM - 1;
-    if (originY == puyo->getPuyoY()) {
+    if (originY == attachedPuyo.getPuyoY()) {
         bouncing = -1;
     }
+    attachedPuyo.getAttachedView()->disallowCycle();
 }
 
 void FallingAnimation::cycle()
 {
     Y += step++;
-    if (Y >= (attachedPuyo->getPuyoY()*TSIZE) + yOffset)
+    if (Y >= (attachedPuyo.getPuyoY()*TSIZE) + yOffset)
     {
         bouncing--;
         if (bouncing < 0) {
             finishedFlag = true;
             audio_sound_play(sound_bam1);
+            attachedPuyo.getAttachedView()->allowCycle();
         }
         else {
             if (BOUNCING_OFFSET[bouncing] == 0)
                 audio_sound_play(sound_bam1);
         }
-        Y = (attachedPuyo->getPuyoY()*TSIZE) + yOffset;
+        Y = (attachedPuyo.getPuyoY()*TSIZE) + yOffset;
     }
 }
 
@@ -244,20 +242,20 @@ void FallingAnimation::draw(int semiMove)
         drect.w = puyoFace->w;
         drect.h = puyoFace->h;
         painter.requestDraw(puyoFace, &drect);
-        if (attachedPuyo->getPuyoState() != PUYO_NEUTRAL)
+        if (attachedPuyo.getPuyoState() != PUYO_NEUTRAL)
             painter.requestDraw(puyoEyesSwirl[(bouncing/2)%4], &drect);
     }
 }
 
 /* Puyo exploding and vanishing animation */
-VanishAnimation::VanishAnimation(AnimatedPuyo *puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer)
+VanishAnimation::VanishAnimation(AnimatedPuyo &puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer) : PuyoAnimation(puyo)
 {
-    puyoFace = PuyoView::getSurfaceForState(puyo->getPuyoState());
+    puyoFace = PuyoView::getSurfaceForState(attachedPuyo.getPuyoState());
     this->xOffset = xOffset;
     this->yOffset = yOffset;
-    this->X = (puyo->getPuyoX()*TSIZE) + xOffset;
-    this->Y = (puyo->getPuyoY()*TSIZE) + yOffset;
-    this->color = puyo->getPuyoState();
+    this->X = (attachedPuyo.getPuyoX()*TSIZE) + xOffset;
+    this->Y = (attachedPuyo.getPuyoY()*TSIZE) + yOffset;
+    this->color = attachedPuyo.getPuyoState();
     if (color > PUYO_EMPTY)
         color -= PUYO_BLUE;
     iter = 0;
@@ -267,7 +265,7 @@ VanishAnimation::VanishAnimation(AnimatedPuyo *puyo, int delay, int xOffset, int
     synchronizer->incrementUsage();
     synchronizer->push();
     this->delay = delay;
-    this->puyo = puyo;
+    attachedPuyo.getAttachedView()->disallowCycle();
 }
 
 VanishAnimation::~VanishAnimation()
@@ -284,12 +282,13 @@ void VanishAnimation::cycle()
     else if (synchronizer->isSynchronized()) {
         enabled = true;
         iter ++;
-        //if (iter == delay + 10) {
-        //    audio_sound_play(sound_splash[0]);
-        //}
-        if (iter == 30/* + delay*/) {
+        if (iter == 20 + delay) {
+            attachedPuyo.getAttachedView()->allowCycle();
+        }
+        else if (iter == 50 + delay) {
             finishedFlag = true;
-            puyo->setVisible(false);
+            attachedPuyo.setVisible(false);
+            attachedPuyo.getAttachedView()->allowCycle();
         }
     }
 }
