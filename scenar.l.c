@@ -544,13 +544,11 @@ char *yytext;
 #define INITIAL 0
 #define STRINGg 1
 
-#ifndef YY_NO_UNISTD_H
 /* Special case for "unistd.h", since it is non-ANSI. We include it way
  * down here because we want the user's section 1 to have been scanned first.
  * The user has a chance to override it with an option.
  */
 #include <unistd.h>
-#endif
 
 #ifndef YY_EXTRA_TYPE
 #define YY_EXTRA_TYPE void *
@@ -693,7 +691,7 @@ YY_DECL
     
 #line 11 "scenar.l"
 
-#line 697 "scenar.l.c"
+#line 695 "scenar.l.c"
 
 	if ( (yy_init) )
 		{
@@ -877,7 +875,7 @@ YY_RULE_SETUP
 #line 38 "scenar.l"
 ECHO;
 	YY_BREAK
-#line 881 "scenar.l.c"
+#line 879 "scenar.l.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(STRINGg):
 	yyterminate();
@@ -1616,10 +1614,10 @@ YY_BUFFER_STATE yy_scan_buffer  (char * base, yy_size_t  size )
  * @note If you want to scan bytes that may contain NUL values, then use
  *       yy_scan_bytes() instead.
  */
-YY_BUFFER_STATE yy_scan_string (yyconst char * yy_str )
+YY_BUFFER_STATE yy_scan_string (yyconst char * str )
 {
     
-	return yy_scan_bytes(yy_str,strlen(yy_str) );
+	return yy_scan_bytes(str,strlen(str) );
 }
 
 /** Setup the input buffer state to scan the given bytes. The next call to yylex() will
@@ -1837,7 +1835,6 @@ void yyfree (void * ptr )
 #undef yy_set_bol
 #undef yy_new_buffer
 #undef yy_set_interactive
-#undef yytext_ptr
 #undef YY_DO_BEFORE_ACTION
 
 #ifdef YY_DECL_IS_OURS

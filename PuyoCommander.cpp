@@ -29,6 +29,9 @@ char *kOptions     = "Options";
 char *kPlayer      = "Player";
 char *kScore       = "Score:";
 
+static char *kMusicVolume = "MusicVolume";
+static char *kAudioVolume = "AudioVolume";
+
 char *kCongratulations = "Congratulations!!!";
 char *kPuyosInvasion   = "You stopped Puyo's invasion.\n"
                          "Peace on Earth is restored!!";
@@ -549,6 +552,9 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   sound = GetBoolPreference(kMusic,snd);
   fx = GetBoolPreference(kAudioFX,audio);
 
+  int music_volume = GetIntPreference(kMusicVolume, 100);
+  int audio_volume = GetIntPreference(kAudioVolume, 80);
+
    keyControls[kPlayer1LeftControl] = (SDLKey)GetIntPreference("P1Left",  keyControls[kPlayer1LeftControl]);
    keyControls[kPlayer1RightControl] = (SDLKey)GetIntPreference("P1Right",  keyControls[kPlayer1RightControl]);
    keyControls[kPlayer1DownControl] = (SDLKey)GetIntPreference("P1Down",  keyControls[kPlayer1DownControl]);
@@ -592,6 +598,9 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   if (sound==false) Mix_PauseMusic();
   audio_set_music_on_off(sound);
   audio_set_sound_on_off(fx);
+
+  audio_set_volume(audio_volume);
+  audio_music_set_volume(music_volume);
 
   display = SDL_SetVideoMode( 640, 480, 0,  SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));
   if ( display == NULL ) {
@@ -703,14 +712,17 @@ void PuyoCommander::run()
                         int score2 = 0;
                         menu_hide (menu);
                         gameOverMenu = gameOver2PMenu;
+                        int currentMusicTheme = 0;
                         if (menu_active_is(gameOverMenu, "NO"))
                             menu_next_item(gameOverMenu);
                         while (menu_active_is(gameOverMenu, "YES")) {
                             menu_next_item(gameOverMenu);
                             PuyoStarter myStarter(this,false,0,RANDOM);
+                            audio_music_switch_theme(currentMusicTheme);
                             myStarter.run(score1, score2, 0);
                             score1 += myStarter.leftPlayerWin();
                             score2 += myStarter.rightPlayerWin();
+                            currentMusicTheme = (currentMusicTheme + 1) % NB_MUSIC_THEME;
                         }
                         menu_show (menu);
                         audio_music_start(0);
@@ -1051,7 +1063,7 @@ mml_play:
     ia = &(ia2[0]);
   else if (menu_active_is (singleGameMenu, kLevelHard))
     ia = &(ia3[0]);
-    
+  
   int score1 = 0;
   int score2 = 0;
   int lives  = 3;
@@ -1064,7 +1076,12 @@ mml_play:
   if (menu_active_is(gameOver2PMenu, "NO"))
     menu_next_item(gameOver2PMenu);
   gameOverMenu = nextLevelMenu;
+
+  int currentMusicTheme = 0;
+  audio_music_switch_theme(currentMusicTheme);
+  
   while (menu_active_is(gameOverMenu, "YES") && (lives >= 0)) {
+    
     PuyoStory myStory(this, score2+1);
     myStory.loop();
     PuyoStarter myStarter(this, true, ia[score2].level, ia[score2].type);
@@ -1073,6 +1090,11 @@ mml_play:
     score2 += myStarter.rightPlayerWin();
     if (!myStarter.rightPlayerWin())
       lives--;
+    else {
+      currentMusicTheme = (currentMusicTheme + 1) % NB_MUSIC_THEME;
+      audio_music_switch_theme(currentMusicTheme);
+    }
+    
     if (ia[score2].level == 0) {
       break;
     }

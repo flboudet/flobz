@@ -1,7 +1,7 @@
-/* A Bison parser, made by GNU Bison 1.875a.  */
+/* A Bison parser, made by GNU Bison 1.875.  */
 
 /* Skeleton parser for Yacc-like parsing with Bison,
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -222,7 +222,7 @@ typedef union YYSTYPE {
     char str[1024];
 } YYSTYPE;
 /* Line 191 of yacc.c.  */
-#line 226 "scenar.y.c"
+#line 225 "scenar.y.c"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
@@ -234,7 +234,7 @@ typedef union YYSTYPE {
 
 
 /* Line 214 of yacc.c.  */
-#line 238 "scenar.y.c"
+#line 237 "scenar.y.c"
 
 #if ! defined (yyoverflow) || YYERROR_VERBOSE
 
@@ -1204,7 +1204,7 @@ yyreduce:
     }
 
 /* Line 999 of yacc.c.  */
-#line 1208 "scenar.y.c"
+#line 1207 "scenar.y.c"
 
   yyvsp -= yylen;
   yyssp -= yylen;

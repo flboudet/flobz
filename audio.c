@@ -19,6 +19,11 @@ Sound  *sound_splash[8];
 #include <SDL/SDL.h>
 static Mix_Music *music[4];
 
+static char *MUSIC_THEME[2][4] = {
+  { "flobopuyo_menu.xm", "flobopuyo_game1.xm", "flobopuyo_game2.xm", "flobopuyo_gameover.xm" },
+  { "flobopuyo_menu.xm", "strange_fear.xm", "strange_fear2.xm", "strange_gameover.xm" }
+};
+
 static int sound_supported;
 static int volume;
 static int sound_on;
@@ -85,7 +90,8 @@ audio_init ()
 	sound_splash[5] = CustomMix_LoadWAV (DATADIR, "splash6.wav",72);
 	sound_splash[6] = CustomMix_LoadWAV (DATADIR, "splash7.wav",72);
 	sound_splash[7] = CustomMix_LoadWAV (DATADIR, "splash8.wav",72);
-	music[0] = CustomMix_LoadMUS (DATADIR, "flobopuyo_menu.xm");
+
+  music[0] = CustomMix_LoadMUS (DATADIR, "flobopuyo_menu.xm");
 	music[1] = CustomMix_LoadMUS (DATADIR, "flobopuyo_game1.xm");
 	music[2] = CustomMix_LoadMUS (DATADIR, "flobopuyo_game2.xm");
 	music[3] = CustomMix_LoadMUS (DATADIR, "flobopuyo_gameover.xm");
@@ -193,5 +199,17 @@ audio_set_sound_on_off (int on)
 		Mix_Volume (-1, 0);
 	}
 	sound_on = on;
+#endif
+}
+
+void    audio_music_switch_theme(int theme_number)
+{
+#ifdef USE_AUDIO
+  int i;
+  if (!sound_supported) return;
+  for (i=0; i<4; ++i) {
+    Mix_FreeMusic(music[i]);
+    music[i] = CustomMix_LoadMUS (DATADIR, MUSIC_THEME[theme_number][i]);
+  }
 #endif
 }

@@ -37,4 +37,8 @@ void    audio_set_volume (int vol);
 void    audio_set_music_on_off (int on);
 void    audio_set_sound_on_off (int on);
 
+
+#define NB_MUSIC_THEME 2
+void    audio_music_switch_theme(int theme_number);
+
 #endif

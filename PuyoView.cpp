@@ -815,8 +815,8 @@ void PuyoStarter::run(int score1, int score2, int lives)
     attachedGameB->cycle();
   }
   while (!quit) {
-    bool left_danger = (attachedGameA->getMaxColumnHeight() > PUYODIMY - 4);
-    bool right_danger = (attachedGameB->getMaxColumnHeight() > PUYODIMY - 4);
+    bool left_danger = (attachedGameA->getMaxColumnHeight() > PUYODIMY - 5);
+    bool right_danger = (attachedGameB->getMaxColumnHeight() > PUYODIMY - 5);
     bool danger = left_danger || right_danger;
     bool gameover = (!attachedGameA->isGameRunning() || !attachedGameB->isGameRunning());
 
