@@ -22,7 +22,8 @@ HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h Pu
 OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o IosException.o \
 					IosVector.o main.o PuyoGame.o PuyoVersion.o PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o sofont.o \
 					menu.o menuitems.o audio.o scrollingtext.o preferences.o PuyoStory.o SDL_Painter.o \
-					InputManager.o GameControls.o PuyoDoomMelt.o glSDL.o IosImgProcess.o
+					InputManager.o GameControls.o PuyoDoomMelt.o glSDL.o IosImgProcess.o \
+					corona32.o corona.o corona_palette.o
 
 all: prelude flobopuyo
 
@@ -75,6 +76,9 @@ glSDL.o:glSDL.c
 SDL_prim.o:SDL_prim.c
 	@echo "[$@]" && $(CC) $(CFLAGS) -DDATADIR=${DATADIR} -c $< 2>> EXT_WARNINGS
 	@rm -f EXT_WARNINGS
+corona.o:corona.cpp
+corona32.o:corona32.cpp
+corona_palette.o:corona_palette.cpp	
 
 scenar.l.c:scenar.l ${HFILES}
 	@echo "[$@]" && flex -oscenar.l.c scenar.l

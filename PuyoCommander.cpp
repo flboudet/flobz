@@ -1000,8 +1000,20 @@ mml_fin:
   menu_hide (optionMenu);
 }
 
+#include "corona32.h"
+#define CORONA_HEIGHT 120
+
 void PuyoCommander::backLoop(Menu *menu, PuyoDrawable *starter)
 {
+    Corona32 *corona = NULL;
+    int      *corona_screen;
+
+    if (menu == aboutMenu) {
+        corona = corona32_new();
+        corona32_resize(corona, 640, CORONA_HEIGHT);
+        corona_screen = (int*)calloc(640 * CORONA_HEIGHT + 64, sizeof(int));
+    }
+
     menu_show(menu);
     while (1) {
         SDL_Event e;
@@ -1021,10 +1033,33 @@ void PuyoCommander::backLoop(Menu *menu, PuyoDrawable *starter)
             }
         }
         
-        updateAll(starter);
+        if (corona)
+        {
+            short frequency[2][512];
+            for (int i=0; i<512; ++i) { // Generate random sound.
+                frequency[0][i] = rand();
+                frequency[1][i] = rand();
+            }
+            corona32_update(corona, SDL_GetTicks(), frequency);
+            corona32_displayRGBA(corona, corona_screen);
+            SDL_Surface *tmpsurf =
+              SDL_CreateRGBSurfaceFrom (corona_screen, 640, CORONA_HEIGHT,
+                                        32, 640*4,
+                                        0x00ff0000, 0x0000ff00, 0x000000ff,
+                                        0xff000000);
+            updateAll(starter, tmpsurf);
+            SDL_FreeSurface (tmpsurf);
+        }
+        else
+            updateAll(starter);
     }
 mml_fin:
-        menu_hide (menu);
+    menu_hide (menu);
+    if (corona)
+    {
+        corona32_delete(corona);
+        free(corona_screen);
+    }
 }
 
 void PuyoCommander::enterStringLoop(Menu *menu, const char *kItem, char out[256])
@@ -1326,7 +1361,7 @@ mml_play:
   doom_melt_start(melt, gameScreen);
 }
 
-void PuyoCommander::updateAll(PuyoDrawable *starter)
+void PuyoCommander::updateAll(PuyoDrawable *starter, SDL_Surface *extra_surf)
 {
   Uint32  now = 0;
 
@@ -1357,8 +1392,20 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
     }
     else {
       SDL_BlitSurface (menuBGImage->surf, NULL, display, NULL);
-      scrolling_text_draw(scrollingText, display, 460);
     }
+
+    if (extra_surf)
+    {
+        SDL_Rect rect;
+        rect.x = 0;
+        rect.y = 480 - extra_surf->h;
+        rect.w = extra_surf->w;
+        rect.h = extra_surf->h;
+        SDL_BlitSurface(extra_surf, NULL, display, &rect);
+    }
+
+    if (!starter)
+      scrolling_text_draw(scrollingText, display, 460);
 
     menu_draw (mainMenu, display);
     menu_draw (gameOverMenu, display);

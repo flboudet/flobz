@@ -19,7 +19,7 @@ class PuyoCommander
   PuyoCommander(bool fullscreen,bool sound, bool audio);
 
   void run();
-  void updateAll(PuyoDrawable *starter);
+  void updateAll(PuyoDrawable *starter, SDL_Surface *extra_surf = NULL);
 
   void showGameOver() { menu_show(gameOverMenu); }
   void hideGameOver() { menu_hide(gameOverMenu); }
