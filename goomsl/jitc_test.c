@@ -8,16 +8,18 @@ int main(int c, char **v)
     JitcX86Env *jitc = jitc_x86_env_new(0xffff);
     JitcFunc    func = jitc_prepare_func(jitc);
 
-    JITC_LOAD_REG_IMM32(jitc,EAX,&i);
-    JITC_LOAD_REG_IMM32(jitc,EBX,1);
-    JITC_LOAD_pREG_REG(jitc,EAX,EBX);
+    jitc_add(jitc, "mov ebx,  $d",   1);
+    jitc_add(jitc, "mov [$d], ebx",  &i);
+    jitc_add(jitc, "mov ecx,  [$d]", &i);
+    jitc_add(jitc, "mov [$d], $d",   &i, 0xdeadbeaf);
+
     JITC_FLD_pIMM32(jitc,&i);
     JITC_FSTP_pIMM32(jitc,&j);
     
     jitc_validate_func(jitc);
     func();
 
-    printf("i = %d\n", i);
+    printf("i = 0x%08x\n", i);
     
     jitc_x86_delete(jitc);
     return 0;

@@ -30,5 +30,5 @@ clean:
 	make -C TinyPTC clean
 	rm -f *.o *~ goomsl_lex.c goomsl_yacc.c goomsl_yacc.h goomsl
 
-jitc_test:jitc_test.c jitc_x86.h
-	gcc -Wall -g -o jitc_test jitc_test.c
+jitc_test:jitc_test.c jitc_x86.c jitc_x86.h
+	gcc -Wall -g -o jitc_test jitc_test.c jitc_x86.c

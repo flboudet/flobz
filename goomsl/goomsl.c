@@ -958,27 +958,19 @@ static void gsl_create_fast_iflow(void)
     Instruction *instr = currentGoomSL->iflow->instr[i];
     switch (instr->id) {
       case INSTR_SETI_VAR_INTEGER     :
-        JITC_LOAD_REG_IMM32(jitc, EAX, instr->data.usrc.value_int);     /* eax  = value */
-        JITC_LOAD_REG_IMM32(jitc, EBX, instr->data.udest.var_int);      /* ebx  = &dest */
-        JITC_LOAD_pREG_REG (jitc, EBX, EAX);                            /* *ebx = eax   */
+        jitc_add(jitc, "mov [$d], $d", instr->data.udest.var_int, instr->data.usrc.value_int);
         break;
       case INSTR_SETI_VAR_VAR         :
-        JITC_LOAD_REG_IMM32(jitc, EAX, instr->data.usrc.var_int);       /* eax  = &src  */
-        JITC_LOAD_REG_IMM32(jitc, EBX, instr->data.udest.var_int);      /* ebx  = &dest */
-        JITC_LOAD_REG_pREG (jitc, EAX, EAX);                            /* eax  = *eax  */
-        JITC_LOAD_pREG_REG (jitc, EBX, EAX);                            /* *ebx = eax   */
+        jitc_add(jitc, "mov eax, [$d]", instr->data.usrc.var_int);
+        jitc_add(jitc, "mov [$d], eax", instr->data.udest.var_int);
         break;
         /* SET.F */
       case INSTR_SETF_VAR_FLOAT       :
-        JITC_LOAD_REG_IMM32(jitc, EAX, *(int*)(&instr->data.usrc.value_float)); /* eax  = value */
-        JITC_LOAD_REG_IMM32(jitc, EBX, instr->data.udest.var_float);            /* ebx  = &dest */
-        JITC_LOAD_pREG_REG (jitc, EBX, EAX);                                    /* *ebx = eax   */
+        jitc_add(jitc, "mov [$d], $d", instr->data.udest.var_float, *(int*)(&instr->data.usrc.value_float));
         break;
       case INSTR_SETF_VAR_VAR         :
-        JITC_LOAD_REG_IMM32(jitc, EAX, instr->data.usrc.var_float);  /* eax  = &src  */
-        JITC_LOAD_REG_IMM32(jitc, EBX, instr->data.udest.var_float); /* ebx  = &dest */
-        JITC_LOAD_REG_pREG (jitc, EAX, EAX);                         /* eax  = *eax  */
-        JITC_LOAD_pREG_REG (jitc, EBX, EAX);                         /* *ebx = eax   */
+        jitc_add(jitc, "mov eax, [$d]", instr->data.usrc.var_float);
+        jitc_add(jitc, "mov [$d], eax", instr->data.udest.var_float);
         break;
       case INSTR_NOP                  :
         if (instr->nop_label != 0)
@@ -988,15 +980,11 @@ static void gsl_create_fast_iflow(void)
         JITC_JUMP_LABEL(jitc,instr->jump_label);
         break;
       case INSTR_SETP_VAR_PTR         :
-        JITC_LOAD_REG_IMM32(jitc, EAX, instr->data.usrc.value_ptr);     /* eax  = value */
-        JITC_LOAD_REG_IMM32(jitc, EBX, instr->data.udest.var_ptr);      /* ebx  = &dest */
-        JITC_LOAD_pREG_REG (jitc, EBX, EAX);                            /* *ebx = eax   */
+        jitc_add(jitc, "mov [$d], $d", instr->data.udest.var_ptr, instr->data.usrc.value_ptr);
         break;
       case INSTR_SETP_VAR_VAR         :
-        JITC_LOAD_REG_IMM32(jitc, EAX, instr->data.usrc.var_ptr);       /* eax  = &src  */
-        JITC_LOAD_REG_IMM32(jitc, EBX, instr->data.udest.var_ptr);      /* ebx  = &dest */
-        JITC_LOAD_REG_pREG (jitc, EAX, EAX);                            /* eax  = *eax  */
-        JITC_LOAD_pREG_REG (jitc, EBX, EAX);                            /* *ebx = eax   */
+        jitc_add(jitc, "mov eax, [$d]", instr->data.usrc.var_ptr);
+        jitc_add(jitc, "mov [$d], eax", instr->data.udest.var_ptr);
         break;
       case INSTR_SUBI_VAR_INTEGER     :
         JITC_LOAD_REG_IMM32(jitc, EBX, instr->data.udest.var_int);      /* ebx = &var   */

@@ -13,6 +13,7 @@
 
 // Code
 
+<main>
   test_expressions
   test_of_tests
   test_loop: start=1 end=10

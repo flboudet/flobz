@@ -100,18 +100,22 @@ typedef struct _JITC_X86_ENV {
     JITC_ADD_UCHAR(jitc,(i>>16)&0xff); \
     JITC_ADD_UCHAR(jitc,(i>>24)&0xff); \
 }
-
 #define JITC_ADD_2UCHAR(jitc,op1,op2) {JITC_ADD_UCHAR(jitc,op1); JITC_ADD_UCHAR(jitc,op2);}
+
+#define JITC_MODRM(jitc,mod,reg,rm) { JITC_ADD_UCHAR(jitc,((int)mod<<6)|((int)reg<<3)|((int)rm)); }
+
+/* special values for R/M */
+#define JITC_RM_DISP32 0x05
+
+#define JITC_MOD_pREG_REG      0x00
+#define JITC_MOD_disp8REG_REG  0x01
+#define JITC_MOD_disp32REG_REG 0x02
+#define JITC_MOD_REG_REG       0x03
+/* cf 24319101 p.27 */
 
 #define JITC_OP_REG_REG(jitc,op,dest,src)     { JITC_ADD_UCHAR(jitc,op); JITC_ADD_UCHAR(jitc,0xc0+(src<<3)+dest); }
 #define JITC_OP_REG_pREG(jitc,op,dest,src)    { JITC_ADD_UCHAR(jitc,op); JITC_ADD_UCHAR(jitc,(dest<<3)+src); }
 #define JITC_OP_pREG_REG(jitc,op,dest,src)    { JITC_ADD_UCHAR(jitc,op); JITC_ADD_UCHAR(jitc,(src<<3)+dest); }
-#define JITC_OP_REG_IMM32(jitc,op,dest,imm32) { JITC_ADD_UCHAR(jitc,op); JITC_ADD_UCHAR(jitc,(src<<3)+dest); }
-
-#define JITC_MODRM(jitc,mod,reg,rm) { JITC_ADD_UCHAR(jitc,((int)mod<<6)|((int)reg<<3)|((int)rm)); }
-
-#define JITC_RM_DISP32 0x05
-/* cf 24319101 p.27 */
 
 /**
  * "high" level macro
@@ -119,6 +123,10 @@ typedef struct _JITC_X86_ENV {
 
 #define JITC_LOAD_REG_IMM32(jitc,reg,imm32) { JITC_ADD_UCHAR  (jitc,0xb8+reg); JITC_ADD_UINT(jitc,(int)(imm32)); }
 #define JITC_LOAD_REG_REG(jitc,dest,src)    { JITC_OP_REG_REG (jitc,0x89,dest,src); }
+
+#define JITC_LOAD_REG_pREG(jitc,dest,src)   { JITC_OP_REG_pREG(jitc,0x8b,dest,src); }
+#define JITC_LOAD_pREG_REG(jitc,dest,src)   { JITC_OP_pREG_REG(jitc,0x89,dest,src); }
+
 
 #define JITC_DEC_REG(jitc,reg)              { JITC_ADD_UCHAR  (jitc,0x48+reg); }
 #define JITC_INC_REG(jitc,reg)              { JITC_ADD_UCHAR  (jitc,0x40+reg); }
@@ -142,9 +150,6 @@ typedef struct _JITC_X86_ENV {
                                               JITC_ADD_UINT   (jitc,(int)imm32); }
 #define JITC_SUB_REG_IMM8(jitc,reg,imm8)    { JITC_ADD_2UCHAR (jitc,0x83, 0xe8+reg);\
                                               JITC_ADD_UCHAR(jitc,imm8); }
-
-#define JITC_LOAD_REG_pREG(jitc,dest,src)   { JITC_OP_REG_pREG(jitc,0x8b,dest,src); }
-#define JITC_LOAD_pREG_REG(jitc,dest,src)   { JITC_OP_pREG_REG(jitc,0x89,dest,src); }
 
 #define JITC_PUSH_REG(jitc,reg)             { JITC_ADD_UCHAR  (jitc,0x50+reg); }
 #define JITC_POP_REG(jitc,reg)              { JITC_ADD_UCHAR  (jitc,0x58+reg); }
