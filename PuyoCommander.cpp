@@ -6,6 +6,7 @@
 #include <SDL/SDL_image.h>
 #include "PuyoCommander.h"
 #include "PuyoView.h"
+#include "PuyoVersion.h"
 #include "PuyoStory.h"
 #include "preferences.h"
 
@@ -422,6 +423,8 @@ MenuItems about_menu_load (SoFont *font)
   static MenuItemsTab option_menu = {
     MENUITEM_INACTIVE(kAbout01),
     MENUITEM_BLANKLINE,
+      MENUITEM_INACTIVE(kVersion),
+      MENUITEM_BLANKLINE,
     MENUITEM_INACTIVE(kAbout02),
     MENUITEM_INACTIVE(kAbout03),
     MENUITEM_BLANKLINE,
@@ -436,6 +439,7 @@ MenuItems about_menu_load (SoFont *font)
     MENUITEM_END
   };
   menu_items_set_font_for(option_menu, kAbout01, font);
+  menu_items_set_font_for(option_menu, kVersion, font);
   menu_items_set_font_for(option_menu, kAbout02, font);
   menu_items_set_font_for(option_menu, kAbout03, font);
   menu_items_set_font_for(option_menu, kAbout04, font);

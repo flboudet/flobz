@@ -15,10 +15,10 @@ CXXFLAGS=${CFLAGS}
 
 HFILES= IosException.h IosImgProcess.h IosVector.h PuyoCommander.h PuyoGame.h \
         PuyoIA.h PuyoPlayer.h PuyoStory.h PuyoView.h SDL_prim.h audio.h menu.h \
-				menuitems.h preferences.h scrollingtext.h sofont.h SDL_Painter.h
+				menuitems.h preferences.h scrollingtext.h sofont.h SDL_Painter.h PuyoVersion.h
 
 OBJFILES= SDL_prim.o scenar.y.o scenar.l.o PuyoCommander.o IosException.o \
-					IosVector.o main.o PuyoGame.o PuyoView.o PuyoIA.o sofont.o \
+					IosVector.o main.o PuyoGame.o PuyoVersion.o PuyoView.o PuyoIA.o sofont.o \
 					menu.o menuitems.o audio.o scrollingtext.o preferences.o PuyoStory.o SDL_Painter.o
 
 all: prelude flobopuyo
@@ -68,6 +68,9 @@ scenar.y.c:scenar.y ${HFILES}
 
 clean:
 	rm -f *~ scenar.y.c scenar.y.h scenar.l.c *.o flobopuyo* WARNINGS
+	rm -rf .xvpics data/.xvpics    data/*/.xvpics
+	rm -rf FloboPuyo.app
+	rm -f  .DS_Store data/.DS_Store data/*/.DS_Store .gdb_history
 
 #_install: ${OBJFILES}
 #	g++ $(CFLAGS) -o flobopuyo `$(SDL_CONFIG) --cflags --static-libs` -lSDL_mixer -lSDL_image ${OBJFILES}
@@ -100,4 +103,7 @@ bundle: flobopuyo-static
 	cp mac/icon.icns $(bundle_name)/Contents/Resources/
 	cp flobopuyo-static $(bundle_name)/Contents/MacOS/flobopuyo
 	cp -r data $(bundle_name)/Contents/Resources
+	rm -rf $(bundle_name)/Contents/Resources/data/CVS $(bundle_name)/Contents/Resources/data/*/CVS
+	rm -rf $(bundle_name)/Contents/Resources/data/.xvpics $(bundle_name)/Contents/Resources/data/*/.xvpics
+	rm $(bundle_name)/Contents/Resources/data/.DS_Store $(bundle_name)/Contents/Resources/data/*/.DS_Store
 	strip $(bundle_name)/Contents/MacOS/flobopuyo

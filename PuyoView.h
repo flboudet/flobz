@@ -71,6 +71,7 @@ class PuyoStarter : public PuyoDrawable {
 
     bool leftPlayerWin() const  { return attachedGameA->isGameRunning(); }
     bool rightPlayerWin() const { return attachedGameB->isGameRunning(); }
+    
   private:
     PuyoCommander *commander;
     PuyoView *areaA, *areaB;

@@ -19,6 +19,8 @@ SDL_Surface *puyoEyes;
 SDL_Surface *puyoEye[3];
 SDL_Surface *puyoEyesSwirl[4];
 
+SDL_Surface *puyoCircle[32];
+
 SDL_Surface *puyoShadow;
 SDL_Surface *puyoFaces[5][16];
 SDL_Surface *live[4];
@@ -417,6 +419,12 @@ SDL_Surface *PuyoView::getSurfaceForPuyo(PuyoPuyo *puyo)
 
 void PuyoView::render(PuyoPuyo *puyo)
 {
+    static unsigned int smallTicksCount = 0;
+
+    int mainX = attachedGame->getFallingX();
+    int mainY = attachedGame->getFallingY();
+    bool falling  = attachedGame->getFallingState() < PUYO_EMPTY;
+    
     SDL_Rect drect;
     int i = puyo->getPuyoX();
     int j = puyo->getPuyoY();
@@ -431,6 +439,10 @@ void PuyoView::render(PuyoPuyo *puyo)
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;
             painter.requestDraw(currentSurface, &drect);
+            
+            /* Main puyo show */
+            if (falling && (mainX == i) && (mainY == j))
+                painter.requestDraw(puyoCircle[(smallTicksCount++ >> 2) & 0x1F], &drect);
             
             if (currentSurface != neutral) {
 				while (puyoEyeState[i][j] >= 750) puyoEyeState[i][j] -= 750;
@@ -694,7 +706,7 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
 	}
 	painter.display = display;
 	painter.redrawAll(painter.gameScreen);
-	
+	        
 	static bool firstTime = true;
 	if (firstTime) {
 		fallingViolet = IMG_Load_DisplayFormatAlpha("v0.png");
@@ -705,6 +717,9 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
 		neutral       = IMG_Load_DisplayFormatAlpha("Neutral.png");
 		bigNeutral    = IMG_Load_DisplayFormatAlpha("BigNeutral.png");
 		
+                puyoCircle[0] = IMG_Load_DisplayFormatAlpha("circle.png");
+		for (int i = 1 ; i < 32 ; i++) puyoCircle[i] = iim_surface_shift_hue(puyoCircle[i-1],11.25f);
+                    
         loadShrinkXplode();
         
         puyoShadow = IMG_Load_DisplayFormatAlpha("Shadow.png");

@@ -1,14 +1,14 @@
 #In game menu background wrong when changing keys while playing
 #Correct the joystick 1P/2P fonctionality
-checker le point precedant.
 #Make puyos fall from 3rd column instead of 4th
 #Should not be able to play if the "falling row" is full
 #Invert th puyos orientation when they fall
-#Eye blinking pb when the puyos rotate?
-Make the "main puyo" visible compared to the companion
-Score board
-Net Play
+#Eye blinking pb when the puyos rotate
 #When puyos are going up because of rotation, semi-move pb
 #Key repetition
-Explosions trop rapides qd on accelere les cycles (fleche du bas)
 #Bug when rotating in a single column
+#Make the "main puyo" visible compared to the companion
+#Version in about
+Score board
+Net Play
+Explosions trop rapides qd on accelere les cycles (fleche du bas)
