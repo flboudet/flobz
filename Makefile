@@ -20,7 +20,7 @@ HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h\
         PuyoGame.h PuyoAnimations.h AnimatedPuyo.h PuyoIA.h PuyoPlayer.h     \
         PuyoStory.h PuyoView.h SDL_prim.h audio.h menu.h menuitems.h         \
         preferences.h scrollingtext.h sofont.h SDL_Painter.h PuyoVersion.h   \
-        InputManager.h GameControls.h HiScores.h IosImgProcess.h
+        InputManager.h GameControls.h HiScores.h IosImgProcess.h PuyoStarter.h
 
 
 OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o        \
@@ -28,7 +28,7 @@ OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o        \
           PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o sofont.o       \
           menu.o menuitems.o audio.o scrollingtext.o preferences.o           \
           PuyoStory.o SDL_Painter.o InputManager.o GameControls.o            \
-          PuyoDoomMelt.o IosImgProcess.o corona32.o corona.o corona_palette.o
+          PuyoDoomMelt.o IosImgProcess.o corona32.o corona.o corona_palette.o PuyoStarter.o
 
 PLATFORM=$(shell uname -s)
 ifeq ($(PLATFORM), Darwin)

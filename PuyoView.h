@@ -2,9 +2,9 @@
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
- *   Guillaume Borios      <gborios@ios-software.com>
+ *   Guillaume Borios      <gyom@ios-software.com>
  *
- * iOS Software <http://ios.free.fr>
+ * iOS Software <http://www.ios-software.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,8 +28,6 @@
 
 #include "glSDL.h"
 #include "PuyoGame.h"
-#include "PuyoIA.h"
-#include "PuyoCommander.h"
 #include "IosImgProcess.h"
 #include "PuyoAnimations.h"
 #include "AnimatedPuyo.h"
@@ -58,6 +56,11 @@ class PuyoView : public virtual PuyoDelegate {
     void allowCycle() { cycleAllowance++; }
     void disallowCycle() { cycleAllowance--; }
     
+    void moveLeft();
+    void moveRight();
+    void rotateLeft();
+    void rotateRight();
+
     static IIM_Surface *getSurfaceForState(PuyoState state);
     IIM_Surface *getSurfaceForPuyo(PuyoPuyo *puyo);
     PuyoGame *getAttachedGame() const { return attachedGame; }
@@ -85,39 +88,6 @@ class PuyoView : public virtual PuyoDelegate {
     IosVector viewAnimations;
     int cycleAllowance;
     SDL_Painter &attachedPainter;
-};
-
-class PuyoStarter : public PuyoDrawable {
-  public:
-    PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_Type aiType, int theme);
-    virtual ~PuyoStarter();
-    void run(int score1, int score2, int lives, int point1, int point2);
-    void draw();
-
-    bool leftPlayerWin() const  { return attachedGameA->isGameRunning(); }
-    bool rightPlayerWin() const { return attachedGameB->isGameRunning(); }
-
-    int leftPlayerPoints() const { return attachedGameA->getPoints(); }
-    int rightPlayerPoints() const { return attachedGameB->getPoints(); }
-    
-  private:
-    PuyoCommander *commander;
-    PuyoView *areaA, *areaB;
-    PuyoGame *attachedGameA, *attachedGameB;
-    PuyoIA *randomPlayer;
-    PuyoRandomSystem attachedRandom;
-    int tickCounts;
-    int lives;
-    int score1;
-    int score2;
-    bool stopRendering;
-    bool paused;
-    int gameSpeed;
-
-    void stopRender();
-    void restartRender();
-
-    int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
 };
 
 #endif // _PUYOVIEW

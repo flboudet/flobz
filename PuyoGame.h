@@ -46,6 +46,7 @@ public:
     virtual ~PuyoPuyo() {};
     PuyoState getPuyoState();
     void setPuyoState(PuyoState state);
+    bool PuyoPuyo::isFalling();
     int getPuyoX() const;
     int getPuyoY() const;
     void setPuyoXY(int X, int Y);

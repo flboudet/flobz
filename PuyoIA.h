@@ -13,7 +13,7 @@ enum IA_Type {
 
 class PuyoIA : public virtual PuyoPlayer {
 public:
-    PuyoIA(IA_Type type, int level, PuyoGame *targetGame);
+    PuyoIA(IA_Type type, int level, PuyoView *targetView);
     virtual void cycle();
  private:
     PuyoState extractColor(PuyoState A) const;

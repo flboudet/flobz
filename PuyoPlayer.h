@@ -1,14 +1,22 @@
 #ifndef PUYOPLAYER_H
 #define PUYOPLAYER_H
 
+#include "Puyoview.h"
 #include "PuyoGame.h"
 
 class PuyoPlayer {
-public:
-    PuyoPlayer(PuyoGame *targetGame) : attachedGame(targetGame) {}
-    virtual void cycle() = 0;
+
 protected:
-        PuyoGame *attachedGame;
+    PuyoView *attachedView;
+    PuyoGame *attachedGame;
+
+public:
+    PuyoPlayer(PuyoView *targetView) : attachedView(targetView)
+    {
+        attachedGame = targetView->getAttachedGame();
+    }
+    virtual void cycle() = 0;
+
 };
 
 #endif

@@ -4,7 +4,7 @@
 #include <string.h>
 #include "glSDL.h"
 #include "PuyoCommander.h"
-#include "PuyoView.h"
+#include "PuyoStarter.h"
 #include "PuyoVersion.h"
 #include "PuyoStory.h"
 #include "preferences.h"

@@ -28,6 +28,7 @@
 #include "PuyoView.h"
 #include "IosImgProcess.h"
 #include "SDL_Painter.h"
+#include "audio.h"
 
 /* not clean, but basta */
 extern SDL_Painter painter;

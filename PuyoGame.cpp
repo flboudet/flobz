@@ -29,11 +29,16 @@ PuyoPuyo::PuyoPuyo(PuyoState state)
     X = 0; Y = 0;
 }
 
+bool PuyoPuyo::isFalling()
+{
+    return (state < PUYO_EMPTY);
+}
+
 PuyoState PuyoPuyo::getPuyoState()
 {
-  if (this != NULL)
-    return state;
-  return PUYO_EMPTY;
+    if (this != NULL)
+        return state;
+    return PUYO_EMPTY;
 }
 
 void PuyoPuyo::setPuyoState(PuyoState state)
