@@ -1,6 +1,8 @@
 #include "ios_selector.h"
 #include "ios_datagramsocket.h"
 #include "ios_udpmessagebox.h"
+#include "ios_igpdatagram.h"
+#include "ios_dirigeable.h"
 #include <stdio.h>
 
 namespace ios_fc {
@@ -8,12 +10,23 @@ namespace ios_fc {
 class IgpMessageListener : public MessageListener {
 public:
     void onMessage(Message &message);
+private:
+  class PeerRecord {
+  public:
+    PeerRecord(PeerAddress address) : address(address) {}
+  private:
+    PeerAddress address;
+  };
+  AdvancedBuffer<PeerRecord *> knownPeers;
 };
 
 void IgpMessageListener::onMessage(Message &data)
 {
     printf("Cool, un nouveau message!\n");
-    IGPDatagram message(data);
+    Dirigeable &dir = dynamic_cast<Dirigeable &>(data);
+    knownPeers.add(new PeerRecord(dir.getPeerAddress()));
+    //IGPDatagram message(&data);
+    /*
     switch (message.getMsgIdent()) {
     case IGPDatagram::ClientMsgAutoAssignID:
         igpID = pool->getUniqueIGPId();
@@ -51,7 +64,8 @@ void IgpMessageListener::onMessage(Message &data)
     }
     default:
         break;
-    }
+	}
+    */
 }
 
 }

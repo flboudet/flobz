@@ -18,7 +18,7 @@ namespace ios_fc {
         PeerAddress getBroadcastAddress();
         void setPeerAddress(PeerAddress);
     private:
-	    class UDPPeerAddressImpl;
+        class UDPPeerAddressImpl;
         UDPMessageBox &owner;
         UDPPeerAddressImpl *peerAddressImpl;
         PeerAddress peerAddress;
