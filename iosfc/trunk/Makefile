@@ -1,4 +1,4 @@
-OBJ=ios_exception.o ios_stream.o ios_hash.o ios_memory.o ios_message.o ios_standardmessage.o ios_udpmessage.o ios_messagebox.o ios_udpmessagebox.o  IosDatagramSocket.o ios_igpmessagebox.o ios_socket.o ios_unixsocketimpl.o ios_igpclient.o ios_igpdatagram.o
+OBJ=ios_exception.o ios_stream.o ios_hash.o ios_memory.o ios_message.o ios_standardmessage.o ios_udpmessage.o ios_messagebox.o ios_udpmessagebox.o  ios_datagramsocket.o ios_unixdatagramsocketimpl.o ios_unixsocketaddressimpl.o ios_igpmessagebox.o ios_socket.o ios_unixsocketimpl.o ios_igpclient.o ios_igpdatagram.o
 TOBJ=test_udpmessagebox.o
 CPPFLAGS=-g `sdl-config --cflags`  -Wall
 

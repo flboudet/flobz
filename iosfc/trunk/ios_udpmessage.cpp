@@ -4,23 +4,42 @@
 
 namespace ios_fc {
 
-  UDPMessage::UDPMessage(int serialID, UDPMessageBox &owner)
+class UDPPeerAddress : public PeerAddress {
+public:
+};
+
+UDPMessage::UDPMessage(int serialID, UDPMessageBox &owner)
     : StandardMessage(serialID), owner(owner)
-  {
-  }
+{
+}
 
-  UDPMessage::~UDPMessage()
-  {
-  }
+UDPMessage::~UDPMessage()
+{
+}
 
-  void UDPMessage::sendBuffer(Buffer<char> out) const
-  {
+void UDPMessage::sendBuffer(Buffer<char> out) const
+{
     owner.sendUDP(out, getSerialID(), isReliable());
-  }
+}
 
-  UDPMessage::UDPMessage(const Buffer<char> raw, UDPMessageBox &owner)  throw(InvalidMessageException)
-    : StandardMessage(raw), owner(owner)
-  {
-  }
+UDPMessage::UDPMessage(const Buffer<char> raw, UDPMessageBox &owner)  throw(InvalidMessageException)
+: StandardMessage(raw), owner(owner)
+{
+}
+
+PeerAddress UDPMessage::getPeerAddress()
+{
+    UDPPeerAddress toto;
+    return toto;
+}
+
+PeerAddress UDPMessage::getBroadcastAddress()
+{
+    return UDPPeerAddress();
+}
+
+void UDPMessage::setPeerAddress(PeerAddress)
+{
+}
 
 };

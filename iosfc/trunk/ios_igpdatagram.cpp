@@ -44,19 +44,22 @@ IGPDatagram::IGPDatagram(IGPMsgIdent ident, int msgSize) : msgSize(msgSize), mes
 
 IGPDatagram::IGPDatagram(InputStream *stream) : msgSize(0), message(8)
 {
-    stream->streamRead(message);
+    int bytesRead = 0;
+    //while (bytesRead < 8) {
+        int readResult = stream->streamRead(message, 8 - bytesRead);
+        bytesRead += readResult;
+        printf("Lu: %d bytes\n", readResult);
+    //}
     msgIdent = readBigEndianIntFromMessage(0);
     msgSize = readBigEndianIntFromMessage(4);
-    printf("Taille message:%d\n", msgSize);
+    printf("Taille message:%d ident:%d\n", msgSize, msgIdent);
+    //printf("Addr msg:%x ; addr msg+1:%x\n", message.ptr(), (message+1).ptr());
     if (msgSize > 0) {
+        message.realloc(msgSize + 8);
         int bytesRead = 0;
         while (bytesRead < msgSize) {
-            VoidBuffer content(msgSize-bytesRead);
-            int readResult = stream->streamRead(content);
+            int readResult = stream->streamRead(message + 8 + bytesRead, msgSize-bytesRead);
             bytesRead += readResult;
-            if (content.size() > readResult)
-                content.reduce(content.size() - readResult);
-            message.concat(content);
             printf("Lu: %d bytes\n", readResult);
         }
     }
