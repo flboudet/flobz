@@ -385,13 +385,13 @@ namespace gameui {
     this->fontInactive = fontInactive;
 
     font = fontInactive;
+    setFocusable(true);
   }
 
   Button::Button(const String &label, SoFont *fontActive, SoFont *fontInactive)
     : Text(label, fontInactive)
   {
     init(fontActive, fontInactive);
-    setFocusable(true);
   }
 
   Button::Button(const String &label, Action *action)
@@ -456,6 +456,8 @@ namespace gameui {
 
     font = fontInactive;
     editionMode = false;
+
+    setFocusable(true);
   }
   
   EditField::EditField(const String &defaultText)
