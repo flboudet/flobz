@@ -388,8 +388,8 @@ SmoothBounceAnimation::SmoothBounceAnimation(AnimatedPuyo &puyo, AnimationSynchr
     bouncePhase = 0;
     this->synchronizer = synchronizer;
     synchronizer->incrementUsage();
-    origX = attachedPuyo.getAttachedView()->getScreenCoordinateX(attachedPuyo.getPuyoX());
-    origY = attachedPuyo.getAttachedView()->getScreenCoordinateY(attachedPuyo.getPuyoY());
+    origX = attachedPuyo.getScreenCoordinateX();
+    origY = attachedPuyo.getScreenCoordinateY();
     enabled = false;
 }
 
@@ -422,12 +422,13 @@ void SmoothBounceAnimation::cycle()
 
 void SmoothBounceAnimation::draw(int semiMove)
 {
-    SDL_Rect drect;
+    /*SDL_Rect drect;
     IIM_Surface *puyoFace = PuyoView::getSurfaceForState(attachedPuyo.getPuyoState());
     drect.x = origX;
     drect.y = origY + bounceOffset;
     drect.w = puyoFace->w;
     drect.h = puyoFace->h;
-    painter.requestDraw(puyoFace, &drect);
+    painter.requestDraw(puyoFace, &drect);*/
+    attachedPuyo.renderAt(origX, origY + bounceOffset);
 }
 

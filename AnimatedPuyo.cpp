@@ -87,6 +87,20 @@ bool AnimatedPuyo::isRenderingAnimation() const
 
 void AnimatedPuyo::render()
 {
+    PuyoGame *attachedGame = attachedView->getAttachedGame();
+    PuyoAnimation *animation = getCurrentAnimation();
+    if (!isRenderingAnimation()) {
+        renderAt(getScreenCoordinateX(), getScreenCoordinateY());
+    }
+    else {
+        if (!animation->isFinished()) {
+            animation->draw(attachedGame->getSemiMove());
+        }
+    }
+}
+
+void AnimatedPuyo::renderAt(int X, int Y)
+{
     SDL_Painter &painter = attachedView->getPainter();
     
     puyoEyeState++;
@@ -99,40 +113,33 @@ void AnimatedPuyo::render()
     bool falling  = attachedGame->getFallingState() < PUYO_EMPTY;
     
     SDL_Rect drect;
-    PuyoAnimation *animation = getCurrentAnimation();
-    if (!isRenderingAnimation()) {
-        IIM_Surface *currentSurface = attachedView->getSurfaceForPuyo(this);
-        if (currentSurface != NULL) {
-            drect.x = getScreenCoordinateX();
-            drect.y = getScreenCoordinateY();
-            if (this->getPuyoState() < PUYO_EMPTY)
-                drect.y -= attachedGame->getSemiMove() * TSIZE / 2;
-            drect.w = currentSurface->w;
-            drect.h = currentSurface->h;
-            painter.requestDraw(currentSurface, &drect);
-            
-            /* Main puyo show */
-            if (falling && (this == attachedGame->getFallingPuyo()))
-                painter.requestDraw(puyoCircle[(smallTicksCount >> 2) & 0x1F][this->getPuyoState()], &drect);
-            
-            /* Eye management */
-            if (getPuyoState() != PUYO_NEUTRAL) {
-                while (puyoEyeState >= 750) puyoEyeState -= 750;
-                int eyePhase = puyoEyeState;
-                if (eyePhase < 5)
-                    painter.requestDraw(puyoEye[1], &drect);
-                else if (eyePhase < 15)
-                    painter.requestDraw(puyoEye[2], &drect);
-                else if (eyePhase < 20)
-                    painter.requestDraw(puyoEye[1], &drect);
-                else
-                    painter.requestDraw(puyoEye[0], &drect);
-            }
-        }
-    }
-    else {
-        if (!animation->isFinished()) {
-            animation->draw(attachedGame->getSemiMove());
+    
+    IIM_Surface *currentSurface = attachedView->getSurfaceForPuyo(this);
+    if (currentSurface != NULL) {
+        drect.x = X;
+        drect.y = Y;
+        if (this->getPuyoState() < PUYO_EMPTY)
+            drect.y -= attachedGame->getSemiMove() * TSIZE / 2;
+        drect.w = currentSurface->w;
+        drect.h = currentSurface->h;
+        painter.requestDraw(currentSurface, &drect);
+        
+        /* Main puyo show */
+        if (falling && (this == attachedGame->getFallingPuyo()))
+            painter.requestDraw(puyoCircle[(smallTicksCount >> 2) & 0x1F][this->getPuyoState()], &drect);
+        
+        /* Eye management */
+        if (getPuyoState() != PUYO_NEUTRAL) {
+            while (puyoEyeState >= 750) puyoEyeState -= 750;
+            int eyePhase = puyoEyeState;
+            if (eyePhase < 5)
+                painter.requestDraw(puyoEye[1], &drect);
+            else if (eyePhase < 15)
+                painter.requestDraw(puyoEye[2], &drect);
+            else if (eyePhase < 20)
+                painter.requestDraw(puyoEye[1], &drect);
+            else
+                painter.requestDraw(puyoEye[0], &drect);
         }
     }
 }
