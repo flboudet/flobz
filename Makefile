@@ -9,7 +9,7 @@ ENABLE_AUDIO=true
 ENABLE_OPENGL=true
 ENABLE_DGA=false
 
-DEBUG_MODE=false
+DEBUG_MODE=true
 MORE_DEBUG=false
 
 PRGNAME=flobopuyo
@@ -142,7 +142,7 @@ flobopuyo: ${OBJFILES}
 	@echo "--------------------------------------"
 
 prelude:
-	@rm -f WARNINGS
+	@rm -f WARNINGS flobopuyo
 	@touch WARNINGS
 	@echo "Compiling with CFLAGS=$(CFLAGS)"
 	@echo "Compiling with LDFLAGS=$(LDFLAGS)"

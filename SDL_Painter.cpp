@@ -131,12 +131,12 @@ void SDL_Painter::draw(SDL_Surface *surf)
 #ifdef DEBUG
 
   SDL_SetClipRect(surf, NULL);
-  SDL_BlitSurface(backGround, NULL, surf, NULL);
+  SDL_BlitSurface(backGround->surf, NULL, surf, NULL);
 
   // Draw everything.
   for (int i=0; i<nbElts; ++i) {
     SDL_Rect copy = onScreenElts[i].rect;
-    SDL_BlitSurface(onScreenElts[i].surf, NULL,
+    SDL_BlitSurface(onScreenElts[i].surf->surf, NULL,
         surf, &copy);
   }
 
