@@ -33,7 +33,7 @@ enum {
 
 extern char *p1name;
 
-Message *PuyoNetworkView::createStateMessage(bool paused) const
+Message *PuyoNetworkView::createStateMessage(bool paused)
 {
     Message *message = mbox->createMessage();
 
@@ -55,10 +55,13 @@ Message *PuyoNetworkView::createStateMessage(bool paused) const
     message->addInt     ("SCORE",  attachedGame->getPoints());
     message->addInt     ("NEXT_F", attachedGame->getNextFalling());
     message->addInt     ("NEXT_C", attachedGame->getNextCompanion());
+    message->addIntArray("AddNeutrals", neutralsBuffer);
+    neutralsBuffer.clear();
+    
     return message;
 }
 
-void PuyoNetworkView::sendStateMessage(bool paused) const
+void PuyoNetworkView::sendStateMessage(bool paused)
 {
     Message *message = createStateMessage(paused);
     message->send();

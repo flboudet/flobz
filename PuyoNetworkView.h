@@ -51,11 +51,11 @@ class PuyoNetworkView : public PuyoView {
     void puyoWillVanish(IosVector &puyoGroup, int groupNum, int phase);
     void gameLost();
     
-    void sendStateMessage(bool paused = false) const;
+    void sendStateMessage(bool paused = false);
     
 private:
     MessageBox *mbox;
-    Message *createStateMessage(bool paused) const;
+    Message *createStateMessage(bool paused);
     AdvancedBuffer<int> neutralsBuffer;
 };
 
