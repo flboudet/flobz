@@ -45,6 +45,7 @@ public:
 private:
     IosVector animationQueue;
     int puyoEyeState;
+    unsigned int smallTicksCount;
 };
 
 

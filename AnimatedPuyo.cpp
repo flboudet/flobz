@@ -62,6 +62,7 @@ void AnimatedPuyo::removeCurrentAnimation()
 
 void AnimatedPuyo::cycleAnimation()
 {
+    smallTicksCount+=2;
     PuyoAnimation * animation = getCurrentAnimation();
     if ((animation != NULL)) {
         if (animation->isFinished()) {
@@ -84,7 +85,6 @@ bool AnimatedPuyo::isRenderingAnimation() const
 
 void AnimatedPuyo::render(SDL_Painter &painter, PuyoView *attachedView)
 {
-    static unsigned int smallTicksCount = 0;
     puyoEyeState++;
     if (attachedView == NULL)
         return;
@@ -110,7 +110,7 @@ void AnimatedPuyo::render(SDL_Painter &painter, PuyoView *attachedView)
             
             /* Main puyo show */
             if (falling && (this == attachedGame->getFallingPuyo()))
-                painter.requestDraw(puyoCircle[(smallTicksCount++ >> 2) & 0x1F], &drect);
+                painter.requestDraw(puyoCircle[(smallTicksCount >> 2) & 0x1F], &drect);
             
             /* Eye management */
             if (getPuyoState() != PUYO_NEUTRAL) {

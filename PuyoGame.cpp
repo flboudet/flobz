@@ -528,7 +528,7 @@ void PuyoGame::deleteMarkedPuyosAt(int X, int Y)
 		deleteMarkedPuyosAt(X, Y+1);
     if (getPuyoCellAt(X-1, Y) == PUYO_NEUTRAL) {
         puyoVector.removeElement(getPuyoAt(X-1, Y));
-        delete (getPuyoAt(X-1, Y));
+        attachedFactory->deletePuyo(getPuyoAt(X-1, Y));
         setPuyoAt(X-1, Y, NULL);
     }
     if (getPuyoCellAt(X+1, Y) == PUYO_NEUTRAL) {
