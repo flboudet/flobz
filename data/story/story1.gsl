@@ -1,6 +1,7 @@
 <init>
   # Init function: called when script is loaded
   Display @display = [new_display: x=200.0 y=0.0 width=640.0 height=480.0]
+  Display @movingDisplay = [new_display: x=350.0 y=0.0 width=640.0 height=480.0]
   Sprite @head =  [new_sprite: image="story/kaori.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
   Sprite @eyes =  [new_sprite: image="story/eyes.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
   Sprite @mouth =  [new_sprite: image="story/mouthsmall.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=4.0]
@@ -14,9 +15,9 @@
   # This also allows you to specify the drawing order
   sprite::@fond display=@display
   sprite::@fond2 display=@display
-  sprite::@head display=@display
-  sprite::@eyes display=@display
-  sprite::@mouth display=@display
+  sprite::@head display=@movingDisplay
+  sprite::@eyes display=@movingDisplay
+  sprite::@mouth display=@movingDisplay
 
 <update>
   # Update function: called every animation cycle
@@ -37,5 +38,6 @@
     @fond2.pos.x     = 0.0
     @targetCycle2 += 100.0
   }
-
-  (@fcycle > 600.0)? @finished = 1
+  
+  @movingDisplay.x -= 0.5
+  (@movingDisplay.x <= 200.0)? @finished = 1
