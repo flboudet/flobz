@@ -24,6 +24,11 @@
 
 namespace ios_fc {
 /*
+
+THIS CLASS IS DEFINED IN IOS_MEMORY.H
+
+(We should remove this file probably....)
+   
 class Vector {
 public:
 	Vector();
