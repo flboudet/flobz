@@ -1213,6 +1213,10 @@ void PuyoCommander::startInternetGame(int level, const char *playerName, const c
     mbox->addListener(this);
     newbox->bind(opponentIgpIdent);
     
+    // degueulasse mais provisoire
+    SDL_Delay(1000);
+    mbox->idle();
+    
     GAME_ACCEL = 2000;
     gameLevel = 1;
     if (level == 1) {
