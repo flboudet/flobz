@@ -2,6 +2,7 @@
 #include "PuyoCommander.h"
 
 extern char *dataFolder;
+extern SoFont *storyFont;
 
 SDL_Surface *sstory;
 
@@ -64,12 +65,18 @@ static void  freeImage (StyrolyseClient *_this, void *image)
   IIM_Free((IIM_Surface*)image);
 }
 
+static void putText (StyrolyseClient *_this, int x, int y, const char *text)
+{
+  SoFont_PutString (storyFont, sstory, x, y, text, NULL);
+}
+
 static StyrolyseClient client;
 StyrolyseClient *client_new()
 {
   client.loadImage = loadImage;
   client.drawImage = drawImage;
   client.freeImage = freeImage;
+  client.putText   = putText;
   return &client;
 };
 

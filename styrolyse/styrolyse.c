@@ -25,9 +25,12 @@ Styrolyse *styrolyse = NULL;
  * GSL->C Sprite management
  */
 
-void sprite_say(GoomSL *gsl, GoomHash *global, GoomHash *local)
+void put_text(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
-/*  int id = GSL_LOCAL_INT(gsl,global,"this.id");*/
+  int         x    = GSL_LOCAL_FLOAT(gsl, local, "pos.x");
+  int         y    = GSL_LOCAL_FLOAT(gsl, local, "pos.y");
+  const char *text = GSL_LOCAL_PTR  (gsl, local, "text");
+  styrolyse->client->putText(styrolyse->client,x,y,text);
 }
 
 void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
@@ -60,7 +63,7 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
 
 static void sbind(GoomSL *gsl)
 {
-  gsl_bind_function(gsl, "say",   sprite_say);
+  gsl_bind_function(gsl, "put_text",   put_text);
   gsl_bind_function(gsl, "draw",  sprite_draw);
 }
 

@@ -25,6 +25,8 @@ extern const char *p2name;
 extern int GAME_ACCEL;
 extern int gameLevel;
 
+SoFont *storyFont;
+
 char *kYouDidIt = "You Dit It!!!";
 char *kNextLevel = "Next:\t\t";
 char *kLooser = "Looser!!!";
@@ -643,7 +645,7 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   SoFont_load (smallFont, IIM_Load_DisplayFormatAlpha ("font4b.png"));
   menuFont = SoFont_new();
   SoFont_load (menuFont, IIM_Load_DisplayFormatAlpha ("font3b.png"));
-  darkFont = SoFont_new();
+  darkFont = storyFont = SoFont_new();
   SoFont_load (darkFont, IIM_Load_DisplayFormatAlpha ("fontdark.png"));
 
   IIM_Surface * menuselector = IIM_Load_DisplayFormatAlpha("menusel.png");

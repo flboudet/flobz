@@ -15,6 +15,7 @@ struct _StyrolyseClient {
   void  (*drawImage) (StyrolyseClient *_this, void *image, int x, int y,
                       int clipx, int clipy, int clipw, int cliph);
   void  (*freeImage) (StyrolyseClient *_this, void *image);
+  void  (*putText)   (StyrolyseClient *_this, int x, int y, const char *text);
 };
 
 Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client);
