@@ -31,7 +31,7 @@
 
 namespace ios_fc {
 
-class UnixSocketImpl : public SocketImpl, UnixSelectableImpl {
+class UnixSocketImpl : public SocketImpl, public UnixSelectableImpl {
 public:
 	virtual void create(String hostName, int portID);
         void create(int fd);

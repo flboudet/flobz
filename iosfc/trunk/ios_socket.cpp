@@ -56,6 +56,7 @@ Socket::Socket(const String hostName, int portID)
 
 Socket::Socket(SocketImpl *impl) : impl(impl)
 {
+    sImpl = impl->getSelectableImpl();
 }
 
 Socket::~Socket()

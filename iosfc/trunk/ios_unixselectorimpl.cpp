@@ -69,6 +69,7 @@ Buffer<Selectable *> UnixSelectorImpl::getSelected()
         if (FD_ISSET(currentImpl->getFd(), &readfds))
             result.add(currentSelectable);
     }
+    result.flush();
     return result;
 }
 
