@@ -1,19 +1,38 @@
-OBJ=ios_exception.o ios_stream.o ios_hash.o ios_memory.o ios_message.o ios_standardmessage.o ios_udpmessage.o ios_messagebox.o ios_udpmessagebox.o  ios_datagramsocket.o ios_unixdatagramsocketimpl.o ios_unixsocketaddressimpl.o ios_igpmessagebox.o ios_socket.o ios_unixsocketimpl.o ios_igpclient.o ios_igpdatagram.o
-TOBJ=test_udpmessagebox.o
+SRCS=ios_exception.cpp ios_stream.cpp ios_hash.cpp ios_memory.cpp ios_message.cpp ios_standardmessage.cpp ios_udpmessage.cpp ios_messagebox.cpp ios_udpmessagebox.cpp  ios_datagramsocket.cpp ios_unixdatagramsocketimpl.cpp ios_unixsocketaddressimpl.cpp ios_igpmessagebox.cpp ios_socket.cpp ios_unixsocketimpl.cpp ios_igpclient.cpp ios_igpdatagram.cpp
+
 CPPFLAGS=-g `sdl-config --cflags`  -Wall
+CXX=g++
 
 # mingw32 cross-compilation (works great in debian testing)
 ifeq ($(PLATFORM), crossmingw32)
-  CC=i586-mingw32msvc-g++
+  CXX=i586-mingw32msvc-g++
   CXX=i586-mingw32msvc-g++
   WINSDLINCLUDE=/home/$(USER)/SDL-1.2.7/include
   CPPFLAGS=-g -mno-cygwin -mwindows -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE)  -I$(WINSDLINCLUDE)/SDL  -Wall
 endif
 
-all:${OBJ} ${TOBJ}
-	$(CXX) `sdl-config --cflags` -o test ${OBJ} ${TOBJ} `sdl-config --libs` -lSDL_net
+DEPDIR = .deps
+df = $(DEPDIR)/$(*F)
 
-object:${OBJ}
+MAKEDEPEND = gcc -MM $(CPPFLAGS) -o $(df).d $<
+# MAKEDEPEND = touch $*.d && makedepend $(CPPFLAGS) -f $*.d $<
+
+all: object
+
+object:${SRCS:%.cpp=%.o}
+
+%.o : %.cpp
+	@mkdir -p $(DEPDIR);\
+	$(MAKEDEPEND); \
+	cp $(df).d $(df).P; \
+	sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+	-e '/^$$/ d' -e 's/$$/ :/' < $(df).d >> $(df).P; \
+	rm -f $(df).d
+	$(COMPILE.cpp) -o $@ $<
 
 clean:
 	rm -f *.o *~
+
+.PHONY: all object clean
+
+-include $(SRCS:%.cpp=$(DEPDIR)/%.P)
