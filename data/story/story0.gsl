@@ -47,6 +47,8 @@
   Sprite @gpuyo2 = [new_sprite: image="puyo-g-frame1.png" x=102.0 y=410.0 curframe=0.7 framespeed=0.1 nbframes=@PuyoAgitation]
   Sprite @ypuyo2 = [new_sprite: image="puyo-y-frame1.png" x=177.0 y=415.0 curframe=2.9 framespeed=0.1 nbframes=@PuyoAgitation]
 
+  Balloon @etTalk = [new_balloon: image="balloon1.png" x=200.0 y=100.0 text_x=10.0 text_y=10.0]
+
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
   # This also allows you to specify the drawing order
@@ -54,6 +56,11 @@
 
   (@planCurrent = @PlanLarge)? {
     sprite::@bg display=@display
+
+    (@cycle = 1)? {
+      show_balloon::@etTalk
+      set_text::@etTalk text="Coin coin... vive les canards !"
+    }
 
     (@fcycle >= @LaserGun)? (@fcycle <= @GrandmaDied)? sprite::@laser display=@display
 
@@ -64,6 +71,7 @@
     for i in (@rpuyo2 @vpuyo2 @bpuyo2 @gpuyo2 @ypuyo2) do sprite::i display=@display
 
     (@activateHalo = 1)? sprite::@halo display=@display
+    balloon::@etTalk display=@display
   }
 
   (@planCurrent = @PlanKaori)? {

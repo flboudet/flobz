@@ -39,6 +39,13 @@ struct <Sprite:
   float  framespeed,
   float  nbframes>
 
+struct <Balloon:
+  Sprite image,
+  string text,
+  float alpha,
+  float delta_alpha,
+  Vec2 text_pos>
+
 struct <Display:
   float x,
   float y,
@@ -76,7 +83,6 @@ external <draw: Sprite &this, Display display>
   new_display.height = height
 
 <sprite: Sprite &this, Display display>
-
   float diff = &this.dcycle - @fcycle
   (@mode = UPDATE)? {
     (diff >= 1.0)? {
@@ -92,3 +98,33 @@ external <draw: Sprite &this, Display display>
     draw::&this display=display
   }
 
+<new_balloon: string image, float x, float y, float text_x, float text_y> : Balloon
+  new_balloon.image = [new_sprite_simple: image=image x=x y=y]
+  new_balloon.text  = ""
+  new_balloon.alpha = 0.0
+  new_balloon.delta_alpha = 0.0
+  new_balloon.text_pos.x = text_x
+  new_balloon.text_pos.y = text_y
+
+<show_balloon: Balloon &this>
+  &this.delta_alpha = 0.6
+
+<hide_balloon: Balloon &this>
+  &this.delta_alpha = -0.6
+
+<set_text: Balloon &this, string text>
+  &this.text = text
+
+<balloon: Balloon &this, Display display>
+  (@mode = UPDATE)? {
+    sprite::&this.image
+      &this.alpha += &this.delta_alpha
+      (&this.alpha < 0.0)? &this.alpha = 0.0
+      (&this.alpha > 1.0)? &this.alpha = 1.0
+  }
+  (@mode = DRAW)? {
+    (&this.alpha > 0.5)? {
+      sprite::&this.image display=display
+      
+    }
+  }

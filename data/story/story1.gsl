@@ -35,8 +35,11 @@
   (@mouth.curframe > 2.0)? @mouth.image = "evilmouth.png"
   (@mouth.curframe > 3.0)? @mouth.image = "happymouth.png"
 
-  @dogEyes.image = "mouthsmall.png"
-  (@dogEyes.curframe > 9.0)? @dogEyes.image = "dogbigeyes1.png"
+  @dogEyes.image = "dogbigeyes2.png"
+  (@fcycle < 220.0)? {
+    @dogEyes.image = "mouthsmall.png"
+    (@dogEyes.curframe > 9.0)? @dogEyes.image = "dogbigeyes1.png"
+  }
 
   @dogMouth.image = "dogbigmouth3.png"
   (@fcycle > 150.0)? {
