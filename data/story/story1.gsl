@@ -1,12 +1,17 @@
 <init>
   # Init function: called when script is loaded
-  Display @display = [new_display: x=200.0 y=0.0 width=640.0 height=480.0]
+  Display @display = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
   Display @movingDisplay = [new_display: x=350.0 y=0.0 width=640.0 height=480.0]
+  Display @dogDisplay = [new_display: x=-100.0 y=0.0 width=640.0 height=480.0]
+
   Sprite @head =  [new_sprite: image="kaori.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
   Sprite @eyes =  [new_sprite: image="eyes.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
   Sprite @mouth =  [new_sprite: image="mouthsmall.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=4.0]
   Sprite @fond =  [new_sprite: image="bluebkgnd.jpg" x=640.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
   Sprite @fond2 =  [new_sprite: image="bluebkgnd.jpg" x=0.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
+  Sprite @dog =  [new_sprite: image="dogbig.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
+  Sprite @dogMouth =  [new_sprite: image="dogbigmouth1.png" x=200.0 y=250.0 curframe=0.0 framespeed=0.1 nbframes=2.0]
+  Sprite @dogEyes =  [new_sprite: image="dogbigeyes1.png" x=183.0 y=119.0 curframe=0.0 framespeed=0.1 nbframes=10.0]
   float @targetCycle = 100.0
   float @targetCycle2 = 50.0
 
@@ -18,6 +23,9 @@
   sprite::@head display=@movingDisplay
   sprite::@eyes display=@movingDisplay
   sprite::@mouth display=@movingDisplay
+  sprite::@dog display=@dogDisplay
+  sprite::@dogMouth display=@dogDisplay
+  sprite::@dogEyes display=@dogDisplay
 
 <update>
   # Update function: called every animation cycle
@@ -26,6 +34,15 @@
   (@mouth.curframe > 1.0)? @mouth.image = "happymouth.png"
   (@mouth.curframe > 2.0)? @mouth.image = "evilmouth.png"
   (@mouth.curframe > 3.0)? @mouth.image = "happymouth.png"
+
+  @dogEyes.image = "mouthsmall.png"
+  (@dogEyes.curframe > 9.0)? @dogEyes.image = "dogbigeyes1.png"
+
+  @dogMouth.image = "dogbigmouth3.png"
+  (@fcycle > 150.0)? {
+    @dogMouth.image = "dogbigmouth1.png"
+    (@dogMouth.curframe > 1.0)? @dogMouth.image = "dogbigmouth2.png"
+  }
 
   (@fond.pos.x >  -640.0)? move::@fond fcycle=@targetCycle x=-640.0 y=0.0
   (@fond.pos.x <= -640.0)? {
@@ -40,4 +57,5 @@
   }
   
   @movingDisplay.x -= 0.5
+  @dogDisplay.x += 0.1
   (@movingDisplay.x <= 200.0)? @finished = 1
