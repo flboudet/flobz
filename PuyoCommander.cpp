@@ -1201,45 +1201,53 @@ void PuyoCommander::getControlEvent(SDL_Event e, GameControlEvent *result)
             }
             break;
         case SDL_JOYAXISMOTION:
-            if (e.jaxis.which == 0) {
-                result->gameEvent = GameControlEvent::kPlayer1DownUp;
-            }
-            else {
-                result->gameEvent = GameControlEvent::kPlayer2DownUp;
-            }
             if ((e.jaxis.value < -3200) || (e.jaxis.value > 3200)) {
-                if (e.jaxis.axis == 0) {
-                    if (e.jaxis.value < 0) {
-                        result->cursorEvent = GameControlEvent::kLeft;
-                        if (e.jaxis.which == 0) {
-                            result->gameEvent = GameControlEvent::kPlayer1Left;
+                if (axis[e.jaxis.which][e.jaxis.axis] == false) {
+                    axis[e.jaxis.which][e.jaxis.axis] = true;
+                    if (e.jaxis.axis == 0) {
+                        if (e.jaxis.value < 0) {
+                            result->cursorEvent = GameControlEvent::kLeft;
+                            if (e.jaxis.which == player1Joystick) {
+                                result->gameEvent = GameControlEvent::kPlayer1Left;
+                            }
+                            else if (e.jaxis.which == player2Joystick) {
+                                result->gameEvent = GameControlEvent::kPlayer2Left;
+                            }
                         }
                         else {
-                            result->gameEvent = GameControlEvent::kPlayer2Left;
+                            result->cursorEvent = GameControlEvent::kRight;
+                            if (e.jaxis.which == player1Joystick) {
+                                result->gameEvent = GameControlEvent::kPlayer1Right;
+                            }
+                            else if (e.jaxis.which == player2Joystick) {
+                                result->gameEvent = GameControlEvent::kPlayer2Right;
+                            }
                         }
                     }
-                    else {
-                        result->cursorEvent = GameControlEvent::kRight;
-                        if (e.jaxis.which == 0) {
-                            result->gameEvent = GameControlEvent::kPlayer1Right;
+                    if (e.jaxis.axis == 1) {
+                        if (e.jaxis.value < 0) {
+                            result->cursorEvent = GameControlEvent::kUp;
                         }
                         else {
-                            result->gameEvent = GameControlEvent::kPlayer2Right;
+                            result->cursorEvent = GameControlEvent::kDown;
+                            if (e.jaxis.which == player1Joystick) {
+                                result->gameEvent = GameControlEvent::kPlayer1Down;
+                            }
+                            else if (e.jaxis.which == player2Joystick) {
+                                result->gameEvent = GameControlEvent::kPlayer2Down;
+                            }
                         }
                     }
                 }
+            }
+            else {
+                axis[e.jaxis.which][e.jaxis.axis] = false;
                 if (e.jaxis.axis == 1) {
-                    if (e.jaxis.value < 0) {
-                        result->cursorEvent = GameControlEvent::kUp;
+                    if (e.jaxis.which == player1Joystick) {
+                        result->gameEvent = GameControlEvent::kPlayer1DownUp;
                     }
-                    else {
-                        result->cursorEvent = GameControlEvent::kDown;
-                        if (e.jaxis.which == 0) {
-                            result->gameEvent = GameControlEvent::kPlayer1Down;
-                        }
-                        else {
-                            result->gameEvent = GameControlEvent::kPlayer2Down;
-                        }
+                    else if (e.jaxis.which == player2Joystick) {
+                        result->gameEvent = GameControlEvent::kPlayer2DownUp;
                     }
                 }
             }

@@ -85,6 +85,9 @@ class PuyoCommander
   
   SDL_Joystick *joystick[16];
   int numJoysticks;
+  static const int player1Joystick = 0;
+  static const int player2Joystick = 1;
+  bool axis[16][16];
 };
 
 SDL_Surface * IMG_Load_DisplayFormat (const char *path);
