@@ -28,8 +28,17 @@
 namespace ios_fc {
 
 struct UDPMessageBox::KnownPeer {
+public:
+    KnownPeer(const PeerAddress &address, int receiveSerialID, int cyclesBeforeResendingReliable)
+    : address(address), receiveSerialID(receiveSerialID), waitingForAckMessage(NULL), cyclesBeforeResendingReliable(cyclesBeforeResendingReliable) {}
+    void sendQueue();
     PeerAddress address;
     int receiveSerialID;
+    int waitingForAckTimeout;
+    UDPRawMessage *waitingForAckMessage;
+    AdvancedBuffer<UDPRawMessage*> outQueue;
+private:
+    int cyclesBeforeResendingReliable;
 };
 
 class UDPRawMessage {
@@ -56,13 +65,27 @@ private:
     DatagramSocket &socket;
 };
 
+void UDPMessageBox::KnownPeer::sendQueue()
+{
+    while ((waitingForAckMessage == NULL) && (outQueue.size() > 0)) {
+        UDPRawMessage *currentMessage = outQueue[0];
+        currentMessage->send();
+        outQueue.remove(currentMessage);
+        if (currentMessage->isReliable()) {
+            waitingForAckMessage = currentMessage;
+            waitingForAckTimeout = cyclesBeforeResendingReliable;
+        }
+        else {
+            delete currentMessage;
+        }
+    }
+}
 
 UDPMessageBox::UDPMessageBox(const String address,
 			     int localPort, int remotePort)
   : defaultAddress(address), defaultPort(remotePort)
 {
     sendSerialID = 0;
-    waitingForAckMessage = NULL;
     cyclesBeforeResendingReliable = 10;
     socket = new DatagramSocket(localPort);
 }
@@ -71,7 +94,6 @@ UDPMessageBox::UDPMessageBox(DatagramSocket *socket)
     : defaultAddress("localhost"), defaultPort(0), socket(socket)
 {
     sendSerialID = 0;
-    waitingForAckMessage = NULL;
     cyclesBeforeResendingReliable = 10;
 }
 
@@ -80,12 +102,15 @@ void UDPMessageBox::idle()
     char receiveData[2048];
     Buffer<char> receiveBuffer(receiveData, 2048);
     
-    // Resend the waitingForAckMessage when it has reached its timeout
-    if (waitingForAckMessage != NULL) {
-        waitingForAckTimeout--;
-        if (waitingForAckTimeout <= 0) {
-            waitingForAckTimeout = cyclesBeforeResendingReliable;
-            waitingForAckMessage->send();
+    // Resend the waitingForAckMessage of each client when it has reached its timeout
+    for (int i = 0, j = knownPeers.size() ; i < j ; i++) {
+        KnownPeer *currentPeer = knownPeers[i];
+        if (currentPeer->waitingForAckMessage != NULL) {
+            currentPeer->waitingForAckTimeout--;
+            if (currentPeer->waitingForAckTimeout <= 0) {
+                currentPeer->waitingForAckTimeout = cyclesBeforeResendingReliable;
+                currentPeer->waitingForAckMessage->send();
+            }
         }
     }
     
@@ -98,12 +123,13 @@ void UDPMessageBox::idle()
                 int messageSerialID = incomingMessage.getSerialID();
                 KnownPeer *currentPeer = findPeer(incomingMessage.getPeerAddress());
                 if (currentPeer == NULL) {
-                    currentPeer = new KnownPeer;
-                    currentPeer->address = incomingMessage.getPeerAddress();
-                    currentPeer->receiveSerialID = messageSerialID <= 0 ? 0 : messageSerialID - 1;
+                    currentPeer = new KnownPeer(incomingMessage.getPeerAddress(),
+                                                messageSerialID <= 0 ? 0 : messageSerialID - 1,
+                                                cyclesBeforeResendingReliable);
                     knownPeers.add(currentPeer);
                 }
                 int &receiveSerialID = currentPeer->receiveSerialID;
+                UDPRawMessage (*(& waitingForAckMessage)) = currentPeer->waitingForAckMessage;
                 
                 // We should acknowledge every reliable message
                 if (incomingMessage.isReliable()) {
@@ -116,7 +142,7 @@ void UDPMessageBox::idle()
                     if (waitingForAckMessage->getSerialID() == -messageSerialID) {
                         delete waitingForAckMessage;
                         waitingForAckMessage = NULL;
-                        sendQueue();
+                        currentPeer->sendQueue();
                     }
                 }
                 
@@ -142,7 +168,7 @@ void UDPMessageBox::idle()
     }
 }
 
-void UDPMessageBox::sendUDP(Buffer<char> buffer, int id, bool reliable, SocketAddress addr, int portNum)
+void UDPMessageBox::sendUDP(Buffer<char> buffer, int id, bool reliable, PeerAddress peerAddr, SocketAddress addr, int portNum)
 {
     UDPRawMessage *rawMessage = new UDPRawMessage(buffer, id, reliable,
 						  addr, portNum, *socket);
@@ -153,24 +179,13 @@ void UDPMessageBox::sendUDP(Buffer<char> buffer, int id, bool reliable, SocketAd
         return;
     }
     
-    outQueue.add(rawMessage);
-    sendQueue();
-}
-
-void UDPMessageBox::sendQueue()
-{
-    while ((waitingForAckMessage == NULL) && (outQueue.size() > 0)) {
-        UDPRawMessage *currentMessage = outQueue[0];
-        currentMessage->send();
-        outQueue.remove(currentMessage);
-        if (currentMessage->isReliable()) {
-            waitingForAckMessage = currentMessage;
-            waitingForAckTimeout = cyclesBeforeResendingReliable;
-        }
-        else {
-            delete currentMessage;
-        }
+    KnownPeer *currentPeer = findPeer(peerAddr);
+    if (currentPeer == NULL) {
+        currentPeer = new KnownPeer(peerAddr, 0, cyclesBeforeResendingReliable);
+        knownPeers.add(currentPeer);
     }
+    currentPeer->outQueue.add(rawMessage);
+    currentPeer->sendQueue();
 }
 
 Message * UDPMessageBox::createMessage()

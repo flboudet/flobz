@@ -32,7 +32,7 @@ UDPMessage::~UDPMessage()
 
 void UDPMessage::sendBuffer(Buffer<char> out) const
 {
-    owner.sendUDP(out, getSerialID(), isReliable(), peerAddressImpl->getAddress(), peerAddressImpl->getPortNum());
+    owner.sendUDP(out, getSerialID(), isReliable(), peerAddress, peerAddressImpl->getAddress(), peerAddressImpl->getPortNum());
 }
 
 UDPMessage::UDPMessage(const Buffer<char> raw, UDPMessageBox &owner, SocketAddress address, int port)  throw(InvalidMessageException)

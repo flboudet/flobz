@@ -40,7 +40,7 @@ public:
     virtual ~UDPMessageBox() {}
     void idle();
     Message * createMessage();
-    void sendUDP(Buffer<char> buffer, int id, bool reliable, SocketAddress addr, int portNum);
+    void sendUDP(Buffer<char> buffer, int id, bool reliable, PeerAddress peerAddr, SocketAddress addr, int portNum);
 private:
     struct KnownPeer;
     KnownPeer *findPeer(PeerAddress address);
@@ -50,10 +50,6 @@ private:
     int sendSerialID;
     AdvancedBuffer<KnownPeer*> knownPeers;
     int cyclesBeforeResendingReliable;
-    int waitingForAckTimeout;
-    UDPRawMessage *waitingForAckMessage;
-    AdvancedBuffer<UDPRawMessage*> outQueue;
-    void sendQueue();
 };
 
 };
