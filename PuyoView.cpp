@@ -102,6 +102,7 @@ PuyoView::PuyoView(PuyoRandomSystem *attachedRandom, int xOffset, int yOffset, i
 	this->nYOffset = nYOffset;
 	gameRunning = true;
 	enemyGame = NULL;
+    skippedCycle = false;
 }
 
 void PuyoView::setEnemyGame(PuyoGame *enemyGame)
@@ -210,7 +211,7 @@ void PuyoView::cycleAnimation()
         }
     }
     
-    if (attachedGame->isEndOfCycle()) {
+    if (attachedGame->isEndOfCycle() && skippedCycle) {
         while (attachedGame->isEndOfCycle() && attachedGame->isGameRunning() && cycleAllowed()) {
             attachedGame->cycle();
         }
@@ -220,8 +221,10 @@ void PuyoView::cycleAnimation()
 void PuyoView::cycleGame()
 {
     if (!attachedGame->isEndOfCycle()) {
+        skippedCycle = false;
         attachedGame->cycle();
     }
+    else skippedCycle = true;
 }
 
 void PuyoView::render()
@@ -236,7 +239,8 @@ void PuyoView::render()
     for (int i = 0 ; i < PUYODIMX ; i++) {
         for (int j = 0 ; j < PUYODIMY ; j++) {
             AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAt(i, j));
-            if ((currentPuyo != NULL) && (getSurfaceForPuyo(currentPuyo) != neutral) && (currentPuyo->isRenderingAnimation() == false)) {
+            if ((currentPuyo != NULL) && (getSurfaceForPuyo(currentPuyo) != neutral)
+                && (currentPuyo->getVisible()) && (currentPuyo->isRenderingAnimation() == false)) {
                 drect.x = xOffset + i * TSIZE;
                 drect.y = yOffset + j * TSIZE;
                 if (currentPuyo->getPuyoState() < PUYO_EMPTY)

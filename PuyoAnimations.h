@@ -32,6 +32,8 @@
 #include "IosImgProcess.h"
 #include "PuyoGame.h"
 
+class AnimatedPuyo;
+
 /* Abstract Animation class */
 class PuyoAnimation {
   public:
@@ -111,11 +113,12 @@ private:
 /* Puyo exploding and vanishing animation */
 class VanishAnimation : public PuyoAnimation {
 public:
-    VanishAnimation(PuyoPuyo *puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer);
+    VanishAnimation(AnimatedPuyo *puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer);
     virtual ~VanishAnimation();
     void cycle();
     void draw(int semiMove);
 private:
+    AnimatedPuyo *puyo;
     IIM_Surface *puyoFace;
     int xOffset, yOffset;
     int X, Y, iter, color;

@@ -24,6 +24,7 @@
  */
 
 #include "PuyoAnimations.h"
+#include "AnimatedPuyo.h"
 #include "PuyoView.h"
 #include "IosImgProcess.h"
 #include "SDL_Painter.h"
@@ -249,7 +250,7 @@ void FallingAnimation::draw(int semiMove)
 }
 
 /* Puyo exploding and vanishing animation */
-VanishAnimation::VanishAnimation(PuyoPuyo *puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer)
+VanishAnimation::VanishAnimation(AnimatedPuyo *puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer)
 {
     puyoFace = PuyoView::getSurfaceForState(puyo->getPuyoState());
     this->xOffset = xOffset;
@@ -266,6 +267,7 @@ VanishAnimation::VanishAnimation(PuyoPuyo *puyo, int delay, int xOffset, int yOf
     synchronizer->incrementUsage();
     synchronizer->push();
     this->delay = delay;
+    this->puyo = puyo;
 }
 
 VanishAnimation::~VanishAnimation()
@@ -287,6 +289,7 @@ void VanishAnimation::cycle()
         //}
         if (iter == 30/* + delay*/) {
             finishedFlag = true;
+            puyo->setVisible(false);
         }
     }
 }

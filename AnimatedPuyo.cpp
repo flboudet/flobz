@@ -33,6 +33,7 @@ extern IIM_Surface *puyoEye[3];
 AnimatedPuyo::AnimatedPuyo(PuyoState state) : PuyoPuyo(state)
 {
     puyoEyeState = random() % 700;
+    visibilityFlag = true;
 }
 
 AnimatedPuyo::~AnimatedPuyo()
@@ -66,10 +67,9 @@ void AnimatedPuyo::cycleAnimation()
     smallTicksCount+=2;
     PuyoAnimation * animation = getCurrentAnimation();
     if ((animation != NULL)) {
+        animation->cycle();
         if (animation->isFinished()) {
             removeCurrentAnimation();
-        } else {
-            animation->cycle();
         }
     }
 }
@@ -89,7 +89,8 @@ void AnimatedPuyo::render(SDL_Painter &painter, PuyoView *attachedView)
     puyoEyeState++;
     if (attachedView == NULL)
         return;
-    
+    if (!visibilityFlag)
+        return;
     PuyoGame *attachedGame = attachedView->getAttachedGame();
     
     bool falling  = attachedGame->getFallingState() < PUYO_EMPTY;

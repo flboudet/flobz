@@ -43,10 +43,13 @@ public:
     void cycleAnimation();
     void render(SDL_Painter &painter, PuyoView *attachedView);
     bool isRenderingAnimation() const;
+    void setVisible(bool flag) { visibilityFlag = flag; }
+    bool getVisible() const { return visibilityFlag; }
 private:
     IosVector animationQueue;
     int puyoEyeState;
     unsigned int smallTicksCount;
+    bool visibilityFlag;
 };
 
 
