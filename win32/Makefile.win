@@ -1,0 +1,77 @@
+# Project: FloboPuyo
+# Makefile created by Dev-C++ 4.9.9.0
+
+CPP  = g++.exe
+CC   = gcc.exe
+WINDRES = windres.exe
+RES  = 
+OBJ  = ../audio.o ../IosException.o ../IosVector.o ../main.o ../menu.o ../menuitems.o ../preferences.o ../PuyoCommander.o ../PuyoGame.o ../PuyoIA.o ../PuyoStory.o ../PuyoView.o ../scrollingtext.o ../SDL_prim.o ../sofont.o ../scenar.l.o ../scenar.y.o $(RES)
+LINKOBJ  = ../audio.o ../IosException.o ../IosVector.o ../main.o ../menu.o ../menuitems.o ../preferences.o ../PuyoCommander.o ../PuyoGame.o ../PuyoIA.o ../PuyoStory.o ../PuyoView.o ../scrollingtext.o ../SDL_prim.o ../sofont.o ../scenar.l.o ../scenar.y.o $(RES)
+LIBS =  -L"D:/programs/dev-cpp5-beta9/lib" -mwindows -lmingw32 -lSDLmain -lSDL -lSDL_image -lSDL_mixer  
+INCS =  -I"D:/programs/dev-cpp5-beta9/include" 
+CXXINCS =  -I"D:/programs/dev-cpp5-beta9/include/c++/3.3.1"  -I"D:/programs/dev-cpp5-beta9/include/c++/3.3.1/mingw32"  -I"D:/programs/dev-cpp5-beta9/include/c++/3.3.1/backward"  -I"D:/programs/dev-cpp5-beta9/lib/gcc-lib/mingw32/3.3.1/include"  -I"D:/programs/dev-cpp5-beta9/include" 
+BIN  = FloboPuyo.exe
+CXXFLAGS = $(CXXINCS) -DYY_NEVER_INTERACTIVE=1 -DUSE_AUDIO=1  
+CFLAGS = $(INCS) -DYY_NEVER_INTERACTIVE=1 -DUSE_AUDIO=1  
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before FloboPuyo.exe all-after
+
+
+clean: clean-custom
+	rm -f $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CPP) $(LINKOBJ) -o "FloboPuyo.exe" $(LIBS)
+
+../audio.o: ../audio.c
+	$(CPP) -c ../audio.c -o ../audio.o $(CXXFLAGS)
+
+../IosException.o: ../IosException.cpp
+	$(CPP) -c ../IosException.cpp -o ../IosException.o $(CXXFLAGS)
+
+../IosVector.o: ../IosVector.cpp
+	$(CPP) -c ../IosVector.cpp -o ../IosVector.o $(CXXFLAGS)
+
+../main.o: ../main.cpp
+	$(CPP) -c ../main.cpp -o ../main.o $(CXXFLAGS)
+
+../menu.o: ../menu.c
+	$(CPP) -c ../menu.c -o ../menu.o $(CXXFLAGS)
+
+../menuitems.o: ../menuitems.c
+	$(CPP) -c ../menuitems.c -o ../menuitems.o $(CXXFLAGS)
+
+../preferences.o: ../preferences.c
+	$(CPP) -c ../preferences.c -o ../preferences.o $(CXXFLAGS)
+
+../PuyoCommander.o: ../PuyoCommander.cpp
+	$(CPP) -c ../PuyoCommander.cpp -o ../PuyoCommander.o $(CXXFLAGS)
+
+../PuyoGame.o: ../PuyoGame.cpp
+	$(CPP) -c ../PuyoGame.cpp -o ../PuyoGame.o $(CXXFLAGS)
+
+../PuyoIA.o: ../PuyoIA.cpp
+	$(CPP) -c ../PuyoIA.cpp -o ../PuyoIA.o $(CXXFLAGS)
+
+../PuyoStory.o: ../PuyoStory.cpp
+	$(CPP) -c ../PuyoStory.cpp -o ../PuyoStory.o $(CXXFLAGS)
+
+../PuyoView.o: ../PuyoView.cpp
+	$(CPP) -c ../PuyoView.cpp -o ../PuyoView.o $(CXXFLAGS)
+
+../scrollingtext.o: ../scrollingtext.c
+	$(CPP) -c ../scrollingtext.c -o ../scrollingtext.o $(CXXFLAGS)
+
+../SDL_prim.o: ../SDL_prim.c
+	$(CPP) -c ../SDL_prim.c -o ../SDL_prim.o $(CXXFLAGS)
+
+../sofont.o: ../sofont.c
+	$(CPP) -c ../sofont.c -o ../sofont.o $(CXXFLAGS)
+
+../scenar.l.o: ../scenar.l.c
+	$(CPP) -c ../scenar.l.c -o ../scenar.l.o $(CXXFLAGS)
+
+../scenar.y.o: ../scenar.y.c
+	$(CPP) -c ../scenar.y.c -o ../scenar.y.o $(CXXFLAGS)

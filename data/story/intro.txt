@@ -1,0 +1,16 @@
+<-- Game Introduction -->
+
+foreground "earth.png"
+background "stars.jpg"
+vector     -50,-50
+textarea   35,35,387,94,30
+
+say "Earth!!\nHere we are!\n..."
+wait 5 sec
+
+textarea   35,35,387,64,30
+say "This will be a nice invasion!\nFor sure..."
+
+<-- say "I'm a bad guy...\nDefeat me.... OR DIE !!!\n\nAH AH AH!!!" wait 5 sec say "Do you wanna die or what ?\nCome on Come on!!" wait 10 sec background "nuages1.png" textarea   325,389,280,74,30 say "Oh, I love a nice cloudy sky.\nThat's nice isn't it??\n\nReady to play ?" -->
+
+loop
