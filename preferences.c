@@ -111,7 +111,11 @@ void GetStrPreference (const char *name, char *out, const char *defaut, const in
 {
     if ((out==NULL) || (name==NULL)) return;
     
-    if (defaut != NULL) strncpy(out,defaut,bufferSize-1);
+    if (defaut != NULL)
+    {
+        strncpy(out,defaut,bufferSize-1);
+        out[bufferSize-1]=0;
+    }
     else out[0]=0;
 
     CFStringRef nom = CFStringCreateWithCString (NULL,name,CFStringGetSystemEncoding());
@@ -251,7 +255,11 @@ void GetStrPreference (const char *name, char *out, const char *defaut, const in
 
     if ((out==NULL) || (name==NULL)) return;
     
-    if (defaut != NULL) strncpy(out,defaut,bufferSize-1);
+    if (defaut != NULL)
+    {
+        strncpy(out,defaut,bufferSize-1);
+        out[bufferSize-1]=0;
+    }
     else out[0]=0;
     
     if (file==NULL) fetchFile();
@@ -268,6 +276,7 @@ void GetStrPreference (const char *name, char *out, const char *defaut, const in
         if (strncmp(key, tmp, tmplen) == 0)
         {
             strncpy(out, key+tmplen, bufferSize-1);
+            out[bufferSize-1] = 0;
             free(copiedfile);
             return;
         }

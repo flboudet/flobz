@@ -11,15 +11,14 @@ hiscore * getHiscores(const char * const defaultNames[kHiScoresNumber])
 {
   if (loaded==true) return HS;
 
-  char HSIDN[6];
-  char HSIDS[6];
+  char HSID[8];
 
   for (int i=0; i<kHiScoresNumber; i++)
   {
-    sprintf(HSIDS,"HSS%2d",i);
-    sprintf(HSIDN,"HSN%2d",i);
-    GetStrPreference(HSIDN,HS[i].name,defaultNames[kHiScoresNumber-i-1],kHiScoreNameLenght+1);      
-    HS[i].score = GetIntPreference(HSIDS,(kHiScoresNumber-i) * 10000);
+    sprintf(HSID,"HSN%2d",i);
+    GetStrPreference(HSID,HS[i].name,defaultNames[kHiScoresNumber-i-1],kHiScoreNameLenght+1);      
+    sprintf(HSID,"HSS%2d",i);
+    HS[i].score = GetIntPreference(HSID,(kHiScoresNumber-i) * 10000);
   }
   loaded = true;
   
@@ -46,8 +45,7 @@ int setHiScore(int score, const char * name)
   tmp->name[kHiScoreNameLenght]=0;
   tmp->score = score;
 
-  char HSIDN[6];
-  char HSIDS[6];
+  char HSID[8];
 
   for (int i=0; i<kHiScoresNumber; i++)
   {
@@ -55,11 +53,11 @@ int setHiScore(int score, const char * name)
     {
       if (retour == -1) retour = i;
 
-      sprintf(HSIDS,"HSS%2d",i);
-      sprintf(HSIDN,"HSN%2d",i);
-      SetStrPreference(HSIDN,tmp->name);
-      SetIntPreference(HSIDS,tmp->score);
-
+      sprintf(HSID,"HSN%2d",i);
+      SetStrPreference(HSID,tmp->name);
+      sprintf(HSID,"HSS%2d",i);
+      SetIntPreference(HSID,tmp->score);
+      
       memcpy(tmp2,&(HS[i]),sizeof(hiscore));
       memcpy(&(HS[i]),tmp,sizeof(hiscore));
       memcpy(tmp,tmp2,sizeof(hiscore));

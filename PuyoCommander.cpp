@@ -95,7 +95,7 @@ static char *kAbout06 = "                   Guillaume 'gyom' Borios";
 static char *kAbout07 = "Beta Goddess:                        ";
 static char *kAbout08 = "                                           Tania";
 
-static char *AI_NAMES[] = { "Fanzy", "Bob the Killer", "Big Rabbit", "Flying Saucer",
+static char *AI_NAMES[] = { "Fanzy", "Gizmo", "Big Rabbit", "Flying Saucer",
   "Satanas", "Doctor X", "Tanya", "Master Gyom",
   "The Duke","Jeko","--------" };
 
@@ -734,7 +734,7 @@ void PuyoCommander::updateHighScoresMenu()
   hiscore *scores = getHiscores(AI_NAMES);
   char tmp[256];
 #define PAS_DE_COMMENTAIRES(X,kXX) \
-  sprintf(tmp, ".... %06d %32s", scores[X].score, scores[X].name); \
+  sprintf(tmp, "%s - %d", scores[X].name, scores[X].score); \
   menu_set_value(highScoresMenu,kXX,tmp);
 
   PAS_DE_COMMENTAIRES(0,k01);
@@ -1063,8 +1063,8 @@ void PuyoCommander::startTwoPlayerGameLoop()
   char player1Name[256];
   char player2Name[256];
 
-  GetStrPreference("Player1 Name", player1Name, "Ugh");
-  GetStrPreference("Player2 Name", player2Name, "Arf");
+  GetStrPreference("Player1 Name", player1Name, "Player 1");
+  GetStrPreference("Player2 Name", player2Name, "Player 2");
   menu_set_value(twoPlayerGameMenu, kPlayer1Name, player1Name);
   menu_set_value(twoPlayerGameMenu, kPlayer2Name, player2Name);
 
@@ -1156,7 +1156,11 @@ void PuyoCommander::startSingleGameLoop()
 {
   char playerName[256];
 
-  GetStrPreference("Player1 Name", playerName, "Ugh");
+    char * defaultName = getenv("USER");
+    if (defaultName[0]>=32) defaultName[0]-=32;
+    else defaultName = "Player";
+    
+  GetStrPreference("Player Name", playerName, defaultName);
   menu_set_value(singleGameMenu, kPlayerName, playerName);
 
   while (!menu_active_is(singleGameMenu,kLevelMedium))
@@ -1253,7 +1257,7 @@ mml_play:
       break;
     }
   }
-  SetStrPreference("Player1 Name", playerName);
+  SetStrPreference("Player Name", playerName);
   audio_music_start(0);
 }
 
