@@ -198,7 +198,7 @@ UDPMessageBox::UDPMessageBox(const String address,
 }
 
 UDPMessageBox::UDPMessageBox(DatagramSocket *socket)
-    : defaultAddress("localhost"), defaultPort(0), socket(socket)
+    : defaultAddress("localhost"), defaultPort(socket->getSocketPortNum()), socket(socket)
 {
     sendSerialID = 0;
     cyclesBeforeResendingReliable = 10;
