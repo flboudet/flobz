@@ -67,7 +67,7 @@ namespace gameui {
       bool isVisible()      { return !hidden; }
 
       virtual bool hasFocus() const { return false; }
-      virtual void event(const GameControlEvent &event) const    { }
+/*      virtual void event(const GameControlEvent &event) const    { } */
 
       virtual Vec3 getPreferedSize() const               { return preferedSize; }
       virtual void setPreferedSize(const Vec3 &v3)       { preferedSize = v3;   }
@@ -78,6 +78,8 @@ namespace gameui {
       // default behaviour is to lost the focus
       virtual void eventOccured(GameControlEvent *event);
 
+      bool isFocusable() const { return focusable; }
+      
       virtual void giveFocus()       { focus = true;  }
       virtual void lostFocus()       { focus = false; }
       bool haveFocus() const { return focus;  }
@@ -94,6 +96,8 @@ namespace gameui {
       virtual void setSize(const Vec3 &v3)       { size     = v3; }
       virtual void setParent(WidgetContainer *p) { parent   =  p; }
 
+      void setFocusable(bool foc);
+      
     private:
       WidgetContainer *parent;
       Vec3    preferedSize;
@@ -101,6 +105,7 @@ namespace gameui {
       Vec3    position;
       bool    hidden;
       bool    focus;
+      bool    focusable;
 
       Action *actions[GAMEUIENUM_LAST];
   };
@@ -145,6 +150,8 @@ namespace gameui {
       void eventOccured(GameControlEvent *event);
       void giveFocus();
       void lostFocus();
+      
+      void add (Widget *child);
 
     protected:
       virtual float getSortingAxe(const Vec3 &v3) const = 0;

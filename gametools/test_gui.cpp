@@ -43,7 +43,7 @@ void OtherMenuScreen::build()
 void MainMenuScreen::build()
 {
   setBackground(IIM_Load_DisplayFormat("Background.jpg"));
-  add(new Button("FloboPuyo #1", new PrintfAction));
+  add(new Text("FloboPuyo #1"));
   add(new Button("FloboPuyo #2", new PrintfAction));
 
   HBox *box1 = new HBox;

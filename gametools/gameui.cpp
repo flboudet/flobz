@@ -14,7 +14,7 @@ namespace gameui {
   // 
   Widget::Widget(WidgetContainer *parent)
     : parent(parent), preferedSize(0,0,0), size(0,0,0),
-    position(0,0,0), hidden(false), focus(false)
+    position(0,0,0), hidden(false), focus(false), focusable(false)
     {
       for (int i = 0; i < GAMEUIENUM_LAST; ++i)
         actions[i] = NULL;
@@ -29,6 +29,13 @@ namespace gameui {
   void Widget::eventOccured(GameControlEvent *event)
   {
     lostFocus();
+  }
+
+  void Widget::setFocusable(bool foc)
+  {
+    focusable = foc;
+    if (parent && foc)
+      parent->setFocusable(true);
   }
 
   //
@@ -118,7 +125,7 @@ namespace gameui {
   Box::Box(GameLoop *loop) : WidgetContainer(loop)
   {
     setPolicy(GameUIDefaults::CONTAINER_POLICY);
-    activeWidget = 0;
+    activeWidget = -1;
   }
 
   void Box::setPolicy(GameUIEnum policy)
@@ -169,17 +176,28 @@ namespace gameui {
         {}
     }
   }
-  
+
+  void Box::add (Widget *child)
+  {
+    WidgetContainer::add(child);
+    if (child->isFocusable() && (activeWidget < 0)) {
+      activeWidget = getNumberOfChilds() - 1;
+      setFocusable(true);
+    }
+  }
+
   void Box::eventOccured(GameControlEvent *event)
   {
     if (event->isUp)
       return;
 
-    if (activeWidget < 0) activeWidget = 0;
     if (activeWidget >= getNumberOfChilds())
       activeWidget = getNumberOfChilds() - 1;
     
-    if (activeWidget < 0) return;
+    if (activeWidget < 0) {
+      lostFocus();
+      return;
+    }
 
     Widget *child = getChild(activeWidget);
     child->giveFocus();
@@ -199,15 +217,16 @@ namespace gameui {
     }
 
     bool childHaveFocus;    
+    int saveActive = activeWidget;
     do {
       activeWidget += direction;
       if (activeWidget < 0) {
-        setActiveWidget(0);
+        setActiveWidget(saveActive);
         lostFocus();
         return;
       }
       if (activeWidget >= getNumberOfChilds()) {
-        setActiveWidget(getNumberOfChilds() - 1);
+        setActiveWidget(saveActive);
         lostFocus();
         return;
       }
@@ -242,7 +261,7 @@ namespace gameui {
   void Box::giveFocus()
   {
     WidgetContainer::giveFocus();
-    if (getNumberOfChilds() > 0) {
+    if (activeWidget >= 0) {
       Widget *child = getChild(activeWidget);
       child->giveFocus();
     }
@@ -251,7 +270,7 @@ namespace gameui {
   void Box::lostFocus()
   {
     WidgetContainer::lostFocus();
-    if (getNumberOfChilds() > 0) {
+    if (activeWidget >= 0) {
       Widget *child = getChild(activeWidget);
       child->lostFocus();
     }
@@ -372,6 +391,7 @@ namespace gameui {
     : Text(label, fontInactive)
   {
     init(fontActive, fontInactive);
+    setFocusable(true);
   }
 
   Button::Button(const String &label, Action *action)
@@ -483,7 +503,6 @@ namespace gameui {
     font = fontInactive;
     requestDraw();
   }
-      
 
   void EditField::giveFocus() {
     Text::giveFocus();
