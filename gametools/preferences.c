@@ -55,8 +55,8 @@ int GetIntPreference(char * name, int defaut)
         {
            if (CFGetTypeID(value) == CFNumberGetTypeID ())
            {
-            if (CFNumberGetValue (value, kCFNumberIntType,&retour) == false);
-            retour = defaut;
+            if (CFNumberGetValue (value, kCFNumberIntType,&retour) == false)
+                retour = defaut;
            }
             CFRelease(value);
         }        
