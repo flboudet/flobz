@@ -78,9 +78,11 @@ PuyoInternetGameMenu::PuyoInternetGameMenu(PuyoMenuScreen *parentScreen, SoFont 
     GetStrPreference("Server Address", serverAddress,   "durandal.homeunix.com");
     
     addItem("Player Name:\t", playerName, false, PuyoMenuItem::EDIT);
-    addItem("Opponent Name:\t", "Joe le rat", false, PuyoMenuItem::EDIT);
+    //addItem("Opponent Name:\t", "Joe le rat", false, PuyoMenuItem::EDIT);
     addSeparator();
     addItem("Server Address:\t", serverAddress, false, PuyoMenuItem::EDIT);
+    addItem("Player Ident:\t", "1", false, PuyoMenuItem::EDIT);
+    addItem("Opponent Ident:\t", "2", false, PuyoMenuItem::EDIT);
     addSeparator();
     addSeparator();
     addSeparator();
@@ -97,7 +99,7 @@ void PuyoInternetGameMenu::itemSelected(int itemNumber)
     switch (itemNumber) {
         case 10:
             parentScreen->hide();
-            attachedCommander.startInternetGame(0, "TEST", "localhost", 4567, 32776);
+            attachedCommander.startInternetGame(itemNumber - 10, getValue(0), getValue(2), 4567, atoi(getValue(3)), atoi(getValue(4)));
             parentScreen->show();
             break;
         default:

@@ -1205,11 +1205,13 @@ void PuyoCommander::startLANGame(int level, const char *playerName, const char *
     mbox = NULL;
 }
 
-void PuyoCommander::startInternetGame(int level, const char *playerName, const char *ipAddress, int portID, int opponentIgpIdent)
+void PuyoCommander::startInternetGame(int level, const char *playerName, const char *ipAddress, int portID, int playerIgpIdent, int opponentIgpIdent)
 {
     if (mbox) delete mbox;
-    mbox = new IgpMessageBox(ipAddress, portID, 25);
+    IgpMessageBox *newbox = new IgpMessageBox(ipAddress, portID, playerIgpIdent);
+    mbox = newbox;
     mbox->addListener(this);
+    newbox->bind(opponentIgpIdent);
     
     GAME_ACCEL = 2000;
     gameLevel = 1;
