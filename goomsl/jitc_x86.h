@@ -92,7 +92,13 @@ typedef struct _JITC_X86_ENV {
   LabelAddr    *knownLabel;
 } JitcX86Env;
 
-#define JITC_ADD_UCHAR(jitc,op) printf(" 0x%02x", op) && (jitc->memory[jitc->used++]=op)
+#define DISPLAY_GENCODE
+
+#ifdef DISPLAY_GENCODE
+  #define JITC_ADD_UCHAR(jitc,op) printf(" 0x%02x", op) && (jitc->memory[jitc->used++]=op)
+#else
+  #define JITC_ADD_UCHAR(jitc,op) (jitc->memory[jitc->used++]=op)
+#endif
 
 #define JITC_ADD_USHORT(jitc,i) { JITC_ADD_UCHAR(jitc,i&0xff); JITC_ADD_UCHAR(jitc,(i>>8)&0xff); } 
 #define JITC_ADD_UINT(jitc,i)   { \

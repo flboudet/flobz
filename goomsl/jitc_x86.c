@@ -237,7 +237,9 @@ void jitc_add(JitcX86Env *jitc, const char *_instr, ...)
   va_list ap;
   strcpy(instr,_instr);
 
-  printf("\n|--> %s : ", _instr);
+#ifdef DISPLAY_GENCODE
+  printf("|");
+#endif
   
   op = strtok(instr, " ,");
   if (!op) return;
@@ -296,7 +298,9 @@ void jitc_add(JitcX86Env *jitc, const char *_instr, ...)
   va_end(ap);
 
   jitc_add_op(jitc, op, &(iparam[0]), nbParam);
-  printf("\n");
+#ifdef DISPLAY_GENCODE
+  printf(" ;;;  %s\n", _instr);
+#endif
 }
 
 JitcX86Env *jitc_x86_env_new(int memory_size) {
@@ -329,21 +333,38 @@ JitcFunc jitc_prepare_func(JitcX86Env *jitc) {
     jitc->used = (32 - jitc->used%32)%32;
     ptr = (JitcFunc)&(jitc->memory[jitc->used]);
 
+#ifdef DISPLAY_GENCODE
+    printf("\n------------------------------------------\n");
+    printf("-- Function Intro                       --\n");
+    printf("------------------------------------------\n");
+#endif
+
     /* save the state */
     JITC_PUSH_REG(jitc,EBP);
     JITC_LOAD_REG_REG(jitc,EBP,ESP);
     JITC_SUB_REG_IMM8(jitc,ESP,8);
     JITC_PUSH_ALL(jitc);
+#ifdef DISPLAY_GENCODE
+    printf("\n------------------------------------------\n");
+#endif
     return ptr;
 }
 
 void jitc_validate_func(JitcX86Env *jitc) {
 
+#ifdef DISPLAY_GENCODE
+    printf("\n------------------------------------------\n");
+    printf("-- Function Outro                       --\n");
+    printf("------------------------------------------\n");
+#endif
     /* restore the state */
     JITC_POP_ALL(jitc);
     JITC_LEAVE(jitc);
     JITC_RETURN_FUNCTION(jitc);
     jitc_resolve_labels(jitc);
+#ifdef DISPLAY_GENCODE
+    printf("\n------------------------------------------\n");
+#endif
 }
 
 void jitc_add_used_label(JitcX86Env *jitc, char *label, int where) {

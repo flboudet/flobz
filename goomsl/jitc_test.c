@@ -8,12 +8,14 @@ int main(int c, char **v)
     JitcX86Env *jitc = jitc_x86_env_new(0xffff);
     JitcFunc    func = jitc_prepare_func(jitc);
 
-    jitc_add(jitc, "mov [$d], $d",   &i, 0xdeadbeaf);
+    jitc_add(jitc, "mov [$d], $d",   &i, 1);
     jitc_add(jitc, "imul ecx");
     jitc_add(jitc, "idiv ecx");
-    jitc_add(jitc, "imul $d[ecx]", 12);
+    jitc_add(jitc, "imul $d[ecx]", 2);
     jitc_add(jitc, "imul ecx, [ecx]");
-    jitc_add(jitc, "dec $d[ecx]", 0xcaca);
+    jitc_add(jitc, "mov ecx,  $d", (char*)(&i)-12);
+    jitc_add(jitc, "dec $d[ecx]",  2);
+    jitc_add(jitc, "add ecx, $d", 12);
     jitc_add(jitc, "dec [ecx]");
     jitc_add(jitc, "dec ecx");
 
