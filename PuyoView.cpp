@@ -369,7 +369,14 @@ void PuyoView::renderNeutral()
 void PuyoView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex) {
     int x = neutralPuyo->getPuyoX();
     int y = neutralPuyo->getPuyoY();
-    ((AnimatedPuyo *)neutralPuyo)->addAnimation(new NeutralAnimation(*((AnimatedPuyo *)neutralPuyo), neutralIndex * 4));
+    AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
+    ((AnimatedPuyo *)neutralPuyo)->addAnimation(new NeutralAnimation(*((AnimatedPuyo *)neutralPuyo), neutralIndex * 4, synchronizer));
+    for (int i = y ; i < PUYODIMY ; i++) {
+        AnimatedPuyo *belowPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAt(x, i));
+        if (belowPuyo != NULL) {
+            belowPuyo->addAnimation(new SmoothBounceAnimation(*belowPuyo, synchronizer));
+        }
+    }
 }
 
 void PuyoView::companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise)

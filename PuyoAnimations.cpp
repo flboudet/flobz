@@ -58,7 +58,7 @@ bool Animation::isEnabled() const
 
 /* Neutral falling animation */
 IIM_Surface *NeutralAnimation::neutral = NULL;
-NeutralAnimation::NeutralAnimation(AnimatedPuyo &puyo, int delay) : PuyoAnimation(puyo)
+NeutralAnimation::NeutralAnimation(AnimatedPuyo &puyo, int delay, AnimationSynchronizer *synchronizer) : PuyoAnimation(puyo)
 {
     if (neutral == NULL)
         neutral = PuyoView::getSurfaceForState(PUYO_NEUTRAL);
@@ -68,6 +68,14 @@ NeutralAnimation::NeutralAnimation(AnimatedPuyo &puyo, int delay) : PuyoAnimatio
     step = 0;
     this->delay = delay;
     attachedPuyo.getAttachedView()->disallowCycle();
+    this->synchronizer = synchronizer;
+    synchronizer->incrementUsage();
+    synchronizer->push();
+}
+
+NeutralAnimation::~NeutralAnimation()
+{
+    synchronizer->decrementUsage();
 }
 
 void NeutralAnimation::cycle()
@@ -82,6 +90,7 @@ void NeutralAnimation::cycle()
             audio_sound_play(sound_bim[random() % 2]);
             finishedFlag = true;
             attachedPuyo.getAttachedView()->allowCycle();
+            synchronizer->pop();
         }
     }
 }
@@ -372,3 +381,53 @@ void VanishSoundAnimation::draw(int semiMove)
 {
     // do nothing
 }
+
+SmoothBounceAnimation::SmoothBounceAnimation(AnimatedPuyo &puyo, AnimationSynchronizer *synchronizer) : PuyoAnimation(puyo)
+{
+    bounceOffset = 0;
+    bouncePhase = 0;
+    this->synchronizer = synchronizer;
+    synchronizer->incrementUsage();
+    origX = attachedPuyo.getAttachedView()->getScreenCoordinateX(attachedPuyo.getPuyoX());
+    origY = attachedPuyo.getAttachedView()->getScreenCoordinateY(attachedPuyo.getPuyoY());
+    enabled = false;
+}
+
+SmoothBounceAnimation::~SmoothBounceAnimation()
+{
+    synchronizer->decrementUsage();
+}
+
+void SmoothBounceAnimation::cycle()
+{
+    if (synchronizer->isSynchronized()) {
+        enabled = true;
+        switch (bouncePhase) {
+            case 0:
+                bounceOffset++;
+                if (bounceOffset == 10)
+                    bouncePhase++;
+                    break;
+            case 1:
+                bounceOffset--;
+                if (bounceOffset == 0)
+                    bouncePhase++;
+                    break;
+            case 2:
+                finishedFlag = true;
+                break;
+        }
+    }
+}
+
+void SmoothBounceAnimation::draw(int semiMove)
+{
+    SDL_Rect drect;
+    IIM_Surface *puyoFace = PuyoView::getSurfaceForState(attachedPuyo.getPuyoState());
+    drect.x = origX;
+    drect.y = origY + bounceOffset;
+    drect.w = puyoFace->w;
+    drect.h = puyoFace->h;
+    painter.requestDraw(puyoFace, &drect);
+}
+

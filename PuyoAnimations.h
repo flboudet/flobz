@@ -72,7 +72,8 @@ private:
 /* Neutral falling animation */
 class NeutralAnimation : public PuyoAnimation {
   public:
-    NeutralAnimation(AnimatedPuyo &puyo, int delay);
+    NeutralAnimation(AnimatedPuyo &puyo, int delay, AnimationSynchronizer *synchronizer);
+    NeutralAnimation::~NeutralAnimation();
     void cycle();
     void draw(int semiMove);
   private:
@@ -80,6 +81,7 @@ class NeutralAnimation : public PuyoAnimation {
     int X, Y, currentY;
     float step;
     int delay;
+    AnimationSynchronizer *synchronizer;
 };
 
 /* Companion turning around main puyo animation */
@@ -139,6 +141,18 @@ private:
     int phase;
     int step;
     bool once;
+    AnimationSynchronizer *synchronizer;
+};
+
+class SmoothBounceAnimation : public PuyoAnimation {
+public:
+    SmoothBounceAnimation(AnimatedPuyo &puyo, AnimationSynchronizer *synchronizer);
+    virtual ~SmoothBounceAnimation();
+    void cycle();
+    void draw(int semiMove);
+private:
+    int bounceOffset, bouncePhase;
+    int origX, origY;
     AnimationSynchronizer *synchronizer;
 };
 
