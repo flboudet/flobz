@@ -29,9 +29,25 @@
 #include "gameui.h"
 #include "PuyoCommander.h"
 
+class PuyoHttpServerList {
+public:
+    PuyoHttpServerList(String hostName, String path, int portNum);
+    String getServerNameAtIndex(int index) const;
+    int getServerPortAtIndex(int index) const;
+    int getNumServer() const;
+private:
+    class PuyoHttpServer;
+    AdvancedBuffer<PuyoHttpServer *> servers;
+};
+
 class InternetGameMenu : public PuyoScreen {
-  public:
+public:
+    InternetGameMenu();
     void build();
+private:
+    PuyoHttpServerList servers;
+    HBox *serverSelectionPanel;
+    VBox *serverListPanel;
 };
 
 #endif // _PUYONETWORKMENU
