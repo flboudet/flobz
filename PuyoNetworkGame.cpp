@@ -34,6 +34,7 @@ PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBo
 {
     fakePuyo = attachedFactory->createPuyo(PUYO_FALLINGRED);
     msgBox.addListener(*this);
+    semiMove = 0;
 }
 
 void PuyoNetworkGame::onMessage(Message &message)
@@ -53,6 +54,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     points = message.getInt(SCORE);
     nextFalling = (PuyoState)(message.getInt(NEXT_F));
     nextCompanion = (PuyoState)(message.getInt(NEXT_C));
+    semiMove = message.getInt(SEMI_MOVE);
     
     Buffer<int> puyos = message.getIntArray(PUYOS);
     int i = 0;
@@ -190,6 +192,6 @@ int PuyoNetworkGame::getSamePuyoAround(int X, int Y, PuyoState color)
 
 int PuyoNetworkGame::getSemiMove() const
 {
-    return 0;
+    return semiMove;
 }
 

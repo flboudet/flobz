@@ -73,6 +73,7 @@ private:
     PuyoPuyo *fakePuyo;
     MessageBox &msgBox;
     IosVector puyoVector;
+    int semiMove;
 };
 
 
