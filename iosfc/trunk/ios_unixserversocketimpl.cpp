@@ -35,8 +35,11 @@
 #ifndef DONT_USE_CONFIG_H
 #include <config.h>
 #else
+#ifdef NO_SOCKLEN_T
 #define socklen_t int
 #endif
+#endif
+
 
 namespace ios_fc {
 
@@ -83,7 +86,7 @@ void UnixServerSocketImpl::createServerSocket()
     }
 }
 
-Socket *UnixServerSocketImpl::acceptClient()
+SocketImpl *UnixServerSocketImpl::acceptClientImpl()
 {
     int sd_client;
     if ((sd_client = accept(sd, (struct sockaddr *)  &pin, (socklen_t *)(&addrlen))) == -1) {
@@ -91,7 +94,7 @@ Socket *UnixServerSocketImpl::acceptClient()
     }
     UnixSocketImpl *newImpl = new UnixSocketImpl();
     newImpl->create(sd_client);
-    return new Socket(newImpl);
+    return newImpl;
 }
 
 ServerSocketImpl * UnixServerSocketFactory::createServerSocket()

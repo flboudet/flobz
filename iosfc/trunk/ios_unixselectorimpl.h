@@ -32,7 +32,7 @@ public:
     virtual int getFd() = 0;
 };
 
-class UnixSelectorImpl {
+class UnixSelectorImpl : public SelectorImpl {
 public:
     UnixSelectorImpl();
     virtual ~UnixSelectorImpl();
@@ -45,7 +45,7 @@ private:
     fd_set readfds;
 };
 
-class UnixSelectorFactory {
+class UnixSelectorFactory : public SelectorFactory {
 public:
     virtual SelectorImpl * createSelectorImpl();
 };

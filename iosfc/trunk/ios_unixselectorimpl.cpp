@@ -72,4 +72,14 @@ Buffer<Selectable *> UnixSelectorImpl::getSelected()
     return result;
 }
 
+SelectorImpl * UnixSelectorFactory::createSelectorImpl()
+{
+  return new UnixSelectorImpl();
+}
+
+UnixSelectorFactory unixSelectorFactory;
+
+SelectorFactory *Selector::factory = &unixSelectorFactory;
+
 };
+

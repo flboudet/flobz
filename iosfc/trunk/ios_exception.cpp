@@ -5,7 +5,8 @@
  * GNU General Public Licence
  */
 
-#include "ios_fc.h"
+#include "ios_memory.h"
+#include "ios_exception.h"
 
 #include <cstdlib>
 #include <cstring>

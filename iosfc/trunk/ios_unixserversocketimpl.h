@@ -38,7 +38,7 @@ public:
     UnixServerSocketImpl();
     virtual ~UnixServerSocketImpl();
     void create(int port);
-    Socket *acceptClient();
+    SocketImpl *acceptClientImpl();
     SelectableImpl *getSelectableImpl() { return this; }
     int getFd() { return sd; }
 private:

@@ -31,7 +31,7 @@ class ServerSocketImpl {
 public:
     virtual ~ServerSocketImpl() {}
     virtual void create(int portID) = 0;
-    virtual Socket *acceptClient() = 0;
+    virtual SocketImpl *acceptClientImpl() = 0;
     virtual SelectableImpl *getSelectableImpl() = 0;
 };
 
@@ -39,12 +39,20 @@ class ServerSocketFactory {
 public:
     virtual ServerSocketImpl * createServerSocket() = 0;
 };
-    
+
+
+
 class ServerSocket : public Selectable {
 public:
     ServerSocket(int portID);
     virtual ~ServerSocket();
     Socket *acceptClient();
+    
+    class AcceptedClientFactory {
+    public:
+        virtual Socket *createSocket(SocketImpl *impl) = 0;
+    };
+    Socket *acceptClient(AcceptedClientFactory &acFactory);
     
     // Selectable implementation
     SelectableImpl *getSelectableImpl() const;

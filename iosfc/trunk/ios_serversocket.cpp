@@ -26,7 +26,7 @@ namespace ios_fc {
 class DefaultServerSocketImpl : public ServerSocketImpl {
 public:
     void create(int portID) {}
-    Socket *acceptClient() { throwError(); }
+    SocketImpl *acceptClientImpl() { throwError(); }
     SelectableImpl *getSelectableImpl() { return NULL; }
 private:
     void throwError() { throw Exception("Invalid socket, no socket backend set"); }
@@ -58,7 +58,12 @@ ServerSocket::~ServerSocket()
 }
 
 Socket *ServerSocket::acceptClient() {
-    return impl->acceptClient();
+    return new Socket(impl->acceptClientImpl());
+}
+
+Socket *ServerSocket::acceptClient(AcceptedClientFactory &acFactory)
+{
+    return acFactory.createSocket(impl->acceptClientImpl());
 }
 
 SelectableImpl *ServerSocket::getSelectableImpl() const
