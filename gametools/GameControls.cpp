@@ -25,6 +25,7 @@ void getKeyName(int gameEvent, char *keyName)
 
 void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
 {
+  result->sdl_event   = e;
   result->gameEvent   = GameControlEvent::kGameNone;
   result->cursorEvent = GameControlEvent::kCursorNone;
   result->isUp = true;

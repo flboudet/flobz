@@ -32,6 +32,7 @@ typedef struct GameControlEvent {
         kCursorLastKey
     } cursorEvent;
     bool isUp;
+    SDL_Event sdl_event;
 } GameControlEvent;
 
 
