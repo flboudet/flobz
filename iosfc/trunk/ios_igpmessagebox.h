@@ -42,6 +42,7 @@ public:
     void onMessage(VoidBuffer message, int origIdent, int destIdent);
     void bind(int igpIdent) { destIdent = igpIdent; }
     void bind(PeerAddress addr); // a revoir
+    int getBound() const { return destIdent; }
  private:
     IGPClient igpClient;
     int sendSerialID;
