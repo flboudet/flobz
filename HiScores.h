@@ -1,6 +1,6 @@
 #define kHiScoresNumber 10
 
-#define kHiScoreNameLenght 10
+#define kHiScoreNameLenght 256
 
 typedef struct hiscore {
   char name[kHiScoreNameLenght+1];

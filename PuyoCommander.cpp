@@ -730,7 +730,7 @@ mml_fin:
   
 void PuyoCommander::updateHighScoresMenu()
 {
-  hiscore *scores = getHiscores();
+  hiscore *scores = getHiscores(AI_NAMES);
   char tmp[256];
 #define PAS_DE_COMMENTAIRES(X,kXX) \
   sprintf(tmp, "%06d   %10s", scores[X].score, scores[X].name); \
