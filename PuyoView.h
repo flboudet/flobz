@@ -84,6 +84,7 @@ class PuyoStarter : public PuyoDrawable {
     int score2;
     bool stopRendering;
     bool paused;
+    int gameSpeed;
 
     void stopRender();
     void restartRender();

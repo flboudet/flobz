@@ -15,6 +15,8 @@ SDL_Surface *bigNeutral;
 SDL_Surface *shrinkingPuyo[5][5];
 SDL_Surface *explodingPuyo[5][5];
 SDL_Surface *grid;
+SDL_Surface *speedImg;
+SDL_Surface *speedBlackImg;
 SDL_Surface *puyoEyes;
 SDL_Surface *puyoEye[3];
 SDL_Surface *puyoEyesSwirl[4];
@@ -29,6 +31,7 @@ static char *AI_NAMES[] = { "Fanzy", "Bob the Killer", "Big Rabbit", "Flying Sau
   "Satanas", "Doctor X", "Tanya", "Master Gyom, King of the Puyos",
   "X","Y","Z" };
 
+#define GAME_ACCEL 500
 
 static char PuyoGroupImageIndex[2][2][2][2] =
 { {  // empty bottom
@@ -721,6 +724,8 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
 		fallingYellow  = iim_surface_shift_hue(fallingViolet, 140.0f);
 		neutral       = IMG_Load_DisplayFormatAlpha("Neutral.png");
 		bigNeutral    = IMG_Load_DisplayFormatAlpha("BigNeutral.png");
+    speedImg      = IMG_Load_DisplayFormatAlpha("speed.png");
+    speedBlackImg = IMG_Load_DisplayFormatAlpha("speed_black.png");
 		
                 puyoCircle[0] = IMG_Load_DisplayFormatAlpha("circle.png");
 		for (int i = 1 ; i < 32 ; i++) puyoCircle[i] = iim_surface_shift_hue(puyoCircle[i-1],11.25f);
@@ -814,7 +819,7 @@ PuyoStarter::~PuyoStarter()
 }
 
 
-#define FPKEY_REPEAT        8
+#define FPKEY_REPEAT        6
 #define FPKEY_DELAY         5
 
 #define FPKEY_keyNumber     10
@@ -843,7 +848,9 @@ void PuyoStarter::run(int score1, int score2, int lives)
 	int quit = 0;
 	SDL_EnableUNICODE(1);
 	int keysDown[FPKEY_keyNumber] = {0,0,0,0,0,0,0,0,0,0};
-	
+
+  gameSpeed = 20;
+  
 	if (!randomPlayer) {
 		int sc1=score1,sc2=score2;
 		while ((sc1>0)&&(sc2>0)) { sc1--; sc2--; }
@@ -998,16 +1005,12 @@ void PuyoStarter::run(int score1, int score2, int lives)
                 attachedGameA->cycle();
                 if (attachedGameA->isEndOfCycle()) {
                   keysDown[FPKEY_P1_Down] = 0;
-                  keysDown[FPKEY_P1_Left] = 0;
-                  keysDown[FPKEY_P1_Right] = 0;
                   keysDown[FPKEY_P1_TurnLeft] = 0;
                   keysDown[FPKEY_P1_TurnRight] = 0;
                 }
                 attachedGameB->cycle();
                 if (attachedGameB->isEndOfCycle()) {
                   keysDown[FPKEY_P2_Down] = 0;
-                  keysDown[FPKEY_P2_Left] = 0;
-                  keysDown[FPKEY_P2_Right] = 0;
                   keysDown[FPKEY_P2_TurnLeft] = 0;
                   keysDown[FPKEY_P2_TurnRight] = 0;
                 }
@@ -1019,13 +1022,9 @@ void PuyoStarter::run(int score1, int score2, int lives)
                 }
                 if (keysDown[FPKEY_P2_Left]) {
                   repeatCondition(FPKEY_P2_Left) attachedGameB->moveLeft();
-                  if (attachedGameB->isEndOfCycle())
-                    keysDown[FPKEY_P2_Left] = 0;
                 }
                 if (keysDown[FPKEY_P2_Right]) {
                   repeatCondition(FPKEY_P2_Right) attachedGameB->moveRight();
-                  if (attachedGameB->isEndOfCycle())
-                    keysDown[FPKEY_P2_Right] = 0;
                 }
                 if (keysDown[FPKEY_P2_TurnLeft]) {
                   repeatCondition(FPKEY_P2_TurnLeft) attachedGameB->rotateLeft();
@@ -1201,10 +1200,16 @@ void PuyoStarter::run(int score1, int score2, int lives)
 			event.user.type = SDL_USEREVENT;
 			event.user.code = 0;
 			SDL_PushEvent(&event);
-			if (tickCounts % 20 == 0) { // Vitesse du jeu
+			if (tickCounts % gameSpeed == 0) { // Vitesse du jeu
 				event.user.type = SDL_USEREVENT;
 				event.user.code = 1;
 				SDL_PushEvent(&event);
+        if (!paused) {
+          if ((tickCounts > GAME_ACCEL) && (gameSpeed > 1)) {
+            tickCounts = 0;
+            gameSpeed--;
+          }
+        }
 			}
 		}
 		
@@ -1277,6 +1282,36 @@ void PuyoStarter::draw()
     SoFont_CenteredString_XY (font, display,
                               130, 460,   AI_NAMES[score2], NULL);
   }
+
+  int gameSpeedCpy = gameSpeed;
+  if (gameSpeed == 1) gameSpeedCpy = 0;
+  
+  SDL_Rect speedRect;
+  speedRect.x = 0;
+  speedRect.w = speedImg->w;
+  speedRect.h = (20 - gameSpeedCpy) * 6;
+  speedRect.y = speedImg->h - speedRect.h;
+
+  SDL_Rect drect;
+  drect.x = 320 - speedRect.w / 2;
+  drect.y = 170 - speedRect.h;
+  drect.w = speedRect.w;
+  drect.h = speedRect.h;
+
+  SDL_Rect speedBlackRect = speedRect;
+  SDL_Rect drectBlack     = drect;
+  
+  speedBlackRect.h = speedImg->h - speedRect.h;
+  speedBlackRect.y = 0;
+  drectBlack.y = 50;
+  drectBlack.h = speedBlackRect.h;
+  
+  SDL_BlitSurface(speedBlackImg,&speedBlackRect,display,&drectBlack);
+  if (stopRendering)
+    SDL_BlitSurface(speedBlackImg,&speedRect,display,&drect);
+  else
+    SDL_BlitSurface(speedImg,&speedRect,display,&drect);
+  
   sprintf(text, "<< %d", attachedGameA->getPoints());
   SoFont_CenteredString_XY (commander->smallFont, display,
                             300, 380,   text, NULL);

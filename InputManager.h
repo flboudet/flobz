@@ -4,7 +4,7 @@
 #include <SDL/SDL.h>
 #include <string.h>
 
-const int JOYSTICK_THRESHOLD = 15000;
+const int JOYSTICK_THRESHOLD = 25000;
 
 class InputSwitch
 {
