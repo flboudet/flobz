@@ -17,7 +17,8 @@ OBJFILES= HiScores.o PuyoCommander.o        \
           PuyoDoomMelt.o corona32.o corona.o corona_palette.o\
           PuyoStarter.o PuyoSinglePlayerStarter.o PuyoTwoPlayerStarter.o     \
           PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o \
-          AnimatedPuyoTheme.o PuyoNetworkMenu.o PuyoNetGameCenter.o PuyoInternetGameCenter.o
+          AnimatedPuyoTheme.o PuyoNetworkMenu.o PuyoNetCenterMenu.o \
+          PuyoNetGameCenter.o PuyoInternetGameCenter.o
 
 DEPDIR = .deps
 df = $(DEPDIR)/$(*F)

@@ -34,12 +34,14 @@ using namespace ios_fc;
 class PuyoNetGameCenterListener {
 public:
     virtual void onChatMessage(const String &msgAuthor, const String &msg) = 0;
+    virtual void onPlayerConnect(int playerIndex) = 0;
 };
 
 class PuyoNetGameCenter {
 public:
     virtual void sendMessage(const String msgText) = 0;
     virtual void idle() = 0;
+    String getPeerNameAtIndex(int i) const;
     void addListener(PuyoNetGameCenterListener *r) { listeners.add(r); }
     void removeListener(PuyoNetGameCenterListener *r) { listeners.remove(r); }
     void connectPeer(PeerAddress addr, const String name);

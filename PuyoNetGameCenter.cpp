@@ -43,6 +43,9 @@ void PuyoNetGameCenter::connectPeer(PeerAddress addr, const String name)
             return;
     }
     peers.add(new GamerPeer(name, addr));
+    for (int i = 0, j = listeners.size() ; i < j ; i++) {
+        listeners[i]->onPlayerConnect(peers.size() - 1);
+    }
 }
 
 void PuyoNetGameCenter::disconnectPeer(PeerAddress addr, const String name)
@@ -58,3 +61,7 @@ void PuyoNetGameCenter::disconnectPeer(PeerAddress addr, const String name)
     }
 }
 
+String PuyoNetGameCenter::getPeerNameAtIndex(int i) const
+{
+    return peers[i]->name;
+}

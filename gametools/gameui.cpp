@@ -137,7 +137,7 @@ namespace gameui {
   void Box::arrangeWidgets()
   {
     if (getNumberOfChilds() == 0) return;
-
+    requestDraw();
     switch (policy)
     {
       case USE_MAX_SIZE:
@@ -365,6 +365,7 @@ namespace gameui {
   void Text::setValue(String value)
   {
     label = value;
+    requestDraw();
     setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
     if (parent)
       parent->arrangeWidgets();
