@@ -45,7 +45,7 @@ private:
 };
 
 
-UDPMessageBox::UDPMessageBox(char *address, int localPort, int remotePort) : socket(address, localPort, remotePort)
+UDPMessageBox::UDPMessageBox(const String address, int localPort, int remotePort) : socket(address, localPort, remotePort)
 {
     sendSerialID = 0;
     receiveSerialID = 0;

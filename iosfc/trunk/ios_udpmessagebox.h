@@ -33,7 +33,7 @@ class UDPRawMessage;
 
 class UDPMessageBox : public MessageBox {
 public:
-    UDPMessageBox(char *address, int localPort, int remotePort);
+    UDPMessageBox(String address, int localPort, int remotePort);
     virtual ~UDPMessageBox() {}
     void idle();
     Message * createMessage();
