@@ -41,7 +41,7 @@ public:
     void removeCurrentAnimation();
     void cycleAnimation();
     void render(SDL_Painter &painter, PuyoView *attachedView);
-    
+    bool isRenderingAnimation() const;
 private:
     IosVector animationQueue;
     int puyoEyeState;

@@ -36,11 +36,13 @@
 class PuyoAnimation {
   public:
     PuyoAnimation();
-    bool isFinished();
+    bool isFinished() const;
+    bool isEnabled() const;
     virtual void cycle() = 0;
     virtual void draw(int semiMove) = 0;
   protected:
     bool finishedFlag;
+    bool enabled;
 };
 
 /* Animation synchronization helper */

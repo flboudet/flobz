@@ -72,6 +72,16 @@ void AnimatedPuyo::cycleAnimation()
     }
 }
 
+bool AnimatedPuyo::isRenderingAnimation() const
+{
+    PuyoAnimation *animation = getCurrentAnimation();
+    if (animation == NULL)
+        return false;
+    if (animation->isFinished())
+        return false;
+    return animation->isEnabled();
+}
+
 void AnimatedPuyo::render(SDL_Painter &painter, PuyoView *attachedView)
 {
     static unsigned int smallTicksCount = 0;
@@ -87,7 +97,7 @@ void AnimatedPuyo::render(SDL_Painter &painter, PuyoView *attachedView)
     int i = this->getPuyoX();
     int j = this->getPuyoY();
     PuyoAnimation *animation = getCurrentAnimation();
-    if ((animation == NULL) || (animation->isFinished())) {
+    if (!isRenderingAnimation()) {
         IIM_Surface *currentSurface = attachedView->getSurfaceForPuyo(this);
         if (currentSurface != NULL) {
             drect.x = (i*TSIZE) + attachedView->xOffset;
