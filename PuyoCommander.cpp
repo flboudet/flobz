@@ -110,6 +110,7 @@ void PuyoCommander::run()
 
 void PuyoCommander::initMenus()
 {
+  DBG_PRINT("initMenus()\n");
   menuBG = IIM_Load_DisplayFormat("MenuBackground.jpg");
   // 
   // Create the structures.

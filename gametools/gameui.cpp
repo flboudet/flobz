@@ -22,7 +22,7 @@ namespace gameui {
 
   void Widget::draw(SDL_Surface *screen, bool force) const
   {
-    if ((force || drawRequested()) && !hidden)
+    if (/*(force || drawRequested()) && */ !hidden)
       draw(screen);
   }
   

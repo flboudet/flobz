@@ -1,4 +1,4 @@
-ENABLE_AUDIO=true
+ENABLE_AUDIO=false
 ENABLE_OPENGL=false
 ENABLE_DGA=false
 
@@ -94,8 +94,8 @@ endif
 endif
 
 ifeq ($(DEBUG_MODE), true)
-CFLAGS:=$(CFLAGS) -g
-LDFLAGS:=$(LDFLAGS) -g
+CFLAGS:=$(CFLAGS) -g -O0
+LDFLAGS:=$(LDFLAGS) -g -O0
 endif
 
 ifeq ($(MORE_DEBUG), true)
