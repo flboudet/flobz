@@ -7,6 +7,7 @@
 
 ENABLE_AUDIO=true
 ENABLE_OPENGL=false
+ENABLE_DGA=false
 
 DEBUG_MODE=false
 
@@ -89,6 +90,12 @@ CFLAGS:=$(CFLAGS) -DHAVE_OPENGL=1
 OBJFILES:=$(OBJFILES) glSDL.o
 ifeq ($(PLATFORM), Linux)
 LDFLAGS:=$(LDFLAGS) -lGL
+endif
+endif
+
+ifeq ($(ENABLE_DGA), true)
+ifeq ($(PLATFORM), Linux)
+CFLAGS:=$(CFLAGS) -DUSE_DGA=1
 endif
 endif
 
