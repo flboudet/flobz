@@ -107,7 +107,7 @@ namespace ios_fc {
             /**
              * Build a VoidBuffer by duplicating an existing one.
              *
-             * @param buf Buffer to duplicate.
+             * @param buf VoidBuffer to duplicate.
              */
             inline VoidBuffer (const VoidBuffer &buf)
                 : offset(0)
@@ -149,7 +149,7 @@ namespace ios_fc {
             /**
              * Gives a copy of a VoidBuffer, duplicating the datas.
              *
-             * @param vb Buffer to duplicate.
+             * @param vb VoidBuffer to duplicate.
              */
 			inline const VoidBuffer &operator= (const VoidBuffer &vb) {
                 unregPtr();
@@ -261,6 +261,7 @@ namespace ios_fc {
 
 	// DO NOT STORE OBJECT IN BUFFER, just pointers or primitive types.
 
+    /// Simulate a (T*) buffer using VoidBuffer.
     template <typename T> class Buffer : public VoidBuffer {
 
         public:
@@ -315,6 +316,12 @@ namespace ios_fc {
                 Buffer<T> buf(*this);
                 buf += offset;
                 return buf;
+            }
+
+            inline void concat(const Buffer<T> &buf) const {
+                int ssize = size();
+                grow(buf.size());
+                Memory::memcpy(ptr() + ssize, buf.ptr(), buf.size());
             }
 
 #ifdef DEBUG_MEMORY
