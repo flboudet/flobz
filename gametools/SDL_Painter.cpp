@@ -1,11 +1,14 @@
 #include "SDL_Painter.h"
+#include <stdlib.h>
+
+// #define DEBUG
 
 SDL_Painter::SDL_Painter(SDL_Surface *gameScreen, SDL_Surface *bg)
   : gameScreen(gameScreen), backGround(bg), nbElts(0), nbPrev(0) {}
 
 void SDL_Painter::requestDraw(SDL_Surface *surf, SDL_Rect *where)
 {
-#if DEBUG
+#ifdef DEBUG
   if (nbElts >= MAX_PAINT_ELTS) {
     fprintf(stderr, "To much elements given to SDL_Painter...\n");
     exit(1);
@@ -36,42 +39,52 @@ static inline bool isEqual(const SDL_Rect &r1, const SDL_Rect &r2)
 
 static inline bool isInside(const SDL_Rect &r1, const SDL_Rect &r2)
 {
-  return (r1.x > r2.x) && (r1.x + r1.w < r2.x + r2.w)
-      && (r1.y > r2.y) && (r1.y + r1.h < r2.y + r2.h);
+  return (r1.x >= r2.x) && (r1.x + r1.w <= r2.x + r2.w)
+      && (r1.y >= r2.y) && (r1.y + r1.h <= r2.y + r2.h);
 }
 
 static inline int addRectToList(SDL_Rect rectList[MAX_PAINT_ELTS], int nbRect, const SDL_Rect &rect)
 {
-	for (int r=0; r<nbRect; ++r)
+  if ((rect.w <= 0) || (rect.h <= 0)) return nbRect;
+  for (int r=0; r<nbRect; ++r)
   {
     // rectangle deja contenu dans un autre...
     if (isInside(rect, rectList[r]) || isEqual(rect, rectList[r]))
       return nbRect;
+    // rectangle en contenant d'autre
     if (isInside(rectList[r], rect)) {
-      rectList[r] = rect;
-      return nbRect;
+      rectList[r] = rectList[nbRect-1];
+      return addRectToList(rectList, nbRect-1, rect);
     }
     // rectangle colle a un autre: on etend l'autre.
-    if ((rect.y == rectList[r].y) && (rect.h == rectList[r].h)) { // voisin horizontal
-      if (rect.x == rectList[r].x + rectList[r].w) {
-        rectList[r].w += rect.w;
-        return nbRect;
+    // voisin horizontal
+    if ((rect.y == rectList[r].y) && (rect.h == rectList[r].h)) {
+      if ((rect.x >= rectList[r].x) && (rect.x <= rectList[r].x + rectList[r].w)) {
+        SDL_Rect newRect = rectList[r];
+        newRect.w = rect.w + rect.x - rectList[r].x;
+        rectList[r] = rectList[nbRect-1];
+        return addRectToList(rectList, nbRect-1, newRect);
       }
-      if (rectList[r].x == rect.x + rect.w) {
-        rectList[r].x = rect.x;
-        rectList[r].w += rect.w;
-        return nbRect;
+      if ((rectList[r].x >= rect.x) && (rectList[r].x <= rect.x + rect.w)) {
+        SDL_Rect newRect = rect;
+        newRect.w = rectList[r].w + rectList[r].x - rect.x;
+        rectList[r] = rectList[nbRect-1];
+        return addRectToList(rectList, nbRect-1, newRect);
       }
     }
-    if ((rect.x == rectList[r].x) && (rect.w == rectList[r].w)) { // voisin vertical
-      if (rect.y == rectList[r].y + rectList[r].h) {
-        rectList[r].h += rect.h;
-        return nbRect;
+    // voisin vertical
+    if ((rect.x == rectList[r].x) && (rect.w == rectList[r].w)) {
+      if ((rect.y >= rectList[r].y) && (rect.y <= rectList[r].y + rectList[r].h)) {
+        SDL_Rect newRect = rectList[r];
+        newRect.h = rect.h + rect.y - rectList[r].y;
+        rectList[r] = rectList[nbRect-1];
+        return addRectToList(rectList, nbRect-1, newRect);
       }
-      if (rectList[r].y == rect.y + rect.h) {
-        rectList[r].y = rect.y;
-        rectList[r].h += rect.h;
-        return nbRect;
+      if ((rectList[r].y >= rect.y) && (rectList[r].y <= rect.y + rect.h)) {
+        SDL_Rect newRect = rect;
+        newRect.h = rectList[r].h + rectList[r].y - rect.y;
+        rectList[r] = rectList[nbRect-1];
+        return addRectToList(rectList, nbRect-1, newRect);
       }
     }
   }
@@ -113,6 +126,37 @@ void SDL_Painter::draw(SDL_Surface *surf)
   // Pour chaque rectangle
   // Chercher les elements de la liste actuelle qui intersectent
   //  (note: j'assume que SDL fait ca aussi bien que nous)
+#ifdef DEBUG
+
+  SDL_SetClipRect(surf, NULL);
+  SDL_BlitSurface(backGround, NULL, surf, NULL);
+
+  // Draw everything.
+  for (int i=0; i<nbElts; ++i) {
+    SDL_Rect copy = onScreenElts[i].rect;
+    SDL_BlitSurface(onScreenElts[i].surf, NULL,
+        surf, &copy);
+  }
+
+  for (int r=0; r<nbRects; ++r) {
+    SDL_Rect over1 = rectToUpdate[r];
+    SDL_Rect over2 = over1;
+    SDL_Rect over3 = over2;
+    SDL_Rect over4 = over3;
+    over1.h = 1;
+    over2.w = 1;
+    over3.y += over3.h;
+    over3.h = 1;
+    over4.x += over4.w;
+    over4.w = 1;
+    SDL_FillRect(surf,&over1,0xffffffff);
+    SDL_FillRect(surf,&over2,0xffffffff);
+    SDL_FillRect(surf,&over3,0xffffffff);
+    SDL_FillRect(surf,&over4,0xffffffff);
+  }    
+
+#else
+
   for (int r=0; r<nbRects; ++r) {
     SDL_SetClipRect(surf, &rectToUpdate[r]);
     SDL_BlitSurface(backGround, &rectToUpdate[r], surf, &rectToUpdate[r]);
@@ -123,6 +167,7 @@ void SDL_Painter::draw(SDL_Surface *surf)
                       surf, &rect);
     }
   }
+#endif
 
   // Draw what is necessary...
   storeScreenContent(surf);
