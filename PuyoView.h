@@ -54,6 +54,7 @@ class PuyoView : public virtual PuyoDelegate {
     void render();
     void renderNeutral();
     void cycleAnimation();
+    void cycleGame();
     void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex);
     void gameDidEndCycle();
     void companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise);

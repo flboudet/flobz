@@ -211,9 +211,16 @@ void PuyoView::cycleAnimation()
     }
     
     if (attachedGame->isEndOfCycle()) {
-        while (attachedGame->isEndOfCycle() && cycleAllowed()) {
+        while (attachedGame->isEndOfCycle() && attachedGame->isGameRunning() && cycleAllowed()) {
             attachedGame->cycle();
         }
+    }
+}
+
+void PuyoView::cycleGame()
+{
+    if (!attachedGame->isEndOfCycle()) {
+        attachedGame->cycle();
     }
 }
 
@@ -750,16 +757,15 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
                   keysDown[FPKEY_P1_TurnLeft] = 0;
                   keysDown[FPKEY_P1_TurnRight] = 0;
                 }
-                else
-                    attachedGameA->cycle(); // a voir
+                
+                areaA->cycleGame(); // a voir
                   
                 if (attachedGameB->isEndOfCycle()) {
                   keysDown[FPKEY_P2_Down] = 0;
                   keysDown[FPKEY_P2_TurnLeft] = 0;
                   keysDown[FPKEY_P2_TurnRight] = 0;
                 }
-                else
-                  attachedGameB->cycle(); // a voir
+                areaB->cycleGame(); // a voir
 
                 switch (gameLevel)
                 {
@@ -798,7 +804,7 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
                   if (attachedGameB->isEndOfCycle())
                     keysDown[FPKEY_P2_Down] = 0;
                   else
-                    attachedGameB->cycle(); // a voir
+                    areaB->cycleGame(); // a voir
                 }
                 if (keysDown[FPKEY_P2_Left]) {
                   repeatCondition(FPKEY_P2_Left) attachedGameB->moveLeft();
@@ -821,7 +827,7 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
                   if (attachedGameA->isEndOfCycle())
                     keysDown[FPKEY_P1_Down] = 0;
                   else
-                    attachedGameA->cycle(); // a voir
+                    areaA->cycleGame(); // a voir
                 }
                 if (keysDown[FPKEY_P1_Left]) {
                   repeatCondition(FPKEY_P1_Left) attachedGameA->moveLeft();
