@@ -106,7 +106,8 @@ void UDPMessageBox::idle()
             }
         }
         catch (UDPMessage::InvalidMessageException e) {
-            printf("Message dropped\n");
+            receiveBuffer[2047] = 0;
+            printf("Message dropped : %s\n", receiveBuffer);
             // Do nothing
         }
     } while (bufferSize != 0);
