@@ -80,13 +80,13 @@ void UDPMessageBox::idle()
         Datagram receivedDatagram = socket.receive(receiveBuffer);
         try {
             if (receivedDatagram.getSize() > 0) {
-                UDPMessage incomingMessage(Buffer<char>((char *)(receivedDatagram.getMessage()), receivedDatagram.getSize()), *this);
+                UDPMessage incomingMessage(Buffer<char>((char *)(receivedDatagram.getMessage()), receivedDatagram.getSize()), *this, receivedDatagram.getAddress(), receivedDatagram.getPortNum());
                 
                 int messageSerialID = incomingMessage.getSerialID();
                 
                 // We should acknowledge every reliable message
                 if (incomingMessage.isReliable()) {
-                    UDPMessage acknowledgeMessage(-messageSerialID, *this);
+                    UDPMessage acknowledgeMessage(-messageSerialID, *this, receivedDatagram.getAddress(), receivedDatagram.getPortNum());
                     acknowledgeMessage.send();
                 }
                 
@@ -155,7 +155,8 @@ void UDPMessageBox::sendQueue()
 Message * UDPMessageBox::createMessage()
 {
     UDPMessage *newMessage;
-    newMessage = new UDPMessage(++sendSerialID, *this);
+    newMessage = new UDPMessage(++sendSerialID, *this,
+				defaultAddress, defaultPort);
     return newMessage;
 }
 

@@ -6,11 +6,11 @@
 #include "ios_dirigeable.h"
 
 namespace ios_fc {
-    
+
     class UDPMessage : public StandardMessage, public Dirigeable {
     public:
-        UDPMessage(int serialID, UDPMessageBox &owner);
-        UDPMessage(const Buffer<char> serialized, UDPMessageBox &owner) throw(InvalidMessageException);
+        UDPMessage(int serialID, UDPMessageBox &owner, SocketAddress address, int port);
+        UDPMessage(const Buffer<char> serialized, UDPMessageBox &owner, SocketAddress address, int port) throw(InvalidMessageException);
         virtual ~UDPMessage();
         void sendBuffer(Buffer<char> out) const;
         // Dirigeable implementation
@@ -18,7 +18,9 @@ namespace ios_fc {
         PeerAddress getBroadcastAddress();
         void setPeerAddress(PeerAddress);
     private:
+	class UDPPeerAddressImpl;
         UDPMessageBox &owner;
+        PeerAddress peerAddress;
     };
     
 };

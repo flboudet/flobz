@@ -4,12 +4,18 @@
 
 namespace ios_fc {
 
-class UDPPeerAddress : public PeerAddress {
+class UDPMessage::UDPPeerAddressImpl : public PeerAddressImpl {
 public:
+    UDPPeerAddressImpl(SocketAddress address, int port)
+      : address(address), port(port) {}
+private:
+    SocketAddress address;
+    int port;
 };
 
-UDPMessage::UDPMessage(int serialID, UDPMessageBox &owner)
-    : StandardMessage(serialID), owner(owner)
+UDPMessage::UDPMessage(int serialID, UDPMessageBox &owner, SocketAddress address, int port)
+    : StandardMessage(serialID), owner(owner),
+      peerAddress(new UDPPeerAddressImpl(address, port))
 {
 }
 
@@ -22,24 +28,25 @@ void UDPMessage::sendBuffer(Buffer<char> out) const
     owner.sendUDP(out, getSerialID(), isReliable());
 }
 
-UDPMessage::UDPMessage(const Buffer<char> raw, UDPMessageBox &owner)  throw(InvalidMessageException)
-: StandardMessage(raw), owner(owner)
+UDPMessage::UDPMessage(const Buffer<char> raw, UDPMessageBox &owner, SocketAddress address, int port)  throw(InvalidMessageException)
+: StandardMessage(raw), owner(owner),
+  peerAddress(new UDPPeerAddressImpl(address, port))
 {
 }
 
 PeerAddress UDPMessage::getPeerAddress()
 {
-    UDPPeerAddress toto;
-    return toto;
+    return peerAddress;
 }
 
 PeerAddress UDPMessage::getBroadcastAddress()
 {
-    return UDPPeerAddress();
+    return peerAddress;
 }
 
-void UDPMessage::setPeerAddress(PeerAddress)
+void UDPMessage::setPeerAddress(PeerAddress newPeerAddress)
 {
+    peerAddress = newPeerAddress;
 }
 
 };

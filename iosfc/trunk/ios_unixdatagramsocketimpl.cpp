@@ -28,6 +28,10 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 
+#ifdef NO_SOCKLEN_T
+#define socklen_t int
+#endif
+
 namespace ios_fc {
 
 
@@ -68,7 +72,7 @@ void UnixDatagramSocketImpl::send(Datagram &sendDatagram)
 Datagram UnixDatagramSocketImpl::receive(VoidBuffer buffer)
 {
     struct sockaddr_in resultAddress;
-    int fromlen = sizeof(resultAddress);
+    socklen_t fromlen = sizeof(resultAddress);
     
     int res = recvfrom(socketFd, buffer.ptr(), buffer.size(), 0, (struct sockaddr *) &resultAddress, &fromlen);
     if (res == -1)
