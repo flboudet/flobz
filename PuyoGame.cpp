@@ -79,11 +79,24 @@ void *PuyoPuyo::getAttachedObject()
 }
 
 
+PuyoGame::PuyoGame(PuyoRandomSystem *attachedRandom,
+		   PuyoFactory *attachedFactory)
+{
+  this->attachedFactory = attachedFactory;
+  InitGame(attachedRandom);
+}
+
 PuyoGame::PuyoGame(PuyoRandomSystem *attachedRandom)
+{
+  attachedFactory = new PuyoDefaultFactory();
+  InitGame(attachedRandom);
+}
+
+void PuyoGame::InitGame(PuyoRandomSystem *attachedRandom)
 {
   nbFalled = 0;
 	int i, j;
-    unmoveablePuyo = new PuyoPuyo(PUYO_UNMOVEABLE);
+    unmoveablePuyo = attachedFactory->createPuyo(PUYO_UNMOVEABLE);
 	for (i = 0 ; i < PUYODIMX ; i++) {
 		for (j = 0 ; j <= PUYODIMY ; j++) {
 			if (j == PUYODIMY)
@@ -134,7 +147,9 @@ void PuyoGame::cycle()
 		setPuyoAt(getFallingCompanionX(), getFallY(getFallingCompanionX(), getFallingCompanionY()), companionPuyo);
         companionPuyo->setPuyoState((PuyoState)(companionPuyo->getPuyoState()+PUYO_STILL));
         if (delegate != NULL) {
+            fprintf(stderr, "Notification fall pour le puyo %x ligne %d\n", fallingPuyo, __LINE__);
             delegate->puyoDidFall(fallingPuyo, fallingX, fallingY);
+            fprintf(stderr, "Notification fall pour le puyo %x ligne %d\n", companionPuyo, __LINE__);
             delegate->puyoDidFall(companionPuyo, getFallingCompanionX(), getFallingCompanionY());
             fallingY = -10;
             notifyReductions();
@@ -324,7 +339,7 @@ void PuyoGame::dropNeutrals()
         if (getPuyoCellAt(posX, posY) != PUYO_EMPTY)
             continue;
         // Creating a new neutral puyo
-        PuyoPuyo *newNeutral = new PuyoPuyo(PUYO_NEUTRAL);
+        PuyoPuyo *newNeutral = attachedFactory->createPuyo(PUYO_NEUTRAL);
         puyoVector.addElement(newNeutral);
         setPuyoAt(posX, posY, newNeutral);
         if (delegate != NULL)
@@ -353,8 +368,8 @@ void PuyoGame::setFallingAtTop(bool gameConstruction)
   fallingX = (PUYODIMX-1)/2;
   fallingY = 1;
   fallingCompanion = 2;
-  fallingPuyo = new PuyoPuyo(attachedRandom->getPuyoForSequence(sequenceNr++));
-  companionPuyo = new PuyoPuyo(attachedRandom->getPuyoForSequence(sequenceNr++));
+  fallingPuyo = attachedFactory->createPuyo(attachedRandom->getPuyoForSequence(sequenceNr++));
+  companionPuyo = attachedFactory->createPuyo(attachedRandom->getPuyoForSequence(sequenceNr++));
   fallingPuyo->setPuyoXY(fallingX, fallingY);
   companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
   puyoVector.addElement(fallingPuyo);
@@ -561,8 +576,9 @@ int PuyoGame::removePuyos()
 			}
 		}
 	}
-
+    
 	/* Next we make the other puyos fall */
+#ifdef AVIRER
 	int fallPuyo;
 	do {
 		fallPuyo = 0;
@@ -574,14 +590,35 @@ int PuyoGame::removePuyos()
 					if (getPuyoCellAt(i, j+1) == PUYO_EMPTY) {
 						setPuyoAt(i, j, NULL);
 						setPuyoAt(i, j+1, currentPuyo);
-                        if (delegate != NULL)
+                        if (delegate != NULL) {
+                            fprintf(stderr, "Notification fall pour le puyo %x ligne %d\n", currentPuyo, __LINE__);
                             delegate->puyoDidFall(currentPuyo, i, j);
+                        }
 						fallPuyo++;
 					}
 				}
 			}
 		} 
 	} while (fallPuyo > 0);
+#endif
+    for (int i = 0 ; i < PUYODIMX ; i++) {
+        for (int j = PUYODIMY - 1 ; j > 0 ; j--) {
+            PuyoState currentPuyoState = getPuyoCellAt(i, j);
+            if ((currentPuyoState >= PUYO_BLUE) && (currentPuyoState <= PUYO_NEUTRAL)) {
+                int newJ = getFallY(i, j);
+                if (newJ != j) {
+                    PuyoPuyo *currentPuyo = getPuyoAt(i, j);
+                    setPuyoAt(i, j, NULL);
+                    setPuyoAt(i, newJ, currentPuyo);
+                    if (delegate != NULL) {
+                        fprintf(stderr, "Notification fall pour le puyo %x ligne %d\n", currentPuyo, __LINE__);
+                        delegate->puyoDidFall(currentPuyo, i, j);
+                    }
+                }
+            }
+        }
+    }
+    
 	return globalRemovedPuyos;
 }
 

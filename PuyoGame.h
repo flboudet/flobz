@@ -43,6 +43,7 @@ private:
 class PuyoPuyo {
 public:
     PuyoPuyo(PuyoState state);
+    virtual ~PuyoPuyo() {};
     PuyoState getPuyoState();
     void setPuyoState(PuyoState state);
     int getPuyoX() const;
@@ -56,18 +57,34 @@ private:
     void *attachedObject;
 };
 
+// The puyos must be created by a factory to ensure custom puyo creation
+class PuyoFactory {
+ public:
+  virtual PuyoPuyo *createPuyo(PuyoState state) = 0;
+};
+
+class PuyoDefaultFactory : public PuyoFactory {
+ public:
+  PuyoPuyo *createPuyo(PuyoState state) {
+    return new PuyoPuyo(state);
+  }
+};
+
 class PuyoDelegate {
 public:
-	virtual void gameDidAddNeutral(PuyoPuyo *neutralPuyo) = 0;
-    virtual void companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise) = 0;
-    virtual void puyoDidFall(PuyoPuyo *puyo, int originX, int originY) = 0;
-    virtual void puyoWillVanish(PuyoPuyo *puyo) = 0;
-	virtual void gameDidEndCycle() = 0;
-	virtual void gameLost() = 0;
+  virtual void gameDidAddNeutral(PuyoPuyo *neutralPuyo) = 0;
+  virtual void companionDidTurn(PuyoPuyo *companionPuyo,
+				int companionVector,
+				bool counterclockwise) = 0;
+  virtual void puyoDidFall(PuyoPuyo *puyo, int originX, int originY) = 0;
+  virtual void puyoWillVanish(PuyoPuyo *puyo) = 0;
+  virtual void gameDidEndCycle() = 0;
+  virtual void gameLost() = 0;
 };
 
 class PuyoGame {
 public:
+  PuyoGame(PuyoRandomSystem *attachedRandom, PuyoFactory *attachedFactory);
   PuyoGame(PuyoRandomSystem *attachedRandom);
   virtual ~PuyoGame();
   void setDelegate(PuyoDelegate *delegate);
@@ -99,7 +116,8 @@ public:
   int getFallingCompanionX() const;
   int getFallingCompanionY() const;
   int getFallingCompanionDir() const { return fallingCompanion; }
-  
+  PuyoPuyo *getFallingPuyo() const { return fallingPuyo; }
+
   void increaseNeutralPuyos(int incr);
   int getNeutralPuyos() const;
   void dropNeutrals();
@@ -114,6 +132,7 @@ public:
   int points;
 
  private:
+  void InitGame(PuyoRandomSystem *attachedRandom);
   // Set the state of the puyo at the indicated coordinates (not recommanded)
   void setPuyoCellAt(int X, int Y, PuyoState value);
   // Set the puyo at the indicated coordinates
@@ -144,6 +163,7 @@ public:
   int sequenceNr;
   int neutralPuyos;
   PuyoDelegate *delegate;
+  PuyoFactory *attachedFactory;
   int phase;
   int semiMove;
   

@@ -86,6 +86,106 @@ static const int NB_PERSO_STATE = 2;
 SDL_Surface *perso[2];
 int currentPerso = 0;
 
+class AnimatedPuyo : public PuyoPuyo {
+public:
+    AnimatedPuyo(PuyoState state) : PuyoPuyo(state) {
+        puyoEyeState = random() % 700;
+    }
+    virtual ~AnimatedPuyo() {
+        fprintf(stderr, "Desallocation puyo %x\n", this);
+        while (animationQueue.getSize() > 0)
+            removeCurrentAnimation();
+    }
+    void addAnimation(PuyoAnimation *animation) {
+        animationQueue.addElement(animation);
+    }
+    PuyoAnimation * getCurrentAnimation() const {
+        if (animationQueue.getSize() == 0)
+            return NULL;
+        return (PuyoAnimation *)animationQueue.getElementAt(0);
+    }
+    void removeCurrentAnimation() {
+        if (animationQueue.getSize() == 0)
+            return;
+        delete (PuyoAnimation *)animationQueue.getElementAt(0);
+        animationQueue.removeElementAt(0);
+    }
+    void cycleAnimation() {
+        PuyoAnimation * animation = getCurrentAnimation();
+        if ((animation != NULL)) {
+            if (animation->isFinished()) {
+                removeCurrentAnimation();
+                fprintf(stderr, "Animation supprimee\n");
+            } else {
+                animation->cycle();
+            }
+        }
+    }
+    void render(SDL_Painter &painter, PuyoView *attachedView) {
+        static unsigned int smallTicksCount = 0;
+        puyoEyeState++;
+        if (attachedView == NULL)
+            return;
+        
+        PuyoGame *attachedGame = attachedView->getAttachedGame();
+        
+        bool falling  = attachedGame->getFallingState() < PUYO_EMPTY;
+        
+        SDL_Rect drect;
+        int i = this->getPuyoX();
+        int j = this->getPuyoY();
+        PuyoAnimation *animation = getCurrentAnimation();
+        if ((animation == NULL) || (animation->isFinished())) {
+            SDL_Surface *currentSurface = attachedView->getSurfaceForPuyo(this);
+            if (currentSurface != NULL) {
+                drect.x = (i*TSIZE) + attachedView->xOffset;
+                drect.y = (j*TSIZE) + attachedView->yOffset;
+                if (this->getPuyoState() < PUYO_EMPTY)
+                    drect.y -= attachedGame->getSemiMove() * TSIZE / 2;
+                drect.w = currentSurface->w;
+                drect.h = currentSurface->h;
+                painter.requestDraw(currentSurface, &drect);
+                
+                /* Main puyo show */
+                if (falling && (this == attachedGame->getFallingPuyo()))
+                    painter.requestDraw(puyoCircle[(smallTicksCount++ >> 2) & 0x1F], &drect);
+                
+                /* Eye management */
+                if (currentSurface != neutral) {
+                    while (puyoEyeState >= 750) puyoEyeState -= 750;
+                    int eyePhase = puyoEyeState;
+                    if (eyePhase < 5)
+                        painter.requestDraw(puyoEye[1], &drect);
+                    else if (eyePhase < 15)
+                        painter.requestDraw(puyoEye[2], &drect);
+                    else if (eyePhase < 20)
+                        painter.requestDraw(puyoEye[1], &drect);
+                    else
+                        painter.requestDraw(puyoEye[0], &drect);
+                }
+            }
+        }
+        else {
+            if (!animation->isFinished()) {
+                animation->draw(attachedGame->getSemiMove());
+            }
+        }
+    }
+    
+private:
+    IosVector animationQueue;
+    int puyoEyeState;
+};
+
+class AnimatedPuyoFactory : public PuyoFactory {
+ public:
+  AnimatedPuyoFactory() {
+  }
+  virtual PuyoPuyo *createPuyo(PuyoState state) {
+    return new AnimatedPuyo(state);
+  }
+};
+
 PuyoAnimation::PuyoAnimation()
 {
 	finishedFlag = false;
@@ -218,6 +318,7 @@ class FallingAnimation : public PuyoAnimation {
 public:
     FallingAnimation(PuyoPuyo *puyo, int originY, int xOffset, int yOffset, int step)
     {
+        fprintf(stderr, "Creation animation pour le puyo puyo %x\n", puyo);
         attachedPuyo  = puyo;
         this->xOffset = xOffset;
         this->yOffset = yOffset;
@@ -426,7 +527,7 @@ SDL_Surface *PuyoView::getSurfaceForPuyo(PuyoPuyo *puyo)
 			return getSurfaceForState(currentPuyo);
     }
 }
-
+#ifdef AVIRER
 void PuyoView::render(PuyoPuyo *puyo)
 {
     static unsigned int smallTicksCount = 0;
@@ -438,7 +539,7 @@ void PuyoView::render(PuyoPuyo *puyo)
     SDL_Rect drect;
     int i = puyo->getPuyoX();
     int j = puyo->getPuyoY();
-    PuyoAnimation *animation = (PuyoAnimation *)(puyo->getAttachedObject());
+    PuyoAnimation *animation = ((AnimatedPuyo *)puyo)->getCurrentAnimation();
     if (animation == NULL) {
         SDL_Surface *currentSurface = getSurfaceForPuyo(puyo);
         if (currentSurface != NULL) {
@@ -470,15 +571,16 @@ void PuyoView::render(PuyoPuyo *puyo)
     }
     else {
         if (animation->isFinished()) {
-            delete animation;
-            puyo->setAttachedObject(NULL);
+            ((AnimatedPuyo *)puyo)->removeCurrentAnimation();
             render(puyo);
         } else {
             animation->draw(attachedGame->getSemiMove());
         }
     }
 }
+#endif
 
+#ifdef AVIRER
 void PuyoView::cycleAnimation(PuyoPuyo *puyo)
 {
 	PuyoAnimation *animation = (PuyoAnimation *)(puyo->getAttachedObject());
@@ -486,11 +588,14 @@ void PuyoView::cycleAnimation(PuyoPuyo *puyo)
 		animation->cycle();
 }
 
+#endif
+
 void PuyoView::cycleAnimation()
 {
 	for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
-		PuyoPuyo *currentPuyo = attachedGame->getPuyoAtIndex(i);
-		cycleAnimation(currentPuyo);
+		AnimatedPuyo *currentPuyo =
+		  (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
+		currentPuyo->cycleAnimation();
 	}
 }
 
@@ -505,8 +610,8 @@ void PuyoView::render()
     for (int i = 0 ; i < PUYODIMX ; i++) {
         for (int j = 0 ; j < PUYODIMY ; j++) {
             puyoEyeState[i][j]++;
-            PuyoPuyo *currentPuyo = attachedGame->getPuyoAt(i, j);
-            if ((currentPuyo != NULL) && (getSurfaceForPuyo(currentPuyo) != neutral) && (currentPuyo->getAttachedObject() == NULL)) {
+            AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAt(i, j));
+            if ((currentPuyo != NULL) && (getSurfaceForPuyo(currentPuyo) != neutral) && (currentPuyo->getCurrentAnimation() == NULL)) {
                 drect.x = xOffset + i * TSIZE;
                 drect.y = yOffset + j * TSIZE;
                 if (currentPuyo->getPuyoState() < PUYO_EMPTY)
@@ -523,8 +628,8 @@ void PuyoView::render()
     }
     
 	for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
-        PuyoPuyo *currentPuyo = attachedGame->getPuyoAtIndex(i);
-        render(currentPuyo);
+        AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
+        currentPuyo->render(painter, this);
     }
     
 	drect.x = nXOffset;
@@ -588,33 +693,24 @@ void PuyoView::renderNeutral()
 void PuyoView::gameDidAddNeutral(PuyoPuyo *neutralPuyo) {
     int x = neutralPuyo->getPuyoX();
     int y = neutralPuyo->getPuyoY();
-	neutralPuyo->setAttachedObject(new NeutralAnimation(x, y, xOffset, yOffset));
+    ((AnimatedPuyo *)neutralPuyo)->addAnimation(new NeutralAnimation(x, y, xOffset, yOffset));
 }
 
 void PuyoView::companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise)
 {
-    PuyoAnimation *animation = (PuyoAnimation *)(companionPuyo->getAttachedObject());
-    if (animation != NULL)
-        delete animation;
-    companionPuyo->setAttachedObject(new TurningAnimation(companionPuyo, companionVector,
-                                                          xOffset, yOffset,
-                                                          getSurfaceForState(companionPuyo->getPuyoState()), counterclockwise));
+    ((AnimatedPuyo *)companionPuyo)->addAnimation(new TurningAnimation(companionPuyo, companionVector,
+								       xOffset, yOffset,
+								       getSurfaceForState(companionPuyo->getPuyoState()), counterclockwise));
 }
 
 void PuyoView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY)
 {
-    PuyoAnimation *animation = (PuyoAnimation *)(puyo->getAttachedObject());
-    if (animation != NULL)
-        delete animation;
-    puyo->setAttachedObject(new FallingAnimation(puyo, originY, xOffset, yOffset, 16));
+    ((AnimatedPuyo *)puyo)->addAnimation(new FallingAnimation(puyo, originY, xOffset, yOffset, 16));
 }
 
 void PuyoView::puyoWillVanish(PuyoPuyo *puyo)
 {
-    PuyoAnimation *animation = (PuyoAnimation *)(puyo->getAttachedObject());
-    if (animation != NULL)
-        delete animation;
-    puyo->setAttachedObject(new VanishAnimation(puyo, xOffset, yOffset));
+    ((AnimatedPuyo *)puyo)->addAnimation(new VanishAnimation(puyo, xOffset, yOffset));
 }
 
 void PuyoView::gameDidEndCycle()
@@ -796,8 +892,9 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
 		fprintf(stderr, "IMG_Load error:%s\n", SDL_GetError());
 		exit(-1);
 	}
-	attachedGameA = new PuyoGame(&attachedRandom);
-	attachedGameB = new PuyoGame(&attachedRandom);
+	static AnimatedPuyoFactory animatedPuyoFactory;
+	attachedGameA = new PuyoGame(&attachedRandom, &animatedPuyoFactory);
+	attachedGameB = new PuyoGame(&attachedRandom, &animatedPuyoFactory);
 	
 	if (aiLeft) {
 		randomPlayer = new PuyoIA(aiType, aiLevel, attachedGameA);
@@ -811,6 +908,7 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
 	
 	areaA = new PuyoView(attachedGameA, 1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
 	areaB = new PuyoView(attachedGameB, 1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE);
+
 	
 	attachedGameA->setDelegate(areaA);
 	attachedGameB->setDelegate(areaB);

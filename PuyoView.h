@@ -52,13 +52,17 @@ class PuyoView : public virtual PuyoDelegate {
     void scheduleAnimations(int tickCount);
     static SDL_Surface *getSurfaceForState(PuyoState state);
     SDL_Surface *getSurfaceForPuyo(PuyoPuyo *puyo);
+    PuyoGame *getAttachedGame() const { return attachedGame; }
+    // normalement c'est prive
+    int xOffset, yOffset, nXOffset, nYOffset;
   private:
     void render(PuyoPuyo *puyo);
     void cycleAnimation(PuyoPuyo *puyo);
     bool gameRunning;
     PuyoGame *attachedGame, *enemyGame;
-    int xOffset, yOffset, nXOffset, nYOffset;
+
     PuyoAnimation *animationBoard[PUYODIMX][PUYODIMY];
+    // A virer
     int puyoEyeState[PUYODIMX][PUYODIMY];
 };
 
