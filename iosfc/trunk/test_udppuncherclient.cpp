@@ -62,9 +62,9 @@ void UdpPuncherClient::onMessage(Message &message)
 
 using namespace ios_fc;
 
-int main()
+int main(int argc, char *argv[])
 {
-    UdpPuncherClient toto("localhost", 5432);;
+    UdpPuncherClient toto(argv[1], 5432);;
     toto.punch("testpool");
     while (1) {
         sleep(1);
