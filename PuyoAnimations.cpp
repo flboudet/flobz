@@ -39,12 +39,18 @@ extern IIM_Surface *explodingPuyo[5][5];
 /* Base class implementation */
 PuyoAnimation::PuyoAnimation()
 {
-	finishedFlag = false;
+    finishedFlag = false;
+    enabled = true;
 }
 
-bool PuyoAnimation::isFinished()
+bool PuyoAnimation::isFinished() const
 {
-	return finishedFlag;
+    return finishedFlag;
+}
+
+bool PuyoAnimation::isEnabled() const
+{
+    return enabled;
 }
 
 
@@ -230,6 +236,7 @@ VanishAnimation::VanishAnimation(PuyoPuyo *puyo, int xOffset, int yOffset, Anima
         color -= PUYO_BLUE;
     iter = 0;
     once = false;
+    enabled = false;
     this->synchronizer = synchronizer;
     synchronizer->push();
 }
@@ -241,6 +248,7 @@ void VanishAnimation::cycle()
         synchronizer->pop();
     }
     else if (synchronizer->isSynchronized()) {
+        enabled = true;
         iter ++;
         if (iter == 55)
             finishedFlag = true;
