@@ -209,13 +209,32 @@ void menu_draw (Menu * menu, SDL_Surface * surf)
 
           strcpy (item_name, menu->items[c].name);
           if (menu->items[c].value) {
-            strcat (item_name, "  ");
+            strcat (item_name, "\t");
             strcat (item_name, menu->items[c].value);
           }
-          SoFont_PutString (item_font, surf,
-              center_x - SoFont_TextWidth (item_font,
-                item_name) / 2,
-              hauteur, item_name, NULL);
+          
+          char *pc = item_name;
+          for (; *pc; pc++)
+          {
+            if (*pc == '\t') {
+              *pc = 0;
+              pc++;
+              break;
+            }
+          }
+          
+          if (*pc)
+          {
+            SoFont_PutString (item_font, surf, center_x-130, hauteur, item_name, NULL);
+            SoFont_PutString (item_font, surf, center_x+130 - SoFont_TextWidth(item_font, pc), hauteur, pc, NULL);
+          }
+          else
+          {
+            SoFont_PutString (item_font, surf,
+                center_x - SoFont_TextWidth (item_font,
+                  item_name) / 2,
+                hauteur, item_name, NULL);
+          }
           hauteur += SoFont_FontHeight (item_font);
         }
       }
