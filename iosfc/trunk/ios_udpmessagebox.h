@@ -35,14 +35,15 @@ class UDPRawMessage;
 class UDPMessageBox : public MessageBox {
 public:
     UDPMessageBox(String address, int localPort, int remotePort);
+    UDPMessageBox(DatagramSocket *socket);
     virtual ~UDPMessageBox() {}
     void idle();
     Message * createMessage();
-    void sendUDP(Buffer<char> buffer, int id, bool reliable);
+    void sendUDP(Buffer<char> buffer, int id, bool reliable, SocketAddress addr, int portNum);
 private:
     SocketAddress defaultAddress;
     int defaultPort;
-    DatagramSocket socket;
+    DatagramSocket *socket;
     int sendSerialID, receiveSerialID;
     int cyclesBeforeResendingReliable;
     int waitingForAckTimeout;

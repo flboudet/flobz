@@ -18,6 +18,7 @@ public:
         this->impl = a.impl;
 	return *this;
     }
+    inline PeerAddressImpl *getImpl() const { return impl; }
 private:
     PeerAddressImpl *impl;
 };

@@ -59,7 +59,7 @@ class PuyoNetwork : public MessageListener
 
 int main(int argc, char *argv[])
 {
-  UDPMessageBox toto(argv[argc-1], 6581, 6581);
+  UDPMessageBox toto(argv[argc-1], 6581, 4567);
   PuyoNetwork network(&toto);
 
   while (true) {

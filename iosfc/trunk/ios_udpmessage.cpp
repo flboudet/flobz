@@ -8,6 +8,8 @@ class UDPMessage::UDPPeerAddressImpl : public PeerAddressImpl {
 public:
     UDPPeerAddressImpl(SocketAddress address, int port)
       : address(address), port(port) {}
+    SocketAddress getAddress() const { return address; }
+    int getPortNum() const { return port; }
 private:
     SocketAddress address;
     int port;
@@ -15,7 +17,8 @@ private:
 
 UDPMessage::UDPMessage(int serialID, UDPMessageBox &owner, SocketAddress address, int port)
     : StandardMessage(serialID), owner(owner),
-      peerAddress(new UDPPeerAddressImpl(address, port))
+      peerAddressImpl(new UDPPeerAddressImpl(address, port)),
+      peerAddress(peerAddressImpl)
 {
 }
 
@@ -25,12 +28,13 @@ UDPMessage::~UDPMessage()
 
 void UDPMessage::sendBuffer(Buffer<char> out) const
 {
-    owner.sendUDP(out, getSerialID(), isReliable());
+    owner.sendUDP(out, getSerialID(), isReliable(), peerAddressImpl->getAddress(), peerAddressImpl->getPortNum());
 }
 
 UDPMessage::UDPMessage(const Buffer<char> raw, UDPMessageBox &owner, SocketAddress address, int port)  throw(InvalidMessageException)
 : StandardMessage(raw), owner(owner),
-  peerAddress(new UDPPeerAddressImpl(address, port))
+  peerAddressImpl(new UDPPeerAddressImpl(address, port)),
+  peerAddress(peerAddressImpl)
 {
 }
 
@@ -46,7 +50,11 @@ PeerAddress UDPMessage::getBroadcastAddress()
 
 void UDPMessage::setPeerAddress(PeerAddress newPeerAddress)
 {
-    peerAddress = newPeerAddress;
+    UDPPeerAddressImpl *newPeerAddressImpl = dynamic_cast<UDPPeerAddressImpl *>(newPeerAddress.getImpl());
+    if (newPeerAddressImpl != NULL) {
+        peerAddress = newPeerAddress;
+    }
+    else throw Exception("Incompatible peer address type!");
 }
 
 };

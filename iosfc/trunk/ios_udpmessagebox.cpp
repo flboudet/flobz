@@ -54,7 +54,17 @@ private:
 
 UDPMessageBox::UDPMessageBox(const String address,
 			     int localPort, int remotePort)
-  : defaultAddress(address), defaultPort(remotePort), socket(localPort)
+  : defaultAddress(address), defaultPort(remotePort)
+{
+    sendSerialID = 0;
+    receiveSerialID = 0;
+    waitingForAckMessage = NULL;
+    cyclesBeforeResendingReliable = 10;
+    socket = new DatagramSocket(localPort);
+}
+
+UDPMessageBox::UDPMessageBox(DatagramSocket *socket)
+    : defaultAddress("localhost"), defaultPort(0), socket(socket)
 {
     sendSerialID = 0;
     receiveSerialID = 0;
@@ -76,8 +86,8 @@ void UDPMessageBox::idle()
         }
     }
     
-    while (socket.available()) {
-        Datagram receivedDatagram = socket.receive(receiveBuffer);
+    while (socket->available()) {
+        Datagram receivedDatagram = socket->receive(receiveBuffer);
         try {
             if (receivedDatagram.getSize() > 0) {
                 UDPMessage incomingMessage(Buffer<char>((char *)(receivedDatagram.getMessage()), receivedDatagram.getSize()), *this, receivedDatagram.getAddress(), receivedDatagram.getPortNum());
@@ -121,10 +131,10 @@ void UDPMessageBox::idle()
     }
 }
 
-void UDPMessageBox::sendUDP(Buffer<char> buffer, int id, bool reliable)
+void UDPMessageBox::sendUDP(Buffer<char> buffer, int id, bool reliable, SocketAddress addr, int portNum)
 {
     UDPRawMessage *rawMessage = new UDPRawMessage(buffer, id, reliable,
-						  defaultAddress, defaultPort, socket);
+						  addr, portNum, *socket);
     
     // Service messages must be sent imediately
     if (id <= 0) {
