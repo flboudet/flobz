@@ -63,9 +63,9 @@ namespace gameui {
 
       virtual IdleComponent *getIdleComponent() const { return NULL; }
 
-      virtual void hide()   { hidden = true;  }
-      virtual void show()   { hidden = false; requestDraw(); }
-      bool isVisible()      { return !hidden; }
+      virtual void hide();
+      virtual void show();
+      bool isVisible() const { return !hidden; }
 
       virtual bool hasFocus() const { return false; }
 /*      virtual void event(const GameControlEvent &event) const    { } */

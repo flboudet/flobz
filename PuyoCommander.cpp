@@ -52,7 +52,7 @@ class NetworkGameMenu : public PuyoScreen {
   public:
     void build();
   private:
-    LANGameMenu lanGameMenu;
+    LANGameMenu      lanGameMenu;
     InternetGameMenu internetGameMenu;
 };
 
@@ -66,9 +66,9 @@ void NetworkGameMenu::build() {
   internetGameMenu.build();
   lanGameMenu.build();
   add(new Text("Network Game"));
-  add(new Button("LAN Game", new PushScreenAction(&lanGameMenu)));
+  add(new Button("LAN Game",      new PushScreenAction(&lanGameMenu)));
   add(new Button("Internet Game", new PushScreenAction(&internetGameMenu)));
-  add(new Button("Cancel", new PopScreenAction()));
+  add(new Button("Cancel",        new PopScreenAction()));
 }
 
 void LANGameMenu::build() {

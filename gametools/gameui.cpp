@@ -21,6 +21,9 @@ namespace gameui {
       requestDraw();
     }
 
+  void Widget::hide()   { hidden = true;                 }
+  void Widget::show()   { hidden = false; requestDraw(); }
+
   void Widget::draw(SDL_Surface *screen, bool force) const
   {
     if (/*(force || drawRequested()) && */ !hidden)
@@ -333,6 +336,7 @@ namespace gameui {
 
   void Screen::draw(SDL_Surface *surface) const
   {
+    if (!isVisible()) return;
     if (bg) {
       SDL_Rect rect;
       rect.x = (Sint16)getPosition().x;
