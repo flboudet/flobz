@@ -37,16 +37,20 @@ namespace ios_fc {
     
     class UnixDatagramSocketImpl : public DatagramSocketImpl, public UnixSelectableImpl {
     public:
+        UnixDatagramSocketImpl();
         virtual ~UnixDatagramSocketImpl();
         void create(int localPortNum);
         void send(Datagram &sendDatagram);
         Datagram receive(VoidBuffer buffer);
         int available() const;
+        SocketAddress getBroadcastAddress() const { return broadcastAddress; }
         SelectableImpl *getSelectableImpl() { return this; }
         int getFd() { return socketFd; }
     private:
         int socketFd;
         struct sockaddr_in boundAddr;
+        bool hasBroadcast;
+        SocketAddress broadcastAddress;
     };
 
     class UnixDatagramSocketFactory : public DatagramSocketFactory {

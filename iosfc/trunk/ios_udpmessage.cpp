@@ -56,7 +56,7 @@ PeerAddress UDPMessage::getPeerAddress()
 
 PeerAddress UDPMessage::getBroadcastAddress()
 {
-    return peerAddress;
+    return PeerAddress(new UDPPeerAddressImpl(owner.getBroadcastAddress(), peerAddressImpl->getPortNum()));
 }
 
 void UDPMessage::setPeerAddress(PeerAddress newPeerAddress)

@@ -34,6 +34,10 @@
 
 namespace ios_fc {
 
+UnixDatagramSocketImpl::UnixDatagramSocketImpl()
+    : broadcastAddress(new UnixSocketAddressImpl(INADDR_BROADCAST))
+{
+}
 
 void UnixDatagramSocketImpl::create(int localPortNum)
 {
@@ -50,6 +54,13 @@ void UnixDatagramSocketImpl::create(int localPortNum)
     // bind the socket as appropriate
     if (bind(socketFd, (struct sockaddr *) &boundAddr, sizeof(boundAddr)) == -1) {
         throw Exception("Socket binding error");
+    }
+    
+    // enable broadcast on the socket
+    int optval = 1;
+    hasBroadcast = false;
+    if (setsockopt(socketFd, SOL_SOCKET, SO_BROADCAST, (const void *)&optval, sizeof(int)) != -1) {
+        hasBroadcast = true;
     }
 }
 

@@ -51,6 +51,7 @@ namespace ios_fc {
         virtual void send(Datagram &sendDatagram) = 0;
         virtual Datagram receive(VoidBuffer buffer) = 0;
         virtual SelectableImpl *getSelectableImpl() = 0;
+        virtual SocketAddress getBroadcastAddress() const = 0;
         virtual int available() const = 0;
     };
     
@@ -69,6 +70,7 @@ namespace ios_fc {
         virtual void send(Datagram &sendDatagam);
         virtual Datagram receive(VoidBuffer buffer);
         virtual int available() const;
+        SocketAddress getBroadcastAddress() const;
         static void setFactory(DatagramSocketFactory *factory) { DatagramSocket::factory = factory; }
         
         // Selectable implementation

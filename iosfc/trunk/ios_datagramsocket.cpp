@@ -70,6 +70,11 @@ int DatagramSocket::available() const
     return impl->available();
 }
 
+SocketAddress DatagramSocket::getBroadcastAddress() const
+{
+    return impl->getBroadcastAddress();
+}
+
 SelectableImpl *DatagramSocket::getSelectableImpl() const
 {
     return sImpl;

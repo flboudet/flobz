@@ -41,7 +41,7 @@ public:
     void idle();
     Message * createMessage();
     void sendUDP(Buffer<char> buffer, int id, bool reliable, PeerAddress peerAddr, SocketAddress addr, int portNum);
-    
+    SocketAddress getBroadcastAddress() const { return socket->getBroadcastAddress(); }
     // Session manager
     void addSessionListener(SessionListener *l);
     void removeSessionListener(SessionListener *l);
