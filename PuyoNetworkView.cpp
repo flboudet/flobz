@@ -133,9 +133,9 @@ void PuyoNetworkView::gameLost()
 {
     PuyoView::gameLost();
     Message *message = mbox->createMessage();
-    message->addInt     ("TYPE",   kGameOver);
-    message->addString  ("NAME",   p1name);
-    message->addInt     ("SCORE",  attachedGame->getPoints());
+    message->addInt     (PuyoMessage::TYPE,   kGameOver);
+    message->addString  (PuyoMessage::NAME,   p1name);
+    message->addInt     (PuyoMessage::SCORE,  attachedGame->getPoints());
     message->addBoolProperty("RELIABLE", true);
     message->send();
     delete message;
