@@ -17,12 +17,11 @@ namespace ios_fc {
       void addBool      (const String key, bool value);
       void addString    (const String key, const String value);
       void addIntArray  (const String key, const Buffer<int> value);
-      void addByteArray (const String key, const Buffer<char> value);
-
-    private:
-      AdvancedBuffer<String *> serialized;
 
       const Buffer<char> serialize() const;
+      
+    private:
+      AdvancedBuffer<String *> serialized;
   };
 
 };

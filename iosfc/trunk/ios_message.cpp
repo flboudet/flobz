@@ -8,8 +8,7 @@ enum ValueType {
   INTEGER = 1,
   BOOLEAN = 2,
   STRING  = 3,
-  INT_ARRAY = 4,
-  BYTE_ARRAY = 5
+  INT_ARRAY = 4
 };
   
 class ValueInterface
@@ -47,10 +46,21 @@ class ValueString : public Value<String> {
     ValueString(const String s) : Value<String>(s, STRING) {}
 };
 
+class ValueIntArray : public Value<Buffer<int> > {
+  public:
+    ValueIntArray(const Buffer<int> array) : Value<Buffer<int> >(array, INT_ARRAY) {}
+};
+
 /* class Message */
 
-Message::Message()  {}
-Message::~Message() {}
+Message::Message()
+{
+}
+
+Message::~Message()
+{
+  /* TODO: delete hashmap content */
+}
 
 void Message::addInt       (const String key, int value)
 {
@@ -69,27 +79,17 @@ void Message::addString    (const String key, const String value)
 
 void Message::addIntArray  (const String key, const Buffer<int> value)
 {
-  printf("TODO\n");
-}
-
-void Message::addByteArray (const String key, const Buffer<char> value)
-{
-  printf("TODO\n");
+  datas.put(key, new ValueIntArray(value));
 }
 
 void Message::addIntProperty   (const String key, const int value)
 {
-  printf("TODO\n");
+  intProperties.put(key, value);
 }
 
 void Message::addBoolProperty  (const String key, const bool property)
 {
-  printf("TODO\n");
-}
-
-void Message::addStringProperty(const String key, const String value)
-{
-  printf("TODO\n");
+  intProperties.put(key, (int)property);
 }
 
 static ValueInterface *getInterfaceAndCheckType(const HashMap &datas,
@@ -129,40 +129,58 @@ bool Message::getBool     (const String key) const throw(DataException)
 
   ValueBool* val_bool = dynamic_cast<ValueBool*>(val_interface);
   if (val_bool == NULL)
-    throw DataException(key + " is not an INTEGER");
+    throw DataException(key + " is not a BOOLEAN");
 
   return val_bool->getValue();
 }
 
 const String Message::getString   (const String key) const throw(DataException)
 {
-  printf("TODO\n");
+  ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, STRING, "String");
+
+  ValueString* val_string = dynamic_cast<ValueString*>(val_interface);
+  if (val_string == NULL)
+    throw DataException(key + " is not a STRING");
+
+  return val_string->getValue();
 }
 
 const Buffer<int> Message::getIntArray (const String key) const throw(DataException)
 {
-  printf("TODO\n");
-}
+  ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, INT_ARRAY, "IntArray");
 
-const Buffer<char> Message::getByteArray(const String key) const throw(DataException)
-{
-  printf("TODO\n");
+  ValueIntArray* val_intarray = dynamic_cast<ValueIntArray*>(val_interface);
+  if (val_intarray == NULL)
+    throw DataException(key + " is not an IntArray");
+
+  return val_intarray->getValue();
 }
 
 
 int Message::getIntProperty(const String key) const throw(PropertyException)
 {
-  printf("TODO\n");
+  HashValue *hval = intProperties.get(key);
+  if (hval == NULL)
+    throw PropertyException(String("No such property '") + key + "'");
+  return hval->i;
 }
 
 bool         Message::getBoolProperty   (const String key) const throw(PropertyException)
 {
-  printf("TODO\n");
+  HashValue *hval = intProperties.get(key);
+  if (hval == NULL)
+    throw PropertyException(String("No such property '") + key + "'");
+  return hval->i;
 }
 
-const String Message::getStringProperty (const String key) const throw(PropertyException)
+bool Message::hasIntProperty    (const String key) const
 {
-  printf("TODO\n");
+  return intProperties.get(key) != NULL;
+}
+
+bool Message::hasBoolProperty   (const String key) const
+{
+  return intProperties.get(key) != NULL;
 }
 
 };
