@@ -246,6 +246,12 @@ namespace ios_fc {
                 return buf;
             }
 
+            inline void concat(const Buffer<T> &buf) const {
+                int ssize = size();
+                grow(buf.size());
+                Memory::memcpy(ptr() + ssize, buf.ptr(), buf.size());
+            }
+
         private:
             Ptr *p;
             int offset;
@@ -316,12 +322,6 @@ namespace ios_fc {
                 Buffer<T> buf(*this);
                 buf += offset;
                 return buf;
-            }
-
-            inline void concat(const Buffer<T> &buf) const {
-                int ssize = size();
-                grow(buf.size());
-                Memory::memcpy(ptr() + ssize, buf.ptr(), buf.size());
             }
 
 #ifdef DEBUG_MEMORY
