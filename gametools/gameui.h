@@ -15,13 +15,26 @@ namespace gameui {
   class Box;
   class VBox;
   class Text;
+  class GameUIDefaults;
+  class ScreenVBox;
+  class Button;
+  class Separator;
+  class Action;
 
 
   enum GameUIEnum {
-    USE_MAX_SIZE,
-    USE_MIN_SIZE
+    USE_MAX_SIZE = 0,
+    USE_MIN_SIZE,
+    ON_START,
+    GAMEUIENUM_LAST
   };
 
+
+  class Action {
+    public:
+      virtual void action() = 0;
+  };
+  
 
   class GameUIDefaults {
     public:
@@ -65,6 +78,9 @@ namespace gameui {
       virtual void giveFocus()       { focus = true;  }
       virtual void lostFocus()       { focus = false; }
       bool haveFocus() const { return focus;  }
+
+      void setAction(GameUIEnum type, Action *action) { actions[type] = action; }
+      Action *getAction(GameUIEnum type)              { return actions[type];   }
       
     protected:
       // To be implemented on each widgets
@@ -82,6 +98,8 @@ namespace gameui {
       Vec3    position;
       bool    hidden;
       bool    focus;
+
+      Action *actions[GAMEUIENUM_LAST];
   };
 
 
@@ -191,6 +209,7 @@ namespace gameui {
   class Button : public Text {
     public:
       Button(const String &label, SoFont *fontActive = NULL, SoFont *fontInactive = NULL);
+      Button(const String &label, Action *action);
 
       void eventOccured(GameControlEvent *event);
 
@@ -200,6 +219,8 @@ namespace gameui {
     private:
       SoFont *fontActive;
       SoFont *fontInactive;
+
+      void init(SoFont *fontActive, SoFont *fontInactive);
   };
 
 

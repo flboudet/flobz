@@ -28,6 +28,18 @@ class PuyoLoop : public GameLoop
 
 class MainMenuScreen : public ScreenVBox
 {
+  class MyAction : public Action
+  {
+    public:
+      MyAction(String text) : text(text) {}
+      virtual ~MyAction() {}
+      void action() {
+        printf("MyAction::action [%s]\n", (const char*)text);
+      }
+    private:
+      String text;
+  };
+  
   public:
     MainMenuScreen() : ScreenVBox(0,0,640,480)
     {
@@ -40,8 +52,8 @@ class MainMenuScreen : public ScreenVBox
       HBox *box1 = new HBox;
       VBox *box2 = new VBox;
       add(box1);
-      box1->add(new Button("Left"));
-      box1->add(new Button("Middle"));
+      box1->add(new Button("Left", new MyAction("Left is clicked!")));
+      box1->add(new Button("Middle", new MyAction("Yo !")));
       box1->add(box2);
       box2->add(new Button("Right-Up"));
       box2->add(new Button("Right-Down"));

@@ -14,7 +14,10 @@ namespace gameui {
   Widget::Widget(WidgetContainer *parent)
     : parent(parent), preferedSize(0,0,0), size(0,0,0),
     position(0,0,0), hidden(false), focus(false)
-    {}
+    {
+      for (int i = 0; i < GAMEUIENUM_LAST; ++i)
+        actions[i] = NULL;
+    }
 
   void Widget::draw(SDL_Surface *screen, bool force) const
   {
@@ -159,9 +162,10 @@ namespace gameui {
         }
         break;
       case USE_MIN_SIZE:
-        {
-        }
+        {}
         break;
+      default:
+        {}
     }
   }
   
@@ -344,8 +348,7 @@ namespace gameui {
   // Button
   // 
 
-  Button::Button(const String &label, SoFont *fontActive, SoFont *fontInactive)
-    : Text(label, fontInactive)
+  void Button::init(SoFont *fontActive, SoFont *fontInactive)
   {
     if (fontInactive == NULL) fontInactive = GameUIDefaults::FONT_INACTIVE;
     if (fontActive == NULL)   fontActive = GameUIDefaults::FONT;
@@ -356,19 +359,45 @@ namespace gameui {
     font = fontInactive;
   }
 
+  Button::Button(const String &label, SoFont *fontActive, SoFont *fontInactive)
+    : Text(label, fontInactive)
+  {
+    init(fontActive, fontInactive);
+  }
+
+  Button::Button(const String &label, Action *action)
+    : Text(label, NULL)
+  {
+    init(NULL,NULL);
+    setAction(ON_START, action);
+  }
+
+  static bool isDirectionEvent(GameControlEvent *event)
+  {
+    if (event->cursorEvent == GameControlEvent::kUp)
+      return true;
+    if (event->cursorEvent == GameControlEvent::kRight)
+      return true;
+    if (event->cursorEvent == GameControlEvent::kLeft)
+      return true;
+    if (event->cursorEvent == GameControlEvent::kDown)
+      return true;
+    return false;
+  }
+  
   void Button::eventOccured(GameControlEvent *event)
   {
     if (event->isUp)
       return;
-    
-    if (event->cursorEvent == GameControlEvent::kUp)
+
+    if (isDirectionEvent(event))
       lostFocus();
-    if (event->cursorEvent == GameControlEvent::kRight)
-      lostFocus();
-    if (event->cursorEvent == GameControlEvent::kLeft)
-      lostFocus();
-    if (event->cursorEvent == GameControlEvent::kDown)
-      lostFocus();
+
+    if (event->cursorEvent == GameControlEvent::kStart) {
+      Action *action = getAction(ON_START);
+      if (action)
+        action->action();
+    }
   }
 
   void Button::lostFocus() {
