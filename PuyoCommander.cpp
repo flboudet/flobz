@@ -55,7 +55,8 @@ void MainMenu::build() {
 }
 
 void NetworkGameMenu::build() {
-  add(new Button("(Temporary) GO!", new NetGameAction));
+  add(new Button("GO!", new NetGameAction));
+  add(new Button("Cancel", new PopScreenAction()));
 }
 
 /**
@@ -77,6 +78,7 @@ void NetGameAction::action()
 {
 //  PuyoStarter *starter = new PuyoNetworkStarter(...);
 //  theCommander->mainMenu->hide();
+  printf("NetGameAction::action() = TODO\n");
 }
 
 void PuyoCommander::run()
@@ -90,6 +92,7 @@ void PuyoCommander::run()
 void PuyoCommander::initMenus()
 {
   menuBG = IIM_Load_DisplayFormat("MenuBackground.jpg");
+  // 
   // Create the structures.
   mainMenu    = new MainMenu;
   netGameMenu = new NetworkGameMenu;
