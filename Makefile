@@ -53,15 +53,6 @@ prelude:
 	@echo "Compiling with CFLAGS=$(CFLAGS)"
 	@echo "Compiling with LDFLAGS=$(LDFLAGS)"
 
-%.o:%.c
-	@mkdir -p $(DEPDIR);\
-	$(MAKEDEPEND); \
-	cp $(df).d $(df).P; \
-	sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
-	-e '/^$$/ d' -e 's/$$/ :/' < $(df).d >> $(df).P; \
-	rm -f $(df).d
-	@echo "[$@]" && $(CC) $(CFLAGS) -c $< 2>> WARNINGS || (cat WARNINGS && false)
-
 %.o:%.cpp
 	@mkdir -p $(DEPDIR);\
 	$(MAKEDEPEND); \
@@ -71,21 +62,15 @@ prelude:
 	rm -f $(df).d
 	@echo "[$@]" && $(CXX) $(CFLAGS) -c $< 2>> WARNINGS || (cat WARNINGS && false)
 
-PuyoDoomMelt.o:PuyoDoomMelt.c ${HFILES}
-HiScores.o:HiScores.cpp HiScores.h ${HFILES}
-PuyoCommander.o:PuyoCommander.cpp ${HFILES}
-PuyoGame.o:PuyoGame.cpp ${HFILES}
-PuyoIA.o:PuyoIA.cpp ${HFILES}
-PuyoStory.o:PuyoStory.cpp ${HFILES}
-PuyoView.o:PuyoView.cpp ${HFILES}
-AnimatedPuyo.o: AnimatedPuyo.cpp ${HFILES}
-PuyoAnimations.o: PuyoAnimations.cpp ${HFILES}
-main.o:main.cpp ${HFILES}
-audio.o:audio.c audio.h
-menu.o:menu.c menu.h menuitems.h
-menuitems.o:menuitems.c menu.h menuitems.h
-IosException.o:IosException.cpp
-IosVector.o:IosVector.cpp
+%.o:%.c
+	@mkdir -p $(DEPDIR);\
+	$(MAKEDEPEND); \
+	cp $(df).d $(df).P; \
+	sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+	-e '/^$$/ d' -e 's/$$/ :/' < $(df).d >> $(df).P; \
+	rm -f $(df).d
+	@echo "[$@]" && $(CC) $(CFLAGS) -c $< 2>> WARNINGS || (cat WARNINGS && false)
+
 glSDL.o:glSDL.c
 	@echo "[$@]" && $(CC) $(CFLAGS) -c $< 2>> EXT_WARNINGS
 	@rm -f EXT_WARNINGS
@@ -158,4 +143,4 @@ win-package: flobopuyo
 
 .PHONY: all clean
 
--include $(SRCS:%.cpp=$(DEPDIR)/%.P)
+-include $(OBJFILES:%.o=$(DEPDIR)/%.P)
