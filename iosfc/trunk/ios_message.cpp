@@ -65,7 +65,7 @@ Message::Message()
 
 class DeleteAction : public HashMapAction {
   public:
-    void action(HashValue *value) { delete value->ptr; }
+    void action(HashValue *value) { delete static_cast<ValueInterface*>(value->ptr); }
 };
 
 Message::~Message()
