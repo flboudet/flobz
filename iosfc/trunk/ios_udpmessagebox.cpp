@@ -100,7 +100,7 @@ void UDPMessageBox::idle()
                 if (currentPeer == NULL) {
                     currentPeer = new KnownPeer;
                     currentPeer->address = incomingMessage.getPeerAddress();
-                    currentPeer->receiveSerialID = messageSerialID == 0 ? 0 : messageSerialID - 1;
+                    currentPeer->receiveSerialID = messageSerialID <= 0 ? 0 : messageSerialID - 1;
                     knownPeers.add(currentPeer);
                 }
                 int &receiveSerialID = currentPeer->receiveSerialID;

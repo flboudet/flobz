@@ -118,7 +118,7 @@ namespace ios_fc {
     int    start = 0;
     int    end   = 0;
    
-    printf("****RAW MSG****\n%s\n********\n", (const char *)tmp_buf);
+    //printf("****RAW MSG****\n%s\n********\n", (const char *)tmp_buf);
     
     while (true) { 
       while (sraw[end] && (sraw[end] != '\n'))
