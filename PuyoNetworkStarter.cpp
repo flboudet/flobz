@@ -42,6 +42,7 @@ void PuyoNetworkStarter::run(int score1, int score2, int lives, int point1, int 
     ios_fc::Message *message = mbox->createMessage();
     message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameStart);
     message->addString  (PuyoMessage::NAME,   p1name);
+    message->addBoolProperty("RELIABLE", true);
     message->send();
     
     while ((!netgame_started) && (!gameAborted)) {
