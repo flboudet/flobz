@@ -1205,6 +1205,51 @@ void PuyoCommander::startLANGame(int level, const char *playerName, const char *
     mbox = NULL;
 }
 
+void PuyoCommander::startInternetGame(int level, const char *playerName, const char *ipAddress, int portID, int opponentIgpIdent)
+{
+    if (mbox) delete mbox;
+    mbox = new IgpMessageBox(ipAddress, portID, 25);
+    mbox->addListener(this);
+    
+    GAME_ACCEL = 2000;
+    gameLevel = 1;
+    if (level == 1) {
+        GAME_ACCEL = 1500;
+        gameLevel = 2;
+    }
+    else if (level == 2) {
+        GAME_ACCEL = 1000;
+        gameLevel = 3;
+    }
+    
+    int score1 = 0;
+    int score2 = 0;
+    gameOverMenu = gameOver2PMenu;
+    int currentMusicTheme = 0;
+    if (menu_active_is(gameOverMenu, "NO"))
+        menu_next_item(gameOverMenu);
+    while (menu_active_is(gameOverMenu, "YES")) {
+        menu_next_item(gameOverMenu);
+        PuyoNetworkStarter myStarter(this, currentMusicTheme, mbox);
+        audio_music_switch_theme(currentMusicTheme);
+        p1name = playerName;
+        p2name = playerName;
+        GAME_ACCEL = 1500;
+        doom_melt_start(melt, menuBGImage);
+        
+        myStarter.run(score1, score2, 0, 0, 0);
+        score1 += myStarter.leftPlayerWin();
+        score2 += myStarter.rightPlayerWin();
+        currentMusicTheme = (currentMusicTheme + 1) % NB_MUSIC_THEME;
+    }
+    
+    SetStrPreference("Player Name", playerName);
+    SetStrPreference("IP Address", ipAddress);
+    doom_melt_start(melt, gameScreen);
+    if (mbox) delete mbox;
+    mbox = NULL;
+}
+
 void PuyoCommander::startTwoPlayerGameLoop()
 {
   char player1Name[256];

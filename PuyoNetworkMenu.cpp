@@ -95,6 +95,11 @@ void PuyoInternetGameMenu::itemSelected(int itemNumber)
 {
     // work in progress
     switch (itemNumber) {
+        case 10:
+            parentScreen->hide();
+            attachedCommander.startInternetGame(0, "TEST", "localhost", 4567, 32776);
+            parentScreen->show();
+            break;
         default:
             break;
     }

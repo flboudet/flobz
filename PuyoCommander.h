@@ -8,6 +8,7 @@
 #include "PuyoDoomMelt.h"
 
 #include "ios_udpmessagebox.h"
+#include "ios_igpmessagebox.h"
 using namespace ios_fc;
 
 #include "corona32.h"
@@ -40,6 +41,7 @@ class PuyoCommander : public MessageListener
   void startTwoPlayerGameLoop();
   void startNetGameLoop();
   void startLANGame(int level, const char *playerName, const char *ipAddress);
+  void startInternetGame(int level, const char *playerName, const char *ipAddress, int portID, int opponentIgpIdent);
   void enterStringLoop(Menu *menu, const char *kItem, char out[256], int maxlen = 10);
   void onMessage(Message &message);
   
