@@ -147,9 +147,7 @@ void PuyoGame::cycle()
 		setPuyoAt(getFallingCompanionX(), getFallY(getFallingCompanionX(), getFallingCompanionY()), companionPuyo);
         companionPuyo->setPuyoState((PuyoState)(companionPuyo->getPuyoState()+PUYO_STILL));
         if (delegate != NULL) {
-            fprintf(stderr, "Notification fall pour le puyo %x ligne %d\n", fallingPuyo, __LINE__);
             delegate->puyoDidFall(fallingPuyo, fallingX, fallingY);
-            fprintf(stderr, "Notification fall pour le puyo %x ligne %d\n", companionPuyo, __LINE__);
             delegate->puyoDidFall(companionPuyo, getFallingCompanionX(), getFallingCompanionY());
             fallingY = -10;
             notifyReductions();
@@ -578,29 +576,6 @@ int PuyoGame::removePuyos()
 	}
     
 	/* Next we make the other puyos fall */
-#ifdef AVIRER
-	int fallPuyo;
-	do {
-		fallPuyo = 0;
-		for (int i = 0 ; i < PUYODIMX ; i++) {
-			for (int j = 0 ; j <= PUYODIMY ; j++) {
-				PuyoPuyo *currentPuyo = getPuyoAt(i, j);
-                PuyoState currentPuyoState = getPuyoCellAt(i, j);
-				if ((currentPuyoState >= PUYO_BLUE) && (currentPuyoState <= PUYO_NEUTRAL)) {
-					if (getPuyoCellAt(i, j+1) == PUYO_EMPTY) {
-						setPuyoAt(i, j, NULL);
-						setPuyoAt(i, j+1, currentPuyo);
-                        if (delegate != NULL) {
-                            fprintf(stderr, "Notification fall pour le puyo %x ligne %d\n", currentPuyo, __LINE__);
-                            delegate->puyoDidFall(currentPuyo, i, j);
-                        }
-						fallPuyo++;
-					}
-				}
-			}
-		} 
-	} while (fallPuyo > 0);
-#endif
     for (int i = 0 ; i < PUYODIMX ; i++) {
         for (int j = PUYODIMY - 1 ; j > 0 ; j--) {
             PuyoState currentPuyoState = getPuyoCellAt(i, j);
@@ -611,7 +586,6 @@ int PuyoGame::removePuyos()
                     setPuyoAt(i, j, NULL);
                     setPuyoAt(i, newJ, currentPuyo);
                     if (delegate != NULL) {
-                        fprintf(stderr, "Notification fall pour le puyo %x ligne %d\n", currentPuyo, __LINE__);
                         delegate->puyoDidFall(currentPuyo, i, j);
                     }
                 }

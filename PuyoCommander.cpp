@@ -103,8 +103,8 @@ char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
   "The Duke","Jeko","--------" };
 
 
-extern SDL_Surface *display, *image;
-static SDL_Surface *menuBGImage = 0;
+extern SDL_Surface *display, *image, *gameScreen;
+SDL_Surface *menuBGImage = 0;
 PuyoCommander *theCommander;
 
 const int cycle_duration = 20;
@@ -641,6 +641,7 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   menu_set_sounds (singleGameMenu, sound_pop, sound_slide);
   menu_set_sounds (twoPlayerGameMenu, sound_pop, sound_slide);
   menu_set_sounds (menu_pause    , sound_pop, sound_slide);
+  melt = doom_melt_new();
 
   scrollingText = scrolling_text_new(
     "Welcome to the wonderful world of FloboPuyo !!!  Enjoy its nice graphics, "
@@ -1145,6 +1146,7 @@ mml_play:
     p1name = player1Name;
     p2name = player2Name;
     GAME_ACCEL = 1500;
+    doom_melt_start(melt, menuBGImage);
     myStarter.run(score1, score2, 0, 0, 0);
     score1 += myStarter.leftPlayerWin();
     score2 += myStarter.rightPlayerWin();
@@ -1153,7 +1155,7 @@ mml_play:
 
   SetStrPreference("Player1 Name", player1Name);
   SetStrPreference("Player2 Name", player2Name);
-  melt(menuBGImage, display);
+  doom_melt_start(melt, gameScreen);
 }
 
 
@@ -1260,6 +1262,7 @@ mml_play:
     PuyoStarter myStarter(this, true, ia[score2].level, ia[score2].type, currentMusicTheme);
     p1name = playerName;
     p2name = AI_NAMES[score2];
+    doom_melt_start(melt, menuBGImage);
     myStarter.run(score1, score2, lives, lastPoints, 0);
     lastPoints = myStarter.rightPlayerPoints();
     score1 += myStarter.leftPlayerWin();
@@ -1267,8 +1270,10 @@ mml_play:
     if (!myStarter.rightPlayerWin())
       lives--;
     else {
-      currentMusicTheme = (currentMusicTheme + 1) % NB_MUSIC_THEME;
-      audio_music_switch_theme(currentMusicTheme);
+      if (!menu_active_is(gameOverMenu, "YES")) {
+        currentMusicTheme = (currentMusicTheme + 1) % NB_MUSIC_THEME;
+        audio_music_switch_theme(currentMusicTheme);
+      }
     }
 
     if (ia[score2].level == 0) {
@@ -1285,9 +1290,7 @@ mml_play:
   
     if (fini)
     {
-      
       audio_music_start(0);
-      melt(menuBGImage, display);
       int newOne = setHiScore(lastPoints, p1name);
       if (newOne >= 0)
       {
@@ -1297,6 +1300,7 @@ mml_play:
     }
   }
   SetStrPreference("Player Name", playerName);
+  doom_melt_start(melt, gameScreen);
 }
 
 void PuyoCommander::updateAll(PuyoDrawable *starter)
@@ -1315,7 +1319,8 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
   menu_update (twoPlayerGameMenu, display);
   menu_update (menu_pause,display);
   scrolling_text_update(scrollingText, display);
-
+  doom_melt_update(melt);
+  
   // affichage eventuel (pourrait ne pas avoir lieu de tps en tps si machine
   // trop lente)
   cycle++;
@@ -1341,6 +1346,7 @@ void PuyoCommander::updateAll(PuyoDrawable *starter)
     menu_draw (singleGameMenu, display);
     menu_draw (twoPlayerGameMenu, display);
     menu_draw(menu_pause,display);
+    doom_melt_display(melt, display);
     SDL_Flip (display);
   }
 

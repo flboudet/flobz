@@ -20,6 +20,15 @@
 #ifndef _PUYODOOMMELT
 #define _PUYODOOMMELT
 
-void melt(SDL_Surface *nextImage, SDL_Surface *screen);
+#include <SDL/SDL.h>
+
+typedef struct _DoomMelt DoomMelt;
+
+DoomMelt *doom_melt_new    (void);
+void      doom_melt_delete (DoomMelt *_this);
+void      doom_melt_update (DoomMelt *_this);
+void      doom_melt_start  (DoomMelt *_this, SDL_Surface *surf);
+void      doom_melt_display(DoomMelt *_this, SDL_Surface *display);
 
 #endif /*_PUYODOOMMELT*/
+

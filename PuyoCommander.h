@@ -5,6 +5,7 @@
 #include "menu.h"
 #include "scrollingtext.h"
 #include "GameControls.h"
+#include "PuyoDoomMelt.h"
 
 class PuyoDrawable
 {
@@ -44,6 +45,7 @@ class PuyoCommander
   SoFont *smallFont;
   SoFont *darkFont;
   SoFont *menuFont;
+  DoomMelt *melt;
 
  private:
   Menu *mainMenu;

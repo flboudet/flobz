@@ -13,6 +13,7 @@
 SDL_Painter painter;
 
 SDL_Surface *display, *background, *fallingBlue, *fallingRed, *fallingGreen, *fallingViolet, *fallingYellow, *neutral;
+SDL_Surface *gameScreen;
 SDL_Surface *bigNeutral;
 SDL_Surface *shrinkingPuyo[5][5];
 SDL_Surface *explodingPuyo[5][5];
@@ -92,7 +93,6 @@ public:
         puyoEyeState = random() % 700;
     }
     virtual ~AnimatedPuyo() {
-        fprintf(stderr, "Desallocation puyo %x\n", this);
         while (animationQueue.getSize() > 0)
             removeCurrentAnimation();
     }
@@ -115,7 +115,6 @@ public:
         if ((animation != NULL)) {
             if (animation->isFinished()) {
                 removeCurrentAnimation();
-                fprintf(stderr, "Animation supprimee\n");
             } else {
                 animation->cycle();
             }
@@ -318,7 +317,6 @@ class FallingAnimation : public PuyoAnimation {
 public:
     FallingAnimation(PuyoPuyo *puyo, int originY, int xOffset, int yOffset, int step)
     {
-        fprintf(stderr, "Creation animation pour le puyo puyo %x\n", puyo);
         attachedPuyo  = puyo;
         this->xOffset = xOffset;
         this->yOffset = yOffset;
@@ -803,9 +801,7 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
   savePointsA = 0;
   savePointsB = 0;
   
-  
 	background    = IMG_Load_DisplayFormat(BACKGROUND[theme]);
-    melt(background, display);
     
 	painter.backGround = background;
 	if (painter.gameScreen == NULL)
@@ -815,7 +811,7 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
 												background->w, background->h, 32,
 												fmt->Rmask, fmt->Gmask,
 												fmt->Bmask, fmt->Amask);
-		painter.gameScreen = SDL_DisplayFormat(tmp);
+		gameScreen = painter.gameScreen = SDL_DisplayFormat(tmp);
 		SDL_FreeSurface(tmp);
 	}
 	painter.display = display;

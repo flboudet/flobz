@@ -23,55 +23,111 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include "PuyoDoomMelt.h"
 
-#include "SDL/SDL.h"
+/* A few definitions */
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 #define COL_WIDTH 8
 #define NUM_COLS SCREEN_WIDTH / COL_WIDTH + 1
 
-typedef struct column
-{
-    short x, y;
-} column_t;
-
-static column_t columns[NUM_COLS];
-
-
-static int rand_fun ()
-{
+static int rand_fun () {
     return rand() % 256;
 }
 
-static void init_columns ()
+typedef struct column {
+    short x;
+    short y;
+} column_t;
+
+/* Private methods */
+
+static void _init_columns (DoomMelt *_this);
+static void _column_draw  (column_t *column, SDL_Surface *meltImage, SDL_Surface *screen);
+static void _column_think (column_t *column, int *isFinished);
+
+
+/* Private members */
+
+struct _DoomMelt {
+  column_t     columns[NUM_COLS];
+  SDL_Surface *surf;
+  int          isFinished;
+};
+
+/* Public methods */
+
+DoomMelt *doom_melt_new (void)
+{
+  DoomMelt *_this = (DoomMelt*)malloc(sizeof(DoomMelt));
+  _this->isFinished = 1;
+  return _this;
+}
+
+void doom_melt_delete (DoomMelt *_this)
+{
+  free(_this);
+}
+
+void doom_melt_start (DoomMelt *_this, SDL_Surface *surf)
+{
+  _this->surf       = surf;
+  _this->isFinished = 0;
+  _init_columns(_this);
+}
+
+void doom_melt_update (DoomMelt *_this)
+{
+  if (!_this->isFinished)
+  {
+    int i = 0;
+    _this->isFinished = 1;
+    for (; i < NUM_COLS; i++)
+      _column_think (&_this->columns[i], &_this->isFinished); 
+  }
+}
+
+void doom_melt_display(DoomMelt *_this, SDL_Surface *display)
+{
+  if (!_this->isFinished)
+  {
+    int i = 0;
+    for (; i < NUM_COLS; i++)
+    _column_draw(&_this->columns[i], _this->surf, display);
+  }
+}
+
+/*
+ * Private methods
+ */
+
+void _init_columns (DoomMelt *_this)
 {
     int i, start_x = 1;
     
-    columns[0].y = -(rand_fun() % 16);
-    columns[0].x = 0;
+    _this->columns[0].y = -(rand_fun() % 16);
+    _this->columns[0].x = 0;
     
     for (i = 1; i < NUM_COLS; i++)
     {
         int r = (rand_fun() % 3) - 1;
-        columns[i].y = columns[i-1].y + r;
-        if (columns[i].y > 0)
-            columns[i].y = 0;
-        else if (columns[i].y == -16)
-            columns[i].y = -15;
+        _this->columns[i].y = _this->columns[i-1].y + r;
+        if (_this->columns[i].y > 0)
+            _this->columns[i].y = 0;
+        else if (_this->columns[i].y == -16)
+            _this->columns[i].y = -15;
         
-        columns[i].x = start_x;
+        _this->columns[i].x = start_x;
         
         start_x += COL_WIDTH;
     }
 }
 
-
-
-static inline void column_draw (column_t *column, SDL_Surface *meltImage, SDL_Surface *screen)
+void _column_draw (column_t *column, SDL_Surface *meltImage, SDL_Surface *display)
 {
     static SDL_Rect image_rect = {0, 0, COL_WIDTH, };
-    static SDL_Rect dest_rect = {0, 0, COL_WIDTH, SCREEN_HEIGHT};
+    static SDL_Rect dest_rect =  {0, 0, COL_WIDTH, SCREEN_HEIGHT};
     
     int tmp = column->y;
     if (tmp < 0) 
@@ -83,10 +139,10 @@ static inline void column_draw (column_t *column, SDL_Surface *meltImage, SDL_Su
     image_rect.x = column->x;
     image_rect.h = meltImage->h - tmp;
     
-    SDL_BlitSurface(meltImage, &image_rect, screen, &dest_rect);
+    SDL_BlitSurface(meltImage, &image_rect, display, &dest_rect);
 }
 
-static void column_think (column_t *column, char *isFinished)
+void _column_think (column_t *column, int *isFinished)
 {
     static int grow = 0;
     
@@ -107,45 +163,5 @@ static void column_think (column_t *column, char *isFinished)
     }
     
     column->y += grow;
-}
-
-static void main_loop (SDL_Surface *meltImage, SDL_Surface *backgroundImage, SDL_Surface *screen)
-{
-    int i;
-    char isFinished = 0;
-    
-    init_columns();
-    while (!isFinished) {
-        isFinished = 1;
-        SDL_BlitSurface(backgroundImage, 0, screen, 0);
-        
-        for (i = 0; i < NUM_COLS; i++)
-        {
-            column_draw (columns + i, meltImage, screen);
-            column_think (&columns[i], &isFinished); 
-        }
-        
-        SDL_Flip(screen);
-        SDL_Delay(1);
-    }
-}
-
-void melt(SDL_Surface *nextImage, SDL_Surface *screen)
-{
-    SDL_Surface *meltImage;
-    
-    // clone of the screen
-    meltImage = SDL_CreateRGBSurface(SDL_SWSURFACE,
-                                     screen->w, screen->h,
-                                     screen->format->BitsPerPixel, 
-                                     screen->format->Rmask, 
-                                     screen->format->Gmask, 
-                                     screen->format->Bmask, 
-                                     screen->format->Amask);
-    SDL_BlitSurface(screen, 0, meltImage, 0);
-    
-    init_columns ();
-    main_loop (meltImage, nextImage, screen);
-    SDL_FreeSurface(meltImage);
 }
 
