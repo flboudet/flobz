@@ -55,6 +55,7 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
     message->addInt     (PuyoMessage::NEXT_F, attachedGame->getNextFalling());
     message->addInt     (PuyoMessage::NEXT_C, attachedGame->getNextCompanion());
     message->addInt     (PuyoMessage::SEMI_MOVE, attachedGame->getSemiMove());
+    message->addInt     (PuyoMessage::CURRENT_NEUTRALS, attachedGame->getNeutralPuyos());
     
     message->addIntArray(PuyoMessage::ADD_NEUTRALS,  neutralsBuffer);
     message->addIntArray(PuyoMessage::COMPANION_TURN,compTurnBuffer);
@@ -140,6 +141,10 @@ void PuyoNetworkView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY)
 void PuyoNetworkView::puyoWillVanish(IosVector &puyoGroup, int groupNum, int phase)
 {
     PuyoView::puyoWillVanish(puyoGroup, groupNum, phase);
+    /*for (int = 0; i < puyoGroup.getSize(); ++i)
+    {
+        willVanish();
+    }*/
 }
 
 void PuyoNetworkView::gameLost()
