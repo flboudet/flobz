@@ -246,7 +246,7 @@ namespace ios_fc {
                 return buf;
             }
 
-            inline void concat(const VoidBuffer &buf) const {
+            inline void concat(const VoidBuffer &buf) {
                 int dsize = size();
                 int ssize = buf.size();
                 grow(buf.size());
