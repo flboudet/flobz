@@ -229,7 +229,7 @@ namespace ios_fc {
              * Change the start address of the buffer.
              */
             inline const VoidBuffer &operator += (int offset) {
-                this->offset+=offset;
+                this->offset += offset;
                 return *this;
             }
             inline VoidBuffer operator + (int offset) {
@@ -321,14 +321,16 @@ namespace ios_fc {
             }
 
             inline const Buffer<T>& operator += (int offset) {
-				VoidBuffer::operator+=(offset*sizeof(T));
+				VoidBuffer::operator += (offset*sizeof(T));
 				return *this;
             }
+
             inline Buffer<T>  operator +  (int offset) {
                 Buffer<T> buf(*this);
                 buf += offset;
                 return buf;
             }
+            
             inline const Buffer<T>  operator +  (int offset) const {
                 Buffer<T> buf(*this);
                 buf += offset;
