@@ -5,23 +5,23 @@
   // Tempo du scenario
   int   @IntroTextEnd     = 225
   int   @EtText1Start     = 275
-  int   @EtText1End       = 420
-  float @SaucerArrive     = 440.0
-  float @HaloOn           = 540.0
-  float @GrandmaGoOut     = 640.0
-  int   @GrandmaTextStart = 720
-  int   @EtText2Start     = 840
-  float @HaloOff          = 850.0
-  int   @EtText2End       = 910
-  float @LaserGun         = 930.0
-  float @GrandmaDied      = 940.0
-  int   @EtText3Start     = 1000
-  int   @EtText3End       = 1170
-  float @KaoriArrives     = 1190.0
-  float @KaoriStops       = 1240.0
-  float @PlanKaoriStarts  = 1290.0
-  float @SaucerLeave      = 1340.0
-  float @EndOfScenar      = 1590.0
+  int   @EtText1End       = 440
+  float @SaucerArrive     = 460.0
+  float @HaloOn           = 560.0
+  float @GrandmaGoOut     = 660.0
+  int   @GrandmaTextStart = 740
+  int   @EtText2Start     = 860
+  float @HaloOff          = 870.0
+  int   @EtText2End       = 930
+  float @LaserGun         = 950.0
+  float @GrandmaDied      = 960.0
+  int   @EtText3Start     = 1020
+  int   @EtText3End       = 1190
+  float @KaoriArrives     = 1210.0
+  float @KaoriStops       = 1260.0
+  float @PlanKaoriStarts  = 1310.0
+  float @SaucerLeave      = 1360.0
+  float @EndOfScenar      = 1610.0
 
   // Differents Plans
   int @PlanLarge = 1
