@@ -10,7 +10,7 @@ gameloop:
 	g++ -Wall ${CFLAGS} `sdl-config --cflags --libs` test_gameloop.cpp gameloop.cpp ../iosfc/*.o -o test_gameloop
 
 gui:object
-	g++ -Wall ${CFLAGS} `sdl-config --cflags --libs` test_gui.cpp gameui.cpp gameloop.cpp ../iosfc/*.o ${OBJFILES} -lSDL_image -lSDL_mixer -o test_gui
+	g++ -Wall ${CFLAGS} `sdl-config --cflags --libs` test_gui.cpp gameui.cpp ../iosfc/*.o ${OBJFILES} -lSDL_image -lSDL_mixer -o test_gui
 
 gameloop.o: gameloop.cpp gameloop.h
 preferences.o:preferences.c preferences.h
