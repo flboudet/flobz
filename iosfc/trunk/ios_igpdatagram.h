@@ -47,6 +47,7 @@ public:
     VoidBuffer serialize();
     int getMsgIdent() const { return msgIdent; }
     class ClientMsgAutoAssignIDDatagram;
+    class ServerMsgInformIDDatagram;
 protected:
     IGPDatagram(IGPMsgIdent ident, VoidBuffer message);
 private:
@@ -58,6 +59,11 @@ private:
 class IGPDatagram::ClientMsgAutoAssignIDDatagram : public IGPDatagram {
 public:
     ClientMsgAutoAssignIDDatagram() : IGPDatagram(ClientMsgAutoAssignID, VoidBuffer()) {}
+};
+
+class IGPDatagram::ServerMsgInformIDDatagram : public IGPDatagram {
+public:
+    ServerMsgInformIDDatagram(int igpIdent) : IGPDatagram(ServerMsgInformID, VoidBuffer()) {}
 };
 
 };

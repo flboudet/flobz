@@ -47,6 +47,11 @@ void IGPServerPortManager::unregisterConnection(IGPServerConnection *connection)
     connections.remove(connection);
 }
 
+int IGPServerPortManager::getUniqueIGPId()
+{
+    return 3;
+}
+
 IGPServerConnection::IGPServerConnection(IGPServerPortManager *pool) : pool(pool)
 {
     igpID = 0;
@@ -61,7 +66,7 @@ IGPServerConnection::~IGPServerConnection()
 
 void IGPServerConnection::connectionMade()
 {
-    clientSocket->getOutputStream()->streamWrite(VoidBuffer("Hello\n", 6));
+    //clientSocket->getOutputStream()->streamWrite(VoidBuffer("Hello\n", 6));
 }
 
 void IGPServerConnection::dataReceived(VoidBuffer data)
@@ -69,7 +74,11 @@ void IGPServerConnection::dataReceived(VoidBuffer data)
     IGPDatagram message(data);
     switch (message.getMsgIdent()) {
     case IGPDatagram::ClientMsgAutoAssignID:
-        printf("Auto-assign ID\n");
+        {printf("Auto-assign ID\n");
+        igpID = pool->getUniqueIGPId();
+        valid=true;
+        IGPDatagram::ServerMsgInformIDDatagram reply(igpID);
+        clientSocket->getOutputStream()->streamWrite(reply.serialize());}
         break;
     default:
         break;
