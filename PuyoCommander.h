@@ -34,7 +34,7 @@ class PuyoCommander
   void startSingleGameLoop();
   void startTwoPlayerGameLoop();
   void startNetGameLoop();
-  void enterStringLoop(Menu *menu, const char *kItem, char out[256]);
+  void enterStringLoop(Menu *menu, const char *kItem, char out[256], int maxlen = 10);
 
   Menu *gameOverMenu;
   

@@ -1088,7 +1088,7 @@ mml_fin:
     }
 }
 
-void PuyoCommander::enterStringLoop(Menu *menu, const char *kItem, char out[256])
+void PuyoCommander::enterStringLoop(Menu *menu, const char *kItem, char out[256], int maxlen)
 {
   int len = 0;
   char prevValue[256];
@@ -1150,7 +1150,7 @@ void PuyoCommander::enterStringLoop(Menu *menu, const char *kItem, char out[256]
             if (e.key.keysym.sym == SDLK_SPACE)
               ch = ' ';
 
-            if ((ch!=0) && (len < 10)) {
+            if ((ch!=0) && (len < maxlen)) {
               out[len++] = ch;
               out[len]   = '_';
               out[len+1] = 0;
@@ -1208,7 +1208,7 @@ void PuyoCommander::startNetGameLoop()
                   menu_next_item (netGameMenu);
                 }
                 else if (menu_active_is(netGameMenu,kIpAddress)) {
-                  enterStringLoop(netGameMenu,kIpAddress,ipAddress);
+                  enterStringLoop(netGameMenu,kIpAddress,ipAddress, 60);
                   menu_next_item (netGameMenu);
                 }
                 else

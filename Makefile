@@ -6,7 +6,7 @@
 # Settings
 
 ENABLE_AUDIO=true
-ENABLE_OPENGL=false
+ENABLE_OPENGL=true
 ENABLE_DGA=false
 
 DEBUG_MODE=true
