@@ -7,6 +7,7 @@
 #include "audio.h"
 #include "IosImgProcess.h"
 #include "HiScores.h"
+#include "PuyoDoomMelt.h"
 
 #include "SDL_Painter.h"
 SDL_Painter painter;
@@ -706,7 +707,10 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, bool aiLeft, int aiLevel, IA_
   savePointsA = 0;
   savePointsB = 0;
   
+  
 	background    = IMG_Load_DisplayFormat(BACKGROUND[theme]);
+    melt(background, display);
+    
 	painter.backGround = background;
 	if (painter.gameScreen == NULL)
 	{
@@ -869,6 +873,7 @@ void PuyoStarter::run(int score1, int score2, int lives, int point1, int point2)
 		attachedGameA->cycle();
 		attachedGameB->cycle();
 	}
+
 	while (!quit) {
 		bool left_danger = (attachedGameA->getMaxColumnHeight() > PUYODIMY - 5);
 		bool right_danger = (attachedGameB->getMaxColumnHeight() > PUYODIMY - 5);

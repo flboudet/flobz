@@ -10,7 +10,7 @@ SDL_CONFIG=sdl-config
 CC=g++
 CXX=g++
 
-CFLAGS=`$(SDL_CONFIG) --cflags` -O3 -I/sw/include -DUSE_AUDIO
+CFLAGS=`$(SDL_CONFIG) --cflags` -g -I/sw/include -DUSE_AUDIO
 CXXFLAGS=${CFLAGS}
 
 HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h PuyoGame.h \
@@ -22,7 +22,7 @@ HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h Pu
 OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o IosException.o \
 					IosVector.o main.o PuyoGame.o PuyoVersion.o PuyoView.o PuyoIA.o sofont.o \
 					menu.o menuitems.o audio.o scrollingtext.o preferences.o PuyoStory.o SDL_Painter.o \
-					InputManager.o GameControls.o
+					InputManager.o GameControls.o PuyoDoomMelt.o
 
 all: prelude flobopuyo
 
@@ -45,6 +45,7 @@ prelude:
 %.o:%.cpp
 	@echo "[$@]" && $(CXX) $(CFLAGS) -DDATADIR=${DATADIR} -c $< 2>> WARNINGS || (cat WARNINGS && false)
 
+PuyoDoomMelt.o:PuyoDoomMelt.c ${HFILES}
 HiScores.o:HiScores.cpp HiScores.h preferences.h
 PuyoCommander.o:PuyoCommander.cpp ${HFILES}
 PuyoGame.o:PuyoGame.cpp ${HFILES}

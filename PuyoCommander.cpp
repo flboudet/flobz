@@ -11,6 +11,7 @@
 #include "preferences.h"
 #include "InputManager.h"
 #include "HiScores.h"
+#include "PuyoDoomMelt.h"
 
 #ifndef DATADIR
 extern char *DATADIR;
@@ -39,6 +40,7 @@ char *kScore       = "Score:\t";
 char *kPlayerName  = "Player Name:\t";
 char *kPlayer1Name  = "P1 Name:\t";
 char *kPlayer2Name  = "P2 Name:\t";
+
 
 static const char *k01 = " 1 - ";
 static const char *k02 = " 2 - ";
@@ -1151,6 +1153,7 @@ mml_play:
 
   SetStrPreference("Player1 Name", player1Name);
   SetStrPreference("Player2 Name", player2Name);
+  melt(menuBGImage, display);
 }
 
 
@@ -1282,7 +1285,9 @@ mml_play:
   
     if (fini)
     {
+      
       audio_music_start(0);
+      melt(menuBGImage, display);
       int newOne = setHiScore(lastPoints, p1name);
       if (newOne >= 0)
       {
