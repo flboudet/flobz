@@ -1,6 +1,6 @@
 CC=gcc
 # CFLAGS=-g -O0 -Wall -pedantic -DVERBOSE # -DUSE_JITC_X86=1
-CFLAGS=-g -march=i586 -Wall -pedantic -DUSE_JITC_X86=1
+CFLAGS=-g -march=athlon -Wall -pedantic -DUSE_JITC_X86=1
 OBJ=goomsl_yacc.o goomsl_lex.o goomsl_hash.o goomsl_heap.o goomsl.o main.o jitc_x86.o
 
 LIBS        = -L/usr/X11R6/lib -L/usr/lib -L/usr/local/lib -lX11 -lXext \
@@ -31,4 +31,4 @@ clean:
 	rm -f *.o *~ goomsl_lex.c goomsl_yacc.c goomsl_yacc.h goomsl
 
 jitc_test:jitc_test.c jitc_x86.c jitc_x86.h
-	gcc -Wall -g -o jitc_test jitc_test.c jitc_x86.c
+	gcc -Wall -g -DDISPLAY_GENCODE=1 -DDISPLAY_GENCODE_HEXA=1 -o jitc_test jitc_test.c jitc_x86.c

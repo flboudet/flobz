@@ -11,6 +11,7 @@
     #include "goomsl_private.h"
 
 #define STRUCT_ALIGNMENT 16
+/* #define VERBOSE */
 
     int yylex(void);
     void yyerror(char *);

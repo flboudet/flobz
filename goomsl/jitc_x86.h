@@ -93,8 +93,9 @@ typedef struct _JITC_X86_ENV {
 } JitcX86Env;
 
 #define DISPLAY_GENCODE
+#define DISPLAY_GENCODE_HEXA
 
-#ifdef DISPLAY_GENCODE
+#ifdef DISPLAY_GENCODE_HEXA
   #define JITC_ADD_UCHAR(jitc,op) printf(" 0x%02x", op) && (jitc->memory[jitc->used++]=op)
 #else
   #define JITC_ADD_UCHAR(jitc,op) (jitc->memory[jitc->used++]=op)
@@ -134,7 +135,6 @@ typedef struct _JITC_X86_ENV {
 #define JITC_LOAD_REG_pREG(jitc,dest,src)   { JITC_OP_REG_pREG(jitc,0x8b,dest,src); }
 #define JITC_LOAD_pREG_REG(jitc,dest,src)   { JITC_OP_pREG_REG(jitc,0x89,dest,src); }
 
-
 #define JITC_DEC_REG(jitc,reg)              { JITC_ADD_UCHAR  (jitc,0x48+reg); }
 #define JITC_INC_REG(jitc,reg)              { JITC_ADD_UCHAR  (jitc,0x40+reg); }
 
@@ -151,15 +151,17 @@ typedef struct _JITC_X86_ENV {
 #define JITC_IDIV_EAX_REG(jitc,reg)         { JITC_ADD_2UCHAR(jitc, 0xf7, 0xf8+reg); }
 #define JITC_IMUL_EAX_REG(jitc,reg)         { JITC_ADD_2UCHAR(jitc, 0xf7, 0xe8+reg); }
 
-#define JITC_SUB_REG_REG(jitc,dest,src)     { JITC_OP_REG_REG (jitc,0x29,dest,src); }
+/*#define JITC_SUB_REG_REG(jitc,dest,src)     { JITC_OP_REG_REG (jitc,0x29,dest,src); }
 #define JITC_SUB_EAX_IMM32(jitc,imm32)      { JITC_ADD_UCHAR  (jitc,0x2d); JITC_ADD_UINT(jitc,(int)imm32); }
 #define JITC_SUB_REG_IMM32(jitc,reg,imm32)  { JITC_ADD_2UCHAR (jitc,0x81, 0xe8+reg);\
-                                              JITC_ADD_UINT   (jitc,(int)imm32); }
+                                              JITC_ADD_UINT   (jitc,(int)imm32); }*/
 #define JITC_SUB_REG_IMM8(jitc,reg,imm8)    { JITC_ADD_2UCHAR (jitc,0x83, 0xe8+reg);\
                                               JITC_ADD_UCHAR(jitc,imm8); }
 
+/*
 #define JITC_PUSH_REG(jitc,reg)             { JITC_ADD_UCHAR  (jitc,0x50+reg); }
 #define JITC_POP_REG(jitc,reg)              { JITC_ADD_UCHAR  (jitc,0x58+reg); }
+*/
 
 /* Floating points */
 
@@ -198,11 +200,12 @@ typedef struct _JITC_X86_ENV {
 #define JITC_LEAVE(jitc)                    { JITC_ADD_UCHAR  (jitc,0xc9); }
 
 /* save all registers (except EAX,ESP,EBP) */
-#define JITC_PUSH_ALL(jitc) { JITC_PUSH_REG(jitc,ECX); JITC_PUSH_REG(jitc,EDX); JITC_PUSH_REG(jitc,EBX);\
-                              JITC_PUSH_REG(jitc,ESI); JITC_PUSH_REG(jitc,EDI); }
+#define JITC_PUSH_ALL(jitc) { jitc_add(jitc,"push ecx"); jitc_add(jitc,"push edx"); jitc_add(jitc,"push ebx"); \
+                              jitc_add(jitc,"push esi"); jitc_add(jitc,"push edi"); }
+
 /* restore all registers (except EAX,ESP,EBP) */
-#define JITC_POP_ALL(jitc)  { JITC_POP_REG(jitc,EDI); JITC_POP_REG(jitc,ESI); JITC_POP_REG(jitc,EBX);\
-                              JITC_POP_REG(jitc,EDX); JITC_POP_REG(jitc,ECX); }
+#define JITC_POP_ALL(jitc)  { jitc_add(jitc,"pop edi"); jitc_add(jitc,"pop esi"); jitc_add(jitc,"pop ebx"); \
+                              jitc_add(jitc,"pop edx"); jitc_add(jitc,"pop ecx"); }
 
 /* public methods */
 JitcX86Env *jitc_x86_env_new(int memory_size);

@@ -25,8 +25,8 @@ struct {
 } RegsName[] = {
   {"eax",EAX}, {"ebx",EBX}, {"ecx",ECX}, {"edx",EDX},
   {"edi",EDI}, {"esi",ESI}, {"ebp",EBP}, {"esp",ESP},
-  {"st(0)",0}, {"st(1)",1}, {"st(2)",2}, {"st(3)",3},
-  {"st(4)",4}, {"st(5)",5}, {"st(6)",6}, {"st(7)",7},
+  {"st0",0}, {"st1",1}, {"st2",2}, {"st3",3},
+  {"st4",4}, {"st5",5}, {"st6",6}, {"st7",7},
   {"mm0",0}, {"mm1",1}, {"mm2",2}, {"mm3",3},
   {"mm4",4}, {"mm5",5}, {"mm6",6}, {"mm7",7}, {NULL,0}
 };
@@ -130,17 +130,67 @@ static AddLikeInstr addLike[] = {
   { "add",  0x01,   0x81, 0x00, 0x05 },
   { "and",  0x21,   0x81, 0x04, 0x25 },
   { "cmp",  0x39,   0x81, 0x07, 0x3D },
-  { "imul", 0x0FAF, 0x69, 0x00    -1 },
+  { "imul", 0x0FAF, 0x69, 0x00, 0x10000 },
+  { "sub",  0x29,   0x81, 0x05, 0X2D },
   { NULL,       -1,   -1,   -1,   -1 }
 };
+
+int checkAddLike(JitcX86Env *jitc, char *op, IParam *iparam, int nbParams)
+{
+  int i;
+  for (i=0;addLike[i].name;++i)
+  {
+    if (strcmp(op,addLike[i].name) == 0)
+    {
+      if ((iparam[0].id == PARAM_REG) && (iparam[1].id == PARAM_INT)) {
+        if ((iparam[0].reg == EAX) && (addLike[i].opcode_eax_int != 0x10000)) {
+          JITC_ADD_UCHAR(jitc, addLike[i].opcode_eax_int);
+          JITC_ADD_UINT(jitc,  iparam[1].i);
+          return 1;
+        }
+        else {
+          JITC_ADD_UCHAR(jitc, addLike[i].opcode_reg_int);
+          JITC_MODRM(jitc,     0x03, addLike[i].digit_reg_int, iparam[0].reg);
+          JITC_ADD_UINT(jitc,  iparam[1].i);
+          return 1;
+        }
+      }
+      else if ((iparam[0].id == PARAM_dispREG) && (iparam[1].id == PARAM_INT)) {
+        JITC_ADD_UCHAR(jitc, addLike[i].opcode_reg_int);
+        if ((iparam[0].disp & 0xff) == iparam[0].disp)
+        {
+          JITC_MODRM(jitc,     0x01, addLike[i].digit_reg_int, iparam[0].reg);
+          JITC_ADD_UCHAR(jitc,  iparam[0].disp);
+        }
+        else
+        {
+          JITC_MODRM(jitc,     0x00, addLike[i].digit_reg_int, iparam[0].reg);
+          JITC_ADD_UINT(jitc,  iparam[0].disp);
+        }
+        JITC_ADD_UINT(jitc,  iparam[1].i);
+        return 1;
+      }
+      else if ((iparam[0].id == PARAM_DISP32) && (iparam[1].id == PARAM_INT)) {
+        JITC_ADD_UCHAR(jitc, addLike[i].opcode_reg_int);
+        JITC_MODRM(jitc, 0x00, addLike[i].digit_reg_int, 0x05);
+        JITC_ADD_UINT(jitc,  iparam[0].disp);
+        JITC_ADD_UINT(jitc,  iparam[1].i);
+        return 1;
+      }
+      else {
+        modrm(jitc, addLike[i].opcode, iparam);
+        return 1;
+      }
+    }
+  }
+  return 0;
+}
 
 /**
  * Check all kind of known instruction... perform special optimisations..
  */
 static void jitc_add_op(JitcX86Env *jitc, char *op, IParam *iparam, int nbParams)
 {
-  int i;
-
   /* MOV */
   if (strcmp(op,"mov") == 0)
   {
@@ -174,6 +224,22 @@ static void jitc_add_op(JitcX86Env *jitc, char *op, IParam *iparam, int nbParams
     }
   }
 
+  /* POP */
+  if (strcmp(op, "pop") == 0) {
+    if (iparam[0].id == PARAM_REG) {
+      JITC_ADD_UCHAR(jitc, 0x58 + iparam[0].reg);
+      return;
+    }
+  }
+
+  /* PUSH */
+  if (strcmp(op, "push") == 0) {
+    if (iparam[0].id == PARAM_REG) {
+      JITC_ADD_UCHAR(jitc, 0x50 + iparam[0].reg);
+      return;
+    }
+  }
+
   /* INC */
   if (strcmp(op, "inc") == 0) {
     if (iparam[0].id == PARAM_REG) {
@@ -193,31 +259,27 @@ static void jitc_add_op(JitcX86Env *jitc, char *op, IParam *iparam, int nbParams
     imul_like_modrm_1param(jitc, 0xff, 0x01, iparam);
     return;
   }
+  
+#define SHIFT_LIKE(_name,_op1,_op2,_digit) \
+  if (strcmp(op, _name) == 0) { \
+    if (iparam[1].id == PARAM_INT) { \
+      if (iparam[1].i == 1) \
+        imul_like_modrm_1param(jitc, _op1, _digit, iparam); \
+      else { \
+        imul_like_modrm_1param(jitc, _op2, _digit, iparam); \
+        JITC_ADD_UCHAR(jitc, iparam[1].i); \
+      } \
+      return; \
+    } \
+  }
+
+  SHIFT_LIKE("sal", 0xd1, 0xc1, 0x04);
+  SHIFT_LIKE("sar", 0xd1, 0xc1, 0x07);
+  SHIFT_LIKE("shl", 0xd1, 0xc1, 0x04);
+  SHIFT_LIKE("shr", 0xd1, 0xc1, 0x05);
     
   /* ADD LIKE */
-  for (i=0;addLike[i].name;++i)
-  {
-    if (strcmp(op,addLike[i].name) == 0)
-    {
-      if ((iparam[0].id == PARAM_REG) && (iparam[1].id == PARAM_INT)) {
-        if ((iparam[0].reg == EAX) && (addLike[i].opcode_eax_int>=0)) {
-          JITC_ADD_UCHAR(jitc, addLike[i].opcode_eax_int);
-          JITC_ADD_UINT(jitc,  iparam[1].i);
-          return;
-        }
-        else {
-          JITC_ADD_UCHAR(jitc, addLike[i].opcode_reg_int);
-          JITC_MODRM(jitc,     0x03, addLike[i].digit_reg_int, iparam[0].reg);
-          JITC_ADD_UINT(jitc,  iparam[1].i);
-          return;
-        }
-      }
-      else {
-        modrm(jitc, addLike[i].opcode, iparam);
-        return;
-      }
-    }
-  }
+  if (checkAddLike(jitc, op, iparam, nbParams)) return;
 
   /* BSWAP : 0F C8+rd */
   
@@ -340,9 +402,9 @@ JitcFunc jitc_prepare_func(JitcX86Env *jitc) {
 #endif
 
     /* save the state */
-    JITC_PUSH_REG(jitc,EBP);
-    JITC_LOAD_REG_REG(jitc,EBP,ESP);
-    JITC_SUB_REG_IMM8(jitc,ESP,8);
+    jitc_add(jitc,"push ebp");
+    jitc_add(jitc,"mov ebp, esp");
+    jitc_add(jitc,"sub esp, $d", 8);
     JITC_PUSH_ALL(jitc);
 #ifdef DISPLAY_GENCODE
     printf("\n------------------------------------------\n");
