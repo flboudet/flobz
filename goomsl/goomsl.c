@@ -915,6 +915,15 @@ static void calculate_labels(InstructionFlow *iflow)
   }
 } /* }}} */
 
+static int powerOfTwo(int i)
+{
+  int b;
+  for (b=0;b<31;b++)
+    if (i == (1<<b))
+      return b;
+  return 0;
+}
+
 /* Cree un flow d'instruction optimise */
 static void gsl_create_fast_iflow(void)
 { /* {{{ */
@@ -1031,9 +1040,21 @@ static void gsl_create_fast_iflow(void)
         printf("NOT IMPLEMENTED : %d\n", instr->id);
         break;
       case INSTR_MULI_VAR_INTEGER:
-        jitc_add(jitc, "mov  eax, [$d]", instr->data.udest.var_int);
-        jitc_add(jitc, "imul eax, $d",   instr->data.usrc.value_int);
-        jitc_add(jitc, "mov  [$d], eax", instr->data.udest.var_int);
+        if (instr->data.usrc.value_int != 1)
+        {
+          int po2 = powerOfTwo(instr->data.usrc.value_int);
+          if (po2) {
+            /* performs (V / 2^n) by doing V >> n */
+            jitc_add(jitc, "mov  eax, [$d]",  instr->data.udest.var_int);
+            jitc_add(jitc, "sal  eax, $d",    po2);
+            jitc_add(jitc, "mov  [$d], eax",  instr->data.udest.var_int);
+          }
+          else {
+            jitc_add(jitc, "mov  eax, [$d]", instr->data.udest.var_int);
+            jitc_add(jitc, "imul eax, $d",   instr->data.usrc.value_int);
+            jitc_add(jitc, "mov  [$d], eax", instr->data.udest.var_int);
+          }
+        }
         break;
       case INSTR_MULI_VAR_VAR:
         jitc_add(jitc, "mov  eax,  [$d]", instr->data.udest.var_int);
@@ -1047,123 +1068,101 @@ static void gsl_create_fast_iflow(void)
         printf("NOT IMPLEMENTED : %d\n", instr->id);
         break;
       case INSTR_DIVI_VAR_INTEGER:
-        jitc_add(jitc, "push ecx");
-        jitc_add(jitc, "push ebx");
-        jitc_add(jitc, "mov  eax, [$d]", instr->data.udest.var_int);
-        jitc_add(jitc, "mov  edx, $d", 0);
-        jitc_add(jitc, "mov  ecx, eax");
-        jitc_add(jitc, "mov  ebx, $d", instr->data.usrc.value_int);
-        jitc_add(jitc, "and  ecx, $d", 0x80000000);
-        jitc_add(jitc, "and  eax, $d", 0x7fffffff);
-        jitc_add(jitc, "idiv ebx");
-        jitc_add(jitc, "or   eax, ecx") /*TODO*/
-        jitc_add(jitc, "pop ebx");
-        jitc_add(jitc, "pop ecx");
-        jitc_add(jitc, "mov [$d], eax", instr->data.udest.var_int);
+        if ((instr->data.usrc.value_int != 1) && (instr->data.usrc.value_int != 0))
+        {
+          int po2 = powerOfTwo(instr->data.usrc.value_int);
+          if (po2) {
+            /* performs (V / 2^n) by doing V >> n */
+            jitc_add(jitc, "mov  eax, [$d]",  instr->data.udest.var_int);
+            jitc_add(jitc, "sar  eax, $d",    po2);
+            jitc_add(jitc, "mov  [$d], eax",  instr->data.udest.var_int);
+          }
+          else {
+            /* performs (V/n) by doing (V*(32^2/n)) */
+            long   coef;
+            double dcoef = (double)4294967296.0 / (double)instr->data.usrc.value_int;
+            if (dcoef < 0.0) dcoef = -dcoef;
+            coef   = (long)floor(dcoef);
+            dcoef -= floor(dcoef);
+            if (dcoef < 0.5) coef += 1;
+            
+            jitc_add(jitc, "mov  eax, [$d]", instr->data.udest.var_int);
+            jitc_add(jitc, "mov  edx, $d",   coef);
+            jitc_add(jitc, "imul edx");
+            if (instr->data.usrc.value_int < 0)
+              jitc_add(jitc, "neg edx");
+            jitc_add(jitc, "mov [$d], edx", instr->data.udest.var_int);
+          }
+        }
         break;
       case INSTR_DIVI_VAR_VAR         :
-        jitc_add(jitc, "push ebx");
         jitc_add(jitc, "mov  eax, [$d]", instr->data.udest.var_int);
-        jitc_add(jitc, "mov  edx, eax");
-        jitc_add(jitc, "mov  ebx, [$d]", instr->data.usrc.var_int);
-        jitc_add(jitc, "and  edx, $d", 0x80000000);
-        jitc_add(jitc, "and  eax, $d", 0x7fffffff);
-        jitc_add(jitc, "idiv ebx");
-        jitc_add(jitc, "pop ebx");
+        jitc_add(jitc, "cdq"); /* sign extend eax into edx */
+        jitc_add(jitc, "idiv [$d]", instr->data.usrc.var_int);
         jitc_add(jitc, "mov [$d], eax", instr->data.udest.var_int);
         break;
-      case INSTR_DIVF_VAR_FLOAT       :
+      case INSTR_DIVF_VAR_FLOAT:
         printf("NOT IMPLEMENTED : %d\n", instr->id);
         break;
-      case INSTR_DIVF_VAR_VAR         :
+      case INSTR_DIVF_VAR_VAR:
         printf("NOT IMPLEMENTED : %d\n", instr->id);
         break;
-      case INSTR_JZERO                :
-        JITC_CMP_REG_IMM32(jitc,EDX,0);
-        JITC_JUMP_COND_LABEL(jitc,COND_EQUAL,instr->jump_label);
+      case INSTR_JZERO:
+        jitc_add(jitc, "cmp edx, $d", 0);
+        jitc_add(jitc, "je $s", instr->jump_label);
         break;
       case INSTR_ISEQUALP_VAR_VAR     :
-        JITC_LOAD_REG_IMM32(jitc, EAX, instr->data.udest.var_ptr);  /* eax  = &dest */
-        JITC_LOAD_REG_IMM32(jitc, EBX, instr->data.usrc.var_ptr);   /* ebx  = &src  */
-        JITC_LOAD_REG_pREG (jitc, EAX, EAX);
-        JITC_LOAD_REG_pREG (jitc, EBX, EBX);
-        JITC_LOAD_REG_IMM32(jitc, EDX, 0);
-        JITC_CMP_REG_REG   (jitc, EAX, EBX);
-        JITC_JUMP_COND     (jitc, COND_NOT_EQUAL, 1);
-        JITC_INC_REG       (jitc, EDX);
+        jitc_add(jitc, "mov eax, [$d]", instr->data.udest.var_ptr);
+        jitc_add(jitc, "mov edx, $d",   0);
+        jitc_add(jitc, "cmp eax, [$d]", instr->data.usrc.var_ptr);
+        jitc_add(jitc, "jne $d",        1);
+        jitc_add(jitc, "inc edx");
         break;
       case INSTR_ISEQUALP_VAR_PTR     :
-        JITC_LOAD_REG_IMM32(jitc, EAX, instr->data.udest.var_ptr); /* eax  = &dest */
-        JITC_LOAD_REG_IMM32(jitc, EDX, 0);
-        JITC_LOAD_REG_pREG (jitc, EAX, EAX);
-        JITC_CMP_REG_IMM32 (jitc, EAX, instr->data.usrc.value_ptr);
-        JITC_JUMP_COND     (jitc, COND_NOT_EQUAL, 1);
-        JITC_INC_REG       (jitc, EDX);
+        jitc_add(jitc, "mov eax, [$d]", instr->data.udest.var_ptr);
+        jitc_add(jitc, "mov edx, $d",   0);
+        jitc_add(jitc, "cmp eax, $d",   instr->data.usrc.value_ptr);
+        jitc_add(jitc, "jne $d",        1);
+        jitc_add(jitc, "inc edx");
         break;
       case INSTR_ISEQUALI_VAR_VAR     :
-        JITC_LOAD_REG_IMM32(jitc, EAX, instr->data.udest.var_int); /* eax  = &dest */
-        JITC_LOAD_REG_IMM32(jitc, EBX, instr->data.usrc.var_int);  /* ebx  = &src  */
-        JITC_LOAD_REG_pREG (jitc, EAX, EAX);
-        JITC_LOAD_REG_pREG (jitc, EBX, EBX);
-        JITC_LOAD_REG_IMM32(jitc, EDX, 0);
-        JITC_CMP_REG_REG   (jitc, EAX, EBX);
-        JITC_JUMP_COND     (jitc, COND_NOT_EQUAL, 1);
-        JITC_INC_REG       (jitc, EDX);
+        jitc_add(jitc, "mov eax, [$d]", instr->data.udest.var_int);
+        jitc_add(jitc, "mov edx, $d",   0);
+        jitc_add(jitc, "cmp eax, [$d]", instr->data.usrc.var_int);
+        jitc_add(jitc, "jne $d",        1);
+        jitc_add(jitc, "inc edx");
         break;
       case INSTR_ISEQUALI_VAR_INTEGER :
-        JITC_LOAD_REG_IMM32(jitc, EAX, instr->data.udest.var_int); /* eax  = &dest */
-        JITC_LOAD_REG_IMM32(jitc, EDX, 0);
-        JITC_LOAD_REG_pREG (jitc, EAX, EAX);
-        JITC_CMP_REG_IMM32 (jitc, EAX, instr->data.usrc.value_int);
-        JITC_JUMP_COND     (jitc, COND_NOT_EQUAL, 1);
-        JITC_INC_REG       (jitc, EDX);
+        jitc_add(jitc, "mov eax, [$d]", instr->data.udest.var_int);
+        jitc_add(jitc, "mov edx, $d",   0);
+        jitc_add(jitc, "cmp eax, $d", instr->data.usrc.value_int);
+        jitc_add(jitc, "jne $d",        1);
+        jitc_add(jitc, "inc edx");
         break;
       case INSTR_ISEQUALF_VAR_VAR     :
-        JITC_LOAD_REG_IMM32(jitc, EAX, instr->data.udest.var_float); /* eax  = &dest */
-        JITC_LOAD_REG_IMM32(jitc, EBX, instr->data.usrc.var_float);  /* ebx  = &src  */
-        JITC_LOAD_REG_pREG (jitc, EAX, EAX);
-        JITC_LOAD_REG_pREG (jitc, EBX, EBX);
-        JITC_LOAD_REG_IMM32(jitc, EDX, 0);
-        JITC_CMP_REG_REG   (jitc, EAX, EBX);
-        JITC_JUMP_COND     (jitc, COND_NOT_EQUAL, 1);
-        JITC_INC_REG       (jitc, EDX);
+        printf("NOT IMPLEMENTED : %d\n", instr->id);
         break;
       case INSTR_ISEQUALF_VAR_FLOAT   :
-        JITC_LOAD_REG_IMM32(jitc, EAX, instr->data.udest.var_float); /* eax  = &dest */
-        JITC_LOAD_REG_IMM32(jitc, EDX, 0);
-        JITC_LOAD_REG_pREG (jitc, EAX, EAX);
-        JITC_CMP_REG_IMM32 (jitc, EAX, *(int*)(&instr->data.usrc.value_float));
-        JITC_JUMP_COND     (jitc, COND_NOT_EQUAL, 1);
-        JITC_INC_REG       (jitc, EDX);
+        printf("NOT IMPLEMENTED : %d\n", instr->id);
         break;
-      case INSTR_CALL                 :
-        JITC_CALL_LABEL(jitc, instr->jump_label);
+      case INSTR_CALL:
+        jitc_add(jitc, "call $s", instr->jump_label);
         break;
-      case INSTR_RET                  :
-        JITC_RETURN_FUNCTION(jitc);
+      case INSTR_RET:
+        jitc_add(jitc, "ret");
         break;
-      case INSTR_EXT_CALL             :
-        JITC_LOAD_REG_IMM32(jitc, EAX, &(instr->data.udest.external_function->vars));
-        JITC_LOAD_REG_pREG(jitc,EAX,EAX);
+      case INSTR_EXT_CALL:
+        jitc_add(jitc, "mov eax, [$d]", &(instr->data.udest.external_function->vars));
         jitc_add(jitc, "push eax");
-        
-        JITC_LOAD_REG_IMM32(jitc, EAX, &(currentGoomSL->vars));
-        JITC_LOAD_REG_pREG(jitc,EAX,EAX);
+        jitc_add(jitc, "mov edx, [$d]", &(currentGoomSL->vars));
+        jitc_add(jitc, "push edx");
+        jitc_add(jitc, "mov eax, [$d]", &(currentGoomSL));
         jitc_add(jitc, "push eax");
 
-        JITC_LOAD_REG_IMM32(jitc, EAX, &(currentGoomSL));
-        JITC_LOAD_REG_pREG(jitc,EAX,EAX);
-        jitc_add(jitc, "push eax");
-
-        JITC_LOAD_REG_IMM32(jitc,EAX,&(instr->data.udest.external_function));
-        JITC_LOAD_REG_pREG(jitc,EAX,EAX);
-        JITC_LOAD_REG_pREG(jitc,EAX,EAX);
-
-        JITC_CALL_pREG(jitc,EAX);
-
-        jitc_add(jitc, "pop eax");
-        jitc_add(jitc, "pop eax");
-        jitc_add(jitc, "pop eax");
+        jitc_add(jitc, "mov eax, [$d]",  &(instr->data.udest.external_function));
+        jitc_add(jitc, "mov eax, [eax]");
+        jitc_add(jitc, "call [eax]");
+        jitc_add(jitc, "add esp, $d", 12);
         break;
       case INSTR_NOT_VAR:
         jitc_add(jitc, "mov eax, edx");
@@ -1171,20 +1170,20 @@ static void gsl_create_fast_iflow(void)
         jitc_add(jitc, "sub edx, eax");
         break;
       case INSTR_JNZERO:
-        JITC_CMP_REG_IMM32(jitc,EDX,0);
-        JITC_JUMP_COND_LABEL(jitc,COND_NOT_EQUAL,instr->jump_label);
+        jitc_add(jitc, "cmp edx, $d", 0);
+        jitc_add(jitc, "jne $s", instr->jump_label);
         break;
       case INSTR_SETS_VAR_VAR:
         {
           int loop = DEST_STRUCT_SIZE / sizeof(int);
-          JITC_LOAD_REG_IMM32(jitc,EAX,pDEST_VAR);
-          JITC_LOAD_REG_IMM32(jitc,EBX,pSRC_VAR);
+          int dst  = (int)pDEST_VAR;
+          int src  = (int)pSRC_VAR;
         
           while (loop--) {
-            JITC_LOAD_REG_pREG(jitc,ECX,EBX);
-            JITC_LOAD_pREG_REG(jitc,EAX,ECX);
-            JITC_ADD_REG_IMM32(jitc,EBX,4);
-            JITC_ADD_REG_IMM32(jitc,EAX,4);
+            jitc_add(jitc,"mov eax, [$d]", src);
+            jitc_add(jitc,"mov [$d], eax", dst);
+            src += 4;
+            dst += 4;
           }
         }
         break;
@@ -1196,13 +1195,10 @@ static void gsl_create_fast_iflow(void)
         int i=0;
         while (DEST_STRUCT_IBLOCK(i).size > 0) {
           int j=DEST_STRUCT_IBLOCK(i).size;
-          while (j--) {
-            JITC_LOAD_REG_IMM32(jitc, ECX, &DEST_STRUCT_IBLOCK_VAR(i,j));
-            JITC_LOAD_REG_IMM32(jitc, EBX, &SRC_STRUCT_IBLOCK_VAR(i,j));
-            JITC_LOAD_REG_pREG(jitc, EAX, ECX);
-            JITC_LOAD_REG_pREG(jitc, EBX, EBX);
-            JITC_ADD_REG_REG(jitc,   EAX, EBX);
-            JITC_LOAD_pREG_REG(jitc, ECX, EAX);
+          while (j--) { /* TODO interlace 2 */
+            jitc_add(jitc, "mov eax, [$d]", &DEST_STRUCT_IBLOCK_VAR(i,j));
+            jitc_add(jitc, "add eax, [$d]", &SRC_STRUCT_IBLOCK_VAR(i,j));
+            jitc_add(jitc, "mov [$d], eax", &DEST_STRUCT_IBLOCK_VAR(i,j));
           }
           ++i;
         }
@@ -1225,12 +1221,9 @@ static void gsl_create_fast_iflow(void)
         while (DEST_STRUCT_IBLOCK(i).size > 0) {
           int j=DEST_STRUCT_IBLOCK(i).size;
           while (j--) {
-            JITC_LOAD_REG_IMM32(jitc, ECX, &DEST_STRUCT_IBLOCK_VAR(i,j));
-            JITC_LOAD_REG_IMM32(jitc, EBX, &SRC_STRUCT_IBLOCK_VAR(i,j));
-            JITC_LOAD_REG_pREG (jitc, EAX, ECX);
-            JITC_LOAD_REG_pREG (jitc, EBX, EBX);
-            jitc_add(jitc, "sub eax, ebx");
-            JITC_LOAD_pREG_REG (jitc, ECX, EAX);
+            jitc_add(jitc, "mov eax, [$d]", &DEST_STRUCT_IBLOCK_VAR(i,j));
+            jitc_add(jitc, "sub eax, [$d]", &SRC_STRUCT_IBLOCK_VAR(i,j));
+            jitc_add(jitc, "mov [$d], eax", &DEST_STRUCT_IBLOCK_VAR(i,j));
           }
           ++i;
         }
@@ -1243,12 +1236,9 @@ static void gsl_create_fast_iflow(void)
         while (DEST_STRUCT_IBLOCK(i).size > 0) {
           int j=DEST_STRUCT_IBLOCK(i).size;
           while (j--) {
-            JITC_LOAD_REG_IMM32(jitc, ECX, &DEST_STRUCT_IBLOCK_VAR(i,j));
-            JITC_LOAD_REG_IMM32(jitc, EBX, &SRC_STRUCT_IBLOCK_VAR(i,j));
-            JITC_LOAD_REG_pREG (jitc, EAX, ECX);
-            JITC_LOAD_REG_pREG (jitc, EBX, EBX);
-            JITC_IMUL_EAX_REG  (jitc,      EBX);
-            JITC_LOAD_pREG_REG (jitc, ECX, EAX);
+            jitc_add(jitc, "mov  eax,  [$d]", &DEST_STRUCT_IBLOCK_VAR(i,j));
+            jitc_add(jitc, "imul eax,  [$d]", &SRC_STRUCT_IBLOCK_VAR(i,j));
+            jitc_add(jitc, "mov  [$d], eax",  &DEST_STRUCT_IBLOCK_VAR(i,j));
           }
           ++i;
         }
@@ -1261,12 +1251,10 @@ static void gsl_create_fast_iflow(void)
         while (DEST_STRUCT_IBLOCK(i).size > 0) {
           int j=DEST_STRUCT_IBLOCK(i).size;
           while (j--) {
-            JITC_LOAD_REG_IMM32(jitc, ECX, &DEST_STRUCT_IBLOCK_VAR(i,j));
-            JITC_LOAD_REG_IMM32(jitc, EBX, &SRC_STRUCT_IBLOCK_VAR(i,j));
-            JITC_LOAD_REG_pREG (jitc, EAX, ECX);
-            JITC_LOAD_REG_pREG (jitc, EBX, EBX);
-            JITC_IDIV_EAX_REG  (jitc,      EBX);
-            JITC_LOAD_pREG_REG (jitc, ECX, EAX);
+            jitc_add(jitc, "mov  eax,  [$d]", &DEST_STRUCT_IBLOCK_VAR(i,j));
+            jitc_add(jitc, "cdq");
+            jitc_add(jitc, "idiv [$d]",       &SRC_STRUCT_IBLOCK_VAR(i,j));
+            jitc_add(jitc, "mov  [$d], eax",  &DEST_STRUCT_IBLOCK_VAR(i,j));
           }
           ++i;
         }
@@ -1276,8 +1264,8 @@ static void gsl_create_fast_iflow(void)
   }
 
   JITC_ADD_LABEL (jitc, "__very_end__");
-  JITC_CALL_LABEL(jitc, "__very_start__");
-  JITC_LOAD_REG_IMM32(jitc, EAX, 0);
+  jitc_add(jitc, "call $s", "__very_start__");
+  jitc_add(jitc, "mov eax, $d", 0);
   jitc_validate_func(jitc);
 #else
   InstructionFlow     *iflow     = currentGoomSL->iflow;

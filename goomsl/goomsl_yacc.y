@@ -1102,8 +1102,7 @@
 %left NOT
 %left '=' '<' '>'
 %left '+' '-'
-%left '*'
-%left '/'
+%left '/' '*'
 
 %%
 

@@ -93,7 +93,7 @@ typedef struct _JITC_X86_ENV {
 } JitcX86Env;
 
 #define DISPLAY_GENCODE
-#define DISPLAY_GENCODE_HEXA
+/*#define DISPLAY_GENCODE_HEXA*/
 
 #ifdef DISPLAY_GENCODE_HEXA
   #define JITC_ADD_UCHAR(jitc,op) printf(" 0x%02x", op) && (jitc->memory[jitc->used++]=op)
@@ -158,11 +158,6 @@ typedef struct _JITC_X86_ENV {
 #define JITC_SUB_REG_IMM8(jitc,reg,imm8)    { JITC_ADD_2UCHAR (jitc,0x83, 0xe8+reg);\
                                               JITC_ADD_UCHAR(jitc,imm8); }
 
-/*
-#define JITC_PUSH_REG(jitc,reg)             { JITC_ADD_UCHAR  (jitc,0x50+reg); }
-#define JITC_POP_REG(jitc,reg)              { JITC_ADD_UCHAR  (jitc,0x58+reg); }
-*/
-
 /* Floating points */
 
 #define JITC_FLD_pIMM32(jitc,address)       { JITC_ADD_UCHAR  (jitc, 0xD9); \
@@ -194,10 +189,8 @@ typedef struct _JITC_X86_ENV {
 #define JITC_JUMP_COND_LABEL(jitc,cond,label) { jitc_add_used_label(jitc,label,jitc->used+2); JITC_JUMP_COND(jitc,cond,0); }
 #define JITC_CALL(jitc,function)            { int __offset__ = (int)function - (int)(&jitc->memory[jitc->used+5]);\
                                               JITC_ADD_UCHAR(jitc,0xe8); JITC_ADD_UINT(jitc,__offset__); }
-#define JITC_CALL_pREG(jitc,reg)            { JITC_ADD_UCHAR(jitc,0xff); JITC_ADD_UCHAR(jitc,0xd0+reg); }
-#define JITC_CALL_LABEL(jitc,label)         { jitc_add_used_label(jitc,label,jitc->used+1); JITC_CALL(jitc,0); }
-#define JITC_RETURN_FUNCTION(jitc)          { JITC_ADD_UCHAR  (jitc,0xc3); }
-#define JITC_LEAVE(jitc)                    { JITC_ADD_UCHAR  (jitc,0xc9); }
+/*#define JITC_CALL_pREG(jitc,reg)            { JITC_ADD_UCHAR(jitc,0xff); JITC_ADD_UCHAR(jitc,0xd0+reg); }
+#define JITC_CALL_LABEL(jitc,label)         { jitc_add_used_label(jitc,label,jitc->used+1); JITC_CALL(jitc,0); }*/
 
 /* save all registers (except EAX,ESP,EBP) */
 #define JITC_PUSH_ALL(jitc) { jitc_add(jitc,"push ecx"); jitc_add(jitc,"push edx"); jitc_add(jitc,"push ebx"); \

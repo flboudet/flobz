@@ -9,6 +9,7 @@
 #define PARAM_REG      3
 #define PARAM_dispREG  4
 #define PARAM_DISP32   5
+#define PARAM_LABEL    6
 #define PARAM_NONE     666
 
 typedef struct {
@@ -17,6 +18,7 @@ typedef struct {
   double f;
   int    reg;
   int    disp;
+  char   label[256];
 } IParam;
 
 struct {
@@ -111,6 +113,12 @@ static void imul_like_modrm_1param(JitcX86Env *jitc, int opcode, int digit, IPar
     }
     return;
   }
+  if (iparam[0].id == PARAM_DISP32) {
+    JITC_ADD_UCHAR(jitc, opcode);
+    JITC_MODRM(jitc, JITC_MOD_pREG_REG, digit, JITC_RM_DISP32);
+    JITC_ADD_UINT(jitc, iparam[0].disp);
+    return;
+  }
 }
 
 /* 1 byte encoded opcode including register... imm32 parameter */
@@ -129,6 +137,7 @@ typedef struct {
 static AddLikeInstr addLike[] = {
   { "add",  0x01,   0x81, 0x00, 0x05 },
   { "and",  0x21,   0x81, 0x04, 0x25 },
+  { "or",   0x0B,   0x81, 0x01, 0x0D },
   { "cmp",  0x39,   0x81, 0x07, 0x3D },
   { "imul", 0x0FAF, 0x69, 0x00, 0x10000 },
   { "sub",  0x29,   0x81, 0x05, 0X2D },
@@ -208,37 +217,42 @@ static void jitc_add_op(JitcX86Env *jitc, char *op, IParam *iparam, int nbParams
     return;
   }
 
-  /* IMUL */
-  if (strcmp(op, "imul") == 0) {
-    if (nbParams == 1) {
-      imul_like_modrm_1param(jitc, 0xf7, 0x05, iparam);
-      return;
-    }
+#define IMUL_LIKE(_OP,_opcode,_digit)\
+  if (strcmp(op, _OP) == 0) { \
+    if (nbParams == 1) { \
+      imul_like_modrm_1param(jitc, _opcode, _digit, iparam); \
+      return; }}
+
+#define SHIFT_LIKE(_name,_op1,_op2,_digit) \
+  if (strcmp(op, _name) == 0) { \
+    if (iparam[1].id == PARAM_INT) { \
+      if (iparam[1].i == 1) \
+        imul_like_modrm_1param(jitc, _op1, _digit, iparam); \
+      else { \
+        imul_like_modrm_1param(jitc, _op2, _digit, iparam); \
+        JITC_ADD_UCHAR(jitc, iparam[1].i); \
+      } \
+      return; \
+    } \
   }
 
-  /* IDIV */
-  if (strcmp(op, "idiv") == 0) {
-    if (nbParams == 1) {
-      imul_like_modrm_1param(jitc, 0xf7, 0x07, iparam);
-      return;
-    }
-  }
+#define POP_LIKE(_OP,_opcode) \
+  if (strcmp(op, _OP) == 0) { \
+    if (iparam[0].id == PARAM_REG) { \
+      JITC_ADD_UCHAR(jitc, _opcode + iparam[0].reg); \
+      return; } }
 
-  /* POP */
-  if (strcmp(op, "pop") == 0) {
-    if (iparam[0].id == PARAM_REG) {
-      JITC_ADD_UCHAR(jitc, 0x58 + iparam[0].reg);
-      return;
-    }
-  }
+  IMUL_LIKE("neg",  0xf7, 0x03);
+  IMUL_LIKE("imul", 0xf7, 0x05);
+  IMUL_LIKE("idiv", 0xf7, 0x07);
 
-  /* PUSH */
-  if (strcmp(op, "push") == 0) {
-    if (iparam[0].id == PARAM_REG) {
-      JITC_ADD_UCHAR(jitc, 0x50 + iparam[0].reg);
-      return;
-    }
-  }
+  POP_LIKE("pop", 0x58);  
+  POP_LIKE("push", 0x50);
+
+  SHIFT_LIKE("sal", 0xd1, 0xc1, 0x04);
+  SHIFT_LIKE("sar", 0xd1, 0xc1, 0x07);
+  SHIFT_LIKE("shl", 0xd1, 0xc1, 0x04);
+  SHIFT_LIKE("shr", 0xd1, 0xc1, 0x05);
 
   /* INC */
   if (strcmp(op, "inc") == 0) {
@@ -259,31 +273,64 @@ static void jitc_add_op(JitcX86Env *jitc, char *op, IParam *iparam, int nbParams
     imul_like_modrm_1param(jitc, 0xff, 0x01, iparam);
     return;
   }
+
+  if (strcmp(op, "call") == 0)
+  {
+    if (iparam[0].id == PARAM_LABEL) {
+      jitc_add_used_label(jitc,iparam[0].label,jitc->used+1);
+      JITC_CALL(jitc,0);
+      return;
+    }
+    if (iparam[0].id == PARAM_INT) {
+      JITC_CALL(jitc,iparam[0].i);
+      return;
+    }
+    if (iparam[0].id == PARAM_dispREG) {
+      JITC_ADD_UCHAR(jitc,0xff);
+      JITC_ADD_UCHAR(jitc,0xd0+iparam[0].reg);
+      return;
+    }
+  }
   
-#define SHIFT_LIKE(_name,_op1,_op2,_digit) \
-  if (strcmp(op, _name) == 0) { \
-    if (iparam[1].id == PARAM_INT) { \
-      if (iparam[1].i == 1) \
-        imul_like_modrm_1param(jitc, _op1, _digit, iparam); \
-      else { \
-        imul_like_modrm_1param(jitc, _op2, _digit, iparam); \
-        JITC_ADD_UCHAR(jitc, iparam[1].i); \
-      } \
-      return; \
-    } \
+#define MONOBYTE_INSTR(_OP,_opcode) \
+  if (strcmp(op, _OP) == 0) { \
+    JITC_ADD_UCHAR(jitc, _opcode); \
+    return; }
+
+  MONOBYTE_INSTR("ret", 0xc3);
+  MONOBYTE_INSTR("leave", 0xc9);
+  MONOBYTE_INSTR("cdq", 0x99);
+
+  /* JNE */
+  if (strcmp(op, "jne") == 0) {
+    if (iparam[0].id == PARAM_LABEL) {
+      JITC_JUMP_COND_LABEL(jitc,COND_NOT_EQUAL,iparam[0].label);
+      return;
+    }
+    if (iparam[0].id == PARAM_INT) {
+      JITC_JUMP_COND(jitc,COND_NOT_EQUAL,iparam[0].i);
+      return;
+    }
   }
 
-  SHIFT_LIKE("sal", 0xd1, 0xc1, 0x04);
-  SHIFT_LIKE("sar", 0xd1, 0xc1, 0x07);
-  SHIFT_LIKE("shl", 0xd1, 0xc1, 0x04);
-  SHIFT_LIKE("shr", 0xd1, 0xc1, 0x05);
+  /* JE */
+  if (strcmp(op, "je") == 0) {
+    if (iparam[0].id == PARAM_LABEL) {
+      JITC_JUMP_COND_LABEL(jitc,COND_EQUAL,iparam[0].label);
+      return;
+    }
+    if (iparam[0].id == PARAM_INT) {
+      JITC_JUMP_COND(jitc,COND_EQUAL,iparam[0].i);
+      return;
+    }
+  }
     
   /* ADD LIKE */
   if (checkAddLike(jitc, op, iparam, nbParams)) return;
 
   /* BSWAP : 0F C8+rd */
   
-  fprintf(stderr, "JITC_x86: Invalid Operation\n");
+  fprintf(stderr, "JITC_x86: Invalid Operation '%s'\n", op);
   exit(1);
 }
 
@@ -328,6 +375,10 @@ void jitc_add(JitcX86Env *jitc, const char *_instr, ...)
       iparam[i].id   = PARAM_DISP32;
       iparam[i].disp = va_arg(ap, int);
     }
+    else if (strcmp(sparam[i], "$s") == 0) {
+      iparam[i].id   = PARAM_LABEL;
+      strcpy(iparam[i].label, va_arg(ap, char*));
+    }
     else
     for (r=0;RegsName[r].name;r++) {
       if (strcmp(sparam[i], RegsName[r].name) == 0) {
@@ -361,7 +412,20 @@ void jitc_add(JitcX86Env *jitc, const char *_instr, ...)
 
   jitc_add_op(jitc, op, &(iparam[0]), nbParam);
 #ifdef DISPLAY_GENCODE
-  printf(" ;;;  %s\n", _instr);
+  printf(" ;;;  %s", op);
+  for (i=0;i<nbParam;++i)
+  {
+    if (iparam[i].id == PARAM_INT)
+      printf(" 0x%x", iparam[i].i);
+    else if (iparam[i].id == PARAM_DISP32)
+      printf(" [0x%x]", iparam[i].disp);
+    else if (iparam[i].id == PARAM_LABEL)
+      printf(" %s", iparam[i].label);
+    else
+      printf(" %s", sparam[i]);
+  }
+  printf("\n");
+  
 #endif
 }
 
@@ -421,8 +485,8 @@ void jitc_validate_func(JitcX86Env *jitc) {
 #endif
     /* restore the state */
     JITC_POP_ALL(jitc);
-    JITC_LEAVE(jitc);
-    JITC_RETURN_FUNCTION(jitc);
+    jitc_add(jitc, "leave");
+    jitc_add(jitc, "ret");
     jitc_resolve_labels(jitc);
 #ifdef DISPLAY_GENCODE
     printf("\n------------------------------------------\n");
@@ -438,6 +502,9 @@ void jitc_add_used_label(JitcX86Env *jitc, char *label, int where) {
 
 void jitc_add_known_label(JitcX86Env *jitc, char *label, int where) {
 
+#ifdef DISPLAY_GENCODE
+    printf("%s:\n", label);
+#endif
     strncpy(jitc->knownLabel[jitc->nbKnownLabel].label, label, JITC_LABEL_SIZE);
     jitc->knownLabel[jitc->nbKnownLabel].address = where;
     jitc->nbKnownLabel++;

@@ -1,10 +1,10 @@
 CC=gcc
 # CFLAGS=-g -O0 -Wall -pedantic -DVERBOSE # -DUSE_JITC_X86=1
-CFLAGS=-g -march=athlon -Wall -pedantic -DUSE_JITC_X86=1
+CFLAGS=-g -O3 -march=athlon -Wall -pedantic -DUSE_JITC_X86=1
 OBJ=goomsl_yacc.o goomsl_lex.o goomsl_hash.o goomsl_heap.o goomsl.o main.o jitc_x86.o
 
 LIBS        = -L/usr/X11R6/lib -L/usr/lib -L/usr/local/lib -lX11 -lXext \
-	-lXxf86dga -lXxf86vm -lXv
+	-lXxf86dga -lXxf86vm -lXv -lm
 
 goomsl: ${OBJ}
 	make -C TinyPTC
