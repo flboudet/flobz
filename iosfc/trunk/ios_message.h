@@ -1,6 +1,9 @@
 #ifndef _IOS_MESSAGE_H
 #define _IOS_MESSAGE_H
 
+#include "ios_memory.h"
+#include "ios_hash.h"
+
 namespace ios_fc {
 
 
@@ -20,24 +23,29 @@ class Message
 
     virtual ~Message();
     
-    void addInt       (const String key, int value);
-    void addBool      (const String key, bool value);
-    void addString    (const String key, const String value);
-    void addIntArray  (const String key, const Buffer<int> value);
+    virtual void addInt       (const String key, int value);
+    virtual void addBool      (const String key, bool value);
+    virtual void addString    (const String key, const String value);
+    virtual void addIntArray  (const String key, const Buffer<int> value);
 
-    void addIntProperty   (const String key, const int value);
-    void addBoolProperty  (const String key, const bool property);
+    bool hasInt       (const String key) const;
+    bool hasBool      (const String key) const;
+    bool hasString    (const String key) const;
+    bool hasIntArray  (const String key) const;
 
     int                getInt      (const String key) const throw(DataException);
     bool               getBool     (const String key) const throw(DataException);
     const String       getString   (const String key) const throw(DataException);
     const Buffer<int>  getIntArray (const String key) const throw(DataException);
 
-    bool hasIntProperty    (const String key) const;
-    bool hasBoolProperty   (const String key) const;
+    virtual void addIntProperty   (const String key, const int value);
+    virtual void addBoolProperty  (const String key, const bool property);
 
-    int          getIntProperty    (const String key) const throw(PropertyException);
-    bool         getBoolProperty   (const String key) const throw(PropertyException);
+    bool hasIntProperty   (const String key) const;
+    bool hasBoolProperty  (const String key) const;
+
+    int  getIntProperty   (const String key) const throw(PropertyException);
+    bool getBoolProperty  (const String key) const throw(PropertyException);
 
     virtual void send() const = 0;
 

@@ -5,16 +5,19 @@
 
 namespace ios_fc {
 
-  static const String INTEGER = "INTEGER";
-  static const String BOOLEAN = "BOOLEAN";
-  static const String STRING  = "STRING";
-  static const String INT_ARRAY  = "INT_ARRAY";
-  static const String SERIAL_ID   = "SERIAL_ID";
-  static const String IS_RELIABLE = "IS_RELIABLE";
+  static const String INTEGER    = "I";
+  static const String BOOLEAN    = "B";
+  static const String STRING     = "S";
+  static const String INT_ARRAY  = "A";
+  static const String PARAM_INTEGER = "PI";
+  static const String PARAM_BOOLEAN = "PB";
+  
+  static const String SERIAL_ID   = "SID";
+  static const String IS_RELIABLE = "RELIABLE";
 
-  UDPMessage::UDPMessage(int serialID/*, const UDPMessageBox &owner*/)
+  UDPMessage::UDPMessage(int serialID, UDPMessageBox &owner) : owner(owner)
   {
-    addInt(SERIAL_ID, serialID);
+    addIntProperty(SERIAL_ID, serialID);
   }
 
   UDPMessage::~UDPMessage()
@@ -32,13 +35,13 @@ namespace ios_fc {
   
   int  UDPMessage::getSerialID() const
   {
-    return getInt(SERIAL_ID);
+    return getIntProperty(SERIAL_ID);
   }
   
   void UDPMessage::send() const
   {
     Buffer<char> out = serialize();
-    /* owner.send(out, getSerialID(), isReliable()); */
+    owner.sendUDP(out, getSerialID(), isReliable());
   }
 
   void UDPMessage::addInt(const String key, int value)
@@ -70,6 +73,17 @@ namespace ios_fc {
     serialized.add(s);
   }
   
+  void UDPMessage::addIntProperty   (const String key, const int value)
+  {
+    Message::addIntProperty(key,value);
+    serialized.add(new String(key + ":" + PARAM_INTEGER + ":" + value));
+  }
+  
+  void UDPMessage::addBoolProperty  (const String key, const bool value)
+  {
+    Message::addBoolProperty(key,value);
+    serialized.add(new String(key + ":" + PARAM_BOOLEAN + ":" + value));
+  }
       
   const Buffer<char> UDPMessage::serialize() const
   {
@@ -81,7 +95,8 @@ namespace ios_fc {
     return Buffer<char>((const char*)out, out.length());
   }
 
-  UDPMessage::UDPMessage(const Buffer<char> raw/*, const UDPMessageBox &owner*/)
+  UDPMessage::UDPMessage(const Buffer<char> raw, UDPMessageBox &owner)  throw(InvalidMessageException)
+    : owner(owner)
   {
     String sraw((const char *)raw);
     int    start = 0;
@@ -93,17 +108,17 @@ namespace ios_fc {
 
       String line = sraw.substring(start, end);
 
-      if (line.length() <= 1) return;
+      if (line.length() <= 1) { checkMessage(); return; }
 
       int itype = 0;
       int ival  = 0;
 
       while (line[itype] && (line[itype] != ':')) { itype++; ival++; }
-      if (!line[itype]) return;
+      if (!line[itype]) { checkMessage(); return; }
       
       ival++;
       while (line[ival] && (line[ival] != ':')) { ival++; }
-      if (!line[ival]) return;
+      if (!line[ival]) { checkMessage(); return; }
 
       String key   = line.substring(0,itype);
       String type  = line.substring(itype+1, ival);
@@ -111,7 +126,9 @@ namespace ios_fc {
 
       if (type == INTEGER) addInt(key, atoi(value));
       else if (type == BOOLEAN) addBool(key, atoi(value));
-      else if (type == STRING) addString(key, value);
+      else if (type == STRING)  addString(key, value);
+      else if (type == PARAM_INTEGER) addIntProperty(key, atoi(value));
+      else if (type == PARAM_BOOLEAN) addBoolProperty(key, atoi(value));
       else if (type == INT_ARRAY) {
         Buffer<int> buffer(atoi(value));
         int index = 0;
@@ -123,11 +140,16 @@ namespace ios_fc {
         addIntArray(key, buffer);
       }
 
-      if (sraw[end] == 0) return;
+      if (sraw[end] == 0) { checkMessage(); return; }
       end   = end + 1;
       start = end;
     }
   }
   
+  void UDPMessage::checkMessage() throw(InvalidMessageException)
+  {
+    if (!hasIntProperty(SERIAL_ID))
+      throw InvalidMessageException();
+  }
 
 };

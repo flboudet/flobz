@@ -24,7 +24,7 @@ class ValueInterface
 template <typename T> class Value : public ValueInterface
 {
   public:
-    Value (const T t, ValueType type) : t(t),ValueInterface(type) {}
+    Value (const T t, ValueType type) : ValueInterface(type), t(t) {}
     virtual ~Value<T>() {}
     const T  getValue() const { return this->t; }
   private:
@@ -111,6 +111,27 @@ static ValueInterface *getInterfaceAndCheckType(const HashMap &datas,
 
   return val_interface;
 }
+
+bool Message::hasInt   (const String key) const
+{
+  return datas.get(key) != NULL;
+}
+
+bool Message::hasBool      (const String key) const
+{
+  return datas.get(key) != NULL;
+}
+
+bool Message::hasString    (const String key) const
+{
+  return datas.get(key) != NULL;
+}
+
+bool Message::hasIntArray  (const String key) const
+{
+  return datas.get(key) != NULL;
+}
+    
 
 int Message::getInt      (const String key) const throw(DataException)
 {
