@@ -2,11 +2,20 @@
 # author: iOS-Software
 # July 2004
 
+###############
+# Settings
+
 ENABLE_AUDIO=true
 ENABLE_OPENGL=true
 
-
 DATADIR=\"data\"
+
+# Mac settings
+macimage_name = FloBoPuyo\ $(VERSION)
+bundle_name = FloboPuyo.app
+
+#
+##########
 
 SDL_CONFIG=sdl-config
 CC=g++
@@ -28,7 +37,16 @@ OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o        \
           PuyoStory.o SDL_Painter.o InputManager.o GameControls.o            \
           PuyoDoomMelt.o IosImgProcess.o corona32.o corona.o corona_palette.o PuyoStarter.o
 
+##############
+# Autodetection
+
 PLATFORM=$(shell uname -s)
+
+VERSION=$(shell grep "\#define FLOBOPUYOVERSION" PuyoVersion.c  | cut -d "\"" -f 2)
+#
+##############
+
+
 ifeq ($(PLATFORM), Darwin)
 CFLAGS:=$(CFLAGS) -DMACOSX -UDATADIR
 endif
@@ -112,10 +130,10 @@ scenar.y.c:scenar.y ${HFILES}
 clean:
 	rm -f *~ scenar.y.c scenar.y.h scenar.l.c *.o flobopuyo* WARNINGS
 	rm -rf .xvpics data/.xvpics    data/*/.xvpics
-	rm -rf FloboPuyo.app
+	rm -rf $(bundle_name)
+	rm -rf $(macimage_name)
+	rm -f  $(macimage_name).dmg
 	rm -f  .DS_Store data/.DS_Store data/*/.DS_Store .gdb_history
-
-bundle_name = FloboPuyo.app
 
 flobopuyo-static: prelude  ${OBJFILES}
 	@echo "[flobopuyo-static]" && g++ $(CFLAGS) -o flobopuyo-static ${OBJFILES}\
@@ -123,18 +141,11 @@ flobopuyo-static: prelude  ${OBJFILES}
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
 
-flobopuyo-staticz:SDL_prim.o
-	bison -y -d -o scenar.y.c scenar.y
-	flex -oscenar.l.c scenar.l
-	g++ -DMACOSX $(CFLAGS) -o flobopuyo-static  IosImgProcess.cpp HiScores.cpp SDL_prim.o PuyoCommander.cpp InputManager.cpp GameControls.cpp IosException.cpp IosVector.cpp main.cpp PuyoGame.cpp PuyoView.cpp PuyoIA.cpp PuyoVersion.c sofont.c menu.c menuitems.c audio.c scrollingtext.c preferences.c SDL_Painter.cpp PuyoStory.cpp scenar.y.c scenar.l.c /sw/lib/libSDL_mixer.a /sw/lib/libvorbisfile.a /sw/lib/libvorbis.a /sw/lib/libogg.a /sw/lib/libsmpeg.a /sw/lib/libSDL_image.a /sw/lib/libjpeg.a /sw/lib/libpng.a -lz `$(SDL_CONFIG) --cflags --static-libs`
-
-# /sw/lib/libvorbis.a   
-
 bundle: flobopuyo-static
 	mkdir -p $(bundle_name)/Contents/MacOS
 	mkdir -p $(bundle_name)/Contents/Resources
 	echo "APPL????" > $(bundle_name)/Contents/PkgInfo
-	cp mac/Info.plist $(bundle_name)/Contents/
+	sed "s/@@VERSION@@/$(VERSION)/" mac/Info.plist > $(bundle_name)/Contents/Info.plist
 	cp mac/icon.icns $(bundle_name)/Contents/Resources/
 	cp flobopuyo-static $(bundle_name)/Contents/MacOS/flobopuyo
 	cp -r data $(bundle_name)/Contents/Resources
@@ -142,3 +153,12 @@ bundle: flobopuyo-static
 	rm -rf $(bundle_name)/Contents/Resources/data/.xvpics $(bundle_name)/Contents/Resources/data/*/.xvpics
 	rm -f $(bundle_name)/Contents/Resources/data/.DS_Store $(bundle_name)/Contents/Resources/data/*/.DS_Store
 	strip $(bundle_name)/Contents/MacOS/flobopuyo
+
+mac-package: bundle
+	mkdir -p $(macimage_name)
+	cp -r $(bundle_name) $(macimage_name)
+	cp COPYING $(macimage_name)
+	hdiutil create -srcfolder $(macimage_name) $(macimage_name).dmg
+	hdiutil internet-enable $(macimage_name).dmg
+
+
