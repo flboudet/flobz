@@ -16,7 +16,7 @@ CXXFLAGS=${CFLAGS}
 HFILES= HiScores.h IosException.h IosImgProcess.h IosVector.h PuyoCommander.h PuyoGame.h \
         PuyoIA.h PuyoPlayer.h PuyoStory.h PuyoView.h SDL_prim.h audio.h menu.h \
 				menuitems.h preferences.h scrollingtext.h sofont.h SDL_Painter.h PuyoVersion.h \
-				InputManager.h GameControls.h
+				InputManager.h GameControls.h HiScores.h
 
 
 OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o IosException.o \
