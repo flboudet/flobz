@@ -1,8 +1,8 @@
 #include stdlib.gsl
 declare <loop: int start, int end>
 
-loop: start=1 end=100000000
-
+<main>
+loop: start=1 end=1000000000
 
 <loop: int start, int end>
 
