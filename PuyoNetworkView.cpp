@@ -25,18 +25,11 @@
 
 #include "PuyoNetworkView.h"
 
-enum {
-    kGameState   = 0,
-    kGameOver    = 1,
-    kAddNeutral  = 2
-};
-
 extern char *p1name;
 
 Message *PuyoNetworkView::createStateMessage(bool paused)
 {
-    Message *message = mbox->createMessage();
-
+    // preparation des infos */
     int puyoCount = attachedGame->getPuyoCount();
     AdvancedBuffer<int> buffer(puyoCount * 4);
 
@@ -47,19 +40,25 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
         buffer.add(currentPuyo->getPuyoX());
         buffer.add(currentPuyo->getPuyoY());
     }
-    
-    message->addInt     ("TYPE",   kGameState);
-    message->addString  ("NAME",   p1name);
+    neutralsBuffer.flush();
+        
+    // creation du message
+    Message *message = mbox->createMessage();
+
+    message->addInt     (PuyoMessage::TYPE,   kGameState);
+    message->addString  (PuyoMessage::NAME,   p1name);
     message->addBool    ("PAUSE",  paused);
-    message->addIntArray("PUYOS",  buffer);
+    message->addIntArray(PuyoMessage::PUYOS,  buffer);
     message->addInt     ("SCORE",  attachedGame->getPoints());
     message->addInt     ("NEXT_F", attachedGame->getNextFalling());
     message->addInt     ("NEXT_C", attachedGame->getNextCompanion());
     
-    neutralsBuffer.flush();
     message->addIntArray("AddNeutrals", neutralsBuffer);
-    neutralsBuffer.clear();
+    message->addBool    ("DidEndCycle", didEndCycle);
     
+    // clear des infos ayant ete envoyee
+    neutralsBuffer.clear();
+    didEndCycle = false;
     return message;
 }
 
@@ -112,6 +111,7 @@ void PuyoNetworkView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex)
 void PuyoNetworkView::gameDidEndCycle()
 {
     PuyoView::gameDidEndCycle();
+    didEndCycle = true;
 }
 
 void PuyoNetworkView::companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise)

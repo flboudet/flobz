@@ -26,15 +26,18 @@
 #ifndef _PUYONETWORKVIEW
 #define _PUYONETWORKVIEW
 
-
+#include "PuyoMessageDef.h"
 #include "PuyoView.h"
+
 #include "ios_messagebox.h"
 using namespace ios_fc;
 
 class PuyoNetworkView : public PuyoView {
   public:
-    PuyoNetworkView(PuyoGameFactory *attachedPuyoGameFactory, int xOffset, int yOffset, int nXOffset, int nYOffset, MessageBox *mbox)
-        :PuyoView(attachedPuyoGameFactory, xOffset, yOffset, nXOffset, nYOffset), mbox(mbox) {}
+    PuyoNetworkView(PuyoGameFactory *attachedPuyoGameFactory, int xOffset, int yOffset,
+                    int nXOffset, int nYOffset, MessageBox *mbox)
+        : PuyoView(attachedPuyoGameFactory, xOffset, yOffset, nXOffset, nYOffset),
+          mbox(mbox),didEndCycle(false) {}
         
     void cycleGame();
     
@@ -57,6 +60,7 @@ private:
     MessageBox *mbox;
     Message *createStateMessage(bool paused);
     AdvancedBuffer<int> neutralsBuffer;
+    bool didEndCycle;
 };
 
 #endif // _PUYONETWORKVIEW
