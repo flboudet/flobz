@@ -21,10 +21,10 @@ extern const char *p2name;
 extern int GAME_ACCEL;
 
 char *kYouDidIt = "You Dit It!!!";
-char *kNextLevel = "Next Level:";
+char *kNextLevel = "Next Level:\t";
 char *kLooser = "Looser!!!";
-char *kCurrentLevel = "Current Level:";
-char *kContinueLeft = "Continue Left:";
+char *kCurrentLevel = "Current Level:\t";
+char *kContinueLeft = "Continue Left:\t";
 char *kGameOver = "Game Over!!!";
 char *kYouGotToLevel = "You get to level";
 char *kHitActionToContinue = "Hit Action to continue...";
@@ -34,21 +34,21 @@ char *kContinueGame= "Continue Game";
 char *kAbortGame   = "Abort Game";
 char *kOptions     = "Options";
 char *kPlayer      = "Player";
-char *kScore       = "Score:";
-char *kPlayerName  = "Player Name:";
-char *kPlayer1Name  = "P1 Name:";
-char *kPlayer2Name  = "P2 Name:";
+char *kScore       = "Score:\t";
+char *kPlayerName  = "Player Name:\t";
+char *kPlayer1Name  = "P1 Name:\t";
+char *kPlayer2Name  = "P2 Name:\t";
 
-static const char *k01 = "01";
-static const char *k02 = "02";
-static const char *k03 = "03";
-static const char *k04 = "04";
-static const char *k05 = "05";
-static const char *k06 = "06";
-static const char *k07 = "07";
-static const char *k08 = "08";
-static const char *k09 = "09";
-static const char *k10 = "10";
+static const char *k01 = " 1\t\t";
+static const char *k02 = " 2\t\t";
+static const char *k03 = " 3\t\t";
+static const char *k04 = " 4\t\t";
+static const char *k05 = " 5\t\t";
+static const char *k06 = " 6\t\t";
+static const char *k07 = " 7\t\t";
+static const char *k08 = " 8\t\t";
+static const char *k09 = " 9\t\t";
+static const char *k10 = "10\t\t";
 
 char *kHighScores  = "Hall of Fame";
 
@@ -59,26 +59,26 @@ char *kCongratulations = "Congratulations!!!";
 char *kPuyosInvasion   = "You stopped Puyo's invasion.\n"
                          "Peace on Earth is restored!!";
 
-static char *kAudioFX     = "Audio FX";
-static char *kMusic       = "Music";
-static char *kFullScreen  = "FullScreen";
+static char *kAudioFX     = "Audio FX\t";
+static char *kMusic       = "Music\t";
+static char *kFullScreen  = "FullScreen\t";
 static char *kControls    = "Change controls...";
 static char *kGameLevel   = "Choose Game Level";
 static char *kLevelEasy   = "Easy";
 static char *kLevelMedium = "Medium";
 static char *kLevelHard   = "Hard";
 
-static char *kPlayer1Left  = "P2  Left:";
-static char *kPlayer1Right = "P2 Right:";
-static char *kPlayer1Down  = "P2  Down:";
-static char *kPlayer1Clockwise        = "P2 Turn L:";
-static char *kPlayer1Counterclockwise = "P2 Turn R:";
+static char *kPlayer1Left  = "P2 Left:\t";
+static char *kPlayer1Right = "P2 Right:\t";
+static char *kPlayer1Down  = "P2 Down:\t";
+static char *kPlayer1Clockwise        = "P2 Turn L:\t";
+static char *kPlayer1Counterclockwise = "P2 Turn R:\t";
 
-static char *kPlayer2Left   = "P1  Left:";
-static char *kPlayer2Right  = "P1 Right:";
-static char *kPlayer2Down   = "P1  Down:";
-static char *kPlayer2Clockwise        = "P1 Turn L:";
-static char *kPlayer2Counterclockwise = "P1 Turn R:";
+static char *kPlayer2Left   = "P1 Left:\t";
+static char *kPlayer2Right  = "P1 Right:\t";
+static char *kPlayer2Down   = "P1 Down:\t";
+static char *kPlayer2Clockwise        = "P1 Turn L:\t";
+static char *kPlayer2Counterclockwise = "P1 Turn R:\t";
 
 static char *kRules01 = "Puyos are fancy smiling bubbles...";
 static char *kRules02 = "But they can really be invading sometimes!";
@@ -86,14 +86,14 @@ static char *kRules03 = "Send them away by making groups of 4 or more.";
 static char *kRules04 = "Try to make large groups, or many at the same time";
 static char *kRules05 = "to send more bad ghost Puyos to your opponent.";
 
-static char *kAbout01 = "FloboPuyo is an iOS-software production.";
-static char *kAbout02 = "Puyo's world Meta God :          ";
-static char *kAbout03 = "                     Florent 'flobo' Boudet";
-static char *kAbout04 = "X Men:                                    ";
-static char *kAbout05 = "          Jean-Christophe 'jeko' Hoelt";
-static char *kAbout06 = "                   Guillaume 'gyom' Borios";
-static char *kAbout07 = "Beta Goddess:                        ";
-static char *kAbout08 = "                                           Tania";
+static char *kAbout01 = "FloboPuyo is an iOS-software production.\t\t";
+static char *kAbout02 = "Puyo's world Meta God:\t\t";
+static char *kAbout03 = "\t\tFlorent 'flobo' Boudet";
+static char *kAbout04 = "X Men:\t\t";
+static char *kAbout05 = "\t\tJean-Christophe 'jeko' Hoelt";
+static char *kAbout06 = "\t\tGuillaume 'gyom' Borios";
+static char *kAbout07 = "Beta Goddess:\t\t";
+static char *kAbout08 = "\t\tTania";
 
 static char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
   "Satanas", "Doctor X", "Tanya", "Mr Gyom",
@@ -1159,8 +1159,12 @@ void PuyoCommander::startSingleGameLoop()
   char playerName[256];
 
     char * defaultName = getenv("USER");
-    if (defaultName[0]>=32) defaultName[0]-=32;
-    else defaultName = "Player";
+    if (defaultName == NULL)
+      defaultName = "Player";
+    if (!(defaultName[0]>=32))
+      defaultName = "Player";
+    if ((defaultName[0]>='a') && (defaultName[0]<='z'))
+      defaultName[0] += 'A' - 'a';
     
   GetStrPreference("Player Name", playerName, defaultName);
   menu_set_value(singleGameMenu, kPlayerName, playerName);
