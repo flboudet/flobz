@@ -1074,7 +1074,6 @@ mml_play:
     if (!myStarter.rightPlayerWin())
       lives--;
     if (ia[score2].level == 0) {
-      printf("YOU FINISHED THE GAME ! ! ! !\n"); // TODO: faire un truc au moins...
       break;
     }
   }

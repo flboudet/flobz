@@ -959,7 +959,7 @@ void PuyoStarter::run(int score1, int score2, int lives)
       {
         if (randomPlayer) {
           if (rightPlayerWin()) {
-            if (score2 == 0)
+            if (score2 == 7)
               commander->gameOverMenu = commander->finishedMenu;
             else
               commander->gameOverMenu = commander->nextLevelMenu;
