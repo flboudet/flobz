@@ -733,7 +733,7 @@ void PuyoCommander::updateHighScoresMenu()
   hiscore *scores = getHiscores(AI_NAMES);
   char tmp[256];
 #define PAS_DE_COMMENTAIRES(X,kXX) \
-  sprintf(tmp, "%06d   %10s", scores[X].score, scores[X].name); \
+  sprintf(tmp, ".... %06d %32s", scores[X].score, scores[X].name); \
   menu_set_value(highScoresMenu,kXX,tmp);
 
   PAS_DE_COMMENTAIRES(0,k01);

@@ -18,7 +18,7 @@ hiscore * getHiscores(const char * const defaultNames[kHiScoresNumber])
   {
     sprintf(HSIDS,"HSS%2d",i);
     sprintf(HSIDN,"HSN%2d",i);
-    GetStrPreference(HSIDN,HS[i].name,defaultNames[i],kHiScoreNameLenght+1);      
+    GetStrPreference(HSIDN,HS[i].name,defaultNames[kHiScoresNumber-i-1],kHiScoreNameLenght+1);      
     HS[i].score = GetIntPreference(HSIDS,(kHiScoresNumber-i) * 10000);
   }
   loaded = true;
