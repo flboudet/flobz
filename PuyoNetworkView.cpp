@@ -117,8 +117,8 @@ void PuyoNetworkView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex)
 void PuyoNetworkView::gameDidEndCycle()
 {
     PuyoView::gameDidEndCycle();
-    if (attachedGame->getNeutralPuyos() > 0)
-        badPuyos += attachedGame->getNeutralPuyos();
+    if (attachedGame->getNeutralPuyos() < 0)
+        badPuyos -= attachedGame->getNeutralPuyos();
 }
 
 void PuyoNetworkView::companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise)
