@@ -30,7 +30,7 @@ public:
     enum SocketType {
         ServerSocketType,
         ClientSocketType };
-    virtual SocketType getSocketType() = 0;
+    virtual SocketType getSocketType() const = 0;
     ListeningPort *getListeningPort() const { return listeningPort; }
 protected:
     ListeningPort *listeningPort;
@@ -40,7 +40,11 @@ class Server::TaggedSocket : public Socket, public TaggedItem {
 public:
     TaggedSocket(SocketImpl *impl, ListeningPort *listeningPort);
     ~TaggedSocket();
-    SocketType getSocketType() { return ClientSocketType; }
+    SocketType getSocketType() const { return ClientSocketType; }
+    void setConnection(ServerConnection *newConnection) { connection = newConnection; }
+    ServerConnection *getConnection() const { return connection; }
+private:
+    ServerConnection *connection;
 };
 
 class Server::TaggedClientFactory : public ServerSocket::AcceptedClientFactory {
@@ -55,7 +59,7 @@ class Server::TaggedServerSocket : public ServerSocket, public TaggedItem {
 public:
     TaggedServerSocket(int portID, ListeningPort *listeningPort, Selector *selectPool);
     ~TaggedServerSocket();
-    SocketType getSocketType() { return ServerSocketType; }
+    SocketType getSocketType() const { return ServerSocketType; }
     TaggedSocket *acceptTaggedClient();
 private:
     TaggedClientFactory taggedClientFactory;
@@ -74,6 +78,35 @@ private:
     TaggedServerSocket serverSocket;
     Selector *selectPool;
 };
+
+
+
+void StandardServerPortManager::connectionFromSocket(Socket *client)
+{
+    ServerConnection *newConnection = createConnection();
+    newConnection->initialize(client);
+    static_cast<Server::TaggedSocket *>(client)->setConnection(newConnection);
+    newConnection->connectionMade();
+}
+
+void StandardServerPortManager::dataFromSocket(Socket *client)
+{
+  ServerConnection *connection = static_cast<Server::TaggedSocket *>(client)->getConnection();
+  connection->dataReceived();
+}
+
+void StandardServerPortManager::deconnectionFromSocket(Socket *client)
+{
+    ServerConnection *connection = static_cast<Server::TaggedSocket *>(client)->getConnection();
+    connection->connectionLost();
+    delete connection;
+}
+
+void StandardServerConnection::dataReceived()
+{
+    InputStream *input = clientSocket->getInputStream();
+    VoidBuffer data = input->streamRead(input->streamAvailable());
+}
 
 
 Server::TaggedSocket::TaggedSocket(SocketImpl *impl, ListeningPort *listeningPort)

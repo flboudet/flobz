@@ -28,12 +28,38 @@
 
 namespace ios_fc {
 
+class ServerConnection {
+public:
+    virtual ~ServerConnection() {}
+    void initialize(Socket *client) { clientSocket = client; }
+    virtual void connectionMade() = 0;
+    virtual void dataReceived() = 0;
+    virtual void connectionLost() = 0;
+ protected:
+    Socket *clientSocket;
+};
+
+class StandardServerConnection : public ServerConnection {
+public:
+    void dataReceived();
+    virtual void dataReceived(VoidBuffer *data) = 0;
+};
+
 class ServerPortManager {
 public:
     virtual void connectionFromSocket(Socket *client) = 0;
     virtual void dataFromSocket(Socket *client) = 0;
     virtual void deconnectionFromSocket(Socket *client) = 0;
 };
+
+class StandardServerPortManager : public ServerPortManager {
+public:
+     void connectionFromSocket(Socket *client);
+     void dataFromSocket(Socket *client);
+     void deconnectionFromSocket(Socket *client);
+private:
+     virtual ServerConnection *createConnection() = 0;
+ };
 
 class Server {
 public:
@@ -52,6 +78,7 @@ private:
     AdvancedBuffer<ListeningPort *> listeningPorts;
     Selector selector;
     ListeningPort *getListeningPort(int portID);
+    friend class StandardServerPortManager; // pas terrible
 };
 
 };
