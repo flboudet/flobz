@@ -44,6 +44,7 @@ public:
         ClientMsgAssignID,
         ClientMsgGetID,
         ClientMsgToClient,
+        ClientMsgKeepAlive,
         ServerMsgInformID,
         ServerMsgBadRequest,
         ServerMsgToClient
@@ -62,6 +63,7 @@ public:
     class ClientMsgToClientDatagram;
     class ServerMsgToClientDatagram;
     class ClientMsgAssignIDDatagram;
+    class ClientMsgKeepAliveDatagram;
 protected:
     IGPDatagram(Message *data, IGPMsgIdent ident);
     Message *message;
@@ -94,6 +96,12 @@ class IGPDatagram::ClientMsgGetIDDatagram : public IGPDatagram {
 public:
     ClientMsgGetIDDatagram(Message *data) : IGPDatagram(data, ClientMsgGetID) {
         message->addBoolProperty("RELIABLE", true);
+    }
+};
+
+class IGPDatagram::ClientMsgKeepAliveDatagram : public IGPDatagram {
+public:
+    ClientMsgKeepAliveDatagram(Message *data) : IGPDatagram(data, ClientMsgKeepAlive) {
     }
 };
 
