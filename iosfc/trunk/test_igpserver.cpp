@@ -14,6 +14,7 @@ public:
 protected:
     void dataReceived(VoidBuffer data);
 private:
+    void sendIGPIdent();
     IGPServerPortManager *pool;
     int igpID;
     bool valid;
@@ -74,12 +75,21 @@ void IGPServerConnection::dataReceived(VoidBuffer data)
     IGPDatagram message(data);
     switch (message.getMsgIdent()) {
     case IGPDatagram::ClientMsgAutoAssignID:
-        {printf("Auto-assign ID\n");
+        printf("Auto-assign ID\n");
         igpID = pool->getUniqueIGPId();
         valid=true;
-        IGPDatagram::ServerMsgInformIDDatagram reply(igpID);
-        clientSocket->getOutputStream()->streamWrite(reply.serialize());}
+        sendIGPIdent();
         break;
+    case IGPDatagram::ClientMsgGetID:
+        sendIGPIdent();
+        break;
+    case IGPDatagram::ClientMsgToClient: {
+        IGPDatagram::ClientMsgToClientDatagram msgToSend(message);
+        Buffer<char> str(msgToSend.getMessage());
+        str.grow(1);
+        str[str.size() - 1] = 0;
+        printf("Message to %d: %c\n", msgToSend.getIgpIdent(), str[0]);
+        break;}
     default:
         break;
     }
@@ -87,6 +97,12 @@ void IGPServerConnection::dataReceived(VoidBuffer data)
     //str.grow(1);
     //str[str.size() - 1] = 0;
     //printf("Donnees recues: %s\n", (const char *)str);
+}
+
+void IGPServerConnection::sendIGPIdent()
+{
+    IGPDatagram::ServerMsgInformIDDatagram reply(igpID);
+    clientSocket->getOutputStream()->streamWrite(reply.serialize());
 }
 
 };

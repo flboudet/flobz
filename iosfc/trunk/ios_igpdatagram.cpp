@@ -30,8 +30,8 @@ namespace ios_fc {
 
 IGPDatagram::IGPDatagram(VoidBuffer data) : message(data)
 {
-    msgIdent = (message[0] << 24) | (message[1] << 16) | (message[2] << 8) | message[3];
-    msgSize = (message[4] << 24) | (message[5] << 16) | (message[6] << 8) | message[7];
+    msgIdent = readBigEndianIntFromMessage(0);
+    msgSize = readBigEndianIntFromMessage(4);
     if (msgSize + 8 > message.size()) {
         printf("Message incomplet!");
     }
