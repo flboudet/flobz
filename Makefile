@@ -69,7 +69,7 @@ OBJFILES= SDL_prim.o HiScores.o scenar.y.o scenar.l.o PuyoCommander.o        \
           menu.o menuitems.o audio.o scrollingtext.o preferences.o           \
           PuyoStory.o SDL_Painter.o InputManager.o GameControls.o            \
           PuyoDoomMelt.o IosImgProcess.o corona32.o corona.o corona_palette.o\
-	  PuyoStarter.o PuyoNetworkView.o PuyoNetworkGame.o
+	  PuyoStarter.o PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o
 
 
 # Autodetected cygwin platform

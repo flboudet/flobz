@@ -5,6 +5,7 @@
 #include "glSDL.h"
 #include "PuyoCommander.h"
 #include "PuyoStarter.h"
+#include "PuyoNetworkStarter.h"
 #include "PuyoVersion.h"
 #include "PuyoStory.h"
 #include "preferences.h"
@@ -1260,7 +1261,7 @@ mml_play:
     menu_next_item(gameOverMenu);
   while (menu_active_is(gameOverMenu, "YES")) {
     menu_next_item(gameOverMenu);
-    PuyoStarter myStarter(this,false,0,RANDOM,currentMusicTheme, mbox);
+    PuyoNetworkStarter myStarter(this, currentMusicTheme, mbox);
     audio_music_switch_theme(currentMusicTheme);
     p1name = playerName;
     p2name = playerName;
