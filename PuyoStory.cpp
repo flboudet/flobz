@@ -26,7 +26,7 @@ static SDL_Surface * createStorySurface()
   amask = 0x00000000;
 #endif
 
-  sstory = SDL_CreateRGBSurface(SDL_HWSURFACE, 640, 480, 32,
+  sstory = SDL_CreateRGBSurface(SDL_SWSURFACE, 640, 480, 32,
                                rmask, gmask, bmask, amask);
   if(sstory == NULL) {
     fprintf(stderr, "CreateRGBSurface failed: %s", SDL_GetError());
