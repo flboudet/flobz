@@ -38,7 +38,9 @@ static SDL_Surface * createStorySurface()
 /* Implementation of the Styrolyse Client */
 static void *loadImage (StyrolyseClient *_this, const char *path)
 {
-  return IIM_Load_DisplayFormatAlpha(path);
+  char spath[2048];
+  sprintf(spath,"story/%s", path);
+  return IIM_Load_DisplayFormatAlpha(spath);
 }
 
 
@@ -104,6 +106,9 @@ void PuyoStory::loop()
                     return;
                 default:
                     break;
+                case GameControlEvent::kDown:
+                    for (int i=0;i<100;++i)
+                      styrolyse_update(currentStory);
             }
         }
     }
