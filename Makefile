@@ -6,10 +6,11 @@
 # Settings
 
 ENABLE_AUDIO=true
-ENABLE_OPENGL=true
+ENABLE_OPENGL=false
 ENABLE_DGA=false
 
-DEBUG_MODE=true
+DEBUG_MODE=false
+MORE_DEBUG=false
 
 # Unix/Linux settings
 PREFIX=/usr/local
@@ -102,9 +103,13 @@ CFLAGS:=$(CFLAGS) -DUSE_DGA=1
 endif
 endif
 
-ifeq ($(DEBUG), true)
-CFLAGS:=$(CFLAGS) -DDEBUG=1 -g
+ifeq ($(DEBUG_MODE), true)
+CFLAGS:=$(CFLAGS) -g
 LDFLAGS:=$(LDFLAGS) -g
+endif
+
+ifeq ($(MORE_DEBUG), true)
+CFLAGS:=$(CFLAGS) -DDEBUG=1
 endif
 
 CXXFLAGS=${CFLAGS}

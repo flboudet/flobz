@@ -79,6 +79,7 @@ public:
     void unsetFlag() { flag = false; }
     bool getFlag() const { return flag; }
     int getID() const { return puyoID; }
+    void setID(int id) { puyoID = id; }
 private:
     int puyoID;
     static int lastID;

@@ -67,9 +67,12 @@ public:
     virtual int getSemiMove() const;
 private:
     void synchronizeState(Message &message);
+    PuyoPuyo *findPuyo(int puyoID);
     
+    PuyoState nextFalling, nextCompanion;
     PuyoPuyo *fakePuyo;
     MessageBox &msgBox;
+    IosVector puyoVector;
 };
 
 

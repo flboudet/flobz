@@ -50,7 +50,44 @@ void PuyoNetworkGame::onMessage(Message &message)
 
 void PuyoNetworkGame::synchronizeState(Message &message)
 {
-    points = message.getInt("SCORE");
+    points = message.getInt(SCORE);
+    nextFalling = (PuyoState)(message.getInt(NEXT_F));
+    nextCompanion = (PuyoState)(message.getInt(NEXT_C));
+    
+    Buffer<int> puyos = message.getIntArray(PUYOS);
+    int i = 0;
+    while (i < puyos.size()) {
+        int currentPuyoID = puyos[i];
+        PuyoPuyo *currentPuyo = findPuyo(currentPuyoID);
+        if (currentPuyo == NULL) {
+            currentPuyo = attachedFactory->createPuyo((PuyoState)(puyos[i+1]));
+            currentPuyo->setID(currentPuyoID);
+            puyoVector.addElement(currentPuyo);
+        }
+        currentPuyo->setFlag();
+        currentPuyo->setPuyoXY(puyos[i+2], puyos[i+3]);
+        i += 4;
+    }
+    
+    for (int i = puyoVector.getSize() - 1 ; i >= 0 ; i--) {
+        PuyoPuyo *currentPuyo = (PuyoPuyo *)(puyoVector.getElementAt(i));
+        if (currentPuyo->getFlag()) {
+            currentPuyo->unsetFlag();
+        }
+        else {
+            puyoVector.removeElementAt(i);
+        }
+    }
+}
+
+PuyoPuyo *PuyoNetworkGame::findPuyo(int puyoID)
+{
+    for (int i = 0, j = puyoVector.getSize() ; i < j ; i++) {
+        PuyoPuyo *currentPuyo = (PuyoPuyo *)(puyoVector.getElementAt(i));
+        if (currentPuyo->getID() == puyoID)
+            return currentPuyo;
+    }
+    return NULL;
 }
 
 void PuyoNetworkGame::cycle()
@@ -65,22 +102,22 @@ PuyoPuyo *PuyoNetworkGame::getPuyoAt(int X, int Y) const
 // List access to the PuyoPuyo objects
 int PuyoNetworkGame::getPuyoCount() const
 {
-    return 0;
+    return puyoVector.getSize();
 }
 
 PuyoPuyo *PuyoNetworkGame::getPuyoAtIndex(int index) const
 {
-    return fakePuyo;
+    return (PuyoPuyo *)(puyoVector.getElementAt(index));
 }
   
 PuyoState PuyoNetworkGame::getNextFalling()
 {
-    return PUYO_FALLINGRED;
+    return nextFalling;
 }
 
 PuyoState PuyoNetworkGame::getNextCompanion()
 {
-    return PUYO_FALLINGRED;
+    return nextCompanion;
 }
   
 PuyoState PuyoNetworkGame::getCompanionState() const
