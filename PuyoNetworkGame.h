@@ -77,6 +77,7 @@ private:
     AdvancedBuffer<PuyoPuyo *> puyoVector;
     int semiMove;
     int neutralPuyos, sentBadPuyos;
+    bool gameRunning;
 };
 
 

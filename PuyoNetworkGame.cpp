@@ -35,7 +35,7 @@ PuyoNetworkGame::~PuyoNetworkGame()
   msgBox.removeListener(this);
 }
 
-PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox) : PuyoGame(attachedFactory), msgBox(msgBox)
+PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox) : PuyoGame(attachedFactory), msgBox(msgBox), gameRunning(true)
 {
     fakePuyo = attachedFactory->createPuyo(PUYO_FALLINGRED);
     msgBox.addListener(this);
@@ -55,6 +55,10 @@ void PuyoNetworkGame::onMessage(Message &message)
     switch (msgType) {
         case kGameState:
             synchronizeState(message);
+            break;
+        case kGameOver:
+            gameRunning = false;
+            delegate->gameLost();
             break;
         default:
             break;
@@ -251,7 +255,7 @@ void PuyoNetworkGame::dropNeutrals()
 
 bool PuyoNetworkGame::isGameRunning() const
 {
-    return true;
+    return gameRunning;
 }
 
 bool PuyoNetworkGame::isEndOfCycle() const
