@@ -179,7 +179,7 @@
   }
 
   (@planCurrent = @PlanKaori)? {
-    @bg.image = "nouveaufond.png"
+    @bg.image = "bluebkgnd.jpg"
     @kaori.image = "kaori-small-sad.png"
     @kaori.pos.y = 250.0
     @saucer.pos.x = 40.0
