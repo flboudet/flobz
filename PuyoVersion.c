@@ -23,6 +23,6 @@
  *
  */
 
-#define FLOBOPUYOVERSION "0.21"
+#define FLOBOPUYOVERSION "0.20"
 
 char *kVersion = "Version " FLOBOPUYOVERSION;
