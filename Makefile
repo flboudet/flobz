@@ -62,9 +62,11 @@ menu.o:menu.c menu.h menuitems.h
 menuitems.o:menuitems.c menu.h menuitems.h
 scrollingtext.o:scrollingtext.c
 sofont.o:sofont.c
-SDL_prim.o:SDL_prim.c
 IosException.o:IosException.cpp
 IosVector.o:IosVector.cpp
+SDL_prim.o:SDL_prim.c
+	@echo "[$@]" && $(CC) $(CFLAGS) -DDATADIR=${DATADIR} -c $< 2>> EXT_WARNINGS
+	@rm -f EXT_WARNINGS
 
 scenar.l.c:scenar.l ${HFILES}
 	@echo "[$@]" && flex -oscenar.l.c scenar.l
