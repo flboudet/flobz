@@ -264,9 +264,9 @@ void PuyoIA::cycle()
 
         default:
         {
-            if (!firstLine && (attachedGame->getFallingY() == 1) && (choosenMove != -1))
+            if (!firstLine && (attachedGame->getFallingY() == 2) && (choosenMove != -1))
                 choosenMove = -1;
-            firstLine = (attachedGame->getFallingY() == 1);
+            firstLine = (attachedGame->getFallingY() == 2);
             if ((choosenMove >= 0) && (random() % level < 10))
             {
                 if (attachedGame->getFallingCompanionDir() != evaluator[choosenMove].c_direction)
@@ -323,7 +323,7 @@ void PuyoIA::cycle()
                         {
                             if (tmp == 1)
                             {
-                                //fprintf(stderr,"\nchoice : %d/%d (%d)\n",i,nbKeep,evaluator[i].score);
+                                /*fprintf(stderr,"\nchoice : %d/%d (%d)\n",i,nbKeep,evaluator[i].score);*/
                                 choosenMove = i;
                                 break;
                             }
