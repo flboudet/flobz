@@ -267,7 +267,7 @@ void GetStrPreference (const char *name, char *out, const char *defaut, const in
     {
         if (strncmp(key, tmp, tmplen) == 0)
         {
-            strcpy(out, ((key+tmplen)<bufferSize)?(key+tmplen):bufferSize);
+            strncpy(out, key+tmplen, bufferSize);
             free(copiedfile);
             return;
         }

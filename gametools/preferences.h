@@ -17,4 +17,4 @@ void SetStrPreference (const char *name, const char *value);
 /* Get preferences */
 int  GetBoolPreference(const char *name, int defaut);
 int  GetIntPreference (const char *name, int defaut);
-void GetStrPreference (const char *name, char *out, const char *defaut, const int bufferSize);
+void GetStrPreference (const char *name, char *out, const char *defaut, const int bufferSize = 256);
