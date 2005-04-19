@@ -25,7 +25,7 @@ class DrawableComponent : public virtual GameComponent
 {
   public:
     DrawableComponent();
-    bool drawRequested() const;
+    virtual bool drawRequested() const;
     void doDraw(SDL_Surface *screen) ;
 
   protected:

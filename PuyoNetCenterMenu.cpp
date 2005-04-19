@@ -47,7 +47,6 @@ void NetCenterMenu::NetCenterChatArea::addChat(String name, String text)
     }
     names[height-1]->setValue(name);
     texts[height-1]->setValue(text);
-    requestDraw();
 }
 
 void NetCenterMenu::NetCenterPlayerList::addNewPlayer(String playerName, PeerAddress playerAddress)

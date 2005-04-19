@@ -8,6 +8,18 @@
 #include "PuyoCommander.h"
 extern int NB_STORIES;
 
+class PuyoStoryWidget : public Widget, CycledComponent {
+public:
+    PuyoStoryWidget(int num);
+    ~PuyoStoryWidget();
+    void cycle();
+    void draw(SDL_Surface *screen) const;
+    IdleComponent *getIdleComponent() const { return this; }
+private:
+    int num;
+    Styrolyse *currentStory;
+};
+
 class PuyoStory : public DrawableComponent {
   public:
     PuyoStory(PuyoCommander *com, int num);

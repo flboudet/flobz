@@ -8,8 +8,13 @@
 #include "PuyoSinglePlayerStarter.h"
 
 #include "PuyoNetworkStarter.h"
+
+#include "PuyoLocalMenu.h"
 #include "PuyoNetworkMenu.h"
 #include "ios_udpmessagebox.h"
+
+#include "PuyoStory.h"
+
 using namespace gameui;
 
 PuyoCommander *theCommander = NULL;
@@ -40,7 +45,11 @@ class NetGameAction : public Action {
 PuyoScreen::PuyoScreen() : Screen(0,0,WIDTH,HEIGHT) { setBackground(menuBG); }
 
 class MainMenu : public PuyoScreen {
-  public: void build();
+public:
+    void build();
+private:
+    LocalGameMenu localGameMenu;
+    VBox menu;
 };
 
 class LANGameMenu : public PuyoScreen {
@@ -57,9 +66,20 @@ class NetworkGameMenu : public PuyoScreen {
 };
 
 void MainMenu::build() {
-  add(new Button(kSinglePlayerGame, new SinglePlayerGameAction));
-  add(new Button(kNetGame, new PushScreenAction(theCommander->netGameMenu)));
-  add(new Button(kExit,    new ExitAction));
+  localGameMenu.build();
+  PuyoStoryWidget *tempStory = new PuyoStoryWidget(0);
+  add(tempStory);
+  menu.add(new Button(kSinglePlayerGame, new PushScreenAction(&localGameMenu)));
+  menu.add(new Button("Two Players Game", new SinglePlayerGameAction));
+  menu.add(new Button("Options", new SinglePlayerGameAction));
+  menu.add(new Button(kNetGame, new PushScreenAction(theCommander->netGameMenu)));
+  menu.add(new Button(kExit,    new ExitAction));
+  add(&menu);
+  Vec3 menuPos = menu.getPosition();
+  menuPos.x = 100;
+  menuPos.y = 250;
+  menu.setPosition(menuPos);
+  menu.setSize(Vec3(640, 200, 0));
 }
 
 void NetworkGameMenu::build() {

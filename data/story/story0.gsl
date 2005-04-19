@@ -13,6 +13,7 @@
   Sprite @u =  [new_sprite: image="title/U.png" x=310.0 y=180.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @y =  [new_sprite: image="title/Y.png" x=310.0 y=180.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @o3 = [new_sprite: image="title/O3.png" x=420.0 y=190.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @kaori = [new_sprite: image="Kaori_title.png" x = -300.0 y=130.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
 
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
@@ -27,6 +28,7 @@
   sprite::@u display=@titledisplay
   sprite::@y display=@titledisplay
   sprite::@o3 display=@titledisplay
+  sprite::@kaori display=@display
 
 <movetitle: Sprite &this, float phase>
   float fcycle = 0.0
@@ -48,4 +50,5 @@
   movetitle::@u phase=7.0
   movetitle::@y phase=8.0
   movetitle::@o3 phase=9.0
+  move::@kaori   fcycle=100.0      x=0.0 y=130.0
   (@cycle = 1000)? @finished = 1

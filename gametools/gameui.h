@@ -49,7 +49,7 @@ namespace gameui {
   };
 
 
-  class Widget : public DrawableComponent {
+  class Widget /*: public DrawableComponent*/ {
     
       friend class WidgetContainer;
       friend class Box;
@@ -58,9 +58,9 @@ namespace gameui {
       Widget(WidgetContainer *parent = NULL);
       virtual ~Widget() {}
 
-      virtual bool drawRequested() const              { return false; }
-      void draw(SDL_Surface *screen, bool force) const;
-
+      virtual bool drawRequested() const { return _drawRequested; }
+      virtual void requestDraw(bool fromParent = false);
+      virtual void doDraw(SDL_Surface *screen);
       virtual IdleComponent *getIdleComponent() const { return NULL; }
 
       virtual void hide();
@@ -107,7 +107,7 @@ namespace gameui {
       bool    hidden;
       bool    focus;
       bool    focusable;
-
+      bool _drawRequested;
       Action *actions[GAMEUIENUM_LAST];
   };
 
@@ -124,8 +124,9 @@ namespace gameui {
       void setPosition(const Vec3 &v3);
 
       void draw(SDL_Surface *surface) const;
-      bool drawRequested() const              { return true; }
-
+      void requestDraw(bool fromParent = false);
+      virtual void widgetMustRedraw(Widget *wid) { requestDraw(); }
+      
     protected:
       Widget *getChild(int i)     const { return childs[i]; }
       int     getNumberOfChilds() const { return childs.size(); }
@@ -194,17 +195,35 @@ namespace gameui {
       bool isNextEvent(GameControlEvent *event) const;
       bool isOtherDirection(GameControlEvent *event) const;
   };
+  
+  class ZBox : public Box {
+    public:
+      ZBox(GameLoop *loop = NULL) : Box(loop) {}
+      void widgetMustRedraw(Widget *wid);
+    protected:
+      float getSortingAxe(const Vec3 &v3) const        { return v3.z;  }
+      void  setSortingAxe(Vec3 &v3, float value)       { v3.z = value; }
+      bool isPrevEvent(GameControlEvent *event) const;
+      bool isNextEvent(GameControlEvent *event) const;
+      bool isOtherDirection(GameControlEvent *event) const;
+  };
 
-  class Screen : public VBox, IdleComponent {
+  class Screen : public DrawableComponent, IdleComponent {
     public:
       Screen(float x, float y, float width, float height, GameLoop *loop = NULL);
       void setBackground(IIM_Surface *bg);
       void draw(SDL_Surface *surface) const;
+      bool drawRequested() const { return rootContainer.drawRequested(); }
       void onEvent(GameControlEvent *event);
       void remove() { IdleComponent::remove(); }
-
+      void add(Widget *child) { rootContainer.add(child); }
+      virtual void hide() { hidden = true; }
+      virtual void show() { hidden = false; }
+      bool isVisible() const { return !hidden; }
     private:
+      ZBox rootContainer;
       IIM_Surface *bg;
+      bool hidden;
   };
 
 

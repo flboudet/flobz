@@ -80,6 +80,39 @@ StyrolyseClient *client_new()
   return &client;
 };
 
+
+PuyoStoryWidget::PuyoStoryWidget(int num) : CycledComponent(0.05), num(num)
+{
+    char scriptPath[1024];
+    sprintf(scriptPath, "%s/story/story%d.gsl",dataFolder, num);
+    FILE *test = fopen(scriptPath, "r");
+    if (test == NULL) {
+        sprintf(scriptPath, "%s/story/storyz.gsl",dataFolder);
+    }
+    else fclose(test);
+    currentStory = styrolyse_new(scriptPath, client_new());
+    sstory = createStorySurface();
+}
+
+PuyoStoryWidget::~PuyoStoryWidget()
+{
+    styrolyse_free(currentStory);
+}
+
+void PuyoStoryWidget::cycle()
+{
+    printf("Update\n");
+    styrolyse_update(currentStory);
+    requestDraw();
+}
+
+void PuyoStoryWidget::draw(SDL_Surface *screen) const
+{
+    styrolyse_draw(currentStory);
+    SDL_BlitSurface(sstory, NULL, screen, NULL);
+    printf("Draw\n");
+}
+
 PuyoStory::PuyoStory(PuyoCommander *com, int num) : num(num), commander(com)
 {
     char scriptPath[1024];

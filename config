@@ -1,8 +1,8 @@
 ENABLE_AUDIO=true
-ENABLE_OPENGL=true
+ENABLE_OPENGL=false
 ENABLE_DGA=false
 
-DEBUG_MODE=false
+DEBUG_MODE=true
 MORE_DEBUG=false
 
 PRGNAME=flobopuyo
@@ -94,8 +94,8 @@ endif
 endif
 
 ifeq ($(DEBUG_MODE), true)
-CFLAGS:=$(CFLAGS) -g -O0 -pg
-LDFLAGS:=$(LDFLAGS) -g -O0 -pg
+CFLAGS:=$(CFLAGS) -g -O0
+LDFLAGS:=$(LDFLAGS) -g -O0
 else
 CFLAGS:=$(CFLAGS) -O2
 endif

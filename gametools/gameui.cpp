@@ -14,7 +14,7 @@ namespace gameui {
   // 
   Widget::Widget(WidgetContainer *parent)
     : parent(parent), preferedSize(0,0,0), size(0,0,0),
-    position(0,0,0), hidden(false), focus(false), focusable(false)
+    position(0,0,0), hidden(false), focus(false), focusable(false), _drawRequested(true)
     {
       for (int i = 0; i < GAMEUIENUM_LAST; ++i)
         actions[i] = NULL;
@@ -23,12 +23,6 @@ namespace gameui {
 
   void Widget::hide()   { hidden = true;                 }
   void Widget::show()   { hidden = false; requestDraw(); }
-
-  void Widget::draw(SDL_Surface *screen, bool force) const
-  {
-    if (/*(force || drawRequested()) && */ !hidden)
-      draw(screen);
-  }
 
   void Widget::eventOccured(GameControlEvent *event)
   {
@@ -41,7 +35,22 @@ namespace gameui {
     if (parent && foc)
       parent->setFocusable(true);
   }
+  
+  void Widget::requestDraw(bool fromParent)
+  {
+    _drawRequested = true;
+    if (parent && !fromParent)
+        parent->widgetMustRedraw(this);
+  }
 
+  void Widget::doDraw(SDL_Surface *screen)
+  {
+    if (_drawRequested) {
+        draw(screen);
+        _drawRequested = false;
+    }
+  }
+  
   //
   // WidgetContainer
   // 
@@ -72,8 +81,18 @@ namespace gameui {
   void WidgetContainer::draw(SDL_Surface *surface) const 
   {
     for (int i = 0; i < getNumberOfChilds(); ++i) {
-      getChild(i)->draw(surface);
+      getChild(i)->doDraw(surface);
     }
+  }
+  
+  void WidgetContainer::requestDraw(bool fromParent)
+  {
+      if (fromParent) {
+          for (int i = 0; i < getNumberOfChilds(); ++i) {
+              getChild(i)->requestDraw(true);
+          }
+      }
+      Widget::requestDraw(fromParent);
   }
 
   GameLoop *WidgetContainer::getGameLoop()
@@ -317,16 +336,40 @@ namespace gameui {
     return (event->cursorEvent == GameControlEvent::kRight)
       ||   (event->cursorEvent == GameControlEvent::kLeft);
   }
+  
+  //
+  // ZBox
+  //
+  bool ZBox::isPrevEvent(GameControlEvent *event) const
+  {
+    return event->cursorEvent == GameControlEvent::kUp;
+  }
+  bool ZBox::isNextEvent(GameControlEvent *event) const
+  {
+    return event->cursorEvent == GameControlEvent::kDown;
+  }
+  bool ZBox::isOtherDirection(GameControlEvent *event) const
+  {
+    return (event->cursorEvent == GameControlEvent::kRight)
+      ||   (event->cursorEvent == GameControlEvent::kLeft);
+  }
+  void ZBox::widgetMustRedraw(Widget *wid)
+  {
+    /*for (int i = 0; i < getNumberOfChilds(); ++i) {
+        getChild(i)->requestDraw(true);
+    }*/
+    requestDraw(true);
+  }
 
   //
   // ScreenVBox
   //
 
-  Screen::Screen(float x, float y, float width, float height, GameLoop *loop) : VBox(loop), bg(NULL)
+  Screen::Screen(float x, float y, float width, float height, GameLoop *loop) : rootContainer(loop), bg(NULL)
   {
-    setPosition(Vec3(x, y, 1.0f));
-    setSize(Vec3(width, height, 1.0f));
-    giveFocus();
+    rootContainer.setPosition(Vec3(x, y, 1.0f));
+    rootContainer.setSize(Vec3(width, height, 1.0f));
+    rootContainer.giveFocus();
   }
 
   void Screen::setBackground(IIM_Surface *bg)
@@ -337,22 +380,22 @@ namespace gameui {
   void Screen::draw(SDL_Surface *surface) const
   {
     if (!isVisible()) return;
-    if (bg) {
+    /*if (bg) {
       SDL_Rect rect;
-      rect.x = (Sint16)getPosition().x;
-      rect.y = (Sint16)getPosition().y;
-      rect.w = (Uint16)getSize().x;
-      rect.h = (Uint16)getSize().y;
+      rect.x = (Sint16)rootContainer.getPosition().x;
+      rect.y = (Sint16)rootContainer.getPosition().y;
+      rect.w = (Uint16)rootContainer.getSize().x;
+      rect.h = (Uint16)rootContainer.getSize().y;
       SDL_BlitSurface(bg->surf, NULL, surface, &rect);
-    }
-    VBox::draw(surface);
+    }*/
+    rootContainer.doDraw(surface);
   }
 
   void Screen::onEvent(GameControlEvent *event)
   {
     if (!isVisible()) return;
-    VBox::eventOccured(event);
-    VBox::giveFocus();
+    rootContainer.eventOccured(event);
+    rootContainer.giveFocus();
     requestDraw();
   }
 
