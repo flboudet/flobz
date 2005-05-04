@@ -61,7 +61,7 @@ namespace gameui {
       virtual bool drawRequested() const { return _drawRequested; }
       virtual void requestDraw(bool fromParent = false);
       virtual void doDraw(SDL_Surface *screen);
-      virtual IdleComponent *getIdleComponent() const { return NULL; }
+      virtual IdleComponent *getIdleComponent() { return NULL; }
 
       virtual void hide();
       virtual void show();
@@ -90,7 +90,7 @@ namespace gameui {
       
     protected:
       // To be implemented on each widgets
-      virtual void draw(SDL_Surface *screen) const { };
+      virtual void draw(SDL_Surface *screen) { };
 
       
       virtual void setPosition(const Vec3 &v3)   { position = v3; }
@@ -123,7 +123,7 @@ namespace gameui {
       void setSize(const Vec3 &v3);
       void setPosition(const Vec3 &v3);
 
-      void draw(SDL_Surface *surface) const;
+      void draw(SDL_Surface *surface);
       void requestDraw(bool fromParent = false);
       virtual void widgetMustRedraw(Widget *wid) { requestDraw(); }
       
@@ -212,7 +212,7 @@ namespace gameui {
     public:
       Screen(float x, float y, float width, float height, GameLoop *loop = NULL);
       void setBackground(IIM_Surface *bg);
-      void draw(SDL_Surface *surface) const;
+      void draw(SDL_Surface *surface);
       bool drawRequested() const { return rootContainer.drawRequested(); }
       void onEvent(GameControlEvent *event);
       void remove() { IdleComponent::remove(); }
@@ -233,7 +233,7 @@ namespace gameui {
       void setValue(String value);
       String getValue() const { return label; }
     protected:
-      void draw(SDL_Surface *screen) const;
+      void draw(SDL_Surface *screen);
       SoFont *font;
       
     private:

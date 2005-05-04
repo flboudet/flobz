@@ -30,7 +30,7 @@ class DrawableComponent : public virtual GameComponent
 
   protected:
     void requestDraw();
-    virtual void draw(SDL_Surface *screen) const {}
+    virtual void draw(SDL_Surface *screen) {}
 
   private:
     bool _drawRequested;

@@ -79,7 +79,7 @@ public:
     void cycle();
     
     virtual void draw();
-    void draw(SDL_Surface *surf) const;
+    void draw(SDL_Surface *surf);
     
     virtual bool leftPlayerWin() const  { return attachedGameA->isGameRunning(); }
     virtual bool rightPlayerWin() const { return attachedGameB->isGameRunning(); }

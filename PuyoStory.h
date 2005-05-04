@@ -13,8 +13,8 @@ public:
     PuyoStoryWidget(int num);
     ~PuyoStoryWidget();
     void cycle();
-    void draw(SDL_Surface *screen) const;
-    IdleComponent *getIdleComponent() const { return this; }
+    void draw(SDL_Surface *screen);
+    IdleComponent *getIdleComponent() { return this; }
 private:
     int num;
     Styrolyse *currentStory;

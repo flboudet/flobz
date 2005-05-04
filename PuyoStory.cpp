@@ -106,7 +106,7 @@ void PuyoStoryWidget::cycle()
     requestDraw();
 }
 
-void PuyoStoryWidget::draw(SDL_Surface *screen) const
+void PuyoStoryWidget::draw(SDL_Surface *screen)
 {
     styrolyse_draw(currentStory);
     SDL_BlitSurface(sstory, NULL, screen, NULL);

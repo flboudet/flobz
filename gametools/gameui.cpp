@@ -78,7 +78,7 @@ namespace gameui {
     arrangeWidgets();
   }
 
-  void WidgetContainer::draw(SDL_Surface *surface) const 
+  void WidgetContainer::draw(SDL_Surface *surface) 
   {
     for (int i = 0; i < getNumberOfChilds(); ++i) {
       getChild(i)->doDraw(surface);
@@ -377,7 +377,7 @@ namespace gameui {
     this->bg = bg;
   }
 
-  void Screen::draw(SDL_Surface *surface) const
+  void Screen::draw(SDL_Surface *surface)
   {
     if (!isVisible()) return;
     /*if (bg) {
@@ -419,7 +419,7 @@ namespace gameui {
       parent->arrangeWidgets();
   }
 
-  void Text::draw(SDL_Surface *screen) const
+  void Text::draw(SDL_Surface *screen)
   {
     SoFont_PutString(font, screen, (int)getPosition().x, (int)getPosition().y, (const char*)label, NULL);
   }

@@ -192,7 +192,7 @@ static void loadShrinkXplode(void)
     loadShrinkXplode2(4,140.0f);
 }
 
-void PuyoStarter::draw(SDL_Surface *surf) const {
+void PuyoStarter::draw(SDL_Surface *surf) {
   const_cast<PuyoStarter*>(this)->draw();
 }
 
