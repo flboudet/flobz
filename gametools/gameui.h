@@ -213,7 +213,7 @@ namespace gameui {
       Screen(float x, float y, float width, float height, GameLoop *loop = NULL);
       void setBackground(IIM_Surface *bg);
       void draw(SDL_Surface *surface);
-      bool drawRequested() const { return rootContainer.drawRequested(); }
+      bool drawRequested() const { if (isVisible()) return rootContainer.drawRequested(); return false;}
       void onEvent(GameControlEvent *event);
       void remove() { IdleComponent::remove(); }
       void add(Widget *child) { rootContainer.add(child); }

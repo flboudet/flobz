@@ -43,11 +43,12 @@ void SinglePlayerGameActionz::action()
 }
 
 void LocalGameMenu::build() {
-    add(new EditFieldWithLabel("Player Name:", "flobo"));
-    add(new Text("Choose Game Level"));
-    add(new Button("Easy", new PopScreenAction()));
-    add(new Button("Medium", new PopScreenAction()));
-    add(new Button("Hard", new SinglePlayerGameActionz()));
-    add(new Button("Cancel", new PopScreenAction()));
+    menu.add(new EditFieldWithLabel("Player Name:", "flobo"));
+    menu.add(new Text("Choose Game Level"));
+    menu.add(new Button("Easy", new PopScreenAction()));
+    menu.add(new Button("Medium", new PopScreenAction()));
+    menu.add(new Button("Hard", new SinglePlayerGameActionz()));
+    menu.add(new Button("Cancel", new PopScreenAction()));
+    PuyoMainScreen::build();
 }
 

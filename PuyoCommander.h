@@ -12,6 +12,7 @@
 #include "ios_udpmessagebox.h"
 #include "ios_igpmessagebox.h"
 #include "gameui.h"
+#include "PuyoStory.h"
 
 using namespace ios_fc;
 using namespace gameui;
@@ -21,6 +22,15 @@ class PuyoScreen : public Screen {
     PuyoScreen();
     virtual ~PuyoScreen() {}
     virtual void build() = 0;
+};
+
+class PuyoMainScreen : public PuyoScreen {
+  public:
+    PuyoMainScreen(PuyoStoryWidget *story = NULL);
+    void build();
+  protected:
+    VBox menu;
+    PuyoStoryWidget *story;
 };
 
 class PuyoCommander : public MessageListener

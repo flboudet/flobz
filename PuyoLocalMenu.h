@@ -29,8 +29,9 @@
 #include "gameui.h"
 #include "PuyoCommander.h"
 
-class LocalGameMenu : public PuyoScreen {
+class LocalGameMenu : public PuyoMainScreen {
 public:
+    LocalGameMenu(PuyoStoryWidget *story) : PuyoMainScreen(story) {}
     void build();
 private:
 };

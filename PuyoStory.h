@@ -5,8 +5,12 @@
 #include "SDL_image.h"
 #include "styrolyse.h"
 
-#include "PuyoCommander.h"
+#include "gameui.h"
 extern int NB_STORIES;
+
+using namespace gameui;
+
+class PuyoCommander;
 
 class PuyoStoryWidget : public Widget, CycledComponent {
 public:
