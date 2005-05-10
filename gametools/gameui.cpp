@@ -614,6 +614,19 @@ namespace gameui {
   }
 
   //
+  // ToggleButton
+  //
+  
+  ToggleButton::ToggleButton(const String &label, const String &offState, const String &onState, bool initialState, Action *action) : Button(label + "  " + (initialState ? onState : offState), action), unmodifiedLabel(label), onState(onState), offState(offState)
+  {
+  }
+  
+  void ToggleButton::setToggle(bool toggleValue)
+  {
+    setValue(unmodifiedLabel + "  " + (toggleValue ? onState : offState));
+  }
+  
+  //
   // Separator
   //
 

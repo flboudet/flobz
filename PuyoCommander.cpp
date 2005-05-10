@@ -11,6 +11,7 @@
 
 #include "PuyoLocalMenu.h"
 #include "PuyoNetworkMenu.h"
+#include "PuyoOptionMenu.h"
 #include "ios_udpmessagebox.h"
 
 using namespace gameui;
@@ -60,10 +61,11 @@ void PuyoMainScreen::build()
 
 class MainMenu : public PuyoMainScreen {
 public:
-    MainMenu(PuyoStoryWidget *story = NULL) : PuyoMainScreen(story), localGameMenu(story) {}
+    MainMenu(PuyoStoryWidget *story = NULL) : PuyoMainScreen(story), localGameMenu(story), optionMenu(story) {}
     void build();
 private:
     LocalGameMenu localGameMenu;
+    OptionMenu optionMenu;
 };
 
 class LANGameMenu : public PuyoMainScreen {
@@ -81,9 +83,10 @@ class NetworkGameMenu : public PuyoScreen {
 
 void MainMenu::build() {
   localGameMenu.build();
+  optionMenu.build();
   menu.add(new Button(kSinglePlayerGame, new PushScreenAction(&localGameMenu)));
   menu.add(new Button("Two Players Game", new SinglePlayerGameAction));
-  menu.add(new Button("Options", new SinglePlayerGameAction));
+  menu.add(new Button("Options", new PushScreenAction(&optionMenu)));
   menu.add(new Button(kNetGame, new PushScreenAction(theCommander->netGameMenu)));
   menu.add(new Button(kExit,    new ExitAction));
   PuyoMainScreen::build();
@@ -161,7 +164,7 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   initGameControls();
   initSDL();
   initAudio();
-  initDisplay();
+  initDisplay(fullscreen, useGL);
   initFonts();
   initMenus();
 }
@@ -239,7 +242,7 @@ void PuyoCommander::initFonts()
 
 
 /* Init SDL display */
-void PuyoCommander::initDisplay()
+void PuyoCommander::initDisplay(bool fullscreen, bool useGL)
 {
   DBG_PRINT("initDisplay()\n");
   display = SDL_SetVideoMode( 640, 480, 0,  SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0)|(useGL?SDL_GLSDL:0));

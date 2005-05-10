@@ -23,38 +23,34 @@
  *
  */
 
-#include "PuyoLocalMenu.h"
-#include "PuyoSinglePlayerStarter.h"
+#ifndef _PUYOOPTIONMENU
+#define _PUYOOPTIONMENU
 
-typedef enum SinglePlayerLevel {
-    EASY,
-    MEDIUM,
-    HARD
-} SinglePlayerLevel;
+#include "gameui.h"
+#include "PuyoCommander.h"
 
-class SinglePlayerGameActionz : public Action {
+class OptionMenu;
+
+class ToggleFullScreenAction : public Action {
 public:
-    SinglePlayerGameActionz(SinglePlayerLevel level) {;}
+    ToggleFullScreenAction(OptionMenu &optMenu) : optMenu(optMenu) {}
     void action();
+private:
+    OptionMenu &optMenu;
 };
 
-/**
- * Launches a single player game
- */
-void SinglePlayerGameActionz::action()
-{
-  PuyoStarter *starter = new PuyoSinglePlayerStarter(theCommander, 250, FLOBO, 0);
-  starter->run(0,0,0,0,0);
-  GameUIDefaults::SCREEN_STACK->push(starter);
-}
+class OptionMenu : public PuyoMainScreen {
+public:
+    OptionMenu(PuyoStoryWidget *story);
+    void build();
+    void toggleFullScreen();
+private:
+    bool fullscreen;
+    bool useGL;
+    ToggleFullScreenAction toggleFullScreenAction;
+    ToggleButton audioButton, musicButton, fullScreenButton;
+    Button changeControlsButton;
+};
 
-void LocalGameMenu::build() {
-    menu.add(new EditFieldWithLabel("Player Name:", "flobo"));
-    menu.add(new Text("Choose Game Level"));
-    menu.add(new Button("Easy", new SinglePlayerGameActionz(EASY)));
-    menu.add(new Button("Medium", new SinglePlayerGameActionz(MEDIUM)));
-    menu.add(new Button("Hard", new SinglePlayerGameActionz(HARD)));
-    menu.add(new Button("Cancel", new PopScreenAction()));
-    PuyoMainScreen::build();
-}
+#endif // _PUYOOPTIONMENU
 

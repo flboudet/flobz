@@ -59,6 +59,7 @@ class PuyoCommander : public MessageListener
     SoFont *menuFont;
     // DoomMelt *melt;
 
+    void initDisplay(bool fullscreen, bool useGL);
   private:
 
     friend class SinglePlayerGameAction;
@@ -70,7 +71,6 @@ class PuyoCommander : public MessageListener
     void initSDL();
     void initAudio();
     void initFonts();
-    void initDisplay();
     void initMenus();
 
     MessageBox *mbox;

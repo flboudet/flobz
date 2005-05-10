@@ -284,6 +284,14 @@ namespace gameui {
   private:
     EditField *editField;
   };
+  
+  class ToggleButton : public Button {
+  public:
+    ToggleButton(const String &label, const String &offState, const String &onState, bool initialState, Action *action);
+    void setToggle(bool toggleValue);
+  private:
+    String unmodifiedLabel, onState, offState;
+  };
 
 
   class Separator : public Widget {
