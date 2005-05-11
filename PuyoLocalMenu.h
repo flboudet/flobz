@@ -36,4 +36,11 @@ public:
 private:
 };
 
+class Local2PlayersGameMenu : public PuyoMainScreen {
+public:
+    Local2PlayersGameMenu(PuyoStoryWidget *story) : PuyoMainScreen(story) {}
+    void build();
+private:
+};
+
 #endif // _PUYOLOCALMENU

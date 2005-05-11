@@ -61,10 +61,11 @@ void PuyoMainScreen::build()
 
 class MainMenu : public PuyoMainScreen {
 public:
-    MainMenu(PuyoStoryWidget *story = NULL) : PuyoMainScreen(story), localGameMenu(story), optionMenu(story) {}
+    MainMenu(PuyoStoryWidget *story = NULL) : PuyoMainScreen(story), localGameMenu(story), local2PlayersGameMenu(story), optionMenu(story) {}
     void build();
 private:
     LocalGameMenu localGameMenu;
+    Local2PlayersGameMenu local2PlayersGameMenu;
     OptionMenu optionMenu;
 };
 
@@ -83,9 +84,10 @@ class NetworkGameMenu : public PuyoScreen {
 
 void MainMenu::build() {
   localGameMenu.build();
+  local2PlayersGameMenu.build();
   optionMenu.build();
   menu.add(new Button(kSinglePlayerGame, new PushScreenAction(&localGameMenu)));
-  menu.add(new Button("Two Players Game", new SinglePlayerGameAction));
+  menu.add(new Button("Two Players Game", new PushScreenAction(&local2PlayersGameMenu)));
   menu.add(new Button("Options", new PushScreenAction(&optionMenu)));
   menu.add(new Button(kNetGame, new PushScreenAction(theCommander->netGameMenu)));
   menu.add(new Button(kExit,    new ExitAction));
