@@ -30,28 +30,44 @@
 /**
  * Toggle fullscreen
  */
+void ToggleSoundFxAction::action()
+{
+    optMenu.toggleSoundFx();
+}
+
+void ToggleMusicAction::action()
+{
+    optMenu.toggleMusic();
+}
+
 void ToggleFullScreenAction::action()
 {
     optMenu.toggleFullScreen();
 }
 
+void OptionMenu::toggleSoundFx()
+{
+    theCommander->setSoundFx(! theCommander->getSoundFx());
+    audioButton.setToggle(theCommander->getSoundFx());
+}
+
+void OptionMenu::toggleMusic()
+{
+    theCommander->setMusic(! theCommander->getMusic());
+    musicButton.setToggle(theCommander->getMusic());
+}
+
 void OptionMenu::toggleFullScreen()
 {
-    fullscreen = !fullscreen;
-    SetBoolPreference(kFullScreen,fullscreen);
-    fullScreenButton.setToggle(fullscreen);
-    SDL_QuitSubSystem(SDL_INIT_VIDEO);
-    SDL_InitSubSystem(SDL_INIT_VIDEO);
-    theCommander->initDisplay(fullscreen, useGL);
+    theCommander->setFullScreen(! theCommander->getFullScreen());
+    fullScreenButton.setToggle(theCommander->getFullScreen());
 }
 
 OptionMenu::OptionMenu(PuyoStoryWidget *story) : PuyoMainScreen(story),
-    fullscreen(GetBoolPreference(kFullScreen, true)),
-    useGL(GetBoolPreference(kOpenGL, false)),
-    toggleFullScreenAction(*this),
-    audioButton(kAudioFX, "OFF", "ON ", fullscreen, &toggleFullScreenAction),
-    musicButton(kMusic, "OFF", "ON ", fullscreen, &toggleFullScreenAction),
-    fullScreenButton(kFullScreen, "OFF", "ON ", fullscreen, &toggleFullScreenAction),
+    toggleSoundFxAction(*this), toggleMusicAction(*this), toggleFullScreenAction(*this),
+    audioButton(kAudioFX, "OFF", "ON ", theCommander->getSoundFx(), &toggleSoundFxAction),
+    musicButton(kMusic, "OFF", "ON ", theCommander->getMusic(), &toggleMusicAction),
+    fullScreenButton(kFullScreen, "OFF", "ON ", theCommander->getFullScreen(), &toggleFullScreenAction),
     changeControlsButton(kControls, (gameui::Action *)NULL)
 {
 }

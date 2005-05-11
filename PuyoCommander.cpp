@@ -241,6 +241,39 @@ void PuyoCommander::initFonts()
 }
 
 
+void PuyoCommander::setMusic(bool music)
+{
+    if (music != this->sound) {
+        this->sound = music;
+        SetBoolPreference(kMusic, music);
+        audio_set_music_on_off(music);
+    }
+}
+    
+void PuyoCommander::setSoundFx(bool fx)
+{
+    if (fx != this->fx) {
+        this->fx = fx;
+        SetBoolPreference(kAudioFX, fx);
+        audio_set_sound_on_off(fx);
+    }
+}
+
+void PuyoCommander::setFullScreen(bool fullScreen)
+{
+    if (fullScreen != this->fullscreen) {
+        this->fullscreen = fullScreen;
+        SetBoolPreference(kFullScreen, fullscreen);
+        SDL_QuitSubSystem(SDL_INIT_VIDEO);
+        SDL_InitSubSystem(SDL_INIT_VIDEO);
+        initDisplay(fullscreen, useGL);
+    }
+}
+
+void PuyoCommander::setGlSDL(bool useGL)
+{
+}
+    
 /* Init SDL display */
 void PuyoCommander::initDisplay(bool fullscreen, bool useGL)
 {

@@ -59,6 +59,15 @@ class PuyoCommander : public MessageListener
     SoFont *menuFont;
     // DoomMelt *melt;
 
+    bool getMusic() const { return sound; }
+    void setMusic(bool music);
+    bool getSoundFx() const { return fx; }
+    void setSoundFx(bool fx);
+    bool getFullScreen() const { return fullscreen; }
+    void setFullScreen(bool fullScreen);
+    bool getGlSDL() const { return useGL; }
+    void setGlSDL(bool useGL);
+    
     void initDisplay(bool fullscreen, bool useGL);
   private:
 

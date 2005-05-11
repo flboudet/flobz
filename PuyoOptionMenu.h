@@ -31,6 +31,22 @@
 
 class OptionMenu;
 
+class ToggleSoundFxAction : public Action {
+public:
+    ToggleSoundFxAction(OptionMenu &optMenu) : optMenu(optMenu) {}
+    void action();
+private:
+    OptionMenu &optMenu;
+};
+
+class ToggleMusicAction : public Action {
+public:
+    ToggleMusicAction(OptionMenu &optMenu) : optMenu(optMenu) {}
+    void action();
+private:
+    OptionMenu &optMenu;
+};
+
 class ToggleFullScreenAction : public Action {
 public:
     ToggleFullScreenAction(OptionMenu &optMenu) : optMenu(optMenu) {}
@@ -43,10 +59,12 @@ class OptionMenu : public PuyoMainScreen {
 public:
     OptionMenu(PuyoStoryWidget *story);
     void build();
+    void toggleSoundFx();
+    void toggleMusic();
     void toggleFullScreen();
 private:
-    bool fullscreen;
-    bool useGL;
+    ToggleSoundFxAction toggleSoundFxAction;
+    ToggleMusicAction toggleMusicAction;
     ToggleFullScreenAction toggleFullScreenAction;
     ToggleButton audioButton, musicButton, fullScreenButton;
     Button changeControlsButton;
