@@ -227,17 +227,24 @@ namespace gameui {
   };
 
 
-  class Text : public Widget {
+  class Text : public Widget, public IdleComponent {
     public:
       Text(const String &label, SoFont *font = NULL);
       void setValue(String value);
       String getValue() const { return label; }
+
+      // Implements IdleComponent
+      virtual void idle(double currentTime);
+      virtual IdleComponent *getIdleComponent() { return this; }
+      
     protected:
       void draw(SDL_Surface *screen);
       SoFont *font;
       
     private:
       String label;
+      double offsetX;
+      double offsetY;
   };
 
 

@@ -408,6 +408,7 @@ namespace gameui {
     {
       if (font == NULL) this->font = GameUIDefaults::FONT;
       setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
+      offsetX = offsetY = 0.;
     }
 
   void Text::setValue(String value)
@@ -421,7 +422,14 @@ namespace gameui {
 
   void Text::draw(SDL_Surface *screen)
   {
-    SoFont_PutString(font, screen, (int)getPosition().x, (int)getPosition().y, (const char*)label, NULL);
+    SoFont_PutString(font, screen, (int)(offsetX + getPosition().x), (int)(offsetY + getPosition().y), (const char*)label, NULL);
+  }
+
+  void Text::idle(double currentTime)
+  {
+    offsetX = 7. * (sin(getPosition().x) + sin(getPosition().y + currentTime));
+    offsetY = 3. * (cos(getPosition().x+1) + sin(getPosition().y - currentTime * 1.1));
+    requestDraw();
   }
 
   //
