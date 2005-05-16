@@ -38,6 +38,13 @@ class NetGameAction : public Action {
   public: void action();
 };
 
+void SliderContainer::transitionToContent(Widget *content)
+{
+  if (this->contentWidget != NULL)
+    remove(contentWidget);
+  else add(contentWidget);
+}
+
 /*
  * THE MENUS
  */

@@ -118,7 +118,7 @@ public:
 
 PuyoHttpServerList::PuyoHttpServerList(String hostName, String path, int portNum)
 {
-    HttpDocument doc(hostName, path, portNum);
+  /*HttpDocument doc(hostName, path, portNum);
     StandardMessage msg(doc.getDocumentContent());
     int nbServers = msg.getInt("NBSERV");
     for (int i = 0 ; i < nbServers ; i++) {
@@ -128,7 +128,7 @@ PuyoHttpServerList::PuyoHttpServerList(String hostName, String path, int portNum
         sprintf(tmpStr, "PORTNUM%.2d", i);
         int portNum = msg.getInt(tmpStr);
         servers.add(new PuyoHttpServer(serverName, portNum));
-    }
+	}*/
 }
 
 
