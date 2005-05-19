@@ -42,7 +42,18 @@ void SliderContainer::transitionToContent(Widget *content)
 {
   if (this->contentWidget != NULL)
     remove(contentWidget);
-  else add(contentWidget);
+  contentWidget = content;
+  add(contentWidget);
+}
+
+void PuyoPushMenuAction::action()
+{
+    mainScreen->pushMenu(menu);
+}
+
+void PuyoPopMenuAction::action()
+{
+    mainScreen->popMenu();
 }
 
 /*
@@ -66,6 +77,30 @@ void PuyoMainScreen::build()
     menu.setSize(Vec3(640, 200, 0));
 }
 
+PuyoRealMainScreen::PuyoRealMainScreen(PuyoStoryWidget *story) : story(story)
+{
+    if (story != NULL)
+        add(story);
+    add(&container);
+    Vec3 menuPos = container.getPosition();
+    menuPos.x = 100;
+    menuPos.y = 250;
+    container.setPosition(menuPos);
+    container.setSize(Vec3(640, 200, 0));
+}
+
+void PuyoRealMainScreen::pushMenu(PuyoMainScreenMenu *menu)
+{
+    menuStack.push(container.getContentWidget());
+    container.transitionToContent(menu);
+}
+
+void PuyoRealMainScreen::popMenu()
+{
+    container.transitionToContent(menuStack.top());
+    menuStack.pop();
+}
+
 class MainMenu : public PuyoMainScreen {
 public:
     MainMenu(PuyoStoryWidget *story = NULL) : PuyoMainScreen(story), localGameMenu(story), local2PlayersGameMenu(story), optionMenu(story) {}
@@ -74,6 +109,23 @@ private:
     LocalGameMenu localGameMenu;
     Local2PlayersGameMenu local2PlayersGameMenu;
     OptionMenu optionMenu;
+};
+
+class LANGameRealMenu : public PuyoMainScreenMenu {
+  public:
+    LANGameRealMenu(PuyoRealMainScreen * mainScreen) : PuyoMainScreenMenu(mainScreen) {}
+    void build();
+};
+
+class MainRealMenu : public PuyoMainScreenMenu {
+public:
+    MainRealMenu(PuyoRealMainScreen * mainScreen) : PuyoMainScreenMenu(mainScreen), localGameMenu(NULL), local2PlayersGameMenu(NULL), optionMenu(NULL), lanGameMenu(mainScreen) {}
+    void build();
+private:
+    LocalGameMenu localGameMenu;
+    Local2PlayersGameMenu local2PlayersGameMenu;
+    OptionMenu optionMenu;
+    LANGameRealMenu lanGameMenu;
 };
 
 class LANGameMenu : public PuyoMainScreen {
@@ -101,6 +153,18 @@ void MainMenu::build() {
   PuyoMainScreen::build();
 }
 
+void MainRealMenu::build() {
+  localGameMenu.build();
+  local2PlayersGameMenu.build();
+  optionMenu.build();
+  lanGameMenu.build();
+  add(new Button(kSinglePlayerGame, new PushScreenAction(&localGameMenu)));
+  add(new Button("Two Players Game", new PushScreenAction(&local2PlayersGameMenu)));
+  add(new Button("Options", new PushScreenAction(&optionMenu)));
+  add(new Button(kNetGame, new PuyoPushMenuAction(&lanGameMenu, mainScreen)));
+  add(new Button(kExit,    new ExitAction));
+}
+
 void NetworkGameMenu::build() {
   internetGameMenu.build();
   lanGameMenu.build();
@@ -116,6 +180,14 @@ void LANGameMenu::build() {
   add(new EditFieldWithLabel("Server name:", "127.0.0.1"));
   add(new Button("Start!", new NetGameAction));
   add(new Button("Cancel", new PopScreenAction()));
+}
+
+void LANGameRealMenu::build() {
+  add(new Text("LAN Game"));
+  add(new EditFieldWithLabel("Player name:", "toto"));
+  add(new EditFieldWithLabel("Server name:", "127.0.0.1"));
+  add(new Button("Start!", new NetGameAction));
+  add(new Button("Cancel", new PuyoPopMenuAction(mainScreen)));
 }
 
 /**
@@ -141,7 +213,7 @@ void NetGameAction::action()
 
 void PuyoCommander::run()
 {
-  GameUIDefaults::SCREEN_STACK->push(mainMenu);
+  GameUIDefaults::SCREEN_STACK->push(mainScreen);
   GameUIDefaults::GAME_LOOP->run();
 }
 
@@ -152,12 +224,17 @@ void PuyoCommander::initMenus()
   // 
   // Create the structures.
   PuyoStoryWidget *tempStory = new PuyoStoryWidget(0);
-  mainMenu    = new MainMenu(tempStory);
-  netGameMenu = new NetworkGameMenu;
+  mainScreen = new PuyoRealMainScreen(tempStory);
+  MainRealMenu *trubudu = new MainRealMenu(mainScreen);
+  //LANGameRealMenu * testMenu = new LANGameRealMenu(mainScreen);
+  trubudu->build();
+  mainScreen->pushMenu(trubudu);
+  //mainMenu    = new MainMenu(tempStory);
+  //netGameMenu = new NetworkGameMenu;
 
   // Build the menus.
-  mainMenu->build();
-  netGameMenu->build();
+  //mainMenu->build();
+  //netGameMenu->build();
 }
 
 /* Build the PuyoCommander */

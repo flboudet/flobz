@@ -96,7 +96,7 @@ namespace gameui {
       virtual void setPosition(const Vec3 &v3)   { position = v3; }
       virtual void setSize(const Vec3 &v3)       { size     = v3; }
       virtual void setParent(WidgetContainer *p) { parent   =  p; }
-      void setFocusable(bool foc);
+      virtual void setFocusable(bool foc);
       
       WidgetContainer *parent;
       
@@ -152,7 +152,7 @@ namespace gameui {
       void eventOccured(GameControlEvent *event);
       void giveFocus();
       void lostFocus();
-      
+      void setFocusable(bool foc);
       void add (Widget *child);
 
     protected:

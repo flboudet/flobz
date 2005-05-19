@@ -21,6 +21,7 @@ class SliderContainer : public VBox {
  public:
   SliderContainer(GameLoop *loop = NULL) : VBox(loop), contentWidget(NULL) {}
   void transitionToContent(Widget *content);
+  Widget * getContentWidget() const { return contentWidget; }
  private:
   Widget *contentWidget;
 };
@@ -39,6 +40,47 @@ class PuyoMainScreen : public PuyoScreen {
   protected:
     VBox menu;
     PuyoStoryWidget *story;
+};
+
+class PuyoMainScreenMenu;
+
+class PuyoRealMainScreen : public PuyoScreen {
+  public:
+    PuyoRealMainScreen(PuyoStoryWidget *story = NULL);
+    void pushMenu(PuyoMainScreenMenu *menu);
+    void popMenu();
+    void build() {}
+  protected:
+    SliderContainer container;
+    PuyoStoryWidget *story;
+    Stack<Widget*> menuStack;
+};
+
+class PuyoMainScreenMenu : public VBox {
+public:
+    PuyoMainScreenMenu(PuyoRealMainScreen *mainScreen, GameLoop *loop = NULL) : VBox(loop), mainScreen(mainScreen) {}
+    virtual void build() = 0;
+protected:
+    PuyoRealMainScreen *mainScreen;
+};
+
+class PuyoPushMenuAction : public Action
+{
+public:
+    PuyoPushMenuAction(PuyoMainScreenMenu *menu, PuyoRealMainScreen *mainScreen) : menu(menu), mainScreen(mainScreen) {}
+    void action();
+private:
+    PuyoRealMainScreen *mainScreen;
+    PuyoMainScreenMenu *menu;
+};
+
+class PuyoPopMenuAction : public Action
+{
+public:
+    PuyoPopMenuAction(PuyoRealMainScreen *mainScreen) : mainScreen(mainScreen) {}
+    void action();
+private:
+    PuyoRealMainScreen *mainScreen;
 };
 
 class PuyoCommander : public MessageListener
@@ -93,6 +135,7 @@ class PuyoCommander : public MessageListener
     MessageBox *mbox;
     GameLoop   *loop;
     PuyoScreen *mainMenu, *netGameMenu;
+    PuyoRealMainScreen *mainScreen;
 
     bool sound;
     bool fx;

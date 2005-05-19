@@ -208,6 +208,13 @@ namespace gameui {
       setFocusable(true);
     }
   }
+  
+  void Box::setFocusable(bool foc)
+  {
+    Widget::setFocusable(foc);
+    if (foc)
+        activeWidget = getNumberOfChilds() - 1;
+  }
 
   void Box::eventOccured(GameControlEvent *event)
   {
