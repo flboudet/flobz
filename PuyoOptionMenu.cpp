@@ -63,7 +63,7 @@ void OptionMenu::toggleFullScreen()
     fullScreenButton.setToggle(theCommander->getFullScreen());
 }
 
-OptionMenu::OptionMenu(PuyoStoryWidget *story) : PuyoMainScreen(story),
+OptionMenu::OptionMenu(PuyoRealMainScreen *mainScreen) : PuyoMainScreenMenu(mainScreen),
     toggleSoundFxAction(*this), toggleMusicAction(*this), toggleFullScreenAction(*this),
     audioButton(kAudioFX, "OFF", "ON ", theCommander->getSoundFx(), &toggleSoundFxAction),
     musicButton(kMusic, "OFF", "ON ", theCommander->getMusic(), &toggleMusicAction),
@@ -73,12 +73,11 @@ OptionMenu::OptionMenu(PuyoStoryWidget *story) : PuyoMainScreen(story),
 }
 
 void OptionMenu::build() {
-    menu.add(new Text("Options"));
-    menu.add(&audioButton);
-    menu.add(&musicButton);
-    menu.add(&fullScreenButton);
-    menu.add(&changeControlsButton);
-    menu.add(new Button("Back", new PopScreenAction()));
-    PuyoMainScreen::build();
+    add(new Text("Options"));
+    add(&audioButton);
+    add(&musicButton);
+    add(&fullScreenButton);
+    add(&changeControlsButton);
+    add(new Button("Back", new PuyoPopMenuAction(mainScreen)));
 }
 

@@ -34,10 +34,6 @@ class SinglePlayerGameAction : public Action {
   public: void action();
 };
 
-class NetGameAction : public Action {
-  public: void action();
-};
-
 void SliderContainer::transitionToContent(Widget *content)
 {
   if (this->contentWidget != NULL)
@@ -83,10 +79,10 @@ PuyoRealMainScreen::PuyoRealMainScreen(PuyoStoryWidget *story) : story(story)
         add(story);
     add(&container);
     Vec3 menuPos = container.getPosition();
-    menuPos.x = 100;
+    menuPos.x = 300;
     menuPos.y = 250;
     container.setPosition(menuPos);
-    container.setSize(Vec3(640, 200, 0));
+    container.setSize(Vec3(300, 200, 0));
 }
 
 void PuyoRealMainScreen::pushMenu(PuyoMainScreenMenu *menu)
@@ -101,93 +97,27 @@ void PuyoRealMainScreen::popMenu()
     menuStack.pop();
 }
 
-class MainMenu : public PuyoMainScreen {
-public:
-    MainMenu(PuyoStoryWidget *story = NULL) : PuyoMainScreen(story), localGameMenu(story), local2PlayersGameMenu(story), optionMenu(story) {}
-    void build();
-private:
-    LocalGameMenu localGameMenu;
-    Local2PlayersGameMenu local2PlayersGameMenu;
-    OptionMenu optionMenu;
-};
-
-class LANGameRealMenu : public PuyoMainScreenMenu {
-  public:
-    LANGameRealMenu(PuyoRealMainScreen * mainScreen) : PuyoMainScreenMenu(mainScreen) {}
-    void build();
-};
-
 class MainRealMenu : public PuyoMainScreenMenu {
 public:
-    MainRealMenu(PuyoRealMainScreen * mainScreen) : PuyoMainScreenMenu(mainScreen), localGameMenu(NULL), local2PlayersGameMenu(NULL), optionMenu(NULL), lanGameMenu(mainScreen) {}
+    MainRealMenu(PuyoRealMainScreen * mainScreen) : PuyoMainScreenMenu(mainScreen), localGameMenu(mainScreen), local2PlayersGameMenu(mainScreen), optionMenu(mainScreen), networkGameMenu(mainScreen) {}
     void build();
 private:
     LocalGameMenu localGameMenu;
     Local2PlayersGameMenu local2PlayersGameMenu;
     OptionMenu optionMenu;
-    LANGameRealMenu lanGameMenu;
+    NetworkGameMenu networkGameMenu;
 };
-
-class LANGameMenu : public PuyoMainScreen {
-  public:
-    void build();
-};
-
-class NetworkGameMenu : public PuyoScreen {
-  public:
-    void build();
-  private:
-    LANGameMenu      lanGameMenu;
-    InternetGameMenu internetGameMenu;
-};
-
-void MainMenu::build() {
-  localGameMenu.build();
-  local2PlayersGameMenu.build();
-  optionMenu.build();
-  menu.add(new Button(kSinglePlayerGame, new PushScreenAction(&localGameMenu)));
-  menu.add(new Button("Two Players Game", new PushScreenAction(&local2PlayersGameMenu)));
-  menu.add(new Button("Options", new PushScreenAction(&optionMenu)));
-  menu.add(new Button(kNetGame, new PushScreenAction(theCommander->netGameMenu)));
-  menu.add(new Button(kExit,    new ExitAction));
-  PuyoMainScreen::build();
-}
 
 void MainRealMenu::build() {
   localGameMenu.build();
   local2PlayersGameMenu.build();
   optionMenu.build();
-  lanGameMenu.build();
-  add(new Button(kSinglePlayerGame, new PushScreenAction(&localGameMenu)));
-  add(new Button("Two Players Game", new PushScreenAction(&local2PlayersGameMenu)));
-  add(new Button("Options", new PushScreenAction(&optionMenu)));
-  add(new Button(kNetGame, new PuyoPushMenuAction(&lanGameMenu, mainScreen)));
+  networkGameMenu.build();
+  add(new Button(kSinglePlayerGame, new PuyoPushMenuAction(&localGameMenu, mainScreen)));
+  add(new Button("Two Players Game", new PuyoPushMenuAction(&local2PlayersGameMenu, mainScreen)));
+  add(new Button("Options", new PuyoPushMenuAction(&optionMenu, mainScreen)));
+  add(new Button(kNetGame, new PuyoPushMenuAction(&networkGameMenu, mainScreen)));
   add(new Button(kExit,    new ExitAction));
-}
-
-void NetworkGameMenu::build() {
-  internetGameMenu.build();
-  lanGameMenu.build();
-  add(new Text("Network Game"));
-  add(new Button("LAN Game",      new PushScreenAction(&lanGameMenu)));
-  add(new Button("Internet Game", new PushScreenAction(&internetGameMenu)));
-  add(new Button("Cancel",        new PopScreenAction()));
-}
-
-void LANGameMenu::build() {
-  add(new Text("LAN Game"));
-  add(new EditFieldWithLabel("Player name:", "toto"));
-  add(new EditFieldWithLabel("Server name:", "127.0.0.1"));
-  add(new Button("Start!", new NetGameAction));
-  add(new Button("Cancel", new PopScreenAction()));
-}
-
-void LANGameRealMenu::build() {
-  add(new Text("LAN Game"));
-  add(new EditFieldWithLabel("Player name:", "toto"));
-  add(new EditFieldWithLabel("Server name:", "127.0.0.1"));
-  add(new Button("Start!", new NetGameAction));
-  add(new Button("Cancel", new PuyoPopMenuAction(mainScreen)));
 }
 
 /**
@@ -203,12 +133,24 @@ void SinglePlayerGameAction::action()
 /**
  * Launches a network game
  */
+ class NetGameAction : public Action {
+  public: void action();
+};
+
 void NetGameAction::action()
 {
   UDPMessageBox *mbox = new UDPMessageBox("127.0.0.1", 6581, 6581);
   PuyoStarter *starter = new PuyoNetworkStarter(theCommander, 0, mbox);
   starter->run(0,0,0,0,0);
   GameUIDefaults::SCREEN_STACK->push(starter);
+}
+
+void LANGameRealMenu::build() {
+  add(new Text("LAN Game"));
+  add(new EditFieldWithLabel("Player name:", "toto"));
+  add(new EditFieldWithLabel("Server name:", "127.0.0.1"));
+  add(new Button("Start!", new NetGameAction));
+  add(new Button("Cancel", new PuyoPopMenuAction(mainScreen)));
 }
 
 void PuyoCommander::run()
@@ -226,15 +168,8 @@ void PuyoCommander::initMenus()
   PuyoStoryWidget *tempStory = new PuyoStoryWidget(0);
   mainScreen = new PuyoRealMainScreen(tempStory);
   MainRealMenu *trubudu = new MainRealMenu(mainScreen);
-  //LANGameRealMenu * testMenu = new LANGameRealMenu(mainScreen);
   trubudu->build();
   mainScreen->pushMenu(trubudu);
-  //mainMenu    = new MainMenu(tempStory);
-  //netGameMenu = new NetworkGameMenu;
-
-  // Build the menus.
-  //mainMenu->build();
-  //netGameMenu->build();
 }
 
 /* Build the PuyoCommander */

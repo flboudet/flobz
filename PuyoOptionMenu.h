@@ -55,9 +55,9 @@ private:
     OptionMenu &optMenu;
 };
 
-class OptionMenu : public PuyoMainScreen {
+class OptionMenu : public PuyoMainScreenMenu {
 public:
-    OptionMenu(PuyoStoryWidget *story);
+    OptionMenu(PuyoRealMainScreen *mainScreen);
     void build();
     void toggleSoundFx();
     void toggleMusic();

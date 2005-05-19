@@ -40,14 +40,29 @@ private:
     AdvancedBuffer<PuyoHttpServer *> servers;
 };
 
-class InternetGameMenu : public PuyoScreen {
+class LANGameRealMenu : public PuyoMainScreenMenu {
+  public:
+    LANGameRealMenu(PuyoRealMainScreen * mainScreen) : PuyoMainScreenMenu(mainScreen) {}
+    void build();
+};
+
+class InternetGameMenu : public PuyoMainScreenMenu {
 public:
-    InternetGameMenu();
+    InternetGameMenu(PuyoRealMainScreen * mainScreen);
     void build();
 private:
     PuyoHttpServerList servers;
     HBox *serverSelectionPanel;
     VBox *serverListPanel;
+};
+
+class NetworkGameMenu : public PuyoMainScreenMenu {
+public:
+    NetworkGameMenu(PuyoRealMainScreen * mainScreen) : PuyoMainScreenMenu(mainScreen), lanGameMenu(mainScreen), internetGameMenu(mainScreen) {}
+    void build();
+private:
+    LANGameRealMenu  lanGameMenu;
+    InternetGameMenu internetGameMenu;
 };
 
 #endif // _PUYONETWORKMENU

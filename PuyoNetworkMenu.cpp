@@ -175,7 +175,16 @@ private:
     Text *userName;
 };
 
-InternetGameMenu::InternetGameMenu() : servers("www.ios-software.com", "/flobopuyo/fpservers", 80)
+void NetworkGameMenu::build() {
+  internetGameMenu.build();
+  lanGameMenu.build();
+  add(new Text("Network Game"));
+  add(new Button("LAN Game",      new PuyoPushMenuAction(&lanGameMenu, mainScreen)));
+  add(new Button("Internet Game", new PuyoPushMenuAction(&internetGameMenu, mainScreen)));
+  add(new Button("Cancel",        new PuyoPopMenuAction(mainScreen)));
+}
+
+InternetGameMenu::InternetGameMenu(PuyoRealMainScreen * mainScreen) : PuyoMainScreenMenu(mainScreen), servers("www.ios-software.com", "/flobopuyo/fpservers", 80)
 {
 }
 
@@ -200,6 +209,6 @@ void InternetGameMenu::build() {
     add(serverSelectionPanel);
     add(serverName);
     add(new Button("Join", new PushNetCenterMenuAction(serverName->getEditField(), playerName->getEditField())));
-    add(new Button("Cancel", new PopScreenAction()));
+    add(new Button("Cancel", new PuyoPopMenuAction(mainScreen)));
 }
 

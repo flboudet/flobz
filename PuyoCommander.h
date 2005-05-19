@@ -134,7 +134,7 @@ class PuyoCommander : public MessageListener
 
     MessageBox *mbox;
     GameLoop   *loop;
-    PuyoScreen *mainMenu, *netGameMenu;
+
     PuyoRealMainScreen *mainScreen;
 
     bool sound;

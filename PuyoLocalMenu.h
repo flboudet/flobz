@@ -29,16 +29,16 @@
 #include "gameui.h"
 #include "PuyoCommander.h"
 
-class LocalGameMenu : public PuyoMainScreen {
+class LocalGameMenu : public PuyoMainScreenMenu {
 public:
-    LocalGameMenu(PuyoStoryWidget *story) : PuyoMainScreen(story) {}
+    LocalGameMenu(PuyoRealMainScreen *mainScreen) : PuyoMainScreenMenu(mainScreen) {}
     void build();
 private:
 };
 
-class Local2PlayersGameMenu : public PuyoMainScreen {
+class Local2PlayersGameMenu : public PuyoMainScreenMenu {
 public:
-    Local2PlayersGameMenu(PuyoStoryWidget *story) : PuyoMainScreen(story) {}
+    Local2PlayersGameMenu(PuyoRealMainScreen *mainScreen) : PuyoMainScreenMenu(mainScreen) {}
     void build();
 private:
 };

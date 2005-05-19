@@ -49,25 +49,23 @@ void SinglePlayerGameActionz::action()
 }
 
 void LocalGameMenu::build() {
-    menu.add(new EditFieldWithLabel("Player Name:", "flobo"));
-    menu.add(new Text("Choose Game Level"));
-    menu.add(new Button("Easy", new SinglePlayerGameActionz(EASY)));
-    menu.add(new Button("Medium", new SinglePlayerGameActionz(MEDIUM)));
-    menu.add(new Button("Hard", new SinglePlayerGameActionz(HARD)));
-    menu.add(new Button("Cancel", new PopScreenAction()));
-    PuyoMainScreen::build();
+    add(new EditFieldWithLabel("Player Name:", "flobo"));
+    add(new Text("Choose Game Level"));
+    add(new Button("Easy", new SinglePlayerGameActionz(EASY)));
+    add(new Button("Medium", new SinglePlayerGameActionz(MEDIUM)));
+    add(new Button("Hard", new SinglePlayerGameActionz(HARD)));
+    add(new Button("Cancel", new PuyoPopMenuAction(mainScreen)));
 }
 
 
 void Local2PlayersGameMenu::build()
 {
-    menu.add(new EditFieldWithLabel("Player Name:", "flobo"));
-    menu.add(new Text("Choose Game Level"));
-    menu.add(new Button("Easy", new SinglePlayerGameActionz(EASY)));
-    menu.add(new Button("Medium", new SinglePlayerGameActionz(MEDIUM)));
-    menu.add(new Button("Hard", new SinglePlayerGameActionz(HARD)));
-    menu.add(new Button("Cancel", new PopScreenAction()));
-    PuyoMainScreen::build();
+    add(new EditFieldWithLabel("Player Name:", "flobo"));
+    add(new Text("Choose Game Level"));
+    add(new Button("Easy", new SinglePlayerGameActionz(EASY)));
+    add(new Button("Medium", new SinglePlayerGameActionz(MEDIUM)));
+    add(new Button("Hard", new SinglePlayerGameActionz(HARD)));
+    add(new Button("Cancel", new PuyoPopMenuAction(mainScreen)));
 }
 
 
