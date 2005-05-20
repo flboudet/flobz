@@ -101,7 +101,6 @@ PuyoStoryWidget::~PuyoStoryWidget()
 
 void PuyoStoryWidget::cycle()
 {
-    printf("Update\n");
     styrolyse_update(currentStory);
     requestDraw();
 }
@@ -110,7 +109,6 @@ void PuyoStoryWidget::draw(SDL_Surface *screen)
 {
     styrolyse_draw(currentStory);
     SDL_BlitSurface(sstory, NULL, screen, NULL);
-    printf("Draw\n");
 }
 
 PuyoStory::PuyoStory(PuyoCommander *com, int num) : num(num), commander(com)
