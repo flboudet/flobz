@@ -34,14 +34,22 @@
 
 class PuyoCycled;
 
+class PuyoPauseMenu : public VBox {
+public:
+    PuyoPauseMenu();
+private:
+    Text menuTitle;
+    Button continueButton;
+    Button abortButton;
+};
+
 // Le PuyoStarter moderne
-class PuyoPureStarter : public Screen { //DrawableComponent {
+class PuyoPureStarter : public Screen {
 public:
     PuyoPureStarter(PuyoCommander *commander);
     virtual ~PuyoPureStarter();
     virtual void run(int score1, int score2, int lives, int point1, int point2) = 0;
     virtual void draw() = 0;
-    virtual void handleEvent(SDL_Event &event);
     
     virtual void startPressed();
     virtual void backPressed();
@@ -67,6 +75,7 @@ protected:
     void restartRender();
 
     PuyoCycled *cycled;
+    PuyoPauseMenu pauseMenu;
 };
 
 

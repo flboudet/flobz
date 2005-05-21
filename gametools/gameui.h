@@ -216,6 +216,7 @@ namespace gameui {
       bool drawRequested() const { if (isVisible()) return rootContainer.drawRequested(); return false;}
       void onEvent(GameControlEvent *event);
       void remove() { IdleComponent::remove(); }
+      void remove(Widget *child) { rootContainer.remove(child); }
       void add(Widget *child) { rootContainer.add(child); }
       virtual void hide() { hidden = true; }
       virtual void show() { hidden = false; }

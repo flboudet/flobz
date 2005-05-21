@@ -55,9 +55,17 @@ static const int NB_PERSO_STATE = 2;
 const char *p1name = "Player1";
 const char *p2name = "Player2";
 
-/*extern Menu *menu_pause; */
 static char *BACKGROUND[NB_MUSIC_THEME] = { "Background.jpg", "BackgroundDark.jpg" };
 extern IIM_Surface *background, *neutral;
+
+
+
+PuyoPauseMenu::PuyoPauseMenu() : menuTitle("Pause"), continueButton("Continue game", (Action*)NULL), abortButton("Abort game", (Action*)NULL)
+{
+    add(&menuTitle);
+    add(&continueButton);
+    add(&abortButton);
+}
 
 class PuyoCycled : public CycledComponent
 {
@@ -92,30 +100,6 @@ bool PuyoPureStarter::isLate(double currentTime) const
   return cycled->isLate(currentTime);
 }
 
-void PuyoPureStarter::handleEvent(SDL_Event &event)
-{
-    /* Check for usual events */
-    GameControlEvent controlEvent;
-    getControlEvent(event, &controlEvent);
-    switch (controlEvent.cursorEvent) {
-        case GameControlEvent::kStart:
-            startPressed();
-            break;
-        case GameControlEvent::kBack:
-            backPressed();
-            break;
-        default:
-            break;
-    }
-    /* Check for SDL special events */
-    if(event.type == SDL_QUIT) {
-/*        if (menu_active_is(commander->gameOverMenu, "YES"))
-            menu_next_item(commander->gameOverMenu);
-        //quit = 1;*/
-        exit(0);
-    }
-}
-
 void PuyoPureStarter::startPressed()
 {
     //if (gameover) {
@@ -127,25 +111,25 @@ void PuyoPureStarter::startPressed()
 
 void PuyoPureStarter::backPressed()
 {
-/*
-    if (!gameover) {
+    printf("Back pressed!\n");
+
+    if (1/*!gameover*/) {
         if (!paused) {
-            menu_show(menu_pause);
+            this->add(&pauseMenu);
             paused = true;
             stopRender();
         }
         else {
             paused = false;
+            this->remove(&pauseMenu);
             restartRender();
-            menu_hide(menu_pause);
         }
     }
     else {
-        if (menu_active_is(commander->gameOverMenu, "NO"))
-            menu_next_item(commander->gameOverMenu);
-        quit = 1;
+        //if (menu_active_is(commander->gameOverMenu, "NO"))
+        //    menu_next_item(commander->gameOverMenu);
+        //quit = 1;
     }
-    */
 }
     
 void PuyoPureStarter::stopRender()
@@ -194,6 +178,7 @@ static void loadShrinkXplode(void)
 
 void PuyoStarter::draw(SDL_Surface *surf) {
   const_cast<PuyoStarter*>(this)->draw();
+  Screen::draw(surf);
 }
 
 void PuyoStarter::draw()
@@ -728,6 +713,7 @@ void PuyoStarter::onEvent(GameControlEvent *cevent)
       break;
     case GameControlEvent::kBack:
       if (!gameover) {
+        backPressed();
         /*                            if (!paused) {
                                       menu_show(menu_pause);
                                       paused = true;
