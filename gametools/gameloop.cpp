@@ -124,6 +124,8 @@ void GameLoop::add(GameComponent *gc)
   DrawableComponent *dc = dynamic_cast<DrawableComponent*>(gc);
   IdleComponent     *ic = dynamic_cast<IdleComponent*>(gc);
 
+  gc->_remove = gc->_kill = false;
+  
   components.add(gc);
   if (dc != NULL)
     drawables.add(dc);

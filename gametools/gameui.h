@@ -14,6 +14,9 @@ namespace gameui {
   class WidgetContainer;
   class Box;
   class VBox;
+  class HBox;
+  class ZBox;
+  class SliderContainer;
   class Text;
   class GameUIDefaults;
   class Screen;
@@ -52,6 +55,7 @@ namespace gameui {
   class Widget /*: public DrawableComponent*/ {
     
       friend class WidgetContainer;
+      friend class SliderContainer;
       friend class Box;
       
     public:
@@ -217,7 +221,7 @@ namespace gameui {
       bool isOtherDirection(GameControlEvent *event) const;
   };
 
-  class SliderContainer : public VBox, IdleComponent {
+  class SliderContainer : public ZBox, IdleComponent {
     public:
       SliderContainer(GameLoop *loop = NULL);
       void transitionToContent(Widget *content);

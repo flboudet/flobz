@@ -79,9 +79,6 @@ namespace gameui {
     childs.add(child);
     child->setParent(this);
     child->addToGameLoop(loop);
-//    if (child->getIdleComponent()) {
-//      loop->add(child->getIdleComponent());
-//    }
     arrangeWidgets();
   }
 
@@ -89,9 +86,6 @@ namespace gameui {
   {
     childs.remove(child);
     child->removeFromGameLoop();
-//    if (child->getIdleComponent()) {
-//      child->getIdleComponent()->remove();
-//    }
     arrangeWidgets();
   }
 
@@ -408,7 +402,7 @@ namespace gameui {
   // SliderContainer
 
   SliderContainer::SliderContainer(GameLoop *loop)
-    : VBox(loop), contentWidget(NULL), previousWidget(NULL)
+    : ZBox(loop), contentWidget(NULL), previousWidget(NULL)
     , currentTime(0), slideStartTime(0)
     {
     }
@@ -418,29 +412,40 @@ namespace gameui {
   {
     previousWidget = contentWidget;
     slideStartTime = currentTime;
-    if (this->contentWidget != NULL)
-      VBox::remove(contentWidget);
     contentWidget = content;
     add(contentWidget);
   }
 
   void SliderContainer::idle(double currentTime)
   {
-    static const double slidingTime = 1.0;
+    static const double slidingTime = .3;
     this->currentTime = currentTime;
     double t = (currentTime - slideStartTime);
-
-    arrangeWidgets();
     
     if ((previousWidget == NULL) || (t > slidingTime) || (contentWidget == NULL) || (t < 0.))
+    {
+      if (previousWidget != NULL)
+        ZBox::remove(previousWidget);
       return;
+    }
 
     double coef = t / slidingTime;
 
-    Vec3 pos1 = contentWidget->getPosition();
-    Vec3 siz1 = contentWidget->getSize();
-    Vec3 pos2 = previousWidget->getPosition();
-    Vec3 siz2 = previousWidget->getSize();
+    Vec3 pos1 = getPosition();
+    Vec3 siz1 = getSize();
+    Vec3 pos2 = pos1;
+    Vec3 siz2 = siz1;
+    
+    double shrink = coef * siz1.y;
+    pos1.y = pos1.y + (siz1.y - shrink) / 2.;
+    pos2.y = pos2.y + shrink / 2.;
+    siz1.y = shrink;
+    siz2.y = siz2.y - shrink;
+
+    contentWidget->setPosition(pos1);
+    contentWidget->setSize(siz1);
+    previousWidget->setPosition(pos2);
+    previousWidget->setSize(siz2);
   }
 
   //
