@@ -14,7 +14,7 @@ namespace gameui {
   // 
   Widget::Widget(WidgetContainer *parent)
     : parent(parent), preferedSize(0,0,0), size(0,0,0),
-    position(0,0,0), hidden(false), focus(false), focusable(false), _drawRequested(true)
+    position(0,0,0), hidden(false), focus(false), focusable(false), _drawRequested(true), receiveUp(false)
     {
       for (int i = 0; i < GAMEUIENUM_LAST; ++i)
         actions[i] = NULL;
@@ -212,15 +212,18 @@ namespace gameui {
   void Box::setFocusable(bool foc)
   {
     Widget::setFocusable(foc);
-    if (foc)
-        activeWidget = getNumberOfChilds() - 1;
+    if (foc) {
+        for (int i = 0, j = getNumberOfChilds() ; i < j ; i++) {
+            if (getChild(i)->isFocusable()) {
+                activeWidget =  i;
+                return;
+            }
+        }
+    }
   }
 
   void Box::eventOccured(GameControlEvent *event)
   {
-    if (event->isUp)
-      return;
-
     if (activeWidget >= getNumberOfChilds())
       activeWidget = getNumberOfChilds() - 1;
 
@@ -230,6 +233,8 @@ namespace gameui {
     }
 
     Widget *child = getChild(activeWidget);
+    if ((event->isUp) && (! child->receiveUpEvents()))
+      return;
     child->giveFocus();
     child->eventOccured(event);
 

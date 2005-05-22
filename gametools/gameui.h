@@ -79,7 +79,7 @@ namespace gameui {
       // default behaviour is to lost the focus
       virtual void eventOccured(GameControlEvent *event);
 
-      bool isFocusable() const { return focusable; }
+      virtual bool isFocusable() const { return focusable; }
       
       virtual void giveFocus()       { focus = true;  }
       virtual void lostFocus()       { focus = false; }
@@ -88,6 +88,8 @@ namespace gameui {
       void setAction(GameUIEnum type, Action *action) { actions[type] = action; }
       Action *getAction(GameUIEnum type)              { return actions[type];   }
       
+      bool receiveUpEvents() const { return receiveUp; }
+      void setReceiveUpEvents(bool receiveUp) { this->receiveUp = receiveUp; }
     protected:
       // To be implemented on each widgets
       virtual void draw(SDL_Surface *screen) { };
@@ -109,6 +111,7 @@ namespace gameui {
       bool    focusable;
       bool _drawRequested;
       Action *actions[GAMEUIENUM_LAST];
+      bool receiveUp;
   };
 
 
