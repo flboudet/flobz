@@ -217,6 +217,23 @@ namespace gameui {
       bool isOtherDirection(GameControlEvent *event) const;
   };
 
+  class SliderContainer : public VBox, IdleComponent {
+    public:
+      SliderContainer(GameLoop *loop = NULL);
+      void transitionToContent(Widget *content);
+      Widget * getContentWidget() const { return contentWidget; }
+      
+      // Implements IdleComponent
+      virtual void idle(double currentTime);
+      virtual IdleComponent *getIdleComponent() { return this; }
+
+    private:
+      Widget *contentWidget;
+      Widget *previousWidget;
+      double slideStartTime;
+      double currentTime;
+  };
+
   class Screen : public DrawableComponent, IdleComponent {
     public:
       Screen(float x, float y, float width, float height, GameLoop *loop = NULL);

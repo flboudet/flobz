@@ -405,6 +405,44 @@ namespace gameui {
     requestDraw(true);
   }
 
+  // SliderContainer
+
+  SliderContainer::SliderContainer(GameLoop *loop)
+    : VBox(loop), contentWidget(NULL), previousWidget(NULL)
+    , currentTime(0), slideStartTime(0)
+    {
+    }
+  
+
+  void SliderContainer::transitionToContent(Widget *content)
+  {
+    previousWidget = contentWidget;
+    slideStartTime = currentTime;
+    if (this->contentWidget != NULL)
+      VBox::remove(contentWidget);
+    contentWidget = content;
+    add(contentWidget);
+  }
+
+  void SliderContainer::idle(double currentTime)
+  {
+    static const double slidingTime = 1.0;
+    this->currentTime = currentTime;
+    double t = (currentTime - slideStartTime);
+
+    arrangeWidgets();
+    
+    if ((previousWidget == NULL) || (t > slidingTime) || (contentWidget == NULL) || (t < 0.))
+      return;
+
+    double coef = t / slidingTime;
+
+    Vec3 pos1 = contentWidget->getPosition();
+    Vec3 siz1 = contentWidget->getSize();
+    Vec3 pos2 = previousWidget->getPosition();
+    Vec3 siz2 = previousWidget->getSize();
+  }
+
   //
   // ScreenVBox
   //
