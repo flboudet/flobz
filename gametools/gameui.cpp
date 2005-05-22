@@ -404,43 +404,82 @@ namespace gameui {
   SliderContainer::SliderContainer(GameLoop *loop)
     : ZBox(loop), contentWidget(NULL), previousWidget(NULL)
     , currentTime(0), slideStartTime(0)
+    , sliding(false), bg(NULL)
     {
     }
   
+  void SliderContainer::draw(SDL_Surface *screen)
+  {
+    if (bg != NULL)
+    {
+      IIM_Rect rect;
+      rect.x = (Sint16)getPosition().x;
+      rect.y = (Sint16)getPosition().y;
+      IIM_BlitSurface(bg, NULL, screen, &rect);
+    }
+    ZBox::draw(screen);
+  }
 
   void SliderContainer::transitionToContent(Widget *content)
   {
+    if (sliding)
+    {
+      printf("WARNING: ALREADY SLIDING !\n");
+      // TODO: fix
+      IOS_ERROR("ALREADY SLIDING");
+    }
     previousWidget = contentWidget;
     slideStartTime = currentTime;
+    if (contentWidget)
+      contentWidget->lostFocus();
     contentWidget = content;
     add(contentWidget);
+    sliding = true;
+
+    if (previousWidget) previousWidget->removeFromGameLoop();
+    if (contentWidget) contentWidget->removeFromGameLoop();
   }
 
   void SliderContainer::idle(double currentTime)
   {
     static const double slidingTime = .3;
     this->currentTime = currentTime;
+
+    if (!sliding) return;
     double t = (currentTime - slideStartTime);
     
     if ((previousWidget == NULL) || (t > slidingTime) || (contentWidget == NULL) || (t < 0.))
     {
       if (previousWidget != NULL)
         ZBox::remove(previousWidget);
+      if (contentWidget != NULL)
+        contentWidget->addToGameLoop(getGameLoop());
+      sliding = false;
       return;
     }
 
-    double coef = t / slidingTime;
+    double coef1 = t / slidingTime - 0.4;
+    double coef2 = t / slidingTime + 0.4;
+
+    if (coef1 < 0.) coef1 = 0.;
+    if (coef2 > 1.) coef2 = 1.;
 
     Vec3 pos1 = getPosition();
     Vec3 siz1 = getSize();
+    pos1.x += 5;
+    pos1.y += 5;
+    siz1.x -= 10;
+    siz1.y -= 10;
     Vec3 pos2 = pos1;
     Vec3 siz2 = siz1;
     
-    double shrink = coef * siz1.y;
-    pos1.y = pos1.y + (siz1.y - shrink) / 2.;
-    pos2.y = pos2.y + shrink / 2.;
-    siz1.y = shrink;
-    siz2.y = siz2.y - shrink;
+    double shrink1 = coef1 * siz1.y;
+    double shrink2 = coef2 * siz1.y;
+    
+    pos1.y = pos1.y + (siz1.y - shrink1) / 2.;
+    pos2.y = pos2.y + shrink2 / 2.;
+    siz1.y = shrink1;
+    siz2.y = siz2.y - shrink2;
 
     contentWidget->setPosition(pos1);
     contentWidget->setSize(siz1);

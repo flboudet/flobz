@@ -53,16 +53,19 @@ PuyoMainScreen::PuyoMainScreen(PuyoStoryWidget *story) : story(story)
 {
 }
 
+#define MENU_X 235
+#define MENU_Y 225
+
 void PuyoMainScreen::build()
 {
     if (story != NULL)
         add(story);
     add(&menu);
     Vec3 menuPos = menu.getPosition();
-    menuPos.x = 100;
-    menuPos.y = 250;
+    menuPos.x = MENU_X;
+    menuPos.y = MENU_Y;
     menu.setPosition(menuPos);
-    menu.setSize(Vec3(640, 200, 0));
+    menu.setSize(Vec3(menuBG->w, menuBG->h, 0));
 }
 
 PuyoRealMainScreen::PuyoRealMainScreen(PuyoStoryWidget *story) : story(story)
@@ -71,10 +74,12 @@ PuyoRealMainScreen::PuyoRealMainScreen(PuyoStoryWidget *story) : story(story)
         add(story);
     add(&container);
     Vec3 menuPos = container.getPosition();
-    menuPos.x = 300;
-    menuPos.y = 250;
+    menuPos.x = MENU_X;
+    menuPos.y = MENU_Y;
+
     container.setPosition(menuPos);
-    container.setSize(Vec3(300, 200, 0));
+    container.setSize(Vec3(menuBG->w, menuBG->h, 0));
+    container.setBackground(menuBG);
 }
 
 void PuyoRealMainScreen::pushMenu(PuyoMainScreenMenu *menu)
@@ -154,7 +159,7 @@ void PuyoCommander::run()
 void PuyoCommander::initMenus()
 {
   DBG_PRINT("initMenus()\n");
-  menuBG = IIM_Load_DisplayFormat("MenuBackground.jpg");
+  menuBG = IIM_Load_DisplayFormatAlpha("menubg.png");
   // 
   // Create the structures.
   PuyoStoryWidget *tempStory = new PuyoStoryWidget(0);

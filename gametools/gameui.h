@@ -226,16 +226,24 @@ namespace gameui {
       SliderContainer(GameLoop *loop = NULL);
       void transitionToContent(Widget *content);
       Widget * getContentWidget() const { return contentWidget; }
+
+      void setBackground(IIM_Surface *bg) { this->bg = bg; }
       
       // Implements IdleComponent
       virtual void idle(double currentTime);
       virtual IdleComponent *getIdleComponent() { return this; }
+      
+    protected:
+      // Implements Widget
+      virtual void draw(SDL_Surface *screen);
 
     private:
       Widget *contentWidget;
       Widget *previousWidget;
       double slideStartTime;
       double currentTime;
+      IIM_Surface *bg;
+      bool sliding;
   };
 
   class Screen : public DrawableComponent, IdleComponent {
