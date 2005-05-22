@@ -423,11 +423,7 @@ namespace gameui {
   void SliderContainer::transitionToContent(Widget *content)
   {
     if (sliding)
-    {
-      printf("WARNING: ALREADY SLIDING !\n");
-      // TODO: fix
-      IOS_ERROR("ALREADY SLIDING");
-    }
+      return;
     previousWidget = contentWidget;
     slideStartTime = currentTime;
     if (contentWidget)
