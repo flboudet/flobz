@@ -50,6 +50,21 @@ namespace gameui {
         _drawRequested = false;
     }
   }
+
+  void Widget::addToGameLoop(GameLoop *loop)
+  {
+    IdleComponent *idle = getIdleComponent();
+    if (idle != NULL)
+      loop->add(idle);
+  }
+  
+  void Widget::removeFromGameLoop()
+  {
+    IdleComponent *idle = getIdleComponent();
+    if (idle != NULL)
+      idle->remove();
+  }
+    
   
   //
   // WidgetContainer
@@ -63,20 +78,37 @@ namespace gameui {
   { 
     childs.add(child);
     child->setParent(this);
-    if (child->getIdleComponent()) {
-      loop->add(child->getIdleComponent());
-    }
+    child->addToGameLoop(loop);
+//    if (child->getIdleComponent()) {
+//      loop->add(child->getIdleComponent());
+//    }
     arrangeWidgets();
   }
 
   void WidgetContainer::remove (Widget *child)
   {
     childs.remove(child);
-    if (child->getIdleComponent()) {
-      child->getIdleComponent()->kill();
-    }
+    child->removeFromGameLoop();
+//    if (child->getIdleComponent()) {
+//      child->getIdleComponent()->remove();
+//    }
     arrangeWidgets();
   }
+
+  void WidgetContainer::addToGameLoop(GameLoop *loop)
+  {
+    Widget::addToGameLoop(loop);
+    for (int i = 0; i < getNumberOfChilds(); ++i)
+      getChild(i)->addToGameLoop(loop);
+  }
+  
+  void WidgetContainer::removeFromGameLoop()
+  {
+    Widget::removeFromGameLoop();
+    for (int i = 0; i < getNumberOfChilds(); ++i)
+      getChild(i)->removeFromGameLoop();
+  }
+    
 
   void WidgetContainer::draw(SDL_Surface *surface) 
   {

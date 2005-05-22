@@ -61,7 +61,10 @@ namespace gameui {
       virtual bool drawRequested() const { return _drawRequested; }
       virtual void requestDraw(bool fromParent = false);
       virtual void doDraw(SDL_Surface *screen);
+
       virtual IdleComponent *getIdleComponent() { return NULL; }
+      virtual void addToGameLoop(GameLoop *loop);
+      virtual void removeFromGameLoop();
 
       virtual void hide();
       virtual void show();
@@ -129,6 +132,9 @@ namespace gameui {
       void draw(SDL_Surface *surface);
       void requestDraw(bool fromParent = false);
       virtual void widgetMustRedraw(Widget *wid) { requestDraw(); }
+      
+      virtual void addToGameLoop(GameLoop *loop);
+      virtual void removeFromGameLoop();
       
     protected:
       Widget *getChild(int i)     const { return childs[i]; }
