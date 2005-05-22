@@ -33,8 +33,6 @@
 /* not clean, but basta */
 extern SDL_Painter painter;
 extern IIM_Surface *puyoEyesSwirl[4];
-extern IIM_Surface *shrinkingPuyo[5][5];
-extern IIM_Surface *explodingPuyo[5][5];
 
 /* Base class implementation */
 Animation::Animation()
@@ -287,30 +285,38 @@ void VanishAnimation::draw(int semiMove)
         }
     }
     else {
+        const AnimatedPuyoTheme *theme = attachedPuyo.getAttachedTheme();
+        SDL_Painter &painter = attachedPuyo.getAttachedView()->getPainter();
+        
         SDL_Rect drect, xrect;
-        drect.x = X;
-        drect.y = Y;// + (2.5 * pow(iter - 16, 2) - 108);
-        drect.w = shrinkingPuyo[0][0]->w;
-        drect.h = shrinkingPuyo[0][0]->h;
         int iter2 = iter - 10 - delay;
         int shrinkingImage = (iter - 10 - delay) / 4;
         if (shrinkingImage < 4) {
-            painter.requestDraw(shrinkingPuyo[shrinkingImage][color], &drect);
+            IIM_Surface *shrinkingSurface, *explodingSurface;
+            shrinkingSurface = theme->getShrinkingSurfaceForIndex(shrinkingImage);
+            explodingSurface = theme->getExplodingSurfaceForIndex(shrinkingImage);
+            
+            drect.x = X;
+            drect.y = Y;
+            drect.w = shrinkingSurface->w;
+            drect.h = shrinkingSurface->h;
+        
+            painter.requestDraw(shrinkingSurface, &drect);
             int xrectY = Y + (int)(2.5 * pow(iter - 16 - delay, 2) - 108);
-            xrect.w = explodingPuyo[shrinkingImage][color]->w;
-            xrect.h = explodingPuyo[shrinkingImage][color]->h;
+            xrect.w = explodingSurface->w;
+            xrect.h = explodingSurface->h;
             xrect.x = X - iter2 * iter2;
             xrect.y = xrectY;
-            painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
+            painter.requestDraw(explodingSurface, &xrect);
             xrect.x = X - iter2;
             xrect.y = xrectY + iter2;
-            painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
+            painter.requestDraw(explodingSurface, &xrect);
             xrect.x = X + iter2;
             xrect.y = xrectY + iter2;
-            painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
+            painter.requestDraw(explodingSurface, &xrect);
             xrect.x = X + iter2 * iter2;
             xrect.y = xrectY;
-            painter.requestDraw(explodingPuyo[shrinkingImage][color], &xrect);
+            painter.requestDraw(explodingSurface, &xrect);
         }
     }
 }
@@ -385,6 +391,7 @@ void NeutralPopAnimation::cycle()
 
 void NeutralPopAnimation::draw(int semiMove)
 {
+    SDL_Painter &painter = attachedPuyo.getAttachedView()->getPainter();
     SDL_Rect drect, xrect;
     drect.x = X;
     drect.y = Y;

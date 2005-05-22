@@ -44,6 +44,8 @@
 extern SDL_Surface *display;
 extern IIM_Surface *image;
 
+extern SDL_Painter painter;
+
 class PuyoGameFactory {
 public:
     virtual PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory) = 0;
@@ -53,7 +55,7 @@ class PuyoView : public PuyoDelegate {
   public:
     PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 	     AnimatedPuyoThemeManager *attachedPuyoThemeManager,
-	     int xOffset, int yOffset, int nXOffset, int nYOffset);
+	     int xOffset, int yOffset, int nXOffset, int nYOffset, SDL_Painter &painterToUse = painter);
     virtual ~PuyoView() {}
     void setEnemyGame(PuyoGame *enemyGame);
     void render();

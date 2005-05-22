@@ -43,6 +43,57 @@ private:
     Button abortButton;
 };
 
+class PuyoLocalGameFactory : public PuyoGameFactory {
+public:
+    PuyoLocalGameFactory(PuyoRandomSystem *attachedRandom): attachedRandom(attachedRandom) {}
+    PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory) {
+        return new PuyoLocalGame(attachedRandom, attachedPuyoFactory);
+    }
+private:
+    PuyoRandomSystem *attachedRandom;
+};
+
+class PuyoGameWidget : public Widget, CycledComponent {
+public:
+    PuyoGameWidget();
+    virtual ~PuyoGameWidget();
+    void cycle();
+    void draw(SDL_Surface *screen);
+    void pause();
+    void resume();
+    bool isFocusable() { return !paused; }
+    void eventOccured(GameControlEvent *event);
+    IdleComponent *getIdleComponent() { return this; }
+private:
+    bool keyShouldRepeat(int &key);
+    SDL_Painter painter;
+    IIM_Surface *background, *grid, *liveImage[4];
+    AnimatedPuyoThemeManager attachedPuyoThemeManager;
+    PuyoRandomSystem attachedRandom;
+    PuyoLocalGameFactory attachedGameFactory;
+    PuyoView areaA, areaB;
+    PuyoGame *attachedGameA, *attachedGameB;
+    int cyclesBeforeGameCycle;
+    unsigned int tickCounts;
+    bool paused;
+    bool displayLives, lives;
+    int fpKey_P1_Down, fpKey_P1_Left, fpKey_P1_Right, fpKey_P1_TurnLeft, fpKey_P1_TurnRight;
+    int fpKey_P2_Down, fpKey_P2_Left, fpKey_P2_Right, fpKey_P2_TurnLeft, fpKey_P2_TurnRight;
+    int fpKey_Repeat, fpKey_Delay;
+};
+
+class PuyoGameScreen : public Screen {
+public:
+    PuyoGameScreen();
+    void onEvent(GameControlEvent *cevent);
+    virtual void backPressed();
+private:
+    bool paused;
+    PuyoPauseMenu pauseMenu;
+    PuyoGameWidget gameWidget;
+};
+
+
 // Le PuyoStarter moderne
 class PuyoPureStarter : public Screen {
 public:
@@ -115,16 +166,6 @@ protected:
     AnimatedPuyoThemeManager attachedThemeManager;
     int quit;
     bool gameover;
-};
-
-class PuyoLocalGameFactory : public PuyoGameFactory {
-public:
-    PuyoLocalGameFactory(PuyoRandomSystem *attachedRandom): attachedRandom(attachedRandom) {}
-    PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory) {
-        return new PuyoLocalGame(attachedRandom, attachedPuyoFactory);
-    }
-private:
-    PuyoRandomSystem *attachedRandom;
 };
 
 #endif // _PUYOSTARTER

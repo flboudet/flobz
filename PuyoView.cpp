@@ -38,9 +38,9 @@
 #include "SDL_Painter.h"
 SDL_Painter painter;
 
-extern SDL_Surface *display;
-IIM_Surface *background, *neutral;
-IIM_Surface *bigNeutral;
+//extern SDL_Surface *display;
+IIM_Surface *background, *neutral = NULL;
+IIM_Surface *bigNeutral = NULL;
 
 static char PuyoGroupImageIndex[2][2][2][2] =
 { {  // empty bottom
@@ -93,9 +93,9 @@ static char PuyoGroupImageIndex[2][2][2][2] =
 
 PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 		   AnimatedPuyoThemeManager *attachedPuyoThemeManager,
-		   int xOffset, int yOffset, int nXOffset, int nYOffset)
+		   int xOffset, int yOffset, int nXOffset, int nYOffset, SDL_Painter &painterToUse)
   :attachedThemeManager(attachedPuyoThemeManager),
-   attachedPuyoFactory(this), attachedPainter(painter)
+   attachedPuyoFactory(this), attachedPainter(painterToUse)
 {
 	attachedGame = attachedPuyoGameFactory->createPuyoGame(&attachedPuyoFactory);
     attachedGame->setDelegate(this);

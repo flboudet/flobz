@@ -58,13 +58,313 @@ const char *p2name = "Player2";
 static char *BACKGROUND[NB_MUSIC_THEME] = { "Background.jpg", "BackgroundDark.jpg" };
 extern IIM_Surface *background, *neutral;
 
+PuyoGameWidget::PuyoGameWidget() : CycledComponent(0.02),
+                                   attachedGameFactory(&attachedRandom),
+                                   areaA(&attachedGameFactory, &attachedPuyoThemeManager,
+                                         1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
+                                   areaB(&attachedGameFactory, &attachedPuyoThemeManager,
+                                         1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
+                                   cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3),
+                                   fpKey_P1_Down(0), fpKey_P1_Left(0), fpKey_P1_Right(0), fpKey_P1_TurnLeft(0), fpKey_P1_TurnRight(0),
+                                   fpKey_P2_Down(0), fpKey_P2_Left(0), fpKey_P2_Right(0), fpKey_P2_TurnLeft(0), fpKey_P2_TurnRight(0),
+                                   fpKey_Repeat(7), fpKey_Delay(5)
+{
+    // Affreux, a degager absolument
+    if (neutral == NULL)
+        neutral = IIM_Load_DisplayFormatAlpha("Neutral.png");
+    if (bigNeutral == NULL)
+        bigNeutral = IIM_Load_DisplayFormatAlpha("BigNeutral.png");
+    static bool firstTime = true;
+    if (firstTime) {
+        /*speedImg      = IIM_Load_DisplayFormatAlpha("speed.png");
+        speedBlackImg = IIM_Load_DisplayFormatAlpha("speed_black.png");
+        */
+        NeutralPopAnimation::initResources();
+        firstTime = false;
+    }
+    background = IIM_Load_DisplayFormat("Background.jpg");
+    grid       = IIM_Load_DisplayFormatAlpha("grid.png");
+    liveImage[0] = IIM_Load_DisplayFormatAlpha("0live.png");
+    liveImage[1] = IIM_Load_DisplayFormatAlpha("1live.png");
+    liveImage[2] = IIM_Load_DisplayFormatAlpha("2live.png");
+    liveImage[3] = IIM_Load_DisplayFormatAlpha("3live.png");
+    SDL_PixelFormat *fmt = background->surf->format;
+    SDL_Surface *tmp = SDL_CreateRGBSurface(background->surf->flags,
+                                            background->w, background->h, 32,
+                                            fmt->Rmask, fmt->Gmask,
+                                            fmt->Bmask, fmt->Amask);
+    painter.gameScreen = IIM_RegisterImg(SDL_DisplayFormat(tmp), false);
+    SDL_FreeSurface(tmp);
+    
+    painter.backGround = background;
+    painter.redrawAll(painter.gameScreen->surf);
+    
+    // Setting up games
+    attachedGameA = areaA.getAttachedGame();
+    attachedGameB = areaB.getAttachedGame();
+    areaA.setEnemyGame(attachedGameB);
+    areaB.setEnemyGame(attachedGameA);
+    
+    setReceiveUpEvents(true);
+}
 
+PuyoGameWidget::~PuyoGameWidget()
+{
+    IIM_Free(painter.gameScreen);
+}
+
+void PuyoGameWidget::cycle()
+{
+    if (!paused) {
+        tickCounts++;
+        
+        // Key repetition
+        // Player 1
+        if (fpKey_P1_Down) {
+            if (attachedGameA->isEndOfCycle())
+                fpKey_P1_Down = 0;
+            else
+                areaA.cycleGame();
+        }
+        if (keyShouldRepeat(fpKey_P1_Left))
+            areaA.moveLeft();
+        if (keyShouldRepeat(fpKey_P1_Right))
+            areaA.moveRight();
+        if (keyShouldRepeat(fpKey_P1_TurnLeft)) {
+            if (attachedGameA->isEndOfCycle())
+                fpKey_P1_TurnLeft = 0;
+            areaA.rotateLeft();
+        }
+        if (keyShouldRepeat(fpKey_P1_TurnRight)) {
+            if (attachedGameA->isEndOfCycle())
+                fpKey_P1_TurnRight = 0;
+            areaA.rotateRight();
+        }
+        // Player 2
+        if (fpKey_P2_Down) {
+            if (attachedGameB->isEndOfCycle())
+                fpKey_P2_Down = 0;
+            else
+                areaB.cycleGame();
+        }
+        if (keyShouldRepeat(fpKey_P2_Left))
+            areaB.moveLeft();
+        if (keyShouldRepeat(fpKey_P2_Right))
+            areaB.moveRight();
+        if (keyShouldRepeat(fpKey_P2_TurnLeft)) {
+            if (attachedGameB->isEndOfCycle())
+                fpKey_P2_TurnLeft = 0;
+            areaB.rotateLeft();
+        }
+        if (keyShouldRepeat(fpKey_P2_TurnRight)) {
+            if (attachedGameB->isEndOfCycle())
+                fpKey_P2_TurnRight = 0;
+            areaB.rotateRight();
+        }
+        // Animations
+        areaA.cycleAnimation();
+        areaB.cycleAnimation();
+        
+        // Game cycles
+        if (tickCounts % cyclesBeforeGameCycle == 0) {
+            areaA.cycleGame();
+            areaB.cycleGame();
+        }
+        requestDraw();
+    }
+}
+
+void PuyoGameWidget::draw(SDL_Surface *screen)
+{
+    if (!paused) {
+        // Rendering puyo views
+        areaA.render();
+        areaB.render();
+        
+        // Rendering the grids
+        SDL_Rect drect;
+        drect.x = 21;
+        drect.y = -1;
+        drect.w = grid->w;
+        drect.h = grid->h;
+        painter.requestDraw(grid, &drect);
+        drect.x = 407;
+        drect.y = -1;
+        drect.w = grid->w;
+        drect.h = grid->h;
+        painter.requestDraw(grid, &drect);
+        
+        // Rendering the neutral puyos
+        areaA.renderNeutral();
+        areaB.renderNeutral();
+        
+        // Rendering the lives        
+        if (displayLives && (lives>=0) && (lives<=3))
+        {
+            drect.x = painter.gameScreen->w / 2 - liveImage[lives]->w / 2;
+            drect.y = 436;
+            drect.w = liveImage[lives]->w;
+            drect.h = liveImage[lives]->h;
+            painter.requestDraw(liveImage[lives], &drect);
+        }
+        
+        // Drawing the painter
+        painter.draw();
+    }
+    SDL_BlitSurface(painter.gameScreen->surf, NULL, screen, NULL);
+}
+
+void PuyoGameWidget::pause()
+{
+    paused = true;
+    iim_surface_convert_to_gray(painter.gameScreen);
+    requestDraw();
+}
+
+void PuyoGameWidget::resume()
+{
+    paused = false;
+    painter.redrawAll();
+}
+
+bool PuyoGameWidget::keyShouldRepeat(int &key)
+{
+    if (key == 0) return false;
+    key++;
+    return ((key - fpKey_Delay) > 0) && ((key - fpKey_Delay) % fpKey_Repeat == 0);
+}
+
+void PuyoGameWidget::eventOccured(GameControlEvent *event)
+{
+    if (paused)
+        lostFocus();
+    else {
+        if (event->isUp) {
+            switch (event->gameEvent) {
+                // Player 1
+                case GameControlEvent::kPlayer1Down:
+                    fpKey_P1_Down = 0;
+                    break;
+                case GameControlEvent::kPlayer1Left:
+                    fpKey_P1_Left = 0;
+                    break;
+                case GameControlEvent::kPlayer1Right:
+                    fpKey_P1_Right = 0;
+                    break;
+                case GameControlEvent::kPlayer1TurnLeft:
+                    fpKey_P1_TurnLeft = 0;
+                    break;
+                case GameControlEvent::kPlayer1TurnRight:
+                    fpKey_P1_TurnRight = 0;
+                    break;
+                // Player 2
+                case GameControlEvent::kPlayer2Down:
+                    fpKey_P2_Down = 0;
+                    break;
+                case GameControlEvent::kPlayer2Left:
+                    fpKey_P2_Left = 0;
+                    break;
+                case GameControlEvent::kPlayer2Right:
+                    fpKey_P2_Right = 0;
+                    break;
+                case GameControlEvent::kPlayer2TurnLeft:
+                    fpKey_P2_TurnLeft = 0;
+                    break;
+                case GameControlEvent::kPlayer2TurnRight:
+                    fpKey_P2_TurnRight = 0;
+                    break; 
+                default:
+                    break;
+            }
+        }
+        else {
+            switch (event->gameEvent) {
+                // Player 1
+                case GameControlEvent::kPlayer1Down:
+                    fpKey_P1_Down++;
+                    break;
+                case GameControlEvent::kPlayer1Left:
+                    areaA.moveLeft();
+                    fpKey_P1_Left++;
+                    break;
+                case GameControlEvent::kPlayer1Right:
+                    areaA.moveRight();
+                    fpKey_P1_Right++;
+                    break;
+                case GameControlEvent::kPlayer1TurnLeft:
+                    areaA.rotateLeft();
+                    fpKey_P1_TurnLeft++;
+                    break;
+                case GameControlEvent::kPlayer1TurnRight:
+                    areaA.rotateRight();
+                    fpKey_P1_TurnRight++;
+                    break;
+                // Player 2
+                case GameControlEvent::kPlayer2Down:
+                    fpKey_P2_Down++;
+                    break;
+                case GameControlEvent::kPlayer2Left:
+                    areaB.moveLeft();
+                    fpKey_P2_Left++;
+                    break;
+                case GameControlEvent::kPlayer2Right:
+                    areaB.moveRight();
+                    fpKey_P2_Right++;
+                    break;
+                case GameControlEvent::kPlayer2TurnLeft:
+                    areaB.rotateLeft();
+                    fpKey_P2_TurnLeft++;
+                    break;
+                case GameControlEvent::kPlayer2TurnRight:
+                    areaB.rotateRight();
+                    fpKey_P2_TurnRight++;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}
 
 PuyoPauseMenu::PuyoPauseMenu() : menuTitle("Pause"), continueButton("Continue game", (Action*)NULL), abortButton("Abort game", (Action*)NULL)
 {
     add(&menuTitle);
     add(&continueButton);
     add(&abortButton);
+}
+
+PuyoGameScreen::PuyoGameScreen() : Screen(0, 0, 640, 480), paused(false)
+{
+    add(&gameWidget);
+}
+
+void PuyoGameScreen::onEvent(GameControlEvent *cevent)
+{
+    switch (cevent->cursorEvent) {
+    case GameControlEvent::kStart:
+        break;
+    case GameControlEvent::kBack:
+        backPressed();
+        break;
+    }
+    Screen::onEvent(cevent);
+}
+
+void PuyoGameScreen::backPressed()
+{
+    printf("Back pressed!\n");
+    if (!paused) {
+        this->add(&pauseMenu);
+        paused = true;
+        gameWidget.pause();
+        //stopRender();
+    }
+    else {
+        paused = false;
+        this->remove(&pauseMenu);
+        gameWidget.resume();
+        //restartRender();
+    }
 }
 
 class PuyoCycled : public CycledComponent
@@ -224,6 +524,7 @@ void PuyoStarter::draw()
         }
         
         painter.draw(painter.gameScreen->surf);
+        SDL_BlitSurface(painter.gameScreen->surf, NULL, display, NULL);
     }
     char text[256];
     if (!randomPlayer)

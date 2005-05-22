@@ -53,6 +53,7 @@ public:
     PuyoView *getAttachedView() const { return attachedView; }
     int getScreenCoordinateX() const;
     int getScreenCoordinateY() const;
+    const AnimatedPuyoTheme *getAttachedTheme() const { return attachedTheme; }
 private:
     IosVector animationQueue;
     int puyoEyeState;

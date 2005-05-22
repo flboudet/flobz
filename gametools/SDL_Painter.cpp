@@ -177,10 +177,10 @@ void SDL_Painter::draw(SDL_Surface *surf)
 
 void SDL_Painter::storeScreenContent(SDL_Surface *surf)
 {
-  if (surf != display) {
+  /*if (surf != display) {
     SDL_SetClipRect(display,NULL);
     SDL_BlitSurface(surf,NULL,display,NULL);
-  }
+  }*/
   nbPrev = nbElts;
   while(nbElts > 0) {
     nbElts --;

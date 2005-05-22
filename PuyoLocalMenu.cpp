@@ -26,12 +26,6 @@
 #include "PuyoLocalMenu.h"
 #include "PuyoSinglePlayerStarter.h"
 
-typedef enum SinglePlayerLevel {
-    EASY,
-    MEDIUM,
-    HARD
-} SinglePlayerLevel;
-
 class SinglePlayerGameActionz : public Action {
 public:
     SinglePlayerGameActionz(SinglePlayerLevel level) {;}
@@ -48,10 +42,16 @@ void SinglePlayerGameActionz::action()
   GameUIDefaults::SCREEN_STACK->push(starter);
 }
 
+void NewSinglePlayerGameAction::action()
+{
+    PuyoGameScreen *starter = new PuyoGameScreen();
+    GameUIDefaults::SCREEN_STACK->push(starter);
+}
+
 void LocalGameMenu::build() {
     add(new EditFieldWithLabel("Player Name:", "flobo"));
     add(new Text("Choose Game Level"));
-    add(new Button("Easy", new SinglePlayerGameActionz(EASY)));
+    add(new Button("Easy", &easyAction));
     add(new Button("Medium", new SinglePlayerGameActionz(MEDIUM)));
     add(new Button("Hard", new SinglePlayerGameActionz(HARD)));
     add(new Button("Cancel", new PuyoPopMenuAction(mainScreen)));

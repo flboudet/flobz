@@ -63,6 +63,7 @@ IIM_Surface *AnimatedPuyoTheme::loadWithPrefix(const char *prefix, const char *s
 
 AnimatedPuyoTheme::AnimatedPuyoTheme(const char *prefix, int hueShift, const char *eyePrefix)
 {
+    // Load faces
     puyoFaces[0] = loadWithPrefix(prefix, "0.png");
     puyoFaces[1] = loadWithPrefix(prefix, "1a.png");
     puyoFaces[2] = loadWithPrefix(prefix, "1b.png");
@@ -86,15 +87,38 @@ AnimatedPuyoTheme::AnimatedPuyoTheme(const char *prefix, int hueShift, const cha
             IIM_Free(tmp);
         }
     }
+    // Load eyes
     puyoEyes[0] = loadWithPrefix(eyePrefix, "0.png");
     puyoEyes[1] = loadWithPrefix(eyePrefix, "1.png");
     puyoEyes[2] = loadWithPrefix(eyePrefix, "2.png");
+    // Load circle
     IIM_Surface *tmpCircle = loadWithPrefix(prefix, "circle.png");
     for (int i = 0 ; i < 32 ; i++) {
         puyoCircles[i] = iim_surface_set_value(tmpCircle, sin(3.14f/2.0f+i*3.14f/64.0f)*0.6f+0.2f);
     }
     IIM_Free(tmpCircle);
+    // Load shadow
     shadowSurface = IIM_Load_DisplayFormatAlpha("Shadow.png");
+    // Load shrinking and explosions
+    IIM_Surface *tmpShrinkingPuyo, *tmpExplodingPuyo;
+    for (int j=1;j<=4;++j)
+    {
+        char f[20];
+        sprintf(f,"Shrink%d.png", j);
+        tmpShrinkingPuyo = IIM_Load_DisplayFormatAlpha(f);
+        sprintf(f,"Explode%d.png", j);
+        tmpExplodingPuyo = IIM_Load_DisplayFormatAlpha(f);
+        if (hueShift != 0) {
+            shrinkingPuyo[j-1] = iim_surface_shift_hue(tmpShrinkingPuyo, hueShift);
+            IIM_Free(tmpShrinkingPuyo);
+            explodingPuyo[j-1] = iim_surface_shift_hue(tmpExplodingPuyo, hueShift);
+            IIM_Free(tmpExplodingPuyo);
+        }
+        else {
+            shrinkingPuyo[j-1] = tmpShrinkingPuyo;
+            explodingPuyo[j-1] = tmpExplodingPuyo;
+        }
+    }
 }
 
 AnimatedPuyoTheme::~AnimatedPuyoTheme()
@@ -137,3 +161,14 @@ IIM_Surface *AnimatedPuyoTheme::getShadowSurface() const
 {
     return shadowSurface;
 }
+
+IIM_Surface *AnimatedPuyoTheme::getShrinkingSurfaceForIndex(int index) const
+{
+    return shrinkingPuyo[index];
+}
+
+IIM_Surface *AnimatedPuyoTheme::getExplodingSurfaceForIndex(int index) const
+{
+    return explodingPuyo[index];
+}
+
