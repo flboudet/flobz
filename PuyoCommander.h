@@ -17,15 +17,6 @@
 using namespace ios_fc;
 using namespace gameui;
 
-class SliderContainer : public VBox {
- public:
-  SliderContainer(GameLoop *loop = NULL) : VBox(loop), contentWidget(NULL) {}
-  void transitionToContent(Widget *content);
-  Widget * getContentWidget() const { return contentWidget; }
- private:
-  Widget *contentWidget;
-};
-
 class PuyoScreen : public Screen {
   public:
     PuyoScreen();

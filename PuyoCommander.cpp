@@ -34,14 +34,6 @@ class SinglePlayerGameAction : public Action {
   public: void action();
 };
 
-void SliderContainer::transitionToContent(Widget *content)
-{
-  if (this->contentWidget != NULL)
-    remove(contentWidget);
-  contentWidget = content;
-  add(contentWidget);
-}
-
 void PuyoPushMenuAction::action()
 {
     mainScreen->pushMenu(menu);
