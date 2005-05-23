@@ -178,10 +178,10 @@ struct PosEvaluator {
 
 };
 
-PuyoIA::PuyoIA(IA_Type type, int level, PuyoView *targetView)
+PuyoIA::PuyoIA(IA_Type type, int level, PuyoView &targetView)
 : PuyoPlayer(targetView), type(type), level(level)
 {
-    attachedGame = targetView->getAttachedGame();
+    attachedGame = targetView.getAttachedGame();
     evaluator = new PosEvaluator[PUYODIMX * 4 - 2];
     int iEval = 0;
     for (int col=0; col<PUYODIMX; ++col) {
@@ -250,13 +250,13 @@ void PuyoIA::cycle()
         case RANDOM:
             switch (random() % 50) {
                 case 0:
-                    attachedView->rotateLeft();
+                    targetView.rotateLeft();
                     break;
                 case 1:
-                    attachedView->moveLeft();
+                    targetView.moveLeft();
                     break;
                 case 2:
-                    attachedView->moveRight();
+                    targetView.moveRight();
                     break;
                 default:
                     break;
@@ -271,13 +271,13 @@ void PuyoIA::cycle()
             if ((choosenMove >= 0) && (random() % level < 10))
             {
                 if (attachedGame->getFallingCompanionDir() != evaluator[choosenMove].c_direction)
-                    attachedView->rotateLeft();
+                    targetView.rotateLeft();
                 else if (attachedGame->getFallingX() < evaluator[choosenMove].f_x)
-                    attachedView->moveRight();
+                    targetView.moveRight();
                 else if (attachedGame->getFallingX() > evaluator[choosenMove].f_x)
-                    attachedView->moveLeft();
+                    targetView.moveLeft();
                 else
-                    attachedView->cycleGame();
+                    targetView.cycleGame();
             }
             else if (choosenMove == -1) 
             {

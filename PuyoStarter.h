@@ -53,21 +53,11 @@ private:
     PuyoRandomSystem *attachedRandom;
 };
 
-class PuyoPlayerController {
+class PuyoEventPlayer : public PuyoPlayer {
 public:
-    PuyoPlayerController(PuyoView &view) : targetView(view), attachedGame(view.getAttachedGame()) {}
-    virtual void eventOccured(GameControlEvent *event) {}
-    virtual void idle() {}
-protected:
-    PuyoView &targetView;
-    PuyoGame *attachedGame;
-};
-
-class PuyoEventPlayerController : public PuyoPlayerController {
-public:
-    PuyoEventPlayerController(PuyoView &view, int downEvent, int leftEvent, int rightEvent, int turnLeftEvent, int turnRightEvent);
+    PuyoEventPlayer(PuyoView &view, int downEvent, int leftEvent, int rightEvent, int turnLeftEvent, int turnRightEvent);
     void eventOccured(GameControlEvent *event);
-    void idle();
+    void cycle();
 private:
     bool keyShouldRepeat(int &key);
     const int downEvent, leftEvent, rightEvent, turnLeftEvent, turnRightEvent;
@@ -94,7 +84,7 @@ private:
     PuyoRandomSystem attachedRandom;
     PuyoLocalGameFactory attachedGameFactory;
     PuyoView areaA, areaB;
-    PuyoEventPlayerController controllerA, controllerB;
+    PuyoEventPlayer controllerA, controllerB;
     PuyoGame *attachedGameA, *attachedGameB;
     int cyclesBeforeGameCycle;
     unsigned int tickCounts;

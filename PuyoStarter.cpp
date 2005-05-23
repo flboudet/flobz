@@ -58,17 +58,17 @@ const char *p2name = "Player2";
 static char *BACKGROUND[NB_MUSIC_THEME] = { "Background.jpg", "BackgroundDark.jpg" };
 extern IIM_Surface *background, *neutral;
 
-PuyoEventPlayerController::PuyoEventPlayerController(PuyoView &view,
+PuyoEventPlayer::PuyoEventPlayer(PuyoView &view,
 						     int downEvent, int leftEvent, int rightEvent,
 						     int turnLeftEvent, int turnRightEvent)
-  : PuyoPlayerController(view), downEvent(downEvent), leftEvent(leftEvent), rightEvent(rightEvent),
+  : PuyoPlayer(view), downEvent(downEvent), leftEvent(leftEvent), rightEvent(rightEvent),
     turnLeftEvent(turnLeftEvent), turnRightEvent(turnRightEvent),
     fpKey_Down(0), fpKey_Left(0), fpKey_Right(0), fpKey_TurnLeft(0), fpKey_TurnRight(0),
     fpKey_Repeat(7), fpKey_Delay(5)
 {
 }
 
-void PuyoEventPlayerController::eventOccured(GameControlEvent *event)
+void PuyoEventPlayer::eventOccured(GameControlEvent *event)
 {
     int curGameEvent = event->gameEvent;
     if (event->isUp) {
@@ -111,7 +111,7 @@ void PuyoEventPlayerController::eventOccured(GameControlEvent *event)
     }
 }
 
-void PuyoEventPlayerController::idle()
+void PuyoEventPlayer::cycle()
 {
     // Key repetition
     if (fpKey_Down) {
@@ -136,7 +136,7 @@ void PuyoEventPlayerController::idle()
     }
 }
 
-bool PuyoEventPlayerController::keyShouldRepeat(int &key)
+bool PuyoEventPlayer::keyShouldRepeat(int &key)
 {
     if (key == 0) return false;
     key++;
@@ -203,11 +203,11 @@ void PuyoGameWidget::cycle()
 {
     if (!paused) {
         tickCounts++;
-
+        
         // Controls
-	controllerA.idle();
-	controllerB.idle();
-
+        controllerA.cycle();
+        controllerB.cycle();
+        
         // Animations
         areaA.cycleAnimation();
         areaB.cycleAnimation();

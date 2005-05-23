@@ -41,7 +41,7 @@ PuyoSinglePlayerStarter::PuyoSinglePlayerStarter(PuyoCommander *commander, int a
     attachedGameA = areaA->getAttachedGame();
     attachedGameB = areaB->getAttachedGame();
     
-    randomPlayer = new PuyoIA(aiType, aiLevel, areaA);
+    randomPlayer = new PuyoIA(aiType, aiLevel, *areaA);
     perso[0] = IIM_Load_DisplayFormatAlpha("perso1_1.png");
     perso[1] = IIM_Load_DisplayFormatAlpha("perso1_2.png");
     
