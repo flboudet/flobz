@@ -58,16 +58,102 @@ const char *p2name = "Player2";
 static char *BACKGROUND[NB_MUSIC_THEME] = { "Background.jpg", "BackgroundDark.jpg" };
 extern IIM_Surface *background, *neutral;
 
+PuyoEventPlayerController::PuyoEventPlayerController(PuyoView &view,
+						     int downEvent, int leftEvent, int rightEvent,
+						     int turnLeftEvent, int turnRightEvent)
+  : PuyoPlayerController(view), downEvent(downEvent), leftEvent(leftEvent), rightEvent(rightEvent),
+    turnLeftEvent(turnLeftEvent), turnRightEvent(turnRightEvent),
+    fpKey_Down(0), fpKey_Left(0), fpKey_Right(0), fpKey_TurnLeft(0), fpKey_TurnRight(0),
+    fpKey_Repeat(7), fpKey_Delay(5)
+{
+}
+
+void PuyoEventPlayerController::eventOccured(GameControlEvent *event)
+{
+    int curGameEvent = event->gameEvent;
+    if (event->isUp) {
+        if (curGameEvent == downEvent) {
+	    fpKey_Down = 0;
+	}
+	else if (curGameEvent == leftEvent) {
+	    fpKey_Left = 0;
+	}
+	else if (curGameEvent == rightEvent) {
+	    fpKey_Right = 0;
+	}
+	else if (curGameEvent == turnLeftEvent) {
+	    fpKey_TurnLeft = 0;
+	}
+	else if (curGameEvent == turnRightEvent) {
+	    fpKey_TurnRight = 0;
+	}
+    }
+    else {
+        if (curGameEvent == downEvent) {
+	    fpKey_Down++;
+	}
+	else if (curGameEvent == leftEvent) {
+	    targetView.moveLeft();
+	    fpKey_Left++;
+	}
+	else if (curGameEvent == rightEvent) {
+	    targetView.moveRight();
+	    fpKey_Right++;
+	}
+	else if (curGameEvent == turnLeftEvent) {
+	    targetView.rotateLeft();
+	    fpKey_TurnLeft++;
+	}
+	else if (curGameEvent == turnRightEvent) {
+	    targetView.rotateRight();
+	    fpKey_TurnRight++;
+	}
+    }
+}
+
+void PuyoEventPlayerController::idle()
+{
+    // Key repetition
+    if (fpKey_Down) {
+    if (attachedGame->isEndOfCycle())
+        fpKey_Down = 0;
+    else
+        targetView.cycleGame();
+    }
+    if (keyShouldRepeat(fpKey_Left))
+        targetView.moveLeft();
+    if (keyShouldRepeat(fpKey_Right))
+        targetView.moveRight();
+    if (keyShouldRepeat(fpKey_TurnLeft)) {
+        if (attachedGame->isEndOfCycle())
+	    fpKey_TurnLeft = 0;
+	targetView.rotateLeft();
+    }
+    if (keyShouldRepeat(fpKey_TurnRight)) {
+        if (attachedGame->isEndOfCycle())
+	    fpKey_TurnRight = 0;
+	targetView.rotateRight();
+    }
+}
+
+bool PuyoEventPlayerController::keyShouldRepeat(int &key)
+{
+    if (key == 0) return false;
+    key++;
+    return ((key - fpKey_Delay) > 0) && ((key - fpKey_Delay) % fpKey_Repeat == 0);
+}
+
 PuyoGameWidget::PuyoGameWidget() : CycledComponent(0.02),
                                    attachedGameFactory(&attachedRandom),
                                    areaA(&attachedGameFactory, &attachedPuyoThemeManager,
                                          1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
                                    areaB(&attachedGameFactory, &attachedPuyoThemeManager,
                                          1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
-                                   cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3),
-                                   fpKey_P1_Down(0), fpKey_P1_Left(0), fpKey_P1_Right(0), fpKey_P1_TurnLeft(0), fpKey_P1_TurnRight(0),
-                                   fpKey_P2_Down(0), fpKey_P2_Left(0), fpKey_P2_Right(0), fpKey_P2_TurnLeft(0), fpKey_P2_TurnRight(0),
-                                   fpKey_Repeat(7), fpKey_Delay(5)
+				   controllerA(areaA, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left, GameControlEvent::kPlayer1Right,
+					       GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
+				   controllerB(areaB, GameControlEvent::kPlayer2Down, GameControlEvent::kPlayer2Left, GameControlEvent::kPlayer2Right,
+					       GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight),
+                                   cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3)
 {
     // Affreux, a degager absolument
     if (neutral == NULL)
@@ -117,50 +203,11 @@ void PuyoGameWidget::cycle()
 {
     if (!paused) {
         tickCounts++;
-        
-        // Key repetition
-        // Player 1
-        if (fpKey_P1_Down) {
-            if (attachedGameA->isEndOfCycle())
-                fpKey_P1_Down = 0;
-            else
-                areaA.cycleGame();
-        }
-        if (keyShouldRepeat(fpKey_P1_Left))
-            areaA.moveLeft();
-        if (keyShouldRepeat(fpKey_P1_Right))
-            areaA.moveRight();
-        if (keyShouldRepeat(fpKey_P1_TurnLeft)) {
-            if (attachedGameA->isEndOfCycle())
-                fpKey_P1_TurnLeft = 0;
-            areaA.rotateLeft();
-        }
-        if (keyShouldRepeat(fpKey_P1_TurnRight)) {
-            if (attachedGameA->isEndOfCycle())
-                fpKey_P1_TurnRight = 0;
-            areaA.rotateRight();
-        }
-        // Player 2
-        if (fpKey_P2_Down) {
-            if (attachedGameB->isEndOfCycle())
-                fpKey_P2_Down = 0;
-            else
-                areaB.cycleGame();
-        }
-        if (keyShouldRepeat(fpKey_P2_Left))
-            areaB.moveLeft();
-        if (keyShouldRepeat(fpKey_P2_Right))
-            areaB.moveRight();
-        if (keyShouldRepeat(fpKey_P2_TurnLeft)) {
-            if (attachedGameB->isEndOfCycle())
-                fpKey_P2_TurnLeft = 0;
-            areaB.rotateLeft();
-        }
-        if (keyShouldRepeat(fpKey_P2_TurnRight)) {
-            if (attachedGameB->isEndOfCycle())
-                fpKey_P2_TurnRight = 0;
-            areaB.rotateRight();
-        }
+
+        // Controls
+	controllerA.idle();
+	controllerB.idle();
+
         // Animations
         areaA.cycleAnimation();
         areaB.cycleAnimation();
@@ -239,90 +286,8 @@ void PuyoGameWidget::eventOccured(GameControlEvent *event)
     if (paused)
         lostFocus();
     else {
-        if (event->isUp) {
-            switch (event->gameEvent) {
-                // Player 1
-                case GameControlEvent::kPlayer1Down:
-                    fpKey_P1_Down = 0;
-                    break;
-                case GameControlEvent::kPlayer1Left:
-                    fpKey_P1_Left = 0;
-                    break;
-                case GameControlEvent::kPlayer1Right:
-                    fpKey_P1_Right = 0;
-                    break;
-                case GameControlEvent::kPlayer1TurnLeft:
-                    fpKey_P1_TurnLeft = 0;
-                    break;
-                case GameControlEvent::kPlayer1TurnRight:
-                    fpKey_P1_TurnRight = 0;
-                    break;
-                // Player 2
-                case GameControlEvent::kPlayer2Down:
-                    fpKey_P2_Down = 0;
-                    break;
-                case GameControlEvent::kPlayer2Left:
-                    fpKey_P2_Left = 0;
-                    break;
-                case GameControlEvent::kPlayer2Right:
-                    fpKey_P2_Right = 0;
-                    break;
-                case GameControlEvent::kPlayer2TurnLeft:
-                    fpKey_P2_TurnLeft = 0;
-                    break;
-                case GameControlEvent::kPlayer2TurnRight:
-                    fpKey_P2_TurnRight = 0;
-                    break; 
-                default:
-                    break;
-            }
-        }
-        else {
-            switch (event->gameEvent) {
-                // Player 1
-                case GameControlEvent::kPlayer1Down:
-                    fpKey_P1_Down++;
-                    break;
-                case GameControlEvent::kPlayer1Left:
-                    areaA.moveLeft();
-                    fpKey_P1_Left++;
-                    break;
-                case GameControlEvent::kPlayer1Right:
-                    areaA.moveRight();
-                    fpKey_P1_Right++;
-                    break;
-                case GameControlEvent::kPlayer1TurnLeft:
-                    areaA.rotateLeft();
-                    fpKey_P1_TurnLeft++;
-                    break;
-                case GameControlEvent::kPlayer1TurnRight:
-                    areaA.rotateRight();
-                    fpKey_P1_TurnRight++;
-                    break;
-                // Player 2
-                case GameControlEvent::kPlayer2Down:
-                    fpKey_P2_Down++;
-                    break;
-                case GameControlEvent::kPlayer2Left:
-                    areaB.moveLeft();
-                    fpKey_P2_Left++;
-                    break;
-                case GameControlEvent::kPlayer2Right:
-                    areaB.moveRight();
-                    fpKey_P2_Right++;
-                    break;
-                case GameControlEvent::kPlayer2TurnLeft:
-                    areaB.rotateLeft();
-                    fpKey_P2_TurnLeft++;
-                    break;
-                case GameControlEvent::kPlayer2TurnRight:
-                    areaB.rotateRight();
-                    fpKey_P2_TurnRight++;
-                    break;
-                default:
-                    break;
-            }
-        }
+        controllerA.eventOccured(event);
+        controllerB.eventOccured(event);
     }
 }
 
