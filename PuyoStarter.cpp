@@ -143,17 +143,9 @@ bool PuyoEventPlayer::keyShouldRepeat(int &key)
     return ((key - fpKey_Delay) > 0) && ((key - fpKey_Delay) % fpKey_Repeat == 0);
 }
 
-PuyoGameWidget::PuyoGameWidget() : CycledComponent(0.02),
-                                   attachedGameFactory(&attachedRandom),
-                                   areaA(&attachedGameFactory, &attachedPuyoThemeManager,
-                                         1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
-                                   areaB(&attachedGameFactory, &attachedPuyoThemeManager,
-                                         1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
-				   controllerA(areaA, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left, GameControlEvent::kPlayer1Right,
-					       GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
-				   controllerB(areaB, GameControlEvent::kPlayer2Down, GameControlEvent::kPlayer2Left, GameControlEvent::kPlayer2Right,
-					       GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight),
-                                   cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3)
+PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB)
+    : CycledComponent(0.02), areaA(areaA), areaB(areaB), controllerA(controllerA), controllerB(controllerB),
+      cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3)
 {
     // Affreux, a degager absolument
     if (neutral == NULL)
@@ -274,13 +266,6 @@ void PuyoGameWidget::resume()
     painter.redrawAll();
 }
 
-bool PuyoGameWidget::keyShouldRepeat(int &key)
-{
-    if (key == 0) return false;
-    key++;
-    return ((key - fpKey_Delay) > 0) && ((key - fpKey_Delay) % fpKey_Repeat == 0);
-}
-
 void PuyoGameWidget::eventOccured(GameControlEvent *event)
 {
     if (paused)
@@ -298,7 +283,7 @@ PuyoPauseMenu::PuyoPauseMenu() : menuTitle("Pause"), continueButton("Continue ga
     add(&abortButton);
 }
 
-PuyoGameScreen::PuyoGameScreen() : Screen(0, 0, 640, 480), paused(false)
+PuyoGameScreen::PuyoGameScreen(PuyoGameWidget &gameWidget) : Screen(0, 0, 640, 480), paused(false), gameWidget(gameWidget)
 {
     add(&gameWidget);
 }
@@ -330,6 +315,18 @@ void PuyoGameScreen::backPressed()
         gameWidget.resume();
         //restartRender();
     }
+}
+
+PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget() : attachedGameFactory(&attachedRandom),
+                                                     areaA(&attachedGameFactory, &attachedPuyoThemeManager,
+                                                     1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
+                                                     areaB(&attachedGameFactory, &attachedPuyoThemeManager,
+                                                     1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
+                                                     controllerA(areaA, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left, GameControlEvent::kPlayer1Right,
+                                                     GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
+                                                     controllerB(areaB, GameControlEvent::kPlayer2Down, GameControlEvent::kPlayer2Left, GameControlEvent::kPlayer2Right,
+                                                     GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight), PuyoGameWidget(areaA, areaB, controllerA, controllerB)
+{
 }
 
 class PuyoCycled : public CycledComponent

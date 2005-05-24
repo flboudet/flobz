@@ -67,7 +67,7 @@ private:
 
 class PuyoGameWidget : public Widget, CycledComponent {
 public:
-    PuyoGameWidget();
+    PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB);
     virtual ~PuyoGameWidget();
     void cycle();
     void draw(SDL_Surface *screen);
@@ -76,36 +76,40 @@ public:
     bool isFocusable() { return !paused; }
     void eventOccured(GameControlEvent *event);
     IdleComponent *getIdleComponent() { return this; }
-private:
-    bool keyShouldRepeat(int &key);
+protected:
     SDL_Painter painter;
+private:
     IIM_Surface *background, *grid, *liveImage[4];
-    AnimatedPuyoThemeManager attachedPuyoThemeManager;
-    PuyoRandomSystem attachedRandom;
-    PuyoLocalGameFactory attachedGameFactory;
-    PuyoView areaA, areaB;
-    PuyoEventPlayer controllerA, controllerB;
+    PuyoView &areaA, &areaB;
+    PuyoPlayer &controllerA, &controllerB;
     PuyoGame *attachedGameA, *attachedGameB;
     int cyclesBeforeGameCycle;
     unsigned int tickCounts;
     bool paused;
     bool displayLives, lives;
-    int fpKey_P1_Down, fpKey_P1_Left, fpKey_P1_Right, fpKey_P1_TurnLeft, fpKey_P1_TurnRight;
-    int fpKey_P2_Down, fpKey_P2_Left, fpKey_P2_Right, fpKey_P2_TurnLeft, fpKey_P2_TurnRight;
-    int fpKey_Repeat, fpKey_Delay;
 };
 
 class PuyoGameScreen : public Screen {
 public:
-    PuyoGameScreen();
+    PuyoGameScreen(PuyoGameWidget &gameWidget);
     void onEvent(GameControlEvent *cevent);
     virtual void backPressed();
 private:
     bool paused;
     PuyoPauseMenu pauseMenu;
-    PuyoGameWidget gameWidget;
+    PuyoGameWidget &gameWidget;
 };
 
+class PuyoTwoPlayerGameWidget : public PuyoGameWidget {
+public:
+    PuyoTwoPlayerGameWidget();
+private:
+    AnimatedPuyoThemeManager attachedPuyoThemeManager;
+    PuyoRandomSystem attachedRandom;
+    PuyoLocalGameFactory attachedGameFactory;
+    PuyoView areaA, areaB;
+    PuyoEventPlayer controllerA, controllerB;
+};
 
 // Le PuyoStarter moderne
 class PuyoPureStarter : public Screen {

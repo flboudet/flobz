@@ -44,7 +44,7 @@ void SinglePlayerGameActionz::action()
 
 void NewSinglePlayerGameAction::action()
 {
-    PuyoGameScreen *starter = new PuyoGameScreen();
+    PuyoGameScreen *starter = new PuyoGameScreen(*(new PuyoTwoPlayerGameWidget()));
     GameUIDefaults::SCREEN_STACK->push(starter);
 }
 
