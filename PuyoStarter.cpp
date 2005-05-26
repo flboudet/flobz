@@ -317,10 +317,11 @@ void PuyoGameScreen::backPressed()
     }
 }
 
-PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget() : attachedGameFactory(&attachedRandom),
-                                                     areaA(&attachedGameFactory, &attachedPuyoThemeManager,
+PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet) : attachedPuyoThemeSet(puyoThemeSet),
+                                                     attachedGameFactory(&attachedRandom),
+                                                     areaA(&attachedGameFactory, &attachedPuyoThemeSet,
                                                      1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
-                                                     areaB(&attachedGameFactory, &attachedPuyoThemeManager,
+                                                     areaB(&attachedGameFactory, &attachedPuyoThemeSet,
                                                      1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
                                                      controllerA(areaA, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left, GameControlEvent::kPlayer1Right,
                                                      GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
@@ -553,7 +554,7 @@ void PuyoStarter::draw()
 }
 
 
-PuyoStarter::PuyoStarter(PuyoCommander *commander, int theme):PuyoPureStarter(commander)
+PuyoStarter::PuyoStarter(PuyoCommander *commander, int theme):attachedThemeManager("path", "name"), PuyoPureStarter(commander)
 {
     tickCounts = 0;
     

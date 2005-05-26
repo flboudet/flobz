@@ -42,6 +42,7 @@ SDL_Painter painter;
 IIM_Surface *background, *neutral = NULL;
 IIM_Surface *bigNeutral = NULL;
 
+#ifdef DESACTIVE
 static char PuyoGroupImageIndex[2][2][2][2] =
 { {  // empty bottom
 {  // empty right
@@ -88,13 +89,14 @@ static char PuyoGroupImageIndex[2][2][2][2] =
     }
 }
 };
+#endif
 
 
 
 PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
-		   AnimatedPuyoThemeManager *attachedPuyoThemeManager,
+		   AnimatedPuyoSetTheme *attachedThemeSet,
 		   int xOffset, int yOffset, int nXOffset, int nYOffset, SDL_Painter &painterToUse)
-  :attachedThemeManager(attachedPuyoThemeManager),
+  :attachedThemeSet(attachedThemeSet),
    attachedPuyoFactory(this), attachedPainter(painterToUse)
 {
 	attachedGame = attachedPuyoGameFactory->createPuyoGame(&attachedPuyoFactory);
@@ -130,11 +132,8 @@ int PuyoView::getValenceForPuyo(PuyoPuyo *puyo) const
     PuyoState upState = (up == NULL)       || (up->isRenderingAnimation())    ? PUYO_EMPTY  : up->getPuyoState();
     PuyoState leftState = (left == NULL)   || (left->isRenderingAnimation())  ? PUYO_EMPTY  : left->getPuyoState();
     
-    return PuyoGroupImageIndex
-		[downState == currentPuyoState  ? 1 : 0]
-		[rightState == currentPuyoState ? 1 : 0]
-		[upState == currentPuyoState    ? 1 : 0]
-		[leftState == currentPuyoState  ? 1 : 0];
+	return (leftState  == currentPuyoState ? 0x8 : 0) | (upState   == currentPuyoState ? 0x4 : 0) |
+	       (rightState == currentPuyoState ? 0x2 : 0) | (downState == currentPuyoState ? 0x1 : 0);
 }
 
 void PuyoView::cycleAnimation()
@@ -228,8 +227,8 @@ void PuyoView::render()
 	drect.w = TSIZE;
 	drect.h = TSIZE * 2;
 	// Drawing next puyos
-	const AnimatedPuyoTheme *nextPuyoTheme =
-	  attachedThemeManager->getThemeForState(attachedGame->getNextFalling());
+	AnimatedPuyoTheme *nextPuyoTheme =
+	  attachedThemeSet->getAnimatedPuyoTheme(attachedGame->getNextFalling());
 	IIM_Surface *currentSurface = nextPuyoTheme->getPuyoSurfaceForValence(0);
 	if (currentSurface != NULL) {
 		drect.x = nXOffset;
@@ -239,8 +238,8 @@ void PuyoView::render()
 		attachedPainter.requestDraw(currentSurface, &drect);
 		attachedPainter.requestDraw(nextPuyoTheme->getEyeSurfaceForIndex(0), &drect);
 	}
-	const AnimatedPuyoTheme *nextCompanionTheme =
-	  attachedThemeManager->getThemeForState(attachedGame->getNextCompanion());
+	AnimatedPuyoTheme *nextCompanionTheme =
+	  attachedThemeSet->getAnimatedPuyoTheme(attachedGame->getNextCompanion());
 	currentSurface = nextCompanionTheme->getPuyoSurfaceForValence(0);
 	if (currentSurface != NULL) {
 		drect.x = nXOffset;

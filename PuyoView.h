@@ -54,7 +54,7 @@ public:
 class PuyoView : public PuyoDelegate {
   public:
     PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
-	     AnimatedPuyoThemeManager *attachedPuyoThemeManager,
+	     AnimatedPuyoSetTheme *attachedThemeSet,
 	     int xOffset, int yOffset, int nXOffset, int nYOffset, SDL_Painter &painterToUse = painter);
     virtual ~PuyoView() {}
     void setEnemyGame(PuyoGame *enemyGame);
@@ -77,7 +77,7 @@ class PuyoView : public PuyoDelegate {
     int getScreenCoordinateX(int X) const { return X * TSIZE + xOffset; }
     int getScreenCoordinateY(int Y) const { return Y * TSIZE + yOffset; }
     
-    AnimatedPuyoThemeManager *getPuyoThemeManager() const { return attachedThemeManager; }
+    AnimatedPuyoSetTheme *getPuyoThemeSet() const { return attachedThemeSet; }
 
     // PuyoDelegate methods
     void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex);
@@ -93,7 +93,7 @@ class PuyoView : public PuyoDelegate {
     bool gameRunning;
     int xOffset, yOffset;
     int nXOffset, nYOffset;
-    AnimatedPuyoThemeManager *attachedThemeManager;
+    AnimatedPuyoSetTheme *attachedThemeSet;
     AnimatedPuyoFactory attachedPuyoFactory;
     PuyoGame *attachedGame, *enemyGame;
     IosVector viewAnimations;

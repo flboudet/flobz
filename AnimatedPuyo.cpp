@@ -30,8 +30,8 @@
 // crade, mais basta
 extern IIM_Surface *neutral;
 
-AnimatedPuyo::AnimatedPuyo(PuyoState state, AnimatedPuyoThemeManager *themeManager, PuyoView *attachedView)
-    : PuyoPuyo(state), attachedTheme(themeManager->getThemeForState(state))
+AnimatedPuyo::AnimatedPuyo(PuyoState state, AnimatedPuyoSetTheme *themeSet, PuyoView *attachedView)
+    : PuyoPuyo(state), attachedTheme(themeSet->getAnimatedPuyoTheme(state))
 {
     puyoEyeState = random() % 700;
     visibilityFlag = true;
@@ -191,7 +191,7 @@ int AnimatedPuyo::getScreenCoordinateY() const
 AnimatedPuyoFactory::AnimatedPuyoFactory(PuyoView *attachedView)
   : attachedView(attachedView)
 {
-    this->attachedThemeManager = attachedView->getPuyoThemeManager();
+    this->attachedThemeSet = attachedView->getPuyoThemeSet();
 }
 
 AnimatedPuyoFactory::~AnimatedPuyoFactory()
@@ -205,7 +205,7 @@ AnimatedPuyoFactory::~AnimatedPuyoFactory()
 
 PuyoPuyo *AnimatedPuyoFactory::createPuyo(PuyoState state)
 {
-    return new AnimatedPuyo(state, attachedThemeManager, attachedView);
+    return new AnimatedPuyo(state, attachedThemeSet, attachedView);
 }
 
 void AnimatedPuyoFactory::deletePuyo(PuyoPuyo *target)

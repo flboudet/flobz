@@ -102,9 +102,9 @@ private:
 
 class PuyoTwoPlayerGameWidget : public PuyoGameWidget {
 public:
-    PuyoTwoPlayerGameWidget();
+    PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet);
 private:
-    AnimatedPuyoThemeManager attachedPuyoThemeManager;
+    AnimatedPuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;
     PuyoLocalGameFactory attachedGameFactory;
     PuyoView areaA, areaB;
@@ -180,7 +180,7 @@ protected:
     int gameSpeed;
     
     int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
-    AnimatedPuyoThemeManager attachedThemeManager;
+    AnimatedPuyoSetTheme attachedThemeManager;
     int quit;
     bool gameover;
 };

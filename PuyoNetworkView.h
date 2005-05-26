@@ -35,10 +35,10 @@ using namespace ios_fc;
 class PuyoNetworkView : public PuyoView {
   public:
     PuyoNetworkView(PuyoGameFactory *attachedPuyoGameFactory,
-		    AnimatedPuyoThemeManager *attachedPuyoThemeManager,
+		    AnimatedPuyoSetTheme *attachedPuyoThemeSet,
 		    int xOffset, int yOffset,
                     int nXOffset, int nYOffset, MessageBox *mbox)
-        : PuyoView(attachedPuyoGameFactory, attachedPuyoThemeManager,
+        : PuyoView(attachedPuyoGameFactory, attachedPuyoThemeSet,
 		   xOffset, yOffset, nXOffset, nYOffset),
           mbox(mbox),badPuyos(0) {}
         

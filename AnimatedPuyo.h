@@ -33,11 +33,11 @@
 
 class PuyoView;
 class AnimatedPuyoTheme;
-class AnimatedPuyoThemeManager;
+class AnimatedPuyoSetTheme;
 
 class AnimatedPuyo : public PuyoPuyo {
 public:
-    AnimatedPuyo(PuyoState state, AnimatedPuyoThemeManager *themeManager, PuyoView *attachedView);
+    AnimatedPuyo(PuyoState state, AnimatedPuyoSetTheme *themeSet, PuyoView *attachedView);
     virtual ~AnimatedPuyo();
     void addAnimation(PuyoAnimation *animation);
     PuyoAnimation * getCurrentAnimation() const;
@@ -53,14 +53,14 @@ public:
     PuyoView *getAttachedView() const { return attachedView; }
     int getScreenCoordinateX() const;
     int getScreenCoordinateY() const;
-    const AnimatedPuyoTheme *getAttachedTheme() const { return attachedTheme; }
+	AnimatedPuyoTheme *getAttachedTheme() const { return attachedTheme; }
 private:
     IosVector animationQueue;
     int puyoEyeState;
     unsigned int smallTicksCount;
     bool visibilityFlag;
     PuyoView *attachedView;
-    const AnimatedPuyoTheme *attachedTheme;
+	AnimatedPuyoTheme *attachedTheme;
 };
 
 
@@ -75,8 +75,9 @@ public:
 private:
     IosVector puyoWalhalla;
     PuyoView *attachedView;
-    AnimatedPuyoThemeManager *attachedThemeManager;
+    AnimatedPuyoSetTheme *attachedThemeSet;
 };
+
 
 #endif // _ANIMATEDPUYO
 

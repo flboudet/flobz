@@ -285,7 +285,7 @@ void VanishAnimation::draw(int semiMove)
         }
     }
     else {
-        const AnimatedPuyoTheme *theme = attachedPuyo.getAttachedTheme();
+		AnimatedPuyoTheme *theme = attachedPuyo.getAttachedTheme();
         SDL_Painter &painter = attachedPuyo.getAttachedView()->getPainter();
         
         SDL_Rect drect, xrect;

@@ -1,0 +1,64 @@
+<author>iOS-Software</author>
+<version>1</version>
+<compatibility>0</compatibility>
+<puyoset>
+	<name>Classic</name>
+	<puyo>
+		<name>stone</name>
+		<disappear>round</disappear>
+		<explosions>round</explosions>
+		<eyes>normal</eyes>
+	</puyo>
+	<puyo>
+		<name>stone</name>
+		<disappear>round</disappear>
+		<explosions>round</explosions>
+		<eyes>upper</eyes>
+		<color_offset>60.0</color_offset>
+	</puyo>
+	<puyo>
+		<name>stone</name>
+		<disappear>round</disappear>
+		<explosions>round</explosions>
+		<eyes>normal</eyes>
+		<color_offset>120.0</color_offset>
+	</puyo>
+	<puyo>
+		<name>stone</name>
+		<disappear>round</disappear>
+		<explosions>round</explosions>
+		<eyes>upper</eyes>
+		<color_offset>180.0</color_offset>
+	</puyo>
+	<puyo>
+		<name>stone</name>
+		<disappear>round</disappear>
+		<explosions>round</explosions>
+		<eyes>normal</eyes>
+		<color_offset>240.0</color_offset>
+	</puyo>
+	<puyo>
+		<name>stone</name>
+		<disappear>round</disappear>
+		<explosions>round</explosions>
+		<eyes>upper</eyes>
+		<color_offset>300.0</color_offset>
+	</puyo>
+	<neutralpuyo>
+		<name>glass</name>
+	</neutralpuyo>
+</puyoset>
+<level>
+	<name>Classic</name>
+	<lives>heart</lives>
+	<background>columns</background>
+	<grid>metal</grid>
+	<speed_meter>fire</speed_meter>
+</level>
+<level>
+	<name>Dark</name>
+	<lives>heart</lives>
+	<background>dark</background>
+	<grid>metal</grid>
+	<speed_meter>fire</speed_meter>
+</level>

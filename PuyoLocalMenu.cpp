@@ -25,6 +25,7 @@
 
 #include "PuyoLocalMenu.h"
 #include "PuyoSinglePlayerStarter.h"
+#include "AnimatedPuyoTheme.h"
 
 class SinglePlayerGameActionz : public Action {
 public:
@@ -44,7 +45,15 @@ void SinglePlayerGameActionz::action()
 
 void NewSinglePlayerGameAction::action()
 {
-    PuyoGameScreen *starter = new PuyoGameScreen(*(new PuyoTwoPlayerGameWidget()));
+    AnimatedPuyoSetTheme *themeToUse = new AnimatedPuyoSetTheme("", "Classic.fptheme");
+    themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 000.0f);
+    themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 060.0f);
+    themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 120.0f);
+    themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 180.0f);
+    themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 240.0f);
+    themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 300.0f);
+    themeToUse->addNeutralPuyo("stone", "round", "round", "normal", 0.0f);
+    PuyoGameScreen *starter = new PuyoGameScreen(*(new PuyoTwoPlayerGameWidget(*themeToUse)));
     GameUIDefaults::SCREEN_STACK->push(starter);
 }
 
