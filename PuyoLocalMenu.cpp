@@ -48,11 +48,20 @@ void NewSinglePlayerGameAction::action()
     GameUIDefaults::SCREEN_STACK->push(starter);
 }
 
+class ExperimentalPlayerGameAction : public Action {
+public:
+    void ExperimentalPlayerGameAction::action()
+    {
+        PuyoStoryScreen *starter = new PuyoStoryScreen(1);
+        GameUIDefaults::SCREEN_STACK->push(starter);
+    }
+};
+
 void LocalGameMenu::build() {
     add(new EditFieldWithLabel("Player Name:", "flobo"));
     add(new Text("Choose Game Level"));
     add(new Button("Easy", &easyAction));
-    add(new Button("Medium", new SinglePlayerGameActionz(MEDIUM)));
+    add(new Button("Medium", new ExperimentalPlayerGameAction()));
     add(new Button("Hard", new SinglePlayerGameActionz(HARD)));
     add(new Button("Cancel", new PuyoPopMenuAction(mainScreen)));
 }

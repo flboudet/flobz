@@ -24,6 +24,13 @@ private:
     Styrolyse *currentStory;
 };
 
+class PuyoStoryScreen : public Screen {
+public:
+    PuyoStoryScreen(int num);
+private:
+    PuyoStoryWidget storyWidget;
+};
+
 class PuyoStory : public DrawableComponent {
   public:
     PuyoStory(PuyoCommander *com, int num);
