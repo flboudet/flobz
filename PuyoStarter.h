@@ -67,7 +67,7 @@ private:
 
 class PuyoGameWidget : public Widget, CycledComponent {
 public:
-    PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB);
+    PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme);
     virtual ~PuyoGameWidget();
     void cycle();
     void draw(SDL_Surface *screen);
@@ -79,6 +79,7 @@ public:
 protected:
     SDL_Painter painter;
 private:
+    PuyoLevelTheme &attachedLevelTheme;
     IIM_Surface *background, *grid, *liveImage[4];
     PuyoView &areaA, &areaB;
     PuyoPlayer &controllerA, &controllerB;
@@ -102,7 +103,7 @@ private:
 
 class PuyoTwoPlayerGameWidget : public PuyoGameWidget {
 public:
-    PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet);
+    PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme);
 private:
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;

@@ -562,9 +562,9 @@ IIM_Surface * PuyoLevelTheme::getSpeedMeter(bool front)
 
 bool PuyoLevelTheme::validate(void)
 {
-    NOT_IMPLEMENTED;
+    //NOT_IMPLEMENTED;
     //fprintf(stderr,"Malformed theme : %s", name);
-    return false;
+    return true;//false;
 }
 
 bool PuyoLevelTheme::cache(void)

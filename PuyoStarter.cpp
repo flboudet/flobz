@@ -143,8 +143,8 @@ bool PuyoEventPlayer::keyShouldRepeat(int &key)
     return ((key - fpKey_Delay) > 0) && ((key - fpKey_Delay) % fpKey_Repeat == 0);
 }
 
-PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB)
-    : CycledComponent(0.02), areaA(areaA), areaB(areaB), controllerA(controllerA), controllerB(controllerB),
+PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme)
+    : CycledComponent(0.02), attachedLevelTheme(levelTheme), areaA(areaA), areaB(areaB), controllerA(controllerA), controllerB(controllerB),
       cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3)
 {
     // Affreux, a degager absolument
@@ -160,7 +160,7 @@ PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &con
         NeutralPopAnimation::initResources();
         firstTime = false;
     }
-    background = IIM_Load_DisplayFormat("Background.jpg");
+    background = /*attachedLevelTheme.getBackground();*/IIM_Load_DisplayFormat("Background.jpg");
     grid       = IIM_Load_DisplayFormatAlpha("grid.png");
     liveImage[0] = IIM_Load_DisplayFormatAlpha("0live.png");
     liveImage[1] = IIM_Load_DisplayFormatAlpha("1live.png");
@@ -317,7 +317,7 @@ void PuyoGameScreen::backPressed()
     }
 }
 
-PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet) : attachedPuyoThemeSet(puyoThemeSet),
+PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme) : attachedPuyoThemeSet(puyoThemeSet),
                                                      attachedGameFactory(&attachedRandom),
                                                      areaA(&attachedGameFactory, &attachedPuyoThemeSet,
                                                      1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
@@ -326,7 +326,7 @@ PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoTheme
                                                      controllerA(areaA, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left, GameControlEvent::kPlayer1Right,
                                                      GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
                                                      controllerB(areaB, GameControlEvent::kPlayer2Down, GameControlEvent::kPlayer2Left, GameControlEvent::kPlayer2Right,
-                                                     GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight), PuyoGameWidget(areaA, areaB, controllerA, controllerB)
+                                                     GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight), PuyoGameWidget(areaA, areaB, controllerA, controllerB, levelTheme)
 {
 }
 

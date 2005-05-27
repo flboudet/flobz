@@ -53,7 +53,16 @@ void NewSinglePlayerGameAction::action()
     themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 240.0f);
     themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 300.0f);
     themeToUse->addNeutralPuyo("stone", "round", "round", "normal", 0.0f);
-    PuyoGameScreen *starter = new PuyoGameScreen(*(new PuyoTwoPlayerGameWidget(*themeToUse)));
+    //themeToUse->cache();
+    
+    PuyoLevelTheme *levelThemeToUse = new PuyoLevelTheme("", "Classic.fptheme");
+    levelThemeToUse->setLives("heart");
+    levelThemeToUse->setBackground("dark");
+    levelThemeToUse->setGrid("metal");
+    levelThemeToUse->setSpeedMeter("fire");
+    //levelThemeToUse->cache();
+    
+    PuyoGameScreen *starter = new PuyoGameScreen(*(new PuyoTwoPlayerGameWidget(*themeToUse, *levelThemeToUse)));
     GameUIDefaults::SCREEN_STACK->push(starter);
 }
 
