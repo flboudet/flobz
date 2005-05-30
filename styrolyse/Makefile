@@ -16,7 +16,7 @@ all: gsl ${OBJ} main.o
 object: ${OBJ} gsl
 
 gsl:
-	make -C ${GSL_DIR} object
+	+make -C ${GSL_DIR} object
 
 main.o: main.c
 styrolyse.o:styrolyse.c

@@ -17,7 +17,7 @@ OBJFILES= HiScores.o PuyoCommander.o        \
           AnimatedPuyoTheme.o PuyoNetworkMenu.o PuyoNetCenterMenu.o \
           PuyoNetGameCenter.o PuyoInternetGameCenter.o \
           PuyoLocalMenu.o PuyoOptionMenu.o
-					
+
 include config
 
 DEPDIR = .deps
@@ -78,8 +78,8 @@ clean:
 	rm -rf $(macimage_name)
 	rm -f  $(macimage_name).dmg
 	rm -f  .DS_Store */.DS_Store */*/.DS_Store .gdb_history
-	make -C iosfc clean
-	make -C gametools clean
+	+make -C iosfc clean
+	+make -C gametools clean
 
 install: flobopuyo
 	$(STRIP) $(PRGNAME)

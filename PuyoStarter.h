@@ -87,7 +87,8 @@ private:
     int cyclesBeforeGameCycle;
     unsigned int tickCounts;
     bool paused;
-    bool displayLives, lives;
+    bool displayLives;
+    int lives;
 };
 
 class PuyoGameScreen : public Screen {
