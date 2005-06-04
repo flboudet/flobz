@@ -67,12 +67,53 @@ void NewSinglePlayerGameAction::action()
     GameUIDefaults::SCREEN_STACK->push(starter);
 }
 
+class PuyoSingleGameLevelData {
+public:
+    PuyoSingleGameLevelData(int gameLevel)
+    {
+        themeToUse = new AnimatedPuyoSetTheme("", "Classic.fptheme");
+        themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 000.0f);
+        themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 060.0f);
+        themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 120.0f);
+        themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 180.0f);
+        themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 240.0f);
+        themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 300.0f);
+        themeToUse->addNeutralPuyo("stone", "round", "round", "normal", 0.0f);
+        
+        levelThemeToUse = new PuyoLevelTheme("", "Classic.fptheme");
+        levelThemeToUse->setLives("heart");
+        levelThemeToUse->setBackground("dark");
+        levelThemeToUse->setGrid("metal");
+        levelThemeToUse->setSpeedMeter("fire");
+    }
+    
+    ~PuyoSingleGameLevelData()
+    {
+        delete themeToUse;
+        delete levelThemeToUse;
+    }
+    
+    int getStory() const { return 1; }
+    AnimatedPuyoSetTheme &getPuyoTheme() const { return *themeToUse; }
+    PuyoLevelTheme &getLevelTheme() const { return *levelThemeToUse; }
+    
+private:
+    AnimatedPuyoSetTheme *themeToUse;
+    PuyoLevelTheme *levelThemeToUse;
+};
+
 class ExperimentalPlayerGameAction : public Action {
 public:
-    ExperimentalPlayerGameAction() : story(NULL) {}
-    void ExperimentalPlayerGameAction::action()
+    ExperimentalPlayerGameAction() : currentLevel(0), levelData(NULL), story(NULL), gameScreen(NULL) {}
+    void action()
     {
-        if (story == NULL) {
+        if (levelData == NULL) {
+            initiateLevel();
+        }
+        else if (gameScreen == NULL) {
+            startGame();
+        }
+        /*if (story == NULL) {
             story = new PuyoStoryScreen(1, *(GameUIDefaults::SCREEN_STACK->top()), this);
             GameUIDefaults::SCREEN_STACK->push(story);
         }
@@ -87,7 +128,7 @@ public:
             themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 240.0f);
             themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 300.0f);
             themeToUse->addNeutralPuyo("stone", "round", "round", "normal", 0.0f);
-            //themeToUse->cache();
+            themeToUse->cache();
             
             PuyoLevelTheme *levelThemeToUse = new PuyoLevelTheme("", "Classic.fptheme");
             levelThemeToUse->setLives("heart");
@@ -99,11 +140,31 @@ public:
             gameScreen = new PuyoGameScreen(*(new PuyoTwoPlayerGameWidget(*themeToUse, *levelThemeToUse)), *story);
             delete story;
             GameUIDefaults::SCREEN_STACK->push(gameScreen);
-        }
+        }*/
     }
+    
+    void initiateLevel()
+    {
+        levelData = new PuyoSingleGameLevelData(currentLevel);
+        story = new PuyoStoryScreen(levelData->getStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
+        GameUIDefaults::SCREEN_STACK->push(story);
+    }
+    
+    void startGame()
+    {
+        gameWidget = new PuyoTwoPlayerGameWidget(levelData->getPuyoTheme(), levelData->getLevelTheme());
+        gameScreen = new PuyoGameScreen(*gameWidget, *story);
+        GameUIDefaults::SCREEN_STACK->pop();
+        delete story;
+        GameUIDefaults::SCREEN_STACK->push(gameScreen);
+    }
+    
 private:
+    int currentLevel;
+    PuyoSingleGameLevelData *levelData;
     PuyoStoryScreen *story;
     PuyoGameScreen *gameScreen;
+    PuyoTwoPlayerGameWidget *gameWidget;
 };
 
 void LocalGameMenu::build() {

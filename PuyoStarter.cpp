@@ -144,8 +144,28 @@ bool PuyoEventPlayer::keyShouldRepeat(int &key)
 }
 
 PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme)
-    : CycledComponent(0.02), attachedLevelTheme(levelTheme), areaA(areaA), areaB(areaB), controllerA(controllerA), controllerB(controllerB),
+    : CycledComponent(0.02), attachedLevelTheme(&levelTheme), areaA(&areaA), areaB(&areaB), controllerA(&controllerA), controllerB(&controllerB),
       cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3)
+{
+    initialize();
+}
+
+PuyoGameWidget::PuyoGameWidget()
+    : CycledComponent(0.02), cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3)
+{
+}
+
+void PuyoGameWidget::initialize(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme)
+{
+    this->areaA = &areaA;
+    this->areaB = &areaB;
+    this->controllerA = &controllerA;
+    this->controllerB = &controllerB;
+    this->attachedLevelTheme = &levelTheme;
+    initialize();
+}
+
+void PuyoGameWidget::initialize()
 {
     printf("Constructeur du PuyoGameWidget\n");
     // Affreux, a degager absolument
@@ -179,10 +199,10 @@ PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &con
     painter.redrawAll(painter.gameScreen->surf);
     
     // Setting up games
-    attachedGameA = areaA.getAttachedGame();
-    attachedGameB = areaB.getAttachedGame();
-    areaA.setEnemyGame(attachedGameB);
-    areaB.setEnemyGame(attachedGameA);
+    attachedGameA = this->areaA->getAttachedGame();
+    attachedGameB = this->areaB->getAttachedGame();
+    this->areaA->setEnemyGame(attachedGameB);
+    this->areaB->setEnemyGame(attachedGameA);
     printf("Ennemis positionnes! %x, %x\n", attachedGameA, attachedGameB);
     
     setReceiveUpEvents(true);
@@ -199,17 +219,17 @@ void PuyoGameWidget::cycle()
         tickCounts++;
         
         // Controls
-        controllerA.cycle();
-        controllerB.cycle();
+        controllerA->cycle();
+        controllerB->cycle();
         
         // Animations
-        areaA.cycleAnimation();
-        areaB.cycleAnimation();
+        areaA->cycleAnimation();
+        areaB->cycleAnimation();
         
         // Game cycles
         if (tickCounts % cyclesBeforeGameCycle == 0) {
-            areaA.cycleGame();
-            areaB.cycleGame();
+            areaA->cycleGame();
+            areaB->cycleGame();
         }
         requestDraw();
     }
@@ -220,8 +240,8 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
   //printf("DRAW()\n");
     if (!paused) {
         // Rendering puyo views
-        areaA.render();
-        areaB.render();
+        areaA->render();
+        areaB->render();
         
         // Rendering the grids
         SDL_Rect drect;
@@ -237,8 +257,8 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
         painter.requestDraw(grid, &drect);
         
         // Rendering the neutral puyos
-        areaA.renderNeutral();
-        areaB.renderNeutral();
+        areaA->renderNeutral();
+        areaB->renderNeutral();
         
         // Rendering the lives        
         if (displayLives && (lives>=0) && (lives<=3))
@@ -274,8 +294,8 @@ void PuyoGameWidget::eventOccured(GameControlEvent *event)
     if (paused)
         lostFocus();
     else {
-        controllerA.eventOccured(event);
-        controllerB.eventOccured(event);
+        controllerA->eventOccured(event);
+        controllerB->eventOccured(event);
     }
 }
 
@@ -330,8 +350,9 @@ PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoTheme
                                                      controllerA(areaA, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left, GameControlEvent::kPlayer1Right,
                                                      GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
                                                      controllerB(areaB, GameControlEvent::kPlayer2Down, GameControlEvent::kPlayer2Left, GameControlEvent::kPlayer2Right,
-                                                     GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight), PuyoGameWidget(areaA, areaB, controllerA, controllerB, levelTheme)
+                                                     GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight)
 {
+    initialize(areaA, areaB, controllerA, controllerB, levelTheme);
 }
 
 class PuyoCycled : public CycledComponent
