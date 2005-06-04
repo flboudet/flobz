@@ -98,6 +98,11 @@ void doom_melt_display(DoomMelt *_this, SDL_Surface *display)
   }
 }
 
+int doom_melt_finished(DoomMelt *_this)
+{
+    return _this->isFinished;
+}
+
 /*
  * Private methods
  */

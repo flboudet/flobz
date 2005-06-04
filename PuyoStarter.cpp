@@ -283,9 +283,10 @@ PuyoPauseMenu::PuyoPauseMenu() : menuTitle("Pause"), continueButton("Continue ga
     add(&abortButton);
 }
 
-PuyoGameScreen::PuyoGameScreen(PuyoGameWidget &gameWidget) : Screen(0, 0, 640, 480), paused(false), gameWidget(gameWidget)
+PuyoGameScreen::PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScreen) : Screen(0, 0, 640, 480), paused(false), gameWidget(gameWidget), transitionWidget(previousScreen, NULL)
 {
     add(&gameWidget);
+    add(&transitionWidget);
 }
 
 void PuyoGameScreen::onEvent(GameControlEvent *cevent)

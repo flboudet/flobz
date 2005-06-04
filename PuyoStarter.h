@@ -28,6 +28,7 @@
 #include "PuyoCommander.h"
 #include "ios_messagebox.h"
 #include "AnimatedPuyoTheme.h"
+#include "PuyoScreenTransition.h"
 
 #ifndef _PUYOSTARTER
 #define _PUYOSTARTER
@@ -93,13 +94,14 @@ private:
 
 class PuyoGameScreen : public Screen {
 public:
-    PuyoGameScreen(PuyoGameWidget &gameWidget);
+    PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScreen);
     void onEvent(GameControlEvent *cevent);
     virtual void backPressed();
 private:
     bool paused;
     PuyoPauseMenu pauseMenu;
     PuyoGameWidget &gameWidget;
+    PuyoScreenTransitionWidget transitionWidget;
 };
 
 class PuyoTwoPlayerGameWidget : public PuyoGameWidget {

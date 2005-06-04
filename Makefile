@@ -16,7 +16,7 @@ OBJFILES= HiScores.o PuyoCommander.o        \
           PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o \
           AnimatedPuyoTheme.o PuyoNetworkMenu.o PuyoNetCenterMenu.o \
           PuyoNetGameCenter.o PuyoInternetGameCenter.o \
-          PuyoLocalMenu.o PuyoOptionMenu.o
+          PuyoLocalMenu.o PuyoOptionMenu.o PuyoScreenTransition.o
 
 include config
 

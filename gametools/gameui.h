@@ -251,6 +251,7 @@ namespace gameui {
       Screen(float x, float y, float width, float height, GameLoop *loop = NULL);
       void setBackground(IIM_Surface *bg);
       void draw(SDL_Surface *surface);
+      virtual void drawAnyway(SDL_Surface *surface);
       bool drawRequested() const { if (isVisible()) return rootContainer.drawRequested(); return false;}
       void onEvent(GameControlEvent *event);
       void remove() { IdleComponent::remove(); }
@@ -355,6 +356,7 @@ namespace gameui {
 
       void push(Screen *screen);
       void pop();
+      Screen * top() const {return stack.top();}
 
     private:
       Stack<Screen*> stack;

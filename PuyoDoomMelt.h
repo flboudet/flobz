@@ -30,6 +30,7 @@ void      doom_melt_delete (DoomMelt *_this);
 void      doom_melt_update (DoomMelt *_this);
 void      doom_melt_start  (DoomMelt *_this, IIM_Surface *surf);
 void      doom_melt_display(DoomMelt *_this, SDL_Surface *display);
+int       doom_melt_finished(DoomMelt *_this);
 
 #endif /*_PUYODOOMMELT*/
 

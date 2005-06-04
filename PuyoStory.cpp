@@ -111,9 +111,10 @@ void PuyoStoryWidget::draw(SDL_Surface *screen)
     SDL_BlitSurface(sstory, NULL, screen, NULL);
 }
 
-PuyoStoryScreen::PuyoStoryScreen(int num) : Screen(0, 0, 640, 480), storyWidget(num)
+PuyoStoryScreen::PuyoStoryScreen(int num, Screen &previousScreen) : Screen(0, 0, 640, 480), storyWidget(num), transitionWidget(previousScreen, NULL)
 {
     add(&storyWidget);
+    add(&transitionWidget);
 }
 
 PuyoStory::PuyoStory(PuyoCommander *com, int num) : num(num), commander(com)

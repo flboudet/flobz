@@ -512,6 +512,12 @@ namespace gameui {
     }*/
     rootContainer.doDraw(surface);
   }
+  
+  void Screen::drawAnyway(SDL_Surface *surface)
+  {
+    rootContainer.requestDraw(true);
+    rootContainer.doDraw(surface);
+  }
 
   void Screen::onEvent(GameControlEvent *event)
   {

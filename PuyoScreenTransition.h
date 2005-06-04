@@ -23,52 +23,25 @@
  *
  */
 
-#ifndef PUYO_STORY_H
-#define PUYO_STORY_H
-
-#include "SDL.h"
-#include "SDL_image.h"
-#include "styrolyse.h"
+#ifndef _PUYOSCREENTRANSITION
+#define _PUYOSCREENTRANSITION
 
 #include "gameui.h"
-#include "PuyoScreenTransition.h"
-
-extern int NB_STORIES;
+#include "PuyoDoomMelt.h"
 
 using namespace gameui;
 
-class PuyoCommander;
-
-class PuyoStoryWidget : public Widget, CycledComponent {
+class PuyoScreenTransitionWidget : public Widget, CycledComponent {
 public:
-    PuyoStoryWidget(int num);
-    ~PuyoStoryWidget();
+    PuyoScreenTransitionWidget(Screen &fromScreen, Action *transitionFinishedAction);
+    virtual ~PuyoScreenTransitionWidget();
     void cycle();
     void draw(SDL_Surface *screen);
     IdleComponent *getIdleComponent() { return this; }
 private:
-    int num;
-    Styrolyse *currentStory;
+    IIM_Surface *fromSurface;
+    Action *transitionFinishedAction;
+    DoomMelt *melt;
 };
 
-class PuyoStoryScreen : public Screen {
-public:
-    PuyoStoryScreen(int num, Screen &previousScreen);
-private:
-    PuyoStoryWidget storyWidget;
-    PuyoScreenTransitionWidget transitionWidget;
-};
-
-class PuyoStory : public DrawableComponent {
-  public:
-    PuyoStory(PuyoCommander *com, int num);
-    virtual ~PuyoStory();
-    void loop();
-    void draw();
-  private:
-    int num;
-    Styrolyse *currentStory;
-    PuyoCommander *commander;
-};
-
-#endif
+#endif // _PUYOSCREENTRANSITION

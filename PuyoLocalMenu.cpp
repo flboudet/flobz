@@ -26,6 +26,7 @@
 #include "PuyoLocalMenu.h"
 #include "PuyoSinglePlayerStarter.h"
 #include "AnimatedPuyoTheme.h"
+#include "PuyoScreenTransition.h"
 
 class SinglePlayerGameActionz : public Action {
 public:
@@ -62,7 +63,7 @@ void NewSinglePlayerGameAction::action()
     levelThemeToUse->setSpeedMeter("fire");
     //levelThemeToUse->cache();
     
-    PuyoGameScreen *starter = new PuyoGameScreen(*(new PuyoTwoPlayerGameWidget(*themeToUse, *levelThemeToUse)));
+    PuyoGameScreen *starter = new PuyoGameScreen(*(new PuyoTwoPlayerGameWidget(*themeToUse, *levelThemeToUse)), *(GameUIDefaults::SCREEN_STACK->top()));
     GameUIDefaults::SCREEN_STACK->push(starter);
 }
 
@@ -70,7 +71,9 @@ class ExperimentalPlayerGameAction : public Action {
 public:
     void ExperimentalPlayerGameAction::action()
     {
-        PuyoStoryScreen *starter = new PuyoStoryScreen(1);
+        PuyoStoryScreen *starter = new PuyoStoryScreen(1, *(GameUIDefaults::SCREEN_STACK->top()));
+        //TransitionToScreenAction *toto = new TransitionToScreenAction(*(GameUIDefaults::SCREEN_STACK->top()), *starter);
+        //toto->action();
         GameUIDefaults::SCREEN_STACK->push(starter);
     }
 };
