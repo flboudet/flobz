@@ -42,6 +42,10 @@ class DrawableComponent : public virtual GameComponent
 class IdleComponent : public virtual GameComponent
 {
   public:
+    IdleComponent():paused(false){}
+   
+    void callIdle(double currentTime) { if (!paused) idle(currentTime); }
+    
     virtual void idle(double currentTime)         {}
 
     /// return true if you want the GameLoop to skip some frames.
@@ -49,6 +53,12 @@ class IdleComponent : public virtual GameComponent
     
     /// perform some computation if you're interested in events.
     virtual void onEvent(GameControlEvent *event) {}
+
+    virtual void setPause(bool paused);
+    bool getPause() const;
+
+  protected:
+    bool paused;
 };
 
 
@@ -68,9 +78,7 @@ class CycledComponent : public virtual IdleComponent
     void idle(double currentTime);
     bool isLate(double currentTime) const;
 
-    void setPause(bool paused);
-    bool getPause() const;
-
+    virtual void setPause(bool paused);
     void reset();
     
   private:
@@ -78,8 +86,6 @@ class CycledComponent : public virtual IdleComponent
 
     double cycleNumber;
     double firstCycleTime;
-
-    bool paused;
 };
 
 
@@ -116,3 +122,4 @@ class GameLoop : public IdleComponent, DrawableComponent
 };
 
 #endif // _GAMELOOP_H
+

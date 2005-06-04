@@ -22,7 +22,15 @@ namespace gameui {
     }
 
   void Widget::hide()   { hidden = true;                 }
-  void Widget::show()   { hidden = false; requestDraw(); }
+  void Widget::show()
+  {
+    hidden = false;
+    IdleComponent *idle = getIdleComponent();
+    if (idle != NULL) {
+      idle->setPause(false);
+    }
+    requestDraw();
+  }
 
   void Widget::eventOccured(GameControlEvent *event)
   {
@@ -54,15 +62,19 @@ namespace gameui {
   void Widget::addToGameLoop(GameLoop *loop)
   {
     IdleComponent *idle = getIdleComponent();
-    if (idle != NULL)
+    if (idle != NULL) {
+      idle->setPause(false);
       loop->add(idle);
+    }
   }
   
   void Widget::removeFromGameLoop()
   {
     IdleComponent *idle = getIdleComponent();
-    if (idle != NULL)
+    if (idle != NULL) {
       idle->remove();
+//      idle->setPause(true);
+    }
   }
   
   void Widget::removeFromGameLoopActive()
@@ -801,17 +813,21 @@ namespace gameui {
     checkLoop();
     if (stack.size() > 0) {
       stack.top()->hide();
+      stack.top()->removeFromGameLoop();
     }
     screen->show();
+    screen->addToGameLoop(screen->getGameLoop());
     stack.push(screen);
     loop->add(screen);
   }
 
   void ScreenStack::pop() {
     stack.top()->remove();
+    stack.top()->removeFromGameLoop();
     stack.top()->hide();
     stack.pop();
     stack.top()->show();
+    stack.top()->addToGameLoop(stack.top()->getGameLoop());
   }
 
   //

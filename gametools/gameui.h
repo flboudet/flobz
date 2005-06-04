@@ -263,6 +263,11 @@ namespace gameui {
       virtual void hide() { hidden = true; }
       virtual void show() { hidden = false; }
       bool isVisible() const { return !hidden; }
+      
+      virtual void addToGameLoop(GameLoop *loop) { rootContainer.addToGameLoop(loop); }
+      virtual void removeFromGameLoop() { rootContainer.removeFromGameLoop(); }
+
+      GameLoop *getGameLoop() { return rootContainer.getGameLoop(); }
     private:
       ZBox rootContainer;
       IIM_Surface *bg;

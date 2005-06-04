@@ -50,6 +50,18 @@ void DrawableComponent::doDraw(SDL_Surface *screen)
   _drawRequested = false;
 }
 
+// IDLE COMPONENT
+
+void IdleComponent::setPause(bool paused)
+{
+  this->paused = paused;
+}
+
+bool IdleComponent::getPause() const
+{
+  return paused;
+}
+
 // CYCLE COMPONENT
 
 CycledComponent::CycledComponent(double cycleTime)
@@ -97,16 +109,11 @@ void CycledComponent::setPause(bool paused)
   if (!paused) reset();
 }
   
-bool CycledComponent::getPause() const
-{
-  return paused;
-}
-
 void CycledComponent::reset()
 {
   firstCycleTime = 0.0;
-  cycleNumber = -1.0;
-  paused = false;
+  cycleNumber    = -1.0;
+  paused         = false;
 }
 
 bool CycledComponent::isLate(double currentTime) const
@@ -216,7 +223,7 @@ void GameLoop::idle(double currentTime)
   }*/
   for (i = idles.size()-1; i >= 0 ; --i) {
     if (idles[i] && !idles[i]->removeMe())
-      idles[i]->idle(currentTime);
+      idles[i]->callIdle(currentTime);
   }
 
   // 3- check components to remove/kill
