@@ -31,10 +31,11 @@ class SharedPtr
 		SharedPtr(const SharedPtr<X> &ptr) : ref(ptr.ref) { ref->inc(); }
 		~SharedPtr()                                { dec(); }
 		
-		void operator= (const SharedPtr<X> &ptr) {
+		SharedPtr<X> &operator= (const SharedPtr<X> &ptr) {
 			dec();
 			ref = ptr.ref;
 			ref->inc();
+      return *this;
 		} 
 
 		void release()        { ref->px = 0;       }

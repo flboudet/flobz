@@ -102,7 +102,7 @@ namespace ios_fc {
              *
              * @param size Initial size.
              */
-            inline VoidBuffer (int size = 0) : offset(0) {
+            inline VoidBuffer (int size = 0) : p(NULL), offset(0) {
                 init_ptr(size);
             }
 
