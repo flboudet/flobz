@@ -68,11 +68,13 @@ OptionMenu::OptionMenu(PuyoRealMainScreen *mainScreen) : PuyoMainScreenMenu(main
     audioButton(kAudioFX, "OFF", "ON ", theCommander->getSoundFx(), &toggleSoundFxAction),
     musicButton(kMusic, "OFF", "ON ", theCommander->getMusic(), &toggleMusicAction),
     fullScreenButton(kFullScreen, "OFF", "ON ", theCommander->getFullScreen(), &toggleFullScreenAction),
-    changeControlsButton(kControls, (gameui::Action *)NULL)
+    controlMenu(mainScreen), 
+    changeControlsButton(kControls, new PuyoPushMenuAction(&controlMenu, mainScreen))
 {
 }
 
 void OptionMenu::build() {
+    controlMenu.build();
     add(new Text("Options"));
     add(&audioButton);
     add(&musicButton);

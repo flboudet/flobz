@@ -133,6 +133,20 @@ void GameLoop::add(GameComponent *gc)
     idles.add(ic);
 }
 
+void GameLoop::remove(GameComponent *gc)
+{
+  for (int i = 0; i < components.size(); ++i) {
+    if (gc == components[i])
+      components[i] = NULL;
+
+    if (gc == drawables[i])
+      drawables[i]  = NULL;
+    
+    if (gc == idles[i])
+      idles[i]      = NULL;
+  }
+}
+
 #include <unistd.h>
 
 void GameLoop::run()
@@ -169,16 +183,16 @@ void GameLoop::idle(double currentTime)
 {
   int i;
 
-  Vector<IdleComponent> idlesCpy = idles.dup();
-  Vector<GameComponent> componentsCpy = components.dup();
+  //Vector<IdleComponent> idlesCpy = idles.dup();
   
   // 1- process events
   SDL_Event e;
   while (SDL_PollEvent (&e)) {
     GameControlEvent controlEvent;
     getControlEvent(e, &controlEvent);
-    for (i = 0; i < idlesCpy.size(); ++i) {
-      idlesCpy[i]->onEvent(&controlEvent);
+    for (i = 0; i < idles.size(); ++i) {
+      if (idles[i] && !idles[i]->removeMe())
+        idles[i]->onEvent(&controlEvent);
     }
     if (controlEvent.cursorEvent == GameControlEvent::kQuit) {
       SDL_Quit();
@@ -187,11 +201,38 @@ void GameLoop::idle(double currentTime)
   }
   
   // 2- call idles
-  for (i = 0; i < idlesCpy.size(); ++i) {
-    idlesCpy[i]->idle(currentTime);
+  for (i = 0; i < idles.size(); ++i) {
+    if (idles[i] && !idles[i]->removeMe())
+      idles[i]->idle(currentTime);
+  }
+
+  // 3- check components to remove/kill
+  // 3a- active remove
+  for (i = 0; i<components.size();) {
+    GameComponent *gc = components[i];
+    if (gc == NULL) {
+      components.removeAt(i);
+    }
+    else i++;
+  }
+  for (i = 0; i<idles.size();) {
+    GameComponent *gc = idles[i];
+    if (gc == NULL) {
+      idles.removeAt(i);
+    }
+    else i++;
+  }
+  for (i = 0; i<drawables.size();) {
+    GameComponent *gc = drawables[i];
+    if (gc == NULL) {
+      drawables.removeAt(i);
+    }
+    else i++;
   }
   
-  // 3- check components to remove/kill
+  // 3b- passive Remove
+  Vector<GameComponent> componentsCpy = components.dup();
+  
   for (i = 0; i < componentsCpy.size(); ++i) {
     GameComponent *gc = componentsCpy[i];
     if (gc->removeMe()) {
@@ -203,6 +244,7 @@ void GameLoop::idle(double currentTime)
         delete gc;
     }
   }
+
 }
 
 bool GameLoop::drawRequested() const

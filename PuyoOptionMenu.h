@@ -28,6 +28,7 @@
 
 #include "gameui.h"
 #include "PuyoCommander.h"
+#include "PuyoControlMenu.h"
 
 class OptionMenu;
 
@@ -67,6 +68,7 @@ private:
     ToggleMusicAction toggleMusicAction;
     ToggleFullScreenAction toggleFullScreenAction;
     ToggleButton audioButton, musicButton, fullScreenButton;
+    ControlMenu controlMenu;
     Button changeControlsButton;
 };
 

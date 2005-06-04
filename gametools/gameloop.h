@@ -86,6 +86,7 @@ class GameLoop : public IdleComponent, DrawableComponent
     GameLoop();
 
     void add(GameComponent *gc);
+    void remove(GameComponent *gc);
     void run();
 
     void idle(double currentTime);

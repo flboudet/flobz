@@ -1,4 +1,4 @@
-ENABLE_AUDIO=true
+ENABLE_AUDIO=false
 ENABLE_OPENGL=false
 ENABLE_DGA=false
 
@@ -46,7 +46,7 @@ CC=g++
 CXX=g++
 STRIP=strip
 
-CFLAGS= -DDATADIR=\"${DATADIR}\" -I${ROOT_DIR}/${GAMETOOLS_DIR} -I${ROOT_DIR}/${IOSFC_DIR} -I${ROOT_DIR} -I. -I${ROOT_DIR}/styrolyse
+CFLAGS:=$(CFLAGS) -DDATADIR=\"${DATADIR}\" -I${ROOT_DIR}/${GAMETOOLS_DIR} -I${ROOT_DIR}/${IOSFC_DIR} -I${ROOT_DIR} -I. -I${ROOT_DIR}/styrolyse
 LDFLAGS=
 
 # Autodetected cygwin platform

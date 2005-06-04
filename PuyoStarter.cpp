@@ -215,6 +215,7 @@ void PuyoGameWidget::cycle()
 
 void PuyoGameWidget::draw(SDL_Surface *screen)
 {
+  //printf("DRAW()\n");
     if (!paused) {
         // Rendering puyo views
         areaA.render();
