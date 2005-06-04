@@ -39,9 +39,9 @@ using namespace gameui;
 
 class PuyoCommander;
 
-class PuyoStoryWidget : public Widget, CycledComponent {
+class PuyoStoryWidget : public Widget, public CycledComponent {
 public:
-    PuyoStoryWidget(int num);
+    PuyoStoryWidget(int num, Action *finishedAction = NULL);
     ~PuyoStoryWidget();
     void cycle();
     void draw(SDL_Surface *screen);
@@ -49,11 +49,14 @@ public:
 private:
     int num;
     Styrolyse *currentStory;
+    Action *finishedAction;
+    bool once;
 };
 
 class PuyoStoryScreen : public Screen {
 public:
-    PuyoStoryScreen(int num, Screen &previousScreen);
+    PuyoStoryScreen(int num, Screen &previousScreen, Action *finishedAction = NULL);
+    virtual ~PuyoStoryScreen();
 private:
     PuyoStoryWidget storyWidget;
     PuyoScreenTransitionWidget transitionWidget;

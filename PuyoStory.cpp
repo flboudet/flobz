@@ -81,7 +81,7 @@ StyrolyseClient *client_new()
 };
 
 
-PuyoStoryWidget::PuyoStoryWidget(int num) : CycledComponent(0.04), num(num)
+PuyoStoryWidget::PuyoStoryWidget(int num, Action *finishedAction) : CycledComponent(0.04), num(num), finishedAction(finishedAction), once(false)
 {
     char scriptPath[1024];
     sprintf(scriptPath, "%s/story/story%d.gsl",dataFolder, num);
@@ -103,6 +103,11 @@ void PuyoStoryWidget::cycle()
 {
     styrolyse_update(currentStory);
     requestDraw();
+    if (styrolyse_finished(currentStory) && !once) {
+        once = true;
+        if (finishedAction)
+            finishedAction->action();
+    }
 }
 
 void PuyoStoryWidget::draw(SDL_Surface *screen)
@@ -111,10 +116,14 @@ void PuyoStoryWidget::draw(SDL_Surface *screen)
     SDL_BlitSurface(sstory, NULL, screen, NULL);
 }
 
-PuyoStoryScreen::PuyoStoryScreen(int num, Screen &previousScreen) : Screen(0, 0, 640, 480), storyWidget(num), transitionWidget(previousScreen, NULL)
+PuyoStoryScreen::PuyoStoryScreen(int num, Screen &previousScreen, Action *finishedAction) : Screen(0, 0, 640, 480), storyWidget(num, finishedAction), transitionWidget(previousScreen, NULL)
 {
     add(&storyWidget);
     add(&transitionWidget);
+}
+
+PuyoStoryScreen::~PuyoStoryScreen()
+{
 }
 
 PuyoStory::PuyoStory(PuyoCommander *com, int num) : num(num), commander(com)

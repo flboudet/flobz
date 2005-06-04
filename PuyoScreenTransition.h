@@ -31,7 +31,7 @@
 
 using namespace gameui;
 
-class PuyoScreenTransitionWidget : public Widget, CycledComponent {
+class PuyoScreenTransitionWidget : public Widget, public CycledComponent {
 public:
     PuyoScreenTransitionWidget(Screen &fromScreen, Action *transitionFinishedAction);
     virtual ~PuyoScreenTransitionWidget();

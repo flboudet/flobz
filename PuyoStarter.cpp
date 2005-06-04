@@ -147,6 +147,7 @@ PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &con
     : CycledComponent(0.02), attachedLevelTheme(levelTheme), areaA(areaA), areaB(areaB), controllerA(controllerA), controllerB(controllerB),
       cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3)
 {
+    printf("Constructeur du PuyoGameWidget\n");
     // Affreux, a degager absolument
     if (neutral == NULL)
         neutral = IIM_Load_DisplayFormatAlpha("Neutral.png");
@@ -182,6 +183,7 @@ PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &con
     attachedGameB = areaB.getAttachedGame();
     areaA.setEnemyGame(attachedGameB);
     areaB.setEnemyGame(attachedGameA);
+    printf("Ennemis positionnes! %x, %x\n", attachedGameA, attachedGameB);
     
     setReceiveUpEvents(true);
 }

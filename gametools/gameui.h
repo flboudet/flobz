@@ -60,7 +60,7 @@ namespace gameui {
       
     public:
       Widget(WidgetContainer *parent = NULL);
-      virtual ~Widget() {}
+      virtual ~Widget() { }
 
       virtual bool drawRequested() const { return _drawRequested; }
       virtual void requestDraw(bool fromParent = false);
@@ -69,6 +69,7 @@ namespace gameui {
       virtual IdleComponent *getIdleComponent() { return NULL; }
       virtual void addToGameLoop(GameLoop *loop);
       virtual void removeFromGameLoop();
+      virtual void removeFromGameLoopActive();
 
       virtual void hide();
       virtual void show();
@@ -139,6 +140,7 @@ namespace gameui {
       
       virtual void addToGameLoop(GameLoop *loop);
       virtual void removeFromGameLoop();
+      virtual void removeFromGameLoopActive();
       
     protected:
       Widget *getChild(int i)     const { return childs[i]; }
@@ -249,6 +251,7 @@ namespace gameui {
   class Screen : public DrawableComponent, IdleComponent {
     public:
       Screen(float x, float y, float width, float height, GameLoop *loop = NULL);
+      virtual ~Screen() {}
       void setBackground(IIM_Surface *bg);
       void draw(SDL_Surface *surface);
       virtual void drawAnyway(SDL_Surface *surface);

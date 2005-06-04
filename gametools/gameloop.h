@@ -2,6 +2,9 @@
 #include <SDL.h>
 #include "GameControls.h"
 
+#ifndef _GAMELOOP_H
+#define _GAMELOOP_H
+
 using namespace ios_fc;
 
 class GameComponent {
@@ -111,3 +114,5 @@ class GameLoop : public IdleComponent, DrawableComponent
     Vector<IdleComponent>     idles;
     bool finished;
 };
+
+#endif // _GAMELOOP_H

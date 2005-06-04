@@ -64,7 +64,13 @@ namespace gameui {
     if (idle != NULL)
       idle->remove();
   }
-    
+  
+  void Widget::removeFromGameLoopActive()
+  {
+    IdleComponent *idle = getIdleComponent();
+    if (idle != NULL)
+      GameUIDefaults::GAME_LOOP->remove(idle);
+  }
   
   //
   // WidgetContainer
@@ -103,6 +109,12 @@ namespace gameui {
       getChild(i)->removeFromGameLoop();
   }
     
+  void WidgetContainer::removeFromGameLoopActive()
+  {
+    Widget::removeFromGameLoopActive();
+    for (int i = 0; i < getNumberOfChilds(); ++i)
+      getChild(i)->removeFromGameLoopActive();
+  }
 
   void WidgetContainer::draw(SDL_Surface *surface) 
   {

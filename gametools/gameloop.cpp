@@ -1,10 +1,14 @@
 #include "gameloop.h"
 
+#include "gameui.h"
+
 GameComponent::GameComponent() : _kill(false), _remove(false)
 {}
 
 GameComponent::~GameComponent()
-{}
+{
+    gameui::GameUIDefaults::GAME_LOOP->remove(this);
+}
 
 bool GameComponent::killMe() const
 {
@@ -137,13 +141,18 @@ void GameLoop::remove(GameComponent *gc)
 {
   for (int i = 0; i < components.size(); ++i) {
     if (gc == components[i])
-      components[i] = NULL;
-
+        components.removeAt(i);
+      //components[i] = NULL;
+  }
+  for (int i = 0; i < drawables.size(); ++i) {
     if (gc == drawables[i])
-      drawables[i]  = NULL;
-    
+        drawables.removeAt(i);
+      //drawables[i]  = NULL;
+  }
+  for (int i = 0; i < idles.size(); ++i) {
     if (gc == idles[i])
-      idles[i]      = NULL;
+        idles.removeAt(i);
+//      idles[i]      = NULL;
   }
 }
 
@@ -201,14 +210,18 @@ void GameLoop::idle(double currentTime)
   }
   
   // 2- call idles
-  for (i = 0; i < idles.size(); ++i) {
+  /*for (i = 0; i < idles.size(); ++i) {
+    if (idles[i] && !idles[i]->removeMe())
+      idles[i]->idle(currentTime);
+  }*/
+  for (i = idles.size()-1; i >= 0 ; --i) {
     if (idles[i] && !idles[i]->removeMe())
       idles[i]->idle(currentTime);
   }
 
   // 3- check components to remove/kill
   // 3a- active remove
-  for (i = 0; i<components.size();) {
+  /*for (i = 0; i<components.size();) {
     GameComponent *gc = components[i];
     if (gc == NULL) {
       components.removeAt(i);
@@ -228,7 +241,7 @@ void GameLoop::idle(double currentTime)
       drawables.removeAt(i);
     }
     else i++;
-  }
+  }*/
   
   // 3b- passive Remove
   Vector<GameComponent> componentsCpy = components.dup();
@@ -238,8 +251,12 @@ void GameLoop::idle(double currentTime)
     if (gc->removeMe()) {
       gc->_remove = false;
       components.remove(gc);
-      idles.remove(dynamic_cast<IdleComponent*>(gc));
-      drawables.remove(dynamic_cast<DrawableComponent*>(gc));
+      IdleComponent *asIdle = dynamic_cast<IdleComponent*>(gc);
+      if (asIdle != NULL)
+        idles.remove(asIdle);
+      DrawableComponent *asDrawable = dynamic_cast<DrawableComponent*>(gc);
+      if (asDrawable != NULL)
+        drawables.remove(asDrawable);
       if (gc->killMe())
         delete gc;
     }
