@@ -37,7 +37,7 @@ class PuyoCycled;
 
 class PuyoPauseMenu : public VBox {
 public:
-    PuyoPauseMenu();
+    PuyoPauseMenu(Action *continueAction, Action *abortAction);
 private:
     Text menuTitle;
     Button continueButton;
@@ -80,6 +80,8 @@ public:
     bool isFocusable() { return !paused; }
     void eventOccured(GameControlEvent *event);
     IdleComponent *getIdleComponent() { return this; }
+    void abort() { abortedFlag = true; }
+    bool getAborted() const { return abortedFlag; }
 protected:
     SDL_Painter painter;
 private:
@@ -96,6 +98,25 @@ private:
     bool once;
     Action *gameOverAction;
     bool gameover;
+    bool abortedFlag;
+};
+
+class PuyoGameScreen;
+
+class ContinueAction : public Action {
+public:
+    ContinueAction(PuyoGameScreen &screen) : screen(screen) {}
+    void action();
+private:
+    PuyoGameScreen &screen;
+};
+
+class AbortAction : public Action {
+public:
+    AbortAction(PuyoGameScreen &screen) : screen(screen) {}
+    void action();
+private:
+    PuyoGameScreen &screen;
 };
 
 class PuyoGameScreen : public Screen {
@@ -103,8 +124,11 @@ public:
     PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScreen);
     void onEvent(GameControlEvent *cevent);
     virtual void backPressed();
+    virtual void abort();
 private:
     bool paused;
+    ContinueAction continueAction;
+    AbortAction abortAction;
     PuyoPauseMenu pauseMenu;
     PuyoGameWidget &gameWidget;
     PuyoScreenTransitionWidget transitionWidget;

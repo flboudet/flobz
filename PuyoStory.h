@@ -57,8 +57,10 @@ class PuyoStoryScreen : public Screen {
 public:
     PuyoStoryScreen(int num, Screen &previousScreen, Action *finishedAction = NULL);
     virtual ~PuyoStoryScreen();
+    void onEvent(GameControlEvent *cevent);
 private:
     PuyoStoryWidget storyWidget;
+    Action *finishedAction;
     PuyoScreenTransitionWidget transitionWidget;
 };
 

@@ -113,37 +113,12 @@ public:
         else if (gameScreen == NULL) {
             startGame();
         }
+        else if (! gameWidget->getAborted()) {
+            nextLevel();
+        }
         else {
             endGameSession();
         }
-        /*if (story == NULL) {
-            story = new PuyoStoryScreen(1, *(GameUIDefaults::SCREEN_STACK->top()), this);
-            GameUIDefaults::SCREEN_STACK->push(story);
-        }
-        else {
-            GameUIDefaults::SCREEN_STACK->pop();
-            
-            AnimatedPuyoSetTheme *themeToUse = new AnimatedPuyoSetTheme("", "Classic.fptheme");
-            themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 000.0f);
-            themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 060.0f);
-            themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 120.0f);
-            themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 180.0f);
-            themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 240.0f);
-            themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 300.0f);
-            themeToUse->addNeutralPuyo("stone", "round", "round", "normal", 0.0f);
-            themeToUse->cache();
-            
-            PuyoLevelTheme *levelThemeToUse = new PuyoLevelTheme("", "Classic.fptheme");
-            levelThemeToUse->setLives("heart");
-            levelThemeToUse->setBackground("dark");
-            levelThemeToUse->setGrid("metal");
-            levelThemeToUse->setSpeedMeter("fire");
-            //levelThemeToUse->cache();
-            
-            gameScreen = new PuyoGameScreen(*(new PuyoTwoPlayerGameWidget(*themeToUse, *levelThemeToUse)), *story);
-            delete story;
-            GameUIDefaults::SCREEN_STACK->push(gameScreen);
-        }*/
     }
     
     void initiateLevel()
@@ -161,6 +136,15 @@ public:
         delete story;
         story = NULL;
         GameUIDefaults::SCREEN_STACK->push(gameScreen);
+    }
+    
+    void nextLevel()
+    {
+        PuyoSingleGameLevelData *tempLevelData = new PuyoSingleGameLevelData(++currentLevel);
+        story = new PuyoStoryScreen(tempLevelData->getStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
+        endGameSession();
+        levelData = tempLevelData;
+        GameUIDefaults::SCREEN_STACK->push(story);
     }
     
     void endGameSession()

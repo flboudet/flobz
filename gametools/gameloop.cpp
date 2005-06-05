@@ -203,7 +203,7 @@ void GameLoop::run()
 
 void GameLoop::idle(double currentTime)
 {
-  int i;
+  int i, j;
 
   //Vector<IdleComponent> idlesCpy = idles.dup();
   
@@ -212,7 +212,8 @@ void GameLoop::idle(double currentTime)
   while (SDL_PollEvent (&e)) {
     GameControlEvent controlEvent;
     getControlEvent(e, &controlEvent);
-    for (i = 0; i < idles.size(); ++i) {
+    for (i = 0, j = idles.size(); i < (j < idles.size() ? j : idles.size()); ++i) {
+    //for (i = 0 ; i < idles.size(); ++i) {
       if (idles[i] && !idles[i]->removeMe())
         idles[i]->onEvent(&controlEvent);
     }

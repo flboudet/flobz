@@ -116,7 +116,7 @@ void PuyoStoryWidget::draw(SDL_Surface *screen)
     SDL_BlitSurface(sstory, NULL, screen, NULL);
 }
 
-PuyoStoryScreen::PuyoStoryScreen(int num, Screen &previousScreen, Action *finishedAction) : Screen(0, 0, 640, 480), storyWidget(num, finishedAction), transitionWidget(previousScreen, NULL)
+PuyoStoryScreen::PuyoStoryScreen(int num, Screen &previousScreen, Action *finishedAction) : Screen(0, 0, 640, 480), storyWidget(num, finishedAction), finishedAction(finishedAction), transitionWidget(previousScreen, NULL)
 {
     add(&storyWidget);
     add(&transitionWidget);
@@ -125,6 +125,18 @@ PuyoStoryScreen::PuyoStoryScreen(int num, Screen &previousScreen, Action *finish
 PuyoStoryScreen::~PuyoStoryScreen()
 {
     printf("Destruction de la story!\n");
+}
+
+void PuyoStoryScreen::onEvent(GameControlEvent *cevent)
+{
+    switch (cevent->cursorEvent) {
+    //case GameControlEvent::kStart:
+    case GameControlEvent::kBack:
+        if (finishedAction != NULL)
+            finishedAction->action();
+        break;
+    }
+    Screen::onEvent(cevent);
 }
 
 PuyoStory::PuyoStory(PuyoCommander *com, int num) : num(num), commander(com)

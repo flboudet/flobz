@@ -145,13 +145,13 @@ bool PuyoEventPlayer::keyShouldRepeat(int &key)
 
 PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
     : CycledComponent(0.02), attachedLevelTheme(&levelTheme), areaA(&areaA), areaB(&areaB), controllerA(&controllerA), controllerB(&controllerB),
-      cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3), gameOverAction(gameOverAction)
+      cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3), gameOverAction(gameOverAction), abortedFlag(false)
 {
     initialize();
 }
 
 PuyoGameWidget::PuyoGameWidget()
-    : CycledComponent(0.02), cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3)
+    : CycledComponent(0.02), cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3), abortedFlag(false)
 {
 }
 
@@ -237,7 +237,7 @@ void PuyoGameWidget::cycle()
         requestDraw();
     }
     gameover = (!attachedGameA->isGameRunning() || !attachedGameB->isGameRunning());
-    if (gameover && !once) {
+    if ((gameover || abortedFlag) && !once) {
         once = true;
         if (gameOverAction)
             gameOverAction->action();
@@ -308,14 +308,26 @@ void PuyoGameWidget::eventOccured(GameControlEvent *event)
     }
 }
 
-PuyoPauseMenu::PuyoPauseMenu() : menuTitle("Pause"), continueButton("Continue game", (Action*)NULL), abortButton("Abort game", (Action*)NULL)
+PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction) : menuTitle("Pause"), continueButton("Continue game", continueAction), abortButton("Abort game", abortAction)
 {
     add(&menuTitle);
     add(&continueButton);
     add(&abortButton);
 }
 
-PuyoGameScreen::PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScreen) : Screen(0, 0, 640, 480), paused(false), gameWidget(gameWidget), transitionWidget(previousScreen, NULL)
+void ContinueAction::action()
+{
+    screen.backPressed();
+}
+
+void AbortAction::action()
+{
+    screen.abort();
+}
+
+PuyoGameScreen::PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScreen)
+    : Screen(0, 0, 640, 480), paused(false), continueAction(*this), abortAction(*this),
+      pauseMenu(&continueAction, &abortAction), gameWidget(gameWidget), transitionWidget(previousScreen, NULL)
 {
     add(&gameWidget);
     add(&transitionWidget);
@@ -352,6 +364,11 @@ void PuyoGameScreen::backPressed()
     }
 }
 
+void PuyoGameScreen::abort()
+{
+    gameWidget.abort();
+}
+
 PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
                                                      attachedGameFactory(&attachedRandom),
                                                      areaA(&attachedGameFactory, &attachedPuyoThemeSet,
@@ -377,7 +394,7 @@ class PuyoCycled : public CycledComponent
     }
 };
 
-PuyoPureStarter::PuyoPureStarter(PuyoCommander *commander) : Screen(0,0,640,480), commander(commander)
+PuyoPureStarter::PuyoPureStarter(PuyoCommander *commander) : Screen(0,0,640,480), commander(commander), pauseMenu(NULL, NULL)
 {
     paused = false;
     stopRendering = false;
