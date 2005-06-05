@@ -381,7 +381,7 @@ bool AnimatedPuyoSetTheme::addAnimatedPuyoTheme(const char * face, const char * 
 { 
     if (_numberOfPuyos >= NUMBER_OF_PUYOS)
     {
-        printf("Too many puyos in theme %s... Ignoring puyo.",_name);
+        printf("Too many puyos in theme %s... Ignoring puyo.\n",_name);
         return false;
     }
     
@@ -397,7 +397,7 @@ bool AnimatedPuyoSetTheme::addNeutralPuyo(const char * face, const char * disapp
 { 
     if (_neutral != NULL)
     {
-        printf("Too many neutral puyos in theme %s... Ignoring puyo.",_name);
+        printf("Too many neutral puyos in theme %s... Ignoring puyo.\n",_name);
         return false;
     }
 
@@ -464,7 +464,8 @@ PuyoLevelTheme::~PuyoLevelTheme(void)
     
     free(_path);
     free(_name);
-    
+
+        
     if (_lives != NULL) free(_lives);
     if (_background != NULL) free(_background);
     if (_grid != NULL) free(_grid);
@@ -573,6 +574,9 @@ bool PuyoLevelTheme::cache(void)
     int i;
     char path[PATH_MAX_LEN];
     
+    String fullPath(_path);
+    fullPath += _name;
+
     if (_cached) releaseCached();
     _cached = false;
     
@@ -581,22 +585,22 @@ bool PuyoLevelTheme::cache(void)
     // LIVES
     for (i=0; i<NUMBER_OF_LIVES; i++)
     {
-        snprintf(path, sizeof(path), "%s/%s-lives-%d.png",_path,_lives,i);
+        snprintf(path, sizeof(path), "%s/%s-lives-%d.png",(const char*)fullPath,_lives,i);
         OK |= loadPictureAt(path,&(_levelLives[i]),NULL);
     }
     
     // BACKGROUND
-    snprintf(path, sizeof(path), "%s/%s-background.png",_path,_background);
+    snprintf(path, sizeof(path), "%s/%s-background.jpg",(const char *)fullPath,_background);
     OK |= loadPictureAt(path,&_levelBackground,NULL);
     
     // GRID
-    snprintf(path, sizeof(path), "%s/%s-background-grid.png",_path,_grid);
+    snprintf(path, sizeof(path), "%s/%s-background-grid.png",(const char*)fullPath,_grid);
     OK |= loadPictureAt(path,&_levelGrid,NULL);
     
     // SPEED METER
-    snprintf(path, sizeof(path), "%s/%s-background-meter-below.png",_path,_speed_meter);
+    snprintf(path, sizeof(path), "%s/%s-background-meter-below.png",(const char*)fullPath,_speed_meter);
     OK |= loadPictureAt(path,&(_levelMeter[0]),NULL);
-    snprintf(path, sizeof(path), "%s/%s-background-meter-above.png",_path,_speed_meter);
+    snprintf(path, sizeof(path), "%s/%s-background-meter-above.png",(const char*)fullPath,_speed_meter);
     OK |= loadPictureAt(path,&(_levelMeter[1]),NULL);
     
     _cached = OK;

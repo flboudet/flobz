@@ -183,7 +183,7 @@ void PuyoGameWidget::initialize()
         NeutralPopAnimation::initResources();
         firstTime = false;
     }
-    background = /*attachedLevelTheme.getBackground();*/IIM_Load_DisplayFormat("Background.jpg");
+    background = attachedLevelTheme->getBackground();/*IIM_Load_DisplayFormat("Background.jpg");*/
     grid       = IIM_Load_DisplayFormatAlpha("grid.png");
     liveImage[0] = IIM_Load_DisplayFormatAlpha("0live.png");
     liveImage[1] = IIM_Load_DisplayFormatAlpha("1live.png");

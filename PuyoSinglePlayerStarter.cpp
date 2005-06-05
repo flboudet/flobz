@@ -65,11 +65,10 @@ PuyoSingleGameLevelData::PuyoSingleGameLevelData(int gameLevel, int difficulty) 
 {
     themeToUse = new AnimatedPuyoSetTheme("", "Classic.fptheme");
     themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 000.0f);
-    themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 060.0f);
-    themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 120.0f);
-    themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 180.0f);
-    themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 240.0f);
-    //themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 300.0f);
+    themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 072.0f);
+    themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 144.0f);
+    themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 216.0f);
+    themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 288.0f);
     themeToUse->addNeutralPuyo("stone", "round", "round", "normal", 0.0f);
     //themeToUse->cache();
     
