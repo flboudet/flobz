@@ -153,6 +153,7 @@ namespace gameui {
       Vector<Widget> childs;
       bool bubbleSortZ_iteration(int itNumber);
       GameLoop *loop;
+      bool addedToGameLoop;
   };
 
 

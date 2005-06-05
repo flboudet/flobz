@@ -113,6 +113,9 @@ public:
         else if (gameScreen == NULL) {
             startGame();
         }
+        else {
+            endGameSession();
+        }
         /*if (story == NULL) {
             story = new PuyoStoryScreen(1, *(GameUIDefaults::SCREEN_STACK->top()), this);
             GameUIDefaults::SCREEN_STACK->push(story);
@@ -152,11 +155,24 @@ public:
     
     void startGame()
     {
-        gameWidget = new PuyoTwoPlayerGameWidget(levelData->getPuyoTheme(), levelData->getLevelTheme());
+        gameWidget = new PuyoTwoPlayerGameWidget(levelData->getPuyoTheme(), levelData->getLevelTheme(), this);
         gameScreen = new PuyoGameScreen(*gameWidget, *story);
         GameUIDefaults::SCREEN_STACK->pop();
         delete story;
+        story = NULL;
         GameUIDefaults::SCREEN_STACK->push(gameScreen);
+    }
+    
+    void endGameSession()
+    {
+        GameUIDefaults::SCREEN_STACK->pop();
+        delete gameWidget;
+        delete gameScreen;
+        delete levelData;
+        
+        gameScreen = NULL;
+        gameWidget = NULL;
+        levelData = NULL;
     }
     
 private:

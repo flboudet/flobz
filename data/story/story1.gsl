@@ -193,6 +193,6 @@
     @movingDisplay.x = @kaoriMax
   (@dogDisplay.x > @dogMax)?
     @dogDisplay.x = @dogMax
-  //(@cycle = 100)? @finished = 1
+  (@cycle = 100)? @finished = 1
 
-  (@cycle = @balloon6off + 100)? @finished = 1
+  //(@cycle = @balloon6off + 100)? @finished = 1

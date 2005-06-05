@@ -124,6 +124,7 @@ PuyoStoryScreen::PuyoStoryScreen(int num, Screen &previousScreen, Action *finish
 
 PuyoStoryScreen::~PuyoStoryScreen()
 {
+    printf("Destruction de la story!\n");
 }
 
 PuyoStory::PuyoStory(PuyoCommander *com, int num) : num(num), commander(com)

@@ -68,10 +68,10 @@ private:
 
 class PuyoGameWidget : public Widget, CycledComponent {
 public:
-    PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme);
+    PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction = NULL);
     PuyoGameWidget();
     virtual ~PuyoGameWidget();
-    void initialize(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme);
+    void initialize(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction = NULL);
     void initialize();
     void cycle();
     void draw(SDL_Surface *screen);
@@ -93,6 +93,9 @@ private:
     bool paused;
     bool displayLives;
     int lives;
+    bool once;
+    Action *gameOverAction;
+    bool gameover;
 };
 
 class PuyoGameScreen : public Screen {
@@ -109,7 +112,7 @@ private:
 
 class PuyoTwoPlayerGameWidget : public PuyoGameWidget {
 public:
-    PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme);
+    PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction = NULL);
 private:
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;

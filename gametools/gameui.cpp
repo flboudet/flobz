@@ -89,7 +89,7 @@ namespace gameui {
   // WidgetContainer
   // 
 
-  WidgetContainer::WidgetContainer(GameLoop *loop) : loop(loop) {
+  WidgetContainer::WidgetContainer(GameLoop *loop) : loop(loop), addedToGameLoop(false) {
     if (loop == NULL) this->loop = GameUIDefaults::GAME_LOOP;
   }
 
@@ -97,7 +97,8 @@ namespace gameui {
   { 
     childs.add(child);
     child->setParent(this);
-    child->addToGameLoop(loop);
+    if (addedToGameLoop)
+        child->addToGameLoop(loop);
     arrangeWidgets();
   }
 
@@ -110,6 +111,7 @@ namespace gameui {
 
   void WidgetContainer::addToGameLoop(GameLoop *loop)
   {
+    addedToGameLoop = true;
     Widget::addToGameLoop(loop);
     for (int i = 0; i < getNumberOfChilds(); ++i)
       getChild(i)->addToGameLoop(loop);
@@ -117,6 +119,7 @@ namespace gameui {
   
   void WidgetContainer::removeFromGameLoop()
   {
+    addedToGameLoop = false;
     Widget::removeFromGameLoop();
     for (int i = 0; i < getNumberOfChilds(); ++i)
       getChild(i)->removeFromGameLoop();
@@ -124,6 +127,7 @@ namespace gameui {
     
   void WidgetContainer::removeFromGameLoopActive()
   {
+    addedToGameLoop = false;
     Widget::removeFromGameLoopActive();
     for (int i = 0; i < getNumberOfChilds(); ++i)
       getChild(i)->removeFromGameLoopActive();

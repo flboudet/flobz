@@ -143,9 +143,9 @@ bool PuyoEventPlayer::keyShouldRepeat(int &key)
     return ((key - fpKey_Delay) > 0) && ((key - fpKey_Delay) % fpKey_Repeat == 0);
 }
 
-PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme)
+PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
     : CycledComponent(0.02), attachedLevelTheme(&levelTheme), areaA(&areaA), areaB(&areaB), controllerA(&controllerA), controllerB(&controllerB),
-      cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3)
+      cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3), gameOverAction(gameOverAction)
 {
     initialize();
 }
@@ -155,19 +155,21 @@ PuyoGameWidget::PuyoGameWidget()
 {
 }
 
-void PuyoGameWidget::initialize(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme)
+void PuyoGameWidget::initialize(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
 {
     this->areaA = &areaA;
     this->areaB = &areaB;
     this->controllerA = &controllerA;
     this->controllerB = &controllerB;
     this->attachedLevelTheme = &levelTheme;
+    this->gameOverAction = gameOverAction;
     initialize();
 }
 
 void PuyoGameWidget::initialize()
 {
-    printf("Constructeur du PuyoGameWidget\n");
+    once = false;
+    gameover = false;
     // Affreux, a degager absolument
     if (neutral == NULL)
         neutral = IIM_Load_DisplayFormatAlpha("Neutral.png");
@@ -233,6 +235,12 @@ void PuyoGameWidget::cycle()
             areaB->cycleGame();
         }
         requestDraw();
+    }
+    gameover = (!attachedGameA->isGameRunning() || !attachedGameB->isGameRunning());
+    if (gameover && !once) {
+        once = true;
+        if (gameOverAction)
+            gameOverAction->action();
     }
 }
 
@@ -344,7 +352,7 @@ void PuyoGameScreen::backPressed()
     }
 }
 
-PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme) : attachedPuyoThemeSet(puyoThemeSet),
+PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
                                                      attachedGameFactory(&attachedRandom),
                                                      areaA(&attachedGameFactory, &attachedPuyoThemeSet,
                                                      1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
@@ -355,7 +363,7 @@ PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoTheme
                                                      controllerB(areaB, GameControlEvent::kPlayer2Down, GameControlEvent::kPlayer2Left, GameControlEvent::kPlayer2Right,
                                                      GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight)
 {
-    initialize(areaA, areaB, controllerA, controllerB, levelTheme);
+    initialize(areaA, areaB, controllerA, controllerB, levelTheme, gameOverAction);
 }
 
 class PuyoCycled : public CycledComponent
