@@ -145,9 +145,9 @@ void MainRealMenu::build() {
  */
 void SinglePlayerGameAction::action()
 {
-  PuyoStarter *starter = new PuyoSinglePlayerStarter(theCommander, 5, FLOBO, 0);
+  /*PuyoStarter *starter = new PuyoSinglePlayerStarter(theCommander, 5, FLOBO, 0);
   starter->run(0,0,0,0,0);
-  GameUIDefaults::SCREEN_STACK->push(starter);
+  GameUIDefaults::SCREEN_STACK->push(starter);*/
 }
 
 /**

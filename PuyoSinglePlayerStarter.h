@@ -27,9 +27,64 @@
 
 #include "PuyoStarter.h"
 
-class PuyoSinglePlayerStarter : public PuyoStarter {
+class PuyoSinglePlayerGameWidget : public PuyoGameWidget {
 public:
-    PuyoSinglePlayerStarter(PuyoCommander *commander, int aiLevel, IA_Type aiType, int theme);
+    PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, Action *gameOverAction = NULL);
+private:
+    AnimatedPuyoSetTheme &attachedPuyoThemeSet;
+    PuyoRandomSystem attachedRandom;
+    PuyoLocalGameFactory attachedGameFactory;
+    PuyoView areaA, areaB;
+    PuyoEventPlayer playercontroller;
+    PuyoIA opponentcontroller;
+};
+
+
+class PuyoSingleGameLevelData {
+public:
+    PuyoSingleGameLevelData(int gameLevel, int difficulty);
+    ~PuyoSingleGameLevelData();    
+    String getStory() const;
+    AnimatedPuyoSetTheme &getPuyoTheme() const;
+    PuyoLevelTheme &getLevelTheme() const;
+    IA_Type getIAType() const;
+    int getIALevel() const;
+    
+private:
+    int gameLevel, difficulty;
+    AnimatedPuyoSetTheme *themeToUse;
+    PuyoLevelTheme *levelThemeToUse;
+    struct SelIA {
+        IA_Type type;
+        int level;
+    };
+    struct StaticLevelDatas {
+        char *storyName;
+        SelIA easySetting, mediumSetting, hardSetting;
+    };
+    static const struct StaticLevelDatas levelDatas[];
+};
+
+
+class SinglePlayerStarterAction : public Action {
+public:
+    SinglePlayerStarterAction(int difficulty);
+    void action();
+    
+private:
+    void initiateLevel();
+    
+    void startGame();
+    
+    void nextLevel();
+    
+    void endGameSession();
+    
+    int currentLevel, difficulty;
+    PuyoSingleGameLevelData *levelData;
+    PuyoStoryScreen *story;
+    PuyoGameScreen *gameScreen;
+    PuyoGameWidget *gameWidget;
 };
 
 #endif // _PUYOSINGLEPLAYERSTARTER
