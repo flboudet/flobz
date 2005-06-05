@@ -98,6 +98,8 @@ namespace gameui {
       
       bool receiveUpEvents() const { return receiveUp; }
       void setReceiveUpEvents(bool receiveUp) { this->receiveUp = receiveUp; }
+      virtual void checkFocus() {}
+
     protected:
       // To be implemented on each widgets
       virtual void draw(SDL_Surface *screen) { };
@@ -169,6 +171,7 @@ namespace gameui {
       void lostFocus();
       void setFocusable(bool foc);
       void add (Widget *child);
+      void checkFocus();
 
     protected:
       virtual float getSortingAxe(const Vec3 &v3) const = 0;
@@ -268,6 +271,7 @@ namespace gameui {
       virtual void removeFromGameLoop() { rootContainer.removeFromGameLoop(); }
 
       GameLoop *getGameLoop() { return rootContainer.getGameLoop(); }
+      void giveFocus();
     private:
       ZBox rootContainer;
       IIM_Surface *bg;

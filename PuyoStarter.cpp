@@ -206,6 +206,7 @@ void PuyoGameWidget::initialize()
     printf("Ennemis positionnes! %x, %x\n", attachedGameA, attachedGameB);
     
     setReceiveUpEvents(true);
+    setFocusable(true);
 }
 
 PuyoGameWidget::~PuyoGameWidget()

@@ -30,6 +30,7 @@ namespace gameui {
       idle->setPause(false);
     }
     requestDraw();
+    checkFocus();
   }
 
   void Widget::eventOccured(GameControlEvent *event)
@@ -211,6 +212,7 @@ namespace gameui {
   {
     if (getNumberOfChilds() == 0) return;
     requestDraw();
+    checkFocus();
     switch (policy)
     {
       case USE_MAX_SIZE:
@@ -257,6 +259,7 @@ namespace gameui {
       activeWidget = getNumberOfChilds() - 1;
       setFocusable(true);
     }
+    checkFocus();
   }
   
   void Box::setFocusable(bool foc)
@@ -269,6 +272,7 @@ namespace gameui {
                 return;
             }
         }
+        checkFocus();
     }
   }
 
@@ -346,10 +350,24 @@ namespace gameui {
   void Box::giveFocus()
   {
     WidgetContainer::giveFocus();
-    if (activeWidget >= 0) {
+    if ((activeWidget >= 0) && (getChild(activeWidget)->isFocusable())) {
       Widget *child = getChild(activeWidget);
       child->giveFocus();
     }
+    else {
+      checkFocus();
+    }
+  }
+
+  void Box::checkFocus()
+  {
+    if (!haveFocus()) return;
+    
+    GameControlEvent ev;
+    ev.cursorEvent = GameControlEvent::kCursorNone;
+    ev.gameEvent   = GameControlEvent::kGameNone;
+    ev.isUp        = false;
+    eventOccured(&ev);
   }
 
   void Box::lostFocus()
@@ -534,6 +552,7 @@ namespace gameui {
       rect.h = (Uint16)rootContainer.getSize().y;
       SDL_BlitSurface(bg->surf, NULL, surface, &rect);
     }*/
+    //rootContainer.checkFocus();
     rootContainer.doDraw(surface);
   }
   
@@ -549,6 +568,11 @@ namespace gameui {
     rootContainer.eventOccured(event);
     rootContainer.giveFocus();
     requestDraw();
+  }
+
+  void Screen::giveFocus()
+  {
+    rootContainer.giveFocus();
   }
 
   //
@@ -816,6 +840,7 @@ namespace gameui {
       stack.top()->removeFromGameLoop();
     }
     screen->show();
+    screen->giveFocus();
     screen->addToGameLoop(screen->getGameLoop());
     stack.push(screen);
     loop->add(screen);
