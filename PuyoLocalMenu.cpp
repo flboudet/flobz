@@ -69,7 +69,7 @@ void NewSinglePlayerGameAction::action()
 
 class PuyoSingleGameLevelData {
 public:
-    PuyoSingleGameLevelData(int gameLevel)
+    PuyoSingleGameLevelData(int gameLevel) : gameLevel(gameLevel)
     {
         themeToUse = new AnimatedPuyoSetTheme("", "Classic.fptheme");
         themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 000.0f);
@@ -77,8 +77,9 @@ public:
         themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 120.0f);
         themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 180.0f);
         themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 240.0f);
-        themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 300.0f);
+        //themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 300.0f);
         themeToUse->addNeutralPuyo("stone", "round", "round", "normal", 0.0f);
+        //themeToUse->cache();
         
         levelThemeToUse = new PuyoLevelTheme("", "Classic.fptheme");
         levelThemeToUse->setLives("heart");
@@ -93,13 +94,25 @@ public:
         delete levelThemeToUse;
     }
     
-    int getStory() const { return 1; }
+    String getStory() const { return String(levelDatas[gameLevel].storyName); }
     AnimatedPuyoSetTheme &getPuyoTheme() const { return *themeToUse; }
     PuyoLevelTheme &getLevelTheme() const { return *levelThemeToUse; }
     
 private:
+    int gameLevel;
     AnimatedPuyoSetTheme *themeToUse;
     PuyoLevelTheme *levelThemeToUse;
+    struct StaticLevelDatas {
+        char *storyName;
+    };
+    static const struct StaticLevelDatas levelDatas[];
+};
+
+const struct PuyoSingleGameLevelData::StaticLevelDatas PuyoSingleGameLevelData::levelDatas[] = {
+// Level 0
+{ "story1.gsl" },
+// Level 1
+{ "story2.gsl" }
 };
 
 class ExperimentalPlayerGameAction : public Action {
@@ -150,6 +163,7 @@ public:
     void endGameSession()
     {
         GameUIDefaults::SCREEN_STACK->pop();
+        ((PuyoRealMainScreen *)(GameUIDefaults::SCREEN_STACK->top()))->transitionFromScreen(*gameScreen);
         delete gameWidget;
         delete gameScreen;
         delete levelData;

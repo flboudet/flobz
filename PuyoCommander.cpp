@@ -68,7 +68,7 @@ void PuyoMainScreen::build()
     menu.setSize(Vec3(menuBG->w, menuBG->h, 0));
 }
 
-PuyoRealMainScreen::PuyoRealMainScreen(PuyoStoryWidget *story) : story(story)
+PuyoRealMainScreen::PuyoRealMainScreen(PuyoStoryWidget *story) : story(story), transition(NULL)
 {
     if (story != NULL)
         add(story);
@@ -82,6 +82,13 @@ PuyoRealMainScreen::PuyoRealMainScreen(PuyoStoryWidget *story) : story(story)
     container.setBackground(menuBG);
 }
 
+PuyoRealMainScreen::~PuyoRealMainScreen()
+{
+    if (transition != NULL) {
+        delete(transition);
+    }
+}
+
 void PuyoRealMainScreen::pushMenu(PuyoMainScreenMenu *menu)
 {
     menuStack.push(container.getContentWidget());
@@ -92,6 +99,22 @@ void PuyoRealMainScreen::popMenu()
 {
     container.transitionToContent(menuStack.top());
     menuStack.pop();
+}
+
+void PuyoRealMainScreen::transitionFromScreen(Screen &fromScreen)
+{
+    if (transition != NULL) {
+        remove(transition);
+        delete(transition);
+    }
+    transition = new PuyoScreenTransitionWidget(fromScreen, NULL);
+    add(transition);
+    Vec3 menuPos = container.getPosition();
+    menuPos.x = MENU_X;
+    menuPos.y = MENU_Y;
+
+    container.setPosition(menuPos);
+    container.setSize(Vec3(menuBG->w, menuBG->h, 0));
 }
 
 class MainRealMenu : public PuyoMainScreenMenu {

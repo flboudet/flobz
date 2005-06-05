@@ -38,13 +38,16 @@ class PuyoMainScreenMenu;
 class PuyoRealMainScreen : public PuyoScreen {
   public:
     PuyoRealMainScreen(PuyoStoryWidget *story = NULL);
+    ~PuyoRealMainScreen();
     void pushMenu(PuyoMainScreenMenu *menu);
     void popMenu();
     void build() {}
+    void transitionFromScreen(Screen &fromScreen);
   protected:
     SliderContainer container;
     PuyoStoryWidget *story;
     Stack<Widget*> menuStack;
+    PuyoScreenTransitionWidget *transition;
 };
 
 class PuyoMainScreenMenu : public VBox {

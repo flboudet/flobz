@@ -81,7 +81,7 @@ StyrolyseClient *client_new()
 };
 
 
-PuyoStoryWidget::PuyoStoryWidget(int num, Action *finishedAction) : CycledComponent(0.04), num(num), finishedAction(finishedAction), once(false)
+PuyoStoryWidget::PuyoStoryWidget(int num, Action *finishedAction) : CycledComponent(0.04), finishedAction(finishedAction), once(false)
 {
     char scriptPath[1024];
     sprintf(scriptPath, "%s/story/story%d.gsl",dataFolder, num);
@@ -91,6 +91,22 @@ PuyoStoryWidget::PuyoStoryWidget(int num, Action *finishedAction) : CycledCompon
     }
     else fclose(test);
     currentStory = styrolyse_new(scriptPath, client_new());
+    sstory = createStorySurface();
+}
+
+PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction) : CycledComponent(0.04), finishedAction(finishedAction), once(false)
+{
+    char scriptPath[1024];
+    String fullPath(dataFolder);
+    fullPath += String("/story/") + screenName;
+    FILE *test = fopen((const char *)fullPath, "r");
+    if (test == NULL) {
+        printf("%s not found!!!\n", (const char *)fullPath);
+        fullPath = dataFolder;
+        fullPath += "/story/storyz.gsl";
+    }
+    else fclose(test);
+    currentStory = styrolyse_new((const char *)fullPath, client_new());
     sstory = createStorySurface();
 }
 
@@ -117,6 +133,12 @@ void PuyoStoryWidget::draw(SDL_Surface *screen)
 }
 
 PuyoStoryScreen::PuyoStoryScreen(int num, Screen &previousScreen, Action *finishedAction) : Screen(0, 0, 640, 480), storyWidget(num, finishedAction), finishedAction(finishedAction), transitionWidget(previousScreen, NULL)
+{
+    add(&storyWidget);
+    add(&transitionWidget);
+}
+
+PuyoStoryScreen::PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction) : Screen(0, 0, 640, 480), storyWidget(screenName, finishedAction), finishedAction(finishedAction), transitionWidget(previousScreen, NULL)
 {
     add(&storyWidget);
     add(&transitionWidget);

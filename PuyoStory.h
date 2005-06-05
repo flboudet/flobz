@@ -42,12 +42,12 @@ class PuyoCommander;
 class PuyoStoryWidget : public Widget, public CycledComponent {
 public:
     PuyoStoryWidget(int num, Action *finishedAction = NULL);
+    PuyoStoryWidget(String screenName, Action *finishedAction = NULL);
     ~PuyoStoryWidget();
     void cycle();
     void draw(SDL_Surface *screen);
     IdleComponent *getIdleComponent() { return this; }
 private:
-    int num;
     Styrolyse *currentStory;
     Action *finishedAction;
     bool once;
@@ -56,6 +56,7 @@ private:
 class PuyoStoryScreen : public Screen {
 public:
     PuyoStoryScreen(int num, Screen &previousScreen, Action *finishedAction = NULL);
+    PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction = NULL);
     virtual ~PuyoStoryScreen();
     void onEvent(GameControlEvent *cevent);
 private:
