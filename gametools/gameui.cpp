@@ -259,7 +259,6 @@ namespace gameui {
       activeWidget = getNumberOfChilds() - 1;
       setFocusable(true);
     }
-    checkFocus();
   }
   
   void Box::setFocusable(bool foc)
@@ -334,6 +333,16 @@ namespace gameui {
     giveFocusToActiveWidget();
   }
 
+  void Box::focus(Widget *widget)
+  {
+    for (int i = 0; i < getNumberOfChilds(); ++i) {
+      if (getChild(i) == widget) {
+        setActiveWidget(i);
+        return;
+      }
+    }
+  }
+
   bool Box::giveFocusToActiveWidget()
   {
     GameControlEvent ev;
@@ -368,6 +377,11 @@ namespace gameui {
     ev.gameEvent   = GameControlEvent::kGameNone;
     ev.isUp        = false;
     eventOccured(&ev);
+
+    if (activeWidget<0) return;
+    if (activeWidget>=getNumberOfChilds()) return;
+
+    giveFocusToActiveWidget();
   }
 
   void Box::lostFocus()
@@ -422,16 +436,20 @@ namespace gameui {
   //
   bool ZBox::isPrevEvent(GameControlEvent *event) const
   {
-    return event->cursorEvent == GameControlEvent::kUp;
+    return false;
+//    return event->cursorEvent == GameControlEvent::kUp;
   }
   bool ZBox::isNextEvent(GameControlEvent *event) const
   {
-    return event->cursorEvent == GameControlEvent::kDown;
+    return false;
+//    return event->cursorEvent == GameControlEvent::kDown;
   }
   bool ZBox::isOtherDirection(GameControlEvent *event) const
   {
     return (event->cursorEvent == GameControlEvent::kRight)
-      ||   (event->cursorEvent == GameControlEvent::kLeft);
+      ||   (event->cursorEvent == GameControlEvent::kLeft)
+      ||   (event->cursorEvent == GameControlEvent::kUp)
+      ||   (event->cursorEvent == GameControlEvent::kDown);
   }
   void ZBox::widgetMustRedraw(Widget *wid)
   {
@@ -526,7 +544,7 @@ namespace gameui {
   }
 
   //
-  // ScreenVBox
+  // Screen
   //
 
   Screen::Screen(float x, float y, float width, float height, GameLoop *loop) : rootContainer(loop), bg(NULL)
@@ -573,6 +591,11 @@ namespace gameui {
   void Screen::giveFocus()
   {
     rootContainer.giveFocus();
+  }
+
+  void Screen::focus(Widget *w)
+  {
+    rootContainer.focus(w);
   }
 
   //

@@ -172,6 +172,7 @@ namespace gameui {
       void setFocusable(bool foc);
       void add (Widget *child);
       void checkFocus();
+      void focus(Widget *widget);
 
     protected:
       virtual float getSortingAxe(const Vec3 &v3) const = 0;
@@ -272,6 +273,8 @@ namespace gameui {
 
       GameLoop *getGameLoop() { return rootContainer.getGameLoop(); }
       void giveFocus();
+      void focus(Widget *widget);
+      
     private:
       ZBox rootContainer;
       IIM_Surface *bg;

@@ -330,6 +330,7 @@ void PuyoGameScreen::backPressed()
     printf("Back pressed!\n");
     if (!paused) {
         this->add(&pauseMenu);
+        this->focus(&pauseMenu);
         paused = true;
         gameWidget.pause();
         //stopRender();
@@ -337,6 +338,7 @@ void PuyoGameScreen::backPressed()
     else {
         paused = false;
         this->remove(&pauseMenu);
+        this->focus(&gameWidget);
         gameWidget.resume();
         //restartRender();
     }
