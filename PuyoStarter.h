@@ -134,6 +134,18 @@ private:
     PuyoScreenTransitionWidget transitionWidget;
 };
 
+class PuyoSinglePlayerGameWidget : public PuyoGameWidget {
+public:
+    PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, Action *gameOverAction = NULL);
+private:
+    AnimatedPuyoSetTheme &attachedPuyoThemeSet;
+    PuyoRandomSystem attachedRandom;
+    PuyoLocalGameFactory attachedGameFactory;
+    PuyoView areaA, areaB;
+    PuyoEventPlayer playercontroller;
+    PuyoIA opponentcontroller;
+};
+
 class PuyoTwoPlayerGameWidget : public PuyoGameWidget {
 public:
     PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction = NULL);

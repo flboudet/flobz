@@ -369,6 +369,20 @@ void PuyoGameScreen::abort()
     gameWidget.abort();
 }
 
+PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
+                                                     attachedGameFactory(&attachedRandom),
+                                                     areaA(&attachedGameFactory, &attachedPuyoThemeSet,
+                                                     1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
+                                                     areaB(&attachedGameFactory, &attachedPuyoThemeSet,
+                                                     1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
+                                                     playercontroller(areaA, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left, GameControlEvent::kPlayer1Right,
+                                                     GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
+                                                     opponentcontroller(type, level, areaB)
+{
+    initialize(areaA, areaB, playercontroller, opponentcontroller, levelTheme, gameOverAction);
+}
+
+
 PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
                                                      attachedGameFactory(&attachedRandom),
                                                      areaA(&attachedGameFactory, &attachedPuyoThemeSet,

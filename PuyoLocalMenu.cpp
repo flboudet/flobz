@@ -69,7 +69,7 @@ void NewSinglePlayerGameAction::action()
 
 class PuyoSingleGameLevelData {
 public:
-    PuyoSingleGameLevelData(int gameLevel) : gameLevel(gameLevel)
+    PuyoSingleGameLevelData(int gameLevel, int difficulty) : gameLevel(gameLevel), difficulty(difficulty)
     {
         themeToUse = new AnimatedPuyoSetTheme("", "Classic.fptheme");
         themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 000.0f);
@@ -97,27 +97,69 @@ public:
     String getStory() const { return String(levelDatas[gameLevel].storyName); }
     AnimatedPuyoSetTheme &getPuyoTheme() const { return *themeToUse; }
     PuyoLevelTheme &getLevelTheme() const { return *levelThemeToUse; }
+    IA_Type getIAType() const
+    {
+        switch (difficulty) {
+        case 0:
+            return levelDatas[gameLevel].easySetting.type;
+        case 1:
+            return levelDatas[gameLevel].mediumSetting.type;
+        default:
+            return levelDatas[gameLevel].hardSetting.type;
+        }
+    }
+    int getIALevel() const
+    {
+        switch (difficulty) {
+        case 0:
+            return levelDatas[gameLevel].easySetting.level;
+        case 1:
+            return levelDatas[gameLevel].mediumSetting.level;
+        default:
+            return levelDatas[gameLevel].hardSetting.level;
+        }
+    }
     
 private:
-    int gameLevel;
+    int gameLevel, difficulty;
     AnimatedPuyoSetTheme *themeToUse;
     PuyoLevelTheme *levelThemeToUse;
+    struct SelIA {
+        IA_Type type;
+        int level;
+    };
     struct StaticLevelDatas {
         char *storyName;
+        SelIA easySetting, mediumSetting, hardSetting;
     };
     static const struct StaticLevelDatas levelDatas[];
 };
 
+
 const struct PuyoSingleGameLevelData::StaticLevelDatas PuyoSingleGameLevelData::levelDatas[] = {
-// Level 0
-{ "story1.gsl" },
 // Level 1
-{ "story2.gsl" }
+{ "story1.gsl", {RANDOM, 350}, {FLOBO , 190}, {TANIA , 130} },
+// Level 2
+{ "story2.gsl", {FLOBO , 350}, {JEKO  , 180}, {JEKO  , 100} },
+// Level 3
+{ "story3.gsl", {FLOBO , 250}, {TANIA , 160}, {GYOM  ,  90} },
+// Level 4
+{ "story4.gsl", {FLOBO , 180}, {FLOBO ,  90}, {JEKO  ,  80} },
+// Level 5
+{ "story5.gsl", {FLOBO ,  90}, {GYOM  , 210}, {TANIA ,  60} },
+// Level 6
+{ "story6.gsl", {JEKO  , 350}, {TANIA ,  90}, {GYOM  ,  60} },
+// Level 7
+{ "story7.gsl", {TANIA , 320}, {JEKO  ,  80}, {GYOM  ,  40} },
+// Level 8
+{ "story8.gsl", {FLOBO ,  62}, {GYOM  ,  90}, {GYOM  ,  30} },
+// Level 9
+{ "story9.gsl", {RANDOM,   0}, {RANDOM,   0}, {RANDOM,   0} }
 };
 
 class ExperimentalPlayerGameAction : public Action {
 public:
-    ExperimentalPlayerGameAction() : currentLevel(0), levelData(NULL), story(NULL), gameScreen(NULL) {}
+    ExperimentalPlayerGameAction(int difficulty) : currentLevel(0), difficulty(difficulty), levelData(NULL), story(NULL), gameScreen(NULL) {}
     void action()
     {
         if (levelData == NULL) {
@@ -136,14 +178,14 @@ public:
     
     void initiateLevel()
     {
-        levelData = new PuyoSingleGameLevelData(currentLevel);
+        levelData = new PuyoSingleGameLevelData(currentLevel, difficulty);
         story = new PuyoStoryScreen(levelData->getStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
         GameUIDefaults::SCREEN_STACK->push(story);
     }
     
     void startGame()
     {
-        gameWidget = new PuyoTwoPlayerGameWidget(levelData->getPuyoTheme(), levelData->getLevelTheme(), this);
+        gameWidget = new PuyoSinglePlayerGameWidget(levelData->getPuyoTheme(), levelData->getLevelTheme(), levelData->getIAType(), levelData->getIALevel(), this);
         gameScreen = new PuyoGameScreen(*gameWidget, *story);
         GameUIDefaults::SCREEN_STACK->pop();
         delete story;
@@ -153,7 +195,7 @@ public:
     
     void nextLevel()
     {
-        PuyoSingleGameLevelData *tempLevelData = new PuyoSingleGameLevelData(++currentLevel);
+        PuyoSingleGameLevelData *tempLevelData = new PuyoSingleGameLevelData(++currentLevel, difficulty);
         story = new PuyoStoryScreen(tempLevelData->getStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
         endGameSession();
         levelData = tempLevelData;
@@ -174,19 +216,19 @@ public:
     }
     
 private:
-    int currentLevel;
+    int currentLevel, difficulty;
     PuyoSingleGameLevelData *levelData;
     PuyoStoryScreen *story;
     PuyoGameScreen *gameScreen;
-    PuyoTwoPlayerGameWidget *gameWidget;
+    PuyoGameWidget *gameWidget;
 };
 
 void LocalGameMenu::build() {
     add(new EditFieldWithLabel("Player Name:", "flobo"));
     add(new Text("Choose Game Level"));
-    add(new Button("Easy", &easyAction));
-    add(new Button("Medium", new ExperimentalPlayerGameAction()));
-    add(new Button("Hard", new SinglePlayerGameActionz(HARD)));
+    add(new Button("Easy", new ExperimentalPlayerGameAction(0)));
+    add(new Button("Medium", new ExperimentalPlayerGameAction(1)));
+    add(new Button("Hard", new ExperimentalPlayerGameAction(2)));
     add(new Button("Cancel", new PuyoPopMenuAction(mainScreen)));
 }
 
