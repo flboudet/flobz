@@ -196,7 +196,7 @@ void PuyoCommander::initMenus()
 
 PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
 {
-  SDL_Delay(500);
+  //SDL_Delay(500);
   loop = GameUIDefaults::GAME_LOOP;
   mbox = NULL;
   theCommander = this;

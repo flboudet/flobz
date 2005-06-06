@@ -51,7 +51,7 @@ typedef enum {
 
 
 
-
+// Class containing the theme for a puyo
 class AnimatedPuyoTheme {
 
 public:
@@ -92,6 +92,8 @@ private:
 };
 
 
+// Class containing the theme for a puyo set
+
 class AnimatedPuyoSetTheme {
   
 public:
@@ -119,6 +121,8 @@ private:
     unsigned int _numberOfPuyos;
 };
 
+
+// Class containing the theme for a level
 
 class PuyoLevelTheme {
     
@@ -160,6 +164,40 @@ private:
     
 };
 
+
+// Class containing the theme manager
+// Should be instantiated only once (see below)
+
+class AnimatedPuyoThemeManager {
+public:
+    AnimatedPuyoThemeManager(const char * path, const char * alternatePath);
+    ~AnimatedPuyoThemeManager(void);
+    
+    AnimatedPuyoSetTheme * getAnimatedPuyoSetTheme(const char *);
+    AnimatedPuyoSetTheme * getAnimatedPuyoSetTheme(void);
+    void setPreferedAnimatedPuyoSetTheme(const char *);
+    
+    PuyoLevelTheme * getPuyoLevelTheme(const char *);
+    PuyoLevelTheme * getPuyoLevelTheme(void);
+    void setPreferedPuyoLevelTheme(const char *);
+    
+    AdvancedBuffer<char *> * getAnimatedPuyoSetThemeList(void);
+    AdvancedBuffer<char *> * getPuyoLevelThemeList(void);
+    
+private:
+    AdvancedBuffer<char *> * themeList;
+    AdvancedBuffer<char *> * puyoSetList;
+
+    AdvancedBuffer<PuyoLevelTheme *> * themes;
+    AdvancedBuffer<AnimatedPuyoSetTheme *> * puyoSets;
+
+    // TEMP
+    AnimatedPuyoSetTheme * _currentPuyoSetTheme;
+    PuyoLevelTheme * _currentLevel;
+};
+
+// Call the following accessor to get the global theme manager
+AnimatedPuyoThemeManager * getPuyoThemeManger(void);
 
 #endif // _ANIMATEDPUYOTHEME_H
 

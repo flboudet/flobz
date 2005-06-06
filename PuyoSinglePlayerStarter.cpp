@@ -63,26 +63,27 @@ const struct PuyoSingleGameLevelData::StaticLevelDatas PuyoSingleGameLevelData::
 
 PuyoSingleGameLevelData::PuyoSingleGameLevelData(int gameLevel, int difficulty) : gameLevel(gameLevel), difficulty(difficulty)
 {
-    themeToUse = new AnimatedPuyoSetTheme("", "Classic.fptheme");
+    AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
+    themeToUse = themeManager->getAnimatedPuyoSetTheme("Classic");
+    levelThemeToUse = themeManager->getPuyoLevelTheme("Level1");
+    
+    /*
     themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 000.0f);
     themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 072.0f);
     themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 144.0f);
     themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 216.0f);
     themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 288.0f);
     themeToUse->addNeutralPuyo("stone", "round", "round", "normal", 0.0f);
-    //themeToUse->cache();
-    
-    levelThemeToUse = new PuyoLevelTheme("", "Classic.fptheme");
+
     levelThemeToUse->setLives("heart");
     levelThemeToUse->setBackground("dark");
     levelThemeToUse->setGrid("metal");
     levelThemeToUse->setSpeedMeter("fire");
+    */
 }
 
 PuyoSingleGameLevelData::~PuyoSingleGameLevelData()
 {
-    delete themeToUse;
-    delete levelThemeToUse;
 }
 
 String PuyoSingleGameLevelData::getStory() const
