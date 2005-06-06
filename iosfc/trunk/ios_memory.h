@@ -498,7 +498,7 @@ namespace ios_fc {
             }
 
             const String& operator+=(const String &s) {
-                buffer.grow(s.size()+1);
+                buffer.grow(s.size());
                 strcat(buffer, s.buffer);
                 return *this;
             }
