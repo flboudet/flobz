@@ -55,7 +55,7 @@ typedef enum {
 class AnimatedPuyoTheme {
 
 public:
-    AnimatedPuyoTheme(const char * path, const char * face, const char * disappear, const char * explosions, const char * eyes, const float color_offset);
+    AnimatedPuyoTheme(const String path, const char * face, const char * disappear, const char * explosions, const char * eyes, const float color_offset);
     ~AnimatedPuyoTheme(void);
     
     IIM_Surface * getSurface(PuyoPictureType picture, int index);
@@ -74,7 +74,7 @@ public:
 private:
     PuyoPictureType _type;
         
-    char * _path;
+    String _path;
     char * _face;
     char * _disappear;
     char * _explosions;
@@ -97,13 +97,13 @@ private:
 class AnimatedPuyoSetTheme {
   
 public:
-    AnimatedPuyoSetTheme(const char * path, const char * name);
+    AnimatedPuyoSetTheme(const String path, const String name);
     ~AnimatedPuyoSetTheme(void);
     
-    const char * getName(void);
+    const String getName(void);
     
-    bool addAnimatedPuyoTheme(const char * face, const char * disappear, const char * explosions, const char * eyes, const float color_offset);
-    bool addNeutralPuyo(const char * face, const char * disappear, const char * explosions, const char * eyes, const float color_offset);
+    bool addAnimatedPuyoTheme(const String face, const char * disappear, const char * explosions, const char * eyes, const float color_offset);
+    bool addNeutralPuyo(const String face, const char * disappear, const char * explosions, const char * eyes, const float color_offset);
     
     AnimatedPuyoTheme * getAnimatedPuyoTheme(PuyoState state);
     
@@ -112,8 +112,8 @@ public:
     void releaseCached(void);
 
 private:
-    char * _path;
-    char * _name;
+    String _path;
+    String _name;
     
     AnimatedPuyoTheme * _puyos[NUMBER_OF_PUYOS];
     AnimatedPuyoTheme * _neutral;
@@ -127,10 +127,10 @@ private:
 class PuyoLevelTheme {
     
 public:
-    PuyoLevelTheme(const char * path, const char * name);
+    PuyoLevelTheme(const String path, const String name);
     ~PuyoLevelTheme(void);
     
-    const char * getName(void);
+    const String getName(void);
     
     bool setLives(const char * lives);
     bool setBackground(const char * back);
@@ -143,8 +143,8 @@ public:
     IIM_Surface * getSpeedMeter(bool front);
     
 private:    
-        char * _path;
-    char * _name;
+    String _path;
+    String _name;
     
     char * _lives;
     char * _background;
@@ -173,13 +173,13 @@ public:
     AnimatedPuyoThemeManager(const char * path, const char * alternatePath);
     ~AnimatedPuyoThemeManager(void);
     
-    AnimatedPuyoSetTheme * getAnimatedPuyoSetTheme(const char *);
+    AnimatedPuyoSetTheme * getAnimatedPuyoSetTheme(const String);
     AnimatedPuyoSetTheme * getAnimatedPuyoSetTheme(void);
-    void setPreferedAnimatedPuyoSetTheme(const char *);
+    void setPreferedAnimatedPuyoSetTheme(const String);
     
-    PuyoLevelTheme * getPuyoLevelTheme(const char *);
+    PuyoLevelTheme * getPuyoLevelTheme(const String);
     PuyoLevelTheme * getPuyoLevelTheme(void);
-    void setPreferedPuyoLevelTheme(const char *);
+    void setPreferedPuyoLevelTheme(const String);
     
     AdvancedBuffer<char *> * getAnimatedPuyoSetThemeList(void);
     AdvancedBuffer<char *> * getPuyoLevelThemeList(void);
