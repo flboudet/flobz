@@ -29,7 +29,8 @@
 
 class PuyoSinglePlayerGameWidget : public PuyoGameWidget {
 public:
-    PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, Action *gameOverAction = NULL);
+    PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, int lifes, Action *gameOverAction = NULL);
+    bool didPlayerWon() const { return isGameARunning(); }
 private:
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;
@@ -43,7 +44,7 @@ private:
 class PuyoSingleGameLevelData {
 public:
     PuyoSingleGameLevelData(int gameLevel, int difficulty);
-    ~PuyoSingleGameLevelData();    
+    ~PuyoSingleGameLevelData();
     String getStory() const;
     AnimatedPuyoSetTheme &getPuyoTheme() const;
     PuyoLevelTheme &getLevelTheme() const;
@@ -80,11 +81,11 @@ private:
     
     void endGameSession();
     
-    int currentLevel, difficulty;
+    int currentLevel, lifes, difficulty;
     PuyoSingleGameLevelData *levelData;
     PuyoStoryScreen *story;
     PuyoGameScreen *gameScreen;
-    PuyoGameWidget *gameWidget;
+    PuyoSinglePlayerGameWidget *gameWidget;
 };
 
 #endif // _PUYOSINGLEPLAYERSTARTER

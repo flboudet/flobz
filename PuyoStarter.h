@@ -82,6 +82,9 @@ public:
     IdleComponent *getIdleComponent() { return this; }
     void abort() { abortedFlag = true; }
     bool getAborted() const { return abortedFlag; }
+    void setLives(int l) { lives = l; }
+    bool isGameARunning() const { return attachedGameA->isGameRunning(); }
+    bool isGameBRunning() const { return attachedGameB->isGameRunning(); }
 protected:
     SDL_Painter painter;
 private:

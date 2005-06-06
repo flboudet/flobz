@@ -26,7 +26,7 @@
 #include "PuyoSinglePlayerStarter.h"
 #include "PuyoView.h"
 
-PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
+PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, int lifes, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
                                                      attachedGameFactory(&attachedRandom),
                                                      areaA(&attachedGameFactory, &attachedPuyoThemeSet,
                                                      1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
@@ -37,6 +37,7 @@ PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puy
                                                      opponentcontroller(type, level, areaB)
 {
     initialize(areaA, areaB, playercontroller, opponentcontroller, levelTheme, gameOverAction);
+    setLives(lifes);
 }
 
 const struct PuyoSingleGameLevelData::StaticLevelDatas PuyoSingleGameLevelData::levelDatas[] = {
@@ -127,7 +128,7 @@ int PuyoSingleGameLevelData::getIALevel() const
 
 
 SinglePlayerStarterAction::SinglePlayerStarterAction(int difficulty)
-    : currentLevel(0), difficulty(difficulty), levelData(NULL), story(NULL), gameScreen(NULL) {}
+    : currentLevel(0), lifes(3), difficulty(difficulty), levelData(NULL), story(NULL), gameScreen(NULL) {}
 
 void SinglePlayerStarterAction::action()
 {
@@ -138,7 +139,17 @@ void SinglePlayerStarterAction::action()
         startGame();
     }
     else if (! gameWidget->getAborted()) {
-        nextLevel();
+        if (! gameWidget->didPlayerWon()) {
+	   lifes--;
+        }
+	else
+            currentLevel++;
+	if (lifes < 0) {
+	    endGameSession();
+	}
+	else {
+            nextLevel();
+	}
     }
     else {
         endGameSession();
@@ -154,7 +165,7 @@ void SinglePlayerStarterAction::initiateLevel()
 
 void SinglePlayerStarterAction::startGame()
 {
-    gameWidget = new PuyoSinglePlayerGameWidget(levelData->getPuyoTheme(), levelData->getLevelTheme(), levelData->getIAType(), levelData->getIALevel(), this);
+    gameWidget = new PuyoSinglePlayerGameWidget(levelData->getPuyoTheme(), levelData->getLevelTheme(), levelData->getIAType(), levelData->getIALevel(), lifes, this);
     gameScreen = new PuyoGameScreen(*gameWidget, *story);
     GameUIDefaults::SCREEN_STACK->pop();
     delete story;
@@ -164,7 +175,7 @@ void SinglePlayerStarterAction::startGame()
 
 void SinglePlayerStarterAction::nextLevel()
 {
-    PuyoSingleGameLevelData *tempLevelData = new PuyoSingleGameLevelData(++currentLevel, difficulty);
+    PuyoSingleGameLevelData *tempLevelData = new PuyoSingleGameLevelData(currentLevel, difficulty);
     story = new PuyoStoryScreen(tempLevelData->getStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
     endGameSession();
     levelData = tempLevelData;
