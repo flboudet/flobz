@@ -89,7 +89,7 @@ protected:
     SDL_Painter painter;
 private:
     PuyoLevelTheme *attachedLevelTheme;
-    IIM_Surface *background, *grid, *liveImage[4];
+    IIM_Surface *background, *grid, *liveImage[4], *speedFront, *speedBack;
     PuyoView *areaA, *areaB;
     PuyoPlayer *controllerA, *controllerB;
     PuyoGame *attachedGameA, *attachedGameB;
@@ -102,6 +102,7 @@ private:
     Action *gameOverAction;
     bool gameover;
     bool abortedFlag;
+    int gameSpeed;
 };
 
 class PuyoGameScreen;

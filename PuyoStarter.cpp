@@ -145,13 +145,13 @@ bool PuyoEventPlayer::keyShouldRepeat(int &key)
 
 PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
     : CycledComponent(0.02), attachedLevelTheme(&levelTheme), areaA(&areaA), areaB(&areaB), controllerA(&controllerA), controllerB(&controllerB),
-      cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3), gameOverAction(gameOverAction), abortedFlag(false)
+      cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3), gameOverAction(gameOverAction), abortedFlag(false), gameSpeed(20)
 {
     initialize();
 }
 
 PuyoGameWidget::PuyoGameWidget()
-    : CycledComponent(0.02), cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3), abortedFlag(false)
+    : CycledComponent(0.02), cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(20)
 {
 }
 
@@ -183,7 +183,9 @@ void PuyoGameWidget::initialize()
         NeutralPopAnimation::initResources();
         firstTime = false;
     }
-    background = attachedLevelTheme->getBackground();/*IIM_Load_DisplayFormat("Background.jpg");*/
+    background = attachedLevelTheme->getBackground();
+    speedFront = attachedLevelTheme->getSpeedMeter(true);
+    speedBack  = attachedLevelTheme->getSpeedMeter(false);
     grid       = IIM_Load_DisplayFormatAlpha("grid.png");
     liveImage[0] = IIM_Load_DisplayFormatAlpha("0live.png");
     liveImage[1] = IIM_Load_DisplayFormatAlpha("1live.png");
@@ -234,6 +236,10 @@ void PuyoGameWidget::cycle()
             areaA->cycleGame();
             areaB->cycleGame();
         }
+        if (tickCounts % 500 == 0) {
+            gameSpeed--;
+        }
+        
         requestDraw();
     }
     gameover = (!attachedGameA->isGameRunning() || !attachedGameB->isGameRunning());
@@ -283,6 +289,37 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
         painter.draw();
     }
     SDL_BlitSurface(painter.gameScreen->surf, NULL, screen, NULL);
+    
+    // Rendering the game speed meter
+    // Should be moved to the painter
+    int gameSpeedCpy = gameSpeed;
+    if (gameSpeed == 1) gameSpeedCpy = 0;
+    
+    SDL_Rect speedRect;
+    speedRect.x = 0;
+    speedRect.w = speedFront->w;
+    speedRect.h = (20 - gameSpeedCpy) * 6;
+    speedRect.y = speedFront->h - speedRect.h;
+    
+    SDL_Rect drect;
+    drect.x = 320 - speedRect.w / 2;
+    drect.y = 170 - speedRect.h;
+    drect.w = speedRect.w;
+    drect.h = speedRect.h;
+    
+    SDL_Rect speedBlackRect = speedRect;
+    SDL_Rect drectBlack     = drect;
+    
+    speedBlackRect.h = speedFront->h - speedRect.h;
+    speedBlackRect.y = 0;
+    drectBlack.y = 50;
+    drectBlack.h = speedBlackRect.h;
+
+    SDL_BlitSurface(speedBack->surf,&speedBlackRect, screen, &drectBlack);
+    if (!paused)
+        SDL_BlitSurface(speedFront->surf,&speedRect, screen, &drect);
+    else
+        SDL_BlitSurface(speedBack->surf,&speedRect, screen, &drect);
 }
 
 void PuyoGameWidget::pause()
