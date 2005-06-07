@@ -437,7 +437,6 @@ PuyoLevelTheme::PuyoLevelTheme(const String path, const String name):_path(path)
     _speed_meter = NULL;
     
     _cached = false;
-    fprintf(stderr,"debug:PuyoLevelTheme cache = %d",_cached);
 
 #ifdef DEBUG
     counter = 0;
@@ -619,6 +618,11 @@ AnimatedPuyoThemeManager::AnimatedPuyoThemeManager(const char * path, const char
     _currentLevel->setBackground("dark");
     _currentLevel->setGrid("metal");
     _currentLevel->setSpeedMeter("fire");
+    
+    puyoSets.add(_currentPuyoSetTheme);
+    puyoSetList.add(_currentPuyoSetTheme->getName());
+    themes.add(_currentLevel);
+    themeList.add(_currentLevel->getName());
 }
 
 AnimatedPuyoThemeManager::~AnimatedPuyoThemeManager(void)
@@ -629,6 +633,14 @@ AnimatedPuyoThemeManager::~AnimatedPuyoThemeManager(void)
     
 AnimatedPuyoSetTheme * AnimatedPuyoThemeManager::getAnimatedPuyoSetTheme(const String name)
 {
+    int size = puyoSets.size();
+    
+    for (int i = 0; i < size; i++)
+    {
+        if (puyoSets[i]->getName() == name) return puyoSets[i];
+    }
+
+    fprintf(stderr, "Puyo set theme %s not found, falling back to default...\n",(const char *)name);
     return getAnimatedPuyoSetTheme();
 }
 
@@ -644,6 +656,14 @@ void AnimatedPuyoThemeManager::setPreferedAnimatedPuyoSetTheme(const String name
 
 PuyoLevelTheme * AnimatedPuyoThemeManager::getPuyoLevelTheme(const String name)
 {
+    int size = puyoSets.size();
+    
+    for (int i = 0; i < size; i++)
+    {
+        if (themes[i]->getName() == name) return themes[i];
+    }
+    
+    fprintf(stderr, "Level theme %s not found, falling back to default...\n",(const char *)name);
     return getPuyoLevelTheme();
 }
 
@@ -657,13 +677,13 @@ void AnimatedPuyoThemeManager::setPreferedPuyoLevelTheme(const String name)
     NOT_IMPLEMENTED;
 }
 
-AdvancedBuffer<char *> * AnimatedPuyoThemeManager::getAnimatedPuyoSetThemeList(void)
-{
-    return themeList;
-}
-
-AdvancedBuffer<char *> * AnimatedPuyoThemeManager::getPuyoLevelThemeList(void)
+AdvancedBuffer<const char *> AnimatedPuyoThemeManager::getAnimatedPuyoSetThemeList(void)
 {
     return puyoSetList;
+}
+
+AdvancedBuffer<const char *> AnimatedPuyoThemeManager::getPuyoLevelThemeList(void)
+{
+    return themeList;
 }
 
