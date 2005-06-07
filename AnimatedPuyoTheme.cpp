@@ -24,13 +24,22 @@
  */
 
 #include "AnimatedPuyoTheme.h"
+#include "preferences.h"
 
 #include <stdio.h>
 #include <strings.h>
 #include <math.h>
 
 
-#define PATH_MAX_LEN 250
+#define PATH_MAX_LEN 256
+#define NAME_MAX_LEN 256
+
+
+static const char * defaultPuyosName = "Invaders";
+static const char * defaultLevelName = "Kaori's farm";
+static const char * preferedPuyosKey = "ThemeManager.Puyos";
+static const char * preferedLevelKey = "ThemeManager.Level";
+
 
 //*********************************************************************************
 //*********************************** Utilities ***********************************
@@ -393,7 +402,7 @@ bool AnimatedPuyoSetTheme::addNeutralPuyo(const String face, const char * disapp
 
     // add puyo
     _neutral=new AnimatedPuyoTheme(_path, face, disappear, explosions, eyes, color_offset);
-    return true;
+    return (_neutral!=NULL);
 }
 
 bool AnimatedPuyoSetTheme::validate(void)
@@ -605,7 +614,7 @@ AnimatedPuyoThemeManager::AnimatedPuyoThemeManager(const char * path, const char
     String fullPath(path);
     fullPath += "Classic.fptheme";
 
-    _currentPuyoSetTheme = new AnimatedPuyoSetTheme(fullPath, "Classic");
+    _currentPuyoSetTheme = new AnimatedPuyoSetTheme(fullPath, defaultPuyosName);
     _currentPuyoSetTheme->addAnimatedPuyoTheme("stone", "round", "round", "normal", 000.0f);
     _currentPuyoSetTheme->addAnimatedPuyoTheme("stone", "round", "round", "normal", 072.0f);
     _currentPuyoSetTheme->addAnimatedPuyoTheme("stone", "round", "round", "normal", 144.0f);
@@ -613,7 +622,7 @@ AnimatedPuyoThemeManager::AnimatedPuyoThemeManager(const char * path, const char
     _currentPuyoSetTheme->addAnimatedPuyoTheme("stone", "round", "round", "normal", 288.0f);
     _currentPuyoSetTheme->addNeutralPuyo("stone", "round", "round", "normal", 0.0f);
     
-    _currentLevel = new PuyoLevelTheme(fullPath, "Level 1");
+    _currentLevel = new PuyoLevelTheme(fullPath, defaultLevelName);
     _currentLevel->setLives("heart");
     _currentLevel->setBackground("dark");
     _currentLevel->setGrid("metal");
@@ -640,41 +649,77 @@ AnimatedPuyoSetTheme * AnimatedPuyoThemeManager::getAnimatedPuyoSetTheme(const S
         if (puyoSets[i]->getName() == name) return puyoSets[i];
     }
 
-    fprintf(stderr, "Puyo set theme %s not found, falling back to default...\n",(const char *)name);
-    return getAnimatedPuyoSetTheme();
+    if (name != defaultPuyosName)
+    {
+        fprintf(stderr, "Puyos theme \"%s\" not found, falling back to default...\n",(const char *)name);
+        return getAnimatedPuyoSetTheme(String(defaultPuyosName));
+    }
+    else
+    {
+        if (size != 0)
+        {
+            fprintf(stderr, "Default puyos theme (%s) not found??? Trying another one...\n",defaultPuyosName);
+            return puyoSets[0];
+        }
+        else
+        {
+            fprintf(stderr, "Default puyos theme (%s) not found??? No possible fallback, Exiting...\n",defaultPuyosName);
+            exit(0);
+        }
+    }
 }
 
 AnimatedPuyoSetTheme * AnimatedPuyoThemeManager::getAnimatedPuyoSetTheme(void)
 {
-    return _currentPuyoSetTheme;
+    char out[NAME_MAX_LEN];
+    GetStrPreference (preferedPuyosKey, out, defaultPuyosName, sizeof(out));
+    return getAnimatedPuyoSetTheme(String(out));
 }
 
 void AnimatedPuyoThemeManager::setPreferedAnimatedPuyoSetTheme(const String name)
 {
-    NOT_IMPLEMENTED;
+    SetStrPreference (preferedPuyosKey, (const char *)name);
 }
 
 PuyoLevelTheme * AnimatedPuyoThemeManager::getPuyoLevelTheme(const String name)
 {
-    int size = puyoSets.size();
+    int size = themes.size();
     
     for (int i = 0; i < size; i++)
     {
         if (themes[i]->getName() == name) return themes[i];
     }
     
-    fprintf(stderr, "Level theme %s not found, falling back to default...\n",(const char *)name);
-    return getPuyoLevelTheme();
+    if (name != defaultLevelName)
+    {
+        fprintf(stderr, "Level theme \"%s\" not found, falling back to default...\n",(const char *)name);
+        return getPuyoLevelTheme(String(defaultLevelName));
+    }
+    else
+    {
+        if (size != 0)
+        {
+            fprintf(stderr, "Default level theme (%s) not found??? Trying another one...\n",defaultLevelName);
+            return themes[0];
+        }
+        else
+        {
+            fprintf(stderr, "Default level theme (%s) not found??? No possible fallback, Exiting...\n",defaultLevelName);
+            exit(0);
+        }
+    }
 }
 
 PuyoLevelTheme * AnimatedPuyoThemeManager::getPuyoLevelTheme(void)
 {
-    return _currentLevel;
+    char out[NAME_MAX_LEN];
+    GetStrPreference (preferedLevelKey, out, defaultLevelName, sizeof(out));
+    return getPuyoLevelTheme(String(out));
 }
 
 void AnimatedPuyoThemeManager::setPreferedPuyoLevelTheme(const String name)
 {
-    NOT_IMPLEMENTED;
+    SetStrPreference (preferedLevelKey, (const char *)name);
 }
 
 AdvancedBuffer<const char *> AnimatedPuyoThemeManager::getAnimatedPuyoSetThemeList(void)
