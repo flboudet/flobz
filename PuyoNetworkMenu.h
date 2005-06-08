@@ -52,9 +52,9 @@ public:
     void build();
 private:
     PuyoHttpServerList servers;
-    HBox *serverSelectionPanel;
+    VBox *serverSelectionPanel;
     ListWidget *serverListPanel;
-    VBox menu;
+    HBox menu;
     PuyoStoryWidget story;
     SliderContainer container;
 };

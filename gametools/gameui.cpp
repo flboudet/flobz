@@ -249,7 +249,31 @@ namespace gameui {
         }
         break;
       case USE_MIN_SIZE:
-        {}
+        {
+          float y       = GameUIDefaults::SPACING;
+          float height  = getSortingAxe(getSize());
+          Vec3 size     = getSize();
+          Vec3 position = getPosition();
+          float axePos  = getSortingAxe(position);
+
+          /*for (int i = 0; i < getNumberOfChilds(); ++i) {
+            Widget *child = getChild(i);
+            if (!child->getPreferedSize().is_zero()) {
+              // center the widget if we know its size
+              Vec3 csize = size - child->getPreferedSize();
+              Vec3 cpos  = position + csize / 2.0;
+              child->setSize(child->getPreferedSize());
+              child->setPosition(cpos);
+            }
+            else {
+              // else give him all the space he want.
+              child->setSize(size);
+              child->setPosition(position);
+            }
+            axePos += heightPerChild + GameUIDefaults::SPACING;
+            setSortingAxe(position, axePos);
+          }*/
+        }
         break;
       default:
         {}
@@ -607,7 +631,7 @@ namespace gameui {
   // 
 
   Text::Text(const String &label, SoFont *font)
-    : font(font), label(label)
+    : font(font), label(label), mdontMove(true)
     {
       if (font == NULL) this->font = GameUIDefaults::FONT;
       setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
@@ -630,8 +654,9 @@ namespace gameui {
 
   void Text::idle(double currentTime)
   {
-    offsetX = 7. * (sin(getPosition().x) + sin(getPosition().y + currentTime));
-    offsetY = 3. * (cos(getPosition().x+1) + sin(getPosition().y - currentTime * 1.1));
+    if (mdontMove) return;
+    offsetX = 5. * (sin(getPosition().x) + sin(getPosition().y + currentTime));
+    offsetY = 2. * (cos(getPosition().x+1) + sin(getPosition().y - currentTime * 1.1));
     requestDraw();
   }
 
@@ -649,6 +674,7 @@ namespace gameui {
 
     font = fontInactive;
     setFocusable(true);
+    mdontMove = false;
   }
 
   Button::Button(const String &label, SoFont *fontActive, SoFont *fontInactive)
@@ -846,6 +872,19 @@ namespace gameui {
     setPreferedSize(Vec3(width, height, 1.0));
   }
 
+  //
+  // ListWidget
+  //
+
+  ListWidget::ListWidget(int size, GameLoop *loop) : VBox(loop), size(size), used(0)
+  {
+    for (int i=0; i<size; ++i) {
+      Text *t = new Text("---");
+      VBox::add(t);
+    }
+    setPreferedSize(Vec3(1,(size+2) + SoFont_FontHeight(GameUIDefaults::FONT)*size, 1));
+  }
+  
   //
   // ScreenStack
   //

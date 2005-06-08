@@ -301,6 +301,9 @@ namespace gameui {
       String label;
       double offsetX;
       double offsetY;
+
+    protected:
+      bool mdontMove;
   };
 
 
@@ -365,7 +368,11 @@ namespace gameui {
   class ListWidget : public VBox
   {
     public:
-      ListWidget(GameLoop *loop = NULL) : VBox(loop) {}
+      ListWidget(int size, GameLoop *loop = NULL);
+
+    private:
+      int size;
+      int used;
   };
 
 

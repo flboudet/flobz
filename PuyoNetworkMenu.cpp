@@ -204,26 +204,37 @@ void InternetGameMenu::build()
     container.setSize(Vec3(menuBG_wide->w, menuBG_wide->h, 0));
     container.setBackground(menuBG_wide);
   
-    serverSelectionPanel = new HBox;
-    serverSelectionPanel->add(new Text("Select a server:"));
-    serverListPanel = new ListWidget();
-    EditFieldWithLabel *playerName, *serverName;
+    serverSelectionPanel = new VBox;
+    serverSelectionPanel->add(new Text("Server List"));
+    serverListPanel = new ListWidget(6);
+    EditField *playerName, *serverName;
     
     for (int i = 0 ; i < servers.getNumServer() ; i++) {
         serverListPanel->add (new Button(servers.getServerNameAtIndex(i),
                                          new ServerSelectAction(servers.getServerNameAtIndex(i),
                                                                 servers.getServerPortAtIndex(i))));
     }
-    
     serverSelectionPanel->add(serverListPanel);
+    serverSelectionPanel->add(new Button("Update"));
     
-    menu.add(new Text("Internet Game"));
-    playerName = new EditFieldWithLabel("Player name:", "toto");
-    serverName = new EditFieldWithLabel("Server name:", "durandal.homeunix.com");
-    menu.add(playerName);
+    playerName = new EditField("Kaori"); // TODO: get that from single player name
+    serverName = new EditField("durandal.homeunix.com");
+    VBox *rightPanel = new VBox();
+    rightPanel->add(new Separator(1,1));
+    rightPanel->add(new Text("Internet Game"));
+    rightPanel->add(new Separator(10,10));
+    rightPanel->add(new Text("Nickname"));
+    rightPanel->add(playerName);
+    rightPanel->add(new Separator(10,10));
+    rightPanel->add(new Text("Server"));
+    rightPanel->add(serverName);
+    rightPanel->add(new Separator(10,10));
+    HBox *hbox = new HBox();
+    hbox->add(new Button("Join", new PushNetCenterMenuAction(serverName, playerName)));
+    hbox->add(new Button("Cancel", new PopScreenAction()));
+    rightPanel->add(hbox);
+    rightPanel->add(new Separator(1,1));
     menu.add(serverSelectionPanel);
-    menu.add(serverName);
-    menu.add(new Button("Join", new PushNetCenterMenuAction(serverName->getEditField(), playerName->getEditField())));
-    menu.add(new Button("Cancel", new PopScreenAction()));
+    menu.add(rightPanel);
 }
 
