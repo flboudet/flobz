@@ -1,0 +1,51 @@
+<init>
+  # Init function: called when script is loaded
+  Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+  Display @titledisplay = [new_display: x=80.0 y=-100.0 width=640.0 height=480.0]
+
+  Sprite @bg      = [new_sprite_simple: image="bg_intro3.jpg" x=0.0 y=0.0]
+  Sprite @f =  [new_sprite: image="title/F.png" x=0.0 y=80.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @l =  [new_sprite: image="title/L.png" x=80.0 y=100.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @o =  [new_sprite: image="title/O.png" x=120.0 y=160.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @b =  [new_sprite: image="title/B.png" x=170.0 y=100.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @o2 = [new_sprite: image="title/O2.png" x=220.0 y=160.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @p =  [new_sprite: image="title/P.png" x=260.0 y=90.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @u =  [new_sprite: image="title/U.png" x=310.0 y=160.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @y =  [new_sprite: image="title/Y.png" x=310.0 y=160.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @o3 = [new_sprite: image="title/O3.png" x=420.0 y=170.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+
+<sprite_list>
+  # Call the 'sprite' function for each sprite you want to update/draw
+  # This also allows you to specify the drawing order
+  sprite::@bg display=@display
+  sprite::@f display=@titledisplay
+  sprite::@l display=@titledisplay
+  sprite::@o display=@titledisplay
+  sprite::@b display=@titledisplay
+  sprite::@o2 display=@titledisplay
+  sprite::@p display=@titledisplay
+  sprite::@u display=@titledisplay
+  sprite::@y display=@titledisplay
+  sprite::@o3 display=@titledisplay
+
+<movetitle: Sprite &this, float phase>
+  float fcycle = 0.0
+  float fy = 30.0
+  while fcycle < 1000.0 do {
+      move::&this fcycle=fcycle+(phase*2.0) x=&this.pos.x y=&this.pos.y+fy
+      fcycle += 20.0
+      fy = (0.0-fy)*0.99
+   }
+
+<update>
+  # Update function: called every animation cycle
+  movetitle::@f phase=1.0
+  movetitle::@l phase=2.0
+  movetitle::@o phase=3.0
+  movetitle::@b phase=4.0
+  movetitle::@o2 phase=5.0
+  movetitle::@p phase=6.0
+  movetitle::@u phase=7.0
+  movetitle::@y phase=8.0
+  movetitle::@o3 phase=9.0
+  (@cycle = 1000)? @finished = 1

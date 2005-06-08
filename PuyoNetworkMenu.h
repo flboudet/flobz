@@ -55,6 +55,8 @@ private:
     HBox *serverSelectionPanel;
     ListWidget *serverListPanel;
     VBox menu;
+    PuyoStoryWidget story;
+    SliderContainer container;
 };
 
 class NetworkGameMenu : public PuyoMainScreenMenu {

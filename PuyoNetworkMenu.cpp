@@ -189,15 +189,20 @@ void NetworkGameMenu::build() {
 InternetGameMenu::InternetGameMenu()
   : PuyoScreen()
   , servers("www.ios-software.com", "/flobopuyo/fpservers", 80)
+  , story(666)
+  , container()
 {
-    setBackground(menuBG_wide);
-    menu.setPosition(Vec3(5,225));
-    menu.setSize(Vec3(menuBG_wide->w, menuBG_wide->h, 0));
 }
 
 void InternetGameMenu::build()
 {
-    add(&menu);
+    add(&story);
+    add(&container);
+    container.add(&menu);
+
+    container.setPosition(Vec3(5,195));
+    container.setSize(Vec3(menuBG_wide->w, menuBG_wide->h, 0));
+    container.setBackground(menuBG_wide);
   
     serverSelectionPanel = new HBox;
     serverSelectionPanel->add(new Text("Select a server:"));
