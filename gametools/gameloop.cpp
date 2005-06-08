@@ -137,6 +137,9 @@ void GameLoop::add(GameComponent *gc)
   IdleComponent     *ic = dynamic_cast<IdleComponent*>(gc);
 
   gc->_remove = gc->_kill = false;
+
+  for (int i = components.size(); i; --i)
+    if (components[i] == gc) return;
   
   //printf("Component %x added to gameloop!\n", gc);
   components.add(gc);
@@ -190,7 +193,7 @@ void GameLoop::run()
 
     tot_cycle ++;
     if  (tot_cycle == 100) {
-      printf("%d%% Frames Dropped\n", tot_dropped);
+      //printf("%d%% Frames Dropped\n", tot_dropped);
       tot_dropped = tot_cycle = 0;
     }
 
@@ -203,31 +206,36 @@ void GameLoop::run()
 
 void GameLoop::idle(double currentTime)
 {
-  int i, j;
+  int i, idles_size_at_start;
+
+  idles_size_at_start = idles.size();
 
   //Vector<IdleComponent> idlesCpy = idles.dup();
   
   // 1- process events
   SDL_Event e;
   while (SDL_PollEvent (&e)) {
+    
     GameControlEvent controlEvent;
     getControlEvent(e, &controlEvent);
-    for (i = 0, j = idles.size(); i < (j < idles.size() ? j : idles.size()); ++i) {
-    //for (i = 0 ; i < idles.size(); ++i) {
+
+    for (i=0; i < idles_size_at_start; ++i) {
+      
       if (idles[i] && !idles[i]->removeMe())
         idles[i]->onEvent(&controlEvent);
     }
-    if (controlEvent.cursorEvent == GameControlEvent::kQuit) {
+
+    if (controlEvent.cursorEvent == GameControlEvent::kQuit) { // TODO: Laisser libre l'utilisateur ?
       SDL_Quit();
       exit(0);
     }
   }
   
   // 2- call idles
-  for (i = 0; i < idles.size(); ++i) {
+  for (i = 0; i < idles_size_at_start; ++i) {
     IdleComponent *gc = idles[i];
     if ((gc != NULL) && !(gc->removeMe()))
-      gc->idle(currentTime);
+      gc->callIdle(currentTime);
   }
   /*for (i = idles.size()-1; i >= 0 ; --i) {
     if (idles[i] && !idles[i]->removeMe())

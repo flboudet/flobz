@@ -35,20 +35,22 @@ static MainMenuScreen  mainMenu;
  */
 void OtherMenuScreen::build()
 {
-  setBackground(IIM_Load_DisplayFormat("Background.jpg"));
-  add(new Button("Hello World !", new PrintfAction));
-  add(new Button("Return",        new PopScreenAction));
+  VBox *vb = new VBox();
+  add(vb);
+  vb->add(new Button("Hello World !", new PrintfAction));
+  vb->add(new Button("Return",        new PopScreenAction));
 }
 
 void MainMenuScreen::build()
 {
-  setBackground(IIM_Load_DisplayFormat("Background.jpg"));
-  add(new Text("FloboPuyo #1"));
-  add(new Button("FloboPuyo #2", new PrintfAction));
+  VBox *vb = new VBox();
+  add(vb);
+  vb->add(new Text("FloboPuyo #1"));
+  vb->add(new Button("FloboPuyo #2", new PrintfAction));
 
   HBox *box1 = new HBox;
   VBox *box2 = new VBox;
-  add(box1);
+  vb->add(box1);
   box1->add(new Button("Open Sub-Menu", new PushScreenAction(&otherMenu)));
   box1->add(new Button("Middle"));
   box2->add(new Button("Right-Up"));
@@ -56,7 +58,7 @@ void MainMenuScreen::build()
   box1->add(box2);
 
   for (int i=3; i<=6; ++i)
-    add(new Button(String("FloboPuyo #") + i));
+    vb->add(new Button(String("FloboPuyo #") + i));
 }
 
 /*

@@ -18,6 +18,7 @@ using namespace gameui;
 
 PuyoCommander *theCommander = NULL;
 IIM_Surface   *menuBG       = NULL;
+IIM_Surface   *menuBG_wide  = NULL;
 SoFont *storyFont;
 #define WIDTH  640
 #define HEIGHT 480
@@ -183,6 +184,7 @@ void PuyoCommander::initMenus()
 {
   DBG_PRINT("initMenus()\n");
   menuBG = IIM_Load_DisplayFormatAlpha("menubg.png");
+  menuBG_wide = IIM_Load_DisplayFormatAlpha("menubg-wide.png");
   // 
   // Create the structures.
   PuyoStoryWidget *tempStory = new PuyoStoryWidget(0);

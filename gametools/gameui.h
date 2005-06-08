@@ -269,8 +269,8 @@ namespace gameui {
       virtual void show() { hidden = false; }
       bool isVisible() const { return !hidden; }
       
-      virtual void addToGameLoop(GameLoop *loop) { rootContainer.addToGameLoop(loop); }
-      virtual void removeFromGameLoop() { rootContainer.removeFromGameLoop(); }
+      virtual void addToGameLoop(GameLoop *loop) { rootContainer.addToGameLoop(loop); loop->add(this); }
+      virtual void removeFromGameLoop() { rootContainer.removeFromGameLoop(); remove(); }
 
       GameLoop *getGameLoop() { return rootContainer.getGameLoop(); }
       void giveFocus();
@@ -360,6 +360,12 @@ namespace gameui {
   class Separator : public Widget {
     public:
       Separator(float width, float height);
+  };
+
+  class ListWidget : public VBox
+  {
+    public:
+      ListWidget(GameLoop *loop = NULL) : VBox(loop) {}
   };
 
 

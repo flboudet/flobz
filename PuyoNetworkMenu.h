@@ -46,19 +46,20 @@ class LANGameRealMenu : public PuyoMainScreenMenu {
     void build();
 };
 
-class InternetGameMenu : public PuyoMainScreenMenu {
+class InternetGameMenu : public PuyoScreen {
 public:
-    InternetGameMenu(PuyoRealMainScreen * mainScreen);
+    InternetGameMenu();
     void build();
 private:
     PuyoHttpServerList servers;
     HBox *serverSelectionPanel;
-    VBox *serverListPanel;
+    ListWidget *serverListPanel;
+    VBox menu;
 };
 
 class NetworkGameMenu : public PuyoMainScreenMenu {
 public:
-    NetworkGameMenu(PuyoRealMainScreen * mainScreen) : PuyoMainScreenMenu(mainScreen), lanGameMenu(mainScreen), internetGameMenu(mainScreen) {}
+    NetworkGameMenu(PuyoRealMainScreen * mainScreen) : PuyoMainScreenMenu(mainScreen), lanGameMenu(mainScreen), internetGameMenu() {}
     void build();
 private:
     LANGameRealMenu  lanGameMenu;

@@ -30,6 +30,8 @@
 #include "ios_standardmessage.h"
 #include "PuyoNetCenterMenu.h"
 
+extern IIM_Surface *menuBG_wide; // I know what you think..
+
 using namespace ios_fc;
 
 class HttpDocument {
@@ -179,19 +181,27 @@ void NetworkGameMenu::build() {
   internetGameMenu.build();
   lanGameMenu.build();
   add(new Text("Network Game"));
-  add(new Button("LAN Game",      new PuyoPushMenuAction(&lanGameMenu, mainScreen)));
-  add(new Button("Internet Game", new PuyoPushMenuAction(&internetGameMenu, mainScreen)));
+  add(new Button("Local Area Network Game", new PuyoPushMenuAction(&lanGameMenu, mainScreen)));
+  add(new Button("Internet Game", new PushScreenAction(&internetGameMenu)));
   add(new Button("Cancel",        new PuyoPopMenuAction(mainScreen)));
 }
 
-InternetGameMenu::InternetGameMenu(PuyoRealMainScreen * mainScreen) : PuyoMainScreenMenu(mainScreen), servers("www.ios-software.com", "/flobopuyo/fpservers", 80)
+InternetGameMenu::InternetGameMenu()
+  : PuyoScreen()
+  , servers("www.ios-software.com", "/flobopuyo/fpservers", 80)
 {
+    setBackground(menuBG_wide);
+    menu.setPosition(Vec3(5,225));
+    menu.setSize(Vec3(menuBG_wide->w, menuBG_wide->h, 0));
 }
 
-void InternetGameMenu::build() {
+void InternetGameMenu::build()
+{
+    add(&menu);
+  
     serverSelectionPanel = new HBox;
     serverSelectionPanel->add(new Text("Select a server:"));
-    serverListPanel = new VBox;
+    serverListPanel = new ListWidget();
     EditFieldWithLabel *playerName, *serverName;
     
     for (int i = 0 ; i < servers.getNumServer() ; i++) {
@@ -202,13 +212,13 @@ void InternetGameMenu::build() {
     
     serverSelectionPanel->add(serverListPanel);
     
-    add(new Text("Internet Game"));
+    menu.add(new Text("Internet Game"));
     playerName = new EditFieldWithLabel("Player name:", "toto");
     serverName = new EditFieldWithLabel("Server name:", "durandal.homeunix.com");
-    add(playerName);
-    add(serverSelectionPanel);
-    add(serverName);
-    add(new Button("Join", new PushNetCenterMenuAction(serverName->getEditField(), playerName->getEditField())));
-    add(new Button("Cancel", new PuyoPopMenuAction(mainScreen)));
+    menu.add(playerName);
+    menu.add(serverSelectionPanel);
+    menu.add(serverName);
+    menu.add(new Button("Join", new PushNetCenterMenuAction(serverName->getEditField(), playerName->getEditField())));
+    menu.add(new Button("Cancel", new PopScreenAction()));
 }
 
