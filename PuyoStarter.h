@@ -93,7 +93,8 @@ private:
     PuyoView *areaA, *areaB;
     PuyoPlayer *controllerA, *controllerB;
     PuyoGame *attachedGameA, *attachedGameB;
-    int cyclesBeforeGameCycle;
+    int cyclesBeforeGameCycle, cyclesBeforeSpeedIncreases;
+    int cyclesBeforeGameCycleV;
     unsigned int tickCounts;
     bool paused;
     bool displayLives;

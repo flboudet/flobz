@@ -145,13 +145,13 @@ bool PuyoEventPlayer::keyShouldRepeat(int &key)
 
 PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
     : CycledComponent(0.02), attachedLevelTheme(&levelTheme), areaA(&areaA), areaB(&areaB), controllerA(&controllerA), controllerB(&controllerB),
-      cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3), gameOverAction(gameOverAction), abortedFlag(false), gameSpeed(20)
+      cyclesBeforeGameCycle(50), cyclesBeforeSpeedIncreases(500), cyclesBeforeGameCycleV(cyclesBeforeGameCycle), tickCounts(0), paused(false), displayLives(true), lives(3), gameOverAction(gameOverAction), abortedFlag(false), gameSpeed(20)
 {
     initialize();
 }
 
 PuyoGameWidget::PuyoGameWidget()
-    : CycledComponent(0.02), cyclesBeforeGameCycle(50), tickCounts(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(20)
+    : CycledComponent(0.02), cyclesBeforeGameCycle(50), cyclesBeforeSpeedIncreases(500), cyclesBeforeGameCycleV(cyclesBeforeGameCycle), tickCounts(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(20)
 {
 }
 
@@ -232,12 +232,13 @@ void PuyoGameWidget::cycle()
         areaB->cycleAnimation();
         
         // Game cycles
-        if (tickCounts % cyclesBeforeGameCycle == 0) {
+        if (tickCounts % cyclesBeforeGameCycleV  == 0) {
             areaA->cycleGame();
             areaB->cycleGame();
         }
-        if (tickCounts % 500 == 0) {
+        if ((cyclesBeforeSpeedIncreases != -1) && (gameSpeed > 0) && (tickCounts % cyclesBeforeSpeedIncreases == 0)) {
             gameSpeed--;
+            cyclesBeforeGameCycleV = (float)cyclesBeforeGameCycle * ((float)gameSpeed / 20.);
         }
         
         requestDraw();
@@ -320,6 +321,11 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
         SDL_BlitSurface(speedFront->surf,&speedRect, screen, &drect);
     else
         SDL_BlitSurface(speedBack->surf,&speedRect, screen, &drect);
+    
+    // Rendering the player names
+    //SoFont *font = (paused?commander->darkFont:commander->menuFont);
+    //SoFont_CenteredString_XY (font, screen, 510, 460,   "bla", NULL);
+    //SoFont_CenteredString_XY (font, screen, 130, 460,   "bli", NULL);
 }
 
 void PuyoGameWidget::pause()
