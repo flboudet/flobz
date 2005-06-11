@@ -20,7 +20,10 @@
  */
 
 #include "IosVector.h"
-#include "IosException.h"
+
+#include "ios_fc.h"
+using ios_fc::Exception;
+
 #include <stdio.h>
 #include <stdlib.h>
 

@@ -1,0 +1,1 @@
+echo ROOT_DIR=`pwd` > root_dir

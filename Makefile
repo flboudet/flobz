@@ -5,10 +5,8 @@
 ###############
 # Settings
 
-ROOT_DIR=.
-
 OBJFILES= HiScores.o PuyoCommander.o        \
-          IosException.o IosVector.o main.o PuyoGame.o PuyoVersion.o         \
+          main.o PuyoGame.o PuyoVersion.o         \
           PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o    \
           menu.o menuitems.o audio.o PuyoStory.o \
           PuyoDoomMelt.o corona32.o corona.o corona_palette.o\
@@ -16,22 +14,20 @@ OBJFILES= HiScores.o PuyoCommander.o        \
           PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o \
           AnimatedPuyoTheme.o PuyoNetworkMenu.o PuyoNetCenterMenu.o \
           PuyoNetGameCenter.o PuyoInternetGameCenter.o \
-          PuyoLocalMenu.o PuyoOptionMenu.o PuyoControlMenu.o PuyoScreenTransition.o
+          PuyoLocalMenu.o PuyoOptionMenu.o PuyoControlMenu.o PuyoScreenTransition.o IosVector.o 
 
+include root_dir
 include config
 
 DEPDIR = .deps
 df = $(DEPDIR)/$(*F)
 
-MAKEDEPEND = gcc -MM $(CFLAGS) -o $(df).d $<
+MAKEDEPEND = ${CXX} -MM $(CFLAGS_NOPCH) -o $(df).d $<
 # MAKEDEPEND = touch $*.d && makedepend $(CPPFLAGS) -f $*.d $<
 
 all: prelude flobopuyo
 
-flobopuyo: ${OBJFILES}
-	+make -C iosfc object
-	+make -C gametools
-	+make -C styrolyse object
+flobopuyo: iosfc_dir gametools_dir styrolyse_dir ${OBJFILES}
 	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) -lSDL_net -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o gametools/*.o styrolyse/*.o styrolyse/goomsl/goomsl*.o
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
@@ -45,24 +41,27 @@ prelude:
 	@touch WARNINGS
 	@echo "Compiling with CFLAGS=$(CFLAGS)"
 	@echo "Compiling with LDFLAGS=$(LDFLAGS)"
+	@echo "[Precompiling Headers]"
+	@rm -f all.h.gch
+	@${CXX} ${CFLAGS_NOPCH} all.h -o all.h.gch
+
+iosfc_dir:
+	@+CFLAGS_NOPCH="$(CFLAGS_NOPCH)" make -C iosfc object
+
+gametools_dir:
+	@+CFLAGS_NOPCH="$(CFLAGS_NOPCH)" make -C gametools object
+
+styrolyse_dir:
+	@+CFLAGS_NOPCH="$(CFLAGS_NOPCH)" make -C styrolyse object
 
 %.o:%.cpp
 	@mkdir -p $(DEPDIR);\
 	$(MAKEDEPEND); \
 	cp $(df).d $(df).P; \
-	sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
-	-e '/^$$/ d' -e 's/$$/ :/' < $(df).d >> $(df).P; \
+	cat $(df).d | sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+	-e '/^$$/ d' -e 's/$$/ :/' >> $(df).P; \
 	rm -f $(df).d
 	@echo "[$@]" && $(CXX) $(CFLAGS) -c $< 2>> WARNINGS || (cat WARNINGS && false)
-
-%.o:%.c
-	@mkdir -p $(DEPDIR);\
-	$(MAKEDEPEND); \
-	cp $(df).d $(df).P; \
-	sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
-	-e '/^$$/ d' -e 's/$$/ :/' < $(df).d >> $(df).P; \
-	rm -f $(df).d
-	@echo "[$@]" && $(CC) $(CFLAGS) -c $< 2>> WARNINGS || (cat WARNINGS && false)
 
 glSDL.o:glSDL.c
 	@echo "[$@]" && $(CC) $(CFLAGS) -c $< 2>> EXT_WARNINGS
@@ -72,7 +71,7 @@ corona32.o:corona32.cpp
 corona_palette.o:corona_palette.cpp	
 
 clean:
-	rm -rf *~ *.o flobopuyo* $(PRGNAME) WARNINGS
+	rm -rf *~ *.o flobopuyo* $(PRGNAME) WARNINGS *.gch
 	rm -rf .xvpics data/.xvpics    data/*/.xvpics
 	rm -rf $(bundle_name)
 	rm -rf $(macimage_name)

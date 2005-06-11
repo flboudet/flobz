@@ -7,6 +7,8 @@
  *
  */
 
+#ifndef PREF_H
+#define PREF_H
 
 /* Set preferences */
 void SetBoolPreference(const char *name,int value);
@@ -18,3 +20,5 @@ void SetStrPreference (const char *name, const char *value);
 int  GetBoolPreference(const char *name, int defaut);
 int  GetIntPreference (const char *name, int defaut);
 void GetStrPreference (const char *name, char *out, const char *defaut, const int bufferSize = 256);
+
+#endif

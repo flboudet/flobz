@@ -250,13 +250,14 @@ namespace gameui {
         break;
       case USE_MIN_SIZE:
         {
+          /* TODO to be continued
           float y       = GameUIDefaults::SPACING;
           float height  = getSortingAxe(getSize());
           Vec3 size     = getSize();
           Vec3 position = getPosition();
           float axePos  = getSortingAxe(position);
 
-          /*for (int i = 0; i < getNumberOfChilds(); ++i) {
+          for (int i = 0; i < getNumberOfChilds(); ++i) {
             Widget *child = getChild(i);
             if (!child->getPreferedSize().is_zero()) {
               // center the widget if we know its size

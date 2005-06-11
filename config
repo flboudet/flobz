@@ -4,6 +4,7 @@ ENABLE_DGA=false
 
 DEBUG_MODE=true
 MORE_DEBUG=false
+ENABLE_PCH=true
 
 PRGNAME=flobopuyo
 
@@ -94,7 +95,7 @@ endif
 endif
 
 ifeq ($(DEBUG_MODE), true)
-CFLAGS:=$(CFLAGS) -g -O0
+CFLAGS:=$(CFLAGS) -g -O0 -Winvalid-pch
 LDFLAGS:=$(LDFLAGS) -g -O0
 else
 CFLAGS:=$(CFLAGS) -O2
@@ -102,6 +103,11 @@ endif
 
 ifeq ($(MORE_DEBUG), true)
 CFLAGS:=$(CFLAGS) -DDEBUG=1
+endif
+
+CFLAGS_NOPCH:=$(CFLAGS)
+ifeq ($(ENABLE_PCH), true)
+CFLAGS:=$(CFLAGS) -include all.h 
 endif
 
 CXXFLAGS=${CFLAGS}

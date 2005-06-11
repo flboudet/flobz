@@ -19,18 +19,22 @@
  *
  */
 
-#ifndef _EXCEPTION
-#define _EXCEPTION
+/*
+#ifndef PUYO_XYEXCEPTION_H
+#define PUYO_XYEXCEPTION_H
 
-class Exception {
+class Exception
+{
 	public:
 		Exception(char *exception);
 		~Exception();
 		void printMessage();
 		const char *getMessage();
-	private:
+
+  private:
 		char *message;
 };
 
 #endif // _EXCEPTION
+*/
 
