@@ -238,7 +238,7 @@ void PuyoGameWidget::cycle()
         }
         if ((cyclesBeforeSpeedIncreases != -1) && (gameSpeed > 0) && (tickCounts % cyclesBeforeSpeedIncreases == 0)) {
             gameSpeed--;
-            cyclesBeforeGameCycleV = (float)cyclesBeforeGameCycle * ((float)gameSpeed / 20.);
+            cyclesBeforeGameCycleV = (int)((float)cyclesBeforeGameCycle * ((float)gameSpeed / 20.));
         }
         
         requestDraw();

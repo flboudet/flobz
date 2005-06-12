@@ -5,6 +5,7 @@ namespace gameui {
   GameUIEnum   GameUIDefaults::CONTAINER_POLICY = USE_MAX_SIZE;
   float        GameUIDefaults::SPACING          = 16.0f;
   SoFont      *GameUIDefaults::FONT           = SoFont_new();
+  SoFont      *GameUIDefaults::FONT_TEXT      = SoFont_new();
   SoFont      *GameUIDefaults::FONT_INACTIVE  = SoFont_new();
   GameLoop    *GameUIDefaults::GAME_LOOP      = new GameLoop();
   ScreenStack *GameUIDefaults::SCREEN_STACK   = new ScreenStack();
@@ -634,7 +635,7 @@ namespace gameui {
   Text::Text(const String &label, SoFont *font)
     : font(font), label(label), mdontMove(true)
     {
-      if (font == NULL) this->font = GameUIDefaults::FONT;
+      if (font == NULL) this->font = GameUIDefaults::FONT_TEXT;
       setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
       offsetX = offsetY = 0.;
     }

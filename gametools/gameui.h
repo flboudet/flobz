@@ -47,6 +47,7 @@ namespace gameui {
       static float        SPACING;
       static SoFont      *FONT;
       static SoFont      *FONT_INACTIVE;
+      static SoFont      *FONT_TEXT;
       static GameLoop    *GAME_LOOP;
       static ScreenStack *SCREEN_STACK;
   };

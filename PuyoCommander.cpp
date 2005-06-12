@@ -272,14 +272,21 @@ void PuyoCommander::initFonts()
 {
   DBG_PRINT("initFonts()\n");
   smallFont = SoFont_new();
-  SoFont_load (smallFont, IIM_Load_DisplayFormatAlpha ("font4b.png"));
+  IIM_Surface *font3b = IIM_Load_DisplayFormatAlpha ("font3b.png");
+  IIM_Surface *font4b = IIM_Load_DisplayFormatAlpha ("font4b.png");
+  IIM_Surface *font5b = iim_surface_shift_hsv(font3b, 170, -.5, -.2);
+
+  SoFont_load (smallFont, font4b);
   menuFont = SoFont_new();
-  SoFont_load (menuFont, IIM_Load_DisplayFormatAlpha ("font3b.png"));
+  SoFont_load (menuFont, font3b);
   darkFont = SoFont_new();
   SoFont_load (darkFont, IIM_Load_DisplayFormatAlpha ("fontdark.png"));
   storyFont = darkFont;
+  SoFont *textFont = SoFont_new();
+  SoFont_load(textFont, font5b);
   
   GameUIDefaults::FONT          = menuFont;
+  GameUIDefaults::FONT_TEXT     = textFont;
   GameUIDefaults::FONT_INACTIVE = darkFont;
 }
 

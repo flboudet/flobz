@@ -53,6 +53,7 @@ typedef struct _IIM_Surface {
 
 IIM_Surface *iim_surface_shift_hue(IIM_Surface *src, float hue_offset);
 IIM_Surface *iim_surface_set_value(IIM_Surface *src, float value);
+IIM_Surface *iim_surface_shift_hsv(IIM_Surface *src, float h, float s, float v);
 void iim_surface_convert_to_gray(IIM_Surface *src);
 
 IIM_Surface * IIM_Load_DisplayFormat (const char *path);

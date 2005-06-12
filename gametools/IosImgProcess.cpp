@@ -326,6 +326,49 @@ RGBA iim_hsva2rgba(HSVA c)
 }
 
 /**
+ * Shift the saturation of a surface
+ */
+IIM_Surface *iim_surface_shift_hsv(IIM_Surface *isrc, float h, float s, float v)
+{
+  SDL_Surface *src = isrc->surf;
+  SDL_PixelFormat *fmt = src->format;
+  SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
+                                          fmt->Rmask, fmt->Gmask,
+                                          fmt->Bmask, fmt->Amask);
+  SDL_LockSurface(src);
+  SDL_LockSurface(ret);
+  for (int y=src->h; y--;)
+  {
+    for (int x=src->w; x--;)
+    {
+      RGBA rgba = iim_surface_get_rgba(src,x,y);
+      HSVA hsva = iim_rgba2hsva(rgba);
+      hsva.hue += h;
+      if (hsva.hue > 360.0f) hsva.hue -= 360.0f;
+      if (hsva.hue < 0.0f) hsva.hue += 360.0f;
+      hsva.saturation += s;
+      if (hsva.saturation > 1.) hsva.saturation = 1.f;
+      if (hsva.saturation < 0.0f) hsva.saturation = .0f;
+      hsva.value += v;
+      if (hsva.value > 1.) hsva.value = 1.f;
+      if (hsva.value < 0.0f) hsva.value = .0f;
+      rgba = iim_hsva2rgba(hsva);
+      iim_surface_set_rgba(ret,x,y,rgba);
+    }
+  }
+  SDL_UnlockSurface(ret);
+  SDL_UnlockSurface(src);
+  SDL_Surface *ret2 = SDL_DisplayFormatAlpha(ret);
+	SDL_SetAlpha(ret2, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
+	SDL_FreeSurface(ret);
+  ret = isrc->surf;
+  isrc->surf = SDL_DisplayFormatAlpha(ret);
+  SDL_SetAlpha(isrc->surf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
+  SDL_FreeSurface(ret);
+  return IIM_RegisterImg(ret2, true);
+}
+
+/**
  * Shift the hue of a surface
  */
 IIM_Surface *iim_surface_shift_hue(IIM_Surface *isrc, float hue_offset)

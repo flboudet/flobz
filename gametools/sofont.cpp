@@ -11,6 +11,8 @@ struct _SOFONT
 
 	int     max_i, spacew, cursShift;
 	Uint32  background;
+
+  int mark_color;
 };
 
 // protected
@@ -250,8 +252,8 @@ SoFont_DoStartNewChar (SoFont * font, Sint32 x)
 {
 	if (!font->picture)
 		return 0;
-	return SoFontGetPixel (font->picture->surf, x, 0) ==
-		SDL_MapRGB (font->picture->surf->format, 255, 0, 255);
+	return SoFontGetPixel (font->picture->surf, x, 0) == font->mark_color;
+//		SDL_MapRGB (font->picture->surf->format, 255, 0, 255);
 }
 
 void
@@ -296,6 +298,7 @@ SoFont_load (SoFont * font, IIM_Surface * FontSurface)
 	}
 	font->picture = FontSurface;
 	font->height = font->picture->h - 1;
+  font->mark_color = SoFontGetPixel (font->picture->surf, 0, 0);
 	while (x < font->picture->w) {
 		if (SoFont_DoStartNewChar (font, x)) {
 			if (i)
