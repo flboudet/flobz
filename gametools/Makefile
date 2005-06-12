@@ -1,4 +1,4 @@
-OBJFILES=SDL_Painter.o InputManager.o GameControls.o IosImgProcess.o preferences.o scrollingtext.o sofont.o gameloop.o gameui.o
+OBJFILES=SDL_Painter.o InputManager.o GameControls.o IosImgProcess.o preferences.o sofont.o gameloop.o gameui.o
 
 object:${OBJFILES}
 
