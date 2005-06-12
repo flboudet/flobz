@@ -63,12 +63,12 @@ styrolyse_dir:prelude
 all.h.gch:
 	@echo "[Precompiling Headers]"
 	@mkdir -p $(DEPDIR);\
-	$(MAKEDEPEND); \
-	cat $(df).d | sed 's/all.o/all.h.gch/' > $(df).P; \
-	cat $(df).d | sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
-	-e '/^$$/ d' -e 's/$$/ :/' >> $(df).P; \
-	rm -f $(df).d
-	@echo "[$@]" && $(CXX) $(CFLAGS_NOPCH) -c $< 2>> WARNINGS || (cat WARNINGS && false)
+	${CXX} -MM $(CFLAGS_NOPCH) -o $(DEPDIR)/all.d all.h ;\
+	cat $(DEPDIR)/all.d | sed 's/all.o/all.h.gch/' > $(DEPDIR)/all.P; \
+	cat $(DEPDIR)/all.d | sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+	-e '/^$$/ d' -e 's/$$/ :/' >> $(DEPDIR)/all.P; \
+	rm -f $(DEPDIR)/all.d
+	@echo "[$@]" && $(CXX) $(CFLAGS_NOPCH) all.h 2>> WARNINGS || (cat WARNINGS && false)
 
 glSDL.o:glSDL.c prelude 
 	@echo "[$@]" && $(CC) $(CFLAGS) -c $< 2>> EXT_WARNINGS
