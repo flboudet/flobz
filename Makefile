@@ -46,13 +46,13 @@ prelude:
 	@${CXX} ${CFLAGS_NOPCH} all.h -o all.h.gch
 
 iosfc_dir:
-	@+CFLAGS_NOPCH="$(CFLAGS_NOPCH)" make -C iosfc object
+	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C iosfc object
 
 gametools_dir:
-	@+CFLAGS_NOPCH="$(CFLAGS_NOPCH)" make -C gametools object
+	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C gametools object
 
 styrolyse_dir:
-	@+CFLAGS_NOPCH="$(CFLAGS_NOPCH)" make -C styrolyse object
+	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C styrolyse object
 
 %.o:%.cpp
 	@mkdir -p $(DEPDIR);\
