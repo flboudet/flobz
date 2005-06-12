@@ -42,16 +42,16 @@ prelude: all.h.gch
 	@echo "Compiling with CFLAGS=$(CFLAGS)"
 	@echo "Compiling with LDFLAGS=$(LDFLAGS)"
 
-iosfc_dir:
+iosfc_dir:prelude
 	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C iosfc object
 
-gametools_dir:
+gametools_dir:prelude
 	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C gametools object
 
-styrolyse_dir:
+styrolyse_dir:prelude
 	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C styrolyse object
 
-%.o:%.cpp
+%.o:%.cpp prelude
 	@mkdir -p $(DEPDIR);\
 	$(MAKEDEPEND); \
 	cp $(df).d $(df).P; \
@@ -70,12 +70,12 @@ all.h.gch:
 	rm -f $(df).d
 	@echo "[$@]" && $(CXX) $(CFLAGS_NOPCH) -c $< 2>> WARNINGS || (cat WARNINGS && false)
 
-glSDL.o:glSDL.c
+glSDL.o:glSDL.c prelude 
 	@echo "[$@]" && $(CC) $(CFLAGS) -c $< 2>> EXT_WARNINGS
 	@rm -f EXT_WARNINGS
-corona.o:corona.cpp
-corona32.o:corona32.cpp
-corona_palette.o:corona_palette.cpp	
+corona.o:corona.cpp prelude 
+corona32.o:corona32.cpp prelude 
+corona_palette.o:corona_palette.cpp	 prelude 
 
 clean:
 	rm -rf *~ *.o flobopuyo* $(PRGNAME) WARNINGS *.gch
