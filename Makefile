@@ -136,3 +136,6 @@ win-package: flobopuyo
 .PHONY: all clean
 
 -include $(OBJFILES:%.o=$(DEPDIR)/%.P)
+
+ctags:
+	ctags --languages=c++ -R .
