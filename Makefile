@@ -31,34 +31,31 @@ flobopuyo: prelude iosfc_dir gametools_dir styrolyse_dir ${OBJFILES}
 	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) -lSDL_net -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o gametools/*.o styrolyse/*.o styrolyse/goomsl/goomsl*.o
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
-	@[ -s WARNINGS ] && echo -e "--------------------------------------\n There have been some warnings:\n" && cat WARNINGS && rm -f WARNINGS && echo "--------------------------------------" || true
 	@echo
 	@echo " Type ./$(PRGNAME) to play."
 	@echo "--------------------------------------"
 
 prelude: all.h.gch
-	@rm -f WARNINGS flobopuyo
-	@touch WARNINGS
 	@echo "Compiling with CFLAGS=$(CFLAGS)"
 	@echo "Compiling with LDFLAGS=$(LDFLAGS)"
 
-iosfc_dir:prelude
+iosfc_dir:all.h.gch
 	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C iosfc object
 
-gametools_dir:prelude
+gametools_dir:all.h.gch
 	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C gametools object
 
-styrolyse_dir:prelude
+styrolyse_dir:all.h.gch
 	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C styrolyse object
 
-%.o:%.cpp prelude
+%.o:%.cpp all.h.gch
 	@mkdir -p $(DEPDIR);\
 	$(MAKEDEPEND); \
 	cp $(df).d $(df).P; \
 	cat $(df).d | sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
 	-e '/^$$/ d' -e 's/$$/ :/' >> $(df).P; \
 	rm -f $(df).d
-	@echo "[$@]" && $(CXX) $(CFLAGS) -c $< 2>> WARNINGS || (cat WARNINGS && false)
+	@echo "[$@]" && $(CXX) $(CFLAGS) -c $< # 2>> WARNINGS || (cat WARNINGS && false)
 
 all.h.gch:
 	@echo "[Precompiling Headers]"
@@ -68,14 +65,14 @@ all.h.gch:
 	cat $(DEPDIR)/all.d | sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
 	-e '/^$$/ d' -e 's/$$/ :/' >> $(DEPDIR)/all.P; \
 	rm -f $(DEPDIR)/all.d
-	@echo "[$@]" && $(CXX) $(CFLAGS_NOPCH) all.h 2>> WARNINGS || (cat WARNINGS && false)
+	@echo "[$@]" && $(CXX) $(CFLAGS_NOPCH) all.h # 2>> WARNINGS || (cat WARNINGS && false)
 
-glSDL.o:glSDL.c prelude 
+glSDL.o:glSDL.c all.h.gch 
 	@echo "[$@]" && $(CC) $(CFLAGS) -c $< 2>> EXT_WARNINGS
 	@rm -f EXT_WARNINGS
-corona.o:corona.cpp prelude 
-corona32.o:corona32.cpp prelude 
-corona_palette.o:corona_palette.cpp	 prelude 
+corona.o:corona.cpp all.h.gch 
+corona32.o:corona32.cpp all.h.gch 
+corona_palette.o:corona_palette.cpp	 all.h.gch 
 
 clean:
 	rm -rf *~ *.o flobopuyo* $(PRGNAME) WARNINGS *.gch
