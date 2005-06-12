@@ -27,7 +27,7 @@ MAKEDEPEND = ${CXX} -MM $(CFLAGS_NOPCH) -o $(df).d $<
 
 all: prelude flobopuyo
 
-flobopuyo: iosfc_dir gametools_dir styrolyse_dir ${OBJFILES}
+flobopuyo: prelude iosfc_dir gametools_dir styrolyse_dir ${OBJFILES}
 	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) -lSDL_net -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o gametools/*.o styrolyse/*.o styrolyse/goomsl/goomsl*.o
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
@@ -36,14 +36,11 @@ flobopuyo: iosfc_dir gametools_dir styrolyse_dir ${OBJFILES}
 	@echo " Type ./$(PRGNAME) to play."
 	@echo "--------------------------------------"
 
-prelude:
+prelude: all.h.gch
 	@rm -f WARNINGS flobopuyo
 	@touch WARNINGS
 	@echo "Compiling with CFLAGS=$(CFLAGS)"
 	@echo "Compiling with LDFLAGS=$(LDFLAGS)"
-	@echo "[Precompiling Headers]"
-	@rm -f all.h.gch
-	@${CXX} ${CFLAGS_NOPCH} all.h -o all.h.gch
 
 iosfc_dir:
 	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C iosfc object
@@ -62,6 +59,16 @@ styrolyse_dir:
 	-e '/^$$/ d' -e 's/$$/ :/' >> $(df).P; \
 	rm -f $(df).d
 	@echo "[$@]" && $(CXX) $(CFLAGS) -c $< 2>> WARNINGS || (cat WARNINGS && false)
+
+all.h.gch:
+	@echo "[Precompiling Headers]"
+	@mkdir -p $(DEPDIR);\
+	$(MAKEDEPEND); \
+	cat $(df).d | sed 's/all.o/all.h.gch/' > $(df).P; \
+	cat $(df).d | sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+	-e '/^$$/ d' -e 's/$$/ :/' >> $(df).P; \
+	rm -f $(df).d
+	@echo "[$@]" && $(CXX) $(CFLAGS_NOPCH) -c $< 2>> WARNINGS || (cat WARNINGS && false)
 
 glSDL.o:glSDL.c
 	@echo "[$@]" && $(CC) $(CFLAGS) -c $< 2>> EXT_WARNINGS
@@ -135,7 +142,7 @@ win-package: flobopuyo
 
 .PHONY: all clean
 
--include $(OBJFILES:%.o=$(DEPDIR)/%.P)
+-include $(OBJFILES:%.o=$(DEPDIR)/%.P) $(DEPDIR)/all.P
 
 ctags:
 	ctags --languages=c++ -R .
