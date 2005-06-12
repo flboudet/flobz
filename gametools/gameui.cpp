@@ -110,6 +110,18 @@ namespace gameui {
     arrangeWidgets();
   }
 
+  void WidgetContainer::changeChild(int i, Widget *w)
+  {
+    Widget *tmp = getChild(i);
+    if (tmp)
+      tmp->removeFromGameLoop();
+    childs[i] = w;
+    w->setParent(this);
+    if (addedToGameLoop)
+      w->addToGameLoop(loop);
+    arrangeWidgets();
+  }
+
   void WidgetContainer::addToGameLoop(GameLoop *loop)
   {
     addedToGameLoop = true;
@@ -881,10 +893,30 @@ namespace gameui {
   ListWidget::ListWidget(int size, GameLoop *loop) : VBox(loop), size(size), used(0)
   {
     for (int i=0; i<size; ++i) {
-      Text *t = new Text("---");
-      VBox::add(t);
+      VBox::add(new Button("---"));
     }
     setPreferedSize(Vec3(1,(size+2) + SoFont_FontHeight(GameUIDefaults::FONT)*size, 1));
+  }
+
+  void ListWidget::set(int pos, Widget *widget)
+  {
+    changeChild(pos, widget);
+  }
+
+  void ListWidget::add(Widget *widget)
+  {
+    if(used>=size) return;
+    set(used++, widget);
+  }
+
+  void ListWidget::clear()
+  {
+    used = 0;
+    for (int i=0; i<size; ++i) {
+      Button *b = new Button("---");
+      VBox::add(b);
+      b->mdontMove=true;
+    }
   }
   
   //

@@ -146,8 +146,9 @@ namespace gameui {
       virtual void removeFromGameLoopActive();
       
     protected:
-      Widget *getChild(int i)     const { return childs[i]; }
-      int     getNumberOfChilds() const { return childs.size(); }
+      Widget *getChild(int i)     const  { return childs[i]; }
+      void    changeChild(int i, Widget *w);
+      int     getNumberOfChilds() const  { return childs.size(); }
       void    sortWidgets();
 
     private:
@@ -303,7 +304,7 @@ namespace gameui {
       double offsetX;
       double offsetY;
 
-    protected:
+    public:
       bool mdontMove;
   };
 
@@ -370,6 +371,9 @@ namespace gameui {
   {
     public:
       ListWidget(int size, GameLoop *loop = NULL);
+      void set(int pos, Widget *widget);
+      void add(Widget *widget);
+      void clear();
 
     private:
       int size;

@@ -120,17 +120,17 @@ public:
 
 PuyoHttpServerList::PuyoHttpServerList(String hostName, String path, int portNum)
 {
-  /*HttpDocument doc(hostName, path, portNum);
-    StandardMessage msg(doc.getDocumentContent());
-    int nbServers = msg.getInt("NBSERV");
-    for (int i = 0 ; i < nbServers ; i++) {
-        char tmpStr[256];
-        sprintf(tmpStr, "SERVNAME%.2d", i);
-        String serverName = msg.getString(tmpStr);
-        sprintf(tmpStr, "PORTNUM%.2d", i);
-        int portNum = msg.getInt(tmpStr);
-        servers.add(new PuyoHttpServer(serverName, portNum));
-	}*/
+/*  HttpDocument doc(hostName, path, portNum);
+  StandardMessage msg(doc.getDocumentContent());
+  int nbServers = msg.getInt("NBSERV");
+  for (int i = 0 ; i < nbServers ; i++) {
+    char tmpStr[256];
+    sprintf(tmpStr, "SERVNAME%.2d", i);
+    String serverName = msg.getString(tmpStr);
+    sprintf(tmpStr, "PORTNUM%.2d", i);
+    int portNum = msg.getInt(tmpStr);
+    servers.add(new PuyoHttpServer(serverName, portNum));
+  } TODO: reactiver */
 }
 
 
@@ -209,11 +209,14 @@ void InternetGameMenu::build()
     serverListPanel = new ListWidget(6);
     EditField *playerName, *serverName;
     
-    for (int i = 0 ; i < servers.getNumServer() ; i++) {
+    /*for (int i = 0 ; i < servers.getNumServer() ; i++) {
         serverListPanel->add (new Button(servers.getServerNameAtIndex(i),
                                          new ServerSelectAction(servers.getServerNameAtIndex(i),
                                                                 servers.getServerPortAtIndex(i))));
-    }
+    }*/
+    serverListPanel->add (new Button("durandal.homeunix.com",
+                                     new ServerSelectAction("durandal.homeunix.com",
+                                                            6581)));
     serverSelectionPanel->add(serverListPanel);
     serverSelectionPanel->add(new Button("Update"));
     
