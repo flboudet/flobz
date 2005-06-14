@@ -8,7 +8,8 @@
 namespace ios_fc
 {
 
-#if _POSIX_TIMERS > 0
+#if 0
+// #if _POSIX_TIMERS > 0
 
 static int checkIfLower(struct timespec *min, clockid_t type, const char *stype)
 {
@@ -98,6 +99,8 @@ double getTimeMs()
 }
 
 #else // !_POSIX_TIMERS
+
+#include <sys/time.h>
 
 double getTimeMs()
 {
