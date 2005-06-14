@@ -138,13 +138,13 @@ HttpDocument *doc = NULL;
 PuyoHttpServerList::PuyoHttpServerList(String hostName, String path, int portNum)
 {
   isReady = false;
-  doc = new HttpDocument(hostName, path, portNum);
+  //doc = new HttpDocument(hostName, path, portNum);
 }
 
 bool PuyoHttpServerList::listIsReady() 
 {
     if (isReady) return true;
-    if (!doc->documentIsReady()) return false;
+    /*if (!doc->documentIsReady())*/ return false;
     
     StandardMessage msg(doc->getDocumentContent());
     int nbServers = msg.getInt("NBSERV");
@@ -195,6 +195,7 @@ class PushNetCenterMenuAction : public Action {
 public:
     PushNetCenterMenuAction(Text *serverName, Text *userName) : serverName(serverName), userName(userName) {}
     void action() {
+        fprintf(stderr, "Connecting to %s..\n", serverName->getValue().c_str());
         PuyoInternetGameCenter *gameCenter = new PuyoInternetGameCenter(serverName->getValue(),
                                                                         4567, userName->getValue());
         NetCenterMenu *newNetCenterMenu = new NetCenterMenu(gameCenter);
@@ -240,6 +241,10 @@ void InternetGameMenu::build()
     serverSelectionPanel->add(serverListPanel);
     updating = new Button("Update");
     serverSelectionPanel->add(updating);
+
+    // temporary entry into the server list
+    serverListPanel->add (new Button("durandal.homeunix.com",
+                                     new ServerSelectAction(*this, "durandal.homeunix.com", 6581)));
     
     playerName = new EditField("Kaori"); // TODO: get that from single player name
     serverName = new Text("---");
@@ -279,12 +284,12 @@ void InternetGameMenu::idle(double currentTime)
     {
         int X = (int)(currentTime*3) % 6;
         static const char *txt[6] = {
-            "Loading . . .   ",
-            " . Loading . .  ",
-            "  . . Loading . ",
-            "   . . . Loading",
-            "  . . Loading . ",
-            " . Loading . .  "
+            ".........Loading",
+            "......Loading...",
+            "...Loading......",
+            "Loading.........",
+            "...Loading......",
+            "......Loading..."
         };
         updating->setValue(txt[X]);
         updating->mdontMove = true;
