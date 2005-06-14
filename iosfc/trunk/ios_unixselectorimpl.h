@@ -53,6 +53,6 @@ public:
     virtual SelectorImpl * createSelectorImpl();
 };
 
-};
+}
 
 #endif // _IOSUNIXSELECTORIMPL

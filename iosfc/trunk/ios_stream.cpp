@@ -34,4 +34,4 @@ int OutputStream::streamWrite(VoidBuffer buffer)
     return streamWrite(buffer, buffer.size());
 }
 
-};
+}

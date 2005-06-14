@@ -37,8 +37,7 @@ namespace ios_fc {
 UnixDatagramSocketImpl::UnixDatagramSocketImpl()
     : broadcastAddress(new UnixSocketAddressImpl(INADDR_BROADCAST)),
       connectedAddress(new UnixSocketAddressImpl(INADDR_ANY))
-{
-}
+{}
 
 void UnixDatagramSocketImpl::create(int localPortNum)
 {

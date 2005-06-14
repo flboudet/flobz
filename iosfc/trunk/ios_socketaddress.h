@@ -51,8 +51,8 @@ namespace ios_fc {
 
     class SocketAddress {
     public:
-        SocketAddress(String hostName) { impl = factory->createSocketAddress(hostName); impl->incrementUsage(); }
-        SocketAddress(SocketAddressImpl *impl) { this->impl = impl; impl->incrementUsage(); }
+        SocketAddress(String hostName) : impl(factory->createSocketAddress(hostName)) { impl->incrementUsage(); }
+        SocketAddress(SocketAddressImpl *impl) : impl(impl) { impl->incrementUsage(); }
         SocketAddress(const SocketAddress &s) : impl(s.impl) { impl->incrementUsage(); }
         ~SocketAddress() { impl->decrementUsage(); }
         SocketAddress & operator = (const SocketAddress &a) {

@@ -76,6 +76,6 @@ public:
     virtual SocketImpl * createSocket();
 };
 
-};
+}
 #endif // _UNIXSOCKETIMPL
 

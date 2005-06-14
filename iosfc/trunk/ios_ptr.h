@@ -27,24 +27,25 @@ class SharedPtr
 		}
 
 	public:
-		SharedPtr(X* px = 0)                        { ref = new Ref(px); }
+		SharedPtr(X* px = NULL)  { ref = new Ref(px); }
 		SharedPtr(const SharedPtr<X> &ptr) : ref(ptr.ref) { ref->inc(); }
 		~SharedPtr()                                { dec(); }
 		
-		SharedPtr<X> &operator= (const SharedPtr<X> &ptr) {
+		SharedPtr &operator= (const SharedPtr<X> &ptr) {
 			dec();
 			ref = ptr.ref;
 			ref->inc();
-      return *this;
+                        return *this;
 		} 
 
-		void release()        { ref->px = 0;       }
-		X *get()        const { return ref->get(); }
-		X &operator*()  const { return *ref->px;   }
-		X *operator->() const { return ref->px;    }
+		void release()        { ref->px = NULL;     }
+		X *get()        const { return ref->px;  }
+		X &operator*()  const { return *ref->px; }
+		X *operator->() const { return ref->px;  }
+		bool operator!() const { return (ref->px == NULL); }
 };
 
-};
+}
 
 #define Ptr SharedPtr
 

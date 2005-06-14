@@ -13,7 +13,6 @@ namespace ios_fc {
         UDPMessage(int serialID, UDPMessageBox &owner, const PeerAddress &address);
         UDPMessage(const Buffer<char> serialized, UDPMessageBox &owner, SocketAddress address, int port) throw(InvalidMessageException);
         virtual ~UDPMessage();
-        void sendBuffer(Buffer<char> out) const;
         // Dirigeable implementation
         PeerAddress getPeerAddress();
         PeerAddress getBroadcastAddress();
@@ -22,9 +21,13 @@ namespace ios_fc {
         PeerAddress getPeerAddress(const String key);
         class UDPPeerAddressImpl;
     private:
+        void sendBuffer(Buffer<char> out) const;
         UDPMessageBox &owner;
         UDPPeerAddressImpl *peerAddressImpl;
         PeerAddress peerAddress;
+
+        UDPMessage(const UDPMessage&);
+        UDPMessage&operator=(const UDPMessage&);
     };
     
     class UDPPeerAddress : public PeerAddress {
@@ -35,6 +38,6 @@ namespace ios_fc {
         SocketAddress getSocketAddress() const;
         int getPortNum() const;
     };
-};
+}
 
 #endif

@@ -66,7 +66,7 @@ class HashMap {
     private:
         IosHash *hash;
     public:
-        HashMap()  { hash = ios_hash_new(); }
+        HashMap() : hash(ios_hash_new()) {}
         ~HashMap() { ios_hash_free(hash);   }
 
         void put(const char *key, void *value) { ios_hash_put_ptr  (hash, key, value); }
@@ -78,6 +78,14 @@ class HashMap {
         void       remove  (const char *key)       { ios_hash_remove(hash, key);          }
 
         void foreach(HashMapAction *action);
+
+    private:
+        HashMap(const HashMap& hmap):hash(0){}
+        HashMap& operator=(const HashMap& hmap)
+        {
+            hash=0;
+            return *this;
+        }
 };
 
 // A Hashmap where keys are ints.
@@ -85,7 +93,7 @@ class IntHashMap {
     private:
         IosHash *hash;
     public:
-        IntHashMap()  { hash = ios_hash_inew(); }
+        IntHashMap() : hash(ios_hash_inew()) {}
         ~IntHashMap() { ios_hash_ifree(hash);   }
 
         void put(int key, void *value) { ios_hash_iput_ptr  (hash, key, value); }
@@ -94,8 +102,15 @@ class IntHashMap {
 
         HashValue *get(int key) const  { return ios_hash_iget(hash, key); }
         void    remove(int key)        { ios_hash_iremove(hash, key);     }
+    private:
+        IntHashMap(const IntHashMap &hmap) : hash(0) {}
+        IntHashMap&operator=(const IntHashMap &hmap)
+        {
+            hash =0;
+            return *this;
+        }
 };
 
-}; // namespace ios_fc
+} // namespace ios_fc
 
 #endif /* _IOS_HASH_H */

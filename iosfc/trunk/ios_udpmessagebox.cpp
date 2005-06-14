@@ -24,6 +24,10 @@
 #include "ios_udpmessagebox.h"
 #include "ios_udpmessage.h"
 #include "ios_socketaddress.h"
+#include "ios_time.h"
+
+#include <sys/time.h>
+#include <stdint.h>
 
 namespace ios_fc {
 
@@ -34,27 +38,43 @@ class UDPMessageBox::KnownPeer {
 public:
     KnownPeer(const PeerAddress &address, int receiveSerialID, UDPMessageBox &owner);
     ~KnownPeer();
+
+    /// @brief Sends a all possible elements of the queue...
     void sendQueue();
-    void idle();
+
+    void idle(double time_ms);
     void handleMessage(UDPMessage &message, int messageSerialID);
     void handleAck(int messageSerialID);
+
+    // Members
+    
     PeerAddress address;
     UDPRawMessage *waitingForAckMessage;
     AdvancedBuffer<UDPRawMessage*> outQueue;
+
 private:
     int receiveSerialID;
     UDPMessageBox &owner;
-    int waitingForAckTimeout;
-    int waitingForAckLifespan;
-    int cycleSinceLastMessage;
+    double waitingForAckTimeout;
+    double waitingForAckLifespan;
+    double timeMsSinceLastMessage;
+    double lastIdle;
+
+    KnownPeer(const KnownPeer&);
+    KnownPeer&operator=(const KnownPeer&);
 };
 
 class UDPRawMessage {
 public:
     UDPRawMessage(Buffer<char> buf, int msgid, int reliableFlag,
 		  SocketAddress &address, int port, DatagramSocket &sock)
-      : id(msgid), reliable(reliableFlag),
-	address(address), port(port), socket(sock) {
+      : buffer()
+      , id(msgid)
+      , reliable(reliableFlag)
+      , address(address)
+      , port(port)
+      , socket(sock)
+      {
         buffer = buf;
     }
     virtual ~UDPRawMessage() {}
@@ -75,8 +95,15 @@ private:
 
 
 UDPMessageBox::KnownPeer::KnownPeer(const PeerAddress &address, int receiveSerialID, UDPMessageBox &owner)
-    : address(address), waitingForAckMessage(NULL), receiveSerialID(receiveSerialID),
-    owner(owner), cycleSinceLastMessage(0)
+    : address(address)
+    , waitingForAckMessage(NULL)
+    , outQueue()
+    , receiveSerialID(receiveSerialID)
+    , owner(owner)
+    , waitingForAckTimeout(0)
+    , waitingForAckLifespan(0)
+    , timeMsSinceLastMessage(0)
+    , lastIdle(0)
 {
     owner.knownPeers.add(this);
     for (int i = 0, j = owner.sessionListeners.size() ; i < j ; i++) {
@@ -99,42 +126,64 @@ UDPMessageBox::KnownPeer::~KnownPeer()
 
 void UDPMessageBox::KnownPeer::sendQueue()
 {
-    while ((waitingForAckMessage == NULL) && (outQueue.size() > 0)) {
+    while ((waitingForAckMessage == NULL) && (outQueue.size() > 0))
+    {
         UDPRawMessage *currentMessage = outQueue[0];
         currentMessage->send();
-        outQueue.remove(currentMessage);
+        outQueue.removeKeepOrder(currentMessage);
         if (currentMessage->isReliable()) {
-            waitingForAckMessage = currentMessage;
-            waitingForAckTimeout = owner.getCyclesBeforeResendingReliable();
+            // Store the current Ack-awaited message.
+            waitingForAckMessage  = currentMessage;
+            // Time remaining before dropping.
+            waitingForAckTimeout  = owner.getTimeMsBeforeResendingReliable();
+            // Time we've waited for an Ack.
             waitingForAckLifespan = 0;
         }
         else {
+            // We don't need this message anymore, bye man!
             delete currentMessage;
         }
     }
 }
 
 
-void UDPMessageBox::KnownPeer::idle()
+void UDPMessageBox::KnownPeer::idle(double time_ms)
 {
+    double elapsed_ms = time_ms - lastIdle;
+    if (lastIdle == 0) {
+        elapsed_ms = 0;
+    }
+    lastIdle = time_ms;
+
     // Handle reliable message reemission
-    if (waitingForAckMessage != NULL) {
-        waitingForAckTimeout--;
-        waitingForAckLifespan++;
-        if (waitingForAckLifespan >= owner.getCyclesBeforeReliableTimeout()) {
+    if (waitingForAckMessage != NULL)
+    {
+        // Time to "drop".
+        if (waitingForAckTimeout  > elapsed_ms) {
+            waitingForAckTimeout  -= elapsed_ms;
+        }
+        else {
+            waitingForAckTimeout = 0;
+        }
+        // Time since "send".
+        waitingForAckLifespan += elapsed_ms;
+
+        if (waitingForAckLifespan >= owner.getTimeMsBeforeReliableTimeout())
+        {
             printf("Reliable message dropped!\n");
             delete waitingForAckMessage;
             waitingForAckMessage = NULL;
         }
-        else if (waitingForAckTimeout <= 0) {
-            waitingForAckTimeout = owner.getCyclesBeforeResendingReliable();
+        else if (waitingForAckTimeout <= 0)
+        {
+            waitingForAckTimeout = owner.getTimeMsBeforeResendingReliable();
             waitingForAckMessage->send();
         }
     }
     
     // Handle peer timeout
-    cycleSinceLastMessage++;
-    if (cycleSinceLastMessage >= owner.getCyclesBeforePeerTimeout()) {
+    timeMsSinceLastMessage += elapsed_ms;
+    if (timeMsSinceLastMessage >= owner.getTimeMsBeforePeerTimeout()) {
         printf("Peer disconnected!\n");
         delete this;
     }
@@ -142,7 +191,7 @@ void UDPMessageBox::KnownPeer::idle()
 
 void UDPMessageBox::KnownPeer::handleMessage(UDPMessage &incomingMessage, int messageSerialID)
 {
-    cycleSinceLastMessage = 0;
+    timeMsSinceLastMessage = 0;
     
     // Handle message with inconsistent serial ID
     if ((messageSerialID >= 0) && (messageSerialID < receiveSerialID)) {
@@ -173,10 +222,12 @@ void UDPMessageBox::KnownPeer::handleMessage(UDPMessage &incomingMessage, int me
 
 void UDPMessageBox::KnownPeer::handleAck(int messageSerialID)
 {
-    if (waitingForAckMessage != NULL) {
+    if (waitingForAckMessage != NULL)
+    {
         // If the incoming message is the ACK for the waitingForAckMessage, do what must be done
-        if (waitingForAckMessage->getSerialID() == -messageSerialID) {
-            cycleSinceLastMessage = 0;
+        if (waitingForAckMessage->getSerialID() == -messageSerialID)
+        {
+            timeMsSinceLastMessage = 0;
             delete waitingForAckMessage;
             waitingForAckMessage = NULL;
             sendQueue();
@@ -187,40 +238,50 @@ void UDPMessageBox::KnownPeer::handleAck(int messageSerialID)
 
 UDPMessageBox::UDPMessageBox(const String address,
 			     int localPort, int remotePort)
-  : defaultAddress(address), defaultPort(remotePort)
+    : defaultAddress(address)
+    , defaultPort(remotePort)
+    , socket(new DatagramSocket(localPort))
+    , sendSerialID(0)
+    , knownPeers()
+    , timeMsBeforeResendingReliable(500)
+    , timeMsBeforeReliableTimeout(60000) // 1 minute
+    , timeMsBeforePeerTimeout(60000) // 1 minute
+    , sessionListeners()
 {
-    sendSerialID = 0;
-    cyclesBeforeResendingReliable = 10;
-    cyclesBeforeReliableTimeout = 2000;
-    cyclesBeforePeerTimeout = 2000;
-    socket = new DatagramSocket(localPort);
     socket->connect(defaultAddress, remotePort);
 }
 
 UDPMessageBox::UDPMessageBox(DatagramSocket *socket)
-    : defaultAddress("localhost"), defaultPort(socket->getSocketPortNum()), socket(socket)
+    : defaultAddress("localhost")
+    , defaultPort(socket->getSocketPortNum())
+    , socket(socket)
+    , sendSerialID(0)
+    , knownPeers()
+    , timeMsBeforeResendingReliable(500)
+    , timeMsBeforeReliableTimeout(60000) // 1 minute
+    , timeMsBeforePeerTimeout(60000) // 1 minute
+    , sessionListeners()
 {
-    sendSerialID = 0;
-    cyclesBeforeResendingReliable = 10;
-    cyclesBeforeReliableTimeout = 2000;
-    cyclesBeforePeerTimeout = 2000;
 }
 
 void UDPMessageBox::idle()
 {
+    double time_ms = getTimeMs();
+      
     char receiveData[2048];
     Buffer<char> receiveBuffer(receiveData, 2048);
     
     // Known peers idle task
     for (int i = 0, j = knownPeers.size() ; i < j ; i++) {
-        knownPeers[i]->idle();
+        knownPeers[i]->idle(time_ms);
     }
     
     while (socket->available()) {
         Datagram receivedDatagram = socket->receive(receiveBuffer);
         try {
             if (receivedDatagram.getSize() > 0) {
-                UDPMessage incomingMessage(Buffer<char>((char *)(receivedDatagram.getMessage()), receivedDatagram.getSize()), *this, receivedDatagram.getAddress(), receivedDatagram.getPortNum());
+                UDPMessage incomingMessage(Buffer<char>((char *)(receivedDatagram.getMessage()), receivedDatagram.getSize()),
+                                           *this, receivedDatagram.getAddress(), receivedDatagram.getPortNum());
                 
                 int messageSerialID = incomingMessage.getSerialID();
                 
@@ -306,6 +367,18 @@ void UDPMessageBox::removeSessionListener(SessionListener *l)
     sessionListeners.remove(l);
 }
 
-};
+
+/*UDPMessageBox::UDPMessageBox (const UDPMessageBox&m)
+  : defaultAddress(m.defaultAddress), defaultPort(m.defaultPort)
+{
+    IOS_ERROR("NOT ALLOWED!\n");
+}
+
+void UDPMessageBox::operator=(const UDPMessageBox&)
+{
+    IOS_ERROR("NOT ALLOWED!\n");
+}*/
+
+}
 
 

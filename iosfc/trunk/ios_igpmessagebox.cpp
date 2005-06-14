@@ -158,5 +158,5 @@ namespace ios_fc {
         }
         else throw Exception("Incompatible peer address type!");
     }
-};
+}
 

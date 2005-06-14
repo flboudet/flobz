@@ -64,6 +64,6 @@ class SelfVector : public AdvancedBuffer<T *>
     }
 };
 
-};
+}
 
 #endif // _IOS_VECTOR_H

@@ -1,6 +1,8 @@
 #include "ios_hash.h"
+
 #include <cstring>
 #include <cstdlib>
+using namespace std;
 
 namespace ios_fc {
 
@@ -287,5 +289,5 @@ void HashMap::foreach(HashMapAction *action)
   ios_hash_foreach(hash->root, action);
 }
 
-};
+}
 

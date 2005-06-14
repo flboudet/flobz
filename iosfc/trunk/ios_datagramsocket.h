@@ -29,6 +29,7 @@
 
 namespace ios_fc {
 
+    /// @brief Manage a Datagram sent by a DatagramSocket.
     class Datagram {
     public:
         Datagram(SocketAddress address, int portNum, VoidBuffer message, int size) : message(message), address(address), portNum(portNum), size(size) {}
@@ -43,6 +44,7 @@ namespace ios_fc {
         int size;
     };
     
+    /// @brief Interface defining Datagram implementation.
     class DatagramSocketImpl {
     public:
         DatagramSocketImpl() {}
@@ -59,14 +61,16 @@ namespace ios_fc {
         virtual void disconnect() = 0;
     };
     
+    /// @brief Interface of a factory for DatagramSocketImpl.
     class DatagramSocketFactory {
     public:
         virtual DatagramSocketImpl * createDatagramSocket() = 0;
     };
 
+    /// @brief Manage an UDP socket, for Datagram based network communication.
     class DatagramSocket : public Selectable {
     public:
-        DatagramSocket(const String hostName, int localPortNum, int remotePortNum);
+//        DatagramSocket(const String hostName, int localPortNum, int remotePortNum);
         DatagramSocket(int localPortNum);
         DatagramSocket();
         DatagramSocket(DatagramSocketImpl *impl);
@@ -91,8 +95,14 @@ namespace ios_fc {
         static DatagramSocketFactory *factory;
         DatagramSocketImpl *impl;
         SelectableImpl *sImpl;
+
+        DatagramSocket(const DatagramSocket&ds) : impl(0),sImpl(0) {}
+        DatagramSocket&operator=(const DatagramSocket&ds) {
+            impl=0;sImpl=0;
+            return *this;
+        }
     };
     
-};
+}
 #endif // _IOSDATAGRAMSOCKET
 

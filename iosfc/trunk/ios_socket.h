@@ -59,6 +59,6 @@ namespace ios_fc {
         SocketImpl *impl;
         SelectableImpl *sImpl;
     };
-};
+}
 #endif // _IOSSOCKET
 

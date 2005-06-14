@@ -5,11 +5,12 @@
 namespace ios_fc {
 
 enum ValueType {
-  INTEGER = 1,
-  BOOLEAN = 2,
-  STRING  = 3,
-  INT_ARRAY = 4,
-  CHAR_ARRAY = 5
+  INTEGER    = 1,
+  BOOLEAN    = 2,
+  STRING     = 3,
+  INT_ARRAY  = 4,
+  CHAR_ARRAY = 5,
+  FLOAT      = 6
 };
   
 class ValueInterface
@@ -42,6 +43,11 @@ class ValueBool : public Value<bool> {
     ValueBool(int b) : Value<bool>(b, BOOLEAN) {}
 };
 
+class ValueFloat : public Value<double> {
+  public:
+    ValueFloat(double f) : Value<double>(f, FLOAT) {}
+};
+
 class ValueString : public Value<String> {
   public:
     ValueString(const String s) : Value<String>(s, STRING) {}
@@ -59,7 +65,7 @@ class ValueCharArray : public Value<Buffer<char> > {
 
 /* class Message */
 
-Message::Message()
+Message::Message() : datas(), intProperties()
 {
 }
 
@@ -81,6 +87,11 @@ void Message::addInt       (const String key, int value)
 void Message::addBool      (const String key, bool value)
 {
   datas.put(key, new ValueBool(value));
+}
+
+void Message::addFloat      (const String key, double value)
+{
+  datas.put(key, new ValueFloat(value));
 }
 
 void Message::addString    (const String key, const String value)
@@ -111,7 +122,7 @@ void Message::addBoolProperty  (const String key, const bool property)
 static ValueInterface *getInterfaceAndCheckType(const HashMap &datas,
                                                 const String key,
                                                 ValueType type,
-                                                const String stype) throw(Message::DataException)
+                                                const String stype)
 {
   HashValue *hval = datas.get(key);
   if (hval == NULL)
@@ -138,6 +149,11 @@ bool Message::hasBool      (const String key) const
   return datas.get(key) != NULL;
 }
 
+bool Message::hasFloat      (const String key) const
+{
+  return datas.get(key) != NULL;
+}
+
 bool Message::hasString    (const String key) const
 {
   return datas.get(key) != NULL;
@@ -152,9 +168,30 @@ bool Message::hasCharArray  (const String key) const
 {
   return datas.get(key) != NULL;
 }
+
+
+bool Message::hasInt       (const String key, int value)    const
+{
+    return hasInt(key) && (getInt(key) == value);
+}
+
+bool Message::hasFloat      (const String key, double value)   const
+{
+    return hasFloat(key) && (getFloat(key) == value);
+}
+
+bool Message::hasBool      (const String key, bool value)   const
+{
+    return hasBool(key) && (getBool(key) == value);
+}
+
+bool Message::hasString    (const String key, String value) const
+{
+    return hasString(key) && (getString(key) == value);
+}
     
 
-int Message::getInt      (const String key) const throw(DataException)
+int Message::getInt      (const String key) const
 {
   ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, INTEGER, "Integer");
 
@@ -165,7 +202,7 @@ int Message::getInt      (const String key) const throw(DataException)
   return val_int->getValue();
 }
 
-bool Message::getBool     (const String key) const throw(DataException)
+bool Message::getBool     (const String key) const
 {
   ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, BOOLEAN, "Boolean");
 
@@ -176,7 +213,18 @@ bool Message::getBool     (const String key) const throw(DataException)
   return val_bool->getValue();
 }
 
-const String Message::getString   (const String key) const throw(DataException)
+double Message::getFloat     (const String key) const
+{
+  ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, FLOAT, "Floatean");
+
+  ValueFloat* val_double = dynamic_cast<ValueFloat*>(val_interface);
+  if (val_double == NULL)
+    throw DataException(key + " is not a FLOAT");
+
+  return val_double->getValue();
+}
+
+const String Message::getString   (const String key) const
 {
   ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, STRING, "String");
 
@@ -187,7 +235,7 @@ const String Message::getString   (const String key) const throw(DataException)
   return val_string->getValue();
 }
 
-const Buffer<int> Message::getIntArray (const String key) const throw(DataException)
+const Buffer<int> Message::getIntArray (const String key) const
 {
   ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, INT_ARRAY, "IntArray");
 
@@ -198,7 +246,7 @@ const Buffer<int> Message::getIntArray (const String key) const throw(DataExcept
   return val_intarray->getValue();
 }
 
-const Buffer<char> Message::getCharArray (const String key) const throw(DataException)
+const Buffer<char> Message::getCharArray (const String key) const
 {
   ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, CHAR_ARRAY, "CharArray");
 
@@ -210,7 +258,7 @@ const Buffer<char> Message::getCharArray (const String key) const throw(DataExce
 }
 
 
-int Message::getIntProperty(const String key) const throw(PropertyException)
+int Message::getIntProperty(const String key) const
 {
   HashValue *hval = intProperties.get(key);
   if (hval == NULL)
@@ -218,7 +266,7 @@ int Message::getIntProperty(const String key) const throw(PropertyException)
   return hval->i;
 }
 
-bool         Message::getBoolProperty   (const String key) const throw(PropertyException)
+bool         Message::getBoolProperty   (const String key) const
 {
   HashValue *hval = intProperties.get(key);
   if (hval == NULL)
@@ -236,4 +284,5 @@ bool Message::hasBoolProperty   (const String key) const
   return intProperties.get(key) != NULL;
 }
 
-};
+}
+

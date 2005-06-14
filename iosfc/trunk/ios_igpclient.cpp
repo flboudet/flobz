@@ -99,4 +99,4 @@ void IGPClient::removeListener(IGPClientMessageListener *listener) {
     listeners.remove(listener);
 }
 
-};
+}

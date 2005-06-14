@@ -49,9 +49,9 @@ public:
     void removeSessionListener(SessionListener *l);
     
     // Accessors
-    inline int getCyclesBeforeResendingReliable() const { return cyclesBeforeResendingReliable; }
-    inline int getCyclesBeforeReliableTimeout() const { return cyclesBeforeReliableTimeout; }
-    inline int getCyclesBeforePeerTimeout() const { return cyclesBeforePeerTimeout; }
+    inline int getTimeMsBeforeResendingReliable() const { return timeMsBeforeResendingReliable; }
+    inline int getTimeMsBeforeReliableTimeout()  const  { return timeMsBeforeReliableTimeout; }
+    inline int getTimeMsBeforePeerTimeout()      const  { return timeMsBeforePeerTimeout; }
 private:
     struct KnownPeer;
     KnownPeer *findPeer(PeerAddress address);
@@ -64,14 +64,17 @@ private:
     int sendSerialID;
     AdvancedBuffer<KnownPeer*> knownPeers;
     // UDP Messagebox parameters
-    int cyclesBeforeResendingReliable;
-    int cyclesBeforeReliableTimeout;
-    int cyclesBeforePeerTimeout;
+    int timeMsBeforeResendingReliable;
+    int timeMsBeforeReliableTimeout;
+    int timeMsBeforePeerTimeout;
     
     // Session manager
     AdvancedBuffer<SessionListener *> sessionListeners;
+
+    UDPMessageBox (const UDPMessageBox&);
+    void operator=(const UDPMessageBox&);
 };
 
-};
+}
 
 #endif // _IOS_UDP_MESSAGE_BOX_H

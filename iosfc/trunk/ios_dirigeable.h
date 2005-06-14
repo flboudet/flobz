@@ -48,16 +48,19 @@ private:
 class PeerAddress {
 public:
     PeerAddress() : impl(NULL) {}
-    PeerAddress(PeerAddressImpl *impl) : impl(impl) { impl->incrementUsage(); }
-    PeerAddress(const PeerAddress &a) : impl(a.impl) { impl->incrementUsage(); }
-    virtual ~PeerAddress() { impl->decrementUsage(); }
+    PeerAddress(PeerAddressImpl *impl) : impl(impl) { if (impl) impl->incrementUsage(); }
+    PeerAddress(const PeerAddress &a) : impl(a.impl) { if (impl) impl->incrementUsage(); }
+    virtual ~PeerAddress() { if (impl) impl->decrementUsage(); }
     PeerAddress & operator = (const PeerAddress &a) {
         if (impl != NULL) impl->decrementUsage();
         this->impl = a.impl;
-        impl->incrementUsage();
+        if (impl) impl->incrementUsage();
         return *this;
     }
     bool operator == (const PeerAddress &a) const {
+        if (impl == a.impl) return true;
+        if (impl == NULL) return false;
+        if (a.impl == NULL) return false;
         return (*impl == *(a.impl));
     } 
     inline PeerAddressImpl *getImpl() const { return impl; }

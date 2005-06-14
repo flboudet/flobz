@@ -14,6 +14,6 @@ class FileLoader {
     static Buffer<char> loadFrom(const String &url);
 };
 
-};
+}
 
 #endif

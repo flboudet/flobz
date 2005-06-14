@@ -54,6 +54,6 @@ namespace ios_fc {
             void *file;
     };
 
-};
+}
 
 #endif

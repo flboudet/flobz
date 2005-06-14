@@ -35,7 +35,7 @@ public:
     virtual SelectableImpl *getSelectableImpl() const = 0;
 };
 
-};
+}
 
 #endif // _IOSSELECTABLE
 

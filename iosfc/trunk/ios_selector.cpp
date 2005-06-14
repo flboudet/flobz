@@ -24,9 +24,8 @@
 namespace ios_fc {
 
 Selector::Selector()
-{
-    impl = factory->createSelectorImpl();
-}
+    : impl(factory->createSelectorImpl())
+{}
 
 Selector::~Selector()
 {

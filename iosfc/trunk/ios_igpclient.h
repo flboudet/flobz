@@ -54,6 +54,6 @@ private:
     int igpKeepAliveCounter;
 };
 
-};
+}
 
 #endif // _IGPCLIENT_H

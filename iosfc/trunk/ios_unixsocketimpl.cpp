@@ -167,4 +167,4 @@ UnixSocketFactory unixSocketFactory;
 
 SocketFactory *Socket::factory = &unixSocketFactory;
 
-};
+}

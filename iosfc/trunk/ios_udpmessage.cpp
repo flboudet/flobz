@@ -27,11 +27,11 @@ UDPMessage::UDPMessage(int serialID, UDPMessageBox &owner, SocketAddress address
 }
 
 UDPMessage::UDPMessage(int serialID, UDPMessageBox &owner, const PeerAddress &address)
-    : StandardMessage(serialID), owner(owner),
-      peerAddress(address)
-{
-    peerAddressImpl = static_cast<UDPPeerAddressImpl *>(address.getImpl());
-}
+    : StandardMessage(serialID)
+    , owner(owner)
+    , peerAddressImpl(static_cast<UDPPeerAddressImpl *>(address.getImpl()))
+    , peerAddress(address)
+{}
 
 UDPMessage::~UDPMessage()
 {
@@ -107,4 +107,4 @@ int UDPPeerAddress::getPortNum() const
     else throw Exception("Incompatible peer address type!");
 }
         
-};
+}

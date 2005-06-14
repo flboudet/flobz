@@ -75,4 +75,4 @@ Buffer<char> FileLoader::loadFrom(const String &url)
   return Buffer<char>(0);
 }
 
-};
+}

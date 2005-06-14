@@ -34,19 +34,44 @@ namespace ios_fc {
 
     class Exception : public std::exception {
         public:
-            Exception(const String msg);
+            Exception(const char *msg);
+            Exception(const Exception &e);
+            void operator=(const Exception &e);
             ~Exception() throw();
             void  printMessage()      const;
-            const String getMessage() const;
             const char *what()        const throw();
 
         private:
-            String message;
+            char *message;
     };
 
-#define IOS_ERROR(msg) { fprintf(stderr,"%s\n",msg); fflush(stderr); throw new ios_fc::Exception(msg); }
+}
 
-};
+
+#ifdef DEBUG
+
+#include <cstdio>
+#include <cstdlib>
+
+static inline void IOS_ERROR(const char *msg)
+{
+	std::fprintf(stderr,"[DEBUG] ios_error: %s\n", msg);
+	std::fflush(stderr);
+	throw ios_fc::Exception(msg);
+}
+
+#define IOS_ASSERT(expr) if (!(expr)) IOS_ERROR(ios_fc::String("Assertion '" #expr "' failed\n  location: " __FILE__ ":") + __LINE__ + ", " + __PRETTY_FUNCTION__); else;
+
+#else // DEBUG
+
+#define IOS_ASSERT(expr) (static_cast<void>(0))
+//#define IOS_ERROR(msg) throw ios_fc::Exception(msg); 
+static inline void IOS_ERROR(const char *msg)
+{
+    throw ios_fc::Exception(msg);
+}
+
+#endif // DEBUG
 
 #endif // _EXCEPTION_H
 

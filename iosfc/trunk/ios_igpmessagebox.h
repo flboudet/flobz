@@ -49,6 +49,6 @@ public:
     int destIdent;
 };
 
-};
+}
 
 #endif // _IOS_IGPMESSAGE_BOX_H

@@ -157,7 +157,7 @@ private:
     Buffer<char> msg;
 };
 
-};
+}
 
 #endif // _IGPDATAGRAM_H
 

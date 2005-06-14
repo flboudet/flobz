@@ -5,36 +5,36 @@
  * GNU General Public Licence
  */
 
-#include "ios_memory.h"
 #include "ios_exception.h"
 
 #include <cstdlib>
 #include <cstring>
-#include <iostream>
-
 using namespace std;
 
 namespace ios_fc {
+    
+    const char *DBG_PRINT_PREFIX = "...";
 
-    Exception::Exception(const String exception)
+    Exception::Exception(const char *exception)
+      : message(strdup(exception))
+      {}
+
+    Exception::~Exception() throw ()
     {
-        message = exception;
+        free(message);
     }
 
-    Exception::~Exception() throw () {
-    }
-
-    const String Exception::getMessage() const {
-        return message;
-    }
+    Exception::Exception(const Exception &e)
+    : message(strdup(e.message))
+    {}
 
     const char *Exception::what() const throw () {
         return message;
     }
 
     void Exception::printMessage() const {
-        cerr << "Exception thrown: " << (const char*)message << endl;
+        fprintf(stderr, "Exception thrown: %s\n", message);
     }
 
-};
+}
 

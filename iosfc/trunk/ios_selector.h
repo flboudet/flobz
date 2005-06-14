@@ -54,9 +54,12 @@ public:
 private:
     static SelectorFactory *factory;
     SelectorImpl *impl;
+
+    Selector(const Selector&);
+    Selector&operator=(const Selector&);
 };
 
-};
+}
 
 #endif // _IOSSTREAMSELECTOR
 

@@ -37,6 +37,7 @@
 #include <cstdio>
 
 #include "ios_ptr.h"
+#include "ios_exception.h"
 
 // #define DEBUG_MEMORY
 
@@ -88,12 +89,12 @@ namespace ios_fc {
                 p->nb   = 1;
             }
 #endif
-			inline void unregPtr() {
+            inline void unregPtr() {
                 if (!(-- p->nb)) {
                     Memory::free(p->ptr);
                     delete p;
                 }
-			}
+            }
 
         public:
 
@@ -102,7 +103,7 @@ namespace ios_fc {
              *
              * @param size Initial size.
              */
-            inline VoidBuffer (int size = 0) : p(NULL), offset(0) {
+            inline VoidBuffer (int size = 0) : p(NULL),offset(0) {
                 init_ptr(size);
             }
 
@@ -112,7 +113,7 @@ namespace ios_fc {
              * @param buf VoidBuffer to duplicate.
              */
             inline VoidBuffer (const VoidBuffer &buf)
-                : offset(0)
+                : p(NULL),offset(0)
             {
               init_ptr(buf.size());
               Memory::memcpy(ptr(), buf.ptr(), size());
@@ -130,7 +131,7 @@ namespace ios_fc {
              * @param data Pointer to the buffer.
              * @param len  Size of the buffer.
              */
-            inline VoidBuffer (const void *data,int len) : offset(0) {
+            inline VoidBuffer (const void *data,int len) : p(NULL),offset(0) {
                 init_ptr (len);
                 Memory::memcpy (p->ptr,data,len);
             }
@@ -140,13 +141,13 @@ namespace ios_fc {
              *
              * @param vb Buffer to copy.
              */
-			inline const VoidBuffer &operator= (VoidBuffer &vb) {
-				unregPtr();
-				p      = vb.p;
-				offset = vb.offset;
-				++ p->nb;
-				return *this;
-			}
+            inline const VoidBuffer &operator= (VoidBuffer &vb) {
+                unregPtr();
+                p      = vb.p;
+                offset = vb.offset;
+                ++ p->nb;
+                return *this;
+            }
 
             /**
              * Gives a copy of a VoidBuffer, duplicating the datas.
@@ -163,7 +164,7 @@ namespace ios_fc {
             /**
              * Destructor.
              */
-            inline ~VoidBuffer () {
+            virtual ~VoidBuffer () {
 				unregPtr();
             }
 
@@ -264,11 +265,11 @@ namespace ios_fc {
             Ptr *p;
             int offset;
 
-            inline VoidBuffer (VoidBuffer &buf, int offset) {
+            inline VoidBuffer (VoidBuffer &buf, int offset):p(NULL),offset(0) {
               printf ("DO NOT USE THIS (%s::%d)\n", __FILE__, __LINE__);
             }
 
-            inline VoidBuffer (const VoidBuffer &buf, int offset) {
+            inline VoidBuffer (const VoidBuffer &buf, int offset):p(NULL),offset(0) {
               printf ("DO NOT USE THIS (%s::%d)\n", __FILE__, __LINE__);
             }
     };
@@ -394,6 +395,29 @@ namespace ios_fc {
                 used++;
             }
 
+            inline void removeKeepOrder(const T t)
+            {
+                if (size() == 0)
+                    return;
+
+                if (this->get(size()-1) == t) {
+                    this->remove();
+                    return;
+                }
+
+                T tafter = this->get(size()-1);
+                for (int index=size()-2;index>=0;--index) {
+                    T tmp            = this->get(index);
+                    this->get(index) = tafter;
+                    tafter           = tmp;
+                    if (tafter == t) {
+                        this->remove();
+                        return;
+                    }
+                }
+                IOS_ERROR("removeKeepOrder() failed!");
+            }
+
             inline int  remove(const T t) {
                 for (int index=size()-1;index>=0;--index)
                     if (this->get(index) == t) {
@@ -452,7 +476,10 @@ namespace ios_fc {
             String(const char *str) : buffer(str, strlen(str)+1) {}
             String(const String &s) : buffer(s.buffer.dup())    {} 
             
-            void operator=(const String &s) { buffer = s.buffer; }
+            String &operator=(const String &s) {
+                buffer = s.buffer;
+                return *this;
+            }
             ~String() {}
 
             String operator+(const String &s) const {
@@ -479,7 +506,7 @@ namespace ios_fc {
 
             String operator+(int i)    const { return concat<int>("%d", i); }
             String operator+(float f)  const { return concat<float>("%f", f); }
-            String operator+(double d) const { return concat<double>("%g", d); }
+            String operator+(double d) const { return concat<double>("%f", d); }
 
             bool operator==(const char *s) const {
                 return !strcmp(buffer, s);
@@ -498,7 +525,7 @@ namespace ios_fc {
             }
 
             const String& operator+=(const String &s) {
-                buffer.grow(s.size());
+                buffer.grow(s.size()+1);
                 strcat(buffer, s.buffer);
                 return *this;
             }
@@ -546,6 +573,7 @@ namespace ios_fc {
                 return ret;
             }
             
+            const char *c_str() const     { return (const char*)buffer; }
             operator const char *() const { return (const char*)buffer; }
             char  operator[] (int i) const { return buffer[i]; }
             char &operator[] (int i)       { return buffer[i]; }
@@ -574,7 +602,7 @@ namespace ios_fc {
             String(int size) : buffer(size) {}
             String(Buffer<char> buf) : buffer(buf) {}
     };
-};
+}
 
 #include "ios_exception.h"
 
@@ -654,18 +682,16 @@ void ios_fc::Memory::free (void *ptr) {
 #ifdef DEBUG
 template<typename T>
     inline T ios_fc::Buffer<T>::operator[] (int i) const {
-        if ((i>=0)&&(i<size()))
-            return ptr()[i];
-        else
+        if ((i<0)||(i>=size()))
             IOS_ERROR("Index out of bounds");
+        return ptr()[i];
     }
 
 template<typename T>
     inline T &ios_fc::Buffer<T>::operator[] (int i) {
-        if ((i>=0)&&(i<size()))
-            return ptr()[i];
-        else
+        if ((i<0)||(i>=size()))
             IOS_ERROR("Index out of bounds");
+        return ptr()[i];
     }
 
 inline void ios_fc::VoidBuffer::init_ptr (int size) {

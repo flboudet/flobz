@@ -21,14 +21,15 @@ namespace ios_fc {
       int  getSerialID() const;
       void send() const;
 
-      void addInt       (const String key, int value);
-      void addBool      (const String key, bool value);
-      void addString    (const String key, const String value);
-      void addIntArray  (const String key, const Buffer<int> value);
-      void addCharArray (const String key, const Buffer<char> value);
+      virtual void addInt       (const String key, int value);
+      virtual void addBool      (const String key, bool value);
+      virtual void addFloat     (const String key, double value);
+      virtual void addString    (const String key, const String value);
+      virtual void addIntArray  (const String key, const Buffer<int> value);
+      virtual void addCharArray (const String key, const Buffer<char> value);
 
-      void addIntProperty   (const String key, const int value);
-      void addBoolProperty  (const String key, const bool property);
+      virtual void addIntProperty   (const String key, const int value);
+      virtual void addBoolProperty  (const String key, const bool property);
 
       const Buffer<char> serialize() const;
       
@@ -39,6 +40,6 @@ namespace ios_fc {
       void checkMessage() throw(InvalidMessageException);
   };
 
-};
+}
 
 #endif

@@ -6,6 +6,7 @@ namespace ios_fc {
 
   static const String INTEGER    = "I";
   static const String BOOLEAN    = "B";
+  static const String FLOAT      = "F";
   static const String STRING     = "S";
   static const String INT_ARRAY  = "A";
   static const String CHAR_ARRAY  = "C";
@@ -16,6 +17,7 @@ namespace ios_fc {
   static const String IS_RELIABLE = "RELIABLE";
 
   StandardMessage::StandardMessage(int serialID)
+    : serialized()
   {
     addIntProperty(SERIAL_ID, serialID);
   }
@@ -54,6 +56,12 @@ namespace ios_fc {
   {
     Message::addBool(key,value);
     serialized.add(new String(key + ":" + BOOLEAN + ":" + value));
+  }
+  
+  void StandardMessage::addFloat(const String key, double value)
+  {
+    Message::addFloat(key,value);
+    serialized.add(new String(key + ":" + FLOAT + ":" + value));
   }
   
   void StandardMessage::addString(const String key, const String value)
@@ -109,6 +117,7 @@ namespace ios_fc {
   }
 
   StandardMessage::StandardMessage(const Buffer<char> raw)  throw(InvalidMessageException)
+    : serialized()
   {
     Buffer<char> tmp_buf = raw.dup();
     tmp_buf.grow(1);
@@ -143,6 +152,7 @@ namespace ios_fc {
 
       if (type == INTEGER) addInt(key, atoi(value));
       else if (type == BOOLEAN) addBool(key, atoi(value));
+      else if (type == FLOAT) addFloat(key, (double)atof(value));
       else if (type == STRING)  addString(key, value);
       else if (type == PARAM_INTEGER) addIntProperty(key, atoi(value));
       else if (type == PARAM_BOOLEAN) addBoolProperty(key, atoi(value));
@@ -191,4 +201,5 @@ namespace ios_fc {
       throw InvalidMessageException();
   }
 
-};
+}
+

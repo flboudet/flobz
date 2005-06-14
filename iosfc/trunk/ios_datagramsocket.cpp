@@ -24,30 +24,31 @@
 
 namespace ios_fc {
 
-DatagramSocket::DatagramSocket(const String hostName, int localPortNum, int remotePortNum)
+/*DatagramSocket::DatagramSocket(const String hostName, int localPortNum, int remotePortNum)
 {
     impl = factory->createDatagramSocket();
     impl->create(localPortNum);
     sImpl = impl->getSelectableImpl();
-}
+}*/
 
 DatagramSocket::DatagramSocket(int localPortNum)
+: impl(factory->createDatagramSocket()), sImpl(0)
 {
-    impl = factory->createDatagramSocket();
     impl->create(localPortNum);
     sImpl = impl->getSelectableImpl();
 }
 
 DatagramSocket::DatagramSocket()
+: impl(factory->createDatagramSocket()), sImpl(0)
 {
-    impl = factory->createDatagramSocket();
     impl->create(NODEFINEDPORT);
     sImpl = impl->getSelectableImpl();
 }
 
-DatagramSocket::DatagramSocket(DatagramSocketImpl *impl) : impl(impl)
+DatagramSocket::DatagramSocket(DatagramSocketImpl *impl)
+    : impl(impl)
+    , sImpl(this->impl->getSelectableImpl())
 {
-    sImpl = impl->getSelectableImpl();
 }
         
 DatagramSocket::~DatagramSocket()

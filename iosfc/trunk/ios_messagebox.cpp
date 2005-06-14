@@ -31,4 +31,5 @@ void MessageBox::removeListener(MessageListener *listener) {
     listeners.remove(listener);
 }
 
-};
+}
+

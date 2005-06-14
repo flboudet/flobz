@@ -44,4 +44,4 @@ IGPDatagram::IGPDatagram(Message *data, IGPMsgIdent ident) : message(data), msgI
     message->addInt(MSGIDENT, ident);
 }
 
-};
+}

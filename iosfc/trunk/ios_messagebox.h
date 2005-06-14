@@ -35,6 +35,8 @@ public:
 
 class MessageBox {
 public:
+    MessageBox() : listeners() {}
+    
     virtual ~MessageBox() {}
     virtual void idle() = 0;
     void addListener(MessageListener *);
@@ -44,6 +46,6 @@ protected:
     Vector<MessageListener> listeners;
 };
 
-};
+}
 
 #endif // _IOS_MESSAGE_BOX_H
