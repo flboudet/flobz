@@ -893,17 +893,20 @@ namespace gameui {
   ListWidget::ListWidget(int size, GameLoop *loop) : VBox(loop), size(size), used(0)
   {
     for (int i=0; i<size; ++i) {
-      VBox::add(new Button("---"));
+      Button *b = new Button("---");
+      b->mdontMove=true;
+      VBox::add(b);
     }
     setPreferedSize(Vec3(1,(size+2) + SoFont_FontHeight(GameUIDefaults::FONT)*size, 1));
   }
 
-  void ListWidget::set(int pos, Widget *widget)
+  void ListWidget::set(int pos, Button *widget)
   {
+    widget->mdontMove = true;
     changeChild(pos, widget);
   }
 
-  void ListWidget::add(Widget *widget)
+  void ListWidget::add(Button *widget)
   {
     if(used>=size) return;
     set(used++, widget);
@@ -914,8 +917,7 @@ namespace gameui {
     used = 0;
     for (int i=0; i<size; ++i) {
       Button *b = new Button("---");
-      VBox::add(b);
-      b->mdontMove=true;
+      set(i,b);
     }
   }
   

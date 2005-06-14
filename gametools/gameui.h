@@ -371,8 +371,8 @@ namespace gameui {
   {
     public:
       ListWidget(int size, GameLoop *loop = NULL);
-      void set(int pos, Widget *widget);
-      void add(Widget *widget);
+      void set(int pos, Button *widget);
+      void add(Button *widget);
       void clear();
 
     private:

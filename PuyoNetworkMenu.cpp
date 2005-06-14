@@ -38,15 +38,21 @@ class HttpDocument {
 public:
     HttpDocument(String hostName, String path, int portNum);
     VoidBuffer getDocumentContent() const { return docContent; }
+    bool documentIsReady();
+
 private:
     String getLine();
     static const String contentLength;
     static const String rqPart[];
     class HttpHeaderElement;
+    bool docIsReady;
     Socket httpSocket;
     InputStream *httpInputStream;
     int msgSize;
     Buffer<char> docContent;
+    String path;
+    String hostName;
+    int portNum;
 };
 
 class HttpDocument::HttpHeaderElement {
@@ -79,11 +85,19 @@ Accept-Language: en\r\n\
 \r\n"};
 
 HttpDocument::HttpDocument(String hostName,  String path, int portNum)
-    : httpSocket(hostName, portNum), httpInputStream(httpSocket.getInputStream()), msgSize(-1)
+    : docIsReady(false), httpSocket(hostName, portNum), httpInputStream(httpSocket.getInputStream()), msgSize(-1), path(path), hostName(hostName), portNum(portNum)
 {
+}
+
+bool HttpDocument::documentIsReady() 
+{
+    if (docIsReady) return true;
+    return false;
+
+    // 1 - check if we can write to the output ?
     String request = rqPart[0] + path + rqPart[1] + hostName + rqPart[2] + portNum + rqPart[3];
-    //printf("request:%s\n", (const char *)request);
     httpSocket.getOutputStream()->streamWrite(VoidBuffer(request, strlen(request)));
+
     String currentLine;
     do {
         currentLine = getLine();
@@ -96,6 +110,7 @@ HttpDocument::HttpDocument(String hostName,  String path, int portNum)
     Buffer<char> msg(msgSize==-1 ? 1024 : msgSize);
     httpInputStream->streamRead(msg);
     docContent = msg;
+    return false;
 }
 
 String HttpDocument::getLine()
@@ -118,19 +133,31 @@ public:
     int portNum;
 };
 
+HttpDocument *doc = NULL;
+
 PuyoHttpServerList::PuyoHttpServerList(String hostName, String path, int portNum)
 {
-/*  HttpDocument doc(hostName, path, portNum);
-  StandardMessage msg(doc.getDocumentContent());
-  int nbServers = msg.getInt("NBSERV");
-  for (int i = 0 ; i < nbServers ; i++) {
-    char tmpStr[256];
-    sprintf(tmpStr, "SERVNAME%.2d", i);
-    String serverName = msg.getString(tmpStr);
-    sprintf(tmpStr, "PORTNUM%.2d", i);
-    int portNum = msg.getInt(tmpStr);
-    servers.add(new PuyoHttpServer(serverName, portNum));
-  } TODO: reactiver */
+  isReady = false;
+  doc = new HttpDocument(hostName, path, portNum);
+}
+
+bool PuyoHttpServerList::listIsReady() 
+{
+    if (isReady) return true;
+    if (!doc->documentIsReady()) return false;
+    
+    StandardMessage msg(doc->getDocumentContent());
+    int nbServers = msg.getInt("NBSERV");
+    for (int i = 0 ; i < nbServers ; i++) {
+        char tmpStr[256];
+        sprintf(tmpStr, "SERVNAME%.2d", i);
+        String serverName = msg.getString(tmpStr);
+        sprintf(tmpStr, "PORTNUM%.2d", i);
+        int portNum = msg.getInt(tmpStr);
+        servers.add(new PuyoHttpServer(serverName, portNum));
+    }
+    isReady = true;
+    return true;
 }
 
 
@@ -153,11 +180,13 @@ int PuyoHttpServerList::getNumServer() const
 // Actions
 class ServerSelectAction : public Action {
 public:
-    ServerSelectAction(String serverName, int portNum) : serverName(serverName), portNum(portNum) {}
+    ServerSelectAction(InternetGameMenu &igm, String serverName, int portNum)
+      : gameMenu(igm), serverName(serverName), portNum(portNum) {}
     void action() {
-        printf("Serveur selectionne: %s:%d\n", (const char *)serverName, portNum);
+        gameMenu.setSelectedServer(serverName, portNum);
     }
 private:
+    InternetGameMenu &gameMenu;
     String serverName;
     int portNum;
 };
@@ -207,21 +236,13 @@ void InternetGameMenu::build()
     serverSelectionPanel = new VBox;
     serverSelectionPanel->add(new Text("Server List"));
     serverListPanel = new ListWidget(6);
-    EditField *playerName, *serverName;
     
-    /*for (int i = 0 ; i < servers.getNumServer() ; i++) {
-        serverListPanel->add (new Button(servers.getServerNameAtIndex(i),
-                                         new ServerSelectAction(servers.getServerNameAtIndex(i),
-                                                                servers.getServerPortAtIndex(i))));
-    }*/
-    serverListPanel->add (new Button("durandal.homeunix.com",
-                                     new ServerSelectAction("durandal.homeunix.com",
-                                                            6581)));
     serverSelectionPanel->add(serverListPanel);
-    serverSelectionPanel->add(new Button("Update"));
+    updating = new Button("Update");
+    serverSelectionPanel->add(updating);
     
     playerName = new EditField("Kaori"); // TODO: get that from single player name
-    serverName = new EditField("durandal.homeunix.com");
+    serverName = new Text("---");
     VBox *rightPanel = new VBox();
     rightPanel->add(new Separator(1,1));
     rightPanel->add(new Text("Internet Game"));
@@ -241,3 +262,37 @@ void InternetGameMenu::build()
     menu.add(rightPanel);
 }
 
+void InternetGameMenu::idle(double currentTime)
+{
+    if (servers.listIsReady())
+    {
+        serverListPanel->clear();
+        for (int i = 0 ; i < servers.getNumServer() ; i++) {
+            serverListPanel->set (i, new Button(servers.getServerNameAtIndex(i),
+                                                new ServerSelectAction(*this, servers.getServerNameAtIndex(i),
+                                                                       servers.getServerPortAtIndex(i))));
+        }
+        updating->setValue("Update");
+        updating->mdontMove = false;
+    }
+    else
+    {
+        int X = (int)(currentTime*3) % 6;
+        static const char *txt[6] = {
+            "Loading . . .   ",
+            " . Loading . .  ",
+            "  . . Loading . ",
+            "   . . . Loading",
+            "  . . Loading . ",
+            " . Loading . .  "
+        };
+        updating->setValue(txt[X]);
+        updating->mdontMove = true;
+    }
+}
+
+void InternetGameMenu::setSelectedServer(const String &serverName, int portNum)
+{
+    this->serverName->setValue(serverName);
+    this->portNum = portNum;
+}

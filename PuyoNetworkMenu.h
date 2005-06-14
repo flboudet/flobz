@@ -35,9 +35,13 @@ public:
     String getServerNameAtIndex(int index) const;
     int getServerPortAtIndex(int index) const;
     int getNumServer() const;
+
+    bool listIsReady();
+
 private:
     class PuyoHttpServer;
     AdvancedBuffer<PuyoHttpServer *> servers;
+    bool isReady;
 };
 
 class LANGameRealMenu : public PuyoMainScreenMenu {
@@ -50,6 +54,9 @@ class InternetGameMenu : public PuyoScreen {
 public:
     InternetGameMenu();
     void build();
+    void setSelectedServer(const String &s, int port);
+    virtual void idle(double currentTime);
+    
 private:
     PuyoHttpServerList servers;
     VBox *serverSelectionPanel;
@@ -57,6 +64,10 @@ private:
     HBox menu;
     PuyoStoryWidget story;
     SliderContainer container;
+    EditField *playerName;
+    Text *serverName;
+    int portNum;
+    Button *updating;
 };
 
 class NetworkGameMenu : public PuyoMainScreenMenu {
