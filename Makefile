@@ -83,6 +83,7 @@ clean:
 	rm -f  .DS_Store */.DS_Store */*/.DS_Store .gdb_history
 	+make -C iosfc clean
 	+make -C gametools clean
+	+make -C styrolyse clean
 
 install: flobopuyo
 	$(STRIP) $(PRGNAME)
@@ -97,12 +98,8 @@ install: flobopuyo
 	cp ./$(PRGNAME) ${INSTALL_BINDIR}/flobopuyo
 	chmod a+rx ${INSTALL_BINDIR}/flobopuyo
 
-flobopuyo-static: prelude  ${OBJFILES}
-	@make -C iosfc object
-	@make -C gametools
-	@make -C styrolyse object
-	@echo "[flobopuyo-static]" && g++ $(CFLAGS) -o flobopuyo-static ${OBJFILES} iosfc/*.o gametools/*.o styrolyse/*.o styrolyse/goomsl/goomsl*.o \
-        /sw/lib/libSDL_mixer.a /sw/lib/libSDL_net.a /sw/lib/libvorbisfile.a /sw/lib/libvorbis.a /sw/lib/libogg.a /sw/lib/libsmpeg.a /sw/lib/libSDL_image.a /sw/lib/libjpeg.a /sw/lib/libpng.a -lz `$(SDL_CONFIG) --static-libs`
+flobopuyo-static: prelude iosfc_dir gametools_dir styrolyse_dir ${OBJFILES}
+	@echo "[flobopuyo-static]" && $(CXX) $(CFLAGS) -o flobopuyo-static ${OBJFILES} iosfc/*.o gametools/*.o styrolyse/*.o styrolyse/goomsl/goomsl*.o /sw/lib/libSDL_mixer.a /sw/lib/libSDL_net.a /sw/lib/libvorbisfile.a /sw/lib/libvorbis.a /sw/lib/libogg.a /sw/lib/libsmpeg.a /sw/lib/libSDL_image.a /sw/lib/libjpeg.a /sw/lib/libpng.a -lz -framework CoreFoundation `$(SDL_CONFIG) --static-libs`
 	@echo "--------------------------------------"
 	@[ -s WARNINGS ] && echo -e "--------------------------------------\n There have been some warnings:\n" && cat WARNINGS && rm -f WARNINGS && echo "--------------------------------------" || true
 	@echo "--------------------------------------"
