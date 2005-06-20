@@ -144,7 +144,8 @@ PuyoHttpServerList::PuyoHttpServerList(String hostName, String path, int portNum
 bool PuyoHttpServerList::listIsReady() 
 {
     if (isReady) return true;
-    /*if (!doc->documentIsReady())*/ return false;
+    // if (!doc->documentIsReady())
+      return false;
     
     StandardMessage msg(doc->getDocumentContent());
     int nbServers = msg.getInt("NBSERV");
@@ -191,10 +192,13 @@ private:
     int portNum;
 };
 
-class PushNetCenterMenuAction : public Action {
+class PushNetCenterMenuAction : public Action
+{
 public:
     PushNetCenterMenuAction(Text *serverName, Text *userName) : serverName(serverName), userName(userName) {}
-    void action() {
+    
+    void action()
+    {
         fprintf(stderr, "Connecting to %s..\n", serverName->getValue().c_str());
         PuyoInternetGameCenter *gameCenter = new PuyoInternetGameCenter(serverName->getValue(),
                                                                         4567, userName->getValue());

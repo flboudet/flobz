@@ -75,7 +75,8 @@ private:
 };
 
 NetCenterMenu::NetCenterMenu(PuyoNetGameCenter *netCenter)
-    : netCenter(netCenter), chatArea(8), playerList(this)
+    : netCenter(netCenter)/*, chatArea(8), playerList(this)*/
+  , story(666)
 {
     cycled = new NetCenterCycled(this);
     netCenter->addListener(this);
@@ -95,12 +96,36 @@ void NetCenterMenu::cycle()
 
 void NetCenterMenu::build()
 {
+    add(&story);
+    add(&container);
+
+    VBox *main   = new VBox();  
+    container.add(main);
+    container.setPosition(Vec3(5,5));
+    container.setSize(Vec3(630,470, 0));
+
+    HBox *topbox = new HBox();
+    VBox *menu   = new VBox();
+    VBox *chatbox = new VBox();
+    VBox *playerbox = new VBox();
     
-    add(new Text("Network Game Center"));
+    ListWidget *playerlist = new ListWidget(8);
+    VBox *chatlist = new VBox();
     
+    menu->add(new Text("Network Game Center"));
+    menu->add(new Button("Change Nick", new PopScreenAction()));
+    menu->add(new Button("Options", new PopScreenAction()));
+    menu->add(new Button("Disconnect", new PopScreenAction()));
+
+    playerbox->add(new Text("Player List"));
+    playerbox->add(playerlist);
+
+    topbox->add(menu);
+    topbox->add(playerbox);
+    
+/*    
     HBox *screenCenter = new HBox();
     
-    VBox *chatBox = new VBox();
     EditFieldWithLabel *sayField = new EditFieldWithLabel("Say:", "");
     SayAction *say = new SayAction(netCenter, sayField->getEditField());
     sayField->getEditField()->setAction(ON_START, say);
@@ -111,21 +136,29 @@ void NetCenterMenu::build()
     
     screenCenter->add(chatBox);
     screenCenter->add(&playerList);
-    
     add(screenCenter);
     add(new Button("Exit", new PopScreenAction()));
+  */  
+
+    chatbox->add(new Text("Chat Area"));
+    chatbox->add(chatlist);
+
+    main->add(topbox);
+    main->add(chatbox);
+
+    // container.setBackground(menuBG_wide);
 }
 
 void NetCenterMenu::onChatMessage(const String &msgAuthor, const String &msg)
 {
     printf("%s:%s\n", (const char *)msgAuthor, (const char *)msg);
-    chatArea.addChat(msgAuthor, msg);
+    //chatArea.addChat(msgAuthor, msg);
 }
 
 void NetCenterMenu::onPlayerConnect(String playerName, PeerAddress playerAddress)
 {
     //printf("Connect: %s\n", (const char *)(netCenter->getPeerNameAtIndex(playerIndex)));
-    playerList.addNewPlayer(playerName, playerAddress);
+    //playerList.addNewPlayer(playerName, playerAddress);
 }
 
 void NetCenterMenu::gameInvitationAgainst(String playerName, PeerAddress playerAddress)

@@ -87,10 +87,12 @@ private:
         NetCenterMenu *targetMenu;
     };
     
-    NetCenterChatArea chatArea;
-    NetCenterPlayerList playerList;
+//    NetCenterChatArea chatArea;
+//    NetCenterPlayerList playerList;
     NetCenterCycled *cycled;
     PuyoNetGameCenter *netCenter;
+    PuyoStoryWidget story;
+    SliderContainer container;
 };
 
 #endif // _PUYONETCENTERMENU
