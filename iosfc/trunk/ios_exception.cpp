@@ -8,6 +8,7 @@
 #include "ios_exception.h"
 
 #include <cstdlib>
+#include <cstdio>
 #include <cstring>
 using namespace std;
 
