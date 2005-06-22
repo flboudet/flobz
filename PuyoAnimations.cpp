@@ -459,3 +459,31 @@ void SmoothBounceAnimation::draw(int semiMove)
     attachedPuyo.renderAt(origX, origY + bounceOffset);
 }
 
+GameOverFallAnimation::GameOverFallAnimation(AnimatedPuyo &puyo, int delay)
+    : PuyoAnimation(puyo), delay(delay), Y(attachedPuyo.getScreenCoordinateY()), yAccel(10)
+{
+}
+
+GameOverFallAnimation::~GameOverFallAnimation()
+{
+}
+
+void GameOverFallAnimation::cycle()
+{
+    if (delay < 0) {
+        if (yAccel > -20)
+            yAccel -= 1;
+        Y -= yAccel;
+        if (Y > 480) {
+            attachedPuyo.setVisible(false);
+            finishedFlag = true;
+        }
+    }
+    else delay--;
+}
+
+void GameOverFallAnimation::draw(int semiMove)
+{
+    attachedPuyo.renderAt(attachedPuyo.getScreenCoordinateX(), Y);
+}
+

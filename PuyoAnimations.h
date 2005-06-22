@@ -167,5 +167,17 @@ private:
     AnimationSynchronizer *synchronizer;
 };
 
+class GameOverFallAnimation : public PuyoAnimation {
+public:
+    GameOverFallAnimation(AnimatedPuyo &puyo, int delay);
+    virtual ~GameOverFallAnimation();
+    void cycle();
+    void draw(int semiMove);
+private:
+    int delay;
+    int Y;
+    int yAccel;
+};
+
 #endif // _PUYOANIMATIONS
 

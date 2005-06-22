@@ -360,7 +360,15 @@ bool PuyoView::cycleAllowed()
 
 void PuyoView::gameLost()
 {
-	gameRunning = false;
+    gameRunning = false;
+    for (int i = 0 ; i <= PUYODIMX ; i++) {
+        for (int j = 0 ; j <= PUYODIMY ; j++) {
+            if (attachedGame->getPuyoAt(i, j) != NULL) {
+                AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(attachedGame->getPuyoAt(i, j));
+                currentPuyo->addAnimation(new GameOverFallAnimation(*currentPuyo, (j - PUYODIMY) + abs((PUYODIMX / 2) - i) * 5));
+            }
+        }
+    }
 }
 
 

@@ -152,6 +152,8 @@ void AnimatedPuyo::renderAt(int X, int Y)
 
 void AnimatedPuyo::renderShadow()
 {
+    if (!visibilityFlag)
+        return;
     if (!isRenderingAnimation()) {
         renderShadowAt(getScreenCoordinateX(), getScreenCoordinateY());
     }
