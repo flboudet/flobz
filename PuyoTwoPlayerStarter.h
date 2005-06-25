@@ -26,11 +26,33 @@
 #define _PUYOTWOPLAYERSTARTER
 
 #include "PuyoStarter.h"
-#include "ios_messagebox.h"
 
-class PuyoTwoPlayerStarter : public PuyoStarter {
+class PuyoTwoPlayersGameWidget : public PuyoGameWidget {
 public:
-    PuyoTwoPlayerStarter::PuyoTwoPlayerStarter(PuyoCommander *commander, int theme);
+    PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction = NULL);
+    bool didPlayerWon() const { return isGameARunning(); }
+private:
+    AnimatedPuyoSetTheme &attachedPuyoThemeSet;
+    PuyoRandomSystem attachedRandom;
+    PuyoLocalGameFactory attachedGameFactory;
+    PuyoView areaA, areaB;
+    PuyoEventPlayer playercontrollerA, playercontrollerB;
+};
+
+
+class TwoPlayersStarterAction : public Action {
+public:
+    TwoPlayersStarterAction(int difficulty);
+    void action();
+    
+private:    
+    void startGame();
+        
+    void endGameSession();
+    
+    int difficulty;
+    PuyoGameScreen *gameScreen;
+    PuyoTwoPlayersGameWidget *gameWidget;
 };
 
 #endif // _PUYOTWOPLAYERSTARTER

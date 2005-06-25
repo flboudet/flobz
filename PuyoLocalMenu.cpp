@@ -41,10 +41,10 @@ void Local2PlayersGameMenu::build()
 {
     add(new EditFieldWithLabel("Player Name:", "flobo"));
     add(new Text("Choose Game Level"));
-    add(new Button("Easy", (Action *)NULL));
-    add(new Button("Medium", (Action *)NULL));
-    add(new Button("Hard", (Action *)NULL));
-    add(new Button("Cancel", new PuyoPopMenuAction(mainScreen)));
+    add(new Button("Easy", &easyAction));
+    add(new Button("Medium", &mediumAction));
+    add(new Button("Hard", &hardAction));
+    add(new Button("Cancel", &popAction));
 }
 
 

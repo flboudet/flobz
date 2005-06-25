@@ -29,6 +29,7 @@
 #include "gameui.h"
 #include "PuyoCommander.h"
 #include "PuyoSinglePlayerStarter.h"
+#include "PuyoTwoPlayerStarter.h"
 
 typedef enum SinglePlayerLevel {
     EASY=0,
@@ -49,9 +50,13 @@ private:
 
 class Local2PlayersGameMenu : public PuyoMainScreenMenu {
 public:
-    Local2PlayersGameMenu(PuyoRealMainScreen *mainScreen) : PuyoMainScreenMenu(mainScreen) {}
+    Local2PlayersGameMenu(PuyoRealMainScreen *mainScreen) : PuyoMainScreenMenu(mainScreen), easyAction(EASY), mediumAction(MEDIUM), hardAction(HARD), popAction(mainScreen) {}
     void build();
 private:
+    TwoPlayersStarterAction easyAction;
+    TwoPlayersStarterAction mediumAction;
+    TwoPlayersStarterAction hardAction;
+    PuyoPopMenuAction popAction;
 };
 
 #endif // _PUYOLOCALMENU

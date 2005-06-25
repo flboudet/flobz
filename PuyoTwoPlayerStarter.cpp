@@ -25,24 +25,50 @@
 
 #include "PuyoTwoPlayerStarter.h"
 
-extern IIM_Surface *perso[2];
-
-PuyoTwoPlayerStarter::PuyoTwoPlayerStarter(PuyoCommander *commander, int theme)
-: PuyoStarter(commander, theme)
+PuyoTwoPlayersGameWidget::PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
+                                                     attachedGameFactory(&attachedRandom),
+                                                     areaA(&attachedGameFactory, &attachedPuyoThemeSet,
+                                                     1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
+                                                     areaB(&attachedGameFactory, &attachedPuyoThemeSet,
+                                                     1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
+                                                     playercontrollerA(areaA, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left, GameControlEvent::kPlayer1Right,
+                                                     GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
+                                                     playercontrollerB(areaB, GameControlEvent::kPlayer2Down, GameControlEvent::kPlayer2Left, GameControlEvent::kPlayer2Right,
+                                                     GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight)
 {
-    attachedGameFactory = new PuyoLocalGameFactory(&attachedRandom);
-    areaA = new PuyoView(attachedGameFactory, &attachedThemeManager,
-                         1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE);
-    areaB = new PuyoView(attachedGameFactory, &attachedThemeManager,
-                         1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE);
+    initialize(areaA, areaB, playercontrollerA, playercontrollerB, levelTheme, gameOverAction);
+}
+
+TwoPlayersStarterAction::TwoPlayersStarterAction(int difficulty)
+    : difficulty(difficulty), gameScreen(NULL) {}
+
+void TwoPlayersStarterAction::action()
+{
+    if (gameScreen == NULL) {
+        startGame();
+    }
+    else {
+	    endGameSession();
+	}
+}
+
+void TwoPlayersStarterAction::startGame()
+{
+    AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
     
-    attachedGameA = areaA->getAttachedGame();
-    attachedGameB = areaB->getAttachedGame();
+    gameWidget = new PuyoTwoPlayersGameWidget(*(themeManager->getAnimatedPuyoSetTheme("Classic")), *(themeManager->getPuyoLevelTheme("Level1")), this);
+    gameScreen = new PuyoGameScreen(*gameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
+    GameUIDefaults::SCREEN_STACK->push(gameScreen);
+}
+
+void TwoPlayersStarterAction::endGameSession()
+{
+    GameUIDefaults::SCREEN_STACK->pop();
+    ((PuyoRealMainScreen *)(GameUIDefaults::SCREEN_STACK->top()))->transitionFromScreen(*gameScreen);
+    delete gameWidget;
+    delete gameScreen;
     
-    randomPlayer = 0;
-    perso[0] = NULL;
-    
-    areaA->setEnemyGame(attachedGameB);
-    areaB->setEnemyGame(attachedGameA);
+    gameScreen = NULL;
+    gameWidget = NULL;
 }
 
