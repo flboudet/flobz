@@ -97,7 +97,7 @@ PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 		   AnimatedPuyoSetTheme *attachedThemeSet,
 		   int xOffset, int yOffset, int nXOffset, int nYOffset, SDL_Painter &painterToUse)
   :attachedThemeSet(attachedThemeSet),
-   attachedPuyoFactory(this), attachedPainter(painterToUse)
+   attachedPuyoFactory(this), attachedPainter(painterToUse), delayBeforeGameOver(60)
 {
     printf("Constructeur du PuyoView\n");
 	attachedGame = attachedPuyoGameFactory->createPuyoGame(&attachedPuyoFactory);
@@ -137,8 +137,19 @@ int PuyoView::getValenceForPuyo(PuyoPuyo *puyo) const
 	       (rightState == currentPuyoState ? 0x2 : 0) | (downState == currentPuyoState ? 0x1 : 0);
 }
 
+bool PuyoView::isGameOver() const
+{
+    if ((!gameRunning) && (delayBeforeGameOver < 0))
+        return true;
+    return false;
+}
+
 void PuyoView::cycleAnimation()
 {
+    // Handle end of game
+    if (!gameRunning)
+        delayBeforeGameOver--;
+    
     // Cycling every puyo's animation
 	for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
 		AnimatedPuyo *currentPuyo =
@@ -352,6 +363,9 @@ void PuyoView::gameDidEndCycle()
 
 bool PuyoView::cycleAllowed()
 {
+    if (enemyGame != NULL)
+        if (!enemyGame->isGameRunning())
+            return false;
     if (cycleAllowance < 0)
         return false;
     return true;

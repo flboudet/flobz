@@ -243,7 +243,7 @@ void PuyoGameWidget::cycle()
         
         requestDraw();
     }
-    gameover = false;//(!attachedGameA->isGameRunning() || !attachedGameB->isGameRunning());
+    gameover = (areaA->isGameOver() || areaB->isGameOver());
     if ((gameover || abortedFlag) && !once) {
         once = true;
         if (gameOverAction)

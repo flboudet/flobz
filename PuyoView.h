@@ -74,6 +74,8 @@ class PuyoView : public PuyoDelegate {
     PuyoGame *getAttachedGame() const { return attachedGame; }
     SDL_Painter & getPainter() const { return attachedPainter; }
     
+    bool isGameOver() const;
+    
     int getScreenCoordinateX(int X) const { return X * TSIZE + xOffset; }
     int getScreenCoordinateY(int Y) const { return Y * TSIZE + yOffset; }
     
@@ -99,6 +101,7 @@ class PuyoView : public PuyoDelegate {
     IosVector viewAnimations;
     int cycleAllowance;
     SDL_Painter &attachedPainter;
+    int delayBeforeGameOver;
 };
 
 #endif // _PUYOVIEW
