@@ -322,10 +322,33 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
     else
         SDL_BlitSurface(speedBack->surf,&speedRect, screen, &drect);
     
+    // Rendering the scores
+    SoFont *fontBl = NULL;
+    int blinkingPointsA = 0; int blinkingPointsB = 0;
+    char text[1024];
+    
+    if ((blinkingPointsA % 2) == 0)
+        fontBl = theCommander->smallFont;
+    else
+        fontBl = theCommander->menuFont;
+    
+    sprintf(text, "<< %d", attachedGameA->getPoints());
+    SoFont_CenteredString_XY (fontBl, display,
+                              300, 380,   text, NULL);
+    
+    if ((blinkingPointsB % 2) == 0)
+        fontBl = theCommander->smallFont;
+    else
+        fontBl = theCommander->menuFont;
+    
+    sprintf(text, "%d >>", attachedGameB->getPoints());
+    SoFont_CenteredString_XY (fontBl, display,
+                              340, 395, text, NULL);
+    
     // Rendering the player names
-    //SoFont *font = (paused?commander->darkFont:commander->menuFont);
-    //SoFont_CenteredString_XY (font, screen, 510, 460,   "bla", NULL);
-    //SoFont_CenteredString_XY (font, screen, 130, 460,   "bli", NULL);
+    SoFont *font = (paused?theCommander->darkFont:theCommander->menuFont);
+    SoFont_CenteredString_XY (font, screen, 510, 460,   "bla", NULL);
+    SoFont_CenteredString_XY (font, screen, 130, 460,   "bli", NULL);
 }
 
 void PuyoGameWidget::pause()
