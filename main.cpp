@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
     }
     
     dataFolder = "data";
-    if (!fileExists("data/gfx/v0.png")) {
+    if (!fileExists("data/gfx")) {
         dataFolder = DATADIR;
     }
     
