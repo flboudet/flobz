@@ -237,6 +237,7 @@ public:
     
     int getSemiMove() const { return semiMove; }
     
+    void setGameLevel(int gameLevel) { this->gameLevel = gameLevel; }
 private:
     void InitGame(PuyoRandomSystem *attachedRandom);
     // Set the state of the puyo at the indicated coordinates (not recommanded)
@@ -277,6 +278,9 @@ private:
     // We are keeping a list of current puyos
     AdvancedBuffer<PuyoPuyo *> puyoVector;
     int nbFalled;
+
+    // Game level for points calculation
+    int gameLevel;
 };
 
 #endif // PUYOGAME_H
