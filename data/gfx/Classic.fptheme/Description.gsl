@@ -1,0 +1,95 @@
+/* FloboPuyo
+ * Copyright (C) 2004
+ *   Florent Boudet        <flobo@ios-software.com>,
+ *   Jean-Christophe Hoelt <jeko@ios-software.com>,
+ *   Guillaume Borios      <gyom@ios-software.com>
+ *
+ * iOS Software <http://www.ios-software.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
+
+/******************* Default Theme for the game *******************/
+/**** Don't modify, if you want more themes, create your own ! ****/
+/******************************************************************/
+
+
+/********** PUYOS SETS **********/
+
+[start_puyoset]
+    puyoset.name        = "Classic"
+    puyoset.description = "Old good puyos."
+    puyoset.author      = "iOS-Software"
+[end_puyoset]
+
+[start_puyoset]
+    puyoset.name        = "Shaped"
+    puyoset.description = "Puyos for everyone (color blindness aware)."
+    puyoset.author      = "iOS-Software"
+    puyoset.P1.face     = "round"
+    puyoset.P1.offset   = 0.0
+    puyoset.P1.eye      = "normal"
+    puyoset.P2.face     = "square"
+    puyoset.P2.offset   = 72.0
+    puyoset.P2.eye      = "upper"
+    puyoset.P3.face     = "vertical"
+    puyoset.P3.offset   = 144.0
+    puyoset.P3.eye      = "normal"
+    puyoset.P4.face     = "horizontal"
+    puyoset.P4.offset   = 216.0
+    puyoset.P4.eye      = "upper"
+    puyoset.P5.face     = "cross"
+    puyoset.P5.offset   = 288.0
+    puyoset.P5.eye      = "normal"
+[end_puyoset]
+
+[start_puyoset]
+    puyoset.name        = "puyoset"
+    puyoset.description = "Funny toons."
+    puyoset.author      = "Daisy"
+    puyoset.P1.face      = "bd"
+    puyoset.P1.offset    = 0.0
+    puyoset.P1.eye       = "big"
+    puyoset.P2.face      = "bd"
+    puyoset.P2.offset    = 72.0
+    puyoset.P2.eye       = "big"
+    puyoset.P3.face      = "bd"
+    puyoset.P3.offset    = 144.0
+    puyoset.P3.eye       = "big"
+    puyoset.P4.face      = "bd"
+    puyoset.P4.offset    = 216.0
+    puyoset.P4.eye       = "big"
+    puyoset.P5.face      = "bd"
+    puyoset.P5.offset    = 288.0
+    puyoset.P5.eye       = "big"
+[end_puyoset]
+
+
+/********** LEVELS **********/
+
+[start_level]
+    level.name          = "Kaori's arena"
+    level.description   = "Her favorite place to play."
+    level.author        = "iOS-Software"
+[end_level]
+
+[start_level]
+    level.name          = "The Dark Cave"
+    level.description   = "The cave of fear..."
+    level.author        = "iOS-Software"
+    level.background    = "dark"
+[end_level]
+
