@@ -145,7 +145,8 @@ bool PuyoEventPlayer::keyShouldRepeat(int &key)
 
 PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
     : CycledComponent(0.02), attachedLevelTheme(&levelTheme), areaA(&areaA), areaB(&areaB), controllerA(&controllerA), controllerB(&controllerB),
-      cyclesBeforeGameCycle(50), cyclesBeforeSpeedIncreases(500), cyclesBeforeGameCycleV(cyclesBeforeGameCycle), tickCounts(0), paused(false), displayLives(true), lives(3), gameOverAction(gameOverAction), abortedFlag(false), gameSpeed(20)
+      cyclesBeforeGameCycle(50), cyclesBeforeSpeedIncreases(500), cyclesBeforeGameCycleV(cyclesBeforeGameCycle), tickCounts(0), paused(false), displayLives(true), lives(3),
+      gameOverAction(gameOverAction), abortedFlag(false), gameSpeed(20), blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0)
 {
     initialize();
 }
@@ -235,6 +236,23 @@ void PuyoGameWidget::cycle()
         if (tickCounts % cyclesBeforeGameCycleV  == 0) {
             areaA->cycleGame();
             areaB->cycleGame();
+            // Blinking point animation
+            if (attachedGameA->getPoints()/50000 > savePointsA/50000)
+                blinkingPointsA = 10;
+            if (attachedGameB->getPoints()/50000 > savePointsB/50000)
+                blinkingPointsB = 10;
+            
+            if (blinkingPointsA > 0)
+                blinkingPointsA--;
+            if (blinkingPointsB > 0)
+                blinkingPointsB--;
+            
+            savePointsB = attachedGameB->getPoints();
+            savePointsA = attachedGameA->getPoints();
+            
+            if (savePointsA < 50000) blinkingPointsA=0;
+            if (savePointsB < 50000) blinkingPointsB=0;
+            // end of the blinking point animation code
         }
         if ((cyclesBeforeSpeedIncreases != -1) && (gameSpeed > 0) && (tickCounts % cyclesBeforeSpeedIncreases == 0)) {
             gameSpeed--;
@@ -332,23 +350,25 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
     else
         fontBl = theCommander->menuFont;
     
-    sprintf(text, "<< %d", attachedGameA->getPoints());
-    SoFont_CenteredString_XY (fontBl, display,
-                              300, 380,   text, NULL);
-    
-    if ((blinkingPointsB % 2) == 0)
-        fontBl = theCommander->smallFont;
-    else
-        fontBl = theCommander->menuFont;
-    
-    sprintf(text, "%d >>", attachedGameB->getPoints());
-    SoFont_CenteredString_XY (fontBl, display,
-                              340, 395, text, NULL);
-    
-    // Rendering the player names
-    SoFont *font = (paused?theCommander->darkFont:theCommander->menuFont);
-    SoFont_CenteredString_XY (font, screen, 510, 460,   "bla", NULL);
-    SoFont_CenteredString_XY (font, screen, 130, 460,   "bli", NULL);
+    if (!paused) {
+        sprintf(text, "<< %d", attachedGameA->getPoints());
+        SoFont_CenteredString_XY (fontBl, display,
+                                  300, 380,   text, NULL);
+        
+        if ((blinkingPointsB % 2) == 0)
+            fontBl = theCommander->smallFont;
+        else
+            fontBl = theCommander->menuFont;
+        
+        sprintf(text, "%d >>", attachedGameB->getPoints());
+        SoFont_CenteredString_XY (fontBl, display,
+                                  340, 395, text, NULL);
+        
+        // Rendering the player names
+        SoFont *font = (paused?theCommander->darkFont:theCommander->menuFont);
+        SoFont_CenteredString_XY (font, screen, 510, 460,   "bla", NULL);
+        SoFont_CenteredString_XY (font, screen, 130, 460,   "bli", NULL);
+    }
 }
 
 void PuyoGameWidget::pause()

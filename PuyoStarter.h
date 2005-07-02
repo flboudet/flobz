@@ -104,6 +104,7 @@ private:
     bool gameover;
     bool abortedFlag;
     int gameSpeed;
+    int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
 };
 
 class PuyoGameScreen;
