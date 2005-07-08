@@ -1,0 +1,15 @@
+<init>
+  # Init function: called when script is loaded
+  Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+
+  Sprite @kaori = [new_sprite: image="Kaori_gamelost.png" x = 350.0 y=50.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+
+<sprite_list>
+  # Call the 'sprite' function for each sprite you want to update/draw
+  # This also allows you to specify the drawing order
+  sprite::@kaori display=@display
+
+<update>
+  # Update function: called every animation cycle
+  #move::@kaori   fcycle=100.0      x=0.0 y=130.0
+  (@cycle = 1000)? @finished = 1
