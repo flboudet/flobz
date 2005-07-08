@@ -413,7 +413,8 @@ void AbortAction::action()
 
 PuyoGameScreen::PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScreen)
     : Screen(0, 0, 640, 480), paused(false), continueAction(*this), abortAction(*this),
-      pauseMenu(&continueAction, &abortAction), gameWidget(gameWidget), transitionWidget(previousScreen, NULL)
+      pauseMenu(&continueAction, &abortAction), gameWidget(gameWidget), transitionWidget(previousScreen, NULL),
+      overlayStory(NULL)
 {
     add(&gameWidget);
     add(&transitionWidget);
@@ -455,6 +456,11 @@ void PuyoGameScreen::abort()
     gameWidget.abort();
 }
 
+void PuyoGameScreen::setOverlayStory(PuyoStoryWidget *story)
+{
+  overlayStory = story;
+  this->add(story);
+}
 
 PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
                                                      attachedGameFactory(&attachedRandom),

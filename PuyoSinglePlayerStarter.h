@@ -78,6 +78,8 @@ private:
     void startGame();
     
     void nextLevel();
+
+    void gameLost();
     
     void endGameSession();
     
@@ -86,6 +88,7 @@ private:
     PuyoStoryScreen *story;
     PuyoGameScreen *gameScreen;
     PuyoSinglePlayerGameWidget *gameWidget;
+    PuyoStoryWidget *gameLostWidget;
 };
 
 #endif // _PUYOSINGLEPLAYERSTARTER

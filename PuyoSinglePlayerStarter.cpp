@@ -128,7 +128,7 @@ int PuyoSingleGameLevelData::getIALevel() const
 
 
 SinglePlayerStarterAction::SinglePlayerStarterAction(int difficulty)
-    : currentLevel(0), lifes(3), difficulty(difficulty), levelData(NULL), story(NULL), gameScreen(NULL) {}
+    : currentLevel(0), lifes(3), difficulty(difficulty), levelData(NULL), story(NULL), gameScreen(NULL), gameLostWidget(NULL) {}
 
 void SinglePlayerStarterAction::action()
 {
@@ -141,6 +141,14 @@ void SinglePlayerStarterAction::action()
     else if (! gameWidget->getAborted()) {
         if (! gameWidget->didPlayerWon()) {
 	   lifes--;
+	   if (gameLostWidget == NULL) {
+	       gameLost();
+	       return;
+	   }
+	   else if (gameLostWidget != NULL) {
+	     //delete gameLostWidget;
+	       gameLostWidget = NULL;
+	   }
         }
 	else
             currentLevel++;
@@ -180,6 +188,12 @@ void SinglePlayerStarterAction::nextLevel()
     endGameSession();
     levelData = tempLevelData;
     GameUIDefaults::SCREEN_STACK->push(story);
+}
+
+void SinglePlayerStarterAction::gameLost()
+{
+    gameLostWidget = new PuyoStoryWidget("gamelost1p.gsl", this);
+    gameScreen->setOverlayStory(gameLostWidget);
 }
 
 void SinglePlayerStarterAction::endGameSession()

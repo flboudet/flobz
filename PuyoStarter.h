@@ -131,6 +131,7 @@ public:
     void onEvent(GameControlEvent *cevent);
     virtual void backPressed();
     virtual void abort();
+    void setOverlayStory(PuyoStoryWidget *story);
 private:
     bool paused;
     ContinueAction continueAction;
@@ -138,6 +139,7 @@ private:
     PuyoPauseMenu pauseMenu;
     PuyoGameWidget &gameWidget;
     PuyoScreenTransitionWidget transitionWidget;
+    PuyoStoryWidget *overlayStory;
 };
 
 class PuyoTwoPlayerGameWidget : public PuyoGameWidget {

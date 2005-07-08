@@ -72,6 +72,7 @@ void PuyoScreenTransitionWidget::cycle()
 void PuyoScreenTransitionWidget::draw(SDL_Surface *screen)
 {
     //toScreen.drawAnyway(screen);
+    SDL_SetClipRect(screen, NULL);
     doom_melt_display(melt, screen);
 }
 

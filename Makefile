@@ -28,7 +28,7 @@ MAKEDEPEND = ${CXX} -MM $(CFLAGS_NOPCH) -o $(df).d $<
 all: prelude flobopuyo
 
 flobopuyo: prelude iosfc_dir gametools_dir styrolyse_dir ${OBJFILES}
-	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) -lSDL_net -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o gametools/*.o styrolyse/*.o styrolyse/goomsl/goomsl*.o
+	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o gametools/*.o styrolyse/*.o styrolyse/goomsl/goomsl*.o
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
 	@echo
