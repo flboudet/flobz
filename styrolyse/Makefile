@@ -11,7 +11,7 @@ OBJ=styrolyse.o
 LIBS        =
 
 all: gsl ${OBJ} main.o
-	gcc -o styrolyse `sdl-config --libs` -lSDL_image ${GSL_OBJ} ${OBJ}
+	gcc -o styrolyse `sdl-config --libs` -lSDL_image ${GSL_OBJ} ${OBJ} main.o
 
 object: ${OBJ} gsl
 
