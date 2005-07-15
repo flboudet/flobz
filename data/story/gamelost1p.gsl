@@ -1,7 +1,7 @@
 <init>
   // Timing
   float @kaoriArrived = 250.0
-  float @kaoriSpeed = 10.0
+  float @kaoriSpeed = 5.0
   float @spAx = 0.0
   float @spAy = 20.0
   float @spBx = 40.0
@@ -14,7 +14,7 @@
 
   # Init function: called when script is loaded
   Display @kaoriDisplay  = [new_display: x=640.0 y=50.0 width=640.0 height=480.0]
-  Display @puyoDisplay = [new_display: x=100.0 y=50.0 width=640.0 height=480.0]
+  Display @puyoDisplay = [new_display: x=680.0 y=50.0 width=640.0 height=480.0]
 
   Sprite @kaori = [new_sprite: image="Kaori_gamelost.png" x = 85.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @tears = [new_sprite: image="tears1.png" x = 0.0 y=70.0 curframe=0.0 framespeed=0.5 nbframes=2.0]
@@ -61,4 +61,6 @@
 
   (@kaoriDisplay.x > @kaoriArrived) ? @kaoriDisplay.x -= @kaoriSpeed
 
-  (@cycle = 500)? @finished = 1
+  @puyoDisplay.x -= 10.0
+  @puyoDisplay.y = 400.0 - ([fabs: x=([sin: value = (@fcycle/10.0)] * 200.0)] / ((@fcycle + 50.0) * 0.01))
+  (@puyoDisplay.x < -500.0)? @finished = 1

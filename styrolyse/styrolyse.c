@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "goomsl_hash.h"
 
 extern char *dataFolder;
@@ -24,6 +25,18 @@ Styrolyse *styrolyse = NULL;
 /**
  * GSL->C Sprite management
  */
+
+void styro_sin(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    GSL_GLOBAL_FLOAT(gsl, "sin") = sin(GSL_LOCAL_FLOAT(gsl, local, "value"));
+}
+
+void styro_mod(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    int numerator = GSL_LOCAL_INT(gsl, local, "numerator");
+    int denominator = GSL_LOCAL_INT(gsl, local, "denominator");
+    GSL_LOCAL_INT(gsl, local, "mod") = numerator % denominator;
+}
 
 void put_text(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
@@ -70,6 +83,8 @@ static void sbind(GoomSL *gsl)
 {
   gsl_bind_function(gsl, "put_text",   put_text);
   gsl_bind_function(gsl, "draw",  sprite_draw);
+  gsl_bind_function(gsl, "sin",  styro_sin);
+  gsl_bind_function(gsl, "mod",  styro_mod);
 }
 
 /* Externals */

@@ -131,6 +131,7 @@ void PuyoStoryWidget::draw(SDL_Surface *screen)
     sstory = screen;
     styrolyse_draw(currentStory);
     // SDL_BlitSurface(sstory, NULL, screen, NULL);
+    SDL_SetClipRect(screen, NULL);
 }
 
 PuyoStoryScreen::PuyoStoryScreen(int num, Screen &previousScreen, Action *finishedAction) : Screen(0, 0, 640, 480), storyWidget(num, finishedAction), finishedAction(finishedAction), transitionWidget(previousScreen, NULL)
