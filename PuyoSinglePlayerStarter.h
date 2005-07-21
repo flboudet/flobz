@@ -46,6 +46,8 @@ public:
     PuyoSingleGameLevelData(int gameLevel, int difficulty);
     ~PuyoSingleGameLevelData();
     String getStory() const;
+    String getGameLostStory() const;
+    String getGameOverStory() const;
     AnimatedPuyoSetTheme &getPuyoTheme() const;
     PuyoLevelTheme &getLevelTheme() const;
     IA_Type getIAType() const;
@@ -89,6 +91,7 @@ private:
     PuyoGameScreen *gameScreen;
     PuyoSinglePlayerGameWidget *gameWidget;
     PuyoStoryWidget *gameLostWidget;
+    PuyoStoryScreen *gameOverScreen;
 };
 
 #endif // _PUYOSINGLEPLAYERSTARTER

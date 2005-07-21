@@ -92,6 +92,16 @@ String PuyoSingleGameLevelData::getStory() const
     return String(levelDatas[gameLevel].storyName);
 }
 
+String PuyoSingleGameLevelData::getGameLostStory() const
+{
+    return "gamelost1p.gsl";
+}
+
+String PuyoSingleGameLevelData::getGameOverStory() const
+{
+    return "gameover1p.gsl";
+}
+    
 AnimatedPuyoSetTheme &PuyoSingleGameLevelData::getPuyoTheme() const
 {
     return *themeToUse;
@@ -147,7 +157,7 @@ void SinglePlayerStarterAction::action()
 	   }
 	   else if (gameLostWidget != NULL) {
 	     //delete gameLostWidget;
-	       gameLostWidget = NULL;
+	     //  gameLostWidget = NULL;
 	   }
         }
 	else
@@ -192,7 +202,8 @@ void SinglePlayerStarterAction::nextLevel()
 
 void SinglePlayerStarterAction::gameLost()
 {
-    gameLostWidget = new PuyoStoryWidget("gamelost1p.gsl", this);
+    gameLostWidget = new PuyoStoryWidget(levelData->getGameLostStory(),
+					 this);
     gameScreen->setOverlayStory(gameLostWidget);
 }
 
@@ -203,9 +214,11 @@ void SinglePlayerStarterAction::endGameSession()
     delete gameWidget;
     delete gameScreen;
     delete levelData;
-    
+    delete gameLostWidget;
+
     gameScreen = NULL;
     gameWidget = NULL;
     levelData = NULL;
+    gameLostWidget = NULL;
 }
 
