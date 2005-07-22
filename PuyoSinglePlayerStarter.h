@@ -83,6 +83,8 @@ private:
 
     void gameLost();
     
+    void gameOver();
+    
     void endGameSession();
     
     int currentLevel, lifes, difficulty;

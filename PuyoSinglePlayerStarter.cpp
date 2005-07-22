@@ -138,7 +138,7 @@ int PuyoSingleGameLevelData::getIALevel() const
 
 
 SinglePlayerStarterAction::SinglePlayerStarterAction(int difficulty)
-    : currentLevel(0), lifes(3), difficulty(difficulty), levelData(NULL), story(NULL), gameScreen(NULL), gameLostWidget(NULL) {}
+    : currentLevel(0), lifes(3), difficulty(difficulty), levelData(NULL), story(NULL), gameScreen(NULL), gameLostWidget(NULL), gameOverScreen(NULL) {}
 
 void SinglePlayerStarterAction::action()
 {
@@ -150,24 +150,23 @@ void SinglePlayerStarterAction::action()
     }
     else if (! gameWidget->getAborted()) {
         if (! gameWidget->didPlayerWon()) {
-	   lifes--;
-	   if (gameLostWidget == NULL) {
-	       gameLost();
-	       return;
-	   }
-	   else if (gameLostWidget != NULL) {
-	     //delete gameLostWidget;
-	     //  gameLostWidget = NULL;
-	   }
+            lifes--;
+            if (gameLostWidget == NULL) {
+                gameLost();
+                return;
+            }
         }
-	else
+        else
             currentLevel++;
-	if (lifes < 0) {
-	    endGameSession();
-	}
-	else {
+        if (lifes < 0) {
+            if (gameOverScreen == NULL)
+                gameOver();
+            else
+                endGameSession();
+        }
+        else {
             nextLevel();
-	}
+        }
     }
     else {
         endGameSession();
@@ -200,6 +199,13 @@ void SinglePlayerStarterAction::nextLevel()
     GameUIDefaults::SCREEN_STACK->push(story);
 }
 
+void SinglePlayerStarterAction::gameOver()
+{
+    gameOverScreen = new PuyoStoryScreen(levelData->getGameOverStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
+    GameUIDefaults::SCREEN_STACK->pop();
+    GameUIDefaults::SCREEN_STACK->push(gameOverScreen);
+}
+
 void SinglePlayerStarterAction::gameLost()
 {
     gameLostWidget = new PuyoStoryWidget(levelData->getGameLostStory(),
@@ -209,16 +215,21 @@ void SinglePlayerStarterAction::gameLost()
 
 void SinglePlayerStarterAction::endGameSession()
 {
+    Screen *screenToTrans = GameUIDefaults::SCREEN_STACK->top();
     GameUIDefaults::SCREEN_STACK->pop();
-    ((PuyoRealMainScreen *)(GameUIDefaults::SCREEN_STACK->top()))->transitionFromScreen(*gameScreen);
+    //(static_cast<PuyoRealMainScreen *>(GameUIDefaults::SCREEN_STACK->top()))->transitionFromScreen(*gameScreen);
     delete gameWidget;
     delete gameScreen;
     delete levelData;
-    delete gameLostWidget;
+    if (gameLostWidget != NULL)
+        delete gameLostWidget;
+    if (gameOverScreen != NULL)
+        delete gameOverScreen;
 
     gameScreen = NULL;
     gameWidget = NULL;
     levelData = NULL;
     gameLostWidget = NULL;
+    gameOverScreen = NULL;
 }
 
