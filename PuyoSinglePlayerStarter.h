@@ -26,6 +26,7 @@
 #define _PUYOSINGLEPLAYERSTARTER
 
 #include "PuyoStarter.h"
+#include "HiScores.h"
 
 class PuyoSinglePlayerGameWidget : public PuyoGameWidget {
 public:
@@ -68,6 +69,14 @@ private:
     static const struct StaticLevelDatas levelDatas[];
 };
 
+class PuyoGameOver1PScreen : public PuyoStoryScreen {
+public:
+    PuyoGameOver1PScreen(String screenName, Screen &previousScreen, Action *finishedAction = NULL);
+private:
+    Text names[kHiScoresNumber], points[kHiScoresNumber];
+    VBox hiScoreNameBox, hiScorePointBox;
+    HBox hiScoreBox;
+};
 
 class SinglePlayerStarterAction : public Action {
 public:
@@ -93,7 +102,7 @@ private:
     PuyoGameScreen *gameScreen;
     PuyoSinglePlayerGameWidget *gameWidget;
     PuyoStoryWidget *gameLostWidget;
-    PuyoStoryScreen *gameOverScreen;
+    PuyoGameOver1PScreen *gameOverScreen;
 };
 
 #endif // _PUYOSINGLEPLAYERSTARTER

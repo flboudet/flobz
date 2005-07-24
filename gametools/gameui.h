@@ -287,9 +287,11 @@ namespace gameui {
 
   class Text : public Widget, public IdleComponent {
     public:
+      Text();
       Text(const String &label, SoFont *font = NULL);
       void setValue(String value);
       String getValue() const { return label; }
+      void setFont(SoFont *newFont) { font = newFont; }
 
       // Implements IdleComponent
       virtual void idle(double currentTime);

@@ -394,6 +394,16 @@ void PuyoGameWidget::eventOccured(GameControlEvent *event)
     }
 }
 
+bool PuyoGameWidget::backPressed()
+{
+    if ((gameover || abortedFlag) && once) {
+        if (gameOverAction)
+            gameOverAction->action();
+        return true;
+    }
+    return false;
+}
+
 PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction) : menuTitle("Pause"), continueButton("Continue game", continueAction), abortButton("Abort game", abortAction)
 {
     add(&menuTitle);
@@ -434,7 +444,8 @@ void PuyoGameScreen::onEvent(GameControlEvent *cevent)
 
 void PuyoGameScreen::backPressed()
 {
-    printf("Back pressed!\n");
+    if (gameWidget.backPressed())
+        return;
     if (!paused) {
         this->add(&pauseMenu);
         this->focus(&pauseMenu);

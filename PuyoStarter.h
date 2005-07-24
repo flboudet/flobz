@@ -79,6 +79,7 @@ public:
     void resume();
     bool isFocusable() { return !paused; }
     void eventOccured(GameControlEvent *event);
+    bool backPressed();
     IdleComponent *getIdleComponent() { return this; }
     void abort() { abortedFlag = true; }
     bool getAborted() const { return abortedFlag; }

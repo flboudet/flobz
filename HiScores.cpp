@@ -9,6 +9,7 @@ static bool loaded = false;
 
 void initHiScores(const char * const defaultNames[kHiScoresNumber])
 {
+    if (loaded) return;
     char HSID[8];
     
     for (int i=0; i<kHiScoresNumber; i++)

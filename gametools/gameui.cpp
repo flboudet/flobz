@@ -644,6 +644,14 @@ namespace gameui {
   // Text
   // 
 
+  Text::Text()
+    : label(""), mdontMove(true)
+  {
+      this->font = GameUIDefaults::FONT_TEXT;
+      setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
+      offsetX = offsetY = 0.;
+  }
+    
   Text::Text(const String &label, SoFont *font)
     : font(font), label(label), mdontMove(true)
     {

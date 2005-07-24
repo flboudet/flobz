@@ -137,6 +137,33 @@ int PuyoSingleGameLevelData::getIALevel() const
 }
 
 
+PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousScreen, Action *finishedAction)
+        : PuyoStoryScreen(screenName, previousScreen, finishedAction)
+{
+    static char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
+    "Satanas", "Doctor X", "Tania", "Mr Gyom",
+    "The Duke","Jeko","--------" };
+    
+    initHiScores(AI_NAMES);
+    hiscore *scores = getHiScores();
+    //hiScoreBox.add(new Text("Game Over"));
+    for (int i = 0 ; i < kHiScoresNumber ; i++) {
+        char tmp[256];
+        sprintf(tmp, "%d", scores[i].score);
+        names[i].setValue(scores[i].name);
+        points[i].setValue(tmp);
+        hiScoreNameBox.add(&names[i]);
+        hiScorePointBox.add(&points[i]);
+        if (i == 3) {
+            names[i].setFont(GameUIDefaults::FONT);
+            points[i].setFont(GameUIDefaults::FONT);
+        }
+    }
+    hiScoreBox.add(&hiScoreNameBox);
+    hiScoreBox.add(&hiScorePointBox);
+    add(&hiScoreBox);
+}
+
 SinglePlayerStarterAction::SinglePlayerStarterAction(int difficulty)
     : currentLevel(0), lifes(3), difficulty(difficulty), levelData(NULL), story(NULL), gameScreen(NULL), gameLostWidget(NULL), gameOverScreen(NULL) {}
 
@@ -150,8 +177,8 @@ void SinglePlayerStarterAction::action()
     }
     else if (! gameWidget->getAborted()) {
         if (! gameWidget->didPlayerWon()) {
-            lifes--;
             if (gameLostWidget == NULL) {
+                lifes--;
                 gameLost();
                 return;
             }
@@ -169,7 +196,10 @@ void SinglePlayerStarterAction::action()
         }
     }
     else {
-        endGameSession();
+        if (gameOverScreen == NULL)
+            gameOver();
+        else
+            endGameSession();
     }
 }
 
@@ -201,7 +231,7 @@ void SinglePlayerStarterAction::nextLevel()
 
 void SinglePlayerStarterAction::gameOver()
 {
-    gameOverScreen = new PuyoStoryScreen(levelData->getGameOverStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
+    gameOverScreen = new PuyoGameOver1PScreen(levelData->getGameOverStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
     GameUIDefaults::SCREEN_STACK->pop();
     GameUIDefaults::SCREEN_STACK->push(gameOverScreen);
 }
