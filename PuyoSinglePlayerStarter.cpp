@@ -42,23 +42,23 @@ PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puy
 
 const struct PuyoSingleGameLevelData::StaticLevelDatas PuyoSingleGameLevelData::levelDatas[] = {
 // Level 1
-{ "story1.gsl", {RANDOM, 350}, {FLOBO , 190}, {TANIA , 130} },
+{ "story1.gsl", "Herbert the Dog", {RANDOM, 350}, {FLOBO , 190}, {TANIA , 130} },
 // Level 2
-{ "story2.gsl", {FLOBO , 350}, {JEKO  , 180}, {JEKO  , 100} },
+{ "story2.gsl", "Duke Beary", {FLOBO , 350}, {JEKO  , 180}, {JEKO  , 100} },
 // Level 3
-{ "story3.gsl", {FLOBO , 250}, {TANIA , 160}, {GYOM  ,  90} },
+{ "story3.gsl", "???", {FLOBO , 250}, {TANIA , 160}, {GYOM  ,  90} },
 // Level 4
-{ "story4.gsl", {FLOBO , 180}, {FLOBO ,  90}, {JEKO  ,  80} },
+{ "story4.gsl", "Azrael", {FLOBO , 180}, {FLOBO ,  90}, {JEKO  ,  80} },
 // Level 5
-{ "story5.gsl", {FLOBO ,  90}, {GYOM  , 210}, {TANIA ,  60} },
+{ "story5.gsl", "???", {FLOBO ,  90}, {GYOM  , 210}, {TANIA ,  60} },
 // Level 6
-{ "story6.gsl", {JEKO  , 350}, {TANIA ,  90}, {GYOM  ,  60} },
+{ "story6.gsl", "Zklogh", {JEKO  , 350}, {TANIA ,  90}, {GYOM  ,  60} },
 // Level 7
-{ "story7.gsl", {TANIA , 320}, {JEKO  ,  80}, {GYOM  ,  40} },
+{ "story7.gsl", "MegaPuyo", {TANIA , 320}, {JEKO  ,  80}, {GYOM  ,  40} },
 // Level 8
-{ "story8.gsl", {FLOBO ,  62}, {GYOM  ,  90}, {GYOM  ,  30} },
+{ "story8.gsl", "Adam McFlurry", {FLOBO ,  62}, {GYOM  ,  90}, {GYOM  ,  30} },
 // Level 9
-{ "story9.gsl", {RANDOM,   0}, {RANDOM,   0}, {RANDOM,   0} }
+{ "story9.gsl", "MechaPuyo", {RANDOM,   0}, {RANDOM,   0}, {RANDOM,   0} }
 };
 
 
@@ -136,8 +136,11 @@ int PuyoSingleGameLevelData::getIALevel() const
     }
 }
 
+const char * PuyoSingleGameLevelData::getIAName() const {
+    return levelDatas[gameLevel].iaName;
+}
 
-PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousScreen, Action *finishedAction)
+PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousScreen, Action *finishedAction, String playerName, int playerPoints)
         : PuyoStoryScreen(screenName, previousScreen, finishedAction)
 {
     static char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
@@ -145,6 +148,7 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousSc
     "The Duke","Jeko","--------" };
     
     initHiScores(AI_NAMES);
+    int scorePlace = setHiScore(playerPoints, playerName);
     hiscore *scores = getHiScores();
     //hiScoreBox.add(new Text("Game Over"));
     for (int i = 0 ; i < kHiScoresNumber ; i++) {
@@ -154,7 +158,7 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousSc
         points[i].setValue(tmp);
         hiScoreNameBox.add(&names[i]);
         hiScorePointBox.add(&points[i]);
-        if (i == 3) {
+        if (i == scorePlace) {
             names[i].setFont(GameUIDefaults::FONT);
             points[i].setFont(GameUIDefaults::FONT);
         }
@@ -164,8 +168,10 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousSc
     add(&hiScoreBox);
 }
 
-SinglePlayerStarterAction::SinglePlayerStarterAction(int difficulty)
-    : currentLevel(0), lifes(3), difficulty(difficulty), levelData(NULL), story(NULL), gameScreen(NULL), gameLostWidget(NULL), gameOverScreen(NULL) {}
+SinglePlayerStarterAction::SinglePlayerStarterAction(int difficulty, PuyoSingleNameProvider *nameProvider)
+    : currentLevel(0), lifes(3), difficulty(difficulty), levelData(NULL),
+      story(NULL), gameScreen(NULL), gameLostWidget(NULL), gameOverScreen(NULL),
+      nameProvider(nameProvider) {}
 
 void SinglePlayerStarterAction::action()
 {
@@ -188,8 +194,11 @@ void SinglePlayerStarterAction::action()
         if (lifes < 0) {
             if (gameOverScreen == NULL)
                 gameOver();
-            else
+            else {
+                lifes = 3;
+                currentLevel = 0;
                 endGameSession();
+            }
         }
         else {
             nextLevel();
@@ -198,8 +207,11 @@ void SinglePlayerStarterAction::action()
     else {
         if (gameOverScreen == NULL)
             gameOver();
-        else
+        else {
+            lifes = 3;
+            currentLevel = 0;
             endGameSession();
+        }
     }
 }
 
@@ -214,6 +226,9 @@ void SinglePlayerStarterAction::startGame()
 {
     gameWidget = new PuyoSinglePlayerGameWidget(levelData->getPuyoTheme(), levelData->getLevelTheme(), levelData->getIAType(), levelData->getIALevel(), lifes, this);
     gameScreen = new PuyoGameScreen(*gameWidget, *story);
+    if (nameProvider != NULL)
+        gameWidget->setPlayerOneName(nameProvider->getPlayerName());
+    gameWidget->setPlayerTwoName(levelData->getIAName());
     GameUIDefaults::SCREEN_STACK->pop();
     delete story;
     story = NULL;
@@ -231,7 +246,7 @@ void SinglePlayerStarterAction::nextLevel()
 
 void SinglePlayerStarterAction::gameOver()
 {
-    gameOverScreen = new PuyoGameOver1PScreen(levelData->getGameOverStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
+    gameOverScreen = new PuyoGameOver1PScreen(levelData->getGameOverStory(), *(GameUIDefaults::SCREEN_STACK->top()), this, gameWidget->getPlayerOneName(), gameWidget->getPointsPlayerOne());
     GameUIDefaults::SCREEN_STACK->pop();
     GameUIDefaults::SCREEN_STACK->push(gameOverScreen);
 }
@@ -247,7 +262,7 @@ void SinglePlayerStarterAction::endGameSession()
 {
     Screen *screenToTrans = GameUIDefaults::SCREEN_STACK->top();
     GameUIDefaults::SCREEN_STACK->pop();
-    //(static_cast<PuyoRealMainScreen *>(GameUIDefaults::SCREEN_STACK->top()))->transitionFromScreen(*gameScreen);
+    (static_cast<PuyoRealMainScreen *>(GameUIDefaults::SCREEN_STACK->top()))->transitionFromScreen(*screenToTrans);
     delete gameWidget;
     delete gameScreen;
     delete levelData;

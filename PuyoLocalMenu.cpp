@@ -26,9 +26,31 @@
 #include "PuyoLocalMenu.h"
 #include "AnimatedPuyoTheme.h"
 #include "PuyoScreenTransition.h"
+#include "preferences.h"
+
+const char *LocalGameMenu::getDefaultPlayerName()
+{
+    static char playerName[256];
+
+    char * defaultName = getenv("USER");
+    if (defaultName == NULL)
+      defaultName = "Player";
+    if (!(defaultName[0]>=32))
+      defaultName = "Player";
+    if ((defaultName[0]>='a') && (defaultName[0]<='z'))
+      defaultName[0] += 'A' - 'a';
+    
+    GetStrPreference("Player Name", playerName, defaultName);
+    return playerName;
+}
+
+LocalGameMenu::LocalGameMenu(PuyoRealMainScreen *mainScreen)
+    : editPlayerName("Player Name:", getDefaultPlayerName()), PuyoMainScreenMenu(mainScreen),
+      easyAction(EASY, this), mediumAction(MEDIUM, this), hardAction(HARD, this), popAction(mainScreen)
+{}
 
 void LocalGameMenu::build() {
-    add(new EditFieldWithLabel("Player Name:", "flobo"));
+    add(&editPlayerName);
     add(new Text("Choose Game Level"));
     add(new Button("Easy", &easyAction));
     add(new Button("Medium", &mediumAction));
@@ -36,6 +58,12 @@ void LocalGameMenu::build() {
     add(new Button("Cancel", &popAction));
 }
 
+String LocalGameMenu::getPlayerName() const
+{
+    String playerName = editPlayerName.getEditField()->getValue();
+    SetStrPreference("Player Name", playerName);
+    return playerName;
+}
 
 void Local2PlayersGameMenu::build()
 {

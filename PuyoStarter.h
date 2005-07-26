@@ -86,6 +86,10 @@ public:
     void setLives(int l) { lives = l; }
     bool isGameARunning() const { return attachedGameA->isGameRunning(); }
     bool isGameBRunning() const { return attachedGameB->isGameRunning(); }
+    void setPlayerOneName(String newName) { playerOneName = newName; }
+    void setPlayerTwoName(String newName) { playerTwoName = newName; }
+    String getPlayerOneName() const { return playerOneName; }
+    int getPointsPlayerOne() { return attachedGameA->getPoints(); }
 protected:
     SDL_Painter painter;
 private:
@@ -106,6 +110,7 @@ private:
     bool abortedFlag;
     int gameSpeed;
     int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
+    String playerOneName, playerTwoName;
 };
 
 class PuyoGameScreen;

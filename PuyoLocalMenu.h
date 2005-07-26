@@ -37,11 +37,14 @@ typedef enum SinglePlayerLevel {
     HARD=2
 } SinglePlayerLevel;
 
-class LocalGameMenu : public PuyoMainScreenMenu {
+class LocalGameMenu : public PuyoMainScreenMenu, public PuyoSingleNameProvider {
 public:
-    LocalGameMenu(PuyoRealMainScreen *mainScreen) : PuyoMainScreenMenu(mainScreen), easyAction(EASY), mediumAction(MEDIUM), hardAction(HARD), popAction(mainScreen) {}
+    LocalGameMenu(PuyoRealMainScreen *mainScreen);
     void build();
+    String getPlayerName() const;
 private:
+    static const char *getDefaultPlayerName();
+    EditFieldWithLabel editPlayerName;
     SinglePlayerStarterAction easyAction;
     SinglePlayerStarterAction mediumAction;
     SinglePlayerStarterAction hardAction;

@@ -146,13 +146,15 @@ bool PuyoEventPlayer::keyShouldRepeat(int &key)
 PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
     : CycledComponent(0.02), attachedLevelTheme(&levelTheme), areaA(&areaA), areaB(&areaB), controllerA(&controllerA), controllerB(&controllerB),
       cyclesBeforeGameCycle(50), cyclesBeforeSpeedIncreases(500), cyclesBeforeGameCycleV(cyclesBeforeGameCycle), tickCounts(0), paused(false), displayLives(true), lives(3),
-      gameOverAction(gameOverAction), abortedFlag(false), gameSpeed(20), blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0)
+      gameOverAction(gameOverAction), abortedFlag(false), gameSpeed(20), blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
+      playerOneName(p1name), playerTwoName(p2name)
 {
     initialize();
 }
 
 PuyoGameWidget::PuyoGameWidget()
-    : CycledComponent(0.02), cyclesBeforeGameCycle(50), cyclesBeforeSpeedIncreases(500), cyclesBeforeGameCycleV(cyclesBeforeGameCycle), tickCounts(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(20)
+    : CycledComponent(0.02), cyclesBeforeGameCycle(50), cyclesBeforeSpeedIncreases(500), cyclesBeforeGameCycleV(cyclesBeforeGameCycle),
+      tickCounts(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(20), playerOneName(p1name), playerTwoName(p2name)
 {
 }
 
@@ -366,8 +368,8 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
         
         // Rendering the player names
         SoFont *font = (paused?theCommander->darkFont:theCommander->menuFont);
-        SoFont_CenteredString_XY (font, screen, 510, 460,   "bla", NULL);
-        SoFont_CenteredString_XY (font, screen, 130, 460,   "bli", NULL);
+        SoFont_CenteredString_XY (font, screen, 130, 460,  playerOneName, NULL);
+        SoFont_CenteredString_XY (font, screen, 510, 460, playerTwoName, NULL);
     }
 }
 

@@ -28,6 +28,11 @@
 #include "PuyoStarter.h"
 #include "HiScores.h"
 
+class PuyoSingleNameProvider {
+public:
+    virtual String getPlayerName() const = 0;
+};
+
 class PuyoSinglePlayerGameWidget : public PuyoGameWidget {
 public:
     PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, int lifes, Action *gameOverAction = NULL);
@@ -53,7 +58,7 @@ public:
     PuyoLevelTheme &getLevelTheme() const;
     IA_Type getIAType() const;
     int getIALevel() const;
-    
+    const char * getIAName() const;
 private:
     int gameLevel, difficulty;
     AnimatedPuyoSetTheme *themeToUse;
@@ -64,6 +69,7 @@ private:
     };
     struct StaticLevelDatas {
         char *storyName;
+        char *iaName;
         SelIA easySetting, mediumSetting, hardSetting;
     };
     static const struct StaticLevelDatas levelDatas[];
@@ -71,7 +77,7 @@ private:
 
 class PuyoGameOver1PScreen : public PuyoStoryScreen {
 public:
-    PuyoGameOver1PScreen(String screenName, Screen &previousScreen, Action *finishedAction = NULL);
+    PuyoGameOver1PScreen(String screenName, Screen &previousScreen, Action *finishedAction, String playerName, int playerPoints);
 private:
     Text names[kHiScoresNumber], points[kHiScoresNumber];
     VBox hiScoreNameBox, hiScorePointBox;
@@ -80,7 +86,7 @@ private:
 
 class SinglePlayerStarterAction : public Action {
 public:
-    SinglePlayerStarterAction(int difficulty);
+    SinglePlayerStarterAction(int difficulty, PuyoSingleNameProvider *nameProvider = NULL);
     void action();
     
 private:
@@ -103,6 +109,7 @@ private:
     PuyoSinglePlayerGameWidget *gameWidget;
     PuyoStoryWidget *gameLostWidget;
     PuyoGameOver1PScreen *gameOverScreen;
+    PuyoSingleNameProvider *nameProvider;
 };
 
 #endif // _PUYOSINGLEPLAYERSTARTER
