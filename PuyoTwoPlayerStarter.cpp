@@ -39,8 +39,8 @@ PuyoTwoPlayersGameWidget::PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThe
     initialize(areaA, areaB, playercontrollerA, playercontrollerB, levelTheme, gameOverAction);
 }
 
-TwoPlayersStarterAction::TwoPlayersStarterAction(int difficulty)
-    : difficulty(difficulty), gameScreen(NULL) {}
+TwoPlayersStarterAction::TwoPlayersStarterAction(int difficulty, PuyoTwoNameProvider *nameProvider)
+    : difficulty(difficulty), gameScreen(NULL), nameProvider(nameProvider) {}
 
 void TwoPlayersStarterAction::action()
 {
@@ -58,6 +58,10 @@ void TwoPlayersStarterAction::startGame()
     
     gameWidget = new PuyoTwoPlayersGameWidget(*(themeManager->getAnimatedPuyoSetTheme("Classic")), *(themeManager->getPuyoLevelTheme("Level1")), this);
     gameScreen = new PuyoGameScreen(*gameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
+    if (nameProvider != NULL) {
+        gameWidget->setPlayerOneName(nameProvider->getPlayer1Name());
+        gameWidget->setPlayerTwoName(nameProvider->getPlayer2Name());
+    }
     GameUIDefaults::SCREEN_STACK->push(gameScreen);
 }
 

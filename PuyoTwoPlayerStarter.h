@@ -27,6 +27,12 @@
 
 #include "PuyoStarter.h"
 
+class PuyoTwoNameProvider {
+public:
+    virtual String getPlayer1Name() const = 0;
+    virtual String getPlayer2Name() const = 0;
+};
+
 class PuyoTwoPlayersGameWidget : public PuyoGameWidget {
 public:
     PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction = NULL);
@@ -42,7 +48,7 @@ private:
 
 class TwoPlayersStarterAction : public Action {
 public:
-    TwoPlayersStarterAction(int difficulty);
+    TwoPlayersStarterAction(int difficulty, PuyoTwoNameProvider *nameProvider = NULL);
     void action();
     
 private:    
@@ -53,6 +59,7 @@ private:
     int difficulty;
     PuyoGameScreen *gameScreen;
     PuyoTwoPlayersGameWidget *gameWidget;
+    PuyoTwoNameProvider *nameProvider;
 };
 
 #endif // _PUYOTWOPLAYERSTARTER

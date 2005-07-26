@@ -45,17 +45,18 @@ const char *LocalGameMenu::getDefaultPlayerName()
 }
 
 LocalGameMenu::LocalGameMenu(PuyoRealMainScreen *mainScreen)
-    : editPlayerName("Player Name:", getDefaultPlayerName()), PuyoMainScreenMenu(mainScreen),
-      easyAction(EASY, this), mediumAction(MEDIUM, this), hardAction(HARD, this), popAction(mainScreen)
+    : editPlayerName("Player Name:", getDefaultPlayerName()), screenTitle("Choose Game Level"), PuyoMainScreenMenu(mainScreen),
+      easyAction(EASY, this), mediumAction(MEDIUM, this), hardAction(HARD, this), popAction(mainScreen),
+      easy("Easy", &easyAction), medium("Medium", &mediumAction), hard("Hard", &hardAction), back("Cancel", &popAction)
 {}
 
 void LocalGameMenu::build() {
     add(&editPlayerName);
-    add(new Text("Choose Game Level"));
-    add(new Button("Easy", &easyAction));
-    add(new Button("Medium", &mediumAction));
-    add(new Button("Hard", &hardAction));
-    add(new Button("Cancel", &popAction));
+    add(&screenTitle);
+    add(&easy);
+    add(&medium);
+    add(&hard);
+    add(&back);
 }
 
 String LocalGameMenu::getPlayerName() const
@@ -65,9 +66,30 @@ String LocalGameMenu::getPlayerName() const
     return playerName;
 }
 
+const char *Local2PlayersGameMenu::getDefaultPlayer1Name()
+{
+    static char player1Name[256];
+    GetStrPreference("Player1 Name", player1Name, "Player 1");
+    return player1Name;
+}
+
+const char *Local2PlayersGameMenu::getDefaultPlayer2Name()
+{
+    static char player2Name[256];
+    GetStrPreference("Player2 Name", player2Name, "Player 2");
+    return player2Name;
+}
+
+Local2PlayersGameMenu::Local2PlayersGameMenu(PuyoRealMainScreen *mainScreen)
+    : PuyoMainScreenMenu(mainScreen), editPlayer1Name("Player 1 Name:", getDefaultPlayer1Name()),
+      editPlayer2Name("Player 2 Name:", getDefaultPlayer2Name()),
+      easyAction(EASY, this), mediumAction(MEDIUM, this), hardAction(HARD, this), popAction(mainScreen)
+{}
+
 void Local2PlayersGameMenu::build()
 {
-    add(new EditFieldWithLabel("Player Name:", "flobo"));
+    add(&editPlayer1Name);
+    add(&editPlayer2Name);
     add(new Text("Choose Game Level"));
     add(new Button("Easy", &easyAction));
     add(new Button("Medium", &mediumAction));
@@ -75,4 +97,16 @@ void Local2PlayersGameMenu::build()
     add(new Button("Cancel", &popAction));
 }
 
+String Local2PlayersGameMenu::getPlayer1Name() const
+{
+    String playerName = editPlayer1Name.getEditField()->getValue();
+    SetStrPreference("Player1 Name", playerName);
+    return playerName;
+}
 
+String Local2PlayersGameMenu::getPlayer2Name() const
+{
+    String playerName = editPlayer2Name.getEditField()->getValue();
+    SetStrPreference("Player2 Name", playerName);
+    return playerName;
+}

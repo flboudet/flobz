@@ -45,17 +45,24 @@ public:
 private:
     static const char *getDefaultPlayerName();
     EditFieldWithLabel editPlayerName;
+    Text screenTitle;
     SinglePlayerStarterAction easyAction;
     SinglePlayerStarterAction mediumAction;
     SinglePlayerStarterAction hardAction;
     PuyoPopMenuAction popAction;
+    Button easy, medium, hard, back;
 };
 
-class Local2PlayersGameMenu : public PuyoMainScreenMenu {
+class Local2PlayersGameMenu : public PuyoMainScreenMenu, public PuyoTwoNameProvider {
 public:
-    Local2PlayersGameMenu(PuyoRealMainScreen *mainScreen) : PuyoMainScreenMenu(mainScreen), easyAction(EASY), mediumAction(MEDIUM), hardAction(HARD), popAction(mainScreen) {}
+    Local2PlayersGameMenu(PuyoRealMainScreen *mainScreen);
     void build();
+    String getPlayer1Name() const;
+    String getPlayer2Name() const;
 private:
+    static const char *getDefaultPlayer1Name();
+    static const char *getDefaultPlayer2Name();
+    EditFieldWithLabel editPlayer1Name, editPlayer2Name;
     TwoPlayersStarterAction easyAction;
     TwoPlayersStarterAction mediumAction;
     TwoPlayersStarterAction hardAction;

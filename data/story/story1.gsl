@@ -19,9 +19,9 @@
   int @kaoriState = @kaoriIdle
 
   string @txt1 = "Where do you think\nyou are going,\nKaori?"
-  string @txt2 = "I must to the forrest,\nto chase them and\nrescue the puyos!"
+  string @txt2 = "I must go to the forrest,\nto chase them and\nrescue the puyos!"
   string @txt3 = "You are going nowhere,\nGrandma's orders!"
-  string @txt4 = "The forrest is a place\ntoo dangerous for you!"
+  string @txt4 = "The forrest is too dangerous\na place for you!"
   string @txt5 = "Get out of my way,\nyou bastard!"
   string @txt6 = "You'll have to fight me first!"
 
@@ -193,6 +193,6 @@
     @movingDisplay.x = @kaoriMax
   (@dogDisplay.x > @dogMax)?
     @dogDisplay.x = @dogMax
-  (@cycle = 100)? @finished = 1
+  //(@cycle = 100)? @finished = 1
 
-  //(@cycle = @balloon6off + 100)? @finished = 1
+  (@cycle = @balloon6off + 100)? @finished = 1
