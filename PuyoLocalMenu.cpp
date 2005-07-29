@@ -81,20 +81,21 @@ const char *Local2PlayersGameMenu::getDefaultPlayer2Name()
 }
 
 Local2PlayersGameMenu::Local2PlayersGameMenu(PuyoRealMainScreen *mainScreen)
-    : PuyoMainScreenMenu(mainScreen), editPlayer1Name("Player 1 Name:", getDefaultPlayer1Name()),
+    : PuyoMainScreenMenu(mainScreen), screenTitle("Choose Game Level"), editPlayer1Name("Player 1 Name:", getDefaultPlayer1Name()),
       editPlayer2Name("Player 2 Name:", getDefaultPlayer2Name()),
-      easyAction(EASY, this), mediumAction(MEDIUM, this), hardAction(HARD, this), popAction(mainScreen)
+      easyAction(EASY, this), mediumAction(MEDIUM, this), hardAction(HARD, this), popAction(mainScreen),
+      easy("Easy", &easyAction), medium("Medium", &mediumAction), hard("Hard", &hardAction), back("Cancel", &popAction)
 {}
 
 void Local2PlayersGameMenu::build()
 {
     add(&editPlayer1Name);
     add(&editPlayer2Name);
-    add(new Text("Choose Game Level"));
-    add(new Button("Easy", &easyAction));
-    add(new Button("Medium", &mediumAction));
-    add(new Button("Hard", &hardAction));
-    add(new Button("Cancel", &popAction));
+    add(&screenTitle);
+    add(&easy);
+    add(&medium);
+    add(&hard);
+    add(&back);
 }
 
 String Local2PlayersGameMenu::getPlayer1Name() const

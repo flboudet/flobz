@@ -63,10 +63,12 @@ private:
     static const char *getDefaultPlayer1Name();
     static const char *getDefaultPlayer2Name();
     EditFieldWithLabel editPlayer1Name, editPlayer2Name;
+    Text screenTitle;
     TwoPlayersStarterAction easyAction;
     TwoPlayersStarterAction mediumAction;
     TwoPlayersStarterAction hardAction;
     PuyoPopMenuAction popAction;
+    Button easy, medium, hard, back;
 };
 
 #endif // _PUYOLOCALMENU
