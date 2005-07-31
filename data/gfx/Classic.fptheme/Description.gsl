@@ -36,7 +36,7 @@
 [end_puyoset]
 
 [start_puyoset]
-    puyoset.name        = "Shaped"
+    puyoset.name        = "Invaders"
     puyoset.description = "Puyos for everyone (color blindness aware)."
     puyoset.author      = "iOS-Software"
     puyoset.P1.face     = "round"
@@ -57,7 +57,7 @@
 [end_puyoset]
 
 [start_puyoset]
-    puyoset.name        = "puyoset"
+    puyoset.name        = "Daisy"
     puyoset.description = "Funny toons."
     puyoset.author      = "Daisy"
     puyoset.P1.face      = "bd"
@@ -88,6 +88,7 @@
 
 [start_level]
     level.name          = "The Dark Cave"
+    level.name          = "Level1"
     level.description   = "The cave of fear..."
     level.author        = "iOS-Software"
     level.background    = "dark"

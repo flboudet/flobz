@@ -184,6 +184,9 @@ public:
     AdvancedBuffer<const char *> getAnimatedPuyoSetThemeList(void);
     AdvancedBuffer<const char *> getPuyoLevelThemeList(void);
     
+    void addPuyoSet(AnimatedPuyoSetTheme *);
+    void addLevel(PuyoLevelTheme *);
+    
 private:
     AdvancedBuffer<const char *> themeList;
     AdvancedBuffer<const char *> puyoSetList;

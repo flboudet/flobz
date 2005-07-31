@@ -41,10 +41,10 @@ void styro_mod(GoomSL *gsl, GoomHash *global, GoomHash *local)
 void put_text(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
   char txt[1024];
-  int         x    = GSL_LOCAL_FLOAT(gsl, local, "pos.x");
-  int         y    = GSL_LOCAL_FLOAT(gsl, local, "pos.y");
-  const char *text = GSL_LOCAL_PTR  (gsl, local, "text");
-  int         i    = GSL_LOCAL_FLOAT(gsl, local, "text_index");
+  int         x    = (int)GSL_LOCAL_FLOAT(gsl, local, "pos.x");
+  int         y    = (int)GSL_LOCAL_FLOAT(gsl, local, "pos.y");
+  const char *text = (const char *)GSL_LOCAL_PTR  (gsl, local, "text");
+  int         i    = (int)GSL_LOCAL_FLOAT(gsl, local, "text_index");
   if (i>sizeof(txt)-1) i=sizeof(txt)-1;
   strncpy(txt,text,i);
   txt[i]=0;
@@ -53,13 +53,13 @@ void put_text(GoomSL *gsl, GoomHash *global, GoomHash *local)
 
 void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
-  const char *path = GSL_LOCAL_PTR  (gsl, local, "&this.image");
-  int         x    = GSL_LOCAL_FLOAT(gsl, local, "&this.pos.x");
-  int         y    = GSL_LOCAL_FLOAT(gsl, local, "&this.pos.y");
-  int        dx    = GSL_LOCAL_FLOAT(gsl, local, "display.x");
-  int        dy    = GSL_LOCAL_FLOAT(gsl, local, "display.y");
-  int        dw    = GSL_LOCAL_FLOAT(gsl, local, "display.width");
-  int        dh    = GSL_LOCAL_FLOAT(gsl, local, "display.height");
+  const char *path = (const char *)GSL_LOCAL_PTR  (gsl, local, "&this.image");
+  int         x    = (int)GSL_LOCAL_FLOAT(gsl, local, "&this.pos.x");
+  int         y    = (int)GSL_LOCAL_FLOAT(gsl, local, "&this.pos.y");
+  int        dx    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.x");
+  int        dy    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.y");
+  int        dw    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.width");
+  int        dh    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.height");
   HashValue  *img  = goom_hash_get(styrolyse->images, path);
   void       *data = NULL;
   if (img == NULL) {

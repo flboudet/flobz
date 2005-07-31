@@ -8,13 +8,13 @@
 OBJFILES= HiScores.o PuyoCommander.o        \
           main.o PuyoGame.o PuyoVersion.o         \
           PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o    \
-          audio.o PuyoStory.o \
+          audio.o styrolyse.o PuyoStory.o \
           PuyoDoomMelt.o corona32.o corona.o corona_palette.o\
           PuyoStarter.o PuyoSinglePlayerStarter.o PuyoTwoPlayerStarter.o     \
           PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o \
           AnimatedPuyoTheme.o PuyoNetworkMenu.o PuyoNetCenterMenu.o \
           PuyoNetGameCenter.o PuyoInternetGameCenter.o \
-          PuyoLocalMenu.o PuyoOptionMenu.o PuyoControlMenu.o PuyoScreenTransition.o IosVector.o 
+          PuyoLocalMenu.o PuyoOptionMenu.o PuyoControlMenu.o PuyoScreenTransition.o IosVector.o
 
 include root_dir
 include config
@@ -27,15 +27,16 @@ MAKEDEPEND = ${CXX} -MM $(CFLAGS_NOPCH) -o $(df).d $<
 
 all: prelude flobopuyo
 
-flobopuyo: prelude iosfc_dir gametools_dir styrolyse_dir ${OBJFILES}
-	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o gametools/*.o styrolyse/*.o styrolyse/goomsl/goomsl*.o
+flobopuyo: prelude iosfc_dir gametools_dir goomsl_dir ${OBJFILES}
+	@echo "[flobopuyo] $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o gametools/*.o goomsl/goomsl*.o"
+	echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o gametools/*.o goomsl/goomsl*.o
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
 	@echo
 	@echo " Type ./$(PRGNAME) to play."
 	@echo "--------------------------------------"
 
-prelude: all.h.gch
+prelude:all.h.gch
 	@echo "Compiling with CFLAGS=$(CFLAGS)"
 	@echo "Compiling with LDFLAGS=$(LDFLAGS)"
 
@@ -45,8 +46,8 @@ iosfc_dir:all.h.gch
 gametools_dir:all.h.gch
 	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C gametools object
 
-styrolyse_dir:all.h.gch
-	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C styrolyse object
+goomsl_dir:all.h.gch
+	@+make -C goomsl object
 
 %.o:%.cpp all.h.gch
 	@mkdir -p $(DEPDIR);\
@@ -83,7 +84,7 @@ clean:
 	rm -f  .DS_Store */.DS_Store */*/.DS_Store .gdb_history
 	+make -C iosfc clean
 	+make -C gametools clean
-	+make -C styrolyse clean
+	+make -C goomsl clean
 
 install: flobopuyo
 	$(STRIP) $(PRGNAME)
@@ -98,8 +99,8 @@ install: flobopuyo
 	cp ./$(PRGNAME) ${INSTALL_BINDIR}/flobopuyo
 	chmod a+rx ${INSTALL_BINDIR}/flobopuyo
 
-flobopuyo-static: prelude iosfc_dir gametools_dir styrolyse_dir ${OBJFILES}
-	@echo "[flobopuyo-static]" && $(CXX) $(CFLAGS) -o flobopuyo-static ${OBJFILES} iosfc/*.o gametools/*.o styrolyse/*.o styrolyse/goomsl/goomsl*.o /sw/lib/libSDL_mixer.a /sw/lib/libSDL_net.a /sw/lib/libvorbisfile.a /sw/lib/libvorbis.a /sw/lib/libogg.a /sw/lib/libsmpeg.a /sw/lib/libSDL_image.a /sw/lib/libjpeg.a /sw/lib/libpng.a -lz -framework CoreFoundation `$(SDL_CONFIG) --static-libs`
+flobopuyo-static: prelude iosfc_dir gametools_dir goomsl_dir ${OBJFILES}
+	@echo "[flobopuyo-static]" && $(CXX) $(CFLAGS) -o flobopuyo-static ${OBJFILES} iosfc/*.o gametools/*.o goomsl/goomsl*.o /sw/lib/libSDL_mixer.a /sw/lib/libSDL_net.a /sw/lib/libvorbisfile.a /sw/lib/libvorbis.a /sw/lib/libogg.a /sw/lib/libsmpeg.a /sw/lib/libSDL_image.a /sw/lib/libjpeg.a /sw/lib/libpng.a -lz -framework CoreFoundation `$(SDL_CONFIG) --static-libs`
 	@echo "--------------------------------------"
 	@[ -s WARNINGS ] && echo -e "--------------------------------------\n There have been some warnings:\n" && cat WARNINGS && rm -f WARNINGS && echo "--------------------------------------" || true
 	@echo "--------------------------------------"
