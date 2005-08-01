@@ -1,0 +1,78 @@
+[ThemeDefinition]
+
+struct <Puyo:
+    string face,
+    string eye,
+    string explosion,
+    float offset>
+
+struct <PuyoSet:
+    string name,
+    string author,
+    string description,
+    Puyo P1,
+    Puyo P2,
+    Puyo P3,
+    Puyo P4,
+    Puyo P5,
+    Puyo Neutral>
+
+struct <Level:
+    string name,
+    string author,
+    string description,
+    string background,
+    string speedmeter,
+    string lives,
+    string grid>
+
+PuyoSet puyoset
+Level   level
+
+external <end_puyoset>
+external <end_level>
+
+<start_puyoset>
+    puyoset.name        = "Unamed"
+    puyoset.description = "Some puyos..."
+    puyoset.author      = "Someone"
+    
+    puyoset.P1.face      = "round"
+    puyoset.P1.offset    = 0.0
+    puyoset.P1.eye       = "normal"
+    puyoset.P1.explosion = "round"
+    puyoset.P2.face      = "round"
+    puyoset.P2.offset    = 72.0
+    puyoset.P2.eye       = "normal"
+    puyoset.P2.explosion = "round"
+    puyoset.P3.face      = "round"
+    puyoset.P3.offset    = 144.0
+    puyoset.P3.eye       = "normal"
+    puyoset.P3.explosion = "round"
+    puyoset.P4.face      = "round"
+    puyoset.P4.offset    = 216.0
+    puyoset.P4.eye       = "normal"
+    puyoset.P4.explosion = "round"
+    puyoset.P5.face      = "round"
+    puyoset.P5.offset    = 288.0
+    puyoset.P5.eye       = "normal"
+    puyoset.P5.explosion = "round"
+
+    puyoset.Neutral.face = "glass"
+    puyoset.Neutral.offset = 0.0
+    puyoset.Neutral.eye = "normal"
+    puyoset.Neutral.explosion = "glass"
+
+<start_level>
+    level.name          = "Unamed"
+    level.description   = "Somewhere..."
+    level.author        = "Someone"
+    
+    level.background    = "columns"
+    level.speedmeter    = "fire"
+    level.lives         = "heart"
+    level.grid          = "metal"
+
+<ThemeDefinition>
+[start_puyoset]
+[start_level]
