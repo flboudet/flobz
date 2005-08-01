@@ -75,6 +75,7 @@ corona32.o:corona32.cpp all.h.gch
 corona_palette.o:corona_palette.cpp	 all.h.gch 
 
 clean:
+	rm -rf .DS_Store */.DS_Store */*/.DS_Store */*/*/.DS_Store
 	rm -rf *~ *.o flobopuyo* $(PRGNAME) WARNINGS *.gch
 	rm -rf .xvpics data/.xvpics    data/*/.xvpics
 	rm -rf $(bundle_name)
