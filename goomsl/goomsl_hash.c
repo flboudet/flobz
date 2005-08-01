@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-static GoomHashEntry *entry_new(const char *key, HashValue value) {
+static GoomHashEntry *entry_new(const char *key, GHashValue value) {
 
   int len = strlen(key);
 	GoomHashEntry *entry = (GoomHashEntry*)malloc(sizeof(GoomHashEntry));
@@ -25,7 +25,7 @@ static void entry_free(GoomHashEntry *entry) {
 	}
 }
 
-static void entry_put(GoomHashEntry *entry, const char *key, HashValue value) {
+static void entry_put(GoomHashEntry *entry, const char *key, GHashValue value) {
 	int cmp = strcmp(key,entry->key);
 	if (cmp==0) {
 		entry->value = value;
@@ -44,7 +44,7 @@ static void entry_put(GoomHashEntry *entry, const char *key, HashValue value) {
 	}
 }
 
-static HashValue *entry_get(GoomHashEntry *entry, const char *key) {
+static GHashValue *entry_get(GoomHashEntry *entry, const char *key) {
 
 	int cmp;
 	if (entry==NULL)
@@ -70,7 +70,7 @@ void goom_hash_free(GoomHash *_this) {
 	free(_this);
 }
 
-void goom_hash_put(GoomHash *_this, const char *key, HashValue value) {
+void goom_hash_put(GoomHash *_this, const char *key, GHashValue value) {
   _this->number_of_puts += 1;
 	if (_this->root == NULL)
 		_this->root = entry_new(key,value);
@@ -78,25 +78,25 @@ void goom_hash_put(GoomHash *_this, const char *key, HashValue value) {
 		entry_put(_this->root,key,value);
 }
 
-HashValue *goom_hash_get(GoomHash *_this, const char *key) {
+GHashValue *goom_hash_get(GoomHash *_this, const char *key) {
   if (_this == NULL) return NULL;
 	return entry_get(_this->root,key);
 }
 
 void goom_hash_put_int(GoomHash *_this, const char *key, int i) {
-    HashValue value;
+    GHashValue value;
     value.i = i;
     goom_hash_put(_this,key,value);
 }
 
 void goom_hash_put_float(GoomHash *_this, const char *key, float f) {
-    HashValue value;
+    GHashValue value;
     value.f = f;
     goom_hash_put(_this,key,value);
 }
 
 void goom_hash_put_ptr(GoomHash *_this, const char *key, void *ptr) {
-    HashValue value;
+    GHashValue value;
     value.ptr = ptr;
     goom_hash_put(_this,key,value);
 }

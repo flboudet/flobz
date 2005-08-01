@@ -1,6 +1,10 @@
 #ifndef _GOOMSL_H
 #define _GOOMSL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "goomsl_hash.h"
 
 typedef struct _GoomSL GoomSL;
@@ -30,5 +34,9 @@ GoomHash *gsl_globals(GoomSL *_this);
 #define GSL_GLOBAL_PTR(gsl,name)   gsl_get_ptr(gsl, *(int*)goom_hash_get(gsl_globals(gsl),name)->ptr)
 #define GSL_GLOBAL_INT(gsl,name)   (*(int*)goom_hash_get(gsl_globals(gsl),name)->ptr)
 #define GSL_GLOBAL_FLOAT(gsl,name) (*(float*)goom_hash_get(gsl_globals(gsl),name)->ptr)
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif
