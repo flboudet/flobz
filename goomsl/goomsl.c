@@ -208,8 +208,8 @@ void gsl_instr_display(Instruction *_this)
 
 static const char *validate_v_v(Instruction *_this)
 { /* {{{ */
-  HashValue *dest = goom_hash_get(_this->vnamespace[1], _this->params[1]);
-  HashValue *src  = goom_hash_get(_this->vnamespace[0], _this->params[0]);
+  GHashValue *dest = goom_hash_get(_this->vnamespace[1], _this->params[1]);
+  GHashValue *src  = goom_hash_get(_this->vnamespace[0], _this->params[0]);
 
   if (dest == NULL) {
     return VALIDATE_NO_SUCH_DEST_VAR;
@@ -224,7 +224,7 @@ static const char *validate_v_v(Instruction *_this)
 
 static const char *validate_v_i(Instruction *_this)
 { /* {{{ */
-  HashValue *dest            = goom_hash_get(_this->vnamespace[1], _this->params[1]);
+  GHashValue *dest            = goom_hash_get(_this->vnamespace[1], _this->params[1]);
   _this->data.usrc.value_int = strtol(_this->params[0],NULL,0);
 
   if (dest == NULL) {
@@ -236,7 +236,7 @@ static const char *validate_v_i(Instruction *_this)
 
 static const char *validate_v_p(Instruction *_this)
 { /* {{{ */
-  HashValue *dest            = goom_hash_get(_this->vnamespace[1], _this->params[1]);
+  GHashValue *dest            = goom_hash_get(_this->vnamespace[1], _this->params[1]);
   _this->data.usrc.value_ptr = strtol(_this->params[0],NULL,0);
 
   if (dest == NULL) {
@@ -248,7 +248,7 @@ static const char *validate_v_p(Instruction *_this)
 
 static const char *validate_v_f(Instruction *_this)
 { /* {{{ */
-  HashValue *dest            = goom_hash_get(_this->vnamespace[1], _this->params[1]);
+  GHashValue *dest            = goom_hash_get(_this->vnamespace[1], _this->params[1]);
   _this->data.usrc.value_float = atof(_this->params[0]);
 
   if (dest == NULL) {
@@ -334,7 +334,7 @@ const char *gsl_instr_validate(Instruction *_this)
       /* extcall */
     case INSTR_EXT_CALL:
       if (_this->types[0] == TYPE_VAR) {
-        HashValue *fval = goom_hash_get(_this->parent->functions, _this->params[0]);
+        GHashValue *fval = goom_hash_get(_this->parent->functions, _this->params[0]);
         if (fval) {
           _this->data.udest.external_function = (struct _ExternalFunctionStruct*)fval->ptr;
           return VALIDATE_OK;
@@ -803,7 +803,7 @@ void gsl_free_ptr(GoomSL *_this, int id)
 
 void gsl_enternamespace(const char *name)
 { /* {{{ */
-  HashValue *val = goom_hash_get(currentGoomSL->functions, name);
+  GHashValue *val = goom_hash_get(currentGoomSL->functions, name);
   if (val) {
     ExternalFunctionStruct *function = (ExternalFunctionStruct*)val->ptr;
     currentGoomSL->currentNS++;
@@ -900,7 +900,7 @@ static void calculate_labels(InstructionFlow *iflow)
   while (i < iflow->number) {
     Instruction *instr = iflow->instr[i];
     if (instr->jump_label) {
-      HashValue *label = goom_hash_get(iflow->labels,instr->jump_label);
+      GHashValue *label = goom_hash_get(iflow->labels,instr->jump_label);
       if (label) {
         instr->data.udest.jump_offset = -instr->address + label->i;
       }
@@ -1406,7 +1406,7 @@ GoomSL *gsl_new(void)
 
 void gsl_bind_function(GoomSL *gss, const char *fname, GoomSL_ExternalFunction func)
 { /* {{{ */
-  HashValue *val = goom_hash_get(gss->functions, fname);
+  GHashValue *val = goom_hash_get(gss->functions, fname);
   if (val) {
     ExternalFunctionStruct *gef = (ExternalFunctionStruct*)val->ptr;
     gef->function = func;

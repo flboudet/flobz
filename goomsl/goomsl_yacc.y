@@ -192,7 +192,7 @@
     /* Returns the ID of a struct from its name */
     int gsl_get_struct_id(const char *name) /* {{{ */
     {
-      HashValue *ret = goom_hash_get(currentGoomSL->structIDS, name);
+      GHashValue *ret = goom_hash_get(currentGoomSL->structIDS, name);
       if (ret != NULL) return ret->i;
       return -1;
     } /* }}} */
@@ -257,7 +257,7 @@
     int gsl_type_of_var(GoomHash *ns, const char *name)
     {
         char type_of[256];
-        HashValue *hv;
+        GHashValue *hv;
         sprintf(type_of, "__type_of_%s", name);
         hv = goom_hash_get(ns, type_of);
         if (hv != NULL)
@@ -929,7 +929,7 @@
 
     /* FUNCTION CALL */
     static NodeType *new_call(const char *name, NodeType *affect_list) { /* {{{ */
-        HashValue *fval;
+        GHashValue *fval;
         fval = goom_hash_get(currentGoomSL->functions, name);
         if (!fval) {
             gsl_declare_task(name);
