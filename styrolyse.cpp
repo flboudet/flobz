@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "goomsl_hash.h"
 
 extern char *dataFolder;
 
@@ -60,7 +59,7 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
   int        dy    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.y");
   int        dw    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.width");
   int        dh    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.height");
-  HashValue  *img  = goom_hash_get(styrolyse->images, path);
+  GHashValue  *img  = goom_hash_get(styrolyse->images, path);
   void       *data = NULL;
   if (img == NULL) {
     data = styrolyse->client->loadImage(styrolyse->client, path);
@@ -101,7 +100,7 @@ Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client)
     return _this;
 }
 
-static void images_free_from_hash(GoomHash *caller, const char *key, HashValue *value)
+static void images_free_from_hash(GoomHash *caller, const char *key, GHashValue *value)
 {
   styrolyse->client->freeImage(styrolyse->client, value->ptr);
 }
