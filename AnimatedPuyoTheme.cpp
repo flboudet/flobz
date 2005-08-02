@@ -118,6 +118,18 @@ static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
     AnimatedPuyoSetTheme * theme = new AnimatedPuyoSetTheme(GlobalCurrentPath, (const char *) GSL_GLOBAL_PTR(gsl, "puyoset.name"));
     
+    AdvancedBuffer<const char *> list = globalManager->getAnimatedPuyoSetThemeList();
+    int size = list.size();
+    for (int i = 0; i < size; i++)
+    {
+        if (list[i] == theme->getName())
+        {
+            fprintf(stderr,"A Puyoset called % already exists, ignoring...\n", (const char *)theme->getName());
+            delete theme;
+            return;
+        }
+    }
+    
     theme->addAnimatedPuyoTheme(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.face")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.face")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.explosion")),
@@ -155,6 +167,19 @@ static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
 static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
     PuyoLevelTheme * theme = new PuyoLevelTheme(GlobalCurrentPath, (const char *) GSL_GLOBAL_PTR(gsl, "level.name"));
+
+    AdvancedBuffer<const char *> list = globalManager->getPuyoLevelThemeList();
+    int size = list.size();
+    for (int i = 0; i < size; i++)
+    {
+        if (list[i] == theme->getName())
+        {
+            fprintf(stderr,"A Level Theme called % already exists, ignoring...\n", (const char *)theme->getName());
+            delete theme;
+            return;
+        }
+    }
+
     theme->setLives((const char *) GSL_GLOBAL_PTR(gsl, "level.lives"));
     theme->setBackground((const char *) GSL_GLOBAL_PTR(gsl, "level.background"));
     theme->setGrid((const char *) GSL_GLOBAL_PTR(gsl, "level.grid"));
