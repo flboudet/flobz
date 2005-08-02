@@ -194,9 +194,6 @@ private:
     AdvancedBuffer<PuyoLevelTheme *> themes;
     AdvancedBuffer<AnimatedPuyoSetTheme *> puyoSets;
 
-    // TEMP
-    AnimatedPuyoSetTheme * _currentPuyoSetTheme;
-    PuyoLevelTheme * _currentLevel;
 };
 
 // Call the following accessor to get the global theme manager

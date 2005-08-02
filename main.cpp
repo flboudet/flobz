@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include "IosImgProcess.h"
 #ifdef MACOSX
 #include <CoreFoundation/CoreFoundation.h>
 #endif
@@ -9,8 +10,6 @@
 #ifndef DATADIR
 char *DATADIR = "data";
 #endif
-
-extern char *dataFolder;
 
 #ifdef MACOSX
 const char *bundleDataPath = "/Contents/Resources/data";
@@ -86,9 +85,9 @@ int main(int argc, char *argv[])
         if (strcmp(argv[i],"-nofx") == 0) fx = false;
     }
     
-    dataFolder = "data";
+    setDataFolder("data");
     if (!fileExists("data/gfx")) {
-        dataFolder = DATADIR;
+        setDataFolder(DATADIR);
     }
     
     PuyoCommander commander( fs, snd, fx );

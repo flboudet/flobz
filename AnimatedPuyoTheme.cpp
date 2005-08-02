@@ -37,15 +37,18 @@
 #define PATH_MAX_LEN 256
 #define NAME_MAX_LEN 256
 
-#define DEFAULTPATH "../../data/gfx/Classic.fptheme"
+
+const char * DEFAULTPATH(void) { String path(getDataFolder()); return (const char *)(path + "Classic.fptheme"); }
+
+ 
 
 static const char * defaultPuyosName = "Invaders";
 static const char * defaultLevelName = "Kaori's farm";
 static const char * preferedPuyosKey = "ThemeManager.Puyos";
 static const char * preferedLevelKey = "ThemeManager.Level";
 
-static AnimatedPuyoThemeManager globalManager("../../data/gfx/","../../");
-char * GlobalCurrentPath = "";
+static AnimatedPuyoThemeManager * globalManager = NULL;
+static char * GlobalCurrentPath = "";
 
 //*********************************************************************************
 //*********************************** Utilities ***********************************
@@ -65,8 +68,8 @@ char * GlobalCurrentPath = "";
 
 static bool loadPictureAt(const char * path, IIM_Surface ** dst, const char * fallback)
 {
-    *dst = IIM_Load_DisplayFormatAlpha(path);
-    if (*dst == NULL) *dst = IIM_Load_DisplayFormatAlpha(fallback);
+    *dst = IIM_Load_Absolute_DisplayFormatAlpha(path);
+    if (*dst == NULL) *dst = IIM_Load_Absolute_DisplayFormatAlpha(fallback);
     return (*dst != NULL);
 }
 
@@ -74,10 +77,10 @@ static bool loadPictureWithOffset(const char * path, IIM_Surface ** dst, const c
 {
     //fprintf(stderr,"Loading %s...\n",path);
 
-    IIM_Surface *tmp = IIM_Load_DisplayFormatAlpha(path);
+    IIM_Surface *tmp = IIM_Load_Absolute_DisplayFormatAlpha(path);
     if (tmp == NULL)
     {
-        *dst = IIM_Load_DisplayFormatAlpha(fallback);
+        *dst = IIM_Load_Absolute_DisplayFormatAlpha(fallback);
         return (*dst != NULL);
     }
     *dst = iim_surface_shift_hue(tmp,offset);
@@ -140,7 +143,7 @@ void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
                          ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.Neutral.eye")),
                          ((const float) GSL_GLOBAL_FLOAT(gsl, "puyoset.Neutral.offset")));
     
-    globalManager.addPuyoSet(theme);
+    globalManager->addPuyoSet(theme);
 }
 
 void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
@@ -151,7 +154,7 @@ void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     theme->setGrid((const char *) GSL_GLOBAL_PTR(gsl, "level.grid"));
     theme->setSpeedMeter((const char *) GSL_GLOBAL_PTR(gsl, "level.speedmeter"));
     
-    globalManager.addLevel(theme);
+    globalManager->addLevel(theme);
 }
 
 static void sbind(GoomSL *gsl)
@@ -682,20 +685,29 @@ bool PuyoLevelTheme::cache(void)
 //**************************************************************************************
 
 
-AnimatedPuyoThemeManager * getPuyoThemeManger(void) {return &globalManager; }
+AnimatedPuyoThemeManager * getPuyoThemeManger(void)
+{
+    if (globalManager == NULL)
+    {
+        fprintf(stderr,"Making new theme manager...\n");
+        new AnimatedPuyoThemeManager(getDataFolder(),getAltDataFolder());
+    }
+    return globalManager;
+}
 
 
 AnimatedPuyoThemeManager::AnimatedPuyoThemeManager(const char * path, const char * alternatePath)
 {
     String fullPath(path);
-    fullPath += "Classic.fptheme";
+    fullPath += "/gfx/Classic.fptheme";
     
+    globalManager = this;
     GlobalCurrentPath = strdup(fullPath);
     
     char scriptPath[1024];
     GoomSL * gsl = gsl_new();
     if (!gsl) return;
-    snprintf(scriptPath,sizeof(scriptPath), "%s/Description.gsl", &(((const char *)GlobalCurrentPath)[6]));
+    snprintf(scriptPath,sizeof(scriptPath), "%s/Description.gsl", GlobalCurrentPath);
     char * fbuffer = gsl_init_buffer("themelib.gsl");
     gsl_append_file_to_buffer(scriptPath, &fbuffer);
     gsl_compile(gsl,fbuffer);
@@ -703,45 +715,21 @@ AnimatedPuyoThemeManager::AnimatedPuyoThemeManager(const char * path, const char
     free(fbuffer);
     gsl_execute(gsl);
     free(GlobalCurrentPath);
-    
-/*
-    _currentPuyoSetTheme = new AnimatedPuyoSetTheme(fullPath, defaultPuyosName);
-    _currentPuyoSetTheme->addAnimatedPuyoTheme("square", "round", "round", "normal", 000.0f);
-    _currentPuyoSetTheme->addAnimatedPuyoTheme("square", "round", "round", "normal", 072.0f);
-    _currentPuyoSetTheme->addAnimatedPuyoTheme("square", "round", "round", "normal", 144.0f);
-    _currentPuyoSetTheme->addAnimatedPuyoTheme("square", "round", "round", "normal", 216.0f);
-    _currentPuyoSetTheme->addAnimatedPuyoTheme("square", "round", "round", "normal", 288.0f);
-    _currentPuyoSetTheme->addNeutralPuyo("square", "round", "round", "normal", 0.0f);
-    
-    _currentLevel = new PuyoLevelTheme(fullPath, defaultLevelName);
-    _currentLevel->setLives("heart");
-    _currentLevel->setBackground("dark");
-    _currentLevel->setGrid("metal");
-    _currentLevel->setSpeedMeter("fire");
-   
-    puyoSets.add(_currentPuyoSetTheme);
-    puyoSetList.add(_currentPuyoSetTheme->getName());
-    
-    themes.add(_currentLevel);
-    themeList.add(_currentLevel->getName());
-
-    _currentPuyoSetTheme = puyoSets[0];
-    _currentLevel = themes[0];
- */
 }
 
 AnimatedPuyoThemeManager::~AnimatedPuyoThemeManager(void)
 {
-    /*
-    delete _currentPuyoSetTheme;
-    delete _currentLevel;
-     */
 }
     
 void AnimatedPuyoThemeManager::addPuyoSet(AnimatedPuyoSetTheme * PST)
 {
+    //fprintf(stderr,"Trying to add %s",(const char *)(PST->getName()));
+    puyoSets.capacity();
+    puyoSets.grow(4);
     puyoSets.add(PST);
     puyoSetList.add(PST->getName());
+    
+    
 }
 
 void AnimatedPuyoThemeManager::addLevel(PuyoLevelTheme * PLT)

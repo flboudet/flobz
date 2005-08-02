@@ -1,10 +1,34 @@
 #include "IosImgProcess.h"
 #include <math.h>
 #include <stdlib.h>
+#include <strings.h>
 
 
-char *dataFolder = ".";
+static char * defaultDataFolder = ".";
+static char * altDataFolder = defaultDataFolder;
+char * dataFolder = defaultDataFolder; /* should also be static one day */
 
+const char * getDataFolder(void)
+{
+    return dataFolder;
+}
+
+void setDataFolder(const char * path)
+{
+    if (dataFolder != defaultDataFolder) free(dataFolder);
+    dataFolder = strdup(path);
+}
+
+const char * getAltDataFolder(void)
+{
+    return altDataFolder;
+}
+
+void setAltDataFolder(const char * path)
+{
+    if (altDataFolder != defaultDataFolder) free(altDataFolder);
+    altDataFolder = strdup(path);
+}
 
 /** Image loading... free... conversion */
 
@@ -14,11 +38,9 @@ bool useGL = false;
 IIM_Surface  imgList[4096];
 int          imgListSize = 0;
 
-IIM_Surface * IIM_Load_DisplayFormat (const char *fname)
+IIM_Surface * IIM_Load_Absolute_DisplayFormat (const char *path)
 {
-  char path[1024];
   SDL_Surface *tmpsurf, *retsurf;
-  sprintf(path, "%s/gfx/%s", dataFolder, fname);
   tmpsurf = IMG_Load (path);
   if (tmpsurf==0) {
     fprintf(stderr,"Could not load %s\n", path);
@@ -29,11 +51,9 @@ IIM_Surface * IIM_Load_DisplayFormat (const char *fname)
   return IIM_RegisterImg(retsurf, false);
 }
 
-IIM_Surface * IIM_Load_DisplayFormatAlpha (const char *fname)
+IIM_Surface * IIM_Load_Absolute_DisplayFormatAlpha (const char * path)
 {
-  char path[1024];
   SDL_Surface *tmpsurf, *retsurf;
-  sprintf(path, "%s/gfx/%s", dataFolder, fname);
   tmpsurf = IMG_Load (path);
   if (tmpsurf==0) {
     fprintf(stderr,"Could not load %s\n", path);
@@ -41,12 +61,26 @@ IIM_Surface * IIM_Load_DisplayFormatAlpha (const char *fname)
   }
   retsurf = SDL_DisplayFormatAlpha (tmpsurf);
   if (!retsurf) {
-    perror("Texture converion failed (is Display initialized?)\n");
+    perror("Texture conversion failed (is Display initialized?)\n");
     exit(1);
   }
   SDL_SetAlpha (retsurf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
   SDL_FreeSurface (tmpsurf);
   return IIM_RegisterImg(retsurf, true);
+}
+
+IIM_Surface * IIM_Load_DisplayFormat (const char *fname)
+{
+    char path[1024];
+    sprintf(path, "%s/gfx/%s", dataFolder, fname);
+    return IIM_Load_Absolute_DisplayFormat(path);
+}
+
+IIM_Surface * IIM_Load_DisplayFormatAlpha(const char *fname)
+{
+    char path[1024];
+    sprintf(path, "%s/gfx/%s", dataFolder, fname);
+    return IIM_Load_Absolute_DisplayFormatAlpha(path);
 }
 
 void IIM_Free(IIM_Surface *img)
