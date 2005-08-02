@@ -56,27 +56,6 @@
     puyoset.P5.eye      = "normal"
 [end_puyoset]
 
-[start_puyoset]
-    puyoset.name        = "Daisy"
-    puyoset.description = "Funny toons."
-    puyoset.author      = "Daisy"
-    puyoset.P1.face      = "bd"
-    puyoset.P1.offset    = 0.0
-    puyoset.P1.eye       = "big"
-    puyoset.P2.face      = "bd"
-    puyoset.P2.offset    = 72.0
-    puyoset.P2.eye       = "big"
-    puyoset.P3.face      = "bd"
-    puyoset.P3.offset    = 144.0
-    puyoset.P3.eye       = "big"
-    puyoset.P4.face      = "bd"
-    puyoset.P4.offset    = 216.0
-    puyoset.P4.eye       = "big"
-    puyoset.P5.face      = "bd"
-    puyoset.P5.offset    = 288.0
-    puyoset.P5.eye       = "big"
-[end_puyoset]
-
 
 /********** LEVELS **********/
 
