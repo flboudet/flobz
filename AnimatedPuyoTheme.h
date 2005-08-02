@@ -170,7 +170,7 @@ private:
 
 class AnimatedPuyoThemeManager {
 public:
-    AnimatedPuyoThemeManager(const char * path, const char * alternatePath);
+    AnimatedPuyoThemeManager(bool useAltLocation);
     ~AnimatedPuyoThemeManager(void);
     
     AnimatedPuyoSetTheme * getAnimatedPuyoSetTheme(const String);

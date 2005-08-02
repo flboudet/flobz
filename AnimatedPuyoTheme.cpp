@@ -24,8 +24,12 @@
  */
 
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include <math.h>
+#include <stddef.h>
+#include <sys/types.h>
+#include <dirent.h>
+#include <sys/stat.h>
 
 #include "AnimatedPuyoTheme.h"
 #include "preferences.h"
@@ -37,6 +41,8 @@
 #define PATH_MAX_LEN 256
 #define NAME_MAX_LEN 256
 
+
+const char * themeFolderExtension = ".fptheme";
 
 const char * DEFAULTPATH(void) { String path(getDataFolder()); return (const char *)(path + "Classic.fptheme"); }
 
@@ -108,7 +114,7 @@ static bool copyPictureWithLuminosity(IIM_Surface * src, IIM_Surface ** dst, IIM
 
 
 
-void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
+static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
     AnimatedPuyoSetTheme * theme = new AnimatedPuyoSetTheme(GlobalCurrentPath, (const char *) GSL_GLOBAL_PTR(gsl, "puyoset.name"));
     
@@ -146,7 +152,7 @@ void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
     globalManager->addPuyoSet(theme);
 }
 
-void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
+static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
     PuyoLevelTheme * theme = new PuyoLevelTheme(GlobalCurrentPath, (const char *) GSL_GLOBAL_PTR(gsl, "level.name"));
     theme->setLives((const char *) GSL_GLOBAL_PTR(gsl, "level.lives"));
@@ -685,37 +691,87 @@ bool PuyoLevelTheme::cache(void)
 //**************************************************************************************
 
 
+static void loadTheme(String fullPath)
+{
+    String scriptPath(fullPath + "/Description.gsl");
+    
+    // Verify input file
+    struct stat s;
+    if (stat(fullPath,&s) == -1)
+    {
+        fprintf(stderr,"Couldn't load theme from %s. Ignoring.\n",(const char *)fullPath);
+        return;
+    }
+        
+    GlobalCurrentPath = strdup(fullPath);
+    GoomSL * gsl = gsl_new();
+    if (!gsl) return;
+    String libPath(getDataFolder());
+    libPath += "/gfx/themelib.gsl";
+    //fprintf(stderr, "%s\n", libPath);
+    char * fbuffer = gsl_init_buffer((const char *)libPath);
+    gsl_append_file_to_buffer(scriptPath, &fbuffer);
+    gsl_compile(gsl,fbuffer);
+    sbind(gsl);
+    gsl_execute(gsl);
+    free(fbuffer);
+    free(GlobalCurrentPath);
+}
+
 AnimatedPuyoThemeManager * getPuyoThemeManger(void)
 {
     if (globalManager == NULL)
     {
-        fprintf(stderr,"Making new theme manager...\n");
-        new AnimatedPuyoThemeManager(getDataFolder(),getAltDataFolder());
+        //fprintf(stderr,"Making new theme manager...\n");
+        new AnimatedPuyoThemeManager(false);
     }
     return globalManager;
 }
 
 
-AnimatedPuyoThemeManager::AnimatedPuyoThemeManager(const char * path, const char * alternatePath)
+AnimatedPuyoThemeManager::AnimatedPuyoThemeManager(bool useAltLocation)
 {
-    String fullPath(path);
-    fullPath += "/gfx/Classic.fptheme";
-    
     globalManager = this;
-    GlobalCurrentPath = strdup(fullPath);
     
-    char scriptPath[1024];
-    GoomSL * gsl = gsl_new();
-    if (!gsl) return;
-    snprintf(scriptPath,sizeof(scriptPath), "%s/Description.gsl", GlobalCurrentPath);
-    char * fbuffer = gsl_init_buffer("themelib.gsl");
-    gsl_append_file_to_buffer(scriptPath, &fbuffer);
-    gsl_compile(gsl,fbuffer);
-    sbind(gsl);
-    free(fbuffer);
-    gsl_execute(gsl);
-    free(GlobalCurrentPath);
+    // Lister puis charger les .fptheme de path
+    String stdPath(getDataFolder());
+    stdPath += "/gfx/";
+
+    DIR *dp;
+    struct dirent *ep;
+    
+    dp = opendir(stdPath);
+    if (dp != NULL)
+    {
+        while (ep = readdir (dp))
+        {
+            if (strstr(ep->d_name,themeFolderExtension) != NULL)
+                loadTheme(stdPath+ep->d_name);
+        }
+        (void) closedir (dp);
+    }
+    else fprintf(stderr,"Couldn't open the theme location %s.",(const char *)stdPath);
+    
+    
+    // Lister puis charger les .fptheme de alternatePath
+    if (useAltLocation)
+    {
+        String altPath(getAltDataFolder());
+        altPath += "/";
+        dp = opendir(altPath);
+        if (dp != NULL)
+        {
+            while (ep = readdir (dp))
+            {
+                if (strstr(ep->d_name,themeFolderExtension) != NULL)
+                    loadTheme(stdPath+ep->d_name);
+            }
+            (void) closedir (dp);
+        }
+        else fprintf(stderr,"Couldn't open the alternate theme location %s.",(const char *)stdPath);
+    }
 }
+
 
 AnimatedPuyoThemeManager::~AnimatedPuyoThemeManager(void)
 {
@@ -723,13 +779,8 @@ AnimatedPuyoThemeManager::~AnimatedPuyoThemeManager(void)
     
 void AnimatedPuyoThemeManager::addPuyoSet(AnimatedPuyoSetTheme * PST)
 {
-    //fprintf(stderr,"Trying to add %s",(const char *)(PST->getName()));
-    puyoSets.capacity();
-    puyoSets.grow(4);
     puyoSets.add(PST);
     puyoSetList.add(PST->getName());
-    
-    
 }
 
 void AnimatedPuyoThemeManager::addLevel(PuyoLevelTheme * PLT)
