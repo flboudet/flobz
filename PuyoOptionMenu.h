@@ -28,6 +28,7 @@
 
 #include "gameui.h"
 #include "PuyoCommander.h"
+#include "PuyoThemeMenu.h"
 #include "PuyoControlMenu.h"
 
 class OptionMenu;
@@ -67,9 +68,15 @@ private:
     ToggleSoundFxAction toggleSoundFxAction;
     ToggleMusicAction toggleMusicAction;
     ToggleFullScreenAction toggleFullScreenAction;
+    Text optionTitle;
     ToggleButton audioButton, musicButton, fullScreenButton;
     ControlMenu controlMenu;
+    PuyoThemeMenu themeMenu;
+    PuyoPushMenuAction changeThemeAction, changeControlsAction;
+    Button changePuyoThemeButton;
     Button changeControlsButton;
+    PuyoPopMenuAction backAction;
+    Button backButton;
 };
 
 #endif // _PUYOOPTIONMENU

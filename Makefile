@@ -14,7 +14,7 @@ OBJFILES= HiScores.o PuyoCommander.o        \
           PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o \
           AnimatedPuyoTheme.o PuyoNetworkMenu.o PuyoNetCenterMenu.o \
           PuyoNetGameCenter.o PuyoInternetGameCenter.o \
-          PuyoLocalMenu.o PuyoOptionMenu.o PuyoControlMenu.o PuyoScreenTransition.o IosVector.o
+          PuyoLocalMenu.o PuyoOptionMenu.o PuyoControlMenu.o PuyoThemeMenu.o PuyoScreenTransition.o IosVector.o
 
 include root_dir
 include config

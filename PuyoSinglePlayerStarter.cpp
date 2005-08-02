@@ -65,7 +65,7 @@ const struct PuyoSingleGameLevelData::StaticLevelDatas PuyoSingleGameLevelData::
 PuyoSingleGameLevelData::PuyoSingleGameLevelData(int gameLevel, int difficulty) : gameLevel(gameLevel), difficulty(difficulty)
 {
     AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
-    themeToUse = themeManager->getAnimatedPuyoSetTheme("Classic");
+    themeToUse = themeManager->getAnimatedPuyoSetTheme();
     levelThemeToUse = themeManager->getPuyoLevelTheme("Level1");
     
     /*

@@ -49,6 +49,7 @@ static const char *kAudioFX     = "Audio FX\t";
 static const char *kMusic       = "Music\t";
 static const char *kFullScreen  = "FullScreen\t";
 static const char *kOpenGL      = "Use OpenGL\t";
+static const char *kChangePuyoTheme = "Change puyo theme...";
 static const char *kControls    = "Change controls...";
 static const char *kGameLevel   = "Choose Game Level";
 static const char *kLevelEasy   = "Easy";
