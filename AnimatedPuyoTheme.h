@@ -181,8 +181,8 @@ public:
     PuyoLevelTheme * getPuyoLevelTheme(void);
     void setPreferedPuyoLevelTheme(const String);
     
-    AdvancedBuffer<const char *> getAnimatedPuyoSetThemeList(void);
-    AdvancedBuffer<const char *> getPuyoLevelThemeList(void);
+    AdvancedBuffer<const char *> * getAnimatedPuyoSetThemeList(void);
+    AdvancedBuffer<const char *> * getPuyoLevelThemeList(void);
     
     void addPuyoSet(AnimatedPuyoSetTheme *);
     void addLevel(PuyoLevelTheme *);

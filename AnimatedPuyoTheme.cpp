@@ -116,19 +116,23 @@ static bool copyPictureWithLuminosity(IIM_Surface * src, IIM_Surface ** dst, IIM
 
 static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
-    AnimatedPuyoSetTheme * theme = new AnimatedPuyoSetTheme(GlobalCurrentPath, (const char *) GSL_GLOBAL_PTR(gsl, "puyoset.name"));
+    const char * newName = (const char *) GSL_GLOBAL_PTR(gsl, "puyoset.name");
+    AnimatedPuyoSetTheme * theme = new AnimatedPuyoSetTheme(GlobalCurrentPath, newName);
     
-    AdvancedBuffer<const char *> list = globalManager->getAnimatedPuyoSetThemeList();
-    int size = list.size();
+    AdvancedBuffer<const char *> * list = globalManager->getAnimatedPuyoSetThemeList();
+    int size = list->size();
+    //fprintf(stderr,"Verif of size : %d\n", size);
     for (int i = 0; i < size; i++)
     {
-        if (list[i] == theme->getName())
+        //fprintf(stderr,"Comparing %s and %s\n", (*list)[i], newName);
+        if (!strcmp((*list)[i], newName))
         {
-            fprintf(stderr,"A Puyoset called % already exists, ignoring...\n", (const char *)theme->getName());
+            fprintf(stderr,"A Puyoset called %s already exists, ignoring...\n", newName);
             delete theme;
             return;
         }
     }
+    fprintf(stderr,"Adding Puyoset called %s.\n", (const char *)(theme->getName()));
     
     theme->addAnimatedPuyoTheme(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.face")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.face")),
@@ -166,15 +170,16 @@ static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
 
 static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
-    PuyoLevelTheme * theme = new PuyoLevelTheme(GlobalCurrentPath, (const char *) GSL_GLOBAL_PTR(gsl, "level.name"));
+    const char * newName = (const char *) GSL_GLOBAL_PTR(gsl, "level.name");
+    PuyoLevelTheme * theme = new PuyoLevelTheme(GlobalCurrentPath, newName);
 
-    AdvancedBuffer<const char *> list = globalManager->getPuyoLevelThemeList();
-    int size = list.size();
+    AdvancedBuffer<const char *> * list = globalManager->getPuyoLevelThemeList();
+    int size = list->size();
     for (int i = 0; i < size; i++)
     {
-        if (list[i] == theme->getName())
+        if (!strcmp((*list)[i], newName))
         {
-            fprintf(stderr,"A Level Theme called % already exists, ignoring...\n", (const char *)theme->getName());
+            fprintf(stderr,"A Level Theme called %s already exists, ignoring...\n", newName);
             delete theme;
             return;
         }
@@ -722,11 +727,12 @@ static void loadTheme(String fullPath)
     
     // Verify input file
     struct stat s;
-    if (stat(fullPath,&s) == -1)
+    if (stat((const char *)scriptPath,&s) == -1)
     {
-        fprintf(stderr,"Couldn't load theme from %s. Ignoring.\n",(const char *)fullPath);
+        fprintf(stderr,"Couldn't load theme from %s. Ignoring.\n",(const char *)scriptPath);
         return;
     }
+    //else fprintf(stderr,"Trying to load theme from %s.\n",(const char *)scriptPath);
         
     GlobalCurrentPath = strdup(fullPath);
     GoomSL * gsl = gsl_new();
@@ -805,13 +811,13 @@ AnimatedPuyoThemeManager::~AnimatedPuyoThemeManager(void)
 void AnimatedPuyoThemeManager::addPuyoSet(AnimatedPuyoSetTheme * PST)
 {
     puyoSets.add(PST);
-    puyoSetList.add(PST->getName());
+    puyoSetList.add(strdup((const char *)(PST->getName())));
 }
 
 void AnimatedPuyoThemeManager::addLevel(PuyoLevelTheme * PLT)
 {
     themes.add(PLT);
-    themeList.add(PLT->getName());
+    themeList.add(strdup((const char *)(PLT->getName())));
 }
 
 AnimatedPuyoSetTheme * AnimatedPuyoThemeManager::getAnimatedPuyoSetTheme(const String name)
@@ -896,13 +902,13 @@ void AnimatedPuyoThemeManager::setPreferedPuyoLevelTheme(const String name)
     SetStrPreference (preferedLevelKey, (const char *)name);
 }
 
-AdvancedBuffer<const char *> AnimatedPuyoThemeManager::getAnimatedPuyoSetThemeList(void)
+AdvancedBuffer<const char *> * AnimatedPuyoThemeManager::getAnimatedPuyoSetThemeList(void)
 {
-    return puyoSetList;
+    return &puyoSetList;
 }
 
-AdvancedBuffer<const char *> AnimatedPuyoThemeManager::getPuyoLevelThemeList(void)
+AdvancedBuffer<const char *> * AnimatedPuyoThemeManager::getPuyoLevelThemeList(void)
 {
-    return themeList;
+    return &themeList;
 }
 
