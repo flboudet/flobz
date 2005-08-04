@@ -135,32 +135,32 @@ static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
     fprintf(stderr,"Adding Puyoset called %s.\n", (const char *)(theme->getName()));
     
     theme->addAnimatedPuyoTheme(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.face")),
-                               ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.face")),
+                               ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.disappear")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.explosion")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.eye")),
                                ((const float) GSL_GLOBAL_FLOAT(gsl, "puyoset.P1.offset")));
     theme->addAnimatedPuyoTheme(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P2.face")),
-                               ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P2.face")),
+                               ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P2.disappear")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P2.explosion")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P2.eye")),
                                ((const float) GSL_GLOBAL_FLOAT(gsl, "puyoset.P2.offset")));
     theme->addAnimatedPuyoTheme(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P3.face")),
-                               ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P3.face")),
+                               ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P3.disappear")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P3.explosion")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P3.eye")),
                                ((const float) GSL_GLOBAL_FLOAT(gsl, "puyoset.P3.offset")));
     theme->addAnimatedPuyoTheme(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P4.face")),
-                               ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P4.face")),
+                               ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P4.disappear")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P4.explosion")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P4.eye")),
                                ((const float) GSL_GLOBAL_FLOAT(gsl, "puyoset.P4.offset")));
     theme->addAnimatedPuyoTheme(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P5.face")),
-                               ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P5.face")),
+                               ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P5.disappear")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P5.explosion")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P5.eye")),
                                ((const float) GSL_GLOBAL_FLOAT(gsl, "puyoset.P5.offset")));
     theme->addNeutralPuyo(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.Neutral.face")),
-                         ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.Neutral.face")),
+                         ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.Neutral.disappear")),
                          ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.Neutral.explosion")),
                          ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.Neutral.eye")),
                          ((const float) GSL_GLOBAL_FLOAT(gsl, "puyoset.Neutral.offset")));

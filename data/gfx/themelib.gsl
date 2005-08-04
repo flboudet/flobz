@@ -4,6 +4,7 @@ struct <Puyo:
     string face,
     string eye,
     string explosion,
+    string disappear,
     float offset>
 
 struct <PuyoSet:
@@ -41,27 +42,33 @@ external <end_level>
     puyoset.P1.offset    = 0.0
     puyoset.P1.eye       = "normal"
     puyoset.P1.explosion = "round"
+    puyoset.P1.disappear = "round"
     puyoset.P2.face      = "round"
     puyoset.P2.offset    = 72.0
     puyoset.P2.eye       = "normal"
     puyoset.P2.explosion = "round"
+    puyoset.P2.disappear = "round"
     puyoset.P3.face      = "round"
     puyoset.P3.offset    = 144.0
     puyoset.P3.eye       = "normal"
     puyoset.P3.explosion = "round"
+    puyoset.P3.disappear = "round"
     puyoset.P4.face      = "round"
     puyoset.P4.offset    = 216.0
     puyoset.P4.eye       = "normal"
     puyoset.P4.explosion = "round"
+    puyoset.P4.disappear = "round"
     puyoset.P5.face      = "round"
     puyoset.P5.offset    = 288.0
     puyoset.P5.eye       = "normal"
     puyoset.P5.explosion = "round"
+    puyoset.P5.disappear = "round"
 
     puyoset.Neutral.face = "glass"
     puyoset.Neutral.offset = 0.0
     puyoset.Neutral.eye = "normal"
-    puyoset.Neutral.explosion = "glass"
+    puyoset.Neutral.explosion = "round"
+    puyoset.Neutral.disappear = "round"
 
 <start_level>
     level.name          = "Unamed"

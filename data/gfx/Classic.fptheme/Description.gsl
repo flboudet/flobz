@@ -36,24 +36,18 @@
 [end_puyoset]
 
 [start_puyoset]
-    puyoset.name        = "Invaders"
-    puyoset.description = "Puyos for everyone (color blindness aware)."
-    puyoset.author      = "iOS-Software"
-    puyoset.P1.face     = "round"
-    puyoset.P1.offset   = 0.0
-    puyoset.P1.eye      = "normal"
-    puyoset.P2.face     = "square"
-    puyoset.P2.offset   = 72.0
-    puyoset.P2.eye      = "upper"
-    puyoset.P3.face     = "vertical"
-    puyoset.P3.offset   = 144.0
-    puyoset.P3.eye      = "normal"
-    puyoset.P4.face     = "horizontal"
-    puyoset.P4.offset   = 216.0
-    puyoset.P4.eye      = "upper"
-    puyoset.P5.face     = "cross"
-    puyoset.P5.offset   = 288.0
-    puyoset.P5.eye      = "normal"
+    puyoset.name         = "Invaders"
+    puyoset.description  = "Puyos for everyone (color blindness aware)."
+    puyoset.author       = "iOS-Software"
+    puyoset.P2.face      = "square"
+    puyoset.P2.offset    = 72.0
+    puyoset.P2.eye       = "upper"
+    puyoset.P3.face      = "vertical"
+    puyoset.P3.offset    = 144.0
+    puyoset.P4.face      = "horizontal"
+    puyoset.P4.offset    = 216.0
+    puyoset.P5.offset    = 288.0
+    puyoset.P5.eye       = "upper"
 [end_puyoset]
 
 
