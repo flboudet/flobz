@@ -42,9 +42,8 @@ IIM_Surface * IIM_Load_Absolute_DisplayFormat (const char *path)
 {
   SDL_Surface *tmpsurf, *retsurf;
   tmpsurf = IMG_Load (path);
-  if (tmpsurf==0) {
-    fprintf(stderr,"Could not load %s\n", path);
-    exit(1);
+  if (tmpsurf==NULL) {
+    return NULL;
   }
   retsurf = SDL_DisplayFormat (tmpsurf);
   SDL_FreeSurface (tmpsurf);
@@ -55,14 +54,14 @@ IIM_Surface * IIM_Load_Absolute_DisplayFormatAlpha (const char * path)
 {
   SDL_Surface *tmpsurf, *retsurf;
   tmpsurf = IMG_Load (path);
-  if (tmpsurf==0) {
-    fprintf(stderr,"Could not load %s\n", path);
-    exit(1);
+  if (tmpsurf==NULL) {
+    return NULL;
   }
   retsurf = SDL_DisplayFormatAlpha (tmpsurf);
-  if (!retsurf) {
+  if (retsurf==NULL) {
     perror("Texture conversion failed (is Display initialized?)\n");
-    exit(1);
+    SDL_FreeSurface (tmpsurf);
+    return NULL;
   }
   SDL_SetAlpha (retsurf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
   SDL_FreeSurface (tmpsurf);
@@ -73,14 +72,26 @@ IIM_Surface * IIM_Load_DisplayFormat (const char *fname)
 {
     char path[1024];
     sprintf(path, "%s/gfx/%s", dataFolder, fname);
-    return IIM_Load_Absolute_DisplayFormat(path);
+    IIM_Surface * ret = IIM_Load_Absolute_DisplayFormat(path);
+    if (ret == NULL)
+    {
+        fprintf(stderr,"Could not load %s\n", fname);
+        exit(1);
+    }
+    return ret;
 }
 
 IIM_Surface * IIM_Load_DisplayFormatAlpha(const char *fname)
 {
     char path[1024];
     sprintf(path, "%s/gfx/%s", dataFolder, fname);
-    return IIM_Load_Absolute_DisplayFormatAlpha(path);
+    IIM_Surface * ret = IIM_Load_Absolute_DisplayFormatAlpha(path);
+    if (ret == NULL)
+    {
+        fprintf(stderr,"Could not load %s\n", fname);
+        exit(1);
+    }
+    return ret;
 }
 
 void IIM_Free(IIM_Surface *img)

@@ -42,9 +42,18 @@
 #define NAME_MAX_LEN 256
 
 
-const char * themeFolderExtension = ".fptheme";
+static const char * themeFolderExtension = ".fptheme";
+static char * defaultThemeFolder = NULL;
 
-const char * DEFAULTPATH(void) { String path(getDataFolder()); return (const char *)(path + "Classic.fptheme"); }
+static const char * DEFAULTPATH(void)
+{
+    if (defaultThemeFolder == NULL)
+    {
+        String path(getDataFolder());
+        defaultThemeFolder = strdup((const char *)(path + "/gfx/Classic.fptheme"));
+    }
+    return defaultThemeFolder;
+}
 
  
 
@@ -359,11 +368,11 @@ bool AnimatedPuyoTheme::cache(void)
     for (j=0; j<NUMBER_OF_PUYO_FACES; j++)
     {
         snprintf(path, sizeof(path), "%s/%s-puyo-%d%d%d%d.png",fullPath,_face,(j&8)>>3,(j&4)>>2,(j&2)>>1,j&1);
-        snprintf(defpath, sizeof(defpath), "%s/%s-puyo-%d%d%d%d.png",DEFAULTPATH,_face,(j&8)>>3,(j&4)>>2,(j&2)>>1,j&1);
+        snprintf(defpath, sizeof(defpath), "%s/%s-puyo-%d%d%d%d.png",DEFAULTPATH(),_face,(j&8)>>3,(j&4)>>2,(j&2)>>1,j&1);
         OK = OK && loadPictureWithOffset(path,&(_puyoFaces[j]),defpath,_color_offset);
     }
     snprintf(path, sizeof(path), "%s/%s-puyo-border.png",fullPath,_face);
-    snprintf(defpath, sizeof(defpath), "%s/%s-puyo-border.png",DEFAULTPATH,_face);
+    snprintf(defpath, sizeof(defpath), "%s/%s-puyo-border.png",DEFAULTPATH(),_face);
     OK = OK && loadPictureAt(path,&(_puyoCircles[0]),defpath);
     for (int i = 1; i<NUMBER_OF_PUYO_CIRCLES; i++)
     {
@@ -371,27 +380,27 @@ bool AnimatedPuyoTheme::cache(void)
     }
     
     snprintf(path, sizeof(path), "%s/%s-puyo-shadow.png",fullPath,_face);
-    snprintf(defpath, sizeof(defpath), "%s/%s-puyo-shadow.png",DEFAULTPATH,_face);
+    snprintf(defpath, sizeof(defpath), "%s/%s-puyo-shadow.png",DEFAULTPATH(),_face);
     OK = OK && loadPictureAt(path,&(_puyoShadow),defpath);
     
     for (j=0; j<NUMBER_OF_PUYO_EXPLOSIONS; j++)
     {
         snprintf(path, sizeof(path), "%s/%s-puyo-explosion-%d.png",fullPath,_explosions,j);
-        snprintf(defpath, sizeof(defpath), "%s/%s-puyo-explosion-%d.png",DEFAULTPATH,_explosions,j);
+        snprintf(defpath, sizeof(defpath), "%s/%s-puyo-explosion-%d.png",DEFAULTPATH(),_explosions,j);
         OK = OK && loadPictureWithOffset(path,&(_puyoExplosion[j]),defpath,_color_offset);
     }
     
     for (j=0; j<NUMBER_OF_PUYO_DISAPPEAR; j++)
     {
         snprintf(path, sizeof(path), "%s/%s-puyo-disappear-%d.png",fullPath,_disappear,j);
-        snprintf(defpath, sizeof(defpath), "%s/%s-puyo-disappear-%d.png",DEFAULTPATH,_disappear,j);
+        snprintf(defpath, sizeof(defpath), "%s/%s-puyo-disappear-%d.png",DEFAULTPATH(),_disappear,j);
         OK = OK && loadPictureWithOffset(path,&(_puyoDisappear[j]),defpath,_color_offset);
     }
     
     for (j=0; j<NUMBER_OF_PUYO_EYES; j++)
     {
         snprintf(path, sizeof(path), "%s/%s-puyo-eye-%d.png",fullPath,_eyes,j);
-        snprintf(defpath, sizeof(defpath), "%s/%s-puyo-eye-%d.png",DEFAULTPATH,_eyes,j);
+        snprintf(defpath, sizeof(defpath), "%s/%s-puyo-eye-%d.png",DEFAULTPATH(),_eyes,j);
         OK = OK && loadPictureWithOffset(path,&(_puyoEyes[j]),defpath,_color_offset);
     }
     
@@ -688,26 +697,26 @@ bool PuyoLevelTheme::cache(void)
     for (i=0; i<NUMBER_OF_LIVES; i++)
     {
         snprintf(path, sizeof(path), "%s/%s-lives-%d.png",fullPath,_lives,i);
-        snprintf(defpath, sizeof(defpath), "%s/%s-lives-%d.png",DEFAULTPATH,_lives,i);
+        snprintf(defpath, sizeof(defpath), "%s/%s-lives-%d.png",DEFAULTPATH(),_lives,i);
         OK = OK && loadPictureAt(path,&(_levelLives[i]),defpath);
     }
     
     // BACKGROUND
     snprintf(path, sizeof(path), "%s/%s-background.jpg",fullPath,_background);
-    snprintf(defpath, sizeof(defpath), "%s/%s-background.jpg",DEFAULTPATH,_background);
+    snprintf(defpath, sizeof(defpath), "%s/%s-background.jpg",DEFAULTPATH(),_background);
     OK = OK && loadPictureAt(path,&_levelBackground,defpath);
     
     // GRID
     snprintf(path, sizeof(path), "%s/%s-background-grid.png",fullPath,_grid);
-    snprintf(defpath, sizeof(defpath), "%s/%s-background-grid.png",DEFAULTPATH,_grid);
+    snprintf(defpath, sizeof(defpath), "%s/%s-background-grid.png",DEFAULTPATH(),_grid);
     OK = OK && loadPictureAt(path,&_levelGrid,defpath);
     
     // SPEED METER
     snprintf(path, sizeof(path), "%s/%s-background-meter-below.png",fullPath,_speed_meter);
-    snprintf(defpath, sizeof(defpath), "%s/%s-background-meter-below.png",DEFAULTPATH,_speed_meter);
+    snprintf(defpath, sizeof(defpath), "%s/%s-background-meter-below.png",DEFAULTPATH(),_speed_meter);
     OK = OK && loadPictureAt(path,&(_levelMeter[0]),defpath);
     snprintf(path, sizeof(path), "%s/%s-background-meter-above.png",fullPath,_speed_meter);
-    snprintf(defpath, sizeof(defpath), "%s/%s-background-meter-above.png",DEFAULTPATH,_speed_meter);
+    snprintf(defpath, sizeof(defpath), "%s/%s-background-meter-above.png",DEFAULTPATH(),_speed_meter);
     OK = OK && loadPictureAt(path,&(_levelMeter[1]),defpath);
     
     _cached = OK;
