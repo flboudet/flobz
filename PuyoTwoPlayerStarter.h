@@ -53,7 +53,7 @@ public:
     
 private:    
     void startGame();
-        
+    void gameOver();
     void endGameSession();
     
     int difficulty;

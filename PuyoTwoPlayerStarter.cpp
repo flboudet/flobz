@@ -37,6 +37,7 @@ PuyoTwoPlayersGameWidget::PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThe
                                                      GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight)
 {
     initialize(areaA, areaB, playercontrollerA, playercontrollerB, levelTheme, gameOverAction);
+    setLives(-1);
 }
 
 TwoPlayersStarterAction::TwoPlayersStarterAction(int difficulty, PuyoTwoNameProvider *nameProvider)
@@ -46,6 +47,9 @@ void TwoPlayersStarterAction::action()
 {
     if (gameScreen == NULL) {
         startGame();
+    }
+    else if (! gameWidget->getAborted()) {
+        gameOver();
     }
     else {
 	    endGameSession();
@@ -63,6 +67,17 @@ void TwoPlayersStarterAction::startGame()
         gameWidget->setPlayerTwoName(nameProvider->getPlayer2Name());
     }
     GameUIDefaults::SCREEN_STACK->push(gameScreen);
+}
+
+void TwoPlayersStarterAction::gameOver()
+{
+    GameUIDefaults::SCREEN_STACK->pop();
+    delete gameWidget;
+    delete gameScreen;
+    
+    gameScreen = NULL;
+    gameWidget = NULL;
+    startGame();
 }
 
 void TwoPlayersStarterAction::endGameSession()
