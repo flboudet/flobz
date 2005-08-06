@@ -95,9 +95,9 @@ static bool loadPictureWithOffset(const char * path, IIM_Surface ** dst, const c
     IIM_Surface *tmp = IIM_Load_Absolute_DisplayFormatAlpha(path);
     if (tmp == NULL)
     {
-        *dst = IIM_Load_Absolute_DisplayFormatAlpha(fallback);
-        return (*dst != NULL);
+        tmp = IIM_Load_Absolute_DisplayFormatAlpha(fallback);
     }
+    if (tmp == NULL) return false;
     *dst = iim_surface_shift_hue(tmp,offset);
     IIM_Free(tmp);
     return (*dst != NULL);
