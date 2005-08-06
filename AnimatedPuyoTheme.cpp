@@ -57,8 +57,8 @@ static const char * DEFAULTPATH(void)
 
  
 
-static const char * defaultPuyosName = "Invaders";
-static const char * defaultLevelName = "Kaori's farm";
+static String defaultPuyosName("Invaders");
+static String defaultLevelName("Kaori's farm");
 static const char * preferedPuyosKey = "ThemeManager.Puyos";
 static const char * preferedLevelKey = "ThemeManager.Level";
 
@@ -841,18 +841,18 @@ AnimatedPuyoSetTheme * AnimatedPuyoThemeManager::getAnimatedPuyoSetTheme(const S
     if (name != defaultPuyosName)
     {
         fprintf(stderr, "Puyos theme \"%s\" not found, falling back to default...\n",(const char *)name);
-        return getAnimatedPuyoSetTheme(String(defaultPuyosName));
+        return getAnimatedPuyoSetTheme(defaultPuyosName);
     }
     else
     {
         if (size != 0)
         {
-            fprintf(stderr, "Default puyos theme (%s) not found??? Trying another one...\n",defaultPuyosName);
+            fprintf(stderr, "Default puyos theme (%s) not found??? Trying another one...\n",(const char *)defaultPuyosName);
             return puyoSets[0];
         }
         else
         {
-            fprintf(stderr, "Default puyos theme (%s) not found??? No possible fallback, Exiting...\n",defaultPuyosName);
+            fprintf(stderr, "Default puyos theme (%s) not found??? No possible fallback, Exiting...\n",(const char *)defaultPuyosName);
             exit(0);
         }
     }
@@ -861,9 +861,43 @@ AnimatedPuyoSetTheme * AnimatedPuyoThemeManager::getAnimatedPuyoSetTheme(const S
 AnimatedPuyoSetTheme * AnimatedPuyoThemeManager::getAnimatedPuyoSetTheme(void)
 {
     char out[NAME_MAX_LEN];
-    GetStrPreference (preferedPuyosKey, out, defaultPuyosName, sizeof(out));
+    GetStrPreference (preferedPuyosKey, out, (const char *)defaultPuyosName, sizeof(out));
     return getAnimatedPuyoSetTheme(String(out));
 }
+
+String AnimatedPuyoThemeManager::getPreferedAnimatedPuyoSetThemeName(void)
+{
+    char out[NAME_MAX_LEN];
+    GetStrPreference (preferedPuyosKey, out, (const char *)defaultPuyosName, sizeof(out));
+    String name(out);
+
+    int size = puyoSets.size();
+    
+    for (int i = 0; i < size; i++)
+    {
+        if (puyoSets[i]->getName() == name) return puyoSets[i]->getName();
+    }
+
+    if (name != defaultPuyosName)
+    {
+        fprintf(stderr, "Prefered Puyos theme \"%s\" not found, falling back to default...\n",(const char *)name);
+        return defaultPuyosName;
+    }
+    else
+    {
+        if (size != 0)
+        {
+            fprintf(stderr, "Default puyos theme (%s) not found??? Trying another one...\n",(const char *)defaultPuyosName);
+            return puyoSets[0]->getName();
+        }
+        else
+        {
+            fprintf(stderr, "Default puyos theme (%s) not found??? No possible fallback, Exiting...\n",(const char *)defaultPuyosName);
+            exit(0);
+        }
+    }
+}
+
 
 void AnimatedPuyoThemeManager::setPreferedAnimatedPuyoSetTheme(const String name)
 {
@@ -882,18 +916,18 @@ PuyoLevelTheme * AnimatedPuyoThemeManager::getPuyoLevelTheme(const String name)
     if (name != defaultLevelName)
     {
         fprintf(stderr, "Level theme \"%s\" not found, falling back to default...\n",(const char *)name);
-        return getPuyoLevelTheme(String(defaultLevelName));
+        return getPuyoLevelTheme(defaultLevelName);
     }
     else
     {
         if (size != 0)
         {
-            fprintf(stderr, "Default level theme (%s) not found??? Trying another one...\n",defaultLevelName);
+            fprintf(stderr, "Default level theme (%s) not found??? Trying another one...\n",(const char *)defaultLevelName);
             return themes[0];
         }
         else
         {
-            fprintf(stderr, "Default level theme (%s) not found??? No possible fallback, Exiting...\n",defaultLevelName);
+            fprintf(stderr, "Default level theme (%s) not found??? No possible fallback, Exiting...\n",(const char *)defaultLevelName);
             exit(0);
         }
     }
@@ -902,9 +936,43 @@ PuyoLevelTheme * AnimatedPuyoThemeManager::getPuyoLevelTheme(const String name)
 PuyoLevelTheme * AnimatedPuyoThemeManager::getPuyoLevelTheme(void)
 {
     char out[NAME_MAX_LEN];
-    GetStrPreference (preferedLevelKey, out, defaultLevelName, sizeof(out));
+    GetStrPreference (preferedLevelKey, out, (const char *)defaultLevelName, sizeof(out));
     return getPuyoLevelTheme(String(out));
 }
+
+String AnimatedPuyoThemeManager::getPreferedPuyoLevelThemeName(void)
+{
+    char out[NAME_MAX_LEN];
+    GetStrPreference (preferedLevelKey, out, (const char *)defaultLevelName, sizeof(out));
+    String name(out);
+
+    int size = themes.size();
+    
+    for (int i = 0; i < size; i++)
+    {
+        if (themes[i]->getName() == name) return themes[i]->getName();
+    }
+    
+    if (name != defaultLevelName)
+    {
+        fprintf(stderr, "Level theme \"%s\" not found, falling back to default...\n",(const char *)name);
+        return defaultLevelName;
+    }
+    else
+    {
+        if (size != 0)
+        {
+            fprintf(stderr, "Default level theme (%s) not found??? Trying another one...\n",(const char *)defaultLevelName);
+            return themes[0]->getName();
+        }
+        else
+        {
+            fprintf(stderr, "Default level theme (%s) not found??? No possible fallback, Exiting...\n",(const char *)defaultLevelName);
+            exit(0);
+        }
+    }
+}
+
 
 void AnimatedPuyoThemeManager::setPreferedPuyoLevelTheme(const String name)
 {

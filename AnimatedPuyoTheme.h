@@ -175,10 +175,12 @@ public:
     
     AnimatedPuyoSetTheme * getAnimatedPuyoSetTheme(const String);
     AnimatedPuyoSetTheme * getAnimatedPuyoSetTheme(void);
+    String getPreferedAnimatedPuyoSetThemeName(void);
     void setPreferedAnimatedPuyoSetTheme(const String);
     
     PuyoLevelTheme * getPuyoLevelTheme(const String);
     PuyoLevelTheme * getPuyoLevelTheme(void);
+    String getPreferedPuyoLevelThemeName(void);
     void setPreferedPuyoLevelTheme(const String);
     
     AdvancedBuffer<const char *> * getAnimatedPuyoSetThemeList(void);

@@ -28,11 +28,28 @@
 
 #include "gameui.h"
 #include "PuyoCommander.h"
+#include "AnimatedPuyoTheme.h"
 
-class PuyoThemePreview : public Text {
-public:
-    PuyoThemePreview();
-    void themeSelected(String themeName);
+class PuyoThemePreview : public Widget, public IdleComponent {
+    public:
+        PuyoThemePreview();
+        void themeSelected(String themeName);
+
+      // Implements IdleComponent
+      virtual void idle(double currentTime);
+      virtual IdleComponent *getIdleComponent() { return this; }
+
+    protected:
+      void draw(SDL_Surface *screen);
+      SoFont *font;
+      
+    private:
+      String label;
+      AnimatedPuyoSetTheme * curTheme;
+      double offsetX;
+      double offsetY;
+      int eyes[NUMBER_OF_PUYOS];
+      double lastTime;
 };
 
 class PuyoThemeSelectionBox : public HBox {
