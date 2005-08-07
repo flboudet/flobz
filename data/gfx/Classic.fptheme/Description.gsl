@@ -39,7 +39,7 @@
     puyoset.name         = "Invaders"
     puyoset.description  = "Puyos for everyone (color blindness aware)."
     puyoset.author       = "iOS-Software"
-    puyoset.P2.face      = "square"
+    puyoset.P2.face      = "fat"
     puyoset.P2.offset    = 72.0
     puyoset.P2.eye       = "upper"
     puyoset.P3.face      = "vertical"
