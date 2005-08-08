@@ -141,7 +141,7 @@ static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
             return;
         }
     }
-    fprintf(stderr,"Adding Puyoset called %s.\n", (const char *)(theme->getName()));
+    //fprintf(stderr,"Adding Puyoset called %s.\n", (const char *)(theme->getName()));
     
     theme->addAnimatedPuyoTheme(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.face")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.disappear")),

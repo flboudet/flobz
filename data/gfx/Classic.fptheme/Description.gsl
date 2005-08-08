@@ -54,7 +54,7 @@
 /********** LEVELS **********/
 
 [start_level]
-    level.name          = "Kaori's arena"
+    level.name          = "Kaori's farm"
     level.description   = "Her favorite place to play."
     level.author        = "iOS-Software"
 [end_level]

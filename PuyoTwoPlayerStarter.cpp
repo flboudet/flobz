@@ -60,7 +60,7 @@ void TwoPlayersStarterAction::startGame()
 {
     AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
     
-    gameWidget = new PuyoTwoPlayersGameWidget(*(themeManager->getAnimatedPuyoSetTheme("Classic")), *(themeManager->getPuyoLevelTheme("Level1")), this);
+    gameWidget = new PuyoTwoPlayersGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *(themeManager->getPuyoLevelTheme()), this);
     gameScreen = new PuyoGameScreen(*gameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
     if (nameProvider != NULL) {
         gameWidget->setPlayerOneName(nameProvider->getPlayer1Name());

@@ -36,17 +36,14 @@ using namespace ios_fc;
 
 extern SDL_Painter painter;
 
-IIM_Surface *grid;
+static IIM_Surface *grid;
 IIM_Surface *perso[2];
 int currentPerso;
 IIM_Surface *live[4];
 IIM_Surface *speedImg;
 IIM_Surface *speedBlackImg;
 IIM_Surface *gameScreen;
-IIM_Surface *shrinkingPuyo[5][5];
-IIM_Surface *explodingPuyo[5][5];
 extern IIM_Surface *bigNeutral;
-IIM_Surface *puyoEyesSwirl[4];
 
 int gameLevel;
 int GAME_ACCEL = 1250;
@@ -180,20 +177,11 @@ void PuyoGameWidget::initialize()
         bigNeutral = IIM_Load_DisplayFormatAlpha("BigNeutral.png");
     static bool firstTime = true;
     if (firstTime) {
-        /*speedImg      = IIM_Load_DisplayFormatAlpha("speed.png");
-        speedBlackImg = IIM_Load_DisplayFormatAlpha("speed_black.png");
-        */
         NeutralPopAnimation::initResources();
         firstTime = false;
     }
-    background = attachedLevelTheme->getBackground();
-    speedFront = attachedLevelTheme->getSpeedMeter(true);
-    speedBack  = attachedLevelTheme->getSpeedMeter(false);
-    grid       = IIM_Load_DisplayFormatAlpha("grid.png");
-    liveImage[0] = IIM_Load_DisplayFormatAlpha("0live.png");
-    liveImage[1] = IIM_Load_DisplayFormatAlpha("1live.png");
-    liveImage[2] = IIM_Load_DisplayFormatAlpha("2live.png");
-    liveImage[3] = IIM_Load_DisplayFormatAlpha("3live.png");
+    IIM_Surface * background = attachedLevelTheme->getBackground();
+
     SDL_PixelFormat *fmt = background->surf->format;
     SDL_Surface *tmp = SDL_CreateRGBSurface(background->surf->flags,
                                             background->w, background->h, 32,
@@ -210,7 +198,7 @@ void PuyoGameWidget::initialize()
     attachedGameB = this->areaB->getAttachedGame();
     this->areaA->setEnemyGame(attachedGameB);
     this->areaB->setEnemyGame(attachedGameA);
-    printf("Ennemis positionnes! %x, %x\n", attachedGameA, attachedGameB);
+    //printf("Ennemis positionnes! %x, %x\n", attachedGameA, attachedGameB);
     
     setReceiveUpEvents(true);
     setFocusable(true);
@@ -281,6 +269,7 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
         
         // Rendering the grids
         SDL_Rect drect;
+        IIM_Surface * grid = attachedLevelTheme->getGrid();
         drect.x = 21;
         drect.y = -1;
         drect.w = grid->w;
@@ -296,14 +285,15 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
         areaA->renderNeutral();
         areaB->renderNeutral();
         
-        // Rendering the lives        
+        // Rendering the lives
         if (displayLives && (lives>=0) && (lives<=3))
         {
-            drect.x = painter.gameScreen->w / 2 - liveImage[lives]->w / 2;
+            IIM_Surface * liveImage = attachedLevelTheme->getLifeForIndex(lives);
+            drect.x = painter.gameScreen->w / 2 - liveImage->w / 2;
             drect.y = 436;
-            drect.w = liveImage[lives]->w;
-            drect.h = liveImage[lives]->h;
-            painter.requestDraw(liveImage[lives], &drect);
+            drect.w = liveImage->w;
+            drect.h = liveImage->h;
+            painter.requestDraw(liveImage, &drect);
         }
         
         // Drawing the painter
@@ -317,6 +307,8 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
     if (gameSpeed == 1) gameSpeedCpy = 0;
     
     SDL_Rect speedRect;
+    IIM_Surface * speedFront = attachedLevelTheme->getSpeedMeter(true);
+    IIM_Surface * speedBack  = attachedLevelTheme->getSpeedMeter(false);
     speedRect.x = 0;
     speedRect.w = speedFront->w;
     speedRect.h = (20 - gameSpeedCpy) * 6;
@@ -569,35 +561,6 @@ void PuyoPureStarter::restartRender()
 
 
 
-
-
-
-static void loadShrinkXplode2(int i, float dec)
-{
-    for (int j=1;j<=4;++j)
-    {
-        shrinkingPuyo[j-1][i] = iim_surface_shift_hue(shrinkingPuyo[j-1][3],dec);
-        explodingPuyo[j-1][i] = iim_surface_shift_hue(explodingPuyo[j-1][3],dec);
-    }
-}
-
-static void loadShrinkXplode(void)
-{
-    for (int j=1;j<=4;++j)
-    {
-        char f[20];
-        sprintf(f,"Shrink%d.png", j);
-        shrinkingPuyo[j-1][3] = IIM_Load_DisplayFormatAlpha(f);
-        sprintf(f,"Explode%d.png", j);
-        explodingPuyo[j-1][3] = IIM_Load_DisplayFormatAlpha(f);
-    }
-    
-    loadShrinkXplode2(0,-65.0f);
-    loadShrinkXplode2(1,100.0f);
-    loadShrinkXplode2(2,-150.0f);
-    loadShrinkXplode2(4,140.0f);
-}
-
 void PuyoStarter::draw(SDL_Surface *surf) {
   const_cast<PuyoStarter*>(this)->draw();
   Screen::draw(surf);
@@ -736,7 +699,7 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, int theme):attachedThemeManag
         SDL_FreeSurface(tmp);
     }
     painter.redrawAll(painter.gameScreen->surf);
-    
+    /*
     static bool firstTime = true;
     if (firstTime) {
 
@@ -762,6 +725,7 @@ PuyoStarter::PuyoStarter(PuyoCommander *commander, int theme):attachedThemeManag
         grid          = IIM_Load_DisplayFormatAlpha("grid.png");
         firstTime = false;
     }
+    */
 }
 
 PuyoStarter::~PuyoStarter()

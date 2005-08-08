@@ -99,7 +99,7 @@ PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
   :attachedThemeSet(attachedThemeSet),
    attachedPuyoFactory(this), attachedPainter(painterToUse), delayBeforeGameOver(60)
 {
-    printf("Constructeur du PuyoView\n");
+    //printf("Constructeur du PuyoView\n");
 	attachedGame = attachedPuyoGameFactory->createPuyoGame(&attachedPuyoFactory);
     attachedGame->setDelegate(this);
     
