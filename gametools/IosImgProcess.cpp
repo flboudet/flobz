@@ -1,7 +1,7 @@
 #include "IosImgProcess.h"
 #include <math.h>
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
 
 
 static char * defaultDataFolder = ".";
