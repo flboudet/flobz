@@ -119,9 +119,6 @@ static bool copyPictureWithLuminosity(IIM_Surface * src, IIM_Surface ** dst, IIM
 //*****************************************************************************************
 //************************************** GSL bindings *************************************
 //*****************************************************************************************
-/*  */
-
-
 
 static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
@@ -141,7 +138,8 @@ static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
             return;
         }
     }
-    //fprintf(stderr,"Adding Puyoset called %s.\n", (const char *)(theme->getName()));
+    
+    theme->addInfo(String(((const char *) GSL_GLOBAL_PTR(gsl, "author"))),String(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.description"))));
     
     theme->addAnimatedPuyoTheme(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.face")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.disappear")),
@@ -193,6 +191,8 @@ static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
             return;
         }
     }
+
+    theme->addInfo(String(((const char *) GSL_GLOBAL_PTR(gsl, "author"))),String(((const char *) GSL_GLOBAL_PTR(gsl, "level.description"))));
 
     theme->setLives((const char *) GSL_GLOBAL_PTR(gsl, "level.lives"));
     theme->setBackground((const char *) GSL_GLOBAL_PTR(gsl, "level.background"));
@@ -451,6 +451,22 @@ AnimatedPuyoSetTheme::~AnimatedPuyoSetTheme(void)
     if (_neutral != NULL) delete _neutral;
 }
 
+void AnimatedPuyoSetTheme::addInfo(const String author, const String comments)
+{
+    _author = author;
+    _comments = comments;
+}
+
+const String AnimatedPuyoSetTheme::getAuthor(void)
+{
+    return _author;
+}
+
+const String AnimatedPuyoSetTheme::getComments(void)
+{
+    return _comments;
+}
+
 const String AnimatedPuyoSetTheme::getName(void)
 {
     return _name;
@@ -583,6 +599,22 @@ PuyoLevelTheme::~PuyoLevelTheme(void)
     if (_speed_meter != NULL) free(_speed_meter);
     
     releaseCached();
+}
+
+void PuyoLevelTheme::addInfo(const String author, const String comments)
+{
+    _author = author;
+    _comments = comments;
+}
+
+const String PuyoLevelTheme::getAuthor(void)
+{
+    return _author;
+}
+
+const String PuyoLevelTheme::getComments(void)
+{
+    return _comments;
 }
 
 const String PuyoLevelTheme::getName(void)

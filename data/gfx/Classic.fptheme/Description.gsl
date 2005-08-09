@@ -26,19 +26,21 @@
 /**** Don't modify, if you want more themes, create your own ! ****/
 /******************************************************************/
 
+[start_description]
+    author = "iOS-Software"
+[end_description]
+
 
 /********** PUYOS SETS **********/
 
 [start_puyoset]
     puyoset.name        = "Classic"
     puyoset.description = "Old good puyos."
-    puyoset.author      = "iOS-Software"
 [end_puyoset]
 
 [start_puyoset]
     puyoset.name         = "Invaders"
     puyoset.description  = "Puyos for everyone (color blindness aware)."
-    puyoset.author       = "iOS-Software"
     puyoset.P2.face      = "fat"
     puyoset.P2.offset    = 72.0
     puyoset.P2.eye       = "upper"
@@ -57,14 +59,11 @@
 [start_level]
     level.name          = "Kaori's farm"
     level.description   = "Her favorite place to play."
-    level.author        = "iOS-Software"
 [end_level]
 
 [start_level]
-    level.name          = "The Dark Cave"
     level.name          = "Level1"
     level.description   = "The cave of fear..."
-    level.author        = "iOS-Software"
     level.background    = "dark"
 [end_level]
 

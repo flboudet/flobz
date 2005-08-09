@@ -109,7 +109,7 @@ static int imageForIndex(int i)
 
 void PuyoThemePreview::draw(SDL_Surface *screen)
 {
-    SoFont_PutString(font, screen, (int)(offsetX + getPosition().x), (int)(offsetY + getPosition().y), (const char*)label, NULL);
+    SoFont_PutString(font, screen, (int)(offsetX + getPosition().x), (int)(offsetY + getPosition().y), (const char*)(label), NULL);
     if (curTheme != NULL)
     {
       IIM_Rect r;

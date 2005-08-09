@@ -9,7 +9,6 @@ struct <Puyo:
 
 struct <PuyoSet:
     string name,
-    string author,
     string description,
     Puyo P1,
     Puyo P2,
@@ -20,7 +19,6 @@ struct <PuyoSet:
 
 struct <Level:
     string name,
-    string author,
     string description,
     string background,
     string speedmeter,
@@ -29,14 +27,19 @@ struct <Level:
 
 PuyoSet puyoset
 Level   level
+string  author
 
 external <end_puyoset>
 external <end_level>
 
+<start_description>
+    author = "iOS-Software"
+    
+<end_description>
+
 <start_puyoset>
     puyoset.name        = "Unamed"
     puyoset.description = "Some puyos..."
-    puyoset.author      = "Someone"
     
     puyoset.P1.face      = "round"
     puyoset.P1.offset    = 0.0
@@ -73,7 +76,6 @@ external <end_level>
 <start_level>
     level.name          = "Unamed"
     level.description   = "Somewhere..."
-    level.author        = "Someone"
     
     level.background    = "columns"
     level.speedmeter    = "fire"
@@ -83,3 +85,4 @@ external <end_level>
 <ThemeDefinition>
 [start_puyoset]
 [start_level]
+[start_description]

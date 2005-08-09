@@ -101,9 +101,12 @@ public:
     ~AnimatedPuyoSetTheme(void);
     
     const String getName(void);
+    const String getAuthor(void);
+    const String getComments(void);
     
     bool addAnimatedPuyoTheme(const String face, const char * disappear, const char * explosions, const char * eyes, const float color_offset);
     bool addNeutralPuyo(const String face, const char * disappear, const char * explosions, const char * eyes, const float color_offset);
+    void addInfo(const String author, const String comments);
     
     AnimatedPuyoTheme * getAnimatedPuyoTheme(PuyoState state);
     
@@ -114,7 +117,10 @@ public:
 private:
     String _path;
     String _name;
-    
+
+    String _author;
+    String _comments;
+
     AnimatedPuyoTheme * _puyos[NUMBER_OF_PUYOS];
     AnimatedPuyoTheme * _neutral;
 
@@ -131,7 +137,11 @@ public:
     ~PuyoLevelTheme(void);
     
     const String getName(void);
-    
+    const String getAuthor(void);
+    const String getComments(void);
+        
+    void addInfo(const String author, const String comments);
+
     bool setLives(const char * lives);
     bool setBackground(const char * back);
     bool setGrid(const char * grid);
@@ -145,6 +155,9 @@ public:
 private:    
     String _path;
     String _name;
+    
+    String _author;
+    String _comments;
     
     char * _lives;
     char * _background;
@@ -161,7 +174,6 @@ private:
     bool validate(void);
     bool cache(void);
     void releaseCached(void);
-    
 };
 
 
