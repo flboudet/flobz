@@ -113,9 +113,9 @@ void PuyoThemePicturePreview::draw(SDL_Surface *screen)
     if (curTheme != NULL)
     {
       IIM_Rect r;
-      Vec3 size = getPreferedSize();
+      Vec3 size = getSize();
       r.x = (Sint16)(getPosition().x+(size.x-NUMBER_OF_PUYOS*ONEPUYO+(NUMBER_OF_PUYOS-1)*ONEPUYO/4.0)/2.0);
-      r.y = (Sint16)(getPosition().y);
+      r.y = (Sint16)(getPosition().y+(size.y-ONEPUYO)/2.0);
       for (int i=0; i<NUMBER_OF_PUYOS; i++)
       {
         IIM_Rect rect = r;

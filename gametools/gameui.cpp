@@ -248,6 +248,21 @@ namespace gameui {
           //if (getNumberOfChilds() != 0) heightOfKnownChilds /= getNumberOfChilds();
 
          float heightPerChild = (height - heightOfKnownChilds) / (getNumberOfChilds());
+         float heightToRemove = 0.0;
+         if (heightPerChild < GameUIDefaults::SPACING)
+         {
+            if (height >= GameUIDefaults::SPACING * getNumberOfChilds())
+            {
+                heightToRemove = heightOfKnownChilds - (height - GameUIDefaults::SPACING * getNumberOfChilds());
+                heightPerChild = GameUIDefaults::SPACING;
+            }
+            else
+            {
+                heightPerChild = (GameUIDefaults::SPACING * getNumberOfChilds() - height) / getNumberOfChilds();
+                heightToRemove = heightOfKnownChilds - (height - heightPerChild * getNumberOfChilds());
+            }
+         }
+         
           Vec3 size     = getSize();
           setSortingAxe(size, heightPerChild);
           Vec3 position = getPosition();
@@ -259,13 +274,16 @@ namespace gameui {
             Widget *child = getChild(i);
             if (!child->getPreferedSize().is_zero()) {
               // center the widget if we know its size
+              float coeff = getSortingAxe(child->getPreferedSize()) / heightOfKnownChilds;
               Vec3 csize = size - child->getPreferedSize();
               Vec3 offset(0.0,0.0,0.0);
               setSortingAxe(offset, heightPerChild - getSortingAxe(csize / 2.0));
+              Vec3 sizeOffset(0.0,0.0,0.0);
+              setSortingAxe(sizeOffset,  heightToRemove*coeff);
               Vec3 cpos  = position + csize / 2.0 + offset;
-              child->setSize(child->getPreferedSize());
+              child->setSize(child->getPreferedSize()-sizeOffset);
               child->setPosition(cpos);
-              axePos += getSortingAxe(child->getPreferedSize());
+              axePos += getSortingAxe(child->getSize());
             }
             else {
               // else give him all the space he want.
