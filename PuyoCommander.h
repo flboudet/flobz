@@ -99,6 +99,7 @@ class PuyoCommander : public MessageListener
     // void updateHighScoresMenu(int newOne = -1);
 
     SoFont *smallFont;
+    SoFont *smallFontInfo;
     SoFont *darkFont;
     SoFont *menuFont;
     // DoomMelt *melt;

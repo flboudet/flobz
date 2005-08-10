@@ -85,13 +85,14 @@ void PuyoThemeSelectionBox::build()
     }
 }
 
-#define MARGIN (52.)
+
+/*****************************************************************************/
+
 #define ONEPUYO (32.)
 
-PuyoThemePreview::PuyoThemePreview()
+PuyoThemePicturePreview::PuyoThemePicturePreview()
 {
-      this->font = GameUIDefaults::FONT_TEXT;
-      setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0)+Vec3(0.,MARGIN,0.));
+      setPreferedSize(Vec3(NUMBER_OF_PUYOS*ONEPUYO-(NUMBER_OF_PUYOS-1)*ONEPUYO/4.0, ONEPUYO, 1.0));
       offsetX = offsetY = 0.;
       curTheme = NULL;
       for (int i=0; i<NUMBER_OF_PUYOS; i++)
@@ -107,15 +108,14 @@ static int imageForIndex(int i)
     else return 2*(NUMBER_OF_PUYO_EYES-1)-i;
 }
 
-void PuyoThemePreview::draw(SDL_Surface *screen)
+void PuyoThemePicturePreview::draw(SDL_Surface *screen)
 {
-    SoFont_PutString(font, screen, (int)(offsetX + getPosition().x), (int)(offsetY + getPosition().y), (const char*)(label), NULL);
     if (curTheme != NULL)
     {
       IIM_Rect r;
       Vec3 size = getPreferedSize();
       r.x = (Sint16)(getPosition().x+(size.x-NUMBER_OF_PUYOS*ONEPUYO+(NUMBER_OF_PUYOS-1)*ONEPUYO/4.0)/2.0);
-      r.y = (Sint16)(getPosition().y+SoFont_FontHeight(this->font)+MARGIN-ONEPUYO);
+      r.y = (Sint16)(getPosition().y);
       for (int i=0; i<NUMBER_OF_PUYOS; i++)
       {
         IIM_Rect rect = r;
@@ -128,17 +128,13 @@ void PuyoThemePreview::draw(SDL_Surface *screen)
     }
 }
 
-void PuyoThemePreview::themeSelected(String themeName)
+void PuyoThemePicturePreview::themeSelected(AnimatedPuyoSetTheme *  theme)
 {
-    label = themeName;
-    curTheme = getPuyoThemeManger()->getAnimatedPuyoSetTheme(themeName);
-    requestDraw();
-    setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0)+Vec3(0.,MARGIN,0.));
-    if (parent)
-      parent->arrangeWidgets();
+    curTheme = theme;
+    //requestDraw();
 }
 
-void PuyoThemePreview::idle(double currentTime)
+void PuyoThemePicturePreview::idle(double currentTime)
 {
     bool refresh = false;
 
@@ -167,6 +163,44 @@ void PuyoThemePreview::idle(double currentTime)
     if (refresh) requestDraw();
 }
 
+
+/*****************************************************************************/
+
+#define MARGIN (10.)
+
+PuyoThemePreview::PuyoThemePreview() {}
+
+void PuyoThemePreview::build() {
+    add(&name);
+    add(&author);
+    add(&picture);
+    add(&description);
+}
+
+PuyoThemePreview::~PuyoThemePreview() {}
+
+void PuyoThemePreview::themeSelected(String themeName)
+{
+    AnimatedPuyoSetTheme * curTheme = getPuyoThemeManger()->getAnimatedPuyoSetTheme(themeName);
+    name.setFont(GameUIDefaults::FONT_TEXT);
+    name.setValue(themeName);
+    author.setFont(GameUIDefaults::FONT_SMALL_INFO);
+    author.setValue(curTheme->getAuthor());
+    description.setFont(GameUIDefaults::FONT_SMALL_INFO);
+    description.setValue(curTheme->getComments());
+    picture.themeSelected(curTheme);
+    Vec3 marges(0.0,MARGIN,0.0);
+    setPreferedSize(name.getPreferedSize()+marges
+        +author.getPreferedSize()+marges
+        +description.getPreferedSize()+marges
+        +picture.getPreferedSize());
+    if (parent)
+      parent->arrangeWidgets();
+}
+
+
+/*****************************************************************************/
+
 PuyoThemeMenu::PuyoThemeMenu(PuyoRealMainScreen *mainScreen)
     : PuyoMainScreenMenu(mainScreen), popAction(mainScreen),
       backButton("Back", &popAction), themeMenuTitle("Change Theme..."),
@@ -176,6 +210,7 @@ PuyoThemeMenu::PuyoThemeMenu(PuyoRealMainScreen *mainScreen)
 
 void PuyoThemeMenu::build() {
     themeList.build();
+    themePreview.build();
 
     add(&themeMenuTitle);
     add(&themeList);

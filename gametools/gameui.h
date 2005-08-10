@@ -48,6 +48,7 @@ namespace gameui {
       static SoFont      *FONT;
       static SoFont      *FONT_INACTIVE;
       static SoFont      *FONT_TEXT;
+      static SoFont      *FONT_SMALL_INFO;
       static GameLoop    *GAME_LOOP;
       static ScreenStack *SCREEN_STACK;
   };

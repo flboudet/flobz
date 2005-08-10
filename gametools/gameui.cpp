@@ -4,11 +4,12 @@ namespace gameui {
 
   GameUIEnum   GameUIDefaults::CONTAINER_POLICY = USE_MAX_SIZE;
   float        GameUIDefaults::SPACING          = 16.0f;
-  SoFont      *GameUIDefaults::FONT           = SoFont_new();
-  SoFont      *GameUIDefaults::FONT_TEXT      = SoFont_new();
-  SoFont      *GameUIDefaults::FONT_INACTIVE  = SoFont_new();
-  GameLoop    *GameUIDefaults::GAME_LOOP      = new GameLoop();
-  ScreenStack *GameUIDefaults::SCREEN_STACK   = new ScreenStack();
+  SoFont      *GameUIDefaults::FONT             = SoFont_new();
+  SoFont      *GameUIDefaults::FONT_TEXT        = SoFont_new();
+  SoFont      *GameUIDefaults::FONT_INACTIVE    = SoFont_new();
+  SoFont      *GameUIDefaults::FONT_SMALL_INFO  = SoFont_new();
+  GameLoop    *GameUIDefaults::GAME_LOOP        = new GameLoop();
+  ScreenStack *GameUIDefaults::SCREEN_STACK     = new ScreenStack();
 
   //
   // Widget
@@ -235,28 +236,45 @@ namespace gameui {
       case USE_MAX_SIZE:
         {
           float height = getSortingAxe(getSize());
-          float heightPerChild = (height + GameUIDefaults::SPACING) / getNumberOfChilds()
-            - GameUIDefaults::SPACING;
+ 
+            float heightOfKnownChilds = 0.0f;
+          for (int i = 0; i < getNumberOfChilds(); ++i) {
+            Widget *child = getChild(i);
+            if (!child->getPreferedSize().is_zero()) {
+                //numberOfknownChilds++;
+                heightOfKnownChilds += getSortingAxe(child->getPreferedSize());
+            }
+          }
+          //if (getNumberOfChilds() != 0) heightOfKnownChilds /= getNumberOfChilds();
+
+         float heightPerChild = (height - heightOfKnownChilds) / (getNumberOfChilds());
           Vec3 size     = getSize();
           setSortingAxe(size, heightPerChild);
           Vec3 position = getPosition();
-          float axePos  = getSortingAxe(position);
+          setSortingAxe(position, getSortingAxe(position)-heightPerChild/2.0);
+          float axePos  = getSortingAxe(position) ;
 
-          for (int i = 0; i < getNumberOfChilds(); ++i) {
+
+         for (int i = 0; i < getNumberOfChilds(); ++i) {
             Widget *child = getChild(i);
             if (!child->getPreferedSize().is_zero()) {
               // center the widget if we know its size
               Vec3 csize = size - child->getPreferedSize();
-              Vec3 cpos  = position + csize / 2.0;
+              Vec3 offset(0.0,0.0,0.0);
+              setSortingAxe(offset, heightPerChild - getSortingAxe(csize / 2.0));
+              Vec3 cpos  = position + csize / 2.0 + offset;
               child->setSize(child->getPreferedSize());
               child->setPosition(cpos);
+              axePos += getSortingAxe(child->getPreferedSize());
             }
             else {
               // else give him all the space he want.
               child->setSize(size);
-              child->setPosition(position);
+              Vec3 offset(0.0,0.0,0.0);
+              setSortingAxe(offset, heightPerChild - getSortingAxe(size / 2.0));
+              child->setPosition(position+ offset);
             }
-            axePos += heightPerChild + GameUIDefaults::SPACING;
+            axePos += heightPerChild;
             setSortingAxe(position, axePos);
           }
         }
@@ -293,7 +311,7 @@ namespace gameui {
         {}
     }
   }
-
+  
   void Box::add (Widget *child)
   {
     WidgetContainer::add(child);

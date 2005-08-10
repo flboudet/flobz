@@ -30,14 +30,16 @@
 #include "PuyoCommander.h"
 #include "AnimatedPuyoTheme.h"
 
-class PuyoThemePreview : public Widget, public IdleComponent {
+class PuyoThemePicturePreview : public Widget, public IdleComponent {
     public:
-        PuyoThemePreview();
-        void themeSelected(String themeName);
+        PuyoThemePicturePreview();
 
-      // Implements IdleComponent
-      virtual void idle(double currentTime);
-      virtual IdleComponent *getIdleComponent() { return this; }
+        // Implements IdleComponent
+        virtual void idle(double currentTime);
+        virtual IdleComponent *getIdleComponent() { return this; }
+
+        void build();
+        void themeSelected(AnimatedPuyoSetTheme * theme);
 
     protected:
       void draw(SDL_Surface *screen);
@@ -51,6 +53,22 @@ class PuyoThemePreview : public Widget, public IdleComponent {
       int eyes[NUMBER_OF_PUYOS];
       double lastTime;
 };
+
+class PuyoThemePreview : public VBox {
+    public:
+        PuyoThemePreview();
+        virtual ~PuyoThemePreview();
+        
+        void build();
+        void themeSelected(String themeName);
+
+    private:
+        Text name;
+        Text author;
+        PuyoThemePicturePreview picture;
+        Text description;
+};
+
 
 class PuyoThemeSelectionBox : public HBox {
 public:

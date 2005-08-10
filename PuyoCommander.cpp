@@ -160,17 +160,16 @@ void SinglePlayerGameAction::action()
 
 void NetGameAction::action()
 {
-  UDPMessageBox *mbox = new UDPMessageBox("127.0.0.1", 6581, 6581);
-  PuyoStarter *starter = new PuyoNetworkStarter(theCommander, 0, mbox);
-  starter->run(0,0,0,0,0);
-  GameUIDefaults::SCREEN_STACK->push(starter);
+  //UDPMessageBox *mbox = new UDPMessageBox("127.0.0.1", 6581, 6581);
+  
+  //GameUIDefaults::SCREEN_STACK->push(starter);
 }
 
 void LANGameRealMenu::build() {
   add(new Text("LAN Game"));
   add(new EditFieldWithLabel("Player name:", "toto"));
   add(new EditFieldWithLabel("Server name:", "127.0.0.1"));
-  add(new Button("Start!", new NetGameAction));
+  add(new Button("Start!", new NetworkStarterAction(*(new UDPMessageBox("127.0.0.1", 6581, 6581)))));
   add(new Button("Cancel", new PuyoPopMenuAction(mainScreen)));
 }
 
@@ -271,23 +270,36 @@ void PuyoCommander::initAudio()
 void PuyoCommander::initFonts()
 {
   DBG_PRINT("initFonts()\n");
-  smallFont = SoFont_new();
+
   IIM_Surface *font3b = IIM_Load_DisplayFormatAlpha ("font3b.png");
   IIM_Surface *font4b = IIM_Load_DisplayFormatAlpha ("font4b.png");
+  IIM_Surface *font6b = iim_surface_shift_hsv(font4b, 170, -.5, -.2);
   IIM_Surface *font5b = iim_surface_shift_hsv(font3b, 170, -.5, -.2);
 
-  SoFont_load (smallFont, font4b);
+  SoFont *darkFont = SoFont_new();
+  SoFont_load (darkFont, IIM_Load_DisplayFormatAlpha ("fontdark.png"));
+  
+  storyFont = darkFont;
+
   menuFont = SoFont_new();
   SoFont_load (menuFont, font3b);
-  darkFont = SoFont_new();
-  SoFont_load (darkFont, IIM_Load_DisplayFormatAlpha ("fontdark.png"));
-  storyFont = darkFont;
+
+  smallFont = SoFont_new();
+  SoFont_load (smallFont, font4b);
+
+
+  smallFontInfo = SoFont_new();
+  SoFont_load (smallFontInfo, font6b);
+
+
   SoFont *textFont = SoFont_new();
   SoFont_load(textFont, font5b);
+
   
-  GameUIDefaults::FONT          = menuFont;
-  GameUIDefaults::FONT_TEXT     = textFont;
-  GameUIDefaults::FONT_INACTIVE = darkFont;
+  GameUIDefaults::FONT            = menuFont;
+  GameUIDefaults::FONT_TEXT       = textFont;
+  GameUIDefaults::FONT_INACTIVE   = darkFont;
+  GameUIDefaults::FONT_SMALL_INFO = smallFontInfo;
 }
 
 

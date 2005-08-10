@@ -33,16 +33,81 @@ extern const char *p2name;
 
 extern IIM_Surface *perso[2];
 
-class PuyoNetworkGameFactory : public PuyoGameFactory {
-public:
-    PuyoNetworkGameFactory(PuyoRandomSystem *attachedRandom, MessageBox &msgBox): attachedRandom(attachedRandom), msgBox(msgBox) {}
-    PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory) {
-        return new PuyoNetworkGame(attachedPuyoFactory, msgBox);
+PuyoGame *PuyoNetworkGameFactory::createPuyoGame(PuyoFactory *attachedPuyoFactory) {
+    return new PuyoNetworkGame(attachedPuyoFactory, msgBox);
+}
+
+PuyoNetworkGameWidget::PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, Action *gameOverAction)
+    : attachedPuyoThemeSet(puyoThemeSet), mbox(mbox), attachedLocalGameFactory(&attachedRandom),
+      attachedNetworkGameFactory(&attachedRandom, mbox), localArea(&attachedLocalGameFactory, &attachedPuyoThemeSet,
+            1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, painter),
+      networkArea(&attachedNetworkGameFactory, &attachedPuyoThemeSet,
+            1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
+      playercontroller(localArea, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left, GameControlEvent::kPlayer1Right,
+      GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight), dummyPlayerController(networkArea)
+{
+    initialize(localArea, networkArea, playercontroller, dummyPlayerController, levelTheme, gameOverAction);
+    setLives(-1);
+}
+
+void PuyoNetworkGameWidget::cycle()
+{
+    mbox.idle();
+    PuyoGameWidget::cycle();
+}
+
+NetworkStarterAction::NetworkStarterAction(ios_fc::MessageBox &mbox)
+    : mbox(mbox), difficulty(1), gameScreen(NULL), gameWidget(NULL)
+{}
+
+void NetworkStarterAction::action()
+{
+    if (gameScreen == NULL) {
+        startGame();
     }
-private:
-    PuyoRandomSystem *attachedRandom;
-    MessageBox &msgBox;
-};
+    else if (! gameWidget->getAborted()) {
+        gameOver();
+    }
+    else {
+	    endGameSession();
+	}
+}
+
+void NetworkStarterAction::startGame()
+{
+    AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
+    
+    gameWidget = new PuyoNetworkGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *(themeManager->getPuyoLevelTheme()), mbox, this);
+    gameScreen = new PuyoGameScreen(*gameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
+    /*if (nameProvider != NULL) {
+        gameWidget->setPlayerOneName(nameProvider->getPlayer1Name());
+        gameWidget->setPlayerTwoName(nameProvider->getPlayer2Name());
+    }*/
+    GameUIDefaults::SCREEN_STACK->push(gameScreen);
+}
+
+void NetworkStarterAction::gameOver()
+{
+    GameUIDefaults::SCREEN_STACK->pop();
+    delete gameWidget;
+    delete gameScreen;
+    
+    gameScreen = NULL;
+    gameWidget = NULL;
+    startGame();
+}
+
+void NetworkStarterAction::endGameSession()
+{
+    GameUIDefaults::SCREEN_STACK->pop();
+    ((PuyoRealMainScreen *)(GameUIDefaults::SCREEN_STACK->top()))->transitionFromScreen(*gameScreen);
+    delete gameWidget;
+    delete gameScreen;
+    
+    gameScreen = NULL;
+    gameWidget = NULL;
+}
+
 
 PuyoNetworkStarter::PuyoNetworkStarter(PuyoCommander *commander, int theme, ios_fc::MessageBox *mbox)
 : PuyoStarter(commander, theme), mbox(mbox)

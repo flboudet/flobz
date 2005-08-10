@@ -27,6 +27,50 @@
 
 #include "PuyoStarter.h"
 #include "ios_messagebox.h"
+#include "PuyoNetworkView.h"
+
+class PuyoNetworkGameFactory : public PuyoGameFactory {
+public:
+    PuyoNetworkGameFactory(PuyoRandomSystem *attachedRandom, MessageBox &msgBox): attachedRandom(attachedRandom), msgBox(msgBox) {}
+    PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory);
+private:
+    PuyoRandomSystem *attachedRandom;
+    MessageBox &msgBox;
+};
+
+class PuyoNetworkGameWidget : public PuyoGameWidget {
+public:
+    PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, Action *gameOverAction = NULL);
+    bool didPlayerWon() const { return isGameARunning(); }
+    void cycle();
+private:
+    AnimatedPuyoSetTheme &attachedPuyoThemeSet;
+    PuyoRandomSystem attachedRandom;
+    ios_fc::MessageBox &mbox;
+    PuyoLocalGameFactory attachedLocalGameFactory;
+    PuyoNetworkGameFactory attachedNetworkGameFactory;
+    PuyoNetworkView localArea;
+    PuyoView networkArea;
+    PuyoEventPlayer playercontroller;
+    PuyoNullPlayer dummyPlayerController;
+};
+
+class NetworkStarterAction : public Action {
+public:
+    NetworkStarterAction(ios_fc::MessageBox &mbox);
+    void action();
+    
+private:
+    ios_fc::MessageBox &mbox;
+    void startGame();
+    void gameOver();
+    void endGameSession();
+    
+    int difficulty;
+    PuyoGameScreen *gameScreen;
+    PuyoNetworkGameWidget *gameWidget;
+    //PuyoTwoNameProvider *nameProvider;
+};
 
 class PuyoNetworkStarter : public PuyoStarter, MessageListener {
 public:
