@@ -1,0 +1,12 @@
+[start_level]
+    level.storyName     = "storyz.gsl"
+    level.opponentName  = "Unmapped Monster"
+    level.levelName     = "Unamed"
+    level.easySetting.type    = "RANDOM"
+    level.easySetting.level   = 350
+    level.mediumSetting.type  = "RANDOM"
+    level.mediumSetting.level = 350
+    level.hardSetting.type    = "RANDOM"
+    level.hardSetting.level   = 350
+[end_level]
+

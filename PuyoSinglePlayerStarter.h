@@ -27,6 +27,8 @@
 
 #include "PuyoStarter.h"
 #include "HiScores.h"
+#include "goomsl/goomsl.h"
+#include "goomsl/goomsl_hash.h"
 
 class PuyoSingleNameProvider {
 public:
@@ -46,6 +48,18 @@ private:
     PuyoIA opponentcontroller;
 };
 
+class PuyoLevelDefinitions {
+public:
+    PuyoLevelDefinitions(String levelDefinitionFile);
+private:
+    static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local);
+    static PuyoLevelDefinitions *currentDefinition;
+    struct SelIA {
+      SelIA(String type, int level);
+        IA_Type type;
+        int level;
+    };
+};
 
 class PuyoSingleGameLevelData {
 public:

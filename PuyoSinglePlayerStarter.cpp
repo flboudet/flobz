@@ -40,6 +40,48 @@ PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puy
     setLives(lifes);
 }
 
+PuyoLevelDefinitions *PuyoLevelDefinitions::currentDefinition = NULL;
+
+PuyoLevelDefinitions::PuyoLevelDefinitions(String levelDefinitionFile)
+{
+    GoomSL * gsl = gsl_new();
+    if (!gsl) return;
+    String libPath(getDataFolder());
+    libPath += "/story/levellib.gsl";
+    char * fbuffer = gsl_init_buffer((const char *)libPath);
+    gsl_append_file_to_buffer(levelDefinitionFile, &fbuffer);
+    gsl_compile(gsl,fbuffer);
+    currentDefinition = this;
+    gsl_bind_function(gsl, "end_level",  PuyoLevelDefinitions::end_level);
+    gsl_execute(gsl);
+    free(fbuffer);
+    gsl_free(gsl);
+}
+
+PuyoLevelDefinitions::SelIA::SelIA(String type, int level) : level(level)
+{
+  if (type == "RANDOM")
+    this->type = RANDOM;
+  else if (type == "FLOBO")
+    this->type = FLOBO;
+  else if (type == "TANIA")
+    this->type = TANIA;
+  else if (type == "JEKO")
+    this->type = JEKO;
+  else if (type == "GYOM")
+    this->type = GYOM;
+}
+
+void PuyoLevelDefinitions::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+  const char * storyName = (const char *) GSL_GLOBAL_PTR(gsl, "level.storyName");
+  const char * opponentName = (const char *) GSL_GLOBAL_PTR(gsl, "level.opponentName");
+  const char * levelName = (const char *) GSL_GLOBAL_PTR(gsl, "level.levelName");
+  //const char * easySettingType = (const char *) GSL_GLOBAL_PTR(gsl, "level.easySetting.level");
+  SelIA easySettings((const char *) GSL_GLOBAL_PTR(gsl, "level.easySetting.type"), GSL_GLOBAL_INT(gsl, "level.easySetting.level"));
+		     //int easySettingLevel = GSL_GLOBAL_INT(gsl, "level.easySetting.level");
+}
+
 const struct PuyoSingleGameLevelData::StaticLevelDatas PuyoSingleGameLevelData::levelDatas[] = {
 // Level 1
 { "story1.gsl", "Herbert the Dog", {RANDOM, 350}, {FLOBO , 190}, {TANIA , 130} },
@@ -67,7 +109,8 @@ PuyoSingleGameLevelData::PuyoSingleGameLevelData(int gameLevel, int difficulty) 
     AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
     themeToUse = themeManager->getAnimatedPuyoSetTheme();
     levelThemeToUse = themeManager->getPuyoLevelTheme("Level1");
-    
+    String defPath(getDataFolder());
+    PuyoLevelDefinitions testDef(defPath + "/story/levels.gsl");
     /*
     themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 000.0f);
     themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 072.0f);
