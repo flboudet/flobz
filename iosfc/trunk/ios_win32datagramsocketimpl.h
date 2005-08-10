@@ -27,7 +27,11 @@
 #define _IOSWIN32DATAGRAMSOCKETIMPL
  
 #include "ios_datagramsocket.h"
-#include <Winsock2.h>
+// Bug debile flobopuyo
+#ifdef DATADIR
+#undef DATADIR
+#endif
+#include <winsock2.h>
 
 namespace ios_fc {
     

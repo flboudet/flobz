@@ -22,7 +22,11 @@
 #ifndef _IOSWIN32SOCKETADDRESSIMPL
 #define _IOSWIN32SOCKETADDRESSIMPL
 
-#include <Winsock2.h>
+// Bug debile flobopuyo
+#ifdef DATADIR
+#undef DATADIR
+#endif
+#include <winsock2.h>
 #include "ios_memory.h"
 #include "ios_socketaddress.h"
 

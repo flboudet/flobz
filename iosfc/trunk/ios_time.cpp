@@ -115,6 +115,20 @@ double getTimeMs()
 
 #else // WIN32
 
-#error TODO
+// Bug debile flobopuyo
+#ifdef DATADIR
+#undef DATADIR
+#endif
 
+#include "windows.h"
+
+namespace ios_fc
+{
+
+double getTimeMs()
+{
+  return (double)GetTickCount();
+}
+
+}
 #endif // WIN32
