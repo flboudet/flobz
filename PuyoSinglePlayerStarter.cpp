@@ -58,6 +58,20 @@ PuyoLevelDefinitions::PuyoLevelDefinitions(String levelDefinitionFile)
     gsl_free(gsl);
 }
 
+PuyoLevelDefinitions::~PuyoLevelDefinitions()
+{
+  for (int i = 0 ; i < levelDefinitions.size() ; i++) {
+    delete levelDefinitions[i];
+  }
+}
+
+void PuyoLevelDefinitions::addLevelDefinition(String levelName, String storyName,
+					      String opponentName, SelIA easySettings,
+					      SelIA mediumSettings, SelIA hardSettings)
+{
+  levelDefinitions.add(new LevelDefinition(levelName, storyName, opponentName, easySettings, mediumSettings, hardSettings));
+}
+
 PuyoLevelDefinitions::SelIA::SelIA(String type, int level) : level(level)
 {
   if (type == "RANDOM")
@@ -77,9 +91,10 @@ void PuyoLevelDefinitions::end_level(GoomSL *gsl, GoomHash *global, GoomHash *lo
   const char * storyName = (const char *) GSL_GLOBAL_PTR(gsl, "level.storyName");
   const char * opponentName = (const char *) GSL_GLOBAL_PTR(gsl, "level.opponentName");
   const char * levelName = (const char *) GSL_GLOBAL_PTR(gsl, "level.levelName");
-  //const char * easySettingType = (const char *) GSL_GLOBAL_PTR(gsl, "level.easySetting.level");
   SelIA easySettings((const char *) GSL_GLOBAL_PTR(gsl, "level.easySetting.type"), GSL_GLOBAL_INT(gsl, "level.easySetting.level"));
-		     //int easySettingLevel = GSL_GLOBAL_INT(gsl, "level.easySetting.level");
+  SelIA mediumSettings((const char *) GSL_GLOBAL_PTR(gsl, "level.mediumSetting.type"), GSL_GLOBAL_INT(gsl, "level.mediumSetting.level"));
+  SelIA hardSettings((const char *) GSL_GLOBAL_PTR(gsl, "level.hardSetting.type"), GSL_GLOBAL_INT(gsl, "level.hardSetting.level"));
+  currentDefinition->addLevelDefinition(levelName, storyName, opponentName, easySettings, mediumSettings, hardSettings);
 }
 
 const struct PuyoSingleGameLevelData::StaticLevelDatas PuyoSingleGameLevelData::levelDatas[] = {

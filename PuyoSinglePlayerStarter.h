@@ -51,14 +51,29 @@ private:
 class PuyoLevelDefinitions {
 public:
     PuyoLevelDefinitions(String levelDefinitionFile);
+    virtual ~PuyoLevelDefinitions();
 private:
-    static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local);
-    static PuyoLevelDefinitions *currentDefinition;
     struct SelIA {
       SelIA(String type, int level);
         IA_Type type;
         int level;
     };
+    struct LevelDefinition {
+      LevelDefinition(String levelName, String storyName, String opponentName,
+		      SelIA easySettings, SelIA mediumSettings, SelIA hardSettings)
+	: levelName(levelName), storyName(storyName), opponentName(opponentName),
+	   easySettings(easySettings), mediumSettings(mediumSettings), hardSettings(hardSettings) {}
+      String levelName;
+      String storyName;
+      String opponentName;
+      SelIA easySettings;
+      SelIA mediumSettings;
+      SelIA hardSettings;
+    };
+    void addLevelDefinition(String levelName, String storyName, String opponentName, SelIA easySettings, SelIA mediumSettings, SelIA hardSettings);
+    static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local);
+    static PuyoLevelDefinitions *currentDefinition;
+    AdvancedBuffer<LevelDefinition *> levelDefinitions;
 };
 
 class PuyoSingleGameLevelData {
