@@ -90,7 +90,10 @@ static void iflow_execute(FastInstructionFlow *_this, GoomSL *gsl);
 
 void iflow_free(InstructionFlow *_this)
 { /* {{{ */
+  int i;
   goom_hash_free(_this->labels);
+  for (i= 0; i<_this->number; i++) gsl_instr_free(_this->instr[i]);
+  free(_this->instr);
   free(_this); /*TODO: finir cette fonction */
 } /* }}} */
 
@@ -185,10 +188,13 @@ Instruction *gsl_instr_init(GoomSL *parent, const char *name, int id, int nb_par
 void gsl_instr_free(Instruction *_this)
 { /* {{{ */
   int i;
-  free(_this->types);
   for (i=_this->cur_param; i<_this->nb_param; ++i)
+  {
     free(_this->params[i]);
+  }
   free(_this->params);
+  free(_this->types);
+  free(_this->vnamespace);
   free(_this);
 } /* }}} */
 
@@ -1421,9 +1427,25 @@ int gsl_is_compiled(GoomSL *gss)
 
 void gsl_free(GoomSL *gss)
 { /* {{{ */
+  int i;
   iflow_free(gss->iflow);
-  free(gss->vars);
-  free(gss->functions);
+  goom_hash_free(gss->vars);
+  goom_hash_free(gss->functions);
+  goom_hash_free(gss->structIDS);
+
+  while (gss->nbStructID > 0) {
+    int i;
+    gss->nbStructID--;
+    for(i=0;i<gss->gsl_struct[gss->nbStructID]->nbFields;++i)
+      free(gss->gsl_struct[gss->nbStructID]->fields[i]);
+    free(gss->gsl_struct[gss->nbStructID]);
+  }
+    free(gss->gsl_struct);
+  
+  goom_heap_delete(gss->data_heap);
+
+  for (i=0; i<gss->nbPtr; i++) if (gss->ptrArray[i] != 0) free(gss->ptrArray[i]);
+  free(gss->ptrArray);
   free(gss);
 } /* }}} */
 
