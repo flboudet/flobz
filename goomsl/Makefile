@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-g -O0 -Wall -pedantic -fno-omit-frame-pointer # -DVERBOSE -DUSE_JITC_X86=1
+CFLAGS=-g -O0 -Wall -pedantic # -fno-omit-frame-pointer -DVERBOSE -DUSE_JITC_X86=1
 #CFLAGS=-g -O3 -march=athlon -Wall -pedantic -DUSE_JITC_X86=1
 OBJ=goomsl_yacc.o goomsl_lex.o goomsl_hash.o goomsl_heap.o goomsl.o main.o jitc_x86.o
 
