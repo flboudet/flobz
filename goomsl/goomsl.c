@@ -194,7 +194,6 @@ void gsl_instr_free(Instruction *_this)
   }
   free(_this->params);
   free(_this->types);
-  free(_this->vnamespace);
   free(_this);
 } /* }}} */
 
