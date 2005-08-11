@@ -63,7 +63,7 @@ static const char * preferedPuyosKey = "ThemeManager.Puyos";
 static const char * preferedLevelKey = "ThemeManager.Level";
 
 static AnimatedPuyoThemeManager * globalManager = NULL;
-static char * GlobalCurrentPath = "";
+static char * GlobalCurrentPath;
 
 //*********************************************************************************
 //*********************************** Utilities ***********************************
@@ -775,7 +775,7 @@ static void loadTheme(String fullPath)
     }
     //else fprintf(stderr,"Trying to load theme from %s.\n",(const char *)scriptPath);
         
-    GlobalCurrentPath = strdup(fullPath);
+    GlobalCurrentPath = strdup((const char *)fullPath);
     GoomSL * gsl = gsl_new();
     if (!gsl) return;
     String libPath(getDataFolder());
@@ -786,6 +786,7 @@ static void loadTheme(String fullPath)
     gsl_compile(gsl,fbuffer);
     sbind(gsl);
     gsl_execute(gsl);
+    gsl_free(gsl);
     free(fbuffer);
     free(GlobalCurrentPath);
 }
