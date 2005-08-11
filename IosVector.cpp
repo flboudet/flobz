@@ -44,6 +44,7 @@ IosVector::IosVector(int size)
 
 IosVector::~IosVector()
 {
+    free(vectorData);
 }
 
 void IosVector::addElement(void *element)
