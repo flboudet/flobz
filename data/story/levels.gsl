@@ -1,12 +1,24 @@
 [start_level]
-    level.storyName     = "storyz.gsl"
-    level.opponentName  = "Unmapped Monster"
-    level.levelName     = "Unamed"
+    level.levelName           = "Kaori vs the Men's Best Friend"
+    level.storyName           = "story1.gsl"
+    level.opponentName        = "Herbert the Dog"
     level.easySetting.type    = "RANDOM"
     level.easySetting.level   = 350
-    level.mediumSetting.type  = "RANDOM"
-    level.mediumSetting.level = 350
-    level.hardSetting.type    = "RANDOM"
-    level.hardSetting.level   = 350
+    level.mediumSetting.type  = "FLOBO"
+    level.mediumSetting.level = 190
+    level.hardSetting.type    = "TANIA"
+    level.hardSetting.level   = 130
+[end_level]
+
+[start_level]
+    level.levelName           = "An unfriendly encounter"
+    level.storyName           = "story2.gsl"
+    level.opponentName        = "Duke Beary"
+    level.easySetting.type    = "FLOBO"
+    level.easySetting.level   = 350
+    level.mediumSetting.type  = "JEKO"
+    level.mediumSetting.level = 180
+    level.hardSetting.type    = "JEKO"
+    level.hardSetting.level   = 100
 [end_level]
 

@@ -124,8 +124,6 @@ PuyoSingleGameLevelData::PuyoSingleGameLevelData(int gameLevel, int difficulty) 
     AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
     themeToUse = themeManager->getAnimatedPuyoSetTheme();
     levelThemeToUse = themeManager->getPuyoLevelTheme("Level1");
-    String defPath(getDataFolder());
-    PuyoLevelDefinitions testDef(defPath + "/story/levels.gsl");
     /*
     themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 000.0f);
     themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 072.0f);
@@ -229,7 +227,7 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousSc
 SinglePlayerStarterAction::SinglePlayerStarterAction(int difficulty, PuyoSingleNameProvider *nameProvider)
     : currentLevel(0), lifes(3), difficulty(difficulty), levelData(NULL),
       story(NULL), gameScreen(NULL), gameLostWidget(NULL), gameOverScreen(NULL),
-      nameProvider(nameProvider) {}
+      nameProvider(nameProvider), levelDefinitions(String(getDataFolder()) + "/story/levels.gsl") {}
 
 void SinglePlayerStarterAction::action()
 {

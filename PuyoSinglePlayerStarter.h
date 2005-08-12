@@ -139,6 +139,7 @@ private:
     PuyoStoryWidget *gameLostWidget;
     PuyoGameOver1PScreen *gameOverScreen;
     PuyoSingleNameProvider *nameProvider;
+    PuyoLevelDefinitions levelDefinitions;
 };
 
 #endif // _PUYOSINGLEPLAYERSTARTER
