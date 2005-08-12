@@ -65,11 +65,16 @@ PuyoLevelDefinitions::~PuyoLevelDefinitions()
   }
 }
 
-void PuyoLevelDefinitions::addLevelDefinition(String levelName, String storyName,
-					      String opponentName, SelIA easySettings,
+void PuyoLevelDefinitions::addLevelDefinition(String levelName, String introStory,
+					      String opponentStory, String opponentName,
+					      String backgroundTheme,
+					      String gameLostStory, String gameOverStory,
+					      SelIA easySettings,
 					      SelIA mediumSettings, SelIA hardSettings)
 {
-  levelDefinitions.add(new LevelDefinition(levelName, storyName, opponentName, easySettings, mediumSettings, hardSettings));
+  levelDefinitions.add(new LevelDefinition(levelName, introStory, opponentStory, opponentName,
+					   backgroundTheme, gameLostStory, gameOverStory,
+					   easySettings, mediumSettings, hardSettings));
 }
 
 PuyoLevelDefinitions::SelIA::SelIA(String type, int level) : level(level)
@@ -88,13 +93,19 @@ PuyoLevelDefinitions::SelIA::SelIA(String type, int level) : level(level)
 
 void PuyoLevelDefinitions::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
-  const char * storyName = (const char *) GSL_GLOBAL_PTR(gsl, "level.storyName");
-  const char * opponentName = (const char *) GSL_GLOBAL_PTR(gsl, "level.opponentName");
   const char * levelName = (const char *) GSL_GLOBAL_PTR(gsl, "level.levelName");
+  const char * introStory = (const char *) GSL_GLOBAL_PTR(gsl, "level.introStory");
+  const char * opponentStory = (const char *) GSL_GLOBAL_PTR(gsl, "level.opponentStory");
+  const char * opponentName = (const char *) GSL_GLOBAL_PTR(gsl, "level.opponentName");
+  const char * backgroundTheme = (const char *) GSL_GLOBAL_PTR(gsl, "level.backgroundTheme");
+  const char * gameLostStory = (const char *) GSL_GLOBAL_PTR(gsl, "level.gameLostStory");
+  const char * gameOverStory = (const char *) GSL_GLOBAL_PTR(gsl, "level.gameOverStory");
   SelIA easySettings((const char *) GSL_GLOBAL_PTR(gsl, "level.easySetting.type"), GSL_GLOBAL_INT(gsl, "level.easySetting.level"));
   SelIA mediumSettings((const char *) GSL_GLOBAL_PTR(gsl, "level.mediumSetting.type"), GSL_GLOBAL_INT(gsl, "level.mediumSetting.level"));
   SelIA hardSettings((const char *) GSL_GLOBAL_PTR(gsl, "level.hardSetting.type"), GSL_GLOBAL_INT(gsl, "level.hardSetting.level"));
-  currentDefinition->addLevelDefinition(levelName, storyName, opponentName, easySettings, mediumSettings, hardSettings);
+  currentDefinition->addLevelDefinition(levelName, introStory, opponentStory, opponentName,
+					backgroundTheme, gameLostStory, gameOverStory,
+					easySettings, mediumSettings, hardSettings);
 }
 
 const struct PuyoSingleGameLevelData::StaticLevelDatas PuyoSingleGameLevelData::levelDatas[] = {
@@ -119,11 +130,14 @@ const struct PuyoSingleGameLevelData::StaticLevelDatas PuyoSingleGameLevelData::
 };
 
 
-PuyoSingleGameLevelData::PuyoSingleGameLevelData(int gameLevel, int difficulty) : gameLevel(gameLevel), difficulty(difficulty)
+PuyoSingleGameLevelData::PuyoSingleGameLevelData(int gameLevel, int difficulty,
+						 PuyoLevelDefinitions &levelDefinitions)
+  : gameLevel(gameLevel), difficulty(difficulty),
+    levelDefinition(levelDefinitions.getLevelDefinition(gameLevel))
 {
     AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
     themeToUse = themeManager->getAnimatedPuyoSetTheme();
-    levelThemeToUse = themeManager->getPuyoLevelTheme("Level1");
+    levelThemeToUse = themeManager->getPuyoLevelTheme(levelDefinition->backgroundTheme);
     /*
     themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 000.0f);
     themeToUse->addAnimatedPuyoTheme("stone", "round", "round", "normal", 072.0f);
@@ -145,17 +159,17 @@ PuyoSingleGameLevelData::~PuyoSingleGameLevelData()
 
 String PuyoSingleGameLevelData::getStory() const
 {
-    return String(levelDatas[gameLevel].storyName);
+    return levelDefinition->opponentStory;
 }
 
 String PuyoSingleGameLevelData::getGameLostStory() const
 {
-    return "gamelost1p.gsl";
+    return levelDefinition->gameLostStory;
 }
 
 String PuyoSingleGameLevelData::getGameOverStory() const
 {
-    return "gameover1p.gsl";
+    return levelDefinition->gameOverStory;
 }
     
 AnimatedPuyoSetTheme &PuyoSingleGameLevelData::getPuyoTheme() const
@@ -172,11 +186,11 @@ IA_Type PuyoSingleGameLevelData::getIAType() const
 {
     switch (difficulty) {
         case 0:
-            return levelDatas[gameLevel].easySetting.type;
+            return levelDefinition->easySettings.type;
         case 1:
-            return levelDatas[gameLevel].mediumSetting.type;
+            return levelDefinition->mediumSettings.type;
         default:
-            return levelDatas[gameLevel].hardSetting.type;
+            return levelDefinition->hardSettings.type;
     }
 }
 
@@ -184,16 +198,16 @@ int PuyoSingleGameLevelData::getIALevel() const
 {
     switch (difficulty) {
         case 0:
-            return levelDatas[gameLevel].easySetting.level;
+            return levelDefinition->easySettings.level;
         case 1:
-            return levelDatas[gameLevel].mediumSetting.level;
+            return levelDefinition->mediumSettings.level;
         default:
-            return levelDatas[gameLevel].hardSetting.level;
+            return levelDefinition->hardSettings.level;
     }
 }
 
-const char * PuyoSingleGameLevelData::getIAName() const {
-    return levelDatas[gameLevel].iaName;
+String PuyoSingleGameLevelData::getIAName() const {
+  return levelDefinition->opponentName;
 }
 
 PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousScreen, Action *finishedAction, String playerName, int playerPoints)
@@ -273,7 +287,7 @@ void SinglePlayerStarterAction::action()
 
 void SinglePlayerStarterAction::initiateLevel()
 {
-    levelData = new PuyoSingleGameLevelData(currentLevel, difficulty);
+    levelData = new PuyoSingleGameLevelData(currentLevel, difficulty, levelDefinitions);
     story = new PuyoStoryScreen(levelData->getStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
     GameUIDefaults::SCREEN_STACK->push(story);
 }
@@ -293,7 +307,7 @@ void SinglePlayerStarterAction::startGame()
 
 void SinglePlayerStarterAction::nextLevel()
 {
-    PuyoSingleGameLevelData *tempLevelData = new PuyoSingleGameLevelData(currentLevel, difficulty);
+    PuyoSingleGameLevelData *tempLevelData = new PuyoSingleGameLevelData(currentLevel, difficulty, levelDefinitions);
     story = new PuyoStoryScreen(tempLevelData->getStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
     endGameSession();
     levelData = tempLevelData;

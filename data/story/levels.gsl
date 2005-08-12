@@ -1,6 +1,6 @@
 [start_level]
     level.levelName           = "Kaori vs the Men's Best Friend"
-    level.storyName           = "story1.gsl"
+    level.opponentStory       = "story1.gsl"
     level.opponentName        = "Herbert the Dog"
     level.easySetting.type    = "RANDOM"
     level.easySetting.level   = 350
@@ -12,7 +12,7 @@
 
 [start_level]
     level.levelName           = "An unfriendly encounter"
-    level.storyName           = "story2.gsl"
+    level.opponentStory       = "story2.gsl"
     level.opponentName        = "Duke Beary"
     level.easySetting.type    = "FLOBO"
     level.easySetting.level   = 350

@@ -50,27 +50,41 @@ private:
 
 class PuyoLevelDefinitions {
 public:
-    PuyoLevelDefinitions(String levelDefinitionFile);
-    virtual ~PuyoLevelDefinitions();
-private:
     struct SelIA {
       SelIA(String type, int level);
         IA_Type type;
         int level;
     };
     struct LevelDefinition {
-      LevelDefinition(String levelName, String storyName, String opponentName,
+      LevelDefinition(String levelName, String introStory,
+		      String opponentStory, String opponentName, String backgroundTheme,
+		      String gameLostStory, String gameOverStory,
 		      SelIA easySettings, SelIA mediumSettings, SelIA hardSettings)
-	: levelName(levelName), storyName(storyName), opponentName(opponentName),
+	: levelName(levelName), introStory(introStory),
+	   opponentStory(opponentStory),  opponentName(opponentName), backgroundTheme(backgroundTheme),
+	   gameLostStory(gameLostStory), gameOverStory(gameOverStory),
 	   easySettings(easySettings), mediumSettings(mediumSettings), hardSettings(hardSettings) {}
       String levelName;
-      String storyName;
+      String introStory;
+      String opponentStory;
       String opponentName;
+      String backgroundTheme;
+      String gameLostStory;
+      String gameOverStory;
       SelIA easySettings;
       SelIA mediumSettings;
       SelIA hardSettings;
     };
-    void addLevelDefinition(String levelName, String storyName, String opponentName, SelIA easySettings, SelIA mediumSettings, SelIA hardSettings);
+
+    PuyoLevelDefinitions(String levelDefinitionFile);
+    LevelDefinition *getLevelDefinition(int levelNumber) { return levelDefinitions[levelNumber]; }
+    virtual ~PuyoLevelDefinitions();
+private:
+    void addLevelDefinition(String levelName, String introStory,
+			    String opponentStory, String opponentName, String backgroundTheme,
+			    String gameLostStory, String gameOverStory,
+			    SelIA easySettings,
+			    SelIA mediumSettings, SelIA hardSettings);
     static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static PuyoLevelDefinitions *currentDefinition;
     AdvancedBuffer<LevelDefinition *> levelDefinitions;
@@ -78,7 +92,7 @@ private:
 
 class PuyoSingleGameLevelData {
 public:
-    PuyoSingleGameLevelData(int gameLevel, int difficulty);
+    PuyoSingleGameLevelData(int gameLevel, int difficulty, PuyoLevelDefinitions &levelDefinitions);
     ~PuyoSingleGameLevelData();
     String getStory() const;
     String getGameLostStory() const;
@@ -87,9 +101,10 @@ public:
     PuyoLevelTheme &getLevelTheme() const;
     IA_Type getIAType() const;
     int getIALevel() const;
-    const char * getIAName() const;
+    String getIAName() const;
 private:
     int gameLevel, difficulty;
+    PuyoLevelDefinitions::LevelDefinition *levelDefinition;
     AnimatedPuyoSetTheme *themeToUse;
     PuyoLevelTheme *levelThemeToUse;
     struct SelIA {

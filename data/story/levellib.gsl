@@ -5,9 +5,13 @@ struct <IASetting:
     int    level>
 
 struct <Level:
-    string storyName,
-    string opponentName,
     string levelName,
+    string introStory,
+    string opponentStory,
+    string opponentName,
+    string backgroundTheme,
+    string gameLostStory,
+    string gameOverStory,
     IASetting easySetting,
     IASetting mediumSetting,
     IASetting hardSetting>
@@ -17,9 +21,13 @@ Level   level
 external <end_level>
 
 <start_level>
-    level.storyName     = "storyz.gsl"
-    level.opponentName  = "Unmapped Monster"
-    level.levelName     = "Unamed"
+    level.levelName           = "Untitled level"
+    level.introStory          = ""
+    level.opponentStory       = "storyz.gsl"
+    level.opponentName        = "Unmapped Monster"
+    level.backgroundTheme     = "Kaori's farm"
+    level.gameLostStory       = "gamelost1p.gsl"
+    level.gameOverStory       = "gameover1p.gsl"
     level.easySetting.type    = "RANDOM"
     level.easySetting.level   = 350
     level.mediumSetting.type  = "RANDOM"
