@@ -295,10 +295,13 @@ void PuyoCommander::initFonts()
   SoFont *textFont = SoFont_new();
   SoFont_load(textFont, font5b);
 
-  
+  SoFont_free(GameUIDefaults::FONT);
   GameUIDefaults::FONT            = menuFont;
+  SoFont_free(GameUIDefaults::FONT_TEXT);
   GameUIDefaults::FONT_TEXT       = textFont;
+  SoFont_free(GameUIDefaults::FONT_INACTIVE);
   GameUIDefaults::FONT_INACTIVE   = darkFont;
+  SoFont_free(GameUIDefaults::FONT_SMALL_INFO);
   GameUIDefaults::FONT_SMALL_INFO = smallFontInfo;
 }
 

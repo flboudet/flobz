@@ -65,6 +65,7 @@ SoFont_free (SoFont * font)
 		free (font->CharPos);
 	if (font->Spacing)
 		free (font->Spacing);
+    free(font);
 }
 
 // SoFontUtilities
