@@ -19,6 +19,25 @@ void SDL_Painter::requestDraw(IIM_Surface *surf, SDL_Rect *where)
   DrawElt elt;
   elt.surf =  surf;
   elt.rect = *where;
+  elt.what.x = 0;
+  elt.what.y = 0;
+  elt.what.w = surf->w;
+  elt.what.h = surf->h;
+  onScreenElts[nbElts++] = elt;
+}
+
+void SDL_Painter::requestDraw(IIM_Surface *surf, SDL_Rect *what, SDL_Rect *where)
+{
+#ifdef DEBUG
+  if (nbElts >= MAX_PAINT_ELTS) {
+    fprintf(stderr, "To much elements given to SDL_Painter...\n");
+    exit(1);
+  }
+#endif
+  DrawElt elt;
+  elt.surf =  surf;
+  elt.rect = *where;
+  elt.what = *what;
   onScreenElts[nbElts++] = elt;
 }
 
@@ -165,7 +184,8 @@ void SDL_Painter::draw(SDL_Surface *surf)
     for (int i=0; i<nbElts; ++i) {
       // Afficher ces elements.
       SDL_Rect rect = onScreenElts[i].rect;
-      SDL_BlitSurface(onScreenElts[i].surf->surf, NULL,
+      SDL_Rect what = onScreenElts[i].what;
+      SDL_BlitSurface(onScreenElts[i].surf->surf, &what,
                       surf, &rect);
     }
   }

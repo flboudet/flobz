@@ -10,6 +10,7 @@ extern SDL_Surface *display;
 struct DrawElt {
   IIM_Surface *surf;
   SDL_Rect     rect;
+  SDL_Rect     what;
 };
       
 class SDL_Painter
@@ -21,6 +22,7 @@ class SDL_Painter
 
       SDL_Painter(IIM_Surface *gameScreen = NULL, IIM_Surface *bg = NULL);
       void requestDraw(IIM_Surface *surf, SDL_Rect *where);
+      void requestDraw(IIM_Surface *surf, SDL_Rect *what, SDL_Rect *where);
       void draw(SDL_Surface *surf);
       void redrawAll(SDL_Surface *surf);
       void draw()      { draw(gameScreen->surf); }
