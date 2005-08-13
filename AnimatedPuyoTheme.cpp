@@ -780,7 +780,6 @@ static void loadTheme(String fullPath)
     if (!gsl) return;
     String libPath(getDataFolder());
     libPath += "/gfx/themelib.gsl";
-    //fprintf(stderr, "%s\n", libPath);
     char * fbuffer = gsl_init_buffer((const char *)libPath);
     gsl_append_file_to_buffer(scriptPath, &fbuffer);
     gsl_compile(gsl,fbuffer);

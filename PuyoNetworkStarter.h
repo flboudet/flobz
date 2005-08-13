@@ -28,6 +28,7 @@
 #include "PuyoStarter.h"
 #include "ios_messagebox.h"
 #include "PuyoNetworkView.h"
+#include "iosfc/ios_memory.h"
 
 class PuyoNetworkGameFactory : public PuyoGameFactory {
 public:
@@ -57,11 +58,13 @@ private:
 
 class NetworkStarterAction : public Action {
 public:
-    NetworkStarterAction(ios_fc::MessageBox &mbox);
+    NetworkStarterAction(String _IP);
+    ~NetworkStarterAction();
     void action();
     
 private:
-    ios_fc::MessageBox &mbox;
+    String IP;
+    ios_fc::MessageBox * mbox;
     void startGame();
     void gameOver();
     void endGameSession();

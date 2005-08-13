@@ -56,9 +56,16 @@ void PuyoNetworkGameWidget::cycle()
     PuyoGameWidget::cycle();
 }
 
-NetworkStarterAction::NetworkStarterAction(ios_fc::MessageBox &mbox)
-    : mbox(mbox), difficulty(1), gameScreen(NULL), gameWidget(NULL)
-{}
+NetworkStarterAction::NetworkStarterAction(String _IP)
+    : IP(_IP), difficulty(1), gameScreen(NULL), gameWidget(NULL)
+{
+    mbox = NULL;
+}
+
+NetworkStarterAction::~NetworkStarterAction()
+{
+    if (mbox != NULL) delete mbox;
+}
 
 void NetworkStarterAction::action()
 {
@@ -77,7 +84,9 @@ void NetworkStarterAction::startGame()
 {
     AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
     
-    gameWidget = new PuyoNetworkGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *(themeManager->getPuyoLevelTheme()), mbox, this);
+    if (mbox == NULL) mbox = new UDPMessageBox((const char *)IP, 6581, 6581);
+    
+    gameWidget = new PuyoNetworkGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *(themeManager->getPuyoLevelTheme()), *mbox, this);
     gameScreen = new PuyoGameScreen(*gameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
     /*if (nameProvider != NULL) {
         gameWidget->setPlayerOneName(nameProvider->getPlayer1Name());
