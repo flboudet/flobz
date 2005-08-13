@@ -193,6 +193,7 @@ void gsl_instr_free(Instruction *_this)
     free(_this->params[i]);
   }
   free(_this->params);
+  /* free(_this->vnamespace); ?? makes it crash??? */
   free(_this->types);
   free(_this);
 } /* }}} */
@@ -920,14 +921,6 @@ static void calculate_labels(InstructionFlow *iflow)
   }
 } /* }}} */
 
-static int powerOfTwo(int i)
-{
-  int b;
-  for (b=0;b<31;b++)
-    if (i == (1<<b))
-      return b;
-  return 0;
-}
 
 /* Cree un flow d'instruction optimise */
 static void gsl_create_fast_iflow(void)
@@ -947,7 +940,17 @@ static void gsl_create_fast_iflow(void)
   jitc = currentGoomSL->jitc = jitc_x86_env_new(0xffff);
   currentGoomSL->jitc_func = jitc_prepare_func(jitc);
 
-#if 0  
+#if 0
+
+static int powerOfTwo(int i)
+{
+  int b;
+  for (b=0;b<31;b++)
+    if (i == (1<<b))
+      return b;
+  return 0;
+}
+
 #define SRC_STRUCT_ID  instr[ip].data.usrc.var_int[-1]
 #define DEST_STRUCT_ID instr[ip].data.udest.var_int[-1]
 #define SRC_STRUCT_IBLOCK(i)  gsl->gsl_struct[SRC_STRUCT_ID]->iBlock[i]
