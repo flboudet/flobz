@@ -792,7 +792,7 @@
         
         while (cur != NULL)
         {
-          NodeType *x, *var;
+          NodeType *x, *var, *tmp;
 
           /* 1: x=var */
           x   = nodeClone(node->unode.opr.op[0]);
@@ -810,7 +810,9 @@
           x   = nodeClone(node->unode.opr.op[0]);
           var = cur->unode.opr.op[0];
           commit_node(new_set(var, x),0);
+	  tmp = cur;
           cur = cur->unode.opr.op[1];
+	  nodeFree(tmp);
         }
         nodeFree(node->unode.opr.op[0]);
     } /* }}} */
@@ -842,6 +844,7 @@
     }
     static void commit_block(NodeType *node) {
         commit_node(node->unode.opr.op[0]->unode.opr.next,0);
+	nodeFree(node->unode.opr.op[0]);
     } /* }}} */
 
     /* FUNCTION INTRO */
@@ -909,9 +912,12 @@
       }
       cur = node;
       while(cur != NULL) {
+        NodeType *tmp;
         NodeType *set = cur->unode.opr.op[0];
         commit_node(set,0);
+	tmp = cur;
         cur = cur->unode.opr.op[1];
+	if (tmp != node) nodeFree(tmp);
       }
     } /* }}} */
 
@@ -959,6 +965,7 @@
             }
         }
     }
+    
     static void commit_ext_call(NodeType *node) {
         NodeType *alafter = new_affect_list_after(node->unode.opr.op[0]);
         commit_node(node->unode.opr.op[0],0);
@@ -969,6 +976,7 @@
 #endif
         commit_node(alafter,0);
     }
+    
     static void commit_call(NodeType *node) {
         NodeType *alafter = new_affect_list_after(node->unode.opr.op[0]);
         commit_node(node->unode.opr.op[0],0);

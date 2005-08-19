@@ -4,5 +4,5 @@
   int i
   int x = 12
   int y = 13
-  for i in (x y) do print: msg="i = %d\n" argi=i
+  for i in (x y x y x y) do print: msg="i = %d\n" argi=i
 

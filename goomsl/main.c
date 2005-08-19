@@ -168,11 +168,14 @@ int main(int argc, char **argv)
     if (argc == 1) return 1;
 
     fbuffer = gsl_init_buffer(argv[argc-1]);
-    
     gsl =  gsl_new();
     if (!gsl) return 1;
     gsl_compile(gsl,fbuffer);
     bind(gsl);
     gsl_execute(gsl);
+
+    gsl_free(gsl);
+    free(fbuffer);
+    
     return 0;
 }

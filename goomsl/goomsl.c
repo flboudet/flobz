@@ -82,6 +82,7 @@ static void iflow_add_instr(InstructionFlow *_this, Instruction *instr);
 static void iflow_clean(InstructionFlow *_this);
 static void iflow_free(InstructionFlow *_this);
 static void iflow_execute(FastInstructionFlow *_this, GoomSL *gsl);
+static void gsl_fast_iflow_free(FastInstructionFlow *fastiflow);
 /* }}} */
 
   /************************************/
@@ -193,7 +194,7 @@ void gsl_instr_free(Instruction *_this)
     free(_this->params[i]);
   }
   free(_this->params);
-  /* free(_this->vnamespace); ?? makes it crash??? */
+  free(_this->vnamespace); /* ?? makes it crash??? */
   free(_this->types);
   free(_this);
 } /* }}} */
@@ -896,6 +897,9 @@ static void reset_scanner(GoomSL *gss)
 
   gss->compilationOK = 1;
 
+  gsl_fast_iflow_free(gss->fastiflow);
+  gss->fastiflow = NULL;
+
   goom_heap_delete(gss->data_heap);
   gss->data_heap = goom_heap_new();
 } /* }}} */
@@ -1291,6 +1295,13 @@ static int powerOfTwo(int i)
 #endif
 } /* }}} */
 
+void gsl_fast_iflow_free(FastInstructionFlow *fastiflow)
+{
+  if (fastiflow==NULL) return;
+  free(fastiflow->mallocedInstr);
+  free(fastiflow);
+}
+
 void yy_scan_string(const char *str);
 void yyparse(void);
 
@@ -1399,6 +1410,7 @@ GoomSL *gsl_new(void)
   gss->currentNS = 0;
   gss->namespaces[0] = gss->vars;
   gss->data_heap = goom_heap_new();
+  gss->fastiflow = NULL;
 
   reset_scanner(gss);
 
@@ -1427,11 +1439,19 @@ int gsl_is_compiled(GoomSL *gss)
   return gss->compilationOK;
 } /* }}} */
 
+static void functions_deletator(GoomHash *caller, const char *key, GHashValue *value)
+{
+  ExternalFunctionStruct *gef = (ExternalFunctionStruct*)value->ptr;
+  goom_hash_free(gef->vars);
+  free(gef);
+}
+
 void gsl_free(GoomSL *gss)
 { /* {{{ */
   int i;
   iflow_free(gss->iflow);
   goom_hash_free(gss->vars);
+  goom_hash_for_each(gss->functions, functions_deletator);
   goom_hash_free(gss->functions);
   goom_hash_free(gss->structIDS);
 
@@ -1445,6 +1465,7 @@ void gsl_free(GoomSL *gss)
     free(gss->gsl_struct);
   
   goom_heap_delete(gss->data_heap);
+  gsl_fast_iflow_free(gss->fastiflow);
 
   for (i=0; i<gss->nbPtr; i++) if (gss->ptrArray[i] != 0) free(gss->ptrArray[i]);
   free(gss->ptrArray);
