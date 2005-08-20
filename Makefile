@@ -35,7 +35,8 @@ flobopuyo: prelude iosfc_dir gametools_dir goomsl_dir ${OBJFILES}
 	@echo " Type ./$(PRGNAME) to play."
 	@echo "--------------------------------------"
 
-prelude:all.h.gch
+prelude: all.h.gch
+	@./configure
 	@echo "Compiling with CFLAGS=$(CFLAGS)"
 	@echo "Compiling with LDFLAGS=$(LDFLAGS)"
 

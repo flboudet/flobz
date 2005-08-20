@@ -26,6 +26,7 @@ using ios_fc::Exception;
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 IosVector::IosVector()
 {
@@ -106,6 +107,6 @@ void IosVector::increaseVectorSize()
 void IosVector::dumpVector() const {
 	fprintf(stderr, "Size: %d\n", getSize());
 	for (int i = 0, j = getSize() ; i < j ; i++)
-		fprintf(stderr, "elt[%d]=%d ", i, (int)getElementAt(i));
+		fprintf(stderr, "elt[%d]=%x ", i, (intptr_t)getElementAt(i));
 	fprintf(stderr, "\n");
 }
