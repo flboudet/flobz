@@ -1302,7 +1302,9 @@ void gsl_fast_iflow_free(FastInstructionFlow *fastiflow)
   free(fastiflow);
 }
 
-void yy_scan_string(const char *str);
+typedef void * YY_BUFFER_STATE;
+YY_BUFFER_STATE yy_scan_string(const char *str);
+void yy_delete_buffer(YY_BUFFER_STATE buffer);
 void yyparse(void);
 
 GoomHash *gsl_globals(GoomSL *_this)
@@ -1348,6 +1350,7 @@ void gsl_compile(GoomSL *_currentGoomSL, const char *script)
     "external <charAt: string value, int index> : int\n"
     "external <f2i: float value> : int\n"
     "external <i2f: int value> : float\n";
+  YY_BUFFER_STATE currentBuffer;
 
 #ifdef VERBOSE
   printf("\n=== Starting Compilation ===\n");
@@ -1362,9 +1365,10 @@ void gsl_compile(GoomSL *_currentGoomSL, const char *script)
   reset_scanner(currentGoomSL);
 
   /* 1- create the syntaxic tree */
-  yy_scan_string(script_and_externals);
+  currentBuffer = yy_scan_string(script_and_externals);
   yyparse();
-
+  yy_delete_buffer(currentBuffer);
+  
   /* 2- generate code */
   gsl_commit_compilation();
 
