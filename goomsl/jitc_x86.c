@@ -434,7 +434,7 @@ JitcX86Env *jitc_x86_env_new(int memory_size) {
     JitcX86Env *jitc = (JitcX86Env*)malloc(sizeof(JitcX86Env));
     jitc->_memory = (unsigned char*)malloc(memory_size);
     jitc->used    = 0;
-    jitc->memory  = (unsigned char*)((int)jitc->_memory + (32-((int)jitc->_memory)%32)%32);
+    jitc->memory  = (unsigned char*)((intptr_t)jitc->_memory + (32-((intptr_t)jitc->_memory)%32)%32);
 
     jitc->nbUsedLabel  = 0;
     jitc->nbKnownLabel = 0;

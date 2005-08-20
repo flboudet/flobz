@@ -3,6 +3,7 @@
  */
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 
 #define JITC_MAXLABEL 1024
@@ -162,17 +163,17 @@ typedef struct _JITC_X86_ENV {
 
 #define JITC_FLD_pIMM32(jitc,address)       { JITC_ADD_UCHAR  (jitc, 0xD9); \
                                               JITC_MODRM      (jitc, 0x00, 0x00,JITC_RM_DISP32); \
-                                              JITC_ADD_UINT(jitc,(int)(address)); }
+                                              JITC_ADD_UINT(jitc,(intptr_t)(address)); }
 #define JITC_FLD_STi(jict,reg)              { JITC_ADD_2UCHAR (jitc, 0xD9, 0xC0+reg); }
 
 #define JITC_FST_pIMM32(jitc,address)       { JITC_ADD_UCHAR  (jitc, 0xD9); \
                                               JITC_MODRM      (jitc, 0x00, 0x02,JITC_RM_DISP32); \
-                                              JITC_ADD_UINT(jitc,(int)(ADDRess)); }
+                                              JITC_ADD_UINT(jitc,(intptr_t)(address)); }
 #define JITC_FST_STi(jict,reg)              { JITC_ADD_2UCHAR (jitc, 0xDD, 0xD0+reg); }
 
 #define JITC_FSTP_pIMM32(jitc,address)      { JITC_ADD_UCHAR  (jitc, 0xD9); \
                                               JITC_MODRM      (jitc, 0x00, 0x03, JITC_RM_DISP32); \
-                                              JITC_ADD_UINT(jitc,(int)(address)); }
+                                              JITC_ADD_UINT(jitc,(intptr_t)(address)); }
 #define JITC_FSTP_STi(jict,reg)             { JITC_ADD_2UCHAR (jitc, 0xDD, 0xD8+reg); }
 
 #define JITC_FADD
@@ -187,7 +188,7 @@ typedef struct _JITC_X86_ENV {
                                               JITC_ADD_UCHAR(jitc,0x80+cond);\
                                               JITC_ADD_UINT(jitc,offset); }
 #define JITC_JUMP_COND_LABEL(jitc,cond,label) { jitc_add_used_label(jitc,label,jitc->used+2); JITC_JUMP_COND(jitc,cond,0); }
-#define JITC_CALL(jitc,function)            { int __offset__ = (int)function - (int)(&jitc->memory[jitc->used+5]);\
+#define JITC_CALL(jitc,function)            { int __offset__ = (intptr_t)function - (intptr_t)(&jitc->memory[jitc->used+5]);\
                                               JITC_ADD_UCHAR(jitc,0xe8); JITC_ADD_UINT(jitc,__offset__); }
 /*#define JITC_CALL_pREG(jitc,reg)            { JITC_ADD_UCHAR(jitc,0xff); JITC_ADD_UCHAR(jitc,0xd0+reg); }
 #define JITC_CALL_LABEL(jitc,label)         { jitc_add_used_label(jitc,label,jitc->used+1); JITC_CALL(jitc,0); }*/
