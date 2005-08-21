@@ -26,14 +26,34 @@
 #include "PuyoSinglePlayerStarter.h"
 #include "PuyoView.h"
 
+PuyoCombinedEventPlayer::PuyoCombinedEventPlayer(PuyoView &view)
+    : PuyoPlayer(view),
+      player1controller(view, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left, GameControlEvent::kPlayer1Right,
+                       GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
+      player2controller(view, GameControlEvent::kPlayer2Down, GameControlEvent::kPlayer2Left, GameControlEvent::kPlayer2Right,
+                       GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight)
+{
+}
+
+void PuyoCombinedEventPlayer::eventOccured(GameControlEvent *event)
+{
+    player1controller.eventOccured(event);
+    player2controller.eventOccured(event);
+}
+
+void PuyoCombinedEventPlayer::cycle()
+{
+    player1controller.cycle();
+    player2controller.cycle();
+}
+    
 PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, int lifes, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
                                                      attachedGameFactory(&attachedRandom),
                                                      areaA(&attachedGameFactory, &attachedPuyoThemeSet,
                                                      1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
                                                      areaB(&attachedGameFactory, &attachedPuyoThemeSet,
                                                      1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
-                                                     playercontroller(areaA, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left, GameControlEvent::kPlayer1Right,
-                                                     GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
+                                                     playercontroller(areaA),
                                                      opponentcontroller(type, level, areaB)
 {
     initialize(areaA, areaB, playercontroller, opponentcontroller, levelTheme, gameOverAction);

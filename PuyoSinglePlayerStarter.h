@@ -35,6 +35,16 @@ public:
     virtual String getPlayerName() const = 0;
 };
 
+class PuyoCombinedEventPlayer : public PuyoPlayer {
+public:
+    PuyoCombinedEventPlayer(PuyoView &view);
+    void eventOccured(GameControlEvent *event);
+    void cycle();
+private:
+    PuyoEventPlayer player1controller;
+    PuyoEventPlayer player2controller;
+};
+
 class PuyoSinglePlayerGameWidget : public PuyoGameWidget {
 public:
     PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, int lifes, Action *gameOverAction = NULL);
@@ -44,7 +54,7 @@ private:
     PuyoRandomSystem attachedRandom;
     PuyoLocalGameFactory attachedGameFactory;
     PuyoView areaA, areaB;
-    PuyoEventPlayer playercontroller;
+    PuyoCombinedEventPlayer playercontroller;
     PuyoIA opponentcontroller;
 };
 
