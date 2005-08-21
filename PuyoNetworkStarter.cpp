@@ -43,17 +43,26 @@ PuyoNetworkGameWidget::PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet,
             1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, painter),
       networkArea(&attachedNetworkGameFactory, &attachedPuyoThemeSet,
             1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
-      playercontroller(localArea, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left, GameControlEvent::kPlayer1Right,
-      GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight), dummyPlayerController(networkArea)
+      playercontroller(localArea), dummyPlayerController(networkArea)
 {
+    mbox.addListener(this);
     initialize(localArea, networkArea, playercontroller, dummyPlayerController, levelTheme, gameOverAction);
     setLives(-1);
+}
+
+PuyoNetworkGameWidget::~PuyoNetworkGameWidget()
+{
+    mbox.removeListener(this);
 }
 
 void PuyoNetworkGameWidget::cycle()
 {
     mbox.idle();
     PuyoGameWidget::cycle();
+}
+
+void PuyoNetworkGameWidget::onMessage(Message &)
+{
 }
 
 NetworkStarterAction::NetworkStarterAction(String _IP)

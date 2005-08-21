@@ -26,6 +26,7 @@
 #define _PUYONETWORKSTARTER
 
 #include "PuyoStarter.h"
+#include "PuyoSinglePlayerStarter.h"
 #include "ios_messagebox.h"
 #include "PuyoNetworkView.h"
 #include "iosfc/ios_memory.h"
@@ -39,11 +40,13 @@ private:
     MessageBox &msgBox;
 };
 
-class PuyoNetworkGameWidget : public PuyoGameWidget {
+class PuyoNetworkGameWidget : public PuyoGameWidget, MessageListener {
 public:
     PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, Action *gameOverAction = NULL);
+    ~PuyoNetworkGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
+    void onMessage(Message &);
 private:
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;
@@ -52,7 +55,7 @@ private:
     PuyoNetworkGameFactory attachedNetworkGameFactory;
     PuyoNetworkView localArea;
     PuyoView networkArea;
-    PuyoEventPlayer playercontroller;
+    PuyoCombinedEventPlayer playercontroller;
     PuyoNullPlayer dummyPlayerController;
 };
 

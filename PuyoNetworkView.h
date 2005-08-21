@@ -40,7 +40,7 @@ class PuyoNetworkView : public PuyoView {
                     int nXOffset, int nYOffset, MessageBox *mbox,
                     SDL_Painter &painterToUse = painter)
         : PuyoView(attachedPuyoGameFactory, attachedPuyoThemeSet,
-		   xOffset, yOffset, nXOffset, nYOffset, painter),
+		   xOffset, yOffset, nXOffset, nYOffset, painterToUse),
           mbox(mbox),badPuyos(0) {}
         
     void cycleGame();
