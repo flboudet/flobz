@@ -127,6 +127,8 @@ void NetworkStarterAction::endGameSession()
 }
 
 
+#ifdef DESACTIVE
+
 PuyoNetworkStarter::PuyoNetworkStarter(PuyoCommander *commander, int theme, ios_fc::MessageBox *mbox)
 : PuyoStarter(commander, theme), mbox(mbox)
 {
@@ -236,3 +238,5 @@ void PuyoNetworkStarter::onMessage(Message &message)
         printf("Message invalide!\n");
     }
 }
+
+#endif // DESACTIVE

@@ -78,18 +78,4 @@ private:
     //PuyoTwoNameProvider *nameProvider;
 };
 
-class PuyoNetworkStarter : public PuyoStarter, MessageListener {
-public:
-    PuyoNetworkStarter(PuyoCommander *commander, int theme, ios_fc::MessageBox *mbox);
-    //virtual void run(int score1, int score2, int lives, int point1, int point2);
-    void cycle();
-    void backPressed();
-    
-    void onMessage(Message &message);
-    
-private:
-    bool netgame_started;
-    ios_fc::MessageBox *mbox;
-};
-
 #endif // _PUYONETWORKSTARTER

@@ -168,9 +168,9 @@ void NetCenterMenu::gameInvitationAgainst(String playerName, PeerAddress playerA
 
 void NetCenterMenu::gameGrantedWithMessagebox(MessageBox *mbox)
 {
-    PuyoStarter *starter = new PuyoNetworkStarter(theCommander, 0, mbox);
-    starter->run(0,0,0,0,0);
-    GameUIDefaults::SCREEN_STACK->push(starter);
+    //PuyoStarter *starter = new PuyoNetworkStarter(theCommander, 0, mbox);
+    //starter->run(0,0,0,0,0);
+    //GameUIDefaults::SCREEN_STACK->push(starter);
 }
 
 void NetCenterMenu::playerSelected(PeerAddress playerAddress)
