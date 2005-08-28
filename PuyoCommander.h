@@ -43,6 +43,7 @@ class PuyoRealMainScreen : public PuyoScreen {
     void popMenu();
     void build() {}
     void transitionFromScreen(Screen &fromScreen);
+    void onEvent(GameControlEvent *cevent);
   protected:
     SliderContainer container;
     PuyoStoryWidget *story;

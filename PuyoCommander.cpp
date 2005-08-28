@@ -98,6 +98,8 @@ void PuyoRealMainScreen::pushMenu(PuyoMainScreenMenu *menu)
 
 void PuyoRealMainScreen::popMenu()
 {
+    if (menuStack.size() == 1)
+        return;
     container.transitionToContent(menuStack.top());
     menuStack.pop();
 }
@@ -116,6 +118,18 @@ void PuyoRealMainScreen::transitionFromScreen(Screen &fromScreen)
 
     container.setPosition(menuPos);
     container.setSize(Vec3(menuBG->w, menuBG->h, 0));
+}
+
+void PuyoRealMainScreen::onEvent(GameControlEvent *cevent)
+{
+    switch (cevent->cursorEvent) {
+    case GameControlEvent::kStart:
+        break;
+    case GameControlEvent::kBack:
+        popMenu();
+        break;
+    }
+    PuyoScreen::onEvent(cevent);
 }
 
 class MainRealMenu : public PuyoMainScreenMenu {
