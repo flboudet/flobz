@@ -90,9 +90,9 @@ public:
     void setPlayerTwoName(String newName) { playerTwoName = newName; }
     String getPlayerOneName() const { return playerOneName; }
     int getPointsPlayerOne() { return attachedGameA->getPoints(); }
+    virtual PuyoStoryWidget *getOpponentFace() { return NULL; }
 protected:
     SDL_Painter painter;
-private:
     PuyoLevelTheme *attachedLevelTheme;
     PuyoView *areaA, *areaB;
     PuyoPlayer *controllerA, *controllerB;

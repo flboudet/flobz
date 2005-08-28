@@ -2,6 +2,7 @@
     level.levelName           = "Kaori vs the Men's Best Friend"
     level.opponentStory       = "story1.gsl"
     level.opponentName        = "Herbert the Dog"
+    level.opponentFace        = "herbert.gsl"
     level.easySetting.type    = "RANDOM"
     level.easySetting.level   = 350
     level.mediumSetting.type  = "FLOBO"
@@ -20,5 +21,89 @@
     level.mediumSetting.level = 180
     level.hardSetting.type    = "JEKO"
     level.hardSetting.level   = 100
+[end_level]
+
+[start_level]
+    level.levelName           = "The Unmapped Level"
+    level.opponentStory       = "storyz.gsl"
+    level.opponentName        = "Unmapped Monster"
+    level.easySetting.type    = "FLOBO"
+    level.easySetting.level   = 250
+    level.mediumSetting.type  = "TANIA"
+    level.mediumSetting.level = 160
+    level.hardSetting.type    = "GYOM"
+    level.hardSetting.level   = 90
+[end_level]
+
+[start_level]
+    level.levelName           = "Close encounters of the third kind"
+    level.opponentStory       = "storyz.gsl"
+    level.opponentName        = "Azrael"
+    level.easySetting.type    = "FLOBO"
+    level.easySetting.level   = 180
+    level.mediumSetting.type  = "FLOBO"
+    level.mediumSetting.level = 90
+    level.hardSetting.type    = "JEKO"
+    level.hardSetting.level   = 80
+[end_level]
+
+[start_level]
+    level.levelName           = "The Unmapped Level, V2"
+    level.opponentStory       = "storyz.gsl"
+    level.opponentName        = "Unmapped Monster V2"
+    level.easySetting.type    = "FLOBO"
+    level.easySetting.level   = 90
+    level.mediumSetting.type  = "GYOM"
+    level.mediumSetting.level = 210
+    level.hardSetting.type    = "TANIA"
+    level.hardSetting.level   = 60
+[end_level]
+
+[start_level]
+    level.levelName           = "Unnamed level"
+    level.opponentStory       = "storyz.gsl"
+    level.opponentName        = "Zklogh"
+    level.easySetting.type    = "JEKO"
+    level.easySetting.level   = 350
+    level.mediumSetting.type  = "TANIA"
+    level.mediumSetting.level = 90
+    level.hardSetting.type    = "GYOM"
+    level.hardSetting.level   = 60
+[end_level]
+
+[start_level]
+    level.levelName           = "The Beauty and the Beast"
+    level.opponentStory       = "storyz.gsl"
+    level.opponentName        = "MegaPuyo"
+    level.easySetting.type    = "TANIA"
+    level.easySetting.level   = 320
+    level.mediumSetting.type  = "JEKO"
+    level.mediumSetting.level = 80
+    level.hardSetting.type    = "GYOM"
+    level.hardSetting.level   = 40
+[end_level]
+
+[start_level]
+    level.levelName           = "Adam McFlurry"
+    level.opponentStory       = "storyz.gsl"
+    level.opponentName        = "Adam McFlurry"
+    level.easySetting.type    = "FLOBO"
+    level.easySetting.level   = 62
+    level.mediumSetting.type  = "GYOM"
+    level.mediumSetting.level = 90
+    level.hardSetting.type    = "GYOM"
+    level.hardSetting.level   = 30
+[end_level]
+
+[start_level]
+    level.levelName           = "MechaPuyo"
+    level.opponentStory       = "storyz.gsl"
+    level.opponentName        = "MechaPuyo"
+    level.easySetting.type    = "RANDOM"
+    level.easySetting.level   = 0
+    level.mediumSetting.type  = "RANDOM"
+    level.mediumSetting.level = 0
+    level.hardSetting.type    = "RANDOM"
+    level.hardSetting.level   = 0
 [end_level]
 

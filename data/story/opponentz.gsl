@@ -1,0 +1,19 @@
+<init>
+  # Init function: called when script is loaded
+  Display @display  = [new_display: x=254.0 y=196.0 width=140.0 height=220.0]
+  int @maxHeightPlayer = 0
+  int @maxHeightAI = 0
+  int @neutralsForPlayer = 0
+  int @neutralsForAI = 0
+
+  Sprite @opponentz      = [new_sprite: image="unmappedmonstersmall.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+
+<sprite_list>
+  # Call the 'sprite' function for each sprite you want to update/draw
+  # This also allows you to specify the drawing order
+  sprite::@opponentz display=@display
+
+<update>
+  # Update function: called every animation cycle
+
+

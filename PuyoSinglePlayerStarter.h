@@ -47,8 +47,10 @@ private:
 
 class PuyoSinglePlayerGameWidget : public PuyoGameWidget {
 public:
-    PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, int lifes, Action *gameOverAction = NULL);
+    PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, int lifes, String aiFace, Action *gameOverAction = NULL);
     bool didPlayerWon() const { return isGameARunning(); }
+    void cycle();
+    PuyoStoryWidget *getOpponentFace();
 private:
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;
@@ -56,6 +58,8 @@ private:
     PuyoView areaA, areaB;
     PuyoCombinedEventPlayer playercontroller;
     PuyoIA opponentcontroller;
+    int faceTicks;
+    PuyoStoryWidget opponentFace;
 };
 
 class PuyoLevelDefinitions {
@@ -67,17 +71,18 @@ public:
     };
     struct LevelDefinition {
       LevelDefinition(String levelName, String introStory,
-		      String opponentStory, String opponentName, String backgroundTheme,
-		      String gameLostStory, String gameOverStory,
+		      String opponentStory, String opponentName, String opponentFace,
+              String backgroundTheme, String gameLostStory, String gameOverStory,
 		      SelIA easySettings, SelIA mediumSettings, SelIA hardSettings)
 	: levelName(levelName), introStory(introStory),
-	   opponentStory(opponentStory),  opponentName(opponentName), backgroundTheme(backgroundTheme),
-	   gameLostStory(gameLostStory), gameOverStory(gameOverStory),
+	   opponentStory(opponentStory),  opponentName(opponentName), opponentFace(opponentFace),
+       backgroundTheme(backgroundTheme), gameLostStory(gameLostStory), gameOverStory(gameOverStory),
 	   easySettings(easySettings), mediumSettings(mediumSettings), hardSettings(hardSettings) {}
       String levelName;
       String introStory;
       String opponentStory;
       String opponentName;
+      String opponentFace;
       String backgroundTheme;
       String gameLostStory;
       String gameOverStory;
@@ -85,14 +90,13 @@ public:
       SelIA mediumSettings;
       SelIA hardSettings;
     };
-
     PuyoLevelDefinitions(String levelDefinitionFile);
     LevelDefinition *getLevelDefinition(int levelNumber) { return levelDefinitions[levelNumber]; }
     virtual ~PuyoLevelDefinitions();
 private:
     void addLevelDefinition(String levelName, String introStory,
-			    String opponentStory, String opponentName, String backgroundTheme,
-			    String gameLostStory, String gameOverStory,
+			    String opponentStory, String opponentName, String opponentFace,
+                String backgroundTheme, String gameLostStory, String gameOverStory,
 			    SelIA easySettings,
 			    SelIA mediumSettings, SelIA hardSettings);
     static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local);
@@ -112,6 +116,7 @@ public:
     IA_Type getIAType() const;
     int getIALevel() const;
     String getIAName() const;
+    String getIAFace() const;
 private:
     int gameLevel, difficulty;
     PuyoLevelDefinitions::LevelDefinition *levelDefinition;

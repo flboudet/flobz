@@ -1,0 +1,42 @@
+<init>
+  # Init function: called when script is loaded
+  Display @display  = [new_display: x=254.0 y=196.0 width=140.0 height=220.0]
+  int @maxHeightPlayer = 0
+  int @maxHeightAI = 0
+  int @neutralsForPlayer = 0
+  int @neutralsForAI = 0
+
+  Sprite @dog      = [new_sprite: image="herbert/dog.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @dogEyes  = [new_sprite: image="herbert/evileyes.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=10.0]
+  Sprite @dogMouth  = [new_sprite: image="null.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @dogHot   = [new_sprite: image="null.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.4 nbframes=6.0]
+<sprite_list>
+  # Call the 'sprite' function for each sprite you want to update/draw
+  # This also allows you to specify the drawing order
+  sprite::@dog display=@display
+  sprite::@dogEyes display=@display
+  sprite::@dogMouth display=@display
+  sprite::@dogHot display=@display
+
+<update>
+  # Update function: called every animation cycle
+  int showDogHot = 0
+  @dogEyes.image = "herbert/evileyes.png"
+  @dogMouth.image = "null.png"
+  (@maxHeightPlayer > 8)? @dogMouth.image = "herbert/funmouth.png"
+  (@neutralsForPlayer > 6)? @dogMouth.image = "herbert/funmouth.png"
+
+  (@maxHeightAI   > 7)? @dogEyes.image = "herbert/sadeyes.png"
+  (@maxHeightAI > 10)? {
+    showDogHot = 1
+    @dogMouth.image = "null.png"
+  }
+  (@neutralsForAI > 6)? @dogEyes.image = "herbert/sadeyes.png"
+  (@neutralsForAI > 12)? showDogHot = 1
+  (@dogEyes.curframe > 9.0)? @dogEyes.image = "null.png"
+  @dogHot.image = "null.png"
+  (showDogHot = 1)? {
+    (@dogHot.curframe > 4.0)? @dogHot.image = "herbert/hot1.png"
+    (@dogHot.curframe > 5.0)? @dogHot.image = "herbert/hot2.png"
+  }
+

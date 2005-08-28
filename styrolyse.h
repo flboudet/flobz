@@ -24,6 +24,7 @@ void styrolyse_free(Styrolyse *_this);
 void styrolyse_update(Styrolyse *_this);
 int  styrolyse_finished(Styrolyse *_this);
 void styrolyse_draw(Styrolyse *_this);
+void styrolyse_setint(Styrolyse *_this, const char *varname, int value);
 
 int  styrolyse_current_cycle(Styrolyse *_this);
 

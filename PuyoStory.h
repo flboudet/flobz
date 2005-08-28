@@ -47,6 +47,7 @@ public:
     void cycle();
     void draw(SDL_Surface *screen);
     IdleComponent *getIdleComponent() { return this; }
+    void setIntegerValue(String varName, int value);
 private:
     Styrolyse *currentStory;
     Action *finishedAction;
@@ -63,18 +64,6 @@ private:
     PuyoStoryWidget storyWidget;
     Action *finishedAction;
     PuyoScreenTransitionWidget transitionWidget;
-};
-
-class PuyoStory : public DrawableComponent {
-  public:
-    PuyoStory(PuyoCommander *com, int num);
-    virtual ~PuyoStory();
-    void loop();
-    void draw();
-  private:
-    int num;
-    Styrolyse *currentStory;
-    PuyoCommander *commander;
 };
 
 #endif

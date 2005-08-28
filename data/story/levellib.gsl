@@ -9,6 +9,7 @@ struct <Level:
     string introStory,
     string opponentStory,
     string opponentName,
+    string opponentFace,
     string backgroundTheme,
     string gameLostStory,
     string gameOverStory,
@@ -25,6 +26,7 @@ external <end_level>
     level.introStory          = ""
     level.opponentStory       = "storyz.gsl"
     level.opponentName        = "Unmapped Monster"
+    level.opponentFace        = "opponentz.gsl"
     level.backgroundTheme     = "Kaori's farm"
     level.gameLostStory       = "gamelost1p.gsl"
     level.gameOverStory       = "gameover1p.gsl"

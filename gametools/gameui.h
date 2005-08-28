@@ -118,7 +118,9 @@ namespace gameui {
       Vec3    preferedSize;
       Vec3    size;
       Vec3    position;
+    protected:
       bool    hidden;
+    private:
       bool    focus;
       bool    focusable;
       bool _drawRequested;

@@ -128,10 +128,16 @@ void PuyoStoryWidget::cycle()
 
 void PuyoStoryWidget::draw(SDL_Surface *screen)
 {
+    if (hidden) return;
     sstory = screen;
     styrolyse_draw(currentStory);
     // SDL_BlitSurface(sstory, NULL, screen, NULL);
     SDL_SetClipRect(screen, NULL);
+}
+
+void PuyoStoryWidget::setIntegerValue(String varName, int value)
+{
+    styrolyse_setint(currentStory, varName, value);
 }
 
 PuyoStoryScreen::PuyoStoryScreen(int num, Screen &previousScreen, Action *finishedAction) : Screen(0, 0, 640, 480), storyWidget(num, finishedAction), finishedAction(finishedAction), transitionWidget(previousScreen, NULL)
@@ -163,56 +169,3 @@ void PuyoStoryScreen::onEvent(GameControlEvent *cevent)
     Screen::onEvent(cevent);
 }
 
-PuyoStory::PuyoStory(PuyoCommander *com, int num) : num(num), commander(com)
-{
-    char scriptPath[1024];
-    sprintf(scriptPath, "%s/story/story%d.gsl",dataFolder, num);
-    FILE *test = fopen(scriptPath, "r");
-    if (test == NULL) {
-        sprintf(scriptPath, "%s/story/storyz.gsl",dataFolder);
-    }
-    else fclose(test);
-    currentStory = styrolyse_new(scriptPath, client_new());
-    sstory = createStorySurface();
-}
-
-PuyoStory::~PuyoStory()
-{
-    styrolyse_free(currentStory);
-}
-
-void PuyoStory::loop()
-{
-  // TODO: UNCOMMENT ALL!
-/*    while (!styrolyse_finished(currentStory)) {
-        styrolyse_update(currentStory);
-//        SDL_FillRect(sstory,  NULL, 0);
-        commander->updateAll(this);
-
-        SDL_Event e;
-        while (SDL_PollEvent (&e)) {
-            GameControlEvent controlEvent;
-            getControlEvent(e, &controlEvent);
- 
-            switch (controlEvent.cursorEvent) {
-                case GameControlEvent::kQuit:
-                  exit(0);
-                case GameControlEvent::kStart:
-                case GameControlEvent::kBack:
-                    return;
-                default:
-                    break;
-                case GameControlEvent::kDown:
-                    for (int i=0;i<100;++i)
-                      styrolyse_update(currentStory);
-            }
-        }
-    }
-*/
-}
-
-void PuyoStory::draw()
-{
-  styrolyse_draw(currentStory);
-  SDL_BlitSurface(sstory, NULL, display, NULL);
-}

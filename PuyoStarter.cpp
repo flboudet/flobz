@@ -421,6 +421,7 @@ PuyoGameScreen::PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScree
       overlayStory(NULL)
 {
     add(&gameWidget);
+    add(gameWidget.getOpponentFace());
     add(&transitionWidget);
 }
 
@@ -441,6 +442,7 @@ void PuyoGameScreen::backPressed()
     if (gameWidget.backPressed())
         return;
     if (!paused) {
+        gameWidget.getOpponentFace()->hide();
         this->add(&pauseMenu);
         this->focus(&pauseMenu);
         paused = true;
@@ -449,6 +451,7 @@ void PuyoGameScreen::backPressed()
     }
     else {
         paused = false;
+        gameWidget.getOpponentFace()->show();
         this->remove(&pauseMenu);
         this->focus(&gameWidget);
         gameWidget.resume();
