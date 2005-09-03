@@ -83,7 +83,7 @@ const char *Local2PlayersGameMenu::getDefaultPlayer2Name()
 Local2PlayersGameMenu::Local2PlayersGameMenu(PuyoRealMainScreen *mainScreen)
     : PuyoMainScreenMenu(mainScreen), screenTitle("Choose Game Level"), editPlayer1Name("Player 1 Name:", getDefaultPlayer1Name()),
       editPlayer2Name("Player 2 Name:", getDefaultPlayer2Name()),
-      easyAction(EASY, this), mediumAction(MEDIUM, this), hardAction(HARD, this), popAction(mainScreen),
+      easyAction(EASY, gameWidgetFactory, this), mediumAction(MEDIUM, gameWidgetFactory, this), hardAction(HARD, gameWidgetFactory, this), popAction(mainScreen),
       easy("Easy", &easyAction), medium("Medium", &mediumAction), hard("Hard", &hardAction), back("Cancel", &popAction)
 {}
 

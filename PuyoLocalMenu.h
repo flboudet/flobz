@@ -62,6 +62,7 @@ public:
 private:
     static const char *getDefaultPlayer1Name();
     static const char *getDefaultPlayer2Name();
+    PuyoLocalTwoPlayerGameWidgetFactory gameWidgetFactory;
     EditFieldWithLabel editPlayer1Name, editPlayer2Name;
     Text screenTitle;
     TwoPlayersStarterAction easyAction;

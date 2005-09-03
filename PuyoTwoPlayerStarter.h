@@ -46,9 +46,22 @@ private:
 };
 
 
+class PuyoGameWidgetFactory {
+public:
+    virtual PuyoGameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction) = 0;
+};
+
+class PuyoLocalTwoPlayerGameWidgetFactory : public PuyoGameWidgetFactory {
+public:
+    PuyoGameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction)
+    {
+        return new PuyoTwoPlayersGameWidget(puyoThemeSet, levelTheme, gameOverAction);
+    }
+};
+
 class TwoPlayersStarterAction : public Action {
 public:
-    TwoPlayersStarterAction(int difficulty, PuyoTwoNameProvider *nameProvider = NULL);
+    TwoPlayersStarterAction(int difficulty, PuyoGameWidgetFactory &gameWidgetFactory, PuyoTwoNameProvider *nameProvider = NULL);
     void action();
     
 private:    
@@ -57,8 +70,9 @@ private:
     void endGameSession();
     
     int difficulty;
+    PuyoGameWidgetFactory &gameWidgetFactory;
     PuyoGameScreen *gameScreen;
-    PuyoTwoPlayersGameWidget *gameWidget;
+    PuyoGameWidget *gameWidget;
     PuyoTwoNameProvider *nameProvider;
 };
 

@@ -40,8 +40,8 @@ PuyoTwoPlayersGameWidget::PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThe
     setLives(-1);
 }
 
-TwoPlayersStarterAction::TwoPlayersStarterAction(int difficulty, PuyoTwoNameProvider *nameProvider)
-    : difficulty(difficulty), gameScreen(NULL), nameProvider(nameProvider) {}
+TwoPlayersStarterAction::TwoPlayersStarterAction(int difficulty, PuyoGameWidgetFactory &gameWidgetFactory, PuyoTwoNameProvider *nameProvider)
+    : difficulty(difficulty), gameWidgetFactory(gameWidgetFactory), gameScreen(NULL), nameProvider(nameProvider) {}
 
 void TwoPlayersStarterAction::action()
 {
@@ -60,7 +60,7 @@ void TwoPlayersStarterAction::startGame()
 {
     AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
     
-    gameWidget = new PuyoTwoPlayersGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *(themeManager->getPuyoLevelTheme()), this);
+    gameWidget = gameWidgetFactory.createGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *(themeManager->getPuyoLevelTheme()), this);
     gameScreen = new PuyoGameScreen(*gameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
     if (nameProvider != NULL) {
         gameWidget->setPlayerOneName(nameProvider->getPlayer1Name());
@@ -72,12 +72,27 @@ void TwoPlayersStarterAction::startGame()
 void TwoPlayersStarterAction::gameOver()
 {
     GameUIDefaults::SCREEN_STACK->pop();
-    delete gameWidget;
-    delete gameScreen;
+    if (gameWidget != NULL) {
+        delete gameWidget;
+        delete gameScreen;
+    }
+    AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
     
-    gameScreen = NULL;
-    gameWidget = NULL;
-    startGame();
+    PuyoTwoPlayersGameWidget *newGameWidget = new PuyoTwoPlayersGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *(themeManager->getPuyoLevelTheme()), this);
+    PuyoGameScreen *newGameScreen = new PuyoGameScreen(*gameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
+    if (nameProvider != NULL) {
+        gameWidget->setPlayerOneName(nameProvider->getPlayer1Name());
+        gameWidget->setPlayerTwoName(nameProvider->getPlayer2Name());
+    }
+    /*
+    GameUIDefaults::SCREEN_STACK->pop();
+    if (gameWidget != NULL) {
+        delete gameWidget;
+        delete gameScreen;
+    }*/
+    gameScreen = newGameScreen;
+    gameWidget = newGameWidget;
+    GameUIDefaults::SCREEN_STACK->push(gameScreen);
 }
 
 void TwoPlayersStarterAction::endGameSession()
