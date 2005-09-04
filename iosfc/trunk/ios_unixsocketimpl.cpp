@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/select.h>
 #include <sys/ioctl.h>
 #include <netinet/in.h>
 #include <netdb.h>
@@ -33,7 +34,15 @@
 
 namespace ios_fc {
 
-void UnixSocketImpl::create(const String hostName, int portID)
+void UnixSocketImpl::create()
+{
+    /* grab an Internet domain socket */
+    if ((socketID = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+        throw Exception("IosSocket: Socket creation failed");
+    }
+}
+
+void UnixSocketImpl::connect(const String hostName, int portID)
 {
     struct hostent *hp;
     /* go find out about the desired host machine */
@@ -48,14 +57,15 @@ void UnixSocketImpl::create(const String hostName, int portID)
     pin.sin_addr.s_addr = ((struct in_addr *)(hp->h_addr))->s_addr;
     pin.sin_port = htons(portID);
 
-    /* grab an Internet domain socket */
-    if ((socketID = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-        throw Exception("IosSocket: Socket creation failed");
-    }
-
     /* connect to PORT on HOST */
-    if (connect(socketID,(struct sockaddr *)  &pin, sizeof(pin)) == -1) {
-        throw Exception("IosSocket: Socket connection failed");
+    if (::connect(socketID,(struct sockaddr *)  &pin, sizeof(pin)) == -1) {
+        switch (errno) {
+        case EINPROGRESS:
+            // Not really an error, the socket is non-blocking
+            break;
+        default:
+            throw Exception("IosSocket: Socket connection failed");
+        }
     }
     inputStream = new SocketInputStream(socketID);
     outputStream = new SocketOutputStream(socketID);
@@ -106,6 +116,32 @@ OutputStream *UnixSocketImpl::getOutputStream()
 {
 	return outputStream;
 }
+
+bool UnixSocketImpl::isConnected() const
+{
+    fd_set writefds;
+    struct timeval timeout;
+    
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 0;
+    FD_ZERO(&writefds);
+    FD_SET(socketID, &writefds);
+    int sresult = select(1, NULL, &writefds, NULL, &timeout);
+    if (sresult == -1)
+        throw Exception("IosSystemStreamSelect error");
+    else if (sresult == 0)
+        return false;
+    return true;
+}
+
+void UnixSocketImpl::setNonBlockingMode(bool mode)
+{
+    int arg = (mode == false ? 0 : 1);
+    if (ioctl(socketID, FIONBIO, (char *)&arg) == -1) {
+        throw Exception("IosSocket: ioctl error");
+    }
+}
+
 
 /*
  * Input stream

@@ -33,18 +33,22 @@ namespace ios_fc {
 
 class UnixSocketImpl : public SocketImpl, public UnixSelectableImpl {
 public:
-	virtual void create(String hostName, int portID);
-        void create(int fd);
-	virtual ~UnixSocketImpl();
+    void create();
+    void connect(String hostName, int portID);
+    void create(int fd);
+    ~UnixSocketImpl();
 
 	InputStream *getInputStream();
 	OutputStream *getOutputStream();
         
 	void socketSend(const void *buffer, int size);
 	void socketReceive(void *buffer, int size);
-        
-        SelectableImpl *getSelectableImpl() { return this; }
-        int getFd() { return socketID; }
+    
+    SelectableImpl *getSelectableImpl() { return this; }
+    int getFd() { return socketID; }
+    
+    bool isConnected() const;
+    void setNonBlockingMode(bool mode);
 
 private:
 

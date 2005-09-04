@@ -26,10 +26,13 @@ namespace ios_fc {
 
 class DefaultSocket : public SocketImpl {
 public:
-    void create(const String hostName, int portID) {}
+    void create() {}
+    void connect(const String hostName, int portID) {}
     InputStream *getInputStream() { throwError(); return NULL; }
     OutputStream *getOutputStream() { throwError(); return NULL; }
     SelectableImpl *getSelectableImpl() { return NULL; }
+    bool isConnected() const { throwError(); return false; }
+    void setNonBlockingMode(bool mode) { throwError(); }
 private:
     void throwError() const { throw Exception("Invalid socket, no socket backend set"); }
 };
@@ -47,10 +50,13 @@ DefaultSocketFactory defaultSocketFactory;
 SocketFactory *Socket::factory = &defaultSocketFactory;
 #endif
 
-Socket::Socket(const String hostName, int portID)
+Socket::Socket(const String hostName, int portID, bool nonblocking)
 {
     impl = factory->createSocket();
-    impl->create(hostName, portID);
+    impl->create();
+    if (nonblocking)
+        impl->setNonBlockingMode(true);
+    impl->connect(hostName, portID);
     sImpl = impl->getSelectableImpl();
 }
 
@@ -79,4 +85,14 @@ SelectableImpl *Socket::getSelectableImpl() const
     return sImpl;
 }
 
+bool Socket::isConnected() const
+{
+    return impl->isConnected();
+}
+
+void Socket::setNonBlockingMode(bool mode)
+{
+    impl->setNonBlockingMode(mode);
+}
+        
 }
