@@ -126,7 +126,7 @@ bool UnixSocketImpl::isConnected() const
     timeout.tv_usec = 0;
     FD_ZERO(&writefds);
     FD_SET(socketID, &writefds);
-    int sresult = select(1, NULL, &writefds, NULL, &timeout);
+    int sresult = select(socketID+1, NULL, &writefds, NULL, &timeout);
     if (sresult == -1)
         throw Exception("IosSystemStreamSelect error");
     else if (sresult == 0)
