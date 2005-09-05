@@ -28,103 +28,12 @@
 #include "preferences.h"
 #include "ios_socket.h"
 #include "ios_standardmessage.h"
+#include "ios_httpdocument.h"
 #include "PuyoNetCenterMenu.h"
 
 extern IIM_Surface *menuBG_wide; // I know what you think..
 
 using namespace ios_fc;
-
-class HttpDocument {
-public:
-    HttpDocument(String hostName, String path, int portNum);
-    VoidBuffer getDocumentContent() const { return docContent; }
-    bool documentIsReady();
-
-private:
-    String getLine();
-    static const String contentLength;
-    static const String rqPart[];
-    class HttpHeaderElement;
-    bool docIsReady;
-    Socket httpSocket;
-    InputStream *httpInputStream;
-    int msgSize;
-    Buffer<char> docContent;
-    String path;
-    String hostName;
-    int portNum;
-};
-
-class HttpDocument::HttpHeaderElement {
-public:
-    HttpHeaderElement(String rawElement);
-    String name;
-    String content;
-};
-
-HttpDocument::HttpHeaderElement::HttpHeaderElement(String rawElement)
-{
-    int sep = 0;
-    while ((sep < rawElement.length()) && (rawElement[sep] != ':')) { sep++; }
-    if (sep+1 >= rawElement.length()) {
-        name = rawElement;
-    }
-    else {
-        name = rawElement.substring(0, sep);
-        content = rawElement.substring(sep+2, rawElement.length());
-    }
-}
-
-const String HttpDocument::contentLength = "Content-Length";
-const String HttpDocument::rqPart[] =
-{"GET ", " HTTP/1.0\r\n\
-Host: ", ":", "\r\n\
-User-Agent: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.7.5) Gecko/20050105 Epiphany/1.4.7\r\n\
-Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png\r\n\
-Accept-Language: en\r\n\
-\r\n"};
-
-HttpDocument::HttpDocument(String hostName,  String path, int portNum)
-    : docIsReady(false), httpSocket(hostName, portNum), httpInputStream(httpSocket.getInputStream()), msgSize(-1), path(path), hostName(hostName), portNum(portNum)
-{
-}
-
-bool HttpDocument::documentIsReady() 
-{
-    if (docIsReady) return true;
-    return false;
-
-    // 1 - check if we can write to the output ?
-    String request = rqPart[0] + path + rqPart[1] + hostName + rqPart[2] + portNum + rqPart[3];
-    httpSocket.getOutputStream()->streamWrite(VoidBuffer(request, strlen(request)));
-
-    String currentLine;
-    do {
-        currentLine = getLine();
-        HttpHeaderElement currentHeader(currentLine);
-        if (currentHeader.name == contentLength) {
-            msgSize = atoi((const char *)currentHeader.content);
-            printf("Taille doc: %d\n", msgSize);
-        }
-    } while (currentLine.length() > 0);
-    Buffer<char> msg(msgSize==-1 ? 1024 : msgSize);
-    httpInputStream->streamRead(msg);
-    docContent = msg;
-    return false;
-}
-
-String HttpDocument::getLine()
-{
-    Buffer<char> tmp(2);
-    String test;
-    do {
-        httpInputStream->streamRead(tmp, 1);
-        tmp[1] = 0;
-        if ((tmp[0] != 10) && (tmp[0] != 13))
-            test += (const char *)tmp;
-    } while (tmp[0] != '\n');
-    return test;
-}
 
 class PuyoHttpServerList::PuyoHttpServer {
 public:
@@ -138,13 +47,13 @@ HttpDocument *doc = NULL;
 PuyoHttpServerList::PuyoHttpServerList(String hostName, String path, int portNum)
 {
   isReady = false;
-  //doc = new HttpDocument(hostName, path, portNum);
+  doc = new HttpDocument(hostName, path, portNum);
 }
 
 bool PuyoHttpServerList::listIsReady() 
 {
     if (isReady) return true;
-    // if (!doc->documentIsReady())
+    if (!doc->documentIsReady())
       return false;
     
     StandardMessage msg(doc->getDocumentContent());
