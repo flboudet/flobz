@@ -44,6 +44,7 @@ private:
     InputStream *httpInputStream;
     int msgSize;
     Buffer<char> docContent;
+    int docContentOffset;
     String path;
     String hostName;
     int portNum;

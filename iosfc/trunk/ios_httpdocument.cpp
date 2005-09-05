@@ -47,7 +47,7 @@ Accept-Language: en\r\n\
 
 HttpDocument::HttpDocument(String hostName,  String path, int portNum)
     : socketIsConnected(false), docIsReady(false), headerIsDone(false), httpSocket(hostName, portNum, true),
-      httpInputStream(httpSocket.getInputStream()), msgSize(-1), path(path),
+      httpInputStream(httpSocket.getInputStream()), msgSize(-1), docContentOffset(0), path(path),
       hostName(hostName), portNum(portNum)
 {
 }
@@ -70,21 +70,30 @@ bool HttpDocument::documentIsReady()
         do {
             currentLine = "";
             if (!getLine()) return false;
-            printf("Current line:%s\n", (const char *)currentLine);
+            //printf("Current line:%s\n", (const char *)currentLine);
             HttpHeaderElement currentHeader(currentLine);
             if (currentHeader.name == contentLength) {
                 msgSize = atoi((const char *)currentHeader.content);
-                printf("Taille doc: %d\n", msgSize);
+                //printf("Taille doc: %d\n", msgSize);
             }
         } while (currentLine.length() > 0);
+        if (msgSize == -1)
+            msgSize = httpInputStream->streamAvailable();
+        docContent = Buffer<char>(msgSize);
+        docContentOffset = 0;
         headerIsDone = true;
     }
     
-    Buffer<char> msg(msgSize==-1 ? 1024 : msgSize);
-    httpInputStream->streamRead(msg);
-    docContent = msg;
-    docIsReady = true;
-    return true;
+    int sizeToRead = msgSize - docContentOffset;
+    int streamAvailable = httpInputStream->streamAvailable();
+    if (sizeToRead > streamAvailable) sizeToRead = streamAvailable;
+    docContent += docContentOffset;
+    httpInputStream->streamRead(docContent, sizeToRead);
+    docContent -= docContentOffset;
+    docContentOffset += sizeToRead;
+    if (docContentOffset == msgSize)
+        docIsReady = true;
+    return docIsReady;
 }
 
 bool HttpDocument::getLine()
