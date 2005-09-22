@@ -30,9 +30,9 @@ namespace ios_fc {
 
 const int IgpMessageListener::firstAutoIgpIdent = 32768;
 
-void IgpMessageListener::PeerRecord::sendIGPIdent()
+void IgpMessageListener::NetworkIgpPeer::sendIGPIdent()
 {
-    IGPDatagram::ServerMsgInformIDDatagram reply(pool->createMessage(), igpID);
+    IGPDatagram::ServerMsgInformIDDatagram reply(createMessage(), getIgpIdent());
     Dirigeable *msg = dynamic_cast<Dirigeable *>(reply.getMessage());
     if (msg != NULL) {
         //printf("setpeeraddress\n");
@@ -46,21 +46,34 @@ void IgpMessageListener::PeerRecord::sendIGPIdent()
     }
 }
 
-void IgpMessageListener::PeerRecord::datagramReceived(IGPDatagram &message)
+void IgpMessageListener::NetworkIgpPeer::messageReceived(VoidBuffer message, int origIgpIdent, bool reliable)
+{
+    IGPDatagram::ServerMsgToClientDatagram msgToSend(createMessage(),
+                                                     origIgpIdent, getIgpIdent(),
+                                                     message,
+                                                     reliable);
+    Dirigeable *msg = dynamic_cast<Dirigeable *>(msgToSend.getMessage());
+    if (msg != NULL) {
+        msg->setPeerAddress(getAddress());
+        msgToSend.getMessage()->send();
+    }
+}
+
+void IgpMessageListener::NetworkIgpPeer::datagramFromMyself(IGPDatagram &message)
 {
     switch (message.getMsgIdent()) {
     case IGPDatagram::ClientMsgAutoAssignID:
-        igpID = pool->getUniqueIGPId();
-        printf("Auto-assign ID:%d\n", igpID);
-        valid=true;
+        setIgpIdent(getUniqueIGPId());
+        printf("Auto-assign ID:%d\n", getIgpIdent());
+        //setValid(true);
         sendIGPIdent();
         break;
     case IGPDatagram::ClientMsgAssignID: {
         IGPDatagram::ClientMsgAssignIDDatagram msgReceived(message);
         printf("Assign ID\n");
-        if (pool->igpIdValidAndUnique(msgReceived.getIgpIdent())) {
-            valid=true;
-            igpID = msgReceived.getIgpIdent();
+        if (igpIdValidAndUnique(msgReceived.getIgpIdent())) {
+            //setValid(true);
+            setIgpIdent(msgReceived.getIgpIdent());
             sendIGPIdent();
         }
         else {
@@ -75,23 +88,10 @@ void IgpMessageListener::PeerRecord::datagramReceived(IGPDatagram &message)
         IGPDatagram::ClientMsgToClientDatagram msgReceived(message);
         bool reliable = false;
         Message *rawmsg = msgReceived.getMessage();
+        //
         if (rawmsg->hasBoolProperty("RELIABLE"))
             reliable = rawmsg->getBoolProperty("RELIABLE");
-        IGPDatagram::ServerMsgToClientDatagram msgToSend(pool->createMessage(),
-                                                        igpID, msgReceived.getIgpIdent(),
-                                                        msgReceived.getIgpMessage(),
-                                                        reliable);
-        PeerRecord *destPeer = pool->getPeer(msgReceived.getIgpIdent());
-        if (destPeer != NULL) {
-            Dirigeable *msg = dynamic_cast<Dirigeable *>(msgToSend.getMessage());
-            if (msg != NULL) {
-                msg->setPeerAddress(destPeer->getAddress());
-                msgToSend.getMessage()->send();
-            }
-        }
-        else {
-            printf("DEST not found!!!\n");
-        }
+        sendMessageToAddress(this, msgReceived.getIgpMessage(), msgReceived.getIgpIdent(), reliable);
         break;
     }
     default:
@@ -99,12 +99,15 @@ void IgpMessageListener::PeerRecord::datagramReceived(IGPDatagram &message)
 	}
 }
 
-IgpMessageListener::PeerRecord *IgpMessageListener::findPeer(PeerAddress address)
+IgpMessageListener::NetworkIgpPeer *IgpMessageListener::findPeer(PeerAddress address)
 {
     for (int i = 0, j = knownPeers.size() ; i < j ; i++) {
-        if (knownPeers[i]->getAddress() == address) {
-            //printf("Trouve !\n");
-            return knownPeers[i];
+        NetworkIgpPeer *networkKnownPeer = dynamic_cast<NetworkIgpPeer *>(knownPeers[i]);
+        if (networkKnownPeer != NULL) {
+            if (networkKnownPeer->getAddress() == address) {
+                //printf("Trouve !\n");
+                return networkKnownPeer;
+            }
         }
     }
     return NULL;
@@ -116,14 +119,14 @@ void IgpMessageListener::onMessage(Message &data)
     Dirigeable &dir = dynamic_cast<Dirigeable &>(data);
     
     PeerAddress msgAddress = dir.getPeerAddress();
-    PeerRecord *currentPeer = findPeer(msgAddress);
+    NetworkIgpPeer *currentPeer = findPeer(msgAddress);
     if (currentPeer == NULL) {
-        currentPeer = new PeerRecord(msgAddress, this);
+        currentPeer = new NetworkIgpPeer(msgAddress, this);
         printf("Nouveau peer !\n");
     }
     
     IGPDatagram message(&data);
-    currentPeer->datagramReceived(message);
+    currentPeer->datagramFromMyself(message);
 }
 
 int IgpMessageListener::getUniqueIGPId()
@@ -142,7 +145,7 @@ bool IgpMessageListener::igpIdValidAndUnique(int igpIdent)
     return true;
 }
 
-IgpMessageListener::PeerRecord *IgpMessageListener::getPeer(int igpIdent) const
+IgpPeer *IgpMessageListener::getPeer(int igpIdent) const
 {
     for (int i = 0, j = knownPeers.size() ; i < j ; i++) {
         if (igpIdent == knownPeers[i]->getIgpIdent())
@@ -159,9 +162,20 @@ void IgpMessageListener::onPeerConnect(const PeerAddress &address)
 void IgpMessageListener::onPeerDisconnect(const PeerAddress &address)
 {
     printf("Cool, une deconnection IGP!\n");
-    PeerRecord *disconnectedPeer = findPeer(address);
+    NetworkIgpPeer *disconnectedPeer = findPeer(address);
     delete disconnectedPeer;
 }
-    
+
+void IgpMessageListener::sendMessageToAddress(IgpPeer *peer, VoidBuffer igpMessage, int destIgpIdent, bool reliable)
+{
+    IgpPeer *destPeer = getPeer(destIgpIdent);
+    if (destPeer != NULL) {
+        destPeer->messageReceived(igpMessage, peer->getIgpIdent(), reliable);
+    }
+    else {
+        printf("DEST not found!!!\n");
+    }
+}
+
 }
 

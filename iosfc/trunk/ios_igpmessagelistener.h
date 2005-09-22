@@ -34,43 +34,84 @@
 
 namespace ios_fc {
 
+class IgpPeer;
+
 class IgpMessageListener : public MessageListener, public SessionListener {
 public:
     IgpMessageListener(MessageBox &mbox) : mbox(mbox), currentAutoIgpIdent(firstAutoIgpIdent) {}
     void onMessage(Message &message);
     void onPeerConnect(const PeerAddress &address);
     void onPeerDisconnect(const PeerAddress &address);
-private:
+    void sendMessageToAddress(IgpPeer *peer, VoidBuffer igpMessage, int destIgpIdent, bool reliable);
+    
+    void addPeer(IgpPeer *peer) { knownPeers.add(peer); }
+    void removePeer(IgpPeer *peer) { knownPeers.remove(peer); }
+    // should be private
+    Message *createMessage() { return mbox.createMessage(); }
     int getUniqueIGPId();
     bool igpIdValidAndUnique(int igpIdent);
-    class PeerRecord;
-    PeerRecord *getPeer(int igpIdent) const;
-    Message *createMessage() { return mbox.createMessage(); }
+private:
+    AdvancedBuffer<IgpPeer *> knownPeers;
+    class NetworkIgpPeer;
+    IgpPeer *getPeer(int igpIdent) const;
     
     static const int firstAutoIgpIdent;
     MessageBox &mbox;
     int currentAutoIgpIdent;
-    PeerRecord *findPeer(PeerAddress address);
-    AdvancedBuffer<PeerRecord *> knownPeers;
+    NetworkIgpPeer *findPeer(PeerAddress address);
 };
 
-class IgpMessageListener::PeerRecord {
+class IgpPeer {
 public:
-    PeerRecord(PeerAddress address, IgpMessageListener *pool) : address(address), pool(pool), valid(false) {
-        pool->knownPeers.add(this);
+    IgpPeer() : pool(NULL) {}
+    virtual ~IgpPeer() {
+        if (pool != NULL)
+            pool->removePeer(this);
     }
-    ~PeerRecord() {
-        pool->knownPeers.remove(this);
-    }
-    inline PeerAddress getAddress() const { return address; }
-    void datagramReceived(IGPDatagram &message);
+    virtual void messageReceived(VoidBuffer message, int origIgpIdent, bool reliable) = 0;
     inline int getIgpIdent() const { return igpID; }
+    inline void setIgpIdent(int igpId) { this->igpID = igpId; }
+protected:
+    void registerSelf(IgpMessageListener *pool)
+    {
+        this->pool = pool;
+        pool->addPeer(this);
+    }
+    inline Message *createMessage() { return pool->createMessage(); }
+    inline int getUniqueIGPId() { return  pool->getUniqueIGPId(); }
+    inline int igpIdValidAndUnique(int igpId) { return pool->igpIdValidAndUnique(igpId); }
+    inline void sendMessageToAddress(IgpPeer *peer, VoidBuffer igpMessage, int destIgpIdent, bool reliable)
+        { pool->sendMessageToAddress(peer, igpMessage, destIgpIdent, reliable); }
+private:
+    IgpMessageListener *pool;
+    int igpID;
+    //bool valid;
+};
+
+class IgpMessageListener::NetworkIgpPeer : public IgpPeer {
+public:
+    NetworkIgpPeer(PeerAddress address, IgpMessageListener *pool) : address(address) {
+        registerSelf(pool);
+    }
+    ~NetworkIgpPeer() {}
+    inline PeerAddress getAddress() const { return address; }
+    void messageReceived(VoidBuffer message, int origIgpIdent, bool reliable);
+    void datagramFromMyself(IGPDatagram &message);
 private:
     void sendIGPIdent();
     PeerAddress address;
-    IgpMessageListener *pool;
     int igpID;
-    bool valid;
+};
+
+class IgpVirtualPeer : public IgpPeer {
+    IgpVirtualPeer(int igpIdent) {
+        if (igpIdValidAndUnique(igpIdent))
+            setIgpIdent(igpIdent);
+        else throw Exception("IGP ident already registered!");
+    }
+    IgpVirtualPeer() {
+        setIgpIdent(getUniqueIGPId());
+    }
 };
 
 }
