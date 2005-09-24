@@ -91,7 +91,7 @@ void IgpMessageListener::NetworkIgpPeer::datagramFromMyself(IGPDatagram &message
         //
         if (rawmsg->hasBoolProperty("RELIABLE"))
             reliable = rawmsg->getBoolProperty("RELIABLE");
-        sendMessageToAddress(this, msgReceived.getIgpMessage(), msgReceived.getIgpIdent(), reliable);
+        sendMessageToAddress(msgReceived.getIgpMessage(), msgReceived.getIgpIdent(), reliable);
         break;
     }
     default:

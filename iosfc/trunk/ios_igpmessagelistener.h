@@ -64,6 +64,7 @@ private:
 class IgpPeer {
 public:
     IgpPeer() : pool(NULL) {}
+    IgpPeer(IgpMessageListener *pool) { registerSelf(pool); }
     virtual ~IgpPeer() {
         if (pool != NULL)
             pool->removePeer(this);
@@ -80,8 +81,8 @@ protected:
     inline Message *createMessage() { return pool->createMessage(); }
     inline int getUniqueIGPId() { return  pool->getUniqueIGPId(); }
     inline int igpIdValidAndUnique(int igpId) { return pool->igpIdValidAndUnique(igpId); }
-    inline void sendMessageToAddress(IgpPeer *peer, VoidBuffer igpMessage, int destIgpIdent, bool reliable)
-        { pool->sendMessageToAddress(peer, igpMessage, destIgpIdent, reliable); }
+    inline void sendMessageToAddress(VoidBuffer igpMessage, int destIgpIdent, bool reliable)
+        { pool->sendMessageToAddress(this, igpMessage, destIgpIdent, reliable); }
 private:
     IgpMessageListener *pool;
     int igpID;
@@ -104,12 +105,13 @@ private:
 };
 
 class IgpVirtualPeer : public IgpPeer {
-    IgpVirtualPeer(int igpIdent) {
+public:
+    IgpVirtualPeer(IgpMessageListener *pool, int igpIdent) : IgpPeer(pool) {
         if (igpIdValidAndUnique(igpIdent))
             setIgpIdent(igpIdent);
         else throw Exception("IGP ident already registered!");
     }
-    IgpVirtualPeer() {
+    IgpVirtualPeer(IgpMessageListener *pool) : IgpPeer(pool) {
         setIgpIdent(getUniqueIGPId());
     }
 };
