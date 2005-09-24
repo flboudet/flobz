@@ -1,11 +1,12 @@
 #include ../root_dir
 include ../config
 
-SRCS=PuyoServerMain.cpp
+SRCS=PuyoServerMain.cpp PuyoServerIgpResponder.cpp
 
 OBJECTS=${SRCS:%.cpp=%.o}
 
-CFLAGS:=$(CFLAGS) -I../iosfc
+CFLAGS:=$(CFLAGS) -I../iosfc -I..
+
 
 all: prelude bin
 
@@ -19,7 +20,7 @@ bin: ${OBJECTS}
 DEPDIR = .deps
 df = $(DEPDIR)/$(*F)
 
-MAKEDEPEND = $(CXX) -MM $(CFLAGS_NOPCH) -o $(df).d $<
+MAKEDEPEND = $(CXX) -MM $(CFLAGS) -o $(df).d $<
 
 %.o:%.cpp
 	@mkdir -p $(DEPDIR); \
