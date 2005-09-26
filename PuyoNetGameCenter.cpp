@@ -66,6 +66,11 @@ String PuyoNetGameCenter::getPeerNameAtIndex(int i) const
     return peers[i]->name;
 }
 
+int PuyoNetGameCenter::getPeerCount() const
+{
+    return peers.size();
+}
+
 void PuyoNetGameCenter::requestGameWith(PeerAddress addr)
 {
     GamerPeer *myPeer = getPeerForAddress(addr);

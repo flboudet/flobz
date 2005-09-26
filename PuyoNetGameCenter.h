@@ -47,6 +47,7 @@ public:
     void acceptInvitationWith(PeerAddress addr);
     virtual void idle() = 0;
     String getPeerNameAtIndex(int i) const;
+    int getPeerCount() const;
     void addListener(PuyoNetGameCenterListener *r) { listeners.add(r); }
     void removeListener(PuyoNetGameCenterListener *r) { listeners.remove(r); }
     void connectPeer(PeerAddress addr, const String name);
