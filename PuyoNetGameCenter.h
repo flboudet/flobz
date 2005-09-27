@@ -36,6 +36,7 @@ class PuyoNetGameCenterListener {
 public:
     virtual void onChatMessage(const String &msgAuthor, const String &msg) = 0;
     virtual void onPlayerConnect(String playerName, PeerAddress playerAddress) = 0;
+    virtual void onPlayerDisconnect(String playerName, PeerAddress playerAddress) = 0;
     virtual void gameInvitationAgainst(String playerName, PeerAddress playerAddress) = 0;
     virtual void gameGrantedWithMessagebox(MessageBox *mbox) = 0;
 };

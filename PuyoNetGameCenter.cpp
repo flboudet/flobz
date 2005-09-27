@@ -55,6 +55,9 @@ void PuyoNetGameCenter::disconnectPeer(PeerAddress addr, const String name)
         GamerPeer *currentPeer = peers[i];
         if (currentPeer->address == addr) {
             peers.remove(currentPeer);
+            for (int u = 0, v = listeners.size() ; u < v ; u++) {
+                listeners[u]->onPlayerConnect(currentPeer->name, currentPeer->address);
+            }
             delete currentPeer;
             return;
         }

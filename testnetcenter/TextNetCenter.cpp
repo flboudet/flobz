@@ -13,7 +13,8 @@ public:
         wprintw(chatArea, "%s: %s\n", (const char *)msgAuthor, (const char *)msg);
         wrefresh(chatArea);
     }
-    void onPlayerConnect(String playerName, PeerAddress playerAddress) {
+    
+    void drawPeers() {
         werase(plyList);
         wrefresh(plyList);
         box(plyList, ACS_VLINE, ACS_HLINE );
@@ -25,6 +26,15 @@ public:
         wrefresh(plyList);
         //mvwprintw(plyList, 1 + currentLine++, 1, "%s", (const char *)playerName);
     }
+    
+    void onPlayerConnect(String playerName, PeerAddress playerAddress) {
+        drawPeers();
+    }
+    
+    void onPlayerDisconnect(String playerName, PeerAddress playerAddress) {
+        drawPeers();
+    }
+    
     void gameInvitationAgainst(String playerName, PeerAddress playerAddress) {}
     void gameGrantedWithMessagebox(MessageBox *mbox) {}
 private:
@@ -99,7 +109,7 @@ int main(int argc, char *argv[])
         }
         wrefresh(inputArea);
         myCenter.idle();
-        usleep(100);
+        usleep(20000);
     }
 //#endif
     return 0;
