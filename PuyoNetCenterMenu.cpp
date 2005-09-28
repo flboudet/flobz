@@ -161,6 +161,10 @@ void NetCenterMenu::onPlayerConnect(String playerName, PeerAddress playerAddress
     //playerList.addNewPlayer(playerName, playerAddress);
 }
 
+void NetCenterMenu::onPlayerDisconnect(String playerName, PeerAddress playerAddress)
+{
+}
+
 void NetCenterMenu::gameInvitationAgainst(String playerName, PeerAddress playerAddress)
 {
     netCenter->acceptInvitationWith(playerAddress);

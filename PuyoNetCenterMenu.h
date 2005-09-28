@@ -36,6 +36,7 @@ public:
     void build();
     void onChatMessage(const String &msgAuthor, const String &msg);
     void onPlayerConnect(String playerName, PeerAddress playerAddress);
+    void onPlayerDisconnect(String playerName, PeerAddress playerAddress);
     void gameInvitationAgainst(String playerName, PeerAddress playerAddress);
     void gameGrantedWithMessagebox(MessageBox *mbox);
     void cycle();
