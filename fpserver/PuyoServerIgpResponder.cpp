@@ -2,6 +2,7 @@
 #include "ios_igpmessagebox.h"
 #include "ios_memory.h"
 #include "ios_dirigeable.h"
+#include "ios_time.h"
 #include "PuyoIgpDefs.h"
 #include "PuyoServerIgpResponder.h"
 
@@ -41,11 +42,11 @@ void PuyoIgpResponder::onMessage(Message &msg)
         
 void PuyoIgpResponder::idle()
 {
+    double time_ms = getTimeMs();
     for (int i = 0, j = peers.size() ; i < j ; i++) {
         GamePeer *currentPeer = peers[i];
-        currentPeer->timer++;
-        if (currentPeer->timer > 500) {
-            printf("Peer timeout!\n");
+        if ((time_ms - currentPeer->lastUpdate) > timeMsBeforePeerTimeout) {
+            printf("PuyoIgpResponder Peer timeout!\n");
             // Build disconnect message
             Message *newMsg = mbox.createMessage();
             newMsg->addBoolProperty("RELIABLE", true);
@@ -72,12 +73,13 @@ void PuyoIgpResponder::updatePeer(PeerAddress addr, const String name)
     for (int i = 0, j = peers.size() ; i < j ; i++) {
         if (peers[i]->addr == addr) {
             currentPeer = peers[i];
-            currentPeer->timer = 0;
+            currentPeer->lastUpdate = getTimeMs();
         }
     }
     if (currentPeer == NULL) {
         // Verifier l'autorisation de connexion ici
         GamePeer *newPeer = new GamePeer(addr, name);
+	newPeer->lastUpdate = getTimeMs();
         printf("Nouveau peer: %s\n", (const char *)name);
         
         // Envoyer tous les peers connectes au petit nouveau
