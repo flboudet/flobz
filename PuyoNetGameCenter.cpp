@@ -37,7 +37,7 @@ public:
 
 void PuyoNetGameCenter::connectPeer(PeerAddress addr, const String name)
 {
-    printf("%s vient de se connecter!\n", (const char *)name);
+    //printf("%s vient de se connecter!\n", (const char *)name);
     for (int i = 0, j = peers.size() ; i < j ; i++) {
         if (peers[i]->address == addr)
             return;
@@ -50,7 +50,7 @@ void PuyoNetGameCenter::connectPeer(PeerAddress addr, const String name)
 
 void PuyoNetGameCenter::disconnectPeer(PeerAddress addr, const String name)
 {
-    printf("%s vient de se deconnecter!\n", (const char *)name);
+    //printf("%s vient de se deconnecter!\n", (const char *)name);
     for (int i = 0, j = peers.size() ; i < j ; i++) {
         GamerPeer *currentPeer = peers[i];
         if (currentPeer->address == addr) {

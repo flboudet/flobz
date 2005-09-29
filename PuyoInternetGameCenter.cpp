@@ -50,7 +50,7 @@ void PuyoInternetGameCenter::sendAliveMessage()
 
 void PuyoInternetGameCenter::sendMessage(const String msgText)
 {
-    printf("Envoi du msg:%s\n", (const char *)msgText);
+    //printf("Envoi du msg:%s\n", (const char *)msgText);
     int prevBound = mbox.getBound();
     mbox.bind(1);
     Message *msg = mbox.createMessage();
@@ -105,7 +105,7 @@ void PuyoInternetGameCenter::idle()
 
 void PuyoInternetGameCenter::onMessage(Message &msg)
 {
-    printf("Cool, un msg!\n");
+    //printf("Cool, un msg!\n");
     try {
         switch (msg.getInt("CMD")) {
             case PUYO_IGP_CHAT:
@@ -127,7 +127,7 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
                 break;
             case PUYO_IGP_GAME_REQUEST:
             {
-                printf("Une partie contre %s?\n", (const char *)msg.getString("ORGNAME"));
+                //printf("Une partie contre %s?\n", (const char *)msg.getString("ORGNAME"));
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
                 for (int i = 0, j = listeners.size() ; i < j ; i++) {
                     listeners[i]->gameInvitationAgainst(msg.getString("ORGNAME"), dir.getPeerAddress());
@@ -136,7 +136,7 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
                 break;
             case PUYO_IGP_GAME_ACCEPT:
             {
-                printf("%s accepte la partie!\n", (const char *)msg.getString("ORGNAME"));
+                //printf("%s accepte la partie!\n", (const char *)msg.getString("ORGNAME"));
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
                 mbox.bind(dir.getPeerAddress());
                 for (int i = 0, j = listeners.size() ; i < j ; i++) {

@@ -8,9 +8,10 @@ WINDOW *rootWin, *plyList, *chatArea, *inputArea;
 
 class MyNetGameCenterListener : public PuyoNetGameCenterListener {
 public:
-    MyNetGameCenterListener(PuyoNetGameCenter &owner) : currentLine(0), owner(owner) {}
+    MyNetGameCenterListener(PuyoNetGameCenter &owner) : currentLine(0), owner(owner), chatLine(1) {}
     void onChatMessage(const String &msgAuthor, const String &msg) {
         wprintw(chatArea, "%s: %s\n", (const char *)msgAuthor, (const char *)msg);
+        //if (chatLine > 10) wscrl(chatArea, 10);
         wrefresh(chatArea);
     }
     
@@ -40,6 +41,7 @@ public:
 private:
     int currentLine;
     PuyoNetGameCenter &owner;
+    int chatLine;
 };
 
 static void finish(int sig)
@@ -68,10 +70,11 @@ int main(int argc, char *argv[])
     
     plyList = newwin(LINES - 6, 26, 1, 1);
     chatArea = newwin(LINES - 6, COLS - 28, 1, 27);
+    scrollok(chatArea, TRUE);
     inputArea = newwin(4, COLS-2, LINES - 5, 1);
     box(rootWin, ACS_VLINE, ACS_HLINE );
     box(plyList, ACS_VLINE, ACS_HLINE );
-    box(chatArea, ACS_VLINE, ACS_HLINE );
+    //box(chatArea, ACS_VLINE, ACS_HLINE );
     box(inputArea, ACS_VLINE, ACS_HLINE );
     refresh();
     wrefresh(chatArea);
@@ -99,12 +102,15 @@ int main(int argc, char *argv[])
             //wprintw(chatArea, "%s\n", (const char *)msgBuf);
             //wrefresh(chatArea);
             myCenter.sendMessage(msgBuf);
+            werase(inputArea);
+            box(inputArea, ACS_VLINE, ACS_HLINE );
             position = 0;
             break;
         default:
             //mvwprintw(plyList, 1, 1, "%d", c);
             msgBuf[position++] = c;
             waddch(inputArea, c);
+            wrefresh(inputArea);
             break;
         }
         wrefresh(inputArea);
