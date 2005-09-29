@@ -27,17 +27,18 @@
 #include "ios_exception.h"
 #include "ios_igpdatagram.h"
 #include "ios_udpmessagebox.h"
+#include "ios_time.h"
 
 namespace ios_fc {
 
-IGPClient::IGPClient(String hostName, int portID) : enabled(false), mbox(new UDPMessageBox(hostName, 0, portID)), igpKeepAliveCounter(0)
+IGPClient::IGPClient(String hostName, int portID) : enabled(false), mbox(new UDPMessageBox(hostName, 0, portID)), igpLastKeepAliveDate(0.), igpKeepAliveInterval(2000.)
 {
     mbox->addListener(this);
     IGPDatagram::ClientMsgAutoAssignIDDatagram datagram(mbox->createMessage());
     datagram.getMessage()->send();
 }
 
-IGPClient::IGPClient(String hostName, int portID, int igpIdent) : enabled(false), mbox(new UDPMessageBox(hostName, 0, portID)), igpKeepAliveCounter(0)
+IGPClient::IGPClient(String hostName, int portID, int igpIdent) : enabled(false), mbox(new UDPMessageBox(hostName, 0, portID)), igpLastKeepAliveDate(0.), igpKeepAliveInterval(2000.)
 {
     mbox->addListener(this);
     IGPDatagram::ClientMsgAssignIDDatagram datagram(mbox->createMessage(), igpIdent);
@@ -57,11 +58,11 @@ void IGPClient::sendMessage(int igpID, VoidBuffer message, bool reliable)
 
 void IGPClient::idle()
 {
-    igpKeepAliveCounter++;
-    if (igpKeepAliveCounter == 100) {
+    double time_ms = getTimeMs();
+    if ((igpLastKeepAliveDate == 0.) || (time_ms - igpLastKeepAliveDate > igpKeepAliveInterval)) {
         IGPDatagram::ClientMsgKeepAliveDatagram datagram(mbox->createMessage());
         datagram.getMessage()->send();
-        igpKeepAliveCounter = 0;
+        igpLastKeepAliveDate = time_ms;
     }
     mbox->idle();
 }
@@ -74,7 +75,7 @@ void IGPClient::onMessage(Message &rawMsg)
             IGPDatagram::ServerMsgInformIDDatagram informIDMessage(message);
             igpIdent = informIDMessage.getIgpIdent();
             enabled = true;
-            printf("Obtenu info sur id: %d\n", informIDMessage.getIgpIdent());
+            //printf("Obtenu info sur id: %d\n", informIDMessage.getIgpIdent());
             break;
         }
         case IGPDatagram::ServerMsgToClient: {
