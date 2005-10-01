@@ -36,7 +36,14 @@ public:
         drawPeers();
     }
     
-    void gameInvitationAgainst(String playerName, PeerAddress playerAddress) {}
+    void gameInvitationAgainst(String playerName, PeerAddress playerAddress) {
+        wprintw(chatArea, "### %s wants to play against you\n", (const char *)playerName);
+        wrefresh(chatArea);
+    }
+    void gameCanceledAgainst(String playerName, PeerAddress playerAddress) {
+        wprintw(chatArea, "### The game against %s has been canceled\n", (const char *)playerName);
+        wrefresh(chatArea);
+    }
     void gameGrantedWithMessagebox(MessageBox *mbox) {}
 private:
     int currentLine;
@@ -51,6 +58,22 @@ static void finish(int sig)
     /* do your non-curses wrapup here */
 
     exit(0);
+}
+
+void decodeMessage(PuyoInternetGameCenter &myCenter, String msgBuf)
+{
+    if (msgBuf.substring(0, 6) == "/start") {
+        String against = msgBuf.substring(7);
+        wprintw(chatArea, "### Asking to start a game against %s\n", (const char *)against);
+        wrefresh(chatArea);
+        myCenter.requestGameWith(myCenter.getPeerAddressForPeerName(against));
+    }
+    else if (msgBuf.substring(0, 7) == "/cancel") {
+        String against = msgBuf.substring(8);
+        wprintw(chatArea, "### Asking to cancel a game against %s\n", (const char *)against);
+        wrefresh(chatArea);
+        myCenter.cancelGameWith(myCenter.getPeerAddressForPeerName(against));
+    }
 }
 
 int main(int argc, char *argv[])
@@ -101,7 +124,10 @@ int main(int argc, char *argv[])
             msgBuf[position++] = 0;
             //wprintw(chatArea, "%s\n", (const char *)msgBuf);
             //wrefresh(chatArea);
-            myCenter.sendMessage(msgBuf);
+            if ((position > 0) && (msgBuf[0] == '/'))
+                decodeMessage(myCenter, msgBuf);
+            else
+                myCenter.sendMessage(msgBuf);
             werase(inputArea);
             box(inputArea, ACS_VLINE, ACS_HLINE );
             position = 0;

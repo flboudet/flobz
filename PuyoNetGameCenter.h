@@ -38,16 +38,21 @@ public:
     virtual void onPlayerConnect(String playerName, PeerAddress playerAddress) = 0;
     virtual void onPlayerDisconnect(String playerName, PeerAddress playerAddress) = 0;
     virtual void gameInvitationAgainst(String playerName, PeerAddress playerAddress) = 0;
+    virtual void gameCanceledAgainst(String playerName, PeerAddress playerAddress) = 0;
     virtual void gameGrantedWithMessagebox(MessageBox *mbox) = 0;
 };
 
 class PuyoNetGameCenter {
 public:
+    PuyoNetGameCenter() : pendingGameTimeout(30000.) {}
     virtual void sendMessage(const String msgText) = 0;
     void requestGameWith(PeerAddress addr);
     void acceptInvitationWith(PeerAddress addr);
-    virtual void idle() = 0;
+    void cancelGameWith(PeerAddress addr);
+    virtual void idle();
     String getPeerNameAtIndex(int i) const;
+    PeerAddress getPeerAddressAtIndex(int i) const;
+    PeerAddress getPeerAddressForPeerName(String peerName) const;
     int getPeerCount() const;
     void addListener(PuyoNetGameCenterListener *r) { listeners.add(r); }
     void removeListener(PuyoNetGameCenterListener *r) { listeners.remove(r); }
@@ -57,9 +62,15 @@ protected:
     AdvancedBuffer<PuyoNetGameCenterListener *> listeners;
     class GamerPeer;
     AdvancedBuffer<GamerPeer *> peers;
+    class PendingGame;
+    AdvancedBuffer<PendingGame *> pendingGames;
     GamerPeer *getPeerForAddress(PeerAddress addr);
+    void receivedInvitationForGameWithPeer(String playerName, PeerAddress addr);
+    void receivedGameCanceledWithPeer(String playerName, PeerAddress addr);
     virtual void requestGameWithPeer(String playerName, PeerAddress addr) = 0;
     virtual void acceptInvitationWithPeer(String playerName, PeerAddress addr) = 0;
+    virtual void cancelGameWithPeer(String playerName, PeerAddress addr) = 0;
+    double pendingGameTimeout;
 };
 
 #endif // _PUYONETGAMECENTER_H

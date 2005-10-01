@@ -40,6 +40,7 @@ public:
 protected:
     void requestGameWithPeer(String playerName, PeerAddress addr);
     void acceptInvitationWithPeer(String playerName, PeerAddress addr);
+    void cancelGameWithPeer(String playerName, PeerAddress addr);
 private:
     void sendAliveMessage();
     

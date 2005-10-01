@@ -38,6 +38,7 @@ public:
     void onPlayerConnect(String playerName, PeerAddress playerAddress);
     void onPlayerDisconnect(String playerName, PeerAddress playerAddress);
     void gameInvitationAgainst(String playerName, PeerAddress playerAddress);
+    void gameCanceledAgainst(String playerName, PeerAddress playerAddress);
     void gameGrantedWithMessagebox(MessageBox *mbox);
     void cycle();
     void playerSelected(PeerAddress playerAddress);

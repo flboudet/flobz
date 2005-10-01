@@ -93,6 +93,19 @@ void PuyoInternetGameCenter::acceptInvitationWithPeer(String playerName, PeerAdd
     }
 }
 
+void PuyoInternetGameCenter::cancelGameWithPeer(String playerName, PeerAddress addr)
+{
+    Message *msg = mbox.createMessage();
+    msg->addBoolProperty("RELIABLE", true);
+    msg->addInt("CMD", PUYO_IGP_GAME_CANCEL);
+    msg->addString("ORGNAME", name);
+    msg->addString("DSTNAME", playerName);
+    Dirigeable *dirNew = dynamic_cast<Dirigeable *>(msg);
+    dirNew->setPeerAddress(addr);
+    msg->send();
+    delete msg;
+}
+
 void PuyoInternetGameCenter::idle()
 {
     static int idleCount = 0;
@@ -101,6 +114,7 @@ void PuyoInternetGameCenter::idle()
         idleCount = 0;
         sendAliveMessage();
     }
+    PuyoNetGameCenter::idle();
 }
 
 void PuyoInternetGameCenter::onMessage(Message &msg)
@@ -129,9 +143,7 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
             {
                 //printf("Une partie contre %s?\n", (const char *)msg.getString("ORGNAME"));
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-                for (int i = 0, j = listeners.size() ; i < j ; i++) {
-                    listeners[i]->gameInvitationAgainst(msg.getString("ORGNAME"), dir.getPeerAddress());
-                }
+                receivedInvitationForGameWithPeer(msg.getString("ORGNAME"), dir.getPeerAddress());
             }
                 break;
             case PUYO_IGP_GAME_ACCEPT:
@@ -142,6 +154,12 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
                 for (int i = 0, j = listeners.size() ; i < j ; i++) {
                     listeners[i]->gameGrantedWithMessagebox(&mbox);
                 }
+            }
+                break;
+            case PUYO_IGP_GAME_CANCEL:
+            {
+                Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
+                receivedGameCanceledWithPeer(msg.getString("ORGNAME"), dir.getPeerAddress());
             }
                 break;
             default:

@@ -170,6 +170,10 @@ void NetCenterMenu::gameInvitationAgainst(String playerName, PeerAddress playerA
     netCenter->acceptInvitationWith(playerAddress);
 }
 
+void NetCenterMenu::gameCanceledAgainst(String playerName, PeerAddress playerAddress)
+{
+}
+
 void NetCenterMenu::gameGrantedWithMessagebox(MessageBox *mbox)
 {
     //PuyoStarter *starter = new PuyoNetworkStarter(theCommander, 0, mbox);
