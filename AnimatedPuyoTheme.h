@@ -53,10 +53,22 @@ typedef enum {
 
 // Class containing the theme for a puyo
 class AnimatedPuyoTheme {
+public:
+    virtual ~AnimatedPuyoTheme() {}
+    virtual IIM_Surface * getSurface(PuyoPictureType picture, int index) = 0;
+    virtual IIM_Surface *getPuyoSurfaceForValence(int valence) = 0;
+    virtual IIM_Surface *getEyeSurfaceForIndex(int index) = 0;
+    virtual IIM_Surface *getCircleSurfaceForIndex(int index) = 0;
+    virtual IIM_Surface *getShadowSurface() = 0;
+    virtual IIM_Surface *getShrinkingSurfaceForIndex(int index) = 0;
+    virtual IIM_Surface *getExplodingSurfaceForIndex(int index) = 0;
+};
+
+class StandardAnimatedPuyoTheme : public AnimatedPuyoTheme {
 
 public:
-    AnimatedPuyoTheme(const String path, const char * face, const char * disappear, const char * explosions, const char * eyes, const float color_offset);
-    ~AnimatedPuyoTheme(void);
+    StandardAnimatedPuyoTheme(const String path, const char * face, const char * disappear, const char * explosions, const char * eyes, const float color_offset);
+    ~StandardAnimatedPuyoTheme(void);
     
     IIM_Surface * getSurface(PuyoPictureType picture, int index);
 
@@ -91,6 +103,25 @@ private:
     bool _cached;
 };
 
+class NeutralAnimatedPuyoTheme : public AnimatedPuyoTheme {
+public:
+    NeutralAnimatedPuyoTheme(const String path, const char * face);
+    ~NeutralAnimatedPuyoTheme(void);
+    IIM_Surface * getSurface(PuyoPictureType picture, int index);
+    IIM_Surface *getPuyoSurfaceForValence(int valence);
+    IIM_Surface *getEyeSurfaceForIndex(int index) { return NULL; }
+    IIM_Surface *getCircleSurfaceForIndex(int index) { return NULL; }
+    IIM_Surface *getShadowSurface() { return NULL; }
+    IIM_Surface *getShrinkingSurfaceForIndex(int index) { return NULL; }
+    IIM_Surface *getExplodingSurfaceForIndex(int index) { return NULL; }
+    bool cache(void);
+    void releaseCached(void);
+private:
+    String imageFullPath;
+    String imageDefaultPath;
+    IIM_Surface * _puyoNeutral;
+    bool _cached;
+};
 
 // Class containing the theme for a puyo set
 
@@ -121,8 +152,8 @@ private:
     String _author;
     String _comments;
 
-    AnimatedPuyoTheme * _puyos[NUMBER_OF_PUYOS];
-    AnimatedPuyoTheme * _neutral;
+    StandardAnimatedPuyoTheme * _puyos[NUMBER_OF_PUYOS];
+    NeutralAnimatedPuyoTheme * _neutral;
 
     unsigned int _numberOfPuyos;
 };
@@ -146,11 +177,16 @@ public:
     bool setBackground(const char * back);
     bool setGrid(const char * grid);
     bool setSpeedMeter(const char * speedmeter);
+    bool setNeutralIndicator(const char * neutralIndicator);
     
     IIM_Surface * getLifeForIndex(int index);
     IIM_Surface * getBackground(void);
     IIM_Surface * getGrid(void);
     IIM_Surface * getSpeedMeter(bool front);
+    
+    IIM_Surface * getNeutralIndicator();
+    IIM_Surface * getBigNeutralIndicator();
+    IIM_Surface * getGiantNeutralIndicator();
     
 private:    
     String _path;
@@ -163,11 +199,16 @@ private:
     char * _background;
     char * _grid;
     char * _speed_meter;
+    char * _neutral_indicator;
     
     IIM_Surface * _levelLives[NUMBER_OF_LIVES];
     IIM_Surface * _levelBackground;
     IIM_Surface * _levelGrid;
     IIM_Surface * _levelMeter[2];
+    
+    IIM_Surface * _neutralIndicator;
+    IIM_Surface * _bigNeutralIndicator;
+    IIM_Surface * _giantNeutralIndicator;
     
     bool _cached;
     

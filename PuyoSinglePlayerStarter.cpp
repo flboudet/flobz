@@ -49,9 +49,9 @@ void PuyoCombinedEventPlayer::cycle()
 
 PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, int lifes, String aiFace, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
                                                      attachedGameFactory(&attachedRandom),
-                                                     areaA(&attachedGameFactory, &attachedPuyoThemeSet,
+                                                     areaA(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
                                                      1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
-                                                     areaB(&attachedGameFactory, &attachedPuyoThemeSet,
+                                                     areaB(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
                                                      1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
                                                      playercontroller(areaA),
                                                      opponentcontroller(type, level, areaB), faceTicks(0), opponentFace(aiFace)

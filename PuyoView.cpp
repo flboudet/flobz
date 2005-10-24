@@ -36,67 +36,15 @@
 #include "PuyoDoomMelt.h"
 
 #include "SDL_Painter.h"
-SDL_Painter painter;
 
-//extern SDL_Surface *display;
-IIM_Surface *background, *neutral = NULL;
-IIM_Surface *bigNeutral = NULL;
-
-#ifdef DESACTIVE
-static char PuyoGroupImageIndex[2][2][2][2] =
-{ {  // empty bottom
-{  // empty right
-{  // empty top
-	0, // empty left
-	4, // full left
-},
-{  // full top
-	3, // empty left
-	10, // full left
-}
-},
-{  // full right
-	{  // empty top
-        2, // empty left
-        9, // full left
-	},
-	{  // full top
-        8, // empty left
-        14, // full left
-	}
-}
-},
-{  // full bottom
-    {  // empty right
-	{  // empty top
-        1, // empty left
-        7, // full left
-	},
-	{  // full top
-        6, // empty left
-        13, // full left
-	}
-    },
-    {  // full right
-	{  // empty top
-        5, // empty left
-        12, // full left
-	},
-	{  // full top
-        11, // empty left
-        15, // full left
-	}
-    }
-}
-};
-#endif
-
-
+//IIM_Surface *neutral = NULL;
+//IIM_Surface *bigNeutral = NULL;
 
 PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 		   AnimatedPuyoSetTheme *attachedThemeSet,
+           PuyoLevelTheme *attachedLevelTheme,
 		   int xOffset, int yOffset, int nXOffset, int nYOffset, SDL_Painter &painterToUse)
-  :attachedThemeSet(attachedThemeSet),
+  :attachedThemeSet(attachedThemeSet), attachedLevelTheme(attachedLevelTheme),
    attachedPuyoFactory(this), attachedPainter(painterToUse), delayBeforeGameOver(60)
 {
     //printf("Constructeur du PuyoView\n");
@@ -274,33 +222,39 @@ void PuyoView::render()
 void PuyoView::renderNeutral()
 {
 	SDL_Rect drect;
-	
-	// Drawing neutral puyos
-	int numBigNeutral = attachedGame->getNeutralPuyos() / PUYODIMX;
-	int numNeutral = attachedGame->getNeutralPuyos() % PUYODIMX;
-	int drect_x = xOffset;
-	int compressor = 0;
-	
-	int width = numBigNeutral * bigNeutral->w + numNeutral * neutral->w;
-	if (width > TSIZE * PUYODIMX) {
-		compressor = (width - TSIZE * PUYODIMX) / (numNeutral + numBigNeutral);
-	} 
-	
-	for (int cpt = 0 ; cpt < numBigNeutral ; cpt++) {
+    int neutralPuyos = attachedGame->getNeutralPuyos();
+    int numGiantNeutral = (neutralPuyos / PUYODIMX) / 4;
+    int numBigNeutral = (neutralPuyos / PUYODIMX) % 4;
+	int numNeutral = neutralPuyos % PUYODIMX;
+    int drect_x = xOffset;
+    int drect_y_base =  yOffset + 3 + TSIZE + TSIZE;
+    IIM_Surface *neutral = attachedLevelTheme->getNeutralIndicator();
+    IIM_Surface *bigNeutral = attachedLevelTheme->getBigNeutralIndicator();
+    IIM_Surface *giantNeutral = attachedLevelTheme->getGiantNeutralIndicator();
+    
+    for (int cpt = 0 ; cpt < numGiantNeutral ; cpt++) {
 		drect.x = drect_x;
-		drect.y = yOffset + 3 + TSIZE;
+		drect.y = drect_y_base - giantNeutral->h;
+		drect.w = giantNeutral->w;
+		drect.h = giantNeutral->h;
+		attachedPainter.requestDraw(giantNeutral, &drect);
+		drect_x += giantNeutral->w;
+	}
+    for (int cpt = 0 ; cpt < numBigNeutral ; cpt++) {
+		drect.x = drect_x;
+		drect.y = drect_y_base - bigNeutral->h;
 		drect.w = bigNeutral->w;
 		drect.h = bigNeutral->h;
 		attachedPainter.requestDraw(bigNeutral, &drect);
-		drect_x += bigNeutral->w - compressor;
+		drect_x += bigNeutral->w;
 	}
-	for (int cpt = 0 ; cpt < numNeutral ; cpt++) {
+    for (int cpt = 0 ; cpt < numNeutral ; cpt++) {
 		drect.x = drect_x;
-		drect.y = yOffset + 3 + TSIZE;
+		drect.y = drect_y_base - neutral->h;
 		drect.w = neutral->w;
 		drect.h = neutral->h;
 		attachedPainter.requestDraw(neutral, &drect);
-		drect_x += neutral->w - compressor;
+		drect_x += neutral->w;
 	}
 }
 

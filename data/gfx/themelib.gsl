@@ -22,6 +22,7 @@ struct <Level:
     string description,
     string background,
     string speedmeter,
+    string neutralindicator,
     string lives,
     string grid>
 
@@ -81,6 +82,8 @@ external <end_level>
     level.speedmeter    = "fire"
     level.lives         = "heart"
     level.grid          = "metal"
+
+    level.neutralindicator = "glass"
 
 <ThemeDefinition>
 [start_puyoset]

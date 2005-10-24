@@ -41,11 +41,6 @@
 #define ESIZE 32
 #define FSIZE 16
 
-extern SDL_Surface *display;
-extern IIM_Surface *image;
-
-extern SDL_Painter painter;
-
 class PuyoGameFactory {
 public:
     virtual PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory) = 0;
@@ -55,7 +50,8 @@ class PuyoView : public PuyoDelegate {
   public:
     PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 	     AnimatedPuyoSetTheme *attachedThemeSet,
-	     int xOffset, int yOffset, int nXOffset, int nYOffset, SDL_Painter &painterToUse = painter);
+         PuyoLevelTheme *attachedLevelTheme,
+	     int xOffset, int yOffset, int nXOffset, int nYOffset, SDL_Painter &painterToUse);
     virtual ~PuyoView() {}
     void setEnemyGame(PuyoGame *enemyGame);
     void render();
@@ -96,6 +92,7 @@ class PuyoView : public PuyoDelegate {
     int xOffset, yOffset;
     int nXOffset, nYOffset;
     AnimatedPuyoSetTheme *attachedThemeSet;
+    PuyoLevelTheme *attachedLevelTheme;
     AnimatedPuyoFactory attachedPuyoFactory;
     PuyoGame *attachedGame, *enemyGame;
     IosVector viewAnimations;

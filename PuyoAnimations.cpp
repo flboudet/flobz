@@ -30,10 +30,6 @@
 #include "SDL_Painter.h"
 #include "audio.h"
 
-/* not clean, but basta */
-extern SDL_Painter painter;
-extern IIM_Surface *puyoEyesSwirl[4];
-
 /* Base class implementation */
 Animation::Animation()
 {

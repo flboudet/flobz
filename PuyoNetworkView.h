@@ -36,10 +36,11 @@ class PuyoNetworkView : public PuyoView {
   public:
     PuyoNetworkView(PuyoGameFactory *attachedPuyoGameFactory,
 		    AnimatedPuyoSetTheme *attachedPuyoThemeSet,
+            PuyoLevelTheme *attachedLevelTheme,
 		    int xOffset, int yOffset,
                     int nXOffset, int nYOffset, MessageBox *mbox,
-                    SDL_Painter &painterToUse = painter)
-        : PuyoView(attachedPuyoGameFactory, attachedPuyoThemeSet,
+                    SDL_Painter &painterToUse)
+        : PuyoView(attachedPuyoGameFactory, attachedPuyoThemeSet, attachedLevelTheme,
 		   xOffset, yOffset, nXOffset, nYOffset, painterToUse),
           mbox(mbox),badPuyos(0) {}
         

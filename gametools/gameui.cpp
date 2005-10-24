@@ -659,7 +659,7 @@ namespace gameui {
   {
     if (!isVisible()) return;
     rootContainer.eventOccured(event);
-    rootContainer.giveFocus();
+    rootContainer.giveFocus(); /* Utile mais mouaif */
     requestDraw();
   }
 

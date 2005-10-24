@@ -34,26 +34,8 @@
 
 using namespace ios_fc;
 
-extern SDL_Painter painter;
-
-static IIM_Surface *grid;
-IIM_Surface *perso[2];
-int currentPerso;
-IIM_Surface *live[4];
-IIM_Surface *speedImg;
-IIM_Surface *speedBlackImg;
-IIM_Surface *gameScreen;
-extern IIM_Surface *bigNeutral;
-
-int gameLevel;
-int GAME_ACCEL = 1250;
-static const int NB_PERSO_STATE = 2;
-
 const char *p1name = "Player1";
 const char *p2name = "Player2";
-
-static char *BACKGROUND[NB_MUSIC_THEME] = { "Background.jpg", "BackgroundDark.jpg" };
-extern IIM_Surface *background, *neutral;
 
 PuyoEventPlayer::PuyoEventPlayer(PuyoView &view,
 						     int downEvent, int leftEvent, int rightEvent,
@@ -171,10 +153,6 @@ void PuyoGameWidget::initialize()
     once = false;
     gameover = false;
     // Affreux, a degager absolument
-    if (neutral == NULL)
-        neutral = IIM_Load_DisplayFormatAlpha("Neutral.png");
-    if (bigNeutral == NULL)
-        bigNeutral = IIM_Load_DisplayFormatAlpha("BigNeutral.png");
     static bool firstTime = true;
     if (firstTime) {
         NeutralPopAnimation::initResources();
@@ -475,9 +453,9 @@ void PuyoGameScreen::setOverlayStory(PuyoStoryWidget *story)
 
 PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
                                                      attachedGameFactory(&attachedRandom),
-                                                     areaA(&attachedGameFactory, &attachedPuyoThemeSet,
+                                                     areaA(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
                                                      1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
-                                                     areaB(&attachedGameFactory, &attachedPuyoThemeSet,
+                                                     areaB(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
                                                      1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
                                                      controllerA(areaA, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left, GameControlEvent::kPlayer1Right,
                                                      GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),

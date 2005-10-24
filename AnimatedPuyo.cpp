@@ -27,9 +27,6 @@
 #include "PuyoView.h"
 #include "AnimatedPuyoTheme.h"
 
-// crade, mais basta
-extern IIM_Surface *neutral;
-
 AnimatedPuyo::AnimatedPuyo(PuyoState state, AnimatedPuyoSetTheme *themeSet, PuyoView *attachedView)
     : PuyoPuyo(state), attachedTheme(themeSet->getAnimatedPuyoTheme(state))
 {
@@ -115,13 +112,7 @@ void AnimatedPuyo::renderAt(int X, int Y)
     
     SDL_Rect drect;
     IIM_Surface *currentSurface;
-    
-    if (getPuyoState() == PUYO_NEUTRAL) {
-        currentSurface = neutral;
-    }
-    else {
-        currentSurface = attachedTheme->getPuyoSurfaceForValence(attachedView->getValenceForPuyo(this));
-    }
+    currentSurface = attachedTheme->getPuyoSurfaceForValence(attachedView->getValenceForPuyo(this));
     if (currentSurface != NULL) {
         drect.x = X;
         drect.y = Y;
