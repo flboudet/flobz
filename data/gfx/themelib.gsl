@@ -69,10 +69,6 @@ external <end_level>
     puyoset.P5.disappear = "round"
 
     puyoset.Neutral.face = "glass"
-    puyoset.Neutral.offset = 0.0
-    puyoset.Neutral.eye = "normal"
-    puyoset.Neutral.explosion = "round"
-    puyoset.Neutral.disappear = "round"
 
 <start_level>
     level.name          = "Unamed"

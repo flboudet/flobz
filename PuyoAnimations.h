@@ -146,13 +146,12 @@ public:
     virtual ~NeutralPopAnimation();
     void cycle();
     void draw(int semiMove);
-    static void initResources();
 private:
     AnimationSynchronizer *synchronizer;
     int iter, delay;
     bool once;
     int X, Y;
-    static IIM_Surface *neutralPop[3];
+    IIM_Surface *neutralPop[3];
 };
 
 class SmoothBounceAnimation : public PuyoAnimation {

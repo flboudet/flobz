@@ -113,13 +113,15 @@ public:
     IIM_Surface *getCircleSurfaceForIndex(int index) { return NULL; }
     IIM_Surface *getShadowSurface() { return NULL; }
     IIM_Surface *getShrinkingSurfaceForIndex(int index) { return NULL; }
-    IIM_Surface *getExplodingSurfaceForIndex(int index) { return NULL; }
+    IIM_Surface *getExplodingSurfaceForIndex(int index);
     bool cache(void);
     void releaseCached(void);
 private:
     String imageFullPath;
     String imageDefaultPath;
+    String faceName;
     IIM_Surface * _puyoNeutral;
+    IIM_Surface * _puyoNeutralPop[3];
     bool _cached;
 };
 

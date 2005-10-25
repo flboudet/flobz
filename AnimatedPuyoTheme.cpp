@@ -421,10 +421,11 @@ void StandardAnimatedPuyoTheme::release(void)
 
 
 NeutralAnimatedPuyoTheme::NeutralAnimatedPuyoTheme(const String path, const char * face)
-    : imageFullPath(path), imageDefaultPath(DEFAULTPATH()), _cached(false)
+    : imageFullPath(path), imageDefaultPath(DEFAULTPATH()), faceName(face), _cached(false)
 {
-    imageFullPath = imageFullPath + "/" + face + ".png";
+    /*imageFullPath = imageFullPath + "/" + face + ".png";
     imageDefaultPath = imageDefaultPath + "/" + face + ".png";
+    faceName = face;*/
 }
 
 NeutralAnimatedPuyoTheme::~NeutralAnimatedPuyoTheme(void)
@@ -434,28 +435,40 @@ NeutralAnimatedPuyoTheme::~NeutralAnimatedPuyoTheme(void)
 
 IIM_Surface * NeutralAnimatedPuyoTheme::getSurface(PuyoPictureType picture, int index)
 {
-    if (!_cached)
-        cache();
+    CACHE_IT_OR_DIE
     return _puyoNeutral;
 }
 
 IIM_Surface *NeutralAnimatedPuyoTheme::getPuyoSurfaceForValence(int valence)
 {
-    if (!_cached)
-        cache();
+    CACHE_IT_OR_DIE
     return _puyoNeutral;
+}
+
+IIM_Surface *NeutralAnimatedPuyoTheme::getExplodingSurfaceForIndex(int index)
+{
+    CACHE_IT_OR_DIE
+    return _puyoNeutralPop[index];
 }
 
 bool NeutralAnimatedPuyoTheme::cache(void)
 {
-    _cached = loadPictureAt(imageFullPath, &(_puyoNeutral), imageDefaultPath);
-    return _cached;
+    bool OK = true;
+    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + ".png", &(_puyoNeutral), imageDefaultPath + "/" + faceName + ".png");
+    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-1.png", &(_puyoNeutralPop[0]), imageDefaultPath + "/" + faceName + "neutral-1.png");
+    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-2.png", &(_puyoNeutralPop[1]), imageDefaultPath + "/" + faceName + "neutral-2.png");
+    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-3.png", &(_puyoNeutralPop[2]), imageDefaultPath + "/" + faceName + "neutral-3.png");
+    _cached = OK;
+    return OK;
 }
 
 void NeutralAnimatedPuyoTheme::releaseCached(void)
 {
     if (_cached) {
         IIM_Free(_puyoNeutral);
+        IIM_Free(_puyoNeutralPop[0]);
+        IIM_Free(_puyoNeutralPop[1]);
+        IIM_Free(_puyoNeutralPop[2]);
         _cached = false;
     }
 }

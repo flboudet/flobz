@@ -152,12 +152,7 @@ void PuyoGameWidget::initialize()
 {
     once = false;
     gameover = false;
-    // Affreux, a degager absolument
-    static bool firstTime = true;
-    if (firstTime) {
-        NeutralPopAnimation::initResources();
-        firstTime = false;
-    }
+    
     IIM_Surface * background = attachedLevelTheme->getBackground();
 
     SDL_PixelFormat *fmt = background->surf->format;

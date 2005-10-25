@@ -358,6 +358,10 @@ NeutralPopAnimation::NeutralPopAnimation(AnimatedPuyo &puyo, int delay, Animatio
 {
     synchronizer->push();
     synchronizer->incrementUsage();
+    AnimatedPuyoTheme *attachedTheme = attachedPuyo.getAttachedTheme();
+    neutralPop[0] = attachedTheme->getExplodingSurfaceForIndex(0);
+    neutralPop[1] = attachedTheme->getExplodingSurfaceForIndex(1);
+    neutralPop[2] = attachedTheme->getExplodingSurfaceForIndex(2);
     enabled = false;
 }
 
@@ -402,14 +406,6 @@ void NeutralPopAnimation::draw(int semiMove)
     else if (iter - delay < 26) {
         painter.requestDraw(neutralPop[2], &drect);
     }
-}
-
-IIM_Surface *NeutralPopAnimation::neutralPop[3];
-void NeutralPopAnimation::initResources()
-{
-    neutralPop[0] = IIM_Load_DisplayFormatAlpha("explneutr01.png");
-    neutralPop[1] = IIM_Load_DisplayFormatAlpha("explneutr02.png");
-    neutralPop[2] = IIM_Load_DisplayFormatAlpha("explneutr03.png");
 }
 
 SmoothBounceAnimation::SmoothBounceAnimation(AnimatedPuyo &puyo, AnimationSynchronizer *synchronizer) : PuyoAnimation(puyo)
