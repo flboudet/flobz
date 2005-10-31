@@ -1,6 +1,6 @@
 <init>
   # Init function: called when script is loaded
-  Display @display  = [new_display: x=254.0 y=196.0 width=140.0 height=220.0]
+  Display @display  = [new_display: x=262.0 y=196.0 width=140.0 height=220.0]
   int @maxHeightPlayer = 0
   int @maxHeightAI = 0
   int @neutralsForPlayer = 0

@@ -27,7 +27,7 @@ external <end_level>
     level.opponentStory       = "storyz.gsl"
     level.opponentName        = "Unmapped Monster"
     level.opponentFace        = "opponentz.gsl"
-    level.backgroundTheme     = "Kaori's farm"
+    level.backgroundTheme     = "Basic level"
     level.gameLostStory       = "gamelost1p.gsl"
     level.gameOverStory       = "gameover1p.gsl"
     level.easySetting.type    = "RANDOM"

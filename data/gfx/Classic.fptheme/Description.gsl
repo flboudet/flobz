@@ -57,8 +57,15 @@
 /********** LEVELS **********/
 
 [start_level]
+    level.name          = "Basic level"
+    level.description   = "The basic Columns level"
+    level.background    = "columns"
+[end_level]
+
+[start_level]
     level.name          = "Kaori's farm"
     level.description   = "Her favorite place to play."
+    level.background    = "farm"
 [end_level]
 
 [start_level]
