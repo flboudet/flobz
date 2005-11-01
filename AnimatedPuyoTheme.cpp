@@ -455,9 +455,9 @@ bool NeutralAnimatedPuyoTheme::cache(void)
 {
     bool OK = true;
     OK = OK && loadPictureAt(imageFullPath + "/" + faceName + ".png", &(_puyoNeutral), imageDefaultPath + "/" + faceName + ".png");
-    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-1.png", &(_puyoNeutralPop[0]), imageDefaultPath + "/" + faceName + "neutral-1.png");
-    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-2.png", &(_puyoNeutralPop[1]), imageDefaultPath + "/" + faceName + "neutral-2.png");
-    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-3.png", &(_puyoNeutralPop[2]), imageDefaultPath + "/" + faceName + "neutral-3.png");
+    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-1.png", &(_puyoNeutralPop[0]), imageDefaultPath + "/" + faceName + "-neutral-1.png");
+    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-2.png", &(_puyoNeutralPop[1]), imageDefaultPath + "/" + faceName + "-neutral-2.png");
+    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-3.png", &(_puyoNeutralPop[2]), imageDefaultPath + "/" + faceName + "-neutral-3.png");
     _cached = OK;
     return OK;
 }
