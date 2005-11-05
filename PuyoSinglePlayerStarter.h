@@ -108,6 +108,7 @@ class PuyoSingleGameLevelData {
 public:
     PuyoSingleGameLevelData(int gameLevel, int difficulty, PuyoLevelDefinitions &levelDefinitions);
     ~PuyoSingleGameLevelData();
+    String getIntroStory() const;
     String getStory() const;
     String getGameLostStory() const;
     String getGameOverStory() const;
@@ -122,16 +123,6 @@ private:
     PuyoLevelDefinitions::LevelDefinition *levelDefinition;
     AnimatedPuyoSetTheme *themeToUse;
     PuyoLevelTheme *levelThemeToUse;
-    struct SelIA {
-        IA_Type type;
-        int level;
-    };
-    struct StaticLevelDatas {
-        char *storyName;
-        char *iaName;
-        SelIA easySetting, mediumSetting, hardSetting;
-    };
-    static const struct StaticLevelDatas levelDatas[];
 };
 
 class PuyoGameOver1PScreen : public PuyoStoryScreen {
@@ -170,6 +161,7 @@ private:
     PuyoGameOver1PScreen *gameOverScreen;
     PuyoSingleNameProvider *nameProvider;
     PuyoLevelDefinitions levelDefinitions;
+    bool inIntroduction;
 };
 
 #endif // _PUYOSINGLEPLAYERSTARTER

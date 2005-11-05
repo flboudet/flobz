@@ -1,6 +1,7 @@
 [start_level]
     level.levelName           = "Kaori vs the Men's Best Friend"
-    level.opponentStory       = "story1.gsl"
+    level.introStory          = "introherbert.gsl"
+    level.opponentStory       = "storyherbert.gsl"
     level.opponentName        = "Herbert the Dog"
     level.opponentFace        = "herbert.gsl"
     level.backgroundTheme     = "Kaori's farm"

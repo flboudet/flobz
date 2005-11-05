@@ -160,6 +160,11 @@ PuyoSingleGameLevelData::~PuyoSingleGameLevelData()
 {
 }
 
+String PuyoSingleGameLevelData::getIntroStory() const
+{
+    return levelDefinition->introStory;
+}
+
 String PuyoSingleGameLevelData::getStory() const
 {
     return levelDefinition->opponentStory;
@@ -249,11 +254,11 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousSc
 SinglePlayerStarterAction::SinglePlayerStarterAction(int difficulty, PuyoSingleNameProvider *nameProvider)
     : currentLevel(0), lifes(3), difficulty(difficulty), levelData(NULL),
       story(NULL), gameScreen(NULL), gameLostWidget(NULL), gameOverScreen(NULL),
-      nameProvider(nameProvider), levelDefinitions(String(getDataFolder()) + "/story/levels.gsl") {}
+      nameProvider(nameProvider), levelDefinitions(String(getDataFolder()) + "/story/levels.gsl"), inIntroduction(false) {}
 
 void SinglePlayerStarterAction::action()
 {
-    if (levelData == NULL) {
+    if ((levelData == NULL) || (inIntroduction)) {
         initiateLevel();
     }
     else if (gameScreen == NULL) {
@@ -295,8 +300,25 @@ void SinglePlayerStarterAction::action()
 
 void SinglePlayerStarterAction::initiateLevel()
 {
-    levelData = new PuyoSingleGameLevelData(currentLevel, difficulty, levelDefinitions);
-    story = new PuyoStoryScreen(levelData->getStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
+    if (levelData == NULL) {
+        levelData = new PuyoSingleGameLevelData(currentLevel, difficulty, levelDefinitions);
+        String introductionStory = levelData->getIntroStory();
+        if (introductionStory != "") {
+            story = new PuyoStoryScreen(introductionStory, *(GameUIDefaults::SCREEN_STACK->top()), this);
+            inIntroduction = true;
+        }
+        else
+            story = new PuyoStoryScreen(levelData->getStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
+    }
+    else {
+        PuyoStoryScreen *previousStory = story;
+        story = new PuyoStoryScreen(levelData->getStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
+        if (inIntroduction) {
+            inIntroduction = false;
+            GameUIDefaults::SCREEN_STACK->pop();
+            delete previousStory;
+        }
+    }
     GameUIDefaults::SCREEN_STACK->push(story);
 }
 
