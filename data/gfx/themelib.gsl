@@ -24,7 +24,9 @@ struct <Level:
     string speedmeter,
     string neutralindicator,
     string lives,
-    string grid>
+    string grid,
+    int speedmeter_x,
+    int speedmeter_y>
 
 PuyoSet puyoset
 Level   level
@@ -80,6 +82,8 @@ external <end_level>
     level.grid          = "metal"
 
     level.neutralindicator = "glass"
+    level.speedmeter_x = 320
+    level.speedmeter_y = 170
 
 <ThemeDefinition>
 [start_puyoset]

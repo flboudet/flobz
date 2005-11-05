@@ -180,6 +180,7 @@ public:
     bool setGrid(const char * grid);
     bool setSpeedMeter(const char * speedmeter);
     bool setNeutralIndicator(const char * neutralIndicator);
+    void setSpeedMeterXY(int x, int y) {_speedMeterX = x; _speedMeterY = y;}
     
     IIM_Surface * getLifeForIndex(int index);
     IIM_Surface * getBackground(void);
@@ -189,6 +190,9 @@ public:
     IIM_Surface * getNeutralIndicator();
     IIM_Surface * getBigNeutralIndicator();
     IIM_Surface * getGiantNeutralIndicator();
+    
+    int getSpeedMeterX() const { return _speedMeterX; }
+    int getSpeedMeterY() const { return _speedMeterY; }
     
 private:    
     String _path;
@@ -211,6 +215,8 @@ private:
     IIM_Surface * _neutralIndicator;
     IIM_Surface * _bigNeutralIndicator;
     IIM_Surface * _giantNeutralIndicator;
+    
+    int _speedMeterX, _speedMeterY;
     
     bool _cached;
     

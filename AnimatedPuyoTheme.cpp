@@ -199,6 +199,7 @@ static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     theme->setGrid((const char *) GSL_GLOBAL_PTR(gsl, "level.grid"));
     theme->setSpeedMeter((const char *) GSL_GLOBAL_PTR(gsl, "level.speedmeter"));
     theme->setNeutralIndicator((const char *) GSL_GLOBAL_PTR(gsl, "level.neutralindicator"));
+    theme->setSpeedMeterXY(GSL_GLOBAL_INT(gsl, "level.speedmeter_x"), GSL_GLOBAL_INT(gsl, "level.speedmeter_y"));
     
     globalManager->addLevel(theme);
 }

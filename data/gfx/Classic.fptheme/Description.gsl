@@ -66,6 +66,8 @@
     level.name          = "Kaori's farm"
     level.description   = "Her favorite place to play."
     level.background    = "farm"
+    level.speedmeter_x = 320
+    level.speedmeter_y = 130
 [end_level]
 
 [start_level]
