@@ -298,7 +298,7 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
     
     speedBlackRect.h = speedFront->h - speedRect.h;
     speedBlackRect.y = 0;
-    drectBlack.y = attachedLevelTheme->getSpeedMeterY() - speedBlackRect.h;
+    drectBlack.y = attachedLevelTheme->getSpeedMeterY() - speedFront->h;
     drectBlack.h = speedBlackRect.h;
 
     SDL_BlitSurface(speedBack->surf,&speedBlackRect, screen, &drectBlack);
