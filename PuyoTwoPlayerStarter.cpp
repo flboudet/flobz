@@ -71,18 +71,13 @@ void TwoPlayersStarterAction::startGame()
 
 void TwoPlayersStarterAction::gameOver()
 {
-    /*GameUIDefaults::SCREEN_STACK->pop();
-    if (gameWidget != NULL) {
-        delete gameWidget;
-        delete gameScreen;
-    }*/
     AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
     
     PuyoTwoPlayersGameWidget *newGameWidget = new PuyoTwoPlayersGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *(themeManager->getPuyoLevelTheme()), this);
-    PuyoGameScreen *newGameScreen = new PuyoGameScreen(*gameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
+    PuyoGameScreen *newGameScreen = new PuyoGameScreen(*newGameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
     if (nameProvider != NULL) {
-        gameWidget->setPlayerOneName(nameProvider->getPlayer1Name());
-        gameWidget->setPlayerTwoName(nameProvider->getPlayer2Name());
+        newGameWidget->setPlayerOneName(nameProvider->getPlayer1Name());
+        newGameWidget->setPlayerTwoName(nameProvider->getPlayer2Name());
     }
     
     GameUIDefaults::SCREEN_STACK->pop();
