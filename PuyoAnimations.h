@@ -38,6 +38,7 @@ class AnimatedPuyo;
 class Animation {
 public:
     Animation();
+    virtual ~Animation() {}
     bool isFinished() const;
     bool isEnabled() const;
     virtual void cycle() = 0;

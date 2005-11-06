@@ -61,6 +61,11 @@ PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
     cycleAllowance = 0;
 }
 
+PuyoView::~PuyoView()
+{
+    delete attachedGame;
+}
+
 void PuyoView::setEnemyGame(PuyoGame *enemyGame)
 {
 	this->enemyGame = enemyGame;

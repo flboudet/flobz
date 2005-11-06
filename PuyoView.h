@@ -52,7 +52,7 @@ class PuyoView : public PuyoDelegate {
 	     AnimatedPuyoSetTheme *attachedThemeSet,
          PuyoLevelTheme *attachedLevelTheme,
 	     int xOffset, int yOffset, int nXOffset, int nYOffset, SDL_Painter &painterToUse);
-    virtual ~PuyoView() {}
+    virtual ~PuyoView();
     void setEnemyGame(PuyoGame *enemyGame);
     void render();
     void renderNeutral();

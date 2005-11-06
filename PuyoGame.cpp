@@ -107,6 +107,9 @@ void PuyoLocalGame::InitGame(PuyoRandomSystem *attachedRandom)
 PuyoLocalGame::~PuyoLocalGame()
 {
     delete unmoveablePuyo;
+    for (int i = 0 ; i < puyoVector.size() ; i++) {
+        delete puyoVector[i];
+    }
 }
 
 void PuyoLocalGame::cycle()
