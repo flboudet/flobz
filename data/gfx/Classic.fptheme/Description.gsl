@@ -71,6 +71,14 @@
 [end_level]
 
 [start_level]
+    level.name          = "The forest"
+    level.description   = "Her favorite place to play."
+    level.background    = "forest"
+    level.speedmeter_x = 320
+    level.speedmeter_y = 130
+[end_level]
+
+[start_level]
     level.name          = "Level1"
     level.description   = "The cave of fear..."
     level.background    = "dark"
