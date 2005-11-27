@@ -27,6 +27,9 @@ void   gsl_free_ptr(GoomSL *_this, int id);
 
 GoomHash *gsl_globals(GoomSL *_this);
 
+#define GSL_HAS_LOCAL(gsl,local,name) (goom_hash_get(local,name) != NULL)
+#define GSL_HAS_GLOBAL(gsl,name) (goom_hash_get(gsl_globals(gsl),name) != NULL)
+
 #define GSL_LOCAL_PTR(gsl,local,name)   gsl_get_ptr(gsl, *(int*)goom_hash_get(local,name)->ptr)
 #define GSL_LOCAL_INT(gsl,local,name)   (*(int*)goom_hash_get(local,name)->ptr)
 #define GSL_LOCAL_FLOAT(gsl,local,name) (*(float*)goom_hash_get(local,name)->ptr)
