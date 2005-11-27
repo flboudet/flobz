@@ -31,6 +31,7 @@ struct <Vec2:
   float y>
 
 struct <Sprite:
+  string parent,
   Vec2   pos,
   Vec2   dest,
   float  dcycle,
@@ -54,6 +55,7 @@ struct <Display:
   float height>
 
 <new_sprite: float x, float y, string image, float curframe, float framespeed, float nbframes> : Sprite
+  new_sprite.parent    = "none"
   new_sprite.pos.x     = x
   new_sprite.pos.y     = y
   new_sprite.dest.x    = x
@@ -132,7 +134,7 @@ external <mod: int numerator, int denominator> : int
     (&this.alpha > 1.0)? &this.alpha = 1.0
     int c = [charAt: value=&this.text index=[f2i: value=&this.text_index]]
     float tspeed = 0.55
-    (c = '!')? tspeed=0.25 // to understand that: you must know your ascii table...
+    (c = '!')? tspeed=0.25
     (c = ',')? tspeed=0.3
     (c = '-')? tspeed=0.05
     (c = '.')? tspeed=0.25

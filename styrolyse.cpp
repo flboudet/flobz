@@ -34,7 +34,7 @@ void styro_mod(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
     int numerator = GSL_LOCAL_INT(gsl, local, "numerator");
     int denominator = GSL_LOCAL_INT(gsl, local, "denominator");
-    GSL_LOCAL_INT(gsl, local, "mod") = numerator % denominator;
+    GSL_GLOBAL_INT(gsl, "mod") = numerator % denominator;
 }
 
 void put_text(GoomSL *gsl, GoomHash *global, GoomHash *local)
@@ -50,6 +50,52 @@ void put_text(GoomSL *gsl, GoomHash *global, GoomHash *local)
   styrolyse->client->putText(styrolyse->client,x,y,txt);
 }
 
+typedef struct _Vec2 {
+  float x;
+  float y;
+} Vec2;
+
+Vec2 global_sprite_get_position(GoomSL *gsl, const char *name)
+{
+  Vec2 v;
+  if (strcmp(name, "none") == 0)
+  {
+    v.x = 0;
+    v.y = 0;
+    return v;
+  }
+
+  char *vx_s = (char*)malloc(strlen(name)+7);
+  char *vy_s = (char*)malloc(strlen(name)+7);
+  char *parent_s = (char*)malloc(strlen(name)+8);
+
+  strcpy(vx_s, name); strcpy(vy_s, name);
+  strcat(vx_s, ".pos.x"); strcat(vy_s, ".pos.y");
+
+  strcpy(parent_s, name);
+  strcat(parent_s, ".parent");
+
+  if (GSL_HAS_GLOBAL(gsl, vx_s))
+  {
+    v.x = GSL_GLOBAL_FLOAT(gsl, vx_s);
+    v.y = GSL_GLOBAL_FLOAT(gsl, vy_s);
+    const char *parent = (const char*)GSL_GLOBAL_PTR(gsl, parent_s);
+
+    Vec2 vp = global_sprite_get_position(gsl, parent);
+    v.x += vp.x;
+    v.y += vp.y;
+  }
+  else
+  {
+    fprintf(stderr, "STYROLYSE: INVALID PARENT, '%s'\n", name);
+  }
+  
+  free(vx_s);
+  free(vy_s);
+  free(parent_s);
+  return v;
+}
+
 void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
   const char *path = (const char *)GSL_LOCAL_PTR  (gsl, local, "&this.image");
@@ -59,6 +105,12 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
   int        dy    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.y");
   int        dw    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.width");
   int        dh    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.height");
+
+  const char *parent = (const char*)GSL_LOCAL_PTR(gsl, local, "&this.parent");
+  Vec2 parentPos = global_sprite_get_position(gsl, parent);
+  x += (int)parentPos.x;
+  y += (int)parentPos.y;
+  
   GHashValue  *img  = goom_hash_get(styrolyse->images, path);
   void       *data = NULL;
   if (img == NULL) {

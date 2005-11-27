@@ -15,6 +15,17 @@
   Sprite @o3 = [new_sprite: image="title/O3.png" x=420.0 y=190.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @kaori = [new_sprite: image="Kaori_title.png" x = -300.0 y=130.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
 
+  // Defines a sprite graph (just for exmple purpose, to be removed!)
+  @f.parent =  "@kaori"
+  @l.parent =  "@kaori"
+  @o.parent =  "@kaori"
+  @b.parent =  "@kaori"
+  @o2.parent = "@kaori"
+  @p.parent =  "@f"
+  @u.parent =  "@kaori"
+  @y.parent =  "@kaori"
+  @o3.parent = "@kaori"
+
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
   # This also allows you to specify the drawing order

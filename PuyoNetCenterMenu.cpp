@@ -113,8 +113,8 @@ void NetCenterMenu::build()
     VBox *chatlist = new VBox();
     
     menu->add(new Text("Network Game Center"));
-    menu->add(new Button("Change Nick", new PopScreenAction()));
-    menu->add(new Button("Options", new PopScreenAction()));
+    menu->add(new Button("Change Nick"));
+    menu->add(new Button("Options"));
     menu->add(new Button("Disconnect", new PopScreenAction()));
 
     playerbox->add(new Text("Player List"));
@@ -122,7 +122,7 @@ void NetCenterMenu::build()
 
     topbox->add(menu);
     topbox->add(playerbox);
-    
+ 
 /*    
     HBox *screenCenter = new HBox();
     

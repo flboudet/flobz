@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
     wrefresh(inputArea);
     wrefresh(plyList);
     
-    PuyoInternetGameCenter myCenter("durandal.local", 4567, argv[1]);
+    PuyoInternetGameCenter myCenter("durandal.homeunix.com", 4567, argv[1]);
     MyNetGameCenterListener myListener(myCenter);
     myCenter.addListener(&myListener);
     while (1) {
