@@ -91,6 +91,8 @@ public:
     String getPlayerOneName() const { return playerOneName; }
     int getPointsPlayerOne() { return attachedGameA->getPoints(); }
     virtual PuyoStoryWidget *getOpponentFace() { return NULL; }
+    void addGameAHandicap(int handicap) {attachedGameA->increaseNeutralPuyos(handicap * PUYODIMX); attachedGameA->dropNeutrals();}
+    void addGameBHandicap(int handicap) {attachedGameB->increaseNeutralPuyos(handicap * PUYODIMX); attachedGameB->dropNeutrals();}
 protected:
     SDL_Painter painter;
     PuyoLevelTheme *attachedLevelTheme;

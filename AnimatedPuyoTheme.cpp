@@ -200,6 +200,9 @@ static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     theme->setSpeedMeter((const char *) GSL_GLOBAL_PTR(gsl, "level.speedmeter"));
     theme->setNeutralIndicator((const char *) GSL_GLOBAL_PTR(gsl, "level.neutralindicator"));
     theme->setSpeedMeterXY(GSL_GLOBAL_INT(gsl, "level.speedmeter_x"), GSL_GLOBAL_INT(gsl, "level.speedmeter_y"));
+    theme->setAnimations((const char *) GSL_GLOBAL_PTR(gsl, "level.gamelost_left_2p"),
+                         (const char *) GSL_GLOBAL_PTR(gsl, "level.gamelost_right_2p"),
+                         (const char *) GSL_GLOBAL_PTR(gsl, "level.animation_2p"));
     
     globalManager->addLevel(theme);
 }

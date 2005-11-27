@@ -181,6 +181,11 @@ public:
     bool setSpeedMeter(const char * speedmeter);
     bool setNeutralIndicator(const char * neutralIndicator);
     void setSpeedMeterXY(int x, int y) {_speedMeterX = x; _speedMeterY = y;}
+    void setAnimations(String gamelost_left_2p, String gamelost_right_2p, String animation_2p) {
+        _gamelost_left_2p = gamelost_left_2p;
+        _gamelost_right_2p = gamelost_right_2p;
+        _animation_2p = animation_2p;
+    }
     
     IIM_Surface * getLifeForIndex(int index);
     IIM_Surface * getBackground(void);
@@ -194,6 +199,10 @@ public:
     int getSpeedMeterX() const { return _speedMeterX; }
     int getSpeedMeterY() const { return _speedMeterY; }
     
+    const String getGameLostLeftAnimation2P() const { return _gamelost_left_2p; }
+    const String getGameLostRightAnimation2P() const { return _gamelost_right_2p; }
+    const String getCentralAnimation2P() const { return _animation_2p; }
+    
 private:    
     String _path;
     String _name;
@@ -206,6 +215,10 @@ private:
     char * _grid;
     char * _speed_meter;
     char * _neutral_indicator;
+    
+    String _gamelost_left_2p;
+    String _gamelost_right_2p;
+    String _animation_2p;
     
     IIM_Surface * _levelLives[NUMBER_OF_LIVES];
     IIM_Surface * _levelBackground;

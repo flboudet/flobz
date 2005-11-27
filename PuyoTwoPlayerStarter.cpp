@@ -25,7 +25,7 @@
 
 #include "PuyoTwoPlayerStarter.h"
 
-PuyoTwoPlayersGameWidget::PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
+PuyoTwoPlayersGameWidget::PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String aiFace, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
                                                      attachedGameFactory(&attachedRandom),
                                                      areaA(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
                                                      1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
@@ -34,14 +34,21 @@ PuyoTwoPlayersGameWidget::PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThe
                                                      playercontrollerA(areaA, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left, GameControlEvent::kPlayer1Right,
                                                      GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
                                                      playercontrollerB(areaB, GameControlEvent::kPlayer2Down, GameControlEvent::kPlayer2Left, GameControlEvent::kPlayer2Right,
-                                                     GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight)
+                                                     GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight),
+                                                     opponentFace(aiFace)
 {
     initialize(areaA, areaB, playercontrollerA, playercontrollerB, levelTheme, gameOverAction);
     setLives(-1);
 }
 
+PuyoStoryWidget *PuyoTwoPlayersGameWidget::getOpponentFace()
+{
+    return &opponentFace;
+}
+
 TwoPlayersStarterAction::TwoPlayersStarterAction(int difficulty, PuyoGameWidgetFactory &gameWidgetFactory, PuyoTwoNameProvider *nameProvider)
-    : difficulty(difficulty), gameWidgetFactory(gameWidgetFactory), gameScreen(NULL), nameProvider(nameProvider) {}
+    : difficulty(difficulty), gameWidgetFactory(gameWidgetFactory), gameScreen(NULL),
+      nameProvider(nameProvider), gameLostWidget(NULL), currentLevelTheme(NULL), leftVictories(0), rightVictories(0) {}
 
 void TwoPlayersStarterAction::action()
 {
@@ -49,7 +56,10 @@ void TwoPlayersStarterAction::action()
         startGame();
     }
     else if (! gameWidget->getAborted()) {
-        gameOver();
+        if (gameLostWidget == NULL)
+            gameOver();
+        else
+            restartGame();
     }
     else {
 	    endGameSession();
@@ -59,21 +69,43 @@ void TwoPlayersStarterAction::action()
 void TwoPlayersStarterAction::startGame()
 {
     AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
+    currentLevelTheme = themeManager->getPuyoLevelTheme();
     
-    gameWidget = gameWidgetFactory.createGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *(themeManager->getPuyoLevelTheme()), this);
+    gameWidget = gameWidgetFactory.createGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *currentLevelTheme, currentLevelTheme->getCentralAnimation2P(), this);
     gameScreen = new PuyoGameScreen(*gameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
     if (nameProvider != NULL) {
         gameWidget->setPlayerOneName(nameProvider->getPlayer1Name());
         gameWidget->setPlayerTwoName(nameProvider->getPlayer2Name());
+    }
+    int victoriesDelta = leftVictories - rightVictories;
+    if (victoriesDelta > 0) {
+        gameWidget->addGameAHandicap(victoriesDelta);
+    }
+    else if (victoriesDelta != 0) {
+        gameWidget->addGameBHandicap(-victoriesDelta);
     }
     GameUIDefaults::SCREEN_STACK->push(gameScreen);
 }
 
 void TwoPlayersStarterAction::gameOver()
 {
+    if (gameWidget->isGameARunning()) {
+        gameLostWidget = new PuyoStoryWidget(currentLevelTheme->getGameLostRightAnimation2P(), this);
+        leftVictories++;
+    }
+    else {
+        gameLostWidget = new PuyoStoryWidget(currentLevelTheme->getGameLostLeftAnimation2P(), this);
+        rightVictories++;
+    }
+    gameScreen->setOverlayStory(gameLostWidget);
+}
+
+void TwoPlayersStarterAction::restartGame()
+{
     AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
+    currentLevelTheme = themeManager->getPuyoLevelTheme();
     
-    PuyoTwoPlayersGameWidget *newGameWidget = new PuyoTwoPlayersGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *(themeManager->getPuyoLevelTheme()), this);
+    PuyoTwoPlayersGameWidget *newGameWidget = new PuyoTwoPlayersGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *currentLevelTheme, currentLevelTheme->getCentralAnimation2P(), this);
     PuyoGameScreen *newGameScreen = new PuyoGameScreen(*newGameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
     if (nameProvider != NULL) {
         newGameWidget->setPlayerOneName(nameProvider->getPlayer1Name());
@@ -85,9 +117,19 @@ void TwoPlayersStarterAction::gameOver()
         delete gameWidget;
         delete gameScreen;
     }
+    if (gameLostWidget != NULL)
+        delete gameLostWidget;
+    gameLostWidget = NULL;
     gameScreen = newGameScreen;
     gameWidget = newGameWidget;
     GameUIDefaults::SCREEN_STACK->push(gameScreen);
+    int victoriesDelta = leftVictories - rightVictories;
+    if (victoriesDelta > 0) {
+        gameWidget->addGameAHandicap(victoriesDelta);
+    }
+    else if (victoriesDelta != 0) {
+        gameWidget->addGameBHandicap(-victoriesDelta);
+    }
 }
 
 void TwoPlayersStarterAction::endGameSession()

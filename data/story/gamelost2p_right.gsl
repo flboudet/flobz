@@ -1,0 +1,51 @@
+<init>
+  // Timing
+  float @spAx = 0.0
+  float @spAy = 20.0
+  float @spBx = 40.0
+  float @spBy = 0.0
+  float @spCx = 80.0
+  float @spCy = 20.0
+
+  float @dstRx = @spBx
+  float @dstRy = @spBy
+
+  # Init function: called when script is loaded
+  Display @puyoDisplay = [new_display: x=460.0 y=50.0 width=640.0 height=480.0]
+
+  Sprite @puyo      = [new_sprite: image="knockedpuyo.png" x = 10.0 y=30.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @redStar   = [new_sprite: image="redstar.png" x = @spAx y=@spAy curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @blueStar  = [new_sprite: image="bluestar.png" x = @spBx y=@spBy curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @greenStar = [new_sprite: image="greenstar.png" x = @spCx y=@spCy curframe=0.0 framespeed=0.2 nbframes=1.0]
+
+<sprite_list>
+  # Call the 'sprite' function for each sprite you want to update/draw
+  # This also allows you to specify the drawing order
+  sprite::@puyo display=@puyoDisplay
+  sprite::@redStar display=@puyoDisplay
+  sprite::@blueStar display=@puyoDisplay
+  sprite::@greenStar display=@puyoDisplay
+
+<fabs: float x> : float
+  (x <  0.0) ? fabs = -x
+  (x >= 0.0) ? fabs = x
+
+<update>
+  # Update function: called every animation cycle
+  #move::@redStar fcycle=30.0 x=@spBx y=@spBy
+  #move::@blueStar fcycle=30.0 x=@spCx y=@spCy
+  #move::@greenStar fcycle=30.0 x=@spAx y=@spAy
+
+  move::@redStar fcycle=@fcycle+30.0 x=@dstRx y=@dstRy
+  #move::@blueStar fcycle=30.0 x=@spCx y=@spCy
+  #move::@greenStar fcycle=30.0 x=@spAx y=@spAy
+  ([fabs: x=(@redStar.pos.x - @spAx)] < 2.0) ? @dstRx = @spBx
+  ([fabs: x=(@redStar.pos.x - @spBx)] < 2.0) ? @dstRx = @spCx
+  ([fabs: x=(@redStar.pos.x - @spCx)] < 2.0) ? @dstRx = @spAx
+
+  ([fabs: x=(@redStar.pos.y - @spAy)] < 2.0) ? @dstRy = @spBy
+  ([fabs: x=(@redStar.pos.y - @spBy)] < 2.0) ? @dstRy = @spCy
+  ([fabs: x=(@redStar.pos.y - @spCy)] < 2.0) ? @dstRy = @spAy
+
+  @puyoDisplay.y = 350.0 - ([fabs: x=([sin: value = (@fcycle/10.0)] * 200.0)])
+

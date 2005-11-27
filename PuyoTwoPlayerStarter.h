@@ -35,27 +35,29 @@ public:
 
 class PuyoTwoPlayersGameWidget : public PuyoGameWidget {
 public:
-    PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction = NULL);
+    PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String aiFace, Action *gameOverAction = NULL);
     bool didPlayerWon() const { return isGameARunning(); }
+    PuyoStoryWidget *PuyoTwoPlayersGameWidget::getOpponentFace();
 private:
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;
     PuyoLocalGameFactory attachedGameFactory;
     PuyoView areaA, areaB;
     PuyoEventPlayer playercontrollerA, playercontrollerB;
+    PuyoStoryWidget opponentFace;
 };
 
 
 class PuyoGameWidgetFactory {
 public:
-    virtual PuyoGameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction) = 0;
+    virtual PuyoGameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String centerFace, Action *gameOverAction) = 0;
 };
 
 class PuyoLocalTwoPlayerGameWidgetFactory : public PuyoGameWidgetFactory {
 public:
-    PuyoGameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction)
+    PuyoGameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
-        return new PuyoTwoPlayersGameWidget(puyoThemeSet, levelTheme, gameOverAction);
+        return new PuyoTwoPlayersGameWidget(puyoThemeSet, levelTheme, centerFace, gameOverAction);
     }
 };
 
@@ -67,6 +69,7 @@ public:
 private:    
     void startGame();
     void gameOver();
+    void restartGame();
     void endGameSession();
     
     int difficulty;
@@ -74,6 +77,10 @@ private:
     PuyoGameScreen *gameScreen;
     PuyoGameWidget *gameWidget;
     PuyoTwoNameProvider *nameProvider;
+    PuyoStoryWidget *gameLostWidget;
+    
+    PuyoLevelTheme *currentLevelTheme;
+    int leftVictories, rightVictories;
 };
 
 #endif // _PUYOTWOPLAYERSTARTER

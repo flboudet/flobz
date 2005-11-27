@@ -25,6 +25,9 @@ struct <Level:
     string neutralindicator,
     string lives,
     string grid,
+    string gamelost_left_2p,
+    string gamelost_right_2p,
+    string animation_2p,
     int speedmeter_x,
     int speedmeter_y>
 
@@ -84,6 +87,10 @@ external <end_level>
     level.neutralindicator = "glass"
     level.speedmeter_x = 320
     level.speedmeter_y = 170
+
+    level.gamelost_left_2p = "gamelost2p_left.gsl"
+    level.gamelost_right_2p = "gamelost2p_right.gsl"
+    level.animation_2p = "herbert.gsl"
 
 <ThemeDefinition>
 [start_puyoset]
