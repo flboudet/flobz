@@ -16,6 +16,20 @@ static InputSwitch *keyControls[NB_CONTROLS] =
     new KeyInputSwitch(SDLK_UP,true)
 };
 
+static InputSwitch *keyAlternateControls[NB_CONTROLS] =
+{
+    new JoystickAxisSwitch(0, 0, false, false),
+    new JoystickAxisSwitch(0, 0, true, false),
+    new JoystickAxisSwitch(0, 1, true, false),
+    new JoystickSwitch(0, 1, false),
+    new JoystickSwitch(0, 0, false),
+    new JoystickAxisSwitch(1, 0, false, false),
+    new JoystickAxisSwitch(1, 0, true, false),
+    new JoystickAxisSwitch(1, 1, true, false),
+    new JoystickSwitch(1, 1, false),
+    new JoystickSwitch(1, 0, false)
+};
+
 void getKeyName(int gameEvent, char *keyName)
 {
   strcpy(keyName,"           ");
@@ -59,26 +73,26 @@ void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
 
   result->isUp = input->isUp();
 
-  if (*input == *keyControls[kPlayer1LeftControl])
+  if ((*input == *keyControls[kPlayer1LeftControl]) || (*input == *keyAlternateControls[kPlayer1LeftControl]))
     result->gameEvent = GameControlEvent::kPlayer1Left;
-  if (*input == *keyControls[kPlayer1RightControl])
+  if ((*input == *keyControls[kPlayer1RightControl]) || (*input == *keyAlternateControls[kPlayer1RightControl]))
     result->gameEvent = GameControlEvent::kPlayer1Right;
-  if (*input == *keyControls[kPlayer1ClockwiseControl])
+  if ((*input == *keyControls[kPlayer1ClockwiseControl]) || (*input == *keyAlternateControls[kPlayer1ClockwiseControl]))
     result->gameEvent = GameControlEvent::kPlayer1TurnRight;
-  if (*input == *keyControls[kPlayer1CounterclockwiseControl])
+  if ((*input == *keyControls[kPlayer1CounterclockwiseControl]) || (*input == *keyAlternateControls[kPlayer1CounterclockwiseControl]))
     result->gameEvent = GameControlEvent::kPlayer1TurnLeft;
-  if (*input == *keyControls[kPlayer1DownControl])
+  if ((*input == *keyControls[kPlayer1DownControl]) || (*input == *keyAlternateControls[kPlayer1DownControl]))
     result->gameEvent = GameControlEvent::kPlayer1Down;
 
-  if (*input == *keyControls[kPlayer2LeftControl])
+  if ((*input == *keyControls[kPlayer2LeftControl]) || (*input == *keyAlternateControls[kPlayer2LeftControl]))
     result->gameEvent = GameControlEvent::kPlayer2Left;
-  if (*input == *keyControls[kPlayer2RightControl])
+  if ((*input == *keyControls[kPlayer2RightControl]) || (*input == *keyAlternateControls[kPlayer2RightControl]))
     result->gameEvent = GameControlEvent::kPlayer2Right;
-  if (*input == *keyControls[kPlayer2ClockwiseControl])
+  if ((*input == *keyControls[kPlayer2ClockwiseControl]) || (*input == *keyAlternateControls[kPlayer2ClockwiseControl]))
     result->gameEvent = GameControlEvent::kPlayer2TurnRight;
-  if (*input == *keyControls[kPlayer2CounterclockwiseControl])
+  if ((*input == *keyControls[kPlayer2CounterclockwiseControl]) || (*input == *keyAlternateControls[kPlayer2CounterclockwiseControl]))
     result->gameEvent = GameControlEvent::kPlayer2TurnLeft;
-  if (*input == *keyControls[kPlayer2DownControl])
+  if ((*input == *keyControls[kPlayer2DownControl]) || (*input == *keyAlternateControls[kPlayer2DownControl]))
     result->gameEvent = GameControlEvent::kPlayer2Down;
 }
 

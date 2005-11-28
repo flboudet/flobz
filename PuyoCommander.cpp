@@ -217,8 +217,8 @@ PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
   theCommander = this;
 
   loadPreferences(fs, snd, audio);
-  initGameControls();
   initSDL();
+  initGameControls();
   initAudio();
   initDisplay(fullscreen, useGL);
   initFonts();
