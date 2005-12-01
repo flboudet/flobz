@@ -48,6 +48,7 @@ namespace gameui {
       static SoFont      *FONT;
       static SoFont      *FONT_INACTIVE;
       static SoFont      *FONT_TEXT;
+      static SoFont      *FONT_SMALL_ACTIVE;
       static SoFont      *FONT_SMALL_INFO;
       static GameLoop    *GAME_LOOP;
       static ScreenStack *SCREEN_STACK;
@@ -335,6 +336,23 @@ namespace gameui {
   class EditField : public Text {
     public:
       EditField(const String &defaultText, Action *action = NULL);
+
+      void eventOccured(GameControlEvent *event);
+
+      void lostFocus();
+      void giveFocus();
+      
+    private:
+      SoFont *fontActive;
+      SoFont *fontInactive;
+      bool editionMode;
+      String previousValue;
+      void init(SoFont *fontActive, SoFont *fontInactive);
+  };
+  
+  class ControlInputWidget : public Text {
+    public:
+      ControlInputWidget(const String &defaultText, Action *action = NULL);
 
       void eventOccured(GameControlEvent *event);
 

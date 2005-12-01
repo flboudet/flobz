@@ -56,17 +56,17 @@ static const char *kLevelEasy   = "Easy";
 static const char *kLevelMedium = "Medium";
 static const char *kLevelHard   = "Hard";
 
-static const char *kPlayer1Left  = "P2 Left:\t";
-static const char *kPlayer1Right = "P2 Right:\t";
-static const char *kPlayer1Down  = "P2 Down:\t";
-static const char *kPlayer1Clockwise        = "P2 Turn L:\t";
-static const char *kPlayer1Counterclockwise = "P2 Turn R:\t";
+static const char *kPlayer1Left  = "P1 Left:\t";
+static const char *kPlayer1Right = "P1 Right:\t";
+static const char *kPlayer1Down  = "P1 Down:\t";
+static const char *kPlayer1Clockwise        = "P1 Turn R:\t";
+static const char *kPlayer1Counterclockwise = "P1 Turn L:\t";
 
-static const char *kPlayer2Left   = "P1 Left:\t";
-static const char *kPlayer2Right  = "P1 Right:\t";
-static const char *kPlayer2Down   = "P1 Down:\t";
-static const char *kPlayer2Clockwise        = "P1 Turn L:\t";
-static const char *kPlayer2Counterclockwise = "P1 Turn R:\t";
+static const char *kPlayer2Left   = "P2 Left:\t";
+static const char *kPlayer2Right  = "P2 Right:\t";
+static const char *kPlayer2Down   = "P2 Down:\t";
+static const char *kPlayer2Clockwise        = "P2 Turn R:\t";
+static const char *kPlayer2Counterclockwise = "P2 Turn L:\t";
 
 static const char *kRules01 = "Puyos are fancy smiling bubbles...";
 static const char *kRules02 = "But they can really be invading sometimes!";

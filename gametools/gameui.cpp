@@ -7,6 +7,7 @@ namespace gameui {
   SoFont      *GameUIDefaults::FONT             = SoFont_new();
   SoFont      *GameUIDefaults::FONT_TEXT        = SoFont_new();
   SoFont      *GameUIDefaults::FONT_INACTIVE    = SoFont_new();
+  SoFont      *GameUIDefaults::FONT_SMALL_ACTIVE= SoFont_new();
   SoFont      *GameUIDefaults::FONT_SMALL_INFO  = SoFont_new();
   GameLoop    *GameUIDefaults::GAME_LOOP        = new GameLoop();
   ScreenStack *GameUIDefaults::SCREEN_STACK     = new ScreenStack();
@@ -888,6 +889,80 @@ namespace gameui {
   }
 
   void EditField::giveFocus() {
+    Text::giveFocus();
+    font = fontActive;
+    requestDraw();
+  }
+  
+  
+  //
+  // ControlInputWidget
+  //
+
+  void ControlInputWidget::init(SoFont *fontActive, SoFont *fontInactive)
+  {
+    if (fontInactive == NULL) fontInactive = GameUIDefaults::FONT_SMALL_INFO;
+    if (fontActive == NULL)   fontActive = GameUIDefaults::FONT_SMALL_ACTIVE;
+
+    this->fontActive   = fontActive;
+    this->fontInactive = fontInactive;
+
+    font = fontInactive;
+    editionMode = false;
+
+    setFocusable(true);
+  }
+
+  ControlInputWidget::ControlInputWidget(const String &defaultText,  Action *action)
+    : Text(defaultText, NULL)
+    {
+      init(NULL,NULL);
+      if (action != NULL)
+        setAction(ON_START, action);
+    }
+
+  void ControlInputWidget::eventOccured(GameControlEvent *event)
+  {
+    if (event->cursorEvent == GameControlEvent::kStart) {
+      editionMode = !editionMode;
+      if (editionMode == true) {
+        previousValue = getValue();
+        setValue("<Press a key>");
+      }
+      else {
+        setValue(getValue().substring(0, getValue().length() - 1));
+        Action *action = getAction(ON_START);
+        if (action)
+            action->action();
+      }
+    }
+    else if (editionMode == true) {
+      if (event->cursorEvent == GameControlEvent::kBack) {
+        setValue(previousValue);
+        editionMode = false;
+      }
+      else if (event->sdl_event.type == SDL_KEYDOWN) {
+        SDL_Event e = event->sdl_event;
+        editionMode = false;
+      }
+      else if (event->sdl_event.type == SDL_JOYBUTTONDOWN) {
+        SDL_Event e = event->sdl_event;
+        editionMode = false;
+      }
+    }
+    else {
+      if (isDirectionEvent(event))
+        lostFocus();
+    }
+  }
+
+  void ControlInputWidget::lostFocus() {
+    Text::lostFocus();
+    font = fontInactive;
+    requestDraw();
+  }
+
+  void ControlInputWidget::giveFocus() {
     Text::giveFocus();
     font = fontActive;
     requestDraw();

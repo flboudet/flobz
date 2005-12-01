@@ -317,6 +317,8 @@ void PuyoCommander::initFonts()
   GameUIDefaults::FONT_INACTIVE   = darkFont;
   SoFont_free(GameUIDefaults::FONT_SMALL_INFO);
   GameUIDefaults::FONT_SMALL_INFO = smallFontInfo;
+    SoFont_free(GameUIDefaults::FONT_SMALL_ACTIVE);
+  GameUIDefaults::FONT_SMALL_ACTIVE = smallFont;
 }
 
 
