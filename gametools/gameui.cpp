@@ -913,10 +913,13 @@ namespace gameui {
     setFocusable(true);
   }
 
-  ControlInputWidget::ControlInputWidget(const String &defaultText,  Action *action)
-    : Text(defaultText, NULL)
+  ControlInputWidget::ControlInputWidget(int control, bool alternate, Action *action)
+    : Text("<Not set>", NULL), control(control), alternate(alternate)
     {
+      char temp[255];
       init(NULL,NULL);
+      getKeyName(control, alternate, temp);
+      setValue(temp);
       if (action != NULL)
         setAction(ON_START, action);
     }
@@ -927,7 +930,7 @@ namespace gameui {
       editionMode = !editionMode;
       if (editionMode == true) {
         previousValue = getValue();
-        setValue("<Press a key>");
+        setValue("<Press>");
       }
       else {
         setValue(getValue().substring(0, getValue().length() - 1));
@@ -941,13 +944,14 @@ namespace gameui {
         setValue(previousValue);
         editionMode = false;
       }
-      else if (event->sdl_event.type == SDL_KEYDOWN) {
-        SDL_Event e = event->sdl_event;
-        editionMode = false;
-      }
-      else if (event->sdl_event.type == SDL_JOYBUTTONDOWN) {
-        SDL_Event e = event->sdl_event;
-        editionMode = false;
+      else {
+        GameControlEvent result;
+        if (tryChangeControl(control, alternate, event->sdl_event, &result)) {
+            char temp[255];
+            getKeyName(control, alternate, temp);
+            setValue(temp);
+            editionMode = false;
+        }
       }
     }
     else {

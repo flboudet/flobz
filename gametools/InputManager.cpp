@@ -6,7 +6,7 @@ typedef struct SdlKeyName {
 } SdlKeyName;
 
 static const SdlKeyName sdlKeyDictionnary[] = {
-  { SDLK_UNKNOWN,   "  "},
+  { SDLK_UNKNOWN,   "<Not set>"},
   { SDLK_BACKSPACE, "Backspace"  },
   { SDLK_TAB,       "Tab"        },
   { SDLK_CLEAR,     "Clear"      },

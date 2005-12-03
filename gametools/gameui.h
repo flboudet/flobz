@@ -352,7 +352,7 @@ namespace gameui {
   
   class ControlInputWidget : public Text {
     public:
-      ControlInputWidget(const String &defaultText, Action *action = NULL);
+      ControlInputWidget(int control, bool alternate, Action *action = NULL);
 
       void eventOccured(GameControlEvent *event);
 
@@ -360,6 +360,8 @@ namespace gameui {
       void giveFocus();
       
     private:
+      int control;
+      bool alternate;
       SoFont *fontActive;
       SoFont *fontInactive;
       bool editionMode;

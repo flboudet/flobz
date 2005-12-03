@@ -53,8 +53,8 @@ enum {
 void initGameControls();
 void getControlEvent(SDL_Event e, GameControlEvent *result);
 
-void getKeyName(int control, char *keyName);
-bool tryChangeControl(int control, SDL_Event e, GameControlEvent *result);
+void getKeyName(int control, bool alternate, char *keyName);
+bool tryChangeControl(int control, bool alternate, SDL_Event e, GameControlEvent *result);
 
 void saveControls();
 void loadControls();
