@@ -63,8 +63,8 @@ private:
 
 class IgpPeer {
 public:
-    IgpPeer() : pool(NULL) {}
-    IgpPeer(IgpMessageListener *pool) { registerSelf(pool); }
+    IgpPeer() : pool(NULL), igpID(-1) {}
+    IgpPeer(IgpMessageListener *pool) : pool(NULL), igpID(-1) { registerSelf(pool); }
     virtual ~IgpPeer() {
         if (pool != NULL)
             pool->removePeer(this);
