@@ -24,7 +24,19 @@
  */
 
 #include "PuyoNetCenterMenu.h"
+#include "PuyoTwoPlayerStarter.h"
 #include "PuyoNetworkStarter.h"
+
+class PuyoNetworkTwoPlayerGameWidgetFactory : public PuyoGameWidgetFactory {
+public:
+    PuyoNetworkTwoPlayerGameWidgetFactory(ios_fc::MessageBox &mbox) : mbox(mbox) {}
+    PuyoGameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String centerFace, Action *gameOverAction)
+    {
+        return new PuyoNetworkGameWidget(puyoThemeSet, levelTheme, mbox, gameOverAction);
+    }
+private:
+    ios_fc::MessageBox &mbox;
+};
 
 NetCenterChatArea::NetCenterChatArea(int height)
     : height(height), lines(new (HBox *[height])), names(new (Text *[height])), texts(new (Text *[height]))
@@ -192,6 +204,9 @@ void NetCenterMenu::gameCanceledAgainst(String playerName, PeerAddress playerAdd
 
 void NetCenterMenu::gameGrantedWithMessagebox(MessageBox *mbox)
 {
+    PuyoNetworkTwoPlayerGameWidgetFactory factory(*mbox);
+    TwoPlayersStarterAction starterAction(0, factory);
+    starterAction.action();
     //PuyoStarter *starter = new PuyoNetworkStarter(theCommander, 0, mbox);
     //starter->run(0,0,0,0,0);
     //GameUIDefaults::SCREEN_STACK->push(starter);
