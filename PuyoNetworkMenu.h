@@ -64,8 +64,8 @@ private:
     HBox menu;
     PuyoStoryWidget story;
     SliderContainer container;
-    EditField *playerName;
-    Text *serverName;
+    EditField playerName;
+    EditField serverName;
     int portNum;
     Button *updating;
 };

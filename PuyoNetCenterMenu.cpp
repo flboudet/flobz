@@ -26,21 +26,39 @@
 #include "PuyoNetCenterMenu.h"
 #include "PuyoNetworkStarter.h"
 
-NetCenterMenu::NetCenterChatArea::NetCenterChatArea(int height)
+NetCenterChatArea::NetCenterChatArea(int height)
     : height(height), lines(new (HBox *[height])), names(new (Text *[height])), texts(new (Text *[height]))
 {
     for (int i = 0 ; i < height ; i++) {
         lines[i] = new HBox;
         names[i] = new Text("");
+        names[i]->setFont(GameUIDefaults::FONT_SMALL_ACTIVE);
+        names[i]->setPreferedSize(Vec3(100, 12, 0));
         texts[i] = new Text("");
+        texts[i]->setFont(GameUIDefaults::FONT_SMALL_INFO);
+        texts[i]->setPreferedSize(Vec3(540, 12, 0));
         lines[i]->add(names[i]);
         lines[i]->add(texts[i]);
         add(lines[i]);
     }
 }
 
-void NetCenterMenu::NetCenterChatArea::addChat(String name, String text)
+NetCenterChatArea::~NetCenterChatArea()
 {
+    for (int i = 0 ; i < height ; i++) {
+        delete texts[i];
+        delete names[i];
+        delete lines[i];
+    }
+    delete[] lines;
+    delete[] names;
+    delete[] texts;
+}
+
+void NetCenterChatArea::addChat(String name, String text)
+{
+    while (text.length() < 150)
+        text += " ";
     for (int i = 0 ; i < height-1 ; i++) {
         names[i]->setValue(names[i+1]->getValue());
         texts[i]->setValue(texts[i+1]->getValue());
@@ -49,14 +67,14 @@ void NetCenterMenu::NetCenterChatArea::addChat(String name, String text)
     texts[height-1]->setValue(text);
 }
 
-void NetCenterMenu::NetCenterPlayerList::addNewPlayer(String playerName, PeerAddress playerAddress)
+void NetCenterPlayerList::addNewPlayer(String playerName, PeerAddress playerAddress)
 {
     PlayerEntry *newEntry = new PlayerEntry(playerName, playerAddress, new PlayerSelectedAction(targetMenu, playerAddress));
     entries.add(newEntry);
     add(newEntry);
 }
 
-void NetCenterMenu::NetCenterPlayerList::PlayerSelectedAction::action()
+void NetCenterPlayerList::PlayerSelectedAction::action()
 {
     printf("ZZZ\n");
     targetMenu->playerSelected(address);
@@ -75,8 +93,8 @@ private:
 };
 
 NetCenterMenu::NetCenterMenu(PuyoNetGameCenter *netCenter)
-    : netCenter(netCenter)/*, chatArea(8), playerList(this)*/
-  , story(666)
+    : netCenter(netCenter), playerListText("Player List"), chatAreaText("Chat Area"),
+      playerList(8, this), chatArea(8), story(666)
 {
     cycled = new NetCenterCycled(this);
     netCenter->addListener(this);
@@ -109,16 +127,13 @@ void NetCenterMenu::build()
     VBox *chatbox = new VBox();
     VBox *playerbox = new VBox();
     
-    ListWidget *playerlist = new ListWidget(8);
-    VBox *chatlist = new VBox();
-    
     menu->add(new Text("Network Game Center"));
     menu->add(new Button("Change Nick"));
     menu->add(new Button("Options"));
     menu->add(new Button("Disconnect", new PopScreenAction()));
 
-    playerbox->add(new Text("Player List"));
-    playerbox->add(playerlist);
+    playerbox->add(&playerListText);
+    playerbox->add(&playerList);
 
     topbox->add(menu);
     topbox->add(playerbox);
@@ -140,8 +155,9 @@ void NetCenterMenu::build()
     add(new Button("Exit", new PopScreenAction()));
   */  
 
-    chatbox->add(new Text("Chat Area"));
-    chatbox->add(chatlist);
+    chatbox->add(&chatAreaText);
+    chatbox->add(&chatArea);
+    chatbox->setPreferedSize(Vec3(640, 120, 0));
 
     main->add(topbox);
     main->add(chatbox);
@@ -152,13 +168,13 @@ void NetCenterMenu::build()
 void NetCenterMenu::onChatMessage(const String &msgAuthor, const String &msg)
 {
     printf("%s:%s\n", (const char *)msgAuthor, (const char *)msg);
-    //chatArea.addChat(msgAuthor, msg);
+    chatArea.addChat(msgAuthor, msg);
 }
 
 void NetCenterMenu::onPlayerConnect(String playerName, PeerAddress playerAddress)
 {
     //printf("Connect: %s\n", (const char *)(netCenter->getPeerNameAtIndex(playerIndex)));
-    //playerList.addNewPlayer(playerName, playerAddress);
+    playerList.addNewPlayer(playerName, playerAddress);
 }
 
 void NetCenterMenu::onPlayerDisconnect(String playerName, PeerAddress playerAddress)

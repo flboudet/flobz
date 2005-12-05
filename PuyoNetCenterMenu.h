@@ -30,6 +30,47 @@
 #include "PuyoCommander.h"
 #include "PuyoInternetGameCenter.h"
 
+class NetCenterMenu;
+
+class NetCenterPlayerList : public ListWidget {
+public:
+    NetCenterPlayerList(int size, NetCenterMenu *targetMenu, GameLoop *loop = NULL) : ListWidget(size, loop), targetMenu(targetMenu) {}
+    void addNewPlayer(String playerName, PeerAddress playerAddress);
+private:
+    class PlayerSelectedAction : public Action {
+    public:
+        PlayerSelectedAction(NetCenterMenu *targetMenu, PeerAddress address)
+        : targetMenu(targetMenu), address(address) {}
+        void action();
+    private:
+        NetCenterMenu *targetMenu;
+        PeerAddress address;
+    };
+    class PlayerEntry : public Button {
+    public:
+        PlayerEntry(String playerName, PeerAddress playerAddress, Action *action)
+        : Button(playerName, action), playerAddress(playerAddress), action(action) {}
+        ~PlayerEntry() { delete action; }
+        PeerAddress playerAddress;
+    private:
+        Action *action;
+    };
+    Vector<PlayerEntry> entries;
+    NetCenterMenu *targetMenu;
+};
+
+class NetCenterChatArea : public VBox {
+public:
+    NetCenterChatArea(int height);
+    ~NetCenterChatArea();
+    void addChat(String name, String text);
+private:
+    int height;
+    HBox **lines;
+    Text **names;
+    Text **texts;
+};
+
 class NetCenterMenu : public PuyoScreen, PuyoNetGameCenterListener {
 public:
     NetCenterMenu(PuyoNetGameCenter *netCenter);
@@ -52,50 +93,15 @@ private:
             netCenter->cycle();
         }
     };
-    class NetCenterChatArea : public VBox {
-    public:
-        NetCenterChatArea::NetCenterChatArea(int height);
-        void addChat(String name, String text);
-    private:
-            int height;
-        HBox **lines;
-        Text **names;
-        Text **texts;
-    };
-    class NetCenterPlayerList : public VBox {
-    public:
-        NetCenterPlayerList(NetCenterMenu *targetMenu) : targetMenu(targetMenu) {}
-        void addNewPlayer(String playerName, PeerAddress playerAddress);
-    private:
-        class PlayerSelectedAction : public Action {
-        public:
-            PlayerSelectedAction(NetCenterMenu *targetMenu, PeerAddress address)
-             : targetMenu(targetMenu), address(address) {}
-            void action();
-        private:
-            NetCenterMenu *targetMenu;
-            PeerAddress address;
-        };
-        class PlayerEntry : public Button {
-        public:
-            PlayerEntry(String playerName, PeerAddress playerAddress, Action *action)
-                : Button(playerName, action), playerAddress(playerAddress), action(action) {}
-            ~PlayerEntry() { delete action; }
-            PeerAddress playerAddress;
-        private:
-            Action *action;
-        };
-        Vector<PlayerEntry> entries;
-        NetCenterMenu *targetMenu;
-    };
     
-//    NetCenterChatArea chatArea;
-//    NetCenterPlayerList playerList;
+    Text playerListText, chatAreaText;   
+    NetCenterPlayerList playerList;
+    NetCenterChatArea chatArea;
     NetCenterCycled *cycled;
     PuyoNetGameCenter *netCenter;
     PuyoStoryWidget story;
     SliderContainer container;
 };
-
+    
 #endif // _PUYONETCENTERMENU
 

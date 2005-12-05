@@ -133,7 +133,7 @@ InternetGameMenu::InternetGameMenu()
   : PuyoScreen()
   , servers("www.ios-software.com", "/flobopuyo/fpservers", 80)
   , story(666)
-  , container()
+  , container(), playerName("Kaori"), serverName("---")
 {
 }
 
@@ -159,20 +159,18 @@ void InternetGameMenu::build()
     serverListPanel->add (new Button("durandal.homeunix.com",
                                      new ServerSelectAction(*this, "durandal.homeunix.com", 6581)));
     
-    playerName = new EditField("Kaori"); // TODO: get that from single player name
-    serverName = new Text("---");
     VBox *rightPanel = new VBox();
     rightPanel->add(new Separator(1,1));
     rightPanel->add(new Text("Internet Game"));
     rightPanel->add(new Separator(10,10));
     rightPanel->add(new Text("Nickname"));
-    rightPanel->add(playerName);
+    rightPanel->add(&playerName);
     rightPanel->add(new Separator(10,10));
     rightPanel->add(new Text("Server"));
-    rightPanel->add(serverName);
+    rightPanel->add(&serverName);
     rightPanel->add(new Separator(10,10));
     HBox *hbox = new HBox();
-    hbox->add(new Button("Join", new PushNetCenterMenuAction(serverName, playerName)));
+    hbox->add(new Button("Join", new PushNetCenterMenuAction(&serverName, &playerName)));
     hbox->add(new Button("Cancel", new PopScreenAction()));
     rightPanel->add(hbox);
     rightPanel->add(new Separator(1,1));
@@ -211,6 +209,6 @@ void InternetGameMenu::idle(double currentTime)
 
 void InternetGameMenu::setSelectedServer(const String &serverName, int portNum)
 {
-    this->serverName->setValue(serverName);
+    this->serverName.setValue(serverName);
     this->portNum = portNum;
 }
