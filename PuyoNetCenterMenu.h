@@ -32,19 +32,35 @@
 
 class NetCenterMenu;
 
+class NetCenterDialogMenu : public SliderContainer {
+public:
+    NetCenterDialogMenu(PeerAddress associatedPeer, String title, String message, Action *cancelAction, Action *acceptAction = NULL);
+    void build();
+public:
+    PeerAddress associatedPeer;
+private:
+    VBox menu;
+    HBox buttons;
+    Text dialogTitle, dialogMsg;
+    Text sep1, sep2;
+    Button acceptButton, cancelButton;
+};
+
 class NetCenterPlayerList : public ListWidget {
 public:
     NetCenterPlayerList(int size, NetCenterMenu *targetMenu, GameLoop *loop = NULL) : ListWidget(size, loop), targetMenu(targetMenu) {}
     void addNewPlayer(String playerName, PeerAddress playerAddress);
+    void removePlayer(PeerAddress playerAddress);
 private:
     class PlayerSelectedAction : public Action {
     public:
-        PlayerSelectedAction(NetCenterMenu *targetMenu, PeerAddress address)
-        : targetMenu(targetMenu), address(address) {}
+        PlayerSelectedAction(NetCenterMenu *targetMenu, PeerAddress address, String playerName)
+        : targetMenu(targetMenu), address(address), playerName(playerName) {}
         void action();
     private:
         NetCenterMenu *targetMenu;
         PeerAddress address;
+        String playerName;
     };
     class PlayerEntry : public Button {
     public:
@@ -79,10 +95,12 @@ public:
     void onPlayerConnect(String playerName, PeerAddress playerAddress);
     void onPlayerDisconnect(String playerName, PeerAddress playerAddress);
     void gameInvitationAgainst(String playerName, PeerAddress playerAddress);
+    void grantCurrentGame();
+    void cancelCurrentGame();
     void gameCanceledAgainst(String playerName, PeerAddress playerAddress);
     void gameGrantedWithMessagebox(MessageBox *mbox);
     void cycle();
-    void playerSelected(PeerAddress playerAddress);
+    void playerSelected(PeerAddress playerAddress, String playerName);
     void idle(double currentTime);
 private:
     class NetCenterCycled : public CycledComponent {
@@ -101,6 +119,7 @@ private:
     PuyoNetGameCenter *netCenter;
     PuyoStoryWidget story;
     SliderContainer container;
+    NetCenterDialogMenu *onScreenDialog;
 };
     
 #endif // _PUYONETCENTERMENU
