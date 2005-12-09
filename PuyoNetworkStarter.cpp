@@ -43,7 +43,7 @@ PuyoNetworkGameWidget::PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet,
             1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, painter),
       networkArea(&attachedNetworkGameFactory, &attachedPuyoThemeSet, &levelTheme,
             1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
-      playercontroller(localArea), dummyPlayerController(networkArea)
+      playercontroller(localArea), dummyPlayerController(networkArea), syncMsgReceived(false), syncMsgSent(false)
 {
     mbox.addListener(this);
     initialize(localArea, networkArea, playercontroller, dummyPlayerController, levelTheme, gameOverAction);
@@ -58,11 +58,34 @@ PuyoNetworkGameWidget::~PuyoNetworkGameWidget()
 void PuyoNetworkGameWidget::cycle()
 {
     mbox.idle();
-    PuyoGameWidget::cycle();
+    if (!syncMsgSent) {
+        sendSyncMsg();
+        syncMsgSent = true;
+    }
+    if (syncMsgReceived)
+        PuyoGameWidget::cycle();
 }
 
-void PuyoNetworkGameWidget::onMessage(Message &)
+void PuyoNetworkGameWidget::onMessage(Message &message)
 {
+    int msgType = message.getInt(PuyoMessage::TYPE);
+    switch (msgType) {
+        case PuyoMessage::kGameStart:
+            syncMsgReceived = true;
+            break;
+        default:
+            break;
+    }
+}
+
+void PuyoNetworkGameWidget::sendSyncMsg()
+{
+    ios_fc::Message *message = mbox.createMessage();
+    message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameStart);
+    message->addString  (PuyoMessage::NAME,   p1name);
+    message->addBoolProperty("RELIABLE", true);
+    message->send();
+    delete message;
 }
 
 NetworkStarterAction::NetworkStarterAction(String _IP)

@@ -48,6 +48,7 @@ public:
     void cycle();
     void onMessage(Message &);
 private:
+    void sendSyncMsg();
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;
     ios_fc::MessageBox &mbox;
@@ -57,6 +58,7 @@ private:
     PuyoView networkArea;
     PuyoCombinedEventPlayer playercontroller;
     PuyoNullPlayer dummyPlayerController;
+    bool syncMsgReceived, syncMsgSent;
 };
 
 class NetworkStarterAction : public Action {

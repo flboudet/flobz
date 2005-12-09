@@ -38,17 +38,7 @@ private:
     ios_fc::MessageBox &mbox;
 };
 
-class NetCenterDialogMenuAction : public Action {
-public:
-    NetCenterDialogMenuAction(NetCenterMenu *targetMenu, bool isCancelAction)
-    : targetMenu(targetMenu), isCancelAction(isCancelAction) {}
-    void action();
-private:
-    NetCenterMenu *targetMenu;
-    bool isCancelAction;
-};
-
-void NetCenterDialogMenuAction::action()
+void NetCenterDialogMenu::NetCenterDialogMenuAction::action()
 {
     if (! isCancelAction)
         targetMenu->grantCurrentGame();
@@ -57,9 +47,10 @@ void NetCenterDialogMenuAction::action()
 
 extern IIM_Surface *menuBG; // I know what you think..
 
-NetCenterDialogMenu::NetCenterDialogMenu(PeerAddress associatedPeer, String title, String message, Action *cancelAction, Action *acceptAction)
-    : associatedPeer(associatedPeer), dialogTitle(title), dialogMsg(message),
-      acceptButton("Accept", acceptAction), cancelButton("Cancel", cancelAction)
+NetCenterDialogMenu::NetCenterDialogMenu(NetCenterMenu *targetMenu, PeerAddress associatedPeer, String title, String message, bool hasAcceptButton)
+    : cancelAction(targetMenu, true), acceptAction(targetMenu, false), hasAcceptButton(hasAcceptButton),
+      associatedPeer(associatedPeer), dialogTitle(title), dialogMsg(message),
+      acceptButton("Accept", &acceptAction), cancelButton("Cancel", &cancelAction)
 {}
 
 void NetCenterDialogMenu::build()
@@ -74,20 +65,12 @@ void NetCenterDialogMenu::build()
     menu.add(&sep1);
     menu.add(&dialogMsg);
     menu.add(&sep2);
-    buttons.add(&acceptButton);
+    if (hasAcceptButton)
+        buttons.add(&acceptButton);
     buttons.add(&cancelButton);
     menu.add(&buttons);
     add(&menu);
 }
-
-/*
-void NetCenterDialogMenu::build()
-{
-    menu.add(&dialogTitle);
-    menu.add(&cancelButton);
-    add(&menu);
-}
-*/
 
 NetCenterChatArea::NetCenterChatArea(int height)
     : height(height), lines(new (HBox *[height])), names(new (Text *[height])), texts(new (Text *[height]))
@@ -266,7 +249,7 @@ void NetCenterMenu::gameInvitationAgainst(String playerName, PeerAddress playerA
         netCenter->cancelGameWith(playerAddress);
     }
     else {
-        onScreenDialog = new NetCenterDialogMenu(playerAddress, "Invitation for a game", playerName + " invited you to play", new NetCenterDialogMenuAction(this, true), new NetCenterDialogMenuAction(this, false));
+        onScreenDialog = new NetCenterDialogMenu(this, playerAddress, "Invitation for a game", playerName + " invited you to play", true);
         add(onScreenDialog);
         onScreenDialog->build();
         this->focus(onScreenDialog);
@@ -300,15 +283,15 @@ void NetCenterMenu::gameCanceledAgainst(String playerName, PeerAddress playerAdd
 
 void NetCenterMenu::gameGrantedWithMessagebox(MessageBox *mbox)
 {
+    PuyoNetworkTwoPlayerGameWidgetFactory *factory = new PuyoNetworkTwoPlayerGameWidgetFactory(*mbox);
+    TwoPlayersStarterAction *starterAction = new TwoPlayersStarterAction(0, *factory);
+    starterAction->action();
+    
     if (this->onScreenDialog != NULL) {
         remove(onScreenDialog);
         delete(onScreenDialog);
         onScreenDialog = NULL;
     }
-    
-    PuyoNetworkTwoPlayerGameWidgetFactory *factory = new PuyoNetworkTwoPlayerGameWidgetFactory(*mbox);
-    TwoPlayersStarterAction *starterAction = new TwoPlayersStarterAction(0, *factory);
-    starterAction->action();
     //PuyoStarter *starter = new PuyoNetworkStarter(theCommander, 0, mbox);
     //starter->run(0,0,0,0,0);
     //GameUIDefaults::SCREEN_STACK->push(starter);
@@ -317,7 +300,7 @@ void NetCenterMenu::gameGrantedWithMessagebox(MessageBox *mbox)
 void NetCenterMenu::playerSelected(PeerAddress playerAddress, String playerName)
 {
     printf("Click joueur\n");
-    onScreenDialog = new NetCenterDialogMenu(playerAddress, "Asking for a game", String("Waiting ") + playerName + " for confirmation", new NetCenterDialogMenuAction(this, true));
+    onScreenDialog = new NetCenterDialogMenu(this, playerAddress, "Asking for a game", String("Waiting ") + playerName + " for confirmation", false);
     add(onScreenDialog);
     onScreenDialog->build();
     this->focus(onScreenDialog);

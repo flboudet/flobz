@@ -34,11 +34,22 @@ class NetCenterMenu;
 
 class NetCenterDialogMenu : public SliderContainer {
 public:
-    NetCenterDialogMenu(PeerAddress associatedPeer, String title, String message, Action *cancelAction, Action *acceptAction = NULL);
+    NetCenterDialogMenu(NetCenterMenu *targetMenu, PeerAddress associatedPeer, String title, String message, bool hasAcceptButton);
     void build();
 public:
     PeerAddress associatedPeer;
 private:
+    class NetCenterDialogMenuAction : public Action {
+    public:
+        NetCenterDialogMenuAction(NetCenterMenu *targetMenu, bool isCancelAction)
+        : targetMenu(targetMenu), isCancelAction(isCancelAction) {}
+        void action();
+    private:
+        NetCenterMenu *targetMenu;
+        bool isCancelAction;
+    };
+    NetCenterDialogMenuAction cancelAction, acceptAction;
+    bool hasAcceptButton;
     VBox menu;
     HBox buttons;
     Text dialogTitle, dialogMsg;
