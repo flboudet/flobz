@@ -138,9 +138,9 @@ void GameLoop::add(GameComponent *gc)
 
   gc->_remove = gc->_kill = false;
 
-  for (int i = components.size(); i; --i)
+  for (int i = 0; i < components.size(); ++i)
     if (components[i] == gc) return;
-  
+
   //printf("Component %x added to gameloop!\n", gc);
   components.add(gc);
   if (dc != NULL)
