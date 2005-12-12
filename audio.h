@@ -4,8 +4,14 @@
 /// AUDIO
 
 #ifdef USE_AUDIO
+
+#ifdef MACOSX
+#include "SDL_mixer.h"
+#else
 #include <SDL/SDL_mixer.h>
+#endif
 typedef Mix_Chunk Sound;
+
 #else
 #define Sound void
 #endif

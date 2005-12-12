@@ -22,32 +22,26 @@ include config
 DEPDIR = .deps
 df = $(DEPDIR)/$(*F)
 
-MAKEDEPEND = ${CXX} -MM $(CFLAGS_NOPCH) -o $(df).d $<
+MAKEDEPEND = $(CXX) -MM $(CFLAGS_NOPCH) -o $(df).d $<
 # MAKEDEPEND = touch $*.d && makedepend $(CPPFLAGS) -f $*.d $<
 
-all: prelude flobopuyo
-
-flobopuyo: prelude iosfc_dir gametools_dir goomsl_dir ${OBJFILES}
-	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) -lSDL_mixer -lSDL_image ${OBJFILES} iosfc/*.o gametools/*.o goomsl/goomsl*.o
+all: flobopuyo
+flobopuyo: all.h.gch iosfc_dir gametools_dir goomsl_dir ${OBJFILES}
+	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) ${OBJFILES} iosfc/*.o gametools/*.o goomsl/goomsl*.o
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
 	@echo
 	@echo " Type ./$(PRGNAME) to play."
 	@echo "--------------------------------------"
 
-prelude: all.h.gch
-	@./configure
-	@echo "Compiling with CFLAGS=$(CFLAGS)"
-	@echo "Compiling with LDFLAGS=$(LDFLAGS)"
-
 iosfc_dir:all.h.gch
-	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C iosfc object
+	@+CFLAGS_NOPCH='$(CFLAGS_NOPCH)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX)  make -C iosfc object
 
 gametools_dir:all.h.gch
 	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C gametools object
 
 goomsl_dir:all.h.gch
-	@+make -C goomsl object
+	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C goomsl object
 
 %.o:%.cpp all.h.gch
 	@mkdir -p $(DEPDIR);\
@@ -59,9 +53,12 @@ goomsl_dir:all.h.gch
 	@echo "[$@]" && $(CXX) $(CFLAGS) -c $< # 2>> WARNINGS || (cat WARNINGS && false)
 
 all.h.gch:
+	@echo "Compiling with CFLAGS=$(CFLAGS)"
+	@echo "Compiling with CFLAGS_NOPCH=$(CFLAGS_NOPCH)"
+	@echo "Compiling with LDFLAGS=$(LDFLAGS)"
 	@echo "[Precompiling Headers]"
 	@mkdir -p $(DEPDIR);\
-	${CXX} -MM $(CFLAGS_NOPCH) -o $(DEPDIR)/all.d all.h ;\
+	$(CXX) -MM $(CFLAGS_NOPCH) -o $(DEPDIR)/all.d all.h ;\
 	cat $(DEPDIR)/all.d | sed 's/all.o/all.h.gch/' > $(DEPDIR)/all.P; \
 	cat $(DEPDIR)/all.d | sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
 	-e '/^$$/ d' -e 's/$$/ :/' >> $(DEPDIR)/all.P; \
@@ -100,20 +97,15 @@ install: flobopuyo
 	cp ./$(PRGNAME) ${INSTALL_BINDIR}/flobopuyo
 	chmod a+rx ${INSTALL_BINDIR}/flobopuyo
 
-flobopuyo-static: prelude iosfc_dir gametools_dir goomsl_dir ${OBJFILES}
-	@echo "[flobopuyo-static]" && $(CXX) $(CFLAGS) -o flobopuyo-static ${OBJFILES} iosfc/*.o gametools/*.o goomsl/goomsl*.o /sw/lib/libSDL_mixer.a /sw/lib/libSDL_net.a /sw/lib/libvorbisfile.a /sw/lib/libvorbis.a /sw/lib/libogg.a /sw/lib/libsmpeg.a /sw/lib/libSDL_image.a /sw/lib/libjpeg.a /sw/lib/libpng.a -lz -framework CoreFoundation `$(SDL_CONFIG) --static-libs`
-	@echo "--------------------------------------"
-	@[ -s WARNINGS ] && echo -e "--------------------------------------\n There have been some warnings:\n" && cat WARNINGS && rm -f WARNINGS && echo "--------------------------------------" || true
-	@echo "--------------------------------------"
-	@echo " Compilation finished"
-
-bundle: flobopuyo-static
+bundle: flobopuyo
 	mkdir -p $(bundle_name)/Contents/MacOS
 	mkdir -p $(bundle_name)/Contents/Resources
+	mkdir -p $(bundle_name)/Contents/Frameworks
+	cp -r $(FRAMEWORKS_DIR)/SDL* $(bundle_name)/Contents/Frameworks/
 	echo "APPL????" > $(bundle_name)/Contents/PkgInfo
 	sed "s/@@VERSION@@/$(VERSION)/" mac/Info.plist > $(bundle_name)/Contents/Info.plist
 	cp mac/icon.icns $(bundle_name)/Contents/Resources/
-	cp flobopuyo-static $(bundle_name)/Contents/MacOS/flobopuyo
+	cp flobopuyo $(bundle_name)/Contents/MacOS/flobopuyo
 	cp -r data $(bundle_name)/Contents/Resources
 	rm -rf $(bundle_name)/Contents/Resources/data/CVS $(bundle_name)/Contents/Resources/data/*/CVS
 	rm -rf $(bundle_name)/Contents/Resources/data/.xvpics $(bundle_name)/Contents/Resources/data/*/.xvpics
@@ -136,7 +128,7 @@ win-package: flobopuyo
 	cp $(WINSDLRUNTIME)/*.dll $(WINZIP_NAME)
 	zip -r $(WINZIP_NAME) $(WINZIP_NAME)
 
-.PHONY: all clean
+.PHONY: all clean iosfc_dir gametools_dir goomsl_dir
 
 -include $(OBJFILES:%.o=$(DEPDIR)/%.P) $(DEPDIR)/all.P
 

@@ -1677,7 +1677,7 @@ static int _UploadTexture(SDL_Surface *datasurf, glSDL_TexInfo *txi, int tex)
 {
 	int bpp = datasurf->format->BytesPerPixel;
 
-	glGenTextures(1, (unsigned int *)&txi->texture[tex]);
+	glGenTextures(1, (GLuint *)&txi->texture[tex]);
 	glBindTexture(GL_TEXTURE_2D, txi->texture[tex]);
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, datasurf->pitch /
 			datasurf->format->BytesPerPixel);
@@ -1832,7 +1832,7 @@ static void _UnloadTexture(glSDL_TexInfo *txi)
 {
 	int i;
 	for(i = 0; i < txi->textures; ++i)
-		glDeleteTextures(1, (unsigned int *)&txi->texture[i]);
+		glDeleteTextures(1, (const GLuint *)&txi->texture[i]);
 	memset(&txi->invalid_area, 0, sizeof(txi->invalid_area));
 }
 

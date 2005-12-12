@@ -68,8 +68,102 @@ class PuyoThemePreview : public VBox {
         PuyoThemePicturePreview picture;
         Text description;
 };
+/*
 
+class ScrollList : public HBox {
+public:
+    ScrollList();
+    virtual ~ScrollList();
+    void add(String &name);
+    void select(String &name);
+    void selectPrevious();
+    void selectNext();
+private:
+    int selected;
+    int maxShown;
+    Button * previous;
+    Button * next;
+    Action * previousAction;
+    Action * nextAction;
+    AdvancedBuffer<Text *> elementList;
+    AdvancedBuffer<Action *> actionList;
+};
 
+ScrollList::ScrollList() :
+{
+    maxShown = 3;
+    selected = -1;
+    previousAction = new ???(this,???);
+    previous = new Button("<",previousAction);
+    add(previous);
+    nextAction = new ???(this,???);
+    next = new Button(">",nextAction);
+    add(next);
+}
+
+ScrollList::~ScrollList()
+{
+    delete previous;
+    delete previousAction;
+    delete next;
+    delete nextAction;
+    int i, size = elementList.size();
+    for (i=0; i<size; i++)
+    {
+        delete elementList[i];
+        //delete actionList[i]; should we?
+    }
+}
+
+void ScrollList::add(String &name, Action &action)
+{
+    text = new Text(name,GameUIDefaults::FONT_INACTIVE);
+    elementList.add(&name);
+    actionList.add(&action);
+    if (selected < 0) selected = 0;
+}
+
+void ScrollList::build()
+{
+    int i, size = elementList.size();
+    for (i=0; (i<maxShown) && (i<size); i++)
+    {
+        itemID = (selected-(maxShown/2)+i+size)%size;
+        changeChild(i+1,elementList[itemID]);
+        elementList[itemID]->setFont( (selected == itemID) ?
+         GameUIDefaults::FONT :
+         GameUIDefaults::FONT_INACTIVE );
+    }
+}
+
+void ScrollList::selectPrevious()
+{
+    if (elementList.size() <= 0) return;
+    selected = (selected - 1) % elementList.size();
+    build();
+    actionList[selected]->action();
+}
+void ScrollList::selectNext()
+{
+    if (elementList.size() <= 0) return;
+    selected = (selected + 1) % elementList.size();
+    build();
+    actionList[selected]->action();
+}
+void ScrollList::select(String &name)
+{
+    int i, size = elementList.size();
+    for (i=0; i<size; i++)
+    {
+        if (*elementList[i] == name)
+        {
+            selected = i;
+            actionList[selected]->action();
+            break;
+        }
+    }
+}
+*/
 class PuyoThemeSelectionBox : public HBox {
 public:
     PuyoThemeSelectionBox(PuyoThemePreview &themePreview);

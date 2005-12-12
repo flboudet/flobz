@@ -16,8 +16,13 @@
  */
 
 /* We're still using SDL datatypes here - we just add some stuff. */
+#ifdef MACOSX
+#include "SDL.h"
+#include "SDL_image.h"
+#else
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+#endif
 
 #ifndef HAVE_OPENGL
 
@@ -311,7 +316,6 @@ glSDL_TexInfo *glSDL_GetTexInfo(SDL_Surface *surface);
 #endif
 
 /* Some extra overloading for common external lib calls... */
-#include "SDL/SDL_image.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

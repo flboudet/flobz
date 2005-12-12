@@ -1,24 +1,38 @@
+###################################
+# Choose your platform            #
+# (or nothing for auto-detection) #
+###################################
+PLATFORM=Darwin
+ENABLE_FAT=true
+
+###################################
+# Configure your application      #
+###################################
+
 ENABLE_AUDIO=true
-ENABLE_OPENGL=false
+ENABLE_OPENGL=true
 ENABLE_DGA=false
 
-DEBUG_MODE=true
+DEBUG_MODE=false
 MORE_DEBUG=false
 ENABLE_PCH=false
 
-PRGNAME=flobopuyo
+# Src settings
+IOSFC_DIR=iosfc
+GAMETOOLS_DIR=gametools
+GOOMSL_DIR=goomsl
 
 # Unix/Linux settings
 PREFIX=/usr/local
 DATADIR=$(PREFIX)/share/games/flobopuyo
 INSTALL_BINDIR=$(DESTDIR)/$(PREFIX)/games
 INSTALL_DATADIR=$(DESTDIR)/$(DATADIR)
-IOSFC_DIR=iosfc
-GAMETOOLS_DIR=gametools
 
 # Mac settings
 macimage_name=FloBoPuyo\ $(VERSION)
 bundle_name=FloboPuyo.app
+SYSTEM_ROOT=/Developer/SDKs/MacOSX10.4u.sdk
+FRAMEWORKS_DIR=$(SYSTEM_ROOT)/Library/Frameworks
 
 # Win32 settings
 CYGWIN_VERSION=CYGWIN_NT-5.1
@@ -30,87 +44,129 @@ WINSDLRUNTIME=/home/$(USER)/SDL-1.2.7/lib
 ##########
 
 
-##############
-# Autodetection
+###################################
+# Don't touch below               #
+###################################
 
+
+##############
+# GLOBAL
+
+# Platform Autodetection
 ifndef PLATFORM
 PLATFORM=$(shell uname -s)
 endif
 
-
-VERSION=$(shell grep "\#define FLOBOPUYOVERSION" PuyoVersion.cpp  | cut -d "\"" -f 2)
-#
-##############
-
-SDL_CONFIG=sdl-config
-CC=g++
-CXX=g++
-STRIP=strip
-
-CFLAGS:=$(CFLAGS) -DDATADIR=\"${DATADIR}\" -I${ROOT_DIR}/${GAMETOOLS_DIR} -I${ROOT_DIR}/${IOSFC_DIR} -I${ROOT_DIR} -I. -I${ROOT_DIR}/goomsl
-LDFLAGS=
-
-# Autodetected cygwin platform
-ifeq ($(PLATFORM), $(CYGWIN_VERSION))
-  CFLAGS:=$(CFLAGS) -mno-cygwin -mwindows -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE)
-  LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_net -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
-else
-# mingw32 cross-compilation (works great in debian testing)
+# Tools
 ifeq ($(PLATFORM), crossmingw32)
-  CC=i586-mingw32msvc-g++
-  CXX=i586-mingw32msvc-g++
-  PRGNAME=flobopuyo.exe
-  STRIP=i586-mingw32msvc-strip
-  CFLAGS:=$(CFLAGS) -mno-cygwin -mwindows -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE)  -I$(WINSDLINCLUDE)/SDL
-  LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_net -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
+  	CC=i586-mingw32msvc-g++
+  	CXX=i586-mingw32msvc-g++
+  	PRGNAME=flobopuyo.exe
+  	STRIP=i586-mingw32msvc-strip
 else
-# more traditional unix platform
-CFLAGS:=$(CFLAGS) `$(SDL_CONFIG) --cflags`
-LDFLAGS:=$(LDFLAGS) `$(SDL_CONFIG) --cflags --libs`
-#small additions for Darwin (we assume SDL was installed with Fink)
-ifeq ($(PLATFORM), Darwin)
-CFLAGS:=$(CFLAGS) -I/sw/include -DMACOSX -UDATADIR
-endif
-endif
+	CC=g++
+	CXX=g++
+	STRIP=strip
+	PRGNAME=flobopuyo
 endif
 
+# Version
+VERSION=$(shell grep "\#define FLOBOPUYOVERSION" PuyoVersion.cpp  | cut -d "\"" -f 2)
 
+# Audio
 ifeq ($(ENABLE_AUDIO), true)
 CFLAGS:=$(CFLAGS) -DUSE_AUDIO=1
-OBJFILES:=$(OBJFILES)
 endif
 
+# OpenGL
 ifeq ($(ENABLE_OPENGL), true)
-CFLAGS:=$(CFLAGS) -DHAVE_OPENGL=1
-OBJFILES:=$(OBJFILES) glSDL.o
-ifeq ($(PLATFORM), Linux)
-LDFLAGS:=$(LDFLAGS) -lGL
-endif
-endif
-
-ifeq ($(ENABLE_DGA), true)
-ifeq ($(PLATFORM), Linux)
-CFLAGS:=$(CFLAGS) -DUSE_DGA=1
-endif
+	CFLAGS:=$(CFLAGS) -DHAVE_OPENGL=1
+	OBJFILES:=$(OBJFILES) glSDL.o
+	ifeq ($(PLATFORM), Darwin)
+		CFLAGS:=$(CFLAGS)
+		LDFLAGS:=$(LDFLAGS) -framework OpenGL
+	else
+		LDFLAGS:=$(LDFLAGS) -lGL
+	endif
 endif
 
+# Debug
 ifeq ($(DEBUG_MODE), true)
-CFLAGS:=$(CFLAGS) -g -O0 -Winvalid-pch
-LDFLAGS:=$(LDFLAGS) -g -O0
+	CFLAGS:=$(CFLAGS) -g -O0 -Winvalid-pch
+	LDFLAGS:=$(LDFLAGS) -g
 else
-CFLAGS:=$(CFLAGS) -O2
+	CFLAGS:=$(CFLAGS) -O2
 endif
 
+# More Debug
 ifeq ($(MORE_DEBUG), true)
-CFLAGS:=$(CFLAGS) -DDEBUG=1
+	CFLAGS:=$(CFLAGS) -DDEBUG=1
 endif
 
+
+# SDL CONFIG
+ifeq ($(PLATFORM), Darwin)
+	OBJFILES:=$(OBJFILES) SDLMain.o
+	CFLAGS:=$(CFLAGS) -I$(FRAMEWORKS_DIR)/SDL.framework/Headers -I$(FRAMEWORKS_DIR)/SDL_image.framework/Headers -I$(FRAMEWORKS_DIR)/SDL_mixer.framework/Headers
+	LDFLAGS:=$(LDFLAGS) -framework SDL -framework SDL_image -framework SDL_mixer -framework Cocoa
+else
+ifeq ($(PLATFORM), $(CYGWIN_VERSION))
+  	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
+else
+
+ifeq ($(PLATFORM), crossmingw32)
+  	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
+else
+	SDL_CONFIG=sdl-config
+	SDL_CFLAGS=`$(SDL_CONFIG) --cflags`
+	LDFLAGS:=$(LDFLAGS) `$(SDL_CONFIG) --libs` -lSDL_mixer -lSDL_image
+endif
+endif
+endif
+
+# DGA for Linux
+ifeq ($(PLATFORM), Linux)
+	ifeq ($(ENABLE_DGA), true)
+		CFLAGS:=$(CFLAGS) -DUSE_DGA=1
+	endif
+endif
+
+##############
+# CFLAGS
+
+# Base
+CFLAGS:=$(CFLAGS) -I$(ROOT_DIR) -I$(ROOT_DIR)/${GAMETOOLS_DIR} -I$(ROOT_DIR)/${IOSFC_DIR} -I$(ROOT_DIR)/${GOOMSL_DIR}
+
+# Platform specific
+ifeq ($(PLATFORM), $(CYGWIN_VERSION))
+	CFLAGS:=$(CFLAGS) -mno-cygwin -mwindows -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE)
+endif
+
+ifeq ($(PLATFORM), crossmingw32)
+  	CFLAGS:=$(CFLAGS) -mno-cygwin -mwindows -DWIN32 -DYY_NEVER_INTERACTIVE=1 -I$(WINSDLINCLUDE)  -I$(WINSDLINCLUDE)/SDL
+endif
+
+ifeq ($(PLATFORM), Darwin)
+	CFLAGS:=$(CFLAGS) -DMACOSX -pipe
+else
+	CFLAGS:=$(CFLAGS) -DDATADIR=\"${DATADIR}\"
+endif
+
+
+# PCH
 CFLAGS_NOPCH:=$(CFLAGS)
 ifeq ($(ENABLE_PCH), true)
-CFLAGS:=$(CFLAGS) -include all.h 
+	CFLAGS:=$(CFLAGS) -include all.h
 endif
 
-CFLAGS:=$(CFLAGS)
+
+# FAT Binaries
+ifeq ($(PLATFORM), Darwin)
+	ifeq ($(ENABLE_FAT), true)
+		CFLAGS:=$(CFLAGS) -isysroot $(SYSTEM_ROOT) -arch ppc -arch i386
+        LDFLAGS:=$(LDFLAGS) -Wl,-syslibroot,$(SYSTEM_ROOT)
+	endif
+endif
 
 CXXFLAGS=${CFLAGS}
 

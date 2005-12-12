@@ -21,6 +21,8 @@ namespace gameui {
   class GameUIDefaults;
   class Screen;
   class Button;
+  class HScrollList;
+  class VScrollList;
   class Separator;
   class Action;
   class ScreenStack;
@@ -87,7 +89,7 @@ namespace gameui {
       Vec3 getPosition() const           { return position; }
       Vec3 getSize() const               { return size; }
 
-      // default behaviour is to lost the focus
+      // default behaviour is to lose the focus
       virtual void eventOccured(GameControlEvent *event);
 
       virtual bool isFocusable() const { return focusable; }

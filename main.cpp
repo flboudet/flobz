@@ -3,6 +3,9 @@
 #include "IosImgProcess.h"
 #ifdef MACOSX
 #include <CoreFoundation/CoreFoundation.h>
+#include "SDL_main.h"
+#else
+#include <SDL/SDL_main.h>
 #endif
 
 #include "PuyoCommander.h"
@@ -43,7 +46,6 @@ bool fileExists(char *path)
     return true;
 }
 
-#include <SDL/SDL_main.h>
 
 int main(int argc, char *argv[])
 {
