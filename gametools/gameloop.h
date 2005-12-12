@@ -1,9 +1,13 @@
-#include "ios_fc.h"
-#include <SDL.h>
-#include "GameControls.h"
-
 #ifndef _GAMELOOP_H
 #define _GAMELOOP_H
+
+#include "ios_fc.h"
+#ifdef MACOSX
+#include <SDL.h>
+#else
+#include <SDL/SDL.h>
+#endif
+#include "GameControls.h"
 
 using namespace ios_fc;
 

@@ -2,7 +2,7 @@
 # Choose your platform            #
 # (or nothing for auto-detection) #
 ###################################
-PLATFORM=Darwin
+PLATFORM=
 ENABLE_FAT=true
 
 ###################################

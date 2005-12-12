@@ -34,7 +34,11 @@
 
 #else	/* HAVE_OPENGL */
 
+#ifdef MACOSX
 #include "begin_code.h"
+#else
+#include <SDL/begin_code.h>
+#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -271,7 +275,12 @@ glSDL_TexInfo *glSDL_GetTexInfo(SDL_Surface *surface);
 #ifdef __cplusplus
 }
 #endif
+#ifdef MACOSX
 #include "close_code.h"
+#else
+#include <SDL/close_code.h>
+#endif
+
 
 /* Some ugly "overriding"... */
 #ifndef	_GLSDL_NO_REDEFINES_
