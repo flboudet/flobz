@@ -1,6 +1,7 @@
-CC=gcc
-CFLAGS=-g -O0 -Wall -pedantic # -fno-omit-frame-pointer -DVERBOSE -DUSE_JITC_X86=1
+#CC=gcc
+#CFLAGS=-g -O0 -Wall -pedantic # -fno-omit-frame-pointer -DVERBOSE -DUSE_JITC_X86=1
 #CFLAGS=-g -O3 -march=athlon -Wall -pedantic -DUSE_JITC_X86=1
+
 OBJ=goomsl_yacc.o goomsl_lex.o goomsl_hash.o goomsl_heap.o goomsl.o jitc_x86.o
 
 LIBS        = -L/usr/X11R6/lib -L/usr/lib -L/usr/local/lib -lX11 -lXext \
@@ -19,6 +20,9 @@ goomsl_yacc.c:goomsl_yacc.y
 	bison -d -b goomsl_yacc goomsl_yacc.y
 	mv goomsl_yacc.tab.c goomsl_yacc.c
 	mv goomsl_yacc.tab.h goomsl_yacc.h
+
+%.o:%.c
+	$(CC) $(CFLAGS) -c $<
 
 goomsl_yacc.o:goomsl_yacc.c
 goomsl_lex.o:goomsl_lex.c
