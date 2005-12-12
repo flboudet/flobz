@@ -1,0 +1,30 @@
+Instructions to compile flobopuyo
+Please report any error
+
+*****************************************
+*     EDIT THE "config" FILE FIRST    * 
+*****************************************
+
+*****************************************
+Linux :
+*****************************************
+cd path-to-the-source-folder-on-your-system
+./configure
+make
+./flobopuyo
+*****************************************
+
+
+*****************************************
+MAC OS X :
+*****************************************
+Install the SDL* frameworks in $(SYSTEM_ROOT)/Library/Frameworks
+and edit the SYSTEM_ROOT variable in the config file to match your MacOS X SDK
+If you want to build a universal binary, put the universal binaries of the SDL frameworks in a universal binary SDK of MacOS X
+Then type the following lines in Terminal:
+cd path-to-the-source-folder-on-your-system
+./configure
+make bundle
+You should get FloboPuyo.app
+*****************************************
+
