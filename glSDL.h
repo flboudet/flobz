@@ -16,11 +16,10 @@
  */
 
 /* We're still using SDL datatypes here - we just add some stuff. */
-#ifdef MACOSX
-#include "SDL.h"
-#include "SDL_image.h"
-#else
 #include <SDL/SDL.h>
+#ifdef MACOSX
+#include <SDL_image/SDL_image.h>
+#else
 #include <SDL/SDL_image.h>
 #endif
 
@@ -34,11 +33,7 @@
 
 #else	/* HAVE_OPENGL */
 
-#ifdef MACOSX
 #include "begin_code.h"
-#else
-#include <SDL/begin_code.h>
-#endif
 #ifdef __cplusplus
 extern "C" {
 #endif

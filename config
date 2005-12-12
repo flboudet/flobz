@@ -118,7 +118,7 @@ ifeq ($(PLATFORM), crossmingw32)
   	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
 else
 	SDL_CONFIG=sdl-config
-	SDL_CFLAGS=`$(SDL_CONFIG) --cflags`
+	CFLAGS:=$(CFLAGS) `$(SDL_CONFIG) --cflags`
 	LDFLAGS:=$(LDFLAGS) `$(SDL_CONFIG) --libs` -lSDL_mixer -lSDL_image
 endif
 endif

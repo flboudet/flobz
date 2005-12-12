@@ -3,9 +3,9 @@
 
 #include "ios_fc.h"
 #ifdef MACOSX
-#include <SDL.h>
-#else
 #include <SDL/SDL.h>
+#else
+#include "SDL.h"
 #endif
 #include "GameControls.h"
 
