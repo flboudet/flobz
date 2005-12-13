@@ -164,7 +164,7 @@ endif
 ifeq ($(PLATFORM), Darwin)
 	ifeq ($(ENABLE_FAT), true)
 		CFLAGS:=$(CFLAGS) -isysroot $(SYSTEM_ROOT) -arch ppc -arch i386
-        LDFLAGS:=$(LDFLAGS) -Wl,-syslibroot,$(SYSTEM_ROOT)
+#        LDFLAGS:=$(LDFLAGS) -Wl,-syslibroot,$(SYSTEM_ROOT)
 	endif
 endif
 
