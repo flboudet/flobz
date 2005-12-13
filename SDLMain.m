@@ -10,6 +10,10 @@
 #import <sys/param.h> /* for MAXPATHLEN */
 #import <unistd.h>
 
+@interface NSApplication(MissingFunction)
+- (void)setAppleMenu:(NSMenu *)menu;
+@end
+
 /* Use this flag to determine whether we use SDLMain.nib or not */
 #define		SDL_USE_NIB_FILE	0
 
@@ -78,11 +82,11 @@ static NSString *getApplicationName(void)
 {
     if (shouldChdir)
     {
-        char parentdir[MAXPATHLEN];
+        UInt8 parentdir[MAXPATHLEN];
 		CFURLRef url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
 		CFURLRef url2 = CFURLCreateCopyDeletingLastPathComponent(0, url);
 		if (CFURLGetFileSystemRepresentation(url2, true, parentdir, MAXPATHLEN)) {
-	        assert ( chdir (parentdir) == 0 );   /* chdir to the binary app's parent */
+	        assert ( chdir ((const char*)parentdir) == 0 );   /* chdir to the binary app's parent */
 		}
 		CFRelease(url);
 		CFRelease(url2);
@@ -189,7 +193,7 @@ static void setupWindowMenu(void)
 }
 
 /* Replacement for NSApplicationMain */
-static void CustomApplicationMain (argc, argv)
+static void CustomApplicationMain (int argc, char **argv)
 {
     NSAutoreleasePool	*pool = [[NSAutoreleasePool alloc] init];
     SDLMain				*sdlMain;
