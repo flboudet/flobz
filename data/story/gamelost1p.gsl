@@ -24,6 +24,8 @@
   Sprite @blueStar  = [new_sprite: image="bluestar.png" x = @spBx y=@spBy curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @greenStar = [new_sprite: image="greenstar.png" x = @spCx y=@spCy curframe=0.0 framespeed=0.2 nbframes=1.0]
 
+  music: file="flobopuyo_gameover.xm"
+
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
   # This also allows you to specify the drawing order

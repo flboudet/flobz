@@ -16,6 +16,7 @@
   Sprite @kaori = [new_sprite: image="Kaori_title.png" x = -300.0 y=130.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
 
   // Defines a sprite graph (just for exmple purpose, to be removed!)
+  /*
   @f.parent =  "@kaori"
   @l.parent =  "@kaori"
   @o.parent =  "@kaori"
@@ -25,6 +26,7 @@
   @u.parent =  "@kaori"
   @y.parent =  "@kaori"
   @o3.parent = "@kaori"
+  */
 
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
@@ -52,6 +54,9 @@
 
 <update>
   # Update function: called every animation cycle
+
+  music: file="flobopuyo_menu.xm"
+
   movetitle::@f phase=1.0
   movetitle::@l phase=2.0
   movetitle::@o phase=3.0

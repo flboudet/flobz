@@ -5,6 +5,8 @@
 #include <string.h>
 #include <math.h>
 
+#include "audio.h"
+
 extern char *dataFolder;
 
 struct _Styrolyse {
@@ -96,6 +98,19 @@ Vec2 global_sprite_get_position(GoomSL *gsl, const char *name)
   return v;
 }
 
+void styro_music(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    const char *path = (const char *)GSL_LOCAL_PTR  (gsl, local, "file");
+    AudioManager::playMusic(path);
+}
+
+void styro_sound(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    const char *path   = (const char *)GSL_LOCAL_PTR  (gsl, local, "file");
+    float       volume = GSL_LOCAL_FLOAT (gsl, local, "volume");
+    AudioManager::playSound(path, volume);
+}
+
 void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
   const char *path = (const char *)GSL_LOCAL_PTR  (gsl, local, "&this.image");
@@ -134,8 +149,10 @@ static void sbind(GoomSL *gsl)
 {
   gsl_bind_function(gsl, "put_text",   put_text);
   gsl_bind_function(gsl, "draw",  sprite_draw);
-  gsl_bind_function(gsl, "sin",  styro_sin);
-  gsl_bind_function(gsl, "mod",  styro_mod);
+  gsl_bind_function(gsl, "sin",   styro_sin);
+  gsl_bind_function(gsl, "mod",   styro_mod);
+  gsl_bind_function(gsl, "music", styro_music);
+  gsl_bind_function(gsl, "sound", styro_sound);
 }
 
 /* Externals */

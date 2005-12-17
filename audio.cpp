@@ -27,6 +27,8 @@ static float music_volume   = 1.0;
 
 static int sound_on = 0;
 static int music_on = 0;
+
+static std::string music_current = "";
 #endif
 
 /*
@@ -429,11 +431,14 @@ void AudioManager::playMusic(const char *fileName)
 #ifdef USE_AUDIO
     if (!audio_supported) return;
 
+    if (music_current == fileName) return;
+    
     preloadMusic(fileName);
     Mix_Music *music = musicCache.get(fileName);
     if (music != NULL) {
         Mix_HaltMusic();
         Mix_PlayMusic(music, -1);
+	music_current = fileName;
     }
 #endif
 }
