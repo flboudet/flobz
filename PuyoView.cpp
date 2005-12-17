@@ -299,6 +299,7 @@ void PuyoView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNu
             currentPuyo->addAnimation(new NeutralPopAnimation(*currentPuyo, i*2, synchronizer));
     }
     // A revoir
+    /*
     if (groupNum == 0) {
         if (phase>=2) {
             audio_sound_play(sound_yahoohoo3[(int)((float)NB_YAHOOHOO3 * random()/(RAND_MAX+1.0))]);
@@ -310,6 +311,7 @@ void PuyoView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNu
             audio_sound_play(sound_yahoohoo1[(int)((float)NB_YAHOOHOO1 * random()/(RAND_MAX+1.0))]);
         }
     }
+    */
 }
 
 void PuyoView::gameDidEndCycle()

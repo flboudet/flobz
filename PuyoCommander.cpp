@@ -259,6 +259,8 @@ void PuyoCommander::initSDL()
 #endif
 }
 
+extern char *dataFolder;
+#include <string>
 
 /* Initialize the audio if necessary */
 void PuyoCommander::initAudio()
@@ -266,16 +268,18 @@ void PuyoCommander::initAudio()
 #ifdef USE_AUDIO
   DBG_PRINT("initAudio()\n");
   int music_volume = GetIntPreference(kMusicVolume, 100);
-  int audio_volume = GetIntPreference(kAudioVolume, 80);
+  int sound_volume = GetIntPreference(kAudioVolume, 80);
 
-  audio_init();
-  audio_music_start(0);
-  if (sound==false) Mix_PauseMusic();
-  audio_set_music_on_off(sound);
-  audio_set_sound_on_off(fx);
+  AudioManager::init((std::string(dataFolder) + "/sfx").c_str());
+  /*
+     audio_music_start(0);
+     if (sound==false) Mix_PauseMusic();
+     */
+  AudioManager::musicOnOff(sound);
+  AudioManager::soundOnOff(fx);
 
-  audio_set_volume(audio_volume);
-  audio_music_set_volume(music_volume);
+  AudioManager::musicVolume(music_volume);
+  AudioManager::soundVolume(sound_volume);
 #endif
 }
 
@@ -327,7 +331,7 @@ void PuyoCommander::setMusic(bool music)
     if (music != this->sound) {
         this->sound = music;
         SetBoolPreference(kMusic, music);
-        audio_set_music_on_off(music);
+        AudioManager::musicOnOff(music);
     }
 }
     
@@ -336,7 +340,7 @@ void PuyoCommander::setSoundFx(bool fx)
     if (fx != this->fx) {
         this->fx = fx;
         SetBoolPreference(kAudioFX, fx);
-        audio_set_sound_on_off(fx);
+        AudioManager::soundOnOff(fx);
     }
 }
 

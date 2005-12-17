@@ -67,6 +67,9 @@ NeutralAnimation::~NeutralAnimation()
     synchronizer->decrementUsage();
 }
 
+static const char *sound_bim[2] =        { "bim1.wav", "bim2.wav" };
+static const float sound_bim_volume[2] = { .6, .6 };
+
 void NeutralAnimation::cycle()
 {
     if (delay >=0) {
@@ -76,7 +79,8 @@ void NeutralAnimation::cycle()
         currentY += (int)step;
         step += 0.5;
         if (currentY >= Y) {
-            audio_sound_play(sound_bim[random() % 2]);
+            int choosenSound = random() % 2;
+            AudioManager::playSound(sound_bim[choosenSound], sound_bim_volume[choosenSound]);
             finishedFlag = true;
             attachedPuyo.getAttachedView()->allowCycle();
             synchronizer->pop();
@@ -136,8 +140,11 @@ TurningAnimation::TurningAnimation(AnimatedPuyo &companionPuyo, int vector,
 
 void TurningAnimation::cycle()
 {
+    static const char * sound_fff = "fff.wav";
+    static const float  sound_fff_volume = .35;
+    
     if (cpt == 0) {
-        audio_sound_play(sound_fff);
+        AudioManager::playSound(sound_fff, sound_fff_volume);
     }
     cpt++;
     angle += step;
@@ -206,12 +213,12 @@ void FallingAnimation::cycle()
         bouncing--;
         if (bouncing < 0) {
             finishedFlag = true;
-            audio_sound_play(sound_bam1);
+            AudioManager::playSound("bam1.wav", .1);
             attachedPuyo.getAttachedView()->allowCycle();
         }
         else {
             if (BOUNCING_OFFSET[bouncing] == 0)
-                audio_sound_play(sound_bam1);
+                AudioManager::playSound("bam1.wav", .1);
         }
         Y = (attachedPuyo.getPuyoY()*TSIZE) + yOffset;
     }
@@ -332,6 +339,11 @@ VanishSoundAnimation::~VanishSoundAnimation()
     synchronizer->decrementUsage();
 }
 
+static const char *sound_splash[8] = {
+    "splash1.wav", "splash2.wav", "splash3.wav", "splash4.wav",
+    "splash5.wav", "splash6.wav", "splash7.wav", "splash8.wav" };
+static float sound_splash_volume = .6;
+
 void VanishSoundAnimation::cycle()
 {
     if (once == false) {
@@ -341,7 +353,7 @@ void VanishSoundAnimation::cycle()
     else if (synchronizer->isSynchronized()) {
         step++;
         if (step == 1) {
-            audio_sound_play(sound_splash[phase>7?7:phase]);
+            AudioManager::playSound(sound_splash[phase>7?7:phase], sound_splash_volume);
             finishedFlag = true;
         }
     }
@@ -379,7 +391,7 @@ void NeutralPopAnimation::cycle()
     else if (synchronizer->isSynchronized()) {
         iter ++;
         if (iter == 17 + delay) {
-            audio_sound_play(sound_pop);
+            AudioManager::playSound("pop.wav", .25);
             enabled = true;
         }
         else if (iter == 30 + delay) {

@@ -5,10 +5,10 @@
 ###############
 # Settings
 
-OBJFILES= HiScores.o PuyoCommander.o        \
+OBJFILES= audio.o HiScores.o PuyoCommander.o        \
           main.o PuyoGame.o PuyoVersion.o         \
           PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o    \
-          audio.o styrolyse.o PuyoStory.o \
+          styrolyse.o PuyoStory.o \
           PuyoDoomMelt.o corona32.o corona.o corona_palette.o\
           PuyoStarter.o PuyoSinglePlayerStarter.o PuyoTwoPlayerStarter.o     \
           PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o \
