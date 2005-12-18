@@ -17,7 +17,7 @@
   Display @puyoDisplay = [new_display: x=680.0 y=50.0 width=640.0 height=480.0]
 
   Sprite @city = [new_sprite: image="city.jpg" x = 0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
-  Sprite @buildings = [new_sprite: image="brokenbuildings.png" x = 0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @buildings = [new_sprite: image="brokenbuildings.png" x = 0.0 y=480.0-448.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
 
   Sprite @puyo      = [new_sprite: image="knockedpuyo.png" x = 10.0 y=30.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
 

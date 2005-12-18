@@ -10,10 +10,19 @@ int    INIT   = 0
 int    UPDATE = 1
 int    DRAW   = 2
 
+int @maxHeightPlayer
+int @maxHeightAI
+int @neutralsForPlayer
+int @neutralsForAI
+
 (@mode = INIT)? {
   @finished = 0
   @cycle  = 0
   @fcycle = 0.0
+  @maxHeightPlayer = 0
+  @maxHeightAI = 0
+  @neutralsForPlayer = 0
+  @neutralsForAI = 0
   init
 }
 

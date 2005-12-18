@@ -16,6 +16,7 @@
 [start_level]
     level.levelName           = "An unfriendly encounter"
     level.opponentStory       = "story2.gsl"
+    level.opponentFace        = "dukebeary.gsl"
     level.opponentName        = "Duke Beary"
     level.backgroundTheme     = "The forest"
     level.easySetting.type    = "FLOBO"

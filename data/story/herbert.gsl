@@ -1,10 +1,6 @@
 <init>
   # Init function: called when script is loaded
   Display @display  = [new_display: x=262.0 y=196.0 width=140.0 height=220.0]
-  int @maxHeightPlayer = 0
-  int @maxHeightAI = 0
-  int @neutralsForPlayer = 0
-  int @neutralsForAI = 0
 
   Sprite @dog      = [new_sprite: image="herbert/dog.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @dogEyes  = [new_sprite: image="herbert/evileyes.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=10.0]
@@ -26,7 +22,7 @@
   
   (@maxHeightPlayer > 7)? music: file="flobopuyo_game2.xm"
   (@maxHeightAI     > 7)? music: file="flobopuyo_game2.xm"
-  
+ 
   # Update function: called every animation cycle
   int showDogHot = 0
   @dogEyes.image = "herbert/evileyes.png"
