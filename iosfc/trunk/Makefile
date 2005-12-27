@@ -1,52 +1,43 @@
-#include ../root_dir
-#include ../config
-
 SRCS=ios_exception.cpp ios_stream.cpp ios_hash.cpp ios_memory.cpp ios_message.cpp ios_standardmessage.cpp ios_udpmessage.cpp ios_messagebox.cpp ios_udpmessagebox.cpp  ios_datagramsocket.cpp ios_igpmessagebox.cpp ios_igpmessage.cpp ios_socket.cpp ios_igpclient.cpp ios_igpdatagram.cpp ios_filemanager.cpp ios_time.cpp ios_httpdocument.cpp ios_thread.cpp ios_igpmessagelistener.cpp ios_igpvirtualpeermessagebox.cpp ios_selector.cpp
-
-ifeq ($(PLATFORM), crossmingw32)
-  PLATFORMTYPE=WIN32
-endif
-
-ifeq ($(PLATFORM), Cygwin)
-  PLATFORMTYPE=WIN32
-endif
-
-ifeq ($(PLATFORMTYPE), WIN32)
-  SRCS:=${SRCS} ios_win32datagramsocketimpl.cpp ios_win32socketaddressimpl.cpp ios_win32socketimpl.cpp
-else
-  SRCS:=${SRCS} ios_unixdatagramsocketimpl.cpp ios_unixsocketaddressimpl.cpp ios_unixsocketimpl.cpp ios_unixthreadimpl.cpp ios_unixselectorimpl.cpp
-endif
 
 OBJECTS=${SRCS:%.cpp=%.o}
 
-all: prelude ${OBJECTS}
-	ar -cru libiosfc.a ${OBJECTS}
+-include Config.mk
+
+ifeq ($(PLATFORMTYPE), WIN32)
+  SUBDIRECTORIES=win32
+endif
+
+ifeq ($(PLATFORMTYPE), POSIX)
+  SUBDIRECTORIES=posix
+endif
+
+all: prelude libiosfc.a
+
+libiosfc.a: libiosfc_core.a ${SUBDIRECTORIES}
+	@rm -rf libiosfc; \
+	mkdir libiosfc; \
+	cd libiosfc; \
+	ar -x ../libiosfc_core.a; \
+	for libdir in ${SUBDIRECTORIES}; do \
+	  ar -x ../$$libdir/libiosfc_$$libdir.a; \
+	done; \
+	ar -x ../posix/libiosfc_posix.a; \
+	ar -cru ../libiosfc.a *.o; \
+	cd ..; \
+	rm -rf libiosfc \
+	echo $(LIBRARIES)
+
+libiosfc_core.a: ${OBJECTS}
+	${AR} -cru libiosfc_core.a ${OBJECTS}
 
 prelude:
 	@echo "PLATFORM: $(PLATFORM)"
 	@echo "PLATFORMTYPE: $(PLATFORMTYPE)"
 
-object: ${OBJECTS}
+$(SUBDIRECTORIES):
+	@+make -C $@
 
-DEPDIR = .deps
-df = $(DEPDIR)/$(*F)
+.PHONY: all prelude ${SUBDIRECTORIES}
 
-MAKEDEPEND = $(CXX) -MM $(CFLAGS_NOPCH) -o $(df).d $<
-# MAKEDEPEND = touch $*.d && makedepend $(CXXFLAGS) -f $*.d $<
-
-%.o:%.cpp
-	@mkdir -p $(DEPDIR); \
-	$(MAKEDEPEND);  \
-	cp $(df).d $(df).P;  \
-	cat $(df).d | sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
-	-e '/^$$/ d' -e 's/$$/ :/' >> $(df).P; \
-	rm -f $(df).d
-	@echo "[$@]" && $(CXX) $(CFLAGS) -c $< # 2>> WARNINGS || (cat WARNINGS && false)
-
-clean:
-	rm -f *.o *~
-
-.PHONY: all object clean
-
--include $(SRCS:%.cpp=$(DEPDIR)/%.P)
-# DO NOT DELETE
+-include Rules.mk
