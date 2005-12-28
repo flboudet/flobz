@@ -27,7 +27,15 @@
 
 namespace ios_fc {
 
-void Win32SocketImpl::create(const String hostName, int portID)
+void Win32SocketImpl::create()
+{
+    /* grab an Internet domain socket */
+    if ((socketFd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
+        throw Exception("IosSocket: Socket creation failed");
+    }
+}
+
+void Win32SocketImpl::connect(const String hostName, int portID)
 {
     struct hostent *hp;
     /* go find out about the desired host machine */
@@ -42,14 +50,15 @@ void Win32SocketImpl::create(const String hostName, int portID)
     pin.sin_addr.s_addr = ((struct in_addr *)(hp->h_addr))->s_addr;
     pin.sin_port = htons(portID);
 
-    /* grab an Internet domain socket */
-    if ((socketFd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-        throw Exception("IosSocket: Socket creation failed");
-    }
-
     /* connect to PORT on HOST */
-    if (connect(socketFd,(struct sockaddr *)  &pin, sizeof(pin)) == -1) {
-        throw Exception("IosSocket: Socket connection failed");
+    if (::connect(socketFd,(struct sockaddr *)  &pin, sizeof(pin)) == SOCKET_ERROR) {
+        switch (WSAGetLastError()) {
+        case WSAEINPROGRESS:
+            // Not really an error, the socket is non-blocking
+            break;
+        default:
+            throw Exception("IosSocket: Socket connection failed");
+	}
     }
     inputStream = new SocketInputStream(socketFd);
     outputStream = new SocketOutputStream(socketFd);
@@ -82,6 +91,31 @@ void Win32SocketImpl::socketSend(const void *buffer, int size)
 	else if (opResult < 0) {
 		throw Exception("IosSocket: Socket send error");
 	}
+}
+
+bool Win32SocketImpl::isConnected() const
+{
+    fd_set writefds;
+    struct timeval timeout;
+    
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 0;
+    FD_ZERO(&writefds);
+    FD_SET(socketFd, &writefds);
+    int sresult = select(socketFd+1, NULL, &writefds, NULL, &timeout);
+    if (sresult == -1)
+        throw Exception("IosSystemStreamSelect error");
+    else if (sresult == 0)
+        return false;
+    return true;
+}
+
+void Win32SocketImpl::setNonBlockingMode(bool mode)
+{
+    int arg = (mode == false ? 0 : 1);
+    if (ioctlsocket(socketFd, FIONBIO, (u_long *)&arg) == -1) {
+        throw Exception("IosSocket: ioctl error");
+    }
 }
 
 InputStream *Win32SocketImpl::getInputStream()

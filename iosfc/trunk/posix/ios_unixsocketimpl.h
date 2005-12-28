@@ -38,11 +38,11 @@ public:
     void create(int fd);
     ~UnixSocketImpl();
 
-	InputStream *getInputStream();
-	OutputStream *getOutputStream();
+    InputStream *getInputStream();
+    OutputStream *getOutputStream();
         
-	void socketSend(const void *buffer, int size);
-	void socketReceive(void *buffer, int size);
+    void socketSend(const void *buffer, int size);
+    void socketReceive(void *buffer, int size);
     
     SelectableImpl *getSelectableImpl() { return this; }
     int getFd() { return socketID; }

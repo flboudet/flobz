@@ -35,8 +35,9 @@ namespace ios_fc {
 
 class Win32SocketImpl : public SocketImpl {
 public:
-	virtual void create(String hostName, int portID);
-	virtual ~Win32SocketImpl();
+        void create();
+	void connect(const String hostName, int portID);
+	~Win32SocketImpl();
 
 	InputStream *getInputStream();
 	OutputStream *getOutputStream();
@@ -45,6 +46,9 @@ public:
 	void socketReceive(void *buffer, int size);
         
         SelectableImpl *getSelectableImpl() { return NULL; }
+
+	bool isConnected() const;
+	void setNonBlockingMode(bool mode);
 
 private:
 

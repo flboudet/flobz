@@ -22,7 +22,6 @@ libiosfc.a: libiosfc_core.a ${SUBDIRECTORIES}
 	for libdir in ${SUBDIRECTORIES}; do \
 	  ar -x ../$$libdir/libiosfc_$$libdir.a; \
 	done; \
-	ar -x ../posix/libiosfc_posix.a; \
 	ar -cru ../libiosfc.a *.o; \
 	cd ..; \
 	rm -rf libiosfc \
