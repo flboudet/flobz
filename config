@@ -3,7 +3,7 @@
 # (or nothing for auto-detection) #
 ###################################
 PLATFORM=
-ENABLE_FAT=true
+ENABLE_FAT=false
 
 ###################################
 # Configure your application      #
@@ -31,7 +31,7 @@ INSTALL_DATADIR=$(DESTDIR)/$(DATADIR)
 # Mac settings
 macimage_name=FloBoPuyo\ $(VERSION)
 bundle_name=FloboPuyo.app
-SYSTEM_ROOT=/Developer/SDKs/MacOSX10.4u.sdk
+SYSTEM_ROOT=/
 FRAMEWORKS_DIR=$(SYSTEM_ROOT)/Library/Frameworks
 
 # Win32 settings

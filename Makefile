@@ -27,7 +27,7 @@ MAKEDEPEND = $(CXX) -MM $(CFLAGS_NOPCH) -o $(df).d $<
 
 all: flobopuyo
 flobopuyo: all.h.gch iosfc_dir gametools_dir goomsl_dir ${OBJFILES}
-	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) ${OBJFILES} iosfc/*.o gametools/*.o goomsl/goomsl*.o
+	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) ${OBJFILES} gametools/*.o goomsl/goomsl*.o -Liosfc -liosfc
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
 	@echo
@@ -35,7 +35,7 @@ flobopuyo: all.h.gch iosfc_dir gametools_dir goomsl_dir ${OBJFILES}
 	@echo "--------------------------------------"
 
 iosfc_dir:all.h.gch
-	@+CFLAGS_NOPCH='$(CFLAGS_NOPCH)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX)  make -C iosfc object
+	@+CFLAGS_NOPCH='$(CFLAGS_NOPCH)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX)  make -C iosfc libiosfc.a
 
 gametools_dir:all.h.gch
 	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C gametools object
