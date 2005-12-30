@@ -22,7 +22,8 @@ libiosfc.a: libiosfc_core.a ${SUBDIRECTORIES}
 	for libdir in ${SUBDIRECTORIES}; do \
 	  ${AR} -x ../$$libdir/libiosfc_$$libdir.a; \
 	done; \
-	libtool -static -o ../libiosfc.a *.o; \
+	${AR} -cru ../libiosfc.a *.o; \
+	ranlib ../libiosfc.a; \
 	cd ..; \
 	rm -rf libiosfc \
 	echo $(LIBRARIES)
