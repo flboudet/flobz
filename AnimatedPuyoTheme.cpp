@@ -167,10 +167,7 @@ static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P5.eye")),
                                ((const float) GSL_GLOBAL_FLOAT(gsl, "puyoset.P5.offset")));
     theme->addNeutralPuyo(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.Neutral.face")),
-                         ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.Neutral.disappear")),
-                         ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.Neutral.explosion")),
-                         ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.Neutral.eye")),
-                         ((const float) GSL_GLOBAL_FLOAT(gsl, "puyoset.Neutral.offset")));
+			  "none", "none", "none", 0);
     
     globalManager->addPuyoSet(theme);
 }

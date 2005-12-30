@@ -72,7 +72,6 @@ external <end_level>
     puyoset.P5.eye       = "normal"
     puyoset.P5.explosion = "round"
     puyoset.P5.disappear = "round"
-
     puyoset.Neutral.face = "glass"
 
 <start_level>

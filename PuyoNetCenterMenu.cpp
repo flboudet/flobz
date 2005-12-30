@@ -53,6 +53,19 @@ NetCenterDialogMenu::NetCenterDialogMenu(NetCenterMenu *targetMenu, PeerAddress 
       acceptButton("Accept", &acceptAction), cancelButton("Cancel", &cancelAction)
 {}
 
+NetCenterDialogMenu::~NetCenterDialogMenu()
+{
+  menu.remove(&dialogTitle);
+  menu.remove(&sep1);
+  menu.remove(&dialogMsg);
+  menu.remove(&sep2);
+  buttons.remove(&cancelButton);
+  if (hasAcceptButton)
+    buttons.remove(&acceptButton);
+  menu.remove(&buttons);
+  //remove(&menu);
+}
+
 void NetCenterDialogMenu::build()
 {
     Vec3 dialogPos = getPosition();
@@ -69,7 +82,7 @@ void NetCenterDialogMenu::build()
         buttons.add(&acceptButton);
     buttons.add(&cancelButton);
     menu.add(&buttons);
-    add(&menu);
+    transitionToContent(&menu);
 }
 
 NetCenterChatArea::NetCenterChatArea(int height)
@@ -275,7 +288,7 @@ void NetCenterMenu::gameCanceledAgainst(String playerName, PeerAddress playerAdd
     if (this->onScreenDialog != NULL) {
         if (playerAddress == onScreenDialog->associatedPeer) {
             remove(onScreenDialog);
-            delete(onScreenDialog);
+            delete onScreenDialog;
             onScreenDialog = NULL;
         }
     }

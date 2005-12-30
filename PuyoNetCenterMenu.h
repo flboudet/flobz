@@ -35,6 +35,7 @@ class NetCenterMenu;
 class NetCenterDialogMenu : public SliderContainer {
 public:
     NetCenterDialogMenu(NetCenterMenu *targetMenu, PeerAddress associatedPeer, String title, String message, bool hasAcceptButton);
+    ~NetCenterDialogMenu();
     void build();
 public:
     PeerAddress associatedPeer;

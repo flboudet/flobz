@@ -70,13 +70,22 @@ private:
     Button *updating;
 };
 
+class NetworkInternetAction : public Action {
+public:
+    NetworkInternetAction(InternetGameMenu **menuToCreate) : menuToCreate(menuToCreate) {}
+    void action();
+private:
+    InternetGameMenu **menuToCreate;
+};
+
 class NetworkGameMenu : public PuyoMainScreenMenu {
 public:
-    NetworkGameMenu(PuyoRealMainScreen * mainScreen) : PuyoMainScreenMenu(mainScreen), lanGameMenu(mainScreen), internetGameMenu() {}
+    NetworkGameMenu(PuyoRealMainScreen * mainScreen) : PuyoMainScreenMenu(mainScreen), lanGameMenu(mainScreen), internetGameMenu(NULL), internetAction(&internetGameMenu) {}
     void build();
 private:
     LANGameRealMenu  lanGameMenu;
-    InternetGameMenu internetGameMenu;
+    InternetGameMenu *internetGameMenu;
+    NetworkInternetAction internetAction;
 };
 
 #endif // _PUYONETWORKMENU

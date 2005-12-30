@@ -52,22 +52,28 @@ PuyoHttpServerList::PuyoHttpServerList(String hostName, String path, int portNum
 
 bool PuyoHttpServerList::listIsReady() 
 {
-    if (isReady) return true;
-    if (!doc->documentIsReady())
-      return false;
+    try {
+        if (isReady) return true;
+        if (!doc->documentIsReady())
+          return false;
     
-    StandardMessage msg(doc->getDocumentContent());
-    int nbServers = msg.getInt("NBSERV");
-    for (int i = 0 ; i < nbServers ; i++) {
-        char tmpStr[256];
-        sprintf(tmpStr, "SERVNAME%.2d", i);
-        String serverName = msg.getString(tmpStr);
-        sprintf(tmpStr, "PORTNUM%.2d", i);
-        int portNum = msg.getInt(tmpStr);
-        servers.add(new PuyoHttpServer(serverName, portNum));
+        StandardMessage msg(doc->getDocumentContent());
+        int nbServers = msg.getInt("NBSERV");
+        for (int i = 0 ; i < nbServers ; i++) {
+            char tmpStr[256];
+            sprintf(tmpStr, "SERVNAME%.2d", i);
+            String serverName = msg.getString(tmpStr);
+            sprintf(tmpStr, "PORTNUM%.2d", i);
+            int portNum = msg.getInt(tmpStr);
+            servers.add(new PuyoHttpServer(serverName, portNum));
+        }
+        isReady = true;
+        return true;
     }
-    isReady = true;
-    return true;
+    catch (Exception e) {
+        e.printMessage();
+        return false;
+    }
 }
 
 
@@ -110,7 +116,7 @@ public:
     {
         fprintf(stderr, "Connecting to %s..\n", serverName->getValue().c_str());
         PuyoInternetGameCenter *gameCenter = new PuyoInternetGameCenter(serverName->getValue(),
-                                                                        4567, userName->getValue());
+                                                                        110, userName->getValue());
         NetCenterMenu *newNetCenterMenu = new NetCenterMenu(gameCenter);
         newNetCenterMenu->build();
         (GameUIDefaults::SCREEN_STACK)->push(newNetCenterMenu);
@@ -120,12 +126,20 @@ private:
     Text *userName;
 };
 
+void NetworkInternetAction::action()
+{
+  if (*menuToCreate == NULL) {
+    *menuToCreate = new InternetGameMenu();
+    (*menuToCreate)->build();
+  }
+  (GameUIDefaults::SCREEN_STACK)->push(*menuToCreate);
+}
+
 void NetworkGameMenu::build() {
-  internetGameMenu.build();
   lanGameMenu.build();
   add(new Text("Network Game"));
   add(new Button("Local Area Network Game", new PuyoPushMenuAction(&lanGameMenu, mainScreen)));
-  add(new Button("Internet Game", new PushScreenAction(&internetGameMenu)));
+  add(new Button("Internet Game", &internetAction));
   add(new Button("Cancel",        new PuyoPopMenuAction(mainScreen)));
 }
 
@@ -156,8 +170,8 @@ void InternetGameMenu::build()
     serverSelectionPanel->add(updating);
 
     // temporary entry into the server list
-    serverListPanel->add (new Button("durandal.homeunix.com",
-                                     new ServerSelectAction(*this, "durandal.homeunix.com", 6581)));
+    serverListPanel->add (new Button("durandal.homeunix.com !",
+                                     new ServerSelectAction(*this, "durandal.homeunix.com", 110)));
     
     VBox *rightPanel = new VBox();
     rightPanel->add(new Separator(1,1));
