@@ -1,7 +1,11 @@
 DEPDIR = .deps
 df = $(DEPDIR)/$(*F)
 
-MAKEDEPEND = $(CXX) -MM $(CXXFLAGS) -o $(df).d $<
+ifneq (, $(DEPFLAGS))
+	MAKEDEPEND = $(CXX) -MM $(DEPFLAGS) -o $(df).d $<
+else
+	MAKEDEPEND = $(CXX) -MM $(CXXFLAGS) -o $(df).d $<
+endif
 # MAKEDEPEND = touch $*.d && makedepend $(CXXFLAGS) -f $*.d $<
 
 %.o:%.cpp

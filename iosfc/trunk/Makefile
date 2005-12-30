@@ -18,11 +18,11 @@ libiosfc.a: libiosfc_core.a ${SUBDIRECTORIES}
 	@rm -rf libiosfc; \
 	mkdir libiosfc; \
 	cd libiosfc; \
-	ar -x ../libiosfc_core.a; \
+	${AR} -x ../libiosfc_core.a; \
 	for libdir in ${SUBDIRECTORIES}; do \
-	  ar -x ../$$libdir/libiosfc_$$libdir.a; \
+	  ${AR} -x ../$$libdir/libiosfc_$$libdir.a; \
 	done; \
-	ar -cru ../libiosfc.a *.o; \
+	libtool -static -o ../libiosfc.a *.o; \
 	cd ..; \
 	rm -rf libiosfc \
 	echo $(LIBRARIES)
@@ -35,7 +35,7 @@ prelude:
 	@echo "PLATFORMTYPE: $(PLATFORMTYPE)"
 
 $(SUBDIRECTORIES):
-	@+make -C $@
+	@+CFLAGS='$(CFLAGS)' CXXFLAGS='$(CXXFLAGS)' make -C $@
 
 .PHONY: all prelude ${SUBDIRECTORIES}
 
