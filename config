@@ -3,7 +3,7 @@
 # (or nothing for auto-detection) #
 ###################################
 PLATFORM=
-ENABLE_FAT=false
+ENABLE_FAT=true
 
 ###################################
 # Configure your application      #
@@ -31,7 +31,7 @@ INSTALL_DATADIR=$(DESTDIR)/$(DATADIR)
 # Mac settings
 macimage_name=FloBoPuyo\ $(VERSION)
 bundle_name=FloboPuyo.app
-SYSTEM_ROOT=/
+SYSTEM_ROOT=/Developer/SDKs/MacOSX10.4u.sdk
 FRAMEWORKS_DIR=$(SYSTEM_ROOT)/Library/Frameworks
 
 # Win32 settings
@@ -95,7 +95,7 @@ ifeq ($(DEBUG_MODE), true)
 	CFLAGS:=$(CFLAGS) -g -O0 -Winvalid-pch
 	LDFLAGS:=$(LDFLAGS) -g
 else
-	CFLAGS:=$(CFLAGS) -O2
+	CFLAGS:=$(CFLAGS) -O3 -fomit-frame-pointer
 endif
 
 # More Debug
@@ -159,14 +159,16 @@ ifeq ($(ENABLE_PCH), true)
 	CFLAGS:=$(CFLAGS) -include all.h
 endif
 
+DEPFLAGS:=${CFLAGS}
 
 # FAT Binaries
 ifeq ($(PLATFORM), Darwin)
 	ifeq ($(ENABLE_FAT), true)
 		CFLAGS:=$(CFLAGS) -isysroot $(SYSTEM_ROOT) -arch ppc -arch i386
-#        LDFLAGS:=$(LDFLAGS) -Wl,-syslibroot,$(SYSTEM_ROOT)
 	endif
 endif
 
 CXXFLAGS=${CFLAGS}
+
+
 

@@ -22,7 +22,7 @@ include config
 DEPDIR = .deps
 df = $(DEPDIR)/$(*F)
 
-MAKEDEPEND = $(CXX) -MM $(CFLAGS_NOPCH) -o $(df).d $<
+MAKEDEPEND = $(CXX) -MM $(DEPFLAGS) -o $(df).d $<
 # MAKEDEPEND = touch $*.d && makedepend $(CPPFLAGS) -f $*.d $<
 
 all: flobopuyo
@@ -35,7 +35,7 @@ flobopuyo: all.h.gch iosfc_dir gametools_dir goomsl_dir ${OBJFILES}
 	@echo "--------------------------------------"
 
 iosfc_dir:all.h.gch
-	@+CFLAGS_NOPCH='$(CFLAGS_NOPCH)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX)  make -C iosfc libiosfc.a
+	@+DEPFLAGS='$(DEPFLAGS)' CFLAGS='$(CFLAGS)' CXXFLAGS='$(CXXFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CXX=$(CXX)  make -C iosfc libiosfc.a
 
 gametools_dir:all.h.gch
 	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C gametools object
@@ -56,6 +56,7 @@ all.h.gch:
 	@echo "Compiling with CFLAGS=$(CFLAGS)"
 	@echo "Compiling with CFLAGS_NOPCH=$(CFLAGS_NOPCH)"
 	@echo "Compiling with LDFLAGS=$(LDFLAGS)"
+	@echo "Compiling with DEPFLAGS=$(DEPFLAGS)"
 	@echo "[Precompiling Headers]"
 	@mkdir -p $(DEPDIR);\
 	$(CXX) -MM $(CFLAGS_NOPCH) -o $(DEPDIR)/all.d all.h ;\
