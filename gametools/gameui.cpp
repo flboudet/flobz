@@ -155,6 +155,15 @@ namespace gameui {
       getChild(i)->removeFromGameLoopActive();
   }
 
+  bool WidgetContainer::hasWidget(Widget *wid)
+  {
+    for (int i = 0, j = getNumberOfChilds() ; i < j ; i++) {
+      if (getChild(i) == wid)
+	return true;
+    }
+    return false;
+  }
+
   void WidgetContainer::draw(SDL_Surface *surface) 
   {
     for (int i = 0; i < getNumberOfChilds(); ++i) {
@@ -376,6 +385,10 @@ namespace gameui {
       return;
     child->giveFocus();
     child->eventOccured(event);
+    // Handle the case where the widget has self-destroyed
+    if (!hasWidget(child)) {
+      return; // there are probably wiser things to do
+    }
 
     if (child->haveFocus()) return;
     int direction = 0;
@@ -432,6 +445,7 @@ namespace gameui {
     ev.cursorEvent = GameControlEvent::kCursorNone;
     ev.gameEvent   = GameControlEvent::kGameNone;
     ev.isUp        = false;
+    ev.sdl_event.type = SDL_NOEVENT;
 
     Widget *child = getChild(activeWidget);
     child->giveFocus();
@@ -459,6 +473,8 @@ namespace gameui {
     ev.cursorEvent = GameControlEvent::kCursorNone;
     ev.gameEvent   = GameControlEvent::kGameNone;
     ev.isUp        = false;
+    ev.sdl_event.type = SDL_NOEVENT;
+
     eventOccured(&ev);
 
     if (activeWidget<0) return;

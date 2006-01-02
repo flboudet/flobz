@@ -80,11 +80,9 @@ void PuyoNetGameCenter::disconnectPeer(PeerAddress addr, const String name)
             // Cancels all games from this peer
             for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
                 if (pendingGames[i]->peer == currentPeer) {
-                    for (int u = 0, v = listeners.size() ; u < v ; u++) {
-                        listeners[u]->gameCanceledAgainst(pendingGames[i]->peer->name, pendingGames[i]->peer->address);
-                    }
-                    delete pendingGames[i];
-                    pendingGames.removeAt(i);
+                    // We won't call gameCanceledAgainst yet to avoid objects destructing themselves
+                    // but instead set the game in timeout
+               	    pendingGames[i]->initiateTime = getTimeMs() - pendingGameTimeout;
                 }
             }
             // Delete the disconnected peer

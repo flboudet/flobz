@@ -138,7 +138,7 @@ namespace gameui {
       WidgetContainer(GameLoop *loop = NULL);
       ~WidgetContainer();
       void add (Widget *child);
-      void remove (Widget *child);
+      virtual void remove (Widget *child);
       GameLoop *getGameLoop();
       virtual void arrangeWidgets() {}
 
@@ -153,6 +153,7 @@ namespace gameui {
       virtual void removeFromGameLoop();
       virtual void removeFromGameLoopActive();
       
+      bool hasWidget(Widget *wid);
     protected:
       Widget *getChild(int i)     const  { return childs[i]; }
       void    changeChild(int i, Widget *w);
