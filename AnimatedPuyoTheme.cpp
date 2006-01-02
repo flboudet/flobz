@@ -166,8 +166,7 @@ static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P5.explosion")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P5.eye")),
                                ((const float) GSL_GLOBAL_FLOAT(gsl, "puyoset.P5.offset")));
-    theme->addNeutralPuyo(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.Neutral.face")),
-			  "none", "none", "none", 0);
+    theme->addNeutralPuyo(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.Neutral.face")),NULL,NULL,NULL,0.0);
     
     globalManager->addPuyoSet(theme);
 }
@@ -204,10 +203,17 @@ static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     globalManager->addLevel(theme);
 }
 
+static void end_description(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+	// TODO !!!
+}
+
+
 static void sbind(GoomSL *gsl)
 {
     gsl_bind_function(gsl, "end_puyoset",   end_puyoset);
     gsl_bind_function(gsl, "end_level",  end_level);
+    gsl_bind_function(gsl, "end_description",  end_description);
 }
 
 //*****************************************************************************************

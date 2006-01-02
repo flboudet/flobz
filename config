@@ -3,7 +3,7 @@
 # (or nothing for auto-detection) #
 ###################################
 PLATFORM=
-ENABLE_FAT=true
+ENABLE_FAT=false
 
 ###################################
 # Configure your application      #
@@ -13,7 +13,7 @@ ENABLE_AUDIO=true
 ENABLE_OPENGL=true
 ENABLE_DGA=false
 
-DEBUG_MODE=false
+DEBUG_MODE=true
 MORE_DEBUG=false
 ENABLE_PCH=false
 

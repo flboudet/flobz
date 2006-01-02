@@ -23,24 +23,23 @@
  *
  */
 
-#ifndef PUYO_THEME_MENU_H
-#define PUYO_THEME_MENU_H
+#ifndef LEVEL_THEME_MENU_H
+#define LEVEL_THEME_MENU_H
 
 #include "gameui.h"
 #include "PuyoCommander.h"
 #include "AnimatedPuyoTheme.h"
-#include "LevelThemeMenu.h"
 
-class PuyoThemePicturePreview : public Widget, public IdleComponent {
+class LevelThemePicturePreview : public Widget, public IdleComponent {
     public:
-        PuyoThemePicturePreview();
-
+        LevelThemePicturePreview();
+		~LevelThemePicturePreview();
         // Implements IdleComponent
         virtual void idle(double currentTime);
         virtual IdleComponent *getIdleComponent() { return this; }
 
         void build();
-        void themeSelected(AnimatedPuyoSetTheme * theme);
+        void themeSelected(PuyoLevelTheme * theme);
 
     protected:
       void draw(SDL_Surface *screen);
@@ -48,17 +47,15 @@ class PuyoThemePicturePreview : public Widget, public IdleComponent {
       
     private:
       String label;
-      AnimatedPuyoSetTheme * curTheme;
+      IIM_Surface * lilback;
       double offsetX;
       double offsetY;
-      int eyes[NUMBER_OF_PUYOS];
-      double lastTime;
 };
 
-class PuyoThemePreview : public VBox {
+class LevelThemePreview : public VBox {
     public:
-        PuyoThemePreview();
-        virtual ~PuyoThemePreview();
+        LevelThemePreview();
+        virtual ~LevelThemePreview();
         
         void build();
         void themeSelected(String themeName);
@@ -66,31 +63,30 @@ class PuyoThemePreview : public VBox {
     private:
         Text name;
         Text author;
-        PuyoThemePicturePreview picture;
+        LevelThemePicturePreview picture;
         Text description;
 };
 
-class PuyoThemeSelectionBox : public HScrollList {
+class LevelThemeSelectionBox : public HScrollList {
 public:
-    PuyoThemeSelectionBox(PuyoThemePreview &themePreview);
-    virtual ~PuyoThemeSelectionBox();
+    LevelThemeSelectionBox(LevelThemePreview &themePreview);
+    virtual ~LevelThemeSelectionBox();
     void build();
 private:
-    PuyoThemePreview &themePreview;
+    LevelThemePreview &themePreview;
     AdvancedBuffer<Button *> buttonList;
     AdvancedBuffer<Action *> actionList;
 };
 
-class PuyoThemeMenu : public PuyoMainScreenMenu {
+class LevelThemeMenu : public PuyoMainScreenMenu {
 public:
-    PuyoThemeMenu(PuyoRealMainScreen *mainScreen);
+    LevelThemeMenu(PuyoRealMainScreen *mainScreen);
     void build();
 private:
     Text themeMenuTitle;
     PuyoPopMenuAction popAction;
-    Button backButton;
-    PuyoThemePreview themePreview;
-    PuyoThemeSelectionBox themeList;
+    LevelThemePreview themePreview;
+    LevelThemeSelectionBox themeList;
 };
 
 #endif

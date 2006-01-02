@@ -484,6 +484,83 @@ IIM_Surface *iim_surface_set_value(IIM_Surface *isrc, float value)
 }
 
 /**
+* Resize a surface
+ */
+IIM_Surface *iim_surface_resize(IIM_Surface *isrc, int width, int height)
+{
+    SDL_Surface *src = isrc->surf;
+    int w = isrc->w;
+    int h = isrc->h;
+    SDL_PixelFormat *fmt = src->format;
+    SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, width, height, 32,
+                                            fmt->Rmask, fmt->Gmask,
+                                            fmt->Bmask, fmt->Amask);
+    SDL_LockSurface(src);
+    SDL_LockSurface(ret);
+    
+    float ratiox = (w<<4)/width;
+    float ratioy = (h<<4)/height;
+    int sizew = w/width;
+    int sizeh = h/height;
+    if (sizew<1) sizew = 1;
+    if (sizeh<1) sizeh = 1;
+    for (int y=height-1; y>=0; y--)
+    {
+        for (int x=width-1; x>=0; x--)
+        {
+            Uint32 red = 0;
+            Uint32 green = 0;
+            Uint32 blue = 0;
+            Uint32 alpha = 0;
+            int x1 = (x*w)/width;
+            int y1 = (y*h)/height;
+            for (int i=sizew; i>0; i--)
+            {
+                for (int j=sizeh; j>0; j--)
+                {
+                    RGBA rgba = iim_surface_get_rgba(src,x1+i-1,y1+j-1);
+                    red += rgba.red;
+                    green += rgba.green;
+                    blue += rgba.blue;
+                    //alpha += rgba.alpha;
+                }
+            }
+            red /= (sizew*sizeh);
+            green /= (sizew*sizeh);
+            blue /= (sizew*sizeh);
+            //alpha /= (sizew*sizeh);
+            alpha = 255;
+            RGBA finalrgba = {(Uint8)red,(Uint8)green,(Uint8)blue,(Uint8)alpha};
+            iim_surface_set_rgba(ret,x,y,finalrgba);
+        }
+    }
+    SDL_UnlockSurface(ret);
+    SDL_UnlockSurface(src);
+    SDL_Surface *ret2 = SDL_DisplayFormatAlpha(ret);
+	SDL_SetAlpha(ret2, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
+	/*SDL_FreeSurface(ret);
+    ret = isrc->surf;
+    isrc->surf = SDL_DisplayFormatAlpha(ret);
+    SDL_SetAlpha(isrc->surf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
+    SDL_FreeSurface(ret);*/
+    return IIM_RegisterImg(ret2, true);
+}
+
+/**
+* Duplicate a surface
+ */
+IIM_Surface *iim_surface_duplicate(IIM_Surface *isrc)
+{
+    SDL_Surface *ret2 = SDL_DisplayFormatAlpha(isrc->surf);
+	SDL_SetAlpha(ret2, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
+    SDL_Surface *ret = isrc->surf;
+    isrc->surf = SDL_DisplayFormatAlpha(ret);
+    SDL_SetAlpha(isrc->surf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
+    SDL_FreeSurface(ret);
+    return IIM_RegisterImg(ret2, true);
+}
+
+/**
  * rotate a surface into a surface of the same size (may lost datas)
  */
 IIM_Surface *iim_rotate(IIM_Surface *isrc, int degrees)

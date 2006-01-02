@@ -627,6 +627,178 @@ namespace gameui {
   }
 
   //
+  // HScrollList
+  //
+#define kHScrollListNbAddedItemsToEachSide 1
+
+  HScrollList::HScrollList(GameLoop *loop)
+  {
+  	lastvisible = firstvisible = -1;
+  }
+  int HScrollList::getNumberOfVisibleChilds() {
+  	if (activeWidget==-1) return 0;
+  	if (getNumberOfChilds()<(1+2*kHScrollListNbAddedItemsToEachSide)) return getNumberOfChilds();
+  	else return 1+2*kHScrollListNbAddedItemsToEachSide;
+  }
+  
+  bool HScrollList::isItemVisible(int i)
+  {
+  	if (firstvisible <= lastvisible)
+  	{
+  		return ((i>=firstvisible) && (i<=lastvisible));
+  	}
+  	else
+  	{
+  		return !((i>lastvisible) && (i<firstvisible));
+  	}
+  }
+  
+  Widget* HScrollList::getVisibleChild(int i) { return getChild((i+firstvisible)%getNumberOfChilds());}
+  void HScrollList::updateShownWidgets(void)
+  {
+  	if ((activeWidget==-1) || (getNumberOfChilds() == 0))
+  	{
+  		firstvisible = lastvisible = -1;
+  		return;
+  	}
+  	if (getNumberOfVisibleChilds()>1+2*kHScrollListNbAddedItemsToEachSide)
+  	{
+  	  firstvisible = (getNumberOfChilds() + activeWidget - kHScrollListNbAddedItemsToEachSide)%getNumberOfChilds();
+  	  lastvisible = (activeWidget + kHScrollListNbAddedItemsToEachSide)%getNumberOfChilds();
+  	}
+  	else
+  	{
+  		firstvisible = (activeWidget + getNumberOfChilds() - (getNumberOfChilds()-1)/2) % getNumberOfChilds();
+  		lastvisible = (firstvisible + getNumberOfChilds() - 1) % getNumberOfChilds();
+  	}
+  }
+  
+  void HScrollList::eventOccured(GameControlEvent *event)
+  {
+  	int old = activeWidget;
+    if (activeWidget >= getNumberOfChilds())
+      activeWidget = getNumberOfChilds() - 1;
+
+    if (activeWidget < 0) {
+      lostFocus();
+      return;
+    }
+
+    Widget *child = getChild(activeWidget);
+    if ((event->isUp) && (! child->receiveUpEvents()))
+      return;
+    child->giveFocus();
+    child->eventOccured(event);
+
+    if (child->haveFocus()) return;
+    int direction = 0;
+
+    if (isPrevEvent(event))
+      direction = -1;
+    else if (isNextEvent(event))
+      direction = 1;
+    else {
+      if (isOtherDirection(event))
+        lostFocus();
+      return;
+    }
+
+    bool childHaveFocus;    
+    do {
+      activeWidget += direction;
+      if (activeWidget < 0) {
+        setActiveWidget(getNumberOfChilds()-1);
+        lostFocus();
+      }
+      if (activeWidget >= getNumberOfChilds()) {
+        setActiveWidget(0);
+        lostFocus();
+      }
+      childHaveFocus = giveFocusToActiveWidget();
+    }
+    while (!childHaveFocus);
+    arrangeWidgets();
+    GameControlEvent ev;
+    ev.cursorEvent = GameControlEvent::kStart;
+    ev.gameEvent   = GameControlEvent::kGameNone;
+    ev.isUp        = false;
+    getChild(activeWidget)->eventOccured(&ev);
+  }
+
+  void HScrollList::arrangeWidgets()
+  {
+  	updateShownWidgets();
+    if (getNumberOfChilds() == 0) return;
+    
+    requestDraw();
+    checkFocus();
+    
+    float height = getSortingAxe(getSize());
+    float heightOfKnownChilds = 0.0f;
+    for (int i = 0; i < getNumberOfVisibleChilds(); ++i) {
+      Widget *child = getVisibleChild(i);
+      if (!child->getPreferedSize().is_zero()) {
+        heightOfKnownChilds += getSortingAxe(child->getPreferedSize());
+      }
+    }
+    float heightPerChild = (height - heightOfKnownChilds) / (getNumberOfVisibleChilds());
+    float heightToRemove = 0.0;
+    if (heightPerChild < GameUIDefaults::SPACING)
+    {
+      if (height >= GameUIDefaults::SPACING * getNumberOfVisibleChilds())
+      {
+        heightToRemove = heightOfKnownChilds - (height - GameUIDefaults::SPACING * getNumberOfVisibleChilds());
+        heightPerChild = GameUIDefaults::SPACING;
+      }
+      else
+      {
+        heightPerChild = (GameUIDefaults::SPACING * getNumberOfVisibleChilds() - height) / getNumberOfVisibleChilds();
+        heightToRemove = heightOfKnownChilds - (height - heightPerChild * getNumberOfVisibleChilds());
+      }
+    }
+
+    Vec3 size     = getSize();
+    setSortingAxe(size, heightPerChild);
+    Vec3 position = getPosition();
+    setSortingAxe(position, getSortingAxe(position)-heightPerChild/2.0);
+    float axePos  = getSortingAxe(position);
+
+    for (int j = 0; j<getNumberOfChilds(); j++) {
+      int i = (j+firstvisible)%getNumberOfChilds();
+      Widget *child = getChild(i);
+      if (isItemVisible(i)) {
+      if (!child->getPreferedSize().is_zero()) {
+        // center the widget if we know its size
+        float coeff = getSortingAxe(child->getPreferedSize()) / heightOfKnownChilds;
+        Vec3 csize = size - child->getPreferedSize();
+        Vec3 offset(0.0,0.0,0.0);
+        setSortingAxe(offset, heightPerChild - getSortingAxe(csize / 2.0));
+        Vec3 sizeOffset(0.0,0.0,0.0);
+        setSortingAxe(sizeOffset,  heightToRemove*coeff);
+        Vec3 cpos  = position + csize / 2.0 + offset;
+        child->setSize(child->getPreferedSize()-sizeOffset);
+        child->setPosition(cpos);
+        axePos += getSortingAxe(child->getSize());
+      } else {
+        // else give him all the space he want.
+        child->setSize(size);
+        Vec3 offset(0.0,0.0,0.0);
+        setSortingAxe(offset, heightPerChild - getSortingAxe(size / 2.0));
+        child->setPosition(position+ offset);
+      }
+      axePos += heightPerChild;
+      setSortingAxe(position, axePos);
+      child->show();
+      }
+      else
+      {
+      	  child->hide();
+      }
+    }
+  }
+
+
+  //
   // Screen
   //
 
@@ -712,7 +884,7 @@ namespace gameui {
 
   void Text::draw(SDL_Surface *screen)
   {
-    SoFont_PutString(font, screen, (int)(offsetX + getPosition().x), (int)(offsetY + getPosition().y), (const char*)label, NULL);
+    if (isVisible()) SoFont_PutString(font, screen, (int)(offsetX + getPosition().x), (int)(offsetY + getPosition().y), (const char*)label, NULL);
   }
 
   void Text::idle(double currentTime)

@@ -62,6 +62,7 @@ namespace gameui {
       friend class WidgetContainer;
       friend class SliderContainer;
       friend class Box;
+      friend class HScrollList;
       
     public:
       Widget(WidgetContainer *parent = NULL);
@@ -194,9 +195,10 @@ namespace gameui {
       GameUIEnum policy;
       int        activeWidget;
 
+      virtual void setActiveWidget(int i);
+      virtual bool giveFocusToActiveWidget();
+
     private:
-      void setActiveWidget(int i);
-      bool giveFocusToActiveWidget();
   };
 
 
@@ -224,7 +226,8 @@ namespace gameui {
       bool isNextEvent(GameControlEvent *event) const;
       bool isOtherDirection(GameControlEvent *event) const;
   };
-  
+
+
   class ZBox : public Box {
     public:
       ZBox(GameLoop *loop = NULL) : Box(loop) {}
@@ -451,6 +454,21 @@ namespace gameui {
       ScreenStack *stack;
   };
 
+    class HScrollList : public HBox {
+      public:
+  	    HScrollList(GameLoop *loop = NULL);
+  	  protected:
+  		int getNumberOfVisibleChilds(void);
+  	  	Widget* getVisibleChild(int i);
+  		void updateShownWidgets(void);
+  		void arrangeWidgets(void);
+  		void eventOccured(GameControlEvent *event);
+  		int lastvisible;
+  		int firstvisible;
+  		bool HScrollList::isItemVisible(int id);
+  		Text threedotsbefore;
+  		Text threedotsafter;
+  	};
 
 };
 

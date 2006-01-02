@@ -5,16 +5,17 @@
 ###############
 # Settings
 
-OBJFILES= audio.o HiScores.o PuyoCommander.o        \
-          main.o PuyoGame.o PuyoVersion.o         \
-          PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o    \
+OBJFILES= audio.o HiScores.o PuyoCommander.o \
+          main.o PuyoGame.o PuyoVersion.o \
+          PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o \
           styrolyse.o PuyoStory.o \
           PuyoDoomMelt.o corona32.o corona.o corona_palette.o\
-          PuyoStarter.o PuyoSinglePlayerStarter.o PuyoTwoPlayerStarter.o     \
+          PuyoStarter.o PuyoSinglePlayerStarter.o PuyoTwoPlayerStarter.o \
           PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o \
           AnimatedPuyoTheme.o PuyoNetworkMenu.o PuyoNetCenterMenu.o \
           PuyoNetGameCenter.o PuyoInternetGameCenter.o \
-          PuyoLocalMenu.o PuyoOptionMenu.o PuyoControlMenu.o PuyoThemeMenu.o PuyoScreenTransition.o IosVector.o
+          PuyoLocalMenu.o PuyoOptionMenu.o PuyoControlMenu.o \
+          LevelThemeMenu.o PuyoThemeMenu.o PuyoScreenTransition.o IosVector.o
 
 include root_dir
 include config
@@ -111,7 +112,8 @@ bundle: flobopuyo
 	rm -rf $(bundle_name)/Contents/Resources/data/CVS $(bundle_name)/Contents/Resources/data/*/CVS
 	rm -rf $(bundle_name)/Contents/Resources/data/.xvpics $(bundle_name)/Contents/Resources/data/*/.xvpics
 	rm -f $(bundle_name)/Contents/Resources/data/.DS_Store $(bundle_name)/Contents/Resources/data/*/.DS_Store
-	$(STRIP) $(bundle_name)/Contents/MacOS/flobopuyo
+
+#	$(STRIP) $(bundle_name)/Contents/MacOS/flobopuyo
 
 mac-package: bundle
 	mkdir -p $(macimage_name)
