@@ -96,6 +96,13 @@ namespace gameui {
     if (loop == NULL) this->loop = GameUIDefaults::GAME_LOOP;
   }
 
+  WidgetContainer::~WidgetContainer()
+  {
+    for (int i = childs.size()-1 ; i >= 0 ; i--) {
+      remove(childs[i]);
+    }
+  }
+
   void WidgetContainer::add (Widget *child)    
   { 
     childs.add(child);

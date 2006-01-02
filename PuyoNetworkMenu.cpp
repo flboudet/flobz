@@ -116,7 +116,7 @@ public:
     {
         fprintf(stderr, "Connecting to %s..\n", serverName->getValue().c_str());
         PuyoInternetGameCenter *gameCenter = new PuyoInternetGameCenter(serverName->getValue(),
-                                                                        110, userName->getValue());
+                                                                        4567, userName->getValue());
         NetCenterMenu *newNetCenterMenu = new NetCenterMenu(gameCenter);
         newNetCenterMenu->build();
         (GameUIDefaults::SCREEN_STACK)->push(newNetCenterMenu);

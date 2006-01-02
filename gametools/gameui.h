@@ -135,6 +135,7 @@ namespace gameui {
   class WidgetContainer : public Widget {
     public:
       WidgetContainer(GameLoop *loop = NULL);
+      ~WidgetContainer();
       void add (Widget *child);
       void remove (Widget *child);
       GameLoop *getGameLoop();
