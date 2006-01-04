@@ -77,13 +77,15 @@ void PuyoNetGameCenter::disconnectPeer(PeerAddress addr, const String name)
     for (int i = 0, j = peers.size() ; i < j ; i++) {
         GamerPeer *currentPeer = peers[i];
         if (currentPeer->address == addr) {
-            // Cancels all games from this peer
+	    // Cancels all games from this peer
             for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
-                if (pendingGames[i]->peer == currentPeer) {
-                    // We won't call gameCanceledAgainst yet to avoid objects destructing themselves
-                    // but instead set the game in timeout
-               	    pendingGames[i]->initiateTime = getTimeMs() - pendingGameTimeout;
-                }
+	      if (pendingGames[i]->peer == currentPeer) {
+		for (int u = 0, v = listeners.size() ; u < v ; u++) {
+		  listeners[u]->gameCanceledAgainst(pendingGames[i]->peer->name, pendingGames[i]->peer->address);
+		}
+		delete pendingGames[i];
+		pendingGames.removeAt(i);
+	      }
             }
             // Delete the disconnected peer
             peers.remove(currentPeer);
@@ -142,12 +144,9 @@ void PuyoNetGameCenter::cancelGameWith(PeerAddress addr)
     if (myPeer != NULL) {
         for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
             if (pendingGames[i]->peer == myPeer) {
-                for (int u = 0, v = listeners.size() ; u < v ; u++) {
-                    listeners[u]->gameCanceledAgainst(pendingGames[i]->peer->name, pendingGames[i]->peer->address);
-                }
-                cancelGameWithPeer(pendingGames[i]->peer->name, pendingGames[i]->peer->address);
-                delete pendingGames[i];
-                pendingGames.removeAt(i);
+	      // We won't call gameCanceledAgainst yet to avoid objects destructing themselves
+	      // but instead set the game in timeout
+	      pendingGames[i]->initiateTime = getTimeMs() - pendingGameTimeout;
             }
         }
     }
