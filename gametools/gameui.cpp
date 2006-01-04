@@ -23,6 +23,13 @@ namespace gameui {
         actions[i] = NULL;
       requestDraw();
     }
+    
+  Widget::~Widget()
+  {
+    if (parent != NULL) {
+        parent->remove(this);
+    }
+  }
 
   void Widget::hide()   { hidden = true;                 }
   void Widget::show()
@@ -115,6 +122,7 @@ namespace gameui {
   void WidgetContainer::remove (Widget *child)
   {
     childs.remove(child);
+    child->setParent(NULL);
     child->removeFromGameLoop();
     arrangeWidgets();
   }

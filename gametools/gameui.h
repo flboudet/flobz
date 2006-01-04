@@ -66,7 +66,7 @@ namespace gameui {
       
     public:
       Widget(WidgetContainer *parent = NULL);
-      virtual ~Widget() { }
+      virtual ~Widget();
 
       virtual bool drawRequested() const { return _drawRequested; }
       virtual void requestDraw(bool fromParent = false);
