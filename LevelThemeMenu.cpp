@@ -93,64 +93,110 @@ void LevelThemeSelectionBox::build()
 
 LevelThemePicturePreview::LevelThemePicturePreview()
 {
-      setPreferedSize(Vec3(ONELEVELX, ONELEVELY, 1.0));
       offsetX = offsetY = 0.;
+      shouldRecache = true;
+      shouldResize = true;
+      curTheme = NULL;
+      picture = lilback = NULL;
+      setPreferedSize(Vec3(ONELEVELX, ONELEVELY, 1.0));
 }
 
 LevelThemePicturePreview::~LevelThemePicturePreview()
 {
       if (lilback != NULL) IIM_Free(lilback);
+      if (picture != NULL) IIM_Free(picture);
 }
 
 void LevelThemePicturePreview::draw(SDL_Surface *screen)
 {
+	updatePicture();
     if (lilback != NULL)
     {
       IIM_Rect r;
       Vec3 size = getSize();
-      r.x = (Sint16)(getPosition().x+(size.x-ONELEVELX)/2.0);
-      r.y = (Sint16)(getPosition().y+(size.y-ONELEVELY)/2.0);
+      Vec3 pos = getPosition();
+      r.x = (Sint16)(pos.x+offsetX);
+      r.y = (Sint16)(pos.y+offsetY);
+      r.w = (Sint16)(size.x);
+      r.h = (Sint16)(size.y);
       IIM_BlitSurface(lilback, NULL, screen, &r);
     }
 }
 
-void LevelThemePicturePreview::themeSelected(PuyoLevelTheme *  theme)
+void LevelThemePicturePreview::updatePicture(void)
 {
-    if (theme != NULL)
+    if ((curTheme != NULL) && (shouldRecache == true))
     {
-      if (lilback != NULL) IIM_Free(lilback);
+      if (picture != NULL) IIM_Free(picture);
       IIM_Rect r;
       // TODO : Draw the oponent.
       // Background
-      IIM_Surface * templilback = iim_surface_duplicate(theme->getBackground());
+      picture = iim_surface_duplicate(curTheme->getBackground());
       // Grids
-      IIM_Surface * grid = theme->getGrid();
+      IIM_Surface * grid = curTheme->getGrid();
       r.x = 21;
       r.y = -1;
       r.w = grid->w;
       r.h = grid->h;
-      IIM_BlitSurface(grid, NULL, templilback->surf, &r);
+      IIM_BlitSurface(grid, NULL, picture->surf, &r);
       r.x = 407;
       r.y = -1;
-      IIM_BlitSurface(grid, NULL, templilback->surf, &r);
+      IIM_BlitSurface(grid, NULL, picture->surf, &r);
       // Speed meter
-      IIM_Surface * speedFront = theme->getSpeedMeter(true);
-      IIM_Surface * speedBack  = theme->getSpeedMeter(false);
-      r.x = theme->getSpeedMeterX() - speedBack->w / 2;
-      r.y = theme->getSpeedMeterY() - speedBack->h;
+      IIM_Surface * speedFront = curTheme->getSpeedMeter(true);
+      IIM_Surface * speedBack  = curTheme->getSpeedMeter(false);
+      r.x = curTheme->getSpeedMeterX() - speedBack->w / 2;
+      r.y = curTheme->getSpeedMeterY() - speedBack->h;
       r.w = speedBack->w;
       r.h = speedBack->h;
       IIM_Rect r2;
-      IIM_BlitSurface(speedBack, NULL, templilback->surf, &r);
+      IIM_BlitSurface(speedBack, NULL, picture->surf, &r);
       r2.x = 0;
       r2.y = speedFront->h/2;
       r2.w = speedFront->w;
       r2.h = speedFront->h/2;
       r.y += speedFront->h/2;
-      IIM_BlitSurface(speedFront, &r2, templilback->surf, &r);
-	  // Final stretch
-      lilback = iim_surface_resize(templilback,(int)ONELEVELX,(int)ONELEVELY);
+      IIM_BlitSurface(speedFront, &r2, picture->surf, &r);
+      shouldRecache = false;
+      shouldResize = true;
     }
+    
+    if ((shouldResize) && (picture!=NULL))
+    {
+      if (lilback != NULL) IIM_Free(lilback);
+	  Vec3 s=getSize();
+      lilback = iim_surface_resize(picture,(int)s.x,(int)s.y);
+      shouldResize = false;
+    }
+}
+
+void LevelThemePicturePreview::themeSelected(PuyoLevelTheme * theme)
+{
+    if (theme != NULL)
+    {
+      curTheme = theme;
+      shouldRecache = true;
+    }
+}
+
+void LevelThemePicturePreview::setSize(const Vec3 &v3)
+{
+	Vec3 s=v3;
+	if ((s.x/s.y) < (ONELEVELX/ONELEVELY))
+	{
+		s.y=s.x*ONELEVELY/ONELEVELX;
+		offsetX=0.0; offsetY=(v3.y-s.y)/2.0;
+	}
+	else
+	{
+		s.x=s.y*ONELEVELX/ONELEVELY;
+		offsetY=0.0; offsetX=(v3.x-s.x)/2.0;
+	}
+	if ((getSize().x != s.x) || (getSize().y != s.y))
+	{
+    	shouldResize = true;
+		Widget::setSize(s);
+	}
 }
 
 void LevelThemePicturePreview::idle(double currentTime) { }
@@ -158,11 +204,12 @@ void LevelThemePicturePreview::idle(double currentTime) { }
 
 /*****************************************************************************/
 
-#define MARGIN (10.)
-
 LevelThemePreview::LevelThemePreview() {}
 
 void LevelThemePreview::build() {
+    name.setFont(GameUIDefaults::FONT_TEXT);
+    author.setFont(GameUIDefaults::FONT_SMALL_INFO);
+    description.setFont(GameUIDefaults::FONT_SMALL_INFO);
     add(&name);
     add(&author);
     add(&picture);
@@ -173,38 +220,34 @@ LevelThemePreview::~LevelThemePreview() {}
 
 void LevelThemePreview::themeSelected(String themeName)
 {
+#define _ComputeVZoneSize(A,B) Vec3(A.x>B.x?A.x:B.x,A.y+B.y+GameUIDefaults::SPACING,1.0)
     PuyoLevelTheme * curTheme = getPuyoThemeManger()->getPuyoLevelTheme(themeName);
-    name.setFont(GameUIDefaults::FONT_TEXT);
     name.setValue(themeName);
-    author.setFont(GameUIDefaults::FONT_SMALL_INFO);
     author.setValue(curTheme->getAuthor());
-    description.setFont(GameUIDefaults::FONT_SMALL_INFO);
     description.setValue(curTheme->getComments());
-    picture.themeSelected(curTheme);
-    Vec3 marges(0.0,MARGIN,0.0);
-    setPreferedSize(name.getPreferedSize()+marges
-        +author.getPreferedSize()+marges
-        +description.getPreferedSize()+marges
-        +picture.getPreferedSize());
+    Vec3 one=_ComputeVZoneSize(name.getPreferedSize(),author.getPreferedSize());
+    Vec3 two=_ComputeVZoneSize(description.getPreferedSize(),picture.getPreferedSize());
+    setPreferedSize(_ComputeVZoneSize(one,two));
     if (parent)
       parent->arrangeWidgets();
+    picture.themeSelected(curTheme);
 }
-
 
 /*****************************************************************************/
 
 LevelThemeMenu::LevelThemeMenu(PuyoRealMainScreen *mainScreen)
     : PuyoMainScreenMenu(mainScreen), popAction(mainScreen),
-      themeMenuTitle("Select Level:"),
+      backButton("Back", &popAction), themeMenuTitle("Level theme"),
       themePreview(), themeList(themePreview)
 {
 }
 
 void LevelThemeMenu::build() {
-    themeList.build();
-    themePreview.build();
-
     add(&themeMenuTitle);
     add(&themeList);
     add(&themePreview);
+    add(&backButton);
+    themePreview.build();
+    arrangeWidgets();
+    themeList.build();
 }

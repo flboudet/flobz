@@ -685,7 +685,7 @@ namespace gameui {
   		firstvisible = lastvisible = -1;
   		return;
   	}
-  	if (getNumberOfVisibleChilds()>1+2*kHScrollListNbAddedItemsToEachSide)
+  	if (getNumberOfVisibleChilds()>=1+2*kHScrollListNbAddedItemsToEachSide)
   	{
   	  firstvisible = (getNumberOfChilds() + activeWidget - kHScrollListNbAddedItemsToEachSide)%getNumberOfChilds();
   	  lastvisible = (activeWidget + kHScrollListNbAddedItemsToEachSide)%getNumberOfChilds();

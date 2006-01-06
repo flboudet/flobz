@@ -69,9 +69,10 @@ OptionMenu::OptionMenu(PuyoRealMainScreen *mainScreen) : PuyoMainScreenMenu(main
     audioButton(kAudioFX, "OFF", "ON ", theCommander->getSoundFx(), &toggleSoundFxAction),
     musicButton(kMusic, "OFF", "ON ", theCommander->getMusic(), &toggleMusicAction),
     fullScreenButton(kFullScreen, "OFF", "ON ", theCommander->getFullScreen(), &toggleFullScreenAction),
-    controlMenu(mainScreen), themeMenu(mainScreen),
-    changeThemeAction(&themeMenu, mainScreen), changeControlsAction(&controlMenu, mainScreen),
+    controlMenu(mainScreen), themeMenu(mainScreen), levelMenu(mainScreen),
+    changeThemeAction(&themeMenu, mainScreen), changeLevelAction(&levelMenu, mainScreen), changeControlsAction(&controlMenu, mainScreen),
     changePuyoThemeButton(kChangePuyoTheme, &changeThemeAction),
+    changeLevelThemeButton(kChangePuyoLevel, &changeLevelAction),
     changeControlsButton(kControls, &changeControlsAction), backAction(mainScreen), backButton("Back", &backAction)
 {
 }
@@ -79,11 +80,13 @@ OptionMenu::OptionMenu(PuyoRealMainScreen *mainScreen) : PuyoMainScreenMenu(main
 void OptionMenu::build() {
     controlMenu.build();
     themeMenu.build();
+    levelMenu.build();
     add(&optionTitle);
     add(&audioButton);
     add(&musicButton);
     add(&fullScreenButton);
     add(&changePuyoThemeButton);
+    add(&changeLevelThemeButton);
     add(&changeControlsButton);
     add(&backButton);
 }

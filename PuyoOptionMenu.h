@@ -29,6 +29,7 @@
 #include "gameui.h"
 #include "PuyoCommander.h"
 #include "PuyoThemeMenu.h"
+#include "LevelThemeMenu.h"
 #include "PuyoControlMenu.h"
 
 class OptionMenu;
@@ -72,8 +73,10 @@ private:
     ToggleButton audioButton, musicButton, fullScreenButton;
     ControlMenu controlMenu;
     PuyoThemeMenu themeMenu;
-    PuyoPushMenuAction changeThemeAction, changeControlsAction;
+    LevelThemeMenu levelMenu;
+    PuyoPushMenuAction changeThemeAction, changeLevelAction, changeControlsAction;
     Button changePuyoThemeButton;
+    Button changeLevelThemeButton;
     Button changeControlsButton;
     PuyoPopMenuAction backAction;
     Button backButton;

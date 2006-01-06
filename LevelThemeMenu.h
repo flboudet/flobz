@@ -37,6 +37,7 @@ class LevelThemePicturePreview : public Widget, public IdleComponent {
         // Implements IdleComponent
         virtual void idle(double currentTime);
         virtual IdleComponent *getIdleComponent() { return this; }
+		void setSize(const Vec3 &v3);
 
         void build();
         void themeSelected(PuyoLevelTheme * theme);
@@ -44,12 +45,17 @@ class LevelThemePicturePreview : public Widget, public IdleComponent {
     protected:
       void draw(SDL_Surface *screen);
       SoFont *font;
-      
+      void updatePicture(void);
+
     private:
       String label;
+      IIM_Surface * picture;
       IIM_Surface * lilback;
       double offsetX;
       double offsetY;
+      bool shouldRecache;
+      bool shouldResize;
+      PuyoLevelTheme * curTheme;
 };
 
 class LevelThemePreview : public VBox {
@@ -85,6 +91,7 @@ public:
 private:
     Text themeMenuTitle;
     PuyoPopMenuAction popAction;
+    Button backButton;
     LevelThemePreview themePreview;
     LevelThemeSelectionBox themeList;
 };
