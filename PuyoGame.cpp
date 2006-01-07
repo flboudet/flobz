@@ -57,7 +57,7 @@ PuyoGame::PuyoGame()
     delegate = NULL;
 }
 
-PuyoGame::PuyoGame(PuyoFactory *attachedFactory) : attachedFactory(attachedFactory)
+PuyoGame::PuyoGame(PuyoFactory *attachedFactory) : attachedFactory(attachedFactory), points(0)
 {
     delegate = NULL;
 }
