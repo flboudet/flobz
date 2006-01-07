@@ -208,10 +208,10 @@ LevelThemePreview::LevelThemePreview() {}
 
 void LevelThemePreview::build() {
     name.setFont(GameUIDefaults::FONT_TEXT);
-    author.setFont(GameUIDefaults::FONT_SMALL_INFO);
+    //author.setFont(GameUIDefaults::FONT_SMALL_INFO);
     description.setFont(GameUIDefaults::FONT_SMALL_INFO);
     add(&name);
-    add(&author);
+    //add(&author);
     add(&picture);
     add(&description);
 }
@@ -222,12 +222,12 @@ void LevelThemePreview::themeSelected(String themeName)
 {
 #define _ComputeVZoneSize(A,B) Vec3(A.x>B.x?A.x:B.x,A.y+B.y+GameUIDefaults::SPACING,1.0)
     PuyoLevelTheme * curTheme = getPuyoThemeManger()->getPuyoLevelTheme(themeName);
-    name.setValue(themeName);
-    author.setValue(curTheme->getAuthor());
+    if (curTheme->getAuthor() == "iOS-Software") name.setValue(themeName);
+    else name.setValue(themeName+" ("+curTheme->getAuthor()+")");
+    //author.setValue(curTheme->getAuthor());
     description.setValue(curTheme->getComments());
-    Vec3 one=_ComputeVZoneSize(name.getPreferedSize(),author.getPreferedSize());
-    Vec3 two=_ComputeVZoneSize(description.getPreferedSize(),picture.getPreferedSize());
-    setPreferedSize(_ComputeVZoneSize(one,two));
+    Vec3 one=_ComputeVZoneSize(name.getPreferedSize(),description.getPreferedSize());
+    setPreferedSize(_ComputeVZoneSize(one,picture.getPreferedSize()));
     if (parent)
       parent->arrangeWidgets();
     picture.themeSelected(curTheme);

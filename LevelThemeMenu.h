@@ -68,7 +68,7 @@ class LevelThemePreview : public VBox {
 
     private:
         Text name;
-        Text author;
+        //Text author;
         LevelThemePicturePreview picture;
         Text description;
 };
