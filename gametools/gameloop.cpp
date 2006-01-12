@@ -2,38 +2,19 @@
 
 #include "gameui.h"
 
-GameComponent::GameComponent() : _kill(false), _remove(false)
-{}
-
-GameComponent::~GameComponent()
+DrawableComponent::DrawableComponent(GameLoop *parentLoop)
+  : _drawRequested(false)
 {
-    //printf("Destructeur gamecomponent %x\n", this);
-    gameui::GameUIDefaults::GAME_LOOP->remove(this);
+  if (parentLoop != NULL)
+    parentLoop->addDrawable(this);
 }
 
-bool GameComponent::killMe() const
+DrawableComponent::~DrawableComponent()
 {
-  return _kill;
+  if (parentLoop != NULL)
+    parentLoop->removeDrawable(this);
+  parentLoop = NULL;
 }
-
-bool GameComponent::removeMe() const
-{
-  return _remove;
-}
-
-void GameComponent::kill()
-{
-  _kill = _remove = true;
-}
-
-void GameComponent::remove()
-{
-  _remove = true;
-}
-
-
-DrawableComponent::DrawableComponent() : _drawRequested(false)
-{}
 
 bool DrawableComponent::drawRequested() const
 {
@@ -53,6 +34,20 @@ void DrawableComponent::doDraw(SDL_Surface *screen)
 
 // IDLE COMPONENT
 
+IdleComponent::IdleComponent(GameLoop *parentLoop)
+  :paused(false)
+{
+  if (parentLoop != NULL)
+    parentLoop->addIdle(this);
+}
+
+IdleComponent::~IdleComponent()
+{
+  if (parentLoop != NULL)
+    parentLoop->removeIdle(this);
+  parentLoop = NULL;
+}
+
 void IdleComponent::setPause(bool paused)
 {
   this->paused = paused;
@@ -65,9 +60,9 @@ bool IdleComponent::getPause() const
 
 // CYCLE COMPONENT
 
-CycledComponent::CycledComponent(double cycleTime)
+CycledComponent::CycledComponent(double cycleTime, GameLoop *parentLoop)
+  : IdleComponent(parentLoop), cycleTime(cycleTime)
 {
-  this->cycleTime = cycleTime;
   reset();
 }
 
@@ -131,43 +126,44 @@ GameLoop::GameLoop() {
   finished = false;
 }
 
-void GameLoop::add(GameComponent *gc)
+void GameLoop::addDrawable(DrawableComponent *gc)
 {
-  DrawableComponent *dc = dynamic_cast<DrawableComponent*>(gc);
-  IdleComponent     *ic = dynamic_cast<IdleComponent*>(gc);
-
-  gc->_remove = gc->_kill = false;
-
-  for (int i = 0; i < components.size(); ++i)
-    if (components[i] == gc) return;
+  for (int i = 0; i < drawables.size(); ++i)
+    if (drawables[i] == gc) return;
 
   //printf("Component %x added to gameloop!\n", gc);
-  components.add(gc);
-  if (dc != NULL)
-    drawables.add(dc);
-  if (ic != NULL)
-    idles.add(ic);
+  drawables.add(gc);
+  gc->parentLoop = this;
 }
 
-void GameLoop::remove(GameComponent *gc)
+void GameLoop::addIdle(IdleComponent *gc)
 {
-  for (int i = 0; i < components.size(); ++i) {
-    if (gc == components[i]) {
-        //printf("Component %d will be removed!\n", i);
-      components[i] = NULL;
-    }
-  }
+  for (int i = 0; i < idles.size(); ++i)
+    if (idles[i] == gc) return;
+
+  //printf("Component %x added to gameloop!\n", gc);
+  idles.add(gc);
+  gc->parentLoop = this;
+}
+
+void GameLoop::removeDrawable(DrawableComponent *gc)
+{
   for (int i = 0; i < drawables.size(); ++i) {
     if (gc == drawables[i]) {
         //printf("Drawable %d will be removed!\n", i);
       drawables[i]  = NULL;
+      gc->parentLoop = NULL;
     }
   }
+}
+
+void GameLoop::removeIdle(IdleComponent *gc)
+{
   for (int i = 0; i < idles.size(); ++i) {
     if (gc == idles[i]) {
         //printf("Idle %d will be removed!\n", i);
-        //idles.removeAt(i);
       idles[i]      = NULL;
+      gc->parentLoop = NULL;
       }
   }
 }
@@ -221,7 +217,7 @@ void GameLoop::idle(double currentTime)
 
     for (i=0; i < idles_size_at_start; ++i) {
       
-      if (idles[i] && !idles[i]->removeMe())
+      if (idles[i])
         idles[i]->onEvent(&controlEvent);
     }
 
@@ -234,7 +230,7 @@ void GameLoop::idle(double currentTime)
   // 2- call idles
   for (i = 0; i < idles_size_at_start; ++i) {
     IdleComponent *gc = idles[i];
-    if ((gc != NULL) && !(gc->removeMe()))
+    if (gc != NULL)
       gc->callIdle(currentTime);
   }
   /*for (i = idles.size()-1; i >= 0 ; --i) {
@@ -244,16 +240,8 @@ void GameLoop::idle(double currentTime)
 
   // 3- check components to remove/kill
   // 3a- active remove
-  for (i = 0; i<components.size();) {
-    GameComponent *gc = components[i];
-    if (gc == NULL) {
-      //printf("COMPONENT %d REMOVED############\n", i);
-      components.removeAt(i);
-    }
-    else i++;
-  }
   for (i = 0; i<idles.size();) {
-    GameComponent *gc = idles[i];
+    IdleComponent *gc = idles[i];
     if (gc == NULL) {
        // printf("IDLE %d REMOVED############\n", i);
       idles.removeAt(i);
@@ -261,33 +249,13 @@ void GameLoop::idle(double currentTime)
     else i++;
   }
   for (i = 0; i<drawables.size();) {
-    GameComponent *gc = drawables[i];
+    DrawableComponent *gc = drawables[i];
     if (gc == NULL) {
     //printf("DRAWABLE %d REMOVED############\n", i);
       drawables.removeAt(i);
     }
     else i++;
   }
-  
-  // 3b- passive Remove
-  Vector<GameComponent> componentsCpy = components.dup();
-  
-  for (i = 0; i < componentsCpy.size(); ++i) {
-    GameComponent *gc = componentsCpy[i];
-    if (gc->removeMe()) {
-      gc->_remove = false;
-      components.remove(gc);
-      IdleComponent *asIdle = dynamic_cast<IdleComponent*>(gc);
-      if (asIdle != NULL)
-        idles.remove(asIdle);
-      DrawableComponent *asDrawable = dynamic_cast<DrawableComponent*>(gc);
-      if (asDrawable != NULL)
-        drawables.remove(asDrawable);
-      if (gc->killMe())
-        delete gc;
-    }
-  }
-
 }
 
 bool GameLoop::drawRequested() const

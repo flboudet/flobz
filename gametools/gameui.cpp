@@ -75,16 +75,7 @@ namespace gameui {
     IdleComponent *idle = getIdleComponent();
     if (idle != NULL) {
       idle->setPause(false);
-      loop->add(idle);
-    }
-  }
-  
-  void Widget::removeFromGameLoop()
-  {
-    IdleComponent *idle = getIdleComponent();
-    if (idle != NULL) {
-      idle->remove();
-//      idle->setPause(true);
+      loop->addIdle(idle);
     }
   }
   
@@ -92,7 +83,7 @@ namespace gameui {
   {
     IdleComponent *idle = getIdleComponent();
     if (idle != NULL)
-      GameUIDefaults::GAME_LOOP->remove(idle);
+      GameUIDefaults::GAME_LOOP->removeIdle(idle);
   }
   
   //
@@ -123,7 +114,7 @@ namespace gameui {
   {
     childs.remove(child);
     child->setParent(NULL);
-    child->removeFromGameLoop();
+    child->removeFromGameLoopActive();
     arrangeWidgets();
   }
 
@@ -131,7 +122,7 @@ namespace gameui {
   {
     Widget *tmp = getChild(i);
     if (tmp)
-      tmp->removeFromGameLoop();
+      tmp->removeFromGameLoopActive();
     childs[i] = w;
     w->setParent(this);
     if (addedToGameLoop)
@@ -147,14 +138,6 @@ namespace gameui {
       getChild(i)->addToGameLoop(loop);
   }
   
-  void WidgetContainer::removeFromGameLoop()
-  {
-    addedToGameLoop = false;
-    Widget::removeFromGameLoop();
-    for (int i = 0; i < getNumberOfChilds(); ++i)
-      getChild(i)->removeFromGameLoop();
-  }
-    
   void WidgetContainer::removeFromGameLoopActive()
   {
     addedToGameLoop = false;
@@ -569,7 +552,9 @@ namespace gameui {
   // SliderContainer
 
   SliderContainer::SliderContainer(GameLoop *loop)
-    : ZBox(loop), contentWidget(NULL), previousWidget(NULL)
+    : IdleComponent(loop == NULL ? GameUIDefaults::GAME_LOOP : loop)
+    , ZBox(loop)
+    , contentWidget(NULL), previousWidget(NULL)
     , currentTime(0), slideStartTime(0)
     , sliding(false), bg(NULL)
     {
@@ -599,8 +584,8 @@ namespace gameui {
     add(contentWidget);
     sliding = true;
 
-    if (previousWidget) previousWidget->removeFromGameLoop();
-    if (contentWidget) contentWidget->removeFromGameLoop();
+    if (previousWidget) previousWidget->removeFromGameLoopActive();
+    if (contentWidget) contentWidget->removeFromGameLoopActive();
   }
 
   void SliderContainer::idle(double currentTime)
@@ -826,7 +811,10 @@ namespace gameui {
   // Screen
   //
 
-  Screen::Screen(float x, float y, float width, float height, GameLoop *loop) : rootContainer(loop), bg(NULL)
+  Screen::Screen(float x, float y, float width, float height, GameLoop *loop)
+    : DrawableComponent(loop == NULL ? GameUIDefaults::GAME_LOOP : loop),
+      IdleComponent(loop == NULL ? GameUIDefaults::GAME_LOOP : loop),
+      rootContainer(loop), bg(NULL)
   {
     rootContainer.setPosition(Vec3(x, y, 1.0f));
     rootContainer.setSize(Vec3(width, height, 1.0f));
@@ -1262,18 +1250,18 @@ namespace gameui {
     checkLoop();
     if (stack.size() > 0) {
       stack.top()->hide();
-      stack.top()->removeFromGameLoop();
+      stack.top()->removeFromGameLoopActive();
     }
     screen->show();
     screen->giveFocus();
     screen->addToGameLoop(screen->getGameLoop());
     stack.push(screen);
-    loop->add(screen);
+    loop->addDrawable(screen);
+    loop->addIdle(screen);
   }
 
   void ScreenStack::pop() {
-    stack.top()->remove();
-    stack.top()->removeFromGameLoop();
+    stack.top()->removeFromGameLoopActive();
     stack.top()->hide();
     stack.pop();
     stack.top()->show();

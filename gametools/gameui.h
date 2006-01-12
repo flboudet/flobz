@@ -74,7 +74,6 @@ namespace gameui {
 
       virtual IdleComponent *getIdleComponent() { return NULL; }
       virtual void addToGameLoop(GameLoop *loop);
-      virtual void removeFromGameLoop();
       virtual void removeFromGameLoopActive();
 
       virtual void hide();
@@ -150,7 +149,6 @@ namespace gameui {
       virtual void widgetMustRedraw(Widget *wid) { requestDraw(); }
       
       virtual void addToGameLoop(GameLoop *loop);
-      virtual void removeFromGameLoop();
       virtual void removeFromGameLoopActive();
       
       bool hasWidget(Widget *wid);
@@ -266,7 +264,7 @@ namespace gameui {
       bool sliding;
   };
 
-  class Screen : public DrawableComponent, IdleComponent {
+  class Screen : public DrawableComponent, public IdleComponent {
     public:
       Screen(float x, float y, float width, float height, GameLoop *loop = NULL);
       virtual ~Screen() {}
@@ -275,15 +273,22 @@ namespace gameui {
       virtual void drawAnyway(SDL_Surface *surface);
       bool drawRequested() const { if (isVisible()) return rootContainer.drawRequested(); return false;}
       void onEvent(GameControlEvent *event);
-      void remove() { IdleComponent::remove(); }
       void remove(Widget *child) { rootContainer.remove(child); }
       void add(Widget *child) { rootContainer.add(child); }
       virtual void hide() { hidden = true; }
       virtual void show() { hidden = false; }
       bool isVisible() const { return !hidden; }
       
-      virtual void addToGameLoop(GameLoop *loop) { rootContainer.addToGameLoop(loop); loop->add(this); }
-      virtual void removeFromGameLoop() { rootContainer.removeFromGameLoop(); remove(); }
+      virtual void addToGameLoop(GameLoop *loop) {
+	rootContainer.addToGameLoop(loop);
+	loop->addDrawable(this);
+	loop->addIdle(this);
+      }
+      virtual void removeFromGameLoopActive() {
+	rootContainer.removeFromGameLoopActive();
+	getGameLoop()->removeDrawable(this);
+	getGameLoop()->removeIdle(this);
+      }
 
       GameLoop *getGameLoop() { return rootContainer.getGameLoop(); }
       void giveFocus();

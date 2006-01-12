@@ -11,42 +11,30 @@
 
 using namespace ios_fc;
 
-class GameComponent {
-  public:
-    GameComponent();
-    virtual ~GameComponent();
+class GameLoop;
 
-    virtual bool killMe() const;
-    virtual bool removeMe() const;
-
-    void kill();
-    void remove();
-
-  protected:
-    bool _kill;
-    bool _remove;
-    friend class GameLoop;
-};
-
-class DrawableComponent : public virtual GameComponent
+class DrawableComponent
 {
   public:
-    DrawableComponent();
+    DrawableComponent(GameLoop *parentLoop = NULL);
+    virtual ~DrawableComponent();
     virtual bool drawRequested() const;
     void doDraw(SDL_Surface *screen) ;
 
   protected:
+    GameLoop *parentLoop;
     void requestDraw();
     virtual void draw(SDL_Surface *screen) {}
-
+    friend class GameLoop;
   private:
     bool _drawRequested;
 };
 
-class IdleComponent : public virtual GameComponent
+class IdleComponent
 {
   public:
-    IdleComponent():paused(false){}
+    IdleComponent(GameLoop *parentLoop = NULL);
+    virtual ~IdleComponent();
    
     void callIdle(double currentTime) { if (!paused) idle(currentTime); }
     
@@ -62,15 +50,17 @@ class IdleComponent : public virtual GameComponent
     bool getPause() const;
 
   protected:
+    GameLoop *parentLoop;
     bool paused;
+    friend class GameLoop;
 };
 
 
-class CycledComponent : public virtual IdleComponent
+class CycledComponent : public IdleComponent
 {
   public:
-    CycledComponent(double cycleTime);
-      
+    CycledComponent(double cycleTime, GameLoop *parentLoop = NULL);
+
     /// called 1 time every cycleTime seconds.
     virtual void cycle()             {}
 
@@ -93,13 +83,15 @@ class CycledComponent : public virtual IdleComponent
 };
 
 
-class GameLoop : public IdleComponent, DrawableComponent
+class GameLoop
 {
   public:
     GameLoop();
 
-    void add(GameComponent *gc);
-    void remove(GameComponent *gc);
+    void addDrawable(DrawableComponent *gc);
+    void addIdle(IdleComponent *gc);
+    void removeDrawable(DrawableComponent *gc);
+    void removeIdle(IdleComponent *gc);
     void run();
 
     void idle(double currentTime);
@@ -119,7 +111,6 @@ class GameLoop : public IdleComponent, DrawableComponent
     
   private:
     SDL_Surface *surface;
-    Vector<GameComponent>     components;
     Vector<DrawableComponent> drawables;
     Vector<IdleComponent>     idles;
     bool finished;
