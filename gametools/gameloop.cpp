@@ -3,7 +3,7 @@
 #include "gameui.h"
 
 DrawableComponent::DrawableComponent(GameLoop *parentLoop)
-  : _drawRequested(false)
+  : parentLoop(parentLoop), _drawRequested(false)
 {
   if (parentLoop != NULL)
     parentLoop->addDrawable(this);
@@ -35,7 +35,7 @@ void DrawableComponent::doDraw(SDL_Surface *screen)
 // IDLE COMPONENT
 
 IdleComponent::IdleComponent(GameLoop *parentLoop)
-  :paused(false)
+  : parentLoop(parentLoop), paused(false)
 {
   if (parentLoop != NULL)
     parentLoop->addIdle(this);
