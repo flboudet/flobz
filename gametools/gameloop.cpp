@@ -2,11 +2,9 @@
 
 #include "gameui.h"
 
-DrawableComponent::DrawableComponent(GameLoop *parentLoop)
-  : parentLoop(parentLoop), _drawRequested(false)
+DrawableComponent::DrawableComponent()
+  : parentLoop(NULL), _drawRequested(false)
 {
-  if (parentLoop != NULL)
-    parentLoop->addDrawable(this);
 }
 
 DrawableComponent::~DrawableComponent()
@@ -34,11 +32,9 @@ void DrawableComponent::doDraw(SDL_Surface *screen)
 
 // IDLE COMPONENT
 
-IdleComponent::IdleComponent(GameLoop *parentLoop)
-  : parentLoop(parentLoop), paused(false)
+IdleComponent::IdleComponent()
+  : parentLoop(NULL), paused(false)
 {
-  if (parentLoop != NULL)
-    parentLoop->addIdle(this);
 }
 
 IdleComponent::~IdleComponent()
@@ -60,8 +56,8 @@ bool IdleComponent::getPause() const
 
 // CYCLE COMPONENT
 
-CycledComponent::CycledComponent(double cycleTime, GameLoop *parentLoop)
-  : IdleComponent(parentLoop), cycleTime(cycleTime)
+CycledComponent::CycledComponent(double cycleTime)
+  : IdleComponent(), cycleTime(cycleTime)
 {
   reset();
 }
@@ -131,7 +127,9 @@ void GameLoop::addDrawable(DrawableComponent *gc)
   for (int i = 0; i < drawables.size(); ++i)
     if (drawables[i] == gc) return;
 
-  //printf("Component %x added to gameloop!\n", gc);
+#ifdef DEBUG_GAMELOOP
+  printf("Drawable %x added to gameloop!\n", gc);
+#endif
   drawables.add(gc);
   gc->parentLoop = this;
 }
@@ -141,7 +139,9 @@ void GameLoop::addIdle(IdleComponent *gc)
   for (int i = 0; i < idles.size(); ++i)
     if (idles[i] == gc) return;
 
-  //printf("Component %x added to gameloop!\n", gc);
+#ifdef DEBUG_GAMELOOP
+  printf("Idle %x added to gameloop!\n", gc);
+#endif
   idles.add(gc);
   gc->parentLoop = this;
 }
@@ -150,7 +150,9 @@ void GameLoop::removeDrawable(DrawableComponent *gc)
 {
   for (int i = 0; i < drawables.size(); ++i) {
     if (gc == drawables[i]) {
-        //printf("Drawable %d will be removed!\n", i);
+#ifdef DEBUG_GAMELOOP
+      printf("Drawable %x removed from gameloop!\n", gc);
+#endif
       drawables[i]  = NULL;
       gc->parentLoop = NULL;
     }
@@ -161,7 +163,9 @@ void GameLoop::removeIdle(IdleComponent *gc)
 {
   for (int i = 0; i < idles.size(); ++i) {
     if (gc == idles[i]) {
-        //printf("Idle %d will be removed!\n", i);
+#ifdef DEBUG_GAMELOOP
+      printf("Idle %x removed from gameloop!\n", gc);
+#endif
       idles[i]      = NULL;
       gc->parentLoop = NULL;
       }
@@ -217,8 +221,13 @@ void GameLoop::idle(double currentTime)
 
     for (i=0; i < idles_size_at_start; ++i) {
       
-      if (idles[i])
+      if (idles[i]) {
+#ifdef DEBUG_GAMELOOP
+	printf("onEvent called on idle %x!\n", idles[i]);
+	fflush(stdout);
+#endif
         idles[i]->onEvent(&controlEvent);
+      }
     }
 
     if (controlEvent.cursorEvent == GameControlEvent::kQuit) { // TODO: Laisser libre l'utilisateur ?
@@ -233,10 +242,6 @@ void GameLoop::idle(double currentTime)
     if (gc != NULL)
       gc->callIdle(currentTime);
   }
-  /*for (i = idles.size()-1; i >= 0 ; --i) {
-    if (idles[i] && !idles[i]->removeMe())
-      idles[i]->callIdle(currentTime);
-  }*/
 
   // 3- check components to remove/kill
   // 3a- active remove

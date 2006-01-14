@@ -133,7 +133,9 @@ PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &con
 
 PuyoGameWidget::PuyoGameWidget()
     : CycledComponent(0.02), cyclesBeforeGameCycle(50), cyclesBeforeSpeedIncreases(500), cyclesBeforeGameCycleV(cyclesBeforeGameCycle),
-      tickCounts(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(20), playerOneName(p1name), playerTwoName(p2name)
+      tickCounts(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(20),
+      blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
+      playerOneName(p1name), playerTwoName(p2name)
 {
 }
 
@@ -393,28 +395,47 @@ PuyoGameScreen::PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScree
       pauseMenu(&continueAction, &abortAction), gameWidget(gameWidget), transitionWidget(previousScreen, NULL),
       overlayStory(NULL)
 {
+#ifdef DEBUG_GAMELOOP
+  printf("GameScreen %x created\n", this);
+  printf("   Idle: %x, Drawable:%x\n",
+	 dynamic_cast<IdleComponent *>(this),
+	 dynamic_cast<DrawableComponent *>(this));
+#endif
     add(&gameWidget);
     if (gameWidget.getOpponentFace() != NULL)
         add(gameWidget.getOpponentFace());
     add(&transitionWidget);
 }
 
+PuyoGameScreen::~PuyoGameScreen()
+{
+#ifdef DEBUG_GAMELOOP
+  printf("GameScreen %x deleted\n", this);
+  printf("   Idle: %x, Drawable:%x\n",
+	 dynamic_cast<IdleComponent *>(this),
+	 dynamic_cast<DrawableComponent *>(this));
+  fflush(stdout);
+#endif
+}
+
 void PuyoGameScreen::onEvent(GameControlEvent *cevent)
 {
+    bool backPressedFromGameWidget = false;
     switch (cevent->cursorEvent) {
     case GameControlEvent::kStart:
         break;
     case GameControlEvent::kBack:
-        backPressed();
+        backPressedFromGameWidget = backPressed();
         break;
     }
-    Screen::onEvent(cevent);
+    if (!backPressedFromGameWidget)
+        Screen::onEvent(cevent);
 }
 
-void PuyoGameScreen::backPressed()
+bool PuyoGameScreen::backPressed()
 {
     if (gameWidget.backPressed())
-        return;
+        return true;
     if (!paused) {
         if (gameWidget.getOpponentFace() != NULL)
             gameWidget.getOpponentFace()->hide();
@@ -433,6 +454,7 @@ void PuyoGameScreen::backPressed()
         gameWidget.resume();
         //restartRender();
     }
+    return false;
 }
 
 void PuyoGameScreen::abort()

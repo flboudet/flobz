@@ -135,8 +135,9 @@ private:
 class PuyoGameScreen : public Screen {
 public:
     PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScreen);
+    ~PuyoGameScreen();
     void onEvent(GameControlEvent *cevent);
-    virtual void backPressed();
+    virtual bool backPressed();
     virtual void abort();
     void setOverlayStory(PuyoStoryWidget *story);
 private:

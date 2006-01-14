@@ -552,7 +552,7 @@ namespace gameui {
   // SliderContainer
 
   SliderContainer::SliderContainer(GameLoop *loop)
-    : IdleComponent(loop == NULL ? GameUIDefaults::GAME_LOOP : loop)
+    : IdleComponent()
     , ZBox(loop)
     , contentWidget(NULL), previousWidget(NULL)
     , currentTime(0), slideStartTime(0)
@@ -812,8 +812,8 @@ namespace gameui {
   //
 
   Screen::Screen(float x, float y, float width, float height, GameLoop *loop)
-    : DrawableComponent(loop == NULL ? GameUIDefaults::GAME_LOOP : loop),
-      IdleComponent(loop == NULL ? GameUIDefaults::GAME_LOOP : loop),
+    : DrawableComponent(),
+      IdleComponent(),
       rootContainer(loop), bg(NULL)
   {
     rootContainer.setPosition(Vec3(x, y, 1.0f));

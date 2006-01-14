@@ -16,7 +16,7 @@ class GameLoop;
 class DrawableComponent
 {
   public:
-    DrawableComponent(GameLoop *parentLoop = NULL);
+    DrawableComponent();
     virtual ~DrawableComponent();
     virtual bool drawRequested() const;
     void doDraw(SDL_Surface *screen) ;
@@ -33,7 +33,7 @@ class DrawableComponent
 class IdleComponent
 {
   public:
-    IdleComponent(GameLoop *parentLoop = NULL);
+    IdleComponent();
     virtual ~IdleComponent();
    
     void callIdle(double currentTime) { if (!paused) idle(currentTime); }
@@ -59,7 +59,7 @@ class IdleComponent
 class CycledComponent : public IdleComponent
 {
   public:
-    CycledComponent(double cycleTime, GameLoop *parentLoop = NULL);
+    CycledComponent(double cycleTime);
 
     /// called 1 time every cycleTime seconds.
     virtual void cycle()             {}
