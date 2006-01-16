@@ -110,19 +110,20 @@ private:
 class PushNetCenterMenuAction : public Action
 {
 public:
-    PushNetCenterMenuAction(Text *serverName, Text *userName) : serverName(serverName), userName(userName) {}
+    PushNetCenterMenuAction(Text *serverName, Text *serverPort, Text *userName) : serverName(serverName), serverPort(serverPort), userName(userName) {}
     
     void action()
     {
         fprintf(stderr, "Connecting to %s..\n", serverName->getValue().c_str());
         PuyoInternetGameCenter *gameCenter = new PuyoInternetGameCenter(serverName->getValue(),
-                                                                        4567, userName->getValue());
+                                                                        atoi(serverPort->getValue()), userName->getValue());
         NetCenterMenu *newNetCenterMenu = new NetCenterMenu(gameCenter);
         newNetCenterMenu->build();
         (GameUIDefaults::SCREEN_STACK)->push(newNetCenterMenu);
     }
 private:
     Text *serverName;
+    Text *serverPort;
     Text *userName;
 };
 
@@ -147,7 +148,7 @@ InternetGameMenu::InternetGameMenu()
   : PuyoScreen()
   , servers("www.ios-software.com", "/flobopuyo/fpservers", 80)
   , story(666)
-  , container(), playerName("Kaori"), serverName("---")
+  , container(), playerName("Kaori"), serverName("---"), serverPort("4567")
 {
 }
 
@@ -170,8 +171,8 @@ void InternetGameMenu::build()
     serverSelectionPanel->add(updating);
 
     // temporary entry into the server list
-    serverListPanel->add (new Button("durandal.homeunix.com !",
-                                     new ServerSelectAction(*this, "durandal.homeunix.com", 110)));
+    serverListPanel->add (new Button("durandal.homeunix.com",
+                                     new ServerSelectAction(*this, "durandal.homeunix.com", 4567)));
     
     VBox *rightPanel = new VBox();
     rightPanel->add(new Separator(1,1));
@@ -182,9 +183,11 @@ void InternetGameMenu::build()
     rightPanel->add(new Separator(10,10));
     rightPanel->add(new Text("Server"));
     rightPanel->add(&serverName);
+    rightPanel->add(new Text("Port"));
+    rightPanel->add(&serverPort);
     rightPanel->add(new Separator(10,10));
     HBox *hbox = new HBox();
-    hbox->add(new Button("Join", new PushNetCenterMenuAction(&serverName, &playerName)));
+    hbox->add(new Button("Join", new PushNetCenterMenuAction(&serverName, &serverPort, &playerName)));
     hbox->add(new Button("Cancel", new PopScreenAction()));
     rightPanel->add(hbox);
     rightPanel->add(new Separator(1,1));
@@ -223,6 +226,9 @@ void InternetGameMenu::idle(double currentTime)
 
 void InternetGameMenu::setSelectedServer(const String &serverName, int portNum)
 {
+    char sportNum[256];
+    sprintf(sportNum, "%d", portNum);
     this->serverName.setValue(serverName);
+    this->serverPort.setValue(sportNum);
     this->portNum = portNum;
 }

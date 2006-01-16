@@ -65,7 +65,7 @@ private:
     PuyoStoryWidget story;
     SliderContainer container;
     EditField playerName;
-    EditField serverName;
+    EditField serverName, serverPort;
     int portNum;
     Button *updating;
 };
