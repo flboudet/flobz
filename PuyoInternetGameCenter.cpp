@@ -29,7 +29,7 @@
 using namespace ios_fc;
 
 PuyoInternetGameCenter::PuyoInternetGameCenter(const String hostName, int portNum, const String name)
-    : mbox(hostName, portNum), name(name)
+  : mbox(hostName, portNum), name(name), gameGranted(false)
 {
     mbox.addListener(this);
     sendAliveMessage();
@@ -87,6 +87,12 @@ void PuyoInternetGameCenter::acceptInvitationWithPeer(String playerName, PeerAdd
     dirNew->setPeerAddress(addr);
     msg->send();
     delete msg;
+    gameGranted = true;
+    grantedAddr = addr;
+}
+
+void PuyoInternetGameCenter::grantGameToPeer(PeerAddress addr)
+{
     mbox.bind(addr);
     for (int i = 0, j = listeners.size() ; i < j ; i++) {
         listeners[i]->gameGrantedWithMessagebox(&mbox);
@@ -109,6 +115,11 @@ void PuyoInternetGameCenter::cancelGameWithPeer(String playerName, PeerAddress a
 void PuyoInternetGameCenter::idle()
 {
     static int idleCount = 0;
+    if (gameGranted) {
+      grantGameToPeer(grantedAddr);
+      gameGranted = false;
+      return;
+    }
     mbox.idle();
     if (idleCount++ == 50) { // a revoir
         idleCount = 0;

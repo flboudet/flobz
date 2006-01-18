@@ -35,7 +35,9 @@ PuyoNetworkGame::~PuyoNetworkGame()
   msgBox.removeListener(this);
 }
 
-PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox) : PuyoGame(attachedFactory), msgBox(msgBox), gameRunning(true)
+PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox)
+  : PuyoGame(attachedFactory), msgBox(msgBox), nextFalling(PUYO_BLUE),
+    nextCompanion(PUYO_BLUE), gameRunning(true)
 {
     fakePuyo = attachedFactory->createPuyo(PUYO_FALLINGRED);
     msgBox.addListener(this);

@@ -43,9 +43,12 @@ protected:
     void cancelGameWithPeer(String playerName, PeerAddress addr);
 private:
     void sendAliveMessage();
+    void grantGameToPeer(PeerAddress addr);
     
     IgpMessageBox mbox;
     const String name;
+    bool gameGranted;
+    PeerAddress grantedAddr;
 };
 
 #endif // _PUYOINTERNETGAMECENTER_H
