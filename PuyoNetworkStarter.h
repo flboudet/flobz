@@ -47,6 +47,8 @@ public:
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
     void onMessage(Message &);
+    void setScreenToPaused(bool fromControls);
+    void setScreenToResumed(bool fromControls);
 private:
     void sendSyncMsg();
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;

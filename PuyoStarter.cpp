@@ -123,7 +123,7 @@ bool PuyoEventPlayer::keyShouldRepeat(int &key)
 }
 
 PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
-    : CycledComponent(0.02), attachedLevelTheme(&levelTheme), areaA(&areaA), areaB(&areaB), controllerA(&controllerA), controllerB(&controllerB),
+    : CycledComponent(0.02), associatedScreen(NULL), attachedLevelTheme(&levelTheme), areaA(&areaA), areaB(&areaB), controllerA(&controllerA), controllerB(&controllerB),
       cyclesBeforeGameCycle(50), cyclesBeforeSpeedIncreases(500), cyclesBeforeGameCycleV(cyclesBeforeGameCycle), tickCounts(0), paused(false), displayLives(true), lives(3),
       gameOverAction(gameOverAction), abortedFlag(false), gameSpeed(20), blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
       playerOneName(p1name), playerTwoName(p2name)
@@ -132,7 +132,7 @@ PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &con
 }
 
 PuyoGameWidget::PuyoGameWidget()
-    : CycledComponent(0.02), cyclesBeforeGameCycle(50), cyclesBeforeSpeedIncreases(500), cyclesBeforeGameCycleV(cyclesBeforeGameCycle),
+    : CycledComponent(0.02), associatedScreen(NULL), cyclesBeforeGameCycle(50), cyclesBeforeSpeedIncreases(500), cyclesBeforeGameCycleV(cyclesBeforeGameCycle),
       tickCounts(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(20),
       blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
       playerOneName(p1name), playerTwoName(p2name)
@@ -373,6 +373,18 @@ bool PuyoGameWidget::backPressed()
     return false;
 }
 
+void PuyoGameWidget::setScreenToPaused(bool fromControls)
+{
+    if (associatedScreen != NULL)
+        associatedScreen->setPaused(fromControls);
+}
+
+void PuyoGameWidget::setScreenToResumed(bool fromControls)
+{
+    if (associatedScreen != NULL)
+        associatedScreen->setResumed(fromControls);
+}
+
 PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction) : menuTitle("Pause"), continueButton("Continue game", continueAction), abortButton("Abort game", abortAction)
 {
     add(&menuTitle);
@@ -405,6 +417,7 @@ PuyoGameScreen::PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScree
     if (gameWidget.getOpponentFace() != NULL)
         add(gameWidget.getOpponentFace());
     add(&transitionWidget);
+    gameWidget.associatedScreen = this;
 }
 
 PuyoGameScreen::~PuyoGameScreen()
@@ -437,24 +450,41 @@ bool PuyoGameScreen::backPressed()
     if (gameWidget.backPressed())
         return true;
     if (!paused) {
+        // Seems complicated.
+        // The pause method is called from the game widget
+        // because this method is virtual and can be overloaded
+        // (see PuyoNetworkGameWidget)
+        gameWidget.setScreenToPaused(true);
+    }
+    else {
+        // Same as for pause
+        gameWidget.setScreenToResumed(true);
+    }
+    return false;
+}
+
+void PuyoGameScreen::setPaused(bool fromControls)
+{
+    if (!paused) {
         if (gameWidget.getOpponentFace() != NULL)
             gameWidget.getOpponentFace()->hide();
         this->add(&pauseMenu);
         this->focus(&pauseMenu);
         paused = true;
         gameWidget.pause();
-        //stopRender();
     }
-    else {
+}
+
+void PuyoGameScreen::setResumed(bool fromControls)
+{
+    if (paused) {
         paused = false;
         if (gameWidget.getOpponentFace() != NULL)
             gameWidget.getOpponentFace()->show();
         this->remove(&pauseMenu);
         this->focus(&gameWidget);
         gameWidget.resume();
-        //restartRender();
     }
-    return false;
 }
 
 void PuyoGameScreen::abort()

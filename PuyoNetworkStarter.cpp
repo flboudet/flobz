@@ -73,9 +73,41 @@ void PuyoNetworkGameWidget::onMessage(Message &message)
         case PuyoMessage::kGameStart:
             syncMsgReceived = true;
             break;
+        case PuyoMessage::kGamePause:
+            setScreenToPaused(false);
+            break;
+        case PuyoMessage::kGameResume:
+            setScreenToResumed(false);
+            break;
         default:
             break;
     }
+}
+
+void PuyoNetworkGameWidget::setScreenToPaused(bool fromControls)
+{
+    // If the pause is from a controller, we have to send the pause information to the other peer
+    if (fromControls) {
+        ios_fc::Message *message = mbox.createMessage();
+        message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGamePause);
+        message->addBoolProperty("RELIABLE", true);
+        message->send();
+        delete message;
+    }
+    PuyoGameWidget::setScreenToPaused(fromControls);
+}
+
+void PuyoNetworkGameWidget::setScreenToResumed(bool fromControls)
+{
+    // If the resume is from a controller, we have to send the resume information to the other peer
+    if (fromControls) {
+        ios_fc::Message *message = mbox.createMessage();
+        message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameResume);
+        message->addBoolProperty("RELIABLE", true);
+        message->send();
+        delete message;
+    }
+    PuyoGameWidget::setScreenToResumed(fromControls);
 }
 
 void PuyoNetworkGameWidget::sendSyncMsg()
@@ -252,6 +284,10 @@ void PuyoNetworkStarter::onMessage(Message &message)
         switch (msgType) {
             case PuyoMessage::kGameStart:
                 netgame_started = true;
+                break;
+            case PuyoMessage::kGamePause:
+                break;
+            case PuyoMessage::kGameResume:
                 break;
             default:
                 break;

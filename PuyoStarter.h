@@ -66,6 +66,8 @@ private:
     int fpKey_Repeat, fpKey_Delay;
 };
 
+class PuyoGameScreen;
+
 class PuyoGameWidget : public Widget, CycledComponent {
 public:
     PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction = NULL);
@@ -93,6 +95,10 @@ public:
     virtual PuyoStoryWidget *getOpponentFace() { return NULL; }
     void addGameAHandicap(int handicap) {attachedGameA->increaseNeutralPuyos(handicap * PUYODIMX); attachedGameA->dropNeutrals();}
     void addGameBHandicap(int handicap) {attachedGameB->increaseNeutralPuyos(handicap * PUYODIMX); attachedGameB->dropNeutrals();}
+    // A deplacer
+    PuyoGameScreen *associatedScreen;
+    virtual void setScreenToPaused(bool fromControls);
+    virtual void setScreenToResumed(bool fromControls);
 protected:
     SDL_Painter painter;
     PuyoLevelTheme *attachedLevelTheme;
@@ -113,8 +119,6 @@ protected:
     int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
     String playerOneName, playerTwoName;
 };
-
-class PuyoGameScreen;
 
 class ContinueAction : public Action {
 public:
@@ -140,6 +144,8 @@ public:
     virtual bool backPressed();
     virtual void abort();
     void setOverlayStory(PuyoStoryWidget *story);
+    virtual void setPaused(bool fromControls);
+    virtual void setResumed(bool fromControls);
 private:
     bool paused;
     ContinueAction continueAction;

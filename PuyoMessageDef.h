@@ -7,7 +7,9 @@ namespace PuyoMessage {
 enum {
     kGameState   = 0,
     kGameOver    = 1,
-    kGameStart   = 2
+    kGameStart   = 2,
+    kGamePause   = 3,
+    kGameResume  = 4
 };
 
 static const char *TYPE          = "TYPE";
