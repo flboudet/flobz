@@ -99,6 +99,7 @@ public:
     PuyoGameScreen *associatedScreen;
     virtual void setScreenToPaused(bool fromControls);
     virtual void setScreenToResumed(bool fromControls);
+    virtual void actionAfterGameOver(bool fromControls);
 protected:
     SDL_Painter painter;
     PuyoLevelTheme *attachedLevelTheme;

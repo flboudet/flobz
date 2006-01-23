@@ -45,8 +45,7 @@
   Display @dogDisplay = [new_display: x=-420.0 y=0.0 width=800.0 height=480.0]
 
   Sprite @head =  [new_sprite: image="kaori.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
-  Sprite @eyes =  [new_sprite: image="eyes.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
-  Sprite @mouth =  [new_sprite: image="mouthsmall.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=4.0]
+  Sprite @mouth =  [new_sprite: image="mouthsmall.png" x=175.0 y=247.0 curframe=0.0 framespeed=0.1 nbframes=4.0]
   Sprite @fond =  [new_sprite: image="bluebkgnd.jpg" x=640.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
   Sprite @fond2 =  [new_sprite: image="bluebkgnd.jpg" x=0.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
   Sprite @dog =  [new_sprite: image="dogbig.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
@@ -64,7 +63,6 @@
   sprite::@fond display=@display
   sprite::@fond2 display=@display
   sprite::@head display=@movingDisplay
-  sprite::@eyes display=@movingDisplay
   sprite::@mouth display=@movingDisplay
   sprite::@dog display=@dogDisplay
   sprite::@dogMouth display=@dogDisplay

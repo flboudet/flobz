@@ -49,6 +49,7 @@ public:
     void onMessage(Message &);
     void setScreenToPaused(bool fromControls);
     void setScreenToResumed(bool fromControls);
+    void actionAfterGameOver(bool fromControls);
 private:
     void sendSyncMsg();
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;

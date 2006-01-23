@@ -9,7 +9,8 @@ enum {
     kGameOver    = 1,
     kGameStart   = 2,
     kGamePause   = 3,
-    kGameResume  = 4
+    kGameResume  = 4,
+    kGameNext    = 5
 };
 
 static const char *TYPE          = "TYPE";

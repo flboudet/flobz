@@ -366,11 +366,16 @@ void PuyoGameWidget::eventOccured(GameControlEvent *event)
 bool PuyoGameWidget::backPressed()
 {
     if ((gameover || abortedFlag) && once) {
-        if (gameOverAction)
-            gameOverAction->action();
+        actionAfterGameOver(true);
         return true;
     }
     return false;
+}
+
+void PuyoGameWidget::actionAfterGameOver(bool fromControls)
+{
+    if (gameOverAction)
+            gameOverAction->action();
 }
 
 void PuyoGameWidget::setScreenToPaused(bool fromControls)

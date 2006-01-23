@@ -57,13 +57,13 @@ PuyoNetworkGameWidget::~PuyoNetworkGameWidget()
 
 void PuyoNetworkGameWidget::cycle()
 {
-    mbox.idle();
     if (!syncMsgSent) {
         sendSyncMsg();
         syncMsgSent = true;
     }
     if (syncMsgReceived)
         PuyoGameWidget::cycle();
+    mbox.idle();
 }
 
 void PuyoNetworkGameWidget::onMessage(Message &message)
@@ -78,6 +78,9 @@ void PuyoNetworkGameWidget::onMessage(Message &message)
             break;
         case PuyoMessage::kGameResume:
             setScreenToResumed(false);
+            break;
+        case PuyoMessage::kGameNext:
+            actionAfterGameOver(false);
             break;
         default:
             break;
@@ -108,6 +111,20 @@ void PuyoNetworkGameWidget::setScreenToResumed(bool fromControls)
         delete message;
     }
     PuyoGameWidget::setScreenToResumed(fromControls);
+}
+
+void PuyoNetworkGameWidget::actionAfterGameOver(bool fromControls)
+{
+    fprintf(stderr, "ACTIONAFTERGAMEOVER\n");
+    // If the resume is from a controller, we have to send the resume information to the other peer
+    if (fromControls) {
+        ios_fc::Message *message = mbox.createMessage();
+        message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameNext);
+        message->addBoolProperty("RELIABLE", true);
+        message->send();
+        delete message;
+    }
+    PuyoGameWidget::actionAfterGameOver(fromControls);
 }
 
 void PuyoNetworkGameWidget::sendSyncMsg()
