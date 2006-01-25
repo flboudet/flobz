@@ -33,7 +33,7 @@ using namespace ios_fc;
 
 class PuyoNetworkGame : public PuyoGame, MessageListener {
 public:
-    PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox);
+    PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox, int gameId = 0);
     ~PuyoNetworkGame();
     
     virtual void onMessage(Message &);
@@ -74,6 +74,7 @@ private:
     PuyoState nextFalling, nextCompanion;
     PuyoPuyo *fakePuyo;
     MessageBox &msgBox;
+    int gameId;
     AdvancedBuffer<PuyoPuyo *> puyoVector;
     int semiMove;
     int neutralPuyos, sentBadPuyos;

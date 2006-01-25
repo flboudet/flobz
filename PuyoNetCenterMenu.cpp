@@ -29,13 +29,14 @@
 
 class PuyoNetworkTwoPlayerGameWidgetFactory : public PuyoGameWidgetFactory {
 public:
-    PuyoNetworkTwoPlayerGameWidgetFactory(ios_fc::MessageBox &mbox) : mbox(mbox) {}
+    PuyoNetworkTwoPlayerGameWidgetFactory(ios_fc::MessageBox &mbox) : mbox(mbox), gameId(0) {}
     PuyoGameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
-        return new PuyoNetworkGameWidget(puyoThemeSet, levelTheme, mbox, gameOverAction);
+        return new PuyoNetworkGameWidget(puyoThemeSet, levelTheme, mbox, gameId++, gameOverAction);
     }
 private:
     ios_fc::MessageBox &mbox;
+    int gameId;
 };
 
 void NetCenterDialogMenu::NetCenterDialogMenuAction::action()

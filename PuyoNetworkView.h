@@ -38,11 +38,11 @@ class PuyoNetworkView : public PuyoView {
 		    AnimatedPuyoSetTheme *attachedPuyoThemeSet,
             PuyoLevelTheme *attachedLevelTheme,
 		    int xOffset, int yOffset,
-                    int nXOffset, int nYOffset, MessageBox *mbox,
+                    int nXOffset, int nYOffset, MessageBox *mbox, int gameId,
                     SDL_Painter &painterToUse)
         : PuyoView(attachedPuyoGameFactory, attachedPuyoThemeSet, attachedLevelTheme,
 		   xOffset, yOffset, nXOffset, nYOffset, painterToUse),
-          mbox(mbox),badPuyos(0) {}
+          mbox(mbox), gameId(gameId), badPuyos(0) {}
         
     void cycleGame();
     
@@ -63,6 +63,7 @@ class PuyoNetworkView : public PuyoView {
     
 private:
     MessageBox *mbox;
+    int gameId;
     Message *createStateMessage(bool paused);
     AdvancedBuffer<int> neutralsBuffer;
     AdvancedBuffer<int> compTurnBuffer;

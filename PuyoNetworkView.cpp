@@ -48,6 +48,7 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
     // creation du message
     Message *message = mbox->createMessage();
 
+    message->addInt     (PuyoMessage::GAMEID, gameId);
     message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameState);
     message->addString  (PuyoMessage::NAME,   p1name);
     message->addBool    (PuyoMessage::PAUSED, paused);
@@ -158,6 +159,7 @@ void PuyoNetworkView::gameLost()
 {
     PuyoView::gameLost();
     Message *message = mbox->createMessage();
+    message->addInt     (PuyoMessage::GAMEID, gameId);
     message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameOver);
     message->addString  (PuyoMessage::NAME,   p1name);
     message->addBoolProperty("RELIABLE", true);

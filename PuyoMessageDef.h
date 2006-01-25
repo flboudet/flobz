@@ -14,6 +14,7 @@ enum {
 };
 
 static const char *TYPE          = "TYPE";
+static const char *GAMEID        = "ID";
 static const char *NAME          = "NAME";
 static const char *PUYOS         = "PUYOS";
 static const char *PAUSED        = "PAUSED";

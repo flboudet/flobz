@@ -33,16 +33,18 @@
 
 class PuyoNetworkGameFactory : public PuyoGameFactory {
 public:
-    PuyoNetworkGameFactory(PuyoRandomSystem *attachedRandom, MessageBox &msgBox): attachedRandom(attachedRandom), msgBox(msgBox) {}
+    PuyoNetworkGameFactory(PuyoRandomSystem *attachedRandom, MessageBox &msgBox, int gameId): attachedRandom(attachedRandom), msgBox(msgBox), gameId(gameId) {}
     PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory);
+    int getGameId() { return gameId; }
 private:
     PuyoRandomSystem *attachedRandom;
     MessageBox &msgBox;
+    int gameId;
 };
 
 class PuyoNetworkGameWidget : public PuyoGameWidget, MessageListener {
 public:
-    PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, Action *gameOverAction = NULL);
+    PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, Action *gameOverAction = NULL);
     ~PuyoNetworkGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
@@ -62,25 +64,6 @@ private:
     PuyoCombinedEventPlayer playercontroller;
     PuyoNullPlayer dummyPlayerController;
     bool syncMsgReceived, syncMsgSent;
-};
-
-class NetworkStarterAction : public Action {
-public:
-    NetworkStarterAction(String _IP);
-    ~NetworkStarterAction();
-    void action();
-    
-private:
-    String IP;
-    ios_fc::MessageBox * mbox;
-    void startGame();
-    void gameOver();
-    void endGameSession();
-    
-    int difficulty;
-    PuyoGameScreen *gameScreen;
-    PuyoNetworkGameWidget *gameWidget;
-    //PuyoTwoNameProvider *nameProvider;
 };
 
 #endif // _PUYONETWORKSTARTER

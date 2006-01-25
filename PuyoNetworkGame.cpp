@@ -35,8 +35,8 @@ PuyoNetworkGame::~PuyoNetworkGame()
   msgBox.removeListener(this);
 }
 
-PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox)
-  : PuyoGame(attachedFactory), msgBox(msgBox), nextFalling(PUYO_BLUE),
+PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox, int gameId)
+  : PuyoGame(attachedFactory), msgBox(msgBox), gameId(gameId), nextFalling(PUYO_BLUE),
     nextCompanion(PUYO_BLUE), gameRunning(true)
 {
     fakePuyo = attachedFactory->createPuyo(PUYO_FALLINGRED);
@@ -54,6 +54,10 @@ PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBo
 void PuyoNetworkGame::onMessage(Message &message)
 {
     try {
+        // Check if the message matches the gameid
+        int gid = message.getInt(GAMEID);
+        if (gid != gameId)
+            return;
         int msgType = message.getInt(TYPE);
         switch (msgType) {
             case kGameState:

@@ -183,7 +183,7 @@ void LANGameRealMenu::build() {
   add(new Text("LAN Game"));
   add(new EditFieldWithLabel("Player name:", "toto"));
   add(new EditFieldWithLabel("Server name:", "127.0.0.1"));
-  add(new Button("Start!", new NetworkStarterAction(String("127.0.0.1"))));
+  //add(new Button("Start!", new NetworkStarterAction(String("127.0.0.1"))));
   add(new Button("Cancel", new PuyoPopMenuAction(mainScreen)));
 }
 
