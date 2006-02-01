@@ -3,6 +3,7 @@
 #include <curses.h>
 #include <signal.h>
 #include "PuyoInternetGameCenter.h"
+#include "PuyoLanGameCenter.h"
 
 WINDOW *rootWin, *plyList, *chatArea, *inputArea;
 
@@ -60,7 +61,7 @@ static void finish(int sig)
     exit(0);
 }
 
-void decodeMessage(PuyoInternetGameCenter &myCenter, String msgBuf)
+void decodeMessage(PuyoNetGameCenter &myCenter, String msgBuf)
 {
     if (msgBuf.substring(0, 6) == "/start") {
         String against = msgBuf.substring(7);
@@ -104,9 +105,10 @@ int main(int argc, char *argv[])
     wrefresh(inputArea);
     wrefresh(plyList);
     
-    PuyoInternetGameCenter myCenter(argv[1], 4567, argv[2]);
-    MyNetGameCenterListener myListener(myCenter);
-    myCenter.addListener(&myListener);
+    PuyoNetGameCenter *myCenter = new PuyoInternetGameCenter(argv[1], 4567, argv[2]);
+    //PuyoLanGameCenter *myLanCenter = new PuyoLanGameCenter(6581, argv[1]);
+    MyNetGameCenterListener myListener(*myCenter);
+    myCenter->addListener(&myListener);
     while (1) {
         wmove(inputArea, 1, 1 + position);
         switch (int c = getch()) {
@@ -125,9 +127,9 @@ int main(int argc, char *argv[])
             //wprintw(chatArea, "%s\n", (const char *)msgBuf);
             //wrefresh(chatArea);
             if ((position > 0) && (msgBuf[0] == '/'))
-                decodeMessage(myCenter, msgBuf);
+                decodeMessage(*myCenter, msgBuf);
             else
-                myCenter.sendMessage(msgBuf);
+                myCenter->sendMessage(msgBuf);
             werase(inputArea);
             box(inputArea, ACS_VLINE, ACS_HLINE );
             position = 0;
@@ -140,7 +142,7 @@ int main(int argc, char *argv[])
             break;
         }
         wrefresh(inputArea);
-        myCenter.idle();
+        myCenter->idle();
         usleep(20000);
     }
 //#endif
