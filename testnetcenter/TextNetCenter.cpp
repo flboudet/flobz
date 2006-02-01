@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <curses.h>
 #include <signal.h>
+#include <unistd.h>
 #include "PuyoInternetGameCenter.h"
 #include "PuyoLanGameCenter.h"
 
@@ -84,6 +85,45 @@ int main(int argc, char *argv[])
     char msgBuf[256];
     signal(SIGINT, finish);
 
+    String serverName;
+    String login;
+    int portNum;
+    bool showHelp = false;
+    bool lanMode = false;
+    while (1) {
+      int LI_Cr = getopt(argc, argv, "lhs:p:");
+      if (LI_Cr == -1)
+	break;
+      switch (LI_Cr) {
+      case 's':
+	serverName = String(optarg);
+	break;
+      case 'p':
+	portNum = atoi(optarg);
+	break;
+      case 'l':
+	lanMode = true;
+	break;
+      case 'h':
+      default:
+	showHelp = true;
+	break;
+      }
+    }
+    if (optind < argc)
+      login = String(argv[optind]);
+    else showHelp = true;
+
+    if (showHelp) {
+      fprintf(stderr, "Usage: %s [-f XMLFILE] [-s] XPATH\n", argv[0]);
+      fprintf(stderr, "       %s -h\n\n", argv[0]);
+      fprintf(stderr, "Options:\n");
+      fprintf(stderr, " -f XMLFILE  use XMLFILE as the XML input (default is stdin)\n");
+      fprintf(stderr, " -s          single node mode, don't list children\n");
+      fprintf(stderr, " -h          show help\n");
+      return -1;
+    }
+
 //#ifdef DISABL
     rootWin = initscr();      /* initialize the curses library */
     keypad(rootWin, TRUE);  /* enable keyboard mapping */
@@ -105,7 +145,7 @@ int main(int argc, char *argv[])
     wrefresh(inputArea);
     wrefresh(plyList);
     
-    PuyoNetGameCenter *myCenter = new PuyoInternetGameCenter(argv[1], 4567, argv[2]);
+    PuyoNetGameCenter *myCenter = new PuyoInternetGameCenter(serverName, 4567, login);
     //PuyoLanGameCenter *myLanCenter = new PuyoLanGameCenter(6581, argv[1]);
     MyNetGameCenterListener myListener(*myCenter);
     myCenter->addListener(&myListener);
