@@ -35,7 +35,7 @@ enum {
 };
 
 PuyoLanGameCenter::PuyoLanGameCenter(int portNum, const String name)
-    : socket("durandal", portNum, portNum), mbox(&socket), name(name)
+    : socket(portNum), mbox(&socket), name(name)
 {
     mbox.addListener(this);
     sendAliveMessage();
@@ -89,15 +89,14 @@ void PuyoLanGameCenter::sendAliveMessage()
     delete msg;
 }
 
-#include <stdio.h>
-#include <unistd.h>
-
-int main(int argc, char *argv[])
+void PuyoLanGameCenter::requestGameWithPeer(String playerName, PeerAddress addr)
 {
-    PuyoLanGameCenter toto(6581, argv[1]);
-    while (1) {
-        sleep(1);
-        toto.idle();
-    }
-    return 0;
+}
+
+void PuyoLanGameCenter::acceptInvitationWithPeer(String playerName, PeerAddress addr)
+{
+}
+
+void PuyoLanGameCenter::cancelGameWithPeer(String playerName, PeerAddress addr)
+{
 }

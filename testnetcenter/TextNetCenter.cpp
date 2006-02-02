@@ -85,9 +85,9 @@ int main(int argc, char *argv[])
     char msgBuf[256];
     signal(SIGINT, finish);
 
-    String serverName;
+    String serverName = "durandal.homeunix.com";
     String login;
-    int portNum;
+    int portNum = 4567;
     bool showHelp = false;
     bool lanMode = false;
     while (1) {
@@ -115,12 +115,13 @@ int main(int argc, char *argv[])
     else showHelp = true;
 
     if (showHelp) {
-      fprintf(stderr, "Usage: %s [-f XMLFILE] [-s] XPATH\n", argv[0]);
+      fprintf(stderr, "Usage: %s [-s servername] [-p portnum] [-l] nickname\n", argv[0]);
       fprintf(stderr, "       %s -h\n\n", argv[0]);
       fprintf(stderr, "Options:\n");
-      fprintf(stderr, " -f XMLFILE  use XMLFILE as the XML input (default is stdin)\n");
-      fprintf(stderr, " -s          single node mode, don't list children\n");
-      fprintf(stderr, " -h          show help\n");
+      fprintf(stderr, " -s servername set the internet servername\n");
+      fprintf(stderr, " -p            set the port number\n");
+      fprintf(stderr, " -l            LAN mode\n");
+      fprintf(stderr, " -h            show help\n");
       return -1;
     }
 
@@ -145,8 +146,13 @@ int main(int argc, char *argv[])
     wrefresh(inputArea);
     wrefresh(plyList);
     
-    PuyoNetGameCenter *myCenter = new PuyoInternetGameCenter(serverName, 4567, login);
-    //PuyoLanGameCenter *myLanCenter = new PuyoLanGameCenter(6581, argv[1]);
+    PuyoNetGameCenter *myCenter;
+    if (lanMode) {
+        myCenter = new PuyoLanGameCenter(portNum, login);
+    }
+    else {
+        myCenter = new PuyoInternetGameCenter(serverName, portNum, login);
+    }
     MyNetGameCenterListener myListener(*myCenter);
     myCenter->addListener(&myListener);
     while (1) {
