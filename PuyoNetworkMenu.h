@@ -44,10 +44,15 @@ private:
     bool isReady;
 };
 
-class LANGameRealMenu : public PuyoMainScreenMenu {
-  public:
-    LANGameRealMenu(PuyoRealMainScreen * mainScreen) : PuyoMainScreenMenu(mainScreen) {}
+class LANGameMenu : public PuyoMainScreenMenu {
+public:
+    LANGameMenu(PuyoRealMainScreen * mainScreen);
     void build();
+private:
+    Text lanTitle;
+    EditFieldWithLabel playerNameLabel, portNumLabel;
+    PuyoPopMenuAction cancelAction;
+    Button startButton, cancelButton;
 };
 
 class InternetGameMenu : public PuyoScreen {
@@ -83,7 +88,7 @@ public:
     NetworkGameMenu(PuyoRealMainScreen * mainScreen) : PuyoMainScreenMenu(mainScreen), lanGameMenu(mainScreen), internetGameMenu(NULL), internetAction(&internetGameMenu) {}
     void build();
 private:
-    LANGameRealMenu  lanGameMenu;
+    LANGameMenu  lanGameMenu;
     InternetGameMenu *internetGameMenu;
     NetworkInternetAction internetAction;
 };

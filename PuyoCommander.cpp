@@ -165,28 +165,6 @@ void SinglePlayerGameAction::action()
   GameUIDefaults::SCREEN_STACK->push(starter);*/
 }
 
-/**
- * Launches a network game
- */
- class NetGameAction : public Action {
-  public: void action();
-};
-
-void NetGameAction::action()
-{
-  //UDPMessageBox *mbox = new UDPMessageBox("127.0.0.1", 6581, 6581);
-  
-  //GameUIDefaults::SCREEN_STACK->push(starter);
-}
-
-void LANGameRealMenu::build() {
-  add(new Text("LAN Game"));
-  add(new EditFieldWithLabel("Player name:", "toto"));
-  add(new EditFieldWithLabel("Server name:", "127.0.0.1"));
-  //add(new Button("Start!", new NetworkStarterAction(String("127.0.0.1"))));
-  add(new Button("Cancel", new PuyoPopMenuAction(mainScreen)));
-}
-
 void PuyoCommander::run()
 {
   GameUIDefaults::SCREEN_STACK->push(mainScreen);

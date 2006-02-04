@@ -25,6 +25,7 @@
 
 #include "PuyoNetworkMenu.h"
 #include "PuyoInternetGameCenter.h"
+#include "PuyoLanGameCenter.h"
 #include "preferences.h"
 #include "ios_socket.h"
 #include "ios_standardmessage.h"
@@ -34,6 +35,40 @@
 extern IIM_Surface *menuBG_wide; // I know what you think..
 
 using namespace ios_fc;
+
+
+class PushLanNetCenterMenuAction : public Action
+{
+public:
+    PushLanNetCenterMenuAction(EditField *serverPort, EditField *userName) : serverPort(serverPort), userName(userName) {}
+    
+    void action()
+    {
+        PuyoLanGameCenter *gameCenter = new PuyoLanGameCenter(atoi(serverPort->getValue()), userName->getValue());
+        NetCenterMenu *newNetCenterMenu = new NetCenterMenu(gameCenter);
+        newNetCenterMenu->build();
+        (GameUIDefaults::SCREEN_STACK)->push(newNetCenterMenu);
+    }
+private:
+    EditField *serverPort;
+    EditField *userName;
+};
+
+LANGameMenu::LANGameMenu(PuyoRealMainScreen * mainScreen)
+  : PuyoMainScreenMenu(mainScreen), lanTitle("LAN Game"), playerNameLabel("Player name:", "toto"),
+    portNumLabel("Port number:", "6581"), cancelAction(mainScreen),
+    startButton("Start!", new PushLanNetCenterMenuAction(portNumLabel.getEditField(), playerNameLabel.getEditField())),
+    cancelButton("Cancel", &cancelAction)
+{
+}
+
+void LANGameMenu::build() {
+    add(&lanTitle);
+    add(&playerNameLabel);
+    add(&portNumLabel);
+    add(&startButton);
+    add(&cancelButton);
+}
 
 class PuyoHttpServerList::PuyoHttpServer {
 public:

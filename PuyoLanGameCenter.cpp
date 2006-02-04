@@ -24,6 +24,7 @@
  */
 
 #include "PuyoLanGameCenter.h"
+#include "ios_time.h"
 
 using namespace ios_fc;
 
@@ -37,7 +38,9 @@ enum {
 };
 
 PuyoLanGameCenter::PuyoLanGameCenter(int portNum, const String name)
-    : socket(portNum), mbox(&socket), name(name)
+    : socket(portNum), mbox(&socket), name(name),
+      timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages),
+      gameGranted(false)
 {
     mbox.addListener(this);
     SessionManager &mboxSession = dynamic_cast<SessionManager &>(mbox);
@@ -119,7 +122,11 @@ void PuyoLanGameCenter::idle()
       return;
     }
     mbox.idle();
-    sendAliveMessage();
+    double time_ms = getTimeMs();
+    if ((time_ms - lastAliveMessage) >= timeMsBetweenTwoAliveMessages) {
+        sendAliveMessage();
+        lastAliveMessage = time_ms;
+    }
 }
 
 void PuyoLanGameCenter::sendAliveMessage()
@@ -127,7 +134,7 @@ void PuyoLanGameCenter::sendAliveMessage()
     Message *msg = mbox.createMessage();
     Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
     dirMsg->setPeerAddress(dirMsg->getBroadcastAddress());
-    //msg->addBoolProperty("RELIABLE", true);
+
     msg->addInt("CMD", PUYO_UDP_ALIVE);
     msg->addString("NAME", name);
     msg->send();
