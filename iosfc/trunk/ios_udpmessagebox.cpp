@@ -367,6 +367,16 @@ void UDPMessageBox::removeSessionListener(SessionListener *l)
     sessionListeners.remove(l);
 }
 
+void UDPMessageBox::bind(PeerAddress addr)
+{
+    UDPMessage::UDPPeerAddressImpl *newPeerAddressImpl = dynamic_cast<UDPMessage::UDPPeerAddressImpl *>(addr.getImpl());
+    if (newPeerAddressImpl != NULL) {
+        defaultAddress = newPeerAddressImpl->getAddress();
+        defaultPort = newPeerAddressImpl->getPortNum();
+    }
+    else throw Exception("Incompatible peer address type!");
+}
+
 
 /*UDPMessageBox::UDPMessageBox (const UDPMessageBox&m)
   : defaultAddress(m.defaultAddress), defaultPort(m.defaultPort)

@@ -52,6 +52,8 @@ public:
     inline int getTimeMsBeforeResendingReliable() const { return timeMsBeforeResendingReliable; }
     inline int getTimeMsBeforeReliableTimeout()  const  { return timeMsBeforeReliableTimeout; }
     inline int getTimeMsBeforePeerTimeout()      const  { return timeMsBeforePeerTimeout; }
+    
+    void bind(PeerAddress addr);
 private:
     struct KnownPeer;
     KnownPeer *findPeer(PeerAddress address);

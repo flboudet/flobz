@@ -30,6 +30,21 @@ namespace ios_fc {
         UDPMessage&operator=(const UDPMessage&);
     };
     
+    class UDPMessage::UDPPeerAddressImpl : public PeerAddressImpl {
+    public:
+        UDPPeerAddressImpl(SocketAddress address, int port)
+        : address(address), port(port) {}
+        SocketAddress getAddress() const { return address; }
+        int getPortNum() const { return port; }
+        virtual bool operator == (const PeerAddressImpl &a) const {
+            const UDPPeerAddressImpl &comp = dynamic_cast<const UDPPeerAddressImpl &>(a);
+            return (comp.port == port) && (comp.address == address);
+        }
+    private:
+        SocketAddress address;
+        int port;
+    };
+    
     class UDPPeerAddress : public PeerAddress {
     public:
         UDPPeerAddress(PeerAddressImpl *impl) : PeerAddress(impl) {}
