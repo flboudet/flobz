@@ -590,7 +590,7 @@ namespace gameui {
 
   void SliderContainer::idle(double currentTime)
   {
-    static const double slidingTime = 1.5;
+    static const double slidingTime = 0.5;
     this->currentTime = currentTime;
 
     if (!sliding) return;
