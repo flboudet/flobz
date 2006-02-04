@@ -74,7 +74,7 @@ void PuyoLanGameCenter::onMessage(Message &msg)
 	break;
       case PUYO_UDP_GAME_ACCEPT: {
 	  Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-	  //mbox.bind(dir.getPeerAddress());
+	  mbox.bind(dir.getPeerAddress());
 	  for (int i = 0, j = listeners.size() ; i < j ; i++) {
 	    listeners[i]->gameGrantedWithMessagebox(&mbox);
 	  }
@@ -173,7 +173,7 @@ void PuyoLanGameCenter::acceptInvitationWithPeer(String playerName, PeerAddress 
 
 void PuyoLanGameCenter::grantGameToPeer(PeerAddress addr)
 {
-  //mbox.bind(addr);
+    mbox.bind(addr);
     for (int i = 0, j = listeners.size() ; i < j ; i++) {
         listeners[i]->gameGrantedWithMessagebox(&mbox);
     }
