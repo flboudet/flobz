@@ -43,32 +43,45 @@ PuyoLanGameCenter::PuyoLanGameCenter(int portNum, const String name)
 
 void PuyoLanGameCenter::onMessage(Message &msg)
 {
-    printf("Cool, un msg!\n");
-    switch (msg.getInt("CMD")) {
-        case PUYO_UDP_CHAT:
-            for (int i = 0, j = listeners.size() ; i < j ; i++) {
-                listeners[i]->onChatMessage(msg.getString("NAME"), msg.getString("MSG"));
-            }
-            break;
-        case PUYO_UDP_ALIVE:
-            {
-                Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-                connectPeer(dir.getPeerAddress(), msg.getString("NAME"));
-            }
-            break;
-        case PUYO_UDP_DISCONNECT:
-            {
-                Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-                disconnectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"));
-            }
-            break;
-        default:
-            break;
+    try {
+      switch (msg.getInt("CMD")) {
+      case PUYO_UDP_CHAT:
+	for (int i = 0, j = listeners.size() ; i < j ; i++) {
+	  listeners[i]->onChatMessage(msg.getString("NAME"), msg.getString("MSG"));
+	}
+	break;
+      case PUYO_UDP_ALIVE: {
+	  Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
+	  connectPeer(dir.getPeerAddress(), msg.getString("NAME"));
+        }
+	break;
+        case PUYO_UDP_DISCONNECT: {
+           Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
+	   disconnectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"));
+	}
+	break;
+      default:
+	break;
+      }
+    }
+    catch (Exception e) {
     }
 }
 
 void PuyoLanGameCenter::sendMessage(const String msgText)
 {
+  for (int i = 0, j = getPeerCount() ; i < j ; i++) {
+    Message *msg = mbox.createMessage();
+    Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
+    dirMsg->setPeerAddress(getPeerAddressAtIndex(i));
+
+    msg->addBoolProperty("RELIABLE", true);
+    msg->addInt("CMD", PUYO_UDP_CHAT);
+    msg->addString("NAME", name);
+    msg->addString("MSG", msgText);
+    msg->send();
+    delete msg;
+  }
 }
 
 void PuyoLanGameCenter::idle()
