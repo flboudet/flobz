@@ -260,6 +260,7 @@ namespace gameui {
       Widget *previousWidget;
       double slideStartTime;
       double currentTime;
+      double slidingOffset;
       IIM_Surface *bg;
       bool sliding;
   };

@@ -555,7 +555,7 @@ namespace gameui {
     : IdleComponent()
     , ZBox(loop)
     , contentWidget(NULL), previousWidget(NULL)
-    , currentTime(0), slideStartTime(0)
+    , currentTime(0.0), slideStartTime(0.0), slidingOffset(0.0)
     , sliding(false), bg(NULL)
     {
     }
@@ -565,7 +565,7 @@ namespace gameui {
     if (bg != NULL)
     {
       IIM_Rect rect;
-      rect.x = (Sint16)getPosition().x;
+      rect.x = (Sint16)(getPosition().x+slidingOffset);
       rect.y = (Sint16)getPosition().y;
       IIM_BlitSurface(bg, NULL, screen, &rect);
     }
@@ -590,7 +590,7 @@ namespace gameui {
 
   void SliderContainer::idle(double currentTime)
   {
-    static const double slidingTime = .3;
+    static const double slidingTime = 1.5;
     this->currentTime = currentTime;
 
     if (!sliding) return;
@@ -603,36 +603,35 @@ namespace gameui {
       if (contentWidget != NULL)
         contentWidget->addToGameLoop(getGameLoop());
       sliding = false;
+      slidingOffset = 0.0;
       return;
     }
 
-    double coef1 = t / slidingTime - 0.4;
-    double coef2 = t / slidingTime + 0.4;
-
-    if (coef1 < 0.) coef1 = 0.;
-    if (coef2 > 1.) coef2 = 1.;
-
     Vec3 pos1 = getPosition();
-    Vec3 siz1 = getSize();
-    pos1.x += 5;
-    pos1.y += 5;
-    siz1.x -= 10;
-    siz1.y -= 10;
     Vec3 pos2 = pos1;
-    Vec3 siz2 = siz1;
-    
-    double shrink1 = coef1 * siz1.y;
-    double shrink2 = coef2 * siz1.y;
-    
-    pos1.y = pos1.y + (siz1.y - shrink1) / 2.;
-    pos2.y = pos2.y + shrink2 / 2.;
-    siz1.y = shrink1;
-    siz2.y = siz2.y - shrink2;
 
+    double distance = getSize().x;
+    double halftime = slidingTime*0.5;
+    if (t<halftime)
+    {
+      double stime = t*t;
+      double shtime = halftime*halftime;
+      slidingOffset = distance*stime/shtime;
+      pos1.x += distance;
+      pos2.x += slidingOffset;
+    }
+    else
+    {
+      double stime = (slidingTime-t)*(slidingTime-t);
+      double shtime = halftime*halftime;
+      slidingOffset = distance*stime/shtime;
+      pos2.x += distance;
+      pos1.x += slidingOffset;
+    }
+
+    requestDraw();
     contentWidget->setPosition(pos1);
-    contentWidget->setSize(siz1);
     previousWidget->setPosition(pos2);
-    previousWidget->setSize(siz2);
   }
 
   //
