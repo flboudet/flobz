@@ -33,7 +33,7 @@ namespace ios_fc {
 class UDPMessageBox;
 class UDPRawMessage;
 
-class UDPMessageBox : public MessageBox, SessionManager {
+class UDPMessageBox : public MessageBox, public SessionManager {
 public:
     UDPMessageBox(String address, int localPort, int remotePort);
     UDPMessageBox(DatagramSocket *socket);
