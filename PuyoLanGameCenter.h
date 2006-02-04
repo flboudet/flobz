@@ -32,21 +32,26 @@
 
 using namespace ios_fc;
 
-class PuyoLanGameCenter : public PuyoNetGameCenter, public MessageListener {
+class PuyoLanGameCenter : public PuyoNetGameCenter, public MessageListener, public SessionListener {
 public:
     PuyoLanGameCenter(int portNum, const String name);
     void sendMessage(const String msgText);
     void idle();
     void onMessage(Message &msg);
+    void onPeerConnect(const PeerAddress &address) {}
+    void onPeerDisconnect(const PeerAddress &address);
 protected:
     void requestGameWithPeer(String playerName, PeerAddress addr);
     void acceptInvitationWithPeer(String playerName, PeerAddress addr);
     void cancelGameWithPeer(String playerName, PeerAddress addr);
 private:
     void sendAliveMessage();
+    void grantGameToPeer(PeerAddress addr);
     DatagramSocket socket;
     UDPMessageBox mbox;
     const String name;
+    bool gameGranted;
+    PeerAddress grantedAddr;
 };
 
 #endif // _PUYOLANGAMECENTER_H
