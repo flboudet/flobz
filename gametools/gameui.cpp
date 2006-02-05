@@ -1,4 +1,5 @@
 #include "gameui.h"
+#include "../audio.h"
 
 namespace gameui {
 
@@ -558,7 +559,13 @@ namespace gameui {
     , currentTime(0.0), slideStartTime(0.0), slidingOffset(0.0)
     , sliding(false), bg(NULL)
     {
+      slidingOffset = getPosition().x;
     }
+  
+  void SliderContainer::eventOccured(GameControlEvent *event)
+  {
+    if ( !(sliding && slideout)) ZBox::eventOccured(event);
+  }
   
   void SliderContainer::draw(SDL_Surface *screen)
   {
@@ -575,65 +582,130 @@ namespace gameui {
   void SliderContainer::transitionToContent(Widget *content)
   {
     if (sliding)
-      return;
-    previousWidget = contentWidget;
+    {
+      if (slideout)
+      {
+        previousWidget->lostFocus();
+        previousWidget->removeFromGameLoopActive();
+        remove(previousWidget);          
+        if (contentWidget != NULL)
+        {
+          add(contentWidget);
+          contentWidget->addToGameLoop(getGameLoop());
+        }
+      }
+    }
+      
     slideStartTime = currentTime;
-    if (contentWidget)
-      contentWidget->lostFocus();
+    previousWidget = contentWidget;
     contentWidget = content;
-    add(contentWidget);
-    sliding = true;
-
-    if (previousWidget) previousWidget->removeFromGameLoopActive();
-    if (contentWidget) contentWidget->removeFromGameLoopActive();
+    if (previousWidget != NULL)
+    {
+      sliding = true;
+      slideout= true;
+      previousWidget->lostFocus();
+      AudioManager::playSound("whop.wav", .1);
+      //previousWidget->removeFromGameLoopActive();
+    }
+    else
+    {
+      if (contentWidget != NULL)
+      {
+        sliding = true;
+        slideout= false;
+        add(contentWidget);
+        contentWidget->addToGameLoop(getGameLoop());
+        AudioManager::playSound("whip.wav", .1);
+      }
+      else
+      {
+        sliding = false;
+        /* Maybe should move myself out here... */
+      }
+    }
   }
 
   void SliderContainer::idle(double currentTime)
   {
-    static const double slidingTime = 0.5;
+    static const double slidingTime = .4;
+    double oldtime = this->currentTime - slideStartTime;
+    
     this->currentTime = currentTime;
-
+    
     if (!sliding) return;
+    
     double t = (currentTime - slideStartTime);
     
-    if ((previousWidget == NULL) || (t > slidingTime) || (contentWidget == NULL) || (t < 0.))
+    if (t > slidingTime) // At end of sliding period
     {
-      if (previousWidget != NULL)
-        ZBox::remove(previousWidget);
-      if (contentWidget != NULL)
-        contentWidget->addToGameLoop(getGameLoop());
-      sliding = false;
-      slidingOffset = 0.0;
-      return;
-    }
+      if (slideout) // If the previous widget has gone
+      {
+        // Then remove it once for all
+        remove(previousWidget);
+        /* Maybe should move myself out here... */
 
+        if (contentWidget != NULL) // there is a new widget to show
+        {
+          // Then slide in the new widget
+          t = 0;
+          slideStartTime = currentTime;
+          slideout = false;
+          add(contentWidget);
+          contentWidget->addToGameLoop(getGameLoop());
+          AudioManager::playSound("whip.wav", .1);
+        }
+        else // Stop here
+        {
+          sliding = false;
+          /* Maybe should move myself out here... */
+          return;
+        }
+      }
+      else // The new widget is here
+      {
+        sliding = false;
+        /* Maybe should move myself in here... */
+        return;
+      }
+    }
+    
+    //previousWidget->removeFromGameLoopActive();
+    //contentWidget->addToGameLoop(getGameLoop());
+    //giveFocusToActiveWidget();
+    
+    //Widget * slidingWidget = slideout ? previousWidget : contentWidget;
+    
     Vec3 pos1 = getPosition();
     Vec3 pos2 = pos1;
-
+    
     double distance = getSize().x;
-    double halftime = slidingTime*0.5;
-    if (t<halftime)
+    IdleComponent * idle = NULL;
+        
+    if (slideout)
     {
       double stime = t*t;
-      double shtime = halftime*halftime;
+      double shtime = slidingTime*slidingTime;
       slidingOffset = distance*stime/shtime;
       pos1.x += distance;
       pos2.x += slidingOffset;
+      //if (previousWidget != NULL) idle = previousWidget->getIdleComponent();
     }
     else
     {
       double stime = (slidingTime-t)*(slidingTime-t);
-      double shtime = halftime*halftime;
+      double shtime = slidingTime*slidingTime;
       slidingOffset = distance*stime/shtime;
       pos2.x += distance;
       pos1.x += slidingOffset;
+      //idle = contentWidget->getIdleComponent();
     }
-
+    
     requestDraw();
-    contentWidget->setPosition(pos1);
-    previousWidget->setPosition(pos2);
+    if (contentWidget  != NULL) contentWidget->setPosition(pos1);
+    if (previousWidget != NULL) previousWidget->setPosition(pos2);
+    if (idle != NULL) idle->idle(currentTime);
   }
-
+  
   //
   // HScrollList
   //
@@ -901,8 +973,10 @@ namespace gameui {
   void Text::idle(double currentTime)
   {
     if (mdontMove) return;
-    offsetX = 5. * (sin(getPosition().x) + sin(getPosition().y + currentTime));
-    offsetY = 2. * (cos(getPosition().x+1) + sin(getPosition().y - currentTime * 1.1));
+    offsetX = 5. * cos(currentTime);
+    offsetY = 2. * sin(currentTime);
+    //offsetX = 5. * (sin(getPosition().x) + sin(getPosition().y + currentTime));
+    //offsetY = 2. * (cos(getPosition().x+1) + sin(getPosition().y - currentTime * 1.1));
     requestDraw();
   }
 

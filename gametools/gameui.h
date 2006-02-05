@@ -254,6 +254,7 @@ namespace gameui {
     protected:
       // Implements Widget
       virtual void draw(SDL_Surface *screen);
+      void eventOccured(GameControlEvent *event);
 
     private:
       Widget *contentWidget;
@@ -263,6 +264,7 @@ namespace gameui {
       double slidingOffset;
       IIM_Surface *bg;
       bool sliding;
+      bool slideout;
   };
 
   class Screen : public DrawableComponent, public IdleComponent {
