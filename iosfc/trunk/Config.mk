@@ -12,8 +12,9 @@ endif
 
 ifneq (, $(findstring CYGWIN, $(PLATFORM)))
   PLATFORMTYPE=WIN32
+  CXXFLAGS:=${CXXFLAGS} -mno-cygwin
 endif
 
 ifeq ($(PLATFORMTYPE), WIN32)
-  CXXFLAGS:=${CXXFLAGS} -mno-cygwin -DWIN32
+  CXXFLAGS:=${CXXFLAGS} -DWIN32
 endif
