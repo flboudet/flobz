@@ -80,9 +80,6 @@ namespace gameui {
       virtual void show();
       bool isVisible() const { return !hidden; }
 
-      virtual bool hasFocus() const { return false; }
-/*      virtual void event(const GameControlEvent &event) const    { } */
-
       virtual Vec3 getPreferedSize() const               { return preferedSize; }
       virtual void setPreferedSize(const Vec3 &v3)       { preferedSize = v3;   }
 
@@ -311,6 +308,7 @@ namespace gameui {
       void setValue(String value);
       String getValue() const { return label; }
       void setFont(SoFont *newFont) { font = newFont; }
+      void boing(void);
 
       // Implements IdleComponent
       virtual void idle(double currentTime);
@@ -319,11 +317,13 @@ namespace gameui {
     protected:
       void draw(SDL_Surface *screen);
       SoFont *font;
+      bool startMoving;
       
     private:
       String label;
-      double offsetX;
-      double offsetY;
+      Vec3 offset;
+      double startTime;
+      bool moving;
 
     public:
       bool mdontMove;
@@ -343,7 +343,6 @@ namespace gameui {
     private:
       SoFont *fontActive;
       SoFont *fontInactive;
-
       void init(SoFont *fontActive, SoFont *fontInactive);
   };
   

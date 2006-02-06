@@ -13,7 +13,7 @@ ENABLE_AUDIO=true
 ENABLE_OPENGL=true
 ENABLE_DGA=false
 
-DEBUG_MODE=true
+DEBUG_MODE=false
 MORE_DEBUG=false
 ENABLE_PCH=false
 

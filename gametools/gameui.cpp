@@ -941,19 +941,21 @@ namespace gameui {
   // 
 
   Text::Text()
-    : label(""), mdontMove(true)
+    : label(""), mdontMove(true), offset(0.0,0.0,0.0)
   {
       this->font = GameUIDefaults::FONT_TEXT;
       setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
-      offsetX = offsetY = 0.;
+      moving = false;
+      startMoving = false;
   }
     
   Text::Text(const String &label, SoFont *font)
-    : font(font), label(label), mdontMove(true)
+    : font(font), label(label), mdontMove(true), offset(0.0,0.0,0.0)
     {
       if (font == NULL) this->font = GameUIDefaults::FONT_TEXT;
       setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
-      offsetX = offsetY = 0.;
+      moving = false;
+      startMoving = false;
     }
 
   void Text::setValue(String value)
@@ -967,19 +969,44 @@ namespace gameui {
 
   void Text::draw(SDL_Surface *screen)
   {
-    if (isVisible()) SoFont_PutString(font, screen, (int)(offsetX + getPosition().x), (int)(offsetY + getPosition().y), (const char*)label, NULL);
+    if (isVisible()) SoFont_PutString(font, screen, (int)(offset.x + getPosition().x), (int)(offset.y + getPosition().y), (const char*)label, NULL);
   }
 
   void Text::idle(double currentTime)
   {
-    if (mdontMove) return;
-    offsetX = 5. * cos(currentTime);
-    offsetY = 2. * sin(currentTime);
-    //offsetX = 5. * (sin(getPosition().x) + sin(getPosition().y + currentTime));
-    //offsetY = 2. * (cos(getPosition().x+1) + sin(getPosition().y - currentTime * 1.1));
+    static const double duration = 1.5;
+    static const double bounces = 10.0;
+    static const double omega = bounces * 3.1415 / duration;
+    
+
+    if (startMoving)
+    {
+      moving = true;
+      startMoving = false;
+      startTime = currentTime;
+    }
+    
+    if (mdontMove || !moving) return;
+
+    double t = currentTime - startTime;
+        
+    if (t>duration)
+    {
+      moving = false;
+      offset.x = 0.0;
+    }
+//    else offset.x = getSize().x * 0.5 * sin(omega * t) * (1.0-t/duration);
+    else offset.x = 50.0 * sin(omega * t) * ((1.0/(t+1.0)) - (1.0/(duration+1.0)));
+    
     requestDraw();
   }
 
+  void Text::boing()
+  {
+    startMoving = true;
+    AudioManager::playSound("slide.wav", .1);
+  }
+  
   //
   // Button
   // 
@@ -1046,6 +1073,7 @@ namespace gameui {
 
 
   void Button::giveFocus() {
+    if (!haveFocus()) boing();
     Text::giveFocus();
     font = fontActive;
     requestDraw();
