@@ -24,6 +24,24 @@
 
 namespace ios_fc {
 
+  class WS2Initializer {
+  public:
+    WS2Initializer()
+    {
+      WORD wVersionRequested = MAKEWORD(2, 2);
+      WSADATA wsaData;
+      int err = WSAStartup(wVersionRequested, &wsaData);
+      if (err != 0) {
+	throw Exception("WS2Initializer: Unable to initialize!");
+      }
+    }
+    ~WS2Initializer()
+    {
+      WSACleanup();
+    }
+  };
+  WS2Initializer singletonInitializer;
+
 Win32SocketAddressImpl::Win32SocketAddressImpl(String hostName)
 {
     struct hostent *ht;
@@ -39,9 +57,10 @@ Win32SocketAddressImpl::Win32SocketAddressImpl(unsigned long address) : address(
 {
 }
 
-bool Win32SocketAddressImpl::operator == (const SocketAddressImpl &) const
+bool Win32SocketAddressImpl::operator == (const SocketAddressImpl &a) const
 {
-    return true;
+    const Win32SocketAddressImpl &comp = dynamic_cast<const Win32SocketAddressImpl &>(a);
+    return (address == comp.address);
 }
 
 String Win32SocketAddressImpl::asString() const
