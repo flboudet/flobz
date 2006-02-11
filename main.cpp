@@ -9,6 +9,8 @@
 #endif
 
 #include "PuyoCommander.h"
+#include "ios_exception.h"
+#include "ios_memory.h"
 
 #ifndef DATADIR
 char *DATADIR = "data";
@@ -46,6 +48,13 @@ bool fileExists(char *path)
     return true;
 }
 
+
+static void displayExceptionMessage(const char * msg)
+{
+  cout << "Sorry, an unhandled exception occured. Giving up." << endl;
+  cout << msg << endl;
+  cout << "You can report this problem to ios@ios-software.com" << endl;
+}
 
 int main(int argc, char *argv[])
 {
@@ -93,6 +102,11 @@ int main(int argc, char *argv[])
     }
     
     PuyoCommander commander( fs, snd, fx );
-    commander.run();
+    
+    try { commander.run(); }
+    catch (Exception e) { displayExceptionMessage(e.what()); }
+    catch (char * str) { displayExceptionMessage(str); }
+    catch (String str) { displayExceptionMessage(str); }
+    catch (...) { displayExceptionMessage("The exception is unknown."); }
     return 0;
 }
