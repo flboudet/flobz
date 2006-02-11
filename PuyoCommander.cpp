@@ -246,18 +246,13 @@ void PuyoCommander::initAudio()
 #ifdef USE_AUDIO
   DBG_PRINT("initAudio()\n");
   int music_volume = GetIntPreference(kMusicVolume, 100);
-  int sound_volume = GetIntPreference(kAudioVolume, 80);
+  int sound_volume = GetIntPreference(kAudioVolume, 100);
 
   AudioManager::init((std::string(dataFolder) + "/sfx").c_str());
-  /*
-     audio_music_start(0);
-     if (sound==false) Mix_PauseMusic();
-     */
+  AudioManager::musicVolume(((float)music_volume)/100.0);
+  AudioManager::soundVolume(((float)sound_volume)/100.0);
   AudioManager::musicOnOff(sound);
   AudioManager::soundOnOff(fx);
-
-  AudioManager::musicVolume(music_volume);
-  AudioManager::soundVolume(sound_volume);
 #endif
 }
 
@@ -358,12 +353,14 @@ void PuyoCommander::loadPreferences(bool fs, bool snd, bool audio)
 {  
   DBG_PRINT("loadPreferences()\n");
   /* Load Preferences */
-  fullscreen = GetBoolPreference(kFullScreen, fs);
+  fullscreen = fs ? GetBoolPreference(kFullScreen, true) : false;
 #ifdef HAVE_OPENGL
   useGL      = GetBoolPreference(kOpenGL,false);
 #endif
-  sound = GetBoolPreference(kMusic,snd);
-  fx = GetBoolPreference(kAudioFX,audio);
+  sound = snd?GetBoolPreference(kMusic,true):false;
+  cout << (sound?"Music":"No Music") <<endl;
+  fx = audio?GetBoolPreference(kAudioFX,true):false;
+  cout << (fx?"SFX":"No SFX") <<endl;
 }
 
 void PuyoCommander::onMessage(Message &msb) {}
