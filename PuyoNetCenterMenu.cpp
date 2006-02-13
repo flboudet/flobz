@@ -299,6 +299,7 @@ void NetCenterMenu::gameGrantedWithMessagebox(MessageBox *mbox)
 {
     PuyoNetworkTwoPlayerGameWidgetFactory *factory = new PuyoNetworkTwoPlayerGameWidgetFactory(*mbox);
     TwoPlayersStarterAction *starterAction = new TwoPlayersStarterAction(0, *factory);
+    
     starterAction->action();
     
     if (this->onScreenDialog != NULL) {
@@ -306,6 +307,7 @@ void NetCenterMenu::gameGrantedWithMessagebox(MessageBox *mbox)
         delete(onScreenDialog);
         onScreenDialog = NULL;
     }
+    
     //PuyoStarter *starter = new PuyoNetworkStarter(theCommander, 0, mbox);
     //starter->run(0,0,0,0,0);
     //GameUIDefaults::SCREEN_STACK->push(starter);

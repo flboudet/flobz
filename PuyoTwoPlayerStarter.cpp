@@ -135,7 +135,10 @@ void TwoPlayersStarterAction::restartGame()
 void TwoPlayersStarterAction::endGameSession()
 {
     GameUIDefaults::SCREEN_STACK->pop();
-    ((PuyoRealMainScreen *)(GameUIDefaults::SCREEN_STACK->top()))->transitionFromScreen(*gameScreen);
+    PuyoRealMainScreen *menuScreen = dynamic_cast<PuyoRealMainScreen *>(GameUIDefaults::SCREEN_STACK->top());
+    if (menuScreen != NULL)
+        menuScreen->transitionFromScreen(*gameScreen);
+        
     delete gameWidget;
     delete gameScreen;
     

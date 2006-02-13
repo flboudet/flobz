@@ -57,13 +57,13 @@ PuyoNetworkGameWidget::~PuyoNetworkGameWidget()
 
 void PuyoNetworkGameWidget::cycle()
 {
+    mbox.idle();
     if (!syncMsgSent) {
         sendSyncMsg();
         syncMsgSent = true;
     }
     if (syncMsgReceived)
         PuyoGameWidget::cycle();
-    mbox.idle();
 }
 
 void PuyoNetworkGameWidget::onMessage(Message &message)
