@@ -47,6 +47,7 @@ private:
     
     IgpMessageBox mbox;
     const String name;
+    double timeMsBetweenTwoAliveMessages, lastAliveMessage;
     bool gameGranted;
     PeerAddress grantedAddr;
 };

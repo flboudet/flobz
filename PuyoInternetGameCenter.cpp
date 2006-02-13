@@ -25,11 +25,13 @@
 
 #include "PuyoInternetGameCenter.h"
 #include "PuyoIgpDefs.h"
+#include "ios_time.h"
 
 using namespace ios_fc;
 
 PuyoInternetGameCenter::PuyoInternetGameCenter(const String hostName, int portNum, const String name)
-  : mbox(hostName, portNum), name(name), gameGranted(false)
+  : mbox(hostName, portNum), name(name),
+    timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages), gameGranted(false)
 {
     mbox.addListener(this);
     sendAliveMessage();
@@ -121,9 +123,10 @@ void PuyoInternetGameCenter::idle()
       return;
     }
     mbox.idle();
-    if (idleCount++ == 50) { // a revoir
-        idleCount = 0;
+    double time_ms = getTimeMs();
+    if ((time_ms - lastAliveMessage) >= timeMsBetweenTwoAliveMessages) {
         sendAliveMessage();
+        lastAliveMessage = time_ms;
     }
     PuyoNetGameCenter::idle();
 }

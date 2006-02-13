@@ -127,6 +127,7 @@ void PuyoLanGameCenter::idle()
         sendAliveMessage();
         lastAliveMessage = time_ms;
     }
+    PuyoNetGameCenter::idle();
 }
 
 void PuyoLanGameCenter::sendAliveMessage()
