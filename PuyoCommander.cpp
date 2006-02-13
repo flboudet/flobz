@@ -23,6 +23,9 @@ SoFont *storyFont;
 #define WIDTH  640
 #define HEIGHT 480
 
+static const char * kFullScreenPref = "Config.FullScreen";
+static const char * kOpenGLPref     = "Config.OpenGL";
+
 /*
  * MENU ACTIONS
  */
@@ -187,14 +190,14 @@ void PuyoCommander::initMenus()
 
 /* Build the PuyoCommander */
 
-PuyoCommander::PuyoCommander(bool fs, bool snd, bool audio)
+PuyoCommander::PuyoCommander(bool fs)
 {
   //SDL_Delay(500);
   loop = GameUIDefaults::GAME_LOOP;
   mbox = NULL;
   theCommander = this;
 
-  loadPreferences(fs, snd, audio);
+  loadPreferences(fs);
   initSDL();
   initGameControls();
   initAudio();
@@ -245,14 +248,7 @@ void PuyoCommander::initAudio()
 {
 #ifdef USE_AUDIO
   DBG_PRINT("initAudio()\n");
-  int music_volume = GetIntPreference(kMusicVolume, 100);
-  int sound_volume = GetIntPreference(kAudioVolume, 100);
-
   AudioManager::init((std::string(dataFolder) + "/sfx").c_str());
-  AudioManager::musicVolume(((float)music_volume)/100.0);
-  AudioManager::soundVolume(((float)sound_volume)/100.0);
-  AudioManager::musicOnOff(sound);
-  AudioManager::soundOnOff(fx);
 #endif
 }
 
@@ -301,27 +297,29 @@ void PuyoCommander::initFonts()
 
 void PuyoCommander::setMusic(bool music)
 {
-    if (music != this->sound) {
-        this->sound = music;
-        SetBoolPreference(kMusic, music);
-        AudioManager::musicOnOff(music);
-    }
+  AudioManager::musicOnOff(music);
 }
     
 void PuyoCommander::setSoundFx(bool fx)
 {
-    if (fx != this->fx) {
-        this->fx = fx;
-        SetBoolPreference(kAudioFX, fx);
-        AudioManager::soundOnOff(fx);
-    }
+  AudioManager::soundOnOff(fx);
+}
+
+bool PuyoCommander::getMusic()
+{
+  return AudioManager::isMusicOn();
+}
+
+bool PuyoCommander::getSoundFx()
+{
+  return AudioManager::isSoundOn();
 }
 
 void PuyoCommander::setFullScreen(bool fullScreen)
 {
     if (fullScreen != this->fullscreen) {
         this->fullscreen = fullScreen;
-        SetBoolPreference(kFullScreen, fullscreen);
+        SetBoolPreference(kFullScreenPref, fullscreen);
         SDL_QuitSubSystem(SDL_INIT_VIDEO);
         SDL_InitSubSystem(SDL_INIT_VIDEO);
         initDisplay(fullscreen, useGL);
@@ -348,19 +346,15 @@ void PuyoCommander::initDisplay(bool fullscreen, bool useGL)
 }
 
 
-/* load a few important preferences for display and sound initialisation */
-void PuyoCommander::loadPreferences(bool fs, bool snd, bool audio)
+/* load a few important preferences for display */
+void PuyoCommander::loadPreferences(bool fs)
 {  
   DBG_PRINT("loadPreferences()\n");
   /* Load Preferences */
-  fullscreen = fs ? GetBoolPreference(kFullScreen, true) : false;
+  fullscreen = fs ? GetBoolPreference(kFullScreenPref, true) : false;
 #ifdef HAVE_OPENGL
-  useGL      = GetBoolPreference(kOpenGL,false);
+  useGL      = GetBoolPreference(kOpenGLPref,false);
 #endif
-  sound = snd?GetBoolPreference(kMusic,true):false;
-  cout << (sound?"Music":"No Music") <<endl;
-  fx = audio?GetBoolPreference(kAudioFX,true):false;
-  cout << (fx?"SFX":"No SFX") <<endl;
 }
 
 void PuyoCommander::onMessage(Message &msb) {}

@@ -1,12 +1,13 @@
 #include <string.h>
 #include "audio.h"
+#include "preferences.h"
 
 #ifdef USE_AUDIO
- #ifdef MACOSX
-  #include <SDL_mixer.h>
- #else
-  #include <SDL/SDL_mixer.h>
- #endif
+#ifdef MACOSX
+#include <SDL_mixer.h>
+#else
+#include <SDL/SDL_mixer.h>
+#endif
 #endif
 
 #include <vector>
@@ -30,6 +31,11 @@ static bool music_on = false;
 
 static std::string music_current = "";
 #endif
+
+static const char * kMusicVolume = "AudioManager.Music.Volume";
+static const char * kSoundVolume = "AudioManager.FX.Volume";
+static const char * kMusic       = "AudioManager.Music.State";
+static const char * kSound       = "AudioManager.FX.State";
 
 
 template <typename T>
@@ -114,10 +120,12 @@ void AudioManager::init(const char *dataFolder)
 
     Mix_QuerySpec (&audio_rate, &audio_format, &audio_channels);
 
-    sound_on = true;
-    music_on = true;
-    musicVolume(music_volume);
-    soundVolume(sound_volume);
+    music_on = GetBoolPreference(kMusic,true);
+    sound_on = GetBoolPreference(kSound,true);
+
+    music_volume = ((float)GetIntPreference(kMusicVolume, 100))/100.0f;
+    sound_volume = ((float)GetIntPreference(kSoundVolume, 100))/100.0f;
+
 #endif
 }
 
@@ -203,16 +211,16 @@ void AudioManager::preloadMusic(const char *fileName)
 void AudioManager::playMusic(const char *fileName)
 {
 #ifdef USE_AUDIO
-    if (!audio_supported) return;
-
-    if (music_current == fileName) return;
+  if ((!audio_supported) || (music_current == fileName)) return;
     
-    preloadMusic(fileName);
-    Mix_Music *music = musicCache.get(fileName);
-    if (music != NULL) {
-        Mix_HaltMusic();
-        Mix_PlayMusic(music, -1);
-        music_current = fileName;
+    music_current = fileName;
+
+    if (music_on)
+    {
+      preloadMusic(fileName);
+      Mix_Music *music = musicCache.get(fileName);
+      Mix_HaltMusic();
+      if (music != NULL) Mix_PlayMusic(music, -1);
     }
 #endif
 }
@@ -257,8 +265,9 @@ void AudioManager::musicVolume(float volume)
     {
         Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * volume));
     }
-    
     music_volume = volume;
+
+    SetIntPreference(kMusicVolume, (int)(volume*100.0f));
 #endif
 }
 
@@ -268,54 +277,54 @@ void AudioManager::soundVolume(float volume)
     if (!audio_supported) return;
 
     if (sound_on)
+    {
         Mix_Volume (-1, (int) ((float)MIX_MAX_VOLUME * volume));
-    
+    }
     sound_volume = volume;
+
+    SetIntPreference(kSoundVolume, (int)(volume*100.0f));
 #endif
 }
 
 void AudioManager::musicOnOff(bool state)
 {
 #ifdef USE_AUDIO
-  if (!audio_supported) return;
+  if ((!audio_supported) || (music_on == state)) return;
 
-  if (state)
-  {
-    Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume));
-    if (Mix_PausedMusic()) Mix_ResumeMusic();
-    else
-    {
-      while (Mix_FadingMusic() == MIX_FADING_OUT) SDL_Delay(100);
-    }
-    if (musicCache.get(music_current))
-      Mix_FadeInMusic (musicCache.get(music_current), -1, 1000);
-  }
-  else {
-    if (Mix_PlayingMusic())
-    {
-      while (Mix_FadingMusic() == MIX_FADING_IN) SDL_Delay(100);
-      Mix_FadeOutMusic (1000);
-    }
-    else Mix_VolumeMusic (0);
-  }
   music_on = state;
 
+  if (music_on)
+  {
+    musicVolume(music_volume);
+    int lenght = music_current.size();
+    char tmp[lenght+1];
+    music_current.copy(tmp,lenght,0);
+    playMusic(tmp);
+  }
+  else
+  {
+    Mix_HaltMusic();
+  }
+  SetBoolPreference(kMusic, music_on);
 #endif
 }
 
 void AudioManager::soundOnOff(bool state)
 {
 #ifdef USE_AUDIO
-  if (!audio_supported) return;
+  if ((!audio_supported) || (sound_on == state)) return;
   
-  if (state)
-  {
-		Mix_Volume (-1, (int) ((float)MIX_MAX_VOLUME * sound_volume));
-  }
-  else
-  {
-    Mix_Volume (-1, 0);
-  }
   sound_on = state;
+  SetBoolPreference(kMusic, sound_on);
 #endif
+}
+
+bool AudioManager::isMusicOn()
+{
+  return music_on;
+}
+
+bool AudioManager::isSoundOn()
+{
+  return sound_on;
 }

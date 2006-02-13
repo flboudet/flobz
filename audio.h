@@ -6,23 +6,27 @@
 class AudioManager
 {
   public:
-    static void init(const char *dataFolder);
-    static void close();
-    
-    static void preloadMusic(const char *fileName);
-    static void playMusic(const char *fileName);
-    static void clearMusicCache();
 
-    static void preloadSound(const char *sName, float volume);
-    static void playSound(const char *sName, float volume = 1.0, float balance = 0.0f);
-    static void clearSoundCache();
+  static void init(const char *dataFolder);
+  static void close();
+  
+  static void preloadMusic(const char *fileName);
+  static void playMusic(const char *fileName);
+  static void clearMusicCache();
 
-    // volume in [0,1] interval
-    static void musicVolume(float volume);
-    static void soundVolume(float volume);
+  static void preloadSound(const char *sName, float volume);
+  static void playSound(const char *sName, float volume = 1.0, float balance = 0.0f);
+  static void clearSoundCache();
 
-    static void musicOnOff(bool state);
-    static void soundOnOff(bool state);
+  // volume in [0,1] interval
+  static void musicVolume(float volume);
+  static void soundVolume(float volume);
+
+  static void musicOnOff(bool state);
+  static void soundOnOff(bool state);
+
+  static bool isMusicOn();
+  static bool isSoundOn();
 };
 
 

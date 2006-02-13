@@ -62,8 +62,6 @@ int main(int argc, char *argv[])
     
   if (!strcmp(argv[argc-1],"-h")) {
       printf("-win for windowed mode.\n");
-      printf("-quiet to remove music.\n");
-      printf("-nofx to remove sound FX.\n");
     return 0;
   }
     
@@ -86,22 +84,16 @@ int main(int argc, char *argv[])
 #endif
  
     bool fs = true;
-    bool snd = true;
-    bool fx = true;
     
     for (i=1; i<argc; i++)
     {
         if (strcmp(argv[i],"-win") == 0) fs = false;
-        if (strcmp(argv[i],"-quiet") == 0) snd = false;
-        if (strcmp(argv[i],"-nofx") == 0) fx = false;
     }
     
     setDataFolder("data");
-    if (!fileExists("data/gfx")) {
-        setDataFolder(DATADIR);
-    }
+    //printf("Datafolder set to %s\n", getDataFolder());
     
-    PuyoCommander commander( fs, snd, fx );
+    PuyoCommander commander( fs );
     
     try { commander.run(); }
     catch (Exception e) { displayExceptionMessage(e.what()); }

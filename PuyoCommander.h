@@ -1,14 +1,6 @@
 #ifndef _PUYOCOMMANDER
 #define _PUYOCOMMANDER
 
-/*
-#include "sofont.h"
-#include "menu.h"
-#include "scrollingtext.h"
-#include "GameControls.h"
-#include "PuyoDoomMelt.h"
-*/
-
 #include "ios_udpmessagebox.h"
 #include "ios_igpmessagebox.h"
 #include "gameui.h"
@@ -81,33 +73,18 @@ private:
 class PuyoCommander : public MessageListener
 {
   public:
-    PuyoCommander(bool fullscreen, bool sound, bool audio);
+    PuyoCommander(bool fullscreen);
     void run();
-
-    /*
-       bool changeControlLoop(int controlIndex, PuyoDrawable *starter);
-       void controlsMenuLoop(PuyoDrawable *d);
-       void optionMenuLoop(PuyoDrawable *d = NULL);
-       void backLoop(Menu *menu, PuyoDrawable *starter = NULL);
-       void startSingleGameLoop();
-       void startTwoPlayerGameLoop();
-       void startNetGameLoop();
-       void startLANGame(int level, const char *playerName, const char *ipAddress);
-       void startInternetGame(int level, const char *playerName, const char *ipAddress, int portID, int playerIgpIdent, int opponentIgpIdent);
-       void enterStringLoop(Menu *menu, const char *kItem, char out[256], int maxlen = 10);
-       */
     void onMessage(Message &message);
-    // void updateHighScoresMenu(int newOne = -1);
 
     SoFont *smallFont;
     SoFont *smallFontInfo;
     SoFont *darkFont;
     SoFont *menuFont;
-    // DoomMelt *melt;
 
-    bool getMusic() const { return sound; }
+    bool getMusic();
     void setMusic(bool music);
-    bool getSoundFx() const { return fx; }
+    bool getSoundFx();
     void setSoundFx(bool fx);
     bool getFullScreen() const { return fullscreen; }
     void setFullScreen(bool fullScreen);
@@ -122,7 +99,7 @@ class PuyoCommander : public MessageListener
     friend class MainMenu;
     friend class NetworkGameMenu;
 
-    void loadPreferences(bool fs, bool snd, bool audio);
+    void loadPreferences(bool fs);
     void initSDL();
     void initAudio();
     void initFonts();
@@ -133,8 +110,6 @@ class PuyoCommander : public MessageListener
 
     PuyoRealMainScreen *mainScreen;
 
-    bool sound;
-    bool fx;
     bool fullscreen;
     bool useGL;
 };
