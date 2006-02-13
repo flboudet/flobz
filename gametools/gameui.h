@@ -252,7 +252,8 @@ namespace gameui {
       // Implements Widget
       virtual void draw(SDL_Surface *screen);
       void eventOccured(GameControlEvent *event);
-
+      void endSlideInside(bool inside);
+      
     private:
       Widget *contentWidget;
       Widget *previousWidget;

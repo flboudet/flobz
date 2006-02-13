@@ -567,6 +567,28 @@ namespace gameui {
     if ( !(sliding && slideout)) ZBox::eventOccured(event);
   }
   
+  void SliderContainer::endSlideInside(bool inside)
+  {
+    Vec3 pos1 = getPosition();
+    Vec3 pos2 = pos1;
+    
+    sliding = false;
+    double distance = getSize().x;
+    if (inside)
+    {
+      pos2.x += distance;
+      slidingOffset = 0.0;
+    }
+    else
+    {
+      pos1.x += distance;
+      slidingOffset = distance;
+    }
+    if (contentWidget  != NULL) contentWidget->setPosition(pos1);
+    if (previousWidget != NULL) previousWidget->setPosition(pos2);
+    requestDraw();
+  }
+  
   void SliderContainer::draw(SDL_Surface *screen)
   {
     if (bg != NULL)
@@ -605,7 +627,6 @@ namespace gameui {
       slideout= true;
       previousWidget->lostFocus();
       AudioManager::playSound("whop.wav", .1);
-      //previousWidget->removeFromGameLoopActive();
     }
     else
     {
@@ -619,8 +640,7 @@ namespace gameui {
       }
       else
       {
-        sliding = false;
-        /* Maybe should move myself out here... */
+        endSlideInside(false);
       }
     }
   }
@@ -642,7 +662,6 @@ namespace gameui {
       {
         // Then remove it once for all
         remove(previousWidget);
-        /* Maybe should move myself out here... */
 
         if (contentWidget != NULL) // there is a new widget to show
         {
@@ -651,35 +670,25 @@ namespace gameui {
           slideStartTime = currentTime;
           slideout = false;
           add(contentWidget);
-          contentWidget->addToGameLoop(getGameLoop());
           AudioManager::playSound("whip.wav", .1);
         }
         else // Stop here
         {
-          sliding = false;
-          /* Maybe should move myself out here... */
+          endSlideInside(false);
           return;
         }
       }
       else // The new widget is here
       {
-        sliding = false;
-        /* Maybe should move myself in here... */
+        endSlideInside(true);
         return;
       }
     }
-    
-    //previousWidget->removeFromGameLoopActive();
-    //contentWidget->addToGameLoop(getGameLoop());
-    //giveFocusToActiveWidget();
-    
-    //Widget * slidingWidget = slideout ? previousWidget : contentWidget;
     
     Vec3 pos1 = getPosition();
     Vec3 pos2 = pos1;
     
     double distance = getSize().x;
-    IdleComponent * idle = NULL;
         
     if (slideout)
     {
@@ -688,7 +697,6 @@ namespace gameui {
       slidingOffset = distance*stime/shtime;
       pos1.x += distance;
       pos2.x += slidingOffset;
-      //if (previousWidget != NULL) idle = previousWidget->getIdleComponent();
     }
     else
     {
@@ -697,13 +705,11 @@ namespace gameui {
       slidingOffset = distance*stime/shtime;
       pos2.x += distance;
       pos1.x += slidingOffset;
-      //idle = contentWidget->getIdleComponent();
     }
     
     requestDraw();
     if (contentWidget  != NULL) contentWidget->setPosition(pos1);
     if (previousWidget != NULL) previousWidget->setPosition(pos2);
-    if (idle != NULL) idle->idle(currentTime);
   }
   
   //
@@ -970,6 +976,7 @@ namespace gameui {
   void Text::draw(SDL_Surface *screen)
   {
     if (isVisible()) SoFont_PutString(font, screen, (int)(offset.x + getPosition().x), (int)(offset.y + getPosition().y), (const char*)label, NULL);
+  //if (moving) printf("draw (%p)\n",this);
   }
 
   void Text::idle(double currentTime)
@@ -977,7 +984,6 @@ namespace gameui {
     static const double duration = 1.5;
     static const double bounces = 10.0;
     static const double omega = bounces * 3.1415 / duration;
-    
 
     if (startMoving)
     {
@@ -988,6 +994,7 @@ namespace gameui {
     
     if (mdontMove || !moving) return;
 
+    //printf("idle (%p)\n",this);
     double t = currentTime - startTime;
         
     if (t>duration)
@@ -995,9 +1002,7 @@ namespace gameui {
       moving = false;
       offset.x = 0.0;
     }
-//    else offset.x = getSize().x * 0.5 * sin(omega * t) * (1.0-t/duration);
     else offset.x = 50.0 * sin(omega * t) * ((1.0/(t+1.0)) - (1.0/(duration+1.0)));
-    
     requestDraw();
   }
 
