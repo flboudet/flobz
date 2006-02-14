@@ -315,7 +315,7 @@ void AudioManager::soundOnOff(bool state)
   if ((!audio_supported) || (sound_on == state)) return;
   
   sound_on = state;
-  SetBoolPreference(kMusic, sound_on);
+  SetBoolPreference(kSound, sound_on);
 #endif
 }
 
