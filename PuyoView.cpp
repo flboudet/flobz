@@ -298,20 +298,32 @@ void PuyoView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNu
         else
             currentPuyo->addAnimation(new NeutralPopAnimation(*currentPuyo, i*2, synchronizer));
     }
-    // A revoir
-    /*
+
     if (groupNum == 0) {
-        if (phase>=2) {
-            audio_sound_play(sound_yahoohoo3[(int)((float)NB_YAHOOHOO3 * random()/(RAND_MAX+1.0))]);
+      static const char * sound_yahoohoo[7] = {
+        NULL, "yahoohoo.wav", "woho.wav", "pastaga.wav",
+        "woho.wav", "woo.wav", "applose.wav"};
+      static const float volume_yahoohoo[7] = {0.0, 0.39, 0.25, 0.55, 0.25, 0.35, 0.70};
+      
+      int index = 0;
+      
+      if (phase>=2)
+      {
+        index = 6;
+      }
+      else
+      {
+        if (phase==1)
+        {
+          index = 4 + (random()/(RAND_MAX>>1));
         }
-        if (phase==1) {
-            audio_sound_play(sound_yahoohoo2[(int)((float)NB_YAHOOHOO2 * random()/(RAND_MAX+1.0))]);
+        else
+        {
+          index = random()/(RAND_MAX>>2);
         }
-        else {
-            audio_sound_play(sound_yahoohoo1[(int)((float)NB_YAHOOHOO1 * random()/(RAND_MAX+1.0))]);
-        }
+      }
+      if (index>1) AudioManager::playSound(sound_yahoohoo[index], volume_yahoohoo[index]);
     }
-    */
 }
 
 void PuyoView::gameDidEndCycle()
