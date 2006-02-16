@@ -124,18 +124,18 @@ bool PuyoEventPlayer::keyShouldRepeat(int &key)
 
 PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
     : CycledComponent(0.02), associatedScreen(NULL), attachedLevelTheme(&levelTheme), areaA(&areaA), areaB(&areaB), controllerA(&controllerA), controllerB(&controllerB),
-      cyclesBeforeGameCycle(50), cyclesBeforeSpeedIncreases(500), cyclesBeforeGameCycleV(cyclesBeforeGameCycle), tickCounts(0), paused(false), displayLives(true), lives(3),
-      gameOverAction(gameOverAction), abortedFlag(false), gameSpeed(20), blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
-      playerOneName(p1name), playerTwoName(p2name)
+      cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(500), tickCounts(0), paused(false), displayLives(true), lives(3),
+      gameOverAction(gameOverAction), abortedFlag(false), gameSpeed(0), blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
+      playerOneName(p1name), playerTwoName(p2name), MinSpeed(10), MaxSpeed(50)
 {
     initialize();
 }
 
 PuyoGameWidget::PuyoGameWidget()
-    : CycledComponent(0.02), associatedScreen(NULL), cyclesBeforeGameCycle(50), cyclesBeforeSpeedIncreases(500), cyclesBeforeGameCycleV(cyclesBeforeGameCycle),
-      tickCounts(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(20),
+    : CycledComponent(0.02), associatedScreen(NULL), cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(500),
+      tickCounts(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(0),
       blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
-      playerOneName(p1name), playerTwoName(p2name)
+      playerOneName(p1name), playerTwoName(p2name), MinSpeed(10), MaxSpeed(50)
 {
 }
 
@@ -186,52 +186,58 @@ PuyoGameWidget::~PuyoGameWidget()
 
 void PuyoGameWidget::cycle()
 {
-    if (!paused) {
-        tickCounts++;
-        
-        // Controls
-        controllerA->cycle();
-        controllerB->cycle();
-        
-        // Animations
-        areaA->cycleAnimation();
-        areaB->cycleAnimation();
-        
-        // Game cycles
-        if (tickCounts % cyclesBeforeGameCycleV  == 0) {
-            areaA->cycleGame();
-            areaB->cycleGame();
-            // Blinking point animation
-            if (attachedGameA->getPoints()/50000 > savePointsA/50000)
-                blinkingPointsA = 10;
-            if (attachedGameB->getPoints()/50000 > savePointsB/50000)
-                blinkingPointsB = 10;
-            
-            if (blinkingPointsA > 0)
-                blinkingPointsA--;
-            if (blinkingPointsB > 0)
-                blinkingPointsB--;
-            
-            savePointsB = attachedGameB->getPoints();
-            savePointsA = attachedGameA->getPoints();
-            
-            if (savePointsA < 50000) blinkingPointsA=0;
-            if (savePointsB < 50000) blinkingPointsB=0;
-            // end of the blinking point animation code
-        }
-        if ((cyclesBeforeSpeedIncreases != -1) && (gameSpeed > 0) && (tickCounts % cyclesBeforeSpeedIncreases == 0)) {
-            gameSpeed--;
-            cyclesBeforeGameCycleV = (int)((float)cyclesBeforeGameCycle * ((float)gameSpeed / 20.));
-        }
-        
-        requestDraw();
+  if (!paused) {
+    tickCounts++;
+    
+    // Controls
+    controllerA->cycle();
+    controllerB->cycle();
+    
+    // Animations
+    areaA->cycleAnimation();
+    areaB->cycleAnimation();
+    
+    // Game cycles
+    if (cyclesBeforeGameCycle == 0) {
+      
+      cyclesBeforeGameCycle =  MaxSpeed + (((MinSpeed-MaxSpeed)*gameSpeed)/20);
+      areaA->cycleGame();
+      areaB->cycleGame();
+      
+      // Blinking point animation
+      if (attachedGameA->getPoints()/50000 > savePointsA/50000)
+        blinkingPointsA = 10;
+      if (attachedGameB->getPoints()/50000 > savePointsB/50000)
+        blinkingPointsB = 10;
+      
+      if (blinkingPointsA > 0)
+        blinkingPointsA--;
+      if (blinkingPointsB > 0)
+        blinkingPointsB--;
+      
+      savePointsB = attachedGameB->getPoints();
+      savePointsA = attachedGameA->getPoints();
+      
+      if (savePointsA < 50000) blinkingPointsA=0;
+      if (savePointsB < 50000) blinkingPointsB=0;
+      // end of the blinking point animation code
     }
-    gameover = (areaA->isGameOver() || areaB->isGameOver());
-    if ((gameover || abortedFlag) && !once) {
-        once = true;
-        if (gameOverAction)
-            gameOverAction->action();
+    
+    cyclesBeforeGameCycle--;
+    
+    if (++tickCounts == cyclesBeforeSpeedIncreases)
+    {
+      tickCounts = 0;
+      if (gameSpeed < 20) gameSpeed++;
     }
+    requestDraw();
+  }
+  gameover = (areaA->isGameOver() || areaB->isGameOver());
+  if ((gameover || abortedFlag) && !once) {
+    once = true;
+    if (gameOverAction)
+      gameOverAction->action();
+  }
 }
 
 void PuyoGameWidget::draw(SDL_Surface *screen)
@@ -277,16 +283,13 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
     SDL_BlitSurface(painter.gameScreen->surf, NULL, screen, NULL);
     
     // Rendering the game speed meter
-    // Should be moved to the painter
-    int gameSpeedCpy = gameSpeed;
-    if (gameSpeed == 1) gameSpeedCpy = 0;
-    
+    // Should be moved to the painter    
     SDL_Rect speedRect;
     IIM_Surface * speedFront = attachedLevelTheme->getSpeedMeter(true);
     IIM_Surface * speedBack  = attachedLevelTheme->getSpeedMeter(false);
     speedRect.x = 0;
     speedRect.w = speedFront->w;
-    speedRect.h = (20 - gameSpeedCpy) * 6;
+    speedRect.h = gameSpeed * 6;
     speedRect.y = speedFront->h - speedRect.h;
     
     SDL_Rect drect;

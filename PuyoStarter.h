@@ -106,8 +106,8 @@ protected:
     PuyoView *areaA, *areaB;
     PuyoPlayer *controllerA, *controllerB;
     PuyoGame *attachedGameA, *attachedGameB;
-    int cyclesBeforeGameCycle, cyclesBeforeSpeedIncreases;
-    int cyclesBeforeGameCycleV;
+    int cyclesBeforeGameCycle;
+    int cyclesBeforeSpeedIncreases; // time between speed increases in units of 20ms
     unsigned int tickCounts;
     bool paused;
     bool displayLives;
@@ -116,7 +116,8 @@ protected:
     Action *gameOverAction;
     bool gameover;
     bool abortedFlag;
-    int gameSpeed;
+    int gameSpeed; // from 0 (MinSpeed) to 20 (MaxSpeed)
+    int MinSpeed,MaxSpeed; // in units of 20ms
     int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
     String playerOneName, playerTwoName;
 };
