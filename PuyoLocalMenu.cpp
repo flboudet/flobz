@@ -30,18 +30,7 @@
 
 const char *LocalGameMenu::getDefaultPlayerName()
 {
-    static char playerName[256];
-
-    char * defaultName = getenv("USER");
-    if (defaultName == NULL)
-      defaultName = "Player";
-    if (!(defaultName[0]>=32))
-      defaultName = "Player";
-    if ((defaultName[0]>='a') && (defaultName[0]<='z'))
-      defaultName[0] += 'A' - 'a';
-    
-    GetStrPreference("Player Name", playerName, defaultName);
-    return playerName;
+    return PuyoGame::getDefaultPlayerName(0);
 }
 
 LocalGameMenu::LocalGameMenu(PuyoRealMainScreen *mainScreen)
@@ -61,23 +50,17 @@ void LocalGameMenu::build() {
 
 String LocalGameMenu::getPlayerName() const
 {
-    String playerName = editPlayerName.getEditField()->getValue();
-    SetStrPreference("Player Name", playerName);
-    return playerName;
+  return PuyoGame::getDefaultPlayerName(0);
 }
 
 const char *Local2PlayersGameMenu::getDefaultPlayer1Name()
 {
-    static char player1Name[256];
-    GetStrPreference("Player1 Name", player1Name, "Player 1");
-    return player1Name;
+  return PuyoGame::getDefaultPlayerName(1);
 }
 
 const char *Local2PlayersGameMenu::getDefaultPlayer2Name()
 {
-    static char player2Name[256];
-    GetStrPreference("Player2 Name", player2Name, "Player 2");
-    return player2Name;
+  return PuyoGame::getDefaultPlayerName(2);
 }
 
 Local2PlayersGameMenu::Local2PlayersGameMenu(PuyoRealMainScreen *mainScreen)

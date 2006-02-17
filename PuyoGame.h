@@ -138,9 +138,13 @@ class PuyoGame {
 public:
     PuyoGame(PuyoFactory *attachedFactory);
     PuyoGame();
+    
     virtual ~PuyoGame() {}
     virtual void setDelegate(PuyoDelegate *delegate);
     virtual void cycle() = 0;
+    
+    static const char * getDefaultPlayerName(int n);
+    static void setDefaultPlayerName(int n, const char * playerName);
     /*  
         // Get the state of the puyo at the indicated coordinates
         PuyoState getPuyoCellAt(int X, int Y) const;

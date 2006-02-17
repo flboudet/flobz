@@ -28,7 +28,7 @@
 #include "PuyoGame.h"
 #include "audio.h"
 #include "glSDL.h"
-
+#include "preferences.h"
 
 static int fallingTable[PUYODIMX] = {0, 3, 1, 4, 2, 5};
 
@@ -66,6 +66,46 @@ void PuyoGame::setDelegate(PuyoDelegate *delegate)
 {
 	this->delegate = delegate;
 }
+
+const char * PuyoGame::getDefaultPlayerName(int n)
+{
+  static char playerName[256];
+  static char defaultPlayerName[256];
+  static char playerKey[50];
+  sprintf(playerKey,"Game.Player.Name.%d",n);
+  if (n == 0)
+  {
+    char * defaultName = getenv("USER");
+    if ((defaultName == NULL) || (defaultName[0]<32))
+    {
+      sprintf(defaultPlayerName,"Player");
+    }
+    else
+    {
+      strncpy(defaultPlayerName,defaultName,255);
+      defaultPlayerName[255]=0;
+    }
+    if ((defaultPlayerName[0]>='a') && (defaultPlayerName[0]<='z'))
+    {
+      defaultPlayerName[0] += 'A' - 'a';
+    }
+  }
+  else
+  {
+    sprintf(defaultPlayerName,"Player %d",n);
+  }
+  
+  GetStrPreference(playerKey, playerName, defaultPlayerName);
+  return playerName;
+}
+
+void PuyoGame::setDefaultPlayerName(int n, const char * playerName)
+{
+  static char playerKey[50];
+  sprintf(playerKey,"Game.Player.Name.%d",n);  
+  SetStrPreference(playerKey, playerName);
+}
+
 
 // PuyoLocalGame implementation
 PuyoLocalGame::PuyoLocalGame(PuyoRandomSystem *attachedRandom,
