@@ -26,7 +26,6 @@
 #include "PuyoLocalMenu.h"
 #include "AnimatedPuyoTheme.h"
 #include "PuyoScreenTransition.h"
-#include "preferences.h"
 
 const char *LocalGameMenu::getDefaultPlayerName()
 {
@@ -50,7 +49,9 @@ void LocalGameMenu::build() {
 
 String LocalGameMenu::getPlayerName() const
 {
-  return PuyoGame::getDefaultPlayerName(0);
+  String playerName = editPlayerName.getEditField()->getValue();
+  PuyoGame::setDefaultPlayerName(0,playerName);
+  return playerName;
 }
 
 const char *Local2PlayersGameMenu::getDefaultPlayer1Name()
@@ -83,14 +84,14 @@ void Local2PlayersGameMenu::build()
 
 String Local2PlayersGameMenu::getPlayer1Name() const
 {
-    String playerName = editPlayer1Name.getEditField()->getValue();
-    SetStrPreference("Player1 Name", playerName);
-    return playerName;
+  String playerName = editPlayer1Name.getEditField()->getValue();
+  PuyoGame::setDefaultPlayerName(1,playerName);
+  return playerName;
 }
 
 String Local2PlayersGameMenu::getPlayer2Name() const
 {
-    String playerName = editPlayer2Name.getEditField()->getValue();
-    SetStrPreference("Player2 Name", playerName);
-    return playerName;
+  String playerName = editPlayer2Name.getEditField()->getValue();
+  PuyoGame::setDefaultPlayerName(2,playerName);
+  return playerName;
 }
