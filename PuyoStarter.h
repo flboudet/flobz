@@ -83,7 +83,7 @@ public:
     void eventOccured(GameControlEvent *event);
     bool backPressed();
     IdleComponent *getIdleComponent() { return this; }
-    void abort() { abortedFlag = true; }
+    virtual void abort() { abortedFlag = true; }
     bool getAborted() const { return abortedFlag; }
     void setLives(int l) { lives = l; }
     bool isGameARunning() const { return attachedGameA->isGameRunning(); }

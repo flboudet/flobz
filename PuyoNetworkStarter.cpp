@@ -82,6 +82,9 @@ void PuyoNetworkGameWidget::onMessage(Message &message)
         case PuyoMessage::kGameNext:
             actionAfterGameOver(false);
             break;
+        case PuyoMessage::kGameAbort:
+            PuyoGameWidget::abort();
+            break;
         default:
             break;
     }
@@ -111,6 +114,16 @@ void PuyoNetworkGameWidget::setScreenToResumed(bool fromControls)
         delete message;
     }
     PuyoGameWidget::setScreenToResumed(fromControls);
+}
+
+void PuyoNetworkGameWidget::abort()
+{
+    ios_fc::Message *message = mbox.createMessage();
+    message->addInt(PuyoMessage::TYPE,   PuyoMessage::kGameAbort);
+    message->addBoolProperty("RELIABLE", true);
+    message->send();
+    delete message;
+    PuyoGameWidget::abort();
 }
 
 void PuyoNetworkGameWidget::actionAfterGameOver(bool fromControls)

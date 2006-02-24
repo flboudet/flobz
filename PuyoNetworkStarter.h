@@ -51,6 +51,7 @@ public:
     void onMessage(Message &);
     void setScreenToPaused(bool fromControls);
     void setScreenToResumed(bool fromControls);
+    void abort();
     void actionAfterGameOver(bool fromControls);
 private:
     void sendSyncMsg();
