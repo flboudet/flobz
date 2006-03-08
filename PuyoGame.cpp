@@ -67,24 +67,31 @@ void PuyoGame::setDelegate(PuyoDelegate *delegate)
 	this->delegate = delegate;
 }
 
-const char * PuyoGame::getDefaultPlayerName(int n)
+const char * PuyoGame::getPlayerName(int n)
 {
   static char playerName[256];
-  static char defaultPlayerName[256];
-  static char playerKey[50];
-  sprintf(playerKey,"Game.Player.Name.%d",n);
-  if (n == 0)
+  GetStrPreference(PuyoGame::getDefaultPlayerKey(n), playerName, PuyoGame::getDefaultPlayerName(n));
+  return playerName;
+}
+
+String PuyoGame::getDefaultPlayerName(int n)
+{
+  char defaultPlayerName[256];
+  if (n <= 0)
   {
     char * defaultName = getenv("USER");
     if ((defaultName == NULL) || (defaultName[0]<32))
     {
-      sprintf(defaultPlayerName,"Player");
+      defaultName = getenv("USERNAME");
+      if ((defaultName == NULL) || (defaultName[0]<32))
+      {            
+        sprintf(defaultName,"Kaori");
+      }
     }
-    else
-    {
-      strncpy(defaultPlayerName,defaultName,255);
-      defaultPlayerName[255]=0;
-    }
+    
+    strncpy(defaultPlayerName,defaultName,255);
+    defaultPlayerName[255]=0;
+    
     if ((defaultPlayerName[0]>='a') && (defaultPlayerName[0]<='z'))
     {
       defaultPlayerName[0] += 'A' - 'a';
@@ -94,9 +101,14 @@ const char * PuyoGame::getDefaultPlayerName(int n)
   {
     sprintf(defaultPlayerName,"Player %d",n);
   }
-  
-  GetStrPreference(playerKey, playerName, defaultPlayerName);
-  return playerName;
+  return String(defaultPlayerName);
+}
+
+String PuyoGame::getDefaultPlayerKey(int n)
+{
+  char playerKey[50];
+  sprintf(playerKey,"Game.Player.Name.%d",n);
+  return String(playerKey);
 }
 
 void PuyoGame::setDefaultPlayerName(int n, const char * playerName)

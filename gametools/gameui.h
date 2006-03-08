@@ -351,6 +351,7 @@ namespace gameui {
   class EditField : public Text {
     public:
       EditField(const String &defaultText, Action *action = NULL);
+      EditField(const String &defaultText, const String &persistentID);
 
       void eventOccured(GameControlEvent *event);
 
@@ -361,6 +362,7 @@ namespace gameui {
       SoFont *fontActive;
       SoFont *fontInactive;
       bool editionMode;
+      String persistence;
       String previousValue;
       void init(SoFont *fontActive, SoFont *fontInactive);
   };
@@ -388,6 +390,7 @@ namespace gameui {
   class EditFieldWithLabel : public HBox {
   public:
     EditFieldWithLabel(String label, String defaultValue, Action *action = NULL);
+    EditFieldWithLabel(String label, String defaultValue, String persistentID);
     EditField * getEditField() const { return editField; }
   private:
     EditField *editField;

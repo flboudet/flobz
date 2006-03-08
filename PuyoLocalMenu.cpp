@@ -27,13 +27,10 @@
 #include "AnimatedPuyoTheme.h"
 #include "PuyoScreenTransition.h"
 
-const char *LocalGameMenu::getDefaultPlayerName()
-{
-    return PuyoGame::getDefaultPlayerName(0);
-}
-
 LocalGameMenu::LocalGameMenu(PuyoRealMainScreen *mainScreen)
-    : editPlayerName("Player Name:", getDefaultPlayerName()), screenTitle("Choose Game Level"), PuyoMainScreenMenu(mainScreen),
+    : 
+      editPlayerName("Player:", PuyoGame::getDefaultPlayerName(0), PuyoGame::getDefaultPlayerKey(0)),
+      screenTitle("Choose Game Level"), PuyoMainScreenMenu(mainScreen),
       easyAction(EASY, this), mediumAction(MEDIUM, this), hardAction(HARD, this), popAction(mainScreen),
       easy("Easy", &easyAction), medium("Medium", &mediumAction), hard("Hard", &hardAction), back("Cancel", &popAction)
 {}
@@ -50,23 +47,13 @@ void LocalGameMenu::build() {
 String LocalGameMenu::getPlayerName() const
 {
   String playerName = editPlayerName.getEditField()->getValue();
-  PuyoGame::setDefaultPlayerName(0,playerName);
   return playerName;
 }
 
-const char *Local2PlayersGameMenu::getDefaultPlayer1Name()
-{
-  return PuyoGame::getDefaultPlayerName(1);
-}
-
-const char *Local2PlayersGameMenu::getDefaultPlayer2Name()
-{
-  return PuyoGame::getDefaultPlayerName(2);
-}
-
 Local2PlayersGameMenu::Local2PlayersGameMenu(PuyoRealMainScreen *mainScreen)
-    : PuyoMainScreenMenu(mainScreen), screenTitle("Choose Game Level"), editPlayer1Name("Player 1 Name:", getDefaultPlayer1Name()),
-      editPlayer2Name("Player 2 Name:", getDefaultPlayer2Name()),
+    : PuyoMainScreenMenu(mainScreen), screenTitle("Choose Game Level"),
+      editPlayer1Name("Player 1:", PuyoGame::getDefaultPlayerName(1), PuyoGame::getDefaultPlayerKey(1)),
+      editPlayer2Name("Player 2:", PuyoGame::getDefaultPlayerName(2), PuyoGame::getDefaultPlayerKey(2)),
       easyAction(EASY, gameWidgetFactory, this), mediumAction(MEDIUM, gameWidgetFactory, this), hardAction(HARD, gameWidgetFactory, this), popAction(mainScreen),
       easy("Easy", &easyAction), medium("Medium", &mediumAction), hard("Hard", &hardAction), back("Cancel", &popAction)
 {}
@@ -85,13 +72,11 @@ void Local2PlayersGameMenu::build()
 String Local2PlayersGameMenu::getPlayer1Name() const
 {
   String playerName = editPlayer1Name.getEditField()->getValue();
-  PuyoGame::setDefaultPlayerName(1,playerName);
   return playerName;
 }
 
 String Local2PlayersGameMenu::getPlayer2Name() const
 {
   String playerName = editPlayer2Name.getEditField()->getValue();
-  PuyoGame::setDefaultPlayerName(2,playerName);
   return playerName;
 }

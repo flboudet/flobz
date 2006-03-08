@@ -143,7 +143,9 @@ public:
     virtual void setDelegate(PuyoDelegate *delegate);
     virtual void cycle() = 0;
     
-    static const char * getDefaultPlayerName(int n);
+    static const char * getPlayerName(int n);
+    static String getDefaultPlayerName(int n);
+    static String getDefaultPlayerKey(int n);
     static void setDefaultPlayerName(int n, const char * playerName);
     /*  
         // Get the state of the puyo at the indicated coordinates

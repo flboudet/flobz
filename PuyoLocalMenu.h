@@ -43,7 +43,6 @@ public:
     void build();
     String getPlayerName() const;
 private:
-    static const char *getDefaultPlayerName();
     EditFieldWithLabel editPlayerName;
     Text screenTitle;
     SinglePlayerStarterAction easyAction;
@@ -60,8 +59,6 @@ public:
     String getPlayer1Name() const;
     String getPlayer2Name() const;
 private:
-    static const char *getDefaultPlayer1Name();
-    static const char *getDefaultPlayer2Name();
     PuyoLocalTwoPlayerGameWidgetFactory gameWidgetFactory;
     EditFieldWithLabel editPlayer1Name, editPlayer2Name;
     Text screenTitle;

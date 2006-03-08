@@ -1,5 +1,6 @@
 #include "gameui.h"
 #include "../audio.h"
+#include "preferences.h"
 
 namespace gameui {
 
@@ -1102,8 +1103,17 @@ namespace gameui {
     setFocusable(true);
   }
 
+  EditField::EditField(const String &defaultText, const String &persistentID)
+    : Text(defaultText, NULL), persistence(persistentID)
+    {
+      char mytext[256];
+      GetStrPreference(persistentID, mytext, defaultText);
+      setValue(mytext);
+      init(NULL,NULL);
+    }
+
   EditField::EditField(const String &defaultText,  Action *action)
-    : Text(defaultText, NULL)
+    : Text(defaultText, NULL), persistence("")
     {
       init(NULL,NULL);
       if (action != NULL)
@@ -1126,6 +1136,7 @@ namespace gameui {
         Action *action = getAction(ON_START);
         if (action)
             action->action();
+        if (persistence != "") SetStrPreference(persistence, getValue());
       }
     }
     else if (editionMode == true) {
@@ -1278,6 +1289,13 @@ namespace gameui {
   {
     add(new Text(label));
     editField = new EditField(defaultValue, action);
+    add(editField);
+  }
+
+  EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, String persistentID)
+  {
+    add(new Text(label));
+    editField = new EditField(defaultValue, persistentID);
     add(editField);
   }
 

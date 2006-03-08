@@ -54,8 +54,11 @@ private:
     EditField *userName;
 };
 
+#include "PuyoGame.h"
+
 LANGameMenu::LANGameMenu(PuyoRealMainScreen * mainScreen)
-  : PuyoMainScreenMenu(mainScreen), lanTitle("LAN Game"), playerNameLabel("Player name:", "toto"),
+  : PuyoMainScreenMenu(mainScreen), lanTitle("LAN Game"),
+    playerNameLabel("Player name:", PuyoGame::getDefaultPlayerName(-1), PuyoGame::getDefaultPlayerKey(-1)),
     portNumLabel("Port number:", "6581"), cancelAction(mainScreen),
     startButton("Start!", new PushLanNetCenterMenuAction(portNumLabel.getEditField(), playerNameLabel.getEditField())),
     cancelButton("Cancel", &cancelAction)
@@ -183,7 +186,7 @@ InternetGameMenu::InternetGameMenu()
   : PuyoScreen()
   , servers("www.ios-software.com", "/flobopuyo/fpservers", 80)
   , story(666)
-  , container(), playerName("Kaori"), serverName("---"), serverPort("4567")
+  , container(), playerName(PuyoGame::getPlayerName(-2)), serverName("---"), serverPort("4567")
 {
 }
 
