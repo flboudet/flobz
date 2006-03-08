@@ -320,9 +320,15 @@ void PuyoCommander::setFullScreen(bool fullScreen)
     if (fullScreen != this->fullscreen) {
         this->fullscreen = fullScreen;
         SetBoolPreference(kFullScreenPref, fullscreen);
-        SDL_QuitSubSystem(SDL_INIT_VIDEO);
-        SDL_InitSubSystem(SDL_INIT_VIDEO);
-        initDisplay(fullscreen, useGL);
+        if (SDL_WM_ToggleFullScreen(loop->getSurface())==0)
+        {
+          // This should not be necessary (and actually prevents Windows
+          // going from fullscreen to windowed mode)
+          //SDL_QuitSubSystem(SDL_INIT_VIDEO);
+          //SDL_InitSubSystem(SDL_INIT_VIDEO);
+          
+          initDisplay(fullscreen, useGL);
+        }  
     }
 }
 
@@ -343,6 +349,9 @@ void PuyoCommander::initDisplay(bool fullscreen, bool useGL)
   loop->setSurface(display);
   atexit(SDL_Quit); 
   SDL_ShowCursor(SDL_DISABLE);
+  SDL_WM_SetCaption("FloboPuyo by iOS-Software",NULL);
+  /* Should also set up an icon someday */
+  //SDL_WM_SetIcon(SDL_LoadBMP("icon.bmp"), NULL);
 }
 
 
