@@ -328,7 +328,10 @@ void PuyoCommander::setFullScreen(bool fullScreen)
           //SDL_InitSubSystem(SDL_INIT_VIDEO);
           
           initDisplay(fullscreen, useGL);
-        }  
+        }
+        SDL_ShowCursor(SDL_ENABLE);
+        SDL_ShowCursor(SDL_DISABLE);
+        //if (SDL_ShowCursor(SDL_QUERY)==SDL_ENABLE) SDL_ShowCursor(SDL_DISABLE);
     }
 }
 
