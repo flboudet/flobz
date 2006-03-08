@@ -80,7 +80,8 @@ static int axisSave[16][16];
 
 /* KEY Input */
 
-KeyInputSwitch::KeyInputSwitch(int keysym, bool isup) : InputSwitch(isup), keysym(keysym) {
+KeyInputSwitch::KeyInputSwitch(int keysym, bool isup, SDLMod keymod)
+  : InputSwitch(isup), keysym(keysym), keymod(keymod) {
   keyName[0] = 0;
 }
 
@@ -125,6 +126,13 @@ bool KeyInputSwitch::isCancel()    const {
 }
 bool KeyInputSwitch::isPause()    const {
   return keysym == SDLK_p;
+}
+bool KeyInputSwitch::isQuit()    const {
+#ifdef MACOSX
+  return (keysym == SDLK_q)  && ( (keymod & (KMOD_META)) != 0 );
+#else
+  return (keysym == SDLK_F4) && ( (keymod & KMOD_ALT) != 0 );
+#endif
 }
 
 
@@ -234,9 +242,9 @@ InputSwitch *switchForEvent(SDL_Event *e)
       return NULL;
       
     case SDL_KEYDOWN:
-      return new KeyInputSwitch(e->key.keysym.sym, false);
+      return new KeyInputSwitch(e->key.keysym.sym, false, e->key.keysym.mod);
     case SDL_KEYUP:
-      return new KeyInputSwitch(e->key.keysym.sym, true);
+      return new KeyInputSwitch(e->key.keysym.sym, true, e->key.keysym.mod);
     default:
       return NULL;
   }

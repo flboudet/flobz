@@ -56,6 +56,9 @@ void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
   if (input == NULL)
     return;
 
+  if (input->isQuit() && input->isDown())
+    result->cursorEvent = GameControlEvent::kQuit;
+  
   if (input->isValidate() && input->isDown())
     result->cursorEvent = GameControlEvent::kStart;
 

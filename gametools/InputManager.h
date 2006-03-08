@@ -30,6 +30,7 @@ class InputSwitch
     virtual bool isValidate()   const { return false; }
     virtual bool isCancel()     const { return false; }
     virtual bool isPause()      const { return false; }
+    virtual bool isQuit()       const { return false; }
 
   private:
     bool isup;
@@ -45,7 +46,7 @@ InputSwitch *checkInputSwitch();
 class KeyInputSwitch : public InputSwitch
 {
   public:
-    KeyInputSwitch(int keysym, bool isup);
+    KeyInputSwitch(int keysym, bool isup, SDLMod keymod = KMOD_NONE);
     const char *name() const;
     int id() const;
 
@@ -56,9 +57,11 @@ class KeyInputSwitch : public InputSwitch
     virtual bool isValidate()  const;
     virtual bool isCancel()    const;
     virtual bool isPause()     const;
+    virtual bool isQuit()      const;
     
   private:
     int keysym;
+    SDLMod keymod;
     mutable char keyName[256];
 };
 
