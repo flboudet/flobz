@@ -329,9 +329,9 @@ void PuyoCommander::setFullScreen(bool fullScreen)
           
           initDisplay(fullscreen, useGL);
         }
+        /* Workaround for cursor showing in MacOS X fullscreen mode */
         SDL_ShowCursor(SDL_ENABLE);
         SDL_ShowCursor(SDL_DISABLE);
-        //if (SDL_ShowCursor(SDL_QUERY)==SDL_ENABLE) SDL_ShowCursor(SDL_DISABLE);
     }
 }
 
