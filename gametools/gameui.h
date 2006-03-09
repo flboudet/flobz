@@ -149,6 +149,7 @@ namespace gameui {
       virtual void removeFromGameLoopActive();
       
       bool hasWidget(Widget *wid);
+      int getNumberOfFocusableChilds();
     protected:
       Widget *getChild(int i)     const  { return childs[i]; }
       void    changeChild(int i, Widget *w);
@@ -354,7 +355,8 @@ namespace gameui {
       EditField(const String &defaultText, const String &persistentID);
 
       void eventOccured(GameControlEvent *event);
-
+      void setValue(String value, bool persistent = true);
+      
       void lostFocus();
       void giveFocus();
       

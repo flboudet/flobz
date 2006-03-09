@@ -157,6 +157,14 @@ namespace gameui {
     return false;
   }
 
+  int WidgetContainer::getNumberOfFocusableChilds()
+  {
+    int n=0;
+    for (int i = 0; i < getNumberOfChilds() ; i++)
+        if (getChild(i)->isFocusable()) n++;
+    return n;
+  }  
+
   void WidgetContainer::draw(SDL_Surface *surface) 
   {
     for (int i = 0; i < getNumberOfChilds(); ++i) {
@@ -365,51 +373,87 @@ namespace gameui {
 
   void Box::eventOccured(GameControlEvent *event)
   {
-    if (activeWidget >= getNumberOfChilds())
-      activeWidget = getNumberOfChilds() - 1;
-
-    if (activeWidget < 0) {
+    bool dontrollover = false;
+    int direction = 0;
+    
+    if (getNumberOfChilds() <= 0) {
       lostFocus();
       return;
-    }
+    }  
+    Vec3 ref(1.0f,2.0f,3.0f);
+    if (((parent!=NULL) &&
+            (((Box*)parent)->getSortingAxe(ref)==getSortingAxe(ref)) &&
+            (parent->getNumberOfFocusableChilds()>1))
+        || (parent==NULL))
+      dontrollover = true;
+
+    if (activeWidget >= getNumberOfChilds())
+      activeWidget = getNumberOfChilds() - 1;
+    if (activeWidget < 0) activeWidget = 0;
 
     Widget *child = getChild(activeWidget);
     if ((event->isUp) && (! child->receiveUpEvents()))
       return;
-    child->giveFocus();
-    child->eventOccured(event);
+    
     // Handle the case where the widget has self-destroyed
     if (!hasWidget(child)) {
       return; // there are probably wiser things to do
     }
 
+    child->eventOccured(event);
     if (child->haveFocus()) return;
-    int direction = 0;
-
-    if (isPrevEvent(event))
-      direction = -1;
-    else if (isNextEvent(event))
-      direction = 1;
-    else {
-      if (isOtherDirection(event))
-        lostFocus();
-      return;
+    
+    if (isPrevEvent(event)) direction = -1;
+    else
+    {
+      if (isNextEvent(event)) direction = 1;
+      else
+      {
+        if (isOtherDirection(event))
+        {
+          lostFocus();
+          return;
+        }
+      }
     }
 
-    bool childHaveFocus;    
-    do {
-      activeWidget += direction;
-      if (activeWidget < 0) {
-        setActiveWidget(getNumberOfChilds()-1);
-        lostFocus();
+    if (!haveFocus())
+      if (isPrevEvent(event)) { activeWidget = getNumberOfChilds(); direction = -1; }
+        else if (isNextEvent(event)) { activeWidget = -1; direction = 1; }
+      
+    if (direction != 0)
+    {
+      int possibleNewWidget = activeWidget;
+      do {
+        possibleNewWidget += direction;
+        if (possibleNewWidget < 0) // roll from first to last
+        {
+          if (dontrollover)
+          {
+            possibleNewWidget = activeWidget;
+            lostFocus();
+          }  
+          else possibleNewWidget = getNumberOfChilds()-1;
+        }  
+        if (possibleNewWidget >= getNumberOfChilds()) // roll from last to first
+        {
+          if (dontrollover)
+          {
+            possibleNewWidget = activeWidget;
+            lostFocus();
+          }  
+          else possibleNewWidget = 0;
+        }  
       }
-      if (activeWidget >= getNumberOfChilds()) {
-        setActiveWidget(0);
-        lostFocus();
-      }
-      childHaveFocus = giveFocusToActiveWidget();
+      while (!getChild(possibleNewWidget)->isFocusable());
+      
+      if (possibleNewWidget != activeWidget)
+      {
+        child->lostFocus();
+        getChild(possibleNewWidget)->eventOccured(event);
+        setActiveWidget(possibleNewWidget);
+      }  
     }
-    while (!childHaveFocus);
   }
 
   void Box::setActiveWidget(int i)
@@ -1010,7 +1054,7 @@ namespace gameui {
   void Text::boing()
   {
     startMoving = true;
-    AudioManager::playSound("slide.wav", .1);
+    AudioManager::playSound("slide.wav", .2);
   }
   
   //
@@ -1120,6 +1164,12 @@ namespace gameui {
         setAction(ON_START, action);
     }
 
+  void EditField::setValue(String value, bool persistent)
+  {
+    Text::setValue(value);
+    if (persistent && (persistence != "")) SetStrPreference(persistence, getValue());
+  }
+    
   void EditField::eventOccured(GameControlEvent *event)
   {
     if (event->isUp)
@@ -1129,19 +1179,18 @@ namespace gameui {
       editionMode = !editionMode;
       if (editionMode == true) {
         previousValue = getValue();
-        setValue("_");
+        setValue("_",false);
       }
       else {
         setValue(getValue().substring(0, getValue().length() - 1));
         Action *action = getAction(ON_START);
         if (action)
             action->action();
-        if (persistence != "") SetStrPreference(persistence, getValue());
       }
     }
     else if (editionMode == true) {
       if (event->cursorEvent == GameControlEvent::kBack) {
-        setValue(previousValue);
+        setValue(previousValue, false);
         editionMode = false;
       }
       else if (event->sdl_event.type == SDL_KEYDOWN) {
@@ -1173,14 +1222,14 @@ namespace gameui {
         if (e.key.keysym.sym == SDLK_BACKSPACE && (getValue().length() > 1)) {
           String newValue = getValue().substring(0, getValue().length() - 2);
           newValue += "_";
-          setValue(newValue);
+          setValue(newValue,false);
         }
 
         if (ch) {
           String newValue = getValue();
           newValue[newValue.length() - 1] = ch;
           newValue += "_";
-          setValue(newValue);
+          setValue(newValue,false);
         }
       }
     }
@@ -1197,6 +1246,7 @@ namespace gameui {
   }
 
   void EditField::giveFocus() {
+    if (!haveFocus()) boing();
     Text::giveFocus();
     font = fontActive;
     requestDraw();

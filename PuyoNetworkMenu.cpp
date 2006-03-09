@@ -29,10 +29,24 @@
 #include "preferences.h"
 #include "ios_socket.h"
 #include "ios_standardmessage.h"
-#include "ios_httpdocument.h"
 #include "PuyoNetCenterMenu.h"
+#include "audio.h"
 
 extern IIM_Surface *menuBG_wide; // I know what you think..
+
+static const char * kInternetServerKey = "Menu.Internet.Server.";
+static const char * kInternetServerPortKey = "Menu.Internet.Server.Port.";
+static const char * kInternetServerNumberKey = "Menu.Internet.Server.Number.";
+static const char * kInternetMetaServerKey = "Menu.Internet.MetaServer.";
+static const char * kInternetMetaServerPathKey = "Menu.Internet.MetaServer.Path.";
+static const char * kInternetMetaServerPortKey = "Menu.Internet.MetaServer.Port.";
+static const char * kInternetMetaServerNumberKey = "Menu.Internet.MetaServer.Number.";
+
+static const char * kInternetCurrentServerKey = "Menu.Internet.CurrentServer";
+static const char * kInternetCurrentServerDefaultValue = "durandal.homeunix.com";
+static const char * kInternetCurrentServerPortKey = "Menu.Internet.CurrentServer.Port";
+static const char * kInternetCurrentServerPortDefaultValue = "4567";
+
 
 using namespace ios_fc;
 
@@ -67,53 +81,157 @@ LANGameMenu::LANGameMenu(PuyoRealMainScreen * mainScreen)
 
 void LANGameMenu::build() {
     add(&lanTitle);
+    add(&startButton);
     add(&playerNameLabel);
     add(&portNumLabel);
-    add(&startButton);
     add(&cancelButton);
 }
 
 class PuyoHttpServerList::PuyoHttpServer {
 public:
-    PuyoHttpServer(String hostName, int portNum) : hostName(hostName), portNum(portNum) {}
+    PuyoHttpServer(String hostName, int portNum, String path) : hostName(hostName), portNum(portNum), hostPath(path) {}
     String hostName;
+    String hostPath;
     int portNum;
 };
 
-HttpDocument *doc = NULL;
-
-PuyoHttpServerList::PuyoHttpServerList(String hostName, String path, int portNum)
+PuyoHttpServerList::PuyoHttpServerList() : doc(NULL), firstTime(true)
 {
-  isReady = false;
-  doc = new HttpDocument(hostName, path, portNum);
+  char servname[256];
+  char servpath[1024];
+  int nbserv;
+  
+  // Making a meta-server list from prefs
+  fetching = 0;
+  nbserv = GetIntPreference(kInternetMetaServerNumberKey,1);
+  for (int i = 1; i <= nbserv; i++)
+  {
+    char tmp[11];
+    snprintf(tmp,sizeof(tmp),"%d",i);
+    GetStrPreference (String(kInternetMetaServerKey)+String(tmp), servname, i==1?"www.ios-software.com":"Error", 256);
+    GetStrPreference (String(kInternetMetaServerPathKey)+String(tmp), servpath, i==1?"/flobopuyo/fpservers":"/fpservers", 1024);
+    metaservers.add(
+        new PuyoHttpServer(servname,
+                GetIntPreference (String(kInternetMetaServerPortKey)+String(tmp), 80), String(servpath)));
+    fetching++;
+  }
+  fetchServersInfo();
+
+  // Making a server list from prefs
+  nbserv = GetIntPreference(kInternetServerNumberKey,1);
+  for (int i = 1; i <= nbserv; i++)
+  {
+    char tmp[11];
+    snprintf(tmp,sizeof(tmp),"%d",i);
+    GetStrPreference (String(kInternetServerKey)+String(tmp), servname, i==1?kInternetCurrentServerDefaultValue:"Error", 256);
+    servers.add(new PuyoHttpServer(servname, GetIntPreference (String(kInternetServerPortKey)+String(tmp), atoi(kInternetCurrentServerPortDefaultValue)), String("")));
+  }
 }
 
-bool PuyoHttpServerList::listIsReady() 
+void PuyoHttpServerList::fetchServersInfo()
 {
+  if (fetching > 0) {
+
+    PuyoHttpServer * curServer = metaservers[metaservers.size()-fetching];
+  
     try {
-        if (isReady) return true;
-        if (!doc->documentIsReady())
-          return false;
-    
-        StandardMessage msg(doc->getDocumentContent());
-        int nbServers = msg.getInt("NBSERV");
-        for (int i = 0 ; i < nbServers ; i++) {
-            char tmpStr[256];
-            sprintf(tmpStr, "SERVNAME%.2d", i);
-            String serverName = msg.getString(tmpStr);
-            sprintf(tmpStr, "PORTNUM%.2d", i);
-            int portNum = msg.getInt(tmpStr);
-            servers.add(new PuyoHttpServer(serverName, portNum));
-        }
-        isReady = true;
-        return true;
+      doc = new HttpDocument(curServer->hostName, curServer->hostPath, curServer->portNum);
+    } catch (Exception e) {
+      //e.printMessage();
+      doc = NULL;
+	    fetching--;
+	    if (fetching > 0) fetchServersInfo();
+	    else fetching = -1;
     }
-    catch (Exception e) {
-        e.printMessage();
-        return false;
-    }
+  }  
 }
 
+bool PuyoHttpServerList::listHasChanged()
+{
+  if (firstTime)
+  {
+    firstTime = false;
+    return true;
+  }  
+	if ((fetching == 0) || (doc == NULL)) return false;
+
+  AdvancedBuffer<PuyoHttpServer *> newservers, newmetaservers;
+  
+  try {
+		if (!doc->documentIsReady()) return false;
+		else {
+      StandardMessage msg(doc->getDocumentContent());
+      int nbServers = msg.getInt("NBSERV");
+      for (int i = 0 ; i < nbServers ; i++) {
+        char tmpStr[256];
+        sprintf(tmpStr, "SERVNAME%.2d", i);
+        String serverName = msg.getString(tmpStr);
+        sprintf(tmpStr, "PORTNUM%.2d", i);
+        int portNum = msg.getInt(tmpStr);
+        newservers.add(new PuyoHttpServer(serverName, portNum, String("")));
+      }
+      nbServers = msg.getInt("NBMETASERV");
+      for (int i = 0 ; i < nbServers ; i++) {
+        char tmpStr[256];
+        sprintf(tmpStr, "METANAME%.2d", i);
+        String serverName = msg.getString(tmpStr);
+        sprintf(tmpStr, "METAPATH%.2d", i);
+        String serverPath = msg.getString(tmpStr);
+        sprintf(tmpStr, "METAPORT%.2d", i);
+        int portNum = msg.getInt(tmpStr);
+        newmetaservers.add(new PuyoHttpServer(serverName, portNum, serverPath));
+      }
+
+    }
+  } catch (Exception e) { // Erreur dans la reception du fichier
+    //e.printMessage();
+    for (int i = 1; i <= newservers.size(); i++) delete newservers[i-1];
+    fetching--;
+    if (fetching > 0) fetchServersInfo();
+    else fetching = -1;
+    return false;
+  }
+  
+  // on doit mettre a jour les prefs de serveurs ici
+  int nbserv;
+  nbserv = newservers.size();
+  if (nbserv>0)
+  {
+    SetIntPreference(String(kInternetServerNumberKey), nbserv);
+    for (int i = 1; i <= nbserv; i++)
+    {
+      char tmp[11];
+      snprintf(tmp,sizeof(tmp),"%d",i);
+      SetStrPreference(String(kInternetServerKey)+String(tmp), newservers[i-1]->hostName);
+      SetIntPreference(String(kInternetServerPortKey)+String(tmp), newservers[i-1]->portNum);
+    }
+  }
+  nbserv = newmetaservers.size();
+  if (nbserv>0)
+  {
+    SetIntPreference(String(kInternetMetaServerNumberKey), nbserv);
+    for (int i = 1; i <= nbserv; i++)
+    {
+      char tmp[11];
+      snprintf(tmp,sizeof(tmp),"%d",i);
+      SetStrPreference(String(kInternetMetaServerKey)    +String(tmp), newmetaservers[i-1]->hostName);
+      SetIntPreference(String(kInternetMetaServerPortKey)+String(tmp), newmetaservers[i-1]->portNum);
+      SetStrPreference(String(kInternetMetaServerPathKey)+String(tmp), newmetaservers[i-1]->hostPath);
+    }
+  }
+  servers = newservers;
+  fetching = 0;
+  return true;
+}
+
+int PuyoHttpServerList::fetchingNewData()
+{
+  if (fetching <0)
+  {
+    fetching = 0;
+    return -1;
+  } else return fetching;
+}
 
 String PuyoHttpServerList::getServerNameAtIndex(int index) const
 {
@@ -152,12 +270,17 @@ public:
     
     void action()
     {
-        fprintf(stderr, "Connecting to %s..\n", serverName->getValue().c_str());
+      try {
         PuyoInternetGameCenter *gameCenter = new PuyoInternetGameCenter(serverName->getValue(),
                                                                         atoi(serverPort->getValue()), userName->getValue());
         NetCenterMenu *newNetCenterMenu = new NetCenterMenu(gameCenter);
         newNetCenterMenu->build();
         (GameUIDefaults::SCREEN_STACK)->push(newNetCenterMenu);
+      } catch (Exception e) {
+        fprintf(stderr, "Error while connecting to %s\n", serverName->getValue().c_str());
+        e.printMessage();
+        AudioManager::playSound("ebenon.wav", 1.0);
+      }
     }
 private:
     Text *serverName;
@@ -183,10 +306,13 @@ void NetworkGameMenu::build() {
 }
 
 InternetGameMenu::InternetGameMenu()
-  : PuyoScreen()
-  , servers("www.ios-software.com", "/flobopuyo/fpservers", 80)
-  , story(666)
-  , container(), playerName(PuyoGame::getPlayerName(-2)), serverName("---"), serverPort("4567")
+  : PuyoScreen(),
+    servers(),
+    story(666),
+    container(),
+    playerName(PuyoGame::getPlayerName(-2), PuyoGame::getDefaultPlayerKey(-2)),
+    serverName(kInternetCurrentServerDefaultValue,kInternetCurrentServerKey),
+    serverPort(kInternetCurrentServerPortDefaultValue,kInternetCurrentServerPortKey)
 {
 }
 
@@ -206,12 +332,9 @@ void InternetGameMenu::build()
     
     serverSelectionPanel->add(serverListPanel);
     updating = new Button("Update");
+    updating->mdontMove = false;
     serverSelectionPanel->add(updating);
 
-    // temporary entry into the server list
-    serverListPanel->add (new Button("durandal.homeunix.com",
-                                     new ServerSelectAction(*this, "durandal.homeunix.com", 4567)));
-    
     VBox *rightPanel = new VBox();
     rightPanel->add(new Separator(1,1));
     rightPanel->add(new Text("Internet Game"));
@@ -235,18 +358,20 @@ void InternetGameMenu::build()
 
 void InternetGameMenu::idle(double currentTime)
 {
-    if (servers.listIsReady())
+    if (servers.listHasChanged())
     {
-        serverListPanel->clear();
-        for (int i = 0 ; i < servers.getNumServer() ; i++) {
-            serverListPanel->set (i, new Button(servers.getServerNameAtIndex(i),
-                                                new ServerSelectAction(*this, servers.getServerNameAtIndex(i),
-                                                                       servers.getServerPortAtIndex(i))));
-        }
-        updating->setValue("Update");
-        updating->mdontMove = false;
+      serverListPanel->clear();
+      for (int i = 0 ; i < servers.getNumServer() ; i++) {
+        serverListPanel->set (i, new Button(servers.getServerNameAtIndex(i),
+            new ServerSelectAction(*this, servers.getServerNameAtIndex(i),
+            servers.getServerPortAtIndex(i))));
+      }
+      updating->setValue("Update");
+      updating->mdontMove = false;
     }
-    else
+
+    int state = servers.fetchingNewData();
+    if (state > 0)
     {
         int X = (int)(currentTime*3) % 6;
         static const char *txt[6] = {
@@ -259,6 +384,11 @@ void InternetGameMenu::idle(double currentTime)
         };
         updating->setValue(txt[X]);
         updating->mdontMove = true;
+    }
+    else if (state < 0)
+    {
+      updating->setValue("Update");
+      updating->mdontMove = false;
     }
 }
 

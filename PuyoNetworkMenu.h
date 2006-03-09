@@ -28,20 +28,26 @@
 
 #include "gameui.h"
 #include "PuyoCommander.h"
+#include "ios_httpdocument.h"
 
 class PuyoHttpServerList {
 public:
-    PuyoHttpServerList(String hostName, String path, int portNum);
+    PuyoHttpServerList();
     String getServerNameAtIndex(int index) const;
     int getServerPortAtIndex(int index) const;
     int getNumServer() const;
 
-    bool listIsReady();
+    void fetchServersInfo();
+    bool listHasChanged();
+    int fetchingNewData();
 
 private:
-    class PuyoHttpServer;
-    AdvancedBuffer<PuyoHttpServer *> servers;
-    bool isReady;
+  class PuyoHttpServer;
+	HttpDocument *doc;
+  AdvancedBuffer<PuyoHttpServer *> servers;
+  AdvancedBuffer<PuyoHttpServer *> metaservers;
+	int fetching;
+	bool firstTime;
 };
 
 class LANGameMenu : public PuyoMainScreenMenu {
