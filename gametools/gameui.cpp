@@ -1054,7 +1054,7 @@ namespace gameui {
   void Text::boing()
   {
     startMoving = true;
-    AudioManager::playSound("slide.wav", .2);
+    AudioManager::playSound("slide.wav", .5);
   }
   
   //

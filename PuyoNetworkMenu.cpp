@@ -279,7 +279,7 @@ public:
       } catch (Exception e) {
         fprintf(stderr, "Error while connecting to %s\n", serverName->getValue().c_str());
         e.printMessage();
-        AudioManager::playSound("ebenon.wav", 1.0);
+        AudioManager::playSound("ebenon.wav", 0.5);
       }
     }
 private:
