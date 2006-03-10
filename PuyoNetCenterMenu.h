@@ -99,9 +99,12 @@ private:
     Text **texts;
 };
 
+class NetCenterMenu;
+
 class NetCenterMenu : public PuyoScreen, PuyoNetGameCenterListener {
 public:
     NetCenterMenu(PuyoNetGameCenter *netCenter);
+    ~NetCenterMenu();
     void build();
     void onChatMessage(const String &msgAuthor, const String &msg);
     void onPlayerConnect(String playerName, PeerAddress playerAddress);
@@ -114,6 +117,7 @@ public:
     void cycle();
     void playerSelected(PeerAddress playerAddress, String playerName);
     void idle(double currentTime);
+    void selfDestroy() { shouldSelfDestroy = true; }
 private:
     class NetCenterCycled : public CycledComponent {
     public:
@@ -124,7 +128,7 @@ private:
         }
     };
     
-    Text playerListText, chatAreaText;   
+    Text playerListText, chatAreaText; 
     NetCenterPlayerList playerList;
     NetCenterChatArea chatArea;
     NetCenterCycled *cycled;
@@ -132,6 +136,7 @@ private:
     PuyoStoryWidget story;
     SliderContainer container;
     NetCenterDialogMenu *onScreenDialog;
+    bool shouldSelfDestroy;
 };
     
 #endif // _PUYONETCENTERMENU

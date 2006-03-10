@@ -164,13 +164,20 @@ private:
     PuyoNetGameCenter *netCenter;
     Text *message;
 };
-
+    
 NetCenterMenu::NetCenterMenu(PuyoNetGameCenter *netCenter)
     : netCenter(netCenter), playerListText("Player List"), chatAreaText("Chat Area"),
-      playerList(8, this), chatArea(8), story(666), onScreenDialog(NULL)
+      playerList(8, this), chatArea(8), story(666), onScreenDialog(NULL), shouldSelfDestroy(false)
 {
     cycled = new NetCenterCycled(this);
     netCenter->addListener(this);
+}
+
+NetCenterMenu::~NetCenterMenu()
+{
+    printf("Deleting the net center\n");
+    // Delete the network center because no one else would do it
+    delete netCenter;
 }
 
 void NetCenterMenu::idle(double currentTime)

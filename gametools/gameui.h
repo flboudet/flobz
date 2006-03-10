@@ -266,7 +266,7 @@ namespace gameui {
       bool slideout;
   };
 
-  class Screen : public DrawableComponent, public IdleComponent {
+  class Screen : public GarbageCollectableItem, public DrawableComponent, public IdleComponent {
     public:
       Screen(float x, float y, float width, float height, GameLoop *loop = NULL);
       virtual ~Screen() {}
@@ -296,10 +296,14 @@ namespace gameui {
       void giveFocus();
       void focus(Widget *widget);
       
+      void setAutoRelease(bool autoRelease) { autoReleaseFlag = autoRelease; }
+      void autoRelease();
+      
     private:
       ZBox rootContainer;
       IIM_Surface *bg;
       bool hidden;
+      bool autoReleaseFlag;
   };
 
 

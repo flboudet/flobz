@@ -45,6 +45,7 @@ public:
 class PuyoNetGameCenter {
 public:
     PuyoNetGameCenter() : pendingGameTimeout(30000.) {}
+    virtual ~PuyoNetGameCenter() {}
     virtual void sendMessage(const String msgText) = 0;
     void requestGameWith(PeerAddress addr);
     void acceptInvitationWith(PeerAddress addr);

@@ -82,6 +82,11 @@ class CycledComponent : public IdleComponent
     double firstCycleTime;
 };
 
+class GarbageCollectableItem {
+public:
+    virtual ~GarbageCollectableItem() {}
+};
+
 
 class GameLoop
 {
@@ -92,6 +97,7 @@ class GameLoop
     void addIdle(IdleComponent *gc);
     void removeDrawable(DrawableComponent *gc);
     void removeIdle(IdleComponent *gc);
+    void garbageCollect(GarbageCollectableItem *item);
     void run();
 
     void idle(double currentTime);
@@ -113,6 +119,7 @@ class GameLoop
     SDL_Surface *surface;
     Vector<DrawableComponent> drawables;
     Vector<IdleComponent>     idles;
+    Vector<GarbageCollectableItem> garbageCollector;
     bool finished;
 };
 

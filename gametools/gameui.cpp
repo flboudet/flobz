@@ -936,7 +936,7 @@ namespace gameui {
   Screen::Screen(float x, float y, float width, float height, GameLoop *loop)
     : DrawableComponent(),
       IdleComponent(),
-      rootContainer(loop), bg(NULL)
+      rootContainer(loop), bg(NULL), autoReleaseFlag(false)
   {
     rootContainer.setPosition(Vec3(x, y, 1.0f));
     rootContainer.setSize(Vec3(width, height, 1.0f));
@@ -985,6 +985,12 @@ namespace gameui {
   void Screen::focus(Widget *w)
   {
     rootContainer.focus(w);
+  }
+  
+  void Screen::autoRelease()
+  {
+    if (autoReleaseFlag)
+        GameUIDefaults::GAME_LOOP->garbageCollect(this);
   }
 
   //
@@ -1435,11 +1441,13 @@ namespace gameui {
   }
 
   void ScreenStack::pop() {
-    stack.top()->removeFromGameLoopActive();
-    stack.top()->hide();
+    Screen *topScreen = stack.top();
+    topScreen->removeFromGameLoopActive();
+    topScreen->hide();
     stack.pop();
     stack.top()->show();
     stack.top()->addToGameLoop(stack.top()->getGameLoop());
+    topScreen->autoRelease();
   }
 
   //

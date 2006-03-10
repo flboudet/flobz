@@ -1,6 +1,6 @@
 [start_level]
     level.levelName           = "Kaori vs the Men's Best Friend"
-    level.introStory          = "introherbert.gsl"
+    level.introStory          = "introazrael.gsl"
     level.opponentStory       = "storyherbert.gsl"
     level.opponentName        = "Herbert the Dog"
     level.opponentFace        = "herbert.gsl"

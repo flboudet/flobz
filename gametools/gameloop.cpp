@@ -172,6 +172,11 @@ void GameLoop::removeIdle(IdleComponent *gc)
   }
 }
 
+void GameLoop::garbageCollect(GarbageCollectableItem *item)
+{
+    garbageCollector.add(item);
+}
+
 #include <unistd.h>
 
 void GameLoop::run()
@@ -260,6 +265,13 @@ void GameLoop::idle(double currentTime)
       drawables.removeAt(i);
     }
     else i++;
+  }
+  
+  // 3b- garbage collector for passive remove
+  while (garbageCollector.size() > 0) {
+    printf("GARBAGE COLLECTABLE REMOVED\n");
+    delete garbageCollector[0];
+    garbageCollector.removeAt(0);
   }
 }
 
