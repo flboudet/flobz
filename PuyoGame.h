@@ -76,7 +76,7 @@ public:
         return PUYO_EMPTY;
     }
     inline void setPuyoState(PuyoState state) { if (this != NULL) this->state = state; }
-    inline bool PuyoPuyo::isFalling() { return (state < PUYO_EMPTY); }
+    inline bool isFalling() { return (state < PUYO_EMPTY); }
     inline int getPuyoX() const {
         if (this != NULL)
             return X;
