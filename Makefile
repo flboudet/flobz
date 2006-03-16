@@ -75,13 +75,13 @@ corona32.o:corona32.cpp all.h.gch
 corona_palette.o:corona_palette.cpp	 all.h.gch 
 
 clean:
-	rm -rf .DS_Store */.DS_Store */*/.DS_Store */*/*/.DS_Store
 	rm -rf *~ *.o flobopuyo* $(PRGNAME) WARNINGS *.gch
-	rm -rf .xvpics data/.xvpics    data/*/.xvpics
+	rm -rf .xvpics data/.xvpics data/*/.xvpics data/*/*/.xvpics
 	rm -rf $(bundle_name)
 	rm -rf $(macimage_name)
 	rm -f  $(macimage_name).dmg
-	rm -f  .DS_Store */.DS_Store */*/.DS_Store .gdb_history
+	rm -f  .DS_Store */.DS_Store */*/.DS_Store */*/*/.DS_Store
+	rm -f  .gdb_history
 	+make -C iosfc clean
 	+make -C gametools clean
 	+make -C goomsl clean
@@ -109,9 +109,9 @@ bundle: flobopuyo
 	cp mac/icon.icns $(bundle_name)/Contents/Resources/
 	cp flobopuyo $(bundle_name)/Contents/MacOS/flobopuyo
 	cp -r data $(bundle_name)/Contents/Resources
-	rm -rf $(bundle_name)/Contents/Resources/data/CVS $(bundle_name)/Contents/Resources/data/*/CVS
-	rm -rf $(bundle_name)/Contents/Resources/data/.xvpics $(bundle_name)/Contents/Resources/data/*/.xvpics
-	rm -f $(bundle_name)/Contents/Resources/data/.DS_Store $(bundle_name)/Contents/Resources/data/*/.DS_Store
+	rm -rf $(bundle_name)/Contents/Resources/data/CVS $(bundle_name)/Contents/Resources/data/*/CVS $(bundle_name)/Contents/Resources/data/*/*/CVS
+	rm -rf $(bundle_name)/Contents/Resources/data/.xvpics $(bundle_name)/Contents/Resources/data/*/.xvpics $(bundle_name)/Contents/Resources/data/*/*/.xvpics
+	rm -f $(bundle_name)/Contents/Resources/data/.DS_Store $(bundle_name)/Contents/Resources/data/*/.DS_Store $(bundle_name)/Contents/Resources/data/*/*/.DS_Store
 
 #	$(STRIP) $(bundle_name)/Contents/MacOS/flobopuyo
 
