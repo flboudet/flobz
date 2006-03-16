@@ -68,7 +68,7 @@ private:
 
 class PuyoGameScreen;
 
-class PuyoGameWidget : public Widget, CycledComponent {
+class PuyoGameWidget : public GarbageCollectableItem, public Widget, CycledComponent {
 public:
     PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction = NULL);
     PuyoGameWidget();

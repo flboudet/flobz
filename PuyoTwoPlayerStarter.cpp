@@ -114,8 +114,10 @@ void TwoPlayersStarterAction::restartGame()
     
     GameUIDefaults::SCREEN_STACK->pop();
     if (gameWidget != NULL) {
-        delete gameWidget;
-        delete gameScreen;
+        GameUIDefaults::GAME_LOOP->garbageCollect(gameWidget);
+        GameUIDefaults::GAME_LOOP->garbageCollect(gameScreen);
+        //delete gameWidget;
+        //delete gameScreen;
     }
     if (gameLostWidget != NULL)
         delete gameLostWidget;

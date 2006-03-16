@@ -54,6 +54,8 @@ PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBo
 void PuyoNetworkGame::onMessage(Message &message)
 {
     try {
+        if (!message.hasInt(GAMEID))
+            return;
         // Check if the message matches the gameid
         int gid = message.getInt(GAMEID);
         if (gid != gameId)

@@ -51,6 +51,8 @@ PuyoLanGameCenter::PuyoLanGameCenter(int portNum, const String name)
 void PuyoLanGameCenter::onMessage(Message &msg)
 {
     try {
+      if (!msg.hasInt("CMD"))
+            return;
       switch (msg.getInt("CMD")) {
       case PUYO_UDP_CHAT:
 	for (int i = 0, j = listeners.size() ; i < j ; i++) {

@@ -68,6 +68,8 @@ void PuyoNetworkGameWidget::cycle()
 
 void PuyoNetworkGameWidget::onMessage(Message &message)
 {
+    if (!message.hasInt(PuyoMessage::TYPE))
+            return;
     int msgType = message.getInt(PuyoMessage::TYPE);
     switch (msgType) {
         case PuyoMessage::kGameStart:

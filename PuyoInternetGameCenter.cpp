@@ -135,6 +135,8 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
 {
     //printf("Cool, un msg!\n");
     try {
+        if (!msg.hasInt("CMD"))
+            return;
         switch (msg.getInt("CMD")) {
             case PUYO_IGP_CHAT:
                 for (int i = 0, j = listeners.size() ; i < j ; i++) {
