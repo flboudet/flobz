@@ -90,7 +90,8 @@ int main(int argc, char *argv[])
         if (strcmp(argv[i],"-win") == 0) fs = false;
     }
     
-    setDataFolder("data");
+    if (!fileExists("data")) setDataFolder(DATADIR);
+    else setDataFolder("data");
     //printf("Datafolder set to %s\n", getDataFolder());
     
     PuyoCommander commander( fs );
