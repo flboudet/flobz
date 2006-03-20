@@ -16,7 +16,7 @@ void PuyoIgpResponder::onMessage(Message &msg)
     switch (msg.getInt("CMD")) {
         case PUYO_IGP_ALIVE:
             //printf("Message d'identification\n");
-            updatePeer(address, msg.getString("NAME"));
+            updatePeer(address, msg.getString("NAME"), msg.getInt("STATUS"));
             break;
         case PUYO_IGP_CHAT:
             printf("Message de %s: %s\n", (const char *)msg.getString("NAME"), (const char *)msg.getString("MSG"));
@@ -67,13 +67,30 @@ void PuyoIgpResponder::idle()
     }
 }
 
-void PuyoIgpResponder::updatePeer(PeerAddress addr, const String name)
+void PuyoIgpResponder::updatePeer(PeerAddress addr, const String name, int status)
 {
     GamePeer *currentPeer = NULL;
     for (int i = 0, j = peers.size() ; i < j ; i++) {
         if (peers[i]->addr == addr) {
             currentPeer = peers[i];
             currentPeer->lastUpdate = getTimeMs();
+	    if (currentPeer->status != status) {
+	      currentPeer->status = status;
+	      // Send a STATUSCHANGE message to the other peers
+	      Message *newMsg = mbox.createMessage();
+	      newMsg->addBoolProperty("RELIABLE", true);
+	      newMsg->addInt("CMD", PUYO_IGP_STATUSCHANGE);
+	      newMsg->addString("NAME", name);
+	      newMsg->addInt("STATUS", status);
+	      Dirigeable *dirNew = dynamic_cast<Dirigeable *>(newMsg);
+	      dirNew->addPeerAddress("ADDR", addr);
+	      for (int i = 0, j = peers.size() ; i < j ; i++) {
+		printf("Diffusion connexion au peer num %d\n", i);
+		dirNew->setPeerAddress(peers[i]->addr);
+		newMsg->send();
+	      }
+	      delete newMsg;
+	    }
         }
     }
     if (currentPeer == NULL) {
@@ -88,6 +105,7 @@ void PuyoIgpResponder::updatePeer(PeerAddress addr, const String name)
             newMsg->addBoolProperty("RELIABLE", true);
             newMsg->addInt("CMD", PUYO_IGP_CONNECT);
             newMsg->addString("NAME", peers[i]->name);
+	    newMsg->addInt("STATUS", peers[i]->status);
             Dirigeable *dirNew = dynamic_cast<Dirigeable *>(newMsg);
             dirNew->addPeerAddress("ADDR", peers[i]->addr);
             dirNew->setPeerAddress(addr);
@@ -102,6 +120,7 @@ void PuyoIgpResponder::updatePeer(PeerAddress addr, const String name)
         newMsg->addBoolProperty("RELIABLE", true);
         newMsg->addInt("CMD", PUYO_IGP_CONNECT);
         newMsg->addString("NAME", name);
+	newMsg->addInt("STATUS", status);
         Dirigeable *dirNew = dynamic_cast<Dirigeable *>(newMsg);
         dirNew->addPeerAddress("ADDR", addr);
         for (int i = 0, j = peers.size() ; i < j ; i++) {

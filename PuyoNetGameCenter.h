@@ -37,9 +37,15 @@ public:
     virtual void onChatMessage(const String &msgAuthor, const String &msg) = 0;
     virtual void onPlayerConnect(String playerName, PeerAddress playerAddress) = 0;
     virtual void onPlayerDisconnect(String playerName, PeerAddress playerAddress) = 0;
+    virtual void onPlayerUpdated(String playerName, PeerAddress playerAddress) = 0;
     virtual void gameInvitationAgainst(String playerName, PeerAddress playerAddress) = 0;
     virtual void gameCanceledAgainst(String playerName, PeerAddress playerAddress) = 0;
     virtual void gameGrantedWithMessagebox(MessageBox *mbox) = 0;
+};
+
+enum PuyoPeerStatus {
+  PEER_NORMAL = 0,
+  PEER_PLAYING = 1
 };
 
 class PuyoNetGameCenter {
@@ -54,11 +60,13 @@ public:
     String getPeerNameAtIndex(int i) const;
     PeerAddress getPeerAddressAtIndex(int i) const;
     PeerAddress getPeerAddressForPeerName(String peerName) const;
+    int getPeerStatusForAddress(PeerAddress &addr) const;
     int getPeerCount() const;
     void addListener(PuyoNetGameCenterListener *r) { listeners.add(r); }
     void removeListener(PuyoNetGameCenterListener *r) { listeners.remove(r); }
-    void connectPeer(PeerAddress addr, const String name);
+    void connectPeer(PeerAddress addr, const String name, int status = PEER_NORMAL);
     void disconnectPeer(PeerAddress addr, const String name);
+    virtual void setStatus(int status) {}
 protected:
     AdvancedBuffer<PuyoNetGameCenterListener *> listeners;
     class GamerPeer;

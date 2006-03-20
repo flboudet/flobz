@@ -13,7 +13,7 @@ public:
     void onMessage(Message &msg);
     void idle();
 private:
-    void updatePeer(PeerAddress addr, const String name);
+    void updatePeer(PeerAddress addr, const String name, int status);
 
     IgpVirtualPeerMessageBox &mbox;
     class GamePeer;
@@ -23,10 +23,11 @@ private:
 
 class PuyoIgpResponder::GamePeer {
 public:
-    GamePeer(PeerAddress addr, const String name) : addr(addr), name(name) {}
+    GamePeer(PeerAddress addr, const String name) : addr(addr), name(name), status(0) {}
     PeerAddress addr;
     const String name;
     double lastUpdate;
+    int status;
 };
 
 #endif // _PUYOSERVERIGPRESPONDER_H

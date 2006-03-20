@@ -61,8 +61,9 @@ private:
 class NetCenterPlayerList : public ListWidget {
 public:
     NetCenterPlayerList(int size, NetCenterMenu *targetMenu, GameLoop *loop = NULL) : ListWidget(size, loop), targetMenu(targetMenu) {}
-    void addNewPlayer(String playerName, PeerAddress playerAddress);
+    void addNewPlayer(String playerName, PeerAddress playerAddress, int status);
     void removePlayer(PeerAddress playerAddress);
+    void updatePlayer(String playerName, PeerAddress playerAddress, int status);
 private:
     class PlayerSelectedAction : public Action {
     public:
@@ -76,12 +77,19 @@ private:
     };
     class PlayerEntry : public Button {
     public:
-        PlayerEntry(String playerName, PeerAddress playerAddress, Action *action)
-        : Button(playerName, action), playerAddress(playerAddress), action(action) {}
+        PlayerEntry(String playerName, PeerAddress playerAddress, int status, Action *action)
+        : Button(playerName + getStatusString(status), action),
+	  playerAddress(playerAddress), status(status), action(action) {}
         ~PlayerEntry() { delete action; }
+	void updateEntry(String playerName, int status) {
+	  setValue(playerName + getStatusString(status));
+	  this->status = status;
+	}
         PeerAddress playerAddress;
+	int status;
     private:
         Action *action;
+	static String getStatusString(int status);
     };
     Vector<PlayerEntry> entries;
     NetCenterMenu *targetMenu;
@@ -109,6 +117,7 @@ public:
     void onChatMessage(const String &msgAuthor, const String &msg);
     void onPlayerConnect(String playerName, PeerAddress playerAddress);
     void onPlayerDisconnect(String playerName, PeerAddress playerAddress);
+    void onPlayerUpdated(String playerName, PeerAddress playerAddress);
     void gameInvitationAgainst(String playerName, PeerAddress playerAddress);
     void grantCurrentGame();
     void cancelCurrentGame();
@@ -116,8 +125,8 @@ public:
     void gameGrantedWithMessagebox(MessageBox *mbox);
     void cycle();
     void playerSelected(PeerAddress playerAddress, String playerName);
-    void idle(double currentTime);
     void selfDestroy() { shouldSelfDestroy = true; }
+    void show();
 private:
     class NetCenterCycled : public CycledComponent {
     public:
@@ -131,7 +140,7 @@ private:
     Text playerListText, chatAreaText; 
     NetCenterPlayerList playerList;
     NetCenterChatArea chatArea;
-    NetCenterCycled *cycled;
+    NetCenterCycled cycled;
     PuyoNetGameCenter *netCenter;
     PuyoStoryWidget story;
     SliderContainer container;

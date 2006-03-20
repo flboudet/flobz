@@ -30,7 +30,7 @@
 using namespace ios_fc;
 
 PuyoInternetGameCenter::PuyoInternetGameCenter(const String hostName, int portNum, const String name)
-  : mbox(hostName, portNum), name(name),
+  : mbox(hostName, portNum), name(name), status(PEER_NORMAL),
     timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages), gameGranted(false)
 {
     mbox.addListener(this);
@@ -45,6 +45,7 @@ void PuyoInternetGameCenter::sendAliveMessage()
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("CMD", PUYO_IGP_ALIVE);
     msg->addString("NAME", name);
+    msg->addInt("STATUS", status);
     msg->send();
     delete msg;
     mbox.bind(prevBound);
@@ -95,6 +96,7 @@ void PuyoInternetGameCenter::acceptInvitationWithPeer(String playerName, PeerAdd
 
 void PuyoInternetGameCenter::grantGameToPeer(PeerAddress addr)
 {
+    setStatus(PEER_PLAYING);
     mbox.bind(addr);
     for (int i = 0, j = listeners.size() ; i < j ; i++) {
         listeners[i]->gameGrantedWithMessagebox(&mbox);
@@ -131,6 +133,12 @@ void PuyoInternetGameCenter::idle()
     PuyoNetGameCenter::idle();
 }
 
+void PuyoInternetGameCenter::setStatus(int status)
+{
+    this->status = status;
+    sendAliveMessage();
+}
+
 void PuyoInternetGameCenter::onMessage(Message &msg)
 {
     //printf("Cool, un msg!\n");
@@ -146,13 +154,19 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
             case PUYO_IGP_CONNECT:
             {
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-                connectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"));
+                connectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"), msg.getInt("STATUS"));
             }
                 break;
             case PUYO_IGP_DISCONNECT:
             {
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
                 disconnectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"));
+            }
+                break;
+            case PUYO_IGP_STATUSCHANGE:
+            {
+                Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
+                connectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"), msg.getInt("STATUS"));
             }
                 break;
             case PUYO_IGP_GAME_REQUEST:
@@ -165,6 +179,7 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
             case PUYO_IGP_GAME_ACCEPT:
             {
                 //printf("%s accepte la partie!\n", (const char *)msg.getString("ORGNAME"));
+    	        setStatus(PEER_PLAYING);
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
                 mbox.bind(dir.getPeerAddress());
                 for (int i = 0, j = listeners.size() ; i < j ; i++) {

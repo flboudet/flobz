@@ -127,9 +127,21 @@ void NetCenterChatArea::addChat(String name, String text)
     texts[height-1]->setValue(text);
 }
 
-void NetCenterPlayerList::addNewPlayer(String playerName, PeerAddress playerAddress)
+String NetCenterPlayerList::PlayerEntry::getStatusString(int status)
 {
-    PlayerEntry *newEntry = new PlayerEntry(playerName, playerAddress, new PlayerSelectedAction(targetMenu, playerAddress, playerName));
+  switch (status) {
+  case PEER_NORMAL:
+    return "";
+  case PEER_PLAYING:
+    return " (playing)";
+  default:
+    return " (unknown)";
+  }
+}
+
+void NetCenterPlayerList::addNewPlayer(String playerName, PeerAddress playerAddress, int status)
+{
+    PlayerEntry *newEntry = new PlayerEntry(playerName, playerAddress, status, new PlayerSelectedAction(targetMenu, playerAddress, playerName));
     entries.add(newEntry);
     add(newEntry);
 }
@@ -142,6 +154,17 @@ void NetCenterPlayerList::removePlayer(PeerAddress playerAddress)
             remove(currentEntry);
             entries.removeAt(i);
             delete currentEntry;
+            return;
+        }
+    }
+}
+
+void NetCenterPlayerList::updatePlayer(String playerName, PeerAddress playerAddress, int status)
+{
+    for (int i = 0 ; i < entries.size() ; i++) {
+        if (entries[i]->playerAddress == playerAddress) {
+            PlayerEntry *currentEntry = entries[i];
+	    currentEntry->updateEntry(playerName, status);
             return;
         }
     }
@@ -167,9 +190,10 @@ private:
     
 NetCenterMenu::NetCenterMenu(PuyoNetGameCenter *netCenter)
     : netCenter(netCenter), playerListText("Player List"), chatAreaText("Chat Area"),
+      cycled(this),
       playerList(8, this), chatArea(8), story(666), onScreenDialog(NULL), shouldSelfDestroy(false)
 {
-    cycled = new NetCenterCycled(this);
+    GameUIDefaults::GAME_LOOP->addIdle(&cycled);
     netCenter->addListener(this);
 }
 
@@ -180,15 +204,8 @@ NetCenterMenu::~NetCenterMenu()
     delete netCenter;
 }
 
-void NetCenterMenu::idle(double currentTime)
-{
-    cycled->idle(currentTime);
-}
-
 void NetCenterMenu::cycle()
 {
-    //PuyoScreen::idle(currentTime);
-    //printf("Idle\n");
     netCenter->idle();
 }
 
@@ -254,12 +271,17 @@ void NetCenterMenu::onChatMessage(const String &msgAuthor, const String &msg)
 void NetCenterMenu::onPlayerConnect(String playerName, PeerAddress playerAddress)
 {
     //printf("Connect: %s\n", (const char *)(netCenter->getPeerNameAtIndex(playerIndex)));
-    playerList.addNewPlayer(playerName, playerAddress);
+    playerList.addNewPlayer(playerName, playerAddress, netCenter->getPeerStatusForAddress(playerAddress));
 }
 
 void NetCenterMenu::onPlayerDisconnect(String playerName, PeerAddress playerAddress)
 {
     playerList.removePlayer(playerAddress);
+}
+
+void NetCenterMenu::onPlayerUpdated(String playerName, PeerAddress playerAddress)
+{
+    playerList.updatePlayer(playerName, playerAddress, netCenter->getPeerStatusForAddress(playerAddress));
 }
 
 void NetCenterMenu::gameInvitationAgainst(String playerName, PeerAddress playerAddress)
@@ -330,3 +352,8 @@ void NetCenterMenu::playerSelected(PeerAddress playerAddress, String playerName)
     netCenter->requestGameWith(playerAddress);
 }
 
+void NetCenterMenu::show()
+{
+  netCenter->setStatus(PEER_NORMAL);
+  Screen::show();
+}

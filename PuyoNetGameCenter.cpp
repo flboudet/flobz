@@ -31,9 +31,10 @@ using namespace ios_fc;
 
 class PuyoNetGameCenter::GamerPeer {
 public:
-    GamerPeer(String name, PeerAddress address) : name(name), address(address) {}
+    GamerPeer(String name, PeerAddress address, int status = PEER_NORMAL) : name(name), address(address), status(status) {}
     String name;
     PeerAddress address;
+    int status;
 };
 
 class PuyoNetGameCenter::PendingGame {
@@ -58,14 +59,21 @@ void PuyoNetGameCenter::idle()
     }
 }
 
-void PuyoNetGameCenter::connectPeer(PeerAddress addr, const String name)
+void PuyoNetGameCenter::connectPeer(PeerAddress addr, const String name, int status)
 {
     //printf("%s vient de se connecter!\n", (const char *)name);
     for (int i = 0, j = peers.size() ; i < j ; i++) {
-        if (peers[i]->address == addr)
+      if (peers[i]->address == addr) {
+            if (peers[i]->status != status) {
+	      peers[i]->status = status;
+	      for (int i = 0, j = listeners.size() ; i < j ; i++) {
+		listeners[i]->onPlayerUpdated(name, addr);
+	      }
+	    }
             return;
+      }
     }
-    peers.add(new GamerPeer(name, addr));
+    peers.add(new GamerPeer(name, addr, status));
     for (int i = 0, j = listeners.size() ; i < j ; i++) {
         listeners[i]->onPlayerConnect(name, addr);
     }
@@ -117,6 +125,15 @@ PeerAddress PuyoNetGameCenter::getPeerAddressForPeerName(String peerName) const
     }
     // hum...
     return peers[i]->address;
+}
+
+int PuyoNetGameCenter::getPeerStatusForAddress(PeerAddress &addr) const
+{
+    for (int i = 0 ; i < peers.size() ; i++) {
+        if (peers[i]->address == addr)
+            return peers[i]->status;
+    }
+    return 0;
 }
 
 int PuyoNetGameCenter::getPeerCount() const

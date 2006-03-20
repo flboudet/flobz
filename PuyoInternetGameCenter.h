@@ -37,6 +37,7 @@ public:
     void sendMessage(const String msgText);
     void idle();
     void onMessage(Message &msg);
+    void setStatus(int status);
 protected:
     void requestGameWithPeer(String playerName, PeerAddress addr);
     void acceptInvitationWithPeer(String playerName, PeerAddress addr);
@@ -47,6 +48,7 @@ private:
     
     IgpMessageBox mbox;
     const String name;
+    int status;
     double timeMsBetweenTwoAliveMessages, lastAliveMessage;
     bool gameGranted;
     PeerAddress grantedAddr;
