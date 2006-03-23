@@ -40,7 +40,7 @@ enum {
 PuyoLanGameCenter::PuyoLanGameCenter(int portNum, const String name)
     : socket(portNum), mbox(&socket), name(name),
       timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages),
-      gameGranted(false)
+      gameGranted(false), status(PEER_NORMAL)
 {
     mbox.addListener(this);
     SessionManager &mboxSession = dynamic_cast<SessionManager &>(mbox);
@@ -61,7 +61,7 @@ void PuyoLanGameCenter::onMessage(Message &msg)
 	break;
       case PUYO_UDP_ALIVE: {
 	  Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-	  connectPeer(dir.getPeerAddress(), msg.getString("NAME"));
+	  connectPeer(dir.getPeerAddress(), msg.getString("NAME"), msg.getInt("STATUS"));
         }
 	break;
         case PUYO_UDP_DISCONNECT: {
@@ -75,6 +75,7 @@ void PuyoLanGameCenter::onMessage(Message &msg)
         }
 	break;
       case PUYO_UDP_GAME_ACCEPT: {
+	  setStatus(PEER_PLAYING);
 	  Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
 	  mbox.bind(dir.getPeerAddress());
 	  for (int i = 0, j = listeners.size() ; i < j ; i++) {
@@ -132,6 +133,12 @@ void PuyoLanGameCenter::idle()
     PuyoNetGameCenter::idle();
 }
 
+void PuyoLanGameCenter::setStatus(int status)
+{
+    this->status = status;
+    sendAliveMessage();
+}
+
 void PuyoLanGameCenter::sendAliveMessage()
 {
     Message *msg = mbox.createMessage();
@@ -140,6 +147,7 @@ void PuyoLanGameCenter::sendAliveMessage()
 
     msg->addInt("CMD", PUYO_UDP_ALIVE);
     msg->addString("NAME", name);
+    msg->addInt("STATUS", status);
     msg->send();
     delete msg;
 }
@@ -176,6 +184,7 @@ void PuyoLanGameCenter::acceptInvitationWithPeer(String playerName, PeerAddress 
 
 void PuyoLanGameCenter::grantGameToPeer(PeerAddress addr)
 {
+    setStatus(PEER_PLAYING);
     mbox.bind(addr);
     for (int i = 0, j = listeners.size() ; i < j ; i++) {
         listeners[i]->gameGrantedWithMessagebox(&mbox);

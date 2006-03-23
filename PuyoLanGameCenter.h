@@ -37,6 +37,7 @@ public:
     PuyoLanGameCenter(int portNum, const String name);
     void sendMessage(const String msgText);
     void idle();
+    void setStatus(int status);
     void onMessage(Message &msg);
     void onPeerConnect(const PeerAddress &address) {}
     void onPeerDisconnect(const PeerAddress &address);
@@ -53,6 +54,7 @@ private:
     double timeMsBetweenTwoAliveMessages, lastAliveMessage;
     bool gameGranted;
     PeerAddress grantedAddr;
+    int status;
 };
 
 #endif // _PUYOLANGAMECENTER_H
