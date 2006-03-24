@@ -145,6 +145,11 @@ bool IgpMessageListener::igpIdValidAndUnique(int igpIdent)
     return true;
 }
 
+PeerAddress IgpMessageListener::getPeerAddress(int igpIdent)
+{
+  return dynamic_cast<NetworkIgpPeer *>(getPeer(igpIdent))->getAddress();
+}
+
 IgpPeer *IgpMessageListener::getPeer(int igpIdent) const
 {
     for (int i = 0, j = knownPeers.size() ; i < j ; i++) {

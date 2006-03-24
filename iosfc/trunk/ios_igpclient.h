@@ -38,8 +38,8 @@ public:
 
 class IGPClient : public MessageListener {
 public:
-    IGPClient(String hostName, int portID);
-    IGPClient(String hostName, int portID, int igpIdent);
+    IGPClient(MessageBox &mbox);
+    IGPClient(MessageBox &mbox, int igpIdent);
     virtual ~IGPClient();
     void sendMessage(int igpID, VoidBuffer message, bool reliable);
     void idle();
@@ -47,9 +47,9 @@ public:
     void removeListener(IGPClientMessageListener *);
     void onMessage(Message &);
 private:
+    MessageBox &mbox;
     bool enabled;
     int igpIdent;
-    MessageBox *mbox;
     AdvancedBuffer<IGPClientMessageListener*> listeners;
     double igpLastKeepAliveDate;
     double igpKeepAliveInterval;

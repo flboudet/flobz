@@ -35,6 +35,8 @@ class IgpMessageBox : public MessageBox, IGPClientMessageListener {
 public:
     IgpMessageBox(const String hostName, int portID);
     IgpMessageBox(const String hostName, int portID, int igpIdent);
+    IgpMessageBox(MessageBox &mbox);
+    IgpMessageBox(MessageBox &mbox, int igpIdent);
     virtual ~IgpMessageBox();
     virtual void idle();
     virtual Message * createMessage();
@@ -44,6 +46,8 @@ public:
     void bind(PeerAddress addr); // a revoir
     int getBound() const { return destIdent; }
  private:
+    MessageBox *mbox;
+    bool ownMessageBox;
     IGPClient igpClient;
     int sendSerialID;
     int destIdent;

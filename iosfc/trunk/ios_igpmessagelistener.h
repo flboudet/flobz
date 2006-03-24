@@ -50,6 +50,7 @@ public:
     Message *createMessage() { return mbox.createMessage(); }
     int getUniqueIGPId();
     bool igpIdValidAndUnique(int igpIdent);
+    PeerAddress getPeerAddress(int igpIdent);
 private:
     AdvancedBuffer<IgpPeer *> knownPeers;
     class NetworkIgpPeer;
@@ -83,7 +84,7 @@ protected:
     inline int igpIdValidAndUnique(int igpId) { return pool->igpIdValidAndUnique(igpId); }
     inline void sendMessageToAddress(VoidBuffer igpMessage, int destIgpIdent, bool reliable)
         { pool->sendMessageToAddress(this, igpMessage, destIgpIdent, reliable); }
-private:
+protected:
     IgpMessageListener *pool;
     int igpID;
     //bool valid;
@@ -101,7 +102,6 @@ public:
 private:
     void sendIGPIdent();
     PeerAddress address;
-    int igpID;
 };
 
 class IgpVirtualPeer : public IgpPeer {

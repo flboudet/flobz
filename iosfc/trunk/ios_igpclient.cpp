@@ -26,33 +26,32 @@
 #include "ios_igpclient.h"
 #include "ios_exception.h"
 #include "ios_igpdatagram.h"
-#include "ios_udpmessagebox.h"
+#include "ios_messagebox.h"
 #include "ios_time.h"
 
 namespace ios_fc {
 
-IGPClient::IGPClient(String hostName, int portID) : enabled(false), mbox(new UDPMessageBox(hostName, 0, portID)), igpLastKeepAliveDate(0.), igpKeepAliveInterval(2000.)
+IGPClient::IGPClient(MessageBox &mbox) : enabled(false), mbox(mbox), igpLastKeepAliveDate(0.), igpKeepAliveInterval(2000.)
 {
-    mbox->addListener(this);
-    IGPDatagram::ClientMsgAutoAssignIDDatagram datagram(mbox->createMessage());
+    mbox.addListener(this);
+    IGPDatagram::ClientMsgAutoAssignIDDatagram datagram(mbox.createMessage());
     datagram.getMessage()->send();
 }
 
-IGPClient::IGPClient(String hostName, int portID, int igpIdent) : enabled(false), mbox(new UDPMessageBox(hostName, 0, portID)), igpLastKeepAliveDate(0.), igpKeepAliveInterval(2000.)
+IGPClient::IGPClient(MessageBox &mbox, int igpIdent) : enabled(false), mbox(mbox), igpLastKeepAliveDate(0.), igpKeepAliveInterval(2000.)
 {
-    mbox->addListener(this);
-    IGPDatagram::ClientMsgAssignIDDatagram datagram(mbox->createMessage(), igpIdent);
+    mbox.addListener(this);
+    IGPDatagram::ClientMsgAssignIDDatagram datagram(mbox.createMessage(), igpIdent);
     datagram.getMessage()->send();
 }
 
 IGPClient::~IGPClient()
 {
-    delete mbox;
 }
 
 void IGPClient::sendMessage(int igpID, VoidBuffer message, bool reliable)
 {
-    IGPDatagram::ClientMsgToClientDatagram datagram(mbox->createMessage(), igpID, message, reliable);
+    IGPDatagram::ClientMsgToClientDatagram datagram(mbox.createMessage(), igpID, message, reliable);
     datagram.getMessage()->send();
 }
 
@@ -60,11 +59,11 @@ void IGPClient::idle()
 {
     double time_ms = getTimeMs();
     if ((igpLastKeepAliveDate == 0.) || (time_ms - igpLastKeepAliveDate > igpKeepAliveInterval)) {
-        IGPDatagram::ClientMsgKeepAliveDatagram datagram(mbox->createMessage());
+        IGPDatagram::ClientMsgKeepAliveDatagram datagram(mbox.createMessage());
         datagram.getMessage()->send();
         igpLastKeepAliveDate = time_ms;
     }
-    mbox->idle();
+    mbox.idle();
 }
 
 void IGPClient::onMessage(Message &rawMsg)
