@@ -1,7 +1,7 @@
 #include ../root_dir
 include ../config
 
-SRCS=PuyoServerMain.cpp PuyoServerIgpResponder.cpp
+SRCS=PuyoServerMain.cpp PuyoServerIgpResponder.cpp PuyoServerIgpNatTraversal.cpp
 
 OBJECTS=${SRCS:%.cpp=%.o}
 

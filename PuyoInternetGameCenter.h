@@ -38,6 +38,8 @@ public:
     void idle();
     void onMessage(Message &msg);
     void setStatus(int status);
+    // Temporaire
+    void punch();
 protected:
     void requestGameWithPeer(String playerName, PeerAddress addr);
     void acceptInvitationWithPeer(String playerName, PeerAddress addr);

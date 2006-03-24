@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; indent-tab-mode: nil; -*- */
 #include <stdio.h>
 #include <unistd.h>
 #include <curses.h>
@@ -47,6 +48,7 @@ public:
         wrefresh(chatArea);
     }
     void gameGrantedWithMessagebox(MessageBox *mbox) {}
+    void onPlayerUpdated(String playerName, PeerAddress playerAddress) {}
 private:
     int currentLine;
     PuyoNetGameCenter &owner;
@@ -75,6 +77,10 @@ void decodeMessage(PuyoNetGameCenter &myCenter, String msgBuf)
         wprintw(chatArea, "### Asking to cancel a game against %s\n", (const char *)against);
         wrefresh(chatArea);
         myCenter.cancelGameWith(myCenter.getPeerAddressForPeerName(against));
+    }
+    else if (msgBuf.substring(0, 6) == "/punch") {
+	PuyoInternetGameCenter &myInternetCenter = dynamic_cast<PuyoInternetGameCenter &>(myCenter);
+	myInternetCenter.punch();
     }
 }
 

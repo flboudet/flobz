@@ -3,6 +3,7 @@
 #include "ios_igpmessagelistener.h"
 #include "ios_igpvirtualpeermessagebox.h"
 #include "PuyoServerIgpResponder.h"
+#include "PuyoServerIgpNatTraversal.h"
 
 using namespace ios_fc;
 
@@ -19,7 +20,9 @@ int main()
     
     IgpVirtualPeerMessageBox igpMBox(listener, 1);
     PuyoIgpResponder responder(igpMBox);
+    PuyoIgpNatTraversal natPuncher(igpMBox, listener);
     igpMBox.addListener(&responder);
+    igpMBox.addListener(&natPuncher);
     
     try {
         while (true) {

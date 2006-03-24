@@ -139,6 +139,18 @@ void PuyoInternetGameCenter::setStatus(int status)
     sendAliveMessage();
 }
 
+void PuyoInternetGameCenter::punch()
+{
+    int prevBound = mbox.getBound();
+    mbox.bind(1);
+    Message *msg = mbox.createMessage();
+    msg->addBoolProperty("RELIABLE", true);
+    msg->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL);
+    msg->send();
+    delete msg;
+    mbox.bind(prevBound);
+}
+
 void PuyoInternetGameCenter::onMessage(Message &msg)
 {
     //printf("Cool, un msg!\n");

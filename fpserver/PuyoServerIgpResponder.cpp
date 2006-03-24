@@ -1,3 +1,4 @@
+/* -*-mode:c; c-style:k&r; c-basic-offset:4; indent-tab-mode: nil; -*- */
 #include <stdio.h>
 #include "ios_igpmessagebox.h"
 #include "ios_memory.h"
