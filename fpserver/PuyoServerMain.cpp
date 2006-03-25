@@ -31,6 +31,7 @@ int main()
                 messageBox.idle();
                 // Pb de timeout par la
                 responder.idle();
+                natPuncher.idle();
             }
             catch (ios_fc::Exception e) {
                 e.printMessage();

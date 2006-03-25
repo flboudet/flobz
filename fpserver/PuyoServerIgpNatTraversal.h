@@ -15,11 +15,13 @@ public:
     void onMessage(Message &msg);
     void idle();
 private:
+    class PunchPool;
     void updatePeer(PeerAddress addr, const String name, int status);
 
     IgpVirtualPeerMessageBox &mbox;
     IgpMessageListener &igpListener;
     double timeMsBeforePunchTimeout;
+    AdvancedBuffer<PunchPool *> pools;
 };
 
 #endif // _PUYOSERVERIGPNATTRAVERSAL_H
