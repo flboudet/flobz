@@ -47,6 +47,7 @@ IGPClient::IGPClient(MessageBox &mbox, int igpIdent) : enabled(false), mbox(mbox
 
 IGPClient::~IGPClient()
 {
+    mbox.removeListener(this);
 }
 
 void IGPClient::sendMessage(int igpID, VoidBuffer message, bool reliable)

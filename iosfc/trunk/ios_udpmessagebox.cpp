@@ -377,6 +377,11 @@ void UDPMessageBox::bind(PeerAddress addr)
     else throw Exception("Incompatible peer address type!");
 }
 
+PeerAddress UDPMessageBox::createPeerAddress(SocketAddress address, int portNum)
+{
+    return UDPPeerAddress(address, portNum);
+}
+
 
 /*UDPMessageBox::UDPMessageBox (const UDPMessageBox&m)
   : defaultAddress(m.defaultAddress), defaultPort(m.defaultPort)

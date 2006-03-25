@@ -54,6 +54,7 @@ public:
     inline int getTimeMsBeforePeerTimeout()      const  { return timeMsBeforePeerTimeout; }
     
     void bind(PeerAddress addr);
+    PeerAddress createPeerAddress(SocketAddress address, int portNum);
 private:
     struct KnownPeer;
     KnownPeer *findPeer(PeerAddress address);
