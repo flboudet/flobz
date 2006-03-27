@@ -37,28 +37,29 @@ AnimatedPuyo::AnimatedPuyo(PuyoState state, AnimatedPuyoSetTheme *themeSet, Puyo
 
 AnimatedPuyo::~AnimatedPuyo()
 {
-    while (animationQueue.getSize() > 0)
+    while (animationQueue.size() > 0)
            removeCurrentAnimation();
 }
 
 void AnimatedPuyo::addAnimation(PuyoAnimation *animation)
 {
-    animationQueue.addElement(animation);
+    animationQueue.add(animation);
 }
 
 PuyoAnimation * AnimatedPuyo::getCurrentAnimation() const
 {
-    if (animationQueue.getSize() == 0)
+    if (animationQueue.size() == 0)
         return NULL;
-    return (PuyoAnimation *)animationQueue.getElementAt(0);
+    return animationQueue[0];
 }
 
 void AnimatedPuyo::removeCurrentAnimation()
 {
-    if (animationQueue.getSize() == 0)
+    if (animationQueue.size() == 0)
         return;
-    delete (PuyoAnimation *)animationQueue.getElementAt(0);
-    animationQueue.removeElementAt(0);
+    PuyoAnimation *animationToRemove = animationQueue[0];
+    animationQueue.removeKeepOrder(animationToRemove);
+    delete animationToRemove;
 }
 
 void AnimatedPuyo::cycleAnimation()
@@ -189,9 +190,9 @@ AnimatedPuyoFactory::AnimatedPuyoFactory(PuyoView *attachedView)
 
 AnimatedPuyoFactory::~AnimatedPuyoFactory()
 {
-    while (puyoWalhalla.getSize() > 0) {
-        AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(puyoWalhalla.getElementAt(0));
-        puyoWalhalla.removeElementAt(0);
+    while (puyoWalhalla.size() > 0) {
+        PuyoPuyo *currentPuyo = puyoWalhalla[0];
+        puyoWalhalla.removeAt(0);
         delete currentPuyo;
     }
 }
@@ -203,26 +204,26 @@ PuyoPuyo *AnimatedPuyoFactory::createPuyo(PuyoState state)
 
 void AnimatedPuyoFactory::deletePuyo(PuyoPuyo *target)
 {
-    puyoWalhalla.addElement(target);
+    puyoWalhalla.add(target);
 }
 
 
 void AnimatedPuyoFactory::renderWalhalla()
 {
-    for (int i = puyoWalhalla.getSize() - 1 ; i >= 0 ; i--) {
-        AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(puyoWalhalla.getElementAt(i));
+    for (int i = puyoWalhalla.size() - 1 ; i >= 0 ; i--) {
+        AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(puyoWalhalla[i]);
         currentPuyo->render();
     }
 }
 
 void AnimatedPuyoFactory::cycleWalhalla()
 {
-    for (int i = puyoWalhalla.getSize() - 1 ; i >= 0 ; i--) {
-        AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(puyoWalhalla.getElementAt(i));
+    for (int i = puyoWalhalla.size() - 1 ; i >= 0 ; i--) {
+        AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(puyoWalhalla[i]);
         if (currentPuyo->getCurrentAnimation() != NULL) {
             currentPuyo->cycleAnimation();
         } else {
-            puyoWalhalla.removeElementAt(i);
+            puyoWalhalla.removeAt(i);
             delete currentPuyo;
         }
     }

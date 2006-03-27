@@ -95,7 +95,7 @@ class PuyoView : public PuyoDelegate {
     PuyoLevelTheme *attachedLevelTheme;
     AnimatedPuyoFactory attachedPuyoFactory;
     PuyoGame *attachedGame, *enemyGame;
-    IosVector viewAnimations;
+    AdvancedBuffer<Animation *> viewAnimations;
     int cycleAllowance;
     SDL_Painter &attachedPainter;
     int delayBeforeGameOver;

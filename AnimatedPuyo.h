@@ -26,10 +26,10 @@
 #ifndef _ANIMATEDPUYO
 #define _ANIMATEDPUYO
 
+#include "ios_memory.h"
 #include "SDL_Painter.h"
 #include "PuyoGame.h"
 #include "PuyoAnimations.h"
-#include "IosVector.h"
 
 class PuyoView;
 class AnimatedPuyoTheme;
@@ -55,7 +55,7 @@ public:
     int getScreenCoordinateY() const;
 	AnimatedPuyoTheme *getAttachedTheme() const { return attachedTheme; }
 private:
-    IosVector animationQueue;
+    AdvancedBuffer<PuyoAnimation *> animationQueue;
     int puyoEyeState;
     unsigned int smallTicksCount;
     bool visibilityFlag;
@@ -73,7 +73,7 @@ public:
     void renderWalhalla();
     void cycleWalhalla();
 private:
-    IosVector puyoWalhalla;
+    AdvancedBuffer<PuyoPuyo *> puyoWalhalla;
     PuyoView *attachedView;
     AnimatedPuyoSetTheme *attachedThemeSet;
 };

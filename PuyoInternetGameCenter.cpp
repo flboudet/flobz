@@ -30,8 +30,8 @@
 using namespace ios_fc;
 
 PuyoInternetGameCenter::PuyoInternetGameCenter(const String hostName, int portNum, const String name)
-  : mbox(hostName, portNum), name(name), status(PEER_NORMAL),
-    timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages), gameGranted(false)
+  : hostName(hostName), portNum(portNum), mbox(hostName, portNum), p2pmbox(NULL), p2pNatTraversal(NULL), tryNatTraversal(true), name(name), status(PEER_NORMAL),
+    timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages), gameGrantedStatus(GAMESTATUS_IDLE)
 {
     mbox.addListener(this);
     sendAliveMessage();
@@ -90,16 +90,18 @@ void PuyoInternetGameCenter::acceptInvitationWithPeer(String playerName, PeerAdd
     dirNew->setPeerAddress(addr);
     msg->send();
     delete msg;
-    gameGranted = true;
+    if (tryNatTraversal)
+        gameGrantedStatus = GAMESTATUS_STARTTRAVERSAL;
+    else
+        gameGrantedStatus = GAMESTATUS_GRANTED_IGP;
     grantedAddr = addr;
 }
 
-void PuyoInternetGameCenter::grantGameToPeer(PeerAddress addr)
+void PuyoInternetGameCenter::grantGameToMBox(MessageBox &thembox)
 {
     setStatus(PEER_PLAYING);
-    mbox.bind(addr);
     for (int i = 0, j = listeners.size() ; i < j ; i++) {
-        listeners[i]->gameGrantedWithMessagebox(&mbox);
+        listeners[i]->gameGrantedWithMessagebox(&thembox);
     }
 }
 
@@ -119,10 +121,41 @@ void PuyoInternetGameCenter::cancelGameWithPeer(String playerName, PeerAddress a
 void PuyoInternetGameCenter::idle()
 {
     static int idleCount = 0;
-    if (gameGranted) {
-      grantGameToPeer(grantedAddr);
-      gameGranted = false;
-      return;
+    switch (gameGrantedStatus) {
+        case GAMESTATUS_STARTTRAVERSAL:
+            p2pmbox = new UDPMessageBox(hostName, 0, portNum);
+            p2pPunchName = "testpunch";
+            p2pNatTraversal = new PuyoNatTraversal(*p2pmbox);
+            p2pNatTraversal->punch(p2pPunchName);
+            gameGrantedStatus = GAMESTATUS_WAITTRAVERSAL;
+            break;
+        case GAMESTATUS_WAITTRAVERSAL:
+            p2pNatTraversal->idle();
+            if (p2pNatTraversal->hasFailed()) {
+                delete p2pNatTraversal;
+                p2pNatTraversal = NULL;
+                delete p2pmbox;
+                p2pmbox = NULL;
+                gameGrantedStatus = GAMESTATUS_GRANTED_IGP;
+            }
+            else if (p2pNatTraversal->hasSucceeded()) {
+                delete p2pNatTraversal;
+                p2pNatTraversal = NULL;
+                gameGrantedStatus = GAMESTATUS_GRANTED_P2P;
+            }
+            break;
+        case GAMESTATUS_GRANTED_P2P:
+            grantGameToMBox(*p2pmbox);
+            gameGrantedStatus = GAMESTATUS_IDLE;
+            break;
+        case GAMESTATUS_GRANTED_IGP:
+            mbox.bind(grantedAddr);
+            grantGameToMBox(mbox);
+            gameGrantedStatus = GAMESTATUS_IDLE;
+            break;
+        case GAMESTATUS_IDLE:
+        default:
+            break;
     }
     mbox.idle();
     double time_ms = getTimeMs();
@@ -193,10 +226,11 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
                 //printf("%s accepte la partie!\n", (const char *)msg.getString("ORGNAME"));
     	        setStatus(PEER_PLAYING);
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-                mbox.bind(dir.getPeerAddress());
-                for (int i = 0, j = listeners.size() ; i < j ; i++) {
-                    listeners[i]->gameGrantedWithMessagebox(&mbox);
-                }
+                grantedAddr = dir.getPeerAddress();
+                if (tryNatTraversal)
+                    gameGrantedStatus = GAMESTATUS_STARTTRAVERSAL;
+                else
+                    gameGrantedStatus = GAMESTATUS_GRANTED_IGP; 
             }
                 break;
             case PUYO_IGP_GAME_CANCEL:

@@ -113,10 +113,10 @@ void PuyoView::cycleAnimation()
     attachedPuyoFactory.cycleWalhalla();
     
     // Cycling view's animations
-    if (viewAnimations.getSize() > 0) {
-        PuyoAnimation *currentAnimation = (PuyoAnimation *)(viewAnimations.getElementAt(0));
+    if (viewAnimations.size() > 0) {
+        Animation *currentAnimation = viewAnimations[0];
         if (currentAnimation->isFinished()) {
-            viewAnimations.removeElementAt(0);
+            viewAnimations.removeKeepOrder(currentAnimation);
             delete currentAnimation;
         }
         else {
@@ -216,8 +216,8 @@ void PuyoView::render()
 	}
     
     // Drawing the view animation
-    if (viewAnimations.getSize() > 0) {
-        PuyoAnimation *currentAnimation = (PuyoAnimation *)(viewAnimations.getElementAt(0));
+    if (viewAnimations.size() > 0) {
+        Animation *currentAnimation = viewAnimations[0];
         if (!currentAnimation->isFinished()) {
             currentAnimation->draw(0);
         }
@@ -290,7 +290,7 @@ void PuyoView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY)
 void PuyoView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase)
 {
     AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
-    viewAnimations.addElement(new VanishSoundAnimation(phase, synchronizer));
+    viewAnimations.add(new VanishSoundAnimation(phase, synchronizer));
     for (int i = 0, j = puyoGroup.size() ; i < j ; i++) {
         AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(puyoGroup[i]);
         if (currentPuyo->getPuyoState() != PUYO_NEUTRAL)

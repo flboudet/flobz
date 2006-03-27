@@ -1,40 +1,31 @@
-#include "ios_udpmessagebox.h"
-#include "ios_igpmessagebox.h"
-#include "ios_udpmessage.h"
-#include "ios_time.h"
-#include "PuyoIgpDefs.h"
-#include <unistd.h>
+/* FloboPuyo
+ * Copyright (C) 2004
+ *   Florent Boudet        <flobo@ios-software.com>,
+ *   Jean-Christophe Hoelt <jeko@ios-software.com>,
+ *   Guillaume Borios      <gyom@ios-software.com>
+ *
+ * iOS Software <http://www.ios-software.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
 
-using namespace ios_fc;
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
 
-class UdpPuncherClient : public MessageListener {
-public:
-    UdpPuncherClient(UDPMessageBox &udpmbox, double punchInfoTimeout = 3000., double strategyTimeout = 2000.);
-    virtual ~UdpPuncherClient();
-    void punch(const String punchPoolName);
-    void idle();
-    void onMessage(Message &message);
-    void sendGarbageMessage();
-    inline bool hasFailed() { return (currentStrategy == FAILED); }
-    inline bool hasSucceeded() { return (currentStrategy == SUCCESS); }
-private:
-    UDPMessageBox &udpmbox;
-    IgpMessageBox *igpmbox;
-    String peerAddressString, peerLocalAddressString;
-    int peerPortNum, peerLocalPortNum;
-    enum {
-        TRY_NONE = 0,
-        TRY_PUBLICADDR = 1,
-        TRY_PUBLICADDR_NEXTPORT = 2,
-        TRY_LOCALADDR = 3,
-        FAILED = 4,
-        SUCCESS = 5
-    };
-    int currentStrategy;
-    double punchInfoTimeout, strategyTimeout, timeToPunchInfo, timeToNextStrategy;
-};
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ *
+ */
 
-UdpPuncherClient::UdpPuncherClient(UDPMessageBox &udpmbox, double punchInfoTimeout, double strategyTimeout)
+#include "PuyoNatTraversal.h"
+
+PuyoNatTraversal::PuyoNatTraversal(UDPMessageBox &udpmbox, double punchInfoTimeout, double strategyTimeout)
   : udpmbox(udpmbox), igpmbox(new IgpMessageBox(udpmbox)), currentStrategy(TRY_NONE), punchInfoTimeout(punchInfoTimeout), strategyTimeout(strategyTimeout)
 {
     igpmbox->addListener(this);
@@ -42,15 +33,16 @@ UdpPuncherClient::UdpPuncherClient(UDPMessageBox &udpmbox, double punchInfoTimeo
     //printf("GetSocketPortNum(): %d\n", mbox->getDatagramSocket()->getSocketPortNum());
 }
 
-UdpPuncherClient::~UdpPuncherClient()
+PuyoNatTraversal::~PuyoNatTraversal()
 {
     if (igpmbox != NULL) {
         delete igpmbox;
         udpmbox.getDatagramSocket()->disconnect();
     }
+    udpmbox.removeListener(this);
 }
 
-void UdpPuncherClient::punch(const String punchPoolName)
+void PuyoNatTraversal::punch(const String punchPoolName)
 {
     int prevBound = igpmbox->getBound();
     igpmbox->bind(1);
@@ -69,7 +61,7 @@ void UdpPuncherClient::punch(const String punchPoolName)
     timeToPunchInfo = getTimeMs() + punchInfoTimeout;
 }
 
-void UdpPuncherClient::idle()
+void PuyoNatTraversal::idle()
 {
     double currentTime = getTimeMs();
     if (igpmbox != NULL) {
@@ -131,8 +123,10 @@ void UdpPuncherClient::idle()
     }
 }
 
-void UdpPuncherClient::onMessage(Message &msg)
+void PuyoNatTraversal::onMessage(Message &msg)
 {
+    if (! msg.hasInt("CMD"))
+        return;
     switch (msg.getInt("CMD")) {
         case PUYO_IGP_NAT_TRAVERSAL: {
             peerAddressString = msg.getString("SOCKADDR");
@@ -164,7 +158,7 @@ void UdpPuncherClient::onMessage(Message &msg)
     }
 }
 
-void UdpPuncherClient::sendGarbageMessage()
+void PuyoNatTraversal::sendGarbageMessage()
 {
     //printf("Envoi garbage\n");
     Message *garbMsg = udpmbox.createMessage();
@@ -174,24 +168,5 @@ void UdpPuncherClient::sendGarbageMessage()
     
     garbMsg->send();
     delete garbMsg;
-}
-
-int main(int argc, char *argv[])
-{
-    UDPMessageBox udpmbox(argv[1], 0, atoi(argv[2]));
-    UdpPuncherClient toto(udpmbox);
-    toto.punch(argv[3]);
-    
-    while ((!toto.hasFailed()) && (!toto.hasSucceeded())) {
-        usleep(20000);
-        toto.idle();
-    }
-    if (toto.hasFailed()) {
-        printf("FAILED to traverse NAT\n");
-    }
-    if (toto.hasSucceeded()) {
-        printf("SUCCEEDED to traverse NAT\n");
-    }
-    return 0;
 }
 

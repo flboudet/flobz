@@ -27,7 +27,9 @@
 #define _PUYOINTERNETGAMECENTER_H
 
 #include "ios_igpmessagebox.h"
+#include "ios_udpmessagebox.h"
 #include "PuyoNetGameCenter.h"
+#include "PuyoNatTraversal.h"
 
 using namespace ios_fc;
 
@@ -46,14 +48,27 @@ protected:
     void cancelGameWithPeer(String playerName, PeerAddress addr);
 private:
     void sendAliveMessage();
-    void grantGameToPeer(PeerAddress addr);
+    void grantGameToMBox(MessageBox &thembox);
     
+    const String hostName;
+    int portNum;
     IgpMessageBox mbox;
+    UDPMessageBox *p2pmbox;
+    PuyoNatTraversal *p2pNatTraversal;
+    String p2pPunchName;
+    bool tryNatTraversal;
     const String name;
     int status;
     double timeMsBetweenTwoAliveMessages, lastAliveMessage;
-    bool gameGranted;
     PeerAddress grantedAddr;
+    enum GameStatus {
+        GAMESTATUS_IDLE,
+        GAMESTATUS_STARTTRAVERSAL,
+        GAMESTATUS_WAITTRAVERSAL,
+        GAMESTATUS_GRANTED_P2P,
+        GAMESTATUS_GRANTED_IGP
+    };
+    GameStatus gameGrantedStatus;
 };
 
 #endif // _PUYOINTERNETGAMECENTER_H
