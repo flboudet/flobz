@@ -463,8 +463,8 @@ namespace ios_fc {
             void push(T t) {buffer.add(t);}
             const T pop()  { T t = buffer.last(); buffer.remove(); return t; }
             const T top() const { return buffer.last(); }
-            T &top()       { return buffer.last(); }
-            int  size()    { return buffer.size(); }
+            T &top()        { return buffer.last(); }
+            int  size() const    { return buffer.size(); }
 
         private:
             AdvancedBuffer<T> buffer;
