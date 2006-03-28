@@ -26,7 +26,7 @@
 #include "PuyoNatTraversal.h"
 
 PuyoNatTraversal::PuyoNatTraversal(UDPMessageBox &udpmbox, double punchInfoTimeout, double strategyTimeout)
-  : udpmbox(udpmbox), igpmbox(new IgpMessageBox(udpmbox)), currentStrategy(TRY_NONE), punchInfoTimeout(punchInfoTimeout), strategyTimeout(strategyTimeout)
+  : udpmbox(udpmbox), igpmbox(new IgpMessageBox(udpmbox)), currentStrategy(TRY_NONE), punchInfoTimeout(punchInfoTimeout), strategyTimeout(strategyTimeout), receivedGarbage(0)
 {
     igpmbox->addListener(this);
     //printf("GetSocketAddress(): %s\n", (const char *)(mbox->getSocketAddress().asString()));
@@ -151,7 +151,9 @@ void PuyoNatTraversal::onMessage(Message &msg)
         }
         case PUYO_IGP_NAT_TRAVERSAL_GARBAGE:
             printf("Garbage msg received: %s\n", (const char *)(msg.getString("GARBAGE")));
-            currentStrategy = SUCCESS;
+	    receivedGarbage++;
+	    if (msg.getInt("RCV") > 0)
+	      currentStrategy = SUCCESS;
             break;
         default:
             break;
@@ -165,6 +167,7 @@ void PuyoNatTraversal::sendGarbageMessage()
     
     garbMsg->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL_GARBAGE);
     garbMsg->addString("GARBAGE", "Connerie");
+    garbMsg->addInt("RCV", receivedGarbage);
     
     garbMsg->send();
     delete garbMsg;
