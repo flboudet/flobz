@@ -25,6 +25,7 @@
 
 #include "PuyoInternetGameCenter.h"
 #include "PuyoIgpDefs.h"
+#include "ios_igpmessage.h"
 #include "ios_time.h"
 
 using namespace ios_fc;
@@ -124,6 +125,7 @@ void PuyoInternetGameCenter::idle()
     switch (gameGrantedStatus) {
         case GAMESTATUS_STARTTRAVERSAL:
             p2pmbox = new UDPMessageBox(hostName, 0, portNum);
+	    printf("grantedAddr:%d\n", static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedAddr.getImpl())->getIgpIdent());
             p2pPunchName = "testpunch";
             p2pNatTraversal = new PuyoNatTraversal(*p2pmbox);
             p2pNatTraversal->punch(p2pPunchName);
@@ -137,11 +139,13 @@ void PuyoInternetGameCenter::idle()
                 delete p2pmbox;
                 p2pmbox = NULL;
                 gameGrantedStatus = GAMESTATUS_GRANTED_IGP;
+		printf("NAT traversal failed, falling back to IGP\n");
             }
             else if (p2pNatTraversal->hasSucceeded()) {
                 delete p2pNatTraversal;
                 p2pNatTraversal = NULL;
                 gameGrantedStatus = GAMESTATUS_GRANTED_P2P;
+		printf("NAT traversal succeeded, going peer-to-peer\n");
             }
             break;
         case GAMESTATUS_GRANTED_P2P:
