@@ -29,6 +29,7 @@
 #include "gameui.h"
 #include "PuyoCommander.h"
 #include "PuyoInternetGameCenter.h"
+#include "PuyoTwoPlayerStarter.h"
 
 class NetCenterMenu;
 
@@ -109,6 +110,15 @@ private:
 
 class NetCenterMenu;
 
+class NetCenterTwoNameProvider : public PuyoTwoNameProvider {
+public:
+    NetCenterTwoNameProvider(PuyoNetGameCenter &netCenter) : netCenter(netCenter) {}
+    String getPlayer1Name() const;
+    String getPlayer2Name() const;
+private:
+    PuyoNetGameCenter &netCenter;
+};
+
 class NetCenterMenu : public PuyoScreen, PuyoNetGameCenterListener {
 public:
     NetCenterMenu(PuyoNetGameCenter *netCenter);
@@ -146,6 +156,7 @@ private:
     SliderContainer container;
     NetCenterDialogMenu *onScreenDialog;
     bool shouldSelfDestroy;
+    NetCenterTwoNameProvider nameProvider;
 };
     
 #endif // _PUYONETCENTERMENU

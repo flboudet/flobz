@@ -11,7 +11,8 @@ enum {
     kGamePause   = 3,
     kGameResume  = 4,
     kGameNext    = 5,
-    kGameAbort   = 6
+    kGameAbort   = 6,
+    kGameChat    = 7
 };
 
 static const char *TYPE          = "TYPE";

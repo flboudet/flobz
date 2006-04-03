@@ -37,14 +37,21 @@ PuyoGame *PuyoNetworkGameFactory::createPuyoGame(PuyoFactory *attachedPuyoFactor
     return new PuyoNetworkGame(attachedPuyoFactory, msgBox, gameId);
 }
 
+void PuyoNetworkGameWidget::ChatAction::action()
+{
+    String chatString = attachedEditField->getValue();
+    owner->sendChat(chatString);
+}
+
 PuyoNetworkGameWidget::PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, Action *gameOverAction)
     : attachedPuyoThemeSet(puyoThemeSet), mbox(mbox), attachedLocalGameFactory(&attachedRandom),
       attachedNetworkGameFactory(&attachedRandom, mbox, gameId), localArea(&attachedLocalGameFactory, &attachedPuyoThemeSet, &levelTheme,
             1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, gameId, painter),
       networkArea(&attachedNetworkGameFactory, &attachedPuyoThemeSet, &levelTheme,
             1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
-      playercontroller(localArea), dummyPlayerController(networkArea), syncMsgReceived(false), syncMsgSent(false)
+      playercontroller(localArea), dummyPlayerController(networkArea), syncMsgReceived(false), syncMsgSent(false), chatAction(this), chatInput("Say:", "Hello", &chatAction), chatArea(8)
 {
+    chatAction.setEditField(chatInput.getEditField());
     mbox.addListener(this);
     initialize(localArea, networkArea, playercontroller, dummyPlayerController, levelTheme, gameOverAction);
     setLives(-1);
@@ -86,6 +93,10 @@ void PuyoNetworkGameWidget::onMessage(Message &message)
             break;
         case PuyoMessage::kGameAbort:
             PuyoGameWidget::abort();
+            break;
+        case PuyoMessage::kGameChat:
+            chatArea.addChat(message.getString("NAME"), message.getString("TEXT"));
+            printf("%s: %s\n", (const char *)message.getString("NAME"), (const char *)message.getString("TEXT"));
             break;
         default:
             break;
@@ -140,6 +151,26 @@ void PuyoNetworkGameWidget::actionAfterGameOver(bool fromControls)
         delete message;
     }
     PuyoGameWidget::actionAfterGameOver(fromControls);
+}
+
+void PuyoNetworkGameWidget::sendChat(String chatText)
+{
+    ios_fc::Message *message = mbox.createMessage();
+    message->addInt(PuyoMessage::TYPE,   PuyoMessage::kGameChat);
+    message->addString("NAME",   getPlayerOneName());
+    message->addString("TEXT",   chatText);
+    message->addBoolProperty("RELIABLE", true);
+    message->send();
+    chatArea.addChat(getPlayerOneName(), chatText);
+    delete message;
+}
+
+void PuyoNetworkGameWidget::associatedScreenHasBeenSet(PuyoGameScreen *associatedScreen)
+{
+    chatBox.add(&chatInput);
+    chatBox.add(&chatArea);
+    chatBox.setPreferedSize(Vec3(640, 200, 0));
+    associatedScreen->getPauseMenu().add(&chatBox);
 }
 
 void PuyoNetworkGameWidget::sendSyncMsg()

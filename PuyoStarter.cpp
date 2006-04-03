@@ -425,7 +425,7 @@ PuyoGameScreen::PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScree
     if (gameWidget.getOpponentFace() != NULL)
         add(gameWidget.getOpponentFace());
     add(&transitionWidget);
-    gameWidget.associatedScreen = this;
+    gameWidget.setAssociatedScreen(this);
 }
 
 PuyoGameScreen::~PuyoGameScreen()

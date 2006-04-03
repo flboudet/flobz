@@ -67,6 +67,8 @@ public:
     void connectPeer(PeerAddress addr, const String name, int status = PEER_NORMAL);
     void disconnectPeer(PeerAddress addr, const String name);
     virtual void setStatus(int status) {}
+    virtual String getSelfName() { return "Myself"; }
+    virtual String getOpponentName() { return "Opponent"; }
 protected:
     AdvancedBuffer<PuyoNetGameCenterListener *> listeners;
     class GamerPeer;

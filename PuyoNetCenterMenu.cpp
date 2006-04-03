@@ -187,11 +187,22 @@ private:
     PuyoNetGameCenter *netCenter;
     Text *message;
 };
-    
+
+String NetCenterTwoNameProvider::getPlayer1Name() const
+{
+    return netCenter.getSelfName();
+}
+
+String NetCenterTwoNameProvider::getPlayer2Name() const
+{
+    return netCenter.getOpponentName();
+}
+
 NetCenterMenu::NetCenterMenu(PuyoNetGameCenter *netCenter)
     : netCenter(netCenter), playerListText("Player List"), chatAreaText("Chat Area"),
       cycled(this),
-      playerList(8, this), chatArea(8), story(666), onScreenDialog(NULL), shouldSelfDestroy(false)
+      playerList(8, this), chatArea(8), story(666), onScreenDialog(NULL), shouldSelfDestroy(false),
+      nameProvider(*netCenter)
 {
     GameUIDefaults::GAME_LOOP->addIdle(&cycled);
     netCenter->addListener(this);
@@ -327,7 +338,7 @@ void NetCenterMenu::gameCanceledAgainst(String playerName, PeerAddress playerAdd
 void NetCenterMenu::gameGrantedWithMessagebox(MessageBox *mbox)
 {
     PuyoNetworkTwoPlayerGameWidgetFactory *factory = new PuyoNetworkTwoPlayerGameWidgetFactory(*mbox);
-    TwoPlayersStarterAction *starterAction = new TwoPlayersStarterAction(0, *factory);
+    TwoPlayersStarterAction *starterAction = new TwoPlayersStarterAction(0, *factory, &nameProvider);
     
     starterAction->action();
     

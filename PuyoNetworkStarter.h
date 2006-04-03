@@ -29,6 +29,7 @@
 #include "PuyoSinglePlayerStarter.h"
 #include "ios_messagebox.h"
 #include "PuyoNetworkView.h"
+#include "PuyoNetCenterMenu.h"
 #include "iosfc/ios_memory.h"
 
 class PuyoNetworkGameFactory : public PuyoGameFactory {
@@ -53,6 +54,9 @@ public:
     void setScreenToResumed(bool fromControls);
     void abort();
     void actionAfterGameOver(bool fromControls);
+    void sendChat(String chatText);
+protected:
+    void associatedScreenHasBeenSet(PuyoGameScreen *associatedScreen);
 private:
     void sendSyncMsg();
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
@@ -65,6 +69,20 @@ private:
     PuyoCombinedEventPlayer playercontroller;
     PuyoNullPlayer dummyPlayerController;
     bool syncMsgReceived, syncMsgSent;
+    // Chat zone
+    class ChatAction : public Action {
+    public:
+        ChatAction(PuyoNetworkGameWidget *owner) : owner(owner) {}
+        void setEditField(EditField *attachedEditField) { this->attachedEditField = attachedEditField; }
+        void action();
+    private:
+        PuyoNetworkGameWidget *owner;
+        EditField *attachedEditField;
+    };
+    VBox chatBox;
+    ChatAction chatAction;
+    EditFieldWithLabel chatInput;
+    NetCenterChatArea chatArea;
 };
 
 #endif // _PUYONETWORKSTARTER

@@ -96,11 +96,13 @@ public:
     void addGameAHandicap(int handicap) {attachedGameA->increaseNeutralPuyos(handicap * PUYODIMX); attachedGameA->dropNeutrals();}
     void addGameBHandicap(int handicap) {attachedGameB->increaseNeutralPuyos(handicap * PUYODIMX); attachedGameB->dropNeutrals();}
     // A deplacer
-    PuyoGameScreen *associatedScreen;
+    void setAssociatedScreen(PuyoGameScreen *associatedScreen) { this->associatedScreen = associatedScreen; associatedScreenHasBeenSet(associatedScreen); };
     virtual void setScreenToPaused(bool fromControls);
     virtual void setScreenToResumed(bool fromControls);
     virtual void actionAfterGameOver(bool fromControls);
 protected:
+    virtual void associatedScreenHasBeenSet(PuyoGameScreen *associatedScreen) {}
+    PuyoGameScreen *associatedScreen;
     SDL_Painter painter;
     PuyoLevelTheme *attachedLevelTheme;
     PuyoView *areaA, *areaB;
@@ -148,6 +150,7 @@ public:
     void setOverlayStory(PuyoStoryWidget *story);
     virtual void setPaused(bool fromControls);
     virtual void setResumed(bool fromControls);
+    PuyoPauseMenu & getPauseMenu() { return pauseMenu; }
 private:
     bool paused;
     ContinueAction continueAction;
