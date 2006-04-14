@@ -41,6 +41,8 @@ public:
     void onMessage(Message &msg);
     void onPeerConnect(const PeerAddress &address) {}
     void onPeerDisconnect(const PeerAddress &address);
+    String getSelfName();
+    String getOpponentName();
 protected:
     void requestGameWithPeer(String playerName, PeerAddress addr);
     void acceptInvitationWithPeer(String playerName, PeerAddress addr);
@@ -55,6 +57,7 @@ private:
     bool gameGranted;
     PeerAddress grantedAddr;
     int status;
+    String opponentName;
 };
 
 #endif // _PUYOLANGAMECENTER_H

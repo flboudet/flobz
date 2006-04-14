@@ -139,6 +139,16 @@ void PuyoLanGameCenter::setStatus(int status)
     sendAliveMessage();
 }
 
+String PuyoLanGameCenter::getSelfName()
+{
+    return name;
+}
+
+String PuyoLanGameCenter::getOpponentName()
+{
+    return opponentName;
+}
+
 void PuyoLanGameCenter::sendAliveMessage()
 {
     Message *msg = mbox.createMessage();
@@ -154,6 +164,7 @@ void PuyoLanGameCenter::sendAliveMessage()
 
 void PuyoLanGameCenter::requestGameWithPeer(String playerName, PeerAddress addr)
 {
+  opponentName = playerName;
   Message *msg = mbox.createMessage();
   Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
   dirMsg->setPeerAddress(addr);
@@ -168,6 +179,7 @@ void PuyoLanGameCenter::requestGameWithPeer(String playerName, PeerAddress addr)
 
 void PuyoLanGameCenter::acceptInvitationWithPeer(String playerName, PeerAddress addr)
 {
+  opponentName = playerName;
   Message *msg = mbox.createMessage();
   Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
   dirMsg->setPeerAddress(addr);

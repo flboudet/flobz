@@ -1154,7 +1154,7 @@ namespace gameui {
   }
 
   EditField::EditField(const String &defaultText, const String &persistentID)
-    : Text(defaultText, NULL), persistence(persistentID)
+    : Text(defaultText, NULL), persistence(persistentID), editOnFocus(false)
     {
       char mytext[256];
       GetStrPreference(persistentID, mytext, defaultText);
@@ -1163,7 +1163,7 @@ namespace gameui {
     }
 
   EditField::EditField(const String &defaultText,  Action *action)
-    : Text(defaultText, NULL), persistence("")
+    : Text(defaultText, NULL), persistence(""), editOnFocus(false)
     {
       init(NULL,NULL);
       if (action != NULL)
@@ -1188,7 +1188,9 @@ namespace gameui {
         setValue("_",false);
       }
       else {
+        editionMode = true;
         setValue(getValue().substring(0, getValue().length() - 1));
+        editionMode = false;
         Action *action = getAction(ON_START);
         if (action)
             action->action();
@@ -1196,20 +1198,32 @@ namespace gameui {
     }
     else if (editionMode == true) {
       if (event->cursorEvent == GameControlEvent::kBack) {
-        setValue(previousValue, false);
-        editionMode = false;
+		if (!editOnFocus) {
+			setValue(previousValue, false);
+			editionMode = false;
+			event->setCaught();
+		}
       }
       else if (event->sdl_event.type == SDL_KEYDOWN) {
         SDL_Event e = event->sdl_event;
         char ch = 0;
-        if (e.key.keysym.sym == SDLK_PERIOD)
-          ch = e.key.keysym.sym;
-        if (e.key.keysym.sym == SDLK_SLASH)
-          ch = e.key.keysym.sym;
-        if (e.key.keysym.sym == SDLK_MINUS)
-          ch = e.key.keysym.sym;
+        if ((e.key.keysym.sym == SDLK_PERIOD)
+          || (e.key.keysym.sym == SDLK_KP_PERIOD))
+          ch = SDLK_PERIOD;
+        if ((e.key.keysym.sym == SDLK_SLASH)
+          || (e.key.keysym.sym == SDLK_KP_DIVIDE))
+          ch = SDLK_SLASH;
+        if ((e.key.keysym.sym == SDLK_MINUS)
+          || (e.key.keysym.sym == SDLK_KP_MINUS))
+          ch = SDLK_MINUS;
         if (e.key.keysym.sym == SDLK_COLON)
-          ch = e.key.keysym.sym;
+          ch = SDLK_COLON;
+        if (e.key.keysym.sym == SDLK_QUESTION)
+          ch = SDLK_QUESTION;
+        if (e.key.keysym.sym == SDLK_AT)
+          ch = SDLK_AT;
+        if (e.key.keysym.sym == SDLK_EXCLAIM)
+          ch = SDLK_EXCLAIM;
 
         if ((e.key.keysym.sym >= SDLK_KP0) && (e.key.keysym.sym <= SDLK_KP9))
           ch = e.key.keysym.sym - SDLK_KP0 + '0';
@@ -1243,6 +1257,11 @@ namespace gameui {
       if (isDirectionEvent(event))
         lostFocus();
     }
+	if (editOnFocus) {
+		if (isDirectionEvent(event)) {
+			lostFocus();
+        }
+	}
   }
 
   void EditField::lostFocus() {
@@ -1255,6 +1274,13 @@ namespace gameui {
     if (!haveFocus()) boing();
     Text::giveFocus();
     font = fontActive;
+	if (editOnFocus) {
+		previousValue = getValue();
+		if (!editionMode) {
+			editionMode = true;
+			setValue("_",false);
+		}
+	}
     requestDraw();
   }
   

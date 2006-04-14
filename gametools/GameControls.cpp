@@ -49,6 +49,7 @@ void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
   result->gameEvent   = GameControlEvent::kGameNone;
   result->cursorEvent = GameControlEvent::kCursorNone;
   result->isUp = true;
+  result->caught = false;
     
   if (e.type == SDL_QUIT)
     result->cursorEvent = GameControlEvent::kQuit;

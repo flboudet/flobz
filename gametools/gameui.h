@@ -363,6 +363,8 @@ namespace gameui {
       
       void lostFocus();
       void giveFocus();
+	  
+	  bool setEditOnFocus(bool editOnFocus) { this->editOnFocus = editOnFocus; }
       
     private:
       SoFont *fontActive;
@@ -371,6 +373,7 @@ namespace gameui {
       String persistence;
       String previousValue;
       void init(SoFont *fontActive, SoFont *fontInactive);
+	  bool editOnFocus;
   };
   
   class ControlInputWidget : public Text {

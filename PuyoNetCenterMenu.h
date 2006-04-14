@@ -146,8 +146,16 @@ private:
             netCenter->cycle();
         }
     };
+    class ChatAction : public Action {
+    public:
+        ChatAction(PuyoNetGameCenter *netCenter, EditField *chatInput) : netCenter(netCenter), chatInput(chatInput) {}
+        void action();
+    private:
+        PuyoNetGameCenter *netCenter;
+        EditField *chatInput;
+    };
     
-    Text playerListText, chatAreaText; 
+    Text playerListText, chatAreaText;
     NetCenterPlayerList playerList;
     NetCenterChatArea chatArea;
     NetCenterCycled cycled;
@@ -157,6 +165,8 @@ private:
     NetCenterDialogMenu *onScreenDialog;
     bool shouldSelfDestroy;
     NetCenterTwoNameProvider nameProvider;
+    ChatAction chatAction;
+    EditField chatInput;
 };
     
 #endif // _PUYONETCENTERMENU

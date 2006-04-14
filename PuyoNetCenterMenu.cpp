@@ -198,11 +198,17 @@ String NetCenterTwoNameProvider::getPlayer2Name() const
     return netCenter.getOpponentName();
 }
 
+void NetCenterMenu::ChatAction::action()
+{
+    printf("Chat:%s\n", (const char *)(chatInput->getValue()));
+    netCenter->sendMessage(chatInput->getValue());
+}
+
 NetCenterMenu::NetCenterMenu(PuyoNetGameCenter *netCenter)
     : netCenter(netCenter), playerListText("Player List"), chatAreaText("Chat Area"),
       cycled(this),
       playerList(8, this), chatArea(8), story(666), onScreenDialog(NULL), shouldSelfDestroy(false),
-      nameProvider(*netCenter)
+      nameProvider(*netCenter), chatAction(netCenter, &chatInput), chatInput("Type some text here", &chatAction)
 {
     GameUIDefaults::GAME_LOOP->addIdle(&cycled);
     netCenter->addListener(this);
@@ -239,7 +245,9 @@ void NetCenterMenu::build()
     menu->add(new Button("Change Nick"));
     menu->add(new Button("Options"));
     menu->add(new Button("Disconnect", new PopScreenAction()));
-
+    menu->add(&chatInput);
+    chatInput.setEditOnFocus(true);
+    
     playerbox->add(&playerListText);
     playerbox->add(&playerList);
 
@@ -263,6 +271,7 @@ void NetCenterMenu::build()
     add(new Button("Exit", new PopScreenAction()));
   */  
 
+    //chatbox->add(&chatInput);
     chatbox->add(&chatAreaText);
     chatbox->add(&chatArea);
     chatbox->setPreferedSize(Vec3(640, 120, 0));

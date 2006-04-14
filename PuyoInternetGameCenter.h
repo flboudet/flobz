@@ -40,6 +40,8 @@ public:
     void idle();
     void onMessage(Message &msg);
     void setStatus(int status);
+    String getSelfName();
+    String getOpponentName();
     // Temporaire
     void punch();
 protected:
@@ -69,6 +71,7 @@ private:
         GAMESTATUS_GRANTED_IGP
     };
     GameStatus gameGrantedStatus;
+    String opponentName;
 };
 
 #endif // _PUYOINTERNETGAMECENTER_H

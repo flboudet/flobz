@@ -52,6 +52,7 @@ PuyoNetworkGameWidget::PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet,
       playercontroller(localArea), dummyPlayerController(networkArea), syncMsgReceived(false), syncMsgSent(false), chatAction(this), chatInput("Say:", "Hello", &chatAction), chatArea(8)
 {
     chatAction.setEditField(chatInput.getEditField());
+	chatInput.getEditField()->setEditOnFocus(true);
     mbox.addListener(this);
     initialize(localArea, networkArea, playercontroller, dummyPlayerController, levelTheme, gameOverAction);
     setLives(-1);
@@ -169,8 +170,11 @@ void PuyoNetworkGameWidget::associatedScreenHasBeenSet(PuyoGameScreen *associate
 {
     chatBox.add(&chatInput);
     chatBox.add(&chatArea);
+    chatArea.setPreferedSize(Vec3(640, 180, 0));
     chatBox.setPreferedSize(Vec3(640, 200, 0));
+    chatBox.arrangeWidgets();
     associatedScreen->getPauseMenu().add(&chatBox);
+    associatedScreen->getPauseMenu().arrangeWidgets();
 }
 
 void PuyoNetworkGameWidget::sendSyncMsg()

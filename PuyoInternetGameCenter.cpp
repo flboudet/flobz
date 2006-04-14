@@ -69,6 +69,7 @@ void PuyoInternetGameCenter::sendMessage(const String msgText)
 
 void PuyoInternetGameCenter::requestGameWithPeer(String playerName, PeerAddress addr)
 {
+    opponentName = playerName;
     Message *msg = mbox.createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("CMD", PUYO_IGP_GAME_REQUEST);
@@ -82,6 +83,7 @@ void PuyoInternetGameCenter::requestGameWithPeer(String playerName, PeerAddress 
 
 void PuyoInternetGameCenter::acceptInvitationWithPeer(String playerName, PeerAddress addr)
 {
+    opponentName = playerName;
     Message *msg = mbox.createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("CMD", PUYO_IGP_GAME_ACCEPT);
@@ -174,6 +176,16 @@ void PuyoInternetGameCenter::setStatus(int status)
 {
     this->status = status;
     sendAliveMessage();
+}
+
+String PuyoInternetGameCenter::getSelfName()
+{
+    return name;
+}
+
+String PuyoInternetGameCenter::getOpponentName()
+{
+    return opponentName;
 }
 
 void PuyoInternetGameCenter::punch()

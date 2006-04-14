@@ -125,6 +125,9 @@ void PuyoRealMainScreen::transitionFromScreen(Screen &fromScreen)
 
 void PuyoRealMainScreen::onEvent(GameControlEvent *cevent)
 {
+    PuyoScreen::onEvent(cevent);
+	if (cevent->caught != false)
+		return;
     switch (cevent->cursorEvent) {
     case GameControlEvent::kStart:
         break;
@@ -132,7 +135,6 @@ void PuyoRealMainScreen::onEvent(GameControlEvent *cevent)
         popMenu();
         break;
     }
-    PuyoScreen::onEvent(cevent);
 }
 
 class MainRealMenu : public PuyoMainScreenMenu {

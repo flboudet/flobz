@@ -5,6 +5,7 @@
 #include "InputManager.h"
 
 typedef struct GameControlEvent {
+	GameControlEvent() : caught(false) {}
     enum {
         kGameNone,
         kPauseGame,
@@ -33,6 +34,8 @@ typedef struct GameControlEvent {
     } cursorEvent;
     bool isUp;
     SDL_Event sdl_event;
+	bool caught;
+	void setCaught() { caught = true; }
 } GameControlEvent;
 
 
