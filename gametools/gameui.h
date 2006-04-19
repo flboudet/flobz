@@ -164,10 +164,6 @@ namespace gameui {
   };
 
 
-  class SingleContainer : public WidgetContainer {
-  };
-
-
   class Box : public WidgetContainer {
     public:
       Box(GameLoop *loop = NULL);

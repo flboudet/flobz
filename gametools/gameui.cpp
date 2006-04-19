@@ -351,8 +351,8 @@ namespace gameui {
   void Box::add (Widget *child)
   {
     WidgetContainer::add(child);
-    if (child->isFocusable() && (activeWidget < 0)) {
-      activeWidget = getNumberOfChilds() - 1;
+    if (child->isFocusable()) {
+      if (activeWidget < 0) activeWidget = getNumberOfChilds() - 1;
       setFocusable(true);
     }
   }
@@ -367,7 +367,7 @@ namespace gameui {
                 return;
             }
         }
-        checkFocus();
+        //checkFocus();
     }
   }
 
@@ -376,16 +376,18 @@ namespace gameui {
     bool dontrollover = false;
     int direction = 0;
     
-    if (getNumberOfChilds() <= 0) {
+    if (getNumberOfFocusableChilds() <= 0) {
       lostFocus();
       return;
-    }  
+    }
     Vec3 ref(1.0f,2.0f,3.0f);
-    if (((parent!=NULL) &&
-            (((Box*)parent)->getSortingAxe(ref)==getSortingAxe(ref)) &&
-            (parent->getNumberOfFocusableChilds()>1))
-        || (parent==NULL))
-      dontrollover = true;
+    float axe = getSortingAxe(ref);
+    WidgetContainer * curParent = parent;
+    while ((curParent!=NULL) && (dontrollover==false)) {
+      if ((static_cast<Box *>(curParent)->getSortingAxe(ref)==axe) && (static_cast<Box *>(curParent)->getNumberOfFocusableChilds()>1))
+        dontrollover = true;
+      curParent = curParent->parent;
+    }
 
     if (activeWidget >= getNumberOfChilds())
       activeWidget = getNumberOfChilds() - 1;
@@ -420,7 +422,7 @@ namespace gameui {
     if (!haveFocus())
       if (isPrevEvent(event)) { activeWidget = getNumberOfChilds(); direction = -1; }
         else if (isNextEvent(event)) { activeWidget = -1; direction = 1; }
-      
+    
     if (direction != 0)
     {
       int possibleNewWidget = activeWidget;
@@ -573,12 +575,10 @@ namespace gameui {
   bool ZBox::isPrevEvent(GameControlEvent *event) const
   {
     return false;
-//    return event->cursorEvent == GameControlEvent::kUp;
   }
   bool ZBox::isNextEvent(GameControlEvent *event) const
   {
     return false;
-//    return event->cursorEvent == GameControlEvent::kDown;
   }
   bool ZBox::isOtherDirection(GameControlEvent *event) const
   {
