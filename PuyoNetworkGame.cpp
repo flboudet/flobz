@@ -172,6 +172,8 @@ void PuyoNetworkGame::synchronizeState(Message &message)
         neutralPuyos = 0;
         sentBadPuyos = badPuyos;
     }
+    
+    neutralPuyos = message.getInt(CURRENT_NEUTRALS);
 }
 
 PuyoPuyo *PuyoNetworkGame::findPuyo(int puyoID)
