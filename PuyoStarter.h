@@ -66,6 +66,34 @@ private:
     int fpKey_Repeat, fpKey_Delay;
 };
 
+class PuyoCheatCodeManager {
+public:
+    PuyoCheatCodeManager(String cheatCode, Action *cheatAction) : cheatCode(cheatCode), cheatAction(cheatAction), cheatCodeLength(cheatCode.length()), currentPosition(0) {}
+    void eventOccured(GameControlEvent *event);
+private:
+    String cheatCode;
+    Action *cheatAction;
+    int cheatCodeLength;
+    int currentPosition;
+};
+
+class PuyoGameWidget;
+class PuyoKillPlayerLeftAction : public Action {
+public:
+    PuyoKillPlayerLeftAction(PuyoGameWidget &target) : target(target) {}
+    void action();
+private:
+    PuyoGameWidget &target;
+};
+
+class PuyoKillPlayerRightAction : public Action {
+public:
+    PuyoKillPlayerRightAction(PuyoGameWidget &target) : target(target) {}
+    void action();
+private:
+    PuyoGameWidget &target;
+};
+
 class PuyoGameScreen;
 
 class PuyoGameWidget : public GarbageCollectableItem, public Widget, CycledComponent {
@@ -122,6 +150,9 @@ protected:
     int MinSpeed,MaxSpeed; // in units of 20ms
     int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
     String playerOneName, playerTwoName;
+    PuyoKillPlayerLeftAction killLeftAction;
+    PuyoKillPlayerRightAction killRightAction;
+    PuyoCheatCodeManager killLeftCheat, killRightCheat;
 };
 
 class ContinueAction : public Action {

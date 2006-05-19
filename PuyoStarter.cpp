@@ -122,11 +122,36 @@ bool PuyoEventPlayer::keyShouldRepeat(int &key)
     return ((key - fpKey_Delay) > 0) && ((key - fpKey_Delay) % fpKey_Repeat == 0);
 }
 
+void PuyoCheatCodeManager::eventOccured(GameControlEvent *event)
+{
+    if (event->sdl_event.type != SDL_KEYDOWN)
+        return;
+    if (event->sdl_event.key.keysym.sym == cheatCode[currentPosition])
+        currentPosition++;
+    else
+        currentPosition = 0;
+    if (currentPosition == cheatCodeLength) {
+        cheatAction->action();
+        currentPosition = 0;
+    }
+}
+
+void PuyoKillPlayerLeftAction::action()
+{
+    target.addGameAHandicap(PUYODIMY);
+}
+
+void PuyoKillPlayerRightAction::action()
+{
+    target.addGameBHandicap(PUYODIMY);
+}
+
 PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
     : CycledComponent(0.02), associatedScreen(NULL), attachedLevelTheme(&levelTheme), areaA(&areaA), areaB(&areaB), controllerA(&controllerA), controllerB(&controllerB),
       cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(500), tickCounts(0), paused(false), displayLives(true), lives(3),
       gameOverAction(gameOverAction), abortedFlag(false), gameSpeed(0), blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
-      playerOneName(p1name), playerTwoName(p2name), MinSpeed(10), MaxSpeed(50)
+      playerOneName(p1name), playerTwoName(p2name), MinSpeed(10), MaxSpeed(50),
+      killLeftAction(*this), killRightAction(*this), killLeftCheat("killleft", &killLeftAction), killRightCheat("killright", &killRightAction)
 {
     initialize();
 }
@@ -135,7 +160,8 @@ PuyoGameWidget::PuyoGameWidget()
     : CycledComponent(0.02), associatedScreen(NULL), cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(500),
       tickCounts(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(0),
       blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
-      playerOneName(p1name), playerTwoName(p2name), MinSpeed(10), MaxSpeed(50)
+      playerOneName(p1name), playerTwoName(p2name), MinSpeed(10), MaxSpeed(50),
+      killLeftAction(*this), killRightAction(*this), killLeftCheat("killleft", &killLeftAction), killRightCheat("killright", &killRightAction)
 {
 }
 
@@ -363,6 +389,8 @@ void PuyoGameWidget::eventOccured(GameControlEvent *event)
     else {
         controllerA->eventOccured(event);
         controllerB->eventOccured(event);
+        killLeftCheat.eventOccured(event);
+        killRightCheat.eventOccured(event);
     }
 }
 
