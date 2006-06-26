@@ -40,11 +40,33 @@ class Vector : public AdvancedBuffer<T *>
 template <typename T>
 class SelfVector : public AdvancedBuffer<T *>
 {
-    public:
-    ~SelfVector() {
-        for (int i=0; i < this->size(); ++i)
-            delete this->get(i);
+public:
+    SelfVector() :  AdvancedBuffer<T*>::AdvancedBuffer(), instanceCounter(new int) {
+        *instanceCounter = 0;
     }
+    
+    SelfVector(const SelfVector &origin)
+        : AdvancedBuffer<T*>::AdvancedBuffer(origin), instanceCounter(origin.instanceCounter) {
+        (*instanceCounter)++;
+    }
+    
+    ~SelfVector() {
+        if (*instanceCounter == 0) {
+            for (int i=0; i < this->size(); ++i) {
+                delete this->get(i);
+            }
+            delete instanceCounter;
+        }
+        else
+         (*instanceCounter)--;
+    }
+    
+    inline void add(const T &element) { AdvancedBuffer<T*>::add(new T(element)); }
+    inline void add(T *element) { AdvancedBuffer<T*>::add(element); }
+    
+    inline T &operator[] (int i)             {return *(AdvancedBuffer<T*>::operator[](i));}
+    
+    inline const T &operator[] (int i) const {return *(AdvancedBuffer<T*>::operator[](i));}
     
     inline int  remove(const T *t)
     {
@@ -62,6 +84,8 @@ class SelfVector : public AdvancedBuffer<T *>
       // (this is bad)
       delete this->get(this->size());
     }
+private:
+    int *instanceCounter;
 };
 
 }
