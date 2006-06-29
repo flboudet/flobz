@@ -34,6 +34,8 @@ class PuyoDataPathManager {
 public:
     PuyoDataPathManager(String coreDataPath);
     String getPath(String shortPath) const;
+    String getPathInPack(String shortPath, int packPathIndex) const { return m_dataPaths[packPathIndex].combine(shortPath); }
+    int getNumPacks() const { return m_dataPaths.size(); }
 private:
     FilePath m_coreDataPath;
     SelfVector<FilePath> m_dataPaths;

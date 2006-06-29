@@ -3,33 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-static char * defaultDataFolder = ".";
-static char * altDataFolder = defaultDataFolder;
-char * dataFolder = defaultDataFolder; /* should also be static one day */
-
-const char * getDataFolder(void)
-{
-    return dataFolder;
-}
-
-void setDataFolder(const char * path)
-{
-    if (dataFolder != defaultDataFolder) free(dataFolder);
-    dataFolder = strdup(path);
-}
-
-const char * getAltDataFolder(void)
-{
-    return altDataFolder;
-}
-
-void setAltDataFolder(const char * path)
-{
-    if (altDataFolder != defaultDataFolder) free(altDataFolder);
-    altDataFolder = strdup(path);
-}
-
 /** Image loading... free... conversion */
 
 bool fullscreen = true;
@@ -66,32 +39,6 @@ IIM_Surface * IIM_Load_Absolute_DisplayFormatAlpha (const char * path)
   SDL_SetAlpha (retsurf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
   SDL_FreeSurface (tmpsurf);
   return IIM_RegisterImg(retsurf, true);
-}
-
-IIM_Surface * IIM_Load_DisplayFormat (const char *fname)
-{
-    char path[1024];
-    sprintf(path, "%s/gfx/%s", dataFolder, fname);
-    IIM_Surface * ret = IIM_Load_Absolute_DisplayFormat(path);
-    if (ret == NULL)
-    {
-        fprintf(stderr,"Could not load %s\n", fname);
-        exit(1);
-    }
-    return ret;
-}
-
-IIM_Surface * IIM_Load_DisplayFormatAlpha(const char *fname)
-{
-    char path[1024];
-    sprintf(path, "%s/gfx/%s", dataFolder, fname);
-    IIM_Surface * ret = IIM_Load_Absolute_DisplayFormatAlpha(path);
-    if (ret == NULL)
-    {
-        fprintf(stderr,"Could not load %s\n", fname);
-        exit(1);
-    }
-    return ret;
 }
 
 void IIM_Free(IIM_Surface *img)

@@ -41,7 +41,6 @@ class PuyoCommander;
 
 class PuyoStoryWidget : public Widget, public CycledComponent {
 public:
-    PuyoStoryWidget(int num, Action *finishedAction = NULL);
     PuyoStoryWidget(String screenName, Action *finishedAction = NULL);
     ~PuyoStoryWidget();
     void cycle();
@@ -52,11 +51,11 @@ private:
     Styrolyse *currentStory;
     Action *finishedAction;
     bool once;
+    static bool classInitialized;
 };
 
 class PuyoStoryScreen : public Screen {
 public:
-    PuyoStoryScreen(int num, Screen &previousScreen, Action *finishedAction = NULL);
     PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction = NULL);
     virtual ~PuyoStoryScreen();
     void onEvent(GameControlEvent *cevent);

@@ -310,7 +310,7 @@ void NetworkGameMenu::build() {
 InternetGameMenu::InternetGameMenu()
   : PuyoScreen(),
     servers(),
-    story(666),
+    story("networkmenu.gsl"),
     container(),
     playerName(PuyoGame::getPlayerName(-2), PuyoGame::getDefaultPlayerKey(-2)),
     serverName(kInternetCurrentServerDefaultValue,kInternetCurrentServerKey),

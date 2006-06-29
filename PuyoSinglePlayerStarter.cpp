@@ -83,8 +83,7 @@ PuyoLevelDefinitions::PuyoLevelDefinitions(String levelDefinitionFile)
 {
     GoomSL * gsl = gsl_new();
     if (!gsl) return;
-    String libPath(getDataFolder());
-    libPath += "/story/levellib.gsl";
+    String libPath = theCommander->getDataPathManager().getPath("/lib/levellib.gsl");
     char * fbuffer = gsl_init_buffer((const char *)libPath);
     gsl_append_file_to_buffer(levelDefinitionFile, &fbuffer);
     gsl_compile(gsl,fbuffer);
@@ -254,7 +253,8 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousSc
 SinglePlayerStarterAction::SinglePlayerStarterAction(int difficulty, PuyoSingleNameProvider *nameProvider)
     : currentLevel(0), lifes(3), difficulty(difficulty), levelData(NULL),
       story(NULL), gameScreen(NULL), gameLostWidget(NULL), gameOverScreen(NULL),
-      nameProvider(nameProvider), levelDefinitions(String(getDataFolder()) + "/story/levels.gsl"), inIntroduction(false) {}
+      nameProvider(nameProvider), levelDefinitions(theCommander->getDataPathManager().getPath("/story/levels.gsl")),
+      inIntroduction(false) {}
 
 void SinglePlayerStarterAction::action()
 {

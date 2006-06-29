@@ -58,8 +58,6 @@ IIM_Surface *iim_surface_duplicate(IIM_Surface *isrc);
 IIM_Surface *iim_surface_shift_hsv(IIM_Surface *src, float h, float s, float v);
 void iim_surface_convert_to_gray(IIM_Surface *src);
 
-IIM_Surface * IIM_Load_DisplayFormat (const char *path);
-IIM_Surface * IIM_Load_DisplayFormatAlpha (const char *path);
 IIM_Surface * IIM_Load_Absolute_DisplayFormat (const char *path);
 IIM_Surface * IIM_Load_Absolute_DisplayFormatAlpha (const char *path);
 void          IIM_Free(IIM_Surface *img);
@@ -68,16 +66,6 @@ void          IIM_ReConvertAll(void);
 
 void IIM_BlitSurface(IIM_Surface *src, IIM_Rect *src_rect, SDL_Surface *dst, SDL_Rect *dst_rect);
 void IIM_BlitRotatedSurfaceCentered(IIM_Surface *src, int degrees, SDL_Surface *dst, int x, int y);
-
-
-// Data Folder
-const char * getDataFolder(void);
-void setDataFolder(const char * path);
-const char * getAltDataFolder(void);
-void setAltDataFolder(const char * path);
-
-// Deprecated
-extern char *dataFolder;
 
 
 #endif

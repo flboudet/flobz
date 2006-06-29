@@ -207,7 +207,7 @@ void NetCenterMenu::ChatAction::action()
 NetCenterMenu::NetCenterMenu(PuyoNetGameCenter *netCenter)
     : netCenter(netCenter), playerListText("Player List"), chatAreaText("Chat Area"),
       cycled(this),
-      playerList(8, this), chatArea(8), story(666), onScreenDialog(NULL), shouldSelfDestroy(false),
+      playerList(8, this), chatArea(8), story("networkmenu.gsl"), onScreenDialog(NULL), shouldSelfDestroy(false),
       nameProvider(*netCenter), chatAction(netCenter, &chatInput), chatInput("Type some text here", &chatAction)
 {
     GameUIDefaults::GAME_LOOP->addIdle(&cycled);

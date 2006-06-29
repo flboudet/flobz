@@ -1,7 +1,6 @@
 #include "PuyoStory.h"
 #include "PuyoCommander.h"
 
-extern char *dataFolder;
 extern SoFont *storyFont;
 
 SDL_Surface *sstory;
@@ -39,9 +38,13 @@ static SDL_Surface * createStorySurface()
 /* Implementation of the Styrolyse Client */
 static void *loadImage (StyrolyseClient *_this, const char *path)
 {
-  char spath[2048];
-  sprintf(spath,"story/%s", path);
-  return IIM_Load_DisplayFormatAlpha(spath);
+  try {
+    String imgPath = theCommander->getDataPathManager().getPath(FilePath("gfx").combine(path));
+    return IIM_Load_Absolute_DisplayFormatAlpha(imgPath);
+  }
+  catch (Exception e) {
+    return NULL;
+  }
 }
 
 
@@ -80,30 +83,25 @@ StyrolyseClient *client_new()
   return &client;
 };
 
-
-PuyoStoryWidget::PuyoStoryWidget(int num, Action *finishedAction) : CycledComponent(0.04), finishedAction(finishedAction), once(false)
-{
-    char scriptPath[1024];
-    sprintf(scriptPath, "%s/story/story%d.gsl",dataFolder, num);
-    FILE *test = fopen(scriptPath, "r");
-    if (test == NULL) {
-        sprintf(scriptPath, "%s/story/storyz.gsl",dataFolder);
-    }
-    else fclose(test);
-    currentStory = styrolyse_new(scriptPath, client_new());
-    sstory = createStorySurface();
-}
+bool PuyoStoryWidget::classInitialized = false;
 
 PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction) : CycledComponent(0.04), finishedAction(finishedAction), once(false)
 {
-    char scriptPath[1024];
-    String fullPath(dataFolder);
-    fullPath += String("/story/") + screenName;
-    FILE *test = fopen((const char *)fullPath, "r");
+    if (!classInitialized) {
+        styrolyse_init(theCommander->getDataPathManager().getPath("lib/styrolyse.gsl"));
+        classInitialized = true;
+    }
+    FILE *test = NULL;
+    String fullPath;
+    try {
+        fullPath = theCommander->getDataPathManager().getPath(String("/story/") + screenName);
+        test = fopen((const char *)fullPath, "r");
+    }
+    catch (Exception e) {
+    }
     if (test == NULL) {
         printf("%s not found!!!\n", (const char *)fullPath);
-        fullPath = dataFolder;
-        fullPath += "/story/storyz.gsl";
+        fullPath = theCommander->getDataPathManager().getPath("/story/storyz.gsl");
     }
     else fclose(test);
     currentStory = styrolyse_new((const char *)fullPath, client_new());
@@ -138,12 +136,6 @@ void PuyoStoryWidget::draw(SDL_Surface *screen)
 void PuyoStoryWidget::setIntegerValue(String varName, int value)
 {
     styrolyse_setint(currentStory, varName, value);
-}
-
-PuyoStoryScreen::PuyoStoryScreen(int num, Screen &previousScreen, Action *finishedAction) : Screen(0, 0, 640, 480), storyWidget(num, finishedAction), finishedAction(finishedAction), transitionWidget(previousScreen, NULL)
-{
-    add(&storyWidget);
-    add(&transitionWidget);
 }
 
 PuyoStoryScreen::PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction) : Screen(0, 0, 640, 480), storyWidget(screenName, finishedAction), finishedAction(finishedAction), transitionWidget(previousScreen, NULL)

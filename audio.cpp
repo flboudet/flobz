@@ -13,8 +13,7 @@
 #include <vector>
 #include <map>
 #include <string>
-
-static std::string audio_data_folder;
+#include "PuyoCommander.h"
 
 #ifdef USE_AUDIO
 #include "glSDL.h"
@@ -108,9 +107,8 @@ Cache<Mix_Chunk> chunkCache(64);
 Cache<Mix_Music> musicCache(6);
 #endif
 
-void AudioManager::init(const char *dataFolder)
+void AudioManager::init()
 {
-    audio_data_folder = dataFolder;
 
 #ifdef USE_AUDIO
     int i;
@@ -171,12 +169,10 @@ static Mix_Chunk *CustomMix_LoadWAV(const char *fileName, int volume)
 {
     if (!audio_supported) return NULL;
     
+    String filePath = theCommander->getDataPathManager().getPath(FilePath("sfx").combine(fileName));
     Mix_Chunk *result;
-    char temp[1024];
 
-    sprintf(temp, "%s/%s", audio_data_folder.c_str(), fileName);
-
-    result = Mix_LoadWAV(temp);
+    result = Mix_LoadWAV(filePath);
     if (result)
       Mix_VolumeChunk (result, volume);
     return result;
@@ -186,11 +182,10 @@ static Mix_Music *CustomMix_LoadMUS(const char *fileName)
 {
     if (!audio_supported) return NULL;
 
+    String filePath = theCommander->getDataPathManager().getPath(FilePath("music").combine(fileName));
     Mix_Music *result;
-    char temp[1024];
-
-    sprintf(temp, "%s/%s", audio_data_folder.c_str(), fileName);
-    result = Mix_LoadMUS(temp);
+    
+    result = Mix_LoadMUS(fileName);
     return result;
 }
 

@@ -7,7 +7,7 @@
 
 #include "audio.h"
 
-extern char *dataFolder;
+static char scriptPath[1024];
 
 struct _Styrolyse {
 
@@ -157,6 +157,11 @@ static void sbind(GoomSL *gsl)
 
 /* Externals */
 
+void styrolyse_init(const char *styrolyse_path)
+{
+    strcpy(scriptPath, styrolyse_path);
+}
+
 Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client)
 {
     Styrolyse *_this;
@@ -193,10 +198,8 @@ void styrolyse_execute(Styrolyse *_this, int mode)
 
 void styrolyse_reload(Styrolyse *_this)
 {
-    char scriptPath[1024];
     char *fbuffer;
     if (!_this->gsl) return;
-    sprintf(scriptPath, "%s/story/styrolyse.gsl", dataFolder);
     fbuffer = gsl_init_buffer(scriptPath);
     gsl_append_file_to_buffer(_this->fname, &fbuffer);
     gsl_compile(_this->gsl,fbuffer);

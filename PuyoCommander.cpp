@@ -179,11 +179,11 @@ void PuyoCommander::run()
 void PuyoCommander::initMenus()
 {
   DBG_PRINT("initMenus()\n");
-  menuBG = IIM_Load_DisplayFormatAlpha("menubg.png");
-  menuBG_wide = IIM_Load_DisplayFormatAlpha("menubg-wide.png");
+  menuBG = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/menubg.png"));
+  menuBG_wide = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/menubg-wide.png"));
   // 
   // Create the structures.
-  PuyoStoryWidget *tempStory = new PuyoStoryWidget(0);
+  PuyoStoryWidget *tempStory = new PuyoStoryWidget("title.gsl");
   mainScreen = new PuyoRealMainScreen(tempStory);
   MainRealMenu *trubudu = new MainRealMenu(mainScreen);
   trubudu->build();
@@ -192,7 +192,7 @@ void PuyoCommander::initMenus()
 
 /* Build the PuyoCommander */
 
-PuyoCommander::PuyoCommander(bool fs)
+PuyoCommander::PuyoCommander(String dataDir, bool fs) : dataPathManager(dataDir)
 {
   //SDL_Delay(500);
   loop = GameUIDefaults::GAME_LOOP;
@@ -250,7 +250,7 @@ void PuyoCommander::initAudio()
 {
 #ifdef USE_AUDIO
   DBG_PRINT("initAudio()\n");
-  AudioManager::init((std::string(dataFolder) + "/sfx").c_str());
+  AudioManager::init();
 #endif
 }
 
@@ -260,13 +260,13 @@ void PuyoCommander::initFonts()
 {
   DBG_PRINT("initFonts()\n");
 
-  IIM_Surface *font3b = IIM_Load_DisplayFormatAlpha ("font3b.png");
-  IIM_Surface *font4b = IIM_Load_DisplayFormatAlpha ("font4b.png");
+  IIM_Surface *font3b = IIM_Load_Absolute_DisplayFormatAlpha (dataPathManager.getPath("gfx/font3b.png"));
+  IIM_Surface *font4b = IIM_Load_Absolute_DisplayFormatAlpha (dataPathManager.getPath("gfx/font4b.png"));
   IIM_Surface *font6b = iim_surface_shift_hsv(font4b, 170, -.5, -.2);
   IIM_Surface *font5b = iim_surface_shift_hsv(font3b, 170, -.5, -.2);
 
   SoFont *darkFont = SoFont_new();
-  SoFont_load (darkFont, IIM_Load_DisplayFormatAlpha ("fontdark.png"));
+  SoFont_load (darkFont, IIM_Load_Absolute_DisplayFormatAlpha (dataPathManager.getPath("gfx/fontdark.png")));
   
   storyFont = darkFont;
 

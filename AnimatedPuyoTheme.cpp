@@ -32,6 +32,7 @@
 #include <sys/stat.h>
 
 #include "AnimatedPuyoTheme.h"
+#include "PuyoCommander.h"
 #include "preferences.h"
 
 #include "goomsl/goomsl.h"
@@ -49,8 +50,8 @@ static const char * DEFAULTPATH(void)
 {
     if (defaultThemeFolder == NULL)
     {
-        String path(getDataFolder());
-        defaultThemeFolder = strdup((const char *)(path + "/gfx/Classic.fptheme"));
+        String path = theCommander->getDataPathManager().getPath("theme/Classic.fptheme");
+        defaultThemeFolder = strdup((const char *)(path));
     }
     return defaultThemeFolder;
 }
@@ -873,7 +874,7 @@ bool PuyoLevelTheme::cache(void)
 
 static void loadTheme(String fullPath)
 {
-    String scriptPath(fullPath + "/Description.gsl");
+    String scriptPath = FilePath::combine(fullPath, "Description.gsl");
     
     // Verify input file
     struct stat s;
@@ -887,8 +888,7 @@ static void loadTheme(String fullPath)
     GlobalCurrentPath = fullPath;
     GoomSL * gsl = gsl_new();
     if (!gsl) return;
-    String libPath(getDataFolder());
-    libPath += "/gfx/themelib.gsl";
+    String libPath = theCommander->getDataPathManager().getPath("lib/themelib.gsl");
     char * fbuffer = gsl_init_buffer((const char *)libPath);
     gsl_append_file_to_buffer(scriptPath, &fbuffer);
     gsl_compile(gsl,fbuffer);
@@ -908,47 +908,20 @@ AnimatedPuyoThemeManager * getPuyoThemeManger(void)
     return globalManager;
 }
 
-
 AnimatedPuyoThemeManager::AnimatedPuyoThemeManager(bool useAltLocation)
 {
     globalManager = this;
     
-    // Lister puis charger les .fptheme de path
-    String stdPath(getDataFolder());
-    stdPath += "/gfx/";
-
-    DIR *dp;
-    struct dirent *ep;
-    
-    dp = opendir(stdPath);
-    if (dp != NULL)
-    {
-        while (ep = readdir (dp))
-        {
-            if (strstr(ep->d_name,themeFolderExtension) != NULL)
-                loadTheme(stdPath+ep->d_name);
-        }
-        (void) closedir (dp);
+    // List the themes in the various pack folders
+    SelfVector<String> themeFolders;
+    for (int i = 0 ; i < theCommander->getDataPathManager().getNumPacks() ; i++) {
+        getThemeListInPath(theCommander->getDataPathManager().getPathInPack("theme", i), themeFolders);
     }
-    else fprintf(stderr,"Couldn't open the theme location %s.",(const char *)stdPath);
     
-    
-    // Lister puis charger les .fptheme de alternatePath
-    if (useAltLocation)
-    {
-        String altPath(getAltDataFolder());
-        altPath += "/";
-        dp = opendir(altPath);
-        if (dp != NULL)
-        {
-            while (ep = readdir (dp))
-            {
-                if (strstr(ep->d_name,themeFolderExtension) != NULL)
-                    loadTheme(stdPath+ep->d_name);
-            }
-            (void) closedir (dp);
-        }
-        else fprintf(stderr,"Couldn't open the alternate theme location %s.",(const char *)stdPath);
+    // Load the themes from the list
+    for (int i = 0 ; i < themeFolders.size() ; i++) {
+        printf("Loading theme %s\n", (const char *)themeFolders[i]);
+        loadTheme(themeFolders[i]);
     }
 }
 
@@ -1127,5 +1100,19 @@ AdvancedBuffer<const char *> * AnimatedPuyoThemeManager::getAnimatedPuyoSetTheme
 AdvancedBuffer<const char *> * AnimatedPuyoThemeManager::getPuyoLevelThemeList(void)
 {
     return &themeList;
+}
+
+void AnimatedPuyoThemeManager::getThemeListInPath(const char *path, SelfVector<String> &resultVector) const
+{
+    FilePath filePath(path);
+    if (!filePath.exists())
+        return;
+    SelfVector<String> pathContent = filePath.listFiles();
+    for (int i = 0 ; i < pathContent.size() ; i++) {
+        String currentPath = pathContent[i];
+        if (strstr(currentPath, themeFolderExtension) != NULL) {
+            resultVector.add(FilePath::combine(path, currentPath));
+        }
+    }
 }
 

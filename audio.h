@@ -7,7 +7,7 @@ class AudioManager
 {
   public:
 
-  static void init(const char *dataFolder);
+  static void init();
   static void close();
   
   static void preloadMusic(const char *fileName);

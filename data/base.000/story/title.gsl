@@ -3,7 +3,7 @@
   Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
   Display @titledisplay = [new_display: x=80.0 y=-100.0 width=640.0 height=480.0]
 
-  Sprite @bg      = [new_sprite_simple: image="bg_intro3.jpg" x=0.0 y=0.0]
+  Sprite @bg      = [new_sprite_simple: image="introherbert/bg_intro3.jpg" x=0.0 y=0.0]
   Sprite @f =  [new_sprite: image="title/F.png" x=0.0 y=100.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @l =  [new_sprite: image="title/L.png" x=80.0 y=120.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @o =  [new_sprite: image="title/O.png" x=120.0 y=180.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
@@ -13,7 +13,7 @@
   Sprite @u =  [new_sprite: image="title/U.png" x=310.0 y=180.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @y =  [new_sprite: image="title/Y.png" x=310.0 y=180.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @o3 = [new_sprite: image="title/O3.png" x=420.0 y=190.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
-  Sprite @kaori = [new_sprite: image="Kaori_title.png" x = -300.0 y=130.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @kaori = [new_sprite: image="kaori_title/kaori_title.png" x = -300.0 y=130.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
 
   // Defines a sprite graph (just for exmple purpose, to be removed!)
   /*

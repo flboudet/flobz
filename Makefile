@@ -6,7 +6,7 @@
 # Settings
 
 OBJFILES= audio.o HiScores.o PuyoCommander.o \
-          main.o PuyoGame.o PuyoVersion.o \
+          main.o PuyoDataPathManager.o PuyoGame.o PuyoVersion.o \
           PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o \
           styrolyse.o PuyoStory.o \
           PuyoDoomMelt.o corona32.o corona.o corona_palette.o\

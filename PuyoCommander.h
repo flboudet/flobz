@@ -5,6 +5,7 @@
 #include "ios_igpmessagebox.h"
 #include "gameui.h"
 #include "PuyoStory.h"
+#include "PuyoDataPathManager.h"
 
 using namespace ios_fc;
 using namespace gameui;
@@ -73,7 +74,7 @@ private:
 class PuyoCommander : public MessageListener
 {
   public:
-    PuyoCommander(bool fullscreen);
+    PuyoCommander(String dataDir, bool fullscreen);
     void run();
     void onMessage(Message &message);
 
@@ -92,6 +93,7 @@ class PuyoCommander : public MessageListener
     void setGlSDL(bool useGL);
     
     void initDisplay(bool fullscreen, bool useGL);
+    const PuyoDataPathManager &getDataPathManager() { return dataPathManager; }
   private:
 
     friend class SinglePlayerGameAction;
@@ -105,6 +107,8 @@ class PuyoCommander : public MessageListener
     void initFonts();
     void initMenus();
 
+    PuyoDataPathManager dataPathManager;
+    
     MessageBox *mbox;
     GameLoop   *loop;
 

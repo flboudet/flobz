@@ -45,31 +45,31 @@
   Display @dgrandma = [new_display: x=0.0 y=0.0 width=443.0  height=480.0]
 
   // Init function: called when script is loaded
-  Sprite @bg      = [new_sprite_simple: image="bg_intro3.jpg" x=0.0 y=0.0]
-  Sprite @saucer  = [new_sprite_simple: image="saucer.png" x=-150.0 y=165.0]
-  Sprite @grandma = [new_sprite: image="grandma-frame1-small.png" x=483.0 y=320.0 curframe=0.0 framespeed=0.1 nbframes=2.0]
-  Sprite @dog     = [new_sprite_simple: image="dog.png" x=238.0 y=433.0]
-  Sprite @kaori   = [new_sprite: image="kaori-far-running1.png" x=483.0 y=320.0 curframe=0.0 framespeed=0.1 nbframes=2.0]
+  Sprite @bg      = [new_sprite_simple: image="introherbert/bg_intro3.jpg" x=0.0 y=0.0]
+  Sprite @saucer  = [new_sprite_simple: image="introherbert/saucer.png" x=-150.0 y=165.0]
+  Sprite @grandma = [new_sprite: image="introherbert/grandma-frame1-small.png" x=483.0 y=320.0 curframe=0.0 framespeed=0.1 nbframes=2.0]
+  Sprite @dog     = [new_sprite_simple: image="introherbert/dog.png" x=238.0 y=433.0]
+  Sprite @kaori   = [new_sprite: image="kaori_farther/kaori-far-running1.png" x=483.0 y=320.0 curframe=0.0 framespeed=0.1 nbframes=2.0]
   
   // Halo of the saucer
-  Sprite @halo = [new_sprite: image="halo_frame1.png" x=640.0 y=480.0 curframe=0.0 framespeed=0.1 nbframes=2.0]
-  Sprite @laser = [new_sprite_simple: image="laser.png" x=640.0 y=480.0]
+  Sprite @halo = [new_sprite: image="introherbert/halo_frame1.png" x=640.0 y=480.0 curframe=0.0 framespeed=0.1 nbframes=2.0]
+  Sprite @laser = [new_sprite_simple: image="introherbert/laser.png" x=640.0 y=480.0]
 
   // Puyos
-  Sprite @vpuyo1 = [new_sprite: image="puyo-v-frame1.png" x=145.0 y=380.0 curframe=0.0 framespeed=0.1 nbframes=@PuyoAgitation]
-  Sprite @rpuyo1 = [new_sprite: image="puyo-r-frame1.png" x=175.0 y=382.0 curframe=3.5 framespeed=0.1 nbframes=@PuyoAgitation]
-  Sprite @gpuyo1 = [new_sprite: image="puyo-g-frame1.png" x=155.0 y=390.0 curframe=4.5 framespeed=0.1 nbframes=@PuyoAgitation]
-  Sprite @bpuyo1 = [new_sprite: image="puyo-b-frame1.png" x=187.0 y=393.0 curframe=2.0 framespeed=0.1 nbframes=@PuyoAgitation]
-  Sprite @ypuyo1 = [new_sprite: image="puyo-y-frame1.png" x=197.0 y=397.0 curframe=6.3 framespeed=0.1 nbframes=@PuyoAgitation]
-  Sprite @rpuyo2 = [new_sprite: image="puyo-r-frame1.png" x=135.0 y=400.0 curframe=1.5 framespeed=0.1 nbframes=@PuyoAgitation]
-  Sprite @vpuyo2 = [new_sprite: image="puyo-v-frame1.png" x=175.0 y=402.0 curframe=7.0 framespeed=0.1 nbframes=@PuyoAgitation]
-  Sprite @bpuyo2 = [new_sprite: image="puyo-b-frame1.png" x=117.0 y=406.0 curframe=5.0 framespeed=0.1 nbframes=@PuyoAgitation]
-  Sprite @gpuyo2 = [new_sprite: image="puyo-g-frame1.png" x=102.0 y=410.0 curframe=0.7 framespeed=0.1 nbframes=@PuyoAgitation]
-  Sprite @ypuyo2 = [new_sprite: image="puyo-y-frame1.png" x=177.0 y=415.0 curframe=2.9 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @vpuyo1 = [new_sprite: image="puyo_farther/puyo-v-frame1.png" x=145.0 y=380.0 curframe=0.0 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @rpuyo1 = [new_sprite: image="puyo_farther/puyo-r-frame1.png" x=175.0 y=382.0 curframe=3.5 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @gpuyo1 = [new_sprite: image="puyo_farther/puyo-g-frame1.png" x=155.0 y=390.0 curframe=4.5 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @bpuyo1 = [new_sprite: image="puyo_farther/puyo-b-frame1.png" x=187.0 y=393.0 curframe=2.0 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @ypuyo1 = [new_sprite: image="puyo_farther/puyo-y-frame1.png" x=197.0 y=397.0 curframe=6.3 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @rpuyo2 = [new_sprite: image="puyo_farther/puyo-r-frame1.png" x=135.0 y=400.0 curframe=1.5 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @vpuyo2 = [new_sprite: image="puyo_farther/puyo-v-frame1.png" x=175.0 y=402.0 curframe=7.0 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @bpuyo2 = [new_sprite: image="puyo_farther/puyo-b-frame1.png" x=117.0 y=406.0 curframe=5.0 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @gpuyo2 = [new_sprite: image="puyo_farther/puyo-g-frame1.png" x=102.0 y=410.0 curframe=0.7 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @ypuyo2 = [new_sprite: image="puyo_farther/puyo-y-frame1.png" x=177.0 y=415.0 curframe=2.9 framespeed=0.1 nbframes=@PuyoAgitation]
 
-  Balloon @offTalk = [new_balloon: image="balloon1.png" x=200.0 y=10.0 text_x=40.0 text_y=15.0]
-  Balloon @lTalk  = [new_balloon: image="balloon1l.png" x=50.0 y=120.0 text_x=40.0 text_y=15.0]
-  Balloon @rTalk  = [new_balloon: image="balloon1r.png" x=250.0 y=100.0 text_x=24.0 text_y=15.0]
+  Balloon @offTalk = [new_balloon: image="balloon/balloon1.png" x=200.0 y=10.0 text_x=40.0 text_y=15.0]
+  Balloon @lTalk  = [new_balloon: image="balloon/balloon1l.png" x=50.0 y=120.0 text_x=40.0 text_y=15.0]
+  Balloon @rTalk  = [new_balloon: image="balloon/balloon1r.png" x=250.0 y=100.0 text_x=24.0 text_y=15.0]
 
 <sprite_list>
   // Call the 'sprite' function for each sprite you want to update/draw
@@ -101,24 +101,24 @@
 
 
 <green_puyo_update: Sprite &this>
-  &this.image = "puyo-g-frame1.png"
-  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "puyo-g-frame2.png"
+  &this.image = "puyo_farther/puyo-g-frame1.png"
+  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "puyo_farther/puyo-g-frame2.png"
 
 <red_puyo_update: Sprite &this>
-  &this.image = "puyo-r-frame1.png"
-  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "puyo-r-frame2.png"
+  &this.image = "puyo_farther/puyo-r-frame1.png"
+  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "puyo_farther/puyo-r-frame2.png"
 
 <violet_puyo_update: Sprite &this>
-  &this.image = "puyo-v-frame1.png"
-  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "puyo-v-frame2.png"
+  &this.image = "puyo_farther/puyo-v-frame1.png"
+  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "puyo_farther/puyo-v-frame2.png"
 
 <blue_puyo_update: Sprite &this>
-  &this.image = "puyo-b-frame1.png"
-  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "puyo-b-frame2.png"
+  &this.image = "puyo_farther/puyo-b-frame1.png"
+  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "puyo_farther/puyo-b-frame2.png"
 
 <yellow_puyo_update: Sprite &this>
-  &this.image = "puyo-y-frame1.png"
-  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "puyo-y-frame2.png"
+  &this.image = "puyo_farther/puyo-y-frame1.png"
+  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "puyo_farther/puyo-y-frame2.png"
 
 
 <update>
@@ -140,7 +140,7 @@
   string txt11 = " ..BUT I WILL BE AVENGED!!"
 
   (@planCurrent = @PlanLarge)? {
-    @bg.image = "bg_intro3.jpg"
+    @bg.image = "introherbert/bg_intro3.jpg"
     @bg.pos.x = 0.0
     @bg.pos.y = 0.0
 
@@ -152,7 +152,7 @@
     (@cycle = @GrandmaTextStart)? show_balloon_with_text::@rTalk text=txt3
     (@cycle = @EtText2Start)?  {
       hide_balloon::@rTalk
-      @lTalk = [new_balloon: image="balloon1r.png" x=50.0 y=10.0 text_x=24.0 text_y=15.0]
+      @lTalk = [new_balloon: image="balloon/balloon1r.png" x=50.0 y=10.0 text_x=24.0 text_y=15.0]
       show_balloon_with_text::@lTalk text=txt4
     }
     (@cycle = @EtText2End)?   hide_balloon::@lTalk
@@ -213,22 +213,22 @@
 
     // Frames of grandma's animation
     (@fcycle < @GrandmaDied)? {
-      @grandma.image = "grandma-frame1-small.png"
-      (@grandma.curframe >= 1.0)? @grandma.image = "grandma-frame2-small.png"
+      @grandma.image = "introherbert/grandma-frame1-small.png"
+      (@grandma.curframe >= 1.0)? @grandma.image = "introherbert/grandma-frame2-small.png"
     }
     (@fcycle > @GrandmaDied)? {
-      @grandma.image = "cendres1.png"
-      (@grandma.curframe >= 1.0)? @grandma.image = "cendres2.png"
+      @grandma.image = "introherbert/cendres1.png"
+      (@grandma.curframe >= 1.0)? @grandma.image = "introherbert/cendres2.png"
     }
 
     // Frames of kaori's animation
-    @kaori.image = "kaori-far-running1.png"
-    (@kaori.curframe >= 1.0)? @kaori.image = "kaori-far-running2.png"
-    (@fcycle >= @KaoriStops)? @kaori.image = "kaori-far-sad.png"
+    @kaori.image = "kaori_farther/kaori-far-running1.png"
+    (@kaori.curframe >= 1.0)? @kaori.image = "kaori_farther/kaori-far-running2.png"
+    (@fcycle >= @KaoriStops)? @kaori.image = "kaori_farther/kaori-far-sad.png"
 
     // Frames of halo animation
-    @halo.image = "halo_frame1.png"
-    (@halo.curframe >= 1.0)? @halo.image = "halo_frame2.png"
+    @halo.image = "introherbert/halo_frame1.png"
+    (@halo.curframe >= 1.0)? @halo.image = "introherbert/halo_frame2.png"
 
     violet_puyo_update::@vpuyo1
     violet_puyo_update::@vpuyo2
@@ -243,18 +243,18 @@
   }
 
   (@planCurrent = @PlanKaori)? {
-    @bg.image = "bluebkgnd.jpg"
-    @kaori.image = "kaori-small-sad.png"
+    @bg.image = "background/bluebkgnd.jpg"
+    @kaori.image = "kaori_far/kaori-small-sad.png"
     @kaori.pos.y = 250.0
   
     // Texts
     (@cycle = @KaoriText2Start)? {
-      @rTalk = [new_balloon: image="balloon2r.png" x=200.0 y=00.0 text_x=54.0 text_y=15.0]
+      @rTalk = [new_balloon: image="balloon/balloon2r.png" x=200.0 y=00.0 text_x=54.0 text_y=15.0]
       show_balloon_with_text::@rTalk text=txt7
     }
     (@cycle = @KaoriText2End)? hide_balloon::@rTalk
     (@cycle = @EtText4Start)? {
-      @lTalk = [new_balloon: image="balloon2l.png" x=10.0 y=105.0 text_x=18.0 text_y=45.0]
+      @lTalk = [new_balloon: image="balloon/balloon2l.png" x=10.0 y=105.0 text_x=18.0 text_y=45.0]
       show_balloon_with_text::@lTalk text=txt8
     }
     (@cycle = @EtText4End)? hide_balloon::@lTalk

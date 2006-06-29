@@ -16,8 +16,8 @@
   Display @kaoriDisplay  = [new_display: x=640.0 y=50.0 width=640.0 height=480.0]
   Display @puyoDisplay = [new_display: x=680.0 y=50.0 width=640.0 height=480.0]
 
-  Sprite @kaori = [new_sprite: image="Kaori_gamelost.png" x = 85.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
-  Sprite @tears = [new_sprite: image="tears1.png" x = 0.0 y=70.0 curframe=0.0 framespeed=0.5 nbframes=2.0]
+  Sprite @kaori = [new_sprite: image="kaori_gamelost/kaori_gamelost.png" x = 85.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @tears = [new_sprite: image="kaori_gamelost/tears1.png" x = 0.0 y=70.0 curframe=0.0 framespeed=0.5 nbframes=2.0]
 
   Sprite @puyo      = [new_sprite: image="knockedpuyo.png" x = 10.0 y=30.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @redStar   = [new_sprite: image="redstar.png" x = @spAx y=@spAy curframe=0.0 framespeed=0.2 nbframes=1.0]
@@ -57,9 +57,9 @@
   ([fabs: x=(@redStar.pos.y - @spBy)] < 2.0) ? @dstRy = @spCy
   ([fabs: x=(@redStar.pos.y - @spCy)] < 2.0) ? @dstRy = @spAy
 
-  (@tears.curframe > 0.0)? @tears.image = "tears1.png"
-  (@tears.curframe > 1.0)? @tears.image = "tears2.png"
-  (@tears.curframe > 3.0)? @tears.image = "happymouth.png"
+  (@tears.curframe > 0.0)? @tears.image = "kaori_gamelost/tears1.png"
+  (@tears.curframe > 1.0)? @tears.image = "kaori_gamelost/tears2.png"
+  (@tears.curframe > 3.0)? @tears.image = "null.png"
 
   (@kaoriDisplay.x > @kaoriArrived) ? @kaoriDisplay.x -= @kaoriSpeed
 

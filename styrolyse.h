@@ -18,6 +18,8 @@ struct _StyrolyseClient {
   void  (*putText)   (StyrolyseClient *_this, int x, int y, const char *text);
 };
 
+void styrolyse_init(const char *styrolyse_path);
+
 Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client);
 void styrolyse_reload(Styrolyse *_this);
 void styrolyse_free(Styrolyse *_this);

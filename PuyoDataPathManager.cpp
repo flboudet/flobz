@@ -65,8 +65,3 @@ String PuyoDataPathManager::getPath(String shortPath) const
     throw Exception(String("File ") + shortPath + " not found !");
 }
 
-int main()
-{
-    PuyoDataPathManager test("data/");
-    printf("Trouve:%s\n", (const char *)test.getPath("gfx/radada.jpeg"));
-}

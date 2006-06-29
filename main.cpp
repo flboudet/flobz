@@ -11,10 +11,13 @@
 #include "PuyoCommander.h"
 #include "ios_exception.h"
 #include "ios_memory.h"
+#include "ios_filepath.h"
 
 #ifndef DATADIR
 char *DATADIR = "data";
 #endif
+
+using namespace ios_fc;
 
 #ifdef MACOSX
 const char *bundleDataPath = "/Contents/Resources/data";
@@ -59,6 +62,7 @@ static void displayExceptionMessage(const char * msg)
 int main(int argc, char *argv[])
 {
     int i;
+    String dataDir;
     
   if (!strcmp(argv[argc-1],"-h")) {
       printf("-win for windowed mode.\n");
@@ -73,14 +77,8 @@ int main(int argc, char *argv[])
     DATADIR = (char *)malloc(pathSize + strlen(bundleDataPath));
     CFStringGetCString (bundlePath, DATADIR, pathSize, CFStringGetSystemEncoding());
     strcat(DATADIR, bundleDataPath);
-    
-    //show(CFSTR("test   : %@"), CFURLCopyFileSystemPath(CFBundleCopyBundleURL(CFBundleGetMainBundle()), kCFURLPOSIXPathStyle));
-    //fprintf(stderr, "bundle=%d path=%s\n", CFBundleGetMainBundle(), DATADIR);
-    //fprintf(stderr, "Attention ça va planter2\n");
-    //CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle(),kCFStringEncodingUnicode);
-    //DATADIR = strdup(CFStringGetCStringPtr(CFURLGetString( CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle())), kCFStringEncodingUnicode));
-    //fprintf(stderr, "Resource path: %s\n", DATADIR);
 #endif
+
 #endif
  
     bool fs = true;
@@ -90,11 +88,12 @@ int main(int argc, char *argv[])
         if (strcmp(argv[i],"-win") == 0) fs = false;
     }
     
-    if (!fileExists("data")) setDataFolder(DATADIR);
-    else setDataFolder("data");
-    //printf("Datafolder set to %s\n", getDataFolder());
-    
-    PuyoCommander commander( fs );
+    if (FilePath("data").exists())
+        dataDir = "data";
+    else
+        dataDir = DATADIR;
+            
+    PuyoCommander commander(dataDir, fs);
     
     try { commander.run(); }
     catch (Exception e) { displayExceptionMessage(e.what()); }

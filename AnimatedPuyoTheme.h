@@ -28,6 +28,7 @@
 
 #include "gametools/IosImgProcess.h"
 #include "iosfc/ios_memory.h"
+#include "iosfc/ios_vector.h"
 #include "PuyoGame.h"
 
 #define NUMBER_OF_PUYOS 5
@@ -264,6 +265,7 @@ public:
     void addLevel(PuyoLevelTheme *);
     
 private:
+    void getThemeListInPath(const char *path, SelfVector<String> &resultVector) const;
     AdvancedBuffer<const char *> themeList;
     AdvancedBuffer<const char *> puyoSetList;
 
