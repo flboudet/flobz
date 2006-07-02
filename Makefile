@@ -90,7 +90,7 @@ install: flobopuyo
 	$(STRIP) $(PRGNAME)
 	mkdir -p ${INSTALL_BINDIR}
 	mkdir -p ${INSTALL_DATADIR}
-	cp -r data/* ${INSTALL_DATADIR}
+	@+make -C data install INSTALL_DATADIR="${INSTALL_DATADIR}"
 	chmod a+rx ${INSTALL_DATADIR}
 	chmod a+rx ${INSTALL_DATADIR}/sfx
 	chmod a+rx ${INSTALL_DATADIR}/gfx
@@ -108,12 +108,8 @@ bundle: flobopuyo
 	sed "s/@@VERSION@@/$(VERSION)/" mac/Info.plist > $(bundle_name)/Contents/Info.plist
 	cp mac/icon.icns $(bundle_name)/Contents/Resources/
 	cp flobopuyo $(bundle_name)/Contents/MacOS/flobopuyo
-	cp -r data $(bundle_name)/Contents/Resources
-	rm -rf $(bundle_name)/Contents/Resources/data/CVS $(bundle_name)/Contents/Resources/data/*/CVS $(bundle_name)/Contents/Resources/data/*/*/CVS
-	rm -rf $(bundle_name)/Contents/Resources/data/.xvpics $(bundle_name)/Contents/Resources/data/*/.xvpics $(bundle_name)/Contents/Resources/data/*/*/.xvpics
-	rm -f $(bundle_name)/Contents/Resources/data/.DS_Store $(bundle_name)/Contents/Resources/data/*/.DS_Store $(bundle_name)/Contents/Resources/data/*/*/.DS_Store
-
-#	$(STRIP) $(bundle_name)/Contents/MacOS/flobopuyo
+	@+make -C data install INSTALL_DATADIR="$(PWD)/$(bundle_name)/Contents/Resources/data"
+	$(STRIP) $(bundle_name)/Contents/MacOS/flobopuyo
 
 mac-package: bundle
 	mkdir -p $(macimage_name)
