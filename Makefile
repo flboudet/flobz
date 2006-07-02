@@ -28,7 +28,7 @@ MAKEDEPEND = $(CXX) -MM $(DEPFLAGS) -o $(df).d $<
 
 all: flobopuyo
 flobopuyo: all.h.gch iosfc_dir gametools_dir goomsl_dir ${OBJFILES}
-	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) $(LDFLAGS) -o $(PRGNAME) ${OBJFILES} gametools/*.o goomsl/goomsl*.o -Liosfc -liosfc
+	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) -o $(PRGNAME) ${OBJFILES} gametools/*.o goomsl/goomsl*.o -Liosfc -liosfc $(LDFLAGS)
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
 	@echo
@@ -121,7 +121,7 @@ mac-package: bundle
 win-package: flobopuyo
 	$(STRIP) $(PRGNAME)
 	mkdir -p $(WINZIP_NAME)
-	cp -r data $(WINZIP_NAME)
+	@+make -C data install INSTALL_DATADIR="$(PWD)/$(WINZIP_NAME)/data"
 	cp flobopuyo.exe $(WINZIP_NAME)
 	cp COPYING $(WINZIP_NAME)
 	cp $(WINSDLRUNTIME)/*.dll $(WINZIP_NAME)

@@ -1,4 +1,4 @@
-FILES=columns-background.jpg fat-puyo-0000.png fat-puyo-0001.png fat-puyo-0010.png \
+FILES=Description.gsl columns-background.jpg fat-puyo-0000.png fat-puyo-0001.png fat-puyo-0010.png \
 fat-puyo-0011.png fat-puyo-0100.png fat-puyo-0101.png fat-puyo-0110.png \
 fat-puyo-0111.png fat-puyo-1000.png fat-puyo-1001.png fat-puyo-1010.png \
 fat-puyo-1011.png fat-puyo-1100.png fat-puyo-1101.png fat-puyo-1110.png \

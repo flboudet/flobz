@@ -10,7 +10,7 @@ ENABLE_FAT=false
 ###################################
 
 ENABLE_AUDIO=true
-ENABLE_OPENGL=true
+ENABLE_OPENGL?=true
 ENABLE_DGA=false
 
 DEBUG_MODE=true
@@ -115,7 +115,7 @@ ifeq ($(PLATFORM), $(CYGWIN_VERSION))
 else
 
 ifeq ($(PLATFORM), crossmingw32)
-  	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
+  	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_image -lSDL_mixer -lSDL -lSDLmain -lws2_32
 else
 	SDL_CONFIG=sdl-config
 	CFLAGS:=$(CFLAGS) `$(SDL_CONFIG) --cflags`
