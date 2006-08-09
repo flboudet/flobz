@@ -6,6 +6,7 @@
 #include "gameui.h"
 #include "PuyoStory.h"
 #include "PuyoDataPathManager.h"
+#include "PuyoLocalizedDictionary.h"
 
 using namespace ios_fc;
 using namespace gameui;

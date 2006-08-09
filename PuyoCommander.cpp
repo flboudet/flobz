@@ -139,13 +139,27 @@ void PuyoRealMainScreen::onEvent(GameControlEvent *cevent)
 
 class MainRealMenu : public PuyoMainScreenMenu {
 public:
-    MainRealMenu(PuyoRealMainScreen * mainScreen) : PuyoMainScreenMenu(mainScreen), localGameMenu(mainScreen), local2PlayersGameMenu(mainScreen), optionMenu(mainScreen), networkGameMenu(mainScreen) {}
+    MainRealMenu(PuyoRealMainScreen * mainScreen)
+      : PuyoMainScreenMenu(mainScreen), localGameMenu(mainScreen),
+        local2PlayersGameMenu(mainScreen), optionMenu(mainScreen),
+        networkGameMenu(mainScreen), locale(theCommander->getDataPathManager().getPath("locale/main")),
+        singlePlayerGameAction(&localGameMenu, mainScreen), twoPlayersGameAction(&local2PlayersGameMenu, mainScreen),
+        optionAction(&optionMenu, mainScreen), networkGameAction(&networkGameMenu, mainScreen),
+        singlePlayerGameButton(locale.getLocalizedString(kSinglePlayerGame), &singlePlayerGameAction),
+        twoPlayersGameButton(locale.getLocalizedString("Two Players Game"), &twoPlayersGameAction),
+        optionButton(locale.getLocalizedString("Options"), &optionAction),
+        networkGameButton(locale.getLocalizedString(kNetGame), &networkGameAction),
+        exitButton(locale.getLocalizedString(kExit), &exitAction) {}
     void build();
 private:
     LocalGameMenu localGameMenu;
     Local2PlayersGameMenu local2PlayersGameMenu;
     OptionMenu optionMenu;
     NetworkGameMenu networkGameMenu;
+    PuyoLocalizedDictionary locale;
+    PuyoPushMenuAction singlePlayerGameAction, twoPlayersGameAction, optionAction, networkGameAction;
+    ExitAction exitAction;
+    Button singlePlayerGameButton, twoPlayersGameButton, optionButton, networkGameButton, exitButton;
 };
 
 void MainRealMenu::build() {
@@ -153,11 +167,11 @@ void MainRealMenu::build() {
   local2PlayersGameMenu.build();
   optionMenu.build();
   networkGameMenu.build();
-  add(new Button(kSinglePlayerGame, new PuyoPushMenuAction(&localGameMenu, mainScreen)));
-  add(new Button("Two Players Game", new PuyoPushMenuAction(&local2PlayersGameMenu, mainScreen)));
-  add(new Button("Options", new PuyoPushMenuAction(&optionMenu, mainScreen)));
-  add(new Button(kNetGame, new PuyoPushMenuAction(&networkGameMenu, mainScreen)));
-  add(new Button(kExit,    new ExitAction));
+  add(&singlePlayerGameButton);
+  add(&twoPlayersGameButton);
+  add(&optionButton);
+  add(&networkGameButton);
+  add(&exitButton);
 }
 
 /**
