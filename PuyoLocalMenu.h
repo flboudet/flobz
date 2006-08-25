@@ -43,6 +43,7 @@ public:
     void build();
     String getPlayerName() const;
 private:
+    PuyoLocalizedDictionary locale;
     EditFieldWithLabel editPlayerName;
     Text screenTitle;
     SinglePlayerStarterAction easyAction;
@@ -59,6 +60,7 @@ public:
     String getPlayer1Name() const;
     String getPlayer2Name() const;
 private:
+    PuyoLocalizedDictionary locale;
     PuyoLocalTwoPlayerGameWidgetFactory gameWidgetFactory;
     EditFieldWithLabel editPlayer1Name, editPlayer2Name;
     Text screenTitle;
