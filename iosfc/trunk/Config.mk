@@ -18,3 +18,5 @@ endif
 ifeq ($(PLATFORMTYPE), WIN32)
   CXXFLAGS:=${CXXFLAGS} -DWIN32
 endif
+
+RANLIB?=ranlib

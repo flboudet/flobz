@@ -23,7 +23,7 @@ libiosfc.a: libiosfc_core.a ${SUBDIRECTORIES}
 	  ${AR} -x ../$$libdir/libiosfc_$$libdir.a; \
 	done; \
 	${AR} -cru ../libiosfc.a *.o; \
-	ranlib ../libiosfc.a; \
+	${RANLIB} ../libiosfc.a; \
 	cd ..; \
 	rm -rf libiosfc \
 	echo $(LIBRARIES)
