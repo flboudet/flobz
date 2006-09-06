@@ -114,7 +114,16 @@ void styro_sound(GoomSL *gsl, GoomHash *global, GoomHash *local)
 void styro_gettext(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
     const char *text = (const char *)GSL_LOCAL_PTR  (gsl, local, "text");
-    //((const char *)GSL_GLOBAL_PTR(gsl, "gettext")) = text;
+
+    int *globalPtrReturn = (int*)goom_hash_get(gsl_globals(gsl), "gettext")->ptr;
+
+    if (gsl_get_ptr(gsl, *globalPtrReturn)) { // may warn on console if not initialized, but it's ok.
+        gsl_free_ptr(gsl, *globalPtrReturn);
+    }
+
+    int newPtrId = gsl_malloc(gsl, strlen(text)+1); // allocate a new pointer (should we allow realloc?)
+    strcpy((char*)gsl_get_ptr(gsl, newPtrId), text);
+    *globalPtrReturn = newPtrId;
 }
 
 void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
