@@ -91,12 +91,17 @@ private:
 
 class NetworkGameMenu : public PuyoMainScreenMenu {
 public:
-    NetworkGameMenu(PuyoRealMainScreen * mainScreen) : PuyoMainScreenMenu(mainScreen), lanGameMenu(mainScreen), internetGameMenu(NULL), internetAction(&internetGameMenu) {}
+    NetworkGameMenu(PuyoRealMainScreen * mainScreen);
     void build();
 private:
+    PuyoLocalizedDictionary locale;
     LANGameMenu  lanGameMenu;
     InternetGameMenu *internetGameMenu;
     NetworkInternetAction internetAction;
+    PuyoPushMenuAction lanAction;
+    PuyoPopMenuAction mainScreenPopAction;
+    Text networkTitleText;
+    Button lanGameButton, internetGameButton, cancelButton;
 };
 
 #endif // _PUYONETWORKMENU

@@ -111,6 +111,12 @@ void styro_sound(GoomSL *gsl, GoomHash *global, GoomHash *local)
     AudioManager::playSound(path, volume);
 }
 
+void styro_gettext(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    const char *text = (const char *)GSL_LOCAL_PTR  (gsl, local, "text");
+    //((const char *)GSL_GLOBAL_PTR(gsl, "gettext")) = text;
+}
+
 void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
   const char *path = (const char *)GSL_LOCAL_PTR  (gsl, local, "&this.image");
@@ -153,6 +159,7 @@ static void sbind(GoomSL *gsl)
   gsl_bind_function(gsl, "mod",   styro_mod);
   gsl_bind_function(gsl, "music", styro_music);
   gsl_bind_function(gsl, "sound", styro_sound);
+  gsl_bind_function(gsl, "gettext",   styro_gettext);
 }
 
 /* Externals */

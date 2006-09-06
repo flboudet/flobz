@@ -299,12 +299,23 @@ void NetworkInternetAction::action()
   (GameUIDefaults::SCREEN_STACK)->push(*menuToCreate);
 }
 
+NetworkGameMenu::NetworkGameMenu(PuyoRealMainScreen * mainScreen)
+    : locale(theCommander->getDataPathManager().getPath("locale/main")),
+      PuyoMainScreenMenu(mainScreen), lanGameMenu(mainScreen),
+      internetGameMenu(NULL), internetAction(&internetGameMenu),
+      lanAction(&lanGameMenu, mainScreen), mainScreenPopAction(mainScreen),
+      networkTitleText(locale.getLocalizedString("Network Game")),
+      lanGameButton(locale.getLocalizedString("Local Area Network Game"), &lanAction),
+      internetGameButton(locale.getLocalizedString("Internet Game"), &internetAction),
+      cancelButton(locale.getLocalizedString("Cancel"), &mainScreenPopAction)
+{}
+
 void NetworkGameMenu::build() {
   lanGameMenu.build();
-  add(new Text("Network Game"));
-  add(new Button("Local Area Network Game", new PuyoPushMenuAction(&lanGameMenu, mainScreen)));
-  add(new Button("Internet Game", &internetAction));
-  add(new Button("Cancel",        new PuyoPopMenuAction(mainScreen)));
+  add(&networkTitleText);
+  add(&lanGameButton);
+  add(&internetGameButton);
+  add(&cancelButton);
 }
 
 InternetGameMenu::InternetGameMenu()
