@@ -70,7 +70,31 @@ static void  freeImage (StyrolyseClient *_this, void *image)
 
 static void putText (StyrolyseClient *_this, int x, int y, const char *text)
 {
-  SoFont_PutString (storyFont, sstory, x, y, text, NULL);
+  String output;
+  char previousChar = text[0];
+  for (int i = 0 ; i < strlen(text) ; i++) {
+    char texti = text[i];
+    switch (previousChar) {
+    case '\\':
+        switch (texti) {
+        case 'n':
+            output += '\n';
+            break;
+        default:
+            output += texti;
+        }
+        break;
+    default:
+        switch (texti) {
+        case '\\':
+            break;
+        default:
+            output += texti;
+        }
+    }
+    previousChar = texti;
+  }
+  SoFont_PutString (storyFont, sstory, x, y, output, NULL);
 }
 
 static StyrolyseClient client;
