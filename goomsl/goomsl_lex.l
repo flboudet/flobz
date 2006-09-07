@@ -42,6 +42,7 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
 <INITIAL>"//"                { BEGIN LINE_COMMENT; }
 <INITIAL>\"                  { BEGIN STRING; string_size=0; }
 
+<STRING>"\\\\"               { string[string_size++] = '\\'; }
 <STRING>"\\n"                { string[string_size++] = '\n'; }
 <STRING>"\\\""               { string[string_size++] = '\"'; }
 <STRING>\"                   { /* fin de la chaine: on cree le pointeur qui va bien */
