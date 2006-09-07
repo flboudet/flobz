@@ -538,6 +538,7 @@ namespace ios_fc {
                 strcat(buffer, txt);
             }
 
+            const String& operator+=(char c)   { append<char>   ("%c",c); return *this; }
             const String& operator+=(int i)    { append<int>   ("%d", i); return *this; }
             const String& operator+=(float f)  { append<float> ("%f", f); return *this; }
             const String& operator+=(double d) { append<double>("%d", d); return *this; }
