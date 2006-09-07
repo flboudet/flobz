@@ -86,6 +86,7 @@ struct <Display:
   }
 
 external <put_text: string text, Vec2 pos, float text_index>
+external <gettext: string text> : string
 external <draw: Sprite &this, Display display>
 external <sin: float value> : float
 external <mod: int numerator, int denominator> : int

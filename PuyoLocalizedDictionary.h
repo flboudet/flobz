@@ -24,6 +24,7 @@
  */
 
 #ifndef _PUYOLOCALIZEDDICTIONARY
+#define _PUYOLOCALIZEDDICTIONARY
 
 #include "ios_hash.h"
 

@@ -6,6 +6,7 @@
 #include <math.h>
 
 #include "audio.h"
+#include "PuyoLocalizedDictionary.h"
 
 static char scriptPath[1024];
 
@@ -19,6 +20,9 @@ struct _Styrolyse {
 
   /* loadImage */
   GoomHash *images;
+  
+  /* dictionnary for locale translations */
+  PuyoLocalizedDictionary *localeDictionary;
 };
 
 Styrolyse *styrolyse = NULL;
@@ -113,12 +117,15 @@ void styro_sound(GoomSL *gsl, GoomHash *global, GoomHash *local)
 
 void styro_gettext(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
-    const char *text = (const char *)GSL_LOCAL_PTR  (gsl, local, "text");
+    static bool firstTime = true;
+    
+    const char *text = styrolyse->localeDictionary->getLocalizedString((const char *)GSL_LOCAL_PTR  (gsl, local, "text"));
 
     int *globalPtrReturn = (int*)goom_hash_get(gsl_globals(gsl), "gettext")->ptr;
 
-    if (gsl_get_ptr(gsl, *globalPtrReturn)) { // may warn on console if not initialized, but it's ok.
+    if ((!firstTime) && (gsl_get_ptr(gsl, *globalPtrReturn))) {
         gsl_free_ptr(gsl, *globalPtrReturn);
+        firstTime = false;
     }
 
     int newPtrId = gsl_malloc(gsl, strlen(text)+1); // allocate a new pointer (should we allow realloc?)
@@ -178,13 +185,14 @@ void styrolyse_init(const char *styrolyse_path)
     strcpy(scriptPath, styrolyse_path);
 }
 
-Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client)
+Styrolyse *styrolyse_new(const char *fname, const char *dictName, StyrolyseClient *client)
 {
     Styrolyse *_this;
     _this = (Styrolyse*)malloc(sizeof(Styrolyse));
     _this->client = client;
     _this->gsl =  gsl_new();
     _this->images = goom_hash_new();
+    _this->localeDictionary = new PuyoLocalizedDictionary(dictName);
     strncpy(_this->fname, fname, 512);
     styrolyse_reload(_this);
     return _this;
@@ -201,6 +209,7 @@ void styrolyse_free(Styrolyse *_this)
   if (_this->gsl) gsl_free(_this->gsl);
   goom_hash_for_each(_this->images, images_free_from_hash);
   goom_hash_free(_this->images);
+  delete _this->localeDictionary;
   free(_this);
 }
 

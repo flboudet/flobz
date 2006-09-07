@@ -18,12 +18,13 @@
   int @kaoriAngry = 2
   int @kaoriState = @kaoriIdle
 
-  string @txt1 = "Where do you think\nyou are going,\nKaori?"
-  string @txt2 = "I must go to the forrest,\nto chase them and\nrescue the puyos!"
-  string @txt3 = "You are going nowhere,\nGrandma's orders!"
-  string @txt4 = "The forrest is too dangerous\na place for you!"
-  string @txt5 = "Get out of my way,\nyou bastard!"
-  string @txt6 = "You'll have to fight me first!"
+  string @txtz = [gettext: text="blabla"]
+  string @txt1 = [gettext: text="Where do you think\nyou are going,\nKaori?"]
+  string @txt2 = [gettext: text="I must go to the forest,\nto chase them and\nrescue the puyos!"]
+  string @txt3 = [gettext: text="You are going nowhere,\nGrandma's orders!"]
+  string @txt4 = [gettext: text="The forest is too dangerous\na place for you!"]
+  string @txt5 = [gettext: text="Get out of my way,\nyou bastard!"]
+  string @txt6 = [gettext: text="You'll have to fight me first!"]
 
   int @balloonExposure = 100
   int @balloon1on = 50

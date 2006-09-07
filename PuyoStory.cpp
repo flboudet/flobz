@@ -104,7 +104,12 @@ PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction) : Cy
         fullPath = theCommander->getDataPathManager().getPath("/story/storyz.gsl");
     }
     else fclose(test);
-    currentStory = styrolyse_new((const char *)fullPath, client_new());
+    String storyLocalePath;
+    try {
+        storyLocalePath = theCommander->getDataPathManager().getPath(String("locale/story/") + screenName);
+    } catch (...) {}
+    printf("Chargement locale: %s\n", (const char *)storyLocalePath);
+    currentStory = styrolyse_new((const char *)fullPath, storyLocalePath, client_new());
     //sstory = createStorySurface();
 }
 

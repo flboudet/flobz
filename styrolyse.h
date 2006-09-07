@@ -20,7 +20,7 @@ struct _StyrolyseClient {
 
 void styrolyse_init(const char *styrolyse_path);
 
-Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client);
+Styrolyse *styrolyse_new(const char *fname, const char *dictName, StyrolyseClient *client);
 void styrolyse_reload(Styrolyse *_this);
 void styrolyse_free(Styrolyse *_this);
 void styrolyse_update(Styrolyse *_this);
