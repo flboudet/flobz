@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
 {
     int i;
     String dataDir;
+    int maxPackNumber = -1;
     
   if (!strcmp(argv[argc-1],"-h")) {
       printf("-win for windowed mode.\n");
@@ -85,7 +86,13 @@ int main(int argc, char *argv[])
     
     for (i=1; i<argc; i++)
     {
+        // Fullscreen option
         if (strcmp(argv[i],"-win") == 0) fs = false;
+        // Max data pack option
+        if (strcmp(argv[i], "-maxpack") == 0) {
+            if (++i < argc)
+                maxPackNumber = atoi(argv[i]);
+        }
     }
     
     if (FilePath("data").exists())
@@ -93,7 +100,7 @@ int main(int argc, char *argv[])
     else
         dataDir = DATADIR;
             
-    PuyoCommander commander(dataDir, fs);
+    PuyoCommander commander(dataDir, fs, maxPackNumber);
     
     try { commander.run(); }
     catch (Exception e) { displayExceptionMessage(e.what()); }

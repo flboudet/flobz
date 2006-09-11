@@ -206,13 +206,15 @@ void PuyoCommander::initMenus()
 
 /* Build the PuyoCommander */
 
-PuyoCommander::PuyoCommander(String dataDir, bool fs) : dataPathManager(dataDir)
+PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber) : dataPathManager(dataDir)
 {
   //SDL_Delay(500);
   loop = GameUIDefaults::GAME_LOOP;
   mbox = NULL;
   theCommander = this;
 
+  if (maxDataPackNumber != -1)
+    dataPathManager.setMaxPackNumber(maxDataPackNumber);
   loadPreferences(fs);
   initSDL();
   initGameControls();

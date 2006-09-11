@@ -75,7 +75,7 @@ private:
 class PuyoCommander : public MessageListener
 {
   public:
-    PuyoCommander(String dataDir, bool fullscreen);
+    PuyoCommander(String dataDir, bool fullscreen, int maxDataPackNumber=-1);
     void run();
     void onMessage(Message &message);
 

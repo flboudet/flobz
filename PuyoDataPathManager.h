@@ -36,6 +36,7 @@ public:
     String getPath(String shortPath) const;
     String getPathInPack(String shortPath, int packPathIndex) const { return m_dataPaths[packPathIndex].combine(shortPath); }
     int getNumPacks() const { return m_dataPaths.size(); }
+    void setMaxPackNumber(int maxPackNumber);
 private:
     FilePath m_coreDataPath;
     SelfVector<FilePath> m_dataPaths;

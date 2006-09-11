@@ -65,3 +65,14 @@ String PuyoDataPathManager::getPath(String shortPath) const
     throw Exception(String("File ") + shortPath + " not found !");
 }
 
+void PuyoDataPathManager::setMaxPackNumber(int maxPackNumber)
+{
+    for (int i = m_dataPaths.size() - 1 ; i >= 0 ; i--) {
+        const String &currentFile = m_dataPaths[i].getPathString();
+        int currentNumber = atoi(currentFile.substring(currentFile.length() - 3));
+        if (currentNumber > maxPackNumber)
+            m_dataPaths.removeAt(i);
+    }
+}
+
+
