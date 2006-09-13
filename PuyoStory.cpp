@@ -70,47 +70,23 @@ static void  freeImage (StyrolyseClient *_this, void *image)
 
 static void putText (StyrolyseClient *_this, int x, int y, const char *text)
 {
-  String output;
-  char previousChar = text[0];
-  for (int i = 0 ; i < strlen(text) ; i++) {
-    char texti = text[i];
-    switch (previousChar) {
-    case '\\':
-        switch (texti) {
-        case 'n':
-            output += '\n';
-            break;
-        default:
-            output += texti;
-        }
-        break;
-    default:
-        switch (texti) {
-        case '\\':
-            break;
-        default:
-            output += texti;
-        }
-    }
-    previousChar = texti;
-  }
-  SoFont_PutString (storyFont, sstory, x, y, output, NULL);
+  SoFont_PutString (storyFont, sstory, x, y, text, NULL);
 }
 
-static StyrolyseClient client;
-StyrolyseClient *client_new()
+static const char *getText(StyrolyseClient *_this, const char *text)
 {
-  client.loadImage = loadImage;
-  client.drawImage = drawImage;
-  client.freeImage = freeImage;
-  client.putText   = putText;
-  return &client;
-};
+    return ((PuyoStoryWidget::PuyoStoryStyrolyseClient *)_this)->widget->getText(text);
+}
 
 bool PuyoStoryWidget::classInitialized = false;
 
-PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction) : CycledComponent(0.04), finishedAction(finishedAction), once(false)
+PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction)
+    : CycledComponent(0.04), localeDictionary(NULL), finishedAction(finishedAction), once(false)
 {
+    try {
+        localeDictionary = new PuyoLocalizedDictionary(theCommander->getDataPathManager(), "locale/story", screenName);
+    } catch (...) {}
+    
     if (!classInitialized) {
         styrolyse_init(theCommander->getDataPathManager().getPath("lib/styrolyse.gsl"));
         classInitialized = true;
@@ -129,17 +105,25 @@ PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction) : Cy
     }
     else fclose(test);
     String storyLocalePath;
-    try {
-        storyLocalePath = theCommander->getDataPathManager().getPath(String("locale/story/") + screenName);
-    } catch (...) {}
-    printf("Chargement locale: %s\n", (const char *)storyLocalePath);
-    currentStory = styrolyse_new((const char *)fullPath, storyLocalePath, client_new());
+    
+    // Initializing the styrolyse client
+    client.styroClient.loadImage = loadImage;
+    client.styroClient.drawImage = drawImage;
+    client.styroClient.freeImage = freeImage;
+    client.styroClient.putText   = putText;
+    client.styroClient.getText   = ::getText;
+    client.widget = this;
+    
+    currentStory = styrolyse_new((const char *)fullPath, (StyrolyseClient *)(&client));
+    //styrolyse_setuserpointer(currentStory, this);
     //sstory = createStorySurface();
 }
 
 PuyoStoryWidget::~PuyoStoryWidget()
 {
     styrolyse_free(currentStory);
+    if (localeDictionary != NULL)
+        delete localeDictionary;
 }
 
 void PuyoStoryWidget::cycle()
@@ -165,6 +149,13 @@ void PuyoStoryWidget::draw(SDL_Surface *screen)
 void PuyoStoryWidget::setIntegerValue(String varName, int value)
 {
     styrolyse_setint(currentStory, varName, value);
+}
+
+const char *PuyoStoryWidget::getText(const char *text) const
+{
+    if (localeDictionary == NULL)
+        return text;
+    return localeDictionary->getLocalizedString(text);
 }
 
 PuyoStoryScreen::PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction) : Screen(0, 0, 640, 480), storyWidget(screenName, finishedAction), finishedAction(finishedAction), transitionWidget(previousScreen, NULL)

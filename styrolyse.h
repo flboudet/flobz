@@ -16,11 +16,12 @@ struct _StyrolyseClient {
                       int clipx, int clipy, int clipw, int cliph);
   void  (*freeImage) (StyrolyseClient *_this, void *image);
   void  (*putText)   (StyrolyseClient *_this, int x, int y, const char *text);
+  const char *(*getText)   (StyrolyseClient *_this, const char *text);
 };
 
 void styrolyse_init(const char *styrolyse_path);
 
-Styrolyse *styrolyse_new(const char *fname, const char *dictName, StyrolyseClient *client);
+Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client);
 void styrolyse_reload(Styrolyse *_this);
 void styrolyse_free(Styrolyse *_this);
 void styrolyse_update(Styrolyse *_this);

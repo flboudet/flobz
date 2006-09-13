@@ -33,17 +33,46 @@ static bool readLine(FILE *dictionaryFile, String &lineRead)
     bool result = true;
     char newChar[2];
     newChar[1] = 0;
-    lineRead = "";
+    String newLineRead;
     do {
         if (fread(newChar, 1, 1, dictionaryFile) != 1)
             result = false;
         if (result && (newChar[0] != 10) && (newChar[0] != 13))
-            lineRead += newChar;
+            newLineRead += newChar;
     } while (result && (newChar[0] != 10) && (newChar[0] != 13));
+    
+    // Converting the escape sequences
+    if (result) {
+        const char *text = newLineRead;
+        lineRead = "";
+        char previousChar = text[0];
+        for (int i = 0 ; i < strlen(text) ; i++) {
+            char texti = text[i];
+            switch (previousChar) {
+                case '\\':
+                    switch (texti) {
+                        case 'n':
+                            lineRead += '\n';
+                            break;
+                        default:
+                            lineRead += texti;
+                    }
+                    break;
+                default:
+                    switch (texti) {
+                        case '\\':
+                            break;
+                        default:
+                            lineRead += texti;
+                    }
+            }
+            previousChar = texti;
+        }
+    }
     return result;
 }
 
-PuyoLocalizedDictionary::PuyoLocalizedDictionary(const char *dictionaryDirectory) : dictionary()
+PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName) : dictionary(), datapathManager(datapathManager)
 {
     // Retrieves the current locale
     //CFMutableArrayRef supportedLocalesArray = CFArrayCreateMutable(NULL, 0, NULL);
@@ -59,12 +88,13 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const char *dictionaryDirectory
     //CFStringGetCString(localeIdentifier, locale, 256, kCFStringEncodingUTF8);
     //locale[2] = 0;
     String locale("fr");
-    String directoryName(dictionaryDirectory);
+    String directoryName = FilePath::combine(dictionaryDirectory, locale);
+    String dictFilePath = FilePath::combine(directoryName, dictionaryName) + ".dic";
     
     printf("Locale lue:%s\n", (const char *)locale);
     
     // Read all the entries in the dictionary file
-    FILE *dictionaryFile = fopen(directoryName + "/" + locale, "r");
+    FILE *dictionaryFile = fopen(datapathManager.getPath(dictFilePath), "r");
     if (dictionaryFile == NULL)
         return;
     String keyString, valueString;

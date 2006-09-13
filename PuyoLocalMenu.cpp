@@ -28,7 +28,7 @@
 #include "PuyoScreenTransition.h"
 
 LocalGameMenu::LocalGameMenu(PuyoRealMainScreen *mainScreen)
-    : locale(theCommander->getDataPathManager().getPath("locale/main")),
+    : locale(theCommander->getDataPathManager(), "locale", "main"),
       editPlayerName(locale.getLocalizedString("Player:"),
 		     PuyoGame::getDefaultPlayerName(0),
 		     PuyoGame::getDefaultPlayerKey(0)),
@@ -58,7 +58,7 @@ String LocalGameMenu::getPlayerName() const
 
 Local2PlayersGameMenu::Local2PlayersGameMenu(PuyoRealMainScreen *mainScreen)
     : PuyoMainScreenMenu(mainScreen),
-      locale(theCommander->getDataPathManager().getPath("locale/main")),
+      locale(theCommander->getDataPathManager(), "locale", "main"),
       screenTitle(locale.getLocalizedString("Choose Game Level")),
       editPlayer1Name(locale.getLocalizedString("Player 1:"),
 		      PuyoGame::getDefaultPlayerName(1),

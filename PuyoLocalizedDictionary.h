@@ -27,15 +27,17 @@
 #define _PUYOLOCALIZEDDICTIONARY
 
 #include "ios_hash.h"
+#include "PuyoDataPathManager.h"
 
 using namespace ios_fc;
 
 class PuyoLocalizedDictionary {
 public:
-    PuyoLocalizedDictionary(const char *dictionaryDirectory);
+    PuyoLocalizedDictionary(const PuyoDataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName);
     const char * getLocalizedString(const char * originalString) const;
 private:
     HashMap dictionary;
+    const PuyoDataPathManager &datapathManager;
 };
 
 #endif // _PUYOLOCALIZEDDICTIONARY

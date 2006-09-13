@@ -300,7 +300,7 @@ void NetworkInternetAction::action()
 }
 
 NetworkGameMenu::NetworkGameMenu(PuyoRealMainScreen * mainScreen)
-    : locale(theCommander->getDataPathManager().getPath("locale/main")),
+    : locale(theCommander->getDataPathManager(), "locale", "main"),
       PuyoMainScreenMenu(mainScreen), lanGameMenu(mainScreen),
       internetGameMenu(NULL), internetAction(&internetGameMenu),
       lanAction(&lanGameMenu, mainScreen), mainScreenPopAction(mainScreen),

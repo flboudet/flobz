@@ -142,7 +142,7 @@ public:
     MainRealMenu(PuyoRealMainScreen * mainScreen)
       : PuyoMainScreenMenu(mainScreen), localGameMenu(mainScreen),
         local2PlayersGameMenu(mainScreen), optionMenu(mainScreen),
-        networkGameMenu(mainScreen), locale(theCommander->getDataPathManager().getPath("locale/main")),
+        networkGameMenu(mainScreen), locale(theCommander->getDataPathManager(), "locale", "main"),
         singlePlayerGameAction(&localGameMenu, mainScreen), twoPlayersGameAction(&local2PlayersGameMenu, mainScreen),
         optionAction(&optionMenu, mainScreen), networkGameAction(&networkGameMenu, mainScreen),
         singlePlayerGameButton(locale.getLocalizedString(kSinglePlayerGame), &singlePlayerGameAction),

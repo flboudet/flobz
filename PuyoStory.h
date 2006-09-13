@@ -32,6 +32,7 @@
 
 #include "gameui.h"
 #include "PuyoScreenTransition.h"
+#include "PuyoLocalizedDictionary.h"
 
 extern int NB_STORIES;
 
@@ -47,11 +48,21 @@ public:
     void draw(SDL_Surface *screen);
     IdleComponent *getIdleComponent() { return this; }
     void setIntegerValue(String varName, int value);
+    const char *getText(const char *text) const;
+
+    struct PuyoStoryStyrolyseClient {
+        StyrolyseClient styroClient;
+        PuyoStoryWidget *widget;
+    };
 private:
+
+    /* dictionnary for locale translations */
+    PuyoLocalizedDictionary *localeDictionary;
     Styrolyse *currentStory;
     Action *finishedAction;
     bool once;
     static bool classInitialized;
+    PuyoStoryStyrolyseClient client;
 };
 
 class PuyoStoryScreen : public Screen {
