@@ -60,7 +60,7 @@ private:
     };
     int currentStrategy;
     double punchInfoTimeout, strategyTimeout, timeToPunchInfo, timeToNextStrategy;
-    int receivedGarbage;
+    int receivedGarbage, peerReceivedGarbage;
 };
 
 #endif // _PUYONATTRAVERSAL_H
