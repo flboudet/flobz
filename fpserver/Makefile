@@ -31,6 +31,9 @@ MAKEDEPEND = $(CXX) -MM $(CFLAGS) -o $(df).d $<
 	rm -f $(df).d
 	@echo "[$@]" && $(CXX) $(CFLAGS) -c $< # 2>> WARNINGS || (cat WARNINGS && false)
 
+test_igpudppuncherclient: test_igpudppuncherclient.cpp ../PuyoNatTraversal.cpp
+	$(CXX) -o test_igpudppuncherclient -I.. -I../iosfc test_igpudppuncherclient.cpp ../PuyoNatTraversal.cpp -L../iosfc -liosfc
+
 clean:
 	rm -f *.o *~
 
