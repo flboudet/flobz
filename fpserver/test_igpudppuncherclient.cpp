@@ -24,7 +24,13 @@ int main(int argc, char *argv[])
     if (toto.hasSucceeded()) {
         printf("SUCCEEDED to traverse NAT\n");
     }
-    sleep(2);
+    if (toto.hasSucceeded()) {
+        for (int i = 0 ; i < 100 ; i++)
+        {
+            usleep(20000);
+            udpmbox.idle();
+        }
+    }
     return 0;
 }
 

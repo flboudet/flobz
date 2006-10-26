@@ -26,7 +26,7 @@
 #include "PuyoNatTraversal.h"
 
 PuyoNatTraversal::PuyoNatTraversal(UDPMessageBox &udpmbox, double punchInfoTimeout, double strategyTimeout)
-  : udpmbox(udpmbox), igpmbox(new IgpMessageBox(udpmbox)), currentStrategy(TRY_NONE), punchInfoTimeout(punchInfoTimeout), strategyTimeout(strategyTimeout), receivedGarbage(0), peerReceivedGarbage(0)
+  : udpmbox(udpmbox), igpmbox(new IgpMessageBox(udpmbox)), currentStrategy(TRY_NONE), punchInfoTimeout(punchInfoTimeout), strategyTimeout(strategyTimeout), receivedGarbage(0)
 {
     igpmbox->addListener(this);
     //printf("GetSocketAddress(): %s\n", (const char *)(mbox->getSocketAddress().asString()));
@@ -115,6 +115,13 @@ void PuyoNatTraversal::idle()
                     currentStrategy = FAILED;
                 }
                 break;
+            case SYNCING:
+                if (timeToNextStrategy < currentTime) {
+                    // Switch to FAILED
+                    printf("Failed to establish NAT traversal (timeout on syncing)\n");
+                    currentStrategy = FAILED;
+                }
+                break;
             default:
                 break;
         }
@@ -150,12 +157,17 @@ void PuyoNatTraversal::onMessage(Message &msg)
             break;
         }
         case PUYO_IGP_NAT_TRAVERSAL_GARBAGE:
-            printf("Garbage msg received: %s (%d, %d)\n", (const char *)(msg.getString("GARBAGE")), msg.getInt("RCV"), msg.getInt("PRCV"));
+            printf("Garbage msg received: %s (%d)\n", (const char *)(msg.getString("GARBAGE")), msg.getInt("RCV"));
             receivedGarbage++;
-            peerReceivedGarbage = msg.getInt("RCV");
-            if ((peerReceivedGarbage > 0) && (msg.getInt("PRCV") > 1))
-                currentStrategy = SUCCESS;
+            if ((msg.getInt("RCV") > 0) && (currentStrategy != SYNCING)) {
+                currentStrategy = SYNCING;
+                timeToNextStrategy = getTimeMs() + strategyTimeout;
+                sendSyncMessage();
+            }
             break;
+        case PUYO_IGP_NAT_TRAVERSAL_SYNC:
+             currentStrategy = SUCCESS;
+             break;
         default:
             break;
     }
@@ -169,9 +181,17 @@ void PuyoNatTraversal::sendGarbageMessage()
     garbMsg->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL_GARBAGE);
     garbMsg->addString("GARBAGE", "Connerie");
     garbMsg->addInt("RCV", receivedGarbage);
-    garbMsg->addInt("PRCV", peerReceivedGarbage);
     
     garbMsg->send();
     delete garbMsg;
+}
+
+void PuyoNatTraversal::sendSyncMessage()
+{
+    Message *message = udpmbox.createMessage();
+    message->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL_SYNC);
+    message->addBoolProperty("RELIABLE", true);
+    message->send();
+    delete message;
 }
 

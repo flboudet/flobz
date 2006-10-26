@@ -42,10 +42,12 @@ public:
     void punch(const String punchPoolName);
     void idle();
     void onMessage(Message &message);
-    void sendGarbageMessage();
     inline bool hasFailed() { return (currentStrategy == FAILED); }
     inline bool hasSucceeded() { return (currentStrategy == SUCCESS); }
 private:
+    void sendGarbageMessage();
+    void sendSyncMessage();
+    
     UDPMessageBox &udpmbox;
     IgpMessageBox *igpmbox;
     String peerAddressString, peerLocalAddressString;
@@ -56,11 +58,12 @@ private:
         TRY_PUBLICADDR_NEXTPORT = 2,
         TRY_LOCALADDR = 3,
         FAILED = 4,
-        SUCCESS = 5
+        SYNCING = 5,
+        SUCCESS = 6
     };
     int currentStrategy;
     double punchInfoTimeout, strategyTimeout, timeToPunchInfo, timeToNextStrategy;
-    int receivedGarbage, peerReceivedGarbage;
+    int receivedGarbage;
 };
 
 #endif // _PUYONATTRAVERSAL_H
