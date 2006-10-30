@@ -28,13 +28,9 @@
   sprite::@puyo display=@puyoDisplay
   sprite::@buildings display=@screen
 
-<fabs: float x> : float
-  (x <  0.0) ? fabs = -x
-  (x >= 0.0) ? fabs = x
-
 <update>
   # Update function: called every animation cycle
 
-  @puyoDisplay.x -= 10.0
+  @puyoDisplay.x -= 10.0 * @delta_cycle
   @puyoDisplay.y = 400.0 - ([fabs: x=([sin: value = (@fcycle/10.0)] * 200.0)] / ((@fcycle + 50.0) * 0.01))
 

@@ -36,10 +36,6 @@
   sprite::@blueStar display=@puyoDisplay
   sprite::@greenStar display=@puyoDisplay
 
-<fabs: float x> : float
-  (x <  0.0) ? fabs = -x
-  (x >= 0.0) ? fabs = x
-
 <update>
   # Update function: called every animation cycle
   #move::@redStar fcycle=30.0 x=@spBx y=@spBy
@@ -61,8 +57,8 @@
   (@tears.curframe > 1.0)? @tears.image = "kaori_gamelost/tears2.png"
   (@tears.curframe > 3.0)? @tears.image = "null.png"
 
-  (@kaoriDisplay.x > @kaoriArrived) ? @kaoriDisplay.x -= @kaoriSpeed
+  (@kaoriDisplay.x > @kaoriArrived) ? @kaoriDisplay.x -= @kaoriSpeed * @delta_cycle
 
-  @puyoDisplay.x -= 10.0
+  @puyoDisplay.x -= 10.0 * @delta_cycle
   @puyoDisplay.y = 400.0 - ([fabs: x=([sin: value = (@fcycle/10.0)] * 200.0)] / ((@fcycle + 50.0) * 0.01))
   (@puyoDisplay.x < -500.0)? @finished = 1

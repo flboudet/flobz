@@ -35,14 +35,13 @@
   Display @movingDisplay = [new_display: x=550.0 y=0.0 width=640.0 height=480.0]
   Display @monsterDisplay = [new_display: x=-420.0 y=0.0 width=800.0 height=480.0]
 
-  Sprite @head =  [new_sprite: image="kaori_close/kaori.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
-  Sprite @eyes =  [new_sprite: image="kaori_close/eyes.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
-  Sprite @mouth =  [new_sprite: image="kaori_close/mouthsmall.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=4.0]
-  Sprite @fond =  [new_sprite: image="background/bluebkgnd.jpg" x=640.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
-  Sprite @fond2 =  [new_sprite: image="background/bluebkgnd.jpg" x=0.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
-  Sprite @monster =  [new_sprite: image="unmappedmonster/unmappedmonster.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
-  float @targetCycle = 100.0
-  float @targetCycle2 = 50.0
+  Sprite @head =    [new_sprite: image="kaori_close/kaori.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
+  Sprite @eyes =    [new_sprite: image="kaori_close/eyes.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
+  Sprite @mouth =   [new_sprite: image="kaori_close/mouthsmall.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=4.0]
+  Sprite @fond =    [new_sprite: image="background/bluebkgnd.jpg" x=0.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
+  Sprite @fond2 =   [new_sprite: image="background/bluebkgnd.jpg" x=640.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
+  Sprite @monster = [new_sprite: image="unmappedmonster/unmappedmonster.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
+  float @targetCycle = 50.0
 
   Balloon @monsterTalk  = [new_balloon: image="balloon/balloon1l.png" x=320.0 y=300.0 text_x=40.0 text_y=15.0]
   Balloon @kaoriTalk  = [new_balloon: image="balloon/balloon1l.png" x=0.0 y=350.0 text_x=40.0 text_y=15.0]
@@ -95,25 +94,20 @@
     (@mouth.curframe > 3.0)? @mouth.image = "kaori_close/happymouth.png"
   }
 
-
-  (@fond.pos.x >  -640.0)? move::@fond fcycle=@targetCycle x=-640.0 y=0.0
-  (@fond.pos.x <= -640.0)? {
-    @fond.pos.x     = 640.0
-    @targetCycle += 100.0
+  (@fond.dcycle < @fcycle)? {
+    @fond.pos.x    = 0.0
+    @fond2.pos.x   = 640.0
+    @targetCycle  += 50.0
   }
-
-  (@fond2.pos.x >  -640.0)? move::@fond2 fcycle=@targetCycle2 x= -640.0 y=0.0
-  (@fond2.pos.x <= -640.0)? {
-    @fond2.pos.x     = 640.0
-    @targetCycle2 += 100.0
-  }
+  move::@fond  fcycle=@targetCycle x=-640.0 y=0.0
+  move::@fond2 fcycle=@targetCycle x=0.0 y=0.0
 
   // Moving displays when appropriate
-  @movingDisplay.x -= @kaoriSpeed
-  @monsterDisplay.x += @monsterSpeed
+  @movingDisplay.x -= @kaoriSpeed * @delta_cycle
+  @monsterDisplay.x += @monsterSpeed * @delta_cycle
   (@movingDisplay.x < @kaoriMax)?
     @movingDisplay.x = @kaoriMax
   (@monsterDisplay.x > @monsterMax)?
     @monsterDisplay.x = @monsterMax
 
-  (@cycle = @balloon2off + 100)? @finished = 1
+  (@cycle > @balloon2off + 100)? @finished = 1

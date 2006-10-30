@@ -48,4 +48,4 @@
   movetitle::@u phase=7.0
   movetitle::@y phase=8.0
   movetitle::@o3 phase=9.0
-  (@cycle = 1000)? @finished = 1
+  (@cycle > 1000)? @finished = 1

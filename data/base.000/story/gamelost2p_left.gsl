@@ -26,10 +26,6 @@
   sprite::@blueStar display=@puyoDisplay
   sprite::@greenStar display=@puyoDisplay
 
-<fabs: float x> : float
-  (x <  0.0) ? fabs = -x
-  (x >= 0.0) ? fabs = x
-
 <update>
   # Update function: called every animation cycle
   #move::@redStar fcycle=30.0 x=@spBx y=@spBy
