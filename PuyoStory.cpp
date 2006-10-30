@@ -81,7 +81,7 @@ static const char *getText(StyrolyseClient *_this, const char *text)
 bool PuyoStoryWidget::classInitialized = false;
 
 PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction)
-    : CycledComponent(0.04), localeDictionary(NULL), finishedAction(finishedAction), once(false)
+    : /*Cycled*/IdleComponent(/*0.04*/), localeDictionary(NULL), finishedAction(finishedAction), once(false), last_time(-1.)
 {
     try {
         localeDictionary = new PuyoLocalizedDictionary(theCommander->getDataPathManager(), "locale/story", screenName);
@@ -126,9 +126,17 @@ PuyoStoryWidget::~PuyoStoryWidget()
         delete localeDictionary;
 }
 
-void PuyoStoryWidget::cycle()
+// void PuyoStoryWidget::cycle()
+void PuyoStoryWidget::idle(double currentTime)
 {
-    styrolyse_update(currentStory);
+    double delta_t;
+    if (last_time < 0.)
+        delta_t = 0.;
+    else
+        delta_t = currentTime - last_time;
+    last_time = currentTime;
+    
+    styrolyse_update(currentStory, (float)delta_t);
     requestDraw();
     if (styrolyse_finished(currentStory) && !once) {
         once = true;

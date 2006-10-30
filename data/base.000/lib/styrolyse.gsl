@@ -1,9 +1,12 @@
-int    @freq
 string @background
 int    @lastID
 int    @cycle
 float  @fcycle
+float  @delta_t
+float  @delta_cycle = @delta_t * 25.
 int    @finished
+
+// int    @freq
 
 int    @mode
 int    INIT   = 0
@@ -29,8 +32,8 @@ int @neutralsForAI
 (@mode = UPDATE)? {
   update
   sprite_list
-  @cycle  += 1
-  @fcycle += 1.0
+  @fcycle += @delta_cycle
+  @cycle  = [f2i: value = @fcycle]
 }
 
 (@mode = DRAW)? sprite_list
@@ -106,9 +109,10 @@ external <sound: string file, float volume>
       Vec2 speed = (&this.dest - &this.pos)
       speed.x   /= diff
       speed.y   /= diff
-      &this.pos += speed
+      &this.pos.x += speed.x * @delta_cycle
+      &this.pos.y += speed.y * @delta_cycle
     }
-    &this.curframe += &this.framespeed
+    &this.curframe += &this.framespeed * @delta_cycle
     while &this.curframe >= &this.nbframes do &this.curframe -= &this.nbframes
   }
   (@mode = DRAW)? {
@@ -141,7 +145,7 @@ external <sound: string file, float volume>
   Vec2 displayPos
   (@mode = UPDATE)? {
     sprite::&this.image
-    &this.alpha += &this.delta_alpha
+    &this.alpha += &this.delta_alpha * @delta_cycle
     (&this.alpha < 0.0)? &this.alpha = 0.0
     (&this.alpha > 1.0)? &this.alpha = 1.0
     int c = [charAt: value=&this.text index=[f2i: value=&this.text_index]]
@@ -151,7 +155,7 @@ external <sound: string file, float volume>
     (c = '-')? tspeed=0.05
     (c = '.')? tspeed=0.25
     (c = '?')? tspeed=0.25
-    &this.text_index += tspeed
+    &this.text_index += tspeed * @delta_cycle
   }
   (@mode = DRAW)? {
     (&this.alpha > 0.5)? {

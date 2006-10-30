@@ -24,7 +24,7 @@ void styrolyse_init(const char *styrolyse_path);
 Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client);
 void styrolyse_reload(Styrolyse *_this);
 void styrolyse_free(Styrolyse *_this);
-void styrolyse_update(Styrolyse *_this);
+void styrolyse_update(Styrolyse *_this, float delta_t);
 int  styrolyse_finished(Styrolyse *_this);
 void styrolyse_draw(Styrolyse *_this);
 void styrolyse_setint(Styrolyse *_this, const char *varname, int value);

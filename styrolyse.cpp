@@ -33,6 +33,13 @@ void styro_sin(GoomSL *gsl, GoomHash *global, GoomHash *local)
     GSL_GLOBAL_FLOAT(gsl, "sin") = sin(GSL_LOCAL_FLOAT(gsl, local, "value"));
 }
 
+/*
+void styro_f2i(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    GSL_GLOBAL_INT(gsl, "f2i") = (int)(GSL_LOCAL_FLOAT(gsl, local, "value"));
+}
+*/
+
 void styro_mod(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
     int numerator = GSL_LOCAL_INT(gsl, local, "numerator");
@@ -169,6 +176,7 @@ static void sbind(GoomSL *gsl)
   gsl_bind_function(gsl, "put_text",   put_text);
   gsl_bind_function(gsl, "draw",  sprite_draw);
   gsl_bind_function(gsl, "sin",   styro_sin);
+//  gsl_bind_function(gsl, "f2i",   styro_f2i);
   gsl_bind_function(gsl, "mod",   styro_mod);
   gsl_bind_function(gsl, "music", styro_music);
   gsl_bind_function(gsl, "sound", styro_sound);
@@ -208,10 +216,12 @@ void styrolyse_free(Styrolyse *_this)
   free(_this);
 }
 
-void styrolyse_execute(Styrolyse *_this, int mode)
+void styrolyse_execute(Styrolyse *_this, int mode, float delta_t)
 {
   /* mutexifier cette fonction si multi-thread */
+    if (delta_t > 0.04) delta_t = 0.04;
     GSL_GLOBAL_INT(_this->gsl, "@mode") = mode;
+    GSL_GLOBAL_FLOAT(_this->gsl, "@delta_t") = delta_t;
     styrolyse = _this;
     gsl_execute(_this->gsl);
 }
@@ -225,7 +235,7 @@ void styrolyse_reload(Styrolyse *_this)
     gsl_compile(_this->gsl,fbuffer);
     sbind(_this->gsl);
     free(fbuffer);
-    styrolyse_execute(_this, 0);
+    styrolyse_execute(_this, 0, 0.0);
 }
 
 int styrolyse_finished(Styrolyse *_this)
@@ -233,16 +243,16 @@ int styrolyse_finished(Styrolyse *_this)
     return GSL_GLOBAL_INT(_this->gsl, "@finished");
 }
 
-void styrolyse_update(Styrolyse *_this)
+void styrolyse_update(Styrolyse *_this, float delta_t)
 {
   if (!_this->gsl) return;
-  styrolyse_execute(_this, 1);
+  styrolyse_execute(_this, 1, delta_t);
 }
 
 void styrolyse_draw(Styrolyse *_this)
 {
   if (!_this->gsl) return;
-  styrolyse_execute(_this, 2);
+  styrolyse_execute(_this, 2, 0.0);
 }
 
 void styrolyse_setint(Styrolyse *_this, const char *varname, int value)

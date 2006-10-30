@@ -40,11 +40,12 @@ using namespace gameui;
 
 class PuyoCommander;
 
-class PuyoStoryWidget : public Widget, public CycledComponent {
+class PuyoStoryWidget : public Widget, public /*Cycled*/IdleComponent {
 public:
     PuyoStoryWidget(String screenName, Action *finishedAction = NULL);
     ~PuyoStoryWidget();
-    void cycle();
+    // void cycle();
+    void idle(double currentTime);
     void draw(SDL_Surface *screen);
     IdleComponent *getIdleComponent() { return this; }
     void setIntegerValue(String varName, int value);
@@ -63,6 +64,7 @@ private:
     bool once;
     static bool classInitialized;
     PuyoStoryStyrolyseClient client;
+    double last_time;
 };
 
 class PuyoStoryScreen : public Screen {

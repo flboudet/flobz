@@ -173,25 +173,25 @@
     (@dogMouth.curframe > 1.0)? @dogMouth.image = "herbert_close/dogbigmouth2.png"
   }
 
-  (@fond.pos.x >  -640.0)? move::@fond fcycle=@targetCycle x=-640.0 y=0.0
-  (@fond.pos.x <= -640.0)? {
-    @fond.pos.x     = 640.0
+  (@fond.dcycle < @fcycle)? {
+    @fond.pos.x   = 640.0
     @targetCycle += 100.0
   }
+  move::@fond fcycle=@targetCycle x=-640.0 y=0.0
 
-  (@fond2.pos.x >  -640.0)? move::@fond2 fcycle=@targetCycle2 x= -640.0 y=0.0
-  (@fond2.pos.x <= -640.0)? {
-    @fond2.pos.x     = 640.0
+  (@fond2.dcycle < @fcycle)? {
+    @fond2.pos.x   = 640.0
     @targetCycle2 += 100.0
   }
+  move::@fond2 fcycle=@targetCycle2 x=-640.0 y=0.0
 
   // Moving displays when appropriate
-  @movingDisplay.x -= @kaoriSpeed
-  @dogDisplay.x += @dogSpeed
+  @movingDisplay.x -= @kaoriSpeed * @delta_cycle
+  @dogDisplay.x += @dogSpeed * @delta_cycle
   (@movingDisplay.x < @kaoriMax)?
     @movingDisplay.x = @kaoriMax
   (@dogDisplay.x > @dogMax)?
     @dogDisplay.x = @dogMax
   //(@cycle = 100)? @finished = 1
 
-  (@cycle = @balloon6off + 100)? @finished = 1
+  (@cycle > @balloon6off + 100)? @finished = 1

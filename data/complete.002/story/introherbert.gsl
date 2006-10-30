@@ -159,7 +159,7 @@
     (@cycle = @EtText3Start)? show_balloon_with_text::@lTalk text=txt5
     (@cycle = @EtText3End)?   hide_balloon::@lTalk
     (@cycle = @KaoriText1Start)? {
-      @rTalk.image.pos.x += 30.0
+      @rTalk.image.pos.x += 30.0 * @delta_cycle
       show_balloon_with_text::@rTalk text=txt6
     }
     (@cycle = @KaoriText1End)?   hide_balloon::@rTalk
