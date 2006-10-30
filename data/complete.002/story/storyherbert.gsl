@@ -47,13 +47,12 @@
 
   Sprite @head =  [new_sprite: image="kaori_close/kaori.png" x=80.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=4.0]
   Sprite @mouth =  [new_sprite: image="kaori_close/mouthsmall.png" x=175.0 y=247.0 curframe=0.0 framespeed=0.1 nbframes=4.0]
-  Sprite @fond =  [new_sprite: image="background/bluebkgnd.jpg" x=640.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
-  Sprite @fond2 =  [new_sprite: image="background/bluebkgnd.jpg" x=0.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
+  Sprite @fond =  [new_sprite: image="background/bluebkgnd.jpg" x=0.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
+  Sprite @fond2 =  [new_sprite: image="background/bluebkgnd.jpg" x=640.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
   Sprite @dog =  [new_sprite: image="herbert_close/dogbig.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.1 nbframes=1.0]
   Sprite @dogMouth =  [new_sprite: image="herbert_close/dogbigmouth1.png" x=200.0 y=250.0 curframe=0.0 framespeed=0.1 nbframes=2.0]
   Sprite @dogEyes =  [new_sprite: image="herbert_close/dogbigeyes1.png" x=183.0 y=119.0 curframe=0.0 framespeed=0.1 nbframes=10.0]
-  float @targetCycle = 100.0
-  float @targetCycle2 = 50.0
+  float @targetCycle = 50.0
 
   Balloon @dogTalk  = [new_balloon: image="balloon/balloon1l.png" x=320.0 y=350.0 text_x=40.0 text_y=15.0]
   Balloon @kaoriTalk  = [new_balloon: image="balloon/balloon1l.png" x=0.0 y=350.0 text_x=40.0 text_y=15.0]
@@ -174,16 +173,12 @@
   }
 
   (@fond.dcycle < @fcycle)? {
-    @fond.pos.x   = 640.0
-    @targetCycle += 100.0
-  }
-  move::@fond fcycle=@targetCycle x=-640.0 y=0.0
-
-  (@fond2.dcycle < @fcycle)? {
+    @fond.pos.x    = 0.0
     @fond2.pos.x   = 640.0
-    @targetCycle2 += 100.0
+    @targetCycle  += 50.0
   }
-  move::@fond2 fcycle=@targetCycle2 x=-640.0 y=0.0
+  move::@fond  fcycle=@targetCycle x=-640.0 y=0.0
+  move::@fond2 fcycle=@targetCycle x=0.0 y=0.0
 
   // Moving displays when appropriate
   @movingDisplay.x -= @kaoriSpeed * @delta_cycle
@@ -192,6 +187,5 @@
     @movingDisplay.x = @kaoriMax
   (@dogDisplay.x > @dogMax)?
     @dogDisplay.x = @dogMax
-  //(@cycle = 100)? @finished = 1
 
   (@cycle > @balloon6off + 100)? @finished = 1
