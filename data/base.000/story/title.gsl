@@ -13,7 +13,7 @@
   Sprite @u =  [new_sprite: image="title/U.png" x=310.0 y=180.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @y =  [new_sprite: image="title/Y.png" x=310.0 y=180.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @o3 = [new_sprite: image="title/O3.png" x=420.0 y=190.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
-  Sprite @kaori = [new_sprite: image="kaori_title/kaori_title.png" x = -300.0 y=70.0 curframe=0.0 framespeed=0.2 nbframes=2.0]
+  Sprite @kaori = [new_sprite: image="kaori_title/kaori_title.png" x = -300.0 y=70.0 curframe=0.0 framespeed=0.15 nbframes=2.0]
 
   // Defines a sprite graph (just for exmple purpose, to be removed!)
   /*
