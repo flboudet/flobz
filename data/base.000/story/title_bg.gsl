@@ -1,0 +1,84 @@
+<init>
+  float @PuyoAgitation = 8.0 # lower is less
+  float @SaucerXMovement = 1.0
+  float @SaucerY = 165.0
+  int   @CanSwitchSaucerY = 1
+
+  # Init function: called when script is loaded
+  Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+
+  Sprite @bg      = [new_sprite_simple: image="introherbert/bg_intro3.jpg" x=0.0 y=0.0]
+  Sprite @saucer  = [new_sprite_simple: image="introherbert/saucer.png" x=-150.0 y=@SaucerY]
+  // Puyos
+  Sprite @vpuyo1 = [new_sprite: image="puyo_farther/puyo-v-frame1.png" x=155.0 y=380.0 curframe=0.0 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @rpuyo1 = [new_sprite: image="puyo_farther/puyo-r-frame1.png" x=185.0 y=382.0 curframe=3.5 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @gpuyo1 = [new_sprite: image="puyo_farther/puyo-g-frame1.png" x=165.0 y=390.0 curframe=4.5 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @bpuyo1 = [new_sprite: image="puyo_farther/puyo-b-frame1.png" x=197.0 y=393.0 curframe=2.0 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @ypuyo1 = [new_sprite: image="puyo_farther/puyo-y-frame1.png" x=207.0 y=397.0 curframe=6.3 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @rpuyo2 = [new_sprite: image="puyo_farther/puyo-r-frame1.png" x=135.0 y=400.0 curframe=1.5 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @vpuyo2 = [new_sprite: image="puyo_farther/puyo-v-frame1.png" x=185.0 y=402.0 curframe=7.0 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @bpuyo2 = [new_sprite: image="puyo_farther/puyo-b-frame1.png" x=117.0 y=406.0 curframe=5.0 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @gpuyo2 = [new_sprite: image="puyo_farther/puyo-g-frame1.png" x=102.0 y=410.0 curframe=0.7 framespeed=0.1 nbframes=@PuyoAgitation]
+  Sprite @ypuyo2 = [new_sprite: image="puyo_farther/puyo-y-frame1.png" x=187.0 y=415.0 curframe=2.9 framespeed=0.1 nbframes=@PuyoAgitation]
+  
+  // Defines a sprite graph
+ 
+
+<sprite_list>
+  # Call the 'sprite' function for each sprite you want to update/draw
+  # This also allows you to specify the drawing order
+  Sprite  i
+  sprite::@bg display=@display
+  for i in (@saucer) do sprite::i display=@display
+  for i in (@vpuyo1 @rpuyo1 @gpuyo1 @bpuyo1 @ypuyo1) do sprite::i display=@display
+  for i in (@rpuyo2 @vpuyo2 @bpuyo2 @gpuyo2 @ypuyo2) do sprite::i display=@display
+
+<green_puyo_update: Sprite &this>
+  &this.image = "puyo_farther/puyo-g-frame1.png"
+  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "puyo_farther/puyo-g-frame2.png"
+
+<red_puyo_update: Sprite &this>
+  &this.image = "puyo_farther/puyo-r-frame1.png"
+  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "puyo_farther/puyo-r-frame2.png"
+
+<violet_puyo_update: Sprite &this>
+  &this.image = "puyo_farther/puyo-v-frame1.png"
+  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "puyo_farther/puyo-v-frame2.png"
+
+<blue_puyo_update: Sprite &this>
+  &this.image = "puyo_farther/puyo-b-frame1.png"
+  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "puyo_farther/puyo-b-frame2.png"
+
+<yellow_puyo_update: Sprite &this>
+  &this.image = "puyo_farther/puyo-y-frame1.png"
+  (&this.curframe >= @PuyoAgitation - 1.0)? &this.image = "puyo_farther/puyo-y-frame2.png"
+
+<update>
+  # Update function: called every animation cycle
+  violet_puyo_update::@vpuyo1
+  violet_puyo_update::@vpuyo2
+  red_puyo_update::@rpuyo1
+  red_puyo_update::@rpuyo2
+  green_puyo_update::@gpuyo1
+  green_puyo_update::@gpuyo2
+  blue_puyo_update::@bpuyo1
+  blue_puyo_update::@bpuyo2
+  yellow_puyo_update::@ypuyo1
+  yellow_puyo_update::@ypuyo2
+  @saucer.pos.x += @SaucerXMovement
+  @saucer.pos.y = @SaucerY + [sin: value = (@fcycle/5.0)]*5.
+  (@saucer.pos.x < -150.0)? {
+    @SaucerXMovement = 1.0
+    @CanSwitchSaucerY = 1
+  }
+  (@saucer.pos.x > 700.0)? {
+    @SaucerXMovement = -1.0
+    (@CanSwitchSaucerY = 1)? {
+      (@SaucerY = 165.0)? @SaucerY = 200.0
+      (@SaucerY = 100.0)? @SaucerY = 165.0
+      (@SaucerY = 235.0)? @SaucerY = 100.0
+      (@SaucerY = 200.0)? @SaucerY = 235.0
+      @CanSwitchSaucerY = 0
+    }
+  }
+  (@cycle = 1000)? @finished = 1
