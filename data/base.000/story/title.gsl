@@ -1,7 +1,19 @@
 <init>
+  float @TitleDisplayXBase = 120.0
+  float @TitleDisplayYBase = -80.0
+
+  float @AmplitudeWaveTitle = 20.
+  float @PeriodFactorTitle = 5.
+
+  float @BigPuyoDelay = 200.
+  float @BigPuyoShowAfter = @BigPuyoDelay
+  int   @ShowBigPuyo = 0
+  int   @BigPuyoApogee = 0
+  float @ShowBigPuyoInitialCycle = 0.
+
   # Init function: called when script is loaded
   Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
-  Display @titledisplay = [new_display: x=100.0 y=-80.0 width=640.0 height=480.0]
+  Display @titledisplay = [new_display: x=@TitleDisplayXBase y=@TitleDisplayYBase width=640.0 height=480.0]
 
   Sprite @bg      = [new_sprite_simple: image="introherbert/bg_intro3.jpg" x=0.0 y=0.0]
   Sprite @f =  [new_sprite: image="title/F.png" x=0.0 y=100.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
@@ -15,6 +27,7 @@
   Sprite @o3 = [new_sprite: image="title/O3.png" x=420.0 y=190.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @kaori = [new_sprite: image="kaori_title/kaori_title.png" x = -300.0 y=70.0 curframe=0.0 framespeed=0.15 nbframes=2.0]
   Sprite @kaorieyes = [new_sprite: image="kaori_title/kaori_title_eyesclosed.png" x = 92.0 y=83.0 curframe=0.0 framespeed=0.4 nbframes=40.0]
+  Sprite @bigpuyo = [new_sprite: image="happypuyo.png" x = 500.0 y=480.0 curframe=0.0 framespeed=0.15 nbframes=1.0]
 
   // Defines a sprite graph (just for exmple purpose, to be removed!)
   /*
@@ -33,7 +46,7 @@
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
   # This also allows you to specify the drawing order
-  sprite::@bg display=@display
+  #sprite::@bg display=@display
   sprite::@f display=@titledisplay
   sprite::@l display=@titledisplay
   sprite::@o display=@titledisplay
@@ -45,15 +58,7 @@
   sprite::@o3 display=@titledisplay
   sprite::@kaori display=@display
   sprite::@kaorieyes display=@display
-
-<movetitle: Sprite &this, float phase>
-  float fcycle = 0.0
-  float fy = 50.0
-  while fcycle < 1000.0 do {
-      move::&this fcycle=fcycle+(phase*2.0) x=&this.pos.x y=&this.pos.y+fy
-      fcycle += 20.0
-      fy = (0.0-fy)*0.9
-   }
+  sprite::@bigpuyo display=@display
 
 <update>
   # Update function: called every animation cycle
@@ -66,22 +71,29 @@
   @kaorieyes.image = "null.png"
   (@kaorieyes.curframe > 39.0)? @kaorieyes.image = "kaori_title/kaori_title_eyesclosed.png"
 
-  @f.pos.y = 100. + [sin: value = (@fcycle/10.0)]*20.
-  @l.pos.y = 120. + [sin: value = (@fcycle/10.0+0.2)]*20.
-  @o.pos.y = 180. + [sin: value = (@fcycle/10.0+0.4)]*20.
-  @b.pos.y = 120. + [sin: value = (@fcycle/10.0+0.6)]*20.
-  @o2.pos.y = 180. + [sin: value = (@fcycle/10.0+0.8)]*20.
-  @p.pos.y = 110. + [sin: value = (@fcycle/10.0+1.0)]*20.
-  @u.pos.y = 180. + [sin: value = (@fcycle/10.0+1.2)]*20.
-  @y.pos.y = 180. + [sin: value = (@fcycle/10.0+1.4)]*20.
-  @o3.pos.y = 190. + [sin: value = (@fcycle/10.0+1.6)]*20.
-  #movetitle::@l phase=2.0
-  #movetitle::@o phase=3.0
-  #movetitle::@b phase=4.0
-  #movetitle::@o2 phase=5.0
-  #movetitle::@p phase=6.0
-  #movetitle::@u phase=7.0
-  #movetitle::@y phase=8.0
-  #movetitle::@o3 phase=9.0
+  @f.pos.y = 100. + [sin: value = (@fcycle/@PeriodFactorTitle)]*@AmplitudeWaveTitle
+  @l.pos.y = 120. + [sin: value = (@fcycle/@PeriodFactorTitle+0.2)]*@AmplitudeWaveTitle
+  @o.pos.y = 180. + [sin: value = (@fcycle/@PeriodFactorTitle+0.4)]*@AmplitudeWaveTitle
+  @b.pos.y = 120. + [sin: value = (@fcycle/@PeriodFactorTitle+0.6)]*@AmplitudeWaveTitle
+  @o2.pos.y = 180. + [sin: value = (@fcycle/@PeriodFactorTitle+0.8)]*@AmplitudeWaveTitle
+  @p.pos.y = 110. + [sin: value = (@fcycle/@PeriodFactorTitle+1.0)]*@AmplitudeWaveTitle
+  @u.pos.y = 180. + [sin: value = (@fcycle/@PeriodFactorTitle+1.2)]*@AmplitudeWaveTitle
+  @y.pos.y = 180. + [sin: value = (@fcycle/@PeriodFactorTitle+1.4)]*@AmplitudeWaveTitle
+  @o3.pos.y = 190. + [sin: value = (@fcycle/@PeriodFactorTitle+1.6)]*@AmplitudeWaveTitle
+
+  @titledisplay.x = @TitleDisplayXBase + [sin: value = (@fcycle/30.0)]*40.
+  @titledisplay.y = @TitleDisplayYBase + [sin: value = (@fcycle/30.0)+1.57]*10.
+
+  (@BigPuyoShowAfter <= @fcycle)? {
+    @ShowBigPuyo = 1
+    @BigPuyoApogee = 0
+    @ShowBigPuyoInitialCycle = @fcycle
+    @BigPuyoShowAfter = @BigPuyoShowAfter + @BigPuyoDelay
+  }
+  (@ShowBigPuyo = 1)? {
+    @bigpuyo.pos.y = 500.0 - ([fabs: x=([sin: value = ((@fcycle - @ShowBigPuyoInitialCycle)/10.0)] * 300.0)])
+    (@bigpuyo.pos.y < 400.)? @BigPuyoApogee = 1
+    (@BigPuyoApogee = 1)? (@bigpuyo.pos.y > 480.)? @ShowBigPuyo=0
+  }
   move::@kaori   fcycle=10.0      x=20.0 y=@kaori.pos.y
   (@cycle = 1000)? @finished = 1
