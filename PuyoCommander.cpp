@@ -62,8 +62,8 @@ PuyoMainScreen::PuyoMainScreen(PuyoStoryWidget *story) : story(story)
 
 void PuyoMainScreen::build()
 {
-    if (story != NULL)
-        add(story);
+    /*if (story != NULL)
+        add(story);*/
     add(&menu);
     Vec3 menuPos = menu.getPosition();
     menuPos.x = MENU_X;
@@ -72,15 +72,18 @@ void PuyoMainScreen::build()
     menu.setSize(Vec3(menuBG->w, menuBG->h, 0));
 }
 
-PuyoRealMainScreen::PuyoRealMainScreen(PuyoStoryWidget *story) : story(story), transition(NULL)
+PuyoRealMainScreen::PuyoRealMainScreen(PuyoStoryWidget *fgStory, PuyoStoryWidget *bgStory)
+    : fgStory(fgStory), bgStory(bgStory), transition(NULL)
 {
-    if (story != NULL)
-        add(story);
+    if (bgStory != NULL)
+        add(bgStory);
     add(&container);
+    if (fgStory != NULL)
+        add(fgStory);
+        
     Vec3 menuPos = container.getPosition();
     menuPos.x = MENU_X;
     menuPos.y = MENU_Y;
-
     container.setPosition(menuPos);
     container.setSize(Vec3(menuBG->w, menuBG->h, 0));
     container.setBackground(menuBG);
@@ -197,8 +200,9 @@ void PuyoCommander::initMenus()
   menuBG_wide = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/menubg-wide.png"));
   // 
   // Create the structures.
-  PuyoStoryWidget *tempStory = new PuyoStoryWidget("title.gsl");
-  mainScreen = new PuyoRealMainScreen(tempStory);
+  PuyoStoryWidget *fgStory = new PuyoStoryWidget("title_fg.gsl");
+  PuyoStoryWidget *bgStory = new PuyoStoryWidget("title_bg.gsl");
+  mainScreen = new PuyoRealMainScreen(fgStory, bgStory);
   MainRealMenu *trubudu = new MainRealMenu(mainScreen);
   trubudu->build();
   mainScreen->pushMenu(trubudu);

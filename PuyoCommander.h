@@ -31,7 +31,7 @@ class PuyoMainScreenMenu;
 
 class PuyoRealMainScreen : public PuyoScreen {
   public:
-    PuyoRealMainScreen(PuyoStoryWidget *story = NULL);
+    PuyoRealMainScreen(PuyoStoryWidget *fgStory = NULL, PuyoStoryWidget *bgStory = NULL);
     ~PuyoRealMainScreen();
     void pushMenu(PuyoMainScreenMenu *menu);
     void popMenu();
@@ -40,7 +40,7 @@ class PuyoRealMainScreen : public PuyoScreen {
     void onEvent(GameControlEvent *cevent);
   protected:
     SliderContainer container;
-    PuyoStoryWidget *story;
+    PuyoStoryWidget *fgStory, *bgStory;
     Stack<Widget*> menuStack;
     PuyoScreenTransitionWidget *transition;
 };
