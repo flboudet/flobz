@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
         }
     }
     
-    if (FilePath("data").exists())
+    if (!FilePath(DATADIR).exists())
         dataDir = "data";
     else
         dataDir = DATADIR;
