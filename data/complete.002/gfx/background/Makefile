@@ -1,3 +1,5 @@
-FILES= bluebkgnd.jpg
+FILES="bluebkgnd.jpg" 
+
+DIRECTORIES=
 
 include ${SOURCE_DATADIR}/Datarules.mk

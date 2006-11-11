@@ -1,4 +1,4 @@
-FILES=unmappedmonstersmall.png unmappedmonster.png
+FILES="unmappedmonster.png" "unmappedmonstersmall.png" 
 
 DIRECTORIES=
 

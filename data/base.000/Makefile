@@ -1,4 +1,5 @@
 FILES=
-DIRECTORIES=gfx lib music sfx story theme
+
+DIRECTORIES="locale" "music" "sfx" "story" "theme" "gfx" "lib" 
 
 include ${SOURCE_DATADIR}/Datarules.mk

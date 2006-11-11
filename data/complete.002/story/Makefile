@@ -1,3 +1,5 @@
-FILES= dukebeary.gsl herbert.gsl introherbert.gsl levels.gsl storyherbert.gsl
+FILES="dukebeary.gsl" "herbert.gsl" "storyherbert.gsl" "introherbert.gsl" "levels.gsl" 
+
+DIRECTORIES=
 
 include ${SOURCE_DATADIR}/Datarules.mk

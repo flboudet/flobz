@@ -1,6 +1,5 @@
-FILES=gamelost1p.gsl gamelost2p_left.gsl gamelost2p_right.gsl \
-      gameover1p.gsl networkmenu.gsl opponentz.gsl storyz.gsl \
-      title.gsl
+FILES="gamelost1p.gsl" "opponentz.gsl" "title_fg.gsl" "networkmenu.gsl" "gameover1p.gsl" "gamelost2p_left.gsl" "title_bg.gsl" "gamelost2p_right.gsl" "storyz.gsl" 
+
 DIRECTORIES=
 
 include ${SOURCE_DATADIR}/Datarules.mk

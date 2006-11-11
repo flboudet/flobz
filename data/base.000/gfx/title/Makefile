@@ -1,4 +1,4 @@
-FILES=B.png F.png L.png O.png O2.png O3.png P.png U.png Y.png
+FILES="O.png" "P.png" "O2.png" "B.png" "O3.png" "U.png" "F.png" "Y.png" "L.png" 
 
 DIRECTORIES=
 

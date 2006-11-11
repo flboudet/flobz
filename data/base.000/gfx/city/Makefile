@@ -1,4 +1,4 @@
-FILES=brokenbuildings.png city.jpg
+FILES="brokenbuildings.png" "city.jpg" 
 
 DIRECTORIES=
 
