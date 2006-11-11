@@ -25,6 +25,8 @@
 
 #include "PuyoDataPathManager.h"
 
+#define isnum(X) ((X>='0') && (X<='9'))
+
 PuyoDataPathManager::PuyoDataPathManager(String coreDataPath) : m_coreDataPath(coreDataPath)
 {
     SelfVector<String> dataFiles = m_coreDataPath.listFiles();
@@ -32,10 +34,15 @@ PuyoDataPathManager::PuyoDataPathManager(String coreDataPath) : m_coreDataPath(c
     AdvancedBuffer<int> wellFormattedNumbers;
     for (int i = 0 ; i < dataFiles.size() ; i++) {
         String currentFile = dataFiles[i];
-        if (currentFile[currentFile.length() - 4] == '.') {
+        int len = currentFile.length();
+        if ((len > 3) && (currentFile[len - 4] == '.')
+                && isnum(currentFile[len - 3])
+                && isnum(currentFile[len - 2])
+                && isnum(currentFile[len - 1])) {
             wellFormattedNames.add(currentFile);
             wellFormattedNumbers.add(atoi(currentFile.substring(currentFile.length() - 3)));
         }
+
     }
     // Now let's sort the names found
     while (wellFormattedNames.size() > 0) {
