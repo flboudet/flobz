@@ -24,7 +24,7 @@
  */
 
 #include <stdio.h>
-//#include <CoreFoundation/CoreFoundation.h>
+#include <CoreFoundation/CoreFoundation.h>
 #include "PuyoLocalizedDictionary.h"
 #include "ios_memory.h"
 
@@ -74,43 +74,86 @@ static bool readLine(FILE *dictionaryFile, String &lineRead)
 
 PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName) : dictionary(), datapathManager(datapathManager)
 {
-    // Retrieves the current locale
-    //CFMutableArrayRef supportedLocalesArray = CFArrayCreateMutable(NULL, 0, NULL);
-    //CFArrayAppendValue(supportedLocalesArray, CFSTR("French"));
-    //CFArrayAppendValue(supportedLocalesArray, CFSTR("English"));
-    //CFArrayRef chosenLocales = CFBundleCopyPreferredLocalizationsFromArray(supportedLocalesArray);
-    //CFStringRef localeIdentifier = (CFStringRef)CFArrayGetValueAtIndex(chosenLocales, 0);
-    //CFLocaleRef systemLocale = CFLocaleCopyCurrent();
-    //CFStringRef localeIdentifier = (CFStringRef)CFLocaleGetValue(systemLocale, kCFLocaleLanguageCode);
-    //CFStringRef localeIdentifier = CFLocaleGetIdentifier(systemLocale);
-    //CFStringRef canonicalLocale = CFLocaleCreateCanonicalLanguageIdentifierFromString(NULL, localeIdentifier);
-    //char locale[256];
-    //CFStringGetCString(localeIdentifier, locale, 256, kCFStringEncodingUTF8);
-    //locale[2] = 0;
-    String locale("fr");
-    String directoryName = FilePath::combine(dictionaryDirectory, locale);
-    String dictFilePath = FilePath::combine(directoryName, dictionaryName) + ".dic";
+/* English is the default */
+#define kPuyoDefaultPreferedLanguage "en"
+/* We'll try at most 10 languages */
+#define kPuyoMaxPreferedLanguage 10
+
+    int i;
+    char * PreferedLocales[kPuyoMaxPreferedLanguage];
+    int PreferedLocalesCount = 0;
+
+    /* First create the prefered languages list */
+#ifdef MACOSX
+
+    CFStringRef localeIdentifier;
+    CFArrayRef prefArray;
+    char canonicalLocale[32];
+
+    prefArray = (CFArrayRef) CFPreferencesCopyValue(CFSTR("AppleLanguages"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+    PreferedLocalesCount = (prefArray ? CFArrayGetCount(prefArray) : 0);
+    if (PreferedLocalesCount > kPuyoMaxPreferedLanguage-1) PreferedLocalesCount = kPuyoMaxPreferedLanguage-1;
     
-    printf("Locale lue:%s\n", (const char *)locale);
+    for (i = 0; i < PreferedLocalesCount; i++) {
+        localeIdentifier = (CFStringRef)CFArrayGetValueAtIndex(prefArray, i);
+        CFStringGetCString(localeIdentifier, canonicalLocale, 32, kCFStringEncodingUTF8);
+        if (canonicalLocale[0] < 'a') canonicalLocale[0] += 'a'-'A';
+        if (canonicalLocale[1] < 'a') canonicalLocale[1] += 'a'-'A';
+        canonicalLocale[2] = 0;
+        PreferedLocales[i] = strdup(canonicalLocale);
+    }
+    PreferedLocales[PreferedLocalesCount] = strdup(kPuyoDefaultPreferedLanguage);
+    PreferedLocalesCount++;
     
-    // Read all the entries in the dictionary file
-    FILE *dictionaryFile = fopen(datapathManager.getPath(dictFilePath), "r");
-    if (dictionaryFile == NULL)
-        return;
-    String keyString, valueString;
-    bool fileOk;
-    fileOk = readLine(dictionaryFile, keyString);
-    while (fileOk) {
-        fileOk = readLine(dictionaryFile, valueString);
-        if (fileOk) {
-            char *test = strdup(valueString);
-            dictionary.put(keyString, test);
-            do {
-                fileOk = readLine(dictionaryFile, keyString);
-            } while (fileOk && (keyString == ""));
+#else
+    
+    char * my_lang = getenv("LANG");
+    if ((my_lang != NULL) && (strlen(my_lang) >= 2)) {
+      PreferedLocales[PreferedLocalesCount] = strdup(my_lang);
+      PreferedLocales[PreferedLocalesCount][2] = 0;
+      PreferedLocalesCount++;
+    }
+    PreferedLocales[PreferedLocalesCount] = strdup(kPuyoDefaultPreferedLanguage);
+    PreferedLocalesCount++;
+
+#endif /* MACOSX */
+
+    /* Get the first matching dictionary */
+    for (i = 0; i < PreferedLocalesCount; i++) {
+        String locale(PreferedLocales[i]);
+        String directoryName = FilePath::combine(dictionaryDirectory, locale);
+        String dictFilePath = FilePath::combine(directoryName, dictionaryName) + ".dic";
+    
+        // Read all the entries in the dictionary file
+        FILE *dictionaryFile = NULL;
+        try { dictionaryFile = fopen(datapathManager.getPath(dictFilePath), "r"); } catch (Exception &e) { }
+        if (dictionaryFile != NULL)
+        {
+            //printf("Locale lue:%s\n", (const char *)locale);
+            String keyString, valueString;
+            bool fileOk;
+            fileOk = readLine(dictionaryFile, keyString);
+            while (fileOk) {
+                fileOk = readLine(dictionaryFile, valueString);
+                if (fileOk) {
+                    char *test = strdup(valueString);
+                    dictionary.put(keyString, test);
+                    do {
+                        fileOk = readLine(dictionaryFile, keyString);
+                    } while (fileOk && (keyString == ""));
+                }
+            }
+            fclose(dictionaryFile);
+            break;
         }
     }
-    fclose(dictionaryFile);
+    
+    /* clean up a bit before leaving */
+    for (i = 0; i < PreferedLocalesCount; i++) {
+        //fprintf(stderr,"Found prefered lang : %s\n",PreferedLocales[i]);
+        free(PreferedLocales[i]);
+    }
+
 }
 
 const char * PuyoLocalizedDictionary::getLocalizedString(const char * originalString) const
