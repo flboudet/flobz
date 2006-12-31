@@ -1,3 +1,9 @@
+struct <HiScoreBoxPosition:
+    int x,
+    int y,
+    int w,
+    int h>
+
 <init>
   // Timing
   float @kaoriArrived = 250.0
@@ -12,12 +18,19 @@
   float @dstRx = @spBx
   float @dstRy = @spBy
 
+  HiScoreBoxPosition   @hiScoreBox
+  @hiScoreBox.x = 180
+  @hiScoreBox.y = 180
+  @hiScoreBox.w = 300
+  @hiScoreBox.h = 230
+
   # Init function: called when script is loaded
   Display @screen = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
   Display @puyoDisplay = [new_display: x=680.0 y=50.0 width=640.0 height=480.0]
 
   Sprite @city = [new_sprite: image="city/city.jpg" x = 0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @buildings = [new_sprite: image="city/brokenbuildings.png" x = 0.0 y=480.0-448.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @hallOfFame = [new_sprite: image="hall-of-fame.png" x = 120.0 y=80.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
 
   Sprite @puyo      = [new_sprite: image="knockedpuyo.png" x = 10.0 y=30.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
 
@@ -27,6 +40,7 @@
   sprite::@city display=@screen
   sprite::@puyo display=@puyoDisplay
   sprite::@buildings display=@screen
+  sprite::@hallOfFame display=@screen
 
 <update>
   # Update function: called every animation cycle

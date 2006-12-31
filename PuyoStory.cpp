@@ -159,6 +159,11 @@ void PuyoStoryWidget::setIntegerValue(String varName, int value)
     styrolyse_setint(currentStory, varName, value);
 }
 
+int PuyoStoryWidget::getIntegerValue(String varName) const
+{
+    return styrolyse_getint(currentStory, varName);
+}
+
 const char *PuyoStoryWidget::getText(const char *text) const
 {
     if (localeDictionary == NULL)
@@ -166,10 +171,11 @@ const char *PuyoStoryWidget::getText(const char *text) const
     return localeDictionary->getLocalizedString(text);
 }
 
-PuyoStoryScreen::PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction) : Screen(0, 0, 640, 480), storyWidget(screenName, finishedAction), finishedAction(finishedAction), transitionWidget(previousScreen, NULL)
+PuyoStoryScreen::PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction, bool shouldAddTransition) : Screen(0, 0, 640, 480), storyWidget(screenName, finishedAction), finishedAction(finishedAction), transitionWidget(previousScreen, NULL)
 {
     add(&storyWidget);
-    add(&transitionWidget);
+    if (shouldAddTransition)
+        add(&transitionWidget);
 }
 
 PuyoStoryScreen::~PuyoStoryScreen()

@@ -28,6 +28,7 @@ void styrolyse_update(Styrolyse *_this, float delta_t);
 int  styrolyse_finished(Styrolyse *_this);
 void styrolyse_draw(Styrolyse *_this);
 void styrolyse_setint(Styrolyse *_this, const char *varname, int value);
+int styrolyse_getint(Styrolyse *_this, const char *varname);
 
 int  styrolyse_current_cycle(Styrolyse *_this);
 

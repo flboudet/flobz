@@ -260,6 +260,11 @@ void styrolyse_setint(Styrolyse *_this, const char *varname, int value)
     GSL_GLOBAL_INT(_this->gsl, varname) = value;
 }
 
+int styrolyse_getint(Styrolyse *_this, const char *varname)
+{
+    return GSL_GLOBAL_INT(_this->gsl, varname);
+}
+
 int  styrolyse_current_cycle(Styrolyse *_this)
 {
   if (!_this->gsl) return 0;

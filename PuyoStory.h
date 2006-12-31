@@ -49,6 +49,7 @@ public:
     void draw(SDL_Surface *screen);
     IdleComponent *getIdleComponent() { return this; }
     void setIntegerValue(String varName, int value);
+    int getIntegerValue(String varName) const;
     const char *getText(const char *text) const;
 
     struct PuyoStoryStyrolyseClient {
@@ -69,13 +70,14 @@ private:
 
 class PuyoStoryScreen : public Screen {
 public:
-    PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction = NULL);
+    PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction = NULL, bool shouldAddTransition = true);
     virtual ~PuyoStoryScreen();
     void onEvent(GameControlEvent *cevent);
-private:
+protected:
     PuyoStoryWidget storyWidget;
-    Action *finishedAction;
     PuyoScreenTransitionWidget transitionWidget;
+private:
+    Action *finishedAction;
 };
 
 #endif

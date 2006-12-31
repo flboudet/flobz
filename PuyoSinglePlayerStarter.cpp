@@ -223,7 +223,7 @@ String PuyoSingleGameLevelData::getIAFace() const
 }
 
 PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousScreen, Action *finishedAction, String playerName, int playerPoints)
-        : PuyoStoryScreen(screenName, previousScreen, finishedAction)
+        : PuyoStoryScreen(screenName, previousScreen, finishedAction, false), playerName(playerName), playerPoints(playerPoints)
 {
     static char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
     "Satanas", "Doctor X", "Tania", "Mr Gyom",
@@ -232,7 +232,7 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousSc
     initHiScores(AI_NAMES);
     int scorePlace = setHiScore(playerPoints, playerName);
     hiscore *scores = getHiScores();
-    //hiScoreBox.add(new Text("Game Over"));
+
     for (int i = 0 ; i < kHiScoresNumber ; i++) {
         char tmp[256];
         sprintf(tmp, "%d", scores[i].score);
@@ -245,9 +245,24 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousSc
             points[i].setFont(GameUIDefaults::FONT);
         }
     }
+
     hiScoreBox.add(&hiScoreNameBox);
     hiScoreBox.add(&hiScorePointBox);
+    
     add(&hiScoreBox);
+    add(&transitionWidget);
+    Vec3 hiScorePos = hiScoreBox.getPosition();
+    
+    hiScorePos.x = storyWidget.getIntegerValue("@hiScoreBox.x");
+    hiScorePos.y = storyWidget.getIntegerValue("@hiScoreBox.y");
+    hiScoreBox.setPosition(hiScorePos);
+    
+    hiScoreBox.setSize(Vec3(storyWidget.getIntegerValue("@hiScoreBox.w"),
+                            storyWidget.getIntegerValue("@hiScoreBox.h"), 0));
+}
+
+PuyoGameOver1PScreen::~PuyoGameOver1PScreen()
+{
 }
 
 SinglePlayerStarterAction::SinglePlayerStarterAction(int difficulty, PuyoSingleNameProvider *nameProvider)
