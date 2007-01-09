@@ -41,6 +41,7 @@ public:
 public:
     PeerAddress associatedPeer;
 private:
+    IIM_Surface   *menuBG;
     class NetCenterDialogMenuAction : public Action {
     public:
         NetCenterDialogMenuAction(NetCenterMenu *targetMenu, bool isCancelAction)

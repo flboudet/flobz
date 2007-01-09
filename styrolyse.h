@@ -17,6 +17,8 @@ struct _StyrolyseClient {
   void  (*freeImage) (StyrolyseClient *_this, void *image);
   void  (*putText)   (StyrolyseClient *_this, int x, int y, const char *text);
   const char *(*getText)   (StyrolyseClient *_this, const char *text);
+  void (*playMusic) (StyrolyseClient *_this, const char *fileName);
+  void (*playSound) (StyrolyseClient *_this, const char *fileName, int volume);
 };
 
 void styrolyse_init(const char *styrolyse_path);

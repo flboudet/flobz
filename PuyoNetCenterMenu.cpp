@@ -46,10 +46,9 @@ void NetCenterDialogMenu::NetCenterDialogMenuAction::action()
     else targetMenu->cancelCurrentGame();
 }
 
-extern IIM_Surface *menuBG; // I know what you think..
-
 NetCenterDialogMenu::NetCenterDialogMenu(NetCenterMenu *targetMenu, PeerAddress associatedPeer, String title, String message, bool hasAcceptButton)
-    : cancelAction(targetMenu, true), acceptAction(targetMenu, false), hasAcceptButton(hasAcceptButton),
+    : menuBG(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/menubg.png"))),
+      cancelAction(targetMenu, true), acceptAction(targetMenu, false), hasAcceptButton(hasAcceptButton),
       associatedPeer(associatedPeer), dialogTitle(title), dialogMsg(message),
       acceptButton("Accept", &acceptAction), cancelButton("Cancel", &cancelAction)
 {}
@@ -64,7 +63,9 @@ NetCenterDialogMenu::~NetCenterDialogMenu()
   if (hasAcceptButton)
     buttons.remove(&acceptButton);
   menu.remove(&buttons);
-  //remove(&menu);
+  if (menuBG != NULL) {
+    IIM_Free(menuBG);
+  }
 }
 
 void NetCenterDialogMenu::build()

@@ -1032,8 +1032,8 @@ namespace gameui {
 
   void Text::idle(double currentTime)
   {
-    static const double duration = 1.5;
-    static const double bounces = 10.0;
+    static const double duration = 0.5;
+    static const double bounces = 3.0;
     static const double omega = bounces * 3.1415 / duration;
 
     if (startMoving)
@@ -1053,7 +1053,7 @@ namespace gameui {
       moving = false;
       offset.x = 0.0;
     }
-    else offset.x = 50.0 * sin(omega * t) * ((1.0/(t+1.0)) - (1.0/(duration+1.0)));
+    else offset.x = 150.0 * sin(omega * t) * ((1.0/(t+1.0)) - (1.0/(duration+1.0)));
     requestDraw();
   }
 

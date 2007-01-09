@@ -421,11 +421,27 @@ void PuyoGameWidget::setScreenToResumed(bool fromControls)
         associatedScreen->setResumed(fromControls);
 }
 
-PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction) : menuTitle("Pause"), continueButton("Continue game", continueAction), abortButton("Abort game", abortAction)
+PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
+    : menuBG(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/menubg.png"))),
+      menuTitle("Pause"), continueButton("Continue game", continueAction), abortButton("Abort game", abortAction)
 {
-    add(&menuTitle);
-    add(&continueButton);
-    add(&abortButton);
+    pauseVBox.add(&menuTitle);
+    pauseVBox.add(&continueButton);
+    pauseVBox.add(&abortButton);
+    pauseContainer.add(&pauseVBox);
+    add(&pauseContainer);
+    pauseContainer.setBackground(menuBG);
+    pauseMenuLeft = (640 - menuBG->w) / 2;
+    pauseMenuTop = (480 - menuBG->h) / 2;
+}
+
+void PuyoPauseMenu::finishLayout()
+{
+    Vec3 menuPos = pauseContainer.getPosition();
+    menuPos.x = pauseMenuLeft;
+    menuPos.y = pauseMenuTop;
+    pauseContainer.setPosition(menuPos);
+    pauseContainer.setSize(Vec3(menuBG->w, menuBG->h, 0));
 }
 
 void ContinueAction::action()
@@ -505,6 +521,7 @@ void PuyoGameScreen::setPaused(bool fromControls)
         if (gameWidget.getOpponentFace() != NULL)
             gameWidget.getOpponentFace()->hide();
         this->add(&pauseMenu);
+        pauseMenu.finishLayout();
         this->focus(&pauseMenu);
         paused = true;
         gameWidget.pause();

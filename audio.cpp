@@ -185,7 +185,9 @@ static Mix_Music *CustomMix_LoadMUS(const char *fileName)
     String filePath = theCommander->getDataPathManager().getPath(FilePath("music").combine(fileName));
     Mix_Music *result;
     
-    result = Mix_LoadMUS(fileName);
+    result = Mix_LoadMUS(filePath);
+    if (!result)
+        printf("Mix_LoadMUS(\"%s\"): %s\n", (const char *)filePath, Mix_GetError());
     return result;
 }
 

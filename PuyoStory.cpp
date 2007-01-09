@@ -1,5 +1,6 @@
 #include "PuyoStory.h"
 #include "PuyoCommander.h"
+#include "audio.h"
 
 extern SoFont *storyFont;
 
@@ -78,6 +79,18 @@ static const char *getText(StyrolyseClient *_this, const char *text)
     return ((PuyoStoryWidget::PuyoStoryStyrolyseClient *)_this)->widget->getText(text);
 }
 
+static void playMusic(StyrolyseClient *_this, const char *fileName)
+{
+    //AudioManager::playMusic(theCommander->getDataPathManager().getPath(String("/music/") + fileName));
+    AudioManager::playMusic(fileName);
+}
+
+static void playSound(StyrolyseClient *_this, const char *fileName, int volume)
+{
+    //AudioManager::playSound(theCommander->getDataPathManager().getPath(String("/sfx/") + fileName), volume);
+    AudioManager::playSound(fileName, volume);
+}
+
 bool PuyoStoryWidget::classInitialized = false;
 
 PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction)
@@ -112,6 +125,8 @@ PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction)
     client.styroClient.freeImage = freeImage;
     client.styroClient.putText   = putText;
     client.styroClient.getText   = ::getText;
+    client.styroClient.playMusic = ::playMusic;
+    client.styroClient.playSound = ::playSound;
     client.widget = this;
     
     currentStory = styrolyse_new((const char *)fullPath, (StyrolyseClient *)(&client));

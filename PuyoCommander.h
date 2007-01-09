@@ -18,15 +18,6 @@ class PuyoScreen : public Screen {
     virtual void build() = 0;
 };
 
-class PuyoMainScreen : public PuyoScreen {
-  public:
-    PuyoMainScreen(PuyoStoryWidget *story = NULL);
-    void build();
-  protected:
-    VBox menu;
-    PuyoStoryWidget *story;
-};
-
 class PuyoMainScreenMenu;
 
 class PuyoRealMainScreen : public PuyoScreen {
@@ -39,6 +30,7 @@ class PuyoRealMainScreen : public PuyoScreen {
     void transitionFromScreen(Screen &fromScreen);
     void onEvent(GameControlEvent *cevent);
   protected:
+    IIM_Surface   *menuBG;
     SliderContainer container;
     PuyoStoryWidget *fgStory, *bgStory;
     Stack<Widget*> menuStack;

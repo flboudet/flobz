@@ -17,11 +17,12 @@
 using namespace gameui;
 
 PuyoCommander *theCommander = NULL;
-IIM_Surface   *menuBG       = NULL;
 IIM_Surface   *menuBG_wide  = NULL;
 SoFont *storyFont;
 #define WIDTH  640
 #define HEIGHT 480
+#define MENU_X 235
+#define MENU_Y 225
 
 static const char * kFullScreenPref = "Config.FullScreen";
 static const char * kOpenGLPref     = "Config.OpenGL";
@@ -51,29 +52,12 @@ void PuyoPopMenuAction::action()
 /*
  * THE MENUS
  */
-PuyoScreen::PuyoScreen() : Screen(0,0,WIDTH,HEIGHT) { setBackground(menuBG); }
 
-PuyoMainScreen::PuyoMainScreen(PuyoStoryWidget *story) : story(story)
-{
-}
-
-#define MENU_X 235
-#define MENU_Y 225
-
-void PuyoMainScreen::build()
-{
-    /*if (story != NULL)
-        add(story);*/
-    add(&menu);
-    Vec3 menuPos = menu.getPosition();
-    menuPos.x = MENU_X;
-    menuPos.y = MENU_Y;
-    menu.setPosition(menuPos);
-    menu.setSize(Vec3(menuBG->w, menuBG->h, 0));
-}
+PuyoScreen::PuyoScreen() : Screen(0,0,WIDTH,HEIGHT) {}
 
 PuyoRealMainScreen::PuyoRealMainScreen(PuyoStoryWidget *fgStory, PuyoStoryWidget *bgStory)
-    : fgStory(fgStory), bgStory(bgStory), transition(NULL)
+    : menuBG(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/menubg.png"))),
+      fgStory(fgStory), bgStory(bgStory), transition(NULL)
 {
     if (bgStory != NULL)
         add(bgStory);
@@ -93,6 +77,9 @@ PuyoRealMainScreen::~PuyoRealMainScreen()
 {
     if (transition != NULL) {
         delete(transition);
+    }
+    if (menuBG != NULL) {
+        IIM_Free(menuBG);
     }
 }
 
@@ -196,7 +183,6 @@ void PuyoCommander::run()
 void PuyoCommander::initMenus()
 {
   DBG_PRINT("initMenus()\n");
-  menuBG = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/menubg.png"));
   menuBG_wide = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/menubg-wide.png"));
   // 
   // Create the structures.

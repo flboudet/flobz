@@ -5,8 +5,6 @@
 #include <string.h>
 #include <math.h>
 
-#include "audio.h"
-
 
 static char scriptPath[1024];
 
@@ -109,14 +107,14 @@ Vec2 global_sprite_get_position(GoomSL *gsl, const char *name)
 void styro_music(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
     const char *path = (const char *)GSL_LOCAL_PTR  (gsl, local, "file");
-    AudioManager::playMusic(path);
+    styrolyse->client->playMusic(styrolyse->client, path);
 }
 
 void styro_sound(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
     const char *path   = (const char *)GSL_LOCAL_PTR  (gsl, local, "file");
     float       volume = GSL_LOCAL_FLOAT (gsl, local, "volume");
-    AudioManager::playSound(path, volume);
+    styrolyse->client->playSound(styrolyse->client, path, volume);
 }
 
 void styro_gettext(GoomSL *gsl, GoomHash *global, GoomHash *local)

@@ -38,7 +38,12 @@ class PuyoCycled;
 class PuyoPauseMenu : public VBox {
 public:
     PuyoPauseMenu(Action *continueAction, Action *abortAction);
+    virtual void finishLayout();
+    int pauseMenuTop, pauseMenuLeft;
 private:
+    IIM_Surface   *menuBG;
+    SliderContainer pauseContainer;
+    VBox pauseVBox;
     Text menuTitle;
     Button continueButton;
     Button abortButton;
