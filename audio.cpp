@@ -27,6 +27,7 @@ static float music_volume   = 1.0f;
 
 static bool sound_on = false;
 static bool music_on = false;
+static bool music_starting = false;
 
 static std::string music_current = "";
 #endif
@@ -208,8 +209,7 @@ void AudioManager::preloadMusic(const char *fileName)
 void AudioManager::playMusic(const char *fileName)
 {
 #ifdef USE_AUDIO
-  if ((!audio_supported) || (music_current == fileName)) return;
-    
+  if ((!music_starting) && ((!audio_supported) || (music_current == fileName))) return;
     music_current = fileName;
 
     if (music_on)
@@ -292,11 +292,14 @@ void AudioManager::musicOnOff(bool state)
 
   if (music_on)
   {
+    music_starting = true;
     musicVolume(music_volume);
     int lenght = music_current.size();
     char tmp[lenght+1];
     music_current.copy(tmp,lenght,0);
+    tmp[lenght] = 0;
     playMusic(tmp);
+    music_starting = false;
   }
   else
   {
