@@ -435,6 +435,11 @@ PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
     pauseMenuTop = (480 - menuBG->h) / 2;
 }
 
+PuyoPauseMenu::~PuyoPauseMenu()
+{
+    IIM_Free(menuBG);
+}
+
 void PuyoPauseMenu::finishLayout()
 {
     Vec3 menuPos = pauseContainer.getPosition();

@@ -5,15 +5,22 @@
 
   Sprite @sky =  [new_sprite: image="introlevel/skynight.jpg" x=0.0 y=0.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
   Sprite @peak =  [new_sprite: image="introlevel/peak.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
+  Sprite @kaori =  [new_sprite: image="introlevel/kaori-mini.png" x=300.0 y=0.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
+  Sprite @herbert =  [new_sprite: image="introlevel/herbert-mini.png" x=200.0 y=1200.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
+  @kaori.parent = "@peak"
+  @herbert.parent = "@peak"
 
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
   # This also allows you to specify the drawing order
   sprite::@sky display=@display
   sprite::@peak display=@display
+  sprite::@kaori display=@display
+  sprite::@herbert display=@display
 
 <update>
   # Update function: called every animation cycle
-  move::@peak fcycle=1000.0  x=0.0 y=-1300.0+480.0
+  move::@peak fcycle=500.0  x=0.0 y=-1300.0+480.0
+  move::@kaori fcycle=500.0  x=300.0 y=1200.0
 
   (@cycle = 1000)? @finished = 1

@@ -37,22 +37,15 @@ PuyoGame *PuyoNetworkGameFactory::createPuyoGame(PuyoFactory *attachedPuyoFactor
     return new PuyoNetworkGame(attachedPuyoFactory, msgBox, gameId);
 }
 
-void PuyoNetworkGameWidget::ChatAction::action()
-{
-    String chatString = attachedEditField->getValue();
-    owner->sendChat(chatString);
-}
-
 PuyoNetworkGameWidget::PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, Action *gameOverAction)
     : attachedPuyoThemeSet(puyoThemeSet), mbox(mbox), attachedLocalGameFactory(&attachedRandom),
       attachedNetworkGameFactory(&attachedRandom, mbox, gameId), localArea(&attachedLocalGameFactory, &attachedPuyoThemeSet, &levelTheme,
             1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, gameId, painter),
       networkArea(&attachedNetworkGameFactory, &attachedPuyoThemeSet, &levelTheme,
             1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
-      playercontroller(localArea), dummyPlayerController(networkArea), syncMsgReceived(false), syncMsgSent(false), chatAction(this), chatInput("Say:", "Hello", &chatAction), chatArea(8)
+      playercontroller(localArea), dummyPlayerController(networkArea), syncMsgReceived(false), syncMsgSent(false), chatBox(*this)
 {
-    chatAction.setEditField(chatInput.getEditField());
-	chatInput.getEditField()->setEditOnFocus(true);
+    
     mbox.addListener(this);
     initialize(localArea, networkArea, playercontroller, dummyPlayerController, levelTheme, gameOverAction);
     setLives(-1);
@@ -96,7 +89,7 @@ void PuyoNetworkGameWidget::onMessage(Message &message)
             PuyoGameWidget::abort();
             break;
         case PuyoMessage::kGameChat:
-            chatArea.addChat(message.getString("NAME"), message.getString("TEXT"));
+            chatBox.addChat(message.getString("NAME"), message.getString("TEXT"));
             printf("%s: %s\n", (const char *)message.getString("NAME"), (const char *)message.getString("TEXT"));
             break;
         default:
@@ -162,19 +155,14 @@ void PuyoNetworkGameWidget::sendChat(String chatText)
     message->addString("TEXT",   chatText);
     message->addBoolProperty("RELIABLE", true);
     message->send();
-    chatArea.addChat(getPlayerOneName(), chatText);
+    chatBox.addChat(getPlayerOneName(), chatText);
     delete message;
 }
 
 void PuyoNetworkGameWidget::associatedScreenHasBeenSet(PuyoGameScreen *associatedScreen)
 {
-    chatBox.add(&chatInput);
-    chatBox.add(&chatArea);
-    chatArea.setPreferedSize(Vec3(640, 180, 0));
-    chatBox.setPreferedSize(Vec3(640, 200, 0));
-    chatBox.arrangeWidgets();
     associatedScreen->getPauseMenu().add(&chatBox);
-    associatedScreen->getPauseMenu().arrangeWidgets();
+    //associatedScreen->getPauseMenu().arrangeWidgets();
 }
 
 void PuyoNetworkGameWidget::sendSyncMsg()
@@ -186,5 +174,4 @@ void PuyoNetworkGameWidget::sendSyncMsg()
     message->send();
     delete message;
 }
-
 

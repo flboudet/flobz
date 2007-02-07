@@ -87,47 +87,6 @@ void NetCenterDialogMenu::build()
     transitionToContent(&menu);
 }
 
-NetCenterChatArea::NetCenterChatArea(int height)
-    : height(height), lines(new (HBox *[height])), names(new (Text *[height])), texts(new (Text *[height]))
-{
-    for (int i = 0 ; i < height ; i++) {
-        lines[i] = new HBox;
-        names[i] = new Text("");
-        names[i]->setFont(GameUIDefaults::FONT_SMALL_ACTIVE);
-        names[i]->setPreferedSize(Vec3(100, 12, 0));
-        texts[i] = new Text("");
-        texts[i]->setFont(GameUIDefaults::FONT_SMALL_INFO);
-        texts[i]->setPreferedSize(Vec3(540, 12, 0));
-        lines[i]->add(names[i]);
-        lines[i]->add(texts[i]);
-        add(lines[i]);
-    }
-}
-
-NetCenterChatArea::~NetCenterChatArea()
-{
-    for (int i = 0 ; i < height ; i++) {
-        delete texts[i];
-        delete names[i];
-        delete lines[i];
-    }
-    delete[] lines;
-    delete[] names;
-    delete[] texts;
-}
-
-void NetCenterChatArea::addChat(String name, String text)
-{
-    while (text.length() < 150)
-        text += " ";
-    for (int i = 0 ; i < height-1 ; i++) {
-        names[i]->setValue(names[i+1]->getValue());
-        texts[i]->setValue(texts[i+1]->getValue());
-    }
-    names[height-1]->setValue(name);
-    texts[height-1]->setValue(text);
-}
-
 String NetCenterPlayerList::PlayerEntry::getStatusString(int status)
 {
   switch (status) {
@@ -199,17 +158,17 @@ String NetCenterTwoNameProvider::getPlayer2Name() const
     return netCenter.getOpponentName();
 }
 
-void NetCenterMenu::ChatAction::action()
+/*void NetCenterMenu::ChatAction::action()
 {
     printf("Chat:%s\n", (const char *)(chatInput->getValue()));
     netCenter->sendMessage(chatInput->getValue());
-}
+}*/
 
 NetCenterMenu::NetCenterMenu(PuyoNetGameCenter *netCenter)
     : netCenter(netCenter), playerListText("Player List"), chatAreaText("Chat Area"),
       cycled(this),
-      playerList(8, this), chatArea(8), story("networkmenu.gsl"), onScreenDialog(NULL), shouldSelfDestroy(false),
-      nameProvider(*netCenter), chatAction(netCenter, &chatInput), chatInput("Type some text here", &chatAction)
+      playerList(8, this), story("networkmenu.gsl"), onScreenDialog(NULL), shouldSelfDestroy(false),
+      nameProvider(*netCenter), chatBox(*this)
 {
     GameUIDefaults::GAME_LOOP->addIdle(&cycled);
     netCenter->addListener(this);
@@ -239,15 +198,15 @@ void NetCenterMenu::build()
 
     HBox *topbox = new HBox();
     VBox *menu   = new VBox();
-    VBox *chatbox = new VBox();
+    //VBox *chatbox = new VBox();
     VBox *playerbox = new VBox();
     
     menu->add(new Text("Network Game Center"));
     menu->add(new Button("Change Nick"));
     menu->add(new Button("Options"));
     menu->add(new Button("Disconnect", new PopScreenAction()));
-    menu->add(&chatInput);
-    chatInput.setEditOnFocus(true);
+    //menu->add(&chatInput);
+    //chatInput.setEditOnFocus(true);
     
     playerbox->add(&playerListText);
     playerbox->add(&playerList);
@@ -273,20 +232,25 @@ void NetCenterMenu::build()
   */  
 
     //chatbox->add(&chatInput);
-    chatbox->add(&chatAreaText);
-    chatbox->add(&chatArea);
-    chatbox->setPreferedSize(Vec3(640, 120, 0));
+    //chatbox->add(&chatAreaText);
+    //chatbox->add(&chatArea);
+    //chatbox->setPreferedSize(Vec3(640, 120, 0));
 
     main->add(topbox);
-    main->add(chatbox);
+    main->add(&chatBox);
 
     // container.setBackground(menuBG_wide);
+}
+
+void NetCenterMenu::sendChat(String chatText)
+{
+    netCenter->sendMessage(chatText);
 }
 
 void NetCenterMenu::onChatMessage(const String &msgAuthor, const String &msg)
 {
     printf("%s:%s\n", (const char *)msgAuthor, (const char *)msg);
-    chatArea.addChat(msgAuthor, msg);
+    chatBox.addChat(msgAuthor, msg);
 }
 
 void NetCenterMenu::onPlayerConnect(String playerName, PeerAddress playerAddress)

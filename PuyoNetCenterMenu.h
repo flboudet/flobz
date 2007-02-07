@@ -30,6 +30,7 @@
 #include "PuyoCommander.h"
 #include "PuyoInternetGameCenter.h"
 #include "PuyoTwoPlayerStarter.h"
+#include "PuyoChatBox.h"
 
 class NetCenterMenu;
 
@@ -97,18 +98,6 @@ private:
     NetCenterMenu *targetMenu;
 };
 
-class NetCenterChatArea : public VBox {
-public:
-    NetCenterChatArea(int height);
-    ~NetCenterChatArea();
-    void addChat(String name, String text);
-private:
-    int height;
-    HBox **lines;
-    Text **names;
-    Text **texts;
-};
-
 class NetCenterMenu;
 
 class NetCenterTwoNameProvider : public PuyoTwoNameProvider {
@@ -120,7 +109,7 @@ private:
     PuyoNetGameCenter &netCenter;
 };
 
-class NetCenterMenu : public PuyoScreen, PuyoNetGameCenterListener {
+class NetCenterMenu : public PuyoScreen, PuyoNetGameCenterListener, ChatBoxDelegate {
 public:
     NetCenterMenu(PuyoNetGameCenter *netCenter);
     ~NetCenterMenu();
@@ -138,6 +127,7 @@ public:
     void playerSelected(PeerAddress playerAddress, String playerName);
     void selfDestroy() { shouldSelfDestroy = true; }
     void show();
+    virtual void sendChat(String chatText);
 private:
     class NetCenterCycled : public CycledComponent {
     public:
@@ -147,18 +137,18 @@ private:
             netCenter->cycle();
         }
     };
-    class ChatAction : public Action {
+    /*class ChatAction : public Action {
     public:
         ChatAction(PuyoNetGameCenter *netCenter, EditField *chatInput) : netCenter(netCenter), chatInput(chatInput) {}
         void action();
     private:
         PuyoNetGameCenter *netCenter;
         EditField *chatInput;
-    };
+    };*/
     
     Text playerListText, chatAreaText;
     NetCenterPlayerList playerList;
-    NetCenterChatArea chatArea;
+    //NetCenterChatArea chatArea;
     NetCenterCycled cycled;
     PuyoNetGameCenter *netCenter;
     PuyoStoryWidget story;
@@ -166,8 +156,9 @@ private:
     NetCenterDialogMenu *onScreenDialog;
     bool shouldSelfDestroy;
     NetCenterTwoNameProvider nameProvider;
-    ChatAction chatAction;
-    EditField chatInput;
+    //ChatAction chatAction;
+    ChatBox chatBox;
+    //EditField chatInput;
 };
     
 #endif // _PUYONETCENTERMENU

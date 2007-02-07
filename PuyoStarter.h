@@ -38,6 +38,7 @@ class PuyoCycled;
 class PuyoPauseMenu : public VBox {
 public:
     PuyoPauseMenu(Action *continueAction, Action *abortAction);
+    virtual ~PuyoPauseMenu();
     virtual void finishLayout();
     int pauseMenuTop, pauseMenuLeft;
 private:
