@@ -37,7 +37,7 @@ class PuyoTwoPlayersGameWidget : public PuyoGameWidget {
 public:
     PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String aiFace, Action *gameOverAction = NULL);
     bool didPlayerWon() const { return isGameARunning(); }
-    PuyoStoryWidget *PuyoTwoPlayersGameWidget::getOpponentFace();
+    PuyoStoryWidget *getOpponentFace();
 private:
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;

@@ -66,7 +66,7 @@ class PuyoView : public PuyoDelegate {
     virtual void rotateLeft();
     virtual void rotateRight();
 
-    int PuyoView::getValenceForPuyo(PuyoPuyo *puyo) const;
+    int getValenceForPuyo(PuyoPuyo *puyo) const;
     PuyoGame *getAttachedGame() const { return attachedGame; }
     SDL_Painter & getPainter() const { return attachedPainter; }
     

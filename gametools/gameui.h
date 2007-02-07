@@ -482,7 +482,7 @@ namespace gameui {
   		void eventOccured(GameControlEvent *event);
   		int lastvisible;
   		int firstvisible;
-  		bool HScrollList::isItemVisible(int id);
+  		bool isItemVisible(int id);
   		Text threedotsbefore;
   		Text threedotsafter;
   	};

@@ -74,7 +74,7 @@ private:
 class NeutralAnimation : public PuyoAnimation {
   public:
     NeutralAnimation(AnimatedPuyo &puyo, int delay, AnimationSynchronizer *synchronizer);
-    NeutralAnimation::~NeutralAnimation();
+    virtual ~NeutralAnimation();
     void cycle();
     void draw(int semiMove);
   private:
