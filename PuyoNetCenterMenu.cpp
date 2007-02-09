@@ -191,55 +191,24 @@ void NetCenterMenu::build()
     add(&story);
     add(&container);
 
-    VBox *main   = new VBox();  
-    container.add(main);
+    container.add(&mainBox);
     container.setPosition(Vec3(5,5));
     container.setSize(Vec3(630,470, 0));
 
-    HBox *topbox = new HBox();
-    VBox *menu   = new VBox();
-    //VBox *chatbox = new VBox();
-    VBox *playerbox = new VBox();
+    menu.add(new Text("Network Game Center"));
+    //menu.add(new Button("Change Nick"));
+    //menu.add(new Button("Options"));
+    menu.add(new Button("Disconnect", new PopScreenAction()));
     
-    menu->add(new Text("Network Game Center"));
-    menu->add(new Button("Change Nick"));
-    menu->add(new Button("Options"));
-    menu->add(new Button("Disconnect", new PopScreenAction()));
-    //menu->add(&chatInput);
-    //chatInput.setEditOnFocus(true);
-    
-    playerbox->add(&playerListText);
-    playerbox->add(&playerList);
+    playerbox.add(&playerListText);
+    playerbox.add(&playerList);
 
-    topbox->add(menu);
-    topbox->add(playerbox);
- 
-/*    
-    HBox *screenCenter = new HBox();
-    
-    EditFieldWithLabel *sayField = new EditFieldWithLabel("Say:", "");
-    SayAction *say = new SayAction(netCenter, sayField->getEditField());
-    sayField->getEditField()->setAction(ON_START, say);
-    chatBox->add(&chatArea);
-    chatBox->add(sayField);
-    
-    playerList.add(new Text("Players"));
-    
-    screenCenter->add(chatBox);
-    screenCenter->add(&playerList);
-    add(screenCenter);
-    add(new Button("Exit", new PopScreenAction()));
-  */  
+    topbox.add(&menu);
+    topbox.add(&playerbox);
 
-    //chatbox->add(&chatInput);
-    //chatbox->add(&chatAreaText);
-    //chatbox->add(&chatArea);
-    //chatbox->setPreferedSize(Vec3(640, 120, 0));
+    mainBox.add(&topbox);
+    mainBox.add(&chatBox);
 
-    main->add(topbox);
-    main->add(&chatBox);
-
-    // container.setBackground(menuBG_wide);
 }
 
 void NetCenterMenu::sendChat(String chatText)

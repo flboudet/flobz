@@ -137,18 +137,12 @@ private:
             netCenter->cycle();
         }
     };
-    /*class ChatAction : public Action {
-    public:
-        ChatAction(PuyoNetGameCenter *netCenter, EditField *chatInput) : netCenter(netCenter), chatInput(chatInput) {}
-        void action();
-    private:
-        PuyoNetGameCenter *netCenter;
-        EditField *chatInput;
-    };*/
-    
+    VBox mainBox;
+    HBox topbox;
+    VBox menu;
+    VBox playerbox;
     Text playerListText, chatAreaText;
     NetCenterPlayerList playerList;
-    //NetCenterChatArea chatArea;
     NetCenterCycled cycled;
     PuyoNetGameCenter *netCenter;
     PuyoStoryWidget story;
@@ -156,9 +150,7 @@ private:
     NetCenterDialogMenu *onScreenDialog;
     bool shouldSelfDestroy;
     NetCenterTwoNameProvider nameProvider;
-    //ChatAction chatAction;
     ChatBox chatBox;
-    //EditField chatInput;
 };
     
 #endif // _PUYONETCENTERMENU
