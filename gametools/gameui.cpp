@@ -589,10 +589,10 @@ namespace gameui {
   }
   void ZBox::widgetMustRedraw(Widget *wid)
   {
-    /*for (int i = 0; i < getNumberOfChilds(); ++i) {
+    for (int i = 0; i < getNumberOfChilds(); ++i) {
         getChild(i)->requestDraw(true);
-    }*/
-    requestDraw(true);
+    }
+    requestDraw(false);
   }
 
   // SliderContainer

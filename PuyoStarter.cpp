@@ -428,9 +428,9 @@ PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
     pauseVBox.add(&menuTitle);
     pauseVBox.add(&continueButton);
     pauseVBox.add(&abortButton);
-    //pauseContainer.add(&pauseVBox);
-    //add(&pauseContainer);
-    add(&pauseVBox);
+    pauseContainer.add(&pauseVBox);
+    add(&pauseContainer);
+    pauseContainer.add(&pauseVBox);
     pauseContainer.setBackground(menuBG);
     pauseMenuLeft = (640 - menuBG->w) / 2;
     pauseMenuTop = (480 - menuBG->h) / 2;
