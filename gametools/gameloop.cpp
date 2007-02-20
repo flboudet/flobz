@@ -118,7 +118,7 @@ bool CycledComponent::isLate(double currentTime) const
 
 // GAME LOOP
 
-GameLoop::GameLoop() {
+GameLoop::GameLoop() : timeDrift(0), lastDrawTime(getCurrentTime()), deltaDrawTimeMax(2.) {
   finished = false;
 }
 
@@ -181,31 +181,19 @@ void GameLoop::garbageCollect(GarbageCollectableItem *item)
 
 void GameLoop::run()
 {
-  static int tot_dropped = 0;
-  static int tot_cycle   = 0;
-  
   draw();
   while (!finished)
   {
     double currentTime = getCurrentTime();
-    idle(getCurrentTime());
+    idle(currentTime);
     if (drawRequested()) {
-      if (!isLate(getCurrentTime()))
+      currentTime = getCurrentTime();
+      // Ensure at least a frame every deltaDrawTimeMax gets drawn
+      if ((!isLate(currentTime)) || (currentTime - lastDrawTime > deltaDrawTimeMax)) {
         draw();
-      else
-        tot_dropped ++;
+        lastDrawTime = currentTime;
+      }
     }
-
-    tot_cycle ++;
-    if  (tot_cycle == 100) {
-      //printf("%d%% Frames Dropped\n", tot_dropped);
-      tot_dropped = tot_cycle = 0;
-    }
-
-//    if (!isLate(getCurrentTime())) {
-      SDL_Delay(10);
-//      printf("DELAY()\n");
-//    }
   }
 }
 

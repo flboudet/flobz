@@ -26,7 +26,7 @@
 #include "PuyoNatTraversal.h"
 
 PuyoNatTraversal::PuyoNatTraversal(UDPMessageBox &udpmbox, double punchInfoTimeout, double strategyTimeout)
-  : udpmbox(udpmbox), igpmbox(new IgpMessageBox(udpmbox)), currentStrategy(TRY_NONE), punchInfoTimeout(punchInfoTimeout), strategyTimeout(strategyTimeout), receivedGarbage(0)
+  : udpmbox(udpmbox), igpmbox(new IgpMessageBox(udpmbox)), currentStrategy(TRY_NONE), punchInfoTimeout(punchInfoTimeout), strategyTimeout(strategyTimeout), receivedGarbage(0), udpSocketAddress("127.0.0.1")
 {
     igpmbox->addListener(this);
     //printf("GetSocketAddress(): %s\n", (const char *)(mbox->getSocketAddress().asString()));
@@ -44,6 +44,7 @@ PuyoNatTraversal::~PuyoNatTraversal()
 
 void PuyoNatTraversal::punch(const String punchPoolName)
 {
+    this->punchPoolName = punchPoolName;
     int prevBound = igpmbox->getBound();
     igpmbox->bind(1);
     Message *punchMsg = igpmbox->createMessage();
@@ -59,12 +60,13 @@ void PuyoNatTraversal::punch(const String punchPoolName)
     delete punchMsg;
     igpmbox->bind(prevBound);
     timeToPunchInfo = getTimeMs() + punchInfoTimeout;
+    gettingPunchInfo = true;
 }
 
 void PuyoNatTraversal::idle()
 {
     double currentTime = getTimeMs();
-    if (igpmbox != NULL) {
+    if (gettingPunchInfo) {
         igpmbox->idle();
         if (timeToPunchInfo < currentTime) {
             currentStrategy = FAILED;
@@ -75,11 +77,12 @@ void PuyoNatTraversal::idle()
             case TRY_NONE: {
                 // Switch to TRY_PUBLICADDR
                 printf("Trying the TRY_PUBLICADDR strategy\n");
-                SocketAddress sockPubAddr(peerAddressString);
+                udpSocketAddress = SocketAddress(peerAddressString);
+                udpSocketPortNum = peerPortNum;
+                //udpmbox.getDatagramSocket()->connect(sockPubAddr, peerPortNum);
+                udpPeerAddress = udpmbox.createPeerAddress(udpSocketAddress, udpSocketPortNum);
+                
                 udpmbox.addListener(this);
-                udpmbox.getDatagramSocket()->connect(sockPubAddr, peerPortNum);
-                PeerAddress peerPubAddr = udpmbox.createPeerAddress(sockPubAddr, peerPortNum);
-                udpmbox.bind(peerPubAddr);
                 currentStrategy = TRY_PUBLICADDR;
                 timeToNextStrategy = currentTime + strategyTimeout;
                 break;
@@ -88,10 +91,10 @@ void PuyoNatTraversal::idle()
                 if (timeToNextStrategy < currentTime) {
                     // Switch to TRY_PUBLICADDR_NEXTPORT
                     printf("Trying the TRY_PUBLICADDR_NEXTPORT strategy\n");
-                    SocketAddress sockPubAddr(peerAddressString);
-                    udpmbox.getDatagramSocket()->connect(sockPubAddr, peerPortNum + 1);
-                    PeerAddress peerPubAddr = udpmbox.createPeerAddress(sockPubAddr, peerPortNum + 1);
-                    udpmbox.bind(peerPubAddr);
+                    udpSocketAddress = SocketAddress(peerAddressString);
+                    udpSocketPortNum = peerPortNum + 1;
+                    //udpmbox.getDatagramSocket()->connect(sockPubAddr, peerPortNum + 1);
+                    udpPeerAddress = udpmbox.createPeerAddress(udpSocketAddress, udpSocketPortNum);
                     currentStrategy = TRY_PUBLICADDR_NEXTPORT;
                     timeToNextStrategy = currentTime + strategyTimeout;
                 }
@@ -100,10 +103,10 @@ void PuyoNatTraversal::idle()
                 if (timeToNextStrategy < currentTime) {
                     // Switch to TRY_LOCALADDR
                     printf("Trying the TRY_LOCALADDR strategy\n");
-                    SocketAddress sockLocalAddr(peerLocalAddressString);
-                    udpmbox.getDatagramSocket()->connect(sockLocalAddr, peerLocalPortNum);
-                    PeerAddress peerLocalAddr = udpmbox.createPeerAddress(sockLocalAddr, peerLocalPortNum);
-                    udpmbox.bind(peerLocalAddr);
+                    udpSocketAddress = SocketAddress(peerLocalAddressString);
+                    udpSocketPortNum = peerLocalPortNum;
+                    //udpmbox.getDatagramSocket()->connect(sockLocalAddr, peerLocalPortNum);
+                    udpPeerAddress = udpmbox.createPeerAddress(udpSocketAddress, udpSocketPortNum);
                     currentStrategy = TRY_LOCALADDR;
                     timeToNextStrategy = currentTime + strategyTimeout;
                 }
@@ -144,8 +147,9 @@ void PuyoNatTraversal::onMessage(Message &msg)
             printf("Peer(L): %s:%d\n", (const char *)peerLocalAddressString, peerLocalPortNum);
             
             // Destroy the igp messagebox
-            delete igpmbox;
-            igpmbox = NULL;
+            //delete igpmbox;
+            //igpmbox = NULL;
+            gettingPunchInfo = false;
             udpmbox.getDatagramSocket()->disconnect();
             
             // Connect the udp messagebox to the local address of the peer
@@ -157,9 +161,9 @@ void PuyoNatTraversal::onMessage(Message &msg)
             break;
         }
         case PUYO_IGP_NAT_TRAVERSAL_GARBAGE:
-            printf("Garbage msg received: %s (%d)\n", (const char *)(msg.getString("GARBAGE")), msg.getInt("RCV"));
+            //printf("Garbage msg received: %s (%d)\n", (const char *)(msg.getString("GARBAGE")), msg.getInt("RCV"));
             receivedGarbage++;
-            if ((msg.getInt("RCV") > 0) && (currentStrategy != SYNCING)) {
+            if ((msg.getInt("RCV") > 0) && (currentStrategy != SYNCING) && (currentStrategy != SUCCESS)) {
                 currentStrategy = SYNCING;
                 timeToNextStrategy = getTimeMs() + strategyTimeout;
                 sendSyncMessage();
@@ -167,6 +171,11 @@ void PuyoNatTraversal::onMessage(Message &msg)
             break;
         case PUYO_IGP_NAT_TRAVERSAL_SYNC:
              currentStrategy = SUCCESS;
+             printf("Punching is a success!\n");
+             // Destroy the igp messagebox
+            delete igpmbox;
+            igpmbox = NULL;
+             udpmbox.getDatagramSocket()->connect(udpSocketAddress, udpSocketPortNum);
              break;
         default:
             break;
@@ -176,6 +185,8 @@ void PuyoNatTraversal::onMessage(Message &msg)
 void PuyoNatTraversal::sendGarbageMessage()
 {
     //printf("Envoi garbage\n");
+    PeerAddress prevBound = udpmbox.getBound();
+    udpmbox.bind(udpPeerAddress);
     Message *garbMsg = udpmbox.createMessage();
     
     garbMsg->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL_GARBAGE);
@@ -184,14 +195,20 @@ void PuyoNatTraversal::sendGarbageMessage()
     
     garbMsg->send();
     delete garbMsg;
+    udpmbox.bind(prevBound);
 }
 
 void PuyoNatTraversal::sendSyncMessage()
 {
-    Message *message = udpmbox.createMessage();
+    printf("send SYNC\n");
+    int prevBound = igpmbox->getBound();
+    igpmbox->bind(1);
+    Message *message = igpmbox->createMessage();
     message->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL_SYNC);
+    message->addString("PPOOL", punchPoolName);
     message->addBoolProperty("RELIABLE", true);
     message->send();
     delete message;
+    igpmbox->bind(prevBound);
 }
 

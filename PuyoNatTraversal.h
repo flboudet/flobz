@@ -64,6 +64,11 @@ private:
     int currentStrategy;
     double punchInfoTimeout, strategyTimeout, timeToPunchInfo, timeToNextStrategy;
     int receivedGarbage;
+    bool gettingPunchInfo;
+    String punchPoolName;
+    PeerAddress udpPeerAddress;
+    SocketAddress udpSocketAddress;
+    int udpSocketPortNum;
 };
 
 #endif // _PUYONATTRAVERSAL_H

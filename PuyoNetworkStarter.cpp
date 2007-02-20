@@ -162,6 +162,7 @@ void PuyoNetworkGameWidget::sendChat(String chatText)
 void PuyoNetworkGameWidget::associatedScreenHasBeenSet(PuyoGameScreen *associatedScreen)
 {
     associatedScreen->getPauseMenu().add(&chatBox);
+    associatedScreen->getPauseMenu().pauseMenuTop = 5;
     //associatedScreen->getPauseMenu().arrangeWidgets();
 }
 

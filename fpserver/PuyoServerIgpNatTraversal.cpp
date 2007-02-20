@@ -103,7 +103,7 @@ void PuyoIgpNatTraversal::onMessage(Message &msg)
                 PunchPool *currentPool = pools[i];
                 if (currentPool->getPunchPoolName() == poolName) {
                     currentPool->dispatchInformations(udpAddress.getSocketAddress().asString(), udpAddress.getPortNum(),
-                                                msg.getString("LSOCKADDR"), msg.getInt("LPORTNUM"), address, &mbox);
+                                                      msg.getString("LSOCKADDR"), msg.getInt("LPORTNUM"), address, &mbox);
                     //pools.remove(currentPool);
                     //delete currentPool;
                     return;
@@ -115,19 +115,19 @@ void PuyoIgpNatTraversal::onMessage(Message &msg)
             break;
         }
         case PUYO_IGP_NAT_TRAVERSAL_SYNC: {
-	    printf("NAT TRAVERSAL SYNC\n");
+            printf("NAT TRAVERSAL SYNC\n");
             String poolName = msg.getString("PPOOL");
-	    Dirigeable &dirMsg = dynamic_cast<Dirigeable &>(msg);
+            Dirigeable &dirMsg = dynamic_cast<Dirigeable &>(msg);
             PeerAddress address = dirMsg.getPeerAddress();
             for (int i = 0, j = pools.size() ; i < j ; i++) {
                 PunchPool *currentPool = pools[i];
                 if (currentPool->getPunchPoolName() == poolName) {
-		    currentPool->syncPeers(address, &mbox);
-		    return;
-		}
-	    }
-	    break;
-	}
+                    currentPool->syncPeers(address, &mbox);
+                    return;
+                }
+            }
+            break;
+        }
         default:
             break;
     }

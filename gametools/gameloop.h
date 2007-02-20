@@ -111,11 +111,13 @@ class GameLoop
       this->surface = surface;
     }
 
-    double getCurrentTime() const {
+    inline double getCurrentTime() const {
       return 0.001 * (double)SDL_GetTicks();
     }
     
   private:
+    double timeDrift;
+    double lastDrawTime, deltaDrawTimeMax;
     SDL_Surface *surface;
     Vector<DrawableComponent> drawables;
     Vector<IdleComponent>     idles;
