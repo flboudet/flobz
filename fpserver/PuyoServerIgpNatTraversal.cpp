@@ -9,15 +9,23 @@ class PuyoIgpNatTraversal::PunchPool {
 public:
     PunchPool(const String punchPoolName, String creatorAddress, int creatorPortNum, String creatorLocalAddress, int creatorLocalPortNum, PeerAddress creatorPeerAddress)
         : lastUpdate(getTimeMs()), punchPoolName(punchPoolName),
-          creatorAddress(creatorAddress), creatorPort(creatorPortNum), creatorLocalAddress(creatorLocalAddress), creatorLocalPort(creatorLocalPortNum), creatorPeerAddress(creatorPeerAddress) {}
+          creatorAddress(creatorAddress), creatorPort(creatorPortNum),
+	  creatorLocalAddress(creatorLocalAddress),
+	  creatorLocalPort(creatorLocalPortNum),
+	  creatorPeerAddress(creatorPeerAddress),
+	  creatorSync(false), guestSync(false) {}
     inline const String getPunchPoolName() const { return punchPoolName; }
     void dispatchInformations(String guestAddress, int guestPortNum, String guestLocalAddress, int guestLocalPortNum, PeerAddress guestPeerAddress, MessageBox *mbox);
+    void syncPeers(PeerAddress senderaddress, MessageBox *mbox);
+    void sendSyncMessage(PeerAddress destAddress, MessageBox *mbox);
     double lastUpdate;
 private:
     String punchPoolName;
     String creatorAddress, creatorLocalAddress;
     PeerAddress creatorPeerAddress;
+    PeerAddress guestPeerAddress;
     int creatorPort, creatorLocalPort;
+    bool creatorSync, guestSync;
 };
 
 void PuyoIgpNatTraversal::PunchPool::dispatchInformations(String guestAddress, int guestPortNum, String guestLocalAddress, int guestLocalPortNum, PeerAddress guestPeerAddress, MessageBox *mbox)
@@ -49,6 +57,31 @@ void PuyoIgpNatTraversal::PunchPool::dispatchInformations(String guestAddress, i
     dirBMsg->setPeerAddress(guestPeerAddress);
     peerBMsg->send();
     delete peerBMsg;
+
+    this->guestPeerAddress = guestPeerAddress;
+}
+
+void PuyoIgpNatTraversal::PunchPool::syncPeers(PeerAddress senderaddress, MessageBox *mbox)
+{
+    if (senderaddress == creatorPeerAddress)
+	creatorSync = true;
+    else if (senderaddress == guestPeerAddress)
+	guestSync = true;
+
+    if (creatorSync && guestSync) {
+	sendSyncMessage(creatorPeerAddress, mbox);
+	sendSyncMessage(guestPeerAddress, mbox);
+    }
+}
+void PuyoIgpNatTraversal::PunchPool::sendSyncMessage(PeerAddress destAddress, MessageBox *mbox)
+{
+     Message *peerMsg = mbox->createMessage();
+    Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(peerMsg);
+    peerMsg->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL_SYNC);
+    peerMsg->addBoolProperty("RELIABLE", true);
+    dirMsg->setPeerAddress(destAddress);
+    peerMsg->send();
+    delete peerMsg;
 }
 
 void PuyoIgpNatTraversal::onMessage(Message &msg)
@@ -71,8 +104,8 @@ void PuyoIgpNatTraversal::onMessage(Message &msg)
                 if (currentPool->getPunchPoolName() == poolName) {
                     currentPool->dispatchInformations(udpAddress.getSocketAddress().asString(), udpAddress.getPortNum(),
                                                 msg.getString("LSOCKADDR"), msg.getInt("LPORTNUM"), address, &mbox);
-                    pools.remove(currentPool);
-                    delete currentPool;
+                    //pools.remove(currentPool);
+                    //delete currentPool;
                     return;
                 }
             }
@@ -81,6 +114,20 @@ void PuyoIgpNatTraversal::onMessage(Message &msg)
                                     msg.getString("LSOCKADDR"), msg.getInt("LPORTNUM"), address));
             break;
         }
+        case PUYO_IGP_NAT_TRAVERSAL_SYNC: {
+	    printf("NAT TRAVERSAL SYNC\n");
+            String poolName = msg.getString("PPOOL");
+	    Dirigeable &dirMsg = dynamic_cast<Dirigeable &>(msg);
+            PeerAddress address = dirMsg.getPeerAddress();
+            for (int i = 0, j = pools.size() ; i < j ; i++) {
+                PunchPool *currentPool = pools[i];
+                if (currentPool->getPunchPoolName() == poolName) {
+		    currentPool->syncPeers(address, &mbox);
+		    return;
+		}
+	    }
+	    break;
+	}
         default:
             break;
     }
