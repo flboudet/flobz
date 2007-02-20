@@ -69,6 +69,8 @@ void IGPClient::idle()
 
 void IGPClient::onMessage(Message &rawMsg)
 {
+    if (!IGPDatagram::isIgpDatagram(rawMsg))
+        return;
     IGPDatagram message(&rawMsg);
     switch (message.getMsgIdent()) {
         case IGPDatagram::ServerMsgInformID: {

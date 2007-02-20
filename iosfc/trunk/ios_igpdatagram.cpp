@@ -44,4 +44,24 @@ IGPDatagram::IGPDatagram(Message *data, IGPMsgIdent ident) : message(data), msgI
     message->addInt(MSGIDENT, ident);
 }
 
+bool IGPDatagram::isIgpDatagram(Message &rawMsg)
+{
+    if (! rawMsg.hasInt(MSGIDENT))
+        return false;
+    switch (rawMsg.getInt("CMD")) {
+    case ServerMsgInformID:
+        if (! rawMsg.hasInt(IGPIDENT))
+            return false;
+        return true;
+    case ServerMsgBadRequest:
+        return true;
+    case ServerMsgToClient:
+        if (! rawMsg.hasInt(IGPMSG))
+            return false;
+        return true;
+    default:
+        return false;
+    }
+}
+
 }

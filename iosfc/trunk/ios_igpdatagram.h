@@ -49,6 +49,7 @@ public:
         ServerMsgBadRequest,
         ServerMsgToClient
     };
+    static bool isIgpDatagram(Message &rawMsg);
     IGPDatagram(Message *data);
     IGPDatagram(IGPDatagram &datagram) : message(datagram.message),  msgIdent(msgIdent) {}
     
