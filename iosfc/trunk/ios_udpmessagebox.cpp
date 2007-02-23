@@ -278,6 +278,7 @@ void UDPMessageBox::idle()
     
     while (socket->available()) {
         Datagram receivedDatagram = socket->receive(receiveBuffer);
+	printf("message UDP recu dans l'UDP Message Box de %s:%d !\n", (const char *)(receivedDatagram.getAddress().asString()), receivedDatagram.getPortNum());
         try {
             if (receivedDatagram.getSize() > 0) {
                 UDPMessage incomingMessage(Buffer<char>((char *)(receivedDatagram.getMessage()), receivedDatagram.getSize()),

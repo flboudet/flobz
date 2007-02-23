@@ -115,6 +115,7 @@ int UnixDatagramSocketImpl::available() const
 
 void UnixDatagramSocketImpl::connect(SocketAddress addr, int portNum)
 {
+  printf("CONNECT UNIX UDP SOCKET\n");
     UnixSocketAddressImpl *impl = dynamic_cast<UnixSocketAddressImpl *>(addr.getImpl());
     if (impl == NULL)
         throw Exception("Address is not compatible with datagramsocket implementation");
@@ -134,6 +135,7 @@ void UnixDatagramSocketImpl::connect(SocketAddress addr, int portNum)
 
 void UnixDatagramSocketImpl::disconnect()
 {
+  printf("DISCONNECT UNIX UDP SOCKET\n");
     struct sockaddr_in connectAddr;
     bzero((char *) &connectAddr, sizeof(connectAddr));
     connectAddr.sin_family = AF_INET;

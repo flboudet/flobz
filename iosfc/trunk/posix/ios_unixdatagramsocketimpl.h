@@ -50,6 +50,9 @@ namespace ios_fc {
         int getSocketPortNum() const;
         SelectableImpl *getSelectableImpl() { return this; }
         int getFd() { return socketFd; }
+	bool getConnected() { return isConnected; }
+	SocketAddress getConnectedAddress() { return connectedAddress; }
+	int getConnectedPortNum() { return connectedPort; }
     private:
         int socketFd;
         struct sockaddr_in boundAddr;

@@ -81,6 +81,21 @@ void DatagramSocket::disconnect()
     impl->disconnect();
 }
 
+bool DatagramSocket::getConnected()
+{
+  return impl->getConnected();
+}
+
+SocketAddress DatagramSocket::getConnectedAddress()
+{
+  return impl->getConnectedAddress();
+}
+
+int DatagramSocket::getConnectedPortNum()
+{
+  return impl->getConnectedPortNum();
+}
+
 SocketAddress DatagramSocket::getBroadcastAddress() const
 {
     return impl->getBroadcastAddress();
