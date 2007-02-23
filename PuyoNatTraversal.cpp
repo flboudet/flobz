@@ -26,7 +26,7 @@
 #include "PuyoNatTraversal.h"
 
 PuyoNatTraversal::PuyoNatTraversal(UDPMessageBox &udpmbox, double punchInfoTimeout, double strategyTimeout)
-  : udpmbox(udpmbox), igpmbox(new IgpMessageBox(udpmbox)), currentStrategy(TRY_NONE), punchInfoTimeout(punchInfoTimeout), strategyTimeout(strategyTimeout), receivedGarbage(0), udpSocketAddress("127.0.0.1")
+  : udpmbox(udpmbox), igpmbox(new IgpMessageBox(udpmbox)), currentStrategy(TRY_NONE), punchInfoTimeout(punchInfoTimeout), strategyTimeout(strategyTimeout), receivedGarbage(0), udpSocketAddress("127.0.0.1"), igpServerSocketAddress(udpmbox.getDatagramSocket()->getConnectedAddress()), igpServerPortNum(udpmbox.getDatagramSocket()->getConnectedPortNum())
 {
     igpmbox->addListener(this);
     //printf("GetSocketAddress(): %s\n", (const char *)(mbox->getSocketAddress().asString()));
@@ -163,7 +163,7 @@ void PuyoNatTraversal::onMessage(Message &msg)
         case PUYO_IGP_NAT_TRAVERSAL_GARBAGE:
             //printf("Garbage msg received: %s (%d)\n", (const char *)(msg.getString("GARBAGE")), msg.getInt("RCV"));
             receivedGarbage++;
-            if ((msg.getInt("RCV") > 0) && (currentStrategy != SYNCING) && (currentStrategy != SUCCESS)) {
+            if ((msg.getInt("RCV") > 0) && (currentStrategy != SYNCING) && (currentStrategy != SUCCESS) && (currentStrategy != FAILED)) {
                 currentStrategy = SYNCING;
                 timeToNextStrategy = getTimeMs() + strategyTimeout;
                 sendSyncMessage();
@@ -185,6 +185,9 @@ void PuyoNatTraversal::onMessage(Message &msg)
 void PuyoNatTraversal::sendGarbageMessage()
 {
     //printf("Envoi garbage\n");
+    bool connectedState = udpmbox.getDatagramSocket()->getConnected();
+    if (connectedState)
+      udpmbox.getDatagramSocket()->disconnect();
     PeerAddress prevBound = udpmbox.getBound();
     udpmbox.bind(udpPeerAddress);
     Message *garbMsg = udpmbox.createMessage();
@@ -196,11 +199,14 @@ void PuyoNatTraversal::sendGarbageMessage()
     garbMsg->send();
     delete garbMsg;
     udpmbox.bind(prevBound);
+    if (connectedState)
+      udpmbox.getDatagramSocket()->connect(igpServerSocketAddress, igpServerPortNum);
 }
 
 void PuyoNatTraversal::sendSyncMessage()
 {
     printf("send SYNC\n");
+    //udpmbox.getDatagramSocket()->connect(igpServerSocketAddress, igpServerPortNum);
     int prevBound = igpmbox->getBound();
     igpmbox->bind(1);
     Message *message = igpmbox->createMessage();

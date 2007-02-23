@@ -24,7 +24,9 @@
  */
 
 #include <stdio.h>
+#ifdef MACOS
 #include <CoreFoundation/CoreFoundation.h>
+#endif
 #include "PuyoLocalizedDictionary.h"
 #include "ios_memory.h"
 

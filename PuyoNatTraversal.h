@@ -69,6 +69,8 @@ private:
     PeerAddress udpPeerAddress;
     SocketAddress udpSocketAddress;
     int udpSocketPortNum;
+    SocketAddress igpServerSocketAddress;
+    int igpServerPortNum;
 };
 
 #endif // _PUYONATTRAVERSAL_H
