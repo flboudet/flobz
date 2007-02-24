@@ -138,8 +138,8 @@ void UnixDatagramSocketImpl::disconnect()
   printf("DISCONNECT UNIX UDP SOCKET\n");
     struct sockaddr_in connectAddr;
     bzero((char *) &connectAddr, sizeof(connectAddr));
-    connectAddr.sin_family = AF_INET;
-    connectAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    connectAddr.sin_family = AF_UNSPEC;
+    connectAddr.sin_addr.s_addr = 0;//htonl(INADDR_ANY);
     connectAddr.sin_port = htons(0);
     ::connect(socketFd, (struct sockaddr *) &connectAddr, sizeof(connectAddr));
     isConnected = false;
