@@ -35,8 +35,10 @@ class PuyoLocalizedDictionary {
 public:
     PuyoLocalizedDictionary(const PuyoDataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName);
     const char * getLocalizedString(const char * originalString) const;
+    ~PuyoLocalizedDictionary();
 private:
-    HashMap dictionary;
+    HashMap * dictionary;
+    String stdName;
     const PuyoDataPathManager &datapathManager;
 };
 

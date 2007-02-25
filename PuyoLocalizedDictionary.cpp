@@ -23,8 +23,10 @@
  *
  */
 
+/* This class is not thread safe */
+
 #include <stdio.h>
-#ifdef MACOS
+#ifdef MACOSX
 #include <CoreFoundation/CoreFoundation.h>
 #endif
 #include "PuyoLocalizedDictionary.h"
@@ -74,18 +76,30 @@ static bool readLine(FILE *dictionaryFile, String &lineRead)
     return result;
 }
 
-PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName) : dictionary(), datapathManager(datapathManager)
-{
 /* English is the default */
 #define kPuyoDefaultPreferedLanguage "en"
-/* We'll try at most 10 languages */
+/* Additionnaly we'll try at most 10 user languages */
 #define kPuyoMaxPreferedLanguage 10
 
-    int i;
-    char * PreferedLocales[kPuyoMaxPreferedLanguage];
-    int PreferedLocalesCount = 0;
+static char * PreferedLocales[kPuyoMaxPreferedLanguage+1]; // +1 for the default one
+static int PreferedLocalesCount = 0;
+static bool systemInitiated = false;
 
-    /* First create the prefered languages list */
+typedef struct {
+  HashMap * dictionary;
+  int refcount;
+} dictionaryEntry;
+
+static HashMap dictionaries;
+
+PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName) : dictionary(), datapathManager(datapathManager)
+{
+  int i;
+
+  /* First create the prefered languages list  whenever needed*/
+  if (!systemInitiated) {
+    fprintf(stderr,"Languages detection...\n");
+
 #ifdef MACOSX
 
     CFStringRef localeIdentifier;
@@ -94,7 +108,7 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
 
     prefArray = (CFArrayRef) CFPreferencesCopyValue(CFSTR("AppleLanguages"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
     PreferedLocalesCount = (prefArray ? CFArrayGetCount(prefArray) : 0);
-    if (PreferedLocalesCount > kPuyoMaxPreferedLanguage-1) PreferedLocalesCount = kPuyoMaxPreferedLanguage-1;
+    if (PreferedLocalesCount > kPuyoMaxPreferedLanguage) PreferedLocalesCount = kPuyoMaxPreferedLanguage;
     
     for (i = 0; i < PreferedLocalesCount; i++) {
         localeIdentifier = (CFStringRef)CFArrayGetValueAtIndex(prefArray, i);
@@ -104,8 +118,6 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
         canonicalLocale[2] = 0;
         PreferedLocales[i] = strdup(canonicalLocale);
     }
-    PreferedLocales[PreferedLocalesCount] = strdup(kPuyoDefaultPreferedLanguage);
-    PreferedLocalesCount++;
     
 #else
     
@@ -115,23 +127,48 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
       PreferedLocales[PreferedLocalesCount][2] = 0;
       PreferedLocalesCount++;
     }
-    PreferedLocales[PreferedLocalesCount] = strdup(kPuyoDefaultPreferedLanguage);
-    PreferedLocalesCount++;
 
 #endif /* MACOSX */
 
+    /* Finally set the default language (the reason for the +1 in PreferedLocales declaration) */
+    PreferedLocales[PreferedLocalesCount] = strdup(kPuyoDefaultPreferedLanguage);
+    PreferedLocalesCount++;
+
+    for (i = 0; i < PreferedLocalesCount; i++)
+      fprintf(stderr,"User prefered language %d : %s\n",i,PreferedLocales[i]);
+
+    systemInitiated = true;
+  }
+
+  stdName = FilePath::combine(dictionaryDirectory, dictionaryName);
+  HashValue * result = dictionaries.get((const char *)stdName);
+  dictionaryEntry * myDictEntry = NULL;
+  
+  if (result != NULL) {
+    myDictEntry = (dictionaryEntry *)(result->ptr);
+  }
+
+  if (myDictEntry == NULL)
+  {
+    myDictEntry = (dictionaryEntry *)malloc(sizeof(dictionaryEntry));
+    myDictEntry->dictionary = new HashMap();
+    myDictEntry->refcount=0;
+    dictionaries.put((const char *)stdName,(void *)myDictEntry);
+    
     /* Get the first matching dictionary */
+    bool found = false;
     for (i = 0; i < PreferedLocalesCount; i++) {
+    
+        /* try to open the dictionary for the selected locale */
         String locale(PreferedLocales[i]);
         String directoryName = FilePath::combine(dictionaryDirectory, locale);
         String dictFilePath = FilePath::combine(directoryName, dictionaryName) + ".dic";
-    
-        // Read all the entries in the dictionary file
         FILE *dictionaryFile = NULL;
         try { dictionaryFile = fopen(datapathManager.getPath(dictFilePath), "r"); } catch (Exception &e) { }
+        
         if (dictionaryFile != NULL)
         {
-            //printf("Locale lue:%s\n", (const char *)locale);
+            /* Read all the entries in the dictionary file */
             String keyString, valueString;
             bool fileOk;
             fileOk = readLine(dictionaryFile, keyString);
@@ -139,28 +176,64 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
                 fileOk = readLine(dictionaryFile, valueString);
                 if (fileOk) {
                     char *test = strdup(valueString);
-                    dictionary.put(keyString, test);
+                    myDictEntry->dictionary->put(keyString, test);
                     do {
                         fileOk = readLine(dictionaryFile, keyString);
                     } while (fileOk && (keyString == ""));
                 }
             }
             fclose(dictionaryFile);
+            fprintf(stderr,"Found dictionary %s\n",(const char *)datapathManager.getPath(dictFilePath));
+            found = true;
             break;
         }
     }
-    
-    /* clean up a bit before leaving */
-    for (i = 0; i < PreferedLocalesCount; i++) {
-        //fprintf(stderr,"Found prefered lang : %s\n",PreferedLocales[i]);
-        free(PreferedLocales[i]);
-    }
+    // Should we look for any eligible dictionnary now?
+    // By now we don't bother since english (en) should be there or we return the original strings anyway.
+    if (!found) fprintf(stderr,"No dictionary found in %s for %s\n",(const char *)datapathManager.getPath(dictionaryDirectory),dictionaryName);
+  }
+  
+  myDictEntry->refcount++;
+  dictionary = myDictEntry->dictionary;
+  //fprintf(stderr,"-----Refcount++ = %d (%s)\n",myDictEntry->refcount,(const char *)stdName);
+}
 
+PuyoLocalizedDictionary::~PuyoLocalizedDictionary()
+{
+  HashValue * result = dictionaries.get((const char *)stdName);
+  dictionaryEntry * myDictEntry = NULL;
+  
+  if (result != NULL) {
+    myDictEntry = (dictionaryEntry *)(result->ptr);
+  }
+
+  if (myDictEntry != NULL)
+  {
+    myDictEntry->refcount--;
+    //fprintf(stderr,"-----Refcount-- = %d (%s)\n",myDictEntry->refcount,(const char *)stdName);
+    if (myDictEntry->refcount <= 0) {
+      //fprintf(stderr,"-----Destroying %s.\n",(const char *)stdName);
+      //delete myDictEntry->dictionary;
+      //dictionaries.remove((const char *)stdName);
+      //free(myDictEntry);
+        /* clean up a bit before leaving
+        fprintf(stderr,"-----Languages cleanup...\n");
+        for (int i = 0; i < PreferedLocalesCount; i++) {
+            free(PreferedLocales[i]);
+        }
+        */
+    }
+  }
+  else
+  {
+    fprintf(stderr,"FATAL ERROR dictionary %s destroyed too early.\n",(const char *)stdName);
+    exit(-1);
+  }
 }
 
 const char * PuyoLocalizedDictionary::getLocalizedString(const char * originalString) const
 {
-    HashValue *result = dictionary.get(originalString);
+    HashValue *result = dictionary->get(originalString);
     if (result != NULL) {
         return  (const char *)(result->ptr);
     }
