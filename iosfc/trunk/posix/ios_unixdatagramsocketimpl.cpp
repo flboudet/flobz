@@ -96,12 +96,6 @@ Datagram UnixDatagramSocketImpl::receive(VoidBuffer buffer)
         throw Exception("Reception error");
     
     return Datagram(SocketAddress(new UnixSocketAddressImpl(ntohl(resultAddress.sin_addr.s_addr))), ntohs(resultAddress.sin_port), buffer, res);
-/*
-    int res = recv(socketFd, buffer.ptr(), buffer.size(), 0);
-    if (res == -1)
-        throw Exception("Reception error");
-    return Datagram(connectedAddress, ntohs(connectedPort), buffer, res);
-    */
 }
 
 int UnixDatagramSocketImpl::available() const
@@ -115,7 +109,6 @@ int UnixDatagramSocketImpl::available() const
 
 void UnixDatagramSocketImpl::connect(SocketAddress addr, int portNum)
 {
-  printf("CONNECT UNIX UDP SOCKET\n");
     UnixSocketAddressImpl *impl = dynamic_cast<UnixSocketAddressImpl *>(addr.getImpl());
     if (impl == NULL)
         throw Exception("Address is not compatible with datagramsocket implementation");
@@ -135,13 +128,27 @@ void UnixDatagramSocketImpl::connect(SocketAddress addr, int portNum)
 
 void UnixDatagramSocketImpl::disconnect()
 {
-  printf("DISCONNECT UNIX UDP SOCKET\n");
+    // We have to keep the information of the currently bound address (because of Linux behaviour)
+    struct sockaddr_in boundAddr;
+    socklen_t namelen = sizeof(struct sockaddr_in);
+    int result = getsockname(socketFd, (struct sockaddr *) &boundAddr, &namelen);
+    if (result != 0) {
+        throw Exception("getsockname error");
+    }
+    
+    // Disconnect the socket
     struct sockaddr_in connectAddr;
     bzero((char *) &connectAddr, sizeof(connectAddr));
     connectAddr.sin_family = AF_UNSPEC;
     connectAddr.sin_addr.s_addr = 0;//htonl(INADDR_ANY);
     connectAddr.sin_port = htons(0);
     ::connect(socketFd, (struct sockaddr *) &connectAddr, sizeof(connectAddr));
+    
+    // We have to rebind the socket to its previous port, because Linux unbinds the socket when disconnecting
+    if (bind(socketFd, (struct sockaddr *) &boundAddr, sizeof(boundAddr)) == -1) {
+        throw Exception("Socket binding error");
+    }
+    
     isConnected = false;
 }
 
