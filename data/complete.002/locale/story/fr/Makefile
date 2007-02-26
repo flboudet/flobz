@@ -1,4 +1,4 @@
-FILES="skynight.jpg" "peak.png" "kaori-mini.png"
+FILES="storyherbert.gsl.dic" 
 
 DIRECTORIES=
 
