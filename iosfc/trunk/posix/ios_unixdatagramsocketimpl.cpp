@@ -128,6 +128,7 @@ void UnixDatagramSocketImpl::connect(SocketAddress addr, int portNum)
 
 void UnixDatagramSocketImpl::disconnect()
 {
+#ifdef LINUX
     // We have to keep the information of the currently bound address (because of Linux behaviour)
     struct sockaddr_in boundAddr;
     socklen_t namelen = sizeof(struct sockaddr_in);
@@ -135,7 +136,8 @@ void UnixDatagramSocketImpl::disconnect()
     if (result != 0) {
         throw Exception("getsockname error");
     }
-    
+#endif
+
     // Disconnect the socket
     struct sockaddr_in connectAddr;
     bzero((char *) &connectAddr, sizeof(connectAddr));
@@ -143,12 +145,13 @@ void UnixDatagramSocketImpl::disconnect()
     connectAddr.sin_addr.s_addr = 0;//htonl(INADDR_ANY);
     connectAddr.sin_port = htons(0);
     ::connect(socketFd, (struct sockaddr *) &connectAddr, sizeof(connectAddr));
-    
+
+#ifdef LINUX
     // We have to rebind the socket to its previous port, because Linux unbinds the socket when disconnecting
     if (bind(socketFd, (struct sockaddr *) &boundAddr, sizeof(boundAddr)) == -1) {
         throw Exception("Socket binding error");
     }
-    
+#endif
     isConnected = false;
 }
 

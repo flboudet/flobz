@@ -10,6 +10,10 @@ ifeq ($(PLATFORM), crossmingw32)
   PLATFORMTYPE=WIN32
 endif
 
+ifeq ($(PLATFORM), Linux)
+    CXXFLAGS:=-DLINUX
+endif
+
 ifneq (, $(findstring CYGWIN, $(PLATFORM)))
   PLATFORMTYPE=WIN32
   CXXFLAGS:=${CXXFLAGS} -mno-cygwin
