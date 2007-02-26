@@ -65,6 +65,7 @@ void PuyoNatTraversal::punch(const String punchPoolName)
 
 void PuyoNatTraversal::idle()
 {
+    //printf("En ce moment, je suis associee au port %d\n", udpmbox.getDatagramSocket()->getSocketPortNum());
     double currentTime = getTimeMs();
     if (gettingPunchInfo) {
         igpmbox->idle();
@@ -184,21 +185,25 @@ void PuyoNatTraversal::onMessage(Message &msg)
 
 void PuyoNatTraversal::sendGarbageMessage()
 {
+    if (udpPeerAddress == udpmbox.createPeerAddress(udpmbox.getSocketAddress(), udpmbox.getDatagramSocket()->getSocketPortNum()))
+        printf("Envoi de messages a moi-meme!!!!!");
     //printf("Envoi garbage\n");
     bool connectedState = udpmbox.getDatagramSocket()->getConnected();
     if (connectedState)
       udpmbox.getDatagramSocket()->disconnect();
-    PeerAddress prevBound = udpmbox.getBound();
-    udpmbox.bind(udpPeerAddress);
+    //PeerAddress prevBound = udpmbox.getBound();
+    //udpmbox.bind(udpPeerAddress);
     Message *garbMsg = udpmbox.createMessage();
     
     garbMsg->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL_GARBAGE);
     garbMsg->addString("GARBAGE", "Connerie");
     garbMsg->addInt("RCV", receivedGarbage);
     
+    Dirigeable *dirigeableMsg = dynamic_cast<Dirigeable *>(garbMsg);
+    dirigeableMsg->setPeerAddress(udpPeerAddress);
     garbMsg->send();
     delete garbMsg;
-    udpmbox.bind(prevBound);
+    //udpmbox.bind(prevBound);
     if (connectedState)
       udpmbox.getDatagramSocket()->connect(igpServerSocketAddress, igpServerPortNum);
 }

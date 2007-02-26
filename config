@@ -10,6 +10,7 @@ ENABLE_FAT=false
 ###################################
 
 ENABLE_AUDIO=true
+DISABLE_NETWORK?=false
 ENABLE_OPENGL?=false
 ENABLE_DGA=false
 
@@ -76,6 +77,11 @@ VERSION=$(shell grep "\#define FLOBOPUYOVERSION" PuyoVersion.cpp  | cut -d "\"" 
 # Audio
 ifeq ($(ENABLE_AUDIO), true)
 CFLAGS:=$(CFLAGS) -DUSE_AUDIO=1
+endif
+
+# Network
+ifeq ($(DISABLE_NETWORK), true)
+    CFLAGS:=$(CFLAGS) -DDISABLE_NETWORK=1
 endif
 
 # OpenGL

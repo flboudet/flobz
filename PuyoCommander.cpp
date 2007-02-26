@@ -10,7 +10,11 @@
 #include "PuyoNetworkStarter.h"
 
 #include "PuyoLocalMenu.h"
+
+#ifndef DISABLE_NETWORK
 #include "PuyoNetworkMenu.h"
+#endif
+
 #include "PuyoOptionMenu.h"
 #include "ios_udpmessagebox.h"
 
