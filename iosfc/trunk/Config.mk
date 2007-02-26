@@ -11,7 +11,7 @@ ifeq ($(PLATFORM), crossmingw32)
 endif
 
 ifeq ($(PLATFORM), Linux)
-    CXXFLAGS:=-DLINUX
+    CXXFLAGS:=${CXXFLAGS} -DLINUX
 endif
 
 ifneq (, $(findstring CYGWIN, $(PLATFORM)))
