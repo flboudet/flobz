@@ -168,7 +168,8 @@ NetCenterMenu::NetCenterMenu(PuyoNetGameCenter *netCenter)
     : netCenter(netCenter), playerListText("Player List"), chatAreaText("Chat Area"),
       cycled(this),
       playerList(8, this), story("networkmenu.gsl"), onScreenDialog(NULL), shouldSelfDestroy(false),
-      nameProvider(*netCenter), chatBox(*this)
+      nameProvider(*netCenter), chatBox(*this),
+      title("Network Game Center"), backAction(), cancelButton("Disconnect", &backAction)
 {
     GameUIDefaults::GAME_LOOP->addIdle(&cycled);
     netCenter->addListener(this);
@@ -195,10 +196,10 @@ void NetCenterMenu::build()
     container.setPosition(Vec3(5,5));
     container.setSize(Vec3(630,470, 0));
 
-    menu.add(new Text("Network Game Center"));
+    menu.add(&title);
     //menu.add(new Button("Change Nick"));
     //menu.add(new Button("Options"));
-    menu.add(new Button("Disconnect", new PopScreenAction()));
+    menu.add(&cancelButton);
     
     playerbox.add(&playerListText);
     playerbox.add(&playerList);

@@ -141,7 +141,9 @@ private:
     HBox topbox;
     VBox menu;
     VBox playerbox;
-    Text playerListText, chatAreaText;
+    Text playerListText, chatAreaText, title;
+    Button cancelButton;
+    PopScreenAction backAction;
     NetCenterPlayerList playerList;
     NetCenterCycled cycled;
     PuyoNetGameCenter *netCenter;
