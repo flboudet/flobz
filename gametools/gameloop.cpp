@@ -153,7 +153,7 @@ void GameLoop::removeDrawable(DrawableComponent *gc)
 #ifdef DEBUG_GAMELOOP
       printf("Drawable %x removed from gameloop!\n", gc);
 #endif
-      drawables.remove(gc);
+      drawables.removeKeepOrder(gc);
       gc->parentLoop = NULL;
     }
   }
@@ -166,7 +166,7 @@ void GameLoop::removeIdle(IdleComponent *gc)
 #ifdef DEBUG_GAMELOOP
       printf("Idle %x removed from gameloop!\n", gc);
 #endif
-      idles.remove(gc);
+      idles.removeKeepOrder(gc);
       gc->parentLoop = NULL;
       }
   }
