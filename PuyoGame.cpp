@@ -29,18 +29,24 @@
 #include "audio.h"
 #include "glSDL.h"
 #include "preferences.h"
+#include "mt19937ar.h"
 
 static int fallingTable[PUYODIMX] = {0, 3, 1, 4, 2, 5};
 
 PuyoRandomSystem::PuyoRandomSystem()
 {
-    srandom(SDL_GetTicks());
+    init_genrand(SDL_GetTicks());
+}
+
+PuyoRandomSystem::PuyoRandomSystem(unsigned long seed)
+{
+    init_genrand(seed);
 }
 
 PuyoState PuyoRandomSystem::getPuyoForSequence(int sequence)
 {
 	if (sequenceItems.size() <= sequence) {
-		int newItem = (random() % 5) + PUYO_FALLINGBLUE;
+		int newItem = (genrand_int32() % 5) + PUYO_FALLINGBLUE;
 		sequenceItems.add(newItem);
 		return (PuyoState)newItem;
 	}

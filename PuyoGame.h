@@ -26,11 +26,6 @@
 #include "ios_memory.h"
 using namespace ios_fc;
 
-#ifdef _WIN32
-#define srandom srand
-#define random rand
-#endif
-
 #ifndef PUYOGAME_H
 #define PUYOGAME_H
 
@@ -60,6 +55,7 @@ enum PuyoState {
 class PuyoRandomSystem {
 public:
 	PuyoRandomSystem();
+  PuyoRandomSystem(unsigned long seed);
 	PuyoState getPuyoForSequence(int sequence);
 private:
 	AdvancedBuffer<int> sequenceItems;
