@@ -48,7 +48,7 @@ public:
  private:
     MessageBox *mbox;
     bool ownMessageBox;
-    IGPClient igpClient;
+    IGPClient *igpClient;
     int sendSerialID;
     int destIdent;
 };

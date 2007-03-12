@@ -49,35 +49,36 @@ namespace ios_fc {
     }
     
     // IgpMessageBox implementation
-    IgpMessageBox::IgpMessageBox(const String hostName, int portID) : mbox(new UDPMessageBox(hostName, 0, portID)), ownMessageBox(true), igpClient(*mbox), sendSerialID(0)
+    IgpMessageBox::IgpMessageBox(const String hostName, int portID) : mbox(new UDPMessageBox(hostName, 0, portID)), ownMessageBox(true), igpClient(new IGPClient(*mbox)), sendSerialID(0)
     {
-        igpClient.addListener(this);
+        igpClient->addListener(this);
     }
     
-    IgpMessageBox::IgpMessageBox(const String hostName, int portID, int igpIdent) : mbox(new UDPMessageBox(hostName, 0, portID)), ownMessageBox(true), igpClient(*mbox, igpIdent), sendSerialID(0)
+    IgpMessageBox::IgpMessageBox(const String hostName, int portID, int igpIdent) : mbox(new UDPMessageBox(hostName, 0, portID)), ownMessageBox(true), igpClient(new IGPClient(*mbox, igpIdent)), sendSerialID(0)
     {
-        igpClient.addListener(this);
+        igpClient->addListener(this);
     }
 
-    IgpMessageBox::IgpMessageBox(MessageBox &mbox) : mbox(&mbox), ownMessageBox(false), igpClient(mbox), sendSerialID(0)
+    IgpMessageBox::IgpMessageBox(MessageBox &mbox) : mbox(&mbox), ownMessageBox(false), igpClient(new IGPClient(mbox)), sendSerialID(0)
     {
-        igpClient.addListener(this);
+        igpClient->addListener(this);
     }
 
-    IgpMessageBox::IgpMessageBox(MessageBox &mbox, int igpIdent) : mbox(&mbox), ownMessageBox(false), igpClient(mbox, igpIdent), sendSerialID(0)
+    IgpMessageBox::IgpMessageBox(MessageBox &mbox, int igpIdent) : mbox(&mbox), ownMessageBox(false), igpClient(new IGPClient(mbox, igpIdent)), sendSerialID(0)
     {
-        igpClient.addListener(this);
+        igpClient->addListener(this);
     }
 
     IgpMessageBox::~IgpMessageBox()
     {
+      delete igpClient;
       if (ownMessageBox)
 	delete mbox;
     }
 
     void IgpMessageBox::idle()
     {
-        igpClient.idle();
+        igpClient->idle();
     }
 
     Message * IgpMessageBox::createMessage()
@@ -87,7 +88,7 @@ namespace ios_fc {
 
     void IgpMessageBox::sendBuffer(VoidBuffer out, bool reliable, int igpDestIdent)
     {
-        igpClient.sendMessage(igpDestIdent, out, reliable);
+        igpClient->sendMessage(igpDestIdent, out, reliable);
     }
     
     void IgpMessageBox::onMessage(VoidBuffer message, int origIdent, int destIdent)
