@@ -132,7 +132,7 @@ namespace gameui {
   class WidgetContainer : public Widget {
     public:
       WidgetContainer(GameLoop *loop = NULL);
-      ~WidgetContainer();
+      virtual ~WidgetContainer();
       void add (Widget *child);
       virtual void remove (Widget *child);
       GameLoop *getGameLoop();
@@ -167,6 +167,7 @@ namespace gameui {
   class Box : public WidgetContainer {
     public:
       Box(GameLoop *loop = NULL);
+      virtual ~Box() {}
       void setPolicy(GameUIEnum policy);
       void arrangeWidgets();
 
@@ -198,7 +199,7 @@ namespace gameui {
   class VBox : public Box {
     public:
       VBox(GameLoop *loop = NULL) : Box(loop) {}
-
+      virtual ~VBox() {}
     protected:
       float getSortingAxe(const Vec3 &v3) const        { return v3.y;  }
       void  setSortingAxe(Vec3 &v3, float value)       { v3.y = value; }
@@ -211,7 +212,7 @@ namespace gameui {
   class HBox : public Box {
     public:
       HBox(GameLoop *loop = NULL) : Box(loop) {}
-
+      virtual ~HBox() {}
     protected:
       float getSortingAxe(const Vec3 &v3) const        { return v3.x;  }
       void  setSortingAxe(Vec3 &v3, float value)       { v3.x = value; }
@@ -224,6 +225,7 @@ namespace gameui {
   class ZBox : public Box {
     public:
       ZBox(GameLoop *loop = NULL) : Box(loop) {}
+      virtual ~ZBox() {}
       void widgetMustRedraw(Widget *wid);
     protected:
       float getSortingAxe(const Vec3 &v3) const        { return v3.z;  }
@@ -236,6 +238,7 @@ namespace gameui {
   class SliderContainer : public ZBox, IdleComponent {
     public:
       SliderContainer(GameLoop *loop = NULL);
+      virtual ~SliderContainer() {}
       void transitionToContent(Widget *content);
       Widget * getContentWidget() const { return contentWidget; }
 
@@ -434,7 +437,7 @@ namespace gameui {
   {
     public:
       ScreenStack(GameLoop *loop = NULL);
-      ~ScreenStack() {}
+      virtual ~ScreenStack() {}
 
       void push(Screen *screen);
       void pop();

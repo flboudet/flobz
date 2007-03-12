@@ -37,7 +37,7 @@ class NetCenterMenu;
 class NetCenterDialogMenu : public SliderContainer {
 public:
     NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvitation &associatedInvitation, String title, String message, bool hasAcceptButton);
-    ~NetCenterDialogMenu();
+    virtual ~NetCenterDialogMenu();
     void build();
 public:
     PuyoGameInvitation associatedInvitation;
