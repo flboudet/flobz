@@ -36,11 +36,11 @@ class NetCenterMenu;
 
 class NetCenterDialogMenu : public SliderContainer {
 public:
-    NetCenterDialogMenu(NetCenterMenu *targetMenu, PeerAddress associatedPeer, String title, String message, bool hasAcceptButton);
+    NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvitation &associatedInvitation, String title, String message, bool hasAcceptButton);
     ~NetCenterDialogMenu();
     void build();
 public:
-    PeerAddress associatedPeer;
+    PuyoGameInvitation associatedInvitation;
 private:
     IIM_Surface   *menuBG;
     class NetCenterDialogMenuAction : public Action {
@@ -118,11 +118,11 @@ public:
     void onPlayerConnect(String playerName, PeerAddress playerAddress);
     void onPlayerDisconnect(String playerName, PeerAddress playerAddress);
     void onPlayerUpdated(String playerName, PeerAddress playerAddress);
-    void gameInvitationAgainst(String playerName, PeerAddress playerAddress);
+    void onGameInvitationReceived(PuyoGameInvitation &invitation);
+    void onGameInvitationCanceledReceived(PuyoGameInvitation &invitation);
+    void onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation);
     void grantCurrentGame();
     void cancelCurrentGame();
-    void gameCanceledAgainst(String playerName, PeerAddress playerAddress);
-    void gameGrantedWithMessagebox(MessageBox *mbox);
     void cycle();
     void playerSelected(PeerAddress playerAddress, String playerName);
     void selfDestroy() { shouldSelfDestroy = true; }

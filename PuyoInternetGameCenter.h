@@ -45,9 +45,9 @@ public:
     // Temporaire
     void punch();
 protected:
-    void requestGameWithPeer(String playerName, PeerAddress addr);
-    void acceptInvitationWithPeer(String playerName, PeerAddress addr);
-    void cancelGameWithPeer(String playerName, PeerAddress addr);
+    void sendGameRequest(PuyoGameInvitation &invitation);
+    void sendGameAcceptInvitation(PuyoGameInvitation &invitation);
+    void sendGameCancelInvitation(PuyoGameInvitation &invitation);
 private:
     void sendAliveMessage();
     void grantGameToMBox(MessageBox &thembox);
@@ -62,7 +62,7 @@ private:
     const String name;
     int status;
     double timeMsBetweenTwoAliveMessages, lastAliveMessage;
-    PeerAddress grantedAddr;
+    PuyoGameInvitation grantedInvitation;
     enum GameStatus {
         GAMESTATUS_IDLE,
         GAMESTATUS_STARTTRAVERSAL,

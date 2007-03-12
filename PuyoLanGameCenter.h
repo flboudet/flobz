@@ -44,18 +44,18 @@ public:
     String getSelfName();
     String getOpponentName();
 protected:
-    void requestGameWithPeer(String playerName, PeerAddress addr);
-    void acceptInvitationWithPeer(String playerName, PeerAddress addr);
-    void cancelGameWithPeer(String playerName, PeerAddress addr);
+    void sendGameRequest(PuyoGameInvitation &invitation);
+    void sendGameAcceptInvitation(PuyoGameInvitation &invitation);
+    void sendGameCancelInvitation(PuyoGameInvitation &invitation);
 private:
     void sendAliveMessage();
-    void grantGameToPeer(PeerAddress addr);
+    void grantGame(PuyoGameInvitation &invitation);
     DatagramSocket socket;
     UDPMessageBox mbox;
     const String name;
     double timeMsBetweenTwoAliveMessages, lastAliveMessage;
     bool gameGranted;
-    PeerAddress grantedAddr;
+    PuyoGameInvitation grantedInvitation;
     int status;
     String opponentName;
 };

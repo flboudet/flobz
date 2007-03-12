@@ -26,16 +26,18 @@
 #include "PuyoNetCenterMenu.h"
 #include "PuyoTwoPlayerStarter.h"
 #include "PuyoNetworkStarter.h"
+#include "ios_time.h"
 
 class PuyoNetworkTwoPlayerGameWidgetFactory : public PuyoGameWidgetFactory {
 public:
-    PuyoNetworkTwoPlayerGameWidgetFactory(ios_fc::MessageBox &mbox) : mbox(mbox), gameId(0) {}
+    PuyoNetworkTwoPlayerGameWidgetFactory(ios_fc::MessageBox &mbox, unsigned int randomSeed) : mbox(mbox), randomSeed(randomSeed), gameId(0) {}
     PuyoGameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
-        return new PuyoNetworkGameWidget(puyoThemeSet, levelTheme, mbox, gameId++, gameOverAction);
+        return new PuyoNetworkGameWidget(puyoThemeSet, levelTheme, mbox, gameId++, randomSeed, gameOverAction);
     }
 private:
     ios_fc::MessageBox &mbox;
+    unsigned int randomSeed;
     int gameId;
 };
 
@@ -46,10 +48,10 @@ void NetCenterDialogMenu::NetCenterDialogMenuAction::action()
     else targetMenu->cancelCurrentGame();
 }
 
-NetCenterDialogMenu::NetCenterDialogMenu(NetCenterMenu *targetMenu, PeerAddress associatedPeer, String title, String message, bool hasAcceptButton)
+NetCenterDialogMenu::NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvitation &associatedInvitation, String title, String message, bool hasAcceptButton)
     : menuBG(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/menubg.png"))),
       cancelAction(targetMenu, true), acceptAction(targetMenu, false), hasAcceptButton(hasAcceptButton),
-      associatedPeer(associatedPeer), dialogTitle(title), dialogMsg(message),
+      associatedInvitation(associatedInvitation), dialogTitle(title), dialogMsg(message),
       acceptButton("Accept", &acceptAction), cancelButton("Cancel", &cancelAction)
 {}
 
@@ -239,15 +241,14 @@ void NetCenterMenu::onPlayerUpdated(String playerName, PeerAddress playerAddress
     playerList.updatePlayer(playerName, playerAddress, netCenter->getPeerStatusForAddress(playerAddress));
 }
 
-void NetCenterMenu::gameInvitationAgainst(String playerName, PeerAddress playerAddress)
+void NetCenterMenu::onGameInvitationReceived(PuyoGameInvitation &invitation)
 {
-    /*netCenter->acceptInvitationWith(playerAddress);*/
     // If already waiting for a game, cancel the invitation
     if (this->onScreenDialog != NULL) {
-        netCenter->cancelGameWith(playerAddress);
+        netCenter->cancelGameInvitation(invitation);
     }
     else {
-        onScreenDialog = new NetCenterDialogMenu(this, playerAddress, "Invitation for a game", playerName + " invited you to play", true);
+        onScreenDialog = new NetCenterDialogMenu(this, invitation, "Invitation for a game", invitation.opponentName + " invited you to play", true);
         add(onScreenDialog);
         onScreenDialog->build();
         this->focus(onScreenDialog);
@@ -257,21 +258,21 @@ void NetCenterMenu::gameInvitationAgainst(String playerName, PeerAddress playerA
 void NetCenterMenu::grantCurrentGame()
 {
     if (this->onScreenDialog != NULL) {
-        netCenter->acceptInvitationWith(onScreenDialog->associatedPeer);
+        netCenter->acceptGameInvitation(onScreenDialog->associatedInvitation);
     }
 }
 
 void NetCenterMenu::cancelCurrentGame()
 {
     if (this->onScreenDialog != NULL) {
-        netCenter->cancelGameWith(onScreenDialog->associatedPeer);
+        netCenter->cancelGameInvitation(onScreenDialog->associatedInvitation);
     }
 }
 
-void NetCenterMenu::gameCanceledAgainst(String playerName, PeerAddress playerAddress)
+void NetCenterMenu::onGameInvitationCanceledReceived(PuyoGameInvitation &invitation)
 {
     if (this->onScreenDialog != NULL) {
-        if (playerAddress == onScreenDialog->associatedPeer) {
+        if (invitation.opponentAddress == onScreenDialog->associatedInvitation.opponentAddress) {
             remove(onScreenDialog);
             delete onScreenDialog;
             onScreenDialog = NULL;
@@ -279,9 +280,10 @@ void NetCenterMenu::gameCanceledAgainst(String playerName, PeerAddress playerAdd
     }
 }
 
-void NetCenterMenu::gameGrantedWithMessagebox(MessageBox *mbox)
+void NetCenterMenu::onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation)
 {
-    PuyoNetworkTwoPlayerGameWidgetFactory *factory = new PuyoNetworkTwoPlayerGameWidgetFactory(*mbox);
+    printf("Game granted with a seed of %d\n", invitation.gameRandomSeed);
+    PuyoNetworkTwoPlayerGameWidgetFactory *factory = new PuyoNetworkTwoPlayerGameWidgetFactory(*mbox, invitation.gameRandomSeed);
     TwoPlayersStarterAction *starterAction = new TwoPlayersStarterAction(0, *factory, &nameProvider);
     
     starterAction->action();
@@ -291,20 +293,19 @@ void NetCenterMenu::gameGrantedWithMessagebox(MessageBox *mbox)
         delete(onScreenDialog);
         onScreenDialog = NULL;
     }
-    
-    //PuyoStarter *starter = new PuyoNetworkStarter(theCommander, 0, mbox);
-    //starter->run(0,0,0,0,0);
-    //GameUIDefaults::SCREEN_STACK->push(starter);
 }
 
 void NetCenterMenu::playerSelected(PeerAddress playerAddress, String playerName)
 {
-    printf("Click joueur\n");
-    onScreenDialog = new NetCenterDialogMenu(this, playerAddress, "Asking for a game", String("Waiting ") + playerName + " for confirmation", false);
+    PuyoGameInvitation invitation;
+    invitation.gameRandomSeed = (unsigned long)(fmod(getTimeMs(), (double)0xFFFFFFFF));
+    invitation.opponentAddress = playerAddress;
+    onScreenDialog = new NetCenterDialogMenu(this, invitation, "Asking for a game", String("Waiting ") + playerName + " for confirmation", false);
     add(onScreenDialog);
     onScreenDialog->build();
     this->focus(onScreenDialog);
-    netCenter->requestGameWith(playerAddress);
+    
+    netCenter->requestGame(invitation);
 }
 
 void NetCenterMenu::show()

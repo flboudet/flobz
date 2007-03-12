@@ -69,19 +69,23 @@ void PuyoLanGameCenter::onMessage(Message &msg)
 	   disconnectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"));
 	}
 	break;
-      case PUYO_UDP_GAME_REQUEST: {
-	  Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-	  receivedInvitationForGameWithPeer(msg.getString("ORGNAME"), dir.getPeerAddress());
+        case PUYO_UDP_GAME_REQUEST: {
+            Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
+            PuyoGameInvitation invitation;
+            invitation.opponentAddress = dir.getPeerAddress();
+            invitation.opponentName = msg.getString("ORGNAME");
+            if (msg.hasInt("RNDSEED"))
+                invitation.gameRandomSeed = msg.getInt("RNDSEED");
+            else
+                invitation.gameRandomSeed = 0; // When there is no seed, fall back to 0 (better than crashing)
+            receivedGameInvitation(invitation);
         }
 	break;
       case PUYO_UDP_GAME_ACCEPT: {
-	  setStatus(PEER_PLAYING);
-	  Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-	  mbox.bind(dir.getPeerAddress());
-	  for (int i = 0, j = listeners.size() ; i < j ; i++) {
-	    listeners[i]->gameGrantedWithMessagebox(&mbox);
-	  }
-        }
+          Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
+          if (grantedInvitation.opponentAddress == dir.getPeerAddress());
+            grantGame(grantedInvitation);
+      }
 	break;
       case PUYO_UDP_GAME_CANCEL:  {
           Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
@@ -120,7 +124,7 @@ void PuyoLanGameCenter::sendMessage(const String msgText)
 void PuyoLanGameCenter::idle()
 {
     if (gameGranted) {
-      grantGameToPeer(grantedAddr);
+      grantGame(grantedInvitation);
       gameGranted = false;
       return;
     }
@@ -162,57 +166,59 @@ void PuyoLanGameCenter::sendAliveMessage()
     delete msg;
 }
 
-void PuyoLanGameCenter::requestGameWithPeer(String playerName, PeerAddress addr)
+void PuyoLanGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
 {
-  opponentName = playerName;
+  opponentName = invitation.opponentName;
   Message *msg = mbox.createMessage();
   Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
-  dirMsg->setPeerAddress(addr);
+  dirMsg->setPeerAddress(invitation.opponentAddress);
 
   msg->addBoolProperty("RELIABLE", true);
   msg->addInt("CMD", PUYO_UDP_GAME_REQUEST);
   msg->addString("ORGNAME", name);
-  msg->addString("DSTNAME", playerName);
+  msg->addString("DSTNAME", invitation.opponentName);
+  msg->addInt("RNDSEED", invitation.gameRandomSeed);
   msg->send();
   delete msg;
+  grantedInvitation = invitation;
 }
 
-void PuyoLanGameCenter::acceptInvitationWithPeer(String playerName, PeerAddress addr)
+void PuyoLanGameCenter::sendGameAcceptInvitation(PuyoGameInvitation &invitation)
 {
-  opponentName = playerName;
+  opponentName = invitation.opponentName;
   Message *msg = mbox.createMessage();
   Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
-  dirMsg->setPeerAddress(addr);
+  dirMsg->setPeerAddress(invitation.opponentAddress);
 
   msg->addBoolProperty("RELIABLE", true);
   msg->addInt("CMD", PUYO_UDP_GAME_ACCEPT);
   msg->addString("ORGNAME", name);
-  msg->addString("DSTNAME", playerName);
+  msg->addString("DSTNAME", invitation.opponentName);
   msg->send();
   delete msg;
   gameGranted = true;
-  grantedAddr = addr;
+  grantedInvitation = invitation;
 }
 
-void PuyoLanGameCenter::grantGameToPeer(PeerAddress addr)
+void PuyoLanGameCenter::grantGame(PuyoGameInvitation &invitation)
 {
     setStatus(PEER_PLAYING);
-    mbox.bind(addr);
+    mbox.bind(invitation.opponentAddress);
     for (int i = 0, j = listeners.size() ; i < j ; i++) {
-        listeners[i]->gameGrantedWithMessagebox(&mbox);
+        listeners[i]->onGameGrantedWithMessagebox(&mbox, invitation);
     }
 }
 
-void PuyoLanGameCenter::cancelGameWithPeer(String playerName, PeerAddress addr)
+void PuyoLanGameCenter::sendGameCancelInvitation(PuyoGameInvitation &invitation)
 {
   Message *msg = mbox.createMessage();
   Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
-  dirMsg->setPeerAddress(addr);
+  dirMsg->setPeerAddress(invitation.opponentAddress);
 
   msg->addBoolProperty("RELIABLE", true);
   msg->addInt("CMD", PUYO_UDP_GAME_CANCEL);
   msg->addString("ORGNAME", name);
-  msg->addString("DSTNAME", playerName);
+  msg->addString("DSTNAME", invitation.opponentName);
   msg->send();
   delete msg;
 }

@@ -67,56 +67,58 @@ void PuyoInternetGameCenter::sendMessage(const String msgText)
     mbox.bind(prevBound);
 }
 
-void PuyoInternetGameCenter::requestGameWithPeer(String playerName, PeerAddress addr)
+void PuyoInternetGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
 {
-    opponentName = playerName;
+    opponentName = invitation.opponentName;
     Message *msg = mbox.createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("CMD", PUYO_IGP_GAME_REQUEST);
     msg->addString("ORGNAME", name);
-    msg->addString("DSTNAME", playerName);
+    msg->addString("DSTNAME", invitation.opponentName);
+    msg->addInt("RNDSEED", invitation.gameRandomSeed);
     Dirigeable *dirNew = dynamic_cast<Dirigeable *>(msg);
-    dirNew->setPeerAddress(addr);
+    dirNew->setPeerAddress(invitation.opponentAddress);
     msg->send();
     delete msg;
+    grantedInvitation = invitation;
 }
 
-void PuyoInternetGameCenter::acceptInvitationWithPeer(String playerName, PeerAddress addr)
+void PuyoInternetGameCenter::sendGameAcceptInvitation(PuyoGameInvitation &invitation)
 {
-    opponentName = playerName;
+    opponentName = invitation.opponentName;
     Message *msg = mbox.createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("CMD", PUYO_IGP_GAME_ACCEPT);
     msg->addString("ORGNAME", name);
-    msg->addString("DSTNAME", playerName);
+    msg->addString("DSTNAME", invitation.opponentName);
     Dirigeable *dirNew = dynamic_cast<Dirigeable *>(msg);
-    dirNew->setPeerAddress(addr);
+    dirNew->setPeerAddress(invitation.opponentAddress);
     msg->send();
     delete msg;
     if (tryNatTraversal)
         gameGrantedStatus = GAMESTATUS_STARTTRAVERSAL;
     else
         gameGrantedStatus = GAMESTATUS_GRANTED_IGP;
-    grantedAddr = addr;
+    grantedInvitation = invitation;
 }
 
 void PuyoInternetGameCenter::grantGameToMBox(MessageBox &thembox)
 {
     setStatus(PEER_PLAYING);
     for (int i = 0, j = listeners.size() ; i < j ; i++) {
-        listeners[i]->gameGrantedWithMessagebox(&thembox);
+        listeners[i]->onGameGrantedWithMessagebox(&thembox, grantedInvitation);
     }
 }
 
-void PuyoInternetGameCenter::cancelGameWithPeer(String playerName, PeerAddress addr)
+void PuyoInternetGameCenter::sendGameCancelInvitation(PuyoGameInvitation &invitation)
 {
     Message *msg = mbox.createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("CMD", PUYO_IGP_GAME_CANCEL);
     msg->addString("ORGNAME", name);
-    msg->addString("DSTNAME", playerName);
+    msg->addString("DSTNAME", invitation.opponentName);
     Dirigeable *dirNew = dynamic_cast<Dirigeable *>(msg);
-    dirNew->setPeerAddress(addr);
+    dirNew->setPeerAddress(invitation.opponentAddress);
     msg->send();
     delete msg;
 }
@@ -127,8 +129,8 @@ void PuyoInternetGameCenter::idle()
     switch (gameGrantedStatus) {
         case GAMESTATUS_STARTTRAVERSAL:
             p2pmbox = new UDPMessageBox(hostName, 0, portNum);
-	    printf("grantedAddr:%d\n", static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedAddr.getImpl())->getIgpIdent());
-            p2pPunchName = "testpunch";
+            printf("grantedAddr:%d\n", static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.opponentAddress.getImpl())->getIgpIdent());
+            p2pPunchName = "punch" + grantedInvitation.gameRandomSeed;
             p2pNatTraversal = new PuyoNatTraversal(*p2pmbox);
             p2pNatTraversal->punch(p2pPunchName);
             gameGrantedStatus = GAMESTATUS_WAITTRAVERSAL;
@@ -155,7 +157,7 @@ void PuyoInternetGameCenter::idle()
             gameGrantedStatus = GAMESTATUS_IDLE;
             break;
         case GAMESTATUS_GRANTED_IGP:
-            mbox.bind(grantedAddr);
+            mbox.bind(grantedInvitation.opponentAddress);
             grantGameToMBox(mbox);
             gameGrantedStatus = GAMESTATUS_IDLE;
             break;
@@ -234,7 +236,14 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
             {
                 //printf("Une partie contre %s?\n", (const char *)msg.getString("ORGNAME"));
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-                receivedInvitationForGameWithPeer(msg.getString("ORGNAME"), dir.getPeerAddress());
+                PuyoGameInvitation invitation;
+                invitation.opponentAddress = dir.getPeerAddress();
+                invitation.opponentName = msg.getString("ORGNAME");
+                if (msg.hasInt("RNDSEED"))
+                    invitation.gameRandomSeed = msg.getInt("RNDSEED");
+                else
+                    invitation.gameRandomSeed = 0; // When there is no seed, fall back to 0 (better than crashing)
+                receivedGameInvitation(invitation);
             }
                 break;
             case PUYO_IGP_GAME_ACCEPT:
@@ -242,7 +251,8 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
                 //printf("%s accepte la partie!\n", (const char *)msg.getString("ORGNAME"));
     	        setStatus(PEER_PLAYING);
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-                grantedAddr = dir.getPeerAddress();
+                if (!(grantedInvitation.opponentAddress == dir.getPeerAddress()))
+                    break;
                 if (tryNatTraversal)
                     gameGrantedStatus = GAMESTATUS_STARTTRAVERSAL;
                 else

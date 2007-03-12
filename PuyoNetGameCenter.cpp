@@ -39,8 +39,9 @@ public:
 
 class PuyoNetGameCenter::PendingGame {
 public:
-    PendingGame(GamerPeer *peer) : peer(peer), initiateTime(getTimeMs()) {}
+    PendingGame(GamerPeer *peer, PuyoGameInvitation &invitation) : peer(peer), invitation(invitation), initiateTime(getTimeMs()) {}
     GamerPeer *peer;
+    PuyoGameInvitation invitation;
     double initiateTime;
 };
 
@@ -50,9 +51,9 @@ void PuyoNetGameCenter::idle()
     for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
         if (time_ms - pendingGames[i]->initiateTime > pendingGameTimeout) {
             for (int u = 0, v = listeners.size() ; u < v ; u++) {
-                listeners[u]->gameCanceledAgainst(pendingGames[i]->peer->name, pendingGames[i]->peer->address);
+                listeners[u]->onGameInvitationCanceledReceived(pendingGames[i]->invitation);
             }
-            cancelGameWithPeer(pendingGames[i]->peer->name, pendingGames[i]->peer->address);
+            sendGameCancelInvitation(pendingGames[i]->invitation);
             delete pendingGames[i];
             pendingGames.removeAt(i);
         }
@@ -63,15 +64,15 @@ void PuyoNetGameCenter::connectPeer(PeerAddress addr, const String name, int sta
 {
     //printf("%s vient de se connecter!\n", (const char *)name);
     for (int i = 0, j = peers.size() ; i < j ; i++) {
-      if (peers[i]->address == addr) {
+        if (peers[i]->address == addr) {
             if (peers[i]->status != status) {
-	      peers[i]->status = status;
-	      for (int i = 0, j = listeners.size() ; i < j ; i++) {
-		listeners[i]->onPlayerUpdated(name, addr);
-	      }
-	    }
+                peers[i]->status = status;
+                for (int i = 0, j = listeners.size() ; i < j ; i++) {
+                    listeners[i]->onPlayerUpdated(name, addr);
+                }
+            }
             return;
-      }
+        }
     }
     peers.add(new GamerPeer(name, addr, status));
     for (int i = 0, j = listeners.size() ; i < j ; i++) {
@@ -85,15 +86,15 @@ void PuyoNetGameCenter::disconnectPeer(PeerAddress addr, const String name)
     for (int i = 0, j = peers.size() ; i < j ; i++) {
         GamerPeer *currentPeer = peers[i];
         if (currentPeer->address == addr) {
-	    // Cancels all games from this peer
+            // Cancels all games from this peer
             for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
-	      if (pendingGames[i]->peer == currentPeer) {
-		for (int u = 0, v = listeners.size() ; u < v ; u++) {
-		  listeners[u]->gameCanceledAgainst(pendingGames[i]->peer->name, pendingGames[i]->peer->address);
-		}
-		delete pendingGames[i];
-		pendingGames.removeAt(i);
-	      }
+                if (pendingGames[i]->peer == currentPeer) {
+                    for (int u = 0, v = listeners.size() ; u < v ; u++) {
+                        listeners[u]->onGameInvitationCanceledReceived(pendingGames[i]->invitation);
+                    }
+                    delete pendingGames[i];
+                    pendingGames.removeAt(i);
+                }
             }
             // Delete the disconnected peer
             peers.remove(currentPeer);
@@ -141,38 +142,46 @@ int PuyoNetGameCenter::getPeerCount() const
     return peers.size();
 }
 
-void PuyoNetGameCenter::requestGameWith(PeerAddress addr)
+void PuyoNetGameCenter::requestGame(PuyoGameInvitation &invitation)
 {
-    GamerPeer *myPeer = getPeerForAddress(addr);
+    GamerPeer *myPeer = getPeerForAddress(invitation.opponentAddress);
     if (myPeer != NULL) {
         // Checks if there is already an active game with this peer
         for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
             if (pendingGames[i]->peer == myPeer)
                 return;
         }
-        pendingGames.add(new PendingGame(myPeer));
-        requestGameWithPeer(myPeer->name, myPeer->address);
+        invitation.opponentName = myPeer->name;
+        pendingGames.add(new PendingGame(myPeer, invitation));
+        sendGameRequest(invitation);
     }
 }
 
-void PuyoNetGameCenter::cancelGameWith(PeerAddress addr)
+void PuyoNetGameCenter::acceptGameInvitation(PuyoGameInvitation &invitation)
 {
-    GamerPeer *myPeer = getPeerForAddress(addr);
+    GamerPeer *myPeer = getPeerForAddress(invitation.opponentAddress);
+    if (myPeer != NULL)
+        sendGameAcceptInvitation(invitation);
+}
+
+void PuyoNetGameCenter::cancelGameInvitation(PuyoGameInvitation &invitation)
+{
+    GamerPeer *myPeer = getPeerForAddress(invitation.opponentAddress);
     if (myPeer != NULL) {
         for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
             if (pendingGames[i]->peer == myPeer) {
-	      // We won't call gameCanceledAgainst yet to avoid objects destructing themselves
-	      // but instead set the game in timeout
-	      pendingGames[i]->initiateTime = getTimeMs() - pendingGameTimeout;
+                // We won't call gameCanceledAgainst yet to avoid objects destructing themselves
+                // but instead set the game in timeout
+                pendingGames[i]->initiateTime = getTimeMs() - pendingGameTimeout;
             }
         }
     }
 }
 
-void PuyoNetGameCenter::receivedInvitationForGameWithPeer(String playerName, PeerAddress addr)
+void PuyoNetGameCenter::receivedGameInvitation(PuyoGameInvitation &invitation)
 {
     // Retrieving the peer
-    GamerPeer *peer = getPeerForAddress(addr);
+    GamerPeer *peer = getPeerForAddress(invitation.opponentAddress);
     if (peer != NULL) {
         // Check if the game doesn't exists
         for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
@@ -180,10 +189,10 @@ void PuyoNetGameCenter::receivedInvitationForGameWithPeer(String playerName, Pee
                 return;
         }
         // Create the game
-        pendingGames.add(new PendingGame(peer));
+        pendingGames.add(new PendingGame(peer, invitation));
         // notifies invitation
         for (int i = 0, j = listeners.size() ; i < j ; i++) {
-            listeners[i]->gameInvitationAgainst(peer->name, peer->address);
+            listeners[i]->onGameInvitationReceived(invitation);
         }
     }
 }
@@ -198,19 +207,13 @@ void PuyoNetGameCenter::receivedGameCanceledWithPeer(String playerName, PeerAddr
             if (pendingGames[i]->peer == peer) {
                 // Cancel the game
                 for (int u = 0, v = listeners.size() ; u < v ; u++) {
-                    listeners[u]->gameCanceledAgainst(pendingGames[i]->peer->name, pendingGames[i]->peer->address);
+                    listeners[u]->onGameInvitationCanceledReceived(pendingGames[i]->invitation);
                 }
                 delete pendingGames[i];
                 pendingGames.removeAt(i);
             }
         }
     }
-}
-
-void PuyoNetGameCenter::acceptInvitationWith(PeerAddress addr)
-{
-    GamerPeer *myPeer = getPeerForAddress(addr);
-    acceptInvitationWithPeer(myPeer->name, myPeer->address);
 }
 
 PuyoNetGameCenter::GamerPeer *PuyoNetGameCenter::getPeerForAddress(PeerAddress addr)
