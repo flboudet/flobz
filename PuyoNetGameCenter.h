@@ -34,6 +34,7 @@ using namespace ios_fc;
 
 class PuyoGameInvitation {
 public:
+    PeerAddress initiatorAddress;
     String opponentName;
     PeerAddress opponentAddress;
     unsigned long gameRandomSeed;

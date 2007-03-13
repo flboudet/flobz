@@ -70,6 +70,7 @@ void PuyoInternetGameCenter::sendMessage(const String msgText)
 void PuyoInternetGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
 {
     opponentName = invitation.opponentName;
+    invitation.initiatorAddress = mbox.getSelfAddress();
     Message *msg = mbox.createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("CMD", PUYO_IGP_GAME_REQUEST);
@@ -130,7 +131,17 @@ void PuyoInternetGameCenter::idle()
         case GAMESTATUS_STARTTRAVERSAL:
             p2pmbox = new UDPMessageBox(hostName, 0, portNum);
             printf("grantedAddr:%d\n", static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.opponentAddress.getImpl())->getIgpIdent());
-            p2pPunchName = "punch" + grantedInvitation.gameRandomSeed;
+            
+            int initiatorIgpIdent, guestIgpIdent;
+            if (grantedInvitation.initiatorAddress == grantedInvitation.opponentAddress) { // The opponent invited me
+                initiatorIgpIdent = static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.initiatorAddress.getImpl())->getIgpIdent();
+                guestIgpIdent = static_cast<IgpMessage::IgpPeerAddressImpl *>(mbox.getSelfAddress().getImpl())->getIgpIdent();
+            }
+            else { // I invited the opponent
+                initiatorIgpIdent = static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.initiatorAddress.getImpl())->getIgpIdent();
+                guestIgpIdent = static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.opponentAddress.getImpl())->getIgpIdent();
+            }
+            p2pPunchName = String("punch:") + initiatorIgpIdent + "vs" + guestIgpIdent + ":" + grantedInvitation.gameRandomSeed;
             p2pNatTraversal = new PuyoNatTraversal(*p2pmbox);
             p2pNatTraversal->punch(p2pPunchName);
             gameGrantedStatus = GAMESTATUS_WAITTRAVERSAL;
@@ -237,6 +248,7 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
                 //printf("Une partie contre %s?\n", (const char *)msg.getString("ORGNAME"));
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
                 PuyoGameInvitation invitation;
+                invitation.initiatorAddress = dir.getPeerAddress();
                 invitation.opponentAddress = dir.getPeerAddress();
                 invitation.opponentName = msg.getString("ORGNAME");
                 if (msg.hasInt("RNDSEED"))
