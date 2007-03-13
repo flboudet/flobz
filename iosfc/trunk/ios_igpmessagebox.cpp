@@ -113,5 +113,10 @@ namespace ios_fc {
         }
         else throw Exception("Incompatible peer address type!");
     }
+    
+    PeerAddress IgpMessageBox::getSelfAddress() const
+    {
+        return PeerAddress(new IgpMessage::IgpPeerAddressImpl(igpClient->getIgpIdent()));
+    }
 }
 

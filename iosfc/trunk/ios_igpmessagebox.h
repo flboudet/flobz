@@ -45,6 +45,7 @@ public:
     void bind(int igpIdent) { destIdent = igpIdent; }
     void bind(PeerAddress addr); // a revoir
     int getBound() const { return destIdent; }
+    PeerAddress getSelfAddress() const; // a revoir
  private:
     MessageBox *mbox;
     bool ownMessageBox;

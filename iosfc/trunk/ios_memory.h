@@ -507,6 +507,8 @@ namespace ios_fc {
             String operator+(int i)    const { return concat<int>("%d", i); }
             String operator+(float f)  const { return concat<float>("%f", f); }
             String operator+(double d) const { return concat<double>("%f", d); }
+            String operator+(unsigned long i) const { return concat<int>("%u", i); }
+            String operator+(unsigned int  i) const { return concat<int>("%u", i); }
 
             bool operator==(const char *s) const {
                 return !strcmp(buffer, s);

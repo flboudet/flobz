@@ -46,6 +46,7 @@ public:
     void addListener(IGPClientMessageListener *);
     void removeListener(IGPClientMessageListener *);
     void onMessage(Message &);
+    int getIgpIdent() const { return igpIdent; }
 private:
     MessageBox &mbox;
     bool enabled;
