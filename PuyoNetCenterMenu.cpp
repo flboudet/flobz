@@ -33,7 +33,7 @@ public:
     PuyoNetworkTwoPlayerGameWidgetFactory(ios_fc::MessageBox &mbox, unsigned int randomSeed) : mbox(mbox), randomSeed(randomSeed), gameId(0) {}
     PuyoGameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
-        return new PuyoNetworkGameWidget(puyoThemeSet, levelTheme, mbox, gameId++, randomSeed, gameOverAction);
+        return new PuyoNetworkGameWidget(puyoThemeSet, levelTheme, mbox, gameId++, randomSeed++, gameOverAction);
     }
 private:
     ios_fc::MessageBox &mbox;
