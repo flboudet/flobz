@@ -153,7 +153,7 @@ void GameLoop::removeDrawable(DrawableComponent *gc)
 #ifdef DEBUG_GAMELOOP
       printf("Drawable %x removed from gameloop!\n", gc);
 #endif
-      drawables.removeKeepOrder(gc);
+      drawables[i] = NULL;
       gc->parentLoop = NULL;
     }
   }
@@ -166,7 +166,7 @@ void GameLoop::removeIdle(IdleComponent *gc)
 #ifdef DEBUG_GAMELOOP
       printf("Idle %x removed from gameloop!\n", gc);
 #endif
-      idles.removeKeepOrder(gc);
+      idles[i] = NULL;
       gc->parentLoop = NULL;
       }
   }
@@ -275,6 +275,7 @@ bool GameLoop::drawRequested() const
 bool GameLoop::isLate(double currentTime) const
 {
   for (int i = 0; i < idles.size(); ++i) {
+    if (idles[i] == NULL) continue;
     if (idles[i]->isLate(currentTime))
       return true;
   }
