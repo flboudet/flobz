@@ -46,6 +46,7 @@ public:
     void bind(PeerAddress addr); // a revoir
     int getBound() const { return destIdent; }
     PeerAddress getSelfAddress() const; // a revoir
+    bool isConnected() const { return igpClient->isEnabled(); }
  private:
     MessageBox *mbox;
     bool ownMessageBox;
