@@ -130,7 +130,9 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
     static const char * WinKnownLangsNames[WinKnownLangsNb] = {"fr","en","ja","de","es","it","nl","sv","da","pt","fi","no","ru"};
     static const WORD WinKnownLangsCodes[WinKnownLangsNb] = {LANG_FRENCH, LANG_ENGLISH, LANG_JAPANESE, LANG_GERMAN, LANG_SPANISH, LANG_ITALIAN, LANG_DUTCH, LANG_SWEDISH, LANG_DANISH, LANG_PORTUGUESE, LANG_FINNISH, LANG_NORWEGIAN, LANG_RUSSIAN};
 
-    WORD winLang = PRIMARYLANGID(GetUserDefaultLangID());
+    WORD winLang;
+
+    winLang = PRIMARYLANGID(GetUserDefaultLangID());
     for (i=0; i<WinKnownLangsNb; i++)
     {
       if (WinKnownLangsCodes[i] == winLang)
@@ -141,7 +143,7 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
       }
     }
 
-    WORD winLang = PRIMARYLANGID(GetSystemDefaultLangID());
+    winLang = PRIMARYLANGID(GetSystemDefaultLangID());
     for (i=0; i<WinKnownLangsNb; i++)
     {
       if (WinKnownLangsCodes[i] == winLang)
