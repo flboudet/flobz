@@ -29,6 +29,11 @@ using namespace ios_fc;
 #ifndef PUYOGAME_H
 #define PUYOGAME_H
 
+#ifdef WIN32
+#define srandom srand
+#define random rand
+#endif
+
 #define PUYODIMX 6
 #define PUYODIMY 14
 
