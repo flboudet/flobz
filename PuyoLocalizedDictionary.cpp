@@ -25,15 +25,19 @@
 
 /* This class is not thread safe */
 
-#include <stdio.h>
 #ifdef MACOSX
 #include <CoreFoundation/CoreFoundation.h>
 #endif
 #ifdef WIN32
+/* Stupid trick for WIN32 */
+#ifdef DATADIR
+#undef DATADIR
+#endif
 #include "windows.h"
 #endif
 #include "PuyoLocalizedDictionary.h"
 #include "ios_memory.h"
+#include <stdio.h>
 
 static bool readLine(FILE *dictionaryFile, String &lineRead)
 {
@@ -123,7 +127,7 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
     }
     
 #else
-    
+
 #ifdef WIN32
 
 #define WinKnownLangsNb 13
