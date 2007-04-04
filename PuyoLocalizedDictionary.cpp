@@ -29,6 +29,9 @@
 #ifdef MACOSX
 #include <CoreFoundation/CoreFoundation.h>
 #endif
+#ifdef WIN32
+#include "windows.h"
+#endif
 #include "PuyoLocalizedDictionary.h"
 #include "ios_memory.h"
 
@@ -98,7 +101,7 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
 
   /* First create the prefered languages list  whenever needed*/
   if (!systemInitiated) {
-    fprintf(stderr,"Languages detection...\n");
+    fprintf(stdout,"Languages detection...\n");
 
 #ifdef MACOSX
 
@@ -121,6 +124,36 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
     
 #else
     
+#ifdef WIN32
+
+#define WinKnownLangsNb 13
+    static const char * WinKnownLangsNames[WinKnownLangsNb] = {"fr","en","ja","de","es","it","nl","sv","da","pt","fi","no","ru"};
+    static const WORD WinKnownLangsCodes[WinKnownLangsNb] = {LANG_FRENCH, LANG_ENGLISH, LANG_JAPANESE, LANG_GERMAN, LANG_SPANISH, LANG_ITALIAN, LANG_DUTCH, LANG_SWEDISH, LANG_DANISH, LANG_PORTUGUESE, LANG_FINNISH, LANG_NORWEGIAN, LANG_RUSSIAN};
+
+    WORD winLang = PRIMARYLANGID(GetUserDefaultLangID());
+    for (i=0; i<WinKnownLangsNb; i++)
+    {
+      if (WinKnownLangsCodes[i] == winLang)
+      {
+        PreferedLocales[PreferedLocalesCount] = strdup(WinKnownLangsNames[i]);
+        PreferedLocalesCount++;
+        break;
+      }
+    }
+
+    WORD winLang = PRIMARYLANGID(GetSystemDefaultLangID());
+    for (i=0; i<WinKnownLangsNb; i++)
+    {
+      if (WinKnownLangsCodes[i] == winLang)
+      {
+        PreferedLocales[PreferedLocalesCount] = strdup(WinKnownLangsNames[i]);
+        PreferedLocalesCount++;
+        break;
+      }
+    }
+
+#endif /* WIN32 */
+
     char * my_lang = getenv("LANG");
     if ((my_lang != NULL) && (strlen(my_lang) >= 2)) {
       PreferedLocales[PreferedLocalesCount] = strdup(my_lang);
@@ -135,7 +168,7 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
     PreferedLocalesCount++;
 
     for (i = 0; i < PreferedLocalesCount; i++)
-      fprintf(stderr,"User prefered language %d : %s\n",i,PreferedLocales[i]);
+      fprintf(stdout,"User prefered language %d : %s\n",i,PreferedLocales[i]);
 
     systemInitiated = true;
   }
@@ -183,14 +216,14 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
                 }
             }
             fclose(dictionaryFile);
-            fprintf(stderr,"Found dictionary %s\n",(const char *)datapathManager.getPath(dictFilePath));
+            fprintf(stdout,"Found dictionary %s\n",(const char *)datapathManager.getPath(dictFilePath));
             found = true;
             break;
         }
     }
     // Should we look for any eligible dictionnary now?
     // By now we don't bother since english (en) should be there or we return the original strings anyway.
-    if (!found) fprintf(stderr,"No dictionary found in %s for %s\n",(const char *)datapathManager.getPath(dictionaryDirectory),dictionaryName);
+    if (!found) fprintf(stdout,"No dictionary found in %s for %s\n",(const char *)datapathManager.getPath(dictionaryDirectory),dictionaryName);
   }
   
   myDictEntry->refcount++;
