@@ -264,6 +264,11 @@ UDPMessageBox::UDPMessageBox(DatagramSocket *socket)
 {
 }
 
+UDPMessageBox::~UDPMessageBox()
+{
+  while(knownPeers.size()>0) delete knownPeers[0];
+}
+
 void UDPMessageBox::idle()
 {
     double time_ms = getTimeMs();

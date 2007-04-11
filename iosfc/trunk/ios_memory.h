@@ -297,7 +297,7 @@ namespace ios_fc {
               return *this;
             }
 
-            inline ~Buffer () {}
+            inline virtual ~Buffer () {}
 
             inline void realloc  (int size) { VoidBuffer::realloc(size*sizeof(T));}
             inline void  grow    (int size) { VoidBuffer::grow   (size*sizeof(T));}

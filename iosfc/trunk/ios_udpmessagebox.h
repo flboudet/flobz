@@ -37,7 +37,7 @@ class UDPMessageBox : public MessageBox, public SessionManager {
 public:
     UDPMessageBox(String address, int localPort, int remotePort);
     UDPMessageBox(DatagramSocket *socket);
-    virtual ~UDPMessageBox() {}
+    virtual ~UDPMessageBox();
     void idle();
     Message * createMessage();
     void sendUDP(Buffer<char> buffer, int id, bool reliable, PeerAddress peerAddr, SocketAddress addr, int portNum);

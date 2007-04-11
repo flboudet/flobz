@@ -50,7 +50,7 @@ public:
         (*instanceCounter)++;
     }
     
-    ~SelfVector() {
+    virtual ~SelfVector() {
         if (*instanceCounter == 0) {
             for (int i=0; i < this->size(); ++i) {
                 delete this->get(i);
@@ -84,6 +84,12 @@ public:
       // (this is bad)
       delete this->get(this->size());
     }
+  
+    inline void removeAt(int i) {
+      delete this->get(i);
+      AdvancedBuffer<T*>::removeAt(i);
+    }
+  
 private:
     int *instanceCounter;
 };
