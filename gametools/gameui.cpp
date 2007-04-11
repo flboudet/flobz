@@ -1367,20 +1367,22 @@ namespace gameui {
   // EditFieldWithLabel
   //
 
-  EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, Action *action)
+  EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, Action *action) : editField(new EditField(defaultValue, action)), text(label)
   {
-    add(new Text(label));
-    editField = new EditField(defaultValue, action);
+    add(&text);
     add(editField);
   }
 
-  EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, String persistentID)
+  EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, String persistentID) : editField(new EditField(defaultValue, persistentID)), text(label)
   {
-    add(new Text(label));
-    editField = new EditField(defaultValue, persistentID);
+    add(&text);
     add(editField);
   }
 
+  EditFieldWithLabel::~EditFieldWithLabel()
+  {
+    delete editField;
+  }
   //
   // ToggleButton
   //
@@ -1407,12 +1409,11 @@ namespace gameui {
   // ListWidget
   //
 
-  ListWidget::ListWidget(int size, GameLoop *loop) : VBox(loop), size(size), used(0)
+  ListWidget::ListWidget(int size, GameLoop *loop) : VBox(loop), size(size), used(0), button("---")
   {
     for (int i=0; i<size; ++i) {
-      Button *b = new Button("---");
-      b->mdontMove=true;
-      VBox::add(b);
+      button.mdontMove=true;
+      VBox::add(&button);
     }
     setPreferedSize(Vec3(1,(size+2) + SoFont_FontHeight(GameUIDefaults::FONT)*size, 1));
   }

@@ -399,9 +399,11 @@ namespace gameui {
   public:
     EditFieldWithLabel(String label, String defaultValue, Action *action = NULL);
     EditFieldWithLabel(String label, String defaultValue, String persistentID);
+    virtual ~EditFieldWithLabel();
     EditField * getEditField() const { return editField; }
   private:
-    EditField *editField;
+    EditField * editField;
+    Text text;
   };
   
   class ToggleButton : public Button {
@@ -429,6 +431,7 @@ namespace gameui {
     private:
       int size;
       int used;
+      Button button;
   };
 
 

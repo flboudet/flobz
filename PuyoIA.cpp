@@ -196,6 +196,11 @@ PuyoIA::PuyoIA(IA_Type type, int level, PuyoView &targetView)
     firstLine = false;
 }
 
+PuyoIA::~PuyoIA()
+{
+  delete evaluator;
+}
+
 PuyoState PuyoIA::extractColor(PuyoState A) const
 {
     switch (A) {
