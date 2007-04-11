@@ -36,6 +36,7 @@ IGPClient::IGPClient(MessageBox &mbox) : enabled(false), mbox(mbox), igpLastKeep
     mbox.addListener(this);
     IGPDatagram::ClientMsgAutoAssignIDDatagram datagram(mbox.createMessage());
     datagram.getMessage()->send();
+    delete datagram.getMessage();
 }
 
 IGPClient::IGPClient(MessageBox &mbox, int igpIdent) : enabled(false), mbox(mbox), igpLastKeepAliveDate(0.), igpKeepAliveInterval(2000.)
@@ -43,6 +44,7 @@ IGPClient::IGPClient(MessageBox &mbox, int igpIdent) : enabled(false), mbox(mbox
     mbox.addListener(this);
     IGPDatagram::ClientMsgAssignIDDatagram datagram(mbox.createMessage(), igpIdent);
     datagram.getMessage()->send();
+    delete datagram.getMessage();
 }
 
 IGPClient::~IGPClient()
@@ -54,6 +56,7 @@ void IGPClient::sendMessage(int igpID, VoidBuffer message, bool reliable)
 {
     IGPDatagram::ClientMsgToClientDatagram datagram(mbox.createMessage(), igpID, message, reliable);
     datagram.getMessage()->send();
+    delete datagram.getMessage();
 }
 
 void IGPClient::idle()
@@ -62,6 +65,7 @@ void IGPClient::idle()
     if ((igpLastKeepAliveDate == 0.) || (time_ms - igpLastKeepAliveDate > igpKeepAliveInterval)) {
         IGPDatagram::ClientMsgKeepAliveDatagram datagram(mbox.createMessage());
         datagram.getMessage()->send();
+        delete datagram.getMessage();
         igpLastKeepAliveDate = time_ms;
     }
     mbox.idle();

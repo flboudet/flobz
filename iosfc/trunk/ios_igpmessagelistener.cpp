@@ -40,6 +40,7 @@ void IgpMessageListener::NetworkIgpPeer::sendIGPIdent()
         //printf("setpeeraddress done\n");
         reply.getMessage()->send();
         //printf("envoye!\n");
+        delete reply.getMessage();
     }
     else {
         printf("msg NULL!\n");
@@ -56,6 +57,7 @@ void IgpMessageListener::NetworkIgpPeer::messageReceived(VoidBuffer message, int
     if (msg != NULL) {
         msg->setPeerAddress(getAddress());
         msgToSend.getMessage()->send();
+        delete msgToSend.getMessage();
     }
 }
 

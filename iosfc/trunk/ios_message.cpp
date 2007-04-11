@@ -76,7 +76,8 @@ class DeleteAction : public HashMapAction {
 
 Message::~Message()
 {
-  datas.foreach(new DeleteAction);
+  DeleteAction act;
+  datas.foreach(&act);
 }
 
 void Message::addInt       (const String key, int value)

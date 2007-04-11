@@ -320,6 +320,7 @@ void UDPMessageBox::sendUDP(Buffer<char> buffer, int id, bool reliable, PeerAddr
     // Service messages must be sent imediately
     if (id <= 0) {
         rawMessage->send();
+        delete rawMessage;
         return;
     }
     
