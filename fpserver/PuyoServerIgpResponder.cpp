@@ -64,6 +64,7 @@ void PuyoIgpResponder::idle()
                 dirNew->setPeerAddress(peers[i2]->addr);
                 newMsg->send();
             }
+            delete newMsg;
         }
     }
 }
