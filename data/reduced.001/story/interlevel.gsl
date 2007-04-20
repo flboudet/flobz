@@ -1,26 +1,164 @@
-<init>
+<init_lib: float enemy>
+
+  float @marges = 25.0
+  float @icons = 96.0
+  float @picHeight = 1360.0
+  float @displayH = 640.0
+  float @displayV = 480.0
+  float @EnnemyLeft = 175.0
+  float @KaoriLeft = 400.0
 
   # Init function: called when script is loaded
-  Display @display = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+  Display @display = [new_display: x=0.0 y=0.0 width=@displayH height=@displayV]
 
-  Sprite @sky =  [new_sprite: image="introlevel/skynight.jpg" x=0.0 y=0.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
-  Sprite @peak =  [new_sprite: image="introlevel/peak.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
-  Sprite @kaori =  [new_sprite: image="introlevel/kaori-mini.png" x=300.0 y=0.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
-  Sprite @herbert =  [new_sprite: image="introlevel/herbert-mini.png" x=200.0 y=1200.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
+  Sprite @sky =     [new_sprite: image="introlevel/skynight.jpg" x=0.0 y=0.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
+  Sprite @peak =    [new_sprite: image="introlevel/peak.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
+  Sprite @kaori =   [new_sprite: image="introlevel/kaori-mini.png" x=@KaoriLeft y=0.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
+  Sprite @enemy1
+  Sprite @enemy2
+  Sprite @enemy3
+  Sprite @enemy4
+  Sprite @enemy5
+  Sprite @enemy6
+  Sprite @enemy7
+  Sprite @enemy8
+  Sprite @enemy9
+  
+  Sprite i
+  float j = 1.0
+  
+  for i in (@enemy1 @enemy2 @enemy3 @enemy4 @enemy5 @enemy6 @enemy7 @enemy8 @enemy9) do {
+    i = [new_sprite: image="" x=@EnnemyLeft y=@picHeight-@marges-j*(@marges+@icons) curframe=0.0 framespeed=0.0 nbframes=1.0]
+    i.parent = "@peak"
+    j = j + 1.0
+  }
+  
+  (enemy = 1.0) ? 
+  {
+    @enemy1.image = "introlevel/herbert-mini.png"
+    @enemy2.image = "introlevel/herbert-mini.png"
+    @enemy3.image = "introlevel/herbert-mini.png"
+    @enemy4.image = "introlevel/herbert-mini.png"
+    @enemy5.image = "introlevel/herbert-mini.png"
+    @enemy6.image = "introlevel/herbert-mini.png"
+    @enemy7.image = "introlevel/herbert-mini.png"
+    @enemy8.image = "introlevel/herbert-mini.png"
+    @enemy9.image = "introlevel/herbert-mini.png"
+  }
+  (enemy = 2.0) ? 
+  {
+    @enemy1.image = "introlevel/herbert-mini-dead.png"
+    @enemy2.image = "introlevel/herbert-mini.png"
+    @enemy3.image = "introlevel/herbert-mini.png"
+    @enemy4.image = "introlevel/herbert-mini.png"
+    @enemy5.image = "introlevel/herbert-mini.png"
+    @enemy6.image = "introlevel/herbert-mini.png"
+    @enemy7.image = "introlevel/herbert-mini.png"
+    @enemy8.image = "introlevel/herbert-mini.png"
+    @enemy9.image = "introlevel/herbert-mini.png"
+  }
+  (enemy = 3.0) ? 
+  {
+    @enemy1.image = "introlevel/herbert-mini-dead.png"
+    @enemy2.image = "introlevel/herbert-mini-dead.png"
+    @enemy3.image = "introlevel/herbert-mini.png"
+    @enemy4.image = "introlevel/herbert-mini.png"
+    @enemy5.image = "introlevel/herbert-mini.png"
+    @enemy6.image = "introlevel/herbert-mini.png"
+    @enemy7.image = "introlevel/herbert-mini.png"
+    @enemy8.image = "introlevel/herbert-mini.png"
+    @enemy9.image = "introlevel/herbert-mini.png"
+  }
+  (enemy = 4.0) ? 
+  {
+    @enemy1.image = "introlevel/herbert-mini-dead.png"
+    @enemy2.image = "introlevel/herbert-mini-dead.png"
+    @enemy3.image = "introlevel/herbert-mini-dead.png"
+    @enemy4.image = "introlevel/herbert-mini.png"
+    @enemy5.image = "introlevel/herbert-mini.png"
+    @enemy6.image = "introlevel/herbert-mini.png"
+    @enemy7.image = "introlevel/herbert-mini.png"
+    @enemy8.image = "introlevel/herbert-mini.png"
+    @enemy9.image = "introlevel/herbert-mini.png"
+  }
+    (enemy = 5.0) ? 
+  {
+    @enemy1.image = "introlevel/herbert-mini-dead.png"
+    @enemy2.image = "introlevel/herbert-mini-dead.png"
+    @enemy3.image = "introlevel/herbert-mini-dead.png"
+    @enemy4.image = "introlevel/herbert-mini-dead.png"
+    @enemy5.image = "introlevel/herbert-mini.png"
+    @enemy6.image = "introlevel/herbert-mini.png"
+    @enemy7.image = "introlevel/herbert-mini.png"
+    @enemy8.image = "introlevel/herbert-mini.png"
+    @enemy9.image = "introlevel/herbert-mini.png"
+  }
+  (enemy = 6.0) ? 
+  {
+    @enemy1.image = "introlevel/herbert-mini-dead.png"
+    @enemy2.image = "introlevel/herbert-mini-dead.png"
+    @enemy3.image = "introlevel/herbert-mini-dead.png"
+    @enemy4.image = "introlevel/herbert-mini-dead.png"
+    @enemy5.image = "introlevel/herbert-mini-dead.png"
+    @enemy6.image = "introlevel/herbert-mini.png"
+    @enemy7.image = "introlevel/herbert-mini.png"
+    @enemy8.image = "introlevel/herbert-mini.png"
+    @enemy9.image = "introlevel/herbert-mini.png"
+  }
+  (enemy = 7.0) ? 
+  {
+    @enemy1.image = "introlevel/herbert-mini-dead.png"
+    @enemy2.image = "introlevel/herbert-mini-dead.png"
+    @enemy3.image = "introlevel/herbert-mini-dead.png"
+    @enemy4.image = "introlevel/herbert-mini-dead.png"
+    @enemy5.image = "introlevel/herbert-mini-dead.png"
+    @enemy6.image = "introlevel/herbert-mini-dead.png"
+    @enemy7.image = "introlevel/herbert-mini.png"
+    @enemy8.image = "introlevel/herbert-mini.png"
+    @enemy9.image = "introlevel/herbert-mini.png"
+  }
+  (enemy = 8.0) ? 
+  {
+    @enemy1.image = "introlevel/herbert-mini-dead.png"
+    @enemy2.image = "introlevel/herbert-mini-dead.png"
+    @enemy3.image = "introlevel/herbert-mini-dead.png"
+    @enemy4.image = "introlevel/herbert-mini-dead.png"
+    @enemy5.image = "introlevel/herbert-mini-dead.png"
+    @enemy6.image = "introlevel/herbert-mini-dead.png"
+    @enemy7.image = "introlevel/herbert-mini-dead.png"
+    @enemy8.image = "introlevel/herbert-mini.png"
+    @enemy9.image = "introlevel/herbert-mini.png"
+  }
+  (enemy = 9.0) ? 
+  {
+    @enemy1.image = "introlevel/herbert-mini-dead.png"
+    @enemy2.image = "introlevel/herbert-mini-dead.png"
+    @enemy3.image = "introlevel/herbert-mini-dead.png"
+    @enemy4.image = "introlevel/herbert-mini-dead.png"
+    @enemy5.image = "introlevel/herbert-mini-dead.png"
+    @enemy6.image = "introlevel/herbert-mini-dead.png"
+    @enemy7.image = "introlevel/herbert-mini-dead.png"
+    @enemy8.image = "introlevel/herbert-mini-dead.png"
+    @enemy9.image = "introlevel/herbert-mini.png"
+  }
+
+  float @enemy = enemy
   @kaori.parent = "@peak"
-  @herbert.parent = "@peak"
-
-<sprite_list>
+  
+<sprite_list_lib>
   # Call the 'sprite' function for each sprite you want to update/draw
   # This also allows you to specify the drawing order
   sprite::@sky display=@display
   sprite::@peak display=@display
   sprite::@kaori display=@display
-  sprite::@herbert display=@display
+  Sprite i
+  for i in (@enemy1 @enemy2 @enemy3 @enemy4 @enemy5 @enemy6 @enemy7 @enemy8 @enemy9) do {
+    sprite::i display=@display
+  }
 
-<update>
+<update_lib>
   # Update function: called every animation cycle
-  move::@peak fcycle=500.0  x=0.0 y=-1300.0+480.0
-  move::@kaori fcycle=500.0  x=300.0 y=1200.0
+  move::@peak fcycle=70.0  x=0.0 y=0.0-(@picHeight-@displayV)
+  move::@kaori fcycle=70.0  x=@KaoriLeft y=@picHeight-@icons-@marges-@enemy*(@marges+@icons)
 
   (@cycle = 1000)? @finished = 1

@@ -1,6 +1,6 @@
 [start_level]
     level.levelName           = "Kaori vs the Men's Best Friend"
-    level.opponentStory       = "interlevel.gsl"
+    level.opponentStory       = "interlevel1.gsl"
     level.opponentName        = "Herbert the Dog"
     level.backgroundTheme     = "Kaori's farm"
     level.easySetting.type    = "RANDOM"
