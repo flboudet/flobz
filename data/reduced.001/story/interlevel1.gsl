@@ -1,0 +1,11 @@
+import </Users/flobo/Sources/flobopuyo/data/reduced.001/story/interlevel.gsl>
+
+<init>
+  init_lib: enemy=3.0
+  
+<sprite_list>
+  sprite_list_lib
+  
+<update>
+  update_lib
+    
