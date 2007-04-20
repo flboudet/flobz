@@ -14,7 +14,7 @@ goomsl: ${OBJ} main.o
 object: ${OBJ}
 
 goomsl_lex.c:goomsl_lex.l goomsl_yacc.c
-	lex -ogoomsl_lex.c goomsl_lex.l
+	flex -ogoomsl_lex.c goomsl_lex.l
 
 goomsl_yacc.c:goomsl_yacc.y
 	bison -d -b goomsl_yacc goomsl_yacc.y

@@ -12,6 +12,23 @@ void yyparse(void);
 GoomSL *currentGoomSL;
 static int  string_size;
 static char string[1024];
+
+#define MAX_IMPORT_DEPTH 10
+static YY_BUFFER_STATE includeStack[MAX_IMPORT_DEPTH];
+static int includeStackPtr = 0;
+
+#define UP_INCLUDE_STACK() \
+        if ( --includeStackPtr < 0 ) { printf("fin include stack\n");\
+            includeStackPtr = 0; \
+            yyterminate(); \
+        } \
+        else \
+        { printf("depile include stack\n");\
+            fclose(yyin); \
+            yy_delete_buffer( YY_CURRENT_BUFFER ); \
+            yy_switch_to_buffer( includeStack[includeStackPtr] ); \
+        }
+
 %}
 
 DIGIT    [0-9]
@@ -21,6 +38,7 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
 %S C_COMMENT
 %S LINE_COMMENT
 %S STRING
+%S IMPORT
 
 %%
 
@@ -33,6 +51,54 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
 <C_COMMENT>"*/"                { BEGIN INITIAL; }
 <C_COMMENT>\n                  { ++currentGoomSL->num_lines; }
 <C_COMMENT,LINE_COMMENT>.      { /* eat up comment */ }
+
+"import"        {  BEGIN IMPORT; }
+<IMPORT>[ \t]*  ;
+<IMPORT>\<[^<>\n]+\> {printf("empile include stack\n");
+        FILE *tmp_yyin = NULL;
+        char* fullName = NULL;
+        yytext[strlen(yytext)-1] = 0;
+
+        if ( includeStackPtr >= MAX_IMPORT_DEPTH )
+        {
+           //META_QueueError("Includes nested too deeply", yytext+1);
+           goto endImport;
+        }
+
+        /* TODO: build the absolute path name */
+        fullName = (char*) strdup( (char*) yytext+1 );
+        if ( fullName == NULL )
+        {
+           // META_QueueError("Imported File Not Found", yytext+1);
+           goto endImport;
+        }
+        
+        /* open the imported file */
+        tmp_yyin = fopen( fullName, "r" );
+        if ( ! tmp_yyin )
+        {
+           // META_QueueError("Imported File Not Found", yytext+1);
+           goto endImport;
+        }
+
+        /* free the imported file after use */
+        if ( fullName != NULL )
+        {
+           free( fullName );
+        }
+
+        includeStack[includeStackPtr++]   = YY_CURRENT_BUFFER;
+        //GPI_LineNumber = (int*)(META_GTI_LineNumber+includeStackPtr);
+        //(*GPI_LineNumber) = 1;
+printf("taille pile:%d\n", includeStackPtr);
+        yyin = tmp_yyin;
+
+        /* changement de buffer d'entree pour le bovin */
+        yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
+
+        endImport:
+        BEGIN(INITIAL);
+    }
 
 <INITIAL>"#RST_LINE#"             { currentGoomSL->num_lines = 0; }
 <INITIAL>"#FILE ".*"#"            { currentGoomSL->num_lines = 0; printf("%s\n", yytext); }
@@ -86,6 +152,9 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
 <INITIAL>"!="                    { return NOT_EQ;  }
 <INITIAL>"<>"                    { return NOT_EQ;  }
 <INITIAL>[ \t]+                  /* eat up whitespace */
+
+<<EOF>> { UP_INCLUDE_STACK(); }
+
 <INITIAL>.                       { yylval.charValue = *yytext; return *yytext;    }
 
 %%
