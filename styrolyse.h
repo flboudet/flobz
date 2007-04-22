@@ -19,6 +19,7 @@ struct _StyrolyseClient {
   const char *(*getText)   (StyrolyseClient *_this, const char *text);
   void (*playMusic) (StyrolyseClient *_this, const char *fileName);
   void (*playSound) (StyrolyseClient *_this, const char *fileName, int volume);
+  char *(*resolveFilePath)(StyrolyseClient *_this, const char *file_name);
 };
 
 void styrolyse_init(const char *styrolyse_path);

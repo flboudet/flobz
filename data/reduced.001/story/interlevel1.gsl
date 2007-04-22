@@ -1,4 +1,4 @@
-import </Users/flobo/Sources/flobopuyo/data/reduced.001/story/interlevel.gsl>
+import <interlevel.gsl>
 
 <init>
   init_lib: enemy=3.0

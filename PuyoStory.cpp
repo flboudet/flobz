@@ -37,6 +37,18 @@ static SDL_Surface * createStorySurface()
 }
 
 /* Implementation of the Styrolyse Client */
+
+static char *pathResolverFunction (StyrolyseClient *_this, const char *path)
+{
+  try {
+    String rsvPath = theCommander->getDataPathManager().getPath(FilePath("story").combine(path));
+    return strdup((const char *)rsvPath);
+  }
+  catch (Exception e) {
+    return strdup(path);
+  }
+}
+
 static void *loadImage (StyrolyseClient *_this, const char *path)
 {
   try {
@@ -127,6 +139,7 @@ PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction)
     client.styroClient.getText   = ::getText;
     client.styroClient.playMusic = ::playMusic;
     client.styroClient.playSound = ::playSound;
+    client.styroClient.resolveFilePath = ::pathResolverFunction;
     client.widget = this;
     
     currentStory = styrolyse_new((const char *)fullPath, (StyrolyseClient *)(&client));

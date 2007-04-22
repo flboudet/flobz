@@ -167,6 +167,11 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
   styrolyse->client->drawImage(styrolyse->client, data, x+dx, y+dy, dx, dy, dw, dh);
 }
 
+char *pathResolverFunction(GoomSL *gsl, const char *path)
+{
+    return styrolyse->client->resolveFilePath(styrolyse->client, path);
+}
+
 /**/
 
 static void sbind(GoomSL *gsl)
@@ -194,6 +199,7 @@ Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client)
     _this = (Styrolyse*)malloc(sizeof(Styrolyse));
     _this->client = client;
     _this->gsl =  gsl_new();
+    gsl_bind_path_resolver(_this->gsl, pathResolverFunction);
     _this->images = goom_hash_new();
     strncpy(_this->fname, fname, 512);
     styrolyse_reload(_this);
