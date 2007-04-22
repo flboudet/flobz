@@ -1407,6 +1407,7 @@ GoomSL *gsl_new(void)
   gss->iflow = iflow_new();
   gss->vars  = goom_hash_new();
   gss->functions = goom_hash_new();
+  gss->file_path_resolver_function = NULL;
   gss->nbStructID  = 0;
   gss->structIDS   = goom_hash_new();
   gss->gsl_struct_size = 32;
@@ -1553,6 +1554,18 @@ void gsl_append_file_to_buffer(const char *fname, char **buffer)
     *buffer = (char*)realloc(*buffer, size+fsize+256);
     strcat((*buffer)+size, fbuffer);
     free(fbuffer);
+}
+
+char *gsl_create_full_filepath(GoomSL *_this, const char *file_name)
+{
+    if (_this->file_path_resolver_function == NULL)
+        return strdup(file_name);
+    return _this->file_path_resolver_function(_this, file_name);
+}
+
+void gsl_bind_path_resolver(GoomSL *_this, GoomSL_FilePathResolver path_resolver_function)
+{
+    _this->file_path_resolver_function = path_resolver_function;
 }
 
 

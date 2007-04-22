@@ -174,7 +174,8 @@ struct _GoomSL { /* {{{ */
     GoomHash *namespaces[16];
     
     GoomHash *functions;    /* table des fonctions externes */
-
+    GoomSL_FilePathResolver file_path_resolver_function;
+    
     GoomHeap *data_heap; /* GSL Heap-like memory space */
     
     int nbStructID;

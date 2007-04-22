@@ -9,17 +9,20 @@ extern "C" {
 
 typedef struct _GoomSL GoomSL;
 typedef void (*GoomSL_ExternalFunction)(GoomSL *gsl, GoomHash *global_vars, GoomHash *local_vars);
+typedef char *(*GoomSL_FilePathResolver)(GoomSL *gsl, const char *file_name);
 
 GoomSL*gsl_new(void);
 void   gsl_free(GoomSL *gss);
 
 char *gsl_init_buffer(const char *file_name);
 void  gsl_append_file_to_buffer(const char *file_name, char **buffer);
+char *gsl_create_full_filepath(GoomSL *_this, const char *file_name);
 
 void   gsl_compile (GoomSL *scanner, const char *script);
 void   gsl_execute (GoomSL *scanner);
 int    gsl_is_compiled  (GoomSL *gss);
 void   gsl_bind_function(GoomSL *gss, const char *fname, GoomSL_ExternalFunction func);
+void   gsl_bind_path_resolver(GoomSL *_this, GoomSL_FilePathResolver path_resolver_function);
 
 int    gsl_malloc  (GoomSL *_this, int size);
 void  *gsl_get_ptr (GoomSL *_this, int id);

@@ -66,7 +66,7 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
         }
 
         /* TODO: build the absolute path name */
-        fullName = (char*) strdup( (char*) yytext+1 );
+        fullName = gsl_create_full_filepath( currentGoomSL, (char*) yytext+1 );
         if ( fullName == NULL )
         {
            // META_QueueError("Imported File Not Found", yytext+1);
