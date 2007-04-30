@@ -37,7 +37,7 @@
   {
     @enemy1.image = "introlevel/herbert-mini.png"
     @enemy2.image = "introlevel/herbert-mini.png"
-    @enemy3.image = "introlevel/herbert-mini.png"
+    @enemy3.image = "introlevel/orloff-mini.png"
     @enemy4.image = "introlevel/herbert-mini.png"
     @enemy5.image = "introlevel/herbert-mini.png"
     @enemy6.image = "introlevel/herbert-mini.png"
@@ -49,7 +49,7 @@
   {
     @enemy1.image = "introlevel/herbert-mini-dead.png"
     @enemy2.image = "introlevel/herbert-mini.png"
-    @enemy3.image = "introlevel/herbert-mini.png"
+    @enemy3.image = "introlevel/orloff-mini.png"
     @enemy4.image = "introlevel/herbert-mini.png"
     @enemy5.image = "introlevel/herbert-mini.png"
     @enemy6.image = "introlevel/herbert-mini.png"
@@ -61,7 +61,7 @@
   {
     @enemy1.image = "introlevel/herbert-mini-dead.png"
     @enemy2.image = "introlevel/herbert-mini-dead.png"
-    @enemy3.image = "introlevel/herbert-mini.png"
+    @enemy3.image = "introlevel/orloff-mini.png"
     @enemy4.image = "introlevel/herbert-mini.png"
     @enemy5.image = "introlevel/herbert-mini.png"
     @enemy6.image = "introlevel/herbert-mini.png"

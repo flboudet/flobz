@@ -48,5 +48,11 @@
     level.speedmeter_y = 130
 [end_level]
 
-
+[start_level]
+    level.name          = "The mansion"
+    level.description   = "A place full of secrets."
+    level.background    = "mansion"
+    level.speedmeter_x = 320
+    level.speedmeter_y = 130
+[end_level]
 
