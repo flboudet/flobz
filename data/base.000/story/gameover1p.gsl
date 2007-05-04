@@ -19,8 +19,8 @@ struct <ShootingSaucer:
     float  targetFCycleSaucer>
 
 <new_saucer: string saucerName, float x, float y, float destx, float desty, float fcycle> : ShootingSaucer
-    new_saucer.saucer = [new_sprite: image="introherbert/saucer.png" x=x y=y curframe=0.0 framespeed=0.0 nbframes=1.0]
-    new_saucer.laserBeam = [new_sprite: image="introherbert/laser.png" x=35.0 y=25.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
+    new_saucer.saucer = [new_sprite: image="saucer.png" x=x y=y curframe=0.0 framespeed=0.0 nbframes=1.0]
+    new_saucer.laserBeam = [new_sprite: image="laser.png" x=35.0 y=25.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
     new_saucer.laserBeam.parent = saucerName
     new_saucer.showLaser = 0
     new_saucer.autoShoot = 0

@@ -1,0 +1,32 @@
+<flying_saucer_init>
+  float @flying_saucer_PuyoAgitation = 8.0 # lower is less
+  float @flying_saucer_SaucerXMovement = 1.0
+  float @flying_saucer_SaucerY = 165.0
+  int   @flying_saucer_CanSwitchSaucerY = 1
+
+  # Init function: called when script is loaded
+  Display @flying_saucer_display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+
+  Sprite @flying_saucer_saucer  = [new_sprite_simple: image="saucer.png" x=-150.0 y=@flying_saucer_SaucerY]
+ 
+
+<flying_saucer_sprite_list>
+  sprite::@flying_saucer_saucer display=@flying_saucer_display
+
+<flying_saucer_update>
+  @flying_saucer_saucer.pos.x += @flying_saucer_SaucerXMovement
+  @flying_saucer_saucer.pos.y = @flying_saucer_SaucerY + [sin: value = (@fcycle/5.0)]*5.
+  (@flying_saucer_saucer.pos.x < -150.0)? {
+    @flying_saucer_SaucerXMovement = 1.0
+    @flying_saucer_CanSwitchSaucerY = 1
+  }
+  (@flying_saucer_saucer.pos.x > 700.0)? {
+    @flying_saucer_SaucerXMovement = -1.0
+    (@flying_saucer_CanSwitchSaucerY = 1)? {
+      (@flying_saucer_SaucerY = 165.0)? @flying_saucer_SaucerY = 200.0
+      (@flying_saucer_SaucerY = 100.0)? @flying_saucer_SaucerY = 165.0
+      (@flying_saucer_SaucerY = 235.0)? @flying_saucer_SaucerY = 100.0
+      (@flying_saucer_SaucerY = 200.0)? @flying_saucer_SaucerY = 235.0
+      @flying_saucer_CanSwitchSaucerY = 0
+    }
+  }

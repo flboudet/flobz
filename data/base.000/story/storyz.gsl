@@ -13,7 +13,7 @@
   int @kaoriAngry = 2
   int @kaoriState = @kaoriIdle
 
-  string @txt1 = "I am an unmapped monster\nand you desserve to die!"
+  string @txt1 = "I am an unmapped monster\nand you deserve to die!"
   string @txt2 = "Prepare to face\nyour doom!"
 
   int @balloonExposure = 100

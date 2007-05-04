@@ -1,10 +1,7 @@
+import <flying_flobo.gsl>
+import <flying_saucer.gsl>
+
 <init>
-  float @TitleDisplayXBase = 120.0
-  float @TitleDisplayYBase = -80.0
-
-  float @AmplitudeWaveTitle = 20.
-  float @PeriodFactorTitle = 5.
-
   float @BigPuyoDelay = 200.
   float @BigPuyoShowAfter = @BigPuyoDelay
   int   @ShowBigPuyo = 0
@@ -13,49 +10,20 @@
 
   # Init function: called when script is loaded
   Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
-  Display @titledisplay = [new_display: x=@TitleDisplayXBase y=@TitleDisplayYBase width=640.0 height=480.0]
 
-  Sprite @bg      = [new_sprite_simple: image="introherbert/bg_intro3.jpg" x=0.0 y=0.0]
-  Sprite @f =  [new_sprite: image="title/F.png" x=0.0 y=100.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
-  Sprite @l =  [new_sprite: image="title/L.png" x=80.0 y=120.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
-  Sprite @o =  [new_sprite: image="title/O.png" x=120.0 y=180.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
-  Sprite @b =  [new_sprite: image="title/B.png" x=170.0 y=120.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
-  Sprite @o2 = [new_sprite: image="title/O2.png" x=220.0 y=180.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
-  Sprite @p =  [new_sprite: image="title/P.png" x=260.0 y=110.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
-  Sprite @u =  [new_sprite: image="title/U.png" x=310.0 y=180.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
-  Sprite @y =  [new_sprite: image="title/Y.png" x=310.0 y=180.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
-  Sprite @o3 = [new_sprite: image="title/O3.png" x=420.0 y=190.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @kaori = [new_sprite: image="kaori_title/kaori_title.png" x = -300.0 y=70.0 curframe=0.0 framespeed=0.15 nbframes=2.0]
   Sprite @kaorieyes = [new_sprite: image="kaori_title/kaori_title_eyesclosed.png" x = 92.0 y=83.0 curframe=0.0 framespeed=0.4 nbframes=40.0]
-  Sprite @bigpuyo = [new_sprite: image="happypuyo.png" x = 500.0 y=480.0 curframe=0.0 framespeed=0.15 nbframes=1.0]
-
-  // Defines a sprite graph (just for exmple purpose, to be removed!)
-  /*
-  @f.parent =  "@kaori"
-  @l.parent =  "@kaori"
-  @o.parent =  "@kaori"
-  @b.parent =  "@kaori"
-  @o2.parent = "@kaori"
-  @p.parent =  "@f"
-  @u.parent =  "@kaori"
-  @y.parent =  "@kaori"
-  @o3.parent = "@kaori"
-  */
   @kaorieyes.parent = "@kaori"
+  Sprite @bigpuyo = [new_sprite: image="happypuyo.png" x = 500.0 y=480.0 curframe=0.0 framespeed=0.15 nbframes=1.0]
+  
+  flying_saucer_init
+  flying_flobo_init
 
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
   # This also allows you to specify the drawing order
-  #sprite::@bg display=@display
-  sprite::@f display=@titledisplay
-  sprite::@l display=@titledisplay
-  sprite::@o display=@titledisplay
-  sprite::@b display=@titledisplay
-  sprite::@o2 display=@titledisplay
-  sprite::@p display=@titledisplay
-  sprite::@u display=@titledisplay
-  sprite::@y display=@titledisplay
-  sprite::@o3 display=@titledisplay
+  flying_saucer_sprite_list
+  flying_flobo_sprite_list
   sprite::@kaori display=@display
   sprite::@kaorieyes display=@display
   sprite::@bigpuyo display=@display
@@ -71,18 +39,8 @@
   @kaorieyes.image = "null.png"
   (@kaorieyes.curframe > 39.0)? @kaorieyes.image = "kaori_title/kaori_title_eyesclosed.png"
 
-  @f.pos.y = 100. + [sin: value = (@fcycle/@PeriodFactorTitle)]*@AmplitudeWaveTitle
-  @l.pos.y = 120. + [sin: value = (@fcycle/@PeriodFactorTitle+0.2)]*@AmplitudeWaveTitle
-  @o.pos.y = 180. + [sin: value = (@fcycle/@PeriodFactorTitle+0.4)]*@AmplitudeWaveTitle
-  @b.pos.y = 120. + [sin: value = (@fcycle/@PeriodFactorTitle+0.6)]*@AmplitudeWaveTitle
-  @o2.pos.y = 180. + [sin: value = (@fcycle/@PeriodFactorTitle+0.8)]*@AmplitudeWaveTitle
-  @p.pos.y = 110. + [sin: value = (@fcycle/@PeriodFactorTitle+1.0)]*@AmplitudeWaveTitle
-  @u.pos.y = 180. + [sin: value = (@fcycle/@PeriodFactorTitle+1.2)]*@AmplitudeWaveTitle
-  @y.pos.y = 180. + [sin: value = (@fcycle/@PeriodFactorTitle+1.4)]*@AmplitudeWaveTitle
-  @o3.pos.y = 190. + [sin: value = (@fcycle/@PeriodFactorTitle+1.6)]*@AmplitudeWaveTitle
-
-  @titledisplay.x = @TitleDisplayXBase + [sin: value = (@fcycle/30.0)]*40.
-  @titledisplay.y = @TitleDisplayYBase + [sin: value = (@fcycle/30.0)+1.57]*10.
+  flying_saucer_update
+  flying_flobo_update
 
   (@BigPuyoShowAfter <= @fcycle)? {
     @ShowBigPuyo = 1

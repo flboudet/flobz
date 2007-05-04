@@ -1,0 +1,47 @@
+<flying_flobo_init>
+  float @flying_flobo_TitleDisplayXBase = 120.0
+  float @flying_flobo_TitleDisplayYBase = -80.0
+
+  float @flying_flobo_AmplitudeWaveTitle = 20.0
+  float @flying_flobo_PeriodFactorTitle  =  5.0
+
+  # Init function: called when script is loaded
+  Display @flying_flobo_titledisplay = [new_display: x=@flying_flobo_TitleDisplayXBase y=@flying_flobo_TitleDisplayYBase width=640.0 height=480.0]
+
+  Sprite @flying_flobo_f  = [new_sprite: image="title/F.png"  x=0.0   y=100.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @flying_flobo_l  = [new_sprite: image="title/L.png"  x=80.0  y=120.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @flying_flobo_o  = [new_sprite: image="title/O.png"  x=120.0 y=180.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @flying_flobo_b  = [new_sprite: image="title/B.png"  x=170.0 y=120.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @flying_flobo_o2 = [new_sprite: image="title/O2.png" x=220.0 y=180.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @flying_flobo_p  = [new_sprite: image="title/P.png"  x=260.0 y=110.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @flying_flobo_u  = [new_sprite: image="title/U.png"  x=310.0 y=180.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @flying_flobo_y  = [new_sprite: image="title/Y.png"  x=310.0 y=180.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @flying_flobo_o3 = [new_sprite: image="title/O3.png" x=420.0 y=190.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+
+<flying_flobo_sprite_list>
+  # Call the 'sprite' function for each sprite you want to update/draw
+  # This also allows you to specify the drawing order
+  sprite::@flying_flobo_f  display = @flying_flobo_titledisplay
+  sprite::@flying_flobo_l  display = @flying_flobo_titledisplay
+  sprite::@flying_flobo_o  display = @flying_flobo_titledisplay
+  sprite::@flying_flobo_b  display = @flying_flobo_titledisplay
+  sprite::@flying_flobo_o2 display = @flying_flobo_titledisplay
+  sprite::@flying_flobo_p  display = @flying_flobo_titledisplay
+  sprite::@flying_flobo_u  display = @flying_flobo_titledisplay
+  sprite::@flying_flobo_y  display = @flying_flobo_titledisplay
+  sprite::@flying_flobo_o3 display = @flying_flobo_titledisplay
+
+<flying_flobo_update>
+  # Update function: called every animation cycle
+  @flying_flobo_f.pos.y  = 100. + [sin: value = (@fcycle/@flying_flobo_PeriodFactorTitle)]*@flying_flobo_AmplitudeWaveTitle
+  @flying_flobo_l.pos.y  = 120. + [sin: value = (@fcycle/@flying_flobo_PeriodFactorTitle+0.2)]*@flying_flobo_AmplitudeWaveTitle
+  @flying_flobo_o.pos.y  = 180. + [sin: value = (@fcycle/@flying_flobo_PeriodFactorTitle+0.4)]*@flying_flobo_AmplitudeWaveTitle
+  @flying_flobo_b.pos.y  = 120. + [sin: value = (@fcycle/@flying_flobo_PeriodFactorTitle+0.6)]*@flying_flobo_AmplitudeWaveTitle
+  @flying_flobo_o2.pos.y = 180. + [sin: value = (@fcycle/@flying_flobo_PeriodFactorTitle+0.8)]*@flying_flobo_AmplitudeWaveTitle
+  @flying_flobo_p.pos.y  = 110. + [sin: value = (@fcycle/@flying_flobo_PeriodFactorTitle+1.0)]*@flying_flobo_AmplitudeWaveTitle
+  @flying_flobo_u.pos.y  = 180. + [sin: value = (@fcycle/@flying_flobo_PeriodFactorTitle+1.2)]*@flying_flobo_AmplitudeWaveTitle
+  @flying_flobo_y.pos.y  = 180. + [sin: value = (@fcycle/@flying_flobo_PeriodFactorTitle+1.4)]*@flying_flobo_AmplitudeWaveTitle
+  @flying_flobo_o3.pos.y = 190. + [sin: value = (@fcycle/@flying_flobo_PeriodFactorTitle+1.6)]*@flying_flobo_AmplitudeWaveTitle
+
+  @flying_flobo_titledisplay.x = @flying_flobo_TitleDisplayXBase + [sin: value = (@fcycle/30.0)]*40.
+  @flying_flobo_titledisplay.y = @flying_flobo_TitleDisplayYBase + [sin: value = (@fcycle/30.0)+1.57]*10.
