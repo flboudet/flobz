@@ -1,4 +1,4 @@
-FILES="mansion_front.png" "mansion.png" "orloff_far.png"
+FILES="mansion_front.png" "orloff_far.png" "mansion.png" 
 
 DIRECTORIES=
 

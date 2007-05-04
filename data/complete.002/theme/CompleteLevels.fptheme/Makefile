@@ -1,4 +1,4 @@
-FILES="farm-background.jpg" "Description.gsl" "forest-background.jpg" "mansion-background.jpg"
+FILES="mansion-background.jpg" "farm-background.jpg" "Description.gsl" "forest-background.jpg" 
 
 DIRECTORIES=
 

@@ -1,4 +1,4 @@
-FILES="tears1.png" "tears2.png" "sadeyes.png" "evileyes.png" "happymouth.png" "sadmouth.png" "orloff.png"
+FILES="sadeyes.png" "happymouth.png" "tears1.png" "tears2.png" "sadmouth.png" "evileyes.png" "orloff.png" 
 
 DIRECTORIES=
 

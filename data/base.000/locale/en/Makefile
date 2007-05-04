@@ -1,4 +1,4 @@
-FILES=main.dic
+FILES="main.dic" 
 
 DIRECTORIES=
 

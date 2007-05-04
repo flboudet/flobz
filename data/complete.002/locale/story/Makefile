@@ -1,5 +1,5 @@
 FILES=
 
-DIRECTORIES="fr"
+DIRECTORIES="fr" 
 
 include ${SOURCE_DATADIR}/Datarules.mk
