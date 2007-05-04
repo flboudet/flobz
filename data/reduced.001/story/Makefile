@@ -1,4 +1,4 @@
-FILES="interlevel.gsl" "levels.gsl" 
+FILES="story1.gsl" "story2.gsl" "story3.gsl" "story4.gsl" "story5.gsl" "story6.gsl" "story7.gsl" "story8.gsl" "interlevel.gsl" "story9.gsl" "levels.gsl" 
 
 DIRECTORIES=
 

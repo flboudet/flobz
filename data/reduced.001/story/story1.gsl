@@ -1,0 +1,14 @@
+import <interlevel.gsl>
+
+<init>
+  init_lib: enemy=1.0
+  @peak.pos.y=0.0
+  @kaori.pos.y=0.0
+  
+<sprite_list>
+  sprite_list_lib
+  
+<update>
+    move::@kaori fcycle=90.0  x=@KaoriLeft y=@picHeight-@marges-@enemy*(@marges+@icons)
+    move::@peak fcycle=90.0  x=0.0 y=@displayV - @picHeight
+    (@cycle = 180)? @finished = 1
