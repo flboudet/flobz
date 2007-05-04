@@ -236,6 +236,7 @@ void styrolyse_reload(Styrolyse *_this)
     if (!_this->gsl) return;
     fbuffer = gsl_init_buffer(scriptPath);
     gsl_append_file_to_buffer(_this->fname, &fbuffer);
+    styrolyse = _this;
     gsl_compile(_this->gsl,fbuffer);
     sbind(_this->gsl);
     free(fbuffer);
