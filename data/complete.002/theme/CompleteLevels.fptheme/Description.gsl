@@ -54,5 +54,6 @@
     level.background    = "mansion"
     level.speedmeter_x = 320
     level.speedmeter_y = 130
+    level.grid          = "mansion"
 [end_level]
 

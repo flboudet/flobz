@@ -1,0 +1,53 @@
+<init>
+  # Init function: called when script is loaded
+  Display @display  = [new_display: x=262.0 y=196.0 width=140.0 height=220.0]
+
+  Sprite @orloff = [new_sprite: image="orloff/orloff.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @eyes   = [new_sprite: image="null.png" x=38.0 y=29.0 curframe=0.0 framespeed=0.1 nbframes=10.0]
+  Sprite @mouth  = [new_sprite: image="null.png" x=53.0 y=68.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @tears  = [new_sprite: image="null.png" x=23.0 y=47.0 curframe=0.0 framespeed=0.4 nbframes=6.0]
+
+<sprite_list>
+  # Call the 'sprite' function for each sprite you want to update/draw
+  # This also allows you to specify the drawing order
+  sprite::@orloff display=@display
+  sprite::@eyes display=@display
+  sprite::@mouth display=@display
+  sprite::@tears display=@display
+
+  @eyes.parent = "@orloff"
+  @mouth.parent = "@orloff"
+  @tears.parent = "@orloff"
+
+<update>
+
+  # Choose music file
+  (@maxHeightPlayer < 7)? (@maxHeightAI < 7)?  music: file="flobopuyo_game1.xm"
+  
+  (@maxHeightPlayer > 7)? music: file="flobopuyo_game2.xm"
+  (@maxHeightAI     > 7)? music: file="flobopuyo_game2.xm"
+ 
+  # Update function: called every animation cycle
+  int showTears = 0
+  @eyes.image = "null.png" # Mettre image yeux ouverts
+  @mouth.image = "null.png"
+  (@maxHeightPlayer > 8)? @mouth.image = "orloff/happymouth.png"
+  (@neutralsForPlayer > 6)? @mouth.image = "orloff/happymouth.png"
+
+  (@neutralsForPlayer > 10)? @eyes.image = "orloff/evileyes.png"
+  (@maxHeightPlayer > 10)? @eyes.image = "orloff/evileyes.png"
+
+  (@maxHeightAI   > 7)? @eyes.image = "orloff/sadeyes.png"
+  (@maxHeightAI > 10)? {
+    showTears = 1
+    @mouth.image = "orloff/sadmouth.png"
+  }
+  (@neutralsForAI > 6)? @eyes.image = "orloff/sadeyes.png"
+  (@neutralsForAI > 12)? showTears = 1
+  (@eyes.curframe > 9.0)? @eyes.image = "orloff/sadeyes.png"
+  @tears.image = "null.png"
+  (showTears = 1)? {
+    (@tears.curframe > 4.0)? @tears.image = "orloff/tears1.png"
+    (@tears.curframe > 5.0)? @tears.image = "orloff/tears2.png"
+  }
+

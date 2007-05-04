@@ -1,0 +1,31 @@
+<init>
+  Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+
+  // Init function: called when script is loaded
+  Sprite @sky     = [new_sprite_simple: image="introlevel/skynight.jpg" x=0.0 y=0.0]
+  Sprite @mansion = [new_sprite_simple: image="introorloff/mansion.png" x=0.0 y=480.0]
+  Sprite @mansion_front = [new_sprite_simple: image="introorloff/mansion_front.png" x=0.0 y=0.0]
+  Sprite @orloff  = [new_sprite_simple: image="introorloff/orloff_far.png" x=-30.0 y=250.0]
+  @orloff.parent = "@mansion"
+  @mansion_front.parent = "@mansion"
+
+<sprite_list>
+  // Call the 'sprite' function for each sprite you want to update/draw
+  // This also allows you to specify the drawing order
+  sprite::@sky display=@display
+  sprite::@mansion display=@display
+  (@fcycle<=300.0) ? sprite::@orloff display=@display
+  sprite::@mansion_front display=@display
+  (@fcycle>300.0) ? sprite::@orloff display=@display
+
+<update>
+  // Update function: called every animation cycle
+  move::@mansion  fcycle=200.0 x=0.0 y=0.0
+  (@fcycle>150.0) ?
+    (@fcycle<300.0) ?
+      move::@orloff  fcycle=300.0 x=300.0 y=190.0
+  (@fcycle>300.0) ?
+    move::@orloff  fcycle=400.0 x=200.0 y=160.0
+
+  (@fcycle > 600.0)? @finished = 1
+

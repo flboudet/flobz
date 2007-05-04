@@ -1,3 +1,4 @@
+# Level 1: Herbert the Dog
 [start_level]
     level.levelName           = "Kaori vs the Men's Best Friend"
     level.introStory          = "introherbert.gsl"
@@ -13,6 +14,7 @@
     level.hardSetting.level   = 130
 [end_level]
 
+# Level 2: Duke Beary
 [start_level]
     level.levelName           = "An unfriendly encounter"
     level.opponentStory       = "story2.gsl"
@@ -27,10 +29,13 @@
     level.hardSetting.level   = 100
 [end_level]
 
+# Level 3: Orloff the Vampire
 [start_level]
-    level.levelName           = "The Unmapped Level"
-    level.opponentStory       = "storyz.gsl"
-    level.opponentName        = "Unmapped Monster"
+    level.levelName           = "The Vampire's Plumber"
+    level.opponentStory       = "storyorloff.gsl"
+    level.opponentName        = "Orloff"
+    level.opponentFace        = "orloff.gsl"
+    level.backgroundTheme     = "The mansion"
     level.easySetting.type    = "FLOBO"
     level.easySetting.level   = 250
     level.mediumSetting.type  = "TANIA"
