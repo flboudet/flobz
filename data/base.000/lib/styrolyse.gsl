@@ -83,13 +83,9 @@ struct <Display:
 
 <move: Sprite &this, float fcycle, float x, float y>
   (fcycle > &this.dcycle)? (&this.dcycle <= @fcycle)? {
-        &this.dest.x = x
-        &this.dest.y = y
-        &this.dcycle = fcycle
-  }
-  (fcycle <= @fcycle)? {
-        &this.pos.x = x
-        &this.pos.y = y
+    &this.dest.x = x
+    &this.dest.y = y
+    &this.dcycle = fcycle
   }
 
 external <put_text: string text, Vec2 pos, float text_index>
@@ -113,7 +109,7 @@ external <sound: string file, float volume>
 <sprite: Sprite &this, Display display>
   float diff = &this.dcycle - @fcycle
   (@mode = UPDATE)? {
-    (diff >= 1.0)? {
+    (diff > 0.0)? {
       Vec2 speed = (&this.dest - &this.pos)
       speed.x   /= diff
       speed.y   /= diff
