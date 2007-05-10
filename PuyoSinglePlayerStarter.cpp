@@ -267,7 +267,7 @@ PuyoGameOver1PScreen::~PuyoGameOver1PScreen()
 
 SinglePlayerStarterAction::SinglePlayerStarterAction(int difficulty, PuyoSingleNameProvider *nameProvider)
     : currentLevel(0), lifes(3), difficulty(difficulty), levelData(NULL),
-      story(NULL), gameScreen(NULL), gameLostWidget(NULL), gameOverScreen(NULL),
+      story(NULL), gameScreen(NULL), gameLostWidget(NULL), gameOverScreen(NULL), gameWonScreen(NULL),
       nameProvider(nameProvider), levelDefinitions(theCommander->getDataPathManager().getPath("/story/levels.gsl")),
       inIntroduction(false) {}
 
@@ -289,25 +289,35 @@ void SinglePlayerStarterAction::action()
         }
         else
             currentLevel++;
+        
+        // Gameover management
         if (lifes < 0) {
             if (gameOverScreen == NULL)
                 gameOver();
             else {
-                lifes = 3;
-                currentLevel = 0;
                 endGameSession();
             }
         }
         else {
-            nextLevel();
+            // Game won management
+            if (levelDefinitions.getNumLevels() <= currentLevel) {
+                if (this->gameWonScreen == NULL)
+                    gameWon();
+                else {
+                    if (gameOverScreen == NULL)
+                        gameOver();
+                    else
+                        endGameSession();
+                }
+            }
+            else
+                nextLevel();
         }
     }
     else {
         if (gameOverScreen == NULL)
             gameOver();
         else {
-            lifes = 3;
-            currentLevel = 0;
             endGameSession();
         }
     }
@@ -354,16 +364,28 @@ void SinglePlayerStarterAction::nextLevel()
 {
     PuyoSingleGameLevelData *tempLevelData = new PuyoSingleGameLevelData(currentLevel, difficulty, levelDefinitions);
     story = new PuyoStoryScreen(tempLevelData->getStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
-    endGameSession();
+    resetGameSession();
     levelData = tempLevelData;
     GameUIDefaults::SCREEN_STACK->push(story);
 }
 
 void SinglePlayerStarterAction::gameOver()
 {
-    gameOverScreen = new PuyoGameOver1PScreen(levelData->getGameOverStory(), *(GameUIDefaults::SCREEN_STACK->top()), this, gameWidget->getPlayerOneName(), gameWidget->getPointsPlayerOne());
+    String gameOverStory;
+    if (gameWonScreen == NULL)
+        gameOverStory = levelData->getGameOverStory();
+    else
+        gameOverStory = "gamewon_highscores_1p.gsl";
+    gameOverScreen = new PuyoGameOver1PScreen(gameOverStory, *(GameUIDefaults::SCREEN_STACK->top()), this, gameWidget->getPlayerOneName(), gameWidget->getPointsPlayerOne());
     GameUIDefaults::SCREEN_STACK->pop();
     GameUIDefaults::SCREEN_STACK->push(gameOverScreen);
+}
+
+void SinglePlayerStarterAction::gameWon()
+{
+    gameWonScreen = new PuyoStoryScreen("gamewon_1p.gsl", *(GameUIDefaults::SCREEN_STACK->top()), this);
+    GameUIDefaults::SCREEN_STACK->pop();
+    GameUIDefaults::SCREEN_STACK->push(gameWonScreen);
 }
 
 void SinglePlayerStarterAction::gameLost()
@@ -375,6 +397,15 @@ void SinglePlayerStarterAction::gameLost()
 
 void SinglePlayerStarterAction::endGameSession()
 {
+    // Restore initial values to the reused action
+    lifes = 3;
+    currentLevel = 0;
+    resetGameSession();
+}
+    
+void SinglePlayerStarterAction::resetGameSession()
+{
+    // Rewind screen stack
     Screen *screenToTrans = GameUIDefaults::SCREEN_STACK->top();
     GameUIDefaults::SCREEN_STACK->pop();
     (static_cast<PuyoRealMainScreen *>(GameUIDefaults::SCREEN_STACK->top()))->transitionFromScreen(*screenToTrans);
@@ -385,11 +416,14 @@ void SinglePlayerStarterAction::endGameSession()
         delete gameLostWidget;
     if (gameOverScreen != NULL)
         delete gameOverScreen;
+    if (gameWonScreen != NULL)
+        delete gameWonScreen;
 
     gameScreen = NULL;
     gameWidget = NULL;
     levelData = NULL;
     gameLostWidget = NULL;
     gameOverScreen = NULL;
+    gameWonScreen = NULL;
 }
 

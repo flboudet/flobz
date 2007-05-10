@@ -92,6 +92,7 @@ public:
     };
     PuyoLevelDefinitions(String levelDefinitionFile);
     LevelDefinition *getLevelDefinition(int levelNumber) { return levelDefinitions[levelNumber]; }
+    int getNumLevels() const { return levelDefinitions.size(); }
     virtual ~PuyoLevelDefinitions();
 private:
     void addLevelDefinition(String levelName, String introStory,
@@ -153,6 +154,10 @@ private:
     
     void gameOver();
     
+    void gameWon();
+    
+    void resetGameSession();
+    
     void endGameSession();
     
     int currentLevel, lifes, difficulty;
@@ -162,6 +167,7 @@ private:
     PuyoSinglePlayerGameWidget *gameWidget;
     PuyoStoryWidget *gameLostWidget;
     PuyoGameOver1PScreen *gameOverScreen;
+    PuyoStoryScreen *gameWonScreen;
     PuyoSingleNameProvider *nameProvider;
     PuyoLevelDefinitions levelDefinitions;
     bool inIntroduction;

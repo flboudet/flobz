@@ -1,0 +1,107 @@
+struct <HiScoreBoxPosition:
+    int x,
+    int y,
+    int w,
+    int h>
+
+struct <ShootingSaucer:
+    Sprite saucer,
+    Sprite laserBeam,
+    int    showLaser,
+    float  targetFCycle,
+    int    autoShoot,
+    float  targetNextShoot,
+    float  initialX,
+    float  initialY,
+    float  destX,
+    float  destY,
+    float  deltaFCycleSaucer,
+    float  targetFCycleSaucer>
+
+<new_saucer: string saucerName, float x, float y, float destx, float desty, float fcycle> : ShootingSaucer
+    new_saucer.saucer = [new_sprite: image="saucer.png" x=x y=y curframe=0.0 framespeed=0.0 nbframes=1.0]
+    new_saucer.laserBeam = [new_sprite: image="laser.png" x=35.0 y=25.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
+    new_saucer.laserBeam.parent = saucerName
+    new_saucer.showLaser = 0
+    new_saucer.autoShoot = 0
+    new_saucer.initialX = x
+    new_saucer.initialY = y
+    new_saucer.destX = destx
+    new_saucer.destY = desty
+    new_saucer.deltaFCycleSaucer = fcycle
+    new_saucer.targetFCycleSaucer = fcycle
+
+<saucer: ShootingSaucer &this, Display display>
+  sprite::&this.saucer display=display
+  (&this.showLaser = 1) ? sprite::&this.laserBeam display=display
+
+<shoot_saucer: ShootingSaucer &this>
+  &this.showLaser = 1
+  &this.targetFCycle = @fcycle + 15.0
+
+<update_saucer: ShootingSaucer &this>
+  (@fcycle > &this.targetFCycle) ? {
+    &this.laserBeam.pos.x= 35.0
+    &this.laserBeam.pos.y = 25.0
+    &this.showLaser = 0
+  }
+  (@fcycle > &this.targetFCycleSaucer) ? {
+    &this.saucer.pos.x= &this.initialX
+    &this.saucer.pos.y = &this.initialY
+    &this.targetFCycleSaucer = @fcycle + &this.deltaFCycleSaucer
+  }
+  (&this.autoShoot = 1) ? {
+    (@fcycle > &this.targetNextShoot) ? {
+      &this.targetNextShoot = @fcycle + 20.0
+      shoot_saucer::&this
+    }
+  }
+  move::&this.laserBeam fcycle=&this.targetFCycle x=100.0 y=480.0
+  move::&this.saucer fcycle=&this.targetFCycleSaucer x=&this.destX y=&this.destY
+
+<autoshoot_saucer: ShootingSaucer &this>
+  shoot_saucer::&this
+  &this.autoShoot = 1
+  &this.targetNextShoot = @fcycle + 20.0
+  
+<init>
+  HiScoreBoxPosition   @hiScoreBox
+  @hiScoreBox.x = 180
+  @hiScoreBox.y = 180
+  @hiScoreBox.w = 300
+  @hiScoreBox.h = 230
+
+  # Init function: called when script is loaded
+  Display @screen = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+
+  Sprite @city = [new_sprite: image="city/city.jpg" x = 0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @buildings = [new_sprite: image="city/brokenbuildings.png" x = 0.0 y=480.0-448.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @hallOfFame = [new_sprite: image="hall-of-fame.png" x = 120.0 y=80.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+
+  ShootingSaucer  i
+  ShootingSaucer @saucer1 = [new_saucer: saucerName="@saucer1.saucer" x=-200.0 y=200.0 destx=700.0 desty=0.0 fcycle=150.0]
+  ShootingSaucer @saucer2 = [new_saucer: saucerName="@saucer2.saucer" x=-50.0 y=400.0 destx=850.0 desty=200.0 fcycle=150.0]
+  ShootingSaucer @saucer3 = [new_saucer: saucerName="@saucer3.saucer" x=-300.0 y=100.0 destx=500.0 desty=-100.0 fcycle=100.0]
+  ShootingSaucer @saucer4 = [new_saucer: saucerName="@saucer4.saucer" x=-300.0 y=400.0 destx=800.0 desty=0.0 fcycle=200.0]
+  #ShootingSaucer @saucer5 = [new_saucer: saucerName="@saucer5.saucer" x=-100.0 y=200.0 destx=700.0 desty=0.0 fcycle=100.0]
+  #ShootingSaucer @saucer6 = [new_saucer: saucerName="@saucer6.saucer" x=-100.0 y=200.0 destx=700.0 desty=0.0 fcycle=100.0]
+
+  for i in (@saucer1 @saucer2 @saucer3 @saucer4) do autoshoot_saucer::i
+
+<sprite_list>
+  # Call the 'sprite' function for each sprite you want to update/draw
+  # This also allows you to specify the drawing order
+  sprite::@city display=@screen
+  saucer::@saucer2 display=@screen
+  saucer::@saucer4 display=@screen
+  sprite::@buildings display=@screen
+  saucer::@saucer1 display=@screen
+  saucer::@saucer3 display=@screen
+  sprite::@hallOfFame display=@screen
+  
+
+<update>
+  # Update function: called every animation cycle
+  ShootingSaucer  i
+  for i in (@saucer1 @saucer2 @saucer3 @saucer4) do update_saucer::i
+

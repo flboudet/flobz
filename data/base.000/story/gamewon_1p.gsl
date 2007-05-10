@@ -1,0 +1,18 @@
+import <flying_flobo.gsl>
+
+<init>
+  # Init function: called when script is loaded
+  Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+  flying_flobo_init
+
+<sprite_list>
+  # Call the 'sprite' function for each sprite you want to update/draw
+  # This also allows you to specify the drawing order
+  flying_flobo_sprite_list
+
+<update>
+  # Update function: called every animation cycle
+
+  music: file="flobopuyo_menu.xm"
+  flying_flobo_update
+  (@cycle = 1000)? @finished = 1
