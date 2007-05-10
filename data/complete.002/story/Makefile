@@ -1,4 +1,4 @@
-FILES="dukebeary.gsl" "herbert.gsl" "storyherbert.gsl" "introherbert.gsl" "orloff.gsl" "storyorloff.gsl" "title_bg.gsl" "levels.gsl" 
+FILES="herbert.gsl" "dukebeary.gsl" "storyherbert.gsl" "introherbert.gsl" "orloff.gsl" "storyorloff.gsl" "levels.gsl" 
 
 DIRECTORIES=
 
