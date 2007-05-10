@@ -1,5 +1,4 @@
 import <flying_flobo.gsl>
-import <flying_saucer.gsl>
 
 <init>
   float @BigPuyoDelay = 200.
@@ -16,13 +15,11 @@ import <flying_saucer.gsl>
   @kaorieyes.parent = "@kaori"
   Sprite @bigpuyo = [new_sprite: image="happypuyo.png" x = 500.0 y=480.0 curframe=0.0 framespeed=0.15 nbframes=1.0]
   
-  flying_saucer_init
   flying_flobo_init
 
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
   # This also allows you to specify the drawing order
-  flying_saucer_sprite_list
   flying_flobo_sprite_list
   sprite::@kaori display=@display
   sprite::@kaorieyes display=@display
@@ -39,7 +36,6 @@ import <flying_saucer.gsl>
   @kaorieyes.image = "null.png"
   (@kaorieyes.curframe > 39.0)? @kaorieyes.image = "kaori_title/kaori_title_eyesclosed.png"
 
-  flying_saucer_update
   flying_flobo_update
 
   (@BigPuyoShowAfter <= @fcycle)? {

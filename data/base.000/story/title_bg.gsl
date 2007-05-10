@@ -1,14 +1,19 @@
+import <flying_saucer.gsl>
+
 <init>
   # Init function: called when script is loaded
   Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
   Sprite @bg = [new_sprite_simple: image="intro-main.jpg" x=0.0 y=0.0]
+  flying_saucer_init
 
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
   # This also allows you to specify the drawing order
   Sprite  i
   sprite::@bg display=@display
+  flying_saucer_sprite_list
 
 <update>
   # Update function: called every animation cycle
+  flying_saucer_update
   @finished = 1
