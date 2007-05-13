@@ -1,4 +1,4 @@
-FILES="skynight.jpg" "kaori-mini.png" "shadow-mini.png" "peak.png" "orloff-mini.png" "herbert-mini.png" 
+FILES="skynight.jpg" "kaori-mini.png" "shadow-mini.png" "peak.png" "orloff-mini.png" "herbert-mini.png" "unmapped-mini.png"
 
 DIRECTORIES=
 
