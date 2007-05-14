@@ -125,7 +125,7 @@ win-package: flobopuyo
 	cp flobopuyo.exe $(WINZIP_NAME)
 	cp COPYING $(WINZIP_NAME)
 	cp $(WINSDLRUNTIME)/*.dll $(WINZIP_NAME)
-	zip -r $(WINZIP_NAME) $(WINZIP_NAME)
+	zip -9 -r $(WINZIP_NAME) $(WINZIP_NAME)
 
 .PHONY: all clean iosfc_dir gametools_dir goomsl_dir
 

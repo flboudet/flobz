@@ -38,9 +38,9 @@ FRAMEWORKS_DIR=$(SYSTEM_ROOT)/Library/Frameworks
 # Win32 settings
 CYGWIN_VERSION=CYGWIN_NT-5.1
 WINZIP_NAME=flobopuyowin32
-WINSDLINCLUDE=/home/$(USER)/SDL-1.2.7/include
-WINSDLDEVLIBS=/home/$(USER)/SDL-1.2.7/lib
-WINSDLRUNTIME=/home/$(USER)/SDL-1.2.7/lib
+WINSDLINCLUDE=/home/$(USER)/SDL-1.2.11/include
+WINSDLDEVLIBS=/home/$(USER)/SDL-1.2.11/lib
+WINSDLRUNTIME=/home/$(USER)/SDL-1.2.11/lib
 #
 ##########
 
@@ -117,11 +117,11 @@ ifeq ($(PLATFORM), Darwin)
 	LDFLAGS:=$(LDFLAGS) -framework SDL -framework SDL_image -framework SDL_mixer -framework Cocoa
 else
 ifeq ($(PLATFORM), $(CYGWIN_VERSION))
-  	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_image -lSDL_mixer -lSDL -lSDLmain 
+  	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib1 -lpng12 -ltiff -lSDL_image -lSDL_mixer -lSDL -lSDLmain
 else
 
 ifeq ($(PLATFORM), crossmingw32)
-  	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib -lpng1 -lSDL_image -lSDL_mixer -lSDL -lSDLmain -lws2_32
+  	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib1 -lpng12 -ltiff -lSDL_image -lSDL_mixer -lSDL -lSDLmain -lws2_32
 else
 	SDL_CONFIG=sdl-config
 	CFLAGS:=$(CFLAGS) `$(SDL_CONFIG) --cflags`
