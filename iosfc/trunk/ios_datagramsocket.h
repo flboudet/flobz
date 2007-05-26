@@ -59,9 +59,10 @@ namespace ios_fc {
         virtual int available() const = 0;
         virtual void connect(SocketAddress addr, int portNum) = 0;
         virtual void disconnect() = 0;
-	virtual bool getConnected() = 0;
-	virtual SocketAddress getConnectedAddress() = 0;
-	virtual int getConnectedPortNum() = 0;
+        virtual bool getConnected() = 0;
+        virtual void joinGroup(SocketAddress groupAddress) = 0;
+        virtual SocketAddress getConnectedAddress() = 0;
+        virtual int getConnectedPortNum() = 0;
     };
     
     /// @brief Interface of a factory for DatagramSocketImpl.
@@ -81,11 +82,12 @@ namespace ios_fc {
         virtual void send(Datagram &sendDatagam);
         virtual Datagram receive(VoidBuffer buffer);
         virtual int available() const;
+        virtual void joinGroup(SocketAddress groupAddress);
         virtual void connect(SocketAddress addr, int portNum);
         virtual void disconnect();
-	virtual bool getConnected();
-	virtual SocketAddress getConnectedAddress();
-	virtual int getConnectedPortNum();
+        virtual bool getConnected();
+        virtual SocketAddress getConnectedAddress();
+        virtual int getConnectedPortNum();
         SocketAddress getBroadcastAddress() const;
         SocketAddress getSocketAddress() const;
         int getSocketPortNum() const;

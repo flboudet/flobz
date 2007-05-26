@@ -71,6 +71,11 @@ int DatagramSocket::available() const
     return impl->available();
 }
 
+void DatagramSocket::joinGroup(SocketAddress groupAddress)
+{
+    impl->joinGroup(groupAddress);
+}
+
 void DatagramSocket::connect(SocketAddress addr, int portNum)
 {
     impl->connect(addr, portNum);

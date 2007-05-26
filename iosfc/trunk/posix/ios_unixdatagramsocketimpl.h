@@ -45,6 +45,7 @@ namespace ios_fc {
         int available() const;
         void connect(SocketAddress addr, int portNum);
         void disconnect();
+        void joinGroup(SocketAddress groupAddress);
         SocketAddress getBroadcastAddress() const { return broadcastAddress; }
         SocketAddress getSocketAddress() const;
         int getSocketPortNum() const;
