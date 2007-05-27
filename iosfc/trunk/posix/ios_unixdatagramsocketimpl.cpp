@@ -159,7 +159,7 @@ void UnixDatagramSocketImpl::joinGroup(SocketAddress groupAddress)
 {
     struct ip_mreq mreq;
     UnixSocketAddressImpl *impl = dynamic_cast<UnixSocketAddressImpl *>(groupAddress.getImpl());
-    mreq.imr_interface.s_addr = INADDR_ANY;
+    mreq.imr_interface.s_addr = htonl(INADDR_ANY);
     mreq.imr_multiaddr.s_addr = htonl(impl->getAddress());
     setsockopt(socketFd, IPPROTO_IP,IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
 }
