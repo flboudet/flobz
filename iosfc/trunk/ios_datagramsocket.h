@@ -95,6 +95,8 @@ namespace ios_fc {
         
         // Selectable implementation
         SelectableImpl *getSelectableImpl() const;
+        // Datagram socket implementation
+        DatagramSocketImpl &getImpl() const { return *impl; }
         
         enum {
             NODEFINEDPORT=-1
