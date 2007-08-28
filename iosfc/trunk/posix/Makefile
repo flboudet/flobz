@@ -1,4 +1,4 @@
-SRCS=ios_unixdatagramsocketimpl.cpp ios_unixsocketaddressimpl.cpp ios_unixsocketimpl.cpp ios_unixthreadimpl.cpp ios_unixselectorimpl.cpp
+SRCS=ios_unixdatagramsocketimpl.cpp ios_unixsocketaddressimpl.cpp ios_unixsocketimpl.cpp ios_unixthreadimpl.cpp ios_unixselectorimpl.cpp ios_unixnetworkinterfacerequesterimpl.cpp
 
 OBJECTS=${SRCS:%.cpp=%.o}
 
