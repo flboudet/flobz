@@ -129,6 +129,7 @@ private:
 class PuyoGameOver1PScreen : public PuyoStoryScreen {
 public:
     PuyoGameOver1PScreen(String screenName, Screen &previousScreen, Action *finishedAction, String playerName, int playerPoints);
+    void refresh();
     virtual ~PuyoGameOver1PScreen();
 private:
     Text names[kHiScoresNumber], points[kHiScoresNumber];
@@ -136,6 +137,13 @@ private:
     HBox hiScoreBox;
     String playerName;
     int playerPoints;
+};
+
+class HallOfFameScreen : public PuyoGameOver1PScreen {
+    public:
+        HallOfFameScreen(Screen &previousScreen, Action *finishedAction)
+            : PuyoGameOver1PScreen("gamewon_highscores_1p.gsl",previousScreen,finishedAction,"NONE",-1)
+        {}
 };
 
 class SinglePlayerStarterAction : public Action {

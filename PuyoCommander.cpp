@@ -131,29 +131,96 @@ void PuyoRealMainScreen::onEvent(GameControlEvent *cevent)
     }
 }
 
+class PopHallOfFameAction : public Action
+{
+    public:
+        PopHallOfFameAction(PuyoRealMainScreen *mainScreen, Screen *fromScreen = NULL)
+            : mainScreen(mainScreen), fromScreen(fromScreen)
+        {}
+        void action() {
+            GameUIDefaults::SCREEN_STACK->pop();
+            mainScreen->transitionFromScreen(*fromScreen);
+        }
+        void setFromScreen(Screen *screen) {
+            fromScreen = screen;
+        }
+    private:
+        PuyoRealMainScreen *mainScreen;
+        Screen *fromScreen;
+};
+
+class PushHallOfFameAction : public Action
+{
+    public:
+        PushHallOfFameAction(HallOfFameScreen *storyScreen, Screen *fromScreen)
+            : storyScreen(storyScreen), fromScreen(fromScreen)
+        {}
+        void action() {
+            GameUIDefaults::SCREEN_STACK->push(storyScreen);
+            storyScreen->transitionFromScreen(*fromScreen);
+            storyScreen->refresh();
+        }
+        void setFromScreen(Screen *screen) {
+            fromScreen = screen;
+        }
+    private:
+        HallOfFameScreen *storyScreen;
+        Screen *fromScreen;
+};
+
+/// Main menu of the game
+///
+/// Contains buttons for 1P,2P,Option and Network menus.
 class MainRealMenu : public PuyoMainScreenMenu {
 public:
-    MainRealMenu(PuyoRealMainScreen * mainScreen)
-      : PuyoMainScreenMenu(mainScreen), localGameMenu(mainScreen),
-        local2PlayersGameMenu(mainScreen), optionMenu(mainScreen),
-        networkGameMenu(mainScreen), locale(theCommander->getDataPathManager(), "locale", "main"),
-        singlePlayerGameAction(&localGameMenu, mainScreen), twoPlayersGameAction(&local2PlayersGameMenu, mainScreen),
-        optionAction(&optionMenu, mainScreen), networkGameAction(&networkGameMenu, mainScreen),
+    MainRealMenu(PuyoRealMainScreen * mainScreen) :
+        // Create sub screens
+        PuyoMainScreenMenu(mainScreen),
+        localGameMenu     (mainScreen),
+        local2PlayersGameMenu(mainScreen),
+        optionMenu        (mainScreen),
+        networkGameMenu   (mainScreen),
+        popScreenAction(mainScreen),
+        hallOfFameScreen(*mainScreen,&popScreenAction),
+        // Load locale and create action for buttons
+        locale(theCommander->getDataPathManager(), "locale", "main"),
+        singlePlayerGameAction(&localGameMenu, mainScreen),
+        twoPlayersGameAction(&local2PlayersGameMenu, mainScreen),
+        optionAction(&optionMenu, mainScreen),
+        networkGameAction(&networkGameMenu, mainScreen),
+        hallOfFameAction(&hallOfFameScreen, mainScreen),
+        // Create buttons
         singlePlayerGameButton(locale.getLocalizedString(kSinglePlayerGame), &singlePlayerGameAction),
         twoPlayersGameButton(locale.getLocalizedString("Two Players Game"), &twoPlayersGameAction),
         optionButton(locale.getLocalizedString("Options"), &optionAction),
         networkGameButton(locale.getLocalizedString(kNetGame), &networkGameAction),
-        exitButton(locale.getLocalizedString(kExit), &exitAction) {}
+        hallOfFameButton(locale.getLocalizedString(kHighScores), &hallOfFameAction),
+        exitButton(locale.getLocalizedString(kExit), &exitAction)
+    {}
     void build();
+
 private:
-    LocalGameMenu localGameMenu;
+    LocalGameMenu         localGameMenu;
     Local2PlayersGameMenu local2PlayersGameMenu;
-    OptionMenu optionMenu;
-    NetworkGameMenu networkGameMenu;
+    OptionMenu            optionMenu;
+    NetworkGameMenu       networkGameMenu;
+    HallOfFameScreen      hallOfFameScreen;
     PuyoLocalizedDictionary locale;
-    PuyoPushMenuAction singlePlayerGameAction, twoPlayersGameAction, optionAction, networkGameAction;
+
+    PuyoPushMenuAction    singlePlayerGameAction;
+    PuyoPushMenuAction    twoPlayersGameAction;
+    PuyoPushMenuAction    optionAction;
+    PuyoPushMenuAction    networkGameAction;
+    PopHallOfFameAction   popScreenAction;
+    PushHallOfFameAction  hallOfFameAction;
     ExitAction exitAction;
-    Button singlePlayerGameButton, twoPlayersGameButton, optionButton, networkGameButton, exitButton;
+
+    Button singlePlayerGameButton;
+    Button twoPlayersGameButton;
+    Button optionButton;
+    Button networkGameButton;
+    Button hallOfFameButton;
+    Button exitButton;
 };
 
 void MainRealMenu::build() {
@@ -165,7 +232,9 @@ void MainRealMenu::build() {
   add(&twoPlayersGameButton);
   add(&optionButton);
   add(&networkGameButton);
+  add(&hallOfFameButton);
   add(&exitButton);
+  popScreenAction.setFromScreen(&hallOfFameScreen);
 }
 
 /**

@@ -199,11 +199,27 @@ const char *PuyoStoryWidget::getText(const char *text) const
     return localeDictionary->getLocalizedString(text);
 }
 
-PuyoStoryScreen::PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction, bool shouldAddTransition) : Screen(0, 0, 640, 480), storyWidget(screenName, finishedAction), finishedAction(finishedAction), transitionWidget(previousScreen, NULL)
+PuyoStoryScreen::PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction, bool shouldAddTransition) : Screen(0, 0, 640, 480), storyWidget(screenName, finishedAction), finishedAction(finishedAction), transitionWidget(new PuyoScreenTransitionWidget(previousScreen, NULL))
 {
     add(&storyWidget);
     if (shouldAddTransition)
-        add(&transitionWidget);
+        add(transitionWidget);
+}
+
+void PuyoStoryScreen::transitionFromScreen(Screen &fromScreen)
+{
+    if (transitionWidget != NULL) {
+        remove(transitionWidget);
+        delete(transitionWidget);
+    }
+    transitionWidget = new PuyoScreenTransitionWidget(fromScreen, NULL);
+    add(transitionWidget);
+//    Vec3 menuPos = container.getPosition();
+//    menuPos.x = MENU_X;
+//    menuPos.y = MENU_Y;
+//
+//    container.setPosition(menuPos);
+//    container.setSize(Vec3(menuBG->w, menuBG->h, 0));
 }
 
 PuyoStoryScreen::~PuyoStoryScreen()

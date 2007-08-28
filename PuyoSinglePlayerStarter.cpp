@@ -231,13 +231,8 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousSc
     
     initHiScores(AI_NAMES);
     int scorePlace = setHiScore(playerPoints, playerName);
-    hiscore *scores = getHiScores();
 
     for (int i = 0 ; i < kHiScoresNumber ; i++) {
-        char tmp[256];
-        sprintf(tmp, "%d", scores[i].score);
-        names[i].setValue(scores[i].name);
-        points[i].setValue(tmp);
         hiScoreNameBox.add(&names[i]);
         hiScorePointBox.add(&points[i]);
         if (i == scorePlace) {
@@ -250,9 +245,21 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousSc
     hiScoreBox.add(&hiScorePointBox);
     
     add(&hiScoreBox);
-    add(&transitionWidget);
+    add(transitionWidget);
+    refresh();
+}
+
+void PuyoGameOver1PScreen::refresh()
+{
+    hiscore *scores = getHiScores();
+    for (int i = 0 ; i < kHiScoresNumber ; i++) {
+        char tmp[256];
+        sprintf(tmp, "%d", scores[i].score);
+        names[i].setValue(scores[i].name);
+        points[i].setValue(tmp);
+    }
+
     Vec3 hiScorePos = hiScoreBox.getPosition();
-    
     hiScorePos.x = storyWidget.getIntegerValue("@hiScoreBox.x");
     hiScorePos.y = storyWidget.getIntegerValue("@hiScoreBox.y");
     hiScoreBox.setPosition(hiScorePos);
