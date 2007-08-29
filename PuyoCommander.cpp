@@ -6,6 +6,7 @@
 #include "preferences.h"
 #include "audio.h"
 #include "PuyoSinglePlayerStarter.h"
+#include "HallOfFame.h"
 
 #include "PuyoNetworkStarter.h"
 
@@ -131,43 +132,6 @@ void PuyoRealMainScreen::onEvent(GameControlEvent *cevent)
     }
 }
 
-class PopHallOfFameAction : public Action
-{
-    public:
-        PopHallOfFameAction(PuyoRealMainScreen *mainScreen, Screen *fromScreen = NULL)
-            : mainScreen(mainScreen), fromScreen(fromScreen)
-        {}
-        void action() {
-            GameUIDefaults::SCREEN_STACK->pop();
-            mainScreen->transitionFromScreen(*fromScreen);
-        }
-        void setFromScreen(Screen *screen) {
-            fromScreen = screen;
-        }
-    private:
-        PuyoRealMainScreen *mainScreen;
-        Screen *fromScreen;
-};
-
-class PushHallOfFameAction : public Action
-{
-    public:
-        PushHallOfFameAction(HallOfFameScreen *storyScreen, Screen *fromScreen)
-            : storyScreen(storyScreen), fromScreen(fromScreen)
-        {}
-        void action() {
-            GameUIDefaults::SCREEN_STACK->push(storyScreen);
-            storyScreen->transitionFromScreen(*fromScreen);
-            storyScreen->refresh();
-        }
-        void setFromScreen(Screen *screen) {
-            fromScreen = screen;
-        }
-    private:
-        HallOfFameScreen *storyScreen;
-        Screen *fromScreen;
-};
-
 /// Main menu of the game
 ///
 /// Contains buttons for 1P,2P,Option and Network menus.
@@ -204,7 +168,7 @@ private:
     Local2PlayersGameMenu local2PlayersGameMenu;
     OptionMenu            optionMenu;
     NetworkGameMenu       networkGameMenu;
-    HallOfFameScreen      hallOfFameScreen;
+    HallOfFameScreen      hallOfFameScreen; // Comes from PuyoSinglePlayerStarter.cpp
     PuyoLocalizedDictionary locale;
 
     PuyoPushMenuAction    singlePlayerGameAction;

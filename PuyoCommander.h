@@ -111,7 +111,6 @@ class PuyoCommander : public MessageListener
     bool useGL;
 };
 
-
 extern class PuyoCommander *theCommander;
 
 #endif // _PUYOCOMMANDER
