@@ -61,6 +61,7 @@ namespace ios_fc {
         virtual void disconnect() = 0;
         virtual bool getConnected() = 0;
         virtual void joinGroup(SocketAddress groupAddress) = 0;
+        virtual void setMulticastInterface(SocketAddress interfaceAddress) = 0;
         virtual SocketAddress getConnectedAddress() = 0;
         virtual int getConnectedPortNum() = 0;
     };
@@ -83,6 +84,7 @@ namespace ios_fc {
         virtual Datagram receive(VoidBuffer buffer);
         virtual int available() const;
         virtual void joinGroup(SocketAddress groupAddress);
+        virtual void setMulticastInterface(SocketAddress interfaceAddress);
         virtual void connect(SocketAddress addr, int portNum);
         virtual void disconnect();
         virtual bool getConnected();

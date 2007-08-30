@@ -76,6 +76,11 @@ void DatagramSocket::joinGroup(SocketAddress groupAddress)
     impl->joinGroup(groupAddress);
 }
 
+void DatagramSocket::setMulticastInterface(SocketAddress interfaceAddress)
+{
+    impl->setMulticastInterface(interfaceAddress);
+}
+
 void DatagramSocket::connect(SocketAddress addr, int portNum)
 {
     impl->connect(addr, portNum);

@@ -46,14 +46,15 @@ namespace ios_fc {
         void connect(SocketAddress addr, int portNum);
         void disconnect();
         void joinGroup(SocketAddress groupAddress);
+        virtual void setMulticastInterface(SocketAddress interfaceAddress);
         SocketAddress getBroadcastAddress() const { return broadcastAddress; }
         SocketAddress getSocketAddress() const;
         int getSocketPortNum() const;
         SelectableImpl *getSelectableImpl() { return this; }
         int getFd() { return socketFd; }
-	bool getConnected() { return isConnected; }
-	SocketAddress getConnectedAddress() { return connectedAddress; }
-	int getConnectedPortNum() { return connectedPort; }
+        bool getConnected() { return isConnected; }
+        SocketAddress getConnectedAddress() { return connectedAddress; }
+        int getConnectedPortNum() { return connectedPort; }
     private:
         int socketFd;
         struct sockaddr_in boundAddr;

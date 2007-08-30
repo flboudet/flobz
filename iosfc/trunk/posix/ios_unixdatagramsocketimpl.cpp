@@ -164,6 +164,14 @@ void UnixDatagramSocketImpl::joinGroup(SocketAddress groupAddress)
     setsockopt(socketFd, IPPROTO_IP,IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
 }
 
+void UnixDatagramSocketImpl::setMulticastInterface(SocketAddress interfaceAddress)
+{
+    UnixSocketAddressImpl *addrImpl = dynamic_cast<ios_fc::UnixSocketAddressImpl *>(interfaceAddress.getImpl());
+    in_addr_t interface_addr = htonl(addrImpl->getAddress());
+    if (setsockopt (socketFd, IPPROTO_IP, IP_MULTICAST_IF, &interface_addr, sizeof(in_addr)) != 0)
+        throw Exception("setMulticastInterface: setsockopt failed!\n");
+}
+
 SocketAddress UnixDatagramSocketImpl::getSocketAddress() const
 {
     struct sockaddr_in name;
