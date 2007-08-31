@@ -1,4 +1,5 @@
 <flying_saucer_init>
+  float @flying_saucer_SPEED = 100.0
   float @flying_saucer_PuyoAgitation = 8.0 # lower is less
   float @flying_saucer_SaucerXMovement = 1.0
   float @flying_saucer_SaucerY = 165.0
@@ -14,7 +15,7 @@
   sprite::@flying_saucer_saucer display=@flying_saucer_display
 
 <flying_saucer_update>
-  @flying_saucer_saucer.pos.x += @flying_saucer_SaucerXMovement
+  @flying_saucer_saucer.pos.x += @flying_saucer_SaucerXMovement * @delta_t * @flying_saucer_SPEED
   @flying_saucer_saucer.pos.y = @flying_saucer_SaucerY + [sin: value = (@fcycle/5.0)]*5.
   (@flying_saucer_saucer.pos.x < -150.0)? {
     @flying_saucer_SaucerXMovement = 1.0
