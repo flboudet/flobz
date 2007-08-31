@@ -214,12 +214,6 @@ void PuyoStoryScreen::transitionFromScreen(Screen &fromScreen)
     }
     transitionWidget = new PuyoScreenTransitionWidget(fromScreen, NULL);
     add(transitionWidget);
-//    Vec3 menuPos = container.getPosition();
-//    menuPos.x = MENU_X;
-//    menuPos.y = MENU_Y;
-//
-//    container.setPosition(menuPos);
-//    container.setSize(Vec3(menuBG->w, menuBG->h, 0));
 }
 
 PuyoStoryScreen::~PuyoStoryScreen()
