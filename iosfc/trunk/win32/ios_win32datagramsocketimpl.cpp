@@ -25,6 +25,7 @@
 
 #include "ios_win32datagramsocketimpl.h"
 #include "ios_win32socketaddressimpl.h"
+#include <ws2tcpip.h>
 
 namespace ios_fc {
 
@@ -137,6 +138,24 @@ void Win32DatagramSocketImpl::disconnect()
     connectAddr.sin_port = htons(0);
     ::connect(socketFd, (struct sockaddr *) &connectAddr, sizeof(connectAddr));
     isConnected = false;
+}
+
+void Win32DatagramSocketImpl::joinGroup(SocketAddress groupAddress)
+{
+    struct ip_mreq mreq;
+    Win32SocketAddressImpl *impl = dynamic_cast<Win32SocketAddressImpl *>(groupAddress.getImpl());
+    mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+    mreq.imr_multiaddr.s_addr = htonl(impl->getAddress());
+    setsockopt(socketFd, IPPROTO_IP,IP_ADD_MEMBERSHIP, (const char *) &mreq, sizeof(mreq));
+}
+
+void Win32DatagramSocketImpl::setMulticastInterface(SocketAddress interfaceAddress)
+{
+    Win32SocketAddressImpl *addrImpl = dynamic_cast<ios_fc::Win32SocketAddressImpl *>(interfaceAddress.getImpl());
+    in_addr interface_addr;
+    interface_addr.s_addr = htonl(addrImpl->getAddress());
+    if (setsockopt (socketFd, IPPROTO_IP, IP_MULTICAST_IF, (const char *) &interface_addr, sizeof(in_addr)) != 0)
+        throw Exception("setMulticastInterface: setsockopt failed!\n");
 }
 
 SocketAddress Win32DatagramSocketImpl::getSocketAddress() const

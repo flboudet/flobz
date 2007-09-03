@@ -1,4 +1,4 @@
-SRCS=ios_win32datagramsocketimpl.cpp ios_win32socketimpl.cpp ios_win32socketaddressimpl.cpp
+SRCS=ios_win32datagramsocketimpl.cpp ios_win32socketimpl.cpp ios_win32socketaddressimpl.cpp ios_win32networkinterfacerequesterimpl.cpp
 
 OBJECTS=${SRCS:%.cpp=%.o}
 
