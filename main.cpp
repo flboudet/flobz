@@ -59,16 +59,23 @@ static void displayExceptionMessage(const char * msg)
   cout << "You can report this problem to ios@ios-software.com" << endl;
 }
 
+static void help()
+{
+    cout << "usage: ./flobopuyo [options]" << endl;
+    cout << endl;
+    cout << "options are:" << endl;
+    cout << "  -win           enable windowed mode" << endl;
+    cout << "  -maxpack {n}   use data pack n (0..2)" << endl;
+    cout << endl;
+    cout << "(c)2007, by iOS-Software (G.Borios, F.Boudet, J.C.Hoelt)." << endl;
+    exit(0);
+}
+
 int main(int argc, char *argv[])
 {
     int i;
     String dataDir;
     int maxPackNumber = -1;
-    
-  if (!strcmp(argv[argc-1],"-h")) {
-      printf("-win for windowed mode.\n");
-    return 0;
-  }
     
 #ifdef MACOSX
 
@@ -86,6 +93,9 @@ int main(int argc, char *argv[])
     
     for (i=1; i<argc; i++)
     {
+        // Help
+        if ((strcmp(argv[i],"--help") == 0) || (strcmp(argv[i],"-h") == 0))
+            help();
         // Fullscreen option
         if (strcmp(argv[i],"-win") == 0) fs = false;
         // Max data pack option
