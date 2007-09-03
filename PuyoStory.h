@@ -71,6 +71,7 @@ private:
 class PuyoStoryScreen : public Screen {
 public:
     PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction = NULL, bool shouldAddTransition = true);
+    PuyoStoryScreen(String screenName);
     virtual ~PuyoStoryScreen();
     void onEvent(GameControlEvent *cevent);
     void transitionFromScreen(Screen &fromScreen);

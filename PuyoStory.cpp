@@ -206,6 +206,11 @@ PuyoStoryScreen::PuyoStoryScreen(String screenName, Screen &previousScreen, Acti
         add(transitionWidget);
 }
 
+PuyoStoryScreen::PuyoStoryScreen(String screenName) : Screen(0, 0, 640, 480), storyWidget(screenName, NULL), finishedAction(NULL), transitionWidget(NULL)
+{
+    add(&storyWidget);
+}
+
 void PuyoStoryScreen::transitionFromScreen(Screen &fromScreen)
 {
     if (transitionWidget != NULL) {

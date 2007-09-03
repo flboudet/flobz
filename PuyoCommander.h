@@ -69,6 +69,7 @@ class PuyoCommander : public MessageListener
   public:
     PuyoCommander(String dataDir, bool fullscreen, int maxDataPackNumber=-1);
     void run();
+    void debug_gsl(String gsl_script);
     void onMessage(Message &message);
 
     SoFont *smallFont;

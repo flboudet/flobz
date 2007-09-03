@@ -211,6 +211,14 @@ void SinglePlayerGameAction::action()
   GameUIDefaults::SCREEN_STACK->push(starter);*/
 }
 
+void PuyoCommander::debug_gsl(String gsl_script)
+{
+  GameUIDefaults::SCREEN_STACK->push(mainScreen);
+  PuyoStoryScreen story_screen(gsl_script);
+  GameUIDefaults::SCREEN_STACK->push(&story_screen);
+  GameUIDefaults::GAME_LOOP->run();
+}
+
 void PuyoCommander::run()
 {
   GameUIDefaults::SCREEN_STACK->push(mainScreen);

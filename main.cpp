@@ -90,6 +90,7 @@ int main(int argc, char *argv[])
 #endif
  
     bool fs = true;
+    const char *gsl_screen = NULL;
     
     for (i=1; i<argc; i++)
     {
@@ -103,16 +104,24 @@ int main(int argc, char *argv[])
             if (++i < argc)
                 maxPackNumber = atoi(argv[i]);
         }
+        if (strcmp(argv[i], "-gsl") == 0) {
+            if (++i < argc) 
+                gsl_screen = argv[i];
+        }
     }
     
     if (!FilePath(DATADIR).exists())
         dataDir = "data";
     else
         dataDir = DATADIR;
-            
+
     PuyoCommander commander(dataDir, fs, maxPackNumber);
-    
-    try { commander.run(); }
+    try {
+        if (gsl_screen != NULL)
+            commander.debug_gsl(gsl_screen);
+        else
+            commander.run();
+    }
     catch (Exception e) { displayExceptionMessage(e.what()); }
     catch (char * str) { displayExceptionMessage(str); }
     catch (String str) { displayExceptionMessage(str); }
