@@ -66,6 +66,7 @@ static void help()
     cout << "options are:" << endl;
     cout << "  -win           enable windowed mode" << endl;
     cout << "  -maxpack {n}   use data pack n (0..2)" << endl;
+    cout << "  -gsl {file}    launch a gsl script" << endl;
     cout << endl;
     cout << "(c)2007, by iOS-Software (G.Borios, F.Boudet, J.C.Hoelt)." << endl;
     exit(0);
