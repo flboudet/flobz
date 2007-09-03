@@ -29,6 +29,8 @@
 #include "ios_datagramsocket.h"
 #include "ios_udpmessagebox.h"
 #include "PuyoNetGameCenter.h"
+#include "ios_networkinterfacerequester.h"
+#include "ios_udpmessage.h"
 
 using namespace ios_fc;
 
@@ -58,6 +60,11 @@ private:
     PuyoGameInvitation grantedInvitation;
     int status;
     String opponentName;
+    
+    SocketAddress multicastAddress;
+    NetworkInterfaceRequester requester;
+    std::vector<NetworkInterface> networkInterfaces;
+    UDPPeerAddress mcastPeerAddress;
 };
 
 #endif // _PUYOLANGAMECENTER_H

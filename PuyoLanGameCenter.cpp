@@ -26,6 +26,8 @@
 #include "PuyoLanGameCenter.h"
 #include "ios_time.h"
 
+#define MULTICASTGROUP "224.0.0.247"
+
 using namespace ios_fc;
 
 enum {
@@ -40,8 +42,10 @@ enum {
 PuyoLanGameCenter::PuyoLanGameCenter(int portNum, const String name)
     : socket(portNum), mbox(&socket), name(name),
       timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages),
-      gameGranted(false), status(PEER_NORMAL)
+      gameGranted(false), status(PEER_NORMAL), multicastAddress(MULTICASTGROUP),
+      networkInterfaces(requester.getInterfaces()), mcastPeerAddress(multicastAddress, portNum)
 {
+    socket.joinGroup(multicastAddress);
     mbox.addListener(this);
     SessionManager &mboxSession = dynamic_cast<SessionManager &>(mbox);
     mboxSession.addSessionListener(this);
@@ -155,15 +159,19 @@ String PuyoLanGameCenter::getOpponentName()
 
 void PuyoLanGameCenter::sendAliveMessage()
 {
-    Message *msg = mbox.createMessage();
-    Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
-    dirMsg->setPeerAddress(dirMsg->getBroadcastAddress());
-
-    msg->addInt("CMD", PUYO_UDP_ALIVE);
-    msg->addString("NAME", name);
-    msg->addInt("STATUS", status);
-    msg->send();
-    delete msg;
+    for (int i = 0 ; i < networkInterfaces.size() ; i++) {
+        NetworkInterface &ifs = networkInterfaces[i];
+        socket.setMulticastInterface(ifs.getAddress());
+        Message *msg = mbox.createMessage();
+        Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
+        dirMsg->setPeerAddress(mcastPeerAddress);
+        
+        msg->addInt("CMD", PUYO_UDP_ALIVE);
+        msg->addString("NAME", name);
+        msg->addInt("STATUS", status);
+        msg->send();
+        delete msg;
+    }
 }
 
 void PuyoLanGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
