@@ -23,6 +23,9 @@
  *
  */
 
+#define TIME_BETWEEN_GAME_CYCLES 0.02
+#define TIME_TO_FINISH_GAME_WITH_BONUS 150.0
+
 #include "PuyoStarter.h"
 #include "PuyoView.h"
 #include "PuyoNetworkView.h"
@@ -147,8 +150,8 @@ void PuyoKillPlayerRightAction::action()
 }
 
 PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
-    : CycledComponent(0.02), associatedScreen(NULL), attachedLevelTheme(&levelTheme), areaA(&areaA), areaB(&areaB), controllerA(&controllerA), controllerB(&controllerB),
-      cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(500), tickCounts(0), paused(false), displayLives(true), lives(3),
+    : CycledComponent(TIME_BETWEEN_GAME_CYCLES), associatedScreen(NULL), attachedLevelTheme(&levelTheme), areaA(&areaA), areaB(&areaB), controllerA(&controllerA), controllerB(&controllerB),
+      cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(500), tickCounts(0), cycles(0), paused(false), displayLives(true), lives(3),
       gameOverAction(gameOverAction), abortedFlag(false), gameSpeed(0), blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
       playerOneName(p1name), playerTwoName(p2name), MinSpeed(10), MaxSpeed(50),
       killLeftAction(*this), killRightAction(*this), killLeftCheat("killleft", &killLeftAction), killRightCheat("killright", &killRightAction)
@@ -157,8 +160,8 @@ PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &con
 }
 
 PuyoGameWidget::PuyoGameWidget()
-    : CycledComponent(0.02), associatedScreen(NULL), cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(500),
-      tickCounts(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(0),
+    : CycledComponent(TIME_BETWEEN_GAME_CYCLES), associatedScreen(NULL), cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(500),
+      tickCounts(0), cycles(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(0),
       blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
       playerOneName(p1name), playerTwoName(p2name), MinSpeed(10), MaxSpeed(50),
       killLeftAction(*this), killRightAction(*this), killLeftCheat("killleft", &killLeftAction), killRightCheat("killright", &killRightAction)
@@ -214,6 +217,7 @@ void PuyoGameWidget::cycle()
 {
   if (!paused) {
     tickCounts++;
+    cycles++;
     
     // Controls
     controllerA->cycle();
@@ -343,24 +347,32 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
     int blinkingPointsA = 0; int blinkingPointsB = 0;
     char text[1024];
     
-    if ((blinkingPointsA % 2) == 0)
-        fontBl = theCommander->smallFont;
-    else
-        fontBl = theCommander->menuFont;
-    
     if (!paused) {
-        sprintf(text, "<< %d", attachedGameA->getPoints());
+        double time = TIME_TO_FINISH_GAME_WITH_BONUS - (double)cycles * TIME_BETWEEN_GAME_CYCLES;
+        if (time < 0.0) time = 0.0;
+        double min  = floor(time / 60.0);
+        double sec  = floor(time - min * 60.0);
+        sprintf(text, "%01.0f:%02.0f", min, sec);
+        fontBl = theCommander->menuFont;
         SoFont_CenteredString_XY (fontBl, display,
-                                  300, 380,   text, NULL);
-        
-        if ((blinkingPointsB % 2) == 0)
-            fontBl = theCommander->smallFont;
-        else
-            fontBl = theCommander->menuFont;
-        
-        sprintf(text, "%d >>", attachedGameB->getPoints());
-        SoFont_CenteredString_XY (fontBl, display,
-                                  340, 395, text, NULL);
+                                  320, 380,   text, NULL);
+    
+//    if ((blinkingPointsA % 2) == 0)
+//        fontBl = theCommander->smallFont;
+//    else
+//        fontBl = theCommander->menuFont;
+//        sprintf(text, "<< %d", attachedGameA->getPoints());
+//        SoFont_CenteredString_XY (fontBl, display,
+//                                  300, 380,   text, NULL);
+//        
+//        if ((blinkingPointsB % 2) == 0)
+//            fontBl = theCommander->smallFont;
+//        else
+//            fontBl = theCommander->menuFont;
+//        
+//        sprintf(text, "%d >>", attachedGameB->getPoints());
+//        SoFont_CenteredString_XY (fontBl, display,
+//                                  340, 395, text, NULL);
         
         // Rendering the player names
         SoFont *font = (paused?theCommander->darkFont:theCommander->menuFont);

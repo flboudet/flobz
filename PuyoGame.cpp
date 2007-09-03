@@ -45,13 +45,13 @@ PuyoRandomSystem::PuyoRandomSystem(unsigned long seed)
 
 PuyoState PuyoRandomSystem::getPuyoForSequence(int sequence)
 {
-	if (sequenceItems.size() <= sequence) {
-		int newItem = (genrand_int32() % 5) + PUYO_FALLINGBLUE;
-		sequenceItems.add(newItem);
-		return (PuyoState)newItem;
-	}
-	else
-		return (PuyoState)(sequenceItems[sequence]);
+    if (sequenceItems.size() <= sequence) {
+        int newItem = (genrand_int32() % 5) + PUYO_FALLINGBLUE;
+        sequenceItems.add(newItem);
+        return (PuyoState)newItem;
+    }
+    else
+        return (PuyoState)(sequenceItems[sequence]);
 }
 
 int PuyoPuyo::lastID = 0;
@@ -70,7 +70,7 @@ PuyoGame::PuyoGame(PuyoFactory *attachedFactory) : attachedFactory(attachedFacto
 
 void PuyoGame::setDelegate(PuyoDelegate *delegate)
 {
-	this->delegate = delegate;
+    this->delegate = delegate;
 }
 
 const char * PuyoGame::getPlayerName(int n)
@@ -127,7 +127,7 @@ void PuyoGame::setDefaultPlayerName(int n, const char * playerName)
 
 // PuyoLocalGame implementation
 PuyoLocalGame::PuyoLocalGame(PuyoRandomSystem *attachedRandom,
-		   PuyoFactory *attachedFactory) : PuyoGame(attachedFactory)
+           PuyoFactory *attachedFactory) : PuyoGame(attachedFactory)
 {
   InitGame(attachedRandom);
 }
@@ -141,25 +141,25 @@ void PuyoLocalGame::InitGame(PuyoRandomSystem *attachedRandom)
 {
   gameLevel = 1;
   nbFalled = 0;
-	int i, j;
+    int i, j;
     unmoveablePuyo = attachedFactory->createPuyo(PUYO_UNMOVEABLE);
-	for (i = 0 ; i < PUYODIMX ; i++) {
-		for (j = 0 ; j <= PUYODIMY ; j++) {
-			if (j == PUYODIMY)
-				setPuyoAt(i, j, unmoveablePuyo);
-			else
-				setPuyoAt(i, j, NULL);
-		}
-	}
-	this->attachedRandom = attachedRandom;
-	sequenceNr = 0;
+    for (i = 0 ; i < PUYODIMX ; i++) {
+        for (j = 0 ; j <= PUYODIMY ; j++) {
+            if (j == PUYODIMY)
+                setPuyoAt(i, j, unmoveablePuyo);
+            else
+                setPuyoAt(i, j, NULL);
+        }
+    }
+    this->attachedRandom = attachedRandom;
+    sequenceNr = 0;
     semiMove = 0;
-	neutralPuyos = 0;
-	
+    neutralPuyos = 0;
+    
     endOfCycle = false;
-	gameRunning = true;
-	setFallingAtTop(true);
-  points = 0;
+    gameRunning = true;
+    setFallingAtTop(true);
+    points = 0;
 }
 
 PuyoLocalGame::~PuyoLocalGame()
@@ -195,16 +195,16 @@ void PuyoLocalGame::cycle()
   if (semiMove == 0)
       return;
 
-	if (endOfCycle) {
-		cycleEnding();
+    if (endOfCycle) {
+        cycleEnding();
         if (delegate != NULL)
             notifyReductions();
-		return;
-	}
-	if ((fallingY >= 0)&&(getPuyoCellAt(fallingX, fallingY+1) > PUYO_EMPTY) || (getPuyoCellAt(getFallingCompanionX(), getFallingCompanionY()+1) > PUYO_EMPTY)) {
-		setPuyoAt(fallingX, getFallY(fallingX, fallingY), fallingPuyo);
+        return;
+    }
+    if ((fallingY >= 0)&&(getPuyoCellAt(fallingX, fallingY+1) > PUYO_EMPTY) || (getPuyoCellAt(getFallingCompanionX(), getFallingCompanionY()+1) > PUYO_EMPTY)) {
+        setPuyoAt(fallingX, getFallY(fallingX, fallingY), fallingPuyo);
         fallingPuyo->setPuyoState((PuyoState)(fallingPuyo->getPuyoState()+PUYO_STILL));
-		setPuyoAt(getFallingCompanionX(), getFallY(getFallingCompanionX(), getFallingCompanionY()), companionPuyo);
+        setPuyoAt(getFallingCompanionX(), getFallY(getFallingCompanionX(), getFallingCompanionY()), companionPuyo);
         companionPuyo->setPuyoState((PuyoState)(companionPuyo->getPuyoState()+PUYO_STILL));
         if (delegate != NULL) {
             delegate->puyoDidFall(fallingPuyo, fallingX, fallingY);
@@ -212,10 +212,10 @@ void PuyoLocalGame::cycle()
             fallingY = -10;
             notifyReductions();
         }
-		endOfCycle = true;
-	}
-	else {
-		fallingY++;
+        endOfCycle = true;
+    }
+    else {
+        fallingY++;
         fallingPuyo->setPuyoXY(fallingX, fallingY);
         companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
     }
@@ -234,13 +234,13 @@ PuyoState PuyoLocalGame::getPuyoCellAt(int X, int Y) const
 PuyoPuyo *PuyoLocalGame::getPuyoAt(int X, int Y) const
 {
     if ((X >= PUYODIMX) || (Y >= PUYODIMY) || (X < 0) || (Y < 0))
-		return unmoveablePuyo;
-	if (!endOfCycle) {
-		if ((X == fallingX) && (Y == fallingY))
-			return fallingPuyo;
-		if ((X == getFallingCompanionX()) && (Y == getFallingCompanionY()))
-			return companionPuyo;
-	}
+        return unmoveablePuyo;
+    if (!endOfCycle) {
+        if ((X == fallingX) && (Y == fallingY))
+            return fallingPuyo;
+        if ((X == getFallingCompanionX()) && (Y == getFallingCompanionY()))
+            return companionPuyo;
+    }
     return puyoCells[X + Y * PUYODIMX];
 }
 
@@ -258,10 +258,10 @@ PuyoPuyo *PuyoLocalGame::getPuyoAtIndex(int index) const
 void PuyoLocalGame::moveLeft()
 {
     if (endOfCycle) {
-		return;
-	}
-	if (((fallingY<0)&&(fallingX>0))||((getPuyoCellAt(fallingX-1, fallingY) <= PUYO_EMPTY)
-	 && (getPuyoCellAt(getFallingCompanionX()-1, getFallingCompanionY()) <= PUYO_EMPTY)))
+        return;
+    }
+    if (((fallingY<0)&&(fallingX>0))||((getPuyoCellAt(fallingX-1, fallingY) <= PUYO_EMPTY)
+     && (getPuyoCellAt(getFallingCompanionX()-1, getFallingCompanionY()) <= PUYO_EMPTY)))
         {
             fallingX--;
         }
@@ -272,11 +272,11 @@ void PuyoLocalGame::moveLeft()
 void PuyoLocalGame::moveRight()
 {
     if (endOfCycle) {
-		return;
-	}
-	if (((fallingY<0)&&(fallingX<PUYODIMX-1))||((getPuyoCellAt(fallingX+1, fallingY) <= PUYO_EMPTY)
-	 && (getPuyoCellAt(getFallingCompanionX()+1, getFallingCompanionY()) <= PUYO_EMPTY)))
-		fallingX++;
+        return;
+    }
+    if (((fallingY<0)&&(fallingX<PUYODIMX-1))||((getPuyoCellAt(fallingX+1, fallingY) <= PUYO_EMPTY)
+     && (getPuyoCellAt(getFallingCompanionX()+1, getFallingCompanionY()) <= PUYO_EMPTY)))
+        fallingX++;
     fallingPuyo->setPuyoXY(fallingX, fallingY);
     companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
 }
@@ -337,22 +337,22 @@ void PuyoLocalGame::rotateRight()
 
 PuyoState PuyoLocalGame::getNextFalling()
 {
-	return attachedRandom->getPuyoForSequence(sequenceNr);
+    return attachedRandom->getPuyoForSequence(sequenceNr);
 }
 
 PuyoState PuyoLocalGame::getNextCompanion()
 {
-	return attachedRandom->getPuyoForSequence(sequenceNr+1);
+    return attachedRandom->getPuyoForSequence(sequenceNr+1);
 }
 
 void PuyoLocalGame::increaseNeutralPuyos(int incr)
 {
-	neutralPuyos += incr;
+    neutralPuyos += incr;
 }
 
 int PuyoLocalGame::getNeutralPuyos() const
 {
-	return neutralPuyos;
+    return neutralPuyos;
 }
 
 
@@ -360,8 +360,8 @@ int PuyoLocalGame::getNeutralPuyos() const
 // Set the state of the puyo at the indicated coordinates (not recommanded)
 void PuyoLocalGame::setPuyoCellAt(int X, int Y, PuyoState value)
 {
-	/*if ((X > PUYODIMX) || (Y > PUYODIMY))
-		return;*/
+    /*if ((X > PUYODIMX) || (Y > PUYODIMY))
+        return;*/
   if (puyoCells[X + Y * PUYODIMX])
     puyoCells[X + Y * PUYODIMX]->setPuyoState(value);
 };
@@ -439,28 +439,28 @@ void PuyoLocalGame::setFallingAtTop(bool gameConstruction)
 
 int PuyoLocalGame::getFallingCompanionX() const
 {
-	if (fallingCompanion == 1)
-		return fallingX - 1;
-	if (fallingCompanion == 3)
-		return fallingX + 1;
-	return fallingX;
+    if (fallingCompanion == 1)
+        return fallingX - 1;
+    if (fallingCompanion == 3)
+        return fallingX + 1;
+    return fallingX;
 }
 
 int PuyoLocalGame::getFallingCompanionY() const
 {
-	if (fallingCompanion == 0)
-		return fallingY + 1;
-	if (fallingCompanion == 2)
-		return fallingY - 1;
-	return fallingY;
+    if (fallingCompanion == 0)
+        return fallingY + 1;
+    if (fallingCompanion == 2)
+        return fallingY - 1;
+    return fallingY;
 }
 
 int PuyoLocalGame::getFallY(int X, int Y) const
 {
-	int result = Y + 1;
-	while (getPuyoCellAt(X, result) == PUYO_EMPTY)
-		result++;
-	return result - 1;
+    int result = Y + 1;
+    while (getPuyoCellAt(X, result) == PUYO_EMPTY)
+        result++;
+    return result - 1;
 }
 
 int PuyoLocalGame::getColumnHeigth(int colNum) const
@@ -541,26 +541,26 @@ void PuyoLocalGame::markPuyoAt(int X, int Y, bool mark, bool includeNeutral)
     PuyoPuyo *currentPuyo = getPuyoAt(X, Y);
     if (currentPuyo->isMarked() == mark)
         return;
-	PuyoState currentPuyoState = getPuyoCellAt(X, Y);
-	currentPuyo->setMark(mark);
-	if (getPuyoCellAt(X-1, Y) == currentPuyoState)
-		markPuyoAt(X-1, Y, mark, includeNeutral);
-	if (getPuyoCellAt(X+1, Y) == currentPuyoState)
-		markPuyoAt(X+1, Y, mark, includeNeutral);
-	if (getPuyoCellAt(X, Y-1) == currentPuyoState)
-		markPuyoAt(X, Y-1, mark, includeNeutral);
-	if (getPuyoCellAt(X, Y+1) == currentPuyoState)
-		markPuyoAt(X, Y+1, mark, includeNeutral);
-	if (includeNeutral) {
-		if (getPuyoCellAt(X-1, Y) == PUYO_NEUTRAL)
-			getPuyoAt(X-1, Y)->setMark(mark);
-		if (getPuyoCellAt(X+1, Y) == PUYO_NEUTRAL)
-			getPuyoAt(X+1, Y)->setMark(mark);
-		if (getPuyoCellAt(X, Y-1) == PUYO_NEUTRAL)
-			getPuyoAt(X, Y-1)->setMark(mark);
-		if (getPuyoCellAt(X, Y+1) == PUYO_NEUTRAL)
-			getPuyoAt(X, Y+1)->setMark(mark);
-	}
+    PuyoState currentPuyoState = getPuyoCellAt(X, Y);
+    currentPuyo->setMark(mark);
+    if (getPuyoCellAt(X-1, Y) == currentPuyoState)
+        markPuyoAt(X-1, Y, mark, includeNeutral);
+    if (getPuyoCellAt(X+1, Y) == currentPuyoState)
+        markPuyoAt(X+1, Y, mark, includeNeutral);
+    if (getPuyoCellAt(X, Y-1) == currentPuyoState)
+        markPuyoAt(X, Y-1, mark, includeNeutral);
+    if (getPuyoCellAt(X, Y+1) == currentPuyoState)
+        markPuyoAt(X, Y+1, mark, includeNeutral);
+    if (includeNeutral) {
+        if (getPuyoCellAt(X-1, Y) == PUYO_NEUTRAL)
+            getPuyoAt(X-1, Y)->setMark(mark);
+        if (getPuyoCellAt(X+1, Y) == PUYO_NEUTRAL)
+            getPuyoAt(X+1, Y)->setMark(mark);
+        if (getPuyoCellAt(X, Y-1) == PUYO_NEUTRAL)
+            getPuyoAt(X, Y-1)->setMark(mark);
+        if (getPuyoCellAt(X, Y+1) == PUYO_NEUTRAL)
+            getPuyoAt(X, Y+1)->setMark(mark);
+    }
 }
 
 // delete the marked puyos and the neutral next to them
@@ -578,14 +578,14 @@ void PuyoLocalGame::deleteMarkedPuyosAt(int X, int Y)
     attachedFactory->deletePuyo(getPuyoAt(X, Y));
   }
   setPuyoAt(X, Y, NULL);
-	if (getPuyoAt(X-1, Y)->isMarked())
-		deleteMarkedPuyosAt(X-1, Y);
-	if (getPuyoAt(X+1, Y)->isMarked())
-		deleteMarkedPuyosAt(X+1, Y);
-	if (getPuyoAt(X, Y-1)->isMarked())
-		deleteMarkedPuyosAt(X, Y-1);
-	if (getPuyoAt(X, Y+1)->isMarked())
-		deleteMarkedPuyosAt(X, Y+1);
+    if (getPuyoAt(X-1, Y)->isMarked())
+        deleteMarkedPuyosAt(X-1, Y);
+    if (getPuyoAt(X+1, Y)->isMarked())
+        deleteMarkedPuyosAt(X+1, Y);
+    if (getPuyoAt(X, Y-1)->isMarked())
+        deleteMarkedPuyosAt(X, Y-1);
+    if (getPuyoAt(X, Y+1)->isMarked())
+        deleteMarkedPuyosAt(X, Y+1);
     if (getPuyoCellAt(X-1, Y) == PUYO_NEUTRAL) {
         puyoVector.remove(getPuyoAt(X-1, Y));
         attachedFactory->deletePuyo(getPuyoAt(X-1, Y));
@@ -610,30 +610,30 @@ void PuyoLocalGame::deleteMarkedPuyosAt(int X, int Y)
 
 int PuyoLocalGame::removePuyos()
 {
-	int globalRemovedPuyos = 0;
-	/* First, we will mark all the puyos that need to be removed */
-	for (int i = 0 ; i < PUYODIMX ; i++) {
-		for (int j = 0 ; j <= PUYODIMY ; j++) {
-			PuyoState currentPuyo = getPuyoCellAt(i, j);
-			if ((currentPuyo >= PUYO_BLUE) && (currentPuyo <= PUYO_YELLOW)) {
-				int removedPuyos = 0;
-				markPuyoAt(i, j, true, false);
+    int globalRemovedPuyos = 0;
+    /* First, we will mark all the puyos that need to be removed */
+    for (int i = 0 ; i < PUYODIMX ; i++) {
+        for (int j = 0 ; j <= PUYODIMY ; j++) {
+            PuyoState currentPuyo = getPuyoCellAt(i, j);
+            if ((currentPuyo >= PUYO_BLUE) && (currentPuyo <= PUYO_YELLOW)) {
+                int removedPuyos = 0;
+                markPuyoAt(i, j, true, false);
                 for (int u = 0, v = puyoVector.size() ; u < v ; u++) {
                     if (puyoVector[u]->isMarked()) {
                         removedPuyos++;
                     }
                 }
-				//printf("Removed for %d, %d : %d\n", i, j, removedPuyos);
-				if (removedPuyos >= 4) {
-					globalRemovedPuyos += removedPuyos;
-					deleteMarkedPuyosAt(i, j);
-				}
-				else
-					markPuyoAt(i, j, false, false);
-			}
-		}
-	}
-	/* Next we make the other puyos fall */
+                //printf("Removed for %d, %d : %d\n", i, j, removedPuyos);
+                if (removedPuyos >= 4) {
+                    globalRemovedPuyos += removedPuyos;
+                    deleteMarkedPuyosAt(i, j);
+                }
+                else
+                    markPuyoAt(i, j, false, false);
+            }
+        }
+    }
+    /* Next we make the other puyos fall */
     for (int i = 0 ; i < PUYODIMX ; i++) {
         for (int j = PUYODIMY - 1 ; j > 0 ; j--) {
             PuyoState currentPuyoState = getPuyoCellAt(i, j);
@@ -650,7 +650,7 @@ int PuyoLocalGame::removePuyos()
             }
         }
     }
-	return globalRemovedPuyos;
+    return globalRemovedPuyos;
 }
 
 
@@ -664,7 +664,7 @@ void PuyoLocalGame::notifyReductions()
     // Search for groupped puyos
     int puyoGroupNumber = 0;
     for (int j = 0 ; j < PUYODIMY ; j++) {
-		for (int i = 0 ; i <= PUYODIMX ; i++) {
+        for (int i = 0 ; i <= PUYODIMX ; i++) {
             PuyoPuyo *puyoToMark = getPuyoAt(i, j);
             // If the puyo exists and is not flagged, then
             if ((puyoToMark != NULL) && (! puyoToMark->getFlag())) {
@@ -695,30 +695,30 @@ void PuyoLocalGame::notifyReductions()
                         markPuyoAt(i, j, false, true);
                     }
                 }
-			}
-		}
-	}
+            }
+        }
+    }
 }
 
 void PuyoLocalGame::cycleEnding()
 {
-  static int cmpt = 0;
-	int score = removePuyos();
+    static int cmpt = 0;
+    int score = removePuyos();
     
-	if (score >= 4) {
-    #ifdef DESACTIVE
-    audio_sound_play(sound_splash[phase>7?7:phase]);
-    #endif
-    score -= 3;
-	  if (phase > 0) {
-	    neutralPuyos -= PUYODIMX;
+    if (score >= 4) {
+#ifdef DESACTIVE
+        audio_sound_play(sound_splash[phase>7?7:phase]);
+#endif
+        score -= 3;
+        if (phase > 0) {
+            neutralPuyos -= PUYODIMX;
+        }
+        phase++;
     }
-	  phase++;
-	}
   
-  points += gameLevel * 100 + gameLevel * (phase>0?phase-1:0) * 5000;
+    points += gameLevel * 100 + gameLevel * (phase>0?phase-1:0) * 5000;
   
-	neutralPuyos -= score;
-	if (score == 0)
-		setFallingAtTop();
+    neutralPuyos -= score;
+    if (score == 0)
+        setFallingAtTop();
 }

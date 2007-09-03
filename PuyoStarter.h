@@ -145,6 +145,7 @@ protected:
     int cyclesBeforeGameCycle;
     int cyclesBeforeSpeedIncreases; // time between speed increases in units of 20ms
     unsigned int tickCounts;
+    unsigned long long cycles;
     bool paused;
     bool displayLives;
     int lives;

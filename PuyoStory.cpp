@@ -232,6 +232,7 @@ void PuyoStoryScreen::onEvent(GameControlEvent *cevent)
     switch (cevent->cursorEvent) {
     //case GameControlEvent::kStart:
     case GameControlEvent::kBack:
+    case GameControlEvent::kStart:
         if (finishedAction != NULL) {
             finishedAction->action();
 	    passEvent = false;
