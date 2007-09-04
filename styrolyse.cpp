@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <libgen.h> /* XXX conforms to POSIX.1-2001 -- ok for windows ? */
 
 
 static char scriptPath[1024];
@@ -137,34 +138,39 @@ void styro_gettext(GoomSL *gsl, GoomHash *global, GoomHash *local)
 
 void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
-  const char *path = (const char *)GSL_LOCAL_PTR  (gsl, local, "&this.image");
-  int         x    = (int)GSL_LOCAL_FLOAT(gsl, local, "&this.pos.x");
-  int         y    = (int)GSL_LOCAL_FLOAT(gsl, local, "&this.pos.y");
-  int        dx    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.x");
-  int        dy    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.y");
-  int        dw    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.width");
-  int        dh    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.height");
+    const char *path = (const char *)GSL_LOCAL_PTR  (gsl, local, "&this.image");
+    int         x    = (int)GSL_LOCAL_FLOAT(gsl, local, "&this.pos.x");
+    int         y    = (int)GSL_LOCAL_FLOAT(gsl, local, "&this.pos.y");
+    int        dx    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.x");
+    int        dy    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.y");
+    int        dw    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.width");
+    int        dh    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.height");
 
-  const char *parent = (const char*)GSL_LOCAL_PTR(gsl, local, "&this.parent");
-  Vec2 parentPos = global_sprite_get_position(gsl, parent);
-  x += (int)parentPos.x;
-  y += (int)parentPos.y;
-  
-  GHashValue  *img  = goom_hash_get(styrolyse->images, path);
-  void       *data = NULL;
-  if (img == NULL) {
-    data = styrolyse->client->loadImage(styrolyse->client, path);
-    goom_hash_put_ptr (styrolyse->images, path, data);
-  }
-  else {
-    data = img->ptr;
-  }
+    const char *parent = (const char*)GSL_LOCAL_PTR(gsl, local, "&this.parent");
+    Vec2 parentPos = global_sprite_get_position(gsl, parent);
+    x += (int)parentPos.x;
+    y += (int)parentPos.y;
 
-  if (data == NULL) {
-    printf("'%s' not loaded\n", path);
-    return;
-  }
-  styrolyse->client->drawImage(styrolyse->client, data, x+dx, y+dy, dx, dy, dw, dh);
+    GHashValue  *img  = goom_hash_get(styrolyse->images, path);
+    void        *data = NULL;
+    if (img == NULL) {
+        data = styrolyse->client->loadImage(styrolyse->client, path);
+        goom_hash_put_ptr (styrolyse->images, path, data);
+    }
+    else {
+        data = img->ptr;
+    }
+
+    if (data == NULL) {
+        char txt[1024];
+        char tmp[1024];
+        strcpy(tmp,path);
+        sprintf(txt, "IMAGE NOT FOUND:\n%s", basename(tmp));
+        styrolyse->client->putText(styrolyse->client,x,y,txt);
+    }
+    else {
+        styrolyse->client->drawImage(styrolyse->client, data, x+dx, y+dy, dx, dy, dw, dh);
+    }
 }
 
 char *pathResolverFunction(GoomSL *gsl, const char *path)
