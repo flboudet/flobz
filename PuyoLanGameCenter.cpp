@@ -42,7 +42,7 @@ enum {
 PuyoLanGameCenter::PuyoLanGameCenter(int portNum, const String name)
     : socket(portNum), mbox(&socket), name(name),
       timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages),
-      gameGranted(false), status(PEER_NORMAL), multicastAddress(MULTICASTGROUP),
+      gameGranted(false), status(PEER_NORMAL), multicastAddress(MULTICASTGROUP), loopbackAddress("127.0.0.1"),
       networkInterfaces(requester.getInterfaces()), mcastPeerAddress(multicastAddress, portNum)
 {
     socket.joinGroup(multicastAddress);
@@ -161,6 +161,8 @@ void PuyoLanGameCenter::sendAliveMessage()
 {
     for (int i = 0 ; i < networkInterfaces.size() ; i++) {
         NetworkInterface &ifs = networkInterfaces[i];
+	if (ifs.getAddress() == loopbackAddress)
+	  continue;
         socket.setMulticastInterface(ifs.getAddress());
         Message *msg = mbox.createMessage();
         Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
