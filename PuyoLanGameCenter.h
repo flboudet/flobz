@@ -61,7 +61,7 @@ private:
     int status;
     String opponentName;
     
-    SocketAddress multicastAddress;
+    SocketAddress multicastAddress, loopbackAddress;
     NetworkInterfaceRequester requester;
     std::vector<NetworkInterface> networkInterfaces;
     UDPPeerAddress mcastPeerAddress;
