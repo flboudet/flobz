@@ -10,8 +10,8 @@
     level.easySetting.level   = 350
     level.mediumSetting.type  = "FLOBO"
     level.mediumSetting.level = 190
-    level.hardSetting.type    = "TANIA"
-    level.hardSetting.level   = 130
+    level.hardSetting.type    = "GYOM"
+    level.hardSetting.level   = 30
 [end_level]
 
 # Level 2: Duke Beary
