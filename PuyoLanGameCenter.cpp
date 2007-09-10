@@ -52,6 +52,11 @@ PuyoLanGameCenter::PuyoLanGameCenter(int portNum, const String name)
     sendAliveMessage();
 }
 
+PuyoLanGameCenter::~PuyoLanGameCenter()
+{
+    sendDisconnectMessage();
+}
+
 void PuyoLanGameCenter::onMessage(Message &msg)
 {
     try {
@@ -161,8 +166,8 @@ void PuyoLanGameCenter::sendAliveMessage()
 {
     for (int i = 0 ; i < networkInterfaces.size() ; i++) {
         NetworkInterface &ifs = networkInterfaces[i];
-	if (ifs.getAddress() == loopbackAddress)
-	  continue;
+        if (ifs.getAddress() == loopbackAddress)
+            continue;
         socket.setMulticastInterface(ifs.getAddress());
         Message *msg = mbox.createMessage();
         Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
@@ -171,6 +176,24 @@ void PuyoLanGameCenter::sendAliveMessage()
         msg->addInt("CMD", PUYO_UDP_ALIVE);
         msg->addString("NAME", name);
         msg->addInt("STATUS", status);
+        msg->send();
+        delete msg;
+    }
+}
+
+void PuyoLanGameCenter::sendDisconnectMessage()
+{
+    for (int i = 0 ; i < networkInterfaces.size() ; i++) {
+        NetworkInterface &ifs = networkInterfaces[i];
+        if (ifs.getAddress() == loopbackAddress)
+            continue;
+        socket.setMulticastInterface(ifs.getAddress());
+        Message *msg = mbox.createMessage();
+        Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
+        dirMsg->setPeerAddress(mcastPeerAddress);
+        
+        msg->addInt("CMD", PUYO_UDP_DISCONNECT);
+        msg->addString("NAME", name);
         msg->send();
         delete msg;
     }

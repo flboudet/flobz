@@ -37,6 +37,7 @@ using namespace ios_fc;
 class PuyoLanGameCenter : public PuyoNetGameCenter, public MessageListener, public SessionListener {
 public:
     PuyoLanGameCenter(int portNum, const String name);
+    virtual ~PuyoLanGameCenter();
     void sendMessage(const String msgText);
     void idle();
     void setStatus(int status);
@@ -51,6 +52,7 @@ protected:
     void sendGameCancelInvitation(PuyoGameInvitation &invitation);
 private:
     void sendAliveMessage();
+    void sendDisconnectMessage();
     void grantGame(PuyoGameInvitation &invitation);
     DatagramSocket socket;
     UDPMessageBox mbox;

@@ -199,8 +199,6 @@ void NetCenterMenu::build()
     container.setSize(Vec3(630,470, 0));
 
     menu.add(&title);
-    //menu.add(new Button("Change Nick"));
-    //menu.add(new Button("Options"));
     menu.add(&cancelButton);
     
     playerbox.add(&playerListText);
