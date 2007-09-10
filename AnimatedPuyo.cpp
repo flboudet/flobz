@@ -109,8 +109,6 @@ void AnimatedPuyo::renderAt(int X, int Y)
         return;
     PuyoGame *attachedGame = attachedView->getAttachedGame();
     
-    bool falling  = attachedGame->getFallingState() < PUYO_EMPTY;
-    
     SDL_Rect drect;
     IIM_Surface *currentSurface;
     currentSurface = attachedTheme->getPuyoSurfaceForValence(attachedView->getValenceForPuyo(this));
@@ -123,7 +121,7 @@ void AnimatedPuyo::renderAt(int X, int Y)
         painter.requestDraw(currentSurface, &drect);
         
         /* Main puyo show */
-        if (falling && (this == attachedGame->getFallingPuyo()))
+        if (this == attachedGame->getFallingPuyo())
             painter.requestDraw(attachedTheme->getCircleSurfaceForIndex((smallTicksCount >> 2) & 0x1F), &drect);
         
         /* Eye management */
