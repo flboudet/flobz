@@ -484,7 +484,7 @@ void evalWith(GridState * grid, GridState * gridOrigin, GridEvaluation * const r
     }
   }
   
-    // count the groups of more than 1 puyo
+  // count the groups of more than 1 puyo
   evaluation = nullEvaluation;
   copyGrid(&tmp,grid);
   for (int x = 0;  x < IA_PUYODIMX; x++)
@@ -525,10 +525,6 @@ bool dropBinom(const PuyoBinom binom, const GridState * const src, GridState * c
   displayBinom(binom);
   displayGrid(src==NULL?dst:src);
 #endif
-
-  // Verify quickly if we can reach the point
-  for (int i = 2; i != binom.position.x; (binom.position.x>i)?i++:i--)
-    if (columnHeight(i, src)>=IA_PUYODIMY) return false;
 
   // Copy the matrix
   if (src != NULL) copyGrid(dst,src);
@@ -603,8 +599,10 @@ PuyoIA::PuyoIA(IA_Type type, int level, PuyoView &targetView)
   decisionMade = false;
   attachedGame = targetView.getAttachedGame();
   objective = nullBinom;
-
+  lastLineSeen = PUYODIMY+1;
   special = NULL;
+  currentCycle = 0;
+  readyToDrop = false;
 
   // Select IA
   switch (type)
@@ -613,13 +611,13 @@ PuyoIA::PuyoIA(IA_Type type, int level, PuyoView &targetView)
       special = malloc(sizeof(AIParameters));
       ((AIParameters*)special)->realSuppressionValue = 1;
       ((AIParameters*)special)->potentialSuppressionValue = 3;
-      ((AIParameters*)special)->criticalHeight = 10;
-      ((AIParameters*)special)->columnScalar[0] = 2;
-      ((AIParameters*)special)->columnScalar[1] = 1;
-      ((AIParameters*)special)->columnScalar[2] = 1;
-      ((AIParameters*)special)->columnScalar[3] = 4;
-      ((AIParameters*)special)->columnScalar[4] = 4;
-      ((AIParameters*)special)->columnScalar[5] = 4;
+      ((AIParameters*)special)->criticalHeight = 8;
+      ((AIParameters*)special)->columnScalar[0] = 13;
+      ((AIParameters*)special)->columnScalar[1] = 12;
+      ((AIParameters*)special)->columnScalar[2] = 11;
+      ((AIParameters*)special)->columnScalar[3] = 18;
+      ((AIParameters*)special)->columnScalar[4] = 19;
+      ((AIParameters*)special)->columnScalar[5] = 20;
       break;
   
     case FLOBO:
@@ -676,17 +674,22 @@ PuyoState PuyoIA::extractColor(PuyoState A) const
 {
   switch (A) {
     case PUYO_FALLINGBLUE:
+    case PUYO_BLUE:
       return PUYO_BLUE;
     case PUYO_FALLINGRED:
+    case PUYO_RED:
       return PUYO_RED;
     case PUYO_FALLINGGREEN:
+    case PUYO_GREEN:
       return PUYO_GREEN;
     case PUYO_FALLINGVIOLET:
+    case PUYO_VIOLET:
       return PUYO_VIOLET;
     case PUYO_FALLINGYELLOW:
+    case PUYO_YELLOW:
       return PUYO_YELLOW;
     default:
-      fprintf(stderr,"Error in AI : unknown puyo color %d!!\nExiting...\n",(int)A);
+      fprintf(stderr,"Error in AI : unknown puyo color %d %d!!\nExiting...\n",(int)A,(int)attachedGame->isGameRunning());
       exit(0);
   }
   return PUYO_EMPTY;
@@ -717,8 +720,55 @@ void PuyoIA::extractGrid(void)
 
   // Fill the grid with current data
   for (int i = 0; i < IA_PUYODIMX; i++)
+  {
     for (int j = 0; j < IA_PUYODIMY; j++)
-      (* internalGrid)[i][j] = attachedGame->getPuyoAt(i,(PUYODIMY-1)-j)->getPuyoState();
+    {
+      PuyoPuyo * thePuyo = attachedGame->getPuyoAt(i,(PUYODIMY-1)-j);
+      (* internalGrid)[i][j] = (thePuyo != NULL) ? thePuyo->getPuyoState() : PUYO_EMPTY;
+    }
+  }
+}
+
+bool canReach(const PuyoBinom binom, const PuyoBinom dest, GridState * const internalGrid)
+{
+  int minBinomY = binom.position.y;
+  int minBinomX = binom.position.x;
+  int maxBinomX = binom.position.x;
+  switch (binom.orientation)
+  {
+    case Left:
+      minBinomX--;
+      break;
+    case Right:
+      maxBinomX++;
+      break;
+    case Below:
+      minBinomY--;
+      break;
+  }
+ 
+  if (minBinomY > 0) minBinomY--;
+  if (minBinomY >= IA_PUYODIMY) return true;
+  
+  int minDestX = dest.position.x;
+  int maxDestX = dest.position.x;
+  switch (dest.orientation)
+  {
+    case Left:
+      minDestX--;
+      break;
+    case Right:
+      maxDestX++;
+      break;
+  }
+  
+  if (minBinomX < maxDestX)
+    for (int i = minBinomX;  i <= maxDestX; i++) if ((*internalGrid)[i][minBinomY] != PUYO_EMPTY) return false;
+  
+  if (maxBinomX > minDestX)
+    for (int i = minDestX;  i <= maxBinomX; i++) if ((*internalGrid)[i][minBinomY] != PUYO_EMPTY) return false;
+  
+  return true;
 }
 
 void PuyoIA::decide()
@@ -736,9 +786,12 @@ void PuyoIA::decide()
   // get puyo binoms to drop
   current.falling     = extractColor(attachedGame->getFallingState());
   current.companion   = extractColor(attachedGame->getCompanionState());
-  current.orientation = Left;
-  current.position.x  = 0;
-  current.position.y  = IA_PUYODIMY+1;
+  current.orientation = extractOrientation(attachedGame->getFallingCompanionDir());
+  current.position.x  = attachedGame->getFallingX();
+  current.position.y  = PUYODIMY - attachedGame->getFallingY();
+  
+  PuyoBinom originalPuyo = current;
+  
   next.falling        = extractColor(attachedGame->getNextFalling());
   next.companion      = extractColor(attachedGame->getNextCompanion());
   next.orientation    = Left;
@@ -754,7 +807,7 @@ void PuyoIA::decide()
     evaluation1 = nullEvaluation;
 
     // drop the binom (including destroying eligible groups) and continue if game not lost
-    if (dropBinom(current, internalGrid, &state1, &evaluation1))
+    if (canReach(originalPuyo, current, internalGrid) && dropBinom(current, internalGrid, &state1, &evaluation1))
     {
       for (unsigned int l2 = 1; l2 <= MAXCOMBINATION; l2++)
       {
@@ -796,8 +849,29 @@ void PuyoIA::decide()
 
 void PuyoIA::cycle()
 {
+  // If no falling puyo, no need to play
+  if (attachedGame->getFallingPuyo() == NULL || !attachedGame->isGameRunning()) 
+  {
+    return;
+  }
+  
+  int currentLine = attachedGame->getFallingY();
+  int currentColumn = attachedGame->getFallingX();
+  
+  // If we start with new puyos
+  if (currentLine < lastLineSeen)
+  {
+    // Reset the cycle counter
+    currentCycle = 0;
+    // Save we did make any decision yet
+    decisionMade = false;
+  }
+  
+  // increment the cycle counter
+  currentCycle++;
+  
   // Test if we have to decide where to play
-  if ((decisionMade == false) && (attachedGame->getFallingY() == 1))
+  if (decisionMade == false)
   {
     // if so update the internal grid
     extractGrid();
@@ -825,15 +899,62 @@ void PuyoIA::cycle()
 
     // remember we decided
     decisionMade = true;
+    
+    // don't drop yet!!
+    readyToDrop = false;
+    
+//    fprintf(stderr,"DEBUG in AI : Decision made (%d,%d)...\n",currentLine,(int)objective.position.x);
   }
-  if (attachedGame->getFallingY() != 1) decisionMade = false;
 
-  // Move to the position we decided
-  if (random() % level < 10)
+  // Now move to the position we decided :
+  
+  // If we can drop, then go on
+  if (readyToDrop)
   {
-    if (extractOrientation(attachedGame->getFallingCompanionDir()) != objective.orientation) targetView.rotateLeft();
-    else if (attachedGame->getFallingX() < objective.position.x) targetView.moveRight();
-    else if (attachedGame->getFallingX() > objective.position.x) targetView.moveLeft();
-    else targetView.cycleGame();
+    targetView.cycleGame();
   }
+  
+  // Else try to move at the specified frequency
+  else if (currentCycle % level == 0)
+  {
+    bool shouldMove = false;
+    bool couldntMove = false;
+  
+    // Move left if useful
+    if (currentColumn < objective.position.x)
+    {
+      shouldMove = true;
+      targetView.moveRight();
+      // or decide again if not possible
+      if (currentColumn == attachedGame->getFallingX()) couldntMove = true;
+      else couldntMove = false;
+    }
+    
+    // Move right if useful
+    if (((shouldMove == true && couldntMove == true) || (shouldMove == false)) && currentColumn > objective.position.x)
+    {
+      shouldMove = true;
+      targetView.moveLeft();
+      // or decide again if not possible
+      if (currentColumn == attachedGame->getFallingX()) couldntMove = true;
+      else couldntMove = false;
+    }
+    
+    // Rotate if useful
+    int curOrientation = attachedGame->getFallingCompanionDir();
+    if (((shouldMove == true && couldntMove == true) || (shouldMove == false)) && extractOrientation(curOrientation) != objective.orientation)
+    {
+      shouldMove = true;
+      targetView.rotateLeft();
+      // or decide again if not possible
+      if (curOrientation == attachedGame->getFallingCompanionDir()) couldntMove = true;
+      else couldntMove = false;
+    }
+    
+    // if no need to move drop
+    if (shouldMove == false) readyToDrop = true;
+    // if need to move but impossible, decide again
+    else if (couldntMove == true) decisionMade = false;
+  }
+  lastLineSeen = currentLine;
 }

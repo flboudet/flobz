@@ -83,6 +83,9 @@ class PuyoIA : public virtual PuyoPlayer {
     IA_Type type;
     int level;
     PuyoBinom objective;
+    int lastLineSeen;
+    int currentCycle;
+    bool readyToDrop;
 
     void * special;
 };
