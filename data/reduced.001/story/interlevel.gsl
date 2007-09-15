@@ -53,7 +53,7 @@
     @enemy5.image = "introlevel/unmapped-mini.png"
     @enemy6.image = "introlevel/unmapped-mini.png"
     @enemy7.image = "introlevel/unmapped-mini.png"
-    @enemy8.image = "introlevel/unmapped-mini.png"
+    @enemy8.image = "introlevel/mcflurry-mini.png"
     @enemy9.image = "introlevel/unmapped-mini.png"
 
   for i in (@shadow1 @shadow2 @shadow3 @shadow4 @shadow5 @shadow6 @shadow7 @shadow8 @shadow9) do {
