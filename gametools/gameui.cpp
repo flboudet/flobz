@@ -1207,45 +1207,23 @@ namespace gameui {
       else if (event->sdl_event.type == SDL_KEYDOWN) {
         SDL_Event e = event->sdl_event;
         char ch = 0;
-        if ((e.key.keysym.sym == SDLK_PERIOD)
-          || (e.key.keysym.sym == SDLK_KP_PERIOD))
-          ch = SDLK_PERIOD;
-        if ((e.key.keysym.sym == SDLK_SLASH)
-          || (e.key.keysym.sym == SDLK_KP_DIVIDE))
-          ch = SDLK_SLASH;
-        if ((e.key.keysym.sym == SDLK_MINUS)
-          || (e.key.keysym.sym == SDLK_KP_MINUS))
-          ch = SDLK_MINUS;
-        if (e.key.keysym.sym == SDLK_COLON)
-          ch = SDLK_COLON;
-        if (e.key.keysym.sym == SDLK_QUESTION)
-          ch = SDLK_QUESTION;
-        if (e.key.keysym.sym == SDLK_AT)
-          ch = SDLK_AT;
-        if (e.key.keysym.sym == SDLK_EXCLAIM)
-          ch = SDLK_EXCLAIM;
 
-        if ((e.key.keysym.sym >= SDLK_KP0) && (e.key.keysym.sym <= SDLK_KP9))
-          ch = e.key.keysym.sym - SDLK_KP0 + '0';
-        if (e.key.keysym.sym == SDLK_KP_PERIOD)
-          ch = '.';
+        if ((e.key.keysym.unicode & 0xFF80) == 0) {
+            ch = e.key.keysym.unicode & 0x7F;
+        }
+        else {
+            printf("An International Character.\n");
 
-        if ((e.key.keysym.sym >= SDLK_0) && (e.key.keysym.sym <= SDLK_9))
-          ch = e.key.keysym.sym;
 
-        if ((e.key.keysym.sym >= SDLK_a) && (e.key.keysym.sym <= SDLK_z))
-          ch = e.key.keysym.sym;
 
-        if (e.key.keysym.sym == SDLK_SPACE)
-          ch = ' ';
+        }
 
         if (e.key.keysym.sym == SDLK_BACKSPACE && (getValue().length() > 1)) {
           String newValue = getValue().substring(0, getValue().length() - 2);
           newValue += "_";
           setValue(newValue,false);
         }
-
-        if (ch) {
+        else if (ch) {
           String newValue = getValue();
           newValue[newValue.length() - 1] = ch;
           newValue += "_";
