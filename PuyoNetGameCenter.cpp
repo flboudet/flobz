@@ -82,10 +82,11 @@ void PuyoNetGameCenter::connectPeer(PeerAddress addr, const String name, int sta
 
 void PuyoNetGameCenter::disconnectPeer(PeerAddress addr, const String name)
 {
-    //printf("%s vient de se deconnecter!\n", (const char *)name);
+    //printf("%s vient de se deconnecter! (parait il)\n", (const char *)name);
     for (int i = 0, j = peers.size() ; i < j ; i++) {
         GamerPeer *currentPeer = peers[i];
         if (currentPeer->address == addr) {
+            //printf("Peer trouve au nom %s\n", (const char *)name);
             // Cancels all games from this peer
             for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
                 if (pendingGames[i]->peer == currentPeer) {
@@ -105,6 +106,7 @@ void PuyoNetGameCenter::disconnectPeer(PeerAddress addr, const String name)
             return;
         }
     }
+    //printf("Pas de peer trouve au nom %s\n", (const char *)name);
 }
 
 String PuyoNetGameCenter::getPeerNameAtIndex(int i) const

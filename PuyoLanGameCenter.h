@@ -34,7 +34,7 @@
 
 using namespace ios_fc;
 
-class PuyoLanGameCenter : public PuyoNetGameCenter, public MessageListener, public SessionListener {
+class PuyoLanGameCenter : public PuyoNetGameCenter, public MessageListener, public SessionListener, PuyoNetGameCenterListener {
 public:
     PuyoLanGameCenter(int portNum, const String name);
     virtual ~PuyoLanGameCenter();
@@ -46,6 +46,14 @@ public:
     void onPeerDisconnect(const PeerAddress &address);
     String getSelfName();
     String getOpponentName();
+// PuyoNetGameCenterListener implementation
+    virtual void onChatMessage(const String &msgAuthor, const String &msg) {}
+    virtual void onPlayerConnect(String playerName, PeerAddress playerAddress);
+    virtual void onPlayerDisconnect(String playerName, PeerAddress playerAddress) {}
+    virtual void onPlayerUpdated(String playerName, PeerAddress playerAddress) {}
+    virtual void onGameInvitationReceived(PuyoGameInvitation &invitation) {}
+    virtual void onGameInvitationCanceledReceived(PuyoGameInvitation &invitation) {}
+    virtual void onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation) {}
 protected:
     void sendGameRequest(PuyoGameInvitation &invitation);
     void sendGameAcceptInvitation(PuyoGameInvitation &invitation);

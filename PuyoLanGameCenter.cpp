@@ -49,6 +49,7 @@ PuyoLanGameCenter::PuyoLanGameCenter(int portNum, const String name)
     mbox.addListener(this);
     SessionManager &mboxSession = dynamic_cast<SessionManager &>(mbox);
     mboxSession.addSessionListener(this);
+    addListener(this);
     sendAliveMessage();
 }
 
@@ -70,13 +71,14 @@ void PuyoLanGameCenter::onMessage(Message &msg)
 	break;
       case PUYO_UDP_ALIVE: {
 	  Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-	  connectPeer(dir.getPeerAddress(), msg.getString("NAME"), msg.getInt("STATUS"));
+	  PuyoNetGameCenter::connectPeer(dir.getPeerAddress(), msg.getString("NAME"), msg.getInt("STATUS"));
         }
 	break;
-        case PUYO_UDP_DISCONNECT: {
-           Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-	   disconnectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"));
-	}
+      case PUYO_UDP_DISCONNECT: {
+          Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
+          //printf("Message de deconnexion recu de %s...\n", (const char *)(msg.getString("NAME")));
+          PuyoNetGameCenter::disconnectPeer(dir.getPeerAddress(), msg.getString("NAME"));
+      }
 	break;
         case PUYO_UDP_GAME_REQUEST: {
             Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
@@ -106,6 +108,7 @@ void PuyoLanGameCenter::onMessage(Message &msg)
       }
     }
     catch (Exception e) {
+        printf("Une putain d'exception est survenue: %s\n", e.what());
     }
 }
 
@@ -195,6 +198,7 @@ void PuyoLanGameCenter::sendDisconnectMessage()
         msg->addInt("CMD", PUYO_UDP_DISCONNECT);
         msg->addString("NAME", name);
         msg->send();
+        //printf("Message de deconnexion envoye...\n");
         delete msg;
     }
 }
@@ -254,4 +258,10 @@ void PuyoLanGameCenter::sendGameCancelInvitation(PuyoGameInvitation &invitation)
   msg->addString("DSTNAME", invitation.opponentName);
   msg->send();
   delete msg;
+}
+
+void PuyoLanGameCenter::onPlayerConnect(String playerName, PeerAddress playerAddress)
+{
+    // When a new player connects, send an alive message
+    sendAliveMessage();
 }
