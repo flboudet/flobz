@@ -37,24 +37,27 @@ static const GridEvaluation nullEvaluation = {0,0,0,0,0,0};
 #define resetGrid(dst) memset((void *)dst, PUYO_EMPTY, sizeof(GridState))
 #define zeroGrid(dst) memset((void *)dst, 0, sizeof(GridState))
 
+#define HEIGHTS_ROW (IA_TABLEDIMY-1)
+
 inline int columnHeight(const unsigned int x, const GridState * const grid)
 {
-  // WARNING: works only if the column has no holes in it
-  if ((*grid)[x][0] != PUYO_EMPTY)
-  {
-    int y = IA_PUYODIMY-1;
-    while ((*grid)[x][y] == PUYO_EMPTY) y--;
-    return y+1;
-  }
-  else return 0;
+  return (*grid)[x][HEIGHTS_ROW];
 }
 
 inline int stripedColumnHeight(const unsigned int x, const GridState * const grid)
 {
+  int h = (*grid)[x][HEIGHTS_ROW];
+  while ((h>0) && ((*grid)[x][h-1] == PUYO_NEUTRAL)) h--;
+  return h;
+}
+
+
+inline int normalColumnHeight(const unsigned int x, const GridState * const grid)
+{
   if ((*grid)[x][0] != PUYO_EMPTY)
   {
     int y = IA_PUYODIMY-1;
-    while ((y>0) && ((*grid)[x][y] == PUYO_EMPTY || (*grid)[x][y] == PUYO_NEUTRAL)) y--;
+    while ((y>0) && ((*grid)[x][y] == PUYO_EMPTY)) y--;
     return y+1;
   }
   else return 0;
@@ -74,33 +77,18 @@ bool removeSamePuyoAround(int X, int Y, const PuyoState color, GridState * const
   marked[X][Y] = 1;
 
   for (int i=0; i<nFound; i++) {
-#ifdef SOLO
-    if (nFound >= IA_PUYODIMX*IA_PUYODIMY)
-    {
-      fprintf(stderr,"ERROR 1 in remove routine, nFound=%d\n", nFound);
-      exit(0);
-    }
-#endif
 
     X = mx[i];
     Y = my[i];
-
-#ifdef SOLO
-    if (Y>=IA_PUYODIMY || Y<0 || X >=IA_PUYODIMX || X <0)
-    {
-      fprintf(stderr,"ERROR 2 in remove routine, X=%d, Y=%d\n", X, Y);
-      exit(0);
-    }
-#endif
 
     if (Y+1<IA_PUYODIMY) {
       if (marked[X][Y+1] == 0) {
         if ((*tab)[X][Y+1] == color) {
           mx[nFound] = X;
           my[nFound] = Y+1;
-          marked[X][Y+1] = 1;
           nFound++;
-        } else marked[X][Y+1] = 2;
+        }
+        marked[X][Y+1] = 1;
       }
     }
     if (Y>0) {
@@ -108,9 +96,9 @@ bool removeSamePuyoAround(int X, int Y, const PuyoState color, GridState * const
         if ((*tab)[X][Y-1] == color) {
           mx[nFound] = X;
           my[nFound] = Y-1;
-          marked[X][Y-1] = 1;
           nFound++;
-        } else marked[X][Y-1] = 2;
+        }
+        marked[X][Y-1] = 1;
       }
     }
     if (X+1<IA_PUYODIMX) {
@@ -118,9 +106,9 @@ bool removeSamePuyoAround(int X, int Y, const PuyoState color, GridState * const
         if ((*tab)[X+1][Y] == color) {
           mx[nFound] = X+1;
           my[nFound] = Y;
-          marked[X+1][Y] = 1;
           nFound++;
-        } else marked[X+1][Y] = 2;
+        }
+        marked[X+1][Y] = 1;
       }
     }
     if (X>0) {
@@ -128,9 +116,9 @@ bool removeSamePuyoAround(int X, int Y, const PuyoState color, GridState * const
         if ((*tab)[X-1][Y] == color) {
           mx[nFound] = X-1;
           my[nFound] = Y;
-          marked[X-1][Y] = 1;
           nFound++;
-        } else marked[X-1][Y] = 2;
+        }
+        marked[X-1][Y] = 1;
       }
     }
   }
@@ -147,13 +135,7 @@ bool removeSamePuyoAround(int X, int Y, const PuyoState color, GridState * const
   {
     X = mx[i];
     Y = my[i];
-#ifdef SOLO
-    if (Y>=IA_PUYODIMY || Y<0 || X >=IA_PUYODIMX || X <0)
-    {
-      fprintf(stderr,"ERROR 3 in remove routine, X=%d, Y=%d\n", X, Y);
-      exit(0);
-    }
-#endif
+
     (*tab)[X][Y] = PUYO_EMPTY;
 
     if ((Y+1<IA_PUYODIMY) && ((*tab)[X][Y+1] == PUYO_NEUTRAL)) {
@@ -192,24 +174,9 @@ bool countSamePuyoAround(int X, int Y, const PuyoState color, GridState * const 
   marked[X][Y] = 1;
 
   for (int i=0; i<nFound; i++) {
-#ifdef SOLO
-    if (nFound >= IA_PUYODIMX*IA_PUYODIMY)
-    {
-      fprintf(stderr,"ERROR 1 in remove routine, nFound=%d\n", nFound);
-      exit(0);
-    }
-#endif
 
     X = mx[i];
     Y = my[i];
-
-#ifdef SOLO
-    if (Y>=IA_PUYODIMY || Y<0 || X >=IA_PUYODIMX || X <0)
-    {
-      fprintf(stderr,"ERROR 2 in remove routine, X=%d, Y=%d\n", X, Y);
-      exit(0);
-    }
-#endif
 
     if (Y+1<IA_PUYODIMY) {
       if (marked[X][Y+1] == 0) {
@@ -265,13 +232,7 @@ bool countSamePuyoAround(int X, int Y, const PuyoState color, GridState * const 
   {
     X = mx[i];
     Y = my[i];
-#ifdef SOLO
-    if (Y>=IA_PUYODIMY || Y<0 || X >=IA_PUYODIMX || X <0)
-    {
-      fprintf(stderr,"ERROR 3 in remove routine, X=%d, Y=%d\n", X, Y);
-      exit(0);
-    }
-#endif
+
     (*tab)[X][Y] = PUYO_EMPTY;
 
     if ((Y+1<IA_PUYODIMY) && ((*tab)[X][Y+1] == PUYO_NEUTRAL)) {
@@ -298,49 +259,35 @@ bool countSamePuyoAround(int X, int Y, const PuyoState color, GridState * const 
 
 inline void columnCompress(const unsigned int x, GridState * const grid)
 {
-    int ydst = 0, ysrc = 0;
-    int last = IA_PUYODIMY;
-
+  int ydst = 0, ysrc = 0;
+  int last = IA_PUYODIMY;
+  int height = 0;
+  
 	// on oublie les cases vides en haut de colonne
-    while (((*grid)[x][last-1] == PUYO_EMPTY) && (last > 0)) last--;
+  while (((*grid)[x][last-1] == PUYO_EMPTY) && (last > 0)) last--;
 
-    while (ydst < last) // Tant qu'on a pas rempli dst
+  while (ydst < last) // Tant qu'on a pas rempli dst
+  {
+    if ( ysrc < last ) // Si on n'a pas ŽpuisŽ src
     {
-        if ( ysrc < last ) // Si on n'a pas épuisé src
-        {
-            PuyoState state = (PuyoState)(*grid)[x][ysrc];
-            if (state != PUYO_EMPTY) // Si src n'est pas vide
-            {
-                // On recopie et on passe au dst suivant
-                if (ysrc != ydst)
-                {
-#ifdef SOLO
-    if (ydst >=IA_PUYODIMY || ydst <0)
+      PuyoState state = (PuyoState)(*grid)[x][ysrc];
+      if (state != PUYO_EMPTY) // Si src n'est pas vide
+      {
+        // On recopie et on passe au dst suivant
+        if (ysrc != ydst) (*grid)[x][ydst] = state;
+        height++;
+        ydst++;
+      }
+      // src suivant
+      ysrc++;
+    }
+    else // Fin du remplissage avec PUYO_EMPTY
     {
-      fprintf(stderr,"ERROR 4 in compress routine, ydst=%d\n", ydst);
-      exit(0);
+      (*grid)[x][ydst] = PUYO_EMPTY;
+      ydst++;
     }
-#endif
-                    (*grid)[x][ydst] = state;
-                }
-                ydst++;
-            }
-            // src suivant
-            ysrc++;
-        }
-        else // Fin du remplissage avec PUYO_EMPTY
-        {
-#ifdef SOLO
-    if (ydst >=IA_PUYODIMY || ydst <0)
-    {
-      fprintf(stderr,"ERROR 5 in compress routine, ydst=%d\n", ydst);
-      exit(0);
-    }
-#endif
-            (*grid)[x][ydst] = PUYO_EMPTY;
-            ydst++;
-        }
-    }
+  }
+  (*grid)[x][HEIGHTS_ROW] = height;
 }
 
 
@@ -354,58 +301,36 @@ bool dropPuyos(const PuyoBinom binom, GridState * const grid)
   {
   case Above:
     if (h + 1 >= IA_PUYODIMY) return false;
-#ifdef SOLO
-    if (x >=IA_PUYODIMX || x <0)
-    {
-      fprintf(stderr,"ERROR 6 in drop routine, x=%d\n", x);
-      exit(0);
-    }
-#endif
     (*grid)[x][h]   = binom.falling;
     (*grid)[x][h+1] = binom.companion;
+    (*grid)[x][HEIGHTS_ROW] = h + 2;
     break;
 
   case Below:
     if (h + 1 >= IA_PUYODIMY) return false;
-#ifdef SOLO
-    if (x >=IA_PUYODIMX || x <0)
-    {
-      fprintf(stderr,"ERROR 7 in drop routine, x=%d\n", x);
-      exit(0);
-    }
-#endif
     (*grid)[x][h+1] = binom.falling;
     (*grid)[x][h]   = binom.companion;
+    (*grid)[x][HEIGHTS_ROW] = h + 2;
     break;
 
   case Left:
     if (h >= IA_PUYODIMY) return false;
     g = columnHeight(x-1, grid);
     if (g >= IA_PUYODIMY) return false;
-#ifdef SOLO
-    if (x >=IA_PUYODIMX || x-1 <0)
-    {
-      fprintf(stderr,"ERROR 6 in drop routine, x=%d\n", x);
-      exit(0);
-    }
-#endif
     (*grid)[x][h]   = binom.falling;
     (*grid)[x-1][g] = binom.companion;
+    ((*grid)[x][HEIGHTS_ROW]) = h + 1;
+    ((*grid)[x-1][HEIGHTS_ROW]) = g + 1;
     break;
 
   case Right:
-#ifdef SOLO
-    if (x +1 >=IA_PUYODIMX || x <0)
-    {
-      fprintf(stderr,"ERROR 6 in drop routine, x=%d\n", x);
-      exit(0);
-    }
-#endif
     if (h >= IA_PUYODIMY) return false;
     g = columnHeight(x+1, grid);
     if (g >= IA_PUYODIMY) return false;
     (*grid)[x][h]   = binom.falling;
     (*grid)[x+1][g] = binom.companion;
+    ((*grid)[x][HEIGHTS_ROW]) = h + 1;
+    ((*grid)[x+1][HEIGHTS_ROW]) = g + 1;
     break;
   }
 
@@ -450,7 +375,7 @@ bool suppressGroups(GridState * const dst, GridEvaluation * const evaluation)
 }
 
 
-void evalWith(GridState * grid, GridState * gridOrigin, GridEvaluation * const realEvaluation)
+void evalWith(const GridState * const grid, const GridState * const gridOrigin, GridEvaluation * const realEvaluation)
 {
   GridState tmp;
   GridEvaluation evaluation;
@@ -463,8 +388,8 @@ void evalWith(GridState * grid, GridState * gridOrigin, GridEvaluation * const r
   {
     int h = columnHeight(x, grid);
     if (h > realEvaluation->height) realEvaluation->height = h;
+    
     h = stripedColumnHeight(x, grid);
-
     for (int y = 1;  y < h-1; y++)
     {
       // if free on the left or free on the right
@@ -514,18 +439,10 @@ void evalWith(GridState * grid, GridState * gridOrigin, GridEvaluation * const r
   }
   d -= evaluation.puyoSuppressed;
   if (d>0) realEvaluation->puyoGrouped = d;
-
 }
 
 bool dropBinom(const PuyoBinom binom, const GridState * const src, GridState * const dst, GridEvaluation * const evaluation)
 {
-  // display debug info
-#ifdef SOLOPLUS
-  displaySep("+++");
-  displayBinom(binom);
-  displayGrid(src==NULL?dst:src);
-#endif
-
   // Copy the matrix
   if (src != NULL) copyGrid(dst,src);
 
@@ -534,13 +451,6 @@ bool dropBinom(const PuyoBinom binom, const GridState * const src, GridState * c
 
   // Delete all eligible groups
   while (suppressGroups(dst, evaluation) == true) {};
-
-  // display debug info
-#ifdef SOLOPLUS
-  displayGrid(dst);
-  fprintf(stdout,"Suppressions -> {%d, %d - %d}\n", evaluation->puyoSuppressed, evaluation->neutralSuppressed, evaluation->puyoSuppressedPotential);
-  displaySep("---");
-#endif
 
   // return
   return true;
@@ -573,7 +483,7 @@ int PuyoIA::makeEvaluation(const GridEvaluation * const referenceOne, const Puyo
       break;
   }
   
-  int c = ((AIParameters*)special)->columnScalar[pos1] + ((AIParameters*)special)->columnScalar[pos2];
+  int c = (((AIParameters*)special)->columnScalar[pos1] + ((AIParameters*)special)->columnScalar[pos2])-referenceOne->height;
 
   int r = c * (1+rR+rP);
   return r;
@@ -721,11 +631,25 @@ void PuyoIA::extractGrid(void)
   // Fill the grid with current data
   for (int i = 0; i < IA_PUYODIMX; i++)
   {
+    int height = 0;
     for (int j = 0; j < IA_PUYODIMY; j++)
     {
       PuyoPuyo * thePuyo = attachedGame->getPuyoAt(i,(PUYODIMY-1)-j);
-      (* internalGrid)[i][j] = (thePuyo != NULL) ? thePuyo->getPuyoState() : PUYO_EMPTY;
+      if (thePuyo != NULL)
+      {
+        PuyoState state = thePuyo->getPuyoState();
+        if (state >= PUYO_STILL)
+        {
+          (* internalGrid)[i][j] = state;
+          height++;
+        } else (* internalGrid)[i][j] = PUYO_EMPTY;
+      }
+      else
+      {
+        (* internalGrid)[i][j] = PUYO_EMPTY;
+      }
     }
+    (* internalGrid)[i][HEIGHTS_ROW] = height;
   }
 }
 
@@ -833,11 +757,6 @@ void PuyoIA::decide()
     }
   }
 
-#ifdef SOLOPLUS
-  displaySep(NULL);
-  fprintf(stdout,"Best Suppressions @ {%d, %d} : {%d, %d - %d}\n",bestl1, bestl2, bestEvaluation.puyoSuppressed, bestEvaluation.neutralSuppressed, bestEvaluation.puyoSuppressedPotential);
-#endif
-
   // set position of best binom
   if (foundOne == false) current.position.x=IA_PUYODIMX;
   else serialPosition(bestl1,&current);
@@ -902,8 +821,6 @@ void PuyoIA::cycle()
     
     // don't drop yet!!
     readyToDrop = false;
-    
-//    fprintf(stderr,"DEBUG in AI : Decision made (%d,%d)...\n",currentLine,(int)objective.position.x);
   }
 
   // Now move to the position we decided :
