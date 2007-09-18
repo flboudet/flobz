@@ -29,8 +29,13 @@ enum IA_Type {
   GYOM
 };
 
+// Redefine the table size to our needs
+// same columns number
 #define IA_PUYODIMX (PUYODIMX)
+#define IA_TABLEDIMX (PUYODIMX)
+// only visible rows (=rows-2), + one to keep colmun heights
 #define IA_PUYODIMY (PUYODIMY-2)
+#define IA_TABLEDIMY (IA_PUYODIMY+1)
 
 typedef enum {
   Left = 0,
@@ -61,7 +66,7 @@ typedef struct {
   int height;
 } GridEvaluation;
 
-typedef unsigned char GridState[IA_PUYODIMX][IA_PUYODIMY];
+typedef unsigned char GridState[IA_TABLEDIMX][IA_TABLEDIMY];
 
 class PuyoIA : public virtual PuyoPlayer {
 
