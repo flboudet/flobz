@@ -1198,6 +1198,8 @@ namespace gameui {
         }
         else if (editionMode == true) {
             const char CHAR_ORDER[] = "/:-. _ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+            // kBack => Cancel current entry
             if (event->cursorEvent == GameControlEvent::kBack) {
                 if (!editOnFocus) {
                     setValue(previousValue, false);
@@ -1205,13 +1207,20 @@ namespace gameui {
                     event->setCaught();
                 }
             }
+            // kUp => Change last char of the entry (forward)
             else if (event->cursorEvent == GameControlEvent::kUp) {
                 String newValue = getValue();
                 while (newValue.length() <= 1)
                     newValue += '_';
                 char ch = newValue[newValue.length() - 2];
                 int index = 0;
-                while (CHAR_ORDER[index] != ch) ++index;
+                while (CHAR_ORDER[index] != ch) {
+                    ++index;
+                    if (CHAR_ORDER[index] == '\0') {
+                        index = 0;
+                        break;
+                    }
+                }
                 if (CHAR_ORDER[index+1] == '\0')
                     index = 0;
                 else
@@ -1219,13 +1228,20 @@ namespace gameui {
                 newValue[newValue.length() - 2] = CHAR_ORDER[index];
                 setValue(newValue,false);
             }
+            // kDown => Change last char of the entry (downward)
             else if (event->cursorEvent == GameControlEvent::kDown) {
                 String newValue = getValue();
                 while (newValue.length() <= 1)
                     newValue += '_';
                 char ch = newValue[newValue.length() - 2];
                 int index = 0;
-                while (CHAR_ORDER[index] != ch) ++index;
+                while (CHAR_ORDER[index] != ch) {
+                    ++index;
+                    if (CHAR_ORDER[index] == '\0') {
+                        index = 0;
+                        break;
+                    }
+                }
                 if (index == 0)
                     index = strlen(CHAR_ORDER) - 1;
                 else
@@ -1233,17 +1249,20 @@ namespace gameui {
                 newValue[newValue.length() - 2] = CHAR_ORDER[index];
                 setValue(newValue,false);
             }
+            // kLeft => Like Backspace
             else if (event->cursorEvent == GameControlEvent::kLeft) {
                 String newValue = getValue().substring(0, getValue().length() - 2);
                 newValue += "_";
                 setValue(newValue,false);
             }
+            // kRight => Duplicate last char
             else if (event->cursorEvent == GameControlEvent::kRight) {
                 String newValue = getValue();
                 newValue[newValue.length() - 1] = newValue[newValue.length() - 2];
                 newValue += "_";
                 setValue(newValue,false);
             }
+            // Keyboard input is also supported
             else if (event->sdl_event.type == SDL_KEYDOWN) {
                 SDL_Event e = event->sdl_event;
                 char ch = 0;
