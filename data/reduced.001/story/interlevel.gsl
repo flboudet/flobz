@@ -105,6 +105,7 @@
 
   float @enemy = enemy
   @kaori.parent = "@peak"
+  music: file="waitnrelax.xm"
   
 <sprite_list_lib>
   # Call the 'sprite' function for each sprite you want to update/draw
@@ -124,8 +125,6 @@
       j = j + 1.0
     }
   }
-
-  music: file="waitnrelax.xm"
 
 <update_lib>
   # Update function: called every animation cycle
