@@ -26,7 +26,7 @@
 /* This class is not thread safe */
 
 #ifdef MACOSX
-#include <CoreFoundation/CoreFoundation.h>
+//#include <CoreFoundation/CoreFoundation.h>
 #endif
 #ifdef WIN32
 /* Stupid trick for WIN32 */

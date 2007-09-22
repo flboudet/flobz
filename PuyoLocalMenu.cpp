@@ -27,6 +27,24 @@
 #include "AnimatedPuyoTheme.h"
 #include "PuyoScreenTransition.h"
 
+class NoNameAction : public Action {
+    public:
+        NoNameAction(PuyoLocalizedDictionary &locale, EditField &field)
+          : locale(locale), field(field)
+        {}
+
+        virtual void action() {
+            String s = field.getValue();
+            if (s == "") {
+                s = locale.getLocalizedString("NoName");
+                field.setValue(s);
+            }
+        }
+    private:
+        PuyoLocalizedDictionary locale;
+        EditField &field;
+};
+
 LocalGameMenu::LocalGameMenu(PuyoRealMainScreen *mainScreen)
     : locale(theCommander->getDataPathManager(), "locale", "main"),
       editPlayerName(locale.getLocalizedString("Player:"),
@@ -39,7 +57,10 @@ LocalGameMenu::LocalGameMenu(PuyoRealMainScreen *mainScreen)
       medium(locale.getLocalizedString("Medium"), &mediumAction),
       hard(locale.getLocalizedString("Hard"), &hardAction),
       back(locale.getLocalizedString("Cancel"), &popAction)
-{}
+{
+    EditField *editName = editPlayerName.getEditField();
+    editName->setAction(ON_START, new NoNameAction(locale, *editName));
+}
 
 void LocalGameMenu::build() {
     add(&editPlayerName);
@@ -47,7 +68,7 @@ void LocalGameMenu::build() {
     add(&easy);
     add(&medium);
     add(&hard);
-    add(&back);
+    // add(&back);
 }
 
 String LocalGameMenu::getPlayerName() const

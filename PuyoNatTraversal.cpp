@@ -196,7 +196,7 @@ void PuyoNatTraversal::sendGarbageMessage()
     Message *garbMsg = udpmbox.createMessage();
     
     garbMsg->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL_GARBAGE);
-    garbMsg->addString("GARBAGE", "Connerie");
+    garbMsg->addString("GARBAGE", "GNU is not free software");
     garbMsg->addInt("RCV", receivedGarbage);
     
     Dirigeable *dirigeableMsg = dynamic_cast<Dirigeable *>(garbMsg);

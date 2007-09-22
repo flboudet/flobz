@@ -1206,19 +1206,18 @@ namespace gameui {
 
     void EditField::eventOccured(GameControlEvent *event)
     {
-        repeat       = false;
-        repeat_speed = REPEAT_TIME;
 
-        if (event->isUp)
+        if (event->isUp) {
+            repeat = false;
             return;
-        printf("%g\n", ios_fc::getTimeMs() - repeat_date);
-        printf("%d\n", event->cursorEvent);
+        }
+        repeat_speed = REPEAT_TIME;
 
         if (event->cursorEvent == GameControlEvent::kStart) {
             editionMode = !editionMode;
             if (editionMode == true) {
                 previousValue = getValue();
-                setValue("_",false);
+                setValue(previousValue+"_",false);
             }
             else {
                 editionMode = true;
@@ -1291,12 +1290,14 @@ namespace gameui {
             }
             // kLeft => Like Backspace
             else if (event->cursorEvent == GameControlEvent::kLeft) {
-                String newValue = getValue().substring(0, getValue().length() - 2);
-                newValue += "_";
-                setValue(newValue,false);
-                repeat = true;
-                repeat_date = ios_fc::getTimeMs();
-                repeatEvent = *event;
+                if (getValue().length() > 1) {
+                    String newValue = getValue().substring(0, getValue().length() - 2);
+                    newValue += "_";
+                    setValue(newValue,false);
+                    repeat = true;
+                    repeat_date = ios_fc::getTimeMs();
+                    repeatEvent = *event;
+                }
             }
             // kRight => Duplicate last char
             else if (event->cursorEvent == GameControlEvent::kRight) {
@@ -1320,10 +1321,12 @@ namespace gameui {
                     printf("An International Character.\n");
                 }
 
-                if (e.key.keysym.sym == SDLK_BACKSPACE && (getValue().length() > 1)) {
-                    String newValue = getValue().substring(0, getValue().length() - 2);
-                    newValue += "_";
-                    setValue(newValue,false);
+                if (e.key.keysym.sym == SDLK_BACKSPACE) {
+                    if (getValue().length() > 1) {
+                        String newValue = getValue().substring(0, getValue().length() - 2);
+                        newValue += "_";
+                        setValue(newValue,false);
+                    }
                 }
                 else if (ch) {
                     String newValue = getValue();

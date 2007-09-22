@@ -11,7 +11,7 @@
     level.mediumSetting.type  = "FLOBO"
     level.mediumSetting.level = 190
     level.hardSetting.type    = "GYOM"
-    level.hardSetting.level   = 30
+    level.hardSetting.level   = 6
 [end_level]
 
 # Level 2: Duke Beary
