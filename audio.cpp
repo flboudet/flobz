@@ -23,7 +23,7 @@ static Uint16 audio_format;
 static int    audio_channels;
 
 static float sound_volume   = 1.0f;
-static float music_volume   = 1.0f;
+static float music_volume   = 0.5f;
 
 static bool sound_on = false;
 static bool music_on = false;
