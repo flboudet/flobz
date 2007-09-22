@@ -226,9 +226,23 @@ InputSwitch *switchForEvent(SDL_Event *e)
     case SDL_JOYBUTTONUP:
       return new JoystickSwitch(e->jbutton.which, e->jbutton.button, true);
       
-    case SDL_JOYAXISMOTION:
+    case SDL_JOYAXISMOTION: {
       prevaxis = axisSave[e->jaxis.which][e->jaxis.axis];
       axisSave[e->jaxis.which][e->jaxis.axis] = e->jaxis.value;
+
+      // Find the dominant axis
+      int axis = -1;
+      int max = 0;
+      for (int i=0;i<16;++i) {
+          int v = abs(axisSave[e->jaxis.which][i]);
+          if (v > max) {
+              max = v;
+              axis = i;
+          }
+      }
+      // If the dominant axis is not the moved axis, do not send event
+      if (e->jaxis.axis != axis)
+          return NULL;
 
       if ((e->jaxis.value > JOYSTICK_THRESHOLD) && (prevaxis <= JOYSTICK_THRESHOLD))
           return new JoystickAxisSwitch(e->jaxis.which, e->jaxis.axis, true, false);
@@ -240,6 +254,7 @@ InputSwitch *switchForEvent(SDL_Event *e)
           return new JoystickAxisSwitch(e->jaxis.which, e->jaxis.axis, false, true);
 
       return NULL;
+    }
       
     case SDL_KEYDOWN:
       return new KeyInputSwitch(e->key.keysym.sym, false, e->key.keysym.mod);

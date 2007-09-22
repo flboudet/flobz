@@ -4,7 +4,7 @@
 #include "glSDL.h"
 #include <string.h>
 
-const int JOYSTICK_THRESHOLD = 25000;
+const int JOYSTICK_THRESHOLD = 28000;
 
 class InputSwitch
 {
