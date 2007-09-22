@@ -4,17 +4,14 @@ import <interlevel.gsl>
   init_lib: enemy=1.0
   @peak.pos.y=0.0
   @kaori.pos.y=0.0
-  boolean @show_press=false
-  Balloon @offTalk = [new_balloon: image="balloon/balloon1.png" x=200.0 y=10.0 text_x=40.0 text_y=15.0]
-  
+  Balloon @offTalk = [new_balloon: image="balloon/balloon.png" x=326.0 y=50.0 text_x=40.0 text_y=15.0]
   
 <sprite_list>
   sprite_list_lib
-  //(@show_press=true)? balloon::@offTalk display=@display
   balloon::@offTalk display=@display
   
 <update>
     move::@kaori fcycle=90.0  x=@KaoriLeft y=@picHeight-@marges-@enemy*(@marges+@icons)
     move::@peak fcycle=90.0  x=0.0 y=@displayV - @picHeight
-    (@cycle > 180)?  show_balloon_with_text::@offTalk text="YO"
+    (@cycle = 90)?  show_balloon_with_text::@offTalk text="<PRESS FIRE>"
     (@cycle = 1800)? @finished=1
