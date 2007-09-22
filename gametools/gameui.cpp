@@ -2,6 +2,9 @@
 #include "../audio.h"
 #include "preferences.h"
 
+#define MIN_REPEAT_TIME 100.0
+#define REPEAT_TIME 300.0
+
 namespace gameui {
 
     GameUIEnum   GameUIDefaults::CONTAINER_POLICY = USE_MAX_SIZE;
@@ -235,6 +238,7 @@ namespace gameui {
     Box::Box(GameLoop *loop) : WidgetContainer(loop)
     {
         setPolicy(GameUIDefaults::CONTAINER_POLICY);
+        setReceiveUpEvents(true);
         activeWidget = -1;
     }
 
@@ -1149,8 +1153,10 @@ namespace gameui {
 
         font = fontInactive;
         editionMode = false;
+        repeat = false;
 
         setFocusable(true);
+        setReceiveUpEvents(true);
     }
 
     EditField::EditField(const String &defaultText, const String &persistentID)
@@ -1176,10 +1182,37 @@ namespace gameui {
         if (persistent && (persistence != "")) SetStrPreference(persistence, getValue());
     }
 
+    void EditField::idle(double currentTime)
+    {
+        Text::idle(currentTime);
+
+        if (repeat) {
+            double t = ios_fc::getTimeMs() - repeat_date;
+            if (t > repeat_speed) {
+                GameControlEvent e = repeatEvent;
+                double save_repeat_speed = repeat_speed;
+
+                eventOccured(&e);
+
+                repeat_speed = save_repeat_speed * 0.66;
+                if (repeat_speed < MIN_REPEAT_TIME)
+                    repeat_speed = MIN_REPEAT_TIME;
+                repeat_date = ios_fc::getTimeMs();
+                repeat = true;
+                repeatEvent = e;
+            }
+        }
+    }
+
     void EditField::eventOccured(GameControlEvent *event)
     {
+        repeat       = false;
+        repeat_speed = REPEAT_TIME;
+
         if (event->isUp)
             return;
+        printf("%g\n", ios_fc::getTimeMs() - repeat_date);
+        printf("%d\n", event->cursorEvent);
 
         if (event->cursorEvent == GameControlEvent::kStart) {
             editionMode = !editionMode;
@@ -1206,6 +1239,7 @@ namespace gameui {
                     editionMode = false;
                     event->setCaught();
                 }
+                repeat = false;
             }
             // kUp => Change last char of the entry (forward)
             else if (event->cursorEvent == GameControlEvent::kUp) {
@@ -1227,6 +1261,9 @@ namespace gameui {
                     index += 1;
                 newValue[newValue.length() - 2] = CHAR_ORDER[index];
                 setValue(newValue,false);
+                repeat = true;
+                repeat_date = ios_fc::getTimeMs();
+                repeatEvent = *event;
             }
             // kDown => Change last char of the entry (downward)
             else if (event->cursorEvent == GameControlEvent::kDown) {
@@ -1248,12 +1285,18 @@ namespace gameui {
                     index -= 1;
                 newValue[newValue.length() - 2] = CHAR_ORDER[index];
                 setValue(newValue,false);
+                repeat = true;
+                repeat_date = ios_fc::getTimeMs();
+                repeatEvent = *event;
             }
             // kLeft => Like Backspace
             else if (event->cursorEvent == GameControlEvent::kLeft) {
                 String newValue = getValue().substring(0, getValue().length() - 2);
                 newValue += "_";
                 setValue(newValue,false);
+                repeat = true;
+                repeat_date = ios_fc::getTimeMs();
+                repeatEvent = *event;
             }
             // kRight => Duplicate last char
             else if (event->cursorEvent == GameControlEvent::kRight) {
@@ -1261,6 +1304,9 @@ namespace gameui {
                 newValue[newValue.length() - 1] = newValue[newValue.length() - 2];
                 newValue += "_";
                 setValue(newValue,false);
+                repeat = true;
+                repeat_date = ios_fc::getTimeMs();
+                repeatEvent = *event;
             }
             // Keyboard input is also supported
             else if (event->sdl_event.type == SDL_KEYDOWN) {
@@ -1285,6 +1331,9 @@ namespace gameui {
                     newValue += "_";
                     setValue(newValue,false);
                 }
+                repeat = true;
+                repeat_date = ios_fc::getTimeMs();
+                repeatEvent = *event;
             }
         }
         else {

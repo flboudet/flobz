@@ -364,6 +364,7 @@ namespace gameui {
       void giveFocus();
 	  
 	  bool setEditOnFocus(bool editOnFocus) { this->editOnFocus = editOnFocus; }
+      void idle(double currentTime);
       
     private:
       SoFont *fontActive;
@@ -373,6 +374,12 @@ namespace gameui {
       String previousValue;
       void init(SoFont *fontActive, SoFont *fontInactive);
 	  bool editOnFocus;
+
+      // Event repeat related attributes
+      bool repeat;
+      double repeat_date;
+      double repeat_speed;
+      GameControlEvent repeatEvent;
   };
   
   class ControlInputWidget : public Text {
