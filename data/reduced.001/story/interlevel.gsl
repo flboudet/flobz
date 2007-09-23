@@ -52,7 +52,7 @@
     @enemy4.image = "introlevel/azrael-mini.png"
     @enemy5.image = "introlevel/unmapped-mini.png"
     @enemy6.image = "introlevel/unmapped-mini.png"
-    @enemy7.image = "introlevel/unmapped-mini.png"
+    @enemy7.image = "introlevel/frankenpuyo-mini.png"
     @enemy8.image = "introlevel/mcflurry-mini.png"
     @enemy9.image = "introlevel/unmapped-mini.png"
 
