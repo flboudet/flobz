@@ -5,6 +5,7 @@
     level.backgroundTheme     = "Kaori's farm"
     level.easySetting.type    = "RANDOM"
     level.easySetting.level   = 350
+    level.easySetting.nColors = 2
     level.mediumSetting.type  = "FLOBO"
     level.mediumSetting.level = 190
     level.hardSetting.type    = "TANIA"
@@ -18,6 +19,7 @@
     level.backgroundTheme     = "The forest"
     level.easySetting.type    = "FLOBO"
     level.easySetting.level   = 350
+    level.easySetting.nColors = 3
     level.mediumSetting.type  = "JEKO"
     level.mediumSetting.level = 180
     level.hardSetting.type    = "JEKO"
@@ -30,6 +32,7 @@
     level.opponentName        = "Unmapped Monster"
     level.easySetting.type    = "FLOBO"
     level.easySetting.level   = 250
+    level.easySetting.nColors = 4
     level.mediumSetting.type  = "TANIA"
     level.mediumSetting.level = 160
     level.hardSetting.type    = "GYOM"
@@ -42,6 +45,7 @@
     level.opponentName        = "Azrael"
     level.easySetting.type    = "FLOBO"
     level.easySetting.level   = 180
+    level.easySetting.nColors = 5
     level.mediumSetting.type  = "FLOBO"
     level.mediumSetting.level = 90
     level.hardSetting.type    = "JEKO"

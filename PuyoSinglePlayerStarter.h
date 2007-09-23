@@ -47,7 +47,7 @@ private:
 
 class PuyoSinglePlayerGameWidget : public PuyoGameWidget {
 public:
-    PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, int lifes, String aiFace, Action *gameOverAction = NULL);
+    PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
     PuyoStoryWidget *getOpponentFace();
@@ -65,9 +65,10 @@ private:
 class PuyoLevelDefinitions {
 public:
     struct SelIA {
-      SelIA(String type, int level);
+      SelIA(String type, int level, int nColors);
         IA_Type type;
         int level;
+        int nColors;
     };
     struct LevelDefinition {
       LevelDefinition(String levelName, String introStory,
@@ -119,6 +120,7 @@ public:
     int getIALevel() const;
     String getIAName() const;
     String getIAFace() const;
+    int getNColors() const;
 private:
     int gameLevel, difficulty;
     PuyoLevelDefinitions::LevelDefinition *levelDefinition;

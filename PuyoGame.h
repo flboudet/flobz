@@ -59,10 +59,11 @@ enum PuyoState {
 
 class PuyoRandomSystem {
 public:
-	PuyoRandomSystem();
+	PuyoRandomSystem(int numColors = 5);
   PuyoRandomSystem(unsigned long seed);
 	PuyoState getPuyoForSequence(int sequence);
 private:
+    int numColors;
 	AdvancedBuffer<int> sequenceItems;
 };
 

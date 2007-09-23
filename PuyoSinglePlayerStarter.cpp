@@ -47,14 +47,16 @@ void PuyoCombinedEventPlayer::cycle()
     player2controller.cycle();
 }
 
-PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, int lifes, String aiFace, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
-                                                     attachedGameFactory(&attachedRandom),
-                                                     areaA(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
-                                                     1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
-                                                     areaB(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
-                                                     1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
-                                                     playercontroller(areaA),
-                                                     opponentcontroller(type, level, areaB), faceTicks(0), opponentFace(aiFace)
+PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
+    : attachedPuyoThemeSet(puyoThemeSet),
+    attachedRandom(nColors),
+    attachedGameFactory(&attachedRandom),
+    areaA(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
+          1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
+    areaB(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
+          1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
+    playercontroller(areaA),
+    opponentcontroller(type, level, areaB), faceTicks(0), opponentFace(aiFace)
 {
     initialize(areaA, areaB, playercontroller, opponentcontroller, levelTheme, gameOverAction);
     setLives(lifes);
@@ -113,7 +115,7 @@ void PuyoLevelDefinitions::addLevelDefinition(String levelName, String introStor
 					   easySettings, mediumSettings, hardSettings));
 }
 
-PuyoLevelDefinitions::SelIA::SelIA(String type, int level) : level(level)
+PuyoLevelDefinitions::SelIA::SelIA(String type, int level, int nColors) : level(level), nColors(nColors)
 {
   if (type == "RANDOM")
     this->type = RANDOM;
@@ -137,9 +139,15 @@ void PuyoLevelDefinitions::end_level(GoomSL *gsl, GoomHash *global, GoomHash *lo
   const char * backgroundTheme = (const char *) GSL_GLOBAL_PTR(gsl, "level.backgroundTheme");
   const char * gameLostStory = (const char *) GSL_GLOBAL_PTR(gsl, "level.gameLostStory");
   const char * gameOverStory = (const char *) GSL_GLOBAL_PTR(gsl, "level.gameOverStory");
-  SelIA easySettings((const char *) GSL_GLOBAL_PTR(gsl, "level.easySetting.type"), GSL_GLOBAL_INT(gsl, "level.easySetting.level"));
-  SelIA mediumSettings((const char *) GSL_GLOBAL_PTR(gsl, "level.mediumSetting.type"), GSL_GLOBAL_INT(gsl, "level.mediumSetting.level"));
-  SelIA hardSettings((const char *) GSL_GLOBAL_PTR(gsl, "level.hardSetting.type"), GSL_GLOBAL_INT(gsl, "level.hardSetting.level"));
+  SelIA easySettings((const char *) GSL_GLOBAL_PTR(gsl, "level.easySetting.type"),
+                     GSL_GLOBAL_INT(gsl, "level.easySetting.level"),
+                     GSL_GLOBAL_INT(gsl, "level.easySetting.nColors"));
+  SelIA mediumSettings((const char *) GSL_GLOBAL_PTR(gsl, "level.mediumSetting.type"),
+                       GSL_GLOBAL_INT(gsl, "level.mediumSetting.level"),
+                       GSL_GLOBAL_INT(gsl, "level.mediumSetting.nColors"));
+  SelIA hardSettings((const char *) GSL_GLOBAL_PTR(gsl, "level.hardSetting.type"),
+                     GSL_GLOBAL_INT(gsl, "level.hardSetting.level"),
+                     GSL_GLOBAL_INT(gsl, "level.hardSetting.nColors"));
   currentDefinition->addLevelDefinition(levelName, introStory, opponentStory, opponentName,
 					opponentFace, backgroundTheme, gameLostStory, gameOverStory,
 					easySettings, mediumSettings, hardSettings);
@@ -210,6 +218,18 @@ int PuyoSingleGameLevelData::getIALevel() const
             return levelDefinition->mediumSettings.level;
         default:
             return levelDefinition->hardSettings.level;
+    }
+}
+
+int PuyoSingleGameLevelData::getNColors() const
+{
+    switch (difficulty) {
+        case 0:
+            return levelDefinition->easySettings.nColors;
+        case 1:
+            return levelDefinition->mediumSettings.nColors;
+        default:
+            return levelDefinition->hardSettings.nColors;
     }
 }
 
@@ -356,7 +376,7 @@ void SinglePlayerStarterAction::initiateLevel()
 
 void SinglePlayerStarterAction::startGame()
 {
-    gameWidget = new PuyoSinglePlayerGameWidget(levelData->getPuyoTheme(), levelData->getLevelTheme(), levelData->getIAType(), levelData->getIALevel(), lifes, levelData->getIAFace(), this);
+    gameWidget = new PuyoSinglePlayerGameWidget(levelData->getPuyoTheme(), levelData->getLevelTheme(), levelData->getIAType(), levelData->getIALevel(), levelData->getNColors(), lifes, levelData->getIAFace(), this);
     gameScreen = new PuyoGameScreen(*gameWidget, *story);
     if (nameProvider != NULL)
         gameWidget->setPlayerOneName(nameProvider->getPlayerName());

@@ -33,7 +33,7 @@
 
 static int fallingTable[PUYODIMX] = {0, 3, 1, 4, 2, 5};
 
-PuyoRandomSystem::PuyoRandomSystem()
+PuyoRandomSystem::PuyoRandomSystem(int numColors) : numColors(numColors)
 {
     init_genrand(SDL_GetTicks());
 }
@@ -46,7 +46,7 @@ PuyoRandomSystem::PuyoRandomSystem(unsigned long seed)
 PuyoState PuyoRandomSystem::getPuyoForSequence(int sequence)
 {
     if (sequenceItems.size() <= sequence) {
-        int newItem = (genrand_int32() % 5) + PUYO_FALLINGBLUE;
+        int newItem = (genrand_int32() % numColors) + PUYO_FALLINGBLUE;
         sequenceItems.add(newItem);
         return (PuyoState)newItem;
     }

@@ -2,7 +2,8 @@
 
 struct <IASetting:
     string type,
-    int    level>
+    int    level,
+    int    nColors>
 
 struct <Level:
     string levelName,
@@ -32,10 +33,13 @@ external <end_level>
     level.gameOverStory       = "gameover1p.gsl"
     level.easySetting.type    = "RANDOM"
     level.easySetting.level   = 350
-    level.mediumSetting.type  = "RANDOM"
-    level.mediumSetting.level = 350
+    level.easySetting.nColors = 5
+    level.mediumSetting.type    = "RANDOM"
+    level.mediumSetting.level   = 350
+    level.mediumSetting.nColors = 5
     level.hardSetting.type    = "RANDOM"
     level.hardSetting.level   = 350
+    level.hardSetting.nColors = 5
 
 <LevelDefinition>
 [start_level]
