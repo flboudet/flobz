@@ -121,7 +121,8 @@ void AnimatedPuyo::renderAt(int X, int Y)
         painter.requestDraw(currentSurface, &drect);
         
         /* Main puyo show */
-        if (this == attachedGame->getFallingPuyo())
+        /* TODO: Investigate why, during network game, the falling puyo starts by being neutral */
+        if ((this == attachedGame->getFallingPuyo()) && (getPuyoState() != PUYO_NEUTRAL))
             painter.requestDraw(attachedTheme->getCircleSurfaceForIndex((smallTicksCount >> 2) & 0x1F), &drect);
         
         /* Eye management */
