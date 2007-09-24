@@ -38,7 +38,7 @@ PuyoRandomSystem::PuyoRandomSystem(int numColors) : numColors(numColors)
     init_genrand(SDL_GetTicks());
 }
 
-PuyoRandomSystem::PuyoRandomSystem(unsigned long seed)
+PuyoRandomSystem::PuyoRandomSystem(unsigned long seed, int numColors) : numColors(numColors)
 {
     init_genrand(seed);
 }

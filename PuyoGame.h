@@ -59,8 +59,8 @@ enum PuyoState {
 
 class PuyoRandomSystem {
 public:
-	PuyoRandomSystem(int numColors = 5);
-  PuyoRandomSystem(unsigned long seed);
+	PuyoRandomSystem(int numColors);
+  PuyoRandomSystem(unsigned long seed, int numColors);
 	PuyoState getPuyoForSequence(int sequence);
 private:
     int numColors;

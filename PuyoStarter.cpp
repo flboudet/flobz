@@ -570,7 +570,7 @@ void PuyoGameScreen::setOverlayStory(PuyoStoryWidget *story)
 }
 
 PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
-                                                     attachedGameFactory(&attachedRandom),
+                                                     attachedRandom(5), attachedGameFactory(&attachedRandom),
                                                      areaA(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
                                                      1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
                                                      areaB(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,

@@ -40,7 +40,7 @@ PuyoGame *PuyoNetworkGameFactory::createPuyoGame(PuyoFactory *attachedPuyoFactor
 }
 
 PuyoNetworkGameWidget::PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction)
-    : attachedPuyoThemeSet(puyoThemeSet), attachedRandom(randomSeed), mbox(mbox), attachedLocalGameFactory(&attachedRandom),
+    : attachedPuyoThemeSet(puyoThemeSet), attachedRandom(randomSeed, 5), mbox(mbox), attachedLocalGameFactory(&attachedRandom),
       attachedNetworkGameFactory(&attachedRandom, mbox, gameId), localArea(&attachedLocalGameFactory, &attachedPuyoThemeSet, &levelTheme,
             1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, gameId, painter),
       networkArea(&attachedNetworkGameFactory, &attachedPuyoThemeSet, &levelTheme,
