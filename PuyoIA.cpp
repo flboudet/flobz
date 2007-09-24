@@ -454,11 +454,11 @@ bool dropBinom(const PuyoBinom binom, const GridState * const src, GridState * c
   return true;
 }
 
-int PuyoIA::makeEvaluation(const GridEvaluation * const referenceOne, const PuyoBinom puyos)
+int PuyoIA::makeEvaluation(const GridEvaluation * const referenceOne, const PuyoBinom puyos, const GridState * const grid)
 {
   int rR,rP;
   
-  rR = (referenceOne->puyoSuppressed + referenceOne->neutralSuppressed + referenceOne->puyoGrouped);
+  rR = (2 * referenceOne->puyoSuppressed + 2 * referenceOne->neutralSuppressed + referenceOne->puyoGrouped);
   rR *= ((AIParameters*)special)->realSuppressionValue;
 
   if (((AIParameters*)special)->criticalHeight > referenceOne->height)
@@ -466,7 +466,11 @@ int PuyoIA::makeEvaluation(const GridEvaluation * const referenceOne, const Puyo
     rP = (referenceOne->neutralSuppressedPotential + referenceOne->puyoSuppressedPotential);
     rP *= ((AIParameters*)special)->potentialSuppressionValue;
   }
-  else rP = 0;
+  else
+  {
+    rP = 0;
+    rR *= 2;
+  }
 
   int pos1, pos2;
   pos1 = puyos.position.x;
@@ -481,15 +485,28 @@ int PuyoIA::makeEvaluation(const GridEvaluation * const referenceOne, const Puyo
       break;
   }
   
-  int c = (((AIParameters*)special)->columnScalar[pos1] + ((AIParameters*)special)->columnScalar[pos2])-referenceOne->height;
+  int c = 0;
+  
+  if (((AIParameters*)special)->criticalHeight > referenceOne->height)
+  {
+
+  for (int x = 0;  x < IA_PUYODIMX; x++)
+  {
+    c += IA_PUYODIMY - abs(((AIParameters*)special)->columnScalar[x] - (int)(*grid)[x][HEIGHTS_ROW]);
+  }
+  c*=IA_PUYODIMX;
+    c += ((AIParameters*)special)->columnScalar[pos1] - (int)(*grid)[pos1][HEIGHTS_ROW];
+    c += ((AIParameters*)special)->columnScalar[pos2] - (int)(*grid)[pos2][HEIGHTS_ROW];
+  }
+  else c = IA_PUYODIMY * IA_PUYODIMX * IA_PUYODIMX + 2 * IA_PUYODIMY;
 
   int r = c * (1+rR+rP);
   return r;
 }
 
-bool PuyoIA::selectIfBetterEvaluation(int * const best, const GridEvaluation * const newOne, const PuyoBinom puyos)
+bool PuyoIA::selectIfBetterEvaluation(int * const best, const GridEvaluation * const newOne, const PuyoBinom puyos, const GridState * const grid)
 {
-  int n = makeEvaluation(newOne, puyos);
+  int n = makeEvaluation(newOne, puyos, grid);
   int r = *best;
   if (n > r)
   {
@@ -517,25 +534,26 @@ PuyoIA::PuyoIA(IA_Type type, int level, PuyoView &targetView)
   {
     case GYOM: // Nohoho maker
       special = malloc(sizeof(AIParameters));
-      ((AIParameters*)special)->realSuppressionValue = 1;
+      ((AIParameters*)special)->realSuppressionValue = 2;
       ((AIParameters*)special)->potentialSuppressionValue = 3;
-      ((AIParameters*)special)->criticalHeight = 8;
-      ((AIParameters*)special)->columnScalar[0] = 13;
-      ((AIParameters*)special)->columnScalar[1] = 12;
-      ((AIParameters*)special)->columnScalar[2] = 11;
-      ((AIParameters*)special)->columnScalar[3] = 18;
-      ((AIParameters*)special)->columnScalar[4] = 19;
+      ((AIParameters*)special)->criticalHeight = 10;
       ((AIParameters*)special)->columnScalar[5] = 20;
+      ((AIParameters*)special)->columnScalar[0] =  4;
+      ((AIParameters*)special)->columnScalar[1] =  2;
+      ((AIParameters*)special)->columnScalar[2] =  1;
+      ((AIParameters*)special)->columnScalar[3] =  8;
+      ((AIParameters*)special)->columnScalar[4] =  9;
+      ((AIParameters*)special)->columnScalar[5] = 10;
       break;
   
     case FLOBO: // Remove it all
       special = malloc(sizeof(AIParameters));
       ((AIParameters*)special)->realSuppressionValue = 1;
-      ((AIParameters*)special)->potentialSuppressionValue = 0;
-      ((AIParameters*)special)->criticalHeight = 3;
+      ((AIParameters*)special)->potentialSuppressionValue = 2;
+      ((AIParameters*)special)->criticalHeight = 1;
       ((AIParameters*)special)->columnScalar[0] = 1;
       ((AIParameters*)special)->columnScalar[1] = 1;
-      ((AIParameters*)special)->columnScalar[2] = 1;
+      ((AIParameters*)special)->columnScalar[2] = 0;
       ((AIParameters*)special)->columnScalar[3] = 1;
       ((AIParameters*)special)->columnScalar[4] = 1;
       ((AIParameters*)special)->columnScalar[5] = 1;
@@ -545,26 +563,26 @@ PuyoIA::PuyoIA(IA_Type type, int level, PuyoView &targetView)
       special = malloc(sizeof(AIParameters));
       ((AIParameters*)special)->realSuppressionValue = 2;
       ((AIParameters*)special)->potentialSuppressionValue = 1;
-      ((AIParameters*)special)->criticalHeight = 5;
-      ((AIParameters*)special)->columnScalar[0] = 12;
-      ((AIParameters*)special)->columnScalar[1] = 11;
-      ((AIParameters*)special)->columnScalar[2] = 9;
-      ((AIParameters*)special)->columnScalar[3] = 10;
-      ((AIParameters*)special)->columnScalar[4] = 11;
-      ((AIParameters*)special)->columnScalar[5] = 12;
+      ((AIParameters*)special)->criticalHeight = 8;
+      ((AIParameters*)special)->columnScalar[0] = 7;
+      ((AIParameters*)special)->columnScalar[1] = 5;
+      ((AIParameters*)special)->columnScalar[2] = 2;
+      ((AIParameters*)special)->columnScalar[3] = 4;
+      ((AIParameters*)special)->columnScalar[4] = 6;
+      ((AIParameters*)special)->columnScalar[5] = 8;
       break;
   
     case JEKO: // Builds til death
       special = malloc(sizeof(AIParameters));
       ((AIParameters*)special)->realSuppressionValue = 1;
       ((AIParameters*)special)->potentialSuppressionValue = 2;
-      ((AIParameters*)special)->criticalHeight = 8;
-      ((AIParameters*)special)->columnScalar[0] = 12;
-      ((AIParameters*)special)->columnScalar[1] = 11;
-      ((AIParameters*)special)->columnScalar[2] = 9;
-      ((AIParameters*)special)->columnScalar[3] = 10;
-      ((AIParameters*)special)->columnScalar[4] = 11;
-      ((AIParameters*)special)->columnScalar[5] = 12;
+      ((AIParameters*)special)->criticalHeight = 9;
+      ((AIParameters*)special)->columnScalar[0] = 9;
+      ((AIParameters*)special)->columnScalar[1] = 8;
+      ((AIParameters*)special)->columnScalar[2] = 7;
+      ((AIParameters*)special)->columnScalar[3] = 8;
+      ((AIParameters*)special)->columnScalar[4] = 8;
+      ((AIParameters*)special)->columnScalar[5] = 9;
       break;
 
     default:
@@ -749,7 +767,7 @@ void PuyoIA::decide()
         {
           evalWith(&state2, &state1, &evaluation2);
 
-          if (foundOne == false || selectIfBetterEvaluation(&bestEvaluation, &evaluation2, current))
+          if (foundOne == false || selectIfBetterEvaluation(&bestEvaluation, &evaluation2, current, &state2))
           {
             bestl1 = l1;
             bestl2 = l2;
