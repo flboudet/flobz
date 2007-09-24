@@ -34,7 +34,6 @@ static const PuyoBinom nullBinom = {PUYO_EMPTY,PUYO_EMPTY,Left,nullPosition};
 static const GridEvaluation nullEvaluation = {0,0,0,0,0,0};
 
 #define copyGrid(dst,src) memcpy((void *)dst, (void *)src, sizeof(GridState))
-#define resetGrid(dst) memset((void *)dst, PUYO_EMPTY, sizeof(GridState))
 #define zeroGrid(dst) memset((void *)dst, 0, sizeof(GridState))
 
 #define HEIGHTS_ROW (IA_TABLEDIMY-1)
@@ -122,7 +121,6 @@ bool removeSamePuyoAround(int X, int Y, const PuyoState color, GridState * const
       }
     }
   }
-
 
   if (nFound < 4)
   {
@@ -517,7 +515,7 @@ PuyoIA::PuyoIA(IA_Type type, int level, PuyoView &targetView)
   // Select IA
   switch (type)
   {
-    case GYOM:
+    case GYOM: // Nohoho maker
       special = malloc(sizeof(AIParameters));
       ((AIParameters*)special)->realSuppressionValue = 1;
       ((AIParameters*)special)->potentialSuppressionValue = 3;
@@ -530,10 +528,10 @@ PuyoIA::PuyoIA(IA_Type type, int level, PuyoView &targetView)
       ((AIParameters*)special)->columnScalar[5] = 20;
       break;
   
-    case FLOBO:
+    case FLOBO: // Remove it all
       special = malloc(sizeof(AIParameters));
-      ((AIParameters*)special)->realSuppressionValue = 3;
-      ((AIParameters*)special)->potentialSuppressionValue = 1;
+      ((AIParameters*)special)->realSuppressionValue = 1;
+      ((AIParameters*)special)->potentialSuppressionValue = 0;
       ((AIParameters*)special)->criticalHeight = 3;
       ((AIParameters*)special)->columnScalar[0] = 1;
       ((AIParameters*)special)->columnScalar[1] = 1;
@@ -543,30 +541,30 @@ PuyoIA::PuyoIA(IA_Type type, int level, PuyoView &targetView)
       ((AIParameters*)special)->columnScalar[5] = 1;
       break;
   
-    case TANIA:
+    case TANIA: // Balanced
       special = malloc(sizeof(AIParameters));
       ((AIParameters*)special)->realSuppressionValue = 2;
       ((AIParameters*)special)->potentialSuppressionValue = 1;
       ((AIParameters*)special)->criticalHeight = 5;
-      ((AIParameters*)special)->columnScalar[0] = 1;
-      ((AIParameters*)special)->columnScalar[1] = 2;
-      ((AIParameters*)special)->columnScalar[2] = 1;
-      ((AIParameters*)special)->columnScalar[3] = 2;
-      ((AIParameters*)special)->columnScalar[4] = 1;
-      ((AIParameters*)special)->columnScalar[5] = 2;
+      ((AIParameters*)special)->columnScalar[0] = 12;
+      ((AIParameters*)special)->columnScalar[1] = 11;
+      ((AIParameters*)special)->columnScalar[2] = 9;
+      ((AIParameters*)special)->columnScalar[3] = 10;
+      ((AIParameters*)special)->columnScalar[4] = 11;
+      ((AIParameters*)special)->columnScalar[5] = 12;
       break;
   
-    case JEKO:
+    case JEKO: // Builds til death
       special = malloc(sizeof(AIParameters));
       ((AIParameters*)special)->realSuppressionValue = 1;
-      ((AIParameters*)special)->potentialSuppressionValue = 3;
+      ((AIParameters*)special)->potentialSuppressionValue = 2;
       ((AIParameters*)special)->criticalHeight = 8;
-      ((AIParameters*)special)->columnScalar[0] = 2;
-      ((AIParameters*)special)->columnScalar[1] = 1;
-      ((AIParameters*)special)->columnScalar[2] = 1;
-      ((AIParameters*)special)->columnScalar[3] = 1;
-      ((AIParameters*)special)->columnScalar[4] = 1;
-      ((AIParameters*)special)->columnScalar[5] = 2;
+      ((AIParameters*)special)->columnScalar[0] = 12;
+      ((AIParameters*)special)->columnScalar[1] = 11;
+      ((AIParameters*)special)->columnScalar[2] = 9;
+      ((AIParameters*)special)->columnScalar[3] = 10;
+      ((AIParameters*)special)->columnScalar[4] = 11;
+      ((AIParameters*)special)->columnScalar[5] = 12;
       break;
 
     default:
@@ -708,8 +706,13 @@ void PuyoIA::decide()
   bool foundOne = false;
 
   // get puyo binoms to drop
-  current.falling     = extractColor(attachedGame->getFallingState());
-  current.companion   = extractColor(attachedGame->getCompanionState());
+  PuyoState etat;
+  etat = attachedGame->getFallingState();
+  if (etat == PUYO_EMPTY) return;
+  current.falling     = extractColor(etat);
+  etat = attachedGame->getCompanionState();
+  if (etat == PUYO_EMPTY) return;
+  current.companion   = extractColor(etat);
   current.orientation = extractOrientation(attachedGame->getFallingCompanionDir());
   current.position.x  = attachedGame->getFallingX();
   current.position.y  = PUYODIMY - attachedGame->getFallingY();
