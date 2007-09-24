@@ -59,6 +59,7 @@ protected:
     void associatedScreenHasBeenSet(PuyoGameScreen *associatedScreen);
 private:
     void sendSyncMsg();
+    void sendAliveMsg();
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;
     ios_fc::MessageBox &mbox;
@@ -69,7 +70,7 @@ private:
     PuyoCombinedEventPlayer playercontroller;
     PuyoNullPlayer dummyPlayerController;
     bool syncMsgReceived, syncMsgSent;
-    double lastMessageDate;
+    double lastMessageDate, lastAliveMessageSentDate;
     // Chat zone
     ChatBox chatBox;
 };

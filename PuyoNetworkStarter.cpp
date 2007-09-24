@@ -67,6 +67,11 @@ void PuyoNetworkGameWidget::cycle()
     }
     if (syncMsgReceived) {
         PuyoGameWidget::cycle();
+        if (paused) {
+            if (ios_fc::getTimeMs() - lastAliveMessageSentDate > 2000.) {
+                sendAliveMsg();
+            }
+        }
         if (ios_fc::getTimeMs() - lastMessageDate > 5000.) {
             printf("Network problem!\n");
         }
@@ -118,6 +123,7 @@ void PuyoNetworkGameWidget::setScreenToPaused(bool fromControls)
         message->send();
         delete message;
     }
+    lastAliveMessageSentDate = ios_fc::getTimeMs();
     PuyoGameWidget::setScreenToPaused(fromControls);
 }
 
@@ -186,4 +192,14 @@ void PuyoNetworkGameWidget::sendSyncMsg()
     message->send();
     delete message;
 }
+
+void PuyoNetworkGameWidget::sendAliveMsg()
+{
+    ios_fc::Message *message = mbox.createMessage();
+    message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameAlive);
+    message->send();
+    delete message;
+}
+
+
 
