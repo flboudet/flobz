@@ -1204,6 +1204,32 @@ namespace gameui {
         }
     }
 
+    int utf16_to_utf8(int src, char *dest)
+    {
+        char byte[4];
+        int i, ch, nbytes;
+
+        if (src < 0x80) {
+            nbytes = 1;
+            byte[0] = src;
+        } else if (src < 0x800) {
+            nbytes = 2;
+            byte[1] = (src & 0x3f) | 0x80;
+            byte[0] = ((src << 2) & 0xcf00 | 0xc000) >> 8;
+        } else {
+            nbytes = 3;
+            byte[2] = (src & 0x3f) | 0x80;
+            byte[1] = ((src << 2) & 0x3f00 | 0x8000) >> 8;
+            byte[0] = ((src << 4) & 0x3f0000 | 0xe00000) >> 16;
+        }
+
+        for (i = nbytes; i < 4; i++)
+            byte[i] = 0;
+
+        strcpy(dest, byte);
+        return nbytes;
+    }
+
     void EditField::eventOccured(GameControlEvent *event)
     {
 
@@ -1291,7 +1317,12 @@ namespace gameui {
             // kLeft => Like Backspace
             else if (event->cursorEvent == GameControlEvent::kLeft) {
                 if (getValue().length() > 1) {
-                    String newValue = getValue().substring(0, getValue().length() - 2);
+                    int last=getValue().length() - 2;
+#ifdef ENABLE_TTF
+                    while ((getValue()[last] & 0xc0) == 0x80)
+                        last--;
+#endif
+                    String newValue = getValue().substring(0, last);
                     newValue += "_";
                     setValue(newValue,false);
                     repeat = true;
@@ -1318,12 +1349,30 @@ namespace gameui {
                     ch = e.key.keysym.unicode & 0x7F;
                 }
                 else {
-                    printf("An International Character.\n");
+#ifdef ENABLE_TTF
+                    String newValue = getValue();
+                    Uint16 unicode = e.key.keysym.unicode;
+                    char utf8[5];
+                    int nchars = utf16_to_utf8(unicode, utf8);
+                    printf("%d\n", nchars);
+                    for (int i=0; i<nchars; ++i) {
+                        newValue[newValue.length() - 1] = utf8[i];
+                        newValue += "_";
+                    }
+                    setValue(newValue,false);
+#else
+                    printf("Not supported.\n");
+#endif
                 }
 
                 if (e.key.keysym.sym == SDLK_BACKSPACE) {
                     if (getValue().length() > 1) {
-                        String newValue = getValue().substring(0, getValue().length() - 2);
+                        int last=getValue().length() - 2;
+#ifdef ENABLE_TTF
+                        while ((getValue()[last] & 0xc0) == 0x80)
+                            last--;
+#endif
+                        String newValue = getValue().substring(0, last);
                         newValue += "_";
                         setValue(newValue,false);
                     }

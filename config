@@ -12,6 +12,7 @@ ENABLE_FAT=false
 ENABLE_AUDIO=true
 DISABLE_NETWORK?=false
 ENABLE_OPENGL?=false
+ENABLE_TTF?=false
 ENABLE_DGA=false
 
 DEBUG_MODE=true
@@ -82,6 +83,12 @@ endif
 # Network
 ifeq ($(DISABLE_NETWORK), true)
     CFLAGS:=$(CFLAGS) -DDISABLE_NETWORK=1
+endif
+
+# True Type Fonts
+ifeq ($(ENABLE_TTF), true)
+	CFLAGS:=$(CFLAGS) -DENABLE_TTF=1
+    LDFLAGS:=$(LDFLAGS) -lSDL_ttf
 endif
 
 # OpenGL

@@ -48,7 +48,11 @@ typedef struct _SOFONT SoFont;
 SoFont *SoFont_new ();
 void    SoFont_free (SoFont * font);
 
-int     SoFont_load (SoFont * font, IIM_Surface * FontSurface);
+#ifdef ENABLE_TTF
+int     SoFont_load_ttf (SoFont * font, const char *fileName, int size);
+#else
+int     SoFont_load (SoFont * font, IIM_Surface *picture);
+#endif
 void    SoFont_Refresh(SoFont * font);
 
 /// Blits a string to a surface
