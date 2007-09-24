@@ -1,4 +1,5 @@
 #include "InputManager.h"
+#include <stdlib.h>
 
 typedef struct SdlKeyName {
   int key;
@@ -241,8 +242,8 @@ InputSwitch *switchForEvent(SDL_Event *e)
           }
       }
       // If the dominant axis is not the moved axis, do not send event
-      if (e->jaxis.axis != axis)
-          return NULL;
+      //if (e->jaxis.axis != axis)
+      //  return NULL;
 
       if ((e->jaxis.value > JOYSTICK_THRESHOLD) && (prevaxis <= JOYSTICK_THRESHOLD))
           return new JoystickAxisSwitch(e->jaxis.which, e->jaxis.axis, true, false);

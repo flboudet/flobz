@@ -57,3 +57,12 @@
     level.grid          = "mansion"
 [end_level]
 
+[start_level]
+    level.name          = "Near the city"
+    level.description   = "A place full of secrets."
+    level.background    = "landfill"
+    level.speedmeter_x = 320
+    level.speedmeter_y = 130
+    level.grid          = "mansion"
+[end_level]
+

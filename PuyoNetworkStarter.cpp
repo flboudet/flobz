@@ -27,6 +27,8 @@
 #include "PuyoMessageDef.h"
 #include "PuyoNetworkView.h"
 #include "PuyoNetworkGame.h"
+#include "ios_time.h"
+#include "PuyoMessageDef.h"
 
 extern const char *p1name;
 extern const char *p2name;
@@ -63,14 +65,23 @@ void PuyoNetworkGameWidget::cycle()
         sendSyncMsg();
         syncMsgSent = true;
     }
-    if (syncMsgReceived)
+    if (syncMsgReceived) {
         PuyoGameWidget::cycle();
+        if (ios_fc::getTimeMs() - lastMessageDate > 5000.) {
+            printf("Network problem!\n");
+        }
+    }
 }
 
 void PuyoNetworkGameWidget::onMessage(Message &message)
 {
+    if (message.hasInt(PuyoMessage::GAMEID)) {
+        lastMessageDate = ios_fc::getTimeMs();
+    }
     if (!message.hasInt(PuyoMessage::TYPE))
-            return;
+        return;
+    lastMessageDate = ios_fc::getTimeMs();
+    printf("Message at date %f\n", lastMessageDate);
     int msgType = message.getInt(PuyoMessage::TYPE);
     switch (msgType) {
         case PuyoMessage::kGameStart:

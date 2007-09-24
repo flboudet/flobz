@@ -153,12 +153,7 @@ external <sound: string file, float volume>
     (&this.alpha < 0.0)? &this.alpha = 0.0
     (&this.alpha > 1.0)? &this.alpha = 1.0
     int c = [charAt: value=&this.text index=[f2i: value=&this.text_index]]
-    float tspeed = 0.55
-    (c = '!')? tspeed=0.25
-    (c = ',')? tspeed=0.3
-    (c = '-')? tspeed=0.05
-    (c = '.')? tspeed=0.25
-    (c = '?')? tspeed=0.25
+    float tspeed = 0.75
     &this.text_index += tspeed * @delta_cycle
   }
   (@mode = DRAW)? {

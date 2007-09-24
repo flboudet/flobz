@@ -69,6 +69,7 @@ private:
     PuyoCombinedEventPlayer playercontroller;
     PuyoNullPlayer dummyPlayerController;
     bool syncMsgReceived, syncMsgSent;
+    double lastMessageDate;
     // Chat zone
     ChatBox chatBox;
 };
