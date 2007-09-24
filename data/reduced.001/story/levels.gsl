@@ -1,42 +1,49 @@
+# Level 1: Herbert the Dog
 [start_level]
     level.levelName           = "Kaori vs the Men's Best Friend"
     level.opponentStory       = "story1.gsl"
     level.opponentName        = "Herbert the Dog"
+    level.opponentFace        = "herbert.gsl"
     level.backgroundTheme     = "Kaori's farm"
-    level.easySetting.type    = "RANDOM"
-    level.easySetting.level   = 350
+    level.easySetting.type    = "FLOBO"
+    level.easySetting.level   = 60
     level.easySetting.nColors = 2
     level.mediumSetting.type  = "FLOBO"
-    level.mediumSetting.level = 190
-    level.hardSetting.type    = "TANIA"
-    level.hardSetting.level   = 130
+    level.mediumSetting.level = 34
+    level.hardSetting.type    = "FLOBO"
+    level.hardSetting.level   = 17
 [end_level]
 
+# Level 2: Duke Beary
 [start_level]
     level.levelName           = "An unfriendly encounter"
     level.opponentStory       = "story2.gsl"
+    level.opponentFace        = "dukebeary.gsl"
     level.opponentName        = "Duke Beary"
     level.backgroundTheme     = "The forest"
-    level.easySetting.type    = "FLOBO"
-    level.easySetting.level   = 350
+    level.easySetting.type    = "JEKO"
+    level.easySetting.level   = 55
     level.easySetting.nColors = 3
     level.mediumSetting.type  = "JEKO"
-    level.mediumSetting.level = 180
+    level.mediumSetting.level = 31
     level.hardSetting.type    = "JEKO"
-    level.hardSetting.level   = 100
+    level.hardSetting.level   = 15
 [end_level]
 
+# Level 3: Orloff the Vampire
 [start_level]
-    level.levelName           = "The Unmapped Level"
+    level.levelName           = "The Vampire's Plumber"
     level.opponentStory       = "story3.gsl"
-    level.opponentName        = "Unmapped Monster"
-    level.easySetting.type    = "FLOBO"
-    level.easySetting.level   = 250
+    level.opponentName        = "Orloff"
+    level.opponentFace        = "orloff.gsl"
+    level.backgroundTheme     = "The mansion"
+    level.easySetting.type    = "TANIA"
+    level.easySetting.level   = 50
     level.easySetting.nColors = 4
     level.mediumSetting.type  = "TANIA"
-    level.mediumSetting.level = 160
-    level.hardSetting.type    = "GYOM"
-    level.hardSetting.level   = 90
+    level.mediumSetting.level = 28
+    level.hardSetting.type    = "TANIA"
+    level.hardSetting.level   = 13
 [end_level]
 
 [start_level]
@@ -44,24 +51,23 @@
     level.opponentStory       = "story4.gsl"
     level.opponentName        = "Azrael"
     level.easySetting.type    = "FLOBO"
-    level.easySetting.level   = 180
-    level.easySetting.nColors = 5
+    level.easySetting.level   = 45
     level.mediumSetting.type  = "FLOBO"
-    level.mediumSetting.level = 90
-    level.hardSetting.type    = "JEKO"
-    level.hardSetting.level   = 80
+    level.mediumSetting.level = 25
+    level.hardSetting.type    = "FLOBO"
+    level.hardSetting.level   = 11
 [end_level]
 
 [start_level]
     level.levelName           = "The Unmapped Level, V2"
     level.opponentStory       = "story5.gsl"
     level.opponentName        = "Unmapped Monster V2"
-    level.easySetting.type    = "FLOBO"
-    level.easySetting.level   = 90
+    level.easySetting.type    = "GYOM"
+    level.easySetting.level   = 40
     level.mediumSetting.type  = "GYOM"
-    level.mediumSetting.level = 210
-    level.hardSetting.type    = "TANIA"
-    level.hardSetting.level   = 60
+    level.mediumSetting.level = 22
+    level.hardSetting.type    = "GYOM"
+    level.hardSetting.level   = 9
 [end_level]
 
 [start_level]
@@ -69,11 +75,11 @@
     level.opponentStory       = "story6.gsl"
     level.opponentName        = "Zklogh"
     level.easySetting.type    = "JEKO"
-    level.easySetting.level   = 350
-    level.mediumSetting.type  = "TANIA"
-    level.mediumSetting.level = 90
-    level.hardSetting.type    = "GYOM"
-    level.hardSetting.level   = 60
+    level.easySetting.level   = 35
+    level.mediumSetting.type  = "JEKO"
+    level.mediumSetting.level = 19
+    level.hardSetting.type    = "JEKO"
+    level.hardSetting.level   = 7
 [end_level]
 
 [start_level]
@@ -81,11 +87,11 @@
     level.opponentStory       = "story7.gsl"
     level.opponentName        = "MegaPuyo"
     level.easySetting.type    = "TANIA"
-    level.easySetting.level   = 320
-    level.mediumSetting.type  = "JEKO"
-    level.mediumSetting.level = 80
-    level.hardSetting.type    = "GYOM"
-    level.hardSetting.level   = 40
+    level.easySetting.level   = 30
+    level.mediumSetting.type  = "TANIA"
+    level.mediumSetting.level = 16
+    level.hardSetting.type    = "TANIA"
+    level.hardSetting.level   = 5
 [end_level]
 
 [start_level]
@@ -93,22 +99,22 @@
     level.opponentStory       = "story8.gsl"
     level.opponentName        = "Adam McFlurry"
     level.easySetting.type    = "FLOBO"
-    level.easySetting.level   = 62
-    level.mediumSetting.type  = "GYOM"
-    level.mediumSetting.level = 90
-    level.hardSetting.type    = "GYOM"
-    level.hardSetting.level   = 30
+    level.easySetting.level   = 25
+    level.mediumSetting.type  = "FLOBO"
+    level.mediumSetting.level = 13
+    level.hardSetting.type    = "FLOBO"
+    level.hardSetting.level   = 3
 [end_level]
 
 [start_level]
     level.levelName           = "MechaPuyo"
     level.opponentStory       = "story9.gsl"
     level.opponentName        = "MechaPuyo"
-    level.easySetting.type    = "RANDOM"
-    level.easySetting.level   = 0
-    level.mediumSetting.type  = "RANDOM"
-    level.mediumSetting.level = 0
-    level.hardSetting.type    = "RANDOM"
-    level.hardSetting.level   = 0
+    level.easySetting.type    = "GYOM"
+    level.easySetting.level   = 20
+    level.mediumSetting.type  = "GYOM"
+    level.mediumSetting.level = 10
+    level.hardSetting.type    = "GYOM"
+    level.hardSetting.level   = 1
 [end_level]
 
