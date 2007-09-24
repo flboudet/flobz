@@ -80,8 +80,8 @@ class PuyoIA : public virtual PuyoPlayer {
     PuyoOrientation extractOrientation(int D) const;
     void extractGrid(void);
     void decide();
-    int makeEvaluation(const GridEvaluation * const referenceOne, const PuyoBinom puyos);
-    bool selectIfBetterEvaluation(int * const referenceOne, const GridEvaluation * const newOne, const PuyoBinom puyos);
+    int makeEvaluation(const GridEvaluation * const referenceOne, const PuyoBinom puyos, const GridState * const grid);
+    bool selectIfBetterEvaluation(int * const referenceOne, const GridEvaluation * const newOne, const PuyoBinom puyos, const GridState * const grid);
 
     GridState * internalGrid;
     bool decisionMade;
