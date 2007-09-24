@@ -495,10 +495,10 @@ int PuyoIA::makeEvaluation(const GridEvaluation * const referenceOne, const Puyo
     c += IA_PUYODIMY - abs(((AIParameters*)special)->columnScalar[x] - (int)(*grid)[x][HEIGHTS_ROW]);
   }
   c*=IA_PUYODIMX;
-    c += ((AIParameters*)special)->columnScalar[pos1] - (int)(*grid)[pos1][HEIGHTS_ROW];
-    c += ((AIParameters*)special)->columnScalar[pos2] - (int)(*grid)[pos2][HEIGHTS_ROW];
   }
   else c = IA_PUYODIMY * IA_PUYODIMX * IA_PUYODIMX + 2 * IA_PUYODIMY;
+    c += ((AIParameters*)special)->columnScalar[pos1] - (int)(*grid)[pos1][HEIGHTS_ROW];
+    c += ((AIParameters*)special)->columnScalar[pos2] - (int)(*grid)[pos2][HEIGHTS_ROW];
 
   int r = c * (1+rR+rP);
   return r;
