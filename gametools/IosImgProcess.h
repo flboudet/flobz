@@ -3,6 +3,8 @@
 
 #include "glSDL.h"
 
+extern bool useGL;
+
 typedef struct _RGBA {
   Uint8 red;
   Uint8 green;
@@ -27,6 +29,10 @@ void iim_surface_set_rgb(SDL_Surface *surface,
 
 /* pre: SDL_Locked(surface) */
 void iim_surface_set_rgba(SDL_Surface *surface,
+                          Uint32 x, Uint32 y, RGBA c);
+
+/* pre: SDL_Locked(surface) */
+void iim_surface_blend_rgba(SDL_Surface *surface,
                           Uint32 x, Uint32 y, RGBA c);
 
 //-- RGB<->HSV conversion

@@ -214,6 +214,43 @@ void iim_surface_set_rgba(SDL_Surface *surface,
   *(Uint32*)((char*)surface->pixels+index) = pixel;
 }
 
+/* pre: SDL_Locked(surface) */
+void iim_surface_blend_rgba(SDL_Surface *surface,
+                          Uint32 x, Uint32 y, RGBA c)
+{
+  Uint32 temp, pixel = 0;
+  int index = x*surface->format->BytesPerPixel + y*surface->pitch;
+  SDL_PixelFormat *fmt = surface->format;
+
+  RGBA src = iim_surface_get_rgba(surface, x,y);
+  c.red   = ((int)src.red   * (255 - (int)c.alpha) + (int)c.red   * (int)c.alpha) / 255;
+  c.green = ((int)src.green * (255 - (int)c.alpha) + (int)c.green * (int)c.alpha) / 255;
+  c.blue  = ((int)src.blue  * (255 - (int)c.alpha) + (int)c.blue  * (int)c.alpha) / 255;
+  c.alpha = ((int)src.alpha  * (255 - (int)c.alpha) + (int)c.alpha  * (int)c.alpha) / 255;
+
+  /* Get Red component */
+  temp = c.red >> fmt->Rloss;
+  temp = temp  << fmt->Rshift;
+  pixel |= temp;
+
+  /* Get Green component */
+  temp = c.green >> fmt->Gloss;
+  temp = temp    << fmt->Gshift;
+  pixel |= temp;
+
+  /* Get Blue component */
+  temp = c.blue >> fmt->Bloss;
+  temp = temp   << fmt->Bshift;
+  pixel |= temp;
+
+  /* Get Alpha component */
+  temp = c.alpha >> fmt->Aloss;
+  temp = temp    << fmt->Ashift;
+  pixel |= temp;
+
+  *(Uint32*)((char*)surface->pixels+index) = pixel;
+}
+
 //-- RGB<->HSV conversion
 
 //-- RGB, each 0 to 255

@@ -1,5 +1,7 @@
 #ifdef ENABLE_TTF
 
+#include <math.h>
+
 #include "sofont.h"
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +15,80 @@ struct _SOFONT
     SDL_Surface *text_image;
     char *text;
 };
+
+/**
+ * Apply nice FX to a SDL_Surface containing a font
+ */
+static void SoFont_FX(SoFont *font)
+{
+#define SHADOW_X 2
+#define SHADOW_Y 1
+  if (font == NULL) return;
+  SDL_Surface *src = font->text_image;
+  if (src == NULL) return;
+  SDL_PixelFormat *fmt = src->format;
+  SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w+SHADOW_X, src->h+SHADOW_Y, 32,
+                                          fmt->Rmask, fmt->Gmask,
+                                          fmt->Bmask, fmt->Amask);
+  SDL_LockSurface(src);
+  SDL_LockSurface(ret);
+
+  for (int y=ret->h; y--;)
+      for (int x=ret->w; x--;) {
+          RGBA c = { 0,0,0,0 };
+          iim_surface_set_rgba(ret,x,y,c);
+      }
+
+  // Draw text
+  for (int y=src->h; y--;)
+  {
+      for (int x=src->w; x--;)
+      {
+          RGBA rgba = iim_surface_get_rgba(src,x,y);
+          rgba.red  = rgba.green = rgba.blue = 0;
+          iim_surface_set_rgba(ret,x+SHADOW_X,y+SHADOW_Y,rgba);
+      }
+  }
+
+  // Draw text
+  for (int y=src->h; y--;)
+  {
+    float cy = (float)y / (float)src->h;
+    float l = 0.5 + 0.5 * sin(cy * 6.29f - 1.7f);
+    l *= l;
+
+    for (int x=src->w; x--;)
+    {
+      RGBA rgba = iim_surface_get_rgba(src,x,y);
+      HSVA hsva = iim_rgba2hsva(rgba);
+
+      float cx = (float)x / (float)src->w;
+
+      hsva.hue = 25.0 + 40.0 * cx;
+      hsva.saturation = 1.25 - l;
+      hsva.value = 1. + l;
+
+      if (hsva.hue > 360.0f) hsva.hue -= 360.0f;
+      if (hsva.hue < 0.0f) hsva.hue += 360.0f;
+      if (hsva.saturation > 1.) hsva.saturation = 1.f;
+      if (hsva.saturation < 0.0f) hsva.saturation = .0f;
+      if (hsva.value > 1.) hsva.value = 1.f;
+      if (hsva.value < 0.0f) hsva.value = .0f;
+      rgba = iim_hsva2rgba(hsva);
+
+      iim_surface_blend_rgba(ret,x,y,rgba);
+    }
+  }
+
+  SDL_UnlockSurface(ret);
+  SDL_UnlockSurface(src);
+  SDL_Surface *ret2 = SDL_DisplayFormatAlpha(ret);
+  SDL_SetAlpha(ret2, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
+  SDL_FreeSurface(ret);
+  SDL_FreeSurface(src);
+
+  font->text_image = ret2;
+}
 
 SoFont *SoFont_new()
 {
@@ -53,6 +129,7 @@ static void SoFont_RenderText(SoFont *font, const char *text)
         font->text = (char*)malloc(len + 1);
         strcpy(font->text, text);
         font->text_image = TTF_RenderUTF8_Blended(font->font, text, white);
+        SoFont_FX(font);
     }
 }
 
