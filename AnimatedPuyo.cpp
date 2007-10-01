@@ -30,7 +30,7 @@
 AnimatedPuyo::AnimatedPuyo(PuyoState state, AnimatedPuyoSetTheme *themeSet, PuyoView *attachedView)
     : PuyoPuyo(state), smallTicksCount(0), attachedTheme(themeSet->getAnimatedPuyoTheme(state))
 {
-    puyoEyeState = random() % 700;
+    puyoEyeState = random() % 8192;
     visibilityFlag = true;
     this->attachedView = attachedView;
 }
@@ -102,7 +102,6 @@ void AnimatedPuyo::renderAt(int X, int Y)
 {
     SDL_Painter &painter = attachedView->getPainter();
     
-    puyoEyeState++;
     if (attachedView == NULL)
         return;
     if (!visibilityFlag)
@@ -127,13 +126,12 @@ void AnimatedPuyo::renderAt(int X, int Y)
         
         /* Eye management */
         if (getPuyoState() != PUYO_NEUTRAL) {
-            while (puyoEyeState >= 750) puyoEyeState -= 750;
-            int eyePhase = puyoEyeState;
-            if (eyePhase < 5)
+            int eyePhase = (puyoEyeState + SDL_GetTicks()) % 8192;
+            if (eyePhase < 100)
                 painter.requestDraw(attachedTheme->getEyeSurfaceForIndex(1), &drect);
-            else if (eyePhase < 15)
+            else if (eyePhase < 200)
                 painter.requestDraw(attachedTheme->getEyeSurfaceForIndex(2), &drect);
-            else if (eyePhase < 20)
+            else if (eyePhase < 300)
                 painter.requestDraw(attachedTheme->getEyeSurfaceForIndex(1), &drect);
             else
                 painter.requestDraw(attachedTheme->getEyeSurfaceForIndex(0), &drect);
