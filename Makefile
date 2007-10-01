@@ -104,6 +104,7 @@ bundle: flobopuyo
 	mkdir -p $(bundle_name)/Contents/Resources
 	mkdir -p $(bundle_name)/Contents/Frameworks
 	cp -r $(FRAMEWORKS_DIR)/SDL* $(bundle_name)/Contents/Frameworks/
+	$(STRIP) $(bundle_name)/Contents/Frameworks/SDL*/SDL*
 	echo "APPL????" > $(bundle_name)/Contents/PkgInfo
 	sed "s/@@VERSION@@/$(VERSION)/" mac/Info.plist > $(bundle_name)/Contents/Info.plist
 	cp mac/icon.icns $(bundle_name)/Contents/Resources/
