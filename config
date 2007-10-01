@@ -85,12 +85,6 @@ ifeq ($(DISABLE_NETWORK), true)
     CFLAGS:=$(CFLAGS) -DDISABLE_NETWORK=1
 endif
 
-# True Type Fonts
-ifeq ($(ENABLE_TTF), true)
-	CFLAGS:=$(CFLAGS) -DENABLE_TTF=1
-    LDFLAGS:=$(LDFLAGS) -lSDL_ttf
-endif
-
 # OpenGL
 ifeq ($(ENABLE_OPENGL), true)
 	CFLAGS:=$(CFLAGS) -DHAVE_OPENGL=1
@@ -122,6 +116,11 @@ ifeq ($(PLATFORM), Darwin)
 	OBJFILES:=$(OBJFILES) SDLMain.o
 	CFLAGS:=$(CFLAGS) -I$(FRAMEWORKS_DIR)/SDL.framework/Headers -I$(FRAMEWORKS_DIR)/SDL_image.framework/Headers -I$(FRAMEWORKS_DIR)/SDL_mixer.framework/Headers
 	LDFLAGS:=$(LDFLAGS) -framework SDL -framework SDL_image -framework SDL_mixer -framework Cocoa
+# True Type Fonts for Mac OS X
+ifeq ($(ENABLE_TTF), true)
+	CFLAGS:=$(CFLAGS) -I$(FRAMEWORKS_DIR)/SDL_ttf.framework/Headers -DENABLE_TTF=1
+	LDFLAGS:=$(LDFLAGS) -framework SDL_ttf
+endif
 else
 ifeq ($(PLATFORM), $(CYGWIN_VERSION))
   	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib1 -lpng12 -ltiff -lSDL_image -lSDL_mixer -lSDL -lSDLmain
@@ -133,6 +132,11 @@ else
 	SDL_CONFIG=sdl-config
 	CFLAGS:=$(CFLAGS) `$(SDL_CONFIG) --cflags`
 	LDFLAGS:=$(LDFLAGS) `$(SDL_CONFIG) --libs` -lSDL_mixer -lSDL_image
+# True Type Fonts for Unix/Linux
+ifeq ($(ENABLE_TTF), true)
+	CFLAGS:=$(CFLAGS) -DENABLE_TTF=1
+	LDFLAGS:=$(LDFLAGS) -lSDL_ttf
+endif
 endif
 endif
 endif

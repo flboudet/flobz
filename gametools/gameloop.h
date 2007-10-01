@@ -20,6 +20,9 @@ class DrawableComponent
     virtual ~DrawableComponent();
     virtual bool drawRequested() const;
     void doDraw(SDL_Surface *screen) ;
+    // Reordering of drawable elements
+    bool moveToFront();
+    bool moveToBack(DrawableComponent *gc);
 
   protected:
     GameLoop *parentLoop;
@@ -87,7 +90,10 @@ public:
     virtual ~GarbageCollectableItem() {}
 };
 
-
+/**
+ * The GameLoop class manages the main loop of the game
+ * and schedules the drawin, timing and events of the game
+ */
 class GameLoop
 {
   public:
@@ -100,6 +106,10 @@ class GameLoop
     void garbageCollect(GarbageCollectableItem *item);
     void run();
 
+    // Reordering of drawable elements
+    bool moveToFront(DrawableComponent *gc);
+    bool moveToBack(DrawableComponent *gc);
+    
     void idle(double currentTime);
     void draw();
     

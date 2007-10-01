@@ -45,7 +45,8 @@ PuyoNetworkGameWidget::PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet,
             1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, gameId, painter),
       networkArea(&attachedNetworkGameFactory, &attachedPuyoThemeSet, &levelTheme,
             1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
-      playercontroller(localArea), dummyPlayerController(networkArea), syncMsgReceived(false), syncMsgSent(false), chatBox(*this)
+      playercontroller(localArea), dummyPlayerController(networkArea), syncMsgReceived(false), syncMsgSent(false), chatBox(*this),
+      brokenNetworkWidget("etherdown.gsl"), networkIsBroken(false)
 {
     
     mbox.addListener(this);
@@ -67,13 +68,23 @@ void PuyoNetworkGameWidget::cycle()
     }
     if (syncMsgReceived) {
         PuyoGameWidget::cycle();
+        double curDate = ios_fc::getTimeMs();
         if (paused) {
-            if (ios_fc::getTimeMs() - lastAliveMessageSentDate > 2000.) {
+            if (curDate - lastAliveMessageSentDate > 2000.) {
                 sendAliveMsg();
+                lastAliveMessageSentDate = curDate;
             }
         }
-        if (ios_fc::getTimeMs() - lastMessageDate > 5000.) {
-            printf("Network problem!\n");
+        if (curDate - lastMessageDate > 5000.) {
+            if (!networkIsBroken) {
+                associatedScreen->add(&brokenNetworkWidget);
+                networkIsBroken = true;
+            }
+            //printf("Network problem!\n");
+        }
+        else if (networkIsBroken == true) {
+            associatedScreen->remove(&brokenNetworkWidget);
+            networkIsBroken = false;
         }
     }
 }

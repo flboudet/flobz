@@ -73,6 +73,9 @@ private:
     double lastMessageDate, lastAliveMessageSentDate;
     // Chat zone
     ChatBox chatBox;
+    // Network broken animation
+    PuyoStoryWidget brokenNetworkWidget;
+    bool networkIsBroken;
 };
 
 

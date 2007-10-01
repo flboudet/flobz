@@ -5,7 +5,7 @@
 #include "sofont.h"
 #include <stdlib.h>
 #include <string.h>
-#include <SDL/SDL_ttf.h>
+#include <SDL_ttf.h>
 static int num_fonts = 0;
 
 struct _SOFONT

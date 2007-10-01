@@ -257,6 +257,9 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber) : d
   initDisplay(fullscreen, useGL);
   initFonts();
   initMenus();
+  cursor = new PuyoCursor(dataPathManager.getPath("gfx/cursor.png"));
+  loop->addDrawable(cursor);
+  loop->addIdle(cursor);
 }
 
 

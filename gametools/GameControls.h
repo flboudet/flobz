@@ -4,6 +4,11 @@
 #include "glSDL.h"
 #include "InputManager.h"
 
+/**
+ * This class represents an SDL event transcripted into a game event.
+ * It manages the mapping between SDL events and game events using
+ * the user's preferences
+ */
 typedef struct GameControlEvent {
 	GameControlEvent() : caught(false) {}
     enum {

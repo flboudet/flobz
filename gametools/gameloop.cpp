@@ -30,6 +30,16 @@ void DrawableComponent::doDraw(SDL_Surface *screen)
   _drawRequested = false;
 }
 
+bool DrawableComponent::moveToFront()
+{
+    return parentLoop->moveToFront(this);
+}
+
+bool DrawableComponent::moveToBack(DrawableComponent *gc)
+{
+    return parentLoop->moveToBack(this);
+}
+
 // IDLE COMPONENT
 
 IdleComponent::IdleComponent()
@@ -290,4 +300,19 @@ void GameLoop::draw()
   }
   SDL_Flip(getSurface());
 }
+
+bool GameLoop::moveToFront(DrawableComponent *gc)
+{
+    if (drawables[drawables.size()-1] == gc)
+        return false;
+    removeDrawable(gc);
+    addDrawable(gc);
+    return true;
+}
+
+bool GameLoop::moveToBack(DrawableComponent *gc)
+{
+    return false;
+}
+
 
