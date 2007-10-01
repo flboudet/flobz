@@ -49,7 +49,9 @@ SoFont *SoFont_new ();
 void    SoFont_free (SoFont * font);
 
 #ifdef ENABLE_TTF
-int     SoFont_load_ttf (SoFont * font, const char *fileName, int size);
+#define SoFont_DARK 0
+#define SoFont_STD 1
+int     SoFont_load_ttf (SoFont * font, const char *fileName, int size, int fx);
 #else
 int     SoFont_load (SoFont * font, IIM_Surface *picture);
 #endif
@@ -61,9 +63,8 @@ void    SoFont_Refresh(SoFont * font);
 void    SoFont_PutString (SoFont * font, SDL_Surface * Surface, int x, int y,
 													const char *text, SDL_Rect * clip /*=NULL*/ );
 void    SoFont_PutStringWithCursor (SoFont * font, SDL_Surface * Surface,
-																		int x, int y, const char *text,
-																		int cursPos, SDL_Rect * clip /*=NULL*/ , int showCurs																															/*=true*/
-	);
+                                    int x, int y, const char *text,
+                                    int cursPos, SDL_Rect * clip /*=NULL*/ , int showCurs/*=true*/);
 
 /// Returns the width of "text" in pixels
 int     SoFont_TextWidth (SoFont * font, const char *text);

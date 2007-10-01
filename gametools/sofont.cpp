@@ -14,6 +14,7 @@ struct _SOFONT
     TTF_Font *font;
     SDL_Surface *text_image;
     char *text;
+    int fx;
 };
 
 /**
@@ -64,9 +65,16 @@ static void SoFont_FX(SoFont *font)
 
       float cx = (float)x / (float)src->w;
 
-      hsva.hue = 25.0 + 40.0 * cx;
-      hsva.saturation = 1.25 - l;
-      hsva.value = 1. + l;
+      if (font->fx == SoFont_STD) {
+        hsva.hue = 55.0 - 20.0 * cx;
+        hsva.saturation = 1.25 - l;
+        hsva.value = 1.0;
+      }
+      else {
+        hsva.hue = 55.0 - 20.0 * cx;
+        hsva.saturation = 0.75;
+        hsva.value = 0.5;
+      } 
 
       if (hsva.hue > 360.0f) hsva.hue -= 360.0f;
       if (hsva.hue < 0.0f) hsva.hue += 360.0f;
@@ -99,6 +107,7 @@ SoFont *SoFont_new()
     font->text_image = NULL;
     font->font   = NULL;
     font->height = 0;
+    font->fx = SoFont_STD;
 }
 
 void SoFont_free (SoFont * font)
@@ -110,8 +119,9 @@ void SoFont_free (SoFont * font)
         TTF_Quit();
 }
 
-int SoFont_load_ttf (SoFont * font, const char *fileName, int size)
+int SoFont_load_ttf (SoFont * font, const char *fileName, int size, int fx)
 {
+    font->fx = fx;
     font->font = TTF_OpenFont(fileName, size);
     font->height = size;
 }

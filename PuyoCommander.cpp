@@ -321,11 +321,11 @@ void PuyoCommander::initFonts()
   SoFont *textFont = SoFont_new();
 
 #ifdef ENABLE_TTF
-  SoFont_load_ttf(darkFont, dataPathManager.getPath("gfx/font.ttf"), 18);
-  SoFont_load_ttf(menuFont, dataPathManager.getPath("gfx/font.ttf"), 18);
-  SoFont_load_ttf(smallFont, dataPathManager.getPath("gfx/font.ttf"), 12);
-  SoFont_load_ttf(smallFontInfo, dataPathManager.getPath("gfx/font.ttf"), 12);
-  SoFont_load_ttf(textFont, dataPathManager.getPath("gfx/font.ttf"), 18);
+  SoFont_load_ttf(darkFont, dataPathManager.getPath("gfx/font.ttf"), 18, SoFont_DARK);
+  SoFont_load_ttf(menuFont, dataPathManager.getPath("gfx/font.ttf"), 18, SoFont_STD);
+  SoFont_load_ttf(smallFont, dataPathManager.getPath("gfx/font.ttf"), 12, SoFont_STD);
+  SoFont_load_ttf(smallFontInfo, dataPathManager.getPath("gfx/font.ttf"), 12, SoFont_STD);
+  SoFont_load_ttf(textFont, dataPathManager.getPath("gfx/font.ttf"), 18, SoFont_DARK);
 #else
   IIM_Surface *font3b = IIM_Load_Absolute_DisplayFormatAlpha (dataPathManager.getPath("gfx/font3b.png"));
   IIM_Surface *font4b = IIM_Load_Absolute_DisplayFormatAlpha (dataPathManager.getPath("gfx/font4b.png"));
