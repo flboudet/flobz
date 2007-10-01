@@ -72,6 +72,7 @@ String GlobalCurrentPath;
 
 #define NOT_IMPLEMENTED { fprintf(stderr,"Not Implemented __FILE__ __LINE__"); }
 #define CACHE_IT_OR_DIE { if (_cached == false) { if (cache() == false) exit(0); } }
+#define ADD_PICTURE(A) { bool tmp = loadPictureAt(path,&(A),defpath); OK = OK && tmp; if (tmp == false) fprintf(stderr,"Unable to load %s\n",(char *)path); }
 #define LOG { fprintf(stderr,"Logged __FILE__ __LINE__"); }
 
 #ifdef DEBUG
@@ -252,9 +253,13 @@ StandardAnimatedPuyoTheme::~StandardAnimatedPuyoTheme(void)
 #endif
 
     if (_face != NULL) free(_face);
+    _face = NULL;
     if (_disappear != NULL) free(_disappear);
+    _disappear = NULL;
     if (_explosions != NULL) free(_explosions);
+    _explosions = NULL;
     if (_eyes != NULL) free(_eyes);
+    _eyes = NULL;
     
     releaseCached();
 }
@@ -371,7 +376,8 @@ bool StandardAnimatedPuyoTheme::cache(void)
     char defpath[PATH_MAX_LEN];
     const char * fullPath = (const char *)_path;
     
-    if (_cached) releaseCached();
+    if (_cached) return true;
+//    if (_cached) releaseCached();
     
     // PUYOS
     for (j=0; j<NUMBER_OF_PUYO_FACES; j++)
@@ -382,7 +388,7 @@ bool StandardAnimatedPuyoTheme::cache(void)
     }
     snprintf(path, sizeof(path), "%s/%s-puyo-border.png",fullPath,_face);
     snprintf(defpath, sizeof(defpath), "%s/%s-puyo-border.png",DEFAULTPATH(),_face);
-    OK = OK && loadPictureAt(path,&(_puyoCircles[0]),defpath);
+    ADD_PICTURE(_puyoCircles[0]);
     for (int i = 1; i<NUMBER_OF_PUYO_CIRCLES; i++)
     {
         OK = OK && copyPictureWithLuminosity(_puyoCircles[0],&(_puyoCircles[i]),NULL,sin(3.14f/2.0f+i*3.14f/64.0f)*0.6f+0.2f);
@@ -390,7 +396,7 @@ bool StandardAnimatedPuyoTheme::cache(void)
     
     snprintf(path, sizeof(path), "%s/%s-puyo-shadow.png",fullPath,_face);
     snprintf(defpath, sizeof(defpath), "%s/%s-puyo-shadow.png",DEFAULTPATH(),_face);
-    OK = OK && loadPictureAt(path,&(_puyoShadow),defpath);
+    ADD_PICTURE(_puyoShadow)
     
     for (j=0; j<NUMBER_OF_PUYO_EXPLOSIONS; j++)
     {
@@ -413,7 +419,7 @@ bool StandardAnimatedPuyoTheme::cache(void)
         OK = OK && loadPictureWithOffset(path,&(_puyoEyes[j]),defpath,_color_offset);
     }
     
-    _cached = OK;
+    _cached = true;
     
     return OK;
 }
@@ -422,7 +428,7 @@ bool StandardAnimatedPuyoTheme::cache(void)
 void StandardAnimatedPuyoTheme::retain(void) { counter++; }
 void StandardAnimatedPuyoTheme::release(void)
 {
-    if (counter == 0) fprintf(stderr,"AnimatedPuyoTheme released while not retained");
+    if (counter == 0) fprintf(stderr,"AnimatedPuyoTheme released while not retained\n");
     else counter--;
 }
 #endif
@@ -466,17 +472,21 @@ bool NeutralAnimatedPuyoTheme::cache(void)
     OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-1.png", &(_puyoNeutralPop[0]), imageDefaultPath + "/" + faceName + "-neutral-1.png");
     OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-2.png", &(_puyoNeutralPop[1]), imageDefaultPath + "/" + faceName + "-neutral-2.png");
     OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-3.png", &(_puyoNeutralPop[2]), imageDefaultPath + "/" + faceName + "-neutral-3.png");
-    _cached = OK;
+    _cached = true;
     return OK;
 }
 
 void NeutralAnimatedPuyoTheme::releaseCached(void)
 {
     if (_cached) {
-        IIM_Free(_puyoNeutral);
-        IIM_Free(_puyoNeutralPop[0]);
-        IIM_Free(_puyoNeutralPop[1]);
-        IIM_Free(_puyoNeutralPop[2]);
+        if (_puyoNeutral != NULL) IIM_Free(_puyoNeutral);
+        _puyoNeutral = NULL;
+        if (_puyoNeutralPop[0] != NULL) IIM_Free(_puyoNeutralPop[0]);
+        _puyoNeutralPop[0] = NULL;
+        if (_puyoNeutralPop[1] != NULL) IIM_Free(_puyoNeutralPop[1]);
+        _puyoNeutralPop[1] = NULL;
+        if (_puyoNeutralPop[2] != NULL) IIM_Free(_puyoNeutralPop[2]);
+        _puyoNeutralPop[2] = NULL;
         _cached = false;
     }
 }
@@ -654,15 +664,19 @@ PuyoLevelTheme::PuyoLevelTheme(const String path, const String name):_path(path)
 PuyoLevelTheme::~PuyoLevelTheme(void)
 {
 #ifdef DEBUG
-    if (counter > 0) fprintf(stderr,"PuyoLevelTheme released while used !!!");
+    if (counter > 0) fprintf(stderr,"PuyoLevelTheme released while used !!!\n");
 #endif
 
     if (_lives != NULL) free(_lives);
+    _lives = NULL;
     if (_background != NULL) free(_background);
+    _background = NULL;
     if (_grid != NULL) free(_grid);
+    _grid = NULL;
     if (_speed_meter != NULL) free(_speed_meter);
-    
+    _speed_meter = NULL;
     if (_neutral_indicator != NULL) free(_neutral_indicator);
+    _neutral_indicator = NULL;
     
     releaseCached();
 }
@@ -820,7 +834,6 @@ bool PuyoLevelTheme::cache(void)
     const char * fullPath = (const char *)_path;
 
     if (_cached) releaseCached();
-    _cached = false;
     
     if (validate() == false) return false;
     
@@ -829,39 +842,39 @@ bool PuyoLevelTheme::cache(void)
     {
         snprintf(path, sizeof(path), "%s/%s-lives-%d.png",fullPath,_lives,i);
         snprintf(defpath, sizeof(defpath), "%s/%s-lives-%d.png",DEFAULTPATH(),_lives,i);
-        OK = OK && loadPictureAt(path,&(_levelLives[i]),defpath);
+        ADD_PICTURE(_levelLives[i])
     }
     
     // BACKGROUND
     snprintf(path, sizeof(path), "%s/%s-background.jpg",fullPath,_background);
     snprintf(defpath, sizeof(defpath), "%s/%s-background.jpg",DEFAULTPATH(),_background);
-    OK = OK && loadPictureAt(path,&_levelBackground,defpath);
+    ADD_PICTURE(_levelBackground)
     
     // GRID
     snprintf(path, sizeof(path), "%s/%s-background-grid.png",fullPath,_grid);
     snprintf(defpath, sizeof(defpath), "%s/%s-background-grid.png",DEFAULTPATH(),_grid);
-    OK = OK && loadPictureAt(path,&_levelGrid,defpath);
+    ADD_PICTURE(_levelGrid)
     
     // SPEED METER
     snprintf(path, sizeof(path), "%s/%s-background-meter-below.png",fullPath,_speed_meter);
     snprintf(defpath, sizeof(defpath), "%s/%s-background-meter-below.png",DEFAULTPATH(),_speed_meter);
-    OK = OK && loadPictureAt(path,&(_levelMeter[0]),defpath);
+    ADD_PICTURE(_levelMeter[0])
     snprintf(path, sizeof(path), "%s/%s-background-meter-above.png",fullPath,_speed_meter);
     snprintf(defpath, sizeof(defpath), "%s/%s-background-meter-above.png",DEFAULTPATH(),_speed_meter);
-    OK = OK && loadPictureAt(path,&(_levelMeter[1]),defpath);
+    ADD_PICTURE(_levelMeter[1])
     
     // NEUTRAL INDICATORS
     snprintf(path, sizeof(path), "%s/%s-small.png",fullPath,_neutral_indicator);
     snprintf(defpath, sizeof(defpath), "%s/%s-small.png",DEFAULTPATH(),_neutral_indicator);
-    OK = OK && loadPictureAt(path,&_neutralIndicator,defpath);
+    ADD_PICTURE(_neutralIndicator)
     snprintf(path, sizeof(path), "%s/%s.png",fullPath,_neutral_indicator);
     snprintf(defpath, sizeof(defpath), "%s/%s.png",DEFAULTPATH(),_neutral_indicator);
-    OK = OK && loadPictureAt(path,&_bigNeutralIndicator,defpath);
+    ADD_PICTURE(_bigNeutralIndicator)
     snprintf(path, sizeof(path), "%s/%s-giant.png",fullPath,_neutral_indicator);
     snprintf(defpath, sizeof(defpath), "%s/%s-giant.png",DEFAULTPATH(),_neutral_indicator);
-    OK = OK && loadPictureAt(path,&_giantNeutralIndicator,defpath);
+    ADD_PICTURE(_giantNeutralIndicator)
     
-    _cached = OK;
+    _cached = true;
     return OK;
 }
 
