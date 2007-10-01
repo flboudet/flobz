@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <libgen.h> /* XXX conforms to POSIX.1-2001 -- ok for windows ? */
-
+#include <ios_filepath.h>
+#include <ios_memory.h>
 
 static char scriptPath[1024];
 
@@ -13,7 +13,7 @@ struct _Styrolyse {
 
   char fname[512];
   GoomSL *gsl;
-
+  
   /* client app */
   StyrolyseClient *client;
 
@@ -165,7 +165,7 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
         char txt[1024];
         char tmp[1024];
         strcpy(tmp,path);
-        sprintf(txt, "IMAGE NOT FOUND:\n%s", basename(tmp));
+        sprintf(txt, "IMAGE NOT FOUND:\n%s", (const char *)ios_fc::FilePath(tmp).basename());
         styrolyse->client->putText(styrolyse->client,x,y,txt);
     }
     else {
