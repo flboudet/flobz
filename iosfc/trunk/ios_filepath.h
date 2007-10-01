@@ -36,6 +36,7 @@ public:
     FilePath(const String &path);
     FilePath(const FilePath &origin);
     String combine(const String &path) const;
+    String basename(void) const;
     static String combine(const String &path1, const String &path2);
     SelfVector<String> listFiles();
     bool exists() const;

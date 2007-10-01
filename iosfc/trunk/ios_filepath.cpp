@@ -28,9 +28,9 @@
 #include <errno.h>
 #include "ios_filepath.h"
 
+
 namespace ios_fc {
 
-// TODO: Rendre ce truc cross-platform
     FilePath::FilePath(const String &path) : path(path)
     {
     }
@@ -72,5 +72,19 @@ namespace ios_fc {
         return true;
     }
     
+    String FilePath::basename(void) const
+    {
+      int size = this->path.size();
+      int i;
+      for (i=size; i>=0; i--)
+      {
+        if (this->path[i] == '/')
+        {
+          i++;
+          break;
+        }
+      }
+      return this->path.substring(i);
+    }
 }
 
