@@ -1,5 +1,3 @@
 FILES=
-
-DIRECTORIES="Classic.fptheme" 
-
+DIRECTORIES= "Classic.fptheme"
 include ${SOURCE_DATADIR}/Datarules.mk

@@ -1,5 +1,3 @@
 FILES=
-
-DIRECTORIES="story" "gfx" 
-
+DIRECTORIES= "gfx" "story"
 include ${SOURCE_DATADIR}/Datarules.mk

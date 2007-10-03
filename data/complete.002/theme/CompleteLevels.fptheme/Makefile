@@ -1,5 +1,3 @@
-FILES="mansion-background.jpg" "farm-background.jpg" "Description.gsl" "mansion-background-grid.png" "forest-background.jpg" 
-
+FILES= "Description.gsl" "farm-background.jpg" "forest-background.jpg" "landfill-background.jpg" "mansion-background-grid.png" "mansion-background.jpg"
 DIRECTORIES=
-
 include ${SOURCE_DATADIR}/Datarules.mk

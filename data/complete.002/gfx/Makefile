@@ -1,5 +1,3 @@
 FILES=
-
-DIRECTORIES="background" "herbert_close" "kaori_farther" "introorloff" "balloon" "introherbert" "puyo_farther" "orloff" "kaori_close" "herbert" "kaori_far" 
-
+DIRECTORIES= "background" "balloon" "herbert" "herbert_close" "introherbert" "introorloff" "kaori_close" "kaori_far" "kaori_farther" "orloff" "puyo_farther"
 include ${SOURCE_DATADIR}/Datarules.mk

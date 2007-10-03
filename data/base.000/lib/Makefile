@@ -1,5 +1,3 @@
-FILES="styrolyse.gsl" "levellib.gsl" "themelib.gsl" 
-
+FILES= "levellib.gsl" "styrolyse.gsl" "themelib.gsl"
 DIRECTORIES=
-
 include ${SOURCE_DATADIR}/Datarules.mk

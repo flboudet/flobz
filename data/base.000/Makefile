@@ -1,5 +1,3 @@
 FILES=
-
-DIRECTORIES="locale" "sfx" "story" "music" "theme" "gfx" "lib" 
-
+DIRECTORIES= "gfx" "lib" "locale" "music" "sfx" "story" "theme"
 include ${SOURCE_DATADIR}/Datarules.mk

@@ -1,5 +1,3 @@
-FILES="skynight.jpg" "kaori-mini.png" "shadow-mini.png" "peak.png" "orloff-mini.png" "herbert-mini.png" "unmapped-mini.png" "dukebeary-mini.png" "azrael-mini.png" "frankenpuyo-mini.png" "mcflurry-mini.png"
-
+FILES= "azrael-mini.png" "dukebeary-mini.png" "frankenpuyo-mini.png" "herbert-mini.png" "kaori-mini.png" "mcflurry-mini.png" "orloff-mini.png" "peak.png" "shadow-mini.png" "skynight.jpg" "unmapped-mini.png"
 DIRECTORIES=
-
 include ${SOURCE_DATADIR}/Datarules.mk

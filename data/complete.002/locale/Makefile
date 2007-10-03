@@ -1,5 +1,3 @@
 FILES=
-
-DIRECTORIES="story" 
-
+DIRECTORIES= "story"
 include ${SOURCE_DATADIR}/Datarules.mk
