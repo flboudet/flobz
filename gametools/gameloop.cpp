@@ -293,8 +293,24 @@ bool GameLoop::isLate(double currentTime) const
   return false;
 }
 
+#ifdef BENCHMARKS
+#include "ios_fc.h"
+#endif
+
 void GameLoop::draw()
 {
+#ifdef BENCHMARKS
+  static double nFrames = 0.0;
+  static double t0 = 0.0;
+  if (nFrames > 60.0) {
+      double t1 = ios_fc::getTimeMs();
+      printf("FPS %3.1f\n", (1000.0 * nFrames / (t1 - t0)));
+      t0 = t1;
+      nFrames = 0.0;
+  }
+  nFrames += 1.0;
+#endif
+
   for (int i = 0; i < drawables.size(); ++i) {
     drawables[i]->doDraw(getSurface());
   }

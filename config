@@ -3,7 +3,7 @@
 # (or nothing for auto-detection) #
 ###################################
 PLATFORM=
-ENABLE_FAT=false
+ENABLE_FAT=false # Support for windows' file system
 
 ###################################
 # Configure your application      #
@@ -18,6 +18,8 @@ ENABLE_DGA=false
 DEBUG_MODE=true
 MORE_DEBUG=false
 ENABLE_PCH=false
+
+ENABLE_BENCHMARKS?=false
 
 # Src settings
 IOSFC_DIR=iosfc
@@ -74,6 +76,11 @@ endif
 
 # Version
 VERSION=$(shell grep "\#define FLOBOPUYOVERSION" PuyoVersion.cpp  | cut -d "\"" -f 2)
+
+# Audio
+ifeq ($(ENABLE_BENCHMARKS), true)
+CFLAGS:=$(CFLAGS) -DBENCHMARKS=1
+endif
 
 # Audio
 ifeq ($(ENABLE_AUDIO), true)

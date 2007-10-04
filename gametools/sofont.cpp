@@ -17,6 +17,12 @@ struct _SOFONT
     int fx;
 };
 
+#ifdef BENCHMARKS
+#include "ios_fc.h"
+static double t = 0.0;
+static double n = 0.0;
+#endif
+
 /**
  * Apply nice FX to a SDL_Surface containing a font
  */
@@ -148,6 +154,9 @@ static void SoFont_RenderText(SoFont *font, const char *text)
 ///   text: a string containing the text you want to blit.
 void SoFont_PutString (SoFont * font, SDL_Surface * surface, int x, int y, const char *text, SDL_Rect * clip /*=NULL*/)
 {
+#ifdef BENCHMARKS
+    t -= ios_fc::getTimeMs();
+#endif
     if (font->font) {
         SoFont_RenderText(font, text);
         if (font->text_image != NULL) {
@@ -159,17 +168,34 @@ void SoFont_PutString (SoFont * font, SDL_Surface * surface, int x, int y, const
             SDL_BlitSurface(font->text_image, NULL, surface, &dst_rect);
         }
     }
+#ifdef BENCHMARKS
+    t += ios_fc::getTimeMs();
+    n += 1.0;
+    if (n > 1000.0) {
+        printf("%3.3fms / string\n", t/n);
+        n = 0.0; t = 0.0;
+    }
+#endif
 }
 
 /// Returns the width of "text" in pixels
 int SoFont_TextWidth (SoFont * font, const char *text)
 {
+#ifdef BENCHMARKS
+    t -= ios_fc::getTimeMs();
+#endif
+    int ret = 0;
     if (font->font) {
+        //int w,h;
+        //TTF_SizeUTF8(font->font, text, &w, &h);
         SoFont_RenderText(font, text);
         if (font->text_image != NULL)
-            return font->text_image->w;
+            ret = font->text_image->w;
     }
-    return 0;
+#ifdef BENCHMARKS
+    t += ios_fc::getTimeMs();
+#endif
+    return ret;
 }
 
 int SoFont_FontHeight (SoFont * font)
