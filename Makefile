@@ -6,16 +6,16 @@
 # Settings
 
 OBJFILES= audio.o HiScores.o PuyoCommander.o PuyoCursor.o \
-          main.o PuyoDataPathManager.o PuyoGame.o PuyoVersion.o \
+          main.o PuyoDataPathManager.o PuyoGame.o PuyoDoomMelt.o \
           PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o \
-          styrolyse.o PuyoStory.o PuyoChatBox.o\
-          PuyoDoomMelt.o \
+          styrolyse.o PuyoStory.o PuyoChatBox.o PuyoLocalizedDictionary.o \
           PuyoStarter.o PuyoSinglePlayerStarter.o PuyoTwoPlayerStarter.o \
           PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o \
           AnimatedPuyoTheme.o PuyoNetworkMenu.o PuyoNetCenterMenu.o \
-          PuyoNetGameCenter.o PuyoInternetGameCenter.o  PuyoLanGameCenter.o\
-          PuyoLocalMenu.o PuyoOptionMenu.o PuyoControlMenu.o PuyoLocalizedDictionary.o\
-          LevelThemeMenu.o PuyoThemeMenu.o PuyoScreenTransition.o PuyoNatTraversal.o
+          PuyoNetGameCenter.o PuyoInternetGameCenter.o PuyoLanGameCenter.o\
+          PuyoLocalMenu.o PuyoOptionMenu.o PuyoControlMenu.o \
+          LevelThemeMenu.o PuyoThemeMenu.o PuyoScreenTransition.o \
+          PuyoNatTraversal.o
 
 include root_dir
 include config
@@ -100,10 +100,11 @@ install: flobopuyo
 	chmod a+rx ${INSTALL_BINDIR}/flobopuyo
 
 bundle: flobopuyo
+	rm -Rf $(bundle_name) 
 	mkdir -p $(bundle_name)/Contents/MacOS
 	mkdir -p $(bundle_name)/Contents/Resources
 	mkdir -p $(bundle_name)/Contents/Frameworks
-	cp -r $(FRAMEWORKS_DIR)/SDL* $(bundle_name)/Contents/Frameworks/
+	cp -RP $(FRAMEWORKS_DIR)/SDL* $(bundle_name)/Contents/Frameworks/
 	$(STRIP) $(bundle_name)/Contents/Frameworks/SDL*/SDL*
 	echo "APPL????" > $(bundle_name)/Contents/PkgInfo
 	sed "s/@@VERSION@@/$(VERSION)/" mac/Info.plist > $(bundle_name)/Contents/Info.plist
@@ -114,7 +115,7 @@ bundle: flobopuyo
 
 mac-package: bundle
 	mkdir -p $(macimage_name)
-	cp -r $(bundle_name) $(macimage_name)
+	cp -RP $(bundle_name) $(macimage_name)
 	cp COPYING $(macimage_name)
 	hdiutil create -srcfolder $(macimage_name) $(macimage_name).dmg
 	hdiutil internet-enable $(macimage_name).dmg

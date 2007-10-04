@@ -1,9 +1,12 @@
 ###################################
 # Choose your platform            #
-# (or nothing for auto-detection) #
 ###################################
+
+# Platform type, leave blank to autodetect
 PLATFORM=
-ENABLE_FAT=false # Support for windows' file system
+
+# Support for mac multiple architecture (PowerPC/i386)
+ENABLE_FAT=false
 
 ###################################
 # Configure your application      #
@@ -33,14 +36,14 @@ INSTALL_BINDIR=$(DESTDIR)/$(PREFIX)/games
 INSTALL_DATADIR=$(DESTDIR)/$(DATADIR)
 
 # Mac settings
-macimage_name=FloBoPuyo\ $(VERSION)
+macimage_name=flobopuyo-mac-$(VERSION)
 bundle_name=FloboPuyo.app
 SYSTEM_ROOT=/
 FRAMEWORKS_DIR=$(SYSTEM_ROOT)/Library/Frameworks
 
 # Win32 settings
 CYGWIN_VERSION=CYGWIN_NT-5.1
-WINZIP_NAME=flobopuyowin32
+WINZIP_NAME=flobopuyo-win32-$(VERSION)
 WINSDLINCLUDE=/home/$(USER)/SDL-1.2.11/include
 WINSDLDEVLIBS=/home/$(USER)/SDL-1.2.11/lib
 WINSDLRUNTIME=/home/$(USER)/SDL-1.2.11/lib
@@ -75,7 +78,8 @@ else
 endif
 
 # Version
-VERSION=$(shell grep "\#define FLOBOPUYOVERSION" PuyoVersion.cpp  | cut -d "\"" -f 2)
+VERSION=$(shell date "+%Y%m%d")
+CFLAGS:=$(CFLAGS) -DFLOBOPUYOVERSION=$(VERSION)
 
 # Audio
 ifeq ($(ENABLE_BENCHMARKS), true)
