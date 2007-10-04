@@ -36,8 +36,6 @@ do
     fi
 done
 
-exit 0
-
 # Pour chaque makefile
 for i in ${MAKEFILES}
 do
