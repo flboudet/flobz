@@ -44,9 +44,9 @@ FRAMEWORKS_DIR=$(SYSTEM_ROOT)/Library/Frameworks
 # Win32 settings
 CYGWIN_VERSION=CYGWIN_NT-5.1
 WINZIP_NAME=flobopuyo-win32-$(VERSION)
-WINSDLINCLUDE=/home/$(USER)/SDL-1.2.11/include
-WINSDLDEVLIBS=/home/$(USER)/SDL-1.2.11/lib
-WINSDLRUNTIME=/home/$(USER)/SDL-1.2.11/lib
+WINSDLINCLUDE=/home/$(USER)/SDL-1.2.12/include
+WINSDLDEVLIBS=/home/gyom//SDL-1.2.12/lib
+WINSDLRUNTIME=/home/$(USER)/SDL-1.2.12/lib
 #
 ##########
 
@@ -134,11 +134,11 @@ ifeq ($(ENABLE_TTF), true)
 endif
 else
 ifeq ($(PLATFORM), $(CYGWIN_VERSION))
-  	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib1 -lpng12 -ltiff -lSDL_image -lSDL_mixer -lSDL -lSDLmain
+  	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib1 -lpng12-0 -ltiff-3 -lSDL_image -lSDL_mixer -lSDL -lSDLmain
 else
 
 ifeq ($(PLATFORM), crossmingw32)
-  	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib1 -lpng12 -ltiff -lSDL_image -lSDL_mixer -lSDL -lSDLmain -lws2_32
+  	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib1 -lpng12-0 -ltiff-3 -lSDL_image -lSDL_mixer -lSDL -lSDLmain -lws2_32
 else
 	SDL_CONFIG=sdl-config
 	CFLAGS:=$(CFLAGS) `$(SDL_CONFIG) --cflags`
