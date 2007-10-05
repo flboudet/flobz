@@ -134,11 +134,19 @@ ifeq ($(ENABLE_TTF), true)
 endif
 else
 ifeq ($(PLATFORM), $(CYGWIN_VERSION))
-  	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib1 -lpng12-0 -ltiff-3 -lSDL_image -lSDL_mixer -lSDL -lSDLmain
+  	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib1 -lpng12-0 -ltiff-3 -lSDL_image -lSDL_mixer -lSDLmain -lSDL
+ifeq ($(ENABLE_TTF), true)
+        CFLAGS:=$(CFLAGS) -DENABLE_TTF=1
+        LDFLAGS:=$(LDFLAGS) -lSDL_ttf
+endif
 else
 
 ifeq ($(PLATFORM), crossmingw32)
-  	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib1 -lpng12-0 -ltiff-3 -lSDL_image -lSDL_mixer -lSDL -lSDLmain -lws2_32
+  	LDFLAGS:=$(LDFLAGS) -L$(WINSDLDEVLIBS) -lmingw32 -ljpeg -lzlib1 -lpng12-0 -ltiff-3 -lSDL_image -lSDL_mixer -lSDLmain -lws2_32 -lSDL
+ifeq ($(ENABLE_TTF), true)
+        CFLAGS:=$(CFLAGS) -DENABLE_TTF=1
+        LDFLAGS:=$(LDFLAGS) -lSDL_ttf
+endif
 else
 	SDL_CONFIG=sdl-config
 	CFLAGS:=$(CFLAGS) `$(SDL_CONFIG) --cflags`
