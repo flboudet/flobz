@@ -23,6 +23,10 @@ typedef struct _HSVA {
  * pre: SDL_Locked(surface) */
 RGBA iim_surface_get_rgba(SDL_Surface *surface, Uint32 x, Uint32 y);
 
+/* Extracting color components from a 32-bit color value
+ * pre: SDL_Locked(surface) */
+Uint8 iim_surface_get_alpha(SDL_Surface *surface, Uint32 x, Uint32 y);
+
 /* pre: SDL_Locked(surface) */
 void iim_surface_set_rgb(SDL_Surface *surface,
                          Uint32 x, Uint32 y, RGBA c);
@@ -30,6 +34,10 @@ void iim_surface_set_rgb(SDL_Surface *surface,
 /* pre: SDL_Locked(surface) */
 void iim_surface_set_rgba(SDL_Surface *surface,
                           Uint32 x, Uint32 y, RGBA c);
+
+/* pre: SDL_Locked(surface) */
+void iim_surface_set_alpha(SDL_Surface *surface,
+                          Uint32 x, Uint32 y, Uint8 alpha);
 
 /* pre: SDL_Locked(surface) */
 void iim_surface_blend_rgba(SDL_Surface *surface,

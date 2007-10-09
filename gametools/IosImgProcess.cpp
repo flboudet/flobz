@@ -143,6 +143,21 @@ RGBA iim_surface_get_rgba(SDL_Surface *surface, Uint32 x, Uint32 y)
   return result;
 }
 
+Uint8 iim_surface_get_alpha(SDL_Surface *surface, Uint32 x, Uint32 y)
+{
+  Uint32 temp, pixel;
+  RGBA result;
+  int index = x*surface->format->BytesPerPixel + y*surface->pitch;
+  SDL_PixelFormat *fmt = surface->format;
+  pixel=*(Uint32*)((char*)surface->pixels+index);
+
+  /* Get Alpha component */
+  temp=pixel&fmt->Amask; /* Isolate alpha component */
+  temp=temp>>fmt->Ashift;/* Shift it down to 8-bit */
+  temp=temp<<fmt->Aloss; /* Expand to a full 8-bit number */
+  return (Uint8)temp;
+}
+
 Uint8 iim_rgba2gray(RGBA col)
 {
   unsigned int level;
@@ -210,6 +225,20 @@ void iim_surface_set_rgba(SDL_Surface *surface,
   temp = c.alpha >> fmt->Aloss;
   temp = temp    << fmt->Ashift;
   pixel |= temp;
+
+  *(Uint32*)((char*)surface->pixels+index) = pixel;
+}
+
+void iim_surface_set_alpha(SDL_Surface *surface,
+                          Uint32 x, Uint32 y, Uint8 alpha)
+{
+  Uint32 pixel = 0;
+  int index = x*surface->format->BytesPerPixel + y*surface->pitch;
+  SDL_PixelFormat *fmt = surface->format;
+
+  /* Get Alpha component */
+  pixel = alpha >> fmt->Aloss;
+  pixel <<= fmt->Ashift;
 
   *(Uint32*)((char*)surface->pixels+index) = pixel;
 }

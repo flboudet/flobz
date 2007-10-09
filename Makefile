@@ -28,6 +28,7 @@ MAKEDEPEND = $(CXX) -MM $(DEPFLAGS) -o $(df).d $<
 
 all: flobopuyo
 flobopuyo: all.h.gch iosfc_dir gametools_dir goomsl_dir ${OBJFILES}
+	@echo "Compiled with CFLAGS=${CFLAGS}"
 	@echo "[flobopuyo]" && $(CXX) $(CFLAGS) -o $(PRGNAME) ${OBJFILES} gametools/*.o goomsl/goomsl*.o -Liosfc -liosfc $(LDFLAGS)
 	@echo "--------------------------------------"
 	@echo " Compilation finished"
