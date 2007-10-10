@@ -17,9 +17,13 @@ struct _SOFONT
 {
     int     height;
     TTF_Font *font;
-    SDL_Surface *text_image;
+
     char *text;
     int fx;
+
+//    int   num_lines;
+//    char *lines;
+    SDL_Surface *text_image;//[MAX_LINES];
 
     RGBA precomputed[8][8][64][16];
 };
