@@ -313,7 +313,7 @@ void GameLoop::draw()
   static double t1 = 0.0;
 
   double t2 = ios_fc::getTimeMs();
-  double curFPS = 1000.0 * nFrames / (t2 - t1);
+  double curFPS = 1000.0 / (t2 - t1);
   if (curFPS < minFPS) minFPS = curFPS;
   t1 = t2;
 
