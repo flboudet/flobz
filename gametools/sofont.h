@@ -43,7 +43,7 @@
 //#include "glSDL.h"
 #include "IosImgProcess.h"
 
-typedef struct _SOFONT SoFont;
+struct SoFont;
 
 SoFont *SoFont_new ();
 void    SoFont_free (SoFont * font);

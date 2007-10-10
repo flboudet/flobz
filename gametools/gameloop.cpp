@@ -299,7 +299,6 @@ bool GameLoop::isLate(double currentTime) const
 
 void GameLoop::draw()
 {
-
   for (int i = 0; i < drawables.size(); ++i) {
     drawables[i]->doDraw(getSurface());
   }

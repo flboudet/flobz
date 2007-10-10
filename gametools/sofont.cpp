@@ -1,38 +1,124 @@
 #ifdef ENABLE_TTF
 
 #include <math.h>
+#include <map>
+#include <vector>
+#include <string>
+using namespace std;
 
 #include "sofont.h"
 
 // Craderie permettant d'avoir toujours une font dispo pour le debug
-// (en particulier pour que gameloop afficher les FPS)
+// (en particulier pour que gameloop affiche les FPS)
 SoFont *DBG_FONT = NULL;
 
 #include <stdlib.h>
-#include <string.h>
 #include <SDL_ttf.h>
-static int num_fonts = 0;
 
-struct _SOFONT
+// Keep track of opened fonts, release SDL_TTF when 0
+static int num_fonts = 0;
+#define CACHE_SIZE 32
+
+int SplitString(const string& input, 
+               const string& delimiter, vector<string>& results, 
+                      bool includeEmpties)
+{
+    int iPos = 0;
+    int newPos = -1;
+    int sizeS2 = (int)delimiter.size();
+    int isize = (int)input.size();
+
+    if( ( isize == 0 ) || ( sizeS2 == 0 )) { return 0; }
+    vector<int> positions;
+    newPos = input.find (delimiter, 0);
+    if( newPos < 0 ) { return 0; }
+    int numFound = 0;
+    while( newPos >= iPos ) {
+        numFound++;
+        positions.push_back(newPos);
+        iPos = newPos;
+        newPos = input.find (delimiter, iPos+sizeS2);
+    }
+    if( numFound == 0 ) { return 0; }
+    for( int i=0; i <= (int)positions.size(); ++i ) {
+        string s("");
+        if( i == 0 ) 
+            s = input.substr( i, positions[i] ); 
+        int offset = positions[i-1] + sizeS2;
+        if( offset < isize ) {
+            if( i == positions.size() )
+                s = input.substr(offset);
+            else if( i > 0 )
+                s = input.substr( positions[i-1] + sizeS2, 
+                        positions[i] - positions[i-1] - sizeS2 );
+        }
+        if( includeEmpties || ( s.size() > 0 ) )
+            results.push_back(s);
+    }
+    return numFound;
+}
+
+class CacheLine
+{
+    public:
+        static int last_usage;
+
+        CacheLine() : image(NULL), usage(0) {}
+
+        void renderImage(SoFont *font, const char *text);
+        void blitImage(int x, int y, SDL_Surface *surface);
+
+        void freeImage() {
+            if (image != NULL) SDL_FreeSurface(image);
+        }
+
+        int getDate() const { return usage; }
+
+    private:
+        SDL_Surface *image;
+        int usage;
+};
+int CacheLine::last_usage = 0;
+
+typedef map<string, CacheLine*> CacheMap;
+typedef pair<string, CacheLine*> CachePair;
+
+struct SoFont
 {
     int     height;
     TTF_Font *font;
 
-    char *text;
     int fx;
-
-//    int   num_lines;
-//    char *lines;
-    SDL_Surface *text_image;//[MAX_LINES];
+    CacheMap cache;
 
     RGBA precomputed[8][8][64][16];
 };
 
-#ifdef BENCHMARKS
-#include "ios_fc.h"
-static double t = 0.0;
-static double n = 0.0;
-#endif
+static SDL_Surface *SoFont_FX(SoFont *font, SDL_Surface *src);
+
+void CacheLine::renderImage(SoFont *font, const char *text)
+{
+    if (font->font) {
+        static const SDL_Colour white = {255,255,255};
+
+        this->freeImage();
+        this->image = TTF_RenderUTF8_Blended(font->font, text, white);
+        this->image = SoFont_FX(font, this->image);
+    }
+}
+
+void CacheLine::blitImage(int x, int y, SDL_Surface *surface) {
+    if (image != NULL) {
+        SDL_Rect dst_rect;
+        dst_rect.x = x;
+        dst_rect.y = y;
+        dst_rect.w = image->w;
+        dst_rect.h = image->h;
+        SDL_BlitSurface(image, NULL, surface, &dst_rect);
+        usage = last_usage++;
+    }
+}
+
 
 // Precompute the font effect function values from discretized alpha and positions.
 static void SoFont_Precompute_FX(SoFont *font)
@@ -81,91 +167,88 @@ static void SoFont_Precompute_FX(SoFont *font)
 /**
  * Apply nice FX to a SDL_Surface containing a font
  */
-static void SoFont_FX(SoFont *font)
+static SDL_Surface *SoFont_FX(SoFont *font, SDL_Surface *src)
 {
 #define SHADOW_X 2
 #define SHADOW_Y 1
-  if (font == NULL) return;
-  SDL_Surface *src = font->text_image;
-  if (src == NULL) return;
-  SDL_PixelFormat *fmt = src->format;
-  SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
-                                          fmt->Rmask, fmt->Gmask,
-                                          fmt->Bmask, fmt->Amask);
-  SDL_LockSurface(src);
-  SDL_LockSurface(ret);
+    if (font == NULL) return NULL;
+    if (src == NULL)  return NULL;
+    SDL_PixelFormat *fmt = src->format;
+    SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
+            fmt->Rmask, fmt->Gmask,
+            fmt->Bmask, fmt->Amask);
+    SDL_LockSurface(src);
+    SDL_LockSurface(ret);
 
-  unsigned int dc_x = (unsigned int)(65535 / (float)src->w);
-  unsigned int dc_y = (unsigned int)(65535 / (float)src->h);
-  unsigned int c_y  = 0;
+    unsigned int dc_x = (unsigned int)(65535 / (float)src->w);
+    unsigned int dc_y = (unsigned int)(65535 / (float)src->h);
+    unsigned int c_y  = 0;
 
-  // Draw text
-  for (int y=src->h; --y >= SHADOW_Y;)
-  {
-    unsigned int c_x  = 0;
-
-    // SHADOW + TEXT
-    for (int x=src->w; --x >= SHADOW_X;)
+    // Draw text
+    for (int y=src->h; --y >= SHADOW_Y;)
     {
-      unsigned int s_alpha = iim_surface_get_alpha(src, x-SHADOW_X, y-SHADOW_Y) >> 5;
-      unsigned int f_alpha = iim_surface_get_alpha(src, x, y) >> 5;
+        unsigned int c_x  = 0;
 
-      RGBA rgba = font->precomputed[s_alpha][f_alpha][c_x >> 10][c_y >> 12];
-      iim_surface_set_rgba(ret,x,y,rgba);
+        // SHADOW + TEXT
+        for (int x=src->w; --x >= SHADOW_X;)
+        {
+            unsigned int s_alpha = iim_surface_get_alpha(src, x-SHADOW_X, y-SHADOW_Y) >> 5;
+            unsigned int f_alpha = iim_surface_get_alpha(src, x, y) >> 5;
 
-      c_x += dc_x;
+            RGBA rgba = font->precomputed[s_alpha][f_alpha][c_x >> 10][c_y >> 12];
+            iim_surface_set_rgba(ret,x,y,rgba);
+
+            c_x += dc_x;
+        }
+
+        // OUTSIDE OF SHADOW, JUST TEXT
+        for (int x=SHADOW_X; x--;)
+        {
+            unsigned int s_alpha = 0;
+            unsigned int f_alpha = iim_surface_get_alpha(src, x, y) >> 5;
+
+            RGBA rgba = font->precomputed[s_alpha][f_alpha][c_x >> 10][c_y >> 12];
+            iim_surface_set_rgba(ret,x,y,rgba);
+
+            c_x += dc_x;
+        }
+
+        c_y += dc_y;
     }
-
     // OUTSIDE OF SHADOW, JUST TEXT
-    for (int x=SHADOW_X; x--;)
+    for (int y=SHADOW_Y; y--;)
     {
-      unsigned int s_alpha = 0;
-      unsigned int f_alpha = iim_surface_get_alpha(src, x, y) >> 5;
+        unsigned int c_x  = 0;
 
-      RGBA rgba = font->precomputed[s_alpha][f_alpha][c_x >> 10][c_y >> 12];
-      iim_surface_set_rgba(ret,x,y,rgba);
+        for (int x=SHADOW_X; x--;)
+        {
+            unsigned int s_alpha = 0;
+            unsigned int f_alpha = iim_surface_get_alpha(src, x, y) >> 5;
 
-      c_x += dc_x;
+            RGBA rgba = font->precomputed[s_alpha][f_alpha][c_x >> 10][c_y >> 12];
+            iim_surface_set_rgba(ret,x,y,rgba);
+
+            c_x += dc_x;
+        }
+
+        c_y += dc_y;
     }
 
-    c_y += dc_y;
-  }
-  // OUTSIDE OF SHADOW, JUST TEXT
-  for (int y=SHADOW_Y; y--;)
-  {
-    unsigned int c_x  = 0;
+    SDL_UnlockSurface(ret);
+    SDL_UnlockSurface(src);
+    SDL_Surface *ret2 = SDL_DisplayFormatAlpha(ret);
+    SDL_SetAlpha(ret2, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
+    SDL_FreeSurface(ret);
+    SDL_FreeSurface(src);
 
-    for (int x=SHADOW_X; x--;)
-    {
-      unsigned int s_alpha = 0;
-      unsigned int f_alpha = iim_surface_get_alpha(src, x, y) >> 5;
-
-      RGBA rgba = font->precomputed[s_alpha][f_alpha][c_x >> 10][c_y >> 12];
-      iim_surface_set_rgba(ret,x,y,rgba);
-
-      c_x += dc_x;
-    }
-
-    c_y += dc_y;
-  }
-
-  SDL_UnlockSurface(ret);
-  SDL_UnlockSurface(src);
-  SDL_Surface *ret2 = SDL_DisplayFormatAlpha(ret);
-  SDL_SetAlpha(ret2, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
-  SDL_FreeSurface(ret);
-  SDL_FreeSurface(src);
-
-  font->text_image = ret2;
+    return ret2;
 }
 
 SoFont *SoFont_new()
 {
     if (num_fonts++ == 0)
         TTF_Init();
-    SoFont *font = (SoFont*)malloc(sizeof(SoFont));
-    font->text   = NULL;
-    font->text_image = NULL;
+    SoFont *font = new SoFont();
     font->font   = NULL;
     font->height = 0;
     font->fx = SoFont_STD;
@@ -175,11 +258,9 @@ SoFont *SoFont_new()
 
 void SoFont_free (SoFont * font)
 {
-    if (font->text != NULL)       free(font->text);
-    if (font->text_image != NULL) SDL_FreeSurface(font->text_image);
     if (font->font)
         TTF_CloseFont(font->font);
-    free((SoFont*)font);
+    delete font;
     if (--num_fonts == 0)
         TTF_Quit();
     if (DBG_FONT == font)
@@ -194,40 +275,23 @@ int SoFont_load_ttf (SoFont * font, const char *fileName, int size, int fx)
     SoFont_Precompute_FX(font);
 }
 
-static void SoFont_RenderText(SoFont *font, const char *text)
+void SoFont_CacheCheck(SoFont *font)
 {
-    if (font->font) {
-        if ((font->text != NULL) && (strcmp(font->text, text) == 0))
-            return;
-        static const SDL_Colour black = {0,0,0};
-        static const SDL_Colour white = {255,255,255};
-
-        if (font->text != NULL) free(font->text);
-        if (font->text_image != NULL) SDL_FreeSurface(font->text_image);
-        int len = strlen(text);
-        font->text = (char*)malloc(len + 1);
-        strcpy(font->text, text);
-
-        // Split the text into lines. 
-//        char *splited = (char*)malloc(len + 1);
-//        strcpy(splited, text);
-//        int begin = 0;
-//        int end   = 0;
-//        while (splited[end] != 0) {
-//            char c = splited[end];
-//            if (c == '\t') splited[end] = '\';
-//            if (c == '\n') {
-//                splited[end] = 0;
-//                font->text_image = TTF_RenderUTF8_Blended(font->font, splited+begin, white);
-//                begin = end + 1;
-//            }
-//            ++end;
-//        }
-
-        font->text_image = TTF_RenderUTF8_Blended(font->font, text, white);
-
-//        free(splited);
-        SoFont_FX(font);
+    if (font->cache.size() >= CACHE_SIZE) {
+        // Find the older cache line.
+        int older_date = 0;
+        CacheMap::iterator older_it = font->cache.begin();
+        CacheMap::iterator it = font->cache.begin();
+        while (it != font->cache.end()) {
+           if (it->second->getDate() > older_date) {
+               older_date = it->second->getDate();
+               older_it = it;
+           }
+           ++it;
+        }
+        older_it->second->freeImage();
+        delete older_it->second;
+        font->cache.erase(older_it);
     }
 }
 
@@ -236,47 +300,36 @@ static void SoFont_RenderText(SoFont *font, const char *text)
 ///   text: a string containing the text you want to blit.
 void SoFont_PutString (SoFont * font, SDL_Surface * surface, int x, int y, const char *text, SDL_Rect * clip /*=NULL*/)
 {
-#ifdef BENCHMARKS
-    t -= ios_fc::getTimeMs();
-#endif
+    if (text == NULL) return;
     if (font->font) {
-        SoFont_RenderText(font, text);
-        if (font->text_image != NULL) {
-            SDL_Rect dst_rect;
-            dst_rect.x = x;
-            dst_rect.y = y;
-            dst_rect.w = font->text_image->w;
-            dst_rect.h = font->text_image->h;
-            SDL_BlitSurface(font->text_image, NULL, surface, &dst_rect);
+        CacheMap::iterator cacheLineIt = font->cache.find(text);
+        CacheLine *cacheLine;
+
+        if (cacheLineIt == font->cache.end()) {
+            // No such line in cache, insert it!
+            SoFont_CacheCheck(font);
+            cacheLine = new CacheLine();
+            font->cache.insert(CachePair(string(text), cacheLine));
         }
+        else {
+            cacheLine = cacheLineIt->second;
+        }
+        // Now it is in cache, use it!
+        // SoFont_RenderText(font, text);
+        cacheLine->renderImage(font, text);
+        cacheLine->blitImage(x,y,surface);
     }
-#ifdef BENCHMARKS
-    t += ios_fc::getTimeMs();
-    n += 1.0;
-    if (n > 1000.0) {
-//        printf("%3.3fms / string\n", t/n);
-        n = 0.0; t = 0.0;
-    }
-#endif
 }
 
 /// Returns the width of "text" in pixels
 int SoFont_TextWidth (SoFont * font, const char *text)
 {
-#ifdef BENCHMARKS
-    t -= ios_fc::getTimeMs();
-#endif
     int ret = 0;
     if (font->font) {
-        //int w,h;
-        //TTF_SizeUTF8(font->font, text, &w, &h);
-        SoFont_RenderText(font, text);
-        if (font->text_image != NULL)
-            ret = font->text_image->w;
+        int w,h;
+        TTF_SizeUTF8(font->font, text, &w, &h);
+        ret = w;
     }
-#ifdef BENCHMARKS
-    t += ios_fc::getTimeMs();
-#endif
     return ret;
 }
 
