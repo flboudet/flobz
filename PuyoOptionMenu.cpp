@@ -85,8 +85,10 @@ void OptionMenu::build() {
     add(&audioButton);
     add(&musicButton);
     add(&fullScreenButton);
-    add(&changePuyoThemeButton);
-    add(&changeLevelThemeButton);
+    if (getPuyoThemeManger()->getAnimatedPuyoSetThemeList()->size() > 1)
+        add(&changePuyoThemeButton);
+    if (getPuyoThemeManger()->getPuyoLevelThemeList()->size() > 1)
+        add(&changeLevelThemeButton);
     add(&changeControlsButton);
     add(&backButton);
 }

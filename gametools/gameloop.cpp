@@ -309,12 +309,21 @@ void GameLoop::draw()
   static double nFrames = 0.0;
   static double t0 = 0.0;
   static char fps[] = "FPS: .....   ";
+  static double minFPS = 100000.0;
+  static double t1 = 0.0;
+
+  double t2 = ios_fc::getTimeMs();
+  double curFPS = 1000.0 * nFrames / (t2 - t1);
+  if (curFPS < minFPS) minFPS = curFPS;
+  t1 = t2;
+
   if (nFrames > 60.0) {
-      double t1 = ios_fc::getTimeMs();
-      sprintf(fps, "FPS: %3.1f", (1000.0 * nFrames / (t1 - t0)));
-      t0 = t1;
+      sprintf(fps, "FPS: %3.1f >> %3.1f", (1000.0 * nFrames / (t2-t0)), minFPS);
+      t0 = t2;
       nFrames = 0.0;
+      minFPS = 1000000.0;
   }
+
   nFrames += 1.0;
   if (DBG_FONT != NULL)
         SoFont_PutString (DBG_FONT, getSurface(), 16, 16, fps, NULL);
