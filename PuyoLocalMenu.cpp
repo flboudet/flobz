@@ -53,9 +53,9 @@ LocalGameMenu::LocalGameMenu(PuyoRealMainScreen *mainScreen)
       screenTitle(locale.getLocalizedString("Choose Game Level")),
       PuyoMainScreenMenu(mainScreen),
       easyAction(EASY, this), mediumAction(MEDIUM, this), hardAction(HARD, this), popAction(mainScreen),
-      easy(locale.getLocalizedString("Easy"), &easyAction),
-      medium(locale.getLocalizedString("Medium"), &mediumAction),
-      hard(locale.getLocalizedString("Hard"), &hardAction),
+      easy(locale.getLocalizedString("Beginner"), &easyAction),
+      medium(locale.getLocalizedString("Normal"), &mediumAction),
+      hard(locale.getLocalizedString("Expert"), &hardAction),
       back(locale.getLocalizedString("Cancel"), &popAction)
 {
     EditField *editName = editPlayerName.getEditField();

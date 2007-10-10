@@ -195,14 +195,34 @@ static void SoFont_RenderText(SoFont *font, const char *text)
     if (font->font) {
         if ((font->text != NULL) && (strcmp(font->text, text) == 0))
             return;
-        SDL_Colour black = {0,0,0};
-        SDL_Colour white = {255,255,255};
-        int len = strlen(text);
+        static const SDL_Colour black = {0,0,0};
+        static const SDL_Colour white = {255,255,255};
+
         if (font->text != NULL) free(font->text);
         if (font->text_image != NULL) SDL_FreeSurface(font->text_image);
+        int len = strlen(text);
         font->text = (char*)malloc(len + 1);
         strcpy(font->text, text);
+
+        // Split the text into lines. 
+//        char *splited = (char*)malloc(len + 1);
+//        strcpy(splited, text);
+//        int begin = 0;
+//        int end   = 0;
+//        while (splited[end] != 0) {
+//            char c = splited[end];
+//            if (c == '\t') splited[end] = '\';
+//            if (c == '\n') {
+//                splited[end] = 0;
+//                font->text_image = TTF_RenderUTF8_Blended(font->font, splited+begin, white);
+//                begin = end + 1;
+//            }
+//            ++end;
+//        }
+
         font->text_image = TTF_RenderUTF8_Blended(font->font, text, white);
+
+//        free(splited);
         SoFont_FX(font);
     }
 }
