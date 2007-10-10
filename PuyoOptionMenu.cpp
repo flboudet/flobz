@@ -65,15 +65,15 @@ void OptionMenu::toggleFullScreen()
 
 OptionMenu::OptionMenu(PuyoRealMainScreen *mainScreen) : PuyoMainScreenMenu(mainScreen),
     toggleSoundFxAction(*this), toggleMusicAction(*this), toggleFullScreenAction(*this),
-    optionTitle("Options"),
-    audioButton(kAudioFX, "OFF", "ON ", theCommander->getSoundFx(), &toggleSoundFxAction),
-    musicButton(kMusic, "OFF", "ON ", theCommander->getMusic(), &toggleMusicAction),
-    fullScreenButton(kFullScreen, "OFF", "ON ", theCommander->getFullScreen(), &toggleFullScreenAction),
+    optionTitle(theCommander->getLocalizedString("Options")),
+    audioButton(theCommander->getLocalizedString(kAudioFX), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getSoundFx(), &toggleSoundFxAction),
+    musicButton(theCommander->getLocalizedString(kMusic), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getMusic(), &toggleMusicAction),
+    fullScreenButton(theCommander->getLocalizedString(kFullScreen), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getFullScreen(), &toggleFullScreenAction),
     controlMenu(mainScreen), themeMenu(mainScreen), levelMenu(mainScreen),
     changeThemeAction(&themeMenu, mainScreen), changeLevelAction(&levelMenu, mainScreen), changeControlsAction(&controlMenu, mainScreen),
-    changePuyoThemeButton(kChangePuyoTheme, &changeThemeAction),
-    changeLevelThemeButton(kChangePuyoLevel, &changeLevelAction),
-    changeControlsButton(kControls, &changeControlsAction), backAction(mainScreen), backButton("Back", &backAction)
+    changePuyoThemeButton(theCommander->getLocalizedString(kChangePuyoTheme), &changeThemeAction),
+    changeLevelThemeButton(theCommander->getLocalizedString(kChangePuyoLevel), &changeLevelAction),
+    changeControlsButton(theCommander->getLocalizedString(kControls), &changeControlsAction), backAction(mainScreen), backButton(theCommander->getLocalizedString("Back"), &backAction)
 {
 }
 

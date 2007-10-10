@@ -89,6 +89,7 @@ class PuyoCommander : public MessageListener
     
     void initDisplay(bool fullscreen, bool useGL);
     const PuyoDataPathManager &getDataPathManager() { return dataPathManager; }
+    const char * getLocalizedString(const char * originalString) const;
   private:
 
     friend class SinglePlayerGameAction;
@@ -98,6 +99,7 @@ class PuyoCommander : public MessageListener
 
     void loadPreferences(bool fs);
     void initSDL();
+    void initLocale();
     void initAudio();
     void initFonts();
     void initMenus();
@@ -109,6 +111,7 @@ class PuyoCommander : public MessageListener
 
     PuyoRealMainScreen *mainScreen;
     PuyoCursor *cursor;
+    PuyoLocalizedDictionary * locale;
 
     bool fullscreen;
     bool useGL;

@@ -146,20 +146,19 @@ public:
         networkGameMenu   (mainScreen),
         popScreenAction(mainScreen),
         hallOfFameScreen(*mainScreen,&popScreenAction),
-        // Load locale and create action for buttons
-        locale(theCommander->getDataPathManager(), "locale", "main"),
+        // Create action for buttons
         singlePlayerGameAction(&localGameMenu, mainScreen),
         twoPlayersGameAction(&local2PlayersGameMenu, mainScreen),
         optionAction(&optionMenu, mainScreen),
         networkGameAction(&networkGameMenu, mainScreen),
         hallOfFameAction(&hallOfFameScreen, mainScreen),
         // Create buttons
-        singlePlayerGameButton(locale.getLocalizedString(kSinglePlayerGame), &singlePlayerGameAction),
-        twoPlayersGameButton(locale.getLocalizedString("Two Players Game"), &twoPlayersGameAction),
-        optionButton(locale.getLocalizedString("Options"), &optionAction),
-        networkGameButton(locale.getLocalizedString(kNetGame), &networkGameAction),
-        hallOfFameButton(locale.getLocalizedString(kHighScores), &hallOfFameAction),
-        exitButton(locale.getLocalizedString(kExit), &exitAction)
+        singlePlayerGameButton(theCommander->getLocalizedString(kSinglePlayerGame), &singlePlayerGameAction),
+        twoPlayersGameButton(theCommander->getLocalizedString("Two Players Game"), &twoPlayersGameAction),
+        optionButton(theCommander->getLocalizedString("Options"), &optionAction),
+        networkGameButton(theCommander->getLocalizedString(kNetGame), &networkGameAction),
+        hallOfFameButton(theCommander->getLocalizedString(kHighScores), &hallOfFameAction),
+        exitButton(theCommander->getLocalizedString(kExit), &exitAction)
     {}
     void build();
 
@@ -169,7 +168,6 @@ private:
     OptionMenu            optionMenu;
     NetworkGameMenu       networkGameMenu;
     HallOfFameScreen      hallOfFameScreen; // Comes from PuyoSinglePlayerStarter.cpp
-    PuyoLocalizedDictionary locale;
 
     PuyoPushMenuAction    singlePlayerGameAction;
     PuyoPushMenuAction    twoPlayersGameAction;
@@ -252,6 +250,7 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber) : d
     dataPathManager.setMaxPackNumber(maxDataPackNumber);
   loadPreferences(fs);
   initSDL();
+  initLocale();
   initGameControls();
   initAudio();
   initDisplay(fullscreen, useGL);
@@ -298,6 +297,18 @@ void PuyoCommander::initSDL()
 
 extern char *dataFolder;
 #include <string>
+
+/* Initialise the default dictionnary */
+void PuyoCommander::initLocale()
+{
+  locale = new PuyoLocalizedDictionary(dataPathManager, "locale", "main");
+}
+
+/* Global translator */
+const char * PuyoCommander::getLocalizedString(const char * originalString) const
+{
+  return locale->getLocalizedString(originalString);
+}
 
 /* Initialize the audio if necessary */
 void PuyoCommander::initAudio()
