@@ -106,15 +106,17 @@ bundle: flobopuyo
 	mkdir -p $(bundle_name)/Contents/Resources
 	mkdir -p $(bundle_name)/Contents/Frameworks
 	cp -RP $(FRAMEWORKS_DIR)/SDL* $(bundle_name)/Contents/Frameworks/
-	$(STRIP) $(bundle_name)/Contents/Frameworks/SDL*/SDL*
+	$(STRIP) -x $(bundle_name)/Contents/Frameworks/SDL*/SDL*
 	echo "APPL????" > $(bundle_name)/Contents/PkgInfo
 	sed "s/@@VERSION@@/$(VERSION)/" mac/Info.plist > $(bundle_name)/Contents/Info.plist
 	cp mac/icon.icns $(bundle_name)/Contents/Resources/
 	cp flobopuyo $(bundle_name)/Contents/MacOS/flobopuyo
 	@+make -C data install INSTALL_DATADIR="$(PWD)/$(bundle_name)/Contents/Resources/data"
-	$(STRIP) $(bundle_name)/Contents/MacOS/flobopuyo
+	$(STRIP) -u -r $(bundle_name)/Contents/MacOS/flobopuyo
 
 mac-package: bundle
+	rm -rf $(macimage_name)
+	rm -f $(macimage_name).dmg
 	mkdir -p $(macimage_name)
 	cp -RP $(bundle_name) $(macimage_name)
 	cp COPYING $(macimage_name)
