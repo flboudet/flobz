@@ -1,0 +1,3 @@
+Editer le fichier main.dic.in
+Utiliser fribidi2 (version CVS de fribidi) pour faire :
+fribidi --ltr main.dic.in > main.dic
