@@ -88,9 +88,9 @@ static bool readLine(FILE *dictionaryFile, String &lineRead)
 /* Additionnaly we'll try at most 10 user languages */
 #define kPuyoMaxPreferedLanguage 10
 
-static char * PreferedLocales[kPuyoMaxPreferedLanguage+1]; // +1 for the default one
-static int PreferedLocalesCount = 0;
-static bool systemInitiated = false;
+char *PreferedLocales[kPuyoMaxPreferedLanguage+1]; // +1 for the default one
+int   PreferedLocalesCount = 0;
+static bool  systemInitiated = false;
 
 typedef struct {
   HashMap * dictionary;
@@ -99,11 +99,10 @@ typedef struct {
 
 static HashMap dictionaries;
 
-PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName) : dictionary(), datapathManager(datapathManager)
+void Locales_Init()
 {
   int i;
 
-  /* First create the prefered languages list  whenever needed*/
   if (!systemInitiated) {
     fprintf(stdout,"Languages detection...\n");
 
@@ -178,6 +177,14 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
 
     systemInitiated = true;
   }
+}
+
+PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName) : dictionary(), datapathManager(datapathManager)
+{
+  int i;
+
+  /* First create the prefered languages list  whenever needed*/
+  Locales_Init();
 
   stdName = FilePath::combine(dictionaryDirectory, dictionaryName);
   HashValue * result = dictionaries.get((const char *)stdName);

@@ -332,11 +332,22 @@ void PuyoCommander::initFonts()
   SoFont *textFont = SoFont_new();
 
 #ifdef ENABLE_TTF
-  SoFont_load_ttf(darkFont, dataPathManager.getPath("gfx/font.ttf"), 18, SoFont_DARK);
-  SoFont_load_ttf(menuFont, dataPathManager.getPath("gfx/font.ttf"), 18, SoFont_STD);
-  SoFont_load_ttf(smallFont, dataPathManager.getPath("gfx/font.ttf"), 12, SoFont_STD);
-  SoFont_load_ttf(smallFontInfo, dataPathManager.getPath("gfx/font.ttf"), 12, SoFont_STD);
-  SoFont_load_ttf(textFont, dataPathManager.getPath("gfx/font.ttf"), 18, SoFont_DARK);
+  Locales_Init(); // Make sure locales are detected.
+  std::string font = "gfx/font.ttf";
+  try {
+      std::string test_str = "gfx/font_";
+      test_str += PreferedLocales[0];
+      test_str += ".ttf";
+      printf("%s found.\n", dataPathManager.getPath(test_str.c_str()).c_str());
+      font = test_str;
+  }
+  catch (ios_fc::Exception) {}
+
+  SoFont_load_ttf(darkFont, dataPathManager.getPath(font.c_str()), 18, SoFont_DARK);
+  SoFont_load_ttf(menuFont, dataPathManager.getPath(font.c_str()), 18, SoFont_STD);
+  SoFont_load_ttf(smallFont, dataPathManager.getPath(font.c_str()), 12, SoFont_STD);
+  SoFont_load_ttf(smallFontInfo, dataPathManager.getPath(font.c_str()), 12, SoFont_STD);
+  SoFont_load_ttf(textFont, dataPathManager.getPath(font.c_str()), 18, SoFont_DARK);
 #else
   IIM_Surface *font3b = IIM_Load_Absolute_DisplayFormatAlpha (dataPathManager.getPath("gfx/font3b.png"));
   IIM_Surface *font4b = IIM_Load_Absolute_DisplayFormatAlpha (dataPathManager.getPath("gfx/font4b.png"));

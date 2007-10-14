@@ -42,5 +42,9 @@ private:
     const PuyoDataPathManager &datapathManager;
 };
 
+void Locales_Init();
+extern char *PreferedLocales[];
+extern int PreferedLocalesCount;
+
 #endif // _PUYOLOCALIZEDDICTIONARY
 
