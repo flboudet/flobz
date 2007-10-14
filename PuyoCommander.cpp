@@ -335,9 +335,9 @@ void PuyoCommander::initFonts()
   Locales_Init(); // Make sure locales are detected.
   std::string font = "gfx/font.ttf";
   try {
-      std::string test_str = "gfx/font_";
-      test_str += PreferedLocales[0];
-      test_str += ".ttf";
+      std::string test_str = std::string("locale/")
+        + PreferedLocales[0]
+        + "/font.ttf";
       printf("%s found.\n", dataPathManager.getPath(test_str.c_str()).c_str());
       font = test_str;
   }
