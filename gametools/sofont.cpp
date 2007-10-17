@@ -20,42 +20,52 @@ static int num_fonts = 0;
 #define CACHE_SIZE 32
 
 int SplitString(const string& input, 
-               const string& delimiter, vector<string>& results, 
+               const char delimiter, vector<string>& results, 
                       bool includeEmpties)
 {
-    int iPos = 0;
+    int iPos   = 0;
     int newPos = -1;
-    int sizeS2 = (int)delimiter.size();
-    int isize = (int)input.size();
+    int isize  = (int)input.size();
 
-    if( ( isize == 0 ) || ( sizeS2 == 0 )) { return 0; }
+    if (isize == 0) return 0;
     vector<int> positions;
-    newPos = input.find (delimiter, 0);
-    if( newPos < 0 ) { return 0; }
+    newPos = input.find(delimiter, 0);
+
+    if (newPos < 0) {
+        results.push_back(input);
+        return 1;
+    }
+
     int numFound = 0;
-    while( newPos >= iPos ) {
+    while (newPos >= iPos) {
         numFound++;
         positions.push_back(newPos);
         iPos = newPos;
-        newPos = input.find (delimiter, iPos+sizeS2);
+        newPos = input.find(delimiter, iPos + 1);
     }
-    if( numFound == 0 ) { return 0; }
-    for( int i=0; i <= (int)positions.size(); ++i ) {
+
+    if (numFound == 0) {
+        results.push_back(input);
+        return 1;
+    }
+
+    for (int i=0; i <= (int)positions.size(); ++i) {
         string s("");
-        if( i == 0 ) 
-            s = input.substr( i, positions[i] ); 
-        int offset = positions[i-1] + sizeS2;
-        if( offset < isize ) {
-            if( i == positions.size() )
+        if (i == 0) 
+            s = input.substr(0, positions[0]);
+        else {
+            int offset = positions[i-1] + 1;
+            if (i == positions.size())
                 s = input.substr(offset);
-            else if( i > 0 )
-                s = input.substr( positions[i-1] + sizeS2, 
-                        positions[i] - positions[i-1] - sizeS2 );
+            else 
+                s = input.substr(positions[i-1] + 1, 
+                        positions[i] - positions[i-1] - 1);
         }
-        if( includeEmpties || ( s.size() > 0 ) )
+        if (includeEmpties || (s.size() > 0)) {
             results.push_back(s);
+        }
     }
-    return numFound;
+    return numFound+1;
 }
 
 class CacheLine
@@ -174,40 +184,28 @@ static SDL_Surface *SoFont_FX(SoFont *font, SDL_Surface *src)
     if (font == NULL) return NULL;
     if (src == NULL)  return NULL;
     SDL_PixelFormat *fmt = src->format;
-    SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
+    SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w + SHADOW_X, src->h + SHADOW_Y, 32,
             fmt->Rmask, fmt->Gmask,
             fmt->Bmask, fmt->Amask);
     SDL_LockSurface(src);
     SDL_LockSurface(ret);
 
-    unsigned int dc_x = (unsigned int)(65535 / (float)src->w);
-    unsigned int dc_y = (unsigned int)(65535 / (float)src->h);
+    unsigned int dc_x = (unsigned int)(65535. / ((float)src->w + SHADOW_X+1));
+    unsigned int dc_y = (unsigned int)(65535. / ((float)src->h + SHADOW_Y+1));
     unsigned int c_y  = 0;
 
-    // Draw text
-    for (int y=src->h; --y >= SHADOW_Y;)
+    // OUTSIDE OF TEXT, JUST SHADOW
+    for (int y=src->h + SHADOW_Y - 1; y >= src->h; --y)
     {
         unsigned int c_x  = 0;
 
-        // SHADOW + TEXT
-        for (int x=src->w; --x >= SHADOW_X;)
-        {
-            unsigned int s_alpha = iim_surface_get_alpha(src, x-SHADOW_X, y-SHADOW_Y) >> 5;
-            unsigned int f_alpha = iim_surface_get_alpha(src, x, y) >> 5;
-
-            RGBA rgba = font->precomputed[s_alpha][f_alpha][c_x >> 10][c_y >> 12];
-            iim_surface_set_rgba(ret,x,y,rgba);
-
-            c_x += dc_x;
-        }
-
-        // OUTSIDE OF SHADOW, JUST TEXT
         for (int x=SHADOW_X; x--;)
         {
-            unsigned int s_alpha = 0;
-            unsigned int f_alpha = iim_surface_get_alpha(src, x, y) >> 5;
+            unsigned int s_alpha = iim_surface_get_alpha(src,
+                    x-SHADOW_X, y-SHADOW_Y) >> 5;
+            unsigned int f_alpha = 0;
 
-            RGBA rgba = font->precomputed[s_alpha][f_alpha][c_x >> 10][c_y >> 12];
+            RGBA rgba = font->precomputed[s_alpha][f_alpha][c_x>>10][c_y>>12];
             iim_surface_set_rgba(ret,x,y,rgba);
 
             c_x += dc_x;
@@ -215,6 +213,53 @@ static SDL_Surface *SoFont_FX(SoFont *font, SDL_Surface *src)
 
         c_y += dc_y;
     }
+
+    // Draw text
+    for (int y=src->h - 1; y >= SHADOW_Y; --y)
+    {
+        unsigned int c_x  = 0;
+ 
+        // OUTSIDE OF TEXT, JUST SHADOW
+        for (int x=src->w + SHADOW_X - 1; x >= src->w; --x)
+        {
+            unsigned int s_alpha = iim_surface_get_alpha(src,
+                    x-SHADOW_X, y-SHADOW_Y) >> 5;
+            unsigned int f_alpha = 0;
+
+            RGBA rgba = font->precomputed[s_alpha][f_alpha][c_x>>10][c_y>>12];
+            iim_surface_set_rgba(ret,x,y,rgba);
+
+            c_x += dc_x;
+        }
+
+        // SHADOW + TEXT
+        for (int x=src->w - 1; x >= SHADOW_X; --x)
+        {
+            unsigned int s_alpha = iim_surface_get_alpha(src,
+                    x-SHADOW_X, y-SHADOW_Y) >> 5;
+            unsigned int f_alpha = iim_surface_get_alpha(src, x, y) >> 5;
+
+            RGBA rgba = font->precomputed[s_alpha][f_alpha][c_x>>10][c_y>>12];
+            iim_surface_set_rgba(ret,x,y,rgba);
+
+            c_x += dc_x;
+        }
+
+        // OUTSIDE OF SHADOW, JUST TEXT
+        for (int x=SHADOW_X - 1; x >= 0; --x)
+        {
+            unsigned int s_alpha = 0;
+            unsigned int f_alpha = iim_surface_get_alpha(src, x, y) >> 5;
+
+            RGBA rgba = font->precomputed[s_alpha][f_alpha][c_x>>10][c_y>>12];
+            iim_surface_set_rgba(ret,x,y,rgba);
+
+            c_x += dc_x;
+        }
+
+        c_y += dc_y;
+    }
+
     // OUTSIDE OF SHADOW, JUST TEXT
     for (int y=SHADOW_Y; y--;)
     {
@@ -295,10 +340,7 @@ void SoFont_CacheCheck(SoFont *font)
     }
 }
 
-/// Blits a string to a surface
-///   Destination: the suface you want to blit to
-///   text: a string containing the text you want to blit.
-void SoFont_PutString (SoFont * font, SDL_Surface * surface, int x, int y, const char *text, SDL_Rect * clip /*=NULL*/)
+void SoFont_PutLine(SoFont * font, SDL_Surface * surface, int x, int y, const char *text, SDL_Rect * clip /*=NULL*/)
 {
     if (text == NULL) return;
     if (font->font) {
@@ -321,16 +363,36 @@ void SoFont_PutString (SoFont * font, SDL_Surface * surface, int x, int y, const
     }
 }
 
+/// Blits a string to a surface
+///   Destination: the suface you want to blit to
+///   text: a string containing the text you want to blit.
+void SoFont_PutString(SoFont * font, SDL_Surface * surface, int x, int y, const char *text, SDL_Rect * clip /*=NULL*/)
+{
+    if (text == NULL) return;
+    if (font->font == NULL) return;
+    vector<string> lines;
+    int num = SplitString(text, '\n', lines, true);
+    int skip = TTF_FontLineSkip(font->font);
+    for (int i=0; i<num; ++i) {
+        SoFont_PutLine(font, surface, x, y, lines[i].c_str(), clip);
+        y += skip;
+    }
+}
+
 /// Returns the width of "text" in pixels
 int SoFont_TextWidth (SoFont * font, const char *text)
 {
+    if (text == NULL) return 0;
+    if (font->font == NULL) return 0;
     int ret = 0;
-    if (font->font) {
+    vector<string> lines;
+    int num = SplitString(text, '\n', lines, true);
+    for (int i=0; i<num; ++i) {
         int w,h;
-        TTF_SizeUTF8(font->font, text, &w, &h);
-        ret = w;
+        TTF_SizeUTF8(font->font, lines[i].c_str(), &w, &h);
+        if (w > ret) ret = w;
     }
-    return ret;
+    return ret + SHADOW_X;
 }
 
 int SoFont_FontHeight (SoFont * font)
