@@ -1,0 +1,11 @@
+<init>
+
+  Display @display = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+  Balloon @talk  = [new_balloon: image="balloon/balloon.png" x=5.0 y=370.0 text_x=15.0 text_y=40.0]
+  string @txt = "GSL STORY NOT FOUND!!!"
+
+<sprite_list>
+  balloon::@talk display=@display
+
+<update>
+  (@cycle = 0) ? show_balloon_with_text::@talk text=@txt

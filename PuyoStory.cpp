@@ -119,14 +119,14 @@ PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction)
     FILE *test = NULL;
     String fullPath;
     try {
-        fullPath = theCommander->getDataPathManager().getPath(String("/story/") + screenName);
+        fullPath = theCommander->getDataPathManager().getPath(String("story/") + screenName);
         test = fopen((const char *)fullPath, "r");
     }
     catch (Exception e) {
     }
     if (test == NULL) {
-        printf("%s not found!!!\n", (const char *)fullPath);
-        fullPath = theCommander->getDataPathManager().getPath("/story/storyz.gsl");
+        printf("GSL NOT FOUNT: %s\n", (const char *)fullPath);
+        fullPath = theCommander->getDataPathManager().getPath("story/error.gsl");
     }
     else fclose(test);
     String storyLocalePath;
