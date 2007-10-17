@@ -155,6 +155,11 @@ static void SoFont_Precompute_FX(SoFont *font)
                         hsva.saturation = 1.0;//5 - l;
                         hsva.value = 1.4 - cy;
                     }
+                    else if (font->fx == SoFont_GREY) {
+                        hsva.hue = 45.0 + 30.0 * cx;
+                        hsva.saturation = 1.25 - l;
+                        hsva.value = 1.0;
+                    }
                     else { // SoFont_DARK
                         hsva.hue = 55.0 - 20.0 * cx;
                         hsva.saturation = 1.25 - l;

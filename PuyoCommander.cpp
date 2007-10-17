@@ -328,7 +328,6 @@ void PuyoCommander::initFonts()
   SoFont *darkFont = SoFont_new();
   menuFont = SoFont_new();
   smallFont = SoFont_new();
-  smallFontInfo = SoFont_new();
   SoFont *textFont = SoFont_new();
 
 #ifdef ENABLE_TTF
@@ -346,9 +345,12 @@ void PuyoCommander::initFonts()
   SoFont_load_ttf(darkFont, dataPathManager.getPath(font.c_str()), 18, SoFont_DARK);
   SoFont_load_ttf(menuFont, dataPathManager.getPath(font.c_str()), 18, SoFont_STD);
   SoFont_load_ttf(smallFont, dataPathManager.getPath(font.c_str()), 12, SoFont_STD);
-  SoFont_load_ttf(smallFontInfo, dataPathManager.getPath(font.c_str()), 12, SoFont_STD);
-  SoFont_load_ttf(textFont, dataPathManager.getPath(font.c_str()), 18, SoFont_DARK);
+  smallFontInfo = smallFont;
+  SoFont_load_ttf(textFont, dataPathManager.getPath(font.c_str()), 18, SoFont_GREY);
+  storyFont = SoFont_new();
+  SoFont_load_ttf(storyFont, dataPathManager.getPath(font.c_str()), 18, SoFont_STORY);
 #else
+  smallFontInfo = SoFont_new();
   IIM_Surface *font3b = IIM_Load_Absolute_DisplayFormatAlpha (dataPathManager.getPath("gfx/font3b.png"));
   IIM_Surface *font4b = IIM_Load_Absolute_DisplayFormatAlpha (dataPathManager.getPath("gfx/font4b.png"));
   IIM_Surface *font6b = iim_surface_shift_hsv(font4b, 170, -.5, -.2);
@@ -359,9 +361,9 @@ void PuyoCommander::initFonts()
   SoFont_load(smallFont, font4b);
   SoFont_load(smallFontInfo, font6b);
   SoFont_load(textFont, font5b);
-#endif
   
   storyFont = darkFont;
+#endif
 
   SoFont_free(GameUIDefaults::FONT);
   GameUIDefaults::FONT            = menuFont;
