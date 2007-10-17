@@ -150,12 +150,18 @@ static void SoFont_Precompute_FX(SoFont *font)
                         hsva.saturation = 1.25 - l;
                         hsva.value = 1.0;
                     }
+                    else if (font->fx == SoFont_STORY) {
+                        hsva.hue = 55.0 - 20.0 * cx;
+                        hsva.saturation = 1.0;//5 - l;
+                        hsva.value = 1.4 - cy;
+                    }
                     else { // SoFont_DARK
                         hsva.hue = 55.0 - 20.0 * cx;
                         hsva.saturation = 1.25 - l;
                         hsva.value = 0.5;
                     }
 
+                    if (hsva.value > 1.)        hsva.value = 1.f;
                     if (hsva.saturation > 1.)   hsva.saturation = 1.f;
                     if (hsva.saturation < 0.0f) hsva.saturation = .0f;
 
@@ -179,7 +185,7 @@ static void SoFont_Precompute_FX(SoFont *font)
  */
 static SDL_Surface *SoFont_FX(SoFont *font, SDL_Surface *src)
 {
-#define SHADOW_X 2
+#define SHADOW_X 1
 #define SHADOW_Y 1
     if (font == NULL) return NULL;
     if (src == NULL)  return NULL;

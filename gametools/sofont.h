@@ -51,6 +51,7 @@ void    SoFont_free (SoFont * font);
 #ifdef ENABLE_TTF
 #define SoFont_DARK 0
 #define SoFont_STD 1
+#define SoFont_STORY 2
 int     SoFont_load_ttf (SoFont * font, const char *fileName, int size, int fx);
 #else
 int     SoFont_load (SoFont * font, IIM_Surface *picture);
