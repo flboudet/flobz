@@ -117,11 +117,14 @@ bundle: flobopuyo
 mac-package: bundle
 	rm -rf $(macimage_name)
 	rm -f $(macimage_name).dmg
+	rm -f $(macimage_name).tmp.dmg
 	mkdir -p $(macimage_name)
 	cp -RP $(bundle_name) $(macimage_name)
 	cp COPYING $(macimage_name)
-	hdiutil create -srcfolder $(macimage_name) $(macimage_name).dmg
+	hdiutil create -srcfolder $(macimage_name) $(macimage_name).tmp.dmg
+	hdiutil convert -format UDZO -imagekey zlib-level=9 -o $(macimage_name).dmg $(macimage_name).tmp.dmg
 	hdiutil internet-enable $(macimage_name).dmg
+	rm -f $(macimage_name).tmp.dmg
 
 win-package: flobopuyo
 	$(STRIP) $(PRGNAME)
