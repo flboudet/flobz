@@ -1,3 +1,3 @@
 FILES=
-DIRECTORIES= "en" "fr"
+DIRECTORIES= "ar" "en" "fr"
 include ${SOURCE_DATADIR}/Datarules.mk
