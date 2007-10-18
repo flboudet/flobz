@@ -181,9 +181,9 @@ void Locales_Init()
 
 PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName) : dictionary(), datapathManager(datapathManager)
 {
-  int i;
+  signed int i;
 
-  /* First create the prefered languages list  whenever needed*/
+  /* First create the prefered languages list whenever needed */
   Locales_Init();
 
   stdName = FilePath::combine(dictionaryDirectory, dictionaryName);
@@ -203,7 +203,7 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
     
     /* Get the first matching dictionary */
     bool found = false;
-    for (i = 0; i < PreferedLocalesCount; i++) {
+    for (i = PreferedLocalesCount - 1; i >= 0 ; i--) {
     
         /* try to open the dictionary for the selected locale */
         String locale(PreferedLocales[i]);
@@ -221,8 +221,10 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
             while (fileOk) {
                 fileOk = readLine(dictionaryFile, valueString);
                 if (fileOk) {
-                    char *test = strdup(valueString);
-                    myDictEntry->dictionary->put(keyString, test);
+                    HashValue * old = myDictEntry->dictionary->get((const char *)valueString);
+                    if (result != NULL) free(old->ptr);
+                    char * newstring = strdup(valueString);
+                    myDictEntry->dictionary->put(keyString, newstring);
                     do {
                         fileOk = readLine(dictionaryFile, keyString);
                     } while (fileOk && (keyString == ""));
@@ -231,7 +233,6 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
             fclose(dictionaryFile);
             fprintf(stdout,"Found dictionary %s\n",(const char *)datapathManager.getPath(dictFilePath));
             found = true;
-            break;
         }
     }
     // Should we look for any eligible dictionnary now?
