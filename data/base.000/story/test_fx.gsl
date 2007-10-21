@@ -1,0 +1,28 @@
+<init>
+  Display @display = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+  Sprite  @flash   = [new_sprite: image="flash.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  float @show_flash = 0.0
+
+<sprite_list>
+  (@show_flash > 0.0)? sprite::@flash display=@display
+
+<update>
+  @show_flash = @show_flash - @delta_t
+  (@show_flash < 0.3)? @flash.image="flash75.png"
+  (@show_flash < 0.2)? @flash.image="flash50.png"
+  (@show_flash < 0.1)? @flash.image="flash25.png"
+
+<event: string type, Vec2 pos>
+    ([strcmp: s1=type s2="falling"] = 0)? (pos.y < 416.0)? {
+        Vec2 offset_start
+        Vec2 offset_end
+        @show_flash = 0.4
+        offset_start.x = -16.0
+        offset_start.y = -4.0
+        offset_end.x = -16.0
+        offset_end.y = -16.0
+        @flash.pos = pos + offset_start
+        @flash.dest = pos + offset_end
+        @flash.dcycle = @fcycle + 10.0
+        @flash.image="flash.png"
+    }
