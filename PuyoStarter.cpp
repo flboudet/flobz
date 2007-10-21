@@ -472,6 +472,15 @@ void AbortAction::action()
     screen.abort();
 }
 
+static std::vector<PuyoFX*> activeFX;
+static int last_post = 0;
+void EventFX(const char *name, float x, float y)
+{
+    if (activeFX.size() == 0) return;
+    last_post = (last_post + 1) % activeFX.size();
+    activeFX[last_post]->postEvent(name, x,y);
+}
+
 PuyoGameScreen::PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScreen)
     : Screen(0, 0, 640, 480), paused(false), continueAction(*this), abortAction(*this),
       pauseMenu(&continueAction, &abortAction), gameWidget(gameWidget), transitionWidget(previousScreen, NULL),
@@ -486,6 +495,10 @@ PuyoGameScreen::PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScree
     add(&gameWidget);
     if (gameWidget.getOpponentFace() != NULL)
         add(gameWidget.getOpponentFace());
+    std::vector<PuyoFX*> fx = gameWidget.getPuyoFX();
+    activeFX = fx;
+    for (int i=0; i<fx.size(); ++i)
+        add(fx[i]);
     add(&transitionWidget);
     gameWidget.setAssociatedScreen(this);
 }
@@ -499,6 +512,7 @@ PuyoGameScreen::~PuyoGameScreen()
 	 dynamic_cast<DrawableComponent *>(this));
   fflush(stdout);
 #endif
+  activeFX = std::vector<PuyoFX*>();
 }
 
 void PuyoGameScreen::onEvent(GameControlEvent *cevent)
@@ -538,6 +552,9 @@ void PuyoGameScreen::setPaused(bool fromControls)
     if (!paused) {
         if (gameWidget.getOpponentFace() != NULL)
             gameWidget.getOpponentFace()->hide();
+        std::vector<PuyoFX*> fx = gameWidget.getPuyoFX();
+        for (int i=0; i<fx.size(); ++i)
+            fx[i]->hide();
         this->add(&pauseMenu);
         pauseMenu.finishLayout();
         this->focus(&pauseMenu);
@@ -552,6 +569,9 @@ void PuyoGameScreen::setResumed(bool fromControls)
         paused = false;
         if (gameWidget.getOpponentFace() != NULL)
             gameWidget.getOpponentFace()->show();
+        std::vector<PuyoFX*> fx = gameWidget.getPuyoFX();
+        for (int i=0; i<fx.size(); ++i)
+            fx[i]->show();
         this->remove(&pauseMenu);
         this->focus(&gameWidget);
         gameWidget.resume();

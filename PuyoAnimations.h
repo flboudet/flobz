@@ -26,6 +26,8 @@
 #ifndef _PUYOANIMATIONS
 #define _PUYOANIMATIONS
 
+void EventFX(const char *name, float x, float y);
+
 #include <stdlib.h>
 #include <math.h>
 #include "glSDL.h"

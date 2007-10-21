@@ -42,7 +42,7 @@ class PuyoCommander;
 
 class PuyoStoryWidget : public Widget, public /*Cycled*/IdleComponent {
 public:
-    PuyoStoryWidget(String screenName, Action *finishedAction = NULL);
+    PuyoStoryWidget(String screenName, Action *finishedAction = NULL, bool fxMode = false);
     ~PuyoStoryWidget();
     // void cycle();
     void idle(double currentTime);
@@ -56,7 +56,7 @@ public:
         StyrolyseClient styroClient;
         PuyoStoryWidget *widget;
     };
-private:
+protected:
 
     /* dictionnary for locale translations */
     PuyoLocalizedDictionary *localeDictionary;
@@ -66,6 +66,12 @@ private:
     static bool classInitialized;
     PuyoStoryStyrolyseClient client;
     double last_time;
+};
+
+class PuyoFX : public PuyoStoryWidget {
+public:
+    PuyoFX(String fxName);
+    void postEvent(const char *name, float x, float y);
 };
 
 class PuyoStoryScreen : public Screen {

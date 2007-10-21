@@ -22,9 +22,9 @@ struct _StyrolyseClient {
   char *(*resolveFilePath)(StyrolyseClient *_this, const char *file_name);
 };
 
-void styrolyse_init(const char *styrolyse_path);
+void styrolyse_init(const char *styrolyse_path, const char *styrolyse_path_optional);
 
-Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client);
+Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client, int fxMode);
 void styrolyse_reload(Styrolyse *_this);
 void styrolyse_free(Styrolyse *_this);
 void styrolyse_update(Styrolyse *_this, float delta_t);
@@ -32,6 +32,7 @@ int  styrolyse_finished(Styrolyse *_this);
 void styrolyse_draw(Styrolyse *_this);
 void styrolyse_setint(Styrolyse *_this, const char *varname, int value);
 int styrolyse_getint(Styrolyse *_this, const char *varname);
+void styrolyse_event(Styrolyse *_this, const char *event, float x, float y);
 
 int  styrolyse_current_cycle(Styrolyse *_this);
 

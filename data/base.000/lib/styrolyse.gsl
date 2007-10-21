@@ -12,11 +12,13 @@ int    @mode
 int    INIT   = 0
 int    UPDATE = 1
 int    DRAW   = 2
+int    EVENT  = 3
 
 int @maxHeightPlayer
 int @maxHeightAI
 int @neutralsForPlayer
 int @neutralsForAI
+string @event_type
 
 (@mode = INIT)? {
   @finished = 0
@@ -26,6 +28,7 @@ int @neutralsForAI
   @maxHeightAI = 0
   @neutralsForPlayer = 0
   @neutralsForAI = 0
+  @event_type = "0123456789012345678901234567890123456789"
   init
 }
 
@@ -41,6 +44,11 @@ int @neutralsForAI
 struct <Vec2:
   float x,
   float y>
+Vec2 @event_pos
+
+declare <event: string type, Vec2 pos>
+
+(@mode = EVENT)? event: type=@event_type pos=@event_pos
 
 struct <Sprite:
   string parent,
@@ -95,6 +103,7 @@ external <sin: float value> : float
 external <mod: int numerator, int denominator> : int
 external <music: string file>
 external <sound: string file, float volume>
+external <strcmp: string s1, string s2> : int
 
 <fabs: float x> : float
   (x <  0.0) ? fabs = -x
@@ -164,3 +173,4 @@ external <sound: string file, float volume>
       put_text: text=&this.text pos=&this.image.pos + &this.text_pos + displayPos text_index=&this.text_index
     }
   }
+

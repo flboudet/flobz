@@ -145,6 +145,9 @@ void TurningAnimation::cycle()
     
     if (cpt == 0) {
         AudioManager::playSound(sound_fff, sound_fff_volume);
+        EventFX("turning",
+                attachedPuyo.getScreenCoordinateX() + TSIZE/2,
+                attachedPuyo.getScreenCoordinateY() + TSIZE/2);
     }
     cpt++;
     angle += step;
@@ -214,6 +217,10 @@ void FallingAnimation::cycle()
         if (bouncing < 0) {
             finishedFlag = true;
             AudioManager::playSound("bam1.wav", .1);
+            EventFX("falling", X+TSIZE/2,Y+TSIZE/2);
+            EventFX("falling",
+                    attachedPuyo.getScreenCoordinateX()+TSIZE/2,
+                    attachedPuyo.getScreenCoordinateY()+TSIZE/2);
             attachedPuyo.getAttachedView()->allowCycle();
         }
         else {

@@ -105,17 +105,20 @@ static void playSound(StyrolyseClient *_this, const char *fileName, int volume)
 
 bool PuyoStoryWidget::classInitialized = false;
 
-PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction)
+PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction, bool fxMode)
     : /*Cycled*/IdleComponent(/*0.04*/), localeDictionary(NULL), finishedAction(finishedAction), once(false), last_time(-1.)
 {
     try {
         localeDictionary = new PuyoLocalizedDictionary(theCommander->getDataPathManager(), "locale/story", screenName);
     } catch (...) {}
-    
+
     if (!classInitialized) {
-        styrolyse_init(theCommander->getDataPathManager().getPath("lib/styrolyse.gsl"));
+        String path0 = theCommander->getDataPathManager().getPath("lib/styrolyse.gsl");
+        String path1 = theCommander->getDataPathManager().getPath("lib/nofx.gsl");
+        styrolyse_init(path0.c_str(), path1.c_str());
         classInitialized = true;
     }
+
     FILE *test = NULL;
     String fullPath;
     try {
@@ -125,7 +128,7 @@ PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction)
     catch (Exception e) {
     }
     if (test == NULL) {
-        printf("GSL NOT FOUNT: %s\n", (const char *)fullPath);
+        printf("GSL NOT FOUND: %s (%s)\n", screenName.c_str(), (const char *)fullPath);
         fullPath = theCommander->getDataPathManager().getPath("story/error.gsl");
     }
     else fclose(test);
@@ -142,7 +145,7 @@ PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction)
     client.styroClient.resolveFilePath = ::pathResolverFunction;
     client.widget = this;
     
-    currentStory = styrolyse_new((const char *)fullPath, (StyrolyseClient *)(&client));
+    currentStory = styrolyse_new((const char *)fullPath, (StyrolyseClient *)(&client), fxMode);
     //styrolyse_setuserpointer(currentStory, this);
     //sstory = createStorySurface();
 }
@@ -243,3 +246,11 @@ void PuyoStoryScreen::onEvent(GameControlEvent *cevent)
       Screen::onEvent(cevent);
 }
 
+PuyoFX::PuyoFX(String fxName)
+    : PuyoStoryWidget(fxName,NULL,true)
+{}
+
+void PuyoFX::postEvent(const char *name, float x, float y)
+{
+    styrolyse_event(currentStory, name, x, y);
+}

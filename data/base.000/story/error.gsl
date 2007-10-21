@@ -9,3 +9,4 @@
 
 <update>
   (@cycle = 0) ? show_balloon_with_text::@talk text=@txt
+

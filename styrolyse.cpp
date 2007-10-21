@@ -7,7 +7,8 @@
 #include <ios_filepath.h>
 #include <ios_memory.h>
 
-static char scriptPath[1024];
+static char *scriptPath0 = NULL;
+static char *scriptPath1 = NULL;
 
 struct _Styrolyse {
 
@@ -19,6 +20,8 @@ struct _Styrolyse {
 
   /* loadImage */
   GoomHash *images;
+
+  int fxMode;
 };
 
 Styrolyse *styrolyse = NULL;
@@ -30,6 +33,13 @@ Styrolyse *styrolyse = NULL;
 void styro_sin(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
     GSL_GLOBAL_FLOAT(gsl, "sin") = sin(GSL_LOCAL_FLOAT(gsl, local, "value"));
+}
+
+void styro_strcmp(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    char *str1 = (char*)GSL_LOCAL_PTR(gsl, local, "s1");
+    char *str2 = (char*)GSL_LOCAL_PTR(gsl, local, "s2");
+    GSL_GLOBAL_INT(gsl, "strcmp") = strcmp(str1,str2);
 }
 
 /*
@@ -182,6 +192,7 @@ char *pathResolverFunction(GoomSL *gsl, const char *path)
 
 static void sbind(GoomSL *gsl)
 {
+  gsl_bind_function(gsl, "strcmp",   styro_strcmp);
   gsl_bind_function(gsl, "put_text",   put_text);
   gsl_bind_function(gsl, "draw",  sprite_draw);
   gsl_bind_function(gsl, "sin",   styro_sin);
@@ -194,17 +205,31 @@ static void sbind(GoomSL *gsl)
 
 /* Externals */
 
-void styrolyse_init(const char *styrolyse_path)
+void styrolyse_init(const char *styrolyse_path0, const char *styrolyse_path1)
 {
-    strcpy(scriptPath, styrolyse_path);
+    if (scriptPath0 != NULL) free(scriptPath0);
+    if (scriptPath1 != NULL) free(scriptPath1);
+
+    scriptPath0 = scriptPath1 = NULL;
+
+    if (styrolyse_path0 != NULL) {
+        scriptPath0 = (char*)malloc(strlen(styrolyse_path0)+1);
+        strcpy(scriptPath0, styrolyse_path0);
+    }
+
+    if (styrolyse_path1 != NULL) {
+        scriptPath1 = (char*)malloc(strlen(styrolyse_path1)+1);
+        strcpy(scriptPath1, styrolyse_path1);
+    }
 }
 
-Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client)
+Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client, int fxMode)
 {
     Styrolyse *_this;
     _this = (Styrolyse*)malloc(sizeof(Styrolyse));
     _this->client = client;
     _this->gsl =  gsl_new();
+    _this->fxMode = fxMode;
     gsl_bind_path_resolver(_this->gsl, pathResolverFunction);
     _this->images = goom_hash_new();
     strncpy(_this->fname, fname, 512);
@@ -226,6 +251,20 @@ void styrolyse_free(Styrolyse *_this)
   free(_this);
 }
 
+void styrolyse_event(Styrolyse *_this, const char *event, float x, float y)
+{
+  if (!_this->gsl) return;
+  /* mutexifier cette fonction si multi-thread */
+    char *str = (char*)GSL_GLOBAL_PTR(_this->gsl, "@event_type");
+    strcpy(str, event);
+    GSL_GLOBAL_INT(_this->gsl, "@mode") = 3;
+    GSL_GLOBAL_FLOAT(_this->gsl, "@delta_t") = 0.0;
+    GSL_GLOBAL_FLOAT(_this->gsl, "@event_pos.x") = x;
+    GSL_GLOBAL_FLOAT(_this->gsl, "@event_pos.y") = y;
+    styrolyse = _this;
+    gsl_execute(_this->gsl);
+}
+
 void styrolyse_execute(Styrolyse *_this, int mode, float delta_t)
 {
   /* mutexifier cette fonction si multi-thread */
@@ -240,7 +279,8 @@ void styrolyse_reload(Styrolyse *_this)
 {
     char *fbuffer;
     if (!_this->gsl) return;
-    fbuffer = gsl_init_buffer(scriptPath);
+    fbuffer = gsl_init_buffer(scriptPath0);
+    if (scriptPath1 && !_this->fxMode) gsl_append_file_to_buffer(scriptPath1, &fbuffer);
     gsl_append_file_to_buffer(_this->fname, &fbuffer);
     styrolyse = _this;
     gsl_compile(_this->gsl,fbuffer);

@@ -29,6 +29,7 @@
 #include "HiScores.h"
 #include "goomsl/goomsl.h"
 #include "goomsl/goomsl_hash.h"
+#include <vector>
 
 class PuyoSingleNameProvider {
 public:
@@ -48,9 +49,11 @@ private:
 class PuyoSinglePlayerGameWidget : public PuyoGameWidget {
 public:
     PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
+    virtual ~PuyoSinglePlayerGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
     PuyoStoryWidget *getOpponentFace();
+    virtual std::vector<PuyoFX*> getPuyoFX();
 private:
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;
@@ -60,6 +63,7 @@ private:
     PuyoIA opponentcontroller;
     int faceTicks;
     PuyoStoryWidget opponentFace;
+    std::vector<PuyoFX*> puyoFX;
 };
 
 class PuyoLevelDefinitions {
