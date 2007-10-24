@@ -7,7 +7,7 @@
 #include "PuyoStory.h"
 #include "PuyoDataPathManager.h"
 #include "PuyoLocalizedDictionary.h"
-#include "PuyoCursor.h"
+#include "GameCursor.h"
 
 using namespace ios_fc;
 using namespace gameui;
@@ -110,7 +110,7 @@ class PuyoCommander : public MessageListener
     GameLoop   *loop;
 
     PuyoRealMainScreen *mainScreen;
-    PuyoCursor *cursor;
+    GameCursor *cursor;
     PuyoLocalizedDictionary * locale;
 
     bool fullscreen;

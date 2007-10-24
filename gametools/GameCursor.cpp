@@ -1,9 +1,9 @@
 #include <math.h>
-#include "PuyoCursor.h"
+#include "GameCursor.h"
 #include "gameui.h"
 using namespace gameui;
 
-PuyoCursor::PuyoCursor(const char *cursorImage) : CycledComponent(0.01), idleDx(0), idleDy(0)
+GameCursor::GameCursor(const char *cursorImage) : CycledComponent(0.01), idleDx(0), idleDy(0), visible(true)
 {
     cursorSurface = IIM_Load_Absolute_DisplayFormatAlpha (cursorImage);
     blitX = 0;
@@ -13,19 +13,19 @@ PuyoCursor::PuyoCursor(const char *cursorImage) : CycledComponent(0.01), idleDx(
     blitAngle = 0;
 }
 
-PuyoCursor::~PuyoCursor()
+GameCursor::~GameCursor()
 {
     IIM_Free(cursorSurface);
 }
 
-void PuyoCursor::draw(SDL_Surface *screen)
+void GameCursor::draw(SDL_Surface *screen)
 {
     if (moveToFront())
         return;
     IIM_BlitRotatedSurfaceCentered(cursorSurface, (-blitAngle) + 90, screen, blitX, blitY);
 }
 
-void PuyoCursor::onEvent(GameControlEvent *event)
+void GameCursor::onEvent(GameControlEvent *event)
 {
     switch (event->sdl_event.type) {
     case SDL_MOUSEMOTION:
@@ -49,19 +49,19 @@ void PuyoCursor::onEvent(GameControlEvent *event)
     }
 }
 
-void PuyoCursor::cycle()
+void GameCursor::cycle()
 {
     if ((idleDx * idleDx) + (idleDy * idleDy) < 1)
         return;
     setCursorPosition(blitX + idleDx, blitY + idleDy);
 }
 
-void PuyoCursor::setCursorPosition(int x, int y)
+void GameCursor::setCursorPosition(int x, int y)
 {
     // Push an SDL user event corresponding to the moving of our game cursor
     SDL_Event moveEvent;
     moveEvent.type = SDL_USEREVENT;
-    moveEvent.user.code = PuyoCursor::MOVE;
+    moveEvent.user.code = GameCursor::MOVE;
     moveEvent.user.data1 = new CursorEventArg(x, y);
     SDL_PushEvent(&moveEvent);
     
@@ -88,12 +88,12 @@ void PuyoCursor::setCursorPosition(int x, int y)
     blitAngle += (tgtBlitAngle - blitAngle) / 3.;
 }
 
-void PuyoCursor::click(int x, int y)
+void GameCursor::click(int x, int y)
 {
     // Push an SDL user event corresponding to the click of our game cursor
     SDL_Event clickEvent;
     clickEvent.type = SDL_USEREVENT;
-    clickEvent.user.code = PuyoCursor::CLICK;
+    clickEvent.user.code = GameCursor::CLICK;
     clickEvent.user.data1 = new CursorEventArg(x, y);
     SDL_PushEvent(&clickEvent);
 }

@@ -5,7 +5,7 @@
 ###############
 # Settings
 
-OBJFILES= audio.o HiScores.o PuyoCommander.o PuyoCursor.o \
+OBJFILES= audio.o HiScores.o PuyoCommander.o \
           main.o PuyoDataPathManager.o PuyoGame.o PuyoDoomMelt.o \
           PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o \
           styrolyse.o PuyoStory.o PuyoChatBox.o PuyoLocalizedDictionary.o \

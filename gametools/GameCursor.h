@@ -1,14 +1,14 @@
-#ifndef _PUYOCURSOR_H
-#define _PUYOCURSOR_H
+#ifndef _GameCursor_H
+#define _GameCursor_H
 
 #include "gameloop.h"
 #include "IosImgProcess.h"
 
-class PuyoCursor : public DrawableComponent, public CycledComponent
+class GameCursor : public DrawableComponent, public CycledComponent
 {
 public:
-    PuyoCursor(const char *cursorImage);
-    virtual ~PuyoCursor();
+    GameCursor(const char *cursorImage);
+    virtual ~GameCursor();
     virtual void onEvent(GameControlEvent *event);
     virtual void cycle();
     // SDL events
@@ -20,6 +20,7 @@ public:
         CursorEventArg(int x, int y) : x(x), y(y) {}
         int x, y;
     };
+    void setVisible(bool visible) { this->visible = visible; }
 protected:
     virtual void draw(SDL_Surface *screen);
 private:
@@ -31,7 +32,8 @@ private:
     int prevblitX, prevblitY;
     float blitAngle, tgtBlitAngle;
     int idleDx, idleDy;
+    bool visible;
 };
 
-#endif // _PUYOCURSOR_H
+#endif // _GameCursor_H
 
