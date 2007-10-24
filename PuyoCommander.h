@@ -86,6 +86,7 @@ class PuyoCommander : public MessageListener
     void setFullScreen(bool fullScreen);
     bool getGlSDL() const { return useGL; }
     void setGlSDL(bool useGL);
+    void setCursorVisible(bool visible) { cursor->setVisible(visible); }
     
     void initDisplay(bool fullscreen, bool useGL);
     const PuyoDataPathManager &getDataPathManager() { return dataPathManager; }

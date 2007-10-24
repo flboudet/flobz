@@ -56,19 +56,19 @@ LocalGameMenu::LocalGameMenu(PuyoRealMainScreen *mainScreen)
       easy(locale.getLocalizedString("Beginner"), &easyAction),
       medium(locale.getLocalizedString("Normal"), &mediumAction),
       hard(locale.getLocalizedString("Expert"), &hardAction),
-      back(locale.getLocalizedString("Cancel"), &popAction)
+      back(locale.getLocalizedString("Back"), &popAction)
 {
     EditField *editName = editPlayerName.getEditField();
     editName->setAction(ON_START, new NoNameAction(locale, *editName));
 }
 
 void LocalGameMenu::build() {
-    add(&editPlayerName);
     add(&screenTitle);
     add(&easy);
     add(&medium);
     add(&hard);
-    // add(&back);
+    add(&editPlayerName);
+    add(&back);
 }
 
 String LocalGameMenu::getPlayerName() const
@@ -93,17 +93,17 @@ Local2PlayersGameMenu::Local2PlayersGameMenu(PuyoRealMainScreen *mainScreen)
       easy(locale.getLocalizedString("Easy"), &easyAction),
       medium(locale.getLocalizedString("Medium"), &mediumAction),
       hard(locale.getLocalizedString("Hard"), &hardAction),
-      back(locale.getLocalizedString("Cancel"), &popAction)
+      back(locale.getLocalizedString("Back"), &popAction)
 {}
 
 void Local2PlayersGameMenu::build()
 {
-    add(&editPlayer1Name);
-    add(&editPlayer2Name);
     add(&screenTitle);
     add(&easy);
     add(&medium);
     add(&hard);
+    add(&editPlayer1Name);
+    add(&editPlayer2Name);
     add(&back);
 }
 

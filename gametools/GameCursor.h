@@ -21,6 +21,7 @@ public:
         int x, y;
     };
     void setVisible(bool visible) { this->visible = visible; }
+    void setObscured(bool obscured) { this->obscured = obscured; }
 protected:
     virtual void draw(SDL_Surface *screen);
 private:
@@ -33,6 +34,7 @@ private:
     float blitAngle, tgtBlitAngle;
     int idleDx, idleDy;
     bool visible;
+    bool obscured;
 };
 
 #endif // _GameCursor_H

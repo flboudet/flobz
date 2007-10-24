@@ -560,6 +560,7 @@ void PuyoGameScreen::setPaused(bool fromControls)
         this->focus(&pauseMenu);
         paused = true;
         gameWidget.pause();
+        theCommander->setCursorVisible(true);
     }
 }
 
@@ -575,6 +576,7 @@ void PuyoGameScreen::setResumed(bool fromControls)
         this->remove(&pauseMenu);
         this->focus(&gameWidget);
         gameWidget.resume();
+        theCommander->setCursorVisible(false);
     }
 }
 

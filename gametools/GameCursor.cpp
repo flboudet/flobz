@@ -3,7 +3,7 @@
 #include "gameui.h"
 using namespace gameui;
 
-GameCursor::GameCursor(const char *cursorImage) : CycledComponent(0.01), idleDx(0), idleDy(0), visible(true)
+GameCursor::GameCursor(const char *cursorImage) : CycledComponent(0.01), idleDx(0), idleDy(0), visible(true), obscured(true)
 {
     cursorSurface = IIM_Load_Absolute_DisplayFormatAlpha (cursorImage);
     blitX = 0;
@@ -20,9 +20,21 @@ GameCursor::~GameCursor()
 
 void GameCursor::draw(SDL_Surface *screen)
 {
+    if ((obscured) || (!visible))
+        return;
     if (moveToFront())
         return;
-    IIM_BlitRotatedSurfaceCentered(cursorSurface, (-blitAngle) + 90, screen, blitX, blitY);
+    float angle = (-blitAngle) + 90;
+    float anglerad = angle * M_PI / 180.0;
+    //float vy = -1.0;
+    //float vx = 0.0;
+    //float nvx =  sin(anglerad) * vy;
+    //float nvy =  cos(anglerad) * vy;
+    //nvx = (nvx * 0.5) * cursorSurface->w;
+    //nvy = (nvy * 0.5) * cursorSurface->h;
+    float nvx = (-sin(anglerad) * 0.5) * cursorSurface->w;
+    float nvy = (-cos(anglerad) * 0.5) * cursorSurface->h;
+    IIM_BlitRotatedSurfaceCentered(cursorSurface, angle, screen, blitX - nvx, blitY - nvy);
 }
 
 void GameCursor::onEvent(GameControlEvent *event)
@@ -58,6 +70,12 @@ void GameCursor::cycle()
 
 void GameCursor::setCursorPosition(int x, int y)
 {
+    obscured = false;
+    
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+    if (x > this->DrawableComponent::parentLoop->getSurface()->w) x = this->DrawableComponent::parentLoop->getSurface()->w;
+    if (y > this->DrawableComponent::parentLoop->getSurface()->h) y = this->DrawableComponent::parentLoop->getSurface()->h;
     // Push an SDL user event corresponding to the moving of our game cursor
     SDL_Event moveEvent;
     moveEvent.type = SDL_USEREVENT;
@@ -85,7 +103,16 @@ void GameCursor::setCursorPosition(int x, int y)
         prevblitX = blitX;
         prevblitY = blitY;
     }
-    blitAngle += (tgtBlitAngle - blitAngle) / 3.;
+    float deltaBlitAngle = tgtBlitAngle - blitAngle;
+    if (deltaBlitAngle > 180.)
+        deltaBlitAngle -= 360.;
+    else if (deltaBlitAngle < -180.)
+        deltaBlitAngle += 360.;
+    blitAngle += (deltaBlitAngle) / 6.;
+    if (blitAngle > 180.)
+        blitAngle -= 360.;
+    else if (blitAngle < -180.)
+        blitAngle += 360.;
 }
 
 void GameCursor::click(int x, int y)
