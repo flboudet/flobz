@@ -11,10 +11,20 @@ public:
     virtual ~PuyoCursor();
     virtual void onEvent(GameControlEvent *event);
     virtual void cycle();
+    // SDL events
+    enum {
+        MOVE = 0,
+        CLICK = 1
+    };
+    struct CursorEventArg {
+        CursorEventArg(int x, int y) : x(x), y(y) {}
+        int x, y;
+    };
 protected:
     virtual void draw(SDL_Surface *screen);
 private:
-    void SetCursorPosition(int x, int y);
+    void setCursorPosition(int x, int y);
+    void click(int x, int y);
     
     IIM_Surface * cursorSurface;
     int blitX, blitY;

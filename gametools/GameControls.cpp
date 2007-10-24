@@ -1,5 +1,6 @@
 #include "GameControls.h"
 #include "preferences.h"
+#include "PuyoCursor.h"
 
 #define NB_CONTROLS 10
 static InputSwitch *keyControls[NB_CONTROLS] =
@@ -54,6 +55,28 @@ void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
   if (e.type == SDL_QUIT)
     result->cursorEvent = GameControlEvent::kQuit;
   
+  if (e.type == SDL_USEREVENT) {
+    switch (e.user.code) {
+    case PuyoCursor::MOVE: {
+        result->isUp = false;
+        result->cursorEvent = GameControlEvent::kGameMouseMoved;
+        PuyoCursor::CursorEventArg *arg = (PuyoCursor::CursorEventArg *)e.user.data1;
+        result->x = arg->x;
+        result->y = arg->y;
+        delete arg;
+        } break;
+    case PuyoCursor::CLICK: {
+        result->isUp = false;
+        result->cursorEvent = GameControlEvent::kGameMouseClicked;
+        PuyoCursor::CursorEventArg *arg = (PuyoCursor::CursorEventArg *)e.user.data1;
+        result->x = arg->x;
+        result->y = arg->y;
+        delete arg;
+        } break;
+    default:
+        break;
+    }
+  }
   if (input == NULL)
     return;
 

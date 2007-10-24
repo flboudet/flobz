@@ -377,38 +377,64 @@ namespace gameui {
 
     void Box::eventOccured(GameControlEvent *event)
     {
-        bool dontrollover = false;
-        int direction = 0;
+        bool dontrollover = false; // rollover is enabled by default (i.e., when we reach the bottom of the box, we continue at the top)
+        int direction = 0; // direction of the active widget change related to the event (1: next, -1: prev, 0: unrelated)
 
+        // If the box has no focusable child, give up the focus
         if (getNumberOfFocusableChilds() <= 0) {
             lostFocus();
             return;
         }
+        
         Vec3 ref(1.0f,2.0f,3.0f);
         float axe = getSortingAxe(ref);
+        // If the event is a mouse moved event, search and focus the widget beneath the cursor
+        if ((axe < 3.0f) && (event->cursorEvent == GameControlEvent::kGameMouseMoved)) {
+            Widget *child = getChild(activeWidget);
+            for (int i = 0 ; i < this->getNumberOfChilds() ; i++) {
+                Widget *wid = this->getChild(i);
+                Vec3 widPosition = wid->getPosition();
+                Vec3 widSize = wid->getSize();
+                if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
+                    && (widPosition.x + widSize.x >= widPosition.x) && (widPosition.y + widSize.y >= event->y) && (activeWidget != i)) {
+                    if (child != NULL)
+                        child->lostFocus();
+                    activeWidget = i;
+                    wid->giveFocus();
+                }
+            }
+            return;
+        }
+        
+        // This stuff has the following behaviour:
+        //   - if this container has an ancestor that is sorted in the same way as this box (i.e., a HBox that has another HBox as parent),
+        //     disables the rollover in the current box.
+        //   - if this container has no ancestor sorted in the same way, let the rollover enabled.
         WidgetContainer * curParent = parent;
         while ((curParent!=NULL) && (dontrollover==false)) {
+            // DANGER: parent can be a container, not a box
             if ((static_cast<Box *>(curParent)->getSortingAxe(ref)==axe) && (static_cast<Box *>(curParent)->getNumberOfFocusableChilds()>1))
                 dontrollover = true;
             curParent = curParent->parent;
         }
-
+        // Ensures that the active widget index is not out of bounds
         if (activeWidget >= getNumberOfChilds())
             activeWidget = getNumberOfChilds() - 1;
         if (activeWidget < 0) activeWidget = 0;
-
+        // child is the active child widget
         Widget *child = getChild(activeWidget);
+        // If the event is a key up event and the child is not interrested, discard the event
         if ((event->isUp) && (! child->receiveUpEvents()))
             return;
-
         // Handle the case where the widget has self-destroyed
         if (!hasWidget(child)) {
+            throw Exception("Truc qui ne devait pas rester !");
             return; // there are probably wiser things to do
         }
-
+        // Send the focus to the active child. If the child doesn't gives up the focus, we're done.
         child->eventOccured(event);
         if (child->haveFocus()) return;
-
+        // The rest of the code handles the change of active widget and the rollover
         if (isPrevEvent(event)) direction = -1;
         else
         {
@@ -422,11 +448,9 @@ namespace gameui {
                 }
             }
         }
-
         if (!haveFocus())
             if (isPrevEvent(event)) { activeWidget = getNumberOfChilds(); direction = -1; }
             else if (isNextEvent(event)) { activeWidget = -1; direction = 1; }
-
         if (direction != 0)
         {
             int possibleNewWidget = activeWidget;
@@ -1112,13 +1136,23 @@ namespace gameui {
 
     void Button::eventOccured(GameControlEvent *event)
     {
+        bool clicked = false;
+        
         if (event->isUp)
             return;
 
         if (isDirectionEvent(event))
             lostFocus();
-
-        if (event->cursorEvent == GameControlEvent::kStart) {
+        if (event->cursorEvent == GameControlEvent::kStart)
+            clicked = true;
+        if (event->cursorEvent == GameControlEvent::kGameMouseClicked) {
+            Vec3 widPosition = getPosition();
+            Vec3 widSize = getSize();
+            if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
+                    && (widPosition.x + widSize.x >= widPosition.x) && (widPosition.y + widSize.y >= event->y))
+                clicked = true;
+        }
+        if (clicked) {
             Action *action = getAction(ON_START);
             if (action)
                 action->action();

@@ -35,11 +35,14 @@ typedef struct GameControlEvent {
         kStart,
         kBack,
         kQuit,
+        kGameMouseMoved,
+        kGameMouseClicked,
         kCursorLastKey
     } cursorEvent;
     bool isUp;
     SDL_Event sdl_event;
 	bool caught;
+    int x, y;
 	void setCaught() { caught = true; }
 } GameControlEvent;
 

@@ -149,6 +149,8 @@ namespace gameui {
       virtual void removeFromGameLoopActive();
       
       bool hasWidget(Widget *wid);
+      /** Returns the number of focusable child in the child tree
+       */
       int getNumberOfFocusableChilds();
     protected:
       Widget *getChild(int i)     const  { return childs[i]; }
@@ -164,13 +166,20 @@ namespace gameui {
   };
 
 
+  /**
+   * The Box class defines the behaviour of a generic box container
+   * It is inherited by the different boxes containers: HBox, VBox, ZBox
+   */
   class Box : public WidgetContainer {
     public:
       Box(GameLoop *loop = NULL);
       virtual ~Box() {}
       void setPolicy(GameUIEnum policy);
       void arrangeWidgets();
-
+      /**
+       * Handles and eventually propagates an event on the widget tree of the box container
+       * @param event the game event
+       */
       void eventOccured(GameControlEvent *event);
       void giveFocus();
       void lostFocus();
@@ -265,6 +274,9 @@ namespace gameui {
       bool slideout;
   };
 
+  /**
+   * Represents a full screen for containing widgets
+   */
   class Screen : public GarbageCollectableItem, public DrawableComponent, public IdleComponent {
     public:
       Screen(float x, float y, float width, float height, GameLoop *loop = NULL);
@@ -273,6 +285,10 @@ namespace gameui {
       void draw(SDL_Surface *surface);
       virtual void drawAnyway(SDL_Surface *surface);
       bool drawRequested() const { if (isVisible()) return rootContainer.drawRequested(); return false;}
+      /**
+       * Propagates an event on the widget tree of the screen
+       * @param event the game event
+       */
       void onEvent(GameControlEvent *event);
       void remove(Widget *child) { rootContainer.remove(child); }
       void add(Widget *child) { rootContainer.add(child); }
