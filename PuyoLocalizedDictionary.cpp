@@ -104,7 +104,10 @@ void Locales_Init()
   int i;
 
   if (!systemInitiated) {
+    
+#ifdef DEBUG
     fprintf(stdout,"Languages detection...\n");
+#endif
 
 #ifdef MACOSX
 
@@ -129,9 +132,9 @@ void Locales_Init()
 
 #ifdef WIN32
 
-#define WinKnownLangsNb 13
-    static const char * WinKnownLangsNames[WinKnownLangsNb] = {"fr","en","ja","de","es","it","nl","sv","da","pt","fi","no","ru"};
-    static const WORD WinKnownLangsCodes[WinKnownLangsNb] = {LANG_FRENCH, LANG_ENGLISH, LANG_JAPANESE, LANG_GERMAN, LANG_SPANISH, LANG_ITALIAN, LANG_DUTCH, LANG_SWEDISH, LANG_DANISH, LANG_PORTUGUESE, LANG_FINNISH, LANG_NORWEGIAN, LANG_RUSSIAN};
+#define WinKnownLangsNb 14
+    static const char * WinKnownLangsNames[WinKnownLangsNb] = {"fr","en","ja","de","es","it","nl","sv","da","pt","fi","no","ru","ar","el","he","kh","ca","zh"};
+    static const WORD WinKnownLangsCodes[WinKnownLangsNb] = {LANG_FRENCH, LANG_ENGLISH, LANG_JAPANESE, LANG_GERMAN, LANG_SPANISH, LANG_ITALIAN, LANG_DUTCH, LANG_SWEDISH, LANG_DANISH, LANG_PORTUGUESE, LANG_FINNISH, LANG_NORWEGIAN, LANG_RUSSIAN, LANG_ARABIC, LANG_GREEK, LANG_HEBREW, LANG_KHMER, LANG_CATALAN, LANG_CHINESE};
 
     WORD winLang;
 
@@ -172,9 +175,11 @@ void Locales_Init()
     PreferedLocales[PreferedLocalesCount] = strdup(kPuyoDefaultPreferedLanguage);
     PreferedLocalesCount++;
 
+#ifdef DEBUG
     for (i = 0; i < PreferedLocalesCount; i++)
       fprintf(stdout,"User prefered language %d : %s\n",i,PreferedLocales[i]);
-
+#endif
+    
     systemInitiated = true;
   }
 }
@@ -237,7 +242,9 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
     }
     // Should we look for any eligible dictionnary now?
     // By now we don't bother since english (en) should be there or we return the original strings anyway.
+#ifdef DEBUG
     if (!found) fprintf(stdout,"No dictionary found in %s for %s\n",(const char *)datapathManager.getPath(dictionaryDirectory),dictionaryName);
+#endif
   }
   
   myDictEntry->refcount++;

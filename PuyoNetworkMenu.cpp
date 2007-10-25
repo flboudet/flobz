@@ -72,11 +72,13 @@ private:
 #include "PuyoGame.h"
 
 LANGameMenu::LANGameMenu(PuyoRealMainScreen * mainScreen)
-  : PuyoMainScreenMenu(mainScreen), lanTitle("LAN Game"),
-    playerNameLabel("Player name:", PuyoGame::getDefaultPlayerName(-1), PuyoGame::getDefaultPlayerKey(-1)),
-    portNumLabel("Port number:", "6581"), cancelAction(mainScreen),
-    startButton("Start!", new PushLanNetCenterMenuAction(portNumLabel.getEditField(), playerNameLabel.getEditField())),
-    cancelButton("Cancel", &cancelAction)
+  : PuyoMainScreenMenu(mainScreen), lanTitle(theCommander->getLocalizedString("LAN Game")),
+    playerNameLabel(theCommander->getLocalizedString("Player name:"),
+                    PuyoGame::getDefaultPlayerName(-1), PuyoGame::getDefaultPlayerKey(-1)),
+    portNumLabel(theCommander->getLocalizedString("Port number:"), "6581"), cancelAction(mainScreen),
+    startButton(theCommander->getLocalizedString("Start!"),
+                new PushLanNetCenterMenuAction(portNumLabel.getEditField(), playerNameLabel.getEditField())),
+    cancelButton(theCommander->getLocalizedString("Cancel"), &cancelAction)
 {
 }
 

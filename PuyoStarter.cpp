@@ -435,7 +435,7 @@ void PuyoGameWidget::setScreenToResumed(bool fromControls)
 
 PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
     : menuBG(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/menubg.png"))),
-      menuTitle("Pause"), continueButton("Continue game", continueAction), abortButton("Abort game", abortAction)
+      menuTitle(theCommander->getLocalizedString("Pause")), continueButton(theCommander->getLocalizedString("Continue game"), continueAction), abortButton(theCommander->getLocalizedString("Abort game"), abortAction)
 {
     pauseVBox.add(&menuTitle);
     pauseVBox.add(&continueButton);

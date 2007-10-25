@@ -52,7 +52,8 @@ NetCenterDialogMenu::NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvi
     : menuBG(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/menubg.png"))),
       cancelAction(targetMenu, true), acceptAction(targetMenu, false), hasAcceptButton(hasAcceptButton),
       associatedInvitation(associatedInvitation), dialogTitle(title), dialogMsg(message),
-      acceptButton("Accept", &acceptAction), cancelButton("Cancel", &cancelAction)
+      acceptButton(theCommander->getLocalizedString("Accept"), &acceptAction),
+      cancelButton(theCommander->getLocalizedString("Cancel"), &cancelAction)
 {}
 
 NetCenterDialogMenu::~NetCenterDialogMenu()
@@ -95,9 +96,9 @@ String NetCenterPlayerList::PlayerEntry::getStatusString(int status)
   case PEER_NORMAL:
     return "";
   case PEER_PLAYING:
-    return " (playing)";
+    return theCommander->getLocalizedString(" (playing)");
   default:
-    return " (unknown)";
+    return theCommander->getLocalizedString(" (unknown)");
   }
 }
 
@@ -167,11 +168,13 @@ String NetCenterTwoNameProvider::getPlayer2Name() const
 }*/
 
 NetCenterMenu::NetCenterMenu(PuyoNetGameCenter *netCenter)
-    : netCenter(netCenter), playerListText("Player List"), chatAreaText("Chat Area"),
+    : netCenter(netCenter), playerListText(theCommander->getLocalizedString("Player List")),
+      chatAreaText(theCommander->getLocalizedString("Chat Area")),
       cycled(this),
       playerList(8, this), story("networkmenu.gsl"), onScreenDialog(NULL), shouldSelfDestroy(false),
       nameProvider(*netCenter), chatBox(*this),
-      title("Network Game Center"), backAction(), cancelButton("Disconnect", &backAction)
+      title(theCommander->getLocalizedString("Network Game Center")), backAction(),
+      cancelButton(theCommander->getLocalizedString("Disconnect"), &backAction)
 {
     GameUIDefaults::GAME_LOOP->addIdle(&cycled);
     netCenter->addListener(this);
@@ -246,7 +249,7 @@ void NetCenterMenu::onGameInvitationReceived(PuyoGameInvitation &invitation)
         netCenter->cancelGameInvitation(invitation);
     }
     else {
-        onScreenDialog = new NetCenterDialogMenu(this, invitation, "Invitation for a game", invitation.opponentName + " invited you to play", true);
+        onScreenDialog = new NetCenterDialogMenu(this, invitation, theCommander->getLocalizedString("Invitation for a game"), invitation.opponentName + theCommander->getLocalizedString(" invited you to play"), true);
         add(onScreenDialog);
         onScreenDialog->build();
         this->focus(onScreenDialog);
@@ -298,7 +301,7 @@ void NetCenterMenu::playerSelected(PeerAddress playerAddress, String playerName)
     PuyoGameInvitation invitation;
     invitation.gameRandomSeed = (unsigned long)(fmod(getTimeMs(), (double)0xFFFFFFFF));
     invitation.opponentAddress = playerAddress;
-    onScreenDialog = new NetCenterDialogMenu(this, invitation, "Asking for a game", String("Waiting ") + playerName + " for confirmation", false);
+    onScreenDialog = new NetCenterDialogMenu(this, invitation, theCommander->getLocalizedString("Asking for a game"), String(theCommander->getLocalizedString("Waiting ")) + playerName + theCommander->getLocalizedString(" for confirmation"), false);
     add(onScreenDialog);
     onScreenDialog->build();
     this->focus(onScreenDialog);
