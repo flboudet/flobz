@@ -132,9 +132,9 @@ void Locales_Init()
 
 #ifdef WIN32
 
-#define WinKnownLangsNb 14
-    static const char * WinKnownLangsNames[WinKnownLangsNb] = {"fr","en","ja","de","es","it","nl","sv","da","pt","fi","no","ru","ar","el","he","kh","ca","zh"};
-    static const WORD WinKnownLangsCodes[WinKnownLangsNb] = {LANG_FRENCH, LANG_ENGLISH, LANG_JAPANESE, LANG_GERMAN, LANG_SPANISH, LANG_ITALIAN, LANG_DUTCH, LANG_SWEDISH, LANG_DANISH, LANG_PORTUGUESE, LANG_FINNISH, LANG_NORWEGIAN, LANG_RUSSIAN, LANG_ARABIC, LANG_GREEK, LANG_HEBREW, LANG_KHMER, LANG_CATALAN, LANG_CHINESE};
+#define WinKnownLangsNb 18
+    static const char * WinKnownLangsNames[WinKnownLangsNb] = {"fr","en","ja","de","es","it","nl","sv","da","pt","fi","no","ru","ar","el","he","ca","zh"};
+    static const WORD WinKnownLangsCodes[WinKnownLangsNb] = {LANG_FRENCH, LANG_ENGLISH, LANG_JAPANESE, LANG_GERMAN, LANG_SPANISH, LANG_ITALIAN, LANG_DUTCH, LANG_SWEDISH, LANG_DANISH, LANG_PORTUGUESE, LANG_FINNISH, LANG_NORWEGIAN, LANG_RUSSIAN, LANG_ARABIC, LANG_GREEK, LANG_HEBREW, LANG_CATALAN, LANG_CHINESE};
 
     WORD winLang;
 
