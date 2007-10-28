@@ -1,25 +1,108 @@
 Single Player Game
-ﺐﻌﻟ ﺪﺣﺍﻭ ﺐﻋﻻ﻿
+ﺪﺣﺍﻭ ﺐﻋﻻ﻿
 
 Two Players Game
-ﺐﻌﻟ ﺐﻋﻻ﻿ ﻥﺎﻨﺛﺍ
+ﻥﺎﺒﻋﻻ﻿
 
 Options
 ﺕﺍﺭﺎﻴﺧ
 
 Network Game
-ﺔﺒﻌﻟ ﺔﻜﺒﺷ
+ﺔﻜﺒﺷ ﻦﻤﺿ ﺐﻌﻠﻟ
 
 Hall of Fame
-ﻩﺮﻬﺸﻟﺍ ﺔﻋﺎﻗ
+ﺓﺮﻬﺸﻟﺍ ﺔﻋﺎﻗ
 
 Exit
 ﺝﻭﺮﺧ
 
 Player:
-ﺐﻋﻻ﻿:
+:ﺐﻋﻻ﻿
 
 Player
 ﺐﻋﻻ﻿
 
+Back
+ﻉﻮﺟﺭ
 
+Choose Game Level
+ﺔﺒﻌﻠﻟﺍ ﻯﻮﺘﺴﻣ ﺭﺎﻴﺘﺧﺇ
+
+Beginner
+ﺉﺪﺘﺒﻣ
+
+Normal
+ﻂﺳﻮﺘﻣ
+
+Expert
+ﻡﺪﻘﺘﻣ
+
+Music	
+ﻰﻘﻴﺳﻮﻣ	
+
+Audio FX	
+ﺔﻴﺗﻮﺻ ﺕﺍﺮﺛﺆﻣ	
+
+FullScreen	
+ﺔﻠﻣﺎﻛ ﺔﺷﺎﺷ	
+
+ON 
+ﻢﻌﻧ
+
+OFF
+ﻻ﻿
+
+Puyo theme...
+...ﻮﻳﻮﺒﻟﺍ ﻝﺎﻜﺷﺃ
+
+Change controls...
+...ﻢﻜﺤﺘﻟﺍ ﺮﻴﻴﻐﺗ
+
+Puyo theme
+ﻮﻳﻮﺒﻟﺍ ﻝﺎﻜﺷﺃ
+
+Cartoon
+ﻥﻮﺗﺮﻛ
+
+Classic
+ﻱﺩﺎﻋ
+
+Invaders
+ﻥﺎﺳﺮﻔﻟﺍ
+
+Puyos for everyone (color blindness aware)
+ًﺎﻀﻳﺃ ﻥﺍﻮﻟﻷ﻿ﺍ ﻰﻤﻌﺑ ﻦﻴﺑﺎﺼﻤﻠﻟ) ﻊﻴﻤﺠﻠﻟ ﻮﻳﻮﺑ)
+
+
+Old good Puyos
+ﻦﻴﺤﻟﺎﺼﻟﺍ ﻦﻴﻤﻳﺪﻘﻟﺍ ﻮﻳﻮﺒﻟﺍ
+
+Funny toons
+ﺔﻜﺤﻀﻣ ﻡﻮﺳﺭ
+
+Player 1:
+:١ ﺐﻋﻻ﻿
+
+Player 2:
+:٢ ﺐﻋﻻ﻿
+
+Local Area Network Game
+(LAN)ﺔﻴﻠﺤﻣ
+
+Internet Game
+ﺖﻧﺮﺘﻧﻹ﻿ﺍ ﻰﻠﻋ
+
+Cancel
+ءﺎﻐﻟﺇ
+
+LAN Game
+ﺔﻴﻠﺤﻣ ﺔﺒﻌﻟ
+
+Start!
+!ﺃﺪﺑﺇ
+
+Player name:
+:ﺐﻋﻼ﻿ﻟﺍ ﻢﺳﺇ
+
+Port number:
+:(Port number) ﺄﻓﺮﻤﻟﺍ ﻢﻗﺭ
