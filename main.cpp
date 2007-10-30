@@ -19,8 +19,8 @@ char *DATADIR = "data";
 
 using namespace ios_fc;
 
+/*
 #ifdef MACOSX
-const char *bundleDataPath = "/Contents/Resources/data";
 void show(CFStringRef formatString, ...) {
     CFStringRef resultString;
     CFDataRef data;
@@ -40,6 +40,7 @@ void show(CFStringRef formatString, ...) {
     CFRelease(resultString);
 }
 #endif
+*/
 
 bool fileExists(char *path)
 {
@@ -81,11 +82,15 @@ int main(int argc, char *argv[])
 #ifdef MACOSX
 
 #ifndef DATADIR
-    CFStringRef bundlePath = CFURLCopyFileSystemPath(CFBundleCopyBundleURL(CFBundleGetMainBundle()), kCFURLPOSIXPathStyle);
-    int pathSize = (int)CFStringGetMaximumSizeForEncoding(CFStringGetLength(bundlePath), CFStringGetSystemEncoding()) + 1;
+    const char *bundleDataPath = "/Contents/Resources/data";
+    CFURLRef bundleURL = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+    CFStringRef bundlePath = CFURLCopyFileSystemPath(bundleURL, kCFURLPOSIXPathStyle);
+    CFRelease(bundleURL);
+    int pathSize = (int)CFStringGetMaximumSizeForEncoding(CFStringGetLength(bundlePath), kCFStringEncodingUTF8) + 1;
     DATADIR = (char *)malloc(pathSize + strlen(bundleDataPath));
-    CFStringGetCString (bundlePath, DATADIR, pathSize, CFStringGetSystemEncoding());
+    CFStringGetCString (bundlePath, DATADIR, pathSize, kCFStringEncodingUTF8);
     strcat(DATADIR, bundleDataPath);
+    CFRelease(bundlePath);
 #endif
 
 #endif
