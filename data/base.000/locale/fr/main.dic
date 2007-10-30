@@ -1,3 +1,9 @@
+__FONT__
+gfx/font.ttf
+
+__DIRECTION__
+rtl
+
 Single Player Game
 Jeu Solo
 
@@ -10,6 +16,9 @@ Options
 Network Game
 Jeu en Réseau
 
+Hall of Fame
+Tableau d'honneur
+
 Exit
 Quitter
 
@@ -19,17 +28,44 @@ Joueur:
 Player
 Joueur
 
+Back
+Retour
+
 Choose Game Level
 Niveau du jeu
+
+Beginner
+Débutant
+
+Normal
+Normal
+
+Expert
+Expert
+
+Music	
+Musique	
+
+Audio FX	
+Effets Sonores	
+
+FullScreen	
+Plein écran	
+
+ON 
+OUI
+
+OFF
+NON
+
+Puyo theme
+Thème de Puyos
 
 Easy
 Facile
 
 Medium
 Moyen
-
-Beginner
-Débutant
 
 Hard
 Difficile
@@ -55,32 +91,8 @@ Jeu en Réseau Local
 Internet Game
 Jeu sur Internet
 
-Back
-Retour
-
 Level theme
 Thème de niveaux
-
-Puyo theme
-Thème de Puyos
-
-ON 
-OUI
-
-OFF
-NON
-
-Options
-Options
-
-Audio FX	
-Effets Sonores	
-
-Music	
-Musique	
-
-FullScreen	
-Plein écran	
 
 Puyo theme...
 Thèmes de Puyos...
@@ -90,9 +102,6 @@ Thèmes de niveaux...
 
 Change controls...
 Contrôles...
-
-Hall of Fame
-Tableau d'honneur
 
 Pause
 Pause
