@@ -39,7 +39,7 @@ typedef enum SinglePlayerLevel {
 
 class LocalGameMenu : public PuyoMainScreenMenu, public PuyoSingleNameProvider {
 public:
-    LocalGameMenu(PuyoRealMainScreen *mainScreen);
+    LocalGameMenu(PuyoMainScreen *mainScreen);
     void build();
     String getPlayerName() const;
 private:
@@ -55,7 +55,7 @@ private:
 
 class Local2PlayersGameMenu : public PuyoMainScreenMenu, public PuyoTwoNameProvider {
 public:
-    Local2PlayersGameMenu(PuyoRealMainScreen *mainScreen);
+    Local2PlayersGameMenu(PuyoMainScreen *mainScreen);
     void build();
     String getPlayer1Name() const;
     String getPlayer2Name() const;

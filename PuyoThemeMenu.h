@@ -83,7 +83,7 @@ private:
 
 class PuyoThemeMenu : public PuyoMainScreenMenu {
 public:
-    PuyoThemeMenu(PuyoRealMainScreen *mainScreen);
+    PuyoThemeMenu(PuyoMainScreen *mainScreen);
     void build();
 private:
     Text themeMenuTitle;

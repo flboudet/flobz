@@ -10,7 +10,7 @@ void ControlMenu::BackSaveAction::action()
     mainScreen->popMenu();
 }
 
-ControlMenu::ControlMenu(PuyoRealMainScreen *mainScreen)
+ControlMenu::ControlMenu(PuyoMainScreen *mainScreen)
     : PuyoMainScreenMenu(mainScreen), title("Change Controls"), backAction(mainScreen), backButton("Back", &backAction),
       labelTitle("Controls"), keyTitle("Primary"), alternateKeyTitle("Alternate"),
       lbl1PLeft(kPlayer1Left), lbl1PRight(kPlayer1Right), lbl1PDown(kPlayer1Down), lbl1PTurnRight(kPlayer1Clockwise), lbl1PTurnLeft(kPlayer1Counterclockwise),

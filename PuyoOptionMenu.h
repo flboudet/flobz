@@ -60,7 +60,7 @@ private:
 
 class OptionMenu : public PuyoMainScreenMenu {
 public:
-    OptionMenu(PuyoRealMainScreen *mainScreen);
+    OptionMenu(PuyoMainScreen *mainScreen);
     void build();
     void toggleSoundFx();
     void toggleMusic();

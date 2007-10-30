@@ -448,7 +448,7 @@ void SinglePlayerStarterAction::resetGameSession()
     // Rewind screen stack
     Screen *screenToTrans = GameUIDefaults::SCREEN_STACK->top();
     GameUIDefaults::SCREEN_STACK->pop();
-    (static_cast<PuyoRealMainScreen *>(GameUIDefaults::SCREEN_STACK->top()))->transitionFromScreen(*screenToTrans);
+    (static_cast<PuyoMainScreen *>(GameUIDefaults::SCREEN_STACK->top()))->transitionFromScreen(*screenToTrans);
     delete gameWidget;
     delete gameScreen;
     delete levelData;

@@ -16,7 +16,7 @@ class HallOfFameScreen : public PuyoGameOver1PScreen {
 class PopHallOfFameAction : public Action
 {
     public:
-        PopHallOfFameAction(PuyoRealMainScreen *mainScreen, Screen *fromScreen = NULL)
+        PopHallOfFameAction(PuyoMainScreen *mainScreen, Screen *fromScreen = NULL)
             : mainScreen(mainScreen), fromScreen(fromScreen)
         {}
         void action() {
@@ -27,7 +27,7 @@ class PopHallOfFameAction : public Action
             fromScreen = screen;
         }
     private:
-        PuyoRealMainScreen *mainScreen;
+        PuyoMainScreen *mainScreen;
         Screen *fromScreen;
 };
 

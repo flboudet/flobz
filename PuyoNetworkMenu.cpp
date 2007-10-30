@@ -71,7 +71,7 @@ private:
 
 #include "PuyoGame.h"
 
-LANGameMenu::LANGameMenu(PuyoRealMainScreen * mainScreen)
+LANGameMenu::LANGameMenu(PuyoMainScreen * mainScreen)
   : PuyoMainScreenMenu(mainScreen), lanTitle(theCommander->getLocalizedString("LAN Game")),
     playerNameLabel(theCommander->getLocalizedString("Player name:"),
                     PuyoGame::getDefaultPlayerName(-1), PuyoGame::getDefaultPlayerKey(-1)),
@@ -301,7 +301,7 @@ void NetworkInternetAction::action()
   (GameUIDefaults::SCREEN_STACK)->push(*menuToCreate);
 }
 
-NetworkGameMenu::NetworkGameMenu(PuyoRealMainScreen * mainScreen)
+NetworkGameMenu::NetworkGameMenu(PuyoMainScreen * mainScreen)
     : locale(theCommander->getDataPathManager(), "locale", "main"),
       PuyoMainScreenMenu(mainScreen), lanGameMenu(mainScreen),
       internetGameMenu(NULL), internetAction(&internetGameMenu),

@@ -6,16 +6,16 @@
 
 class ControlMenu : public PuyoMainScreenMenu {
 public:
-    ControlMenu(PuyoRealMainScreen *mainScreen);
+    ControlMenu(PuyoMainScreen *mainScreen);
     void build();
 private:
     class BackSaveAction : public Action
     {
     public:
-        BackSaveAction(PuyoRealMainScreen *mainScreen) : mainScreen(mainScreen) {}
+        BackSaveAction(PuyoMainScreen *mainScreen) : mainScreen(mainScreen) {}
         void action();
     private:
-        PuyoRealMainScreen *mainScreen;
+        PuyoMainScreen *mainScreen;
     };
     Text title;
     BackSaveAction backAction;

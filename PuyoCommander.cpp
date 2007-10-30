@@ -60,7 +60,7 @@ void PuyoPopMenuAction::action()
 
 PuyoScreen::PuyoScreen() : Screen(0,0,WIDTH,HEIGHT) {}
 
-PuyoRealMainScreen::PuyoRealMainScreen(PuyoStoryWidget *fgStory, PuyoStoryWidget *bgStory)
+PuyoMainScreen::PuyoMainScreen(PuyoStoryWidget *fgStory, PuyoStoryWidget *bgStory)
     : menuBG(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/menubg.png"))),
       fgStory(fgStory), bgStory(bgStory), transition(NULL)
 {
@@ -78,7 +78,7 @@ PuyoRealMainScreen::PuyoRealMainScreen(PuyoStoryWidget *fgStory, PuyoStoryWidget
     container.setBackground(menuBG);
 }
 
-PuyoRealMainScreen::~PuyoRealMainScreen()
+PuyoMainScreen::~PuyoMainScreen()
 {
     if (transition != NULL) {
         delete(transition);
@@ -88,13 +88,13 @@ PuyoRealMainScreen::~PuyoRealMainScreen()
     }
 }
 
-void PuyoRealMainScreen::pushMenu(PuyoMainScreenMenu *menu)
+void PuyoMainScreen::pushMenu(PuyoMainScreenMenu *menu)
 {
     menuStack.push(container.getContentWidget());
     container.transitionToContent(menu);
 }
 
-void PuyoRealMainScreen::popMenu()
+void PuyoMainScreen::popMenu()
 {
     if (menuStack.size() == 1)
         return;
@@ -102,7 +102,7 @@ void PuyoRealMainScreen::popMenu()
     menuStack.pop();
 }
 
-void PuyoRealMainScreen::transitionFromScreen(Screen &fromScreen)
+void PuyoMainScreen::transitionFromScreen(Screen &fromScreen)
 {
     if (transition != NULL) {
         remove(transition);
@@ -118,7 +118,7 @@ void PuyoRealMainScreen::transitionFromScreen(Screen &fromScreen)
     container.setSize(Vec3(menuBG->w, menuBG->h, 0));
 }
 
-void PuyoRealMainScreen::onEvent(GameControlEvent *cevent)
+void PuyoMainScreen::onEvent(GameControlEvent *cevent)
 {
     PuyoScreen::onEvent(cevent);
 	if (cevent->caught != false)
@@ -137,7 +137,7 @@ void PuyoRealMainScreen::onEvent(GameControlEvent *cevent)
 /// Contains buttons for 1P,2P,Option and Network menus.
 class MainRealMenu : public PuyoMainScreenMenu {
 public:
-    MainRealMenu(PuyoRealMainScreen * mainScreen) :
+    MainRealMenu(PuyoMainScreen * mainScreen) :
         // Create sub screens
         PuyoMainScreenMenu(mainScreen),
         localGameMenu     (mainScreen),
@@ -231,7 +231,7 @@ void PuyoCommander::initMenus()
   // Create the structures.
   PuyoStoryWidget *fgStory = new PuyoStoryWidget("title_fg.gsl");
   PuyoStoryWidget *bgStory = new PuyoStoryWidget("title_bg.gsl");
-  mainScreen = new PuyoRealMainScreen(fgStory, bgStory);
+  mainScreen = new PuyoMainScreen(fgStory, bgStory);
   MainRealMenu *trubudu = new MainRealMenu(mainScreen);
   trubudu->build();
   mainScreen->pushMenu(trubudu);

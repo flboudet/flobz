@@ -52,7 +52,7 @@ private:
 
 class LANGameMenu : public PuyoMainScreenMenu {
 public:
-    LANGameMenu(PuyoRealMainScreen * mainScreen);
+    LANGameMenu(PuyoMainScreen * mainScreen);
     void build();
 private:
     Text lanTitle;
@@ -91,7 +91,7 @@ private:
 
 class NetworkGameMenu : public PuyoMainScreenMenu {
 public:
-    NetworkGameMenu(PuyoRealMainScreen * mainScreen);
+    NetworkGameMenu(PuyoMainScreen * mainScreen);
     void build();
 private:
     PuyoLocalizedDictionary locale;

@@ -63,7 +63,7 @@ void OptionMenu::toggleFullScreen()
     fullScreenButton.setToggle(theCommander->getFullScreen());
 }
 
-OptionMenu::OptionMenu(PuyoRealMainScreen *mainScreen) : PuyoMainScreenMenu(mainScreen),
+OptionMenu::OptionMenu(PuyoMainScreen *mainScreen) : PuyoMainScreenMenu(mainScreen),
     toggleSoundFxAction(*this), toggleMusicAction(*this), toggleFullScreenAction(*this),
     optionTitle(theCommander->getLocalizedString("Options")),
     audioButton(theCommander->getLocalizedString(kAudioFX), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getSoundFx(), &toggleSoundFxAction),

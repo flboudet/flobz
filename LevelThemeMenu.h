@@ -86,7 +86,7 @@ private:
 
 class LevelThemeMenu : public PuyoMainScreenMenu {
 public:
-    LevelThemeMenu(PuyoRealMainScreen *mainScreen);
+    LevelThemeMenu(PuyoMainScreen *mainScreen);
     void build();
 private:
     Text themeMenuTitle;

@@ -21,10 +21,10 @@ class PuyoScreen : public Screen {
 
 class PuyoMainScreenMenu;
 
-class PuyoRealMainScreen : public PuyoScreen {
+class PuyoMainScreen : public PuyoScreen {
   public:
-    PuyoRealMainScreen(PuyoStoryWidget *fgStory = NULL, PuyoStoryWidget *bgStory = NULL);
-    ~PuyoRealMainScreen();
+    PuyoMainScreen(PuyoStoryWidget *fgStory = NULL, PuyoStoryWidget *bgStory = NULL);
+    ~PuyoMainScreen();
     void pushMenu(PuyoMainScreenMenu *menu);
     void popMenu();
     void build() {}
@@ -40,29 +40,29 @@ class PuyoRealMainScreen : public PuyoScreen {
 
 class PuyoMainScreenMenu : public VBox {
 public:
-    PuyoMainScreenMenu(PuyoRealMainScreen *mainScreen, GameLoop *loop = NULL) : VBox(loop), mainScreen(mainScreen) {}
+    PuyoMainScreenMenu(PuyoMainScreen *mainScreen, GameLoop *loop = NULL) : VBox(loop), mainScreen(mainScreen) {}
     virtual void build() = 0;
 protected:
-    PuyoRealMainScreen *mainScreen;
+    PuyoMainScreen *mainScreen;
 };
 
 class PuyoPushMenuAction : public Action
 {
 public:
-    PuyoPushMenuAction(PuyoMainScreenMenu *menu, PuyoRealMainScreen *mainScreen) : menu(menu), mainScreen(mainScreen) {}
+    PuyoPushMenuAction(PuyoMainScreenMenu *menu, PuyoMainScreen *mainScreen) : menu(menu), mainScreen(mainScreen) {}
     void action();
 private:
-    PuyoRealMainScreen *mainScreen;
+    PuyoMainScreen *mainScreen;
     PuyoMainScreenMenu *menu;
 };
 
 class PuyoPopMenuAction : public Action
 {
 public:
-    PuyoPopMenuAction(PuyoRealMainScreen *mainScreen) : mainScreen(mainScreen) {}
+    PuyoPopMenuAction(PuyoMainScreen *mainScreen) : mainScreen(mainScreen) {}
     void action();
 private:
-    PuyoRealMainScreen *mainScreen;
+    PuyoMainScreen *mainScreen;
 };
 
 class PuyoCommander : public MessageListener
@@ -110,7 +110,7 @@ class PuyoCommander : public MessageListener
     MessageBox *mbox;
     GameLoop   *loop;
 
-    PuyoRealMainScreen *mainScreen;
+    PuyoMainScreen *mainScreen;
     GameCursor *cursor;
     PuyoLocalizedDictionary * locale;
 
