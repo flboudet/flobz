@@ -1285,6 +1285,16 @@ namespace gameui {
                     action->action();
             }
         }
+        else if ((event->cursorEvent == GameControlEvent::kGameMouseClicked) && (editionMode == false)) {
+            Vec3 widPosition = getPosition();
+            Vec3 widSize = getSize();
+            if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
+                    && (widPosition.x + widSize.x >= widPosition.x) && (widPosition.y + widSize.y >= event->y)) {
+                previousValue = getValue();
+                setValue(previousValue+"_",false);
+                editionMode = true;
+            }
+        }
         else if (editionMode == true) {
             const char CHAR_ORDER[] = "/:-. _ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 

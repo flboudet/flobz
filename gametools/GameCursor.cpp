@@ -34,7 +34,7 @@ void GameCursor::draw(SDL_Surface *screen)
     //nvy = (nvy * 0.5) * cursorSurface->h;
     float nvx = (-sin(anglerad) * 0.5) * cursorSurface->w;
     float nvy = (-cos(anglerad) * 0.5) * cursorSurface->h;
-    IIM_BlitRotatedSurfaceCentered(cursorSurface, angle, screen, blitX - nvx, blitY - nvy);
+    IIM_BlitRotatedSurfaceCentered(cursorSurface, (int)angle, screen, (int)(blitX - nvx), (int)(blitY - nvy));
 }
 
 void GameCursor::onEvent(GameControlEvent *event)

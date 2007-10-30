@@ -78,7 +78,7 @@ LANGameMenu::LANGameMenu(PuyoMainScreen * mainScreen)
     portNumLabel(theCommander->getLocalizedString("Port number:"), "6581"), cancelAction(mainScreen),
     startButton(theCommander->getLocalizedString("Start!"),
                 new PushLanNetCenterMenuAction(portNumLabel.getEditField(), playerNameLabel.getEditField())),
-    cancelButton(theCommander->getLocalizedString("Cancel"), &cancelAction)
+    cancelButton(theCommander->getLocalizedString("Back"), &cancelAction)
 {
 }
 
@@ -309,7 +309,7 @@ NetworkGameMenu::NetworkGameMenu(PuyoMainScreen * mainScreen)
       networkTitleText(locale.getLocalizedString("Network Game")),
       lanGameButton(locale.getLocalizedString("Local Area Network Game"), &lanAction),
       internetGameButton(locale.getLocalizedString("Internet Game"), &internetAction),
-      cancelButton(locale.getLocalizedString("Cancel"), &mainScreenPopAction)
+      cancelButton(locale.getLocalizedString("Back"), &mainScreenPopAction)
 {}
 
 void NetworkGameMenu::build() {
