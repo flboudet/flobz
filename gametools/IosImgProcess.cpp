@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h> // Conforms to ANSI "C 89", is that OK?
 
 /** Image loading... free... conversion */
 
@@ -656,6 +657,16 @@ void iim_surface_convert_to_gray(IIM_Surface *isrc)
 
 void IIM_BlitSurface(IIM_Surface *src, IIM_Rect *src_rect, SDL_Surface *dst, SDL_Rect *dst_rect)
 {
+  SDL_BlitSurface(src->surf, src_rect, dst, dst_rect);
+}
+
+void IIM_BlitSurfaceAlpha(IIM_Surface *src, IIM_Rect *src_rect, SDL_Surface *dst, SDL_Rect *dst_rect, Uint8 alpha)
+{
+  assert(src != NULL);
+  assert(src->surf != NULL);
+  assert(alpha >= 0);
+  assert(alpha <= 255);
+  SDL_SetAlpha(src->surf, SDL_SRCALPHA|(useGL?0:SDL_RLEACCEL), alpha);
   SDL_BlitSurface(src->surf, src_rect, dst, dst_rect);
 }
 

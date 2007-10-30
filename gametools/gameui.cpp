@@ -97,6 +97,7 @@ namespace gameui {
 
     WidgetContainer::WidgetContainer(GameLoop *loop) : loop(loop), addedToGameLoop(false) {
         if (loop == NULL) this->loop = GameUIDefaults::GAME_LOOP;
+        innerMargin = 10;
     }
 
     WidgetContainer::~WidgetContainer()
@@ -257,17 +258,14 @@ namespace gameui {
         {
             case USE_MAX_SIZE:
                 {
-                    float height = getSortingAxe(getSize());
+                    float height = getSortingAxe(getSize()) - innerMargin*2;
 
                     float heightOfKnownChilds = 0.0f;
                     for (int i = 0; i < getNumberOfChilds(); ++i) {
                         Widget *child = getChild(i);
-                        if (!child->getPreferedSize().is_zero()) {
-                            //numberOfknownChilds++;
+                        if (!child->getPreferedSize().is_zero())
                             heightOfKnownChilds += getSortingAxe(child->getPreferedSize());
-                        }
                     }
-                    //if (getNumberOfChilds() != 0) heightOfKnownChilds /= getNumberOfChilds();
 
                     float heightPerChild = (height - heightOfKnownChilds) / (getNumberOfChilds());
                     float heightToRemove = 0.0;
@@ -288,9 +286,8 @@ namespace gameui {
                     Vec3 size     = getSize();
                     setSortingAxe(size, heightPerChild);
                     Vec3 position = getPosition();
-                    setSortingAxe(position, getSortingAxe(position)-heightPerChild/2.0);
-                    float axePos  = getSortingAxe(position) ;
-
+                    setSortingAxe(position, getSortingAxe(position)-heightPerChild/2.0+innerMargin);
+                    float axePos  = getSortingAxe(position);
 
                     for (int i = 0; i < getNumberOfChilds(); ++i) {
                         Widget *child = getChild(i);

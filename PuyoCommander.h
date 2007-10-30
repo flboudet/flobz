@@ -30,6 +30,7 @@ class PuyoMainScreen : public PuyoScreen {
     void build() {}
     void transitionFromScreen(Screen &fromScreen);
     void onEvent(GameControlEvent *cevent);
+    void updateSize();
   protected:
     IIM_Surface   *menuBG;
     SliderContainer container;

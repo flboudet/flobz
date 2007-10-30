@@ -87,7 +87,7 @@ void ControlMenu::build() {
     mainHBox.add(&alternateKeyBox);
     
     Vec3 margins(400.0,400.0,0.0);
-    mainHBox.setPreferedSize(mainHBox.getPreferedSize() + margins);
+    mainHBox.setPreferedSize(/*mainHBox.getPreferedSize() + */margins);
     
     add(&title);
     add(&mainHBox);

@@ -140,6 +140,7 @@ namespace gameui {
 
       void setSize(const Vec3 &v3);
       void setPosition(const Vec3 &v3);
+      void setInnerMargin(int margin) { innerMargin = margin; }
 
       void draw(SDL_Surface *surface);
       void requestDraw(bool fromParent = false);
@@ -157,6 +158,7 @@ namespace gameui {
       void    changeChild(int i, Widget *w);
       int     getNumberOfChilds() const  { return childs.size(); }
       void    sortWidgets();
+      int     innerMargin;
 
     private:
       Vector<Widget> childs;

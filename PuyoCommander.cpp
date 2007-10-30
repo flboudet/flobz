@@ -70,12 +70,17 @@ PuyoMainScreen::PuyoMainScreen(PuyoStoryWidget *fgStory, PuyoStoryWidget *bgStor
     if (fgStory != NULL)
         add(fgStory);
         
+    this->updateSize();
+    container.setBackground(menuBG);
+}
+
+void PuyoMainScreen::updateSize()
+{
     Vec3 menuPos = container.getPosition();
     menuPos.x = MENU_X;
     menuPos.y = MENU_Y;
     container.setPosition(menuPos);
     container.setSize(Vec3(menuBG->w, menuBG->h, 0));
-    container.setBackground(menuBG);
 }
 
 PuyoMainScreen::~PuyoMainScreen()
@@ -110,12 +115,7 @@ void PuyoMainScreen::transitionFromScreen(Screen &fromScreen)
     }
     transition = new PuyoScreenTransitionWidget(fromScreen, NULL);
     add(transition);
-    Vec3 menuPos = container.getPosition();
-    menuPos.x = MENU_X;
-    menuPos.y = MENU_Y;
-
-    container.setPosition(menuPos);
-    container.setSize(Vec3(menuBG->w, menuBG->h, 0));
+    this->updateSize();
 }
 
 void PuyoMainScreen::onEvent(GameControlEvent *cevent)
@@ -328,6 +328,7 @@ void PuyoCommander::initFonts()
   SoFont *darkFont = SoFont_new();
   menuFont = SoFont_new();
   smallFont = SoFont_new();
+  smallFontInfo = SoFont_new();
   SoFont *textFont = SoFont_new();
 
 #ifdef ENABLE_TTF
@@ -342,13 +343,13 @@ void PuyoCommander::initFonts()
   }
   catch (ios_fc::Exception) {}
 
-  SoFont_load_ttf(darkFont, dataPathManager.getPath(font.c_str()), 18, SoFont_DARK);
-  SoFont_load_ttf(menuFont, dataPathManager.getPath(font.c_str()), 18, SoFont_STD);
+  SoFont_load_ttf(darkFont, dataPathManager.getPath(font.c_str()), 17, SoFont_DARK);
+  SoFont_load_ttf(menuFont, dataPathManager.getPath(font.c_str()), 17, SoFont_STD);
   SoFont_load_ttf(smallFont, dataPathManager.getPath(font.c_str()), 12, SoFont_STD);
-  smallFontInfo = smallFont;
-  SoFont_load_ttf(textFont, dataPathManager.getPath(font.c_str()), 18, SoFont_GREY);
+  SoFont_load_ttf(smallFontInfo, dataPathManager.getPath(font.c_str()), 12, SoFont_DARK);
+  SoFont_load_ttf(textFont, dataPathManager.getPath(font.c_str()), 17, SoFont_GREY);
   storyFont = SoFont_new();
-  SoFont_load_ttf(storyFont, dataPathManager.getPath(font.c_str()), 18, SoFont_STORY);
+  SoFont_load_ttf(storyFont, dataPathManager.getPath(font.c_str()), 17, SoFont_STORY);
 #else
   smallFontInfo = SoFont_new();
   IIM_Surface *font3b = IIM_Load_Absolute_DisplayFormatAlpha (dataPathManager.getPath("gfx/font3b.png"));
@@ -373,7 +374,7 @@ void PuyoCommander::initFonts()
   GameUIDefaults::FONT_INACTIVE   = darkFont;
   SoFont_free(GameUIDefaults::FONT_SMALL_INFO);
   GameUIDefaults::FONT_SMALL_INFO = smallFontInfo;
-    SoFont_free(GameUIDefaults::FONT_SMALL_ACTIVE);
+  SoFont_free(GameUIDefaults::FONT_SMALL_ACTIVE);
   GameUIDefaults::FONT_SMALL_ACTIVE = smallFont;
 }
 

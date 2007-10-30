@@ -14,6 +14,8 @@ struct _StyrolyseClient {
   void *(*loadImage) (StyrolyseClient *_this, const char *path);
   void  (*drawImage) (StyrolyseClient *_this, void *image, int x, int y,
                       int clipx, int clipy, int clipw, int cliph);
+  void  (*drawImageAdvanced) (StyrolyseClient *_this, void *image, int x, int y,
+                      int clipx, int clipy, int clipw, int cliph, int degrees, int alpha);
   void  (*freeImage) (StyrolyseClient *_this, void *image);
   void  (*putText)   (StyrolyseClient *_this, int x, int y, const char *text);
   const char *(*getText)   (StyrolyseClient *_this, const char *text);
