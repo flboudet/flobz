@@ -64,8 +64,25 @@ void put_text(GoomSL *gsl, GoomHash *global, GoomHash *local)
   const char *text = (const char *)GSL_LOCAL_PTR  (gsl, local, "text");
   int         i    = (int)GSL_LOCAL_FLOAT(gsl, local, "text_index");
   if (i>sizeof(txt)-1) i=sizeof(txt)-1;
-  strncpy(txt,text,i);
-  txt[i]=0;
+  int m = 0, n = 0;
+  while (true)
+  {
+    // if end of src or dst string, break
+    if ( (text[m] == 0) || (m >= sizeof(txt) - 1) ) break;
+    
+    // test for new character
+    if ((text[m] & 0xC0) != 0x80) n++;
+    
+    // if not needed, break
+    if (n>i) break;
+    
+    // copy byte
+    txt[m]=text[m];
+      
+    // Next byte
+    m++;
+  }
+  txt[m] = 0;
   styrolyse->client->putText(styrolyse->client,x,y,txt);
 }
 
