@@ -206,11 +206,16 @@ void PuyoGameWidget::initialize()
     
     setReceiveUpEvents(true);
     setFocusable(true);
+
+    // Load a few FX for the game
+    puyoFX.push_back(new PuyoFX("test_fx.gsl"));
 }
 
 PuyoGameWidget::~PuyoGameWidget()
 {
     IIM_Free(painter.gameScreen);
+    for (int i=0; i<puyoFX.size(); ++i)
+        delete puyoFX[i];
 }
 
 void PuyoGameWidget::cycle()
@@ -472,13 +477,37 @@ void AbortAction::action()
     screen.abort();
 }
 
-static std::vector<PuyoFX*> activeFX;
+static std::vector<PuyoFX*> *activeFX = NULL;
 static int last_post = 0;
 void EventFX(const char *name, float x, float y)
 {
-    if (activeFX.size() == 0) return;
-    last_post = (last_post + 1) % activeFX.size();
-    activeFX[last_post]->postEvent(name, x,y);
+    if (activeFX == NULL) return;
+
+    printf("Simultaneous FX: %d\n", activeFX->size());
+
+    PuyoFX *supporting_fx = NULL;
+    for (int i=0; i<activeFX->size(); ++i) {
+
+        // Find an FX supporting this event
+        PuyoFX *fx = (*activeFX)[i];
+        if (fx->supportedFX() == name) {
+            supporting_fx = fx;
+            // FX not busy, report it the event
+            if (!fx->busy()) {
+                fx->postEvent(name, x, y);
+                return;
+            }
+        }
+    }
+
+    // All FX are busy, if we find an FX supporting this event
+    // we clone it an report the FX to the newly created one.
+    if (supporting_fx != NULL) {
+        PuyoFX *fx = supporting_fx->clone();
+        activeFX->push_back(fx);
+        fx->getGameScreen()->add(fx);
+        fx->postEvent(name, x, y);
+    }
 }
 
 PuyoGameScreen::PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScreen)
@@ -495,10 +524,12 @@ PuyoGameScreen::PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScree
     add(&gameWidget);
     if (gameWidget.getOpponentFace() != NULL)
         add(gameWidget.getOpponentFace());
-    std::vector<PuyoFX*> fx = gameWidget.getPuyoFX();
-    activeFX = fx;
-    for (int i=0; i<fx.size(); ++i)
-        add(fx[i]);
+
+    activeFX = &gameWidget.getPuyoFX();
+    for (int i=0; i<activeFX->size(); ++i) {
+        add((*activeFX)[i]);
+        (*activeFX)[i]->setGameScreen(this);
+    }
     add(&transitionWidget);
     gameWidget.setAssociatedScreen(this);
 }
@@ -512,7 +543,7 @@ PuyoGameScreen::~PuyoGameScreen()
 	 dynamic_cast<DrawableComponent *>(this));
   fflush(stdout);
 #endif
-  activeFX = std::vector<PuyoFX*>();
+  activeFX = NULL;
 }
 
 void PuyoGameScreen::onEvent(GameControlEvent *cevent)

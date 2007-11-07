@@ -1,0 +1,5 @@
+<init>
+  Display @display = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+  boolean @busy = false
+  string @supported_fx = ""
+  init_fx

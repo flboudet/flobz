@@ -53,7 +53,6 @@ public:
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
     PuyoStoryWidget *getOpponentFace();
-    virtual std::vector<PuyoFX*> getPuyoFX();
 private:
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;
@@ -63,7 +62,6 @@ private:
     PuyoIA opponentcontroller;
     int faceTicks;
     PuyoStoryWidget opponentFace;
-    std::vector<PuyoFX*> puyoFX;
 };
 
 class PuyoLevelDefinitions {

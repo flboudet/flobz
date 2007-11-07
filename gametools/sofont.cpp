@@ -437,7 +437,8 @@ void    SoFont_CenteredString_XY (SoFont * font, SDL_Surface * Surface, int x,
 #include "sofont.h"
 #include "string.h"
 
-struct _SOFONT
+//struct _SOFONT
+struct SoFont
 {
   int     height;
   IIM_Surface *picture;
@@ -449,6 +450,8 @@ struct _SOFONT
 
   int mark_color;
 };
+
+SoFont *DBG_FONT = NULL;
 
 // protected
 int     SoFont_DoStartNewChar (SoFont * font, Sint32 x);

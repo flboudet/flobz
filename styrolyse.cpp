@@ -8,7 +8,8 @@
 #include <ios_memory.h>
 
 static char *scriptPath0 = NULL;
-static char *scriptPath1 = NULL;
+static char *scriptPath_fx = NULL;
+static char *scriptPath_nofx = NULL;
 
 struct _Styrolyse {
 
@@ -222,21 +223,27 @@ static void sbind(GoomSL *gsl)
 
 /* Externals */
 
-void styrolyse_init(const char *styrolyse_path0, const char *styrolyse_path1)
+void styrolyse_init(const char *styrolyse_path0, const char *styrolyse_path_nofx, const char *styrolyse_path_fx)
 {
     if (scriptPath0 != NULL) free(scriptPath0);
-    if (scriptPath1 != NULL) free(scriptPath1);
+    if (scriptPath_nofx != NULL) free(scriptPath_nofx);
+    if (scriptPath_fx != NULL) free(scriptPath_fx);
 
-    scriptPath0 = scriptPath1 = NULL;
+    scriptPath0 = scriptPath_nofx = scriptPath_fx = NULL;
 
     if (styrolyse_path0 != NULL) {
         scriptPath0 = (char*)malloc(strlen(styrolyse_path0)+1);
         strcpy(scriptPath0, styrolyse_path0);
     }
 
-    if (styrolyse_path1 != NULL) {
-        scriptPath1 = (char*)malloc(strlen(styrolyse_path1)+1);
-        strcpy(scriptPath1, styrolyse_path1);
+    if (styrolyse_path_nofx != NULL) {
+        scriptPath_nofx = (char*)malloc(strlen(styrolyse_path_nofx)+1);
+        strcpy(scriptPath_nofx, styrolyse_path_nofx);
+    }
+
+    if (styrolyse_path_fx != NULL) {
+        scriptPath_fx = (char*)malloc(strlen(styrolyse_path_fx)+1);
+        strcpy(scriptPath_fx, styrolyse_path_fx);
     }
 }
 
@@ -297,7 +304,10 @@ void styrolyse_reload(Styrolyse *_this)
     char *fbuffer;
     if (!_this->gsl) return;
     fbuffer = gsl_init_buffer(scriptPath0);
-    if (scriptPath1 && !_this->fxMode) gsl_append_file_to_buffer(scriptPath1, &fbuffer);
+    if (scriptPath_nofx && !_this->fxMode)
+        gsl_append_file_to_buffer(scriptPath_nofx, &fbuffer);
+    if (scriptPath_fx && _this->fxMode)
+        gsl_append_file_to_buffer(scriptPath_fx, &fbuffer);
     gsl_append_file_to_buffer(_this->fname, &fbuffer);
     styrolyse = _this;
     gsl_compile(_this->gsl,fbuffer);
@@ -331,6 +341,11 @@ void styrolyse_setint(Styrolyse *_this, const char *varname, int value)
 int styrolyse_getint(Styrolyse *_this, const char *varname)
 {
     return GSL_GLOBAL_INT(_this->gsl, varname);
+}
+
+const char *styrolyse_getstr(Styrolyse *_this, const char *varname)
+{
+    return (const char*)GSL_GLOBAL_PTR(_this->gsl, varname);
 }
 
 int  styrolyse_current_cycle(Styrolyse *_this)

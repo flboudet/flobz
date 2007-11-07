@@ -56,18 +56,14 @@ PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puy
     areaB(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
           1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
     playercontroller(areaA),
-    opponentcontroller(type, level, areaB), faceTicks(0), opponentFace(aiFace), puyoFX()
+    opponentcontroller(type, level, areaB), faceTicks(0), opponentFace(aiFace)
 {
-    for (int i=0; i<30; ++i) // TODO, augmenter le nombre de story si necessaire
-        puyoFX.push_back(new PuyoFX("test_fx.gsl"));
     initialize(areaA, areaB, playercontroller, opponentcontroller, levelTheme, gameOverAction);
     setLives(lifes);
 }
 
 PuyoSinglePlayerGameWidget::~PuyoSinglePlayerGameWidget()
 {
-    for (int i=0; i<puyoFX.size(); ++i)
-        delete puyoFX[i];
 }
 
 void PuyoSinglePlayerGameWidget::cycle()
@@ -85,11 +81,6 @@ void PuyoSinglePlayerGameWidget::cycle()
 PuyoStoryWidget *PuyoSinglePlayerGameWidget::getOpponentFace()
 {
     return &opponentFace;
-}
-
-std::vector<PuyoFX*> PuyoSinglePlayerGameWidget::getPuyoFX()
-{
-    return puyoFX;
 }
 
 PuyoLevelDefinitions *PuyoLevelDefinitions::currentDefinition = NULL;

@@ -26,6 +26,8 @@
 #ifndef PUYO_STORY_H
 #define PUYO_STORY_H
 
+class PuyoGameScreen;
+
 #include "SDL.h"
 #include "SDL_image.h"
 #include "styrolyse.h"
@@ -72,6 +74,15 @@ class PuyoFX : public PuyoStoryWidget {
 public:
     PuyoFX(String fxName);
     void postEvent(const char *name, float x, float y);
+    bool busy() const;
+    String supportedFX() const;
+    PuyoFX *clone() const;
+
+    void setGameScreen(PuyoGameScreen *screen) { this->screen = screen; }
+    PuyoGameScreen *getGameScreen() const { return screen; }
+private:
+    String fxName;
+    PuyoGameScreen *screen;
 };
 
 class PuyoStoryScreen : public Screen {

@@ -129,7 +129,7 @@ public:
     String getPlayerOneName() const { return playerOneName; }
     int getPointsPlayerOne() { return attachedGameA->getPoints(); }
     virtual PuyoStoryWidget *getOpponentFace() { return NULL; }
-    virtual std::vector<PuyoFX*> getPuyoFX() { return std::vector<PuyoFX*>(); }
+    virtual std::vector<PuyoFX*> &getPuyoFX() { return puyoFX; }
     void addGameAHandicap(int handicap) {attachedGameA->increaseNeutralPuyos(handicap * PUYODIMX); attachedGameA->dropNeutrals();}
     void addGameBHandicap(int handicap) {attachedGameB->increaseNeutralPuyos(handicap * PUYODIMX); attachedGameB->dropNeutrals();}
     // A deplacer
@@ -163,6 +163,7 @@ protected:
     PuyoKillPlayerLeftAction killLeftAction;
     PuyoKillPlayerRightAction killRightAction;
     PuyoCheatCodeManager killLeftCheat, killRightCheat;
+    std::vector<PuyoFX*> puyoFX;
 };
 
 class ContinueAction : public Action {

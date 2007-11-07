@@ -115,7 +115,8 @@ PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction, bool
     if (!classInitialized) {
         String path0 = theCommander->getDataPathManager().getPath("lib/styrolyse.gsl");
         String path1 = theCommander->getDataPathManager().getPath("lib/nofx.gsl");
-        styrolyse_init(path0.c_str(), path1.c_str());
+        String path2 = theCommander->getDataPathManager().getPath("lib/fx.gsl");
+        styrolyse_init(path0.c_str(), path1.c_str(), path2.c_str());
         classInitialized = true;
     }
 
@@ -247,8 +248,25 @@ void PuyoStoryScreen::onEvent(GameControlEvent *cevent)
 }
 
 PuyoFX::PuyoFX(String fxName)
-    : PuyoStoryWidget(fxName,NULL,true)
+    : PuyoStoryWidget(fxName,NULL,true), fxName(fxName)
 {}
+
+bool PuyoFX::busy() const
+{
+    return getIntegerValue("@busy") != 0;
+}
+
+String PuyoFX::supportedFX() const
+{
+    return String(styrolyse_getstr(currentStory, "@supported_fx"));
+}
+
+PuyoFX *PuyoFX::clone() const
+{
+    PuyoFX *fx = new PuyoFX(fxName);
+    fx->setGameScreen(screen);
+    return fx;
+}
 
 void PuyoFX::postEvent(const char *name, float x, float y)
 {
