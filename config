@@ -6,7 +6,10 @@
 PLATFORM=
 
 # Support for mac multiple architecture (PowerPC/i386)
-ENABLE_FAT?=false
+ENABLE_FAT?=true
+
+# Select distro
+data-packages="reduced.001"
 
 ###################################
 # Configure your application      #
@@ -18,7 +21,7 @@ ENABLE_OPENGL?=false
 ENABLE_TTF?=true
 ENABLE_DGA?=false
 
-DEBUG_MODE?=true
+DEBUG_MODE?=false
 MORE_DEBUG?=false
 ENABLE_PCH?=false
 
@@ -38,7 +41,7 @@ INSTALL_DATADIR=$(DESTDIR)/$(DATADIR)
 # Mac settings
 macimage_name=flobopuyo-mac-$(VERSION)
 bundle_name=FloboPuyo.app
-SYSTEM_ROOT=/
+SYSTEM_ROOT=/Developer/SDKs/MacOSX10.4u.sdk
 FRAMEWORKS_DIR=$(SYSTEM_ROOT)/Library/Frameworks
 
 # Win32 settings
@@ -183,7 +186,7 @@ ifeq ($(PLATFORM), crossmingw32)
 endif
 
 ifeq ($(PLATFORM), Darwin)
-	CFLAGS:=$(CFLAGS) -DMACOSX -pipe
+	CFLAGS:=$(CFLAGS) -DMACOSX -pipe -mmacosx-version-min=10.2
 else
 	CFLAGS:=$(CFLAGS) -DDATADIR=\"${DATADIR}\"
 endif

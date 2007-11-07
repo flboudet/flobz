@@ -91,7 +91,7 @@ install: flobopuyo
 	$(STRIP) $(PRGNAME)
 	mkdir -p ${INSTALL_BINDIR}
 	mkdir -p ${INSTALL_DATADIR}
-	@+make -C data install INSTALL_DATADIR="${INSTALL_DATADIR}"
+	@+make -C data install INSTALL_DATADIR="${INSTALL_DATADIR}" ADDITIONAL_DIRECTORIES="$(data-packages)"
 	chmod a+rx ${INSTALL_DATADIR}
 	chmod a+rx ${INSTALL_DATADIR}/sfx
 	chmod a+rx ${INSTALL_DATADIR}/gfx
@@ -111,7 +111,7 @@ bundle: flobopuyo
 	sed "s/@@VERSION@@/$(VERSION)/" mac/Info.plist > $(bundle_name)/Contents/Info.plist
 	cp mac/icon.icns $(bundle_name)/Contents/Resources/
 	cp flobopuyo $(bundle_name)/Contents/MacOS/flobopuyo
-	@+make -C data install INSTALL_DATADIR="$(PWD)/$(bundle_name)/Contents/Resources/data"
+	@+make -C data install INSTALL_DATADIR="$(PWD)/$(bundle_name)/Contents/Resources/data" ADDITIONAL_DIRECTORIES="$(data-packages)"
 	$(STRIP) -u -r $(bundle_name)/Contents/MacOS/flobopuyo
 
 mac-package: bundle
@@ -124,12 +124,13 @@ mac-package: bundle
 	hdiutil create -srcfolder $(macimage_name) $(macimage_name).tmp.dmg
 	hdiutil convert -format UDZO -imagekey zlib-level=9 -o $(macimage_name).dmg $(macimage_name).tmp.dmg
 	hdiutil internet-enable $(macimage_name).dmg
+	rm -rf $(macimage_name)
 	rm -f $(macimage_name).tmp.dmg
 
 win-package: flobopuyo
 	$(STRIP) $(PRGNAME)
 	mkdir -p $(WINZIP_NAME)
-	@+make -C data install INSTALL_DATADIR="$(PWD)/$(WINZIP_NAME)/data"
+	@+make -C data install INSTALL_DATADIR="$(PWD)/$(WINZIP_NAME)/data" ADDITIONAL_DIRECTORIES="$(data-packages)"
 	cp flobopuyo.exe $(WINZIP_NAME)
 	cp COPYING $(WINZIP_NAME)
 	cp $(WINSDLRUNTIME)/*.dll $(WINZIP_NAME)

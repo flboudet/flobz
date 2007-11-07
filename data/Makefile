@@ -1,6 +1,5 @@
 FILES=
-
-DIRECTORIES="base.000" "complete.002" "reduced.001" 
+DIRECTORIES=base.000 $(ADDITIONAL_DIRECTORIES)
 
 SOURCE_DATADIR:=$(shell pwd)
 
