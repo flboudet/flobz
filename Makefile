@@ -37,13 +37,13 @@ flobopuyo: all.h.gch iosfc_dir gametools_dir goomsl_dir ${OBJFILES}
 	@echo "--------------------------------------"
 
 iosfc_dir:all.h.gch
-	@+DEPFLAGS='$(DEPFLAGS)' CFLAGS='$(CFLAGS)' CXXFLAGS='$(CXXFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CXX=$(CXX)  make -C iosfc libiosfc.a
+	@+DEPFLAGS='$(DEPFLAGS)' CFLAGS='$(CFLAGS)' CXXFLAGS='$(CXXFLAGS)' LDFLAGS='$(LDFLAGS)' CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) CXX=$(CXX)  make -C iosfc libiosfc.a
 
 gametools_dir:all.h.gch
-	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C gametools object
+	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C gametools object
 
 goomsl_dir:all.h.gch
-	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C goomsl object
+	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C goomsl object
 
 %.o:%.cpp all.h.gch
 	@mkdir -p $(DEPDIR);\
@@ -79,8 +79,7 @@ clean:
 	rm -rf *~ *.o flobopuyo* $(PRGNAME) WARNINGS *.gch
 	rm -rf .xvpics data/.xvpics data/*/.xvpics data/*/*/.xvpics
 	rm -rf $(bundle_name)
-	rm -rf $(macimage_name)
-	rm -f  $(macimage_name).dmg
+	rm -rf $(macimage_name) $(macimage_name).dmg $(macimage_name).tmp.dmg $(WINZIP_NAME) $(WINZIP_NAME).zip
 	rm -f  .DS_Store */.DS_Store */*/.DS_Store */*/*/.DS_Store
 	rm -f  .gdb_history
 	+make -C iosfc clean
@@ -133,8 +132,9 @@ win-package: flobopuyo
 	@+make -C data install INSTALL_DATADIR="$(PWD)/$(WINZIP_NAME)/data" ADDITIONAL_DIRECTORIES="$(data-packages)"
 	cp flobopuyo.exe $(WINZIP_NAME)
 	cp COPYING $(WINZIP_NAME)
-	cp $(WINSDLRUNTIME)/*.dll $(WINZIP_NAME)
+	cp $(WINSDLDEVLIBS)/*.dll $(WINZIP_NAME)
 	zip -9 -r $(WINZIP_NAME) $(WINZIP_NAME)
+	rm -rf $(WINZIP_NAME)
 
 .PHONY: all clean iosfc_dir gametools_dir goomsl_dir
 

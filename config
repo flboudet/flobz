@@ -47,9 +47,10 @@ FRAMEWORKS_DIR=$(SYSTEM_ROOT)/Library/Frameworks
 # Win32 settings
 CYGWIN_VERSION=CYGWIN_NT-5.1
 WINZIP_NAME=flobopuyo-win32-$(VERSION)
-WINSDLINCLUDE=/home/$(USER)/SDL-1.2.12/include
-WINSDLDEVLIBS=/home/gyom//SDL-1.2.12/lib
-WINSDLRUNTIME=/home/$(USER)/SDL-1.2.12/lib
+WINSDLINCLUDE=$(HOME)/SDL-1.2.12/include
+WINSDLDEVLIBS=$(HOME)/SDL-1.2.12/lib
+CROSSTOOLS=$(HOME)/mingw/bin
+CROSSTRIPLET=i386-mingw32
 #
 ##########
 
@@ -69,10 +70,13 @@ endif
 
 # Tools
 ifeq ($(PLATFORM), crossmingw32)
-  	CC=i586-mingw32msvc-g++
-  	CXX=i586-mingw32msvc-g++
+  	CC=$(CROSSTOOLS)/$(CROSSTRIPLET)-gcc
+  	CXX=$(CROSSTOOLS)/$(CROSSTRIPLET)-g++
+	RANLIB=$(CROSSTOOLS)/$(CROSSTRIPLET)-ranlib
+  	STRIP=$(CROSSTOOLS)/$(CROSSTRIPLET)-strip
+	AR=$(CROSSTOOLS)/$(CROSSTRIPLET)-ar
   	PRGNAME=flobopuyo.exe
-  	STRIP=i586-mingw32msvc-strip
+	ENABLE_OPENGL=false
 else
 	CC=g++
 	CXX=g++
