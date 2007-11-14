@@ -208,7 +208,7 @@ void PuyoGameWidget::initialize()
     setFocusable(true);
 
     // Load a few FX for the game
-    puyoFX.push_back(new PuyoFX("test_fx.gsl"));
+    puyoFX.push_back(new PuyoFX("fx/white_star.gsl"));
 }
 
 PuyoGameWidget::~PuyoGameWidget()
