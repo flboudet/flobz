@@ -69,13 +69,20 @@ class Cache
             return false;
         }
 
-        /* Like get, but does not check if 'c' is in the cache. */
+        /* Like get, but does not check if 'c' is in the cache.
+         *
+         * Make sure that "this->contains(c)" is true.
+         */
         T* veryGet(const std::string &c) 
         {
             lastUseMap[c] = ios_fc::getTimeMs();
             return tMap[c];
         }
 
+        /* Return the time of the last use of 'c'.
+         *
+         * Make sure that "this->contains(c)" is true.
+         */
         double veryGetLastUse(std::string &c)
         {
             return lastUseMap[c];
