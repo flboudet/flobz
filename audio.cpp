@@ -2,6 +2,8 @@
 #include "audio.h"
 #include "preferences.h"
 
+#define TIMEMS_BETWEEN_SAME_SOUND 10.0
+
 #ifdef USE_AUDIO
 #ifdef MACOSX
 #include <SDL_mixer.h>
@@ -37,36 +39,46 @@ static const char * kSoundVolume = "AudioManager.FX.Volume";
 static const char * kMusic       = "AudioManager.Music.State";
 static const char * kSound       = "AudioManager.FX.State";
 
-
 template <typename T>
 class Cache
 {
     private:
         typedef std::vector<std::string>   NameVector;
-        typedef std::map<std::string, int> LastUseMap;
+        typedef std::map<std::string, double> LastUseMap;
         typedef std::map<std::string, T*>  TMap;
 
         NameVector   nameVector;
         TMap         tMap;
         LastUseMap   lastUseMap;
         
-        int          curTime;
+        double          curTime;
         int          maxT;
 
     public:
-        Cache(int maxT) : curTime(0), maxT(maxT) {}
+        Cache(int maxT) : curTime(0.0), maxT(maxT) {}
 
-        T* get(const std::string &c) 
+        bool contains(const std::string &c) 
         {
             NameVector::iterator it = nameVector.begin();
             while (it != nameVector.end()) {
                 if (*it == c) {
-                    lastUseMap[c] = ++curTime;
-                    return tMap[c];
+                    return true;
                 }
                 ++it;
             }
-            return NULL;
+            return false;
+        }
+
+        /* Like get, but does not check if 'c' is in the cache. */
+        T* veryGet(const std::string &c) 
+        {
+            lastUseMap[c] = ios_fc::getTimeMs();
+            return tMap[c];
+        }
+
+        double veryGetLastUse(std::string &c)
+        {
+            return lastUseMap[c];
         }
 
         T* add(const std::string &c, T* t)
@@ -77,7 +89,8 @@ class Cache
             
             nameVector.push_back(c);
             tMap[c] = t;
-            lastUseMap[c] = ++curTime;
+            curTime = ios_fc::getTimeMs();
+            lastUseMap[c] = curTime - TIMEMS_BETWEEN_SAME_SOUND - 0.0001;
 
             return ret;
         }
@@ -197,7 +210,7 @@ void AudioManager::preloadMusic(const char *fileName)
 #ifdef USE_AUDIO
     if (!audio_supported) return;
 
-    if (musicCache.get(fileName) != NULL) return;
+    if (musicCache.contains(fileName)) return;
 
     Mix_Music *music   = CustomMix_LoadMUS (fileName);
     Mix_Music *removed = musicCache.add(fileName, music);
@@ -215,7 +228,7 @@ void AudioManager::playMusic(const char *fileName)
     if (music_on)
     {
       preloadMusic(fileName);
-      Mix_Music *music = musicCache.get(fileName);
+      Mix_Music *music = musicCache.veryGet(fileName);
       Mix_HaltMusic();
       if (music != NULL) Mix_PlayMusic(music, -1);
     }
@@ -227,7 +240,7 @@ void AudioManager::preloadSound(const char *fileName, float volume)
 #ifdef USE_AUDIO
     if (!audio_supported) return;
 
-    if (chunkCache.get(fileName) != NULL) return;
+    if (chunkCache.contains(fileName)) return;
 
     Mix_Chunk *chunk   = CustomMix_LoadWAV (fileName, (int)(volume * MIX_MAX_VOLUME));
     Mix_Chunk *removed = chunkCache.add(fileName, chunk);
@@ -242,7 +255,11 @@ void AudioManager::playSound(const char *fileName, float volume, float balance)
     if ((!audio_supported) || (!sound_on)) return;
 
     preloadSound(fileName, volume);
-    Mix_Chunk *chunk = chunkCache.get(fileName);
+    std::string c = fileName;
+    if (ios_fc::getTimeMs() - chunkCache.veryGetLastUse(c) < TIMEMS_BETWEEN_SAME_SOUND)
+        return;
+
+    Mix_Chunk *chunk = chunkCache.veryGet(c);
     if (chunk != NULL) {
         int channel = -1;
         if (balance < -0.5f) channel = 0;
