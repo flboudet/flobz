@@ -213,25 +213,26 @@ void FallingAnimation::cycle()
     Y += step++;
     if (Y >= (attachedPuyo.getPuyoY()*TSIZE) + yOffset)
     {
-        bouncing--;
         if (bouncing < 0) {
             finishedFlag = true;
             AudioManager::playSound("bam1.wav", .1);
-            EventFX("falling", X+TSIZE/2,Y+TSIZE/2);
-            EventFX("falling",
+            EventFX("end_falling", X+TSIZE/2,Y+TSIZE/2);
+            EventFX("end_falling",
                     attachedPuyo.getScreenCoordinateX()+TSIZE/2,
                     attachedPuyo.getScreenCoordinateY()+TSIZE/2);
             attachedPuyo.getAttachedView()->allowCycle();
         }
         else {
-            if (BOUNCING_OFFSET[bouncing] == 0) {
+            if (BOUNCING_OFFSET[bouncing] == 0)
                 AudioManager::playSound("bam1.wav", .1);
-                EventFX("falling", X+TSIZE/2,Y+TSIZE/2);
-                EventFX("falling",
+
+                EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2);
+                EventFX("bouncing",
                         attachedPuyo.getScreenCoordinateX()+TSIZE/2,
                         attachedPuyo.getScreenCoordinateY()+TSIZE/2);
             }
         }
+        bouncing--;
         Y = (attachedPuyo.getPuyoY()*TSIZE) + yOffset;
     }
 }
