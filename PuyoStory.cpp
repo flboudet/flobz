@@ -256,9 +256,17 @@ bool PuyoFX::busy() const
     return getIntegerValue("@busy") != 0;
 }
 
-String PuyoFX::supportedFX() const
+/*String PuyoFX::supportedFX() const
 {
     return String(styrolyse_getstr(currentStory, "@supported_fx"));
+}*/
+bool PuyoFX::supportFX(const char *fx) const
+{
+    String haystack(styrolyse_getstr(currentStory, "@supported_fx"));
+    String needle(fx);
+    haystack += ",";
+    needle += ",";
+    return (strstr(haystack.c_str(), needle.c_str()) != NULL);
 }
 
 PuyoFX *PuyoFX::clone() const

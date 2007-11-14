@@ -75,7 +75,7 @@ public:
     PuyoFX(String fxName);
     void postEvent(const char *name, float x, float y);
     bool busy() const;
-    String supportedFX() const;
+    bool supportFX(const char *str) const;
     PuyoFX *clone() const;
 
     void setGameScreen(PuyoGameScreen *screen) { this->screen = screen; }

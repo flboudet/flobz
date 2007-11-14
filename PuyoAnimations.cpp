@@ -214,7 +214,9 @@ void FallingAnimation::cycle()
     Y += step++;
     if (Y >= (attachedPuyo.getPuyoY()*TSIZE) + yOffset)
     {
+        Y = (attachedPuyo.getPuyoY()*TSIZE) + yOffset;
         bouncing--;
+
         if (bouncing < 0) {
             finishedFlag = true;
             AudioManager::playSound("bam1.wav", .1);
@@ -227,7 +229,6 @@ void FallingAnimation::cycle()
 
             EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2);
         }
-        Y = (attachedPuyo.getPuyoY()*TSIZE) + yOffset;
     }
 }
 

@@ -490,7 +490,7 @@ void EventFX(const char *name, float x, float y)
 
         // Find an FX supporting this event
         PuyoFX *fx = (*activeFX)[i];
-        if (fx->supportedFX() == name) {
+        if (fx->supportFX(name)) {
             supporting_fx = fx;
             // FX not busy, report it the event
             if (!fx->busy()) {
