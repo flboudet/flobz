@@ -1,0 +1,15 @@
+- "turning"
+When: The attached puyo make the quarter of a turn around the main puyo.
+Where: Final position of the turning puyo.
+
+- "start_falling"
+When: A puyo start to fall.
+Where: Position of the puyo.
+
+- "bouncing"
+When: A falling puyo touch the ground and bounce.
+Where: Position of the impact.
+
+- "end_falling"
+When: A puyo was bouncing and reach its final position.
+Where: Position of the puyo.
