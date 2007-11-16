@@ -35,7 +35,7 @@
 
 [start_puyoset]
     puyoset.name        = "Classic"
-    puyoset.description = "Old good puyos."
+    puyoset.description = "Old school puyos."
 [end_puyoset]
 
 [start_puyoset]
@@ -57,7 +57,7 @@
 
 [start_level]
     level.name          = "Basic level"
-    level.description   = "The basic Columns level"
+    level.description   = "The main arena."
     level.background    = "columns"
 [end_level]
 

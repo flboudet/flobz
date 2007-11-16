@@ -215,6 +215,7 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
         String directoryName = FilePath::combine(dictionaryDirectory, locale);
         String dictFilePath = FilePath::combine(directoryName, dictionaryName) + ".dic";
         FILE *dictionaryFile = NULL;
+
         try { dictionaryFile = fopen(datapathManager.getPath(dictFilePath), "r"); } catch (Exception &e) { }
         
         if (dictionaryFile != NULL)
@@ -285,12 +286,18 @@ PuyoLocalizedDictionary::~PuyoLocalizedDictionary()
   }
 }
 
-const char * PuyoLocalizedDictionary::getLocalizedString(const char * originalString) const
+const char * PuyoLocalizedDictionary::getLocalizedString(const char * originalString, bool copyIfNotThere)
 {
     HashValue *result = dictionary->get(originalString);
     if (result != NULL) {
         return  (const char *)(result->ptr);
-    }
+    } else if (copyIfNotThere)
+	{
+	  char * A = strdup(originalString);
+	  char * B = strdup(originalString);
+      dictionary->put(A, B);
+	  return B;
+	}
     return originalString;
 }
 

@@ -34,7 +34,7 @@ using namespace ios_fc;
 class PuyoLocalizedDictionary {
 public:
     PuyoLocalizedDictionary(const PuyoDataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName);
-    const char * getLocalizedString(const char * originalString) const;
+    const char * getLocalizedString(const char * originalString,  bool copyIfNotThere = false);
     ~PuyoLocalizedDictionary();
 private:
     HashMap * dictionary;

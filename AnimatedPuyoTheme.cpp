@@ -124,7 +124,11 @@ static bool copyPictureWithLuminosity(IIM_Surface * src, IIM_Surface ** dst, IIM
 
 static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
-    const char * newName = (const char *) GSL_GLOBAL_PTR(gsl, "puyoset.name");
+	FilePath tmp0(GlobalCurrentPath);
+	String tmp1 = FilePath::combine(FilePath::combine("theme",tmp0.basename()),"locale");
+	PuyoLocalizedDictionary localeDictionary(theCommander->getDataPathManager(), tmp1, "theme");
+
+	const char * newName = localeDictionary.getLocalizedString(String(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.name"))),true);
     AnimatedPuyoSetTheme * theme = new AnimatedPuyoSetTheme(GlobalCurrentPath, newName);
     
     AdvancedBuffer<const char *> * list = globalManager->getAnimatedPuyoSetThemeList();
@@ -141,7 +145,9 @@ static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
         }
     }
     
-    theme->addInfo(String(((const char *) GSL_GLOBAL_PTR(gsl, "author"))),String(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.description"))));
+    theme->addInfo(
+		String(((const char *) GSL_GLOBAL_PTR(gsl, "author"))),
+		localeDictionary.getLocalizedString(String(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.description"))),true));
     
     theme->addAnimatedPuyoTheme(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.face")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.disappear")),
@@ -175,7 +181,11 @@ static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
 
 static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
-    const char * newName = (const char *) GSL_GLOBAL_PTR(gsl, "level.name");
+	FilePath tmp0(GlobalCurrentPath);
+	String tmp1 = FilePath::combine(FilePath::combine("theme",tmp0.basename()),"locale");
+	PuyoLocalizedDictionary localeDictionary(theCommander->getDataPathManager(), tmp1, "theme");
+
+	const char * newName = localeDictionary.getLocalizedString(String(((const char *) GSL_GLOBAL_PTR(gsl, "level.name"))),true);
     PuyoLevelTheme * theme = new PuyoLevelTheme(GlobalCurrentPath, newName);
 
     AdvancedBuffer<const char *> * list = globalManager->getPuyoLevelThemeList();
@@ -190,7 +200,9 @@ static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
         }
     }
 
-    theme->addInfo(String(((const char *) GSL_GLOBAL_PTR(gsl, "author"))),String(((const char *) GSL_GLOBAL_PTR(gsl, "level.description"))));
+    theme->addInfo(
+		String(((const char *) GSL_GLOBAL_PTR(gsl, "author"))),
+		localeDictionary.getLocalizedString(String(((const char *) GSL_GLOBAL_PTR(gsl, "level.description"))),true));
 
     theme->setLives((const char *) GSL_GLOBAL_PTR(gsl, "level.lives"));
     theme->setBackground((const char *) GSL_GLOBAL_PTR(gsl, "level.background"));
@@ -631,7 +643,7 @@ bool AnimatedPuyoSetTheme::cache(void)
 void AnimatedPuyoSetTheme::retain(void) { counter++; }
 void AnimatedPuyoSetTheme::release(void)
 {
-    if (counter == 0) fprintf(stderr,"AnimatedPuyoSetTheme released while not retained");
+    if (counter == 0) fprintf(stderr,"AnimatedPuyoSetTheme released while not retained\n");
     else counter--;
 }
 #endif
@@ -765,7 +777,7 @@ bool PuyoLevelTheme::setSpeedMeter(const char * speedmeter)
 
 bool PuyoLevelTheme::setNeutralIndicator(const char * neutralIndicator)
 {
-    DEBUG_PARAM_MISSING(speedmeter,"neutralindicator","PuyoLevelTheme")
+    DEBUG_PARAM_MISSING(neutralIndicator,"neutralindicator","PuyoLevelTheme")
     
     _neutral_indicator = strdup(neutralIndicator);
     return true;
