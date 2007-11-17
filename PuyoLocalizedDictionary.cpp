@@ -253,6 +253,15 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
   //fprintf(stderr,"-----Refcount++ = %d (%s)\n",myDictEntry->refcount,(const char *)stdName);
 }
 
+class HashActionValueFree : public HashMapAction {
+	public:
+		void action(HashValue * value);
+};
+
+void HashActionValueFree::action(HashValue * value) {
+	free(value->ptr);
+}
+
 PuyoLocalizedDictionary::~PuyoLocalizedDictionary()
 {
   HashValue * result = dictionaries.get((const char *)stdName);
@@ -268,9 +277,14 @@ PuyoLocalizedDictionary::~PuyoLocalizedDictionary()
     //fprintf(stderr,"-----Refcount-- = %d (%s)\n",myDictEntry->refcount,(const char *)stdName);
     if (myDictEntry->refcount <= 0) {
       //fprintf(stderr,"-----Destroying %s.\n",(const char *)stdName);
-      //delete myDictEntry->dictionary;
-      //dictionaries.remove((const char *)stdName);
-      //free(myDictEntry);
+      dictionaries.remove((const char *)stdName);
+
+	  HashActionValueFree myDeleteAction;
+	  myDictEntry->dictionary->foreach(&myDeleteAction);
+
+      delete myDictEntry->dictionary;
+
+      free(myDictEntry);
         /* clean up a bit before leaving
         fprintf(stderr,"-----Languages cleanup...\n");
         for (int i = 0; i < PreferedLocalesCount; i++) {
@@ -293,10 +307,9 @@ const char * PuyoLocalizedDictionary::getLocalizedString(const char * originalSt
         return  (const char *)(result->ptr);
     } else if (copyIfNotThere)
 	{
-	  char * A = strdup(originalString);
-	  char * B = strdup(originalString);
-      dictionary->put(A, B);
-	  return B;
+	  const char * A = strdup(originalString);
+      dictionary->put(originalString, (void *)A);
+	  return A;
 	}
     return originalString;
 }
