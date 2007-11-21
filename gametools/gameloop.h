@@ -23,7 +23,9 @@ class DrawableComponent
     // Reordering of drawable elements
     bool moveToFront();
     bool moveToBack(DrawableComponent *gc);
-
+    
+    // Notifications
+    virtual void onDrawableVisibleChanged(bool visible) {}
   protected:
     GameLoop *parentLoop;
     void requestDraw();

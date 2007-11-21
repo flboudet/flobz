@@ -92,6 +92,10 @@ public:
     virtual ~PuyoStoryScreen();
     void onEvent(GameControlEvent *cevent);
     void transitionFromScreen(Screen &fromScreen);
+    /* Notification on screen visibility change
+     * @param visible  true if the scren is visible, otherwise false
+     */
+    virtual void onScreenVisibleChanged(bool visible);
 protected:
     PuyoStoryWidget storyWidget;
     PuyoScreenTransitionWidget *transitionWidget;

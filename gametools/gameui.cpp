@@ -36,10 +36,10 @@ namespace gameui {
         }
     }
 
-    void Widget::hide()   { hidden = true;                 }
+    void Widget::hide()   { onWidgetVisibleChanged(false);  }
     void Widget::show()
     {
-        hidden = false;
+        onWidgetVisibleChanged(true);
         IdleComponent *idle = getIdleComponent();
         if (idle != NULL) {
             idle->setPause(false);
@@ -95,7 +95,7 @@ namespace gameui {
     // WidgetContainer
     // 
 
-    WidgetContainer::WidgetContainer(GameLoop *loop) : loop(loop), addedToGameLoop(false) {
+    WidgetContainer::WidgetContainer(GameLoop *loop) : loop(loop), addedToGameLoop(false), layoutSuspended(false) {
         if (loop == NULL) this->loop = GameUIDefaults::GAME_LOOP;
         innerMargin = 10;
     }
@@ -114,6 +114,7 @@ namespace gameui {
         if (addedToGameLoop)
             child->addToGameLoop(loop);
         arrangeWidgets();
+        child->onWidgetVisibleChanged(isVisible());
     }
 
     void WidgetContainer::remove (Widget *child)
@@ -122,18 +123,22 @@ namespace gameui {
         child->setParent(NULL);
         child->removeFromGameLoopActive();
         arrangeWidgets();
+        child->onWidgetVisibleChanged(false);
     }
 
     void WidgetContainer::changeChild(int i, Widget *w)
     {
         Widget *tmp = getChild(i);
-        if (tmp)
+        if (tmp) {
             tmp->removeFromGameLoopActive();
+            tmp->onWidgetVisibleChanged(false);
+        }
         childs[i] = w;
         w->setParent(this);
         if (addedToGameLoop)
             w->addToGameLoop(loop);
         arrangeWidgets();
+        w->onWidgetVisibleChanged(isVisible());
     }
 
     void WidgetContainer::addToGameLoop(GameLoop *loop)
@@ -230,7 +235,16 @@ namespace gameui {
     void WidgetContainer::setPosition(const Vec3 &v3)
     {
         Widget::setPosition(v3);
-        arrangeWidgets();
+        if (!layoutSuspended)
+            arrangeWidgets();
+    }
+
+    void WidgetContainer::onWidgetVisibleChanged(bool visible)
+    {
+        for (int i = 0; i < childs.size() ; i++) {
+            childs[i]->onWidgetVisibleChanged(visible);
+        }
+        Widget::onWidgetVisibleChanged(visible);
     }
 
     // 
@@ -624,12 +638,11 @@ namespace gameui {
 
     SliderContainer::SliderContainer(GameLoop *loop)
         : IdleComponent()
-          , ZBox(loop)
-                      , contentWidget(NULL), previousWidget(NULL)
-                                                                 , currentTime(0.0), slideStartTime(0.0), slidingOffset(0.0)
-                                                                                                                            , sliding(false), bg(NULL)
+        , ZBox(loop), slidingTime(.4)
+        , contentWidget(NULL), previousWidget(NULL)
+        , currentTime(0.0), slideStartTime(0.0)
+        , sliding(false), bg(NULL)
     {
-        slidingOffset = getPosition().x;
     }
 
     void SliderContainer::eventOccured(GameControlEvent *event)
@@ -639,24 +652,10 @@ namespace gameui {
 
     void SliderContainer::endSlideInside(bool inside)
     {
-        Vec3 pos1 = getPosition();
-        Vec3 pos2 = pos1;
-
         sliding = false;
-        double distance = getSize().x;
-        if (inside)
-        {
-            pos2.x += distance;
-            slidingOffset = 0.0;
-        }
-        else
-        {
-            pos1.x += distance;
-            slidingOffset = distance;
-        }
-        if (contentWidget  != NULL) contentWidget->setPosition(pos1);
-        if (previousWidget != NULL) previousWidget->setPosition(pos2);
+        setPosition(Vec2(640 - getSize().x, getPosition().y));
         requestDraw();
+        onSlideInside(); // Send notification that we have slided inside
     }
 
     void SliderContainer::draw(SDL_Surface *screen)
@@ -664,7 +663,7 @@ namespace gameui {
         if (bg != NULL)
         {
             IIM_Rect rect;
-            rect.x = (Sint16)(getPosition().x+slidingOffset);
+            rect.x = (Sint16)getPosition().x;
             rect.y = (Sint16)getPosition().y;
             IIM_BlitSurface(bg, NULL, screen, &rect);
         }
@@ -673,21 +672,18 @@ namespace gameui {
 
     void SliderContainer::transitionToContent(Widget *content)
     {
-        if (sliding)
+        if (sliding && slideout)
         {
-            if (slideout)
-            {
+            if (previousWidget != NULL) {
                 previousWidget->lostFocus();
-                previousWidget->removeFromGameLoopActive();
-                remove(previousWidget);          
-                if (contentWidget != NULL)
-                {
-                    add(contentWidget);
-                    contentWidget->addToGameLoop(getGameLoop());
-                }
+                remove(previousWidget);
+                previousWidget = NULL;
+            }
+            if (contentWidget != NULL)
+            {
+                addContentWidget();
             }
         }
-
         slideStartTime = currentTime;
         previousWidget = contentWidget;
         contentWidget = content;
@@ -704,8 +700,7 @@ namespace gameui {
             {
                 sliding = true;
                 slideout= false;
-                add(contentWidget);
-                contentWidget->addToGameLoop(getGameLoop());
+                addContentWidget();
                 AudioManager::playSound("whip.wav", .1);
             }
             else
@@ -717,29 +712,26 @@ namespace gameui {
 
     void SliderContainer::idle(double currentTime)
     {
-        static const double slidingTime = .4;
-        double oldtime = this->currentTime - slideStartTime;
-
         this->currentTime = currentTime;
-
-        if (!sliding) return;
-
+        if (!sliding) return; // only executed when the slider is animated
         double t = (currentTime - slideStartTime);
 
         if (t > slidingTime) // At end of sliding period
         {
             if (slideout) // If the previous widget has gone
             {
-                // Then remove it once for all
-                remove(previousWidget);
-
+                if (previousWidget != NULL) {
+                    // Remove the previous widget for good
+                    remove(previousWidget);
+                    previousWidget = NULL;
+                }
                 if (contentWidget != NULL) // there is a new widget to show
                 {
                     // Then slide in the new widget
                     t = 0;
                     slideStartTime = currentTime;
                     slideout = false;
-                    add(contentWidget);
+					addContentWidget();
                     AudioManager::playSound("whip.wav", .1);
                 }
                 else // Stop here
@@ -748,38 +740,58 @@ namespace gameui {
                     return;
                 }
             }
-            else // The new widget is here
-            {
+            else {
                 endSlideInside(true);
                 return;
             }
         }
-
-        Vec3 pos1 = getPosition();
-        Vec3 pos2 = pos1;
+        
+        Vec2 pos = getPosition();
+        pos.x = 235;
 
         double distance = getSize().x;
-
         if (slideout)
         {
             double stime = t*t;
             double shtime = slidingTime*slidingTime;
-            slidingOffset = distance*stime/shtime;
-            pos1.x += distance;
-            pos2.x += slidingOffset;
+            pos.x += distance*stime/shtime;
+            
         }
         else
         {
             double stime = (slidingTime-t)*(slidingTime-t);
             double shtime = slidingTime*slidingTime;
-            slidingOffset = distance*stime/shtime;
-            pos2.x += distance;
-            pos1.x += slidingOffset;
+            pos.x += distance*stime/shtime;
         }
-
+        //suspendLayout();
+        setPosition(pos);
+        //resumeLayout();
         requestDraw();
-        if (contentWidget  != NULL) contentWidget->setPosition(pos1);
-        if (previousWidget != NULL) previousWidget->setPosition(pos2);
+    }
+	
+	void SliderContainer::addContentWidget()
+	{
+        onSlideOutside(); // Sends notification that we are now outside the screen, before adding the content widget
+		add(contentWidget);
+	}
+    
+    void SliderContainer::addListener(SliderContainerListener &listener)
+    {
+        this->listeners.push_back(&listener);
+    }
+    
+    void SliderContainer::onSlideOutside()
+    {
+        for (std::vector<SliderContainerListener *>::iterator iter = this->listeners.begin() ; iter != this->listeners.end() ; iter++) {
+            (*iter)->onSlideOutside(*this);
+        }
+    }
+    
+    void SliderContainer::onSlideInside()
+    {
+        for (std::vector<SliderContainerListener *>::iterator iter = this->listeners.begin() ; iter != this->listeners.end() ; iter++) {
+            (*iter)->onSlideInside(*this);
+        }
     }
 
     //
@@ -976,15 +988,6 @@ namespace gameui {
     void Screen::draw(SDL_Surface *surface)
     {
         if (!isVisible()) return;
-        /*if (bg) {
-          SDL_Rect rect;
-          rect.x = (Sint16)rootContainer.getPosition().x;
-          rect.y = (Sint16)rootContainer.getPosition().y;
-          rect.w = (Uint16)rootContainer.getSize().x;
-          rect.h = (Uint16)rootContainer.getSize().y;
-          SDL_BlitSurface(bg->surf, NULL, surface, &rect);
-          }*/
-        //rootContainer.checkFocus();
         rootContainer.doDraw(surface);
     }
 
@@ -1000,6 +1003,17 @@ namespace gameui {
         rootContainer.eventOccured(event);
         rootContainer.giveFocus(); /* Utile mais mouaif */
         requestDraw();
+    }
+    
+    void Screen::onDrawableVisibleChanged(bool visible)
+    {
+        hidden = !visible;
+        onScreenVisibleChanged(visible);
+    }
+    
+    void Screen::onScreenVisibleChanged(bool visible)
+    {
+        rootContainer.onWidgetVisibleChanged(visible);
     }
 
     void Screen::giveFocus()

@@ -2,7 +2,6 @@
 
 #include "PuyoCommander.h"
 #include "PuyoStrings.h"
-#include "gameui.h"
 #include "preferences.h"
 #include "audio.h"
 #include "PuyoSinglePlayerStarter.h"
@@ -62,16 +61,27 @@ PuyoScreen::PuyoScreen() : Screen(0,0,WIDTH,HEIGHT) {}
 
 PuyoMainScreen::PuyoMainScreen(PuyoStoryWidget *fgStory, PuyoStoryWidget *bgStory)
     : menuBG(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/menubg.png"))),
-      fgStory(fgStory), bgStory(bgStory), transition(NULL)
+      fgStory(fgStory), bgStory(bgStory), transition(NULL), nextFullScreen(false)
 {
     if (bgStory != NULL)
         add(bgStory);
     add(&container);
-    if (fgStory != NULL)
+    if (fgStory != NULL) {
+		setInNetGameCenter(false);
         add(fgStory);
+	}
         
     this->updateSize();
     container.setBackground(menuBG);
+    container.addListener(*this);
+}
+
+void PuyoMainScreen::setInNetGameCenter(bool inNetGameCenter)
+{
+	if (fgStory != NULL) {
+		fgStory->setIntegerValue("@inNetGameCenter", inNetGameCenter == false ? 0 : 1);
+		printf("inNetGameCenter: %d\n", inNetGameCenter == false ? 0 : 1);
+	}
 }
 
 void PuyoMainScreen::updateSize()
@@ -93,9 +103,11 @@ PuyoMainScreen::~PuyoMainScreen()
     }
 }
 
-void PuyoMainScreen::pushMenu(PuyoMainScreenMenu *menu)
+void PuyoMainScreen::pushMenu(PuyoMainScreenMenu *menu, bool fullScreen)
 {
     menuStack.push(container.getContentWidget());
+    fullScreenStack.push(fullScreen);
+    nextFullScreen = fullScreen;
     container.transitionToContent(menu);
 }
 
@@ -103,6 +115,8 @@ void PuyoMainScreen::popMenu()
 {
     if (menuStack.size() == 1)
         return;
+    fullScreenStack.pop();
+    nextFullScreen = fullScreenStack.top();
     container.transitionToContent(menuStack.top());
     menuStack.pop();
 }
@@ -129,6 +143,22 @@ void PuyoMainScreen::onEvent(GameControlEvent *cevent)
     case GameControlEvent::kBack:
         popMenu();
         break;
+    }
+}
+
+void PuyoMainScreen::onSlideOutside(SliderContainer &slider)
+{
+    if (nextFullScreen) {
+        Vec3 menuPos = container.getPosition();
+        menuPos.y = 0;
+        container.setPosition(menuPos);
+        container.setSize(Vec3(WIDTH, HEIGHT, 0));
+    }
+    else {
+        Vec3 menuPos = container.getPosition();
+        menuPos.y = MENU_Y;
+        container.setPosition(menuPos);
+        container.setSize(Vec3(menuBG->w, menuBG->h, 0));
     }
 }
 

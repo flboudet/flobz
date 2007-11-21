@@ -54,17 +54,25 @@ using namespace ios_fc;
 class PushLanNetCenterMenuAction : public Action
 {
 public:
-    PushLanNetCenterMenuAction(EditField *serverPort, EditField *userName) : serverPort(serverPort), userName(userName) {}
+    PushLanNetCenterMenuAction(PuyoMainScreen * mainScreen, EditField *serverPort, EditField *userName)
+        : mainScreen(mainScreen), serverPort(serverPort), userName(userName) {}
     
     void action()
     {
         PuyoLanGameCenter *gameCenter = new PuyoLanGameCenter(atoi(serverPort->getValue()), userName->getValue());
-        NetCenterMenu *newNetCenterMenu = new NetCenterMenu(gameCenter);
-        newNetCenterMenu->setAutoRelease(true);
+        NetCenterMenu *newNetCenterMenu = new NetCenterMenu(mainScreen, gameCenter);
+		//newNetCenterMenu->setSize(Vec2(640, 480));
+		//newNetCenterMenu->setPosition(Vec2(0, 0));
+        //newNetCenterMenu->setAutoRelease(true);
         newNetCenterMenu->build();
-        (GameUIDefaults::SCREEN_STACK)->push(newNetCenterMenu);
+		//newNetCenterMenu->setSize(Vec2(640, 480));
+		//newNetCenterMenu->setPosition(Vec2(0, 0));
+        mainScreen->pushMenu(newNetCenterMenu, true);
+		mainScreen->setInNetGameCenter(true);
+        //(GameUIDefaults::SCREEN_STACK)->push(newNetCenterMenu);
     }
 private:
+    PuyoMainScreen * mainScreen;
     EditField *serverPort;
     EditField *userName;
 };
@@ -77,7 +85,7 @@ LANGameMenu::LANGameMenu(PuyoMainScreen * mainScreen)
                     PuyoGame::getDefaultPlayerName(-1), PuyoGame::getDefaultPlayerKey(-1)),
     portNumLabel(theCommander->getLocalizedString("Port number:"), "6581"), cancelAction(mainScreen),
     startButton(theCommander->getLocalizedString("Start!"),
-                new PushLanNetCenterMenuAction(portNumLabel.getEditField(), playerNameLabel.getEditField())),
+                new PushLanNetCenterMenuAction(mainScreen, portNumLabel.getEditField(), playerNameLabel.getEditField())),
     cancelButton(theCommander->getLocalizedString("Back"), &cancelAction)
 {
 }
@@ -274,12 +282,14 @@ public:
     void action()
     {
       try {
+#ifdef DISABLED
         PuyoInternetGameCenter *gameCenter = new PuyoInternetGameCenter(serverName->getValue(),
                                                                         atoi(serverPort->getValue()), userName->getValue());
         NetCenterMenu *newNetCenterMenu = new NetCenterMenu(gameCenter);
         newNetCenterMenu->setAutoRelease(true);
         newNetCenterMenu->build();
         (GameUIDefaults::SCREEN_STACK)->push(newNetCenterMenu);
+#endif
       } catch (Exception e) {
         fprintf(stderr, "Error while connecting to %s\n", serverName->getValue().c_str());
         e.printMessage();

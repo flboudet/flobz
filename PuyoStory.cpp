@@ -237,6 +237,7 @@ void PuyoStoryScreen::onEvent(GameControlEvent *cevent)
     //case GameControlEvent::kStart:
     case GameControlEvent::kBack:
     case GameControlEvent::kStart:
+    case GameControlEvent::kGameMouseClicked:
         if (finishedAction != NULL) {
             finishedAction->action();
 	    passEvent = false;
@@ -246,6 +247,13 @@ void PuyoStoryScreen::onEvent(GameControlEvent *cevent)
     if (passEvent)
       Screen::onEvent(cevent);
 }
+
+void PuyoStoryScreen::onScreenVisibleChanged(bool visible)
+{
+    theCommander->setCursorVisible(!visible);
+    Screen::onScreenVisibleChanged(visible);
+}
+
 
 PuyoFX::PuyoFX(String fxName)
     : PuyoStoryWidget(fxName,NULL,true), fxName(fxName)
@@ -280,3 +288,4 @@ void PuyoFX::postEvent(const char *name, float x, float y)
 {
     styrolyse_event(currentStory, name, x, y);
 }
+

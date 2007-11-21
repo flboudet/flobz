@@ -142,6 +142,7 @@ void GameLoop::addDrawable(DrawableComponent *gc)
 #endif
   drawables.add(gc);
   gc->parentLoop = this;
+  gc->onDrawableVisibleChanged(true);
 }
 
 void GameLoop::addIdle(IdleComponent *gc)
@@ -165,6 +166,7 @@ void GameLoop::removeDrawable(DrawableComponent *gc)
 #endif
       drawables[i] = NULL;
       gc->parentLoop = NULL;
+      gc->onDrawableVisibleChanged(false);
     }
   }
 }

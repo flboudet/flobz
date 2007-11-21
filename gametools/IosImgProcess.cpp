@@ -664,8 +664,6 @@ void IIM_BlitSurfaceAlpha(IIM_Surface *src, IIM_Rect *src_rect, SDL_Surface *dst
 {
   assert(src != NULL);
   assert(src->surf != NULL);
-  assert(alpha >= 0);
-  assert(alpha <= 255);
   SDL_SetAlpha(src->surf, SDL_SRCALPHA|(useGL?0:SDL_RLEACCEL), alpha);
   SDL_BlitSurface(src->surf, src_rect, dst, dst_rect);
 }

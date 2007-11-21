@@ -109,11 +109,11 @@ private:
     PuyoNetGameCenter &netCenter;
 };
 
-class NetCenterMenu : public PuyoScreen, PuyoNetGameCenterListener, ChatBoxDelegate {
+class NetCenterMenu : public PuyoMainScreenMenu, PuyoNetGameCenterListener, ChatBoxDelegate {
 public:
-    NetCenterMenu(PuyoNetGameCenter *netCenter);
+    NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netCenter, GameLoop *loop = NULL);
     ~NetCenterMenu();
-    void build();
+    virtual void build();
     void onChatMessage(const String &msgAuthor, const String &msg);
     void onPlayerConnect(String playerName, PeerAddress playerAddress);
     void onPlayerDisconnect(String playerName, PeerAddress playerAddress);
@@ -128,6 +128,8 @@ public:
     void selfDestroy() { shouldSelfDestroy = true; }
     void show();
     virtual void sendChat(String chatText);
+    // Notification
+    virtual void onWidgetVisibleChanged(bool visible);
 private:
     class NetCenterCycled : public CycledComponent {
     public:
@@ -143,11 +145,10 @@ private:
     VBox playerbox;
     Text playerListText, chatAreaText, title;
     Button cancelButton;
-    PopScreenAction backAction;
+    PuyoPopMenuAction backAction;
     NetCenterPlayerList playerList;
     NetCenterCycled cycled;
     PuyoNetGameCenter *netCenter;
-    PuyoStoryWidget story;
     SliderContainer container;
     NetCenterDialogMenu *onScreenDialog;
     bool shouldSelfDestroy;

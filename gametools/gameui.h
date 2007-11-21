@@ -1,6 +1,7 @@
 #ifndef GAMEUI_H
 #define GAMEUI_H
 
+#include <vector>
 #include "SDL_Painter.h"
 #include "GameControls.h"
 #include "ios_fc.h"
@@ -101,6 +102,8 @@ namespace gameui {
       bool receiveUpEvents() const { return receiveUp; }
       void setReceiveUpEvents(bool receiveUp) { this->receiveUp = receiveUp; }
       virtual void checkFocus() {}
+      
+      virtual void onWidgetVisibleChanged(bool visible) { hidden = !visible; }
 
     protected:
       // To be implemented on each widgets
@@ -153,12 +156,18 @@ namespace gameui {
       /** Returns the number of focusable child in the child tree
        */
       int getNumberOfFocusableChilds();
+      
+      void suspendLayout() { layoutSuspended = true; }
+      void resumeLayout() { layoutSuspended = false; }
+      
+      virtual void onWidgetVisibleChanged(bool visible);
     protected:
       Widget *getChild(int i)     const  { return childs[i]; }
       void    changeChild(int i, Widget *w);
       int     getNumberOfChilds() const  { return childs.size(); }
       void    sortWidgets();
       int     innerMargin;
+      bool    layoutSuspended;
 
     private:
       Vector<Widget> childs;
@@ -246,14 +255,52 @@ namespace gameui {
       bool isOtherDirection(GameControlEvent *event) const;
   };
 
+  class SliderContainer;
+  
+  /**
+   * Represents a slider notification listener
+   */
+  class SliderContainerListener {
+  public:
+      /**
+       * Notify that the slider is outside of the screen, before sliding back inside
+       */
+      virtual void onSlideOutside(SliderContainer &slider) {}
+      /**
+       * Notify that the slider is inside the screen, at the end of its sliding movement
+       */
+      virtual void onSlideInside(SliderContainer &slider) {}
+  };
+  
+  /**
+   * Represents a slider container, ie a container which slides from one side of the screen
+   * to present a content, and which can slide back to the side of the screen to change its
+   * content
+   */
   class SliderContainer : public ZBox, IdleComponent {
     public:
       SliderContainer(GameLoop *loop = NULL);
       virtual ~SliderContainer() {}
+      /**
+       * Slides the current widget out of the screen, then slides back with a new widget.
+       * @param content  The widget to be placed inside the slider when the slider slides back
+       */
       void transitionToContent(Widget *content);
+      /**
+       * Returns the widget contained inside the slider
+       * @return  the widget contained inside the slider
+       */
       Widget * getContentWidget() const { return contentWidget; }
-
+      /**
+       * Changes the background image of the slider
+       * @param bg    The new background image
+       */
       void setBackground(IIM_Surface *bg) { this->bg = bg; }
+      /**
+       * Adds a new listener to the events of the SliderContainer widget
+       * @param listener   the reference of the new listener object
+       */
+      void addListener(SliderContainerListener &listener);
       
       // Implements IdleComponent
       virtual void idle(double currentTime);
@@ -263,17 +310,29 @@ namespace gameui {
       // Implements Widget
       virtual void draw(SDL_Surface *screen);
       void eventOccured(GameControlEvent *event);
+	  void addContentWidget();
       void endSlideInside(bool inside);
       
+      // Notifications
+      /**
+       * Notify that the slider is outside of the screen, before sliding back inside
+       */
+      virtual void onSlideOutside();
+      /**
+       * Notify that the slider is inside the screen, at the end of its sliding movement
+       */
+      virtual void onSlideInside();
+      
     private:
+	  double slidingTime;
       Widget *contentWidget;
       Widget *previousWidget;
       double slideStartTime;
       double currentTime;
-      double slidingOffset;
       IIM_Surface *bg;
       bool sliding;
       bool slideout;
+      std::vector<SliderContainerListener *> listeners;
   };
 
   /**
@@ -294,8 +353,9 @@ namespace gameui {
       void onEvent(GameControlEvent *event);
       void remove(Widget *child) { rootContainer.remove(child); }
       void add(Widget *child) { rootContainer.add(child); }
-      virtual void hide() { hidden = true; }
-      virtual void show() { hidden = false; }
+      virtual void hide() { hidden = true; onScreenVisibleChanged(isVisible()); }
+      virtual void show() { hidden = false; onScreenVisibleChanged(isVisible());}
+      virtual void onDrawableVisibleChanged(bool visible);
       bool isVisible() const { return !hidden; }
       
       virtual void addToGameLoop(GameLoop *loop) {
@@ -315,6 +375,9 @@ namespace gameui {
       
       void setAutoRelease(bool autoRelease) { autoReleaseFlag = autoRelease; }
       void autoRelease();
+      
+      // screen callbacks
+      virtual void onScreenVisibleChanged(bool visible);
       
     private:
       ZBox rootContainer;

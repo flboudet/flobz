@@ -21,28 +21,39 @@ class PuyoScreen : public Screen {
 
 class PuyoMainScreenMenu;
 
-class PuyoMainScreen : public PuyoScreen {
+class PuyoMainScreen : public PuyoScreen, public SliderContainerListener {
   public:
     PuyoMainScreen(PuyoStoryWidget *fgStory = NULL, PuyoStoryWidget *bgStory = NULL);
     ~PuyoMainScreen();
-    void pushMenu(PuyoMainScreenMenu *menu);
+    void pushMenu(PuyoMainScreenMenu *menu, bool fullScreen = false);
     void popMenu();
     void build() {}
     void transitionFromScreen(Screen &fromScreen);
     void onEvent(GameControlEvent *cevent);
     void updateSize();
+	void setInNetGameCenter(bool inNetGameCenter);
+    // SliderContainerListener implementation
+    /**
+     * Notify that the slider is outside of the screen, before sliding back inside
+     */
+    virtual void onSlideOutside(SliderContainer &slider);
   protected:
     IIM_Surface   *menuBG;
     SliderContainer container;
     PuyoStoryWidget *fgStory, *bgStory;
     Stack<Widget*> menuStack;
+    Stack<bool> fullScreenStack;
     PuyoScreenTransitionWidget *transition;
+    bool nextFullScreen;
 };
 
 class PuyoMainScreenMenu : public VBox {
 public:
     PuyoMainScreenMenu(PuyoMainScreen *mainScreen, GameLoop *loop = NULL) : VBox(loop), mainScreen(mainScreen) {}
     virtual void build() = 0;
+    // Notifications
+    virtual void onMainScreenMenuPushed() {}
+    virtual void onMainScreenMenuPoped() {}
 protected:
     PuyoMainScreen *mainScreen;
 };

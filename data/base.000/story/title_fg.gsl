@@ -1,5 +1,9 @@
 import <flying_flobo.gsl>
 
+int @inNetGameCenter
+float @kaoriMovesFCycle
+float @kaoriDestX
+
 <init>
   float @BigPuyoDelay = 200.
   float @BigPuyoShowAfter = @BigPuyoDelay
@@ -20,7 +24,9 @@ import <flying_flobo.gsl>
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
   # This also allows you to specify the drawing order
-  flying_flobo_sprite_list
+  (@inNetGameCenter != 3)? {
+    flying_flobo_sprite_list
+  }
   sprite::@kaori display=@display
   sprite::@kaorieyes display=@display
   sprite::@bigpuyo display=@display
@@ -49,5 +55,18 @@ import <flying_flobo.gsl>
     (@bigpuyo.pos.y < 400.)? @BigPuyoApogee = 1
     (@BigPuyoApogee = 1)? (@bigpuyo.pos.y > 480.)? @ShowBigPuyo=0
   }
-  move::@kaori   fcycle=10.0      x=20.0 y=@kaori.pos.y
+  (@inNetGameCenter = 0)? {
+    @kaoriMovesFCycle = @fcycle + 10.0
+    @kaoriDestX=20.0
+	@inNetGameCenter = 2
+  }
+  (@inNetGameCenter = 1)? {
+    @kaoriMovesFCycle = @fcycle + 20.0
+	@kaoriDestX=-300.0
+    @inNetGameCenter = 3
+  }
+  (@inNetGameCenter > 1)? {
+    move::@kaori   fcycle=@kaoriMovesFCycle      x=@kaoriDestX y=@kaori.pos.y
+  }
+  
   (@cycle = 1000)? @finished = 1

@@ -161,19 +161,14 @@ String NetCenterTwoNameProvider::getPlayer2Name() const
     return netCenter.getOpponentName();
 }
 
-/*void NetCenterMenu::ChatAction::action()
-{
-    printf("Chat:%s\n", (const char *)(chatInput->getValue()));
-    netCenter->sendMessage(chatInput->getValue());
-}*/
-
-NetCenterMenu::NetCenterMenu(PuyoNetGameCenter *netCenter)
-    : netCenter(netCenter), playerListText(theCommander->getLocalizedString("Player List")),
+NetCenterMenu::NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netCenter, GameLoop *loop)
+    : PuyoMainScreenMenu(mainScreen, loop),
+      netCenter(netCenter), playerListText(theCommander->getLocalizedString("Player List")),
       chatAreaText(theCommander->getLocalizedString("Chat Area")),
       cycled(this),
-      playerList(8, this), story("networkmenu.gsl"), onScreenDialog(NULL), shouldSelfDestroy(false),
+      playerList(8, this), onScreenDialog(NULL), shouldSelfDestroy(false),
       nameProvider(*netCenter), chatBox(*this),
-      title(theCommander->getLocalizedString("Network Game Center")), backAction(),
+      title(theCommander->getLocalizedString("Network Game Center")), backAction(mainScreen),
       cancelButton(theCommander->getLocalizedString("Disconnect"), &backAction)
 {
     GameUIDefaults::GAME_LOOP->addIdle(&cycled);
@@ -183,6 +178,8 @@ NetCenterMenu::NetCenterMenu(PuyoNetGameCenter *netCenter)
 NetCenterMenu::~NetCenterMenu()
 {
     printf("Deleting the net center\n");
+    // Warn the mainScreen that we are not in the net game center any more
+    mainScreen->setInNetGameCenter(false);
     // Delete the network center because no one else would do it
     delete netCenter;
 }
@@ -194,7 +191,6 @@ void NetCenterMenu::cycle()
 
 void NetCenterMenu::build()
 {
-    add(&story);
     add(&container);
 
     container.add(&mainBox);
@@ -256,6 +252,13 @@ void NetCenterMenu::onGameInvitationReceived(PuyoGameInvitation &invitation)
     }
 }
 
+void NetCenterMenu::onWidgetVisibleChanged(bool visible)
+{
+    printf("netcentermenu visible: %s\n", visible ? "true" : "false");
+    if (!visible)
+        delete this;
+}
+
 void NetCenterMenu::grantCurrentGame()
 {
     if (this->onScreenDialog != NULL) {
@@ -312,5 +315,5 @@ void NetCenterMenu::playerSelected(PeerAddress playerAddress, String playerName)
 void NetCenterMenu::show()
 {
   netCenter->setStatus(PEER_NORMAL);
-  Screen::show();
+  //Screen::show();
 }

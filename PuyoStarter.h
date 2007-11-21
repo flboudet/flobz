@@ -193,6 +193,10 @@ public:
     virtual void setPaused(bool fromControls);
     virtual void setResumed(bool fromControls);
     PuyoPauseMenu & getPauseMenu() { return pauseMenu; }
+    /* Notification on screen visibility change
+     * @param visible  true if the scren is visible, otherwise false
+     */
+    virtual void onScreenVisibleChanged(bool visible);
 private:
     bool paused;
     ContinueAction continueAction;

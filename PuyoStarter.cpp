@@ -622,6 +622,11 @@ void PuyoGameScreen::setOverlayStory(PuyoStoryWidget *story)
   this->add(story);
 }
 
+void PuyoGameScreen::onScreenVisibleChanged(bool visible)
+{
+    theCommander->setCursorVisible(!visible);
+}
+
 PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
                                                      attachedRandom(5), attachedGameFactory(&attachedRandom),
                                                      areaA(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,

@@ -54,7 +54,7 @@
     @enemy6.image = "introlevel/unmapped-mini.png" # Aliens
     @enemy7.image = "introlevel/frankenpuyo-mini.png"
     @enemy8.image = "introlevel/mcflurry-mini.png"
-    @enemy9.image = "introlevel/unmapped-mini.png" # Meca Puyo
+    @enemy9.image = "introlevel/mechapuyo-mini.png"
 
   for i in (@shadow1 @shadow2 @shadow3 @shadow4 @shadow5 @shadow6 @shadow7 @shadow8 @shadow9) do {
     i = [new_sprite: image="introlevel/shadow-mini.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
