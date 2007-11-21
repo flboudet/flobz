@@ -414,7 +414,6 @@ namespace gameui {
                     wid->giveFocus();
                 }
             }
-            return;
         }
         
         // This stuff has the following behaviour:
