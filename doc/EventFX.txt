@@ -13,3 +13,7 @@ Where: Position of the impact.
 - "end_falling"
 When: A puyo was bouncing and reach its final position.
 Where: Position of the puyo.
+
+- "neutral_pop"
+When: A neutral puyo is being destroyed.
+Where: Position of the neutral puyo.

@@ -400,6 +400,9 @@ void NeutralPopAnimation::cycle()
         iter ++;
         if (iter == 17 + delay) {
             AudioManager::playSound("pop.wav", .25);
+            EventFX("neutral_pop", 
+                    attachedPuyo.getScreenCoordinateX() + TSIZE/2,
+                    attachedPuyo.getScreenCoordinateY() + TSIZE/2);
             enabled = true;
         }
         else if (iter == 30 + delay) {
