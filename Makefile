@@ -37,13 +37,13 @@ flobopuyo: all.h.gch iosfc_dir gametools_dir goomsl_dir ${OBJFILES}
 	@echo "--------------------------------------"
 
 iosfc_dir:all.h.gch
-	@+DEPFLAGS='$(DEPFLAGS)' CFLAGS='$(CFLAGS)' CXXFLAGS='$(CXXFLAGS)' LDFLAGS='$(LDFLAGS)' CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) CXX=$(CXX)  make -C iosfc libiosfc.a
+	@+DEPFLAGS='$(DEPFLAGS)' CFLAGS='$(CFLAGS)' CXXFLAGS='$(CXXFLAGS)' LDFLAGS='$(LDFLAGS)' CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C iosfc libiosfc.a
 
 gametools_dir:all.h.gch
-	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C gametools object
+	@+DEPFLAGS='$(DEPFLAGS)' CFLAGS='$(CFLAGS)' CXXFLAGS='$(CXXFLAGS)' LDFLAGS='$(LDFLAGS)' CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C gametools object
 
 goomsl_dir:all.h.gch
-	@+CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C goomsl object
+	@+DEPFLAGS='$(DEPFLAGS)' CFLAGS='$(CFLAGS)' CXXFLAGS='$(CXXFLAGS)' LDFLAGS='$(LDFLAGS)' CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C goomsl object
 
 %.o:%.cpp all.h.gch
 	@mkdir -p $(DEPDIR);\
