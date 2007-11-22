@@ -19,6 +19,7 @@ int @maxHeightAI
 int @neutralsForPlayer
 int @neutralsForAI
 string @event_type
+int  @event_player
 
 (@mode = INIT)? {
   @finished = 0
@@ -29,6 +30,7 @@ string @event_type
   @neutralsForPlayer = 0
   @neutralsForAI = 0
   @event_type = "0123456789012345678901234567890123456789"
+  @event_player = 0
   init
 }
 
@@ -46,9 +48,9 @@ struct <Vec2:
   float y>
 Vec2 @event_pos
 
-declare <event: string type, Vec2 pos>
+declare <event: string type, Vec2 pos, int player>
 
-(@mode = EVENT)? event: type=@event_type pos=@event_pos
+(@mode = EVENT)? event: type=@event_type pos=@event_pos player=@event_player
 
 struct <Sprite:
   string parent,

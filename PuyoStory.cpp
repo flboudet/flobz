@@ -1,6 +1,7 @@
 #include "PuyoStory.h"
 #include "PuyoCommander.h"
 #include "audio.h"
+#include "AnimatedPuyoTheme.h"
 
 extern SoFont *storyFont;
 
@@ -49,11 +50,33 @@ static char *pathResolverFunction (StyrolyseClient *_this, const char *path)
   }
 }
 
+class StyroImage
+{
+    public:
+        String path;
+        IIM_Surface *surface;
+
+        StyroImage(const char *path) : path(path)
+        {
+            if (path[0] == '@') {
+                surface = getPuyoThemeManger()->getAnimatedPuyoSetTheme()->getAnimatedPuyoTheme((PuyoState)11)->getSurface((PuyoPictureType)0, 0);
+            }
+            else {
+                String imgPath = theCommander->getDataPathManager().getPath(FilePath("gfx").combine(path));
+                surface = IIM_Load_Absolute_DisplayFormatAlpha(imgPath);
+            }
+        }
+
+        ~StyroImage() {
+            if (path[0] != '@')
+                IIM_Free(surface);
+        }
+};
+
 static void *loadImage (StyrolyseClient *_this, const char *path)
 {
   try {
-    String imgPath = theCommander->getDataPathManager().getPath(FilePath("gfx").combine(path));
-    return IIM_Load_Absolute_DisplayFormatAlpha(imgPath);
+      return new StyroImage(path);
   }
   catch (Exception e) {
     return NULL;
@@ -64,7 +87,8 @@ static void *loadImage (StyrolyseClient *_this, const char *path)
 static void  drawImage (StyrolyseClient *_this, void *image, int x, int y,
                  int clipx, int clipy, int clipw, int cliph)
 {
-  IIM_Surface *surf = (IIM_Surface*)image;
+  StyroImage  *simg = (StyroImage*)image;
+  IIM_Surface *surf = simg->surface;
   SDL_Rect  rect, cliprect;
   rect.x = x;
   rect.y = y;
@@ -78,7 +102,7 @@ static void  drawImage (StyrolyseClient *_this, void *image, int x, int y,
 
 static void  freeImage (StyrolyseClient *_this, void *image)
 {
-  IIM_Free((IIM_Surface*)image);
+    delete (StyroImage*)image;
 }
 
 static void putText (StyrolyseClient *_this, int x, int y, const char *text)
@@ -272,8 +296,8 @@ bool PuyoFX::supportFX(const char *fx) const
 {
     String haystack(styrolyse_getstr(currentStory, "@supported_fx"));
     String needle(fx);
-    haystack += ",";
-    needle += ",";
+    haystack = String(",") + haystack + ",";
+    needle = String(",") + needle + ",";
     return (strstr(haystack.c_str(), needle.c_str()) != NULL);
 }
 
@@ -284,8 +308,8 @@ PuyoFX *PuyoFX::clone() const
     return fx;
 }
 
-void PuyoFX::postEvent(const char *name, float x, float y)
+void PuyoFX::postEvent(const char *name, float x, float y, int player)
 {
-    styrolyse_event(currentStory, name, x, y);
+    styrolyse_event(currentStory, name, x, y, player);
 }
 

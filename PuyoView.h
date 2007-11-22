@@ -84,6 +84,7 @@ class PuyoView : public PuyoDelegate {
     void puyoDidFall(PuyoPuyo *puyo, int originX, int originY);
     void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase);
     void gameLost();
+    int getPlayerId() const { return (xOffset < 320) ? 1 : 2; }
     
   protected:
     bool cycleAllowed();

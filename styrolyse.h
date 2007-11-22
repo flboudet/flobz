@@ -37,7 +37,7 @@ void styrolyse_setint(Styrolyse *_this, const char *varname, int value);
 int styrolyse_getint(Styrolyse *_this, const char *varname);
 const char *styrolyse_getstr(Styrolyse *_this, const char *varname);
 
-void styrolyse_event(Styrolyse *_this, const char *event, float x, float y);
+void styrolyse_event(Styrolyse *_this, const char *event, float x, float y, int player);
 
 int  styrolyse_current_cycle(Styrolyse *_this);
 

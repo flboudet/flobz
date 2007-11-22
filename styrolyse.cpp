@@ -275,7 +275,7 @@ void styrolyse_free(Styrolyse *_this)
   free(_this);
 }
 
-void styrolyse_event(Styrolyse *_this, const char *event, float x, float y)
+void styrolyse_event(Styrolyse *_this, const char *event, float x, float y, int player)
 {
   if (!_this->gsl) return;
   /* mutexifier cette fonction si multi-thread */
@@ -285,6 +285,7 @@ void styrolyse_event(Styrolyse *_this, const char *event, float x, float y)
     GSL_GLOBAL_FLOAT(_this->gsl, "@delta_t") = 0.0;
     GSL_GLOBAL_FLOAT(_this->gsl, "@event_pos.x") = x;
     GSL_GLOBAL_FLOAT(_this->gsl, "@event_pos.y") = y;
+    GSL_GLOBAL_INT(_this->gsl, "@event_player") = player;
     styrolyse = _this;
     gsl_execute(_this->gsl);
 }

@@ -17,3 +17,18 @@ Where: Position of the puyo.
 - "neutral_pop"
 When: A neutral puyo is being destroyed.
 Where: Position of the neutral puyo.
+
+- "vanish"
+When: A member of a newly created group of puyo explodes.
+Where: Position of the exploding puyo.
+
+--- ANNEXE ---
+
+typedef enum {
+    PUYO_FACES = 0,
+    PUYO_CIRCLES = 1,
+    PUYO_EXPLOSIONS = 2,
+    PUYO_DISAPPEAR = 3,
+    PUYO_EYES = 4,
+    PUYO_SHADOWS = 5
+} PuyoPictureType;

@@ -1,3 +1,5 @@
+loadImage styrolyse, vraiment parser les "@11.0" => Pour les images venant du theme de puyo.
+En game over, pouvoir cliquer sur ENTER.
 #In game menu background wrong when changing keys while playing
 #Correct the joystick 1P/2P fonctionality
 #Make puyos fall from 3rd column instead of 4th
@@ -16,4 +18,4 @@ Net Play
 #Explosions trop rapides qd on accelere les cycles (fleche du bas)
 #Ameliorer ce putain de makefile (cible statique pour mac, et surtout ne pas compiler glsdl quand opengl est desactive, c'est une horreur a compiler sur les becanes qui n'ont pas opengl installe, et eventuellement gerer mieux les dependances)
 #Faire un systeme d'installation decent pour Linux
-Fix pour le probleme des connexions de sockets impossibles : une implementation multi-threads du HttpDoc ? (warum nicht...)
+Fix pour le probleme des connexions de sockets impossibles : une implementation multi-threads du HttpDoc ? (warum nicht...)`

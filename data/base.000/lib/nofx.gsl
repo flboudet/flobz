@@ -1,2 +1,2 @@
-<event: string type, Vec2 pos>
+<event: string type, Vec2 pos, int player>
 

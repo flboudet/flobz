@@ -26,7 +26,7 @@
 #ifndef _PUYOANIMATIONS
 #define _PUYOANIMATIONS
 
-void EventFX(const char *name, float x, float y);
+void EventFX(const char *name, float x, float y, int player);
 
 #include <stdlib.h>
 #include <math.h>

@@ -73,7 +73,7 @@ protected:
 class PuyoFX : public PuyoStoryWidget {
 public:
     PuyoFX(String fxName);
-    void postEvent(const char *name, float x, float y);
+    void postEvent(const char *name, float x, float y, int player);
     bool busy() const;
     bool supportFX(const char *str) const;
     PuyoFX *clone() const;

@@ -80,7 +80,11 @@ void NeutralAnimation::cycle()
         step += 0.5;
         if (currentY >= Y) {
             int choosenSound = random() % 2;
-            AudioManager::playSound(sound_bim[choosenSound], sound_bim_volume[choosenSound]);
+            /*EventFX("neutral_bouncing", 
+                attachedPuyo.getScreenCoordinateX() + TSIZE/2,
+                attachedPuyo.getScreenCoordinateY() + TSIZE/2,
+                attachedPuyo.getAttachedView()->getPlayerId());
+            AudioManager::playSound(sound_bim[choosenSound], sound_bim_volume[choosenSound]);*/
             finishedFlag = true;
             attachedPuyo.getAttachedView()->allowCycle();
             synchronizer->pop();
@@ -147,7 +151,8 @@ void TurningAnimation::cycle()
         AudioManager::playSound(sound_fff, sound_fff_volume);
         EventFX("turning",
                 attachedPuyo.getScreenCoordinateX() + TSIZE/2,
-                attachedPuyo.getScreenCoordinateY() + TSIZE/2);
+                attachedPuyo.getScreenCoordinateY() + TSIZE/2,
+                attachedPuyo.getAttachedView()->getPlayerId());
     }
     cpt++;
     angle += step;
@@ -206,7 +211,7 @@ FallingAnimation::FallingAnimation(AnimatedPuyo &puyo, int originY, int xOffset,
         bouncing = -1;
     }
     attachedPuyo.getAttachedView()->disallowCycle();
-    EventFX("start_falling", X+TSIZE/2,Y+TSIZE/2);
+    EventFX("start_falling", X+TSIZE/2, Y+TSIZE/2, puyo.getAttachedView()->getPlayerId());
 }
 
 void FallingAnimation::cycle()
@@ -220,14 +225,13 @@ void FallingAnimation::cycle()
         if (bouncing < 0) {
             finishedFlag = true;
             AudioManager::playSound("bam1.wav", .1);
-            EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2);
-            EventFX("end_falling", X+TSIZE/2,Y+TSIZE/2);
+            EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
+            EventFX("end_falling", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
             attachedPuyo.getAttachedView()->allowCycle();
         }
         else if (BOUNCING_OFFSET[bouncing] == 0) {
             AudioManager::playSound("bam1.wav", .1);
-
-            EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2);
+            EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
         }
     }
 }
@@ -278,6 +282,12 @@ void VanishAnimation::cycle()
     else if (synchronizer->isSynchronized()) {
         enabled = true;
         iter ++;
+        if (iter == 1) {
+            EventFX("vanish",
+                    attachedPuyo.getScreenCoordinateX() + TSIZE/2,
+                    attachedPuyo.getScreenCoordinateY() + TSIZE/2,
+                    attachedPuyo.getAttachedView()->getPlayerId());
+        }
         if (iter == 20 + delay) {
             attachedPuyo.getAttachedView()->allowCycle();
         }
@@ -402,7 +412,8 @@ void NeutralPopAnimation::cycle()
             AudioManager::playSound("pop.wav", .25);
             EventFX("neutral_pop", 
                     attachedPuyo.getScreenCoordinateX() + TSIZE/2,
-                    attachedPuyo.getScreenCoordinateY() + TSIZE/2);
+                    attachedPuyo.getScreenCoordinateY() + TSIZE/2,
+                    attachedPuyo.getAttachedView()->getPlayerId());
             enabled = true;
         }
         else if (iter == 30 + delay) {

@@ -209,6 +209,7 @@ void PuyoGameWidget::initialize()
 
     // Load a few FX for the game
     puyoFX.push_back(new PuyoFX("fx/white_star.gsl"));
+    puyoFX.push_back(new PuyoFX("fx/vanish.gsl"));
 }
 
 PuyoGameWidget::~PuyoGameWidget()
@@ -479,11 +480,11 @@ void AbortAction::action()
 
 static std::vector<PuyoFX*> *activeFX = NULL;
 static int last_post = 0;
-void EventFX(const char *name, float x, float y)
+void EventFX(const char *name, float x, float y, int player)
 {
     if (activeFX == NULL) return;
 
-    printf("Simultaneous FX: %d\n", activeFX->size());
+    /* printf("Simultaneous FX: %d\n", activeFX->size()); */
 
     PuyoFX *supporting_fx = NULL;
     for (int i=0; i<activeFX->size(); ++i) {
@@ -494,7 +495,7 @@ void EventFX(const char *name, float x, float y)
             supporting_fx = fx;
             // FX not busy, report it the event
             if (!fx->busy()) {
-                fx->postEvent(name, x, y);
+                fx->postEvent(name, x, y, player);
                 return;
             }
         }
@@ -506,7 +507,7 @@ void EventFX(const char *name, float x, float y)
         PuyoFX *fx = supporting_fx->clone();
         activeFX->push_back(fx);
         fx->getGameScreen()->add(fx);
-        fx->postEvent(name, x, y);
+        fx->postEvent(name, x, y, player);
     }
 }
 
