@@ -296,12 +296,18 @@ namespace gameui {
        * @param bg    The new background image
        */
       void setBackground(IIM_Surface *bg) { this->bg = bg; }
+      void setBackgroundVisible(bool visible) { backgroundVisible = visible; }
+      
       /**
        * Adds a new listener to the events of the SliderContainer widget
        * @param listener   the reference of the new listener object
        */
       void addListener(SliderContainerListener &listener);
       
+      /* Sets current position when not sliding or dest position
+      during slideOut noifications, or inoperant while sliding */
+      void setPosition(const Vec3 &v3);
+
       // Implements IdleComponent
       virtual void idle(double currentTime);
       virtual IdleComponent *getIdleComponent() { return this; }
@@ -332,6 +338,8 @@ namespace gameui {
       IIM_Surface *bg;
       bool sliding;
       bool slideout;
+      Vec3 backupedPosition;
+      bool backgroundVisible;
       std::vector<SliderContainerListener *> listeners;
   };
 

@@ -645,7 +645,7 @@ namespace gameui {
         , ZBox(loop), slidingTime(.4)
         , contentWidget(NULL), previousWidget(NULL)
         , currentTime(0.0), slideStartTime(0.0)
-        , sliding(false), bg(NULL)
+        , sliding(false), bg(NULL), backgroundVisible(true)
     {
     }
 
@@ -657,14 +657,20 @@ namespace gameui {
     void SliderContainer::endSlideInside(bool inside)
     {
         sliding = false;
-        setPosition(Vec2(640 - getSize().x, getPosition().y));
+        setPosition(backupedPosition);
         requestDraw();
         onSlideInside(); // Send notification that we have slided inside
     }
-
+	
+    void SliderContainer::setPosition(const Vec3 &v3)
+    {
+        if (sliding == false) backupedPosition = v3;
+        ZBox::setPosition(v3);
+    }
+	
     void SliderContainer::draw(SDL_Surface *screen)
     {
-        if (bg != NULL)
+        if (bg != NULL && backgroundVisible)
         {
             IIM_Rect rect;
             rect.x = (Sint16)getPosition().x;
@@ -750,10 +756,9 @@ namespace gameui {
             }
         }
         
-        Vec2 pos = getPosition();
-        pos.x = 235;
+        Vec3 pos = backupedPosition;
 
-        double distance = getSize().x;
+        double distance = 640 - pos.x;
         if (slideout)
         {
             double stime = t*t;
@@ -768,14 +773,17 @@ namespace gameui {
             pos.x += distance*stime/shtime;
         }
         //suspendLayout();
-        setPosition(pos);
+        ZBox::setPosition(pos);
         //resumeLayout();
         requestDraw();
     }
 	
 	void SliderContainer::addContentWidget()
 	{
+		bool s = sliding;
+		sliding = false;
         onSlideOutside(); // Sends notification that we are now outside the screen, before adding the content widget
+		sliding = s;
 		add(contentWidget);
 	}
     

@@ -148,17 +148,20 @@ void PuyoMainScreen::onEvent(GameControlEvent *cevent)
 
 void PuyoMainScreen::onSlideOutside(SliderContainer &slider)
 {
+	Vec3 menuPos;
     if (nextFullScreen) {
-        Vec3 menuPos = container.getPosition();
         menuPos.y = 0;
+        menuPos.x = 0;
         container.setPosition(menuPos);
         container.setSize(Vec3(WIDTH, HEIGHT, 0));
+        container.setBackgroundVisible(false);
     }
     else {
-        Vec3 menuPos = container.getPosition();
         menuPos.y = MENU_Y;
+        menuPos.x = MENU_X;
         container.setPosition(menuPos);
         container.setSize(Vec3(menuBG->w, menuBG->h, 0));
+        container.setBackgroundVisible(true);
     }
 }
 
