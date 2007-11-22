@@ -176,16 +176,19 @@ namespace gameui {
 
     void WidgetContainer::draw(SDL_Surface *surface) 
     {
-        for (int i = 0; i < getNumberOfChilds(); ++i) {
+		int n = getNumberOfChilds();
+        for (int i = 0; i < n; ++i) {
             getChild(i)->doDraw(surface);
         }
     }
 
     void WidgetContainer::requestDraw(bool fromParent)
     {
-        if (fromParent) {
-            for (int i = 0; i < getNumberOfChilds(); ++i) {
-                getChild(i)->requestDraw(true);
+        if (!_drawRequested) {
+			int n = getNumberOfChilds();
+            for (int i = 0; i < n; ++i) {
+				Widget * w = getChild(i);
+                if (!w->drawRequested()) w->requestDraw(true);
             }
         }
         Widget::requestDraw(fromParent);
@@ -627,9 +630,11 @@ namespace gameui {
     }
     void ZBox::widgetMustRedraw(Widget *wid)
     {
-        for (int i = 0; i < getNumberOfChilds(); ++i) {
-            getChild(i)->requestDraw(true);
-        }
+		/*int n = getNumberOfChilds();
+        for (int i = 0; i < n; ++i) {
+			Widget * w = getChild(i);
+            if (!w->drawRequested()) w->requestDraw(true);
+        }*/
         requestDraw(false);
     }
 
