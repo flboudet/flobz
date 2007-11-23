@@ -231,15 +231,58 @@ namespace gameui {
 
     void WidgetContainer::setSize(const Vec3 &v3)
     {
-        Widget::setSize(v3);
-        arrangeWidgets();
+        if (!layoutSuspended)
+        {
+            Widget::setSize(v3);
+            arrangeWidgets();
+        }
+        else {
+            Vec3 v3offset = v3 - position;
+            int s = childs.size();
+            for (int i = 0; i < s ; i++) {
+                Widget * c = childs[i];
+                c->setSize(c->getSize()+v3offset);
+            }
+            Widget::setSize(v3);
+        }
     }
 
     void WidgetContainer::setPosition(const Vec3 &v3)
     {
-        Widget::setPosition(v3);
         if (!layoutSuspended)
+        {
+            Widget::setPosition(v3);
             arrangeWidgets();
+        }
+        else {
+            Vec3 v3offset = v3 - position;
+            int s = childs.size();
+            for (int i = 0; i < s ; i++) {
+                Widget * c = childs[i];
+                c->setPosition(c->getPosition()+v3offset);
+            }
+            Widget::setPosition(v3);
+        }
+    }
+    
+    void WidgetContainer::suspendLayout()
+    {
+        layoutSuspended = true;
+        
+        int s = childs.size();
+        for (int i = 0; i < s ; i++) {
+            childs[i]->suspendLayout();
+        }
+    }
+
+    void WidgetContainer::resumeLayout()
+    {
+        layoutSuspended = false;
+        
+        int s = childs.size();
+        for (int i = 0; i < s ; i++) {
+            childs[i]->resumeLayout();
+        }
     }
 
     void WidgetContainer::onWidgetVisibleChanged(bool visible)
@@ -657,7 +700,9 @@ namespace gameui {
     void SliderContainer::endSlideInside(bool inside)
     {
         sliding = false;
+        suspendLayout();
         setPosition(backupedPosition);
+        resumeLayout();
         requestDraw();
         onSlideInside(); // Send notification that we have slided inside
     }
@@ -772,10 +817,10 @@ namespace gameui {
             double shtime = slidingTime*slidingTime;
             pos.x += distance*stime/shtime;
         }
-        //suspendLayout();
+        suspendLayout();
         ZBox::setPosition(pos);
-        //resumeLayout();
         requestDraw();
+        resumeLayout();
     }
 	
 	void SliderContainer::addContentWidget()

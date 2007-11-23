@@ -115,6 +115,9 @@ namespace gameui {
       virtual void setParent(WidgetContainer *p) { parent   =  p; }
       virtual void setFocusable(bool foc);
       
+      virtual void suspendLayout() { }
+      virtual void resumeLayout() { }
+
       WidgetContainer *parent;
       
     private:
@@ -157,8 +160,8 @@ namespace gameui {
        */
       int getNumberOfFocusableChilds();
       
-      void suspendLayout() { layoutSuspended = true; }
-      void resumeLayout() { layoutSuspended = false; }
+      void suspendLayout();
+      void resumeLayout();
       
       virtual void onWidgetVisibleChanged(bool visible);
     protected:
