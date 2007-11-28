@@ -32,39 +32,23 @@
  */
 void ToggleSoundFxAction::action()
 {
-    optMenu.toggleSoundFx();
+    theCommander->setSoundFx(! theCommander->getSoundFx());
+    if (toggleButton) toggleButton->setToggle(theCommander->getSoundFx());
 }
 
 void ToggleMusicAction::action()
 {
-    optMenu.toggleMusic();
+    theCommander->setMusic(! theCommander->getMusic());
+    if (toggleButton) toggleButton->setToggle(theCommander->getMusic());
 }
 
 void ToggleFullScreenAction::action()
 {
-    optMenu.toggleFullScreen();
-}
-
-void OptionMenu::toggleSoundFx()
-{
-    theCommander->setSoundFx(! theCommander->getSoundFx());
-    audioButton.setToggle(theCommander->getSoundFx());
-}
-
-void OptionMenu::toggleMusic()
-{
-    theCommander->setMusic(! theCommander->getMusic());
-    musicButton.setToggle(theCommander->getMusic());
-}
-
-void OptionMenu::toggleFullScreen()
-{
     theCommander->setFullScreen(! theCommander->getFullScreen());
-    fullScreenButton.setToggle(theCommander->getFullScreen());
+    if (toggleButton) toggleButton->setToggle(theCommander->getFullScreen());
 }
 
 OptionMenu::OptionMenu(PuyoMainScreen *mainScreen) : PuyoMainScreenMenu(mainScreen),
-    toggleSoundFxAction(*this), toggleMusicAction(*this), toggleFullScreenAction(*this),
     optionTitle(theCommander->getLocalizedString("Options")),
     audioButton(theCommander->getLocalizedString(kAudioFX), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getSoundFx(), &toggleSoundFxAction),
     musicButton(theCommander->getLocalizedString(kMusic), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getMusic(), &toggleMusicAction),
@@ -75,6 +59,9 @@ OptionMenu::OptionMenu(PuyoMainScreen *mainScreen) : PuyoMainScreenMenu(mainScre
     changeLevelThemeButton(theCommander->getLocalizedString(kChangePuyoLevel), &changeLevelAction),
     changeControlsButton(theCommander->getLocalizedString(kControls), &changeControlsAction), backAction(mainScreen), backButton(theCommander->getLocalizedString("Back"), &backAction)
 {
+    toggleSoundFxAction.setButton(&audioButton);
+    toggleMusicAction.setButton(&musicButton);
+    toggleFullScreenAction.setButton(&fullScreenButton);
 }
 
 void OptionMenu::build() {

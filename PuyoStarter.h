@@ -29,6 +29,8 @@
 #include "ios_messagebox.h"
 #include "AnimatedPuyoTheme.h"
 #include "PuyoScreenTransition.h"
+#include "PuyoOptionMenu.h"
+#include "PuyoStrings.h"
 
 #ifndef _PUYOSTARTER
 #define _PUYOSTARTER
@@ -43,12 +45,19 @@ public:
     virtual ~PuyoPauseMenu();
     virtual void finishLayout();
     int pauseMenuTop, pauseMenuLeft;
+    void toggleSoundFx();
+    void toggleMusic();
+    void toggleFullScreen();
 private:
     IIM_Surface   *menuBG;
     SliderContainer pauseContainer;
     VBox pauseVBox;
     Text menuTitle;
     Button continueButton;
+    ToggleSoundFxAction toggleSoundFxAction;
+    ToggleMusicAction toggleMusicAction;
+    ToggleFullScreenAction toggleFullScreenAction;
+    ToggleButton audioButton, musicButton, fullScreenButton;
     Button abortButton;
 };
 

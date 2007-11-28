@@ -36,35 +36,35 @@ class OptionMenu;
 
 class ToggleSoundFxAction : public Action {
 public:
-    ToggleSoundFxAction(OptionMenu &optMenu) : optMenu(optMenu) {}
+    ToggleSoundFxAction() : toggleButton(NULL) {}
+    void setButton(ToggleButton *_toggleButton) { toggleButton = _toggleButton; }
     void action();
 private:
-    OptionMenu &optMenu;
+    ToggleButton *toggleButton;
 };
 
 class ToggleMusicAction : public Action {
 public:
-    ToggleMusicAction(OptionMenu &optMenu) : optMenu(optMenu) {}
+    ToggleMusicAction() : toggleButton(NULL) {}
+    void setButton(ToggleButton *_toggleButton) { toggleButton = _toggleButton; }
     void action();
 private:
-    OptionMenu &optMenu;
+    ToggleButton *toggleButton;
 };
 
 class ToggleFullScreenAction : public Action {
 public:
-    ToggleFullScreenAction(OptionMenu &optMenu) : optMenu(optMenu) {}
+    ToggleFullScreenAction() : toggleButton(NULL) {}
+    void setButton(ToggleButton *_toggleButton) { toggleButton = _toggleButton; }
     void action();
 private:
-    OptionMenu &optMenu;
+    ToggleButton *toggleButton;
 };
 
 class OptionMenu : public PuyoMainScreenMenu {
 public:
     OptionMenu(PuyoMainScreen *mainScreen);
     void build();
-    void toggleSoundFx();
-    void toggleMusic();
-    void toggleFullScreen();
 private:
     ToggleSoundFxAction toggleSoundFxAction;
     ToggleMusicAction toggleMusicAction;
