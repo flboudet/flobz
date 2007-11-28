@@ -255,8 +255,14 @@ void NetCenterMenu::onGameInvitationReceived(PuyoGameInvitation &invitation)
 void NetCenterMenu::onWidgetVisibleChanged(bool visible)
 {
     printf("netcentermenu visible: %s\n", visible ? "true" : "false");
-    if (!visible)
-        delete this;
+    /*if (!visible)
+        delete this;*/
+}
+
+void NetCenterMenu::onWidgetRemoved(WidgetContainer *parent)
+{
+     printf("netcentermenu removed");
+    delete this;
 }
 
 void NetCenterMenu::grantCurrentGame()

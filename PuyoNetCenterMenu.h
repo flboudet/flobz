@@ -130,6 +130,7 @@ public:
     virtual void sendChat(String chatText);
     // Notification
     virtual void onWidgetVisibleChanged(bool visible);
+    virtual void onWidgetRemoved(WidgetContainer *parent);
 private:
     class NetCenterCycled : public CycledComponent {
     public:

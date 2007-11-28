@@ -114,6 +114,7 @@ namespace gameui {
         if (addedToGameLoop)
             child->addToGameLoop(loop);
         arrangeWidgets();
+        child->onWidgetAdded(this);
         child->onWidgetVisibleChanged(isVisible());
     }
 
@@ -124,6 +125,7 @@ namespace gameui {
         child->removeFromGameLoopActive();
         arrangeWidgets();
         child->onWidgetVisibleChanged(false);
+        child->onWidgetRemoved(this);
     }
 
     void WidgetContainer::changeChild(int i, Widget *w)

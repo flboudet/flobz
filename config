@@ -21,7 +21,7 @@ ENABLE_OPENGL?=false
 ENABLE_TTF?=true
 ENABLE_DGA?=false
 
-DEBUG_MODE?=false
+DEBUG_MODE?=true
 MORE_DEBUG?=false
 ENABLE_PCH?=false
 

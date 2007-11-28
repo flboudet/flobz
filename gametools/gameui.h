@@ -103,8 +103,10 @@ namespace gameui {
       void setReceiveUpEvents(bool receiveUp) { this->receiveUp = receiveUp; }
       virtual void checkFocus() {}
       
+      // Notifications
       virtual void onWidgetVisibleChanged(bool visible) { hidden = !visible; }
-
+      virtual void onWidgetAdded(WidgetContainer *parent) {}
+      virtual void onWidgetRemoved(WidgetContainer *parent) {}
     protected:
       // To be implemented on each widgets
       virtual void draw(SDL_Surface *screen) { };
