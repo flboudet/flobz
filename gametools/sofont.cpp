@@ -415,12 +415,17 @@ int SoFont_FontHeight (SoFont * font)
 void SoFont_XCenteredString (SoFont * font, SDL_Surface * Surface, int y,
 																const char *text, SDL_Rect * clip /*=NULL*/ )
 {
+    SoFont_PutString (font, Surface,
+                    Surface->w / 2 - SoFont_TextWidth (font, text) / 2, y,
+                    text, clip);
 }
 
 /// Blits a string to with centered x & y position
 void    SoFont_CenteredString (SoFont * font, SDL_Surface * Surface,
 															 const char *text, SDL_Rect * clip /*=NULL*/ )
 {
+    SoFont_CenteredString_XY (font, Surface, Surface->clip_rect.w / 2,
+                            Surface->clip_rect.h / 2, text, clip);
 }
 
 /// Blits a string to with centered around x & y positions
@@ -428,6 +433,8 @@ void    SoFont_CenteredString_XY (SoFont * font, SDL_Surface * Surface, int x,
 																	int y, const char *text,
 																	SDL_Rect * clip /*=NULL*/ )
 {
+    SoFont_PutString (font, Surface, x - SoFont_TextWidth (font, text) / 2,
+                    y - font->height / 2, text, clip);
 }
 
 
