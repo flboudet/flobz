@@ -183,6 +183,8 @@ void PuyoGameWidget::initialize()
 {
     once = false;
     gameover = false;
+    skipGameCycleA = false;
+    skipGameCycleB = false;
     
     IIM_Surface * background = attachedLevelTheme->getBackground();
 
@@ -225,20 +227,44 @@ void PuyoGameWidget::cycle()
     tickCounts++;
     cycles++;
     
+    int animCyclesBeforeGameCycles = (MaxSpeed + (((MinSpeed-MaxSpeed)*gameSpeed)/20));
+    
     // Controls
     controllerA->cycle();
     controllerB->cycle();
     
+    if (!skipGameCycleA && areaA->isNewMetaCycleStart() && (cyclesBeforeGameCycle < animCyclesBeforeGameCycles/2))
+      skipGameCycleA = true;  
+    if (!skipGameCycleB && areaB->isNewMetaCycleStart() && (cyclesBeforeGameCycle < animCyclesBeforeGameCycles/2))
+      skipGameCycleB = true;  
+
     // Animations
     areaA->cycleAnimation();
     areaB->cycleAnimation();
     
+    if (!skipGameCycleA && areaA->isNewMetaCycleStart() && (cyclesBeforeGameCycle < animCyclesBeforeGameCycles/2))
+      skipGameCycleA = true;  
+    if (!skipGameCycleB && areaB->isNewMetaCycleStart() && (cyclesBeforeGameCycle < animCyclesBeforeGameCycles/2))
+      skipGameCycleB = true;  
+
     // Game cycles
     if (cyclesBeforeGameCycle == 0) {
       
-      cyclesBeforeGameCycle =  MaxSpeed + (((MinSpeed-MaxSpeed)*gameSpeed)/20);
-      areaA->cycleGame();
-      areaB->cycleGame();
+      areaA->clearMetaCycleStart();
+      areaB->clearMetaCycleStart();
+
+      cyclesBeforeGameCycle = animCyclesBeforeGameCycles;
+      if (!skipGameCycleA) 
+      {
+        areaA->cycleGame();
+      }
+      else skipGameCycleA = false;
+      
+      if (!skipGameCycleB)
+      {
+        areaB->cycleGame();
+      }
+      else skipGameCycleB = false;
       
       // Blinking point animation
       if (attachedGameA->getPoints()/50000 > savePointsA/50000)

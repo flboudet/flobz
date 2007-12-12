@@ -77,6 +77,9 @@ class PuyoView : public PuyoDelegate {
     
     AnimatedPuyoSetTheme *getPuyoThemeSet() const { return attachedThemeSet; }
 
+    bool isNewMetaCycleStart() { return newMetaCycleStart; }
+    void clearMetaCycleStart() { newMetaCycleStart = false; }
+    
     // PuyoDelegate methods
     void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex);
     void gameDidEndCycle();
@@ -100,6 +103,7 @@ class PuyoView : public PuyoDelegate {
     int cycleAllowance;
     SDL_Painter &attachedPainter;
     int delayBeforeGameOver;
+    bool newMetaCycleStart;
 };
 
 #endif // _PUYOVIEW

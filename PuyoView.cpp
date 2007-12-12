@@ -59,6 +59,7 @@ PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 	enemyGame = NULL;
     skippedCycle = false;
     cycleAllowance = 0;
+    newMetaCycleStart = false;
 }
 
 PuyoView::~PuyoView()
@@ -97,7 +98,7 @@ bool PuyoView::isGameOver() const
     return false;
 }
 
-void PuyoView::cycleAnimation()
+void PuyoView::cycleAnimation(void)
 {
     // Handle end of game
     if (!gameRunning)
@@ -125,10 +126,8 @@ void PuyoView::cycleAnimation()
     }
 
     // If there is a skipped cycle to do, do it
-    if ((skippedCycle || attachedGame->isEndOfCycle()) && attachedGame->isGameRunning() && cycleAllowed()) {
-        attachedGame->cycle();
-        skippedCycle = false;
-    }
+    if (attachedGame->isEndOfCycle() && attachedGame->isGameRunning() && !newMetaCycleStart) cycleGame();
+
 }
 
 void PuyoView::cycleGame()
@@ -332,6 +331,7 @@ void PuyoView::gameDidEndCycle()
 		if (attachedGame->getNeutralPuyos() < 0)
 			enemyGame->increaseNeutralPuyos(- attachedGame->getNeutralPuyos());
 	}
+    newMetaCycleStart = true;
 }
 
 bool PuyoView::cycleAllowed()

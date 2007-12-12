@@ -173,6 +173,8 @@ protected:
     PuyoKillPlayerRightAction killRightAction;
     PuyoCheatCodeManager killLeftCheat, killRightCheat;
     std::vector<PuyoFX*> puyoFX;
+    bool skipGameCycleA, skipGameCycleB;
+
 };
 
 class ContinueAction : public Action {
