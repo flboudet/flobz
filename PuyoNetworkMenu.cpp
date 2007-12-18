@@ -274,47 +274,37 @@ private:
     int portNum;
 };
 
-class PushNetCenterMenuAction : public Action
+
+void PushNetCenterMenuAction::action()
 {
-public:
-    PushNetCenterMenuAction(Text *serverName, Text *serverPort, Text *userName) : serverName(serverName), serverPort(serverPort), userName(userName) {}
-    
-    void action()
-    {
-      try {
-#ifdef DISABLED
+    try {
         PuyoInternetGameCenter *gameCenter = new PuyoInternetGameCenter(serverName->getValue(),
                                                                         atoi(serverPort->getValue()), userName->getValue());
-        NetCenterMenu *newNetCenterMenu = new NetCenterMenu(gameCenter);
-        newNetCenterMenu->setAutoRelease(true);
+        NetCenterMenu *newNetCenterMenu = new NetCenterMenu(mainScreen, gameCenter);
         newNetCenterMenu->build();
-        (GameUIDefaults::SCREEN_STACK)->push(newNetCenterMenu);
-#endif
-      } catch (Exception e) {
+        mainScreen->pushMenu(newNetCenterMenu, true);
+		mainScreen->setInNetGameCenter(true);
+    } catch (Exception e) {
         fprintf(stderr, "Error while connecting to %s\n", serverName->getValue().c_str());
         e.printMessage();
         AudioManager::playSound("ebenon.wav", 0.5);
-      }
     }
-private:
-    Text *serverName;
-    Text *serverPort;
-    Text *userName;
-};
+}
 
 void NetworkInternetAction::action()
 {
-  if (*menuToCreate == NULL) {
-    *menuToCreate = new InternetGameMenu();
-    (*menuToCreate)->build();
-  }
-  (GameUIDefaults::SCREEN_STACK)->push(*menuToCreate);
+    if (*menuToCreate == NULL) {
+        *menuToCreate = new InternetGameMenu(mainScreen);
+        (*menuToCreate)->build();
+    }
+    mainScreen->pushMenu(*menuToCreate, true);
+    mainScreen->setInNetGameCenter(true);
 }
 
 NetworkGameMenu::NetworkGameMenu(PuyoMainScreen * mainScreen)
     : locale(theCommander->getDataPathManager(), "locale", "main"),
       PuyoMainScreenMenu(mainScreen), lanGameMenu(mainScreen),
-      internetGameMenu(NULL), internetAction(&internetGameMenu),
+      internetGameMenu(NULL), internetAction(mainScreen, &internetGameMenu),
       lanAction(&lanGameMenu, mainScreen), mainScreenPopAction(mainScreen),
       networkTitleText(locale.getLocalizedString("Network Game")),
       lanGameButton(locale.getLocalizedString("Local Area Network Game"), &lanAction),
@@ -330,20 +320,23 @@ void NetworkGameMenu::build() {
   add(&cancelButton);
 }
 
-InternetGameMenu::InternetGameMenu()
-  : PuyoScreen(),
+InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)
+  : PuyoMainScreenMenu(mainScreen),
     servers(),
-    story("networkmenu.gsl"),
     container(),
+    serverListText("Server List"), updating("Update"),
+    separator1_1(1,1), separator1_2(1,1), separator1_3(1, 1), separator10_1(10,10), separator10_2(10,10),
+    internetGameText("Internet Game"), nicknameText("Nickname"), serverText("Server"), portText("Port"),
     playerName(PuyoGame::getPlayerName(-2), PuyoGame::getDefaultPlayerKey(-2)),
     serverName(kInternetCurrentServerDefaultValue,kInternetCurrentServerKey),
-    serverPort(kInternetCurrentServerPortDefaultValue,kInternetCurrentServerPortKey)
+    serverPort(kInternetCurrentServerPortDefaultValue,kInternetCurrentServerPortKey),
+    pushNetCenter(mainScreen, &serverName, &serverPort, &playerName), backAction(mainScreen),
+    joinButton("Join", &pushNetCenter), backButton("Back", &backAction)
 {
 }
 
 void InternetGameMenu::build()
 {
-    add(&story);
     add(&container);
     container.add(&menu);
 
@@ -351,34 +344,30 @@ void InternetGameMenu::build()
     container.setSize(Vec3(menuBG_wide->w, menuBG_wide->h, 0));
     container.setBackground(menuBG_wide);
   
-    serverSelectionPanel = new VBox;
-    serverSelectionPanel->add(new Text("Server List"));
-    serverListPanel = new ListWidget(6);
+    serverSelectionPanel.add(&serverListText);
+    serverListPanel = new ListWidget(6, IIM_Load_Absolute_DisplayFormat(theCommander->getDataPathManager().getPath("gfx/downarrow.png")));
     
-    serverSelectionPanel->add(serverListPanel);
-    updating = new Button("Update");
-    updating->mdontMove = false;
-    serverSelectionPanel->add(updating);
+    serverSelectionPanel.add(serverListPanel);
+    updating.mdontMove = false;
+    serverSelectionPanel.add(&updating);
 
-    VBox *rightPanel = new VBox();
-    rightPanel->add(new Separator(1,1));
-    rightPanel->add(new Text("Internet Game"));
-    rightPanel->add(new Separator(10,10));
-    rightPanel->add(new Text("Nickname"));
-    rightPanel->add(&playerName);
-    rightPanel->add(new Separator(10,10));
-    rightPanel->add(new Text("Server"));
-    rightPanel->add(&serverName);
-    rightPanel->add(new Text("Port"));
-    rightPanel->add(&serverPort);
-    rightPanel->add(new Separator(10,10));
-    HBox *hbox = new HBox();
-    hbox->add(new Button("Join", new PushNetCenterMenuAction(&serverName, &serverPort, &playerName)));
-    hbox->add(new Button("Cancel", new PopScreenAction()));
-    rightPanel->add(hbox);
-    rightPanel->add(new Separator(1,1));
-    menu.add(serverSelectionPanel);
-    menu.add(rightPanel);
+    rightPanel.add(&separator1_1);
+    rightPanel.add(&internetGameText);
+    rightPanel.add(&separator1_2);
+    rightPanel.add(&nicknameText);
+    rightPanel.add(&playerName);
+    rightPanel.add(&separator10_1);
+    rightPanel.add(&serverText);
+    rightPanel.add(&serverName);
+    rightPanel.add(&portText);
+    rightPanel.add(&serverPort);
+    rightPanel.add(&separator10_2);
+    hbox.add(&joinButton);
+    hbox.add(&backButton);
+    rightPanel.add(&hbox);
+    rightPanel.add(&separator1_3);
+    menu.add(&serverSelectionPanel);
+    menu.add(&rightPanel);
 }
 
 void InternetGameMenu::idle(double currentTime)
@@ -391,8 +380,8 @@ void InternetGameMenu::idle(double currentTime)
             new ServerSelectAction(*this, servers.getServerNameAtIndex(i),
             servers.getServerPortAtIndex(i))));
       }
-      updating->setValue("Update");
-      updating->mdontMove = false;
+      updating.setValue("Update");
+      updating.mdontMove = false;
     }
 
     int state = servers.fetchingNewData();
@@ -407,13 +396,13 @@ void InternetGameMenu::idle(double currentTime)
             "...Loading......",
             "......Loading..."
         };
-        updating->setValue(txt[X]);
-        updating->mdontMove = true;
+        updating.setValue(txt[X]);
+        updating.mdontMove = true;
     }
     else if (state < 0)
     {
-      updating->setValue("Update");
-      updating->mdontMove = false;
+      updating.setValue("Update");
+      updating.mdontMove = false;
     }
 }
 

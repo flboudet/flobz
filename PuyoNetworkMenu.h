@@ -30,6 +30,19 @@
 #include "PuyoCommander.h"
 #include "ios_httpdocument.h"
 
+
+class PushNetCenterMenuAction : public Action
+{
+public:
+    PushNetCenterMenuAction(PuyoMainScreen * mainScreen, Text *serverName, Text *serverPort, Text *userName) : mainScreen(mainScreen), serverName(serverName), serverPort(serverPort), userName(userName) {}
+    virtual void action();
+private:
+    PuyoMainScreen * mainScreen;
+    Text *serverName;
+    Text *serverPort;
+    Text *userName;
+};
+
 class PuyoHttpServerList {
 public:
     PuyoHttpServerList();
@@ -61,31 +74,38 @@ private:
     Button startButton, cancelButton;
 };
 
-class InternetGameMenu : public PuyoScreen {
+class InternetGameMenu : public PuyoMainScreenMenu {
 public:
-    InternetGameMenu();
+    InternetGameMenu(PuyoMainScreen * mainScreen);
     void build();
     void setSelectedServer(const String &s, int port);
     virtual void idle(double currentTime);
     
 private:
     PuyoHttpServerList servers;
-    VBox *serverSelectionPanel;
+    VBox serverSelectionPanel;
     ListWidget *serverListPanel;
-    HBox menu;
-    PuyoStoryWidget story;
+    Text serverListText;
+    Button updating;
+    VBox rightPanel;
+    Separator separator1_1, separator1_2, separator1_3,  separator10_1, separator10_2;
+    Text internetGameText, nicknameText, serverText, portText;
+    HBox hbox, menu;
     SliderContainer container;
     EditField playerName;
     EditField serverName, serverPort;
     int portNum;
-    Button *updating;
+    PushNetCenterMenuAction pushNetCenter;
+    PuyoPopMenuAction backAction;
+    Button joinButton, backButton;
 };
 
 class NetworkInternetAction : public Action {
 public:
-    NetworkInternetAction(InternetGameMenu **menuToCreate) : menuToCreate(menuToCreate) {}
+    NetworkInternetAction(PuyoMainScreen * mainScreen, InternetGameMenu **menuToCreate) : mainScreen(mainScreen), menuToCreate(menuToCreate) {}
     void action();
 private:
+    PuyoMainScreen * mainScreen;
     InternetGameMenu **menuToCreate;
 };
 
