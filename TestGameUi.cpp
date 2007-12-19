@@ -42,9 +42,32 @@ public:
     }
 };
 
+class ShowModalDialogAction : public Action {
+public:
+    ShowModalDialogAction(ZBox *rootZBox);
+    virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
+private:
+    ZBox *rootZBox;
+    SliderContainer slider;
+    Text title;
+    Button simpleButton;
+};
+
+ShowModalDialogAction::ShowModalDialogAction(ZBox *rootZBox) : rootZBox(rootZBox), title("Slider"), simpleButton("button")
+{
+    slider.add(&title);
+    slider.add(&simpleButton);
+}
+
+void ShowModalDialogAction::action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
+{
+    rootZBox->add(&slider);
+}
+
 int main(int argc, char *argv[])
 {
     TestAction actionBidon;
+
     int init_flags = SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK;
     
     if ( SDL_Init(init_flags) < 0 ) {
@@ -81,13 +104,16 @@ int main(int argc, char *argv[])
     Screen scr(0, 0, 640, 480);
     VBox bidonBox;
     Text bidonText("Hello");
-    Button bidonButton1("Hi");
+    ShowModalDialogAction showDialogAction(scr.getRootContainer());
+    
+    Button bidonButton1("Hi", &showDialogAction);
     Button bidonButton2("Ho");
     IIM_Surface *downArrow = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/downarrow.png");
-    ListView list(10, downArrow);
+    bidonBox.setPolicy(USE_MIN_SIZE);
+    ListView list(20, downArrow);
     bidonBox.add(&bidonText);
-    //bidonBox.add(&bidonButton1);
-    //bidonBox.add(&bidonButton2);
+    bidonBox.add(&bidonButton1);
+    bidonBox.add(&bidonButton2);
     for (int i = 0 ; i < 100 ; i++) {
         String newEntry("Bla bla ");
         list.addEntry(ListViewEntry(newEntry + i, &actionBidon));
