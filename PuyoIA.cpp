@@ -373,7 +373,7 @@ bool suppressGroups(GridState * const dst, GridEvaluation * const evaluation)
 }
 
 
-void evalWith(const GridState * const grid, const GridState * const gridOrigin, GridEvaluation * const realEvaluation)
+void evalWith(const GridState * const grid, const GridEvaluation * const originEvaluation, GridEvaluation * const realEvaluation)
 {
   GridState tmp;
   GridEvaluation evaluation;
@@ -398,7 +398,10 @@ void evalWith(const GridState * const grid, const GridState * const gridOrigin, 
         tmp[x][y] = PUYO_EMPTY;
         columnCompress(x,&tmp);
         evaluation = nullEvaluation;
-        while (suppressGroups(&tmp, &evaluation) == true) {};
+        int r;
+        for (r=0; suppressGroups(&tmp, &evaluation); r++) {};
+        // if we used more than 1 round more neutrals willbe dropped to the ennemy
+        if (r>1) evaluation.puyoSuppressed += (r-1)*PUYODIMX;
         if (evaluation.puyoSuppressed > realEvaluation->puyoSuppressedPotential)
         {
           realEvaluation->puyoSuppressedPotential = evaluation.puyoSuppressed;
@@ -421,21 +424,7 @@ void evalWith(const GridState * const grid, const GridState * const gridOrigin, 
       }
     }
   }
-  int d = evaluation.puyoSuppressed;
-  evaluation = nullEvaluation;
-  copyGrid(&tmp,gridOrigin);
-  for (int x = 0;  x < IA_PUYODIMX; x++)
-  {
-    int h = stripedColumnHeight(x, grid);
-    for (int y = 0;  y < h; y++)
-    {
-      if ((tmp[x][y] != PUYO_EMPTY) && (tmp[x][y] != PUYO_NEUTRAL))
-      {
-        countSamePuyoAround(x, y, (PuyoState)tmp[x][y], &tmp, &evaluation);
-      }
-    }
-  }
-  d -= evaluation.puyoSuppressed;
+  int d = evaluation.puyoSuppressed - originEvaluation->puyoSuppressed;
   if (d>0) realEvaluation->puyoGrouped = d;
 }
 
@@ -765,7 +754,7 @@ void PuyoIA::decide()
         // drop the binom (including destroying eligible groups) and eval board if game not lost
         if (dropBinom(next, &state1, &state2, &evaluation2))
         {
-          evalWith(&state2, &state1, &evaluation2);
+          evalWith(&state2, &evaluation1, &evaluation2);
 
           if (foundOne == false || selectIfBetterEvaluation(&bestEvaluation, &evaluation2, current, &state2))
           {
