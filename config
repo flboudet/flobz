@@ -21,6 +21,7 @@ ENABLE_OPENGL?=false
 ENABLE_TTF?=true
 ENABLE_DGA?=false
 
+RELEASE_MODE?=false
 DEBUG_MODE?=true
 MORE_DEBUG?=false
 ENABLE_PCH?=false
@@ -122,7 +123,9 @@ endif
 ifeq ($(DEBUG_MODE), true)
 	CFLAGS:=$(CFLAGS) -g -O0 -Winvalid-pch
 	LDFLAGS:=$(LDFLAGS) -g
-else
+endif
+
+ifeq ($(RELEASE_MODE), true)
 	CFLAGS:=$(CFLAGS) -O3 -fomit-frame-pointer
 endif
 
@@ -133,8 +136,8 @@ endif
 
 
 ifeq ($(ENABLE_GPROF), true)
-	CFLAGS:=$(CFLAGS) -g -pg
-	LDFLAGS:=$(LDFLAGS) -g -pg
+	CFLAGS:=$(CFLAGS) -O3 -g -pg
+	LDFLAGS:=$(LDFLAGS) -O3 -g -pg
 endif
 
 # SDL CONFIG
@@ -211,6 +214,7 @@ ifeq ($(ENABLE_PCH), true)
 endif
 
 DEPFLAGS:=${CFLAGS}
+CFLAGS:=$(CFLAGS) $(EXTRA_CFLAGS)
 
 # FAT Binaries
 ifeq ($(PLATFORM), Darwin)
