@@ -98,6 +98,7 @@ class PuyoIA : public virtual PuyoPlayer {
     unsigned int bestl1;
     bool foundOne;
     PuyoBinom originalPuyo;
+    int bestEvaluation;
   
 };
 

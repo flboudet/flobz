@@ -728,12 +728,11 @@ void PuyoIA::decide(int partial)
 
     bestl1=1;
     foundOne = false;
+    bestEvaluation = 0;
   }
   
   for (unsigned int l1 = 1+partial; l1 <= MAXCOMBINATION; l1+=DISPATCHCYCLES)
   {
-    int bestEvaluation = 0;
-
     // set position of binom 1
     serialPosition(l1,&current);
 
