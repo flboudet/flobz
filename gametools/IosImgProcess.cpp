@@ -334,7 +334,7 @@ RGBA iim_hsva2rgba(HSVA c)
       hueTemp = 0.0f;
     else {
       hueTemp = c.hue / 60.0f;  // h is now in [0,6)
-      hueTemp = hueTemp / 60.0f;
+      // hueTemp = hueTemp / 60.0f;
     }
     float i = floor(hueTemp); // largest integer <= h
     float f = hueTemp - i;    // fractional part of h
