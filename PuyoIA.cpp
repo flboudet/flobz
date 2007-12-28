@@ -339,6 +339,7 @@ bool dropPuyos(const PuyoBinom binom, GridState * const grid)
 // Those combinations can place the binoms everywhere on x
 // except x=0 with companion left and x=IA_PUYODIMX-1 with companion right
 #define MAXCOMBINATION (IA_PUYODIMX*4)-2
+#define DISPATCHCYCLES 4
 inline void serialPosition(unsigned int serialnr /* from 1 to MAXCOMBINATION */, PuyoBinom * binom)
 {
   binom->orientation = (PuyoOrientation)(serialnr % 4);
@@ -510,7 +511,7 @@ PuyoIA::PuyoIA(IA_Type type, int level, PuyoView &targetView)
 : PuyoPlayer(targetView), type(type), level(level)
 {
   internalGrid = NULL;
-  decisionMade = false;
+  decisionMade = 0;
   attachedGame = targetView.getAttachedGame();
   objective = nullBinom;
   lastLineSeen = PUYODIMY+1;
@@ -700,45 +701,46 @@ bool canReach(const PuyoBinom binom, const PuyoBinom dest, GridState * const int
   return true;
 }
 
-void PuyoIA::decide()
+void PuyoIA::decide(int partial)
 {
-  PuyoBinom current, next;
-
-  GridState state1,state2;
-  GridEvaluation evaluation1, evaluation2;
-
-  unsigned int bestl1=1, bestl2=1;
-  int bestEvaluation = 0;
-
-  bool foundOne = false;
-
-  // get puyo binoms to drop
-  PuyoState etat;
-  etat = attachedGame->getFallingState();
-  if (etat == PUYO_EMPTY) return;
-  current.falling     = extractColor(etat);
-  etat = attachedGame->getCompanionState();
-  if (etat == PUYO_EMPTY) return;
-  current.companion   = extractColor(etat);
-  current.orientation = extractOrientation(attachedGame->getFallingCompanionDir());
-  current.position.x  = attachedGame->getFallingX();
-  current.position.y  = PUYODIMY - attachedGame->getFallingY();
-  
-  PuyoBinom originalPuyo = current;
-  
-  next.falling        = extractColor(attachedGame->getNextFalling());
-  next.companion      = extractColor(attachedGame->getNextCompanion());
-  next.orientation    = Left;
-  next.position.x     = 0;
-  next.position.y     = IA_PUYODIMY+1;
-
-  for (unsigned int l1 = 1; l1 <= MAXCOMBINATION; l1++)
+  //fprintf(stderr, "  Decision %d on %d\n",partial+1,DISPATCHCYCLES);
+  if (partial == 0)
   {
+    // get puyo binoms to drop
+    PuyoState etat;
+    etat = attachedGame->getFallingState();
+    if (etat == PUYO_EMPTY) return;
+    current.falling     = extractColor(etat);
+    etat = attachedGame->getCompanionState();
+    if (etat == PUYO_EMPTY) return;
+    current.companion   = extractColor(etat);
+    current.orientation = extractOrientation(attachedGame->getFallingCompanionDir());
+    current.position.x  = attachedGame->getFallingX();
+    current.position.y  = PUYODIMY - attachedGame->getFallingY();
+    
+    originalPuyo = current;
+    
+    next.falling        = extractColor(attachedGame->getNextFalling());
+    next.companion      = extractColor(attachedGame->getNextCompanion());
+    next.orientation    = Left;
+    next.position.x     = 0;
+    next.position.y     = IA_PUYODIMY+1;
+
+    bestl1=1;
+    foundOne = false;
+  }
+  
+  for (unsigned int l1 = 1+partial; l1 <= MAXCOMBINATION; l1+=DISPATCHCYCLES)
+  {
+    int bestEvaluation = 0;
+
     // set position of binom 1
     serialPosition(l1,&current);
 
     // reset evaluation
-    evaluation1 = nullEvaluation;
+    GridEvaluation evaluation1 = nullEvaluation;
+
+    GridState state1;
 
     // drop the binom (including destroying eligible groups) and continue if game not lost
     if (canReach(originalPuyo, current, internalGrid) && dropBinom(current, internalGrid, &state1, &evaluation1))
@@ -749,7 +751,9 @@ void PuyoIA::decide()
         serialPosition(l2,&next);
 
         // copy evaluation
-        evaluation2 = evaluation1;
+        GridEvaluation evaluation2 = evaluation1;
+
+        GridState state2;
 
         // drop the binom (including destroying eligible groups) and eval board if game not lost
         if (dropBinom(next, &state1, &state2, &evaluation2))
@@ -759,7 +763,6 @@ void PuyoIA::decide()
           if (foundOne == false || selectIfBetterEvaluation(&bestEvaluation, &evaluation2, current, &state2))
           {
             bestl1 = l1;
-            bestl2 = l2;
           }
           foundOne = true;
         }
@@ -788,22 +791,23 @@ void PuyoIA::cycle()
   int currentColumn = attachedGame->getFallingX();
   
   // If we start with new puyos
-  if (currentLine < lastLineSeen)
+  if (attachedGame->isPhaseReady())
   {
+    //fprintf(stderr, "Thinking\n");
     // Reset the cycle counter
     currentCycle = 0;
     // Save we did make any decision yet
-    decisionMade = false;
+    decisionMade = 0;
   }
   
   // increment the cycle counter
   currentCycle++;
   
   // Test if we have to decide where to play
-  if (decisionMade == false)
+  if (decisionMade < DISPATCHCYCLES)
   {
     // if so update the internal grid
-    extractGrid();
+    if (decisionMade == 0) extractGrid();
 
     // Select IA
     switch (type)
@@ -817,7 +821,7 @@ void PuyoIA::cycle()
       case TANIA:
       case JEKO:
       case FLOBO:
-        decide();
+        decide(decisionMade);
         break;
 
       default:
@@ -826,8 +830,8 @@ void PuyoIA::cycle()
         break;        
     }
 
-    // remember we decided
-    decisionMade = true;
+    // remember what we decided
+    decisionMade++;
     
     // don't drop yet!!
     readyToDrop = false;
@@ -881,7 +885,7 @@ void PuyoIA::cycle()
     // if no need to move drop
     if (shouldMove == false) readyToDrop = true;
     // if need to move but impossible, decide again
-    else if (couldntMove == true) decisionMade = false;
+    else if (couldntMove == true) decisionMade = 0;
   }
   lastLineSeen = currentLine;
 }

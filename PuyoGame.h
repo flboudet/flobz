@@ -192,6 +192,8 @@ public:
     virtual int  getSamePuyoAround(int X, int Y, PuyoState color) = 0;
     virtual int  getSemiMove() const = 0;
     
+    virtual bool isPhaseReady(void) { return true; }
+
     virtual int  getPoints()  { return points; }
     int points;
 protected:
@@ -244,8 +246,10 @@ public:
     int getSamePuyoAround(int X, int Y, PuyoState color);
     
     int getSemiMove() const { return semiMove; }
+    bool isPhaseReady(void);
     
     void setGameLevel(int gameLevel) { this->gameLevel = gameLevel; }
+
 private:
     void InitGame(PuyoRandomSystem *attachedRandom);
     // Set the state of the puyo at the indicated coordinates (not recommanded)
@@ -276,6 +280,7 @@ private:
     PuyoPuyo *puyoCells[PUYODIMX * (PUYODIMY+1)];
     PuyoRandomSystem *attachedRandom;
     int sequenceNr;
+    int phaseReady;
     int neutralPuyos;
     int phase;
     int semiMove;

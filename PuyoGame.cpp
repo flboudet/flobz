@@ -141,6 +141,7 @@ void PuyoLocalGame::InitGame(PuyoRandomSystem *attachedRandom)
 {
   gameLevel = 1;
   nbFalled = 0;
+  phaseReady = 2;
     int i, j;
     unmoveablePuyo = attachedFactory->createPuyo(PUYO_UNMOVEABLE);
     for (i = 0 ; i < PUYODIMX ; i++) {
@@ -216,6 +217,7 @@ void PuyoLocalGame::cycle()
     }
     else {
         fallingY++;
+        if (phaseReady == 1) phaseReady = 2;
         fallingPuyo->setPuyoXY(fallingX, fallingY);
         companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
     }
@@ -404,6 +406,14 @@ void PuyoLocalGame::dropNeutrals()
       }
     }
     neutralPuyos = 0;
+  phaseReady = 1;
+}
+
+bool PuyoLocalGame::isPhaseReady(void)
+{
+  bool r = (phaseReady == 2);
+  if (r) phaseReady = 0;
+  return r;
 }
 
 void PuyoLocalGame::setFallingAtTop(bool gameConstruction)

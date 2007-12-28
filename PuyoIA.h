@@ -79,12 +79,12 @@ class PuyoIA : public virtual PuyoPlayer {
     PuyoState extractColor(PuyoState A) const;
     PuyoOrientation extractOrientation(int D) const;
     void extractGrid(void);
-    void decide();
+    void decide(int partial);
     int makeEvaluation(const GridEvaluation * const referenceOne, const PuyoBinom puyos, const GridState * const grid);
     bool selectIfBetterEvaluation(int * const referenceOne, const GridEvaluation * const newOne, const PuyoBinom puyos, const GridState * const grid);
 
     GridState * internalGrid;
-    bool decisionMade;
+    int decisionMade;
     IA_Type type;
     int level;
     PuyoBinom objective;
@@ -93,6 +93,12 @@ class PuyoIA : public virtual PuyoPlayer {
     bool readyToDrop;
 
     void * special;
+  
+    PuyoBinom current, next;
+    unsigned int bestl1;
+    bool foundOne;
+    PuyoBinom originalPuyo;
+  
 };
 
 #endif // PUYOIA_H
