@@ -50,6 +50,29 @@ static char *pathResolverFunction (StyrolyseClient *_this, const char *path)
   }
 }
 
+// "@state.type"
+int extract_state_and_type(const char *s, int *state, int *type)
+{
+    char *first;
+    first = strchr(s,'@');
+    if(first != NULL){
+        *state = atoi(first+1);
+    }
+    char *second;
+    second = strchr(s,'.');
+    if(second != NULL){
+        *type = atoi(second+1);    
+    }
+   
+    if (first!=NULL && second != NULL){
+        return 0;
+    }
+    else{
+        return 1;
+    }
+}
+
+
 class StyroImage
 {
     public:
@@ -59,7 +82,14 @@ class StyroImage
         StyroImage(const char *path) : path(path)
         {
             if (path[0] == '@') {
-                surface = getPuyoThemeManger()->getAnimatedPuyoSetTheme()->getAnimatedPuyoTheme((PuyoState)11)->getSurface((PuyoPictureType)0, 0);
+                int state = 0;
+                int type = 0;
+                if (extract_state_and_type(path,&state,&type)==0){
+                    surface = getPuyoThemeManger()->getAnimatedPuyoSetTheme()->getAnimatedPuyoTheme((PuyoState)state)->getSurface((PuyoPictureType)state, 0);
+                }
+                else{
+                    surface = NULL;
+                }
             }
             else {
                 String imgPath = theCommander->getDataPathManager().getPath(FilePath("gfx").combine(path));
