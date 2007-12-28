@@ -17,7 +17,7 @@ SoFont *DBG_FONT = NULL;
 
 // Keep track of opened fonts, release SDL_TTF when 0
 static int num_fonts = 0;
-#define CACHE_SIZE 32
+#define CACHE_SIZE 64
 
 int SplitString(const string& input, 
                const char delimiter, vector<string>& results, 
@@ -362,6 +362,7 @@ void SoFont_PutLine(SoFont * font, SDL_Surface * surface, int x, int y, const ch
             // No such line in cache, insert it!
             SoFont_CacheCheck(font);
             cacheLine = new CacheLine();
+            cacheLine->renderImage(font, text);
             font->cache.insert(CachePair(string(text), cacheLine));
         }
         else {
@@ -369,7 +370,6 @@ void SoFont_PutLine(SoFont * font, SDL_Surface * surface, int x, int y, const ch
         }
         // Now it is in cache, use it!
         // SoFont_RenderText(font, text);
-        cacheLine->renderImage(font, text);
         cacheLine->blitImage(x,y,surface);
     }
 }

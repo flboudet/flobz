@@ -331,17 +331,17 @@ RGBA iim_hsva2rgba(HSVA c)
   }
   else { // chromatic color
     if (c.hue == 360.0f)      // 360 degrees same as 0 degrees
-      hueTemp=0.0f;
-    else 
-      hueTemp = c.hue;
-
-    hueTemp = hueTemp/60.0f;  // h is now in [0,6)
+      hueTemp = 0.0f;
+    else {
+      hueTemp = c.hue / 60.0f;  // h is now in [0,6)
+      hueTemp = hueTemp / 60.0f;
+    }
     float i = floor(hueTemp); // largest integer <= h
-    float f = hueTemp-i;      // fractional part of h
+    float f = hueTemp - i;    // fractional part of h
 
-    float p = c.value*(1.0f - c.saturation);
-    float q = c.value*(1.0f-(c.saturation*f));
-    float t = c.value*(1.0f-(c.saturation*(1.0-f)));
+    float p = c.value * (1.0f - c.saturation);
+    float q = c.value * (1.0f - (c.saturation * f));
+    float t = c.value * (1.0f - (c.saturation * (1.0-f)));
 
     switch((int)i) {
       case 0:

@@ -24,6 +24,7 @@ ENABLE_DGA?=false
 DEBUG_MODE?=true
 MORE_DEBUG?=false
 ENABLE_PCH?=false
+ENABLE_GPROF?=false
 
 ENABLE_BENCHMARKS?=false
 
@@ -130,6 +131,11 @@ ifeq ($(MORE_DEBUG), true)
 	CFLAGS:=$(CFLAGS) -DDEBUG=1
 endif
 
+
+ifeq ($(ENABLE_GPROF), true)
+	CFLAGS:=$(CFLAGS) -g -pg
+	LDFLAGS:=$(LDFLAGS) -g -pg
+endif
 
 # SDL CONFIG
 ifeq ($(PLATFORM), Darwin)
