@@ -100,7 +100,7 @@ class PuyoCommander : public MessageListener
     void setGlSDL(bool useGL);
     void setCursorVisible(bool visible) { cursor->setVisible(visible); }
     
-    void initDisplay(bool fullscreen, bool useGL);
+    void initDisplay(int w, int h, bool fullscreen, bool useGL);
     const PuyoDataPathManager &getDataPathManager() { return dataPathManager; }
     const char * getLocalizedString(const char * originalString) const;
   private:
