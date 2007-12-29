@@ -1,6 +1,9 @@
 #include "gameloop.h"
-
 #include "gameui.h"
+
+#ifdef HAVE_OPENGL
+#include "SDL_opengl.h"
+#endif
 
 DrawableComponent::DrawableComponent()
   : parentLoop(NULL), _drawRequested(false)
@@ -131,6 +134,7 @@ bool CycledComponent::isLate(double currentTime) const
 GameLoop::GameLoop() : timeDrift(0), lastDrawTime(getCurrentTime()), deltaDrawTimeMax(2.) {
   finished = false;
   display = NULL;
+  opengl_mode = false;
 }
 
 void GameLoop::addDrawable(DrawableComponent *gc)
@@ -336,7 +340,115 @@ void GameLoop::draw()
         SoFont_PutString (DBG_FONT, getSurface(), 16, 16, fps, NULL);
 #endif
 
-  if (display != NULL) {
+  if (opengl_mode) {
+#ifdef HAVE_OPENGL
+      GLuint texture;
+      GLenum texture_format;
+      GLint  nOfColors;
+      static int texture_mode = 0;
+
+      if (texture_mode == 0) {
+          char *ext = (char *)glGetString(GL_EXTENSIONS);
+          if (strstr(ext, "EXT_texture_rectangle")) {
+              printf("Using EXT_texture_rectangle\n");
+              texture_mode = 2;
+          }
+          else if (strstr(ext, "NV_texture_rectangle")) {
+              texture_mode = 2; 
+              printf("Using NV_texture_rectangle\n");
+          }
+          else if (strstr(ext, "ARB_texture_non_power_of_two")) {
+              texture_mode = 1;
+              printf("Using ARB_texture_non_power_of_two\n");
+          }
+      }
+
+      if (texture_mode == 0) {
+          printf("OpenGL mode unsupported\n");
+          SDL_Quit();
+      }
+
+      // get the number of channels in the SDL surface
+      nOfColors = surface->format->BytesPerPixel;
+      if (nOfColors == 4)     // contains an alpha channel
+      {
+          if (surface->format->Rmask == 0x000000ff) texture_format = GL_RGBA;
+          else texture_format = GL_BGRA;
+      } else if (nOfColors == 3)     // no alpha channel
+      {
+          if (surface->format->Rmask == 0x000000ff) texture_format = GL_RGB;
+          else texture_format = GL_BGR;
+      } else {
+          printf("warning: the image is not truecolor..  this will probably break\n");
+          // this error should not go unhandled
+      }
+
+      // Have OpenGL generate a texture object handle for us
+      glGenTextures(1, &texture);
+      if (texture_mode == 2) {
+          // Bind the texture object
+          glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture);
+          // Set the texture's stretching properties
+          //glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          //glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          // Edit the texture object's image data using the information SDL_Surface gives us
+          glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, nOfColors, surface->w, surface->h, 0,
+                  texture_format, GL_UNSIGNED_BYTE, surface->pixels);
+          glEnable(GL_TEXTURE_RECTANGLE_ARB);
+      }
+      if (texture_mode == 1) {
+          // Bind the texture object
+          glBindTexture(GL_TEXTURE_2D, texture);
+          // Set the texture's stretching properties
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          // Edit the texture object's image data using the information SDL_Surface gives us
+          glTexImage2D(GL_TEXTURE_2D, 0, nOfColors, surface->w, surface->h, 0,
+                  texture_format, GL_UNSIGNED_BYTE, surface->pixels);
+          glEnable(GL_TEXTURE_2D);
+      }
+
+      glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
+      glViewport(0, 0, display->w, display->h);
+      glMatrixMode( GL_PROJECTION );
+      glLoadIdentity();
+      glOrtho(0.0f, display->w, display->h, 0.0f, -1.0f, 1.0f);
+      glMatrixMode( GL_MODELVIEW );
+      glLoadIdentity();
+      glClear(GL_COLOR_BUFFER_BIT);
+
+      glDisable(GL_DEPTH_TEST);
+
+      int dx = (display->w - 640) / 2;
+      int dy = (display->h - 480) / 2;
+      glBegin(GL_QUADS);
+      if (texture_mode == 2) {
+          glTexCoord2i(0, 0);
+          glVertex3f(dx, dy, 0.0f);
+          glTexCoord2i(640, 0);
+          glVertex3f(dx + 640, dy, 0);
+          glTexCoord2i(640, 480);
+          glVertex3f(dx + 640, dy + 480, 0);
+          glTexCoord2i(0, 480);
+          glVertex3f(dx, dy + 480, 0);
+      }
+      else if (texture_mode == 1) {
+          glTexCoord2i(0, 0);
+          glVertex3f(dx, dy, 0.0f);
+          glTexCoord2i(1, 0);
+          glVertex3f(dx + 640, dy, 0);
+          glTexCoord2i(1, 1);
+          glVertex3f(dx + 640, dy + 480, 0);
+          glTexCoord2i(0, 1);
+          glVertex3f(dx, dy + 480, 0);
+      }
+      glEnd();
+
+      SDL_GL_SwapBuffers();
+      glDeleteTextures(1,&texture);
+#endif
+  }
+  else if (display != NULL) {
       SDL_Rect r;
       r.x = (display->w - 640) / 2;
       r.y = (display->h - 480) / 2;

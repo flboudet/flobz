@@ -126,6 +126,9 @@ class GameLoop
     void setDisplay(SDL_Surface *surface) {
       this->display = surface;
     }
+    void setOpenGLMode(bool state) {
+        this->opengl_mode = state;
+    }
 
     inline double getCurrentTime() const {
       return 0.001 * (double)SDL_GetTicks();
@@ -140,6 +143,7 @@ class GameLoop
     Vector<IdleComponent>     idles;
     Vector<GarbageCollectableItem> garbageCollector;
     bool finished;
+    bool opengl_mode;
 };
 
 #endif // _GAMELOOP_H
