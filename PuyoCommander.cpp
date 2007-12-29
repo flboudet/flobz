@@ -449,7 +449,8 @@ void PuyoCommander::setFullScreen(bool fullScreen)
           //SDL_QuitSubSystem(SDL_INIT_VIDEO);
           //SDL_InitSubSystem(SDL_INIT_VIDEO);
           
-          initDisplay(640, 480, fullscreen, useGL);
+            initDisplay(GetIntPreference(kScreenWidthPref, 640),
+                    GetIntPreference(kScreenHeightPref, 480), fullscreen, useGL);
         }
         /* Workaround for cursor showing in MacOS X fullscreen mode */
         SDL_ShowCursor(SDL_ENABLE);
@@ -465,40 +466,39 @@ void PuyoCommander::setGlSDL(bool useGL)
 void PuyoCommander::initDisplay(int w, int h, bool fullscreen, bool useGL)
 {
   DBG_PRINT("initDisplay()\n");
-  display = SDL_SetVideoMode(w, h, 0, SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0)|(useGL?SDL_GLSDL:0));
-  if ( display == NULL ) {
-    fprintf(stderr, "SDL_SetVideoMode error: %s\n",
-            SDL_GetError());
-    exit(1);
-  }
-  if ((w == 640) && (h == 480)) {
-      loop->setSurface(display);
-      loop->setDisplay(NULL);
+
+  if (useGL) {
+      SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+      SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+      SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+      SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+      SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+      if ((display = SDL_SetVideoMode(w, h, 24, SDL_OPENGL|(fullscreen?SDL_FULLSCREEN:0))) == NULL) {
+          fprintf(stderr, "Couldn't set GL mode: %s\n", SDL_GetError());
+          SDL_Quit();
+          return;
+      }
+      loop->setSurface(SDL_CreateRGBSurface(SDL_SWSURFACE, 640, 480, 32,0,0,0,0));
+      loop->setDisplay(display);
+      loop->setOpenGLMode(true);
   }
   else {
-      /* Create a 32-bit surface with the bytes of each pixel in R,G,B,A order,
-       *        as expected by OpenGL for textures */
-      SDL_Surface *surface;
-      Uint32 rmask, gmask, bmask, amask;
-
-      /* SDL interprets each pixel as a 32-bit number, so our masks must depend
-       *        on the endianness (byte order) of the machine */
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-      rmask = 0xff000000;
-      gmask = 0x00ff0000;
-      bmask = 0x0000ff00;
-      amask = 0x00000000;
-#else
-      rmask = 0x000000ff;
-      gmask = 0x0000ff00;
-      bmask = 0x00ff0000;
-      amask = 0x00000000;
-#endif
-
-      surface = SDL_CreateRGBSurface(SDL_SWSURFACE, 640, 480, 32,0,0,0,0);
-      /*32, rmask, gmask, bmask, amask);*/
-      loop->setSurface(surface);
-      loop->setDisplay(display);
+      display = SDL_SetVideoMode(w, h, 0, SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));
+      if (display == NULL) {
+          fprintf(stderr, "SDL_SetVideoMode error: %s\n",
+                  SDL_GetError());
+          exit(1);
+      }
+      if ((w == 640) && (h == 480)) {
+          loop->setSurface(display);
+          loop->setDisplay(NULL);
+      }
+      else {
+          SDL_Surface *surface = SDL_CreateRGBSurface(SDL_SWSURFACE, 640, 480, 32,0,0,0,0);
+          loop->setSurface(surface);
+          loop->setDisplay(display);
+      }
+      loop->setOpenGLMode(false);
   }
   atexit(SDL_Quit); 
   SDL_ShowCursor(SDL_DISABLE);
@@ -515,7 +515,9 @@ void PuyoCommander::loadPreferences(bool fs)
   /* Load Preferences */
   fullscreen = fs ? GetBoolPreference(kFullScreenPref, true) : false;
 #ifdef HAVE_OPENGL
-  useGL      = GetBoolPreference(kOpenGLPref,false);
+  useGL = GetBoolPreference(kOpenGLPref, false);
+#else
+  useGL = false;
 #endif
 }
 
