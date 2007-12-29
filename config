@@ -110,7 +110,7 @@ endif
 # OpenGL
 ifeq ($(ENABLE_OPENGL), true)
 	CFLAGS:=$(CFLAGS) -DHAVE_OPENGL=1
-	OBJFILES:=$(OBJFILES) glSDL.o
+    # OBJFILES:=$(OBJFILES) glSDL.o
 	ifeq ($(PLATFORM), Darwin)
 		CFLAGS:=$(CFLAGS)
 		LDFLAGS:=$(LDFLAGS) -framework OpenGL
