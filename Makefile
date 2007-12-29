@@ -68,9 +68,9 @@ all.h.gch:
 	rm -f $(DEPDIR)/all.d
 	@echo "[$@]" && $(CXX) $(CFLAGS_NOPCH) all.h # 2>> WARNINGS || (cat WARNINGS && false)
 
-glSDL.o:glSDL.cpp all.h.gch 
-	@echo "[$@]" && $(CXX) $(CFLAGS) -c $< 2>> EXT_WARNINGS
-	@rm -f EXT_WARNINGS
+#glSDL.o:glSDL.cpp all.h.gch 
+#	@echo "[$@]" && $(CXX) $(CFLAGS) -c $< 2>> EXT_WARNINGS
+#	@rm -f EXT_WARNINGS
 corona.o:corona.cpp all.h.gch 
 corona32.o:corona32.cpp all.h.gch 
 corona_palette.o:corona_palette.cpp	 all.h.gch 
