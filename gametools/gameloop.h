@@ -119,8 +119,12 @@ class GameLoop
     bool isLate(double currentTime) const;
 
     SDL_Surface *getSurface() const { return surface; }
+    SDL_Surface *getDisplay() const { return display; }
     void setSurface(SDL_Surface *surface) {
       this->surface = surface;
+    }
+    void setDisplay(SDL_Surface *surface) {
+      this->display = surface;
     }
 
     inline double getCurrentTime() const {
@@ -131,6 +135,7 @@ class GameLoop
     double timeDrift;
     double lastDrawTime, deltaDrawTimeMax;
     SDL_Surface *surface;
+    SDL_Surface *display;
     Vector<DrawableComponent> drawables;
     Vector<IdleComponent>     idles;
     Vector<GarbageCollectableItem> garbageCollector;

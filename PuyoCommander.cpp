@@ -30,6 +30,8 @@ SoFont *storyFont;
 
 static const char * kFullScreenPref = "Config.FullScreen";
 static const char * kOpenGLPref     = "Config.OpenGL";
+static const char * kScreenWidthPref = "Config.ScreenWidth";
+static const char * kScreenHeightPref = "Config.ScreenHeight";
 
 /*
  * MENU ACTIONS
@@ -286,7 +288,8 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber) : d
   initLocale();
   initGameControls();
   initAudio();
-  initDisplay(fullscreen, useGL);
+  initDisplay(GetIntPreference(kScreenWidthPref, 640),
+          GetIntPreference(kScreenHeightPref, 480), fullscreen, useGL);
   initFonts();
   initMenus();
   cursor = new GameCursor(dataPathManager.getPath("gfx/cursor.png"));
@@ -446,7 +449,7 @@ void PuyoCommander::setFullScreen(bool fullScreen)
           //SDL_QuitSubSystem(SDL_INIT_VIDEO);
           //SDL_InitSubSystem(SDL_INIT_VIDEO);
           
-          initDisplay(fullscreen, useGL);
+          initDisplay(640, 480, fullscreen, useGL);
         }
         /* Workaround for cursor showing in MacOS X fullscreen mode */
         SDL_ShowCursor(SDL_ENABLE);
@@ -459,16 +462,44 @@ void PuyoCommander::setGlSDL(bool useGL)
 }
     
 /* Init SDL display */
-void PuyoCommander::initDisplay(bool fullscreen, bool useGL)
+void PuyoCommander::initDisplay(int w, int h, bool fullscreen, bool useGL)
 {
   DBG_PRINT("initDisplay()\n");
-  display = SDL_SetVideoMode( 640, 480, 0,  SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0)|(useGL?SDL_GLSDL:0));
+  display = SDL_SetVideoMode(w, h, 0, SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0)|(useGL?SDL_GLSDL:0));
   if ( display == NULL ) {
     fprintf(stderr, "SDL_SetVideoMode error: %s\n",
             SDL_GetError());
     exit(1);
   }
-  loop->setSurface(display);
+  if ((w == 640) && (h == 480)) {
+      loop->setSurface(display);
+      loop->setDisplay(NULL);
+  }
+  else {
+      /* Create a 32-bit surface with the bytes of each pixel in R,G,B,A order,
+       *        as expected by OpenGL for textures */
+      SDL_Surface *surface;
+      Uint32 rmask, gmask, bmask, amask;
+
+      /* SDL interprets each pixel as a 32-bit number, so our masks must depend
+       *        on the endianness (byte order) of the machine */
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+      rmask = 0xff000000;
+      gmask = 0x00ff0000;
+      bmask = 0x0000ff00;
+      amask = 0x00000000;
+#else
+      rmask = 0x000000ff;
+      gmask = 0x0000ff00;
+      bmask = 0x00ff0000;
+      amask = 0x00000000;
+#endif
+
+      surface = SDL_CreateRGBSurface(SDL_SWSURFACE, 640, 480, 32,0,0,0,0);
+      /*32, rmask, gmask, bmask, amask);*/
+      loop->setSurface(surface);
+      loop->setDisplay(display);
+  }
   atexit(SDL_Quit); 
   SDL_ShowCursor(SDL_DISABLE);
   SDL_WM_SetCaption("FloboPuyo by iOS-Software",NULL);

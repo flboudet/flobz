@@ -130,6 +130,7 @@ bool CycledComponent::isLate(double currentTime) const
 
 GameLoop::GameLoop() : timeDrift(0), lastDrawTime(getCurrentTime()), deltaDrawTimeMax(2.) {
   finished = false;
+  display = NULL;
 }
 
 void GameLoop::addDrawable(DrawableComponent *gc)
@@ -301,9 +302,11 @@ bool GameLoop::isLate(double currentTime) const
 
 void GameLoop::draw()
 {
+  SDL_Surface *screen = getSurface();
+
   for (int i = 0; i < drawables.size(); ++i) {
     if (drawables[i] != NULL)
-        drawables[i]->doDraw(getSurface());
+        drawables[i]->doDraw(screen);
     else
         printf("INVALID DRAWABLE\n");
   }
@@ -333,7 +336,16 @@ void GameLoop::draw()
         SoFont_PutString (DBG_FONT, getSurface(), 16, 16, fps, NULL);
 #endif
 
-  SDL_Flip(getSurface());
+  if (display != NULL) {
+      SDL_Rect r;
+      r.x = (display->w - 640) / 2;
+      r.y = (display->h - 480) / 2;
+      SDL_BlitSurface(screen, NULL, display, &r);
+      SDL_Flip(display);
+  }
+  else {
+      SDL_Flip(screen);
+  }
 }
 
 bool GameLoop::moveToFront(DrawableComponent *gc)
