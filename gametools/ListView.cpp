@@ -14,6 +14,13 @@ namespace gameui {
 void ScrollWidget::eventOccured(GameControlEvent *event)
 {
     if (event->cursorEvent == GameControlEvent::kGameMouseClicked) {
+        if (event->isUp) {
+            if (m_grabbing) {
+                getParentScreen()->ungrabEventsOnWidget(this);
+                m_grabbing = false;
+            }
+            return;
+        }
         Vec3 widPosition = getPosition();
         Vec3 widSize = getSize();
         if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
@@ -32,6 +39,29 @@ void ScrollWidget::eventOccured(GameControlEvent *event)
             else if (event->y > widPosition.y + lastVisibleOffset) {
                 m_siProvider.setFirstVisible(firstVisible + (numItems - lastVisible) / 2.);
             }
+            else {
+                m_grabbing = true;
+                m_grabOffset = event->y - widPosition.y - firstVisibleOffset;
+                getParentScreen()->grabEventsOnWidget(this);
+            }
+        }
+    }
+    else if (event->cursorEvent == GameControlEvent::kGameMouseMoved) {
+        if (m_grabbing) {
+            Vec3 widPosition = getPosition();
+            Vec3 widSize = getSize();
+            float firstVisible = m_siProvider.getFirstVisible();
+            float lastVisible = m_siProvider.getLastVisible();
+            float numItems = m_siProvider.getFullSize();
+            int eventY = event->y - m_grabOffset;
+            if (eventY < widPosition.y)
+                m_siProvider.setFirstVisible(0.);
+            else if (event->y > widPosition.y + widSize.y)
+                m_siProvider.setFirstVisible(numItems + firstVisible - lastVisible);
+            else {
+                float mouseOffset = eventY - widPosition.y;
+                m_siProvider.setFirstVisible(numItems * (mouseOffset / widSize.y));
+            }
         }
     }
 }
@@ -43,7 +73,7 @@ void ScrollWidget::draw(SDL_Surface *screen)
     float numItems = m_siProvider.getFullSize();
     
     int firstVisibleOffset = getSize().y * firstVisible / numItems;
-    int lastVisibleOffset = getSize().y * lastVisible / numItems;
+    int lastVisibleOffset = lastVisible > numItems ? getSize().y : getSize().y * lastVisible / numItems;
     
     SDL_Rect dstrect;
     
@@ -58,7 +88,16 @@ void ScrollWidget::draw(SDL_Surface *screen)
     SDL_FillRect(screen, &dstrect, 0xFFAAAAAA);
 }
 
+//
+// ListViewEntry
+//
 
+void ListViewEntry::setText(String text)
+{
+    m_text = text;
+    if (m_owner != NULL)
+        m_owner->resyncLabels();
+}
 
 //
 // ListView
@@ -98,9 +137,23 @@ ListView::ListView(int size, IIM_Surface *downArrow, GameLoop *loop) : CycledCom
     resumeLayout();
 }
 
-void ListView::addEntry(const ListViewEntry &entry)
+void ListView::addEntry(ListViewEntry *entry)
 {
     entries.push_back(entry);
+    entry->m_owner = this;
+    resyncLabels();
+}
+
+void ListView::removeEntry(ListViewEntry *entry)
+{
+    for (std::vector<ListViewEntry *>::iterator iter = entries.begin() ;
+         iter < entries.end() ; iter++) {
+         if (*iter == entry) {
+            entry->m_owner = NULL;
+            entries.erase(iter);
+            break;
+         }
+    }
     resyncLabels();
 }
 
@@ -184,14 +237,18 @@ void ListView::resyncLabels()
 {
     int lastVisible = size < entries.size() ? firstVisible + size : firstVisible + entries.size();
     for (int i = firstVisible ; i < lastVisible ; i++) {
-        buttons[i-firstVisible]->setValue(entries[i].m_text);
-        buttons[i-firstVisible]->setAction(ON_START, entries[i].m_action);
+        buttons[i-firstVisible]->setValue(entries[i]->m_text);
+        buttons[i-firstVisible]->setAction(ON_START, entries[i]->m_action);
+    }
+    for (int i = lastVisible ; i < firstVisible + size ; i++) {
+        buttons[i-firstVisible]->setValue("");
+        buttons[i-firstVisible]->setAction(ON_START, NULL);
     }
 }
 
 void ListView::setFirstVisible(float firstVisible)
 {
-    if ((firstVisible >= 0) && (firstVisible + size < entries.size())) {
+    if ((firstVisible >= 0) && (firstVisible + size <= entries.size())) {
             this->firstVisible = firstVisible;
             resyncLabels();
     }

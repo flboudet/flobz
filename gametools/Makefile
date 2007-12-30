@@ -1,5 +1,6 @@
 OBJFILES=SDL_Painter.o InputManager.o GameControls.o GameCursor.o \
-         IosImgProcess.o preferences.o sofont.o gameloop.o gameui.o mt19937ar.o
+         IosImgProcess.o preferences.o sofont.o gameloop.o gameui.o \
+         ListView.o mt19937ar.o
 
 object:${OBJFILES}
 

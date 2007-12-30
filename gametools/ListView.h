@@ -14,6 +14,8 @@
 
 namespace gameui {
 
+class ListView;
+
 class ScrollInfoProvider {
 public:
     virtual float getFirstVisible() const = 0;
@@ -24,27 +26,34 @@ public:
 
 class ScrollWidget : public Widget {
 public:
-    ScrollWidget(ScrollInfoProvider &siProvider) : m_siProvider(siProvider) {Widget::setFocusable(true);}
+    ScrollWidget(ScrollInfoProvider &siProvider) : m_siProvider(siProvider), m_grabbing(false) {Widget::setFocusable(true); setReceiveUpEvents(true);}
     virtual void eventOccured(GameControlEvent *event);
 protected:
     virtual void draw(SDL_Surface *screen);
 private:
     ScrollInfoProvider &m_siProvider;
+    bool m_grabbing;
+    int m_grabOffset;
 };
 
 class ListViewEntry {
 public:
-    ListViewEntry(String text, Action *action = NULL) : m_text(text), m_action(action) {}
+    ListViewEntry(String text, Action *action = NULL) : m_text(text), m_action(action), m_owner(NULL) {}
+    String getText() const { return m_text; }
+    void setText(String text);
 private:
     String m_text;
     Action *m_action;
+    ListView *m_owner;
 friend class ListView;
 };
 
 class ListView : public CycledComponent, public HBox, public Action, public ScrollInfoProvider {
 public:
     ListView(int size, IIM_Surface *downArrow, GameLoop *loop = NULL);
-    void addEntry(const ListViewEntry &entry);
+    void addEntry(ListViewEntry *entry);
+    void removeEntry(ListViewEntry *entry);
+    ListViewEntry *getEntryAt(int index) const { return entries[index]; }
     virtual void eventOccured(GameControlEvent *event);
     virtual IdleComponent *getIdleComponent() { return this; }
     // Action
@@ -68,10 +77,11 @@ private:
     ScrollWidget scrollWidget;
     VBox scrollerBox;
     VBox listBox;
-    std::vector<ListViewEntry> entries;
+    std::vector<ListViewEntry *> entries;
     std::vector<Button *> buttons;
     Widget *m_clickedButton;
     int m_cyclesBeforeContinuousScroll;
+friend class ListViewEntry;
 };
 
 }

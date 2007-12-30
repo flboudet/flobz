@@ -14,7 +14,8 @@ public:
     // SDL events
     enum {
         MOVE = 0,
-        CLICK = 1
+        MOUSE_DOWN = 1,
+        MOUSE_UP = 2
     };
     struct CursorEventArg {
         CursorEventArg(int x, int y) : x(x), y(y) {}
@@ -26,7 +27,7 @@ protected:
     virtual void draw(SDL_Surface *screen);
 private:
     void setCursorPosition(int x, int y);
-    void click(int x, int y);
+    void pushMouseEvent(int x, int y, int eventType);
     
     IIM_Surface * cursorSurface;
     int blitX, blitY;

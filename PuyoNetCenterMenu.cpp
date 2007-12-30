@@ -87,6 +87,7 @@ void NetCenterDialogMenu::build()
         buttons.add(&acceptButton);
     buttons.add(&cancelButton);
     menu.add(&buttons);
+    getParentScreen()->grabEventsOnWidget(this);
     transitionToContent(&menu);
 }
 
@@ -102,11 +103,16 @@ String NetCenterPlayerList::PlayerEntry::getStatusString(int status)
   }
 }
 
+NetCenterPlayerList::NetCenterPlayerList(int size, NetCenterMenu *targetMenu, GameLoop *loop)
+    : ListView(size, IIM_Load_Absolute_DisplayFormat(theCommander->getDataPathManager().getPath("gfx/downarrow.png")), loop), targetMenu(targetMenu)
+{}
+
 void NetCenterPlayerList::addNewPlayer(String playerName, PeerAddress playerAddress, int status)
 {
-    PlayerEntry *newEntry = new PlayerEntry(playerName, playerAddress, status, new PlayerSelectedAction(targetMenu, playerAddress, playerName));
+    Action *playerSelectedAction = new PlayerSelectedAction(targetMenu, playerAddress, playerName);
+    PlayerEntry *newEntry = new PlayerEntry(playerName, playerAddress, status, playerSelectedAction);
     entries.add(newEntry);
-    add(newEntry);
+    addEntry(newEntry);
 }
 
 void NetCenterPlayerList::removePlayer(PeerAddress playerAddress)
@@ -114,7 +120,7 @@ void NetCenterPlayerList::removePlayer(PeerAddress playerAddress)
     for (int i = 0 ; i < entries.size() ; i++) {
         if (entries[i]->playerAddress == playerAddress) {
             PlayerEntry *currentEntry = entries[i];
-            remove(currentEntry);
+            removeEntry(currentEntry);
             entries.removeAt(i);
             delete currentEntry;
             return;
@@ -127,7 +133,7 @@ void NetCenterPlayerList::updatePlayer(String playerName, PeerAddress playerAddr
     for (int i = 0 ; i < entries.size() ; i++) {
         if (entries[i]->playerAddress == playerAddress) {
             PlayerEntry *currentEntry = entries[i];
-	    currentEntry->updateEntry(playerName, status);
+            currentEntry->updateEntry(playerName, status);
             return;
         }
     }
@@ -166,7 +172,7 @@ NetCenterMenu::NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netC
       netCenter(netCenter), playerListText(theCommander->getLocalizedString("Player List")),
       chatAreaText(theCommander->getLocalizedString("Chat Area")),
       cycled(this),
-      playerList(8, this), onScreenDialog(NULL), shouldSelfDestroy(false),
+      playerList(5, this), onScreenDialog(NULL), shouldSelfDestroy(false),
       nameProvider(*netCenter), chatBox(*this),
       title(theCommander->getLocalizedString("Network Game Center")), backAction(mainScreen),
       cancelButton(theCommander->getLocalizedString("Disconnect"), &backAction)
@@ -200,6 +206,7 @@ void NetCenterMenu::build()
     menu.add(&title);
     menu.add(&cancelButton);
     
+    playerbox.setPolicy(USE_MIN_SIZE);
     playerbox.add(&playerListText);
     playerbox.add(&playerList);
 
@@ -246,7 +253,7 @@ void NetCenterMenu::onGameInvitationReceived(PuyoGameInvitation &invitation)
     }
     else {
         onScreenDialog = new NetCenterDialogMenu(this, invitation, theCommander->getLocalizedString("Invitation for a game"), invitation.opponentName + theCommander->getLocalizedString(" invited you to play"), true);
-        add(onScreenDialog);
+        container.add(onScreenDialog);
         onScreenDialog->build();
         this->focus(onScreenDialog);
     }
@@ -283,7 +290,7 @@ void NetCenterMenu::onGameInvitationCanceledReceived(PuyoGameInvitation &invitat
 {
     if (this->onScreenDialog != NULL) {
         if (invitation.opponentAddress == onScreenDialog->associatedInvitation.opponentAddress) {
-            remove(onScreenDialog);
+            container.remove(onScreenDialog);
             delete onScreenDialog;
             onScreenDialog = NULL;
         }
@@ -299,7 +306,7 @@ void NetCenterMenu::onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvita
     starterAction->action();
     
     if (this->onScreenDialog != NULL) {
-        remove(onScreenDialog);
+        container.remove(onScreenDialog);
         delete(onScreenDialog);
         onScreenDialog = NULL;
     }
@@ -311,7 +318,7 @@ void NetCenterMenu::playerSelected(PeerAddress playerAddress, String playerName)
     invitation.gameRandomSeed = (unsigned long)(fmod(getTimeMs(), (double)0xFFFFFFFF));
     invitation.opponentAddress = playerAddress;
     onScreenDialog = new NetCenterDialogMenu(this, invitation, theCommander->getLocalizedString("Asking for a game"), String(theCommander->getLocalizedString("Waiting ")) + playerName + theCommander->getLocalizedString(" for confirmation"), false);
-    add(onScreenDialog);
+    container.add(onScreenDialog);
     onScreenDialog->build();
     this->focus(onScreenDialog);
     

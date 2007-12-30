@@ -33,13 +33,15 @@ namespace gameui {
     USE_MAX_SIZE = 0,
     USE_MIN_SIZE,
     ON_START,
+    ON_MOUSEUP,
     GAMEUIENUM_LAST
   };
 
 
   class Action {
     public:
-      virtual void action() = 0;
+      virtual void action() {}
+      virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event) { action(); }
       virtual ~Action() {}
   };
   
@@ -102,6 +104,8 @@ namespace gameui {
       bool receiveUpEvents() const { return receiveUp; }
       void setReceiveUpEvents(bool receiveUp) { this->receiveUp = receiveUp; }
       virtual void checkFocus() {}
+      
+      virtual Screen *getParentScreen() const;
       
       // Notifications
       virtual void onWidgetVisibleChanged(bool visible) { hidden = !visible; }
@@ -166,10 +170,11 @@ namespace gameui {
       void resumeLayout();
       
       virtual void onWidgetVisibleChanged(bool visible);
-    protected:
+    
       Widget *getChild(int i)     const  { return childs[i]; }
       void    changeChild(int i, Widget *w);
       int     getNumberOfChilds() const  { return childs.size(); }
+    protected:
       void    sortWidgets();
       int     innerMargin;
       bool    layoutSuspended;
@@ -196,17 +201,19 @@ namespace gameui {
        * Handles and eventually propagates an event on the widget tree of the box container
        * @param event the game event
        */
-      void eventOccured(GameControlEvent *event);
-      void giveFocus();
-      void lostFocus();
-      void setFocusable(bool foc);
+      virtual void eventOccured(GameControlEvent *event);
+      virtual void giveFocus();
+      virtual void lostFocus();
+      virtual void setFocusable(bool foc);
       void add (Widget *child);
       void checkFocus();
       void focus(Widget *widget);
-
+      int getActiveWidget() const { return activeWidget; }
     protected:
       virtual float getSortingAxe(const Vec3 &v3) const = 0;
+      virtual float getOtherAxis(const Vec3 &v3) const = 0;
       virtual void setSortingAxe(Vec3 &v3, float value) = 0;
+      virtual void setOtherAxis(Vec3 &v3, float value) = 0;
       virtual bool isPrevEvent(GameControlEvent *event) const = 0;
       virtual bool isNextEvent(GameControlEvent *event) const = 0;
       virtual bool isOtherDirection(GameControlEvent *event) const = 0;
@@ -218,6 +225,8 @@ namespace gameui {
       virtual bool giveFocusToActiveWidget();
 
     private:
+      //Events
+      Action *onRollDownAction, *onRollUpAction;
   };
 
 
@@ -228,6 +237,8 @@ namespace gameui {
     protected:
       float getSortingAxe(const Vec3 &v3) const        { return v3.y;  }
       void  setSortingAxe(Vec3 &v3, float value)       { v3.y = value; }
+      virtual float getOtherAxis(const Vec3 &v3) const { return v3.x; }
+      virtual void setOtherAxis(Vec3 &v3, float value) { v3.x = value; }
       bool isPrevEvent(GameControlEvent *event) const;
       bool isNextEvent(GameControlEvent *event) const;
       bool isOtherDirection(GameControlEvent *event) const;
@@ -241,6 +252,8 @@ namespace gameui {
     protected:
       float getSortingAxe(const Vec3 &v3) const        { return v3.x;  }
       void  setSortingAxe(Vec3 &v3, float value)       { v3.x = value; }
+      virtual float getOtherAxis(const Vec3 &v3) const { return v3.y; }
+      virtual void setOtherAxis(Vec3 &v3, float value) { v3.y = value; }
       bool isPrevEvent(GameControlEvent *event) const;
       bool isNextEvent(GameControlEvent *event) const;
       bool isOtherDirection(GameControlEvent *event) const;
@@ -252,9 +265,15 @@ namespace gameui {
       ZBox(GameLoop *loop = NULL) : Box(loop) {}
       virtual ~ZBox() {}
       void widgetMustRedraw(Widget *wid);
+      
+      virtual void giveFocus() { Box::giveFocus(); }
+      virtual void lostFocus() { Box::lostFocus(); }
+      virtual void eventOccured(GameControlEvent *event);
     protected:
       float getSortingAxe(const Vec3 &v3) const        { return v3.z;  }
       void  setSortingAxe(Vec3 &v3, float value)       { v3.z = value; }
+      virtual float getOtherAxis(const Vec3 &v3) const { return v3.x; }
+      virtual void setOtherAxis(Vec3 &v3, float value) { v3.x = value; }
       bool isPrevEvent(GameControlEvent *event) const;
       bool isNextEvent(GameControlEvent *event) const;
       bool isOtherDirection(GameControlEvent *event) const;
@@ -349,6 +368,17 @@ namespace gameui {
   };
 
   /**
+   * Represents the root container of a screen
+   */
+  class ScreenRootContainer : public ZBox {
+    public:
+        ScreenRootContainer(Screen *parentScreen, GameLoop *loop = NULL) : ZBox(loop), m_parentScreen(parentScreen) {}
+        virtual Screen *getParentScreen() const { return m_parentScreen; }
+    private:
+        Screen *m_parentScreen;
+  };
+  
+  /**
    * Represents a full screen for containing widgets
    */
   class Screen : public GarbageCollectableItem, public DrawableComponent, public IdleComponent {
@@ -363,7 +393,7 @@ namespace gameui {
        * Propagates an event on the widget tree of the screen
        * @param event the game event
        */
-      void onEvent(GameControlEvent *event);
+      virtual void onEvent(GameControlEvent *event);
       void remove(Widget *child) { rootContainer.remove(child); }
       void add(Widget *child) { rootContainer.add(child); }
       virtual void hide() { hidden = true; onScreenVisibleChanged(isVisible()); }
@@ -372,31 +402,37 @@ namespace gameui {
       bool isVisible() const { return !hidden; }
       
       virtual void addToGameLoop(GameLoop *loop) {
-	rootContainer.addToGameLoop(loop);
-	loop->addDrawable(this);
-	loop->addIdle(this);
+          rootContainer.addToGameLoop(loop);
+          loop->addDrawable(this);
+          loop->addIdle(this);
       }
       virtual void removeFromGameLoopActive() {
-	rootContainer.removeFromGameLoopActive();
-	getGameLoop()->removeDrawable(this);
-	getGameLoop()->removeIdle(this);
+          rootContainer.removeFromGameLoopActive();
+          getGameLoop()->removeDrawable(this);
+          getGameLoop()->removeIdle(this);
       }
-
+      
       GameLoop *getGameLoop() { return rootContainer.getGameLoop(); }
       void giveFocus();
       void focus(Widget *widget);
+      ZBox *getRootContainer() { return &rootContainer; }
       
       void setAutoRelease(bool autoRelease) { autoReleaseFlag = autoRelease; }
       void autoRelease();
+      
+      void grabEventsOnWidget(Widget *widget);
+      void ungrabEventsOnWidget(Widget *widget);
       
       // screen callbacks
       virtual void onScreenVisibleChanged(bool visible);
       
     private:
-      ZBox rootContainer;
+      // The root container of the screen
+      ScreenRootContainer rootContainer;
       IIM_Surface *bg;
       bool hidden;
       bool autoReleaseFlag;
+      std::vector<Widget *> m_grabbedWidgets;
   };
 
 
@@ -428,6 +464,26 @@ namespace gameui {
       bool mdontMove;
   };
 
+  class Image : public Widget {
+  public:
+    Image();
+    Image(IIM_Surface *image);
+    // Properties
+    void setImage(IIM_Surface *image);
+    virtual void setFocusable(bool focusable) { Widget::setFocusable(focusable); }
+    // Notifications
+    virtual void onWidgetVisibleChanged(bool visible) { Widget::onWidgetVisibleChanged(visible); }
+    virtual void onWidgetAdded(WidgetContainer *parent) { Widget::onWidgetAdded(parent); }
+    virtual void onWidgetRemoved(WidgetContainer *parent) { Widget::onWidgetRemoved(parent); }
+    virtual void eventOccured(GameControlEvent *event);
+    // Events
+    void setOnStartAction(Action *onStartAction) { setAction(ON_START, onStartAction); setFocusable(true); }
+    void setOnMouseUpAction(Action *onMouseUpAction) { setAction(ON_MOUSEUP, onMouseUpAction); setFocusable(true); setReceiveUpEvents(true); }
+  protected:
+    virtual void draw(SDL_Surface *screen);
+  private:
+    IIM_Surface *m_image;
+  };
 
   class Button : public Text {
     public:
@@ -521,18 +577,22 @@ namespace gameui {
       Separator(float width, float height);
   };
 
-  class ListWidget : public VBox
+  class ListWidget : public HBox
   {
     public:
-      ListWidget(int size, GameLoop *loop = NULL);
+      ListWidget(int size, IIM_Surface *downArrow, GameLoop *loop = NULL);
       void set(int pos, Button *widget);
       void add(Button *widget);
       void clear();
-
+    protected:
+        virtual void draw(SDL_Surface *screen);
     private:
       int size;
       int used;
       Button button;
+      Image downButton, upButton;
+      VBox scrollerBox;
+      VBox listBox;
   };
 
 

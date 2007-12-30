@@ -42,6 +42,8 @@ public:
     }
 };
 
+Screen *pscr;
+    
 class ShowModalDialogAction : public Action {
 public:
     ShowModalDialogAction(ZBox *rootZBox);
@@ -49,19 +51,29 @@ public:
 private:
     ZBox *rootZBox;
     SliderContainer slider;
+    VBox dlgBox;
     Text title;
     Button simpleButton;
 };
 
 ShowModalDialogAction::ShowModalDialogAction(ZBox *rootZBox) : rootZBox(rootZBox), title("Slider"), simpleButton("button")
 {
-    slider.add(&title);
-    slider.add(&simpleButton);
+    IIM_Surface *sliderBkgnd = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/menubg.png");
+    slider.setBackground(sliderBkgnd);
+    Vec3 dialogPos = slider.getPosition();
+    dialogPos.x = 50;
+    dialogPos.y = 195;
+    slider.setPosition(dialogPos);
+    dlgBox.add(&title);
+    dlgBox.add(&simpleButton);
+    slider.setSize(Vec3(sliderBkgnd->w, sliderBkgnd->h));
+    slider.add(&dlgBox);
 }
 
 void ShowModalDialogAction::action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
 {
     rootZBox->add(&slider);
+    slider.getParentScreen()->grabEventsOnWidget(&slider);
 }
 
 int main(int argc, char *argv[])
@@ -102,23 +114,26 @@ int main(int argc, char *argv[])
     loop->addIdle(cursor);
     
     Screen scr(0, 0, 640, 480);
+    pscr = &scr;
     VBox bidonBox;
     Text bidonText("Hello");
     ShowModalDialogAction showDialogAction(scr.getRootContainer());
     
     Button bidonButton1("Hi", &showDialogAction);
     Button bidonButton2("Ho");
+    Button bidonButton3("Hop");
     IIM_Surface *downArrow = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/downarrow.png");
     bidonBox.setPolicy(USE_MIN_SIZE);
     ListView list(20, downArrow);
     bidonBox.add(&bidonText);
     bidonBox.add(&bidonButton1);
     bidonBox.add(&bidonButton2);
-    for (int i = 0 ; i < 100 ; i++) {
+    for (int i = 0 ; i < 5 ; i++) {
         String newEntry("Bla bla ");
-        list.addEntry(ListViewEntry(newEntry + i, &actionBidon));
+        list.addEntry(new ListViewEntry(newEntry + i, &actionBidon));
     }
     bidonBox.add(&list);
+    bidonBox.add(&bidonButton3);
     //list.add(&bidonButton1);
     //list.add(&bidonButton2);
     

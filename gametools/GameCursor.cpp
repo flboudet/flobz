@@ -53,7 +53,12 @@ void GameCursor::onEvent(GameControlEvent *event)
         break;
     case SDL_MOUSEBUTTONDOWN:
         if (event->sdl_event.button.button == SDL_BUTTON_LEFT) {
-            click(event->sdl_event.button.x, event->sdl_event.button.y);
+            pushMouseEvent(event->sdl_event.button.x, event->sdl_event.button.y, GameCursor::MOUSE_DOWN);
+        }
+        break;
+    case SDL_MOUSEBUTTONUP:
+        if (event->sdl_event.button.button == SDL_BUTTON_LEFT) {
+            pushMouseEvent(event->sdl_event.button.x, event->sdl_event.button.y, GameCursor::MOUSE_UP);
         }
         break;
     default:
@@ -115,14 +120,14 @@ void GameCursor::setCursorPosition(int x, int y)
         blitAngle += 360.;
 }
 
-void GameCursor::click(int x, int y)
+void GameCursor::pushMouseEvent(int x, int y, int eventType)
 {
     // Push an SDL user event corresponding to the click of our game cursor
-    SDL_Event clickEvent;
-    clickEvent.type = SDL_USEREVENT;
-    clickEvent.user.code = GameCursor::CLICK;
-    clickEvent.user.data1 = new CursorEventArg(x, y);
-    SDL_PushEvent(&clickEvent);
+    SDL_Event mouseEvent;
+    mouseEvent.type = SDL_USEREVENT;
+    mouseEvent.user.code = eventType;
+    mouseEvent.user.data1 = new CursorEventArg(x, y);
+    SDL_PushEvent(&mouseEvent);
 }
 
 

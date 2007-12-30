@@ -48,7 +48,6 @@ PuyoNetworkGameWidget::PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet,
       playercontroller(localArea), dummyPlayerController(networkArea), syncMsgReceived(false), syncMsgSent(false), chatBox(*this),
       brokenNetworkWidget("etherdown.gsl"), networkIsBroken(false)
 {
-    
     mbox.addListener(this);
     initialize(localArea, networkArea, playercontroller, dummyPlayerController, levelTheme, gameOverAction);
     setLives(-1);
@@ -67,7 +66,6 @@ void PuyoNetworkGameWidget::cycle()
         syncMsgSent = true;
     }
     if (syncMsgReceived) {
-        PuyoGameWidget::cycle();
         double curDate = ios_fc::getTimeMs();
         if (paused) {
             if (curDate - lastAliveMessageSentDate > 2000.) {
@@ -86,6 +84,7 @@ void PuyoNetworkGameWidget::cycle()
             associatedScreen->remove(&brokenNetworkWidget);
             networkIsBroken = false;
         }
+        PuyoGameWidget::cycle();
     }
 }
 

@@ -65,8 +65,16 @@ void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
         result->y = arg->y;
         delete arg;
         } break;
-    case GameCursor::CLICK: {
+    case GameCursor::MOUSE_DOWN: {
         result->isUp = false;
+        result->cursorEvent = GameControlEvent::kGameMouseClicked;
+        GameCursor::CursorEventArg *arg = (GameCursor::CursorEventArg *)e.user.data1;
+        result->x = arg->x;
+        result->y = arg->y;
+        delete arg;
+        } break;
+    case GameCursor::MOUSE_UP: {
+        result->isUp = true;
         result->cursorEvent = GameControlEvent::kGameMouseClicked;
         GameCursor::CursorEventArg *arg = (GameCursor::CursorEventArg *)e.user.data1;
         result->x = arg->x;

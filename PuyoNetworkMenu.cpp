@@ -324,6 +324,7 @@ InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)
   : PuyoMainScreenMenu(mainScreen),
     servers(),
     container(),
+    serverListPanel(6, IIM_Load_Absolute_DisplayFormat(theCommander->getDataPathManager().getPath("gfx/downarrow.png"))),
     serverListText("Server List"), updating("Update"),
     separator1_1(1,1), separator1_2(1,1), separator1_3(1, 1), separator10_1(10,10), separator10_2(10,10),
     internetGameText("Internet Game"), nicknameText("Nickname"), serverText("Server"), portText("Port"),
@@ -344,10 +345,9 @@ void InternetGameMenu::build()
     container.setSize(Vec3(menuBG_wide->w, menuBG_wide->h, 0));
     container.setBackground(menuBG_wide);
   
+    serverSelectionPanel.setPolicy(USE_MIN_SIZE);
     serverSelectionPanel.add(&serverListText);
-    serverListPanel = new ListWidget(6, IIM_Load_Absolute_DisplayFormat(theCommander->getDataPathManager().getPath("gfx/downarrow.png")));
-    
-    serverSelectionPanel.add(serverListPanel);
+    serverSelectionPanel.add(&serverListPanel);
     updating.mdontMove = false;
     serverSelectionPanel.add(&updating);
 
@@ -374,9 +374,13 @@ void InternetGameMenu::idle(double currentTime)
 {
     if (servers.listHasChanged())
     {
-      serverListPanel->clear();
+      while (serverListPanel.getFullSize() > 0) {
+        ListViewEntry *entry = serverListPanel.getEntryAt(0);
+        serverListPanel.removeEntry(entry);
+        delete entry;
+      }
       for (int i = 0 ; i < servers.getNumServer() ; i++) {
-        serverListPanel->set (i, new Button(servers.getServerNameAtIndex(i),
+        serverListPanel.addEntry(new ListViewEntry(servers.getServerNameAtIndex(i),
             new ServerSelectAction(*this, servers.getServerNameAtIndex(i),
             servers.getServerPortAtIndex(i))));
       }

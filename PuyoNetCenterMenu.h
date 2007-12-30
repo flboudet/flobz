@@ -27,6 +27,7 @@
 #define _PUYONETCENTERMENU
 
 #include "gameui.h"
+#include "ListView.h"
 #include "PuyoCommander.h"
 #include "PuyoInternetGameCenter.h"
 #include "PuyoTwoPlayerStarter.h"
@@ -61,9 +62,9 @@ private:
     Button acceptButton, cancelButton;
 };
 
-class NetCenterPlayerList : public ListWidget {
+class NetCenterPlayerList : public ListView {
 public:
-    NetCenterPlayerList(int size, NetCenterMenu *targetMenu, GameLoop *loop = NULL) : ListWidget(size, loop), targetMenu(targetMenu) {}
+    NetCenterPlayerList(int size, NetCenterMenu *targetMenu, GameLoop *loop = NULL);
     void addNewPlayer(String playerName, PeerAddress playerAddress, int status);
     void removePlayer(PeerAddress playerAddress);
     void updatePlayer(String playerName, PeerAddress playerAddress, int status);
@@ -78,14 +79,14 @@ private:
         PeerAddress address;
         String playerName;
     };
-    class PlayerEntry : public Button {
+    class PlayerEntry : public ListViewEntry {
     public:
         PlayerEntry(String playerName, PeerAddress playerAddress, int status, Action *action)
-        : Button(playerName + getStatusString(status), action),
+        : ListViewEntry(playerName + getStatusString(status), action),
 	  playerAddress(playerAddress), status(status), action(action) {}
         ~PlayerEntry() { delete action; }
 	void updateEntry(String playerName, int status) {
-	  setValue(playerName + getStatusString(status));
+	  setText(playerName + getStatusString(status));
 	  this->status = status;
 	}
         PeerAddress playerAddress;
@@ -150,7 +151,7 @@ private:
     NetCenterPlayerList playerList;
     NetCenterCycled cycled;
     PuyoNetGameCenter *netCenter;
-    SliderContainer container;
+    ZBox container;
     NetCenterDialogMenu *onScreenDialog;
     bool shouldSelfDestroy;
     NetCenterTwoNameProvider nameProvider;
