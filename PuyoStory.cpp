@@ -292,6 +292,8 @@ void PuyoStoryScreen::onEvent(GameControlEvent *cevent)
     case GameControlEvent::kBack:
     case GameControlEvent::kStart:
     case GameControlEvent::kGameMouseClicked:
+        if (cevent->isUp)
+            break;
         if (finishedAction != NULL) {
             finishedAction->action();
 	    passEvent = false;
