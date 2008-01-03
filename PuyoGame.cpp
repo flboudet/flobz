@@ -699,7 +699,7 @@ void PuyoLocalGame::notifyReductions()
                     if (removedCount >= 4) {
                         markPuyoAt(i, j, false, true);
                         if (delegate != NULL)
-                            delegate->puyoWillVanish(removedPuyos, puyoGroupNumber++, phase);
+                            delegate->puyoWillVanish(removedPuyos, puyoGroupNumber++, phase+1);
                     }
                     else {
                         markPuyoAt(i, j, false, true);
