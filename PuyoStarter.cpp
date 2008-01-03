@@ -149,21 +149,25 @@ void PuyoKillPlayerRightAction::action()
     target.addGameBHandicap(PUYODIMY);
 }
 
+#define MIN_SPEED 2
+#define MAX_SPEED 20
+#define CYCLES_BEFORE_SPEED_INCREASES 240
+
 PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
     : CycledComponent(TIME_BETWEEN_GAME_CYCLES), associatedScreen(NULL), attachedLevelTheme(&levelTheme), areaA(&areaA), areaB(&areaB), controllerA(&controllerA), controllerB(&controllerB),
-      cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(500), tickCounts(0), cycles(0), paused(false), displayLives(true), lives(3),
+      cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(CYCLES_BEFORE_SPEED_INCREASES), tickCounts(0), cycles(0), paused(false), displayLives(true), lives(3),
       gameOverAction(gameOverAction), abortedFlag(false), gameSpeed(0), blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
-      playerOneName(p1name), playerTwoName(p2name), MinSpeed(10), MaxSpeed(50),
+      playerOneName(p1name), playerTwoName(p2name), MinSpeed(MIN_SPEED), MaxSpeed(MAX_SPEED),
       killLeftAction(*this), killRightAction(*this), killLeftCheat("killleft", &killLeftAction), killRightCheat("killright", &killRightAction)
 {
     initialize();
 }
 
 PuyoGameWidget::PuyoGameWidget()
-    : CycledComponent(TIME_BETWEEN_GAME_CYCLES), associatedScreen(NULL), cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(500),
+    : CycledComponent(TIME_BETWEEN_GAME_CYCLES), associatedScreen(NULL), cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(CYCLES_BEFORE_SPEED_INCREASES),
       tickCounts(0), cycles(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(0),
       blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
-      playerOneName(p1name), playerTwoName(p2name), MinSpeed(10), MaxSpeed(50),
+      playerOneName(p1name), playerTwoName(p2name), MinSpeed(MIN_SPEED), MaxSpeed(MAX_SPEED),
       killLeftAction(*this), killRightAction(*this), killLeftCheat("killleft", &killLeftAction), killRightCheat("killright", &killRightAction)
 {
 }
@@ -227,7 +231,7 @@ void PuyoGameWidget::cycle()
     tickCounts++;
     cycles++;
     
-    int animCyclesBeforeGameCycles = (MaxSpeed + (((MinSpeed-MaxSpeed)*gameSpeed)/20));
+    int animCyclesBeforeGameCycles = (MaxSpeed + (((MinSpeed - MaxSpeed) * gameSpeed) / 20));
     
     // Controls
     controllerA->cycle();
@@ -287,10 +291,12 @@ void PuyoGameWidget::cycle()
     
     cyclesBeforeGameCycle--;
     
-    if (++tickCounts == cyclesBeforeSpeedIncreases)
+    if (tickCounts == cyclesBeforeSpeedIncreases)
     {
       tickCounts = 0;
       if (gameSpeed < 20) gameSpeed++;
+      cyclesBeforeSpeedIncreases = cyclesBeforeSpeedIncreases * (20 + gameSpeed) / 20;
+      printf("Changing speed: %d (next in %d)\n", gameSpeed, cyclesBeforeSpeedIncreases);
     }
     requestDraw();
   }
