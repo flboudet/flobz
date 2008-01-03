@@ -118,7 +118,7 @@ private:
 /* Puyo exploding and vanishing animation */
 class VanishAnimation : public PuyoAnimation {
 public:
-    VanishAnimation(AnimatedPuyo &puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer);
+    VanishAnimation(AnimatedPuyo &puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int puyoNum, int groupSize, int groupNum, int phase);
     virtual ~VanishAnimation();
     void cycle();
     void draw(int semiMove);
@@ -128,6 +128,11 @@ private:
     AnimationSynchronizer *synchronizer;
     bool once;
     int delay;
+
+    int puyoNum;
+    int groupSize;
+    int groupNum;
+    int phase;
 };
 
 class VanishSoundAnimation : public Animation {
