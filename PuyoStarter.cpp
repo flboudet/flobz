@@ -216,6 +216,7 @@ void PuyoGameWidget::initialize()
     // Load a few FX for the game
     puyoFX.push_back(new PuyoFX("fx/white_star.gsl"));
     puyoFX.push_back(new PuyoFX("fx/vanish.gsl"));
+    puyoFX.push_back(new PuyoFX("fx/combo.gsl"));
 }
 
 PuyoGameWidget::~PuyoGameWidget()
