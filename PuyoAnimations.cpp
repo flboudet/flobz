@@ -249,7 +249,7 @@ void FallingAnimation::draw(int semiMove)
 }
 
 /* Puyo exploding and vanishing animation */
-VanishAnimation::VanishAnimation(AnimatedPuyo &puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer) : PuyoAnimation(puyo)
+VanishAnimation::VanishAnimation(AnimatedPuyo &puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int puyoNum, int groupSize, int groupNum, int phase) : PuyoAnimation(puyo), puyoNum(puyoNum), groupSize(groupSize), groupNum(groupNum), phase(phase)
 {
     this->xOffset = xOffset;
     this->yOffset = yOffset;
@@ -290,6 +290,8 @@ void VanishAnimation::cycle()
         }
         if (iter == 20 + delay) {
             attachedPuyo.getAttachedView()->allowCycle();
+            if ((groupNum == 0) && (puyoNum == 0))
+                EventFX("vanish_phase", groupSize,phase, attachedPuyo.getAttachedView()->getPlayerId());
         }
         else if (iter == 50 + delay) {
             finishedFlag = true;
