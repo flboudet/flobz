@@ -391,8 +391,8 @@ void GameLoop::draw()
           // Bind the texture object
           glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture);
           // Set the texture's stretching properties
-          //glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          //glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
           // Edit the texture object's image data using the information SDL_Surface gives us
           glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, nOfColors, surface->w, surface->h, 0,
                   texture_format, GL_UNSIGNED_BYTE, surface->pixels);
