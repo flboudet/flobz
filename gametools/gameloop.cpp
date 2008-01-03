@@ -342,7 +342,7 @@ void GameLoop::draw()
 
   if (opengl_mode) {
 #ifdef HAVE_OPENGL
-      GLuint texture;
+      static GLuint texture = 0;
       GLenum texture_format;
       GLint  nOfColors;
       static int texture_mode = 0;
@@ -384,7 +384,9 @@ void GameLoop::draw()
       }
 
       // Have OpenGL generate a texture object handle for us
-      glGenTextures(1, &texture);
+      if (texture == 0)
+          glGenTextures(1, &texture);
+
       if (texture_mode == 2) {
           // Bind the texture object
           glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture);
@@ -419,33 +421,50 @@ void GameLoop::draw()
 
       glDisable(GL_DEPTH_TEST);
 
-      int dx = (display->w - 640) / 2;
-      int dy = (display->h - 480) / 2;
-      glBegin(GL_QUADS);
+      // Max texture coordinate
+      int tx = 1;
+      int ty = 1;
       if (texture_mode == 2) {
-          glTexCoord2i(0, 0);
-          glVertex3f(dx, dy, 0.0f);
-          glTexCoord2i(640, 0);
-          glVertex3f(dx + 640, dy, 0);
-          glTexCoord2i(640, 480);
-          glVertex3f(dx + 640, dy + 480, 0);
-          glTexCoord2i(0, 480);
-          glVertex3f(dx, dy + 480, 0);
+          // TEXTURE_RECTANGLE does not have normalized coordinates
+          tx = 640;
+          ty = 480;
       }
-      else if (texture_mode == 1) {
-          glTexCoord2i(0, 0);
-          glVertex3f(dx, dy, 0.0f);
-          glTexCoord2i(1, 0);
-          glVertex3f(dx + 640, dy, 0);
-          glTexCoord2i(1, 1);
-          glVertex3f(dx + 640, dy + 480, 0);
-          glTexCoord2i(0, 1);
-          glVertex3f(dx, dy + 480, 0);
+
+      // Scale the image without changing the 1.33 aspect ratio
+      float ratio = (float)display->w / (float)display->h;
+      int dx = 0;
+      int dy = 0;
+      int sx = 640;
+      int sy = 480;
+
+      if (ratio > 4.0 / 3.0) {
+          // Window is too large, scale verticaly
+          sx = display->h * 4 / 3;
+          sy = display->h;
+          dx = (display->w - sx) / 2;
+          dy = 0;
       }
+      else {
+          // Window is too tall, scale horizontaly
+          sx = display->w;
+          sy = display->w * 3 / 4;
+          dx = 0;
+          dy = (display->h - sy) / 2;
+      }
+
+      // Draw the quad on screen
+      glBegin(GL_QUADS);
+      glTexCoord2i(0, 0);
+      glVertex3i(dx, dy, 0);
+      glTexCoord2i(tx, 0);
+      glVertex3i(dx + sx, dy, 0);
+      glTexCoord2i(tx, ty);
+      glVertex3i(dx + sx, dy + sy, 0);
+      glTexCoord2i(0, ty);
+      glVertex3i(dx, dy + sy, 0);
       glEnd();
 
       SDL_GL_SwapBuffers();
-      glDeleteTextures(1,&texture);
 #endif
   }
   else if (display != NULL) {
