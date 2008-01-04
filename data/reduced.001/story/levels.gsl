@@ -7,7 +7,7 @@
     level.backgroundTheme     = "Kaori's farm"
     level.easySetting.type    = "FLOBO"
     level.easySetting.level   = 60
-    level.easySetting.nColors = 2
+    level.easySetting.nColors = 3
     level.mediumSetting.type  = "FLOBO"
     level.mediumSetting.level = 34
     level.hardSetting.type    = "FLOBO"
@@ -52,6 +52,7 @@
     level.opponentName        = "Azrael"
     level.easySetting.type    = "FLOBO"
     level.easySetting.level   = 45
+    level.easySetting.nColors = 4
     level.mediumSetting.type  = "FLOBO"
     level.mediumSetting.level = 25
     level.hardSetting.type    = "FLOBO"
