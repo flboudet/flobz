@@ -68,7 +68,21 @@ PuyoSinglePlayerGameWidget::~PuyoSinglePlayerGameWidget()
 
 void PuyoSinglePlayerGameWidget::cycle()
 {
-    if (faceTicks++ == 100) {
+    faceTicks += 1;
+    if (faceTicks == 50) {
+        AIParameters ai;
+        ai.realSuppressionValue = opponentFace.getIntegerValue("@AI_RealSuppression");
+        ai.potentialSuppressionValue = opponentFace.getIntegerValue("@AI_PotentialSuppression");
+        ai.criticalHeight = opponentFace.getIntegerValue("@AI_CriticalHeight");
+        ai.columnScalar[0] = opponentFace.getIntegerValue("@AI_Column1");
+        ai.columnScalar[1] = opponentFace.getIntegerValue("@AI_Column2");
+        ai.columnScalar[2] = opponentFace.getIntegerValue("@AI_Column3");
+        ai.columnScalar[3] = opponentFace.getIntegerValue("@AI_Column4");
+        ai.columnScalar[4] = opponentFace.getIntegerValue("@AI_Column5");
+        ai.columnScalar[5] = opponentFace.getIntegerValue("@AI_Column6");
+        opponentcontroller.setAIParameters(ai);
+    }
+    if (faceTicks == 100) {
         opponentFace.setIntegerValue("@maxHeightPlayer", attachedGameA->getMaxColumnHeight());
         opponentFace.setIntegerValue("@maxHeightAI", attachedGameB->getMaxColumnHeight());
         opponentFace.setIntegerValue("@neutralsForPlayer", attachedGameA->getNeutralPuyos());
