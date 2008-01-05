@@ -14,6 +14,18 @@ int    UPDATE = 1
 int    DRAW   = 2
 int    EVENT  = 3
 
+// AI Parameters
+
+int @AI_RealSuppression
+int @AI_PotentialSuppression
+int @AI_CriticalHeight
+int @AI_Column1
+int @AI_Column2
+int @AI_Column3
+int @AI_Column4
+int @AI_Column5
+int @AI_Column6
+
 int @maxHeightPlayer
 int @maxHeightAI
 int @neutralsForPlayer
@@ -176,3 +188,46 @@ external <strcmp: string s1, string s2> : int
     }
   }
 
+<AI_Gyom> // Nohoho maker
+      @AI_RealSuppression      = 2
+      @AI_PotentialSuppression = 3
+      @AI_CriticalHeight       = 10
+      @AI_Column1        = 4
+      @AI_Column2        = 2
+      @AI_Column3        = 1
+      @AI_Column4        = 8
+      @AI_Column5        = 9
+      @AI_Column6        = 10
+
+<AI_Flobo> // Remove it all
+      @AI_RealSuppression      = 1
+      @AI_PotentialSuppression = 2
+      @AI_CriticalHeight       = 1
+      @AI_Column1        = 1
+      @AI_Column2        = 1
+      @AI_Column3        = 0
+      @AI_Column4        = 1
+      @AI_Column5        = 1
+      @AI_Column6        = 1
+  
+<AI_Tania> // Balanced
+      @AI_RealSuppression      = 2
+      @AI_PotentialSuppression = 1
+      @AI_CriticalHeight       = 8
+      @AI_Column1        = 7
+      @AI_Column2        = 5
+      @AI_Column3        = 2
+      @AI_Column4        = 4
+      @AI_Column5        = 6
+      @AI_Column6        = 8
+  
+<AI_Jeko> // Builds til death
+      @AI_RealSuppression      = 1
+      @AI_PotentialSuppression = 2
+      @AI_CriticalHeight       = 9
+      @AI_Column1        = 9
+      @AI_Column2        = 8
+      @AI_Column3        = 7
+      @AI_Column4        = 8
+      @AI_Column5        = 8
+      @AI_Column6        = 9
