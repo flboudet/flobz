@@ -22,13 +22,6 @@
 #include <string.h>
 #include "PuyoIA.h"
 
-typedef struct {
-  int realSuppressionValue;
-  int potentialSuppressionValue;
-  int criticalHeight;
-  int columnScalar[IA_PUYODIMX];
-} AIParameters;
-
 static const PuyoCoordinates nullPosition = {0,0};
 static const PuyoBinom nullBinom = {PUYO_EMPTY,PUYO_EMPTY,Left,nullPosition};
 static const GridEvaluation nullEvaluation = {0,0,0,0,0,0};
@@ -449,12 +442,12 @@ int PuyoIA::makeEvaluation(const GridEvaluation * const referenceOne, const Puyo
   int rR,rP;
   
   rR = (2 * referenceOne->puyoSuppressed + 2 * referenceOne->neutralSuppressed + referenceOne->puyoGrouped);
-  rR *= ((AIParameters*)special)->realSuppressionValue;
+  rR *= params.realSuppressionValue;
 
-  if (((AIParameters*)special)->criticalHeight > referenceOne->height)
+  if (params.criticalHeight > referenceOne->height)
   {
     rP = (referenceOne->neutralSuppressedPotential + referenceOne->puyoSuppressedPotential);
-    rP *= ((AIParameters*)special)->potentialSuppressionValue;
+    rP *= params.potentialSuppressionValue;
   }
   else
   {
@@ -477,18 +470,18 @@ int PuyoIA::makeEvaluation(const GridEvaluation * const referenceOne, const Puyo
   
   int c = 0;
   
-  if (((AIParameters*)special)->criticalHeight > referenceOne->height)
+  if (params.criticalHeight > referenceOne->height)
   {
 
   for (int x = 0;  x < IA_PUYODIMX; x++)
   {
-    c += IA_PUYODIMY - abs(((AIParameters*)special)->columnScalar[x] - (int)(*grid)[x][HEIGHTS_ROW]);
+    c += IA_PUYODIMY - abs(params.columnScalar[x] - (int)(*grid)[x][HEIGHTS_ROW]);
   }
   c*=IA_PUYODIMX;
   }
   else c = IA_PUYODIMY * IA_PUYODIMX * IA_PUYODIMX + 2 * IA_PUYODIMY;
-    c += ((AIParameters*)special)->columnScalar[pos1] - (int)(*grid)[pos1][HEIGHTS_ROW];
-    c += ((AIParameters*)special)->columnScalar[pos2] - (int)(*grid)[pos2][HEIGHTS_ROW];
+    c += params.columnScalar[pos1] - (int)(*grid)[pos1][HEIGHTS_ROW];
+    c += params.columnScalar[pos2] - (int)(*grid)[pos2][HEIGHTS_ROW];
 
   int r = c * (1+rR+rP);
   return r;
@@ -515,7 +508,6 @@ PuyoIA::PuyoIA(IA_Type type, int level, PuyoView &targetView)
   attachedGame = targetView.getAttachedGame();
   objective = nullBinom;
   lastLineSeen = PUYODIMY+1;
-  special = NULL;
   currentCycle = 0;
   readyToDrop = false;
 
@@ -523,56 +515,52 @@ PuyoIA::PuyoIA(IA_Type type, int level, PuyoView &targetView)
   switch (type)
   {
     case GYOM: // Nohoho maker
-      special = malloc(sizeof(AIParameters));
-      ((AIParameters*)special)->realSuppressionValue = 2;
-      ((AIParameters*)special)->potentialSuppressionValue = 3;
-      ((AIParameters*)special)->criticalHeight = 10;
-      ((AIParameters*)special)->columnScalar[5] = 20;
-      ((AIParameters*)special)->columnScalar[0] =  4;
-      ((AIParameters*)special)->columnScalar[1] =  2;
-      ((AIParameters*)special)->columnScalar[2] =  1;
-      ((AIParameters*)special)->columnScalar[3] =  8;
-      ((AIParameters*)special)->columnScalar[4] =  9;
-      ((AIParameters*)special)->columnScalar[5] = 10;
+      params.realSuppressionValue = 2;
+      params.potentialSuppressionValue = 3;
+      params.criticalHeight = 10;
+      params.columnScalar[5] = 20;
+      params.columnScalar[0] =  4;
+      params.columnScalar[1] =  2;
+      params.columnScalar[2] =  1;
+      params.columnScalar[3] =  8;
+      params.columnScalar[4] =  9;
+      params.columnScalar[5] = 10;
       break;
   
     case FLOBO: // Remove it all
-      special = malloc(sizeof(AIParameters));
-      ((AIParameters*)special)->realSuppressionValue = 1;
-      ((AIParameters*)special)->potentialSuppressionValue = 2;
-      ((AIParameters*)special)->criticalHeight = 1;
-      ((AIParameters*)special)->columnScalar[0] = 1;
-      ((AIParameters*)special)->columnScalar[1] = 1;
-      ((AIParameters*)special)->columnScalar[2] = 0;
-      ((AIParameters*)special)->columnScalar[3] = 1;
-      ((AIParameters*)special)->columnScalar[4] = 1;
-      ((AIParameters*)special)->columnScalar[5] = 1;
+      params.realSuppressionValue = 1;
+      params.potentialSuppressionValue = 2;
+      params.criticalHeight = 1;
+      params.columnScalar[0] = 1;
+      params.columnScalar[1] = 1;
+      params.columnScalar[2] = 0;
+      params.columnScalar[3] = 1;
+      params.columnScalar[4] = 1;
+      params.columnScalar[5] = 1;
       break;
   
     case TANIA: // Balanced
-      special = malloc(sizeof(AIParameters));
-      ((AIParameters*)special)->realSuppressionValue = 2;
-      ((AIParameters*)special)->potentialSuppressionValue = 1;
-      ((AIParameters*)special)->criticalHeight = 8;
-      ((AIParameters*)special)->columnScalar[0] = 7;
-      ((AIParameters*)special)->columnScalar[1] = 5;
-      ((AIParameters*)special)->columnScalar[2] = 2;
-      ((AIParameters*)special)->columnScalar[3] = 4;
-      ((AIParameters*)special)->columnScalar[4] = 6;
-      ((AIParameters*)special)->columnScalar[5] = 8;
+      params.realSuppressionValue = 2;
+      params.potentialSuppressionValue = 1;
+      params.criticalHeight = 8;
+      params.columnScalar[0] = 7;
+      params.columnScalar[1] = 5;
+      params.columnScalar[2] = 2;
+      params.columnScalar[3] = 4;
+      params.columnScalar[4] = 6;
+      params.columnScalar[5] = 8;
       break;
   
     case JEKO: // Builds til death
-      special = malloc(sizeof(AIParameters));
-      ((AIParameters*)special)->realSuppressionValue = 1;
-      ((AIParameters*)special)->potentialSuppressionValue = 2;
-      ((AIParameters*)special)->criticalHeight = 9;
-      ((AIParameters*)special)->columnScalar[0] = 9;
-      ((AIParameters*)special)->columnScalar[1] = 8;
-      ((AIParameters*)special)->columnScalar[2] = 7;
-      ((AIParameters*)special)->columnScalar[3] = 8;
-      ((AIParameters*)special)->columnScalar[4] = 8;
-      ((AIParameters*)special)->columnScalar[5] = 9;
+      params.realSuppressionValue = 1;
+      params.potentialSuppressionValue = 2;
+      params.criticalHeight = 9;
+      params.columnScalar[0] = 9;
+      params.columnScalar[1] = 8;
+      params.columnScalar[2] = 7;
+      params.columnScalar[3] = 8;
+      params.columnScalar[4] = 8;
+      params.columnScalar[5] = 9;
       break;
 
     default:
@@ -580,10 +568,14 @@ PuyoIA::PuyoIA(IA_Type type, int level, PuyoView &targetView)
   }
 }
 
+void PuyoIA::setAIParameters(const AIParameters &ai)
+{
+    params = ai;
+}
+
 PuyoIA::~PuyoIA()
 {
   if (internalGrid != NULL) free(internalGrid);
-  if (special != NULL) free(special);
 }
 
 PuyoState PuyoIA::extractColor(PuyoState A) const

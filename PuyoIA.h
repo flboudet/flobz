@@ -37,6 +37,13 @@ enum IA_Type {
 #define IA_PUYODIMY (PUYODIMY-2)
 #define IA_TABLEDIMY (IA_PUYODIMY+1)
 
+typedef struct {
+  int realSuppressionValue;
+  int potentialSuppressionValue;
+  int criticalHeight;
+  int columnScalar[IA_PUYODIMX];
+} AIParameters;
+
 typedef enum {
   Left = 0,
   Above = 1,
@@ -74,6 +81,7 @@ class PuyoIA : public virtual PuyoPlayer {
     PuyoIA(IA_Type type, int level, PuyoView &targetView);
     ~PuyoIA();
     virtual void cycle();
+    void setAIParameters(const AIParameters &ai);
 
   private:
     PuyoState extractColor(PuyoState A) const;
@@ -92,7 +100,7 @@ class PuyoIA : public virtual PuyoPlayer {
     int currentCycle;
     bool readyToDrop;
 
-    void * special;
+    AIParameters params;
   
     PuyoBinom current, next;
     unsigned int bestl1;
