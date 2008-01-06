@@ -37,6 +37,8 @@
       @AI_Column4        = 1
       @AI_Column5        = 1
       @AI_Column6        = 1
+      @AI_RotationMethod = 0
+      @AI_FastDropDelta  = 8
   
 <AI_Tania> // Balanced
       AI_Init
