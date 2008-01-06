@@ -80,8 +80,8 @@ void PuyoSinglePlayerGameWidget::cycle()
         ai.columnScalar[3] = opponentFace.getIntegerValue("@AI_Column4");
         ai.columnScalar[4] = opponentFace.getIntegerValue("@AI_Column5");
         ai.columnScalar[5] = opponentFace.getIntegerValue("@AI_Column6");
-        ai.columnScalar[5] = opponentFace.getIntegerValue("@AI_RotationMethod");
-        ai.columnScalar[5] = opponentFace.getIntegerValue("@AI_FastDropDelta");
+        ai.rotationMethod = opponentFace.getIntegerValue("@AI_RotationMethod");
+        ai.fastDropDelta = opponentFace.getIntegerValue("@AI_FastDropDelta");
         opponentcontroller.setAIParameters(ai);
     }
     if (faceTicks == 100) {
