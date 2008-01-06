@@ -511,6 +511,19 @@ PuyoIA::PuyoIA(IA_Type type, int level, PuyoView &targetView)
   currentCycle = 0;
   readyToDrop = false;
 
+  params.realSuppressionValue = 1;
+  params.potentialSuppressionValue = 3;
+  params.criticalHeight = 10;
+  params.columnScalar[5] = 1;
+  params.columnScalar[0] = 1;
+  params.columnScalar[1] = 1;
+  params.columnScalar[2] = 1;
+  params.columnScalar[3] = 1;
+  params.columnScalar[4] = 1;
+  params.columnScalar[5] = 1;
+  params.rotationMethod = 0; // negative (right), null (shortest), positive(left)
+  params.fastDropDelta = PUYODIMY; // puyo height relative to column height before fast drop
+
   // Select IA
   switch (type)
   {
@@ -603,22 +616,24 @@ PuyoState PuyoIA::extractColor(PuyoState A) const
   return PUYO_EMPTY;
 }
 
+static const PuyoOrientation GameToIAOrientation[4] = {Below,Left,Above,Right};
 PuyoOrientation PuyoIA::extractOrientation(int D) const
 {
-  switch (D) {
-    case 0:
-      return Below;
-    case 1:
-      return Left;
-    case 2:
-      return Above;
-    case 3:
-      return Right;
-    default:
-      fprintf(stderr,"Error in AI : unknown puyo orientation!!\nExiting...\n");
-      exit(0);
+  if (D<0 || D>3) {
+    fprintf(stderr,"Error in AI : unknown puyo orientation!!\nExiting...\n");
+    exit(0);  
   }
-  return Left;
+  return GameToIAOrientation[(int)D];
+}
+
+static const int IAToGameOrientation[4] = {1,2,0,3};
+int PuyoIA::revertOrientation(PuyoOrientation D) const
+{
+  if (D<0 || D>3) {
+    fprintf(stderr,"Error in AI : unknown puyo orientation bis!!\nExiting...\n");
+    exit(0);
+  }
+  return IAToGameOrientation[D];
 }
 
 void PuyoIA::extractGrid(void)
@@ -769,6 +784,9 @@ void PuyoIA::decide(int partial)
 }
 
 
+// 0 no need to rotate, 1 rotate clockwise, 2 both directions are equal, -1 rotate counterclockwise
+// positions are expression as Game references
+static const signed char rotationMatrix[4 /*target*/][4 /*current*/] = {{0,-1,2,1},{1,0,-1,2},{2,1,0,-1},{-1,2,1,0}};
 
 void PuyoIA::cycle()
 {
@@ -833,50 +851,63 @@ void PuyoIA::cycle()
   // If we can drop, then go on
   if (readyToDrop)
   {
-    targetView.cycleGame();
+    if (internalGrid == NULL) extractGrid();
+    if ((PUYODIMY-1-currentLine) - ((* internalGrid)[currentColumn][HEIGHTS_ROW] + (objective.orientation == Below)?1:0) <= params.fastDropDelta) targetView.cycleGame();
   }
   
   // Else try to move at the specified frequency
   else if (currentCycle % level == 0)
   {
-    bool shouldMove = false;
-    bool couldntMove = false;
-  
-    // Move left if useful
-    if (currentColumn < objective.position.x)
-    {
-      shouldMove = true;
-      targetView.moveRight();
-      // or decide again if not possible
-      if (currentColumn == attachedGame->getFallingX()) couldntMove = true;
-      else couldntMove = false;
-    }
+    bool shouldMove;
+    bool shouldRotate;
     
-    // Move right if useful
-    if (((shouldMove == true && couldntMove == true) || (shouldMove == false)) && currentColumn > objective.position.x)
+    bool couldntMove = false;
+    bool couldntRotate = false;
+  
+    int curOrientation = attachedGame->getFallingCompanionDir();
+
+    // should we move or rotate
+    if (random()%2 == 0)
     {
-      shouldMove = true;
-      targetView.moveLeft();
+      shouldMove = (currentColumn != objective.position.x);
+      shouldRotate = (!shouldMove) && (extractOrientation(curOrientation) != objective.orientation);
+    } else {
+      shouldRotate = (extractOrientation(curOrientation) != objective.orientation);
+      shouldMove = (!shouldRotate) && (currentColumn != objective.position.x);
+    }
+    // if no need to move or rotate we're ready to drop
+    readyToDrop = !(shouldMove || shouldRotate);
+    
+    // Move if useful
+    if (shouldMove)
+    {
+      if (currentColumn < objective.position.x) targetView.moveRight();
+      else targetView.moveLeft();
+
       // or decide again if not possible
-      if (currentColumn == attachedGame->getFallingX()) couldntMove = true;
-      else couldntMove = false;
+      couldntMove = (currentColumn == attachedGame->getFallingX());
     }
     
     // Rotate if useful
-    int curOrientation = attachedGame->getFallingCompanionDir();
-    if (((shouldMove == true && couldntMove == true) || (shouldMove == false)) && extractOrientation(curOrientation) != objective.orientation)
+    if (shouldRotate)
     {
-      shouldMove = true;
-      targetView.rotateLeft();
+      if (params.rotationMethod == 0)
+      {
+        if (rotationMatrix[revertOrientation(objective.orientation)][curOrientation] > 0)
+          targetView.rotateRight();
+        else
+          targetView.rotateLeft();
+        
+      }
+      else if (params.rotationMethod < 0) targetView.rotateRight();
+      else if (params.rotationMethod > 0) targetView.rotateLeft();
+        
       // or decide again if not possible
-      if (curOrientation == attachedGame->getFallingCompanionDir()) couldntMove = true;
-      else couldntMove = false;
+      couldntRotate = (curOrientation == attachedGame->getFallingCompanionDir());
     }
-    
-    // if no need to move drop
-    if (shouldMove == false) readyToDrop = true;
+
     // if need to move but impossible, decide again
-    else if (couldntMove == true) decisionMade = 0;
+    if (couldntMove || couldntRotate) decisionMade = 0;
   }
   lastLineSeen = currentLine;
 }

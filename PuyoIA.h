@@ -42,6 +42,8 @@ typedef struct {
   int potentialSuppressionValue;
   int criticalHeight;
   int columnScalar[IA_PUYODIMX];
+  int rotationMethod;
+  int fastDropDelta;
 } AIParameters;
 
 typedef enum {
@@ -86,6 +88,7 @@ class PuyoIA : public virtual PuyoPlayer {
   private:
     PuyoState extractColor(PuyoState A) const;
     PuyoOrientation extractOrientation(int D) const;
+    int PuyoIA::revertOrientation(PuyoOrientation D) const;
     void extractGrid(void);
     void decide(int partial);
     int makeEvaluation(const GridEvaluation * const referenceOne, const PuyoBinom puyos, const GridState * const grid);
