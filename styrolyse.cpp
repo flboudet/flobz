@@ -344,6 +344,13 @@ int styrolyse_getint(Styrolyse *_this, const char *varname)
     return GSL_GLOBAL_INT(_this->gsl, varname);
 }
 
+int styrolyse_secured_getint(Styrolyse *_this, const char *varname)
+{
+  if (GSL_HAS_GLOBAL(_this->gsl, varname))
+  return GSL_GLOBAL_INT(_this->gsl, varname);
+  else throw ios_fc::String("GSL Error, variable ")+ios_fc::String(varname)+ios_fc::String(" in script ")+ios_fc::String(_this->fname)+ios_fc::String(" does not exist\n");
+}
+
 const char *styrolyse_getstr(Styrolyse *_this, const char *varname)
 {
     return (const char*)GSL_GLOBAL_PTR(_this->gsl, varname);

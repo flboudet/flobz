@@ -247,7 +247,7 @@ void PuyoStoryWidget::setIntegerValue(String varName, int value)
 
 int PuyoStoryWidget::getIntegerValue(String varName) const
 {
-    return styrolyse_getint(currentStory, varName);
+    return styrolyse_secured_getint(currentStory, varName);
 }
 
 const char *PuyoStoryWidget::getText(const char *text) const

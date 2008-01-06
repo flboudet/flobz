@@ -69,7 +69,7 @@ PuyoSinglePlayerGameWidget::~PuyoSinglePlayerGameWidget()
 void PuyoSinglePlayerGameWidget::cycle()
 {
     faceTicks += 1;
-    if (faceTicks == 50) {
+    if (faceTicks == 1) {
         AIParameters ai;
         ai.realSuppressionValue = opponentFace.getIntegerValue("@AI_RealSuppression");
         ai.potentialSuppressionValue = opponentFace.getIntegerValue("@AI_PotentialSuppression");
@@ -80,6 +80,8 @@ void PuyoSinglePlayerGameWidget::cycle()
         ai.columnScalar[3] = opponentFace.getIntegerValue("@AI_Column4");
         ai.columnScalar[4] = opponentFace.getIntegerValue("@AI_Column5");
         ai.columnScalar[5] = opponentFace.getIntegerValue("@AI_Column6");
+        ai.columnScalar[5] = opponentFace.getIntegerValue("@AI_RotationMethod");
+        ai.columnScalar[5] = opponentFace.getIntegerValue("@AI_FastDropDelta");
         opponentcontroller.setAIParameters(ai);
     }
     if (faceTicks == 100) {

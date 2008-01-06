@@ -1,16 +1,21 @@
 // AI Parameters
 
-int @AI_RealSuppression
-int @AI_PotentialSuppression
-int @AI_CriticalHeight
-int @AI_Column1
-int @AI_Column2
-int @AI_Column3
-int @AI_Column4
-int @AI_Column5
-int @AI_Column6
+<AI_Init>
+  int @AI_RealSuppression = 2
+  int @AI_PotentialSuppression = 1
+  int @AI_CriticalHeight = 8
+  int @AI_Column1 = 7
+  int @AI_Column2 = 5
+  int @AI_Column3 = 2
+  int @AI_Column4 = 4
+  int @AI_Column5 = 6
+  int @AI_Column6 = 8
+  int @AI_RotationMethod = 0
+  int @AI_FastDropDelta = 0
+      
 
 <AI_Gyom> // Nohoho maker
+      AI_Init
       @AI_RealSuppression      = 2
       @AI_PotentialSuppression = 3
       @AI_CriticalHeight       = 10
@@ -22,6 +27,7 @@ int @AI_Column6
       @AI_Column6        = 10
 
 <AI_Flobo> // Remove it all
+      AI_Init
       @AI_RealSuppression      = 1
       @AI_PotentialSuppression = 2
       @AI_CriticalHeight       = 1
@@ -33,6 +39,7 @@ int @AI_Column6
       @AI_Column6        = 1
   
 <AI_Tania> // Balanced
+      AI_Init
       @AI_RealSuppression      = 2
       @AI_PotentialSuppression = 1
       @AI_CriticalHeight       = 8
@@ -44,6 +51,7 @@ int @AI_Column6
       @AI_Column6        = 8
   
 <AI_Jeko> // Builds til death
+      AI_Init
       @AI_RealSuppression      = 1
       @AI_PotentialSuppression = 2
       @AI_CriticalHeight       = 9
