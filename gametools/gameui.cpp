@@ -543,6 +543,8 @@ namespace gameui {
         child->eventOccured(event);
         if (child->haveFocus()) return;
         // The rest of the code handles the change of active widget and the rollover
+        if (event->isUp)
+            return;
         if (isPrevEvent(event)) direction = -1;
         else if (isNextEvent(event)) direction = 1;
         else if (isOtherDirection(event)) {
@@ -1237,11 +1239,11 @@ namespace gameui {
     //
     // Image
     //
-    Image::Image() : m_image(NULL)
+    Image::Image() : m_image(NULL), m_focusedImage(NULL)
     {
     }
     
-    Image::Image(IIM_Surface *image)
+    Image::Image(IIM_Surface *image) : m_focusedImage(NULL)
     {
         setImage(image);
     }
@@ -1255,16 +1257,21 @@ namespace gameui {
     void Image::draw(SDL_Surface *screen)
     {
         SDL_Rect dstRect;
+        IIM_Surface *imageToDraw = m_image;
         Vec3 pos = this->getPosition();
         Vec3 size = this->getSize();
-        dstRect.x = pos.x; dstRect.y = pos.y; dstRect.h = size.x; dstRect.w = size.y; 
-        IIM_BlitSurface(m_image, NULL, screen, &dstRect);
+        dstRect.x = pos.x; dstRect.y = pos.y; dstRect.h = size.x; dstRect.w = size.y;
+        if (haveFocus()) {
+            if (m_focusedImage == NULL)
+                m_focusedImage = iim_surface_shift_hsv(m_image, 0., 0., 0.3);
+            imageToDraw = m_focusedImage;
+        }
+        IIM_BlitSurface(imageToDraw, NULL, screen, &dstRect);
     }
     
     void Image::eventOccured(GameControlEvent *event)
     {
         bool clicked = false;
-
         if (isDirectionEvent(event))
             lostFocus();
         if (event->cursorEvent == GameControlEvent::kStart)

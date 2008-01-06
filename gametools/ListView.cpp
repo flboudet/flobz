@@ -11,6 +11,19 @@
 
 namespace gameui {
 
+ScrollWidget::ScrollWidget(ScrollInfoProvider &siProvider)
+    : m_bgSurface(NULL), m_siProvider(siProvider), m_grabbing(false)
+{
+    Widget::setFocusable(true);
+    setReceiveUpEvents(true);
+}
+
+ScrollWidget::~ScrollWidget()
+{
+    if (m_bgSurface != NULL)
+        SDL_FreeSurface(m_bgSurface);
+}
+
 void ScrollWidget::eventOccured(GameControlEvent *event)
 {
     if (event->cursorEvent == GameControlEvent::kGameMouseClicked) {
@@ -68,24 +81,55 @@ void ScrollWidget::eventOccured(GameControlEvent *event)
 
 void ScrollWidget::draw(SDL_Surface *screen)
 {
+    Vec3 bsize = getSize();
+    SDL_Rect srcrect, dstrect;
+    
+    srcrect.x = 0;
+    srcrect.y = 0;
+    srcrect.h = bsize.y;
+    srcrect.w = bsize.x;
+    
+    dstrect.x = getPosition().x;
+    dstrect.y = getPosition().y;
+    dstrect.h = bsize.y;
+    dstrect.w = bsize.x;
+    
+    if ((m_bgSurface == NULL) || (bsize.x != m_bgSurface->w) || (bsize.x != m_bgSurface->h)) {
+        if (m_bgSurface != NULL)
+            SDL_FreeSurface(m_bgSurface);
+        Uint32 rmask, gmask, bmask, amask;
+        /* SDL interprets each pixel as a 32-bit number, so our masks must depend
+           on the endianness (byte order) of the machine */
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+        rmask = 0xff000000;
+        gmask = 0x00ff0000;
+        bmask = 0x0000ff00;
+        amask = 0x000000ff;
+#else
+        rmask = 0x000000ff;
+        gmask = 0x0000ff00;
+        bmask = 0x00ff0000;
+        amask = 0xff000000;
+#endif
+        m_bgSurface = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, bsize.x, bsize.y, 32, 
+                                      rmask, gmask, bmask, amask);
+        SDL_FillRect(m_bgSurface, &srcrect, (m_bgSurface->format->Rmask & 0x80808080) | (m_bgSurface->format->Amask & 0x80808080));
+    }
+    
     float firstVisible = m_siProvider.getFirstVisible();
     float lastVisible = m_siProvider.getLastVisible();
     float numItems = m_siProvider.getFullSize();
     
-    int firstVisibleOffset = getSize().y * firstVisible / numItems;
-    int lastVisibleOffset = lastVisible > numItems ? getSize().y : getSize().y * lastVisible / numItems;
+    int firstVisibleOffset = bsize.y * firstVisible / numItems;
+    int lastVisibleOffset = lastVisible > numItems ? bsize.y : bsize.y * lastVisible / numItems;
     
-    SDL_Rect dstrect;
+    // Drawing the background
+    SDL_BlitSurface(m_bgSurface, &srcrect, screen, &dstrect);
     
-    dstrect.x = getPosition().x;
-    dstrect.y = getPosition().y;
-    dstrect.h = getSize().y;
-    dstrect.w = getSize().x;
-    SDL_FillRect(screen, &dstrect, 0xFF550000);
-    
+    // Drawing the thumb
     dstrect.y += firstVisibleOffset;
     dstrect.h = lastVisibleOffset - firstVisibleOffset;
-    SDL_FillRect(screen, &dstrect, 0xFFAAAAAA);
+    SDL_FillRect(screen, &dstrect, 0xAAAAAAAA);
 }
 
 //
@@ -103,22 +147,22 @@ void ListViewEntry::setText(String text)
 // ListView
 //
 
-ListView::ListView(int size, IIM_Surface *downArrow, GameLoop *loop) : CycledComponent(0.1), HBox(loop), size(size), firstVisible(0), used(0), scrollWidget(*this), m_clickedButton(NULL), m_cyclesBeforeContinuousScroll(0)
+ListView::ListView(int size, IIM_Surface *upArrow, IIM_Surface *downArrow, GameLoop *loop)
+ : CycledComponent(0.1), HBox(loop), m_bgSurface(NULL), size(size), firstVisible(0), used(0),
+   scrollWidget(*this), m_clickedButton(NULL), m_cyclesBeforeContinuousScroll(0)
 {
     suspendLayout();
     scrollerBox.suspendLayout();
     listBox.suspendLayout();
     
     setPolicy(USE_MIN_SIZE);
-    upButton.setImage(downArrow);
+    upButton.setImage(upArrow);
     downButton.setImage(downArrow);
     upButton.setOnStartAction(this);
     upButton.setOnMouseUpAction(this);
     downButton.setOnStartAction(this);
     downButton.setOnMouseUpAction(this);
     scrollerBox.setPreferedSize(Vec3(16, (size+2) + SoFont_FontHeight(GameUIDefaults::FONT)*size));
-    //listBox.setPreferedSize(Vec3(150,(size+2) + SoFont_FontHeight(GameUIDefaults::FONT)*size, 1));
-    //listBox.setPolicy(USE_MIN_SIZE);
     scrollerBox.setPolicy(USE_MIN_SIZE);
     scrollerBox.add(&upButton);
     scrollerBox.add(&scrollWidget);
@@ -135,6 +179,12 @@ ListView::ListView(int size, IIM_Surface *downArrow, GameLoop *loop) : CycledCom
     scrollerBox.resumeLayout();
     listBox.resumeLayout();
     resumeLayout();
+}
+
+ListView::~ListView()
+{
+    if (m_bgSurface != NULL)
+        SDL_FreeSurface(m_bgSurface);
 }
 
 void ListView::addEntry(ListViewEntry *entry)
@@ -159,39 +209,46 @@ void ListView::removeEntry(ListViewEntry *entry)
 
 void ListView::draw(SDL_Surface *screen)
 {
-    SDL_Rect dstrect;
+    SDL_Rect srcrect, dstrect;
+    Vec3 lbsize = listBox.getSize();
     
-    dstrect.x = getPosition().x;
-    dstrect.y = getPosition().y;
-    dstrect.h = getSize().y;
-    dstrect.w = getSize().x;
-    SDL_FillRect(screen, &dstrect, 0x55555555);
+    srcrect.x = 0;
+    srcrect.y = 0;
+    srcrect.h = lbsize.y;
+    srcrect.w = lbsize.x;
     
+    if ((m_bgSurface == NULL) || (lbsize.x != m_bgSurface->w) || (lbsize.x != m_bgSurface->h)) {
+        if (m_bgSurface != NULL)
+            SDL_FreeSurface(m_bgSurface);
+        Uint32 rmask, gmask, bmask, amask;
+        /* SDL interprets each pixel as a 32-bit number, so our masks must depend
+           on the endianness (byte order) of the machine */
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+        rmask = 0xff000000;
+        gmask = 0x00ff0000;
+        bmask = 0x0000ff00;
+        amask = 0x000000ff;
+#else
+        rmask = 0x000000ff;
+        gmask = 0x0000ff00;
+        bmask = 0x00ff0000;
+        amask = 0xff000000;
+#endif
+        m_bgSurface = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, lbsize.x, lbsize.y, 32, 
+                                      rmask, gmask, bmask, amask);
+        SDL_FillRect(m_bgSurface, &srcrect, m_bgSurface->format->Amask & 0x80808080);
+    }
     dstrect.x = listBox.getPosition().x;
     dstrect.y = listBox.getPosition().y;
     dstrect.h = listBox.getSize().y;
     dstrect.w = listBox.getSize().x;
-    SDL_FillRect(screen, &dstrect, 0xFFFFFFFF);
-    
-    dstrect.x = scrollerBox.getPosition().x;
-    dstrect.y = scrollerBox.getPosition().y;
-    dstrect.h = scrollerBox.getSize().y;
-    dstrect.w = scrollerBox.getSize().x;
-    SDL_FillRect(screen, &dstrect, 0xFFFFFF00);
-    
+    SDL_BlitSurface(m_bgSurface, &srcrect, screen, &dstrect);
     HBox::draw(screen);
 }
 
 void ListView::eventOccured(GameControlEvent *event)
 {
-    /*int direction = 0;
-    if (listBox.isPrevEvent(event)) direction = -1;
-    else if (listBox.isNextEvent(event)) direction = 1;
-    if (direction != 0) {
-        if (listBox.getActiveWidget() + direction >= listBox.getNumberOfChilds()) {}
-        else if (listBox.getActiveWidget() + direction < 0) {}
-    }
-    else */HBox::eventOccured(event);
+    HBox::eventOccured(event);
 }
 
 void ListView::action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
@@ -221,6 +278,8 @@ void ListView::handleButtons()
             resyncLabels();
         }
     }
+    if (! m_clickedButton->haveFocus())
+        m_clickedButton = NULL;
 }
 
 void ListView::cycle()
@@ -239,10 +298,12 @@ void ListView::resyncLabels()
     for (int i = firstVisible ; i < lastVisible ; i++) {
         buttons[i-firstVisible]->setValue(entries[i]->m_text);
         buttons[i-firstVisible]->setAction(ON_START, entries[i]->m_action);
+        buttons[i-firstVisible]->setFocusable(true);
     }
     for (int i = lastVisible ; i < firstVisible + size ; i++) {
         buttons[i-firstVisible]->setValue("");
         buttons[i-firstVisible]->setAction(ON_START, NULL);
+        buttons[i-firstVisible]->setFocusable(false);
     }
 }
 

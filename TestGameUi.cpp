@@ -122,13 +122,14 @@ int main(int argc, char *argv[])
     Button bidonButton1("Hi", &showDialogAction);
     Button bidonButton2("Ho");
     Button bidonButton3("Hop");
+    IIM_Surface *upArrow = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/uparrow.png");
     IIM_Surface *downArrow = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/downarrow.png");
     bidonBox.setPolicy(USE_MIN_SIZE);
-    ListView list(20, downArrow);
+    ListView list(20, upArrow, downArrow);
     bidonBox.add(&bidonText);
     bidonBox.add(&bidonButton1);
     bidonBox.add(&bidonButton2);
-    for (int i = 0 ; i < 5 ; i++) {
+    for (int i = 0 ; i < 100 ; i++) {
         String newEntry("Bla bla ");
         list.addEntry(new ListViewEntry(newEntry + i, &actionBidon));
     }

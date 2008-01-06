@@ -88,28 +88,28 @@ void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
   if (input == NULL)
     return;
 
-  if (input->isQuit() && input->isDown())
+  if (input->isQuit())
     result->cursorEvent = GameControlEvent::kQuit;
   
-  if (input->isValidate() && input->isDown())
+  if (input->isValidate())
     result->cursorEvent = GameControlEvent::kStart;
 
-  if (input->isCancel() && input->isDown())
+  if (input->isCancel())
     result->cursorEvent = GameControlEvent::kBack;
 
-  if (input->isArrowDown() && input->isDown())
+  if (input->isArrowDown())
     result->cursorEvent = GameControlEvent::kDown;
 
-  if (input->isArrowUp() && input->isDown())
+  if (input->isArrowUp())
     result->cursorEvent = GameControlEvent::kUp;
 
-  if (input->isArrowLeft() && input->isDown())
+  if (input->isArrowLeft())
     result->cursorEvent = GameControlEvent::kLeft;
 
-  if (input->isArrowRight() && input->isDown())
+  if (input->isArrowRight())
     result->cursorEvent = GameControlEvent::kRight;
 
-  if (input->isPause() && input->isDown())
+  if (input->isPause())
     result->gameEvent = GameControlEvent::kPauseGame;
 
   result->isUp = input->isUp();

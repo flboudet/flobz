@@ -482,7 +482,7 @@ namespace gameui {
   protected:
     virtual void draw(SDL_Surface *screen);
   private:
-    IIM_Surface *m_image;
+    IIM_Surface *m_image, *m_focusedImage;
   };
 
   class Button : public Text {
@@ -494,7 +494,7 @@ namespace gameui {
 
       void lostFocus();
       void giveFocus();
-      
+      void setFocusable(bool foc) { Text::setFocusable(foc); }
     private:
       SoFont *fontActive;
       SoFont *fontInactive;

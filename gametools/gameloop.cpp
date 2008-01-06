@@ -372,12 +372,10 @@ void GameLoop::draw()
       nOfColors = surface->format->BytesPerPixel;
       if (nOfColors == 4)     // contains an alpha channel
       {
-          if (surface->format->Rmask == 0x000000ff) texture_format = GL_RGBA;
-          else texture_format = GL_BGRA;
+          texture_format = GL_RGBA;
       } else if (nOfColors == 3)     // no alpha channel
       {
-          if (surface->format->Rmask == 0x000000ff) texture_format = GL_RGB;
-          else texture_format = GL_BGR;
+        texture_format = GL_RGB;
       } else {
           printf("warning: the image is not truecolor..  this will probably break\n");
           // this error should not go unhandled

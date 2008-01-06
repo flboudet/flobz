@@ -104,7 +104,8 @@ String NetCenterPlayerList::PlayerEntry::getStatusString(int status)
 }
 
 NetCenterPlayerList::NetCenterPlayerList(int size, NetCenterMenu *targetMenu, GameLoop *loop)
-    : ListView(size, IIM_Load_Absolute_DisplayFormat(theCommander->getDataPathManager().getPath("gfx/downarrow.png")), loop), targetMenu(targetMenu)
+    : ListView(size, IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png")),
+               IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png")), loop), targetMenu(targetMenu)
 {}
 
 void NetCenterPlayerList::addNewPlayer(String playerName, PeerAddress playerAddress, int status)

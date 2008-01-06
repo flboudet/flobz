@@ -26,11 +26,13 @@ public:
 
 class ScrollWidget : public Widget {
 public:
-    ScrollWidget(ScrollInfoProvider &siProvider) : m_siProvider(siProvider), m_grabbing(false) {Widget::setFocusable(true); setReceiveUpEvents(true);}
+    ScrollWidget(ScrollInfoProvider &siProvider);
+    virtual ~ScrollWidget();
     virtual void eventOccured(GameControlEvent *event);
 protected:
     virtual void draw(SDL_Surface *screen);
 private:
+    SDL_Surface *m_bgSurface;
     ScrollInfoProvider &m_siProvider;
     bool m_grabbing;
     int m_grabOffset;
@@ -50,7 +52,8 @@ friend class ListView;
 
 class ListView : public CycledComponent, public HBox, public Action, public ScrollInfoProvider {
 public:
-    ListView(int size, IIM_Surface *downArrow, GameLoop *loop = NULL);
+    ListView(int size, IIM_Surface *upArrow, IIM_Surface *downArrow, GameLoop *loop = NULL);
+    virtual ~ListView();
     void addEntry(ListViewEntry *entry);
     void removeEntry(ListViewEntry *entry);
     ListViewEntry *getEntryAt(int index) const { return entries[index]; }
@@ -71,6 +74,7 @@ private:
     void resyncLabels();
     void handleButtons();
     
+    SDL_Surface *m_bgSurface;
     int size, firstVisible;
     int used;
     Image downButton, upButton;

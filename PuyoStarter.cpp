@@ -611,12 +611,14 @@ PuyoGameScreen::~PuyoGameScreen()
 void PuyoGameScreen::onEvent(GameControlEvent *cevent)
 {
     bool backPressedFromGameWidget = false;
-    switch (cevent->cursorEvent) {
-    case GameControlEvent::kStart:
-        break;
-    case GameControlEvent::kBack:
-        backPressedFromGameWidget = backPressed();
-        break;
+    if (!cevent->isUp) {
+        switch (cevent->cursorEvent) {
+        case GameControlEvent::kStart:
+            break;
+        case GameControlEvent::kBack:
+            backPressedFromGameWidget = backPressed();
+            break;
+        }
     }
     if (!backPressedFromGameWidget)
         Screen::onEvent(cevent);
