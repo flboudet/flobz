@@ -3,8 +3,7 @@ import <libface.gsl>
 
 <init>
     AI_Flobo
-    @AI_PotentialSuppression = 0
-    [face_init: name="introlevel/herbert-mini.png"]
+    [face_init: name="introlevel/orloff-mini.png"]
 
 <sprite_list>
     [face_list]

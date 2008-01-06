@@ -1,0 +1,8 @@
+import <libai.gsl>
+
+<init>
+    AI_Flobo
+
+<sprite_list>
+
+<update>

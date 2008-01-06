@@ -18,7 +18,7 @@
 [start_level]
     level.levelName           = "An unfriendly encounter"
     level.opponentStory       = "story2.gsl"
-#    level.opponentFace        = "dukebeary.gsl"
+    level.opponentFace        = "dukebeary.gsl"
     level.opponentName        = "Duke Beary"
     level.backgroundTheme     = "The forest"
     level.easySetting.type    = "JEKO"
@@ -35,7 +35,7 @@
     level.levelName           = "The Vampire's Plumber"
     level.opponentStory       = "story3.gsl"
     level.opponentName        = "Orloff"
-#    level.opponentFace        = "orloff.gsl"
+    level.opponentFace        = "orloff.gsl"
     level.backgroundTheme     = "The mansion"
     level.easySetting.type    = "TANIA"
     level.easySetting.level   = 50
@@ -50,6 +50,7 @@
     level.levelName           = "Close encounters of the third kind"
     level.opponentStory       = "story4.gsl"
     level.opponentName        = "Azrael"
+    level.opponentFace        = "azrael.gsl"
     level.easySetting.type    = "FLOBO"
     level.easySetting.level   = 45
     level.easySetting.nColors = 4
@@ -63,6 +64,7 @@
     level.levelName           = "The Unmapped Level, V2"
     level.opponentStory       = "story5.gsl"
     level.opponentName        = "Unmapped Monster V2"
+    level.opponentFace        = "monk.gsl"
     level.easySetting.type    = "GYOM"
     level.easySetting.level   = 40
     level.mediumSetting.type  = "GYOM"
@@ -75,6 +77,7 @@
     level.levelName           = "Unnamed level"
     level.opponentStory       = "story6.gsl"
     level.opponentName        = "Zklogh"
+    level.opponentFace        = "zklogh.gsl"
     level.easySetting.type    = "JEKO"
     level.easySetting.level   = 35
     level.mediumSetting.type  = "JEKO"
@@ -87,6 +90,7 @@
     level.levelName           = "The Beauty and the Beast"
     level.opponentStory       = "story7.gsl"
     level.opponentName        = "MegaPuyo"
+    level.opponentFace        = "megapuyo.gsl"
     level.easySetting.type    = "TANIA"
     level.easySetting.level   = 30
     level.mediumSetting.type  = "TANIA"
@@ -99,6 +103,7 @@
     level.levelName           = "Adam McFlurry"
     level.opponentStory       = "story8.gsl"
     level.opponentName        = "Adam McFlurry"
+    level.opponentFace        = "mcflurry.gsl"
     level.easySetting.type    = "FLOBO"
     level.easySetting.level   = 25
     level.mediumSetting.type  = "FLOBO"
@@ -111,6 +116,7 @@
     level.levelName           = "MechaPuyo"
     level.opponentStory       = "story9.gsl"
     level.opponentName        = "MechaPuyo"
+    level.opponentFace        = "mechapuyo.gsl"
     level.easySetting.type    = "GYOM"
     level.easySetting.level   = 20
     level.mediumSetting.type  = "GYOM"

@@ -1,0 +1,6 @@
+<face_init: string name>
+    Display @face_display = [new_display: x=274.0 y=206.0 width=140.0 height=220.0]
+    Sprite  @face_sprite = [new_sprite: image=name x=0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+
+<face_list>
+    sprite::@face_sprite display=@face_display
