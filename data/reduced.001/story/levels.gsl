@@ -3,7 +3,7 @@
     level.levelName           = "Kaori vs the Men's Best Friend"
     level.opponentStory       = "story1.gsl"
     level.opponentName        = "Herbert the Dog"
-#    level.opponentFace        = "herbert.gsl"
+    level.opponentFace        = "herbert.gsl"
     level.backgroundTheme     = "Kaori's farm"
     level.easySetting.type    = "FLOBO"
     level.easySetting.level   = 60
