@@ -229,8 +229,8 @@ void MainRealMenu::build() {
   networkGameMenu.build();
   add(&singlePlayerGameButton);
   add(&twoPlayersGameButton);
-  add(&optionButton);
   add(&networkGameButton);
+  add(&optionButton);
   add(&hallOfFameButton);
   add(&exitButton);
   popScreenAction.setFromScreen(&hallOfFameScreen);
