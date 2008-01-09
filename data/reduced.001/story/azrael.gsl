@@ -1,0 +1,11 @@
+import <libai.gsl>
+import <libface.gsl>
+
+<init>
+    AI_Flobo
+    [face_init: name="introlevel/dukebeary-mini.png"]
+
+<sprite_list>
+    [face_list]
+
+<update>
