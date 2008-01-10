@@ -485,27 +485,50 @@ namespace gameui {
     }
 
     void Box::eventOccured(GameControlEvent *event)
-    {
+    {     
         // If the box has no focusable child, give up the focus
         if (getNumberOfFocusableChilds() <= 0) {
             lostFocus();
             return;
         }
         
-        bool dontrollover = false; // rollover is enabled by default (i.e., when we reach the bottom of the box, we continue at the top)
-        int direction = 0; // direction of the active widget change related to the event (1: next, -1: prev, 0: unrelated)
+        // Mouse focus management
+        handleMouseFocus(event);
         
+        // Event transmission to the widget tree
+        Widget *child = getChild(activeWidget);
+        // If the event is a key up event and the child is not interrested, discard the event
+        if ((event->isUp) && (! child->receiveUpEvents()))
+            return;
+        // Send the event to the active child. If the child doesn't gives up the focus, we're done.
+        child->eventOccured(event);
+        if (child->haveFocus()) return;
+        
+        // Keyboard focus management
+        // Discard up events for the keyboard focus management
+        if (event->isUp)
+            return;
+        handleKeyboardFocus(event);
+    }
+    
+    void Box::handleMouseFocus(GameControlEvent *event)
+    {
         Vec3 ref(1.0f,2.0f,3.0f);
-        float axe = getSortingAxe(ref);
+        float axis = getSortingAxe(ref);
+        
+        // If the box is a zbox, don't perform mouse management
+        if (axis == 3.0f)
+            return;
+        
         // If the event is a mouse moved event, search and focus the widget beneath the cursor
-        if ((axe < 3.0f) && (event->cursorEvent == GameControlEvent::kGameMouseMoved)) {
+        if (event->cursorEvent == GameControlEvent::kGameMouseMoved) {
             Widget *child = getChild(activeWidget);
             for (int i = 0 ; i < this->getNumberOfChilds() ; i++) {
                 Widget *wid = this->getChild(i);
                 Vec3 widPosition = wid->getPosition();
                 Vec3 widSize = wid->getSize();
-                if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
-                    && (widPosition.x + widSize.x >= widPosition.x) && (widPosition.y + widSize.y >= event->y) && (activeWidget != i)) {
+                if ((wid->isFocusable()) && (widPosition.x <= event->x) && (widPosition.y <= event->y)
+                    && (widPosition.x + widSize.x >= event->x) && (widPosition.y + widSize.y >= event->y) && (activeWidget != i)) {
                     if (child != NULL)
                         child->lostFocus();
                     activeWidget = i;
@@ -513,6 +536,15 @@ namespace gameui {
                 }
             }
         }
+    }
+    
+    void Box::handleKeyboardFocus(GameControlEvent *event)
+    {
+        bool dontrollover = false; // rollover is enabled by default (i.e., when we reach the bottom of the box, we continue at the top)
+        int direction = 0; // direction of the active widget change related to the event (1: next, -1: prev, 0: unrelated)
+        
+        Vec3 ref(1.0f,2.0f,3.0f);
+        float axis = getSortingAxe(ref);
         
         // This stuff has the following behaviour:
         //   - if this container has an ancestor that is sorted in the same way as this box (i.e., a HBox that has another HBox as parent),
@@ -521,30 +553,11 @@ namespace gameui {
         WidgetContainer * curParent = parent;
         while ((curParent!=NULL) && (dontrollover==false)) {
             // DANGER: parent can be a container, not a box
-            if ((static_cast<Box *>(curParent)->getSortingAxe(ref)==axe) && (static_cast<Box *>(curParent)->getNumberOfFocusableChilds()>1))
+            if ((static_cast<Box *>(curParent)->getSortingAxe(ref)==axis) && (static_cast<Box *>(curParent)->getNumberOfFocusableChilds()>1))
                 dontrollover = true;
             curParent = curParent->parent;
         }
-        // Ensures that the active widget index is not out of bounds
-        if (activeWidget >= getNumberOfChilds())
-            activeWidget = getNumberOfChilds() - 1;
-        if (activeWidget < 0) activeWidget = 0;
-        // child is the active child widget
-        Widget *child = getChild(activeWidget);
-        // If the event is a key up event and the child is not interrested, discard the event
-        if ((event->isUp) && (! child->receiveUpEvents()))
-            return;
-        // Handle the case where the widget has self-destroyed
-        if (!hasWidget(child)) {
-            throw Exception("Truc qui ne devait pas rester !");
-            return; // there are probably wiser things to do
-        }
-        // Send the focus to the active child. If the child doesn't gives up the focus, we're done.
-        child->eventOccured(event);
-        if (child->haveFocus()) return;
-        // The rest of the code handles the change of active widget and the rollover
-        if (event->isUp)
-            return;
+        
         if (isPrevEvent(event)) direction = -1;
         else if (isNextEvent(event)) direction = 1;
         else if (isOtherDirection(event)) {
@@ -561,8 +574,7 @@ namespace gameui {
                 possibleNewWidget += direction;
                 if (possibleNewWidget < 0) // roll from first to last
                 {
-                    if (dontrollover)
-                    {
+                    if (dontrollover) {
                         possibleNewWidget = activeWidget;
                         lostFocus();
                     }  
@@ -570,8 +582,7 @@ namespace gameui {
                 }  
                 if (possibleNewWidget >= getNumberOfChilds()) // roll from last to first
                 {
-                    if (dontrollover)
-                    {
+                    if (dontrollover) {
                         possibleNewWidget = activeWidget;
                         lostFocus();
                     }  
@@ -580,9 +591,7 @@ namespace gameui {
             }
             while (!getChild(possibleNewWidget)->isFocusable());
 
-            if (possibleNewWidget != activeWidget)
-            {
-                child->lostFocus();
+            if (possibleNewWidget != activeWidget) {
                 getChild(possibleNewWidget)->eventOccured(event);
                 setActiveWidget(possibleNewWidget);
             }  
@@ -823,6 +832,8 @@ namespace gameui {
 
     void SliderContainer::idle(double currentTime)
     {
+        if (sliding && slideStartTime == 0)
+            slideStartTime = currentTime;
         this->currentTime = currentTime;
         if (!sliding) return; // only executed when the slider is animated
         double t = (currentTime - slideStartTime);
@@ -1117,8 +1128,15 @@ namespace gameui {
     {
         // If the screen is not visible, don't propagate events
         if (!isVisible()) return;
-        // Pass the event to the last grabbed widget (if no other widget has been grabbed, it is rootContainer)
-        m_grabbedWidgets.back()->eventOccured(event);
+        // If no other widget has been grabbed, the grabbed widget is rootContainer
+        Widget *grabbedWidget = m_grabbedWidgets.back();
+        // If the grabbed widget doesn't have the focus, try to give it
+        // (important so that whenever the grabbed widget gives up focus, it will be
+        // given back to it)
+        if ((! grabbedWidget->haveFocus()) && (grabbedWidget->isFocusable()))
+            grabbedWidget->giveFocus();
+        // Pass the event to the last grabbed widget
+        grabbedWidget->eventOccured(event);
     }
     
     void Screen::onDrawableVisibleChanged(bool visible)
@@ -1168,7 +1186,7 @@ namespace gameui {
     // 
 
     Text::Text()
-        : label(""), mdontMove(true), offset(0.0,0.0,0.0)
+        : label(""), mdontMove(true), offset(0.0,0.0,0.0), m_textAlign(TEXT_CENTERED), m_autoSize(true)
     {
         this->font = GameUIDefaults::FONT_TEXT;
         setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
@@ -1177,7 +1195,7 @@ namespace gameui {
     }
 
     Text::Text(const String &label, SoFont *font)
-        : font(font), label(label), mdontMove(true), offset(0.0,0.0,0.0)
+        : font(font), label(label), mdontMove(true), offset(0.0,0.0,0.0), m_textAlign(TEXT_CENTERED), m_autoSize(true)
     {
         if (font == NULL) this->font = GameUIDefaults::FONT_TEXT;
         setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
@@ -1189,7 +1207,8 @@ namespace gameui {
     {
         label = value;
         requestDraw();
-        setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
+        if (m_autoSize)
+            setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
         if (parent)
             parent->arrangeWidgets();
     }
@@ -1452,13 +1471,21 @@ namespace gameui {
 
     void EditField::eventOccured(GameControlEvent *event)
     {
-
+        bool shouldHandleKbdInput = true;
         if (event->isUp) {
             repeat = false;
             return;
         }
         repeat_speed = REPEAT_TIME;
 
+        // If editOnFocus is enabled, losing our focus is a priority!
+        if (editOnFocus) {
+            if (isDirectionEvent(event)) {
+                lostFocus();
+                return;
+            }
+        }
+        
         if (event->cursorEvent == GameControlEvent::kStart) {
             editionMode = !editionMode;
             if (editionMode == true) {
@@ -1473,6 +1500,7 @@ namespace gameui {
                 if (action)
                     action->action();
             }
+            shouldHandleKbdInput = false;
         }
         else if ((event->cursorEvent == GameControlEvent::kGameMouseClicked) && (editionMode == false)) {
             Vec3 widPosition = getPosition();
@@ -1483,10 +1511,9 @@ namespace gameui {
                 setValue(previousValue+"_",false);
                 editionMode = true;
             }
+            shouldHandleKbdInput = false;
         }
         else if (editionMode == true) {
-            const char CHAR_ORDER[] = "/:-. _ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
             // kBack => Cancel current entry
             if (event->cursorEvent == GameControlEvent::kBack) {
                 if (!editOnFocus) {
@@ -1495,83 +1522,13 @@ namespace gameui {
                     event->setCaught();
                 }
                 repeat = false;
+                shouldHandleKbdInput = false;
             }
-            // kUp => Change last char of the entry (forward)
-            else if (event->cursorEvent == GameControlEvent::kUp) {
-                String newValue = getValue();
-                while (newValue.length() <= 1)
-                    newValue += '_';
-                char ch = newValue[newValue.length() - 2];
-                int index = 0;
-                while (CHAR_ORDER[index] != ch) {
-                    ++index;
-                    if (CHAR_ORDER[index] == '\0') {
-                        index = 0;
-                        break;
-                    }
-                }
-                if (CHAR_ORDER[index+1] == '\0')
-                    index = 0;
-                else
-                    index += 1;
-                newValue[newValue.length() - 2] = CHAR_ORDER[index];
-                setValue(newValue,false);
-                repeat = true;
-                repeat_date = ios_fc::getTimeMs();
-                repeatEvent = *event;
-            }
-            // kDown => Change last char of the entry (downward)
-            else if (event->cursorEvent == GameControlEvent::kDown) {
-                String newValue = getValue();
-                while (newValue.length() <= 1)
-                    newValue += '_';
-                char ch = newValue[newValue.length() - 2];
-                int index = 0;
-                while (CHAR_ORDER[index] != ch) {
-                    ++index;
-                    if (CHAR_ORDER[index] == '\0') {
-                        index = 0;
-                        break;
-                    }
-                }
-                if (index == 0)
-                    index = strlen(CHAR_ORDER) - 1;
-                else
-                    index -= 1;
-                newValue[newValue.length() - 2] = CHAR_ORDER[index];
-                setValue(newValue,false);
-                repeat = true;
-                repeat_date = ios_fc::getTimeMs();
-                repeatEvent = *event;
-            }
-            // kLeft => Like Backspace
-            else if (event->cursorEvent == GameControlEvent::kLeft) {
-                if (getValue().length() > 1) {
-                    int last=getValue().length() - 2;
-#ifdef ENABLE_TTF
-                    while ((getValue()[last] & 0xc0) == 0x80)
-                        last--;
-#endif
-                    String newValue = getValue().substring(0, last);
-                    newValue += "_";
-                    setValue(newValue,false);
-                    repeat = true;
-                    repeat_date = ios_fc::getTimeMs();
-                    repeatEvent = *event;
-                }
-            }
-            // kRight => Duplicate last char
-            else if (event->cursorEvent == GameControlEvent::kRight) {
-                String newValue = getValue();
-                newValue[newValue.length() - 1] = newValue[newValue.length() - 2];
-                newValue += "_";
-                setValue(newValue,false);
-                repeat = true;
-                repeat_date = ios_fc::getTimeMs();
-                repeatEvent = *event;
-            }
+            // Joystick entry, discarded when editOnFocus is enabled
+            else if (!editOnFocus)
+                shouldHandleKbdInput = !handleJoystickEdit(event);
             // Keyboard input is also supported
-            else if (event->sdl_event.type == SDL_KEYDOWN) {
+            if ((shouldHandleKbdInput) && (event->sdl_event.type == SDL_KEYDOWN)) {
                 SDL_Event e = event->sdl_event;
                 char ch = 0;
 
@@ -1622,16 +1579,100 @@ namespace gameui {
             if (isDirectionEvent(event))
                 lostFocus();
         }
-        if (editOnFocus) {
-            if (isDirectionEvent(event)) {
-                lostFocus();
+    }
+    
+    bool EditField::handleJoystickEdit(GameControlEvent *event)
+    {
+        static const char CHAR_ORDER[] = "/:-. _ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?@";
+        bool handled = false;
+        // kUp => Change last char of the entry (forward)
+        if (event->cursorEvent == GameControlEvent::kUp) {
+            String newValue = getValue();
+            while (newValue.length() <= 1)
+                newValue += '_';
+            char ch = newValue[newValue.length() - 2];
+            int index = 0;
+            while (CHAR_ORDER[index] != ch) {
+                ++index;
+                if (CHAR_ORDER[index] == '\0') {
+                    index = 0;
+                    break;
+                }
+            }
+            if (CHAR_ORDER[index+1] == '\0')
+                index = 0;
+            else
+                index += 1;
+            newValue[newValue.length() - 2] = CHAR_ORDER[index];
+            setValue(newValue,false);
+            repeat = true;
+            repeat_date = ios_fc::getTimeMs();
+            repeatEvent = *event;
+            handled = true;
+        }
+        // kDown => Change last char of the entry (downward)
+        else if (event->cursorEvent == GameControlEvent::kDown) {
+            String newValue = getValue();
+            while (newValue.length() <= 1)
+                newValue += '_';
+            char ch = newValue[newValue.length() - 2];
+            int index = 0;
+            while (CHAR_ORDER[index] != ch) {
+                ++index;
+                if (CHAR_ORDER[index] == '\0') {
+                    index = 0;
+                    break;
+                }
+            }
+            if (index == 0)
+                index = strlen(CHAR_ORDER) - 1;
+            else
+                index -= 1;
+            newValue[newValue.length() - 2] = CHAR_ORDER[index];
+            setValue(newValue,false);
+            repeat = true;
+            repeat_date = ios_fc::getTimeMs();
+            repeatEvent = *event;
+            handled = true;
+        }
+        // kLeft => Like Backspace
+        else if (event->cursorEvent == GameControlEvent::kLeft) {
+            if (getValue().length() > 1) {
+                int last=getValue().length() - 2;
+#ifdef ENABLE_TTF
+                while ((getValue()[last] & 0xc0) == 0x80)
+                    last--;
+#endif
+                String newValue = getValue().substring(0, last);
+                newValue += "_";
+                setValue(newValue,false);
+                repeat = true;
+                repeat_date = ios_fc::getTimeMs();
+                repeatEvent = *event;
+                handled = true;
             }
         }
+        // kRight => Duplicate last char
+        else if (event->cursorEvent == GameControlEvent::kRight) {
+            String newValue = getValue();
+            newValue[newValue.length() - 1] = newValue[newValue.length() - 2];
+            newValue += "_";
+            setValue(newValue,false);
+            repeat = true;
+            repeat_date = ios_fc::getTimeMs();
+            repeatEvent = *event;
+            handled = true;
+        }
+        return handled;
     }
 
     void EditField::lostFocus() {
         Text::lostFocus();
         font = fontInactive;
+        if (editionMode == true && !editOnFocus)  {
+            setValue(previousValue, false);
+            editionMode = false;
+        }
         requestDraw();
     }
 
@@ -1767,6 +1808,7 @@ namespace gameui {
 
     Separator::Separator(float width, float height)
     {
+        setFocusable(false);
         setPreferedSize(Vec3(width, height, 1.0));
     }
 

@@ -69,8 +69,11 @@ private:
     };
     ChatBoxDelegate &delegate;
     ChatAction chatAction;
-    EditFieldWithLabel chatInput;
+    Text chatInputLabel;
+    EditField chatInput;
     NetCenterChatArea chatArea;
+    Separator topSeparator, leftEditSeparator, betweenSeparator, leftChatSeparator, bottomSeparator;
+    HBox chatInputContainer, chatAreaContainer;
     VBox chatBoxContainer;
 };
 

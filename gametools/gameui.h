@@ -225,6 +225,8 @@ namespace gameui {
       virtual bool giveFocusToActiveWidget();
 
     private:
+      void handleMouseFocus(GameControlEvent *event);
+      void handleKeyboardFocus(GameControlEvent *event);
       //Events
       Action *onRollDownAction, *onRollUpAction;
   };
@@ -435,11 +437,20 @@ namespace gameui {
       std::vector<Widget *> m_grabbedWidgets;
   };
 
-
+  enum TextAlign {
+    TEXT_CENTERED,
+    TEXT_LEFT_ALIGN,
+    TEXT_RIGHT_ALIGN
+  };
+  
   class Text : public Widget, public IdleComponent {
     public:
       Text();
       Text(const String &label, SoFont *font = NULL);
+      void setTextAlign(TextAlign align) { m_textAlign = align; }
+      TextAlign getTextAlign() const { return m_textAlign; }
+      void setAutoSize(bool autoSize) { m_autoSize = autoSize; }
+      bool getAutoSize() const { return m_autoSize; }
       void setValue(String value);
       String getValue() const { return label; }
       void setFont(SoFont *newFont) { font = newFont; }
@@ -459,6 +470,8 @@ namespace gameui {
       Vec3 offset;
       double startTime;
       bool moving;
+      TextAlign m_textAlign;
+      bool m_autoSize;
 
     public:
       bool mdontMove;
@@ -508,6 +521,7 @@ namespace gameui {
       EditField(const String &defaultText, const String &persistentID);
 
       void eventOccured(GameControlEvent *event);
+      bool handleJoystickEdit(GameControlEvent *event);
       void setValue(String value, bool persistent = true);
       
       void lostFocus();
