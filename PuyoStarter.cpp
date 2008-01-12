@@ -473,7 +473,7 @@ void PuyoGameWidget::setScreenToResumed(bool fromControls)
 }
 
 PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
-    : menuBG(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/menubg.png"))),
+    : menuBG(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/menubg.png"))), topSeparator(0, 10),
       toggleSoundFxAction(), toggleMusicAction(), toggleFullScreenAction(),
       menuTitle(theCommander->getLocalizedString("Pause")), 
       continueButton(theCommander->getLocalizedString("Continue game"), continueAction),
@@ -485,6 +485,8 @@ PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
     toggleSoundFxAction.setButton(&audioButton);
     toggleMusicAction.setButton(&musicButton);
     toggleFullScreenAction.setButton(&fullScreenButton);
+    
+    setPolicy(USE_MIN_SIZE);
     pauseVBox.add(&menuTitle);
     pauseVBox.add(&continueButton);
     pauseVBox.add(&audioButton);
@@ -492,11 +494,14 @@ PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
     pauseVBox.add(&fullScreenButton);
     pauseVBox.add(&abortButton);
     pauseContainer.add(&pauseVBox);
-    add(&pauseContainer);
-    pauseContainer.add(&pauseVBox);
+    
+    //topBox.setPreferedSize(Vec3(menuBG->w, menuBG->h, 0));
+    pauseContainer.setPreferedSize(Vec3(menuBG->w, menuBG->h, 0));
     pauseContainer.setBackground(menuBG);
-    pauseMenuLeft = (640 - menuBG->w) / 2;
-    pauseMenuTop = (480 - menuBG->h) / 2;
+    
+    topBox.add(&pauseContainer);
+    add(&topSeparator);
+    add(&topBox);
 }
 
 void PuyoPauseMenu::toggleSoundFx()
@@ -518,15 +523,6 @@ void PuyoPauseMenu::toggleFullScreen()
 PuyoPauseMenu::~PuyoPauseMenu()
 {
     IIM_Free(menuBG);
-}
-
-void PuyoPauseMenu::finishLayout()
-{
-    Vec3 menuPos = pauseContainer.getPosition();
-    menuPos.x = pauseMenuLeft;
-    menuPos.y = pauseMenuTop;
-    pauseContainer.setPosition(menuPos);
-    pauseContainer.setSize(Vec3(menuBG->w, menuBG->h, 0));
 }
 
 void ContinueAction::action()
@@ -651,7 +647,6 @@ void PuyoGameScreen::setPaused(bool fromControls)
         for (int i=0; i<fx.size(); ++i)
             fx[i]->hide();
         this->add(&pauseMenu);
-        pauseMenu.finishLayout();
         this->focus(&pauseMenu);
         paused = true;
         gameWidget.pause();

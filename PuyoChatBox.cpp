@@ -116,7 +116,7 @@ ChatBox::ChatBox(ChatBoxDelegate &delegate)
     chatBoxContainer.add(&bottomSeparator);
     add(&chatBoxContainer);
     
-    chatBoxContainer.setPreferedSize(Vec3(640, 216, 0));
+    chatBoxContainer.setPreferedSize(Vec3(chatBoxBG->w, chatBoxBG->h));
     
     resumeLayout();
 }

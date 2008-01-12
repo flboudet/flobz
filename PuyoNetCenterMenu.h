@@ -40,10 +40,13 @@ public:
     NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvitation &associatedInvitation, String title, String message, bool hasAcceptButton);
     virtual ~NetCenterDialogMenu();
     void build();
+    // Notification
+    virtual void eventOccured(GameControlEvent *event);
 public:
     PuyoGameInvitation associatedInvitation;
 private:
     IIM_Surface   *menuBG;
+    
     class NetCenterDialogMenuAction : public Action {
     public:
         NetCenterDialogMenuAction(NetCenterMenu *targetMenu, bool isCancelAction)
@@ -53,6 +56,7 @@ private:
         NetCenterMenu *targetMenu;
         bool isCancelAction;
     };
+    
     NetCenterDialogMenuAction cancelAction, acceptAction;
     bool hasAcceptButton;
     VBox menu;
@@ -127,9 +131,9 @@ public:
     void cycle();
     void playerSelected(PeerAddress playerAddress, String playerName);
     void selfDestroy() { shouldSelfDestroy = true; }
-    void show();
     virtual void sendChat(String chatText);
     // Notification
+    virtual void eventOccured(GameControlEvent *event);
     virtual void onWidgetVisibleChanged(bool visible);
     virtual void onWidgetRemoved(WidgetContainer *parent);
 private:

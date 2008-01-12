@@ -91,6 +91,18 @@ void NetCenterDialogMenu::build()
     transitionToContent(&menu);
 }
 
+void NetCenterDialogMenu::eventOccured(GameControlEvent *event)
+{
+    SliderContainer::eventOccured(event);
+    // We intercept the back event so it will do the same as the cancel action
+    switch (event->cursorEvent) {
+        case GameControlEvent::kBack:
+            event->caught = true;
+            cancelAction.action();
+            break;
+    }
+}
+
 String NetCenterPlayerList::PlayerEntry::getStatusString(int status)
 {
   switch (status) {
@@ -264,11 +276,24 @@ void NetCenterMenu::onGameInvitationReceived(PuyoGameInvitation &invitation)
     }
 }
 
+void NetCenterMenu::eventOccured(GameControlEvent *event)
+{
+    PuyoMainScreenMenu::eventOccured(event);
+    // We intercept the back event so it will be impossible
+    // to go to the previous menu by hitting the back button.
+    // (otherwise, it's too easy to disconnect by mistake)
+    switch (event->cursorEvent) {
+        case GameControlEvent::kBack:
+            event->caught = true;
+            break;
+    }
+}
+
 void NetCenterMenu::onWidgetVisibleChanged(bool visible)
 {
     printf("netcentermenu visible: %s\n", visible ? "true" : "false");
-    /*if (!visible)
-        delete this;*/
+    if (visible)
+        netCenter->setStatus(PEER_NORMAL);
 }
 
 void NetCenterMenu::onWidgetRemoved(WidgetContainer *parent)
@@ -330,8 +355,4 @@ void NetCenterMenu::playerSelected(PeerAddress playerAddress, String playerName)
     netCenter->requestGame(invitation);
 }
 
-void NetCenterMenu::show()
-{
-  netCenter->setStatus(PEER_NORMAL);
-  //Screen::show();
-}
+

@@ -43,7 +43,6 @@ class PuyoPauseMenu : public VBox {
 public:
     PuyoPauseMenu(Action *continueAction, Action *abortAction);
     virtual ~PuyoPauseMenu();
-    virtual void finishLayout();
     int pauseMenuTop, pauseMenuLeft;
     void toggleSoundFx();
     void toggleMusic();
@@ -51,6 +50,8 @@ public:
 private:
     IIM_Surface   *menuBG;
     SliderContainer pauseContainer;
+    Separator topSeparator;
+    HBox topBox;
     VBox pauseVBox;
     Text menuTitle;
     Button continueButton;
