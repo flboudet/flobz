@@ -26,6 +26,8 @@ ScrollWidget::~ScrollWidget()
 
 void ScrollWidget::eventOccured(GameControlEvent *event)
 {
+    if (isDirectionEvent(event))
+            lostFocus();
     if (event->cursorEvent == GameControlEvent::kGameMouseClicked) {
         if (event->isUp) {
             if (m_grabbing) {

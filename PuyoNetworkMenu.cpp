@@ -61,15 +61,8 @@ public:
     {
         PuyoLanGameCenter *gameCenter = new PuyoLanGameCenter(atoi(serverPort->getValue()), userName->getValue());
         NetCenterMenu *newNetCenterMenu = new NetCenterMenu(mainScreen, gameCenter);
-		//newNetCenterMenu->setSize(Vec2(640, 480));
-		//newNetCenterMenu->setPosition(Vec2(0, 0));
-        //newNetCenterMenu->setAutoRelease(true);
         newNetCenterMenu->build();
-		//newNetCenterMenu->setSize(Vec2(640, 480));
-		//newNetCenterMenu->setPosition(Vec2(0, 0));
         mainScreen->pushMenu(newNetCenterMenu, true);
-		mainScreen->setInNetGameCenter(true);
-        //(GameUIDefaults::SCREEN_STACK)->push(newNetCenterMenu);
     }
 private:
     PuyoMainScreen * mainScreen;
@@ -283,7 +276,6 @@ void PushNetCenterMenuAction::action()
         NetCenterMenu *newNetCenterMenu = new NetCenterMenu(mainScreen, gameCenter);
         newNetCenterMenu->build();
         mainScreen->pushMenu(newNetCenterMenu, true);
-		mainScreen->setInNetGameCenter(true);
     } catch (Exception e) {
         fprintf(stderr, "Error while connecting to %s\n", serverName->getValue().c_str());
         e.printMessage();
@@ -298,7 +290,6 @@ void NetworkInternetAction::action()
         (*menuToCreate)->build();
     }
     mainScreen->pushMenu(*menuToCreate, true);
-    mainScreen->setInNetGameCenter(true);
 }
 
 NetworkGameMenu::NetworkGameMenu(PuyoMainScreen * mainScreen)

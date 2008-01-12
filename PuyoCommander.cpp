@@ -69,30 +69,12 @@ PuyoMainScreen::PuyoMainScreen(PuyoStoryWidget *fgStory, PuyoStoryWidget *bgStor
         add(bgStory);
     add(&container);
     if (fgStory != NULL) {
-		setInNetGameCenter(false);
         add(fgStory);
 	}
         
-    this->updateSize();
+    setMenuDimensions();
     container.setBackground(menuBG);
     container.addListener(*this);
-}
-
-void PuyoMainScreen::setInNetGameCenter(bool inNetGameCenter)
-{
-	if (fgStory != NULL) {
-		fgStory->setIntegerValue("@inNetGameCenter", inNetGameCenter == false ? 0 : 1);
-		printf("inNetGameCenter: %d\n", inNetGameCenter == false ? 0 : 1);
-	}
-}
-
-void PuyoMainScreen::updateSize()
-{
-    Vec3 menuPos = container.getPosition();
-    menuPos.x = MENU_X;
-    menuPos.y = MENU_Y;
-    container.setPosition(menuPos);
-    container.setSize(Vec3(menuBG->w, menuBG->h, 0));
 }
 
 PuyoMainScreen::~PuyoMainScreen()
@@ -111,6 +93,8 @@ void PuyoMainScreen::pushMenu(PuyoMainScreenMenu *menu, bool fullScreen)
     fullScreenStack.push(fullScreen);
     nextFullScreen = fullScreen;
     container.transitionToContent(menu);
+    if (fgStory != NULL)
+        fgStory->setIntegerValue("@inNetGameCenter", fullScreen ? 1 : 0);
 }
 
 void PuyoMainScreen::popMenu()
@@ -131,7 +115,7 @@ void PuyoMainScreen::transitionFromScreen(Screen &fromScreen)
     }
     transition = new PuyoScreenTransitionWidget(fromScreen, NULL);
     add(transition);
-    this->updateSize();
+    setMenuDimensions();
 }
 
 void PuyoMainScreen::onEvent(GameControlEvent *cevent)
@@ -152,6 +136,11 @@ void PuyoMainScreen::onEvent(GameControlEvent *cevent)
 
 void PuyoMainScreen::onSlideOutside(SliderContainer &slider)
 {
+    setMenuDimensions();
+}
+
+void PuyoMainScreen::setMenuDimensions()
+{
 	Vec3 menuPos;
     if (nextFullScreen) {
         menuPos.y = 0;
@@ -159,6 +148,8 @@ void PuyoMainScreen::onSlideOutside(SliderContainer &slider)
         container.setPosition(menuPos);
         container.setSize(Vec3(WIDTH, HEIGHT, 0));
         container.setBackgroundVisible(false);
+        if (fgStory != NULL)
+            fgStory->setIntegerValue("@inNetGameCenter", 1);
     }
     else {
         menuPos.y = MENU_Y;
@@ -166,6 +157,8 @@ void PuyoMainScreen::onSlideOutside(SliderContainer &slider)
         container.setPosition(menuPos);
         container.setSize(Vec3(menuBG->w, menuBG->h, 0));
         container.setBackgroundVisible(true);
+        if (fgStory != NULL)
+            fgStory->setIntegerValue("@inNetGameCenter", 0);
     }
 }
 

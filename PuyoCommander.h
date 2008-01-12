@@ -30,14 +30,14 @@ class PuyoMainScreen : public PuyoScreen, public SliderContainerListener {
     void build() {}
     void transitionFromScreen(Screen &fromScreen);
     void onEvent(GameControlEvent *cevent);
-    void updateSize();
-	void setInNetGameCenter(bool inNetGameCenter);
     // SliderContainerListener implementation
     /**
      * Notify that the slider is outside of the screen, before sliding back inside
      */
     virtual void onSlideOutside(SliderContainer &slider);
   protected:
+    void setMenuDimensions();
+    
     IIM_Surface   *menuBG;
     SliderContainer container;
     PuyoStoryWidget *fgStory, *bgStory;

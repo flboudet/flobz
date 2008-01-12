@@ -156,6 +156,7 @@ private:
     bool shouldSelfDestroy;
     NetCenterTwoNameProvider nameProvider;
     ChatBox chatBox;
+    Separator topSeparator, middleSeparator, bottomSeparator;
 };
     
 #endif // _PUYONETCENTERMENU

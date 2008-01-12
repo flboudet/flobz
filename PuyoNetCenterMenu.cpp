@@ -176,7 +176,8 @@ NetCenterMenu::NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netC
       playerList(5, this), onScreenDialog(NULL), shouldSelfDestroy(false),
       nameProvider(*netCenter), chatBox(*this),
       title(theCommander->getLocalizedString("Network Game Center")), backAction(mainScreen),
-      cancelButton(theCommander->getLocalizedString("Disconnect"), &backAction)
+      cancelButton(theCommander->getLocalizedString("Disconnect"), &backAction),
+      topSeparator(0, 5), middleSeparator(0, 5), bottomSeparator(0, 5)
 {
     GameUIDefaults::GAME_LOOP->addIdle(&cycled);
     netCenter->addListener(this);
@@ -185,8 +186,6 @@ NetCenterMenu::NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netC
 NetCenterMenu::~NetCenterMenu()
 {
     printf("Deleting the net center\n");
-    // Warn the mainScreen that we are not in the net game center any more
-    mainScreen->setInNetGameCenter(false);
     // Delete the network center because no one else would do it
     delete netCenter;
 }
@@ -200,22 +199,27 @@ void NetCenterMenu::build()
 {
     add(&container);
 
+    mainBox.setPolicy(USE_MIN_SIZE);
+    topbox.setPolicy(USE_MIN_SIZE);
+    playerbox.setPolicy(USE_MIN_SIZE);
+    
     container.add(&mainBox);
-    container.setPosition(Vec3(5,5));
-    container.setSize(Vec3(630,470, 0));
 
     menu.add(&title);
     menu.add(&cancelButton);
     
-    playerbox.setPolicy(USE_MIN_SIZE);
     playerbox.add(&playerListText);
     playerbox.add(&playerList);
 
+    topbox.setPreferedSize(Vec3(0, 240));
     topbox.add(&menu);
     topbox.add(&playerbox);
 
+    mainBox.add(&topSeparator);
     mainBox.add(&topbox);
+    mainBox.add(&middleSeparator);
     mainBox.add(&chatBox);
+    //mainBox.add(&bottomSeparator);
 
 }
 

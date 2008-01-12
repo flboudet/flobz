@@ -84,7 +84,8 @@ void NetCenterChatArea::addChat(String name, String text)
 
 ChatBox::ChatBox(ChatBoxDelegate &delegate)
   : chatBoxBG(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/chatzonebg.png"))),
-    delegate(delegate), chatAction(this), chatInputLabel("Say:"), chatInput("Hello", &chatAction), chatArea(10),
+    delegate(delegate), chatAction(this), chatInputLabel(theCommander->getLocalizedString("Say:")),
+    chatInput(theCommander->getLocalizedString("Hello"), &chatAction), chatArea(10),
     topSeparator(1, 8), leftEditSeparator(15, 1), betweenSeparator(1, 8), leftChatSeparator(15, 1), bottomSeparator(1, 4)
 {
     suspendLayout();
@@ -115,7 +116,6 @@ ChatBox::ChatBox(ChatBoxDelegate &delegate)
     chatBoxContainer.add(&bottomSeparator);
     add(&chatBoxContainer);
     
-    //chatArea.setPreferedSize(Vec3(640, 180, 0));
     chatBoxContainer.setPreferedSize(Vec3(640, 216, 0));
     
     resumeLayout();

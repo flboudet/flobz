@@ -19,7 +19,7 @@ namespace gameui {
     GameLoop    *GameUIDefaults::GAME_LOOP        = new GameLoop();
     ScreenStack *GameUIDefaults::SCREEN_STACK     = new ScreenStack();
 
-    static bool isDirectionEvent(GameControlEvent *event)
+    bool isDirectionEvent(GameControlEvent *event)
     {
         if (event->cursorEvent == GameControlEvent::kUp)
             return true;
@@ -345,6 +345,7 @@ namespace gameui {
         if (getNumberOfChilds() == 0) return;
         requestDraw();
         checkFocus();
+        // TODO: A corriger
         switch (policy)
         {
             case USE_MAX_SIZE:
@@ -480,7 +481,6 @@ namespace gameui {
                     return;
                 }
             }
-            //checkFocus();
         }
     }
 
@@ -647,14 +647,6 @@ namespace gameui {
     void Box::checkFocus()
     {
         if (!haveFocus()) return;
-
-        GameControlEvent ev;
-        ev.cursorEvent = GameControlEvent::kCursorNone;
-        ev.gameEvent   = GameControlEvent::kGameNone;
-        ev.isUp        = false;
-        ev.sdl_event.type = SDL_NOEVENT;
-
-        eventOccured(&ev);
 
         if (activeWidget<0) return;
         if (activeWidget>=getNumberOfChilds()) return;

@@ -37,6 +37,7 @@ namespace gameui {
     GAMEUIENUM_LAST
   };
 
+bool isDirectionEvent(GameControlEvent *event);
 
   class Action {
     public:
