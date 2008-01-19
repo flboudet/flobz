@@ -655,9 +655,9 @@ void iim_surface_convert_to_gray(IIM_Surface *isrc)
 }
 
 
-void IIM_BlitSurface(IIM_Surface *src, IIM_Rect *src_rect, SDL_Surface *dst, SDL_Rect *dst_rect)
+int IIM_BlitSurface(IIM_Surface *src, IIM_Rect *src_rect, SDL_Surface *dst, SDL_Rect *dst_rect)
 {
-  SDL_BlitSurface(src->surf, src_rect, dst, dst_rect);
+  return SDL_BlitSurface(src->surf, src_rect, dst, dst_rect);
 }
 
 void IIM_BlitSurfaceAlpha(IIM_Surface *src, IIM_Rect *src_rect, SDL_Surface *dst, SDL_Rect *dst_rect, Uint8 alpha)

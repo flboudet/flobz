@@ -96,7 +96,7 @@ void ScrollWidget::draw(SDL_Surface *screen)
     dstrect.h = bsize.y;
     dstrect.w = bsize.x;
     
-    if ((m_bgSurface == NULL) || (bsize.x != m_bgSurface->w) || (bsize.x != m_bgSurface->h)) {
+    if ((m_bgSurface == NULL) || (bsize.x != m_bgSurface->w) || (bsize.y != m_bgSurface->h)) {
         if (m_bgSurface != NULL)
             SDL_FreeSurface(m_bgSurface);
         Uint32 rmask, gmask, bmask, amask;
@@ -219,7 +219,7 @@ void ListView::draw(SDL_Surface *screen)
     srcrect.h = lbsize.y;
     srcrect.w = lbsize.x;
     
-    if ((m_bgSurface == NULL) || (lbsize.x != m_bgSurface->w) || (lbsize.x != m_bgSurface->h)) {
+    if ((m_bgSurface == NULL) || (lbsize.x != m_bgSurface->w) || (lbsize.y != m_bgSurface->h)) {
         if (m_bgSurface != NULL)
             SDL_FreeSurface(m_bgSurface);
         Uint32 rmask, gmask, bmask, amask;

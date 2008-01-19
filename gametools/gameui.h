@@ -61,7 +61,7 @@ bool isDirectionEvent(GameControlEvent *event);
   };
 
 
-  class Widget /*: public DrawableComponent*/ {
+  class Widget {
     
       friend class WidgetContainer;
       friend class SliderContainer;
@@ -146,7 +146,7 @@ bool isDirectionEvent(GameControlEvent *event);
     public:
       WidgetContainer(GameLoop *loop = NULL);
       virtual ~WidgetContainer();
-      void add (Widget *child);
+      virtual void add (Widget *child);
       virtual void remove (Widget *child);
       GameLoop *getGameLoop();
       virtual void arrangeWidgets() {}
@@ -176,6 +176,10 @@ bool isDirectionEvent(GameControlEvent *event);
       void    changeChild(int i, Widget *w);
       int     getNumberOfChilds() const  { return childs.size(); }
     protected:
+      // Accessors to private friend methods of the widget class 
+      void setWidgetSize(Widget *w, const Vec3 v3) const { w->setSize(v3); }
+      void setWidgetPosition(Widget *w, const Vec3 v3) const { w->setPosition(v3); }
+      void drawWidget(Widget *w, SDL_Surface *screen) { w->draw(screen); }
       void    sortWidgets();
       int     innerMargin;
       bool    layoutSuspended;
@@ -197,7 +201,7 @@ bool isDirectionEvent(GameControlEvent *event);
       Box(GameLoop *loop = NULL);
       virtual ~Box() {}
       void setPolicy(GameUIEnum policy);
-      void arrangeWidgets();
+      virtual void arrangeWidgets();
       /**
        * Handles and eventually propagates an event on the widget tree of the box container
        * @param event the game event
@@ -206,7 +210,7 @@ bool isDirectionEvent(GameControlEvent *event);
       virtual void giveFocus();
       virtual void lostFocus();
       virtual void setFocusable(bool foc);
-      void add (Widget *child);
+      virtual void add (Widget *child);
       void checkFocus();
       void focus(Widget *widget);
       int getActiveWidget() const { return activeWidget; }

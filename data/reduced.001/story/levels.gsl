@@ -4,7 +4,7 @@
     level.opponentStory       = "story1.gsl"
     level.opponentName        = "Herbert the Dog"
     level.opponentFace        = "herbert.gsl"
-    level.backgroundTheme     = "Kaori's farm"
+    level.backgroundTheme     = "Developer level"
     level.easySetting.type    = "FLOBO"
     level.easySetting.level   = 60
     level.easySetting.nColors = 3
