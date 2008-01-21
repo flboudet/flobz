@@ -153,7 +153,6 @@ bool isDirectionEvent(GameControlEvent *event);
 
       void setSize(const Vec3 &v3);
       void setPosition(const Vec3 &v3);
-      void setInnerMargin(int margin) { innerMargin = margin; }
 
       void draw(SDL_Surface *surface);
       void requestDraw(bool fromParent = false);
@@ -181,7 +180,6 @@ bool isDirectionEvent(GameControlEvent *event);
       void setWidgetPosition(Widget *w, const Vec3 v3) const { w->setPosition(v3); }
       void drawWidget(Widget *w, SDL_Surface *screen) { w->draw(screen); }
       void    sortWidgets();
-      int     innerMargin;
       bool    layoutSuspended;
 
     private:
@@ -201,6 +199,7 @@ bool isDirectionEvent(GameControlEvent *event);
       Box(GameLoop *loop = NULL);
       virtual ~Box() {}
       void setPolicy(GameUIEnum policy);
+      void setInnerMargin(int margin) { innerMargin = margin; }
       virtual void arrangeWidgets();
       /**
        * Handles and eventually propagates an event on the widget tree of the box container
@@ -224,6 +223,7 @@ bool isDirectionEvent(GameControlEvent *event);
       virtual bool isOtherDirection(GameControlEvent *event) const = 0;
 
       GameUIEnum policy;
+      int     innerMargin;
       int        activeWidget;
 
       virtual void setActiveWidget(int i);

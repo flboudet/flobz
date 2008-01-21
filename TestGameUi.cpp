@@ -33,6 +33,7 @@ const int Frame::topH = 19, Frame::middleH = 26, Frame::bottomH = 23;
 Frame::Frame(IIM_Surface *frameSurface) : m_frameSurface(frameSurface), m_bgSurface(NULL)
 {
     setPolicy(USE_MIN_SIZE);
+    setInnerMargin(9);
 }
 
 Frame::~Frame()

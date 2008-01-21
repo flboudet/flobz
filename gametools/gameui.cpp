@@ -119,7 +119,6 @@ namespace gameui {
 
     WidgetContainer::WidgetContainer(GameLoop *loop) : loop(loop), addedToGameLoop(false), layoutSuspended(false) {
         if (loop == NULL) this->loop = GameUIDefaults::GAME_LOOP;
-        innerMargin = 10;
     }
 
     WidgetContainer::~WidgetContainer()
@@ -327,7 +326,7 @@ namespace gameui {
     // 
     // Box
     // 
-    Box::Box(GameLoop *loop) : WidgetContainer(loop)
+    Box::Box(GameLoop *loop) : WidgetContainer(loop), innerMargin(0)
     {
         setPolicy(GameUIDefaults::CONTAINER_POLICY);
         setReceiveUpEvents(true);
@@ -420,7 +419,8 @@ namespace gameui {
                         else
                             numZeroSizedChildren++;
                     }
-                    Vec3 boxSize = getSize();
+                    Vec3 boxSize = getSize() - Vec3(innerMargin*2, innerMargin*2);
+                    Vec3 boxPosition = getPosition() + Vec3(innerMargin, innerMargin);
                     // If there is no zero sized children, children will be centered in the box
                     // Otherwise, the remaining space will be divided between the zero sized children
                     float positionOffset = (numZeroSizedChildren != 0 ? 0. : (getSortingAxe(boxSize) - heightOfKnownChilds) / 2.);
@@ -439,10 +439,10 @@ namespace gameui {
                         }
                     }
                     // Set the position of the child widgets
-                    float currentPosition = getSortingAxe(getPosition()) + positionOffset;
+                    float currentPosition = getSortingAxe(boxPosition) + positionOffset;
                     for (int i = 0; i < getNumberOfChilds(); ++i) {
                         Widget *child = getChild(i);
-                        Vec3 childPosition = getPosition();
+                        Vec3 childPosition = boxPosition;
                         Vec3 childSize = child->getPreferedSize();
                         setSortingAxe(childPosition, currentPosition);
                         child->setPosition(childPosition);
