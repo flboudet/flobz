@@ -27,6 +27,7 @@
 #define _PUYONETWORKMENU
 
 #include "gameui.h"
+#include "Frame.h"
 #include "ListView.h"
 #include "PuyoCommander.h"
 #include "ios_httpdocument.h"
@@ -78,17 +79,19 @@ private:
 class InternetGameMenu : public PuyoMainScreenMenu, public IdleComponent {
 public:
     InternetGameMenu(PuyoMainScreen * mainScreen);
+    virtual ~InternetGameMenu();
     void build();
     void setSelectedServer(const String &s, int port);
     virtual void idle(double currentTime);
     virtual IdleComponent *getIdleComponent() { return this; }
 private:
+    IIM_Surface *frame, *upArrow, *downArrow;
     PuyoHttpServerList servers;
-    VBox serverSelectionPanel;
+    Frame serverSelectionPanel;
     ListView serverListPanel;
     Text serverListText;
     Button updating;
-    VBox rightPanel;
+    Frame rightPanel;
     Separator separator1_1, separator1_2, separator1_3,  separator10_1, separator10_2;
     Text internetGameText, nicknameText, serverText, portText;
     HBox hbox, menu;

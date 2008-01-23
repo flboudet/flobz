@@ -4,6 +4,7 @@
 #include "ios_udpmessagebox.h"
 #include "ios_igpmessagebox.h"
 #include "gameui.h"
+#include "Frame.h"
 #include "PuyoStory.h"
 #include "PuyoDataPathManager.h"
 #include "PuyoLocalizedDictionary.h"
@@ -29,6 +30,7 @@ class PuyoMainScreen : public PuyoScreen, public SliderContainerListener {
     void popMenu();
     void build() {}
     void transitionFromScreen(Screen &fromScreen);
+    IIM_Surface *getFrameImage() const { return m_frameImage; }
     void onEvent(GameControlEvent *cevent);
     // SliderContainerListener implementation
     /**
@@ -37,7 +39,7 @@ class PuyoMainScreen : public PuyoScreen, public SliderContainerListener {
     virtual void onSlideOutside(SliderContainer &slider);
   protected:
     void setMenuDimensions();
-    
+    IIM_Surface   *m_frameImage;
     IIM_Surface   *menuBG;
     SliderContainer container;
     PuyoStoryWidget *fgStory, *bgStory;
@@ -47,9 +49,9 @@ class PuyoMainScreen : public PuyoScreen, public SliderContainerListener {
     bool nextFullScreen;
 };
 
-class PuyoMainScreenMenu : public VBox {
+class PuyoMainScreenMenu : public Frame {
 public:
-    PuyoMainScreenMenu(PuyoMainScreen *mainScreen, GameLoop *loop = NULL) : VBox(loop), mainScreen(mainScreen) {}
+    PuyoMainScreenMenu(PuyoMainScreen *mainScreen, GameLoop *loop = NULL);
     virtual void build() = 0;
     // Notifications
     virtual void onMainScreenMenuPushed() {}

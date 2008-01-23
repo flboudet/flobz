@@ -32,8 +32,6 @@
 #include "PuyoNetCenterMenu.h"
 #include "audio.h"
 
-extern IIM_Surface *menuBG_wide; // I know what you think..
-
 static const char * kInternetServerKey = "Menu.Internet.Server.";
 static const char * kInternetServerPortKey = "Menu.Internet.Server.Port.";
 static const char * kInternetServerNumberKey = "Menu.Internet.Server.Number.";
@@ -313,11 +311,14 @@ void NetworkGameMenu::build() {
 
 InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)
   : PuyoMainScreenMenu(mainScreen),
+    frame(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/frame.png"))),
+    upArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png"))),
+    downArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png"))),
+    serverSelectionPanel(frame),
     servers(),
     container(),
-    serverListPanel(20, IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png")),
-                       IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png"))),
-    serverListText("Server List"), updating("Update"),
+    serverListPanel(20, upArrow, downArrow),
+    serverListText("Server List"), rightPanel(frame), updating("Update"),
     separator1_1(1,1), separator1_2(1,1), separator1_3(1, 1), separator10_1(10,10), separator10_2(10,10),
     internetGameText("Internet Game"), nicknameText("Nickname"), serverText("Server"), portText("Port"),
     playerName(PuyoGame::getPlayerName(-2), PuyoGame::getDefaultPlayerKey(-2)),
@@ -328,14 +329,20 @@ InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)
 {
 }
 
+InternetGameMenu::~InternetGameMenu()
+{
+    IIM_Free(frame);
+    IIM_Free(upArrow);
+    IIM_Free(downArrow);
+}
+
 void InternetGameMenu::build()
 {
     add(&container);
     container.add(&menu);
 
     container.setPosition(Vec3(5,195));
-    container.setSize(Vec3(menuBG_wide->w, menuBG_wide->h, 0));
-    container.setBackground(menuBG_wide);
+    //container.setSize(Vec3(menuBG_wide->w, menuBG_wide->h, 0));
   
     serverSelectionPanel.setPolicy(USE_MIN_SIZE);
     serverSelectionPanel.add(&serverListText);

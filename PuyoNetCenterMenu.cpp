@@ -115,10 +115,14 @@ String NetCenterPlayerList::PlayerEntry::getStatusString(int status)
   }
 }
 
-NetCenterPlayerList::NetCenterPlayerList(int size, NetCenterMenu *targetMenu, GameLoop *loop)
-    : ListView(size, IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png")),
-               IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png")), loop), targetMenu(targetMenu)
+NetCenterPlayerList::NetCenterPlayerList(int size, NetCenterMenu *targetMenu, IIM_Surface *upArrow, IIM_Surface *downArrow, GameLoop *loop)
+    : ListView(size, upArrow, downArrow, loop),
+      targetMenu(targetMenu)
 {}
+
+NetCenterPlayerList::~NetCenterPlayerList()
+{
+}
 
 void NetCenterPlayerList::addNewPlayer(String playerName, PeerAddress playerAddress, int status)
 {
@@ -182,10 +186,15 @@ String NetCenterTwoNameProvider::getPlayer2Name() const
 
 NetCenterMenu::NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netCenter, GameLoop *loop)
     : PuyoMainScreenMenu(mainScreen, loop),
-      netCenter(netCenter), playerListText(theCommander->getLocalizedString("Player List")),
+      netCenter(netCenter),
+      playerListText(theCommander->getLocalizedString("Player List")),
+      frame(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/frame.png"))),
+      upArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png"))),
+      downArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png"))),
+      menu(frame), playerbox(frame),
       chatAreaText(theCommander->getLocalizedString("Chat Area")),
-      cycled(this),
-      playerList(5, this), onScreenDialog(NULL), shouldSelfDestroy(false),
+      cycled(this), playerList(5, this, upArrow, downArrow),
+      onScreenDialog(NULL), shouldSelfDestroy(false),
       nameProvider(*netCenter), chatBox(*this),
       title(theCommander->getLocalizedString("Network Game Center")), backAction(mainScreen),
       cancelButton(theCommander->getLocalizedString("Disconnect"), &backAction),
@@ -200,6 +209,9 @@ NetCenterMenu::~NetCenterMenu()
     printf("Deleting the net center\n");
     // Delete the network center because no one else would do it
     delete netCenter;
+    IIM_Free(frame);
+    IIM_Free(upArrow);
+    IIM_Free(downArrow);
 }
 
 void NetCenterMenu::cycle()
@@ -222,7 +234,7 @@ void NetCenterMenu::build()
     
     playerbox.add(&playerListText);
     playerbox.add(&playerList);
-
+    
     topbox.setPreferedSize(Vec3(0, 240));
     topbox.add(&menu);
     topbox.add(&playerbox);

@@ -21,7 +21,6 @@
 using namespace gameui;
 
 PuyoCommander *theCommander = NULL;
-IIM_Surface   *menuBG_wide  = NULL;
 SoFont *storyFont;
 #define WIDTH  640
 #define HEIGHT 480
@@ -62,7 +61,8 @@ void PuyoPopMenuAction::action()
 PuyoScreen::PuyoScreen() : Screen(0,0,WIDTH,HEIGHT) {}
 
 PuyoMainScreen::PuyoMainScreen(PuyoStoryWidget *fgStory, PuyoStoryWidget *bgStory)
-    : menuBG(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/menubg.png"))),
+    : m_frameImage(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/frame.png"))),
+      menuBG(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/menubg.png"))),
       fgStory(fgStory), bgStory(bgStory), transition(NULL), nextFullScreen(false)
 {
     if (bgStory != NULL)
@@ -73,7 +73,7 @@ PuyoMainScreen::PuyoMainScreen(PuyoStoryWidget *fgStory, PuyoStoryWidget *bgStor
 	}
         
     setMenuDimensions();
-    container.setBackground(menuBG);
+    //container.setBackground(menuBG);
     container.addListener(*this);
 }
 
@@ -160,6 +160,12 @@ void PuyoMainScreen::setMenuDimensions()
         if (fgStory != NULL)
             fgStory->setIntegerValue("@inNetGameCenter", 0);
     }
+}
+
+PuyoMainScreenMenu::PuyoMainScreenMenu(PuyoMainScreen *mainScreen, GameLoop *loop)
+  : Frame(mainScreen->getFrameImage(), loop), mainScreen(mainScreen)
+{
+    setPolicy(USE_MAX_SIZE);
 }
 
 /// Main menu of the game
@@ -256,7 +262,6 @@ void PuyoCommander::run()
 void PuyoCommander::initMenus()
 {
   DBG_PRINT("initMenus()\n");
-  menuBG_wide = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/menubg-wide.png"));
   // 
   // Create the structures.
   PuyoStoryWidget *fgStory = new PuyoStoryWidget("title_fg.gsl");

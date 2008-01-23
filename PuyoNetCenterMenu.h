@@ -28,6 +28,7 @@
 
 #include "gameui.h"
 #include "ListView.h"
+#include "Frame.h"
 #include "PuyoCommander.h"
 #include "PuyoInternetGameCenter.h"
 #include "PuyoTwoPlayerStarter.h"
@@ -68,7 +69,8 @@ private:
 
 class NetCenterPlayerList : public ListView {
 public:
-    NetCenterPlayerList(int size, NetCenterMenu *targetMenu, GameLoop *loop = NULL);
+    NetCenterPlayerList(int size, NetCenterMenu *targetMenu, IIM_Surface *upArrow, IIM_Surface *downArrow, GameLoop *loop = NULL);
+    virtual ~NetCenterPlayerList();
     void addNewPlayer(String playerName, PeerAddress playerAddress, int status);
     void removePlayer(PeerAddress playerAddress);
     void updatePlayer(String playerName, PeerAddress playerAddress, int status);
@@ -87,17 +89,17 @@ private:
     public:
         PlayerEntry(String playerName, PeerAddress playerAddress, int status, Action *action)
         : ListViewEntry(playerName + getStatusString(status), action),
-	  playerAddress(playerAddress), status(status), action(action) {}
+        playerAddress(playerAddress), status(status), action(action) {}
         ~PlayerEntry() { delete action; }
-	void updateEntry(String playerName, int status) {
-	  setText(playerName + getStatusString(status));
-	  this->status = status;
-	}
+        void updateEntry(String playerName, int status) {
+            setText(playerName + getStatusString(status));
+            this->status = status;
+        }
         PeerAddress playerAddress;
-	int status;
+        int status;
     private:
         Action *action;
-	static String getStatusString(int status);
+        static String getStatusString(int status);
     };
     Vector<PlayerEntry> entries;
     NetCenterMenu *targetMenu;
@@ -145,14 +147,16 @@ private:
             netCenter->cycle();
         }
     };
+    IIM_Surface *frame, *upArrow, *downArrow;
     VBox mainBox;
     HBox topbox;
-    VBox menu;
-    VBox playerbox;
+    Frame menu;
+    Frame playerbox;
     Text playerListText, chatAreaText, title;
     Button cancelButton;
     PuyoPopMenuAction backAction;
     NetCenterPlayerList playerList;
+    //Frame ncActionsFrame, playerBoxFrame;
     NetCenterCycled cycled;
     PuyoNetGameCenter *netCenter;
     ZBox container;
