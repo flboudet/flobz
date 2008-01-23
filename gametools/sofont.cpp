@@ -71,7 +71,7 @@ int SplitString(const string& input,
 class CacheLine
 {
     public:
-        static int last_usage;
+        static Uint64 last_usage;
 
         CacheLine() : image(NULL), usage(0) {}
 
@@ -82,13 +82,13 @@ class CacheLine
             if (image != NULL) SDL_FreeSurface(image);
         }
 
-        int getDate() const { return usage; }
+        Uint64 getDate() const { return usage; }
 
     private:
         SDL_Surface *image;
-        int usage;
+        Uint64 usage;
 };
-int CacheLine::last_usage = 0;
+Uint64 CacheLine::last_usage = 0;
 
 typedef map<string, CacheLine*> CacheMap;
 typedef pair<string, CacheLine*> CachePair;
@@ -335,11 +335,12 @@ void SoFont_CacheCheck(SoFont *font)
 {
     if (font->cache.size() >= CACHE_SIZE) {
         // Find the older cache line.
-        int older_date = 0;
+        Uint64 older_date = 0;
+        older_date -= 1;
         CacheMap::iterator older_it = font->cache.begin();
         CacheMap::iterator it = font->cache.begin();
         while (it != font->cache.end()) {
-           if (it->second->getDate() > older_date) {
+           if (it->second->getDate() < older_date) {
                older_date = it->second->getDate();
                older_it = it;
            }
@@ -360,6 +361,7 @@ void SoFont_PutLine(SoFont * font, SDL_Surface * surface, int x, int y, const ch
 
         if (cacheLineIt == font->cache.end()) {
             // No such line in cache, insert it!
+
             SoFont_CacheCheck(font);
             cacheLine = new CacheLine();
             cacheLine->renderImage(font, text);
