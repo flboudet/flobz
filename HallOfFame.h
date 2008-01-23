@@ -6,7 +6,7 @@
 class HallOfFameScreen : public PuyoGameOver1PScreen {
     public:
         HallOfFameScreen(Screen &previousScreen, Action *finishedAction)
-            : PuyoGameOver1PScreen("gamewon_highscores_1p.gsl",previousScreen,finishedAction,"NONE",-1)
+            : PuyoGameOver1PScreen("gamewon_highscores_1p.gsl",previousScreen,finishedAction,"NONE",PlayerGameStat(-1))
         {}
 };
 

@@ -137,7 +137,7 @@ public:
     void setPlayerOneName(String newName) { playerOneName = newName; }
     void setPlayerTwoName(String newName) { playerTwoName = newName; }
     String getPlayerOneName() const { return playerOneName; }
-    int getPointsPlayerOne() { return attachedGameA->getPoints(); }
+    PlayerGameStat getStatPlayerOne() { return attachedGameA->getGameStat(); }
     virtual PuyoStoryWidget *getOpponentFace() { return NULL; }
     virtual std::vector<PuyoFX*> &getPuyoFX() { return puyoFX; }
     void addGameAHandicap(int handicap) {attachedGameA->increaseNeutralPuyos(handicap * PUYODIMX); attachedGameA->dropNeutrals();}

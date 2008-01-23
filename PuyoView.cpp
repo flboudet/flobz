@@ -44,12 +44,13 @@ PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 		   AnimatedPuyoSetTheme *attachedThemeSet,
            PuyoLevelTheme *attachedLevelTheme,
 		   int xOffset, int yOffset, int nXOffset, int nYOffset, SDL_Painter &painterToUse)
-  :attachedThemeSet(attachedThemeSet), attachedLevelTheme(attachedLevelTheme),
-   attachedPuyoFactory(this), attachedPainter(painterToUse), delayBeforeGameOver(60)
+  : attachedThemeSet(attachedThemeSet), attachedLevelTheme(attachedLevelTheme),
+    attachedPuyoFactory(this), attachedPainter(painterToUse), delayBeforeGameOver(60)
 {
     //printf("Constructeur du PuyoView\n");
 	attachedGame = attachedPuyoGameFactory->createPuyoGame(&attachedPuyoFactory);
     attachedGame->setDelegate(this);
+    attachedStatDisplay = new PlayerGameStatDisplay("Player TODO", attachedGame->getGameStat(), xOffset < 320 ? 0 : 1);
     
 	this->xOffset = xOffset;
 	this->yOffset = yOffset - TSIZE;
@@ -82,12 +83,12 @@ int PuyoView::getValenceForPuyo(PuyoPuyo *puyo) const
     AnimatedPuyo *up    = (AnimatedPuyo *)(attachedGame->getPuyoAt(i, j-1));
     AnimatedPuyo *left  = (AnimatedPuyo *)(attachedGame->getPuyoAt(i-1, j));
     
-    PuyoState downState = (down == NULL)   || (down->isRenderingAnimation())  ? PUYO_EMPTY  : down->getPuyoState();
-    PuyoState rightState = (right == NULL) || (right->isRenderingAnimation()) ? PUYO_EMPTY  : right->getPuyoState();
-    PuyoState upState = (up == NULL)       || (up->isRenderingAnimation())    ? PUYO_EMPTY  : up->getPuyoState();
-    PuyoState leftState = (left == NULL)   || (left->isRenderingAnimation())  ? PUYO_EMPTY  : left->getPuyoState();
+    PuyoState downState = (down == NULL) || (down->isRenderingAnimation()) ? PUYO_EMPTY : down->getPuyoState();
+    PuyoState rightState = (right == NULL) || (right->isRenderingAnimation()) ? PUYO_EMPTY : right->getPuyoState();
+    PuyoState upState = (up == NULL) || (up->isRenderingAnimation()) ? PUYO_EMPTY : up->getPuyoState();
+    PuyoState leftState = (left == NULL)   || (left->isRenderingAnimation()) ? PUYO_EMPTY : left->getPuyoState();
     
-	return (leftState  == currentPuyoState ? 0x8 : 0) | (upState   == currentPuyoState ? 0x4 : 0) |
+	return (leftState  == currentPuyoState ? 0x8 : 0) | (upState  == currentPuyoState ? 0x4 : 0) |
 	       (rightState == currentPuyoState ? 0x2 : 0) | (downState == currentPuyoState ? 0x1 : 0);
 }
 
@@ -221,6 +222,11 @@ void PuyoView::render()
             currentAnimation->draw(0);
         }
     }
+}
+
+void PuyoView::renderOverlay()
+{
+    attachedStatDisplay->draw();
 }
 
 void PuyoView::renderNeutral()

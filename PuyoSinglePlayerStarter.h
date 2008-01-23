@@ -132,7 +132,8 @@ private:
 
 class PuyoGameOver1PScreen : public PuyoStoryScreen {
 public:
-    PuyoGameOver1PScreen(String screenName, Screen &previousScreen, Action *finishedAction, String playerName, int playerPoints);
+    PuyoGameOver1PScreen(String screenName, Screen &previousScreen, Action *finishedAction,
+            String playerName, const PlayerGameStat &playerPoints);
     void refresh();
     virtual ~PuyoGameOver1PScreen();
 private:
@@ -140,7 +141,7 @@ private:
     VBox hiScoreNameBox, hiScorePointBox;
     HBox hiScoreBox;
     String playerName;
-    int playerPoints;
+    PlayerGameStat playerStat;
 };
 
 class SinglePlayerStarterAction : public Action {

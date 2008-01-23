@@ -80,7 +80,7 @@ void PuyoNetworkGame::onMessage(Message &message)
 
 void PuyoNetworkGame::synchronizeState(Message &message)
 {
-    points = message.getInt(SCORE);
+    gameStat.points = message.getInt(SCORE);
     nextFalling = (PuyoState)(message.getInt(NEXT_F));
     nextCompanion = (PuyoState)(message.getInt(NEXT_C));
     semiMove = message.getInt(SEMI_MOVE);

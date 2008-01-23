@@ -213,10 +213,12 @@ void PuyoGameWidget::initialize()
     setReceiveUpEvents(true);
     setFocusable(true);
 
-    // Load a few FX for the game
-    puyoFX.push_back(new PuyoFX("fx/white_star.gsl"));
-    puyoFX.push_back(new PuyoFX("fx/vanish.gsl"));
-    puyoFX.push_back(new PuyoFX("fx/combo.gsl"));
+    // Load and preload a few FX for the game
+    for (int i=0; i<15; ++i)
+        puyoFX.push_back(new PuyoFX("fx/vanish.gsl"));
+    for (int i=0; i<3; ++i)
+        puyoFX.push_back(new PuyoFX("fx/combo.gsl"));
+    // puyoFX.push_back(new PuyoFX("fx/white_star.gsl"));
 }
 
 PuyoGameWidget::~PuyoGameWidget()
@@ -272,21 +274,26 @@ void PuyoGameWidget::cycle()
       else skipGameCycleB = false;
       
       // Blinking point animation
+      // TODO
+      /*
       if (attachedGameA->getPoints()/50000 > savePointsA/50000)
         blinkingPointsA = 10;
       if (attachedGameB->getPoints()/50000 > savePointsB/50000)
         blinkingPointsB = 10;
+        */
       
       if (blinkingPointsA > 0)
         blinkingPointsA--;
       if (blinkingPointsB > 0)
         blinkingPointsB--;
       
+      /*
       savePointsB = attachedGameB->getPoints();
       savePointsA = attachedGameA->getPoints();
       
       if (savePointsA < 50000) blinkingPointsA=0;
       if (savePointsB < 50000) blinkingPointsB=0;
+      */
       // end of the blinking point animation code
     }
     
@@ -350,7 +357,7 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
         painter.draw();
     }
     SDL_BlitSurface(painter.gameScreen->surf, NULL, screen, NULL);
-    
+
     // Rendering the game speed meter
     // Should be moved to the painter    
     SDL_Rect speedRect;
@@ -382,11 +389,14 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
         SDL_BlitSurface(speedBack->surf,&speedRect, screen, &drect);
     
     // Rendering the scores
+    areaA->renderOverlay();
+    areaB->renderOverlay();
+    
     SoFont *fontBl = NULL;
     int blinkingPointsA = 0; int blinkingPointsB = 0;
     char text[1024];
     
-    if (!paused) {
+    /* if (!paused) {
         double time = TIME_TO_FINISH_GAME_WITH_BONUS - (double)cycles * TIME_BETWEEN_GAME_CYCLES;
         if (time < 0.0) time = 0.0;
         double min  = floor(time / 60.0);
@@ -415,9 +425,10 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
         
         // Rendering the player names
         SoFont *font = (paused?theCommander->darkFont:theCommander->menuFont);
-        SoFont_CenteredString_XY (font, screen, 130, 460,  playerOneName, NULL);
+        SoFont_CenteredString_XY (font, screen, 130, 460, playerOneName, NULL);
         SoFont_CenteredString_XY (font, screen, 510, 460, playerTwoName, NULL);
     }
+    */
 }
 
 void PuyoGameWidget::pause()
@@ -686,16 +697,22 @@ void PuyoGameScreen::onScreenVisibleChanged(bool visible)
     theCommander->setCursorVisible(!visible);
 }
 
-PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
-                                                     attachedRandom(5), attachedGameFactory(&attachedRandom),
-                                                     areaA(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
-                                                     1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
-                                                     areaB(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
-                                                     1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
-                                                     controllerA(areaA, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left, GameControlEvent::kPlayer1Right,
-                                                     GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
-                                                     controllerB(areaB, GameControlEvent::kPlayer2Down, GameControlEvent::kPlayer2Left, GameControlEvent::kPlayer2Right,
-                                                     GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight)
+PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction)
+: attachedPuyoThemeSet(puyoThemeSet),
+    attachedRandom(5), attachedGameFactory(&attachedRandom),
+    areaA(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
+            1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE,
+            BSIZE+ESIZE, painter),
+    areaB(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
+            1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE,
+            CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE,
+            BSIZE+ESIZE, painter),
+    controllerA(areaA, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left,
+            GameControlEvent::kPlayer1Right,
+            GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
+    controllerB(areaB, GameControlEvent::kPlayer2Down, GameControlEvent::kPlayer2Left,
+            GameControlEvent::kPlayer2Right,
+            GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight)
 {
     initialize(areaA, areaB, controllerA, controllerB, levelTheme, gameOverAction);
 }

@@ -63,7 +63,7 @@ PuyoGame::PuyoGame()
     delegate = NULL;
 }
 
-PuyoGame::PuyoGame(PuyoFactory *attachedFactory) : attachedFactory(attachedFactory), points(0)
+PuyoGame::PuyoGame(PuyoFactory *attachedFactory) : attachedFactory(attachedFactory)
 {
     delegate = NULL;
 }
@@ -160,7 +160,8 @@ void PuyoLocalGame::InitGame(PuyoRandomSystem *attachedRandom)
     endOfCycle = false;
     gameRunning = true;
     setFallingAtTop(true);
-    points = 0;
+
+    gameStat = PlayerGameStat();
 }
 
 PuyoLocalGame::~PuyoLocalGame()
@@ -180,16 +181,16 @@ void PuyoLocalGame::cycle()
   switch (gameLevel)
   {
   case 1:
-      points += 1;
+      gameStat.points += 1;
       break;
   case 2:
-      points += 5;
+      gameStat.points += 5;
       break;
   case 3:
-      points += 10;
+      gameStat.points += 10;
       break;
   default:
-      points += gameLevel * 5;
+      gameStat.points += gameLevel * 5;
   }
 
   semiMove = 1 - semiMove;
@@ -210,6 +211,7 @@ void PuyoLocalGame::cycle()
         if (delegate != NULL) {
             delegate->puyoDidFall(fallingPuyo, fallingX, fallingY);
             delegate->puyoDidFall(companionPuyo, getFallingCompanionX(), getFallingCompanionY());
+            gameStat.drop_count += 2;
             fallingY = -10;
             notifyReductions();
         }
@@ -378,9 +380,9 @@ void PuyoLocalGame::setPuyoAt(int X, int Y, PuyoPuyo *newPuyo)
 
 void PuyoLocalGame::dropNeutrals()
 {
-  if (neutralPuyos < 0) {
-    points -= gameLevel * neutralPuyos * 1000;
-  }
+    if (neutralPuyos < 0) {
+        gameStat.points -= gameLevel * neutralPuyos * 1000;
+    }
 
     int idNeutral = 0;
     while (neutralPuyos > 0)
@@ -714,7 +716,8 @@ void PuyoLocalGame::cycleEnding()
 {
     static int cmpt = 0;
     int score = removePuyos();
-    
+    gameStat.explode_count += score;
+
     if (score >= 4) {
 #ifdef DESACTIVE
         audio_sound_play(sound_splash[phase>7?7:phase]);
@@ -722,13 +725,17 @@ void PuyoLocalGame::cycleEnding()
         score -= 3;
         if (phase > 0) {
             neutralPuyos -= PUYODIMX;
+            gameStat.ghost_sent_count += PUYODIMX;
         }
+        ++gameStat.combo_count[phase];
         phase++;
     }
   
-    points += gameLevel * 100 + gameLevel * (phase>0?phase-1:0) * 5000;
+    gameStat.points += gameLevel * 100 + gameLevel * (phase>0?phase-1:0) * 5000;
   
     neutralPuyos -= score;
+    gameStat.ghost_sent_count += score;
+
     if (score == 0)
         setFallingAtTop();
 }

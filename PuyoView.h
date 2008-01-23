@@ -55,6 +55,7 @@ class PuyoView : public PuyoDelegate {
     virtual ~PuyoView();
     void setEnemyGame(PuyoGame *enemyGame);
     void render();
+    void renderOverlay();
     void renderNeutral();
     void cycleAnimation();
     virtual void cycleGame();
@@ -104,6 +105,7 @@ class PuyoView : public PuyoDelegate {
     SDL_Painter &attachedPainter;
     int delayBeforeGameOver;
     bool newMetaCycleStart;
+    PlayerGameStatDisplay *attachedStatDisplay;
 };
 
 #endif // _PUYOVIEW

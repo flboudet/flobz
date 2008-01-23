@@ -349,6 +349,7 @@ void GameLoop::draw()
 
       if (texture_mode == 0) {
           char *ext = (char *)glGetString(GL_EXTENSIONS);
+          printf("%s\n", ext);
           if (strstr(ext, "EXT_texture_rectangle")) {
               printf("Using EXT_texture_rectangle\n");
               texture_mode = 2;

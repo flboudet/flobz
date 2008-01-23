@@ -1,3 +1,3 @@
-FILES= "README" "font.ttf" "main.dic" "main.dic.in"
+FILES= "font.ttf" "main.dic" "main.dic.in" "README"
 DIRECTORIES=
 include ${SOURCE_DATADIR}/Datarules.mk

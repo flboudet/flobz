@@ -23,6 +23,8 @@
  *
  */
 
+#include "PuyoGameAbstract.h"
+
 #include "ios_memory.h"
 using namespace ios_fc;
 
@@ -194,11 +196,11 @@ public:
     
     virtual bool isPhaseReady(void) { return true; }
 
-    virtual int  getPoints()  { return points; }
-    int points;
+    virtual PlayerGameStat &getGameStat() { return gameStat; }
 protected:
     PuyoDelegate *delegate;
     PuyoFactory *attachedFactory;
+    PlayerGameStat gameStat;
 };
 
 class PuyoLocalGame : public PuyoGame {

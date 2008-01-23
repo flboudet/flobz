@@ -262,15 +262,17 @@ String PuyoSingleGameLevelData::getIAFace() const
     return levelDefinition->opponentFace;
 }
 
-PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousScreen, Action *finishedAction, String playerName, int playerPoints)
-        : PuyoStoryScreen(screenName, previousScreen, finishedAction, false), playerName(playerName), playerPoints(playerPoints)
+PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousScreen,
+        Action *finishedAction, String playerName, const PlayerGameStat &playerPoints)
+        : PuyoStoryScreen(screenName, previousScreen, finishedAction, false),
+        playerName(playerName), playerStat(playerPoints)
 {
     static char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
     "Satanas", "Doctor X", "Tania", "Mr Gyom",
     "The Duke","Jeko","--------" };
     
     initHiScores(AI_NAMES);
-    int scorePlace = setHiScore(playerPoints, playerName);
+    int scorePlace = setHiScore(playerStat.points, playerName);
 
     for (int i = 0 ; i < kHiScoresNumber ; i++) {
         hiScoreNameBox.add(&names[i]);
@@ -423,7 +425,7 @@ void SinglePlayerStarterAction::gameOver()
         gameOverStory = levelData->getGameOverStory();
     else
         gameOverStory = "gamewon_highscores_1p.gsl";
-    gameOverScreen = new PuyoGameOver1PScreen(gameOverStory, *(GameUIDefaults::SCREEN_STACK->top()), this, gameWidget->getPlayerOneName(), gameWidget->getPointsPlayerOne());
+    gameOverScreen = new PuyoGameOver1PScreen(gameOverStory, *(GameUIDefaults::SCREEN_STACK->top()), this, gameWidget->getPlayerOneName(), gameWidget->getStatPlayerOne());
     GameUIDefaults::SCREEN_STACK->pop();
     GameUIDefaults::SCREEN_STACK->push(gameOverScreen);
 }
