@@ -5,6 +5,7 @@ tmpfile=tmp
 
 # Pour avoir un sort qui trie pareil sur toutes les machines
 LANG=C
+LC_ALL=C
 
 # Warning...
 echo "Ce script cree les Makefiles de tous les dossiers contenus dans 'data'."
