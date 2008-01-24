@@ -7,7 +7,6 @@ namespace ios_fc {
  * Copyright (c) 2004, JC Hoelt.
  */
 
-typedef struct IOS_HASH_ENTRY IosHashEntry;
 typedef struct IOS_HASH IosHash;
 
 typedef union {
@@ -18,25 +17,11 @@ typedef union {
     float f;
 } HashValue;
 
-struct IOS_HASH_ENTRY {
-    union {
-    	char *skey;
-        int   ikey;
-    } key;
-    HashValue value;
-	IosHashEntry *lower;
-	IosHashEntry *upper;
-};
-
-struct IOS_HASH {
-	IosHashEntry *root;
-};
-
 /* a hash map having a char* as key */
-IosHash  *ios_hash_new       ();
+IosHash  *ios_hash_new       (unsigned int initial_size = 128);
 void       ios_hash_free     (IosHash *gh);
 HashValue *ios_hash_get      (IosHash *gh, const char *key);
-HashValue *ios_hash_get_like (IosHash *gh, const char *key);
+/* HashValue *ios_hash_get_like (IosHash *gh, const char *key); */
 void       ios_hash_put      (IosHash *gh, const char *key, HashValue value);
 void       ios_hash_remove   (IosHash *gh, const char *key);
 
@@ -45,7 +30,7 @@ void ios_hash_put_float(IosHash *_this,  const char *key, float f);
 void ios_hash_put_ptr  (IosHash *_this,  const char *key, void *ptr);
 
 /* a hash map having integers as key */
-IosHash  *ios_hash_inew    ();
+IosHash  *ios_hash_inew     (unsigned int initial_size = 128);
 void       ios_hash_ifree   (IosHash *gh);
 HashValue *ios_hash_iget    (IosHash *gh, int key);
 void       ios_hash_iput    (IosHash *gh, const char *key, HashValue value);
@@ -67,14 +52,14 @@ class HashMap {
         IosHash *hash;
     public:
         HashMap() : hash(ios_hash_new()) {}
-        ~HashMap() { ios_hash_free(hash);   }
+        ~HashMap() { ios_hash_free(hash); }
 
         void put(const char *key, void *value) { ios_hash_put_ptr  (hash, key, value); }
         void put(const char *key, int   value) { ios_hash_put_int  (hash, key, value); }
         void put(const char *key, float value) { ios_hash_put_float(hash, key, value); }
 
         HashValue *get     (const char *key) const { return ios_hash_get(hash, key);      }
-        HashValue *get_like(const char *key) const { return ios_hash_get_like(hash, key); }
+        /* HashValue *get_like(const char *key) const { return ios_hash_get_like(hash, key); } */
         void       remove  (const char *key)       { ios_hash_remove(hash, key);          }
 
         void foreach(HashMapAction *action);
@@ -88,6 +73,7 @@ class HashMap {
         }
 };
 
+/*
 // A Hashmap where keys are ints.
 class IntHashMap {
     private:
@@ -110,6 +96,7 @@ class IntHashMap {
             return *this;
         }
 };
+*/
 
 } // namespace ios_fc
 

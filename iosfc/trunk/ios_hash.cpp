@@ -1,194 +1,215 @@
 #include "ios_hash.h"
 
-#include <cstring>
-#include <cstdlib>
-using namespace std;
+#include "google/dense_hash_map" // Time efficient hashmap
+using google::dense_hash_map;
+
+#include <string.h>
+#include <stdint.h>
+
+#undef get16bits
+#if (defined(__GNUC__) && defined(__i386__)) || defined(__WATCOMC__) \
+      || defined(_MSC_VER) || defined (__BORLANDC__) || defined (__TURBOC__)
+#define get16bits(d) (*((const uint16_t *) (d)))
+#endif
+
+#if !defined (get16bits)
+#define get16bits(d) ((((uint32_t)(((const uint8_t *)(d))[1])) << 8)\
+                               +(uint32_t)(((const uint8_t *)(d))[0]) )
+#endif
 
 namespace ios_fc {
+
+#define EMPTY_KEY ((const char*)1)
+#define DELETED_KEY (NULL)
+
+// by Paul Hsieh
+// http://www.azillionmonkeys.com/qed/hash.html
+struct SuperFastHashString {
+    size_t operator()(const char *data) const {
+        if ((data == EMPTY_KEY) || (data == DELETED_KEY)) return 0;
+        uint32_t len = strlen(data);
+        uint32_t hash = len, tmp;
+        int rem;
+
+        if (len <= 0 || data == NULL) return 0;
+
+        rem = len & 3;
+        len >>= 2;
+
+        /* Main loop */
+        for (;len > 0; len--) {
+            hash  += get16bits (data);
+            tmp    = (get16bits (data+2) << 11) ^ hash;
+            hash   = (hash << 16) ^ tmp;
+            data  += 2*sizeof (uint16_t);
+            hash  += hash >> 11;
+        }
+
+        /* Handle end cases */
+        switch (rem) {
+            case 3: hash += get16bits (data);
+                    hash ^= hash << 16;
+                    hash ^= data[sizeof (uint16_t)] << 18;
+                    hash += hash >> 11;
+                    break;
+            case 2: hash += get16bits (data);
+                    hash ^= hash << 11;
+                    hash += hash >> 17;
+                    break;
+            case 1: hash += *data;
+                    hash ^= hash << 10;
+                    hash += hash >> 1;
+        }
+
+        /* Force "avalanching" of final 127 bits */
+        hash ^= hash << 3;
+        hash += hash >> 5;
+        hash ^= hash << 4;
+        hash += hash >> 17;
+        hash ^= hash << 25;
+        hash += hash >> 6;
+
+        return hash;
+    }
+};
+
+struct EqualString {
+    bool operator()(const char* s1, const char* s2) const {
+        return (s1 == s2) || (
+                (s1 != EMPTY_KEY) &&
+                (s2 != DELETED_KEY) &&
+                (s1 != DELETED_KEY) &&
+                (s2 != EMPTY_KEY) && strcmp(s1, s2) == 0);
+    }
+};
+typedef dense_hash_map<const char*, HashValue, SuperFastHashString, EqualString> gg_str_hashmap;
+
+struct IOS_HASH {
+    gg_str_hashmap root;
+};
 
 /**
  * Copyright (c) 2004 JC Hoelt.
  */
 
-static IosHashEntry *entry_new(const char *key, HashValue value) {
-
-	IosHashEntry *entry = (IosHashEntry*)malloc(sizeof(IosHashEntry));
-
-	entry->key.skey = (char *)malloc(strlen(key)+1);
-	strcpy(entry->key.skey, key);
-	entry->value = value;
-	entry->lower = NULL;
-	entry->upper = NULL;
-
-	return entry;
-}
-
-static IosHashEntry *entry_inew(int key, HashValue value) {
-
-	IosHashEntry *entry = (IosHashEntry*)malloc(sizeof(IosHashEntry));
-
-	entry->key.ikey = key;
-	entry->value = value;
-	entry->lower = NULL;
-	entry->upper = NULL;
-
-	return entry;
-}
-
-static void entry_free(IosHashEntry *entry) {
-	if (entry!=NULL) {
-		entry_free(entry->lower);
-		entry_free(entry->upper);
-		free(entry->key.skey);
-		free(entry);
-	}
-}
-
-static void entry_ifree(IosHashEntry *entry) {
-	if (entry!=NULL) {
-		entry_ifree(entry->lower);
-		entry_ifree(entry->upper);
-		free(entry);
-	}
-}
-
-static void entry_put(IosHashEntry *entry, const char *key, HashValue value) {
-	int cmp = strcmp(key,entry->key.skey);
-	if (cmp==0) {
-		entry->value = value;
-	}
-	else if (cmp > 0) {
-		if (entry->upper == NULL)
-			entry->upper = entry_new(key,value);
-		else
-			entry_put(entry->upper, key, value);
-	}
-	else {
-		if (entry->lower == NULL)
-			entry->lower = entry_new(key,value);
-		else
-			entry_put(entry->lower, key, value);
-	}
-}
-
-static HashValue *entry_get(IosHashEntry *entry, const char *key) {
-
-	int cmp;
-	if (entry==NULL)
-		return NULL;
-	cmp = strcmp(key,entry->key.skey);
-	if (cmp > 0)
-		return entry_get(entry->upper, key);
-	else if (cmp < 0)
-		return entry_get(entry->lower, key);
-	else
-		return &(entry->value);
-}
-
-static HashValue *entry_get_like(IosHashEntry *entry, const char *key) {
-    int cmp;
-    if (entry == NULL)
-        return NULL;
-    cmp = strncmp(key,entry->key.skey,strlen(key));
-    if (cmp > 0)
-        return entry_get_like(entry->upper, key);
-    else if (cmp < 0)
-        return entry_get_like(entry->lower, key);
-    else
-        return &(entry->value);
-}
-
-static void entry_remove(IosHashEntry *entry, IosHashEntry **caller, const char *key) {
-    int cmp;
-    if (entry == NULL) return;
-    cmp = strcmp(key, entry->key.skey);
-    if (cmp > 0)
-        entry_remove(entry->upper, &(entry->upper), key);
-	else if (cmp < 0)
-        entry_remove(entry->lower, &entry->lower, key);
-	else {
-        IosHashEntry *sentry = entry;
-        if (entry->lower) {
-            *caller = entry->lower;
-            if (entry->upper) {
-                IosHashEntry *upper = entry->upper;
-                entry = entry->lower;
-                while(entry->upper) entry = entry->upper;
-                entry->upper = upper;
-            }
-        }
-        else
-            *caller = entry->upper;
-        sentry->lower = sentry->upper = 0;
-        entry_free(sentry);
-    }
-}
-
-static void entry_iremove(IosHashEntry *entry, IosHashEntry **caller, int key) {
-    int cmp;
-    if (entry == NULL) return;
-    cmp = key - entry->key.ikey;
-    if (cmp > 0)
-        entry_iremove(entry->upper, &(entry->upper), key);
-	else if (cmp < 0)
-        entry_iremove(entry->lower, &(entry->lower), key);
-	else {
-        IosHashEntry *sentry = entry;
-        if (entry->lower) {
-            *caller = entry->lower;
-            if (entry->upper) {
-                IosHashEntry *upper = entry->upper;
-                entry = entry->lower;
-                while(entry->upper) entry = entry->upper;
-                entry->upper = upper;
-            }
-        }
-        else
-            *caller = entry->upper;
-        sentry->lower = sentry->upper = 0;
-        entry_ifree(sentry);
-    }
-}
-
-IosHash *ios_hash_new() {
-	IosHash *_this = (IosHash*)malloc(sizeof(IosHash));
-	_this->root = NULL;
+IosHash *ios_hash_new(unsigned int initial_size) {
+	IosHash *_this = new IOS_HASH;
+    _this->root.set_empty_key((const char*)1);
+    _this->root.set_deleted_key(NULL);
 	return _this;
 }
 
 void ios_hash_free(IosHash *_this) {
-	entry_free(_this->root);
+	delete _this;
+}
+
+void ios_hash_put(IosHash *_this, const char *key, HashValue value) {
+    if (_this == NULL) return;
+    _this->root[key] = value;
+}
+
+HashValue *ios_hash_get(IosHash *_this, const char *key) {
+    if (_this == NULL) return NULL;
+    gg_str_hashmap::iterator it = _this->root.find(key);
+    if (it == _this->root.end())
+        return NULL;
+    else if ((*it).first == DELETED_KEY)
+        return NULL;
+    else if ((*it).first == EMPTY_KEY)
+        return NULL;
+    else
+        return &((*it).second);
+}
+
+void ios_hash_remove (IosHash *_this, const char *key) {
+    _this->root.erase(key);
+}
+
+void ios_hash_put_int(IosHash *_this, const char *key, int i) {
+    HashValue value;
+    value.i = i;
+    ios_hash_put(_this,key,value);
+}
+
+void ios_hash_put_float(IosHash *_this, const char *key, float f) {
+    HashValue value;
+    value.f = f;
+    ios_hash_put(_this,key,value);
+}
+
+void ios_hash_put_ptr(IosHash *_this, const char *key, void *ptr) {
+    HashValue value;
+    value.ptr = ptr;
+    ios_hash_put(_this,key,value);
+}
+
+void ios_hash_foreach(IosHash *_this, HashMapAction *action)
+{
+    gg_str_hashmap::iterator it = _this->root.begin();
+    while (it != _this->root.end()) {
+        action->action(&((*it).second));
+        ++ it;
+    }
+}
+
+void HashMap::foreach(HashMapAction *action)
+{
+  ios_hash_foreach(hash, action);
+}
+
+}
+
+#if 0
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
+using namespace std;
+namespace ios_fc {
+
+#include "bf_hashmap.h"
+
+struct IOS_HASH {
+    Hashmap root;
+};
+
+/**
+ * Copyright (c) 2004 JC Hoelt.
+ */
+
+IosHash *ios_hash_new(unsigned int initial_size) {
+	IosHash *_this = (IosHash*)malloc(sizeof(IosHash));
+	hashmap_open(&_this->root, initial_size);
+	return _this;
+}
+
+void ios_hash_free(IosHash *_this) {
+    hashmap_close(&_this->root);
 	free(_this);
 }
 
-IosHash *ios_hash_inew() {
+IosHash *ios_hash_inew(unsigned int initial_size) {
 	IosHash *_this = (IosHash*)malloc(sizeof(IosHash));
-	_this->root = NULL;
+	hashmap_open(&_this->root, initial_size);
 	return _this;
 }
 
 void ios_hash_ifree(IosHash *_this) {
-	entry_ifree(_this->root);
+    hashmap_close(&_this->root);
 	free(_this);
 }
 
 void ios_hash_put(IosHash *_this, const char *key, HashValue value) {
-	if (_this->root == NULL)
-		_this->root = entry_new(key,value);
-	else
-		entry_put(_this->root,key,value);
+    if (_this == NULL) return;
+    hashmap_put(&_this->root, (void*)key, NULL, &value, (&value) + 1);
 }
 
 HashValue *ios_hash_get(IosHash *_this, const char *key) {
-	return entry_get(_this->root,key);
-}
-
-HashValue *ios_hash_get_like(IosHash *_this, const char *key) {
-	return entry_get_like(_this->root,key);
+    if (_this == NULL) return NULL;
+    return (HashValue*)hashmap_get(&_this->root, (void*)key, NULL);
 }
 
 void ios_hash_remove (IosHash *_this, const char *key) {
-    entry_remove(_this->root, &_this->root, key);
+    printf("hashmap_remove(&_this->root, (void*)key, NULL)\n");
 }
 
 void ios_hash_put_int(IosHash *_this, const char *key, int i) {
@@ -210,52 +231,17 @@ void ios_hash_put_ptr(IosHash *_this, const char *key, void *ptr) {
 }
 
 
-static void entry_iput(IosHashEntry *entry, int key, HashValue value) {
-	int cmp = key - entry->key.ikey;
-	if (cmp==0) {
-		entry->value = value;
-	}
-	else if (cmp > 0) {
-		if (entry->upper == NULL)
-			entry->upper = entry_inew(key,value);
-		else
-			entry_iput(entry->upper, key, value);
-	}
-	else {
-		if (entry->lower == NULL)
-			entry->lower = entry_inew(key,value);
-		else
-			entry_iput(entry->lower, key, value);
-	}
-}
-
-static HashValue *entry_iget(IosHashEntry *entry, int key) {
-
-	int cmp;
-	if (entry==NULL)
-		return NULL;
-	cmp = key - entry->key.ikey;
-	if (cmp > 0)
-		return entry_iget(entry->upper, key);
-	else if (cmp < 0)
-		return entry_iget(entry->lower, key);
-	else
-		return &(entry->value);
-}
-
 void ios_hash_iput(IosHash *_this, int key, HashValue value) {
-    if (_this->root == NULL)
-        _this->root = entry_inew(key,value);
-    else
-        entry_iput(_this->root,key,value);
+    hashmap_put(&_this->root, (void*)&key, (void*)((&key) + 1), &value, (&value) + 1);
 }
 
 HashValue *ios_hash_iget(IosHash *_this, int key) {
-	return entry_iget(_this->root,key);
+    if (_this == NULL) return NULL;
+    return (HashValue*)hashmap_get(&_this->root, (void*)&key, (void*)((&key) + 1));
 }
 
 void ios_hash_iremove (IosHash *_this, int key) {
-    entry_iremove(_this->root, &_this->root, key);
+    printf("hashmap_remove(&_this->root, (void*)&key, (void*)((&key) + 1))\n");
 }
 
 void ios_hash_iput_int(IosHash *_this, int key, int i) {
@@ -276,18 +262,20 @@ void ios_hash_iput_ptr(IosHash *_this, int key, void *ptr) {
     ios_hash_iput(_this,key,value);
 }
 
-void ios_hash_foreach(IosHashEntry *entry, HashMapAction *action)
+void ios_hash_foreach(IosHash *_this, HashMapAction *action)
 {
-  if (entry == NULL) return;
-  action->action(&entry->value);
-  ios_hash_foreach(entry->lower, action);
-  ios_hash_foreach(entry->upper, action);
+    iter i = {0,0};
+    HashValue *value;
+    while (hashmap_iterate(&_this->root, &i, (void**)&value)) {
+        action->action(value);
+    }
 }
 
 void HashMap::foreach(HashMapAction *action)
 {
-  ios_hash_foreach(hash->root, action);
+  ios_hash_foreach(hash, action);
 }
 
 }
+#endif
 
