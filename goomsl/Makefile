@@ -24,9 +24,12 @@ goomsl_yacc.c:goomsl_yacc.y
 %.o:%.c
 	$(CC) $(CFLAGS) -c $<
 
+%.o:%.cpp
+	$(CXX) $(CXXFLAGS) -c $<
+
 goomsl_yacc.o:goomsl_yacc.c
 goomsl_lex.o:goomsl_lex.c
-goomsl_hash.o:goomsl_hash.c
+goomsl_hash.o:goomsl_hash.cpp
 goomsl_heap.o:goomsl_heap.c
 goomsl.o:goomsl.c
 jitc_x86.o:jitc_x86.c

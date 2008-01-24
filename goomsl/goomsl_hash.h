@@ -1,7 +1,10 @@
 #ifndef _GOOMSL_HASH_H
 #define _GOOMSL_HASH_H
 
-typedef struct GOOM_HASH_ENTRY GoomHashEntry;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct GOOM_HASH GoomHash;
 
 typedef union {
@@ -9,18 +12,6 @@ typedef union {
     int   i;
     float f;
 } GHashValue;
-
-struct GOOM_HASH_ENTRY {
-	char          *key;
-  GHashValue      value;
-	GoomHashEntry *lower;
-	GoomHashEntry *upper;
-};
-
-struct GOOM_HASH {
-	GoomHashEntry *root;
-  int number_of_puts;
-};
 
 GoomHash *goom_hash_new();
 void      goom_hash_free(GoomHash *gh);
@@ -36,5 +27,9 @@ typedef void (*GH_Func)(GoomHash *caller, const char *key, GHashValue *value);
 
 void goom_hash_for_each(GoomHash *_this, GH_Func func);
 int goom_hash_number_of_puts(GoomHash *_this);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _GOOM_HASH_H */
