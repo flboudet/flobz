@@ -100,12 +100,20 @@ IosHash *ios_hash_new(unsigned int initial_size) {
 }
 
 void ios_hash_free(IosHash *_this) {
+    gg_str_hashmap::iterator it = _this->root.begin();
+    while (it != _this->root.end()) {
+        free((void*)(*it).first);
+        ++ it;
+    }
 	delete _this;
 }
 
 void ios_hash_put(IosHash *_this, const char *key, HashValue value) {
     if (_this == NULL) return;
-    _this->root[key] = value;
+    int len    = strlen(key);
+	char *key2 = (char*)malloc(len+1);
+	memcpy(key2,key,len+1);
+    _this->root[key2] = value;
 }
 
 HashValue *ios_hash_get(IosHash *_this, const char *key) {
@@ -122,7 +130,11 @@ HashValue *ios_hash_get(IosHash *_this, const char *key) {
 }
 
 void ios_hash_remove (IosHash *_this, const char *key) {
-    _this->root.erase(key);
+    gg_str_hashmap::iterator it = _this->root.find(key);
+    if ((it != _this->root.end()) && ((*it).first != DELETED_KEY) && ((*it).first != EMPTY_KEY)) {
+        free((void*)(*it).first);
+        _this->root.erase(it);
+    }
 }
 
 void ios_hash_put_int(IosHash *_this, const char *key, int i) {
