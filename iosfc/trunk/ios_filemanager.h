@@ -12,6 +12,8 @@ class FileLoader {
 
     static void addHandler(FileLoader *loader);
     static Buffer<char> loadFrom(const String &url);
+  
+    virtual ~FileLoader() {};
 };
 
 }

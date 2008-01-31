@@ -34,6 +34,7 @@ namespace ios_fc {
 class IGPClientMessageListener {
 public:
     virtual void onMessage(VoidBuffer message, int igpOriginIdent, int igpDestinationIdent) = 0;
+    virtual ~IGPClientMessageListener() {};
 };
 
 class IGPClient : public MessageListener {

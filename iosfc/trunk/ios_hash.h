@@ -31,6 +31,7 @@ void ios_hash_put_ptr  (IosHash *_this,  const char *key, void *ptr);
 class HashMapAction {
   public:
     virtual void action(HashValue *value) = 0;
+    virtual ~HashMapAction() {};
 };
 
 // A Hashmap where keys are strings.

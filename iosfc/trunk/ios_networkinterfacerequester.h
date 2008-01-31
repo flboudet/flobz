@@ -38,6 +38,7 @@ public:
     NetworkInterface(String interfaceName, SocketAddress address) : ifName(interfaceName), ifAddress(address) {}
     virtual String getName() const { return ifName; }
     virtual SocketAddress getAddress() { return ifAddress; }
+    virtual ~NetworkInterface() {};
 private:
     String ifName;
     SocketAddress ifAddress;
@@ -46,11 +47,13 @@ private:
 class NetworkInterfaceRequesterImpl {
 public:
     virtual std::vector<NetworkInterface> getInterfaces() = 0;
+    virtual ~NetworkInterfaceRequesterImpl() {};
 };
 
 class NetworkInterfaceRequesterImplFactory {
 public:
     virtual NetworkInterfaceRequesterImpl * createNetworkInterfaceRequesterImpl() = 0;
+    virtual ~NetworkInterfaceRequesterImplFactory() {};
 };
 
 class NetworkInterfaceRequester {

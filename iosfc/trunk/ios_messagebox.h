@@ -31,6 +31,7 @@ namespace ios_fc {
 class MessageListener {
 public:
     virtual void onMessage(Message &) = 0;
+    virtual ~MessageListener() {};
 };
 
 class MessageBox {

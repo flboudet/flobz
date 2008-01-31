@@ -45,11 +45,13 @@ namespace ios_fc {
     public:
         ThreadImpl *proceedCreation(Thread *owner);
         virtual ThreadImpl * createThread() = 0;
+        virtual ~ThreadFactory() {};
     };
     
     class Runnable {
     public:
         virtual void run() = 0;
+        virtual ~Runnable() {};
     };
     
     class Thread {

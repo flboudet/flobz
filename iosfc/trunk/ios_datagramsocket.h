@@ -70,6 +70,7 @@ namespace ios_fc {
     class DatagramSocketFactory {
     public:
         virtual DatagramSocketImpl * createDatagramSocket() = 0;
+        virtual ~DatagramSocketFactory() {};
     };
 
     /// @brief Manage an UDP socket, for Datagram based network communication.

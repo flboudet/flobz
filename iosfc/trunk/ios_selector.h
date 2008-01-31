@@ -40,6 +40,7 @@ public:
 class SelectorFactory {
 public:
     virtual SelectorImpl * createSelectorImpl() = 0;
+    virtual ~SelectorFactory() {};
 };
 
 class Selector {

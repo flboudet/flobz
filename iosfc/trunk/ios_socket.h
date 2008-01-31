@@ -44,6 +44,7 @@ namespace ios_fc {
     class SocketFactory {
     public:
         virtual SocketImpl * createSocket() = 0;
+        virtual ~SocketFactory() {};
     };
     
     class Socket : public Selectable {

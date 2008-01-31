@@ -47,6 +47,7 @@ namespace ios_fc {
     class SocketAddressFactory {
     public:
         virtual SocketAddressImpl * createSocketAddress(String hostName) = 0;
+        virtual ~SocketAddressFactory() {};
     };
 
     class SocketAddress {

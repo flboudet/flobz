@@ -64,6 +64,11 @@ namespace ios_fc {
              * @param buffer The buffer where datas will be stored.
              */
             virtual void streamReadAll (VoidBuffer buffer);
+
+            /**
+             * @brief virtual destructor.
+             */
+            virtual ~InputStream() {};
     };
 
     /**
@@ -84,6 +89,12 @@ namespace ios_fc {
              * @param buffer the buffer where are the datas to write (buffer.size() octets will be written)
              */
             virtual int streamWrite(VoidBuffer buffer);
+      
+            /**
+             * @brief virtual destructor.
+             */
+             virtual ~OutputStream() {};
+
     };
 
 }

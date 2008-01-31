@@ -75,18 +75,21 @@ public:
     virtual void setPeerAddress(PeerAddress) = 0;
     virtual void addPeerAddress(const String key, const PeerAddress &value) = 0;
     virtual PeerAddress getPeerAddress(const String key) = 0;
+    virtual ~Dirigeable() {};
 };
 
 class SessionListener {
 public:
     virtual void onPeerConnect(const PeerAddress &address) = 0;
     virtual void onPeerDisconnect(const PeerAddress &address) = 0;
+    virtual ~SessionListener() {};
 };
 
 class SessionManager {
 public:
     virtual void addSessionListener(SessionListener *) = 0;
     virtual void removeSessionListener(SessionListener *) = 0;
+    virtual ~SessionManager() {};
 };
 
 }
