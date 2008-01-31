@@ -21,14 +21,6 @@
 
 #include "PuyoPlayer.h"
 
-enum IA_Type {
-  RANDOM,
-  FLOBO,
-  JEKO,
-  TANIA,
-  GYOM
-};
-
 // Redefine the table size to our needs
 // same columns number
 #define IA_PUYODIMX (PUYODIMX)
@@ -44,6 +36,8 @@ typedef struct {
   int columnScalar[IA_PUYODIMX];
   int rotationMethod;
   int fastDropDelta;
+  int thinkDepth;
+  int speedFactor;
 } AIParameters;
 
 typedef enum {
@@ -80,7 +74,7 @@ typedef unsigned char GridState[IA_TABLEDIMX][IA_TABLEDIMY];
 class PuyoIA : public virtual PuyoPlayer {
 
   public:
-    PuyoIA(IA_Type type, int level, PuyoView &targetView);
+    PuyoIA(int level, PuyoView &targetView);
     ~PuyoIA();
     virtual void cycle();
     void setAIParameters(const AIParameters &ai);
@@ -90,14 +84,12 @@ class PuyoIA : public virtual PuyoPlayer {
     PuyoOrientation extractOrientation(int D) const;
     int revertOrientation(PuyoOrientation D) const;
     void extractGrid(void);
-    void decide(int partial);
+    void decide(int partial, int depth);
     int makeEvaluation(const GridEvaluation * const referenceOne, const PuyoBinom puyos, const GridState * const grid);
     bool selectIfBetterEvaluation(int * const referenceOne, const GridEvaluation * const newOne, const PuyoBinom puyos, const GridState * const grid);
 
     GridState * internalGrid;
     int decisionMade;
-    IA_Type type;
-    int level;
     PuyoBinom objective;
     int lastLineSeen;
     int currentCycle;

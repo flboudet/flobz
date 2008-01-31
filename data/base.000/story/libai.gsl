@@ -11,8 +11,8 @@
   int @AI_Column5 = 6
   int @AI_Column6 = 8
   int @AI_RotationMethod = 0
-  int @AI_FastDropDelta = 0
-      
+  int @AI_FastDropDelta = 8
+  int @AI_ThinkDepth = 2
 
 <AI_Gyom> // Nohoho maker
       AI_Init

@@ -500,8 +500,8 @@ bool PuyoIA::selectIfBetterEvaluation(int * const best, const GridEvaluation * c
 }
 
 
-PuyoIA::PuyoIA(IA_Type type, int level, PuyoView &targetView)
-: PuyoPlayer(targetView), type(type), level(level)
+PuyoIA::PuyoIA(int level, PuyoView &targetView)
+: PuyoPlayer(targetView)
 {
   internalGrid = NULL;
   decisionMade = 0;
@@ -523,67 +523,16 @@ PuyoIA::PuyoIA(IA_Type type, int level, PuyoView &targetView)
   params.columnScalar[5] = 1;
   params.rotationMethod = 0; // negative (right), null (shortest), positive(left)
   params.fastDropDelta = PUYODIMY; // puyo height relative to column height before fast drop
+  params.thinkDepth = 2;
+  params.speedFactor = level;
 
-  // Select IA
-  switch (type)
-  {
-    case GYOM: // Nohoho maker
-      params.realSuppressionValue = 2;
-      params.potentialSuppressionValue = 3;
-      params.criticalHeight = 10;
-      params.columnScalar[5] = 20;
-      params.columnScalar[0] =  4;
-      params.columnScalar[1] =  2;
-      params.columnScalar[2] =  1;
-      params.columnScalar[3] =  8;
-      params.columnScalar[4] =  9;
-      params.columnScalar[5] = 10;
-      break;
-  
-    case FLOBO: // Remove it all
-      params.realSuppressionValue = 1;
-      params.potentialSuppressionValue = 2;
-      params.criticalHeight = 1;
-      params.columnScalar[0] = 1;
-      params.columnScalar[1] = 1;
-      params.columnScalar[2] = 0;
-      params.columnScalar[3] = 1;
-      params.columnScalar[4] = 1;
-      params.columnScalar[5] = 1;
-      break;
-  
-    case TANIA: // Balanced
-      params.realSuppressionValue = 2;
-      params.potentialSuppressionValue = 1;
-      params.criticalHeight = 8;
-      params.columnScalar[0] = 7;
-      params.columnScalar[1] = 5;
-      params.columnScalar[2] = 2;
-      params.columnScalar[3] = 4;
-      params.columnScalar[4] = 6;
-      params.columnScalar[5] = 8;
-      break;
-  
-    case JEKO: // Builds til death
-      params.realSuppressionValue = 1;
-      params.potentialSuppressionValue = 2;
-      params.criticalHeight = 9;
-      params.columnScalar[0] = 9;
-      params.columnScalar[1] = 8;
-      params.columnScalar[2] = 7;
-      params.columnScalar[3] = 8;
-      params.columnScalar[4] = 8;
-      params.columnScalar[5] = 9;
-      break;
-
-    default:
-      break;
-  }
 }
 
 void PuyoIA::setAIParameters(const AIParameters &ai)
 {
-    params = ai;
+  int a = params.speedFactor;
+  params = ai;
+  params.speedFactor = a;
 }
 
 PuyoIA::~PuyoIA()
@@ -708,9 +657,9 @@ bool canReach(const PuyoBinom binom, const PuyoBinom dest, GridState * const int
   return true;
 }
 
-void PuyoIA::decide(int partial)
+void PuyoIA::decide(int partial, int depth)
 {
-  //fprintf(stderr, "  Decision %d on %d\n",partial+1,DISPATCHCYCLES);
+  //fprintf(stderr, "  Decision %d on %d - Depth = %d\n",partial+1,DISPATCHCYCLES,depth);
   if (partial == 0)
   {
     // get puyo binoms to drop
@@ -738,49 +687,83 @@ void PuyoIA::decide(int partial)
     bestEvaluation = 0;
   }
   
-  for (unsigned int l1 = 1+partial; l1 <= MAXCOMBINATION; l1+=DISPATCHCYCLES)
+  switch (depth)
   {
-    // set position of binom 1
-    serialPosition(l1,&current);
-
-    // reset evaluation
-    GridEvaluation evaluation1 = nullEvaluation;
-
-    GridState state1;
-
-    // drop the binom (including destroying eligible groups) and continue if game not lost
-    if (canReach(originalPuyo, current, internalGrid) && dropBinom(current, internalGrid, &state1, &evaluation1))
-    {
-      for (unsigned int l2 = 1; l2 <= MAXCOMBINATION; l2++)
+    case 1:
+      for (unsigned int l1 = 1+partial; l1 <= MAXCOMBINATION; l1+=DISPATCHCYCLES)
       {
         // set position of binom 1
-        serialPosition(l2,&next);
-
-        // copy evaluation
-        GridEvaluation evaluation2 = evaluation1;
-
-        GridState state2;
-
-        // drop the binom (including destroying eligible groups) and eval board if game not lost
-        if (dropBinom(next, &state1, &state2, &evaluation2))
+        serialPosition(l1,&current);
+        
+        // reset evaluation
+        GridEvaluation evaluation1 = nullEvaluation;
+        
+        GridState state1;
+        
+        // drop the binom (including destroying eligible groups) and continue if game not lost
+        if (canReach(originalPuyo, current, internalGrid) && dropBinom(current, internalGrid, &state1, &evaluation1))
         {
-          evalWith(&state2, &evaluation1, &evaluation2);
-
-          if (foundOne == false || selectIfBetterEvaluation(&bestEvaluation, &evaluation2, current, &state2))
+          evalWith(&state1, &nullEvaluation, &evaluation1);
+          
+          if (foundOne == false || selectIfBetterEvaluation(&bestEvaluation, &evaluation1, current, &state1))
           {
             bestl1 = l1;
           }
           foundOne = true;
         }
       }
-    }
+      if (foundOne) serialPosition(bestl1,&current);
+      objective = current;
+      break;
+      
+    case 2:
+      for (unsigned int l1 = 1+partial; l1 <= MAXCOMBINATION; l1+=DISPATCHCYCLES)
+      {
+        // set position of binom 1
+        serialPosition(l1,&current);
+        
+        // reset evaluation
+        GridEvaluation evaluation1 = nullEvaluation;
+        
+        GridState state1;
+        
+        // drop the binom (including destroying eligible groups) and continue if game not lost
+        if (canReach(originalPuyo, current, internalGrid) && dropBinom(current, internalGrid, &state1, &evaluation1))
+        {
+          for (unsigned int l2 = 1; l2 <= MAXCOMBINATION; l2++)
+          {
+            // set position of binom 1
+            serialPosition(l2,&next);
+            
+            // copy evaluation
+            GridEvaluation evaluation2 = evaluation1;
+            
+            GridState state2;
+            
+            // drop the binom (including destroying eligible groups) and eval board if game not lost
+            if (canReach(originalPuyo, next, &state1) && dropBinom(next, &state1, &state2, &evaluation2))
+            {
+              evalWith(&state2, &evaluation1, &evaluation2);
+              
+              if (foundOne == false || selectIfBetterEvaluation(&bestEvaluation, &evaluation2, current, &state2))
+              {
+                bestl1 = l1;
+              }
+              foundOne = true;
+            }
+          }
+        }
+      }
+      if (foundOne) serialPosition(bestl1,&current);
+      objective = current;
+      break;
+      
+    default:
+      objective.position.x = (random() % IA_PUYODIMX);
+      objective.orientation = (PuyoOrientation)(random() % 4);
+      break;
   }
 
-  // set position of best binom
-  if (foundOne == false) current.position.x=IA_PUYODIMX;
-  else serialPosition(bestl1,&current);
-
-  objective = current;
 }
 
 
@@ -815,30 +798,12 @@ void PuyoIA::cycle()
   // Test if we have to decide where to play
   if (decisionMade < DISPATCHCYCLES)
   {
-    // if so update the internal grid
+    // if so update the internal grid the first time
     if (decisionMade == 0) extractGrid();
 
-    // Select IA
-    switch (type)
-    {
-      case RANDOM: // Random move
-        objective.position.x = (random() % IA_PUYODIMX);
-        objective.orientation = (PuyoOrientation)(random() % 4);
-        break;
-
-      case GYOM:
-      case TANIA:
-      case JEKO:
-      case FLOBO:
-        decide(decisionMade);
-        break;
-
-      default:
-        objective.position.x = 3;
-        objective.orientation = Above;
-        break;        
-    }
-
+    // then start to think
+    decide(decisionMade, params.thinkDepth);
+ 
     // remember what we decided
     decisionMade++;
     
@@ -847,7 +812,7 @@ void PuyoIA::cycle()
   }
 
   // Now move to the position we decided :
-  
+
   // If we can drop, then go on
   if (readyToDrop)
   {
@@ -856,7 +821,7 @@ void PuyoIA::cycle()
   }
   
   // Else try to move at the specified frequency
-  else if (currentCycle % level == 0)
+  else if ((currentCycle % params.speedFactor) == 0)
   {
     bool shouldMove;
     bool shouldRotate;

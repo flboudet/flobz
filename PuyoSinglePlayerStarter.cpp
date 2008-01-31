@@ -47,7 +47,7 @@ void PuyoCombinedEventPlayer::cycle()
     player2controller.cycle();
 }
 
-PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
+PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
     : attachedPuyoThemeSet(puyoThemeSet),
     attachedRandom(nColors),
     attachedGameFactory(&attachedRandom),
@@ -56,7 +56,7 @@ PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puy
     areaB(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
           1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
     playercontroller(areaA),
-    opponentcontroller(type, level, areaB), faceTicks(0), opponentFace(aiFace)
+    opponentcontroller(level, areaB), faceTicks(0), opponent(aiFace)
 {
     initialize(areaA, areaB, playercontroller, opponentcontroller, levelTheme, gameOverAction);
     setLives(lifes);
@@ -71,32 +71,33 @@ void PuyoSinglePlayerGameWidget::cycle()
     faceTicks += 1;
     if (faceTicks == 1) {
         AIParameters ai;
-        ai.realSuppressionValue = opponentFace.getIntegerValue("@AI_RealSuppression");
-        ai.potentialSuppressionValue = opponentFace.getIntegerValue("@AI_PotentialSuppression");
-        ai.criticalHeight = opponentFace.getIntegerValue("@AI_CriticalHeight");
-        ai.columnScalar[0] = opponentFace.getIntegerValue("@AI_Column1");
-        ai.columnScalar[1] = opponentFace.getIntegerValue("@AI_Column2");
-        ai.columnScalar[2] = opponentFace.getIntegerValue("@AI_Column3");
-        ai.columnScalar[3] = opponentFace.getIntegerValue("@AI_Column4");
-        ai.columnScalar[4] = opponentFace.getIntegerValue("@AI_Column5");
-        ai.columnScalar[5] = opponentFace.getIntegerValue("@AI_Column6");
-        ai.rotationMethod = opponentFace.getIntegerValue("@AI_RotationMethod");
-        ai.fastDropDelta = opponentFace.getIntegerValue("@AI_FastDropDelta");
+        ai.realSuppressionValue = opponent.getIntegerValue("@AI_RealSuppression");
+        ai.potentialSuppressionValue = opponent.getIntegerValue("@AI_PotentialSuppression");
+        ai.criticalHeight = opponent.getIntegerValue("@AI_CriticalHeight");
+        ai.columnScalar[0] = opponent.getIntegerValue("@AI_Column1");
+        ai.columnScalar[1] = opponent.getIntegerValue("@AI_Column2");
+        ai.columnScalar[2] = opponent.getIntegerValue("@AI_Column3");
+        ai.columnScalar[3] = opponent.getIntegerValue("@AI_Column4");
+        ai.columnScalar[4] = opponent.getIntegerValue("@AI_Column5");
+        ai.columnScalar[5] = opponent.getIntegerValue("@AI_Column6");
+        ai.rotationMethod = opponent.getIntegerValue("@AI_RotationMethod");
+        ai.fastDropDelta = opponent.getIntegerValue("@AI_FastDropDelta");
+        ai.thinkDepth = opponent.getIntegerValue("@AI_ThinkDepth");
         opponentcontroller.setAIParameters(ai);
     }
     if (faceTicks == 100) {
-        opponentFace.setIntegerValue("@maxHeightPlayer", attachedGameA->getMaxColumnHeight());
-        opponentFace.setIntegerValue("@maxHeightAI", attachedGameB->getMaxColumnHeight());
-        opponentFace.setIntegerValue("@neutralsForPlayer", attachedGameA->getNeutralPuyos());
-        opponentFace.setIntegerValue("@neutralsForAI", attachedGameB->getNeutralPuyos());
+        opponent.setIntegerValue("@maxHeightPlayer", attachedGameA->getMaxColumnHeight());
+        opponent.setIntegerValue("@maxHeightAI", attachedGameB->getMaxColumnHeight());
+        opponent.setIntegerValue("@neutralsForPlayer", attachedGameA->getNeutralPuyos());
+        opponent.setIntegerValue("@neutralsForAI", attachedGameB->getNeutralPuyos());
         faceTicks = 0;
     }
     PuyoGameWidget::cycle();
 }
 
-PuyoStoryWidget *PuyoSinglePlayerGameWidget::getOpponentFace()
+PuyoStoryWidget *PuyoSinglePlayerGameWidget::getOpponent()
 {
-    return &opponentFace;
+    return &opponent;
 }
 
 PuyoLevelDefinitions *PuyoLevelDefinitions::currentDefinition = NULL;
@@ -125,28 +126,18 @@ PuyoLevelDefinitions::~PuyoLevelDefinitions()
 
 void PuyoLevelDefinitions::addLevelDefinition(String levelName, String introStory,
 					      String opponentStory, String opponentName,
-					      String opponentFace, String backgroundTheme,
+					      String opponent, String backgroundTheme,
 					      String gameLostStory, String gameOverStory,
 					      SelIA easySettings,
 					      SelIA mediumSettings, SelIA hardSettings)
 {
   levelDefinitions.add(new LevelDefinition(levelName, introStory, opponentStory, opponentName,
-					   opponentFace, backgroundTheme, gameLostStory, gameOverStory,
+					   opponent, backgroundTheme, gameLostStory, gameOverStory,
 					   easySettings, mediumSettings, hardSettings));
 }
 
-PuyoLevelDefinitions::SelIA::SelIA(String type, int level, int nColors) : level(level), nColors(nColors)
+PuyoLevelDefinitions::SelIA::SelIA(int level, int nColors) : level(level), nColors(nColors)
 {
-  if (type == "RANDOM")
-    this->type = RANDOM;
-  else if (type == "FLOBO")
-    this->type = FLOBO;
-  else if (type == "TANIA")
-    this->type = TANIA;
-  else if (type == "JEKO")
-    this->type = JEKO;
-  else if (type == "GYOM")
-    this->type = GYOM;
 }
 
 void PuyoLevelDefinitions::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
@@ -155,21 +146,18 @@ void PuyoLevelDefinitions::end_level(GoomSL *gsl, GoomHash *global, GoomHash *lo
   const char * introStory = (const char *) GSL_GLOBAL_PTR(gsl, "level.introStory");
   const char * opponentStory = (const char *) GSL_GLOBAL_PTR(gsl, "level.opponentStory");
   const char * opponentName = (const char *) GSL_GLOBAL_PTR(gsl, "level.opponentName");
-  const char * opponentFace = (const char *) GSL_GLOBAL_PTR(gsl, "level.opponentFace");
+  const char * opponent = (const char *) GSL_GLOBAL_PTR(gsl, "level.opponentAI");
   const char * backgroundTheme = (const char *) GSL_GLOBAL_PTR(gsl, "level.backgroundTheme");
   const char * gameLostStory = (const char *) GSL_GLOBAL_PTR(gsl, "level.gameLostStory");
   const char * gameOverStory = (const char *) GSL_GLOBAL_PTR(gsl, "level.gameOverStory");
-  SelIA easySettings((const char *) GSL_GLOBAL_PTR(gsl, "level.easySetting.type"),
-                     GSL_GLOBAL_INT(gsl, "level.easySetting.level"),
+  SelIA easySettings(GSL_GLOBAL_INT(gsl, "level.easySetting.level"),
                      GSL_GLOBAL_INT(gsl, "level.easySetting.nColors"));
-  SelIA mediumSettings((const char *) GSL_GLOBAL_PTR(gsl, "level.mediumSetting.type"),
-                       GSL_GLOBAL_INT(gsl, "level.mediumSetting.level"),
+  SelIA mediumSettings(GSL_GLOBAL_INT(gsl, "level.mediumSetting.level"),
                        GSL_GLOBAL_INT(gsl, "level.mediumSetting.nColors"));
-  SelIA hardSettings((const char *) GSL_GLOBAL_PTR(gsl, "level.hardSetting.type"),
-                     GSL_GLOBAL_INT(gsl, "level.hardSetting.level"),
+  SelIA hardSettings(GSL_GLOBAL_INT(gsl, "level.hardSetting.level"),
                      GSL_GLOBAL_INT(gsl, "level.hardSetting.nColors"));
   currentDefinition->addLevelDefinition(levelName, introStory, opponentStory, opponentName,
-					opponentFace, backgroundTheme, gameLostStory, gameOverStory,
+					opponent, backgroundTheme, gameLostStory, gameOverStory,
 					easySettings, mediumSettings, hardSettings);
 }
 
@@ -217,18 +205,6 @@ PuyoLevelTheme &PuyoSingleGameLevelData::getLevelTheme() const
     return *levelThemeToUse;
 }
 
-IA_Type PuyoSingleGameLevelData::getIAType() const
-{
-    switch (difficulty) {
-        case 0:
-            return levelDefinition->easySettings.type;
-        case 1:
-            return levelDefinition->mediumSettings.type;
-        default:
-            return levelDefinition->hardSettings.type;
-    }
-}
-
 int PuyoSingleGameLevelData::getIALevel() const
 {
     switch (difficulty) {
@@ -259,7 +235,7 @@ String PuyoSingleGameLevelData::getIAName() const {
 
 String PuyoSingleGameLevelData::getIAFace() const
 {
-    return levelDefinition->opponentFace;
+    return levelDefinition->opponent;
 }
 
 PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousScreen,
@@ -398,7 +374,7 @@ void SinglePlayerStarterAction::initiateLevel()
 
 void SinglePlayerStarterAction::startGame()
 {
-    gameWidget = new PuyoSinglePlayerGameWidget(levelData->getPuyoTheme(), levelData->getLevelTheme(), levelData->getIAType(), levelData->getIALevel(), levelData->getNColors(), lifes, levelData->getIAFace(), this);
+    gameWidget = new PuyoSinglePlayerGameWidget(levelData->getPuyoTheme(), levelData->getLevelTheme(), levelData->getIALevel(), levelData->getNColors(), lifes, levelData->getIAFace(), this);
     gameScreen = new PuyoGameScreen(*gameWidget, *story);
     if (nameProvider != NULL)
         gameWidget->setPlayerOneName(nameProvider->getPlayerName());

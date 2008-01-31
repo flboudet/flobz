@@ -3,4 +3,8 @@
     Sprite  @face_sprite = [new_sprite: image=name x=0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
 
 <face_list>
+    Vec2 mypos
+    mypos.x=100.0
+    mypos.y=100.0
+    //[put_text: text="toto" pos=mypos text_index=4.0]
     sprite::@face_sprite display=@face_display

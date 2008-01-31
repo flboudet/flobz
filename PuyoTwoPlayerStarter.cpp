@@ -41,7 +41,7 @@ PuyoTwoPlayersGameWidget::PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThe
     setLives(-1);
 }
 
-PuyoStoryWidget *PuyoTwoPlayersGameWidget::getOpponentFace()
+PuyoStoryWidget *PuyoTwoPlayersGameWidget::getOpponent()
 {
     return &opponentFace;
 }

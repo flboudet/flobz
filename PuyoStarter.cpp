@@ -591,8 +591,8 @@ PuyoGameScreen::PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScree
 	 dynamic_cast<DrawableComponent *>(this));
 #endif
     add(&gameWidget);
-    if (gameWidget.getOpponentFace() != NULL)
-        add(gameWidget.getOpponentFace());
+    if (gameWidget.getOpponent() != NULL)
+        add(gameWidget.getOpponent());
 
     activeFX = &gameWidget.getPuyoFX();
     for (int i=0; i<activeFX->size(); ++i) {
@@ -652,8 +652,8 @@ bool PuyoGameScreen::backPressed()
 void PuyoGameScreen::setPaused(bool fromControls)
 {
     if (!paused) {
-        if (gameWidget.getOpponentFace() != NULL)
-            gameWidget.getOpponentFace()->hide();
+        if (gameWidget.getOpponent() != NULL)
+            gameWidget.getOpponent()->hide();
         std::vector<PuyoFX*> fx = gameWidget.getPuyoFX();
         for (int i=0; i<fx.size(); ++i)
             fx[i]->hide();
@@ -669,8 +669,8 @@ void PuyoGameScreen::setResumed(bool fromControls)
 {
     if (paused) {
         paused = false;
-        if (gameWidget.getOpponentFace() != NULL)
-            gameWidget.getOpponentFace()->show();
+        if (gameWidget.getOpponent() != NULL)
+            gameWidget.getOpponent()->show();
         std::vector<PuyoFX*> fx = gameWidget.getPuyoFX();
         for (int i=0; i<fx.size(); ++i)
             fx[i]->show();
