@@ -75,7 +75,7 @@ class PuyoIA : public virtual PuyoPlayer {
 
   public:
     PuyoIA(int level, PuyoView &targetView);
-    ~PuyoIA();
+    virtual ~PuyoIA();
     virtual void cycle();
     void setAIParameters(const AIParameters &ai);
 

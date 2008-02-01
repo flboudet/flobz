@@ -466,6 +466,8 @@ int PuyoIA::makeEvaluation(const GridEvaluation * const referenceOne, const Puyo
     case Left:
       pos2 = pos1-1;
       break;
+    default:
+      break;
   }
   
   int c = 0;
@@ -631,6 +633,8 @@ bool canReach(const PuyoBinom binom, const PuyoBinom dest, GridState * const int
     case Below:
       minBinomY--;
       break;
+    default:
+      break;
   }
  
   if (minBinomY > 0) minBinomY--;
@@ -645,6 +649,8 @@ bool canReach(const PuyoBinom binom, const PuyoBinom dest, GridState * const int
       break;
     case Right:
       maxDestX++;
+      break;
+    default:
       break;
   }
   

@@ -1,94 +1,91 @@
 #ifndef PUYO_STRINGS_H
 #define PUYO_STRINGS_H
 
-static const char *kYouDidIt     = "You Dit It!!!";
-static const char *kNextLevel    = "Next:\t\t";
-static const char *kLooser       = "Looser!!!";
-static const char *kCurrentLevel = "Level:\t\t";
-static const char *kContinueLeft = "Continues:\t\t";
-static const char *kGameOver     = "Game Over!!!";
-static const char *kYouGotToLevel = "You Get To ";
-static const char *kHitActionToContinue = "Hit Action to continue...";
-static const char *kHitActionForMenu = "Hit Action for menu...";
-static const char *kContinue     = "Continue?";
-static const char *kContinueGame = "Continue Game";
-static const char *kAbortGame    = "Abort Game";
-static const char *kOptions      = "Options";
-static const char *kPlayer       = "Player";
-static const char *kScore        = "Score:\t";
-static const char *kPlayerName   = "Player Name:\t";
-static const char *kPlayer1Name  = "P1 Name:\t";
-static const char *kPlayer2Name  = "P2 Name:\t";
-static const char *kIpAddress    = "IP Address: ";
-static const char *kExit         = "Exit";
+extern const char *kYouDidIt;
+extern const char *kNextLevel;
+extern const char *kLooser;
+extern const char *kCurrentLevel;
+extern const char *kContinueLeft;
+extern const char *kGameOver;
+extern const char *kYouGotToLevel;
+extern const char *kHitActionToContinue;
+extern const char *kHitActionForMenu;
+extern const char *kContinue;
+extern const char *kContinueGame;
+extern const char *kAbortGame;
+extern const char *kOptions;
+extern const char *kPlayer;
+extern const char *kScore;
+extern const char *kPlayerName;
+extern const char *kPlayer1Name;
+extern const char *kPlayer2Name;
+extern const char *kIpAddress;
+extern const char *kExit;
 
 
-static const char *k01 = " 1 - ";
-static const char *k02 = " 2 - ";
-static const char *k03 = " 3 - ";
-static const char *k04 = " 4 - ";
-static const char *k05 = " 5 - ";
-static const char *k06 = " 6 - ";
-static const char *k07 = " 7 - ";
-static const char *k08 = " 8 - ";
-static const char *k09 = " 9 - ";
-static const char *k10 = "10 - ";
+extern const char *k01;
+extern const char *k02;
+extern const char *k03;
+extern const char *k04;
+extern const char *k05;
+extern const char *k06;
+extern const char *k07;
+extern const char *k08;
+extern const char *k09;
+extern const char *k10;
 
-static const char *kMustRestart1 = "Major Video Mode Change...";
-static const char *kMustRestart2 = "This will take effect next time you restart Flobo Puyo.";
-static const char *kHighScores  = "Hall of Fame";
+extern const char *kMustRestart1;
+extern const char *kMustRestart2;
+extern const char *kHighScores;
 
-static const char *kMusicVolume = "MusicVolume";
-static const char *kAudioVolume = "AudioVolume";
+extern const char *kMusicVolume;
+extern const char *kAudioVolume;
 
-static const char *kCongratulations = "Congratulations!!!";
-static const char *kPuyosInvasion   = "                        You stopped Puyo's invasion.\n"
-                         "                         Peace on Earth is restored!!";
+extern const char *kCongratulations;
+extern const char *kPuyosInvasion;
 
-static const char *kAudioFX     = "Audio FX\t";
-static const char *kMusic       = "Music\t";
-static const char *kFullScreen  = "FullScreen\t";
-static const char *kOpenGL      = "Use OpenGL\t";
-static const char *kChangePuyoTheme = "Puyo theme...";
-static const char *kChangePuyoLevel = "Level theme...";
-static const char *kControls    = "Change controls...";
-static const char *kGameLevel   = "Choose Game Level";
-static const char *kLevelEasy   = "Easy";
-static const char *kLevelMedium = "Medium";
-static const char *kLevelHard   = "Hard";
+extern const char *kAudioFX;
+extern const char *kMusic;
+extern const char *kFullScreen;
+extern const char *kOpenGL;
+extern const char *kChangePuyoTheme;
+extern const char *kChangePuyoLevel;
+extern const char *kControls;
+extern const char *kGameLevel;
+extern const char *kLevelEasy;
+extern const char *kLevelMedium;
+extern const char *kLevelHard;
 
-static const char *kPlayer1Left  = "P1 Left:\t";
-static const char *kPlayer1Right = "P1 Right:\t";
-static const char *kPlayer1Down  = "P1 Down:\t";
-static const char *kPlayer1Clockwise        = "P1 Turn R:\t";
-static const char *kPlayer1Counterclockwise = "P1 Turn L:\t";
+extern const char *kPlayer1Left;
+extern const char *kPlayer1Right;
+extern const char *kPlayer1Down;
+extern const char *kPlayer1Clockwise;
+extern const char *kPlayer1Counterclockwise;
 
-static const char *kPlayer2Left   = "P2 Left:\t";
-static const char *kPlayer2Right  = "P2 Right:\t";
-static const char *kPlayer2Down   = "P2 Down:\t";
-static const char *kPlayer2Clockwise        = "P2 Turn R:\t";
-static const char *kPlayer2Counterclockwise = "P2 Turn L:\t";
+extern const char *kPlayer2Left;
+extern const char *kPlayer2Right;
+extern const char *kPlayer2Down;
+extern const char *kPlayer2Clockwise;
+extern const char *kPlayer2Counterclockwise;
 
-static const char *kRules01 = "Puyos are fancy smiling bubbles...";
-static const char *kRules02 = "But they can really be invading sometimes!";
-static const char *kRules03 = "Send them away by making groups of 4 or more.";
-static const char *kRules04 = "Try to make large groups, or many at the same time";
-static const char *kRules05 = "to send more bad ghost Puyos to your opponent.";
+extern const char *kRules01;
+extern const char *kRules02;
+extern const char *kRules03;
+extern const char *kRules04;
+extern const char *kRules05;
 
-static const char *kAbout01 = "FloboPuyo is an iOS-software production.\t\t";
-static const char *kAbout02 = "Puyo's world Meta God:\t\t";
-static const char *kAbout03 = "\t\tFlorent 'flobo' Boudet";
-static const char *kAbout04 = "X Men:\t\t";
-static const char *kAbout05 = "\t\tJean-Christophe 'jeko' Hoelt";
-static const char *kAbout06 = "\t\tGuillaume 'gyom' Borios";
-static const char *kAbout07 = "Beta Goddess:\t\t";
-static const char *kAbout08 = "\t\tTania";
-static const char *kSinglePlayerGame = "Single Player Game";
-static const char *kTwoPlayersGame = "Two Players Game";
-static const char *kNetGame = "Network Game";
+extern const char *kAbout01;
+extern const char *kAbout02;
+extern const char *kAbout03;
+extern const char *kAbout04;
+extern const char *kAbout05;
+extern const char *kAbout06;
+extern const char *kAbout07;
+extern const char *kAbout08;
+extern const char *kSinglePlayerGame;
+extern const char *kTwoPlayersGame;
+extern const char *kNetGame;
 
-static const char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
-  "Satanas", "Doctor X", "Tanya", "Mr Gyom",
-  "The Duke","Jeko","--------" };
+extern const char *AI_NAMES[];
 
 #endif

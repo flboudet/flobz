@@ -49,6 +49,7 @@ public:
     virtual void onGameInvitationReceived(PuyoGameInvitation &invitation) = 0;
     virtual void onGameInvitationCanceledReceived(PuyoGameInvitation &invitation) = 0;
     virtual void onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation) = 0;
+    virtual ~PuyoNetGameCenterListener() {};
 };
 
 enum PuyoPeerStatus {

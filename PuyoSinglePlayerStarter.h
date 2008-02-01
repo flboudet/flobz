@@ -34,6 +34,7 @@
 class PuyoSingleNameProvider {
 public:
     virtual String getPlayerName() const = 0;
+    virtual ~PuyoSingleNameProvider() {};
 };
 
 class PuyoCombinedEventPlayer : public PuyoPlayer {
@@ -48,11 +49,11 @@ private:
 
 class PuyoSinglePlayerGameWidget : public PuyoGameWidget {
 public:
-    PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, IA_Type type, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
+    PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
     virtual ~PuyoSinglePlayerGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
-    PuyoStoryWidget *getOpponentFace();
+    PuyoStoryWidget *getOpponent();
 private:
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;
@@ -61,31 +62,30 @@ private:
     PuyoCombinedEventPlayer playercontroller;
     PuyoIA opponentcontroller;
     int faceTicks;
-    PuyoStoryWidget opponentFace;
+    PuyoStoryWidget opponent;
 };
 
 class PuyoLevelDefinitions {
 public:
     struct SelIA {
-      SelIA(String type, int level, int nColors);
-        IA_Type type;
+      SelIA(int level, int nColors);
         int level;
         int nColors;
     };
     struct LevelDefinition {
       LevelDefinition(String levelName, String introStory,
-		      String opponentStory, String opponentName, String opponentFace,
+		      String opponentStory, String opponentName, String opponent,
               String backgroundTheme, String gameLostStory, String gameOverStory,
 		      SelIA easySettings, SelIA mediumSettings, SelIA hardSettings)
 	: levelName(levelName), introStory(introStory),
-	   opponentStory(opponentStory),  opponentName(opponentName), opponentFace(opponentFace),
+	   opponentStory(opponentStory),  opponentName(opponentName), opponent(opponent),
        backgroundTheme(backgroundTheme), gameLostStory(gameLostStory), gameOverStory(gameOverStory),
 	   easySettings(easySettings), mediumSettings(mediumSettings), hardSettings(hardSettings) {}
       String levelName;
       String introStory;
       String opponentStory;
       String opponentName;
-      String opponentFace;
+      String opponent;
       String backgroundTheme;
       String gameLostStory;
       String gameOverStory;
@@ -99,7 +99,7 @@ public:
     virtual ~PuyoLevelDefinitions();
 private:
     void addLevelDefinition(String levelName, String introStory,
-			    String opponentStory, String opponentName, String opponentFace,
+			    String opponentStory, String opponentName, String opponent,
                 String backgroundTheme, String gameLostStory, String gameOverStory,
 			    SelIA easySettings,
 			    SelIA mediumSettings, SelIA hardSettings);
@@ -118,7 +118,6 @@ public:
     String getGameOverStory() const;
     AnimatedPuyoSetTheme &getPuyoTheme() const;
     PuyoLevelTheme &getLevelTheme() const;
-    IA_Type getIAType() const;
     int getIALevel() const;
     String getIAName() const;
     String getIAFace() const;

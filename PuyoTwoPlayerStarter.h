@@ -31,6 +31,7 @@ class PuyoTwoNameProvider {
 public:
     virtual String getPlayer1Name() const = 0;
     virtual String getPlayer2Name() const = 0;
+    virtual ~PuyoTwoNameProvider() {};
 };
 
 class PuyoTwoPlayersGameWidget : public PuyoGameWidget {
@@ -51,6 +52,7 @@ private:
 class PuyoGameWidgetFactory {
 public:
     virtual PuyoGameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String centerFace, Action *gameOverAction) = 0;
+    virtual ~PuyoGameWidgetFactory() {};
 };
 
 class PuyoLocalTwoPlayerGameWidgetFactory : public PuyoGameWidgetFactory {

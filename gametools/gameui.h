@@ -301,6 +301,8 @@ bool isDirectionEvent(GameControlEvent *event);
        * Notify that the slider is inside the screen, at the end of its sliding movement
        */
       virtual void onSlideInside(SliderContainer &slider) {}
+
+      virtual ~SliderContainerListener() {}
   };
   
   /**
@@ -532,7 +534,7 @@ bool isDirectionEvent(GameControlEvent *event);
       void lostFocus();
       void giveFocus();
 	  
-	  bool setEditOnFocus(bool editOnFocus) { this->editOnFocus = editOnFocus; }
+	    void setEditOnFocus(bool editOnFocus) { this->editOnFocus = editOnFocus; }
       void idle(double currentTime);
       
     private:

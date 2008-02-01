@@ -15,7 +15,7 @@ OBJFILES= audio.o HiScores.o PuyoCommander.o \
           PuyoNetGameCenter.o PuyoInternetGameCenter.o PuyoLanGameCenter.o\
           PuyoLocalMenu.o PuyoOptionMenu.o PuyoControlMenu.o \
           LevelThemeMenu.o PuyoThemeMenu.o PuyoScreenTransition.o \
-          PuyoNatTraversal.o PuyoGameAbstract.o
+          PuyoNatTraversal.o PuyoGameAbstract.o PuyoStrings.o
 
 include root_dir
 include config

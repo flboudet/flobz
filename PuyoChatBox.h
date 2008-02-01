@@ -36,6 +36,7 @@ class ChatBoxDelegate
 {
 public:
     virtual void sendChat(String chatText) = 0;
+    virtual ~ChatBoxDelegate() {};
 };
 
 class NetCenterChatArea : public VBox {

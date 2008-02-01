@@ -35,6 +35,7 @@ public:
     PuyoPlayer(PuyoView &view) : targetView(view), attachedGame(view.getAttachedGame()) {}
     virtual void eventOccured(GameControlEvent *event) {}
     virtual void cycle() {}
+    virtual ~PuyoPlayer() {}
 protected:
     PuyoView &targetView;
     PuyoGame *attachedGame;

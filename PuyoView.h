@@ -44,6 +44,7 @@
 class PuyoGameFactory {
 public:
     virtual PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory) = 0;
+    virtual ~PuyoGameFactory() {};
 };
 
 class PuyoView : public PuyoDelegate {

@@ -72,7 +72,7 @@ private:
 // A PuyoPuyo is an entity of the game
 class PuyoPuyo {
 public:
-    PuyoPuyo(PuyoState state) : state(state), X(0), Y(0), puyoID(lastID++), flag(false), bmark(false) {}
+    PuyoPuyo(PuyoState state) : puyoID(lastID++), state(state), X(0), Y(0), flag(false), bmark(false) {}
     virtual ~PuyoPuyo() {};
     inline PuyoState getPuyoState() const {
         if (this != NULL)
@@ -117,6 +117,7 @@ class PuyoFactory {
  public:
   virtual PuyoPuyo *createPuyo(PuyoState state) = 0;
   virtual void deletePuyo(PuyoPuyo *target) { delete target; }
+  virtual ~PuyoFactory() {};
 };
 
 class PuyoDefaultFactory : public PuyoFactory {
@@ -136,6 +137,7 @@ public:
   virtual void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase) = 0;
   virtual void gameDidEndCycle() = 0;
   virtual void gameLost() = 0;
+  virtual ~PuyoDelegate() {};
 };
 
 class PuyoGame {

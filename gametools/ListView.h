@@ -22,6 +22,7 @@ public:
     virtual float getLastVisible() const = 0;
     virtual float getFullSize() const = 0;
     virtual void setFirstVisible(float firstVisible) = 0;
+  virtual ~ScrollInfoProvider() {};
 };
 
 class ScrollWidget : public Widget {
