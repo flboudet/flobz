@@ -117,7 +117,7 @@ namespace gameui {
     // WidgetContainer
     // 
 
-    WidgetContainer::WidgetContainer(GameLoop *loop) : loop(loop), addedToGameLoop(false), layoutSuspended(false) {
+    WidgetContainer::WidgetContainer(GameLoop *loop) : layoutSuspended(false), loop(loop), addedToGameLoop(false) {
         if (loop == NULL) this->loop = GameUIDefaults::GAME_LOOP;
     }
 
@@ -737,11 +737,11 @@ namespace gameui {
     // SliderContainer
 
     SliderContainer::SliderContainer(GameLoop *loop)
-        : IdleComponent()
-        , ZBox(loop), slidingTime(.4)
+        : ZBox(loop), IdleComponent()
+        , slidingTime(.4)
         , contentWidget(NULL), previousWidget(NULL)
-        , currentTime(0.0), slideStartTime(0.0)
-        , sliding(false), bg(NULL), backgroundVisible(true)
+        , slideStartTime(0.0), currentTime(0.0)
+        , bg(NULL), sliding(false), backgroundVisible(true)
     {
     }
 
@@ -961,7 +961,6 @@ namespace gameui {
 
     void HScrollList::eventOccured(GameControlEvent *event)
     {
-        int old = activeWidget;
         if (activeWidget >= getNumberOfChilds())
             activeWidget = getNumberOfChilds() - 1;
 
@@ -1178,7 +1177,7 @@ namespace gameui {
     // 
 
     Text::Text()
-        : label(""), mdontMove(true), offset(0.0,0.0,0.0), m_textAlign(TEXT_CENTERED), m_autoSize(true)
+        : label(""), offset(0.0,0.0,0.0), m_textAlign(TEXT_CENTERED), m_autoSize(true), mdontMove(true)
     {
         this->font = GameUIDefaults::FONT_TEXT;
         setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
@@ -1187,7 +1186,7 @@ namespace gameui {
     }
 
     Text::Text(const String &label, SoFont *font)
-        : font(font), label(label), mdontMove(true), offset(0.0,0.0,0.0), m_textAlign(TEXT_CENTERED), m_autoSize(true)
+        : font(font), label(label), offset(0.0,0.0,0.0), m_textAlign(TEXT_CENTERED), m_autoSize(true), mdontMove(true)
     {
         if (font == NULL) this->font = GameUIDefaults::FONT_TEXT;
         setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
@@ -1438,7 +1437,7 @@ namespace gameui {
     int utf16_to_utf8(int src, char *dest)
     {
         char byte[4];
-        int i, ch, nbytes;
+        int i, nbytes;
 
         if (src < 0x80) {
             nbytes = 1;
@@ -1662,7 +1661,11 @@ namespace gameui {
         Text::lostFocus();
         font = fontInactive;
         if (editionMode == true && !editOnFocus)  {
-            setValue(previousValue, false);
+            setValue(getValue().substring(0, getValue().length() - 1));
+            editionMode = false;
+            Action *action = getAction(ON_START);
+            if (action)
+              action->action();
             editionMode = false;
         }
         requestDraw();
