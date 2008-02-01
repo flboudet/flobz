@@ -46,7 +46,7 @@ class SinglePlayerGameAction : public Action {
 
 void PuyoPushMenuAction::action()
 {
-    mainScreen->pushMenu(menu);
+    mainScreen->pushMenu(menu, m_fullScreen);
 }
 
 void PuyoPopMenuAction::action()

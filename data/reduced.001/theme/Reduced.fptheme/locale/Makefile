@@ -1,3 +1,3 @@
 FILES=
-DIRECTORIES= "gfx" "story" "theme"
+DIRECTORIES= "fr"
 include ${SOURCE_DATADIR}/Datarules.mk

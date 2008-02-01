@@ -238,7 +238,11 @@ void ListView::draw(SDL_Surface *screen)
 #endif
         m_bgSurface = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, lbsize.x, lbsize.y, 32, 
                                       rmask, gmask, bmask, amask);
-        SDL_FillRect(m_bgSurface, &srcrect, m_bgSurface->format->Amask & 0x80808080);
+        SDL_FillRect(m_bgSurface, &srcrect,
+            (m_bgSurface->format->Rmask & 0xFFFFFFFF) |
+            (m_bgSurface->format->Gmask & 0xFFFFFFFF) |
+            (m_bgSurface->format->Bmask & 0xFFFFFFFF) |
+            (m_bgSurface->format->Amask & 0x80808080));
     }
     dstrect.x = listBox.getPosition().x;
     dstrect.y = listBox.getPosition().y;

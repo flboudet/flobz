@@ -327,6 +327,7 @@ InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)
     pushNetCenter(mainScreen, &serverName, &serverPort, &playerName), backAction(mainScreen),
     joinButton("Join", &pushNetCenter), backButton("Back", &backAction)
 {
+    this->setBorderVisible(false);
 }
 
 InternetGameMenu::~InternetGameMenu()

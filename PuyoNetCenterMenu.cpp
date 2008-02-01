@@ -54,7 +54,8 @@ NetCenterDialogMenu::NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvi
       associatedInvitation(associatedInvitation), dialogTitle(title), dialogMsg(message),
       acceptButton(theCommander->getLocalizedString("Accept"), &acceptAction),
       cancelButton(theCommander->getLocalizedString("Cancel"), &cancelAction)
-{}
+{
+}
 
 NetCenterDialogMenu::~NetCenterDialogMenu()
 {
@@ -201,6 +202,7 @@ NetCenterMenu::NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netC
       topSeparator(0, 5), middleSeparator(0, 5), bottomSeparator(0, 5)
 {
     GameUIDefaults::GAME_LOOP->addIdle(&cycled);
+    this->setBorderVisible(false);
     netCenter->addListener(this);
 }
 

@@ -63,11 +63,13 @@ protected:
 class PuyoPushMenuAction : public Action
 {
 public:
-    PuyoPushMenuAction(PuyoMainScreenMenu *menu, PuyoMainScreen *mainScreen) : menu(menu), mainScreen(mainScreen) {}
+    PuyoPushMenuAction(PuyoMainScreenMenu *menu, PuyoMainScreen *mainScreen, bool fullScreen = false)
+      : menu(menu), mainScreen(mainScreen), m_fullScreen(fullScreen) {}
     void action();
 private:
     PuyoMainScreen *mainScreen;
     PuyoMainScreenMenu *menu;
+    bool m_fullScreen;
 };
 
 class PuyoPopMenuAction : public Action

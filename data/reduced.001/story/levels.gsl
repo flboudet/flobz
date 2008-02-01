@@ -4,7 +4,7 @@
     level.opponentStory       = "story1.gsl"
     level.opponentName        = "Herbert the Dog"
     level.opponentAI          = "herbert.gsl"
-    level.backgroundTheme     = "Developer level"
+    level.backgroundTheme     = "Blue Plastic"
     level.easySetting.level   = 60
     level.easySetting.nColors = 3
     level.mediumSetting.level = 34
@@ -17,7 +17,7 @@
     level.opponentStory       = "story2.gsl"
     level.opponentAI          = "dukebeary.gsl"
     level.opponentName        = "Duke Beary"
-    level.backgroundTheme     = "The forest"
+    level.backgroundTheme     = "Blue Plastic"
     level.easySetting.level   = 55
     level.easySetting.nColors = 3
     level.mediumSetting.level = 31
@@ -30,7 +30,7 @@
     level.opponentStory       = "story3.gsl"
     level.opponentName        = "Orloff"
     level.opponentAI          = "orloff.gsl"
-    level.backgroundTheme     = "The mansion"
+    level.backgroundTheme     = "Blue Plastic"
     level.easySetting.level   = 50
     level.easySetting.nColors = 4
     level.mediumSetting.level = 28
@@ -42,6 +42,7 @@
     level.opponentStory       = "story4.gsl"
     level.opponentName        = "Azrael"
     level.opponentAI          = "azrael.gsl"
+    level.backgroundTheme     = "Blue Plastic"
     level.easySetting.level   = 45
     level.easySetting.nColors = 4
     level.mediumSetting.level = 25
@@ -53,6 +54,7 @@
     level.opponentStory       = "story5.gsl"
     level.opponentName        = "Unmapped Monster V2"
     level.opponentAI          = "monk.gsl"
+    level.backgroundTheme     = "Blue Plastic"
     level.easySetting.level   = 40
     level.mediumSetting.level = 22
     level.hardSetting.level   = 9
@@ -63,6 +65,7 @@
     level.opponentStory       = "story6.gsl"
     level.opponentName        = "Zklogh"
     level.opponentAI          = "zklogh.gsl"
+    level.backgroundTheme     = "Blue Plastic"
     level.easySetting.level   = 35
     level.mediumSetting.level = 19
     level.hardSetting.level   = 7
@@ -73,6 +76,7 @@
     level.opponentStory       = "story7.gsl"
     level.opponentName        = "MegaPuyo"
     level.opponentAI          = "megapuyo.gsl"
+    level.backgroundTheme     = "Blue Plastic"
     level.easySetting.level   = 30
     level.mediumSetting.level = 16
     level.hardSetting.level   = 5
@@ -83,6 +87,7 @@
     level.opponentStory       = "story8.gsl"
     level.opponentName        = "Adam McFlurry"
     level.opponentAI          = "mcflurry.gsl"
+    level.backgroundTheme     = "Blue Plastic"
     level.easySetting.level   = 25
     level.mediumSetting.level = 13
     level.hardSetting.level   = 3
@@ -93,6 +98,7 @@
     level.opponentStory       = "story9.gsl"
     level.opponentName        = "MechaPuyo"
     level.opponentAI          = "mechapuyo.gsl"
+    level.backgroundTheme     = "Blue Plastic"
     level.easySetting.level   = 20
     level.mediumSetting.level = 10
     level.hardSetting.level   = 1

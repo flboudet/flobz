@@ -14,7 +14,8 @@ namespace gameui {
 const int Frame::leftW = 25, Frame::middleW = 28, Frame::rightW = 25;
 const int Frame::topH = 19, Frame::middleH = 26, Frame::bottomH = 23;
 
-Frame::Frame(IIM_Surface *frameSurface, GameLoop *loop) : VBox(loop), m_frameSurface(frameSurface), m_bgSurface(NULL)
+Frame::Frame(IIM_Surface *frameSurface, GameLoop *loop)
+  : VBox(loop), m_frameSurface(frameSurface), m_bgSurface(NULL), m_borderVisible(true)
 {
     setPolicy(USE_MIN_SIZE);
     setInnerMargin(9);
@@ -115,7 +116,8 @@ void Frame::draw(SDL_Surface *screen)
                                              (m_bgSurface->format->Amask & 0x80808080));
     }
     // Drawing the background
-    SDL_BlitSurface(m_bgSurface, &srcrect, screen, &dstrect);
+    if (m_borderVisible)
+        SDL_BlitSurface(m_bgSurface, &srcrect, screen, &dstrect);
     VBox::draw(screen);
 }
 

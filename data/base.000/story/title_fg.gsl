@@ -1,6 +1,7 @@
 import <flying_flobo.gsl>
 
 int @inNetGameCenter
+int @isFullScreen
 float @kaoriMovesFCycle
 float @kaoriDestX
 
@@ -18,13 +19,13 @@ float @kaoriDestX
   Sprite @kaorieyes = [new_sprite: image="kaori_title/kaori_title_eyesclosed.png" x = 92.0 y=83.0 curframe=0.0 framespeed=0.4 nbframes=40.0]
   @kaorieyes.parent = "@kaori"
   Sprite @bigpuyo = [new_sprite: image="happypuyo.png" x = 500.0 y=480.0 curframe=0.0 framespeed=0.15 nbframes=1.0]
-  
+  @isFullScreen = 1
   flying_flobo_init
 
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
   # This also allows you to specify the drawing order
-  (@inNetGameCenter != 3)? {
+  (@isFullScreen = 0)? {
     flying_flobo_sprite_list
   }
   sprite::@kaori display=@display
@@ -56,17 +57,19 @@ float @kaoriDestX
     (@BigPuyoApogee = 1)? (@bigpuyo.pos.y > 480.)? @ShowBigPuyo=0
   }
   (@inNetGameCenter = 0)? {
-    @kaoriMovesFCycle = @fcycle + 10.0
-    @kaoriDestX=20.0
-	@inNetGameCenter = 2
+    (@isFullScreen = 1)? {
+      @kaoriMovesFCycle = @fcycle + 10.0
+      @kaoriDestX=20.0
+      @isFullScreen = 0
+    }
   }
   (@inNetGameCenter = 1)? {
-    @kaoriMovesFCycle = @fcycle + 20.0
-	@kaoriDestX=-300.0
-    @inNetGameCenter = 3
+    (@isFullScreen = 0)? {
+      @kaoriMovesFCycle = @fcycle + 20.0
+      @kaoriDestX=-300.0
+      @isFullScreen = 1
+    }
   }
-  (@inNetGameCenter > 1)? {
-    move::@kaori   fcycle=@kaoriMovesFCycle      x=@kaoriDestX y=@kaori.pos.y
-  }
+  move::@kaori   fcycle=@kaoriMovesFCycle      x=@kaoriDestX y=@kaori.pos.y
   
   (@cycle = 1000)? @finished = 1
