@@ -21,7 +21,7 @@ ScrollWidget::ScrollWidget(ScrollInfoProvider &siProvider)
 ScrollWidget::~ScrollWidget()
 {
     if (m_bgSurface != NULL)
-        SDL_FreeSurface(m_bgSurface);
+        IIM_Free(m_bgSurface);
 }
 
 void ScrollWidget::eventOccured(GameControlEvent *event)
@@ -98,24 +98,9 @@ void ScrollWidget::draw(SDL_Surface *screen)
     
     if ((m_bgSurface == NULL) || (bsize.x != m_bgSurface->w) || (bsize.y != m_bgSurface->h)) {
         if (m_bgSurface != NULL)
-            SDL_FreeSurface(m_bgSurface);
-        Uint32 rmask, gmask, bmask, amask;
-        /* SDL interprets each pixel as a 32-bit number, so our masks must depend
-           on the endianness (byte order) of the machine */
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-        rmask = 0xff000000;
-        gmask = 0x00ff0000;
-        bmask = 0x0000ff00;
-        amask = 0x000000ff;
-#else
-        rmask = 0x000000ff;
-        gmask = 0x0000ff00;
-        bmask = 0x00ff0000;
-        amask = 0xff000000;
-#endif
-        m_bgSurface = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, bsize.x, bsize.y, 32, 
-                                      rmask, gmask, bmask, amask);
-        SDL_FillRect(m_bgSurface, &srcrect, (m_bgSurface->format->Rmask & 0x80808080) | (m_bgSurface->format->Amask & 0x80808080));
+            IIM_Free(m_bgSurface);
+        m_bgSurface = iim_surface_create_rgba(bsize.x, bsize.y);
+        SDL_FillRect(m_bgSurface->surf, &srcrect, (m_bgSurface->surf->format->Rmask & 0x80808080) | (m_bgSurface->surf->format->Amask & 0x80808080));
     }
     
     float firstVisible = m_siProvider.getFirstVisible();
@@ -126,7 +111,7 @@ void ScrollWidget::draw(SDL_Surface *screen)
     int lastVisibleOffset = lastVisible > numItems ? bsize.y : bsize.y * lastVisible / numItems;
     
     // Drawing the background
-    SDL_BlitSurface(m_bgSurface, &srcrect, screen, &dstrect);
+    IIM_BlitSurface(m_bgSurface, &srcrect, screen, &dstrect);
     
     // Drawing the thumb
     dstrect.y += firstVisibleOffset;
@@ -186,7 +171,7 @@ ListView::ListView(int size, IIM_Surface *upArrow, IIM_Surface *downArrow, GameL
 ListView::~ListView()
 {
     if (m_bgSurface != NULL)
-        SDL_FreeSurface(m_bgSurface);
+        IIM_Free(m_bgSurface);
 }
 
 void ListView::addEntry(ListViewEntry *entry)
@@ -221,34 +206,22 @@ void ListView::draw(SDL_Surface *screen)
     
     if ((m_bgSurface == NULL) || (lbsize.x != m_bgSurface->w) || (lbsize.y != m_bgSurface->h)) {
         if (m_bgSurface != NULL)
-            SDL_FreeSurface(m_bgSurface);
-        Uint32 rmask, gmask, bmask, amask;
-        /* SDL interprets each pixel as a 32-bit number, so our masks must depend
-           on the endianness (byte order) of the machine */
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-        rmask = 0xff000000;
-        gmask = 0x00ff0000;
-        bmask = 0x0000ff00;
-        amask = 0x000000ff;
-#else
-        rmask = 0x000000ff;
-        gmask = 0x0000ff00;
-        bmask = 0x00ff0000;
-        amask = 0xff000000;
-#endif
-        m_bgSurface = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, lbsize.x, lbsize.y, 32, 
-                                      rmask, gmask, bmask, amask);
-        SDL_FillRect(m_bgSurface, &srcrect,
-            (m_bgSurface->format->Rmask & 0xFFFFFFFF) |
-            (m_bgSurface->format->Gmask & 0xFFFFFFFF) |
-            (m_bgSurface->format->Bmask & 0xFFFFFFFF) |
-            (m_bgSurface->format->Amask & 0x80808080));
+            IIM_Free(m_bgSurface);
+        m_bgSurface = iim_surface_create_rgba(lbsize.x, lbsize.y);
+        SDL_FillRect(m_bgSurface->surf, &srcrect,
+            (m_bgSurface->surf->format->Rmask & 0xFFFFFFFF) |
+            (m_bgSurface->surf->format->Gmask & 0xFFFFFFFF) |
+            (m_bgSurface->surf->format->Bmask & 0xFFFFFFFF) |
+            (m_bgSurface->surf->format->Amask & 0xFFFFFFFF));
+        srcrect.x += 3; srcrect.y += 3; srcrect.h -= 6; srcrect.w -= 6;
+        SDL_FillRect(m_bgSurface->surf, &srcrect,
+            (m_bgSurface->surf->format->Amask & 0x80808080));
     }
     dstrect.x = listBox.getPosition().x;
     dstrect.y = listBox.getPosition().y;
     dstrect.h = listBox.getSize().y;
     dstrect.w = listBox.getSize().x;
-    SDL_BlitSurface(m_bgSurface, &srcrect, screen, &dstrect);
+    IIM_BlitSurface(m_bgSurface, &srcrect, screen, &dstrect);
     HBox::draw(screen);
 }
 

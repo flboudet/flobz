@@ -654,6 +654,27 @@ void iim_surface_convert_to_gray(IIM_Surface *isrc)
   SDL_FreeSurface(src);
 }
 
+IIM_Surface *iim_surface_create_rgba(int width, int height)
+{
+    SDL_Surface *ret;
+    Uint32 rmask, gmask, bmask, amask;
+    /* SDL interprets each pixel as a 32-bit number, so our masks must depend
+     on the endianness (byte order) of the machine */
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    rmask = 0xff000000;
+    gmask = 0x00ff0000;
+    bmask = 0x0000ff00;
+    amask = 0x000000ff;
+#else
+    rmask = 0x000000ff;
+    gmask = 0x0000ff00;
+    bmask = 0x00ff0000;
+    amask = 0xff000000;
+#endif
+    ret = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, width, height, 32, 
+                                       rmask, gmask, bmask, amask);
+    return IIM_RegisterImg(ret, true);
+}
 
 int IIM_BlitSurface(IIM_Surface *src, IIM_Rect *src_rect, SDL_Surface *dst, SDL_Rect *dst_rect)
 {

@@ -33,7 +33,7 @@ public:
 protected:
     virtual void draw(SDL_Surface *screen);
 private:
-    SDL_Surface *m_bgSurface;
+    IIM_Surface *m_bgSurface;
     ScrollInfoProvider &m_siProvider;
     bool m_grabbing;
     int m_grabOffset;
@@ -75,7 +75,7 @@ private:
     void resyncLabels();
     void handleButtons();
     
-    SDL_Surface *m_bgSurface;
+    IIM_Surface *m_bgSurface;
     int size, firstVisible;
     int used;
     Image downButton, upButton;
