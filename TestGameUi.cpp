@@ -16,6 +16,61 @@ using namespace gameui;
 
 extern "C"
 
+class SquareEditField : public EditField {
+public:
+    SquareEditField(const String &defaultText, Action *action = NULL);
+    virtual ~SquareEditField();
+protected:
+    virtual void draw(SDL_Surface *screen);
+private:
+    IIM_Surface *m_bgSurface;
+};
+
+SquareEditField::SquareEditField(const String &defaultText, Action *action)
+  : EditField(defaultText, action), m_bgSurface(NULL)
+{
+}
+
+SquareEditField::~SquareEditField()
+{
+    if (m_bgSurface != NULL)
+        IIM_Free(m_bgSurface);
+}
+
+void SquareEditField::draw(SDL_Surface *screen)
+{
+    SDL_Rect srcrect, dstrect;
+    Vec3 lbsize = getSize();
+    
+    srcrect.x = 0;
+    srcrect.y = 0;
+    srcrect.h = lbsize.y;
+    srcrect.w = lbsize.x;
+    
+    if ((m_bgSurface == NULL) || (lbsize.x != m_bgSurface->w) || (lbsize.y != m_bgSurface->h)) {
+        if (m_bgSurface != NULL)
+            IIM_Free(m_bgSurface);
+            m_bgSurface = iim_surface_create_rgba(lbsize.x, lbsize.y);
+            SDL_FillRect(m_bgSurface->surf, &srcrect,
+                         (m_bgSurface->surf->format->Rmask & 0x77777777) |
+                         (m_bgSurface->surf->format->Gmask & 0x77777777) |
+                         (m_bgSurface->surf->format->Bmask & 0x77777777) |
+                         (m_bgSurface->surf->format->Amask & 0xFFFFFFFF));
+            srcrect.x += 3; srcrect.y += 3; srcrect.h -= 3; srcrect.w -= 3;
+        SDL_FillRect(m_bgSurface->surf, &srcrect,
+                         (m_bgSurface->surf->format->Rmask & 0xFFFFFFFF) |
+                         (m_bgSurface->surf->format->Gmask & 0xFFFFFFFF) |
+                         (m_bgSurface->surf->format->Bmask & 0xFFFFFFFF) |
+                         (m_bgSurface->surf->format->Amask & 0xFFFFFFFF));
+    }
+    dstrect.x = getPosition().x;
+    dstrect.y = getPosition().y;
+    dstrect.h = getSize().y;
+    dstrect.w = getSize().x;
+    IIM_BlitSurface(m_bgSurface, &srcrect, screen, &dstrect);
+    EditField::draw(screen);
+}
+
 class BusyWidget : public Widget, IdleComponent {
 public:
     void idle(double currentTime) { requestDraw(); }
@@ -125,6 +180,7 @@ int main(int argc, char *argv[])
     Button bidonButton1("Hi", &showDialogAction);
     Button bidonButton2("Ho");
     Button bidonButton3("Hop");
+    SquareEditField bidonField("toto");
     IIM_Surface *upArrow = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/uparrow.png");
     IIM_Surface *downArrow = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/downarrow.png");
     bidonBox.setPolicy(USE_MIN_SIZE);
@@ -132,6 +188,7 @@ int main(int argc, char *argv[])
     bidonBox.add(&bidonText);
     bidonBox.add(&bidonButton1);
     bidonBox.add(&bidonButton2);
+    bidonBox.add(&bidonField);
     bidonBox.add(&frame);
     for (int i = 0 ; i < 100 ; i++) {
         String newEntry("Bla bla ");
