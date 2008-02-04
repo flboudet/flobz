@@ -131,10 +131,11 @@ private:
 class AnimatedPuyoSetTheme {
   
 public:
-    AnimatedPuyoSetTheme(const String path, const String name);
+    AnimatedPuyoSetTheme(const String path, const String name, const String lname);
     ~AnimatedPuyoSetTheme(void);
     
     const String getName(void);
+    const String getLocalizedName(void);
     const String getAuthor(void);
     const String getComments(void);
     
@@ -151,14 +152,15 @@ public:
 private:
     String _path;
     String _name;
-
+    String _lname;
+  
     String _author;
     String _comments;
 
     StandardAnimatedPuyoTheme * _puyos[NUMBER_OF_PUYOS];
     NeutralAnimatedPuyoTheme * _neutral;
 
-    unsigned int _numberOfPuyos;
+    int _numberOfPuyos;
 };
 
 
@@ -167,10 +169,11 @@ private:
 class PuyoLevelTheme {
     
 public:
-    PuyoLevelTheme(const String path, const String name);
+    PuyoLevelTheme(const String path, const String name, const String lname);
     ~PuyoLevelTheme(void);
     
     const String getName(void);
+    const String getLocalizedName(void);
     const String getAuthor(void);
     const String getComments(void);
         
@@ -207,7 +210,8 @@ public:
 private:    
     String _path;
     String _name;
-    
+    String _lname;
+   
     String _author;
     String _comments;
     
@@ -261,6 +265,9 @@ public:
     AdvancedBuffer<const char *> * getAnimatedPuyoSetThemeList(void);
     AdvancedBuffer<const char *> * getPuyoLevelThemeList(void);
     
+    AdvancedBuffer<AnimatedPuyoSetTheme *> * getAnimatedPuyoSetThemeObjectList(void);
+    AdvancedBuffer<PuyoLevelTheme *> * getPuyoLevelThemeObjectList(void);
+
     void addPuyoSet(AnimatedPuyoSetTheme *);
     void addLevel(PuyoLevelTheme *);
     

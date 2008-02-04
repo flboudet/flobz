@@ -66,14 +66,14 @@ PuyoThemeSelectionBox::~PuyoThemeSelectionBox()
 
 void PuyoThemeSelectionBox::build()
 {
-    AdvancedBuffer<const char *> * themes = 
-        getPuyoThemeManger()->getAnimatedPuyoSetThemeList();
+    AdvancedBuffer<const char *> * themes = getPuyoThemeManger()->getAnimatedPuyoSetThemeList();
+    AdvancedBuffer<AnimatedPuyoSetTheme *> * themesObjects = getPuyoThemeManger()->getAnimatedPuyoSetThemeObjectList();
     String pref = getPuyoThemeManger()->getPreferedAnimatedPuyoSetThemeName();
     int size = themes->size();
     for (int i = 0; i < size; i++)
     {
         Action * a = new PuyoThemeSelectedAction(themePreview, (*themes)[i]);
-        Button * b = new Button((*themes)[i], a);
+        Button * b = new Button((*themesObjects)[i]->getLocalizedName(), a);
         buttonList.add(b);
         actionList.add(a);
         add(b);
@@ -116,6 +116,8 @@ void PuyoThemePicturePreview::draw(SDL_Surface *screen)
       Vec3 size = getSize();
       r.x = (Sint16)(getPosition().x+(size.x-NUMBER_OF_PUYOS*ONEPUYO+(NUMBER_OF_PUYOS-1)*ONEPUYO/4.0)/2.0);
       r.y = (Sint16)(getPosition().y+(size.y-ONEPUYO)/2.0);
+      r.h = 0.0;
+      r.w = 0.0;
       for (int i=0; i<NUMBER_OF_PUYOS; i++)
       {
         IIM_Rect rect = r;
@@ -183,7 +185,7 @@ void PuyoThemePreview::themeSelected(String themeName)
 {
     AnimatedPuyoSetTheme * curTheme = getPuyoThemeManger()->getAnimatedPuyoSetTheme(themeName);
     name.setFont(GameUIDefaults::FONT_TEXT);
-    name.setValue(themeName);
+    name.setValue(curTheme->getLocalizedName());
     author.setFont(GameUIDefaults::FONT_SMALL_INFO);
     author.setValue(curTheme->getAuthor());
     description.setFont(GameUIDefaults::FONT_SMALL_INFO);
@@ -202,8 +204,8 @@ void PuyoThemePreview::themeSelected(String themeName)
 /*****************************************************************************/
 
 PuyoThemeMenu::PuyoThemeMenu(PuyoMainScreen *mainScreen)
-    : PuyoMainScreenMenu(mainScreen), popAction(mainScreen),
-      backButton(theCommander->getLocalizedString("Back"), &popAction), themeMenuTitle(theCommander->getLocalizedString("Puyo theme")),
+    : PuyoMainScreenMenu(mainScreen), themeMenuTitle(theCommander->getLocalizedString("Puyo theme")), popAction(mainScreen),
+      backButton(theCommander->getLocalizedString("Back"), &popAction),
       themePreview(), themeList(themePreview)
 {
 }

@@ -64,7 +64,7 @@ class PuyoPushMenuAction : public Action
 {
 public:
     PuyoPushMenuAction(PuyoMainScreenMenu *menu, PuyoMainScreen *mainScreen, bool fullScreen = false)
-      : menu(menu), mainScreen(mainScreen), m_fullScreen(fullScreen) {}
+      : mainScreen(mainScreen), menu(menu), m_fullScreen(fullScreen) {}
     void action();
 private:
     PuyoMainScreen *mainScreen;

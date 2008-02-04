@@ -104,13 +104,13 @@ static bool loadPictureWithOffset(const char * path, IIM_Surface ** dst, const c
     IIM_Free(tmp);
     return (*dst != NULL);
 }
-
+/*
 static bool copyPictureWithOffset(IIM_Surface * src, IIM_Surface ** dst, IIM_Surface * fallback, float offset)
 {
     *dst = iim_surface_shift_hue(src,offset);
     return (*dst != NULL);
 }
-
+*/
 static bool copyPictureWithLuminosity(IIM_Surface * src, IIM_Surface ** dst, IIM_Surface * fallback, float lum)
 {
     *dst = iim_surface_set_value(src, lum);
@@ -128,8 +128,9 @@ static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
 	String tmp1 = FilePath::combine(FilePath::combine("theme",tmp0.basename()),"locale");
 	PuyoLocalizedDictionary localeDictionary(theCommander->getDataPathManager(), tmp1, "theme");
 
-	const char * newName = localeDictionary.getLocalizedString(String(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.name"))),true);
-    AnimatedPuyoSetTheme * theme = new AnimatedPuyoSetTheme(GlobalCurrentPath, newName);
+	const char * newName  = (const char *) GSL_GLOBAL_PTR(gsl, "puyoset.name");
+	const char * newLName = localeDictionary.getLocalizedString(String(newName),true);
+    AnimatedPuyoSetTheme * theme = new AnimatedPuyoSetTheme(GlobalCurrentPath, newName, newLName);
     
     AdvancedBuffer<const char *> * list = globalManager->getAnimatedPuyoSetThemeList();
     int size = list->size();
@@ -185,8 +186,9 @@ static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
 	String tmp1 = FilePath::combine(FilePath::combine("theme",tmp0.basename()),"locale");
 	PuyoLocalizedDictionary localeDictionary(theCommander->getDataPathManager(), tmp1, "theme");
 
-	const char * newName = localeDictionary.getLocalizedString(String(((const char *) GSL_GLOBAL_PTR(gsl, "level.name"))),true);
-    PuyoLevelTheme * theme = new PuyoLevelTheme(GlobalCurrentPath, newName);
+	  const char * newName  = (const char *) GSL_GLOBAL_PTR(gsl, "level.name");
+	  const char * newLName = localeDictionary.getLocalizedString(String(newName),true);
+    PuyoLevelTheme * theme = new PuyoLevelTheme(GlobalCurrentPath, newName, newLName);
 
     AdvancedBuffer<const char *> * list = globalManager->getPuyoLevelThemeList();
     int size = list->size();
@@ -507,7 +509,7 @@ void NeutralAnimatedPuyoTheme::releaseCached(void)
 //*********************************** AnimatedPuyoSetTheme ***********************************
 //********************************************************************************************
 
-AnimatedPuyoSetTheme::AnimatedPuyoSetTheme(const String path, const String name):_path(path),_name(name)
+AnimatedPuyoSetTheme::AnimatedPuyoSetTheme(const String path, const String name, const String lname):_path(path),_name(name),_lname(lname)
 {
     DEBUG_PARAM_MISSING(path,"path","AnimatedPuyoTheme")
     DEBUG_PARAM_MISSING(name,"name","AnimatedPuyoTheme")
@@ -552,6 +554,11 @@ const String AnimatedPuyoSetTheme::getComments(void)
 const String AnimatedPuyoSetTheme::getName(void)
 {
     return _name;
+}
+
+const String AnimatedPuyoSetTheme::getLocalizedName(void)
+{
+    return _lname;
 }
 
 AnimatedPuyoTheme * AnimatedPuyoSetTheme::getAnimatedPuyoTheme(PuyoState state)
@@ -599,7 +606,7 @@ bool AnimatedPuyoSetTheme::addAnimatedPuyoTheme(const String face, const char * 
 { 
     if (_numberOfPuyos >= NUMBER_OF_PUYOS)
     {
-        printf("Too many puyos in theme %s... Ignoring puyo.\n",(const char *)_name);
+        printf("Too many puyos in theme %s... Ignoring puyo.\n",(const char *)_lname);
         return false;
     }
     
@@ -613,7 +620,7 @@ bool AnimatedPuyoSetTheme::addNeutralPuyo(const String face, const char * disapp
 { 
     if (_neutral != NULL)
     {
-        printf("Too many neutral puyos in theme %s... Ignoring puyo.\n",(const char *)_name);
+        printf("Too many neutral puyos in theme %s... Ignoring puyo.\n",(const char *)_lname);
         return false;
     }
 
@@ -652,7 +659,7 @@ void AnimatedPuyoSetTheme::release(void)
 //*********************************** PuyoLevelTheme ***********************************
 //**************************************************************************************
 
-PuyoLevelTheme::PuyoLevelTheme(const String path, const String name):_path(path),_name(name)
+PuyoLevelTheme::PuyoLevelTheme(const String path, const String name, const String lname):_path(path),_name(name),_lname(lname)
 { 
     DEBUG_PARAM_MISSING(path,"path","PuyoLevelTheme")
     DEBUG_PARAM_MISSING(name,"name","PuyoLevelTheme")
@@ -712,6 +719,11 @@ const String PuyoLevelTheme::getComments(void)
 const String PuyoLevelTheme::getName(void)
 {
     return _name;
+}
+
+const String PuyoLevelTheme::getLocalizedName(void)
+{
+  return _lname;
 }
 
 void PuyoLevelTheme::releaseCached(void)
@@ -1125,6 +1137,16 @@ AdvancedBuffer<const char *> * AnimatedPuyoThemeManager::getAnimatedPuyoSetTheme
 AdvancedBuffer<const char *> * AnimatedPuyoThemeManager::getPuyoLevelThemeList(void)
 {
     return &themeList;
+}
+
+AdvancedBuffer<AnimatedPuyoSetTheme *> * AnimatedPuyoThemeManager::getAnimatedPuyoSetThemeObjectList(void)
+{
+  return &puyoSets;
+}
+
+AdvancedBuffer<PuyoLevelTheme *> * AnimatedPuyoThemeManager::getPuyoLevelThemeObjectList(void)
+{
+  return &themes;
 }
 
 void AnimatedPuyoThemeManager::getThemeListInPath(const char *path, SelfVector<String> &resultVector) const

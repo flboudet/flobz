@@ -66,14 +66,14 @@ LevelThemeSelectionBox::~LevelThemeSelectionBox()
 
 void LevelThemeSelectionBox::build()
 {
-    AdvancedBuffer<const char *> * themes = 
-        getPuyoThemeManger()->getPuyoLevelThemeList();
+    AdvancedBuffer<const char *> * themes = getPuyoThemeManger()->getPuyoLevelThemeList();
+    AdvancedBuffer<PuyoLevelTheme *> * themesObjects = getPuyoThemeManger()->getPuyoLevelThemeObjectList();
     String pref = getPuyoThemeManger()->getPreferedPuyoLevelThemeName();
     int size = themes->size();
     for (int i = 0; i < size; i++)
     {
         Action * a = new LevelThemeSelectedAction(themePreview, (*themes)[i]);
-        Button * b = new Button((*themes)[i], a);
+        Button * b = new Button((*themesObjects)[i]->getLocalizedName(), a);
         buttonList.add(b);
         actionList.add(a);
         add(b);
@@ -222,7 +222,7 @@ void LevelThemePreview::themeSelected(String themeName)
 {
 #define _ComputeVZoneSize(A,B) Vec3(A.x>B.x?A.x:B.x,A.y+B.y+GameUIDefaults::SPACING,1.0)
     PuyoLevelTheme * curTheme = getPuyoThemeManger()->getPuyoLevelTheme(themeName);
-    if (curTheme->getAuthor() == "iOS-Software") name.setValue(themeName);
+    if (curTheme->getAuthor() == "iOS-Software") name.setValue(curTheme->getLocalizedName());
     else name.setValue(themeName+" ("+curTheme->getAuthor()+")");
     //author.setValue(curTheme->getAuthor());
     description.setValue(curTheme->getComments());
@@ -236,8 +236,8 @@ void LevelThemePreview::themeSelected(String themeName)
 /*****************************************************************************/
 
 LevelThemeMenu::LevelThemeMenu(PuyoMainScreen *mainScreen)
-    : PuyoMainScreenMenu(mainScreen), popAction(mainScreen),
-      backButton(theCommander->getLocalizedString("Back"), &popAction), themeMenuTitle(theCommander->getLocalizedString("Level theme")),
+    : PuyoMainScreenMenu(mainScreen), themeMenuTitle(theCommander->getLocalizedString("Level theme")), popAction(mainScreen),
+      backButton(theCommander->getLocalizedString("Back"), &popAction), 
       themePreview(), themeList(themePreview)
 {
 }
