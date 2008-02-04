@@ -16,22 +16,22 @@ enum {
     kGameAlive   = 8
 };
 
-static const char *TYPE          = "TYPE";
-static const char *GAMEID        = "ID";
-static const char *NAME          = "NAME";
-static const char *PUYOS         = "PUYOS";
-static const char *PAUSED        = "PAUSED";
-static const char *SCORE         = "SCORE";
-static const char *NEXT_F        = "NEXT_F";
-static const char *NEXT_C        = "NEXT_C";
-static const char *ADD_NEUTRALS  = "ADD_NEUTRALS";
-static const char *DID_END_CYCLE = "DID_END_CYCLE";
-static const char *SEMI_MOVE     = "SEMI_MOVE";
-static const char *COMPANION_TURN = "COMPANION_TURN";
-static const char *DID_FALL       = "DID_FALL";
-static const char *WILL_VANISH    = "WILL_VANISH";
-static const char *CURRENT_NEUTRALS = "CURRENT_NEUTRALS";
-static const char *NUMBER_BAD_PUYOS = "NUMBER_BAD_PUYOS";
+  extern const char *TYPE;
+  extern const char *GAMEID;
+  extern const char *NAME;
+  extern const char *PUYOS;
+  extern const char *PAUSED;
+  extern const char *SCORE;
+  extern const char *NEXT_F;
+  extern const char *NEXT_C;
+  extern const char *ADD_NEUTRALS;
+  extern const char *DID_END_CYCLE;
+  extern const char *SEMI_MOVE;
+  extern const char *COMPANION_TURN;
+  extern const char *DID_FALL;
+  extern const char *WILL_VANISH;
+  extern const char *CURRENT_NEUTRALS;
+  extern const char *NUMBER_BAD_PUYOS;
 
 };
 
