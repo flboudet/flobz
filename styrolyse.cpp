@@ -64,12 +64,12 @@ void put_text(GoomSL *gsl, GoomHash *global, GoomHash *local)
   int         y    = (int)GSL_LOCAL_FLOAT(gsl, local, "pos.y");
   const char *text = (const char *)GSL_LOCAL_PTR  (gsl, local, "text");
   int         i    = (int)GSL_LOCAL_FLOAT(gsl, local, "text_index");
-  if (i>sizeof(txt)-1) i=sizeof(txt)-1;
+  if (((size_t)i)>sizeof(txt)-1) i=sizeof(txt)-1;
   int m = 0, n = 0;
   while (true)
   {
     // if end of src or dst string, break
-    if ( (text[m] == 0) || (m >= sizeof(txt) - 1) ) break;
+    if ( (text[m] == 0) || ((size_t)m >= sizeof(txt) - 1) ) break;
     
     // test for new character
     if ((text[m] & 0xC0) != 0x80) n++;
@@ -95,12 +95,10 @@ typedef struct _Vec2 {
 Vec2 global_sprite_get_position(GoomSL *gsl, const char *name)
 {
   Vec2 v;
-  if (strcmp(name, "none") == 0)
-  {
-    v.x = 0;
-    v.y = 0;
-    return v;
-  }
+  v.x = 0.0;
+  v.y = 0.0;
+  
+  if (strcmp(name, "none") == 0) return v;
 
   char *vx_s = (char*)malloc(strlen(name)+7);
   char *vy_s = (char*)malloc(strlen(name)+7);

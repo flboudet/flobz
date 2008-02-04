@@ -49,7 +49,7 @@ int SplitString(const string& input,
         return 1;
     }
 
-    for (int i=0; i <= (int)positions.size(); ++i) {
+    for (unsigned int i=0; i <= positions.size(); ++i) {
         string s("");
         if (i == 0) 
             s = input.substr(0, positions[0]);
@@ -145,6 +145,7 @@ static void SoFont_Precompute_FX(SoFont *font)
                     l *= l;
 
                     HSVA hsva;
+                    hsva.alpha = 0.0;
                     if (font->fx == SoFont_STD) {
                         hsva.hue = 55.0 - 20.0 * cx;
                         hsva.saturation = 1.25 - l;
@@ -328,7 +329,11 @@ int SoFont_load_ttf (SoFont * font, const char *fileName, int size, int fx)
     font->fx = fx;
     font->font = TTF_OpenFont(fileName, size);
     font->height = size;
-    SoFont_Precompute_FX(font);
+
+    if (font->font == NULL) return 0;
+    else SoFont_Precompute_FX(font);
+  
+    return 1;
 }
 
 void SoFont_CacheCheck(SoFont *font)

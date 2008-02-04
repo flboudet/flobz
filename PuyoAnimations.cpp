@@ -80,11 +80,12 @@ void NeutralAnimation::cycle()
         step += 0.5;
         if (currentY >= Y) {
             int choosenSound = random() % 2;
+            // TODO jeko
             /*EventFX("neutral_bouncing", 
                 attachedPuyo.getScreenCoordinateX() + TSIZE/2,
                 attachedPuyo.getScreenCoordinateY() + TSIZE/2,
-                attachedPuyo.getAttachedView()->getPlayerId());
-            AudioManager::playSound(sound_bim[choosenSound], sound_bim_volume[choosenSound]);*/
+                attachedPuyo.getAttachedView()->getPlayerId());*/
+            AudioManager::playSound(sound_bim[choosenSound], sound_bim_volume[choosenSound]);
             finishedFlag = true;
             attachedPuyo.getAttachedView()->allowCycle();
             synchronizer->pop();
@@ -185,7 +186,8 @@ void TurningAnimation::draw(int semiMove)
             ax = (short)(X + offsetA - TSIZE);
             ay = (short)(Y + offsetB);
             break;
-            
+        
+        default:
         case -3:
             ax = (short)(X + offsetB);
             ay = (short)(Y + offsetA - TSIZE);
@@ -428,7 +430,7 @@ void NeutralPopAnimation::cycle()
 void NeutralPopAnimation::draw(int semiMove)
 {
     SDL_Painter &painter = attachedPuyo.getAttachedView()->getPainter();
-    SDL_Rect drect, xrect;
+    SDL_Rect drect;
     drect.x = X;
     drect.y = Y;
     drect.w = neutralPop[0]->w;
