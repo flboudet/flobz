@@ -175,7 +175,10 @@ int main(int argc, char *argv[])
     Text bidonText("Hello");
     ShowModalDialogAction showDialogAction(scr.getRootContainer());
     
-    Frame frame(IIM_Load_Absolute_DisplayFormatAlpha("data/base.000/gfx/frame.png"));
+    FramePicture fpict(IIM_Load_Absolute_DisplayFormatAlpha("data/base.000/gfx/frame.png"),
+                       25, 28, 25, 19, 26, 23);
+
+    Frame frame(fpict);
     //frame.setPreferedSize(Vec3(100, 100));
     Button bidonButton1("Hi", &showDialogAction);
     Button bidonButton2("Ho");

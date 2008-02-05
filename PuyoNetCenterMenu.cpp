@@ -192,7 +192,7 @@ NetCenterMenu::NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netC
       frame(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/frame.png"))),
       upArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png"))),
       downArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png"))),
-      menu(frame), playerbox(frame),
+      menu(FramePicture(frame, 25, 28, 25, 19, 26, 23)), playerbox(FramePicture(frame, 25, 28, 25, 19, 26, 23)),
       chatAreaText(theCommander->getLocalizedString("Chat Area")),
       cycled(this), playerList(5, this, upArrow, downArrow),
       onScreenDialog(NULL), shouldSelfDestroy(false),

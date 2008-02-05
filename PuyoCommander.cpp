@@ -163,7 +163,8 @@ void PuyoMainScreen::setMenuDimensions()
 }
 
 PuyoMainScreenMenu::PuyoMainScreenMenu(PuyoMainScreen *mainScreen, GameLoop *loop)
-  : Frame(mainScreen->getFrameImage(), loop), mainScreen(mainScreen)
+  : Frame(FramePicture(mainScreen->getFrameImage(), 25, 28, 25, 19, 26, 23), loop),
+    mainScreen(mainScreen)
 {
     setPolicy(USE_MAX_SIZE);
 }
