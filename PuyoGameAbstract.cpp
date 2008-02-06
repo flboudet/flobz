@@ -18,22 +18,25 @@ PlayerGameStatDisplay::PlayerGameStatDisplay(const ios_fc::String &player_name, 
     display_stats = 0;
 }
 
+PlayerGameStatDisplay::~PlayerGameStatDisplay()
+{
+}
+
 void PlayerGameStatDisplay::draw() const
 {
     char txt[4096];
     sprintf(txt, "%d", stat.points);
     // if (player == 0) {
     SDL_Surface *surface = gameui::GameUIDefaults::GAME_LOOP->getSurface();
-    SoFont_CenteredString_XY(theCommander->menuFont,
-            surface, 310 + player * 20, 360 + player * 25, txt, NULL);
+    SoFont_CenteredString_XY(theCommander->funnyFont, surface, 300 + player * 40, 360 - player * 40, txt, NULL);
     // }
 
     if (display_stats) {
         double t = ios_fc::getTimeMs() - display_stats_start;
         int combo[24];
         double date[24];
-        int txt_len = 14;
-        sprintf(txt, "-- Combos --\n\n");
+        int txt_len = 13;
+        sprintf(txt, "-- Combos --\n");
 
         for (int i=0; i<10; ++i)
             combo[i] = stat.combo_count[i] - stat.combo_count[i+1];
@@ -41,8 +44,8 @@ void PlayerGameStatDisplay::draw() const
         date[0] = 0.0;
         for (int i=1; i<10; ++i) {
             date[i] = date[i-1]
-                + (double)i * 150.0 * (double)combo[i-1]
-                + 200.0;
+                + 100.0 * (double)combo[i-1]
+                + 250.0;
         }
 
         for (int i=0; i<9; ++i) {
@@ -54,20 +57,20 @@ void PlayerGameStatDisplay::draw() const
                 }
                 if (combo[i] > 0) {
                     sprintf(&txt[txt_len],
-                            "%1dx: %3d   ", i+1, n);
-                    txt_len += 10;
+                            "%1dx: %d ", i+1, n);
+                    txt_len += 6;
+                    if (n >= 10) txt_len += 1;
                     for (int j=0; j<n; ++j) {
-                        txt[txt_len++] = '|';
+                        txt[txt_len++] = '%';
                     }
                 }
                 txt[txt_len++] = '\n';
-                txt[txt_len++] = '\n';
+                // txt[txt_len++] = '\n';
                 txt[txt_len] = '\0';
             }
         }
 
-        SoFont_PutString(theCommander->menuFont, surface,
-                50 + player * 420, 80, txt, NULL);
+        SoFont_PutString(theCommander->funnyFont, surface, 20 + player * 410, 40, txt, NULL);
     }
 }
 

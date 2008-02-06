@@ -90,6 +90,7 @@ class PuyoCommander : public MessageListener
     SoFont *smallFontInfo;
     SoFont *darkFont;
     SoFont *menuFont;
+    SoFont *funnyFont;
 
     bool getMusic();
     void setMusic(bool music);

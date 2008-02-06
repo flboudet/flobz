@@ -61,4 +61,4 @@
 
   @puyoDisplay.x -= 10.0 * @delta_cycle
   @puyoDisplay.y = 400.0 - ([fabs: x=([sin: value = (@fcycle/10.0)] * 200.0)] / ((@fcycle + 50.0) * 0.01))
-  (@puyoDisplay.x < -500.0)? @finished = 1
+  // (@puyoDisplay.x < -500.0)? @finished = 1

@@ -371,10 +371,11 @@ void PuyoCommander::initFonts()
   smallFont = SoFont_new();
   smallFontInfo = SoFont_new();
   SoFont *textFont = SoFont_new();
+  funnyFont = SoFont_new();
 
 #ifdef ENABLE_TTF
   Locales_Init(); // Make sure locales are detected.
-  String font;
+  String font, funny_path;
   try {
     font = dataPathManager.getPath(locale->getLocalizedString("__FONT__"));
 #ifdef DEBUG
@@ -385,6 +386,7 @@ void PuyoCommander::initFonts()
     font = dataPathManager.getPath("gfx/font.ttf");
     fprintf(stderr,"Using default font %s.\n", (const char *)font);
   }
+  funny_path = getDataPathManager().getPath("gfx/zill_spills.ttf");
 
   SoFont_load_ttf(darkFont, font, 17, SoFont_DARK);
   SoFont_load_ttf(menuFont, font, 17, SoFont_STD);
@@ -393,6 +395,7 @@ void PuyoCommander::initFonts()
   SoFont_load_ttf(textFont, font, 17, SoFont_GREY);
   storyFont = SoFont_new();
   SoFont_load_ttf(storyFont, font, 17, SoFont_STORY);
+  SoFont_load_ttf(funnyFont, funny_path, 24, SoFont_STD);
 #else
   smallFontInfo = SoFont_new();
   IIM_Surface *font3b = IIM_Load_Absolute_DisplayFormatAlpha (dataPathManager.getPath("gfx/font3b.png"));
