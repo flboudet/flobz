@@ -17,8 +17,10 @@ FramePicture::FramePicture(IIM_Surface *frameSurface, int leftW, int middleW, in
 {
 }
 
-void FramePicture::render(SDL_Surface *surf, Vec3 bsize)
+void FramePicture::render(SDL_Surface *surf)
 {
+    int surfW = surf->w;
+    int surfH = surf->h;
     SDL_SetAlpha(m_frameSurface->surf, 0, SDL_ALPHA_OPAQUE);
     // Draw the corners first
     // Top left corner
@@ -27,50 +29,50 @@ void FramePicture::render(SDL_Surface *surf, Vec3 bsize)
     IIM_BlitSurface(m_frameSurface, &src_rect, surf, &dst_rect);
     // Top right corner
     src_rect.x = m_leftW + m_middleW; src_rect.y = 0; src_rect.w = m_rightW; src_rect.h = m_topH;
-    dst_rect.x = bsize.x - m_rightW; dst_rect.y = 0; dst_rect.w = m_rightW; dst_rect.h = m_topH;
+    dst_rect.x = surfW - m_rightW; dst_rect.y = 0; dst_rect.w = m_rightW; dst_rect.h = m_topH;
     IIM_BlitSurface(m_frameSurface, &src_rect, surf, &dst_rect);
     // Bottom left corner
     src_rect.x = 0; src_rect.y = m_topH + m_middleH; src_rect.w = m_leftW; src_rect.h = m_bottomH;
-    dst_rect.x = 0; dst_rect.y = bsize.y - m_bottomH; dst_rect.w = m_leftW; dst_rect.h = m_bottomH;
+    dst_rect.x = 0; dst_rect.y = surfH - m_bottomH; dst_rect.w = m_leftW; dst_rect.h = m_bottomH;
     IIM_BlitSurface(m_frameSurface, &src_rect, surf, &dst_rect);
     // Bottom right corner
     src_rect.x = m_leftW + m_middleW; src_rect.y = m_topH + m_middleH; src_rect.w = m_rightW; src_rect.h = m_bottomH;
-    dst_rect.x = bsize.x - m_rightW; dst_rect.y = bsize.y - m_bottomH; dst_rect.w = m_rightW; dst_rect.h = m_bottomH;
+    dst_rect.x = surfW - m_rightW; dst_rect.y = surfH - m_bottomH; dst_rect.w = m_rightW; dst_rect.h = m_bottomH;
     IIM_BlitSurface(m_frameSurface, &src_rect, surf, &dst_rect);
     // Top edge
     src_rect.x = m_leftW; src_rect.y = 0; src_rect.w = m_middleW; src_rect.h = m_topH;
     dst_rect.y = 0; dst_rect.w = m_middleW; dst_rect.h = m_topH;
-    for (dst_rect.x = m_leftW ; dst_rect.x < bsize.x - m_rightW ; dst_rect.x += m_middleW) {
-        if (dst_rect.x + m_middleW > bsize.x - m_rightW)
-            dst_rect.w = src_rect.w = bsize.x - m_rightW - dst_rect.x;
+    for (dst_rect.x = m_leftW ; dst_rect.x < surfW - m_rightW ; dst_rect.x += m_middleW) {
+        if (dst_rect.x + m_middleW > surfW - m_rightW)
+            dst_rect.w = src_rect.w = surfW - m_rightW - dst_rect.x;
         IIM_BlitSurface(m_frameSurface, &src_rect, surf, &dst_rect);
     }
     // Bottom edge
     src_rect.x = m_leftW; src_rect.y = m_topH + m_middleH; src_rect.w = m_middleW; src_rect.h = m_bottomH;
-    dst_rect.y = bsize.y - m_bottomH; dst_rect.w = m_middleW; dst_rect.h = m_bottomH;
-    for (dst_rect.x = m_leftW ; dst_rect.x < bsize.x - m_rightW ; dst_rect.x += m_middleW) {
-        if (dst_rect.x + m_middleW > bsize.x - m_rightW)
-            dst_rect.w = src_rect.w = bsize.x - m_rightW - dst_rect.x;
+    dst_rect.y = surfH - m_bottomH; dst_rect.w = m_middleW; dst_rect.h = m_bottomH;
+    for (dst_rect.x = m_leftW ; dst_rect.x < surfW - m_rightW ; dst_rect.x += m_middleW) {
+        if (dst_rect.x + m_middleW > surfW - m_rightW)
+            dst_rect.w = src_rect.w = surfW - m_rightW - dst_rect.x;
         IIM_BlitSurface(m_frameSurface, &src_rect, surf, &dst_rect);
     }
     // Left edge
     src_rect.x = 0; src_rect.y = m_topH; src_rect.w = m_leftW; src_rect.h = m_middleH;
     dst_rect.x = 0; dst_rect.w = m_leftW; dst_rect.h = m_middleH;
-    for (dst_rect.y = m_topH ; dst_rect.y < bsize.y - m_bottomH ; dst_rect.y += m_middleH) {
-        if (dst_rect.y + m_middleH > bsize.y - m_bottomH)
-            dst_rect.h = src_rect.h = bsize.y - m_bottomH - dst_rect.y;
+    for (dst_rect.y = m_topH ; dst_rect.y < surfH - m_bottomH ; dst_rect.y += m_middleH) {
+        if (dst_rect.y + m_middleH > surfH - m_bottomH)
+            dst_rect.h = src_rect.h = surfH - m_bottomH - dst_rect.y;
         IIM_BlitSurface(m_frameSurface, &src_rect, surf, &dst_rect);
     }
     // Right edge
     src_rect.x = m_leftW + m_middleW; src_rect.y = m_topH; src_rect.w = m_rightW; src_rect.h = m_middleH;
-    dst_rect.x = bsize.x - m_rightW; dst_rect.w = m_rightW; dst_rect.h = m_middleH;
-    for (dst_rect.y = m_topH ; dst_rect.y < bsize.y - m_bottomH ; dst_rect.y += m_middleH) {
-        if (dst_rect.y + m_middleH > bsize.y - m_bottomH)
-            dst_rect.h = src_rect.h = bsize.y - m_bottomH - dst_rect.y;
+    dst_rect.x = surfW - m_rightW; dst_rect.w = m_rightW; dst_rect.h = m_middleH;
+    for (dst_rect.y = m_topH ; dst_rect.y < surfH - m_bottomH ; dst_rect.y += m_middleH) {
+        if (dst_rect.y + m_middleH > surfH - m_bottomH)
+            dst_rect.h = src_rect.h = surfH - m_bottomH - dst_rect.y;
         IIM_BlitSurface(m_frameSurface, &src_rect, surf, &dst_rect);
     }
     // Content rect
-    src_rect.x = m_leftW; src_rect.y = m_topH; src_rect.w = bsize.x - m_leftW - m_rightW; src_rect.h = bsize.y - m_topH - m_bottomH;
+    src_rect.x = m_leftW; src_rect.y = m_topH; src_rect.w = surfW - m_leftW - m_rightW; src_rect.h = surfH - m_topH - m_bottomH;
     SDL_FillRect(surf, &src_rect, (surf->format->Rmask & 0x00000000) |
                  (surf->format->Gmask & 0x00000000) |
                  (surf->format->Bmask & 0x00000000) |
@@ -121,12 +123,21 @@ void Frame::draw(SDL_Surface *screen)
 #endif
         m_bgSurface = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, bsize.x, bsize.y, 32, 
                                       rmask, gmask, bmask, amask);
-        m_frameSurface.render(m_bgSurface, bsize);
+        m_frameSurface.render(m_bgSurface);
     }
     // Drawing the background
     if (m_borderVisible)
         SDL_BlitSurface(m_bgSurface, &srcrect, screen, &dstrect);
     VBox::draw(screen);
+}
+
+void Frame::add (Widget *child)
+{
+  Vec3 childSize = child->getPreferedSize();
+  if (! childSize.is_zero())
+    childSize += 18;
+  setPreferedSize(childSize);
+  VBox::add(child);
 }
 
 }

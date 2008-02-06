@@ -18,7 +18,7 @@ class FramePicture {
 public:
     FramePicture(IIM_Surface *frameSurface, int leftW, int middleW, int rightW, int topH, int middleH, int bottomH);
     virtual ~FramePicture() {}
-    void render(SDL_Surface *surf, Vec3 bsize);
+    void render(SDL_Surface *surf);
 private:
     IIM_Surface *m_frameSurface;
     int m_leftW, m_middleW, m_rightW;
@@ -30,6 +30,7 @@ public:
     Frame(FramePicture frameSurface, GameLoop *loop = NULL);
     virtual ~Frame();
     virtual void draw(SDL_Surface *screen);
+    virtual void add (Widget *child);
     void setBorderVisible(bool borderVisible) { m_borderVisible = borderVisible; }
     bool getBorderVisible() const { return m_borderVisible; }
 private:

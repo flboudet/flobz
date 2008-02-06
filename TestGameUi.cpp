@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <string.h>
-#include <CoreFoundation/CoreFoundation.h>
 #include <SDL.h>
 #include <SDL_main.h>
 #include <vector>
@@ -177,8 +176,11 @@ int main(int argc, char *argv[])
     
     FramePicture fpict(IIM_Load_Absolute_DisplayFormatAlpha("data/base.000/gfx/frame.png"),
                        25, 28, 25, 19, 26, 23);
+    FramePicture fpict2(IIM_Load_Absolute_DisplayFormatAlpha(
+		       "data/base.000/gfx/button.png"),
+			12, 12, 12, 7, 16, 7);
 
-    Frame frame(fpict);
+    Frame frame(fpict), frame2(fpict2);
     //frame.setPreferedSize(Vec3(100, 100));
     Button bidonButton1("Hi", &showDialogAction);
     Button bidonButton2("Ho");
@@ -190,7 +192,8 @@ int main(int argc, char *argv[])
     ListView list(20, upArrow, downArrow);
     bidonBox.add(&bidonText);
     bidonBox.add(&bidonButton1);
-    bidonBox.add(&bidonButton2);
+    frame2.add(&bidonButton2);
+    bidonBox.add(&frame2);
     bidonBox.add(&bidonField);
     bidonBox.add(&frame);
     for (int i = 0 ; i < 100 ; i++) {
