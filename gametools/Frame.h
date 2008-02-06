@@ -17,8 +17,10 @@ namespace gameui {
 class FramePicture {
 public:
     FramePicture(IIM_Surface *frameSurface, int leftW, int middleW, int rightW, int topH, int middleH, int bottomH);
+    FramePicture(int leftW, int middleW, int rightW, int topH, int middleH, int bottomH);
     virtual ~FramePicture() {}
-    void render(SDL_Surface *surf);
+    void setFrameSurface(IIM_Surface *frameSurface) { m_frameSurface = frameSurface; }
+    void render(SDL_Surface *surf) const;
 private:
     IIM_Surface *m_frameSurface;
     int m_leftW, m_middleW, m_rightW;
@@ -27,14 +29,14 @@ private:
 
 class Frame : public VBox {
 public:
-    Frame(FramePicture frameSurface, GameLoop *loop = NULL);
+    Frame(const FramePicture *frameSurface, GameLoop *loop = NULL);
     virtual ~Frame();
     virtual void draw(SDL_Surface *screen);
     virtual void add (Widget *child);
     void setBorderVisible(bool borderVisible) { m_borderVisible = borderVisible; }
     bool getBorderVisible() const { return m_borderVisible; }
 private:
-    FramePicture m_frameSurface;
+    const FramePicture *m_frameSurface;
     SDL_Surface *m_bgSurface;
     bool m_borderVisible;
 };

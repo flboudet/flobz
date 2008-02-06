@@ -30,7 +30,6 @@ class PuyoMainScreen : public PuyoScreen, public SliderContainerListener {
     void popMenu();
     void build() {}
     void transitionFromScreen(Screen &fromScreen);
-    IIM_Surface *getFrameImage() const { return m_frameImage; }
     void onEvent(GameControlEvent *cevent);
     // SliderContainerListener implementation
     /**
@@ -39,8 +38,6 @@ class PuyoMainScreen : public PuyoScreen, public SliderContainerListener {
     virtual void onSlideOutside(SliderContainer &slider);
   protected:
     void setMenuDimensions();
-    IIM_Surface   *m_frameImage;
-    IIM_Surface   *menuBG;
     SliderContainer container;
     PuyoStoryWidget *fgStory, *bgStory;
     Stack<Widget*> menuStack;
@@ -107,6 +104,11 @@ class PuyoCommander : public MessageListener
     void initDisplay(int w, int h, bool fullscreen, bool useGL);
     const PuyoDataPathManager &getDataPathManager() { return dataPathManager; }
     const char * getLocalizedString(const char * originalString) const;
+
+    const FramePicture *getWindowFramePicture() const { return &m_windowFramePicture; }
+    const FramePicture *getButtonFramePicture() const { return &m_buttonIdleFramePicture; }
+    const FramePicture *getButtonDownFramePicture() const { return &m_buttonDownFramePicture; }
+    const FramePicture *getButtonOverFramePicture() const { return &m_buttonOverFramePicture; }
   private:
 
     friend class SinglePlayerGameAction;
@@ -132,6 +134,9 @@ class PuyoCommander : public MessageListener
 
     bool fullscreen;
     bool useGL;
+    IIM_Surface   *m_frameImage, *m_buttonIdleImage;
+    FramePicture m_windowFramePicture;
+    FramePicture m_buttonIdleFramePicture, m_buttonDownFramePicture, m_buttonOverFramePicture;
 };
 
 extern class PuyoCommander *theCommander;

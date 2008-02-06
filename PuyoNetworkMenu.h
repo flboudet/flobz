@@ -85,7 +85,7 @@ public:
     virtual void idle(double currentTime);
     virtual IdleComponent *getIdleComponent() { return this; }
 private:
-    IIM_Surface *frame, *upArrow, *downArrow;
+    IIM_Surface *upArrow, *downArrow;
     PuyoHttpServerList servers;
     Frame serverSelectionPanel;
     ListView serverListPanel;

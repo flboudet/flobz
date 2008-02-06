@@ -61,9 +61,7 @@ void PuyoPopMenuAction::action()
 PuyoScreen::PuyoScreen() : Screen(0,0,WIDTH,HEIGHT) {}
 
 PuyoMainScreen::PuyoMainScreen(PuyoStoryWidget *fgStory, PuyoStoryWidget *bgStory)
-    : m_frameImage(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/frame.png"))),
-      menuBG(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/menubg.png"))),
-      fgStory(fgStory), bgStory(bgStory), transition(NULL), nextFullScreen(false)
+    : fgStory(fgStory), bgStory(bgStory), transition(NULL), nextFullScreen(false)
 {
     if (bgStory != NULL)
         add(bgStory);
@@ -73,7 +71,6 @@ PuyoMainScreen::PuyoMainScreen(PuyoStoryWidget *fgStory, PuyoStoryWidget *bgStor
 	}
         
     setMenuDimensions();
-    //container.setBackground(menuBG);
     container.addListener(*this);
 }
 
@@ -81,9 +78,6 @@ PuyoMainScreen::~PuyoMainScreen()
 {
     if (transition != NULL) {
         delete(transition);
-    }
-    if (menuBG != NULL) {
-        IIM_Free(menuBG);
     }
 }
 
@@ -155,7 +149,7 @@ void PuyoMainScreen::setMenuDimensions()
         menuPos.y = MENU_Y;
         menuPos.x = MENU_X;
         container.setPosition(menuPos);
-        container.setSize(Vec3(menuBG->w, menuBG->h, 0));
+        container.setSize(Vec3(400, 250, 0)); // TODO: mettre dimensions dans GSL
         container.setBackgroundVisible(true);
         if (fgStory != NULL)
             fgStory->setIntegerValue("@inNetGameCenter", 0);
@@ -163,7 +157,7 @@ void PuyoMainScreen::setMenuDimensions()
 }
 
 PuyoMainScreenMenu::PuyoMainScreenMenu(PuyoMainScreen *mainScreen, GameLoop *loop)
-  : Frame(FramePicture(mainScreen->getFrameImage(), 25, 28, 25, 19, 26, 23), loop),
+  : Frame(theCommander->getWindowFramePicture(), loop),
     mainScreen(mainScreen)
 {
     setPolicy(USE_MAX_SIZE);
@@ -275,7 +269,12 @@ void PuyoCommander::initMenus()
 
 /* Build the PuyoCommander */
 
-PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber) : dataPathManager(dataDir)
+PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
+  : dataPathManager(dataDir),
+    m_windowFramePicture(25, 28, 25, 19, 26, 23),
+    m_buttonIdleFramePicture(12, 12, 12, 7, 16, 7),
+    m_buttonDownFramePicture(12, 12, 12, 7, 16, 7),
+    m_buttonOverFramePicture(12, 12, 12, 7, 16, 7)
 {
   //SDL_Delay(500);
   loop = GameUIDefaults::GAME_LOOP;
@@ -296,6 +295,11 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber) : d
   cursor = new GameCursor(dataPathManager.getPath("gfx/cursor.png"));
   loop->addDrawable(cursor);
   loop->addIdle(cursor);
+  // Loading the frame images, and setting up the frames
+  m_frameImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/frame.png"));
+  m_buttonIdleImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/button.png"));
+  m_windowFramePicture.setFrameSurface(m_frameImage);
+  m_buttonIdleFramePicture.setFrameSurface(m_buttonIdleImage);
 }
 
 

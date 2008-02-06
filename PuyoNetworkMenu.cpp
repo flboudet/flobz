@@ -311,14 +311,13 @@ void NetworkGameMenu::build() {
 
 InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)
   : PuyoMainScreenMenu(mainScreen),
-    frame(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/frame.png"))),
     upArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png"))),
     downArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png"))),
-    serverSelectionPanel(FramePicture(frame, 25, 28, 25, 19, 26, 23)),
+    serverSelectionPanel(theCommander->getWindowFramePicture()),
     servers(),
     container(),
     serverListPanel(20, upArrow, downArrow),
-    serverListText("Server List"), rightPanel(FramePicture(frame, 25, 28, 25, 19, 26, 23)), updating("Update"),
+    serverListText("Server List"), rightPanel(theCommander->getWindowFramePicture()), updating("Update"),
     separator1_1(1,1), separator1_2(1,1), separator1_3(1, 1), separator10_1(10,10), separator10_2(10,10),
     internetGameText("Internet Game"), nicknameText("Nickname"), serverText("Server"), portText("Port"),
     playerName(PuyoGame::getPlayerName(-2), PuyoGame::getDefaultPlayerKey(-2)),
@@ -332,7 +331,6 @@ InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)
 
 InternetGameMenu::~InternetGameMenu()
 {
-    IIM_Free(frame);
     IIM_Free(upArrow);
     IIM_Free(downArrow);
 }

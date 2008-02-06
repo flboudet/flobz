@@ -17,7 +17,13 @@ FramePicture::FramePicture(IIM_Surface *frameSurface, int leftW, int middleW, in
 {
 }
 
-void FramePicture::render(SDL_Surface *surf)
+FramePicture::FramePicture(int leftW, int middleW, int rightW, int topH, int middleH, int bottomH)
+    : m_leftW(leftW), m_middleW(middleW), m_rightW(rightW),
+      m_topH(topH), m_middleH(middleH), m_bottomH(bottomH)
+{
+}
+
+void FramePicture::render(SDL_Surface *surf) const
 {
     int surfW = surf->w;
     int surfH = surf->h;
@@ -79,7 +85,7 @@ void FramePicture::render(SDL_Surface *surf)
                  (surf->format->Amask & 0x80808080));
 }
 
-Frame::Frame(FramePicture frameSurface, GameLoop *loop)
+Frame::Frame(const FramePicture *frameSurface, GameLoop *loop)
   : VBox(loop), m_frameSurface(frameSurface), m_bgSurface(NULL), m_borderVisible(true)
 {
     setPolicy(USE_MIN_SIZE);
@@ -95,13 +101,13 @@ void Frame::draw(SDL_Surface *screen)
     SDL_Rect srcrect, dstrect;
     srcrect.x = 0;
     srcrect.y = 0;
-    srcrect.h = bsize.y;
-    srcrect.w = bsize.x;
+    srcrect.h = (int)(bsize.y);
+    srcrect.w = (int)(bsize.x);
     
-    dstrect.x = getPosition().x;
-    dstrect.y = getPosition().y;
-    dstrect.h = bsize.y;
-    dstrect.w = bsize.x;
+    dstrect.x = (int)(getPosition().x);
+    dstrect.y = (int)(getPosition().y);
+    dstrect.h = (int)(bsize.y);
+    dstrect.w = (int)(bsize.x);
     
     // If the background of the frame has not been created or has changed size, recreate it
     if ((m_bgSurface == NULL) || (bsize.x != m_bgSurface->w) || (bsize.y != m_bgSurface->h)) {
@@ -121,9 +127,9 @@ void Frame::draw(SDL_Surface *screen)
         bmask = 0x00ff0000;
         amask = 0xff000000;
 #endif
-        m_bgSurface = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, bsize.x, bsize.y, 32, 
+        m_bgSurface = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, (int)(bsize.x), (int)(bsize.y), 32, 
                                       rmask, gmask, bmask, amask);
-        m_frameSurface.render(m_bgSurface);
+        m_frameSurface->render(m_bgSurface);
     }
     // Drawing the background
     if (m_borderVisible)
@@ -133,10 +139,12 @@ void Frame::draw(SDL_Surface *screen)
 
 void Frame::add (Widget *child)
 {
+#ifdef DISABLED
   Vec3 childSize = child->getPreferedSize();
   if (! childSize.is_zero())
     childSize += 18;
   setPreferedSize(childSize);
+#endif
   VBox::add(child);
 }
 
