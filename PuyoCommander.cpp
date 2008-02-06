@@ -299,7 +299,9 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
   m_frameImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/frame.png"));
   m_buttonIdleImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/button.png"));
   m_windowFramePicture.setFrameSurface(m_frameImage);
+  m_windowFramePicture.setContentColor(_RGBA(0x00, 0x00, 0x00, 0x80));
   m_buttonIdleFramePicture.setFrameSurface(m_buttonIdleImage);
+  m_buttonIdleFramePicture.setContentColor(_RGBA(0xA5, 0xA5, 0xA5, 0xFF));
 }
 
 

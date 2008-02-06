@@ -178,9 +178,15 @@ int main(int argc, char *argv[])
                        25, 28, 25, 19, 26, 23);
     FramePicture fpict2(IIM_Load_Absolute_DisplayFormatAlpha(
 		       "data/base.000/gfx/button.png"),
-			12, 12, 12, 7, 16, 7);
+			12, 12, 12, 12, 8, 12);
+    FramePicture fpict3(IIM_Load_Absolute_DisplayFormatAlpha(
+		       "data/base.000/gfx/buttondown.png"),
+			12, 12, 12, 12, 8, 12);
+    fpict.setContentColor(_RGBA(0x00, 0x00, 0x00, 0x80));
+    fpict2.setContentColor(_RGBA(0xA5, 0xA5, 0xA5, 0xFF));
+    fpict3.setContentColor(_RGBA(0xA5, 0xA5, 0xA5, 0xFF));
 
-    Frame frame(&fpict), frame2(&fpict2);
+    Frame frame(&fpict), frame2(&fpict3);
     //frame.setPreferedSize(Vec3(100, 100));
     Button bidonButton1("Hi", &showDialogAction);
     Button bidonButton2("Ho");

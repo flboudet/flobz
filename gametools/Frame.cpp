@@ -79,10 +79,23 @@ void FramePicture::render(SDL_Surface *surf) const
     }
     // Content rect
     src_rect.x = m_leftW; src_rect.y = m_topH; src_rect.w = surfW - m_leftW - m_rightW; src_rect.h = surfH - m_topH - m_bottomH;
-    SDL_FillRect(surf, &src_rect, (surf->format->Rmask & 0x00000000) |
-                 (surf->format->Gmask & 0x00000000) |
-                 (surf->format->Bmask & 0x00000000) |
-                 (surf->format->Amask & 0x80808080));
+    SDL_FillRect(surf, &src_rect,
+		 (surf->format->Rmask & ((m_contentColor.red)      |
+					 (m_contentColor.red<<8)   |
+					 (m_contentColor.red<<16)  |
+					 (m_contentColor.red<<24))) |
+                 (surf->format->Gmask & ((m_contentColor.green)    |
+					 (m_contentColor.green<<8) |
+					 (m_contentColor.green<<16)|
+					 (m_contentColor.green<<24)))|
+                 (surf->format->Bmask & ((m_contentColor.blue)    |
+					 (m_contentColor.blue<<8) |
+					 (m_contentColor.blue<<16)|
+					 (m_contentColor.blue<<24)))|
+                 (surf->format->Amask & ((m_contentColor.alpha)    |
+					 (m_contentColor.alpha<<8) |
+					 (m_contentColor.alpha<<16)|
+					 (m_contentColor.alpha<<24))));
 }
 
 Frame::Frame(const FramePicture *frameSurface, GameLoop *loop)

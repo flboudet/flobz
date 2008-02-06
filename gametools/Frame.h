@@ -20,11 +20,13 @@ public:
     FramePicture(int leftW, int middleW, int rightW, int topH, int middleH, int bottomH);
     virtual ~FramePicture() {}
     void setFrameSurface(IIM_Surface *frameSurface) { m_frameSurface = frameSurface; }
+    void setContentColor(RGBA contentColor) { m_contentColor = contentColor; }
     void render(SDL_Surface *surf) const;
 private:
     IIM_Surface *m_frameSurface;
     int m_leftW, m_middleW, m_rightW;
     int m_topH, m_middleH, m_bottomH;
+    RGBA m_contentColor;
 };
 
 class Frame : public VBox {
