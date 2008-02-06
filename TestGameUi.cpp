@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
 		       "data/base.000/gfx/button.png"),
 			12, 12, 12, 7, 16, 7);
 
-    Frame frame(fpict), frame2(fpict2);
+    Frame frame(&fpict), frame2(&fpict2);
     //frame.setPreferedSize(Vec3(100, 100));
     Button bidonButton1("Hi", &showDialogAction);
     Button bidonButton2("Ho");
