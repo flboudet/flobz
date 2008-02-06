@@ -139,9 +139,9 @@ PuyoLocalGame::PuyoLocalGame(PuyoRandomSystem *attachedRandom) : PuyoGame()
 
 void PuyoLocalGame::InitGame(PuyoRandomSystem *attachedRandom)
 {
-  gameLevel = 1;
-  nbFalled = 0;
-  phaseReady = 2;
+    gameLevel = 1;
+    nbFalled = 0;
+    phaseReady = 2;
     int i, j;
     unmoveablePuyo = attachedFactory->createPuyo(PUYO_UNMOVEABLE);
     for (i = 0 ; i < PUYODIMX ; i++) {
@@ -177,22 +177,6 @@ void PuyoLocalGame::cycle()
   if (!gameRunning)
     return;
 
-  // Increase points
-  switch (gameLevel)
-  {
-  case 1:
-      gameStat.points += 1;
-      break;
-  case 2:
-      gameStat.points += 5;
-      break;
-  case 3:
-      gameStat.points += 10;
-      break;
-  default:
-      gameStat.points += gameLevel * 5;
-  }
-
   semiMove = 1 - semiMove;
   if (semiMove == 0)
       return;
@@ -222,6 +206,21 @@ void PuyoLocalGame::cycle()
         if (phaseReady == 1) phaseReady = 2;
         fallingPuyo->setPuyoXY(fallingX, fallingY);
         companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
+        // Increase points
+        switch (gameLevel)
+        {
+            case 1:
+                gameStat.points += 1;
+                break;
+            case 2:
+                gameStat.points += 5;
+                break;
+            case 3:
+                gameStat.points += 10;
+                break;
+            default:
+                gameStat.points += gameLevel * 5;
+        }
     }
 }
 

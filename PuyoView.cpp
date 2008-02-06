@@ -102,8 +102,11 @@ bool PuyoView::isGameOver() const
 void PuyoView::cycleAnimation(void)
 {
     // Handle end of game
-    if (!gameRunning)
+    if (!gameRunning) {
         delayBeforeGameOver--;
+        if (delayBeforeGameOver < 0)
+            attachedStatDisplay->gameIsOver();
+    }
     
     // Cycling every puyo's animation
 	for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {

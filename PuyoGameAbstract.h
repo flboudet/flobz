@@ -23,11 +23,14 @@ class PlayerGameStatDisplay
     public:
         PlayerGameStatDisplay(const ios_fc::String &player_name, PlayerGameStat &stat, int player);
         void draw() const;
+        void gameIsOver();
 
     private:
         ios_fc::String player_name;
         PlayerGameStat &stat;
         int player;
+        double display_stats_start;
+        int display_stats;
 };
 
 
