@@ -91,7 +91,7 @@ class Cache
         T* add(const std::string &c, T* t)
         {
             T* ret = NULL;
-            if (nameVector.size() >= maxT)
+            if (nameVector.size() >= (unsigned int)maxT)
                 ret = removeOne();
             
             nameVector.push_back(c);
@@ -132,8 +132,6 @@ void AudioManager::init()
 {
 
 #ifdef USE_AUDIO
-    int i;
-
     audio_supported = (Mix_OpenAudio (MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 2048) == 0);
     if (!audio_supported) return;
 
@@ -144,7 +142,6 @@ void AudioManager::init()
 
     music_volume = ((float)GetIntPreference(kMusicVolume, 100))/100.0f;
     sound_volume = ((float)GetIntPreference(kSoundVolume, 100))/100.0f;
-
 #endif
 }
 

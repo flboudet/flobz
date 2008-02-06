@@ -6,14 +6,14 @@
 extern SoFont *storyFont;
 
 SDL_Surface *sstory;
-
+/*
 static SDL_Surface * createStorySurface()
 {
   SDL_Surface *sstory, *tmpsurf;
   Uint32 rmask, gmask, bmask, amask;
 
-  /* SDL interprets each pixel as a 32-bit number, so our masks must depend
-   *               on the endianness (byte order) of the machine */
+  // SDL interprets each pixel as a 32-bit number, so our masks must depend
+  // on the endianness (byte order) of the machine
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
   rmask = 0xff000000;
   gmask = 0x00ff0000;
@@ -36,7 +36,7 @@ static SDL_Surface * createStorySurface()
   SDL_FreeSurface(sstory);
   return tmpsurf;
 }
-
+*/
 /* Implementation of the Styrolyse Client */
 
 static char *pathResolverFunction (StyrolyseClient *_this, const char *path)
@@ -257,14 +257,14 @@ const char *PuyoStoryWidget::getText(const char *text) const
     return localeDictionary->getLocalizedString(text);
 }
 
-PuyoStoryScreen::PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction, bool shouldAddTransition) : Screen(0, 0, 640, 480), storyWidget(screenName, finishedAction), finishedAction(finishedAction), transitionWidget(new PuyoScreenTransitionWidget(previousScreen, NULL))
+PuyoStoryScreen::PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction, bool shouldAddTransition) : Screen(0, 0, 640, 480), storyWidget(screenName, finishedAction), transitionWidget(new PuyoScreenTransitionWidget(previousScreen, NULL)), finishedAction(finishedAction)
 {
     add(&storyWidget);
     if (shouldAddTransition)
         add(transitionWidget);
 }
 
-PuyoStoryScreen::PuyoStoryScreen(String screenName) : Screen(0, 0, 640, 480), storyWidget(screenName, NULL), finishedAction(NULL), transitionWidget(NULL)
+PuyoStoryScreen::PuyoStoryScreen(String screenName) : Screen(0, 0, 640, 480), storyWidget(screenName, NULL), transitionWidget(NULL), finishedAction(NULL)
 {
     add(&storyWidget);
 }
@@ -298,6 +298,8 @@ void PuyoStoryScreen::onEvent(GameControlEvent *cevent)
             finishedAction->action();
 	    passEvent = false;
         }
+        break;
+    default:
         break;
     }
     if (passEvent)
