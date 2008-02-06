@@ -63,7 +63,7 @@ vector<NetworkInterface> UnixNetworkInterfaceRequesterImpl::getInterfaces()
     
     ifreq *curIf = (ifreq *)(ifc.ifc_buf);
     int remaining = ifc.ifc_len;
-    struct in_addr *interface_addr;
+
     while (remaining) {
         struct sockaddr_in *addr = (struct sockaddr_in *)&(curIf->ifr_addr);
         if (addr->sin_family == AF_INET) {

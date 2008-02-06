@@ -31,7 +31,7 @@
 
 namespace ios_fc {
 
-IGPClient::IGPClient(MessageBox &mbox) : enabled(false), mbox(mbox), igpLastKeepAliveDate(0.), igpKeepAliveInterval(2000.)
+IGPClient::IGPClient(MessageBox &mbox) : mbox(mbox), enabled(false), igpLastKeepAliveDate(0.), igpKeepAliveInterval(2000.)
 {
     mbox.addListener(this);
     IGPDatagram::ClientMsgAutoAssignIDDatagram datagram(mbox.createMessage());
@@ -39,7 +39,7 @@ IGPClient::IGPClient(MessageBox &mbox) : enabled(false), mbox(mbox), igpLastKeep
     delete datagram.getMessage();
 }
 
-IGPClient::IGPClient(MessageBox &mbox, int igpIdent) : enabled(false), mbox(mbox), igpLastKeepAliveDate(0.), igpKeepAliveInterval(2000.)
+IGPClient::IGPClient(MessageBox &mbox, int igpIdent) : mbox(mbox), enabled(false), igpLastKeepAliveDate(0.), igpKeepAliveInterval(2000.)
 {
     mbox.addListener(this);
     IGPDatagram::ClientMsgAssignIDDatagram datagram(mbox.createMessage(), igpIdent);

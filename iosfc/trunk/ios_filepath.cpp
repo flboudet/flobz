@@ -45,8 +45,10 @@ namespace ios_fc {
             perror("dirlist");
             exit(1);
         }
-        while(dptr=readdir(dirp)) {
+        dptr = readdir(dirp);
+        while(dptr != NULL) {
             result.add(dptr->d_name);
+            dptr = readdir(dirp);
         }
         closedir(dirp);
         return result;
