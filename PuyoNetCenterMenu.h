@@ -147,7 +147,7 @@ private:
             netCenter->cycle();
         }
     };
-    IIM_Surface *frame, *upArrow, *downArrow;
+    IIM_Surface *upArrow, *downArrow;
     VBox mainBox;
     HBox topbox;
     Frame menu;

@@ -189,10 +189,9 @@ NetCenterMenu::NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netC
     : PuyoMainScreenMenu(mainScreen, loop),
       netCenter(netCenter),
       playerListText(theCommander->getLocalizedString("Player List")),
-      frame(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/frame.png"))),
       upArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png"))),
       downArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png"))),
-      menu(FramePicture(frame, 25, 28, 25, 19, 26, 23)), playerbox(FramePicture(frame, 25, 28, 25, 19, 26, 23)),
+      menu(theCommander->getWindowFramePicture()), playerbox(theCommander->getWindowFramePicture()),
       chatAreaText(theCommander->getLocalizedString("Chat Area")),
       cycled(this), playerList(5, this, upArrow, downArrow),
       onScreenDialog(NULL), shouldSelfDestroy(false),
@@ -211,7 +210,6 @@ NetCenterMenu::~NetCenterMenu()
     printf("Deleting the net center\n");
     // Delete the network center because no one else would do it
     delete netCenter;
-    IIM_Free(frame);
     IIM_Free(upArrow);
     IIM_Free(downArrow);
 }
