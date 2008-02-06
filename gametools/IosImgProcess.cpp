@@ -147,7 +147,7 @@ RGBA iim_surface_get_rgba(SDL_Surface *surface, Uint32 x, Uint32 y)
 Uint8 iim_surface_get_alpha(SDL_Surface *surface, Uint32 x, Uint32 y)
 {
   Uint32 temp, pixel;
-  RGBA result;
+
   int index = x*surface->format->BytesPerPixel + y*surface->pitch;
   SDL_PixelFormat *fmt = surface->format;
   pixel=*(Uint32*)((char*)surface->pixels+index);
@@ -512,8 +512,6 @@ IIM_Surface *iim_surface_resize(IIM_Surface *isrc, int width, int height)
     SDL_LockSurface(src);
     SDL_LockSurface(ret);
     
-    float ratiox = (w<<4)/width;
-    float ratioy = (h<<4)/height;
     int sizew = w/width;
     int sizeh = h/height;
     if (sizew<1) sizew = 1;
@@ -637,7 +635,6 @@ IIM_Surface *iim_rotate(IIM_Surface *isrc, int degrees)
 void iim_surface_convert_to_gray(IIM_Surface *isrc)
 {
   SDL_Surface *src = isrc->surf;
-  SDL_PixelFormat *fmt = src->format;
   SDL_LockSurface(src);
   for (int y=src->h; y--;)
   {

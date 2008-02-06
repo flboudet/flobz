@@ -28,7 +28,7 @@
 
 
 PuyoScreenTransitionWidget::PuyoScreenTransitionWidget(Screen &fromScreen, Action *transitionFinishedAction)
-    : transitionFinishedAction(transitionFinishedAction), CycledComponent(0.02)
+    : CycledComponent(0.02), transitionFinishedAction(transitionFinishedAction)
 {
     Uint32 rmask, gmask, bmask, amask;
     #if SDL_BYTEORDER == SDL_BIG_ENDIAN

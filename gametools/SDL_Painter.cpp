@@ -6,7 +6,7 @@
 SDL_Surface *display;
 
 SDL_Painter::SDL_Painter(IIM_Surface *gameScreen, IIM_Surface *bg)
-  : gameScreen(gameScreen), backGround(bg), nbElts(0), nbPrev(0) {}
+  : backGround(bg), gameScreen(gameScreen), nbElts(0), nbPrev(0) {}
 
 void SDL_Painter::requestDraw(IIM_Surface *surf, SDL_Rect *where)
 {

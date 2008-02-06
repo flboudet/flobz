@@ -46,12 +46,12 @@ class NoNameAction : public Action {
 };
 
 LocalGameMenu::LocalGameMenu(PuyoMainScreen *mainScreen)
-    : locale(theCommander->getDataPathManager(), "locale", "main"),
+    : PuyoMainScreenMenu(mainScreen),
+      locale(theCommander->getDataPathManager(), "locale", "main"),
       editPlayerName(locale.getLocalizedString("Player:"),
 		     PuyoGame::getDefaultPlayerName(0),
 		     PuyoGame::getDefaultPlayerKey(0)),
       screenTitle(locale.getLocalizedString("Choose Game Level")),
-      PuyoMainScreenMenu(mainScreen),
       easyAction(EASY, this), mediumAction(MEDIUM, this), hardAction(HARD, this), popAction(mainScreen),
       easy(locale.getLocalizedString("Beginner"), &easyAction),
       medium(locale.getLocalizedString("Normal"), &mediumAction),
@@ -80,13 +80,13 @@ String LocalGameMenu::getPlayerName() const
 Local2PlayersGameMenu::Local2PlayersGameMenu(PuyoMainScreen *mainScreen)
     : PuyoMainScreenMenu(mainScreen),
       locale(theCommander->getDataPathManager(), "locale", "main"),
-      screenTitle(locale.getLocalizedString("Choose Game Level")),
       editPlayer1Name(locale.getLocalizedString("Player 1:"),
 		      PuyoGame::getDefaultPlayerName(1),
 		      PuyoGame::getDefaultPlayerKey(1)),
       editPlayer2Name(locale.getLocalizedString("Player 2:"),
 		      PuyoGame::getDefaultPlayerName(2),
 		      PuyoGame::getDefaultPlayerKey(2)),
+      screenTitle(locale.getLocalizedString("Choose Game Level")),
       easyAction(EASY, gameWidgetFactory, this),
       mediumAction(MEDIUM, gameWidgetFactory, this),
       hardAction(HARD, gameWidgetFactory, this), popAction(mainScreen),

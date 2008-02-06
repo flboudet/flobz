@@ -240,13 +240,15 @@ void ListView::action(Widget *sender, GameUIEnum actionType, GameControlEvent *e
         case ON_MOUSEUP:
             m_clickedButton = NULL;
             break;
+        default:
+            break;
     }
 }
 
 void ListView::handleButtons()
 {
     if (m_clickedButton == &downButton) {
-        if (firstVisible + size < entries.size()) {
+        if (firstVisible + size < (int)entries.size()) {
             firstVisible++;
             resyncLabels();
         }
@@ -273,7 +275,7 @@ void ListView::cycle()
 
 void ListView::resyncLabels()
 {
-    int lastVisible = size < entries.size() ? firstVisible + size : firstVisible + entries.size();
+    int lastVisible = size < (int)entries.size() ? firstVisible + size : firstVisible + entries.size();
     for (int i = firstVisible ; i < lastVisible ; i++) {
         buttons[i-firstVisible]->setValue(entries[i]->m_text);
         buttons[i-firstVisible]->setAction(ON_START, entries[i]->m_action);

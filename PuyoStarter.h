@@ -53,11 +53,11 @@ private:
     Separator topSeparator;
     HBox topBox;
     VBox pauseVBox;
-    Text menuTitle;
-    Button continueButton;
     ToggleSoundFxAction toggleSoundFxAction;
     ToggleMusicAction toggleMusicAction;
     ToggleFullScreenAction toggleFullScreenAction;
+    Text menuTitle;
+    Button continueButton;
     ToggleButton audioButton, musicButton, fullScreenButton;
     Button abortButton;
 };
