@@ -6,9 +6,6 @@
 extern bool useGL;
 
 typedef struct _RGBA {
-  _RGBA(Uint8 red, Uint8 green, Uint8 blue, Uint8 alpha)
-    : red(red), green(green), blue(blue), alpha(alpha) {}
-  _RGBA() {}
   Uint8 red;
   Uint8 green;
   Uint8 blue;
