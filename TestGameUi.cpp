@@ -8,6 +8,7 @@
 #include "GameCursor.h"
 #include "ListView.h"
 #include "Frame.h"
+#include "FramedButton.h"
 #include "IosImgProcess.h"
 
 using namespace ios_fc;
@@ -182,12 +183,16 @@ int main(int argc, char *argv[])
     FramePicture fpict3(IIM_Load_Absolute_DisplayFormatAlpha(
 		       "data/base.000/gfx/buttondown.png"),
 			12, 12, 12, 12, 8, 12);
-    fpict.setContentColor(_RGBA(0x00, 0x00, 0x00, 0x80));
-    fpict2.setContentColor(_RGBA(0xA5, 0xA5, 0xA5, 0xFF));
-    fpict3.setContentColor(_RGBA(0xA5, 0xA5, 0xA5, 0xFF));
+    RGBA blackTranslucient = {(Uint8)0x00, (Uint8)0x00, (Uint8)0x00, (Uint8)0x80};
+    RGBA buttonGray = {(Uint8)0xA5, (Uint8)0xA5, (Uint8)0xA5, (Uint8)0xFF};
+    fpict.setContentColor(blackTranslucient);
+    fpict2.setContentColor(buttonGray);
+    fpict3.setContentColor(buttonGray);
 
-    Frame frame(&fpict), frame2(&fpict3);
+    Frame frame(&fpict), frame2(&fpict2);
+    frame2.setFocusedPicture(&fpict3);
     //frame.setPreferedSize(Vec3(100, 100));
+    FramedButton framedButton1("Hi", NULL, &fpict2, &fpict3);
     Button bidonButton1("Hi", &showDialogAction);
     Button bidonButton2("Ho");
     Button bidonButton3("Hop");
@@ -197,9 +202,10 @@ int main(int argc, char *argv[])
     bidonBox.setPolicy(USE_MIN_SIZE);
     ListView list(20, upArrow, downArrow);
     bidonBox.add(&bidonText);
+    bidonBox.add(&framedButton1);
     bidonBox.add(&bidonButton1);
     frame2.add(&bidonButton2);
-    bidonBox.add(&frame2);
+    //bidonBox.add(&frame2);
     bidonBox.add(&bidonField);
     bidonBox.add(&frame);
     for (int i = 0 ; i < 100 ; i++) {

@@ -28,6 +28,7 @@
 
 #include "gameui.h"
 #include "Frame.h"
+#include "FramedButton.h"
 #include "ListView.h"
 #include "PuyoCommander.h"
 #include "ios_httpdocument.h"
@@ -90,7 +91,7 @@ private:
     Frame serverSelectionPanel;
     ListView serverListPanel;
     Text serverListText;
-    Button updating;
+    FramedButton updating;
     Frame rightPanel;
     Separator separator1_1, separator1_2, separator1_3,  separator10_1, separator10_2;
     Text internetGameText, nicknameText, serverText, portText;
@@ -101,7 +102,7 @@ private:
     int portNum;
     PushNetCenterMenuAction pushNetCenter;
     PuyoPopMenuAction backAction;
-    Button joinButton, backButton;
+    FramedButton joinButton, backButton;
 };
 
 class NetworkInternetAction : public Action {

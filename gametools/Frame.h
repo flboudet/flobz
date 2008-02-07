@@ -37,9 +37,12 @@ public:
     virtual void add (Widget *child);
     void setBorderVisible(bool borderVisible) { m_borderVisible = borderVisible; }
     bool getBorderVisible() const { return m_borderVisible; }
+    void setFocusedPicture(const FramePicture *focusedSurface) { m_focusedSurface = focusedSurface; }
 private:
+    void cacheSurface(IIM_Surface * &cachedSurface, const FramePicture *framePicture);
     const FramePicture *m_frameSurface;
-    SDL_Surface *m_bgSurface;
+    const FramePicture *m_focusedSurface;
+    IIM_Surface *m_bgSurface, *m_bgFocus;
     bool m_borderVisible;
 };
 

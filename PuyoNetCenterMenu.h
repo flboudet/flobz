@@ -29,6 +29,7 @@
 #include "gameui.h"
 #include "ListView.h"
 #include "Frame.h"
+#include "FramedButton.h"
 #include "PuyoCommander.h"
 #include "PuyoInternetGameCenter.h"
 #include "PuyoTwoPlayerStarter.h"
@@ -46,8 +47,6 @@ public:
 public:
     PuyoGameInvitation associatedInvitation;
 private:
-    IIM_Surface   *menuBG;
-    
     class NetCenterDialogMenuAction : public Action {
     public:
         NetCenterDialogMenuAction(NetCenterMenu *targetMenu, bool isCancelAction)
@@ -57,14 +56,13 @@ private:
         NetCenterMenu *targetMenu;
         bool isCancelAction;
     };
-    
+    Frame menu;
     NetCenterDialogMenuAction cancelAction, acceptAction;
     bool hasAcceptButton;
-    VBox menu;
     HBox buttons;
     Text dialogTitle, dialogMsg;
     Text sep1, sep2;
-    Button acceptButton, cancelButton;
+    FramedButton acceptButton, cancelButton;
 };
 
 class NetCenterPlayerList : public ListView {
@@ -153,7 +151,7 @@ private:
     Frame menu;
     Frame playerbox;
     Text playerListText, chatAreaText, title;
-    Button cancelButton;
+    FramedButton cancelButton;
     PuyoPopMenuAction backAction;
     NetCenterPlayerList playerList;
     //Frame ncActionsFrame, playerBoxFrame;

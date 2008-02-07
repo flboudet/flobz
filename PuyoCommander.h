@@ -82,6 +82,7 @@ class PuyoCommander : public MessageListener
 {
   public:
     PuyoCommander(String dataDir, bool fullscreen, int maxDataPackNumber=-1);
+    virtual ~PuyoCommander();
     void run();
     void debug_gsl(String gsl_script);
     void onMessage(Message &message);
@@ -135,7 +136,7 @@ class PuyoCommander : public MessageListener
 
     bool fullscreen;
     bool useGL;
-    IIM_Surface   *m_frameImage, *m_buttonIdleImage;
+    IIM_Surface   *m_frameImage, *m_buttonIdleImage, *m_buttonDownImage;
     FramePicture m_windowFramePicture;
     FramePicture m_buttonIdleFramePicture, m_buttonDownFramePicture, m_buttonOverFramePicture;
 };

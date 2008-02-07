@@ -99,14 +99,20 @@ void FramePicture::render(SDL_Surface *surf) const
 }
 
 Frame::Frame(const FramePicture *frameSurface, GameLoop *loop)
-  : VBox(loop), m_frameSurface(frameSurface), m_bgSurface(NULL), m_borderVisible(true)
+  : VBox(loop), m_frameSurface(frameSurface), m_focusedSurface(NULL),
+    m_bgSurface(NULL), m_bgFocus(NULL), m_borderVisible(true)
 {
     setPolicy(USE_MIN_SIZE);
     setInnerMargin(9);
 }
 
 Frame::~Frame()
-{}
+{
+  if (m_bgSurface)
+    IIM_Free(m_bgSurface);
+  if (m_bgFocus)
+    IIM_Free(m_bgFocus);
+}
 
 void Frame::draw(SDL_Surface *screen)
 {
@@ -122,32 +128,31 @@ void Frame::draw(SDL_Surface *screen)
     dstrect.h = (int)(bsize.y);
     dstrect.w = (int)(bsize.x);
     
-    // If the background of the frame has not been created or has changed size, recreate it
-    if ((m_bgSurface == NULL) || (bsize.x != m_bgSurface->w) || (bsize.y != m_bgSurface->h)) {
-        if (m_bgSurface != NULL)
-            SDL_FreeSurface(m_bgSurface);
-        Uint32 rmask, gmask, bmask, amask;
-        /* SDL interprets each pixel as a 32-bit number, so our masks must depend
-           on the endianness (byte order) of the machine */
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-        rmask = 0xff000000;
-        gmask = 0x00ff0000;
-        bmask = 0x0000ff00;
-        amask = 0x000000ff;
-#else
-        rmask = 0x000000ff;
-        gmask = 0x0000ff00;
-        bmask = 0x00ff0000;
-        amask = 0xff000000;
-#endif
-        m_bgSurface = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, (int)(bsize.x), (int)(bsize.y), 32, 
-                                      rmask, gmask, bmask, amask);
-        m_frameSurface->render(m_bgSurface);
+    if (haveFocus() && (m_focusedSurface != NULL)) {
+      cacheSurface(m_bgFocus, m_focusedSurface);
+      // Drawing the background
+      if (m_borderVisible)
+        IIM_BlitSurface(m_bgFocus, &srcrect, screen, &dstrect);
     }
-    // Drawing the background
-    if (m_borderVisible)
-        SDL_BlitSurface(m_bgSurface, &srcrect, screen, &dstrect);
+    else {
+      cacheSurface(m_bgSurface, m_frameSurface);
+      // Drawing the background
+      if (m_borderVisible)
+        IIM_BlitSurface(m_bgSurface, &srcrect, screen, &dstrect);
+    }
     VBox::draw(screen);
+}
+
+void Frame::cacheSurface(IIM_Surface * &cachedSurface, const FramePicture *framePicture)
+{
+  Vec3 bsize = getSize();
+  // If the background of the frame has not been created or has changed size, recreate it
+  if ((cachedSurface == NULL) || ((int)(bsize.x) != cachedSurface->w) || ((int)(bsize.y) != cachedSurface->h)) {
+    if (cachedSurface != NULL)
+      IIM_Free(cachedSurface);
+    cachedSurface = iim_surface_create_rgba((int)(bsize.x), (int)(bsize.y));
+    framePicture->render(cachedSurface->surf);
+  }
 }
 
 void Frame::add (Widget *child)

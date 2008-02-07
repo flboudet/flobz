@@ -49,11 +49,13 @@ void NetCenterDialogMenu::NetCenterDialogMenuAction::action()
 }
 
 NetCenterDialogMenu::NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvitation &associatedInvitation, String title, String message, bool hasAcceptButton)
-    : menuBG(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/menubg.png"))),
+    : menu(theCommander->getWindowFramePicture()),
       cancelAction(targetMenu, true), acceptAction(targetMenu, false), hasAcceptButton(hasAcceptButton),
       associatedInvitation(associatedInvitation), dialogTitle(title), dialogMsg(message),
-      acceptButton(theCommander->getLocalizedString("Accept"), &acceptAction),
-      cancelButton(theCommander->getLocalizedString("Cancel"), &cancelAction)
+      acceptButton(theCommander->getLocalizedString("Accept"), &acceptAction,
+		   theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
+      cancelButton(theCommander->getLocalizedString("Cancel"), &cancelAction,
+		   theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture())
 {
 }
 
@@ -67,9 +69,6 @@ NetCenterDialogMenu::~NetCenterDialogMenu()
   if (hasAcceptButton)
     buttons.remove(&acceptButton);
   menu.remove(&buttons);
-  if (menuBG != NULL) {
-    IIM_Free(menuBG);
-  }
 }
 
 void NetCenterDialogMenu::build()
@@ -78,8 +77,7 @@ void NetCenterDialogMenu::build()
     dialogPos.x = 50;
     dialogPos.y = 195;
     setPosition(dialogPos);
-    setSize(Vec3(menuBG->w, menuBG->h, 0));
-    setBackground(menuBG);
+    setSize(Vec3(350., 200.));
     menu.add(&dialogTitle);
     menu.add(&sep1);
     menu.add(&dialogMsg);
@@ -197,7 +195,8 @@ NetCenterMenu::NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netC
       onScreenDialog(NULL), shouldSelfDestroy(false),
       nameProvider(*netCenter), chatBox(*this),
       title(theCommander->getLocalizedString("Network Game Center")), backAction(mainScreen),
-      cancelButton(theCommander->getLocalizedString("Disconnect"), &backAction),
+      cancelButton(theCommander->getLocalizedString("Disconnect"), &backAction,
+		   theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
       topSeparator(0, 5), middleSeparator(0, 5), bottomSeparator(0, 5)
 {
     GameUIDefaults::GAME_LOOP->addIdle(&cycled);

@@ -317,14 +317,19 @@ InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)
     servers(),
     container(),
     serverListPanel(20, upArrow, downArrow),
-    serverListText("Server List"), rightPanel(theCommander->getWindowFramePicture()), updating("Update"),
+    serverListText("Server List"), rightPanel(theCommander->getWindowFramePicture()),
+    updating("Update", NULL,
+	     theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
     separator1_1(1,1), separator1_2(1,1), separator1_3(1, 1), separator10_1(10,10), separator10_2(10,10),
     internetGameText("Internet Game"), nicknameText("Nickname"), serverText("Server"), portText("Port"),
     playerName(PuyoGame::getPlayerName(-2), PuyoGame::getDefaultPlayerKey(-2)),
     serverName(kInternetCurrentServerDefaultValue,kInternetCurrentServerKey),
     serverPort(kInternetCurrentServerPortDefaultValue,kInternetCurrentServerPortKey),
     pushNetCenter(mainScreen, &serverName, &serverPort, &playerName), backAction(mainScreen),
-    joinButton("Join", &pushNetCenter), backButton("Back", &backAction)
+    joinButton("Join", &pushNetCenter,
+	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
+    backButton("Back", &backAction,
+	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture())
 {
     this->setBorderVisible(false);
 }
@@ -346,7 +351,6 @@ void InternetGameMenu::build()
     serverSelectionPanel.setPolicy(USE_MIN_SIZE);
     serverSelectionPanel.add(&serverListText);
     serverSelectionPanel.add(&serverListPanel);
-    updating.mdontMove = false;
     serverSelectionPanel.add(&updating);
 
     rightPanel.add(&separator1_1);
@@ -383,7 +387,6 @@ void InternetGameMenu::idle(double currentTime)
             servers.getServerPortAtIndex(i))));
       }
       updating.setValue("Update");
-      updating.mdontMove = false;
     }
 
     int state = servers.fetchingNewData();
@@ -399,12 +402,10 @@ void InternetGameMenu::idle(double currentTime)
             "......Loading..."
         };
         updating.setValue(txt[X]);
-        updating.mdontMove = true;
     }
     else if (state < 0)
     {
       updating.setValue("Update");
-      updating.mdontMove = false;
     }
 }
 

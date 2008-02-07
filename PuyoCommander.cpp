@@ -298,14 +298,28 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
   // Loading the frame images, and setting up the frames
   m_frameImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/frame.png"));
   m_buttonIdleImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/button.png"));
+  m_buttonDownImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/buttondown.png"));
   m_windowFramePicture.setFrameSurface(m_frameImage);
   RGBA blackTranslucient = {(Uint8)0x00, (Uint8)0x00, (Uint8)0x00, (Uint8)0x80};
   m_windowFramePicture.setContentColor(blackTranslucient);
   m_buttonIdleFramePicture.setFrameSurface(m_buttonIdleImage);
   RGBA buttonGray = {(Uint8)0xA5, (Uint8)0xA5, (Uint8)0xA5, (Uint8)0xFF};
   m_buttonIdleFramePicture.setContentColor(buttonGray);
+  m_buttonDownFramePicture.setFrameSurface(m_buttonDownImage);
+  m_buttonDownFramePicture.setContentColor(buttonGray);
+  m_buttonOverFramePicture.setFrameSurface(m_buttonDownImage);
+  m_buttonOverFramePicture.setContentColor(buttonGray);
 }
 
+PuyoCommander::~PuyoCommander()
+{
+#ifdef ENABLE_TTF
+#else
+#endif
+  IIM_Free(m_frameImage);
+  IIM_Free(m_buttonIdleImage);
+  IIM_Free(m_buttonDownImage);
+}
 
 /* Initialize SDL context */
 void PuyoCommander::initSDL()
@@ -427,7 +441,6 @@ void PuyoCommander::initFonts()
   SoFont_free(GameUIDefaults::FONT_SMALL_ACTIVE);
   GameUIDefaults::FONT_SMALL_ACTIVE = smallFont;
 }
-
 
 void PuyoCommander::setMusic(bool music)
 {
