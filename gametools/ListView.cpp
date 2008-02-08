@@ -96,10 +96,10 @@ void ScrollWidget::draw(SDL_Surface *screen)
     dstrect.h = bsize.y;
     dstrect.w = bsize.x;
     
-    if ((m_bgSurface == NULL) || (bsize.x != m_bgSurface->w) || (bsize.y != m_bgSurface->h)) {
+    if ((m_bgSurface == NULL) || ((int)(bsize.x) != m_bgSurface->w) || ((int)(bsize.y) != m_bgSurface->h)) {
         if (m_bgSurface != NULL)
             IIM_Free(m_bgSurface);
-        m_bgSurface = iim_surface_create_rgba(bsize.x, bsize.y);
+        m_bgSurface = iim_surface_create_rgba((int)(bsize.x), (int)(bsize.y));
         SDL_FillRect(m_bgSurface->surf, &srcrect, (m_bgSurface->surf->format->Rmask & 0x80808080) | (m_bgSurface->surf->format->Amask & 0x80808080));
     }
     
@@ -204,10 +204,10 @@ void ListView::draw(SDL_Surface *screen)
     srcrect.h = lbsize.y;
     srcrect.w = lbsize.x;
     
-    if ((m_bgSurface == NULL) || (lbsize.x != m_bgSurface->w) || (lbsize.y != m_bgSurface->h)) {
+    if ((m_bgSurface == NULL) || ((int)(lbsize.x) != m_bgSurface->w) || ((int)(lbsize.y) != m_bgSurface->h)) {
         if (m_bgSurface != NULL)
             IIM_Free(m_bgSurface);
-        m_bgSurface = iim_surface_create_rgba(lbsize.x, lbsize.y);
+        m_bgSurface = iim_surface_create_rgba((int)(lbsize.x), (int)(lbsize.y));
         SDL_FillRect(m_bgSurface->surf, &srcrect,
             (m_bgSurface->surf->format->Rmask & 0xFFFFFFFF) |
             (m_bgSurface->surf->format->Gmask & 0xFFFFFFFF) |
