@@ -111,7 +111,8 @@ class PuyoCommander : public MessageListener
     const FramePicture *getButtonFramePicture() const { return &m_buttonIdleFramePicture; }
     const FramePicture *getButtonDownFramePicture() const { return &m_buttonDownFramePicture; }
     const FramePicture *getButtonOverFramePicture() const { return &m_buttonOverFramePicture; }
-    const FramePicture *getTextFieldFramePicture() const { return &m_textFieldIdleFramePicture; }
+    const FramePicture *getEditFieldFramePicture() const { return &m_textFieldIdleFramePicture; }
+    const FramePicture *getEditFieldOverFramePicture() const { return &m_textFieldIdleFramePicture; }
   private:
 
     friend class SinglePlayerGameAction;

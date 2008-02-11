@@ -27,6 +27,7 @@
 #define _PUYOLOCALMENU
 
 #include "gameui.h"
+#include "FramedEditField.h"
 #include "PuyoCommander.h"
 #include "PuyoSinglePlayerStarter.h"
 #include "PuyoTwoPlayerStarter.h"

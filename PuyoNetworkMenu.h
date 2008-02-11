@@ -29,6 +29,7 @@
 #include "gameui.h"
 #include "Frame.h"
 #include "FramedButton.h"
+#include "FramedEditField.h"
 #include "ListView.h"
 #include "PuyoCommander.h"
 #include "ios_httpdocument.h"
@@ -97,8 +98,8 @@ private:
     Text internetGameText, nicknameText, serverText, portText;
     HBox hbox, menu;
     SliderContainer container;
-    EditField playerName;
-    EditField serverName, serverPort;
+    FramedEditField playerName;
+    FramedEditField serverName, serverPort;
     int portNum;
     PushNetCenterMenuAction pushNetCenter;
     PuyoPopMenuAction backAction;

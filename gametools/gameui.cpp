@@ -1765,26 +1765,6 @@ namespace gameui {
 
 
     //
-    // EditFieldWithLabel
-    //
-
-    EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, Action *action) : editField(new EditField(defaultValue, action)), text(label)
-    {
-        add(&text);
-        add(editField);
-    }
-
-    EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, String persistentID) : editField(new EditField(defaultValue, persistentID)), text(label)
-    {
-        add(&text);
-        add(editField);
-    }
-
-    EditFieldWithLabel::~EditFieldWithLabel()
-    {
-        delete editField;
-    }
-    //
     // ToggleButton
     //
 

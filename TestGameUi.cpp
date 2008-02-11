@@ -9,39 +9,13 @@
 #include "ListView.h"
 #include "Frame.h"
 #include "FramedButton.h"
+#include "FramedEditField.h"
 #include "IosImgProcess.h"
 
 using namespace ios_fc;
 using namespace gameui;
 
 extern "C"
-
-class SquareEditField : public Frame {
-public:
-  SquareEditField(const String &defaultText, Action *action,
-		  const FramePicture *normalPicture, const FramePicture *focusedPicture=NULL);
-  virtual ~SquareEditField();
-private:
-  EditField m_field;
-};
-
-SquareEditField::SquareEditField(const String &defaultText, Action *action,
-				 const FramePicture *normalPicture, const FramePicture *focusedPicture)
-  : Frame(normalPicture), m_field(defaultText, action)
-{
-  setFocusedPicture(focusedPicture);
-  Vec3 preferedSize = m_field.getPreferedSize();
-  preferedSize.x += 25;
-  preferedSize.y = 28;
-  setPreferedSize(preferedSize);
-  add(&m_field);
-}
-
-SquareEditField::~SquareEditField()
-{
-}
-
-
 
 class BusyWidget : public Widget, IdleComponent {
 public:
@@ -169,7 +143,7 @@ int main(int argc, char *argv[])
     Button bidonButton1("Hi", &showDialogAction);
     Button bidonButton2("Ho");
     Button bidonButton3("Hop");
-    SquareEditField bidonField("toto", NULL, &fpict3, &fpict2);
+    FramedEditField bidonField("toto", NULL, &fpict2, &fpict2);
     IIM_Surface *upArrow = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/uparrow.png");
     IIM_Surface *downArrow = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/downarrow.png");
     bidonBox.setPolicy(USE_MIN_SIZE);

@@ -50,7 +50,9 @@ LocalGameMenu::LocalGameMenu(PuyoMainScreen *mainScreen)
       locale(theCommander->getDataPathManager(), "locale", "main"),
       editPlayerName(locale.getLocalizedString("Player:"),
 		     PuyoGame::getDefaultPlayerName(0),
-		     PuyoGame::getDefaultPlayerKey(0)),
+		     PuyoGame::getDefaultPlayerKey(0),
+		     theCommander->getEditFieldFramePicture(),
+		     theCommander->getEditFieldOverFramePicture()),
       screenTitle(locale.getLocalizedString("Choose Game Level")),
       easyAction(EASY, this), mediumAction(MEDIUM, this), hardAction(HARD, this), popAction(mainScreen),
       easy(locale.getLocalizedString("Beginner"), &easyAction),
@@ -58,8 +60,8 @@ LocalGameMenu::LocalGameMenu(PuyoMainScreen *mainScreen)
       hard(locale.getLocalizedString("Expert"), &hardAction),
       back(locale.getLocalizedString("Back"), &popAction)
 {
-    EditField *editName = editPlayerName.getEditField();
-    editName->setAction(ON_START, new NoNameAction(locale, *editName));
+    EditField &editName = editPlayerName.getEditField();
+    editName.setAction(ON_START, new NoNameAction(locale, editName));
 }
 
 void LocalGameMenu::build() {
@@ -73,7 +75,7 @@ void LocalGameMenu::build() {
 
 String LocalGameMenu::getPlayerName() const
 {
-  String playerName = editPlayerName.getEditField()->getValue();
+  String playerName = editPlayerName.getEditField().getValue();
   return playerName;
 }
 
@@ -82,10 +84,14 @@ Local2PlayersGameMenu::Local2PlayersGameMenu(PuyoMainScreen *mainScreen)
       locale(theCommander->getDataPathManager(), "locale", "main"),
       editPlayer1Name(locale.getLocalizedString("Player 1:"),
 		      PuyoGame::getDefaultPlayerName(1),
-		      PuyoGame::getDefaultPlayerKey(1)),
+		      PuyoGame::getDefaultPlayerKey(1),
+		      theCommander->getEditFieldFramePicture(),
+		      theCommander->getEditFieldOverFramePicture()),
       editPlayer2Name(locale.getLocalizedString("Player 2:"),
 		      PuyoGame::getDefaultPlayerName(2),
-		      PuyoGame::getDefaultPlayerKey(2)),
+		      PuyoGame::getDefaultPlayerKey(2),
+		      theCommander->getEditFieldFramePicture(),
+		      theCommander->getEditFieldOverFramePicture()),
       screenTitle(locale.getLocalizedString("Choose Game Level")),
       easyAction(EASY, gameWidgetFactory, this),
       mediumAction(MEDIUM, gameWidgetFactory, this),
@@ -109,12 +115,12 @@ void Local2PlayersGameMenu::build()
 
 String Local2PlayersGameMenu::getPlayer1Name() const
 {
-  String playerName = editPlayer1Name.getEditField()->getValue();
+  String playerName = editPlayer1Name.getEditField().getValue();
   return playerName;
 }
 
 String Local2PlayersGameMenu::getPlayer2Name() const
 {
-  String playerName = editPlayer2Name.getEditField()->getValue();
+  String playerName = editPlayer2Name.getEditField().getValue();
   return playerName;
 }
