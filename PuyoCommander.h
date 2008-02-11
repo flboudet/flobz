@@ -111,6 +111,7 @@ class PuyoCommander : public MessageListener
     const FramePicture *getButtonFramePicture() const { return &m_buttonIdleFramePicture; }
     const FramePicture *getButtonDownFramePicture() const { return &m_buttonDownFramePicture; }
     const FramePicture *getButtonOverFramePicture() const { return &m_buttonOverFramePicture; }
+    const FramePicture *getTextFieldFramePicture() const { return &m_textFieldIdleFramePicture; }
   private:
 
     friend class SinglePlayerGameAction;
@@ -136,9 +137,11 @@ class PuyoCommander : public MessageListener
 
     bool fullscreen;
     bool useGL;
-    IIM_Surface   *m_frameImage, *m_buttonIdleImage, *m_buttonDownImage;
+    IIM_Surface   *m_frameImage, *m_buttonIdleImage, *m_buttonDownImage, *m_buttonOverImage;
+    IIM_Surface   *m_textFieldIdleImage;
     FramePicture m_windowFramePicture;
     FramePicture m_buttonIdleFramePicture, m_buttonDownFramePicture, m_buttonOverFramePicture;
+    FramePicture m_textFieldIdleFramePicture;
 };
 
 extern class PuyoCommander *theCommander;

@@ -150,15 +150,16 @@ int main(int argc, char *argv[])
     FramePicture fpict(IIM_Load_Absolute_DisplayFormatAlpha("data/base.000/gfx/frame.png"),
                        25, 28, 25, 19, 26, 23);
     FramePicture fpict2(IIM_Load_Absolute_DisplayFormatAlpha(
-		       "data/base.000/gfx/button.png"),
-			12, 12, 12, 12, 8, 12);
+		       "data/base.000/gfx/editfield.png"),
+			5, 23, 4, 6, 10, 3);
     FramePicture fpict3(IIM_Load_Absolute_DisplayFormatAlpha(
 		       "data/base.000/gfx/buttondown.png"),
 			12, 12, 12, 12, 8, 12);
     RGBA blackTranslucient = {(Uint8)0x00, (Uint8)0x00, (Uint8)0x00, (Uint8)0x80};
     RGBA buttonGray = {(Uint8)0xA5, (Uint8)0xA5, (Uint8)0xA5, (Uint8)0xFF};
+    RGBA textFieldColor = {(Uint8)0xFA, (Uint8)0xEF, (Uint8)0xDB, (Uint8)0xFF};
     fpict.setContentColor(blackTranslucient);
-    fpict2.setContentColor(buttonGray);
+    fpict2.setContentColor(textFieldColor);
     fpict3.setContentColor(buttonGray);
 
     Frame frame(&fpict), frame2(&fpict2);
