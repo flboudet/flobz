@@ -485,7 +485,7 @@ void PuyoGameWidget::setScreenToResumed(bool fromControls)
 {
   if (associatedScreen != NULL)
     if (!fromControls)
-      associatedScreen->getPauseMenu().backPressed();
+      associatedScreen->getPauseMenu().backPressed(false);
 }
 
 PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
@@ -558,14 +558,14 @@ void PuyoPauseMenu::action(Widget *sender, GameUIEnum actionType, GameControlEve
   }
 }
 
-bool PuyoPauseMenu::backPressed()
+bool PuyoPauseMenu::backPressed(bool fromControls)
 {
-  if (pauseContainer.getContentWidget() == &optionsBox) {
-    pauseContainer.transitionToContent(&pauseVBox);
-  }
-  else if (pauseContainer.getContentWidget() == &pauseVBox) {
+  if (!fromControls || (pauseContainer.getContentWidget() == &pauseVBox)) {
     pauseContainer.transitionToContent(NULL);
     return true;
+  }
+  if (pauseContainer.getContentWidget() == &optionsBox) {
+    pauseContainer.transitionToContent(&pauseVBox);
   }
   return false;
 }

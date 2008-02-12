@@ -48,7 +48,7 @@ public:
     void toggleSoundFx();
     void toggleMusic();
     void toggleFullScreen();
-    bool backPressed();
+    bool backPressed(bool fromControls = true);
     // Action
     virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
     /**
