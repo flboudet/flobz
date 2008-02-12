@@ -40,7 +40,7 @@
 
 class PuyoCycled;
 
-class PuyoPauseMenu : public VBox, public Action {
+class PuyoPauseMenu : public VBox, public Action, public SliderContainerListener {
 public:
     PuyoPauseMenu(Action *continueAction, Action *abortAction);
     virtual ~PuyoPauseMenu();
@@ -48,8 +48,14 @@ public:
     void toggleSoundFx();
     void toggleMusic();
     void toggleFullScreen();
+    bool backPressed();
     // Action
     virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
+    /**
+     * Notify that the slider is outside of the screen, before sliding back inside
+     */
+    virtual void onSlideInside(SliderContainer &slider);
+    virtual void onWidgetAdded(WidgetContainer *parent);
 private:
     SliderContainer pauseContainer;
     Separator topSeparator;

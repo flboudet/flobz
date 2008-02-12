@@ -57,6 +57,8 @@ public:
     ChatBox(ChatBoxDelegate &delegate);
     virtual ~ChatBox();
     void addChat(String name, String message);
+    void slideOut();
+    void slideIn();
 private:
     IIM_Surface   *chatBoxBG;
     class ChatAction : public Action {

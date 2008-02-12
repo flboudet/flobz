@@ -349,7 +349,7 @@ bool isDirectionEvent(GameControlEvent *event);
       // Implements Widget
       virtual void draw(SDL_Surface *screen);
       void eventOccured(GameControlEvent *event);
-	  void addContentWidget();
+      void addContentWidget();
       void endSlideInside(bool inside);
       
       // Notifications
@@ -363,7 +363,7 @@ bool isDirectionEvent(GameControlEvent *event);
       virtual void onSlideInside();
       
     private:
-	  double slidingTime;
+      double slidingTime;
       Widget *contentWidget;
       Widget *previousWidget;
       double slideStartTime;

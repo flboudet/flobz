@@ -100,7 +100,7 @@ ChatBox::ChatBox(ChatBoxDelegate &delegate)
     chatAction.setEditField(&chatInput);
     chatInputLabel.setAutoSize(false);
     chatInputLabel.setPreferedSize(Vec3(120, 1));
-	chatInput.setEditOnFocus(true);
+    chatInput.setEditOnFocus(true);
     chatInput.setAutoSize(false);
     chatInput.setPreferedSize(Vec3(0, 0));
     chatInputContainer.setPreferedSize(Vec3(1, 28));
@@ -138,6 +138,15 @@ void ChatBox::ChatAction::action()
     owner->delegate.sendChat(chatString);
 }
 
+void ChatBox::slideOut()
+{
+  transitionToContent(NULL);
+}
+
+void ChatBox::slideIn()
+{
+  transitionToContent(&chatBoxContainer);
+}
 
 
 

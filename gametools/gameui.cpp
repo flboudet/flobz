@@ -741,7 +741,8 @@ namespace gameui {
         , slidingTime(.4)
         , contentWidget(NULL), previousWidget(NULL)
         , slideStartTime(0.0), currentTime(0.0)
-        , bg(NULL), sliding(false), backgroundVisible(true)
+        , bg(NULL), sliding(false), slideout(false)
+	, backgroundVisible(true)
     {
     }
 
@@ -792,7 +793,7 @@ namespace gameui {
                 addContentWidget();
             }
         }
-        slideStartTime = currentTime;
+        slideStartTime = 0.;
         previousWidget = contentWidget;
         contentWidget = content;
         if (previousWidget != NULL)
@@ -883,15 +884,16 @@ namespace gameui {
         requestDraw();
         resumeLayout();
     }
-	
-	void SliderContainer::addContentWidget()
-	{
-		bool s = sliding;
-		sliding = false;
-        onSlideOutside(); // Sends notification that we are now outside the screen, before adding the content widget
-		sliding = s;
-		add(contentWidget);
-	}
+  
+    void SliderContainer::addContentWidget()
+    {
+      bool s = sliding;
+      sliding = false;
+      onSlideOutside(); // Sends notification that we are now outside the screen, before adding the content widget
+      sliding = s;
+      add(contentWidget);
+      contentWidget->giveFocus();
+    }
     
     void SliderContainer::addListener(SliderContainerListener &listener)
     {

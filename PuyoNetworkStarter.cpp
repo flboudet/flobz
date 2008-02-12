@@ -190,7 +190,6 @@ void PuyoNetworkGameWidget::associatedScreenHasBeenSet(PuyoGameScreen *associate
 {
     associatedScreen->getPauseMenu().add(&chatBox);
     associatedScreen->getPauseMenu().pauseMenuTop = 5;
-    //associatedScreen->getPauseMenu().arrangeWidgets();
 }
 
 void PuyoNetworkGameWidget::sendSyncMsg()

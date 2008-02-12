@@ -483,8 +483,9 @@ void PuyoGameWidget::setScreenToPaused(bool fromControls)
 
 void PuyoGameWidget::setScreenToResumed(bool fromControls)
 {
-    if (associatedScreen != NULL)
-        associatedScreen->setResumed(fromControls);
+  if (associatedScreen != NULL)
+    if (!fromControls)
+      associatedScreen->backPressed();
 }
 
 PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
@@ -511,8 +512,9 @@ PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
     pauseVBox.add(&optionsButton);
     pauseVBox.add(&abortButton);
     pauseVBox.setPolicy(USE_MAX_SIZE);
+    pauseContainer.addListener(*this);
     pauseContainer.setPreferedSize(Vec3(350, 250));
-    pauseContainer.transitionToContent(&pauseVBox);
+    pauseContainer.setPosition(Vec3((640-350)/2., (480-250)/2.));
     topBox.add(&pauseContainer);
     add(&topSeparator);
     add(&topBox);
@@ -554,6 +556,30 @@ void PuyoPauseMenu::action(Widget *sender, GameUIEnum actionType, GameControlEve
   else if (sender == &optionsBack) {
     pauseContainer.transitionToContent(&pauseVBox);
   }
+}
+
+bool PuyoPauseMenu::backPressed()
+{
+  if (pauseContainer.getContentWidget() == &optionsBox) {
+    pauseContainer.transitionToContent(&pauseVBox);
+    return true;
+  }
+  else if (pauseContainer.getContentWidget() == &pauseVBox) {
+    pauseContainer.transitionToContent(NULL);
+  }
+  return true;
+}
+
+void PuyoPauseMenu::onSlideInside(SliderContainer &slider)
+{
+  if (slider.getContentWidget() == NULL) {
+    dynamic_cast<PuyoGameScreen *>(getParentScreen())->setResumed(false);
+  }
+}
+
+void PuyoPauseMenu::onWidgetAdded(WidgetContainer *parent)
+{
+  pauseContainer.transitionToContent(&pauseVBox);
 }
 
 void ContinueAction::action()
@@ -665,8 +691,9 @@ bool PuyoGameScreen::backPressed()
         gameWidget.setScreenToPaused(true);
     }
     else {
-        // Same as for pause
-        gameWidget.setScreenToResumed(true);
+      // Same as for pause
+      pauseMenu.backPressed();
+      gameWidget.setScreenToResumed(true);
     }
     return false;
 }
@@ -680,6 +707,7 @@ void PuyoGameScreen::setPaused(bool fromControls)
         for (unsigned int i=0; i<fx.size(); ++i)
             fx[i]->hide();
         this->add(&pauseMenu);
+	pauseMenu.giveFocus();
 	grabEventsOnWidget(&pauseMenu);
         paused = true;
         gameWidget.pause();
