@@ -23,6 +23,7 @@
  *
  */
 
+#include "Frame.h"
 #include "PuyoGame.h"
 #include "PuyoIA.h"
 #include "PuyoCommander.h"
@@ -39,7 +40,7 @@
 
 class PuyoCycled;
 
-class PuyoPauseMenu : public VBox {
+class PuyoPauseMenu : public VBox, public Action {
 public:
     PuyoPauseMenu(Action *continueAction, Action *abortAction);
     virtual ~PuyoPauseMenu();
@@ -47,19 +48,24 @@ public:
     void toggleSoundFx();
     void toggleMusic();
     void toggleFullScreen();
+    // Action
+    virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
 private:
-    IIM_Surface   *menuBG;
     SliderContainer pauseContainer;
     Separator topSeparator;
     HBox topBox;
-    VBox pauseVBox;
+    Frame pauseVBox;
     ToggleSoundFxAction toggleSoundFxAction;
     ToggleMusicAction toggleMusicAction;
     ToggleFullScreenAction toggleFullScreenAction;
     Text menuTitle;
-    Button continueButton;
+    Button continueButton, optionsButton;
     ToggleButton audioButton, musicButton, fullScreenButton;
     Button abortButton;
+
+    Frame optionsBox;
+    Text optionsTitle;
+    Button optionsBack;
 };
 
 class PuyoLocalGameFactory : public PuyoGameFactory {

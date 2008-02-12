@@ -488,14 +488,18 @@ void PuyoGameWidget::setScreenToResumed(bool fromControls)
 }
 
 PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
-    : menuBG(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/menubg.png"))), topSeparator(0, 10),
+    : topSeparator(0, 10), pauseVBox(theCommander->getWindowFramePicture()),
       toggleSoundFxAction(), toggleMusicAction(), toggleFullScreenAction(),
       menuTitle(theCommander->getLocalizedString("Pause")), 
       continueButton(theCommander->getLocalizedString("Continue game"), continueAction),
+      optionsButton(theCommander->getLocalizedString("Options"), this),
       audioButton(theCommander->getLocalizedString(kAudioFX), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getSoundFx(), &toggleSoundFxAction),
       musicButton(theCommander->getLocalizedString(kMusic), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getMusic(), &toggleMusicAction),
       fullScreenButton(theCommander->getLocalizedString(kFullScreen), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getFullScreen(), &toggleFullScreenAction),
-      abortButton(theCommander->getLocalizedString("Abort game"), abortAction)
+      abortButton(theCommander->getLocalizedString("Abort game"), abortAction),
+      optionsBox(theCommander->getWindowFramePicture()),
+      optionsTitle(theCommander->getLocalizedString("Options")),
+      optionsBack(theCommander->getLocalizedString("Back"), this)
 {
     toggleSoundFxAction.setButton(&audioButton);
     toggleMusicAction.setButton(&musicButton);
@@ -504,19 +508,22 @@ PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
     setPolicy(USE_MIN_SIZE);
     pauseVBox.add(&menuTitle);
     pauseVBox.add(&continueButton);
-    pauseVBox.add(&audioButton);
-    pauseVBox.add(&musicButton);
-    pauseVBox.add(&fullScreenButton);
+    pauseVBox.add(&optionsButton);
     pauseVBox.add(&abortButton);
-    pauseContainer.add(&pauseVBox);
-    
-    //topBox.setPreferedSize(Vec3(menuBG->w, menuBG->h, 0));
-    pauseContainer.setPreferedSize(Vec3(menuBG->w, menuBG->h, 0));
-    pauseContainer.setBackground(menuBG);
-    
+    pauseVBox.setPolicy(USE_MAX_SIZE);
+    pauseContainer.setPreferedSize(Vec3(350, 250));
+    pauseContainer.transitionToContent(&pauseVBox);
     topBox.add(&pauseContainer);
     add(&topSeparator);
     add(&topBox);
+
+    // Options menu
+    optionsBox.setPolicy(USE_MAX_SIZE);
+    optionsBox.add(&optionsTitle);
+    optionsBox.add(&audioButton);
+    optionsBox.add(&musicButton);
+    optionsBox.add(&fullScreenButton);
+    optionsBox.add(&optionsBack);
 }
 
 void PuyoPauseMenu::toggleSoundFx()
@@ -537,7 +544,16 @@ void PuyoPauseMenu::toggleFullScreen()
 
 PuyoPauseMenu::~PuyoPauseMenu()
 {
-    IIM_Free(menuBG);
+}
+
+void PuyoPauseMenu::action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
+{
+  if (sender == &optionsButton) {
+    pauseContainer.transitionToContent(&optionsBox);
+  }
+  else if (sender == &optionsBack) {
+    pauseContainer.transitionToContent(&pauseVBox);
+  }
 }
 
 void ContinueAction::action()
@@ -664,7 +680,7 @@ void PuyoGameScreen::setPaused(bool fromControls)
         for (unsigned int i=0; i<fx.size(); ++i)
             fx[i]->hide();
         this->add(&pauseMenu);
-        this->focus(&pauseMenu);
+	grabEventsOnWidget(&pauseMenu);
         paused = true;
         gameWidget.pause();
         theCommander->setCursorVisible(true);
@@ -680,6 +696,7 @@ void PuyoGameScreen::setResumed(bool fromControls)
         std::vector<PuyoFX*> fx = gameWidget.getPuyoFX();
         for (unsigned int i=0; i<fx.size(); ++i)
             fx[i]->show();
+	ungrabEventsOnWidget(&pauseMenu);
         this->remove(&pauseMenu);
         this->focus(&gameWidget);
         gameWidget.resume();
