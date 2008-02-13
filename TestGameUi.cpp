@@ -127,10 +127,10 @@ int main(int argc, char *argv[])
 		       "data/base.000/gfx/editfield.png"),
 			5, 23, 4, 6, 10, 3);
     FramePicture fpict3(IIM_Load_Absolute_DisplayFormatAlpha(
-		       "data/base.000/gfx/buttondown.png"),
-			12, 12, 12, 12, 8, 12);
+		       "data/base.000/gfx/separator.png"),
+			63, 2, 63, 2, 4, 2);
     RGBA blackTranslucient = {(Uint8)0x00, (Uint8)0x00, (Uint8)0x00, (Uint8)0x80};
-    RGBA buttonGray = {(Uint8)0xA5, (Uint8)0xA5, (Uint8)0xA5, (Uint8)0xFF};
+    RGBA buttonGray = {(Uint8)0xCC, (Uint8)0x95, (Uint8)0x36, (Uint8)0xFF};
     RGBA textFieldColor = {(Uint8)0xFA, (Uint8)0xEF, (Uint8)0xDB, (Uint8)0xFF};
     fpict.setContentColor(blackTranslucient);
     fpict2.setContentColor(textFieldColor);
