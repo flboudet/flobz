@@ -64,13 +64,17 @@ private:
     ToggleSoundFxAction toggleSoundFxAction;
     ToggleMusicAction toggleMusicAction;
     ToggleFullScreenAction toggleFullScreenAction;
+    Frame pauseTitleFrame;
     Text menuTitle;
+    VBox buttonsBox;
     Button continueButton, optionsButton;
     ToggleButton audioButton, musicButton, fullScreenButton;
     Button abortButton;
 
     Frame optionsBox;
+    Frame optionsTitleFrame;
     Text optionsTitle;
+    VBox optionsButtonsBox;
     Button optionsBack;
 };
 

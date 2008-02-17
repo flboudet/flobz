@@ -49,6 +49,7 @@ void ToggleFullScreenAction::action()
 }
 
 OptionMenu::OptionMenu(PuyoMainScreen *mainScreen) : PuyoMainScreenMenu(mainScreen),
+    screenTitleFrame(theCommander->getSeparatorFramePicture()),
     optionTitle(theCommander->getLocalizedString("Options")),
     audioButton(theCommander->getLocalizedString(kAudioFX), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getSoundFx(), &toggleSoundFxAction),
     musicButton(theCommander->getLocalizedString(kMusic), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getMusic(), &toggleMusicAction),
@@ -68,15 +69,19 @@ void OptionMenu::build() {
     controlMenu.build();
     themeMenu.build();
     levelMenu.build();
-    add(&optionTitle);
-    add(&audioButton);
-    add(&musicButton);
-    add(&fullScreenButton);
+    setPolicy(USE_MIN_SIZE);
+    screenTitleFrame.setPreferedSize(Vec3(0, 20));
+    screenTitleFrame.add(&optionTitle);
+    add(&screenTitleFrame);
+    buttonsBox.add(&audioButton);
+    buttonsBox.add(&musicButton);
+    buttonsBox.add(&fullScreenButton);
     if (getPuyoThemeManger()->getAnimatedPuyoSetThemeList()->size() > 1)
-        add(&changePuyoThemeButton);
+        buttonsBox.add(&changePuyoThemeButton);
     if (getPuyoThemeManger()->getPuyoLevelThemeList()->size() > 1)
-        add(&changeLevelThemeButton);
-    add(&changeControlsButton);
-    add(&backButton);
+        buttonsBox.add(&changeLevelThemeButton);
+    buttonsBox.add(&changeControlsButton);
+    buttonsBox.add(&backButton);
+    add(&buttonsBox);
 }
 

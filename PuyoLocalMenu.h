@@ -44,8 +44,10 @@ public:
     void build();
     String getPlayerName() const;
 private:
+    VBox buttonsBox;
     PuyoLocalizedDictionary locale;
     EditFieldWithLabel editPlayerName;
+    Frame screenTitleFrame;
     Text screenTitle;
     SinglePlayerStarterAction easyAction;
     SinglePlayerStarterAction mediumAction;
@@ -61,9 +63,11 @@ public:
     String getPlayer1Name() const;
     String getPlayer2Name() const;
 private:
+    VBox buttonsBox;
     PuyoLocalizedDictionary locale;
     PuyoLocalTwoPlayerGameWidgetFactory gameWidgetFactory;
     EditFieldWithLabel editPlayer1Name, editPlayer2Name;
+    Frame screenTitleFrame;
     Text screenTitle;
     TwoPlayersStarterAction easyAction;
     TwoPlayersStarterAction mediumAction;

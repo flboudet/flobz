@@ -491,6 +491,7 @@ void PuyoGameWidget::setScreenToResumed(bool fromControls)
 PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
     : topSeparator(0, 10), pauseVBox(theCommander->getWindowFramePicture()),
       toggleSoundFxAction(), toggleMusicAction(), toggleFullScreenAction(),
+      pauseTitleFrame(theCommander->getSeparatorFramePicture()),
       menuTitle(theCommander->getLocalizedString("Pause")), 
       continueButton(theCommander->getLocalizedString("Continue game"), continueAction),
       optionsButton(theCommander->getLocalizedString("Options"), this),
@@ -499,6 +500,7 @@ PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
       fullScreenButton(theCommander->getLocalizedString(kFullScreen), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getFullScreen(), &toggleFullScreenAction),
       abortButton(theCommander->getLocalizedString("Abort game"), abortAction),
       optionsBox(theCommander->getWindowFramePicture()),
+      optionsTitleFrame(theCommander->getSeparatorFramePicture()),
       optionsTitle(theCommander->getLocalizedString("Options")),
       optionsBack(theCommander->getLocalizedString("Back"), this)
 {
@@ -507,11 +509,13 @@ PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
     toggleFullScreenAction.setButton(&fullScreenButton);
     
     setPolicy(USE_MIN_SIZE);
-    pauseVBox.add(&menuTitle);
-    pauseVBox.add(&continueButton);
-    pauseVBox.add(&optionsButton);
-    pauseVBox.add(&abortButton);
-    pauseVBox.setPolicy(USE_MAX_SIZE);
+    pauseTitleFrame.add(&menuTitle);
+    pauseTitleFrame.setPreferedSize(Vec3(0, 20));
+    pauseVBox.add(&pauseTitleFrame);
+    buttonsBox.add(&continueButton);
+    buttonsBox.add(&optionsButton);
+    buttonsBox.add(&abortButton);
+    pauseVBox.add(&buttonsBox);
     pauseContainer.addListener(*this);
     pauseContainer.setPreferedSize(Vec3(350, 250));
     pauseContainer.setPosition(Vec3((640-350)/2., (480-250)/2.));
@@ -520,12 +524,14 @@ PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
     add(&topBox);
 
     // Options menu
-    optionsBox.setPolicy(USE_MAX_SIZE);
-    optionsBox.add(&optionsTitle);
-    optionsBox.add(&audioButton);
-    optionsBox.add(&musicButton);
-    optionsBox.add(&fullScreenButton);
-    optionsBox.add(&optionsBack);
+    optionsTitleFrame.add(&optionsTitle);
+    optionsTitleFrame.setPreferedSize(Vec3(0, 20));
+    optionsBox.add(&optionsTitleFrame);
+    optionsButtonsBox.add(&audioButton);
+    optionsButtonsBox.add(&musicButton);
+    optionsButtonsBox.add(&fullScreenButton);
+    optionsButtonsBox.add(&optionsBack);
+    optionsBox.add(&optionsButtonsBox);
 }
 
 void PuyoPauseMenu::toggleSoundFx()

@@ -113,6 +113,7 @@ class PuyoCommander : public MessageListener
     const FramePicture *getButtonOverFramePicture() const { return &m_buttonOverFramePicture; }
     const FramePicture *getEditFieldFramePicture() const { return &m_textFieldIdleFramePicture; }
     const FramePicture *getEditFieldOverFramePicture() const { return &m_textFieldIdleFramePicture; }
+    const FramePicture *getSeparatorFramePicture() const { return &m_separatorFramePicture; }
   private:
 
     friend class SinglePlayerGameAction;
@@ -140,9 +141,11 @@ class PuyoCommander : public MessageListener
     bool useGL;
     IIM_Surface   *m_frameImage, *m_buttonIdleImage, *m_buttonDownImage, *m_buttonOverImage;
     IIM_Surface   *m_textFieldIdleImage;
+    IIM_Surface   *m_separatorImage;
     FramePicture m_windowFramePicture;
     FramePicture m_buttonIdleFramePicture, m_buttonDownFramePicture, m_buttonOverFramePicture;
     FramePicture m_textFieldIdleFramePicture;
+    FramePicture m_separatorFramePicture;
 };
 
 extern class PuyoCommander *theCommander;

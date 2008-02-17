@@ -52,7 +52,8 @@ LocalGameMenu::LocalGameMenu(PuyoMainScreen *mainScreen)
 		     PuyoGame::getDefaultPlayerName(0),
 		     PuyoGame::getDefaultPlayerKey(0),
 		     theCommander->getEditFieldFramePicture(),
-		     theCommander->getEditFieldOverFramePicture()),
+		     theCommander->getEditFieldOverFramePicture(), 150),
+      screenTitleFrame(theCommander->getSeparatorFramePicture()),
       screenTitle(locale.getLocalizedString("Choose Game Level")),
       easyAction(EASY, this), mediumAction(MEDIUM, this), hardAction(HARD, this), popAction(mainScreen),
       easy(locale.getLocalizedString("Beginner"), &easyAction),
@@ -65,12 +66,16 @@ LocalGameMenu::LocalGameMenu(PuyoMainScreen *mainScreen)
 }
 
 void LocalGameMenu::build() {
-    add(&screenTitle);
-    add(&easy);
-    add(&medium);
-    add(&hard);
-    add(&editPlayerName);
-    add(&back);
+    setPolicy(USE_MIN_SIZE);
+    screenTitleFrame.add(&screenTitle);
+    add(&screenTitleFrame);
+    screenTitleFrame.setPreferedSize(Vec3(0, 20));
+    buttonsBox.add(&easy);
+    buttonsBox.add(&medium);
+    buttonsBox.add(&hard);
+    buttonsBox.add(&editPlayerName);
+    buttonsBox.add(&back);
+    add(&buttonsBox);
 }
 
 String LocalGameMenu::getPlayerName() const
@@ -86,12 +91,13 @@ Local2PlayersGameMenu::Local2PlayersGameMenu(PuyoMainScreen *mainScreen)
 		      PuyoGame::getDefaultPlayerName(1),
 		      PuyoGame::getDefaultPlayerKey(1),
 		      theCommander->getEditFieldFramePicture(),
-		      theCommander->getEditFieldOverFramePicture()),
+		      theCommander->getEditFieldOverFramePicture(), 150),
       editPlayer2Name(locale.getLocalizedString("Player 2:"),
 		      PuyoGame::getDefaultPlayerName(2),
 		      PuyoGame::getDefaultPlayerKey(2),
 		      theCommander->getEditFieldFramePicture(),
-		      theCommander->getEditFieldOverFramePicture()),
+		      theCommander->getEditFieldOverFramePicture(), 150),
+      screenTitleFrame(theCommander->getSeparatorFramePicture()),
       screenTitle(locale.getLocalizedString("Choose Game Level")),
       easyAction(EASY, gameWidgetFactory, this),
       mediumAction(MEDIUM, gameWidgetFactory, this),
@@ -104,13 +110,17 @@ Local2PlayersGameMenu::Local2PlayersGameMenu(PuyoMainScreen *mainScreen)
 
 void Local2PlayersGameMenu::build()
 {
-    add(&screenTitle);
-    add(&easy);
-    add(&medium);
-    add(&hard);
-    add(&editPlayer1Name);
-    add(&editPlayer2Name);
-    add(&back);
+    setPolicy(USE_MIN_SIZE);
+    screenTitleFrame.add(&screenTitle);
+    add(&screenTitleFrame);
+    screenTitleFrame.setPreferedSize(Vec3(0, 20));
+    buttonsBox.add(&easy);
+    buttonsBox.add(&medium);
+    buttonsBox.add(&hard);
+    buttonsBox.add(&editPlayer1Name);
+    buttonsBox.add(&editPlayer2Name);
+    buttonsBox.add(&back);
+    add(&buttonsBox);
 }
 
 String Local2PlayersGameMenu::getPlayer1Name() const

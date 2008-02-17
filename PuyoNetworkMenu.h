@@ -72,7 +72,9 @@ public:
     LANGameMenu(PuyoMainScreen * mainScreen);
     void build();
 private:
+    Frame titleFrame;
     Text lanTitle;
+    VBox buttonsBox;
     EditFieldWithLabel playerNameLabel, portNumLabel;
     PuyoPopMenuAction cancelAction;
     Button startButton, cancelButton;
@@ -126,7 +128,9 @@ private:
     NetworkInternetAction internetAction;
     PuyoPushMenuAction lanAction;
     PuyoPopMenuAction mainScreenPopAction;
+    Frame titleFrame;
     Text networkTitleText;
+    VBox buttonsBox;
     Button lanGameButton, internetGameButton, cancelButton;
 };
 

@@ -116,8 +116,8 @@ void PuyoThemePicturePreview::draw(SDL_Surface *screen)
       Vec3 size = getSize();
       r.x = (Sint16)(getPosition().x+(size.x-NUMBER_OF_PUYOS*ONEPUYO+(NUMBER_OF_PUYOS-1)*ONEPUYO/4.0)/2.0);
       r.y = (Sint16)(getPosition().y+(size.y-ONEPUYO)/2.0);
-      r.h = 0.0;
-      r.w = 0.0;
+      r.h = 0;
+      r.w = 0;
       for (int i=0; i<NUMBER_OF_PUYOS; i++)
       {
         IIM_Rect rect = r;
@@ -204,7 +204,9 @@ void PuyoThemePreview::themeSelected(String themeName)
 /*****************************************************************************/
 
 PuyoThemeMenu::PuyoThemeMenu(PuyoMainScreen *mainScreen)
-    : PuyoMainScreenMenu(mainScreen), themeMenuTitle(theCommander->getLocalizedString("Puyo theme")), popAction(mainScreen),
+    : PuyoMainScreenMenu(mainScreen),
+      screenTitleFrame(theCommander->getSeparatorFramePicture()),
+      themeMenuTitle(theCommander->getLocalizedString("Puyo theme")), popAction(mainScreen),
       backButton(theCommander->getLocalizedString("Back"), &popAction),
       themePreview(), themeList(themePreview)
 {
@@ -214,8 +216,12 @@ void PuyoThemeMenu::build() {
     themeList.build();
     themePreview.build();
 
-    add(&themeMenuTitle);
-    add(&themeList);
-    add(&themePreview);
-    add(&backButton);
+    setPolicy(USE_MIN_SIZE);
+    screenTitleFrame.setPreferedSize(Vec3(0, 20));
+    screenTitleFrame.add(&themeMenuTitle);
+    add(&screenTitleFrame);
+    buttonsBox.add(&themeList);
+    buttonsBox.add(&themePreview);
+    buttonsBox.add(&backButton);
+    add(&buttonsBox);
 }

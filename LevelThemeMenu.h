@@ -89,7 +89,9 @@ public:
     LevelThemeMenu(PuyoMainScreen *mainScreen);
     void build();
 private:
+    Frame screenTitleFrame;
     Text themeMenuTitle;
+    VBox buttonsBox;
     PuyoPopMenuAction popAction;
     Button backButton;
     LevelThemePreview themePreview;

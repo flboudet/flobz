@@ -71,7 +71,9 @@ private:
 #include "PuyoGame.h"
 
 LANGameMenu::LANGameMenu(PuyoMainScreen * mainScreen)
-  : PuyoMainScreenMenu(mainScreen), lanTitle(theCommander->getLocalizedString("LAN Game")),
+  : PuyoMainScreenMenu(mainScreen),
+    titleFrame(theCommander->getSeparatorFramePicture()),
+    lanTitle(theCommander->getLocalizedString("LAN Game")),
     playerNameLabel(theCommander->getLocalizedString("Player name:"),
                     PuyoGame::getDefaultPlayerName(-1), PuyoGame::getDefaultPlayerKey(-1),
 		    theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
@@ -86,11 +88,15 @@ LANGameMenu::LANGameMenu(PuyoMainScreen * mainScreen)
 }
 
 void LANGameMenu::build() {
-    add(&lanTitle);
-    add(&startButton);
-    add(&playerNameLabel);
-    add(&portNumLabel);
-    add(&cancelButton);
+    setPolicy(USE_MIN_SIZE);
+    titleFrame.add(&lanTitle);
+    titleFrame.setPreferedSize(Vec3(0, 20));
+    add(&titleFrame);
+    buttonsBox.add(&startButton);
+    buttonsBox.add(&playerNameLabel);
+    buttonsBox.add(&portNumLabel);
+    buttonsBox.add(&cancelButton);
+    add(&buttonsBox);
 }
 
 class PuyoHttpServerList::PuyoHttpServer {
@@ -299,6 +305,7 @@ NetworkGameMenu::NetworkGameMenu(PuyoMainScreen * mainScreen)
       PuyoMainScreenMenu(mainScreen), lanGameMenu(mainScreen),
       internetGameMenu(NULL), internetAction(mainScreen, &internetGameMenu),
       lanAction(&lanGameMenu, mainScreen), mainScreenPopAction(mainScreen),
+      titleFrame(theCommander->getSeparatorFramePicture()),
       networkTitleText(locale.getLocalizedString("Network Game")),
       lanGameButton(locale.getLocalizedString("Local Area Network Game"), &lanAction),
       internetGameButton(locale.getLocalizedString("Internet Game"), &internetAction),
@@ -306,11 +313,15 @@ NetworkGameMenu::NetworkGameMenu(PuyoMainScreen * mainScreen)
 {}
 
 void NetworkGameMenu::build() {
+  setPolicy(USE_MIN_SIZE);
   lanGameMenu.build();
-  add(&networkTitleText);
-  add(&lanGameButton);
-  add(&internetGameButton);
-  add(&cancelButton);
+  titleFrame.add(&networkTitleText);
+  titleFrame.setPreferedSize(Vec3(0, 20));
+  add(&titleFrame);
+  buttonsBox.add(&lanGameButton);
+  buttonsBox.add(&internetGameButton);
+  buttonsBox.add(&cancelButton);
+  add(&buttonsBox);
 }
 
 InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)

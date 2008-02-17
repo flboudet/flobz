@@ -69,7 +69,9 @@ private:
     ToggleSoundFxAction toggleSoundFxAction;
     ToggleMusicAction toggleMusicAction;
     ToggleFullScreenAction toggleFullScreenAction;
+    Frame screenTitleFrame;
     Text optionTitle;
+    VBox buttonsBox;
     ToggleButton audioButton, musicButton, fullScreenButton;
     ControlMenu controlMenu;
     PuyoThemeMenu themeMenu;

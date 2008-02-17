@@ -24,9 +24,11 @@ private:
 class EditFieldWithLabel : public HBox {
 public:
   EditFieldWithLabel(String label, String defaultValue, Action *action,
-		     const FramePicture *framePicture, const FramePicture *focusedPicture);
+		     const FramePicture *framePicture, const FramePicture *focusedPicture,
+		     int width = 0);
   EditFieldWithLabel(String label, String defaultValue, String persistentID,
-		     const FramePicture *framePicture, const FramePicture *focusedPicture);
+		     const FramePicture *framePicture, const FramePicture *focusedPicture,
+		     int width = 0);
   virtual ~EditFieldWithLabel();
   EditField &getEditField() { return m_editField.getEditField(); }
   const EditField &getEditField() const { return m_editField.getEditField(); }

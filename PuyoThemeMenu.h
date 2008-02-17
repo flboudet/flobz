@@ -86,7 +86,9 @@ public:
     PuyoThemeMenu(PuyoMainScreen *mainScreen);
     void build();
 private:
+    Frame screenTitleFrame;
     Text themeMenuTitle;
+    VBox buttonsBox;
     PuyoPopMenuAction popAction;
     Button backButton;
     PuyoThemePreview themePreview;

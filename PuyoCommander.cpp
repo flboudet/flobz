@@ -275,7 +275,8 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
     m_buttonIdleFramePicture(13, 10, 13, 12, 7, 13),
     m_buttonDownFramePicture(13, 10, 13, 12, 7, 13),
     m_buttonOverFramePicture(13, 10, 13, 12, 7, 13),
-    m_textFieldIdleFramePicture(5, 23, 4, 6, 10, 3)
+    m_textFieldIdleFramePicture(5, 23, 4, 6, 10, 3),
+    m_separatorFramePicture(63, 2, 63, 2, 4, 2)
 {
   //SDL_Delay(500);
   loop = GameUIDefaults::GAME_LOOP;
@@ -302,6 +303,7 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
   m_buttonDownImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/buttondown.png"));
   m_buttonOverImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/buttonover.png"));
   m_textFieldIdleImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/editfield.png"));
+  m_separatorImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/separator.png"));
   m_windowFramePicture.setFrameSurface(m_frameImage);
   RGBA blackTranslucient = {(Uint8)0x00, (Uint8)0x00, (Uint8)0x00, (Uint8)0x80};
   m_windowFramePicture.setContentColor(blackTranslucient);
@@ -315,6 +317,9 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
   RGBA textFieldColor = {(Uint8)0xFA, (Uint8)0xEF, (Uint8)0xDB, (Uint8)0xFF};
   m_textFieldIdleFramePicture.setFrameSurface(m_textFieldIdleImage);
   m_textFieldIdleFramePicture.setContentColor(textFieldColor);
+  RGBA separatorColor = {(Uint8)0xCC, (Uint8)0x95, (Uint8)0x36, (Uint8)0xFF};
+  m_separatorFramePicture.setFrameSurface(m_separatorImage);
+  m_separatorFramePicture.setContentColor(separatorColor);
 }
 
 PuyoCommander::~PuyoCommander()
@@ -327,6 +332,7 @@ PuyoCommander::~PuyoCommander()
   IIM_Free(m_buttonDownImage);
   IIM_Free(m_buttonOverImage);
   IIM_Free(m_textFieldIdleImage);
+  IIM_Free(m_separatorImage);
 }
 
 /* Initialize SDL context */

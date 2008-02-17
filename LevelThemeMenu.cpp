@@ -236,18 +236,23 @@ void LevelThemePreview::themeSelected(String themeName)
 /*****************************************************************************/
 
 LevelThemeMenu::LevelThemeMenu(PuyoMainScreen *mainScreen)
-    : PuyoMainScreenMenu(mainScreen), themeMenuTitle(theCommander->getLocalizedString("Level theme")), popAction(mainScreen),
+    : PuyoMainScreenMenu(mainScreen),
+      screenTitleFrame(theCommander->getSeparatorFramePicture()),
+      themeMenuTitle(theCommander->getLocalizedString("Level theme")), popAction(mainScreen),
       backButton(theCommander->getLocalizedString("Back"), &popAction), 
       themePreview(), themeList(themePreview)
 {
 }
 
 void LevelThemeMenu::build() {
-    add(&themeMenuTitle);
-    add(&themeList);
-    add(&themePreview);
-    add(&backButton);
+    setPolicy(USE_MIN_SIZE);
+    screenTitleFrame.setPreferedSize(Vec3(0, 20));
+    screenTitleFrame.add(&themeMenuTitle);
+    add(&screenTitleFrame);
+    buttonsBox.add(&themeList);
+    buttonsBox.add(&themePreview);
+    buttonsBox.add(&backButton);
+    add(&buttonsBox);
     themePreview.build();
-    arrangeWidgets();
     themeList.build();
 }

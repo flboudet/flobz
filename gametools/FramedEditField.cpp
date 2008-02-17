@@ -38,20 +38,26 @@ void FramedEditField::initFramedEditField(const FramePicture *framePicture, cons
 //
 
 EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, Action *action,
-				       const FramePicture *framePicture, const FramePicture *focusedPicture)
+				       const FramePicture *framePicture, const FramePicture *focusedPicture,
+				       int width)
   : m_editField(defaultValue, action, framePicture, focusedPicture),
     text(label)
 {
+  setPolicy(USE_MIN_SIZE);
   add(&text);
+  m_editField.setPreferedSize(Vec3(0, 0, 0));
   add(&m_editField);
 }
 
 EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, String persistentID,
-				       const FramePicture *framePicture, const FramePicture *focusedPicture)
+				       const FramePicture *framePicture, const FramePicture *focusedPicture,
+				       int width)
   : m_editField(defaultValue, persistentID, framePicture, focusedPicture),
     text(label)
 {
+  setPolicy(USE_MIN_SIZE);
   add(&text);
+  m_editField.setPreferedSize(Vec3(width, 0, 0));
   add(&m_editField);
 }
 
