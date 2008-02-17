@@ -17,6 +17,7 @@ private:
     private:
         PuyoMainScreen *mainScreen;
     };
+    Frame screenTitleFrame;
     Text title;
     BackSaveAction backAction;
     Button backButton;

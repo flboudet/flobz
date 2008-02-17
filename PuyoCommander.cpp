@@ -317,7 +317,7 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
   RGBA textFieldColor = {(Uint8)0xFA, (Uint8)0xEF, (Uint8)0xDB, (Uint8)0xFF};
   m_textFieldIdleFramePicture.setFrameSurface(m_textFieldIdleImage);
   m_textFieldIdleFramePicture.setContentColor(textFieldColor);
-  RGBA separatorColor = {(Uint8)0xCC, (Uint8)0x95, (Uint8)0x36, (Uint8)0xFF};
+  RGBA separatorColor = {(Uint8)0xCC, (Uint8)0x95, (Uint8)0x36, (Uint8)0x80};
   m_separatorFramePicture.setFrameSurface(m_separatorImage);
   m_separatorFramePicture.setContentColor(separatorColor);
 }

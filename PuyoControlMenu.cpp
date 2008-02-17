@@ -11,7 +11,9 @@ void ControlMenu::BackSaveAction::action()
 }
 
 ControlMenu::ControlMenu(PuyoMainScreen *mainScreen)
-    : PuyoMainScreenMenu(mainScreen), title("Change Controls"), backAction(mainScreen), backButton("Back", &backAction),
+    : PuyoMainScreenMenu(mainScreen),
+      screenTitleFrame(theCommander->getSeparatorFramePicture()),
+      title("Change Controls"), backAction(mainScreen), backButton("Back", &backAction),
       labelTitle("Controls"), keyTitle("Primary"), alternateKeyTitle("Alternate"),
       lbl1PLeft(kPlayer1Left), lbl1PRight(kPlayer1Right), lbl1PDown(kPlayer1Down), lbl1PTurnRight(kPlayer1Clockwise), lbl1PTurnLeft(kPlayer1Counterclockwise),
       lbl2PLeft(kPlayer2Left), lbl2PRight(kPlayer2Right), lbl2PDown(kPlayer2Down), lbl2PTurnRight(kPlayer2Clockwise), lbl2PTurnLeft(kPlayer2Counterclockwise),
@@ -34,6 +36,8 @@ ControlMenu::ControlMenu(PuyoMainScreen *mainScreen)
 }
 
 void ControlMenu::build() {
+    setPolicy(USE_MIN_SIZE);
+    screenTitleFrame.setPreferedSize(Vec3(0, 20));
     labelBox.add(&labelTitle);
     keyBox.add(&keyTitle);
     alternateKeyBox.add(&alternateKeyTitle);
@@ -89,7 +93,8 @@ void ControlMenu::build() {
     Vec3 margins(400.0,400.0,0.0);
     mainHBox.setPreferedSize(/*mainHBox.getPreferedSize() + */margins);
     
-    add(&title);
+    screenTitleFrame.add(&title);
+    add(&screenTitleFrame);
     add(&mainHBox);
     add(&backButton);
 }
