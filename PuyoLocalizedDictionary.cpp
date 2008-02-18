@@ -57,7 +57,7 @@ static bool readLine(FILE *dictionaryFile, String &lineRead)
         const char *text = newLineRead;
         lineRead = "";
         char previousChar = text[0];
-        for (int i = 0 ; i < strlen(text) ; i++) {
+        for (unsigned int i = 0 ; i < strlen(text) ; i++) {
             char texti = text[i];
             switch (previousChar) {
                 case '\\':

@@ -12,9 +12,10 @@
 namespace gameui {
 
 FramePicture::FramePicture(IIM_Surface *frameSurface, int leftW, int middleW, int rightW, int topH, int middleH, int bottomH)
-    : m_frameSurface(frameSurface), m_leftW(leftW), m_middleW(middleW), m_rightW(rightW),
+    : m_leftW(leftW), m_middleW(middleW), m_rightW(rightW),
       m_topH(topH), m_middleH(middleH), m_bottomH(bottomH)
 {
+  setFrameSurface(frameSurface);
 }
 
 FramePicture::FramePicture(int leftW, int middleW, int rightW, int topH, int middleH, int bottomH)
@@ -23,8 +24,18 @@ FramePicture::FramePicture(int leftW, int middleW, int rightW, int topH, int mid
 {
 }
 
+void FramePicture::setFrameSurface(IIM_Surface *frameSurface)
+{
+  if (frameSurface && frameSurface->surf)
+  {
+    m_frameSurface = frameSurface;
+    m_contentColor = iim_surface_get_rgba(frameSurface->surf,m_leftW,m_topH);
+  }
+}
+
 void FramePicture::render(SDL_Surface *surf) const
 {
+  if (m_frameSurface && m_frameSurface->surf) {
     int surfW = surf->w;
     int surfH = surf->h;
     SDL_SetAlpha(m_frameSurface->surf, 0, SDL_ALPHA_OPAQUE);
@@ -96,6 +107,7 @@ void FramePicture::render(SDL_Surface *surf) const
 					 (m_contentColor.alpha<<8) |
 					 (m_contentColor.alpha<<16)|
 					 (m_contentColor.alpha<<24))));
+  }
 }
 
 Frame::Frame(const FramePicture *frameSurface, GameLoop *loop)

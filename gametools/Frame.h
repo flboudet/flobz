@@ -19,7 +19,7 @@ public:
     FramePicture(IIM_Surface *frameSurface, int leftW, int middleW, int rightW, int topH, int middleH, int bottomH);
     FramePicture(int leftW, int middleW, int rightW, int topH, int middleH, int bottomH);
     virtual ~FramePicture() {}
-    void setFrameSurface(IIM_Surface *frameSurface) { m_frameSurface = frameSurface; }
+    void setFrameSurface(IIM_Surface *frameSurface);
     void setContentColor(RGBA contentColor) { m_contentColor = contentColor; }
     void render(SDL_Surface *surf) const;
 private:

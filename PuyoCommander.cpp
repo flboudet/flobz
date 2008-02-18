@@ -28,7 +28,9 @@ SoFont *storyFont;
 #define MENU_Y 225
 
 static const char * kFullScreenPref = "Config.FullScreen";
+#ifdef HAVE_OPENGL
 static const char * kOpenGLPref     = "Config.OpenGL";
+#endif
 static const char * kScreenWidthPref = "Config.ScreenWidth";
 static const char * kScreenHeightPref = "Config.ScreenHeight";
 
@@ -125,6 +127,8 @@ void PuyoMainScreen::onEvent(GameControlEvent *cevent)
     case GameControlEvent::kBack:
         popMenu();
         break;
+      default:
+        break;
     }
 }
 
@@ -198,13 +202,14 @@ private:
     Local2PlayersGameMenu local2PlayersGameMenu;
     OptionMenu            optionMenu;
     NetworkGameMenu       networkGameMenu;
+
+    PopHallOfFameAction   popScreenAction;
     HallOfFameScreen      hallOfFameScreen; // Comes from PuyoSinglePlayerStarter.cpp
 
     PuyoPushMenuAction    singlePlayerGameAction;
     PuyoPushMenuAction    twoPlayersGameAction;
     PuyoPushMenuAction    optionAction;
     PuyoPushMenuAction    networkGameAction;
-    PopHallOfFameAction   popScreenAction;
     PushHallOfFameAction  hallOfFameAction;
     ExitAction exitAction;
 
@@ -305,21 +310,11 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
   m_textFieldIdleImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/editfield.png"));
   m_separatorImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/separator.png"));
   m_windowFramePicture.setFrameSurface(m_frameImage);
-  RGBA blackTranslucient = {(Uint8)0x00, (Uint8)0x00, (Uint8)0x00, (Uint8)0x80};
-  m_windowFramePicture.setContentColor(blackTranslucient);
   m_buttonIdleFramePicture.setFrameSurface(m_buttonIdleImage);
-  RGBA buttonGray = {(Uint8)0xA5, (Uint8)0xA5, (Uint8)0xA5, (Uint8)0xFF};
-  m_buttonIdleFramePicture.setContentColor(buttonGray);
   m_buttonDownFramePicture.setFrameSurface(m_buttonDownImage);
-  m_buttonDownFramePicture.setContentColor(buttonGray);
   m_buttonOverFramePicture.setFrameSurface(m_buttonOverImage);
-  m_buttonOverFramePicture.setContentColor(buttonGray);
-  RGBA textFieldColor = {(Uint8)0xFA, (Uint8)0xEF, (Uint8)0xDB, (Uint8)0xFF};
   m_textFieldIdleFramePicture.setFrameSurface(m_textFieldIdleImage);
-  m_textFieldIdleFramePicture.setContentColor(textFieldColor);
-  RGBA separatorColor = {(Uint8)0xCC, (Uint8)0x95, (Uint8)0x36, (Uint8)0x80};
   m_separatorFramePicture.setFrameSurface(m_separatorImage);
-  m_separatorFramePicture.setContentColor(separatorColor);
 }
 
 PuyoCommander::~PuyoCommander()
