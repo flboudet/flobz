@@ -4,13 +4,19 @@
 #include "ios_igpvirtualpeermessagebox.h"
 #include "PuyoServerIgpResponder.h"
 #include "PuyoServerIgpNatTraversal.h"
+#include <stdlib.h>
 
 using namespace ios_fc;
 
-int main()
+int main(int argc, const char * argv[])
 {
+  int port;
+    if (argc >= 2)  port = atoi(argv[1]);
+    else port = 4567;
+    fprintf (stderr, "Starting server at port %d\n", port);
+  
     Selector serverSelector;
-    DatagramSocket serverSocket(4567);
+    DatagramSocket serverSocket(port);
     UDPMessageBox messageBox(&serverSocket);
     IgpMessageListener listener(messageBox);
     

@@ -9,10 +9,10 @@ class PuyoIgpNatTraversal::PunchPool {
 public:
     PunchPool(const String punchPoolName, String creatorAddress, int creatorPortNum, String creatorLocalAddress, int creatorLocalPortNum, PeerAddress creatorPeerAddress)
         : lastUpdate(getTimeMs()), punchPoolName(punchPoolName),
-          creatorAddress(creatorAddress), creatorPort(creatorPortNum),
+          creatorAddress(creatorAddress),
 	  creatorLocalAddress(creatorLocalAddress),
-	  creatorLocalPort(creatorLocalPortNum),
-	  creatorPeerAddress(creatorPeerAddress),
+    creatorPeerAddress(creatorPeerAddress),
+    creatorPort(creatorPortNum), creatorLocalPort(creatorLocalPortNum),
 	  creatorSync(false), guestSync(false) {}
     inline const String getPunchPoolName() const { return punchPoolName; }
     void dispatchInformations(String guestAddress, int guestPortNum, String guestLocalAddress, int guestLocalPortNum, PeerAddress guestPeerAddress, MessageBox *mbox);
