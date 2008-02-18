@@ -54,17 +54,17 @@ const char *kLevelEasy   = "Easy";
 const char *kLevelMedium = "Medium";
 const char *kLevelHard   = "Hard";
 
-const char *kPlayer1Left  = "P1 Left:\t";
-const char *kPlayer1Right = "P1 Right:\t";
-const char *kPlayer1Down  = "P1 Down:\t";
-const char *kPlayer1Clockwise        = "P1 Turn R:\t";
-const char *kPlayer1Counterclockwise = "P1 Turn L:\t";
+const char *kPlayer1Left  = "P1 Left:";
+const char *kPlayer1Right = "P1 Right:";
+const char *kPlayer1Down  = "P1 Down:";
+const char *kPlayer1Clockwise        = "P1 Turn R:";
+const char *kPlayer1Counterclockwise = "P1 Turn L:";
 
-const char *kPlayer2Left   = "P2 Left:\t";
-const char *kPlayer2Right  = "P2 Right:\t";
-const char *kPlayer2Down   = "P2 Down:\t";
-const char *kPlayer2Clockwise        = "P2 Turn R:\t";
-const char *kPlayer2Counterclockwise = "P2 Turn L:\t";
+const char *kPlayer2Left   = "P2 Left:";
+const char *kPlayer2Right  = "P2 Right:";
+const char *kPlayer2Down   = "P2 Down:";
+const char *kPlayer2Clockwise        = "P2 Turn R:";
+const char *kPlayer2Counterclockwise = "P2 Turn L:";
 
 const char *kRules01 = "Puyos are fancy smiling bubbles...";
 const char *kRules02 = "But they can really be invading sometimes!";

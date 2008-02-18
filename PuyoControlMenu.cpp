@@ -13,10 +13,34 @@ void ControlMenu::BackSaveAction::action()
 ControlMenu::ControlMenu(PuyoMainScreen *mainScreen)
     : PuyoMainScreenMenu(mainScreen),
       screenTitleFrame(theCommander->getSeparatorFramePicture()),
-      title("Change Controls"), backAction(mainScreen), backButton("Back", &backAction),
-      labelTitle("Controls"), keyTitle("Primary"), alternateKeyTitle("Alternate"),
-      lbl1PLeft(kPlayer1Left), lbl1PRight(kPlayer1Right), lbl1PDown(kPlayer1Down), lbl1PTurnRight(kPlayer1Clockwise), lbl1PTurnLeft(kPlayer1Counterclockwise),
-      lbl2PLeft(kPlayer2Left), lbl2PRight(kPlayer2Right), lbl2PDown(kPlayer2Down), lbl2PTurnRight(kPlayer2Clockwise), lbl2PTurnLeft(kPlayer2Counterclockwise),
+      playerOneTitleFrame(theCommander->getSeparatorFramePicture()),
+      playerTwoTitleFrame(theCommander->getSeparatorFramePicture()),
+      playerOneFrame(theCommander->getWindowFramePicture()),
+      playerTwoFrame(theCommander->getWindowFramePicture()),
+      title(theCommander->getLocalizedString("Change Controls")),
+      playerOneTitle(theCommander->getLocalizedString("Player 1 Controls")),
+      playerTwoTitle(theCommander->getLocalizedString("Player 2 Controls")),
+      titleSeparator(0., 10.), playersSeparator(0., 10.), bottomSeparator(0., 10.),
+      backAction(mainScreen),
+      backButton(theCommander->getLocalizedString("Back"), &backAction,
+		 theCommander->getButtonFramePicture(),
+		 theCommander->getButtonOverFramePicture()),
+      label1pTitle(theCommander->getLocalizedString("Controls")),
+      key1pTitle(theCommander->getLocalizedString("Primary")),
+      alternateKey1pTitle(theCommander->getLocalizedString("Alternate")),
+      label2pTitle(theCommander->getLocalizedString("Controls")),
+      key2pTitle(theCommander->getLocalizedString("Primary")),
+      alternateKey2pTitle(theCommander->getLocalizedString("Alternate")),
+      lbl1PLeft(theCommander->getLocalizedString(kPlayer1Left)),
+      lbl1PRight(theCommander->getLocalizedString(kPlayer1Right)),
+      lbl1PDown(theCommander->getLocalizedString(kPlayer1Down)),
+      lbl1PTurnRight(theCommander->getLocalizedString(kPlayer1Clockwise)),
+      lbl1PTurnLeft(theCommander->getLocalizedString(kPlayer1Counterclockwise)),
+      lbl2PLeft(theCommander->getLocalizedString(kPlayer2Left)),
+      lbl2PRight(theCommander->getLocalizedString(kPlayer2Right)),
+      lbl2PDown(theCommander->getLocalizedString(kPlayer2Down)),
+      lbl2PTurnRight(theCommander->getLocalizedString(kPlayer2Clockwise)),
+      lbl2PTurnLeft(theCommander->getLocalizedString(kPlayer2Counterclockwise)),
       p1Left(0, false), p1Right(1, false), p1Down(2, false), p1TurnRight(3, false), p1TurnLeft(4, false),
       ap1Left(0, true), ap1Right(1, true), ap1Down(2, true), ap1TurnRight(3, true), ap1TurnLeft(4, true),
       p2Left(5, false), p2Right(6, false), p2Down(7, false), p2TurnRight(8, false), p2TurnLeft(9, false),
@@ -42,62 +66,72 @@ void ControlMenu::build() {
     screenTitleFrame.setPreferedSize(Vec3(0, 20));
     screenTitleFrame.add(&title);
     add(&screenTitleFrame);
+    add(&titleSeparator);
+    
+    playerOneTitleFrame.setPreferedSize(Vec3(0, 20));
+    playerTwoTitleFrame.setPreferedSize(Vec3(0, 20));
+    playerOneTitleFrame.add(&playerOneTitle);
+    playerTwoTitleFrame.add(&playerTwoTitle);
 
-    labelBox.add(&labelTitle);
-    keyBox.add(&keyTitle);
-    alternateKeyBox.add(&alternateKeyTitle);
-    
-    labelBox.add(&labelSep1);
-    keyBox.add(&keySep1);
-    alternateKeyBox.add(&altSep1);
-    
-    labelBox.add(&lbl1PLeft);
-    labelBox.add(&lbl1PRight);
-    labelBox.add(&lbl1PDown);
-    labelBox.add(&lbl1PTurnRight);
-    labelBox.add(&lbl1PTurnLeft);
-    
-    keyBox.add(&p1Left);
-    keyBox.add(&p1Right);
-    keyBox.add(&p1Down);
-    keyBox.add(&p1TurnRight);
-    keyBox.add(&p1TurnLeft);
-    
-    alternateKeyBox.add(&ap1Left);
-    alternateKeyBox.add(&ap1Right);
-    alternateKeyBox.add(&ap1Down);
-    alternateKeyBox.add(&ap1TurnRight);
-    alternateKeyBox.add(&ap1TurnLeft);
-    
-    labelBox.add(&labelSep2);
-    keyBox.add(&keySep2);
-    alternateKeyBox.add(&altSep2);
-    
-    labelBox.add(&lbl2PLeft);
-    labelBox.add(&lbl2PRight);
-    labelBox.add(&lbl2PDown);
-    labelBox.add(&lbl2PTurnRight);
-    labelBox.add(&lbl2PTurnLeft);
-    
-    keyBox.add(&p2Left);
-    keyBox.add(&p2Right);
-    keyBox.add(&p2Down);
-    keyBox.add(&p2TurnRight);
-    keyBox.add(&p2TurnLeft);
-    
-    alternateKeyBox.add(&ap2Left);
-    alternateKeyBox.add(&ap2Right);
-    alternateKeyBox.add(&ap2Down);
-    alternateKeyBox.add(&ap2TurnRight);
-    alternateKeyBox.add(&ap2TurnLeft);
+    label1pBox.add(&label1pTitle);
+    key1pBox.add(&key1pTitle);
+    alternateKey1pBox.add(&alternateKey1pTitle);
 
-    mainHBox.add(&labelBox);
-    mainHBox.add(&keyBox);
-    mainHBox.add(&alternateKeyBox);
+    label2pBox.add(&label2pTitle);
+    key2pBox.add(&key2pTitle);
+    alternateKey2pBox.add(&alternateKey2pTitle);
     
-    Vec3 margins(400.0,400.0,0.0);
-    mainHBox.setPreferedSize(/*mainHBox.getPreferedSize() + */margins);
+    label1pBox.add(&lbl1PLeft);
+    label1pBox.add(&lbl1PRight);
+    label1pBox.add(&lbl1PDown);
+    label1pBox.add(&lbl1PTurnRight);
+    label1pBox.add(&lbl1PTurnLeft);
     
-    add(&mainHBox);
+    key1pBox.add(&p1Left);
+    key1pBox.add(&p1Right);
+    key1pBox.add(&p1Down);
+    key1pBox.add(&p1TurnRight);
+    key1pBox.add(&p1TurnLeft);
+    
+    alternateKey1pBox.add(&ap1Left);
+    alternateKey1pBox.add(&ap1Right);
+    alternateKey1pBox.add(&ap1Down);
+    alternateKey1pBox.add(&ap1TurnRight);
+    alternateKey1pBox.add(&ap1TurnLeft);
+    
+    label2pBox.add(&lbl2PLeft);
+    label2pBox.add(&lbl2PRight);
+    label2pBox.add(&lbl2PDown);
+    label2pBox.add(&lbl2PTurnRight);
+    label2pBox.add(&lbl2PTurnLeft);
+    
+    key2pBox.add(&p2Left);
+    key2pBox.add(&p2Right);
+    key2pBox.add(&p2Down);
+    key2pBox.add(&p2TurnRight);
+    key2pBox.add(&p2TurnLeft);
+    
+    alternateKey2pBox.add(&ap2Left);
+    alternateKey2pBox.add(&ap2Right);
+    alternateKey2pBox.add(&ap2Down);
+    alternateKey2pBox.add(&ap2TurnRight);
+    alternateKey2pBox.add(&ap2TurnLeft);
+
+    playerOneBox.add(&label1pBox);
+    playerOneBox.add(&key1pBox);
+    playerOneBox.add(&alternateKey1pBox);
+
+    playerTwoBox.add(&label2pBox);
+    playerTwoBox.add(&key2pBox);
+    playerTwoBox.add(&alternateKey2pBox);
+    
+    playerOneFrame.add(&playerOneBox);
+    playerTwoFrame.add(&playerTwoBox);
+    add(&playerOneTitleFrame);
+    add(&playerOneFrame);
+    add(&playersSeparator);
+    add(&playerTwoTitleFrame);
+    add(&playerTwoFrame);
+    add(&bottomSeparator);
     add(&backButton);
 }

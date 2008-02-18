@@ -3,6 +3,8 @@
 
 #include "gameui.h"
 #include "PuyoCommander.h"
+#include "Frame.h"
+#include "FramedButton.h"
 
 class ControlMenu : public PuyoMainScreenMenu {
 public:
@@ -18,12 +20,17 @@ private:
         PuyoMainScreen *mainScreen;
     };
     Frame screenTitleFrame;
-    Text title;
+    Frame playerOneTitleFrame, playerTwoTitleFrame;
+    Frame playerOneFrame, playerTwoFrame;
+    Text title, playerOneTitle, playerTwoTitle;
+    Separator titleSeparator, playersSeparator, bottomSeparator;
     BackSaveAction backAction;
-    Button backButton;
-    HBox mainHBox;
-    VBox labelBox, keyBox, alternateKeyBox;
-    Text labelTitle, keyTitle, alternateKeyTitle, labelSep1, keySep1, altSep1, labelSep2, keySep2, altSep2;
+    FramedButton backButton;
+    HBox playerOneBox, playerTwoBox;
+    VBox label1pBox, key1pBox, alternateKey1pBox;
+    VBox label2pBox, key2pBox, alternateKey2pBox;
+    Text label1pTitle, key1pTitle, alternateKey1pTitle;
+    Text label2pTitle, key2pTitle, alternateKey2pTitle;
     Text lbl1PLeft, lbl1PRight, lbl1PDown, lbl1PTurnRight, lbl1PTurnLeft;
     Text lbl2PLeft, lbl2PRight, lbl2PDown, lbl2PTurnRight, lbl2PTurnLeft;
     ControlInputWidget p1Left, p1Right, p1Down, p1TurnRight, p1TurnLeft;
