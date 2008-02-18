@@ -592,9 +592,24 @@ namespace gameui {
             while (!getChild(possibleNewWidget)->isFocusable());
 
             if (possibleNewWidget != activeWidget) {
-                getChild(possibleNewWidget)->eventOccured(event);
+	        // If the child to be focused is a box sorted in the same way as
+	        // the box which has just left the focus, try to give the focus
+	        // to the child wearing the same number as in the box that has
+	        // just left the focus
+                Widget *possibleActiveWidget = getChild(possibleNewWidget);
+  	        Box *prevActiveBox = NULL;
+		if ((activeWidget >= 0)
+		    && (activeWidget < getNumberOfChilds())) {
+		  prevActiveBox = dynamic_cast<Box *>(getChild(activeWidget));
+		}
+		Box *curActiveBox = dynamic_cast<Box *>(possibleActiveWidget);
+		if ((prevActiveBox != NULL) && (curActiveBox != NULL)) {
+		  if (prevActiveBox->getSortingAxe(ref) == curActiveBox->getSortingAxe(ref))
+		    curActiveBox->setActiveWidget(prevActiveBox->activeWidget);
+		}
+                possibleActiveWidget->eventOccured(event);
                 setActiveWidget(possibleNewWidget);
-            }  
+            }
         }
     }
 

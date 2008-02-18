@@ -37,8 +37,8 @@ flobopuyo: all.h.gch iosfc_dir gametools_dir goomsl_dir ${OBJFILES}
 	@echo " Type ./$(PRGNAME) to play."
 	@echo "--------------------------------------"
 
-TestGameUi: TestGameUi.o SDLMain.o gametools_dir
-	$(CXX) $(CFLAGS) -o $@ TestGameUi.o SDLMain.o gametools/*.o -Liosfc -liosfc $(LDFLAGS)
+TestGameUi: TestGameUi.o gametools_dir
+	$(CXX) $(CFLAGS) -o $@ TestGameUi.o gametools/*.o -Liosfc -liosfc $(LDFLAGS)
 
 iosfc_dir:
 	@+DEPFLAGS='$(DEPFLAGS)' CFLAGS='$(CFLAGS)' CXXFLAGS='$(CXXFLAGS)' LDFLAGS='$(LDFLAGS)' CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C iosfc libiosfc.a

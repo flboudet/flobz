@@ -33,11 +33,16 @@ ControlMenu::ControlMenu(PuyoMainScreen *mainScreen)
     lbl2PDown.setFont(GameUIDefaults::FONT_SMALL_INFO);
     lbl2PTurnRight.setFont(GameUIDefaults::FONT_SMALL_INFO);
     lbl2PTurnLeft.setFont(GameUIDefaults::FONT_SMALL_INFO);
+
+    this->setBorderVisible(false);
 }
 
 void ControlMenu::build() {
     setPolicy(USE_MIN_SIZE);
     screenTitleFrame.setPreferedSize(Vec3(0, 20));
+    screenTitleFrame.add(&title);
+    add(&screenTitleFrame);
+
     labelBox.add(&labelTitle);
     keyBox.add(&keyTitle);
     alternateKeyBox.add(&alternateKeyTitle);
@@ -93,8 +98,6 @@ void ControlMenu::build() {
     Vec3 margins(400.0,400.0,0.0);
     mainHBox.setPreferedSize(/*mainHBox.getPreferedSize() + */margins);
     
-    screenTitleFrame.add(&title);
-    add(&screenTitleFrame);
     add(&mainHBox);
     add(&backButton);
 }
