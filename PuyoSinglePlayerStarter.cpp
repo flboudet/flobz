@@ -375,6 +375,7 @@ void SinglePlayerStarterAction::initiateLevel()
 void SinglePlayerStarterAction::startGame()
 {
     gameWidget = new PuyoSinglePlayerGameWidget(levelData->getPuyoTheme(), levelData->getLevelTheme(), levelData->getIALevel(), levelData->getNColors(), lifes, levelData->getIAFace(), this);
+    gameWidget->setGameOptions(GameOptions::FromLevel(difficulty));
     gameScreen = new PuyoGameScreen(*gameWidget, *story);
     if (nameProvider != NULL)
         gameWidget->setPlayerOneName(nameProvider->getPlayerName());

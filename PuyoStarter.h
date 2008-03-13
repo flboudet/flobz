@@ -129,11 +129,28 @@ private:
 };
 
 class PuyoGameScreen;
+struct GameOptions;
+
+struct GameOptions
+{
+    GameOptions() {
+        MIN_SPEED = 2;
+        MAX_SPEED = 20;
+        CYCLES_BEFORE_SPEED_INCREASES = 240;
+    }
+
+    static GameOptions FromLevel(int level);
+
+    int MIN_SPEED;
+    int MAX_SPEED;
+    int CYCLES_BEFORE_SPEED_INCREASES;
+};
 
 class PuyoGameWidget : public GarbageCollectableItem, public Widget, CycledComponent {
 public:
-    PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction = NULL);
-    PuyoGameWidget();
+    /*PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, GameOptions &options, Action *gameOverAction = NULL);*/
+    PuyoGameWidget(GameOptions options = GameOptions());
+    void setGameOptions(GameOptions options);
     virtual ~PuyoGameWidget();
     void initialize(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction = NULL);
     void initialize();

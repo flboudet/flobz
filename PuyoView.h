@@ -90,6 +90,7 @@ class PuyoView : public PuyoDelegate {
     void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase);
     void gameLost();
     int getPlayerId() const { return (xOffset < 320) ? 1 : 2; }
+    void gameWin();
     
   protected:
     bool cycleAllowed();

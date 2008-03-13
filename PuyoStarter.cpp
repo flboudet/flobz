@@ -149,14 +149,10 @@ void PuyoKillPlayerRightAction::action()
     target.addGameBHandicap(PUYODIMY);
 }
 
-#define MIN_SPEED 2
-#define MAX_SPEED 20
-#define CYCLES_BEFORE_SPEED_INCREASES 240
-
-PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
+/*PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, GameOptions &game_options, Action *gameOverAction)
     : CycledComponent(TIME_BETWEEN_GAME_CYCLES), associatedScreen(NULL), attachedLevelTheme(&levelTheme), areaA(&areaA), areaB(&areaB), controllerA(&controllerA), controllerB(&controllerB),
-      cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(CYCLES_BEFORE_SPEED_INCREASES), tickCounts(0), cycles(0), paused(false), displayLives(true), lives(3),
-      gameOverAction(gameOverAction), abortedFlag(false), gameSpeed(0), MinSpeed(MIN_SPEED), MaxSpeed(MAX_SPEED),
+      cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(game_options.CYCLES_BEFORE_SPEED_INCREASES), tickCounts(0), cycles(0), paused(false), displayLives(true), lives(3),
+      gameOverAction(gameOverAction), abortedFlag(false), gameSpeed(0), MinSpeed(game_options.MIN_SPEED), MaxSpeed(game_options.MAX_SPEED),
       blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
       playerOneName(p1name), playerTwoName(p2name), 
       killLeftAction(*this), killRightAction(*this),
@@ -164,11 +160,19 @@ PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &con
 {
     initialize();
 }
+*/
 
-PuyoGameWidget::PuyoGameWidget()
-    : CycledComponent(TIME_BETWEEN_GAME_CYCLES), associatedScreen(NULL), cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(CYCLES_BEFORE_SPEED_INCREASES),
+void PuyoGameWidget::setGameOptions(GameOptions game_options)
+{
+    cyclesBeforeSpeedIncreases = game_options.CYCLES_BEFORE_SPEED_INCREASES;
+    MinSpeed = game_options.MIN_SPEED;
+    MaxSpeed = game_options.MAX_SPEED;
+}
+
+PuyoGameWidget::PuyoGameWidget(GameOptions game_options)
+    : CycledComponent(TIME_BETWEEN_GAME_CYCLES), associatedScreen(NULL), cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(game_options.CYCLES_BEFORE_SPEED_INCREASES),
       tickCounts(0), cycles(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(0),
-      MinSpeed(MIN_SPEED), MaxSpeed(MAX_SPEED),
+      MinSpeed(game_options.MIN_SPEED), MaxSpeed(game_options.MAX_SPEED),
       blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
       playerOneName(p1name), playerTwoName(p2name),
       killLeftAction(*this), killRightAction(*this),
@@ -315,6 +319,10 @@ void PuyoGameWidget::cycle()
   gameover = (areaA->isGameOver() || areaB->isGameOver());
   if ((gameover || abortedFlag) && !once) {
     once = true;
+    if (areaA->isGameOver())
+      areaB->gameWin();
+    if (areaB->isGameOver())
+      areaA->gameWin();
     if (gameOverAction)
       gameOverAction->action();
   }
@@ -772,4 +780,23 @@ PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoTheme
             GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight)
 {
     initialize(areaA, areaB, controllerA, controllerB, levelTheme, gameOverAction);
+}
+
+GameOptions GameOptions::FromLevel(int level) {
+    GameOptions go;
+    switch(level) {
+        case 0:
+            go.MIN_SPEED = 4;
+            go.MAX_SPEED = 20;
+            break;
+        case 1:
+            go.MIN_SPEED = 2;
+            go.MAX_SPEED = 15;
+            break;
+        case 2:
+            go.MIN_SPEED = 1;
+            go.MAX_SPEED = 8;
+            break;
+    }
+    return go;
 }

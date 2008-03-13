@@ -355,9 +355,15 @@ bool PuyoView::cycleAllowed()
     return true;
 }
 
+void PuyoView::gameWin()
+{
+    attachedGame->getGameStat().is_winner = true;
+    gameRunning = false;
+}
 
 void PuyoView::gameLost()
 {
+    attachedGame->getGameStat().is_winner = false;
     gameRunning = false;
     for (int i = 0 ; i <= PUYODIMX ; i++) {
         for (int j = 0 ; j <= PUYODIMY ; j++) {
