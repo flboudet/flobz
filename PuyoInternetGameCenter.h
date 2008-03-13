@@ -42,6 +42,7 @@ public:
     void setStatus(int status);
     String getSelfName();
     String getOpponentName();
+    bool isConnected() const;
     // Temporaire
     void punch();
 protected:

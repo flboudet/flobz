@@ -276,7 +276,7 @@ private:
 };
 
 
-void PushNetCenterMenuAction::action()
+/*void PushNetCenterMenuAction::action()
 {
     try {
         PuyoInternetGameCenter *gameCenter = new PuyoInternetGameCenter(serverName->getValue(),
@@ -289,7 +289,7 @@ void PushNetCenterMenuAction::action()
         e.printMessage();
         AudioManager::playSound("ebenon.wav", 0.5);
     }
-}
+}*/
 
 void NetworkInternetAction::action()
 {
@@ -343,9 +343,9 @@ InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)
 	       theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
     serverPort(kInternetCurrentServerPortDefaultValue,kInternetCurrentServerPortKey,
 	       theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
-    pushNetCenter(mainScreen, &(serverName.getEditField()), &(serverPort.getEditField()),
-		  &(playerName.getEditField())), backAction(mainScreen),
-    joinButton("Join", &pushNetCenter,
+    /*pushNetCenter(mainScreen, &(serverName.getEditField()), &(serverPort.getEditField()),
+		  &(playerName.getEditField())),*/ backAction(mainScreen),
+    joinButton("Join", this,
 	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
     backButton("Back", &backAction,
 	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture())
@@ -389,6 +389,159 @@ void InternetGameMenu::build()
     rightPanel.add(&separator1_3);
     menu.add(&serverSelectionPanel);
     menu.add(&rightPanel);
+}
+
+class PuyoInternetDialog : public SliderContainer, public SliderContainerListener
+{
+public:
+    PuyoInternetDialog(String dialogTitle);
+    virtual ~PuyoInternetDialog();
+    virtual void onSlideInside(SliderContainer &slider);
+    void close();
+protected:
+    VBox m_contentBox;
+private:
+    Frame m_dialogFrame;
+    Frame m_titleFrame;
+    Text m_titleText;
+    bool m_closing;
+};
+
+PuyoInternetDialog::PuyoInternetDialog(String dialogTitle)
+  : SliderContainer(), m_dialogFrame(theCommander->getWindowFramePicture()),
+    m_titleFrame(theCommander->getSeparatorFramePicture()),
+    m_titleText(dialogTitle), m_closing(false)
+{
+    m_titleFrame.add(&m_titleText);
+    m_titleFrame.setPreferedSize(Vec3(0, 20));
+    m_dialogFrame.add(&m_titleFrame);
+    m_dialogFrame.add(&m_contentBox);
+    setPreferedSize(Vec3(300, 200));
+    setPosition(Vec3(150, 150));
+    this->addListener(*this);
+    transitionToContent(&m_dialogFrame);
+}
+
+PuyoInternetDialog::~PuyoInternetDialog()
+{
+    //this->getParentScreen()->ungrabEventsOnWidget(this);
+}
+
+void PuyoInternetDialog::onSlideInside(SliderContainer &slider)
+{
+    if (!m_closing)
+        return;
+    this->getParentScreen()->remove(this);
+    delete this;
+}
+
+void PuyoInternetDialog::close()
+{
+    m_closing = true;
+    transitionToContent(NULL);
+}
+
+class PuyoInternetErrorDialog : public PuyoInternetDialog, public Action
+{
+public:
+    PuyoInternetErrorDialog(String errorMessageL1, String errorMessageL2);
+    virtual ~PuyoInternetErrorDialog();
+    virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
+private:
+    VBox m_textBox;
+    HBox m_view;
+    Text m_errorMessageL1, m_errorMessageL2;
+    FramedButton m_okButton;
+    IIM_Surface *m_errorIconImage;
+    Image m_errorIcon;
+};
+
+PuyoInternetErrorDialog::PuyoInternetErrorDialog(String errorMessageL1, String errorMessageL2)
+  : PuyoInternetDialog("Error"), m_errorMessageL1(errorMessageL1),
+    m_errorMessageL2(errorMessageL2), m_okButton("OK", this,
+	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
+    m_errorIconImage(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/errorpuyo.png"))),
+    m_errorIcon(m_errorIconImage)
+{
+    m_view.setPolicy(USE_MIN_SIZE);
+    m_textBox.add(&m_errorMessageL1);
+    m_textBox.add(&m_errorMessageL2);
+    m_view.add(&m_errorIcon);
+    m_view.add(&m_textBox);
+    m_contentBox.add(&m_view);
+    m_contentBox.add(&m_okButton);
+}
+
+PuyoInternetErrorDialog::~PuyoInternetErrorDialog()
+{
+    IIM_Free(m_errorIconImage);
+    
+}
+
+void PuyoInternetErrorDialog::action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
+{
+    if (sender == m_okButton.getButton()) {
+        close();
+    }
+}
+
+class PuyoInternetConnectDialog : public PuyoInternetDialog, public Action
+{
+public:
+    PuyoInternetConnectDialog(String serverName, PuyoInternetGameCenter *gameCenter, InternetGameMenu *owner);
+    virtual ~PuyoInternetConnectDialog();
+    virtual void idle(double currentTime);
+private:
+    Text m_messageL1, m_messageL2;
+    PuyoInternetGameCenter *m_gameCenter;
+    InternetGameMenu *m_owner;
+};
+
+PuyoInternetConnectDialog::PuyoInternetConnectDialog(String serverName, PuyoInternetGameCenter *gameCenter, InternetGameMenu *owner)
+    : PuyoInternetDialog("Connecting"),
+      m_messageL1("Connecting to server"), m_messageL2(serverName),
+      m_gameCenter(gameCenter), m_owner(owner)
+{
+    m_contentBox.add(&m_messageL1);
+    m_contentBox.add(&m_messageL2);
+}
+
+PuyoInternetConnectDialog::~PuyoInternetConnectDialog()
+{
+    m_owner->enterNetCenterMenu(m_gameCenter);
+}
+
+void PuyoInternetConnectDialog::idle(double currentTime)
+{
+    m_gameCenter->idle();
+    if (m_gameCenter->isConnected())
+        close();
+    PuyoInternetDialog::idle(currentTime);
+}
+
+void InternetGameMenu::enterNetCenterMenu(PuyoInternetGameCenter *gameCenter)
+{
+    NetCenterMenu *newNetCenterMenu = new NetCenterMenu(mainScreen, gameCenter);
+    newNetCenterMenu->build();
+    mainScreen->pushMenu(newNetCenterMenu, true);
+}
+
+void InternetGameMenu::action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
+{
+    try {
+        PuyoInternetGameCenter *gameCenter = new PuyoInternetGameCenter(serverName.getEditField().getValue(),
+                                                                        atoi(serverPort.getEditField().getValue()), playerName.getEditField().getValue());
+        PuyoInternetConnectDialog *connectionDialog = new PuyoInternetConnectDialog(serverName.getEditField().getValue(), gameCenter, this);
+        this->getParentScreen()->add(connectionDialog);
+        this->getParentScreen()->grabEventsOnWidget(connectionDialog);
+    } catch (Exception e) {
+        fprintf(stderr, "Error while connecting to %s\n", serverName.getEditField().getValue().c_str());
+        e.printMessage();
+        PuyoInternetErrorDialog *errorDialog = new PuyoInternetErrorDialog("Cannot connect to", serverName.getEditField().getValue());
+        this->getParentScreen()->add(errorDialog);
+        this->getParentScreen()->grabEventsOnWidget(errorDialog);
+        AudioManager::playSound("ebenon.wav", 0.5);
+    }
 }
 
 void InternetGameMenu::idle(double currentTime)

@@ -833,6 +833,7 @@ namespace gameui {
             }
             else
             {
+                onSlideOutside();
                 endSlideInside(false);
             }
         }

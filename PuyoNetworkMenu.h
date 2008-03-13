@@ -33,9 +33,10 @@
 #include "ListView.h"
 #include "PuyoCommander.h"
 #include "ios_httpdocument.h"
+#include "PuyoInternetGameCenter.h"
 
 
-class PushNetCenterMenuAction : public Action
+/*class PushNetCenterMenuAction : public Action
 {
 public:
     PushNetCenterMenuAction(PuyoMainScreen * mainScreen, Text *serverName, Text *serverPort, Text *userName) : mainScreen(mainScreen), serverName(serverName), serverPort(serverPort), userName(userName) {}
@@ -45,7 +46,7 @@ private:
     Text *serverName;
     Text *serverPort;
     Text *userName;
-};
+};*/
 
 class PuyoHttpServerList {
 public:
@@ -80,14 +81,16 @@ private:
     Button startButton, cancelButton;
 };
 
-class InternetGameMenu : public PuyoMainScreenMenu, public IdleComponent {
+class InternetGameMenu : public PuyoMainScreenMenu, public IdleComponent, public Action {
 public:
     InternetGameMenu(PuyoMainScreen * mainScreen);
     virtual ~InternetGameMenu();
     void build();
+    virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
     void setSelectedServer(const String &s, int port);
     virtual void idle(double currentTime);
     virtual IdleComponent *getIdleComponent() { return this; }
+    void enterNetCenterMenu(PuyoInternetGameCenter *gameCenter);
 private:
     IIM_Surface *upArrow, *downArrow;
     PuyoHttpServerList servers;
@@ -103,7 +106,7 @@ private:
     FramedEditField playerName;
     FramedEditField serverName, serverPort;
     int portNum;
-    PushNetCenterMenuAction pushNetCenter;
+    //PushNetCenterMenuAction pushNetCenter;
     PuyoPopMenuAction backAction;
     FramedButton joinButton, backButton;
 };

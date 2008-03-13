@@ -201,6 +201,11 @@ String PuyoInternetGameCenter::getOpponentName()
     return opponentName;
 }
 
+bool PuyoInternetGameCenter::isConnected() const
+{
+    return mbox.isConnected();
+}
+
 void PuyoInternetGameCenter::punch()
 {
     int prevBound = mbox.getBound();

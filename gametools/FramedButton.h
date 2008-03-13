@@ -12,6 +12,7 @@ public:
 	       const FramePicture *btnPicture, const FramePicture *focusedPicture);
   virtual ~FramedButton() {}
   virtual void setValue(String value);
+  Button *getButton() { return &m_button; }
 private:
   Button m_button;
 };
