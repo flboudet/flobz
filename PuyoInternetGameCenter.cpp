@@ -30,9 +30,12 @@
 
 using namespace ios_fc;
 
+const int PuyoInternetGameCenter::fpipVersion = 0x00000001;
+
 PuyoInternetGameCenter::PuyoInternetGameCenter(const String hostName, int portNum, const String name)
   : hostName(hostName), portNum(portNum), mbox(hostName, portNum), p2pmbox(NULL), p2pNatTraversal(NULL), tryNatTraversal(true), name(name), status(PEER_NORMAL),
-    timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages), gameGrantedStatus(GAMESTATUS_IDLE)
+    timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages), gameGrantedStatus(GAMESTATUS_IDLE),
+    m_isAccepted(false), m_isDenied(false), m_denyString("")
 {
     mbox.addListener(this);
     sendAliveMessage();
@@ -44,6 +47,7 @@ void PuyoInternetGameCenter::sendAliveMessage()
     mbox.bind(1);
     Message *msg = mbox.createMessage();
     msg->addBoolProperty("RELIABLE", true);
+    msg->addInt("V", fpipVersion);
     msg->addInt("CMD", PUYO_IGP_ALIVE);
     msg->addString("NAME", name);
     msg->addInt("STATUS", status);
@@ -59,6 +63,7 @@ void PuyoInternetGameCenter::sendMessage(const String msgText)
     mbox.bind(1);
     Message *msg = mbox.createMessage();
     msg->addBoolProperty("RELIABLE", true);
+    msg->addInt("V", fpipVersion);
     msg->addInt("CMD", PUYO_IGP_CHAT);
     msg->addString("NAME", name);
     msg->addString("MSG", msgText);
@@ -203,7 +208,12 @@ String PuyoInternetGameCenter::getOpponentName()
 
 bool PuyoInternetGameCenter::isConnected() const
 {
-    return mbox.isConnected();
+    return (mbox.isConnected()) && (m_isAccepted);
+}
+
+bool PuyoInternetGameCenter::isDenied() const
+{
+    return (mbox.isConnected()) && (m_isDenied);
 }
 
 void PuyoInternetGameCenter::punch()
@@ -225,6 +235,13 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
         if (!msg.hasInt("CMD"))
             return;
         switch (msg.getInt("CMD")) {
+            case PUYO_IGP_ACCEPT:
+                m_isAccepted = true;
+                break;
+            case PUYO_IGP_DENY:
+                m_isDenied = true;
+                m_denyString = msg.getString("MSG");
+                break;
             case PUYO_IGP_CHAT:
                 for (int i = 0, j = listeners.size() ; i < j ; i++) {
                     listeners[i]->onChatMessage(msg.getString("NAME"), msg.getString("MSG"));

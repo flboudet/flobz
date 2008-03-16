@@ -9,16 +9,21 @@ using namespace ios_fc;
 
 class PuyoIgpResponder : public MessageListener {
 public:
-    PuyoIgpResponder(IgpVirtualPeerMessageBox &mbox) : mbox(mbox), timeMsBeforePeerTimeout(5000.) {}
+    PuyoIgpResponder(IgpVirtualPeerMessageBox &mbox);
+    bool checkVersion(int clientVersion) const;
     void onMessage(Message &msg);
     void idle();
 private:
-    void updatePeer(PeerAddress addr, const String name, int status);
+    class GamePeer;
+    
+    GamePeer * getPeer(PeerAddress &addr) const;
+    void connectPeer(PeerAddress addr, int fpipVersion, const String name, int status);
+    void updatePeer(GamePeer *peer, int status);
 
     IgpVirtualPeerMessageBox &mbox;
-    class GamePeer;
     AdvancedBuffer<GamePeer *>peers;
     double timeMsBeforePeerTimeout;
+    int m_maxPeersAllowed;
 };
 
 class PuyoIgpResponder::GamePeer {

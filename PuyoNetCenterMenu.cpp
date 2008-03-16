@@ -202,6 +202,11 @@ NetCenterMenu::NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netC
     GameUIDefaults::GAME_LOOP->addIdle(&cycled);
     this->setBorderVisible(false);
     netCenter->addListener(this);
+    // Adding all the already connected peers to the list
+    for (int i = 0 ; i < netCenter->getPeerCount() ; i++) {
+        PeerAddress curPeerAddress = netCenter->getPeerAddressAtIndex(i);
+        playerList.addNewPlayer(netCenter->getPeerNameAtIndex(i), curPeerAddress, netCenter->getPeerStatusForAddress(curPeerAddress));
+    }
 }
 
 NetCenterMenu::~NetCenterMenu()
@@ -259,7 +264,6 @@ void NetCenterMenu::onChatMessage(const String &msgAuthor, const String &msg)
 
 void NetCenterMenu::onPlayerConnect(String playerName, PeerAddress playerAddress)
 {
-    //printf("Connect: %s\n", (const char *)(netCenter->getPeerNameAtIndex(playerIndex)));
     playerList.addNewPlayer(playerName, playerAddress, netCenter->getPeerStatusForAddress(playerAddress));
 }
 

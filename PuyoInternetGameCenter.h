@@ -43,6 +43,9 @@ public:
     String getSelfName();
     String getOpponentName();
     bool isConnected() const;
+    bool isAccepted() const;
+    bool isDenied() const;
+    String getDenyString() const { return m_denyString; }
     // Temporaire
     void punch();
 protected:
@@ -53,6 +56,7 @@ private:
     void sendAliveMessage();
     void grantGameToMBox(MessageBox &thembox);
     
+    static const int fpipVersion;
     const String hostName;
     int portNum;
     IgpMessageBox mbox;
@@ -73,6 +77,8 @@ private:
     };
     GameStatus gameGrantedStatus;
     String opponentName;
+    bool m_isAccepted, m_isDenied;
+    String m_denyString;
 };
 
 #endif // _PUYOINTERNETGAMECENTER_H

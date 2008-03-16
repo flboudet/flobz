@@ -508,13 +508,21 @@ PuyoInternetConnectDialog::PuyoInternetConnectDialog(String serverName, PuyoInte
 
 PuyoInternetConnectDialog::~PuyoInternetConnectDialog()
 {
-    m_owner->enterNetCenterMenu(m_gameCenter);
+    if (m_gameCenter->isConnected())
+        m_owner->enterNetCenterMenu(m_gameCenter);
+    else if (m_gameCenter->isDenied()) {
+        PuyoInternetErrorDialog *errorDialog = new PuyoInternetErrorDialog(m_gameCenter->getDenyString(), "");
+        m_owner->getParentScreen()->add(errorDialog);
+        m_owner->getParentScreen()->grabEventsOnWidget(errorDialog);
+        AudioManager::playSound("ebenon.wav", 0.5);
+        delete m_gameCenter;
+    }
 }
 
 void PuyoInternetConnectDialog::idle(double currentTime)
 {
     m_gameCenter->idle();
-    if (m_gameCenter->isConnected())
+    if ((m_gameCenter->isConnected()) || (m_gameCenter->isDenied()))
         close();
     PuyoInternetDialog::idle(currentTime);
 }
