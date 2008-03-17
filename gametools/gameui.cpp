@@ -341,9 +341,13 @@ namespace gameui {
 
     void Box::arrangeWidgets()
     {
-        if (getNumberOfChilds() == 0) return;
+        int numZeroSizedChildren = 0;
+        int numAnyChildren = getNumberOfChilds();
+
+        if (numAnyChildren == 0) return;
         requestDraw();
         checkFocus();
+
         // TODO: A corriger
         switch (policy)
         {
@@ -409,52 +413,88 @@ namespace gameui {
                 break;
             case USE_MIN_SIZE:
                 {
-                    int numZeroSizedChildren = 0;
-                    // Get the total height of the childs of this box
-                    float heightOfKnownChilds = 0.0f;
-                    for (int i = 0; i < getNumberOfChilds(); ++i) {
-                        Widget *child = getChild(i);
-                        if (!child->getPreferedSize().is_zero())
-                            heightOfKnownChilds += getSortingAxe(child->getPreferedSize());
-                        else
-                            numZeroSizedChildren++;
-                    }
-                    Vec3 boxSize = getSize() - Vec3(innerMargin*2, innerMargin*2);
-                    Vec3 boxPosition = getPosition() + Vec3(innerMargin, innerMargin);
-                    // If there is no zero sized children, children will be centered in the box
-                    // Otherwise, the remaining space will be divided between the zero sized children
-                    float positionOffset = (numZeroSizedChildren != 0 ? 0. : (getSortingAxe(boxSize) - heightOfKnownChilds) / 2.);
-                    // Divide the remaining space between the zero sized children
-                    if (numZeroSizedChildren > 0) {
-                        float spaceAllocated = (getSortingAxe(boxSize) - heightOfKnownChilds) / (float)numZeroSizedChildren;
-                        if (spaceAllocated < 0) spaceAllocated = 0;
-                        Vec3 newSize(0, 0);
-                        setSortingAxe(newSize, spaceAllocated);
-                        for (int i = 0; i < getNumberOfChilds(); ++i) {
-                            Widget *child = getChild(i);
-                            if (child->getPreferedSize().is_zero()) {
-                                setOtherAxis(newSize, getOtherAxis(boxSize));
-                                child->setSize(newSize);
-                            }
-                        }
-                    }
-                    // Set the position of the child widgets
-                    float currentPosition = getSortingAxe(boxPosition) + positionOffset;
-                    for (int i = 0; i < getNumberOfChilds(); ++i) {
-                        Widget *child = getChild(i);
-                        Vec3 childPosition = boxPosition;
-                        Vec3 childSize = child->getPreferedSize();
-                        setSortingAxe(childPosition, currentPosition);
-                        child->setPosition(childPosition);
-                        if (childSize.is_zero()) {
-                            currentPosition += getSortingAxe(child->getSize());
-                        }
-                        else {
-                            setOtherAxis(childSize, getOtherAxis(boxSize));
-                            child->setSize(childSize);
-                            currentPosition += getSortingAxe(child->getPreferedSize());
-                        }
-                    }
+        // Get the total sorted prefered size of the childs of this box
+        float sortedSizeOfKnownChilds = 0.0f;
+        for (int i = 0; i < numAnyChildren; ++i) {
+          float preferedWidgetSortedSize = getSortingAxe(getChild(i)->getPreferedSize());
+          if (preferedWidgetSortedSize != 0.0f)
+            sortedSizeOfKnownChilds += preferedWidgetSortedSize;
+          else
+            numZeroSizedChildren++;
+        }
+        Vec3 boxSize = getSize() - Vec3(innerMargin*2, innerMargin*2);
+      if ((getSortingAxe(boxSize) < 0.0f) || (getOtherAxis(boxSize) < 0.0f))
+      {
+        for (int i = 0; i < numAnyChildren; ++i) {
+          Widget *child = getChild(i);
+          child->setSize(Vec3(0.0f,0.0f));
+        }
+        return;
+      }
+
+        Vec3 boxPosition = getPosition() + Vec3(innerMargin, innerMargin);
+ 
+        float spaceLeft = getSortingAxe(boxSize) - sortedSizeOfKnownChilds;
+        if (spaceLeft < 0.0f) spaceLeft = 0.0f;
+      
+        float spaceAllocated = 0.0f;
+        if (numZeroSizedChildren > 0) {
+          spaceAllocated = spaceLeft / (float)numZeroSizedChildren;
+        }
+        fprintf(stderr,"%p Size %f %f Pos %f %f\n",this, boxSize.x, boxSize.y, boxPosition.x, boxPosition.y);
+      
+        // Set child sizes
+        Vec3 newSize(0.0f,0.0f);
+        for (int i = 0; i < numAnyChildren; ++i) {
+          Widget *child = getChild(i);
+          Vec3 PreferedSize = child->getPreferedSize();
+          
+          // Sorting axe
+          float sortingAxePref = getSortingAxe(PreferedSize);
+          if (sortingAxePref == 0.0f) { // if zero, allocate space left / nb zero sized widgets
+            setSortingAxe(newSize, spaceAllocated);
+          } else { // else allocate min between boxSize and requested
+            if (getSortingAxe(boxSize) < sortingAxePref)
+              setSortingAxe(newSize, getSortingAxe(boxSize));
+            else setSortingAxe(newSize, sortingAxePref);
+          }
+
+          // Other axe
+          float otherAxisPref = getOtherAxis(PreferedSize);
+          if (otherAxisPref == 0.0f) { // if zero, allocate box size
+            setOtherAxis(newSize, getOtherAxis(boxSize));
+          } else { // else allocate min between boxSize and requested
+            if (getOtherAxis(boxSize) < otherAxisPref)
+              setOtherAxis(newSize, getOtherAxis(boxSize));
+            else setOtherAxis(newSize, otherAxisPref);
+          }
+          
+          // final size setting
+          child->setSize(newSize);
+        }
+
+        // Set the position of the child widgets
+        Vec3 childPosition = boxPosition;
+        float offsetPosition = 0.0f;
+
+        if (numZeroSizedChildren == 0) { // If we have no zero sized widget
+          if (policy == USE_MAX_SIZE) // dispatch everyone to fill space
+            offsetPosition = spaceLeft / ( 2.0f * (float)numAnyChildren );
+          else // Collate everyone and add padding before and after
+            if ((getSortingAxe(boxSize) - sortedSizeOfKnownChilds) > 0.0f)
+              setSortingAxe(childPosition, getSortingAxe(childPosition) + (getSortingAxe(boxSize) - sortedSizeOfKnownChilds)/2.0f);
+        }
+
+
+        // Set positions
+        for (int i = 0; i < numAnyChildren; ++i) {
+          Widget *child = getChild(i);
+          Vec3 childSize = child->getSize();
+          setOtherAxis(childPosition, getOtherAxis(boxPosition) + (getOtherAxis(boxSize) - getOtherAxis(childSize))/2.0f);
+          setSortingAxe(childPosition, getSortingAxe(childPosition) + offsetPosition);
+          child->setPosition(childPosition);
+          setSortingAxe(childPosition, getSortingAxe(childPosition) + getSortingAxe(childSize) + offsetPosition);
+        }
                 }
                 break;
             default:
@@ -462,6 +502,7 @@ namespace gameui {
         }
     }
 
+  
     void Box::add (Widget *child)
     {
         WidgetContainer::add(child);
@@ -1037,26 +1078,26 @@ namespace gameui {
         checkFocus();
 
         float height = getSortingAxe(getSize());
-        float heightOfKnownChilds = 0.0f;
+        float sortedSizeOfKnownChilds = 0.0f;
         for (int i = 0; i < getNumberOfVisibleChilds(); ++i) {
             Widget *child = getVisibleChild(i);
             if (!child->getPreferedSize().is_zero()) {
-                heightOfKnownChilds += getSortingAxe(child->getPreferedSize());
+                sortedSizeOfKnownChilds += getSortingAxe(child->getPreferedSize());
             }
         }
-        float heightPerChild = (height - heightOfKnownChilds) / (getNumberOfVisibleChilds());
+        float heightPerChild = (height - sortedSizeOfKnownChilds) / (getNumberOfVisibleChilds());
         float heightToRemove = 0.0;
         if (heightPerChild < GameUIDefaults::SPACING)
         {
             if (height >= GameUIDefaults::SPACING * getNumberOfVisibleChilds())
             {
-                heightToRemove = heightOfKnownChilds - (height - GameUIDefaults::SPACING * getNumberOfVisibleChilds());
+                heightToRemove = sortedSizeOfKnownChilds - (height - GameUIDefaults::SPACING * getNumberOfVisibleChilds());
                 heightPerChild = GameUIDefaults::SPACING;
             }
             else
             {
                 heightPerChild = (GameUIDefaults::SPACING * getNumberOfVisibleChilds() - height) / getNumberOfVisibleChilds();
-                heightToRemove = heightOfKnownChilds - (height - heightPerChild * getNumberOfVisibleChilds());
+                heightToRemove = sortedSizeOfKnownChilds - (height - heightPerChild * getNumberOfVisibleChilds());
             }
         }
 
@@ -1072,7 +1113,7 @@ namespace gameui {
             if (isItemVisible(i)) {
                 if (!child->getPreferedSize().is_zero()) {
                     // center the widget if we know its size
-                    float coeff = getSortingAxe(child->getPreferedSize()) / heightOfKnownChilds;
+                    float coeff = getSortingAxe(child->getPreferedSize()) / sortedSizeOfKnownChilds;
                     Vec3 csize = size - child->getPreferedSize();
                     Vec3 offset(0.0,0.0,0.0);
                     setSortingAxe(offset, heightPerChild - getSortingAxe(csize / 2.0));
@@ -1195,7 +1236,7 @@ namespace gameui {
     // 
 
     Text::Text()
-        : label(""), offset(0.0,0.0,0.0), m_textAlign(TEXT_CENTERED), m_autoSize(true), mdontMove(true)
+        : label(""), offset(0.0,0.0,0.0), m_textAlign(TEXT_LEFT_ALIGN), m_autoSize(true), mdontMove(true)
     {
         this->font = GameUIDefaults::FONT_TEXT;
         setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
@@ -1204,7 +1245,7 @@ namespace gameui {
     }
 
     Text::Text(const String &label, SoFont *font)
-        : font(font), label(label), offset(0.0,0.0,0.0), m_textAlign(TEXT_CENTERED), m_autoSize(true), mdontMove(true)
+        : font(font), label(label), offset(0.0,0.0,0.0), m_textAlign(TEXT_LEFT_ALIGN), m_autoSize(true), mdontMove(true)
     {
         if (font == NULL) this->font = GameUIDefaults::FONT_TEXT;
         setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
@@ -1224,7 +1265,18 @@ namespace gameui {
 
     void Text::draw(SDL_Surface *screen)
     {
-        if (isVisible()) SoFont_PutString(font, screen, (int)(offset.x + getPosition().x), (int)(offset.y + getPosition().y), (const char*)label, NULL);
+      SDL_Rect r;
+      r.x = getPosition().x;
+      r.y = getPosition().y;
+      r.h = getSize().y;
+      r.w = getSize().x;
+      SDL_FillRect(screen,&r,0xAAAAAAAA);
+        if (isVisible())
+          SoFont_PutString(font, screen,
+                           (int)(offset.x + getPosition().x),
+                           (int)(offset.y + getPosition().y + (getSize().y-SoFont_FontHeight(this->font))/2.0),
+                           (const char*)label, NULL);
+      
         //if (moving) printf("draw (%p)\n",this);
     }
 

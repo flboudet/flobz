@@ -149,7 +149,7 @@ ListView::ListView(int size, IIM_Surface *upArrow, IIM_Surface *downArrow, GameL
     upButton.setOnMouseUpAction(this);
     downButton.setOnStartAction(this);
     downButton.setOnMouseUpAction(this);
-    scrollerBox.setPreferedSize(Vec3(16, (size+2) + SoFont_FontHeight(GameUIDefaults::FONT)*size));
+    scrollerBox.setPreferedSize(Vec3(16., 0.));
     scrollerBox.setPolicy(USE_MIN_SIZE);
     scrollerBox.add(&upButton);
     scrollerBox.add(&scrollWidget);
