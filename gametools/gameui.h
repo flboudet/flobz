@@ -114,7 +114,13 @@ bool isDirectionEvent(GameControlEvent *event);
       virtual void onWidgetRemoved(WidgetContainer *parent) {}
     protected:
       // To be implemented on each widgets
-      virtual void draw(SDL_Surface *screen) { };
+    virtual void draw(SDL_Surface *screen) {     /*SDL_Rect r;
+      r.x = getPosition().x;
+      r.y = getPosition().y;
+      r.h = getSize().y;
+      r.w = getSize().x;
+      SDL_FillRect(screen,&r,0x2468AC22);*/
+    };
 
       
       virtual void setPosition(const Vec3 &v3)   { position = v3; }

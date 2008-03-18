@@ -23,10 +23,11 @@ void FramedEditField::setValue(String value)
 
 void FramedEditField::initFramedEditField(const FramePicture *framePicture, const FramePicture *focusedPicture)
 {
+    innerMargin = framePicture->getMaxMargin();
   setFocusedPicture(focusedPicture);
   Vec3 preferedSize = m_editField.getPreferedSize();
-  preferedSize.x += 25;
-  preferedSize.y = 28;
+  preferedSize.x += 25.0f;
+  preferedSize.y += 2.0f*innerMargin;
   setPreferedSize(preferedSize);
   add(&m_editField);
 }
@@ -43,9 +44,10 @@ EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, Action
   : m_editField(defaultValue, action, framePicture, focusedPicture),
     text(label)
 {
+    innerMargin = 0.0f;
   setPolicy(USE_MIN_SIZE);
+  setPreferedSize(Vec3(0.0f, m_editField.getPreferedSize().y, 0.0f));
   add(&text);
-  m_editField.setPreferedSize(Vec3(0, 0, 0));
   add(&m_editField);
 }
 
@@ -55,9 +57,11 @@ EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, String
   : m_editField(defaultValue, persistentID, framePicture, focusedPicture),
     text(label)
 {
+    innerMargin = 0.0f;
   setPolicy(USE_MIN_SIZE);
+  setPreferedSize(Vec3(0.0f, m_editField.getPreferedSize().y, 0.0f));
+  m_editField.setPreferedSize(Vec3(width, m_editField.getPreferedSize().y, 0.0f));
   add(&text);
-  m_editField.setPreferedSize(Vec3(width, 0, 0));
   add(&m_editField);
 }
 

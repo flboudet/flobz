@@ -33,6 +33,18 @@ void FramePicture::setFrameSurface(IIM_Surface *frameSurface)
   }
 }
 
+int FramePicture::getMaxMargin() const
+{
+  int a = m_leftW;
+  int b = m_rightW;
+  int c = m_topH;
+  int d = m_bottomH;
+
+  int e = (a>b)?a:b;
+  int f = (c>d)?c:d;
+  return (e>f)?e:f;
+}
+
 void FramePicture::render(SDL_Surface *surf) const
 {
   if (m_frameSurface && m_frameSurface->surf) {
@@ -165,17 +177,6 @@ void Frame::cacheSurface(IIM_Surface * &cachedSurface, const FramePicture *frame
     cachedSurface = iim_surface_create_rgba((int)(bsize.x), (int)(bsize.y));
     framePicture->render(cachedSurface->surf);
   }
-}
-
-void Frame::add (Widget *child)
-{
-#ifdef DISABLED
-  Vec3 childSize = child->getPreferedSize();
-  if (! childSize.is_zero())
-    childSize += 18;
-  setPreferedSize(childSize);
-#endif
-  VBox::add(child);
 }
 
 }

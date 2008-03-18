@@ -22,6 +22,7 @@ public:
     void setFrameSurface(IIM_Surface *frameSurface);
     void setContentColor(RGBA contentColor) { m_contentColor = contentColor; }
     void render(SDL_Surface *surf) const;
+    int getMaxMargin() const;
 private:
     IIM_Surface *m_frameSurface;
     int m_leftW, m_middleW, m_rightW;
@@ -34,7 +35,6 @@ public:
     Frame(const FramePicture *frameSurface, GameLoop *loop = NULL);
     virtual ~Frame();
     virtual void draw(SDL_Surface *screen);
-    virtual void add (Widget *child);
     void setBorderVisible(bool borderVisible) { m_borderVisible = borderVisible; }
     bool getBorderVisible() const { return m_borderVisible; }
     void setFocusedPicture(const FramePicture *focusedSurface) { m_focusedSurface = focusedSurface; }
