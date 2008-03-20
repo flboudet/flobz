@@ -29,28 +29,75 @@
 
 using namespace ios_fc;
 
-NetCenterChatArea::NetCenterChatArea(int height)
-    : height(height), lines(new (HBox *[height])), names(new (Text *[height])), texts(new (Text *[height]))
+void ChatBox::addChat(String name, String text)
 {
-    setPolicy(USE_MIN_SIZE);
-    setFocusable(false);
+    suspendLayout();
+    float nameLen, maxNameLen = 0.0f;
+    for (int i = 0 ; i < height-1 ; i++) {
+        names[i]->setValue(names[i+1]->getValue());
+        texts[i]->setValue(texts[i+1]->getValue());
+        nameLen = names[i]->getPreferedSize().x;
+        if (nameLen > maxNameLen) maxNameLen = nameLen;
+    }
+    names[height-1]->setValue(name);
+    texts[height-1]->setValue(text);
+    nameLen = names[height-1]->getPreferedSize().x;
+    if (nameLen > maxNameLen) maxNameLen = nameLen;
     for (int i = 0 ; i < height ; i++) {
-        lines[i] = new HBox;
-        lines[i]->setPolicy(USE_MIN_SIZE);
-        lines[i]->setPreferedSize(Vec3(0, 0));
+        names[i]->setPreferedSize(Vec3(maxNameLen+innerMargin, 0.0f));
+        texts[i]->setPreferedSize(Vec3(0.0f, 0.0f));
+    }
+    resumeLayout();
+    arrangeWidgets();
+}
+
+ChatBox::ChatBox(ChatBoxDelegate &delegate)
+  : Frame(theCommander->getWindowFramePicture()),
+    delegate(delegate), chatAction(this), chatInputLabel(theCommander->getLocalizedString("Say:")),
+    chatInput(theCommander->getLocalizedString("Hello"), &chatAction,theCommander->getEditFieldFramePicture(),theCommander->getEditFieldFramePicture()),
+    chatInputContainerFrame(theCommander->getWindowFramePicture()),
+    height(8), lines(new (HBox *[height])), names(new (Text *[height])), texts(new (Text *[height]))
+{
+    Vec3 lineSize(0.0f, SoFont_FontHeight(GameUIDefaults::FONT_TEXT), 1.0f);
+
+    suspendLayout();
+
+    for (int i = 0 ; i < height ; i++) {
         names[i] = new Text("");
         names[i]->setFont(GameUIDefaults::FONT_SMALL_ACTIVE);
-        names[i]->setPreferedSize(Vec3(120, 1));
+        names[i]->setPreferedSize(Vec3(0.0f, 0.0f));
         texts[i] = new Text("");
         texts[i]->setFont(GameUIDefaults::FONT_SMALL_INFO);
-        texts[i]->setPreferedSize(Vec3(0, 0));
+        texts[i]->setPreferedSize(Vec3(0.0f, 0.0f));
+        lines[i] = new HBox;
+        lines[i]->setPolicy(USE_MIN_SIZE);
+        lines[i]->setPreferedSize(lineSize);
         lines[i]->add(names[i]);
         lines[i]->add(texts[i]);
         add(lines[i]);
     }
+    
+    setPolicy(USE_MAX_SIZE_NO_MARGIN);
+    
+    //chatInputContainerFrame.setInnerMargin(0.0f);
+    chatInputContainerFrame.add(&chatInputContainer);
+    chatInputContainer.add(&chatInputLabel);
+    chatInputContainer.add(&chatInput);
+    chatAction.setEditField(&(chatInput.getEditField()));
+    Vec3 s = chatInputLabel.getPreferedSize();
+    s.x += innerMargin;
+    chatInputLabel.setPreferedSize(s);
+    chatInput.getEditField().setEditOnFocus(true);
+    chatInput.getEditField().setAutoSize(false);
+    chatInputContainerFrame.setPreferedSize(Vec3(0.0f, 0.0f));
+    //chatInput.setPreferedSize(Vec3(0.0f, 0.0f));
+    chatInputContainer.setPreferedSize(lineSize);
+    add(&chatInputContainerFrame);
+    
+    resumeLayout();
 }
 
-NetCenterChatArea::~NetCenterChatArea()
+ChatBox::~ChatBox()
 {
     for (int i = 0 ; i < height ; i++) {
         delete texts[i];
@@ -62,91 +109,9 @@ NetCenterChatArea::~NetCenterChatArea()
     delete[] texts;
 }
 
-void NetCenterChatArea::addChat(String name, String text)
-{
-    suspendLayout();
-    while (text.length() < 150)
-        text += " ";
-    for (int i = 0 ; i < height-1 ; i++) {
-        names[i]->setValue(names[i+1]->getValue());
-        texts[i]->setValue(texts[i+1]->getValue());
-        names[i]->setPreferedSize(Vec3(120, 12));
-        texts[i]->setPreferedSize(Vec3(0, 0));
-    }
-    names[height-1]->setValue(name);
-    texts[height-1]->setValue(text);
-    names[height-1]->setPreferedSize(Vec3(120, 12));
-    texts[height-1]->setPreferedSize(Vec3(0, 0));
-    resumeLayout();
-    arrangeWidgets();
-}
-
-
-ChatBox::ChatBox(ChatBoxDelegate &delegate)
-  : chatBoxBG(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/chatzonebg.png"))),
-    delegate(delegate), chatAction(this), chatInputLabel(theCommander->getLocalizedString("Say:")),
-    chatInput(theCommander->getLocalizedString("Hello"), &chatAction), chatArea(10),
-    topSeparator(1, 8), leftEditSeparator(15, 1), betweenSeparator(1, 8), leftChatSeparator(15, 1), bottomSeparator(1, 4)
-{
-    suspendLayout();
-    setPolicy(USE_MIN_SIZE);
-    chatBoxContainer.setPolicy(USE_MIN_SIZE);
-    chatInputContainer.setPolicy(USE_MIN_SIZE);
-    chatAreaContainer.setPolicy(USE_MIN_SIZE);
-    
-    chatInputContainer.add(&leftEditSeparator);
-    chatInputContainer.add(&chatInputLabel);
-    chatInputContainer.add(&chatInput);
-    chatAction.setEditField(&chatInput);
-    chatInputLabel.setAutoSize(false);
-    chatInputLabel.setPreferedSize(Vec3(120, 1));
-    chatInput.setEditOnFocus(true);
-    chatInput.setAutoSize(false);
-    chatInput.setPreferedSize(Vec3(0, 0));
-    chatInputContainer.setPreferedSize(Vec3(1, 28));
-    
-    chatAreaContainer.add(&leftChatSeparator);
-    chatAreaContainer.add(&chatArea);
-    
-    setBackground(chatBoxBG);
-    chatBoxContainer.add(&topSeparator);
-    chatBoxContainer.add(&chatAreaContainer);
-    chatBoxContainer.add(&betweenSeparator);
-    chatBoxContainer.add(&chatInputContainer);
-    chatBoxContainer.add(&bottomSeparator);
-    add(&chatBoxContainer);
-    
-    chatBoxContainer.setPreferedSize(Vec3(chatBoxBG->w, chatBoxBG->h));
-    
-    resumeLayout();
-}
-
-ChatBox::~ChatBox()
-{
-    IIM_Free(chatBoxBG);
-}
-
-void ChatBox::addChat(String name, String message)
-{
-    chatArea.addChat(name, message);
-}
-
 void ChatBox::ChatAction::action()
 {
     String chatString = attachedEditField->getValue();
     attachedEditField->setValue("");
     owner->delegate.sendChat(chatString);
 }
-
-void ChatBox::slideOut()
-{
-  transitionToContent(NULL);
-}
-
-void ChatBox::slideIn()
-{
-  transitionToContent(&chatBoxContainer);
-}
-
-
-

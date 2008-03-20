@@ -32,6 +32,7 @@ namespace gameui {
   enum GameUIEnum {
     USE_MAX_SIZE = 0,
     USE_MIN_SIZE,
+    USE_MAX_SIZE_NO_MARGIN,
     ON_START,
     ON_MOUSEUP,
     GAMEUIENUM_LAST
@@ -459,7 +460,7 @@ bool isDirectionEvent(GameControlEvent *event);
   class Text : public Widget, public IdleComponent {
     public:
       Text();
-      Text(const String &label, SoFont *font = NULL);
+      Text(const String &label, SoFont *font = NULL, bool autosize = true);
       void setTextAlign(TextAlign align) { m_textAlign = align; }
       TextAlign getTextAlign() const { return m_textAlign; }
       void setAutoSize(bool autoSize) { m_autoSize = autoSize; }

@@ -427,11 +427,21 @@ namespace gameui {
         float offsetPosition = 0.0f;
         
         if (numZeroSizedChildren == 0) { // If we have no zero sized widget
-            if (policy == USE_MAX_SIZE) // dispatch everyone to fill space
-                offsetPosition = spaceLeft / ( 2.0f * (float)numAnyChildren );
-            else // Collate everyone and add padding before and after
-                if ((getSortingAxe(boxSize) - sortedSizeOfKnownChilds) > 0.0f)
-                    setSortingAxe(childPosition, getSortingAxe(childPosition) + (getSortingAxe(boxSize) - sortedSizeOfKnownChilds)/2.0f);
+            switch (policy) {
+                default:
+                    fprintf(stderr,"Layout policy %d not implemented, using USE_MAX_SIZE", policy);
+                    policy = USE_MAX_SIZE;
+                case USE_MAX_SIZE: // dispatch everyone to fill space
+                    if (numAnyChildren > 0) offsetPosition = spaceLeft / ( 2.0f * (float)(numAnyChildren) );
+                    break;
+                case USE_MAX_SIZE_NO_MARGIN: // dispatch everyone to fill space with no margin before or after
+                    if (numAnyChildren > 1) offsetPosition = spaceLeft / ( (float)(numAnyChildren-1) );
+                    break;
+                case USE_MIN_SIZE: // Collate everyone and add padding before and after
+                    if ((getSortingAxe(boxSize) - sortedSizeOfKnownChilds) > 0.0f)
+                        setSortingAxe(childPosition, getSortingAxe(childPosition) + (getSortingAxe(boxSize) - sortedSizeOfKnownChilds)/2.0f);
+                    break;
+            }
         }
         
         
@@ -440,7 +450,7 @@ namespace gameui {
             Widget *child = getChild(i);
             Vec3 childSize = child->getSize();
             setOtherAxis(childPosition, getOtherAxis(boxPosition) + (getOtherAxis(boxSize) - getOtherAxis(childSize))/2.0f);
-            setSortingAxe(childPosition, getSortingAxe(childPosition) + offsetPosition);
+            if (policy == USE_MAX_SIZE) setSortingAxe(childPosition, getSortingAxe(childPosition) + offsetPosition);
             child->setPosition(childPosition);
             setSortingAxe(childPosition, getSortingAxe(childPosition) + getSortingAxe(childSize) + offsetPosition);
         }
@@ -1184,16 +1194,16 @@ namespace gameui {
         : label(""), offset(0.0,0.0,0.0), m_textAlign(TEXT_LEFT_ALIGN), m_autoSize(true), mdontMove(true)
     {
         this->font = GameUIDefaults::FONT_TEXT;
-        setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
+        setPreferedSize(Vec3(m_autoSize?SoFont_TextWidth(this->font, label):0.0f, SoFont_FontHeight(this->font), 1.0));
         moving = false;
         startMoving = false;
     }
 
-    Text::Text(const String &label, SoFont *font)
-        : font(font), label(label), offset(0.0,0.0,0.0), m_textAlign(TEXT_LEFT_ALIGN), m_autoSize(true), mdontMove(true)
+    Text::Text(const String &label, SoFont *font, bool autosize)
+        : font(font), label(label), offset(0.0,0.0,0.0), m_textAlign(TEXT_LEFT_ALIGN), m_autoSize(autosize), mdontMove(true)
     {
         if (font == NULL) this->font = GameUIDefaults::FONT_TEXT;
-        setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
+        setPreferedSize(Vec3(m_autoSize?SoFont_TextWidth(this->font, label):0.0f, SoFont_FontHeight(this->font), 1.0));
         moving = false;
         startMoving = false;
     }
@@ -1202,8 +1212,7 @@ namespace gameui {
     {
         label = value;
         requestDraw();
-        if (m_autoSize)
-            setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0));
+        setPreferedSize(Vec3(m_autoSize?SoFont_TextWidth(this->font, label):0.0f, SoFont_FontHeight(this->font), 1.0f));
         if (parent)
             parent->arrangeWidgets();
     }
@@ -1217,12 +1226,30 @@ namespace gameui {
       r.w = getSize().x;
       if (r.h>0.0f && r.w>0.0f)
           SDL_FillRect(screen,&r,0xAAAAAAAA);*/
+
       if (isVisible())
-          SoFont_PutString(font, screen,
-                           (int)(offset.x + getPosition().x),
-                           (int)(offset.y + getPosition().y + (getSize().y-SoFont_FontHeight(this->font))/2.0),
-                           (const char*)label, NULL);
-      
+      {
+          switch (m_textAlign) {
+              case TEXT_CENTERED:
+                  SoFont_PutString(font, screen,
+                                   (int)(offset.x + getPosition().x + (getSize().x-SoFont_TextWidth(this->font, label))/2.0f),
+                                   (int)(offset.y + getPosition().y + (getSize().y-SoFont_FontHeight(this->font))/2.0f),
+                                   (const char*)label, NULL);
+                  break;
+              case TEXT_RIGHT_ALIGN:
+                  SoFont_PutString(font, screen,
+                                   (int)(offset.x + getPosition().x + getSize().x-SoFont_TextWidth(this->font, label)),
+                                   (int)(offset.y + getPosition().y + (getSize().y-SoFont_FontHeight(this->font))/2.0f),
+                                   (const char*)label, NULL);
+                  break;
+              case TEXT_LEFT_ALIGN:
+                  SoFont_PutString(font, screen,
+                                   (int)(offset.x + getPosition().x),
+                                   (int)(offset.y + getPosition().y + (getSize().y-SoFont_FontHeight(this->font))/2.0f),
+                                   (const char*)label, NULL);
+                  break;
+          }
+      }
         //if (moving) printf("draw (%p)\n",this);
     }
 
@@ -1406,7 +1433,7 @@ namespace gameui {
     }
 
     EditField::EditField(const String &defaultText, const String &persistentID)
-        : Text(defaultText, NULL), persistence(persistentID), editOnFocus(false)
+        : Text(defaultText, NULL, false), persistence(persistentID), editOnFocus(false)
     {
         char mytext[256];
         GetStrPreference(persistentID, mytext, defaultText);
@@ -1415,7 +1442,7 @@ namespace gameui {
     }
 
     EditField::EditField(const String &defaultText,  Action *action)
-        : Text(defaultText, NULL), persistence(""), editOnFocus(false)
+        : Text(defaultText, NULL, false), persistence(""), editOnFocus(false)
     {
         init(NULL,NULL);
         if (action != NULL)

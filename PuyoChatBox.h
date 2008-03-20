@@ -25,7 +25,8 @@
 #ifndef _PUYOCHATBOX
 #define _PUYOCHATBOX
 
-#include "gameui.h"
+#include "Frame.h"
+#include "FramedEditField.h"
 #include "ios_memory.h"
 #include "ios_messagebox.h"
 
@@ -39,33 +40,19 @@ public:
     virtual ~ChatBoxDelegate() {};
 };
 
-class NetCenterChatArea : public VBox {
-public:
-    NetCenterChatArea(int height);
-    ~NetCenterChatArea();
-    void addChat(String name, String text);
-private:
-    int height;
-    HBox **lines;
-    Text **names;
-    Text **texts;
-};
-
-class ChatBox : public SliderContainer
+class ChatBox : public Frame
 {
 public:
     ChatBox(ChatBoxDelegate &delegate);
     virtual ~ChatBox();
     void addChat(String name, String message);
-    void slideOut();
-    void slideIn();
 private:
-    IIM_Surface   *chatBoxBG;
     class ChatAction : public Action {
     public:
         ChatAction(ChatBox *owner) : owner(owner) {}
         void setEditField(EditField *attachedEditField) { this->attachedEditField = attachedEditField; }
         void action();
+        void addChat(String name, String text);
     private:
         ChatBox *owner;
         EditField *attachedEditField;
@@ -73,11 +60,13 @@ private:
     ChatBoxDelegate &delegate;
     ChatAction chatAction;
     Text chatInputLabel;
-    EditField chatInput;
-    NetCenterChatArea chatArea;
-    Separator topSeparator, leftEditSeparator, betweenSeparator, leftChatSeparator, bottomSeparator;
-    HBox chatInputContainer, chatAreaContainer;
-    VBox chatBoxContainer;
+    FramedEditField chatInput;
+    Frame chatInputContainerFrame;
+    HBox chatInputContainer;
+    int height;
+    HBox **lines;
+    Text **names;
+    Text **texts;
 };
 
 #endif // _PUYOCHATBOX

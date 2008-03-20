@@ -227,9 +227,10 @@ void NetCenterMenu::build()
 {
     add(&container);
 
-    mainBox.setPolicy(USE_MIN_SIZE);
-    topbox.setPolicy(USE_MIN_SIZE);
-    playerbox.setPolicy(USE_MIN_SIZE);
+    menu.setPolicy(USE_MAX_SIZE);
+    mainBox.setPolicy(USE_MAX_SIZE);
+    topbox.setPolicy(USE_MAX_SIZE);
+    playerbox.setPolicy(USE_MAX_SIZE);
     
     container.add(&mainBox);
 

@@ -23,10 +23,10 @@ void FramedEditField::setValue(String value)
 
 void FramedEditField::initFramedEditField(const FramePicture *framePicture, const FramePicture *focusedPicture)
 {
-    innerMargin = framePicture->getMaxMargin();
+  innerMargin = framePicture->getMaxMargin();
   setFocusedPicture(focusedPicture);
   Vec3 preferedSize = m_editField.getPreferedSize();
-  preferedSize.x += 25.0f;
+  preferedSize.x = 0.0f;
   preferedSize.y += 2.0f*innerMargin;
   setPreferedSize(preferedSize);
   add(&m_editField);
