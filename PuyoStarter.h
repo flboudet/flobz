@@ -161,6 +161,7 @@ public:
     bool isFocusable() { return !paused; }
     void eventOccured(GameControlEvent *event);
     bool backPressed();
+    bool startPressed();
     IdleComponent *getIdleComponent() { return this; }
     virtual void abort() { abortedFlag = true; }
     bool getAborted() const { return abortedFlag; }
@@ -208,7 +209,7 @@ protected:
     PuyoCheatCodeManager killLeftCheat, killRightCheat;
     std::vector<PuyoFX*> puyoFX;
     bool skipGameCycleA, skipGameCycleB;
-
+    double gameOverDate;
 };
 
 class ContinueAction : public Action {
@@ -233,6 +234,7 @@ public:
     ~PuyoGameScreen();
     void onEvent(GameControlEvent *cevent);
     virtual bool backPressed();
+    virtual bool startPressed();
     virtual void abort();
     void setOverlayStory(PuyoStoryWidget *story);
     virtual void setPaused(bool fromControls);

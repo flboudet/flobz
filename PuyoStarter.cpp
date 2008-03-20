@@ -319,6 +319,7 @@ void PuyoGameWidget::cycle()
   gameover = (areaA->isGameOver() || areaB->isGameOver());
   if ((gameover || abortedFlag) && !once) {
     once = true;
+    gameOverDate = ios_fc::getTimeMs();
     if (areaA->isGameOver())
       areaB->gameWin();
     if (areaB->isGameOver())
@@ -466,6 +467,15 @@ void PuyoGameWidget::eventOccured(GameControlEvent *event)
         killLeftCheat.eventOccured(event);
         killRightCheat.eventOccured(event);
     }
+}
+
+bool PuyoGameWidget::startPressed()
+{
+    if ((gameover || abortedFlag) && once && (ios_fc::getTimeMs() > gameOverDate + 2000)) {
+        actionAfterGameOver(true);
+        return true;
+    }
+    return false;
 }
 
 bool PuyoGameWidget::backPressed()
@@ -677,20 +687,26 @@ PuyoGameScreen::~PuyoGameScreen()
 
 void PuyoGameScreen::onEvent(GameControlEvent *cevent)
 {
-    bool backPressedFromGameWidget = false;
+    bool pressedFromGameWidget = false;
     if (!cevent->isUp) {
         switch (cevent->cursorEvent) {
         case GameControlEvent::kStart:
+            pressedFromGameWidget = startPressed();
             break;
         case GameControlEvent::kBack:
-            backPressedFromGameWidget = backPressed();
+            pressedFromGameWidget = backPressed();
             break;
         default:
             break;
         }
     }
-    if (!backPressedFromGameWidget)
+    if (!pressedFromGameWidget)
         Screen::onEvent(cevent);
+}
+
+bool PuyoGameScreen::startPressed()
+{
+    return gameWidget.startPressed();
 }
 
 bool PuyoGameScreen::backPressed()
