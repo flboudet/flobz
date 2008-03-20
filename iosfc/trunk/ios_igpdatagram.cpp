@@ -48,12 +48,13 @@ bool IGPDatagram::isIgpDatagram(Message &rawMsg)
 {
     if (! rawMsg.hasInt(MSGIDENT))
         return false;
-    switch (rawMsg.getInt("CMD")) {
+    switch (rawMsg.getInt(MSGIDENT)) {
     case ServerMsgInformID:
         if (! rawMsg.hasInt(IGPIDENT))
             return false;
         return true;
     case ServerMsgBadRequest:
+    case IgpPing:
         return true;
     case ServerMsgToClient:
         if (! rawMsg.hasInt(IGPMSG))

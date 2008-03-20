@@ -23,8 +23,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
  */
  
- #include "ios_igpmessagelistener.h"
- #include <stdio.h>
+#include "ios_igpmessagelistener.h"
+#include "ios_igpdatagram.h"
+#include <stdio.h>
  
 namespace ios_fc {
 
@@ -117,10 +118,24 @@ IgpMessageListener::NetworkIgpPeer *IgpMessageListener::findPeer(PeerAddress add
 
 void IgpMessageListener::onMessage(Message &data)
 {
-    //printf("Cool, un nouveau message!\n");
     Dirigeable &dir = dynamic_cast<Dirigeable &>(data);
-    
     PeerAddress msgAddress = dir.getPeerAddress();
+    
+    // Before identifying the peer, check if it has a valid igp cmd
+    if (! data.hasInt(IGPDatagram::MSGIDENT))
+        return;
+    // Then check if this is a PING message
+    if (data.getInt(IGPDatagram::MSGIDENT) == IGPDatagram::IgpPing) {
+        // Answer the ping message
+        Message *pingMessage = this->mbox.createMessage();
+        pingMessage->addInt(IGPDatagram::MSGIDENT, IGPDatagram::IgpPing);
+        Dirigeable *dirPing = dynamic_cast<Dirigeable *>(pingMessage);
+        dirPing->setPeerAddress(msgAddress);
+        pingMessage->send();
+        delete pingMessage;
+        return;
+    }
+    // else process the message as a regular IGP message
     NetworkIgpPeer *currentPeer = findPeer(msgAddress);
     if (currentPeer == NULL) {
         currentPeer = new NetworkIgpPeer(msgAddress, this);

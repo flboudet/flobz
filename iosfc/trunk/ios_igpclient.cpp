@@ -31,12 +31,14 @@
 
 namespace ios_fc {
 
-IGPClient::IGPClient(MessageBox &mbox) : mbox(mbox), enabled(false), igpLastKeepAliveDate(0.), igpKeepAliveInterval(2000.)
+IGPClient::IGPClient(MessageBox &mbox, bool identify) : mbox(mbox), enabled(false), igpLastKeepAliveDate(0.), igpKeepAliveInterval(2000.)
 {
     mbox.addListener(this);
-    IGPDatagram::ClientMsgAutoAssignIDDatagram datagram(mbox.createMessage());
-    datagram.getMessage()->send();
-    delete datagram.getMessage();
+    if (identify) {
+        IGPDatagram::ClientMsgAutoAssignIDDatagram datagram(mbox.createMessage());
+        datagram.getMessage()->send();
+        delete datagram.getMessage();
+    }
 }
 
 IGPClient::IGPClient(MessageBox &mbox, int igpIdent) : mbox(mbox), enabled(false), igpLastKeepAliveDate(0.), igpKeepAliveInterval(2000.)
@@ -69,6 +71,26 @@ void IGPClient::idle()
         igpLastKeepAliveDate = time_ms;
     }
     mbox.idle();
+    // take care of the pending ping transactions
+    for (int i = 0 ; i < pendingPingTransactions.size() ; i++) {
+        PingTransaction *currentTransaction = pendingPingTransactions[i];
+        if (currentTransaction->m_timeoutMs < time_ms) {
+            currentTransaction->m_completed = true;
+            currentTransaction->m_success = false;
+            pendingPingTransactions.removeAt(i);
+        }
+    }
+}
+
+IGPClient::PingTransaction *IGPClient::ping(double timeoutMs)
+{
+    Message *pingMsg = mbox.createMessage();
+    pingMsg->addInt(IGPDatagram::MSGIDENT, IGPDatagram::IgpPing);
+    pingMsg->send();
+    delete pingMsg;
+    PingTransaction *newTransaction = new PingTransaction(getTimeMs(), timeoutMs);
+    pendingPingTransactions.add(newTransaction);
+    return newTransaction;
 }
 
 void IGPClient::onMessage(Message &rawMsg)
@@ -93,6 +115,16 @@ void IGPClient::onMessage(Message &rawMsg)
             }
             break;
         }
+        case IGPDatagram::IgpPing: {
+            for (int i = 0 ; i < pendingPingTransactions.size() ; i++) {
+                PingTransaction *currentTransaction = pendingPingTransactions[i];
+                currentTransaction->m_completed = true;
+                currentTransaction->m_success = true;
+                currentTransaction->m_time = getTimeMs() - currentTransaction->m_initialTime;
+                pendingPingTransactions.removeAt(i);
+            }
+            break;
+        }
         default:
             break;
     }
@@ -104,6 +136,15 @@ void IGPClient::addListener(IGPClientMessageListener *newListener) {
 
 void IGPClient::removeListener(IGPClientMessageListener *listener) {
     listeners.remove(listener);
+}
+
+IGPClient::PingTransaction::PingTransaction(double initialTime, double timeoutMs)
+  : m_completed(false), m_success(false), m_time(0.), m_initialTime(initialTime), m_timeoutMs(initialTime + timeoutMs)
+{
+}
+
+IGPClient::PingTransaction::~PingTransaction()
+{
 }
 
 }

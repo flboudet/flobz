@@ -39,7 +39,8 @@ public:
 
 class IGPClient : public MessageListener {
 public:
-    IGPClient(MessageBox &mbox);
+    class PingTransaction;
+    IGPClient(MessageBox &mbox, bool identify = true);
     IGPClient(MessageBox &mbox, int igpIdent);
     virtual ~IGPClient();
     void sendMessage(int igpID, VoidBuffer message, bool reliable);
@@ -49,13 +50,28 @@ public:
     void onMessage(Message &);
     int getIgpIdent() const { return igpIdent; }
     bool isEnabled() const { return enabled; }
+    PingTransaction *ping(double timeoutMs);
 private:
     MessageBox &mbox;
     bool enabled;
     int igpIdent;
     AdvancedBuffer<IGPClientMessageListener*> listeners;
+    AdvancedBuffer<PingTransaction *> pendingPingTransactions;
     double igpLastKeepAliveDate;
     double igpKeepAliveInterval;
+};
+
+class IGPClient::PingTransaction {
+public:
+    virtual ~PingTransaction();
+    bool completed() { return m_completed; }
+    bool success()   { return m_success;   }
+    double time()    { return m_time;      }
+private:
+    PingTransaction(double initialTime, double timeoutMs);
+    bool m_completed, m_success;
+    double m_time, m_initialTime, m_timeoutMs;
+    friend class IGPClient;
 };
 
 }

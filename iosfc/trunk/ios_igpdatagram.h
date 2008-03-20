@@ -47,7 +47,8 @@ public:
         ClientMsgKeepAlive,
         ServerMsgInformID,
         ServerMsgBadRequest,
-        ServerMsgToClient
+        ServerMsgToClient,
+        IgpPing
     };
     static bool isIgpDatagram(Message &rawMsg);
     IGPDatagram(Message *data);
