@@ -101,7 +101,7 @@ void LANGameMenu::build() {
 
 class PuyoHttpServerList::PuyoHttpServer {
 public:
-    PuyoHttpServer(String hostName, int portNum, String path) : hostName(hostName), portNum(portNum), hostPath(path) {}
+    PuyoHttpServer(String hostName, int portNum, String path) : hostName(hostName), hostPath(path), portNum(portNum) {}
     String hostName;
     String hostPath;
     int portNum;
@@ -301,8 +301,9 @@ void NetworkInternetAction::action()
 }
 
 NetworkGameMenu::NetworkGameMenu(PuyoMainScreen * mainScreen)
-    : locale(theCommander->getDataPathManager(), "locale", "main"),
-      PuyoMainScreenMenu(mainScreen), lanGameMenu(mainScreen),
+    : PuyoMainScreenMenu(mainScreen),
+      locale(theCommander->getDataPathManager(), "locale", "main"),
+      lanGameMenu(mainScreen),
       internetGameMenu(NULL), internetAction(mainScreen, &internetGameMenu),
       lanAction(&lanGameMenu, mainScreen), mainScreenPopAction(mainScreen),
       titleFrame(theCommander->getSeparatorFramePicture()),
@@ -328,15 +329,15 @@ InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)
   : PuyoMainScreenMenu(mainScreen),
     upArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png"))),
     downArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png"))),
-    serverSelectionPanel(theCommander->getWindowFramePicture()),
     servers(),
-    container(),
+    serverSelectionPanel(theCommander->getWindowFramePicture()),
     serverListPanel(20, upArrow, downArrow),
-    serverListText("Server List"), rightPanel(theCommander->getWindowFramePicture()),
-    updating("Update", NULL,
-	     theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
+    serverListText("Server List"),
+    updating("Update", NULL, theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
+    rightPanel(theCommander->getWindowFramePicture()),
     separator1_1(1,1), separator1_2(1,1), separator1_3(1, 1), separator10_1(10,10), separator10_2(10,10),
     internetGameText("Internet Game"), nicknameText("Nickname"), serverText("Server"), portText("Port"),
+    container(),
     playerName(PuyoGame::getPlayerName(-2), PuyoGame::getDefaultPlayerKey(-2),
 	       theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
     serverName(kInternetCurrentServerDefaultValue,kInternetCurrentServerKey,
@@ -413,11 +414,12 @@ PuyoInternetDialog::PuyoInternetDialog(String dialogTitle)
     m_titleText(dialogTitle), m_closing(false)
 {
     m_titleFrame.add(&m_titleText);
-    m_titleFrame.setPreferedSize(Vec3(0, 20));
+    m_titleFrame.setPreferedSize(Vec3(0.0f, 20.0f));
     m_dialogFrame.add(&m_titleFrame);
     m_dialogFrame.add(&m_contentBox);
-    setPreferedSize(Vec3(300, 200));
-    setPosition(Vec3(150, 150));
+    setPreferedSize(Vec3(300.0f, 200.0f));
+    setSize(getPreferedSize());
+    setPosition(Vec3(150.0f, 150.0f));
     this->addListener(*this);
     transitionToContent(&m_dialogFrame);
 }
@@ -448,8 +450,6 @@ public:
     virtual ~PuyoInternetErrorDialog();
     virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
 private:
-    VBox m_textBox;
-    HBox m_view;
     Text m_errorMessageL1, m_errorMessageL2;
     FramedButton m_okButton;
     IIM_Surface *m_errorIconImage;
@@ -457,19 +457,19 @@ private:
 };
 
 PuyoInternetErrorDialog::PuyoInternetErrorDialog(String errorMessageL1, String errorMessageL2)
-  : PuyoInternetDialog("Error"), m_errorMessageL1(errorMessageL1),
-    m_errorMessageL2(errorMessageL2), m_okButton("OK", this,
+  : PuyoInternetDialog(theCommander->getLocalizedString("Error")), m_errorMessageL1(errorMessageL1),
+    m_errorMessageL2(errorMessageL2), m_okButton(theCommander->getLocalizedString("OK"), this,
 	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
     m_errorIconImage(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/errorpuyo.png"))),
     m_errorIcon(m_errorIconImage)
 {
-    m_view.setPolicy(USE_MIN_SIZE);
-    m_textBox.add(&m_errorMessageL1);
-    m_textBox.add(&m_errorMessageL2);
-    m_view.add(&m_errorIcon);
-    m_view.add(&m_textBox);
-    m_contentBox.add(&m_view);
+    m_contentBox.setInnerMargin(10.0f);
+    m_contentBox.setPolicy(USE_MAX_SIZE);
+    m_contentBox.add(&m_errorIcon);
+    m_contentBox.add(&m_errorMessageL1);
+    m_contentBox.add(&m_errorMessageL2);
     m_contentBox.add(&m_okButton);
+    setSize(Vec3(350.0f, 200.0f));
 }
 
 PuyoInternetErrorDialog::~PuyoInternetErrorDialog()
