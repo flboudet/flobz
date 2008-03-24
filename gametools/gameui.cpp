@@ -933,7 +933,9 @@ namespace gameui {
     HScrollList::HScrollList(GameLoop *loop)
     {
         lastvisible = firstvisible = -1;
+        setPreferedSize(Vec3(0.0f, Text("").getPreferedSize().y));
     }
+    
     int HScrollList::getNumberOfVisibleChilds() {
         if (activeWidget==-1) return 0;
         if (getNumberOfChilds()<(1+2*kHScrollListNbAddedItemsToEachSide)) return getNumberOfChilds();
