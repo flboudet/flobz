@@ -13,7 +13,7 @@ echo "Tous les fichiers et dossiers doivent etre commites au prealable."
 echo "Ce script ne gere pas les chemins contenant des espaces."
 
 # Recuperation des fichiers sur le svn
-svn -R ls > ${tmpfile}
+svn -R ls -r HEAD > ${tmpfile}
 
 # Extraction des Makefiles
 MAKEFILES=$(grep Makefile ${tmpfile} | grep "/")
