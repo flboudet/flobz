@@ -19,6 +19,7 @@ public:
 private:
   void initFramedEditField(const FramePicture *framePicture, const FramePicture *focusedPicture);
   EditField m_editField;
+  void eventOccured(GameControlEvent *event);
 };
 
 class EditFieldWithLabel : public HBox {

@@ -32,7 +32,30 @@ void FramedEditField::initFramedEditField(const FramePicture *framePicture, cons
   add(&m_editField);
 }
 
-
+    void FramedEditField::eventOccured(GameControlEvent *event)
+    {
+        if (event->cursorEvent == GameControlEvent::kGameMouseMoved
+            || event->cursorEvent == GameControlEvent::kGameMouseClicked) {
+            Vec3 widPosition = getPosition();
+            Vec3 widSize = getSize();
+            // If we click inside the frame
+            if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
+                && (widPosition.x + widSize.x >= event->x) && (widPosition.y + widSize.y >= event->y))
+            {
+                // Reposition the click so it's inside the widget
+                Vec3 buttonPosition = m_editField.getPosition();
+                Vec3 buttonSize = m_editField.getSize();
+                if (event->x < buttonPosition.x) event->x = (int)ceil(buttonPosition.x);
+                if (event->x > buttonPosition.x + buttonSize.x) event->x = (int)floor(buttonPosition.x + buttonSize.x);
+                if (event->y < buttonPosition.y) event->y = (int)ceil(buttonPosition.y);
+                if (event->y > buttonPosition.y + buttonSize.y) event->y = (int)floor(buttonPosition.y + buttonSize.y);
+            }
+        }    
+        
+        // Push the event to the widget
+        Frame::eventOccured(event);
+    }
+    
 
 //
 // EditFieldWithLabel
@@ -65,6 +88,7 @@ EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, String
   add(&m_editField);
 }
 
+    
 EditFieldWithLabel::~EditFieldWithLabel()
 {
 }

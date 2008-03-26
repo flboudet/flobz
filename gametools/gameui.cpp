@@ -1390,10 +1390,11 @@ namespace gameui {
             Vec3 widPosition = getPosition();
             Vec3 widSize = getSize();
             if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
-                    && (widPosition.x + widSize.x >= widPosition.x) && (widPosition.y + widSize.y >= event->y))
+                    && (widPosition.x + widSize.x >= event->x) && (widPosition.y + widSize.y >= event->y))
                 clicked = true;
         }
         if (clicked) {
+//            fprintf(stderr,"clicked...\n");
             Action *action = getAction(ON_START);
             if (action)
                 action->action(this, ON_START, event);
