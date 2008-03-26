@@ -55,7 +55,9 @@ ChatBox::ChatBox(ChatBoxDelegate &delegate)
   : Frame(theCommander->getWindowFramePicture()),
     delegate(delegate), chatAction(this), chatInputLabel(theCommander->getLocalizedString("Say:")),
     chatInput(theCommander->getLocalizedString("Hello"), &chatAction,theCommander->getEditFieldFramePicture(),theCommander->getEditFieldFramePicture()),
-    chatInputContainerFrame(theCommander->getWindowFramePicture()),
+    chatInputFrameSurface(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/chatzone.png"))),
+    chatInputFramePicture(chatInputFrameSurface, 31, 10, 25, 9, 6, 15),
+    chatInputContainerFrame(&chatInputFramePicture),
     height(8), lines(new (HBox *[height])), names(new (Text *[height])), texts(new (Text *[height]))
 {
     Vec3 lineSize(0.0f, SoFont_FontHeight(GameUIDefaults::FONT_TEXT), 1.0f);
@@ -92,6 +94,7 @@ ChatBox::ChatBox(ChatBoxDelegate &delegate)
     chatInputContainerFrame.setPreferedSize(Vec3(0.0f, 0.0f));
     //chatInput.setPreferedSize(Vec3(0.0f, 0.0f));
     chatInputContainer.setPreferedSize(lineSize);
+    setInnerMargin(6);
     add(&chatInputContainerFrame);
     
     resumeLayout();
@@ -107,6 +110,7 @@ ChatBox::~ChatBox()
     delete[] lines;
     delete[] names;
     delete[] texts;
+    IIM_Free(chatInputFrameSurface);
 }
 
 void ChatBox::ChatAction::action()

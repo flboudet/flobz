@@ -61,6 +61,8 @@ private:
     ChatAction chatAction;
     Text chatInputLabel;
     FramedEditField chatInput;
+    IIM_Surface *chatInputFrameSurface;
+    FramePicture chatInputFramePicture;
     Frame chatInputContainerFrame;
     HBox chatInputContainer;
     int height;
