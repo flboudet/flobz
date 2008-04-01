@@ -198,8 +198,8 @@ void TurningAnimation::draw(int semiMove)
 
 /* Puyo falling and bouncing animation */
 
-const int FallingAnimation::BOUNCING_OFFSET_NUM = 12;
-const int FallingAnimation::BOUNCING_OFFSET[] = { -1, -3, -5, -4, -2, 0, -6, -9, -11, -9, -6, 0 };
+const int FallingAnimation::BOUNCING_OFFSET_NUM = 9;
+const int FallingAnimation::BOUNCING_OFFSET[] = { 1, 7, 11,  8,  4,  1, -1, -3,  0 };
 
 FallingAnimation::FallingAnimation(AnimatedPuyo &puyo, int originY, int xOffset, int yOffset, int step) : PuyoAnimation(puyo)
 {
@@ -209,9 +209,9 @@ FallingAnimation::FallingAnimation(AnimatedPuyo &puyo, int originY, int xOffset,
     this->X  = (attachedPuyo.getPuyoX()*TSIZE) + xOffset;
     this->Y  = (originY*TSIZE) + yOffset;
     bouncing = BOUNCING_OFFSET_NUM - 1;
-    if (originY == attachedPuyo.getPuyoY()) {
+    /*if (originY == attachedPuyo.getPuyoY()) {
         bouncing = -1;
-    }
+    }*/
     attachedPuyo.getAttachedView()->disallowCycle();
     EventFX("start_falling", X+TSIZE/2, Y+TSIZE/2, puyo.getAttachedView()->getPlayerId());
 }
@@ -229,12 +229,16 @@ void FallingAnimation::cycle()
             AudioManager::playSound("bam1.wav", .1);
             EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
             EventFX("end_falling", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
+            attachedPuyo.setAnimatedState(AnimatedPuyo::PUYO_NORMAL);
             attachedPuyo.getAttachedView()->allowCycle();
         }
-        else if (BOUNCING_OFFSET[bouncing] == 0) {
-            AudioManager::playSound("bam1.wav", .1);
-            EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
+        else if (BOUNCING_OFFSET[bouncing] < 7) {
+            attachedPuyo.setAnimatedState(AnimatedPuyo::PUYO_CRUNSHED);
+            //AudioManager::playSound("bam1.wav", .1);
+            //EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
         }
+        else
+            attachedPuyo.setAnimatedState(AnimatedPuyo::PUYO_NORMAL);
     }
 }
 

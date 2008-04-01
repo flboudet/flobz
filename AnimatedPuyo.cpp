@@ -28,7 +28,8 @@
 #include "AnimatedPuyoTheme.h"
 
 AnimatedPuyo::AnimatedPuyo(PuyoState state, AnimatedPuyoSetTheme *themeSet, PuyoView *attachedView)
-    : PuyoPuyo(state), smallTicksCount(0), attachedTheme(themeSet->getAnimatedPuyoTheme(state))
+    : PuyoPuyo(state), smallTicksCount(0), attachedTheme(themeSet->getAnimatedPuyoTheme(state)),
+      m_currentAnimatedState(PUYO_NORMAL)
 {
     puyoEyeState = random() % 8192;
     visibilityFlag = true;
@@ -117,11 +118,25 @@ void AnimatedPuyo::renderAt(int X, int Y)
         
         drect.w = currentSurface->w;
         drect.h = currentSurface->h;
-        painter.requestDraw(currentSurface, &drect);
+        if (m_currentAnimatedState == PUYO_NORMAL)
+            painter.requestDraw(currentSurface, &drect);
+        else if (m_currentAnimatedState == PUYO_CRUNSHED) {
+            SDL_Rect srcRect;
+            int shrinkSurface = 12;//currentSurface->h / 3;
+            drect.y += (currentSurface->h - 2*shrinkSurface)/2;
+            srcRect.x = 0; srcRect.y = 0; srcRect.w = currentSurface->w; srcRect.h = shrinkSurface;
+            drect.h = shrinkSurface;
+            painter.requestDraw(currentSurface, &srcRect, &drect);
+            drect.y += shrinkSurface;
+            srcRect.y = currentSurface->h - shrinkSurface;
+            painter.requestDraw(currentSurface, &srcRect, &drect);
+            drect.y = Y;
+            drect.h = currentSurface->h;
+        }
         
         /* Main puyo show */
         /* TODO: Investigate why, during network game, the falling puyo starts by being neutral */
-        if ((this == attachedGame->getFallingPuyo()) && (getPuyoState() != PUYO_NEUTRAL))
+        if ((this == attachedGame->getFallingPuyo()) && (getPuyoState() != PUYO_NEUTRAL) && (m_currentAnimatedState != PUYO_CRUNSHED))
             painter.requestDraw(attachedTheme->getCircleSurfaceForIndex((smallTicksCount >> 2) & 0x1F), &drect);
         
         /* Eye management */

@@ -11,7 +11,7 @@ OBJFILES= audio.o HiScores.o PuyoCommander.o \
           styrolyse.o PuyoStory.o PuyoChatBox.o PuyoLocalizedDictionary.o \
           PuyoStarter.o PuyoSinglePlayerStarter.o PuyoTwoPlayerStarter.o \
           PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o \
-          AnimatedPuyoTheme.o PuyoNetworkMenu.o PuyoNetCenterMenu.o \
+          AnimatedPuyoTheme.o PuyoNetworkMenu.o PuyoInternetMenu.o PuyoNetCenterMenu.o \
           PuyoNetGameCenter.o PuyoInternetGameCenter.o PuyoLanGameCenter.o\
           PuyoLocalMenu.o PuyoOptionMenu.o PuyoControlMenu.o \
           LevelThemeMenu.o PuyoThemeMenu.o PuyoScreenTransition.o \

@@ -32,41 +32,9 @@
 #include "FramedEditField.h"
 #include "ListView.h"
 #include "PuyoCommander.h"
-#include "ios_httpdocument.h"
+#include "PuyoInternetMenu.h"
 #include "PuyoInternetGameCenter.h"
 
-
-/*class PushNetCenterMenuAction : public Action
-{
-public:
-    PushNetCenterMenuAction(PuyoMainScreen * mainScreen, Text *serverName, Text *serverPort, Text *userName) : mainScreen(mainScreen), serverName(serverName), serverPort(serverPort), userName(userName) {}
-    virtual void action();
-private:
-    PuyoMainScreen * mainScreen;
-    Text *serverName;
-    Text *serverPort;
-    Text *userName;
-};*/
-
-class PuyoHttpServerList {
-public:
-    PuyoHttpServerList();
-    String getServerNameAtIndex(int index) const;
-    int getServerPortAtIndex(int index) const;
-    int getNumServer() const;
-
-    void fetchServersInfo();
-    bool listHasChanged();
-    int fetchingNewData();
-
-private:
-  class PuyoHttpServer;
-	HttpDocument *doc;
-  AdvancedBuffer<PuyoHttpServer *> servers;
-  AdvancedBuffer<PuyoHttpServer *> metaservers;
-	int fetching;
-	bool firstTime;
-};
 
 class LANGameMenu : public PuyoMainScreenMenu {
 public:
@@ -79,36 +47,6 @@ private:
     EditFieldWithLabel playerNameLabel, portNumLabel;
     PuyoPopMenuAction cancelAction;
     Button startButton, cancelButton;
-};
-
-class InternetGameMenu : public PuyoMainScreenMenu, public IdleComponent, public Action {
-public:
-    InternetGameMenu(PuyoMainScreen * mainScreen);
-    virtual ~InternetGameMenu();
-    void build();
-    virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
-    void setSelectedServer(const String &s, int port);
-    virtual void idle(double currentTime);
-    virtual IdleComponent *getIdleComponent() { return this; }
-    void enterNetCenterMenu(PuyoInternetGameCenter *gameCenter);
-private:
-    IIM_Surface *upArrow, *downArrow;
-    PuyoHttpServerList servers;
-    Frame serverSelectionPanel;
-    ListView serverListPanel;
-    Text serverListText;
-    FramedButton updating;
-    Frame rightPanel;
-    Separator separator1_1, separator1_2, separator1_3,  separator10_1, separator10_2;
-    Text internetGameText, nicknameText, serverText, portText;
-    HBox hbox, menu;
-    SliderContainer container;
-    FramedEditField playerName;
-    FramedEditField serverName, serverPort;
-    int portNum;
-    //PushNetCenterMenuAction pushNetCenter;
-    PuyoPopMenuAction backAction;
-    FramedButton joinButton, backButton;
 };
 
 class NetworkInternetAction : public Action {

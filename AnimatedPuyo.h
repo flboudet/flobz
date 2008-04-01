@@ -37,6 +37,10 @@ class AnimatedPuyoSetTheme;
 
 class AnimatedPuyo : public PuyoPuyo {
 public:
+    enum AnimatedPuyoState {
+        PUYO_NORMAL,
+        PUYO_CRUNSHED
+    };
     AnimatedPuyo(PuyoState state, AnimatedPuyoSetTheme *themeSet, PuyoView *attachedView);
     virtual ~AnimatedPuyo();
     void addAnimation(PuyoAnimation *animation);
@@ -54,6 +58,7 @@ public:
     int getScreenCoordinateX() const;
     int getScreenCoordinateY() const;
 	AnimatedPuyoTheme *getAttachedTheme() const { return attachedTheme; }
+    void setAnimatedState(AnimatedPuyoState animatedState) { m_currentAnimatedState = animatedState; }
 private:
     AdvancedBuffer<PuyoAnimation *> animationQueue;
     int puyoEyeState;
@@ -61,8 +66,8 @@ private:
     bool visibilityFlag;
     PuyoView *attachedView;
 	AnimatedPuyoTheme *attachedTheme;
+    AnimatedPuyoState m_currentAnimatedState;
 };
-
 
 class AnimatedPuyoFactory : public PuyoFactory {
 public:
