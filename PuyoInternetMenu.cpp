@@ -87,6 +87,7 @@ HttpMetaServerConnection::~HttpMetaServerConnection()
 void HttpMetaServerConnection::fetch()
 {
     try {
+        m_servers.clear();
         m_doc = new HttpDocument(m_hostName, m_hostPath, m_portNum);
     } catch (Exception e) {
         e.printMessage();
@@ -123,10 +124,6 @@ void HttpMetaServerConnection::idle(double currentTime)
     }
 }
 
-
-
-
-
 PuyoServerList::PuyoServerList(PuyoServerListResponder *responder)
   : m_responder(responder)
 {
@@ -135,7 +132,7 @@ PuyoServerList::PuyoServerList(PuyoServerListResponder *responder)
   int nbserv;
   
   // For debugging purpose
-  m_metaservers.push_back(new DummyMetaServerConnection(this));
+  //m_metaservers.push_back(new DummyMetaServerConnection(this));
   
   // Making a meta-server list from prefs
   nbserv = GetIntPreference(kInternetMetaServerNumberKey, 1);
@@ -146,16 +143,6 @@ PuyoServerList::PuyoServerList(PuyoServerListResponder *responder)
     m_metaservers.push_back(new HttpMetaServerConnection(servname, servpath,
                               GetIntPreference (String(kInternetMetaServerPortKey)+i, 80), this));
   }
-
-  // Making a server list from prefs
-/*  nbserv = GetIntPreference(kInternetServerNumberKey,1);
-  for (int i = 1; i <= nbserv; i++)
-  {
-    char tmp[11];
-    snprintf(tmp,sizeof(tmp),"%d",i);
-    GetStrPreference (String(kInternetServerKey)+String(tmp), servname, i==1?kInternetCurrentServerDefaultValue:"Error", 256);
-    servers.add(new PuyoServer(servname, GetIntPreference (String(kInternetServerPortKey)+String(tmp), atoi(kInternetCurrentServerPortDefaultValue)), String("")));
-  }*/
 }
 
 PuyoServerList::~PuyoServerList()
@@ -172,48 +159,20 @@ PuyoServerList::~PuyoServerList()
 
 void PuyoServerList::fetch()
 {
+    // Delete all the already found servers
+    for (std::vector<PingablePuyoServer *>::iterator iter = m_servers.begin() ;
+         iter != m_servers.end() ; iter++) {
+         delete *iter;
+    }
+    m_servers.clear();
+    // Notify the responder that we have a clear list now
+    m_responder->PuyoServerListHasChanged(*this);
+    // Launch the fetching process
     for (std::vector<AbstractPuyoMetaServerConnection *>::iterator iter = m_metaservers.begin() ;
          iter != m_metaservers.end() ; iter++) {
          (*iter)->fetch();
     }
 }
-
-#ifdef DISABLED
-bool PuyoServerList::listHasChanged()
-{
-  return false;
-  // on doit mettre a jour les prefs de serveurs ici
-  int nbserv;
-  nbserv = newservers.size();
-  if (nbserv>0)
-  {
-    SetIntPreference(String(kInternetServerNumberKey), nbserv);
-    for (int i = 1; i <= nbserv; i++)
-    {
-      char tmp[11];
-      snprintf(tmp,sizeof(tmp),"%d",i);
-      SetStrPreference(String(kInternetServerKey)+String(tmp), newservers[i-1]->hostName);
-      SetIntPreference(String(kInternetServerPortKey)+String(tmp), newservers[i-1]->portNum);
-    }
-  }
-  nbserv = newmetaservers.size();
-  if (nbserv>0)
-  {
-    SetIntPreference(String(kInternetMetaServerNumberKey), nbserv);
-    for (int i = 1; i <= nbserv; i++)
-    {
-      char tmp[11];
-      snprintf(tmp,sizeof(tmp),"%d",i);
-      SetStrPreference(String(kInternetMetaServerKey)    +String(tmp), newmetaservers[i-1]->hostName);
-      SetIntPreference(String(kInternetMetaServerPortKey)+String(tmp), newmetaservers[i-1]->portNum);
-      SetStrPreference(String(kInternetMetaServerPathKey)+String(tmp), newmetaservers[i-1]->hostPath);
-    }
-  }
-  servers = newservers;
-  fetching = 0;
-  return true;
-}
-#endif
 
 void PuyoServerList::PuyoMetaServerListHasChanged(AbstractPuyoMetaServerConnection &metaServerConnection)
 {
@@ -248,7 +207,7 @@ PingablePuyoServer::PingablePuyoServer(String hostName, int portNum, String path
     m_pingBox(hostName, 0, portNum), m_igpclient(m_pingBox, false), m_responder(responder), m_alreadyReported(false)
 {
     GameUIDefaults::GAME_LOOP->addIdle(this);
-    m_pingTransaction = m_igpclient.ping(10000.);
+    m_pingTransaction = m_igpclient.ping(10000., 1000.);
 }
 
 PingablePuyoServer::~PingablePuyoServer()
@@ -295,7 +254,7 @@ InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)
     serverSelectionPanel(theCommander->getWindowFramePicture()),
     serverListPanel(20, upArrow, downArrow),
     serverListText("Server List"),
-    updating("Update", NULL, theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
+    updating("Update", this, theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
     rightPanel(theCommander->getWindowFramePicture()),
     separator1_1(1,1), separator1_2(1,1), separator1_3(1, 1), separator10_1(10,10), separator10_2(10,10),
     internetGameText("Internet Game"), nicknameText("Nickname"), serverText("Server"), portText("Port"),
@@ -498,19 +457,24 @@ void InternetGameMenu::enterNetCenterMenu(PuyoInternetGameCenter *gameCenter)
 
 void InternetGameMenu::action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
 {
-    try {
-        PuyoInternetGameCenter *gameCenter = new PuyoInternetGameCenter(serverName.getEditField().getValue(),
-                                                                        atoi(serverPort.getEditField().getValue()), playerName.getEditField().getValue());
-        PuyoInternetConnectDialog *connectionDialog = new PuyoInternetConnectDialog(serverName.getEditField().getValue(), gameCenter, this);
-        this->getParentScreen()->add(connectionDialog);
-        this->getParentScreen()->grabEventsOnWidget(connectionDialog);
-    } catch (Exception e) {
-        fprintf(stderr, "Error while connecting to %s\n", serverName.getEditField().getValue().c_str());
-        e.printMessage();
-        PuyoInternetErrorDialog *errorDialog = new PuyoInternetErrorDialog("Cannot connect to", serverName.getEditField().getValue());
-        this->getParentScreen()->add(errorDialog);
-        this->getParentScreen()->grabEventsOnWidget(errorDialog);
-        AudioManager::playSound("ebenon.wav", 0.5);
+    if (sender == this->joinButton.getButton()) {
+        try {
+            PuyoInternetGameCenter *gameCenter = new PuyoInternetGameCenter(serverName.getEditField().getValue(),
+                                                                            atoi(serverPort.getEditField().getValue()), playerName.getEditField().getValue());
+            PuyoInternetConnectDialog *connectionDialog = new PuyoInternetConnectDialog(serverName.getEditField().getValue(), gameCenter, this);
+            this->getParentScreen()->add(connectionDialog);
+            this->getParentScreen()->grabEventsOnWidget(connectionDialog);
+        } catch (Exception e) {
+            fprintf(stderr, "Error while connecting to %s\n", serverName.getEditField().getValue().c_str());
+            e.printMessage();
+            PuyoInternetErrorDialog *errorDialog = new PuyoInternetErrorDialog("Cannot connect to", serverName.getEditField().getValue());
+            this->getParentScreen()->add(errorDialog);
+            this->getParentScreen()->grabEventsOnWidget(errorDialog);
+            AudioManager::playSound("ebenon.wav", 0.5);
+        }
+    }
+    else if (sender == this->updating.getButton()) {
+        this->servers.fetch();
     }
 }
 
