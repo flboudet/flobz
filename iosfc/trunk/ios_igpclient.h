@@ -50,8 +50,10 @@ public:
     void onMessage(Message &);
     int getIgpIdent() const { return igpIdent; }
     bool isEnabled() const { return enabled; }
-    PingTransaction *ping(double timeoutMs);
+    PingTransaction *ping(double timeoutMs, double interval=0.);
 private:
+    void sendPingMessage(int sequenceNumber) const;
+    void unregisterPingTransaction(PingTransaction *pingTransaction);
     MessageBox &mbox;
     bool enabled;
     int igpIdent;
@@ -68,9 +70,12 @@ public:
     bool success()   { return m_success;   }
     double time()    { return m_time;      }
 private:
-    PingTransaction(double initialTime, double timeoutMs);
+    PingTransaction(double initialTime, double timeoutMs, double interval, IGPClient *owner);
+    void idle(double currentTime);
     bool m_completed, m_success;
-    double m_time, m_initialTime, m_timeoutMs;
+    double m_time, m_initialTime, m_timeoutMs, m_interval, m_nextRepeatTime;
+    IGPClient *m_owner;
+    int m_sequenceNumber;
     friend class IGPClient;
 };
 

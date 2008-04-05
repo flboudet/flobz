@@ -52,6 +52,11 @@ IGPClient::IGPClient(MessageBox &mbox, int igpIdent) : mbox(mbox), enabled(false
 IGPClient::~IGPClient()
 {
     mbox.removeListener(this);
+    // remove all reference to this from the current pending ping transactions
+    for (int i = 0 ; i < pendingPingTransactions.size() ; i++) {
+        PingTransaction *currentTransaction = pendingPingTransactions[i];
+        currentTransaction->m_owner = NULL;
+    }
 }
 
 void IGPClient::sendMessage(int igpID, VoidBuffer message, bool reliable)
@@ -74,23 +79,21 @@ void IGPClient::idle()
     // take care of the pending ping transactions
     for (int i = 0 ; i < pendingPingTransactions.size() ; i++) {
         PingTransaction *currentTransaction = pendingPingTransactions[i];
-        if (currentTransaction->m_timeoutMs < time_ms) {
-            currentTransaction->m_completed = true;
-            currentTransaction->m_success = false;
-            pendingPingTransactions.removeAt(i);
-        }
+        currentTransaction->idle(time_ms);
     }
 }
 
-IGPClient::PingTransaction *IGPClient::ping(double timeoutMs)
+IGPClient::PingTransaction *IGPClient::ping(double timeoutMs, double interval)
 {
-    Message *pingMsg = mbox.createMessage();
-    pingMsg->addInt(IGPDatagram::MSGIDENT, IGPDatagram::IgpPing);
-    pingMsg->send();
-    delete pingMsg;
-    PingTransaction *newTransaction = new PingTransaction(getTimeMs(), timeoutMs);
+    PingTransaction *newTransaction = new PingTransaction(getTimeMs(), timeoutMs, interval, this);
     pendingPingTransactions.add(newTransaction);
     return newTransaction;
+}
+
+void IGPClient::unregisterPingTransaction(IGPClient::PingTransaction *pingTransaction)
+{
+    pingTransaction->m_owner = NULL;
+    pendingPingTransactions.remove(pingTransaction);
 }
 
 void IGPClient::onMessage(Message &rawMsg)
@@ -138,13 +141,41 @@ void IGPClient::removeListener(IGPClientMessageListener *listener) {
     listeners.remove(listener);
 }
 
-IGPClient::PingTransaction::PingTransaction(double initialTime, double timeoutMs)
-  : m_completed(false), m_success(false), m_time(0.), m_initialTime(initialTime), m_timeoutMs(initialTime + timeoutMs)
+void IGPClient::sendPingMessage(int sequenceNumber) const
 {
+    Message *pingMsg = mbox.createMessage();
+    pingMsg->addInt(IGPDatagram::MSGIDENT, IGPDatagram::IgpPing);
+    pingMsg->addInt("SN", sequenceNumber);
+    pingMsg->send();
+    delete pingMsg;
+}
+
+
+IGPClient::PingTransaction::PingTransaction(double initialTime, double timeoutMs, double interval, IGPClient *owner)
+  : m_completed(false), m_success(false), m_time(0.), m_initialTime(initialTime),
+    m_timeoutMs(initialTime + timeoutMs), m_interval(interval), m_owner(owner), m_sequenceNumber(0)
+{
+    m_owner->sendPingMessage(m_sequenceNumber++);
+    m_nextRepeatTime = initialTime + interval;
 }
 
 IGPClient::PingTransaction::~PingTransaction()
 {
+    if (m_owner != NULL)
+        m_owner->unregisterPingTransaction(this);
+}
+
+void IGPClient::PingTransaction::idle(double currentTime)
+{
+    if (m_timeoutMs < currentTime) {
+        m_completed = true;
+        m_success = false;
+        m_owner->unregisterPingTransaction(this);
+    }
+    else if ((m_interval != 0.) && (m_nextRepeatTime < currentTime)) {
+        m_owner->sendPingMessage(m_sequenceNumber++);
+        m_nextRepeatTime = currentTime + m_interval;
+    }
 }
 
 }
