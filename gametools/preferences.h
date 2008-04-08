@@ -11,13 +11,13 @@
 #define PREF_H
 
 /* Set preferences */
-void SetBoolPreference(const char *name,int value);
+void SetBoolPreference(const char *name, bool value);
 void SetIntPreference (const char *name, int value);
 void SetStrPreference (const char *name, const char *value);
 
 
 /* Get preferences */
-int  GetBoolPreference(const char *name, int defaut);
+bool GetBoolPreference(const char *name, bool defaut);
 int  GetIntPreference (const char *name, int defaut);
 void GetStrPreference (const char *name, char *out, const char *defaut, const int bufferSize = 256);
 

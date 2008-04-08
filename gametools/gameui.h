@@ -495,6 +495,7 @@ bool isDirectionEvent(GameControlEvent *event);
   public:
     Image();
     Image(IIM_Surface *image);
+    ~Image();
     // Properties
     void setImage(IIM_Surface *image);
     virtual void setFocusable(bool focusable) { Widget::setFocusable(focusable); }

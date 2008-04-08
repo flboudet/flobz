@@ -522,8 +522,8 @@ namespace gameui {
                 Widget *wid = this->getChild(i);
                 Vec3 widPosition = wid->getPosition();
                 Vec3 widSize = wid->getSize();
-                if ((wid->isFocusable()) && (widPosition.x <= event->x) && (widPosition.y <= event->y)
-                    && (widPosition.x + widSize.x >= event->x) && (widPosition.y + widSize.y >= event->y) && (activeWidget != i)) {
+                if ((wid->isFocusable()) && (widPosition.x < event->x) && (widPosition.y < event->y)
+                    && (widPosition.x + widSize.x > event->x) && (widPosition.y + widSize.y > event->y) && (activeWidget != i)) {
                     if (child != NULL)
                         child->lostFocus();
                     activeWidget = i;
@@ -1303,9 +1303,18 @@ namespace gameui {
         setImage(image);
     }
     
+    Image::~Image()
+    {
+        if (m_focusedImage != NULL) IIM_Free(m_focusedImage);
+    }
+    
     void Image::setImage(IIM_Surface *image)
     {
         m_image = image;
+        if (m_focusedImage != NULL) {
+            IIM_Free(m_focusedImage);
+            m_focusedImage = NULL;
+        }
         this->setPreferedSize(Vec3(m_image->h, m_image->w));
     }
     
@@ -1327,7 +1336,7 @@ namespace gameui {
     void Image::eventOccured(GameControlEvent *event)
     {
         bool clicked = false;
-        if (isDirectionEvent(event))
+        if (isDirectionEvent(event) && !event->isUp)
             lostFocus();
         if (event->cursorEvent == GameControlEvent::kStart)
             clicked = true;
