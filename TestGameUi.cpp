@@ -11,6 +11,7 @@
 #include "FramedButton.h"
 #include "FramedEditField.h"
 #include "IosImgProcess.h"
+#include "SwitchedButton.h"
 
 using namespace ios_fc;
 using namespace gameui;
@@ -40,7 +41,7 @@ class TestAction : public Action {
 public:
     virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
     {
-        printf("Clic sur %x\n", sender);
+        printf("Clic sur %p\n", sender);
     }
 };
 
@@ -60,7 +61,7 @@ private:
 
 ShowModalDialogAction::ShowModalDialogAction(ZBox *rootZBox) : rootZBox(rootZBox), title("Slider"), simpleButton("button")
 {
-    IIM_Surface *sliderBkgnd = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/menubg.png");
+    IIM_Surface *sliderBkgnd = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/frame.png");
     slider.setBackground(sliderBkgnd);
     Vec3 dialogPos = slider.getPosition();
     dialogPos.x = 50;
@@ -148,6 +149,20 @@ int main(int argc, char *argv[])
     IIM_Surface *downArrow = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/downarrow.png");
     bidonBox.setPolicy(USE_MIN_SIZE);
     ListView list(20, upArrow, downArrow);
+    IIM_Surface *onSwitchImage = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/switch-on.png");
+    IIM_Surface *offSwitchImage = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/switch-off.png");
+    SwitchedButton prefSwitchA(String("Mon switch tout neuf A"), true,
+                              onSwitchImage, offSwitchImage,
+                              String("test.widget.switchbuttonAB"));
+    SwitchedButton prefSwitchB(String("Mon switch tout neuf B sur la même pref que A"), true,
+                               onSwitchImage, offSwitchImage,
+                               String("test.widget.switchbuttonAB"));
+    SwitchedButton prefSwitchC(String("Mon switch tout neuf C sur une autre pref"), false,
+                               onSwitchImage, offSwitchImage,
+                               String("test.widget.switchbuttonC"));
+    bidonBox.add(&prefSwitchA);
+    bidonBox.add(&prefSwitchB);
+    bidonBox.add(&prefSwitchC);
     bidonBox.add(&bidonText);
     bidonBox.add(&framedButton1);
     bidonBox.add(&bidonButton1);
