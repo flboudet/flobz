@@ -1,3 +1,3 @@
 FILES=
-DIRECTORIES= "introlevel"
+DIRECTORIES= "ending" "introlevel"
 include ${SOURCE_DATADIR}/Datarules.mk

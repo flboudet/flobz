@@ -64,7 +64,9 @@ PuyoDataPathManager::PuyoDataPathManager(String coreDataPath) : m_coreDataPath(c
 
 String PuyoDataPathManager::getPath(String shortPath) const
 {
+    printf("Recherche de %s\n", (const char *)shortPath);
     for (int i = 0 ; i < m_dataPaths.size() ; i++) {
+        printf("Dans %s\n", (const char *)(m_dataPaths[i].getPathString()));
         FilePath testPath(m_dataPaths[i].combine(shortPath));
         if (testPath.exists())
             return testPath.getPathString();
@@ -78,7 +80,7 @@ void PuyoDataPathManager::setMaxPackNumber(int maxPackNumber)
         const String &currentFile = m_dataPaths[i].getPathString();
         int currentNumber = atoi(currentFile.substring(currentFile.length() - 3));
         if (currentNumber > maxPackNumber)
-            m_dataPaths.removeAt(i);
+            m_dataPaths.removeAtKeepOrder(i);
     }
 }
 
