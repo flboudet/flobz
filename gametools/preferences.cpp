@@ -10,7 +10,7 @@
 #include "preferences.h"
 
 
-#ifndef __APPLE__
+#ifdef __APPLE__
 
 #include <CoreFoundation/CoreFoundation.h>
 
