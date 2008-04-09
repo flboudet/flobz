@@ -89,6 +89,11 @@ public:
       delete this->get(i);
       AdvancedBuffer<T*>::removeAt(i);
     }
+    
+    inline void removeAtKeepOrder(int i) {
+        delete this->get(i);
+        AdvancedBuffer<T*>::removeAtKeepOrder(i);
+    }
   
 private:
     int *instanceCounter;

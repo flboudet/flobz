@@ -432,6 +432,15 @@ namespace ios_fc {
                 this->get(i) = this->get(size()-1);
                 used--;
             }
+            inline void removeAtKeepOrder(int i) {
+                T tafter = this->get(size()-1);
+                for (int index=size()-2;index>=i;--index) {
+                    T tmp            = this->get(index);
+                    this->get(index) = tafter;
+                    tafter           = tmp;
+                }
+                this->remove();
+            }
             
             inline int capacity() const { return Buffer<T>::size(); }
             inline int size()     const { return used; }
