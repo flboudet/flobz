@@ -15,16 +15,33 @@ namespace gameui {
         if (key == "") stateValue = defaultValue;
         else stateValue = (bool)GetBoolPreference(key, defaultValue);
         setInnerMargin(0);
+        setFocusable(true);
+        text.setFocusable(false);
+        stateImage.setFocusable(true);
         setPolicy(USE_MAX_SIZE_NO_MARGIN);
         stateImage.setImage(stateValue ? imageTrue : imageFalse);
         //stateImage.setOnStartAction(this);
         stateImage.setOnMouseUpAction(this);
+        stateImage.setInvertedFocus(true);
         add(&stateImage);
+        text.mdontMove=true;
         add(&text);
         autoSetPreferedSize();
         gameui::GlobalNotificationCenter.addListener(key, this);
     }
     
+    void SwitchedButton::lostFocus()
+    {
+        stateImage.lostFocus();
+        text.lostFocus();
+    }
+    
+    void SwitchedButton::giveFocus()
+    {
+        stateImage.giveFocus();
+        text.giveFocus();
+    }
+
     void SwitchedButton::action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
     {
         if ((actionType == ON_MOUSEUP) || (actionType == ON_MOUSEUP)) {
@@ -53,6 +70,7 @@ namespace gameui {
         Vec3 imgSize = stateImage.getPreferedSize();
         size.x += imgSize.x + 10.0f;
         if (imgSize.y > size.y) size.y = imgSize.y;
+        size.y += 2.0f;
         setPreferedSize(size);
     }
     

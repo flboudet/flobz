@@ -499,6 +499,7 @@ bool isDirectionEvent(GameControlEvent *event);
     // Properties
     void setImage(IIM_Surface *image);
     virtual void setFocusable(bool focusable) { Widget::setFocusable(focusable); }
+    void setInvertedFocus(bool mode);
     // Notifications
     virtual void onWidgetVisibleChanged(bool visible) { Widget::onWidgetVisibleChanged(visible); }
     virtual void onWidgetAdded(WidgetContainer *parent) { Widget::onWidgetAdded(parent); }
@@ -511,6 +512,7 @@ bool isDirectionEvent(GameControlEvent *event);
     virtual void draw(SDL_Surface *screen);
   private:
     IIM_Surface *m_image, *m_focusedImage;
+    bool m_invertFocusMode;
   };
 
   class Button : public Text {

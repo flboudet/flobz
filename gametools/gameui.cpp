@@ -1294,11 +1294,11 @@ namespace gameui {
     //
     // Image
     //
-    Image::Image() : m_image(NULL), m_focusedImage(NULL)
+    Image::Image() : m_image(NULL), m_focusedImage(NULL), m_invertFocusMode(false)
     {
     }
     
-    Image::Image(IIM_Surface *image) : m_focusedImage(NULL)
+    Image::Image(IIM_Surface *image) : m_focusedImage(NULL), m_invertFocusMode(false)
     {
         setImage(image);
     }
@@ -1325,12 +1325,22 @@ namespace gameui {
         Vec3 pos = this->getPosition();
         Vec3 size = this->getSize();
         dstRect.x = pos.x; dstRect.y = pos.y; dstRect.h = size.x; dstRect.w = size.y;
-        if (haveFocus()) {
+        if (haveFocus() ^ m_invertFocusMode) {
             if (m_focusedImage == NULL)
-                m_focusedImage = iim_surface_shift_hsv(m_image, 0., 0., 0.3);
+                m_focusedImage = iim_surface_shift_hsv(m_image, 0., 0., m_invertFocusMode ? -0.3 : 0.3);
             imageToDraw = m_focusedImage;
         }
         IIM_BlitSurface(imageToDraw, NULL, screen, &dstRect);
+    }
+    
+    void Image::setInvertedFocus(bool mode)
+    {
+        m_invertFocusMode = mode;
+        if (m_focusedImage != NULL) {
+            IIM_Free(m_focusedImage);
+            m_focusedImage = NULL;
+        }
+        requestDraw();
     }
     
     void Image::eventOccured(GameControlEvent *event)
@@ -1375,6 +1385,7 @@ namespace gameui {
         : Text(label, fontInactive)
     {
         init(fontActive, fontInactive);
+        setValue(label);
     }
 
     Button::Button(const String &label, Action *action)
@@ -1382,6 +1393,7 @@ namespace gameui {
     {
         init(NULL,NULL);
         setAction(ON_START, action);
+        setValue(label);
     }
 
     void Button::eventOccured(GameControlEvent *event)

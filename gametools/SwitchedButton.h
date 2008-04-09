@@ -14,12 +14,15 @@ namespace gameui {
         void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
         void notificationOccured(String identifier, void * context);
         bool getState();
+        void lostFocus();
+        void giveFocus();
+
     private:
         void autoSetPreferedSize();
         Image stateImage;
         IIM_Surface * imageTrue;
         IIM_Surface * imageFalse;
-        Text text;
+        Button text;
         String key;
         bool stateValue;
     };
