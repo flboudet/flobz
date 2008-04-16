@@ -9,6 +9,7 @@ namespace gameui {
     class NotificationResponder {
     public:
         virtual void notificationOccured(String identifier, void * context) {};
+        virtual ~NotificationResponder() {};
     };
     
     class NotifyCenter: HashMap {

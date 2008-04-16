@@ -26,43 +26,41 @@
 #include "PuyoOptionMenu.h"
 #include "preferences.h"
 #include "PuyoStrings.h"
+#include "audio.h"
 
-/**
- * Toggle fullscreen
- */
-void ToggleSoundFxAction::action()
+MusicPrefSwitch::MusicPrefSwitch()
+: gameui::SwitchedButton(theCommander->getLocalizedString(kMusic), true,
+                         theCommander->getSwitchOnPicture(), theCommander->getSwitchOffPicture(),
+                         String(AudioManager::musicOnOffKey()))
 {
-    theCommander->setSoundFx(! theCommander->getSoundFx());
-    if (toggleButton) toggleButton->setToggle(theCommander->getSoundFx());
 }
 
-void ToggleMusicAction::action()
+AudioPrefSwitch::AudioPrefSwitch()
+: gameui::SwitchedButton(theCommander->getLocalizedString(kAudioFX), true,
+                         theCommander->getSwitchOnPicture(), theCommander->getSwitchOffPicture(),
+                         String(AudioManager::soundOnOffKey()))
 {
-    theCommander->setMusic(! theCommander->getMusic());
-    if (toggleButton) toggleButton->setToggle(theCommander->getMusic());
 }
 
-void ToggleFullScreenAction::action()
+FSPrefSwitch::FSPrefSwitch()
+: gameui::SwitchedButton(theCommander->getLocalizedString(kFullScreen), true,
+                         theCommander->getSwitchOnPicture(), theCommander->getSwitchOffPicture(),
+                         String(theCommander->getFullScreenKey()))
 {
-    theCommander->setFullScreen(! theCommander->getFullScreen());
-    if (toggleButton) toggleButton->setToggle(theCommander->getFullScreen());
 }
 
 OptionMenu::OptionMenu(PuyoMainScreen *mainScreen) : PuyoMainScreenMenu(mainScreen),
     screenTitleFrame(theCommander->getSeparatorFramePicture()),
     optionTitle(theCommander->getLocalizedString("Options")),
-    audioButton(theCommander->getLocalizedString(kAudioFX), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getSoundFx(), &toggleSoundFxAction),
-    musicButton(theCommander->getLocalizedString(kMusic), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getMusic(), &toggleMusicAction),
-    fullScreenButton(theCommander->getLocalizedString(kFullScreen), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getFullScreen(), &toggleFullScreenAction),
+    audioButton(),
+    musicButton(),
+    fullScreenButton(),
     controlMenu(mainScreen), themeMenu(mainScreen), levelMenu(mainScreen),
     changeThemeAction(&themeMenu, mainScreen), changeLevelAction(&levelMenu, mainScreen), changeControlsAction(&controlMenu, mainScreen, true),
     changePuyoThemeButton(theCommander->getLocalizedString(kChangePuyoTheme), &changeThemeAction),
     changeLevelThemeButton(theCommander->getLocalizedString(kChangePuyoLevel), &changeLevelAction),
     changeControlsButton(theCommander->getLocalizedString(kControls), &changeControlsAction), backAction(mainScreen), backButton(theCommander->getLocalizedString("Back"), &backAction)
 {
-    toggleSoundFxAction.setButton(&audioButton);
-    toggleMusicAction.setButton(&musicButton);
-    toggleFullScreenAction.setButton(&fullScreenButton);
 }
 
 void OptionMenu::build() {

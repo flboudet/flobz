@@ -31,34 +31,23 @@
 #include "PuyoThemeMenu.h"
 #include "LevelThemeMenu.h"
 #include "PuyoControlMenu.h"
+#include "SwitchedButton.h"
 
 class OptionMenu;
 
-class ToggleSoundFxAction : public Action {
+class MusicPrefSwitch : public gameui::SwitchedButton {
 public:
-    ToggleSoundFxAction() : toggleButton(NULL) {}
-    void setButton(ToggleButton *_toggleButton) { toggleButton = _toggleButton; }
-    void action();
-private:
-    ToggleButton *toggleButton;
+    MusicPrefSwitch();
 };
 
-class ToggleMusicAction : public Action {
+class AudioPrefSwitch : public gameui::SwitchedButton {
 public:
-    ToggleMusicAction() : toggleButton(NULL) {}
-    void setButton(ToggleButton *_toggleButton) { toggleButton = _toggleButton; }
-    void action();
-private:
-    ToggleButton *toggleButton;
+    AudioPrefSwitch();
 };
 
-class ToggleFullScreenAction : public Action {
+class FSPrefSwitch : public gameui::SwitchedButton {
 public:
-    ToggleFullScreenAction() : toggleButton(NULL) {}
-    void setButton(ToggleButton *_toggleButton) { toggleButton = _toggleButton; }
-    void action();
-private:
-    ToggleButton *toggleButton;
+    FSPrefSwitch();
 };
 
 class OptionMenu : public PuyoMainScreenMenu {
@@ -66,13 +55,12 @@ public:
     OptionMenu(PuyoMainScreen *mainScreen);
     void build();
 private:
-    ToggleSoundFxAction toggleSoundFxAction;
-    ToggleMusicAction toggleMusicAction;
-    ToggleFullScreenAction toggleFullScreenAction;
     Frame screenTitleFrame;
     Text optionTitle;
     VBox buttonsBox;
-    ToggleButton audioButton, musicButton, fullScreenButton;
+    AudioPrefSwitch audioButton;
+    MusicPrefSwitch musicButton;
+    FSPrefSwitch fullScreenButton;
     ControlMenu controlMenu;
     PuyoThemeMenu themeMenu;
     LevelThemeMenu levelMenu;

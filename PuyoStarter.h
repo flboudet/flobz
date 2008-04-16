@@ -45,9 +45,6 @@ public:
     PuyoPauseMenu(Action *continueAction, Action *abortAction);
     virtual ~PuyoPauseMenu();
     int pauseMenuTop, pauseMenuLeft;
-    void toggleSoundFx();
-    void toggleMusic();
-    void toggleFullScreen();
     bool backPressed(bool fromControls = true);
     // Action
     virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
@@ -61,14 +58,13 @@ private:
     Separator topSeparator;
     HBox topBox;
     Frame pauseVBox;
-    ToggleSoundFxAction toggleSoundFxAction;
-    ToggleMusicAction toggleMusicAction;
-    ToggleFullScreenAction toggleFullScreenAction;
     Frame pauseTitleFrame;
     Text menuTitle;
     VBox buttonsBox;
     Button continueButton, optionsButton;
-    ToggleButton audioButton, musicButton, fullScreenButton;
+    AudioPrefSwitch audioButton;
+    MusicPrefSwitch musicButton;
+    FSPrefSwitch fullScreenButton;
     Button abortButton;
 
     Frame optionsBox;

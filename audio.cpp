@@ -32,6 +32,7 @@ static bool music_on = false;
 static bool music_starting = false;
 
 static std::string music_current = "";
+
 #endif
 
 static const char * kMusicVolume = "AudioManager.Music.Volume";
@@ -152,6 +153,44 @@ void AudioManager::close()
     Mix_CloseAudio();
     clearMusicCache();
     clearSoundCache();
+#endif
+}
+
+AudioManager::AudioManager()
+{
+#ifdef USE_AUDIO
+    GlobalNotificationCenter.addListener(String(kMusicVolume), this);
+    GlobalNotificationCenter.addListener(String(kSoundVolume), this);
+    GlobalNotificationCenter.addListener(String(kMusic), this);
+    GlobalNotificationCenter.addListener(String(kSound), this);
+#endif    
+}
+
+AudioManager::~AudioManager()
+{
+#ifdef USE_AUDIO
+    GlobalNotificationCenter.removeListener(String(kMusicVolume), this);
+    GlobalNotificationCenter.removeListener(String(kSoundVolume), this);
+    GlobalNotificationCenter.removeListener(String(kMusic), this);
+    GlobalNotificationCenter.removeListener(String(kSound), this);
+#endif
+}
+
+void AudioManager::notificationOccured(String identifier, void * context)
+{
+#ifdef USE_AUDIO
+    if (identifier == kMusicVolume) {
+        musicVolume((float)*(int *)context);
+    } else
+        if (identifier == kSoundVolume) {
+            soundVolume((float)*(int *)context);
+        } else
+            if (identifier == kMusic) {
+                musicOnOff(*(bool *)context);
+            } else
+                if (identifier == kSound) {
+                    soundOnOff(*(bool *)context);
+                }
 #endif
 }
 
@@ -284,8 +323,6 @@ void AudioManager::musicVolume(float volume)
         Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * volume));
     }
     music_volume = volume;
-
-    SetIntPreference(kMusicVolume, (int)(volume*100.0f));
 #endif
 }
 
@@ -299,10 +336,13 @@ void AudioManager::soundVolume(float volume)
         Mix_Volume (-1, (int) ((float)MIX_MAX_VOLUME * volume));
     }
     sound_volume = volume;
-
-    SetIntPreference(kSoundVolume, (int)(volume*100.0f));
 #endif
 }
+
+const char * AudioManager::musicVolumeKey(void) { return kMusicVolume; }
+const char * AudioManager::soundVolumeKey(void) { return kSoundVolume; }
+const char * AudioManager::musicOnOffKey(void)  { return kMusic; }
+const char * AudioManager::soundOnOffKey(void)  { return kSound; }
 
 void AudioManager::musicOnOff(bool state)
 {
@@ -326,7 +366,6 @@ void AudioManager::musicOnOff(bool state)
   {
     Mix_HaltMusic();
   }
-  SetBoolPreference(kMusic, music_on);
 #endif
 }
 
@@ -336,7 +375,6 @@ void AudioManager::soundOnOff(bool state)
   if ((!audio_supported) || (sound_on == state)) return;
   
   sound_on = state;
-  SetBoolPreference(kSound, sound_on);
 #endif
 }
 

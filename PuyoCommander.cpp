@@ -291,6 +291,7 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
   if (maxDataPackNumber != -1)
     dataPathManager.setMaxPackNumber(maxDataPackNumber);
   loadPreferences(fs);
+  gameui::GlobalNotificationCenter.addListener(getFullScreenKey(),this);
   initSDL();
   initLocale();
   initGameControls();
@@ -298,36 +299,39 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
   initDisplay(GetIntPreference(kScreenWidthPref, 640),
           GetIntPreference(kScreenHeightPref, 480), fullscreen, useGL);
   initFonts();
+
+    // Loading the frame images, and setting up the frames
+    m_switchOnImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/switch-on.png"));
+    m_switchOffImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/switch-off.png"));
+    m_frameImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/frame.png"));
+    m_buttonIdleImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/button.png"));
+    m_buttonDownImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/buttondown.png"));
+    m_buttonOverImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/buttonover.png"));
+    m_textFieldIdleImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/editfield.png"));
+    m_separatorImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/separator.png"));
+    m_windowFramePicture.setFrameSurface(m_frameImage);
+    m_buttonIdleFramePicture.setFrameSurface(m_buttonIdleImage);
+    m_buttonDownFramePicture.setFrameSurface(m_buttonDownImage);
+    m_buttonOverFramePicture.setFrameSurface(m_buttonOverImage);
+    m_textFieldIdleFramePicture.setFrameSurface(m_textFieldIdleImage);
+    m_separatorFramePicture.setFrameSurface(m_separatorImage);
+
   initMenus();
   cursor = new GameCursor(dataPathManager.getPath("gfx/cursor.png"));
   loop->addDrawable(cursor);
   loop->addIdle(cursor);
-  // Loading the frame images, and setting up the frames
-  m_frameImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/frame.png"));
-  m_buttonIdleImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/button.png"));
-  m_buttonDownImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/buttondown.png"));
-  m_buttonOverImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/buttonover.png"));
-  m_textFieldIdleImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/editfield.png"));
-  m_separatorImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/separator.png"));
-  m_windowFramePicture.setFrameSurface(m_frameImage);
-  m_buttonIdleFramePicture.setFrameSurface(m_buttonIdleImage);
-  m_buttonDownFramePicture.setFrameSurface(m_buttonDownImage);
-  m_buttonOverFramePicture.setFrameSurface(m_buttonOverImage);
-  m_textFieldIdleFramePicture.setFrameSurface(m_textFieldIdleImage);
-  m_separatorFramePicture.setFrameSurface(m_separatorImage);
+    
 }
 
 PuyoCommander::~PuyoCommander()
 {
-#ifdef ENABLE_TTF
-#else
-#endif
   IIM_Free(m_frameImage);
   IIM_Free(m_buttonIdleImage);
   IIM_Free(m_buttonDownImage);
   IIM_Free(m_buttonOverImage);
   IIM_Free(m_textFieldIdleImage);
   IIM_Free(m_separatorImage);
+  gameui::GlobalNotificationCenter.removeListener(getFullScreenKey(),this);
 }
 
 /* Initialize SDL context */
@@ -451,6 +455,14 @@ void PuyoCommander::initFonts()
   GameUIDefaults::FONT_SMALL_ACTIVE = smallFont;
 }
 
+
+void PuyoCommander::notificationOccured(String identifier, void * context)
+{
+    if (identifier == kFullScreenPref) {
+        setFullScreen(*(bool *)context);
+    }    
+}
+/*
 void PuyoCommander::setMusic(bool music)
 {
   AudioManager::musicOnOff(music);
@@ -460,7 +472,7 @@ void PuyoCommander::setSoundFx(bool fx)
 {
   AudioManager::soundOnOff(fx);
 }
-
+*/
 bool PuyoCommander::getMusic()
 {
   return AudioManager::isMusicOn();
@@ -469,6 +481,11 @@ bool PuyoCommander::getMusic()
 bool PuyoCommander::getSoundFx()
 {
   return AudioManager::isSoundOn();
+}
+
+String PuyoCommander::getFullScreenKey(void) const
+{
+    return String(kFullScreenPref);
 }
 
 void PuyoCommander::setFullScreen(bool fullScreen)

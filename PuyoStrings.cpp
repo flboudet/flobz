@@ -42,10 +42,10 @@ const char *kCongratulations = "Congratulations!!!";
 const char *kPuyosInvasion   = "                        You stopped Puyo's invasion.\n"
 "                         Peace on Earth is restored!!";
 
-const char *kAudioFX     = "Audio FX\t";
-const char *kMusic       = "Music\t";
-const char *kFullScreen  = "FullScreen\t";
-const char *kOpenGL      = "Use OpenGL\t";
+const char *kAudioFX     = "Audio FX";
+const char *kMusic       = "Music";
+const char *kFullScreen  = "FullScreen";
+const char *kOpenGL      = "Use OpenGL";
 const char *kChangePuyoTheme = "Puyo theme...";
 const char *kChangePuyoLevel = "Level theme...";
 const char *kControls    = "Change controls...";

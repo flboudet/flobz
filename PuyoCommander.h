@@ -9,6 +9,8 @@
 #include "PuyoDataPathManager.h"
 #include "PuyoLocalizedDictionary.h"
 #include "GameCursor.h"
+#include "NotifyCenter.h"
+#include "audio.h"
 
 using namespace ios_fc;
 using namespace gameui;
@@ -78,7 +80,7 @@ private:
     PuyoMainScreen *mainScreen;
 };
 
-class PuyoCommander : public MessageListener
+class PuyoCommander : public MessageListener, NotificationResponder
 {
   public:
     PuyoCommander(String dataDir, bool fullscreen, int maxDataPackNumber=-1);
@@ -93,10 +95,11 @@ class PuyoCommander : public MessageListener
     SoFont *menuFont;
     SoFont *funnyFont;
 
+    void notificationOccured(String identifier, void * context);
+    
     bool getMusic();
-    void setMusic(bool music);
     bool getSoundFx();
-    void setSoundFx(bool fx);
+    String getFullScreenKey(void) const;
     bool getFullScreen() const { return fullscreen; }
     void setFullScreen(bool fullScreen);
     bool getGlSDL() const { return useGL; }
@@ -114,6 +117,8 @@ class PuyoCommander : public MessageListener
     const FramePicture *getEditFieldFramePicture() const { return &m_textFieldIdleFramePicture; }
     const FramePicture *getEditFieldOverFramePicture() const { return &m_textFieldIdleFramePicture; }
     const FramePicture *getSeparatorFramePicture() const { return &m_separatorFramePicture; }
+    IIM_Surface * getSwitchOnPicture() { return m_switchOnImage; }
+    IIM_Surface * getSwitchOffPicture() { return m_switchOffImage; }
   private:
 
     friend class SinglePlayerGameAction;
@@ -136,12 +141,15 @@ class PuyoCommander : public MessageListener
     PuyoMainScreen *mainScreen;
     GameCursor *cursor;
     PuyoLocalizedDictionary * locale;
+    
+    AudioManager globalAudioManager;
 
     bool fullscreen;
     bool useGL;
     IIM_Surface   *m_frameImage, *m_buttonIdleImage, *m_buttonDownImage, *m_buttonOverImage;
     IIM_Surface   *m_textFieldIdleImage;
     IIM_Surface   *m_separatorImage;
+    IIM_Surface   *m_switchOnImage, *m_switchOffImage;
     FramePicture m_windowFramePicture;
     FramePicture m_buttonIdleFramePicture, m_buttonDownFramePicture, m_buttonOverFramePicture;
     FramePicture m_textFieldIdleFramePicture;

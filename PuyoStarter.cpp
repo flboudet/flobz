@@ -508,24 +508,19 @@ void PuyoGameWidget::setScreenToResumed(bool fromControls)
 
 PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
     : topSeparator(0, 10), pauseVBox(theCommander->getWindowFramePicture()),
-      toggleSoundFxAction(), toggleMusicAction(), toggleFullScreenAction(),
       pauseTitleFrame(theCommander->getSeparatorFramePicture()),
       menuTitle(theCommander->getLocalizedString("Pause")), 
       continueButton(theCommander->getLocalizedString("Continue game"), continueAction),
       optionsButton(theCommander->getLocalizedString("Options"), this),
-      audioButton(theCommander->getLocalizedString(kAudioFX), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getSoundFx(), &toggleSoundFxAction),
-      musicButton(theCommander->getLocalizedString(kMusic), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getMusic(), &toggleMusicAction),
-      fullScreenButton(theCommander->getLocalizedString(kFullScreen), theCommander->getLocalizedString("OFF"), theCommander->getLocalizedString("ON "), theCommander->getFullScreen(), &toggleFullScreenAction),
+      audioButton(),
+      musicButton(),
+      fullScreenButton(),
       abortButton(theCommander->getLocalizedString("Abort game"), abortAction),
       optionsBox(theCommander->getWindowFramePicture()),
       optionsTitleFrame(theCommander->getSeparatorFramePicture()),
       optionsTitle(theCommander->getLocalizedString("Options")),
       optionsBack(theCommander->getLocalizedString("Back"), this)
 {
-    toggleSoundFxAction.setButton(&audioButton);
-    toggleMusicAction.setButton(&musicButton);
-    toggleFullScreenAction.setButton(&fullScreenButton);
-    
     setPolicy(USE_MIN_SIZE);
     pauseTitleFrame.add(&menuTitle);
     pauseTitleFrame.setPreferedSize(Vec3(0, 20));
@@ -551,22 +546,6 @@ PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
     optionsButtonsBox.add(&optionsBack);
     optionsBox.add(&optionsButtonsBox);
 }
-
-void PuyoPauseMenu::toggleSoundFx()
-{
-    audioButton.setToggle(theCommander->getSoundFx());
-}
-
-void PuyoPauseMenu::toggleMusic()
-{
-    musicButton.setToggle(theCommander->getMusic());
-}
-
-void PuyoPauseMenu::toggleFullScreen()
-{
-    fullScreenButton.setToggle(theCommander->getFullScreen());
-}
-
 
 PuyoPauseMenu::~PuyoPauseMenu()
 {
