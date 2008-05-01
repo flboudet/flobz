@@ -149,19 +149,6 @@ void PuyoKillPlayerRightAction::action()
     target.addGameBHandicap(PUYODIMY);
 }
 
-/*PuyoGameWidget::PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, GameOptions &game_options, Action *gameOverAction)
-    : CycledComponent(TIME_BETWEEN_GAME_CYCLES), associatedScreen(NULL), attachedLevelTheme(&levelTheme), areaA(&areaA), areaB(&areaB), controllerA(&controllerA), controllerB(&controllerB),
-      cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(game_options.CYCLES_BEFORE_SPEED_INCREASES), tickCounts(0), cycles(0), paused(false), displayLives(true), lives(3),
-      gameOverAction(gameOverAction), abortedFlag(false), gameSpeed(0), MinSpeed(game_options.MIN_SPEED), MaxSpeed(game_options.MAX_SPEED),
-      blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
-      playerOneName(p1name), playerTwoName(p2name), 
-      killLeftAction(*this), killRightAction(*this),
-      killLeftCheat("killleft", &killLeftAction), killRightCheat("killright", &killRightAction)
-{
-    initialize();
-}
-*/
-
 void PuyoGameWidget::setGameOptions(GameOptions game_options)
 {
     cyclesBeforeSpeedIncreases = game_options.CYCLES_BEFORE_SPEED_INCREASES;
@@ -176,7 +163,8 @@ PuyoGameWidget::PuyoGameWidget(GameOptions game_options)
       blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
       playerOneName(p1name), playerTwoName(p2name),
       killLeftAction(*this), killRightAction(*this),
-      killLeftCheat("killleft", &killLeftAction), killRightCheat("killright", &killRightAction)
+      killLeftCheat("killleft", &killLeftAction), killRightCheat("killright", &killRightAction),
+      m_foregroundAnimation(NULL)
 {
 }
 
@@ -199,6 +187,24 @@ void PuyoGameWidget::initialize()
     skipGameCycleB = false;
     
     IIM_Surface * background = attachedLevelTheme->getBackground();
+    if (attachedLevelTheme->getForegroundAnimation() != "") {
+      // Initializing the styrolyse client
+      m_styroPainter.m_styroClient.loadImage = styro_loadImage;
+      m_styroPainter.m_styroClient.drawImage = styro_drawImage;
+      m_styroPainter.m_styroClient.freeImage = styro_freeImage;
+      m_styroPainter.m_styroClient.putText   = NULL;
+      m_styroPainter.m_styroClient.getText   = NULL;
+      m_styroPainter.m_styroClient.playMusic = NULL;
+      m_styroPainter.m_styroClient.playSound = NULL;
+      m_styroPainter.m_styroClient.resolveFilePath = NULL;
+      m_styroPainter.m_painter = &painter;
+      m_styroPainter.m_theme = attachedLevelTheme;
+      m_foregroundAnimation =
+	styrolyse_new((const char *)
+		      (FilePath(attachedLevelTheme->getThemeRootPath()).combine(
+		        attachedLevelTheme->getForegroundAnimation())),
+		      (StyrolyseClient *)(&m_styroPainter), false);
+    }
 
     SDL_PixelFormat *fmt = background->surf->format;
     SDL_Surface *tmp = SDL_CreateRGBSurface(background->surf->flags,
@@ -234,6 +240,9 @@ PuyoGameWidget::~PuyoGameWidget()
     IIM_Free(painter.gameScreen);
     for (unsigned int i=0; i<puyoFX.size(); ++i)
         delete puyoFX[i];
+    if (m_foregroundAnimation != NULL) {
+      styrolyse_free(m_foregroundAnimation);
+    }
 }
 
 void PuyoGameWidget::cycle()
@@ -244,6 +253,10 @@ void PuyoGameWidget::cycle()
     
     int animCyclesBeforeGameCycles = (MaxSpeed + (((MinSpeed - MaxSpeed) * gameSpeed) / 20));
     
+    // Cycling through the foreground animation
+    if (m_foregroundAnimation != NULL)
+      styrolyse_update(m_foregroundAnimation, 0.);
+
     // Controls
     controllerA->cycle();
     controllerB->cycle();
@@ -350,6 +363,10 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
         drect.w = grid->w;
         drect.h = grid->h;
         painter.requestDraw(grid, &drect);
+
+	// Rendering the foreground animation
+	if (m_foregroundAnimation != NULL)
+	  styrolyse_draw(m_foregroundAnimation);
         
         // Rendering the neutral puyos
         areaA->renderNeutral();
@@ -504,6 +521,33 @@ void PuyoGameWidget::setScreenToResumed(bool fromControls)
   if (associatedScreen != NULL)
     if (!fromControls)
       associatedScreen->getPauseMenu().backPressed(false);
+}
+
+void *PuyoGameWidget::styro_loadImage(StyrolyseClient *_this, const char *path)
+{
+  IIM_Surface *surface;
+  surface = IIM_Load_Absolute_DisplayFormatAlpha
+    ((FilePath(((StyrolysePainterClient *)_this)->m_theme->getThemeRootPath())
+      .combine(path)));
+  return surface;
+}
+void PuyoGameWidget::styro_drawImage(StyrolyseClient *_this,
+			    void *image, int x, int y,
+			    int clipx, int clipy, int clipw, int cliph)
+{
+  IIM_Surface *surf = (IIM_Surface *)image;
+  SDL_Rect  rect, cliprect;
+  rect.x = x;
+  rect.y = y;
+  cliprect.x = clipx;
+  cliprect.y = clipy;
+  cliprect.w = clipw;
+  cliprect.h = cliph;
+  ((StyrolysePainterClient *)_this)->m_painter->requestDraw(surf, &rect);
+}
+void PuyoGameWidget::styro_freeImage(StyrolyseClient *_this, void *image)
+{
+  IIM_Free((IIM_Surface *)image);
 }
 
 PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)

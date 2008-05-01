@@ -215,7 +215,7 @@ static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     theme->setAnimations((const char *) GSL_GLOBAL_PTR(gsl, "level.gamelost_left_2p"),
                          (const char *) GSL_GLOBAL_PTR(gsl, "level.gamelost_right_2p"),
                          (const char *) GSL_GLOBAL_PTR(gsl, "level.animation_2p"));
-    
+    theme->setForegroundAnimation((const char *) GSL_GLOBAL_PTR(gsl, "level.foreground_animation"));
     globalManager->addLevel(theme);
 }
 

@@ -176,7 +176,7 @@ public:
     const String getLocalizedName(void);
     const String getAuthor(void);
     const String getComments(void);
-        
+    const String getThemeRootPath() const { return _path; }
     void addInfo(const String author, const String comments);
 
     bool setLives(const char * lives);
@@ -190,6 +190,7 @@ public:
         _gamelost_right_2p = gamelost_right_2p;
         _animation_2p = animation_2p;
     }
+    void setForegroundAnimation(String foregroundAnimation) { _foreground_animation = foregroundAnimation; }
     
     IIM_Surface * getLifeForIndex(int index);
     IIM_Surface * getBackground(void);
@@ -206,7 +207,7 @@ public:
     const String getGameLostLeftAnimation2P() const { return _gamelost_left_2p; }
     const String getGameLostRightAnimation2P() const { return _gamelost_right_2p; }
     const String getCentralAnimation2P() const { return _animation_2p; }
-    
+    const String getForegroundAnimation() const { return _foreground_animation; }
 private:    
     String _path;
     String _name;
@@ -224,6 +225,7 @@ private:
     String _gamelost_left_2p;
     String _gamelost_right_2p;
     String _animation_2p;
+    String _foreground_animation;
     
     IIM_Surface * _levelLives[NUMBER_OF_LIVES];
     IIM_Surface * _levelBackground;

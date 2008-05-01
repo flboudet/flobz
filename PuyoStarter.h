@@ -179,6 +179,14 @@ public:
     virtual void actionAfterGameOver(bool fromControls);
 protected:
     virtual void associatedScreenHasBeenSet(PuyoGameScreen *associatedScreen) {}
+
+    // Styrolyse methods
+    static void *styro_loadImage(StyrolyseClient *_this, const char *path);
+    static void styro_drawImage(StyrolyseClient *_this,
+				void *image, int x, int y,
+				int clipx, int clipy, int clipw, int cliph);
+    static void styro_freeImage(StyrolyseClient *_this, void *image);
+
     PuyoGameScreen *associatedScreen;
     SDL_Painter painter;
     PuyoLevelTheme *attachedLevelTheme;
@@ -206,6 +214,14 @@ protected:
     std::vector<PuyoFX*> puyoFX;
     bool skipGameCycleA, skipGameCycleB;
     double gameOverDate;
+    // Foreground animation
+    struct StyrolysePainterClient {
+      StyrolyseClient m_styroClient;
+      SDL_Painter *m_painter;
+      PuyoLevelTheme *m_theme;
+    };
+    Styrolyse *m_foregroundAnimation;
+    StyrolysePainterClient m_styroPainter;
 };
 
 class ContinueAction : public Action {
