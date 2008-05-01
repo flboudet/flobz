@@ -1,17 +1,35 @@
 // AI Parameters
 
+########################
+# The following parameters are readable only and reflect the game state in real time :
+
+int @maxHeightPlayer
+int @maxHeightAI
+int @neutralsForPlayer
+int @neutralsForAI
+
+########################
+# The following parameters are writable and controls the IA behaviour in real time :
+
 <AI_Init>
+  # The value of the puyos that will be destroyed for sure in the evaluated movement sequence
   int @AI_RealSuppression = 2
+  # The value of the puyos that may be destroyed later afetr the evaluated movement sequence
   int @AI_PotentialSuppression = 1
+  # Height of the highest column at which the AI starts to destroy as much as possible to recover free space
   int @AI_CriticalHeight = 8
-  int @AI_Column1 = 7
-  int @AI_Column2 = 5
-  int @AI_Column3 = 2
-  int @AI_Column4 = 4
-  int @AI_Column5 = 6
-  int @AI_Column6 = 8
+  # Relative priority of each column (ie colunm x = 2 and column y = 4 means column y as twice the priority of column x)
+  int @AI_Column1 = 1
+  int @AI_Column2 = 1
+  int @AI_Column3 = 1
+  int @AI_Column4 = 1
+  int @AI_Column5 = 1
+  int @AI_Column6 = 1
+  # The rotation method : -1 = clockwise, 0 = minimize rotations to reach desired position, 1 = counter-clockwise
   int @AI_RotationMethod = 0
-  int @AI_FastDropDelta = 8
+  # Distance between the puyo and the top of the column when the AI quickly drops the puyos (levels height = 12)
+  int @AI_FastDropDelta = 4
+  # Depth of AI analysis. 0 = drops randomly, 1 = tries every combinations, 2 = tries every combinations with the next puyos as well
   int @AI_ThinkDepth = 2
 
 <AI_Gyom> // Nohoho maker
