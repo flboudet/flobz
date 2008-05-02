@@ -875,9 +875,12 @@ bool PuyoLevelTheme::cache(void)
     ADD_PICTURE(_levelBackground)
     
     // GRID
-    snprintf(path, sizeof(path), "%s/%s-background-grid.png",fullPath,_grid);
-    snprintf(defpath, sizeof(defpath), "%s/%s-background-grid.png",DEFAULTPATH(),_grid);
-    ADD_PICTURE(_levelGrid)
+    if (strcmp(_grid, "") != 0) {
+      snprintf(path, sizeof(path), "%s/%s-background-grid.png",fullPath,_grid);
+      snprintf(defpath, sizeof(defpath), "%s/%s-background-grid.png",DEFAULTPATH(),_grid);
+      ADD_PICTURE(_levelGrid)
+    }
+    else _levelGrid = NULL;
     
     // SPEED METER
     snprintf(path, sizeof(path), "%s/%s-background-meter-below.png",fullPath,_speed_meter);

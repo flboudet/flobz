@@ -37,6 +37,7 @@
     level.name          = "Blue Plastic"
     level.description   = "A slick theme for the reduced game"
     level.background    = "blueplastic"
+    level.grid          = ""
     level.foreground_animation = "blueplastic_foreground.gsl"
 [end_level]
 

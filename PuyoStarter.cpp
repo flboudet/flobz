@@ -353,16 +353,18 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
         // Rendering the grids
         SDL_Rect drect;
         IIM_Surface * grid = attachedLevelTheme->getGrid();
-        drect.x = 21;
-        drect.y = -1;
-        drect.w = grid->w;
-        drect.h = grid->h;
-        painter.requestDraw(grid, &drect);
-        drect.x = 407;
-        drect.y = -1;
-        drect.w = grid->w;
-        drect.h = grid->h;
-        painter.requestDraw(grid, &drect);
+	if (grid != NULL) {
+	  drect.x = 21;
+	  drect.y = -1;
+	  drect.w = grid->w;
+	  drect.h = grid->h;
+	  painter.requestDraw(grid, &drect);
+	  drect.x = 407;
+	  drect.y = -1;
+	  drect.w = grid->w;
+	  drect.h = grid->h;
+	  painter.requestDraw(grid, &drect);
+	}
 
 	// Rendering the foreground animation
 	if (m_foregroundAnimation != NULL)

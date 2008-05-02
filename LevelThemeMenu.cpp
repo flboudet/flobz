@@ -134,14 +134,16 @@ void LevelThemePicturePreview::updatePicture(void)
       picture = iim_surface_duplicate(curTheme->getBackground());
       // Grids
       IIM_Surface * grid = curTheme->getGrid();
-      r.x = 21;
-      r.y = -1;
-      r.w = grid->w;
-      r.h = grid->h;
-      IIM_BlitSurface(grid, NULL, picture->surf, &r);
-      r.x = 407;
-      r.y = -1;
-      IIM_BlitSurface(grid, NULL, picture->surf, &r);
+      if (grid != NULL) {
+	r.x = 21;
+	r.y = -1;
+	r.w = grid->w;
+	r.h = grid->h;
+	IIM_BlitSurface(grid, NULL, picture->surf, &r);
+	r.x = 407;
+	r.y = -1;
+	IIM_BlitSurface(grid, NULL, picture->surf, &r);
+      }
       // Speed meter
       IIM_Surface * speedFront = curTheme->getSpeedMeter(true);
       IIM_Surface * speedBack  = curTheme->getSpeedMeter(false);
