@@ -1,8 +1,46 @@
+# First, import the mandatory AI lib
+# check this lib in base.000/story/
 import <libai.gsl>
 
+# Then import the face lib which factorises some gsl routines for the basic media pack
+import <libface.gsl>
+
+# This is called once at level start
 <init>
-    AI_Flobo
+    # Init a default AI
+    AI_Gyom
+    
+    # Override some of its settings:
+    # mechapuyo is the best mechanical player on earth
 
+    # mechapuyo targets only best moves
+    @AI_RotationMethod = 0
+    
+    # mechapuyo is quick and drops everything quickly
+    @AI_FastDropDelta = 12
+
+    # mechapuyo takes some risk
+    @AI_CriticalHeight = 10
+
+    # Init the sprite for the face lib with mechapuyo
+    [face_init: name="introlevel/mechapuyo-mini.png"]
+
+
+# This allows you to specify which sprite to draw and the drawing order
 <sprite_list>
+    # Calls the default sprite list updater
+    [face_list]
 
+
+# Update function: called every animation cycle
 <update>
+
+  # mechapuyo becomes more straightforward when the game goes high
+  # to avoid being trapped with too much construction
+  @AI_ThinkDepth = 2
+  @AI_PotentialSuppression = 4
+  (@maxHeightAI > 12) ? @AI_ThinkDepth = 1
+  (@maxHeightAI > 8) ? @AI_PotentialSuppression = 2
+  (@maxHeightAI > 9) ? @AI_PotentialSuppression = 1
+  (@maxHeightAI > 10) ? @AI_PotentialSuppression = 0
+

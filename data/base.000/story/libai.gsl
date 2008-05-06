@@ -28,7 +28,7 @@ int @neutralsForAI
   # The rotation method : -1 = clockwise, 0 = minimize rotations to reach desired position, 1 = counter-clockwise
   int @AI_RotationMethod = 0
   # Distance between the puyo and the top of the column when the AI quickly drops the puyos (levels height = 12)
-  int @AI_FastDropDelta = 4
+  int @AI_FastDropDelta = 5
   # Depth of AI analysis. 0 = drops randomly, 1 = tries every combinations, 2 = tries every combinations with the next puyos as well
   int @AI_ThinkDepth = 2
 
@@ -37,12 +37,14 @@ int @neutralsForAI
       @AI_RealSuppression      = 2
       @AI_PotentialSuppression = 3
       @AI_CriticalHeight       = 10
-      @AI_Column1        = 4
-      @AI_Column2        = 2
+      @AI_Column1        = 5
+      @AI_Column2        = 4
       @AI_Column3        = 1
       @AI_Column4        = 8
       @AI_Column5        = 9
       @AI_Column6        = 10
+      @AI_RotationMethod = 0
+      @AI_FastDropDelta  = 8
 
 <AI_Flobo> // Remove it all
       AI_Init
@@ -69,6 +71,8 @@ int @neutralsForAI
       @AI_Column4        = 4
       @AI_Column5        = 6
       @AI_Column6        = 8
+      @AI_RotationMethod = 0
+      @AI_FastDropDelta  = 8
   
 <AI_Jeko> // Builds til death
       AI_Init
@@ -81,3 +85,5 @@ int @neutralsForAI
       @AI_Column4        = 8
       @AI_Column5        = 8
       @AI_Column6        = 9
+      @AI_RotationMethod = 0
+      @AI_FastDropDelta  = 8

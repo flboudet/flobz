@@ -1,11 +1,36 @@
+# First, import the mandatory AI lib
+# check this lib in base.000/story/
 import <libai.gsl>
+
+# Then import the face lib which factorises some gsl routines for the basic media pack
 import <libface.gsl>
 
+# This is called once at level start
 <init>
-    AI_Flobo
-    [face_init: name="introlevel/dukebeary-mini.png"]
+    # Init a default AI
+    # azrael makes nohohos
+    AI_Gyom
+    
+    # Override some of its settings:
+    # azrael plays in a very straight forward style and ignores potentials suppressions
+    @AI_PotentialSuppression = 0
+    
+    # azrael is quite clever au rotates the best way he can
+    @AI_RotationMethod = 0
+    
+    # Init the sprite for the face lib with azrael
+    [face_init: name="introlevel/azrael-mini.png"]
 
+
+# This allows you to specify which sprite to draw and the drawing order
 <sprite_list>
+    # Calls the default sprite list updater
     [face_list]
 
+
+# Update function: called every animation cycle
 <update>
+
+  # azrael isn't that clever and doesn't think far
+  @AI_ThinkDepth = 1
+

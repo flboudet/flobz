@@ -15,13 +15,16 @@ import <libface.gsl>
     @AI_PotentialSuppression = 0
     
     # Herbert is left handed and rotates only clockwise
-    @AI_RotationMethod = -1
+    @AI_RotationMethod = 1
     
     # Herbert is quite slow and doesn't drop anything quickly
     @AI_FastDropDelta = 0
     
     # Init the sprite for the face lib with herbert
     [face_init: name="introlevel/herbert-mini.png"]
+
+    # herbert is stupid, he plays mainly on the third column
+    @AI_Column3 = 2
 
 
 # This allows you to specify which sprite to draw and the drawing order
@@ -33,8 +36,7 @@ import <libface.gsl>
 # Update function: called every animation cycle
 <update>
 
-  # Herbert doesn't like the stress and become dumb when stressed
-  @AI_ThinkDepth = 2
-  (@maxHeightPlayer > 4) ? @AI_ThinkDepth = 1
-  (@maxHeightPlayer > 8) ? @AI_ThinkDepth = 0
+  # Herbert doesn't like the stress and becomes dumb when stressed
+  @AI_ThinkDepth = 1
+  (@maxHeightAI > 6) ? @AI_ThinkDepth = 0
 

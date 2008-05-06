@@ -1,11 +1,35 @@
+# First, import the mandatory AI lib
+# check this lib in base.000/story/
 import <libai.gsl>
+
+# Then import the face lib which factorises some gsl routines for the basic media pack
 import <libface.gsl>
 
+# This is called once at level start
 <init>
-    AI_Flobo
+    # Init a default AI
+    AI_Init
+    
+    # Override some of its settings:    
+    # dukebeary is right handed and rotates only counter clockwise
+    @AI_RotationMethod = -1
+    
+    # dukebeary is quite slow and doesn't drop quickly
+    @AI_FastDropDelta = 2
+    
+    # Init the sprite for the face lib with dukebeary
     [face_init: name="introlevel/dukebeary-mini.png"]
 
+
+# This allows you to specify which sprite to draw and the drawing order
 <sprite_list>
+    # Calls the default sprite list updater
     [face_list]
 
+
+# Update function: called every animation cycle
 <update>
+
+  # dukebeary doesn't has no patience and plays dumbly after 2 minutes
+  @AI_ThinkDepth = 1
+  (@cycle > 3000) ? @AI_ThinkDepth = 0

@@ -1,11 +1,32 @@
+# First, import the mandatory AI lib
+# check this lib in base.000/story/
 import <libai.gsl>
+
+# Then import the face lib which factorises some gsl routines for the basic media pack
 import <libface.gsl>
 
+# This is called once at level start
 <init>
-    AI_Flobo
+    # Init a default AI
+    # orloff is a psychotic constructor...
+    AI_Jeko
+    
+    # Override some of its settings:
+    # orloff is left handed and rotates only clockwise
+    @AI_RotationMethod = 1
+    
+    # Init the sprite for the face lib with orloff
     [face_init: name="introlevel/orloff-mini.png"]
 
+# This allows you to specify which sprite to draw and the drawing order
 <sprite_list>
+    # Calls the default sprite list updater
     [face_list]
 
+
+# Update function: called every animation cycle
 <update>
+
+  # orloff plays in a straight forward manner and doesn't look at the incoming puyos
+  @AI_ThinkDepth = 1
+

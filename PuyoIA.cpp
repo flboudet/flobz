@@ -526,7 +526,7 @@ PuyoIA::PuyoIA(int level, PuyoView &targetView)
   params.rotationMethod = 0; // negative (right), null (shortest), positive(left)
   params.fastDropDelta = PUYODIMY; // puyo height relative to column height before fast drop
   params.thinkDepth = 2;
-  params.speedFactor = level;
+  params.speedFactor = level>0?level:1;
 
 }
 
