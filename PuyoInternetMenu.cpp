@@ -396,7 +396,6 @@ PuyoInternetErrorDialog::PuyoInternetErrorDialog(String errorMessageL1, String e
 PuyoInternetErrorDialog::~PuyoInternetErrorDialog()
 {
     IIM_Free(m_errorIconImage);
-    
 }
 
 void PuyoInternetErrorDialog::action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
@@ -412,40 +411,72 @@ public:
     PuyoInternetConnectDialog(String serverName, PuyoInternetGameCenter *gameCenter, InternetGameMenu *owner);
     virtual ~PuyoInternetConnectDialog();
     virtual void idle(double currentTime);
+    void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
 private:
     Text m_messageL1, m_messageL2;
+    FramedButton m_cancelButton;
     PuyoInternetGameCenter *m_gameCenter;
     InternetGameMenu *m_owner;
+    double m_startTime;
+    bool m_timeout;
+    static const double CONNECT_TIMEOUT;
 };
+
+const double PuyoInternetConnectDialog::CONNECT_TIMEOUT = 5.;
 
 PuyoInternetConnectDialog::PuyoInternetConnectDialog(String serverName, PuyoInternetGameCenter *gameCenter, InternetGameMenu *owner)
     : PuyoInternetDialog("Connecting"),
       m_messageL1("Connecting to server"), m_messageL2(serverName),
-      m_gameCenter(gameCenter), m_owner(owner)
+      m_cancelButton(theCommander->getLocalizedString("Cancel"), this,
+		     theCommander->getButtonFramePicture(),
+		     theCommander->getButtonOverFramePicture()),
+      m_gameCenter(gameCenter), m_owner(owner), m_startTime(0.), m_timeout(false)
 {
     m_contentBox.add(&m_messageL1);
     m_contentBox.add(&m_messageL2);
+    m_contentBox.add(&m_cancelButton);
 }
 
 PuyoInternetConnectDialog::~PuyoInternetConnectDialog()
 {
-    if (m_gameCenter->isConnected())
+    if (m_gameCenter->isConnected()) {
         m_owner->enterNetCenterMenu(m_gameCenter);
-    else if (m_gameCenter->isDenied()) {
-        PuyoInternetErrorDialog *errorDialog = new PuyoInternetErrorDialog(m_gameCenter->getDenyString(), "");
+	return;
+    }
+    else if ((m_gameCenter->isDenied()) || (m_timeout)) {
+        PuyoInternetErrorDialog *errorDialog;
+	if (m_timeout)
+	  errorDialog = new PuyoInternetErrorDialog(String("Server didn't answered"), m_messageL2.getValue());
+	else
+	    errorDialog = new PuyoInternetErrorDialog(m_gameCenter->getDenyString(), "");
         m_owner->getParentScreen()->add(errorDialog);
         m_owner->getParentScreen()->grabEventsOnWidget(errorDialog);
         AudioManager::playSound("ebenon.wav", 0.5);
-        delete m_gameCenter;
     }
+    delete m_gameCenter;
 }
 
 void PuyoInternetConnectDialog::idle(double currentTime)
 {
+    if (m_startTime == 0.)
+        m_startTime = currentTime;
+    if (currentTime - m_startTime > CONNECT_TIMEOUT) {
+        close();
+	m_timeout = true;
+	PuyoInternetDialog::idle(currentTime);
+	m_startTime = 0.;
+    }
     m_gameCenter->idle();
     if ((m_gameCenter->isConnected()) || (m_gameCenter->isDenied()))
         close();
     PuyoInternetDialog::idle(currentTime);
+}
+
+void PuyoInternetConnectDialog::action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
+{
+  if (sender == m_cancelButton.getButton()) {
+    close();
+  }
 }
 
 void InternetGameMenu::enterNetCenterMenu(PuyoInternetGameCenter *gameCenter)
