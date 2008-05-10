@@ -42,7 +42,9 @@ public:
     void action()
     {
         PuyoLanGameCenter *gameCenter = new PuyoLanGameCenter(atoi(serverPort->getValue()), userName->getValue());
-        NetCenterMenu *newNetCenterMenu = new NetCenterMenu(mainScreen, gameCenter);
+        NetCenterMenu *newNetCenterMenu =
+	  new NetCenterMenu(mainScreen, gameCenter,
+			    theCommander->getLocalizedString("LAN Game Center"));
         newNetCenterMenu->build();
         mainScreen->pushMenu(newNetCenterMenu, true);
     }

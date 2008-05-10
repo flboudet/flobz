@@ -49,9 +49,11 @@ void NetCenterDialogMenu::NetCenterDialogMenuAction::action()
 }
 
 NetCenterDialogMenu::NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvitation &associatedInvitation, String title, String message, bool hasAcceptButton)
-    : menu(theCommander->getWindowFramePicture()),
+    : associatedInvitation(associatedInvitation),
+      menu(theCommander->getWindowFramePicture()),
       cancelAction(targetMenu, true), acceptAction(targetMenu, false), hasAcceptButton(hasAcceptButton),
-      associatedInvitation(associatedInvitation), dialogTitle(title), dialogMsg(message),
+      titleFrame(theCommander->getSeparatorFramePicture()),
+      dialogTitle(title), dialogMsg(message),
       acceptButton(theCommander->getLocalizedString("Accept"), &acceptAction,
 		   theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
       cancelButton(theCommander->getLocalizedString("Cancel"), &cancelAction,
@@ -61,14 +63,6 @@ NetCenterDialogMenu::NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvi
 
 NetCenterDialogMenu::~NetCenterDialogMenu()
 {
-  menu.remove(&dialogTitle);
-  menu.remove(&sep1);
-  menu.remove(&dialogMsg);
-  menu.remove(&sep2);
-  buttons.remove(&cancelButton);
-  if (hasAcceptButton)
-    buttons.remove(&acceptButton);
-  menu.remove(&buttons);
 }
 
 void NetCenterDialogMenu::build()
@@ -78,7 +72,10 @@ void NetCenterDialogMenu::build()
     dialogPos.y = 195;
     setPosition(dialogPos);
     setSize(Vec3(350., 200.));
-    menu.add(&dialogTitle);
+    menu.setPolicy(USE_MIN_SIZE);
+    titleFrame.setPreferedSize(Vec3(0, 20));
+    titleFrame.add(&dialogTitle);
+    menu.add(&titleFrame);
     menu.add(&sep1);
     menu.add(&dialogMsg);
     menu.add(&sep2);
@@ -98,6 +95,8 @@ void NetCenterDialogMenu::eventOccured(GameControlEvent *event)
         case GameControlEvent::kBack:
             event->caught = true;
             cancelAction.action();
+            break;
+        default:
             break;
     }
 }
@@ -157,7 +156,6 @@ void NetCenterPlayerList::updatePlayer(String playerName, PeerAddress playerAddr
 
 void NetCenterPlayerList::PlayerSelectedAction::action()
 {
-    printf("ZZZ\n");
     targetMenu->playerSelected(address, playerName);
 }
 
@@ -165,8 +163,7 @@ class SayAction : public Action {
 public:
     SayAction(PuyoNetGameCenter *netCenter, Text *message) : netCenter(netCenter), message(message) {}
     void action() {
-        printf("Message: %s\n", (const char *)message->getValue());
-        netCenter->sendMessage(message->getValue());
+      netCenter->sendMessage(message->getValue());
     }
 private:
     PuyoNetGameCenter *netCenter;
@@ -183,20 +180,23 @@ String NetCenterTwoNameProvider::getPlayer2Name() const
     return netCenter.getOpponentName();
 }
 
-NetCenterMenu::NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netCenter, GameLoop *loop)
+NetCenterMenu::NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netCenter,
+                             String title, GameLoop *loop)
     : PuyoMainScreenMenu(mainScreen, loop),
-      netCenter(netCenter),
-      playerListText(theCommander->getLocalizedString("Player List")),
       upArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png"))),
       downArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png"))),
-      menu(theCommander->getWindowFramePicture()), playerbox(theCommander->getWindowFramePicture()),
+      topFrame(theCommander->getWindowFramePicture()),
+      titleFrame(theCommander->getSeparatorFramePicture()),
+      title(title),
+      playerListText(theCommander->getLocalizedString("Player List")),
       chatAreaText(theCommander->getLocalizedString("Chat Area")),
-      cycled(this), playerList(5, this, upArrow, downArrow),
-      onScreenDialog(NULL), shouldSelfDestroy(false),
-      nameProvider(*netCenter), chatBox(*this),
-      title(theCommander->getLocalizedString("Network Game Center")), backAction(mainScreen),
       cancelButton(theCommander->getLocalizedString("Disconnect"), &backAction,
 		   theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
+      backAction(mainScreen),
+      playerList(5, this, upArrow, downArrow), cycled(this),
+      netCenter(netCenter), onScreenDialog(NULL),
+      shouldSelfDestroy(false), nameProvider(*netCenter),
+      chatBox(*this),
       topSeparator(0, 5), middleSeparator(0, 5), bottomSeparator(0, 5)
 {
     GameUIDefaults::GAME_LOOP->addIdle(&cycled);
@@ -234,22 +234,25 @@ void NetCenterMenu::build()
     
     container.add(&mainBox);
 
-    menu.add(&title);
     menu.add(&cancelButton);
     
     playerbox.add(&playerListText);
     playerbox.add(&playerList);
-    
-    topbox.setPreferedSize(Vec3(0, 240));
+
     topbox.add(&menu);
     topbox.add(&playerbox);
 
+    titleFrame.setPreferedSize(Vec3(0, 20));
+    titleFrame.add(&title);
+
+    topFrame.setPreferedSize(Vec3(0, 240));    
+    topFrame.add(&titleFrame);
+    topFrame.add(&topbox);
+
     mainBox.add(&topSeparator);
-    mainBox.add(&topbox);
+    mainBox.add(&topFrame);
     mainBox.add(&middleSeparator);
     mainBox.add(&chatBox);
-    //mainBox.add(&bottomSeparator);
-
 }
 
 void NetCenterMenu::sendChat(String chatText)
@@ -302,6 +305,8 @@ void NetCenterMenu::eventOccured(GameControlEvent *event)
         case GameControlEvent::kBack:
             event->caught = true;
             break;
+    default:
+      break;
     }
 }
 
@@ -345,7 +350,6 @@ void NetCenterMenu::onGameInvitationCanceledReceived(PuyoGameInvitation &invitat
 
 void NetCenterMenu::onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation)
 {
-    printf("Game granted with a seed of %d\n", invitation.gameRandomSeed);
     PuyoNetworkTwoPlayerGameWidgetFactory *factory = new PuyoNetworkTwoPlayerGameWidgetFactory(*mbox, invitation.gameRandomSeed);
     TwoPlayersStarterAction *starterAction = new TwoPlayersStarterAction(0, *factory, &nameProvider);
     

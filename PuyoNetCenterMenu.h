@@ -60,6 +60,7 @@ private:
     NetCenterDialogMenuAction cancelAction, acceptAction;
     bool hasAcceptButton;
     HBox buttons;
+    Frame titleFrame;
     Text dialogTitle, dialogMsg;
     Text sep1, sep2;
     FramedButton acceptButton, cancelButton;
@@ -116,7 +117,8 @@ private:
 
 class NetCenterMenu : public PuyoMainScreenMenu, PuyoNetGameCenterListener, ChatBoxDelegate {
 public:
-    NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netCenter, GameLoop *loop = NULL);
+    NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netCenter,
+                  String title, GameLoop *loop = NULL);
     ~NetCenterMenu();
     virtual void build();
     void onChatMessage(const String &msgAuthor, const String &msg);
@@ -147,14 +149,16 @@ private:
     };
     IIM_Surface *upArrow, *downArrow;
     VBox mainBox;
+    Frame topFrame;
+    Frame titleFrame;
+    Text title;
     HBox topbox;
-    Frame menu;
-    Frame playerbox;
-    Text playerListText, chatAreaText, title;
+    VBox menu;
+    VBox playerbox;
+    Text playerListText, chatAreaText;
     FramedButton cancelButton;
     PuyoPopMenuAction backAction;
     NetCenterPlayerList playerList;
-    //Frame ncActionsFrame, playerBoxFrame;
     NetCenterCycled cycled;
     PuyoNetGameCenter *netCenter;
     ZBox container;

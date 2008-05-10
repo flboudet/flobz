@@ -384,7 +384,7 @@ PuyoInternetErrorDialog::PuyoInternetErrorDialog(String errorMessageL1, String e
     m_errorIconImage(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/errorpuyo.png"))),
     m_errorIcon(m_errorIconImage)
 {
-    m_contentBox.setInnerMargin(10.0f);
+    m_contentBox.setInnerMargin(10);
     m_contentBox.setPolicy(USE_MAX_SIZE);
     m_contentBox.add(&m_errorIcon);
     m_contentBox.add(&m_errorMessageL1);
@@ -481,7 +481,8 @@ void PuyoInternetConnectDialog::action(Widget *sender, GameUIEnum actionType, Ga
 
 void InternetGameMenu::enterNetCenterMenu(PuyoInternetGameCenter *gameCenter)
 {
-    NetCenterMenu *newNetCenterMenu = new NetCenterMenu(mainScreen, gameCenter);
+    NetCenterMenu *newNetCenterMenu = new NetCenterMenu(mainScreen, gameCenter,
+                      theCommander->getLocalizedString("Internet Game Center"));
     newNetCenterMenu->build();
     mainScreen->pushMenu(newNetCenterMenu, true);
 }
