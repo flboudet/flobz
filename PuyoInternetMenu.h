@@ -148,7 +148,7 @@ public:
     InternetGameMenu(PuyoMainScreen * mainScreen);
     virtual ~InternetGameMenu();
     void build();
-    virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
+    virtual void action(Widget *sender, int actionType, GameControlEvent *event);
     void setSelectedServer(const String &s, int port);
     virtual void idle(double currentTime);
     virtual IdleComponent *getIdleComponent() { return this; }

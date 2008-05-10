@@ -43,7 +43,7 @@ bool isDirectionEvent(GameControlEvent *event);
   class Action {
     public:
       virtual void action() {}
-      virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event) { action(); }
+      virtual void action(Widget *sender, int actionType, GameControlEvent *event) { action(); }
       virtual ~Action() {}
   };
   

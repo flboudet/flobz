@@ -11,7 +11,7 @@ namespace gameui {
         SwitchedButton(String label, bool defaultValue,
                        IIM_Surface *trueSurface, IIM_Surface *falseSurface, String prefKey);
         virtual ~SwitchedButton();
-        void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
+        virtual void action(Widget *sender, int actionType, GameControlEvent *event);
         void notificationOccured(String identifier, void * context);
         bool getState();
         void lostFocus();

@@ -200,7 +200,7 @@ void ListView::eventOccured(GameControlEvent *event)
     HBox::eventOccured(event);
 }
 
-void ListView::action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
+void ListView::action(Widget *sender, int actionType, GameControlEvent *event)
 {
     switch (actionType) {
         case ON_START:

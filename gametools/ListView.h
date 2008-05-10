@@ -63,7 +63,7 @@ public:
     virtual void eventOccured(GameControlEvent *event);
     virtual IdleComponent *getIdleComponent() { return this; }
     // Action
-    virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
+    virtual void action(Widget *sender, int actionType, GameControlEvent *event);
     // CycledComponent
     virtual void cycle();
     // ScrollInfoProvider

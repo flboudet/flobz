@@ -23,56 +23,21 @@
  *
  */
 
-#include "Frame.h"
-#include "PuyoGame.h"
-#include "PuyoIA.h"
-#include "PuyoCommander.h"
-#include "ios_messagebox.h"
-#include "AnimatedPuyoTheme.h"
-#include "PuyoScreenTransition.h"
-#include "PuyoOptionMenu.h"
-#include "PuyoStrings.h"
-
 #ifndef _PUYOSTARTER
 #define _PUYOSTARTER
 
 #include <vector>
 
-class PuyoCycled;
-
-class PuyoPauseMenu : public VBox, public Action, public SliderContainerListener {
-public:
-    PuyoPauseMenu(Action *continueAction, Action *abortAction);
-    virtual ~PuyoPauseMenu();
-    int pauseMenuTop, pauseMenuLeft;
-    bool backPressed(bool fromControls = true);
-    // Action
-    virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
-    /**
-     * Notify that the slider is outside of the screen, before sliding back inside
-     */
-    virtual void onSlideInside(SliderContainer &slider);
-    virtual void onWidgetAdded(WidgetContainer *parent);
-private:
-    SliderContainer pauseContainer;
-    Separator topSeparator;
-    HBox topBox;
-    Frame pauseVBox;
-    Frame pauseTitleFrame;
-    Text menuTitle;
-    VBox buttonsBox;
-    Button continueButton, optionsButton;
-    AudioPrefSwitch audioButton;
-    MusicPrefSwitch musicButton;
-    FSPrefSwitch fullScreenButton;
-    Button abortButton;
-
-    Frame optionsBox;
-    Frame optionsTitleFrame;
-    Text optionsTitle;
-    VBox optionsButtonsBox;
-    Button optionsBack;
-};
+#include "PuyoGame.h"
+#include "PuyoEventPlayer.h"
+#include "PuyoIA.h"
+#include "PuyoCheatCodeManager.h"
+#include "PuyoPauseMenu.h"
+#include "PuyoCommander.h"
+#include "ios_messagebox.h"
+#include "AnimatedPuyoTheme.h"
+#include "PuyoScreenTransition.h"
+#include "PuyoStrings.h"
 
 class PuyoLocalGameFactory : public PuyoGameFactory {
 public:
@@ -82,29 +47,6 @@ public:
     }
 private:
     PuyoRandomSystem *attachedRandom;
-};
-
-class PuyoEventPlayer : public PuyoPlayer {
-public:
-    PuyoEventPlayer(PuyoView &view, int downEvent, int leftEvent, int rightEvent, int turnLeftEvent, int turnRightEvent);
-    void eventOccured(GameControlEvent *event);
-    void cycle();
-private:
-    bool keyShouldRepeat(int &key);
-    const int downEvent, leftEvent, rightEvent, turnLeftEvent, turnRightEvent;
-    int fpKey_Down, fpKey_Left, fpKey_Right, fpKey_TurnLeft, fpKey_TurnRight;
-    int fpKey_Repeat, fpKey_Delay;
-};
-
-class PuyoCheatCodeManager {
-public:
-    PuyoCheatCodeManager(String cheatCode, Action *cheatAction) : cheatCode(cheatCode), cheatAction(cheatAction), cheatCodeLength(cheatCode.length()), currentPosition(0) {}
-    void eventOccured(GameControlEvent *event);
-private:
-    String cheatCode;
-    Action *cheatAction;
-    int cheatCodeLength;
-    int currentPosition;
 };
 
 class PuyoGameWidget;
@@ -144,7 +86,6 @@ struct GameOptions
 
 class PuyoGameWidget : public GarbageCollectableItem, public Widget, CycledComponent {
 public:
-    /*PuyoGameWidget(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, GameOptions &options, Action *gameOverAction = NULL);*/
     PuyoGameWidget(GameOptions options = GameOptions());
     void setGameOptions(GameOptions options);
     virtual ~PuyoGameWidget();
@@ -224,23 +165,7 @@ protected:
     StyrolysePainterClient m_styroPainter;
 };
 
-class ContinueAction : public Action {
-public:
-    ContinueAction(PuyoGameScreen &screen) : screen(screen) {}
-    void action();
-private:
-    PuyoGameScreen &screen;
-};
-
-class AbortAction : public Action {
-public:
-    AbortAction(PuyoGameScreen &screen) : screen(screen) {}
-    void action();
-private:
-    PuyoGameScreen &screen;
-};
-
-class PuyoGameScreen : public Screen {
+class PuyoGameScreen : public Screen, public Action {
 public:
     PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScreen);
     ~PuyoGameScreen();
@@ -249,17 +174,35 @@ public:
     virtual bool startPressed();
     virtual void abort();
     void setOverlayStory(PuyoStoryWidget *story);
+    /**
+     * Sets the game to paused
+     * @param fromControls true if the action leading to the pause comes
+     *                     in response to a local input control. In this case,
+     *                     the action will get forwarded to the opponent in
+     *                     a network game. Otherwise it won't.
+     */
     virtual void setPaused(bool fromControls);
+    /**
+     * Sets the game to resumed
+     * @param fromControls true if the action leading to the pause comes
+     *                     in response to a local input control. In this case,
+     *                     the action will get forwarded to the opponent in
+     *                     a network game. Otherwise it won't.
+     */
     virtual void setResumed(bool fromControls);
+    /** Returns the ingame pause menu widget
+     */
     PuyoPauseMenu & getPauseMenu() { return pauseMenu; }
-    /* Notification on screen visibility change
+    /** Notification on screen visibility change
      * @param visible  true if the scren is visible, otherwise false
      */
     virtual void onScreenVisibleChanged(bool visible);
+    /**
+     * Implements the Action interface
+     */
+    virtual void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
     bool paused;
-    ContinueAction continueAction;
-    AbortAction abortAction;
     PuyoPauseMenu pauseMenu;
     PuyoGameWidget &gameWidget;
     PuyoScreenTransitionWidget transitionWidget;

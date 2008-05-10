@@ -40,105 +40,6 @@ using namespace ios_fc;
 const char *p1name = "Player1";
 const char *p2name = "Player2";
 
-PuyoEventPlayer::PuyoEventPlayer(PuyoView &view,
-						     int downEvent, int leftEvent, int rightEvent,
-						     int turnLeftEvent, int turnRightEvent)
-  : PuyoPlayer(view), downEvent(downEvent), leftEvent(leftEvent), rightEvent(rightEvent),
-    turnLeftEvent(turnLeftEvent), turnRightEvent(turnRightEvent),
-    fpKey_Down(0), fpKey_Left(0), fpKey_Right(0), fpKey_TurnLeft(0), fpKey_TurnRight(0),
-    fpKey_Repeat(7), fpKey_Delay(5)
-{
-}
-
-void PuyoEventPlayer::eventOccured(GameControlEvent *event)
-{
-    int curGameEvent = event->gameEvent;
-    if (event->isUp) {
-        if (curGameEvent == downEvent) {
-	    fpKey_Down = 0;
-	}
-	else if (curGameEvent == leftEvent) {
-	    fpKey_Left = 0;
-	}
-	else if (curGameEvent == rightEvent) {
-	    fpKey_Right = 0;
-	}
-	else if (curGameEvent == turnLeftEvent) {
-	    fpKey_TurnLeft = 0;
-	}
-	else if (curGameEvent == turnRightEvent) {
-	    fpKey_TurnRight = 0;
-	}
-    }
-    else {
-        if (curGameEvent == downEvent) {
-	    fpKey_Down++;
-	}
-	else if (curGameEvent == leftEvent) {
-	    targetView.moveLeft();
-	    fpKey_Left++;
-	}
-	else if (curGameEvent == rightEvent) {
-	    targetView.moveRight();
-	    fpKey_Right++;
-	}
-	else if (curGameEvent == turnLeftEvent) {
-	    targetView.rotateLeft();
-	    fpKey_TurnLeft++;
-	}
-	else if (curGameEvent == turnRightEvent) {
-	    targetView.rotateRight();
-	    fpKey_TurnRight++;
-	}
-    }
-}
-
-void PuyoEventPlayer::cycle()
-{
-    // Key repetition
-    if (fpKey_Down) {
-    if (attachedGame->isEndOfCycle())
-        fpKey_Down = 0;
-    else
-        targetView.cycleGame();
-    }
-    if (keyShouldRepeat(fpKey_Left))
-        targetView.moveLeft();
-    if (keyShouldRepeat(fpKey_Right))
-        targetView.moveRight();
-    if (keyShouldRepeat(fpKey_TurnLeft)) {
-        if (attachedGame->isEndOfCycle())
-	    fpKey_TurnLeft = 0;
-	targetView.rotateLeft();
-    }
-    if (keyShouldRepeat(fpKey_TurnRight)) {
-        if (attachedGame->isEndOfCycle())
-	    fpKey_TurnRight = 0;
-	targetView.rotateRight();
-    }
-}
-
-bool PuyoEventPlayer::keyShouldRepeat(int &key)
-{
-    if (key == 0) return false;
-    key++;
-    return ((key - fpKey_Delay) > 0) && ((key - fpKey_Delay) % fpKey_Repeat == 0);
-}
-
-void PuyoCheatCodeManager::eventOccured(GameControlEvent *event)
-{
-    if (event->sdl_event.type != SDL_KEYDOWN)
-        return;
-    if (event->sdl_event.key.keysym.sym == cheatCode[currentPosition])
-        currentPosition++;
-    else
-        currentPosition = 0;
-    if (currentPosition == cheatCodeLength) {
-        cheatAction->action();
-        currentPosition = 0;
-    }
-}
-
 void PuyoKillPlayerLeftAction::action()
 {
     target.addGameAHandicap(PUYODIMY);
@@ -552,95 +453,6 @@ void PuyoGameWidget::styro_freeImage(StyrolyseClient *_this, void *image)
   IIM_Free((IIM_Surface *)image);
 }
 
-PuyoPauseMenu::PuyoPauseMenu(Action *continueAction, Action *abortAction)
-    : topSeparator(0, 10), pauseVBox(theCommander->getWindowFramePicture()),
-      pauseTitleFrame(theCommander->getSeparatorFramePicture()),
-      menuTitle(theCommander->getLocalizedString("Pause")), 
-      continueButton(theCommander->getLocalizedString("Continue game"), continueAction),
-      optionsButton(theCommander->getLocalizedString("Options"), this),
-      audioButton(),
-      musicButton(),
-      fullScreenButton(),
-      abortButton(theCommander->getLocalizedString("Abort game"), abortAction),
-      optionsBox(theCommander->getWindowFramePicture()),
-      optionsTitleFrame(theCommander->getSeparatorFramePicture()),
-      optionsTitle(theCommander->getLocalizedString("Options")),
-      optionsBack(theCommander->getLocalizedString("Back"), this)
-{
-    setPolicy(USE_MIN_SIZE);
-    pauseTitleFrame.add(&menuTitle);
-    pauseTitleFrame.setPreferedSize(Vec3(0, 20));
-    pauseVBox.add(&pauseTitleFrame);
-    buttonsBox.add(&continueButton);
-    buttonsBox.add(&optionsButton);
-    buttonsBox.add(&abortButton);
-    pauseVBox.add(&buttonsBox);
-    pauseContainer.addListener(*this);
-    pauseContainer.setPreferedSize(Vec3(350, 250));
-    pauseContainer.setPosition(Vec3((640-350)/2., (480-250)/2.));
-    topBox.add(&pauseContainer);
-    add(&topSeparator);
-    add(&topBox);
-
-    // Options menu
-    optionsTitleFrame.add(&optionsTitle);
-    optionsTitleFrame.setPreferedSize(Vec3(0, 20));
-    optionsBox.add(&optionsTitleFrame);
-    optionsButtonsBox.add(&audioButton);
-    optionsButtonsBox.add(&musicButton);
-    optionsButtonsBox.add(&fullScreenButton);
-    optionsButtonsBox.add(&optionsBack);
-    optionsBox.add(&optionsButtonsBox);
-}
-
-PuyoPauseMenu::~PuyoPauseMenu()
-{
-}
-
-void PuyoPauseMenu::action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
-{
-  if (sender == &optionsButton) {
-    pauseContainer.transitionToContent(&optionsBox);
-  }
-  else if (sender == &optionsBack) {
-    pauseContainer.transitionToContent(&pauseVBox);
-  }
-}
-
-bool PuyoPauseMenu::backPressed(bool fromControls)
-{
-  if (!fromControls || (pauseContainer.getContentWidget() == &pauseVBox)) {
-    pauseContainer.transitionToContent(NULL);
-    return true;
-  }
-  if (pauseContainer.getContentWidget() == &optionsBox) {
-    pauseContainer.transitionToContent(&pauseVBox);
-  }
-  return false;
-}
-
-void PuyoPauseMenu::onSlideInside(SliderContainer &slider)
-{
-  if (slider.getContentWidget() == NULL) {
-    dynamic_cast<PuyoGameScreen *>(getParentScreen())->setResumed(false);
-  }
-}
-
-void PuyoPauseMenu::onWidgetAdded(WidgetContainer *parent)
-{
-  pauseContainer.transitionToContent(&pauseVBox);
-}
-
-void ContinueAction::action()
-{
-    screen.backPressed();
-}
-
-void AbortAction::action()
-{
-    screen.abort();
-}
-
 static std::vector<PuyoFX*> *activeFX = NULL;
 
 void EventFX(const char *name, float x, float y, int player)
@@ -675,8 +487,9 @@ void EventFX(const char *name, float x, float y, int player)
 }
 
 PuyoGameScreen::PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScreen)
-    : Screen(0, 0, 640, 480), paused(false), continueAction(*this), abortAction(*this),
-      pauseMenu(&continueAction, &abortAction), gameWidget(gameWidget), transitionWidget(previousScreen, NULL),
+    : Screen(0, 0, 640, 480), paused(false),
+      pauseMenu(this),
+      gameWidget(gameWidget), transitionWidget(previousScreen, NULL),
       overlayStory(NULL)
 {
 #ifdef DEBUG_GAMELOOP
@@ -747,8 +560,7 @@ bool PuyoGameScreen::backPressed()
     }
     else {
       // Same as for pause
-      if (pauseMenu.backPressed())
-	gameWidget.setScreenToResumed(true);
+      pauseMenu.backPressed();
     }
     return false;
 }
@@ -801,6 +613,22 @@ void PuyoGameScreen::setOverlayStory(PuyoStoryWidget *story)
 void PuyoGameScreen::onScreenVisibleChanged(bool visible)
 {
     theCommander->setCursorVisible(!visible);
+}
+
+void PuyoGameScreen::action(Widget *sender, int actionType, GameControlEvent *event)
+{
+  if (sender == &pauseMenu) {
+    switch (actionType) {
+    case PuyoPauseMenu::KPauseMenuClosing_Abort:
+      abort();
+      break;
+    case PuyoPauseMenu::KPauseMenuClosed_Continue:
+      setResumed(true);
+      break;
+    default:
+      break;
+    }
+  }
 }
 
 PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction)

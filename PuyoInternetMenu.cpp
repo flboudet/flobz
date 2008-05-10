@@ -366,7 +366,7 @@ class PuyoInternetErrorDialog : public PuyoInternetDialog, public Action
 public:
     PuyoInternetErrorDialog(String errorMessageL1, String errorMessageL2);
     virtual ~PuyoInternetErrorDialog();
-    virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
+    virtual void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
     Text m_errorMessageL1, m_errorMessageL2;
     FramedButton m_okButton;
@@ -395,7 +395,7 @@ PuyoInternetErrorDialog::~PuyoInternetErrorDialog()
     IIM_Free(m_errorIconImage);
 }
 
-void PuyoInternetErrorDialog::action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
+void PuyoInternetErrorDialog::action(Widget *sender, int actionType, GameControlEvent *event)
 {
     if (sender == m_okButton.getButton()) {
         close();
@@ -408,7 +408,7 @@ public:
     PuyoInternetConnectDialog(String serverName, PuyoInternetGameCenter *gameCenter, InternetGameMenu *owner);
     virtual ~PuyoInternetConnectDialog();
     virtual void idle(double currentTime);
-    void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
+    void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
     Text m_messageL1, m_messageL2;
     FramedButton m_cancelButton;
@@ -469,7 +469,7 @@ void PuyoInternetConnectDialog::idle(double currentTime)
     PuyoInternetDialog::idle(currentTime);
 }
 
-void PuyoInternetConnectDialog::action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
+void PuyoInternetConnectDialog::action(Widget *sender, int actionType, GameControlEvent *event)
 {
   if (sender == m_cancelButton.getButton()) {
     close();
@@ -484,7 +484,7 @@ void InternetGameMenu::enterNetCenterMenu(PuyoInternetGameCenter *gameCenter)
     mainScreen->pushMenu(newNetCenterMenu, true);
 }
 
-void InternetGameMenu::action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
+void InternetGameMenu::action(Widget *sender, int actionType, GameControlEvent *event)
 {
     if (sender == this->joinButton.getButton()) {
         try {

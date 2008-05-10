@@ -42,7 +42,7 @@ namespace gameui {
         text.giveFocus();
     }
 
-    void SwitchedButton::action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
+    void SwitchedButton::action(Widget *sender, int actionType, GameControlEvent *event)
     {
         if ((actionType == ON_MOUSEUP) || (actionType == ON_MOUSEUP)) {
             stateValue = !stateValue;
