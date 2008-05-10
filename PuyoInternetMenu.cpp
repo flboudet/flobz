@@ -31,9 +31,6 @@
 
 using namespace std;
 
-static const char * kInternetServerKey = "Menu.Internet.Server.";
-static const char * kInternetServerPortKey = "Menu.Internet.Server.Port.";
-static const char * kInternetServerNumberKey = "Menu.Internet.Server.Number.";
 static const char * kInternetMetaServerKey = "Menu.Internet.MetaServer.";
 static const char * kInternetMetaServerPathKey = "Menu.Internet.MetaServer.Path.";
 static const char * kInternetMetaServerPortKey = "Menu.Internet.MetaServer.Port.";
@@ -252,7 +249,7 @@ InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)
     downArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png"))),
     servers(this),
     serverSelectionPanel(theCommander->getWindowFramePicture()),
-    serverListPanel(20, upArrow, downArrow),
+    serverListPanel(20, upArrow, downArrow, theCommander->getEditFieldFramePicture()),
     serverListText("Server List"),
     updating("Update", this, theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
     rightPanel(theCommander->getWindowFramePicture()),

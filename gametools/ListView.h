@@ -11,6 +11,7 @@
 #define LISTVIEW_H
 
 #include "gameui.h"
+#include "Frame.h"
 
 namespace gameui {
 
@@ -53,7 +54,8 @@ friend class ListView;
 
 class ListView : public CycledComponent, public HBox, public Action, public ScrollInfoProvider {
 public:
-    ListView(int size, IIM_Surface *upArrow, IIM_Surface *downArrow, GameLoop *loop = NULL);
+    ListView(int size, IIM_Surface *upArrow, IIM_Surface *downArrow,
+	     const FramePicture *listViewFramePicture, GameLoop *loop = NULL);
     virtual ~ListView();
     void addEntry(ListViewEntry *entry);
     void removeEntry(ListViewEntry *entry);
@@ -69,19 +71,15 @@ public:
     virtual float getLastVisible() const { return firstVisible + size; }
     virtual float getFullSize() const { return entries.size(); }
     virtual void setFirstVisible(float firstVisible);
-protected:
-    virtual void draw(SDL_Surface *screen);
 private:
     void resyncLabels();
     void handleButtons();
-    
-    IIM_Surface *m_bgSurface;
     int size, firstVisible;
     int used;
     Image downButton, upButton;
     ScrollWidget scrollWidget;
     VBox scrollerBox;
-    VBox listBox;
+    Frame listBox;
     std::vector<ListViewEntry *> entries;
     std::vector<Button *> buttons;
     Widget *m_clickedButton;

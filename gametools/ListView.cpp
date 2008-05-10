@@ -44,8 +44,8 @@ void ScrollWidget::eventOccured(GameControlEvent *event)
             float lastVisible = m_siProvider.getLastVisible();
             float numItems = m_siProvider.getFullSize();
             
-            int firstVisibleOffset = widSize.y * firstVisible / numItems;
-            int lastVisibleOffset = widSize.y * lastVisible / numItems;
+            int firstVisibleOffset = (int)(widSize.y * firstVisible / numItems);
+            int lastVisibleOffset = (int)(widSize.y * lastVisible / numItems);
             
             // Click above the cursor
             if (event->y < widPosition.y + firstVisibleOffset) {
@@ -56,7 +56,7 @@ void ScrollWidget::eventOccured(GameControlEvent *event)
             }
             else {
                 m_grabbing = true;
-                m_grabOffset = event->y - widPosition.y - firstVisibleOffset;
+                m_grabOffset = (int)(event->y - widPosition.y - firstVisibleOffset);
                 getParentScreen()->grabEventsOnWidget(this);
             }
         }
@@ -134,15 +134,18 @@ void ListViewEntry::setText(String text)
 // ListView
 //
 
-ListView::ListView(int size, IIM_Surface *upArrow, IIM_Surface *downArrow, GameLoop *loop)
- : CycledComponent(0.1), HBox(loop), m_bgSurface(NULL), size(size), firstVisible(0), used(0),
-   scrollWidget(*this), m_clickedButton(NULL), m_cyclesBeforeContinuousScroll(0)
+ListView::ListView(int size, IIM_Surface *upArrow, IIM_Surface *downArrow,
+		   const FramePicture *listViewFramePicture, GameLoop *loop)
+ : CycledComponent(0.1), HBox(loop), size(size), firstVisible(0), used(0),
+   scrollWidget(*this), listBox(listViewFramePicture, loop),
+   m_clickedButton(NULL), m_cyclesBeforeContinuousScroll(0)
 {
     suspendLayout();
     scrollerBox.suspendLayout();
     listBox.suspendLayout();
     
     setPolicy(USE_MIN_SIZE);
+    listBox.setPolicy(USE_MAX_SIZE);
     upButton.setImage(upArrow);
     downButton.setImage(downArrow);
     upButton.setOnStartAction(this);
@@ -170,8 +173,6 @@ ListView::ListView(int size, IIM_Surface *upArrow, IIM_Surface *downArrow, GameL
 
 ListView::~ListView()
 {
-    if (m_bgSurface != NULL)
-        IIM_Free(m_bgSurface);
 }
 
 void ListView::addEntry(ListViewEntry *entry)
@@ -192,37 +193,6 @@ void ListView::removeEntry(ListViewEntry *entry)
          }
     }
     resyncLabels();
-}
-
-void ListView::draw(SDL_Surface *screen)
-{
-    SDL_Rect srcrect, dstrect;
-    Vec3 lbsize = listBox.getSize();
-    
-    srcrect.x = 0;
-    srcrect.y = 0;
-    srcrect.h = lbsize.y;
-    srcrect.w = lbsize.x;
-    
-    if ((m_bgSurface == NULL) || ((int)(lbsize.x) != m_bgSurface->w) || ((int)(lbsize.y) != m_bgSurface->h)) {
-        if (m_bgSurface != NULL)
-            IIM_Free(m_bgSurface);
-        m_bgSurface = iim_surface_create_rgba((int)(lbsize.x), (int)(lbsize.y));
-        SDL_FillRect(m_bgSurface->surf, &srcrect,
-            (m_bgSurface->surf->format->Rmask & 0xFFFFFFFF) |
-            (m_bgSurface->surf->format->Gmask & 0xFFFFFFFF) |
-            (m_bgSurface->surf->format->Bmask & 0xFFFFFFFF) |
-            (m_bgSurface->surf->format->Amask & 0xFFFFFFFF));
-        srcrect.x += 3; srcrect.y += 3; srcrect.h -= 6; srcrect.w -= 6;
-        SDL_FillRect(m_bgSurface->surf, &srcrect,
-            (m_bgSurface->surf->format->Amask & 0x80808080));
-    }
-    dstrect.x = listBox.getPosition().x;
-    dstrect.y = listBox.getPosition().y;
-    dstrect.h = listBox.getSize().y;
-    dstrect.w = listBox.getSize().x;
-    IIM_BlitSurface(m_bgSurface, &srcrect, screen, &dstrect);
-    HBox::draw(screen);
 }
 
 void ListView::eventOccured(GameControlEvent *event)
@@ -290,8 +260,8 @@ void ListView::resyncLabels()
 
 void ListView::setFirstVisible(float firstVisible)
 {
-    if ((firstVisible >= 0) && (firstVisible + size <= entries.size())) {
-            this->firstVisible = firstVisible;
+    if (((int)firstVisible >= 0) && ((int)firstVisible + size <= (int)(entries.size()))) {
+            this->firstVisible = (int)firstVisible;
             resyncLabels();
     }
 }
