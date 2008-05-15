@@ -26,27 +26,6 @@
 #include "PuyoSinglePlayerStarter.h"
 #include "PuyoView.h"
 
-PuyoCombinedEventPlayer::PuyoCombinedEventPlayer(PuyoView &view)
-    : PuyoPlayer(view),
-      player1controller(view, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left, GameControlEvent::kPlayer1Right,
-                       GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
-      player2controller(view, GameControlEvent::kPlayer2Down, GameControlEvent::kPlayer2Left, GameControlEvent::kPlayer2Right,
-                       GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight)
-{
-}
-
-void PuyoCombinedEventPlayer::eventOccured(GameControlEvent *event)
-{
-    player1controller.eventOccured(event);
-    player2controller.eventOccured(event);
-}
-
-void PuyoCombinedEventPlayer::cycle()
-{
-    player1controller.cycle();
-    player2controller.cycle();
-}
-
 PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
     : attachedPuyoThemeSet(puyoThemeSet),
     attachedRandom(nColors),
@@ -56,10 +35,14 @@ PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puy
     areaB(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
           1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
     playercontroller(areaA),
-    opponentcontroller(level, areaB), faceTicks(0), opponent(aiFace)
+    opponentcontroller(level, areaB), faceTicks(0), opponent(aiFace),
+    killLeftCheat("killleft", this),
+    killRightCheat("killright", this)
 {
     initialize(areaA, areaB, playercontroller, opponentcontroller, levelTheme, gameOverAction);
     setLives(lifes);
+    addSubWidget(&killLeftCheat);
+    addSubWidget(&killRightCheat);
 }
 
 PuyoSinglePlayerGameWidget::~PuyoSinglePlayerGameWidget()
@@ -98,6 +81,15 @@ void PuyoSinglePlayerGameWidget::cycle()
 PuyoStoryWidget *PuyoSinglePlayerGameWidget::getOpponent()
 {
     return &opponent;
+}
+
+void PuyoSinglePlayerGameWidget::action(Widget *sender, int actionType,
+                                        GameControlEvent *event)
+{
+    if (sender == static_cast<Widget *>(&killLeftCheat))
+        addGameAHandicap(PUYODIMY);
+    else if (sender == static_cast<Widget *>(&killRightCheat))
+        addGameBHandicap(PUYODIMY);
 }
 
 PuyoLevelDefinitions *PuyoLevelDefinitions::currentDefinition = NULL;
@@ -243,7 +235,7 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousSc
         : PuyoStoryScreen(screenName, previousScreen, finishedAction, false),
         playerName(playerName), playerStat(playerPoints)
 {
-    static char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
+    static const char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
     "Satanas", "Doctor X", "Tania", "Mr Gyom",
     "The Duke","Jeko","--------" };
     
@@ -296,7 +288,8 @@ SinglePlayerStarterAction::SinglePlayerStarterAction(int difficulty, PuyoSingleN
       nameProvider(nameProvider), levelDefinitions(theCommander->getDataPathManager().getPath("/story/levels.gsl")),
       inIntroduction(false) {}
 
-void SinglePlayerStarterAction::action()
+void SinglePlayerStarterAction::action(Widget *sender, int actionType,
+			GameControlEvent *event)
 {
     if ((levelData == NULL) || (inIntroduction)) {
         initiateLevel();

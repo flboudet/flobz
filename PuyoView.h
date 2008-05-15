@@ -41,12 +41,26 @@
 #define ESIZE 32
 #define FSIZE 16
 
+/**
+ * Abstract class serving as a factory
+ * for the PuyoView to create the corresponding PuyoGame.
+ * Implemented in the following classes:
+ * - PuyoLocalGameFactory, to be used with a PuyoView on a game
+ *   playing on the local computer,
+ * - PuyoRemoteGameFactory, to be used with a PuyoView to display
+ *   a game playing on a distant computer.
+ */
 class PuyoGameFactory {
 public:
     virtual PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory) = 0;
     virtual ~PuyoGameFactory() {};
 };
 
+/**
+ * PuyoView is the graphical representation of a PuyoGame.
+ * The PuyoGame is owned by the PuyoView and created
+ * through a PuyoGameFactory.
+ */
 class PuyoView : public PuyoDelegate {
   public:
     PuyoView(PuyoGameFactory *attachedPuyoGameFactory,

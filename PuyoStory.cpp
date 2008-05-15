@@ -6,37 +6,7 @@
 extern SoFont *storyFont;
 
 SDL_Surface *sstory;
-/*
-static SDL_Surface * createStorySurface()
-{
-  SDL_Surface *sstory, *tmpsurf;
-  Uint32 rmask, gmask, bmask, amask;
 
-  // SDL interprets each pixel as a 32-bit number, so our masks must depend
-  // on the endianness (byte order) of the machine
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-  rmask = 0xff000000;
-  gmask = 0x00ff0000;
-  bmask = 0x0000ff00;
-  amask = 0x00000000;
-#else
-  rmask = 0x000000ff;
-  gmask = 0x0000ff00;
-  bmask = 0x00ff0000;
-  amask = 0x00000000;
-#endif
-
-  sstory = SDL_CreateRGBSurface(SDL_SWSURFACE, 640, 480, 32,
-                               rmask, gmask, bmask, amask);
-  if(sstory == NULL) {
-    fprintf(stderr, "CreateRGBSurface failed: %s", SDL_GetError());
-    exit(1);
-  }
-  tmpsurf = SDL_DisplayFormat(sstory);
-  SDL_FreeSurface(sstory);
-  return tmpsurf;
-}
-*/
 /* Implementation of the Styrolyse Client */
 
 static char *pathResolverFunction (StyrolyseClient *_this, const char *path)
@@ -227,7 +197,7 @@ void PuyoStoryWidget::idle(double currentTime)
     if (styrolyse_finished(currentStory) && !once) {
         once = true;
         if (finishedAction)
-            finishedAction->action();
+	  finishedAction->action(this, 0, NULL);
     }
 }
 
@@ -295,7 +265,7 @@ void PuyoStoryScreen::onEvent(GameControlEvent *cevent)
         if (cevent->isUp)
             break;
         if (finishedAction != NULL) {
-            finishedAction->action();
+	  finishedAction->action(&storyWidget, 0, cevent);
 	    passEvent = false;
         }
         break;

@@ -44,5 +44,22 @@ private:
     int fpKey_Repeat, fpKey_Delay;
 };
 
+/**
+ * The PuyoCombinedEventPlayer class implements a PuyoPlayer
+ * controlled by the combination of two PuyoEventPlayers.
+ * The purpose is to have a "union" of the Player 1 and Player 2
+ * controllers, so that any joystick or keyboard for either
+ * player 1 or player 2 can be used when playing a solo game
+ */
+class PuyoCombinedEventPlayer : public PuyoPlayer {
+public:
+    PuyoCombinedEventPlayer(PuyoView &view);
+    void eventOccured(GameControlEvent *event);
+    void cycle();
+private:
+    PuyoEventPlayer player1controller;
+    PuyoEventPlayer player2controller;
+};
+
 #endif // _PUYO_EVENT_PLAYER_H
 

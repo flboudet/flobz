@@ -10,6 +10,7 @@ OBJFILES= audio.o HiScores.o PuyoCommander.o \
           PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o \
           styrolyse.o PuyoStory.o PuyoChatBox.o PuyoLocalizedDictionary.o \
           PuyoEventPlayer.o PuyoPauseMenu.o PuyoCheatCodeManager.o \
+          PuyoGameWidget.o \
           PuyoStarter.o PuyoSinglePlayerStarter.o PuyoTwoPlayerStarter.o \
           PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o \
           AnimatedPuyoTheme.o PuyoNetworkMenu.o PuyoInternetMenu.o PuyoNetCenterMenu.o \

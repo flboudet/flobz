@@ -156,6 +156,8 @@ public:
     // PuyoServerListResponder implementation
     virtual void PuyoServerListHasChanged(PuyoServerList &serverList);
 private:
+    Frame screenTitleFrame;
+    Text internetGameText;
     IIM_Surface *upArrow, *downArrow;
     PuyoServerList servers;
     Frame serverSelectionPanel;
@@ -164,7 +166,7 @@ private:
     FramedButton updating;
     Frame rightPanel;
     Separator separator1_1, separator1_2, separator1_3,  separator10_1, separator10_2;
-    Text internetGameText, nicknameText, serverText, portText;
+    Text nicknameText, serverText, portText;
     HBox hbox, menu;
     SliderContainer container;
     FramedEditField playerName;

@@ -110,3 +110,33 @@ bool PuyoEventPlayer::keyShouldRepeat(int &key)
     return ((key - fpKey_Delay) > 0) && ((key - fpKey_Delay) % fpKey_Repeat == 0);
 }
 
+
+PuyoCombinedEventPlayer::PuyoCombinedEventPlayer(PuyoView &view)
+    : PuyoPlayer(view),
+      player1controller(view,
+                        GameControlEvent::kPlayer1Down,
+                        GameControlEvent::kPlayer1Left,
+                        GameControlEvent::kPlayer1Right,
+                        GameControlEvent::kPlayer1TurnLeft,
+                        GameControlEvent::kPlayer1TurnRight),
+      player2controller(view,
+                        GameControlEvent::kPlayer2Down,
+                        GameControlEvent::kPlayer2Left,
+                        GameControlEvent::kPlayer2Right,
+                        GameControlEvent::kPlayer2TurnLeft,
+                        GameControlEvent::kPlayer2TurnRight)
+{
+}
+
+void PuyoCombinedEventPlayer::eventOccured(GameControlEvent *event)
+{
+    player1controller.eventOccured(event);
+    player2controller.eventOccured(event);
+}
+
+void PuyoCombinedEventPlayer::cycle()
+{
+    player1controller.cycle();
+    player2controller.cycle();
+}
+

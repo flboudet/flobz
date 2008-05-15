@@ -29,9 +29,10 @@
 #include "gameui.h"
 #include "GameControls.h"
 
-class PuyoCheatCodeManager {
+class PuyoCheatCodeManager : public gameui::Widget {
 public:
-    PuyoCheatCodeManager(String cheatCode, gameui::Action *cheatAction) : cheatCode(cheatCode), cheatAction(cheatAction), cheatCodeLength(cheatCode.length()), currentPosition(0) {}
+    PuyoCheatCodeManager(String cheatCode, gameui::Action *cheatAction)
+      : cheatCode(cheatCode), cheatAction(cheatAction), cheatCodeLength(cheatCode.length()), currentPosition(0) {}
     void eventOccured(GameControlEvent *event);
 private:
     String cheatCode;

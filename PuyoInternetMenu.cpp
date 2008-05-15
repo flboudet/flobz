@@ -245,6 +245,8 @@ private:
 
 InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)
   : PuyoMainScreenMenu(mainScreen),
+    screenTitleFrame(theCommander->getSeparatorFramePicture()),
+    internetGameText("Internet Game"), 
     upArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png"))),
     downArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png"))),
     servers(this),
@@ -254,7 +256,7 @@ InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)
     updating("Update", this, theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
     rightPanel(theCommander->getWindowFramePicture()),
     separator1_1(1,1), separator1_2(1,1), separator1_3(1, 1), separator10_1(10,10), separator10_2(10,10),
-    internetGameText("Internet Game"), nicknameText("Nickname"), serverText("Server"), portText("Port"),
+    nicknameText("Nickname"), serverText("Server"), portText("Port"),
     container(),
     playerName(PuyoGame::getPlayerName(-2), PuyoGame::getDefaultPlayerKey(-2),
 	       theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
@@ -292,7 +294,11 @@ void InternetGameMenu::build()
     serverSelectionPanel.add(&updating);
 
     rightPanel.add(&separator1_1);
-    rightPanel.add(&internetGameText);
+
+    screenTitleFrame.setPreferedSize(Vec3(0, 20));
+    screenTitleFrame.add(&internetGameText);
+    rightPanel.add(&screenTitleFrame);
+
     rightPanel.add(&separator1_2);
     rightPanel.add(&nicknameText);
     rightPanel.add(&playerName);

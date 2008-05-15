@@ -36,7 +36,7 @@ void PuyoCheatCodeManager::eventOccured(GameControlEvent *event)
     else
         currentPosition = 0;
     if (currentPosition == cheatCodeLength) {
-        cheatAction->action();
+        cheatAction->action(this, 0, event);
         currentPosition = 0;
     }
 }

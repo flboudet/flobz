@@ -37,23 +37,18 @@ public:
     virtual ~PuyoSingleNameProvider() {};
 };
 
-class PuyoCombinedEventPlayer : public PuyoPlayer {
-public:
-    PuyoCombinedEventPlayer(PuyoView &view);
-    void eventOccured(GameControlEvent *event);
-    void cycle();
-private:
-    PuyoEventPlayer player1controller;
-    PuyoEventPlayer player2controller;
-};
-
-class PuyoSinglePlayerGameWidget : public PuyoGameWidget {
+class PuyoSinglePlayerGameWidget : public PuyoGameWidget, public Action {
 public:
     PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
     virtual ~PuyoSinglePlayerGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
     PuyoStoryWidget *getOpponent();
+    /**
+     * Implements the Action interface
+     */
+    virtual void action(Widget *sender, int actionType,
+                        GameControlEvent *event);
 private:
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;
@@ -63,6 +58,7 @@ private:
     PuyoIA opponentcontroller;
     int faceTicks;
     PuyoStoryWidget opponent;
+    PuyoCheatCodeManager killLeftCheat, killRightCheat;
 };
 
 class PuyoLevelDefinitions {
@@ -143,11 +139,18 @@ private:
     PlayerGameStat playerStat;
 };
 
+/**
+ * State machine managing a single player game session
+ */
 class SinglePlayerStarterAction : public Action {
 public:
-    SinglePlayerStarterAction(int difficulty, PuyoSingleNameProvider *nameProvider = NULL);
-    void action();
-    
+    SinglePlayerStarterAction(int difficulty,
+			      PuyoSingleNameProvider *nameProvider = NULL);
+    /**
+     * Implements the Action interface
+     */
+    virtual void action(Widget *sender, int actionType,
+			GameControlEvent *event);
 private:
     void initiateLevel();
     

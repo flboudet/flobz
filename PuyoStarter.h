@@ -33,6 +33,7 @@
 #include "PuyoIA.h"
 #include "PuyoCheatCodeManager.h"
 #include "PuyoPauseMenu.h"
+#include "PuyoGameWidget.h"
 #include "PuyoCommander.h"
 #include "ios_messagebox.h"
 #include "AnimatedPuyoTheme.h"
@@ -49,121 +50,8 @@ private:
     PuyoRandomSystem *attachedRandom;
 };
 
-class PuyoGameWidget;
-class PuyoKillPlayerLeftAction : public Action {
-public:
-    PuyoKillPlayerLeftAction(PuyoGameWidget &target) : target(target) {}
-    void action();
-private:
-    PuyoGameWidget &target;
-};
-
-class PuyoKillPlayerRightAction : public Action {
-public:
-    PuyoKillPlayerRightAction(PuyoGameWidget &target) : target(target) {}
-    void action();
-private:
-    PuyoGameWidget &target;
-};
-
 class PuyoGameScreen;
 struct GameOptions;
-
-struct GameOptions
-{
-    GameOptions() {
-        MIN_SPEED = 2;
-        MAX_SPEED = 20;
-        CYCLES_BEFORE_SPEED_INCREASES = 240;
-    }
-
-    static GameOptions FromLevel(int level);
-
-    int MIN_SPEED;
-    int MAX_SPEED;
-    int CYCLES_BEFORE_SPEED_INCREASES;
-};
-
-class PuyoGameWidget : public GarbageCollectableItem, public Widget, CycledComponent {
-public:
-    PuyoGameWidget(GameOptions options = GameOptions());
-    void setGameOptions(GameOptions options);
-    virtual ~PuyoGameWidget();
-    void initialize(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction = NULL);
-    void initialize();
-    void cycle();
-    void draw(SDL_Surface *screen);
-    void pause();
-    void resume();
-    bool isFocusable() { return !paused; }
-    void eventOccured(GameControlEvent *event);
-    bool backPressed();
-    bool startPressed();
-    IdleComponent *getIdleComponent() { return this; }
-    virtual void abort() { abortedFlag = true; }
-    bool getAborted() const { return abortedFlag; }
-    void setLives(int l) { lives = l; }
-    bool isGameARunning() const { return attachedGameA->isGameRunning(); }
-    bool isGameBRunning() const { return attachedGameB->isGameRunning(); }
-    void setPlayerOneName(String newName) { playerOneName = newName; }
-    void setPlayerTwoName(String newName) { playerTwoName = newName; }
-    String getPlayerOneName() const { return playerOneName; }
-    PlayerGameStat getStatPlayerOne() { return attachedGameA->getGameStat(); }
-    virtual PuyoStoryWidget *getOpponent() { return NULL; }
-    virtual std::vector<PuyoFX*> &getPuyoFX() { return puyoFX; }
-    void addGameAHandicap(int handicap) {attachedGameA->increaseNeutralPuyos(handicap * PUYODIMX); attachedGameA->dropNeutrals();}
-    void addGameBHandicap(int handicap) {attachedGameB->increaseNeutralPuyos(handicap * PUYODIMX); attachedGameB->dropNeutrals();}
-    // A deplacer
-    void setAssociatedScreen(PuyoGameScreen *associatedScreen) { this->associatedScreen = associatedScreen; associatedScreenHasBeenSet(associatedScreen); };
-    virtual void setScreenToPaused(bool fromControls);
-    virtual void setScreenToResumed(bool fromControls);
-    virtual void actionAfterGameOver(bool fromControls);
-protected:
-    virtual void associatedScreenHasBeenSet(PuyoGameScreen *associatedScreen) {}
-
-    // Styrolyse methods
-    static void *styro_loadImage(StyrolyseClient *_this, const char *path);
-    static void styro_drawImage(StyrolyseClient *_this,
-				void *image, int x, int y,
-				int clipx, int clipy, int clipw, int cliph);
-    static void styro_freeImage(StyrolyseClient *_this, void *image);
-
-    PuyoGameScreen *associatedScreen;
-    SDL_Painter painter;
-    PuyoLevelTheme *attachedLevelTheme;
-    PuyoView *areaA, *areaB;
-    PuyoPlayer *controllerA, *controllerB;
-    PuyoGame *attachedGameA, *attachedGameB;
-    int cyclesBeforeGameCycle;
-    int cyclesBeforeSpeedIncreases; // time between speed increases in units of 20ms
-    unsigned int tickCounts;
-    unsigned long long cycles;
-    bool paused;
-    bool displayLives;
-    int lives;
-    bool once;
-    Action *gameOverAction;
-    bool gameover;
-    bool abortedFlag;
-    int gameSpeed; // from 0 (MinSpeed) to 20 (MaxSpeed)
-    int MinSpeed,MaxSpeed; // in units of 20ms
-    int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
-    String playerOneName, playerTwoName;
-    PuyoKillPlayerLeftAction killLeftAction;
-    PuyoKillPlayerRightAction killRightAction;
-    PuyoCheatCodeManager killLeftCheat, killRightCheat;
-    std::vector<PuyoFX*> puyoFX;
-    bool skipGameCycleA, skipGameCycleB;
-    double gameOverDate;
-    // Foreground animation
-    struct StyrolysePainterClient {
-      StyrolyseClient m_styroClient;
-      SDL_Painter *m_painter;
-      PuyoLevelTheme *m_theme;
-    };
-    Styrolyse *m_foregroundAnimation;
-    StyrolysePainterClient m_styroPainter;
-};
 
 class PuyoGameScreen : public Screen, public Action {
 public:
