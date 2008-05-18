@@ -230,6 +230,11 @@ String PuyoSingleGameLevelData::getIAFace() const
     return levelDefinition->opponent;
 }
 
+GameOptions PuyoSingleGameLevelData::getGameOptions() const
+{
+  return GameOptions::FromLevel(difficulty);
+}
+
 PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousScreen,
         Action *finishedAction, String playerName, const PlayerGameStat &playerPoints)
         : PuyoStoryScreen(screenName, previousScreen, finishedAction, false),
@@ -283,166 +288,300 @@ PuyoGameOver1PScreen::~PuyoGameOver1PScreen()
 }
 
 SinglePlayerStarterAction::SinglePlayerStarterAction(int difficulty, PuyoSingleNameProvider *nameProvider)
-    : currentLevel(0), lifes(3), difficulty(difficulty), levelData(NULL),
-      story(NULL), gameScreen(NULL), gameLostWidget(NULL), gameOverScreen(NULL), gameWonScreen(NULL),
-      nameProvider(nameProvider), levelDefinitions(theCommander->getDataPathManager().getPath("/story/levels.gsl")),
-      inIntroduction(false) {}
+    : m_state(kGameNotStarted),
+      m_nameProvider(nameProvider),
+      m_currentLevel(0), m_lifes(3), m_difficulty(difficulty),
+      m_currentMatch(NULL),
+      m_hiScoreScreen(NULL), m_gameWonScreen(NULL),
+      m_levelDefinitions(theCommander->getDataPathManager().getPath("/story/levels.gsl"))
+{}
 
 void SinglePlayerStarterAction::action(Widget *sender, int actionType,
 			GameControlEvent *event)
 {
-    if ((levelData == NULL) || (inIntroduction)) {
-        initiateLevel();
-    }
-    else if (gameScreen == NULL) {
-        startGame();
-    }
-    else if (! gameWidget->getAborted()) {
-        if (! gameWidget->didPlayerWon()) {
-            if (gameLostWidget == NULL) {
-                lifes--;
-                gameLost();
-                return;
-            }
-        }
-        else
-            currentLevel++;
-        
-        // Gameover management
-        if (lifes < 0) {
-            if (gameOverScreen == NULL)
-                gameOver();
-            else {
-                endGameSession();
-            }
-        }
-        else {
-            // Game won management
-            if (levelDefinitions.getNumLevels() <= currentLevel) {
-                if (this->gameWonScreen == NULL)
-                    gameWon();
-                else {
-                    if (gameOverScreen == NULL)
-                        gameOver();
-                    else
-                        endGameSession();
-                }
-            }
-            else
-                nextLevel();
-        }
-    }
-    else {
-        if (gameOverScreen == NULL)
-            gameOver();
-        else {
-            endGameSession();
-        }
+  if (m_state == kGameNotStarted)
+    stateMachine();
+  else if (sender == m_currentMatch)
+    stateMachine();
+  else if (sender == m_hiScoreScreen->getStoryWidget())
+    stateMachine();
+  else if (sender == m_gameWonScreen->getStoryWidget())
+    stateMachine();
+}
+
+void SinglePlayerStarterAction::stateMachine()
+{
+  switch (m_state) {
+  case kGameNotStarted:
+    performMatchPlaying(false, false);
+    break;
+  case kMatchPlaying:
+    performEndOfMatch();
+    break;
+  case kGameOver:
+    performHiScoreScreen(m_currentMatch->getGameOverStoryName());
+    break;
+  case kGameWon:
+    performHiScoreScreen("gamewon_highscores_1p.gsl");
+    break;
+  case kHiScoreScreen:
+    performBackToMenu();
+  default:
+    break;
+  }
+}
+
+void SinglePlayerStarterAction::performMatchPlaying(bool skipIntroduction,
+						    bool popScreen)
+{
+    m_state = kMatchPlaying;
+    SinglePlayerMatch *previousMatch = m_currentMatch;
+    PuyoSingleGameLevelData *levelData = new PuyoSingleGameLevelData(m_currentLevel, m_difficulty, m_levelDefinitions);
+    m_currentMatch = new SinglePlayerMatch(this, levelData,
+					   skipIntroduction, popScreen,
+                                           m_nameProvider, m_lifes);
+    m_currentMatch->run();
+    if (previousMatch != NULL) {
+      delete previousMatch;
     }
 }
 
-void SinglePlayerStarterAction::initiateLevel()
+void SinglePlayerStarterAction::performEndOfMatch()
 {
-    if (levelData == NULL) {
-        levelData = new PuyoSingleGameLevelData(currentLevel, difficulty, levelDefinitions);
-        String introductionStory = levelData->getIntroStory();
-        if (introductionStory != "") {
-            story = new PuyoStoryScreen(introductionStory, *(GameUIDefaults::SCREEN_STACK->top()), this);
-            inIntroduction = true;
-        }
-        else
-            story = new PuyoStoryScreen(levelData->getStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
+  switch (m_currentMatch->getState()) {
+  case SinglePlayerMatch::kMatchOverWon:
+    m_currentLevel++;
+    if (m_levelDefinitions.getNumLevels() > m_currentLevel) {
+      performMatchPlaying(false, true);
     }
+    else { // The game is won, there is no more levels
+      performGameWon();
+    }
+    break;
+  case SinglePlayerMatch::kMatchOverLost:
+    m_lifes--;
+    if (m_lifes >= 0)
+      performMatchPlaying(true, true);
     else {
-        PuyoStoryScreen *previousStory = story;
-        story = new PuyoStoryScreen(levelData->getStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
-        if (inIntroduction) {
-            inIntroduction = false;
-            GameUIDefaults::SCREEN_STACK->pop();
-            delete previousStory;
-        }
+      m_state = kGameOver;
+      stateMachine();
     }
-    GameUIDefaults::SCREEN_STACK->push(story);
+    break;
+  case SinglePlayerMatch::kMatchOverAborted:
+  default:
+    m_state = kGameOver;
+    stateMachine();
+    break;
+  }
 }
 
-void SinglePlayerStarterAction::startGame()
+void SinglePlayerStarterAction::performGameWon()
 {
-    gameWidget = new PuyoSinglePlayerGameWidget(levelData->getPuyoTheme(), levelData->getLevelTheme(), levelData->getIALevel(), levelData->getNColors(), lifes, levelData->getIAFace(), this);
-    gameWidget->setGameOptions(GameOptions::FromLevel(difficulty));
-    gameScreen = new PuyoGameScreen(*gameWidget, *story);
-    if (nameProvider != NULL)
-        gameWidget->setPlayerOneName(nameProvider->getPlayerName());
-    gameWidget->setPlayerTwoName(levelData->getIAName());
+    m_state = kGameWon;
+    m_gameWonScreen = new PuyoStoryScreen("gamewon_1p.gsl", *(GameUIDefaults::SCREEN_STACK->top()), this);
     GameUIDefaults::SCREEN_STACK->pop();
-    delete story;
-    story = NULL;
-    GameUIDefaults::SCREEN_STACK->push(gameScreen);
+    GameUIDefaults::SCREEN_STACK->push(m_gameWonScreen);
+    if (m_currentMatch != NULL) {
+      delete m_currentMatch;
+      m_currentMatch = NULL;
+    }
 }
 
-void SinglePlayerStarterAction::nextLevel()
+void SinglePlayerStarterAction::performHiScoreScreen(String gameOverStoryName)
 {
-    PuyoSingleGameLevelData *tempLevelData = new PuyoSingleGameLevelData(currentLevel, difficulty, levelDefinitions);
-    story = new PuyoStoryScreen(tempLevelData->getStory(), *(GameUIDefaults::SCREEN_STACK->top()), this);
-    resetGameSession();
-    levelData = tempLevelData;
-    GameUIDefaults::SCREEN_STACK->push(story);
+  m_state = kHiScoreScreen;
+  m_hiScoreScreen = new PuyoGameOver1PScreen(gameOverStoryName,
+		     *(GameUIDefaults::SCREEN_STACK->top()),
+                     this, m_nameProvider->getPlayerName(),
+                     PlayerGameStat());
+  GameUIDefaults::SCREEN_STACK->pop();
+  GameUIDefaults::SCREEN_STACK->push(m_hiScoreScreen);
+  if (m_currentMatch != NULL) {
+    delete m_currentMatch;
+    m_currentMatch = NULL;
+  }
+  if (m_gameWonScreen != NULL) {
+    delete m_gameWonScreen;
+    m_gameWonScreen = NULL;
+  }
 }
 
-void SinglePlayerStarterAction::gameOver()
+void SinglePlayerStarterAction::performBackToMenu()
 {
-    String gameOverStory;
-    if (gameWonScreen == NULL)
-        gameOverStory = levelData->getGameOverStory();
+  // Rewind screen stack
+  Screen *screenToTrans = GameUIDefaults::SCREEN_STACK->top();
+  GameUIDefaults::SCREEN_STACK->pop();
+  (static_cast<PuyoMainScreen *>(GameUIDefaults::SCREEN_STACK->top()))->transitionFromScreen(*screenToTrans);
+  delete m_hiScoreScreen;
+  // Restore initial values to the reused action
+  m_lifes = 3;
+  m_currentLevel = 0;
+  m_state = kGameNotStarted;
+}
+
+SinglePlayerMatch::SinglePlayerMatch
+                     (Action *gameOverAction,
+                      PuyoSingleGameLevelData *levelData,
+		      bool skipIntroduction,
+                      bool popScreen,
+		      PuyoSingleNameProvider *nameProvider,
+		      int remainingLifes)
+		       : m_state(kNotRunning),
+                         m_matchOverAction(gameOverAction),
+                         m_levelData(levelData),
+			 m_skipIntroduction(skipIntroduction),
+			 m_popScreen(popScreen),
+			 m_nameProvider(nameProvider),
+			 m_remainingLifes(remainingLifes),
+			 m_introStory(NULL),
+			 m_opponentStory(NULL),
+			 m_matchLostAnimation(NULL)
+
+{
+}
+
+SinglePlayerMatch::~SinglePlayerMatch()
+{
+  if (m_matchLostAnimation != NULL)
+    delete m_matchLostAnimation;
+  delete m_gameScreen;
+  delete m_gameWidget;
+  delete m_levelData;
+}
+
+void SinglePlayerMatch::run()
+{
+  if (m_state == kNotRunning)
+    stateMachine();
+}
+
+void SinglePlayerMatch::action(Widget *sender, int actionType,
+				     GameControlEvent *event)
+{
+  if (sender == m_introStory->getStoryWidget()) {
+    stateMachine();
+  }
+  else if (sender == m_opponentStory->getStoryWidget()) {
+    stateMachine();
+  }
+  else if (sender == m_gameWidget) {
+    stateMachine();
+  }
+  else if (sender == m_matchLostAnimation) {
+    stateMachine();
+  }
+}
+
+void SinglePlayerMatch::performStoryIntroduction()
+{
+  m_introStory = new PuyoStoryScreen(m_levelData->getIntroStory(),
+			*(GameUIDefaults::SCREEN_STACK->top()), this);
+  if (m_popScreen)
+    GameUIDefaults::SCREEN_STACK->pop();
+  GameUIDefaults::SCREEN_STACK->push(m_introStory);
+  m_state = kStoryIntroduction;
+}
+
+void SinglePlayerMatch::performOpponentStory()
+{
+  m_opponentStory = new PuyoStoryScreen(m_levelData->getStory(),
+                         *(GameUIDefaults::SCREEN_STACK->top()), this);
+  // If we went from an introduction story, remove it from display
+  if (m_introStory != NULL)
+    GameUIDefaults::SCREEN_STACK->pop();
+  else if (m_popScreen)
+    GameUIDefaults::SCREEN_STACK->pop();
+  GameUIDefaults::SCREEN_STACK->push(m_opponentStory);
+  // Delete the intro story if needed
+  if (m_introStory != NULL) {
+    delete m_introStory;
+    m_introStory = NULL;
+  }
+  m_state = kStory;
+}
+
+void SinglePlayerMatch::performMatchPlaying()
+{
+  m_gameWidget = new PuyoSinglePlayerGameWidget
+    (m_levelData->getPuyoTheme(), m_levelData->getLevelTheme(),
+     m_levelData->getIALevel(), m_levelData->getNColors(), m_remainingLifes,
+     m_levelData->getIAFace(), this);
+  m_gameWidget->setGameOptions(m_levelData->getGameOptions());
+  m_gameScreen = new PuyoGameScreen(*m_gameWidget, *m_opponentStory);
+  if (m_nameProvider != NULL)
+    m_gameWidget->setPlayerOneName(m_nameProvider->getPlayerName());
+  m_gameWidget->setPlayerTwoName(m_levelData->getIAName());
+  GameUIDefaults::SCREEN_STACK->pop();
+  GameUIDefaults::SCREEN_STACK->push(m_gameScreen);
+  delete m_opponentStory;
+  m_state = kMatchPlaying;
+}
+
+void SinglePlayerMatch::performEndOfMatch()
+{
+  if (m_gameWidget->getAborted()) {
+    m_state = kMatchOverAborted;
+    trigMatchOverAction();
+  }
+  else if (m_gameWidget->didPlayerWon()) {
+    performMatchScores(kMatchWonScores);
+  }
+  else { // Match has been lost
+    performMatchLostAnimation();
+  }
+}
+
+void SinglePlayerMatch::performMatchLostAnimation()
+{
+  m_matchLostAnimation = new PuyoStoryWidget(m_levelData->getGameLostStory(),
+					    this);
+  m_gameScreen->setOverlayStory(m_matchLostAnimation);
+  m_state = kMatchLostAnimation;
+}
+
+void SinglePlayerMatch::performMatchScores(State scoreState)
+{
+  m_state = scoreState;
+  // Provisoire, cet etat n'existe pas encore
+  stateMachine();
+}
+
+void SinglePlayerMatch::trigMatchOverAction()
+{
+  m_matchOverAction->action(this, 0, NULL);
+}
+
+void SinglePlayerMatch::stateMachine()
+{
+  switch (m_state) {
+  case kNotRunning:
+    if ((m_levelData->getIntroStory() != "")
+        && (!m_skipIntroduction))
+      performStoryIntroduction();
     else
-        gameOverStory = "gamewon_highscores_1p.gsl";
-    gameOverScreen = new PuyoGameOver1PScreen(gameOverStory, *(GameUIDefaults::SCREEN_STACK->top()), this, gameWidget->getPlayerOneName(), gameWidget->getStatPlayerOne());
-    GameUIDefaults::SCREEN_STACK->pop();
-    GameUIDefaults::SCREEN_STACK->push(gameOverScreen);
+      performOpponentStory();
+    break;
+  case kStoryIntroduction:
+    performOpponentStory();
+    break;
+  case kStory:
+    performMatchPlaying();
+    break;
+  case kMatchPlaying:
+    performEndOfMatch();
+    break;
+  case kMatchLostAnimation:
+    performMatchScores(kMatchLostScores);
+    break;
+  case kMatchWonScores:
+    m_state = kMatchOverWon;
+    trigMatchOverAction();
+    break;
+  case kMatchLostScores:
+    m_state = kMatchOverLost;
+    trigMatchOverAction();
+    break;
+  default:
+    break;
+  }
 }
-
-void SinglePlayerStarterAction::gameWon()
-{
-    gameWonScreen = new PuyoStoryScreen("gamewon_1p.gsl", *(GameUIDefaults::SCREEN_STACK->top()), this);
-    GameUIDefaults::SCREEN_STACK->pop();
-    GameUIDefaults::SCREEN_STACK->push(gameWonScreen);
-}
-
-void SinglePlayerStarterAction::gameLost()
-{
-    gameLostWidget = new PuyoStoryWidget(levelData->getGameLostStory(),
-					 this);
-    gameScreen->setOverlayStory(gameLostWidget);
-}
-
-void SinglePlayerStarterAction::endGameSession()
-{
-    // Restore initial values to the reused action
-    lifes = 3;
-    currentLevel = 0;
-    resetGameSession();
-}
-    
-void SinglePlayerStarterAction::resetGameSession()
-{
-    // Rewind screen stack
-    Screen *screenToTrans = GameUIDefaults::SCREEN_STACK->top();
-    GameUIDefaults::SCREEN_STACK->pop();
-    (static_cast<PuyoMainScreen *>(GameUIDefaults::SCREEN_STACK->top()))->transitionFromScreen(*screenToTrans);
-    delete gameWidget;
-    delete gameScreen;
-    delete levelData;
-    if (gameLostWidget != NULL)
-        delete gameLostWidget;
-    if (gameOverScreen != NULL)
-        delete gameOverScreen;
-    if (gameWonScreen != NULL)
-        delete gameWonScreen;
-
-    gameScreen = NULL;
-    gameWidget = NULL;
-    levelData = NULL;
-    gameLostWidget = NULL;
-    gameOverScreen = NULL;
-    gameWonScreen = NULL;
-}
-

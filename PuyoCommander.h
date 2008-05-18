@@ -117,6 +117,7 @@ class PuyoCommander : public MessageListener, NotificationResponder
     const FramePicture *getEditFieldFramePicture() const { return &m_textFieldIdleFramePicture; }
     const FramePicture *getEditFieldOverFramePicture() const { return &m_textFieldIdleFramePicture; }
     const FramePicture *getSeparatorFramePicture() const { return &m_separatorFramePicture; }
+    const FramePicture *getListFramePicture() const { return &m_listFramePicture; }
     IIM_Surface * getSwitchOnPicture() { return m_switchOnImage; }
     IIM_Surface * getSwitchOffPicture() { return m_switchOffImage; }
   private:
@@ -149,11 +150,13 @@ class PuyoCommander : public MessageListener, NotificationResponder
     IIM_Surface   *m_frameImage, *m_buttonIdleImage, *m_buttonDownImage, *m_buttonOverImage;
     IIM_Surface   *m_textFieldIdleImage;
     IIM_Surface   *m_separatorImage;
+    IIM_Surface   *m_listIdleImage;
     IIM_Surface   *m_switchOnImage, *m_switchOffImage;
     FramePicture m_windowFramePicture;
     FramePicture m_buttonIdleFramePicture, m_buttonDownFramePicture, m_buttonOverFramePicture;
     FramePicture m_textFieldIdleFramePicture;
     FramePicture m_separatorFramePicture;
+    FramePicture m_listFramePicture;
 };
 
 extern class PuyoCommander *theCommander;

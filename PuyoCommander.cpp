@@ -281,7 +281,8 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
     m_buttonDownFramePicture(13, 10, 13, 12, 7, 13),
     m_buttonOverFramePicture(13, 10, 13, 12, 7, 13),
     m_textFieldIdleFramePicture(5, 23, 4, 6, 10, 3),
-    m_separatorFramePicture(63, 2, 63, 2, 4, 2)
+    m_separatorFramePicture(63, 2, 63, 2, 4, 2),
+    m_listFramePicture(13, 6, 13, 13, 6, 13)
 {
   //SDL_Delay(500);
   loop = GameUIDefaults::GAME_LOOP;
@@ -309,12 +310,14 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
     m_buttonOverImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/buttonover.png"));
     m_textFieldIdleImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/editfield.png"));
     m_separatorImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/separator.png"));
+    m_listIdleImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/listborder.png"));
     m_windowFramePicture.setFrameSurface(m_frameImage);
     m_buttonIdleFramePicture.setFrameSurface(m_buttonIdleImage);
     m_buttonDownFramePicture.setFrameSurface(m_buttonDownImage);
     m_buttonOverFramePicture.setFrameSurface(m_buttonOverImage);
     m_textFieldIdleFramePicture.setFrameSurface(m_textFieldIdleImage);
     m_separatorFramePicture.setFrameSurface(m_separatorImage);
+    m_listFramePicture.setFrameSurface(m_listIdleImage);
 
   initMenus();
   cursor = new GameCursor(dataPathManager.getPath("gfx/cursor.png"));

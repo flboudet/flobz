@@ -114,7 +114,7 @@ String NetCenterPlayerList::PlayerEntry::getStatusString(int status)
 }
 
 NetCenterPlayerList::NetCenterPlayerList(int size, NetCenterMenu *targetMenu, IIM_Surface *upArrow, IIM_Surface *downArrow, GameLoop *loop)
-    : ListView(size, upArrow, downArrow, theCommander->getEditFieldFramePicture(), loop),
+    : ListView(size, upArrow, downArrow, theCommander->getListFramePicture(), loop),
       targetMenu(targetMenu)
 {}
 

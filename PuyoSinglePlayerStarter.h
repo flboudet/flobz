@@ -118,6 +118,7 @@ public:
     String getIAName() const;
     String getIAFace() const;
     int getNColors() const;
+    GameOptions getGameOptions() const;
 private:
     int gameLevel, difficulty;
     PuyoLevelDefinitions::LevelDefinition *levelDefinition;
@@ -139,6 +140,8 @@ private:
     PlayerGameStat playerStat;
 };
 
+class SinglePlayerMatch;
+
 /**
  * State machine managing a single player game session
  */
@@ -152,33 +155,94 @@ public:
     virtual void action(Widget *sender, int actionType,
 			GameControlEvent *event);
 private:
-    void initiateLevel();
-    
-    void startGame();
-    
-    void nextLevel();
+    void stateMachine();
+    void performMatchPlaying(bool skipIntroduction = false,
+			     bool popScreen = false);
+    void performEndOfMatch();
+    void performHiScoreScreen(String gameOverStoryName);
+    void performBackToMenu();
+    void performGameWon();
 
-    void gameLost();
-    
-    void gameOver();
-    
-    void gameWon();
-    
-    void resetGameSession();
-    
-    void endGameSession();
-    
-    int currentLevel, lifes, difficulty;
-    PuyoSingleGameLevelData *levelData;
-    PuyoStoryScreen *story;
-    PuyoGameScreen *gameScreen;
-    PuyoSinglePlayerGameWidget *gameWidget;
-    PuyoStoryWidget *gameLostWidget;
-    PuyoGameOver1PScreen *gameOverScreen;
-    PuyoStoryScreen *gameWonScreen;
-    PuyoSingleNameProvider *nameProvider;
-    PuyoLevelDefinitions levelDefinitions;
-    bool inIntroduction;
+    enum State {
+      kGameNotStarted,
+      kMatchPlaying,
+      kGameWon,
+      kGameOver,
+      kHiScoreScreen
+    };
+    State m_state;
+    PuyoSingleNameProvider *m_nameProvider;
+    int m_currentLevel, m_lifes, m_difficulty;
+    SinglePlayerMatch *m_currentMatch;
+    PuyoGameOver1PScreen *m_hiScoreScreen;
+    PuyoStoryScreen *m_gameWonScreen;
+    PuyoLevelDefinitions m_levelDefinitions;
+};
+
+/**
+ * State machine managing a single player match against an opponent
+ */
+class SinglePlayerMatch : public Action, public Widget {
+public:
+    SinglePlayerMatch(Action *gameOverAction,
+		      PuyoSingleGameLevelData *levelData,
+		      bool skipIntroduction = false,
+                      bool popScreen = false,
+		      PuyoSingleNameProvider *nameProvider = NULL,
+		      int remainingLifes = 0);
+    virtual ~SinglePlayerMatch();
+    void run();
+    /**
+     * Implements the Action interface
+     */
+    virtual void action(Widget *sender, int actionType,
+			GameControlEvent *event);
+    enum State {
+      kNotRunning,
+      kStoryIntroduction,
+      kStory,
+      kMatchPlaying,
+      kMatchLostAnimation,
+      kMatchWonScores,
+      kMatchLostScores,
+      kMatchOverWon,
+      kMatchOverLost,
+      kMatchOverAborted
+    };
+    /**
+     * Returns the current state of the match
+     */
+    State getState() const { return m_state; }
+    /**
+     * Returns the game over story name of the opponent
+     */
+    String getGameOverStoryName() const
+      { return m_levelData->getGameOverStory(); }
+private:
+    void performStoryIntroduction();
+    void performOpponentStory();
+    void performMatchPlaying();
+    void performEndOfMatch();
+    void performMatchLostAnimation();
+    void performMatchScores(State scoreState);
+    void trigMatchOverAction();
+    /**
+     * Performs a step in the match state machine
+     */
+    void stateMachine();
+    State m_state;
+    Action *m_matchOverAction;
+    PuyoSingleGameLevelData *m_levelData;
+    bool m_skipIntroduction;
+    bool m_popScreen;
+    PuyoSingleNameProvider *m_nameProvider;
+    int m_remainingLifes;
+    PuyoStoryScreen *m_introStory, *m_opponentStory;
+    PuyoGameScreen *m_gameScreen;
+    PuyoSinglePlayerGameWidget *m_gameWidget;
+    PuyoStoryWidget *m_matchLostAnimation;
 };
 
 #endif // _PUYOSINGLEPLAYERSTARTER
+
+

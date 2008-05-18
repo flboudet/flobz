@@ -96,6 +96,7 @@ public:
      * @param visible  true if the scren is visible, otherwise false
      */
     virtual void onScreenVisibleChanged(bool visible);
+    const PuyoStoryWidget * getStoryWidget() const { return &storyWidget; }
 protected:
     PuyoStoryWidget storyWidget;
     PuyoScreenTransitionWidget *transitionWidget;
