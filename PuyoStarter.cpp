@@ -144,6 +144,7 @@ void PuyoGameScreen::setResumed(bool fromControls)
         this->focus(&gameWidget);
         gameWidget.resume();
         theCommander->setCursorVisible(false);
+	gameWidget.setScreenToResumed(fromControls);
     }
 }
 

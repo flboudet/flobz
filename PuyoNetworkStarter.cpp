@@ -96,7 +96,6 @@ void PuyoNetworkGameWidget::onMessage(Message &message)
     if (!message.hasInt(PuyoMessage::TYPE))
         return;
     lastMessageDate = ios_fc::getTimeMs();
-    printf("Message at date %f\n", lastMessageDate);
     int msgType = message.getInt(PuyoMessage::TYPE);
     switch (msgType) {
         case PuyoMessage::kGameStart:
