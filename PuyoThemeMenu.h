@@ -70,15 +70,17 @@ class PuyoThemePreview : public VBox {
         Text description;
 };
 
-class PuyoThemeSelectionBox : public HScrollList {
+class PuyoThemeSelectionBox : public HBox, public Action {
 public:
-    PuyoThemeSelectionBox(PuyoThemePreview &themePreview);
+    PuyoThemeSelectionBox();
     virtual ~PuyoThemeSelectionBox();
     void build();
+    void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
-    PuyoThemePreview &themePreview;
-    AdvancedBuffer<Button *> buttonList;
-    AdvancedBuffer<Action *> actionList;
+    PuyoThemePreview themePreview;
+    IIM_Surface *leftArrow, *rightArrow;
+    Image *prevButton, *nextButton;
+    ZBox Spacer1, Spacer2;
 };
 
 class PuyoThemeMenu : public PuyoMainScreenMenu {
@@ -91,7 +93,6 @@ private:
     VBox buttonsBox;
     PuyoPopMenuAction popAction;
     Button backButton;
-    PuyoThemePreview themePreview;
     PuyoThemeSelectionBox themeList;
 };
 

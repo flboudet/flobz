@@ -28,60 +28,89 @@
 #include "PuyoStrings.h"
 #include "AnimatedPuyoTheme.h"
 
-class PuyoThemeSelectedAction : public Action {
-public:
-    PuyoThemeSelectedAction(PuyoThemePreview &previewWidget, String themeName);
-    void action();
-private:
-    PuyoThemePreview &previewWidget;
-    String themeName;
-};
-
-PuyoThemeSelectedAction::PuyoThemeSelectedAction(PuyoThemePreview &previewWidget, String themeName)
-    : previewWidget(previewWidget), themeName(themeName)
+PuyoThemeSelectionBox::PuyoThemeSelectionBox()
+    : themePreview(), Spacer1(), Spacer2()
 {
-}
-
-void PuyoThemeSelectedAction::action()
-{
-    previewWidget.themeSelected(themeName);
-    getPuyoThemeManger()->setPreferedAnimatedPuyoSetTheme(themeName);
-}
-
-
-PuyoThemeSelectionBox::PuyoThemeSelectionBox(PuyoThemePreview &themePreview)
-    : themePreview(themePreview)
-{
+    leftArrow = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/leftarrow.png"));
+    rightArrow = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/rightarrow.png"));
+    
+    prevButton = new Image(leftArrow);
+    nextButton = new Image(rightArrow);
+    
+    Spacer1.setPreferedSize(Vec3(10.0f, 0.0f));
+    Spacer2.setPreferedSize(Vec3(10.0f, 0.0f));
+    
+    setPolicy(USE_MAX_SIZE_NO_MARGIN);
 }
 
 PuyoThemeSelectionBox::~PuyoThemeSelectionBox()
 {
-    int size = buttonList.size();
-    for (int i = 0; i < size; i++)
-    {
-        delete buttonList[i];
-        delete actionList[i];
-    }
+    delete prevButton;
+    delete nextButton;
+    IIM_Free(leftArrow);
+    IIM_Free(rightArrow);
 }
 
 void PuyoThemeSelectionBox::build()
 {
+    themePreview.build();
     AdvancedBuffer<const char *> * themes = getPuyoThemeManger()->getAnimatedPuyoSetThemeList();
-    AdvancedBuffer<AnimatedPuyoSetTheme *> * themesObjects = getPuyoThemeManger()->getAnimatedPuyoSetThemeObjectList();
     String pref = getPuyoThemeManger()->getPreferedAnimatedPuyoSetThemeName();
     int size = themes->size();
+    bool found = false;
     for (int i = 0; i < size; i++)
     {
-        Action * a = new PuyoThemeSelectedAction(themePreview, (*themes)[i]);
-        Button * b = new Button((*themesObjects)[i]->getLocalizedName(), a);
-        buttonList.add(b);
-        actionList.add(a);
-        add(b);
         if (pref == (*themes)[i])
         {
-            focus(b);
             themePreview.themeSelected(pref);
+            found = true;
         }
+    }
+    
+    add(&Spacer1);
+    
+    prevButton->setFocusable(size > 1);
+    prevButton->setOnStartAction(this);
+    prevButton->setInvertedFocus(true);
+    add(prevButton);
+    
+    if (found == false && size > 0)
+    {
+        themePreview.themeSelected((*themes)[0]);
+        getPuyoThemeManger()->setPreferedAnimatedPuyoSetTheme((*themes)[0]);
+    }
+    add(&themePreview);
+    
+    nextButton->setFocusable(size > 1);
+    nextButton->setOnStartAction(this);
+    nextButton->setInvertedFocus(true);
+    add(nextButton);
+    
+    add(&Spacer2);
+}
+
+void PuyoThemeSelectionBox::action(Widget *sender, int actionType, GameControlEvent *event)
+{
+    AdvancedBuffer<const char *> * themes = getPuyoThemeManger()->getAnimatedPuyoSetThemeList();
+    String pref = getPuyoThemeManger()->getPreferedAnimatedPuyoSetThemeName();
+    int size = themes->size();
+    if (size <= 0) return;
+    
+    int currentTheme;
+    // get the selected theme id or zero if the prefered theme if not there
+    for (currentTheme = size-1; currentTheme > 0; --currentTheme)
+    {
+        if (pref == (*themes)[currentTheme]) break;
+    }
+    if (sender == prevButton) {
+        (currentTheme <= 0) ? currentTheme = size - 1 : currentTheme--;
+        themePreview.themeSelected((*themes)[currentTheme]);
+        getPuyoThemeManger()->setPreferedAnimatedPuyoSetTheme((*themes)[currentTheme]);
+    }
+    else if (sender == nextButton) {
+        currentTheme = (currentTheme+1)%size;
+        themePreview.themeSelected((*themes)[currentTheme]);
+        getPuyoThemeManger()->setPreferedAnimatedPuyoSetTheme((*themes)[currentTheme]);
     }
 }
 
@@ -183,6 +212,7 @@ PuyoThemePreview::~PuyoThemePreview() {}
 
 void PuyoThemePreview::themeSelected(String themeName)
 {
+#define _ComputeVZoneSize(A,B) Vec3(A.x>B.x?A.x:B.x,A.y+B.y+GameUIDefaults::SPACING,1.0)
     AnimatedPuyoSetTheme * curTheme = getPuyoThemeManger()->getAnimatedPuyoSetTheme(themeName);
     name.setFont(GameUIDefaults::FONT_TEXT);
     name.setValue(curTheme->getLocalizedName());
@@ -192,10 +222,9 @@ void PuyoThemePreview::themeSelected(String themeName)
     description.setValue(curTheme->getComments());
     picture.themeSelected(curTheme);
     Vec3 marges(0.0,MARGIN,0.0);
-    setPreferedSize(name.getPreferedSize()+marges
-        +author.getPreferedSize()+marges
-        +description.getPreferedSize()+marges
-        +picture.getPreferedSize());
+    Vec3 one=_ComputeVZoneSize(name.getPreferedSize(),author.getPreferedSize());
+    one=_ComputeVZoneSize(one,description.getPreferedSize());
+    setPreferedSize(_ComputeVZoneSize(one,picture.getPreferedSize()));
     if (parent)
       parent->arrangeWidgets();
 }
@@ -208,20 +237,17 @@ PuyoThemeMenu::PuyoThemeMenu(PuyoMainScreen *mainScreen)
       screenTitleFrame(theCommander->getSeparatorFramePicture()),
       themeMenuTitle(theCommander->getLocalizedString("Puyo theme")), popAction(mainScreen),
       backButton(theCommander->getLocalizedString("Back"), &popAction),
-      themePreview(), themeList(themePreview)
+      themeList()
 {
 }
 
 void PuyoThemeMenu::build() {
-    themeList.build();
-    themePreview.build();
-
     setPolicy(USE_MIN_SIZE);
     screenTitleFrame.setPreferedSize(Vec3(0, 20));
     screenTitleFrame.add(&themeMenuTitle);
     add(&screenTitleFrame);
     buttonsBox.add(&themeList);
-    buttonsBox.add(&themePreview);
     buttonsBox.add(&backButton);
     add(&buttonsBox);
+    themeList.build();
 }
