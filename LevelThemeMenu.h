@@ -73,15 +73,17 @@ class LevelThemePreview : public VBox {
         Text description;
 };
 
-class LevelThemeSelectionBox : public HScrollList {
+class LevelThemeSelectionBox : public HBox, public Action {
 public:
-    LevelThemeSelectionBox(LevelThemePreview &themePreview);
+    LevelThemeSelectionBox();
     virtual ~LevelThemeSelectionBox();
     void build();
+    void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
-    LevelThemePreview &themePreview;
-    AdvancedBuffer<Button *> buttonList;
-    AdvancedBuffer<Action *> actionList;
+    LevelThemePreview themePreview;
+    IIM_Surface *leftArrow, *rightArrow;
+    Image *prevButton, *nextButton;
+    ZBox Spacer1, Spacer2;
 };
 
 class LevelThemeMenu : public PuyoMainScreenMenu {
@@ -94,7 +96,6 @@ private:
     VBox buttonsBox;
     PuyoPopMenuAction popAction;
     Button backButton;
-    LevelThemePreview themePreview;
     LevelThemeSelectionBox themeList;
 };
 

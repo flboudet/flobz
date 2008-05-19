@@ -28,63 +28,91 @@
 #include "PuyoStrings.h"
 #include "AnimatedPuyoTheme.h"
 
-class LevelThemeSelectedAction : public Action {
-public:
-    LevelThemeSelectedAction(LevelThemePreview &previewWidget, String themeName);
-    void action();
-private:
-    LevelThemePreview &previewWidget;
-    String themeName;
-};
-
-LevelThemeSelectedAction::LevelThemeSelectedAction(LevelThemePreview &previewWidget, String themeName)
-    : previewWidget(previewWidget), themeName(themeName)
+LevelThemeSelectionBox::LevelThemeSelectionBox()
+    : themePreview(), Spacer1(), Spacer2()
 {
-}
+    leftArrow = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/leftarrow.png"));
+    rightArrow = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/rightarrow.png"));
 
-void LevelThemeSelectedAction::action()
-{
-    getPuyoThemeManger()->setPreferedPuyoLevelTheme(themeName);
-    previewWidget.themeSelected(themeName);
-}
-
-
-LevelThemeSelectionBox::LevelThemeSelectionBox(LevelThemePreview &themePreview)
-    : themePreview(themePreview)
-{
+    prevButton = new Image(leftArrow);
+    nextButton = new Image(rightArrow);
+    
+    Spacer1.setPreferedSize(Vec3(10.0f, 0.0f));
+    Spacer2.setPreferedSize(Vec3(10.0f, 0.0f));
+    
+    setPolicy(USE_MAX_SIZE_NO_MARGIN);
 }
 
 LevelThemeSelectionBox::~LevelThemeSelectionBox()
 {
-    int size = buttonList.size();
-    for (int i = 0; i < size; i++)
-    {
-        delete buttonList[i];
-        delete actionList[i];
-    }
+    delete prevButton;
+    delete nextButton;
+    IIM_Free(leftArrow);
+    IIM_Free(rightArrow);
 }
 
 void LevelThemeSelectionBox::build()
 {
+    themePreview.build();
     AdvancedBuffer<const char *> * themes = getPuyoThemeManger()->getPuyoLevelThemeList();
-    AdvancedBuffer<PuyoLevelTheme *> * themesObjects = getPuyoThemeManger()->getPuyoLevelThemeObjectList();
     String pref = getPuyoThemeManger()->getPreferedPuyoLevelThemeName();
     int size = themes->size();
+    bool found = false;
     for (int i = 0; i < size; i++)
     {
-        Action * a = new LevelThemeSelectedAction(themePreview, (*themes)[i]);
-        Button * b = new Button((*themesObjects)[i]->getLocalizedName(), a);
-        buttonList.add(b);
-        actionList.add(a);
-        add(b);
         if (pref == (*themes)[i])
         {
-            focus(b);
             themePreview.themeSelected(pref);
+            found = true;
         }
     }
+    
+    add(&Spacer1);
+    
+    prevButton->setFocusable(size > 1);
+    prevButton->setOnStartAction(this);
+    prevButton->setInvertedFocus(true);
+    add(prevButton);
+    
+    if (found == false && size > 0)
+    {
+        themePreview.themeSelected((*themes)[0]);
+        getPuyoThemeManger()->setPreferedPuyoLevelTheme((*themes)[0]);
+    }
+    add(&themePreview);
+
+    nextButton->setFocusable(size > 1);
+    nextButton->setOnStartAction(this);
+    nextButton->setInvertedFocus(true);
+    add(nextButton);
+    
+    add(&Spacer2);
 }
 
+void LevelThemeSelectionBox::action(Widget *sender, int actionType, GameControlEvent *event)
+{
+    AdvancedBuffer<const char *> * themes = getPuyoThemeManger()->getPuyoLevelThemeList();
+    String pref = getPuyoThemeManger()->getPreferedPuyoLevelThemeName();
+    int size = themes->size();
+    if (size <= 0) return;
+    
+    int currentTheme;
+    // get the selected theme id or zero if the prefered theme if not there
+    for (currentTheme = size-1; currentTheme > 0; --currentTheme)
+    {
+        if (pref == (*themes)[currentTheme]) break;
+    }
+    if (sender == prevButton) {
+        (currentTheme <= 0) ? currentTheme = size - 1 : currentTheme--;
+        themePreview.themeSelected((*themes)[currentTheme]);
+        getPuyoThemeManger()->setPreferedPuyoLevelTheme((*themes)[currentTheme]);
+    }
+    else if (sender == nextButton) {
+        currentTheme = (currentTheme+1)%size;
+        themePreview.themeSelected((*themes)[currentTheme]);
+        getPuyoThemeManger()->setPreferedPuyoLevelTheme((*themes)[currentTheme]);
+    }
+}
 
 /*****************************************************************************/
 
@@ -242,7 +270,7 @@ LevelThemeMenu::LevelThemeMenu(PuyoMainScreen *mainScreen)
       screenTitleFrame(theCommander->getSeparatorFramePicture()),
       themeMenuTitle(theCommander->getLocalizedString("Level theme")), popAction(mainScreen),
       backButton(theCommander->getLocalizedString("Back"), &popAction), 
-      themePreview(), themeList(themePreview)
+      themeList()
 {
 }
 
@@ -252,9 +280,9 @@ void LevelThemeMenu::build() {
     screenTitleFrame.add(&themeMenuTitle);
     add(&screenTitleFrame);
     buttonsBox.add(&themeList);
-    buttonsBox.add(&themePreview);
     buttonsBox.add(&backButton);
     add(&buttonsBox);
-    themePreview.build();
     themeList.build();
 }
+
+
