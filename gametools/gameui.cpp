@@ -748,7 +748,7 @@ namespace gameui {
 
     SliderContainer::SliderContainer(GameLoop *loop)
         : ZBox(loop), IdleComponent()
-        , slidingTime(.4)
+        , slidingTime(.45)
         , contentWidget(NULL), previousWidget(NULL)
         , slideStartTime(0.0), currentTime(0.0)
         , bg(NULL), sliding(false), slideout(false)
@@ -903,6 +903,8 @@ namespace gameui {
       onSlideOutside(); // Sends notification that we are now outside the screen, before adding the content widget
       sliding = s;
       add(contentWidget);
+      Vec3 pos = Vec3(640, backupedPosition.y);
+      ZBox::setPosition(pos);
       contentWidget->giveFocus();
     }
     
