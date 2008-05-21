@@ -6,7 +6,7 @@
 PLATFORM=
 
 # Support for mac multiple architecture (PowerPC/i386)
-ENABLE_FAT?=false
+ENABLE_FAT?=true
 
 # Select distro
 data-packages="reduced.001"
@@ -92,7 +92,8 @@ endif
 CFLAGS:=$(CFLAGS) -Wall
 
 # Version
-VERSION=$(shell date "+%Y%m%d")
+VERSION=$(shell svn info | grep "Revision: " | cut -f2 -d' ')
+#VERSION=$(shell date "+%Y%m%d")
 CFLAGS:=$(CFLAGS) -DFLOBOPUYOVERSION=$(VERSION)
 
 # Benchmark
@@ -192,7 +193,7 @@ endif
 # CFLAGS
 
 # Base
-CFLAGS:=$(CFLAGS) -I$(ROOT_DIR) -I$(ROOT_DIR)/${GAMETOOLS_DIR} -I$(ROOT_DIR)/${IOSFC_DIR} -I$(ROOT_DIR)/${GOOMSL_DIR}
+CFLAGS:=$(CFLAGS) -pipe -I$(ROOT_DIR) -I$(ROOT_DIR)/${GAMETOOLS_DIR} -I$(ROOT_DIR)/${IOSFC_DIR} -I$(ROOT_DIR)/${GOOMSL_DIR}
 
 # Platform specific
 ifeq ($(PLATFORM), $(CYGWIN_VERSION))
@@ -204,7 +205,7 @@ ifeq ($(PLATFORM), crossmingw32)
 endif
 
 ifeq ($(PLATFORM), Darwin)
-	CFLAGS:=$(CFLAGS) -DMACOSX -pipe -mmacosx-version-min=10.2
+	CFLAGS:=$(CFLAGS) -DMACOSX -mmacosx-version-min=10.2
 else
 	CFLAGS:=$(CFLAGS) -DDATADIR=\"${DATADIR}\"
 endif
