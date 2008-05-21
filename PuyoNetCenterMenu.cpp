@@ -211,7 +211,9 @@ NetCenterMenu::NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netC
 
 NetCenterMenu::~NetCenterMenu()
 {
+#ifdef DEBUG
     printf("Deleting the net center\n");
+#endif
     // Delete the network center because no one else would do it
     delete netCenter;
     IIM_Free(upArrow);
@@ -262,7 +264,9 @@ void NetCenterMenu::sendChat(String chatText)
 
 void NetCenterMenu::onChatMessage(const String &msgAuthor, const String &msg)
 {
+#ifdef DEBUG
     printf("%s:%s\n", (const char *)msgAuthor, (const char *)msg);
+#endif
     chatBox.addChat(msgAuthor, msg);
 }
 
@@ -312,14 +316,18 @@ void NetCenterMenu::eventOccured(GameControlEvent *event)
 
 void NetCenterMenu::onWidgetVisibleChanged(bool visible)
 {
+#ifdef DEBUG
     printf("netcentermenu visible: %s\n", visible ? "true" : "false");
+#endif
     if (visible)
         netCenter->setStatus(PEER_NORMAL);
 }
 
 void NetCenterMenu::onWidgetRemoved(WidgetContainer *parent)
 {
-     printf("netcentermenu removed");
+#ifdef DEBUG
+     printf("netcentermenu removed\n");
+#endif
     delete this;
 }
 

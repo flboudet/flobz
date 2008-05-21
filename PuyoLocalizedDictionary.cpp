@@ -237,7 +237,9 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
                 }
             }
             fclose(dictionaryFile);
+#ifdef DEBUG
             fprintf(stdout,"Found dictionary %s\n",(const char *)datapathManager.getPath(dictFilePath));
+#endif
             found = true;
         }
     }

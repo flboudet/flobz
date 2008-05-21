@@ -64,9 +64,13 @@ PuyoDataPathManager::PuyoDataPathManager(String coreDataPath) : m_coreDataPath(c
 
 String PuyoDataPathManager::getPath(String shortPath) const
 {
+#ifdef FLOBOPUYODEBUG
     printf("Recherche de %s\n", (const char *)shortPath);
+#endif
     for (int i = 0 ; i < m_dataPaths.size() ; i++) {
+#ifdef FLOBOPUYODEBUG
         printf("Dans %s\n", (const char *)(m_dataPaths[i].getPathString()));
+#endif
         FilePath testPath(m_dataPaths[i].combine(shortPath));
         if (testPath.exists())
             return testPath.getPathString();

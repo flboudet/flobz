@@ -960,7 +960,9 @@ AnimatedPuyoThemeManager::AnimatedPuyoThemeManager(bool useAltLocation)
     
     // Load the themes from the list
     for (int i = 0 ; i < themeFolders.size() ; i++) {
+#ifdef DEBUG
         printf("Loading theme %s\n", (const char *)themeFolders[i]);
+#endif
         loadTheme(themeFolders[i]);
     }
 }
