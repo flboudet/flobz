@@ -94,10 +94,10 @@
 [end_level]
 
 [start_level]
-    level.levelName           = "MechaPuyo"
+    level.levelName           = "FrankenPuyo"
     level.opponentStory       = "story9.gsl"
-    level.opponentName        = "MechaPuyo"
-    level.opponentAI          = "mechapuyo.gsl"
+    level.opponentName        = "FrankenPuyo"
+    level.opponentAI          = "frankenpuyo.gsl"
     level.backgroundTheme     = "Blue Plastic"
     level.easySetting.level   = 20
     level.mediumSetting.level = 10
