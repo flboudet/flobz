@@ -83,7 +83,7 @@ private:
     LevelThemePreview themePreview;
     IIM_Surface *leftArrow, *rightArrow;
     Image *prevButton, *nextButton;
-    ZBox Spacer1, Spacer2;
+    ZBox Spacer0, Spacer1, Spacer2, Spacer3;
 };
 
 class LevelThemeMenu : public PuyoMainScreenMenu {

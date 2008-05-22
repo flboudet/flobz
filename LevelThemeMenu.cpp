@@ -29,7 +29,7 @@
 #include "AnimatedPuyoTheme.h"
 
 LevelThemeSelectionBox::LevelThemeSelectionBox()
-    : themePreview(), Spacer1(), Spacer2()
+    : themePreview(), Spacer0(), Spacer1(), Spacer2(), Spacer3()
 {
     leftArrow = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/leftarrow.png"));
     rightArrow = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/rightarrow.png"));
@@ -37,8 +37,10 @@ LevelThemeSelectionBox::LevelThemeSelectionBox()
     prevButton = new Image(leftArrow);
     nextButton = new Image(rightArrow);
     
-    Spacer1.setPreferedSize(Vec3(10.0f, 0.0f));
-    Spacer2.setPreferedSize(Vec3(10.0f, 0.0f));
+    Spacer0.setPreferedSize(Vec3(15.0f, 0.0f));
+    Spacer1.setPreferedSize(Vec3(0.0f, 0.0f));
+    Spacer2.setPreferedSize(Vec3(0.0f, 0.0f));
+    Spacer3.setPreferedSize(Vec3(15.0f, 0.0f));
     
     setPolicy(USE_MAX_SIZE_NO_MARGIN);
 }
@@ -67,26 +69,28 @@ void LevelThemeSelectionBox::build()
         }
     }
     
-    add(&Spacer1);
+    add(&Spacer0);
     
     prevButton->setFocusable(size > 1);
     prevButton->setOnStartAction(this);
     prevButton->setInvertedFocus(true);
     add(prevButton);
     
+    add(&Spacer1);
     if (found == false && size > 0)
     {
         themePreview.themeSelected((*themes)[0]);
         getPuyoThemeManger()->setPreferedPuyoLevelTheme((*themes)[0]);
     }
     add(&themePreview);
+    add(&Spacer2);
 
     nextButton->setFocusable(size > 1);
     nextButton->setOnStartAction(this);
     nextButton->setInvertedFocus(true);
     add(nextButton);
     
-    add(&Spacer2);
+    add(&Spacer3);
 }
 
 void LevelThemeSelectionBox::action(Widget *sender, int actionType, GameControlEvent *event)
