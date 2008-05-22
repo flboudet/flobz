@@ -8,15 +8,15 @@ import <libface.gsl>
 # This is called once at level start
 <init>
     # Init a default AI
-    # megapuyo is a big constructor
+    # frankenpuyo is a big constructor
     AI_Gyom
     
     # Override some of its settings:
-    # megapuyo is quite clever au rotates the best way he can
+    # frankenpuyo is quite clever au rotates the best way he can
     @AI_RotationMethod = 0
     
-    # Init the sprite for the face lib with megapuyo
-    [face_init: name="introlevel/megapuyo-mini.png"]
+    # Init the sprite for the face lib with frankenpuyo
+    [face_init: name="introlevel/frankenpuyo-mini.png"]
 
 
 # This allows you to specify which sprite to draw and the drawing order
