@@ -281,6 +281,31 @@ inline void columnCompress(const unsigned int x, GridState * const grid)
   (*grid)[x][HEIGHTS_ROW] = height;
 }
 
+static int fallingTable[PUYODIMX] = {0, 3, 1, 4, 2, 5};
+
+void dropNeutrals(int number, int totalFromStart, GridState * const grid, GridState * const src)
+{
+    copyGrid(grid, src);
+    while (number > 0)
+    {
+        int cycleNeutral;
+        if (number >= IA_PUYODIMX)
+            cycleNeutral = IA_PUYODIMX;
+        else
+            cycleNeutral = number;
+        for (int i = 0 ; i < cycleNeutral ; i++)
+        {
+            int posX = fallingTable[(totalFromStart++) % IA_PUYODIMX];
+            int posY = (*grid)[posX][HEIGHTS_ROW];
+            number--;
+            if (((*grid)[posX][posY] = PUYO_EMPTY) || (posY >= IA_PUYODIMY))
+                continue;
+            // Creating a new neutral puyo
+            (*grid)[posX][posY] = PUYO_NEUTRAL;
+            (*grid)[posX][HEIGHTS_ROW]++;
+        }
+    }    
+}
 
 bool dropPuyos(const PuyoBinom binom, GridState * const grid)
 {
@@ -507,6 +532,9 @@ PuyoIA::PuyoIA(int level, PuyoView &targetView)
 {
   internalGrid = NULL;
   decisionMade = 0;
+  shouldRedecide = false;
+  lastNumberOfBadPuyos = 0;
+  totalNumberOfBadPuyos = 0;
   attachedGame = targetView.getAttachedGame();
   objective = nullBinom;
   lastLineSeen = PUYODIMY+1;
@@ -617,7 +645,7 @@ void PuyoIA::extractGrid(void)
   }
 }
 
-bool canReach(const PuyoBinom binom, const PuyoBinom dest, GridState * const internalGrid)
+bool canReach(const PuyoBinom binom, const PuyoBinom dest, GridState * const internalGrid, int duration)
 {
   int minBinomY = binom.position.y;
   int minBinomX = binom.position.x;
@@ -637,8 +665,8 @@ bool canReach(const PuyoBinom binom, const PuyoBinom dest, GridState * const int
       break;
   }
  
-  if (minBinomY > 0) minBinomY--;
-  if (minBinomY >= IA_PUYODIMY) return true;
+    minBinomY = ((minBinomY-duration) >= 0) ? minBinomY-duration : 0;
+  //if (minBinomY >= IA_PUYODIMY) return true;
   
   int minDestX = dest.position.x;
   int maxDestX = dest.position.x;
@@ -707,7 +735,7 @@ void PuyoIA::decide(int partial, int depth)
         GridState state1;
         
         // drop the binom (including destroying eligible groups) and continue if game not lost
-        if (canReach(originalPuyo, current, internalGrid) && dropBinom(current, internalGrid, &state1, &evaluation1))
+        if (canReach(originalPuyo, current, internalGrid, 1) && dropBinom(current, internalGrid, &state1, &evaluation1))
         {
           evalWith(&state1, &nullEvaluation, &evaluation1);
           
@@ -734,7 +762,7 @@ void PuyoIA::decide(int partial, int depth)
         GridState state1;
         
         // drop the binom (including destroying eligible groups) and continue if game not lost
-        if (canReach(originalPuyo, current, internalGrid) && dropBinom(current, internalGrid, &state1, &evaluation1))
+        if (canReach(originalPuyo, current, internalGrid, 1) && dropBinom(current, internalGrid, &state1, &evaluation1))
         {
           for (unsigned int l2 = 1; l2 <= MAXCOMBINATION; l2++)
           {
@@ -744,10 +772,13 @@ void PuyoIA::decide(int partial, int depth)
             // copy evaluation
             GridEvaluation evaluation2 = evaluation1;
             
+            GridState state1bis;
             GridState state2;
             
+            dropNeutrals(lastNumberOfBadPuyos-evaluation1.puyoSuppressed, totalNumberOfBadPuyos, &state1bis, &state1);  
+            
             // drop the binom (including destroying eligible groups) and eval board if game not lost
-            if (canReach(originalPuyo, next, &state1) && dropBinom(next, &state1, &state2, &evaluation2))
+            if (canReach(originalPuyo, next, &state1bis, 1) && dropBinom(next, &state1bis, &state2, &evaluation2))
             {
               evalWith(&state2, &evaluation1, &evaluation2);
               
@@ -787,8 +818,10 @@ void PuyoIA::cycle()
   
   int currentLine = attachedGame->getFallingY();
   int currentColumn = attachedGame->getFallingX();
-  
-  // If we start with new puyos
+  int currentNumberOfBadPuyos = attachedGame->getNeutralPuyos();
+  int currentTotalNumberOfBadPuyos = attachedGame->getGameTotalNeutralPuyos();
+    
+  // If we start with new puyos or restart because new bad Puyos came
   if (attachedGame->isPhaseReady())
   {
     //fprintf(stderr, "Thinking\n");
@@ -796,7 +829,27 @@ void PuyoIA::cycle()
     currentCycle = 0;
     // Save we did make any decision yet
     decisionMade = 0;
+    // Should not decide again if we didn't decide yet !
+    shouldRedecide = false;
+    lastNumberOfBadPuyos = currentNumberOfBadPuyos;
+    totalNumberOfBadPuyos = currentTotalNumberOfBadPuyos;
+  } else {
+      // If we did not start, test if we should restart because new bad puyos arrived
+      if (currentNumberOfBadPuyos != lastNumberOfBadPuyos) {
+          //fprintf(stderr, "RE-Thinking\n");
+          // Reset the cycle counter
+          currentCycle = 0;
+          // Save we did make any decision yet
+          decisionMade = 0;
+          // Should not decide again if we didn't decide yet !
+          shouldRedecide = true;
+          lastNumberOfBadPuyos = currentNumberOfBadPuyos;
+          totalNumberOfBadPuyos = currentTotalNumberOfBadPuyos;
+      }
   }
+
+
+
   
   // increment the cycle counter
   currentCycle++;
@@ -805,7 +858,7 @@ void PuyoIA::cycle()
   if (decisionMade < DISPATCHCYCLES)
   {
     // if so update the internal grid the first time
-    if (decisionMade == 0) extractGrid();
+    if (decisionMade == 0 && !shouldRedecide) extractGrid();
 
     // then start to think
     decide(decisionMade, params.thinkDepth);
@@ -815,6 +868,10 @@ void PuyoIA::cycle()
     
     // don't drop yet!!
     readyToDrop = false;
+    
+    // Do not move until we are sure
+    //if (decisionMade < DISPATCHCYCLES) return;
+      //if (decisionMade == DISPATCHCYCLES) fprintf(stderr, "Thought\n");
   }
 
   // Now move to the position we decided :
@@ -878,7 +935,10 @@ void PuyoIA::cycle()
     }
 
     // if need to move but impossible, decide again
-    if (couldntMove || couldntRotate) decisionMade = 0;
+      if (couldntMove) {
+          decisionMade = 0;
+          //fprintf(stderr, "ReThink because couldn't move\n");;
+      }
   }
   lastLineSeen = currentLine;
 }

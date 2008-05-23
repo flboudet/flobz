@@ -188,6 +188,7 @@ public:
     
     virtual void increaseNeutralPuyos(int incr) = 0;
     virtual int  getNeutralPuyos() const = 0;
+    virtual int  getGameTotalNeutralPuyos() const { return 0; }
     virtual void dropNeutrals() = 0;
     virtual bool isGameRunning() const = 0;
     virtual bool isEndOfCycle() const = 0;
@@ -242,6 +243,7 @@ public:
     
     void increaseNeutralPuyos(int incr);
     int getNeutralPuyos() const;
+    int getGameTotalNeutralPuyos() const;
     void dropNeutrals();
     bool isGameRunning() const { return gameRunning; }
     bool isEndOfCycle() const { return endOfCycle; }

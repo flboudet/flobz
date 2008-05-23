@@ -39,7 +39,7 @@ import <libface.gsl>
   # to avoid being trapped with too much construction
   @AI_ThinkDepth = 2
   @AI_PotentialSuppression = 4
-  (@maxHeightAI > 12) ? @AI_ThinkDepth = 1
+  (@maxHeightAI > 9) ? @AI_ThinkDepth = 1
   (@maxHeightAI > 8) ? @AI_PotentialSuppression = 2
   (@maxHeightAI > 9) ? @AI_PotentialSuppression = 1
   (@maxHeightAI > 10) ? @AI_PotentialSuppression = 0

@@ -90,6 +90,9 @@ class PuyoIA : public virtual PuyoPlayer {
 
     GridState * internalGrid;
     int decisionMade;
+    bool shouldRedecide;
+    int lastNumberOfBadPuyos;
+    int totalNumberOfBadPuyos;
     PuyoBinom objective;
     int lastLineSeen;
     int currentCycle;

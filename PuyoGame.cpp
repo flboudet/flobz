@@ -377,6 +377,11 @@ void PuyoLocalGame::setPuyoAt(int X, int Y, PuyoPuyo *newPuyo)
         newPuyo->setPuyoXY(X, Y);
 }
 
+int PuyoLocalGame::getGameTotalNeutralPuyos() const
+{
+    return nbFalled;
+}
+
 void PuyoLocalGame::dropNeutrals()
 {
     if (neutralPuyos < 0) {
@@ -387,7 +392,7 @@ void PuyoLocalGame::dropNeutrals()
     while (neutralPuyos > 0)
     {
       int cycleNeutral;
-      if (neutralPuyos >=  PUYODIMX)
+      if (neutralPuyos >= PUYODIMX)
         cycleNeutral = PUYODIMX;
       else
         cycleNeutral = neutralPuyos;

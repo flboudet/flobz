@@ -5,10 +5,10 @@
     level.opponentName        = "Herbert the Dog"
     level.opponentAI          = "herbert.gsl"
     level.backgroundTheme     = "Blue Plastic"
-    level.easySetting.level   = 60
+    level.easySetting.level   = 58
     level.easySetting.nColors = 3
     level.mediumSetting.level = 30
-    level.hardSetting.level   = 17
+    level.hardSetting.level   = 12
 [end_level]
 
 # Level 2: Duke Beary
@@ -18,10 +18,10 @@
     level.opponentAI          = "dukebeary.gsl"
     level.opponentName        = "Duke Beary"
     level.backgroundTheme     = "Blue Plastic"
-    level.easySetting.level   = 55
+    level.easySetting.level   = 50
     level.easySetting.nColors = 3
-    level.mediumSetting.level = 27
-    level.hardSetting.level   = 15
+    level.mediumSetting.level = 26
+    level.hardSetting.level   = 10
 [end_level]
 
 # Level 3: Orloff the Vampire
@@ -31,10 +31,10 @@
     level.opponentName        = "Orloff"
     level.opponentAI          = "orloff.gsl"
     level.backgroundTheme     = "Blue Plastic"
-    level.easySetting.level   = 50
+    level.easySetting.level   = 42
     level.easySetting.nColors = 4
-    level.mediumSetting.level = 24
-    level.hardSetting.level   = 13
+    level.mediumSetting.level = 22
+    level.hardSetting.level   = 8
 [end_level]
 
 [start_level]
@@ -43,10 +43,10 @@
     level.opponentName        = "Azrael"
     level.opponentAI          = "azrael.gsl"
     level.backgroundTheme     = "Blue Plastic"
-    level.easySetting.level   = 45
+    level.easySetting.level   = 34
     level.easySetting.nColors = 4
-    level.mediumSetting.level = 21
-    level.hardSetting.level   = 11
+    level.mediumSetting.level = 18
+    level.hardSetting.level   = 6
 [end_level]
 
 [start_level]
@@ -55,9 +55,9 @@
     level.opponentName        = "Unmapped Monster V2"
     level.opponentAI          = "monk.gsl"
     level.backgroundTheme     = "Blue Plastic"
-    level.easySetting.level   = 40
-    level.mediumSetting.level = 18
-    level.hardSetting.level   = 9
+    level.easySetting.level   = 30
+    level.mediumSetting.level = 16
+    level.hardSetting.level   = 5
 [end_level]
 
 [start_level]
@@ -66,20 +66,20 @@
     level.opponentName        = "Zklogh"
     level.opponentAI          = "zklogh.gsl"
     level.backgroundTheme     = "Blue Plastic"
-    level.easySetting.level   = 35
-    level.mediumSetting.level = 19
-    level.hardSetting.level   = 7
+    level.easySetting.level   = 26
+    level.mediumSetting.level = 14
+    level.hardSetting.level   = 4
 [end_level]
 
 [start_level]
     level.levelName           = "The Beauty and the Beast"
     level.opponentStory       = "story7.gsl"
-    level.opponentName        = "MegaPuyo"
-    level.opponentAI          = "megapuyo.gsl"
+    level.opponentName        = "FrankenPuyo"
+    level.opponentAI          = "frankenpuyo.gsl"
     level.backgroundTheme     = "Blue Plastic"
-    level.easySetting.level   = 30
-    level.mediumSetting.level = 16
-    level.hardSetting.level   = 5
+    level.easySetting.level   = 22
+    level.mediumSetting.level = 12
+    level.hardSetting.level   = 3
 [end_level]
 
 [start_level]
@@ -88,19 +88,19 @@
     level.opponentName        = "Adam McFlurry"
     level.opponentAI          = "mcflurry.gsl"
     level.backgroundTheme     = "Blue Plastic"
-    level.easySetting.level   = 25
-    level.mediumSetting.level = 13
-    level.hardSetting.level   = 3
+    level.easySetting.level   = 18
+    level.mediumSetting.level = 10
+    level.hardSetting.level   = 2
 [end_level]
 
 [start_level]
-    level.levelName           = "FrankenPuyo"
+    level.levelName           = "MechaPuyo"
     level.opponentStory       = "story9.gsl"
-    level.opponentName        = "FrankenPuyo"
-    level.opponentAI          = "frankenpuyo.gsl"
+    level.opponentName        = "MechaPuyo"
+    level.opponentAI          = "mechapuyo.gsl"
     level.backgroundTheme     = "Blue Plastic"
-    level.easySetting.level   = 20
-    level.mediumSetting.level = 10
+    level.easySetting.level   = 14
+    level.mediumSetting.level = 8
     level.hardSetting.level   = 1
 [end_level]
 
