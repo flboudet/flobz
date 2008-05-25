@@ -342,6 +342,10 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
         SoFont_CenteredString_XY (font, screen, 510, 460, playerTwoName, NULL);
     }
     */
+    // Rendering the player names
+    SoFont *font = (paused ? GameUIDefaults::FONT_INACTIVE : GameUIDefaults::FONT_TEXT);
+    SoFont_CenteredString_XY (font, screen, 130, 460, playerOneName, NULL);
+    SoFont_CenteredString_XY (font, screen, 510, 460, playerTwoName, NULL);
 }
 
 void PuyoGameWidget::addSubWidget(Widget *subWidget)

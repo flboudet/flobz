@@ -1,5 +1,6 @@
 #include "PuyoGameAbstract.h"
 #include "PuyoCommander.h"
+#include "gameui.h"
 
 PlayerGameStat::PlayerGameStat(int p)
 {
@@ -28,7 +29,7 @@ void PlayerGameStatDisplay::draw() const
     sprintf(txt, "%d", stat.points);
     // if (player == 0) {
     SDL_Surface *surface = gameui::GameUIDefaults::GAME_LOOP->getSurface();
-    SoFont_CenteredString_XY(theCommander->funnyFont, surface, 300 + player * 40, 360 - player * 40, txt, NULL);
+    SoFont_CenteredString_XY(GameUIDefaults::FONT_FUNNY, surface, 300 + player * 40, 360 - player * 40, txt, NULL);
     // }
 
     if (display_stats) {
@@ -70,7 +71,7 @@ void PlayerGameStatDisplay::draw() const
             }
         }
 
-        SoFont_PutString(theCommander->funnyFont, surface, 20 + player * 410, 40, txt, NULL);
+        SoFont_PutString(GameUIDefaults::FONT_FUNNY, surface, 20 + player * 410, 40, txt, NULL);
     }
 }
 

@@ -89,12 +89,6 @@ class PuyoCommander : public MessageListener, NotificationResponder
     void debug_gsl(String gsl_script);
     void onMessage(Message &message);
 
-    SoFont *smallFont;
-    SoFont *smallFontInfo;
-    SoFont *darkFont;
-    SoFont *menuFont;
-    SoFont *funnyFont;
-
     void notificationOccured(String identifier, void * context);
     
     bool getMusic();

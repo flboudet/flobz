@@ -16,6 +16,7 @@ namespace gameui {
     SoFont      *GameUIDefaults::FONT_INACTIVE    = SoFont_new();
     SoFont      *GameUIDefaults::FONT_SMALL_ACTIVE= SoFont_new();
     SoFont      *GameUIDefaults::FONT_SMALL_INFO  = SoFont_new();
+    SoFont      *GameUIDefaults::FONT_FUNNY       = SoFont_new();
     GameLoop    *GameUIDefaults::GAME_LOOP        = new GameLoop();
     ScreenStack *GameUIDefaults::SCREEN_STACK     = new ScreenStack();
 
