@@ -160,14 +160,16 @@ private:
     Text internetGameText;
     IIM_Surface *upArrow, *downArrow;
     PuyoServerList servers;
-    Frame serverSelectionPanel;
+    VBox serverSelectionPanel;
     ListView serverListPanel;
     Text serverListText;
     FramedButton updating;
-    Frame rightPanel;
+    VBox rightPanel;
     Separator separator1_1, separator1_2, separator1_3,  separator10_1, separator10_2;
     Text nicknameText, serverText, portText;
     HBox hbox, menu;
+    HBox bottomPanel;
+    Separator bottomPanelSeparator, rightPanelSeparator;
     SliderContainer container;
     FramedEditField playerName;
     FramedEditField serverName, serverPort;

@@ -246,17 +246,19 @@ private:
 InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)
   : PuyoMainScreenMenu(mainScreen),
     screenTitleFrame(theCommander->getSeparatorFramePicture()),
-    internetGameText("Internet Game"), 
+    internetGameText(theCommander->getLocalizedString("Internet Game")), 
     upArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png"))),
     downArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png"))),
     servers(this),
-    serverSelectionPanel(theCommander->getWindowFramePicture()),
-    serverListPanel(20, upArrow, downArrow, theCommander->getEditFieldFramePicture()),
-    serverListText("Server List"),
-    updating("Update", this, theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
-    rightPanel(theCommander->getWindowFramePicture()),
-    separator1_1(1,1), separator1_2(1,1), separator1_3(1, 1), separator10_1(10,10), separator10_2(10,10),
-    nicknameText("Nickname"), serverText("Server"), portText("Port"),
+    //serverSelectionPanel(theCommander->getWindowFramePicture()),
+    serverListPanel(20, upArrow, downArrow, theCommander->getListFramePicture()),
+    serverListText(theCommander->getLocalizedString("Server List")),
+    updating(theCommander->getLocalizedString("Update"), this, theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
+    //rightPanel(theCommander->getWindowFramePicture()),
+    separator1_1(1,1), separator1_2(1,1), separator1_3(1, 1), separator10_1(10,10), //separator10_2(10,10),
+    nicknameText(theCommander->getLocalizedString("Nickname"), NULL, false),
+    serverText(theCommander->getLocalizedString("Server"), NULL, false),
+    portText(theCommander->getLocalizedString("Port"), NULL, false),
     container(),
     playerName(PuyoGame::getPlayerName(-2), PuyoGame::getDefaultPlayerKey(-2),
 	       theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
@@ -265,12 +267,12 @@ InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)
     serverPort(kInternetCurrentServerPortDefaultValue,kInternetCurrentServerPortKey,
 	       theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
     backAction(mainScreen),
-    joinButton("Join", this,
+    joinButton(theCommander->getLocalizedString("Join"), this,
 	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
-    backButton("Back", &backAction,
+    backButton(theCommander->getLocalizedString("Back"), &backAction,
 	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture())
 {
-    this->setBorderVisible(false);
+    //this->setBorderVisible(false);
     servers.fetch();
 }
 
@@ -282,38 +284,53 @@ InternetGameMenu::~InternetGameMenu()
 
 void InternetGameMenu::build()
 {
-    add(&container);
-    container.add(&menu);
+    screenTitleFrame.setPreferedSize(Vec3(0, 20));
+    screenTitleFrame.add(&internetGameText);
+    add(&screenTitleFrame);
+    
+    add(&menu);
+    //add(&container);
+    //container.add(&menu);
 
-    container.setPosition(Vec3(5,195));
+    //container.setPosition(Vec3(5,195));
     //container.setSize(Vec3(menuBG_wide->w, menuBG_wide->h, 0));
   
+    serverSelectionPanel.setInnerMargin(10);
     serverSelectionPanel.setPolicy(USE_MIN_SIZE);
     serverSelectionPanel.add(&serverListText);
     serverSelectionPanel.add(&serverListPanel);
     serverSelectionPanel.add(&updating);
 
+    rightPanel.setInnerMargin(10);
     rightPanel.add(&separator1_1);
 
-    screenTitleFrame.setPreferedSize(Vec3(0, 20));
-    screenTitleFrame.add(&internetGameText);
-    rightPanel.add(&screenTitleFrame);
-
     rightPanel.add(&separator1_2);
+    nicknameText.setTextAlign(TEXT_LEFT_ALIGN);
     rightPanel.add(&nicknameText);
     rightPanel.add(&playerName);
     rightPanel.add(&separator10_1);
+    serverText.setTextAlign(TEXT_LEFT_ALIGN);
     rightPanel.add(&serverText);
     rightPanel.add(&serverName);
+    portText.setTextAlign(TEXT_LEFT_ALIGN);
     rightPanel.add(&portText);
     rightPanel.add(&serverPort);
     rightPanel.add(&separator10_2);
+    hbox.setPreferedSize(Vec3(0, joinButton.getPreferedSize().y + 20));
+    hbox.add(&rightPanelSeparator);
     hbox.add(&joinButton);
-    hbox.add(&backButton);
+    
     rightPanel.add(&hbox);
     rightPanel.add(&separator1_3);
     menu.add(&serverSelectionPanel);
     menu.add(&rightPanel);
+    
+    bottomPanel.setInnerMargin(10);
+    bottomPanel.setPreferedSize(Vec3(0, backButton.getPreferedSize().y + 20));
+    bottomPanel.setPolicy(USE_MIN_SIZE);
+    bottomPanel.add(&bottomPanelSeparator);
+    bottomPanel.add(&backButton);
+    add(&bottomPanel);
 }
 
 class PuyoInternetDialog : public SliderContainer, public SliderContainerListener
@@ -558,6 +575,6 @@ void InternetGameMenu::PuyoServerListHasChanged(PuyoServerList &serverList)
                                                    new ServerSelectAction(*this, iter->hostName,
                                                                           iter->portNum)));
     }
-    updating.setValue("Update");
+    updating.setValue(theCommander->getLocalizedString("Update"));
 }
 

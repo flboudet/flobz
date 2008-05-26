@@ -160,7 +160,10 @@ PuyoSingleGameLevelData::PuyoSingleGameLevelData(int gameLevel, int difficulty,
 {
     AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
     themeToUse = themeManager->getAnimatedPuyoSetTheme();
-    levelThemeToUse = themeManager->getPuyoLevelTheme(levelDefinition->backgroundTheme);
+    if (levelDefinition->backgroundTheme == "Prefs.DefaultTheme")
+        levelThemeToUse = themeManager->getPuyoLevelTheme();
+    else
+        levelThemeToUse = themeManager->getPuyoLevelTheme(levelDefinition->backgroundTheme);
 }
 
 PuyoSingleGameLevelData::~PuyoSingleGameLevelData()

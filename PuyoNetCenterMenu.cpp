@@ -241,8 +241,9 @@ void NetCenterMenu::build()
     playerbox.add(&playerListText);
     playerbox.add(&playerList);
 
-    topbox.add(&menu);
+    topbox.setInnerMargin(10.);
     topbox.add(&playerbox);
+    topbox.add(&menu);
 
     titleFrame.setPreferedSize(Vec3(0, 20));
     titleFrame.add(&title);

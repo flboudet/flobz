@@ -30,7 +30,7 @@ external <end_level>
     level.opponentName        = "Unmapped Monster"
     level.opponentAI          = "opponent.gsl"
     level.fxStory             = "game_fx.gsl"
-    level.backgroundTheme     = "Basic level"
+    level.backgroundTheme     = "Prefs.DefaultTheme"
     level.gameLostStory       = "gamelost1p.gsl"
     level.gameOverStory       = "gameover1p.gsl"
     level.easySetting.type    = "RANDOM"

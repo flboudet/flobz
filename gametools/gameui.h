@@ -594,7 +594,7 @@ bool isDirectionEvent(GameControlEvent *event);
 
   class Separator : public Widget {
     public:
-      Separator(float width, float height);
+      Separator(float width=0., float height=0.);
   };
 
   class ListWidget : public HBox

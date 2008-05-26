@@ -1223,8 +1223,8 @@ namespace gameui {
     }
 
     void Text::draw(SDL_Surface *screen)
-    {/*
-      SDL_Rect r;
+    {
+      /*SDL_Rect r;
       r.x = getPosition().x;
       r.y = getPosition().y;
       r.h = getSize().y;

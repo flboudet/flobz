@@ -282,7 +282,7 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
     m_buttonOverFramePicture(13, 10, 13, 12, 7, 13),
     m_textFieldIdleFramePicture(5, 23, 4, 6, 10, 3),
     m_separatorFramePicture(63, 2, 63, 2, 4, 2),
-    m_listFramePicture(13, 6, 13, 13, 6, 13)
+    m_listFramePicture(5, 23, 4, 6, 10, 3)
 {
   //SDL_Delay(500);
   loop = GameUIDefaults::GAME_LOOP;
