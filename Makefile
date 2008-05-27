@@ -10,7 +10,7 @@ OBJFILES= audio.o HiScores.o PuyoCommander.o \
           PuyoView.o PuyoAnimations.o AnimatedPuyo.o PuyoIA.o \
           styrolyse.o PuyoStory.o PuyoChatBox.o PuyoLocalizedDictionary.o \
           PuyoEventPlayer.o PuyoPauseMenu.o PuyoCheatCodeManager.o \
-          PuyoGameWidget.o \
+          PuyoGameWidget.o PuyoStatsWidget.o \
           PuyoStarter.o PuyoSinglePlayerStarter.o PuyoTwoPlayerStarter.o \
           PuyoNetworkStarter.o PuyoNetworkView.o PuyoNetworkGame.o \
           AnimatedPuyoTheme.o PuyoNetworkMenu.o PuyoInternetMenu.o PuyoNetCenterMenu.o \
@@ -39,8 +39,8 @@ flobopuyo: all.h.gch iosfc_dir gametools_dir goomsl_dir ${OBJFILES}
 	@echo " Type ./$(PRGNAME) to play."
 	@echo "--------------------------------------"
 
-TestGameUi: TestGameUi.o gametools_dir
-	$(CXX) $(CFLAGS) -o $@ TestGameUi.o gametools/*.o -Liosfc -liosfc $(LDFLAGS)
+TestGameUi: TestGameUi.o PuyoStatsWidget.o gametools_dir
+	$(CXX) $(CFLAGS) -o $@ TestGameUi.o PuyoStatsWidget.o gametools/*.o SDLMain.o -Liosfc -liosfc $(LDFLAGS)
 
 iosfc_dir:
 	@+DEPFLAGS='$(DEPFLAGS)' CFLAGS='$(CFLAGS)' CXXFLAGS='$(CXXFLAGS)' LDFLAGS='$(LDFLAGS)' CC=$(CC) AR=$(AR) RANLIB=$(RANLIB) CXX=$(CXX) CFLAGS_NOPCH='$(CFLAGS_NOPCH)' make -C iosfc libiosfc.a

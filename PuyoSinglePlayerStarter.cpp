@@ -25,6 +25,7 @@
 
 #include "PuyoSinglePlayerStarter.h"
 #include "PuyoView.h"
+#include "PuyoStatsWidget.h"
 
 PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
     : attachedPuyoThemeSet(puyoThemeSet),
@@ -545,6 +546,7 @@ void SinglePlayerMatch::performMatchLostAnimation()
 void SinglePlayerMatch::performMatchScores(State scoreState)
 {
   m_state = scoreState;
+  //m_gameScreen->add(new PuyoStatsWidget(this->m_gameWidget->getStatPlayerOne()));
   // Provisoire, cet etat n'existe pas encore
   stateMachine();
 }

@@ -130,7 +130,7 @@ class GameLoop
         this->opengl_mode = state;
     }
 
-    inline double getCurrentTime() const {
+    static inline double getCurrentTime() {
       return 0.001 * (double)SDL_GetTicks();
     }
     

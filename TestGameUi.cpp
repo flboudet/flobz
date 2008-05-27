@@ -12,11 +12,23 @@
 #include "FramedEditField.h"
 #include "IosImgProcess.h"
 #include "SwitchedButton.h"
+#include "PuyoStatsWidget.h"
 
 using namespace ios_fc;
 using namespace gameui;
 
 extern "C"
+
+PlayerGameStat::PlayerGameStat(int p)
+{
+    for (int i=0; i<24; ++i)
+        combo_count[i] = 0;
+    ghost_sent_count = 0;
+    time_left = 0;
+    is_dead = false;
+    is_winner = false;
+    points = p;
+}
 
 class BusyWidget : public Widget, IdleComponent {
 public:
@@ -39,18 +51,33 @@ void BusyWidget::draw(SDL_Surface *screen)
 
 class TestAction : public Action {
 public:
-    virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
+    virtual void action(Widget *sender, int actionType, GameControlEvent *event)
     {
         printf("Clic sur %p\n", sender);
     }
 };
 
 Screen *pscr;
-    
+
+
+FramePicture *windowFramePict;
+
+class TestPuyoStatsAction : public Action {
+public:
+    virtual void action(Widget *sender, int actionType, GameControlEvent *event);
+private:
+};
+
+void TestPuyoStatsAction::action(Widget *sender, int actionType, GameControlEvent *event)
+{
+    PlayerGameStat stats;
+    GameUIDefaults::SCREEN_STACK->top()->add(new PuyoStatsWidget(stats, windowFramePict));
+}
+
 class ShowModalDialogAction : public Action {
 public:
     ShowModalDialogAction(ZBox *rootZBox);
-    virtual void action(Widget *sender, GameUIEnum actionType, GameControlEvent *event);
+    virtual void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
     ZBox *rootZBox;
     SliderContainer slider;
@@ -73,7 +100,7 @@ ShowModalDialogAction::ShowModalDialogAction(ZBox *rootZBox) : rootZBox(rootZBox
     slider.add(&dlgBox);
 }
 
-void ShowModalDialogAction::action(Widget *sender, GameUIEnum actionType, GameControlEvent *event)
+void ShowModalDialogAction::action(Widget *sender, int actionType, GameControlEvent *event)
 {
     rootZBox->add(&slider);
     slider.getParentScreen()->grabEventsOnWidget(&slider);
@@ -124,6 +151,7 @@ int main(int argc, char *argv[])
     
     FramePicture fpict(IIM_Load_Absolute_DisplayFormatAlpha("data/base.000/gfx/frame.png"),
                        25, 28, 25, 19, 26, 23);
+    windowFramePict = &fpict;
     FramePicture fpict2(IIM_Load_Absolute_DisplayFormatAlpha(
 		       "data/base.000/gfx/editfield.png"),
 			5, 23, 4, 6, 10, 3);
@@ -142,13 +170,14 @@ int main(int argc, char *argv[])
     //frame.setPreferedSize(Vec3(100, 100));
     FramedButton framedButton1("Hi", NULL, &fpict2, &fpict3);
     Button bidonButton1("Hi", &showDialogAction);
-    Button bidonButton2("Ho");
+    TestPuyoStatsAction statsAction;
+    Button bidonButton2("Stats", &statsAction);
     Button bidonButton3("Hop");
     FramedEditField bidonField("toto", NULL, &fpict2, &fpict2);
     IIM_Surface *upArrow = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/uparrow.png");
     IIM_Surface *downArrow = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/downarrow.png");
     bidonBox.setPolicy(USE_MIN_SIZE);
-    ListView list(20, upArrow, downArrow);
+    ListView list(10, upArrow, downArrow, &fpict);
     IIM_Surface *onSwitchImage = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/switch-on.png");
     IIM_Surface *offSwitchImage = IIM_Load_Absolute_DisplayFormatAlpha ("data/base.000/gfx/switch-off.png");
     SwitchedButton prefSwitchA(String("Mon switch tout neuf A"), true,
@@ -166,7 +195,7 @@ int main(int argc, char *argv[])
     bidonBox.add(&bidonText);
     bidonBox.add(&framedButton1);
     bidonBox.add(&bidonButton1);
-    frame2.add(&bidonButton2);
+    bidonBox.add(&bidonButton2);
     //bidonBox.add(&frame2);
     bidonBox.add(&bidonField);
     bidonBox.add(&frame);
