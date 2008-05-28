@@ -22,6 +22,7 @@ public:
     void idle(double currentTime);
     IdleComponent *getIdleComponent() { return this; }
     void setValue(float value, bool progressive = false);
+    float getValue() const { return m_value; }
     void setVisible(bool visible);
     enum {
         VALUE_CHANGED,
@@ -46,15 +47,18 @@ private:
     public:
         ComboLine();
         virtual ~ComboLine() {}
-        void setComboLineInfos(String comboText, int numberOfCombos, int opponentNumberOfCombos);
+        void setComboLineInfos(int tag, String comboText, int numberOfCombos, int totalNumOfCombos, gameui::Action *progressionCompleteAction);
         virtual void action(Widget *sender, int actionType, GameControlEvent *event);
     private:
+        int m_tag;
         gameui::Text m_comboLabel;
+        Action *m_progressionCompleteAction;
         ProgressBarWidget m_progressBar;
+        gameui::Text m_currentValue;
+        int m_totalNumOfCombos;
     };
     PlayerGameStat &m_stats;
     gameui::Text m_statTitle;
-    gameui::Text m_currentValue;
     ComboLine m_comboLines[24];
 };
 

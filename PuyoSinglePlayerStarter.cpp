@@ -546,9 +546,9 @@ void SinglePlayerMatch::performMatchLostAnimation()
 void SinglePlayerMatch::performMatchScores(State scoreState)
 {
   m_state = scoreState;
-  //m_gameScreen->add(new PuyoStatsWidget(this->m_gameWidget->getStatPlayerOne()));
+  m_gameScreen->add(new PuyoStatsWidget(this->m_gameWidget->getStatPlayerOne(), theCommander->getWindowFramePicture()));
   // Provisoire, cet etat n'existe pas encore
-  stateMachine();
+  //stateMachine();
 }
 
 void SinglePlayerMatch::trigMatchOverAction()

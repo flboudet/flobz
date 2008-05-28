@@ -13,7 +13,7 @@
 using namespace gameui;
 
 ProgressBarWidget::ProgressBarWidget(Action *associatedAction)
-  : m_value(0.), m_targetValue(0.), m_progressive(false), m_progressiveDuration(3.), m_visible(true),
+  : m_value(0.), m_targetValue(0.), m_progressive(false), m_progressiveDuration(1.), m_visible(true),
     m_associatedAction(associatedAction)
 {
     setPreferedSize(Vec3(0, 10));
@@ -80,30 +80,38 @@ PuyoStatsWidget::PuyoStatsWidget(PlayerGameStat &stats, const gameui::FramePictu
   : Frame(/*theCommander->getWindowFramePicture()*/framePicture), m_stats(stats),
     m_statTitle("Combos")
 {
+    setInnerMargin(20);
     add(&m_statTitle);
     for (int i = 0 ; i < 24 ; i++) {
         add(&m_comboLines[i]);
-        m_comboLines[i].setComboLineInfos(String("Combo x") + (i+1), 9, 10);
     }
+    m_comboLines[0].setComboLineInfos(0, String("Combo x") + (1) + ": ", 9, 20, this);
 }
 
 void PuyoStatsWidget::action(Widget *sender, int actionType, GameControlEvent *event)
 {
+    int comboLineIndex = actionType + 1;
+    if (comboLineIndex >= 24)
+        return;
+    m_comboLines[comboLineIndex].setComboLineInfos(comboLineIndex, String("Combo x") + (comboLineIndex+1) + ": ", 9, 20, this);
 }
 
 PuyoStatsWidget::ComboLine::ComboLine()
   : m_progressBar(this)
 {
     add(&m_comboLabel);
+    add(&m_currentValue);
     add(&m_progressBar);
     m_progressBar.setVisible(false);
 }
 
-void PuyoStatsWidget::ComboLine::setComboLineInfos(String comboText, int numberOfCombos, int opponentNumberOfCombos)
+void PuyoStatsWidget::ComboLine::setComboLineInfos(int tag, String comboText,
+                                                   int numberOfCombos, int totalNumOfCombos, Action *progressionCompleteAction)
 {
-    float progressBarValue = (float)numberOfCombos / (float)opponentNumberOfCombos;
-    if (progressBarValue > 1.)
-        progressBarValue = 1;
+    m_tag = tag;
+    m_progressionCompleteAction = progressionCompleteAction;
+    m_totalNumOfCombos = totalNumOfCombos;
+    float progressBarValue = (float)numberOfCombos / (float)m_totalNumOfCombos;
     m_comboLabel.setValue(comboText);
     m_progressBar.setVisible(true);
     m_progressBar.setValue(progressBarValue, true);
@@ -113,8 +121,10 @@ void PuyoStatsWidget::ComboLine::action(Widget *sender, int actionType, GameCont
 {
     switch (actionType) {
         case ProgressBarWidget::VALUE_CHANGED:
+            m_currentValue.setValue(String("") + (int)(m_progressBar.getValue() * (float)m_totalNumOfCombos) + " ");
             break;
         case ProgressBarWidget::PROGRESSION_COMPLETE:
+            m_progressionCompleteAction->action(this, m_tag, event);
             break;
         default:
             break;
