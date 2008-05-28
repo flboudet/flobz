@@ -12,14 +12,17 @@
 
 using namespace gameui;
 
-ProgressBarWidget::ProgressBarWidget()
-  : m_value(0.), m_targetValue(0.), m_progressive(false), m_progressiveDuration(3.)
+ProgressBarWidget::ProgressBarWidget(Action *associatedAction)
+  : m_value(0.), m_targetValue(0.), m_progressive(false), m_progressiveDuration(3.), m_visible(true),
+    m_associatedAction(associatedAction)
 {
     setPreferedSize(Vec3(0, 10));
 }
 
 void ProgressBarWidget::draw(SDL_Surface *screen)
 {
+    if (!m_visible)
+        return;
     Vec3 bsize = getSize();
     Vec3 bpos = getPosition();
     SDL_Rect dstrect;
@@ -38,10 +41,13 @@ void ProgressBarWidget::idle(double currentTime)
         double deltaT = currentTime - m_targetBaseTime;
         if (deltaT < m_progressiveDuration) {
             m_value = m_fromValue + (m_targetValue - m_fromValue) * (deltaT / m_progressiveDuration);
+            m_associatedAction->action(this, VALUE_CHANGED, NULL);
         }
         else {
             m_value = m_targetValue;
             m_progressive = false;
+            m_associatedAction->action(this, VALUE_CHANGED, NULL);
+            m_associatedAction->action(this, PROGRESSION_COMPLETE, NULL);
         }
         requestDraw(false);
     }
@@ -55,6 +61,7 @@ void ProgressBarWidget::setValue(float value, bool progressive)
     if (!progressive) {
         m_value = value;
         requestDraw(false);
+        m_associatedAction->action(this, VALUE_CHANGED, NULL);
     }
     else {
         m_fromValue = m_value;
@@ -63,13 +70,54 @@ void ProgressBarWidget::setValue(float value, bool progressive)
     }
 }
 
+void ProgressBarWidget::setVisible(bool visible)
+{
+    m_visible = visible;
+    requestDraw();
+}
+
 PuyoStatsWidget::PuyoStatsWidget(PlayerGameStat &stats, const gameui::FramePicture *framePicture)
   : Frame(/*theCommander->getWindowFramePicture()*/framePicture), m_stats(stats),
-    m_statTitle("Combos"), m_comboLabel("1x")
+    m_statTitle("Combos")
 {
-    //add(&m_statTitle);
-    //m_comboLine.add(&m_comboLabel);
-    //m_comboLine.add(&m_progressBar);
-    //add(&m_comboLine);
+    add(&m_statTitle);
+    for (int i = 0 ; i < 24 ; i++) {
+        add(&m_comboLines[i]);
+        m_comboLines[i].setComboLineInfos(String("Combo x") + (i+1), 9, 10);
+    }
+}
+
+void PuyoStatsWidget::action(Widget *sender, int actionType, GameControlEvent *event)
+{
+}
+
+PuyoStatsWidget::ComboLine::ComboLine()
+  : m_progressBar(this)
+{
+    add(&m_comboLabel);
+    add(&m_progressBar);
+    m_progressBar.setVisible(false);
+}
+
+void PuyoStatsWidget::ComboLine::setComboLineInfos(String comboText, int numberOfCombos, int opponentNumberOfCombos)
+{
+    float progressBarValue = (float)numberOfCombos / (float)opponentNumberOfCombos;
+    if (progressBarValue > 1.)
+        progressBarValue = 1;
+    m_comboLabel.setValue(comboText);
+    m_progressBar.setVisible(true);
+    m_progressBar.setValue(progressBarValue, true);
+}
+
+void PuyoStatsWidget::ComboLine::action(Widget *sender, int actionType, GameControlEvent *event)
+{
+    switch (actionType) {
+        case ProgressBarWidget::VALUE_CHANGED:
+            break;
+        case ProgressBarWidget::PROGRESSION_COMPLETE:
+            break;
+        default:
+            break;
+    }
 }
 

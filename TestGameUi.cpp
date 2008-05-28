@@ -168,8 +168,8 @@ int main(int argc, char *argv[])
     Frame frame(&fpict), frame2(&fpict2);
     frame2.setFocusedPicture(&fpict3);
     //frame.setPreferedSize(Vec3(100, 100));
-    FramedButton framedButton1("Hi", NULL, &fpict2, &fpict3);
-    Button bidonButton1("Hi", &showDialogAction);
+    FramedButton framedButton1("Hi1", NULL, &fpict2, &fpict3);
+    Button bidonButton1("Hi2", &showDialogAction);
     TestPuyoStatsAction statsAction;
     Button bidonButton2("Stats", &statsAction);
     Button bidonButton3("Hop");
@@ -193,8 +193,8 @@ int main(int argc, char *argv[])
     bidonBox.add(&prefSwitchB);
     bidonBox.add(&prefSwitchC);
     bidonBox.add(&bidonText);
-    bidonBox.add(&framedButton1);
-    bidonBox.add(&bidonButton1);
+    //bidonBox.add(&framedButton1);
+    //bidonBox.add(&bidonButton1);
     bidonBox.add(&bidonButton2);
     //bidonBox.add(&frame2);
     bidonBox.add(&bidonField);
