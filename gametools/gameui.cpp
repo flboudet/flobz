@@ -1217,7 +1217,8 @@ namespace gameui {
     {
         label = value;
         requestDraw();
-        setPreferedSize(Vec3(m_autoSize?SoFont_TextWidth(this->font, label):0.0f, SoFont_FontHeight(this->font), 1.0f));
+        if (m_autoSize)
+            setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0f));
         if (parent)
             parent->arrangeWidgets();
     }
