@@ -14,14 +14,16 @@ using namespace gameui;
 
 static IIM_Surface *rope_elt = NULL;
 static IIM_Surface *puyo_right = NULL;
+static IIM_Surface *puyo_left = NULL;
 
 ProgressBarWidget::ProgressBarWidget(Action *associatedAction)
-  : m_value(0.), m_targetValue(0.), m_progressive(false), m_progressiveDuration(1.), m_visible(true),
+  : m_value(0.), m_targetValue(0.), m_progressive(false), m_progressiveDuration(0.6), m_visible(true),
     m_associatedAction(associatedAction)
 {
     if (rope_elt == NULL) {
         rope_elt = IIM_Load_Absolute_DisplayFormatAlpha("data/base.000/gfx/progressbar/rope.png");
         puyo_right = IIM_Load_Absolute_DisplayFormatAlpha("data/base.000/gfx/progressbar/puyo_right.png");
+        puyo_left = IIM_Load_Absolute_DisplayFormatAlpha("data/base.000/gfx/progressbar/puyo_left.png");
     }
     setPreferedSize(Vec3(0, 32));
 }
@@ -47,15 +49,12 @@ void ProgressBarWidget::draw(SDL_Surface *screen)
 
     int rope_targetSize = (bsize.x - IMG_RING_WIDTH - IMG_PUYO_WIDTH) * m_targetValue;
     int rope_size = (bsize.x - IMG_RING_WIDTH - IMG_PUYO_WIDTH) * m_value;
-    int n_rope_elt = rope_targetSize / IMG_ROPE_ELT_WIDTH;
-    if (n_rope_elt < 4) n_rope_elt = 4;
-//if (rope_size < n_rope_elt*2) rope_size = n_rope_elt*2;
+    int n_rope_elt = 3 * rope_targetSize / (2 * IMG_ROPE_ELT_WIDTH);
+    if (n_rope_elt < 8) n_rope_elt = 8;
+    //if (rope_size < n_rope_elt*2) rope_size = n_rope_elt*2;
 
     for (int i=1; i<=n_rope_elt; ++i) {
-        /*
-        dstrect.x = bpos.x + i;
-        dstrect.y = bpos.y + bsize.y / 3 + 150.0 * m_value * m_value * (1.54 - cosh(1.0 - 2.0 * f));
-        */
+
         dstrect.w = IMG_ROPE_ELT_WIDTH;
         dstrect.h = IMG_ROPE_ELT_HEIGHT;
 
@@ -71,25 +70,34 @@ void ProgressBarWidget::draw(SDL_Surface *screen)
                 dstrect.y = bsize.y - dstrect.h;
         }
 
-        dstrect.x = rope_size - i*IMG_ROPE_ELT_WIDTH;
-        if (dstrect.x < (n_rope_elt-i)*2) {
-            dstrect.x = (n_rope_elt-i)*2;
-        }
-        if (dstrect.x > rope_size) {
-            dstrect.x = rope_size;
-        }
+        dstrect.x = rope_size * f;//- i*(IMG_ROPE_ELT_WIDTH-2);
+        //if (dstrect.x < (n_rope_elt-i)*1) {
+        //    dstrect.x = (n_rope_elt-i)*1;
+        //}
+        //if (dstrect.x > rope_size) {
+        //    dstrect.x = rope_size;
+        //}
 
-        dstrect.x += bpos.x + IMG_RING_WIDTH;
         dstrect.y += bpos.y;
-
-        //SDL_FillRect(screen, &dstrect, 0x11661166);
+        if (m_dir == LEFT_TO_RIGHT) {
+            dstrect.x = bpos.x + dstrect.x + IMG_RING_WIDTH;
+        }
+        else {
+            dstrect.x = bpos.x + (bsize.x - dstrect.x - IMG_ROPE_ELT_WIDTH) - IMG_RING_WIDTH;
+        }
         SDL_BlitSurface(rope_elt->surf, NULL, screen, &dstrect);
     }
     dstrect.w = puyo_right->w;
     dstrect.h = puyo_right->h;
-    dstrect.x = bpos.x + rope_size + IMG_RING_WIDTH - 4;
     dstrect.y = bpos.y;
-    SDL_BlitSurface(puyo_right->surf, NULL, screen, &dstrect);
+    if (m_dir == LEFT_TO_RIGHT) {
+        dstrect.x = bpos.x + rope_size + IMG_RING_WIDTH - 4;
+        SDL_BlitSurface(puyo_right->surf, NULL, screen, &dstrect);
+    }
+    else {
+        dstrect.x = bpos.x + bsize.x - rope_size - IMG_RING_WIDTH - IMG_PUYO_WIDTH + 4;
+        SDL_BlitSurface(puyo_left->surf, NULL, screen, &dstrect);
+    }
 }
 
 void ProgressBarWidget::idle(double currentTime)
@@ -128,14 +136,19 @@ void ProgressBarWidget::setValue(float value, bool progressive)
     }
 }
 
+void ProgressBarWidget::setDirection(PuyoStatsDirection dir)
+{
+   m_dir = dir; 
+}
+
 void ProgressBarWidget::setVisible(bool visible)
 {
     m_visible = visible;
     requestDraw();
 }
 
-PuyoStatsWidget::PuyoStatsWidget(PlayerGameStat &stats, const gameui::FramePicture *framePicture)
-  : Frame(/*theCommander->getWindowFramePicture()*/framePicture), m_stats(stats),
+PuyoStatsWidget::PuyoStatsWidget(PlayerGameStat &stats, const gameui::FramePicture *framePicture, PuyoStatsDirection dir)
+  : Frame(/*theCommander->getWindowFramePicture()*/framePicture), m_dir(dir), m_stats(stats),
     m_statTitle("Combos")
 {
     setInnerMargin(20);
@@ -143,7 +156,7 @@ PuyoStatsWidget::PuyoStatsWidget(PlayerGameStat &stats, const gameui::FramePictu
     for (int i = 0 ; i < 12 ; i++) {
         add(&m_comboLines[i]);
     }
-    m_comboLines[0].setComboLineInfos(0, String("Combo x") + (1) + ": ", 9, 20, this);
+    m_comboLines[0].setComboLineInfos(m_dir, 0, String("Combo x") + (1) + ": ", 9, 20, this);
 }
 
 void PuyoStatsWidget::action(Widget *sender, int actionType, GameControlEvent *event)
@@ -151,21 +164,36 @@ void PuyoStatsWidget::action(Widget *sender, int actionType, GameControlEvent *e
     int comboLineIndex = actionType + 1;
     if (comboLineIndex >= 12)
         return;
-    m_comboLines[comboLineIndex].setComboLineInfos(comboLineIndex, String("Combo x") + (comboLineIndex+1) + ": ", rand()%20, 20, this);
+    m_comboLines[comboLineIndex].setComboLineInfos(m_dir, comboLineIndex, String("Combo x") + (comboLineIndex+1) + ": ", rand()%20, 20, this);
 }
 
 PuyoStatsWidget::ComboLine::ComboLine()
   : m_progressBar(this)
 {
-    add(&m_comboLabel);
-    add(&m_progressBar);
-    add(&m_currentValue);
-    m_progressBar.setVisible(false);
+    //add(&m_comboLabel);
 }
 
-void PuyoStatsWidget::ComboLine::setComboLineInfos(int tag, String comboText,
+void PuyoStatsWidget::ComboLine::setComboLineInfos(PuyoStatsDirection dir, int tag, String comboText,
                                                    int numberOfCombos, int totalNumOfCombos, Action *progressionCompleteAction)
 {
+    m_dir = dir;
+
+    m_currentValue.setAutoSize(false);
+    m_currentValue.setPreferedSize(Vec3(50));
+
+    if (m_dir == LEFT_TO_RIGHT) {
+        m_currentValue.setTextAlign(TEXT_LEFT_ALIGN);
+        add(&m_progressBar);
+        add(&m_currentValue);
+    }
+    else {
+        m_currentValue.setTextAlign(TEXT_RIGHT_ALIGN);
+        add(&m_currentValue);
+        add(&m_progressBar);
+    }
+    m_progressBar.setVisible(false);
+
+    m_progressBar.setDirection(dir);
     m_tag = tag;
     m_progressionCompleteAction = progressionCompleteAction;
     m_totalNumOfCombos = totalNumOfCombos;
@@ -190,8 +218,8 @@ void PuyoStatsWidget::ComboLine::action(Widget *sender, int actionType, GameCont
 }
 
 PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats, const gameui::FramePicture *framePicture)
-  : m_leftStats(leftPlayerStats, framePicture),
-    m_rightStats(rightPlayerStats, framePicture)
+  : m_leftStats(leftPlayerStats, framePicture, RIGHT_TO_LEFT),
+    m_rightStats(rightPlayerStats, framePicture, LEFT_TO_RIGHT)
 {
     add(&m_leftStats);
     add(&m_rightStats);

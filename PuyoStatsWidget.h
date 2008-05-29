@@ -14,6 +14,11 @@
 #include "Frame.h"
 #include "PuyoGameAbstract.h"
 
+enum PuyoStatsDirection {
+    RIGHT_TO_LEFT,
+    LEFT_TO_RIGHT
+};
+
 class ProgressBarWidget : public gameui::Widget, IdleComponent {
 public:
     ProgressBarWidget(gameui::Action *associatedAction);
@@ -24,11 +29,13 @@ public:
     void setValue(float value, bool progressive = false);
     float getValue() const { return m_value; }
     void setVisible(bool visible);
+    void setDirection(PuyoStatsDirection dir);
     enum {
         VALUE_CHANGED,
         PROGRESSION_COMPLETE
     };
 private:
+    PuyoStatsDirection m_dir;
     float m_value, m_fromValue, m_targetValue;
     bool m_progressive;
     double m_targetBaseTime;
@@ -40,17 +47,19 @@ private:
 
 class PuyoStatsWidget : public gameui::Frame, gameui::Action {
 public:
-    PuyoStatsWidget(PlayerGameStat &stats, const gameui::FramePicture *framePicture);
+    PuyoStatsWidget(PlayerGameStat &stats, const gameui::FramePicture *framePicture, PuyoStatsDirection dir);
     virtual ~PuyoStatsWidget() {}
     virtual void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
+    PuyoStatsDirection m_dir;
     class ComboLine : public gameui::HBox, gameui::Action {
     public:
         ComboLine();
         virtual ~ComboLine() {}
-        void setComboLineInfos(int tag, String comboText, int numberOfCombos, int totalNumOfCombos, gameui::Action *progressionCompleteAction);
+        void setComboLineInfos(PuyoStatsDirection dir, int tag, String comboText, int numberOfCombos, int totalNumOfCombos, gameui::Action *progressionCompleteAction);
         virtual void action(Widget *sender, int actionType, GameControlEvent *event);
     private:
+        PuyoStatsDirection m_dir;
         int m_tag;
         gameui::Text m_comboLabel;
         Action *m_progressionCompleteAction;
