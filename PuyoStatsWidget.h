@@ -63,7 +63,13 @@ private:
     ComboLine m_comboLines[24];
 };
 
-
+class PuyoTwoPlayersStatsWidget : public gameui::HBox {
+public:
+    PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats, const gameui::FramePicture *framePicture);
+    virtual ~PuyoTwoPlayersStatsWidget() {}
+private:
+    PuyoStatsWidget m_leftStats, m_rightStats;
+};
 
 #endif // _PUYO_STATS_WIDGET_H
 

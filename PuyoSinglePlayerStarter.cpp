@@ -25,7 +25,6 @@
 
 #include "PuyoSinglePlayerStarter.h"
 #include "PuyoView.h"
-#include "PuyoStatsWidget.h"
 
 PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
     : attachedPuyoThemeSet(puyoThemeSet),
@@ -439,18 +438,20 @@ SinglePlayerMatch::SinglePlayerMatch
 			 m_remainingLifes(remainingLifes),
 			 m_introStory(NULL),
 			 m_opponentStory(NULL),
-			 m_matchLostAnimation(NULL)
-
+			 m_matchLostAnimation(NULL),
+             m_statsWidget(NULL)
 {
 }
 
 SinglePlayerMatch::~SinglePlayerMatch()
 {
-  if (m_matchLostAnimation != NULL)
-    delete m_matchLostAnimation;
   delete m_gameScreen;
   delete m_gameWidget;
   delete m_levelData;
+  if (m_matchLostAnimation != NULL)
+    delete m_matchLostAnimation;
+  if (m_statsWidget != NULL)
+    delete m_statsWidget;
 }
 
 void SinglePlayerMatch::run()
@@ -546,7 +547,8 @@ void SinglePlayerMatch::performMatchLostAnimation()
 void SinglePlayerMatch::performMatchScores(State scoreState)
 {
   m_state = scoreState;
-  m_gameScreen->add(new PuyoStatsWidget(this->m_gameWidget->getStatPlayerOne(), theCommander->getWindowFramePicture()));
+  m_statsWidget = new PuyoTwoPlayersStatsWidget(this->m_gameWidget->getStatPlayerOne(), this->m_gameWidget->getStatPlayerTwo(), theCommander->getWindowFramePicture());
+  m_gameScreen->add(m_statsWidget);
   // Provisoire, cet etat n'existe pas encore
   //stateMachine();
 }

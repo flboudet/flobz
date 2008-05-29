@@ -189,3 +189,11 @@ void PuyoStatsWidget::ComboLine::action(Widget *sender, int actionType, GameCont
     }
 }
 
+PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats, const gameui::FramePicture *framePicture)
+  : m_leftStats(leftPlayerStats, framePicture),
+    m_rightStats(rightPlayerStats, framePicture)
+{
+    add(&m_leftStats);
+    add(&m_rightStats);
+}
+
