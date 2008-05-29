@@ -35,6 +35,7 @@ private:
     double m_progressiveDuration;
     bool m_visible;
     gameui::Action *m_associatedAction;
+    double m_t;
 };
 
 class PuyoStatsWidget : public gameui::Frame, gameui::Action {
