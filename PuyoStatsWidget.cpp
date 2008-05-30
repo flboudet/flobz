@@ -147,16 +147,26 @@ void ProgressBarWidget::setVisible(bool visible)
     requestDraw();
 }
 
-PuyoStatsWidget::PuyoStatsWidget(PlayerGameStat &stats, const gameui::FramePicture *framePicture, PuyoStatsDirection dir)
-  : Frame(/*theCommander->getWindowFramePicture()*/framePicture), m_dir(dir), m_stats(stats),
-    m_statTitle("Combos")
+PuyoStatsWidget::PuyoStatsWidget(PlayerGameStat &stats, PlayerGameStat &opponentStats,
+                                 const gameui::FramePicture *framePicture, PuyoStatsDirection dir)
+  : Frame(framePicture), m_dir(dir), m_stats(stats), m_opponentStats(opponentStats),
+    m_statTitle("Combos"), m_maxCombo(0)
 {
     setInnerMargin(20);
     add(&m_statTitle);
     for (int i = 0 ; i < 12 ; i++) {
         add(&m_comboLines[i]);
     }
-    m_comboLines[0].setComboLineInfos(m_dir, 0, String("Combo x") + (1) + ": ", 9, 20, this);
+    // Looking for the biggest combo
+    for (int i = 0 ; i < 12 ; i++) {
+        if (m_stats.combo_count[i] > m_maxCombo)
+            m_maxCombo = m_stats.combo_count[i];
+    }
+    for (int i = 0 ; i < 12 ; i++) {
+        if (m_opponentStats.combo_count[i] > m_maxCombo)
+            m_maxCombo = m_opponentStats.combo_count[i];
+    }
+    m_comboLines[0].setComboLineInfos(m_dir, 0, String("Combo x") + (1) + ": ", m_stats.combo_count[0], m_maxCombo, this);
 }
 
 void PuyoStatsWidget::action(Widget *sender, int actionType, GameControlEvent *event)
@@ -164,7 +174,7 @@ void PuyoStatsWidget::action(Widget *sender, int actionType, GameControlEvent *e
     int comboLineIndex = actionType + 1;
     if (comboLineIndex >= 12)
         return;
-    m_comboLines[comboLineIndex].setComboLineInfos(m_dir, comboLineIndex, String("Combo x") + (comboLineIndex+1) + ": ", rand()%20, 20, this);
+    m_comboLines[comboLineIndex].setComboLineInfos(m_dir, comboLineIndex, String("Combo x") + (comboLineIndex+1) + ": ", m_stats.combo_count[comboLineIndex], m_maxCombo, this);
 }
 
 PuyoStatsWidget::ComboLine::ComboLine()
@@ -176,6 +186,8 @@ PuyoStatsWidget::ComboLine::ComboLine()
 void PuyoStatsWidget::ComboLine::setComboLineInfos(PuyoStatsDirection dir, int tag, String comboText,
                                                    int numberOfCombos, int totalNumOfCombos, Action *progressionCompleteAction)
 {
+    if (numberOfCombos == 0)
+        return;
     m_dir = dir;
 
     m_currentValue.setAutoSize(false);
@@ -218,8 +230,8 @@ void PuyoStatsWidget::ComboLine::action(Widget *sender, int actionType, GameCont
 }
 
 PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats, const gameui::FramePicture *framePicture)
-  : m_leftStats(leftPlayerStats, framePicture, RIGHT_TO_LEFT),
-    m_rightStats(rightPlayerStats, framePicture, LEFT_TO_RIGHT)
+  : m_leftStats(leftPlayerStats, rightPlayerStats, framePicture, RIGHT_TO_LEFT),
+    m_rightStats(rightPlayerStats, leftPlayerStats, framePicture, LEFT_TO_RIGHT)
 {
     add(&m_leftStats);
     add(&m_rightStats);

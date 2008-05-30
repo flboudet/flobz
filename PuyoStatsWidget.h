@@ -47,7 +47,7 @@ private:
 
 class PuyoStatsWidget : public gameui::Frame, gameui::Action {
 public:
-    PuyoStatsWidget(PlayerGameStat &stats, const gameui::FramePicture *framePicture, PuyoStatsDirection dir);
+    PuyoStatsWidget(PlayerGameStat &stats, PlayerGameStat &opponentStats, const gameui::FramePicture *framePicture, PuyoStatsDirection dir);
     virtual ~PuyoStatsWidget() {}
     virtual void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
@@ -67,9 +67,10 @@ private:
         gameui::Text m_currentValue;
         int m_totalNumOfCombos;
     };
-    PlayerGameStat &m_stats;
+    PlayerGameStat &m_stats, &m_opponentStats;
     gameui::Text m_statTitle;
     ComboLine m_comboLines[24];
+    int m_maxCombo;
 };
 
 class PuyoTwoPlayersStatsWidget : public gameui::HBox {
