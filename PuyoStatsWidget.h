@@ -77,7 +77,9 @@ class PuyoTwoPlayersStatsWidget : public gameui::HBox {
 public:
     PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats, const gameui::FramePicture *framePicture);
     virtual ~PuyoTwoPlayersStatsWidget() {}
+    virtual void onWidgetVisibleChanged(bool visible);
 private:
+    gameui::SliderContainer m_leftSlider, m_rightSlider;
     PuyoStatsWidget m_leftStats, m_rightStats;
 };
 

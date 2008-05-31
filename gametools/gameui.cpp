@@ -749,7 +749,7 @@ namespace gameui {
 
     SliderContainer::SliderContainer(GameLoop *loop)
         : ZBox(loop), IdleComponent()
-        , slidingTime(.45)
+        , m_slideSide(SLIDE_FROM_RIGHT), slidingTime(.45)
         , contentWidget(NULL), previousWidget(NULL)
         , slideStartTime(0.0), currentTime(0.0)
         , bg(NULL), sliding(false), slideout(false)
@@ -776,6 +776,11 @@ namespace gameui {
     {
         if (sliding == false) backupedPosition = v3;
         ZBox::setPosition(v3);
+    }
+
+    void SliderContainer::setSlideSide(SlideFromSide slideSide)
+    {
+        m_slideSide = slideSide;
     }
 	
     void SliderContainer::draw(SDL_Surface *screen)

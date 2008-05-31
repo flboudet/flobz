@@ -320,6 +320,16 @@ bool isDirectionEvent(GameControlEvent *event);
    */
   class SliderContainer : public ZBox, IdleComponent {
     public:
+      /**
+       * Constants defining from which side of the screen
+       * the slider will slide in and out
+       */
+      enum SlideFromSide {
+	SLIDE_FROM_TOP,
+	SLIDE_FROM_LEFT,
+	SLIDE_FROM_RIGHT,
+	SLIDE_FROM_BOTTOM
+      };
       SliderContainer(GameLoop *loop = NULL);
       virtual ~SliderContainer() {}
       /**
@@ -345,9 +355,16 @@ bool isDirectionEvent(GameControlEvent *event);
        */
       void addListener(SliderContainerListener &listener);
       
-      /* Sets current position when not sliding or dest position
-      during slideOut noifications, or inoperant while sliding */
+      /**
+       * Sets current position when not sliding or dest position
+       * during slideOut noifications, or inoperant while sliding
+       */
       void setPosition(const Vec3 &v3);
+
+      /**
+       * Sets the side from where the slider will slide in and out
+       */
+      void setSlideSide(SlideFromSide slideSide);
 
       // Implements IdleComponent
       virtual void idle(double currentTime);
@@ -371,6 +388,7 @@ bool isDirectionEvent(GameControlEvent *event);
       virtual void onSlideInside();
       
     private:
+      SlideFromSide m_slideSide;
       double slidingTime;
       Widget *contentWidget;
       Widget *previousWidget;

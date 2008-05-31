@@ -233,7 +233,13 @@ PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerS
   : m_leftStats(leftPlayerStats, rightPlayerStats, framePicture, RIGHT_TO_LEFT),
     m_rightStats(rightPlayerStats, leftPlayerStats, framePicture, LEFT_TO_RIGHT)
 {
-    add(&m_leftStats);
-    add(&m_rightStats);
+    add(&m_leftSlider);
+    add(&m_rightSlider);
+}
+
+void PuyoTwoPlayersStatsWidget::onWidgetVisibleChanged(bool visible)
+{
+    m_leftSlider.transitionToContent(&m_leftStats);
+    m_rightSlider.transitionToContent(&m_rightStats);
 }
 
