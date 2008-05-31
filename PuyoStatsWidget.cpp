@@ -233,13 +233,24 @@ PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerS
   : m_leftStats(leftPlayerStats, rightPlayerStats, framePicture, RIGHT_TO_LEFT),
     m_rightStats(rightPlayerStats, leftPlayerStats, framePicture, LEFT_TO_RIGHT)
 {
+    m_legendBox.add(new Text("Combos"));
+    m_legendBox.add(new Text("1x"));
+    m_legendBox.add(new Text("2x"));
+    m_legendBox.add(new Text("3x"));
+    m_legendBox.add(new Text("4x"));
+    m_legendSlider.setPreferedSize(Vec3(150., 0.));
     add(&m_leftSlider);
+    add(&m_legendSlider);
     add(&m_rightSlider);
 }
 
 void PuyoTwoPlayersStatsWidget::onWidgetVisibleChanged(bool visible)
 {
+    m_leftSlider.setSlideSide(SliderContainer::SLIDE_FROM_LEFT);
+    m_rightSlider.setSlideSide(SliderContainer::SLIDE_FROM_RIGHT);
+    m_legendSlider.setSlideSide(SliderContainer::SLIDE_FROM_RIGHT);
     m_leftSlider.transitionToContent(&m_leftStats);
     m_rightSlider.transitionToContent(&m_rightStats);
+    m_legendSlider.transitionToContent(&m_legendBox);
 }
 

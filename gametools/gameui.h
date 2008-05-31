@@ -325,10 +325,10 @@ bool isDirectionEvent(GameControlEvent *event);
        * the slider will slide in and out
        */
       enum SlideFromSide {
-	SLIDE_FROM_TOP,
-	SLIDE_FROM_LEFT,
-	SLIDE_FROM_RIGHT,
-	SLIDE_FROM_BOTTOM
+          SLIDE_FROM_TOP,
+          SLIDE_FROM_LEFT,
+          SLIDE_FROM_RIGHT,
+          SLIDE_FROM_BOTTOM
       };
       SliderContainer(GameLoop *loop = NULL);
       virtual ~SliderContainer() {}
@@ -400,6 +400,7 @@ bool isDirectionEvent(GameControlEvent *event);
       Vec3 backupedPosition;
       bool backgroundVisible;
       std::vector<SliderContainerListener *> listeners;
+      int m_outsidePosition;
   };
 
   /**

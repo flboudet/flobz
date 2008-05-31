@@ -79,8 +79,9 @@ public:
     virtual ~PuyoTwoPlayersStatsWidget() {}
     virtual void onWidgetVisibleChanged(bool visible);
 private:
-    gameui::SliderContainer m_leftSlider, m_rightSlider;
+    gameui::SliderContainer m_leftSlider, m_rightSlider, m_legendSlider;
     PuyoStatsWidget m_leftStats, m_rightStats;
+    gameui::VBox m_legendBox;
 };
 
 #endif // _PUYO_STATS_WIDGET_H

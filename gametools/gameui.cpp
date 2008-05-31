@@ -838,6 +838,21 @@ namespace gameui {
                 endSlideInside(false);
             }
         }
+        if (contentWidget != NULL) {
+            switch (m_slideSide) {
+                case SLIDE_FROM_RIGHT:
+                    m_outsidePosition = 640;
+                    break;
+                case SLIDE_FROM_LEFT:
+                    m_outsidePosition = 0 - contentWidget->getSize().x;
+                    break;
+                case SLIDE_FROM_TOP:
+                    break;
+                case SLIDE_FROM_BOTTOM:
+                    break;
+            }
+        }
+        else m_outsidePosition = 640;
     }
 
     void SliderContainer::idle(double currentTime)
@@ -882,7 +897,7 @@ namespace gameui {
         
         Vec3 pos = backupedPosition;
 
-        double distance = 640 - pos.x;
+        double distance = m_outsidePosition - pos.x;
         if (slideout)
         {
             double stime = t*t;
