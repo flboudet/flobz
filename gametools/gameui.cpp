@@ -847,8 +847,10 @@ namespace gameui {
                     m_outsidePosition = 0 - contentWidget->getSize().x;
                     break;
                 case SLIDE_FROM_TOP:
+                    m_outsidePosition = 0 - contentWidget->getSize().y;
                     break;
                 case SLIDE_FROM_BOTTOM:
+                    m_outsidePosition = 480;
                     break;
             }
         }
@@ -897,19 +899,32 @@ namespace gameui {
         
         Vec3 pos = backupedPosition;
 
-        double distance = m_outsidePosition - pos.x;
+        double distance;
+	if ((m_slideSide == SLIDE_FROM_LEFT)
+            || (m_slideSide ==SLIDE_FROM_RIGHT))
+	  distance = m_outsidePosition - pos.x;
+	else
+	  distance = m_outsidePosition - pos.y;
         if (slideout)
         {
             double stime = t*t;
             double shtime = slidingTime*slidingTime;
-            pos.x += distance*stime/shtime;
+	    if ((m_slideSide == SLIDE_FROM_LEFT)
+		|| (m_slideSide ==SLIDE_FROM_RIGHT))
+	      pos.x += distance*stime/shtime;
+	    else
+	      pos.y += distance*stime/shtime;
             
         }
         else
         {
             double stime = (slidingTime-t)*(slidingTime-t);
             double shtime = slidingTime*slidingTime;
-            pos.x += distance*stime/shtime;
+	    if ((m_slideSide == SLIDE_FROM_LEFT)
+		|| (m_slideSide ==SLIDE_FROM_RIGHT))
+	      pos.x += distance*stime/shtime;
+	    else
+	      pos.y += distance*stime/shtime;
         }
         suspendLayout();
         ZBox::setPosition(pos);

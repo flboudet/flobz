@@ -73,6 +73,12 @@ private:
     int m_maxCombo;
 };
 
+class PuyoStatsLegendWidget : public gameui::Frame {
+public:
+  PuyoStatsLegendWidget(const gameui::FramePicture *framePicture);
+  virtual ~PuyoStatsLegendWidget() {}
+};
+
 class PuyoTwoPlayersStatsWidget : public gameui::HBox {
 public:
     PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats, const gameui::FramePicture *framePicture);
@@ -81,7 +87,7 @@ public:
 private:
     gameui::SliderContainer m_leftSlider, m_rightSlider, m_legendSlider;
     PuyoStatsWidget m_leftStats, m_rightStats;
-    gameui::VBox m_legendBox;
+    PuyoStatsLegendWidget m_legend;
 };
 
 #endif // _PUYO_STATS_WIDGET_H
