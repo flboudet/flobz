@@ -58,6 +58,7 @@ public:
                     const gameui::FramePicture *framePicture, PuyoStatsDirection dir);
     virtual ~PuyoStatsWidget() {}
     virtual void action(Widget *sender, int actionType, GameControlEvent *event);
+    void startAnimation();
 private:
     PuyoStatsDirection m_dir;
     class ComboLine : public gameui::HBox, gameui::Action {
@@ -88,14 +89,19 @@ public:
   virtual ~PuyoStatsLegendWidget() {}
 private:
   PuyoStatsFormat &m_statsFormat;
+  gameui::SliderContainer m_legendSlider[MAX_DISPLAYED_COMBOS];
   gameui::Text m_legendText[MAX_DISPLAYED_COMBOS];
 };
 
-class PuyoTwoPlayersStatsWidget : public gameui::HBox {
+class PuyoTwoPlayersStatsWidget : public gameui::HBox, gameui::SliderContainerListener {
 public:
     PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats, const gameui::FramePicture *framePicture);
     virtual ~PuyoTwoPlayersStatsWidget() {}
     virtual void onWidgetVisibleChanged(bool visible);
+    /**
+     * Notified when the slider is inside the screen, at the end of its sliding movement
+     */
+    virtual void onSlideInside(gameui::SliderContainer &slider);
 private:
     PuyoStatsFormat m_statsFormat;
     gameui::SliderContainer m_leftSlider, m_rightSlider, m_legendSlider;

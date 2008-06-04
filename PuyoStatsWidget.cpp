@@ -162,7 +162,7 @@ PuyoStatsFormat::PuyoStatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &p
 PuyoStatsWidget::PuyoStatsWidget(PuyoStatsFormat &statsFormat,
                                  PlayerGameStat &stats, PlayerGameStat &opponentStats,
                                  const gameui::FramePicture *framePicture, PuyoStatsDirection dir)
-  : Frame(framePicture), m_statsFormat(statsFormat), m_dir(dir), m_stats(stats), m_opponentStats(opponentStats),
+  : Frame(framePicture), m_dir(dir), m_statsFormat(statsFormat), m_stats(stats), m_opponentStats(opponentStats),
     m_statTitle("Combos"), m_maxCombo(0)
 {
     setInnerMargin(20);
@@ -179,9 +179,6 @@ PuyoStatsWidget::PuyoStatsWidget(PuyoStatsFormat &statsFormat,
         if (m_opponentStats.combo_count[i] > m_maxCombo)
             m_maxCombo = m_opponentStats.combo_count[i];
     }
-    int currentComboIndex = m_statsFormat.m_comboIndirection[0];
-    if (currentComboIndex != -1)
-        m_comboLines[0].setComboLineInfos(m_dir, 0, String(""), m_stats.combo_count[currentComboIndex], m_maxCombo, this);
 }
 
 void PuyoStatsWidget::action(Widget *sender, int actionType, GameControlEvent *event)
@@ -192,6 +189,13 @@ void PuyoStatsWidget::action(Widget *sender, int actionType, GameControlEvent *e
     int currentComboIndex = m_statsFormat.m_comboIndirection[comboIndirectionIndex];
     if (currentComboIndex != -1)
         m_comboLines[comboIndirectionIndex].setComboLineInfos(m_dir, comboIndirectionIndex, String(""), m_stats.combo_count[currentComboIndex], m_maxCombo, this);
+}
+
+void PuyoStatsWidget::startAnimation()
+{
+    int currentComboIndex = m_statsFormat.m_comboIndirection[0];
+    if (currentComboIndex != -1)
+        m_comboLines[0].setComboLineInfos(m_dir, 0, String(""), m_stats.combo_count[currentComboIndex], m_maxCombo, this);
 }
 
 PuyoStatsWidget::ComboLine::ComboLine()
@@ -255,7 +259,9 @@ PuyoStatsLegendWidget::PuyoStatsLegendWidget(PuyoStatsFormat &statsFormat, PuyoS
         int numCombo = m_statsFormat.m_comboIndirection[i];
         if (numCombo != -1)
             m_legendText[i].setValue(String("x") + (numCombo+1));
-        add(&(m_legendText[i]));
+        m_legendSlider[i].setSlideSide(SliderContainer::SLIDE_FROM_BOTTOM);
+        add(&m_legendSlider[i]);
+        m_legendSlider[i].transitionToContent(&m_legendText[i]);
     }
     if (m_statsFormat.m_comboIndirection[MAX_DISPLAYED_COMBOS] != -1)
         m_legendText[MAX_DISPLAYED_COMBOS-1].setValue("Countless");
@@ -274,6 +280,9 @@ PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerS
     add(&m_leftSlider);
     add(&m_legendSlider);
     add(&m_rightSlider);
+    m_leftSlider.addListener(*this);
+    m_legendSlider.addListener(*this);
+    m_rightSlider.addListener(*this);
 }
 
 void PuyoTwoPlayersStatsWidget::onWidgetVisibleChanged(bool visible)
@@ -284,5 +293,11 @@ void PuyoTwoPlayersStatsWidget::onWidgetVisibleChanged(bool visible)
     m_leftSlider.transitionToContent(&m_leftStats);
     m_rightSlider.transitionToContent(&m_rightStats);
     m_legendSlider.transitionToContent(&m_legend);
+}
+
+void PuyoTwoPlayersStatsWidget::onSlideInside(SliderContainer &slider)
+{
+    if (&slider == &m_leftSlider)
+        m_leftStats.startAnimation();
 }
 
