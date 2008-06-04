@@ -45,13 +45,13 @@ private:
     double m_t;
 };
 
-#define MAX_DISPLAYED_COMBOS 5
+#define MAX_DISPLAYED_COMBOS 7
 struct PuyoStatsFormat {
     PuyoStatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &playerBStats);
     int m_comboIndirection[MAX_DISPLAYED_COMBOS+1];
 };
 
-class PuyoStatsWidget : public gameui::Frame, gameui::Action {
+class PuyoStatsWidget : public gameui::VBox, gameui::Action {
 public:
     PuyoStatsWidget(PuyoStatsFormat &statsFormat, 
                     PlayerGameStat &stats, PlayerGameStat &opponentStats,

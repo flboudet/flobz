@@ -15,6 +15,7 @@ using namespace gameui;
 static IIM_Surface *rope_elt = NULL;
 static IIM_Surface *puyo_right = NULL;
 static IIM_Surface *puyo_left = NULL;
+static IIM_Surface *stats_bg = NULL;
 
 ProgressBarWidget::ProgressBarWidget(Action *associatedAction)
   : m_value(0.), m_targetValue(0.), m_progressive(false), m_progressiveDuration(0.6), m_visible(true),
@@ -43,7 +44,7 @@ void ProgressBarWidget::draw(SDL_Surface *screen)
     SDL_FillRect(screen, &dstrect, 0x11666666);
 
     static const int IMG_PUYO_WIDTH = 52;
-    static const int IMG_RING_WIDTH = 16;
+    static const int IMG_RING_WIDTH = 0;
     static const int IMG_ROPE_ELT_WIDTH = 8;
     static const int IMG_ROPE_ELT_HEIGHT = 8;
 
@@ -60,7 +61,7 @@ void ProgressBarWidget::draw(SDL_Surface *screen)
 
         double f = i / (double)n_rope_elt;
         double c = (1.54 - cosh(1.0 - 2.0 * f)) / (1.0+3.0*m_value/m_targetValue);
-        double oscil = 10.0 * c * sin(rope_size+5.0*m_t + f*rope_size/32);
+        double oscil = 10.0 * c * sin(bpos.y + 8.1*m_t + f*rope_size/8) + 10.0 * c * sin(bpos.y-5.0*m_t - f*rope_size/32);
         dstrect.y = bsize.y / 3 + 75.0 * c;
         if (dstrect.y > bsize.y - dstrect.h)
             dstrect.y = bsize.y - dstrect.h;
@@ -153,7 +154,7 @@ PuyoStatsFormat::PuyoStatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &p
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS+1 ; i++)
         m_comboIndirection[i] = -1;
     for (int i = 0 ; (i < 24) && (j < MAX_DISPLAYED_COMBOS+1) ; i++) {
-        if ((playerAStats.combo_count[i] > 0) || (playerBStats.combo_count[i] > 0))
+        if ((playerAStats.combo_count[i] >= 0) || (playerBStats.combo_count[i] >= 0))
             m_comboIndirection[j++] = i;
     }
 }
@@ -162,11 +163,12 @@ PuyoStatsFormat::PuyoStatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &p
 PuyoStatsWidget::PuyoStatsWidget(PuyoStatsFormat &statsFormat,
                                  PlayerGameStat &stats, PlayerGameStat &opponentStats,
                                  const gameui::FramePicture *framePicture, PuyoStatsDirection dir)
-  : Frame(framePicture), m_dir(dir), m_statsFormat(statsFormat), m_stats(stats), m_opponentStats(opponentStats),
+  : m_dir(dir), m_statsFormat(statsFormat), m_stats(stats), m_opponentStats(opponentStats),
     m_statTitle("Combos"), m_maxCombo(0)
 {
+    setPolicy(USE_MIN_SIZE);
     setInnerMargin(20);
-    add(&m_statTitle);
+    /*add(&m_statTitle);*/
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++) {
         add(&m_comboLines[i]);
     }
@@ -207,8 +209,8 @@ PuyoStatsWidget::ComboLine::ComboLine()
 void PuyoStatsWidget::ComboLine::setComboLineInfos(PuyoStatsDirection dir, int tag, String comboText,
                                                    int numberOfCombos, int totalNumOfCombos, Action *progressionCompleteAction)
 {
-    if (numberOfCombos == 0)
-        return;
+    /*if (numberOfCombos == 0)
+        return;*/
     m_dir = dir;
 
     m_currentValue.setAutoSize(false);
@@ -230,7 +232,7 @@ void PuyoStatsWidget::ComboLine::setComboLineInfos(PuyoStatsDirection dir, int t
     m_tag = tag;
     m_progressionCompleteAction = progressionCompleteAction;
     m_totalNumOfCombos = totalNumOfCombos;
-    float progressBarValue = (float)numberOfCombos / (float)m_totalNumOfCombos;
+    float progressBarValue = (float)(2+numberOfCombos) / (float)(2+m_totalNumOfCombos);
     m_comboLabel.setValue(comboText);
     m_progressBar.setVisible(true);
     m_progressBar.setValue(progressBarValue, true);
@@ -254,7 +256,7 @@ PuyoStatsLegendWidget::PuyoStatsLegendWidget(PuyoStatsFormat &statsFormat, PuyoS
   : Frame(framePicture), m_statsFormat(statsFormat)
 {
     setInnerMargin(20);
-    add(new Text("Combos"));
+    /*add(new Text("Combos"));*/
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++) {
         int numCombo = m_statsFormat.m_comboIndirection[i];
         if (numCombo != -1)
@@ -272,14 +274,22 @@ PuyoStatsLegendWidget::PuyoStatsLegendWidget(PuyoStatsFormat &statsFormat, PuyoS
 
 PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats, const gameui::FramePicture *framePicture)
   : m_statsFormat(leftPlayerStats, rightPlayerStats),
-    m_leftStats(m_statsFormat, leftPlayerStats, rightPlayerStats, framePicture, RIGHT_TO_LEFT),
-    m_rightStats(m_statsFormat, rightPlayerStats, leftPlayerStats, framePicture, LEFT_TO_RIGHT),
-    m_legend(m_statsFormat, m_leftStats, framePicture)
+    m_leftStats(m_statsFormat, leftPlayerStats, rightPlayerStats, NULL, RIGHT_TO_LEFT),
+    m_rightStats(m_statsFormat, rightPlayerStats, leftPlayerStats, NULL, LEFT_TO_RIGHT),
+    m_legend(m_statsFormat, m_leftStats, NULL/*framePicture*/)
 {
-    m_legendSlider.setPreferedSize(Vec3(150., 0.));
-    add(&m_leftSlider);
+    m_legendSlider.setPreferedSize(Vec3(190., 0.));
+    m_leftSlider.setPreferedSize(Vec3(0., 416.));
+    m_rightSlider.setPreferedSize(Vec3(0., 416.));
+    VBox *v1 = new VBox();
+    v1->add(&m_leftSlider);
+    v1->add(new Separator());
+    add(v1);
     add(&m_legendSlider);
-    add(&m_rightSlider);
+    VBox *v2 = new VBox();
+    v2->add(&m_rightSlider);
+    v2->add(new Separator());
+    add(v2);
     m_leftSlider.addListener(*this);
     m_legendSlider.addListener(*this);
     m_rightSlider.addListener(*this);
@@ -293,11 +303,17 @@ void PuyoTwoPlayersStatsWidget::onWidgetVisibleChanged(bool visible)
     m_leftSlider.transitionToContent(&m_leftStats);
     m_rightSlider.transitionToContent(&m_rightStats);
     m_legendSlider.transitionToContent(&m_legend);
+    if (stats_bg == NULL)
+        stats_bg = IIM_Load_Absolute_DisplayFormatAlpha("data/base.000/gfx/stats-bg.png");
+    m_leftSlider.setBackground(stats_bg);
+    m_rightSlider.setBackground(stats_bg);
 }
 
 void PuyoTwoPlayersStatsWidget::onSlideInside(SliderContainer &slider)
 {
     if (&slider == &m_leftSlider)
         m_leftStats.startAnimation();
+    if (&slider == &m_rightSlider)
+        m_rightStats.startAnimation();
 }
 
