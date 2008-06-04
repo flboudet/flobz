@@ -45,9 +45,17 @@ private:
     double m_t;
 };
 
+#define MAX_DISPLAYED_COMBOS 5
+struct PuyoStatsFormat {
+    PuyoStatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &playerBStats);
+    int m_comboIndirection[MAX_DISPLAYED_COMBOS+1];
+};
+
 class PuyoStatsWidget : public gameui::Frame, gameui::Action {
 public:
-    PuyoStatsWidget(PlayerGameStat &stats, PlayerGameStat &opponentStats, const gameui::FramePicture *framePicture, PuyoStatsDirection dir);
+    PuyoStatsWidget(PuyoStatsFormat &statsFormat, 
+                    PlayerGameStat &stats, PlayerGameStat &opponentStats,
+                    const gameui::FramePicture *framePicture, PuyoStatsDirection dir);
     virtual ~PuyoStatsWidget() {}
     virtual void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
@@ -67,16 +75,20 @@ private:
         gameui::Text m_currentValue;
         int m_totalNumOfCombos;
     };
+    PuyoStatsFormat &m_statsFormat;
     PlayerGameStat &m_stats, &m_opponentStats;
     gameui::Text m_statTitle;
-    ComboLine m_comboLines[24];
+    ComboLine m_comboLines[MAX_DISPLAYED_COMBOS];
     int m_maxCombo;
 };
 
 class PuyoStatsLegendWidget : public gameui::Frame {
 public:
-  PuyoStatsLegendWidget(const gameui::FramePicture *framePicture);
+  PuyoStatsLegendWidget(PuyoStatsFormat &statsFormat, PuyoStatsWidget &guideWidget, const gameui::FramePicture *framePicture);
   virtual ~PuyoStatsLegendWidget() {}
+private:
+  PuyoStatsFormat &m_statsFormat;
+  gameui::Text m_legendText[MAX_DISPLAYED_COMBOS];
 };
 
 class PuyoTwoPlayersStatsWidget : public gameui::HBox {
@@ -85,6 +97,7 @@ public:
     virtual ~PuyoTwoPlayersStatsWidget() {}
     virtual void onWidgetVisibleChanged(bool visible);
 private:
+    PuyoStatsFormat m_statsFormat;
     gameui::SliderContainer m_leftSlider, m_rightSlider, m_legendSlider;
     PuyoStatsWidget m_leftStats, m_rightStats;
     PuyoStatsLegendWidget m_legend;

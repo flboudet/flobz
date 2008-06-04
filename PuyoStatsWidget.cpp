@@ -147,34 +147,51 @@ void ProgressBarWidget::setVisible(bool visible)
     requestDraw();
 }
 
-PuyoStatsWidget::PuyoStatsWidget(PlayerGameStat &stats, PlayerGameStat &opponentStats,
+PuyoStatsFormat::PuyoStatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &playerBStats)
+{
+    int j = 0;
+    for (int i = 0 ; i < MAX_DISPLAYED_COMBOS+1 ; i++)
+        m_comboIndirection[i] = -1;
+    for (int i = 0 ; (i < 24) && (j < MAX_DISPLAYED_COMBOS+1) ; i++) {
+        if ((playerAStats.combo_count[i] > 0) || (playerBStats.combo_count[i] > 0))
+            m_comboIndirection[j++] = i;
+    }
+}
+
+
+PuyoStatsWidget::PuyoStatsWidget(PuyoStatsFormat &statsFormat,
+                                 PlayerGameStat &stats, PlayerGameStat &opponentStats,
                                  const gameui::FramePicture *framePicture, PuyoStatsDirection dir)
-  : Frame(framePicture), m_dir(dir), m_stats(stats), m_opponentStats(opponentStats),
+  : Frame(framePicture), m_statsFormat(statsFormat), m_dir(dir), m_stats(stats), m_opponentStats(opponentStats),
     m_statTitle("Combos"), m_maxCombo(0)
 {
     setInnerMargin(20);
     add(&m_statTitle);
-    for (int i = 0 ; i < 12 ; i++) {
+    for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++) {
         add(&m_comboLines[i]);
     }
     // Looking for the biggest combo
-    for (int i = 0 ; i < 12 ; i++) {
+    for (int i = 0 ; i < 24 ; i++) {
         if (m_stats.combo_count[i] > m_maxCombo)
             m_maxCombo = m_stats.combo_count[i];
     }
-    for (int i = 0 ; i < 12 ; i++) {
+    for (int i = 0 ; i < 24 ; i++) {
         if (m_opponentStats.combo_count[i] > m_maxCombo)
             m_maxCombo = m_opponentStats.combo_count[i];
     }
-    m_comboLines[0].setComboLineInfos(m_dir, 0, String("Combo x") + (1) + ": ", m_stats.combo_count[0], m_maxCombo, this);
+    int currentComboIndex = m_statsFormat.m_comboIndirection[0];
+    if (currentComboIndex != -1)
+        m_comboLines[0].setComboLineInfos(m_dir, 0, String(""), m_stats.combo_count[currentComboIndex], m_maxCombo, this);
 }
 
 void PuyoStatsWidget::action(Widget *sender, int actionType, GameControlEvent *event)
 {
-    int comboLineIndex = actionType + 1;
-    if (comboLineIndex >= 12)
+    int comboIndirectionIndex = actionType + 1;
+    if (comboIndirectionIndex >= MAX_DISPLAYED_COMBOS)
         return;
-    m_comboLines[comboLineIndex].setComboLineInfos(m_dir, comboLineIndex, String("Combo x") + (comboLineIndex+1) + ": ", m_stats.combo_count[comboLineIndex], m_maxCombo, this);
+    int currentComboIndex = m_statsFormat.m_comboIndirection[comboIndirectionIndex];
+    if (currentComboIndex != -1)
+        m_comboLines[comboIndirectionIndex].setComboLineInfos(m_dir, comboIndirectionIndex, String(""), m_stats.combo_count[currentComboIndex], m_maxCombo, this);
 }
 
 PuyoStatsWidget::ComboLine::ComboLine()
@@ -229,20 +246,29 @@ void PuyoStatsWidget::ComboLine::action(Widget *sender, int actionType, GameCont
     }
 }
 
-PuyoStatsLegendWidget::PuyoStatsLegendWidget(const gameui::FramePicture *framePicture)
-  : Frame(framePicture)
+PuyoStatsLegendWidget::PuyoStatsLegendWidget(PuyoStatsFormat &statsFormat, PuyoStatsWidget &guideWidget, const gameui::FramePicture *framePicture)
+  : Frame(framePicture), m_statsFormat(statsFormat)
 {
+    setInnerMargin(20);
     add(new Text("Combos"));
-    add(new Text("1x"));
-    add(new Text("2x"));
-    add(new Text("3x"));
-    add(new Text("4x"));
+    for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++) {
+        int numCombo = m_statsFormat.m_comboIndirection[i];
+        if (numCombo != -1)
+            m_legendText[i].setValue(String("x") + (numCombo+1));
+        add(&(m_legendText[i]));
+    }
+    if (m_statsFormat.m_comboIndirection[MAX_DISPLAYED_COMBOS] != -1)
+        m_legendText[MAX_DISPLAYED_COMBOS-1].setValue("Countless");
+    // Set the size of the different rows
+    for (int i = 0 ; i < this->getNumberOfChilds() ; i++)
+        getChild(i)->setPreferedSize(Vec3(0, guideWidget.getChild(i)->getSize().y));
 }
 
 PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats, const gameui::FramePicture *framePicture)
-  : m_leftStats(leftPlayerStats, rightPlayerStats, framePicture, RIGHT_TO_LEFT),
-    m_rightStats(rightPlayerStats, leftPlayerStats, framePicture, LEFT_TO_RIGHT),
-    m_legend(framePicture)
+  : m_statsFormat(leftPlayerStats, rightPlayerStats),
+    m_leftStats(m_statsFormat, leftPlayerStats, rightPlayerStats, framePicture, RIGHT_TO_LEFT),
+    m_rightStats(m_statsFormat, rightPlayerStats, leftPlayerStats, framePicture, LEFT_TO_RIGHT),
+    m_legend(m_statsFormat, m_leftStats, framePicture)
 {
     m_legendSlider.setPreferedSize(Vec3(150., 0.));
     add(&m_leftSlider);
