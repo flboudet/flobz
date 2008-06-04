@@ -158,7 +158,7 @@ void Frame::draw(SDL_Surface *screen)
       if (m_borderVisible)
         IIM_BlitSurface(m_bgFocus, &srcrect, screen, &dstrect);
     }
-    else {
+    else if (m_frameSurface) {
       cacheSurface(m_bgSurface, m_frameSurface);
       // Drawing the background
       if (m_borderVisible)
