@@ -12,20 +12,31 @@
 
 using namespace gameui;
 
-static IIM_Surface *rope_elt = NULL;
-static IIM_Surface *puyo_right = NULL;
-static IIM_Surface *puyo_left = NULL;
-static IIM_Surface *stats_bg = NULL;
+static StatsResources *res;
+
+StatsResources::StatsResources() 
+{
+    res = this;
+    rope_elt = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/rope.png"));
+    puyo_right = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_right.png"));
+    puyo_left = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left.png"));
+    separator = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/separator.png"));
+    stats_bg = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/stats-bg.png"));
+}
+
+StatsResources::~StatsResources()
+{
+    IIM_Free(rope_elt);
+    IIM_Free(puyo_left);
+    IIM_Free(puyo_right);
+    IIM_Free(stats_bg);
+    IIM_Free(separator);
+}
 
 ProgressBarWidget::ProgressBarWidget(Action *associatedAction)
   : m_value(0.), m_targetValue(0.), m_progressive(false), m_progressiveDuration(0.6), m_visible(true),
     m_associatedAction(associatedAction)
 {
-    if (rope_elt == NULL) {
-      rope_elt = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/rope.png"));
-      puyo_right = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_right.png"));
-      puyo_left = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left.png"));
-    }
     setPreferedSize(Vec3(0, 32));
 }
 
@@ -84,20 +95,20 @@ void ProgressBarWidget::draw(SDL_Surface *screen)
             dstrect.x = bpos.x + dstrect.x + IMG_RING_WIDTH;
         }
         else {
-            dstrect.x = bpos.x + (bsize.x - dstrect.x - IMG_ROPE_ELT_WIDTH) - IMG_RING_WIDTH;
+            dstrect.x = bpos.x + (bsize.x - dstrect.x - IMG_ROPE_ELT_WIDTH) - IMG_RING_WIDTH - 1;
         }
-        SDL_BlitSurface(rope_elt->surf, NULL, screen, &dstrect);
+        SDL_BlitSurface(res->rope_elt->surf, NULL, screen, &dstrect);
     }
-    dstrect.w = puyo_right->w;
-    dstrect.h = puyo_right->h;
+    dstrect.w = res->puyo_right->w;
+    dstrect.h = res->puyo_right->h;
     dstrect.y = bpos.y;
     if (m_dir == LEFT_TO_RIGHT) {
         dstrect.x = bpos.x + rope_size + IMG_RING_WIDTH - 4;
-        SDL_BlitSurface(puyo_right->surf, NULL, screen, &dstrect);
+        SDL_BlitSurface(res->puyo_right->surf, NULL, screen, &dstrect);
     }
     else {
         dstrect.x = bpos.x + bsize.x - rope_size - IMG_RING_WIDTH - IMG_PUYO_WIDTH + 4;
-        SDL_BlitSurface(puyo_left->surf, NULL, screen, &dstrect);
+        SDL_BlitSurface(res->puyo_left->surf, NULL, screen, &dstrect);
     }
 }
 
@@ -170,7 +181,10 @@ PuyoStatsWidget::PuyoStatsWidget(PuyoStatsFormat &statsFormat,
 {
     setPolicy(USE_MIN_SIZE);
     setInnerMargin(20);
+
     /*add(&m_statTitle);*/
+    add(new Text("WINNER"));
+    add(new Image(res->separator));
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++) {
         add(&m_comboLines[i]);
     }
@@ -267,7 +281,7 @@ PuyoStatsLegendWidget::PuyoStatsLegendWidget(PuyoStatsFormat &statsFormat, PuyoS
         int numCombo = m_statsFormat.m_comboIndirection[i];
         if (numCombo != -1) {
 	  String pictureName = theCommander->getDataPathManager().getPath(String("gfx/combo") + ((numCombo+1) == 1 ? 2 : numCombo+1) + String("x.png"));
-	  IIM_Surface *comboImage = IIM_Load_Absolute_DisplayFormatAlpha(pictureName);
+      IIM_Surface *comboImage = IIM_Load_Absolute_DisplayFormatAlpha(pictureName);
 	  m_legendImage[i].setImage(comboImage);
 	}
         m_legendSlider[i].setSlideSide(SliderContainer::SLIDE_FROM_BOTTOM);
@@ -325,10 +339,8 @@ void PuyoTwoPlayersStatsWidget::onWidgetVisibleChanged(bool visible)
     m_leftSlider.transitionToContent(&m_leftStats);
     m_rightSlider.transitionToContent(&m_rightStats);
     m_legendSlider.transitionToContent(&m_legend);
-    if (stats_bg == NULL)
-        stats_bg = IIM_Load_Absolute_DisplayFormatAlpha("data/base.000/gfx/stats-bg.png");
-    m_leftSlider.setBackground(stats_bg);
-    m_rightSlider.setBackground(stats_bg);
+    m_leftSlider.setBackground(::res->stats_bg);
+    m_rightSlider.setBackground(::res->stats_bg);
 }
 
 void PuyoTwoPlayersStatsWidget::onSlideInside(SliderContainer &slider)

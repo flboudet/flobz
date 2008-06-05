@@ -98,6 +98,17 @@ private:
   gameui::Image m_legendImage[MAX_DISPLAYED_COMBOS];
 };
 
+class StatsResources {
+    public:
+        IIM_Surface *rope_elt;
+        IIM_Surface *puyo_right;
+        IIM_Surface *puyo_left;
+        IIM_Surface *stats_bg;
+        IIM_Surface *separator;
+        StatsResources();
+        ~StatsResources();
+};
+
 class PuyoTwoPlayersStatsWidget : public gameui::HBox, gameui::SliderContainerListener {
 public:
     PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats, const gameui::FramePicture *framePicture);
@@ -108,6 +119,7 @@ public:
      */
     virtual void onSlideInside(gameui::SliderContainer &slider);
 private:
+    StatsResources m_res;
     PuyoStatsFormat m_statsFormat;
     gameui::SliderContainer m_leftSlider, m_rightSlider, m_legendSlider;
     PuyoStatsLegendWidget m_legend;
