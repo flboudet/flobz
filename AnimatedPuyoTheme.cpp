@@ -257,6 +257,48 @@ StandardAnimatedPuyoTheme::StandardAnimatedPuyoTheme(const String path, const ch
 #ifdef DEBUG
     counter = 0;
 #endif
+
+    unsigned int j;
+    unsigned int i;
+    
+    for (j=0; j<NUMBER_OF_PUYO_FACES; j++)
+    {
+        for (i=0; i<MAX_COMPRESSED; i++) {
+            _puyoFaces[j][i] = NULL;
+        }
+    }
+    
+    for (j=0; j<NUMBER_OF_PUYO_CIRCLES; j++)
+    {
+        for (i=0; i<MAX_COMPRESSED; i++) {
+            _puyoCircles[j][i] = NULL;
+        }
+    }
+    
+    for (i=0; i<MAX_COMPRESSED; i++) {
+        _puyoShadow[i] = NULL;
+    }
+    
+    for (j=0; j<NUMBER_OF_PUYO_EXPLOSIONS; j++)
+    {
+        for (i=0; i<MAX_COMPRESSED; i++) {
+            _puyoExplosion[j][i] = NULL;
+        }
+    }
+    
+    for (j=0; j<NUMBER_OF_PUYO_DISAPPEAR; j++)
+    {
+        for (i=0; i<MAX_COMPRESSED; i++) {
+            _puyoDisappear[j][i] = NULL;
+        }
+    }
+    
+    for (j=0; j<NUMBER_OF_PUYO_EYES; j++)
+    {
+        for (i=0; i<MAX_COMPRESSED; i++) {
+            _puyoEyes[j][i] = NULL;
+        }
+    }
 }
 
 
@@ -276,6 +318,81 @@ StandardAnimatedPuyoTheme::~StandardAnimatedPuyoTheme(void)
     _eyes = NULL;
     
     releaseCached();
+}
+
+IIM_Surface * StandardAnimatedPuyoTheme::getShrunkSurface(PuyoPictureType picture, int index, int compression)
+{
+    
+#ifdef DEBUG
+    ASSERT_RANGE(PUYO_FACES,PUYO_SHADOWS,picture);
+    int max;
+    switch (picture)
+    {
+        case PUYO_FACES:
+            max = NUMBER_OF_PUYO_FACES;
+            break;
+        case PUYO_CIRCLES:
+            max = NUMBER_OF_PUYO_CIRCLES;
+            break;
+        case PUYO_EXPLOSIONS:
+            max = NUMBER_OF_PUYO_EXPLOSIONS;
+            break;
+        case PUYO_DISAPPEAR:
+            max = NUMBER_OF_PUYO_DISAPPEAR;
+            break;
+        case PUYO_EYES:
+            max = NUMBER_OF_PUYO_EYES;
+            break;
+        case PUYO_SHADOWS:
+            max = 1;
+            break;
+        default:
+            max = 0;
+            break;
+    }
+    ASSERT_RANGE(0,max-1,index);
+#endif
+    
+    if (_cached == false) cache();
+    
+    if (compression<1) return getSurface(picture, index);
+    if (compression>(MAX_COMPRESSED-1)) compression = MAX_COMPRESSED-1;
+    
+    IIM_Surface * * myImage = NULL;
+    
+    switch (picture)
+    {
+        case PUYO_FACES:
+            myImage = &(_puyoFaces[index][0]);
+            break;
+        case PUYO_CIRCLES:
+            myImage = &(_puyoCircles[index][0]);
+            break;
+        case PUYO_EXPLOSIONS:
+            myImage = &(_puyoExplosion[index][0]);
+            break;
+        case PUYO_DISAPPEAR:
+            myImage = &(_puyoDisappear[index][0]);
+            break;
+        case PUYO_EYES:
+            myImage = &(_puyoEyes[index][0]);
+            break;
+        case PUYO_SHADOWS:
+            myImage = &(_puyoShadow[0]);
+            break;
+        default:
+            break;
+    }
+    //fprintf(stderr,"1-%p - %p\n",myImage, myImage[0]);
+    if (myImage && myImage[0]) {
+        //fprintf(stderr,"2-%p - %p\n",myImage[0],myImage[compression]);
+        if (myImage[compression] == NULL) {
+            myImage[compression] = iim_surface_resize_alpha(myImage[0], myImage[0]->w, (myImage[0]->h - compression));
+            //fprintf(stderr,"3-%p - %p\n",myImage[0],myImage[compression]);
+        }
+        return myImage[compression];
+    }
+    return NULL;
 }
 
 IIM_Surface * StandardAnimatedPuyoTheme::getSurface(PuyoPictureType picture, int index)
@@ -316,22 +433,22 @@ IIM_Surface * StandardAnimatedPuyoTheme::getSurface(PuyoPictureType picture, int
     switch (picture)
     {
         case PUYO_FACES:
-            return _puyoFaces[index];
+            return _puyoFaces[index][0];
             break;
         case PUYO_CIRCLES:
-            return _puyoCircles[index];
+            return _puyoCircles[index][0];
             break;
         case PUYO_EXPLOSIONS:
-            return _puyoExplosion[index];
+            return _puyoExplosion[index][0];
             break;
         case PUYO_DISAPPEAR:
-            return _puyoDisappear[index];
+            return _puyoDisappear[index][0];
             break;
         case PUYO_EYES:
-            return _puyoEyes[index];
+            return _puyoEyes[index][0];
             break;
         case PUYO_SHADOWS:
-            return _puyoShadow;
+            return _puyoShadow[0];
             break;
         default:
             break;
@@ -339,44 +456,64 @@ IIM_Surface * StandardAnimatedPuyoTheme::getSurface(PuyoPictureType picture, int
     return NULL;
 }
 
+IIM_Surface *StandardAnimatedPuyoTheme::getPuyoSurfaceForValence(int valence, int compression)
+{
+    //if (compression < 1) return getSurface(PUYO_FACES, valence);
+    return getShrunkSurface(PUYO_FACES, valence, compression);
+}
+
+
 
 void StandardAnimatedPuyoTheme::releaseCached(void)
 {
     unsigned int j;
+    unsigned int i;
     
-        for (j=0; j<NUMBER_OF_PUYO_FACES; j++)
-        {
-            if (_puyoFaces[j] != NULL) IIM_Free(_puyoFaces[j]);
-            _puyoFaces[j] = NULL;
+    for (j=0; j<NUMBER_OF_PUYO_FACES; j++)
+    {
+        for (i=0; i<MAX_COMPRESSED; i++) {
+            if (_puyoFaces[j][i] != NULL) IIM_Free(_puyoFaces[j][i]);
+            _puyoFaces[j][i] = NULL;
         }
-        
-        for (j=0; j<NUMBER_OF_PUYO_CIRCLES; j++)
-        {
-            if (_puyoCircles[j] != NULL) IIM_Free(_puyoCircles[j]);
-            _puyoCircles[j] = NULL;
+    }
+    
+    for (j=0; j<NUMBER_OF_PUYO_CIRCLES; j++)
+    {
+        for (i=0; i<MAX_COMPRESSED; i++) {
+            if (_puyoCircles[j][i] != NULL) IIM_Free(_puyoCircles[j][i]);
+            _puyoCircles[j][i] = NULL;
         }
-        
-        if (_puyoShadow != NULL) IIM_Free(_puyoShadow);
-        _puyoShadow = NULL;
-        
-        for (j=0; j<NUMBER_OF_PUYO_EXPLOSIONS; j++)
-        {
-            if (_puyoExplosion[j] != NULL) IIM_Free(_puyoExplosion[j]);
-            _puyoExplosion[j] = NULL;
+    }
+    
+    for (i=0; i<MAX_COMPRESSED; i++) {
+        if (_puyoShadow[i] != NULL) IIM_Free(_puyoShadow[i]);
+        _puyoShadow[i] = NULL;
+    }
+    
+    for (j=0; j<NUMBER_OF_PUYO_EXPLOSIONS; j++)
+    {
+        for (i=0; i<MAX_COMPRESSED; i++) {
+            if (_puyoExplosion[j][i] != NULL) IIM_Free(_puyoExplosion[j][i]);
+            _puyoExplosion[j][i] = NULL;
         }
-        
-        for (j=0; j<NUMBER_OF_PUYO_DISAPPEAR; j++)
-        {
-            if (_puyoDisappear[j] != NULL) IIM_Free(_puyoDisappear[j]);
-            _puyoDisappear[j] = NULL;
+    }
+    
+    for (j=0; j<NUMBER_OF_PUYO_DISAPPEAR; j++)
+    {
+        for (i=0; i<MAX_COMPRESSED; i++) {
+            if (_puyoDisappear[j][i] != NULL) IIM_Free(_puyoDisappear[j][i]);
+            _puyoDisappear[j][i] = NULL;
         }
-        
-        for (j=0; j<NUMBER_OF_PUYO_EYES; j++)
-        {
-            if (_puyoEyes[j] != NULL) IIM_Free(_puyoEyes[j]);
-            _puyoEyes[j] = NULL;
+    }
+    
+    for (j=0; j<NUMBER_OF_PUYO_EYES; j++)
+    {
+        for (i=0; i<MAX_COMPRESSED; i++) {
+            if (_puyoEyes[j][i] != NULL) IIM_Free(_puyoEyes[j][i]);
+            _puyoEyes[j][i] = NULL;
         }
-        _cached = false;
+    }
+    _cached = false;
 }
 
 
@@ -398,39 +535,39 @@ bool StandardAnimatedPuyoTheme::cache(void)
     {
         snprintf(path, sizeof(path), "%s/%s-puyo-%d%d%d%d.png",fullPath,_face,(j&8)>>3,(j&4)>>2,(j&2)>>1,j&1);
         snprintf(defpath, sizeof(defpath), "%s/%s-puyo-%d%d%d%d.png",DEFAULTPATH(),_face,(j&8)>>3,(j&4)>>2,(j&2)>>1,j&1);
-        OK = OK && loadPictureWithOffset(path,&(_puyoFaces[j]),defpath,_color_offset);
+        OK = OK && loadPictureWithOffset(path,&(_puyoFaces[j][0]),defpath,_color_offset);
     }
     snprintf(path, sizeof(path), "%s/%s-puyo-border.png",fullPath,_face);
     snprintf(defpath, sizeof(defpath), "%s/%s-puyo-border.png",DEFAULTPATH(),_face);
-    ADD_PICTURE(_puyoCircles[0]);
+    ADD_PICTURE(_puyoCircles[0][0]);
     for (int i = 1; i<NUMBER_OF_PUYO_CIRCLES; i++)
     {
-        OK = OK && copyPictureWithLuminosity(_puyoCircles[0],&(_puyoCircles[i]),NULL,sin(3.14f/2.0f+i*3.14f/64.0f)*0.6f+0.2f);
+        OK = OK && copyPictureWithLuminosity(_puyoCircles[0][0],&(_puyoCircles[i][0]),NULL,sin(3.14f/2.0f+i*3.14f/64.0f)*0.6f+0.2f);
     }
     
     snprintf(path, sizeof(path), "%s/%s-puyo-shadow.png",fullPath,_face);
     snprintf(defpath, sizeof(defpath), "%s/%s-puyo-shadow.png",DEFAULTPATH(),_face);
-    ADD_PICTURE(_puyoShadow)
+    ADD_PICTURE(_puyoShadow[0])
     
     for (j=0; j<NUMBER_OF_PUYO_EXPLOSIONS; j++)
     {
         snprintf(path, sizeof(path), "%s/%s-puyo-explosion-%d.png",fullPath,_explosions,j);
         snprintf(defpath, sizeof(defpath), "%s/%s-puyo-explosion-%d.png",DEFAULTPATH(),_explosions,j);
-        OK = OK && loadPictureWithOffset(path,&(_puyoExplosion[j]),defpath,_color_offset);
+        OK = OK && loadPictureWithOffset(path,&(_puyoExplosion[j][0]),defpath,_color_offset);
     }
     
     for (j=0; j<NUMBER_OF_PUYO_DISAPPEAR; j++)
     {
         snprintf(path, sizeof(path), "%s/%s-puyo-disappear-%d.png",fullPath,_disappear,j);
         snprintf(defpath, sizeof(defpath), "%s/%s-puyo-disappear-%d.png",DEFAULTPATH(),_disappear,j);
-        OK = OK && loadPictureWithOffset(path,&(_puyoDisappear[j]),defpath,_color_offset);
+        OK = OK && loadPictureWithOffset(path,&(_puyoDisappear[j][0]),defpath,_color_offset);
     }
     
     for (j=0; j<NUMBER_OF_PUYO_EYES; j++)
     {
         snprintf(path, sizeof(path), "%s/%s-puyo-eye-%d.png",fullPath,_eyes,j);
         snprintf(defpath, sizeof(defpath), "%s/%s-puyo-eye-%d.png",DEFAULTPATH(),_eyes,j);
-        OK = OK && loadPictureWithOffset(path,&(_puyoEyes[j]),defpath,_color_offset);
+        OK = OK && loadPictureWithOffset(path,&(_puyoEyes[j][0]),defpath,_color_offset);
     }
     
     _cached = true;
@@ -467,13 +604,13 @@ IIM_Surface * NeutralAnimatedPuyoTheme::getSurface(PuyoPictureType picture, int 
     return _puyoNeutral;
 }
 
-IIM_Surface *NeutralAnimatedPuyoTheme::getPuyoSurfaceForValence(int valence)
+IIM_Surface *NeutralAnimatedPuyoTheme::getPuyoSurfaceForValence(int valence, int compression)
 {
     CACHE_IT_OR_DIE
     return _puyoNeutral;
 }
 
-IIM_Surface *NeutralAnimatedPuyoTheme::getExplodingSurfaceForIndex(int index)
+IIM_Surface *NeutralAnimatedPuyoTheme::getExplodingSurfaceForIndex(int index, int compression)
 {
     CACHE_IT_OR_DIE
     return _puyoNeutralPop[index];

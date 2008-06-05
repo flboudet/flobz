@@ -55,8 +55,10 @@ void IIM_Free(IIM_Surface *img)
   }
 }
 
+#include <stdio.h>
 IIM_Surface * IIM_RegisterImg(SDL_Surface *img, bool isAlpha)
 {
+    fprintf (stderr,"# %d\n",imgListSize);
   IIM_Surface *_this = &imgList[imgListSize++];
   _this->isAlpha = isAlpha;
   _this->surf    = img;
@@ -389,42 +391,37 @@ RGBA iim_hsva2rgba(HSVA c)
  */
 IIM_Surface *iim_surface_shift_hsv(IIM_Surface *isrc, float h, float s, float v)
 {
-  SDL_Surface *src = isrc->surf;
-  SDL_PixelFormat *fmt = src->format;
-  SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
-                                          fmt->Rmask, fmt->Gmask,
-                                          fmt->Bmask, fmt->Amask);
-  SDL_LockSurface(src);
-  SDL_LockSurface(ret);
-  for (int y=src->h; y--;)
-  {
-    for (int x=src->w; x--;)
+    SDL_Surface *src = isrc->surf;
+    SDL_PixelFormat *fmt = src->format;
+    SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
+                                            fmt->Rmask, fmt->Gmask,
+                                            fmt->Bmask, fmt->Amask);
+    bool srclocked = false;
+    if(SDL_MUSTLOCK(src)) srclocked = (SDL_LockSurface(src) == 0);
+    bool retlocked = false;
+    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);        
+    for (int y=src->h; y--;)
     {
-      RGBA rgba = iim_surface_get_rgba(src,x,y);
-      HSVA hsva = iim_rgba2hsva(rgba);
-      hsva.hue += h;
-      if (hsva.hue > 360.0f) hsva.hue -= 360.0f;
-      if (hsva.hue < 0.0f) hsva.hue += 360.0f;
-      hsva.saturation += s;
-      if (hsva.saturation > 1.) hsva.saturation = 1.f;
-      if (hsva.saturation < 0.0f) hsva.saturation = .0f;
-      hsva.value += v;
-      if (hsva.value > 1.) hsva.value = 1.f;
-      if (hsva.value < 0.0f) hsva.value = .0f;
-      rgba = iim_hsva2rgba(hsva);
-      iim_surface_set_rgba(ret,x,y,rgba);
+        for (int x=src->w; x--;)
+        {
+            RGBA rgba = iim_surface_get_rgba(src,x,y);
+            HSVA hsva = iim_rgba2hsva(rgba);
+            hsva.hue += h;
+            if (hsva.hue > 360.0f) hsva.hue -= 360.0f;
+            if (hsva.hue < 0.0f) hsva.hue += 360.0f;
+            hsva.saturation += s;
+            if (hsva.saturation > 1.) hsva.saturation = 1.f;
+            if (hsva.saturation < 0.0f) hsva.saturation = .0f;
+            hsva.value += v;
+            if (hsva.value > 1.) hsva.value = 1.f;
+            if (hsva.value < 0.0f) hsva.value = .0f;
+            rgba = iim_hsva2rgba(hsva);
+            iim_surface_set_rgba(ret,x,y,rgba);
+        }
     }
-  }
-  SDL_UnlockSurface(ret);
-  SDL_UnlockSurface(src);
-  SDL_Surface *ret2 = SDL_DisplayFormatAlpha(ret);
-	SDL_SetAlpha(ret2, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
-	SDL_FreeSurface(ret);
-  ret = isrc->surf;
-  isrc->surf = SDL_DisplayFormatAlpha(ret);
-  SDL_SetAlpha(isrc->surf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
-  SDL_FreeSurface(ret);
-  return IIM_RegisterImg(ret2, true);
+    if(retlocked) SDL_UnlockSurface(ret);
+    if(srclocked) SDL_UnlockSurface(src);
+    return IIM_RegisterImg(ret, true);
 }
 
 /**
@@ -432,36 +429,31 @@ IIM_Surface *iim_surface_shift_hsv(IIM_Surface *isrc, float h, float s, float v)
  */
 IIM_Surface *iim_surface_shift_hue(IIM_Surface *isrc, float hue_offset)
 {
-  SDL_Surface *src = isrc->surf;
-  SDL_PixelFormat *fmt = src->format;
-  SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
-                                          fmt->Rmask, fmt->Gmask,
-                                          fmt->Bmask, fmt->Amask);
-  SDL_LockSurface(src);
-  SDL_LockSurface(ret);
-  for (int y=src->h; y--;)
-  {
-    for (int x=src->w; x--;)
+    SDL_Surface *src = isrc->surf;
+    SDL_PixelFormat *fmt = src->format;
+    SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
+                                            fmt->Rmask, fmt->Gmask,
+                                            fmt->Bmask, fmt->Amask);
+    bool srclocked = false;
+    if(SDL_MUSTLOCK(src)) srclocked = (SDL_LockSurface(src) == 0);
+    bool retlocked = false;
+    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);        
+    for (int y=src->h; y--;)
     {
-      RGBA rgba = iim_surface_get_rgba(src,x,y);
-      HSVA hsva = iim_rgba2hsva(rgba);
-      hsva.hue += hue_offset;
-      if (hsva.hue > 360.0f) hsva.hue -= 360.0f;
-      if (hsva.hue < 0.0f) hsva.hue += 360.0f;
-      rgba = iim_hsva2rgba(hsva);
-      iim_surface_set_rgba(ret,x,y,rgba);
+        for (int x=src->w; x--;)
+        {
+            RGBA rgba = iim_surface_get_rgba(src,x,y);
+            HSVA hsva = iim_rgba2hsva(rgba);
+            hsva.hue += hue_offset;
+            if (hsva.hue > 360.0f) hsva.hue -= 360.0f;
+            if (hsva.hue < 0.0f) hsva.hue += 360.0f;
+            rgba = iim_hsva2rgba(hsva);
+            iim_surface_set_rgba(ret,x,y,rgba);
+        }
     }
-  }
-  SDL_UnlockSurface(ret);
-  SDL_UnlockSurface(src);
-  SDL_Surface *ret2 = SDL_DisplayFormatAlpha(ret);
-	SDL_SetAlpha(ret2, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
-	SDL_FreeSurface(ret);
-  ret = isrc->surf;
-  isrc->surf = SDL_DisplayFormatAlpha(ret);
-  SDL_SetAlpha(isrc->surf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
-  SDL_FreeSurface(ret);
-  return IIM_RegisterImg(ret2, true);
+    if(retlocked) SDL_UnlockSurface(ret);
+    if(srclocked) SDL_UnlockSurface(src);
+    return IIM_RegisterImg(ret, true);
 }
 
 /**
@@ -469,32 +461,31 @@ IIM_Surface *iim_surface_shift_hue(IIM_Surface *isrc, float hue_offset)
  */
 IIM_Surface *iim_surface_set_value(IIM_Surface *isrc, float value)
 {
-  SDL_Surface *src = isrc->surf;
-  SDL_PixelFormat *fmt = src->format;
-  SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
-                                          fmt->Rmask, fmt->Gmask,
-                                          fmt->Bmask, fmt->Amask);
-  SDL_LockSurface(src);
-  SDL_LockSurface(ret);
-  for (int y=src->h; y--;)
+    SDL_Surface *src = isrc->surf;
+    SDL_PixelFormat *fmt = src->format;
+    SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
+                                            fmt->Rmask, fmt->Gmask,
+                                            fmt->Bmask, fmt->Amask);
+    bool srclocked = false;
+    if(SDL_MUSTLOCK(src)) srclocked = (SDL_LockSurface(src) == 0);
+    bool retlocked = false;
+    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);        
+    for (int y=src->h; y--;)
     {
-      for (int x=src->w; x--;)
-	{
-	  RGBA rgba = iim_surface_get_rgba(src,x,y);
-	  HSVA hsva = iim_rgba2hsva(rgba);
-	  hsva.value = value;
-	  if (hsva.value > 1.0f) hsva.value = 1.0f;
-	  if (hsva.value < 0.0f) hsva.value = 0.0f;
-	  rgba = iim_hsva2rgba(hsva);
-	  iim_surface_set_rgba(ret,x,y,rgba);
-	}
+        for (int x=src->w; x--;)
+        {
+            RGBA rgba = iim_surface_get_rgba(src,x,y);
+            HSVA hsva = iim_rgba2hsva(rgba);
+            hsva.value = value;
+            if (hsva.value > 1.0f) hsva.value = 1.0f;
+            if (hsva.value < 0.0f) hsva.value = 0.0f;
+            rgba = iim_hsva2rgba(hsva);
+            iim_surface_set_rgba(ret,x,y,rgba);
+        }
     }
-  SDL_UnlockSurface(src);
-  SDL_UnlockSurface(ret);
-  SDL_Surface *ret2 = SDL_DisplayFormatAlpha(ret);
-  SDL_SetAlpha(ret2, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
-  SDL_FreeSurface(ret);
-  return IIM_RegisterImg(ret2, true);
+    if(retlocked) SDL_UnlockSurface(ret);
+    if(srclocked) SDL_UnlockSurface(src);
+    return IIM_RegisterImg(ret, true);
 }
 
 /**
@@ -509,8 +500,10 @@ IIM_Surface *iim_surface_resize(IIM_Surface *isrc, int width, int height)
     SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, width, height, 32,
                                             fmt->Rmask, fmt->Gmask,
                                             fmt->Bmask, fmt->Amask);
-    SDL_LockSurface(src);
-    SDL_LockSurface(ret);
+    bool srclocked = false;
+    if(SDL_MUSTLOCK(src)) srclocked = (SDL_LockSurface(src) == 0);
+    bool retlocked = false;
+    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);        
     
     int sizew = w/width;
     int sizeh = h/height;
@@ -546,16 +539,65 @@ IIM_Surface *iim_surface_resize(IIM_Surface *isrc, int width, int height)
             iim_surface_set_rgba(ret,x,y,finalrgba);
         }
     }
-    SDL_UnlockSurface(ret);
-    SDL_UnlockSurface(src);
-    SDL_Surface *ret2 = SDL_DisplayFormatAlpha(ret);
-	SDL_SetAlpha(ret2, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
-	/*SDL_FreeSurface(ret);
-    ret = isrc->surf;
-    isrc->surf = SDL_DisplayFormatAlpha(ret);
-    SDL_SetAlpha(isrc->surf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
-    SDL_FreeSurface(ret);*/
-    return IIM_RegisterImg(ret2, true);
+    if(retlocked) SDL_UnlockSurface(ret);
+    if(srclocked) SDL_UnlockSurface(src);
+    return IIM_RegisterImg(ret, true);
+}
+
+/**
+ * Resize a surface
+ */
+IIM_Surface *iim_surface_resize_alpha(IIM_Surface *isrc, int width, int height)
+{
+    SDL_Surface *src = isrc->surf;
+    int w = isrc->w;
+    int h = isrc->h;
+    SDL_PixelFormat *fmt = src->format;
+    SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, width, height, 32,
+                                            fmt->Rmask, fmt->Gmask,
+                                            fmt->Bmask, fmt->Amask);
+    bool srclocked = false;
+    if(SDL_MUSTLOCK(src)) srclocked = (SDL_LockSurface(src) == 0);
+    bool retlocked = false;
+    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);        
+    
+    int sizew = w/width;
+    int sizeh = h/height;
+    if (sizew<1) sizew = 1;
+    if (sizeh<1) sizeh = 1;
+    for (int y=height-1; y>=0; y--)
+    {
+        for (int x=width-1; x>=0; x--)
+        {
+            Uint32 red = 0;
+            Uint32 green = 0;
+            Uint32 blue = 0;
+            Uint32 alpha = 0;
+            int x1 = (x*w)/width;
+            int y1 = (y*h)/height;
+            for (int i=sizew; i>0; i--)
+            {
+                for (int j=sizeh; j>0; j--)
+                {
+                    RGBA rgba = iim_surface_get_rgba(src,x1+i-1,y1+j-1);
+                    red += rgba.red;
+                    green += rgba.green;
+                    blue += rgba.blue;
+                    alpha += rgba.alpha;
+                }
+            }
+            red /= (sizew*sizeh);
+            green /= (sizew*sizeh);
+            blue /= (sizew*sizeh);
+            alpha /= (sizew*sizeh);
+            //alpha = 255;
+            RGBA finalrgba = {(Uint8)red,(Uint8)green,(Uint8)blue,(Uint8)alpha};
+            iim_surface_set_rgba(ret,x,y,finalrgba);
+        }
+    }
+    if(retlocked) SDL_UnlockSurface(ret);
+    if(srclocked) SDL_UnlockSurface(src);
+    return IIM_RegisterImg(ret, true);
 }
 
 /**
@@ -563,13 +605,7 @@ IIM_Surface *iim_surface_resize(IIM_Surface *isrc, int width, int height)
  */
 IIM_Surface *iim_surface_duplicate(IIM_Surface *isrc)
 {
-    SDL_Surface *ret2 = SDL_DisplayFormatAlpha(isrc->surf);
-	SDL_SetAlpha(ret2, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
-    SDL_Surface *ret = isrc->surf;
-    isrc->surf = SDL_DisplayFormatAlpha(ret);
-    SDL_SetAlpha(isrc->surf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
-    SDL_FreeSurface(ret);
-    return IIM_RegisterImg(ret2, true);
+    return IIM_RegisterImg(SDL_DisplayFormatAlpha(isrc->surf), true);
 }
 
 /**
@@ -587,8 +623,12 @@ IIM_Surface *iim_rotate(IIM_Surface *isrc, int degrees)
     float sina    = sin(radians);
     float cx = src->w / 2;
     float cy = src->h / 2;
-    SDL_LockSurface(src);
-    SDL_LockSurface(ret);
+    
+    bool srclocked = false;
+    if(SDL_MUSTLOCK(src)) srclocked = (SDL_LockSurface(src) == 0);
+    bool retlocked = false;
+    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);        
+
     for (int y=src->h; y--;)
     {
         for (int x=src->w; x--;)
@@ -624,12 +664,9 @@ IIM_Surface *iim_rotate(IIM_Surface *isrc, int degrees)
             iim_surface_set_rgba(ret,x,y,rgba);
         }
     }
-    SDL_UnlockSurface(src);
-    SDL_UnlockSurface(ret);
-    SDL_Surface *ret2 = SDL_DisplayFormatAlpha(ret);
-    SDL_SetAlpha(ret2, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
-    SDL_FreeSurface(ret);
-    return IIM_RegisterImg(ret2, true);
+    if(retlocked) SDL_UnlockSurface(ret);
+    if(srclocked) SDL_UnlockSurface(src);
+    return IIM_RegisterImg(ret, true);
 }
 
 void iim_surface_convert_to_gray(IIM_Surface *isrc)

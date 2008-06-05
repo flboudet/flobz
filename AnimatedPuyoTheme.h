@@ -41,6 +41,8 @@
 
 #define NUMBER_OF_LIVES 4
 
+#define MAX_COMPRESSED 32
+
 typedef enum {
     PUYO_FACES = 0,
     PUYO_CIRCLES = 1,
@@ -56,13 +58,14 @@ typedef enum {
 class AnimatedPuyoTheme {
 public:
     virtual ~AnimatedPuyoTheme() {}
-    virtual IIM_Surface * getSurface(PuyoPictureType picture, int index) = 0;
-    virtual IIM_Surface *getPuyoSurfaceForValence(int valence) = 0;
-    virtual IIM_Surface *getEyeSurfaceForIndex(int index) = 0;
-    virtual IIM_Surface *getCircleSurfaceForIndex(int index) = 0;
-    virtual IIM_Surface *getShadowSurface() = 0;
-    virtual IIM_Surface *getShrinkingSurfaceForIndex(int index) = 0;
-    virtual IIM_Surface *getExplodingSurfaceForIndex(int index) = 0;
+    virtual IIM_Surface *getSurface(PuyoPictureType picture, int index) = 0;
+    virtual IIM_Surface *getShrunkSurface(PuyoPictureType picture, int index, int compression) = 0;
+    virtual IIM_Surface *getPuyoSurfaceForValence(int valence, int compression = 0) = 0;
+    virtual IIM_Surface *getEyeSurfaceForIndex(int index, int compression = 0) = 0;
+    virtual IIM_Surface *getCircleSurfaceForIndex(int index, int compression = 0) = 0;
+    virtual IIM_Surface *getShadowSurface(int compression = 0) = 0;
+    virtual IIM_Surface *getShrinkingSurfaceForIndex(int index, int compression = 0) = 0;
+    virtual IIM_Surface *getExplodingSurfaceForIndex(int index, int compression = 0) = 0;
 };
 
 class StandardAnimatedPuyoTheme : public AnimatedPuyoTheme {
@@ -71,14 +74,14 @@ public:
     StandardAnimatedPuyoTheme(const String path, const char * face, const char * disappear, const char * explosions, const char * eyes, const float color_offset);
     ~StandardAnimatedPuyoTheme(void);
     
-    IIM_Surface * getSurface(PuyoPictureType picture, int index);
-
-    IIM_Surface *getPuyoSurfaceForValence(int valence) { return getSurface(PUYO_FACES,valence); };
-    IIM_Surface *getEyeSurfaceForIndex(int index) { return getSurface(PUYO_EYES,index); };
-    IIM_Surface *getCircleSurfaceForIndex(int index) { return getSurface(PUYO_CIRCLES,index); };
-    IIM_Surface *getShadowSurface() { return getSurface(PUYO_SHADOWS,0); };
-    IIM_Surface *getShrinkingSurfaceForIndex(int index) { return getSurface(PUYO_DISAPPEAR,index); };
-    IIM_Surface *getExplodingSurfaceForIndex(int index) { return getSurface(PUYO_EXPLOSIONS,index); };
+    IIM_Surface *getSurface(PuyoPictureType picture, int index);
+    IIM_Surface *getShrunkSurface(PuyoPictureType picture, int index, int compression);
+    IIM_Surface *getPuyoSurfaceForValence(int valence, int compression = 0);
+    IIM_Surface *getEyeSurfaceForIndex(int index, int compression = 0) { return getShrunkSurface(PUYO_EYES,index,compression); };
+    IIM_Surface *getCircleSurfaceForIndex(int index, int compression = 0) { return getShrunkSurface(PUYO_CIRCLES,index,compression); };
+    IIM_Surface *getShadowSurface(int compression = 0) { return getShrunkSurface(PUYO_SHADOWS,0,compression); };
+    IIM_Surface *getShrinkingSurfaceForIndex(int index, int compression = 0) { return getShrunkSurface(PUYO_DISAPPEAR,index,compression); };
+    IIM_Surface *getExplodingSurfaceForIndex(int index, int compression = 0) { return getShrunkSurface(PUYO_EXPLOSIONS,index,compression); };
 
     bool validate(void);
     bool cache(void);
@@ -94,12 +97,12 @@ private:
     char * _eyes;
     float _color_offset;
     
-    IIM_Surface * _puyoFaces[NUMBER_OF_PUYO_FACES];
-    IIM_Surface * _puyoCircles[NUMBER_OF_PUYO_CIRCLES];
-    IIM_Surface * _puyoShadow;
-    IIM_Surface * _puyoExplosion[NUMBER_OF_PUYO_EXPLOSIONS];
-    IIM_Surface * _puyoDisappear[NUMBER_OF_PUYO_DISAPPEAR];
-    IIM_Surface * _puyoEyes[NUMBER_OF_PUYO_EYES];
+    IIM_Surface * _puyoFaces[NUMBER_OF_PUYO_FACES][MAX_COMPRESSED];
+    IIM_Surface * _puyoCircles[NUMBER_OF_PUYO_CIRCLES][MAX_COMPRESSED];
+    IIM_Surface * _puyoShadow[MAX_COMPRESSED];
+    IIM_Surface * _puyoExplosion[NUMBER_OF_PUYO_EXPLOSIONS][MAX_COMPRESSED];
+    IIM_Surface * _puyoDisappear[NUMBER_OF_PUYO_DISAPPEAR][MAX_COMPRESSED];
+    IIM_Surface * _puyoEyes[NUMBER_OF_PUYO_EYES][MAX_COMPRESSED];
 
     bool _cached;
 };
@@ -108,13 +111,14 @@ class NeutralAnimatedPuyoTheme : public AnimatedPuyoTheme {
 public:
     NeutralAnimatedPuyoTheme(const String path, const char * face);
     ~NeutralAnimatedPuyoTheme(void);
-    IIM_Surface * getSurface(PuyoPictureType picture, int index);
-    IIM_Surface *getPuyoSurfaceForValence(int valence);
-    IIM_Surface *getEyeSurfaceForIndex(int index) { return NULL; }
-    IIM_Surface *getCircleSurfaceForIndex(int index) { return NULL; }
-    IIM_Surface *getShadowSurface() { return NULL; }
-    IIM_Surface *getShrinkingSurfaceForIndex(int index) { return NULL; }
-    IIM_Surface *getExplodingSurfaceForIndex(int index);
+    IIM_Surface *getSurface(PuyoPictureType picture, int index);
+    IIM_Surface *getShrunkSurface(PuyoPictureType picture, int index, int compression) { return getSurface(picture, index);}
+    IIM_Surface *getPuyoSurfaceForValence(int valence, int compression = 0);
+    IIM_Surface *getEyeSurfaceForIndex(int index, int compression = 0) { return NULL; }
+    IIM_Surface *getCircleSurfaceForIndex(int index, int compression = 0) { return NULL; }
+    IIM_Surface *getShadowSurface(int compression = 0) { return NULL; }
+    IIM_Surface *getShrinkingSurfaceForIndex(int index, int compression = 0) { return NULL; }
+    IIM_Surface *getExplodingSurfaceForIndex(int index, int compression = 0);
     bool cache(void);
     void releaseCached(void);
 private:

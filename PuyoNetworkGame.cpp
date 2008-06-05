@@ -139,7 +139,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     if (didFall.size() > 0) {
        if (delegate != NULL) {
             for (int i = 0, j = didFall.size() ; i < j ; i += 3) {
-                delegate->puyoDidFall(findPuyo(didFall[i]), didFall[i+1], didFall[i+2]);
+                delegate->puyoDidFall(findPuyo(didFall[i]), didFall[i+1], didFall[i+2], 0);
             }
         }
     }

@@ -199,46 +199,48 @@ void TurningAnimation::draw(int semiMove)
 /* Puyo falling and bouncing animation */
 
 const int FallingAnimation::BOUNCING_OFFSET_NUM = 9;
-const int FallingAnimation::BOUNCING_OFFSET[] = { 1, 7, 11,  8,  4,  1, -1, -3,  0 };
+const int FallingAnimation::BOUNCING_OFFSET[] = {-3, -4, -3, 0, 3, 6, 8, 6, 3};
 
-FallingAnimation::FallingAnimation(AnimatedPuyo &puyo, int originY, int xOffset, int yOffset, int step) : PuyoAnimation(puyo)
+FallingAnimation::FallingAnimation(AnimatedPuyo &puyo, int originY, int xOffset, int yOffset, int off) : PuyoAnimation(puyo)
 {
     this->xOffset = xOffset;
     this->yOffset = yOffset;
-    this->step    = 0/*step*/;
+    this->off     = off;
+    this->step    = 0;
     this->X  = (attachedPuyo.getPuyoX()*TSIZE) + xOffset;
     this->Y  = (originY*TSIZE) + yOffset;
-    bouncing = BOUNCING_OFFSET_NUM - 1;
-    /*if (originY == attachedPuyo.getPuyoY()) {
-        bouncing = -1;
-    }*/
+    bouncing = BOUNCING_OFFSET_NUM + off;
     attachedPuyo.getAttachedView()->disallowCycle();
     EventFX("start_falling", X+TSIZE/2, Y+TSIZE/2, puyo.getAttachedView()->getPlayerId());
+    AudioManager::playSound("bam1.wav", .1);
 }
 
 void FallingAnimation::cycle()
 {
     Y += step++;
+    
     if (Y >= (attachedPuyo.getPuyoY()*TSIZE) + yOffset)
     {
         Y = (attachedPuyo.getPuyoY()*TSIZE) + yOffset;
+        if (bouncing == BOUNCING_OFFSET_NUM + off) attachedPuyo.getAttachedView()->allowCycle();
+
         bouncing--;
 
         if (bouncing < 0) {
             finishedFlag = true;
-            AudioManager::playSound("bam1.wav", .1);
-            EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
-            EventFX("end_falling", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
-            attachedPuyo.setAnimatedState(AnimatedPuyo::PUYO_NORMAL);
-            attachedPuyo.getAttachedView()->allowCycle();
+            //EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
+            //EventFX("end_falling", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
+            attachedPuyo.setAnimatedState(0);
+            //attachedPuyo.getAttachedView()->allowCycle();
         }
-        else if (BOUNCING_OFFSET[bouncing] < 7) {
-            attachedPuyo.setAnimatedState(AnimatedPuyo::PUYO_CRUNSHED);
+        else if ((bouncing < BOUNCING_OFFSET_NUM) && (BOUNCING_OFFSET[bouncing] > 0)) {
+            attachedPuyo.setAnimatedState(BOUNCING_OFFSET[bouncing]);
             //AudioManager::playSound("bam1.wav", .1);
             //EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
         }
         else
-            attachedPuyo.setAnimatedState(AnimatedPuyo::PUYO_NORMAL);
+            attachedPuyo.setAnimatedState(0);
+        
     }
 }
 
@@ -246,7 +248,14 @@ void FallingAnimation::draw(int semiMove)
 {
     SDL_Rect drect;
     drect.x = X;
-    int coordY = Y + (bouncing>=0?BOUNCING_OFFSET[bouncing]:0);
+    int coordY = Y;
+    if (bouncing >=0)
+    {
+        for (int i = bouncing-off; i <= bouncing && i < BOUNCING_OFFSET_NUM ; i++)
+            if (i>=0)
+                coordY += BOUNCING_OFFSET[i];
+    }
+    attachedPuyo.renderShadowAt(X, coordY);
     attachedPuyo.renderAt(X, coordY);
 
     // TODO : Reactiver le EyeSwirl !
@@ -450,7 +459,8 @@ void NeutralPopAnimation::draw(int semiMove)
     }
 }
 
-SmoothBounceAnimation::SmoothBounceAnimation(AnimatedPuyo &puyo, AnimationSynchronizer *synchronizer) : PuyoAnimation(puyo)
+SmoothBounceAnimation::SmoothBounceAnimation(AnimatedPuyo &puyo, AnimationSynchronizer *synchronizer, int depth) :
+    PuyoAnimation(puyo), bounceMax(depth)
 {
     bounceOffset = 0;
     bouncePhase = 0;
@@ -473,7 +483,7 @@ void SmoothBounceAnimation::cycle()
         switch (bouncePhase) {
             case 0:
                 bounceOffset++;
-                if (bounceOffset == 10)
+                if (bounceOffset == bounceMax)
                     bouncePhase++;
                     break;
             case 1:

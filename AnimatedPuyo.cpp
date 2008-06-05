@@ -29,7 +29,7 @@
 
 AnimatedPuyo::AnimatedPuyo(PuyoState state, AnimatedPuyoSetTheme *themeSet, PuyoView *attachedView)
     : PuyoPuyo(state), smallTicksCount(0), attachedTheme(themeSet->getAnimatedPuyoTheme(state)),
-      m_currentAnimatedState(PUYO_NORMAL)
+      m_currentCompressedState(0)
 {
     puyoEyeState = random() % 8192;
     visibilityFlag = true;
@@ -110,46 +110,34 @@ void AnimatedPuyo::renderAt(int X, int Y)
     PuyoGame *attachedGame = attachedView->getAttachedGame();
     
     SDL_Rect drect;
+
     IIM_Surface *currentSurface;
-    currentSurface = attachedTheme->getPuyoSurfaceForValence(attachedView->getValenceForPuyo(this));
+    
+    currentSurface = attachedTheme->getPuyoSurfaceForValence(attachedView->getValenceForPuyo(this), m_currentCompressedState);
     if (currentSurface != NULL) {
         drect.x = X;
         drect.y = Y;
-        
         drect.w = currentSurface->w;
-        drect.h = currentSurface->h;
-        if (m_currentAnimatedState == PUYO_NORMAL)
-            painter.requestDraw(currentSurface, &drect);
-        else if (m_currentAnimatedState == PUYO_CRUNSHED) {
-            SDL_Rect srcRect;
-            int shrinkSurface = 12;//currentSurface->h / 3;
-            drect.y += (currentSurface->h - 2*shrinkSurface)/2;
-            srcRect.x = 0; srcRect.y = 0; srcRect.w = currentSurface->w; srcRect.h = shrinkSurface;
-            drect.h = shrinkSurface;
-            painter.requestDraw(currentSurface, &srcRect, &drect);
-            drect.y += shrinkSurface;
-            srcRect.y = currentSurface->h - shrinkSurface;
-            painter.requestDraw(currentSurface, &srcRect, &drect);
-            drect.y = Y;
-            drect.h = currentSurface->h;
-        }
-        
+        drect.h = currentSurface->h;            
+
+        painter.requestDraw(currentSurface, &drect);
+
         /* Main puyo show */
         /* TODO: Investigate why, during network game, the falling puyo starts by being neutral */
-        if ((this == attachedGame->getFallingPuyo()) && (getPuyoState() != PUYO_NEUTRAL) && (m_currentAnimatedState != PUYO_CRUNSHED))
-            painter.requestDraw(attachedTheme->getCircleSurfaceForIndex((smallTicksCount >> 2) & 0x1F), &drect);
+        if ((this == attachedGame->getFallingPuyo()) && (getPuyoState() != PUYO_NEUTRAL))
+            painter.requestDraw(attachedTheme->getCircleSurfaceForIndex((smallTicksCount >> 2) & 0x1F, m_currentCompressedState), &drect);
         
         /* Eye management */
         if (getPuyoState() != PUYO_NEUTRAL) {
             int eyePhase = (puyoEyeState + SDL_GetTicks()) % 8192;
             if (eyePhase < 100)
-                painter.requestDraw(attachedTheme->getEyeSurfaceForIndex(1), &drect);
+                painter.requestDraw(attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState), &drect);
             else if (eyePhase < 200)
-                painter.requestDraw(attachedTheme->getEyeSurfaceForIndex(2), &drect);
+                painter.requestDraw(attachedTheme->getEyeSurfaceForIndex(2, m_currentCompressedState), &drect);
             else if (eyePhase < 300)
-                painter.requestDraw(attachedTheme->getEyeSurfaceForIndex(1), &drect);
+                painter.requestDraw(attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState), &drect);
             else
-                painter.requestDraw(attachedTheme->getEyeSurfaceForIndex(0), &drect);
+                painter.requestDraw(attachedTheme->getEyeSurfaceForIndex(0, m_currentCompressedState), &drect);
         }
     }
 }
@@ -167,7 +155,7 @@ void AnimatedPuyo::renderShadowAt(int X, int Y)
 {
     if (getPuyoState() != PUYO_NEUTRAL) {
         IIM_Surface *currentSurface;
-        currentSurface = attachedTheme->getShadowSurface();
+        currentSurface = attachedTheme->getShadowSurface(m_currentCompressedState);
         if (currentSurface != NULL) {
             SDL_Rect drect;
             SDL_Painter &painter = attachedView->getPainter();

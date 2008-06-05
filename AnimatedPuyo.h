@@ -58,7 +58,7 @@ public:
     int getScreenCoordinateX() const;
     int getScreenCoordinateY() const;
 	AnimatedPuyoTheme *getAttachedTheme() const { return attachedTheme; }
-    void setAnimatedState(AnimatedPuyoState animatedState) { m_currentAnimatedState = animatedState; }
+    void setAnimatedState(int animatedState) { m_currentCompressedState = animatedState; }
 private:
     AdvancedBuffer<PuyoAnimation *> animationQueue;
     int puyoEyeState;
@@ -66,7 +66,7 @@ private:
     bool visibilityFlag;
     PuyoView *attachedView;
 	AnimatedPuyoTheme *attachedTheme;
-    AnimatedPuyoState m_currentAnimatedState;
+    int m_currentCompressedState;
 };
 
 class AnimatedPuyoFactory : public PuyoFactory {

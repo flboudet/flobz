@@ -108,7 +108,7 @@ public:
     void cycle();
     void draw(int semiMove);
 private:
-    int xOffset, yOffset, step;
+    int xOffset, yOffset, step, off;
     int X, Y;
     int bouncing;
     static const int BOUNCING_OFFSET_NUM;
@@ -164,12 +164,12 @@ private:
 
 class SmoothBounceAnimation : public PuyoAnimation {
 public:
-    SmoothBounceAnimation(AnimatedPuyo &puyo, AnimationSynchronizer *synchronizer);
+    SmoothBounceAnimation(AnimatedPuyo &puyo, AnimationSynchronizer *synchronizer, int depth = 10);
     virtual ~SmoothBounceAnimation();
     void cycle();
     void draw(int semiMove);
 private:
-    int bounceOffset, bouncePhase;
+    int bounceOffset, bouncePhase, bounceMax;
     int origX, origY;
     AnimationSynchronizer *synchronizer;
 };

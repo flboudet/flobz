@@ -134,9 +134,9 @@ void PuyoNetworkView::companionDidTurn(PuyoPuyo *companionPuyo, int companionVec
     compTurnBuffer.add(counterclockwise);
 }
 
-void PuyoNetworkView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY)
+void PuyoNetworkView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow)
 {
-    PuyoView::puyoDidFall(puyo, originX, originY);
+    PuyoView::puyoDidFall(puyo, originX, originY, nFalledBelow);
     didFallBuffer.add(puyo->getID());
     didFallBuffer.add(originX);
     didFallBuffer.add(originY);

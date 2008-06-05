@@ -193,8 +193,8 @@ void PuyoLocalGame::cycle()
         setPuyoAt(getFallingCompanionX(), getFallY(getFallingCompanionX(), getFallingCompanionY()), companionPuyo);
         companionPuyo->setPuyoState((PuyoState)(companionPuyo->getPuyoState()+PUYO_STILL));
         if (delegate != NULL) {
-            delegate->puyoDidFall(fallingPuyo, fallingX, fallingY);
-            delegate->puyoDidFall(companionPuyo, getFallingCompanionX(), getFallingCompanionY());
+            delegate->puyoDidFall(fallingPuyo, fallingX, fallingY, 0);
+            delegate->puyoDidFall(companionPuyo, getFallingCompanionX(), getFallingCompanionY(), 0);
             gameStat.drop_count += 2;
             fallingY = -10;
             notifyReductions();
@@ -651,6 +651,7 @@ int PuyoLocalGame::removePuyos()
     }
     /* Next we make the other puyos fall */
     for (int i = 0 ; i < PUYODIMX ; i++) {
+        int feltBelow = 0;
         for (int j = PUYODIMY - 1 ; j > 0 ; j--) {
             PuyoState currentPuyoState = getPuyoCellAt(i, j);
             if ((currentPuyoState >= PUYO_BLUE) && (currentPuyoState <= PUYO_NEUTRAL)) {
@@ -660,7 +661,8 @@ int PuyoLocalGame::removePuyos()
                     setPuyoAt(i, j, NULL);
                     setPuyoAt(i, newJ, currentPuyo);
                     if (delegate != NULL) {
-                        delegate->puyoDidFall(currentPuyo, i, j);
+                        delegate->puyoDidFall(currentPuyo, i, j, feltBelow);
+                        feltBelow++;
                     }
                 }
             }
@@ -718,7 +720,6 @@ void PuyoLocalGame::notifyReductions()
 
 void PuyoLocalGame::cycleEnding()
 {
-    static int cmpt = 0;
     int score = removePuyos();
     gameStat.explode_count += score;
 
