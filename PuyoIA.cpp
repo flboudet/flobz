@@ -255,7 +255,7 @@ inline void columnCompress(const unsigned int x, GridState * const grid)
   int height = 0;
   
 	// on oublie les cases vides en haut de colonne
-  while (((*grid)[x][last-1] == PUYO_EMPTY) && (last > 0)) last--;
+  while ( (last > 0) && ((*grid)[x][last-1] == PUYO_EMPTY) ) last--;
 
   while (ydst < last) // Tant qu'on a pas rempli dst
   {
