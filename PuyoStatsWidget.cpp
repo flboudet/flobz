@@ -22,6 +22,7 @@ StatsResources::StatsResources()
     puyo_left = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left.png"));
     separator = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/separator.png"));
     stats_bg = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/stats-bg.png"));
+    // TODO: Combos images
 }
 
 StatsResources::~StatsResources()
@@ -182,12 +183,23 @@ PuyoStatsWidget::PuyoStatsWidget(PuyoStatsFormat &statsFormat,
     setPolicy(USE_MIN_SIZE);
     setInnerMargin(20);
 
-    /*add(&m_statTitle);*/
-    add(new Text("WINNER"));
-    add(new Image(res->separator));
+    // Create Layout
+    Text *txt = new Text(stats.is_winner?"WINNER":"LOOSER");
+    /*txt->setPreferedSize(Vec3(128, 32));*/
+    Image *img1 = new Image(res->separator);
+    img1->setPreferedSize(Vec3(128, 32));
+    add(txt);
+    add(img1);
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++) {
         add(&m_comboLines[i]);
     }
+    Separator *sep = new Separator();
+    sep->setPreferedSize(Vec3(128, 24));
+    add(sep);
+    Image *img2 = new Image(res->separator);
+    img2->setPreferedSize(Vec3(128, 8));
+    add(img2);
+
     // Looking for the biggest combo
     for (int i = 0 ; i < 24 ; i++) {
         if (m_stats.combo_count[i] > m_maxCombo)
@@ -252,7 +264,7 @@ void PuyoStatsWidget::ComboLine::setComboLineInfos(PuyoStatsDirection dir, int t
     m_tag = tag;
     m_progressionCompleteAction = progressionCompleteAction;
     m_totalNumOfCombos = totalNumOfCombos;
-    float progressBarValue = (float)(2+numberOfCombos) / (float)(2+m_totalNumOfCombos);
+    float progressBarValue = (float)(1+numberOfCombos) / (float)(1+m_totalNumOfCombos);
     m_comboLabel.setValue(comboText);
     m_progressBar.setVisible(true);
     m_progressBar.setValue(progressBarValue, true);
@@ -275,7 +287,7 @@ void PuyoStatsWidget::ComboLine::action(Widget *sender, int actionType, GameCont
 PuyoStatsLegendWidget::PuyoStatsLegendWidget(PuyoStatsFormat &statsFormat, PuyoStatsWidget &guideWidget, const gameui::FramePicture *framePicture)
   : Frame(framePicture), m_statsFormat(statsFormat), m_guideWidget(guideWidget)
 {
-  //setPolicy(USE_MIN_SIZE);
+    //setPolicy(USE_MIN_SIZE);
     setInnerMargin(20);
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++) {
         int numCombo = m_statsFormat.m_comboIndirection[i];
