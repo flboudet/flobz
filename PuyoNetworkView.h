@@ -55,7 +55,7 @@ class PuyoNetworkView : public PuyoView {
     void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex);
     void gameDidEndCycle();
     void companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise);
-    void puyoDidFall(PuyoPuyo *puyo, int originX, int originY);
+    void puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow);
     void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase);
     void gameLost();
     

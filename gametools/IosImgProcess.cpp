@@ -9,7 +9,7 @@
 bool fullscreen = true;
 bool useGL = false;
 
-IIM_Surface  imgList[4096];
+IIM_Surface  imgList[8192];
 int          imgListSize = 0;
 
 IIM_Surface * IIM_Load_Absolute_DisplayFormat (const char *path)
@@ -55,10 +55,8 @@ void IIM_Free(IIM_Surface *img)
   }
 }
 
-#include <stdio.h>
 IIM_Surface * IIM_RegisterImg(SDL_Surface *img, bool isAlpha)
 {
-    fprintf (stderr,"# %d\n",imgListSize);
   IIM_Surface *_this = &imgList[imgListSize++];
   _this->isAlpha = isAlpha;
   _this->surf    = img;

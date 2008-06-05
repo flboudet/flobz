@@ -193,8 +193,8 @@ void PuyoLocalGame::cycle()
         setPuyoAt(getFallingCompanionX(), getFallY(getFallingCompanionX(), getFallingCompanionY()), companionPuyo);
         companionPuyo->setPuyoState((PuyoState)(companionPuyo->getPuyoState()+PUYO_STILL));
         if (delegate != NULL) {
-            delegate->puyoDidFall(fallingPuyo, fallingX, fallingY, 0);
-            delegate->puyoDidFall(companionPuyo, getFallingCompanionX(), getFallingCompanionY(), 0);
+            delegate->puyoDidFall(fallingPuyo, fallingX, fallingY, fallingCompanion == 0 ? 1 : 0);
+            delegate->puyoDidFall(companionPuyo, getFallingCompanionX(), getFallingCompanionY(), fallingCompanion == 0 ? 0 : 1);
             gameStat.drop_count += 2;
             fallingY = -10;
             notifyReductions();
