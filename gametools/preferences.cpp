@@ -258,9 +258,13 @@ void SetStrPreference (const char *name, const char *value)
     char * oldValue = (char *)malloc(valueLen+2);
     if (oldValue != NULL)
     {
-     // If equal, ignore request
+      // If equal, ignore request
       GetStrPreference(name, oldValue, "core.preferences.fakeoldvalue", valueLen+2);
-      if (!strcmp(oldValue,value) && strlen(oldValue) == strlen(value)) return;
+      if (!strcmp(oldValue,value) && strlen(oldValue) == strlen(value)) {
+	free(oldValue);
+	return;
+      }
+      free(oldValue);
     }
 
     // Not equal... we should update the memory image and the file
