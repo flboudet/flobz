@@ -83,6 +83,7 @@ private:
     gameui::Text m_statTitle;
     ComboLine m_comboLines[MAX_DISPLAYED_COMBOS];
     int m_maxCombo;
+    SelfVector<Widget*> widgetAutoReleasePool;
 };
 
 class PuyoStatsLegendWidget : public gameui::Frame, public gameui::Action {
@@ -124,6 +125,7 @@ private:
     gameui::SliderContainer m_leftSlider, m_rightSlider, m_legendSlider;
     PuyoStatsLegendWidget m_legend;
     PuyoStatsWidget m_leftStats, m_rightStats;
+    SelfVector<Widget*> widgetAutoReleasePool;
 };
 
 #endif // _PUYO_STATS_WIDGET_H

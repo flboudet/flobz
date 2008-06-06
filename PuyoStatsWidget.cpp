@@ -200,6 +200,12 @@ PuyoStatsWidget::PuyoStatsWidget(PuyoStatsFormat &statsFormat,
     img2->setPreferedSize(Vec3(128, 8));
     add(img2);
 
+    // Prepare un-allocation
+    widgetAutoReleasePool.add(sep);
+    widgetAutoReleasePool.add(img1);
+    widgetAutoReleasePool.add(img2);
+    widgetAutoReleasePool.add(txt);
+
     // Looking for the biggest combo
     for (int i = 0 ; i < 24 ; i++) {
         if (m_stats.combo_count[i] > m_maxCombo)
@@ -326,21 +332,31 @@ PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerS
     m_leftSlider.setPreferedSize(Vec3(0., 416.));
     m_rightSlider.setPreferedSize(Vec3(0., 416.));
     VBox *v1 = new VBox();
+    Separator *sep1 = new Separator();
     v1->add(&m_leftSlider);
-    v1->add(new Separator());
+    v1->add(sep1);
     add(v1);
     VBox *v3 = new VBox();
+    Separator *sep3 = new Separator();
     v3->add(&m_legendSlider);
-    v3->add(new Separator());
+    v3->add(sep3);
     v3->setPreferedSize(Vec3(190., 0.));
     add(v3);
     VBox *v2 = new VBox();
+    Separator *sep2 = new Separator();
     v2->add(&m_rightSlider);
-    v2->add(new Separator());
+    v2->add(sep2);
     add(v2);
     m_leftSlider.addListener(*this);
     m_legendSlider.addListener(*this);
     m_rightSlider.addListener(*this);
+
+    widgetAutoReleasePool.add(v1);
+    widgetAutoReleasePool.add(v2);
+    widgetAutoReleasePool.add(v3);
+    widgetAutoReleasePool.add(sep1);
+    widgetAutoReleasePool.add(sep2);
+    widgetAutoReleasePool.add(sep3);
 }
 
 void PuyoTwoPlayersStatsWidget::onWidgetVisibleChanged(bool visible)
