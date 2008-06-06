@@ -35,7 +35,7 @@ StatsResources::~StatsResources()
 }
 
 ProgressBarWidget::ProgressBarWidget(Action *associatedAction)
-  : m_value(0.), m_targetValue(0.), m_progressive(false), m_progressiveDuration(0.6), m_visible(true),
+  : m_value(0.), m_targetValue(0.), m_progressive(false), m_progressiveDuration(0.8), m_visible(true),
     m_associatedAction(associatedAction)
 {
     setPreferedSize(Vec3(0, 32));
@@ -119,7 +119,7 @@ void ProgressBarWidget::idle(double currentTime)
     if (m_progressive) {
         double deltaT = currentTime - m_targetBaseTime;
         if (deltaT < m_progressiveDuration) {
-            m_value = m_fromValue + (m_targetValue - m_fromValue) * (deltaT / m_progressiveDuration);
+            m_value = m_fromValue + (m_targetValue - m_fromValue) * sin(0.5 * M_PI * deltaT / m_progressiveDuration);
             m_associatedAction->action(this, VALUE_CHANGED, NULL);
         }
         else {
@@ -200,11 +200,20 @@ PuyoStatsWidget::PuyoStatsWidget(PuyoStatsFormat &statsFormat,
     img2->setPreferedSize(Vec3(128, 8));
     add(img2);
 
+    HBox *box = new HBox();
+    Text *score = new Text("Score:");
+    m_score.setValue(String() + stats.points);
+    box->add(score);
+    box->add(&m_score);
+    add(box);
+
     // Prepare un-allocation
     widgetAutoReleasePool.add(sep);
     widgetAutoReleasePool.add(img1);
     widgetAutoReleasePool.add(img2);
     widgetAutoReleasePool.add(txt);
+    widgetAutoReleasePool.add(score);
+    widgetAutoReleasePool.add(box);
 
     // Looking for the biggest combo
     for (int i = 0 ; i < 24 ; i++) {

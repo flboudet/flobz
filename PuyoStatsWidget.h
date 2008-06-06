@@ -83,6 +83,7 @@ private:
     gameui::Text m_statTitle;
     ComboLine m_comboLines[MAX_DISPLAYED_COMBOS];
     int m_maxCombo;
+    gameui::Text m_score;
     SelfVector<Widget*> widgetAutoReleasePool;
 };
 
