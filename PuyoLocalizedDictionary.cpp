@@ -228,7 +228,7 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
                 fileOk = readLine(dictionaryFile, valueString);
                 if (fileOk) {
                     HashValue * old = myDictEntry->dictionary->get((const char *)valueString);
-                    if (result != NULL) free(old->ptr);
+                    if (old != NULL && old->ptr != NULL) free(old->ptr);
                     char * newstring = strdup(valueString);
                     myDictEntry->dictionary->put(keyString, newstring);
                     do {
