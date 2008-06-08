@@ -140,6 +140,7 @@ void PuyoNetworkView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int 
     didFallBuffer.add(puyo->getID());
     didFallBuffer.add(originX);
     didFallBuffer.add(originY);
+    didFallBuffer.add(nFalledBelow);
 }
 
 void PuyoNetworkView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase)

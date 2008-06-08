@@ -36,8 +36,8 @@ PuyoNetworkGame::~PuyoNetworkGame()
 }
 
 PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox, int gameId)
-  : PuyoGame(attachedFactory), msgBox(msgBox), gameId(gameId), nextFalling(PUYO_BLUE),
-    nextCompanion(PUYO_BLUE), gameRunning(true)
+  : PuyoGame(attachedFactory), nextFalling(PUYO_BLUE), nextCompanion(PUYO_BLUE),
+    msgBox(msgBox), gameId(gameId), gameRunning(true)
 {
     fakePuyo = attachedFactory->createPuyo(PUYO_FALLINGRED);
     msgBox.addListener(this);
@@ -120,7 +120,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     Buffer<int> addNeutrals= message.getIntArray(ADD_NEUTRALS);
     if (addNeutrals.size() > 0) {
        if (delegate != NULL) {
-            for (int i = 0, j = addNeutrals.size() ; i < j ; i += 2) {
+            for (int i = 0, j = addNeutrals.size() ; i+1 < j ; i += 2) {
                 delegate->gameDidAddNeutral(findPuyo(addNeutrals[i]), addNeutrals[i+1]);
             }
         }
@@ -129,7 +129,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     Buffer<int> turnBuffer= message.getIntArray(COMPANION_TURN);
     if (turnBuffer.size() > 0) {
         if (delegate != NULL) {
-            for (int i = 0, j = turnBuffer.size() ; i < j ; i += 3) {
+            for (int i = 0, j = turnBuffer.size() ; i+2 < j ; i += 3) {
                 delegate->companionDidTurn(findPuyo(turnBuffer[i]), turnBuffer[i+1], turnBuffer[i+2]);
             }
         }
@@ -138,8 +138,8 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     Buffer<int> didFall= message.getIntArray(DID_FALL);
     if (didFall.size() > 0) {
        if (delegate != NULL) {
-            for (int i = 0, j = didFall.size() ; i < j ; i += 3) {
-                delegate->puyoDidFall(findPuyo(didFall[i]), didFall[i+1], didFall[i+2], 0);
+            for (int i = 0, j = didFall.size() ; i+3 < j ; i += 4) {
+                delegate->puyoDidFall(findPuyo(didFall[i]), didFall[i+1], didFall[i+2], didFall[i+3]);
             }
         }
     }
