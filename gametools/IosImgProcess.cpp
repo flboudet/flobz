@@ -621,6 +621,8 @@ IIM_Surface *iim_rotate(IIM_Surface *isrc, int degrees)
     float sina    = sin(radians);
     float cx = src->w / 2;
     float cy = src->h / 2;
+    float xmax = src->w-1;
+    float ymax = src->h-1;
     
     bool srclocked = false;
     if(SDL_MUSTLOCK(src)) srclocked = (SDL_LockSurface(src) == 0);
@@ -647,12 +649,18 @@ IIM_Surface *iim_rotate(IIM_Surface *isrc, int degrees)
               float mey = 1.0f - ey;
 
               int iix = (int)ix;
+              iix = (iix < 0) ? 0 : iix;
+              int iix2 = iix+1;
+              iix2 = (iix2 > xmax) ? xmax : iix2;
               int iiy = (int)iy;
+              iiy = (iiy < 0) ? 0 : iiy;
+              int iiy2 = iiy+1;
+              iiy2 = (iiy2 > ymax) ? ymax : iiy2;
 
               RGBA c11 = iim_surface_get_rgba(src,iix,iiy);
-              RGBA c12 = iim_surface_get_rgba(src,iix,iiy+1);
-              RGBA c21 = iim_surface_get_rgba(src,iix+1,iiy);
-              RGBA c22 = iim_surface_get_rgba(src,iix+1,iiy+1);
+              RGBA c12 = iim_surface_get_rgba(src,iix,iiy2);
+              RGBA c21 = iim_surface_get_rgba(src,iix2,iiy);
+              RGBA c22 = iim_surface_get_rgba(src,iix2,iiy2);
 
               rgba.red = (int)(mex*mey*c11.red + mex*ey*c12.red + ex*mey*c21.red + ex*ey*c22.red);
               rgba.green = (int)(mex*mey*c11.green + mex*ey*c12.green + ex*mey*c21.green + ex*ey*c22.green);
