@@ -430,14 +430,12 @@ void PuyoGameWidget::styro_drawImage(StyrolyseClient *_this,
 			    int clipx, int clipy, int clipw, int cliph)
 {
   IIM_Surface *surf = (IIM_Surface *)image;
-  SDL_Rect  rect, cliprect;
-  rect.x = x;
-  rect.y = y;
+  SDL_Rect  cliprect;
   cliprect.x = clipx;
   cliprect.y = clipy;
   cliprect.w = clipw;
   cliprect.h = cliph;
-  ((StyrolysePainterClient *)_this)->m_painter->requestDraw(surf, &rect);
+  ((StyrolysePainterClient *)_this)->m_painter->requestDraw(surf, &cliprect);
 }
 void PuyoGameWidget::styro_freeImage(StyrolyseClient *_this, void *image)
 {
