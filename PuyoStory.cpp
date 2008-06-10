@@ -251,14 +251,16 @@ void PuyoStoryScreen::transitionFromScreen(Screen &fromScreen)
 
 PuyoStoryScreen::~PuyoStoryScreen()
 {
-    printf("Destruction de la story!\n");
+    if (transitionWidget != NULL) {
+        remove(transitionWidget);
+        delete(transitionWidget);
+    }
 }
 
 void PuyoStoryScreen::onEvent(GameControlEvent *cevent)
 {
     bool passEvent = true;
     switch (cevent->cursorEvent) {
-    //case GameControlEvent::kStart:
     case GameControlEvent::kBack:
     case GameControlEvent::kStart:
     case GameControlEvent::kGameMouseClicked:
@@ -292,10 +294,6 @@ bool PuyoFX::busy() const
     return getIntegerValue("@busy") != 0;
 }
 
-/*String PuyoFX::supportedFX() const
-{
-    return String(styrolyse_getstr(currentStory, "@supported_fx"));
-}*/
 bool PuyoFX::supportFX(const char *fx) const
 {
     String haystack(styrolyse_getstr(currentStory, "@supported_fx"));
