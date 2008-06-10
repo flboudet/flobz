@@ -340,19 +340,20 @@ public:
     virtual ~PuyoInternetDialog();
     virtual void onSlideInside(SliderContainer &slider);
     void close();
+    void idle(double v);
 protected:
     VBox m_contentBox;
 private:
     Frame m_dialogFrame;
     Frame m_titleFrame;
     Text m_titleText;
-    bool m_closing;
+    bool m_closing, m_closed;
 };
 
 PuyoInternetDialog::PuyoInternetDialog(String dialogTitle)
   : SliderContainer(), m_dialogFrame(theCommander->getWindowFramePicture()),
     m_titleFrame(theCommander->getSeparatorFramePicture()),
-    m_titleText(dialogTitle), m_closing(false)
+    m_titleText(dialogTitle), m_closing(false), m_closed(false)
 {
     m_titleFrame.add(&m_titleText);
     m_titleFrame.setPreferedSize(Vec3(0.0f, 20.0f));
@@ -374,14 +375,20 @@ void PuyoInternetDialog::onSlideInside(SliderContainer &slider)
 {
     if (!m_closing)
         return;
-    this->getParentScreen()->remove(this);
-    delete this;
+    //this->getParentScreen()->remove(this);
+    m_closed = true;
 }
 
 void PuyoInternetDialog::close()
 {
     m_closing = true;
     transitionToContent(NULL);
+}
+
+void PuyoInternetDialog::idle(double v)
+{
+    SliderContainer::idle(v);
+    if (m_closed) delete this;
 }
 
 class PuyoInternetErrorDialog : public PuyoInternetDialog, public Action
