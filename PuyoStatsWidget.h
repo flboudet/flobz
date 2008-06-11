@@ -10,6 +10,7 @@
 #ifndef _PUYO_STATS_WIDGET_H
 #define _PUYO_STATS_WIDGET_H
 
+#include "gameloop.h"
 #include "gameui.h"
 #include "Frame.h"
 #include "PuyoGameAbstract.h"
@@ -51,7 +52,7 @@ struct PuyoStatsFormat {
     int m_comboIndirection[MAX_DISPLAYED_COMBOS+1];
 };
 
-class PuyoStatsWidget : public gameui::VBox, gameui::Action {
+class PuyoStatsWidget : public gameui::VBox, gameui::Action, IdleComponent {
 public:
     PuyoStatsWidget(PuyoStatsFormat &statsFormat, 
                     PlayerGameStat &stats, PlayerGameStat &opponentStats,
@@ -60,6 +61,8 @@ public:
     virtual ~PuyoStatsWidget() {}
     virtual void action(Widget *sender, int actionType, GameControlEvent *event);
     void startAnimation();
+    virtual void idle(double currentTime);
+    virtual IdleComponent *getIdleComponent() { return this; }
 private:
     PuyoStatsDirection m_dir;
     gameui::Action *m_action;
@@ -84,6 +87,7 @@ private:
     ComboLine m_comboLines[MAX_DISPLAYED_COMBOS];
     int m_maxCombo;
     gameui::Text m_score;
+    double m_startTime;
     SelfVector<Widget*> widgetAutoReleasePool;
 };
 

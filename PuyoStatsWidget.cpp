@@ -10,6 +10,8 @@
 #include "PuyoStatsWidget.h"
 #include "PuyoCommander.h"
 
+#define LINE_DURATION 0.8
+
 using namespace gameui;
 
 static StatsResources *res;
@@ -35,7 +37,7 @@ StatsResources::~StatsResources()
 }
 
 ProgressBarWidget::ProgressBarWidget(Action *associatedAction)
-  : m_value(0.), m_targetValue(0.), m_progressive(false), m_progressiveDuration(0.8), m_visible(true),
+  : m_value(0.), m_targetValue(0.), m_progressive(false), m_progressiveDuration(LINE_DURATION), m_visible(true),
     m_associatedAction(associatedAction)
 {
     setPreferedSize(Vec3(0, 32));
@@ -178,7 +180,7 @@ PuyoStatsWidget::PuyoStatsWidget(PuyoStatsFormat &statsFormat,
                                  gameui::Action *action)
   : m_dir(dir), m_action(action), m_statsFormat(statsFormat),
     m_stats(stats), m_opponentStats(opponentStats),
-    m_statTitle("Combos"), m_maxCombo(0)
+    m_statTitle("Combos"), m_maxCombo(0), m_startTime(-1)
 {
     setPolicy(USE_MIN_SIZE);
     setInnerMargin(20);
@@ -202,7 +204,7 @@ PuyoStatsWidget::PuyoStatsWidget(PuyoStatsFormat &statsFormat,
 
     HBox *box = new HBox();
     Text *score = new Text("Score:");
-    m_score.setValue(String() + stats.points);
+    m_score.setValue("0");
     box->add(score);
     box->add(&m_score);
     add(box);
@@ -283,6 +285,15 @@ void PuyoStatsWidget::ComboLine::setComboLineInfos(PuyoStatsDirection dir, int t
     m_comboLabel.setValue(comboText);
     m_progressBar.setVisible(true);
     m_progressBar.setValue(progressBarValue, true);
+}
+
+void PuyoStatsWidget::idle(double currentTime)
+{
+    if (m_startTime < 0.0) m_startTime = currentTime;
+    const double duration = MAX_DISPLAYED_COMBOS * LINE_DURATION + 0.5;
+    int points = m_stats.points * sin(1.5708 * (currentTime-m_startTime) / duration);
+    if (currentTime-m_startTime > duration) points = m_stats.points;
+    m_score.setValue(String() + points);
 }
 
 void PuyoStatsWidget::ComboLine::action(Widget *sender, int actionType, GameControlEvent *event)
