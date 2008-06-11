@@ -37,7 +37,7 @@ public:
     const char * getLocalizedString(const char * originalString,  bool copyIfNotThere = false);
     ~PuyoLocalizedDictionary();
 private:
-    HashMap * dictionary;
+    void * dictionary;
     String stdName;
     const PuyoDataPathManager &datapathManager;
 };

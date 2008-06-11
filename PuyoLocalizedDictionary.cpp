@@ -38,6 +38,9 @@
 #include "PuyoLocalizedDictionary.h"
 #include "ios_memory.h"
 #include <stdio.h>
+#include <ext/hash_map>
+#include <cstring>
+#include <string>
 
 static bool readLine(FILE *dictionaryFile, String &lineRead)
 {
@@ -91,13 +94,6 @@ static bool readLine(FILE *dictionaryFile, String &lineRead)
 char *PreferedLocales[kPuyoMaxPreferedLanguage+1]; // +1 for the default one
 int   PreferedLocalesCount = 0;
 static bool  systemInitiated = false;
-
-typedef struct {
-  HashMap * dictionary;
-  int refcount;
-} dictionaryEntry;
-
-static HashMap dictionaries;
 
 void Locales_Init()
 {
@@ -184,7 +180,96 @@ void Locales_Init()
   }
 }
 
-PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName) : dictionary(), datapathManager(datapathManager)
+
+/*************************** CUSTOM HASHMAP STUFF *********************************/
+#undef get16bits
+#if (defined(__GNUC__) && defined(__i386__)) || defined(__WATCOMC__) \
+|| defined(_MSC_VER) || defined (__BORLANDC__) || defined (__TURBOC__)
+#define get16bits(d) (*((const uint16_t *) (d)))
+#endif
+
+#if !defined (get16bits)
+#define get16bits(d) ((((uint32_t)(((const uint8_t *)(d))[1])) << 8)\
++(uint32_t)(((const uint8_t *)(d))[0]) )
+#endif
+
+// by Paul Hsieh
+// http://www.azillionmonkeys.com/qed/hash.html
+struct SuperFastHashString {
+    size_t operator()(std::string datas) const {
+        const char * data = datas.c_str();
+        uint32_t len = datas.size();
+        uint32_t hash = len, tmp;
+        int rem;
+        
+        if (len <= 0 || data == NULL) return 0;
+        
+        rem = len & 3;
+        len >>= 2;
+        
+        /* Main loop */
+        for (;len > 0; len--) {
+            hash  += get16bits (data);
+            tmp    = (get16bits (data+2) << 11) ^ hash;
+            hash   = (hash << 16) ^ tmp;
+            data  += 2*sizeof (uint16_t);
+            hash  += hash >> 11;
+        }
+        
+        /* Handle end cases */
+        switch (rem) {
+            case 3: hash += get16bits (data);
+                hash ^= hash << 16;
+                hash ^= data[sizeof (uint16_t)] << 18;
+                hash += hash >> 11;
+                break;
+            case 2: hash += get16bits (data);
+                hash ^= hash << 11;
+                hash += hash >> 17;
+                break;
+            case 1: hash += *data;
+                hash ^= hash << 10;
+                hash += hash >> 1;
+        }
+        
+        /* Force "avalanching" of final 127 bits */
+        hash ^= hash << 3;
+        hash += hash >> 5;
+        hash ^= hash << 4;
+        hash += hash >> 17;
+        hash ^= hash << 25;
+        hash += hash >> 6;
+        
+        return hash;
+    }
+};
+
+struct EqualString {
+    bool operator()(const std::string s1, const std::string s2) const {
+        return (s1 == s2);
+    }
+};
+
+typedef __gnu_cxx::hash_map<std::string, void *, SuperFastHashString, EqualString> str_dictionnary;
+
+
+typedef struct {
+    str_dictionnary * dictionary;
+    int refcount;
+} dictionaryEntry;
+
+static str_dictionnary dictionaries;
+
+
+
+    
+/*************************************************************************************/    
+
+
+
+
+
+PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName) : dictionary(NULL), datapathManager(datapathManager)
 {
   signed int i;
 
@@ -192,19 +277,14 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
   Locales_Init();
 
   stdName = FilePath::combine(dictionaryDirectory, dictionaryName);
-  HashValue * result = dictionaries.get((const char *)stdName);
-  dictionaryEntry * myDictEntry = NULL;
+  dictionaryEntry * myDictEntry = (dictionaryEntry *)dictionaries[std::string((const char *)stdName)];
   
-  if (result != NULL) {
-    myDictEntry = (dictionaryEntry *)(result->ptr);
-  }
-
   if (myDictEntry == NULL)
   {
     myDictEntry = (dictionaryEntry *)malloc(sizeof(dictionaryEntry));
-    myDictEntry->dictionary = new HashMap();
+    myDictEntry->dictionary = new str_dictionnary;
     myDictEntry->refcount=0;
-    dictionaries.put((const char *)stdName,(void *)myDictEntry);
+    dictionaries[std::string((const char *)stdName)] = (void *)myDictEntry;
     
     /* Get the first matching dictionary */
     bool found = false;
@@ -227,10 +307,11 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
             while (fileOk) {
                 fileOk = readLine(dictionaryFile, valueString);
                 if (fileOk) {
-                    HashValue * old = myDictEntry->dictionary->get((const char *)valueString);
-                    if (old != NULL && old->ptr != NULL) free(old->ptr);
+                    std::string key((const char *)keyString);
+                    void * old = (*(myDictEntry->dictionary))[key];
+                    if (old != NULL) free(old);
                     char * newstring = strdup(valueString);
-                    myDictEntry->dictionary->put(keyString, newstring);
+                    (*(myDictEntry->dictionary))[key] = (void *)newstring;
                     do {
                         fileOk = readLine(dictionaryFile, keyString);
                     } while (fileOk && (keyString == ""));
@@ -251,42 +332,33 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
   }
   
   myDictEntry->refcount++;
-  dictionary = myDictEntry->dictionary;
+  dictionary = (void*)(myDictEntry->dictionary);
   //fprintf(stderr,"-----Refcount++ = %d (%s)\n",myDictEntry->refcount,(const char *)stdName);
-}
-
-class HashActionValueFree : public HashMapAction {
-	public:
-		void action(HashValue * value);
-};
-
-void HashActionValueFree::action(HashValue * value) {
-	free(value->ptr);
 }
 
 PuyoLocalizedDictionary::~PuyoLocalizedDictionary()
 {
-  HashValue * result = dictionaries.get((const char *)stdName);
-  dictionaryEntry * myDictEntry = NULL;
-  
-  if (result != NULL) {
-    myDictEntry = (dictionaryEntry *)(result->ptr);
-  }
+  str_dictionnary::iterator iter = dictionaries.find(std::string((const char *)stdName));
 
-  if (myDictEntry != NULL)
+  if (iter != dictionaries.end())
   {
+    dictionaryEntry * myDictEntry = (dictionaryEntry *)(iter->second);
     myDictEntry->refcount--;
     //fprintf(stderr,"-----Refcount-- = %d (%s)\n",myDictEntry->refcount,(const char *)stdName);
     if (myDictEntry->refcount <= 0) {
       //fprintf(stderr,"-----Destroying %s.\n",(const char *)stdName);
-      dictionaries.remove((const char *)stdName);
-
-	  HashActionValueFree myDeleteAction;
-	  myDictEntry->dictionary->foreach(&myDeleteAction);
-
+        
+        for (str_dictionnary::iterator it = myDictEntry->dictionary->begin(); it != myDictEntry->dictionary->end(); it++)
+      {
+          free(it->second);
+      }
+      myDictEntry->dictionary->clear();
+        
       delete myDictEntry->dictionary;
 
       free(myDictEntry);
+        
+        dictionaries.erase(iter);
         /* clean up a bit before leaving
         fprintf(stderr,"-----Languages cleanup...\n");
         for (int i = 0; i < PreferedLocalesCount; i++) {
@@ -304,13 +376,12 @@ PuyoLocalizedDictionary::~PuyoLocalizedDictionary()
 
 const char * PuyoLocalizedDictionary::getLocalizedString(const char * originalString, bool copyIfNotThere)
 {
-    HashValue *result = dictionary->get(originalString);
+    char * result = (char *) ((*(str_dictionnary *)dictionary)[std::string(originalString)]);
     if (result != NULL) {
-        return  (const char *)(result->ptr);
-    } else if (copyIfNotThere)
-	{
-	  const char * A = strdup(originalString);
-      dictionary->put(originalString, (void *)A);
+        return result;
+    } else if (copyIfNotThere) {
+      char * A = strdup(originalString);
+      (*(str_dictionnary *)dictionary)[std::string(originalString)] = (void *)A;
 	  return A;
 	}
     return originalString;
