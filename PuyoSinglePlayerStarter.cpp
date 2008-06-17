@@ -472,7 +472,8 @@ void SinglePlayerMatch::action(Widget *sender, int actionType,
   else if (sender == m_gameWidget) {
     stateMachine();
   }
-  else if (sender == m_matchLostAnimation) {
+  else if ((sender == m_matchLostAnimation)
+           && (m_state == kMatchLostAnimation)) {
     stateMachine();
   }
 }
@@ -549,8 +550,6 @@ void SinglePlayerMatch::performMatchScores(State scoreState)
   m_state = scoreState;
   m_statsWidget = new PuyoTwoPlayersStatsWidget(this->m_gameWidget->getStatPlayerOne(), this->m_gameWidget->getStatPlayerTwo(), theCommander->getWindowFramePicture());
   m_gameScreen->add(m_statsWidget);
-  // Provisoire, cet etat n'existe pas encore
-  //stateMachine();
 }
 
 void SinglePlayerMatch::trigMatchOverAction()
