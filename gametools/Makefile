@@ -1,7 +1,7 @@
 OBJFILES=SDL_Painter.o InputManager.o GameControls.o GameCursor.o \
          IosImgProcess.o preferences.o sofont.o gameloop.o gameui.o \
          ListView.o Frame.o FramedButton.o FramedEditField.o \
-	 mt19937ar.o SwitchedButton.o NotifyCenter.o
+	 mt19937ar.o SwitchedButton.o RadioButton.o NotifyCenter.o
 
 object:${OBJFILES}
 

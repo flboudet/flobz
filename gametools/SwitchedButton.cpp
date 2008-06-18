@@ -8,26 +8,35 @@ namespace gameui {
     //
     
     SwitchedButton::SwitchedButton(String label, bool defaultValue,
-                                   IIM_Surface *trueSurface, IIM_Surface *falseSurface, String prefKey = "")
+                                   IIM_Surface *trueSurface, IIM_Surface *falseSurface, String prefKey, Action * altResponder)
     : stateImage(), imageTrue(trueSurface), imageFalse(falseSurface),
-    text(label), key(prefKey)
+    text(label), key(prefKey), persistant(true), m_altResponder(altResponder)
     {
-        if (key == "") stateValue = defaultValue;
-        else stateValue = (bool)GetBoolPreference(key, defaultValue);
+        if (key == "") 
+        {
+            char tmp[sizeof(void *)+1];
+            sprintf(tmp,"%p",this);
+            notifKey = String("UI.button.") + tmp;
+            stateValue = defaultValue;
+            persistant = false;
+        } else {
+            stateValue = (bool)GetBoolPreference(key, defaultValue);
+            persistant = true;
+            notifKey = key;
+        }        
+        gameui::GlobalNotificationCenter.addListener(notifKey, this);
         setInnerMargin(0);
         setFocusable(true);
         text.setFocusable(false);
         stateImage.setFocusable(true);
         setPolicy(USE_MAX_SIZE_NO_MARGIN);
         stateImage.setImage(stateValue ? imageTrue : imageFalse);
-        //stateImage.setOnStartAction(this);
         stateImage.setOnMouseUpAction(this);
         stateImage.setInvertedFocus(true);
         add(&stateImage);
         text.mdontMove=true;
         add(&text);
         autoSetPreferedSize();
-        gameui::GlobalNotificationCenter.addListener(key, this);
     }
     
     void SwitchedButton::lostFocus()
@@ -44,24 +53,33 @@ namespace gameui {
 
     void SwitchedButton::action(Widget *sender, int actionType, GameControlEvent *event)
     {
+        if (m_altResponder != NULL) {
+            m_altResponder->action(this, actionType, event);
+            return;
+        }
         if ((actionType == ON_MOUSEUP) || (actionType == ON_MOUSEUP)) {
-            stateValue = !stateValue;
-            if (key != "") SetBoolPreference((const char*)key, (bool)stateValue);
-            gameui::GlobalNotificationCenter.notify(key, &stateValue);
+            bool val = !stateValue;
+            gameui::GlobalNotificationCenter.notify(notifKey, &val);
         }
     }
     
     void SwitchedButton::notificationOccured(String identifier, void * context)
     {
-        if (!(identifier == key))
+        if (!(identifier == notifKey))
         {
-            fprintf(stderr, "Something weird has occured, SwitchedButton registered for notification '%s',\n",(const char *)key);
+            fprintf(stderr, "Something weird has occured, SwitchedButton registered for notification '%s',\n",(const char *)notifKey);
             fprintf(stderr, "but received one for '%s'... ignoring...\n",(const char *)identifier);
             return;
         }
         stateValue = *(bool*)(context);
         stateImage.setImage(stateValue ? imageTrue : imageFalse);
+        if (persistant) SetBoolPreference((const char*)key, (bool)stateValue);
         autoSetPreferedSize();
+    }
+
+    void SwitchedButton::setState(bool _state)
+    {
+        gameui::GlobalNotificationCenter.notify(notifKey, &_state);
     }
 
     void SwitchedButton::autoSetPreferedSize()
@@ -81,7 +99,7 @@ namespace gameui {
     
     SwitchedButton::~SwitchedButton()
     {
-        gameui::GlobalNotificationCenter.removeListener(key, this);
+        gameui::GlobalNotificationCenter.removeListener(notifKey, this);
     }
     
 }
