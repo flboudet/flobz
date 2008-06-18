@@ -46,9 +46,9 @@
 [end_level]
 
 [start_level]
-    level.levelName           = "The Unmapped Level, V2"
+    level.levelName           = "Monikonik"
     level.opponentStory       = "story5.gsl"
-    level.opponentName        = "Unmapped Monster V2"
+    level.opponentName        = "Monikonik"
     level.opponentAI          = "monk.gsl"
     level.easySetting.level   = 30
     level.mediumSetting.level = 16
