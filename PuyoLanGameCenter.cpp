@@ -89,6 +89,10 @@ void PuyoLanGameCenter::onMessage(Message &msg)
                 invitation.gameRandomSeed = msg.getInt("RNDSEED");
             else
                 invitation.gameRandomSeed = 0; // When there is no seed, fall back to 0 (better than crashing)
+            if (msg.hasInt("SPEED"))
+                invitation.gameSpeed = msg.getInt("SPEED");
+            else
+                invitation.gameSpeed = 1; // When there is no seed, fall back to 1 (better than crashing)
             receivedGameInvitation(invitation);
         }
 	break;
@@ -215,6 +219,7 @@ void PuyoLanGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
   msg->addString("ORGNAME", name);
   msg->addString("DSTNAME", invitation.opponentName);
   msg->addInt("RNDSEED", invitation.gameRandomSeed);
+  msg->addInt("SPEED", invitation.gameSpeed);
   msg->send();
   delete msg;
   grantedInvitation = invitation;

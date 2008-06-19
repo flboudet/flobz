@@ -38,6 +38,7 @@ public:
     String opponentName;
     PeerAddress opponentAddress;
     unsigned long gameRandomSeed;
+    int gameSpeed;
 };
 
 class PuyoNetGameCenterListener {

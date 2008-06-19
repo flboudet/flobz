@@ -1,8 +1,6 @@
 #ifndef _PUYOCOMMANDER
 #define _PUYOCOMMANDER
 
-#include "ios_udpmessagebox.h"
-#include "ios_igpmessagebox.h"
 #include "gameui.h"
 #include "Frame.h"
 #include "PuyoStory.h"
@@ -12,7 +10,6 @@
 #include "NotifyCenter.h"
 #include "audio.h"
 
-using namespace ios_fc;
 using namespace gameui;
 
 class PuyoScreen : public Screen {
@@ -114,6 +111,8 @@ class PuyoCommander : public MessageListener, NotificationResponder
     const FramePicture *getListFramePicture() const { return &m_listFramePicture; }
     IIM_Surface * getSwitchOnPicture() { return m_switchOnImage; }
     IIM_Surface * getSwitchOffPicture() { return m_switchOffImage; }
+    IIM_Surface * getRadioOnPicture() { return m_radioOnImage; }
+    IIM_Surface * getRadioOffPicture() { return m_radioOffImage; }
   private:
 
     friend class SinglePlayerGameAction;
@@ -146,6 +145,7 @@ class PuyoCommander : public MessageListener, NotificationResponder
     IIM_Surface   *m_separatorImage;
     IIM_Surface   *m_listIdleImage;
     IIM_Surface   *m_switchOnImage, *m_switchOffImage;
+    IIM_Surface   *m_radioOnImage, *m_radioOffImage;
     FramePicture m_windowFramePicture;
     FramePicture m_buttonIdleFramePicture, m_buttonDownFramePicture, m_buttonOverFramePicture;
     FramePicture m_textFieldIdleFramePicture;

@@ -34,6 +34,7 @@
 #include "PuyoInternetGameCenter.h"
 #include "PuyoTwoPlayerStarter.h"
 #include "PuyoChatBox.h"
+#include "RadioButton.h"
 
 class NetCenterMenu;
 
@@ -167,6 +168,7 @@ private:
     NetCenterTwoNameProvider nameProvider;
     ChatBox chatBox;
     Separator topSeparator, middleSeparator, bottomSeparator;
+    RadioButton m_speedSelector;
 };
     
 #endif // _PUYONETCENTERMENU

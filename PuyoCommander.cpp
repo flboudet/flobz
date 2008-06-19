@@ -16,7 +16,6 @@
 #endif
 
 #include "PuyoOptionMenu.h"
-#include "ios_udpmessagebox.h"
 
 using namespace gameui;
 
@@ -304,6 +303,8 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
     // Loading the frame images, and setting up the frames
     m_switchOnImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/switch-on.png"));
     m_switchOffImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/switch-off.png"));
+    m_radioOnImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/radio-on.png"));
+    m_radioOffImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/radio-off.png"));
     m_frameImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/frame.png"));
     m_buttonIdleImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/button.png"));
     m_buttonDownImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/buttondown.png"));

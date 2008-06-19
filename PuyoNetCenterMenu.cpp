@@ -197,7 +197,8 @@ NetCenterMenu::NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netC
       netCenter(netCenter), onScreenDialog(NULL),
       shouldSelfDestroy(false), nameProvider(*netCenter),
       chatBox(*this),
-      topSeparator(0, 5), middleSeparator(0, 5), bottomSeparator(0, 5)
+      topSeparator(0, 5), middleSeparator(0, 5), bottomSeparator(0, 5),
+      m_speedSelector(1, theCommander->getRadioOnPicture(), theCommander->getRadioOffPicture(), "Config.TwoPlayerGameDifficulty")
 {
     GameUIDefaults::GAME_LOOP->addIdle(&cycled);
     this->setBorderVisible(false);
@@ -236,6 +237,10 @@ void NetCenterMenu::build()
     
     container.add(&mainBox);
 
+    m_speedSelector.addButton(theCommander->getLocalizedString("Beginner"));
+    m_speedSelector.addButton(theCommander->getLocalizedString("Normal"));
+    m_speedSelector.addButton(theCommander->getLocalizedString("Expert"));
+    menu.add(&m_speedSelector);
     menu.add(&cancelButton);
     
     playerbox.add(&playerListText);
@@ -360,7 +365,7 @@ void NetCenterMenu::onGameInvitationCanceledReceived(PuyoGameInvitation &invitat
 void NetCenterMenu::onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation)
 {
     PuyoNetworkTwoPlayerGameWidgetFactory *factory = new PuyoNetworkTwoPlayerGameWidgetFactory(*mbox, invitation.gameRandomSeed);
-    TwoPlayersStarterAction *starterAction = new TwoPlayersStarterAction(0, *factory, &nameProvider);
+    TwoPlayersStarterAction *starterAction = new TwoPlayersStarterAction(invitation.gameSpeed, *factory, &nameProvider);
     
     starterAction->action();
     
@@ -376,6 +381,7 @@ void NetCenterMenu::playerSelected(PeerAddress playerAddress, String playerName)
     PuyoGameInvitation invitation;
     invitation.gameRandomSeed = (unsigned long)(fmod(getTimeMs(), (double)0xFFFFFFFF));
     invitation.opponentAddress = playerAddress;
+    invitation.gameSpeed = m_speedSelector.getState() - 1;
     onScreenDialog = new NetCenterDialogMenu(this, invitation, theCommander->getLocalizedString("Asking for a game"), String(theCommander->getLocalizedString("Waiting ")) + playerName + theCommander->getLocalizedString(" for confirmation"), false);
     container.add(onScreenDialog);
     onScreenDialog->build();
