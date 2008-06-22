@@ -598,6 +598,31 @@ IIM_Surface *iim_surface_resize_alpha(IIM_Surface *isrc, int width, int height)
     return IIM_RegisterImg(ret, true);
 }
 
+IIM_Surface *iim_surface_mirror_h(IIM_Surface *isrc)
+{
+    SDL_Surface *src = isrc->surf;
+    SDL_PixelFormat *fmt = src->format;
+    SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
+                                            fmt->Rmask, fmt->Gmask,
+                                            fmt->Bmask, fmt->Amask);
+    bool srclocked = false;
+    if(SDL_MUSTLOCK(src)) srclocked = (SDL_LockSurface(src) == 0);
+    bool retlocked = false;
+    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);
+    
+    for (int y=src->h-1 ; y >= 0 ; y--)
+    {
+        for (int x=src->w-1 , ix = 0 ; x >= 0 ; x--, ix++)
+        {
+            iim_surface_set_rgba(ret, x, y, iim_surface_get_rgba(src, ix, y));
+        }
+    }
+    
+    if(retlocked) SDL_UnlockSurface(ret);
+    if(srclocked) SDL_UnlockSurface(src);
+    return IIM_RegisterImg(ret, true);
+}
+
 /**
 * Duplicate a surface
  */

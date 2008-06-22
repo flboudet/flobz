@@ -1354,7 +1354,8 @@ namespace gameui {
             IIM_Free(m_focusedImage);
             m_focusedImage = NULL;
         }
-        this->setPreferedSize(Vec3(m_image->h, m_image->w));
+        this->setPreferedSize(Vec3(m_image->w, m_image->h));
+        this->setSize(Vec3(m_image->w, m_image->h));
     }
     
     void Image::draw(SDL_Surface *screen)
@@ -1363,12 +1364,13 @@ namespace gameui {
         IIM_Surface *imageToDraw = m_image;
         Vec3 pos = this->getPosition();
         Vec3 size = this->getSize();
-        dstRect.x = pos.x; dstRect.y = pos.y; dstRect.h = size.x; dstRect.w = size.y;
+        dstRect.x = pos.x; dstRect.y = pos.y; dstRect.h = size.y; dstRect.w = size.x;
         if (haveFocus() ^ m_invertFocusMode) {
             if (m_focusedImage == NULL)
                 m_focusedImage = iim_surface_shift_hsv(m_image, 0., 0., m_invertFocusMode ? -0.3 : 0.3);
             imageToDraw = m_focusedImage;
         }
+        //SDL_FillRect(screen,&dstRect,0xAAAAAAAA);
         IIM_BlitSurface(imageToDraw, NULL, screen, &dstRect);
     }
     

@@ -20,8 +20,12 @@ StatsResources::StatsResources()
 {
     res = this;
     rope_elt = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/rope.png"));
-    puyo_right = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_right.png"));
-    puyo_left = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left.png"));
+    puyo_left[0] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_1.png"));
+    puyo_left[1] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_2.png"));
+    puyo_left[2] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_3.png"));
+    puyo_right[0] = iim_surface_mirror_h(puyo_left[0]);
+    puyo_right[1] = iim_surface_mirror_h(puyo_left[1]);
+    puyo_right[2] = iim_surface_mirror_h(puyo_left[2]);
     separator = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/separator.png"));
     stats_bg = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/stats-bg.png"));
     // TODO: Combos images
@@ -30,8 +34,12 @@ StatsResources::StatsResources()
 StatsResources::~StatsResources()
 {
     IIM_Free(rope_elt);
-    IIM_Free(puyo_left);
-    IIM_Free(puyo_right);
+    IIM_Free(puyo_left[0]);
+    IIM_Free(puyo_left[1]);
+    IIM_Free(puyo_left[2]);
+    IIM_Free(puyo_right[0]);
+    IIM_Free(puyo_right[1]);
+    IIM_Free(puyo_right[2]);
     IIM_Free(stats_bg);
     IIM_Free(separator);
 }
@@ -102,16 +110,16 @@ void ProgressBarWidget::draw(SDL_Surface *screen)
         }
         SDL_BlitSurface(res->rope_elt->surf, NULL, screen, &dstrect);
     }
-    dstrect.w = res->puyo_right->w;
-    dstrect.h = res->puyo_right->h;
+    dstrect.w = res->puyo_right[0]->w;
+    dstrect.h = res->puyo_right[0]->h;
     dstrect.y = bpos.y;
     if (m_dir == LEFT_TO_RIGHT) {
         dstrect.x = bpos.x + rope_size + IMG_RING_WIDTH - 4;
-        SDL_BlitSurface(res->puyo_right->surf, NULL, screen, &dstrect);
+        SDL_BlitSurface(res->puyo_right[m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : 2]->surf, NULL, screen, &dstrect);
     }
     else {
         dstrect.x = bpos.x + bsize.x - rope_size - IMG_RING_WIDTH - IMG_PUYO_WIDTH + 4;
-        SDL_BlitSurface(res->puyo_left->surf, NULL, screen, &dstrect);
+        SDL_BlitSurface(res->puyo_left[m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : 2]->surf, NULL, screen, &dstrect);
     }
 }
 
@@ -313,18 +321,22 @@ void PuyoStatsWidget::ComboLine::action(Widget *sender, int actionType, GameCont
 PuyoStatsLegendWidget::PuyoStatsLegendWidget(PuyoStatsFormat &statsFormat, PuyoStatsWidget &guideWidget, const gameui::FramePicture *framePicture)
   : Frame(framePicture), m_statsFormat(statsFormat), m_guideWidget(guideWidget)
 {
-    //setPolicy(USE_MIN_SIZE);
+    setPolicy(USE_MIN_SIZE);
     setInnerMargin(20);
+    add(&m_titleSeparator);
+    add(&m_barSeparator);
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++) {
         int numCombo = m_statsFormat.m_comboIndirection[i];
         if (numCombo != -1) {
-	  String pictureName = theCommander->getDataPathManager().getPath(String("gfx/combo") + ((numCombo+1) == 1 ? 2 : numCombo+1) + String("x.png"));
-      IIM_Surface *comboImage = IIM_Load_Absolute_DisplayFormatAlpha(pictureName);
-	  m_legendImage[i].setImage(comboImage);
-	}
+            String pictureName = theCommander->getDataPathManager().getPath(String("gfx/combo") + ((numCombo+1) == 1 ? 2 : numCombo+1) + String("x.png"));
+            IIM_Surface *comboImage = IIM_Load_Absolute_DisplayFormatAlpha(pictureName);
+            m_legendImage[i].setImage(comboImage);
+            m_legendCell[i].add(&m_legendImage[i]);
+        }
         m_legendSlider[i].setSlideSide(SliderContainer::SLIDE_FROM_BOTTOM);
         add(&m_legendSlider[i]);
     }
+    add(&m_bottomSeparator);
     //if (m_statsFormat.m_comboIndirection[MAX_DISPLAYED_COMBOS] != -1)
     //    m_legendText[MAX_DISPLAYED_COMBOS-1].setValue("Countless");
 }
@@ -332,14 +344,17 @@ PuyoStatsLegendWidget::PuyoStatsLegendWidget(PuyoStatsFormat &statsFormat, PuyoS
 void PuyoStatsLegendWidget::onWidgetVisibleChanged(bool visible)
 {
   // Set the size of the different rows
-  for (int i = 0 ; i < this->getNumberOfChilds() ; i++)
-    getChild(i)->setPreferedSize(Vec3(0, m_guideWidget.getChild(i)->getSize().y));
+  for (int i = 0 ; i < this->getNumberOfChilds() - 1 ; i++) {
+    Vec3 elementSize = m_guideWidget.getChild(i)->getSize();
+    printf("Elementsize: %f %f\n", elementSize.x, elementSize.y);
+    getChild(i)->setPreferedSize(Vec3(0, elementSize.y));
+  }
 }
 
 void PuyoStatsLegendWidget::action(Widget *sender, int actionType, GameControlEvent *event)
 {
     if (actionType < MAX_DISPLAYED_COMBOS)
-        m_legendSlider[actionType].transitionToContent(&m_legendImage[actionType]);
+        m_legendSlider[actionType].transitionToContent(&m_legendCell[actionType]);
 }
 
 PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats, const gameui::FramePicture *framePicture)

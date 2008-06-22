@@ -100,15 +100,17 @@ public:
 private:
   PuyoStatsFormat &m_statsFormat;
   PuyoStatsWidget &m_guideWidget;
+  gameui::Separator m_titleSeparator, m_barSeparator, m_bottomSeparator;
   gameui::SliderContainer m_legendSlider[MAX_DISPLAYED_COMBOS];
+  gameui::HBox m_legendCell[MAX_DISPLAYED_COMBOS];
   gameui::Image m_legendImage[MAX_DISPLAYED_COMBOS];
 };
 
 class StatsResources {
     public:
         IIM_Surface *rope_elt;
-        IIM_Surface *puyo_right;
-        IIM_Surface *puyo_left;
+        IIM_Surface *puyo_right[3];
+        IIM_Surface *puyo_left[3];
         IIM_Surface *stats_bg;
         IIM_Surface *separator;
         StatsResources();
