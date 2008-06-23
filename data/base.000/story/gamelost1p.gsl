@@ -1,17 +1,6 @@
 <init>
   // Timing
   float @kaoriArrived = 335.0
-  float @kaoriSpeed = 5.0
-  float @spAx = 0.0
-  float @spAy = 20.0
-  float @spBx = 40.0
-  float @spBy = 0.0
-  float @spCx = 80.0
-  float @spCy = 20.0
-
-  float @dstRx = @spBx
-  float @dstRy = @spBy
-
   # Init function: called when script is loaded
   Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
 
@@ -19,10 +8,10 @@
   Sprite @tears = [new_sprite: image="kaori_gamelost/tears1.png" x = -85.0 y=70.0 curframe=0.0 framespeed=0.5 nbframes=2.0]
   @tears.parent = "@kaori"
 
-  Sprite @puyo      = [new_sprite: image="knockedpuyo.png" x = 800.0 y=500.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
-  Sprite @redStar   = [new_sprite: image="redstar.png" x = @spAx y=@spAy curframe=0.0 framespeed=0.2 nbframes=1.0]
-  Sprite @blueStar  = [new_sprite: image="bluestar.png" x = @spBx y=@spBy curframe=0.0 framespeed=0.2 nbframes=1.0]
-  Sprite @greenStar = [new_sprite: image="greenstar.png" x = @spCx y=@spCy curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @puyo      = [new_sprite: image="knockedpuyo.png" x = 700.0 y=500.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @redStar   = [new_sprite: image="redstar.png" x =0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @blueStar  = [new_sprite: image="bluestar.png" x =0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @greenStar = [new_sprite: image="greenstar.png" x =0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   @redStar.parent="@puyo"
   @blueStar.parent="@puyo"
   @greenStar.parent="@puyo"
@@ -32,39 +21,31 @@
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
   # This also allows you to specify the drawing order
+  sprite::@kaori display=@display
+  sprite::@tears display=@display
   sprite::@puyo display=@display
   sprite::@redStar display=@display
   sprite::@blueStar display=@display
   sprite::@greenStar display=@display
-  sprite::@kaori display=@display
-  sprite::@tears display=@display
 
 <update>
   # Update function: called every animation cycle
-  #move::@redStar fcycle=30.0 x=@spBx y=@spBy
-  #move::@blueStar fcycle=30.0 x=@spCx y=@spCy
-  #move::@greenStar fcycle=30.0 x=@spAx y=@spAy
-
-  #move::@redStar fcycle=@fcycle+30.0 x=@dstRx y=@dstRy
-  #move::@blueStar fcycle=30.0 x=@spCx y=@spCy
-  #move::@greenStar fcycle=30.0 x=@spAx y=@spAy
-  ([fabs: x=(@redStar.pos.x - @spAx)] < 2.0) ? @dstRx = @spBx
-  ([fabs: x=(@redStar.pos.x - @spBx)] < 2.0) ? @dstRx = @spCx
-  ([fabs: x=(@redStar.pos.x - @spCx)] < 2.0) ? @dstRx = @spAx
-
-  ([fabs: x=(@redStar.pos.y - @spAy)] < 2.0) ? @dstRy = @spBy
-  ([fabs: x=(@redStar.pos.y - @spBy)] < 2.0) ? @dstRy = @spCy
-  ([fabs: x=(@redStar.pos.y - @spCy)] < 2.0) ? @dstRy = @spAy
 
   (@tears.curframe > 0.0)? @tears.image = "kaori_gamelost/tears1.png"
   (@tears.curframe > 1.0)? @tears.image = "kaori_gamelost/tears2.png"
   (@tears.curframe > 3.0)? @tears.image = "null.png"
 
   move::@kaori fcycle=30.0 x=@kaoriArrived y=@kaori.pos.y
-  move::@kaori fcycle=80.0 x=@kaoriArrived y=@kaori.pos.y
-  move::@kaori fcycle=110.0 x=@kaoriArrived y=800.0
-  #(@kaoriDisplay.x > @kaoriArrived) ? @kaoriDisplay.x -= @kaoriSpeed * @delta_cycle
+  move::@kaori fcycle=80.0 x=@kaori.pos.x y=@kaori.pos.y
+  move::@kaori fcycle=110.0 x=@kaori.pos.x y=800.0
 
-  @puyo.pos.x -= 10.0 * @delta_cycle
+  @redStar.pos.x = [sin : value = @fcycle/4.0] * 40.0 + 30.0
+  @redStar.pos.y = [cos : value = @fcycle/4.0] * 10.0 - 10.0
+  @blueStar.pos.x = [sin : value = (@fcycle/4.0) + 2.0943951] * 40.0 + 30.0
+  @blueStar.pos.y = [cos : value = (@fcycle/4.0) + 2.0943951] * 10.0 - 10.0
+  @greenStar.pos.x = [sin : value = (@fcycle/4.0) + 4.18879] * 40.0 + 30.0
+  @greenStar.pos.y = [cos : value = (@fcycle/4.0) + 4.18879] * 10.0 - 10.0
+  
+  @puyo.pos.x -= 6.0 * @delta_cycle
   @puyo.pos.y = 400.0 - ([fabs: x=([sin: value = (@fcycle/10.0)] * 200.0)] / ((@fcycle + 50.0) * 0.01))
   (@kaori.pos.y > 200.0)? @finished = 1

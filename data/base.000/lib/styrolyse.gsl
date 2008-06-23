@@ -107,6 +107,9 @@ external <music: string file>
 external <sound: string file, float volume>
 external <strcmp: string s1, string s2> : int
 
+<cos: float value> : float
+  cos = [sin: value=value + 1.57079632679]
+
 <fabs: float x> : float
   (x <  0.0) ? fabs = -x
   (x >= 0.0) ? fabs = x
