@@ -13,8 +13,9 @@ namespace gameui {
     {
         if (key == "") 
         {
-            char tmp[sizeof(void *)+1];
-            sprintf(tmp,"%p",this);
+            char tmp[2+sizeof(void *)*2+1];
+            snprintf(tmp,sizeof(tmp),"%p",this);
+	    tmp[sizeof(tmp)-1] = 0;
             notifKey = String("UI.radio.") + tmp;
             stateValue = defaultValue;
             persistant = false;
@@ -32,7 +33,8 @@ namespace gameui {
     void RadioButton::addButton(String _label)
     {
         bool value = (stateValue == (int)buttons.size()+1);
-        buttons.push_back(new SwitchedButton(_label, value, imageTrue, imageFalse, String(""), this));
+	SwitchedButton * newButton = new SwitchedButton(_label, value, imageTrue, imageFalse, String(""), this);
+        buttons.push_back(newButton);
         add(buttons[buttons.size()-1]);
     }
     

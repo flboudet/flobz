@@ -14,8 +14,9 @@ namespace gameui {
     {
         if (key == "") 
         {
-            char tmp[sizeof(void *)+1];
-            sprintf(tmp,"%p",this);
+            char tmp[2+sizeof(void *)*2+1];
+            snprintf(tmp,sizeof(tmp),"%p",this);
+	    tmp[sizeof(tmp)-1] = 0;
             notifKey = String("UI.button.") + tmp;
             stateValue = defaultValue;
             persistant = false;
