@@ -47,23 +47,46 @@ PuyoStoryWidget *PuyoTwoPlayersGameWidget::getOpponent()
 }
 
 TwoPlayersStarterAction::TwoPlayersStarterAction(int difficulty, PuyoGameWidgetFactory &gameWidgetFactory, PuyoTwoNameProvider *nameProvider)
-    : difficulty(difficulty), gameWidgetFactory(gameWidgetFactory), gameScreen(NULL),
-      nameProvider(nameProvider), gameLostWidget(NULL), currentLevelTheme(NULL), leftVictories(0), rightVictories(0) {}
+  : m_state(kNotRunning), difficulty(difficulty), gameWidgetFactory(gameWidgetFactory), gameScreen(NULL),
+    nameProvider(nameProvider), gameLostWidget(NULL), currentLevelTheme(NULL), leftVictories(0), rightVictories(0),
+    m_statsWidget(NULL) {}
 
-void TwoPlayersStarterAction::action()
+void TwoPlayersStarterAction::action(Widget *sender, int actionType,
+                                     GameControlEvent *event)
 {
-    if (gameScreen == NULL) {
-        startGame();
-    }
-    else if (! gameWidget->getAborted()) {
-        if (gameLostWidget == NULL)
-            gameOver();
-        else
-            restartGame();
-    }
-    else {
-	    endGameSession();
-	}
+  if (m_state == kNotRunning)
+    stateMachine();
+  else if (sender == gameWidget) {
+    if (gameWidget->getAborted())
+      endGameSession();
+    else
+      stateMachine();
+  }
+  else if (sender == gameLostWidget)
+    stateMachine();
+}
+
+void TwoPlayersStarterAction::stateMachine()
+{
+  switch (m_state) {
+  case kNotRunning:
+    startGame();
+    break;
+  case kMatchPlaying:
+    gameOver();
+    break;
+  case kMatchWonP1Animation:
+    gameScores();
+    break;
+  case kMatchWonP2Animation:
+    gameScores();
+    break;
+  case kMatchScores:
+    restartGame();
+    break;
+  default:
+    break;
+  }
 }
 
 void TwoPlayersStarterAction::startGame()
@@ -86,6 +109,7 @@ void TwoPlayersStarterAction::startGame()
         gameWidget->addGameBHandicap(-victoriesDelta);
     }
     GameUIDefaults::SCREEN_STACK->push(gameScreen);
+    m_state = kMatchPlaying;
 }
 
 void TwoPlayersStarterAction::gameOver()
@@ -93,12 +117,21 @@ void TwoPlayersStarterAction::gameOver()
     if (gameWidget->isGameARunning()) {
         gameLostWidget = new PuyoStoryWidget(currentLevelTheme->getGameLostRightAnimation2P(), this);
         leftVictories++;
+	m_state = kMatchWonP1Animation;
     }
     else {
         gameLostWidget = new PuyoStoryWidget(currentLevelTheme->getGameLostLeftAnimation2P(), this);
         rightVictories++;
+	m_state = kMatchWonP2Animation;
     }
     gameScreen->setOverlayStory(gameLostWidget);
+}
+
+void TwoPlayersStarterAction::gameScores()
+{
+  m_state = kMatchScores;
+  m_statsWidget = new PuyoTwoPlayersStatsWidget(this->gameWidget->getStatPlayerOne(), this->gameWidget->getStatPlayerTwo(), theCommander->getWindowFramePicture());
+  gameScreen->add(m_statsWidget);
 }
 
 void TwoPlayersStarterAction::restartGame()
@@ -133,6 +166,11 @@ void TwoPlayersStarterAction::restartGame()
     else if (victoriesDelta != 0) {
         gameWidget->addGameBHandicap(-victoriesDelta);
     }
+    if (m_statsWidget != NULL)
+      delete m_statsWidget;
+    m_statsWidget = NULL;
+
+    m_state = kMatchPlaying;
 }
 
 void TwoPlayersStarterAction::endGameSession()
@@ -147,5 +185,11 @@ void TwoPlayersStarterAction::endGameSession()
     
     gameScreen = NULL;
     gameWidget = NULL;
+
+    if (m_statsWidget != NULL)
+      delete m_statsWidget;
+    m_statsWidget = NULL;
+
+    m_state = kNotRunning;
 }
 

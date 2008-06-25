@@ -26,6 +26,7 @@
 #define _PUYOTWOPLAYERSTARTER
 
 #include "PuyoStarter.h"
+#include "PuyoStatsWidget.h"
 
 class PuyoTwoNameProvider {
 public:
@@ -66,14 +67,29 @@ public:
 class TwoPlayersStarterAction : public Action {
 public:
     TwoPlayersStarterAction(int difficulty, PuyoGameWidgetFactory &gameWidgetFactory, PuyoTwoNameProvider *nameProvider = NULL);
-    void action();
-    
-private:    
+    /**
+     * Implements the Action interface
+     */
+    virtual void action(Widget *sender, int actionType,
+			GameControlEvent *event);
+private:
+    enum State {
+      kNotRunning,
+      kMatchPlaying,
+      kMatchWonP1Animation,
+      kMatchWonP2Animation,
+      kMatchScores,
+    };
+    /**
+     * Performs a step in the match state machine
+     */
+    void stateMachine();
     void startGame();
     void gameOver();
+    void gameScores();
     void restartGame();
     void endGameSession();
-    
+    State m_state;
     int difficulty;
     PuyoGameWidgetFactory &gameWidgetFactory;
     PuyoGameScreen *gameScreen;
@@ -83,6 +99,7 @@ private:
     
     PuyoLevelTheme *currentLevelTheme;
     int leftVictories, rightVictories;
+    PuyoTwoPlayersStatsWidget *m_statsWidget;
 };
 
 #endif // _PUYOTWOPLAYERSTARTER

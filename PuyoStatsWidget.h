@@ -31,6 +31,7 @@ public:
     float getValue() const { return m_value; }
     void setVisible(bool visible);
     void setDirection(PuyoStatsDirection dir);
+    void setPositiveAttitude(bool positiveAttitude) { m_positiveAttitude = positiveAttitude; }
     enum {
         VALUE_CHANGED,
         PROGRESSION_COMPLETE
@@ -44,6 +45,7 @@ private:
     bool m_visible;
     gameui::Action *m_associatedAction;
     double m_t;
+    bool m_positiveAttitude;
 };
 
 #define MAX_DISPLAYED_COMBOS 7
@@ -70,7 +72,9 @@ private:
     public:
         ComboLine();
         virtual ~ComboLine() {}
-        void setComboLineInfos(PuyoStatsDirection dir, int tag, String comboText, int numberOfCombos, int totalNumOfCombos, gameui::Action *progressionCompleteAction);
+        void setComboLineInfos(PuyoStatsDirection dir, int tag, String comboText,
+                               int numberOfCombos, int vsNumberOfCombos,
+                               int totalNumOfCombos, gameui::Action *progressionCompleteAction);
         virtual void action(Widget *sender, int actionType, GameControlEvent *event);
     private:
         PuyoStatsDirection m_dir;
@@ -109,8 +113,8 @@ private:
 class StatsResources {
     public:
         IIM_Surface *rope_elt;
-        IIM_Surface *puyo_right[3];
-        IIM_Surface *puyo_left[3];
+        IIM_Surface *puyo_right[4];
+        IIM_Surface *puyo_left[4];
         IIM_Surface *stats_bg;
         IIM_Surface *separator;
         StatsResources();

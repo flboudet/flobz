@@ -389,7 +389,7 @@ void NetCenterMenu::onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvita
     PuyoNetworkTwoPlayerGameWidgetFactory *factory = new PuyoNetworkTwoPlayerGameWidgetFactory(*mbox, invitation.gameRandomSeed);
     TwoPlayersStarterAction *starterAction = new TwoPlayersStarterAction(invitation.gameSpeed, *factory, &nameProvider);
     
-    starterAction->action();
+    starterAction->action(this, NULL, 0);
     
     if (this->onScreenDialog != NULL) {
         container.remove(onScreenDialog);

@@ -23,9 +23,11 @@ StatsResources::StatsResources()
     puyo_left[0] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_1.png"));
     puyo_left[1] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_2.png"));
     puyo_left[2] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_3.png"));
+    puyo_left[3] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_4.png"));
     puyo_right[0] = iim_surface_mirror_h(puyo_left[0]);
     puyo_right[1] = iim_surface_mirror_h(puyo_left[1]);
     puyo_right[2] = iim_surface_mirror_h(puyo_left[2]);
+    puyo_right[3] = iim_surface_mirror_h(puyo_left[3]);
     separator = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/separator.png"));
     stats_bg = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/stats-bg.png"));
     // TODO: Combos images
@@ -46,7 +48,7 @@ StatsResources::~StatsResources()
 
 ProgressBarWidget::ProgressBarWidget(Action *associatedAction)
   : m_value(0.), m_targetValue(0.), m_progressive(false), m_progressiveDuration(LINE_DURATION), m_visible(true),
-    m_associatedAction(associatedAction)
+    m_associatedAction(associatedAction), m_positiveAttitude(true)
 {
     setPreferedSize(Vec3(0, 32));
 }
@@ -115,11 +117,11 @@ void ProgressBarWidget::draw(SDL_Surface *screen)
     dstrect.y = bpos.y;
     if (m_dir == LEFT_TO_RIGHT) {
         dstrect.x = bpos.x + rope_size + IMG_RING_WIDTH - 4;
-        SDL_BlitSurface(res->puyo_right[m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : 2]->surf, NULL, screen, &dstrect);
+        SDL_BlitSurface(res->puyo_right[m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)]->surf, NULL, screen, &dstrect);
     }
     else {
         dstrect.x = bpos.x + bsize.x - rope_size - IMG_RING_WIDTH - IMG_PUYO_WIDTH + 4;
-        SDL_BlitSurface(res->puyo_left[m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : 2]->surf, NULL, screen, &dstrect);
+        SDL_BlitSurface(res->puyo_left[m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)]->surf, NULL, screen, &dstrect);
     }
 }
 
@@ -245,14 +247,20 @@ void PuyoStatsWidget::action(Widget *sender, int actionType, GameControlEvent *e
         return;
     int currentComboIndex = m_statsFormat.m_comboIndirection[comboIndirectionIndex];
     if (currentComboIndex != -1)
-        m_comboLines[comboIndirectionIndex].setComboLineInfos(m_dir, comboIndirectionIndex, String(""), m_stats.combo_count[currentComboIndex], m_maxCombo, this);
+        m_comboLines[comboIndirectionIndex].setComboLineInfos(m_dir, comboIndirectionIndex, String(""),
+                                                        m_stats.combo_count[currentComboIndex],
+                                                        m_opponentStats.combo_count[currentComboIndex],
+                                                        m_maxCombo, this);
 }
 
 void PuyoStatsWidget::startAnimation()
 {
     int currentComboIndex = m_statsFormat.m_comboIndirection[0];
     if (currentComboIndex != -1)
-        m_comboLines[0].setComboLineInfos(m_dir, 0, String(""), m_stats.combo_count[currentComboIndex], m_maxCombo, this);
+        m_comboLines[0].setComboLineInfos(m_dir, 0, String(""),
+                                          m_stats.combo_count[currentComboIndex],
+                                          m_opponentStats.combo_count[currentComboIndex],
+                                          m_maxCombo, this);
     if (m_action != NULL)
         m_action->action(this, 0, NULL);
 }
@@ -264,7 +272,8 @@ PuyoStatsWidget::ComboLine::ComboLine()
 }
 
 void PuyoStatsWidget::ComboLine::setComboLineInfos(PuyoStatsDirection dir, int tag, String comboText,
-                                                   int numberOfCombos, int totalNumOfCombos, Action *progressionCompleteAction)
+                                                   int numberOfCombos, int vsNumberOfCombos,
+                                                   int totalNumOfCombos, Action *progressionCompleteAction)
 {
     /*if (numberOfCombos == 0)
         return;*/
@@ -293,6 +302,7 @@ void PuyoStatsWidget::ComboLine::setComboLineInfos(PuyoStatsDirection dir, int t
     m_comboLabel.setValue(comboText);
     m_progressBar.setVisible(true);
     m_progressBar.setValue(progressBarValue, true);
+    m_progressBar.setPositiveAttitude((numberOfCombos >= vsNumberOfCombos) && (numberOfCombos > 0) ? true : false);
 }
 
 void PuyoStatsWidget::idle(double currentTime)
