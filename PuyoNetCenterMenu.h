@@ -40,7 +40,7 @@ class NetCenterMenu;
 
 class NetCenterDialogMenu : public SliderContainer {
 public:
-    NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvitation &associatedInvitation, String title, String message, bool hasAcceptButton);
+    NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvitation &associatedInvitation, String title, String message, String optLine, bool hasAcceptButton);
     virtual ~NetCenterDialogMenu();
     void build();
     // Notification
@@ -62,7 +62,7 @@ private:
     bool hasAcceptButton;
     HBox buttons;
     Frame titleFrame;
-    Text dialogTitle, dialogMsg;
+    Text dialogTitle, dialogMsg, * optMsg;
     Text sep1, sep2;
     FramedButton acceptButton, cancelButton;
 };

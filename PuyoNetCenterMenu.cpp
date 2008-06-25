@@ -48,21 +48,23 @@ void NetCenterDialogMenu::NetCenterDialogMenuAction::action()
     else targetMenu->cancelCurrentGame();
 }
 
-NetCenterDialogMenu::NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvitation &associatedInvitation, String title, String message, bool hasAcceptButton)
+NetCenterDialogMenu::NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvitation &associatedInvitation, String title, String message, String optLine, bool hasAcceptButton)
     : associatedInvitation(associatedInvitation),
       menu(theCommander->getWindowFramePicture()),
       cancelAction(targetMenu, true), acceptAction(targetMenu, false), hasAcceptButton(hasAcceptButton),
       titleFrame(theCommander->getSeparatorFramePicture()),
-      dialogTitle(title), dialogMsg(message),
+      dialogTitle(title), dialogMsg(message), optMsg(NULL),
       acceptButton(theCommander->getLocalizedString("Accept"), &acceptAction,
 		   theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
       cancelButton(theCommander->getLocalizedString("Cancel"), &cancelAction,
 		   theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture())
 {
+    if (optLine != "") optMsg = new Text(optLine);
 }
 
 NetCenterDialogMenu::~NetCenterDialogMenu()
 {
+    if (optMsg != NULL) delete optMsg;
 }
 
 void NetCenterDialogMenu::build()
@@ -78,7 +80,10 @@ void NetCenterDialogMenu::build()
     menu.add(&titleFrame);
     menu.add(&sep1);
     menu.add(&dialogMsg);
-    menu.add(&sep2);
+    if (optMsg != NULL) {
+        menu.add(&sep2);
+        menu.add(optMsg);
+    }
     if (hasAcceptButton)
         buttons.add(&acceptButton);
     buttons.add(&cancelButton);
@@ -298,7 +303,24 @@ void NetCenterMenu::onGameInvitationReceived(PuyoGameInvitation &invitation)
         netCenter->cancelGameInvitation(invitation);
     }
     else {
-        onScreenDialog = new NetCenterDialogMenu(this, invitation, theCommander->getLocalizedString("Invitation for a game"), invitation.opponentName + theCommander->getLocalizedString(" invited you to play"), true);
+        String levelSpeed = theCommander->getLocalizedString("Game speed:");
+        levelSpeed += " ";
+        switch (invitation.gameSpeed) {
+            default:
+            case 0:
+                levelSpeed += theCommander->getLocalizedString("Beginner");
+                break;
+            case 1:
+                levelSpeed += theCommander->getLocalizedString("Normal");
+                break;
+            case 2:
+                levelSpeed += theCommander->getLocalizedString("Expert");
+                break;
+        }
+        onScreenDialog = new NetCenterDialogMenu(this, invitation, theCommander->getLocalizedString("Invitation for a game"),
+                                                 invitation.opponentName + theCommander->getLocalizedString(" invited you to play"),
+                                                 levelSpeed,
+                                                 true);
         container.add(onScreenDialog);
         onScreenDialog->build();
         this->focus(onScreenDialog);
@@ -382,7 +404,7 @@ void NetCenterMenu::playerSelected(PeerAddress playerAddress, String playerName)
     invitation.gameRandomSeed = (unsigned long)(fmod(getTimeMs(), (double)0xFFFFFFFF));
     invitation.opponentAddress = playerAddress;
     invitation.gameSpeed = m_speedSelector.getState() - 1;
-    onScreenDialog = new NetCenterDialogMenu(this, invitation, theCommander->getLocalizedString("Asking for a game"), String(theCommander->getLocalizedString("Waiting ")) + playerName + theCommander->getLocalizedString(" for confirmation"), false);
+    onScreenDialog = new NetCenterDialogMenu(this, invitation, theCommander->getLocalizedString("Asking for a game"), String(theCommander->getLocalizedString("Waiting ")) + playerName + theCommander->getLocalizedString(" for confirmation"), String(""), false);
     container.add(onScreenDialog);
     onScreenDialog->build();
     this->focus(onScreenDialog);
