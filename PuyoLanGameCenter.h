@@ -66,6 +66,7 @@ private:
     UDPMessageBox mbox;
     const String name;
     double timeMsBetweenTwoAliveMessages, lastAliveMessage;
+    double timeMsBetweenTwoNetworkInterfacesDetection, lastNetworkInterfacesDetection;
     bool gameGranted;
     PuyoGameInvitation grantedInvitation;
     int status;

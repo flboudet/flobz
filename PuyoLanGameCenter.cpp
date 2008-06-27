@@ -42,6 +42,7 @@ enum {
 PuyoLanGameCenter::PuyoLanGameCenter(int portNum, const String name)
     : socket(portNum), mbox(&socket), name(name),
       timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages),
+      timeMsBetweenTwoNetworkInterfacesDetection(10000.), lastNetworkInterfacesDetection(getTimeMs()),
       gameGranted(false), status(PEER_NORMAL), multicastAddress(MULTICASTGROUP), loopbackAddress("127.0.0.1"),
       networkInterfaces(requester.getInterfaces()), mcastPeerAddress(multicastAddress, portNum)
 {
@@ -150,6 +151,10 @@ void PuyoLanGameCenter::idle()
         sendAliveMessage();
         lastAliveMessage = time_ms;
     }
+    if ((time_ms - lastNetworkInterfacesDetection) >= timeMsBetweenTwoNetworkInterfacesDetection) {
+        networkInterfaces = requester.getInterfaces();
+        lastNetworkInterfacesDetection = time_ms;
+    }
     PuyoNetGameCenter::idle();
 }
 
@@ -171,20 +176,27 @@ String PuyoLanGameCenter::getOpponentName()
 
 void PuyoLanGameCenter::sendAliveMessage()
 {
-    for (int i = 0 ; i < networkInterfaces.size() ; i++) {
-        NetworkInterface &ifs = networkInterfaces[i];
-        if (ifs.getAddress() == loopbackAddress)
-            continue;
-        socket.setMulticastInterface(ifs.getAddress());
-        Message *msg = mbox.createMessage();
-        Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
-        dirMsg->setPeerAddress(mcastPeerAddress);
-        
-        msg->addInt("CMD", PUYO_UDP_ALIVE);
-        msg->addString("NAME", name);
-        msg->addInt("STATUS", status);
-        msg->send();
-        delete msg;
+    try {
+        for (unsigned int i = 0 ; i < networkInterfaces.size() ; i++) {
+            NetworkInterface &ifs = networkInterfaces[i];
+            if (ifs.getAddress() == loopbackAddress)
+                continue;
+            socket.setMulticastInterface(ifs.getAddress());
+            Message *msg = mbox.createMessage();
+            Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
+            dirMsg->setPeerAddress(mcastPeerAddress);
+            
+            msg->addInt("CMD", PUYO_UDP_ALIVE);
+            msg->addString("NAME", name);
+            msg->addInt("STATUS", status);
+            msg->send();
+            delete msg;
+        }
+    }
+    catch (Exception ex) {
+        // If we have an exception there, it is probably because we are attempting to use
+        // a network interface which has just disappeared. Redetect the interfaces.
+        networkInterfaces = requester.getInterfaces();
     }
 }
 
