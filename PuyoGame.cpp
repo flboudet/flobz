@@ -206,6 +206,9 @@ void PuyoLocalGame::cycle()
         if (phaseReady == 1) phaseReady = 2;
         fallingPuyo->setPuyoXY(fallingX, fallingY);
         companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
+		if (delegate != NULL) {
+			delegate->fallingsDidFallingStep(fallingPuyo, companionPuyo);
+		}
         // Increase points
         switch (gameLevel)
         {
@@ -263,13 +266,18 @@ void PuyoLocalGame::moveLeft()
     if (endOfCycle) {
         return;
     }
+    bool moved = false;
     if (((fallingY<0)&&(fallingX>0))||((getPuyoCellAt(fallingX-1, fallingY) <= PUYO_EMPTY)
-     && (getPuyoCellAt(getFallingCompanionX()-1, getFallingCompanionY()) <= PUYO_EMPTY)))
-        {
-            fallingX--;
-        }
+     && (getPuyoCellAt(getFallingCompanionX()-1, getFallingCompanionY()) <= PUYO_EMPTY))) {
+		moved = true;
+		fallingX--;
+    }
+
     fallingPuyo->setPuyoXY(fallingX, fallingY);
     companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
+
+    if ((delegate != NULL) && (moved))
+        delegate->fallingsDidMoveLeft(fallingPuyo, companionPuyo);
 }
 
 void PuyoLocalGame::moveRight()
@@ -277,11 +285,17 @@ void PuyoLocalGame::moveRight()
     if (endOfCycle) {
         return;
     }
+    bool moved = false;
     if (((fallingY<0)&&(fallingX<PUYODIMX-1))||((getPuyoCellAt(fallingX+1, fallingY) <= PUYO_EMPTY)
-     && (getPuyoCellAt(getFallingCompanionX()+1, getFallingCompanionY()) <= PUYO_EMPTY)))
+        && (getPuyoCellAt(getFallingCompanionX()+1, getFallingCompanionY()) <= PUYO_EMPTY))) {
+	moved = true;
         fallingX++;
+    }
     fallingPuyo->setPuyoXY(fallingX, fallingY);
     companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
+
+    if ((delegate != NULL) && (moved))
+        delegate->fallingsDidMoveRight(fallingPuyo, companionPuyo);
 }
 
 void PuyoLocalGame::rotate(bool left)
@@ -290,8 +304,6 @@ void PuyoLocalGame::rotate(bool left)
         return;
     }
     unsigned char backupCompanion = fallingCompanion;
-    /*int backupX = fallingX;
-    int backupY = fallingY;*/
     int newX, newY;
     bool moved = true;
     fallingCompanion = (unsigned char)(fallingCompanion + (left?3:1)) % 4;
@@ -300,10 +312,8 @@ void PuyoLocalGame::rotate(bool left)
     int newCompanionY = getFallingCompanionY();
     fallingCompanion = backupCompanion;
     if (getPuyoCellAt(newCompanionX, newCompanionY) > PUYO_EMPTY) {
-        //if (((fallingY<0)&&(fallingX>0)&&(fallingX<PUYODIMX-1))||(getPuyoCellAt(newCompanionX, newCompanionY) > PUYO_EMPTY)) {
         newX = fallingX + (fallingX - newCompanionX);
         newY = fallingY + (fallingY - newCompanionY);
-        //        if ((fallingY >= 0) && (getPuyoCellAt(newX, newY) > PUYO_EMPTY)) {
         if (getPuyoCellAt(newX, newY) > PUYO_EMPTY) {
             moved = false;
         }

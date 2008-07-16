@@ -97,6 +97,9 @@ class PuyoView : public PuyoDelegate {
     void clearMetaCycleStart() { newMetaCycleStart = false; }
     
     // PuyoDelegate methods
+	virtual void fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
+	virtual void fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
+	virtual void fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
     void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex);
     void gameDidEndCycle();
     void companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise);

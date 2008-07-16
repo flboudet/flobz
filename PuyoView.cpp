@@ -284,6 +284,21 @@ void PuyoView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex) {
     }
 }
 
+void PuyoView::fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
+{
+	// TODO
+}
+
+void PuyoView::fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
+{
+	// TODO
+}
+
+void PuyoView::fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
+{
+	// TODO
+}
+
 void PuyoView::companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise)
 {
     ((AnimatedPuyo *)companionPuyo)->addAnimation(new TurningAnimation(*(AnimatedPuyo *)companionPuyo,

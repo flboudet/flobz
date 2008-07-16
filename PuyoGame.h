@@ -133,6 +133,9 @@ public:
   virtual void companionDidTurn(PuyoPuyo *companionPuyo,
 				int companionVector,
 				bool counterclockwise) = 0;
+  virtual void fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo) = 0;
+  virtual void fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo) = 0;
+  virtual void fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo) = 0;
   virtual void puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow) = 0;
   virtual void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase) = 0;
   virtual void gameDidEndCycle() = 0;
