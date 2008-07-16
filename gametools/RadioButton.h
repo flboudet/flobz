@@ -15,7 +15,8 @@ namespace gameui {
         int getState();
         void setState(int _value);
         void addButton(String _label);
-
+//        void draw(SDL_Surface *screen);
+        
     private:
         IIM_Surface * imageTrue;
         IIM_Surface * imageFalse;
@@ -23,6 +24,8 @@ namespace gameui {
         int stateValue;
         bool persistant;
         std::vector<SwitchedButton *> buttons;
+        std::vector<HBox *> containers;
+        std::vector<HBox *> spacers;
     };
     
 }

@@ -29,13 +29,34 @@ namespace gameui {
 
         setPolicy(USE_MIN_SIZE);
     }
-    
+    /*
+    void RadioButton::draw(SDL_Surface *screen) {
+        SDL_Rect r;
+        r.x = getPosition().x;
+        r.y = getPosition().y;
+        r.h = getSize().y;
+        r.w = getSize().x;
+        SDL_FillRect(screen,&r,0x2468AC22);
+        VBox::draw(screen);
+    };
+    */
     void RadioButton::addButton(String _label)
     {
         bool value = (stateValue == (int)buttons.size()+1);
-	SwitchedButton * newButton = new SwitchedButton(_label, value, imageTrue, imageFalse, String(""), this);
+        SwitchedButton * newButton = new SwitchedButton(_label, value, imageTrue, imageFalse, String(""), this);
+        HBox * mySpacer = new HBox();
+        HBox * myContainer = new HBox();
         buttons.push_back(newButton);
-        add(buttons[buttons.size()-1]);
+        spacers.push_back(mySpacer);
+        containers.push_back(myContainer);
+        myContainer->add(buttons[buttons.size()-1]);
+        myContainer->add(mySpacer);
+        Vec3 size = getPreferedSize();
+        Vec3 buttonSize = newButton->getPreferedSize();
+        size.y += 10.0 + buttonSize.y;
+        if (size.x < buttonSize.x ) size.x = buttonSize.x;
+        setPreferedSize( size );
+        add(myContainer);
     }
     
     void RadioButton::action(Widget *sender, int actionType, GameControlEvent *event)
@@ -88,6 +109,7 @@ namespace gameui {
     RadioButton::~RadioButton()
     {
         gameui::GlobalNotificationCenter.removeListener(notifKey, this);
+        // TODO: delete the elements in the vectors...
     }
     
 }
