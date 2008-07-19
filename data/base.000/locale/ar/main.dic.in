@@ -93,7 +93,7 @@ Player 2:
 :لاعب ٢
 
 Local Area Network Game
-(LAN)محلية
+(LAN) محلية
 
 Internet Game
 على الإنترنت
@@ -111,4 +111,49 @@ Player name:
 :إسم اللاعب
 
 Port number:
-:(Port number) رقم المرفأ
+:(Port number) رقم الميناء 
+
+Server List
+:(Server List) لائحة الخدام
+
+Update
+تحديث
+
+Internet Game
+اللعبة على إنترنت
+
+Join
+إلتحق
+
+Network Game Center
+مركز اللعب على الشبكة
+
+Player List
+لائحة اللاعبين
+
+Disconnect
+خروج
+
+Say:
+:يقول
+
+Asking for a game
+طلب اللعب
+
+
+Waiting 
+إنتظار
+
+ for confirmation
+...
+
+Pause
+توقف
+
+Continue game
+متابعة اللعب
+
+Abort game
+إنهاء اللعب
+
+

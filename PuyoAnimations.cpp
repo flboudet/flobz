@@ -212,7 +212,7 @@ FallingAnimation::FallingAnimation(AnimatedPuyo &puyo, int originY, int xOffset,
     bouncing = BOUNCING_OFFSET_NUM + off;
     attachedPuyo.getAttachedView()->disallowCycle();
     EventFX("start_falling", X+TSIZE/2, Y+TSIZE/2, puyo.getAttachedView()->getPlayerId());
-    AudioManager::playSound("bam1.wav", .1);
+    AudioManager::playSound("bam1.wav", .3);
 }
 
 void FallingAnimation::cycle()
@@ -228,10 +228,18 @@ void FallingAnimation::cycle()
 
         if (bouncing < 0) {
             finishedFlag = true;
+//<<<<<<< .mine
+//            AudioManager::playSound("bam1.wav", .3);
+//            EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
+//            EventFX("end_falling", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
+//            attachedPuyo.setAnimatedState(AnimatedPuyo::PUYO_NORMAL);
+//            attachedPuyo.getAttachedView()->allowCycle();
+//=======
             //EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
             //EventFX("end_falling", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
             attachedPuyo.setAnimatedState(0);
             //attachedPuyo.getAttachedView()->allowCycle();
+//>>>>>>> .r1012
         }
         else if ((bouncing < BOUNCING_OFFSET_NUM) && (BOUNCING_OFFSET[bouncing] > 0)) {
             attachedPuyo.setAnimatedState(BOUNCING_OFFSET[bouncing]);
@@ -377,7 +385,7 @@ VanishSoundAnimation::~VanishSoundAnimation()
 static const char *sound_splash[8] = {
     "splash1.wav", "splash2.wav", "splash3.wav", "splash4.wav",
     "splash5.wav", "splash6.wav", "splash7.wav", "splash8.wav" };
-static float sound_splash_volume = .6;
+static float sound_splash_volume = 1.0;
 
 void VanishSoundAnimation::cycle()
 {
@@ -388,7 +396,7 @@ void VanishSoundAnimation::cycle()
     else if (synchronizer->isSynchronized()) {
         step++;
         if (step == 1) {
-            AudioManager::playSound(sound_splash[phase>7?7:phase], sound_splash_volume);
+            AudioManager::playSound(sound_splash[phase-1>7?7:phase-1], sound_splash_volume);
             finishedFlag = true;
         }
     }
