@@ -46,6 +46,8 @@ public:
     void addAnimation(PuyoAnimation *animation);
     PuyoAnimation * getCurrentAnimation() const;
     void removeCurrentAnimation();
+    void flushAnimations();
+    void flushAnimations(int animationTag);
     void cycleAnimation();
     void render();
     void renderAt(int X, int Y);
@@ -59,6 +61,10 @@ public:
     int getScreenCoordinateY() const;
 	AnimatedPuyoTheme *getAttachedTheme() const { return attachedTheme; }
     void setAnimatedState(int animatedState) { m_currentCompressedState = animatedState; }
+    void setPartner(AnimatedPuyo *partner) { m_partner = partner; }
+    void setOffsetX(int offsetX) { m_offsetX = offsetX; }
+    void setOffsetY(int offsetY) { m_offsetY = offsetY; }
+    void setRotation(float angle) { m_angle = angle; }
 private:
     AdvancedBuffer<PuyoAnimation *> animationQueue;
     int puyoEyeState;
@@ -67,6 +73,9 @@ private:
     PuyoView *attachedView;
 	AnimatedPuyoTheme *attachedTheme;
     int m_currentCompressedState;
+    AnimatedPuyo *m_partner;
+    int m_offsetX, m_offsetY;
+    float m_angle;
 };
 
 class AnimatedPuyoFactory : public PuyoFactory {

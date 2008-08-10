@@ -286,27 +286,39 @@ void PuyoView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex) {
 
 void PuyoView::fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
 {
-	// TODO
+    ((AnimatedPuyo *)fallingPuyo)->flushAnimations(ANIMATION_H);
+    ((AnimatedPuyo *)companionPuyo)->flushAnimations(ANIMATION_H);
+	((AnimatedPuyo *)fallingPuyo)->addAnimation(new MovingHAnimation(*(AnimatedPuyo *)fallingPuyo, TSIZE, 4));
+    ((AnimatedPuyo *)companionPuyo)->addAnimation(new MovingHAnimation(*(AnimatedPuyo *)companionPuyo, TSIZE, 4));
 }
 
 void PuyoView::fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
 {
-	// TODO
+    ((AnimatedPuyo *)fallingPuyo)->flushAnimations(ANIMATION_H);
+    ((AnimatedPuyo *)companionPuyo)->flushAnimations(ANIMATION_H);
+	((AnimatedPuyo *)fallingPuyo)->addAnimation(new MovingHAnimation(*(AnimatedPuyo *)fallingPuyo, -TSIZE, 4));
+    ((AnimatedPuyo *)companionPuyo)->addAnimation(new MovingHAnimation(*(AnimatedPuyo *)companionPuyo, -TSIZE, 4));
 }
 
 void PuyoView::fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
 {
-	// TODO
+    ((AnimatedPuyo *)fallingPuyo)->flushAnimations(ANIMATION_V);
+    ((AnimatedPuyo *)companionPuyo)->flushAnimations(ANIMATION_V);
+	((AnimatedPuyo *)fallingPuyo)->addAnimation(new MovingVAnimation(*(AnimatedPuyo *)fallingPuyo, -TSIZE/2, 4));
+    ((AnimatedPuyo *)companionPuyo)->addAnimation(new MovingVAnimation(*(AnimatedPuyo *)companionPuyo, -TSIZE/2, 4));
 }
 
 void PuyoView::companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise)
 {
+    ((AnimatedPuyo *)companionPuyo)->setPartner(((AnimatedPuyo *)(attachedGame->getFallingPuyo())));
+    ((AnimatedPuyo *)companionPuyo)->flushAnimations(ANIMATION_ROTATE);
     ((AnimatedPuyo *)companionPuyo)->addAnimation(new TurningAnimation(*(AnimatedPuyo *)companionPuyo,
-                                                                       companionVector, counterclockwise));
+                                                                       counterclockwise));
 }
 
 void PuyoView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow)
 {
+    ((AnimatedPuyo *)puyo)->flushAnimations();
     ((AnimatedPuyo *)puyo)->addAnimation(new FallingAnimation(*(AnimatedPuyo *)puyo, originY, xOffset, yOffset, nFalledBelow));
 }
 

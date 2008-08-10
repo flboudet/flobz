@@ -32,9 +32,9 @@
 
 /* Base class implementation */
 Animation::Animation()
+  : finishedFlag(false), enabled(true),
+    m_exclusive(true), m_tag(ANIMATION_NO_TAG)
 {
-    finishedFlag = false;
-    enabled = true;
 }
 
 bool Animation::isFinished() const
@@ -47,6 +47,10 @@ bool Animation::isEnabled() const
     return enabled;
 }
 
+float PuyoAnimation::getPuyoSoundPadding() const
+{
+    return ((float)attachedPuyo.getScreenCoordinateX() / 640.)*2. - 1.;
+}
 
 /* Neutral falling animation */
 NeutralAnimation::NeutralAnimation(AnimatedPuyo &puyo, int delay, AnimationSynchronizer *synchronizer) : PuyoAnimation(puyo)
@@ -85,7 +89,7 @@ void NeutralAnimation::cycle()
                 attachedPuyo.getScreenCoordinateX() + TSIZE/2,
                 attachedPuyo.getScreenCoordinateY() + TSIZE/2,
                 attachedPuyo.getAttachedView()->getPlayerId());*/
-            AudioManager::playSound(sound_bim[choosenSound], sound_bim_volume[choosenSound]);
+            AudioManager::playSound(sound_bim[choosenSound], sound_bim_volume[choosenSound], getPuyoSoundPadding());
             finishedFlag = true;
             attachedPuyo.getAttachedView()->allowCycle();
             synchronizer->pop();
@@ -133,14 +137,16 @@ void AnimationSynchronizer::decrementUsage()
 }
 
 /* Companion turning around main puyo animation */
-TurningAnimation::TurningAnimation(AnimatedPuyo &companionPuyo, int vector,
+TurningAnimation::TurningAnimation(AnimatedPuyo &companionPuyo,
                                    bool counterclockwise) : PuyoAnimation(companionPuyo)
 {
-    this->counterclockwise = counterclockwise;
-    companionVector = vector;
+    enabled = false;
+    m_exclusive = false;
+    m_tag = ANIMATION_ROTATE;
     cpt = 0;
-    angle = 0;
-    step = (3.14 / 2) / 4;
+    angle = 3.14 / 2;
+    step = (3.14 / 2) / 4 * (counterclockwise ? 1 : -1);
+    cycle();
 }
 
 void TurningAnimation::cycle()
@@ -149,7 +155,7 @@ void TurningAnimation::cycle()
     static const float  sound_fff_volume = .35;
     
     if (cpt == 0) {
-        AudioManager::playSound(sound_fff, sound_fff_volume);
+        AudioManager::playSound(sound_fff, sound_fff_volume, getPuyoSoundPadding());
         EventFX("turning",
                 attachedPuyo.getScreenCoordinateX() + TSIZE/2,
                 attachedPuyo.getScreenCoordinateY() + TSIZE/2,
@@ -157,43 +163,55 @@ void TurningAnimation::cycle()
     }
     cpt++;
     angle += step;
-    if (cpt == 4)
+    if (cpt == 4) {
         finishedFlag = true;
+        attachedPuyo.setRotation(0.);
+    }
+    else
+        attachedPuyo.setRotation(angle);
 }
 
-void TurningAnimation::draw(int semiMove)
+/* Puyo moving from one place to another in the horizontal axis */
+MovingHAnimation::MovingHAnimation(AnimatedPuyo &puyo, int hOffset, int step)
+  : PuyoAnimation(puyo), m_cpt(0), m_hOffset(hOffset), m_step(step),
+    m_hOffsetByStep((float)hOffset/(float)step)
 {
-    int X = attachedPuyo.getScreenCoordinateX();
-    int Y = attachedPuyo.getScreenCoordinateY();
-    float offsetA = sin(angle) * TSIZE;
-    float offsetB = cos(angle) * TSIZE * (counterclockwise ? -1 : 1);
-    int ax, ay;
+    enabled = false;
+    m_exclusive = false;
+    m_tag = ANIMATION_H;
+    AudioManager::playSound("tick.wav", .35, getPuyoSoundPadding());
+    cycle();
+}
 
-    switch (companionVector) {
-        case 0:
-            ax = (short)(X - offsetB);
-            ay = (short)(Y + offsetA - TSIZE);
-            break;
-        case 1:
-            ax = (short)(X - offsetA + TSIZE);
-            ay = (short)(Y - offsetB);
-            break;
-        case 2:
-            ax = (short)(X + offsetB);
-            ay = (short)(Y - offsetA + TSIZE);
-            break;
-        case 3:
-            ax = (short)(X + offsetA - TSIZE);
-            ay = (short)(Y + offsetB);
-            break;
-        
-        default:
-        case -3:
-            ax = (short)(X + offsetB);
-            ay = (short)(Y + offsetA - TSIZE);
-            break;
+void MovingHAnimation::cycle()
+{
+    m_cpt++;
+    attachedPuyo.setOffsetX(m_hOffset - m_hOffsetByStep*m_cpt);
+    if (m_cpt == m_step) {
+        finishedFlag = true;
+        attachedPuyo.setOffsetX(0);
     }
-    attachedPuyo.renderAt(ax, ay);
+}
+
+/* Puyo moving from one place to another in the vertical axis */
+MovingVAnimation::MovingVAnimation(AnimatedPuyo &puyo, int vOffset, int step)
+  : PuyoAnimation(puyo), m_cpt(0), m_vOffset(vOffset), m_step(step),
+    m_vOffsetByStep((float)vOffset/(float)step)
+{
+    enabled = false;
+    m_exclusive = false;
+    m_tag = ANIMATION_V;
+    cycle();
+}
+
+void MovingVAnimation::cycle()
+{
+    m_cpt++;
+    attachedPuyo.setOffsetY(m_vOffset - m_vOffsetByStep*m_cpt);
+    if (m_cpt == m_step) {
+        finishedFlag = true;
+        attachedPuyo.setOffsetY(0);
+    }
 }
 
 /* Puyo falling and bouncing animation */
@@ -201,7 +219,7 @@ void TurningAnimation::draw(int semiMove)
 const int FallingAnimation::BOUNCING_OFFSET_NUM = 9;
 const int FallingAnimation::BOUNCING_OFFSET[] = {-3, -4, -3, 0, 3, 6, 8, 6, 3};
 
-FallingAnimation::FallingAnimation(AnimatedPuyo &puyo, int originY, int xOffset, int yOffset, int off) : PuyoAnimation(puyo)
+FallingAnimation::FallingAnimation(AnimatedPuyo &puyo, int originY, int xOffset, int yOffset, int off) : PuyoAnimation(puyo), m_once(false)
 {
     this->xOffset = xOffset;
     this->yOffset = yOffset;
@@ -212,7 +230,6 @@ FallingAnimation::FallingAnimation(AnimatedPuyo &puyo, int originY, int xOffset,
     bouncing = BOUNCING_OFFSET_NUM + off;
     attachedPuyo.getAttachedView()->disallowCycle();
     EventFX("start_falling", X+TSIZE/2, Y+TSIZE/2, puyo.getAttachedView()->getPlayerId());
-    AudioManager::playSound("bam1.wav", .3);
 }
 
 void FallingAnimation::cycle()
@@ -221,6 +238,10 @@ void FallingAnimation::cycle()
     
     if (Y >= (attachedPuyo.getPuyoY()*TSIZE) + yOffset)
     {
+        if (!m_once) {
+            AudioManager::playSound("bam1.wav", .3, getPuyoSoundPadding());
+            m_once = true;
+        }
         Y = (attachedPuyo.getPuyoY()*TSIZE) + yOffset;
         if (bouncing == BOUNCING_OFFSET_NUM + off) attachedPuyo.getAttachedView()->allowCycle();
 
@@ -434,7 +455,7 @@ void NeutralPopAnimation::cycle()
     else if (synchronizer->isSynchronized()) {
         iter ++;
         if (iter == 17 + delay) {
-            AudioManager::playSound("pop.wav", .25);
+            AudioManager::playSound("pop.wav", .25, getPuyoSoundPadding());
             EventFX("neutral_pop", 
                     attachedPuyo.getScreenCoordinateX() + TSIZE/2,
                     attachedPuyo.getScreenCoordinateY() + TSIZE/2,

@@ -41,6 +41,9 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
         buffer.add(currentPuyo->getPuyoY());
     }
     neutralsBuffer.flush();
+    moveLeftBuffer.flush();
+    moveRightBuffer.flush();
+    fallingStepBuffer.flush();
     compTurnBuffer.flush();
     didFallBuffer.flush();
     willVanishBuffer.flush();
@@ -60,6 +63,9 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
     message->addInt     (PuyoMessage::CURRENT_NEUTRALS, attachedGame->getNeutralPuyos());
     
     message->addIntArray(PuyoMessage::ADD_NEUTRALS,  neutralsBuffer);
+    message->addIntArray(PuyoMessage::MV_L,moveLeftBuffer);
+    message->addIntArray(PuyoMessage::MV_R,moveRightBuffer);
+    message->addIntArray(PuyoMessage::MV_D,fallingStepBuffer);
     message->addIntArray(PuyoMessage::COMPANION_TURN,compTurnBuffer);
     message->addIntArray(PuyoMessage::DID_FALL,      didFallBuffer);
     message->addIntArray(PuyoMessage::WILL_VANISH,   willVanishBuffer);
@@ -67,6 +73,9 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
     
     // clear des infos ayant ete envoyee
     neutralsBuffer.clear();
+    moveLeftBuffer.clear();
+    moveRightBuffer.clear();
+    fallingStepBuffer.clear();
     compTurnBuffer.clear();
     didFallBuffer.clear();
     willVanishBuffer.clear();
@@ -112,6 +121,27 @@ void PuyoNetworkView::rotateRight()
 }
 
 // PuyoDelegate methods
+void PuyoNetworkView::fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
+{
+    PuyoView::fallingsDidMoveLeft(fallingPuyo, companionPuyo);
+    moveLeftBuffer.add(fallingPuyo->getID());
+    moveLeftBuffer.add(companionPuyo->getID());
+}
+
+void PuyoNetworkView::fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
+{
+    PuyoView::fallingsDidMoveRight(fallingPuyo, companionPuyo);
+    moveRightBuffer.add(fallingPuyo->getID());
+    moveRightBuffer.add(companionPuyo->getID());
+}
+
+void PuyoNetworkView::fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
+{
+    PuyoView::fallingsDidFallingStep(fallingPuyo, companionPuyo);
+    fallingStepBuffer.add(fallingPuyo->getID());
+    fallingStepBuffer.add(companionPuyo->getID());
+}
+
 void PuyoNetworkView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex)
 {
     PuyoView::gameDidAddNeutral(neutralPuyo, neutralIndex);
@@ -163,6 +193,19 @@ void PuyoNetworkView::gameLost()
     message->addInt     (PuyoMessage::GAMEID, gameId);
     message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameOver);
     message->addString  (PuyoMessage::NAME,   p1name);
+    PlayerGameStat &gameStat = attachedGame->getGameStat();
+    message->addInt(PuyoMessage::SCORE, gameStat.points);
+    for (int i = 0 ; i < 24 ; i++) {
+        String messageName = String(PuyoMessage::COMBO_COUNT) + i;
+        message->addInt(messageName, gameStat.combo_count[i]);
+    }
+    message->addInt(PuyoMessage::EXPLODE_COUNT, gameStat.explode_count);
+    message->addInt(PuyoMessage::DROP_COUNT, gameStat.drop_count);
+    message->addInt(PuyoMessage::GHOST_SENT_COUNT, gameStat.ghost_sent_count);
+    message->addFloat(PuyoMessage::TIME_LEFT, gameStat.time_left);
+    message->addBool(PuyoMessage::IS_DEAD, gameStat.is_dead);
+    message->addBool(PuyoMessage::IS_WINNER, gameStat.is_winner);
+    
     message->addBoolProperty("RELIABLE", true);
     message->send();
     delete message;

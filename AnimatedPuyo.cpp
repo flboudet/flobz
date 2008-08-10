@@ -29,7 +29,7 @@
 
 AnimatedPuyo::AnimatedPuyo(PuyoState state, AnimatedPuyoSetTheme *themeSet, PuyoView *attachedView)
     : PuyoPuyo(state), smallTicksCount(0), attachedTheme(themeSet->getAnimatedPuyoTheme(state)),
-      m_currentCompressedState(0)
+      m_currentCompressedState(0), m_partner(NULL), m_offsetX(0), m_offsetY(0), m_angle(0)
 {
     puyoEyeState = random() % 8192;
     visibilityFlag = true;
@@ -63,14 +63,38 @@ void AnimatedPuyo::removeCurrentAnimation()
     delete animationToRemove;
 }
 
+void AnimatedPuyo::flushAnimations()
+{
+    while (getCurrentAnimation() != NULL)
+        removeCurrentAnimation();
+    m_angle = 0.;
+    m_offsetX = 0;
+    m_offsetY = 0;
+}
+
+void AnimatedPuyo::flushAnimations(int animationTag)
+{
+    for (int i = animationQueue.size() - 1 ; i >= 0 ; i--) {
+        PuyoAnimation *anim = animationQueue[i];
+        if (anim->getTag() == animationTag)
+            animationQueue.removeKeepOrder(anim);
+    }
+}
+
 void AnimatedPuyo::cycleAnimation()
 {
+    bool exclusive = false;
     smallTicksCount+=2;
-    PuyoAnimation * animation = getCurrentAnimation();
-    if ((animation != NULL)) {
-        animation->cycle();
-        if (animation->isFinished()) {
-            removeCurrentAnimation();
+    for (int i = 0 ; (i < animationQueue.size()) && (!exclusive) ; i++) {
+        PuyoAnimation *animation = animationQueue[i];
+        exclusive = animation->getExclusive();
+        if ((!exclusive) || (i == 0)) {
+            animation->cycle();
+            if (animation->isFinished()) {
+                removeCurrentAnimation();
+                i--;
+                exclusive = false;
+            }
         }
     }
 }
@@ -79,8 +103,6 @@ bool AnimatedPuyo::isRenderingAnimation() const
 {
     PuyoAnimation *animation = getCurrentAnimation();
     if (animation == NULL)
-        return false;
-    if (animation->isFinished())
         return false;
     return animation->isEnabled();
 }
@@ -171,15 +193,38 @@ void AnimatedPuyo::renderShadowAt(int X, int Y)
 
 int AnimatedPuyo::getScreenCoordinateX() const
 {
-    return attachedView->getScreenCoordinateX(getPuyoX());
+    if ((m_angle == 0.) || (m_partner == NULL))
+        return attachedView->getScreenCoordinateX(getPuyoX()) + m_offsetX;
+    if (m_partner->getPuyoX() == getPuyoX()) {
+        if (m_partner->getPuyoY() < getPuyoY())
+            return (m_partner->getScreenCoordinateX()) - sin(m_angle) * TSIZE;
+        else
+            return (m_partner->getScreenCoordinateX()) + sin(m_angle) * TSIZE;
+    }
+    else if (m_partner->getPuyoX() < getPuyoX())
+        return (m_partner->getScreenCoordinateX()) + cos(m_angle) * TSIZE;
+    else
+        return (m_partner->getScreenCoordinateX()) - cos(m_angle) * TSIZE;
 }
 
 int AnimatedPuyo::getScreenCoordinateY() const
 {
-    if (getPuyoState() < PUYO_EMPTY)
-        if (attachedView->getAttachedGame()->getSemiMove())
-            return attachedView->getScreenCoordinateY(getPuyoY()) -  TSIZE / 2;
-    return attachedView->getScreenCoordinateY(getPuyoY());
+    if ((m_angle == 0.) || (m_partner == NULL)) {
+        if (getPuyoState() < PUYO_EMPTY)
+            if (attachedView->getAttachedGame()->getSemiMove())
+                return (attachedView->getScreenCoordinateY(getPuyoY()) -  TSIZE / 2) + m_offsetY;
+        return attachedView->getScreenCoordinateY(getPuyoY()) + m_offsetY;
+    }
+    if (m_partner->getPuyoY() == getPuyoY()) {
+        if (m_partner->getPuyoX() < getPuyoX())
+            return (m_partner->getScreenCoordinateY()) + sin(m_angle) * TSIZE;
+        else
+            return (m_partner->getScreenCoordinateY()) - sin(m_angle) * TSIZE;
+    }
+    else if (m_partner->getPuyoY() < getPuyoY())
+        return (m_partner->getScreenCoordinateY()) + cos(m_angle) * TSIZE;
+    else
+        return (m_partner->getScreenCoordinateY()) - cos(m_angle) * TSIZE;
 }
 
 AnimatedPuyoFactory::AnimatedPuyoFactory(PuyoView *attachedView)

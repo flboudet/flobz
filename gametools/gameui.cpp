@@ -1,4 +1,5 @@
 #include "gameui.h"
+#define ENABLE_DIRTY_CODE
 #ifdef ENABLE_DIRTY_CODE
 #include "../audio.h"
 #endif

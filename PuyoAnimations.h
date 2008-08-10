@@ -36,6 +36,13 @@ void EventFX(const char *name, float x, float y, int player);
 
 class AnimatedPuyo;
 
+enum AnimationTag {
+    ANIMATION_NO_TAG,
+    ANIMATION_H,
+    ANIMATION_V,
+    ANIMATION_ROTATE
+};
+
 /* Abstract Animation class */
 class Animation {
 public:
@@ -44,10 +51,14 @@ public:
     bool isFinished() const;
     bool isEnabled() const;
     virtual void cycle() = 0;
-    virtual void draw(int semiMove) = 0;
+    virtual void draw(int semiMove) {}
+    int getTag() const { return m_tag; }
+    bool getExclusive() const { return m_exclusive; }
 protected:
     bool finishedFlag;
     bool enabled;
+    bool m_exclusive;
+    int m_tag;
 };
 
 /* Abstract animation class for puyos */
@@ -55,6 +66,7 @@ class PuyoAnimation : public Animation{
 public:
     PuyoAnimation(AnimatedPuyo &puyo):attachedPuyo(puyo) {}
 protected:
+    float getPuyoSoundPadding() const;
     AnimatedPuyo &attachedPuyo;
 };
 
@@ -89,15 +101,32 @@ class NeutralAnimation : public PuyoAnimation {
 /* Companion turning around main puyo animation */
 class TurningAnimation : public PuyoAnimation {
 public:
-    TurningAnimation(AnimatedPuyo &companionPuyo,
-                     int vector, bool counterclockwise);
+    TurningAnimation(AnimatedPuyo &companionPuyo, bool counterclockwise);
     void cycle();
-    void draw(int semiMove);
 private:
-    int companionVector, cpt;
+    int cpt;
     float angle;
     float step;
-    bool counterclockwise;
+};
+
+/* Puyo moving from one place to another, horizontal axis */
+class MovingHAnimation : public PuyoAnimation {
+public:
+    MovingHAnimation(AnimatedPuyo &puyo, int hOffset, int step);
+    void cycle();
+private:
+    int m_cpt, m_hOffset, m_step;
+    float m_hOffsetByStep;
+};
+
+/* Puyo moving from one place to another, vertical axis */
+class MovingVAnimation : public PuyoAnimation {
+public:
+    MovingVAnimation(AnimatedPuyo &puyo, int vOffset, int step);
+    void cycle();
+private:
+    int m_cpt, m_vOffset, m_step;
+    float m_vOffsetByStep;
 };
 
 /* Puyo falling and bouncing animation */
@@ -113,6 +142,7 @@ private:
     int bouncing;
     static const int BOUNCING_OFFSET_NUM;
     static const int BOUNCING_OFFSET[];
+    bool m_once;
 };
 
 /* Puyo exploding and vanishing animation */

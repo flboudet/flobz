@@ -52,6 +52,9 @@ class PuyoNetworkView : public PuyoView {
     void rotateRight();
 
     // PuyoDelegate methods
+    virtual void fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
+	virtual void fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
+	virtual void fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
     void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex);
     void gameDidEndCycle();
     void companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise);
@@ -66,6 +69,9 @@ private:
     int gameId;
     Message *createStateMessage(bool paused);
     AdvancedBuffer<int> neutralsBuffer;
+    AdvancedBuffer<int> moveLeftBuffer;
+    AdvancedBuffer<int> moveRightBuffer;
+    AdvancedBuffer<int> fallingStepBuffer;
     AdvancedBuffer<int> compTurnBuffer;
     AdvancedBuffer<int> didFallBuffer;
     AdvancedBuffer<int> willVanishBuffer;

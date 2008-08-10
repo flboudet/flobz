@@ -174,13 +174,16 @@ PuyoLocalGame::~PuyoLocalGame()
 
 void PuyoLocalGame::cycle()
 {
-  if (!gameRunning)
-    return;
-
-  semiMove = 1 - semiMove;
-  if (semiMove == 0)
-      return;
-
+    if (!gameRunning)
+        return;
+    
+    semiMove = 1 - semiMove;
+    if (semiMove == 0) {
+        if ((!endOfCycle) && (delegate != NULL)) {
+            delegate->fallingsDidFallingStep(fallingPuyo, companionPuyo);
+        }
+        return;
+    }
     if (endOfCycle) {
         cycleEnding();
         if (delegate != NULL)

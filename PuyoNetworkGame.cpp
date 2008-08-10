@@ -66,6 +66,17 @@ void PuyoNetworkGame::onMessage(Message &message)
                 synchronizeState(message);
                 break;
             case kGameOver:
+                gameStat.points = message.getInt(SCORE);
+                for (int i = 0 ; i < 24 ; i++) {
+                    String messageName = String(COMBO_COUNT) + i;
+                    gameStat.combo_count[i] = message.getInt(messageName);
+                }
+                gameStat.explode_count = message.getInt(EXPLODE_COUNT);
+                gameStat.drop_count = message.getInt(DROP_COUNT);
+                gameStat.ghost_sent_count = message.getInt(GHOST_SENT_COUNT);
+                gameStat.time_left = message.getFloat(TIME_LEFT);
+                gameStat.is_dead = message.getBool(IS_DEAD);
+                gameStat.is_winner = message.getBool(IS_WINNER);
                 gameRunning = false;
                 delegate->gameLost();
                 break;
@@ -122,6 +133,33 @@ void PuyoNetworkGame::synchronizeState(Message &message)
        if (delegate != NULL) {
             for (int i = 0, j = addNeutrals.size() ; i+1 < j ; i += 2) {
                 delegate->gameDidAddNeutral(findPuyo(addNeutrals[i]), addNeutrals[i+1]);
+            }
+        }
+    }
+    
+    Buffer<int> moveLeftBuffer= message.getIntArray(MV_L);
+    if (moveLeftBuffer.size() > 0) {
+        if (delegate != NULL) {
+            for (int i = 0, j = moveLeftBuffer.size() ; i+1 < j ; i += 2) {
+                delegate->fallingsDidMoveLeft(findPuyo(moveLeftBuffer[i]), findPuyo(moveLeftBuffer[i+1]));
+            }
+        }
+    }
+    
+    Buffer<int> moveRightBuffer= message.getIntArray(MV_R);
+    if (moveRightBuffer.size() > 0) {
+        if (delegate != NULL) {
+            for (int i = 0, j = moveRightBuffer.size() ; i+1 < j ; i += 2) {
+                delegate->fallingsDidMoveRight(findPuyo(moveRightBuffer[i]), findPuyo(moveRightBuffer[i+1]));
+            }
+        }
+    }
+    
+    Buffer<int> fallingStepBuffer= message.getIntArray(MV_D);
+    if (fallingStepBuffer.size() > 0) {
+        if (delegate != NULL) {
+            for (int i = 0, j = fallingStepBuffer.size() ; i+1 < j ; i += 2) {
+                delegate->fallingsDidFallingStep(findPuyo(fallingStepBuffer[i]), findPuyo(fallingStepBuffer[i+1]));
             }
         }
     }

@@ -137,6 +137,8 @@ void AudioManager::init()
     if (!audio_supported) return;
 
     Mix_QuerySpec (&audio_rate, &audio_format, &audio_channels);
+    
+    Mix_AllocateChannels(16);
 
     music_on = GetBoolPreference(kMusic,true);
     sound_on = GetBoolPreference(kSound,true);
@@ -304,11 +306,9 @@ void AudioManager::playSound(const char *fileName, float volume, float balance)
 
     Mix_Chunk *chunk = chunkCache.veryGet(c);
     if (chunk != NULL) {
-        int channel = -1;
-        if (balance < -0.5f) channel = 0;
-        if (balance >  0.5f) channel = 1;
-        
-        Mix_PlayChannel (channel, chunk, 0);
+        int channel = Mix_PlayChannel (-1, chunk, 0);
+        Uint8 leftVolume = (Uint8)(255.*((-balance + 1.)/2.));
+        Mix_SetPanning(channel, leftVolume, 255-leftVolume);
     }
 #endif
 }
