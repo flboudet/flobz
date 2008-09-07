@@ -16,18 +16,27 @@ using namespace gameui;
 
 static StatsResources *res;
 
-StatsResources::StatsResources() 
+StatsResources::StatsResources()
 {
     res = this;
     rope_elt = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/rope.png"));
-    puyo_left[0] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_1.png"));
-    puyo_left[1] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_2.png"));
-    puyo_left[2] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_3.png"));
-    puyo_left[3] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_4.png"));
-    puyo_right[0] = iim_surface_mirror_h(puyo_left[0]);
-    puyo_right[1] = iim_surface_mirror_h(puyo_left[1]);
-    puyo_right[2] = iim_surface_mirror_h(puyo_left[2]);
-    puyo_right[3] = iim_surface_mirror_h(puyo_left[3]);
+    puyo_left[0][0] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_1.png"));
+    puyo_left[0][1] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_2.png"));
+    puyo_left[0][2] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_3.png"));
+    puyo_left[0][3] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_4.png"));
+    puyo_right[0][0] = iim_surface_mirror_h(puyo_left[0][0]);
+    puyo_right[0][1] = iim_surface_mirror_h(puyo_left[0][1]);
+    puyo_right[0][2] = iim_surface_mirror_h(puyo_left[0][2]);
+    puyo_right[0][3] = iim_surface_mirror_h(puyo_left[0][3]);
+
+    for (int i = 0 ; i < 4 ; i++) {
+        puyo_left[1][i] = iim_surface_shift_hue(puyo_left[0][i], 30.);
+        puyo_right[1][i] = iim_surface_shift_hue(puyo_right[0][i], 30.);
+        puyo_left[2][i] = iim_surface_shift_hue(puyo_left[0][i], 60.);
+        puyo_right[2][i] = iim_surface_shift_hue(puyo_right[0][i], 60.);
+        puyo_left[3][i] = iim_surface_shift_hue(puyo_left[0][i], 90.);
+        puyo_right[3][i] = iim_surface_shift_hue(puyo_right[0][i], 90.);
+    }
     separator = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/separator.png"));
     stats_bg = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/stats-bg.png"));
     // TODO: Combos images
@@ -36,12 +45,12 @@ StatsResources::StatsResources()
 StatsResources::~StatsResources()
 {
     IIM_Free(rope_elt);
-    IIM_Free(puyo_left[0]);
-    IIM_Free(puyo_left[1]);
-    IIM_Free(puyo_left[2]);
-    IIM_Free(puyo_right[0]);
-    IIM_Free(puyo_right[1]);
-    IIM_Free(puyo_right[2]);
+    for (int i = 0 ; i < 4 ; i++) {
+        for (int j = 0 ; j < 4 ; j++) {
+            IIM_Free(puyo_left[i][j]);
+            IIM_Free(puyo_right[i][j]);
+        }
+    }
     IIM_Free(stats_bg);
     IIM_Free(separator);
 }
@@ -112,16 +121,16 @@ void ProgressBarWidget::draw(SDL_Surface *screen)
         }
         SDL_BlitSurface(res->rope_elt->surf, NULL, screen, &dstrect);
     }
-    dstrect.w = res->puyo_right[0]->w;
-    dstrect.h = res->puyo_right[0]->h;
+    dstrect.w = res->puyo_right[0][0]->w;
+    dstrect.h = res->puyo_right[0][0]->h;
     dstrect.y = bpos.y;
     if (m_dir == LEFT_TO_RIGHT) {
         dstrect.x = bpos.x + rope_size + IMG_RING_WIDTH - 4;
-        SDL_BlitSurface(res->puyo_right[m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)]->surf, NULL, screen, &dstrect);
+        SDL_BlitSurface(res->puyo_right[m_colorIndex][m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)]->surf, NULL, screen, &dstrect);
     }
     else {
         dstrect.x = bpos.x + bsize.x - rope_size - IMG_RING_WIDTH - IMG_PUYO_WIDTH + 4;
-        SDL_BlitSurface(res->puyo_left[m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)]->surf, NULL, screen, &dstrect);
+        SDL_BlitSurface(res->puyo_left[m_colorIndex][m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)]->surf, NULL, screen, &dstrect);
     }
 }
 
@@ -163,7 +172,7 @@ void ProgressBarWidget::setValue(float value, bool progressive)
 
 void ProgressBarWidget::setDirection(PuyoStatsDirection dir)
 {
-   m_dir = dir; 
+   m_dir = dir;
 }
 
 void ProgressBarWidget::setVisible(bool visible)
@@ -178,7 +187,7 @@ PuyoStatsFormat::PuyoStatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &p
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS+1 ; i++)
         m_comboIndirection[i] = -1;
     for (int i = 0 ; (i < 24) && (j < MAX_DISPLAYED_COMBOS+1) ; i++) {
-        if ((playerAStats.combo_count[i] >= 0) || (playerBStats.combo_count[i] >= 0))
+        if ((playerAStats.combo_count[i] > 0) || (playerBStats.combo_count[i] > 0))
             m_comboIndirection[j++] = i;
     }
 }
@@ -196,7 +205,7 @@ PuyoStatsWidget::PuyoStatsWidget(PuyoStatsFormat &statsFormat,
     setInnerMargin(20);
 
     // Create Layout
-    Text *txt = new Text(stats.is_winner?"WINNER":"LOOSER");
+    Text *txt = new Text(stats.is_winner?"WINNER":"LOSER");
     /*txt->setPreferedSize(Vec3(128, 32));*/
     Image *img1 = new Image(res->separator);
     img1->setPreferedSize(Vec3(128, 32));
@@ -303,6 +312,8 @@ void PuyoStatsWidget::ComboLine::setComboLineInfos(PuyoStatsDirection dir, int t
     m_progressBar.setVisible(true);
     m_progressBar.setValue(progressBarValue, true);
     m_progressBar.setPositiveAttitude((numberOfCombos >= vsNumberOfCombos) && (numberOfCombos > 0) ? true : false);
+    static int bof = 0;
+    m_progressBar.setColorIndex(bof++ % 4);
 }
 
 void PuyoStatsWidget::idle(double currentTime)

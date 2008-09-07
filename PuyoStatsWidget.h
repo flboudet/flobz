@@ -32,6 +32,7 @@ public:
     void setVisible(bool visible);
     void setDirection(PuyoStatsDirection dir);
     void setPositiveAttitude(bool positiveAttitude) { m_positiveAttitude = positiveAttitude; }
+    void setColorIndex(int colorIndex) { m_colorIndex = colorIndex; }
     enum {
         VALUE_CHANGED,
         PROGRESSION_COMPLETE
@@ -46,6 +47,7 @@ private:
     gameui::Action *m_associatedAction;
     double m_t;
     bool m_positiveAttitude;
+    int m_colorIndex;
 };
 
 #define MAX_DISPLAYED_COMBOS 7
@@ -56,7 +58,7 @@ struct PuyoStatsFormat {
 
 class PuyoStatsWidget : public gameui::VBox, gameui::Action, IdleComponent {
 public:
-    PuyoStatsWidget(PuyoStatsFormat &statsFormat, 
+    PuyoStatsWidget(PuyoStatsFormat &statsFormat,
                     PlayerGameStat &stats, PlayerGameStat &opponentStats,
                     const gameui::FramePicture *framePicture, PuyoStatsDirection dir,
                     gameui::Action *action = NULL);
@@ -113,8 +115,8 @@ private:
 class StatsResources {
     public:
         IIM_Surface *rope_elt;
-        IIM_Surface *puyo_right[4];
-        IIM_Surface *puyo_left[4];
+        IIM_Surface *puyo_right[4][4];
+        IIM_Surface *puyo_left[4][4];
         IIM_Surface *stats_bg;
         IIM_Surface *separator;
         StatsResources();
