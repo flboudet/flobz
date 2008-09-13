@@ -138,14 +138,14 @@ void AnimationSynchronizer::decrementUsage()
 
 /* Companion turning around main puyo animation */
 TurningAnimation::TurningAnimation(AnimatedPuyo &companionPuyo,
-                                   bool counterclockwise) : PuyoAnimation(companionPuyo)
+                                   bool counterclockwise) : PuyoAnimation(companionPuyo), NUMSTEPS(6)
 {
     enabled = false;
     m_exclusive = false;
     m_tag = ANIMATION_ROTATE;
     cpt = 0;
-    angle = 3.14 / 2;
-    step = (3.14 / 2) / 4 * (counterclockwise ? 1 : -1);
+    angle = (3.14 / 2) * (counterclockwise ? -1 : 1);
+    step = (3.14 / 2) / NUMSTEPS * (counterclockwise ? 1 : -1);
     cycle();
 }
 
@@ -163,7 +163,7 @@ void TurningAnimation::cycle()
     }
     cpt++;
     angle += step;
-    if (cpt == 4) {
+    if (cpt == NUMSTEPS) {
         finishedFlag = true;
         attachedPuyo.setRotation(0.);
     }

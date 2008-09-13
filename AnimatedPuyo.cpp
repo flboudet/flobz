@@ -91,7 +91,7 @@ void AnimatedPuyo::cycleAnimation()
         if ((!exclusive) || (i == 0)) {
             animation->cycle();
             if (animation->isFinished()) {
-                removeCurrentAnimation();
+                animationQueue.removeKeepOrder(animation);
                 i--;
                 exclusive = false;
             }

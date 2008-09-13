@@ -107,6 +107,7 @@ private:
     int cpt;
     float angle;
     float step;
+    const int NUMSTEPS;
 };
 
 /* Puyo moving from one place to another, horizontal axis */
