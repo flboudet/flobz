@@ -66,6 +66,7 @@ typedef struct _IIM_Surface {
 #define IIM_Rect SDL_Rect
 
 IIM_Surface *iim_surface_shift_hue(IIM_Surface *src, float hue_offset);
+IIM_Surface *iim_surface_shift_hue_masked(IIM_Surface *isrc, IIM_Surface *imask, float hue_offset);
 IIM_Surface *iim_surface_set_value(IIM_Surface *src, float value);
 IIM_Surface *iim_surface_resize(IIM_Surface *isrc, int width, int height);
 IIM_Surface *iim_surface_resize_alpha(IIM_Surface *isrc, int width, int height);

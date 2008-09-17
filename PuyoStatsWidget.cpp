@@ -24,18 +24,20 @@ StatsResources::StatsResources()
     puyo_left[0][1] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_2.png"));
     puyo_left[0][2] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_3.png"));
     puyo_left[0][3] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_4.png"));
+    puyo_left_mask = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_mask.png"));
     puyo_right[0][0] = iim_surface_mirror_h(puyo_left[0][0]);
     puyo_right[0][1] = iim_surface_mirror_h(puyo_left[0][1]);
     puyo_right[0][2] = iim_surface_mirror_h(puyo_left[0][2]);
     puyo_right[0][3] = iim_surface_mirror_h(puyo_left[0][3]);
+    puyo_right_mask = iim_surface_mirror_h(puyo_left_mask);
 
     for (int i = 0 ; i < 4 ; i++) {
-        puyo_left[1][i] = iim_surface_shift_hue(puyo_left[0][i], 30.);
-        puyo_right[1][i] = iim_surface_shift_hue(puyo_right[0][i], 30.);
-        puyo_left[2][i] = iim_surface_shift_hue(puyo_left[0][i], 60.);
-        puyo_right[2][i] = iim_surface_shift_hue(puyo_right[0][i], 60.);
-        puyo_left[3][i] = iim_surface_shift_hue(puyo_left[0][i], 90.);
-        puyo_right[3][i] = iim_surface_shift_hue(puyo_right[0][i], 90.);
+        puyo_left[1][i] = iim_surface_shift_hue_masked(puyo_left[0][i], puyo_left_mask, 30.);
+        puyo_right[1][i] = iim_surface_shift_hue_masked(puyo_right[0][i], puyo_right_mask, 30.);
+        puyo_left[2][i] = iim_surface_shift_hue_masked(puyo_left[0][i], puyo_left_mask, 60.);
+        puyo_right[2][i] = iim_surface_shift_hue_masked(puyo_right[0][i], puyo_right_mask, 60.);
+        puyo_left[3][i] = iim_surface_shift_hue_masked(puyo_left[0][i], puyo_left_mask, 90.);
+        puyo_right[3][i] = iim_surface_shift_hue_masked(puyo_right[0][i], puyo_right_mask, 90.);
     }
     separator = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/separator.png"));
     stats_bg = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/stats-bg.png"));
@@ -51,6 +53,8 @@ StatsResources::~StatsResources()
             IIM_Free(puyo_right[i][j]);
         }
     }
+    IIM_Free(puyo_left_mask);
+    IIM_Free(puyo_right_mask);
     IIM_Free(stats_bg);
     IIM_Free(separator);
 }

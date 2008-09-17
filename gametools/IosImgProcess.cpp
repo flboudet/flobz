@@ -455,6 +455,48 @@ IIM_Surface *iim_surface_shift_hue(IIM_Surface *isrc, float hue_offset)
 }
 
 /**
+ * Shift the hue of a surface with a 1-bit mask
+ */
+IIM_Surface *iim_surface_shift_hue_masked(IIM_Surface *isrc, IIM_Surface *imask, float hue_offset)
+{
+    SDL_Surface *src = isrc->surf;
+    SDL_Surface *mask = imask->surf;
+    SDL_PixelFormat *fmt = src->format;
+    SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
+                                            fmt->Rmask, fmt->Gmask,
+                                            fmt->Bmask, fmt->Amask);
+    bool srclocked = false;
+    if(SDL_MUSTLOCK(src)) srclocked = (SDL_LockSurface(src) == 0);
+    bool retlocked = false;
+    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);
+    bool masklocked = false;
+    if(SDL_MUSTLOCK(mask)) masklocked = (SDL_LockSurface(mask) == 0);
+    for (int y=src->h; y--;)
+    {
+        for (int x=src->w; x--;)
+        {
+            RGBA rgba = iim_surface_get_rgba(src,x,y);
+            RGBA mrgba = iim_surface_get_rgba(mask,x,y);
+            if ((mrgba.red == 0) && (mrgba.green == 0) && (mrgba.blue == 0) && (mrgba.alpha > 128)) {
+                iim_surface_set_rgba(ret,x,y,rgba);
+            }
+            else {
+                HSVA hsva = iim_rgba2hsva(rgba);
+                hsva.hue += hue_offset;
+                if (hsva.hue > 360.0f) hsva.hue -= 360.0f;
+                if (hsva.hue < 0.0f) hsva.hue += 360.0f;
+                rgba = iim_hsva2rgba(hsva);
+                iim_surface_set_rgba(ret,x,y,rgba);
+            }
+        }
+    }
+    if(retlocked) SDL_UnlockSurface(ret);
+    if(srclocked) SDL_UnlockSurface(src);
+    if(masklocked) SDL_UnlockSurface(mask);
+    return IIM_RegisterImg(ret, true);
+}
+
+/**
  * Change the value (luminosity) of each pixel in a surface
  */
 IIM_Surface *iim_surface_set_value(IIM_Surface *isrc, float value)
