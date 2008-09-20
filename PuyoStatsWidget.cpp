@@ -20,6 +20,8 @@ StatsResources::StatsResources()
 {
     res = this;
     rope_elt = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/rope.png"));
+    ring_left = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/ring.png"));
+    ring_right = iim_surface_mirror_h(ring_left);
     puyo_left[0][0] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_1.png"));
     puyo_left[0][1] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_2.png"));
     puyo_left[0][2] = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_3.png"));
@@ -91,6 +93,17 @@ void ProgressBarWidget::draw(SDL_Surface *screen)
     if (n_rope_elt < 8) n_rope_elt = 8;
     //if (rope_size < n_rope_elt*2) rope_size = n_rope_elt*2;
 
+    if (m_dir == LEFT_TO_RIGHT)
+        dstrect.x = bpos.x;
+    else
+        dstrect.x = bpos.x + bsize.x - 10;
+    dstrect.y = bpos.y;
+    dstrect.h = bsize.y;
+    dstrect.w = 10;
+    if (m_dir == LEFT_TO_RIGHT)
+        SDL_BlitSurface(res->ring_right->surf, NULL, screen, &dstrect);
+    else
+        SDL_BlitSurface(res->ring_left->surf, NULL, screen, &dstrect);
     for (int i=1; i<=n_rope_elt; ++i) {
 
         dstrect.w = IMG_ROPE_ELT_WIDTH;
@@ -206,7 +219,7 @@ PuyoStatsWidget::PuyoStatsWidget(PuyoStatsFormat &statsFormat,
     m_statTitle("Combos"), m_maxCombo(0), m_startTime(-1)
 {
     setPolicy(USE_MIN_SIZE);
-    setInnerMargin(20);
+    setInnerMargin(15);
 
     // Create Layout
     Text *txt = new Text(stats.is_winner?"WINNER":"LOSER");

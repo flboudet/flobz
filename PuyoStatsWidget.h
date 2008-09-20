@@ -115,6 +115,7 @@ private:
 class StatsResources {
     public:
         IIM_Surface *rope_elt;
+        IIM_Surface *ring_left, *ring_right;
         IIM_Surface *puyo_right[4][4];
         IIM_Surface *puyo_left[4][4];
         IIM_Surface *puyo_left_mask, *puyo_right_mask;
