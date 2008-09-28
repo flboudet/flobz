@@ -65,8 +65,8 @@ protected:
 class PuyoAnimation : public Animation{
 public:
     PuyoAnimation(AnimatedPuyo &puyo):attachedPuyo(puyo) {}
-protected:
     float getPuyoSoundPadding() const;
+protected:
     AnimatedPuyo &attachedPuyo;
 };
 
@@ -168,7 +168,7 @@ private:
 
 class VanishSoundAnimation : public Animation {
 public:
-    VanishSoundAnimation(int phase, AnimationSynchronizer *synchronizer);
+    VanishSoundAnimation(int phase, AnimationSynchronizer *synchronizer, float soundPadding);
     virtual ~VanishSoundAnimation();
     void cycle();
     void draw(int semiMove);
@@ -177,6 +177,7 @@ private:
     int step;
     bool once;
     AnimationSynchronizer *synchronizer;
+    float soundPadding;
 };
 
 class NeutralPopAnimation : public PuyoAnimation {

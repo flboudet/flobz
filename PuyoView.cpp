@@ -324,15 +324,20 @@ void PuyoView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalled
 
 void PuyoView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase)
 {
+    double groupPadding = 0.;
     AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
-    viewAnimations.add(new VanishSoundAnimation(phase, synchronizer));
     for (int i = 0, j = puyoGroup.size() ; i < j ; i++) {
         AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(puyoGroup[i]);
+        PuyoAnimation *newAnimation;
         if (currentPuyo->getPuyoState() != PUYO_NEUTRAL)
-            currentPuyo->addAnimation(new VanishAnimation(*currentPuyo, i*2 , xOffset, yOffset, synchronizer, i, puyoGroup.size(), groupNum, phase));
+            newAnimation = new VanishAnimation(*currentPuyo, i*2 , xOffset, yOffset, synchronizer, i, puyoGroup.size(), groupNum, phase);
         else
-            currentPuyo->addAnimation(new NeutralPopAnimation(*currentPuyo, i*2, synchronizer));
+            newAnimation = new NeutralPopAnimation(*currentPuyo, i*2, synchronizer);
+        currentPuyo->addAnimation(newAnimation);
+        // Compute the center of the vanishing puyos padding
+        groupPadding += newAnimation->getPuyoSoundPadding();
     }
+    viewAnimations.add(new VanishSoundAnimation(phase, synchronizer, groupPadding / puyoGroup.size()));
 
 /*
     if (groupNum == 0) {

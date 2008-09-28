@@ -388,12 +388,9 @@ void VanishAnimation::draw(int semiMove)
     }
 }
 
-VanishSoundAnimation::VanishSoundAnimation(int phase, AnimationSynchronizer *synchronizer)
+VanishSoundAnimation::VanishSoundAnimation(int phase, AnimationSynchronizer *synchronizer, float soundPadding)
+  : phase(phase), step(0), once(false), synchronizer(synchronizer), soundPadding(soundPadding)
 {
-    once = false;
-    step = 0;
-    this->phase = phase;
-    this->synchronizer = synchronizer;
     synchronizer->incrementUsage();
     synchronizer->push();
 }
@@ -417,7 +414,7 @@ void VanishSoundAnimation::cycle()
     else if (synchronizer->isSynchronized()) {
         step++;
         if (step == 1) {
-            AudioManager::playSound(sound_splash[phase-1>7?7:phase-1], sound_splash_volume);
+            AudioManager::playSound(sound_splash[phase-1>7?7:phase-1], sound_splash_volume, soundPadding);
             finishedFlag = true;
         }
     }
