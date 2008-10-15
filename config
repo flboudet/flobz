@@ -6,7 +6,7 @@
 PLATFORM=
 
 # Support for mac multiple architecture (PowerPC/i386)
-ENABLE_FAT?=false
+ENABLE_FAT?=true
 
 # Select distro
 data-packages="reduced.001"
@@ -21,8 +21,8 @@ ENABLE_OPENGL?=false
 ENABLE_TTF?=true
 ENABLE_DGA?=false
 
-RELEASE_MODE?=false
-DEBUG_MODE?=true
+RELEASE_MODE?=true
+DEBUG_MODE?=false
 MORE_DEBUG?=false
 ENABLE_PCH?=false
 ENABLE_GPROF?=false
