@@ -37,7 +37,7 @@ static const char * kInternetMetaServerPortKey = "Menu.Internet.MetaServer.Port.
 static const char * kInternetMetaServerNumberKey = "Menu.Internet.MetaServer.Number.";
 
 static const char * kInternetCurrentServerKey = "Menu.Internet.CurrentServer";
-static const char * kInternetCurrentServerDefaultValue = "durandal.homeunix.com";
+static const char * kInternetCurrentServerDefaultValue = "durandal.ios-software.com";
 static const char * kInternetCurrentServerPortKey = "Menu.Internet.CurrentServer.Port";
 static const char * kInternetCurrentServerPortDefaultValue = "4567";
 
