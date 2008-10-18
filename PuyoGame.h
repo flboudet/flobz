@@ -131,7 +131,7 @@ class PuyoDelegate {
 public:
   virtual void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex) = 0;
   virtual void companionDidTurn(PuyoPuyo *companionPuyo,
-				int companionVector,
+				PuyoPuyo *fallingPuyo,
 				bool counterclockwise) = 0;
   virtual void fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo) = 0;
   virtual void fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo) = 0;

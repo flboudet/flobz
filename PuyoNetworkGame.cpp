@@ -168,7 +168,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     if (turnBuffer.size() > 0) {
         if (delegate != NULL) {
             for (int i = 0, j = turnBuffer.size() ; i+2 < j ; i += 3) {
-                delegate->companionDidTurn(findPuyo(turnBuffer[i]), turnBuffer[i+1], turnBuffer[i+2]);
+                delegate->companionDidTurn(findPuyo(turnBuffer[i]), findPuyo(turnBuffer[i+1]), turnBuffer[i+2]);
             }
         }
     }

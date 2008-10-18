@@ -337,7 +337,7 @@ void PuyoLocalGame::rotate(bool left)
     companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
     
     if ((delegate != NULL) && (moved))
-        delegate->companionDidTurn(companionPuyo, fallingCompanion, !left);
+        delegate->companionDidTurn(companionPuyo, fallingPuyo, !left);
     
 }
 

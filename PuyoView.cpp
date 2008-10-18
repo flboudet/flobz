@@ -308,9 +308,9 @@ void PuyoView::fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companion
     ((AnimatedPuyo *)companionPuyo)->addAnimation(new MovingVAnimation(*(AnimatedPuyo *)companionPuyo, -TSIZE/2, 4));
 }
 
-void PuyoView::companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise)
+void PuyoView::companionDidTurn(PuyoPuyo *companionPuyo, PuyoPuyo *fallingPuyo, bool counterclockwise)
 {
-    ((AnimatedPuyo *)companionPuyo)->setPartner(((AnimatedPuyo *)(attachedGame->getFallingPuyo())));
+    ((AnimatedPuyo *)companionPuyo)->setPartner(((AnimatedPuyo *)fallingPuyo));
     ((AnimatedPuyo *)companionPuyo)->flushAnimations(ANIMATION_ROTATE);
     ((AnimatedPuyo *)companionPuyo)->addAnimation(new TurningAnimation(*(AnimatedPuyo *)companionPuyo,
                                                                        counterclockwise));

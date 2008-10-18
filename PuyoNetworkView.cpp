@@ -156,11 +156,11 @@ void PuyoNetworkView::gameDidEndCycle()
         badPuyos -= attachedGame->getNeutralPuyos();
 }
 
-void PuyoNetworkView::companionDidTurn(PuyoPuyo *companionPuyo, int companionVector, bool counterclockwise)
+void PuyoNetworkView::companionDidTurn(PuyoPuyo *companionPuyo, PuyoPuyo *fallingPuyo, bool counterclockwise)
 {
-    PuyoView::companionDidTurn(companionPuyo, companionVector, counterclockwise);
+    PuyoView::companionDidTurn(companionPuyo, fallingPuyo, counterclockwise);
     compTurnBuffer.add(companionPuyo->getID());
-    compTurnBuffer.add(companionVector);
+    compTurnBuffer.add(fallingPuyo->getID());
     compTurnBuffer.add(counterclockwise);
 }
 
