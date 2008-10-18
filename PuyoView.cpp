@@ -310,10 +310,12 @@ void PuyoView::fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companion
 
 void PuyoView::companionDidTurn(PuyoPuyo *companionPuyo, PuyoPuyo *fallingPuyo, bool counterclockwise)
 {
-    ((AnimatedPuyo *)companionPuyo)->setPartner(((AnimatedPuyo *)fallingPuyo));
-    ((AnimatedPuyo *)companionPuyo)->flushAnimations(ANIMATION_ROTATE);
-    ((AnimatedPuyo *)companionPuyo)->addAnimation(new TurningAnimation(*(AnimatedPuyo *)companionPuyo,
-                                                                       counterclockwise));
+    if (companionPuyo != NULL) && (fallingPuyo != NULL)) { // Just to be sure of what we get if data comes from network
+        ((AnimatedPuyo *)companionPuyo)->setPartner(((AnimatedPuyo *)fallingPuyo));
+        ((AnimatedPuyo *)companionPuyo)->flushAnimations(ANIMATION_ROTATE);
+        ((AnimatedPuyo *)companionPuyo)->addAnimation(new TurningAnimation(*(AnimatedPuyo *)companionPuyo,
+                                                                           counterclockwise));
+    }
 }
 
 void PuyoView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow)
