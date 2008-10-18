@@ -329,8 +329,9 @@ void PuyoStatsWidget::ComboLine::setComboLineInfos(PuyoStatsDirection dir, int t
     m_progressBar.setVisible(true);
     m_progressBar.setValue(progressBarValue, true);
     m_progressBar.setPositiveAttitude((numberOfCombos >= vsNumberOfCombos) && (numberOfCombos > 0) ? true : false);
-    static int bof = 0;
-    m_progressBar.setColorIndex(bof++ % 4);
+    int bof = (int)(progressBarValue * 3.0f);
+    if (bof > 3) bof = 3;
+    m_progressBar.setColorIndex( bof);
 }
 
 void PuyoStatsWidget::idle(double currentTime)
