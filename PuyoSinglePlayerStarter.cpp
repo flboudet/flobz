@@ -189,7 +189,7 @@ String PuyoSingleGameLevelData::getGameOverStory() const
 {
     return levelDefinition->gameOverStory;
 }
-    
+
 AnimatedPuyoSetTheme &PuyoSingleGameLevelData::getPuyoTheme() const
 {
     return *themeToUse;
@@ -246,7 +246,7 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousSc
     static const char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
     "Satanas", "Doctor X", "Tania", "Mr Gyom",
     "The Duke","Jeko","--------" };
-    
+
     initHiScores(AI_NAMES);
     int scorePlace = setHiScore(playerStat.points, playerName);
 
@@ -261,9 +261,9 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousSc
 
     hiScoreBox.add(&hiScoreNameBox);
     hiScoreBox.add(&hiScorePointBox);
-    
+
     add(&hiScoreBox);
-    add(transitionWidget);
+    //add(transitionWidget);
     refresh();
 }
 
@@ -281,7 +281,7 @@ void PuyoGameOver1PScreen::refresh()
     hiScorePos.x = storyWidget.getIntegerValue("@hiScoreBox.x");
     hiScorePos.y = storyWidget.getIntegerValue("@hiScoreBox.y");
     hiScoreBox.setPosition(hiScorePos);
-    
+
     hiScoreBox.setSize(Vec3(storyWidget.getIntegerValue("@hiScoreBox.w"),
                             storyWidget.getIntegerValue("@hiScoreBox.h"), 0));
 }

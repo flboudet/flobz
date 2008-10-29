@@ -31,9 +31,9 @@ int extract_state_and_type(const char *s, int *state, int *type)
     char *second;
     second = strchr(s,'.');
     if(second != NULL){
-        *type = atoi(second+1);    
+        *type = atoi(second+1);
     }
-   
+
     if (first!=NULL && second != NULL){
         return 0;
     }
@@ -158,7 +158,7 @@ PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction, bool
     }
     else fclose(test);
     String storyLocalePath;
-    
+
     // Initializing the styrolyse client
     client.styroClient.loadImage = loadImage;
     client.styroClient.drawImage = drawImage;
@@ -169,7 +169,7 @@ PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction, bool
     client.styroClient.playSound = ::playSound;
     client.styroClient.resolveFilePath = ::pathResolverFunction;
     client.widget = this;
-    
+
     currentStory = styrolyse_new((const char *)fullPath, (StyrolyseClient *)(&client), fxMode);
     //styrolyse_setuserpointer(currentStory, this);
     //sstory = createStorySurface();
@@ -191,7 +191,7 @@ void PuyoStoryWidget::idle(double currentTime)
     else
         delta_t = currentTime - last_time;
     last_time = currentTime;
-    
+
     styrolyse_update(currentStory, (float)delta_t);
     requestDraw();
     if (styrolyse_finished(currentStory) && !once) {
@@ -227,14 +227,20 @@ const char *PuyoStoryWidget::getText(const char *text) const
     return localeDictionary->getLocalizedString(text);
 }
 
-PuyoStoryScreen::PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction, bool shouldAddTransition) : Screen(0, 0, 640, 480), storyWidget(screenName, finishedAction), transitionWidget(new PuyoScreenTransitionWidget(previousScreen, NULL)), finishedAction(finishedAction)
+PuyoStoryScreen::PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction, bool shouldAddTransition)
+    : Screen(0, 0, 640, 480), storyWidget(screenName, finishedAction),
+      transitionWidget(NULL), finishedAction(finishedAction)
 {
     add(&storyWidget);
-    if (shouldAddTransition)
+    if (shouldAddTransition) {
+        transitionWidget = new PuyoScreenTransitionWidget(previousScreen, NULL);
         add(transitionWidget);
+    }
 }
 
-PuyoStoryScreen::PuyoStoryScreen(String screenName) : Screen(0, 0, 640, 480), storyWidget(screenName, NULL), transitionWidget(NULL), finishedAction(NULL)
+PuyoStoryScreen::PuyoStoryScreen(String screenName)
+    : Screen(0, 0, 640, 480), storyWidget(screenName, NULL),
+      transitionWidget(NULL), finishedAction(NULL)
 {
     add(&storyWidget);
 }

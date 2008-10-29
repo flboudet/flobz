@@ -30,6 +30,8 @@
 PuyoScreenTransitionWidget::PuyoScreenTransitionWidget(Screen &fromScreen, Action *transitionFinishedAction)
     : CycledComponent(0.02), transitionFinishedAction(transitionFinishedAction)
 {
+//#define OLD_METHOD
+#ifdef OLD_METHOD
     Uint32 rmask, gmask, bmask, amask;
     #if SDL_BYTEORDER == SDL_BIG_ENDIAN
            rmask = 0xff000000;
@@ -49,7 +51,10 @@ PuyoScreenTransitionWidget::PuyoScreenTransitionWidget(Screen &fromScreen, Actio
                                             bmask, amask);
     fromSurface = IIM_RegisterImg(SDL_DisplayFormat(tmp), false);
     SDL_FreeSurface(tmp);
-    //SDL_FillRect(fromSurface->surf, NULL, 0xFFFFFFFF);
+#else
+    melt = doom_melt_new();
+    fromSurface = iim_surface_create_rgb(640, 480);
+#endif
     fromScreen.drawAnyway(fromSurface->surf);
     doom_melt_start(melt, fromSurface);
 }

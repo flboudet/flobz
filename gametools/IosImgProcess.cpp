@@ -397,7 +397,7 @@ IIM_Surface *iim_surface_shift_hsv(IIM_Surface *isrc, float h, float s, float v)
     bool srclocked = false;
     if(SDL_MUSTLOCK(src)) srclocked = (SDL_LockSurface(src) == 0);
     bool retlocked = false;
-    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);        
+    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);
     for (int y=src->h; y--;)
     {
         for (int x=src->w; x--;)
@@ -435,7 +435,7 @@ IIM_Surface *iim_surface_shift_hue(IIM_Surface *isrc, float hue_offset)
     bool srclocked = false;
     if(SDL_MUSTLOCK(src)) srclocked = (SDL_LockSurface(src) == 0);
     bool retlocked = false;
-    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);        
+    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);
     for (int y=src->h; y--;)
     {
         for (int x=src->w; x--;)
@@ -509,7 +509,7 @@ IIM_Surface *iim_surface_set_value(IIM_Surface *isrc, float value)
     bool srclocked = false;
     if(SDL_MUSTLOCK(src)) srclocked = (SDL_LockSurface(src) == 0);
     bool retlocked = false;
-    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);        
+    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);
     for (int y=src->h; y--;)
     {
         for (int x=src->w; x--;)
@@ -543,8 +543,8 @@ IIM_Surface *iim_surface_resize(IIM_Surface *isrc, int width, int height)
     bool srclocked = false;
     if(SDL_MUSTLOCK(src)) srclocked = (SDL_LockSurface(src) == 0);
     bool retlocked = false;
-    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);        
-    
+    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);
+
     int sizew = w/width;
     int sizeh = h/height;
     if (sizew<1) sizew = 1;
@@ -599,8 +599,8 @@ IIM_Surface *iim_surface_resize_alpha(IIM_Surface *isrc, int width, int height)
     bool srclocked = false;
     if(SDL_MUSTLOCK(src)) srclocked = (SDL_LockSurface(src) == 0);
     bool retlocked = false;
-    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);        
-    
+    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);
+
     int sizew = w/width;
     int sizeh = h/height;
     if (sizew<1) sizew = 1;
@@ -651,7 +651,7 @@ IIM_Surface *iim_surface_mirror_h(IIM_Surface *isrc)
     if(SDL_MUSTLOCK(src)) srclocked = (SDL_LockSurface(src) == 0);
     bool retlocked = false;
     if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);
-    
+
     for (int y=src->h-1 ; y >= 0 ; y--)
     {
         for (int x=src->w-1 , ix = 0 ; x >= 0 ; x--, ix++)
@@ -659,7 +659,7 @@ IIM_Surface *iim_surface_mirror_h(IIM_Surface *isrc)
             iim_surface_set_rgba(ret, x, y, iim_surface_get_rgba(src, ix, y));
         }
     }
-    
+
     if(retlocked) SDL_UnlockSurface(ret);
     if(srclocked) SDL_UnlockSurface(src);
     return IIM_RegisterImg(ret, true);
@@ -690,11 +690,11 @@ IIM_Surface *iim_rotate(IIM_Surface *isrc, int degrees)
     float cy = src->h / 2;
     float xmax = src->w-1;
     float ymax = src->h-1;
-    
+
     bool srclocked = false;
     if(SDL_MUSTLOCK(src)) srclocked = (SDL_LockSurface(src) == 0);
     bool retlocked = false;
-    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);        
+    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);
 
     for (int y=src->h; y--;)
     {
@@ -778,9 +778,33 @@ IIM_Surface *iim_surface_create_rgba(int width, int height)
     bmask = 0x00ff0000;
     amask = 0xff000000;
 #endif
-    tmp = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, width, height, 32, 
+    tmp = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, width, height, 32,
                                        rmask, gmask, bmask, amask);
     ret = SDL_DisplayFormatAlpha(tmp);
+    SDL_FreeSurface(tmp);
+    return IIM_RegisterImg(ret, true);
+}
+
+IIM_Surface *iim_surface_create_rgb(int width, int height)
+{
+    SDL_Surface *ret, *tmp;
+    Uint32 rmask, gmask, bmask, amask;
+    /* SDL interprets each pixel as a 32-bit number, so our masks must depend
+     on the endianness (byte order) of the machine */
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    rmask = 0xff000000;
+    gmask = 0x00ff0000;
+    bmask = 0x0000ff00;
+    amask = 0x000000ff;
+#else
+    rmask = 0x000000ff;
+    gmask = 0x0000ff00;
+    bmask = 0x00ff0000;
+    amask = 0xff000000;
+#endif
+    tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 32,
+                               rmask, gmask, bmask, amask);
+    ret = SDL_DisplayFormat(tmp);
     SDL_FreeSurface(tmp);
     return IIM_RegisterImg(ret, true);
 }

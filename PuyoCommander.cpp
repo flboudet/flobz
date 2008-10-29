@@ -70,7 +70,6 @@ PuyoMainScreen::PuyoMainScreen(PuyoStoryWidget *fgStory, PuyoStoryWidget *bgStor
     if (fgStory != NULL) {
         add(fgStory);
 	}
-        
     setMenuDimensions();
     container.addListener(*this);
 }
@@ -178,20 +177,24 @@ public:
         local2PlayersGameMenu(mainScreen),
         optionMenu        (mainScreen),
         networkGameMenu   (mainScreen),
-        popScreenAction(mainScreen),
-        hallOfFameScreen(*mainScreen,&popScreenAction),
+        popFromHallScreenAction(mainScreen, &hallOfFameScreen),
+        popFromCreditsAction(mainScreen, &creditsScreen),
+        hallOfFameScreen(*mainScreen, &popFromHallScreenAction),
+        creditsScreen("credits.gsl", *mainScreen, &popFromCreditsAction, false),
         // Create action for buttons
         singlePlayerGameAction(&localGameMenu, mainScreen),
         twoPlayersGameAction(&local2PlayersGameMenu, mainScreen),
         optionAction(&optionMenu, mainScreen),
         networkGameAction(&networkGameMenu, mainScreen),
         hallOfFameAction(&hallOfFameScreen, mainScreen),
+        creditsAction(&creditsScreen, mainScreen),
         // Create buttons
         singlePlayerGameButton(theCommander->getLocalizedString(kSinglePlayerGame), &singlePlayerGameAction),
         twoPlayersGameButton(theCommander->getLocalizedString("Two Players Game"), &twoPlayersGameAction),
         optionButton(theCommander->getLocalizedString("Options"), &optionAction),
         networkGameButton(theCommander->getLocalizedString(kNetGame), &networkGameAction),
         hallOfFameButton(theCommander->getLocalizedString(kHighScores), &hallOfFameAction),
+        creditsButton(theCommander->getLocalizedString("Credits"), &creditsAction),
         exitButton(theCommander->getLocalizedString(kExit), &exitAction)
     {}
     void build();
@@ -202,14 +205,15 @@ private:
     OptionMenu            optionMenu;
     NetworkGameMenu       networkGameMenu;
 
-    PopHallOfFameAction   popScreenAction;
+    PopToMainScreenAction popFromHallScreenAction, popFromCreditsAction;
     HallOfFameScreen      hallOfFameScreen; // Comes from PuyoSinglePlayerStarter.cpp
-
+    PuyoStoryScreen       creditsScreen;
     PuyoPushMenuAction    singlePlayerGameAction;
     PuyoPushMenuAction    twoPlayersGameAction;
     PuyoPushMenuAction    optionAction;
     PuyoPushMenuAction    networkGameAction;
     PushHallOfFameAction  hallOfFameAction;
+    PushStoryScreenAction creditsAction;
     ExitAction exitAction;
 
     Button singlePlayerGameButton;
@@ -217,6 +221,7 @@ private:
     Button optionButton;
     Button networkGameButton;
     Button hallOfFameButton;
+    Button creditsButton;
     Button exitButton;
 };
 
@@ -230,8 +235,9 @@ void MainRealMenu::build() {
   add(&networkGameButton);
   add(&optionButton);
   add(&hallOfFameButton);
+  add(&creditsButton);
   add(&exitButton);
-  popScreenAction.setFromScreen(&hallOfFameScreen);
+  //popScreenAction.setFromScreen(&hallOfFameScreen);
 }
 
 /**
@@ -261,7 +267,7 @@ void PuyoCommander::run()
 void PuyoCommander::initMenus()
 {
   DBG_PRINT("initMenus()\n");
-  // 
+  //
   // Create the structures.
   PuyoStoryWidget *fgStory = new PuyoStoryWidget("title_fg.gsl");
   PuyoStoryWidget *bgStory = new PuyoStoryWidget("title_bg.gsl");
@@ -324,7 +330,7 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
   cursor = new GameCursor(dataPathManager.getPath("gfx/cursor.png"));
   loop->addDrawable(cursor);
   loop->addIdle(cursor);
-    
+
 }
 
 PuyoCommander::~PuyoCommander()
@@ -407,7 +413,7 @@ void PuyoCommander::initFonts()
   SoFont * smallFontInfo = SoFont_new();
   SoFont * textFont = SoFont_new();
   SoFont * funnyFont = SoFont_new();
-    
+
 #ifdef ENABLE_TTF
   Locales_Init(); // Make sure locales are detected.
   String font, funny_path;
@@ -427,7 +433,7 @@ void PuyoCommander::initFonts()
   SoFont_load_ttf(smallFontInfo, font, 12, SoFont_DARK);
   SoFont_load_ttf(textFont, font, 17, SoFont_GREY);
   SoFont_load_ttf(funnyFont, funny_path, 24, SoFont_STD);
-    
+
   storyFont = SoFont_new();
   SoFont_load_ttf(storyFont, font, 17, SoFont_STORY);
 #else
@@ -466,14 +472,14 @@ void PuyoCommander::notificationOccured(String identifier, void * context)
 {
     if (identifier == kFullScreenPref) {
         setFullScreen(*(bool *)context);
-    }    
+    }
 }
 /*
 void PuyoCommander::setMusic(bool music)
 {
   AudioManager::musicOnOff(music);
 }
-    
+
 void PuyoCommander::setSoundFx(bool fx)
 {
   AudioManager::soundOnOff(fx);
@@ -505,7 +511,7 @@ void PuyoCommander::setFullScreen(bool fullScreen)
           // going from fullscreen to windowed mode)
           //SDL_QuitSubSystem(SDL_INIT_VIDEO);
           //SDL_InitSubSystem(SDL_INIT_VIDEO);
-          
+
             initDisplay(GetIntPreference(kScreenWidthPref, 640),
                     GetIntPreference(kScreenHeightPref, 480), fullscreen, useGL);
         }
@@ -518,7 +524,7 @@ void PuyoCommander::setFullScreen(bool fullScreen)
 void PuyoCommander::setGlSDL(bool useGL)
 {
 }
-    
+
 /* Init SDL display */
 void PuyoCommander::initDisplay(int w, int h, bool fullscreen, bool useGL)
 {
@@ -571,7 +577,7 @@ void PuyoCommander::initDisplay(int w, int h, bool fullscreen, bool useGL)
       }
       loop->setOpenGLMode(false);
   }
-  atexit(SDL_Quit); 
+  atexit(SDL_Quit);
   SDL_ShowCursor(SDL_DISABLE);
   SDL_WM_SetCaption("FloboPuyo by iOS-Software",NULL);
   /* Should also set up an icon someday */
@@ -581,7 +587,7 @@ void PuyoCommander::initDisplay(int w, int h, bool fullscreen, bool useGL)
 
 /* load a few important preferences for display */
 void PuyoCommander::loadPreferences(bool fs)
-{  
+{
   DBG_PRINT("loadPreferences()\n");
   /* Load Preferences */
   fullscreen = fs ? GetBoolPreference(kFullScreenPref, true) : false;

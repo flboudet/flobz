@@ -13,15 +13,15 @@ class HallOfFameScreen : public PuyoGameOver1PScreen {
 /// Action to close a screen and restore main screen.
 ///
 /// Note: this class was conceived for the HallOfFame but can be used for other screens
-class PopHallOfFameAction : public Action
+class PopToMainScreenAction : public Action
 {
     public:
-        PopHallOfFameAction(PuyoMainScreen *mainScreen, Screen *fromScreen = NULL)
+        PopToMainScreenAction(PuyoMainScreen *mainScreen, Screen *fromScreen = NULL)
             : mainScreen(mainScreen), fromScreen(fromScreen)
         {}
         void action() {
             GameUIDefaults::SCREEN_STACK->pop();
-            mainScreen->transitionFromScreen(*fromScreen);
+            //mainScreen->transitionFromScreen(*fromScreen);
         }
         void setFromScreen(Screen *screen) {
             fromScreen = screen;
@@ -45,6 +45,22 @@ class PushHallOfFameAction : public Action
         }
     private:
         HallOfFameScreen *storyScreen;
+        Screen *fromScreen;
+};
+
+/// Action to open a story screen with a transition
+class PushStoryScreenAction : public Action
+{
+    public:
+        PushStoryScreenAction(PuyoStoryScreen *storyScreen, Screen *fromScreen)
+            : storyScreen(storyScreen), fromScreen(fromScreen)
+        {}
+        void action() {
+            GameUIDefaults::SCREEN_STACK->push(storyScreen);
+            //storyScreen->transitionFromScreen(*fromScreen);
+        }
+    private:
+        PuyoStoryScreen *storyScreen;
         Screen *fromScreen;
 };
 

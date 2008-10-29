@@ -75,6 +75,7 @@ IIM_Surface *iim_surface_shift_hsv(IIM_Surface *src, float h, float s, float v);
 IIM_Surface *iim_surface_mirror_h(IIM_Surface *isrc);
 void iim_surface_convert_to_gray(IIM_Surface *src);
 IIM_Surface *iim_surface_create_rgba(int width, int height);
+IIM_Surface *iim_surface_create_rgb(int width, int height);
 
 IIM_Surface * IIM_Load_Absolute_DisplayFormat (const char *path);
 IIM_Surface * IIM_Load_Absolute_DisplayFormatAlpha (const char *path);
