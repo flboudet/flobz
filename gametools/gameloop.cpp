@@ -259,7 +259,9 @@ void GameLoop::idle(double currentTime)
   for (i = 0; i<idles.size();) {
     IdleComponent *gc = idles[i];
     if (gc == NULL) {
-       // printf("IDLE %d REMOVED############\n", i);
+#ifdef DEBUG_GAMELOOP
+      printf("IDLE %d REMOVED############\n", i);
+#endif
       idles.removeAt(i);
     }
     else i++;
@@ -267,7 +269,9 @@ void GameLoop::idle(double currentTime)
   for (i = 0; i<drawables.size();) {
     DrawableComponent *gc = drawables[i];
     if (gc == NULL) {
-    //printf("DRAWABLE %d REMOVED############\n", i);
+#ifdef DEBUG_GAMELOOP
+    printf("DRAWABLE %d REMOVED############\n", i);
+#endif
       drawables.removeAt(i);
     }
     else i++;
@@ -275,7 +279,9 @@ void GameLoop::idle(double currentTime)
   
   // 3b- garbage collector for passive remove
   while (garbageCollector.size() > 0) {
+#ifdef DEBUG_GAMELOOP
     printf("GARBAGE COLLECTABLE REMOVED\n");
+#endif
     delete garbageCollector[0];
     garbageCollector.removeAt(0);
   }

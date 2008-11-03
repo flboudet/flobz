@@ -385,7 +385,7 @@ void PuyoStatsLegendWidget::onWidgetVisibleChanged(bool visible)
   // Set the size of the different rows
   for (int i = 0 ; i < this->getNumberOfChilds() - 1 ; i++) {
     Vec3 elementSize = m_guideWidget.getChild(i)->getSize();
-    printf("Elementsize: %f %f\n", elementSize.x, elementSize.y);
+    //printf("Elementsize: %f %f\n", elementSize.x, elementSize.y);
     getChild(i)->setPreferedSize(Vec3(0, elementSize.y));
   }
 }
