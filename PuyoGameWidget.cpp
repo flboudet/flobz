@@ -206,7 +206,7 @@ void PuyoGameWidget::cycle()
       tickCounts = 0;
       if (gameSpeed < 20) gameSpeed++;
       cyclesBeforeSpeedIncreases = cyclesBeforeSpeedIncreases * (20 + gameSpeed) / 20;
-      printf("Changing speed: %d (next in %d)\n", gameSpeed, cyclesBeforeSpeedIncreases);
+      //printf("Changing speed: %d (next in %d)\n", gameSpeed, cyclesBeforeSpeedIncreases);
     }
     requestDraw();
   }
@@ -382,7 +382,7 @@ void PuyoGameWidget::eventOccured(GameControlEvent *event)
 
 bool PuyoGameWidget::startPressed()
 {
-    if ((gameover || abortedFlag) && once && (ios_fc::getTimeMs() > gameOverDate + 2000)) {
+    if ((gameover || abortedFlag) && once && (ios_fc::getTimeMs() > gameOverDate + 500)) {
         actionAfterGameOver(true);
         return true;
     }
