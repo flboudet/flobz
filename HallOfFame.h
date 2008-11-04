@@ -20,8 +20,8 @@ class PopToMainScreenAction : public Action
             : mainScreen(mainScreen), fromScreen(fromScreen)
         {}
         void action() {
+            mainScreen->transitionFromScreen(*fromScreen);
             GameUIDefaults::SCREEN_STACK->pop();
-            //mainScreen->transitionFromScreen(*fromScreen);
         }
         void setFromScreen(Screen *screen) {
             fromScreen = screen;
@@ -39,8 +39,8 @@ class PushHallOfFameAction : public Action
             : storyScreen(storyScreen), fromScreen(fromScreen)
         {}
         void action() {
-            GameUIDefaults::SCREEN_STACK->push(storyScreen);
             storyScreen->transitionFromScreen(*fromScreen);
+            GameUIDefaults::SCREEN_STACK->push(storyScreen);
             storyScreen->refresh();
         }
     private:
@@ -56,8 +56,8 @@ class PushStoryScreenAction : public Action
             : storyScreen(storyScreen), fromScreen(fromScreen)
         {}
         void action() {
+            storyScreen->transitionFromScreen(*fromScreen);
             GameUIDefaults::SCREEN_STACK->push(storyScreen);
-            //storyScreen->transitionFromScreen(*fromScreen);
         }
     private:
         PuyoStoryScreen *storyScreen;

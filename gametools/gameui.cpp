@@ -33,10 +33,10 @@ namespace gameui {
             return true;
         return false;
     }
-    
+
     //
     // Widget
-    // 
+    //
     Widget::Widget(WidgetContainer *parent)
         : parent(parent), preferedSize(0,0,0), size(0,0,0),
         position(0,0,0), hidden(false), focus(false), focusable(false), _drawRequested(true), receiveUp(false)
@@ -107,7 +107,7 @@ namespace gameui {
         if (idle != NULL)
             GameUIDefaults::GAME_LOOP->removeIdle(idle);
     }
-    
+
     Screen *Widget::getParentScreen() const
     {
         if (parent == NULL)
@@ -117,7 +117,7 @@ namespace gameui {
 
     //
     // WidgetContainer
-    // 
+    //
 
     WidgetContainer::WidgetContainer(GameLoop *loop) : layoutSuspended(false), loop(loop), addedToGameLoop(false) {
         if (loop == NULL) this->loop = GameUIDefaults::GAME_LOOP;
@@ -130,8 +130,8 @@ namespace gameui {
         }
     }
 
-    void WidgetContainer::add (Widget *child)    
-    { 
+    void WidgetContainer::add (Widget *child)
+    {
         childs.add(child);
         child->setParent(this);
         if (addedToGameLoop)
@@ -145,12 +145,12 @@ namespace gameui {
     void WidgetContainer::remove (Widget *child)
     {
         childs.remove(child);
-        
+
         // Ensures the removed children doesn't grabs the screen events
         Screen *childScreen = getParentScreen();
         if (childScreen != NULL)
             childScreen->ungrabEventsOnWidget(child);
-            
+
         child->setParent(NULL);
         child->removeFromGameLoopActive();
         arrangeWidgets();
@@ -204,9 +204,9 @@ namespace gameui {
         for (int i = 0; i < getNumberOfChilds() ; i++)
             if (getChild(i)->isFocusable()) n++;
         return n;
-    }  
+    }
 
-    void WidgetContainer::draw(SDL_Surface *surface) 
+    void WidgetContainer::draw(SDL_Surface *surface)
     {
 		int n = getNumberOfChilds();
         for (int i = 0; i < n; ++i) {
@@ -296,11 +296,11 @@ namespace gameui {
             Widget::setPosition(v3);
         }
     }
-    
+
     void WidgetContainer::suspendLayout()
     {
         layoutSuspended = true;
-        
+
         int s = childs.size();
         for (int i = 0; i < s ; i++) {
             childs[i]->suspendLayout();
@@ -310,7 +310,7 @@ namespace gameui {
     void WidgetContainer::resumeLayout()
     {
         layoutSuspended = false;
-        
+
         int s = childs.size();
         for (int i = 0; i < s ; i++) {
             childs[i]->resumeLayout();
@@ -325,31 +325,31 @@ namespace gameui {
         Widget::onWidgetVisibleChanged(visible);
     }
 
-    // 
+    //
     // Box
-    // 
+    //
     Box::Box(GameLoop *loop) : WidgetContainer(loop), innerMargin(0)
     {
         setPolicy(GameUIDefaults::CONTAINER_POLICY);
         setReceiveUpEvents(true);
         activeWidget = -1;
     }
-    
+
     void Box::setPolicy(GameUIEnum policy)
     {
         this->policy = policy;
         arrangeWidgets();
     }
-    
+
     void Box::arrangeWidgets()
     {
         int numZeroSizedChildren = 0;
         int numAnyChildren = getNumberOfChilds();
-        
+
         if (numAnyChildren == 0) return;
         requestDraw();
         checkFocus();
-        
+
         // TODO Ugly, set size of children to own size if we are a ZBox
         if (getSortingAxe(Vec3(1.0f, 2.0f, 3.0f)) == 3.0f)
         {
@@ -360,7 +360,7 @@ namespace gameui {
             }
             return;
         }
-        
+
         // Get the total sorted prefered size of the childs of this box
         float sortedSizeOfKnownChilds = 0.0f;
         for (int i = 0; i < numAnyChildren; ++i) {
@@ -379,24 +379,24 @@ namespace gameui {
             }
             return;
         }
-        
+
         Vec3 boxPosition = getPosition() + Vec3(innerMargin, innerMargin);
-        
+
         float spaceLeft = getSortingAxe(boxSize) - sortedSizeOfKnownChilds;
         if (spaceLeft < 0.0f) spaceLeft = 0.0f;
-        
+
         float spaceAllocated = 0.0f;
         if (numZeroSizedChildren > 0) {
             spaceAllocated = spaceLeft / (float)numZeroSizedChildren;
         }
         //fprintf(stderr,"%p Size %f %f Pos %f %f\n",this, boxSize.x, boxSize.y, boxPosition.x, boxPosition.y);
-        
+
         // Set child sizes
         Vec3 newSize(0.0f,0.0f);
         for (int i = 0; i < numAnyChildren; ++i) {
             Widget *child = getChild(i);
             Vec3 PreferedSize = child->getPreferedSize();
-            
+
             // Sorting axe
             float sortingAxePref = getSortingAxe(PreferedSize);
             if (sortingAxePref == 0.0f) { // if zero, allocate space left / nb zero sized widgets
@@ -407,7 +407,7 @@ namespace gameui {
                     setSortingAxe(newSize, s);
                 else setSortingAxe(newSize, sortingAxePref);
             }
-            
+
             // Other axe
             float otherAxisPref = getOtherAxis(PreferedSize);
             if (otherAxisPref == 0.0f) { // if zero, allocate box size
@@ -418,16 +418,16 @@ namespace gameui {
                     setOtherAxis(newSize, s);
                 else setOtherAxis(newSize, otherAxisPref);
             }
-            
+
             // final size setting
             //fprintf(stderr,"%p -- %p Size %f %f Pref %f %f\n",this, child, newSize.x, newSize.y, PreferedSize.x, PreferedSize.y);
             child->setSize(newSize);
         }
-        
+
         // Set the position of the child widgets
         Vec3 childPosition = boxPosition;
         float offsetPosition = 0.0f;
-        
+
         if (numZeroSizedChildren == 0) { // If we have no zero sized widget
             switch (policy) {
                 default:
@@ -445,8 +445,8 @@ namespace gameui {
                     break;
             }
         }
-        
-        
+
+
         // Set positions
         for (int i = 0; i < numAnyChildren; ++i) {
             Widget *child = getChild(i);
@@ -457,8 +457,8 @@ namespace gameui {
             setSortingAxe(childPosition, getSortingAxe(childPosition) + getSortingAxe(childSize) + offsetPosition);
         }
     }
-    
-  
+
+
     void Box::add (Widget *child)
     {
         WidgetContainer::add(child);
@@ -482,16 +482,16 @@ namespace gameui {
     }
 
     void Box::eventOccured(GameControlEvent *event)
-    {     
+    {
         // If the box has no focusable child, give up the focus
         if (getNumberOfFocusableChilds() <= 0) {
             lostFocus();
             return;
         }
-        
+
         // Mouse focus management
         handleMouseFocus(event);
-        
+
         // Event transmission to the widget tree
         Widget *child = getChild(activeWidget);
         // If the event is a key up event and the child is not interrested, discard the event
@@ -500,23 +500,23 @@ namespace gameui {
         // Send the event to the active child. If the child doesn't gives up the focus, we're done.
         child->eventOccured(event);
         if (child->haveFocus()) return;
-        
+
         // Keyboard focus management
         // Discard up events for the keyboard focus management
         if (event->isUp)
             return;
         handleKeyboardFocus(event);
     }
-    
+
     void Box::handleMouseFocus(GameControlEvent *event)
     {
         Vec3 ref(1.0f,2.0f,3.0f);
         float axis = getSortingAxe(ref);
-        
+
         // If the box is a zbox, don't perform mouse management
         if (axis == 3.0f)
             return;
-        
+
         // If the event is a mouse moved event, search and focus the widget beneath the cursor
         if (event->cursorEvent == GameControlEvent::kGameMouseMoved) {
             Widget *child = getChild(activeWidget);
@@ -534,15 +534,15 @@ namespace gameui {
             }
         }
     }
-    
+
     void Box::handleKeyboardFocus(GameControlEvent *event)
     {
         bool dontrollover = false; // rollover is enabled by default (i.e., when we reach the bottom of the box, we continue at the top)
         int direction = 0; // direction of the active widget change related to the event (1: next, -1: prev, 0: unrelated)
-        
+
         Vec3 ref(1.0f,2.0f,3.0f);
         float axis = getSortingAxe(ref);
-        
+
         // This stuff has the following behaviour:
         //   - if this container has an ancestor that is sorted in the same way as this box (i.e., a HBox that has another HBox as parent),
         //     disables the rollover in the current box.
@@ -554,7 +554,7 @@ namespace gameui {
                 dontrollover = true;
             curParent = curParent->parent;
         }
-        
+
         if (isPrevEvent(event)) direction = -1;
         else if (isNextEvent(event)) direction = 1;
         else if (isOtherDirection(event)) {
@@ -574,17 +574,17 @@ namespace gameui {
                     if (dontrollover) {
                         possibleNewWidget = activeWidget;
                         lostFocus();
-                    }  
+                    }
                     else possibleNewWidget = getNumberOfChilds()-1;
-                }  
+                }
                 if (possibleNewWidget >= getNumberOfChilds()) // roll from last to first
                 {
                     if (dontrollover) {
                         possibleNewWidget = activeWidget;
                         lostFocus();
-                    }  
+                    }
                     else possibleNewWidget = 0;
-                }  
+                }
             }
             while (!getChild(possibleNewWidget)->isFocusable());
 
@@ -678,7 +678,7 @@ namespace gameui {
 
     //
     // HBox
-    // 
+    //
     bool HBox::isPrevEvent(GameControlEvent *event) const
     {
         return event->cursorEvent == GameControlEvent::kLeft;
@@ -740,7 +740,7 @@ namespace gameui {
         }*/
         requestDraw(false);
     }
-    
+
     void ZBox::eventOccured(GameControlEvent *event)
     {
         Box::eventOccured(event);
@@ -772,7 +772,7 @@ namespace gameui {
         requestDraw();
         onSlideInside(); // Send notification that we have slided inside
     }
-	
+
     void SliderContainer::setPosition(const Vec3 &v3)
     {
         if (sliding == false) backupedPosition = v3;
@@ -783,7 +783,7 @@ namespace gameui {
     {
         m_slideSide = slideSide;
     }
-	
+
     void SliderContainer::draw(SDL_Surface *screen)
     {
         if (bg != NULL && backgroundVisible)
@@ -897,7 +897,7 @@ namespace gameui {
                 return;
             }
         }
-        
+
         Vec3 pos = backupedPosition;
 
         double distance;
@@ -915,7 +915,7 @@ namespace gameui {
 	      pos.x += distance*stime/shtime;
 	    else
 	      pos.y += distance*stime/shtime;
-            
+
         }
         else
         {
@@ -932,7 +932,7 @@ namespace gameui {
         requestDraw();
         resumeLayout();
     }
-  
+
     void SliderContainer::addContentWidget()
     {
       bool s = sliding;
@@ -944,19 +944,19 @@ namespace gameui {
       ZBox::setPosition(pos);
       contentWidget->giveFocus();
     }
-    
+
     void SliderContainer::addListener(SliderContainerListener &listener)
     {
         this->listeners.push_back(&listener);
     }
-    
+
     void SliderContainer::onSlideOutside()
     {
         for (std::vector<SliderContainerListener *>::iterator iter = this->listeners.begin() ; iter != this->listeners.end() ; iter++) {
             (*iter)->onSlideOutside(*this);
         }
     }
-    
+
     void SliderContainer::onSlideInside()
     {
         for (std::vector<SliderContainerListener *>::iterator iter = this->listeners.begin() ; iter != this->listeners.end() ; iter++) {
@@ -974,7 +974,7 @@ namespace gameui {
         lastvisible = firstvisible = -1;
         setPreferedSize(Vec3(0.0f, Text("").getPreferedSize().y));
     }
-    
+
     int HScrollList::getNumberOfVisibleChilds() {
         if (activeWidget==-1) return 0;
         if (getNumberOfChilds()<(1+2*kHScrollListNbAddedItemsToEachSide)) return getNumberOfChilds();
@@ -1042,7 +1042,7 @@ namespace gameui {
             return;
         }
 
-        bool childHaveFocus;    
+        bool childHaveFocus;
         do {
             activeWidget += direction;
             if (activeWidget < 0) {
@@ -1167,7 +1167,7 @@ namespace gameui {
     void Screen::drawAnyway(SDL_Surface *surface)
     {
         rootContainer.requestDraw(true);
-        rootContainer.doDraw(surface);
+        rootContainer.draw(surface);
     }
 
     void Screen::onEvent(GameControlEvent *event)
@@ -1184,13 +1184,13 @@ namespace gameui {
         // Pass the event to the last grabbed widget
         grabbedWidget->eventOccured(event);
     }
-    
+
     void Screen::onDrawableVisibleChanged(bool visible)
     {
         hidden = !visible;
         onScreenVisibleChanged(visible);
     }
-    
+
     void Screen::onScreenVisibleChanged(bool visible)
     {
         rootContainer.onWidgetVisibleChanged(visible);
@@ -1216,7 +1216,7 @@ namespace gameui {
     {
         m_grabbedWidgets.push_back(widget);
     }
-    
+
     void Screen::ungrabEventsOnWidget(Widget *widget)
     {
         for (std::vector<Widget *>::iterator iter = m_grabbedWidgets.begin() ; iter != m_grabbedWidgets.end() ; iter++) {
@@ -1226,10 +1226,10 @@ namespace gameui {
             }
         }
     }
-    
+
     //
     // Text
-    // 
+    //
 
     Text::Text()
         : label(""), offset(0.0,0.0,0.0), m_textAlign(TEXT_LEFT_ALIGN), m_autoSize(true), mdontMove(true)
@@ -1329,25 +1329,25 @@ namespace gameui {
         AudioManager::playSound("slide.wav", .5);
 #endif
     }
-    
-    
+
+
     //
     // Image
     //
     Image::Image() : m_image(NULL), m_focusedImage(NULL), m_invertFocusMode(false)
     {
     }
-    
+
     Image::Image(IIM_Surface *image) : m_focusedImage(NULL), m_invertFocusMode(false)
     {
         setImage(image);
     }
-    
+
     Image::~Image()
     {
         if (m_focusedImage != NULL) IIM_Free(m_focusedImage);
     }
-    
+
     void Image::setImage(IIM_Surface *image)
     {
         m_image = image;
@@ -1358,7 +1358,7 @@ namespace gameui {
         this->setPreferedSize(Vec3(m_image->w, m_image->h));
         this->setSize(Vec3(m_image->w, m_image->h));
     }
-    
+
     void Image::draw(SDL_Surface *screen)
     {
         SDL_Rect dstRect;
@@ -1374,7 +1374,7 @@ namespace gameui {
         //SDL_FillRect(screen,&dstRect,0xAAAAAAAA);
         IIM_BlitSurface(imageToDraw, NULL, screen, &dstRect);
     }
-    
+
     void Image::setInvertedFocus(bool mode)
     {
         m_invertFocusMode = mode;
@@ -1384,7 +1384,7 @@ namespace gameui {
         }
         requestDraw();
     }
-    
+
     void Image::eventOccured(GameControlEvent *event)
     {
         bool clicked = false;
@@ -1405,10 +1405,10 @@ namespace gameui {
                 action->action(this, event->isUp ? ON_MOUSEUP : ON_START, event);
         }
     }
-    
+
     //
     // Button
-    // 
+    //
 
     void Button::init(SoFont *fontActive, SoFont *fontInactive)
     {
@@ -1441,7 +1441,7 @@ namespace gameui {
     void Button::eventOccured(GameControlEvent *event)
     {
         bool clicked = false;
-        
+
         if (event->isUp)
             return;
 
@@ -1585,7 +1585,7 @@ namespace gameui {
                 return;
             }
         }
-        
+
         if (event->cursorEvent == GameControlEvent::kStart) {
             editionMode = !editionMode;
             if (editionMode == true) {
@@ -1680,7 +1680,7 @@ namespace gameui {
                 lostFocus();
         }
     }
-    
+
     bool EditField::handleJoystickEdit(GameControlEvent *event)
     {
         static const char CHAR_ORDER[] = "/:-. _ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?@";
@@ -1937,23 +1937,23 @@ namespace gameui {
             set(i,b);
         }
     }
-    
+
     void ListWidget::draw(SDL_Surface *screen)
     {
         SDL_Rect dstrect;
-        
+
         dstrect.x = getPosition().x;
         dstrect.y = getPosition().y;
         dstrect.h = getSize().y;
         dstrect.w = getSize().x;
         SDL_FillRect(screen, &dstrect, 0x55555555);
-        
+
         dstrect.x = listBox.getPosition().x;
         dstrect.y = listBox.getPosition().y;
         dstrect.h = listBox.getSize().y;
         dstrect.w = listBox.getSize().x;
         SDL_FillRect(screen, &dstrect, 0xFFFFFFFF);
-        
+
         dstrect.x = scrollerBox.getPosition().x;
         dstrect.y = scrollerBox.getPosition().y;
         dstrect.h = scrollerBox.getSize().y;
