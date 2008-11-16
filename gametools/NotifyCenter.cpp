@@ -1,5 +1,8 @@
 #include "NotifyCenter.h"
 #include <stdio.h>
+#include <algorithm>
+
+using namespace std;
 
 namespace gameui {
  
