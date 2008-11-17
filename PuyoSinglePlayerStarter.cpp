@@ -239,8 +239,8 @@ GameOptions PuyoSingleGameLevelData::getGameOptions() const
 }
 
 PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousScreen,
-        Action *finishedAction, String playerName, const PlayerGameStat &playerPoints)
-        : PuyoStoryScreen(screenName, previousScreen, finishedAction, false),
+        Action *finishedAction, String playerName, const PlayerGameStat &playerPoints, bool initialTransition)
+        : PuyoStoryScreen(screenName, previousScreen, finishedAction, initialTransition),
         playerName(playerName), playerStat(playerPoints)
 {
     static const char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
@@ -290,8 +290,9 @@ PuyoGameOver1PScreen::~PuyoGameOver1PScreen()
 {
 }
 
-SinglePlayerStarterAction::SinglePlayerStarterAction(int difficulty, PuyoSingleNameProvider *nameProvider)
-    : m_state(kGameNotStarted),
+SinglePlayerStarterAction::SinglePlayerStarterAction(PuyoMainScreen *mainScreen, int difficulty, PuyoSingleNameProvider *nameProvider)
+    : m_mainScreen(mainScreen),
+      m_state(kGameNotStarted),
       m_nameProvider(nameProvider),
       m_currentLevel(0), m_lifes(3), m_difficulty(difficulty),
       m_currentMatch(NULL),
@@ -397,6 +398,9 @@ void SinglePlayerStarterAction::performHiScoreScreen(String gameOverStoryName)
 		     *(GameUIDefaults::SCREEN_STACK->top()),
                      this, m_nameProvider->getPlayerName(),
                      PlayerGameStat());
+  Screen *screenToTrans = GameUIDefaults::SCREEN_STACK->top();
+  m_hiScoreScreen->transitionFromScreen(*screenToTrans);
+  m_hiScoreScreen->refresh();
   GameUIDefaults::SCREEN_STACK->pop();
   GameUIDefaults::SCREEN_STACK->push(m_hiScoreScreen);
   if (m_currentMatch != NULL) {
@@ -413,8 +417,8 @@ void SinglePlayerStarterAction::performBackToMenu()
 {
   // Rewind screen stack
   Screen *screenToTrans = GameUIDefaults::SCREEN_STACK->top();
+  m_mainScreen->transitionFromScreen(*screenToTrans);
   GameUIDefaults::SCREEN_STACK->pop();
-  (static_cast<PuyoMainScreen *>(GameUIDefaults::SCREEN_STACK->top()))->transitionFromScreen(*screenToTrans);
   delete m_hiScoreScreen;
   // Restore initial values to the reused action
   m_lifes = 3;

@@ -130,7 +130,7 @@ private:
 class PuyoGameOver1PScreen : public PuyoStoryScreen {
 public:
     PuyoGameOver1PScreen(String screenName, Screen &previousScreen, Action *finishedAction,
-            String playerName, const PlayerGameStat &playerPoints);
+            String playerName, const PlayerGameStat &playerPoints, bool initialTransition=false);
     void refresh();
     virtual ~PuyoGameOver1PScreen();
 private:
@@ -148,7 +148,7 @@ class SinglePlayerMatch;
  */
 class SinglePlayerStarterAction : public Action {
 public:
-    SinglePlayerStarterAction(int difficulty,
+    SinglePlayerStarterAction(PuyoMainScreen *mainScreen, int difficulty,
 			      PuyoSingleNameProvider *nameProvider = NULL);
     /**
      * Implements the Action interface
@@ -171,6 +171,7 @@ private:
       kGameOver,
       kHiScoreScreen
     };
+    PuyoMainScreen *m_mainScreen;
     State m_state;
     PuyoSingleNameProvider *m_nameProvider;
     int m_currentLevel, m_lifes, m_difficulty;
