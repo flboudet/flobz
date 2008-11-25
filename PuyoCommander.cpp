@@ -4,27 +4,15 @@
 #include "PuyoStrings.h"
 #include "preferences.h"
 #include "audio.h"
+#include "MainMenu.h"
 #include "PuyoSinglePlayerStarter.h"
-#include "HallOfFame.h"
 
 #include "PuyoNetworkStarter.h"
-
-#include "PuyoLocalMenu.h"
-
-#ifndef DISABLE_NETWORK
-#include "PuyoNetworkMenu.h"
-#endif
-
-#include "PuyoOptionMenu.h"
 
 using namespace gameui;
 
 PuyoCommander *theCommander = NULL;
 SoFont *storyFont;
-#define WIDTH  640
-#define HEIGHT 480
-#define MENU_X 235
-#define MENU_Y 225
 
 static const char * kFullScreenPref = "Config.FullScreen";
 #ifdef HAVE_OPENGL
@@ -33,212 +21,11 @@ static const char * kOpenGLPref     = "Config.OpenGL";
 static const char * kScreenWidthPref = "Config.ScreenWidth";
 static const char * kScreenHeightPref = "Config.ScreenHeight";
 
-/*
- * MENU ACTIONS
- */
-class ExitAction : public Action {
-  public:
-    void action() { SDL_Quit(); exit(0); }
-};
 
-class SinglePlayerGameAction : public Action {
-  public: void action();
-};
-
-void PuyoPushMenuAction::action()
-{
-    mainScreen->pushMenu(menu, m_fullScreen);
-}
-
-void PuyoPopMenuAction::action()
-{
-    mainScreen->popMenu();
-}
 
 /*
  * THE MENUS
  */
-
-PuyoScreen::PuyoScreen() : Screen(0,0,WIDTH,HEIGHT) {}
-
-PuyoMainScreen::PuyoMainScreen(PuyoStoryWidget *fgStory, PuyoStoryWidget *bgStory)
-    : fgStory(fgStory), bgStory(bgStory), transition(NULL), nextFullScreen(false)
-{
-    if (bgStory != NULL)
-        add(bgStory);
-    add(&container);
-    if (fgStory != NULL) {
-        add(fgStory);
-	}
-    setMenuDimensions();
-    container.addListener(*this);
-}
-
-PuyoMainScreen::~PuyoMainScreen()
-{
-    if (transition != NULL) {
-        delete(transition);
-    }
-}
-
-void PuyoMainScreen::pushMenu(PuyoMainScreenMenu *menu, bool fullScreen)
-{
-    menuStack.push(container.getContentWidget());
-    fullScreenStack.push(fullScreen);
-    nextFullScreen = fullScreen;
-    container.transitionToContent(menu);
-    if (fgStory != NULL)
-        fgStory->setIntegerValue("@inNetGameCenter", fullScreen ? 1 : 0);
-}
-
-void PuyoMainScreen::popMenu()
-{
-    if (menuStack.size() == 1)
-        return;
-    fullScreenStack.pop();
-    nextFullScreen = fullScreenStack.top();
-    container.transitionToContent(menuStack.top());
-    menuStack.pop();
-}
-
-void PuyoMainScreen::transitionFromScreen(Screen &fromScreen)
-{
-    if (transition != NULL) {
-        remove(transition);
-        delete(transition);
-    }
-    transition = new PuyoScreenTransitionWidget(fromScreen, NULL);
-    add(transition);
-    setMenuDimensions();
-}
-
-void PuyoMainScreen::onEvent(GameControlEvent *cevent)
-{
-    PuyoScreen::onEvent(cevent);
-	if (cevent->caught != false)
-		return;
-    if (cevent->isUp)
-        return;
-    switch (cevent->cursorEvent) {
-    case GameControlEvent::kStart:
-        break;
-    case GameControlEvent::kBack:
-        popMenu();
-        break;
-      default:
-        break;
-    }
-}
-
-void PuyoMainScreen::onSlideOutside(SliderContainer &slider)
-{
-    setMenuDimensions();
-}
-
-void PuyoMainScreen::setMenuDimensions()
-{
-	Vec3 menuPos;
-    if (nextFullScreen) {
-        menuPos.y = 0;
-        menuPos.x = 0;
-        container.setPosition(menuPos);
-        container.setSize(Vec3(WIDTH, HEIGHT, 0));
-        container.setBackgroundVisible(false);
-        if (fgStory != NULL)
-            fgStory->setIntegerValue("@inNetGameCenter", 1);
-    }
-    else {
-        menuPos.y = MENU_Y;
-        menuPos.x = MENU_X;
-        container.setPosition(menuPos);
-        container.setSize(Vec3(400, 250, 0)); // TODO: mettre dimensions dans GSL
-        container.setBackgroundVisible(true);
-        if (fgStory != NULL)
-            fgStory->setIntegerValue("@inNetGameCenter", 0);
-    }
-}
-
-PuyoMainScreenMenu::PuyoMainScreenMenu(PuyoMainScreen *mainScreen, GameLoop *loop)
-  : Frame(theCommander->getWindowFramePicture(), loop),
-    mainScreen(mainScreen)
-{
-    setPolicy(USE_MAX_SIZE);
-}
-
-/// Main menu of the game
-///
-/// Contains buttons for 1P,2P,Option and Network menus.
-class MainRealMenu : public PuyoMainScreenMenu {
-public:
-    MainRealMenu(PuyoMainScreen * mainScreen) :
-        // Create sub screens
-        PuyoMainScreenMenu(mainScreen),
-        localGameMenu     (mainScreen),
-        local2PlayersGameMenu(mainScreen),
-        optionMenu        (mainScreen),
-        networkGameMenu   (mainScreen),
-        popFromHallScreenAction(mainScreen, &hallOfFameScreen),
-        popFromCreditsAction(mainScreen, &creditsScreen),
-        hallOfFameScreen(*mainScreen, &popFromHallScreenAction),
-        creditsScreen("credits.gsl", *mainScreen, &popFromCreditsAction, false),
-        // Create action for buttons
-        singlePlayerGameAction(&localGameMenu, mainScreen),
-        twoPlayersGameAction(&local2PlayersGameMenu, mainScreen),
-        optionAction(&optionMenu, mainScreen),
-        networkGameAction(&networkGameMenu, mainScreen),
-        hallOfFameAction(&hallOfFameScreen, mainScreen),
-        creditsAction(&creditsScreen, mainScreen),
-        // Create buttons
-        singlePlayerGameButton(theCommander->getLocalizedString(kSinglePlayerGame), &singlePlayerGameAction),
-        twoPlayersGameButton(theCommander->getLocalizedString("Two Players Game"), &twoPlayersGameAction),
-        optionButton(theCommander->getLocalizedString("Options"), &optionAction),
-        networkGameButton(theCommander->getLocalizedString(kNetGame), &networkGameAction),
-        hallOfFameButton(theCommander->getLocalizedString(kHighScores), &hallOfFameAction),
-        creditsButton(theCommander->getLocalizedString("Credits"), &creditsAction),
-        exitButton(theCommander->getLocalizedString(kExit), &exitAction)
-    {}
-    void build();
-
-private:
-    LocalGameMenu         localGameMenu;
-    Local2PlayersGameMenu local2PlayersGameMenu;
-    OptionMenu            optionMenu;
-    NetworkGameMenu       networkGameMenu;
-
-    PopToMainScreenAction popFromHallScreenAction, popFromCreditsAction;
-    HallOfFameScreen      hallOfFameScreen; // Comes from PuyoSinglePlayerStarter.cpp
-    PuyoStoryScreen       creditsScreen;
-    PuyoPushMenuAction    singlePlayerGameAction;
-    PuyoPushMenuAction    twoPlayersGameAction;
-    PuyoPushMenuAction    optionAction;
-    PuyoPushMenuAction    networkGameAction;
-    PushHallOfFameAction  hallOfFameAction;
-    PushStoryScreenAction creditsAction;
-    ExitAction exitAction;
-
-    Button singlePlayerGameButton;
-    Button twoPlayersGameButton;
-    Button optionButton;
-    Button networkGameButton;
-    Button hallOfFameButton;
-    Button creditsButton;
-    Button exitButton;
-};
-
-void MainRealMenu::build() {
-  localGameMenu.build();
-  local2PlayersGameMenu.build();
-  optionMenu.build();
-  networkGameMenu.build();
-  add(&singlePlayerGameButton);
-  add(&twoPlayersGameButton);
-  add(&networkGameButton);
-  add(&optionButton);
-  add(&hallOfFameButton);
-  add(&creditsButton);
-  add(&exitButton);
-  //popScreenAction.setFromScreen(&hallOfFameScreen);
-}
 
 /**
  * Launches a single player game

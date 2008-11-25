@@ -9,73 +9,9 @@
 #include "GameCursor.h"
 #include "NotifyCenter.h"
 #include "audio.h"
+#include "MainScreen.h"
 
 using namespace gameui;
-
-class PuyoScreen : public Screen {
-  public:
-    PuyoScreen();
-    virtual ~PuyoScreen() {}
-    virtual void build() = 0;
-};
-
-class PuyoMainScreenMenu;
-
-class PuyoMainScreen : public PuyoScreen, public SliderContainerListener {
-  public:
-    PuyoMainScreen(PuyoStoryWidget *fgStory = NULL, PuyoStoryWidget *bgStory = NULL);
-    ~PuyoMainScreen();
-    void pushMenu(PuyoMainScreenMenu *menu, bool fullScreen = false);
-    void popMenu();
-    void build() {}
-    void transitionFromScreen(Screen &fromScreen);
-    void onEvent(GameControlEvent *cevent);
-    // SliderContainerListener implementation
-    /**
-     * Notify that the slider is outside of the screen, before sliding back inside
-     */
-    virtual void onSlideOutside(SliderContainer &slider);
-  protected:
-    void setMenuDimensions();
-    SliderContainer container;
-    PuyoStoryWidget *fgStory, *bgStory;
-    Stack<Widget*> menuStack;
-    Stack<bool> fullScreenStack;
-    PuyoScreenTransitionWidget *transition;
-    bool nextFullScreen;
-};
-
-class PuyoMainScreenMenu : public Frame {
-public:
-    PuyoMainScreenMenu(PuyoMainScreen *mainScreen, GameLoop *loop = NULL);
-    virtual void build() = 0;
-    // Notifications
-    virtual void onMainScreenMenuPushed() {}
-    virtual void onMainScreenMenuPoped() {}
-protected:
-    PuyoMainScreen *mainScreen;
-};
-
-class PuyoPushMenuAction : public Action
-{
-public:
-    PuyoPushMenuAction(PuyoMainScreenMenu *menu, PuyoMainScreen *mainScreen, bool fullScreen = false)
-      : mainScreen(mainScreen), menu(menu), m_fullScreen(fullScreen) {}
-    void action();
-private:
-    PuyoMainScreen *mainScreen;
-    PuyoMainScreenMenu *menu;
-    bool m_fullScreen;
-};
-
-class PuyoPopMenuAction : public Action
-{
-public:
-    PuyoPopMenuAction(PuyoMainScreen *mainScreen) : mainScreen(mainScreen) {}
-    void action();
-private:
-    PuyoMainScreen *mainScreen;
-};
 
 class PuyoCommander : public MessageListener, NotificationResponder
 {
