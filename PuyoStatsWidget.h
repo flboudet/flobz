@@ -125,7 +125,7 @@ class StatsResources {
         ~StatsResources();
 };
 
-class PuyoTwoPlayersStatsWidget : public gameui::HBox, gameui::SliderContainerListener {
+class PuyoTwoPlayersStatsWidget : public gameui::VBox, gameui::SliderContainerListener {
 public:
     PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats, const gameui::FramePicture *framePicture);
     virtual ~PuyoTwoPlayersStatsWidget() {}
@@ -137,7 +137,8 @@ public:
 private:
     StatsResources m_res;
     PuyoStatsFormat m_statsFormat;
-    gameui::SliderContainer m_leftSlider, m_rightSlider, m_legendSlider;
+    gameui::SliderContainer m_topSlider, m_leftSlider, m_rightSlider, m_legendSlider;
+    gameui::Text m_title;
     PuyoStatsLegendWidget m_legend;
     PuyoStatsWidget m_leftStats, m_rightStats;
     SelfVector<Widget*> widgetAutoReleasePool;

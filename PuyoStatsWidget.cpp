@@ -367,7 +367,7 @@ PuyoStatsLegendWidget::PuyoStatsLegendWidget(PuyoStatsFormat &statsFormat, PuyoS
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++) {
         int numCombo = m_statsFormat.m_comboIndirection[i];
         if (numCombo != -1) {
-            String pictureName = theCommander->getDataPathManager().getPath(String("gfx/combo") + ((numCombo+1) == 1 ? 2 : numCombo+1) + String("x.png"));
+            String pictureName = theCommander->getDataPathManager().getPath(String("gfx/combo") + ((numCombo+1) == 1 ? 1 : numCombo+1) + String("x.png"));
             IIM_Surface *comboImage = IIM_Load_Absolute_DisplayFormatAlpha(pictureName);
             m_legendImage[i].setImage(comboImage);
             m_legendCell[i].add(&m_legendImage[i]);
@@ -398,33 +398,42 @@ void PuyoStatsLegendWidget::action(Widget *sender, int actionType, GameControlEv
 
 PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats, const gameui::FramePicture *framePicture)
   : m_statsFormat(leftPlayerStats, rightPlayerStats),
+    m_title("Game Statistics"),
     m_legend(m_statsFormat, m_leftStats, NULL/*framePicture*/),
     m_leftStats(m_statsFormat, leftPlayerStats, rightPlayerStats, NULL, RIGHT_TO_LEFT, &m_legend),
     m_rightStats(m_statsFormat, rightPlayerStats, leftPlayerStats, NULL, LEFT_TO_RIGHT)
 {
-    m_legendSlider.setPreferedSize(Vec3(190., 416.));
+    m_topSlider.setPreferedSize(Vec3(0., 50.));
+    m_legendSlider.setPreferedSize(Vec3(220., 416.));
     m_leftSlider.setPreferedSize(Vec3(0., 416.));
     m_rightSlider.setPreferedSize(Vec3(0., 416.));
+    VBox *topBox = new VBox();
+    topBox->add(&m_topSlider);
+    topBox->setPreferedSize(Vec3(0., 50.));
+    HBox *mainBox = new HBox();
     VBox *v1 = new VBox();
     Separator *sep1 = new Separator();
     v1->add(&m_leftSlider);
     v1->add(sep1);
-    add(v1);
+    mainBox->add(v1);
     VBox *v3 = new VBox();
     Separator *sep3 = new Separator();
     v3->add(&m_legendSlider);
     v3->add(sep3);
-    v3->setPreferedSize(Vec3(190., 0.));
-    add(v3);
+    v3->setPreferedSize(Vec3(220., 0.));
+     mainBox->add(v3);
     VBox *v2 = new VBox();
     Separator *sep2 = new Separator();
     v2->add(&m_rightSlider);
     v2->add(sep2);
-    add(v2);
+    mainBox->add(v2);
+    add(topBox);
+    add(mainBox);
     m_leftSlider.addListener(*this);
     m_legendSlider.addListener(*this);
     m_rightSlider.addListener(*this);
 
+    widgetAutoReleasePool.add(mainBox);
     widgetAutoReleasePool.add(v1);
     widgetAutoReleasePool.add(v2);
     widgetAutoReleasePool.add(v3);
@@ -435,9 +444,11 @@ PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerS
 
 void PuyoTwoPlayersStatsWidget::onWidgetVisibleChanged(bool visible)
 {
+    m_topSlider.setSlideSide(SliderContainer::SLIDE_FROM_TOP);
     m_leftSlider.setSlideSide(SliderContainer::SLIDE_FROM_LEFT);
     m_rightSlider.setSlideSide(SliderContainer::SLIDE_FROM_RIGHT);
-    m_legendSlider.setSlideSide(SliderContainer::SLIDE_FROM_TOP);
+    m_legendSlider.setSlideSide(SliderContainer::SLIDE_FROM_BOTTOM);
+    m_topSlider.transitionToContent(&m_title);
     m_leftSlider.transitionToContent(&m_leftStats);
     m_rightSlider.transitionToContent(&m_rightStats);
     m_legendSlider.transitionToContent(&m_legend);

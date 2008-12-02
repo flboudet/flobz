@@ -16,11 +16,11 @@
  */
 
 /* We're still using SDL datatypes here - we just add some stuff. */
-#include <SDL/SDL.h>
+#include <SDL.h>
 #ifdef MACOSX
 #include <SDL_image/SDL_image.h>
 #else
-#include <SDL/SDL_image.h>
+#include <SDL_image.h>
 #endif
 
 /* Fakes to make glSDL code compile with SDL. */

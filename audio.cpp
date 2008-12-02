@@ -5,11 +5,7 @@
 #define TIMEMS_BETWEEN_SAME_SOUND 10.0
 
 #ifdef USE_AUDIO
-#ifdef MACOSX
 #include <SDL_mixer.h>
-#else
-#include <SDL/SDL_mixer.h>
-#endif
 #endif
 
 #include <vector>
@@ -51,14 +47,14 @@ class Cache
         NameVector   nameVector;
         TMap         tMap;
         LastUseMap   lastUseMap;
-        
+
         double          curTime;
         int          maxT;
 
     public:
         Cache(int maxT) : curTime(0.0), maxT(maxT) {}
 
-        bool contains(const std::string &c) 
+        bool contains(const std::string &c)
         {
             NameVector::iterator it = nameVector.begin();
             while (it != nameVector.end()) {
@@ -74,7 +70,7 @@ class Cache
          *
          * Make sure that "this->contains(c)" is true.
          */
-        T* veryGet(const std::string &c) 
+        T* veryGet(const std::string &c)
         {
             lastUseMap[c] = ios_fc::getTimeMs();
             return tMap[c];
@@ -94,7 +90,7 @@ class Cache
             T* ret = NULL;
             if (nameVector.size() >= (unsigned int)maxT)
                 ret = removeOne();
-            
+
             nameVector.push_back(c);
             tMap[c] = t;
             curTime = ios_fc::getTimeMs();
@@ -113,7 +109,7 @@ class Cache
                     oldest = it;
                 ++it;
             }
-            
+
             T* t = tMap[*oldest];
             tMap.erase(*oldest);
             lastUseMap.erase(*oldest);
@@ -137,7 +133,7 @@ void AudioManager::init()
     if (!audio_supported) return;
 
     Mix_QuerySpec (&audio_rate, &audio_format, &audio_channels);
-    
+
     Mix_AllocateChannels(16);
 
     music_on = GetBoolPreference(kMusic,true);
@@ -165,7 +161,7 @@ AudioManager::AudioManager()
     GlobalNotificationCenter.addListener(String(kSoundVolume), this);
     GlobalNotificationCenter.addListener(String(kMusic), this);
     GlobalNotificationCenter.addListener(String(kSound), this);
-#endif    
+#endif
 }
 
 AudioManager::~AudioManager()
@@ -227,7 +223,7 @@ void AudioManager::clearMusicCache()
 static Mix_Chunk *CustomMix_LoadWAV(const char *fileName, int volume)
 {
     if (!audio_supported) return NULL;
-    
+
     String filePath = theCommander->getDataPathManager().getPath(FilePath("sfx").combine(fileName));
     Mix_Chunk *result;
 
@@ -243,7 +239,7 @@ static Mix_Music *CustomMix_LoadMUS(const char *fileName)
 
     String filePath = theCommander->getDataPathManager().getPath(FilePath("music").combine(fileName));
     Mix_Music *result;
-    
+
     result = Mix_LoadMUS(filePath);
     if (!result)
         printf("Mix_LoadMUS(\"%s\"): %s\n", (const char *)filePath, Mix_GetError());
@@ -373,7 +369,7 @@ void AudioManager::soundOnOff(bool state)
 {
 #ifdef USE_AUDIO
   if ((!audio_supported) || (sound_on == state)) return;
-  
+
   sound_on = state;
 #endif
 }
