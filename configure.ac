@@ -4,11 +4,6 @@
 #######################################################################
 # Configuration                                                       #
 #######################################################################
-ENABLE_AUDIO=true
-#DISABLE_NETWORK?=false
-#ENABLE_OPENGL?=false
-#ENABLE_TTF?=true
-#ENABLE_BENCHMARKS?=false
 
 AC_INIT([flobopuyo], [1.0], [flobo@ios-software.com])
 AC_CANONICAL_BUILD
@@ -18,11 +13,17 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_SRCDIR([main.cpp])
 AC_CONFIG_HEADERS([config.h])
 
-AC_ARG_ENABLE([audio],
-              [AS_HELP_STRING([--enable-audio],
-              [enable audio support @<:@default=yes@:>@])],
-              [ENABLE_AUDIO=true],
-              [ENABLE_AUDIO=false])
+ENABLE_AUDIO=true
+#DISABLE_NETWORK?=false
+#ENABLE_OPENGL?=false
+ENABLE_TTF=true
+#ENABLE_BENCHMARKS?=false
+
+#AC_ARG_ENABLE([audio],
+#              [AS_HELP_STRING([--enable-audio],
+#              [enable audio support @<:@default=yes@:>@])],
+#              [ENABLE_AUDIO=true],
+#              [ENABLE_AUDIO=false])
 
 #######################################################################
 # Checks for programs.                                                #
@@ -73,7 +74,10 @@ AC_SEARCH_LIBS([SDL_Init], [SDL])
 
 ac_link="$LDPREFIX $ac_link"
 AC_SEARCH_LIBS([IMG_Load],
-               [SDL_image], [],
+               [SDL_image], [if test -n "$LDPREFIX" -a -r `$SDL_CONFIG --prefix`/lib/libSDL_image.la
+then SDL_IMAGE_LIBS=`$SDL_CONFIG --prefix`/lib/libSDL_image.la
+else SDL_IMAGE_LIBS=-lSDL_image
+fi],
 	       [AC_MSG_ERROR([*** SDL_image lib not found! Get SDL_image from
 http://www.libsdl.org/projects/SDL_image/index.html])])
 
@@ -173,7 +177,15 @@ AC_FUNC_STAT
 AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([floor socket strtoul])
 
+AC_CHECK_MEMBERS([struct sockaddr.sa_len], , ,
+  ['#include <sys/types.h>
+    #include <sys/socket.h>'])
+
 # Checks for header files.
+
+#######################################################################
+# Automake conditionals                                               #
+#######################################################################
 
 # Features summary
 if test "x$ENABLE_AUDIO" = "xtrue"; then
@@ -183,6 +195,18 @@ else
   AC_MSG_RESULT([Audio Disabled])
 fi
 
+if test "x$ENABLE_TTF" = "xtrue"; then
+  AC_MSG_RESULT([TTF Enabled])
+  FPFEATURES="$FPFEATURES -DENABLE_TTF=1"
+else
+  AC_MSG_RESULT([TTF Disabled])
+fi
+
+case $host_os in
+   darwin*)
+       MACOSX=true
+esac
+AM_CONDITIONAL([MACOSX], [test x$MACOSX = xtrue])
 
 AC_SUBST([FPFEATURES])
 

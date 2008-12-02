@@ -1,7 +1,7 @@
 /**
- * iosfc::NetworkInterfaceRequester: Class to request a list of 
+ * iosfc::NetworkInterfaceRequester: Class to request a list of
  * or an IgpVirtualPeerMessageBox
- * 
+ *
  * This file is part of the iOS Foundation Classes project.
  *
  * authors:
@@ -23,7 +23,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
  */
- 
+
+#include "config.h"
 #include "ios_networkinterfacerequester.h"
 #include <stdio.h>
 #include "ios_datagramsocket.h"
@@ -56,11 +57,11 @@ vector<NetworkInterface> UnixNetworkInterfaceRequesterImpl::getInterfaces()
     char buf[sizeof(struct ifreq)*MAX_IFS];
     ifc.ifc_len = sizeof( buf );
     ifc.ifc_buf = (caddr_t)buf;
-    
+
     ios_fc::DatagramSocket toto;
     ios_fc::UnixDatagramSocketImpl &impl = dynamic_cast<ios_fc::UnixDatagramSocketImpl &>(toto.getImpl());
     ioctl(impl.getFd(), SIOCGIFCONF, (caddr_t)&ifc);
-    
+
     ifreq *curIf = (ifreq *)(ifc.ifc_buf);
     int remaining = ifc.ifc_len;
 
@@ -69,10 +70,10 @@ vector<NetworkInterface> UnixNetworkInterfaceRequesterImpl::getInterfaces()
         if (addr->sin_family == AF_INET) {
             result.push_back(NetworkInterface(String(curIf->ifr_name), SocketAddress(inet_ntoa(addr->sin_addr))));
         }
-#ifdef LINUX
-        int current = sizeof(ifreq);
-#else
+#ifdef HAVE_STRUCT_SOCKADDR_SA_LEN
         int current = curIf->ifr_addr.sa_len + IFNAMSIZ;
+#else
+        int current = sizeof(ifreq);
 #endif
         curIf = (struct ifreq *)( ((char *)curIf)+current );
         remaining -= current;

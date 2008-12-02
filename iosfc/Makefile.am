@@ -8,6 +8,7 @@ libiosfc_a_SOURCES=ios_exception.cpp ios_stream.cpp ios_hash.cpp ios_memory.cpp 
             ios_igpmessagelistener.cpp ios_igpvirtualpeermessagebox.cpp ios_selector.cpp \
             ios_filepath.cpp ios_networkinterfacerequester.cpp
 
+libiosfc_a_CXXFLAGS = $(AM_CXXFLAGS)
 #libgametools_a_CXXFLAGS = -I../iosfc $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 
 # SUBDIRS = iosfc gametools goomsl

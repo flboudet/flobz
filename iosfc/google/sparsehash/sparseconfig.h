@@ -1,9 +1,13 @@
+/*
+ * NOTE: This file is for internal use only.
+ *       Do not use these #defines in your own program!
+ */
 
 /* Namespace for Google classes */
-#define GOOGLE_NAMESPACE google
+#define GOOGLE_NAMESPACE ::google
 
 /* the location of <hash_fun.h>/<stl_hash_fun.h> */
-#define HASH_FUN_H <ext/hash_fun.h>
+#define HASH_FUN_H <hash_fun.h>
 
 /* the namespace of hash_map/hash_set */
 #define HASH_NAMESPACE __gnu_cxx
