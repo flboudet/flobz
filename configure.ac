@@ -68,37 +68,27 @@ else
     fi
 fi
 OLD_LIBS=$LIBS
-LIBS="$LIBS $SDL_LIBS"
+LIBS="$SDL_LIBS"
 
 AC_SEARCH_LIBS([SDL_Init], [SDL])
 
 ac_link="$LDPREFIX $ac_link"
 AC_SEARCH_LIBS([IMG_Load],
-               [SDL_image], [if test -n "$LDPREFIX" -a -r `$SDL_CONFIG --prefix`/lib/libSDL_image.la
-then SDL_IMAGE_LIBS=`$SDL_CONFIG --prefix`/lib/libSDL_image.la
-else SDL_IMAGE_LIBS=-lSDL_image
-fi],
+               [SDL_image],,
 	       [AC_MSG_ERROR([*** SDL_image lib not found! Get SDL_image from
 http://www.libsdl.org/projects/SDL_image/index.html])])
 
 AC_SEARCH_LIBS([Mix_OpenAudio],
-               [SDL_mixer],
-	          [if test -n "$LDPREFIX" -a -r `$SDL_CONFIG --prefix`/lib/libSDL_mixer.la
-then SDL_MIXER_LIBS=`$SDL_CONFIG --prefix`/lib/libSDL_mixer.la
-else SDL_MIXER_LIBS=-lSDL_mixer
-fi],
+               [SDL_mixer],,
 	     [AC_MSG_ERROR([*** SDL_mixer lib not found! Get SDL_mixer from
 http://www.libsdl.org/projects/SDL_mixer/index.html])])
 
 AC_SEARCH_LIBS([TTF_Init],
-               [SDL_ttf],
-	          [if test -n "$LDPREFIX" -a -r `$SDL_CONFIG --prefix`/lib/libSDL_ttf.la
-then SDL_TTF_LIBS=`$SDL_CONFIG --prefix`/lib/libSDL_ttf.la
-else SDL_TTF_LIBS=-lSDL_ttf
-fi],
+               [SDL_ttf],,
 	     [AC_MSG_ERROR([*** SDL_ttf lib not found! Get SDL_ttf from
 http://www.libsdl.org/projects/SDL_ttf/index.html])])
 
+SDL_LIBS=$LIBS
 LIBS=$OLD_LIBS
 
 AC_SUBST([SDL_LIBS])
