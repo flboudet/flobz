@@ -41,7 +41,7 @@ PuyoTwoPlayersGameWidget::PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThe
     setLives(-1);
 }
 
-PuyoStoryWidget *PuyoTwoPlayersGameWidget::getOpponent()
+StoryWidget *PuyoTwoPlayersGameWidget::getOpponent()
 {
     return &opponentFace;
 }
@@ -115,12 +115,12 @@ void TwoPlayersStarterAction::startGame()
 void TwoPlayersStarterAction::gameOver()
 {
     if (gameWidget->isGameARunning()) {
-        gameLostWidget = new PuyoStoryWidget(currentLevelTheme->getGameLostRightAnimation2P(), this);
+        gameLostWidget = new StoryWidget(currentLevelTheme->getGameLostRightAnimation2P(), this);
         leftVictories++;
 	m_state = kMatchWonP1Animation;
     }
     else {
-        gameLostWidget = new PuyoStoryWidget(currentLevelTheme->getGameLostLeftAnimation2P(), this);
+        gameLostWidget = new StoryWidget(currentLevelTheme->getGameLostLeftAnimation2P(), this);
         rightVictories++;
 	m_state = kMatchWonP2Animation;
     }
@@ -176,7 +176,7 @@ void TwoPlayersStarterAction::restartGame()
 void TwoPlayersStarterAction::endGameSession()
 {
     GameUIDefaults::SCREEN_STACK->pop();
-    PuyoMainScreen *menuScreen = dynamic_cast<PuyoMainScreen *>(GameUIDefaults::SCREEN_STACK->top());
+    MainScreen *menuScreen = dynamic_cast<MainScreen *>(GameUIDefaults::SCREEN_STACK->top());
     if (menuScreen != NULL)
         menuScreen->transitionFromScreen(*gameScreen);
         

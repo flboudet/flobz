@@ -78,7 +78,7 @@ void PuyoSinglePlayerGameWidget::cycle()
     PuyoGameWidget::cycle();
 }
 
-PuyoStoryWidget *PuyoSinglePlayerGameWidget::getOpponent()
+StoryWidget *PuyoSinglePlayerGameWidget::getOpponent()
 {
     return &opponent;
 }
@@ -240,7 +240,7 @@ GameOptions PuyoSingleGameLevelData::getGameOptions() const
 
 PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousScreen,
         Action *finishedAction, String playerName, const PlayerGameStat &playerPoints, bool initialTransition)
-        : PuyoStoryScreen(screenName, previousScreen, finishedAction, initialTransition),
+        : StoryScreen(screenName, previousScreen, finishedAction, initialTransition),
         playerName(playerName), playerStat(playerPoints)
 {
     static const char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
@@ -290,7 +290,7 @@ PuyoGameOver1PScreen::~PuyoGameOver1PScreen()
 {
 }
 
-SinglePlayerStarterAction::SinglePlayerStarterAction(PuyoMainScreen *mainScreen, int difficulty, PuyoSingleNameProvider *nameProvider)
+SinglePlayerStarterAction::SinglePlayerStarterAction(MainScreen *mainScreen, int difficulty, PuyoSingleNameProvider *nameProvider)
     : m_mainScreen(mainScreen),
       m_state(kGameNotStarted),
       m_nameProvider(nameProvider),
@@ -382,7 +382,7 @@ void SinglePlayerStarterAction::performEndOfMatch()
 void SinglePlayerStarterAction::performGameWon()
 {
     m_state = kGameWon;
-    m_gameWonScreen = new PuyoStoryScreen("gamewon_1p.gsl", *(GameUIDefaults::SCREEN_STACK->top()), this);
+    m_gameWonScreen = new StoryScreen("gamewon_1p.gsl", *(GameUIDefaults::SCREEN_STACK->top()), this);
     GameUIDefaults::SCREEN_STACK->pop();
     GameUIDefaults::SCREEN_STACK->push(m_gameWonScreen);
     if (m_currentMatch != NULL) {
@@ -484,7 +484,7 @@ void SinglePlayerMatch::action(Widget *sender, int actionType,
 
 void SinglePlayerMatch::performStoryIntroduction()
 {
-  m_introStory = new PuyoStoryScreen(m_levelData->getIntroStory(),
+  m_introStory = new StoryScreen(m_levelData->getIntroStory(),
 			*(GameUIDefaults::SCREEN_STACK->top()), this);
   if (m_popScreen)
     GameUIDefaults::SCREEN_STACK->pop();
@@ -494,7 +494,7 @@ void SinglePlayerMatch::performStoryIntroduction()
 
 void SinglePlayerMatch::performOpponentStory()
 {
-  m_opponentStory = new PuyoStoryScreen(m_levelData->getStory(),
+  m_opponentStory = new StoryScreen(m_levelData->getStory(),
                          *(GameUIDefaults::SCREEN_STACK->top()), this);
   // If we went from an introduction story, remove it from display
   if (m_introStory != NULL)
@@ -543,7 +543,7 @@ void SinglePlayerMatch::performEndOfMatch()
 
 void SinglePlayerMatch::performMatchLostAnimation()
 {
-  m_matchLostAnimation = new PuyoStoryWidget(m_levelData->getGameLostStory(),
+  m_matchLostAnimation = new StoryWidget(m_levelData->getGameLostStory(),
 					    this);
   m_gameScreen->setOverlayStory(m_matchLostAnimation);
   m_state = kMatchLostAnimation;

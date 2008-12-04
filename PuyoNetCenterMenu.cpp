@@ -185,9 +185,9 @@ String NetCenterTwoNameProvider::getPlayer2Name() const
     return netCenter.getOpponentName();
 }
 
-NetCenterMenu::NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netCenter,
+NetCenterMenu::NetCenterMenu(MainScreen *mainScreen, PuyoNetGameCenter *netCenter,
                              String title, GameLoop *loop)
-    : PuyoMainScreenMenu(mainScreen, loop),
+    : MainScreenMenu(mainScreen, loop),
       upArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png"))),
       downArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png"))),
       topFrame(theCommander->getWindowFramePicture()),
@@ -329,7 +329,7 @@ void NetCenterMenu::onGameInvitationReceived(PuyoGameInvitation &invitation)
 
 void NetCenterMenu::eventOccured(GameControlEvent *event)
 {
-    PuyoMainScreenMenu::eventOccured(event);
+    MainScreenMenu::eventOccured(event);
     // We intercept the back event so it will be impossible
     // to go to the previous menu by hitting the back button.
     // (otherwise, it's too easy to disconnect by mistake)

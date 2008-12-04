@@ -36,9 +36,9 @@
 #include "PuyoInternetGameCenter.h"
 
 
-class LANGameMenu : public PuyoMainScreenMenu {
+class LANGameMenu : public MainScreenMenu {
 public:
-    LANGameMenu(PuyoMainScreen * mainScreen);
+    LANGameMenu(MainScreen * mainScreen);
     void build();
 private:
     Frame titleFrame;
@@ -51,16 +51,16 @@ private:
 
 class NetworkInternetAction : public Action {
 public:
-    NetworkInternetAction(PuyoMainScreen * mainScreen, InternetGameMenu **menuToCreate) : mainScreen(mainScreen), menuToCreate(menuToCreate) {}
+    NetworkInternetAction(MainScreen * mainScreen, InternetGameMenu **menuToCreate) : mainScreen(mainScreen), menuToCreate(menuToCreate) {}
     void action();
 private:
-    PuyoMainScreen * mainScreen;
+    MainScreen * mainScreen;
     InternetGameMenu **menuToCreate;
 };
 
-class NetworkGameMenu : public PuyoMainScreenMenu {
+class NetworkGameMenu : public MainScreenMenu {
 public:
-    NetworkGameMenu(PuyoMainScreen * mainScreen);
+    NetworkGameMenu(MainScreen * mainScreen);
     void build();
 private:
     PuyoLocalizedDictionary locale;

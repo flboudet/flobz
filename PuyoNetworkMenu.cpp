@@ -36,7 +36,7 @@ using namespace ios_fc;
 class PushLanNetCenterMenuAction : public Action
 {
 public:
-    PushLanNetCenterMenuAction(PuyoMainScreen * mainScreen, EditField *serverPort, EditField *userName)
+    PushLanNetCenterMenuAction(MainScreen * mainScreen, EditField *serverPort, EditField *userName)
         : mainScreen(mainScreen), serverPort(serverPort), userName(userName) {}
     
     void action()
@@ -49,15 +49,15 @@ public:
         mainScreen->pushMenu(newNetCenterMenu, true);
     }
 private:
-    PuyoMainScreen * mainScreen;
+    MainScreen * mainScreen;
     EditField *serverPort;
     EditField *userName;
 };
 
 #include "PuyoGame.h"
 
-LANGameMenu::LANGameMenu(PuyoMainScreen * mainScreen)
-  : PuyoMainScreenMenu(mainScreen),
+LANGameMenu::LANGameMenu(MainScreen * mainScreen)
+  : MainScreenMenu(mainScreen),
     titleFrame(theCommander->getSeparatorFramePicture()),
     lanTitle(theCommander->getLocalizedString("LAN Game")),
     playerNameLabel(theCommander->getLocalizedString("Player name:"),
@@ -95,8 +95,8 @@ void NetworkInternetAction::action()
 }
 
 
-NetworkGameMenu::NetworkGameMenu(PuyoMainScreen * mainScreen)
-    : PuyoMainScreenMenu(mainScreen),
+NetworkGameMenu::NetworkGameMenu(MainScreen * mainScreen)
+    : MainScreenMenu(mainScreen),
       locale(theCommander->getDataPathManager(), "locale", "main"),
       lanGameMenu(mainScreen),
       internetGameMenu(NULL), internetAction(mainScreen, &internetGameMenu),

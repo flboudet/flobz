@@ -61,7 +61,7 @@ public:
     virtual bool backPressed();
     virtual bool startPressed();
     virtual void abort();
-    void setOverlayStory(PuyoStoryWidget *story);
+    void setOverlayStory(StoryWidget *story);
     /**
      * Sets the game to paused
      * @param fromControls true if the action leading to the pause comes
@@ -94,7 +94,7 @@ private:
     PuyoPauseMenu pauseMenu;
     PuyoGameWidget &gameWidget;
     PuyoScreenTransitionWidget transitionWidget;
-    PuyoStoryWidget *overlayStory;
+    StoryWidget *overlayStory;
 };
 
 class PuyoTwoPlayerGameWidget : public PuyoGameWidget {

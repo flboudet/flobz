@@ -85,7 +85,7 @@ public:
     String getPlayerOneName() const { return playerOneName; }
     PlayerGameStat &getStatPlayerOne() { return attachedGameA->getGameStat(); }
     PlayerGameStat &getStatPlayerTwo() { return attachedGameB->getGameStat(); }
-    virtual PuyoStoryWidget *getOpponent() { return NULL; }
+    virtual StoryWidget *getOpponent() { return NULL; }
     virtual std::vector<PuyoFX*> &getPuyoFX() { return puyoFX; }
     void addGameAHandicap(int handicap) {attachedGameA->increaseNeutralPuyos((handicap>10?10:handicap) * PUYODIMX); attachedGameA->dropNeutrals();}
     void addGameBHandicap(int handicap) {attachedGameB->increaseNeutralPuyos((handicap>10?10:handicap) * PUYODIMX); attachedGameB->dropNeutrals();}

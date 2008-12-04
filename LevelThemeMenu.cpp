@@ -269,8 +269,8 @@ void LevelThemePreview::themeSelected(String themeName)
 
 /*****************************************************************************/
 
-LevelThemeMenu::LevelThemeMenu(PuyoMainScreen *mainScreen)
-    : PuyoMainScreenMenu(mainScreen),
+LevelThemeMenu::LevelThemeMenu(MainScreen *mainScreen)
+    : MainScreenMenu(mainScreen),
       screenTitleFrame(theCommander->getSeparatorFramePicture()),
       themeMenuTitle(theCommander->getLocalizedString("Level theme")), popAction(mainScreen),
       backButton(theCommander->getLocalizedString("Back"), &popAction), 

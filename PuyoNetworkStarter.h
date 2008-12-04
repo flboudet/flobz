@@ -74,7 +74,7 @@ private:
     // Chat zone
     ChatBox chatBox;
     // Network broken animation
-    PuyoStoryWidget brokenNetworkWidget;
+    StoryWidget brokenNetworkWidget;
     bool networkIsBroken;
 };
 

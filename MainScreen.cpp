@@ -19,7 +19,7 @@ using namespace gameui;
 
 PuyoScreen::PuyoScreen() : Screen(0,0,WIDTH,HEIGHT) {}
 
-PuyoMainScreen::PuyoMainScreen(PuyoStoryWidget *fgStory, PuyoStoryWidget *bgStory)
+MainScreen::MainScreen(StoryWidget *fgStory, StoryWidget *bgStory)
     : fgStory(fgStory), bgStory(bgStory), transition(NULL), nextFullScreen(false)
 {
     if (bgStory != NULL)
@@ -32,14 +32,14 @@ PuyoMainScreen::PuyoMainScreen(PuyoStoryWidget *fgStory, PuyoStoryWidget *bgStor
     container.addListener(*this);
 }
 
-PuyoMainScreen::~PuyoMainScreen()
+MainScreen::~MainScreen()
 {
     if (transition != NULL) {
         delete(transition);
     }
 }
 
-void PuyoMainScreen::pushMenu(PuyoMainScreenMenu *menu, bool fullScreen)
+void MainScreen::pushMenu(MainScreenMenu *menu, bool fullScreen)
 {
     menuStack.push(container.getContentWidget());
     fullScreenStack.push(fullScreen);
@@ -49,7 +49,7 @@ void PuyoMainScreen::pushMenu(PuyoMainScreenMenu *menu, bool fullScreen)
         fgStory->setIntegerValue("@inNetGameCenter", fullScreen ? 1 : 0);
 }
 
-void PuyoMainScreen::popMenu()
+void MainScreen::popMenu()
 {
     if (menuStack.size() == 1)
         return;
@@ -59,7 +59,7 @@ void PuyoMainScreen::popMenu()
     menuStack.pop();
 }
 
-void PuyoMainScreen::transitionFromScreen(Screen &fromScreen)
+void MainScreen::transitionFromScreen(Screen &fromScreen)
 {
     if (transition != NULL) {
         remove(transition);
@@ -70,7 +70,7 @@ void PuyoMainScreen::transitionFromScreen(Screen &fromScreen)
     setMenuDimensions();
 }
 
-void PuyoMainScreen::onEvent(GameControlEvent *cevent)
+void MainScreen::onEvent(GameControlEvent *cevent)
 {
     PuyoScreen::onEvent(cevent);
 	if (cevent->caught != false)
@@ -88,12 +88,12 @@ void PuyoMainScreen::onEvent(GameControlEvent *cevent)
     }
 }
 
-void PuyoMainScreen::onSlideOutside(SliderContainer &slider)
+void MainScreen::onSlideOutside(SliderContainer &slider)
 {
     setMenuDimensions();
 }
 
-void PuyoMainScreen::setMenuDimensions()
+void MainScreen::setMenuDimensions()
 {
 	Vec3 menuPos;
     if (nextFullScreen) {
@@ -116,7 +116,7 @@ void PuyoMainScreen::setMenuDimensions()
     }
 }
 
-PuyoMainScreenMenu::PuyoMainScreenMenu(PuyoMainScreen *mainScreen, GameLoop *loop)
+MainScreenMenu::MainScreenMenu(MainScreen *mainScreen, GameLoop *loop)
   : Frame(theCommander->getWindowFramePicture(), loop),
     mainScreen(mainScreen)
 {

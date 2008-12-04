@@ -16,7 +16,7 @@ class HallOfFameScreen : public PuyoGameOver1PScreen {
 class PopToMainScreenAction : public Action
 {
     public:
-        PopToMainScreenAction(PuyoMainScreen *mainScreen, Screen *fromScreen = NULL)
+        PopToMainScreenAction(MainScreen *mainScreen, Screen *fromScreen = NULL)
             : mainScreen(mainScreen), fromScreen(fromScreen)
         {}
         void action() {
@@ -27,7 +27,7 @@ class PopToMainScreenAction : public Action
             fromScreen = screen;
         }
     private:
-        PuyoMainScreen *mainScreen;
+        MainScreen *mainScreen;
         Screen *fromScreen;
 };
 
@@ -52,7 +52,7 @@ class PushHallOfFameAction : public Action
 class PushStoryScreenAction : public Action
 {
     public:
-        PushStoryScreenAction(PuyoStoryScreen *storyScreen, Screen *fromScreen)
+        PushStoryScreenAction(StoryScreen *storyScreen, Screen *fromScreen)
             : storyScreen(storyScreen), fromScreen(fromScreen)
         {}
         void action() {
@@ -60,7 +60,7 @@ class PushStoryScreenAction : public Action
             GameUIDefaults::SCREEN_STACK->push(storyScreen);
         }
     private:
-        PuyoStoryScreen *storyScreen;
+        StoryScreen *storyScreen;
         Screen *fromScreen;
 };
 

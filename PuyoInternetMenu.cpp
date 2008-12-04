@@ -243,8 +243,8 @@ private:
     int portNum;
 };
 
-InternetGameMenu::InternetGameMenu(PuyoMainScreen * mainScreen)
-  : PuyoMainScreenMenu(mainScreen),
+InternetGameMenu::InternetGameMenu(MainScreen * mainScreen)
+  : MainScreenMenu(mainScreen),
     screenTitleFrame(theCommander->getSeparatorFramePicture()),
     internetGameText(theCommander->getLocalizedString("Internet Game")), 
     upArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png"))),

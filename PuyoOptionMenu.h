@@ -50,9 +50,9 @@ public:
     FSPrefSwitch();
 };
 
-class OptionMenu : public PuyoMainScreenMenu {
+class OptionMenu : public MainScreenMenu {
 public:
-    OptionMenu(PuyoMainScreen *mainScreen);
+    OptionMenu(MainScreen *mainScreen);
     void build();
 private:
     Frame screenTitleFrame;

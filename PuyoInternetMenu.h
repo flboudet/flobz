@@ -143,9 +143,9 @@ private:
 };
 
 
-class InternetGameMenu : public PuyoMainScreenMenu, public IdleComponent, public Action, public PuyoServerListResponder {
+class InternetGameMenu : public MainScreenMenu, public IdleComponent, public Action, public PuyoServerListResponder {
 public:
-    InternetGameMenu(PuyoMainScreen * mainScreen);
+    InternetGameMenu(MainScreen * mainScreen);
     virtual ~InternetGameMenu();
     void build();
     virtual void action(Widget *sender, int actionType, GameControlEvent *event);

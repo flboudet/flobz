@@ -39,14 +39,14 @@ class PuyoTwoPlayersGameWidget : public PuyoGameWidget {
 public:
     PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String aiFace, Action *gameOverAction = NULL);
     bool didPlayerWon() const { return isGameARunning(); }
-    PuyoStoryWidget *getOpponent();
+    StoryWidget *getOpponent();
 private:
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;
     PuyoLocalGameFactory attachedGameFactory;
     PuyoView areaA, areaB;
     PuyoEventPlayer playercontrollerA, playercontrollerB;
-    PuyoStoryWidget opponentFace;
+    StoryWidget opponentFace;
 };
 
 
@@ -95,7 +95,7 @@ private:
     PuyoGameScreen *gameScreen;
     PuyoGameWidget *gameWidget;
     PuyoTwoNameProvider *nameProvider;
-    PuyoStoryWidget *gameLostWidget;
+    StoryWidget *gameLostWidget;
     
     PuyoLevelTheme *currentLevelTheme;
     int leftVictories, rightVictories;

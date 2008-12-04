@@ -116,9 +116,9 @@ private:
     PuyoNetGameCenter &netCenter;
 };
 
-class NetCenterMenu : public PuyoMainScreenMenu, PuyoNetGameCenterListener, ChatBoxDelegate {
+class NetCenterMenu : public MainScreenMenu, PuyoNetGameCenterListener, ChatBoxDelegate {
 public:
-    NetCenterMenu(PuyoMainScreen *mainScreen, PuyoNetGameCenter *netCenter,
+    NetCenterMenu(MainScreen *mainScreen, PuyoNetGameCenter *netCenter,
                   String title, GameLoop *loop = NULL);
     ~NetCenterMenu();
     virtual void build();

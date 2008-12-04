@@ -237,8 +237,8 @@ void PuyoThemePreview::themeSelected(String themeName)
 
 /*****************************************************************************/
 
-PuyoThemeMenu::PuyoThemeMenu(PuyoMainScreen *mainScreen)
-    : PuyoMainScreenMenu(mainScreen),
+PuyoThemeMenu::PuyoThemeMenu(MainScreen *mainScreen)
+    : MainScreenMenu(mainScreen),
       screenTitleFrame(theCommander->getSeparatorFramePicture()),
       themeMenuTitle(theCommander->getLocalizedString("Puyo theme")), popAction(mainScreen),
       backButton(theCommander->getLocalizedString("Back"), &popAction),

@@ -68,7 +68,7 @@ class PuyoCommander : public MessageListener, NotificationResponder
     MessageBox *mbox;
     GameLoop   *loop;
 
-    PuyoMainScreen *mainScreen;
+    MainScreen *mainScreen;
     GameCursor *cursor;
     PuyoLocalizedDictionary * locale;
     

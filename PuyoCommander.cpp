@@ -40,7 +40,7 @@ void SinglePlayerGameAction::action()
 void PuyoCommander::debug_gsl(String gsl_script)
 {
   GameUIDefaults::SCREEN_STACK->push(mainScreen);
-  PuyoStoryScreen story_screen(gsl_script);
+  StoryScreen story_screen(gsl_script);
   GameUIDefaults::SCREEN_STACK->push(&story_screen);
   GameUIDefaults::GAME_LOOP->run();
 }
@@ -56,9 +56,9 @@ void PuyoCommander::initMenus()
   DBG_PRINT("initMenus()\n");
   //
   // Create the structures.
-  PuyoStoryWidget *fgStory = new PuyoStoryWidget("title_fg.gsl");
-  PuyoStoryWidget *bgStory = new PuyoStoryWidget("title_bg.gsl");
-  mainScreen = new PuyoMainScreen(fgStory, bgStory);
+  StoryWidget *fgStory = new StoryWidget("title_fg.gsl");
+  StoryWidget *bgStory = new StoryWidget("title_bg.gsl");
+  mainScreen = new MainScreen(fgStory, bgStory);
   MainRealMenu *trubudu = new MainRealMenu(mainScreen);
   trubudu->build();
   mainScreen->pushMenu(trubudu);

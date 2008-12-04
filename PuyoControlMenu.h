@@ -6,18 +6,18 @@
 #include "Frame.h"
 #include "FramedButton.h"
 
-class ControlMenu : public PuyoMainScreenMenu {
+class ControlMenu : public MainScreenMenu {
 public:
-    ControlMenu(PuyoMainScreen *mainScreen);
+    ControlMenu(MainScreen *mainScreen);
     void build();
 private:
     class BackSaveAction : public Action
     {
     public:
-        BackSaveAction(PuyoMainScreen *mainScreen) : mainScreen(mainScreen) {}
+        BackSaveAction(MainScreen *mainScreen) : mainScreen(mainScreen) {}
         void action();
     private:
-        PuyoMainScreen *mainScreen;
+        MainScreen *mainScreen;
     };
     Frame screenTitleFrame;
     Frame playerOneTitleFrame, playerTwoTitleFrame;

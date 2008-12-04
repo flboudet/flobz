@@ -153,7 +153,7 @@ void PuyoGameScreen::abort()
     gameWidget.abort();
 }
 
-void PuyoGameScreen::setOverlayStory(PuyoStoryWidget *story)
+void PuyoGameScreen::setOverlayStory(StoryWidget *story)
 {
   overlayStory = story;
   this->add(story);

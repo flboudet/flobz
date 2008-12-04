@@ -21,13 +21,13 @@ class PuyoScreen : public gameui::Screen {
     virtual void build() = 0;
 };
 
-class PuyoMainScreenMenu;
+class MainScreenMenu;
 
-class PuyoMainScreen : public PuyoScreen, public gameui::SliderContainerListener {
+class MainScreen : public PuyoScreen, public gameui::SliderContainerListener {
   public:
-    PuyoMainScreen(PuyoStoryWidget *fgStory = NULL, PuyoStoryWidget *bgStory = NULL);
-    ~PuyoMainScreen();
-    void pushMenu(PuyoMainScreenMenu *menu, bool fullScreen = false);
+    MainScreen(StoryWidget *fgStory = NULL, StoryWidget *bgStory = NULL);
+    ~MainScreen();
+    void pushMenu(MainScreenMenu *menu, bool fullScreen = false);
     void popMenu();
     void build() {}
     void transitionFromScreen(Screen &fromScreen);
@@ -40,43 +40,43 @@ class PuyoMainScreen : public PuyoScreen, public gameui::SliderContainerListener
   protected:
     void setMenuDimensions();
     SliderContainer container;
-    PuyoStoryWidget *fgStory, *bgStory;
+    StoryWidget *fgStory, *bgStory;
     Stack<Widget*> menuStack;
     Stack<bool> fullScreenStack;
     PuyoScreenTransitionWidget *transition;
     bool nextFullScreen;
 };
 
-class PuyoMainScreenMenu : public gameui::Frame {
+class MainScreenMenu : public gameui::Frame {
 public:
-    PuyoMainScreenMenu(PuyoMainScreen *mainScreen, GameLoop *loop = NULL);
+    MainScreenMenu(MainScreen *mainScreen, GameLoop *loop = NULL);
     virtual void build() = 0;
     // Notifications
     virtual void onMainScreenMenuPushed() {}
     virtual void onMainScreenMenuPoped() {}
 protected:
-    PuyoMainScreen *mainScreen;
+    MainScreen *mainScreen;
 };
 
 class PuyoPushMenuAction : public Action
 {
 public:
-    PuyoPushMenuAction(PuyoMainScreenMenu *menu, PuyoMainScreen *mainScreen, bool fullScreen = false)
+    PuyoPushMenuAction(MainScreenMenu *menu, MainScreen *mainScreen, bool fullScreen = false)
       : mainScreen(mainScreen), menu(menu), m_fullScreen(fullScreen) {}
     void action();
 private:
-    PuyoMainScreen *mainScreen;
-    PuyoMainScreenMenu *menu;
+    MainScreen *mainScreen;
+    MainScreenMenu *menu;
     bool m_fullScreen;
 };
 
 class PuyoPopMenuAction : public Action
 {
 public:
-    PuyoPopMenuAction(PuyoMainScreen *mainScreen) : mainScreen(mainScreen) {}
+    PuyoPopMenuAction(MainScreen *mainScreen) : mainScreen(mainScreen) {}
     void action();
 private:
-    PuyoMainScreen *mainScreen;
+    MainScreen *mainScreen;
 };
 
 #endif // _MAIN_SCREEN_H_

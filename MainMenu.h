@@ -33,9 +33,9 @@ class SinglePlayerGameAction : public Action {
 /// Main menu of the game
 ///
 /// Contains buttons for 1P,2P,Option and Network menus.
-class MainRealMenu : public PuyoMainScreenMenu {
+class MainRealMenu : public MainScreenMenu {
 public:
-    MainRealMenu(PuyoMainScreen * mainScreen);
+    MainRealMenu(MainScreen * mainScreen);
     void build();
 
 private:
@@ -46,7 +46,7 @@ private:
 
     PopToMainScreenAction popFromHallScreenAction, popFromCreditsAction;
     HallOfFameScreen      hallOfFameScreen; // Comes from PuyoSinglePlayerStarter.cpp
-    PuyoStoryScreen       creditsScreen;
+    StoryScreen       creditsScreen;
     PuyoPushMenuAction    singlePlayerGameAction;
     PuyoPushMenuAction    twoPlayersGameAction;
     PuyoPushMenuAction    optionAction;

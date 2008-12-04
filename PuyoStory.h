@@ -42,10 +42,10 @@ using namespace gameui;
 
 class PuyoCommander;
 
-class PuyoStoryWidget : public Widget, public /*Cycled*/IdleComponent {
+class StoryWidget : public Widget, public /*Cycled*/IdleComponent {
 public:
-    PuyoStoryWidget(String screenName, Action *finishedAction = NULL, bool fxMode = false);
-    ~PuyoStoryWidget();
+    StoryWidget(String screenName, Action *finishedAction = NULL, bool fxMode = false);
+    ~StoryWidget();
     // void cycle();
     void idle(double currentTime);
     void draw(SDL_Surface *screen);
@@ -56,7 +56,7 @@ public:
 
     struct PuyoStoryStyrolyseClient {
         StyrolyseClient styroClient;
-        PuyoStoryWidget *widget;
+        StoryWidget *widget;
     };
 protected:
 
@@ -70,7 +70,7 @@ protected:
     double last_time;
 };
 
-class PuyoFX : public PuyoStoryWidget {
+class PuyoFX : public StoryWidget {
 public:
     PuyoFX(String fxName);
     void postEvent(const char *name, float x, float y, int player);
@@ -85,20 +85,20 @@ private:
     PuyoGameScreen *screen;
 };
 
-class PuyoStoryScreen : public Screen {
+class StoryScreen : public Screen {
 public:
-    PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction = NULL, bool shouldAddTransition = true);
-    PuyoStoryScreen(String screenName);
-    virtual ~PuyoStoryScreen();
+    StoryScreen(String screenName, Screen &previousScreen, Action *finishedAction = NULL, bool shouldAddTransition = true);
+    StoryScreen(String screenName);
+    virtual ~StoryScreen();
     void onEvent(GameControlEvent *cevent);
     void transitionFromScreen(Screen &fromScreen);
     /* Notification on screen visibility change
      * @param visible  true if the scren is visible, otherwise false
      */
     virtual void onScreenVisibleChanged(bool visible);
-    const PuyoStoryWidget * getStoryWidget() const { return &storyWidget; }
+    const StoryWidget * getStoryWidget() const { return &storyWidget; }
 protected:
-    PuyoStoryWidget storyWidget;
+    StoryWidget storyWidget;
     PuyoScreenTransitionWidget *transitionWidget;
 private:
     Action *finishedAction;

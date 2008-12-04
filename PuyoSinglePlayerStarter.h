@@ -44,7 +44,7 @@ public:
     virtual ~PuyoSinglePlayerGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
-    PuyoStoryWidget *getOpponent();
+    StoryWidget *getOpponent();
     /**
      * Implements the Action interface
      */
@@ -58,7 +58,7 @@ private:
     PuyoCombinedEventPlayer playercontroller;
     PuyoIA opponentcontroller;
     int faceTicks;
-    PuyoStoryWidget opponent;
+    StoryWidget opponent;
     PuyoCheatCodeManager killLeftCheat, killRightCheat;
 };
 
@@ -127,7 +127,7 @@ private:
     PuyoLevelTheme *levelThemeToUse;
 };
 
-class PuyoGameOver1PScreen : public PuyoStoryScreen {
+class PuyoGameOver1PScreen : public StoryScreen {
 public:
     PuyoGameOver1PScreen(String screenName, Screen &previousScreen, Action *finishedAction,
             String playerName, const PlayerGameStat &playerPoints, bool initialTransition=false);
@@ -148,7 +148,7 @@ class SinglePlayerMatch;
  */
 class SinglePlayerStarterAction : public Action {
 public:
-    SinglePlayerStarterAction(PuyoMainScreen *mainScreen, int difficulty,
+    SinglePlayerStarterAction(MainScreen *mainScreen, int difficulty,
 			      PuyoSingleNameProvider *nameProvider = NULL);
     /**
      * Implements the Action interface
@@ -171,13 +171,13 @@ private:
       kGameOver,
       kHiScoreScreen
     };
-    PuyoMainScreen *m_mainScreen;
+    MainScreen *m_mainScreen;
     State m_state;
     PuyoSingleNameProvider *m_nameProvider;
     int m_currentLevel, m_lifes, m_difficulty;
     SinglePlayerMatch *m_currentMatch;
     PuyoGameOver1PScreen *m_hiScoreScreen;
-    PuyoStoryScreen *m_gameWonScreen;
+    StoryScreen *m_gameWonScreen;
     PuyoLevelDefinitions m_levelDefinitions;
 };
 
@@ -239,10 +239,10 @@ private:
     bool m_popScreen;
     PuyoSingleNameProvider *m_nameProvider;
     int m_remainingLifes;
-    PuyoStoryScreen *m_introStory, *m_opponentStory;
+    StoryScreen *m_introStory, *m_opponentStory;
     PuyoGameScreen *m_gameScreen;
     PuyoSinglePlayerGameWidget *m_gameWidget;
-    PuyoStoryWidget *m_matchLostAnimation;
+    StoryWidget *m_matchLostAnimation;
     PuyoTwoPlayersStatsWidget *m_statsWidget;
 };
 

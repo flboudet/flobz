@@ -83,9 +83,9 @@ private:
     ZBox Spacer0, Spacer1, Spacer2, Spacer3;
 };
 
-class PuyoThemeMenu : public PuyoMainScreenMenu {
+class PuyoThemeMenu : public MainScreenMenu {
 public:
-    PuyoThemeMenu(PuyoMainScreen *mainScreen);
+    PuyoThemeMenu(MainScreen *mainScreen);
     void build();
 private:
     Frame screenTitleFrame;

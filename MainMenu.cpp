@@ -9,9 +9,9 @@
 
 #include "MainMenu.h"
 
-MainRealMenu::MainRealMenu(PuyoMainScreen * mainScreen) :
+MainRealMenu::MainRealMenu(MainScreen * mainScreen) :
 // Create sub screens
-PuyoMainScreenMenu(mainScreen),
+MainScreenMenu(mainScreen),
 localGameMenu     (mainScreen),
 local2PlayersGameMenu(mainScreen),
 optionMenu        (mainScreen),

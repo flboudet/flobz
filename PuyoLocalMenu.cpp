@@ -45,8 +45,8 @@ class NoNameAction : public Action {
         EditField &field;
 };
 
-LocalGameMenu::LocalGameMenu(PuyoMainScreen *mainScreen)
-    : PuyoMainScreenMenu(mainScreen),
+LocalGameMenu::LocalGameMenu(MainScreen *mainScreen)
+    : MainScreenMenu(mainScreen),
       locale(theCommander->getDataPathManager(), "locale", "main"),
       editPlayerName(locale.getLocalizedString("Player:"),
 		     PuyoGame::getDefaultPlayerName(0),
@@ -85,8 +85,8 @@ String LocalGameMenu::getPlayerName() const
   return playerName;
 }
 
-Local2PlayersGameMenu::Local2PlayersGameMenu(PuyoMainScreen *mainScreen)
-    : PuyoMainScreenMenu(mainScreen),
+Local2PlayersGameMenu::Local2PlayersGameMenu(MainScreen *mainScreen)
+    : MainScreenMenu(mainScreen),
       locale(theCommander->getDataPathManager(), "locale", "main"),
       editPlayer1Name(locale.getLocalizedString("Player 1:"),
 		      PuyoGame::getDefaultPlayerName(1),

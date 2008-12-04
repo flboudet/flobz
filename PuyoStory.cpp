@@ -112,7 +112,7 @@ static void putText (StyrolyseClient *_this, int x, int y, const char *text)
 
 static const char *getText(StyrolyseClient *_this, const char *text)
 {
-    return ((PuyoStoryWidget::PuyoStoryStyrolyseClient *)_this)->widget->getText(text);
+    return ((StoryWidget::PuyoStoryStyrolyseClient *)_this)->widget->getText(text);
 }
 
 static void playMusic(StyrolyseClient *_this, const char *fileName)
@@ -127,9 +127,9 @@ static void playSound(StyrolyseClient *_this, const char *fileName, int volume)
     AudioManager::playSound(fileName, volume);
 }
 
-bool PuyoStoryWidget::classInitialized = false;
+bool StoryWidget::classInitialized = false;
 
-PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction, bool fxMode)
+StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
     : /*Cycled*/IdleComponent(/*0.04*/), localeDictionary(NULL), finishedAction(finishedAction), once(false), last_time(-1.)
 {
     try {
@@ -175,15 +175,15 @@ PuyoStoryWidget::PuyoStoryWidget(String screenName, Action *finishedAction, bool
     //sstory = createStorySurface();
 }
 
-PuyoStoryWidget::~PuyoStoryWidget()
+StoryWidget::~StoryWidget()
 {
     styrolyse_free(currentStory);
     if (localeDictionary != NULL)
         delete localeDictionary;
 }
 
-// void PuyoStoryWidget::cycle()
-void PuyoStoryWidget::idle(double currentTime)
+// void StoryWidget::cycle()
+void StoryWidget::idle(double currentTime)
 {
     double delta_t;
     if (last_time < 0.)
@@ -201,7 +201,7 @@ void PuyoStoryWidget::idle(double currentTime)
     }
 }
 
-void PuyoStoryWidget::draw(SDL_Surface *screen)
+void StoryWidget::draw(SDL_Surface *screen)
 {
     if (hidden) return;
     sstory = screen;
@@ -210,24 +210,24 @@ void PuyoStoryWidget::draw(SDL_Surface *screen)
     SDL_SetClipRect(screen, NULL);
 }
 
-void PuyoStoryWidget::setIntegerValue(String varName, int value)
+void StoryWidget::setIntegerValue(String varName, int value)
 {
     styrolyse_setint(currentStory, varName, value);
 }
 
-int PuyoStoryWidget::getIntegerValue(String varName) const
+int StoryWidget::getIntegerValue(String varName) const
 {
     return styrolyse_secured_getint(currentStory, varName);
 }
 
-const char *PuyoStoryWidget::getText(const char *text) const
+const char *StoryWidget::getText(const char *text) const
 {
     if (localeDictionary == NULL)
         return text;
     return localeDictionary->getLocalizedString(text);
 }
 
-PuyoStoryScreen::PuyoStoryScreen(String screenName, Screen &previousScreen, Action *finishedAction, bool shouldAddTransition)
+StoryScreen::StoryScreen(String screenName, Screen &previousScreen, Action *finishedAction, bool shouldAddTransition)
     : Screen(0, 0, 640, 480), storyWidget(screenName, finishedAction),
       transitionWidget(NULL), finishedAction(finishedAction)
 {
@@ -238,14 +238,14 @@ PuyoStoryScreen::PuyoStoryScreen(String screenName, Screen &previousScreen, Acti
     }
 }
 
-PuyoStoryScreen::PuyoStoryScreen(String screenName)
+StoryScreen::StoryScreen(String screenName)
     : Screen(0, 0, 640, 480), storyWidget(screenName, NULL),
       transitionWidget(NULL), finishedAction(NULL)
 {
     add(&storyWidget);
 }
 
-void PuyoStoryScreen::transitionFromScreen(Screen &fromScreen)
+void StoryScreen::transitionFromScreen(Screen &fromScreen)
 {
     if (transitionWidget != NULL) {
         remove(transitionWidget);
@@ -255,7 +255,7 @@ void PuyoStoryScreen::transitionFromScreen(Screen &fromScreen)
     add(transitionWidget);
 }
 
-PuyoStoryScreen::~PuyoStoryScreen()
+StoryScreen::~StoryScreen()
 {
     if (transitionWidget != NULL) {
         remove(transitionWidget);
@@ -263,7 +263,7 @@ PuyoStoryScreen::~PuyoStoryScreen()
     }
 }
 
-void PuyoStoryScreen::onEvent(GameControlEvent *cevent)
+void StoryScreen::onEvent(GameControlEvent *cevent)
 {
     bool passEvent = true;
     switch (cevent->cursorEvent) {
@@ -284,7 +284,7 @@ void PuyoStoryScreen::onEvent(GameControlEvent *cevent)
       Screen::onEvent(cevent);
 }
 
-void PuyoStoryScreen::onScreenVisibleChanged(bool visible)
+void StoryScreen::onScreenVisibleChanged(bool visible)
 {
     theCommander->setCursorVisible(!visible);
     Screen::onScreenVisibleChanged(visible);
@@ -292,7 +292,7 @@ void PuyoStoryScreen::onScreenVisibleChanged(bool visible)
 
 
 PuyoFX::PuyoFX(String fxName)
-    : PuyoStoryWidget(fxName,NULL,true), fxName(fxName)
+    : StoryWidget(fxName,NULL,true), fxName(fxName)
 {}
 
 bool PuyoFX::busy() const

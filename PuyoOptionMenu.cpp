@@ -49,7 +49,7 @@ FSPrefSwitch::FSPrefSwitch()
 {
 }
 
-OptionMenu::OptionMenu(PuyoMainScreen *mainScreen) : PuyoMainScreenMenu(mainScreen),
+OptionMenu::OptionMenu(MainScreen *mainScreen) : MainScreenMenu(mainScreen),
     screenTitleFrame(theCommander->getSeparatorFramePicture()),
     optionTitle(theCommander->getLocalizedString("Options")),
     audioButton(),

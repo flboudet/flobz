@@ -10,8 +10,8 @@ void ControlMenu::BackSaveAction::action()
     mainScreen->popMenu();
 }
 
-ControlMenu::ControlMenu(PuyoMainScreen *mainScreen)
-    : PuyoMainScreenMenu(mainScreen),
+ControlMenu::ControlMenu(MainScreen *mainScreen)
+    : MainScreenMenu(mainScreen),
       screenTitleFrame(theCommander->getSeparatorFramePicture()),
       playerOneTitleFrame(theCommander->getSeparatorFramePicture()),
       playerTwoTitleFrame(theCommander->getSeparatorFramePicture()),
