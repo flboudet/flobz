@@ -71,8 +71,8 @@ private:
 void TestPuyoStatsAction::action(Widget *sender, int actionType, GameControlEvent *event)
 {
     PlayerGameStat stats;
-    GameUIDefaults::SCREEN_STACK->top()->add(new PuyoStatsWidget(stats, windowFramePict, LEFT_TO_RIGHT));
-    //GameUIDefaults::SCREEN_STACK->top()->add(new PuyoStatsWidget(stats, windowFramePict, RIGHT_TO_LEFT));
+    GameUIDefaults::SCREEN_STACK->top()->add(new StatsWidget(stats, windowFramePict, LEFT_TO_RIGHT));
+    //GameUIDefaults::SCREEN_STACK->top()->add(new StatsWidget(stats, windowFramePict, RIGHT_TO_LEFT));
 }
 
 class ShowModalDialogAction : public Action {

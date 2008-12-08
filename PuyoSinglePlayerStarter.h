@@ -179,6 +179,7 @@ private:
     PuyoGameOver1PScreen *m_hiScoreScreen;
     StoryScreen *m_gameWonScreen;
     PuyoLevelDefinitions m_levelDefinitions;
+    PlayerGameStat m_playerStat;
 };
 
 /**
@@ -186,7 +187,8 @@ private:
  */
 class SinglePlayerMatch : public Action, public Widget {
 public:
-    SinglePlayerMatch(Action *gameOverAction,
+    SinglePlayerMatch(PlayerGameStat &playerStat,
+              Action *gameOverAction,
 		      PuyoSingleGameLevelData *levelData,
 		      bool skipIntroduction = false,
                       bool popScreen = false,
@@ -244,6 +246,7 @@ private:
     PuyoSinglePlayerGameWidget *m_gameWidget;
     StoryWidget *m_matchLostAnimation;
     PuyoTwoPlayersStatsWidget *m_statsWidget;
+    PlayerGameStat &m_playerStat;
 };
 
 #endif // _PUYOSINGLEPLAYERSTARTER

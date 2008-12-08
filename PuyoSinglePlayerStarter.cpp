@@ -248,7 +248,7 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousSc
     "The Duke","Jeko","--------" };
 
     initHiScores(AI_NAMES);
-    int scorePlace = setHiScore(playerStat.points, playerName);
+    int scorePlace = setHiScore(playerStat.total_points, playerName);
 
     for (int i = 0 ; i < kHiScoresNumber ; i++) {
         hiScoreNameBox.add(&names[i]);
@@ -341,7 +341,7 @@ void SinglePlayerStarterAction::performMatchPlaying(bool skipIntroduction,
     m_state = kMatchPlaying;
     SinglePlayerMatch *previousMatch = m_currentMatch;
     PuyoSingleGameLevelData *levelData = new PuyoSingleGameLevelData(m_currentLevel, m_difficulty, m_levelDefinitions);
-    m_currentMatch = new SinglePlayerMatch(this, levelData,
+    m_currentMatch = new SinglePlayerMatch(m_playerStat, this, levelData,
 					   skipIntroduction, popScreen,
                                            m_nameProvider, m_lifes);
     m_currentMatch->run();
@@ -397,7 +397,7 @@ void SinglePlayerStarterAction::performHiScoreScreen(String gameOverStoryName)
   m_hiScoreScreen = new PuyoGameOver1PScreen(gameOverStoryName,
 		     *(GameUIDefaults::SCREEN_STACK->top()),
                      this, m_nameProvider->getPlayerName(),
-                     PlayerGameStat());
+                     m_playerStat);
   Screen *screenToTrans = GameUIDefaults::SCREEN_STACK->top();
   m_hiScoreScreen->transitionFromScreen(*screenToTrans);
   m_hiScoreScreen->refresh();
@@ -427,13 +427,15 @@ void SinglePlayerStarterAction::performBackToMenu()
 }
 
 SinglePlayerMatch::SinglePlayerMatch
-                     (Action *gameOverAction,
+                     (PlayerGameStat &playerStat,
+                      Action *gameOverAction,
                       PuyoSingleGameLevelData *levelData,
 		      bool skipIntroduction,
                       bool popScreen,
 		      PuyoSingleNameProvider *nameProvider,
 		      int remainingLifes)
-		       : m_state(kNotRunning),
+		       : m_playerStat(playerStat),
+               m_state(kNotRunning),
                          m_matchOverAction(gameOverAction),
                          m_levelData(levelData),
 			 m_skipIntroduction(skipIntroduction),
@@ -521,6 +523,7 @@ void SinglePlayerMatch::performMatchPlaying()
   if (m_nameProvider != NULL)
     m_gameWidget->setPlayerOneName(m_nameProvider->getPlayerName());
   m_gameWidget->setPlayerTwoName(m_levelData->getIAName());
+  m_gameWidget->getStatPlayerOne().total_points = m_playerStat.total_points;
   GameUIDefaults::SCREEN_STACK->pop();
   GameUIDefaults::SCREEN_STACK->push(m_gameScreen);
   delete m_opponentStory;
@@ -529,6 +532,7 @@ void SinglePlayerMatch::performMatchPlaying()
 
 void SinglePlayerMatch::performEndOfMatch()
 {
+  m_playerStat.total_points += m_gameWidget->getStatPlayerOne().points;
   if (m_gameWidget->getAborted()) {
     m_state = kMatchOverAborted;
     trigMatchOverAction();
@@ -552,7 +556,7 @@ void SinglePlayerMatch::performMatchLostAnimation()
 void SinglePlayerMatch::performMatchScores(State scoreState)
 {
   m_state = scoreState;
-  m_statsWidget = new PuyoTwoPlayersStatsWidget(this->m_gameWidget->getStatPlayerOne(), this->m_gameWidget->getStatPlayerTwo(), theCommander->getWindowFramePicture());
+  m_statsWidget = new PuyoTwoPlayersStatsWidget(this->m_gameWidget->getStatPlayerOne(), this->m_gameWidget->getStatPlayerTwo(), true, false, theCommander->getWindowFramePicture());
   m_gameScreen->add(m_statsWidget);
 }
 

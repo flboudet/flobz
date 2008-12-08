@@ -51,24 +51,26 @@ private:
 };
 
 #define MAX_DISPLAYED_COMBOS 7
-struct PuyoStatsFormat {
-    PuyoStatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &playerBStats);
+struct StatsFormat {
+    StatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &playerBStats);
     int m_comboIndirection[MAX_DISPLAYED_COMBOS+1];
 };
 
-class PuyoStatsWidget : public gameui::VBox, gameui::Action, IdleComponent {
+class StatsWidget : public gameui::VBox, gameui::Action, IdleComponent {
 public:
-    PuyoStatsWidget(PuyoStatsFormat &statsFormat,
+    StatsWidget(StatsFormat &statsFormat,
                     PlayerGameStat &stats, PlayerGameStat &opponentStats,
                     const gameui::FramePicture *framePicture, PuyoStatsDirection dir,
+                    bool showGlobalScore = false,
                     gameui::Action *action = NULL);
-    virtual ~PuyoStatsWidget() {}
+    virtual ~StatsWidget() {}
     virtual void action(Widget *sender, int actionType, GameControlEvent *event);
     void startAnimation();
     virtual void idle(double currentTime);
     virtual IdleComponent *getIdleComponent() { return this; }
 private:
     PuyoStatsDirection m_dir;
+    bool m_showGlobalScore;
     gameui::Action *m_action;
     class ComboLine : public gameui::HBox, gameui::Action {
     public:
@@ -87,25 +89,25 @@ private:
         gameui::Text m_currentValue;
         int m_totalNumOfCombos;
     };
-    PuyoStatsFormat &m_statsFormat;
+    StatsFormat &m_statsFormat;
     PlayerGameStat &m_stats, &m_opponentStats;
     gameui::Text m_statTitle;
     ComboLine m_comboLines[MAX_DISPLAYED_COMBOS];
     int m_maxCombo;
-    gameui::Text m_score;
+    gameui::Text m_score, m_globalScore;
     double m_startTime;
     SelfVector<Widget*> widgetAutoReleasePool;
 };
 
 class PuyoStatsLegendWidget : public gameui::Frame, public gameui::Action {
 public:
-  PuyoStatsLegendWidget(PuyoStatsFormat &statsFormat, PuyoStatsWidget &guideWidget, const gameui::FramePicture *framePicture);
+  PuyoStatsLegendWidget(StatsFormat &statsFormat, StatsWidget &guideWidget, const gameui::FramePicture *framePicture);
   virtual ~PuyoStatsLegendWidget() {}
   virtual void onWidgetVisibleChanged(bool visible);
   virtual void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
-  PuyoStatsFormat &m_statsFormat;
-  PuyoStatsWidget &m_guideWidget;
+  StatsFormat &m_statsFormat;
+  StatsWidget &m_guideWidget;
   gameui::Separator m_titleSeparator, m_barSeparator, m_bottomSeparator;
   gameui::SliderContainer m_legendSlider[MAX_DISPLAYED_COMBOS];
   gameui::HBox m_legendCell[MAX_DISPLAYED_COMBOS];
@@ -127,7 +129,9 @@ class StatsResources {
 
 class PuyoTwoPlayersStatsWidget : public gameui::VBox, gameui::SliderContainerListener {
 public:
-    PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats, const gameui::FramePicture *framePicture);
+    PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats,
+                              bool showLeftGlobalScore, bool showRightGlobalScore,
+                              const gameui::FramePicture *framePicture);
     virtual ~PuyoTwoPlayersStatsWidget() {}
     virtual void onWidgetVisibleChanged(bool visible);
     /**
@@ -136,11 +140,11 @@ public:
     virtual void onSlideInside(gameui::SliderContainer &slider);
 private:
     StatsResources m_res;
-    PuyoStatsFormat m_statsFormat;
+    StatsFormat m_statsFormat;
     gameui::SliderContainer m_topSlider, m_leftSlider, m_rightSlider, m_legendSlider;
     gameui::Text m_title;
     PuyoStatsLegendWidget m_legend;
-    PuyoStatsWidget m_leftStats, m_rightStats;
+    StatsWidget m_leftStats, m_rightStats;
     SelfVector<Widget*> widgetAutoReleasePool;
 };
 

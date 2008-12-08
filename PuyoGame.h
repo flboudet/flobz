@@ -203,6 +203,7 @@ public:
     virtual bool isPhaseReady(void) { return true; }
 
     virtual PlayerGameStat &getGameStat() { return gameStat; }
+    virtual void setGameStat(PlayerGameStat &stat) { gameStat = stat; }
 protected:
     PuyoDelegate *delegate;
     PuyoFactory *attachedFactory;

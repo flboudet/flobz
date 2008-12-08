@@ -13,7 +13,7 @@ struct PlayerGameStat
     bool is_dead;
     bool is_winner;
     int points; //
-
+    int total_points;
     PlayerGameStat(int p = 0);
 };
 

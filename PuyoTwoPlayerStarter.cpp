@@ -130,7 +130,7 @@ void TwoPlayersStarterAction::gameOver()
 void TwoPlayersStarterAction::gameScores()
 {
   m_state = kMatchScores;
-  m_statsWidget = new PuyoTwoPlayersStatsWidget(this->gameWidget->getStatPlayerOne(), this->gameWidget->getStatPlayerTwo(), theCommander->getWindowFramePicture());
+  m_statsWidget = new PuyoTwoPlayersStatsWidget(this->gameWidget->getStatPlayerOne(), this->gameWidget->getStatPlayerTwo(), true, true, theCommander->getWindowFramePicture());
   gameScreen->add(m_statsWidget);
 }
 

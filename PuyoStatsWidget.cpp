@@ -1,5 +1,5 @@
 /*
- *  PuyoStatsWidget.cpp
+ *  StatsWidget.cpp
  *  flobopuyo
  *
  *  Created by Florent Boudet on 26/05/08.
@@ -198,7 +198,7 @@ void ProgressBarWidget::setVisible(bool visible)
     requestDraw();
 }
 
-PuyoStatsFormat::PuyoStatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &playerBStats)
+StatsFormat::StatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &playerBStats)
 {
     int j = 0;
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS+1 ; i++)
@@ -210,11 +210,13 @@ PuyoStatsFormat::PuyoStatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &p
 }
 
 
-PuyoStatsWidget::PuyoStatsWidget(PuyoStatsFormat &statsFormat,
+StatsWidget::StatsWidget(StatsFormat &statsFormat,
                                  PlayerGameStat &stats, PlayerGameStat &opponentStats,
                                  const gameui::FramePicture *framePicture, PuyoStatsDirection dir,
+                                 bool showGlobalScore,
                                  gameui::Action *action)
-  : m_dir(dir), m_action(action), m_statsFormat(statsFormat),
+  : m_dir(dir), m_showGlobalScore(showGlobalScore),
+    m_action(action), m_statsFormat(statsFormat),
     m_stats(stats), m_opponentStats(opponentStats),
     m_statTitle("Combos"), m_maxCombo(0), m_startTime(-1)
 {
@@ -240,9 +242,15 @@ PuyoStatsWidget::PuyoStatsWidget(PuyoStatsFormat &statsFormat,
 
     HBox *box = new HBox();
     Text *score = new Text("Score:");
+    Text *globalScore = new Text("Total:");
     m_score.setValue("0");
+    m_globalScore.setValue("0");
     box->add(score);
     box->add(&m_score);
+    if (m_showGlobalScore) {
+        box->add(globalScore);
+        box->add(&m_globalScore);
+    }
     add(box);
 
     // Prepare un-allocation
@@ -251,6 +259,7 @@ PuyoStatsWidget::PuyoStatsWidget(PuyoStatsFormat &statsFormat,
     widgetAutoReleasePool.add(img2);
     widgetAutoReleasePool.add(txt);
     widgetAutoReleasePool.add(score);
+    widgetAutoReleasePool.add(globalScore);
     widgetAutoReleasePool.add(box);
 
     // Looking for the biggest combo
@@ -264,7 +273,7 @@ PuyoStatsWidget::PuyoStatsWidget(PuyoStatsFormat &statsFormat,
     }
 }
 
-void PuyoStatsWidget::action(Widget *sender, int actionType, GameControlEvent *event)
+void StatsWidget::action(Widget *sender, int actionType, GameControlEvent *event)
 {
     if (m_action != NULL)
         m_action->action(this, actionType+1, event);
@@ -279,7 +288,7 @@ void PuyoStatsWidget::action(Widget *sender, int actionType, GameControlEvent *e
                                                         m_maxCombo, this);
 }
 
-void PuyoStatsWidget::startAnimation()
+void StatsWidget::startAnimation()
 {
     int currentComboIndex = m_statsFormat.m_comboIndirection[0];
     if (currentComboIndex != -1)
@@ -291,13 +300,13 @@ void PuyoStatsWidget::startAnimation()
         m_action->action(this, 0, NULL);
 }
 
-PuyoStatsWidget::ComboLine::ComboLine()
+StatsWidget::ComboLine::ComboLine()
   : m_progressBar(this)
 {
     //add(&m_comboLabel);
 }
 
-void PuyoStatsWidget::ComboLine::setComboLineInfos(PuyoStatsDirection dir, int tag, String comboText,
+void StatsWidget::ComboLine::setComboLineInfos(PuyoStatsDirection dir, int tag, String comboText,
                                                    int numberOfCombos, int vsNumberOfCombos,
                                                    int totalNumOfCombos, Action *progressionCompleteAction)
 {
@@ -334,16 +343,17 @@ void PuyoStatsWidget::ComboLine::setComboLineInfos(PuyoStatsDirection dir, int t
     m_progressBar.setColorIndex( bof);
 }
 
-void PuyoStatsWidget::idle(double currentTime)
+void StatsWidget::idle(double currentTime)
 {
     if (m_startTime < 0.0) m_startTime = currentTime;
     const double duration = MAX_DISPLAYED_COMBOS * LINE_DURATION + 0.5;
     int points = m_stats.points * sin(1.5708 * (currentTime-m_startTime) / duration);
     if (currentTime-m_startTime > duration) points = m_stats.points;
     m_score.setValue(String() + points);
+    m_globalScore.setValue(String() + (m_stats.total_points + points));
 }
 
-void PuyoStatsWidget::ComboLine::action(Widget *sender, int actionType, GameControlEvent *event)
+void StatsWidget::ComboLine::action(Widget *sender, int actionType, GameControlEvent *event)
 {
     switch (actionType) {
         case ProgressBarWidget::VALUE_CHANGED:
@@ -357,7 +367,7 @@ void PuyoStatsWidget::ComboLine::action(Widget *sender, int actionType, GameCont
     }
 }
 
-PuyoStatsLegendWidget::PuyoStatsLegendWidget(PuyoStatsFormat &statsFormat, PuyoStatsWidget &guideWidget, const gameui::FramePicture *framePicture)
+PuyoStatsLegendWidget::PuyoStatsLegendWidget(StatsFormat &statsFormat, StatsWidget &guideWidget, const gameui::FramePicture *framePicture)
   : Frame(framePicture), m_statsFormat(statsFormat), m_guideWidget(guideWidget)
 {
     setPolicy(USE_MIN_SIZE);
@@ -396,12 +406,14 @@ void PuyoStatsLegendWidget::action(Widget *sender, int actionType, GameControlEv
         m_legendSlider[actionType].transitionToContent(&m_legendCell[actionType]);
 }
 
-PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats, const gameui::FramePicture *framePicture)
+PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats,
+                                                     bool showLeftGlobalScore, bool showRightGlobalScore,
+                                                     const gameui::FramePicture *framePicture)
   : m_statsFormat(leftPlayerStats, rightPlayerStats),
     m_title("Game Statistics"),
     m_legend(m_statsFormat, m_leftStats, NULL/*framePicture*/),
-    m_leftStats(m_statsFormat, leftPlayerStats, rightPlayerStats, NULL, RIGHT_TO_LEFT, &m_legend),
-    m_rightStats(m_statsFormat, rightPlayerStats, leftPlayerStats, NULL, LEFT_TO_RIGHT)
+    m_leftStats(m_statsFormat, leftPlayerStats, rightPlayerStats, NULL, RIGHT_TO_LEFT, showLeftGlobalScore, &m_legend),
+    m_rightStats(m_statsFormat, rightPlayerStats, leftPlayerStats, NULL, LEFT_TO_RIGHT, showRightGlobalScore)
 {
     m_topSlider.setPreferedSize(Vec3(0., 50.));
     m_legendSlider.setPreferedSize(Vec3(220., 416.));
