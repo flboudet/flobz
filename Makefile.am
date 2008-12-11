@@ -22,4 +22,4 @@ flobopuyo_CXXFLAGS = -Iiosfc -Igametools -Igoomsl $(SDL_CFLAGS) $(AM_CXXFLAGS) $
 flobopuyo_OBJCFLAGS= $(SDL_CFLAGS)
 flobopuyo_LDADD = -Lgametools -Lgoomsl -Liosfc -lgametools -lgoomsl -liosfc $(SDL_LIBS)
 
-SUBDIRS = iosfc gametools goomsl
+SUBDIRS = iosfc gametools goomsl data
