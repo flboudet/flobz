@@ -1,11 +1,12 @@
 namespace PuyoMessage {
-  
+
 const char *TYPE          = "TYPE";
 const char *GAMEID        = "ID";
 const char *NAME          = "NAME";
 const char *PUYOS         = "PUYOS";
 const char *PAUSED        = "PAUSED";
 const char *SCORE         = "SCORE";
+const char *TOTAL_SCORE   = "TOTAL_SCORE";
 
 const char *COMBO_COUNT   = "COMBO_COUNT";
 const char *EXPLODE_COUNT = "EXPLODE_COUNT";
@@ -14,7 +15,7 @@ const char *GHOST_SENT_COUNT= "GHOST_SENT_COUNT";
 const char *TIME_LEFT     = "TIME_LEFT";
 const char *IS_DEAD       = "IS_DEAD";
 const char *IS_WINNER     = "IS_WINNER";
-                
+
 const char *NEXT_F        = "NEXT_F";
 const char *NEXT_C        = "NEXT_C";
 const char *ADD_NEUTRALS  = "ADD_NEUTRALS";

@@ -47,7 +47,7 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
     compTurnBuffer.flush();
     didFallBuffer.flush();
     willVanishBuffer.flush();
-        
+
     // creation du message
     Message *message = mbox->createMessage();
 
@@ -61,7 +61,7 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
     message->addInt     (PuyoMessage::NEXT_C, attachedGame->getNextCompanion());
     message->addInt     (PuyoMessage::SEMI_MOVE, attachedGame->getSemiMove());
     message->addInt     (PuyoMessage::CURRENT_NEUTRALS, attachedGame->getNeutralPuyos());
-    
+
     message->addIntArray(PuyoMessage::ADD_NEUTRALS,  neutralsBuffer);
     message->addIntArray(PuyoMessage::MV_L,moveLeftBuffer);
     message->addIntArray(PuyoMessage::MV_R,moveRightBuffer);
@@ -70,7 +70,7 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
     message->addIntArray(PuyoMessage::DID_FALL,      didFallBuffer);
     message->addIntArray(PuyoMessage::WILL_VANISH,   willVanishBuffer);
     message->addInt     (PuyoMessage::NUMBER_BAD_PUYOS, badPuyos);
-    
+
     // clear des infos ayant ete envoyee
     neutralsBuffer.clear();
     moveLeftBuffer.clear();
@@ -90,7 +90,7 @@ void PuyoNetworkView::sendStateMessage(bool paused)
 }
 
 
-void PuyoNetworkView::cycleGame() 
+void PuyoNetworkView::cycleGame()
 {
     PuyoView::cycleGame();
     sendStateMessage();
@@ -186,15 +186,27 @@ void PuyoNetworkView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int 
     }
 }
 
+void PuyoNetworkView::gameWin()
+{
+    PuyoView::gameWin();
+    sendEndOfGameMessage(PuyoMessage::kGameOverWon);
+}
+
 void PuyoNetworkView::gameLost()
 {
     PuyoView::gameLost();
+    sendEndOfGameMessage(PuyoMessage::kGameOverLost);
+}
+
+void PuyoNetworkView::sendEndOfGameMessage(int messageType)
+{
     Message *message = mbox->createMessage();
     message->addInt     (PuyoMessage::GAMEID, gameId);
-    message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameOver);
+    message->addInt     (PuyoMessage::TYPE,   messageType);
     message->addString  (PuyoMessage::NAME,   p1name);
     PlayerGameStat &gameStat = attachedGame->getGameStat();
     message->addInt(PuyoMessage::SCORE, gameStat.points);
+    message->addInt(PuyoMessage::TOTAL_SCORE, gameStat.total_points);
     for (int i = 0 ; i < 24 ; i++) {
         String messageName = String(PuyoMessage::COMBO_COUNT) + i;
         message->addInt(messageName, gameStat.combo_count[i]);
@@ -205,7 +217,7 @@ void PuyoNetworkView::gameLost()
     message->addFloat(PuyoMessage::TIME_LEFT, gameStat.time_left);
     message->addBool(PuyoMessage::IS_DEAD, gameStat.is_dead);
     message->addBool(PuyoMessage::IS_WINNER, gameStat.is_winner);
-    
+
     message->addBoolProperty("RELIABLE", true);
     message->send();
     delete message;

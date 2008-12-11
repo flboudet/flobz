@@ -65,8 +65,10 @@ void PuyoNetworkGame::onMessage(Message &message)
             case kGameState:
                 synchronizeState(message);
                 break;
-            case kGameOver:
+            case kGameOverLost:
+            case kGameOverWon:
                 gameStat.points = message.getInt(SCORE);
+                gameStat.total_points = message.getInt(TOTAL_SCORE);
                 for (int i = 0 ; i < 24 ; i++) {
                     String messageName = String(COMBO_COUNT) + i;
                     gameStat.combo_count[i] = message.getInt(messageName);
@@ -78,7 +80,8 @@ void PuyoNetworkGame::onMessage(Message &message)
                 gameStat.is_dead = message.getBool(IS_DEAD);
                 gameStat.is_winner = message.getBool(IS_WINNER);
                 gameRunning = false;
-                delegate->gameLost();
+                if (msgType == kGameOverLost)
+                    delegate->gameLost();
                 break;
             default:
                 break;
@@ -95,7 +98,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     nextFalling = (PuyoState)(message.getInt(NEXT_F));
     nextCompanion = (PuyoState)(message.getInt(NEXT_C));
     semiMove = message.getInt(SEMI_MOVE);
-    
+
     Buffer<int> puyos = message.getIntArray(PUYOS);
     int i = 0;
     while (i < puyos.size()) {
@@ -114,7 +117,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
         setPuyoAt(puyos[i+2], puyos[i+3], currentPuyo);
         i += 4;
     }
-    
+
     for (int i = puyoVector.size() - 1 ; i >= 0 ; i--) {
         PuyoPuyo *currentPuyo = puyoVector[i];
         if (currentPuyo->getFlag()) {
@@ -126,7 +129,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
             attachedFactory->deletePuyo(currentPuyo);
         }
     }
-    
+
     // Notifications
     Buffer<int> addNeutrals= message.getIntArray(ADD_NEUTRALS);
     if (addNeutrals.size() > 0) {
@@ -136,7 +139,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
             }
         }
     }
-    
+
     Buffer<int> moveLeftBuffer= message.getIntArray(MV_L);
     if (moveLeftBuffer.size() > 0) {
         if (delegate != NULL) {
@@ -145,7 +148,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
             }
         }
     }
-    
+
     Buffer<int> moveRightBuffer= message.getIntArray(MV_R);
     if (moveRightBuffer.size() > 0) {
         if (delegate != NULL) {
@@ -154,7 +157,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
             }
         }
     }
-    
+
     Buffer<int> fallingStepBuffer= message.getIntArray(MV_D);
     if (fallingStepBuffer.size() > 0) {
         if (delegate != NULL) {
@@ -163,7 +166,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
             }
         }
     }
-    
+
     Buffer<int> turnBuffer= message.getIntArray(COMPANION_TURN);
     if (turnBuffer.size() > 0) {
         if (delegate != NULL) {
@@ -172,7 +175,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
             }
         }
     }
-    
+
     Buffer<int> didFall= message.getIntArray(DID_FALL);
     if (didFall.size() > 0) {
        if (delegate != NULL) {
@@ -181,7 +184,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
             }
         }
     }
-    
+
     Buffer<int> willVanish= message.getIntArray(WILL_VANISH);
     if (willVanish.size() > 0) {
        if (delegate != NULL) {
@@ -200,7 +203,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
             }
         }
     }
-    
+
     int badPuyos = message.getInt(NUMBER_BAD_PUYOS);
     if (badPuyos > sentBadPuyos) {
         neutralPuyos = sentBadPuyos - badPuyos;
@@ -210,7 +213,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
         neutralPuyos = 0;
         sentBadPuyos = badPuyos;
     }
-    
+
     neutralPuyos = message.getInt(CURRENT_NEUTRALS);
 }
 
@@ -252,7 +255,7 @@ PuyoPuyo *PuyoNetworkGame::getPuyoAtIndex(int index) const
 {
     return puyoVector[index];
 }
-  
+
 PuyoState PuyoNetworkGame::getNextFalling()
 {
     return nextFalling;
@@ -262,7 +265,7 @@ PuyoState PuyoNetworkGame::getNextCompanion()
 {
     return nextCompanion;
 }
-  
+
 PuyoState PuyoNetworkGame::getCompanionState() const
 {
     return PUYO_FALLINGRED;

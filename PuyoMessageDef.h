@@ -5,15 +5,16 @@
 namespace PuyoMessage {
 
 enum {
-    kGameState   = 0,
-    kGameOver    = 1,
-    kGameStart   = 2,
-    kGamePause   = 3,
-    kGameResume  = 4,
-    kGameNext    = 5,
-    kGameAbort   = 6,
-    kGameChat    = 7,
-    kGameAlive   = 8
+    kGameState    = 0,
+    kGameOverLost = 1,
+    kGameStart    = 2,
+    kGamePause    = 3,
+    kGameResume   = 4,
+    kGameNext     = 5,
+    kGameAbort    = 6,
+    kGameChat     = 7,
+    kGameAlive    = 8,
+    kGameOverWon  = 9,
 };
 
   extern const char *TYPE;
@@ -22,7 +23,8 @@ enum {
   extern const char *PUYOS;
   extern const char *PAUSED;
   extern const char *SCORE;
-  
+  extern const char *TOTAL_SCORE;
+
   extern const char *COMBO_COUNT;
   extern const char *EXPLODE_COUNT;
   extern const char *DROP_COUNT;

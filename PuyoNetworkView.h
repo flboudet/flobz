@@ -43,9 +43,9 @@ class PuyoNetworkView : public PuyoView {
         : PuyoView(attachedPuyoGameFactory, attachedPuyoThemeSet, attachedLevelTheme,
 		   xOffset, yOffset, nXOffset, nYOffset, painterToUse),
           mbox(mbox), gameId(gameId), badPuyos(0) {}
-        
+
     void cycleGame();
-    
+
     void moveLeft();
     void moveRight();
     void rotateLeft();
@@ -60,11 +60,14 @@ class PuyoNetworkView : public PuyoView {
     void companionDidTurn(PuyoPuyo *companionPuyo, PuyoPuyo *fallingPuyo, bool counterclockwise);
     void puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow);
     void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase);
+    virtual void gameWin();
     void gameLost();
-    
+
     void sendStateMessage(bool paused = false);
-    
+
 private:
+    void sendEndOfGameMessage(int messageType);
+
     MessageBox *mbox;
     int gameId;
     Message *createStateMessage(bool paused);

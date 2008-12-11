@@ -76,7 +76,7 @@ class PuyoView : public PuyoDelegate {
     virtual void cycleGame();
     void allowCycle() { cycleAllowance++; }
     void disallowCycle() { cycleAllowance--; }
-    
+
     virtual void moveLeft();
     virtual void moveRight();
     virtual void rotateLeft();
@@ -85,17 +85,17 @@ class PuyoView : public PuyoDelegate {
     int getValenceForPuyo(PuyoPuyo *puyo) const;
     PuyoGame *getAttachedGame() const { return attachedGame; }
     SDL_Painter & getPainter() const { return attachedPainter; }
-    
+
     bool isGameOver() const;
-    
+
     int getScreenCoordinateX(int X) const { return X * TSIZE + xOffset; }
     int getScreenCoordinateY(int Y) const { return Y * TSIZE + yOffset; }
-    
+
     AnimatedPuyoSetTheme *getPuyoThemeSet() const { return attachedThemeSet; }
 
     bool isNewMetaCycleStart() { return newMetaCycleStart; }
     void clearMetaCycleStart() { newMetaCycleStart = false; }
-    
+
     // PuyoDelegate methods
 	virtual void fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
 	virtual void fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
@@ -107,8 +107,8 @@ class PuyoView : public PuyoDelegate {
     void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase);
     void gameLost();
     int getPlayerId() const { return (xOffset < 320) ? 1 : 2; }
-    void gameWin();
-    
+    virtual void gameWin();
+
   protected:
     bool cycleAllowed();
     bool skippedCycle;
