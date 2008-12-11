@@ -1,6 +1,0 @@
-FILES=
-DIRECTORIES=base.000 $(ADDITIONAL_DIRECTORIES)
-
-SOURCE_DATADIR:=$(shell pwd)
-
-include Datarules.mk
