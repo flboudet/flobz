@@ -168,8 +168,10 @@ AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([floor socket strtoul])
 
 AC_CHECK_MEMBERS([struct sockaddr.sa_len], , ,
-  ['#include <sys/types.h>
-    #include <sys/socket.h>'])
+[
+#include <sys/types.h>
+#include <sys/socket.h>
+])
 
 # Checks for header files.
 
