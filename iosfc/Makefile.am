@@ -9,10 +9,19 @@ libiosfc_a_SOURCES=ios_exception.cpp ios_stream.cpp ios_hash.cpp ios_memory.cpp 
             ios_filepath.cpp ios_networkinterfacerequester.cpp
 
 libiosfc_a_CXXFLAGS = $(AM_CXXFLAGS)
-#libgametools_a_CXXFLAGS = -I../iosfc $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 
-# SUBDIRS = iosfc gametools goomsl
-
+EXTRA_DIST=ios_datagramsocket.h ios_dirigeable.h \
+           ios_exception.h ios_fc.h ios_filemanager.h \
+           ios_filepath.h ios_filestream.h ios_hash.h \
+           ios_httpdocument.h ios_igpclient.h ios_igpdatagram.h \
+           ios_igpmessagebox.h ios_igpmessage.h ios_igpmessagelistener.h \
+           ios_igpvirtualpeermessagebox.h ios_memory.h ios_messagebox.h \
+           ios_message.h ios_networkinterfacerequester.h \
+           ios_ptr.h ios_sdlsocketimpl.h ios_selectable.h \
+           ios_selector.h ios_server.h ios_serversocket.h \
+           ios_socketaddress.h ios_socket.h ios_standardmessage.h \
+           ios_stream.h ios_thread.h ios_time.h ios_translator.h \
+           ios_udpmessagebox.h ios_udpmessage.h ios_vector.h
 
 include $(srcdir)/posix/Makefile.am
 # include $(srcdir)/win32

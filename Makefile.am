@@ -18,6 +18,25 @@ if MACOSX
 flobopuyo_SOURCES+=SDLMain.m
 endif
 
+EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
+           AnimatedPuyo.h PuyoGameAbstract.h PuyoOptionMenu.h \
+           AnimatedPuyoTheme.h PuyoGame.h PuyoPauseMenu.h \
+           audio.h PuyoGameWidget.h PuyoPlayer.h \
+           PuyoIA.h PuyoScoring.h \
+           glSDL.h PuyoIgpDefs.h PuyoScreenTransition.h \
+           HallOfFame.h PuyoInternetGameCenter.h PuyoSinglePlayerStarter.h \
+           HiScores.h PuyoInternetMenu.h PuyoStarter.h \
+           LevelThemeMenu.h PuyoLanGameCenter.h PuyoStatsWidget.h \
+           MainMenu.h PuyoLocalizedDictionary.h  PuyoStory.h \
+           MainScreen.h PuyoLocalMenu.h PuyoStrings.h \
+           PuyoAnimations.h PuyoMessageDef.h PuyoThemeMenu.h \
+           PuyoChatBox.h PuyoNatTraversal.h PuyoTwoPlayerStarter.h \
+           PuyoCheatCodeManager.h PuyoNetCenterMenu.h PuyoView.h \
+           PuyoCommander.h PuyoNetGameCenter.h SDLMain.h \
+           PuyoControlMenu.h PuyoNetworkGame.h styrolyse.h \
+           PuyoDataPathManager.h PuyoNetworkMenu.h \
+           PuyoDoomMelt.h PuyoNetworkStarter.h
+
 flobopuyo_CXXFLAGS = -Iiosfc -Igametools -Igoomsl $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 flobopuyo_OBJCFLAGS= $(SDL_CFLAGS)
 flobopuyo_LDADD = -Lgametools -Lgoomsl -Liosfc -lgametools -lgoomsl -liosfc $(SDL_LIBS)
