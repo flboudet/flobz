@@ -21,7 +21,12 @@ EXTRA_DIST=ios_datagramsocket.h ios_dirigeable.h \
            ios_selector.h ios_server.h ios_serversocket.h \
            ios_socketaddress.h ios_socket.h ios_standardmessage.h \
            ios_stream.h ios_thread.h ios_time.h ios_translator.h \
-           ios_udpmessagebox.h ios_udpmessage.h ios_vector.h
+           ios_udpmessagebox.h ios_udpmessage.h ios_vector.h \
+           google/sparse_hash_set google/sparsetable \
+           google/dense_hash_map google/type_traits.h \
+           google/sparse_hash_map google/dense_hash_set \
+           google/sparsehash google/sparsehash/sparseconfig.h \
+           google/sparsehash/sparsehashtable.h google/sparsehash/densehashtable.h
 
 include $(srcdir)/posix/Makefile.am
 # include $(srcdir)/win32
