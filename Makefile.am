@@ -37,7 +37,7 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            PuyoDataPathManager.h PuyoNetworkMenu.h \
            PuyoDoomMelt.h PuyoNetworkStarter.h
 
-flobopuyo_CXXFLAGS = -Iiosfc -Igametools -Igoomsl $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
+flobopuyo_CXXFLAGS = -I$(top_srcdir)/iosfc -I$(top_srcdir)/gametools -I$(top_srcdir)/goomsl $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 flobopuyo_OBJCFLAGS= $(SDL_CFLAGS)
 flobopuyo_LDADD = -Lgametools -Lgoomsl -Liosfc -lgametools -lgoomsl -liosfc $(SDL_LIBS)
 

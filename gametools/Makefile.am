@@ -5,7 +5,7 @@ libgametools_a_SOURCES=SDL_Painter.cpp InputManager.cpp GameControls.cpp GameCur
          ListView.cpp Frame.cpp FramedButton.cpp FramedEditField.cpp \
 	 mt19937ar.cpp SwitchedButton.cpp RadioButton.cpp NotifyCenter.cpp
 
-libgametools_a_CXXFLAGS = -I../iosfc $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
+libgametools_a_CXXFLAGS = -I$(top_srcdir) -I$(top_srcdir)/iosfc $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 
 EXTRA_DIST=FramedButton.h FramedEditField.h Frame.h \
            GameControls.h GameCursor.h gameloop.h \
