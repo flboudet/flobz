@@ -205,6 +205,7 @@ fi
 case $host_os in
    darwin*)
        MACOSX=true
+       CXXFLAGS="$CXXFLAGS -DMACOSX -DSYSTEM_ROOT=\"$SYSTEM_ROOT\""
        ;;
    mingw*)
        WIN32=true
