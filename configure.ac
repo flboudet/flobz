@@ -39,6 +39,7 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
 # Check for SDL_CONFIG
+if test "x$SDL_CONFIG" = "x"; then
 case $host_os in
      darwin*)
          SDL_CONFIG=none
@@ -52,6 +53,7 @@ please send a mail to the address that appears in ./configure --version
 indicating your platform, the version of configure script and the problem.])
          fi
 esac
+fi
 
 #######################################################################
 # Checks for libraries.                                               #
@@ -203,8 +205,13 @@ fi
 case $host_os in
    darwin*)
        MACOSX=true
+       ;;
+   mingw*)
+       WIN32=true
+       LIBS="$LIBS -lws2_32"
 esac
 AM_CONDITIONAL([MACOSX], [test x$MACOSX = xtrue])
+AM_CONDITIONAL([WIN32], [test x$WIN32 = xtrue])
 
 AC_SUBST([FPFEATURES])
 

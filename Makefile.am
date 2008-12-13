@@ -41,4 +41,4 @@ flobopuyo_CXXFLAGS = -I$(top_srcdir)/iosfc -I$(top_srcdir)/gametools -I$(top_src
 flobopuyo_OBJCFLAGS= $(SDL_CFLAGS)
 flobopuyo_LDADD = -Lgametools -Lgoomsl -Liosfc -lgametools -lgoomsl -liosfc $(SDL_LIBS)
 
-SUBDIRS = iosfc gametools goomsl data fpserver
+SUBDIRS = iosfc gametools goomsl data

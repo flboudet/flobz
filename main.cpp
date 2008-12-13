@@ -5,7 +5,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include "SDL_main.h"
 #else
-#include <SDL/SDL_main.h>
+#include <SDL_main.h>
 #endif
 
 #include "PuyoCommander.h"
@@ -25,18 +25,18 @@ void show(CFStringRef formatString, ...) {
     CFStringRef resultString;
     CFDataRef data;
     va_list argList;
-    
+
     va_start(argList, formatString);
     resultString = CFStringCreateWithFormatAndArguments(NULL, NULL, formatString, argList);
     va_end(argList);
-    
+
     data = CFStringCreateExternalRepresentation(NULL, resultString, CFStringGetSystemEncoding(), '?');
-    
+
     if (data != NULL) {
         printf ("%.*s\n\n", (int)CFDataGetLength(data), CFDataGetBytePtr(data));
         CFRelease(data);
     }
-    
+
     CFRelease(resultString);
 }
 #endif
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     int i;
     String dataDir;
     int maxPackNumber = -1;
-    
+
 #ifdef MACOSX
 
 #ifndef DATADIR
@@ -94,10 +94,10 @@ int main(int argc, char *argv[])
 #endif
 
 #endif
- 
+
     bool fs = true;
     const char *gsl_screen = NULL;
-    
+
     for (i=1; i<argc; i++)
     {
         // Help
@@ -111,11 +111,11 @@ int main(int argc, char *argv[])
                 maxPackNumber = atoi(argv[i]);
         }
         if (strcmp(argv[i], "-gsl") == 0) {
-            if (++i < argc) 
+            if (++i < argc)
                 gsl_screen = argv[i];
         }
     }
-    
+
     if (!FilePath(DATADIR).exists())
         dataDir = "data";
     else

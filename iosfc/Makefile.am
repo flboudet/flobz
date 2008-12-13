@@ -28,5 +28,9 @@ EXTRA_DIST=ios_datagramsocket.h ios_dirigeable.h \
            google/sparsehash google/sparsehash/sparseconfig.h \
            google/sparsehash/sparsehashtable.h google/sparsehash/densehashtable.h
 
+if WIN32
+include $(srcdir)/win32/Makefile.am
+else
 include $(srcdir)/posix/Makefile.am
-# include $(srcdir)/win32
+endif
+
