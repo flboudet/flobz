@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS=-I m4
+
 bin_PROGRAMS=flobopuyo
 flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           MainMenu.cpp MainScreen.cpp \
