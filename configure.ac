@@ -105,6 +105,13 @@ AC_SEARCH_LIBS([gethostbyname], [nsl])
 AC_HEADER_DIRENT
 AC_HEADER_STDC
 
+AC_LANG([C++])
+# Headers for google sparse hash
+# Figure out where hash_map lives and also hash_fun.h (or stl_hash_fun.h).
+# This also tells us what namespace hash code lives in.
+AC_CXX_STL_HASH
+AC_CXX_STL_HASH_FUN
+
 OLD_CPPFLAGS=$CPPFLAGS
 OLD_CXXFLAGS=$CXXFLAGS
 
@@ -148,7 +155,6 @@ CXXFLAGS=$OLD_CXXFLAGS
 AC_SUBST([SDL_CFLAGS])
 
 AC_CHECK_HEADERS([stdlib.h unistd.h poll.h sys/poll.h sys/select.h])
-
 
 #######################################################################
 # Checks for typedefs, structures, and compiler characteristics.      #

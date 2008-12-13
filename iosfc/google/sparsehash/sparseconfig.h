@@ -3,14 +3,10 @@
  *       Do not use these #defines in your own program!
  */
 
+#include "config.h"
+
 /* Namespace for Google classes */
 #define GOOGLE_NAMESPACE ::google
-
-/* the location of <hash_fun.h>/<stl_hash_fun.h> */
-#define HASH_FUN_H <ext/hash_fun.h>
-
-/* the namespace of hash_map/hash_set */
-#define HASH_NAMESPACE __gnu_cxx
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
