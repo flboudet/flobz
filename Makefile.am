@@ -45,6 +45,39 @@ flobopuyo_LDADD = -Lgametools -Lgoomsl -Liosfc -lgametools -lgoomsl -liosfc $(SD
 
 SUBDIRS = iosfc gametools goomsl data
 
+# Mac OS X Targets
+
+bundle_name = $(abs_top_builddir)/FloboPuyo.app
+macimage_name = $(abs_top_builddir)/FloboPuyo_Image
+
+mac-bundle:
+	rm -Rf "$(bundle_name)"
+	mkdir -p "$(bundle_name)/Contents/MacOS"
+	mkdir -p "$(bundle_name)/Contents/Resources"
+	mkdir -p "$(bundle_name)/Contents/Frameworks"
+	echo "APPL????" > "$(bundle_name)/Contents/PkgInfo"
+	sed "s/@@VERSION@@/$(VERSION)/" mac/Info.plist > "$(bundle_name)/Contents/Info.plist"
+	cp mac/icon.icns "$(bundle_name)/Contents/Resources/"
+	cp $(bin_PROGRAMS) "$(bundle_name)/Contents/MacOS/"
+	$(MAKE) $(AM_MAKEFLAGS) install fpdata="$(bundle_name)/Contents/Resources/data" datarootdir="$(bundle_name)/Contents/Resources" bindir="$(windistdir)"
+	cp -RP "$(SYSTEM_ROOT)/Library/Frameworks/SDL.framework" "$(bundle_name)/Contents/Frameworks"
+	cp -RP "$(SYSTEM_ROOT)/Library/Frameworks/SDL_image.framework" "$(bundle_name)/Contents/Frameworks"
+	cp -RP "$(SYSTEM_ROOT)/Library/Frameworks/SDL_mixer.framework" "$(bundle_name)/Contents/Frameworks"
+	cp -RP "$(SYSTEM_ROOT)/Library/Frameworks/SDL_ttf.framework" "$(bundle_name)/Contents/Frameworks"
+
+mac-package: mac-bundle
+	rm -rf $(macimage_name)
+	rm -f $(macimage_name).dmg
+	rm -f $(macimage_name).tmp.dmg
+	mkdir -p $(macimage_name)
+	cp -RP $(bundle_name) $(macimage_name)
+	cp COPYING $(macimage_name)
+	hdiutil create -srcfolder $(macimage_name) $(macimage_name).tmp.dmg
+	hdiutil convert -format UDZO -imagekey zlib-level=9 -o $(macimage_name).dmg $(macimage_name).tmp.dmg
+	hdiutil internet-enable $(macimage_name).dmg
+	rm -rf $(macimage_name)
+	rm -f $(macimage_name).tmp.dmg
+
 # Windows targets
 
 windistdir = "$(abs_top_builddir)/$(PACKAGE)-$(VERSION)-win32"
@@ -69,4 +102,5 @@ win_zip_archive: win_binary_distribution
 	rm -f $(winziparchive)
 	cd `dirname $(windistdir)` \
 	&& zip -9 -r $(winziparchive) `basename $(windistdir)`
+
 
