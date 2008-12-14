@@ -73,7 +73,7 @@ SectionIn RO
     # set the installation directory as the destination for the following actions
     setOutPath $INSTDIR
 
-    file flobopuyo.exe
+    file /r *
 
     ;Store installation folder
     WriteRegStr HKCU "Software\${MUI_PRODUCT}" "" $INSTDIR
@@ -109,6 +109,7 @@ section "uninstall"
     delete "$SMPROGRAMS\new shortcut.lnk"
 
     delete "$INSTDIR\flobopuyo.exe"
+    RMDir /r "$INSTDIR"
 
 # uninstaller section end
 sectionEnd

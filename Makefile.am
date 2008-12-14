@@ -44,3 +44,23 @@ flobopuyo_OBJCFLAGS= $(SDL_CFLAGS)
 flobopuyo_LDADD = -Lgametools -Lgoomsl -Liosfc -lgametools -lgoomsl -liosfc $(SDL_LIBS)
 
 SUBDIRS = iosfc gametools goomsl data
+
+# Windows targets
+
+windistdir = "$(abs_top_builddir)/$(PACKAGE)-$(VERSION)-win32"
+wininstaller = "$(abs_top_builddir)/$(PACKAGE)-$(VERSION)-setup.exe"
+winziparchive = "$(abs_top_builddir)/$(PACKAGE)-$(VERSION)-win32"
+win_binary_distribution:
+	rm -rf $(windistdir)
+	mkdir $(windistdir)
+	$(MAKE) $(AM_MAKEFLAGS) install fpdata="$(windistdir)/data" datarootdir="$(windistdir)" bindir="$(windistdir)"
+	cp COPYING $(windistdir)
+
+win_installer: win_binary_distribution
+	cd $(windistdir) \
+	&& makensis -NOCD $(abs_top_srcdir)/installer.nsi \
+	&& mv FloboPuyoSetup.exe $(wininstaller)
+
+win_zip_archive: win_binary_distribution
+	zip -9 -r $(windistdir) $(winziparchive)
+
