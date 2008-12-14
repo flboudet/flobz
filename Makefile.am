@@ -50,11 +50,15 @@ SUBDIRS = iosfc gametools goomsl data
 windistdir = "$(abs_top_builddir)/$(PACKAGE)-$(VERSION)-win32"
 wininstaller = "$(abs_top_builddir)/$(PACKAGE)-$(VERSION)-setup.exe"
 winziparchive = "$(abs_top_builddir)/$(PACKAGE)-$(VERSION)-win32.zip"
+win_dll_to_copy=jpeg.dll libpng12-0.dll SDL.dll SDL_mixer.dll zlib1.dll \
+libfreetype-6.dll libtiff-3.dll SDL_image.dll SDL_ttf.dll
+
 win_binary_distribution:
 	rm -rf $(windistdir)
 	mkdir $(windistdir)
 	$(MAKE) $(AM_MAKEFLAGS) install fpdata="$(windistdir)/data" datarootdir="$(windistdir)" bindir="$(windistdir)"
 	cp COPYING $(windistdir)
+	for curlib in $(win_dll_to_copy); do find `dirname \`dirname "$(SDL_CONFIG)"\`` -name "$${curlib}" -exec cp {} $(windistdir) \; ; done
 
 win_installer: win_binary_distribution
 	cd $(windistdir) \
