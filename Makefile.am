@@ -49,7 +49,7 @@ SUBDIRS = iosfc gametools goomsl data
 
 windistdir = "$(abs_top_builddir)/$(PACKAGE)-$(VERSION)-win32"
 wininstaller = "$(abs_top_builddir)/$(PACKAGE)-$(VERSION)-setup.exe"
-winziparchive = "$(abs_top_builddir)/$(PACKAGE)-$(VERSION)-win32"
+winziparchive = "$(abs_top_builddir)/$(PACKAGE)-$(VERSION)-win32.zip"
 win_binary_distribution:
 	rm -rf $(windistdir)
 	mkdir $(windistdir)
@@ -58,9 +58,9 @@ win_binary_distribution:
 
 win_installer: win_binary_distribution
 	cd $(windistdir) \
-	&& makensis -NOCD $(abs_top_srcdir)/installer.nsi \
+	&& makensis -NOCD $(abs_top_srcdir)/win32/installer.nsi \
 	&& mv FloboPuyoSetup.exe $(wininstaller)
 
 win_zip_archive: win_binary_distribution
-	zip -9 -r $(windistdir) $(winziparchive)
+	zip -9 -r $(winziparchive) $(windistdir)
 
