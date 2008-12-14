@@ -62,5 +62,7 @@ win_installer: win_binary_distribution
 	&& mv FloboPuyoSetup.exe $(wininstaller)
 
 win_zip_archive: win_binary_distribution
-	zip -9 -r $(winziparchive) $(windistdir)
+	rm -f $(winziparchive)
+	cd `dirname $(windistdir)` \
+	&& zip -9 -r $(winziparchive) `basename $(windistdir)`
 
