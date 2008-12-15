@@ -11,6 +11,7 @@ PlayerGameStat::PlayerGameStat(int p)
     is_dead = false;
     is_winner = false;
     points = p;
+    total_points = 0;
 }
 
 PlayerGameStatDisplay::PlayerGameStatDisplay(const ios_fc::String &player_name, PlayerGameStat &stat, int player)

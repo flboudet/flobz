@@ -49,7 +49,7 @@ StoryWidget *PuyoTwoPlayersGameWidget::getOpponent()
 TwoPlayersStarterAction::TwoPlayersStarterAction(int difficulty, PuyoGameWidgetFactory &gameWidgetFactory, PuyoTwoNameProvider *nameProvider)
   : m_state(kNotRunning), difficulty(difficulty), gameWidgetFactory(gameWidgetFactory), gameScreen(NULL),
     nameProvider(nameProvider), gameLostWidget(NULL), currentLevelTheme(NULL), leftVictories(0), rightVictories(0),
-    m_statsWidget(NULL) {}
+    m_statsWidget(NULL), totalPointsPlayerOne_(0), totalPointsPlayerTwo_(0) {}
 
 void TwoPlayersStarterAction::action(Widget *sender, int actionType,
                                      GameControlEvent *event)
@@ -93,7 +93,7 @@ void TwoPlayersStarterAction::startGame()
 {
     AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
     currentLevelTheme = themeManager->getPuyoLevelTheme();
-    
+
     gameWidget = gameWidgetFactory.createGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *currentLevelTheme, currentLevelTheme->getCentralAnimation2P(), this);
     gameWidget->setGameOptions(GameOptions::FromLevel(difficulty));
     gameScreen = new PuyoGameScreen(*gameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
@@ -138,26 +138,28 @@ void TwoPlayersStarterAction::restartGame()
 {
     AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
     currentLevelTheme = themeManager->getPuyoLevelTheme();
-    
+
     PuyoGameWidget *newGameWidget = gameWidgetFactory.createGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *currentLevelTheme, currentLevelTheme->getCentralAnimation2P(), this);
     PuyoGameScreen *newGameScreen = new PuyoGameScreen(*newGameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
     if (nameProvider != NULL) {
         newGameWidget->setPlayerOneName(nameProvider->getPlayer1Name());
         newGameWidget->setPlayerTwoName(nameProvider->getPlayer2Name());
     }
-    
+
     GameUIDefaults::SCREEN_STACK->pop();
     if (gameWidget != NULL) {
+        totalPointsPlayerOne_ += gameWidget->getStatPlayerOne().points;
+        totalPointsPlayerTwo_ += gameWidget->getStatPlayerTwo().points;
         GameUIDefaults::GAME_LOOP->garbageCollect(gameWidget);
         GameUIDefaults::GAME_LOOP->garbageCollect(gameScreen);
-        //delete gameWidget;
-        //delete gameScreen;
     }
     if (gameLostWidget != NULL)
         delete gameLostWidget;
     gameLostWidget = NULL;
     gameScreen = newGameScreen;
     gameWidget = newGameWidget;
+    gameWidget->getStatPlayerOne().total_points = totalPointsPlayerOne_;
+    gameWidget->getStatPlayerTwo().total_points = totalPointsPlayerTwo_;
     GameUIDefaults::SCREEN_STACK->push(gameScreen);
     int victoriesDelta = leftVictories - rightVictories;
     if (victoriesDelta > 0) {
@@ -179,10 +181,10 @@ void TwoPlayersStarterAction::endGameSession()
     MainScreen *menuScreen = dynamic_cast<MainScreen *>(GameUIDefaults::SCREEN_STACK->top());
     if (menuScreen != NULL)
         menuScreen->transitionFromScreen(*gameScreen);
-        
+
     delete gameWidget;
     delete gameScreen;
-    
+
     gameScreen = NULL;
     gameWidget = NULL;
 

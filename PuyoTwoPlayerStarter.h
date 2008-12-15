@@ -96,10 +96,11 @@ private:
     PuyoGameWidget *gameWidget;
     PuyoTwoNameProvider *nameProvider;
     StoryWidget *gameLostWidget;
-    
+
     PuyoLevelTheme *currentLevelTheme;
     int leftVictories, rightVictories;
     PuyoTwoPlayersStatsWidget *m_statsWidget;
+    int totalPointsPlayerOne_, totalPointsPlayerTwo_;
 };
 
 #endif // _PUYOTWOPLAYERSTARTER
