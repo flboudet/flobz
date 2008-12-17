@@ -424,6 +424,7 @@ void SinglePlayerStarterAction::performBackToMenu()
   m_lifes = 3;
   m_currentLevel = 0;
   m_state = kGameNotStarted;
+  m_playerStat.total_points = 0;
 }
 
 SinglePlayerMatch::SinglePlayerMatch
