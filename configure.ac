@@ -39,6 +39,23 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
+case $host_os in
+    darwin*)
+            SYSTEM_ROOT="/Developer/SDKs/MacOSX10.4u.sdk"
+	    COMMON_FLAGS="-DMACOSX -isysroot $SYSTEM_ROOT -pipe -mmacosx-version-min=10.4"
+	    LDFLAGS="$LDFLAGS -isysroot $SYSTEM_ROOT -Wl,-syslibroot,$SYSTEM_ROOT"
+            ;;
+    *)
+            ;;
+esac
+COMMON_FLAGS="$COMMON_FLAGS -pipe"
+CPPFLAGS="$CPPFLAGS $COMMON_FLAGS"
+CXXFLAGS="$CXXFLAGS $COMMON_FLAGS"
+CFLAGS="$CFLAGS $COMMON_FLAGS"
+OBJCFLAGS="$OBJCFLAGS $COMMON_FLAGS"
+LDFLAGS="$LDFLAGS $COMMON_FLAGS"
+
+
 # Check for SDL_CONFIG
 if test "x$SDL_CONFIG" = "x"; then
 case $host_os in
@@ -115,22 +132,22 @@ AC_LANG([C++])
 AC_CXX_STL_HASH
 AC_CXX_STL_HASH_FUN
 
-OLD_CPPFLAGS=$CPPFLAGS
-OLD_CXXFLAGS=$CXXFLAGS
 
 if test "x$SDL_CONFIG" = "xnone"; then
     case $host_os in
         darwin*)
-            SYSTEM_ROOT="/Developer/SDKs/MacOSX10.4u.sdk"
             FRAMEWORKS_DIR="$SYSTEM_ROOT/Library/Frameworks"
 	    SDL_CFLAGS="-I$FRAMEWORKS_DIR/SDL.framework/Headers -I$FRAMEWORKS_DIR/SDL_image.framework/Headers -I$FRAMEWORKS_DIR/SDL_mixer.framework/Headers -I$FRAMEWORKS_DIR/SDL_ttf.framework/Headers"
     esac
 else
   SDL_CFLAGS=`$SDL_CONFIG --cflags`
-  SDL_CFLAGS="$SDL_CFLAGS"
 fi
+
+OLD_CPPFLAGS=$CPPFLAGS
+OLD_CXXFLAGS=$CXXFLAGS
 CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
 CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
+
 
 AC_CHECK_HEADER([SDL.h],
 		[],
@@ -220,7 +237,6 @@ fi
 case $host_os in
    darwin*)
        MACOSX=true
-       CXXFLAGS="$CXXFLAGS -DMACOSX -DSYSTEM_ROOT=\"$SYSTEM_ROOT\""
        ;;
    mingw*)
        WIN32=true
