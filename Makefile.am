@@ -9,13 +9,19 @@ flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           PuyoEventPlayer.cpp PuyoPauseMenu.cpp PuyoCheatCodeManager.cpp \
           PuyoGameWidget.cpp PuyoStatsWidget.cpp \
           PuyoStarter.cpp PuyoSinglePlayerStarter.cpp PuyoTwoPlayerStarter.cpp \
-          PuyoNetworkStarter.cpp PuyoNetworkView.cpp PuyoNetworkGame.cpp \
-          AnimatedPuyoTheme.cpp PuyoNetworkMenu.cpp PuyoInternetMenu.cpp PuyoNetCenterMenu.cpp \
-          PuyoNetGameCenter.cpp PuyoInternetGameCenter.cpp PuyoLanGameCenter.cpp\
           PuyoLocalMenu.cpp PuyoOptionMenu.cpp PuyoControlMenu.cpp \
           LevelThemeMenu.cpp PuyoThemeMenu.cpp PuyoScreenTransition.cpp \
-          PuyoNatTraversal.cpp PuyoGameAbstract.cpp PuyoStrings.cpp \
-          PuyoMessageDef.cpp
+          PuyoGameAbstract.cpp PuyoStrings.cpp AnimatedPuyoTheme.cpp
+
+# Optional sources for network gaming support
+if ENABLE_NETWORK
+flobopuyo_SOURCES+=PuyoNetworkStarter.cpp PuyoNetworkView.cpp PuyoNetworkGame.cpp \
+          PuyoNetworkMenu.cpp PuyoInternetMenu.cpp PuyoNetCenterMenu.cpp \
+          PuyoNetGameCenter.cpp PuyoInternetGameCenter.cpp PuyoLanGameCenter.cpp\
+          PuyoNatTraversal.cpp PuyoMessageDef.cpp
+endif
+
+# If we are building for Mac OS X, we also need to compile the SDLMain wrapper
 if MACOSX
 flobopuyo_SOURCES+=SDLMain.m
 endif

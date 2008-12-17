@@ -14,10 +14,11 @@ AC_CONFIG_SRCDIR([main.cpp])
 AC_CONFIG_HEADERS([config.h])
 
 ENABLE_AUDIO=true
-#DISABLE_NETWORK?=false
 #ENABLE_OPENGL?=false
 ENABLE_TTF=true
 #ENABLE_BENCHMARKS?=false
+ENABLE_NETWORK=true
+ENABLE_NETWORK_INTERNET=true
 
 #AC_ARG_ENABLE([audio],
 #              [AS_HELP_STRING([--enable-audio],
@@ -202,6 +203,20 @@ else
   AC_MSG_RESULT([TTF Disabled])
 fi
 
+if test "x$ENABLE_NETWORK" = "xtrue"; then
+  AC_MSG_RESULT([Network Gaming Enabled])
+  FPFEATURES="$FPFEATURES -DENABLE_NETWORK=1"
+else
+  AC_MSG_RESULT([Network Gaming Disabled])
+fi
+
+if test "x$ENABLE_NETWORK_INTERNET" = "xtrue"; then
+  AC_MSG_RESULT([Network Gaming (Internet) Enabled])
+  FPFEATURES="$FPFEATURES -DENABLE_NETWORK_INTERNET=1"
+else
+  AC_MSG_RESULT([Network Gaming (Internet) Disabled])
+fi
+
 case $host_os in
    darwin*)
        MACOSX=true
@@ -213,6 +228,9 @@ case $host_os in
 esac
 AM_CONDITIONAL([MACOSX], [test x$MACOSX = xtrue])
 AM_CONDITIONAL([WIN32], [test x$WIN32 = xtrue])
+
+AM_CONDITIONAL([ENABLE_NETWORK], [test x$ENABLE_NETWORK = xtrue])
+AM_CONDITIONAL([ENABLE_NETWORK_INTERNET], [test x$ENABLE_NETWORK_INTERNET = xtrue])
 
 AC_SUBST([SYSTEM_ROOT])
 AC_SUBST([FPFEATURES])

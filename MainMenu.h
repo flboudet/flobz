@@ -13,7 +13,7 @@
 #include "HallOfFame.h"
 #include "PuyoOptionMenu.h"
 #include "PuyoLocalMenu.h"
-#ifndef DISABLE_NETWORK
+#ifdef ENABLE_NETWORK
 #include "PuyoNetworkMenu.h"
 #endif
 
@@ -42,15 +42,13 @@ private:
     LocalGameMenu         localGameMenu;
     Local2PlayersGameMenu local2PlayersGameMenu;
     OptionMenu            optionMenu;
-    NetworkGameMenu       networkGameMenu;
 
     PopToMainScreenAction popFromHallScreenAction, popFromCreditsAction;
     HallOfFameScreen      hallOfFameScreen; // Comes from PuyoSinglePlayerStarter.cpp
-    StoryScreen       creditsScreen;
+    StoryScreen           creditsScreen;
     PuyoPushMenuAction    singlePlayerGameAction;
     PuyoPushMenuAction    twoPlayersGameAction;
     PuyoPushMenuAction    optionAction;
-    PuyoPushMenuAction    networkGameAction;
     PushHallOfFameAction  hallOfFameAction;
     PushStoryScreenAction creditsAction;
     ExitAction exitAction;
@@ -58,10 +56,21 @@ private:
     Button singlePlayerGameButton;
     Button twoPlayersGameButton;
     Button optionButton;
-    Button networkGameButton;
     Button hallOfFameButton;
     Button creditsButton;
     Button exitButton;
+
+#ifdef ENABLE_NETWORK
+#ifdef ENABLE_NETWORK_INTERNET
+    NetworkGameMenu       networkGameMenu;
+    PuyoPushMenuAction    networkGameAction;
+    Button                networkGameButton;
+#else
+    LANGameMenu           lanGameMenu;
+    PuyoPushMenuAction    lanAction;
+    Button                lanGameButton;
+#endif
+#endif
 };
 
 #endif // _MAIN_MENU_H_
