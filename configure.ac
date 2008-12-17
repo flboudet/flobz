@@ -20,6 +20,8 @@ ENABLE_TTF=true
 ENABLE_NETWORK=true
 ENABLE_NETWORK_INTERNET=true
 
+AC_ARG_ENABLE(universal-binary, [ --enable-universal-binary enables universal-binary compilation on Mac OS X], [universal-binary=yes])
+
 #AC_ARG_ENABLE([audio],
 #              [AS_HELP_STRING([--enable-audio],
 #              [enable audio support @<:@default=yes@:>@])],
@@ -41,19 +43,22 @@ AC_PROG_RANLIB
 
 case $host_os in
     darwin*)
-            SYSTEM_ROOT="/Developer/SDKs/MacOSX10.4u.sdk"
-	    COMMON_FLAGS="-DMACOSX -isysroot $SYSTEM_ROOT -pipe -mmacosx-version-min=10.4"
-	    LDFLAGS="$LDFLAGS -isysroot $SYSTEM_ROOT -Wl,-syslibroot,$SYSTEM_ROOT"
+	    FPCOMMON_FLAGS="$FPCOMMON_FLAGS -DMACOSX"
+            if test x$universal-binary = xyes; then
+                SYSTEM_ROOT="/Developer/SDKs/MacOSX10.4u.sdk"
+                CPPFLAGS="$CPPFLAGS -isysroot $SYSTEM_ROOT"
+	        FPCOMMON_FLAGS="$FPCOMMON_FLAGS -arch ppc -arch i386 -mmacosx-version-min=10.3"
+                LDFLAGS="$LDFLAGS -isysroot $SYSTEM_ROOT -Wl,-syslibroot,$SYSTEM_ROOT -arch ppc -arch i386"
+            fi
             ;;
     *)
             ;;
 esac
-COMMON_FLAGS="$COMMON_FLAGS -pipe"
-CPPFLAGS="$CPPFLAGS $COMMON_FLAGS"
-CXXFLAGS="$CXXFLAGS $COMMON_FLAGS"
-CFLAGS="$CFLAGS $COMMON_FLAGS"
-OBJCFLAGS="$OBJCFLAGS $COMMON_FLAGS"
-LDFLAGS="$LDFLAGS $COMMON_FLAGS"
+
+FPCOMMON_FLAGS="$FPCOMMON_FLAGS -pipe"
+CXXFLAGS="$CXXFLAGS $FPCOMMON_FLAGS"
+CFLAGS="$CFLAGS $FPCOMMON_FLAGS"
+OBJCFLAGS="$OBJCFLAGS $FPCOMMON_FLAGS"
 
 
 # Check for SDL_CONFIG
