@@ -54,7 +54,7 @@ SUBDIRS = iosfc gametools goomsl data
 # Mac OS X Targets
 
 bundle_name = $(abs_top_builddir)/FloboPuyo.app
-macimage_name = $(abs_top_builddir)/FloboPuyo_Image
+macimage_name=flobopuyo-$(VERSION)-mac$(REVISION)
 
 mac-bundle:
 	rm -Rf "$(bundle_name)"
@@ -62,14 +62,16 @@ mac-bundle:
 	mkdir -p "$(bundle_name)/Contents/Resources"
 	mkdir -p "$(bundle_name)/Contents/Frameworks"
 	echo "APPL????" > "$(bundle_name)/Contents/PkgInfo"
-	sed "s/@@VERSION@@/$(VERSION)/" mac/Info.plist > "$(bundle_name)/Contents/Info.plist"
+	sed "s/@[@]VERSION[@]@/$(VERSION)$(REVISION)/" $(top_srcdir)/mac/Info.plist > "$(bundle_name)/Contents/Info.plist"
 	cp mac/icon.icns "$(bundle_name)/Contents/Resources/"
 	cp $(bin_PROGRAMS) "$(bundle_name)/Contents/MacOS/"
-	$(MAKE) $(AM_MAKEFLAGS) install fpdata="$(bundle_name)/Contents/Resources/data" datarootdir="$(bundle_name)/Contents/Resources" bindir="$(windistdir)"
+	$(MAKE) $(AM_MAKEFLAGS) install fpdata="$(bundle_name)/Contents/Resources/data" datarootdir="$(bundle_name)/Contents/Resources" bindir="$(bundle_name)/Contents/MacOS"
+	strip -u -r $(bundle_name)/Contents/MacOS/flobopuyo
 	cp -RP "$(SYSTEM_ROOT)/Library/Frameworks/SDL.framework" "$(bundle_name)/Contents/Frameworks"
 	cp -RP "$(SYSTEM_ROOT)/Library/Frameworks/SDL_image.framework" "$(bundle_name)/Contents/Frameworks"
 	cp -RP "$(SYSTEM_ROOT)/Library/Frameworks/SDL_mixer.framework" "$(bundle_name)/Contents/Frameworks"
 	cp -RP "$(SYSTEM_ROOT)/Library/Frameworks/SDL_ttf.framework" "$(bundle_name)/Contents/Frameworks"
+	strip -x $(bundle_name)/Contents/Frameworks/SDL*/SDL*
 
 mac-package: mac-bundle
 	rm -rf $(macimage_name)
@@ -86,9 +88,9 @@ mac-package: mac-bundle
 
 # Windows targets
 
-windistdir = "$(abs_top_builddir)/$(PACKAGE)-$(VERSION)-win32"
-wininstaller = "$(abs_top_builddir)/$(PACKAGE)-$(VERSION)-setup.exe"
-winziparchive = "$(abs_top_builddir)/$(PACKAGE)-$(VERSION)-win32.zip"
+windistdir = "$(abs_top_builddir)/$(PACKAGE)-$(VERSION)-win32$(REVISION)"
+wininstaller = "$(abs_top_builddir)/$(PACKAGE)-$(VERSION)$(REVISION)-setup.exe"
+winziparchive = "$(abs_top_builddir)/$(PACKAGE)-$(VERSION)-win32$(REVISION).zip"
 win_dll_to_copy=jpeg.dll libpng12-0.dll SDL.dll SDL_mixer.dll zlib1.dll \
 libfreetype-6.dll libtiff-3.dll SDL_image.dll SDL_ttf.dll
 
@@ -108,5 +110,4 @@ win_zip_archive: win_binary_distribution
 	rm -f $(winziparchive)
 	cd `dirname $(windistdir)` \
 	&& zip -9 -r $(winziparchive) `basename $(windistdir)`
-
 
