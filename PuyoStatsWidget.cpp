@@ -240,17 +240,31 @@ StatsWidget::StatsWidget(StatsFormat &statsFormat,
     img2->setPreferedSize(Vec3(128, 8));
     add(img2);
 
-    HBox *box = new HBox();
+    VBox *box = new VBox();
+    HBox *scorebox = new HBox();
+    HBox *totalscorebox = new HBox();
     Text *score = new Text("Score:");
     Text *globalScore = new Text("Total:");
+    score->setAutoSize(false);
+    globalScore->setAutoSize(false);
+    score->setPreferedSize(Vec3(200., 0.));
+    globalScore->setPreferedSize(Vec3(200., 0.));
     m_score.setValue("0");
     m_globalScore.setValue("0");
-    box->add(score);
-    box->add(&m_score);
+    m_score.setAutoSize(false);
+    m_globalScore.setAutoSize(false);
+    m_score.setPreferedSize(Vec3(0., 0.));
+    m_globalScore.setPreferedSize(Vec3(0., 0.));
+    m_score.setTextAlign(TEXT_RIGHT_ALIGN);
+    m_globalScore.setTextAlign(TEXT_RIGHT_ALIGN);
+    scorebox->add(score);
+    scorebox->add(&m_score);
     if (m_showGlobalScore) {
-        box->add(globalScore);
-        box->add(&m_globalScore);
+        totalscorebox->add(globalScore);
+        totalscorebox->add(&m_globalScore);
     }
+    box->add(scorebox);
+    box->add(totalscorebox);
     add(box);
 
     // Prepare un-allocation
@@ -260,6 +274,8 @@ StatsWidget::StatsWidget(StatsFormat &statsFormat,
     widgetAutoReleasePool.add(txt);
     widgetAutoReleasePool.add(score);
     widgetAutoReleasePool.add(globalScore);
+    widgetAutoReleasePool.add(scorebox);
+    widgetAutoReleasePool.add(totalscorebox);
     widgetAutoReleasePool.add(box);
 
     // Looking for the biggest combo

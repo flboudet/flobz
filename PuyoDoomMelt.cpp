@@ -1,8 +1,8 @@
-/* Copyright (C) 2002 W.P. van Paassen - peter@paassen.tmfweb.nl, 
+/* Copyright (C) 2002 W.P. van Paassen - peter@paassen.tmfweb.nl,
                       Ed Sinjiashvili  - slimb@swes.saren.ru
 		      dekoder          - dekoder81@users.sourceforge.net
    Copyright (C) 2004 flobo for this hacked version
-   
+
    This program is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
    Software Foundation; either version 2 of the License, or (at your
@@ -84,7 +84,7 @@ void doom_melt_update (DoomMelt *_this)
     int i = 0;
     _this->isFinished = 1;
     for (; i < NUM_COLS; i++)
-      _column_think (&_this->columns[i], &_this->isFinished); 
+      _column_think (&_this->columns[i], &_this->isFinished);
   }
 }
 
@@ -110,10 +110,10 @@ int doom_melt_finished(DoomMelt *_this)
 void _init_columns (DoomMelt *_this)
 {
     int i, start_x = 1;
-    
+
     _this->columns[0].y = -(rand_fun() % 16);
     _this->columns[0].x = 0;
-    
+
     for (i = 1; i < NUM_COLS; i++)
     {
         int r = (rand_fun() % 3) - 1;
@@ -122,9 +122,9 @@ void _init_columns (DoomMelt *_this)
             _this->columns[i].y = 0;
         else if (_this->columns[i].y == -16)
             _this->columns[i].y = -15;
-        
+
         _this->columns[i].x = start_x;
-        
+
         start_x += COL_WIDTH;
     }
 }
@@ -133,24 +133,24 @@ void _column_draw (column_t *column, SDL_Surface *meltImage, SDL_Surface *displa
 {
     static SDL_Rect image_rect = {0, 0, COL_WIDTH, };
     static SDL_Rect dest_rect =  {0, 0, COL_WIDTH, SCREEN_HEIGHT};
-    
+
     int tmp = column->y;
-    if (tmp < 0) 
+    if (tmp < 0)
         tmp = 0;
-    
+
     dest_rect.x = column->x;
     dest_rect.y = tmp;
-    
+
     image_rect.x = column->x;
     image_rect.h = meltImage->h - tmp;
-    
+
     SDL_BlitSurface(meltImage, &image_rect, display, &dest_rect);
 }
 
 void _column_think (column_t *column, int *isFinished)
 {
     static int grow = 0;
-    
+
     if (column->y < 0)
     {
         *isFinished = 0;
@@ -163,10 +163,10 @@ void _column_think (column_t *column, int *isFinished)
             grow = column->y+3;
         else
         {
-            grow = 15; 
+            grow = 15;
         }
     }
-    
+
     column->y += grow;
 }
 
