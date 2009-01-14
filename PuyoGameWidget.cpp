@@ -427,7 +427,7 @@ void *PuyoGameWidget::styro_loadImage(StyrolyseClient *_this, const char *path)
 }
 void PuyoGameWidget::styro_drawImage(StyrolyseClient *_this,
 			    void *image, int x, int y,
-			    int clipx, int clipy, int clipw, int cliph)
+			    int clipx, int clipy, int clipw, int cliph, int flipped)
 {
   IIM_Surface *surf = (IIM_Surface *)image;
   SDL_Rect  cliprect;
@@ -435,6 +435,13 @@ void PuyoGameWidget::styro_drawImage(StyrolyseClient *_this,
   cliprect.y = clipy;
   cliprect.w = clipw;
   cliprect.h = cliph;
+  if (flipped) {
+    if (!surf->fliph) {
+        // Generate flipped image.
+        surf->fliph = iim_surface_mirror_h(surf);
+    }
+    surf = surf->fliph;
+  }    
   ((StyrolysePainterClient *)_this)->m_painter->requestDraw(surf, &cliprect);
 }
 void PuyoGameWidget::styro_freeImage(StyrolyseClient *_this, void *image)

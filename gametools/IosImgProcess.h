@@ -61,6 +61,7 @@ typedef struct _IIM_Surface {
   int h;
   bool isAlpha;
   struct _IIM_Surface *rotated[36];
+  struct _IIM_Surface *fliph;
 } IIM_Surface;
 
 #define IIM_Rect SDL_Rect
@@ -84,6 +85,7 @@ IIM_Surface * IIM_RegisterImg(SDL_Surface *img, bool isAlpha);
 void          IIM_ReConvertAll(void);
 
 int IIM_BlitSurface(IIM_Surface *src, IIM_Rect *src_rect, SDL_Surface *dst, SDL_Rect *dst_rect);
+int IIM_BlitFlippedSurface(IIM_Surface *src, IIM_Rect *src_rect, SDL_Surface *dst, SDL_Rect *dst_rect);
 void IIM_BlitSurfaceAlpha(IIM_Surface *src, IIM_Rect *src_rect, SDL_Surface *dst, SDL_Rect *dst_rect, Uint8 alpha);
 void IIM_BlitRotatedSurfaceCentered(IIM_Surface *src, int degrees, SDL_Surface *dst, int x, int y);
 

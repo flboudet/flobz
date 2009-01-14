@@ -104,7 +104,7 @@ protected:
     static void *styro_loadImage(StyrolyseClient *_this, const char *path);
     static void styro_drawImage(StyrolyseClient *_this,
 				void *image, int x, int y,
-				int clipx, int clipy, int clipw, int cliph);
+				int clipx, int clipy, int clipw, int cliph, int flipped);
     static void styro_freeImage(StyrolyseClient *_this, void *image);
 
     PuyoGameScreen *associatedScreen;

@@ -85,7 +85,7 @@ static void *loadImage (StyrolyseClient *_this, const char *path)
 
 
 static void  drawImage (StyrolyseClient *_this, void *image, int x, int y,
-                 int clipx, int clipy, int clipw, int cliph)
+                 int clipx, int clipy, int clipw, int cliph, int flipped)
 {
   StyroImage  *simg = (StyroImage*)image;
   IIM_Surface *surf = simg->surface;
@@ -97,7 +97,8 @@ static void  drawImage (StyrolyseClient *_this, void *image, int x, int y,
   cliprect.w = clipw;
   cliprect.h = cliph;
   SDL_SetClipRect(sstory, &cliprect);
-  SDL_BlitSurface(surf->surf, NULL, sstory, &rect);
+  if (!flipped) IIM_BlitSurface(surf, NULL, sstory, &rect);
+  else IIM_BlitFlippedSurface(surf, NULL, sstory, &rect);
 }
 
 static void  freeImage (StyrolyseClient *_this, void *image)

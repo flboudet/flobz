@@ -9,8 +9,10 @@
 bool fullscreen = true;
 bool useGL = false;
 
-IIM_Surface  imgList[8192];
+#define MAXIMG 8192
+IIM_Surface  imgList[MAXIMG];
 int          imgListSize = 0;
+int          imgListIndex = 0;
 
 IIM_Surface * IIM_Load_Absolute_DisplayFormat (const char *path)
 {
@@ -48,16 +50,41 @@ void IIM_Free(IIM_Surface *img)
   {
     if (&imgList[i] == img)
     {
-      SDL_FreeSurface(imgList[i].surf);
-      imgList[i].surf = 0;
-      return;
+        if (img->surf != NULL) SDL_FreeSurface(imgList[i].surf);
+        imgList[i].surf = NULL;
+        //fprintf(stderr,"Pictures array freed %d\n",i);
+        for (int j=1; j<36; ++j)
+            if (img->rotated[j] != NULL) IIM_Free(img->rotated[j]);
+        if (img->fliph != NULL) IIM_Free(img->fliph);
+        return;
     }
   }
 }
 
 IIM_Surface * IIM_RegisterImg(SDL_Surface *img, bool isAlpha)
 {
-  IIM_Surface *_this = &imgList[imgListSize++];
+    IIM_Surface *_this = NULL;
+    /* We still have empty slots */
+    if (imgListSize < MAXIMG) {
+        _this = &imgList[imgListSize++];
+        //fprintf(stderr,"Pictures array using %d\n",imgListSize-1);
+    } else {
+        // try to find another place
+        int orig = imgListIndex;
+        for (int i=(orig+1)%MAXIMG; i!=orig; i=(i+1)%MAXIMG)
+        {
+            if (imgList[i].surf == NULL) {
+                _this = &imgList[i];
+                imgListIndex = i;
+                //fprintf(stderr,"Pictures array reusing %d\n",imgListIndex);
+                break;
+            }
+        }
+        if (_this == NULL) {
+            fprintf(stderr,"Pictures array limit exceeded, aborting...\n");
+            exit(0);
+        }
+    }
   _this->isAlpha = isAlpha;
   _this->surf    = img;
   _this->w       = img->w;
@@ -65,6 +92,7 @@ IIM_Surface * IIM_RegisterImg(SDL_Surface *img, bool isAlpha)
   for (int i=0; i<36; ++i)
     _this->rotated[i] = NULL;
   _this->rotated[0] = _this;
+  _this->fliph = NULL;
   return _this;
 }
 
@@ -820,6 +848,15 @@ void IIM_BlitSurfaceAlpha(IIM_Surface *src, IIM_Rect *src_rect, SDL_Surface *dst
   assert(src->surf != NULL);
   SDL_SetAlpha(src->surf, SDL_SRCALPHA|(useGL?0:SDL_RLEACCEL), alpha);
   SDL_BlitSurface(src->surf, src_rect, dst, dst_rect);
+}
+
+int IIM_BlitFlippedSurface(IIM_Surface *src, IIM_Rect *src_rect, SDL_Surface *dst, SDL_Rect *dst_rect)
+{
+    if (src->fliph == NULL) {
+        // Generate flipped image.
+        src->fliph = iim_surface_mirror_h(src);
+    }
+    return SDL_BlitSurface(src->fliph->surf, src_rect, dst, dst_rect);
 }
 
 void IIM_BlitRotatedSurfaceCentered(IIM_Surface *src, int degrees, SDL_Surface *dst, int x, int y)

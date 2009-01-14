@@ -56,6 +56,7 @@ struct <Sprite:
   string parent,
   Vec2   pos,
   Vec2   dest,
+  int    flipped,
   float  dcycle,
   string image,
   float  curframe,
@@ -82,6 +83,7 @@ struct <Display:
   new_sprite.pos.y     = y
   new_sprite.dest.x    = x
   new_sprite.dest.y    = y
+  new_sprite.flipped   = 1
   new_sprite.dcycle    = 0.0
   new_sprite.image     = image
   new_sprite.curframe  = curframe
