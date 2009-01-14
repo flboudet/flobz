@@ -13,3 +13,6 @@
     move::@kaori fcycle=60.0 x=800.0 y=280.0
     move::@kaori fcycle=120.0 x=-200.0 y=280.0
     move::@kaori fcycle=180.0 x=800.0 y=280.0
+    @kaori.flipped=0
+    (@fcycle >= 60.0)? @kaori.flipped=1
+    (@fcycle >= 120.0)? @kaori.flipped=0
