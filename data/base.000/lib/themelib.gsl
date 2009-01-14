@@ -90,7 +90,7 @@ external <end_level>
 
     level.gamelost_left_2p = "gamelost2p_left.gsl"
     level.gamelost_right_2p = "gamelost2p_right.gsl"
-    level.animation_2p = "herbert.gsl"
+    level.animation_2p = "little_kaori.gsl"
     level.foreground_animation=""
 
 <ThemeDefinition>
