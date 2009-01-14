@@ -1,0 +1,15 @@
+<init>
+  Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+  Sprite @kaori      = [new_sprite: image="sdkaori/running_01.png" x=-200.0 y=280.0 curframe=0.0 framespeed=0.4 nbframes=4.0]
+
+<sprite_list>
+    sprite::@kaori display=@display
+
+<update>
+    @kaori.image = "sdkaori/running_01.png"
+    (@kaori.curframe >= 1.0)? @kaori.image = "sdkaori/running_02.png"
+    (@kaori.curframe >= 2.0)? @kaori.image = "sdkaori/running_03.png"
+    (@kaori.curframe >= 3.0)? @kaori.image = "sdkaori/running_04.png"
+    move::@kaori fcycle=60.0 x=800.0 y=280.0
+    move::@kaori fcycle=120.0 x=-200.0 y=280.0
+    move::@kaori fcycle=180.0 x=800.0 y=280.0
