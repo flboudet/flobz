@@ -35,11 +35,9 @@ Windows Package :
 (Cross compile using Mac OS X or Linux)
 *****************************************
 Install all the SDL* dll somewhere (one "include" and one "lib" folder for all SDL*)
-and edit the WINSDL* variables in the config file to match your installation
-Install the cross-compiler somewhere and edit the CROSSTOOLS and CROSSTRIPLET variables in config to match your cross compiler
-Then type the following lines in Terminal:
-cd path-to-the-source-folder-on-your-system
-./configure
-make -j3 PLATFORM=crossmingw32 win-package
+Install the cross-compiler somewhere
+Then type the following lines in a terminal:
+export SDL_CONFIG=<path to your win32 mingw32 sdlconfig>
+./configure -prefix=/usr/local/i586-mingw32 --host=i586-mingw32msvc --build=i686-linux
 *****************************************
 
