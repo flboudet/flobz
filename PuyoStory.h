@@ -42,11 +42,11 @@ using namespace gameui;
 
 class PuyoCommander;
 
-class StoryWidget : public Widget, public /*Cycled*/IdleComponent {
+class StoryWidget : public Widget, public IdleComponent {
 public:
     StoryWidget(String screenName, Action *finishedAction = NULL, bool fxMode = false);
     ~StoryWidget();
-    // void cycle();
+    void reset();
     void idle(double currentTime);
     void draw(SDL_Surface *screen);
     IdleComponent *getIdleComponent() { return this; }
@@ -68,6 +68,8 @@ protected:
     static bool classInitialized;
     PuyoStoryStyrolyseClient client;
     double last_time;
+    bool fxMode;
+    String fullPath;
 };
 
 class PuyoFX : public StoryWidget {
@@ -97,6 +99,7 @@ public:
      */
     virtual void onScreenVisibleChanged(bool visible);
     const StoryWidget * getStoryWidget() const { return &storyWidget; }
+    StoryWidget * getStoryWidget() { return &storyWidget; }
 protected:
     StoryWidget storyWidget;
     PuyoScreenTransitionWidget *transitionWidget;

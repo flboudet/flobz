@@ -131,7 +131,7 @@ static void playSound(StyrolyseClient *_this, const char *fileName, int volume)
 bool StoryWidget::classInitialized = false;
 
 StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
-    : /*Cycled*/IdleComponent(/*0.04*/), localeDictionary(NULL), finishedAction(finishedAction), once(false), last_time(-1.)
+    : IdleComponent(), localeDictionary(NULL), finishedAction(finishedAction), once(false), last_time(-1.), fxMode(fxMode)
 {
     try {
         localeDictionary = new PuyoLocalizedDictionary(theCommander->getDataPathManager(), "locale/story", screenName);
@@ -146,7 +146,6 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
     }
 
     FILE *test = NULL;
-    String fullPath;
     try {
         fullPath = theCommander->getDataPathManager().getPath(String("story/") + screenName);
         test = fopen((const char *)fullPath, "r");
@@ -181,6 +180,12 @@ StoryWidget::~StoryWidget()
     styrolyse_free(currentStory);
     if (localeDictionary != NULL)
         delete localeDictionary;
+}
+
+void StoryWidget::reset()
+{
+    styrolyse_free(currentStory);
+    currentStory = styrolyse_new((const char *)fullPath, (StyrolyseClient *)(&client), fxMode);
 }
 
 // void StoryWidget::cycle()

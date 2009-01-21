@@ -56,6 +56,7 @@ class PushStoryScreenAction : public Action
             : storyScreen(storyScreen), fromScreen(fromScreen)
         {}
         void action() {
+            storyScreen->getStoryWidget()->reset();
             storyScreen->transitionFromScreen(*fromScreen);
             GameUIDefaults::SCREEN_STACK->push(storyScreen);
         }
