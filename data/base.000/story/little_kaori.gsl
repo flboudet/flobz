@@ -1,18 +1,139 @@
 <init>
-  Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
-  Sprite @kaori      = [new_sprite: image="sdkaori/running_01.png" x=-200.0 y=280.0 curframe=0.0 framespeed=0.4 nbframes=4.0]
+    Display @lk_display = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+    Sprite @lk_sprite = [new_sprite: image="sdkaori/running_01.png" x=-200.0 y=280.0 curframe=0.0 framespeed=0.4 nbframes=4.0]
+
+    # Available states for Little Kaori (LK)
+
+    int @LK_GONE = 0
+    int @LK_RUNNING_SIDE_TO_SIDE = 1
+    int @LK_RUNNING_SIDE_TO_MIDDLE = 2
+    int @LK_RUNNING_MIDDLE_TO_SIDE = 3
+    int @LK_MOCKING = 4
+
+    int @LK_LEFT = 0
+    int @LK_RIGHT = 1
+
+    # State machin variables
+
+    int   @lk_state      = @LK_GONE
+    int   @lk_side       = @LK_LEFT
+    float @lk_startcycle = @fcycle
+
+    # Some constants
+
+    float @LK_DISPLAY_WIDTH         = 640.0
+    float @LK_DISPLAY_HEIGHT        = 480.0
+
+    float @LK_RUNNING_SPRITE_WIDTH  = 173.0
+    float @LK_RUNNING_SPRITE_HEIGHT = 200.0
+
+    float @LK_MOCKING_SPRITE_WIDTH  = 129.0
+    float @LK_MOCKING_SPRITE_HEIGHT = 200.0
+
+    float @LK_MOCKING_SPRITE_CENTER_X = 0.5 * (@LK_DISPLAY_WIDTH - @LK_MOCKING_SPRITE_WIDTH)
+    float @LK_MOCKING_SPRITE_Y = @LK_DISPLAY_HEIGHT - @LK_RUNNING_SPRITE_HEIGHT
+
+    float @LK_RUNNING_SPRITE_CENTER_X = 0.5 * (@LK_DISPLAY_WIDTH - @LK_RUNNING_SPRITE_WIDTH)
+    float @LK_RUNNING_SPRITE_Y = @LK_DISPLAY_HEIGHT - @LK_RUNNING_SPRITE_HEIGHT
 
 <sprite_list>
-    sprite::@kaori display=@display
+    (@lk_state != @LK_GONE)? sprite::@lk_sprite display=@lk_display
+
+# ------------------ #
+# Animations Methods #
+# ------------------ #
+
+<lk_gone>
+    @lk_sprite.image = ""
+
+<lk_running>
+    # Animation
+    @lk_sprite.nbframes = 4.0
+    @lk_sprite.image = "sdkaori/running_01.png"
+    (@lk_sprite.curframe >= 1.0)? @lk_sprite.image = "sdkaori/running_02.png"
+    (@lk_sprite.curframe >= 2.0)? @lk_sprite.image = "sdkaori/running_03.png"
+    (@lk_sprite.curframe >= 3.0)? @lk_sprite.image = "sdkaori/running_04.png"
+    @lk_sprite.flipped = @lk_side
+
+<lk_running_left_to_right>
+    move::@lk_sprite fcycle=@lk_startcycle         x=-@LK_RUNNING_SPRITE_WIDTH    y=@LK_RUNNING_SPRITE_Y
+    move::@lk_sprite fcycle=@lk_startcycle + 60.0  x= @LK_DISPLAY_WIDTH           y=@LK_RUNNING_SPRITE_Y
+    lk_running
+<lk_running_right_to_left>
+    move::@lk_sprite fcycle=@lk_startcycle         x= @LK_DISPLAY_WIDTH           y=@LK_RUNNING_SPRITE_Y
+    move::@lk_sprite fcycle=@lk_startcycle + 60.0  x=-@LK_RUNNING_SPRITE_WIDTH    y=@LK_RUNNING_SPRITE_Y
+    lk_running
+<lk_running_left_to_middle>
+    move::@lk_sprite fcycle=@lk_startcycle         x=-@LK_RUNNING_SPRITE_WIDTH    y=@LK_RUNNING_SPRITE_Y
+    move::@lk_sprite fcycle=@lk_startcycle + 30.0  x= @LK_RUNNING_SPRITE_CENTER_X y=@LK_RUNNING_SPRITE_Y
+    lk_running
+<lk_running_right_to_middle>
+    move::@lk_sprite fcycle=@lk_startcycle         x=-@LK_DISPLAY_WIDTH           y=@LK_RUNNING_SPRITE_Y
+    move::@lk_sprite fcycle=@lk_startcycle + 30.0  x= @LK_RUNNING_SPRITE_CENTER_X y=@LK_RUNNING_SPRITE_Y
+    lk_running
+<lk_running_middle_to_left>
+    move::@lk_sprite fcycle=@lk_startcycle         x= @LK_RUNNING_SPRITE_CENTER_X y=@LK_RUNNING_SPRITE_Y
+    move::@lk_sprite fcycle=@lk_startcycle + 30.0  x=-@LK_RUNNING_SPRITE_WIDTH    y=@LK_RUNNING_SPRITE_Y
+    lk_running
+<lk_running_middle_to_right>
+    move::@lk_sprite fcycle=@lk_startcycle         x= @LK_RUNNING_SPRITE_CENTER_X y=@LK_RUNNING_SPRITE_Y
+    move::@lk_sprite fcycle=@lk_startcycle + 30.0  x= @LK_DISPLAY_WIDTH           y=@LK_RUNNING_SPRITE_Y
+    lk_running
+
+<lk_mocking>
+    @lk_sprite.nbframes = 2.0
+    @lk_sprite.image = "sdkaori/mocking_01.png"
+    (@lk_sprite.curframe >= 1.0)? @lk_sprite.image = "sdkaori/mocking_02.png"
+    move::@lk_sprite fcycle=@lk_startcycle          x=@LK_MOCKING_SPRITE_CENTER_X  y=@LK_MOCKING_SPRITE_Y
+    @lk_sprite.pos.x = @LK_MOCKING_SPRITE_CENTER_X
+    @lk_sprite.pos.y = @LK_MOCKING_SPRITE_Y
+    @lk_sprite.flipped = @lk_side
 
 <update>
-    @kaori.image = "sdkaori/running_01.png"
-    (@kaori.curframe >= 1.0)? @kaori.image = "sdkaori/running_02.png"
-    (@kaori.curframe >= 2.0)? @kaori.image = "sdkaori/running_03.png"
-    (@kaori.curframe >= 3.0)? @kaori.image = "sdkaori/running_04.png"
-    move::@kaori fcycle=60.0 x=800.0 y=280.0
-    move::@kaori fcycle=120.0 x=-200.0 y=280.0
-    move::@kaori fcycle=180.0 x=800.0 y=280.0
-    @kaori.flipped=0
-    (@fcycle >= 60.0)? @kaori.flipped=1
-    (@fcycle >= 120.0)? @kaori.flipped=0
+
+    # ------------- #
+    # State Changes #
+    # ------------- #
+
+    (@lk_state = @LK_GONE)? (@fcycle > @lk_startcycle + 50.0)? {
+        float r = [random]
+        (r <  0.5)? @lk_state = @LK_RUNNING_SIDE_TO_MIDDLE
+        (r >= 0.5)? @lk_state = @LK_RUNNING_SIDE_TO_SIDE
+        @lk_startcycle = @fcycle
+    }
+
+    (@lk_state = @LK_RUNNING_SIDE_TO_SIDE)? (@fcycle > @lk_startcycle + 60.0)? {
+        @lk_state = @LK_GONE
+        @lk_startcycle = @fcycle
+        @lk_side = 1 - @lk_side
+    }
+
+    (@lk_state = @LK_RUNNING_SIDE_TO_MIDDLE)? (@fcycle > @lk_startcycle + 30.0)? {
+        @lk_state = @LK_MOCKING
+        @lk_startcycle = @fcycle
+    }
+
+    (@lk_state = @LK_MOCKING)? (@fcycle > @lk_startcycle + 60.0)? {
+        @lk_state = @LK_RUNNING_MIDDLE_TO_SIDE
+        @lk_startcycle = @fcycle
+    }
+
+    (@lk_state = @LK_RUNNING_MIDDLE_TO_SIDE)? (@fcycle > @lk_startcycle + 30.0)? {
+        @lk_state = @LK_GONE
+        @lk_startcycle = @fcycle
+        @lk_side = 1 - @lk_side
+    }
+
+    # ------------------ #
+    # Actions to perform #
+    # ------------------ #
+
+    (@lk_state = @LK_GONE                  )?                         lk_gone
+    (@lk_state = @LK_MOCKING               )?                         lk_mocking
+    (@lk_state = @LK_RUNNING_SIDE_TO_SIDE  )? (@lk_side = @LK_LEFT )? lk_running_left_to_right
+    (@lk_state = @LK_RUNNING_SIDE_TO_SIDE  )? (@lk_side = @LK_RIGHT)? lk_running_right_to_left
+    (@lk_state = @LK_RUNNING_MIDDLE_TO_SIDE)? (@lk_side = @LK_LEFT )? lk_running_middle_to_right
+    (@lk_state = @LK_RUNNING_MIDDLE_TO_SIDE)? (@lk_side = @LK_RIGHT)? lk_running_middle_to_left
+    (@lk_state = @LK_RUNNING_SIDE_TO_MIDDLE)? (@lk_side = @LK_LEFT )? lk_running_left_to_middle
+    (@lk_state = @LK_RUNNING_SIDE_TO_MIDDLE)? (@lk_side = @LK_RIGHT)? lk_running_right_to_middle
+

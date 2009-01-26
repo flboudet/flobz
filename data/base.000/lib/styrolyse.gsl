@@ -100,12 +100,13 @@ struct <Display:
     &this.dcycle = fcycle
   }
 
-external <put_text: string text, Vec2 pos, float text_index>
-external <gettext: string text> : string
 external <draw: Sprite &this, Display display>
-external <sin: float value> : float
+external <gettext: string text> : string
 external <mod: int numerator, int denominator> : int
 external <music: string file>
+external <put_text: string text, Vec2 pos, float text_index>
+external <random> : float
+external <sin: float value> : float
 external <sound: string file, float volume>
 external <strcmp: string s1, string s2> : int
 

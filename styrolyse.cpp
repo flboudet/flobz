@@ -36,6 +36,11 @@ void styro_sin(GoomSL *gsl, GoomHash *global, GoomHash *local)
     GSL_GLOBAL_FLOAT(gsl, "sin") = sin(GSL_LOCAL_FLOAT(gsl, local, "value"));
 }
 
+void styro_random(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    GSL_GLOBAL_FLOAT(gsl, "random") = (float)((double)rand() / (double)RAND_MAX);
+}
+
 void styro_strcmp(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
     char *str1 = (char*)GSL_LOCAL_PTR(gsl, local, "s1");
@@ -209,15 +214,16 @@ char *pathResolverFunction(GoomSL *gsl, const char *path)
 
 static void sbind(GoomSL *gsl)
 {
+  gsl_bind_function(gsl, "draw",     sprite_draw);
+  gsl_bind_function(gsl, "gettext",  styro_gettext);
+  gsl_bind_function(gsl, "mod",      styro_mod);
+  gsl_bind_function(gsl, "music",    styro_music);
+  gsl_bind_function(gsl, "put_text", put_text);
+  gsl_bind_function(gsl, "random",   styro_random);
+  gsl_bind_function(gsl, "sin",      styro_sin);
+  gsl_bind_function(gsl, "sound",    styro_sound);
   gsl_bind_function(gsl, "strcmp",   styro_strcmp);
-  gsl_bind_function(gsl, "put_text",   put_text);
-  gsl_bind_function(gsl, "draw",  sprite_draw);
-  gsl_bind_function(gsl, "sin",   styro_sin);
-//  gsl_bind_function(gsl, "f2i",   styro_f2i);
-  gsl_bind_function(gsl, "mod",   styro_mod);
-  gsl_bind_function(gsl, "music", styro_music);
-  gsl_bind_function(gsl, "sound", styro_sound);
-  gsl_bind_function(gsl, "gettext",   styro_gettext);
+// gsl_bind_function(gsl, "f2i",      styro_f2i);
 }
 
 /* Externals */
