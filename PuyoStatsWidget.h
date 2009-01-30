@@ -106,6 +106,7 @@ public:
   virtual void onWidgetVisibleChanged(bool visible);
   virtual void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
+  gameui::Image m_statsImage;
   StatsFormat &m_statsFormat;
   StatsWidget &m_guideWidget;
   gameui::Separator m_titleSeparator, m_barSeparator, m_bottomSeparator;
@@ -141,8 +142,7 @@ public:
 private:
     StatsResources m_res;
     StatsFormat m_statsFormat;
-    gameui::SliderContainer m_topSlider, m_leftSlider, m_rightSlider, m_legendSlider;
-    gameui::Text m_title;
+    gameui::SliderContainer m_leftSlider, m_rightSlider, m_legendSlider;
     PuyoStatsLegendWidget m_legend;
     StatsWidget m_leftStats, m_rightStats;
     SelfVector<Widget*> widgetAutoReleasePool;
