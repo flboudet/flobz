@@ -18,6 +18,11 @@ int @maxHeightPlayer
 int @maxHeightAI
 int @neutralsForPlayer
 int @neutralsForAI
+int @maxHeightLeft
+int @maxHeightRight
+int @neutralsForLeft
+int @neutralsForRight
+
 string @event_type
 int  @event_player
 
