@@ -12,15 +12,20 @@
     float @LK_RUNNING_SPRITE_HEIGHT = 200.0
     float @LK_MOCKING_SPRITE_WIDTH  = 129.0
     float @LK_MOCKING_SPRITE_HEIGHT = 200.0
+    float @LK_HAPPY_SPRITE_WIDTH = 195.0
+    float @LK_HAPPY_SPRITE_HEIGHT = 240.0
 
     # Duration of animations
     float @LK_RUNNING_DURATION = 60.0
     float @LK_MOCKING_DURATION = 40.0
+    float @LK_HAPPY_DURATION = 25.0 # 2 * nbframes / framespeed
     float @LK_GONE_DURATION = 80.0
 
     # Some precomputed positions
     float @LK_MOCKING_SPRITE_CENTER_X = 0.5 * (@LK_DISPLAY_WIDTH - @LK_MOCKING_SPRITE_WIDTH)
-    float @LK_MOCKING_SPRITE_Y = @LK_DISPLAY_HEIGHT - @LK_RUNNING_SPRITE_HEIGHT
+    float @LK_MOCKING_SPRITE_Y = @LK_DISPLAY_HEIGHT - @LK_MOCKING_SPRITE_HEIGHT
+    float @LK_HAPPY_SPRITE_CENTER_X = 0.5 * (@LK_DISPLAY_WIDTH - @LK_HAPPY_SPRITE_WIDTH)
+    float @LK_HAPPY_SPRITE_Y = @LK_DISPLAY_HEIGHT - @LK_HAPPY_SPRITE_HEIGHT
     float @LK_RUNNING_SPRITE_CENTER_X = 0.5 * (@LK_DISPLAY_WIDTH - @LK_RUNNING_SPRITE_WIDTH)
     float @LK_RUNNING_SPRITE_Y = @LK_DISPLAY_HEIGHT - @LK_RUNNING_SPRITE_HEIGHT
 
@@ -37,6 +42,7 @@
     int @LK_RUNNING_SIDE_TO_MIDDLE = 2
     int @LK_RUNNING_MIDDLE_TO_SIDE = 3
     int @LK_MOCKING = 4
+    int @LK_HAPPY = 5
 
     # Available directions
     int @LK_LEFT = 0
@@ -64,6 +70,7 @@
     (@lk_sprite.curframe >= 1.0)? @lk_sprite.image = "sdkaori/running_02.png"
     (@lk_sprite.curframe >= 2.0)? @lk_sprite.image = "sdkaori/running_03.png"
     (@lk_sprite.curframe >= 3.0)? @lk_sprite.image = "sdkaori/running_04.png"
+    @lk_sprite.pos.y = @LK_RUNNING_SPRITE_Y
     @lk_sprite.flipped = @lk_side
 
 <lk_running_left_to_right>
@@ -100,6 +107,18 @@
     @lk_sprite.pos.y = @LK_MOCKING_SPRITE_Y
     @lk_sprite.flipped = @lk_side
 
+<lk_happy>
+    @lk_sprite.nbframes = 5.0
+    @lk_sprite.image = "sdkaori/happy_01.png"
+    (@lk_sprite.curframe >= 1.0)? @lk_sprite.image = "sdkaori/happy_02.png"
+    (@lk_sprite.curframe >= 2.0)? @lk_sprite.image = "sdkaori/happy_03.png"
+    (@lk_sprite.curframe >= 3.0)? @lk_sprite.image = "sdkaori/happy_04.png"
+    (@lk_sprite.curframe >= 4.0)? @lk_sprite.image = "sdkaori/happy_05.png"
+    move::@lk_sprite fcycle=@lk_startcycle          x=@LK_HAPPY_SPRITE_CENTER_X  y=@LK_HAPPY_SPRITE_Y
+    @lk_sprite.pos.x = @LK_HAPPY_SPRITE_CENTER_X
+    @lk_sprite.pos.y = @LK_HAPPY_SPRITE_Y
+    @lk_sprite.flipped = @lk_side
+
 <lk_switch: int state>
     @lk_state = state
     @lk_startcycle = @fcycle
@@ -122,7 +141,9 @@
     }
 
     (@lk_state = @LK_RUNNING_SIDE_TO_MIDDLE)? (@fcycle > @lk_startcycle + @LK_RUNNING_DURATION / 2.0)? {
-        lk_switch: state = @LK_MOCKING
+        float rnd = [random]
+        (rnd <  0.5)? lk_switch: state = @LK_MOCKING
+        (rnd >= 0.5)? lk_switch: state = @LK_HAPPY
     }
 
     (@lk_state = @LK_RUNNING_MIDDLE_TO_SIDE)? (@fcycle > @lk_startcycle + @LK_RUNNING_DURATION / 2.0)? {
@@ -134,11 +155,16 @@
         lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
     }
 
+    (@lk_state = @LK_HAPPY)?                  (@fcycle > @lk_startcycle + @LK_HAPPY_DURATION)? {
+        lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
+    }
+
     # ------------------ #
     # Actions to perform #
     # ------------------ #
 
     (@lk_state = @LK_GONE                  )?                         lk_gone
+    (@lk_state = @LK_HAPPY                 )?                         lk_happy
     (@lk_state = @LK_MOCKING               )?                         lk_mocking
     (@lk_state = @LK_RUNNING_SIDE_TO_SIDE  )? (@lk_side = @LK_LEFT )? lk_running_left_to_right
     (@lk_state = @LK_RUNNING_SIDE_TO_SIDE  )? (@lk_side = @LK_RIGHT)? lk_running_right_to_left
