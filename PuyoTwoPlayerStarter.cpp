@@ -35,7 +35,7 @@ PuyoTwoPlayersGameWidget::PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThe
                                                      GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
                                                      playercontrollerB(areaB, GameControlEvent::kPlayer2Down, GameControlEvent::kPlayer2Left, GameControlEvent::kPlayer2Right,
                                                      GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight),
-                                                     opponentFace(aiFace)
+                                                     opponentFace(aiFace), faceTicks(0)
 {
     initialize(areaA, areaB, playercontrollerA, playercontrollerB, levelTheme, gameOverAction);
     setLives(-1);
@@ -44,6 +44,19 @@ PuyoTwoPlayersGameWidget::PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThe
 StoryWidget *PuyoTwoPlayersGameWidget::getOpponent()
 {
     return &opponentFace;
+}
+
+void PuyoTwoPlayersGameWidget::cycle()
+{
+    faceTicks += 1;
+    if (faceTicks == 100) {
+        opponentFace.setIntegerValue("@maxHeightLeft", attachedGameA->getMaxColumnHeight());
+        opponentFace.setIntegerValue("@maxHeightRight", attachedGameB->getMaxColumnHeight());
+        opponentFace.setIntegerValue("@neutralsForLeft", attachedGameA->getNeutralPuyos());
+        opponentFace.setIntegerValue("@neutralsForRight", attachedGameB->getNeutralPuyos());
+        faceTicks = 0;
+    }
+    PuyoGameWidget::cycle();
 }
 
 TwoPlayersStarterAction::TwoPlayersStarterAction(int difficulty, PuyoGameWidgetFactory &gameWidgetFactory, PuyoTwoNameProvider *nameProvider)

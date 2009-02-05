@@ -39,6 +39,7 @@ class PuyoTwoPlayersGameWidget : public PuyoGameWidget {
 public:
     PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String aiFace, Action *gameOverAction = NULL);
     bool didPlayerWon() const { return isGameARunning(); }
+    void cycle();
     StoryWidget *getOpponent();
 private:
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
@@ -47,6 +48,7 @@ private:
     PuyoView areaA, areaB;
     PuyoEventPlayer playercontrollerA, playercontrollerB;
     StoryWidget opponentFace;
+    int faceTicks;
 };
 
 
