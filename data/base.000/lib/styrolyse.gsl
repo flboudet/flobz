@@ -22,6 +22,8 @@ int @maxHeightLeft
 int @maxHeightRight
 int @neutralsForLeft
 int @neutralsForRight
+int @comboPhaseLeft
+int @comboPhaseRight
 
 string @event_type
 int  @event_player
