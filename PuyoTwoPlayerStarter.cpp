@@ -48,8 +48,8 @@ StoryWidget *PuyoTwoPlayersGameWidget::getOpponent()
 
 void PuyoTwoPlayersGameWidget::cycle()
 {
-    opponentFace.setIntegerValue("@maxHeightLeft", attachedGameA->getMaxColumnHeight());
-    opponentFace.setIntegerValue("@maxHeightRight", attachedGameB->getMaxColumnHeight());
+    opponentFace.setIntegerValue("@maxHeightLeft", attachedGameA->getColumnHeigth(2));
+    opponentFace.setIntegerValue("@maxHeightRight", attachedGameB->getColumnHeigth(2));
     opponentFace.setIntegerValue("@neutralsForLeft", attachedGameA->getNeutralPuyos());
     opponentFace.setIntegerValue("@neutralsForRight", attachedGameB->getNeutralPuyos());
     opponentFace.setIntegerValue("@comboPhaseLeft", attachedGameA->getComboPhase());

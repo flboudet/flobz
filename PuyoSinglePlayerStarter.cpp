@@ -69,8 +69,8 @@ void PuyoSinglePlayerGameWidget::cycle()
         opponentcontroller.setAIParameters(ai);
     }
     if (faceTicks == 100) {
-        opponent.setIntegerValue("@maxHeightPlayer", attachedGameA->getMaxColumnHeight());
-        opponent.setIntegerValue("@maxHeightAI", attachedGameB->getMaxColumnHeight());
+        opponent.setIntegerValue("@maxHeightPlayer", attachedGameA->getColumnHeigth(2));
+        opponent.setIntegerValue("@maxHeightAI", attachedGameB->getColumnHeigth(2));
         opponent.setIntegerValue("@neutralsForPlayer", attachedGameA->getNeutralPuyos());
         opponent.setIntegerValue("@neutralsForAI", attachedGameB->getNeutralPuyos());
         faceTicks = 0;
