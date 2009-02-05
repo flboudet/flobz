@@ -35,7 +35,7 @@ PuyoTwoPlayersGameWidget::PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThe
                                                      GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
                                                      playercontrollerB(areaB, GameControlEvent::kPlayer2Down, GameControlEvent::kPlayer2Left, GameControlEvent::kPlayer2Right,
                                                      GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight),
-                                                     opponentFace(aiFace), faceTicks(0)
+                                                     opponentFace(aiFace)
 {
     initialize(areaA, areaB, playercontrollerA, playercontrollerB, levelTheme, gameOverAction);
     setLives(-1);
@@ -48,16 +48,12 @@ StoryWidget *PuyoTwoPlayersGameWidget::getOpponent()
 
 void PuyoTwoPlayersGameWidget::cycle()
 {
-    faceTicks += 1;
-    if (faceTicks == 100) {
-        opponentFace.setIntegerValue("@maxHeightLeft", attachedGameA->getMaxColumnHeight());
-        opponentFace.setIntegerValue("@maxHeightRight", attachedGameB->getMaxColumnHeight());
-        opponentFace.setIntegerValue("@neutralsForLeft", attachedGameA->getNeutralPuyos());
-        opponentFace.setIntegerValue("@neutralsForRight", attachedGameB->getNeutralPuyos());
-        opponentFace.setIntegerValue("@comboPhaseLeft", attachedGameA->getComboPhase());
-        opponentFace.setIntegerValue("@comboPhaseRight", attachedGameB->getComboPhase());
-        faceTicks = 0;
-    }
+    opponentFace.setIntegerValue("@maxHeightLeft", attachedGameA->getMaxColumnHeight());
+    opponentFace.setIntegerValue("@maxHeightRight", attachedGameB->getMaxColumnHeight());
+    opponentFace.setIntegerValue("@neutralsForLeft", attachedGameA->getNeutralPuyos());
+    opponentFace.setIntegerValue("@neutralsForRight", attachedGameB->getNeutralPuyos());
+    opponentFace.setIntegerValue("@comboPhaseLeft", attachedGameA->getComboPhase());
+    opponentFace.setIntegerValue("@comboPhaseRight", attachedGameB->getComboPhase());
     PuyoGameWidget::cycle();
 }
 

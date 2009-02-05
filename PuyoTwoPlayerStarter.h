@@ -48,7 +48,6 @@ private:
     PuyoView areaA, areaB;
     PuyoEventPlayer playercontrollerA, playercontrollerB;
     StoryWidget opponentFace;
-    int faceTicks;
 };
 
 
