@@ -66,6 +66,7 @@ public:
     virtual int getMaxColumnHeight() const;
     virtual int getSamePuyoAround(int X, int Y, PuyoState color);
     virtual int getSemiMove() const;
+    virtual int  getComboPhase() const { return comboPhase; }
 private:
     void synchronizeState(Message &message);
     void setPuyoAt(int X, int Y, PuyoPuyo *newPuyo);
@@ -79,6 +80,7 @@ private:
     int semiMove;
     int neutralPuyos, sentBadPuyos;
     bool gameRunning;
+    int comboPhase;
 };
 
 

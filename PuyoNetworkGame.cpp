@@ -37,7 +37,7 @@ PuyoNetworkGame::~PuyoNetworkGame()
 
 PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox, int gameId)
   : PuyoGame(attachedFactory), nextFalling(PUYO_BLUE), nextCompanion(PUYO_BLUE),
-    msgBox(msgBox), gameId(gameId), gameRunning(true)
+    msgBox(msgBox), gameId(gameId), gameRunning(true), comboPhase(0)
 {
     fakePuyo = attachedFactory->createPuyo(PUYO_FALLINGRED);
     msgBox.addListener(this);

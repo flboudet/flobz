@@ -199,6 +199,7 @@ public:
     virtual int  getMaxColumnHeight() const = 0;
     virtual int  getSamePuyoAround(int X, int Y, PuyoState color) = 0;
     virtual int  getSemiMove() const = 0;
+    virtual int  getComboPhase() const = 0;
     
     virtual bool isPhaseReady(void) { return true; }
 
@@ -254,6 +255,7 @@ public:
     int getColumnHeigth(int colNum) const;
     int getMaxColumnHeight() const;
     int getSamePuyoAround(int X, int Y, PuyoState color);
+    int  getComboPhase() const {return phase; }
     
     int getSemiMove() const { return semiMove; }
     bool isPhaseReady(void);

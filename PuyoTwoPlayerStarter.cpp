@@ -54,6 +54,8 @@ void PuyoTwoPlayersGameWidget::cycle()
         opponentFace.setIntegerValue("@maxHeightRight", attachedGameB->getMaxColumnHeight());
         opponentFace.setIntegerValue("@neutralsForLeft", attachedGameA->getNeutralPuyos());
         opponentFace.setIntegerValue("@neutralsForRight", attachedGameB->getNeutralPuyos());
+        opponentFace.setIntegerValue("@comboPhaseLeft", attachedGameA->getComboPhase());
+        opponentFace.setIntegerValue("@comboPhaseRight", attachedGameB->getComboPhase());
         faceTicks = 0;
     }
     PuyoGameWidget::cycle();
