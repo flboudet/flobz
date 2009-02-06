@@ -21,8 +21,8 @@
     float @LK_RUNNING_DURATION = 60.0
     float @LK_MOCKING_DURATION = 40.0
     float @LK_HAPPY_DURATION = 25.0 # 2 * nbframes / framespeed
-    float @LK_GONE_DURATION = 80.0
-    float @LK_WAITING_DURATION = 120.0
+    float @LK_GONE_DURATION = 500.0
+    float @LK_WAITING_DURATION = 130.0
 
     # Some precomputed positions
     float @LK_SIDE_LOOKING_OFFSET = 30.0
@@ -61,21 +61,17 @@
     int   @lk_side       = @LK_LEFT # ...on the left hand side of the screen
     float @lk_startcycle = @fcycle  # This indicate time of last state transition.
 
-<get_neutrals> : int
-    (@lk_side = @LK_LEFT)?  get_neutrals = @neutralsForPlayer
-    (@lk_side = @LK_RIGHT)? get_neutrals = @neutralsForAI
-<get_opposite_neutrals> : int
-    (@lk_side = @LK_LEFT)?  get_opposite_neutrals = @neutralsForAI
-    (@lk_side = @LK_RIGHT)? get_opposite_neutrals = @neutralsForPlayer
+<lk_combo> : boolean
+    lk_combo = false
+    (@lk_side = @LK_RIGHT)? (@comboPhaseLeft > 0)?  lk_combo = true
+    (@lk_side = @LK_LEFT)?  (@comboPhaseRight > 0)? lk_combo = true
+<lk_combo_opposite> : boolean
+    lk_combo_opposite = false
+    (@lk_side = @LK_LEFT)?  (@comboPhaseLeft > 0)?  lk_combo_opposite = true
+    (@lk_side = @LK_RIGHT)? (@comboPhaseRight > 0)? lk_combo_opposite = true
 
 <sprite_list>
     (@lk_state != @LK_GONE)? sprite::@lk_sprite display=@lk_display
-    /* int happyLeft  = [DBi: get="HappyAI"]
-    int happyRight = [DBi: get="HappyPlayer"]
-    Vec2 p
-    p.y = 100.0 + [i2f: value=@neutralsForPlayer] * 100.0
-    p.x = 100.0 + [i2f: value=@neutralsForAI] * 100.0 
-    put_text: text="Coucou" pos=p text_index=1000.0 */
 
 # ------------------ #
 # Animations Methods #
@@ -157,26 +153,32 @@
     @lk_sprite.pos.y = @LK_WAITING_SPRITE_Y
     @lk_sprite.flipped = @lk_side
 
+    # ------------- #
+    # State Changes #
+    # ------------- #
+
 <lk_switch: int state>
     # Perform here action when leaving a state
     # Make the state change
     @lk_state = state
     @lk_startcycle = @fcycle
     # Perform here the action when entering a state
-    (@lk_state = @LK_RUNNING_MIDDLE_TO_MIDDLE)? @lk_side = 1 - @lk_side
-    (@lk_state = @LK_GONE)? @lk_side = 1 - @lk_side
+    (@lk_state = @LK_RUNNING_MIDDLE_TO_MIDDLE)? {
+        @lk_side = 1 - @lk_side
+        @LK_GONE_DURATION = 400.0 + 400.0 * [random]
+    }
+    (@lk_state = @LK_GONE)? {
+        @lk_side = 1 - @lk_side
+    }
 
 <update>
 
-    # ------------- #
-    # State Changes #
-    # ------------- #
+    float r = [random]
 
     (@lk_state = @LK_GONE)?                   (@fcycle > @lk_startcycle + @LK_GONE_DURATION)? {
-        float rnd = [random]
-        # rnd = 0.1
-        (rnd <  0.5)? lk_switch: state = @LK_RUNNING_SIDE_TO_MIDDLE
-        (rnd >= 0.5)? lk_switch: state = @LK_RUNNING_SIDE_TO_SIDE
+        # r = 0.0
+        (r <  0.75)? lk_switch: state = @LK_RUNNING_SIDE_TO_MIDDLE
+        (r >= 0.75)? lk_switch: state = @LK_RUNNING_SIDE_TO_SIDE
     }
 
     (@lk_state = @LK_RUNNING_SIDE_TO_SIDE)?   (@fcycle > @lk_startcycle + @LK_RUNNING_DURATION)? {
@@ -184,19 +186,11 @@
     }
 
     (@lk_state = @LK_RUNNING_SIDE_TO_MIDDLE)? (@fcycle > @lk_startcycle + @LK_RUNNING_DURATION / 2.0)? {
-        float rnd = [random]
-        # rnd = 1.0
-        (rnd <  0.33)?               lk_switch: state = @LK_MOCKING
-        (rnd >= 0.33)? (rnd < 0.66)? lk_switch: state = @LK_HAPPY
-        (rnd >= 0.66)?               lk_switch: state = @LK_WAITING
+        lk_switch: state = @LK_WAITING
     }
 
     (@lk_state = @LK_RUNNING_MIDDLE_TO_MIDDLE)? (@fcycle > @lk_startcycle + @LK_RUNNING_DURATION / 9.0)? {
-        float rnd = [random]
-        # rnd = 1.0
-        (rnd <  0.33)?               lk_switch: state = @LK_MOCKING
-        (rnd >= 0.33)? (rnd < 0.66)? lk_switch: state = @LK_HAPPY
-        (rnd >= 0.66)?               lk_switch: state = @LK_WAITING
+        lk_switch: state = @LK_WAITING
     }
 
     (@lk_state = @LK_RUNNING_MIDDLE_TO_SIDE)? (@fcycle > @lk_startcycle + @LK_RUNNING_DURATION / 2.0)? {
@@ -204,20 +198,23 @@
     }
 
     (@lk_state = @LK_MOCKING)?                (@fcycle > @lk_startcycle + @LK_MOCKING_DURATION)? {
-        lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
+        (r < 0.5)? lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
+        (r >= 0.5)? lk_switch: state = @LK_RUNNING_MIDDLE_TO_MIDDLE
     }
 
     (@lk_state = @LK_HAPPY)?                  (@fcycle > @lk_startcycle + @LK_HAPPY_DURATION)? {
+        # (r < 0.5)? lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
+        # (r >= 0.5)? lk_switch: state = @LK_WAITING
         lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
     }
 
     (@lk_state = @LK_WAITING)?                (@fcycle > @lk_startcycle + @LK_WAITING_DURATION)? {
-        float rnd = [random]
-        # rnd = 1.0
-        (rnd <  0.2)?              lk_switch: state = @LK_MOCKING
-        (rnd >= 0.2)? (rnd < 0.4)? lk_switch: state = @LK_HAPPY
-        (rnd >= 0.4)? (rnd < 0.6)? lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
-        (rnd >= 0.6)?              lk_switch: state = @LK_RUNNING_MIDDLE_TO_MIDDLE
+        (r < 0.5)? lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
+        (r >= 0.5)? lk_switch: state = @LK_RUNNING_MIDDLE_TO_MIDDLE
+    }
+    (@lk_state = @LK_WAITING)? {
+        ([lk_combo_opposite] = true)? lk_switch: state = @LK_MOCKING
+        ([lk_combo] = true)?          lk_switch: state = @LK_HAPPY
     }
 
     # ------------------ #
@@ -235,3 +232,4 @@
     (@lk_state = @LK_RUNNING_SIDE_TO_MIDDLE)? (@lk_side = @LK_LEFT )? lk_running_left_to_middle
     (@lk_state = @LK_RUNNING_SIDE_TO_MIDDLE)? (@lk_side = @LK_RIGHT)? lk_running_right_to_middle
     (@lk_state = @LK_RUNNING_MIDDLE_TO_MIDDLE)?                       lk_running_middle_to_middle
+
