@@ -63,8 +63,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.0052487"
-     inkscape:cx="526.18111"
-     inkscape:cy="461.52354"
+     inkscape:cx="445.90394"
+     inkscape:cy="312.53463"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -84,9 +84,11 @@
     </rdf:RDF>
   </metadata>
   <g
-     inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     id="layer1">
+     id="layer2"
+     inkscape:label="Background"
+     style="display:inline"
+     sodipodi:insensitive="true">
     <rect
        style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect2462"
@@ -96,6 +98,21 @@
        y="0"
        rx="0"
        ry="0" />
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="465.71426"
+       y="35.523052"
+       id="text13031"><tspan
+         sodipodi:role="line"
+         id="tspan13033"
+         x="465.71426"
+         y="35.523052">little_kaori.gsl</tspan></text>
+  </g>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
     <text
        xml:space="preserve"
        style="font-size:20px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
@@ -202,7 +219,7 @@
     </g>
     <g
        id="g3220"
-       transform="translate(-222.85715,-204.28571)">
+       transform="translate(-289.50732,-112.76607)">
       <text
          id="text2407"
          y="456.64789"
@@ -282,8 +299,9 @@
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-start:none;marker-end:url(#Arrow1Lend);stroke-opacity:1" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1"
-       d="M 521.42857,136.95162 C 515.71428,195.52306 431.42857,228.3802 431.42857,228.3802"
-       id="path5628" />
+       d="M 546.29804,144.90985 C 544.68042,203.48129 451.02301,331.83719 391.63742,331.83719"
+       id="path5628"
+       sodipodi:nodetypes="cc" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1"
        d="M 632.85714,224.09449 C 622.85714,161.23734 567.14285,134.09448 567.14285,134.09448"
@@ -324,29 +342,38 @@
     </g>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1"
-       d="M 280,269.80877 C 240,432.66592 324.28571,552.66592 455.71428,554.09449"
-       id="path6680" />
+       d="M 293.9269,363.31797 C 253.9269,526.17512 324.28571,552.66592 455.71428,554.09449"
+       id="path6680"
+       sodipodi:nodetypes="cc" />
     <text
        xml:space="preserve"
        style="font-size:20px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
-       x="361.80991"
+       x="347.883"
        y="76.951622"
        id="text7207"><tspan
          sodipodi:role="line"
          id="tspan7209"
-         x="361.80991"
-         y="76.951622">r &gt; 0.75</tspan></text>
+         x="347.883"
+         y="76.951622">t &gt; GD</tspan><tspan
+         sodipodi:role="line"
+         x="347.883"
+         y="101.95162"
+         id="tspan2474">r &gt; 0.75</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
-       x="188.73334"
-       y="465.87015"
+       style="font-size:20.00000191px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="104.19685"
+       y="529.03815"
        id="text7211"
-       transform="matrix(0.7360459,-0.6769316,0.6769316,0.7360459,0,0)"><tspan
+       transform="matrix(0.665167,-0.7466947,0.7466947,0.665167,0,0)"><tspan
          sodipodi:role="line"
          id="tspan7213"
-         x="188.73334"
-         y="465.87015">r &lt; 0.75</tspan></text>
+         x="104.19685"
+         y="529.03815">t &gt; GD</tspan><tspan
+         sodipodi:role="line"
+         x="104.19685"
+         y="554.03815"
+         id="tspan2476">r &lt; 0.75</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1"
        d="M 480,568.3802 C 454.28571,609.80877 462.85714,649.80877 478.57142,669.80877"
@@ -365,21 +392,11 @@
          sodipodi:role="line"
          id="tspan8263"
          x="367.52597"
-         y="623.46332">timeout</tspan><tspan
+         y="623.46332">t &gt; WD</tspan><tspan
          sodipodi:role="line"
          x="367.52597"
          y="648.46332"
          id="tspan11431">r &lt; 0.5</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
-       x="33.510548"
-       y="716.53937"
-       id="text8265"><tspan
-         sodipodi:role="line"
-         id="tspan8267"
-         x="33.510548"
-         y="716.53937">r = random()</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-start:none;marker-end:url(#Arrow1Lend);stroke-opacity:1"
        d="M 522.85713,535.52306 C 521.42856,474.09449 565.71428,461.23734 701.42856,465.52305"
@@ -394,8 +411,8 @@
        xml:space="preserve"
        style="font-size:20px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
        id="text10357"
-       x="610.63043"
-       y="370.70511"><tspan
+       x="606.65131"
+       y="372.69467"><tspan
          id="tspan10359">combo</tspan></text>
     <text
        xml:space="preserve"
@@ -415,17 +432,18 @@
        id="path10902" />
     <text
        xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
-       x="402.85715"
-       y="352.66592"
-       id="text11425"><tspan
+       style="font-size:19.99999809px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="-52.267403"
+       y="597.65991"
+       id="text11425"
+       transform="matrix(0.5712281,-0.8207913,0.8207913,0.5712281,0,0)"><tspan
          sodipodi:role="line"
          id="tspan11427"
-         x="402.85715"
-         y="352.66592">timeout</tspan><tspan
+         x="-52.267403"
+         y="597.65991">t &gt; WD</tspan><tspan
          sodipodi:role="line"
-         x="402.85715"
-         y="377.66592"
+         x="-52.267403"
+         y="622.65991"
          id="tspan11429">r &gt; 0.5</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1"
@@ -455,26 +473,16 @@
          x="884.28564"
          id="tspan13018"
          sodipodi:role="line">r &lt; 0.5</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:20px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
-       x="465.71426"
-       y="35.523052"
-       id="text13031"><tspan
-         sodipodi:role="line"
-         id="tspan13033"
-         x="465.71426"
-         y="35.523052">little_kaori.gsl</tspan></text>
     <g
        id="g3245"
-       transform="translate(12.443472,28.442221)">
+       transform="translate(15.427808,29.437)">
       <rect
-         ry="21.331665"
+         ry="16.694845"
          rx="21.331665"
          y="70.36937"
          x="575.95502"
          height="42.66333"
-         width="215.09428"
+         width="125.56422"
          id="rect2461"
          style="opacity:1;fill:#b3b3b3;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
       <text
@@ -487,16 +495,16 @@
            y="88.145752"
            x="585.73254"
            id="tspan2457"
-           sodipodi:role="line">filp side</tspan><tspan
+           sodipodi:role="line">Flip side</tspan><tspan
            style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Bitstream Vera Sans Mono;-inkscape-font-specification:Bitstream Vera Sans Mono"
            id="tspan2459"
            y="105.64575"
            x="585.73254"
-           sodipodi:role="line">randomize gone duration</tspan></text>
+           sodipodi:role="line">Randomize GD</tspan></text>
     </g>
     <g
        id="g3267"
-       transform="translate(562.85623,7.5551172)">
+       transform="translate(566.83534,7.5551172)">
       <rect
          style="fill:#b3b3b3;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
          id="rect3253"
@@ -516,7 +524,89 @@
            x="148.4334"
            y="692.54297"
            id="tspan3259"
-           style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Bitstream Vera Sans Mono;-inkscape-font-specification:Bitstream Vera Sans Mono">filp side</tspan></text>
+           style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Bitstream Vera Sans Mono;-inkscape-font-specification:Bitstream Vera Sans Mono">Flip side</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="10.942568"
+       y="682.41821"
+       id="text2478"><tspan
+         sodipodi:role="line"
+         id="tspan2480"
+         x="10.942568"
+         y="682.41821"
+         style="font-size:18px">d = game dynamicity coeficient</tspan><tspan
+         sodipodi:role="line"
+         x="10.942568"
+         y="704.91821"
+         id="tspan4326"
+         style="font-size:18px">t = time_in_state()</tspan><tspan
+         sodipodi:role="line"
+         x="10.942568"
+         y="727.41821"
+         id="tspan2482"
+         style="font-size:18px">r = random()</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="8.9530087"
+       y="622.73145"
+       id="text2488"><tspan
+         sodipodi:role="line"
+         id="tspan2490"
+         x="8.9530087"
+         y="622.73145"
+         style="font-size:18px">GD = GONE_DURATION</tspan><tspan
+         sodipodi:role="line"
+         x="8.9530087"
+         y="645.23145"
+         id="tspan2492"
+         style="font-size:18px">WD = WAITING_DURATION</tspan></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="M 495.3998,137.27946 C 443.55153,247.2285 253.32179,206.02407 215.86698,311.36574"
+       id="path3799"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="244.78131"
+       y="287.38144"
+       id="text4322"
+       transform="matrix(0.9794509,-0.2016829,0.2016829,0.9794509,0,0)"><tspan
+         sodipodi:role="line"
+         id="tspan4324"
+         x="244.78131"
+         y="287.38144">d &gt; 1.0</tspan></text>
+    <g
+       transform="translate(-1.4834302,463.16052)"
+       id="g4328">
+      <rect
+         style="opacity:1;fill:#b3b3b3;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="rect4330"
+         width="125.56422"
+         height="42.66333"
+         x="575.95502"
+         y="70.36937"
+         rx="21.331665"
+         ry="16.694845" />
+      <text
+         xml:space="preserve"
+         style="font-size:14px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         x="585.73254"
+         y="88.145752"
+         id="text4332"><tspan
+           sodipodi:role="line"
+           x="585.73254"
+           y="88.145752"
+           style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Bitstream Vera Sans Mono;-inkscape-font-specification:Bitstream Vera Sans Mono"
+           id="tspan4340">Randomize</tspan><tspan
+           sodipodi:role="line"
+           x="585.73254"
+           y="105.64575"
+           style="font-size:14px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Bitstream Vera Sans Mono;-inkscape-font-specification:Bitstream Vera Sans Mono"
+           id="tspan4344">Waiting Anim</tspan></text>
     </g>
   </g>
 </svg>

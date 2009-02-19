@@ -38,7 +38,7 @@ void styro_sin(GoomSL *gsl, GoomHash *global, GoomHash *local)
 
 void styro_random(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
-    GSL_GLOBAL_FLOAT(gsl, "random") = (float)((double)rand() / (double)RAND_MAX);
+    GSL_GLOBAL_FLOAT(gsl, "random") = (float)(1.0 * (rand() / (RAND_MAX + 1.0)));
 }
 
 void styro_strcmp(GoomSL *gsl, GoomHash *global, GoomHash *local)

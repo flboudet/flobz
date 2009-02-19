@@ -21,7 +21,7 @@
     float @LK_RUNNING_DURATION = 60.0
     float @LK_MOCKING_DURATION = 40.0
     float @LK_HAPPY_DURATION = 25.0 # 2 * nbframes / framespeed
-    float @LK_GONE_DURATION = 500.0
+    float @LK_GONE_DURATION = 400.0
     float @LK_WAITING_DURATION = 130.0
 
     # Some precomputed positions
@@ -56,10 +56,18 @@
     int @LK_LEFT = 0
     int @LK_RIGHT = 1
 
+    # Available waiting animations
+    int @LK_WAITING_TAP_FOOT = 0
+    int @LK_WAITING_LOOK_LEFT_RIGHT = 1
+    int @LK_WAITING_YOYO = 2
+
     # State machin variables
     int   @lk_state      = @LK_GONE # Kaori is initially gone...
     int   @lk_side       = @LK_LEFT # ...on the left hand side of the screen
     float @lk_startcycle = @fcycle  # This indicate time of last state transition.
+
+    float @lk_activity = 0.0
+    int   @lk_waiting_anim = @LK_WAITING_TAP_FOOT
 
 <lk_combo> : boolean
     lk_combo = false
@@ -69,6 +77,11 @@
     lk_combo_opposite = false
     (@lk_side = @LK_LEFT)?  (@comboPhaseLeft > 0)?  lk_combo_opposite = true
     (@lk_side = @LK_RIGHT)? (@comboPhaseRight > 0)? lk_combo_opposite = true
+
+<lk_detect_activity>
+    (@comboPhaseRight > 0)? @lk_activity += 0.1
+    (@comboPhaseLeft  > 0)? @lk_activity += 0.1
+    @lk_activity *= 0.9999
 
 <sprite_list>
     (@lk_state != @LK_GONE)? sprite::@lk_sprite display=@lk_display
@@ -88,6 +101,7 @@
 <lk_running>
     # Animation
     @lk_sprite.nbframes = 4.0
+    @lk_sprite.framespeed = 0.4
     @lk_sprite.image = "sdkaori/running_01.png"
     (@lk_sprite.curframe >= 1.0)? @lk_sprite.image = "sdkaori/running_02.png"
     (@lk_sprite.curframe >= 2.0)? @lk_sprite.image = "sdkaori/running_03.png"
@@ -126,6 +140,7 @@
 
 <lk_mocking>
     @lk_sprite.nbframes = 2.0
+    @lk_sprite.framespeed = 0.4
     @lk_sprite.image = "sdkaori/mocking_01.png"
     (@lk_sprite.curframe >= 1.0)? @lk_sprite.image = "sdkaori/mocking_02.png"
     move::@lk_sprite fcycle=@lk_startcycle          x=@LK_MOCKING_SPRITE_CENTER_X  y=@LK_MOCKING_SPRITE_Y
@@ -135,6 +150,7 @@
 
 <lk_happy>
     @lk_sprite.nbframes = 5.0
+    @lk_sprite.framespeed = 0.4
     @lk_sprite.image = "sdkaori/happy_01.png"
     (@lk_sprite.curframe >= 1.0)? @lk_sprite.image = "sdkaori/happy_02.png"
     (@lk_sprite.curframe >= 2.0)? @lk_sprite.image = "sdkaori/happy_03.png"
@@ -145,9 +161,30 @@
     @lk_sprite.pos.y = @LK_HAPPY_SPRITE_Y
 
 <lk_waiting>
-    @lk_sprite.nbframes = 2.0
-    @lk_sprite.image = "sdkaori/waiting_01.png"
-    (@lk_sprite.curframe >= 1.0)? @lk_sprite.image = "sdkaori/waiting_02.png"
+    (@lk_waiting_anim = @LK_WAITING_TAP_FOOT)? {
+        @lk_sprite.nbframes = 2.0
+        @lk_sprite.framespeed = 0.3
+        @lk_sprite.image = "sdkaori/waiting_01.png"
+        (@lk_sprite.curframe >= 1.0)? @lk_sprite.image = "sdkaori/waiting_02.png"
+        @LK_WAITING_DURATION = 130.0
+    }
+    (@lk_waiting_anim = @LK_WAITING_LOOK_LEFT_RIGHT)? {
+        @lk_sprite.nbframes = 2.0
+        @lk_sprite.framespeed = 0.05
+        @lk_sprite.image = "sdkaori/waiting_b_01.png"
+        (@lk_sprite.curframe >= 1.0)? @lk_sprite.image = "sdkaori/waiting_b_02.png"
+        @LK_WAITING_DURATION = 160.0
+    }
+    (@lk_waiting_anim = @LK_WAITING_YOYO)? {
+        @lk_sprite.nbframes = 5.0
+        @lk_sprite.framespeed = 0.16
+        @lk_sprite.image = "sdkaori/yoyo_01.png"
+        (@lk_sprite.curframe >= 1.0)? @lk_sprite.image = "sdkaori/yoyo_02.png"
+        (@lk_sprite.curframe >= 2.0)? @lk_sprite.image = "sdkaori/yoyo_03.png"
+        (@lk_sprite.curframe >= 3.0)? @lk_sprite.image = "sdkaori/yoyo_04.png"
+        (@lk_sprite.curframe >= 4.0)? @lk_sprite.image = "sdkaori/yoyo_02.png"
+        @LK_WAITING_DURATION = 200.0
+    }
     move::@lk_sprite fcycle=@lk_startcycle          x=@LK_WAITING_SPRITE_CENTER_X  y=@LK_WAITING_SPRITE_Y
     @lk_sprite.pos.x = @LK_WAITING_SPRITE_CENTER_X + [lk_side_look]
     @lk_sprite.pos.y = @LK_WAITING_SPRITE_Y
@@ -159,13 +196,19 @@
 
 <lk_switch: int state>
     # Perform here action when leaving a state
+    (@lk_state = @LK_RUNNING_MIDDLE_TO_MIDDLE)? (state = @LK_WAITING)? {
+        @lk_waiting_anim = [f2i: value=2.99 * [random]]
+    }
+    (@lk_state = @LK_RUNNING_SIDE_TO_MIDDLE)? (state = @LK_WAITING)? {
+        @lk_waiting_anim = [f2i: value=1.99 * [random]]
+    }
     # Make the state change
     @lk_state = state
     @lk_startcycle = @fcycle
     # Perform here the action when entering a state
     (@lk_state = @LK_RUNNING_MIDDLE_TO_MIDDLE)? {
         @lk_side = 1 - @lk_side
-        @LK_GONE_DURATION = 400.0 + 400.0 * [random]
+        @LK_GONE_DURATION = 300.0 + 200.0 * [random]
     }
     (@lk_state = @LK_GONE)? {
         @lk_side = 1 - @lk_side
@@ -173,12 +216,18 @@
 
 <update>
 
-    float r = [random]
+    float r = [random] * 0.99
+    lk_detect_activity
 
     (@lk_state = @LK_GONE)?                   (@fcycle > @lk_startcycle + @LK_GONE_DURATION)? {
         # r = 0.0
-        (r <  0.75)? lk_switch: state = @LK_RUNNING_SIDE_TO_MIDDLE
-        (r >= 0.75)? lk_switch: state = @LK_RUNNING_SIDE_TO_SIDE
+        (r <  0.8)? lk_switch: state = @LK_RUNNING_SIDE_TO_MIDDLE
+        (r >= 0.8)? lk_switch: state = @LK_RUNNING_SIDE_TO_SIDE
+    }
+
+    (@lk_state = @LK_GONE)?                   (@lk_activity > 90.0)? {
+        lk_switch: state = @LK_RUNNING_SIDE_TO_MIDDLE
+        @lk_activity = 0.0
     }
 
     (@lk_state = @LK_RUNNING_SIDE_TO_SIDE)?   (@fcycle > @lk_startcycle + @LK_RUNNING_DURATION)? {
@@ -198,19 +247,19 @@
     }
 
     (@lk_state = @LK_MOCKING)?                (@fcycle > @lk_startcycle + @LK_MOCKING_DURATION)? {
-        (r < 0.5)? lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
-        (r >= 0.5)? lk_switch: state = @LK_RUNNING_MIDDLE_TO_MIDDLE
+        (r < 0.4)? lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
+        (r >= 0.4)? lk_switch: state = @LK_RUNNING_MIDDLE_TO_MIDDLE
     }
 
     (@lk_state = @LK_HAPPY)?                  (@fcycle > @lk_startcycle + @LK_HAPPY_DURATION)? {
-        # (r < 0.5)? lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
-        # (r >= 0.5)? lk_switch: state = @LK_WAITING
-        lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
+        (r < 0.5)? lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
+        (r >= 0.5)? lk_switch: state = @LK_WAITING
+        # lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
     }
 
     (@lk_state = @LK_WAITING)?                (@fcycle > @lk_startcycle + @LK_WAITING_DURATION)? {
-        (r < 0.5)? lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
-        (r >= 0.5)? lk_switch: state = @LK_RUNNING_MIDDLE_TO_MIDDLE
+        (r < 0.4)? lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
+        (r >= 0.4)? lk_switch: state = @LK_RUNNING_MIDDLE_TO_MIDDLE
     }
     (@lk_state = @LK_WAITING)? {
         ([lk_combo_opposite] = true)? lk_switch: state = @LK_MOCKING
@@ -232,4 +281,3 @@
     (@lk_state = @LK_RUNNING_SIDE_TO_MIDDLE)? (@lk_side = @LK_LEFT )? lk_running_left_to_middle
     (@lk_state = @LK_RUNNING_SIDE_TO_MIDDLE)? (@lk_side = @LK_RIGHT)? lk_running_right_to_middle
     (@lk_state = @LK_RUNNING_MIDDLE_TO_MIDDLE)?                       lk_running_middle_to_middle
-
