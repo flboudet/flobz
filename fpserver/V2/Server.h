@@ -33,7 +33,7 @@ void Server::checkTimeouts() {
     double time_ms = ios_fc::getTimeMs();
     for (int i = 0; i < mPeers.size() ; i++) {
         Peer *currentPeer = mPeers[i];
-        if ((time_ms - currentPeer->lastUpdate) > mTimeMsBeforePeerTimeout) {
+        if (currentPeer->isTimeout(time_ms)) {
 #if DEBUG_PUYOPEERSLISTENERV2
             printf("PuyoServer Peer timeout!\n");
 #endif
@@ -89,70 +89,45 @@ void Server::onPeerConnect(ios_fc::PeerAddress addr, int fpipVersion, const ios_
 
     if (accept) {
         // Send accept message
-        ios_fc::Message *acceptMsg = mMbox.createMessage();
-        acceptMsg->addBoolProperty("RELIABLE", true);
-        acceptMsg->addInt("CMD", PUYO_IGP_ACCEPT);
-        ios_fc::Dirigeable *dirAccept = dynamic_cast<ios_fc::Dirigeable *>(acceptMsg);
-        dirAccept->setPeerAddress(addr);
-        acceptMsg->send();
-        delete acceptMsg;
+        AcceptMessage acceptMsg(mMbox);
+        acceptMsg.sendTo(addr);
         
         // Create the new peer
-        Peer *newPeer = new Peer(addr, name);
-        newPeer->lastUpdate = ios_fc::getTimeMs();
+        Peer *newPeer = new Peer(addr, name, mTimeMsBeforePeerTimeout);
+        newPeer->status = status;
+
 #if DEBUG_PUYOPEERSLISTENERV2
         printf("Nouveau peer: %s\n", (const char *)name);
 #endif
         
         // Envoyer tous les peers connectes au petit nouveau
         for (int i = 0; i < mPeers.size(); i++) {
-            ios_fc::Message *newMsg = mMbox.createMessage();
-            newMsg->addBoolProperty("RELIABLE", true);
-            newMsg->addInt("CMD", PUYO_IGP_CONNECT);
-            newMsg->addString("NAME", mPeers[i]->name);
-            newMsg->addInt("STATUS", mPeers[i]->status);
-            ios_fc::Dirigeable *dirNew = dynamic_cast<ios_fc::Dirigeable *>(newMsg);
-            dirNew->addPeerAddress("ADDR", mPeers[i]->addr);
-            dirNew->setPeerAddress(addr);
-            newMsg->send();
-            delete newMsg;
+            ConnectMessage newMsg(mMbox, mPeers[i]);
+            newMsg.sendTo(addr);
         }
         // Inserer le petit nouveau a la liste
         mPeers.add(newPeer);
         
         // Envoyer l'info de connexion a tous les peers
-        ios_fc::Message *newMsg = mMbox.createMessage();
-        newMsg->addBoolProperty("RELIABLE", true);
-        newMsg->addInt("CMD", PUYO_IGP_CONNECT);
-        newMsg->addString("NAME", name);
-        newMsg->addInt("STATUS", status);
-        ios_fc::Dirigeable *dirNew = dynamic_cast<ios_fc::Dirigeable *>(newMsg);
-        dirNew->addPeerAddress("ADDR", addr);
+        ConnectMessage newMsg(mMbox, newPeer);
         for (int i = 0; i < mPeers.size(); i++) {
 #if DEBUG_PUYOPEERSLISTENERV2
             printf("Diffusion connexion au peer num %d\n", i);
 #endif
-            dirNew->setPeerAddress(mPeers[i]->addr);
-            newMsg->send();
+            newMsg.sendTo(mPeers[i]->addr);
         }
-        delete newMsg;
     }
     else {
         // Send deny message
-        ios_fc::Message *denyMsg = mMbox.createMessage();
-        denyMsg->addBoolProperty("RELIABLE", true);
-        denyMsg->addInt("CMD", PUYO_IGP_DENY);
-        denyMsg->addString("MSG", request.getDenyErrorString());
-        ios_fc::Dirigeable *dirDeny = dynamic_cast<ios_fc::Dirigeable *>(denyMsg);
-        dirDeny->setPeerAddress(addr);
-        denyMsg->send();
-        delete denyMsg;
+        DenyMessage denyMsg(mMbox, request.getDenyErrorString());
+        denyMsg.sendTo(addr);
     }
 }
 
 void Server::onPeerUpdate(Peer *peer, int status)
 {
-    peer->lastUpdate = ios_fc::getTimeMs();
+    peer->touch();
+
     if (peer->status != status) {
         peer->status = status;
         // Send a STATUSCHANGE message to the other peers

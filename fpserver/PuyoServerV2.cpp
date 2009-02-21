@@ -9,6 +9,11 @@
 #include "PuyoIgpDefs.h"
 
 #include "V2/Peer.h"
+
+#include "V2/messages/AcceptMessage.h"
+#include "V2/messages/ConnectMessage.h"
+#include "V2/messages/DenyMessage.h"
+
 #include "V2/PeersList.h"
 #include "V2/ConnectionRequest.h"
 #include "V2/Server.h"
