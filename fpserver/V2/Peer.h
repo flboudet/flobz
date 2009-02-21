@@ -8,7 +8,7 @@ namespace v2 {
 class Peer {
 public:
     Peer(ios_fc::PeerAddress addr, const ios_fc::String name, double timeMsBeforeTimeout)
-      : addr(addr), name(name), status(0)
+      : addr(addr), name(name), status(0), mTimeMsBeforePeerTimeout(timeMsBeforeTimeout)
     { touch(); }
 
     void touch() {
