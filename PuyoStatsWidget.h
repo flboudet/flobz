@@ -68,6 +68,7 @@ public:
     void startAnimation();
     virtual void idle(double currentTime);
     virtual IdleComponent *getIdleComponent() { return this; }
+    bool isWinner() const { return m_stats.is_winner; }
 private:
     PuyoStatsDirection m_dir;
     bool m_showGlobalScore;
@@ -122,7 +123,7 @@ class StatsResources {
         IIM_Surface *puyo_right[4][4];
         IIM_Surface *puyo_left[4][4];
         IIM_Surface *puyo_left_mask, *puyo_right_mask;
-        IIM_Surface *stats_bg;
+        IIM_Surface *stats_bg_winner, *stats_bg_loser;
         IIM_Surface *separator;
         StatsResources();
         ~StatsResources();

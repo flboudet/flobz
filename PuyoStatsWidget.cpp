@@ -42,7 +42,8 @@ StatsResources::StatsResources()
         puyo_right[3][i] = iim_surface_shift_hue_masked(puyo_right[0][i], puyo_right_mask, 90.);
     }
     separator = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/separator.png"));
-    stats_bg = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/stats-bg.png"));
+    stats_bg_winner = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/stats-bg.png"));
+    stats_bg_loser = iim_surface_shift_hue(stats_bg_winner, 180);
     // TODO: Combos images
 }
 
@@ -57,7 +58,8 @@ StatsResources::~StatsResources()
     }
     IIM_Free(puyo_left_mask);
     IIM_Free(puyo_right_mask);
-    IIM_Free(stats_bg);
+    IIM_Free(stats_bg_winner);
+    IIM_Free(stats_bg_loser);
     IIM_Free(separator);
 }
 
@@ -389,7 +391,7 @@ PuyoStatsLegendWidget::PuyoStatsLegendWidget(StatsFormat &statsFormat, StatsWidg
     setPolicy(USE_MIN_SIZE);
     setInnerMargin(20);
     // Load title image
-    IIM_Surface *titleImage = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath(String("gfx/combo1x.png")));
+    IIM_Surface *titleImage = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath(String("gfx/stats_title.png")));
     m_statsImage.setImage(titleImage);
     add(&m_statsImage);
     add(&m_titleSeparator);
@@ -476,8 +478,8 @@ void PuyoTwoPlayersStatsWidget::onWidgetVisibleChanged(bool visible)
     m_leftSlider.transitionToContent(&m_leftStats);
     m_rightSlider.transitionToContent(&m_rightStats);
     m_legendSlider.transitionToContent(&m_legend);
-    m_leftSlider.setBackground(::res->stats_bg);
-    m_rightSlider.setBackground(::res->stats_bg);
+    m_leftSlider.setBackground(m_leftStats.isWinner() ? ::res->stats_bg_winner : ::res->stats_bg_loser);
+    m_rightSlider.setBackground(m_rightStats.isWinner() ? ::res->stats_bg_winner : ::res->stats_bg_loser);
 }
 
 void PuyoTwoPlayersStatsWidget::onSlideInside(SliderContainer &slider)
