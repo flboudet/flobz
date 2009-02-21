@@ -13,16 +13,16 @@ public:
     void onIgpAlive(ios_fc::Message &msg, ios_fc::PeerAddress &address);
     // Process chat messages
     void onIgpChat(ios_fc::Message &msg);
+    // Check if a peer reached timeout.
+    void checkTimeouts();
 
+private:
     // Called when a peer connects
     void onPeerConnect(ios_fc::PeerAddress addr, int fpipVersion, const ios_fc::String name, int status);
     // Called when a peer updates its status
     void onPeerUpdate(Peer *peer, int status);
     // Called when a peer is disconnected
     void onPeerDisconnect(Peer *peer);
-
-    // Check if a peer reached timeout.
-    void checkTimeouts();
 
     PeersList mPeers;
     ios_fc::IgpVirtualPeerMessageBox &mMbox; // Message box
