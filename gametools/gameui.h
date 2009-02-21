@@ -477,6 +477,12 @@ bool isDirectionEvent(GameControlEvent *event);
     TEXT_RIGHT_ALIGN
   };
   
+  enum ImageAlign {
+    IMAGE_CENTERED,
+    IMAGE_LEFT_ALIGN,
+    IMAGE_RIGHT_ALIGN
+  };
+  
   class Text : public Widget, public IdleComponent {
     public:
       Text();
@@ -514,10 +520,11 @@ bool isDirectionEvent(GameControlEvent *event);
   class Image : public Widget {
   public:
     Image();
-    Image(IIM_Surface *image);
+    Image(IIM_Surface *image, ImageAlign align = IMAGE_LEFT_ALIGN);
     ~Image();
     // Properties
     void setImage(IIM_Surface *image);
+    void setAlign(ImageAlign align) { m_align = align; }
     virtual void setFocusable(bool focusable) { Widget::setFocusable(focusable); }
     void setInvertedFocus(bool mode);
     // Notifications
@@ -533,6 +540,7 @@ bool isDirectionEvent(GameControlEvent *event);
   private:
     IIM_Surface *m_image, *m_focusedImage;
     bool m_invertFocusMode;
+    ImageAlign m_align;
   };
 
   class Button : public Text {

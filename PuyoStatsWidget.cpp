@@ -393,6 +393,7 @@ PuyoStatsLegendWidget::PuyoStatsLegendWidget(StatsFormat &statsFormat, StatsWidg
     // Load title image
     IIM_Surface *titleImage = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath(String("gfx/stats_title.png")));
     m_statsImage.setImage(titleImage);
+    m_statsImage.setAlign(IMAGE_CENTERED);
     add(&m_statsImage);
     add(&m_titleSeparator);
     add(&m_barSeparator);
@@ -402,6 +403,7 @@ PuyoStatsLegendWidget::PuyoStatsLegendWidget(StatsFormat &statsFormat, StatsWidg
             String pictureName = theCommander->getDataPathManager().getPath(String("gfx/combo") + ((numCombo+1) == 1 ? 1 : numCombo+1) + String("x.png"));
             IIM_Surface *comboImage = IIM_Load_Absolute_DisplayFormatAlpha(pictureName);
             m_legendImage[i].setImage(comboImage);
+            m_legendImage[i].setAlign(IMAGE_CENTERED);
             m_legendCell[i].add(&m_legendImage[i]);
         }
         m_legendSlider[i].setSlideSide(SliderContainer::SLIDE_FROM_BOTTOM);

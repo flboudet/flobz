@@ -789,8 +789,8 @@ namespace gameui {
         if (bg != NULL && backgroundVisible)
         {
             IIM_Rect rect;
-            rect.x = (Sint16)getPosition().x;
-            rect.y = (Sint16)getPosition().y;
+            rect.x = (Sint16)getPosition().x - (bg->w - getSize().x)/2;
+            rect.y = (Sint16)getPosition().y - (bg->h - getSize().y)/2;
             IIM_BlitSurface(bg, NULL, screen, &rect);
         }
         ZBox::draw(screen);
@@ -1338,7 +1338,8 @@ namespace gameui {
     {
     }
 
-    Image::Image(IIM_Surface *image) : m_focusedImage(NULL), m_invertFocusMode(false)
+    Image::Image(IIM_Surface *image, ImageAlign align)
+      : m_focusedImage(NULL), m_invertFocusMode(false), m_align(align)
     {
         setImage(image);
     }
@@ -1365,7 +1366,17 @@ namespace gameui {
         IIM_Surface *imageToDraw = m_image;
         Vec3 pos = this->getPosition();
         Vec3 size = this->getSize();
-        dstRect.x = pos.x; dstRect.y = pos.y; dstRect.h = size.y; dstRect.w = size.x;
+        switch (m_align) {
+            case IMAGE_CENTERED:
+                dstRect.x = pos.x - (imageToDraw->w - size.x)/2;
+                dstRect.y = pos.y - (imageToDraw->h - size.y)/2;
+                dstRect.h = imageToDraw->h; dstRect.w = imageToDraw->w;
+                break;
+            default:
+                dstRect.x = pos.x;
+                dstRect.y = pos.y;
+                dstRect.h = size.y; dstRect.w = size.x;
+        }
         if (haveFocus() ^ m_invertFocusMode) {
             if (m_focusedImage == NULL)
                 m_focusedImage = iim_surface_shift_hsv(m_image, 0., 0., m_invertFocusMode ? -0.3 : 0.3);
