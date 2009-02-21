@@ -1,5 +1,5 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; indent-tab-mode: nil; -*- */
-#include "PuyoPeersListenerV2.h"
+#include "PuyoServerV2.h"
 
 #include <stdio.h>
 #include "ios_igpmessagebox.h"
