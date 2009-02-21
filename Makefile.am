@@ -47,7 +47,7 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
 
 flobopuyo_CXXFLAGS = -I$(top_srcdir)/iosfc -I$(top_srcdir)/gametools -I$(top_srcdir)/goomsl $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 flobopuyo_OBJCFLAGS= $(SDL_CFLAGS)
-flobopuyo_LDADD = -Lgametools -Lgoomsl -Liosfc -lgametools -lgoomsl -liosfc $(SDL_LIBS)
+flobopuyo_LDADD = gametools/libgametools.la goomsl/libgoomsl.la iosfc/libiosfc.la $(SDL_LIBS)
 
 SUBDIRS = iosfc gametools goomsl data
 

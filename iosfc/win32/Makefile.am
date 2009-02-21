@@ -1,4 +1,4 @@
-libiosfc_a_SOURCES+=win32/ios_win32datagramsocketimpl.cpp \
+libiosfc_la_SOURCES+=win32/ios_win32datagramsocketimpl.cpp \
                     win32/ios_win32socketimpl.cpp \
                     win32/ios_win32socketaddressimpl.cpp \
                     win32/ios_win32networkinterfacerequesterimpl.cpp
