@@ -8,10 +8,10 @@
 namespace flobopuyo {
 namespace server {
 
-class PuyoPeersListener : public ios_fc::MessageListener {
+class PuyoServer : public ios_fc::MessageListener {
 public:
     virtual void idle() = 0;
-    virtual ~PuyoPeersListener() {}
+    virtual ~PuyoServer() {}
 };
 
 }}
