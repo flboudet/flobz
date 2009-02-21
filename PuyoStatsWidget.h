@@ -110,7 +110,7 @@ private:
   gameui::Image m_statsImage;
   StatsFormat &m_statsFormat;
   StatsWidget &m_guideWidget;
-  gameui::Separator m_titleSeparator, m_barSeparator, m_bottomSeparator;
+  gameui::Separator m_barSeparator, m_bottomSeparator;
   gameui::SliderContainer m_legendSlider[MAX_DISPLAYED_COMBOS];
   gameui::HBox m_legendCell[MAX_DISPLAYED_COMBOS];
   gameui::Image m_legendImage[MAX_DISPLAYED_COMBOS];

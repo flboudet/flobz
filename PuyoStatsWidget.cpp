@@ -93,7 +93,6 @@ void ProgressBarWidget::draw(SDL_Surface *screen)
     int rope_size = (bsize.x - IMG_RING_WIDTH - IMG_PUYO_WIDTH) * m_value;
     int n_rope_elt = 3 * rope_targetSize / (2 * IMG_ROPE_ELT_WIDTH);
     if (n_rope_elt < 8) n_rope_elt = 8;
-    //if (rope_size < n_rope_elt*2) rope_size = n_rope_elt*2;
 
     if (m_dir == LEFT_TO_RIGHT)
         dstrect.x = bpos.x;
@@ -227,9 +226,8 @@ StatsWidget::StatsWidget(StatsFormat &statsFormat,
 
     // Create Layout
     Text *txt = new Text(stats.is_winner?"WINNER":"LOSER");
-    /*txt->setPreferedSize(Vec3(128, 32));*/
     Image *img1 = new Image(res->separator);
-    img1->setPreferedSize(Vec3(128, 32));
+    img1->setPreferedSize(Vec3(128, 50));
     add(txt);
     add(img1);
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++) {
@@ -389,14 +387,12 @@ PuyoStatsLegendWidget::PuyoStatsLegendWidget(StatsFormat &statsFormat, StatsWidg
   : Frame(framePicture), m_statsImage(), m_statsFormat(statsFormat), m_guideWidget(guideWidget)
 {
     setPolicy(USE_MIN_SIZE);
-    setInnerMargin(20);
+    setInnerMargin(10);
     // Load title image
     IIM_Surface *titleImage = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath(String("gfx/stats_title.png")));
     m_statsImage.setImage(titleImage);
     m_statsImage.setAlign(IMAGE_CENTERED);
     add(&m_statsImage);
-    add(&m_titleSeparator);
-    add(&m_barSeparator);
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++) {
         int numCombo = m_statsFormat.m_comboIndirection[i];
         if (numCombo != -1) {
@@ -410,18 +406,18 @@ PuyoStatsLegendWidget::PuyoStatsLegendWidget(StatsFormat &statsFormat, StatsWidg
         add(&m_legendSlider[i]);
     }
     add(&m_bottomSeparator);
-    //if (m_statsFormat.m_comboIndirection[MAX_DISPLAYED_COMBOS] != -1)
-    //    m_legendText[MAX_DISPLAYED_COMBOS-1].setValue("Countless");
 }
 
 void PuyoStatsLegendWidget::onWidgetVisibleChanged(bool visible)
 {
   // Set the size of the different rows
   for (int i = 0 ; i < this->getNumberOfChilds() - 1 ; i++) {
-    Vec3 elementSize = m_guideWidget.getChild(i)->getSize();
-    //printf("Elementsize: %f %f\n", elementSize.x, elementSize.y);
+    Vec3 elementSize = m_guideWidget.getChild(i+1)->getSize();
     getChild(i)->setPreferedSize(Vec3(0, elementSize.y));
   }
+  // Special case: the title should have the size of the first 2 items of the guide
+  // +10 is to compensate the difference in inner margin
+  getChild(0)->setPreferedSize(Vec3(0, getChild(0)->getPreferedSize().y + m_guideWidget.getChild(0)->getSize().y + 10));
 }
 
 void PuyoStatsLegendWidget::action(Widget *sender, int actionType, GameControlEvent *event)
