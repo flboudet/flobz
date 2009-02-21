@@ -1,6 +1,8 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; indent-tab-mode: nil; -*- */
 #include "PuyoServerV2.h"
 
+#define DEBUG_PUYOPEERSLISTENERV2 1
+
 #include <stdio.h>
 #include "ios_igpmessagebox.h"
 #include "ios_memory.h"
@@ -17,8 +19,6 @@
 #include "V2/PeersList.h"
 #include "V2/ConnectionRequest.h"
 #include "V2/Server.h"
-
-// #define DEBUG_PUYOPEERSLISTENERV2 1
 
 using namespace ios_fc;
 

@@ -15,7 +15,7 @@ using namespace flobopuyo::server;
 int main(int argc, const char * argv[])
 {
     int port = 4567;  // Default port number
-    int protocol = 2; // Default protocol number
+    int protocol = 1; // Default protocol number
     if (argc >= 2) port = atoi(argv[1]);
     if (argc >= 3) protocol = atoi(argv[2]);
     fprintf(stderr, "Usage %s [port number] [protocol number]\n", argv[0]);

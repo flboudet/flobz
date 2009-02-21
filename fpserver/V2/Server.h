@@ -94,7 +94,6 @@ void Server::onPeerConnect(ios_fc::PeerAddress addr, int fpipVersion, const ios_
         
         // Create the new peer
         Peer *newPeer = new Peer(addr, name, mTimeMsBeforePeerTimeout);
-        newPeer->status = status;
 
 #if DEBUG_PUYOPEERSLISTENERV2
         printf("Nouveau peer: %s\n", (const char *)name);
