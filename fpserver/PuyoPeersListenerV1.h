@@ -1,39 +1,40 @@
 #ifndef _PUYOSERVERIGPRESPONDER_H
 #define _PUYOSERVERIGPRESPONDER_H
 
-#include "ios_igpvirtualpeermessagebox.h"
-#include "ios_memory.h"
-#include "ios_dirigeable.h"
+#include "PuyoPeersListener.h"
 
-using namespace ios_fc;
+namespace flobopuyo {
+namespace server {
 
-class PuyoIgpResponder : public MessageListener {
+class PuyoPeersListenerV1 : public PuyoPeersListener {
 public:
-    PuyoIgpResponder(IgpVirtualPeerMessageBox &mbox);
+    PuyoPeersListenerV1(ios_fc::IgpVirtualPeerMessageBox &mbox);
     bool checkVersion(int clientVersion) const;
-    void onMessage(Message &msg);
+    void onMessage(ios_fc::Message &msg);
     void idle();
 private:
     class GamePeer;
     
-    GamePeer * getPeer(PeerAddress &addr) const;
-    void connectPeer(PeerAddress addr, int fpipVersion, const String name, int status);
+    GamePeer * getPeer(ios_fc::PeerAddress &addr) const;
+    void connectPeer(ios_fc::PeerAddress addr, int fpipVersion, const ios_fc::String name, int status);
     void updatePeer(GamePeer *peer, int status);
 
-    IgpVirtualPeerMessageBox &mbox;
-    AdvancedBuffer<GamePeer *>peers;
+    ios_fc::IgpVirtualPeerMessageBox &mbox;
+    ios_fc::AdvancedBuffer<GamePeer *>peers;
     double timeMsBeforePeerTimeout;
     int m_maxPeersAllowed;
 };
 
-class PuyoIgpResponder::GamePeer {
+class PuyoPeersListenerV1::GamePeer {
 public:
-    GamePeer(PeerAddress addr, const String name) : addr(addr), name(name), status(0) {}
-    PeerAddress addr;
-    const String name;
+    GamePeer(ios_fc::PeerAddress addr, const ios_fc::String name) : addr(addr), name(name), status(0) {}
+    ios_fc::PeerAddress addr;
+    const ios_fc::String name;
     double lastUpdate;
     int status;
 };
+
+}}
 
 #endif // _PUYOSERVERIGPRESPONDER_H
 

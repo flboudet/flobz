@@ -10,8 +10,8 @@ namespace server {
 
 class PuyoPeersListener : public ios_fc::MessageListener {
 public:
-    PuyoPeersListener(ios_fc::IgpVirtualPeerMessageBox &mbox);
     virtual void idle() = 0;
+    virtual ~PuyoPeersListener() {}
 };
 
 }}

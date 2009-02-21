@@ -2,9 +2,9 @@
 #include "ios_udpmessagebox.h"
 #include "ios_igpmessagelistener.h"
 #include "ios_igpvirtualpeermessagebox.h"
-#include "PuyoServerIgpResponder.h"
 #include "PuyoServerIgpNatTraversal.h"
-#include "PuyoPeersListener.h"
+#include "PuyoPeersListenerV1.h"
+#include "PuyoPeersListenerV2.h"
 #include <stdlib.h>
 
 using namespace ios_fc;
@@ -34,10 +34,10 @@ int main(int argc, const char * argv[])
     PuyoIgpNatTraversal natPuncher(igpMBox, listener);
     igpMBox.addListener(&natPuncher);
     
-    MessageListener *responder;
+    PuyoPeersListener *responder;
     switch (protocol) {
-        case 1: responder = new PuyoIgpResponder(igpMBox); break;
-        case 2: responder = new PuyoPeersListener(igpMBox); break;
+        case 1: responder = new PuyoPeersListenerV1(igpMBox); break;
+        case 2: responder = new PuyoPeersListenerV2(igpMBox); break;
         default:
                 fprintf(stderr, "Erros: valid protocols are 1 and 2");
     }

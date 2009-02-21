@@ -1,27 +1,31 @@
 /* -*-mode:c; c-style:k&r; c-basic-offset:4; indent-tab-mode: nil; -*- */
+#include "PuyoPeersListenerV1.h"
+
 #include <stdio.h>
 #include "ios_igpmessagebox.h"
 #include "ios_memory.h"
 #include "ios_dirigeable.h"
 #include "ios_time.h"
 #include "PuyoIgpDefs.h"
-#include "PuyoServerIgpResponder.h"
 
 using namespace ios_fc;
 
-PuyoIgpResponder::PuyoIgpResponder(IgpVirtualPeerMessageBox &mbox)
+namespace flobopuyo {
+namespace server {
+
+PuyoPeersListenerV1::PuyoPeersListenerV1(IgpVirtualPeerMessageBox &mbox)
  : mbox(mbox), timeMsBeforePeerTimeout(5000.), m_maxPeersAllowed(0)
 {
 }
 
-bool PuyoIgpResponder::checkVersion(int clientVersion) const
+bool PuyoPeersListenerV1::checkVersion(int clientVersion) const
 {
     if (clientVersion == 1)
         return true;
     return false;
 }
 
-void PuyoIgpResponder::onMessage(Message &msg)
+void PuyoPeersListenerV1::onMessage(Message &msg)
 {
     try {
         // Gets the address of the sender of the message
@@ -67,13 +71,13 @@ void PuyoIgpResponder::onMessage(Message &msg)
     } catch (Exception e) {}
 }
  
-void PuyoIgpResponder::idle()
+void PuyoPeersListenerV1::idle()
 {
     double time_ms = getTimeMs();
     for (int i = 0, j = peers.size() ; i < j ; i++) {
         GamePeer *currentPeer = peers[i];
         if ((time_ms - currentPeer->lastUpdate) > timeMsBeforePeerTimeout) {
-            printf("PuyoIgpResponder Peer timeout!\n");
+            printf("PuyoPeersListenerV1 Peer timeout!\n");
             // Build disconnect message
             Message *newMsg = mbox.createMessage();
             newMsg->addBoolProperty("RELIABLE", true);
@@ -95,7 +99,7 @@ void PuyoIgpResponder::idle()
     }
 }
 
-PuyoIgpResponder::GamePeer * PuyoIgpResponder::getPeer(PeerAddress &addr) const
+PuyoPeersListenerV1::GamePeer * PuyoPeersListenerV1::getPeer(PeerAddress &addr) const
 {
     for (int i = 0, j = peers.size() ; i < j ; i++) {
         if (peers[i]->addr == addr) {
@@ -105,7 +109,7 @@ PuyoIgpResponder::GamePeer * PuyoIgpResponder::getPeer(PeerAddress &addr) const
     return NULL;
 }
 
-void PuyoIgpResponder::connectPeer(PeerAddress addr, int fpipVersion, const String name, int status)
+void PuyoPeersListenerV1::connectPeer(PeerAddress addr, int fpipVersion, const String name, int status)
 {
     // First check wether the new peer can connect to the server or not
     bool accept = true;
@@ -180,7 +184,7 @@ void PuyoIgpResponder::connectPeer(PeerAddress addr, int fpipVersion, const Stri
     }
 }
 
-void PuyoIgpResponder::updatePeer(GamePeer *peer, int status)
+void PuyoPeersListenerV1::updatePeer(GamePeer *peer, int status)
 {
     peer->lastUpdate = getTimeMs();
     if (peer->status != status) {
@@ -201,3 +205,5 @@ void PuyoIgpResponder::updatePeer(GamePeer *peer, int status)
         delete newMsg;
     }
 }
+
+}}
