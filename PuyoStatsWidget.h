@@ -129,7 +129,7 @@ class StatsResources {
         ~StatsResources();
 };
 
-class PuyoTwoPlayersStatsWidget : public gameui::VBox, gameui::SliderContainerListener {
+class PuyoTwoPlayersStatsWidget : public gameui::ZBox, gameui::SliderContainerListener {
 public:
     PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats,
                               bool showLeftGlobalScore, bool showRightGlobalScore,

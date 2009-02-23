@@ -437,35 +437,51 @@ PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerS
     m_legendSlider.setPreferedSize(Vec3(194., 416.));
     m_leftSlider.setPreferedSize(Vec3(0., 416.));
     m_rightSlider.setPreferedSize(Vec3(0., 416.));
-    HBox *mainBox = new HBox();
+    HBox *backBox = new HBox();
     VBox *v1 = new VBox();
     Separator *sep1 = new Separator();
     v1->add(&m_leftSlider);
     v1->add(sep1);
-    mainBox->add(v1);
+    backBox->add(v1);
     VBox *v3 = new VBox();
-    Separator *sep3 = new Separator();
-    v3->add(&m_legendSlider);
-    v3->add(sep3);
     v3->setPreferedSize(Vec3(194., 0.));
-     mainBox->add(v3);
+    backBox->add(v3);
     VBox *v2 = new VBox();
     Separator *sep2 = new Separator();
     v2->add(&m_rightSlider);
     v2->add(sep2);
-    mainBox->add(v2);
-    add(mainBox);
+    backBox->add(v2);
+    
+    HBox *frontBox = new HBox();
+    VBox *f1 = new VBox();
+    frontBox->add(f1);
+    VBox *f3 = new VBox();
+    Separator *sep3 = new Separator();
+    f3->setPreferedSize(Vec3(194., 0.));
+    f3->add(&m_legendSlider);
+    f3->add(sep3);
+    frontBox->add(f3);
+    VBox *f2 = new VBox();
+    frontBox->add(f2);
+    
+    add(backBox);
+    add(frontBox);
+    
     m_leftSlider.addListener(*this);
     m_legendSlider.addListener(*this);
     m_rightSlider.addListener(*this);
 
-    widgetAutoReleasePool.add(mainBox);
+    widgetAutoReleasePool.add(backBox);
     widgetAutoReleasePool.add(v1);
     widgetAutoReleasePool.add(v2);
     widgetAutoReleasePool.add(v3);
     widgetAutoReleasePool.add(sep1);
     widgetAutoReleasePool.add(sep2);
     widgetAutoReleasePool.add(sep3);
+    widgetAutoReleasePool.add(frontBox);
+    widgetAutoReleasePool.add(f1);
+    widgetAutoReleasePool.add(f2);
+    widgetAutoReleasePool.add(f3);
 }
 
 void PuyoTwoPlayersStatsWidget::onWidgetVisibleChanged(bool visible)
