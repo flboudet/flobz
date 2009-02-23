@@ -396,7 +396,7 @@ PuyoStatsLegendWidget::PuyoStatsLegendWidget(StatsFormat &statsFormat, StatsWidg
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++) {
         int numCombo = m_statsFormat.m_comboIndirection[i];
         if (numCombo != -1) {
-            String pictureName = theCommander->getDataPathManager().getPath(String("gfx/combo") + ((numCombo+1) == 1 ? 1 : numCombo+1) + String("x.png"));
+            String pictureName = theCommander->getDataPathManager().getPath(String("gfx/combo") + ((numCombo+1) == 1 ? 1 : numCombo+1) + String("x_stat.png"));
             IIM_Surface *comboImage = IIM_Load_Absolute_DisplayFormatAlpha(pictureName);
             m_legendImage[i].setImage(comboImage);
             m_legendImage[i].setAlign(IMAGE_CENTERED);
