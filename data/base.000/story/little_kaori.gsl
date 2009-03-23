@@ -177,13 +177,13 @@
     }
     (@lk_waiting_anim = @LK_WAITING_YOYO)? {
         @lk_sprite.nbframes = 5.0
-        @lk_sprite.framespeed = 0.16
+        @lk_sprite.framespeed = 0.32
         @lk_sprite.image = "sdkaori/yoyo_01.png"
         (@lk_sprite.curframe >= 1.0)? @lk_sprite.image = "sdkaori/yoyo_02.png"
         (@lk_sprite.curframe >= 2.0)? @lk_sprite.image = "sdkaori/yoyo_03.png"
         (@lk_sprite.curframe >= 3.0)? @lk_sprite.image = "sdkaori/yoyo_04.png"
         (@lk_sprite.curframe >= 4.0)? @lk_sprite.image = "sdkaori/yoyo_02.png"
-        @LK_WAITING_DURATION = 200.0
+        @LK_WAITING_DURATION = 250.0
     }
     move::@lk_sprite fcycle=@lk_startcycle          x=@LK_WAITING_SPRITE_CENTER_X  y=@LK_WAITING_SPRITE_Y
     @lk_sprite.pos.x = @LK_WAITING_SPRITE_CENTER_X + [lk_side_look]
