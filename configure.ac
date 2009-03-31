@@ -41,7 +41,7 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 #AC_PROG_RANLIB
 AC_DISABLE_SHARED
-AM_PROG_LIBTOOL 
+AM_PROG_LIBTOOL
 
 case $host_os in
     darwin*)
@@ -269,6 +269,7 @@ data/base.000/gfx/etherdown/Makefile
 data/base.000/gfx/kaori_gamelost/Makefile
 data/base.000/gfx/kaori_title/Makefile
 data/base.000/gfx/progressbar/Makefile
+data/base.000/gfx/sdkaori/Makefile
 data/base.000/gfx/title/Makefile
 data/base.000/gfx/unmappedmonster/Makefile
 data/base.000/lib/Makefile
