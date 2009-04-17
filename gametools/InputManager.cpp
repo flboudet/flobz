@@ -59,10 +59,12 @@ static const SdlKeyName sdlKeyDictionnary[] = {
   { SDLK_LCTRL,     "Left Ctrl" },
   { SDLK_RALT,     "Right Alt" },
   { SDLK_LALT,     "Left Alt" },
+#if not SDL_VERSION_ATLEAST(1, 3, 0)
   { SDLK_RMETA,     "Right Meta" },
   { SDLK_LMETA,     "Left Meta" },
   { SDLK_RSUPER,     "Right Windows" },
   { SDLK_LSUPER,     "Left Windows" },
+#endif
   { SDLK_MODE,     "Mode Shift" },
   { SDLK_HELP,     "Help" },
   { SDLK_PRINT,     "Print Screen" },
@@ -80,8 +82,11 @@ static int numJoysticks;
 static int axisSave[16][16];
 
 /* KEY Input */
-
+#if not SDL_VERSION_ATLEAST(1, 3, 0)
+KeyInputSwitch::KeyInputSwitch(int keysym, bool isup, Uint16 keymod)
+#else
 KeyInputSwitch::KeyInputSwitch(int keysym, bool isup, SDLMod keymod)
+#endif
   : InputSwitch(isup), keysym(keysym), keymod(keymod) {
   keyName[0] = 0;
 }
@@ -226,7 +231,7 @@ InputSwitch *switchForEvent(SDL_Event *e)
 
     case SDL_JOYBUTTONUP:
       return new JoystickSwitch(e->jbutton.which, e->jbutton.button, true);
-      
+
     case SDL_JOYAXISMOTION: {
       prevaxis = axisSave[e->jaxis.which][e->jaxis.axis];
       axisSave[e->jaxis.which][e->jaxis.axis] = e->jaxis.value;
@@ -256,7 +261,7 @@ InputSwitch *switchForEvent(SDL_Event *e)
 
       return NULL;
     }
-      
+
     case SDL_KEYDOWN:
       return new KeyInputSwitch(e->key.keysym.sym, false, e->key.keysym.mod);
     case SDL_KEYUP:
@@ -270,7 +275,7 @@ InputSwitch *switchForEvent(SDL_Event *e)
 void initControllers()
 {
   numJoysticks = SDL_NumJoysticks();
-  for( int i=0 ; i < numJoysticks ; i++ ) 
+  for( int i=0 ; i < numJoysticks ; i++ )
   {
     joystick[numJoysticks - i - 1] = SDL_JoystickOpen(i);
   }
@@ -283,7 +288,7 @@ void initControllers()
 
 void closeControllers()
 {
-  for( int i=0 ; i < numJoysticks ; i++ ) 
+  for( int i=0 ; i < numJoysticks ; i++ )
   {
     SDL_JoystickClose(joystick[i]);
   }
