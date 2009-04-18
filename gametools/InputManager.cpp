@@ -82,7 +82,7 @@ static int numJoysticks;
 static int axisSave[16][16];
 
 /* KEY Input */
-#if not SDL_VERSION_ATLEAST(1, 3, 0)
+#if SDL_VERSION_ATLEAST(1, 3, 0)
 KeyInputSwitch::KeyInputSwitch(int keysym, bool isup, Uint16 keymod)
 #else
 KeyInputSwitch::KeyInputSwitch(int keysym, bool isup, SDLMod keymod)

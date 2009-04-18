@@ -18,12 +18,10 @@ class PuyoCommander : public MessageListener, NotificationResponder
   public:
     PuyoCommander(String dataDir, bool fullscreen, int maxDataPackNumber=-1);
     virtual ~PuyoCommander();
-    void run();
-    void debug_gsl(String gsl_script);
     void onMessage(Message &message);
 
     void notificationOccured(String identifier, void * context);
-    
+
     bool getMusic();
     bool getSoundFx();
     String getFullScreenKey(void) const;
@@ -31,9 +29,8 @@ class PuyoCommander : public MessageListener, NotificationResponder
     void setFullScreen(bool fullScreen);
     bool getGlSDL() const { return useGL; }
     void setGlSDL(bool useGL);
-    void setCursorVisible(bool visible) { cursor->setVisible(visible); }
-    
-    void initDisplay(int w, int h, bool fullscreen, bool useGL);
+    void setCursorVisible(bool visible) {} // TODO: Find a solution cursor->setVisible(visible); }
+
     const PuyoDataPathManager &getDataPathManager() { return dataPathManager; }
     const char * getLocalizedString(const char * originalString) const;
 
@@ -57,21 +54,16 @@ class PuyoCommander : public MessageListener, NotificationResponder
     friend class NetworkGameMenu;
 
     void loadPreferences(bool fs);
-    void initSDL();
     void initLocale();
     void initAudio();
     void initFonts();
-    void initMenus();
 
     PuyoDataPathManager dataPathManager;
-    
+
     MessageBox *mbox;
     GameLoop   *loop;
-
-    MainScreen *mainScreen;
-    GameCursor *cursor;
     PuyoLocalizedDictionary * locale;
-    
+
     AudioManager globalAudioManager;
 
     bool fullscreen;
@@ -87,6 +79,22 @@ class PuyoCommander : public MessageListener, NotificationResponder
     FramePicture m_textFieldIdleFramePicture;
     FramePicture m_separatorFramePicture;
     FramePicture m_listFramePicture;
+};
+
+class PuyoMain
+{
+public:
+    PuyoMain(String dataDir, bool fullscreen, int maxDataPackNumber=-1);
+    void run();
+    void debug_gsl(String gsl_script);
+private:
+    void initMenus();
+    void initSDL();
+    void initDisplay(int w, int h, bool fullscreen, bool useGL);
+
+    GameLoop   *loop;
+    MainScreen *mainScreen;
+    GameCursor *cursor;
 };
 
 extern class PuyoCommander *theCommander;

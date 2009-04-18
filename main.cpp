@@ -121,12 +121,12 @@ int main(int argc, char *argv[])
     else
         dataDir = DATADIR;
 
-    PuyoCommander commander(dataDir, fs, maxPackNumber);
+    PuyoMain fp(dataDir, fs, maxPackNumber);
     try {
         if (gsl_screen != NULL)
-            commander.debug_gsl(gsl_screen);
+            fp.debug_gsl(gsl_screen);
         else
-            commander.run();
+            fp.run();
     }
     catch (Exception e) { displayExceptionMessage(e.what()); }
     catch (char * str) { displayExceptionMessage(str); }

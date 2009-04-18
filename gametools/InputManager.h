@@ -38,7 +38,7 @@ class InputSwitch
 
 void initControllers();
 void closeControllers();
-  
+
 InputSwitch *switchForEvent(SDL_Event *e);
 InputSwitch *waitInputSwitch();
 InputSwitch *checkInputSwitch();
@@ -46,7 +46,11 @@ InputSwitch *checkInputSwitch();
 class KeyInputSwitch : public InputSwitch
 {
   public:
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+    KeyInputSwitch(int keysym, bool isup, Uint16 keymod = KMOD_NONE);
+#else
     KeyInputSwitch(int keysym, bool isup, SDLMod keymod = KMOD_NONE);
+#endif
     const char *name() const;
     int id() const;
 
@@ -58,10 +62,14 @@ class KeyInputSwitch : public InputSwitch
     virtual bool isCancel()    const;
     virtual bool isPause()     const;
     virtual bool isQuit()      const;
-    
+
   private:
     int keysym;
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+    Uint16 keymod;
+#else
     SDLMod keymod;
+#endif
     mutable char keyName[256];
 };
 

@@ -37,33 +37,6 @@ void SinglePlayerGameAction::action()
   GameUIDefaults::SCREEN_STACK->push(starter);*/
 }
 
-void PuyoCommander::debug_gsl(String gsl_script)
-{
-  GameUIDefaults::SCREEN_STACK->push(mainScreen);
-  StoryScreen story_screen(gsl_script);
-  GameUIDefaults::SCREEN_STACK->push(&story_screen);
-  GameUIDefaults::GAME_LOOP->run();
-}
-
-void PuyoCommander::run()
-{
-  GameUIDefaults::SCREEN_STACK->push(mainScreen);
-  GameUIDefaults::GAME_LOOP->run();
-}
-
-void PuyoCommander::initMenus()
-{
-  DBG_PRINT("initMenus()\n");
-  //
-  // Create the structures.
-  StoryWidget *fgStory = new StoryWidget("title_fg.gsl");
-  StoryWidget *bgStory = new StoryWidget("title_bg.gsl");
-  mainScreen = new MainScreen(fgStory, bgStory);
-  MainRealMenu *trubudu = new MainRealMenu(mainScreen);
-  trubudu->build();
-  mainScreen->pushMenu(trubudu);
-}
-
 /* Build the PuyoCommander */
 
 PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
@@ -85,12 +58,10 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
     dataPathManager.setMaxPackNumber(maxDataPackNumber);
   loadPreferences(fs);
   gameui::GlobalNotificationCenter.addListener(getFullScreenKey(),this);
-  initSDL();
+
   initLocale();
   initGameControls();
   initAudio();
-  initDisplay(GetIntPreference(kScreenWidthPref, 640),
-          GetIntPreference(kScreenHeightPref, 480), fullscreen, useGL);
   initFonts();
 
     // Loading the frame images, and setting up the frames
@@ -112,12 +83,6 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
     m_textFieldIdleFramePicture.setFrameSurface(m_textFieldIdleImage);
     m_separatorFramePicture.setFrameSurface(m_separatorImage);
     m_listFramePicture.setFrameSurface(m_listIdleImage);
-
-  initMenus();
-  cursor = new GameCursor(dataPathManager.getPath("gfx/cursor.png"));
-  loop->addDrawable(cursor);
-  loop->addIdle(cursor);
-
 }
 
 PuyoCommander::~PuyoCommander()
@@ -129,39 +94,6 @@ PuyoCommander::~PuyoCommander()
   IIM_Free(m_textFieldIdleImage);
   IIM_Free(m_separatorImage);
   gameui::GlobalNotificationCenter.removeListener(getFullScreenKey(),this);
-}
-
-/* Initialize SDL context */
-void PuyoCommander::initSDL()
-{
-  DBG_PRINT("initSDL()\n");
-  int init_flags = SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK;
-
-#ifdef USE_DGA
-  /* This Hack Allows Hardware Surface on Linux */
-  if (fullscreen)
-    setenv("SDL_VIDEODRIVER","dga",0);
-
-  if (SDL_Init(init_flags) < 0) {
-    setenv("SDL_VIDEODRIVER","x11",1);
-    if (SDL_Init(init_flags) < 0) {
-      fprintf(stderr, "SDL initialisation error:  %s\n", SDL_GetError());
-      exit(1);
-    }
-  }
-  else {
-    if (fullscreen)
-      SDL_WM_GrabInput(SDL_GRAB_ON);
-  }
-#else
-#ifdef WIN32
-  _putenv("SDL_VIDEODRIVER=windib");
-#endif
-  if ( SDL_Init(init_flags) < 0 ) {
-    fprintf(stderr, "SDL initialisation error:  %s\n", SDL_GetError());
-    exit(1);
-  }
-#endif
 }
 
 extern char *dataFolder;
@@ -299,8 +231,8 @@ void PuyoCommander::setFullScreen(bool fullScreen)
           //SDL_QuitSubSystem(SDL_INIT_VIDEO);
           //SDL_InitSubSystem(SDL_INIT_VIDEO);
 
-            initDisplay(GetIntPreference(kScreenWidthPref, 640),
-                    GetIntPreference(kScreenHeightPref, 480), fullscreen, useGL);
+            //initDisplay(GetIntPreference(kScreenWidthPref, 640),
+            //        GetIntPreference(kScreenHeightPref, 480), fullscreen, useGL);
         }
         /* Workaround for cursor showing in MacOS X fullscreen mode */
         SDL_ShowCursor(SDL_ENABLE);
@@ -312,8 +244,70 @@ void PuyoCommander::setGlSDL(bool useGL)
 {
 }
 
+/* load a few important preferences for display */
+void PuyoCommander::loadPreferences(bool fs)
+{
+  DBG_PRINT("loadPreferences()\n");
+  /* Load Preferences */
+  fullscreen = fs ? GetBoolPreference(kFullScreenPref, true) : false;
+#ifdef HAVE_OPENGL
+  useGL = GetBoolPreference(kOpenGLPref, false);
+#else
+  useGL = false;
+#endif
+}
+
+void PuyoCommander::onMessage(Message &msb) {}
+
+PuyoMain::PuyoMain(String dataDir, bool fullscreen, int maxDataPackNumber)
+{
+    // Create the PuyoCommander singleton
+    loop = GameUIDefaults::GAME_LOOP;
+    initSDL();
+    initDisplay(GetIntPreference(kScreenWidthPref, 640),
+                GetIntPreference(kScreenHeightPref, 480), GetIntPreference(kFullScreenPref, fullscreen), useGL);
+    new PuyoCommander(dataDir, fullscreen, maxDataPackNumber);
+    initMenus();
+    cursor = new GameCursor(theCommander->getDataPathManager().getPath("gfx/cursor.png"));
+    loop->addDrawable(cursor);
+    loop->addIdle(cursor);
+}
+
+/* Initialize SDL context */
+void PuyoMain::initSDL()
+{
+  DBG_PRINT("initSDL()\n");
+  int init_flags = SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK;
+
+#ifdef USE_DGA
+  /* This Hack Allows Hardware Surface on Linux */
+  if (fullscreen)
+    setenv("SDL_VIDEODRIVER","dga",0);
+
+  if (SDL_Init(init_flags) < 0) {
+    setenv("SDL_VIDEODRIVER","x11",1);
+    if (SDL_Init(init_flags) < 0) {
+      fprintf(stderr, "SDL initialisation error:  %s\n", SDL_GetError());
+      exit(1);
+    }
+  }
+  else {
+    if (theCommander->getFullScreen())
+      SDL_WM_GrabInput(SDL_GRAB_ON);
+  }
+#else
+#ifdef WIN32
+  _putenv("SDL_VIDEODRIVER=windib");
+#endif
+  if ( SDL_Init(init_flags) < 0 ) {
+    fprintf(stderr, "SDL initialisation error:  %s\n", SDL_GetError());
+    exit(1);
+  }
+#endif
+}
+
 /* Init SDL display */
-void PuyoCommander::initDisplay(int w, int h, bool fullscreen, bool useGL)
+void PuyoMain::initDisplay(int w, int h, bool fullscreen, bool useGL)
 {
   DBG_PRINT("initDisplay()\n");
 
@@ -371,18 +365,31 @@ void PuyoCommander::initDisplay(int w, int h, bool fullscreen, bool useGL)
   //SDL_WM_SetIcon(SDL_LoadBMP("icon.bmp"), NULL);
 }
 
-
-/* load a few important preferences for display */
-void PuyoCommander::loadPreferences(bool fs)
+void PuyoMain::run()
 {
-  DBG_PRINT("loadPreferences()\n");
-  /* Load Preferences */
-  fullscreen = fs ? GetBoolPreference(kFullScreenPref, true) : false;
-#ifdef HAVE_OPENGL
-  useGL = GetBoolPreference(kOpenGLPref, false);
-#else
-  useGL = false;
-#endif
+  GameUIDefaults::SCREEN_STACK->push(mainScreen);
+  GameUIDefaults::GAME_LOOP->run();
 }
 
-void PuyoCommander::onMessage(Message &msb) {}
+void PuyoMain::debug_gsl(String gsl_script)
+{
+  GameUIDefaults::SCREEN_STACK->push(mainScreen);
+  StoryScreen story_screen(gsl_script);
+  GameUIDefaults::SCREEN_STACK->push(&story_screen);
+  GameUIDefaults::GAME_LOOP->run();
+}
+
+void PuyoMain::initMenus()
+{
+  DBG_PRINT("initMenus()\n");
+  //
+  // Create the structures.
+  StoryWidget *fgStory = new StoryWidget("title_fg.gsl");
+  StoryWidget *bgStory = new StoryWidget("title_bg.gsl");
+  mainScreen = new MainScreen(fgStory, bgStory);
+  MainRealMenu *trubudu = new MainRealMenu(mainScreen);
+  trubudu->build();
+  mainScreen->pushMenu(trubudu);
+}
+
+
