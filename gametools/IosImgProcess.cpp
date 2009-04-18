@@ -3,121 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h> // Conforms to ANSI "C 89", is that OK?
+#ifdef MACOSX
+#include <SDL_image/SDL_image.h>
+#else
+#include <SDL_image.h>
+#endif
 
 /** Image loading... free... conversion */
 
-bool fullscreen = true;
-bool useGL = false;
-
-#define MAXIMG 8192
-IIM_Surface  imgList[MAXIMG];
-int          imgListSize = 0;
-int          imgListIndex = 0;
-
-IIM_Surface * IIM_Load_Absolute_DisplayFormat (const char *path)
-{
-  SDL_Surface *tmpsurf, *retsurf;
-  tmpsurf = IMG_Load (path);
-  if (tmpsurf==NULL) {
-    return NULL;
-  }
-  retsurf = SDL_DisplayFormat (tmpsurf);
-  SDL_FreeSurface (tmpsurf);
-  return IIM_RegisterImg(retsurf, false);
-}
-
-IIM_Surface * IIM_Load_Absolute_DisplayFormatAlpha (const char * path)
-{
-  SDL_Surface *tmpsurf, *retsurf;
-  tmpsurf = IMG_Load (path);
-  if (tmpsurf==NULL) {
-    return NULL;
-  }
-  retsurf = SDL_DisplayFormatAlpha (tmpsurf);
-  if (retsurf==NULL) {
-    perror("Texture conversion failed (is Display initialized?)\n");
-    SDL_FreeSurface (tmpsurf);
-    return NULL;
-  }
-  SDL_SetAlpha (retsurf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
-  SDL_FreeSurface (tmpsurf);
-  return IIM_RegisterImg(retsurf, true);
-}
-
-void IIM_Free(IIM_Surface *img)
-{
-  for (int i=0; i<imgListSize; ++i)
-  {
-    if (&imgList[i] == img)
-    {
-        if (img->surf != NULL) SDL_FreeSurface(imgList[i].surf);
-        imgList[i].surf = NULL;
-        //fprintf(stderr,"Pictures array freed %d\n",i);
-        for (int j=1; j<36; ++j)
-            if (img->rotated[j] != NULL) IIM_Free(img->rotated[j]);
-        if (img->fliph != NULL) IIM_Free(img->fliph);
-        return;
-    }
-  }
-}
-
-IIM_Surface * IIM_RegisterImg(SDL_Surface *img, bool isAlpha)
-{
-    IIM_Surface *_this = NULL;
-    /* We still have empty slots */
-    if (imgListSize < MAXIMG) {
-        _this = &imgList[imgListSize++];
-        //fprintf(stderr,"Pictures array using %d\n",imgListSize-1);
-    } else {
-        // try to find another place
-        int orig = imgListIndex;
-        for (int i=(orig+1)%MAXIMG; i!=orig; i=(i+1)%MAXIMG)
-        {
-            if (imgList[i].surf == NULL) {
-                _this = &imgList[i];
-                imgListIndex = i;
-                //fprintf(stderr,"Pictures array reusing %d\n",imgListIndex);
-                break;
-            }
-        }
-        if (_this == NULL) {
-            fprintf(stderr,"Pictures array limit exceeded, aborting...\n");
-            exit(0);
-        }
-    }
-  _this->isAlpha = isAlpha;
-  _this->surf    = img;
-  _this->w       = img->w;
-  _this->h       = img->h;
-  for (int i=0; i<36; ++i)
-    _this->rotated[i] = NULL;
-  _this->rotated[0] = _this;
-  _this->fliph = NULL;
-  return _this;
-}
-
-void IIM_ReConvertAll(void)
-{
-  for (int i=0; i<imgListSize; ++i)
-  {
-    if (imgList[i].surf)
-    {
-      if (imgList[i].isAlpha)
-      {
-        SDL_Surface *retsurf = SDL_DisplayFormat(imgList[i].surf);
-        SDL_SetAlpha (retsurf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
-        SDL_FreeSurface(imgList[i].surf);
-        imgList[i].surf = retsurf;
-      }
-      else
-      {
-        SDL_Surface *retsurf = SDL_DisplayFormat(imgList[i].surf);
-        SDL_FreeSurface(imgList[i].surf);
-        imgList[i].surf = retsurf;
-      }
-    }
-  }
-}
+// Pure SDL part
 
 /** Image processing */
 
@@ -415,9 +309,8 @@ RGBA iim_hsva2rgba(HSVA c)
 /**
  * Shift the saturation of a surface
  */
-IIM_Surface *iim_surface_shift_hsv(IIM_Surface *isrc, float h, float s, float v)
+SDL_Surface *iim_sdlsurface_shift_hsv(SDL_Surface *src, float h, float s, float v)
 {
-    SDL_Surface *src = isrc->surf;
     SDL_PixelFormat *fmt = src->format;
     SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
                                             fmt->Rmask, fmt->Gmask,
@@ -447,15 +340,14 @@ IIM_Surface *iim_surface_shift_hsv(IIM_Surface *isrc, float h, float s, float v)
     }
     if(retlocked) SDL_UnlockSurface(ret);
     if(srclocked) SDL_UnlockSurface(src);
-    return IIM_RegisterImg(ret, true);
+    return ret;
 }
 
 /**
  * Shift the hue of a surface
  */
-IIM_Surface *iim_surface_shift_hue(IIM_Surface *isrc, float hue_offset)
+SDL_Surface *iim_sdlsurface_shift_hue(SDL_Surface *src, float hue_offset)
 {
-    SDL_Surface *src = isrc->surf;
     SDL_PixelFormat *fmt = src->format;
     SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
                                             fmt->Rmask, fmt->Gmask,
@@ -479,16 +371,14 @@ IIM_Surface *iim_surface_shift_hue(IIM_Surface *isrc, float hue_offset)
     }
     if(retlocked) SDL_UnlockSurface(ret);
     if(srclocked) SDL_UnlockSurface(src);
-    return IIM_RegisterImg(ret, true);
+    return ret;
 }
 
 /**
  * Shift the hue of a surface with a 1-bit mask
  */
-IIM_Surface *iim_surface_shift_hue_masked(IIM_Surface *isrc, IIM_Surface *imask, float hue_offset)
+SDL_Surface *iim_sdlsurface_shift_hue_masked(SDL_Surface *src, SDL_Surface *mask, float hue_offset)
 {
-    SDL_Surface *src = isrc->surf;
-    SDL_Surface *mask = imask->surf;
     SDL_PixelFormat *fmt = src->format;
     SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
                                             fmt->Rmask, fmt->Gmask,
@@ -521,15 +411,14 @@ IIM_Surface *iim_surface_shift_hue_masked(IIM_Surface *isrc, IIM_Surface *imask,
     if(retlocked) SDL_UnlockSurface(ret);
     if(srclocked) SDL_UnlockSurface(src);
     if(masklocked) SDL_UnlockSurface(mask);
-    return IIM_RegisterImg(ret, true);
+    return ret;
 }
 
 /**
  * Change the value (luminosity) of each pixel in a surface
  */
-IIM_Surface *iim_surface_set_value(IIM_Surface *isrc, float value)
+SDL_Surface *iim_sdlsurface_set_value(SDL_Surface *src, float value)
 {
-    SDL_Surface *src = isrc->surf;
     SDL_PixelFormat *fmt = src->format;
     SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
                                             fmt->Rmask, fmt->Gmask,
@@ -553,17 +442,16 @@ IIM_Surface *iim_surface_set_value(IIM_Surface *isrc, float value)
     }
     if(retlocked) SDL_UnlockSurface(ret);
     if(srclocked) SDL_UnlockSurface(src);
-    return IIM_RegisterImg(ret, true);
+    return ret;
 }
 
 /**
 * Resize a surface
  */
-IIM_Surface *iim_surface_resize(IIM_Surface *isrc, int width, int height)
+SDL_Surface *iim_sdlsurface_resize(SDL_Surface *src, int width, int height)
 {
-    SDL_Surface *src = isrc->surf;
-    int w = isrc->w;
-    int h = isrc->h;
+    int w = src->w;
+    int h = src->h;
     SDL_PixelFormat *fmt = src->format;
     SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, width, height, 32,
                                             fmt->Rmask, fmt->Gmask,
@@ -609,17 +497,16 @@ IIM_Surface *iim_surface_resize(IIM_Surface *isrc, int width, int height)
     }
     if(retlocked) SDL_UnlockSurface(ret);
     if(srclocked) SDL_UnlockSurface(src);
-    return IIM_RegisterImg(ret, true);
+    return ret;
 }
 
 /**
  * Resize a surface
  */
-IIM_Surface *iim_surface_resize_alpha(IIM_Surface *isrc, int width, int height)
+SDL_Surface *iim_sdlsurface_resize_alpha(SDL_Surface *src, int width, int height)
 {
-    SDL_Surface *src = isrc->surf;
-    int w = isrc->w;
-    int h = isrc->h;
+    int w = src->w;
+    int h = src->h;
     SDL_PixelFormat *fmt = src->format;
     SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, width, height, 32,
                                             fmt->Rmask, fmt->Gmask,
@@ -665,12 +552,14 @@ IIM_Surface *iim_surface_resize_alpha(IIM_Surface *isrc, int width, int height)
     }
     if(retlocked) SDL_UnlockSurface(ret);
     if(srclocked) SDL_UnlockSurface(src);
-    return IIM_RegisterImg(ret, true);
+    return ret;
 }
 
-IIM_Surface *iim_surface_mirror_h(IIM_Surface *isrc)
+/**
+ * Mirror a surface
+ */
+SDL_Surface *iim_sdlsurface_mirror_h(SDL_Surface *src)
 {
-    SDL_Surface *src = isrc->surf;
     SDL_PixelFormat *fmt = src->format;
     SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
                                             fmt->Rmask, fmt->Gmask,
@@ -690,23 +579,14 @@ IIM_Surface *iim_surface_mirror_h(IIM_Surface *isrc)
 
     if(retlocked) SDL_UnlockSurface(ret);
     if(srclocked) SDL_UnlockSurface(src);
-    return IIM_RegisterImg(ret, true);
-}
-
-/**
-* Duplicate a surface
- */
-IIM_Surface *iim_surface_duplicate(IIM_Surface *isrc)
-{
-    return IIM_RegisterImg(SDL_DisplayFormatAlpha(isrc->surf), true);
+    return ret;
 }
 
 /**
  * rotate a surface into a surface of the same size (may lost datas)
  */
-IIM_Surface *iim_rotate(IIM_Surface *isrc, int degrees)
+SDL_Surface *iim_sdlsurface_rotate(SDL_Surface *src, int degrees)
 {
-    SDL_Surface *src = isrc->surf;
     SDL_PixelFormat *fmt = src->format;
     SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
                                             fmt->Rmask, fmt->Gmask,
@@ -767,12 +647,14 @@ IIM_Surface *iim_rotate(IIM_Surface *isrc, int degrees)
     }
     if(retlocked) SDL_UnlockSurface(ret);
     if(srclocked) SDL_UnlockSurface(src);
-    return IIM_RegisterImg(ret, true);
+    return ret;
 }
 
-void iim_surface_convert_to_gray(IIM_Surface *isrc)
+/**
+ * Convert a surface to B&W
+ */
+void iim_sdlsurface_convert_to_gray(SDL_Surface *src)
 {
-  SDL_Surface *src = isrc->surf;
   SDL_LockSurface(src);
   for (int y=src->h; y--;)
   {
@@ -785,11 +667,9 @@ void iim_surface_convert_to_gray(IIM_Surface *isrc)
     }
   }
   SDL_UnlockSurface(src);
-  isrc->surf = SDL_DisplayFormat(src);
-  SDL_FreeSurface(src);
 }
 
-IIM_Surface *iim_surface_create_rgba(int width, int height)
+SDL_Surface *iim_sdlsurface_create_rgba(int width, int height)
 {
     SDL_Surface *ret, *tmp;
     Uint32 rmask, gmask, bmask, amask;
@@ -810,10 +690,10 @@ IIM_Surface *iim_surface_create_rgba(int width, int height)
                                        rmask, gmask, bmask, amask);
     ret = SDL_DisplayFormatAlpha(tmp);
     SDL_FreeSurface(tmp);
-    return IIM_RegisterImg(ret, true);
+    return ret;
 }
 
-IIM_Surface *iim_surface_create_rgb(int width, int height)
+SDL_Surface *iim_sdlsurface_create_rgb(int width, int height)
 {
     SDL_Surface *ret, *tmp;
     Uint32 rmask, gmask, bmask, amask;
@@ -834,7 +714,211 @@ IIM_Surface *iim_surface_create_rgb(int width, int height)
                                rmask, gmask, bmask, amask);
     ret = SDL_DisplayFormat(tmp);
     SDL_FreeSurface(tmp);
-    return IIM_RegisterImg(ret, true);
+    return ret;
+}
+
+// IIM abstraction
+
+bool fullscreen = true;
+bool useGL = false;
+
+#define MAXIMG 8192
+IIM_Surface  imgList[MAXIMG];
+int          imgListSize = 0;
+int          imgListIndex = 0;
+
+IIM_Surface * IIM_Load_Absolute_DisplayFormat (const char *path)
+{
+  SDL_Surface *tmpsurf, *retsurf;
+  tmpsurf = IMG_Load (path);
+  if (tmpsurf==NULL) {
+    return NULL;
+  }
+  retsurf = SDL_DisplayFormat (tmpsurf);
+  SDL_FreeSurface (tmpsurf);
+  return IIM_RegisterImg(retsurf, false);
+}
+
+IIM_Surface * IIM_Load_Absolute_DisplayFormatAlpha (const char * path)
+{
+  SDL_Surface *tmpsurf, *retsurf;
+  tmpsurf = IMG_Load (path);
+  if (tmpsurf==NULL) {
+    return NULL;
+  }
+  retsurf = SDL_DisplayFormatAlpha (tmpsurf);
+  if (retsurf==NULL) {
+    perror("Texture conversion failed (is Display initialized?)\n");
+    SDL_FreeSurface (tmpsurf);
+    return NULL;
+  }
+  SDL_SetAlpha (retsurf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
+  SDL_FreeSurface (tmpsurf);
+  return IIM_RegisterImg(retsurf, true);
+}
+
+void IIM_Free(IIM_Surface *img)
+{
+  for (int i=0; i<imgListSize; ++i)
+  {
+    if (&imgList[i] == img)
+    {
+        if (img->surf != NULL) SDL_FreeSurface(imgList[i].surf);
+        imgList[i].surf = NULL;
+        //fprintf(stderr,"Pictures array freed %d\n",i);
+        for (int j=1; j<36; ++j)
+            if (img->rotated[j] != NULL) IIM_Free(img->rotated[j]);
+        if (img->fliph != NULL) IIM_Free(img->fliph);
+        return;
+    }
+  }
+}
+
+IIM_Surface * IIM_RegisterImg(SDL_Surface *img, bool isAlpha)
+{
+    IIM_Surface *_this = NULL;
+    /* We still have empty slots */
+    if (imgListSize < MAXIMG) {
+        _this = &imgList[imgListSize++];
+        //fprintf(stderr,"Pictures array using %d\n",imgListSize-1);
+    } else {
+        // try to find another place
+        int orig = imgListIndex;
+        for (int i=(orig+1)%MAXIMG; i!=orig; i=(i+1)%MAXIMG)
+        {
+            if (imgList[i].surf == NULL) {
+                _this = &imgList[i];
+                imgListIndex = i;
+                //fprintf(stderr,"Pictures array reusing %d\n",imgListIndex);
+                break;
+            }
+        }
+        if (_this == NULL) {
+            fprintf(stderr,"Pictures array limit exceeded, aborting...\n");
+            exit(0);
+        }
+    }
+  _this->isAlpha = isAlpha;
+  _this->surf    = img;
+  _this->w       = img->w;
+  _this->h       = img->h;
+  for (int i=0; i<36; ++i)
+    _this->rotated[i] = NULL;
+  _this->rotated[0] = _this;
+  _this->fliph = NULL;
+  return _this;
+}
+
+void IIM_ReConvertAll(void)
+{
+  for (int i=0; i<imgListSize; ++i)
+  {
+    if (imgList[i].surf)
+    {
+      if (imgList[i].isAlpha)
+      {
+        SDL_Surface *retsurf = SDL_DisplayFormat(imgList[i].surf);
+        SDL_SetAlpha (retsurf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
+        SDL_FreeSurface(imgList[i].surf);
+        imgList[i].surf = retsurf;
+      }
+      else
+      {
+        SDL_Surface *retsurf = SDL_DisplayFormat(imgList[i].surf);
+        SDL_FreeSurface(imgList[i].surf);
+        imgList[i].surf = retsurf;
+      }
+    }
+  }
+}
+
+// Image processing
+
+/**
+ * Shift the saturation of a surface
+ */
+IIM_Surface *iim_surface_shift_hsv(IIM_Surface *isrc, float h, float s, float v)
+{
+    return IIM_RegisterImg(iim_sdlsurface_shift_hsv(isrc->surf, h, s, v), true);
+}
+
+/**
+ * Shift the hue of a surface
+ */
+IIM_Surface *iim_surface_shift_hue(IIM_Surface *isrc, float hue_offset)
+{
+    return IIM_RegisterImg(iim_sdlsurface_shift_hue(isrc->surf, hue_offset), true);
+}
+
+/**
+ * Shift the hue of a surface with a 1-bit mask
+ */
+IIM_Surface *iim_surface_shift_hue_masked(IIM_Surface *isrc, IIM_Surface *imask, float hue_offset)
+{
+    return IIM_RegisterImg(iim_sdlsurface_shift_hue_masked(isrc->surf, imask->surf, hue_offset), true);
+}
+
+/**
+ * Change the value (luminosity) of each pixel in a surface
+ */
+IIM_Surface *iim_surface_set_value(IIM_Surface *isrc, float value)
+{
+    return IIM_RegisterImg(iim_sdlsurface_set_value(isrc->surf, value), true);
+}
+
+/**
+* Resize a surface
+ */
+IIM_Surface *iim_surface_resize(IIM_Surface *isrc, int width, int height)
+{
+    return IIM_RegisterImg(iim_sdlsurface_resize(isrc->surf, width, height), true);
+}
+
+/**
+ * Resize a surface
+ */
+IIM_Surface *iim_surface_resize_alpha(IIM_Surface *isrc, int width, int height)
+{
+    return IIM_RegisterImg(iim_sdlsurface_resize_alpha(isrc->surf, width, height), true);
+}
+
+/**
+ * Mirror a surface
+ */
+IIM_Surface *iim_surface_mirror_h(IIM_Surface *isrc)
+{
+    return IIM_RegisterImg(iim_sdlsurface_mirror_h(isrc->surf), true);
+}
+
+/**
+* Duplicate a surface
+ */
+IIM_Surface *iim_surface_duplicate(IIM_Surface *isrc)
+{
+    return IIM_RegisterImg(SDL_DisplayFormatAlpha(isrc->surf), true);
+}
+
+/**
+ * rotate a surface into a surface of the same size (may lost datas)
+ */
+IIM_Surface *iim_rotate(IIM_Surface *isrc, int degrees)
+{
+    return IIM_RegisterImg(iim_sdlsurface_rotate(isrc->surf, degrees), true);
+}
+
+void iim_surface_convert_to_gray(IIM_Surface *isrc)
+{
+    iim_sdlsurface_convert_to_gray(isrc->surf);
+}
+
+IIM_Surface *iim_surface_create_rgba(int width, int height)
+{
+    return IIM_RegisterImg(iim_sdlsurface_create_rgba(width, height), true);
+}
+
+IIM_Surface *iim_surface_create_rgb(int width, int height)
+{
+    return IIM_RegisterImg(iim_sdlsurface_create_rgb(width, height), true);
 }
 
 int IIM_BlitSurface(IIM_Surface *src, IIM_Rect *src_rect, SDL_Surface *dst, SDL_Rect *dst_rect)

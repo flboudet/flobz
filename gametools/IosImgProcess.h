@@ -1,9 +1,9 @@
 #ifndef _IOS_IMG_PROCESS
 #define _IOS_IMG_PROCESS
 
-#include "glSDL.h"
+#include "SDL.h"
 
-extern bool useGL;
+// Pure SDL part
 
 typedef struct _RGBA {
   Uint8 red;
@@ -18,6 +18,8 @@ typedef struct _HSVA {
   float value;
   Uint8 alpha;
 } HSVA;
+
+/* Low-level functions */
 
 /* Extracting color components from a 32-bit color value
  * pre: SDL_Locked(surface) */
@@ -54,6 +56,60 @@ void iim_surface_blend_rgba(SDL_Surface *surface,
 //-- Foley et al, 1996, pp. 592,593.
 HSVA iim_rgba2hsva(RGBA c);
 RGBA iim_hsva2rgba(HSVA c);
+
+/* Higher level functions */
+
+/**
+ * Shift the saturation of a surface
+ */
+SDL_Surface *iim_sdlsurface_shift_hsv(SDL_Surface *src, float h, float s, float v);
+
+/**
+ * Shift the hue of a surface
+ */
+SDL_Surface *iim_sdlsurface_shift_hue(SDL_Surface *isrc, float hue_offset);
+
+/**
+ * Shift the hue of a surface with a 1-bit mask
+ */
+SDL_Surface *iim_sdlsurface_shift_hue_masked(SDL_Surface *src, SDL_Surface *mask, float hue_offset);
+
+/**
+ * Change the value (luminosity) of each pixel in a surface
+ */
+SDL_Surface *iim_sdlsurface_set_value(SDL_Surface *src, float value);
+
+/**
+* Resize a surface
+ */
+SDL_Surface *iim_sdlsurface_resize(SDL_Surface *src, int width, int height);
+
+/**
+ * Resize a surface
+ */
+SDL_Surface *iim_sdlsurface_resize_alpha(SDL_Surface *src, int width, int height);
+
+/**
+ * Mirror a surface
+ */
+SDL_Surface *iim_sdlsurface_mirror_h(SDL_Surface *src);
+
+/**
+ * rotate a surface into a surface of the same size (may lost datas)
+ */
+SDL_Surface *iim_sdlsurface_rotate(SDL_Surface *src, int degrees);
+
+/**
+ * Convert a surface to B&W
+ */
+void iim_sdlsurface_convert_to_gray(SDL_Surface *src);
+
+SDL_Surface *iim_sdlsurface_create_rgba(int width, int height);
+
+SDL_Surface *iim_sdlsurface_create_rgb(int width, int height);
+
+// IIM abstraction
+extern bool useGL;
 
 typedef struct _IIM_Surface {
   SDL_Surface *surf;
