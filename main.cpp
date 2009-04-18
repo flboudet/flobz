@@ -8,7 +8,7 @@
 #include <SDL_main.h>
 #endif
 
-#include "PuyoCommander.h"
+#include "PuyoMain.h"
 #include "ios_exception.h"
 #include "ios_memory.h"
 #include "ios_filepath.h"

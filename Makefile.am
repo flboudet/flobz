@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS=-I m4
 
 bin_PROGRAMS=flobopuyo
 flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
-          MainMenu.cpp MainScreen.cpp \
+          MainMenu.cpp MainScreen.cpp PuyoMain.cpp \
           main.cpp PuyoDataPathManager.cpp PuyoGame.cpp PuyoDoomMelt.cpp \
           PuyoView.cpp PuyoAnimations.cpp AnimatedPuyo.cpp PuyoIA.cpp \
           styrolyse.cpp PuyoStory.cpp PuyoChatBox.cpp PuyoLocalizedDictionary.cpp \
@@ -30,7 +30,7 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            AnimatedPuyo.h PuyoGameAbstract.h PuyoOptionMenu.h \
            AnimatedPuyoTheme.h PuyoGame.h PuyoPauseMenu.h \
            audio.h PuyoGameWidget.h PuyoPlayer.h \
-           PuyoIA.h PuyoScoring.h \
+           PuyoIA.h PuyoScoring.h PuyoMain.h \
            glSDL.h PuyoIgpDefs.h PuyoScreenTransition.h \
            HallOfFame.h PuyoInternetGameCenter.h PuyoSinglePlayerStarter.h \
            HiScores.h PuyoInternetMenu.h PuyoStarter.h \

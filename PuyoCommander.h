@@ -81,22 +81,6 @@ class PuyoCommander : public MessageListener, NotificationResponder
     FramePicture m_listFramePicture;
 };
 
-class PuyoMain
-{
-public:
-    PuyoMain(String dataDir, bool fullscreen, int maxDataPackNumber=-1);
-    void run();
-    void debug_gsl(String gsl_script);
-private:
-    void initMenus();
-    void initSDL();
-    void initDisplay(int w, int h, bool fullscreen, bool useGL);
-
-    GameLoop   *loop;
-    MainScreen *mainScreen;
-    GameCursor *cursor;
-};
-
 extern class PuyoCommander *theCommander;
 
 #endif // _PUYOCOMMANDER
