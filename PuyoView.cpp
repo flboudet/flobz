@@ -51,7 +51,7 @@ PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 	attachedGame = attachedPuyoGameFactory->createPuyoGame(&attachedPuyoFactory);
     attachedGame->setDelegate(this);
     attachedStatDisplay = new PlayerGameStatDisplay("Player TODO", attachedGame->getGameStat(), xOffset < 320 ? 0 : 1);
-    
+
 	this->xOffset = xOffset;
 	this->yOffset = yOffset - TSIZE;
 	this->nXOffset = nXOffset;
@@ -82,12 +82,12 @@ int PuyoView::getValenceForPuyo(PuyoPuyo *puyo) const
     AnimatedPuyo *right = (AnimatedPuyo *)(attachedGame->getPuyoAt(i+1, j));
     AnimatedPuyo *up    = (AnimatedPuyo *)(attachedGame->getPuyoAt(i, j-1));
     AnimatedPuyo *left  = (AnimatedPuyo *)(attachedGame->getPuyoAt(i-1, j));
-    
+
     PuyoState downState = (down == NULL) || (down->isRenderingAnimation()) ? PUYO_EMPTY : down->getPuyoState();
     PuyoState rightState = (right == NULL) || (right->isRenderingAnimation()) ? PUYO_EMPTY : right->getPuyoState();
     PuyoState upState = (up == NULL) || (up->isRenderingAnimation()) ? PUYO_EMPTY : up->getPuyoState();
     PuyoState leftState = (left == NULL)   || (left->isRenderingAnimation()) ? PUYO_EMPTY : left->getPuyoState();
-    
+
 	return (leftState  == currentPuyoState ? 0x8 : 0) | (upState  == currentPuyoState ? 0x4 : 0) |
 	       (rightState == currentPuyoState ? 0x2 : 0) | (downState == currentPuyoState ? 0x1 : 0);
 }
@@ -107,7 +107,7 @@ void PuyoView::cycleAnimation(void)
         if (delayBeforeGameOver < 0)
             attachedStatDisplay->gameIsOver();
     }
-    
+
     // Cycling every puyo's animation
 	for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
 		AnimatedPuyo *currentPuyo =
@@ -116,7 +116,7 @@ void PuyoView::cycleAnimation(void)
 	}
     // Cycling dead puyo's animations
     attachedPuyoFactory.cycleWalhalla();
-    
+
     // Cycling view's animations
     if (viewAnimations.size() > 0) {
         Animation *currentAnimation = viewAnimations[0];
@@ -169,14 +169,14 @@ void PuyoView::rotateRight()
 
 void PuyoView::render()
 {
-    
-	SDL_Rect drect;
-    SDL_Rect vrect;
+
+	IosRect drect;
+    IosRect vrect;
 	vrect.x = xOffset;
 	vrect.y = yOffset;
 	vrect.w = TSIZE * PUYODIMX;
 	vrect.h = TSIZE * PUYODIMY;
-        
+
         bool displayFallings = this->cycleAllowed();
 
     for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
@@ -189,7 +189,7 @@ void PuyoView::render()
     }
     // drawing the walhalla
     attachedPuyoFactory.renderWalhalla();
-    
+
 	drect.x = nXOffset;
 	drect.y = nYOffset;
 	drect.w = TSIZE;
@@ -197,7 +197,7 @@ void PuyoView::render()
 	// Drawing next puyos
 	AnimatedPuyoTheme *nextPuyoTheme =
 	  attachedThemeSet->getAnimatedPuyoTheme(attachedGame->getNextFalling());
-	IIM_Surface *currentSurface = nextPuyoTheme->getPuyoSurfaceForValence(0);
+	IosSurface *currentSurface = nextPuyoTheme->getPuyoSurfaceForValence(0);
 	if (currentSurface != NULL) {
 		drect.x = nXOffset;
 		drect.y = nYOffset + TSIZE;
@@ -217,7 +217,7 @@ void PuyoView::render()
 		attachedPainter.requestDraw(currentSurface, &drect);
 		attachedPainter.requestDraw(nextCompanionTheme->getEyeSurfaceForIndex(0), &drect);
 	}
-    
+
     // Drawing the view animation
     if (viewAnimations.size() > 0) {
         Animation *currentAnimation = viewAnimations[0];
@@ -234,17 +234,17 @@ void PuyoView::renderOverlay()
 
 void PuyoView::renderNeutral()
 {
-	SDL_Rect drect;
+	IosRect drect;
     int neutralPuyos = attachedGame->getNeutralPuyos();
     int numGiantNeutral = (neutralPuyos / PUYODIMX) / 4;
     int numBigNeutral = (neutralPuyos / PUYODIMX) % 4;
 	int numNeutral = neutralPuyos % PUYODIMX;
     int drect_x = xOffset;
     int drect_y_base =  yOffset + 3 + TSIZE + TSIZE;
-    IIM_Surface *neutral = attachedLevelTheme->getNeutralIndicator();
-    IIM_Surface *bigNeutral = attachedLevelTheme->getBigNeutralIndicator();
-    IIM_Surface *giantNeutral = attachedLevelTheme->getGiantNeutralIndicator();
-    
+    IosSurface *neutral = attachedLevelTheme->getNeutralIndicator();
+    IosSurface *bigNeutral = attachedLevelTheme->getBigNeutralIndicator();
+    IosSurface *giantNeutral = attachedLevelTheme->getGiantNeutralIndicator();
+
     for (int cpt = 0 ; cpt < numGiantNeutral ; cpt++) {
 		drect.x = drect_x;
 		drect.y = drect_y_base - giantNeutral->h;
@@ -347,9 +347,9 @@ void PuyoView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNu
         NULL, "yahoohoo.wav", "woho.wav", "pastaga.wav",
         "woho.wav", "woo.wav", "applose.wav"};
       static const float volume_yahoohoo[7] = {0.0, 0.39, 0.25, 0.55, 0.25, 0.35, 0.70};
-      
+
       int index = 0;
-      
+
       if (phase>=2)
       {
         index = 6;

@@ -68,10 +68,10 @@ class PuyoCommander : public MessageListener, NotificationResponder
 
     bool fullscreen;
     bool useGL;
-    IIM_Surface   *m_frameImage, *m_buttonIdleImage, *m_buttonDownImage, *m_buttonOverImage;
-    IIM_Surface   *m_textFieldIdleImage;
-    IIM_Surface   *m_separatorImage;
-    IIM_Surface   *m_listIdleImage;
+    IosSurface   *m_frameImage, *m_buttonIdleImage, *m_buttonDownImage, *m_buttonOverImage;
+    IosSurface   *m_textFieldIdleImage;
+    IosSurface   *m_separatorImage;
+    IosSurface   *m_listIdleImage;
     IIM_Surface   *m_switchOnImage, *m_switchOffImage;
     IIM_Surface   *m_radioOnImage, *m_radioOffImage;
     FramePicture m_windowFramePicture;

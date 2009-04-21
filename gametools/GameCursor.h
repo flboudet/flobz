@@ -24,12 +24,12 @@ public:
     void setVisible(bool visible) { this->visible = visible; }
     void setObscured(bool obscured) { this->obscured = obscured; }
 protected:
-    virtual void draw(SDL_Surface *screen);
+    virtual void draw(DrawTarget *dt);
 private:
     void setCursorPosition(int x, int y);
     void pushMouseEvent(int x, int y, int eventType);
-    
-    IIM_Surface * cursorSurface;
+
+    IosSurface * cursorSurface;
     int blitX, blitY;
     int prevblitX, prevblitY;
     float blitAngle, tgtBlitAngle;

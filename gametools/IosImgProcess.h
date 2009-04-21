@@ -2,22 +2,9 @@
 #define _IOS_IMG_PROCESS
 
 #include "SDL.h"
+#include "rgba.h"
 
 // Pure SDL part
-
-typedef struct _RGBA {
-  Uint8 red;
-  Uint8 green;
-  Uint8 blue;
-  Uint8 alpha;
-} RGBA;
-
-typedef struct _HSVA {
-  float hue;
-  float saturation;
-  float value;
-  Uint8 alpha;
-} HSVA;
 
 /* Low-level functions */
 

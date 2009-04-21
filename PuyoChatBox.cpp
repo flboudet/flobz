@@ -55,7 +55,9 @@ ChatBox::ChatBox(ChatBoxDelegate &delegate)
   : Frame(theCommander->getWindowFramePicture()),
     delegate(delegate), chatAction(this), chatInputLabel(theCommander->getLocalizedString("Say:")),
     chatInput(theCommander->getLocalizedString("Hello"), &chatAction,theCommander->getEditFieldFramePicture(),theCommander->getEditFieldFramePicture()),
-    chatInputFrameSurface(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/chatzone.png"))),
+    chatInputFrameSurface(
+        GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary()
+        .load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/chatzone.png"))),
     chatInputFramePicture(chatInputFrameSurface, 31, 10, 25, 9, 6, 15),
     chatInputContainerFrame(&chatInputFramePicture),
     height(8), lines(new (HBox *[height])), names(new (Text *[height])), texts(new (Text *[height]))
@@ -78,9 +80,9 @@ ChatBox::ChatBox(ChatBoxDelegate &delegate)
         lines[i]->add(texts[i]);
         add(lines[i]);
     }
-    
+
     setPolicy(USE_MAX_SIZE_NO_MARGIN);
-    
+
     //chatInputContainerFrame.setInnerMargin(0.0f);
     chatInputContainerFrame.add(&chatInputContainer);
     chatInputContainer.add(&chatInputLabel);
@@ -96,7 +98,7 @@ ChatBox::ChatBox(ChatBoxDelegate &delegate)
     chatInputContainer.setPreferedSize(lineSize);
     setInnerMargin(6);
     add(&chatInputContainerFrame);
-    
+
     resumeLayout();
 }
 
@@ -110,7 +112,7 @@ ChatBox::~ChatBox()
     delete[] lines;
     delete[] names;
     delete[] texts;
-    IIM_Free(chatInputFrameSurface);
+    delete chatInputFrameSurface;
 }
 
 void ChatBox::ChatAction::action()

@@ -36,10 +36,10 @@ public:
     PuyoScreenTransitionWidget(Screen &fromScreen, Action *transitionFinishedAction);
     virtual ~PuyoScreenTransitionWidget();
     void cycle();
-    void draw(SDL_Surface *screen);
+    void draw(DrawTarget *dt);
     IdleComponent *getIdleComponent() { return this; }
 private:
-    IIM_Surface *fromSurface;
+    IosSurface *fromSurface;
     Action *transitionFinishedAction;
     DoomMelt *melt;
 };

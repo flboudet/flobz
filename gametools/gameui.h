@@ -28,7 +28,7 @@ namespace gameui {
   class Action;
   class ScreenStack;
 
-  
+
   enum GameUIEnum {
     USE_MAX_SIZE = 0,
     USE_MIN_SIZE,
@@ -46,7 +46,7 @@ bool isDirectionEvent(GameControlEvent *event);
       virtual void action(Widget *sender, int actionType, GameControlEvent *event) { action(); }
       virtual ~Action() {}
   };
-  
+
 
   class GameUIDefaults {
     public:
@@ -64,19 +64,19 @@ bool isDirectionEvent(GameControlEvent *event);
 
 
   class Widget {
-    
+
       friend class WidgetContainer;
       friend class SliderContainer;
       friend class Box;
       friend class HScrollList;
-      
+
     public:
       Widget(WidgetContainer *parent = NULL);
       virtual ~Widget();
 
       virtual bool drawRequested() const { return _drawRequested; }
       virtual void requestDraw(bool fromParent = false);
-      virtual void doDraw(SDL_Surface *screen);
+      virtual void doDraw(DrawTarget *dt);
 
       virtual IdleComponent *getIdleComponent() { return NULL; }
       virtual void addToGameLoop(GameLoop *loop);
@@ -96,27 +96,27 @@ bool isDirectionEvent(GameControlEvent *event);
       virtual void eventOccured(GameControlEvent *event);
 
       virtual bool isFocusable() const { return focusable; }
-      
+
       virtual void giveFocus()       { focus = true;  }
       virtual void lostFocus()       { focus = false; }
       bool haveFocus() const { return focus;  }
 
       void setAction(GameUIEnum type, Action *action) { actions[type] = action; }
       Action *getAction(GameUIEnum type)              { return actions[type];   }
-      
+
       bool receiveUpEvents() const { return receiveUp; }
       void setReceiveUpEvents(bool receiveUp) { this->receiveUp = receiveUp; }
       virtual void checkFocus() {}
-      
+
       virtual Screen *getParentScreen() const;
-      
+
       // Notifications
       virtual void onWidgetVisibleChanged(bool visible) { hidden = !visible; }
       virtual void onWidgetAdded(WidgetContainer *parent) {}
       virtual void onWidgetRemoved(WidgetContainer *parent) {}
     protected:
       // To be implemented on each widgets
-    virtual void draw(SDL_Surface *screen) {     /*SDL_Rect r;
+    virtual void draw(DrawTarget *dt) {     /*SDL_Rect r;
       r.x = getPosition().x;
       r.y = getPosition().y;
       r.h = getSize().y;
@@ -124,17 +124,17 @@ bool isDirectionEvent(GameControlEvent *event);
       SDL_FillRect(screen,&r,0x2468AC22);*/
     };
 
-      
+
       virtual void setPosition(const Vec3 &v3)   { position = v3; }
       virtual void setSize(const Vec3 &v3)       { size     = v3; }
       virtual void setParent(WidgetContainer *p) { parent   =  p; }
       virtual void setFocusable(bool foc);
-      
+
       virtual void suspendLayout() { }
       virtual void resumeLayout() { }
 
       WidgetContainer *parent;
-      
+
     private:
       Vec3    preferedSize;
       Vec3    size;
@@ -162,31 +162,31 @@ bool isDirectionEvent(GameControlEvent *event);
       void setSize(const Vec3 &v3);
       void setPosition(const Vec3 &v3);
 
-      void draw(SDL_Surface *surface);
+      void draw(DrawTarget *dt);
       void requestDraw(bool fromParent = false);
       virtual void widgetMustRedraw(Widget *wid) { requestDraw(); }
-      
+
       virtual void addToGameLoop(GameLoop *loop);
       virtual void removeFromGameLoopActive();
-      
+
       bool hasWidget(Widget *wid);
       /** Returns the number of focusable child in the child tree
        */
       int getNumberOfFocusableChilds();
-      
+
       void suspendLayout();
       void resumeLayout();
-      
+
       virtual void onWidgetVisibleChanged(bool visible);
-    
+
       Widget *getChild(int i)     const  { return childs[i]; }
       void    changeChild(int i, Widget *w);
       int     getNumberOfChilds() const  { return childs.size(); }
     protected:
-      // Accessors to private friend methods of the widget class 
+      // Accessors to private friend methods of the widget class
       void setWidgetSize(Widget *w, const Vec3 v3) const { w->setSize(v3); }
       void setWidgetPosition(Widget *w, const Vec3 v3) const { w->setPosition(v3); }
-      void drawWidget(Widget *w, SDL_Surface *screen) { w->draw(screen); }
+      void drawWidget(Widget *w, DrawTarget *dt) { w->draw(dt); }
       void    sortWidgets();
       bool    layoutSuspended;
 
@@ -280,7 +280,7 @@ bool isDirectionEvent(GameControlEvent *event);
       ZBox(GameLoop *loop = NULL) : Box(loop) {}
       virtual ~ZBox() {}
       void widgetMustRedraw(Widget *wid);
-      
+
       virtual void giveFocus() { Box::giveFocus(); }
       virtual void lostFocus() { Box::lostFocus(); }
       virtual void eventOccured(GameControlEvent *event);
@@ -295,7 +295,7 @@ bool isDirectionEvent(GameControlEvent *event);
   };
 
   class SliderContainer;
-  
+
   /**
    * Represents a slider notification listener
    */
@@ -312,7 +312,7 @@ bool isDirectionEvent(GameControlEvent *event);
 
       virtual ~SliderContainerListener() {}
   };
-  
+
   /**
    * Represents a slider container, ie a container which slides from one side of the screen
    * to present a content, and which can slide back to the side of the screen to change its
@@ -348,13 +348,13 @@ bool isDirectionEvent(GameControlEvent *event);
        */
       void setBackground(IIM_Surface *bg) { this->bg = bg; }
       void setBackgroundVisible(bool visible) { backgroundVisible = visible; }
-      
+
       /**
        * Adds a new listener to the events of the SliderContainer widget
        * @param listener   the reference of the new listener object
        */
       void addListener(SliderContainerListener &listener);
-      
+
       /**
        * Sets current position when not sliding or dest position
        * during slideOut noifications, or inoperant while sliding
@@ -369,14 +369,14 @@ bool isDirectionEvent(GameControlEvent *event);
       // Implements IdleComponent
       virtual void idle(double currentTime);
       virtual IdleComponent *getIdleComponent() { return this; }
-      
+
     protected:
       // Implements Widget
       virtual void draw(SDL_Surface *screen);
       void eventOccured(GameControlEvent *event);
       void addContentWidget();
       void endSlideInside(bool inside);
-      
+
       // Notifications
       /**
        * Notify that the slider is outside of the screen, before sliding back inside
@@ -386,7 +386,7 @@ bool isDirectionEvent(GameControlEvent *event);
        * Notify that the slider is inside the screen, at the end of its sliding movement
        */
       virtual void onSlideInside();
-      
+
     private:
       SlideFromSide m_slideSide;
       double slidingTime;
@@ -413,7 +413,7 @@ bool isDirectionEvent(GameControlEvent *event);
     private:
         Screen *m_parentScreen;
   };
-  
+
   /**
    * Represents a full screen for containing widgets
    */
@@ -422,8 +422,8 @@ bool isDirectionEvent(GameControlEvent *event);
       Screen(float x, float y, float width, float height, GameLoop *loop = NULL);
       virtual ~Screen() {}
       void setBackground(IIM_Surface *bg);
-      void draw(SDL_Surface *surface);
-      virtual void drawAnyway(SDL_Surface *surface);
+      void draw(DrawTarget *dt);
+      virtual void drawAnyway(DrawTarget *dt);
       bool drawRequested() const { if (isVisible()) return rootContainer.drawRequested(); return false;}
       /**
        * Propagates an event on the widget tree of the screen
@@ -436,7 +436,7 @@ bool isDirectionEvent(GameControlEvent *event);
       virtual void show() { hidden = false; onScreenVisibleChanged(isVisible());}
       virtual void onDrawableVisibleChanged(bool visible);
       bool isVisible() const { return !hidden; }
-      
+
       virtual void addToGameLoop(GameLoop *loop) {
           rootContainer.addToGameLoop(loop);
           loop->addDrawable(this);
@@ -447,21 +447,21 @@ bool isDirectionEvent(GameControlEvent *event);
           getGameLoop()->removeDrawable(this);
           getGameLoop()->removeIdle(this);
       }
-      
+
       GameLoop *getGameLoop() { return rootContainer.getGameLoop(); }
       void giveFocus();
       void focus(Widget *widget);
       ZBox *getRootContainer() { return &rootContainer; }
-      
+
       void setAutoRelease(bool autoRelease) { autoReleaseFlag = autoRelease; }
       void autoRelease();
-      
+
       void grabEventsOnWidget(Widget *widget);
       void ungrabEventsOnWidget(Widget *widget);
-      
+
       // screen callbacks
       virtual void onScreenVisibleChanged(bool visible);
-      
+
     private:
       // The root container of the screen
       ScreenRootContainer rootContainer;
@@ -476,13 +476,13 @@ bool isDirectionEvent(GameControlEvent *event);
     TEXT_LEFT_ALIGN,
     TEXT_RIGHT_ALIGN
   };
-  
+
   enum ImageAlign {
     IMAGE_CENTERED,
     IMAGE_LEFT_ALIGN,
     IMAGE_RIGHT_ALIGN
   };
-  
+
   class Text : public Widget, public IdleComponent {
     public:
       Text();
@@ -499,12 +499,12 @@ bool isDirectionEvent(GameControlEvent *event);
       // Implements IdleComponent
       virtual void idle(double currentTime);
       virtual IdleComponent *getIdleComponent() { return this; }
-      
+
     protected:
       void draw(SDL_Surface *screen);
       SoFont *font;
       bool startMoving;
-      
+
     private:
       String label;
       Vec3 offset;
@@ -558,8 +558,8 @@ bool isDirectionEvent(GameControlEvent *event);
       SoFont *fontInactive;
       void init(SoFont *fontActive, SoFont *fontInactive);
   };
-  
-  
+
+
   class EditField : public Text {
     public:
       EditField(const String &defaultText, Action *action = NULL);
@@ -568,13 +568,13 @@ bool isDirectionEvent(GameControlEvent *event);
       void eventOccured(GameControlEvent *event);
       bool handleJoystickEdit(GameControlEvent *event);
       void setValue(String value, bool persistent = true);
-      
+
       void lostFocus();
       void giveFocus();
-	  
+
 	    void setEditOnFocus(bool editOnFocus) { this->editOnFocus = editOnFocus; }
       void idle(double currentTime);
-      
+
     private:
       SoFont *fontActive;
       SoFont *fontInactive;
@@ -590,7 +590,7 @@ bool isDirectionEvent(GameControlEvent *event);
       double repeat_speed;
       GameControlEvent repeatEvent;
   };
-  
+
   class ControlInputWidget : public Text {
     public:
       ControlInputWidget(int control, bool alternate, Action *action = NULL);
@@ -599,7 +599,7 @@ bool isDirectionEvent(GameControlEvent *event);
 
       void lostFocus();
       void giveFocus();
-      
+
     private:
       int control;
       bool alternate;
@@ -609,7 +609,7 @@ bool isDirectionEvent(GameControlEvent *event);
       String previousValue;
       void init(SoFont *fontActive, SoFont *fontInactive);
   };
-  
+
   class ToggleButton : public Button {
   public:
     ToggleButton(const String &label, const String &offState, const String &onState, bool initialState, Action *action);
@@ -668,7 +668,7 @@ bool isDirectionEvent(GameControlEvent *event);
       PushScreenAction(Screen *screen, ScreenStack *stack = NULL);
       virtual ~PushScreenAction() {}
       void action();
-      
+
     private:
       ScreenStack *stack;
       Screen      *screen;

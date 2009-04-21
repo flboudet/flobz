@@ -56,7 +56,7 @@ static const char * DEFAULTPATH(void)
     return defaultThemeFolder;
 }
 
- 
+
 
 static String defaultPuyosName("Invaders");
 static String defaultLevelName("Kaori's farm");
@@ -83,25 +83,25 @@ String GlobalCurrentPath;
 #define ASSERT_RANGE(min,max,value) { }
 #endif
 
-static bool loadPictureAt(const char * path, IIM_Surface ** dst, const char * fallback)
+static bool loadPictureAt(const char * path, IosSurface ** dst, const char * fallback)
 {
-    *dst = IIM_Load_Absolute_DisplayFormatAlpha(path);
-    if (*dst == NULL) *dst = IIM_Load_Absolute_DisplayFormatAlpha(fallback);
+    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
+    *dst = iimLib.load_Absolute_DisplayFormatAlpha(path);
+    if (*dst == NULL) *dst = iimLib.load_Absolute_DisplayFormatAlpha(fallback);
     return (*dst != NULL);
 }
 
-static bool loadPictureWithOffset(const char * path, IIM_Surface ** dst, const char * fallback, float offset)
+static bool loadPictureWithOffset(const char * path, IosSurface ** dst, const char * fallback, float offset)
 {
-    //fprintf(stderr,"Loading %s...\n",path);
-
-    IIM_Surface *tmp = IIM_Load_Absolute_DisplayFormatAlpha(path);
+    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
+    IosSurface *tmp = iimLib.load_Absolute_DisplayFormatAlpha(path);
     if (tmp == NULL)
     {
-        tmp = IIM_Load_Absolute_DisplayFormatAlpha(fallback);
+        tmp = iimLib.load_Absolute_DisplayFormatAlpha(fallback);
     }
     if (tmp == NULL) return false;
-    *dst = iim_surface_shift_hue(tmp,offset);
-    IIM_Free(tmp);
+    *dst = iimLib.shiftHue(tmp,offset);
+    delete tmp;
     return (*dst != NULL);
 }
 /*
@@ -111,9 +111,10 @@ static bool copyPictureWithOffset(IIM_Surface * src, IIM_Surface ** dst, IIM_Sur
     return (*dst != NULL);
 }
 */
-static bool copyPictureWithLuminosity(IIM_Surface * src, IIM_Surface ** dst, IIM_Surface * fallback, float lum)
+static bool copyPictureWithLuminosity(IosSurface * src, IosSurface ** dst, IosSurface * fallback, float lum)
 {
-    *dst = iim_surface_set_value(src, lum);
+    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
+    *dst = iimLib.setValue(src, lum);
     return (*dst != NULL);
 }
 
@@ -131,7 +132,7 @@ static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
 	const char * newName  = (const char *) GSL_GLOBAL_PTR(gsl, "puyoset.name");
 	const char * newLName = localeDictionary.getLocalizedString(String(newName),true);
     AnimatedPuyoSetTheme * theme = new AnimatedPuyoSetTheme(GlobalCurrentPath, newName, newLName);
-    
+
     AdvancedBuffer<const char *> * list = globalManager->getAnimatedPuyoSetThemeList();
     int size = list->size();
     //fprintf(stderr,"Verif of size : %d\n", size);
@@ -145,11 +146,11 @@ static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
             return;
         }
     }
-    
+
     theme->addInfo(
 		String(((const char *) GSL_GLOBAL_PTR(gsl, "author"))),
 		localeDictionary.getLocalizedString(String(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.description"))),true));
-    
+
     theme->addAnimatedPuyoTheme(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.face")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.disappear")),
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P1.explosion")),
@@ -176,7 +177,7 @@ static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
                                ((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.P5.eye")),
                                ((const float) GSL_GLOBAL_FLOAT(gsl, "puyoset.P5.offset")));
     theme->addNeutralPuyo(((const char *) GSL_GLOBAL_PTR(gsl, "puyoset.Neutral.face")),NULL,NULL,NULL,0.0);
-    
+
     globalManager->addPuyoSet(theme);
 }
 
@@ -244,55 +245,55 @@ StandardAnimatedPuyoTheme::StandardAnimatedPuyoTheme(const String path, const ch
     DEBUG_PARAM_MISSING(disappear,"disappear","AnimatedPuyoTheme")
     DEBUG_PARAM_MISSING(explosions,"explosions","AnimatedPuyoTheme")
     DEBUG_PARAM_MISSING(eyes,"eyes","AnimatedPuyoTheme")
-    
-    
+
+
     _face = strdup(face);
     _disappear = strdup(disappear);
     _explosions = strdup(explosions);
     _eyes = strdup(eyes);
     _color_offset = color_offset;
-    
+
     _cached = false;
-    
+
 #ifdef DEBUG
     counter = 0;
 #endif
 
     unsigned int j;
     unsigned int i;
-    
+
     for (j=0; j<NUMBER_OF_PUYO_FACES; j++)
     {
         for (i=0; i<MAX_COMPRESSED; i++) {
             _puyoFaces[j][i] = NULL;
         }
     }
-    
+
     for (j=0; j<NUMBER_OF_PUYO_CIRCLES; j++)
     {
         for (i=0; i<MAX_COMPRESSED; i++) {
             _puyoCircles[j][i] = NULL;
         }
     }
-    
+
     for (i=0; i<MAX_COMPRESSED; i++) {
         _puyoShadow[i] = NULL;
     }
-    
+
     for (j=0; j<NUMBER_OF_PUYO_EXPLOSIONS; j++)
     {
         for (i=0; i<MAX_COMPRESSED; i++) {
             _puyoExplosion[j][i] = NULL;
         }
     }
-    
+
     for (j=0; j<NUMBER_OF_PUYO_DISAPPEAR; j++)
     {
         for (i=0; i<MAX_COMPRESSED; i++) {
             _puyoDisappear[j][i] = NULL;
         }
     }
-    
+
     for (j=0; j<NUMBER_OF_PUYO_EYES; j++)
     {
         for (i=0; i<MAX_COMPRESSED; i++) {
@@ -316,13 +317,13 @@ StandardAnimatedPuyoTheme::~StandardAnimatedPuyoTheme(void)
     _explosions = NULL;
     if (_eyes != NULL) free(_eyes);
     _eyes = NULL;
-    
+
     releaseCached();
 }
 
-IIM_Surface * StandardAnimatedPuyoTheme::getShrunkSurface(PuyoPictureType picture, int index, int compression)
+IosSurface * StandardAnimatedPuyoTheme::getShrunkSurface(PuyoPictureType picture, int index, int compression)
 {
-    
+
 #ifdef DEBUG
     ASSERT_RANGE(PUYO_FACES,PUYO_SHADOWS,picture);
     int max;
@@ -352,14 +353,14 @@ IIM_Surface * StandardAnimatedPuyoTheme::getShrunkSurface(PuyoPictureType pictur
     }
     ASSERT_RANGE(0,max-1,index);
 #endif
-    
+
     if (_cached == false) cache();
-    
+
     if (compression<1) return getSurface(picture, index);
     if (compression>(MAX_COMPRESSED-1)) compression = MAX_COMPRESSED-1;
-    
-    IIM_Surface * * myImage = NULL;
-    
+
+    IosSurface * * myImage = NULL;
+
     switch (picture)
     {
         case PUYO_FACES:
@@ -387,7 +388,8 @@ IIM_Surface * StandardAnimatedPuyoTheme::getShrunkSurface(PuyoPictureType pictur
     if (myImage && myImage[0]) {
         //fprintf(stderr,"2-%p - %p\n",myImage[0],myImage[compression]);
         if (myImage[compression] == NULL) {
-            myImage[compression] = iim_surface_resize_alpha(myImage[0], myImage[0]->w, (myImage[0]->h - compression));
+            IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
+            myImage[compression] = iimLib.resizeAlpha(myImage[0], myImage[0]->w, (myImage[0]->h - compression));
             //fprintf(stderr,"3-%p - %p\n",myImage[0],myImage[compression]);
         }
         return myImage[compression];
@@ -395,9 +397,9 @@ IIM_Surface * StandardAnimatedPuyoTheme::getShrunkSurface(PuyoPictureType pictur
     return NULL;
 }
 
-IIM_Surface * StandardAnimatedPuyoTheme::getSurface(PuyoPictureType picture, int index)
+IosSurface * StandardAnimatedPuyoTheme::getSurface(PuyoPictureType picture, int index)
 {
-    
+
 #ifdef DEBUG
     ASSERT_RANGE(PUYO_FACES,PUYO_SHADOWS,picture);
     int max;
@@ -427,9 +429,9 @@ IIM_Surface * StandardAnimatedPuyoTheme::getSurface(PuyoPictureType picture, int
     }
     ASSERT_RANGE(0,max-1,index);
 #endif
-    
+
     if (_cached == false) cache();
-    
+
     switch (picture)
     {
         case PUYO_FACES:
@@ -456,7 +458,7 @@ IIM_Surface * StandardAnimatedPuyoTheme::getSurface(PuyoPictureType picture, int
     return NULL;
 }
 
-IIM_Surface *StandardAnimatedPuyoTheme::getPuyoSurfaceForValence(int valence, int compression)
+IosSurface *StandardAnimatedPuyoTheme::getPuyoSurfaceForValence(int valence, int compression)
 {
     //if (compression < 1) return getSurface(PUYO_FACES, valence);
     return getShrunkSurface(PUYO_FACES, valence, compression);
@@ -468,48 +470,48 @@ void StandardAnimatedPuyoTheme::releaseCached(void)
 {
     unsigned int j;
     unsigned int i;
-    
+
     for (j=0; j<NUMBER_OF_PUYO_FACES; j++)
     {
         for (i=0; i<MAX_COMPRESSED; i++) {
-            if (_puyoFaces[j][i] != NULL) IIM_Free(_puyoFaces[j][i]);
+            if (_puyoFaces[j][i] != NULL) delete _puyoFaces[j][i];
             _puyoFaces[j][i] = NULL;
         }
     }
-    
+
     for (j=0; j<NUMBER_OF_PUYO_CIRCLES; j++)
     {
         for (i=0; i<MAX_COMPRESSED; i++) {
-            if (_puyoCircles[j][i] != NULL) IIM_Free(_puyoCircles[j][i]);
+            if (_puyoCircles[j][i] != NULL) delete _puyoCircles[j][i];
             _puyoCircles[j][i] = NULL;
         }
     }
-    
+
     for (i=0; i<MAX_COMPRESSED; i++) {
-        if (_puyoShadow[i] != NULL) IIM_Free(_puyoShadow[i]);
+        if (_puyoShadow[i] != NULL) delete _puyoShadow[i];
         _puyoShadow[i] = NULL;
     }
-    
+
     for (j=0; j<NUMBER_OF_PUYO_EXPLOSIONS; j++)
     {
         for (i=0; i<MAX_COMPRESSED; i++) {
-            if (_puyoExplosion[j][i] != NULL) IIM_Free(_puyoExplosion[j][i]);
+            if (_puyoExplosion[j][i] != NULL) delete _puyoExplosion[j][i];
             _puyoExplosion[j][i] = NULL;
         }
     }
-    
+
     for (j=0; j<NUMBER_OF_PUYO_DISAPPEAR; j++)
     {
         for (i=0; i<MAX_COMPRESSED; i++) {
-            if (_puyoDisappear[j][i] != NULL) IIM_Free(_puyoDisappear[j][i]);
+            if (_puyoDisappear[j][i] != NULL) delete _puyoDisappear[j][i];
             _puyoDisappear[j][i] = NULL;
         }
     }
-    
+
     for (j=0; j<NUMBER_OF_PUYO_EYES; j++)
     {
         for (i=0; i<MAX_COMPRESSED; i++) {
-            if (_puyoEyes[j][i] != NULL) IIM_Free(_puyoEyes[j][i]);
+            if (_puyoEyes[j][i] != NULL) delete _puyoEyes[j][i];
             _puyoEyes[j][i] = NULL;
         }
     }
@@ -522,14 +524,14 @@ bool StandardAnimatedPuyoTheme::cache(void)
 {
     bool OK = true;
     int j;
-    
+
     char path[PATH_MAX_LEN];
     char defpath[PATH_MAX_LEN];
     const char * fullPath = (const char *)_path;
-    
+
     if (_cached) return true;
 //    if (_cached) releaseCached();
-    
+
     // PUYOS
     for (j=0; j<NUMBER_OF_PUYO_FACES; j++)
     {
@@ -544,34 +546,34 @@ bool StandardAnimatedPuyoTheme::cache(void)
     {
         OK = OK && copyPictureWithLuminosity(_puyoCircles[0][0],&(_puyoCircles[i][0]),NULL,sin(3.14f/2.0f+i*3.14f/64.0f)*0.6f+0.2f);
     }
-    
+
     snprintf(path, sizeof(path), "%s/%s-puyo-shadow.png",fullPath,_face);
     snprintf(defpath, sizeof(defpath), "%s/%s-puyo-shadow.png",DEFAULTPATH(),_face);
     ADD_PICTURE(_puyoShadow[0])
-    
+
     for (j=0; j<NUMBER_OF_PUYO_EXPLOSIONS; j++)
     {
         snprintf(path, sizeof(path), "%s/%s-puyo-explosion-%d.png",fullPath,_explosions,j);
         snprintf(defpath, sizeof(defpath), "%s/%s-puyo-explosion-%d.png",DEFAULTPATH(),_explosions,j);
         OK = OK && loadPictureWithOffset(path,&(_puyoExplosion[j][0]),defpath,_color_offset);
     }
-    
+
     for (j=0; j<NUMBER_OF_PUYO_DISAPPEAR; j++)
     {
         snprintf(path, sizeof(path), "%s/%s-puyo-disappear-%d.png",fullPath,_disappear,j);
         snprintf(defpath, sizeof(defpath), "%s/%s-puyo-disappear-%d.png",DEFAULTPATH(),_disappear,j);
         OK = OK && loadPictureWithOffset(path,&(_puyoDisappear[j][0]),defpath,_color_offset);
     }
-    
+
     for (j=0; j<NUMBER_OF_PUYO_EYES; j++)
     {
         snprintf(path, sizeof(path), "%s/%s-puyo-eye-%d.png",fullPath,_eyes,j);
         snprintf(defpath, sizeof(defpath), "%s/%s-puyo-eye-%d.png",DEFAULTPATH(),_eyes,j);
         OK = OK && loadPictureWithOffset(path,&(_puyoEyes[j][0]),defpath,_color_offset);
     }
-    
+
     _cached = true;
-    
+
     return OK;
 }
 
@@ -598,19 +600,19 @@ NeutralAnimatedPuyoTheme::~NeutralAnimatedPuyoTheme(void)
     releaseCached();
 }
 
-IIM_Surface * NeutralAnimatedPuyoTheme::getSurface(PuyoPictureType picture, int index)
+IosSurface * NeutralAnimatedPuyoTheme::getSurface(PuyoPictureType picture, int index)
 {
     CACHE_IT_OR_DIE
     return _puyoNeutral;
 }
 
-IIM_Surface *NeutralAnimatedPuyoTheme::getPuyoSurfaceForValence(int valence, int compression)
+IosSurface *NeutralAnimatedPuyoTheme::getPuyoSurfaceForValence(int valence, int compression)
 {
     CACHE_IT_OR_DIE
     return _puyoNeutral;
 }
 
-IIM_Surface *NeutralAnimatedPuyoTheme::getExplodingSurfaceForIndex(int index, int compression)
+IosSurface *NeutralAnimatedPuyoTheme::getExplodingSurfaceForIndex(int index, int compression)
 {
     CACHE_IT_OR_DIE
     return _puyoNeutralPop[index];
@@ -630,13 +632,13 @@ bool NeutralAnimatedPuyoTheme::cache(void)
 void NeutralAnimatedPuyoTheme::releaseCached(void)
 {
     if (_cached) {
-        if (_puyoNeutral != NULL) IIM_Free(_puyoNeutral);
+        if (_puyoNeutral != NULL) delete _puyoNeutral;
         _puyoNeutral = NULL;
-        if (_puyoNeutralPop[0] != NULL) IIM_Free(_puyoNeutralPop[0]);
+        if (_puyoNeutralPop[0] != NULL) delete _puyoNeutralPop[0];
         _puyoNeutralPop[0] = NULL;
-        if (_puyoNeutralPop[1] != NULL) IIM_Free(_puyoNeutralPop[1]);
+        if (_puyoNeutralPop[1] != NULL) delete _puyoNeutralPop[1];
         _puyoNeutralPop[1] = NULL;
-        if (_puyoNeutralPop[2] != NULL) IIM_Free(_puyoNeutralPop[2]);
+        if (_puyoNeutralPop[2] != NULL) delete _puyoNeutralPop[2];
         _puyoNeutralPop[2] = NULL;
         _cached = false;
     }
@@ -650,7 +652,7 @@ AnimatedPuyoSetTheme::AnimatedPuyoSetTheme(const String path, const String name,
 {
     DEBUG_PARAM_MISSING(path,"path","AnimatedPuyoTheme")
     DEBUG_PARAM_MISSING(name,"name","AnimatedPuyoTheme")
-    
+
     _numberOfPuyos = 0;
     _neutral = NULL;
 #ifdef DEBUG
@@ -701,7 +703,7 @@ const String AnimatedPuyoSetTheme::getLocalizedName(void)
 AnimatedPuyoTheme * AnimatedPuyoSetTheme::getAnimatedPuyoTheme(PuyoState state)
 {
     //ASSERT_RANGE(PUYO_BLUE,PUYO_NEUTRAL,state);
-    
+
     switch (state) {
         case PUYO_FALLINGBLUE:
         case PUYO_BLUE:
@@ -721,8 +723,8 @@ AnimatedPuyoTheme * AnimatedPuyoSetTheme::getAnimatedPuyoTheme(PuyoState state)
         default:
             return _neutral;
     }
-    
-    
+
+
     if (state == PUYO_NEUTRAL) return _neutral;
     if ((state >= PUYO_BLUE) && (state < PUYO_NEUTRAL) && (state-PUYO_BLUE < _numberOfPuyos))
         return _puyos[state-PUYO_BLUE];
@@ -740,13 +742,13 @@ void AnimatedPuyoSetTheme::releaseCached(void)
 
 
 bool AnimatedPuyoSetTheme::addAnimatedPuyoTheme(const String face, const char * disappear, const char * explosions, const char * eyes, const float color_offset)
-{ 
+{
     if (_numberOfPuyos >= NUMBER_OF_PUYOS)
     {
         printf("Too many puyos in theme %s... Ignoring puyo.\n",(const char *)_lname);
         return false;
     }
-    
+
     // add puyo
     _puyos[_numberOfPuyos] = new StandardAnimatedPuyoTheme(_path, face, disappear, explosions, eyes, color_offset);
     if (_puyos[_numberOfPuyos]!=NULL) _numberOfPuyos++;
@@ -754,7 +756,7 @@ bool AnimatedPuyoSetTheme::addAnimatedPuyoTheme(const String face, const char * 
 }
 
 bool AnimatedPuyoSetTheme::addNeutralPuyo(const String face, const char * disappear, const char * explosions, const char * eyes, const float color_offset)
-{ 
+{
     if (_neutral != NULL)
     {
         printf("Too many neutral puyos in theme %s... Ignoring puyo.\n",(const char *)_lname);
@@ -797,19 +799,19 @@ void AnimatedPuyoSetTheme::release(void)
 //**************************************************************************************
 
 PuyoLevelTheme::PuyoLevelTheme(const String path, const String name, const String lname):_path(path),_name(name),_lname(lname)
-{ 
+{
     DEBUG_PARAM_MISSING(path,"path","PuyoLevelTheme")
     DEBUG_PARAM_MISSING(name,"name","PuyoLevelTheme")
-    
+
     _lives = NULL;
     _background = NULL;
     _grid = NULL;
     _speed_meter = NULL;
-    
+
     _neutralIndicator = NULL;
     _bigNeutralIndicator = NULL;
     _giantNeutralIndicator = NULL;
-    
+
     _cached = false;
 
 #ifdef DEBUG
@@ -833,7 +835,7 @@ PuyoLevelTheme::~PuyoLevelTheme(void)
     _speed_meter = NULL;
     if (_neutral_indicator != NULL) free(_neutral_indicator);
     _neutral_indicator = NULL;
-    
+
     releaseCached();
 }
 
@@ -864,62 +866,62 @@ const String PuyoLevelTheme::getLocalizedName(void)
 }
 
 void PuyoLevelTheme::releaseCached(void)
-{    
+{
     unsigned int i;
-    
+
     for (i=0; i<NUMBER_OF_LIVES; i++)
     {
-        if (_levelLives[i] != NULL) IIM_Free(_levelLives[i]);
+        if (_levelLives[i] != NULL) delete _levelLives[i];
         _levelLives[i] = NULL;
     }
-    if (_levelBackground != NULL) IIM_Free(_levelBackground);
+    if (_levelBackground != NULL) delete _levelBackground;
     _levelBackground = NULL;
-    if (_levelGrid != NULL) IIM_Free(_levelGrid);
+    if (_levelGrid != NULL) delete _levelGrid;
     _levelGrid = NULL;
-    if (_levelMeter[0] != NULL) IIM_Free(_levelMeter[0]);
+    if (_levelMeter[0] != NULL) delete _levelMeter[0];
     _levelMeter[0] = NULL;
-    if (_levelMeter[1] != NULL) IIM_Free(_levelMeter[1]);
+    if (_levelMeter[1] != NULL) delete _levelMeter[1];
     _levelMeter[1] = NULL;
-    
+
     if (_neutralIndicator != NULL) free(_neutralIndicator);
     if (_bigNeutralIndicator != NULL) free(_bigNeutralIndicator);
     if (_giantNeutralIndicator != NULL) free(_giantNeutralIndicator);
     _neutralIndicator = NULL;
     _bigNeutralIndicator = NULL;
     _giantNeutralIndicator = NULL;
-    
+
     _cached = false;
 }
 
 
 bool PuyoLevelTheme::setLives(const char * lives)
-{ 
+{
     DEBUG_PARAM_MISSING(lives,"lives","PuyoLevelTheme")
-    
+
     _lives = strdup(lives);
     return true;
 }
 
 bool PuyoLevelTheme::setBackground(const char * back)
-{ 
+{
     DEBUG_PARAM_MISSING(back,"back","PuyoLevelTheme")
-    
+
     _background = strdup(back);
     return true;
 }
 
 bool PuyoLevelTheme::setGrid(const char * grid)
-{ 
+{
     DEBUG_PARAM_MISSING(grid,"grid","PuyoLevelTheme")
-    
+
     _grid = strdup(grid);
     return true;
 }
 
 bool PuyoLevelTheme::setSpeedMeter(const char * speedmeter)
-{ 
+{
     DEBUG_PARAM_MISSING(speedmeter,"speedmeter","PuyoLevelTheme")
-    
+
     _speed_meter = strdup(speedmeter);
     return true;
 }
@@ -927,52 +929,52 @@ bool PuyoLevelTheme::setSpeedMeter(const char * speedmeter)
 bool PuyoLevelTheme::setNeutralIndicator(const char * neutralIndicator)
 {
     DEBUG_PARAM_MISSING(neutralIndicator,"neutralindicator","PuyoLevelTheme")
-    
+
     _neutral_indicator = strdup(neutralIndicator);
     return true;
 }
 
-IIM_Surface * PuyoLevelTheme::getLifeForIndex(int index)
-{ 
+IosSurface * PuyoLevelTheme::getLifeForIndex(int index)
+{
     ASSERT_RANGE(0,NUMBER_OF_LIVES-1,index);
     CACHE_IT_OR_DIE
-        
+
         return _levelLives[index];
 }
 
-IIM_Surface * PuyoLevelTheme::getBackground(void)
-{ 
+IosSurface * PuyoLevelTheme::getBackground(void)
+{
     CACHE_IT_OR_DIE
-    
+
     return _levelBackground;
 }
 
-IIM_Surface * PuyoLevelTheme::getGrid(void)
-{ 
+IosSurface * PuyoLevelTheme::getGrid(void)
+{
     CACHE_IT_OR_DIE
-    
+
     return _levelGrid;
 }
 
-IIM_Surface * PuyoLevelTheme::getSpeedMeter(bool front)
+IosSurface * PuyoLevelTheme::getSpeedMeter(bool front)
 {
     CACHE_IT_OR_DIE
     return _levelMeter[front?1:0];
 }
 
-IIM_Surface * PuyoLevelTheme::getNeutralIndicator()
+IosSurface * PuyoLevelTheme::getNeutralIndicator()
 {
     CACHE_IT_OR_DIE
     return _neutralIndicator;
 }
 
-IIM_Surface * PuyoLevelTheme::getBigNeutralIndicator()
+IosSurface * PuyoLevelTheme::getBigNeutralIndicator()
 {
     CACHE_IT_OR_DIE
     return _bigNeutralIndicator;
 }
 
-IIM_Surface * PuyoLevelTheme::getGiantNeutralIndicator()
+IosSurface * PuyoLevelTheme::getGiantNeutralIndicator()
 {
     CACHE_IT_OR_DIE
     return _giantNeutralIndicator;
@@ -989,15 +991,15 @@ bool PuyoLevelTheme::cache(void)
 {
     bool OK = true;
     int i;
-    
+
     char path[PATH_MAX_LEN];
     char defpath[PATH_MAX_LEN];
     const char * fullPath = (const char *)_path;
 
     if (_cached) releaseCached();
-    
+
     if (validate() == false) return false;
-    
+
     // LIVES
     for (i=0; i<NUMBER_OF_LIVES; i++)
     {
@@ -1005,12 +1007,12 @@ bool PuyoLevelTheme::cache(void)
         snprintf(defpath, sizeof(defpath), "%s/%s-lives-%d.png",DEFAULTPATH(),_lives,i);
         ADD_PICTURE(_levelLives[i])
     }
-    
+
     // BACKGROUND
     snprintf(path, sizeof(path), "%s/%s-background.jpg",fullPath,_background);
     snprintf(defpath, sizeof(defpath), "%s/%s-background.jpg",DEFAULTPATH(),_background);
     ADD_PICTURE(_levelBackground)
-    
+
     // GRID
     if (strcmp(_grid, "") != 0) {
       snprintf(path, sizeof(path), "%s/%s-background-grid.png",fullPath,_grid);
@@ -1018,7 +1020,7 @@ bool PuyoLevelTheme::cache(void)
       ADD_PICTURE(_levelGrid)
     }
     else _levelGrid = NULL;
-    
+
     // SPEED METER
     snprintf(path, sizeof(path), "%s/%s-background-meter-below.png",fullPath,_speed_meter);
     snprintf(defpath, sizeof(defpath), "%s/%s-background-meter-below.png",DEFAULTPATH(),_speed_meter);
@@ -1026,7 +1028,7 @@ bool PuyoLevelTheme::cache(void)
     snprintf(path, sizeof(path), "%s/%s-background-meter-above.png",fullPath,_speed_meter);
     snprintf(defpath, sizeof(defpath), "%s/%s-background-meter-above.png",DEFAULTPATH(),_speed_meter);
     ADD_PICTURE(_levelMeter[1])
-    
+
     // NEUTRAL INDICATORS
     snprintf(path, sizeof(path), "%s/%s-small.png",fullPath,_neutral_indicator);
     snprintf(defpath, sizeof(defpath), "%s/%s-small.png",DEFAULTPATH(),_neutral_indicator);
@@ -1037,7 +1039,7 @@ bool PuyoLevelTheme::cache(void)
     snprintf(path, sizeof(path), "%s/%s-giant.png",fullPath,_neutral_indicator);
     snprintf(defpath, sizeof(defpath), "%s/%s-giant.png",DEFAULTPATH(),_neutral_indicator);
     ADD_PICTURE(_giantNeutralIndicator)
-    
+
     _cached = true;
     return OK;
 }
@@ -1052,7 +1054,7 @@ bool PuyoLevelTheme::cache(void)
 static void loadTheme(String fullPath)
 {
     String scriptPath = FilePath::combine(fullPath, "Description.gsl");
-    
+
     // Verify input file
     struct stat s;
     if (stat((const char *)scriptPath,&s) == -1)
@@ -1061,7 +1063,7 @@ static void loadTheme(String fullPath)
         return;
     }
     //else fprintf(stderr,"Trying to load theme from %s.\n",(const char *)scriptPath);
-        
+
     GlobalCurrentPath = fullPath;
     GoomSL * gsl = gsl_new();
     if (!gsl) return;
@@ -1088,13 +1090,13 @@ AnimatedPuyoThemeManager * getPuyoThemeManger(void)
 AnimatedPuyoThemeManager::AnimatedPuyoThemeManager(bool useAltLocation)
 {
     globalManager = this;
-    
+
     // List the themes in the various pack folders
     SelfVector<String> themeFolders;
     for (int i = 0 ; i < theCommander->getDataPathManager().getNumPacks() ; i++) {
         getThemeListInPath(theCommander->getDataPathManager().getPathInPack("theme", i), themeFolders);
     }
-    
+
     // Load the themes from the list
     for (int i = 0 ; i < themeFolders.size() ; i++) {
 #ifdef DEBUG
@@ -1108,7 +1110,7 @@ AnimatedPuyoThemeManager::AnimatedPuyoThemeManager(bool useAltLocation)
 AnimatedPuyoThemeManager::~AnimatedPuyoThemeManager(void)
 {
 }
-    
+
 void AnimatedPuyoThemeManager::addPuyoSet(AnimatedPuyoSetTheme * PST)
 {
     puyoSets.add(PST);
@@ -1124,7 +1126,7 @@ void AnimatedPuyoThemeManager::addLevel(PuyoLevelTheme * PLT)
 AnimatedPuyoSetTheme * AnimatedPuyoThemeManager::getAnimatedPuyoSetTheme(const String name)
 {
     int size = puyoSets.size();
-    
+
     for (int i = 0; i < size; i++)
     {
         if (puyoSets[i]->getName() == name) return puyoSets[i];
@@ -1164,7 +1166,7 @@ String AnimatedPuyoThemeManager::getPreferedAnimatedPuyoSetThemeName(void)
     String name(out);
 
     int size = puyoSets.size();
-    
+
     for (int i = 0; i < size; i++)
     {
         if (puyoSets[i]->getName() == name) return puyoSets[i]->getName();
@@ -1199,12 +1201,12 @@ void AnimatedPuyoThemeManager::setPreferedAnimatedPuyoSetTheme(const String name
 PuyoLevelTheme * AnimatedPuyoThemeManager::getPuyoLevelTheme(const String name)
 {
     int size = themes.size();
-    
+
     for (int i = 0; i < size; i++)
     {
         if (themes[i]->getName() == name) return themes[i];
     }
-    
+
     if (name != defaultLevelName)
     {
         fprintf(stderr, "Level theme \"%s\" not found, falling back to default...\n",(const char *)name);
@@ -1239,12 +1241,12 @@ String AnimatedPuyoThemeManager::getPreferedPuyoLevelThemeName(void)
     String name(out);
 
     int size = themes.size();
-    
+
     for (int i = 0; i < size; i++)
     {
         if (themes[i]->getName() == name) return themes[i]->getName();
     }
-    
+
     if (name != defaultLevelName)
     {
         fprintf(stderr, "Level theme \"%s\" not found, falling back to default...\n",(const char *)name);

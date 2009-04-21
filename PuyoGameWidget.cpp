@@ -66,8 +66,8 @@ void PuyoGameWidget::initialize()
     gameover = false;
     skipGameCycleA = false;
     skipGameCycleB = false;
-    
-    IIM_Surface * background = attachedLevelTheme->getBackground();
+
+    IosSurface * background = attachedLevelTheme->getBackground();
     if (attachedLevelTheme->getForegroundAnimation() != "") {
       // Initializing the styrolyse client
       m_styroPainter.m_styroClient.loadImage = styro_loadImage;
@@ -86,25 +86,18 @@ void PuyoGameWidget::initialize()
 		        attachedLevelTheme->getForegroundAnimation())),
 		      (StyrolyseClient *)(&m_styroPainter), false);
     }
-
-    SDL_PixelFormat *fmt = background->surf->format;
-    SDL_Surface *tmp = SDL_CreateRGBSurface(background->surf->flags,
-                                            background->w, background->h, 32,
-                                            fmt->Rmask, fmt->Gmask,
-                                            fmt->Bmask, fmt->Amask);
-    painter.gameScreen = IIM_RegisterImg(SDL_DisplayFormat(tmp), false);
-    SDL_FreeSurface(tmp);
-    
+    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
+    painter.gameScreen = painterGameScreen = iimLib.create_DisplayFormat(background->w, background->h);
     painter.backGround = background;
-    painter.redrawAll(painter.gameScreen->surf);
-    
+    painter.redrawAll(painter.gameScreen);
+
     // Setting up games
     attachedGameA = this->areaA->getAttachedGame();
     attachedGameB = this->areaB->getAttachedGame();
     this->areaA->setEnemyGame(attachedGameB);
     this->areaB->setEnemyGame(attachedGameA);
     //printf("Ennemis positionnes! %x, %x\n", attachedGameA, attachedGameB);
-    
+
     setReceiveUpEvents(true);
     setFocusable(true);
 
@@ -118,7 +111,7 @@ void PuyoGameWidget::initialize()
 
 PuyoGameWidget::~PuyoGameWidget()
 {
-    IIM_Free(painter.gameScreen);
+    delete painter.gameScreen;
     for (unsigned int i=0; i<puyoFX.size(); ++i)
         delete puyoFX[i];
     if (m_foregroundAnimation != NULL) {
@@ -131,9 +124,9 @@ void PuyoGameWidget::cycle()
   if (!paused) {
     tickCounts++;
     cycles++;
-    
+
     int animCyclesBeforeGameCycles = (MaxSpeed + (((MinSpeed - MaxSpeed) * gameSpeed) / 20));
-    
+
     // Cycling through the foreground animation
     if (m_foregroundAnimation != NULL)
       styrolyse_update(m_foregroundAnimation, 0.);
@@ -141,40 +134,40 @@ void PuyoGameWidget::cycle()
     // Controls
     controllerA->cycle();
     controllerB->cycle();
-    
+
     if (!skipGameCycleA && areaA->isNewMetaCycleStart() && (cyclesBeforeGameCycle < animCyclesBeforeGameCycles/2))
-      skipGameCycleA = true;  
+      skipGameCycleA = true;
     if (!skipGameCycleB && areaB->isNewMetaCycleStart() && (cyclesBeforeGameCycle < animCyclesBeforeGameCycles/2))
-      skipGameCycleB = true;  
+      skipGameCycleB = true;
 
     // Animations
     areaA->cycleAnimation();
     areaB->cycleAnimation();
-    
+
     if (!skipGameCycleA && areaA->isNewMetaCycleStart() && (cyclesBeforeGameCycle < animCyclesBeforeGameCycles/2))
-      skipGameCycleA = true;  
+      skipGameCycleA = true;
     if (!skipGameCycleB && areaB->isNewMetaCycleStart() && (cyclesBeforeGameCycle < animCyclesBeforeGameCycles/2))
-      skipGameCycleB = true;  
+      skipGameCycleB = true;
 
     // Game cycles
     if (cyclesBeforeGameCycle == 0) {
-      
+
       areaA->clearMetaCycleStart();
       areaB->clearMetaCycleStart();
 
       cyclesBeforeGameCycle = animCyclesBeforeGameCycles;
-      if (!skipGameCycleA) 
+      if (!skipGameCycleA)
       {
         areaA->cycleGame();
       }
       else skipGameCycleA = false;
-      
+
       if (!skipGameCycleB)
       {
         areaB->cycleGame();
       }
       else skipGameCycleB = false;
-      
+
       // Blinking point animation
       // TODO
       /*
@@ -183,24 +176,24 @@ void PuyoGameWidget::cycle()
       if (attachedGameB->getPoints()/50000 > savePointsB/50000)
         blinkingPointsB = 10;
         */
-      
+
       if (blinkingPointsA > 0)
         blinkingPointsA--;
       if (blinkingPointsB > 0)
         blinkingPointsB--;
-      
+
       /*
       savePointsB = attachedGameB->getPoints();
       savePointsA = attachedGameA->getPoints();
-      
+
       if (savePointsA < 50000) blinkingPointsA=0;
       if (savePointsB < 50000) blinkingPointsB=0;
       */
       // end of the blinking point animation code
     }
-    
+
     cyclesBeforeGameCycle--;
-    
+
     if (tickCounts == (unsigned int)cyclesBeforeSpeedIncreases)
     {
       tickCounts = 0;
@@ -223,84 +216,83 @@ void PuyoGameWidget::cycle()
   }
 }
 
-void PuyoGameWidget::draw(SDL_Surface *screen)
+void PuyoGameWidget::draw(DrawTarget *dt)
 {
-  //printf("DRAW()\n");
     if (!paused) {
         // Rendering puyo views
         areaA->render();
         areaB->render();
-        
-        // Rendering the grids
-        SDL_Rect drect;
-        IIM_Surface * grid = attachedLevelTheme->getGrid();
-	if (grid != NULL) {
-	  drect.x = 21;
-	  drect.y = -1;
-	  drect.w = grid->w;
-	  drect.h = grid->h;
-	  painter.requestDraw(grid, &drect);
-	  drect.x = 407;
-	  drect.y = -1;
-	  drect.w = grid->w;
-	  drect.h = grid->h;
-	  painter.requestDraw(grid, &drect);
-	}
 
-	// Rendering the foreground animation
-	if (m_foregroundAnimation != NULL)
-	  styrolyse_draw(m_foregroundAnimation);
-        
+        // Rendering the grids
+        IosRect drect;
+        IosSurface * grid = attachedLevelTheme->getGrid();
+        if (grid != NULL) {
+            drect.x = 21;
+            drect.y = -1;
+            drect.w = grid->w;
+            drect.h = grid->h;
+            painter.requestDraw(grid, &drect);
+            drect.x = 407;
+            drect.y = -1;
+            drect.w = grid->w;
+            drect.h = grid->h;
+            painter.requestDraw(grid, &drect);
+        }
+
+        // Rendering the foreground animation
+        if (m_foregroundAnimation != NULL)
+            styrolyse_draw(m_foregroundAnimation);
+
         // Rendering the neutral puyos
         areaA->renderNeutral();
         areaB->renderNeutral();
-        
+
         // Rendering the lives
         if (displayLives && (lives>=0) && (lives<=3))
         {
-            IIM_Surface * liveImage = attachedLevelTheme->getLifeForIndex(lives);
+            IosSurface * liveImage = attachedLevelTheme->getLifeForIndex(lives);
             drect.x = painter.gameScreen->w / 2 - liveImage->w / 2;
             drect.y = 436;
             drect.w = liveImage->w;
             drect.h = liveImage->h;
             painter.requestDraw(liveImage, &drect);
         }
-        
+
         // Drawing the painter
         painter.draw();
     }
-    SDL_BlitSurface(painter.gameScreen->surf, NULL, screen, NULL);
+    dt->renderCopy(painterGameScreen, NULL, NULL);
 
     // Rendering the game speed meter
-    // Should be moved to the painter    
-    SDL_Rect speedRect;
-    IIM_Surface * speedFront = attachedLevelTheme->getSpeedMeter(true);
-    IIM_Surface * speedBack  = attachedLevelTheme->getSpeedMeter(false);
+    // Should be moved to the painter
+    IosRect speedRect;
+    IosSurface * speedFront = attachedLevelTheme->getSpeedMeter(true);
+    IosSurface * speedBack  = attachedLevelTheme->getSpeedMeter(false);
     speedRect.x = 0;
     speedRect.w = speedFront->w;
     speedRect.h = gameSpeed * 6;
     speedRect.y = speedFront->h - speedRect.h;
-    
-    SDL_Rect drect;
+
+    IosRect drect;
     drect.x = attachedLevelTheme->getSpeedMeterX() - speedRect.w / 2;
     drect.y = attachedLevelTheme->getSpeedMeterY() - speedRect.h;
     drect.w = speedRect.w;
     drect.h = speedRect.h;
-    
-    SDL_Rect speedBlackRect = speedRect;
-    SDL_Rect drectBlack     = drect;
-    
+
+    IosRect speedBlackRect = speedRect;
+    IosRect drectBlack     = drect;
+
     speedBlackRect.h = speedFront->h - speedRect.h;
     speedBlackRect.y = 0;
     drectBlack.y = attachedLevelTheme->getSpeedMeterY() - speedFront->h;
     drectBlack.h = speedBlackRect.h;
 
-    SDL_BlitSurface(speedBack->surf,&speedBlackRect, screen, &drectBlack);
+    dt->renderCopy(speedBack,&speedBlackRect,&drectBlack);
     if (!paused)
-        SDL_BlitSurface(speedFront->surf,&speedRect, screen, &drect);
+        dt->renderCopy(speedFront,&speedRect, &drect);
     else
-        SDL_BlitSurface(speedBack->surf,&speedRect, screen, &drect);
-    
+        dt->renderCopy(speedBack,&speedRect, &drect);
+
     // Rendering the scores
     areaA->renderOverlay();
     areaB->renderOverlay();
@@ -308,7 +300,7 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
     SoFont *fontBl = NULL;
     int blinkingPointsA = 0; int blinkingPointsB = 0;
     char text[1024];
-    
+
     if (!paused) {
         double time = TIME_TO_FINISH_GAME_WITH_BONUS - (double)cycles * TIME_BETWEEN_GAME_CYCLES;
         if (time < 0.0) time = 0.0;
@@ -318,7 +310,7 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
         fontBl = theCommander->menuFont;
         SoFont_CenteredString_XY (fontBl, display,
                                   320, 380,   text, NULL);
-    
+
 //    if ((blinkingPointsA % 2) == 0)
 //        fontBl = theCommander->smallFont;
 //    else
@@ -326,16 +318,16 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
 //        sprintf(text, "<< %d", attachedGameA->getPoints());
 //        SoFont_CenteredString_XY (fontBl, display,
 //                                  300, 380,   text, NULL);
-//        
+//
 //        if ((blinkingPointsB % 2) == 0)
 //            fontBl = theCommander->smallFont;
 //        else
 //            fontBl = theCommander->menuFont;
-//        
+//
 //        sprintf(text, "%d >>", attachedGameB->getPoints());
 //        SoFont_CenteredString_XY (fontBl, display,
 //                                  340, 395, text, NULL);
-        
+
         // Rendering the player names
         SoFont *font = (paused?theCommander->darkFont:theCommander->menuFont);
         SoFont_CenteredString_XY (font, screen, 130, 460, playerOneName, NULL);
@@ -344,8 +336,9 @@ void PuyoGameWidget::draw(SDL_Surface *screen)
     */
     // Rendering the player names
     SoFont *font = (paused ? GameUIDefaults::FONT_INACTIVE : GameUIDefaults::FONT_TEXT);
-    SoFont_CenteredString_XY (font, screen, 130, 460, playerOneName, NULL);
-    SoFont_CenteredString_XY (font, screen, 510, 460, playerTwoName, NULL);
+    // TODO: Fix
+    //SoFont_CenteredString_XY (font, screen, 130, 460, playerOneName, NULL);
+    //SoFont_CenteredString_XY (font, screen, 510, 460, playerTwoName, NULL);
 }
 
 void PuyoGameWidget::addSubWidget(Widget *subWidget)
@@ -356,7 +349,8 @@ void PuyoGameWidget::addSubWidget(Widget *subWidget)
 void PuyoGameWidget::pause()
 {
     paused = true;
-    iim_surface_convert_to_gray(painter.gameScreen);
+    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
+    iimLib.convertToGray(painterGameScreen);
     requestDraw();
 }
 
@@ -419,8 +413,9 @@ void PuyoGameWidget::setScreenToResumed(bool fromControls)
 
 void *PuyoGameWidget::styro_loadImage(StyrolyseClient *_this, const char *path)
 {
-  IIM_Surface *surface;
-  surface = IIM_Load_Absolute_DisplayFormatAlpha
+  IosSurface *surface;
+  IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
+  surface = iimLib.load_Absolute_DisplayFormatAlpha
     ((FilePath(((StyrolysePainterClient *)_this)->m_theme->getThemeRootPath())
       .combine(path)));
   return surface;
@@ -429,24 +424,27 @@ void PuyoGameWidget::styro_drawImage(StyrolyseClient *_this,
 			    void *image, int x, int y,
 			    int clipx, int clipy, int clipw, int cliph, int flipped)
 {
-  IIM_Surface *surf = (IIM_Surface *)image;
-  SDL_Rect  cliprect;
+  IosSurface *surf = (IosSurface *)image;
+  IosRect  cliprect;
   cliprect.x = clipx;
   cliprect.y = clipy;
   cliprect.w = clipw;
   cliprect.h = cliph;
+  // TODO: Fix
+#ifdef DISABLED
   if (flipped) {
     if (!surf->fliph) {
         // Generate flipped image.
         surf->fliph = iim_surface_mirror_h(surf);
     }
     surf = surf->fliph;
-  }    
+  }
+#endif
   ((StyrolysePainterClient *)_this)->m_painter->requestDraw(surf, &cliprect);
 }
 void PuyoGameWidget::styro_freeImage(StyrolyseClient *_this, void *image)
 {
-  IIM_Free((IIM_Surface *)image);
+  delete ((IosSurface *)image);
 }
 
 std::vector<PuyoFX*> *activeFX = NULL;

@@ -67,7 +67,7 @@ public:
                     gameui::Action *gameOverAction = NULL);
     void initialize();
     void cycle();
-    void draw(SDL_Surface *screen);
+    void draw(DrawTarget *dt);
     void pause();
     void resume();
     bool isFocusable() { return !paused; }
@@ -109,6 +109,7 @@ protected:
 
     PuyoGameScreen *associatedScreen;
     SDL_Painter painter;
+    IosSurface *painterGameScreen;
     PuyoLevelTheme *attachedLevelTheme;
     PuyoView *areaA, *areaB;
     PuyoPlayer *controllerA, *controllerB;

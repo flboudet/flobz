@@ -31,15 +31,16 @@ PuyoScreenTransitionWidget::PuyoScreenTransitionWidget(Screen &fromScreen, Actio
     : CycledComponent(.03), transitionFinishedAction(transitionFinishedAction)
 {
     melt = doom_melt_new();
-    fromSurface = iim_surface_create_rgb(640, 480);
-    fromScreen.drawAnyway(fromSurface->surf);
+    DrawContext *dc = GameUIDefaults::GAME_LOOP->getDrawContext();
+    fromSurface = dc->getIIMLibrary().create_DisplayFormat(dc->getWidth(), dc->getHeight());
+    fromScreen.drawAnyway(fromSurface);
     doom_melt_start(melt, fromSurface);
 }
 
 PuyoScreenTransitionWidget::~PuyoScreenTransitionWidget()
 {
     doom_melt_delete(melt);
-    IIM_Free(fromSurface);
+    delete fromSurface;
 }
 
 void PuyoScreenTransitionWidget::cycle()
@@ -51,10 +52,10 @@ void PuyoScreenTransitionWidget::cycle()
     //transitionFinishedAction.action();
 }
 
-void PuyoScreenTransitionWidget::draw(SDL_Surface *screen)
+void PuyoScreenTransitionWidget::draw(DrawTarget *dt)
 {
     //toScreen.drawAnyway(screen);
-    SDL_SetClipRect(screen, NULL);
-    doom_melt_display(melt, screen);
+    dt->setClipRect(NULL);
+    doom_melt_display(melt, dt);
 }
 

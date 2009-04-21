@@ -65,17 +65,19 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
   initFonts();
 
     // Loading the frame images, and setting up the frames
+    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
     m_switchOnImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/switch-on.png"));
     m_switchOffImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/switch-off.png"));
     m_radioOnImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/radio-on.png"));
     m_radioOffImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/radio-off.png"));
-    m_frameImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/frame.png"));
-    m_buttonIdleImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/button.png"));
-    m_buttonDownImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/buttondown.png"));
-    m_buttonOverImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/buttonover.png"));
-    m_textFieldIdleImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/editfield.png"));
-    m_separatorImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/separator.png"));
-    m_listIdleImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/listborder.png"));
+
+    m_frameImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/frame.png"));
+    m_buttonIdleImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/button.png"));
+    m_buttonDownImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/buttondown.png"));
+    m_buttonOverImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/buttonover.png"));
+    m_textFieldIdleImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/editfield.png"));
+    m_separatorImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/separator.png"));
+    m_listIdleImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/listborder.png"));
     m_windowFramePicture.setFrameSurface(m_frameImage);
     m_buttonIdleFramePicture.setFrameSurface(m_buttonIdleImage);
     m_buttonDownFramePicture.setFrameSurface(m_buttonDownImage);
@@ -87,12 +89,12 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
 
 PuyoCommander::~PuyoCommander()
 {
-  IIM_Free(m_frameImage);
-  IIM_Free(m_buttonIdleImage);
-  IIM_Free(m_buttonDownImage);
-  IIM_Free(m_buttonOverImage);
-  IIM_Free(m_textFieldIdleImage);
-  IIM_Free(m_separatorImage);
+  delete m_frameImage;
+  delete m_buttonIdleImage;
+  delete m_buttonDownImage;
+  delete m_buttonOverImage;
+  delete m_textFieldIdleImage;
+  delete m_separatorImage;
   gameui::GlobalNotificationCenter.removeListener(getFullScreenKey(),this);
 }
 
@@ -221,6 +223,7 @@ String PuyoCommander::getFullScreenKey(void) const
 
 void PuyoCommander::setFullScreen(bool fullScreen)
 {
+#ifdef DISABLED
     if (fullScreen != this->fullscreen) {
         this->fullscreen = fullScreen;
         SetBoolPreference(kFullScreenPref, fullscreen);
@@ -238,6 +241,7 @@ void PuyoCommander::setFullScreen(bool fullScreen)
         SDL_ShowCursor(SDL_ENABLE);
         SDL_ShowCursor(SDL_DISABLE);
     }
+#endif
 }
 
 void PuyoCommander::setGlSDL(bool useGL)

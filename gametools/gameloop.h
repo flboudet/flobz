@@ -7,6 +7,7 @@
 #else
 #include "SDL.h"
 #endif
+#include "drawcontext.h"
 #include "GameControls.h"
 
 using namespace ios_fc;
@@ -19,17 +20,18 @@ class DrawableComponent
     DrawableComponent();
     virtual ~DrawableComponent();
     virtual bool drawRequested() const;
-    void doDraw(SDL_Surface *screen) ;
+    // Immediately draws the DrawableComponent
+    void doDraw(DrawTarget *dt) ;
     // Reordering of drawable elements
     bool moveToFront();
     bool moveToBack(DrawableComponent *gc);
-    
+
     // Notifications
     virtual void onDrawableVisibleChanged(bool visible) {}
   protected:
     GameLoop *parentLoop;
     void requestDraw();
-    virtual void draw(SDL_Surface *screen) {}
+    virtual void draw(DrawTarget *dt) {}
     friend class GameLoop;
   private:
     bool _drawRequested;
@@ -40,14 +42,14 @@ class IdleComponent
   public:
     IdleComponent();
     virtual ~IdleComponent();
-   
+
     void callIdle(double currentTime) { if (!paused) idle(currentTime); }
-    
+
     virtual void idle(double currentTime)         {}
 
     /// return true if you want the GameLoop to skip some frames.
     virtual bool isLate(double currentTime) const { return false; }
-    
+
     /// perform some computation if you're interested in events.
     virtual void onEvent(GameControlEvent *event) {}
 
@@ -79,7 +81,7 @@ class CycledComponent : public IdleComponent
 
     virtual void setPause(bool paused);
     void reset();
-    
+
   private:
     double cycleTime;
 
@@ -101,6 +103,9 @@ class GameLoop
   public:
     GameLoop();
 
+    void setDrawContext(DrawContext *dc) { m_dc = dc; }
+    DrawContext *getDrawContext() const { return m_dc; }
+
     void addDrawable(DrawableComponent *gc);
     void addIdle(IdleComponent *gc);
     void removeDrawable(DrawableComponent *gc);
@@ -111,21 +116,13 @@ class GameLoop
     // Reordering of drawable elements
     bool moveToFront(DrawableComponent *gc);
     bool moveToBack(DrawableComponent *gc);
-    
+
     void idle(double currentTime);
     void draw();
-    
+
     bool drawRequested() const;
     bool isLate(double currentTime) const;
 
-    SDL_Surface *getSurface() const { return surface; }
-    SDL_Surface *getDisplay() const { return display; }
-    void setSurface(SDL_Surface *surface) {
-      this->surface = surface;
-    }
-    void setDisplay(SDL_Surface *surface) {
-      this->display = surface;
-    }
     void setOpenGLMode(bool state) {
         this->opengl_mode = state;
     }
@@ -133,12 +130,16 @@ class GameLoop
     static inline double getCurrentTime() {
       return 0.001 * (double)SDL_GetTicks();
     }
-    
+
   private:
+    DrawContext *m_dc;
+
     double timeDrift;
     double lastDrawTime, deltaDrawTimeMax;
+    // obsolete
     SDL_Surface *surface;
     SDL_Surface *display;
+
     Vector<DrawableComponent> drawables;
     Vector<IdleComponent>     idles;
     Vector<GarbageCollectableItem> garbageCollector;

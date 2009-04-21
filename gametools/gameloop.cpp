@@ -27,9 +27,9 @@ void DrawableComponent::requestDraw()
   _drawRequested = true;
 }
 
-void DrawableComponent::doDraw(SDL_Surface *screen)
+void DrawableComponent::doDraw(DrawTarget *dt)
 {
-  draw(screen);
+  draw(dt);
   _drawRequested = false;
 }
 
@@ -99,7 +99,7 @@ void   CycledComponent::idle(double currentTime)
     firstCycleTime = currentTime;
     cycleNumber = 0.0;
   }
-  
+
   bool requireCycle = (currentTime + time_tolerence > firstCycleTime + cycleTime * cycleNumber);
 
   if (requireCycle && (!paused)) {
@@ -113,7 +113,7 @@ void CycledComponent::setPause(bool paused)
   this->paused = paused;
   if (!paused) reset();
 }
-  
+
 void CycledComponent::reset()
 {
   firstCycleTime = 0.0;
@@ -222,16 +222,16 @@ void GameLoop::idle(double currentTime)
   idles_size_at_start = idles.size();
 
   //Vector<IdleComponent> idlesCpy = idles.dup();
-  
+
   // 1- process events
   SDL_Event e;
   while (SDL_PollEvent (&e)) {
-    
+
     GameControlEvent controlEvent;
     getControlEvent(e, &controlEvent);
 
     for (i=0; i < idles_size_at_start; ++i) {
-      
+
       if (idles[i]) {
 #ifdef DEBUG_GAMELOOP
 	printf("onEvent called on idle %x!\n", idles[i]);
@@ -246,7 +246,7 @@ void GameLoop::idle(double currentTime)
       exit(0);
     }
   }
-  
+
   // 2- call idles
   for (i = 0; i < idles_size_at_start; ++i) {
     IdleComponent *gc = idles[i];
@@ -276,7 +276,7 @@ void GameLoop::idle(double currentTime)
     }
     else i++;
   }
-  
+
   // 3b- garbage collector for passive remove
   while (garbageCollector.size() > 0) {
 #ifdef DEBUG_GAMELOOP
@@ -306,182 +306,17 @@ bool GameLoop::isLate(double currentTime) const
   return false;
 }
 
-#ifdef BENCHMARKS
-#include "ios_fc.h"
-#endif
-
 void GameLoop::draw()
 {
-  SDL_Surface *screen = getSurface();
+  DrawContext *dc = getDrawContext();
 
   for (int i = 0; i < drawables.size(); ++i) {
     if (drawables[i] != NULL)
-        drawables[i]->doDraw(screen);
+        drawables[i]->doDraw(dc);
     else
         printf("INVALID DRAWABLE\n");
   }
-
-#ifdef BENCHMARKS
-  extern SoFont *DBG_FONT;
-  static double nFrames = 0.0;
-  static double t0 = 0.0;
-  static char fps[] = "FPS: .....   ";
-  static double minFPS = 100000.0;
-  static double t1 = 0.0;
-
-  double t2 = ios_fc::getTimeMs();
-  double curFPS = 1000.0 / (t2 - t1);
-  if (curFPS < minFPS) minFPS = curFPS;
-  t1 = t2;
-
-  if (nFrames > 60.0) {
-      sprintf(fps, "FPS: %3.1f >> %3.1f", (1000.0 * nFrames / (t2-t0)), minFPS);
-      t0 = t2;
-      nFrames = 0.0;
-      minFPS = 1000000.0;
-  }
-
-  nFrames += 1.0;
-  if (DBG_FONT != NULL)
-        SoFont_PutString (DBG_FONT, getSurface(), 16, 16, fps, NULL);
-#endif
-
-  if (opengl_mode) {
-#ifdef HAVE_OPENGL
-      static GLuint texture = 0;
-      GLenum texture_format;
-      GLint  nOfColors;
-      static int texture_mode = 0;
-
-      if (texture_mode == 0) {
-          char *ext = (char *)glGetString(GL_EXTENSIONS);
-          printf("%s\n", ext);
-          if (strstr(ext, "EXT_texture_rectangle")) {
-              printf("Using EXT_texture_rectangle\n");
-              texture_mode = 2;
-          }
-          else if (strstr(ext, "NV_texture_rectangle")) {
-              texture_mode = 2; 
-              printf("Using NV_texture_rectangle\n");
-          }
-          else if (strstr(ext, "ARB_texture_non_power_of_two")) {
-              texture_mode = 1;
-              printf("Using ARB_texture_non_power_of_two\n");
-          }
-      }
-
-      if (texture_mode == 0) {
-          printf("OpenGL mode unsupported\n");
-          SDL_Quit();
-      }
-
-      // get the number of channels in the SDL surface
-      nOfColors = surface->format->BytesPerPixel;
-      if (nOfColors == 4)     // contains an alpha channel
-      {
-          texture_format = GL_RGBA;
-      } else if (nOfColors == 3)     // no alpha channel
-      {
-        texture_format = GL_RGB;
-      } else {
-          printf("warning: the image is not truecolor..  this will probably break\n");
-          // this error should not go unhandled
-      }
-
-      // Have OpenGL generate a texture object handle for us
-      if (texture == 0)
-          glGenTextures(1, &texture);
-
-      if (texture_mode == 2) {
-          // Bind the texture object
-          glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture);
-          // Set the texture's stretching properties
-          glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          // Edit the texture object's image data using the information SDL_Surface gives us
-          glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, nOfColors, surface->w, surface->h, 0,
-                  texture_format, GL_UNSIGNED_BYTE, surface->pixels);
-          glEnable(GL_TEXTURE_RECTANGLE_ARB);
-      }
-      if (texture_mode == 1) {
-          // Bind the texture object
-          glBindTexture(GL_TEXTURE_2D, texture);
-          // Set the texture's stretching properties
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-          // Edit the texture object's image data using the information SDL_Surface gives us
-          glTexImage2D(GL_TEXTURE_2D, 0, nOfColors, surface->w, surface->h, 0,
-                  texture_format, GL_UNSIGNED_BYTE, surface->pixels);
-          glEnable(GL_TEXTURE_2D);
-      }
-
-      glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
-      glViewport(0, 0, display->w, display->h);
-      glMatrixMode( GL_PROJECTION );
-      glLoadIdentity();
-      glOrtho(0.0f, display->w, display->h, 0.0f, -1.0f, 1.0f);
-      glMatrixMode( GL_MODELVIEW );
-      glLoadIdentity();
-      glClear(GL_COLOR_BUFFER_BIT);
-
-      glDisable(GL_DEPTH_TEST);
-
-      // Max texture coordinate
-      int tx = 1;
-      int ty = 1;
-      if (texture_mode == 2) {
-          // TEXTURE_RECTANGLE does not have normalized coordinates
-          tx = 640;
-          ty = 480;
-      }
-
-      // Scale the image without changing the 1.33 aspect ratio
-      float ratio = (float)display->w / (float)display->h;
-      int dx = 0;
-      int dy = 0;
-      int sx = 640;
-      int sy = 480;
-
-      if (ratio > 4.0 / 3.0) {
-          // Window is too large, scale verticaly
-          sx = display->h * 4 / 3;
-          sy = display->h;
-          dx = (display->w - sx) / 2;
-          dy = 0;
-      }
-      else {
-          // Window is too tall, scale horizontaly
-          sx = display->w;
-          sy = display->w * 3 / 4;
-          dx = 0;
-          dy = (display->h - sy) / 2;
-      }
-
-      // Draw the quad on screen
-      glBegin(GL_QUADS);
-      glTexCoord2i(0, 0);
-      glVertex3i(dx, dy, 0);
-      glTexCoord2i(tx, 0);
-      glVertex3i(dx + sx, dy, 0);
-      glTexCoord2i(tx, ty);
-      glVertex3i(dx + sx, dy + sy, 0);
-      glTexCoord2i(0, ty);
-      glVertex3i(dx, dy + sy, 0);
-      glEnd();
-
-      SDL_GL_SwapBuffers();
-#endif
-  }
-  else if (display != NULL) {
-      SDL_Rect r;
-      r.x = (display->w - 640) / 2;
-      r.y = (display->h - 480) / 2;
-      SDL_BlitSurface(screen, NULL, display, &r);
-      SDL_Flip(display);
-  }
-  else {
-      SDL_Flip(screen);
-  }
+  m_dc->flip();
 }
 
 bool GameLoop::moveToFront(DrawableComponent *gc)

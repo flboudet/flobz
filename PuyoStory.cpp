@@ -5,7 +5,7 @@
 
 extern SoFont *storyFont;
 
-SDL_Surface *sstory;
+DrawTarget *sstory;
 
 /* Implementation of the Styrolyse Client */
 
@@ -47,7 +47,7 @@ class StyroImage
 {
     public:
         String path;
-        IIM_Surface *surface;
+        IosSurface *surface;
 
         StyroImage(const char *path) : path(path)
         {
@@ -55,21 +55,22 @@ class StyroImage
                 int state = 0;
                 int type = 0;
                 if (extract_state_and_type(path,&state,&type)==0){
-                    surface = getPuyoThemeManger()->getAnimatedPuyoSetTheme()->getAnimatedPuyoTheme((PuyoState)state)->getSurface((PuyoPictureType)state, 0);
+                    surface =  getPuyoThemeManger()->getAnimatedPuyoSetTheme()->getAnimatedPuyoTheme((PuyoState)state)->getSurface((PuyoPictureType)state, 0);
                 }
                 else{
                     surface = NULL;
                 }
             }
             else {
+                IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
                 String imgPath = theCommander->getDataPathManager().getPath(FilePath("gfx").combine(path));
-                surface = IIM_Load_Absolute_DisplayFormatAlpha(imgPath);
+                surface = iimLib.load_Absolute_DisplayFormatAlpha(imgPath);
             }
         }
 
         ~StyroImage() {
             if (path[0] != '@')
-                IIM_Free(surface);
+                delete surface;
         }
 };
 
@@ -88,17 +89,17 @@ static void  drawImage (StyrolyseClient *_this, void *image, int x, int y,
                  int clipx, int clipy, int clipw, int cliph, int flipped)
 {
   StyroImage  *simg = (StyroImage*)image;
-  IIM_Surface *surf = simg->surface;
-  SDL_Rect  rect, cliprect;
+  IosSurface *surf = simg->surface;
+  IosRect  rect, cliprect;
   rect.x = x;
   rect.y = y;
   cliprect.x = clipx;
   cliprect.y = clipy;
   cliprect.w = clipw;
   cliprect.h = cliph;
-  SDL_SetClipRect(sstory, &cliprect);
-  if (!flipped) IIM_BlitSurface(surf, NULL, sstory, &rect);
-  else IIM_BlitFlippedSurface(surf, NULL, sstory, &rect);
+  sstory->setClipRect(&cliprect);
+  if (!flipped) sstory->renderCopy(surf, NULL, &rect);
+  else sstory->renderCopyFlipped(surf, NULL, &rect);
 }
 
 static void  freeImage (StyrolyseClient *_this, void *image)
@@ -108,7 +109,7 @@ static void  freeImage (StyrolyseClient *_this, void *image)
 
 static void putText (StyrolyseClient *_this, int x, int y, const char *text)
 {
-  SoFont_PutString (storyFont, sstory, x, y, text, NULL);
+  // TODO: Fix SoFont_PutString (storyFont, sstory, x, y, text, NULL);
 }
 
 static const char *getText(StyrolyseClient *_this, const char *text)
@@ -207,13 +208,12 @@ void StoryWidget::idle(double currentTime)
     }
 }
 
-void StoryWidget::draw(SDL_Surface *screen)
+void StoryWidget::draw(DrawTarget *dt)
 {
     if (hidden) return;
-    sstory = screen;
+    sstory = dt;
     styrolyse_draw(currentStory);
-    // SDL_BlitSurface(sstory, NULL, screen, NULL);
-    SDL_SetClipRect(screen, NULL);
+    dt->setClipRect(NULL);
 }
 
 void StoryWidget::setIntegerValue(String varName, int value)

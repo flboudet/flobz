@@ -29,8 +29,10 @@ void PlayerGameStatDisplay::draw() const
     char txt[4096];
     sprintf(txt, "%d", stat.points);
     // if (player == 0) {
+#ifdef DISABLED
     SDL_Surface *surface = gameui::GameUIDefaults::GAME_LOOP->getSurface();
     SoFont_CenteredString_XY(GameUIDefaults::FONT_FUNNY, surface, 300 + player * 40, 360 - player * 40, txt, NULL);
+#endif
     // }
 }
 

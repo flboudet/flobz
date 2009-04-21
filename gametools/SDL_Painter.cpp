@@ -3,12 +3,11 @@
 
 #undef DEBUG
 
-SDL_Surface *display;
 
-SDL_Painter::SDL_Painter(IIM_Surface *gameScreen, IIM_Surface *bg)
+SDL_Painter::SDL_Painter(DrawTarget *gameScreen, IosSurface *bg)
   : backGround(bg), gameScreen(gameScreen), nbElts(0), nbPrev(0) {}
 
-void SDL_Painter::requestDraw(IIM_Surface *surf, SDL_Rect *where)
+void SDL_Painter::requestDraw(IosSurface *surf, IosRect *where)
 {
 #ifdef DEBUG
   if (nbElts >= MAX_PAINT_ELTS) {
@@ -26,7 +25,7 @@ void SDL_Painter::requestDraw(IIM_Surface *surf, SDL_Rect *where)
   onScreenElts[nbElts++] = elt;
 }
 
-void SDL_Painter::requestDraw(IIM_Surface *surf, SDL_Rect *what, SDL_Rect *where)
+void SDL_Painter::requestDraw(IosSurface *surf, IosRect *what, IosRect *where)
 {
 #ifdef DEBUG
   if (nbElts >= MAX_PAINT_ELTS) {
@@ -43,14 +42,14 @@ void SDL_Painter::requestDraw(IIM_Surface *surf, SDL_Rect *what, SDL_Rect *where
 
 static inline bool isEqual(DrawElt &d1, DrawElt &d2)
 {
-  return (d1.surf == d2.surf)   
+  return (d1.surf == d2.surf)
     && (d1.rect.x == d2.rect.x)
     && (d1.rect.y == d2.rect.y)
     && (d1.rect.w == d2.rect.w)
     && (d1.rect.h == d2.rect.h);
 }
 
-static inline bool isEqual(const SDL_Rect &r1, const SDL_Rect &r2)
+static inline bool isEqual(const IosRect &r1, const IosRect &r2)
 {
   return (r1.x == r2.x)
     && (r1.y == r2.y)
@@ -58,13 +57,13 @@ static inline bool isEqual(const SDL_Rect &r1, const SDL_Rect &r2)
     && (r1.h == r2.h);
 }
 
-static inline bool isInside(const SDL_Rect &r1, const SDL_Rect &r2)
+static inline bool isInside(const IosRect &r1, const IosRect &r2)
 {
   return (r1.x >= r2.x) && (r1.x + r1.w <= r2.x + r2.w)
       && (r1.y >= r2.y) && (r1.y + r1.h <= r2.y + r2.h);
 }
 
-static inline int addRectToList(SDL_Rect rectList[MAX_PAINT_ELTS], int nbRect, const SDL_Rect &rect)
+static inline int addRectToList(IosRect rectList[MAX_PAINT_ELTS], int nbRect, const IosRect &rect)
 {
   if ((rect.w <= 0) || (rect.h <= 0)) return nbRect;
   for (int r=0; r<nbRect; ++r)
@@ -81,13 +80,13 @@ static inline int addRectToList(SDL_Rect rectList[MAX_PAINT_ELTS], int nbRect, c
     // voisin horizontal
     if ((rect.y == rectList[r].y) && (rect.h == rectList[r].h)) {
       if ((rect.x >= rectList[r].x) && (rect.x <= rectList[r].x + rectList[r].w)) {
-        SDL_Rect newRect = rectList[r];
+        IosRect newRect = rectList[r];
         newRect.w = rect.w + rect.x - rectList[r].x;
         rectList[r] = rectList[nbRect-1];
         return addRectToList(rectList, nbRect-1, newRect);
       }
       if ((rectList[r].x >= rect.x) && (rectList[r].x <= rect.x + rect.w)) {
-        SDL_Rect newRect = rect;
+        IosRect newRect = rect;
         newRect.w = rectList[r].w + rectList[r].x - rect.x;
         rectList[r] = rectList[nbRect-1];
         return addRectToList(rectList, nbRect-1, newRect);
@@ -96,13 +95,13 @@ static inline int addRectToList(SDL_Rect rectList[MAX_PAINT_ELTS], int nbRect, c
     // voisin vertical
     if ((rect.x == rectList[r].x) && (rect.w == rectList[r].w)) {
       if ((rect.y >= rectList[r].y) && (rect.y <= rectList[r].y + rectList[r].h)) {
-        SDL_Rect newRect = rectList[r];
+        IosRect newRect = rectList[r];
         newRect.h = rect.h + rect.y - rectList[r].y;
         rectList[r] = rectList[nbRect-1];
         return addRectToList(rectList, nbRect-1, newRect);
       }
       if ((rectList[r].y >= rect.y) && (rectList[r].y <= rect.y + rect.h)) {
-        SDL_Rect newRect = rect;
+        IosRect newRect = rect;
         newRect.h = rectList[r].h + rectList[r].y - rect.y;
         rectList[r] = rectList[nbRect-1];
         return addRectToList(rectList, nbRect-1, newRect);
@@ -113,9 +112,9 @@ static inline int addRectToList(SDL_Rect rectList[MAX_PAINT_ELTS], int nbRect, c
   return nbRect + 1;
 }
 
-void SDL_Painter::draw(SDL_Surface *surf)
+void SDL_Painter::draw(DrawTarget *dt)
 {
-  SDL_Rect rectToUpdate[MAX_PAINT_ELTS]; // liste des zones a reafficher.
+  IosRect rectToUpdate[MAX_PAINT_ELTS]; // liste des zones a reafficher.
   int nbRects = 0;
 
   bool findMatchPrev[MAX_PAINT_ELTS];
@@ -149,21 +148,20 @@ void SDL_Painter::draw(SDL_Surface *surf)
   //  (note: j'assume que SDL fait ca aussi bien que nous)
 #ifdef DEBUG
 
-  SDL_SetClipRect(surf, NULL);
-  SDL_BlitSurface(backGround->surf, NULL, surf, NULL);
+  dt->setClipRect(NULL);
+  dt->renderCopy(backGround, NULL, NULL);
 
   // Draw everything.
   for (int i=0; i<nbElts; ++i) {
-    SDL_Rect copy = onScreenElts[i].rect;
-    SDL_BlitSurface(onScreenElts[i].surf->surf, NULL,
-        surf, &copy);
+    IosRect copy = onScreenElts[i].rect;
+    dt->renderCopy(onScreenElts[i].surf, NULL, &copy);
   }
 
   for (int r=0; r<nbRects; ++r) {
-    SDL_Rect over1 = rectToUpdate[r];
-    SDL_Rect over2 = over1;
-    SDL_Rect over3 = over2;
-    SDL_Rect over4 = over3;
+    IosRect over1 = rectToUpdate[r];
+    IosRect over2 = over1;
+    IosRect over3 = over2;
+    IosRect over4 = over3;
     over1.h = 1;
     over2.w = 1;
     over3.y += over3.h;
@@ -174,28 +172,27 @@ void SDL_Painter::draw(SDL_Surface *surf)
     SDL_FillRect(surf,&over2,0xffffffff);
     SDL_FillRect(surf,&over3,0xffffffff);
     SDL_FillRect(surf,&over4,0xffffffff);
-  }    
+  }
 
 #else
 
   for (int r=0; r<nbRects; ++r) {
-    SDL_SetClipRect(surf, &rectToUpdate[r]);
-    SDL_BlitSurface(backGround->surf, &rectToUpdate[r], surf, &rectToUpdate[r]);
+    dt->setClipRect(&rectToUpdate[r]);
+    dt->renderCopy(backGround, &rectToUpdate[r], &rectToUpdate[r]);
     for (int i=0; i<nbElts; ++i) {
       // Afficher ces elements.
-      SDL_Rect rect = onScreenElts[i].rect;
-      SDL_Rect what = onScreenElts[i].what;
-      SDL_BlitSurface(onScreenElts[i].surf->surf, &what,
-                      surf, &rect);
+      IosRect rect = onScreenElts[i].rect;
+      IosRect what = onScreenElts[i].what;
+      dt->renderCopy(onScreenElts[i].surf, &what, &rect);
     }
   }
 #endif
 
   // Draw what is necessary...
-  storeScreenContent(surf);
+  storeScreenContent(dt);
 }
 
-void SDL_Painter::storeScreenContent(SDL_Surface *surf)
+void SDL_Painter::storeScreenContent(DrawTarget *dt)
 {
   /*if (surf != display) {
     SDL_SetClipRect(display,NULL);
@@ -209,17 +206,16 @@ void SDL_Painter::storeScreenContent(SDL_Surface *surf)
   nbElts = 0;
 }
 
-void SDL_Painter::redrawAll(SDL_Surface *surf)
+void SDL_Painter::redrawAll(DrawTarget *dt)
 {
-  SDL_SetClipRect(surf, NULL);
+  dt->setClipRect(NULL);
 
   // Draw everything.
-  SDL_BlitSurface(backGround->surf, NULL, surf, NULL);
+  dt->renderCopy(backGround, NULL, NULL);
   for (int i=0; i<nbElts; ++i) {
-    SDL_BlitSurface(onScreenElts[i].surf->surf, NULL,
-        surf, &onScreenElts[i].rect);
+    dt->renderCopy(onScreenElts[i].surf, NULL, &onScreenElts[i].rect);
   }
 
   // Remember what is on screen...
-  storeScreenContent(surf);
-} 
+  storeScreenContent(dt);
+}

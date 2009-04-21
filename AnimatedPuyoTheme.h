@@ -22,11 +22,11 @@
  *
  *
  */
- 
+
  #ifndef _ANIMATEDPUYOTHEME_H
  #define _ANIMATEDPUYOTHEME_H
 
-#include "gametools/IosImgProcess.h"
+#include "gametools/drawcontext.h"
 #include "iosfc/ios_memory.h"
 #include "iosfc/ios_vector.h"
 #include "PuyoGame.h"
@@ -58,14 +58,14 @@ typedef enum {
 class AnimatedPuyoTheme {
 public:
     virtual ~AnimatedPuyoTheme() {}
-    virtual IIM_Surface *getSurface(PuyoPictureType picture, int index) = 0;
-    virtual IIM_Surface *getShrunkSurface(PuyoPictureType picture, int index, int compression) = 0;
-    virtual IIM_Surface *getPuyoSurfaceForValence(int valence, int compression = 0) = 0;
-    virtual IIM_Surface *getEyeSurfaceForIndex(int index, int compression = 0) = 0;
-    virtual IIM_Surface *getCircleSurfaceForIndex(int index, int compression = 0) = 0;
-    virtual IIM_Surface *getShadowSurface(int compression = 0) = 0;
-    virtual IIM_Surface *getShrinkingSurfaceForIndex(int index, int compression = 0) = 0;
-    virtual IIM_Surface *getExplodingSurfaceForIndex(int index, int compression = 0) = 0;
+    virtual IosSurface *getSurface(PuyoPictureType picture, int index) = 0;
+    virtual IosSurface *getShrunkSurface(PuyoPictureType picture, int index, int compression) = 0;
+    virtual IosSurface *getPuyoSurfaceForValence(int valence, int compression = 0) = 0;
+    virtual IosSurface *getEyeSurfaceForIndex(int index, int compression = 0) = 0;
+    virtual IosSurface *getCircleSurfaceForIndex(int index, int compression = 0) = 0;
+    virtual IosSurface *getShadowSurface(int compression = 0) = 0;
+    virtual IosSurface *getShrinkingSurfaceForIndex(int index, int compression = 0) = 0;
+    virtual IosSurface *getExplodingSurfaceForIndex(int index, int compression = 0) = 0;
 };
 
 class StandardAnimatedPuyoTheme : public AnimatedPuyoTheme {
@@ -73,15 +73,15 @@ class StandardAnimatedPuyoTheme : public AnimatedPuyoTheme {
 public:
     StandardAnimatedPuyoTheme(const String path, const char * face, const char * disappear, const char * explosions, const char * eyes, const float color_offset);
     ~StandardAnimatedPuyoTheme(void);
-    
-    IIM_Surface *getSurface(PuyoPictureType picture, int index);
-    IIM_Surface *getShrunkSurface(PuyoPictureType picture, int index, int compression);
-    IIM_Surface *getPuyoSurfaceForValence(int valence, int compression = 0);
-    IIM_Surface *getEyeSurfaceForIndex(int index, int compression = 0) { return getShrunkSurface(PUYO_EYES,index,compression); };
-    IIM_Surface *getCircleSurfaceForIndex(int index, int compression = 0) { return getShrunkSurface(PUYO_CIRCLES,index,compression); };
-    IIM_Surface *getShadowSurface(int compression = 0) { return getShrunkSurface(PUYO_SHADOWS,0,compression); };
-    IIM_Surface *getShrinkingSurfaceForIndex(int index, int compression = 0) { return getShrunkSurface(PUYO_DISAPPEAR,index,compression); };
-    IIM_Surface *getExplodingSurfaceForIndex(int index, int compression = 0) { return getShrunkSurface(PUYO_EXPLOSIONS,index,compression); };
+
+    IosSurface *getSurface(PuyoPictureType picture, int index);
+    IosSurface *getShrunkSurface(PuyoPictureType picture, int index, int compression);
+    IosSurface *getPuyoSurfaceForValence(int valence, int compression = 0);
+    IosSurface *getEyeSurfaceForIndex(int index, int compression = 0) { return getShrunkSurface(PUYO_EYES,index,compression); };
+    IosSurface *getCircleSurfaceForIndex(int index, int compression = 0) { return getShrunkSurface(PUYO_CIRCLES,index,compression); };
+    IosSurface *getShadowSurface(int compression = 0) { return getShrunkSurface(PUYO_SHADOWS,0,compression); };
+    IosSurface *getShrinkingSurfaceForIndex(int index, int compression = 0) { return getShrunkSurface(PUYO_DISAPPEAR,index,compression); };
+    IosSurface *getExplodingSurfaceForIndex(int index, int compression = 0) { return getShrunkSurface(PUYO_EXPLOSIONS,index,compression); };
 
     bool validate(void);
     bool cache(void);
@@ -89,20 +89,20 @@ public:
 
 private:
     PuyoPictureType _type;
-        
+
     String _path;
     char * _face;
     char * _disappear;
     char * _explosions;
     char * _eyes;
     float _color_offset;
-    
-    IIM_Surface * _puyoFaces[NUMBER_OF_PUYO_FACES][MAX_COMPRESSED];
-    IIM_Surface * _puyoCircles[NUMBER_OF_PUYO_CIRCLES][MAX_COMPRESSED];
-    IIM_Surface * _puyoShadow[MAX_COMPRESSED];
-    IIM_Surface * _puyoExplosion[NUMBER_OF_PUYO_EXPLOSIONS][MAX_COMPRESSED];
-    IIM_Surface * _puyoDisappear[NUMBER_OF_PUYO_DISAPPEAR][MAX_COMPRESSED];
-    IIM_Surface * _puyoEyes[NUMBER_OF_PUYO_EYES][MAX_COMPRESSED];
+
+    IosSurface * _puyoFaces[NUMBER_OF_PUYO_FACES][MAX_COMPRESSED];
+    IosSurface * _puyoCircles[NUMBER_OF_PUYO_CIRCLES][MAX_COMPRESSED];
+    IosSurface * _puyoShadow[MAX_COMPRESSED];
+    IosSurface * _puyoExplosion[NUMBER_OF_PUYO_EXPLOSIONS][MAX_COMPRESSED];
+    IosSurface * _puyoDisappear[NUMBER_OF_PUYO_DISAPPEAR][MAX_COMPRESSED];
+    IosSurface * _puyoEyes[NUMBER_OF_PUYO_EYES][MAX_COMPRESSED];
 
     bool _cached;
 };
@@ -111,44 +111,44 @@ class NeutralAnimatedPuyoTheme : public AnimatedPuyoTheme {
 public:
     NeutralAnimatedPuyoTheme(const String path, const char * face);
     ~NeutralAnimatedPuyoTheme(void);
-    IIM_Surface *getSurface(PuyoPictureType picture, int index);
-    IIM_Surface *getShrunkSurface(PuyoPictureType picture, int index, int compression) { return getSurface(picture, index);}
-    IIM_Surface *getPuyoSurfaceForValence(int valence, int compression = 0);
-    IIM_Surface *getEyeSurfaceForIndex(int index, int compression = 0) { return NULL; }
-    IIM_Surface *getCircleSurfaceForIndex(int index, int compression = 0) { return NULL; }
-    IIM_Surface *getShadowSurface(int compression = 0) { return NULL; }
-    IIM_Surface *getShrinkingSurfaceForIndex(int index, int compression = 0) { return NULL; }
-    IIM_Surface *getExplodingSurfaceForIndex(int index, int compression = 0);
+    IosSurface *getSurface(PuyoPictureType picture, int index);
+    IosSurface *getShrunkSurface(PuyoPictureType picture, int index, int compression) { return getSurface(picture, index);}
+    IosSurface *getPuyoSurfaceForValence(int valence, int compression = 0);
+    IosSurface *getEyeSurfaceForIndex(int index, int compression = 0) { return NULL; }
+    IosSurface *getCircleSurfaceForIndex(int index, int compression = 0) { return NULL; }
+    IosSurface *getShadowSurface(int compression = 0) { return NULL; }
+    IosSurface *getShrinkingSurfaceForIndex(int index, int compression = 0) { return NULL; }
+    IosSurface *getExplodingSurfaceForIndex(int index, int compression = 0);
     bool cache(void);
     void releaseCached(void);
 private:
     String imageFullPath;
     String imageDefaultPath;
     String faceName;
-    IIM_Surface * _puyoNeutral;
-    IIM_Surface * _puyoNeutralPop[3];
+    IosSurface * _puyoNeutral;
+    IosSurface * _puyoNeutralPop[3];
     bool _cached;
 };
 
 // Class containing the theme for a puyo set
 
 class AnimatedPuyoSetTheme {
-  
+
 public:
     AnimatedPuyoSetTheme(const String path, const String name, const String lname);
     ~AnimatedPuyoSetTheme(void);
-    
+
     const String getName(void);
     const String getLocalizedName(void);
     const String getAuthor(void);
     const String getComments(void);
-    
+
     bool addAnimatedPuyoTheme(const String face, const char * disappear, const char * explosions, const char * eyes, const float color_offset);
     bool addNeutralPuyo(const String face, const char * disappear, const char * explosions, const char * eyes, const float color_offset);
     void addInfo(const String author, const String comments);
-    
+
     AnimatedPuyoTheme * getAnimatedPuyoTheme(PuyoState state);
-    
+
     bool validate(void);
     bool cache(void);
     void releaseCached(void);
@@ -157,7 +157,7 @@ private:
     String _path;
     String _name;
     String _lname;
-  
+
     String _author;
     String _comments;
 
@@ -171,11 +171,11 @@ private:
 // Class containing the theme for a level
 
 class PuyoLevelTheme {
-    
+
 public:
     PuyoLevelTheme(const String path, const String name, const String lname);
     ~PuyoLevelTheme(void);
-    
+
     const String getName(void);
     const String getLocalizedName(void);
     const String getAuthor(void);
@@ -195,55 +195,55 @@ public:
         _animation_2p = animation_2p;
     }
     void setForegroundAnimation(String foregroundAnimation) { _foreground_animation = foregroundAnimation; }
-    
-    IIM_Surface * getLifeForIndex(int index);
-    IIM_Surface * getBackground(void);
-    IIM_Surface * getGrid(void);
-    IIM_Surface * getSpeedMeter(bool front);
-    
-    IIM_Surface * getNeutralIndicator();
-    IIM_Surface * getBigNeutralIndicator();
-    IIM_Surface * getGiantNeutralIndicator();
-    
+
+    IosSurface * getLifeForIndex(int index);
+    IosSurface * getBackground(void);
+    IosSurface * getGrid(void);
+    IosSurface * getSpeedMeter(bool front);
+
+    IosSurface * getNeutralIndicator();
+    IosSurface * getBigNeutralIndicator();
+    IosSurface * getGiantNeutralIndicator();
+
     int getSpeedMeterX() const { return _speedMeterX; }
     int getSpeedMeterY() const { return _speedMeterY; }
-    
+
     const String getGameLostLeftAnimation2P() const { return _gamelost_left_2p; }
     const String getGameLostRightAnimation2P() const { return _gamelost_right_2p; }
     const String getCentralAnimation2P() const { return _animation_2p; }
     const String getForegroundAnimation() const { return _foreground_animation; }
-private:    
+private:
     String _path;
     String _name;
     String _lname;
-   
+
     String _author;
     String _comments;
-    
+
     char * _lives;
     char * _background;
     char * _grid;
     char * _speed_meter;
     char * _neutral_indicator;
-    
+
     String _gamelost_left_2p;
     String _gamelost_right_2p;
     String _animation_2p;
     String _foreground_animation;
-    
-    IIM_Surface * _levelLives[NUMBER_OF_LIVES];
-    IIM_Surface * _levelBackground;
-    IIM_Surface * _levelGrid;
-    IIM_Surface * _levelMeter[2];
-    
-    IIM_Surface * _neutralIndicator;
-    IIM_Surface * _bigNeutralIndicator;
-    IIM_Surface * _giantNeutralIndicator;
-    
+
+    IosSurface * _levelLives[NUMBER_OF_LIVES];
+    IosSurface * _levelBackground;
+    IosSurface * _levelGrid;
+    IosSurface * _levelMeter[2];
+
+    IosSurface * _neutralIndicator;
+    IosSurface * _bigNeutralIndicator;
+    IosSurface * _giantNeutralIndicator;
+
     int _speedMeterX, _speedMeterY;
-    
+
     bool _cached;
-    
+
     bool validate(void);
     bool cache(void);
     void releaseCached(void);
@@ -257,26 +257,26 @@ class AnimatedPuyoThemeManager {
 public:
     AnimatedPuyoThemeManager(bool useAltLocation);
     ~AnimatedPuyoThemeManager(void);
-    
+
     AnimatedPuyoSetTheme * getAnimatedPuyoSetTheme(const String);
     AnimatedPuyoSetTheme * getAnimatedPuyoSetTheme(void);
     String getPreferedAnimatedPuyoSetThemeName(void);
     void setPreferedAnimatedPuyoSetTheme(const String);
-    
+
     PuyoLevelTheme * getPuyoLevelTheme(const String);
     PuyoLevelTheme * getPuyoLevelTheme(void);
     String getPreferedPuyoLevelThemeName(void);
     void setPreferedPuyoLevelTheme(const String);
-    
+
     AdvancedBuffer<const char *> * getAnimatedPuyoSetThemeList(void);
     AdvancedBuffer<const char *> * getPuyoLevelThemeList(void);
-    
+
     AdvancedBuffer<AnimatedPuyoSetTheme *> * getAnimatedPuyoSetThemeObjectList(void);
     AdvancedBuffer<PuyoLevelTheme *> * getPuyoLevelThemeObjectList(void);
 
     void addPuyoSet(AnimatedPuyoSetTheme *);
     void addLevel(PuyoLevelTheme *);
-    
+
 private:
     void getThemeListInPath(const char *path, SelfVector<String> &resultVector) const;
     AdvancedBuffer<const char *> themeList;

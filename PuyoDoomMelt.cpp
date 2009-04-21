@@ -44,7 +44,7 @@ typedef struct column {
 /* Private methods */
 
 static void _init_columns (DoomMelt *_this);
-static void _column_draw  (column_t *column, SDL_Surface *meltImage, SDL_Surface *screen);
+static void _column_draw  (column_t *column, IosSurface *meltImage, DrawTarget *screen);
 static void _column_think (column_t *column, int *isFinished);
 
 
@@ -52,7 +52,7 @@ static void _column_think (column_t *column, int *isFinished);
 
 struct _DoomMelt {
   column_t     columns[NUM_COLS];
-  IIM_Surface *surf;
+  IosSurface *surf;
   int          isFinished;
 };
 
@@ -70,7 +70,7 @@ void doom_melt_delete (DoomMelt *_this)
   free(_this);
 }
 
-void doom_melt_start (DoomMelt *_this, IIM_Surface *surf)
+void doom_melt_start (DoomMelt *_this, IosSurface *surf)
 {
   _this->surf       = surf;
   _this->isFinished = 0;
@@ -88,13 +88,13 @@ void doom_melt_update (DoomMelt *_this)
   }
 }
 
-void doom_melt_display(DoomMelt *_this, SDL_Surface *display)
+void doom_melt_display(DoomMelt *_this, DrawTarget *display)
 {
   if (!_this->isFinished)
   {
     int i = 0;
     for (; i < NUM_COLS; i++)
-    _column_draw(&_this->columns[i], _this->surf->surf, display);
+    _column_draw(&_this->columns[i], _this->surf, display);
   }
 }
 
@@ -129,10 +129,10 @@ void _init_columns (DoomMelt *_this)
     }
 }
 
-void _column_draw (column_t *column, SDL_Surface *meltImage, SDL_Surface *display)
+void _column_draw (column_t *column, IosSurface *meltImage, DrawTarget *display)
 {
-    static SDL_Rect image_rect = {0, 0, COL_WIDTH, };
-    static SDL_Rect dest_rect =  {0, 0, COL_WIDTH, SCREEN_HEIGHT};
+    static IosRect image_rect = {0, 0, COL_WIDTH, };
+    static IosRect dest_rect =  {0, 0, COL_WIDTH, SCREEN_HEIGHT};
 
     int tmp = column->y;
     if (tmp < 0)
@@ -144,7 +144,7 @@ void _column_draw (column_t *column, SDL_Surface *meltImage, SDL_Surface *displa
     image_rect.x = column->x;
     image_rect.h = meltImage->h - tmp;
 
-    SDL_BlitSurface(meltImage, &image_rect, display, &dest_rect);
+    display->renderCopy(meltImage, &image_rect, &dest_rect);
 }
 
 void _column_think (column_t *column, int *isFinished)

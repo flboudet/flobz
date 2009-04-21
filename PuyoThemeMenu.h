@@ -43,9 +43,9 @@ class PuyoThemePicturePreview : public Widget, public IdleComponent {
         void themeSelected(AnimatedPuyoSetTheme * theme);
 
     protected:
-      void draw(SDL_Surface *screen);
+      void draw(DrawTarget *dt);
       SoFont *font;
-      
+
     private:
       String label;
       AnimatedPuyoSetTheme * curTheme;
@@ -59,7 +59,7 @@ class PuyoThemePreview : public VBox {
     public:
         PuyoThemePreview();
         virtual ~PuyoThemePreview();
-        
+
         void build();
         void themeSelected(String themeName);
 

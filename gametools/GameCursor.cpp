@@ -5,7 +5,8 @@ using namespace gameui;
 
 GameCursor::GameCursor(const char *cursorImage) : CycledComponent(0.01), idleDx(0), idleDy(0), visible(true), obscured(true)
 {
-    cursorSurface = IIM_Load_Absolute_DisplayFormatAlpha (cursorImage);
+    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
+    cursorSurface = iimLib.load_Absolute_DisplayFormatAlpha(cursorImage);
     blitX = 0;
     blitY = 0;
     prevblitX = 0;
@@ -15,10 +16,10 @@ GameCursor::GameCursor(const char *cursorImage) : CycledComponent(0.01), idleDx(
 
 GameCursor::~GameCursor()
 {
-    IIM_Free(cursorSurface);
+    delete cursorSurface;
 }
 
-void GameCursor::draw(SDL_Surface *screen)
+void GameCursor::draw(DrawTarget *dt)
 {
     if ((obscured) || (!visible))
         return;
@@ -26,15 +27,9 @@ void GameCursor::draw(SDL_Surface *screen)
         return;
     float angle = (-blitAngle) + 90;
     float anglerad = angle * M_PI / 180.0;
-    //float vy = -1.0;
-    //float vx = 0.0;
-    //float nvx =  sin(anglerad) * vy;
-    //float nvy =  cos(anglerad) * vy;
-    //nvx = (nvx * 0.5) * cursorSurface->w;
-    //nvy = (nvy * 0.5) * cursorSurface->h;
     float nvx = (-sin(anglerad) * 0.5) * cursorSurface->w;
     float nvy = (-cos(anglerad) * 0.5) * cursorSurface->h;
-    IIM_BlitRotatedSurfaceCentered(cursorSurface, (int)angle, screen, (int)(blitX - nvx), (int)(blitY - nvy));
+    dt->renderRotatedCentered(cursorSurface, (int)angle, (int)(blitX - nvx), (int)(blitY - nvy));
 }
 
 void GameCursor::onEvent(GameControlEvent *event)
@@ -76,18 +71,20 @@ void GameCursor::cycle()
 void GameCursor::setCursorPosition(int x, int y)
 {
     obscured = false;
-    
+
     if (x < 0) x = 0;
     if (y < 0) y = 0;
-    if (x > this->DrawableComponent::parentLoop->getSurface()->w) x = this->DrawableComponent::parentLoop->getSurface()->w;
-    if (y > this->DrawableComponent::parentLoop->getSurface()->h) y = this->DrawableComponent::parentLoop->getSurface()->h;
+    if (x > this->DrawableComponent::parentLoop->getDrawContext()->getWidth())
+        x = this->DrawableComponent::parentLoop->getDrawContext()->getWidth();
+    if (y > this->DrawableComponent::parentLoop->getDrawContext()->getHeight())
+        y = this->DrawableComponent::parentLoop->getDrawContext()->getHeight();
     // Push an SDL user event corresponding to the moving of our game cursor
     SDL_Event moveEvent;
     moveEvent.type = SDL_USEREVENT;
     moveEvent.user.code = GameCursor::MOVE;
     moveEvent.user.data1 = new CursorEventArg(x, y);
     SDL_PushEvent(&moveEvent);
-    
+
     blitX = x;
     blitY = y;
     int dx = prevblitX - blitX;

@@ -22,7 +22,7 @@
  *
  *
  */
- 
+
 #include "AnimatedPuyo.h"
 #include "PuyoView.h"
 #include "AnimatedPuyoTheme.h"
@@ -124,23 +124,23 @@ void AnimatedPuyo::render()
 void AnimatedPuyo::renderAt(int X, int Y)
 {
     SDL_Painter &painter = attachedView->getPainter();
-    
+
     if (attachedView == NULL)
         return;
     if (!visibilityFlag)
         return;
     PuyoGame *attachedGame = attachedView->getAttachedGame();
-    
-    SDL_Rect drect;
 
-    IIM_Surface *currentSurface;
-    
+    IosRect drect;
+
+    IosSurface *currentSurface;
+
     currentSurface = attachedTheme->getPuyoSurfaceForValence(attachedView->getValenceForPuyo(this), m_currentCompressedState);
     if (currentSurface != NULL) {
         drect.x = X;
         drect.y = Y;
         drect.w = currentSurface->w;
-        drect.h = currentSurface->h;            
+        drect.h = currentSurface->h;
 
         painter.requestDraw(currentSurface, &drect);
 
@@ -148,7 +148,7 @@ void AnimatedPuyo::renderAt(int X, int Y)
         /* TODO: Investigate why, during network game, the falling puyo starts by being neutral */
         if ((this == attachedGame->getFallingPuyo()) && (getPuyoState() != PUYO_NEUTRAL))
             painter.requestDraw(attachedTheme->getCircleSurfaceForIndex((smallTicksCount >> 2) & 0x1F, m_currentCompressedState), &drect);
-        
+
         /* Eye management */
         if (getPuyoState() != PUYO_NEUTRAL) {
             int eyePhase = (puyoEyeState + SDL_GetTicks()) % 8192;
@@ -176,14 +176,14 @@ void AnimatedPuyo::renderShadow()
 void AnimatedPuyo::renderShadowAt(int X, int Y)
 {
     if (getPuyoState() != PUYO_NEUTRAL) {
-        IIM_Surface *currentSurface;
+        IosSurface *currentSurface;
         currentSurface = attachedTheme->getShadowSurface(m_currentCompressedState);
         if (currentSurface != NULL) {
-            SDL_Rect drect;
+            IosRect drect;
             SDL_Painter &painter = attachedView->getPainter();
             drect.x = X;
             drect.y = Y;
-            
+
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;
             painter.requestDraw(currentSurface, &drect);

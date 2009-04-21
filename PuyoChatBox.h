@@ -61,7 +61,7 @@ private:
     ChatAction chatAction;
     Text chatInputLabel;
     FramedEditField chatInput;
-    IIM_Surface *chatInputFrameSurface;
+    IosSurface *chatInputFrameSurface;
     FramePicture chatInputFramePicture;
     Frame chatInputContainerFrame;
     HBox chatInputContainer;

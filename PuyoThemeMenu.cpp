@@ -33,15 +33,15 @@ PuyoThemeSelectionBox::PuyoThemeSelectionBox()
 {
     leftArrow = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/leftarrow.png"));
     rightArrow = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/rightarrow.png"));
-    
+
     prevButton = new Image(leftArrow);
     nextButton = new Image(rightArrow);
-    
+
     Spacer0.setPreferedSize(Vec3(15.0f, 0.0f));
     Spacer1.setPreferedSize(Vec3(0.0f, 0.0f));
     Spacer2.setPreferedSize(Vec3(0.0f, 0.0f));
     Spacer3.setPreferedSize(Vec3(15.0f, 0.0f));
-    
+
 //    setPreferedSize(Vec3(300.0f,200.0f));
 //    setSize(Vec3(300.0f,200.0f));
     setPolicy(USE_MAX_SIZE_NO_MARGIN);
@@ -70,13 +70,13 @@ void PuyoThemeSelectionBox::build()
             found = true;
         }
     }
-    add(&Spacer0);  
-    
+    add(&Spacer0);
+
     prevButton->setFocusable(size > 1);
     prevButton->setOnStartAction(this);
     prevButton->setInvertedFocus(true);
     add(prevButton);
-    
+
     add(&Spacer1);
     if (found == false && size > 0)
     {
@@ -85,12 +85,12 @@ void PuyoThemeSelectionBox::build()
     }
     add(&themePreview);
     add(&Spacer2);
-    
+
     nextButton->setFocusable(size > 1);
     nextButton->setOnStartAction(this);
     nextButton->setInvertedFocus(true);
     add(nextButton);
-    
+
     add(&Spacer3);
 }
 
@@ -100,7 +100,7 @@ void PuyoThemeSelectionBox::action(Widget *sender, int actionType, GameControlEv
     String pref = getPuyoThemeManger()->getPreferedAnimatedPuyoSetThemeName();
     int size = themes->size();
     if (size <= 0) return;
-    
+
     int currentTheme;
     // get the selected theme id or zero if the prefered theme if not there
     for (currentTheme = size-1; currentTheme > 0; --currentTheme)
@@ -142,11 +142,11 @@ static int imageForIndex(int i)
     else return 2*(NUMBER_OF_PUYO_EYES-1)-i;
 }
 
-void PuyoThemePicturePreview::draw(SDL_Surface *screen)
+void PuyoThemePicturePreview::draw(DrawTarget *dt)
 {
     if (curTheme != NULL)
     {
-      IIM_Rect r;
+      IosRect r;
       Vec3 size = getSize();
       r.x = (Sint16)(getPosition().x+(size.x-NUMBER_OF_PUYOS*ONEPUYO+(NUMBER_OF_PUYOS-1)*ONEPUYO/4.0)/2.0);
       r.y = (Sint16)(getPosition().y+(size.y-ONEPUYO)/2.0);
@@ -154,12 +154,12 @@ void PuyoThemePicturePreview::draw(SDL_Surface *screen)
       r.w = 0;
       for (int i=0; i<NUMBER_OF_PUYOS; i++)
       {
-        IIM_Rect rect = r;
+        IosRect rect = r;
         rect.x += (Sint16)((i*3*ONEPUYO)/4);
         AnimatedPuyoTheme * t = curTheme->getAnimatedPuyoTheme((PuyoState)(PUYO_BLUE+i));
-        IIM_BlitSurface(t->getSurface(PUYO_SHADOWS,0), NULL, screen, &rect);
-        IIM_BlitSurface(t->getSurface(PUYO_FACES,0), NULL, screen, &rect);
-        IIM_BlitSurface(t->getSurface(PUYO_EYES,imageForIndex(eyes[i])), NULL, screen, &rect);
+        dt->renderCopy(t->getSurface(PUYO_SHADOWS,0), NULL, &rect);
+        dt->renderCopy(t->getSurface(PUYO_FACES,0), NULL, &rect);
+        dt->renderCopy(t->getSurface(PUYO_EYES,imageForIndex(eyes[i])), NULL, &rect);
       }
     }
 }
@@ -185,7 +185,7 @@ void PuyoThemePicturePreview::idle(double currentTime)
             eyes[i]++;
             if (eyes[i] > 2*(NUMBER_OF_PUYO_EYES-1)) eyes[i] = 0;
         }
-        else 
+        else
         {
             if ((random() % 50) == 0)
             {

@@ -84,10 +84,10 @@ namespace gameui {
             parent->widgetMustRedraw(this);
     }
 
-    void Widget::doDraw(SDL_Surface *screen)
+    void Widget::doDraw(DrawTarget *dt)
     {
         if (_drawRequested) {
-            draw(screen);
+            draw(dt);
             _drawRequested = false;
         }
     }
@@ -206,11 +206,11 @@ namespace gameui {
         return n;
     }
 
-    void WidgetContainer::draw(SDL_Surface *surface)
+    void WidgetContainer::draw(DrawTarget *dt)
     {
 		int n = getNumberOfChilds();
         for (int i = 0; i < n; ++i) {
-            getChild(i)->doDraw(surface);
+            getChild(i)->doDraw(dt);
         }
     }
 
@@ -793,7 +793,8 @@ namespace gameui {
             rect.y = (Sint16)getPosition().y - (bg->h - getSize().y)/2;
             IIM_BlitSurface(bg, NULL, screen, &rect);
         }
-        ZBox::draw(screen);
+        // TODO: Fix
+        //ZBox::draw(screen);
     }
 
     void SliderContainer::transitionToContent(Widget *content)
@@ -1158,16 +1159,16 @@ namespace gameui {
         this->bg = bg;
     }
 
-    void Screen::draw(SDL_Surface *surface)
+    void Screen::draw(DrawTarget *dt)
     {
         if (!isVisible()) return;
-        rootContainer.doDraw(surface);
+        rootContainer.doDraw(dt);
     }
 
-    void Screen::drawAnyway(SDL_Surface *surface)
+    void Screen::drawAnyway(DrawTarget *dt)
     {
         rootContainer.requestDraw(true);
-        rootContainer.draw(surface);
+        rootContainer.draw(dt);
     }
 
     void Screen::onEvent(GameControlEvent *event)
@@ -1971,7 +1972,8 @@ namespace gameui {
         dstrect.w = scrollerBox.getSize().x;
         SDL_FillRect(screen, &dstrect, 0xFFFFFF00);
 
-        HBox::draw(screen);
+        // TODO: Fix
+        // HBox::draw(screen);
     }
 
     //

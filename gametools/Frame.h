@@ -16,15 +16,15 @@ namespace gameui {
 
 class FramePicture {
 public:
-    FramePicture(IIM_Surface *frameSurface, int leftW, int middleW, int rightW, int topH, int middleH, int bottomH);
+    FramePicture(IosSurface *frameSurface, int leftW, int middleW, int rightW, int topH, int middleH, int bottomH);
     FramePicture(int leftW, int middleW, int rightW, int topH, int middleH, int bottomH);
     virtual ~FramePicture() {}
-    void setFrameSurface(IIM_Surface *frameSurface);
+    void setFrameSurface(IosSurface *frameSurface);
     void setContentColor(RGBA contentColor) { m_contentColor = contentColor; }
-    void render(SDL_Surface *surf) const;
+    void render(DrawTarget *surf) const;
     int getMaxMargin() const;
 private:
-    IIM_Surface *m_frameSurface;
+    IosSurface *m_frameSurface;
     int m_leftW, m_middleW, m_rightW;
     int m_topH, m_middleH, m_bottomH;
     RGBA m_contentColor;
@@ -34,15 +34,15 @@ class Frame : public VBox {
 public:
     Frame(const FramePicture *frameSurface, GameLoop *loop = NULL);
     virtual ~Frame();
-    virtual void draw(SDL_Surface *screen);
+    virtual void draw(DrawTarget *dt);
     void setBorderVisible(bool borderVisible) { m_borderVisible = borderVisible; }
     bool getBorderVisible() const { return m_borderVisible; }
     void setFocusedPicture(const FramePicture *focusedSurface) { m_focusedSurface = focusedSurface; }
 private:
-    void cacheSurface(IIM_Surface * &cachedSurface, const FramePicture *framePicture);
+    void cacheSurface(IosSurface * &cachedSurface, const FramePicture *framePicture);
     const FramePicture *m_frameSurface;
     const FramePicture *m_focusedSurface;
-    IIM_Surface *m_bgSurface, *m_bgFocus;
+    IosSurface *m_bgSurface, *m_bgFocus;
     bool m_borderVisible;
 };
 

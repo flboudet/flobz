@@ -2,6 +2,7 @@
 #define _PUYO_MAIN_H_
 
 #include "PuyoCommander.h"
+#include "drawcontext.h"
 
 class PuyoMain
 {
@@ -14,6 +15,7 @@ private:
     void initSDL();
     void initDisplay(int w, int h, bool fullscreen, bool useGL);
 
+    DrawContext *m_drawContext;
     GameLoop   *loop;
     MainScreen *mainScreen;
     GameCursor *cursor;

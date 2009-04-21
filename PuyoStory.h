@@ -48,7 +48,7 @@ public:
     ~StoryWidget();
     void reset();
     void idle(double currentTime);
-    void draw(SDL_Surface *screen);
+    void draw(DrawTarget *dt);
     IdleComponent *getIdleComponent() { return this; }
     void setIntegerValue(String varName, int value);
     int getIntegerValue(String varName) const;

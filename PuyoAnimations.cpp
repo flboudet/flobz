@@ -85,7 +85,7 @@ void NeutralAnimation::cycle()
         if (currentY >= Y) {
             int choosenSound = random() % 2;
             // TODO jeko
-            /*EventFX("neutral_bouncing", 
+            /*EventFX("neutral_bouncing",
                 attachedPuyo.getScreenCoordinateX() + TSIZE/2,
                 attachedPuyo.getScreenCoordinateY() + TSIZE/2,
                 attachedPuyo.getAttachedView()->getPlayerId());*/
@@ -153,7 +153,7 @@ void TurningAnimation::cycle()
 {
     static const char * sound_fff = "fff.wav";
     static const float  sound_fff_volume = .35;
-    
+
     if (cpt == 0) {
         AudioManager::playSound(sound_fff, sound_fff_volume, getPuyoSoundPadding());
         EventFX("turning",
@@ -235,7 +235,7 @@ FallingAnimation::FallingAnimation(AnimatedPuyo &puyo, int originY, int xOffset,
 void FallingAnimation::cycle()
 {
     Y += step++;
-    
+
     if (Y >= (attachedPuyo.getPuyoY()*TSIZE) + yOffset)
     {
         if (!m_once) {
@@ -269,13 +269,13 @@ void FallingAnimation::cycle()
         }
         else
             attachedPuyo.setAnimatedState(0);
-        
+
     }
 }
 
 void FallingAnimation::draw(int semiMove)
 {
-    SDL_Rect drect;
+    IosRect drect;
     drect.x = X;
     int coordY = Y;
     if (bouncing >=0)
@@ -354,20 +354,20 @@ void VanishAnimation::draw(int semiMove)
     else {
 		AnimatedPuyoTheme *theme = attachedPuyo.getAttachedTheme();
         SDL_Painter &painter = attachedPuyo.getAttachedView()->getPainter();
-        
-        SDL_Rect drect, xrect;
+
+        IosRect drect, xrect;
         int iter2 = iter - 10 - delay;
         int shrinkingImage = (iter - 10 - delay) / 4;
         if (shrinkingImage < 4) {
-            IIM_Surface *shrinkingSurface, *explodingSurface;
+            IosSurface *shrinkingSurface, *explodingSurface;
             shrinkingSurface = theme->getShrinkingSurfaceForIndex(shrinkingImage);
             explodingSurface = theme->getExplodingSurfaceForIndex(shrinkingImage);
-            
+
             drect.x = X;
             drect.y = Y;
             drect.w = shrinkingSurface->w;
             drect.h = shrinkingSurface->h;
-        
+
             painter.requestDraw(shrinkingSurface, &drect);
             int xrectY = Y + (int)(2.5 * pow(iter - 16 - delay, 2) - 108);
             xrect.w = explodingSurface->w;
@@ -453,7 +453,7 @@ void NeutralPopAnimation::cycle()
         iter ++;
         if (iter == 17 + delay) {
             AudioManager::playSound("pop.wav", .25, getPuyoSoundPadding());
-            EventFX("neutral_pop", 
+            EventFX("neutral_pop",
                     attachedPuyo.getScreenCoordinateX() + TSIZE/2,
                     attachedPuyo.getScreenCoordinateY() + TSIZE/2,
                     attachedPuyo.getAttachedView()->getPlayerId());
@@ -469,7 +469,7 @@ void NeutralPopAnimation::cycle()
 void NeutralPopAnimation::draw(int semiMove)
 {
     SDL_Painter &painter = attachedPuyo.getAttachedView()->getPainter();
-    SDL_Rect drect;
+    IosRect drect;
     drect.x = X;
     drect.y = Y;
     drect.w = neutralPop[0]->w;

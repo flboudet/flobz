@@ -30,8 +30,7 @@ void EventFX(const char *name, float x, float y, int player);
 
 #include <stdlib.h>
 #include <math.h>
-#include "glSDL.h"
-#include "IosImgProcess.h"
+#include "drawcontext.h"
 #include "PuyoGame.h"
 
 class AnimatedPuyo;
@@ -191,7 +190,7 @@ private:
     int iter, delay;
     bool once;
     int X, Y;
-    IIM_Surface *neutralPop[3];
+    IosSurface *neutralPop[3];
 };
 
 class SmoothBounceAnimation : public PuyoAnimation {
