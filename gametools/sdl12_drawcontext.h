@@ -15,8 +15,13 @@ public:
 public:
     // DrawTarget implementation
     virtual void renderCopy(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
+    virtual void renderCopyFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
+    virtual void renderRotatedCentered(IosSurface *surf, int angle, int x, int y);
+    virtual void setClipRect(IosRect *rect);
+    virtual void fillRect(const IosRect *rect, const RGBA &color);
 public:
     SDL_Surface *m_surf;
+    SDL_Surface *m_flippedSurf;
     SDL_Surface *m_rotated[36];
 };
 
@@ -46,9 +51,9 @@ public:
     virtual IIMLibrary & getIIMLibrary();
     // DrawTarget implementation
     virtual void renderCopy(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
-    //virtual void renderCopyFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
+    virtual void renderCopyFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
     virtual void renderRotatedCentered(IosSurface *surf, int angle, int x, int y);
-    //virtual void setClipRect(IosRect *rect);
+    virtual void setClipRect(IosRect *rect);
     virtual void fillRect(const IosRect *rect, const RGBA &color);
 private:
     SDL_Surface *display;

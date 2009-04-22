@@ -23,8 +23,75 @@ inline static void renderCopy_(SDL_Surface *dest, IosSurface *surf, IosRect *src
                     dest, IOSRECTPTR_TO_SDL(dstRect, sDstRect));
 }
 
+inline static void renderCopyFlipped_(SDL_Surface *dest,
+                                     IosSurface *surf,
+                                     IosRect *srcRect,
+                                     IosRect *dstRect)
+{
+    SDL12_IosSurface *sSurf = static_cast<SDL12_IosSurface *>(surf);
+    if (sSurf->m_flippedSurf == NULL) {
+        sSurf->m_flippedSurf = iim_sdlsurface_mirror_h(sSurf->m_surf);
+    }
+    SDL_Rect sSrcRect, sDstRect;
+    SDL_BlitSurface(sSurf->m_flippedSurf, IOSRECTPTR_TO_SDL(srcRect, sSrcRect),
+                    dest, IOSRECTPTR_TO_SDL(dstRect, sDstRect));
+}
+
+inline static void renderRotatedCentered_(SDL_Surface *dest,
+                                          IosSurface *surf,
+                                          int angle, int x, int y)
+{
+    SDL12_IosSurface *sSurf = static_cast<SDL12_IosSurface *>(surf);
+    while (angle < 0) angle+=8640;
+    angle /= 10;
+    angle %= 36;
+    if (!sSurf->m_rotated[angle]) {
+        // Generated rotated image.
+        sSurf->m_rotated[angle] = iim_sdlsurface_rotate(sSurf->m_surf, angle * 10);
+    }
+    x -= surf->w/2;
+    y -= surf->h/2;
+    SDL_Rect rect;
+    rect.x = x;
+    rect.y = y;
+    rect.w = surf->w;
+    rect.h = surf->h;
+    SDL_BlitSurface(sSurf->m_rotated[angle], NULL, dest, &rect);
+}
+
+inline static void setClipRect_(SDL_Surface *surf, IosRect *rect)
+{
+    SDL_Rect sRect;
+    SDL_SetClipRect(surf, IOSRECTPTR_TO_SDL(rect, sRect));
+}
+
+inline static void fillRect_(SDL_Surface *surf, const IosRect *rect, const RGBA &color)
+{
+    SDL_Rect srect;
+    SDL_FillRect(surf,
+                 IOSRECTPTR_TO_SDL(rect, srect),
+                 (surf->format->Rmask & ((color.red)      |
+					 (color.red<<8)   |
+					 (color.red<<16)  |
+					 (color.red<<24))) |
+                 (surf->format->Gmask & ((color.green)    |
+					 (color.green<<8) |
+					 (color.green<<16)|
+					 (color.green<<24)))|
+                 (surf->format->Bmask & ((color.blue)    |
+					 (color.blue<<8) |
+					 (color.blue<<16)|
+					 (color.blue<<24)))|
+                 (surf->format->Amask & ((color.alpha)    |
+					 (color.alpha<<8) |
+					 (color.alpha<<16)|
+					 (color.alpha<<24))));
+}
+
+// IosSurface implementation
+
 SDL12_IosSurface::SDL12_IosSurface(SDL_Surface *surf)
-    : m_surf(surf)
+    : m_surf(surf), m_flippedSurf(NULL)
 {
     w = m_surf->w;
     h = m_surf->h;
@@ -36,6 +103,28 @@ void SDL12_IosSurface::renderCopy(IosSurface *surf, IosRect *srcRect, IosRect *d
 {
     renderCopy_(m_surf, surf, srcRect, dstRect);
 }
+
+void SDL12_IosSurface::renderCopyFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
+{
+    renderCopyFlipped_(m_surf, surf, srcRect, dstRect);
+}
+
+void SDL12_IosSurface::renderRotatedCentered(IosSurface *surf, int angle, int x, int y)
+{
+    renderRotatedCentered_(m_surf, surf, angle, x, y);
+}
+
+void SDL12_IosSurface::setClipRect(IosRect *rect)
+{
+    setClipRect_(m_surf, rect);
+}
+
+void SDL12_IosSurface::fillRect(const IosRect *rect, const RGBA &color)
+{
+    fillRect_(m_surf, rect, color);
+}
+
+// IIMLibrary implementation
 
 IosSurface * SDL12_IIMLibrary::create_DisplayFormat(int w, int h)
 {
@@ -94,6 +183,8 @@ void SDL12_IIMLibrary::convertToGray(IosSurface *surf)
     SDL12_IosSurface *sSurf = static_cast<SDL12_IosSurface *>(surf);
     iim_sdlsurface_convert_to_gray(sSurf->m_surf);
 }
+
+// DrawContext implementation
 
 SDL12_DrawContext::SDL12_DrawContext(int w, int h, bool fullscreen, const char *caption)
 {
@@ -160,47 +251,22 @@ void SDL12_DrawContext::renderCopy(IosSurface *surf, IosRect *srcRect, IosRect *
     renderCopy_(display, surf, srcRect, dstRect);
 }
 
+void SDL12_DrawContext::renderCopyFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
+{
+    renderCopyFlipped_(display, surf, srcRect, dstRect);
+}
+
 void SDL12_DrawContext::renderRotatedCentered(IosSurface *surf, int angle, int x, int y)
 {
-    SDL12_IosSurface *sSurf = static_cast<SDL12_IosSurface *>(surf);
-    while (angle < 0) angle+=8640;
-    angle /= 10;
-    angle %= 36;
-    if (!sSurf->m_rotated[angle]) {
-        // Generated rotated image.
-        sSurf->m_rotated[angle] = iim_sdlsurface_rotate(sSurf->m_surf, angle * 10);
-    }
-    x -= surf->w/2;
-    y -= surf->h/2;
-    SDL_Rect rect;
-    rect.x = x;
-    rect.y = y;
-    rect.w = surf->w;
-    rect.h = surf->h;
-    SDL_BlitSurface(sSurf->m_rotated[angle], NULL, display, &rect);
+    renderRotatedCentered_(display, surf, angle, x, y);
 }
 
 void SDL12_DrawContext::fillRect(const IosRect *rect, const RGBA &color)
 {
-    SDL_Rect srect;
-    SDL_FillRect(display,
-                 IOSRECTPTR_TO_SDL(rect, srect),
-                 (display->format->Rmask & ((color.red)      |
-					 (color.red<<8)   |
-					 (color.red<<16)  |
-					 (color.red<<24))) |
-                 (display->format->Gmask & ((color.green)    |
-					 (color.green<<8) |
-					 (color.green<<16)|
-					 (color.green<<24)))|
-                 (display->format->Bmask & ((color.blue)    |
-					 (color.blue<<8) |
-					 (color.blue<<16)|
-					 (color.blue<<24)))|
-                 (display->format->Amask & ((color.alpha)    |
-					 (color.alpha<<8) |
-					 (color.alpha<<16)|
-					 (color.alpha<<24))));
+    fillRect_(display, rect, color);
 }
 
-    // SDL_SetClipRect(screen, NULL);
+void SDL12_DrawContext::setClipRect(IosRect *rect)
+{
+    setClipRect_(display, rect);
+}
