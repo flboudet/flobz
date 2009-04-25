@@ -12,6 +12,7 @@ class SDL12_IosSurface : public IosSurface
 {
 public:
     SDL12_IosSurface(SDL_Surface *surf);
+    void setAlpha(unsigned char alpha);
 public:
     // DrawTarget implementation
     virtual void renderCopy(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
@@ -33,6 +34,7 @@ public:
     virtual IosSurface * load_Absolute_DisplayFormatAlpha(const char *path);
     virtual RGBA         getRGBA(IosSurface *surf, int x, int y);
     virtual IosSurface * shiftHue(IosSurface *surf, float hue_offset);
+    virtual IosSurface * shiftHSV(IosSurface *surf, float h, float s, float v);
     virtual IosSurface * setValue(IosSurface *surf, float value);
     virtual IosSurface * resizeAlpha(IosSurface *surf, int width, int height);
     virtual void         convertToGray(IosSurface *surf);

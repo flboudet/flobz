@@ -18,6 +18,7 @@ static StatsResources *res;
 
 StatsResources::StatsResources()
 {
+    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
     res = this;
     rope_elt = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/rope.png"));
     ring_left = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/ring.png"));
@@ -41,10 +42,14 @@ StatsResources::StatsResources()
         puyo_left[3][i] = iim_surface_shift_hue_masked(puyo_left[0][i], puyo_left_mask, 90.);
         puyo_right[3][i] = iim_surface_shift_hue_masked(puyo_right[0][i], puyo_right_mask, 90.);
     }
-    separator = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/separator.png"));
+    separator = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/separator.png"));
+    titleImage = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath(String("gfx/stats_title.png")));
+    for (int numCombo = 0 ; numCombo < 3 ; numCombo++) {
+        String pictureName = theCommander->getDataPathManager().getPath(String("gfx/combo") + (numCombo+1) + String("x_stat.png"));
+        comboImage[numCombo] = iimLib.load_Absolute_DisplayFormatAlpha(pictureName);
+    }
     stats_bg_winner = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/stats-bg.png"));
     stats_bg_loser = iim_surface_shift_hue(stats_bg_winner, 180);
-    // TODO: Combos images
 }
 
 StatsResources::~StatsResources()
@@ -60,7 +65,7 @@ StatsResources::~StatsResources()
     IIM_Free(puyo_right_mask);
     IIM_Free(stats_bg_winner);
     IIM_Free(stats_bg_loser);
-    IIM_Free(separator);
+    delete separator;
 }
 
 ProgressBarWidget::ProgressBarWidget(Action *associatedAction)
@@ -389,16 +394,13 @@ PuyoStatsLegendWidget::PuyoStatsLegendWidget(StatsFormat &statsFormat, StatsWidg
     setPolicy(USE_MIN_SIZE);
     setInnerMargin(10);
     // Load title image
-    IIM_Surface *titleImage = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath(String("gfx/stats_title.png")));
-    m_statsImage.setImage(titleImage);
+    m_statsImage.setImage(res->titleImage);
     m_statsImage.setAlign(IMAGE_CENTERED);
     add(&m_statsImage);
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++) {
         int numCombo = m_statsFormat.m_comboIndirection[i];
         if (numCombo != -1) {
-            String pictureName = theCommander->getDataPathManager().getPath(String("gfx/combo") + ((numCombo+1) == 1 ? 1 : numCombo+1) + String("x_stat.png"));
-            IIM_Surface *comboImage = IIM_Load_Absolute_DisplayFormatAlpha(pictureName);
-            m_legendImage[i].setImage(comboImage);
+            m_legendImage[i].setImage(res->comboImage[numCombo+1]);
             m_legendImage[i].setAlign(IMAGE_CENTERED);
             m_legendCell[i].add(&m_legendImage[i]);
         }
@@ -451,7 +453,7 @@ PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerS
     v2->add(&m_rightSlider);
     v2->add(sep2);
     backBox->add(v2);
-    
+
     HBox *frontBox = new HBox();
     VBox *f1 = new VBox();
     frontBox->add(f1);
@@ -463,10 +465,10 @@ PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerS
     frontBox->add(f3);
     VBox *f2 = new VBox();
     frontBox->add(f2);
-    
+
     add(backBox);
     add(frontBox);
-    
+
     m_leftSlider.addListener(*this);
     m_legendSlider.addListener(*this);
     m_rightSlider.addListener(*this);

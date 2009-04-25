@@ -1339,7 +1339,7 @@ namespace gameui {
     {
     }
 
-    Image::Image(IIM_Surface *image, ImageAlign align)
+    Image::Image(IosSurface *image, ImageAlign align)
       : m_focusedImage(NULL), m_invertFocusMode(false), m_align(align)
     {
         setImage(image);
@@ -1347,24 +1347,24 @@ namespace gameui {
 
     Image::~Image()
     {
-        if (m_focusedImage != NULL) IIM_Free(m_focusedImage);
+        if (m_focusedImage != NULL) delete m_focusedImage;
     }
 
-    void Image::setImage(IIM_Surface *image)
+    void Image::setImage(IosSurface *image)
     {
         m_image = image;
         if (m_focusedImage != NULL) {
-            IIM_Free(m_focusedImage);
+            delete m_focusedImage;
             m_focusedImage = NULL;
         }
         this->setPreferedSize(Vec3(m_image->w, m_image->h));
         this->setSize(Vec3(m_image->w, m_image->h));
     }
 
-    void Image::draw(SDL_Surface *screen)
+    void Image::draw(DrawTarget *dt)
     {
-        SDL_Rect dstRect;
-        IIM_Surface *imageToDraw = m_image;
+        IosRect dstRect;
+        IosSurface *imageToDraw = m_image;
         Vec3 pos = this->getPosition();
         Vec3 size = this->getSize();
         switch (m_align) {
@@ -1379,19 +1379,20 @@ namespace gameui {
                 dstRect.h = size.y; dstRect.w = size.x;
         }
         if (haveFocus() ^ m_invertFocusMode) {
-            if (m_focusedImage == NULL)
-                m_focusedImage = iim_surface_shift_hsv(m_image, 0., 0., m_invertFocusMode ? -0.3 : 0.3);
+            if (m_focusedImage == NULL) {
+                IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
+                m_focusedImage = iimLib.shiftHSV(m_image, 0., 0., m_invertFocusMode ? -0.3 : 0.3);
+            }
             imageToDraw = m_focusedImage;
         }
-        //SDL_FillRect(screen,&dstRect,0xAAAAAAAA);
-        IIM_BlitSurface(imageToDraw, NULL, screen, &dstRect);
+        dt->renderCopy(imageToDraw, NULL, &dstRect);
     }
 
     void Image::setInvertedFocus(bool mode)
     {
         m_invertFocusMode = mode;
         if (m_focusedImage != NULL) {
-            IIM_Free(m_focusedImage);
+            delete m_focusedImage;
             m_focusedImage = NULL;
         }
         requestDraw();
@@ -1908,11 +1909,12 @@ namespace gameui {
         setPreferedSize(Vec3(width, height, 1.0));
     }
 
+#ifdef DISABLED
     //
     // ListWidget
     //
 
-    ListWidget::ListWidget(int size, IIM_Surface *downArrow, GameLoop *loop) : HBox(loop), size(size), used(0), button("---")
+    ListWidget::ListWidget(int size, IosSurface *downArrow, GameLoop *loop) : HBox(loop), size(size), used(0), button("---")
     {
         setPolicy(USE_MIN_SIZE);
         upButton.setImage(downArrow);
@@ -1975,6 +1977,7 @@ namespace gameui {
         // TODO: Fix
         // HBox::draw(screen);
     }
+#endif
 
     //
     // ScreenStack

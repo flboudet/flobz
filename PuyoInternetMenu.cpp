@@ -127,10 +127,10 @@ PuyoServerList::PuyoServerList(PuyoServerListResponder *responder)
   char servname[256];
   char servpath[1024];
   int nbserv;
-  
+
   // For debugging purpose
   //m_metaservers.push_back(new DummyMetaServerConnection(this));
-  
+
   // Making a meta-server list from prefs
   nbserv = GetIntPreference(kInternetMetaServerNumberKey, 1);
   for (int i = 1; i <= nbserv; i++)
@@ -246,12 +246,10 @@ private:
 InternetGameMenu::InternetGameMenu(MainScreen * mainScreen)
   : MainScreenMenu(mainScreen),
     screenTitleFrame(theCommander->getSeparatorFramePicture()),
-    internetGameText(theCommander->getLocalizedString("Internet Game")), 
-    upArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png"))),
-    downArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png"))),
+    internetGameText(theCommander->getLocalizedString("Internet Game")),
     servers(this),
     //serverSelectionPanel(theCommander->getWindowFramePicture()),
-    serverListPanel(20, upArrow, downArrow, theCommander->getListFramePicture()),
+    serverListPanel(20, theCommander->getUpArrow(), theCommander->getDownArrow(), theCommander->getListFramePicture()),
     serverListText(theCommander->getLocalizedString("Server List")),
     updating(theCommander->getLocalizedString("Update"), this, theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
     //rightPanel(theCommander->getWindowFramePicture()),
@@ -278,8 +276,6 @@ InternetGameMenu::InternetGameMenu(MainScreen * mainScreen)
 
 InternetGameMenu::~InternetGameMenu()
 {
-    IIM_Free(upArrow);
-    IIM_Free(downArrow);
 }
 
 void InternetGameMenu::build()
@@ -287,14 +283,14 @@ void InternetGameMenu::build()
     screenTitleFrame.setPreferedSize(Vec3(0, 20));
     screenTitleFrame.add(&internetGameText);
     add(&screenTitleFrame);
-    
+
     add(&menu);
     //add(&container);
     //container.add(&menu);
 
     //container.setPosition(Vec3(5,195));
     //container.setSize(Vec3(menuBG_wide->w, menuBG_wide->h, 0));
-  
+
     serverSelectionPanel.setInnerMargin(10);
     serverSelectionPanel.setPolicy(USE_MIN_SIZE);
     serverSelectionPanel.add(&serverListText);
@@ -319,12 +315,12 @@ void InternetGameMenu::build()
     hbox.setPreferedSize(Vec3(0, joinButton.getPreferedSize().y + 20));
     hbox.add(&rightPanelSeparator);
     hbox.add(&joinButton);
-    
+
     rightPanel.add(&hbox);
     rightPanel.add(&separator1_3);
     menu.add(&serverSelectionPanel);
     menu.add(&rightPanel);
-    
+
     bottomPanel.setInnerMargin(10);
     bottomPanel.setPreferedSize(Vec3(0, backButton.getPreferedSize().y + 20));
     bottomPanel.setPolicy(USE_MIN_SIZE);
@@ -400,7 +396,7 @@ public:
 private:
     Text m_errorMessageL1, m_errorMessageL2;
     FramedButton m_okButton;
-    IIM_Surface *m_errorIconImage;
+    IosSurface *m_errorIconImage;
     Image m_errorIcon;
 };
 
@@ -408,7 +404,8 @@ PuyoInternetErrorDialog::PuyoInternetErrorDialog(String errorMessageL1, String e
   : PuyoInternetDialog(theCommander->getLocalizedString("Error")), m_errorMessageL1(errorMessageL1),
     m_errorMessageL2(errorMessageL2), m_okButton(theCommander->getLocalizedString("OK"), this,
 	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
-    m_errorIconImage(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/errorpuyo.png"))),
+    m_errorIconImage(GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary()
+                     .load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/errorpuyo.png"))),
     m_errorIcon(m_errorIconImage)
 {
     m_contentBox.setInnerMargin(10);
@@ -422,7 +419,7 @@ PuyoInternetErrorDialog::PuyoInternetErrorDialog(String errorMessageL1, String e
 
 PuyoInternetErrorDialog::~PuyoInternetErrorDialog()
 {
-    IIM_Free(m_errorIconImage);
+    delete m_errorIconImage;
 }
 
 void PuyoInternetErrorDialog::action(Widget *sender, int actionType, GameControlEvent *event)

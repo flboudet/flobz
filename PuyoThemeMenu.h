@@ -78,7 +78,6 @@ public:
     void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
     PuyoThemePreview themePreview;
-    IIM_Surface *leftArrow, *rightArrow;
     Image *prevButton, *nextButton;
     ZBox Spacer0, Spacer1, Spacer2, Spacer3;
 };

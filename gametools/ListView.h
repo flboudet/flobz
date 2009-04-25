@@ -32,9 +32,9 @@ public:
     virtual ~ScrollWidget();
     virtual void eventOccured(GameControlEvent *event);
 protected:
-    virtual void draw(SDL_Surface *screen);
+    virtual void draw(DrawTarget *dt);
 private:
-    IIM_Surface *m_bgSurface;
+    IosSurface *m_bgSurface;
     ScrollInfoProvider &m_siProvider;
     bool m_grabbing;
     int m_grabOffset;
@@ -54,7 +54,7 @@ friend class ListView;
 
 class ListView : public CycledComponent, public HBox, public Action, public ScrollInfoProvider {
 public:
-    ListView(int size, IIM_Surface *upArrow, IIM_Surface *downArrow,
+    ListView(int size, IosSurface *upArrow, IosSurface *downArrow,
 	     const FramePicture *listViewFramePicture, GameLoop *loop = NULL);
     virtual ~ListView();
     void addEntry(ListViewEntry *entry);

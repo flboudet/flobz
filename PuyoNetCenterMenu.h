@@ -69,7 +69,7 @@ private:
 
 class NetCenterPlayerList : public ListView {
 public:
-    NetCenterPlayerList(int size, NetCenterMenu *targetMenu, IIM_Surface *upArrow, IIM_Surface *downArrow, GameLoop *loop = NULL);
+    NetCenterPlayerList(int size, NetCenterMenu *targetMenu, IosSurface *upArrow, IosSurface *downArrow, GameLoop *loop = NULL);
     virtual ~NetCenterPlayerList();
     void addNewPlayer(String playerName, PeerAddress playerAddress, int status);
     void removePlayer(PeerAddress playerAddress);
@@ -148,7 +148,6 @@ private:
             netCenter->cycle();
         }
     };
-    IIM_Surface *upArrow, *downArrow;
     VBox mainBox;
     Frame topFrame;
     Frame titleFrame;
@@ -170,6 +169,6 @@ private:
     Separator topSeparator, middleSeparator, bottomSeparator;
     RadioButton m_speedSelector;
 };
-    
+
 #endif // _PUYONETCENTERMENU
 

@@ -51,8 +51,7 @@ void FramePicture::render(DrawTarget *surf) const
   if (m_frameSurface != NULL) {
     int surfW = surf->w;
     int surfH = surf->h;
-    // TODO: Fix
-    // SDL_SetAlpha(m_frameSurface->surf, 0, SDL_ALPHA_OPAQUE);
+    m_frameSurface->setAlpha(IOS_ALPHA_OPAQUE);
     // Draw the corners first
     // Top left corner
     IosRect src_rect = {0, 0, m_leftW, m_topH};

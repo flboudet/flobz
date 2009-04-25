@@ -2,17 +2,17 @@
 #include "preferences.h"
 
 namespace gameui {
-    
+
     //
     // SwitchedButton
     //
-    
+
     SwitchedButton::SwitchedButton(String label, bool defaultValue,
-                                   IIM_Surface *trueSurface, IIM_Surface *falseSurface, String prefKey, Action * altResponder)
+                                   IosSurface *trueSurface, IosSurface *falseSurface, String prefKey, Action * altResponder)
     : stateImage(), imageTrue(trueSurface), imageFalse(falseSurface),
     text(label), key(prefKey), persistant(true), m_altResponder(altResponder)
     {
-        if (key == "") 
+        if (key == "")
         {
             char tmp[2+sizeof(void *)*2+1];
             snprintf(tmp,sizeof(tmp),"%p",this);
@@ -24,7 +24,7 @@ namespace gameui {
             stateValue = (bool)GetBoolPreference(key, defaultValue);
             persistant = true;
             notifKey = key;
-        }        
+        }
         gameui::GlobalNotificationCenter.addListener(notifKey, this);
         setInnerMargin(0);
         setFocusable(true);
@@ -39,13 +39,13 @@ namespace gameui {
         add(&text);
         autoSetPreferedSize();
     }
-    
+
     void SwitchedButton::lostFocus()
     {
         stateImage.lostFocus();
         text.lostFocus();
     }
-    
+
     void SwitchedButton::giveFocus()
     {
         stateImage.giveFocus();
@@ -63,7 +63,7 @@ namespace gameui {
             gameui::GlobalNotificationCenter.notify(notifKey, &val);
         }
     }
-    
+
     void SwitchedButton::notificationOccured(String identifier, void * context)
     {
         if (!(identifier == notifKey))
@@ -92,16 +92,16 @@ namespace gameui {
         size.y += 2.0f;
         setPreferedSize(size);
     }
-    
+
     bool SwitchedButton::getState()
     {
         return stateValue;
     }
-    
+
     SwitchedButton::~SwitchedButton()
     {
         gameui::GlobalNotificationCenter.removeListener(notifKey, this);
     }
-    
+
 }
 

@@ -124,7 +124,9 @@ class StatsResources {
         IIM_Surface *puyo_left[4][4];
         IIM_Surface *puyo_left_mask, *puyo_right_mask;
         IIM_Surface *stats_bg_winner, *stats_bg_loser;
-        IIM_Surface *separator;
+        IosSurface *separator;
+        IosSurface *titleImage;
+        IosSurface *comboImage[MAX_DISPLAYED_COMBOS];
         StatsResources();
         ~StatsResources();
 };

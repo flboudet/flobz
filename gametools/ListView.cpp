@@ -21,7 +21,7 @@ ScrollWidget::ScrollWidget(ScrollInfoProvider &siProvider)
 ScrollWidget::~ScrollWidget()
 {
     if (m_bgSurface != NULL)
-        IIM_Free(m_bgSurface);
+        delete m_bgSurface;
 }
 
 void ScrollWidget::eventOccured(GameControlEvent *event)
@@ -43,10 +43,10 @@ void ScrollWidget::eventOccured(GameControlEvent *event)
             float firstVisible = m_siProvider.getFirstVisible();
             float lastVisible = m_siProvider.getLastVisible();
             float numItems = m_siProvider.getFullSize();
-            
+
             int firstVisibleOffset = (int)(widSize.y * firstVisible / numItems);
             int lastVisibleOffset = (int)(widSize.y * lastVisible / numItems);
-            
+
             // Click above the cursor
             if (event->y < widPosition.y + firstVisibleOffset) {
                 m_siProvider.setFirstVisible(firstVisible / 2.);
@@ -81,42 +81,45 @@ void ScrollWidget::eventOccured(GameControlEvent *event)
     }
 }
 
-void ScrollWidget::draw(SDL_Surface *screen)
+void ScrollWidget::draw(DrawTarget *dt)
 {
     Vec3 bsize = getSize();
-    SDL_Rect srcrect, dstrect;
-    
+    IosRect srcrect, dstrect;
+
     srcrect.x = 0;
     srcrect.y = 0;
     srcrect.h = bsize.y;
     srcrect.w = bsize.x;
-    
+
     dstrect.x = getPosition().x;
     dstrect.y = getPosition().y;
     dstrect.h = bsize.y;
     dstrect.w = bsize.x;
-    
+
     if ((m_bgSurface == NULL) || ((int)(bsize.x) != m_bgSurface->w) || ((int)(bsize.y) != m_bgSurface->h)) {
         if (m_bgSurface != NULL)
-            IIM_Free(m_bgSurface);
-        m_bgSurface = iim_surface_create_rgba((int)(bsize.x), (int)(bsize.y));
-        SDL_FillRect(m_bgSurface->surf, &srcrect, (m_bgSurface->surf->format->Rmask & 0x80808080) | (m_bgSurface->surf->format->Amask & 0x80808080));
+            delete m_bgSurface;
+        RGBA color = {0x80, 0x00, 0x00, 0x80};
+        IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
+        m_bgSurface = iimLib.create_DisplayFormatAlpha((int)(bsize.x), (int)(bsize.y));
+        m_bgSurface->fillRect(&srcrect, color);
     }
-    
+
     float firstVisible = m_siProvider.getFirstVisible();
     float lastVisible = m_siProvider.getLastVisible();
     float numItems = m_siProvider.getFullSize();
-    
+
     int firstVisibleOffset = bsize.y * firstVisible / numItems;
     int lastVisibleOffset = lastVisible > numItems ? bsize.y : bsize.y * lastVisible / numItems;
-    
+
     // Drawing the background
-    IIM_BlitSurface(m_bgSurface, &srcrect, screen, &dstrect);
-    
+    dt->renderCopy(m_bgSurface, &srcrect, &dstrect);
+
     // Drawing the thumb
     dstrect.y += firstVisibleOffset;
     dstrect.h = lastVisibleOffset - firstVisibleOffset;
-    SDL_FillRect(screen, &dstrect, 0xAAAAAAAA);
+    RGBA thumbColor = {0xAA, 0xAA, 0xAA, 0xAA};
+    dt->fillRect(&dstrect, thumbColor);
 }
 
 //
@@ -134,7 +137,7 @@ void ListViewEntry::setText(String text)
 // ListView
 //
 
-ListView::ListView(int size, IIM_Surface *upArrow, IIM_Surface *downArrow,
+ListView::ListView(int size, IosSurface *upArrow, IosSurface *downArrow,
 		   const FramePicture *listViewFramePicture, GameLoop *loop)
  : CycledComponent(0.1), HBox(loop), size(size), firstVisible(0), used(0),
    scrollWidget(*this), listBox(listViewFramePicture, loop),
@@ -143,7 +146,7 @@ ListView::ListView(int size, IIM_Surface *upArrow, IIM_Surface *downArrow,
     suspendLayout();
     scrollerBox.suspendLayout();
     listBox.suspendLayout();
-    
+
     setPolicy(USE_MIN_SIZE);
     listBox.setPolicy(USE_MAX_SIZE);
     upButton.setImage(upArrow);
@@ -157,12 +160,12 @@ ListView::ListView(int size, IIM_Surface *upArrow, IIM_Surface *downArrow,
     scrollerBox.add(&upButton);
     scrollerBox.add(&scrollWidget);
     scrollerBox.add(&downButton);
-    
+
     for (int i=0; i<size; ++i) {
         buttons.push_back(new Button(""));
         listBox.add(buttons.back());
     }
-    
+
     HBox::add(&listBox);
     HBox::add(&scrollerBox);
 

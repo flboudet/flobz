@@ -42,10 +42,14 @@ class PuyoCommander : public MessageListener, NotificationResponder
     const FramePicture *getEditFieldOverFramePicture() const { return &m_textFieldIdleFramePicture; }
     const FramePicture *getSeparatorFramePicture() const { return &m_separatorFramePicture; }
     const FramePicture *getListFramePicture() const { return &m_listFramePicture; }
-    IIM_Surface * getSwitchOnPicture() { return m_switchOnImage; }
-    IIM_Surface * getSwitchOffPicture() { return m_switchOffImage; }
-    IIM_Surface * getRadioOnPicture() { return m_radioOnImage; }
-    IIM_Surface * getRadioOffPicture() { return m_radioOffImage; }
+    IosSurface * getSwitchOnPicture() { return m_switchOnImage; }
+    IosSurface * getSwitchOffPicture() { return m_switchOffImage; }
+    IosSurface * getRadioOnPicture() { return m_radioOnImage; }
+    IosSurface * getRadioOffPicture() { return m_radioOffImage; }
+    IosSurface * getUpArrow() { return m_upArrow; }
+    IosSurface * getDownArrow() { return m_downArrow; }
+    IosSurface * getLeftArrow() { return m_leftArrow; }
+    IosSurface * getRightArrow() { return m_rightArrow; }
   private:
 
     friend class SinglePlayerGameAction;
@@ -72,8 +76,9 @@ class PuyoCommander : public MessageListener, NotificationResponder
     IosSurface   *m_textFieldIdleImage;
     IosSurface   *m_separatorImage;
     IosSurface   *m_listIdleImage;
-    IIM_Surface   *m_switchOnImage, *m_switchOffImage;
-    IIM_Surface   *m_radioOnImage, *m_radioOffImage;
+    IosSurface   *m_switchOnImage, *m_switchOffImage;
+    IosSurface   *m_radioOnImage, *m_radioOffImage;
+    IosSurface   *m_upArrow, *m_downArrow, *m_leftArrow, *m_rightArrow;
     FramePicture m_windowFramePicture;
     FramePicture m_buttonIdleFramePicture, m_buttonDownFramePicture, m_buttonOverFramePicture;
     FramePicture m_textFieldIdleFramePicture;

@@ -520,10 +520,10 @@ bool isDirectionEvent(GameControlEvent *event);
   class Image : public Widget {
   public:
     Image();
-    Image(IIM_Surface *image, ImageAlign align = IMAGE_LEFT_ALIGN);
+    Image(IosSurface *image, ImageAlign align = IMAGE_LEFT_ALIGN);
     ~Image();
     // Properties
-    void setImage(IIM_Surface *image);
+    void setImage(IosSurface *image);
     void setAlign(ImageAlign align) { m_align = align; }
     virtual void setFocusable(bool focusable) { Widget::setFocusable(focusable); }
     void setInvertedFocus(bool mode);
@@ -536,9 +536,9 @@ bool isDirectionEvent(GameControlEvent *event);
     void setOnStartAction(Action *onStartAction) { setAction(ON_START, onStartAction); setFocusable(true); }
     void setOnMouseUpAction(Action *onMouseUpAction) { setAction(ON_MOUSEUP, onMouseUpAction); setFocusable(true); setReceiveUpEvents(true); }
   protected:
-    virtual void draw(SDL_Surface *screen);
+    virtual void draw(DrawTarget *dt);
   private:
-    IIM_Surface *m_image, *m_focusedImage;
+    IosSurface *m_image, *m_focusedImage;
     bool m_invertFocusMode;
     ImageAlign m_align;
   };
@@ -624,6 +624,7 @@ bool isDirectionEvent(GameControlEvent *event);
       Separator(float width=0., float height=0.);
   };
 
+#ifdef DISABLED
   class ListWidget : public HBox
   {
     public:
@@ -641,7 +642,7 @@ bool isDirectionEvent(GameControlEvent *event);
       VBox scrollerBox;
       VBox listBox;
   };
-
+#endif
 
   // Manage a stack of screens.
   class ScreenStack

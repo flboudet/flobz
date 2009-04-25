@@ -118,7 +118,7 @@ String NetCenterPlayerList::PlayerEntry::getStatusString(int status)
   }
 }
 
-NetCenterPlayerList::NetCenterPlayerList(int size, NetCenterMenu *targetMenu, IIM_Surface *upArrow, IIM_Surface *downArrow, GameLoop *loop)
+NetCenterPlayerList::NetCenterPlayerList(int size, NetCenterMenu *targetMenu, IosSurface *upArrow, IosSurface *downArrow, GameLoop *loop)
     : ListView(size, upArrow, downArrow, theCommander->getListFramePicture(), loop),
       targetMenu(targetMenu)
 {}
@@ -188,8 +188,6 @@ String NetCenterTwoNameProvider::getPlayer2Name() const
 NetCenterMenu::NetCenterMenu(MainScreen *mainScreen, PuyoNetGameCenter *netCenter,
                              String title, GameLoop *loop)
     : MainScreenMenu(mainScreen, loop),
-      upArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png"))),
-      downArrow(IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png"))),
       topFrame(theCommander->getWindowFramePicture()),
       titleFrame(theCommander->getSeparatorFramePicture()),
       title(title),
@@ -198,7 +196,7 @@ NetCenterMenu::NetCenterMenu(MainScreen *mainScreen, PuyoNetGameCenter *netCente
       cancelButton(theCommander->getLocalizedString("Disconnect"), &backAction,
 		   theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
       backAction(mainScreen),
-      playerList(5, this, upArrow, downArrow), cycled(this),
+      playerList(5, this, theCommander->getUpArrow(), theCommander->getDownArrow()), cycled(this),
       netCenter(netCenter), onScreenDialog(NULL),
       shouldSelfDestroy(false), nameProvider(*netCenter),
       chatBox(*this),
@@ -222,8 +220,6 @@ NetCenterMenu::~NetCenterMenu()
 #endif
     // Delete the network center because no one else would do it
     delete netCenter;
-    IIM_Free(upArrow);
-    IIM_Free(downArrow);
 }
 
 void NetCenterMenu::cycle()
@@ -239,7 +235,7 @@ void NetCenterMenu::build()
     mainBox.setPolicy(USE_MAX_SIZE);
     topbox.setPolicy(USE_MAX_SIZE);
     playerbox.setPolicy(USE_MAX_SIZE);
-    
+
     container.add(&mainBox);
 
     m_speedSelector.addButton(theCommander->getLocalizedString("Beginner"));
@@ -247,7 +243,7 @@ void NetCenterMenu::build()
     m_speedSelector.addButton(theCommander->getLocalizedString("Expert"));
     menu.add(&m_speedSelector);
     menu.add(&cancelButton);
-    
+
     playerbox.add(&playerListText);
     playerbox.add(&playerList);
 
@@ -258,7 +254,7 @@ void NetCenterMenu::build()
     titleFrame.setPreferedSize(Vec3(0, 20));
     titleFrame.add(&title);
 
-    topFrame.setPreferedSize(Vec3(0, 240));    
+    topFrame.setPreferedSize(Vec3(0, 240));
     topFrame.add(&titleFrame);
     topFrame.add(&topbox);
 
@@ -388,9 +384,9 @@ void NetCenterMenu::onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvita
 {
     PuyoNetworkTwoPlayerGameWidgetFactory *factory = new PuyoNetworkTwoPlayerGameWidgetFactory(*mbox, invitation.gameRandomSeed);
     TwoPlayersStarterAction *starterAction = new TwoPlayersStarterAction(invitation.gameSpeed, *factory, &nameProvider);
-    
+
     starterAction->action(this, NULL, 0);
-    
+
     if (this->onScreenDialog != NULL) {
         container.remove(onScreenDialog);
         delete(onScreenDialog);
@@ -408,7 +404,7 @@ void NetCenterMenu::playerSelected(PeerAddress playerAddress, String playerName)
     container.add(onScreenDialog);
     onScreenDialog->build();
     this->focus(onScreenDialog);
-    
+
     netCenter->requestGame(invitation);
 }
 

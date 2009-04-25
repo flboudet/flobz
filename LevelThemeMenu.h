@@ -62,7 +62,7 @@ class LevelThemePreview : public VBox {
     public:
         LevelThemePreview();
         virtual ~LevelThemePreview();
-        
+
         void build();
         void themeSelected(String themeName);
 
@@ -81,7 +81,6 @@ public:
     void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
     LevelThemePreview themePreview;
-    IIM_Surface *leftArrow, *rightArrow;
     Image *prevButton, *nextButton;
     ZBox Spacer0, Spacer1, Spacer2, Spacer3;
 };

@@ -2,16 +2,16 @@
 #include "preferences.h"
 
 namespace gameui {
-    
+
     //
     // RadioButton
     //
-    
-    RadioButton::RadioButton(int defaultValue, IIM_Surface *trueSurface, IIM_Surface *falseSurface, String prefKey)
+
+    RadioButton::RadioButton(int defaultValue, IosSurface *trueSurface, IosSurface *falseSurface, String prefKey)
     : imageTrue(trueSurface), imageFalse(falseSurface),
     key(prefKey), persistant(true)
     {
-        if (key == "") 
+        if (key == "")
         {
             char tmp[2+sizeof(void *)*2+1];
             snprintf(tmp,sizeof(tmp),"%p",this);
@@ -23,7 +23,7 @@ namespace gameui {
             stateValue = (int)GetIntPreference(key, defaultValue);
             persistant = true;
             notifKey = key;
-        }        
+        }
         gameui::GlobalNotificationCenter.addListener(notifKey, this);
         setInnerMargin(0);
 
@@ -58,13 +58,13 @@ namespace gameui {
         setPreferedSize( size );
         add(myContainer);
     }
-    
+
     void RadioButton::action(Widget *sender, int actionType, GameControlEvent *event)
     {
         if ((actionType == ON_MOUSEUP) || (actionType == ON_MOUSEUP)) {
             vector<SwitchedButton *>::iterator myIntVectorIterator;
             int pos = 1;
-            for(myIntVectorIterator = buttons.begin(); 
+            for(myIntVectorIterator = buttons.begin();
                 myIntVectorIterator != buttons.end();
                 myIntVectorIterator++)
             {
@@ -76,7 +76,7 @@ namespace gameui {
             }
         }
     }
-    
+
     void RadioButton::setState(int _value) {
          gameui::GlobalNotificationCenter.notify(notifKey, &_value);
     }
@@ -89,7 +89,7 @@ namespace gameui {
             fprintf(stderr, "but received one for '%s'... ignoring...\n",(const char *)identifier);
             return;
         }
-        
+
         if ((*(int*)(context)<=(int)buttons.size()) && (*(int*)(context)>0)) {
             stateValue = *(int*)(context);
             for (int i = buttons.size(); i>0; i--) {
@@ -105,12 +105,12 @@ namespace gameui {
     {
         return stateValue;
     }
-    
+
     RadioButton::~RadioButton()
     {
         gameui::GlobalNotificationCenter.removeListener(notifKey, this);
         // TODO: delete the elements in the vectors...
     }
-    
+
 }
 

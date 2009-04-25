@@ -66,10 +66,14 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
 
     // Loading the frame images, and setting up the frames
     IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
-    m_switchOnImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/switch-on.png"));
-    m_switchOffImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/switch-off.png"));
-    m_radioOnImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/radio-on.png"));
-    m_radioOffImage = IIM_Load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/radio-off.png"));
+    m_switchOnImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/switch-on.png"));
+    m_switchOffImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/switch-off.png"));
+    m_radioOnImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/radio-on.png"));
+    m_radioOffImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/radio-off.png"));
+    m_upArrow = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png"));
+    m_downArrow = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png"));
+    m_leftArrow = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/leftarrow.png"));
+    m_rightArrow = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/rightarrow.png"));
 
     m_frameImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/frame.png"));
     m_buttonIdleImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/button.png"));

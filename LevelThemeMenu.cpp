@@ -31,11 +31,8 @@
 LevelThemeSelectionBox::LevelThemeSelectionBox()
     : themePreview(), Spacer0(), Spacer1(), Spacer2(), Spacer3()
 {
-    leftArrow = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/leftarrow.png"));
-    rightArrow = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/rightarrow.png"));
-
-    prevButton = new Image(leftArrow);
-    nextButton = new Image(rightArrow);
+    prevButton = new Image(theCommander->getLeftArrow());
+    nextButton = new Image(theCommander->getRightArrow());
 
     Spacer0.setPreferedSize(Vec3(15.0f, 0.0f));
     Spacer1.setPreferedSize(Vec3(0.0f, 0.0f));
@@ -49,8 +46,6 @@ LevelThemeSelectionBox::~LevelThemeSelectionBox()
 {
     delete prevButton;
     delete nextButton;
-    IIM_Free(leftArrow);
-    IIM_Free(rightArrow);
 }
 
 void LevelThemeSelectionBox::build()

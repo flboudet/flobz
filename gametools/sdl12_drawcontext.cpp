@@ -99,6 +99,11 @@ SDL12_IosSurface::SDL12_IosSurface(SDL_Surface *surf)
         m_rotated[i] = NULL;
 }
 
+void SDL12_IosSurface::setAlpha(unsigned char alpha)
+{
+    SDL_SetAlpha(m_surf, 0, alpha);
+}
+
 void SDL12_IosSurface::renderCopy(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
     renderCopy_(m_surf, surf, srcRect, dstRect);
@@ -164,6 +169,12 @@ IosSurface * SDL12_IIMLibrary::shiftHue(IosSurface *surf, float hue_offset)
 {
     SDL12_IosSurface *sSurf = static_cast<SDL12_IosSurface *>(surf);
     return new SDL12_IosSurface(iim_sdlsurface_shift_hue(sSurf->m_surf, hue_offset));
+}
+
+IosSurface * SDL12_IIMLibrary::shiftHSV(IosSurface *surf, float h, float s, float v)
+{
+    SDL12_IosSurface *sSurf = static_cast<SDL12_IosSurface *>(surf);
+    return new SDL12_IosSurface(iim_sdlsurface_shift_hsv(sSurf->m_surf, h, s, v));
 }
 
 IosSurface * SDL12_IIMLibrary::setValue(IosSurface *surf, float value)

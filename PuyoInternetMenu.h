@@ -158,7 +158,6 @@ public:
 private:
     Frame screenTitleFrame;
     Text internetGameText;
-    IIM_Surface *upArrow, *downArrow;
     PuyoServerList servers;
     VBox serverSelectionPanel;
     ListView serverListPanel;

@@ -31,19 +31,14 @@
 PuyoThemeSelectionBox::PuyoThemeSelectionBox()
     : themePreview(), Spacer0(), Spacer1(), Spacer2(), Spacer3()
 {
-    leftArrow = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/leftarrow.png"));
-    rightArrow = IIM_Load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/rightarrow.png"));
-
-    prevButton = new Image(leftArrow);
-    nextButton = new Image(rightArrow);
+    prevButton = new Image(theCommander->getLeftArrow());
+    nextButton = new Image(theCommander->getRightArrow());
 
     Spacer0.setPreferedSize(Vec3(15.0f, 0.0f));
     Spacer1.setPreferedSize(Vec3(0.0f, 0.0f));
     Spacer2.setPreferedSize(Vec3(0.0f, 0.0f));
     Spacer3.setPreferedSize(Vec3(15.0f, 0.0f));
 
-//    setPreferedSize(Vec3(300.0f,200.0f));
-//    setSize(Vec3(300.0f,200.0f));
     setPolicy(USE_MAX_SIZE_NO_MARGIN);
 }
 
@@ -51,8 +46,6 @@ PuyoThemeSelectionBox::~PuyoThemeSelectionBox()
 {
     delete prevButton;
     delete nextButton;
-    IIM_Free(leftArrow);
-    IIM_Free(rightArrow);
 }
 
 void PuyoThemeSelectionBox::build()
