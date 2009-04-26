@@ -97,6 +97,14 @@ fi
 OLD_LIBS=$LIBS
 LIBS="$SDL_LIBS"
 
+case "`$SDL_CONFIG --version`" in
+    1.2.*)
+        ENABLE_SDL12_GFX="true"
+        ;;
+    1.3.*)
+        ENABLE_SDL13_GFX="true"
+        ;;
+esac
 AC_SEARCH_LIBS([SDL_Init], [SDL])
 
 ac_link="$LDPREFIX $ac_link"
@@ -227,6 +235,20 @@ else
   AC_MSG_RESULT([TTF Disabled])
 fi
 
+if test "x$ENABLE_SDL12_GFX" = "xtrue"; then
+  AC_MSG_RESULT([SDL 1.2 Enabled])
+  FPFEATURES="$FPFEATURES -DSDL12_GFX=1"
+else
+  AC_MSG_RESULT([SDL 1.2 Disabled])
+fi
+
+if test "x$ENABLE_SDL13_GFX" = "xtrue"; then
+  AC_MSG_RESULT([SDL 1.3 Enabled])
+  FPFEATURES="$FPFEATURES -DSDL13_GFX=1"
+else
+  AC_MSG_RESULT([SDL 1.3 Disabled])
+fi
+
 if test "x$ENABLE_NETWORK" = "xtrue"; then
   AC_MSG_RESULT([Network Gaming Enabled])
   FPFEATURES="$FPFEATURES -DENABLE_NETWORK=1"
@@ -252,6 +274,8 @@ esac
 AM_CONDITIONAL([MACOSX], [test x$MACOSX = xtrue])
 AM_CONDITIONAL([WIN32], [test x$WIN32 = xtrue])
 
+AM_CONDITIONAL([ENABLE_SDL12_GFX], [test x$ENABLE_SDL12_GFX = xtrue])
+AM_CONDITIONAL([ENABLE_SDL13_GFX], [test x$ENABLE_SDL13_GFX = xtrue])
 AM_CONDITIONAL([ENABLE_NETWORK], [test x$ENABLE_NETWORK = xtrue])
 AM_CONDITIONAL([ENABLE_NETWORK_INTERNET], [test x$ENABLE_NETWORK_INTERNET = xtrue])
 

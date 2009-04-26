@@ -688,8 +688,12 @@ SDL_Surface *iim_sdlsurface_create_rgba(int width, int height)
 #endif
     tmp = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, width, height, 32,
                                        rmask, gmask, bmask, amask);
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+    ret = tmp;
+#else
     ret = SDL_DisplayFormatAlpha(tmp);
     SDL_FreeSurface(tmp);
+#endif
     return ret;
 }
 
@@ -712,8 +716,12 @@ SDL_Surface *iim_sdlsurface_create_rgb(int width, int height)
 #endif
     tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, 32,
                                rmask, gmask, bmask, amask);
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+    ret = tmp;
+#else
     ret = SDL_DisplayFormat(tmp);
     SDL_FreeSurface(tmp);
+#endif
     return ret;
 }
 

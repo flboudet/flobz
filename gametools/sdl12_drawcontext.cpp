@@ -218,8 +218,8 @@ SDL12_DrawContext::SDL12_DrawContext(int w, int h, bool fullscreen, const char *
                 SDL_GetError());
         exit(1);
     }
-    h = display->h;
-    w = display->w;
+    this->h = display->h;
+    this->w = display->w;
     atexit(SDL_Quit);
     SDL_ShowCursor(SDL_DISABLE);
     SDL_WM_SetCaption(caption, NULL);

@@ -2,7 +2,12 @@
 #include "PuyoStrings.h"
 #include "preferences.h"
 #include "MainMenu.h"
+#ifdef SDL12_GFX
 #include "sdl12_drawcontext.h"
+#endif
+#ifdef SDL13_GFX
+#include "sdl13_drawcontext.h"
+#endif
 
 // To be moved elsewhere
 static const char * kFullScreenPref = "Config.FullScreen";
@@ -20,9 +25,16 @@ PuyoMain::PuyoMain(String dataDir, bool fullscreen, int maxDataPackNumber)
     // Create the DrawContext
     int requestedWidth = GetIntPreference(kScreenWidthPref, 640);
     int requestedHeight = GetIntPreference(kScreenHeightPref, 480);
+#ifdef SDL12_GFX
     m_drawContext = new SDL12_DrawContext(640, 480,
                                           GetIntPreference(kFullScreenPref, fullscreen),
                                           "FloboPuyo by iOS-Software");
+#endif
+#ifdef SDL13_GFX
+    m_drawContext = new SDL13_DrawContext(640, 480,
+                                          GetIntPreference(kFullScreenPref, fullscreen),
+                                          "FloboPuyo by iOS-Software");
+#endif
     // Give the DrawContext to the GameLoop
     loop->setDrawContext(m_drawContext);
     // Create the PuyoCommander singleton

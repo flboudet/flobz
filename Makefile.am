@@ -13,6 +13,13 @@ flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           LevelThemeMenu.cpp PuyoThemeMenu.cpp PuyoScreenTransition.cpp \
           PuyoGameAbstract.cpp PuyoStrings.cpp AnimatedPuyoTheme.cpp
 
+# Graphic backend configuration
+if ENABLE_SDL12_GFX
+endif
+
+if ENABLE_SDL13_GFX
+endif
+
 # Optional sources for network gaming support
 if ENABLE_NETWORK
 flobopuyo_SOURCES+=PuyoNetworkStarter.cpp PuyoNetworkView.cpp PuyoNetworkGame.cpp \
