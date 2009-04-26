@@ -171,6 +171,13 @@ IosSurface * SDL12_IIMLibrary::shiftHue(IosSurface *surf, float hue_offset)
     return new SDL12_IosSurface(iim_sdlsurface_shift_hue(sSurf->m_surf, hue_offset));
 }
 
+IosSurface * SDL12_IIMLibrary::shiftHueMasked(IosSurface *surf, IosSurface *mask, float hue_offset)
+{
+    SDL12_IosSurface *sSurf = static_cast<SDL12_IosSurface *>(surf);
+    SDL12_IosSurface *sMask = static_cast<SDL12_IosSurface *>(mask);
+    return new SDL12_IosSurface(iim_sdlsurface_shift_hue_masked(sSurf->m_surf, sMask->m_surf, hue_offset));
+}
+
 IosSurface * SDL12_IIMLibrary::shiftHSV(IosSurface *surf, float h, float s, float v)
 {
     SDL12_IosSurface *sSurf = static_cast<SDL12_IosSurface *>(surf);
@@ -187,6 +194,12 @@ IosSurface * SDL12_IIMLibrary::resizeAlpha(IosSurface *surf, int width, int heig
 {
     SDL12_IosSurface *sSurf = static_cast<SDL12_IosSurface *>(surf);
     return new SDL12_IosSurface(iim_sdlsurface_resize_alpha(sSurf->m_surf, width, height));
+}
+
+IosSurface * SDL12_IIMLibrary::mirrorH(IosSurface *surf)
+{
+    SDL12_IosSurface *sSurf = static_cast<SDL12_IosSurface *>(surf);
+    return new SDL12_IosSurface(iim_sdlsurface_mirror_h(sSurf->m_surf));
 }
 
 void SDL12_IIMLibrary::convertToGray(IosSurface *surf)

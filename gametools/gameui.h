@@ -346,7 +346,7 @@ bool isDirectionEvent(GameControlEvent *event);
        * Changes the background image of the slider
        * @param bg    The new background image
        */
-      void setBackground(IIM_Surface *bg) { this->bg = bg; }
+      void setBackground(IosSurface *bg) { this->bg = bg; }
       void setBackgroundVisible(bool visible) { backgroundVisible = visible; }
 
       /**
@@ -372,7 +372,7 @@ bool isDirectionEvent(GameControlEvent *event);
 
     protected:
       // Implements Widget
-      virtual void draw(SDL_Surface *screen);
+      virtual void draw(DrawTarget *dt);
       void eventOccured(GameControlEvent *event);
       void addContentWidget();
       void endSlideInside(bool inside);
@@ -394,7 +394,7 @@ bool isDirectionEvent(GameControlEvent *event);
       Widget *previousWidget;
       double slideStartTime;
       double currentTime;
-      IIM_Surface *bg;
+      IosSurface *bg;
       bool sliding;
       bool slideout;
       Vec3 backupedPosition;
@@ -501,7 +501,7 @@ bool isDirectionEvent(GameControlEvent *event);
       virtual IdleComponent *getIdleComponent() { return this; }
 
     protected:
-      void draw(SDL_Surface *screen);
+      void draw(DrawTarget *dt);
       SoFont *font;
       bool startMoving;
 

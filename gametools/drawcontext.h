@@ -40,9 +40,11 @@ public:
     virtual IosSurface * load_Absolute_DisplayFormatAlpha(const char *path) = 0;
     virtual RGBA         getRGBA(IosSurface *surf, int x, int y) = 0;
     virtual IosSurface * shiftHue(IosSurface *surf, float hue_offset) = 0;
+    virtual IosSurface * shiftHueMasked(IosSurface *surf, IosSurface *mask, float hue_offset) = 0;
     virtual IosSurface * shiftHSV(IosSurface *surf, float h, float s, float v) = 0;
     virtual IosSurface * setValue(IosSurface *surf, float value) = 0;
     virtual IosSurface * resizeAlpha(IosSurface *surf, int width, int height) = 0;
+    virtual IosSurface * mirrorH(IosSurface *surf) = 0;
     virtual void         convertToGray(IosSurface *surf) = 0;
 protected:
     virtual ~IIMLibrary() {}

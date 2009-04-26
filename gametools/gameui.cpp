@@ -784,17 +784,16 @@ namespace gameui {
         m_slideSide = slideSide;
     }
 
-    void SliderContainer::draw(SDL_Surface *screen)
+    void SliderContainer::draw(DrawTarget *dt)
     {
         if (bg != NULL && backgroundVisible)
         {
-            IIM_Rect rect;
+            IosRect rect;
             rect.x = (Sint16)getPosition().x - (bg->w - getSize().x)/2;
             rect.y = (Sint16)getPosition().y - (bg->h - getSize().y)/2;
-            IIM_BlitSurface(bg, NULL, screen, &rect);
+            dt->renderCopy(bg, NULL, &rect);
         }
-        // TODO: Fix
-        //ZBox::draw(screen);
+        ZBox::draw(dt);
     }
 
     void SliderContainer::transitionToContent(Widget *content)
@@ -1260,16 +1259,19 @@ namespace gameui {
             parent->arrangeWidgets();
     }
 
-    void Text::draw(SDL_Surface *screen)
+    void Text::draw(DrawTarget *dt)
     {
-      /*SDL_Rect r;
+//#ifdef DEBUG_POSITION
+      IosRect r;
       r.x = getPosition().x;
       r.y = getPosition().y;
       r.h = getSize().y;
       r.w = getSize().x;
+      RGBA rectColor = {0xAA, 0xAA, 0xAA, 0xAA};
       if (r.h>0.0f && r.w>0.0f)
-          SDL_FillRect(screen,&r,0xAAAAAAAA);*/
-
+          dt->fillRect(&r,rectColor);
+//#endif
+#ifdef DISABLED
       if (isVisible())
       {
           switch (m_textAlign) {
@@ -1293,7 +1295,7 @@ namespace gameui {
                   break;
           }
       }
-        //if (moving) printf("draw (%p)\n",this);
+#endif
     }
 
     void Text::idle(double currentTime)

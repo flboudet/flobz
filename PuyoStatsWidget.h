@@ -24,7 +24,7 @@ class ProgressBarWidget : public gameui::Widget, IdleComponent {
 public:
     ProgressBarWidget(gameui::Action *associatedAction);
     virtual ~ProgressBarWidget() {}
-    void draw(SDL_Surface *screen);
+    void draw(DrawTarget *dt);
     void idle(double currentTime);
     IdleComponent *getIdleComponent() { return this; }
     void setValue(float value, bool progressive = false);
@@ -50,7 +50,7 @@ private:
     int m_colorIndex;
 };
 
-#define MAX_DISPLAYED_COMBOS 7
+#define MAX_DISPLAYED_COMBOS 4 // TODO: More
 struct StatsFormat {
     StatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &playerBStats);
     int m_comboIndirection[MAX_DISPLAYED_COMBOS+1];
@@ -118,12 +118,12 @@ private:
 
 class StatsResources {
     public:
-        IIM_Surface *rope_elt;
-        IIM_Surface *ring_left, *ring_right;
-        IIM_Surface *puyo_right[4][4];
-        IIM_Surface *puyo_left[4][4];
-        IIM_Surface *puyo_left_mask, *puyo_right_mask;
-        IIM_Surface *stats_bg_winner, *stats_bg_loser;
+        IosSurface *rope_elt;
+        IosSurface *ring_left, *ring_right;
+        IosSurface *puyo_right[4][4];
+        IosSurface *puyo_left[4][4];
+        IosSurface *puyo_left_mask, *puyo_right_mask;
+        IosSurface *stats_bg_winner, *stats_bg_loser;
         IosSurface *separator;
         IosSurface *titleImage;
         IosSurface *comboImage[MAX_DISPLAYED_COMBOS];

@@ -34,9 +34,11 @@ public:
     virtual IosSurface * load_Absolute_DisplayFormatAlpha(const char *path);
     virtual RGBA         getRGBA(IosSurface *surf, int x, int y);
     virtual IosSurface * shiftHue(IosSurface *surf, float hue_offset);
+    virtual IosSurface * shiftHueMasked(IosSurface *surf, IosSurface *mask, float hue_offset);
     virtual IosSurface * shiftHSV(IosSurface *surf, float h, float s, float v);
     virtual IosSurface * setValue(IosSurface *surf, float value);
     virtual IosSurface * resizeAlpha(IosSurface *surf, int width, int height);
+    virtual IosSurface * mirrorH(IosSurface *surf);
     virtual void         convertToGray(IosSurface *surf);
 private:
     friend class SDL12_DrawContext;
