@@ -93,8 +93,8 @@ inline static void fillRect_(SDL_Surface *surf, const IosRect *rect, const RGBA 
 
 // IosSurface implementation
 
-SDL13_IosSurface::SDL13_IosSurface(SDL_Surface *surf)
-    : m_surf(surf), m_tex(0), m_flippedSurf(NULL)
+SDL13_IosSurface::SDL13_IosSurface(SDL_Surface *surf, SDL13_DrawContext &drawContext)
+    : m_surf(surf), m_tex(0), m_flippedSurf(NULL), m_drawContext(drawContext)
 {
     w = m_surf->w;
     h = m_surf->h;
@@ -102,33 +102,49 @@ SDL13_IosSurface::SDL13_IosSurface(SDL_Surface *surf)
         m_rotated[i] = NULL;
 }
 
-SDL_TextureID SDL13_IosSurface::getTexture()
+SDL13_IosSurface::~SDL13_IosSurface()
 {
-    if (m_tex == 0)
-        m_tex = SDL_CreateTextureFromSurface(0, m_surf);
+    releaseTexture();
 }
 
-void SDL13_IosSurface::setAlpha(unsigned char alpha)
+SDL_TextureID SDL13_IosSurface::getTexture()
+{
+    if (m_tex == 0) {
+        m_tex = SDL_CreateTextureFromSurface(m_drawContext.m_mode.format, m_surf);
+        SDL_SetTextureBlendMode(m_tex, SDL_BLENDMODE_BLEND);
+    }
+    return m_tex;
+}
+
+void SDL13_IosSurface::releaseTexture()
 {
     if (m_tex != 0) {
         SDL_DestroyTexture(m_tex);
         m_tex = 0;
     }
+}
+
+void SDL13_IosSurface::setAlpha(unsigned char alpha)
+{
+    releaseTexture();
     SDL_SetAlpha(m_surf, 0, alpha);
 }
 
 void SDL13_IosSurface::renderCopy(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
+    releaseTexture();
     renderCopy_(m_surf, surf, srcRect, dstRect);
 }
 
 void SDL13_IosSurface::renderCopyFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
+    releaseTexture();
     renderCopyFlipped_(m_surf, surf, srcRect, dstRect);
 }
 
 void SDL13_IosSurface::renderRotatedCentered(IosSurface *surf, int angle, int x, int y)
 {
+    releaseTexture();
     renderRotatedCentered_(m_surf, surf, angle, x, y);
 }
 
@@ -139,6 +155,7 @@ void SDL13_IosSurface::setClipRect(IosRect *rect)
 
 void SDL13_IosSurface::fillRect(const IosRect *rect, const RGBA &color)
 {
+    releaseTexture();
     fillRect_(m_surf, rect, color);
 }
 
@@ -146,12 +163,12 @@ void SDL13_IosSurface::fillRect(const IosRect *rect, const RGBA &color)
 
 IosSurface * SDL13_IIMLibrary::create_DisplayFormat(int w, int h)
 {
-    return new SDL13_IosSurface(iim_sdlsurface_create_rgb(w, h));
+    return new SDL13_IosSurface(iim_sdlsurface_create_rgb(w, h), m_drawContext);
 }
 
 IosSurface * SDL13_IIMLibrary::create_DisplayFormatAlpha(int w, int h)
 {
-    return new SDL13_IosSurface(iim_sdlsurface_create_rgba(w, h));
+    return new SDL13_IosSurface(iim_sdlsurface_create_rgba(w, h), m_drawContext);
 }
 
 IosSurface * SDL13_IIMLibrary::load_Absolute_DisplayFormatAlpha(const char *path)
@@ -169,7 +186,7 @@ IosSurface * SDL13_IIMLibrary::load_Absolute_DisplayFormatAlpha(const char *path
     }
     // SDL_SetAlpha (retsurf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
     // SDL_FreeSurface (tmpsurf);
-    return new SDL13_IosSurface(retsurf);
+    return new SDL13_IosSurface(retsurf, m_drawContext);
 }
 
 RGBA SDL13_IIMLibrary::getRGBA(IosSurface *surf, int x, int y)
@@ -181,38 +198,38 @@ RGBA SDL13_IIMLibrary::getRGBA(IosSurface *surf, int x, int y)
 IosSurface * SDL13_IIMLibrary::shiftHue(IosSurface *surf, float hue_offset)
 {
     SDL13_IosSurface *sSurf = static_cast<SDL13_IosSurface *>(surf);
-    return new SDL13_IosSurface(iim_sdlsurface_shift_hue(sSurf->m_surf, hue_offset));
+    return new SDL13_IosSurface(iim_sdlsurface_shift_hue(sSurf->m_surf, hue_offset), m_drawContext);
 }
 
 IosSurface * SDL13_IIMLibrary::shiftHueMasked(IosSurface *surf, IosSurface *mask, float hue_offset)
 {
     SDL13_IosSurface *sSurf = static_cast<SDL13_IosSurface *>(surf);
     SDL13_IosSurface *sMask = static_cast<SDL13_IosSurface *>(mask);
-    return new SDL13_IosSurface(iim_sdlsurface_shift_hue_masked(sSurf->m_surf, sMask->m_surf, hue_offset));
+    return new SDL13_IosSurface(iim_sdlsurface_shift_hue_masked(sSurf->m_surf, sMask->m_surf, hue_offset), m_drawContext);
 }
 
 IosSurface * SDL13_IIMLibrary::shiftHSV(IosSurface *surf, float h, float s, float v)
 {
     SDL13_IosSurface *sSurf = static_cast<SDL13_IosSurface *>(surf);
-    return new SDL13_IosSurface(iim_sdlsurface_shift_hsv(sSurf->m_surf, h, s, v));
+    return new SDL13_IosSurface(iim_sdlsurface_shift_hsv(sSurf->m_surf, h, s, v), m_drawContext);
 }
 
 IosSurface * SDL13_IIMLibrary::setValue(IosSurface *surf, float value)
 {
     SDL13_IosSurface *sSurf = static_cast<SDL13_IosSurface *>(surf);
-    return new SDL13_IosSurface(iim_sdlsurface_set_value(sSurf->m_surf, value));
+    return new SDL13_IosSurface(iim_sdlsurface_set_value(sSurf->m_surf, value), m_drawContext);
 }
 
 IosSurface * SDL13_IIMLibrary::resizeAlpha(IosSurface *surf, int width, int height)
 {
     SDL13_IosSurface *sSurf = static_cast<SDL13_IosSurface *>(surf);
-    return new SDL13_IosSurface(iim_sdlsurface_resize_alpha(sSurf->m_surf, width, height));
+    return new SDL13_IosSurface(iim_sdlsurface_resize_alpha(sSurf->m_surf, width, height), m_drawContext);
 }
 
 IosSurface * SDL13_IIMLibrary::mirrorH(IosSurface *surf)
 {
     SDL13_IosSurface *sSurf = static_cast<SDL13_IosSurface *>(surf);
-    return new SDL13_IosSurface(iim_sdlsurface_mirror_h(sSurf->m_surf));
+    return new SDL13_IosSurface(iim_sdlsurface_mirror_h(sSurf->m_surf), m_drawContext);
 }
 
 void SDL13_IIMLibrary::convertToGray(IosSurface *surf)
@@ -224,6 +241,7 @@ void SDL13_IIMLibrary::convertToGray(IosSurface *surf)
 // DrawContext implementation
 
 SDL13_DrawContext::SDL13_DrawContext(int w, int h, bool fullscreen, const char *caption)
+    : m_iimLib(*this)
 {
     SDL_WindowID wid = SDL_CreateWindow("Test SDL 1.3",
                                         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -238,6 +256,8 @@ SDL13_DrawContext::SDL13_DrawContext(int w, int h, bool fullscreen, const char *
     atexit(SDL_Quit);
     SDL_ShowCursor(SDL_DISABLE);
     SDL_SetWindowTitle(wid, caption);
+    SDL_GetDisplayMode(SDL_GetCurrentVideoDisplay(), &m_mode);
+    SDL_SetRenderDrawBlendMode(SDL_BLENDMODE_BLEND);
 }
 
 void SDL13_DrawContext::flip()
@@ -258,6 +278,26 @@ int SDL13_DrawContext::getWidth() const
 IIMLibrary & SDL13_DrawContext::getIIMLibrary()
 {
     return m_iimLib;
+}
+
+static void mySDL_RenderCopy(SDL_TextureID id, SDL_Rect *srcRect, SDL_Rect *dstRect,
+                             IosRect *isrcRect, IosRect *idstRect)
+{
+    cout << "RenderCopy " << id << endl;
+    if (srcRect == NULL)
+        cout << "    srcRect: " << "NULL" << endl;
+    else
+        cout << "    srcRect: " << srcRect->x << "," << srcRect-> y << " ; "
+             << srcRect->w << "," << srcRect->h << endl;
+    if (dstRect == NULL)
+        cout << "    dstRect: " << "NULL" << endl;
+    else {
+        cout << "    dstRect: " << dstRect->x << "," << dstRect-> y << " ; "
+             << dstRect->w << "," << dstRect->h << endl;
+        cout << "    idstRect:" << idstRect->x << "," << idstRect-> y << " ; "
+             << idstRect->w << "," << idstRect->h << endl;
+    }
+    SDL_RenderCopy(id, srcRect, dstRect);
 }
 
 // DrawTarget implementation

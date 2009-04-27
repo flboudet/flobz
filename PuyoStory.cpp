@@ -93,6 +93,8 @@ static void  drawImage (StyrolyseClient *_this, void *image, int x, int y,
   IosRect  rect, cliprect;
   rect.x = x;
   rect.y = y;
+  rect.h = surf->h;
+  rect.w = surf->w;
   cliprect.x = clipx;
   cliprect.y = clipy;
   cliprect.w = clipw;

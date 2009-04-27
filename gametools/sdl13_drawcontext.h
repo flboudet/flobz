@@ -8,13 +8,18 @@
 #include "SDL.h"
 #endif
 
+class SDL13_DrawContext;
+
 class SDL13_IosSurface : public IosSurface
 {
 public:
-    SDL13_IosSurface(SDL_Surface *surf);
+    SDL13_IosSurface(SDL_Surface *surf, SDL13_DrawContext &drawContext);
+    virtual ~SDL13_IosSurface();
     void setAlpha(unsigned char alpha);
 public:
     SDL_TextureID getTexture();
+private:
+    void releaseTexture();
 public:
     // DrawTarget implementation
     virtual void renderCopy(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
@@ -27,10 +32,14 @@ public:
     SDL_TextureID m_tex;
     SDL_Surface *m_flippedSurf;
     SDL_Surface *m_rotated[36];
+private:
+    SDL13_DrawContext &m_drawContext;
 };
 
 class SDL13_IIMLibrary : public IIMLibrary
 {
+private:
+    SDL13_IIMLibrary(SDL13_DrawContext &drawContext) : m_drawContext(drawContext) {}
 public:
     virtual IosSurface * create_DisplayFormat(int w, int h);
     virtual IosSurface * create_DisplayFormatAlpha(int w, int h);
@@ -44,6 +53,7 @@ public:
     virtual IosSurface * mirrorH(IosSurface *surf);
     virtual void         convertToGray(IosSurface *surf);
 private:
+    SDL13_DrawContext &m_drawContext;
     friend class SDL13_DrawContext;
 };
 
@@ -64,6 +74,9 @@ public:
     virtual void fillRect(const IosRect *rect, const RGBA &color);
 private:
     SDL13_IIMLibrary m_iimLib;
+    SDL_DisplayMode m_mode;
+    friend class SDL13_IIMLibrary;
+    friend class SDL13_IosSurface;
 };
 
 #endif // _SDL13_DRAWCONTEXT_H_
