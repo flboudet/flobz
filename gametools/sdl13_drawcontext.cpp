@@ -110,7 +110,7 @@ SDL13_IosSurface::~SDL13_IosSurface()
 SDL_TextureID SDL13_IosSurface::getTexture()
 {
     if (m_tex == 0) {
-        m_tex = SDL_CreateTextureFromSurface(m_drawContext.m_mode.format, m_surf);
+        m_tex = SDL_CreateTextureFromSurface(/*m_drawContext.m_mode.format*/SDL_PIXELFORMAT_ARGB8888, m_surf);
         SDL_SetTextureBlendMode(m_tex, SDL_BLENDMODE_BLEND);
     }
     return m_tex;
@@ -243,10 +243,21 @@ void SDL13_IIMLibrary::convertToGray(IosSurface *surf)
 SDL13_DrawContext::SDL13_DrawContext(int w, int h, bool fullscreen, const char *caption)
     : m_iimLib(*this)
 {
+    SDL_DisplayMode wishedMode, possibleMode;
+    wishedMode.format = SDL_PIXELFORMAT_ARGB8888;
+    wishedMode.w = 640;
+    wishedMode.h = 480;
+    wishedMode.refresh_rate = 0;
+    wishedMode.driverdata = NULL;
+    if (SDL_GetClosestDisplayMode(&wishedMode, &possibleMode) == NULL) {
+        cout << "Impossible display mode" << endl;
+        exit(0);
+    }
+    SDL_SetFullscreenDisplayMode(&possibleMode);
     SDL_WindowID wid = SDL_CreateWindow("Test SDL 1.3",
                                         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                         w, h,/*SDL_WINDOW_FULLSCREEN |*/ SDL_WINDOW_OPENGL);
-    SDL_CreateRenderer(wid, 0, SDL_RENDERER_ACCELERATED);
+    SDL_CreateRenderer(wid, 1, SDL_RENDERER_ACCELERATED);
     SDL_ShowWindow(wid);
     if (SDL_SelectRenderer(wid) != 0) {
         cout << "Window doesn't have a renderer" << endl;
@@ -256,8 +267,8 @@ SDL13_DrawContext::SDL13_DrawContext(int w, int h, bool fullscreen, const char *
     atexit(SDL_Quit);
     SDL_ShowCursor(SDL_DISABLE);
     SDL_SetWindowTitle(wid, caption);
-    SDL_GetDisplayMode(SDL_GetCurrentVideoDisplay(), &m_mode);
     SDL_SetRenderDrawBlendMode(SDL_BLENDMODE_BLEND);
+    SDL_GetDisplayMode(SDL_GetCurrentVideoDisplay(), &m_mode);
 }
 
 void SDL13_DrawContext::flip()
