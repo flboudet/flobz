@@ -99,6 +99,15 @@ SDL12_IosSurface::SDL12_IosSurface(SDL_Surface *surf)
         m_rotated[i] = NULL;
 }
 
+SDL12_IosSurface::~SDL12_IosSurface()
+{
+    for (int i = 0 ; i < 36 ; i++)
+        if (m_rotated[i] != NULL)
+            SDL_FreeSurface(m_rotated[i]);
+    if (m_surf != NULL)
+        SDL_FreeSurface(m_surf);
+}
+
 void SDL12_IosSurface::setAlpha(unsigned char alpha)
 {
     SDL_SetAlpha(m_surf, 0, alpha);

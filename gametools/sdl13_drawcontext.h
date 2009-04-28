@@ -18,6 +18,7 @@ public:
     void setAlpha(unsigned char alpha);
 public:
     SDL_TextureID getTexture();
+    SDL_TextureID getTexture(int angle);
 private:
     void releaseTexture();
 public:
@@ -31,7 +32,9 @@ public:
     SDL_Surface *m_surf;
     SDL_TextureID m_tex;
     SDL_Surface *m_flippedSurf;
+    SDL_TextureID m_texFlipped;
     SDL_Surface *m_rotated[36];
+    SDL_TextureID m_texRotated[36];
 private:
     SDL13_DrawContext &m_drawContext;
 };

@@ -12,6 +12,7 @@ class SDL12_IosSurface : public IosSurface
 {
 public:
     SDL12_IosSurface(SDL_Surface *surf);
+    virtual ~SDL12_IosSurface();
     void setAlpha(unsigned char alpha);
 public:
     // DrawTarget implementation

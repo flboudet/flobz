@@ -98,22 +98,46 @@ SDL13_IosSurface::SDL13_IosSurface(SDL_Surface *surf, SDL13_DrawContext &drawCon
 {
     w = m_surf->w;
     h = m_surf->h;
-    for (int i = 0 ; i < 36 ; i++)
+    for (int i = 0 ; i < 36 ; i++) {
         m_rotated[i] = NULL;
+        m_texRotated[i] = 0;
+    }
 }
 
 SDL13_IosSurface::~SDL13_IosSurface()
 {
     releaseTexture();
+    for (int i = 0 ; i < 36 ; i++)
+    {
+        if (m_rotated[i] != NULL)
+            SDL_FreeSurface(m_rotated[i]);
+        if (m_texRotated[i] != 0)
+            SDL_DestroyTexture(m_texRotated[i]);
+    }
+    if (m_surf != NULL)
+        SDL_FreeSurface(m_surf);
 }
 
 SDL_TextureID SDL13_IosSurface::getTexture()
 {
     if (m_tex == 0) {
-        m_tex = SDL_CreateTextureFromSurface(/*m_drawContext.m_mode.format*/SDL_PIXELFORMAT_ARGB8888, m_surf);
+        m_tex = SDL_CreateTextureFromSurface(SDL_PIXELFORMAT_ARGB8888, m_surf);
         SDL_SetTextureBlendMode(m_tex, SDL_BLENDMODE_BLEND);
     }
     return m_tex;
+}
+
+SDL_TextureID SDL13_IosSurface::getTexture(int angle)
+{
+    if (m_texRotated[angle] == 0) {
+        if (!m_rotated[angle]) {
+            // Generated rotated image.
+            m_rotated[angle] = iim_sdlsurface_rotate(m_surf, angle * 10);
+        }
+        m_texRotated[angle] = SDL_CreateTextureFromSurface(SDL_PIXELFORMAT_ARGB8888, m_rotated[angle]);
+        SDL_SetTextureBlendMode(m_texRotated[angle], SDL_BLENDMODE_BLEND);
+    }
+    return m_texRotated[angle];
 }
 
 void SDL13_IosSurface::releaseTexture()
@@ -328,7 +352,18 @@ void SDL13_DrawContext::renderCopyFlipped(IosSurface *surf, IosRect *srcRect, Io
 
 void SDL13_DrawContext::renderRotatedCentered(IosSurface *surf, int angle, int x, int y)
 {
-    //renderRotatedCentered_(display, surf, angle, x, y);
+    SDL13_IosSurface *sSurf = static_cast<SDL13_IosSurface *>(surf);
+    while (angle < 0) angle+=8640;
+    angle /= 10;
+    angle %= 36;
+    x -= surf->w/2;
+    y -= surf->h/2;
+    SDL_Rect rect;
+    rect.x = x;
+    rect.y = y;
+    rect.w = surf->w;
+    rect.h = surf->h;
+    SDL_RenderCopy(sSurf->getTexture(angle), NULL, &rect);
 }
 
 void SDL13_DrawContext::fillRect(const IosRect *rect, const RGBA &color)
