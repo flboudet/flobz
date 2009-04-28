@@ -18,6 +18,7 @@ public:
     void setAlpha(unsigned char alpha);
 public:
     SDL_TextureID getTexture();
+    SDL_TextureID getFlippedTexture();
     SDL_TextureID getTexture(int angle);
 private:
     void releaseTexture();

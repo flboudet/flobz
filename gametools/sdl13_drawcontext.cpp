@@ -94,7 +94,7 @@ inline static void fillRect_(SDL_Surface *surf, const IosRect *rect, const RGBA 
 // IosSurface implementation
 
 SDL13_IosSurface::SDL13_IosSurface(SDL_Surface *surf, SDL13_DrawContext &drawContext)
-    : m_surf(surf), m_tex(0), m_flippedSurf(NULL), m_drawContext(drawContext)
+    : m_surf(surf), m_tex(0), m_flippedSurf(NULL), m_texFlipped(0), m_drawContext(drawContext)
 {
     w = m_surf->w;
     h = m_surf->h;
@@ -125,6 +125,18 @@ SDL_TextureID SDL13_IosSurface::getTexture()
         SDL_SetTextureBlendMode(m_tex, SDL_BLENDMODE_BLEND);
     }
     return m_tex;
+}
+
+SDL_TextureID SDL13_IosSurface::getFlippedTexture()
+{
+    if (m_texFlipped == 0) {
+        if (m_flippedSurf == NULL) {
+            m_flippedSurf = iim_sdlsurface_mirror_h(m_surf);
+        }
+        m_texFlipped = SDL_CreateTextureFromSurface(SDL_PIXELFORMAT_ARGB8888, m_flippedSurf);
+        SDL_SetTextureBlendMode(m_texFlipped, SDL_BLENDMODE_BLEND);
+    }
+    return m_texFlipped;
 }
 
 SDL_TextureID SDL13_IosSurface::getTexture(int angle)
@@ -347,7 +359,11 @@ void SDL13_DrawContext::renderCopy(IosSurface *surf, IosRect *srcRect, IosRect *
 
 void SDL13_DrawContext::renderCopyFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
-    //renderCopyFlipped_(display, surf, srcRect, dstRect);
+    SDL13_IosSurface *sSurf = static_cast<SDL13_IosSurface *>(surf);
+    SDL_Rect sSrcRect, sDstRect;
+    SDL_RenderCopy(sSurf->getFlippedTexture(),
+                   IOSRECTPTR_TO_SDL(srcRect, sSrcRect),
+                   IOSRECTPTR_TO_SDL(dstRect, sDstRect));
 }
 
 void SDL13_DrawContext::renderRotatedCentered(IosSurface *surf, int angle, int x, int y)
