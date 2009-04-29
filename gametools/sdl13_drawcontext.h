@@ -79,6 +79,7 @@ public:
 private:
     SDL13_IIMLibrary m_iimLib;
     SDL_DisplayMode m_mode;
+    SDL_Rect m_clipRect, *m_clipRectPtr;
     friend class SDL13_IIMLibrary;
     friend class SDL13_IosSurface;
 };

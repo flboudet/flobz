@@ -277,7 +277,7 @@ void SDL13_IIMLibrary::convertToGray(IosSurface *surf)
 // DrawContext implementation
 
 SDL13_DrawContext::SDL13_DrawContext(int w, int h, bool fullscreen, const char *caption)
-    : m_iimLib(*this)
+    : m_iimLib(*this), m_clipRectPtr(NULL)
 {
     SDL_DisplayMode wishedMode, possibleMode;
     wishedMode.format = SDL_PIXELFORMAT_ARGB8888;
@@ -347,14 +347,46 @@ static void mySDL_RenderCopy(SDL_TextureID id, SDL_Rect *srcRect, SDL_Rect *dstR
     SDL_RenderCopy(id, srcRect, dstRect);
 }
 
+#define MAX(a, b) ( a < b ? b : a)
+#define MIN(a, b) ( a < b ? a : b)
+
 // DrawTarget implementation
 void SDL13_DrawContext::renderCopy(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
     SDL_Rect sSrcRect, sDstRect;
     SDL13_IosSurface *sSurf = static_cast<SDL13_IosSurface *>(surf);
-    SDL_RenderCopy(sSurf->getTexture(),
-                   IOSRECTPTR_TO_SDL(srcRect, sSrcRect),
-                   IOSRECTPTR_TO_SDL(dstRect, sDstRect));
+    if (m_clipRectPtr == NULL) {
+        SDL_RenderCopy(sSurf->getTexture(),
+                       IOSRECTPTR_TO_SDL(srcRect, sSrcRect),
+                       IOSRECTPTR_TO_SDL(dstRect, sDstRect));
+    }
+    else {
+        if (IOSRECTPTR_TO_SDL(srcRect, sSrcRect) == NULL) {
+            sSrcRect.x = 0;
+            sSrcRect.y = 0;
+            sSrcRect.h = sSurf->h;
+            sSrcRect.w = sSurf->w;
+        }
+        if (IOSRECTPTR_TO_SDL(dstRect, sDstRect) == NULL) {
+            sDstRect.x = 0;
+            sDstRect.y = 0;
+            sDstRect.h = this->h;
+            sDstRect.w = this->w;
+        }
+        // SrcRect computation
+        SDL_Rect sSrcResult;
+        m_clipRect.x -= sDstRect.x - sSrcRect.x;
+        m_clipRect.y -= sDstRect.y - sSrcRect.y;
+        if (! SDL_IntersectRect(&sSrcRect, &m_clipRect, &sSrcResult))
+            return;
+        m_clipRect.x += sDstRect.x - sSrcRect.x;
+        m_clipRect.y += sDstRect.y - sSrcRect.y;
+        // DstRect computation
+        SDL_Rect sDstResult;
+        if (! SDL_IntersectRect(&sDstRect, &m_clipRect, &sDstResult))
+            return;
+        SDL_RenderCopy(sSurf->getTexture(), &sSrcResult, &sDstResult);
+    }
 }
 
 void SDL13_DrawContext::renderCopyFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
@@ -391,5 +423,5 @@ void SDL13_DrawContext::fillRect(const IosRect *rect, const RGBA &color)
 
 void SDL13_DrawContext::setClipRect(IosRect *rect)
 {
-    //setClipRect_(display, rect);
+    m_clipRectPtr = IOSRECTPTR_TO_SDL(rect, m_clipRect);
 }

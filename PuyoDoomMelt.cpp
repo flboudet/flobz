@@ -140,6 +140,7 @@ void _column_draw (column_t *column, IosSurface *meltImage, DrawTarget *display)
 
     dest_rect.x = column->x;
     dest_rect.y = tmp;
+    dest_rect.h = meltImage->h - tmp;
 
     image_rect.x = column->x;
     image_rect.h = meltImage->h - tmp;
