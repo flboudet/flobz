@@ -353,7 +353,7 @@ void VanishAnimation::draw(int semiMove)
     }
     else {
 		AnimatedPuyoTheme *theme = attachedPuyo.getAttachedTheme();
-        SDL_Painter &painter = attachedPuyo.getAttachedView()->getPainter();
+        DrawTarget &painter = attachedPuyo.getAttachedView()->getPainter();
 
         IosRect drect, xrect;
         int iter2 = iter - 10 - delay;
@@ -368,22 +368,22 @@ void VanishAnimation::draw(int semiMove)
             drect.w = shrinkingSurface->w;
             drect.h = shrinkingSurface->h;
 
-            painter.requestDraw(shrinkingSurface, &drect);
+            painter.renderCopy(shrinkingSurface, NULL, &drect);
             int xrectY = Y + (int)(2.5 * pow(iter - 16 - delay, 2) - 108);
             xrect.w = explodingSurface->w;
             xrect.h = explodingSurface->h;
             xrect.x = X - iter2 * iter2;
             xrect.y = xrectY;
-            painter.requestDraw(explodingSurface, &xrect);
+            painter.renderCopy(explodingSurface, NULL, &xrect);
             xrect.x = X - iter2;
             xrect.y = xrectY + iter2;
-            painter.requestDraw(explodingSurface, &xrect);
+            painter.renderCopy(explodingSurface, NULL, &xrect);
             xrect.x = X + iter2;
             xrect.y = xrectY + iter2;
-            painter.requestDraw(explodingSurface, &xrect);
+            painter.renderCopy(explodingSurface, NULL, &xrect);
             xrect.x = X + iter2 * iter2;
             xrect.y = xrectY;
-            painter.requestDraw(explodingSurface, &xrect);
+            painter.renderCopy(explodingSurface, NULL, &xrect);
         }
     }
 }
@@ -468,20 +468,20 @@ void NeutralPopAnimation::cycle()
 
 void NeutralPopAnimation::draw(int semiMove)
 {
-    SDL_Painter &painter = attachedPuyo.getAttachedView()->getPainter();
+    DrawTarget &painter = attachedPuyo.getAttachedView()->getPainter();
     IosRect drect;
     drect.x = X;
     drect.y = Y;
     drect.w = neutralPop[0]->w;
     drect.h = neutralPop[0]->h;
     if (iter - delay < 20) {
-        painter.requestDraw(neutralPop[0], &drect);
+        painter.renderCopy(neutralPop[0], NULL, &drect);
     }
     else if (iter - delay < 23) {
-        painter.requestDraw(neutralPop[1], &drect);
+        painter.renderCopy(neutralPop[1], NULL, &drect);
     }
     else if (iter - delay < 26) {
-        painter.requestDraw(neutralPop[2], &drect);
+        painter.renderCopy(neutralPop[2], NULL, &drect);
     }
 }
 

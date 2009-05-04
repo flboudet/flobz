@@ -24,7 +24,6 @@
 #include "PuyoGameWidget.h"
 #include "PuyoCommander.h"
 #include "PuyoStarter.h"
-//#include "PuyoStrings.h"
 
 
 #define TIME_BETWEEN_GAME_CYCLES 0.02
@@ -40,7 +39,9 @@ void PuyoGameWidget::setGameOptions(GameOptions game_options)
 }
 
 PuyoGameWidget::PuyoGameWidget(GameOptions game_options)
-    : CycledComponent(TIME_BETWEEN_GAME_CYCLES), associatedScreen(NULL), cyclesBeforeGameCycle(0), cyclesBeforeSpeedIncreases(game_options.CYCLES_BEFORE_SPEED_INCREASES),
+    : CycledComponent(TIME_BETWEEN_GAME_CYCLES), associatedScreen(NULL),
+      painter(*(GameUIDefaults::GAME_LOOP->getDrawContext())), cyclesBeforeGameCycle(0),
+      cyclesBeforeSpeedIncreases(game_options.CYCLES_BEFORE_SPEED_INCREASES),
       tickCounts(0), cycles(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(0),
       MinSpeed(game_options.MIN_SPEED), MaxSpeed(game_options.MAX_SPEED),
       blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
@@ -67,7 +68,6 @@ void PuyoGameWidget::initialize()
     skipGameCycleA = false;
     skipGameCycleB = false;
 
-    IosSurface * background = attachedLevelTheme->getBackground();
     if (attachedLevelTheme->getForegroundAnimation() != "") {
       // Initializing the styrolyse client
       m_styroPainter.m_styroClient.loadImage = styro_loadImage;
@@ -87,9 +87,6 @@ void PuyoGameWidget::initialize()
 		      (StyrolyseClient *)(&m_styroPainter), false);
     }
     IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
-    painter.gameScreen = painterGameScreen = iimLib.create_DisplayFormat(background->w, background->h);
-    painter.backGround = background;
-    painter.redrawAll(painter.gameScreen);
 
     // Setting up games
     attachedGameA = this->areaA->getAttachedGame();
@@ -111,7 +108,6 @@ void PuyoGameWidget::initialize()
 
 PuyoGameWidget::~PuyoGameWidget()
 {
-    delete painter.gameScreen;
     for (unsigned int i=0; i<puyoFX.size(); ++i)
         delete puyoFX[i];
     if (m_foregroundAnimation != NULL) {
@@ -218,6 +214,8 @@ void PuyoGameWidget::cycle()
 
 void PuyoGameWidget::draw(DrawTarget *dt)
 {
+    // Render the background
+    painter.renderCopy(attachedLevelTheme->getBackground(), NULL, NULL);
     if (!paused) {
         // Rendering puyo views
         areaA->render();
@@ -231,12 +229,12 @@ void PuyoGameWidget::draw(DrawTarget *dt)
             drect.y = -1;
             drect.w = grid->w;
             drect.h = grid->h;
-            painter.requestDraw(grid, &drect);
+            painter.renderCopy(grid, NULL, &drect);
             drect.x = 407;
             drect.y = -1;
             drect.w = grid->w;
             drect.h = grid->h;
-            painter.requestDraw(grid, &drect);
+            painter.renderCopy(grid, NULL, &drect);
         }
 
         // Rendering the foreground animation
@@ -251,17 +249,19 @@ void PuyoGameWidget::draw(DrawTarget *dt)
         if (displayLives && (lives>=0) && (lives<=3))
         {
             IosSurface * liveImage = attachedLevelTheme->getLifeForIndex(lives);
-            drect.x = painter.gameScreen->w / 2 - liveImage->w / 2;
+            drect.x = painter.w / 2 - liveImage->w / 2;
             drect.y = 436;
             drect.w = liveImage->w;
             drect.h = liveImage->h;
-            painter.requestDraw(liveImage, &drect);
+            painter.renderCopy(liveImage, NULL, &drect);
         }
 
         // Drawing the painter
-        painter.draw();
+        // TODO: Fix
+        // painter.draw();
     }
-    dt->renderCopy(painterGameScreen, NULL, NULL);
+    // Disabled for direct draw
+    //dt->renderCopy(painterGameScreen, NULL, NULL);
 
     // Rendering the game speed meter
     // Should be moved to the painter
@@ -357,7 +357,8 @@ void PuyoGameWidget::pause()
 void PuyoGameWidget::resume()
 {
     paused = false;
-    painter.redrawAll();
+    // TODO: Fix
+    //painter.redrawAll();
 }
 
 void PuyoGameWidget::eventOccured(GameControlEvent *event)
@@ -424,6 +425,7 @@ void PuyoGameWidget::styro_drawImage(StyrolyseClient *_this,
 			    void *image, int x, int y,
 			    int clipx, int clipy, int clipw, int cliph, int flipped)
 {
+#ifdef DISABLED
   IosSurface *surf = (IosSurface *)image;
   IosRect  cliprect;
   cliprect.x = clipx;
@@ -440,7 +442,8 @@ void PuyoGameWidget::styro_drawImage(StyrolyseClient *_this,
     surf = surf->fliph;
   }
 #endif
-  ((StyrolysePainterClient *)_this)->m_painter->requestDraw(surf, &cliprect);
+  ((StyrolysePainterClient *)_this)->m_painter->renderCopy(surf, NULL, &cliprect);
+#endif
 }
 void PuyoGameWidget::styro_freeImage(StyrolyseClient *_this, void *image)
 {

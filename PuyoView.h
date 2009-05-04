@@ -66,7 +66,7 @@ class PuyoView : public PuyoDelegate {
     PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 	     AnimatedPuyoSetTheme *attachedThemeSet,
          PuyoLevelTheme *attachedLevelTheme,
-	     int xOffset, int yOffset, int nXOffset, int nYOffset, SDL_Painter &painterToUse);
+	     int xOffset, int yOffset, int nXOffset, int nYOffset, DrawTarget &painterToUse);
     virtual ~PuyoView();
     void setEnemyGame(PuyoGame *enemyGame);
     void render();
@@ -84,7 +84,7 @@ class PuyoView : public PuyoDelegate {
 
     int getValenceForPuyo(PuyoPuyo *puyo) const;
     PuyoGame *getAttachedGame() const { return attachedGame; }
-    SDL_Painter & getPainter() const { return attachedPainter; }
+    DrawTarget & getPainter() const { return attachedPainter; }
 
     bool isGameOver() const;
 
@@ -121,7 +121,7 @@ class PuyoView : public PuyoDelegate {
     PuyoGame *attachedGame, *enemyGame;
     AdvancedBuffer<Animation *> viewAnimations;
     int cycleAllowance;
-    SDL_Painter &attachedPainter;
+    DrawTarget &attachedPainter;
     int delayBeforeGameOver;
     bool newMetaCycleStart;
     PlayerGameStatDisplay *attachedStatDisplay;

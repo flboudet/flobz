@@ -108,7 +108,7 @@ protected:
     static void styro_freeImage(StyrolyseClient *_this, void *image);
 
     PuyoGameScreen *associatedScreen;
-    SDL_Painter painter;
+    DrawTarget &painter;
     IosSurface *painterGameScreen;
     PuyoLevelTheme *attachedLevelTheme;
     PuyoView *areaA, *areaB;
@@ -136,7 +136,7 @@ protected:
     // Foreground animation
     struct StyrolysePainterClient {
       StyrolyseClient m_styroClient;
-      SDL_Painter *m_painter;
+      DrawTarget *m_painter;
       PuyoLevelTheme *m_theme;
     };
     Styrolyse *m_foregroundAnimation;

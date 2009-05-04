@@ -35,15 +35,10 @@
 #include "HiScores.h"
 #include "PuyoDoomMelt.h"
 
-#include "SDL_Painter.h"
-
-//IIM_Surface *neutral = NULL;
-//IIM_Surface *bigNeutral = NULL;
-
 PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 		   AnimatedPuyoSetTheme *attachedThemeSet,
            PuyoLevelTheme *attachedLevelTheme,
-		   int xOffset, int yOffset, int nXOffset, int nYOffset, SDL_Painter &painterToUse)
+		   int xOffset, int yOffset, int nXOffset, int nYOffset, DrawTarget &painterToUse)
   : attachedThemeSet(attachedThemeSet), attachedLevelTheme(attachedLevelTheme),
     attachedPuyoFactory(this), attachedPainter(painterToUse), delayBeforeGameOver(60)
 {
@@ -203,8 +198,8 @@ void PuyoView::render()
 		drect.y = nYOffset + TSIZE;
 		drect.w = currentSurface->w;
 		drect.h = currentSurface->h;
-		attachedPainter.requestDraw(currentSurface, &drect);
-		attachedPainter.requestDraw(nextPuyoTheme->getEyeSurfaceForIndex(0), &drect);
+		attachedPainter.renderCopy(currentSurface, NULL, &drect);
+		attachedPainter.renderCopy(nextPuyoTheme->getEyeSurfaceForIndex(0), NULL, &drect);
 	}
 	AnimatedPuyoTheme *nextCompanionTheme =
 	  attachedThemeSet->getAnimatedPuyoTheme(attachedGame->getNextCompanion());
@@ -214,8 +209,8 @@ void PuyoView::render()
 		drect.y = nYOffset;
 		drect.w = currentSurface->w;
 		drect.h = currentSurface->h;
-		attachedPainter.requestDraw(currentSurface, &drect);
-		attachedPainter.requestDraw(nextCompanionTheme->getEyeSurfaceForIndex(0), &drect);
+		attachedPainter.renderCopy(currentSurface, NULL, &drect);
+		attachedPainter.renderCopy(nextCompanionTheme->getEyeSurfaceForIndex(0), NULL, &drect);
 	}
 
     // Drawing the view animation
@@ -250,7 +245,7 @@ void PuyoView::renderNeutral()
 		drect.y = drect_y_base - giantNeutral->h;
 		drect.w = giantNeutral->w;
 		drect.h = giantNeutral->h;
-		attachedPainter.requestDraw(giantNeutral, &drect);
+		attachedPainter.renderCopy(giantNeutral, NULL, &drect);
 		drect_x += giantNeutral->w;
 	}
     for (int cpt = 0 ; cpt < numBigNeutral ; cpt++) {
@@ -258,7 +253,7 @@ void PuyoView::renderNeutral()
 		drect.y = drect_y_base - bigNeutral->h;
 		drect.w = bigNeutral->w;
 		drect.h = bigNeutral->h;
-		attachedPainter.requestDraw(bigNeutral, &drect);
+		attachedPainter.renderCopy(bigNeutral, NULL, &drect);
 		drect_x += bigNeutral->w;
 	}
     for (int cpt = 0 ; cpt < numNeutral ; cpt++) {
@@ -266,7 +261,7 @@ void PuyoView::renderNeutral()
 		drect.y = drect_y_base - neutral->h;
 		drect.w = neutral->w;
 		drect.h = neutral->h;
-		attachedPainter.requestDraw(neutral, &drect);
+		attachedPainter.renderCopy(neutral, NULL, &drect);
 		drect_x += neutral->w;
 	}
 }

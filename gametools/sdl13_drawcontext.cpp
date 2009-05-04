@@ -121,6 +121,12 @@ SDL13_IosSurface::~SDL13_IosSurface()
 SDL_TextureID SDL13_IosSurface::getTexture()
 {
     if (m_tex == 0) {
+        //if (! SDL_ISPIXELFORMAT_ALPHA(m_surf->format)) {
+        //    cout << "No alpha!" << endl;
+        //}
+        //if (SDL_ISPIXELFORMAT_INDEXED(m_surf->format)) {
+        //    cout << "Indexed!" << endl;
+        //}
         m_tex = SDL_CreateTextureFromSurface(SDL_PIXELFORMAT_ARGB8888, m_surf);
         SDL_SetTextureBlendMode(m_tex, SDL_BLENDMODE_BLEND);
     }
