@@ -425,25 +425,20 @@ void PuyoGameWidget::styro_drawImage(StyrolyseClient *_this,
 			    void *image, int x, int y,
 			    int clipx, int clipy, int clipw, int cliph, int flipped)
 {
-#ifdef DISABLED
-  IosSurface *surf = (IosSurface *)image;
-  IosRect  cliprect;
+    IosSurface *surf = (IosSurface *)image;
+  IosRect  rect, cliprect;
+  rect.x = x;
+  rect.y = y;
+  rect.h = surf->h;
+  rect.w = surf->w;
   cliprect.x = clipx;
   cliprect.y = clipy;
   cliprect.w = clipw;
   cliprect.h = cliph;
-  // TODO: Fix
-#ifdef DISABLED
-  if (flipped) {
-    if (!surf->fliph) {
-        // Generate flipped image.
-        surf->fliph = iim_surface_mirror_h(surf);
-    }
-    surf = surf->fliph;
-  }
-#endif
-  ((StyrolysePainterClient *)_this)->m_painter->renderCopy(surf, NULL, &cliprect);
-#endif
+  ((StyrolysePainterClient *)_this)->m_painter->setClipRect(&cliprect);
+  if (!flipped)
+      ((StyrolysePainterClient *)_this)->m_painter->renderCopy(surf, NULL, &rect);
+  else ((StyrolysePainterClient *)_this)->m_painter->renderCopyFlipped(surf, NULL, &rect);
 }
 void PuyoGameWidget::styro_freeImage(StyrolyseClient *_this, void *image)
 {
