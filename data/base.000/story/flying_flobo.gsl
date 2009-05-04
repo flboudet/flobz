@@ -43,5 +43,5 @@
   @flying_flobo_y.pos.y  = 180. + [sin: value = (@fcycle/@flying_flobo_PeriodFactorTitle+1.4)]*@flying_flobo_AmplitudeWaveTitle
   @flying_flobo_o3.pos.y = 190. + [sin: value = (@fcycle/@flying_flobo_PeriodFactorTitle+1.6)]*@flying_flobo_AmplitudeWaveTitle
 
-  @flying_flobo_titledisplay.x = @flying_flobo_TitleDisplayXBase + [sin: value = (@fcycle/30.0)]*40.
-  @flying_flobo_titledisplay.y = @flying_flobo_TitleDisplayYBase + [sin: value = (@fcycle/30.0)+1.57]*10.
+  @flying_flobo_titledisplay.x = @flying_flobo_TitleDisplayXBase + [sin: value = (@fcycle/30.0)]*@flying_flobo_AmplitudeWaveTitle*2.
+  @flying_flobo_titledisplay.y = @flying_flobo_TitleDisplayYBase + [sin: value = (@fcycle/30.0)+1.57]*@flying_flobo_AmplitudeWaveTitle/2.

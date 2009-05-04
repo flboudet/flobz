@@ -1,24 +1,144 @@
+import <libkaorisd.gsl>
+import <flying_flobo.gsl>
+# Line 220
+
 <init>
-  Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
-  Sprite @kaori      = [new_sprite: image="sdkaori/running_01.png" x=-200.0 y=280.0 curframe=0.0 framespeed=0.4 nbframes=4.0]
-  Sprite @sky =     [new_sprite: image="introlevel/skynight.jpg" x=0.0 y=0.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
+    Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+    Sprite @sky = [new_sprite: image="introlevel/skynight.jpg" x=0.0 y=0.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
+
+    lk_init
+
+    # Timing
+    float @CREDITS_KAORI_COMES_T = 60.0
+    float @CREDITS_PROUDLY_PRESENTS_T = @CREDITS_KAORI_COMES_T + @LK_RUNNING_DURATION/2.0
+    float @CREDITS_FOVEA_TEAM_T = @CREDITS_PROUDLY_PRESENTS_T + 75.0
+    float @CREDITS_INTERLUDE_1_T = @CREDITS_FOVEA_TEAM_T + 60.0
+    float @CREDITS_INTERLUDE_2_T = @CREDITS_INTERLUDE_1_T + @LK_RUNNING_DURATION/9.0
+    float @CREDITS_INTERLUDE_3_T = @CREDITS_INTERLUDE_2_T + 160.0
+    float @CREDITS_FLOBO_T = @CREDITS_INTERLUDE_3_T + @LK_RUNNING_DURATION * 2.0
+    float @CREDITS_JEKO_T = @CREDITS_FLOBO_T + 135.0
+    float @CREDITS_GYOM_T = @CREDITS_JEKO_T + 140.0
+
+    # Available states
+    int @CREDITS_START = 1
+    int @CREDITS_KAORI_COMES = 2
+    int @CREDITS_PROUDLY_PRESENTS = 3
+    int @CREDITS_FOVEA_TEAM = 4
+    int @CREDITS_INTERLUDE_1 = 5
+    int @CREDITS_INTERLUDE_2 = 6
+    int @CREDITS_INTERLUDE_3 = 7
+    int @CREDITS_FLOBO = 8
+    int @CREDITS_JEKO = 9
+    int @CREDITS_GYOM = 10
+
+    # Current state
+    int @credits_state = @CREDITS_START
+
+    # Flying flobo
+    flying_flobo_init
+    @flying_flobo_TitleDisplayXBase = 60.0
+    @flying_flobo_TitleDisplayYBase = -110.0
+    @flying_flobo_AmplitudeWaveTitle = 10.0
 
 <sprite_list>
     Vec2 displayPos
     sprite::@sky display=@display
-    sprite::@kaori display=@display
-    displayPos.x = 100.
-    displayPos.y = 100.
-    put_text: text="Credits" pos=displayPos text_index=100.
+    flying_flobo_sprite_list
+    (@credits_state >= @CREDITS_PROUDLY_PRESENTS)? {
+        displayPos.x = 230.0
+        displayPos.y = 170.0
+        put_text: text="Proudly offered by..." pos=displayPos text_index=(@fcycle - @CREDITS_PROUDLY_PRESENTS_T)/2.0
+    }
+    (@credits_state >= @CREDITS_FOVEA_TEAM)? {
+        displayPos.x = 20.0 + (@fcycle - @CREDITS_FOVEA_TEAM_T)/1.4
+        displayPos.y = 320.0 - (@fcycle - @CREDITS_FOVEA_TEAM_T)/2.7
+        (displayPos.x > 245.0)? displayPos.x = 245.0
+        (displayPos.y < 200.0)? displayPos.y = 200.0
+        put_text: text="The Fovea team!" pos=displayPos text_index=(@fcycle - @CREDITS_FOVEA_TEAM_T)
+        (@credits_state <= @CREDITS_INTERLUDE_3)? {
+        (@fcycle >= @CREDITS_FOVEA_TEAM_T + 50.0)? {
+            displayPos.x = 100.0 - (@fcycle - @CREDITS_FOVEA_TEAM_T - 50.0)/5.0
+            displayPos.y = 390.0
+            put_text: text="and friends..." pos=displayPos text_index=(@fcycle - @CREDITS_FOVEA_TEAM_T - 50.0)
+        }
+        (@fcycle >= @CREDITS_FOVEA_TEAM_T + 120.0)? {
+            displayPos.x = 430.0 - (@fcycle - @CREDITS_FOVEA_TEAM_T - 120.0)/6.0
+            displayPos.y = 440.0 - (@fcycle - @CREDITS_FOVEA_TEAM_T - 120.0)/2.5
+            put_text: text="and friends of friends..." pos=displayPos text_index=(@fcycle - @CREDITS_FOVEA_TEAM_T - 120.0)
+        }
+    }
+    }
+    (@credits_state >= @CREDITS_FLOBO)? {
+        displayPos.x = -230.0 + (@fcycle - @CREDITS_FLOBO_T)*4.0
+        displayPos.y = 340.0
+        put_text: text="Florent \"Flobo\" Boudet\nGraphics and Programming" pos=displayPos text_index=100.0
+    }
+    (@credits_state >= @CREDITS_JEKO)? {
+        displayPos.x = 660.0 - (@fcycle - @CREDITS_JEKO_T)*3.75
+        displayPos.y = 385.0
+        put_text: text="Jean-Christophe \"Jeko\" Hoelt\nAudio and Programming" pos=displayPos text_index=100.0
+    }
+    (@credits_state >= @CREDITS_GYOM)? {
+        displayPos.x = -230.0 + (@fcycle - @CREDITS_GYOM_T)*3.6
+        displayPos.y = 430.0
+        put_text: text="Guillaume \"Gyom\" Borios\nArtificial Intelligence and GUI" pos=displayPos text_index=100.0
+    }
+    lk_sprite_list
 
 <update>
-    @kaori.image = "sdkaori/running_01.png"
-    (@kaori.curframe >= 1.0)? @kaori.image = "sdkaori/running_02.png"
-    (@kaori.curframe >= 2.0)? @kaori.image = "sdkaori/running_03.png"
-    (@kaori.curframe >= 3.0)? @kaori.image = "sdkaori/running_04.png"
-    move::@kaori fcycle=60.0 x=800.0 y=280.0
-    move::@kaori fcycle=120.0 x=-200.0 y=280.0
-    move::@kaori fcycle=180.0 x=800.0 y=280.0
-    @kaori.flipped=0
-    (@fcycle >= 60.0)? @kaori.flipped=1
-    (@fcycle >= 120.0)? @kaori.flipped=0
+    (@credits_state = @CREDITS_START)? (@fcycle > @CREDITS_KAORI_COMES_T)? {
+        lk_switch: state = @LK_RUNNING_SIDE_TO_MIDDLE
+        @credits_state = @CREDITS_KAORI_COMES
+    }
+    (@credits_state = @CREDITS_KAORI_COMES)? (@fcycle > @CREDITS_PROUDLY_PRESENTS_T)? {
+        lk_switch: state = @LK_WAITING
+        @credits_state = @CREDITS_PROUDLY_PRESENTS
+    }
+    (@credits_state = @CREDITS_PROUDLY_PRESENTS)? (@fcycle > @CREDITS_FOVEA_TEAM_T)? {
+        lk_switch: state = @LK_HAPPY
+        @credits_state = @CREDITS_FOVEA_TEAM
+    }
+    (@credits_state = @CREDITS_FOVEA_TEAM)? (@fcycle > @CREDITS_INTERLUDE_1_T)? {
+        lk_switch: state = @LK_RUNNING_MIDDLE_TO_MIDDLE
+        @credits_state = @CREDITS_INTERLUDE_1
+    }
+    (@credits_state = @CREDITS_INTERLUDE_1)? (@fcycle > @CREDITS_INTERLUDE_2_T)? {
+        lk_switch: state = @LK_HAPPY
+        @credits_state = @CREDITS_INTERLUDE_2
+    }
+    (@credits_state = @CREDITS_INTERLUDE_2)? (@fcycle > @CREDITS_INTERLUDE_3_T)? {
+        lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
+        @credits_state = @CREDITS_INTERLUDE_3
+    }
+    (@credits_state = @CREDITS_INTERLUDE_3)? (@lk_state = @LK_RUNNING_MIDDLE_TO_SIDE)? (@fcycle > @lk_startcycle + @LK_RUNNING_DURATION/2.0)? {
+        lk_switch: state = @LK_GONE
+    }
+    (@credits_state = @CREDITS_INTERLUDE_3)? (@fcycle > @CREDITS_FLOBO_T)? {
+        lk_switch: state = @LK_RUNNING_SIDE_TO_SIDE
+        @credits_state = @CREDITS_FLOBO
+    }
+    (@credits_state = @CREDITS_FLOBO)? (@lk_state = @LK_RUNNING_SIDE_TO_SIDE)? (@fcycle > @lk_startcycle + @LK_RUNNING_DURATION)? {
+        lk_switch: state = @LK_GONE
+    }
+    (@credits_state = @CREDITS_FLOBO)? (@fcycle > @CREDITS_JEKO_T)? {
+        lk_switch: state = @LK_RUNNING_SIDE_TO_SIDE
+        @credits_state = @CREDITS_JEKO
+    }
+    (@credits_state = @CREDITS_JEKO)? (@lk_state = @LK_RUNNING_SIDE_TO_SIDE)? (@fcycle > @lk_startcycle + @LK_RUNNING_DURATION)? {
+        lk_switch: state = @LK_GONE
+    }
+    (@credits_state = @CREDITS_JEKO)? (@fcycle > @CREDITS_GYOM_T)? {
+        lk_switch: state = @LK_RUNNING_SIDE_TO_SIDE
+        @credits_state = @CREDITS_GYOM
+    }
+    (@credits_state = @CREDITS_GYOM)? (@lk_state = @LK_RUNNING_SIDE_TO_SIDE)? (@fcycle > @lk_startcycle + @LK_RUNNING_DURATION)? {
+        lk_switch: state = @LK_GONE
+    }
+
+    # ------------------ #
+    # Actions to perform #
+    # ------------------ #
+    lk_update
+    @flying_flobo_AmplitudeWaveTitle = 30.0 - @fcycle  / 2.0
+    (@flying_flobo_AmplitudeWaveTitle < 3.0)? @flying_flobo_AmplitudeWaveTitle = 3.0
+    flying_flobo_update

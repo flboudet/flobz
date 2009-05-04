@@ -111,7 +111,8 @@ static void  freeImage (StyrolyseClient *_this, void *image)
 
 static void putText (StyrolyseClient *_this, int x, int y, const char *text)
 {
-  // TODO: Fix SoFont_PutString (storyFont, sstory, x, y, text, NULL);
+//  SDL_SetClipRect(sstory, NULL);
+//  SoFont_PutString (storyFont, sstory, x, y, text, NULL);
 }
 
 static const char *getText(StyrolyseClient *_this, const char *text)
