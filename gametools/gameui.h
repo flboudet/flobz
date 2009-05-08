@@ -52,12 +52,12 @@ bool isDirectionEvent(GameControlEvent *event);
     public:
       static GameUIEnum   CONTAINER_POLICY;
       static float        SPACING;
-      static SoFont      *FONT;
-      static SoFont      *FONT_INACTIVE;
-      static SoFont      *FONT_TEXT;
-      static SoFont      *FONT_SMALL_ACTIVE;
-      static SoFont      *FONT_SMALL_INFO;
-      static SoFont      *FONT_FUNNY;
+      static IosFont      *FONT;
+      static IosFont      *FONT_INACTIVE;
+      static IosFont     *FONT_TEXT;
+      static IosFont      *FONT_SMALL_ACTIVE;
+      static IosFont      *FONT_SMALL_INFO;
+      static IosFont      *FONT_FUNNY;
       static GameLoop    *GAME_LOOP;
       static ScreenStack *SCREEN_STACK;
   };
@@ -486,14 +486,14 @@ bool isDirectionEvent(GameControlEvent *event);
   class Text : public Widget, public IdleComponent {
     public:
       Text();
-      Text(const String &label, SoFont *font = NULL, bool autosize = true);
+      Text(const String &label, IosFont *font = NULL, bool autosize = true);
       void setTextAlign(TextAlign align) { m_textAlign = align; }
       TextAlign getTextAlign() const { return m_textAlign; }
       void setAutoSize(bool autoSize) { m_autoSize = autoSize; }
       bool getAutoSize() const { return m_autoSize; }
       void setValue(String value);
       String getValue() const { return label; }
-      void setFont(SoFont *newFont) { font = newFont; }
+      void setFont(IosFont *newFont) { font = newFont; }
       void boing(void);
 
       // Implements IdleComponent
@@ -502,7 +502,7 @@ bool isDirectionEvent(GameControlEvent *event);
 
     protected:
       void draw(DrawTarget *dt);
-      SoFont *font;
+      IosFont *font;
       bool startMoving;
 
     private:
@@ -545,7 +545,7 @@ bool isDirectionEvent(GameControlEvent *event);
 
   class Button : public Text {
     public:
-      Button(const String &label, SoFont *fontActive = NULL, SoFont *fontInactive = NULL);
+      Button(const String &label, IosFont *fontActive = NULL, IosFont *fontInactive = NULL);
       Button(const String &label, Action *action);
 
       void eventOccured(GameControlEvent *event);
@@ -554,9 +554,9 @@ bool isDirectionEvent(GameControlEvent *event);
       void giveFocus();
       void setFocusable(bool foc) { Text::setFocusable(foc); }
     private:
-      SoFont *fontActive;
-      SoFont *fontInactive;
-      void init(SoFont *fontActive, SoFont *fontInactive);
+      IosFont *fontActive;
+      IosFont *fontInactive;
+      void init(IosFont *fontActive, IosFont *fontInactive);
   };
 
 
@@ -576,12 +576,12 @@ bool isDirectionEvent(GameControlEvent *event);
       void idle(double currentTime);
 
     private:
-      SoFont *fontActive;
-      SoFont *fontInactive;
+      IosFont *fontActive;
+      IosFont *fontInactive;
       bool editionMode;
       String persistence;
       String previousValue;
-      void init(SoFont *fontActive, SoFont *fontInactive);
+      void init(IosFont *fontActive, IosFont *fontInactive);
 	  bool editOnFocus;
 
       // Event repeat related attributes
@@ -603,11 +603,11 @@ bool isDirectionEvent(GameControlEvent *event);
     private:
       int control;
       bool alternate;
-      SoFont *fontActive;
-      SoFont *fontInactive;
+      IosFont *fontActive;
+      IosFont *fontInactive;
       bool editionMode;
       String previousValue;
-      void init(SoFont *fontActive, SoFont *fontInactive);
+      void init(IosFont *fontActive, IosFont *fontInactive);
   };
 
   class ToggleButton : public Button {

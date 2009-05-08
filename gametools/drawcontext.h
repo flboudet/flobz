@@ -10,6 +10,7 @@ typedef struct IosRect
 } IosRect;
 
 class IosSurface;
+class IosFont;
 
 class DrawTarget
 {
@@ -20,6 +21,8 @@ public:
     virtual void renderRotatedCentered(IosSurface *surf, int angle, int x, int y) {}
     virtual void setClipRect(IosRect *rect) {}
     virtual void fillRect(const IosRect *rect, const RGBA &color) {}
+    virtual void putString(IosFont *font, int x, int y, const char *text) {}
+    void putStringCenteredXY(IosFont *font, int x, int y, const char *text);
 public:
     int h, w;
 };
@@ -30,6 +33,22 @@ class IosSurface : public DrawTarget
 {
 public:
     virtual void setAlpha(unsigned char alpha) = 0;
+};
+
+enum IosFontFx
+{
+    Font_STD,
+    Font_STORY,
+    Font_GREY,
+    Font_DARK
+};
+
+class IosFont
+{
+public:
+    virtual ~IosFont() {}
+    virtual int getTextWidth(const char *text) = 0;
+    virtual int getHeight() = 0;
 };
 
 class IIMLibrary
@@ -46,6 +65,7 @@ public:
     virtual IosSurface * resizeAlpha(IosSurface *surf, int width, int height) = 0;
     virtual IosSurface * mirrorH(IosSurface *surf) = 0;
     virtual void         convertToGray(IosSurface *surf) = 0;
+    virtual IosFont    * createFont(const char *path, int size, IosFontFx fx = Font_STD) = 0;
 protected:
     virtual ~IIMLibrary() {}
 };
@@ -60,6 +80,14 @@ public:
     virtual int getWidth() const = 0;
     virtual IIMLibrary & getIIMLibrary() = 0;
 };
+
+
+// Implementation
+inline void DrawTarget::putStringCenteredXY(IosFont *font, int x, int y, const char *text)
+{
+    putString(font, x - font->getTextWidth(text) / 2,
+              y - font->getHeight() / 2, text);
+}
 
 #endif // _DRAWCONTEXT_H_
 

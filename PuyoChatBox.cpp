@@ -62,7 +62,7 @@ ChatBox::ChatBox(ChatBoxDelegate &delegate)
     chatInputContainerFrame(&chatInputFramePicture),
     height(8), lines(new (HBox *[height])), names(new (Text *[height])), texts(new (Text *[height]))
 {
-    Vec3 lineSize(0.0f, SoFont_FontHeight(GameUIDefaults::FONT_TEXT), 1.0f);
+    Vec3 lineSize(0.0f, GameUIDefaults::FONT_TEXT->getHeight(), 1.0f);
 
     suspendLayout();
 

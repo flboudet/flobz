@@ -48,6 +48,8 @@ PuyoGameWidget::PuyoGameWidget(GameOptions game_options)
       playerOneName(p1name), playerTwoName(p2name),
       m_foregroundAnimation(NULL)
 {
+    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
+    painterGameScreen = iimLib.create_DisplayFormat(GameUIDefaults::GAME_LOOP->getDrawContext()->w, GameUIDefaults::GAME_LOOP->getDrawContext()->h);
 }
 
 void PuyoGameWidget::initialize(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
@@ -335,10 +337,9 @@ void PuyoGameWidget::draw(DrawTarget *dt)
     }
     */
     // Rendering the player names
-    SoFont *font = (paused ? GameUIDefaults::FONT_INACTIVE : GameUIDefaults::FONT_TEXT);
-    // TODO: Fix
-    //SoFont_CenteredString_XY (font, screen, 130, 460, playerOneName, NULL);
-    //SoFont_CenteredString_XY (font, screen, 510, 460, playerTwoName, NULL);
+    IosFont *font = (paused ? GameUIDefaults::FONT_INACTIVE : GameUIDefaults::FONT_TEXT);
+    dt->putStringCenteredXY(font, 130, 460, playerOneName);
+    dt->putStringCenteredXY(font, 510, 460, playerTwoName);
 }
 
 void PuyoGameWidget::addSubWidget(Widget *subWidget)

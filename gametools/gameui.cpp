@@ -12,12 +12,12 @@ namespace gameui {
 
     GameUIEnum   GameUIDefaults::CONTAINER_POLICY = USE_MAX_SIZE;
     float        GameUIDefaults::SPACING          = 16.0f;
-    SoFont      *GameUIDefaults::FONT             = SoFont_new();
-    SoFont      *GameUIDefaults::FONT_TEXT        = SoFont_new();
-    SoFont      *GameUIDefaults::FONT_INACTIVE    = SoFont_new();
-    SoFont      *GameUIDefaults::FONT_SMALL_ACTIVE= SoFont_new();
-    SoFont      *GameUIDefaults::FONT_SMALL_INFO  = SoFont_new();
-    SoFont      *GameUIDefaults::FONT_FUNNY       = SoFont_new();
+    IosFont      *GameUIDefaults::FONT             = NULL;
+    IosFont      *GameUIDefaults::FONT_TEXT        = NULL;
+    IosFont      *GameUIDefaults::FONT_INACTIVE    = NULL;
+    IosFont      *GameUIDefaults::FONT_SMALL_ACTIVE= NULL;
+    IosFont      *GameUIDefaults::FONT_SMALL_INFO  = NULL;
+    IosFont      *GameUIDefaults::FONT_FUNNY       = NULL;
     GameLoop    *GameUIDefaults::GAME_LOOP        = new GameLoop();
     ScreenStack *GameUIDefaults::SCREEN_STACK     = new ScreenStack();
 
@@ -1235,16 +1235,16 @@ namespace gameui {
         : label(""), offset(0.0,0.0,0.0), m_textAlign(TEXT_LEFT_ALIGN), m_autoSize(true), mdontMove(true)
     {
         this->font = GameUIDefaults::FONT_TEXT;
-        setPreferedSize(Vec3(m_autoSize?SoFont_TextWidth(this->font, label):0.0f, SoFont_FontHeight(this->font), 1.0));
+        setPreferedSize(Vec3(m_autoSize?this->font->getTextWidth(label):0.0f, this->font->getHeight(), 1.0));
         moving = false;
         startMoving = false;
     }
 
-    Text::Text(const String &label, SoFont *font, bool autosize)
+    Text::Text(const String &label, IosFont *font, bool autosize)
         : font(font), label(label), offset(0.0,0.0,0.0), m_textAlign(TEXT_LEFT_ALIGN), m_autoSize(autosize), mdontMove(true)
     {
         if (font == NULL) this->font = GameUIDefaults::FONT_TEXT;
-        setPreferedSize(Vec3(m_autoSize?SoFont_TextWidth(this->font, label):0.0f, SoFont_FontHeight(this->font), 1.0));
+        setPreferedSize(Vec3(m_autoSize?this->font->getTextWidth(label):0.0f, this->font->getHeight(), 1.0));
         moving = false;
         startMoving = false;
     }
@@ -1254,14 +1254,14 @@ namespace gameui {
         label = value;
         requestDraw();
         if (m_autoSize)
-            setPreferedSize(Vec3(SoFont_TextWidth(this->font, label), SoFont_FontHeight(this->font), 1.0f));
+            setPreferedSize(Vec3(font->getTextWidth(label), font->getHeight(), 1.0f));
         if (parent)
             parent->arrangeWidgets();
     }
 
     void Text::draw(DrawTarget *dt)
     {
-//#ifdef DEBUG_POSITION
+#ifdef DEBUG_POSITION
       IosRect r;
       r.x = getPosition().x;
       r.y = getPosition().y;
@@ -1270,32 +1270,30 @@ namespace gameui {
       RGBA rectColor = {0xAA, 0xAA, 0xAA, 0xAA};
       if (r.h>0.0f && r.w>0.0f)
           dt->fillRect(&r,rectColor);
-//#endif
-#ifdef DISABLED
+#endif
       if (isVisible())
       {
           switch (m_textAlign) {
               case TEXT_CENTERED:
-                  SoFont_PutString(font, screen,
-                                   (int)(offset.x + getPosition().x + (getSize().x-SoFont_TextWidth(this->font, label))/2.0f),
-                                   (int)(offset.y + getPosition().y + (getSize().y-SoFont_FontHeight(this->font))/2.0f),
-                                   (const char*)label, NULL);
+                  dt->putString(font,
+                                (int)(offset.x + getPosition().x + (getSize().x-(font->getTextWidth(label)))/2.0f),
+                                (int)(offset.y + getPosition().y + (getSize().y-(font->getHeight()))/2.0f),
+                                (const char*)label);
                   break;
               case TEXT_RIGHT_ALIGN:
-                  SoFont_PutString(font, screen,
-                                   (int)(offset.x + getPosition().x + getSize().x-SoFont_TextWidth(this->font, label)),
-                                   (int)(offset.y + getPosition().y + (getSize().y-SoFont_FontHeight(this->font))/2.0f),
-                                   (const char*)label, NULL);
+                  dt->putString(font,
+                                (int)(offset.x + getPosition().x + getSize().x-(font->getTextWidth(label))),
+                                (int)(offset.y + getPosition().y + (getSize().y-(font->getHeight()))/2.0f),
+                                (const char*)label);
                   break;
               case TEXT_LEFT_ALIGN:
-                  SoFont_PutString(font, screen,
-                                   (int)(offset.x + getPosition().x),
-                                   (int)(offset.y + getPosition().y + (getSize().y-SoFont_FontHeight(this->font))/2.0f),
-                                   (const char*)label, NULL);
+                  dt->putString(font,
+                                (int)(offset.x + getPosition().x),
+                                (int)(offset.y + getPosition().y + (getSize().y-(font->getHeight()))/2.0f),
+                                (const char*)label);
                   break;
           }
       }
-#endif
     }
 
     void Text::idle(double currentTime)
@@ -1425,7 +1423,7 @@ namespace gameui {
     // Button
     //
 
-    void Button::init(SoFont *fontActive, SoFont *fontInactive)
+    void Button::init(IosFont *fontActive, IosFont *fontInactive)
     {
         if (fontInactive == NULL) fontInactive = GameUIDefaults::FONT_INACTIVE;
         if (fontActive == NULL)   fontActive = GameUIDefaults::FONT;
@@ -1438,7 +1436,7 @@ namespace gameui {
         mdontMove = false;
     }
 
-    Button::Button(const String &label, SoFont *fontActive, SoFont *fontInactive)
+    Button::Button(const String &label, IosFont *fontActive, IosFont *fontInactive)
         : Text(label, fontInactive)
     {
         init(fontActive, fontInactive);
@@ -1497,7 +1495,7 @@ namespace gameui {
     // EditField
     //
 
-    void EditField::init(SoFont *fontActive, SoFont *fontInactive)
+    void EditField::init(IosFont *fontActive, IosFont *fontInactive)
     {
         if (fontInactive == NULL) fontInactive = GameUIDefaults::FONT_INACTIVE;
         if (fontActive == NULL)   fontActive = GameUIDefaults::FONT;
@@ -1814,7 +1812,7 @@ namespace gameui {
     // ControlInputWidget
     //
 
-    void ControlInputWidget::init(SoFont *fontActive, SoFont *fontInactive)
+    void ControlInputWidget::init(IosFont *fontActive, IosFont *fontInactive)
     {
         if (fontInactive == NULL) fontInactive = GameUIDefaults::FONT_SMALL_INFO;
         if (fontActive == NULL)   fontActive = GameUIDefaults::FONT_SMALL_ACTIVE;
@@ -1921,8 +1919,8 @@ namespace gameui {
         setPolicy(USE_MIN_SIZE);
         upButton.setImage(downArrow);
         downButton.setImage(downArrow);
-        scrollerBox.setPreferedSize(Vec3(16, (size+2) + SoFont_FontHeight(GameUIDefaults::FONT)*size));
-        listBox.setPreferedSize(Vec3(150,(size+2) + SoFont_FontHeight(GameUIDefaults::FONT)*size, 1));
+        scrollerBox.setPreferedSize(Vec3(16, (size+2) + GameUIDefaults::FONT->getHeight()*size));
+        listBox.setPreferedSize(Vec3(150,(size+2) + GameUIDefaults::FONT->getHeight()*size, 1));
         scrollerBox.add(&upButton);
         scrollerBox.add(&downButton);
         for (int i=0; i<size; ++i) {

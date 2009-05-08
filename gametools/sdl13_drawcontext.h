@@ -1,14 +1,43 @@
 #ifndef _SDL13_DRAWCONTEXT_H_
 #define _SDL13_DRAWCONTEXT_H_
 
+#include <map>
+#include <queue>
+
 #include "drawcontext.h"
 #ifdef MACOSX
 #include <SDL/SDL.h>
 #else
-#include "SDL.h"
+#include <SDL.h>
+#include <SDL_ttf.h>
 #endif
 
 class SDL13_DrawContext;
+class SDL13_IosSurface;
+
+class SDL13_IosFont : public IosFont
+{
+public:
+    SDL13_IosFont(const char *path, int size, IosFontFx fx, SDL13_DrawContext &drawContext);
+    virtual ~SDL13_IosFont();
+    virtual int getTextWidth(const char *text);
+    virtual int getHeight();
+    SDL13_IosSurface * render(const char *text);
+private:
+    SDL13_IosSurface * getFromCache(const char *text);
+    void storeInCache(const char *text, SDL13_IosSurface *surf);
+    void precomputeFX();
+    SDL_Surface *fontFX(SDL_Surface *src);
+private:
+    IosFontFx m_fx;
+    int m_height;
+    TTF_Font *m_font;
+    typedef std::map<std::string, SDL13_IosSurface *> CachedSurfacesMap;
+    CachedSurfacesMap m_cacheMap;
+    RGBA m_precomputed[8][8][64][16];
+private:
+    SDL13_DrawContext &m_drawContext;
+};
 
 class SDL13_IosSurface : public IosSurface
 {
@@ -56,6 +85,7 @@ public:
     virtual IosSurface * resizeAlpha(IosSurface *surf, int width, int height);
     virtual IosSurface * mirrorH(IosSurface *surf);
     virtual void         convertToGray(IosSurface *surf);
+    virtual IosFont    * createFont(const char *path, int size, IosFontFx fx = Font_STD);
 private:
     SDL13_DrawContext &m_drawContext;
     friend class SDL13_DrawContext;
@@ -76,6 +106,7 @@ public:
     virtual void renderRotatedCentered(IosSurface *surf, int angle, int x, int y);
     virtual void setClipRect(IosRect *rect);
     virtual void fillRect(const IosRect *rect, const RGBA &color);
+    virtual void putString(IosFont *font, int x, int y, const char *text);
 private:
     SDL13_IIMLibrary m_iimLib;
     SDL_DisplayMode m_mode;

@@ -3,7 +3,7 @@
 #include "audio.h"
 #include "AnimatedPuyoTheme.h"
 
-extern SoFont *storyFont;
+extern IosFont *storyFont;
 
 DrawTarget *sstory;
 
@@ -111,8 +111,8 @@ static void  freeImage (StyrolyseClient *_this, void *image)
 
 static void putText (StyrolyseClient *_this, int x, int y, const char *text)
 {
-//  SDL_SetClipRect(sstory, NULL);
-//  SoFont_PutString (storyFont, sstory, x, y, text, NULL);
+    sstory->setClipRect(NULL);
+    sstory->putString(storyFont, x, y, text);
 }
 
 static const char *getText(StyrolyseClient *_this, const char *text)

@@ -12,7 +12,7 @@
 using namespace gameui;
 
 PuyoCommander *theCommander = NULL;
-SoFont *storyFont;
+IosFont *storyFont;
 
 static const char * kFullScreenPref = "Config.FullScreen";
 #ifdef HAVE_OPENGL
@@ -132,12 +132,12 @@ void PuyoCommander::initFonts()
 {
   DBG_PRINT("initFonts()\n");
 
-  SoFont * darkFont = SoFont_new();
-  SoFont * menuFont = SoFont_new();
-  SoFont * smallFont = SoFont_new();
-  SoFont * smallFontInfo = SoFont_new();
-  SoFont * textFont = SoFont_new();
-  SoFont * funnyFont = SoFont_new();
+  IosFont * darkFont;
+  IosFont * menuFont;
+  IosFont * smallFont;
+  IosFont * smallFontInfo;
+  IosFont * textFont;
+  IosFont * funnyFont;
 
 #ifdef ENABLE_TTF
   Locales_Init(); // Make sure locales are detected.
@@ -152,15 +152,14 @@ void PuyoCommander::initFonts()
   }
   funny_path = getDataPathManager().getPath("gfx/zill_spills.ttf");
 
-  SoFont_load_ttf(darkFont, font, 17, SoFont_DARK);
-  SoFont_load_ttf(menuFont, font, 17, SoFont_STD);
-  SoFont_load_ttf(smallFont, font, 12, SoFont_STD);
-  SoFont_load_ttf(smallFontInfo, font, 12, SoFont_DARK);
-  SoFont_load_ttf(textFont, font, 17, SoFont_GREY);
-  SoFont_load_ttf(funnyFont, funny_path, 24, SoFont_STD);
-
-  storyFont = SoFont_new();
-  SoFont_load_ttf(storyFont, font, 17, SoFont_STORY);
+  IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
+  darkFont = iimLib.createFont(font, 17, Font_DARK);
+  menuFont = iimLib.createFont(font, 17, Font_STD);
+  smallFont = iimLib.createFont(font, 12, Font_STD);
+  smallFontInfo = iimLib.createFont(font, 12, Font_DARK);
+  textFont = iimLib.createFont(font, 17, Font_GREY);
+  funnyFont = iimLib.createFont(funny_path, 24, Font_STD);
+  storyFont = iimLib.createFont(font, 17, Font_STORY);
 #else
   smallFontInfo = SoFont_new();
   IIM_Surface *font3b = IIM_Load_Absolute_DisplayFormatAlpha (dataPathManager.getPath("gfx/font3b.png"));
@@ -177,18 +176,11 @@ void PuyoCommander::initFonts()
 
   storyFont = darkFont;
 #endif
-
-  SoFont_free(GameUIDefaults::FONT);
   GameUIDefaults::FONT              = menuFont;
-  SoFont_free(GameUIDefaults::FONT_TEXT);
   GameUIDefaults::FONT_TEXT         = textFont;
-  SoFont_free(GameUIDefaults::FONT_INACTIVE);
   GameUIDefaults::FONT_INACTIVE     = darkFont;
-  SoFont_free(GameUIDefaults::FONT_SMALL_INFO);
   GameUIDefaults::FONT_SMALL_INFO   = smallFontInfo;
-  SoFont_free(GameUIDefaults::FONT_SMALL_ACTIVE);
   GameUIDefaults::FONT_SMALL_ACTIVE = smallFont;
-  SoFont_free(GameUIDefaults::FONT_FUNNY);
   GameUIDefaults::FONT_FUNNY        = funnyFont;
 }
 
