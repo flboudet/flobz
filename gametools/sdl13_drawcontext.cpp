@@ -440,14 +440,22 @@ IosSurface * SDL13_IIMLibrary::load_Absolute_DisplayFormatAlpha(const char *path
     if (tmpsurf==NULL) {
         return NULL;
     }
-    retsurf = tmpsurf;
+#define ENABLE_WORKAROUND
+#ifdef ENABLE_WORKAROUND
+    retsurf = iim_sdlsurface_create_rgba(tmpsurf->w, tmpsurf->h);
+    if (tmpsurf->format->Amask != 0)
+        SDL_SetAlpha(tmpsurf, 0, SDL_ALPHA_OPAQUE);
+    SDL_BlitSurface(tmpsurf, NULL, retsurf, NULL);
     if (retsurf==NULL) {
         perror("Texture conversion failed (is Display initialized?)\n");
         SDL_FreeSurface (tmpsurf);
         return NULL;
     }
-    // SDL_SetAlpha (retsurf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
-    // SDL_FreeSurface (tmpsurf);
+    SDL_SetAlpha (retsurf, 0, SDL_ALPHA_OPAQUE);
+    SDL_FreeSurface (tmpsurf);
+#else
+    retsurf = tmpsurf;
+#endif
     return new SDL13_IosSurface(retsurf, m_drawContext);
 }
 
