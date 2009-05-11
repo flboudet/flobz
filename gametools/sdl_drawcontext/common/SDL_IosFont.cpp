@@ -34,6 +34,11 @@ int SDL_IosFont::getHeight()
     return m_height;
 }
 
+int SDL_IosFont::getLineSkip()
+{
+    return TTF_FontLineSkip(m_font);
+}
+
 IosSurface * SDL_IosFont::render(const char *text)
 {
     IosSurface *result = getFromCache(text);

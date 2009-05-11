@@ -49,6 +49,7 @@ public:
     virtual ~IosFont() {}
     virtual int getTextWidth(const char *text) = 0;
     virtual int getHeight() = 0;
+    virtual int getLineSkip() = 0;
 };
 
 class IIMLibrary

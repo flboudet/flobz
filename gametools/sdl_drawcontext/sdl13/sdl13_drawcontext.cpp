@@ -8,6 +8,8 @@
 #include <SDL_image.h>
 #endif
 #include "SDL_IosFont.h"
+#include "ios_fc.h"
+static IosFont *DBG_FONT = NULL;
 
 using namespace std;
 
@@ -17,6 +19,55 @@ using namespace std;
         sdlrect.x = iosrectptr->x, sdlrect.y = iosrectptr->y, \
         &sdlrect) \
         )
+
+int SplitString(const string& input,
+               const char delimiter, vector<string>& results,
+                      bool includeEmpties)
+{
+    int iPos   = 0;
+    int newPos = -1;
+    int isize  = (int)input.size();
+
+    if (isize == 0) return 0;
+    vector<int> positions;
+    newPos = input.find(delimiter, 0);
+
+    if (newPos < 0) {
+        results.push_back(input);
+        return 1;
+    }
+
+    int numFound = 0;
+    while (newPos >= iPos) {
+        numFound++;
+        positions.push_back(newPos);
+        iPos = newPos;
+        newPos = input.find(delimiter, iPos + 1);
+    }
+
+    if (numFound == 0) {
+        results.push_back(input);
+        return 1;
+    }
+
+    for (unsigned int i=0; i <= positions.size(); ++i) {
+        string s("");
+        if (i == 0)
+            s = input.substr(0, positions[0]);
+        else {
+            int offset = positions[i-1] + 1;
+            if (i == positions.size())
+                s = input.substr(offset);
+            else
+                s = input.substr(positions[i-1] + 1,
+                        positions[i] - positions[i-1] - 1);
+        }
+        if (includeEmpties || (s.size() > 0)) {
+            results.push_back(s);
+        }
+    }
+    return numFound+1;
+}
 
 // DrawTarget common functions for SDL13_IosSurface and SDL13_DrawContext
 inline static void renderCopy_(SDL_Surface *dest, IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
@@ -311,7 +362,9 @@ void SDL13_IIMLibrary::convertToGray(IosSurface *surf)
 
 IosFont *SDL13_IIMLibrary::createFont(const char *path, int size, IosFontFx fx)
 {
-    return new SDL13_IosFont(path, size, fx, m_drawContext);
+    IosFont *result = new SDL13_IosFont(path, size, fx, m_drawContext);
+    DBG_FONT = result;
+    return result;
 }
 
 // DrawContext implementation
@@ -351,7 +404,33 @@ SDL13_DrawContext::SDL13_DrawContext(int w, int h, bool fullscreen, const char *
 
 void SDL13_DrawContext::flip()
 {
-    SDL_RenderPresent();
+#define BENCHMARKS
+#ifdef BENCHMARKS
+  static double nFrames = 0.0;
+  static double t0 = 0.0;
+  static char fps[] = "FPS: .....   ";
+  static double minFPS = 100000.0;
+  static double t1 = 0.0;
+
+  double t2 = ios_fc::getTimeMs();
+  double curFPS = 1000.0 / (t2 - t1);
+  if (curFPS < minFPS) minFPS = curFPS;
+  t1 = t2;
+
+  if (nFrames > 60.0) {
+      sprintf(fps, "FPS: %3.1f >> %3.1f", (1000.0 * nFrames / (t2-t0)), minFPS);
+      t0 = t2;
+      nFrames = 0.0;
+      minFPS = 1000000.0;
+  }
+
+  nFrames += 1.0;
+  if (DBG_FONT != NULL) {
+      setClipRect(NULL);
+      putString (DBG_FONT, 16, 16, fps);
+  }
+#endif
+  SDL_RenderPresent();
 }
 
 int SDL13_DrawContext::getHeight() const
@@ -470,10 +549,17 @@ void SDL13_DrawContext::setClipRect(IosRect *rect)
 
 void SDL13_DrawContext::putString(IosFont *font, int x, int y, const char *text)
 {
-    if (strcmp(text, "") == 0)
-        return;
     SDL13_IosFont *sFont = static_cast<SDL13_IosFont *>(font);
-    IosSurface *surf = sFont->render(text);
-    IosRect dstRect = { x, y, surf->w, surf->h };
-    renderCopy(surf, NULL, &dstRect);
+    vector<string> lines;
+    int num = SplitString(text, '\n', lines, true);
+    int skip = sFont->getLineSkip();
+    for (vector<string>::iterator iter = lines.begin() ;
+         iter != lines.end() ; iter++) {
+        if (strcmp(iter->c_str(), "") == 0)
+            continue;
+        IosSurface *surf = sFont->render(iter->c_str());
+        IosRect dstRect = { x, y, surf->w, surf->h };
+        renderCopy(surf, NULL, &dstRect);
+        y += skip;
+    }
 }

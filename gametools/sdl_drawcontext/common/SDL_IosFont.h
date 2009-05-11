@@ -20,6 +20,7 @@ public:
     virtual ~SDL_IosFont();
     virtual int getTextWidth(const char *text);
     virtual int getHeight();
+    virtual int getLineSkip();
     IosSurface * render(const char *text);
 private:
     IosSurface * getFromCache(const char *text);
