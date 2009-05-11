@@ -7,7 +7,7 @@
 #include <SDL_image.h>
 #endif
 #include "SDL_IosFont.h"
-
+#include "ios_fc.h"
 static IosFont *DBG_FONT = NULL;
 
 using namespace std;
