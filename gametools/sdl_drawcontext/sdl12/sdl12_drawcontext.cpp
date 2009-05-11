@@ -256,6 +256,7 @@ SDL12_DrawContext::SDL12_DrawContext(int w, int h, bool fullscreen, const char *
     atexit(SDL_Quit);
     SDL_ShowCursor(SDL_DISABLE);
     SDL_WM_SetCaption(caption, NULL);
+    TTF_Init();
 }
 
 void SDL12_DrawContext::flip()
