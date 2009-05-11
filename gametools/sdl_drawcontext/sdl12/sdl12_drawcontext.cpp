@@ -6,6 +6,7 @@
 #else
 #include <SDL_image.h>
 #endif
+#include "SDL_IosFont.h"
 
 #define IOSRECTPTR_TO_SDL(iosrectptr, sdlrect) \
     ((iosrectptr == NULL) ? NULL : \
@@ -86,6 +87,24 @@ inline static void fillRect_(SDL_Surface *surf, const IosRect *rect, const RGBA 
 					 (color.alpha<<8) |
 					 (color.alpha<<16)|
 					 (color.alpha<<24))));
+}
+
+// IosFont implementation
+class SDL12_IosFont : public SDL_IosFont
+{
+public:
+    SDL12_IosFont(const char *path, int size, IosFontFx fx);
+protected:
+    virtual IosSurface *createSurface(SDL_Surface *src);
+};
+
+SDL12_IosFont::SDL12_IosFont(const char *path, int size, IosFontFx fx)
+  : SDL_IosFont(path, size, fx)
+{}
+
+IosSurface *SDL12_IosFont::createSurface(SDL_Surface *src)
+{
+    return new SDL12_IosSurface(src);
 }
 
 // IosSurface implementation
@@ -217,6 +236,11 @@ void SDL12_IIMLibrary::convertToGray(IosSurface *surf)
     iim_sdlsurface_convert_to_gray(sSurf->m_surf);
 }
 
+IosFont *SDL12_IIMLibrary::createFont(const char *path, int size, IosFontFx fx)
+{
+    return new SDL12_IosFont(path, size, fx);
+}
+
 // DrawContext implementation
 
 SDL12_DrawContext::SDL12_DrawContext(int w, int h, bool fullscreen, const char *caption)
@@ -303,3 +327,14 @@ void SDL12_DrawContext::setClipRect(IosRect *rect)
 {
     setClipRect_(display, rect);
 }
+
+void SDL12_DrawContext::putString(IosFont *font, int x, int y, const char *text)
+{
+    if (strcmp(text, "") == 0)
+        return;
+    SDL12_IosFont *sFont = static_cast<SDL12_IosFont *>(font);
+    IosSurface *surf = sFont->render(text);
+    IosRect dstRect = { x, y, surf->w, surf->h };
+    renderCopy(surf, NULL, &dstRect);
+}
+

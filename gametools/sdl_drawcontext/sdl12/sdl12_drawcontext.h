@@ -41,6 +41,7 @@ public:
     virtual IosSurface * resizeAlpha(IosSurface *surf, int width, int height);
     virtual IosSurface * mirrorH(IosSurface *surf);
     virtual void         convertToGray(IosSurface *surf);
+    virtual IosFont    * createFont(const char *path, int size, IosFontFx fx = Font_STD);
 private:
     friend class SDL12_DrawContext;
 };
@@ -60,6 +61,7 @@ public:
     virtual void renderRotatedCentered(IosSurface *surf, int angle, int x, int y);
     virtual void setClipRect(IosRect *rect);
     virtual void fillRect(const IosRect *rect, const RGBA &color);
+    virtual void putString(IosFont *font, int x, int y, const char *text);
 private:
     SDL_Surface *display;
     SDL12_IIMLibrary m_iimLib;
