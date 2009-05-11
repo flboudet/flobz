@@ -284,6 +284,7 @@ AC_SUBST([FPFEATURES])
 
 AC_CONFIG_FILES([
 Makefile gametools/Makefile iosfc/Makefile goomsl/Makefile
+gametools/sdl_drawcontext/Makefile
 data/Makefile
 data/base.000/Makefile
 data/base.000/gfx/Makefile

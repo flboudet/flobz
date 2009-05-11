@@ -15,12 +15,4 @@ EXTRA_DIST=FramedButton.h FramedEditField.h Frame.h \
            SDL_Painter.h sofont.h SwitchedButton.h vec3.h \
 	   drawcontext.h
 
-if ENABLE_SDL12_GFX
-libgametools_la_SOURCES+=sdl12_drawcontext.cpp
-EXTRA_DIST+=sdl12_drawcontext.h
-endif
-
-if ENABLE_SDL13_GFX
-libgametools_la_SOURCES+=sdl13_drawcontext.cpp
-EXTRA_DIST+=sdl13_drawcontext.h
-endif
+SUBDIRS=sdl_drawcontext

@@ -5,39 +5,14 @@
 #include <queue>
 
 #include "drawcontext.h"
+
 #ifdef MACOSX
 #include <SDL/SDL.h>
 #else
 #include <SDL.h>
-#include <SDL_ttf.h>
 #endif
 
 class SDL13_DrawContext;
-class SDL13_IosSurface;
-
-class SDL13_IosFont : public IosFont
-{
-public:
-    SDL13_IosFont(const char *path, int size, IosFontFx fx, SDL13_DrawContext &drawContext);
-    virtual ~SDL13_IosFont();
-    virtual int getTextWidth(const char *text);
-    virtual int getHeight();
-    SDL13_IosSurface * render(const char *text);
-private:
-    SDL13_IosSurface * getFromCache(const char *text);
-    void storeInCache(const char *text, SDL13_IosSurface *surf);
-    void precomputeFX();
-    SDL_Surface *fontFX(SDL_Surface *src);
-private:
-    IosFontFx m_fx;
-    int m_height;
-    TTF_Font *m_font;
-    typedef std::map<std::string, SDL13_IosSurface *> CachedSurfacesMap;
-    CachedSurfacesMap m_cacheMap;
-    RGBA m_precomputed[8][8][64][16];
-private:
-    SDL13_DrawContext &m_drawContext;
-};
 
 class SDL13_IosSurface : public IosSurface
 {

@@ -13,13 +13,6 @@ flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           LevelThemeMenu.cpp PuyoThemeMenu.cpp PuyoScreenTransition.cpp \
           PuyoGameAbstract.cpp PuyoStrings.cpp AnimatedPuyoTheme.cpp
 
-# Graphic backend configuration
-if ENABLE_SDL12_GFX
-endif
-
-if ENABLE_SDL13_GFX
-endif
-
 # Optional sources for network gaming support
 if ENABLE_NETWORK
 flobopuyo_SOURCES+=PuyoNetworkStarter.cpp PuyoNetworkView.cpp PuyoNetworkGame.cpp \
@@ -55,6 +48,15 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
 flobopuyo_CXXFLAGS = -I$(top_srcdir)/iosfc -I$(top_srcdir)/gametools -I$(top_srcdir)/goomsl $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 flobopuyo_OBJCFLAGS= $(SDL_CFLAGS)
 flobopuyo_LDADD = gametools/libgametools.la goomsl/libgoomsl.la iosfc/libiosfc.la $(SDL_LIBS)
+
+# Graphic backend configuration
+if ENABLE_SDL12_GFX
+flobopuyo_LDADD+=gametools/sdl_drawcontext/libsdl12_drawcontext.la
+endif
+
+if ENABLE_SDL13_GFX
+flobopuyo_LDADD+=gametools/sdl_drawcontext/libsdl13_drawcontext.la
+endif
 
 SUBDIRS = iosfc gametools goomsl data
 

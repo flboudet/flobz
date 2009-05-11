@@ -3,10 +3,10 @@
 #include "preferences.h"
 #include "MainMenu.h"
 #ifdef SDL12_GFX
-#include "sdl12_drawcontext.h"
+#include "sdl_drawcontext/sdl12/sdl12_drawcontext.h"
 #endif
 #ifdef SDL13_GFX
-#include "sdl13_drawcontext.h"
+#include "sdl_drawcontext/sdl13/sdl13_drawcontext.h"
 #endif
 
 // To be moved elsewhere
