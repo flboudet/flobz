@@ -386,7 +386,10 @@ SDL13_DrawContext::SDL13_DrawContext(int w, int h, bool fullscreen, const char *
     SDL_WindowID wid = SDL_CreateWindow("Test SDL 1.3",
                                         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                         w, h,/*SDL_WINDOW_FULLSCREEN |*/ SDL_WINDOW_OPENGL);
-    SDL_CreateRenderer(wid, 1, SDL_RENDERER_ACCELERATED);
+    SDL_CreateRenderer(wid, 1,
+                       SDL_RENDERER_PRESENTVSYNC |
+                       SDL_RENDERER_PRESENTFLIP3 |
+                       SDL_RENDERER_ACCELERATED);
     SDL_ShowWindow(wid);
     if (SDL_SelectRenderer(wid) != 0) {
         cout << "Window doesn't have a renderer" << endl;
