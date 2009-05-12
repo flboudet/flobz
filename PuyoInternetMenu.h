@@ -165,12 +165,12 @@ private:
     FramedButton updating;
     VBox rightPanel;
     Separator separator1_1, separator1_2, separator1_3,  separator10_1, separator10_2;
-    Text nicknameText, serverText, portText;
+    Text nicknameText, passwordText, serverText, portText;
     HBox hbox, menu;
     HBox bottomPanel;
     Separator bottomPanelSeparator, rightPanelSeparator;
     SliderContainer container;
-    FramedEditField playerName;
+    FramedEditField playerName, password;
     FramedEditField serverName, serverPort;
     int portNum;
     PuyoPopMenuAction backAction;
