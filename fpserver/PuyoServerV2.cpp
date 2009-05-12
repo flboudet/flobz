@@ -4,6 +4,11 @@
 #define DEBUG_PUYOPEERSLISTENERV2 1
 
 #include <stdio.h>
+#include <sqlite3.h>
+#include <string>
+#include <vector>
+#include <sstream>
+
 #include "ios_igpmessagebox.h"
 #include "ios_memory.h"
 #include "ios_dirigeable.h"
@@ -16,12 +21,12 @@
 #include "V2/messages/ConnectMessage.h"
 #include "V2/messages/DenyMessage.h"
 
+#include "V2/Database.h"
 #include "V2/PeersList.h"
 #include "V2/ConnectionRequest.h"
 #include "V2/Server.h"
 
 using namespace ios_fc;
-
 namespace flobopuyo {
 namespace server {
 
@@ -54,7 +59,9 @@ void PuyoServerV2::onMessage(Message &msg) {
             default:
                 break;
         }
-    } catch (Exception e) {} // XXX Handle exceptions?
+    } catch (Exception e) {
+        e.printMessage();
+    } // XXX Handle exceptions?
 }
  
 void PuyoServerV2::idle()

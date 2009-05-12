@@ -9,9 +9,11 @@ namespace v2 {
 class ConnectionRequest
 {
 public:
-    ConnectionRequest(const PeersList &peers, ios_fc::PeerAddress addr, int fpipVersion, const ios_fc::String name, int status)
-    : mPeers(peers), mAddr(addr), mFpipVersion(fpipVersion), mName(name), mStatus(status)
-    {}
+    ConnectionRequest(Database db, const PeersList &peers, ios_fc::PeerAddress addr, int fpipVersion, const ios_fc::String name, const ios_fc::String password, int status)
+    : mPeers(peers), mAddr(addr), mFpipVersion(fpipVersion), mName(name), mStatus(status), mUserExists(false), mPasswordCorrect(false)
+    {
+        db.checkLogin(name.c_str(), password.c_str(), mUserExists,mPasswordCorrect);
+    }
 
     // Return true if the connection can be accepted
     bool isAcceptable() const;
@@ -25,6 +27,8 @@ private:
     const ios_fc::String mName;
     int mStatus;
     mutable ios_fc::String mDenyErrorString;
+    bool mUserExists;
+    bool mPasswordCorrect;
 
     // Returns true if client protocol is supported
     bool checkVersion(int clientVersion) const;
@@ -40,12 +44,20 @@ bool ConnectionRequest::isAcceptable() const
     
     // Check if the client FPIP version is compatible with the server
     if (!checkVersion(mFpipVersion)) {
-        mDenyErrorString = "Client version mismatch.";
+        mDenyErrorString = "Err#01: Client version mismatch.";
         return false;
     }
     // Check if we are exceeding the maximum number of allowed peers
     else if (mPeers.isFull()) {
-        mDenyErrorString = "Too many connected players.";
+        mDenyErrorString = "Err#02: Too many connected players.";
+        return false;
+    }
+    else if (!mUserExists) {
+        mDenyErrorString = "Err#03: Incorrect user.";
+        return false;
+    }
+    else if (!mPasswordCorrect) {
+        mDenyErrorString = "Err#04: Incorrect password.";
         return false;
     }
     else {

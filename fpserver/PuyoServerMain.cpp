@@ -21,6 +21,7 @@ int main(int argc, const char * argv[])
     fprintf(stderr, "Usage %s [port number] [protocol number]\n", argv[0]);
     fprintf(stderr, "Starting server at port %d, using protocol %d\n", port, protocol);
   
+    try {
     Selector serverSelector;
     DatagramSocket serverSocket(port);
     UDPMessageBox messageBox(&serverSocket);
@@ -42,8 +43,6 @@ int main(int argc, const char * argv[])
                 fprintf(stderr, "Erros: valid protocols are 1 and 2");
     }
     igpMBox.addListener(responder);
-
-    try {
         while (true) {
             serverSelector.select(10);
             try {

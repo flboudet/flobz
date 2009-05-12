@@ -18,12 +18,13 @@ public:
 
 private:
     // Called when a peer connects
-    void onPeerConnect(ios_fc::PeerAddress addr, int fpipVersion, const ios_fc::String name, int status);
+    void onPeerConnect(ios_fc::PeerAddress addr, int fpipVersion, const ios_fc::String name, const ios_fc::String password, int status);
     // Called when a peer updates its status
     void onPeerUpdate(Peer *peer, int status);
     // Called when a peer is disconnected
     void onPeerDisconnect(Peer *peer);
 
+    Database mDB;
     PeersList mPeers;
     ios_fc::IgpVirtualPeerMessageBox &mMbox; // Message box
     double mTimeMsBeforePeerTimeout;         // Peers are disconnected when last update gets older than this
@@ -52,10 +53,22 @@ void Server::onIgpAlive(ios_fc::Message &msg, ios_fc::PeerAddress &address)
         onPeerUpdate(currentPeer, status);
     }
     else { // No such peer? Connect it
+#if DEBUG_PUYOPEERSLISTENERV2
+        printf("onIgpAlive: No such peer? Connect it\n");
+#endif
         int protocolVersion = msg.getInt("V"); // version of the FPIP protocol used by the client
         int status = msg.getInt("STATUS");
         ios_fc::String name = msg.getString("NAME");
-        onPeerConnect(address, protocolVersion, name, status);
+        printf("Name = %s\n", (const char*)name);
+        ios_fc::String pass;
+        try {
+            pass = msg.getString("PASS");
+        }
+        catch (ios_fc::Exception e) {
+            // No password specified
+            pass = "";
+        }
+        onPeerConnect(address, protocolVersion, name, pass, status);
     }
 }
 
@@ -78,13 +91,15 @@ void Server::onIgpChat(ios_fc::Message &msg)
             dirNew->setPeerAddress(mPeers[i]->addr);
             newMsg->send();
         }
-    } catch (ios_fc::Exception e) {}
+    } catch (ios_fc::Exception e) {
+        // TODO: something here
+    }
     delete newMsg;
 }
 
-void Server::onPeerConnect(ios_fc::PeerAddress addr, int fpipVersion, const ios_fc::String name, int status)
+void Server::onPeerConnect(ios_fc::PeerAddress addr, int fpipVersion, const ios_fc::String name, const ios_fc::String password, int status)
 {
-    ConnectionRequest request(mPeers, addr, fpipVersion, name, status);
+    ConnectionRequest request(mDB, mPeers, addr, fpipVersion, name, password, status);
     bool accept = request.isAcceptable();
 
     if (accept) {
@@ -118,6 +133,9 @@ void Server::onPeerConnect(ios_fc::PeerAddress addr, int fpipVersion, const ios_
     }
     else {
         // Send deny message
+#if DEBUG_PUYOPEERSLISTENERV2
+        printf("Connection refused for %s (%s)\n", (const char*)name, request.getDenyErrorString().c_str());
+#endif
         DenyMessage denyMsg(mMbox, request.getDenyErrorString());
         denyMsg.sendTo(addr);
     }
