@@ -18,6 +18,8 @@ import <flying_flobo.gsl>
     float @CREDITS_FLOBO_T = @CREDITS_INTERLUDE_3_T + @LK_RUNNING_DURATION * 2.0
     float @CREDITS_JEKO_T = @CREDITS_FLOBO_T + 135.0
     float @CREDITS_GYOM_T = @CREDITS_JEKO_T + 140.0
+    float @CREDITS_ALL_T = @CREDITS_GYOM_T + 170.0
+    float @CREDITS_FINAL_T = @CREDITS_ALL_T + 700.0
 
     # Available states
     int @CREDITS_START = 1
@@ -30,6 +32,8 @@ import <flying_flobo.gsl>
     int @CREDITS_FLOBO = 8
     int @CREDITS_JEKO = 9
     int @CREDITS_GYOM = 10
+    int @CREDITS_ALL = 11
+    int @CREDITS_FINAL = 12
 
     # Current state
     int @credits_state = @CREDITS_START
@@ -43,10 +47,18 @@ import <flying_flobo.gsl>
 <sprite_list>
     Vec2 displayPos
     sprite::@sky display=@display
+    (@credits_state >= @CREDITS_ALL)? {
+        displayPos.x = 40.0
+        displayPos.y = 460.0 - (@fcycle - @CREDITS_ALL_T)*0.5
+        put_text: text="We would also like to warmly thank every one who supported us with\nreally apprieciated contributions.\n           \nSouad \"Sousou\" El Merhebi\n-- for the website and lot of beta-testing\n        \nTania \"Gnia\" Garcia\n-- for its always original ideas\n        \nOur families...\n        \nOur friends...\n                           \nAnd friends of friends!\n \n \n \n \n \n                                            Thank you all" pos=displayPos text_index=(@fcycle-@CREDITS_ALL_T)*0.625
+        (@fcycle >= @CREDITS_ALL_T + 420.0)? @flying_flobo_TitleDisplayYBase = -110.0 - (@fcycle - 420.0 - @CREDITS_ALL_T)*0.5
+    }
     flying_flobo_sprite_list
     (@credits_state >= @CREDITS_PROUDLY_PRESENTS)? {
         displayPos.x = 230.0
         displayPos.y = 170.0
+        (@fcycle >= @CREDITS_ALL_T + 420.0)? 
+            displayPos.y = 170.0 - (@fcycle - 420.0 - @CREDITS_ALL_T)*0.5
         put_text: text="Proudly offered by..." pos=displayPos text_index=(@fcycle - @CREDITS_PROUDLY_PRESENTS_T)/2.0
     }
     (@credits_state >= @CREDITS_FOVEA_TEAM)? {
@@ -54,6 +66,8 @@ import <flying_flobo.gsl>
         displayPos.y = 320.0 - (@fcycle - @CREDITS_FOVEA_TEAM_T)/2.7
         (displayPos.x > 245.0)? displayPos.x = 245.0
         (displayPos.y < 200.0)? displayPos.y = 200.0
+        (@fcycle >= @CREDITS_ALL_T + 420.0)? 
+            displayPos.y = 200.0 - (@fcycle - 420.0 - @CREDITS_ALL_T)*0.5
         put_text: text="The Fovea team!" pos=displayPos text_index=(@fcycle - @CREDITS_FOVEA_TEAM_T)
         (@credits_state <= @CREDITS_INTERLUDE_3)? {
         (@fcycle >= @CREDITS_FOVEA_TEAM_T + 50.0)? {
@@ -62,7 +76,7 @@ import <flying_flobo.gsl>
             put_text: text="and friends..." pos=displayPos text_index=(@fcycle - @CREDITS_FOVEA_TEAM_T - 50.0)
         }
         (@fcycle >= @CREDITS_FOVEA_TEAM_T + 120.0)? {
-            displayPos.x = 430.0 - (@fcycle - @CREDITS_FOVEA_TEAM_T - 120.0)/6.0
+            displayPos.x = 420.0 - (@fcycle - @CREDITS_FOVEA_TEAM_T - 120.0)/6.0
             displayPos.y = 440.0 - (@fcycle - @CREDITS_FOVEA_TEAM_T - 120.0)/2.5
             put_text: text="and friends of friends..." pos=displayPos text_index=(@fcycle - @CREDITS_FOVEA_TEAM_T - 120.0)
         }
@@ -134,6 +148,22 @@ import <flying_flobo.gsl>
     (@credits_state = @CREDITS_GYOM)? (@lk_state = @LK_RUNNING_SIDE_TO_SIDE)? (@fcycle > @lk_startcycle + @LK_RUNNING_DURATION)? {
         lk_switch: state = @LK_GONE
     }
+    (@credits_state = @CREDITS_GYOM)? (@fcycle > @CREDITS_ALL_T)? {
+        @credits_state = @CREDITS_ALL
+    }
+    (@credits_state = @CREDITS_ALL)?  (@lk_state = @LK_GONE)? (@fcycle > @CREDITS_FINAL_T)? {
+        @credits_state = @CREDITS_FINAL
+        lk_switch: state = @LK_RUNNING_SIDE_TO_MIDDLE
+    }
+    (@credits_state = @CREDITS_FINAL)? (@lk_state = @LK_RUNNING_SIDE_TO_MIDDLE)? (@fcycle > @lk_startcycle + @LK_RUNNING_DURATION/2.0)? {
+        lk_switch: state = @LK_MOCKING
+    }
+    (@credits_state = @CREDITS_FINAL)? (@lk_state = @LK_MOCKING)? (@fcycle > @lk_startcycle + @LK_MOCKING_DURATION)? {
+        lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
+    }
+    #(@credits_state = @CREDITS_FINAL)? (@lk_state = @LK_RUNNING_MIDDLE_TO_SIDE)? (@fcycle > @lk_startcycle + @LK_RUNNING_DURATION/2.0)? {
+    #        lk_switch: state = @LK_GONE
+    #    }
 
     # ------------------ #
     # Actions to perform #
