@@ -36,6 +36,7 @@ static const char * kInternetMetaServerPathKey = "Menu.Internet.MetaServer.Path.
 static const char * kInternetMetaServerPortKey = "Menu.Internet.MetaServer.Port.";
 static const char * kInternetMetaServerNumberKey = "Menu.Internet.MetaServer.Number.";
 
+static const char * kInternetPasswordKey = "Menu.Internet.Password";
 static const char * kInternetCurrentServerKey = "Menu.Internet.CurrentServer";
 static const char * kInternetCurrentServerDefaultValue = "durandal.ios-software.com";
 static const char * kInternetCurrentServerPortKey = "Menu.Internet.CurrentServer.Port";
@@ -255,10 +256,13 @@ InternetGameMenu::InternetGameMenu(MainScreen * mainScreen)
     //rightPanel(theCommander->getWindowFramePicture()),
     separator1_1(1,1), separator1_2(1,1), separator1_3(1, 1), separator10_1(10,10), //separator10_2(10,10),
     nicknameText(theCommander->getLocalizedString("Nickname"), NULL, false),
+    passwordText(theCommander->getLocalizedString("Password"), NULL, false),
     serverText(theCommander->getLocalizedString("Server"), NULL, false),
     portText(theCommander->getLocalizedString("Port"), NULL, false),
     container(),
     playerName(PuyoGame::getPlayerName(-2), PuyoGame::getDefaultPlayerKey(-2),
+	       theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
+    password("", kInternetPasswordKey,
 	       theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
     serverName(kInternetCurrentServerDefaultValue,kInternetCurrentServerKey,
 	       theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
@@ -304,6 +308,9 @@ void InternetGameMenu::build()
     nicknameText.setTextAlign(TEXT_LEFT_ALIGN);
     rightPanel.add(&nicknameText);
     rightPanel.add(&playerName);
+    passwordText.setTextAlign(TEXT_LEFT_ALIGN);
+    rightPanel.add(&passwordText);
+    rightPanel.add(&password);
     rightPanel.add(&separator10_1);
     serverText.setTextAlign(TEXT_LEFT_ALIGN);
     rightPanel.add(&serverText);

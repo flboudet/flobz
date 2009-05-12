@@ -184,6 +184,8 @@ AC_CHECK_HEADER([SDL_ttf.h],
 			[AC_MSG_ERROR([*** SDL_ttf include files not found!
 You should install development package.])])
 
+AC_CHECK_HEADER(sqlite3.h, ENABLE_SQLITE=true, ENABLE_SQLITE=false)
+
 CPPFLAGS=$OLD_CPPFLAGS
 CXXFLAGS=$OLD_CXXFLAGS
 
@@ -263,6 +265,13 @@ else
   AC_MSG_RESULT([Network Gaming (Internet) Disabled])
 fi
 
+if test "x$ENABLE_SQLITE" = "xtrue"; then
+  AC_MSG_RESULT([Network Gaming Server (Internet) Enabled])
+  FPFEATURES="$FPFEATURES -DENABLE_NETWORK_SERVER_INTERNET=1"
+else
+  AC_MSG_RESULT([Network Gaming Server (Internet) Disabled])
+fi
+
 case $host_os in
    darwin*)
        MACOSX=true
@@ -278,6 +287,7 @@ AM_CONDITIONAL([ENABLE_SDL12_GFX], [test x$ENABLE_SDL12_GFX = xtrue])
 AM_CONDITIONAL([ENABLE_SDL13_GFX], [test x$ENABLE_SDL13_GFX = xtrue])
 AM_CONDITIONAL([ENABLE_NETWORK], [test x$ENABLE_NETWORK = xtrue])
 AM_CONDITIONAL([ENABLE_NETWORK_INTERNET], [test x$ENABLE_NETWORK_INTERNET = xtrue])
+AM_CONDITIONAL([ENABLE_NETWORK_SERVER], [test x$ENABLE_SQLITE = xtrue])
 
 AC_SUBST([SYSTEM_ROOT])
 AC_SUBST([FPFEATURES])
