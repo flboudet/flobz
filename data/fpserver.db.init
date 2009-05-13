@@ -1,0 +1,4 @@
+#!/bin/bash
+rm -fv data/fpserver.db
+sqlite3 data/fpserver.db "create table users (login text, password text, end_date timestamp)"
+sqlite3 data/fpserver.db "insert into users (login, password, end_date) values ('GUEST', '', strftime('%s', datetime('now', '+10 years')))"

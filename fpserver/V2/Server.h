@@ -110,6 +110,7 @@ void Server::onPeerConnect(ios_fc::PeerAddress addr, int fpipVersion, const ios_
 #if DEBUG_PUYOPEERSLISTENERV2
         printf("Nouveau peer: %s\n", (const char *)name);
 #endif
+        mDB.storeConnection(name.c_str());
         
         // Envoyer tous les peers connectes au petit nouveau
         for (int i = 0; i < mPeers.size(); i++) {
@@ -133,7 +134,7 @@ void Server::onPeerConnect(ios_fc::PeerAddress addr, int fpipVersion, const ios_
 #if DEBUG_PUYOPEERSLISTENERV2
         printf("Connection refused for %s (%s)\n", (const char*)name, request.getDenyErrorString().c_str());
 #endif
-        DenyMessage denyMsg(mMbox, request.getDenyErrorString());
+        DenyMessage denyMsg(mMbox, request.getDenyErrorString(), request.getDenyErrorStringMore());
         denyMsg.sendTo(addr);
     }
 }

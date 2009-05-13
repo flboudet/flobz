@@ -20,17 +20,29 @@ public:
         }
     }
 
-    void checkLogin(const std::string &user, const std::string &password, bool &userExists, bool &passwordCorrect) {
-        std::stringstream s; s << "select password from users where login='" << user << "'";
+    void resetDB() {
+    }
+
+    void checkLogin(const std::string &user, const std::string &password,
+                    bool &userExists, bool &userExpired, bool &passwordCorrect) {
+        std::stringstream s; s << "select password,end_date from users where login='" << user << "'";
         request(s.str().c_str());
         if (vcol_head.size() > 0) {
             userExists = true;
+            double end_date = atol(vdata[1].c_str());
             passwordCorrect = (password == vdata[0]); // TODO: Don't store password so clearly
+            userExpired = (end_date < ios_fc::getUnixTime());
+            printf("Login '%s' exists and is valid for %g days\n", user.c_str(), (end_date-ios_fc::getUnixTime())/(24.*3600.));
         }
         else {
             userExists = false;
             passwordCorrect = false;
         }
+    }
+
+    void storeConnection(const std::string &user) {
+        // TODO: ?
+        // Log generiques ou Log des connections...
     }
 
     ~Database() {
