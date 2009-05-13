@@ -523,7 +523,7 @@ void InternetGameMenu::action(Widget *sender, int actionType, GameControlEvent *
     if (sender == this->joinButton.getButton()) {
         try {
             PuyoInternetGameCenter *gameCenter = new PuyoInternetGameCenter(serverName.getEditField().getValue(),
-                                                                            atoi(serverPort.getEditField().getValue()), playerName.getEditField().getValue());
+                                                                            atoi(serverPort.getEditField().getValue()), playerName.getEditField().getValue(), password.getEditField().getValue());
             PuyoInternetConnectDialog *connectionDialog = new PuyoInternetConnectDialog(serverName.getEditField().getValue(), gameCenter, this);
             this->getParentScreen()->add(connectionDialog);
             this->getParentScreen()->grabEventsOnWidget(connectionDialog);

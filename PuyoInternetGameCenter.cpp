@@ -32,8 +32,8 @@ using namespace ios_fc;
 
 const int PuyoInternetGameCenter::fpipVersion = 0x00000001;
 
-PuyoInternetGameCenter::PuyoInternetGameCenter(const String hostName, int portNum, const String name)
-  : hostName(hostName), portNum(portNum), mbox(hostName, portNum), p2pmbox(NULL), p2pNatTraversal(NULL), tryNatTraversal(true), name(name), status(PEER_NORMAL),
+PuyoInternetGameCenter::PuyoInternetGameCenter(const String hostName, int portNum, const String name, const String password)
+  : hostName(hostName), portNum(portNum), mbox(hostName, portNum), p2pmbox(NULL), p2pNatTraversal(NULL), tryNatTraversal(true), name(name), password(password), status(PEER_NORMAL),
     timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages), gameGrantedStatus(GAMESTATUS_IDLE),
     m_isAccepted(false), m_isDenied(false), m_denyString("")
 {
@@ -50,6 +50,7 @@ void PuyoInternetGameCenter::sendAliveMessage()
     msg->addInt("V", fpipVersion);
     msg->addInt("CMD", PUYO_IGP_ALIVE);
     msg->addString("NAME", name);
+    msg->addString("PASSWD", password);
     msg->addInt("STATUS", status);
     msg->send();
     delete msg;

@@ -61,13 +61,10 @@ void Server::onIgpAlive(ios_fc::Message &msg, ios_fc::PeerAddress &address)
         ios_fc::String name = msg.getString("NAME");
         printf("Name = %s\n", (const char*)name);
         ios_fc::String pass;
-        try {
-            pass = msg.getString("PASS");
-        }
-        catch (ios_fc::Exception e) {
-            // No password specified
+        if (msg.hasString("PASSWD"))
+            pass = msg.getString("PASSWD");
+        else
             pass = "";
-        }
         onPeerConnect(address, protocolVersion, name, pass, status);
     }
 }

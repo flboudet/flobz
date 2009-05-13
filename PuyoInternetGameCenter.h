@@ -35,7 +35,7 @@ using namespace ios_fc;
 
 class PuyoInternetGameCenter : public PuyoNetGameCenter, public MessageListener {
 public:
-    PuyoInternetGameCenter(const String hostName, int portNum, const String name);
+    PuyoInternetGameCenter(const String hostName, int portNum, const String name, const String password);
     void sendMessage(const String msgText);
     void idle();
     void onMessage(Message &msg);
@@ -65,6 +65,7 @@ private:
     String p2pPunchName;
     bool tryNatTraversal;
     const String name;
+    const String password;
     int status;
     double timeMsBetweenTwoAliveMessages, lastAliveMessage;
     PuyoGameInvitation grantedInvitation;
