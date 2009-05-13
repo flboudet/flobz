@@ -4,6 +4,7 @@
 namespace ios_fc
 {
     double getTimeMs();
+    double getUnixTime();
 }
 
 #endif

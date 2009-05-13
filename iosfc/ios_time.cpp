@@ -109,6 +109,13 @@ double getTimeMs()
     return ((double)tv.tv_usec / 1000.0) + ((double)tv.tv_sec * 1000.0);
 }
 
+double getUnixTime()
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return ((double)tv.tv_usec / 1000000.0) + ((double)tv.tv_sec);
+}
+
 #endif // _POSIX_TIMERS
 
 }
