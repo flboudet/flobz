@@ -362,9 +362,9 @@ PuyoInternetDialog::PuyoInternetDialog(String dialogTitle)
     m_titleFrame.setPreferedSize(Vec3(0.0f, 20.0f));
     m_dialogFrame.add(&m_titleFrame);
     m_dialogFrame.add(&m_contentBox);
-    setPreferedSize(Vec3(300.0f, 200.0f));
+    setPreferedSize(Vec3(450.0f, 200.0f));
     setSize(getPreferedSize());
-    setPosition(Vec3(150.0f, 150.0f));
+    setPosition(Vec3(95.0f, 150.0f));
     this->addListener(*this);
     transitionToContent(&m_dialogFrame);
 }
@@ -421,7 +421,7 @@ PuyoInternetErrorDialog::PuyoInternetErrorDialog(String errorMessageL1, String e
     m_contentBox.add(&m_errorMessageL1);
     m_contentBox.add(&m_errorMessageL2);
     m_contentBox.add(&m_okButton);
-    setSize(Vec3(350.0f, 200.0f));
+    setSize(Vec3(450.0f, 200.0f)); 
 }
 
 PuyoInternetErrorDialog::~PuyoInternetErrorDialog()
@@ -479,7 +479,7 @@ PuyoInternetConnectDialog::~PuyoInternetConnectDialog()
 	if (m_timeout)
 	  errorDialog = new PuyoInternetErrorDialog(String("Server didn't answered"), m_messageL2.getValue());
 	else
-	    errorDialog = new PuyoInternetErrorDialog(m_gameCenter->getDenyString(), "");
+	    errorDialog = new PuyoInternetErrorDialog(m_gameCenter->getDenyString(), m_gameCenter->getDenyStringMore());
         m_owner->getParentScreen()->add(errorDialog);
         m_owner->getParentScreen()->grabEventsOnWidget(errorDialog);
         AudioManager::playSound("ebenon.wav", 0.5);

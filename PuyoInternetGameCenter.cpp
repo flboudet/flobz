@@ -35,7 +35,7 @@ const int PuyoInternetGameCenter::fpipVersion = 0x00000001;
 PuyoInternetGameCenter::PuyoInternetGameCenter(const String hostName, int portNum, const String name, const String password)
   : hostName(hostName), portNum(portNum), mbox(hostName, portNum), p2pmbox(NULL), p2pNatTraversal(NULL), tryNatTraversal(true), name(name), password(password), status(PEER_NORMAL),
     timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages), gameGrantedStatus(GAMESTATUS_IDLE),
-    m_isAccepted(false), m_isDenied(false), m_denyString("")
+    m_isAccepted(false), m_isDenied(false), m_denyString(""), m_denyStringMore("")
 {
     mbox.addListener(this);
     sendAliveMessage();
@@ -243,6 +243,10 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
             case PUYO_IGP_DENY:
                 m_isDenied = true;
                 m_denyString = msg.getString("MSG");
+                if (msg.hasString("MSG_MORE"))
+                    m_denyStringMore = msg.getString("MSG_MORE");
+                else
+                    m_denyStringMore = "";
                 break;
             case PUYO_IGP_CHAT:
                 for (int i = 0, j = listeners.size() ; i < j ; i++) {

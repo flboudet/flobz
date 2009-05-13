@@ -46,6 +46,7 @@ public:
     bool isAccepted() const;
     bool isDenied() const;
     String getDenyString() const { return m_denyString; }
+    String getDenyStringMore() const { return m_denyStringMore; }
     // Temporaire
     void punch();
 protected:
@@ -80,6 +81,7 @@ private:
     String opponentName;
     bool m_isAccepted, m_isDenied;
     String m_denyString;
+    String m_denyStringMore;
 };
 
 #endif // _PUYOINTERNETGAMECENTER_H
