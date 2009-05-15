@@ -350,5 +350,6 @@ data/reduced.001/theme/Reduced.fptheme/Makefile
 data/reduced.001/theme/Reduced.fptheme/locale/Makefile
 data/reduced.001/theme/Reduced.fptheme/locale/fr/Makefile
 fpserver/Makefile
+iphone/Makefile
 ])
 AC_OUTPUT
