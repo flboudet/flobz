@@ -8,7 +8,7 @@ namespace v2 {
 class Database {
 public:
     Database() {
-        int rc = sqlite3_open("data/fpserver.db", &mDB);
+        int rc = sqlite3_open("data/fpserver/fpserver.db", &mDB);
         if (rc) {
             std::string err = sqlite3_errmsg(mDB);
             sqlite3_close(mDB);
