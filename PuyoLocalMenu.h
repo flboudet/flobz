@@ -38,7 +38,7 @@ typedef enum SinglePlayerLevel {
     HARD=2
 } SinglePlayerLevel;
 
-class LocalGameMenu : public MainScreenMenu, public PuyoSingleNameProvider {
+class LocalGameMenu : public MainScreenMenu, public SinglePlayerStandardLayoutFactory {
 public:
     LocalGameMenu(MainScreen *mainScreen);
     void build();

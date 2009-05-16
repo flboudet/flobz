@@ -92,6 +92,16 @@ void PuyoSinglePlayerGameWidget::action(Widget *sender, int actionType,
         addGameBHandicap(PUYODIMY);
 }
 
+PuyoSinglePlayerGameWidget *SinglePlayerStandardLayoutFactory::createGameWidget
+          (AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme,
+           int level, int nColors, int lifes, String aiFace,
+           Action *gameOverAction)
+{
+    return new PuyoSinglePlayerGameWidget(puyoThemeSet, levelTheme,
+                                          level, nColors, lifes,
+                                          aiFace, gameOverAction);
+}
+
 PuyoLevelDefinitions *PuyoLevelDefinitions::currentDefinition = NULL;
 
 PuyoLevelDefinitions::PuyoLevelDefinitions(String levelDefinitionFile)
@@ -290,10 +300,10 @@ PuyoGameOver1PScreen::~PuyoGameOver1PScreen()
 {
 }
 
-SinglePlayerStarterAction::SinglePlayerStarterAction(MainScreen *mainScreen, int difficulty, PuyoSingleNameProvider *nameProvider)
+SinglePlayerStarterAction::SinglePlayerStarterAction(MainScreen *mainScreen, int difficulty, SinglePlayerFactory *spFactory)
     : m_mainScreen(mainScreen),
       m_state(kGameNotStarted),
-      m_nameProvider(nameProvider),
+      m_spFactory(spFactory),
       m_currentLevel(0), m_lifes(3), m_difficulty(difficulty),
       m_currentMatch(NULL),
       m_hiScoreScreen(NULL), m_gameWonScreen(NULL),
@@ -342,8 +352,8 @@ void SinglePlayerStarterAction::performMatchPlaying(bool skipIntroduction,
     SinglePlayerMatch *previousMatch = m_currentMatch;
     PuyoSingleGameLevelData *levelData = new PuyoSingleGameLevelData(m_currentLevel, m_difficulty, m_levelDefinitions);
     m_currentMatch = new SinglePlayerMatch(m_playerStat, this, levelData,
-					   skipIntroduction, popScreen,
-                                           m_nameProvider, m_lifes);
+                                           skipIntroduction, popScreen,
+                                           m_spFactory, m_lifes);
     m_currentMatch->run();
     if (previousMatch != NULL) {
       delete previousMatch;
@@ -396,7 +406,7 @@ void SinglePlayerStarterAction::performHiScoreScreen(String gameOverStoryName)
   m_state = kHiScoreScreen;
   m_hiScoreScreen = new PuyoGameOver1PScreen(gameOverStoryName,
 		     *(GameUIDefaults::SCREEN_STACK->top()),
-                     this, m_nameProvider->getPlayerName(),
+                     this, m_spFactory->getPlayerName(),
                      m_playerStat);
   Screen *screenToTrans = GameUIDefaults::SCREEN_STACK->top();
   m_hiScoreScreen->transitionFromScreen(*screenToTrans);
@@ -431,22 +441,22 @@ SinglePlayerMatch::SinglePlayerMatch
                      (PlayerGameStat &playerStat,
                       Action *gameOverAction,
                       PuyoSingleGameLevelData *levelData,
-		      bool skipIntroduction,
+                      bool skipIntroduction,
                       bool popScreen,
-		      PuyoSingleNameProvider *nameProvider,
-		      int remainingLifes)
+                      SinglePlayerFactory *spFactory,
+                      int remainingLifes)
 		       : m_playerStat(playerStat),
-               m_state(kNotRunning),
-                         m_matchOverAction(gameOverAction),
-                         m_levelData(levelData),
-			 m_skipIntroduction(skipIntroduction),
-			 m_popScreen(popScreen),
-			 m_nameProvider(nameProvider),
-			 m_remainingLifes(remainingLifes),
-			 m_introStory(NULL),
-			 m_opponentStory(NULL),
-			 m_matchLostAnimation(NULL),
-             m_statsWidget(NULL)
+                 m_state(kNotRunning),
+                 m_matchOverAction(gameOverAction),
+                 m_levelData(levelData),
+                 m_skipIntroduction(skipIntroduction),
+                 m_popScreen(popScreen),
+                 m_spFactory(spFactory),
+                 m_remainingLifes(remainingLifes),
+                 m_introStory(NULL),
+                 m_opponentStory(NULL),
+                 m_matchLostAnimation(NULL),
+                 m_statsWidget(NULL)
 {
 }
 
@@ -515,14 +525,13 @@ void SinglePlayerMatch::performOpponentStory()
 
 void SinglePlayerMatch::performMatchPlaying()
 {
-  m_gameWidget = new PuyoSinglePlayerGameWidget
-    (m_levelData->getPuyoTheme(), m_levelData->getLevelTheme(),
-     m_levelData->getIALevel(), m_levelData->getNColors(), m_remainingLifes,
-     m_levelData->getIAFace(), this);
+  m_gameWidget = m_spFactory->createGameWidget
+        (m_levelData->getPuyoTheme(), m_levelData->getLevelTheme(),
+         m_levelData->getIALevel(), m_levelData->getNColors(), m_remainingLifes,
+         m_levelData->getIAFace(), this);
   m_gameWidget->setGameOptions(m_levelData->getGameOptions());
   m_gameScreen = new PuyoGameScreen(*m_gameWidget, *m_opponentStory);
-  if (m_nameProvider != NULL)
-    m_gameWidget->setPlayerOneName(m_nameProvider->getPlayerName());
+  m_gameWidget->setPlayerOneName(m_spFactory->getPlayerName());
   m_gameWidget->setPlayerTwoName(m_levelData->getIAName());
   m_gameWidget->getStatPlayerOne().total_points = m_playerStat.total_points;
   GameUIDefaults::SCREEN_STACK->pop();

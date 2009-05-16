@@ -32,12 +32,6 @@
 #include "goomsl/goomsl_hash.h"
 #include <vector>
 
-class PuyoSingleNameProvider {
-public:
-    virtual String getPlayerName() const = 0;
-    virtual ~PuyoSingleNameProvider() {};
-};
-
 class PuyoSinglePlayerGameWidget : public PuyoGameWidget, public Action {
 public:
     PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
@@ -60,6 +54,31 @@ private:
     int faceTicks;
     StoryWidget opponent;
     PuyoCheatCodeManager killLeftCheat, killRightCheat;
+};
+
+/**
+ * This class provides objects that are used during the game,
+ * such as the player name, the player controller,
+ * and the screen layout.
+ */
+class SinglePlayerFactory {
+public:
+    virtual String getPlayerName() const = 0;
+    virtual PuyoSinglePlayerGameWidget *createGameWidget
+        (AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme,
+         int level, int nColors, int lifes, String aiFace,
+         Action *gameOverAction) = 0;
+    virtual ~SinglePlayerFactory() {};
+};
+
+/**
+ * Implementation of SinglePlayerFactory with the standard game layout
+ */
+class SinglePlayerStandardLayoutFactory : public SinglePlayerFactory {
+    virtual PuyoSinglePlayerGameWidget *createGameWidget
+    (AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme,
+     int level, int nColors, int lifes, String aiFace,
+     Action *gameOverAction);
 };
 
 class PuyoLevelDefinitions {
@@ -149,7 +168,7 @@ class SinglePlayerMatch;
 class SinglePlayerStarterAction : public Action {
 public:
     SinglePlayerStarterAction(MainScreen *mainScreen, int difficulty,
-			      PuyoSingleNameProvider *nameProvider = NULL);
+			      SinglePlayerFactory *spFactory);
     /**
      * Implements the Action interface
      */
@@ -173,7 +192,7 @@ private:
     };
     MainScreen *m_mainScreen;
     State m_state;
-    PuyoSingleNameProvider *m_nameProvider;
+    SinglePlayerFactory *m_spFactory;
     int m_currentLevel, m_lifes, m_difficulty;
     SinglePlayerMatch *m_currentMatch;
     PuyoGameOver1PScreen *m_hiScoreScreen;
@@ -192,7 +211,7 @@ public:
 		      PuyoSingleGameLevelData *levelData,
 		      bool skipIntroduction = false,
                       bool popScreen = false,
-		      PuyoSingleNameProvider *nameProvider = NULL,
+		      SinglePlayerFactory *spFactory = NULL,
 		      int remainingLifes = 0);
     virtual ~SinglePlayerMatch();
     void run();
@@ -239,7 +258,7 @@ private:
     PuyoSingleGameLevelData *m_levelData;
     bool m_skipIntroduction;
     bool m_popScreen;
-    PuyoSingleNameProvider *m_nameProvider;
+    SinglePlayerFactory *m_spFactory;
     int m_remainingLifes;
     StoryScreen *m_introStory, *m_opponentStory;
     PuyoGameScreen *m_gameScreen;

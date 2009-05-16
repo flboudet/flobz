@@ -42,7 +42,7 @@
 #define PATH_MAX_LEN 256
 #define NAME_MAX_LEN 256
 
-
+const char *defaultThemeName = "theme/Classic.fptheme";
 static const char * themeFolderExtension = ".fptheme";
 static char * defaultThemeFolder = NULL;
 
@@ -50,7 +50,7 @@ static const char * DEFAULTPATH(void)
 {
     if (defaultThemeFolder == NULL)
     {
-        String path = theCommander->getDataPathManager().getPath("theme/Classic.fptheme");
+        String path = theCommander->getDataPathManager().getPath(defaultThemeName);
         defaultThemeFolder = strdup((const char *)(path));
     }
     return defaultThemeFolder;
