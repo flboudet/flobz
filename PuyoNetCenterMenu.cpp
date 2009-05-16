@@ -27,6 +27,7 @@
 #include "PuyoTwoPlayerStarter.h"
 #include "PuyoNetworkStarter.h"
 #include "ios_time.h"
+#include <sstream>
 
 class PuyoNetworkTwoPlayerGameWidgetFactory : public PuyoGameWidgetFactory {
 public:
@@ -106,6 +107,18 @@ void NetCenterDialogMenu::eventOccured(GameControlEvent *event)
     }
 }
 
+String NetCenterPlayerList::PlayerEntry::getRankString(int rank)
+{
+    std::stringstream s;
+    if (rank < 0)
+        s << "[?]";
+    else if (rank < 30)
+        s << "[" << (30-rank) << "k]";
+    else
+        s << "[" << (rank-29) << "d]";
+    return String(s.str().c_str());
+}
+
 String NetCenterPlayerList::PlayerEntry::getStatusString(int status)
 {
   switch (status) {
@@ -127,10 +140,10 @@ NetCenterPlayerList::~NetCenterPlayerList()
 {
 }
 
-void NetCenterPlayerList::addNewPlayer(String playerName, PeerAddress playerAddress, int status)
+void NetCenterPlayerList::addNewPlayer(String playerName, PeerAddress playerAddress, const PuyoPeerInfo &info)
 {
     Action *playerSelectedAction = new PlayerSelectedAction(targetMenu, playerAddress, playerName);
-    PlayerEntry *newEntry = new PlayerEntry(playerName, playerAddress, status, playerSelectedAction);
+    PlayerEntry *newEntry = new PlayerEntry(playerName, playerAddress, info, playerSelectedAction);
     entries.add(newEntry);
     addEntry(newEntry);
 }
@@ -148,12 +161,12 @@ void NetCenterPlayerList::removePlayer(PeerAddress playerAddress)
     }
 }
 
-void NetCenterPlayerList::updatePlayer(String playerName, PeerAddress playerAddress, int status)
+void NetCenterPlayerList::updatePlayer(String playerName, PeerAddress playerAddress, const PuyoPeerInfo &info)
 {
     for (int i = 0 ; i < entries.size() ; i++) {
         if (entries[i]->playerAddress == playerAddress) {
             PlayerEntry *currentEntry = entries[i];
-            currentEntry->updateEntry(playerName, status);
+            currentEntry->updateEntry(playerName, info);
             return;
         }
     }
@@ -209,7 +222,8 @@ NetCenterMenu::NetCenterMenu(MainScreen *mainScreen, PuyoNetGameCenter *netCente
     // Adding all the already connected peers to the list
     for (int i = 0 ; i < netCenter->getPeerCount() ; i++) {
         PeerAddress curPeerAddress = netCenter->getPeerAddressAtIndex(i);
-        playerList.addNewPlayer(netCenter->getPeerNameAtIndex(i), curPeerAddress, netCenter->getPeerStatusForAddress(curPeerAddress));
+        PuyoPeerInfo curPeerInfo = netCenter->getPeerInfoForAddress(curPeerAddress);
+        playerList.addNewPlayer(netCenter->getPeerNameAtIndex(i), curPeerAddress, curPeerInfo);
     }
 }
 
@@ -279,7 +293,8 @@ void NetCenterMenu::onChatMessage(const String &msgAuthor, const String &msg)
 
 void NetCenterMenu::onPlayerConnect(String playerName, PeerAddress playerAddress)
 {
-    playerList.addNewPlayer(playerName, playerAddress, netCenter->getPeerStatusForAddress(playerAddress));
+    PuyoPeerInfo info = netCenter->getPeerInfoForAddress(playerAddress);
+    playerList.addNewPlayer(playerName, playerAddress, info);
 }
 
 void NetCenterMenu::onPlayerDisconnect(String playerName, PeerAddress playerAddress)
@@ -289,7 +304,8 @@ void NetCenterMenu::onPlayerDisconnect(String playerName, PeerAddress playerAddr
 
 void NetCenterMenu::onPlayerUpdated(String playerName, PeerAddress playerAddress)
 {
-    playerList.updatePlayer(playerName, playerAddress, netCenter->getPeerStatusForAddress(playerAddress));
+    PuyoPeerInfo info = netCenter->getPeerInfoForAddress(playerAddress);
+    playerList.updatePlayer(playerName, playerAddress, info);
 }
 
 void NetCenterMenu::onGameInvitationReceived(PuyoGameInvitation &invitation)

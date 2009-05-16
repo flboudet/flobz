@@ -31,10 +31,12 @@ using namespace ios_fc;
 
 class PuyoNetGameCenter::GamerPeer {
 public:
-    GamerPeer(String name, PeerAddress address, int status = PEER_NORMAL) : name(name), address(address), status(status) {}
+    GamerPeer(String name, PeerAddress address, int status = PEER_NORMAL, int rank = -1) :
+        name(name), address(address), status(status), rank(rank) {}
     String name;
     PeerAddress address;
     int status;
+    int rank;
 };
 
 class PuyoNetGameCenter::PendingGame {
@@ -60,13 +62,14 @@ void PuyoNetGameCenter::idle()
     }
 }
 
-void PuyoNetGameCenter::connectPeer(PeerAddress addr, const String name, int status)
+void PuyoNetGameCenter::connectPeer(PeerAddress addr, const String name, int status, int rank)
 {
     //printf("%s vient de se connecter!\n", (const char *)name);
     for (int i = 0, j = peers.size() ; i < j ; i++) {
         if (peers[i]->address == addr) {
             if (peers[i]->status != status) {
                 peers[i]->status = status;
+                peers[i]->rank = rank;
                 for (int i = 0, j = listeners.size() ; i < j ; i++) {
                     listeners[i]->onPlayerUpdated(name, addr);
                 }
@@ -74,7 +77,8 @@ void PuyoNetGameCenter::connectPeer(PeerAddress addr, const String name, int sta
             return;
         }
     }
-    peers.add(new GamerPeer(name, addr, status));
+    // Peer is not known. Add to list
+    peers.add(new GamerPeer(name, addr, status, rank));
     for (int i = 0, j = listeners.size() ; i < j ; i++) {
         listeners[i]->onPlayerConnect(name, addr);
     }
@@ -128,6 +132,21 @@ PeerAddress PuyoNetGameCenter::getPeerAddressForPeerName(String peerName) const
     }
     // hum...
     return peers[i]->address;
+}
+
+PuyoPeerInfo PuyoNetGameCenter::getPeerInfoForAddress(PeerAddress &addr) const
+{
+    PuyoPeerInfo info;
+    info.status = 0;
+    info.rank = -1;
+    for (int i = 0 ; i < peers.size() ; i++) {
+        if (peers[i]->address == addr) {
+            info.status = peers[i]->status;
+            info.rank = peers[i]->rank;
+            return info;
+        }
+    }
+    return info;
 }
 
 int PuyoNetGameCenter::getPeerStatusForAddress(PeerAddress &addr) const

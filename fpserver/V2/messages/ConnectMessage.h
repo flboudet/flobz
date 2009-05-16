@@ -16,6 +16,7 @@ public:
         msg->addBoolProperty("RELIABLE", true);
         msg->addInt("CMD", PUYO_IGP_CONNECT);
         msg->addString("NAME", peer->name);
+        msg->addInt("RANK", peer->rank);
         msg->addInt("STATUS", peer->status);
         ios_fc::Dirigeable *dirNew = dynamic_cast<ios_fc::Dirigeable *>(msg);
         dirNew->addPeerAddress("ADDR", peer->addr);

@@ -58,6 +58,11 @@ enum PuyoPeerStatus {
   PEER_PLAYING = 1
 };
 
+struct PuyoPeerInfo {
+    int status;
+    int rank;
+};
+
 class PuyoNetGameCenter {
 public:
     PuyoNetGameCenter() : pendingGameTimeout(30000.) {}
@@ -73,11 +78,12 @@ public:
     String getPeerNameAtIndex(int i) const;
     PeerAddress getPeerAddressAtIndex(int i) const;
     PeerAddress getPeerAddressForPeerName(String peerName) const;
+    PuyoPeerInfo getPeerInfoForAddress(PeerAddress &addr) const;
     int getPeerStatusForAddress(PeerAddress &addr) const;
     int getPeerCount() const;
     void addListener(PuyoNetGameCenterListener *r) { listeners.add(r); }
     void removeListener(PuyoNetGameCenterListener *r) { listeners.remove(r); }
-    void connectPeer(PeerAddress addr, const String name, int status = PEER_NORMAL);
+    void connectPeer(PeerAddress addr, const String name, int status = PEER_NORMAL, int rank = -1);
     void disconnectPeer(PeerAddress addr, const String name);
     virtual void setStatus(int status) {}
     virtual String getSelfName() { return "Myself"; }

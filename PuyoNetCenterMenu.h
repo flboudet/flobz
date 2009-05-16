@@ -71,9 +71,9 @@ class NetCenterPlayerList : public ListView {
 public:
     NetCenterPlayerList(int size, NetCenterMenu *targetMenu, IosSurface *upArrow, IosSurface *downArrow, GameLoop *loop = NULL);
     virtual ~NetCenterPlayerList();
-    void addNewPlayer(String playerName, PeerAddress playerAddress, int status);
+    void addNewPlayer(String playerName, PeerAddress playerAddress, const PuyoPeerInfo &info);
     void removePlayer(PeerAddress playerAddress);
-    void updatePlayer(String playerName, PeerAddress playerAddress, int status);
+    void updatePlayer(String playerName, PeerAddress playerAddress, const PuyoPeerInfo &info);
 private:
     class PlayerSelectedAction : public Action {
     public:
@@ -87,19 +87,22 @@ private:
     };
     class PlayerEntry : public ListViewEntry {
     public:
-        PlayerEntry(String playerName, PeerAddress playerAddress, int status, Action *action)
-        : ListViewEntry(playerName + getStatusString(status), action),
-        playerAddress(playerAddress), status(status), action(action) {}
+        PlayerEntry(String playerName, PeerAddress playerAddress, const PuyoPeerInfo &info, Action *action)
+        : ListViewEntry(getRankString(info.rank) + playerName + getStatusString(info.status), action),
+        playerAddress(playerAddress), status(info.status), rank(info.rank), action(action) {}
         ~PlayerEntry() { delete action; }
-        void updateEntry(String playerName, int status) {
-            setText(playerName + getStatusString(status));
+        void updateEntry(String playerName, const PuyoPeerInfo &info) {
+            setText(getRankString(info.rank) + playerName + getStatusString(info.status));
             this->status = status;
+            this->rank = rank;
         }
         PeerAddress playerAddress;
         int status;
+        int rank;
     private:
         Action *action;
         static String getStatusString(int status);
+        static String getRankString(int rank);
     };
     Vector<PlayerEntry> entries;
     NetCenterMenu *targetMenu;

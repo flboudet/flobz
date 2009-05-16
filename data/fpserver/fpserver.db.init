@@ -1,12 +1,14 @@
 #!/bin/bash
-rm -fv data/fpserver.db
+DB=data/fpserver/fpserver.db
+DB_EXE="sqlite3 $DB"
+rm -f $DB
 
 # Registered users
 #
 # Users {
 #    login, password, end_date, rank
 # }
-sqlite3 data/fpserver.db "create table users (login text, password text, end_date timestamp, rank integer)"
+$DB_EXE "create table users (login text, password text, end_date timestamp, rank integer)"
 
 # Played games
 #
@@ -14,17 +16,23 @@ sqlite3 data/fpserver.db "create table users (login text, password text, end_dat
 #    id, date, login1, login2, handicap1, handicap2, winner
 # }
 # With winner in [1, 2]
-sqlite3 data/fpserver.db "create table games (date timestamp, login1 text, login2 text, rank1 integer, rank2 integer, handicap1 integer, handicap2 integer, winner integer)"
+$DB_EXE "create table games (date timestamp, login1 text, login2 text, rank1 integer, rank2 integer, handicap1 integer, handicap2 integer, winner integer)"
 
 # Fill tables
 
 # Create a few dummy GUEST user.
-sqlite3 data/fpserver.db "insert into users (login, password, end_date, rank) values ('GUEST1', '', strftime('%s', datetime('now', '+5 years')), 0)"
-sqlite3 data/fpserver.db "insert into users (login, password, end_date, rank) values ('GUEST2', '', strftime('%s', datetime('now', '+6 years')), 0)"
-sqlite3 data/fpserver.db "insert into users (login, password, end_date, rank) values ('GUEST3', '', strftime('%s', datetime('now', '+7 years')), 0)"
-sqlite3 data/fpserver.db "insert into users (login, password, end_date, rank) values ('GUEST4', '', strftime('%s', datetime('now', '+8 years')), 0)"
-sqlite3 data/fpserver.db "insert into users (login, password, end_date, rank) values ('GUEST5', '', strftime('%s', datetime('now', '+9 years')), 0)"
+$DB_EXE "insert into users (login, password, end_date, rank) values ('GUEST1', '', strftime('%s', datetime('now', '+5 years')), 0)"
+$DB_EXE "insert into users (login, password, end_date, rank) values ('GUEST2', '', strftime('%s', datetime('now', '+6 years')), 0)"
+$DB_EXE "insert into users (login, password, end_date, rank) values ('GUEST3', '', strftime('%s', datetime('now', '+7 years')), 0)"
+$DB_EXE "insert into users (login, password, end_date, rank) values ('GUEST4', '', strftime('%s', datetime('now', '+8 years')), 0)"
+$DB_EXE "insert into users (login, password, end_date, rank) values ('GUEST5', '', strftime('%s', datetime('now', '+9 years')), 0)"
 
 # Create a few dummy games to test ranking system
-sqlite3 data/fpserver.db "insert into games (date, login1, login2, rank1, rank2, handicap1, handicap2, winner) values (datetime('now'), 'GUEST1', 'GUEST2', 0, 0, 0, 0, 1)"
-sqlite3 data/fpserver.db "insert into games (date, login1, login2, rank1, rank2, handicap1, handicap2, winner) values (datetime('now'), 'GUEST1', 'GUEST3', 0, 0, 0, 0, 1)"
+$DB_EXE "insert into games (date, login1, login2, rank1, rank2, handicap1, handicap2, winner) values (datetime('now'), 'GUEST1', 'GUEST2', 10, 10, 0, 0, 1)"
+$DB_EXE "insert into games (date, login1, login2, rank1, rank2, handicap1, handicap2, winner) values (datetime('now', '+1 day'), 'GUEST1', 'GUEST3', 10, 11, 0, 0, 1)"
+$DB_EXE "insert into games (date, login1, login2, rank1, rank2, handicap1, handicap2, winner) values (datetime('now', '+2 day'), 'GUEST2', 'GUEST3', 10, 10, 0, 0, 1)"
+$DB_EXE "insert into games (date, login1, login2, rank1, rank2, handicap1, handicap2, winner) values (datetime('now', '+3 day'), 'GUEST1', 'GUEST5', 11, 10, 0, 0, 2)"
+$DB_EXE "insert into games (date, login1, login2, rank1, rank2, handicap1, handicap2, winner) values (datetime('now', '+5 day'), 'GUEST1', 'GUEST5', 11, 11, 0, 0, 2)"
+$DB_EXE "insert into games (date, login1, login2, rank1, rank2, handicap1, handicap2, winner) values (datetime('now', '+12 day'), 'GUEST5', 'GUEST2', 12, 10, 0, 0, 1)"
+$DB_EXE "insert into games (date, login1, login2, rank1, rank2, handicap1, handicap2, winner) values (datetime('now', '+18 day'), 'GUEST5', 'GUEST3', 12, 11, 0, 0, 1)"
+$DB_EXE "insert into games (date, login1, login2, rank1, rank2, handicap1, handicap2, winner) values (datetime('now', '+24 day'), 'GUEST5', 'GUEST2', 12, 10, 0, 0, 1)"

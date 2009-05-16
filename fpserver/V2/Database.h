@@ -20,9 +20,6 @@ public:
         }
     }
 
-    void resetDB() {
-    }
-
     void checkLogin(const std::string &user, const std::string &password,
                     bool &userExists, bool &userExpired, bool &passwordCorrect) {
         std::stringstream s; s << "select password,end_date from users where login='" << user << "'";
@@ -37,6 +34,15 @@ public:
         else {
             userExists = false;
             passwordCorrect = false;
+        }
+    }
+
+    void loadPeerInfos(Peer *peer) {
+        std::stringstream s; s << "select rank,end_date from users where login='" << peer->name << "'";
+        request(s.str().c_str());
+        if (vcol_head.size() > 0) {
+            peer->rank = atoi(vdata[0].c_str());
+            peer->end_date = strtol(vdata[1].c_str(), NULL, 10);
         }
     }
 

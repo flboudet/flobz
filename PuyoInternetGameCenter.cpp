@@ -256,7 +256,7 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
             case PUYO_IGP_CONNECT:
             {
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-                connectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"), msg.getInt("STATUS"));
+                connectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"), msg.getInt("STATUS"), msg.getInt("RANK"));
             }
                 break;
             case PUYO_IGP_DISCONNECT:
@@ -268,7 +268,7 @@ void PuyoInternetGameCenter::onMessage(Message &msg)
             case PUYO_IGP_STATUSCHANGE:
             {
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-                connectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"), msg.getInt("STATUS"));
+                connectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"), msg.getInt("STATUS"), msg.getInt("RANK"));
             }
                 break;
             case PUYO_IGP_GAME_REQUEST:

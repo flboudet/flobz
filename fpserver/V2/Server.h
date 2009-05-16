@@ -111,6 +111,7 @@ void Server::onPeerConnect(ios_fc::PeerAddress addr, int fpipVersion, const ios_
         printf("Nouveau peer: %s\n", (const char *)name);
 #endif
         mDB.storeConnection(name.c_str());
+        mDB.loadPeerInfos(newPeer);
         
         // Envoyer tous les peers connectes au petit nouveau
         for (int i = 0; i < mPeers.size(); i++) {
@@ -150,6 +151,7 @@ void Server::onPeerUpdate(Peer *peer, int status)
         newMsg->addBoolProperty("RELIABLE", true);
         newMsg->addInt("CMD", PUYO_IGP_STATUSCHANGE);
         newMsg->addString("NAME", peer->name);
+        newMsg->addInt("RANK", peer->rank);
         newMsg->addInt("STATUS", status);
         ios_fc::Dirigeable *dirNew = dynamic_cast<ios_fc::Dirigeable *>(newMsg);
         dirNew->addPeerAddress("ADDR", peer->addr);
