@@ -26,27 +26,47 @@
 #include "PuyoSinglePlayerStarter.h"
 #include "PuyoView.h"
 
-PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
-    : attachedPuyoThemeSet(puyoThemeSet),
-    attachedRandom(nColors),
-    attachedGameFactory(&attachedRandom),
-    areaA(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
-          1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
-    areaB(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
-          1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
-    playercontroller(areaA),
-    opponentcontroller(level, areaB), faceTicks(0), opponent(aiFace),
-    killLeftCheat("killleft", this),
-    killRightCheat("killright", this)
+PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(int lifes, String aiFace)
+    : opponentcontroller(NULL),
+      faceTicks(0), opponent(aiFace),
+      killLeftCheat("killleft", this),
+      killRightCheat("killright", this)
 {
-    initialize(areaA, areaB, playercontroller, opponentcontroller, levelTheme, gameOverAction);
     setLives(lifes);
+}
+
+void PuyoSinglePlayerGameWidget::initialize(PuyoView &areaA, PuyoView &areaB,
+                                            PuyoPlayer &playercontroller,
+                                            PuyoLevelTheme &levelTheme,
+                                            int level,
+                                            Action *gameOverAction)
+{
+    opponentcontroller = new PuyoIA(level, areaB);
+    PuyoGameWidget::initialize(areaA, areaB, playercontroller, *opponentcontroller,
+                               levelTheme, gameOverAction);
     addSubWidget(&killLeftCheat);
     addSubWidget(&killRightCheat);
 }
 
+SinglePlayerStandardLayoutGameWidget::SinglePlayerStandardLayoutGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
+  : PuyoSinglePlayerGameWidget(lifes, aiFace),
+      attachedPuyoThemeSet(puyoThemeSet),
+      attachedRandom(nColors),
+      attachedGameFactory(&attachedRandom),
+      areaA(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
+            1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
+      areaB(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
+            1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
+      playercontroller(areaA)
+
+{
+    initialize(areaA, areaB, playercontroller, levelTheme, level, gameOverAction);
+}
+
 PuyoSinglePlayerGameWidget::~PuyoSinglePlayerGameWidget()
 {
+    if (opponentcontroller != NULL)
+        delete opponentcontroller;
 }
 
 void PuyoSinglePlayerGameWidget::cycle()
@@ -66,7 +86,7 @@ void PuyoSinglePlayerGameWidget::cycle()
         ai.rotationMethod = opponent.getIntegerValue("@AI_RotationMethod");
         ai.fastDropDelta = opponent.getIntegerValue("@AI_FastDropDelta");
         ai.thinkDepth = opponent.getIntegerValue("@AI_ThinkDepth");
-        opponentcontroller.setAIParameters(ai);
+        opponentcontroller->setAIParameters(ai);
     }
     if (faceTicks == 100) {
         opponent.setIntegerValue("@maxHeightPlayer", attachedGameA->getColumnHeigth(2));
@@ -97,7 +117,7 @@ PuyoSinglePlayerGameWidget *SinglePlayerStandardLayoutFactory::createGameWidget
            int level, int nColors, int lifes, String aiFace,
            Action *gameOverAction)
 {
-    return new PuyoSinglePlayerGameWidget(puyoThemeSet, levelTheme,
+    return new SinglePlayerStandardLayoutGameWidget(puyoThemeSet, levelTheme,
                                           level, nColors, lifes,
                                           aiFace, gameOverAction);
 }

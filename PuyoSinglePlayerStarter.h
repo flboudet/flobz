@@ -34,7 +34,8 @@
 
 class PuyoSinglePlayerGameWidget : public PuyoGameWidget, public Action {
 public:
-    PuyoSinglePlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
+    PuyoSinglePlayerGameWidget(int lifes, String aiFace);
+    void initialize(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &playercontroller, PuyoLevelTheme &levelTheme, int level, Action *gameOverAction);
     virtual ~PuyoSinglePlayerGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
@@ -44,16 +45,23 @@ public:
      */
     virtual void action(Widget *sender, int actionType,
                         GameControlEvent *event);
+protected:
+    PuyoIA *opponentcontroller;
+    int faceTicks;
+    StoryWidget opponent;
+    PuyoCheatCodeManager killLeftCheat, killRightCheat;
+};
+
+class SinglePlayerStandardLayoutGameWidget : public PuyoSinglePlayerGameWidget
+{
+public:
+    SinglePlayerStandardLayoutGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
 private:
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;
     PuyoLocalGameFactory attachedGameFactory;
     PuyoView areaA, areaB;
     PuyoCombinedEventPlayer playercontroller;
-    PuyoIA opponentcontroller;
-    int faceTicks;
-    StoryWidget opponent;
-    PuyoCheatCodeManager killLeftCheat, killRightCheat;
 };
 
 /**
