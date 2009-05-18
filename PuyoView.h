@@ -108,9 +108,10 @@ class PuyoView : public PuyoDelegate {
     void gameLost();
     int getPlayerId() const { return (xOffset < 320) ? 1 : 2; }
     virtual void gameWin();
-
+    void setShowNextPuyos(bool show) { m_showNextPuyos = show; }
   protected:
     bool cycleAllowed();
+    bool m_showNextPuyos;
     bool skippedCycle;
     bool gameRunning;
     int xOffset, yOffset;

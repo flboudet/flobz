@@ -39,7 +39,7 @@ PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 		   AnimatedPuyoSetTheme *attachedThemeSet,
            PuyoLevelTheme *attachedLevelTheme,
 		   int xOffset, int yOffset, int nXOffset, int nYOffset, DrawTarget &painterToUse)
-  : attachedThemeSet(attachedThemeSet), attachedLevelTheme(attachedLevelTheme),
+  : m_showNextPuyos(true), attachedThemeSet(attachedThemeSet), attachedLevelTheme(attachedLevelTheme),
     attachedPuyoFactory(this), attachedPainter(painterToUse), delayBeforeGameOver(60)
 {
     //printf("Constructeur du PuyoView\n");
@@ -185,33 +185,35 @@ void PuyoView::render()
     // drawing the walhalla
     attachedPuyoFactory.renderWalhalla();
 
-	drect.x = nXOffset;
-	drect.y = nYOffset;
-	drect.w = TSIZE;
-	drect.h = TSIZE * 2;
-	// Drawing next puyos
-	AnimatedPuyoTheme *nextPuyoTheme =
-	  attachedThemeSet->getAnimatedPuyoTheme(attachedGame->getNextFalling());
-	IosSurface *currentSurface = nextPuyoTheme->getPuyoSurfaceForValence(0);
-	if (currentSurface != NULL) {
-		drect.x = nXOffset;
-		drect.y = nYOffset + TSIZE;
-		drect.w = currentSurface->w;
-		drect.h = currentSurface->h;
-		attachedPainter.renderCopy(currentSurface, NULL, &drect);
-		attachedPainter.renderCopy(nextPuyoTheme->getEyeSurfaceForIndex(0), NULL, &drect);
-	}
-	AnimatedPuyoTheme *nextCompanionTheme =
-	  attachedThemeSet->getAnimatedPuyoTheme(attachedGame->getNextCompanion());
-	currentSurface = nextCompanionTheme->getPuyoSurfaceForValence(0);
-	if (currentSurface != NULL) {
-		drect.x = nXOffset;
-		drect.y = nYOffset;
-		drect.w = currentSurface->w;
-		drect.h = currentSurface->h;
-		attachedPainter.renderCopy(currentSurface, NULL, &drect);
-		attachedPainter.renderCopy(nextCompanionTheme->getEyeSurfaceForIndex(0), NULL, &drect);
-	}
+    if (m_showNextPuyos) {
+        drect.x = nXOffset;
+        drect.y = nYOffset;
+        drect.w = TSIZE;
+        drect.h = TSIZE * 2;
+        // Drawing next puyos
+        AnimatedPuyoTheme *nextPuyoTheme =
+            attachedThemeSet->getAnimatedPuyoTheme(attachedGame->getNextFalling());
+        IosSurface *currentSurface = nextPuyoTheme->getPuyoSurfaceForValence(0);
+        if (currentSurface != NULL) {
+            drect.x = nXOffset;
+            drect.y = nYOffset + TSIZE;
+            drect.w = currentSurface->w;
+            drect.h = currentSurface->h;
+            attachedPainter.renderCopy(currentSurface, NULL, &drect);
+            attachedPainter.renderCopy(nextPuyoTheme->getEyeSurfaceForIndex(0), NULL, &drect);
+        }
+        AnimatedPuyoTheme *nextCompanionTheme =
+            attachedThemeSet->getAnimatedPuyoTheme(attachedGame->getNextCompanion());
+        currentSurface = nextCompanionTheme->getPuyoSurfaceForValence(0);
+        if (currentSurface != NULL) {
+            drect.x = nXOffset;
+            drect.y = nYOffset;
+            drect.w = currentSurface->w;
+            drect.h = currentSurface->h;
+            attachedPainter.renderCopy(currentSurface, NULL, &drect);
+            attachedPainter.renderCopy(nextCompanionTheme->getEyeSurfaceForIndex(0), NULL, &drect);
+        }
+    }
 
     // Drawing the view animation
     if (viewAnimations.size() > 0) {
