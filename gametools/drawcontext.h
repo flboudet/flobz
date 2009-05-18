@@ -3,11 +3,23 @@
 
 #include "rgba.h"
 
-typedef struct IosRect
+struct IosRect
 {
+    //IosRect() {}
+    //IosRect(int x, int y, int w, int h)
+    //    : x(x), y(y), w(w), h(h) {}
     int x, y;
     int w, h;
-} IosRect;
+};
+
+struct IosRectC
+{
+    IosRectC(int x, int y, int w, int h)
+    {
+        r.x = x; r.y = y; r.w = w; r.h = h;
+    }
+    IosRect r;
+};
 
 class IosSurface;
 class IosFont;
