@@ -29,9 +29,9 @@
  */
  
 #include <exception>
+#include <string>
 
 namespace ios_fc {
-
     class Exception : public std::exception {
         public:
             Exception(const char *msg);
@@ -40,11 +40,16 @@ namespace ios_fc {
             ~Exception() throw();
             void  printMessage()      const;
             const char *what()        const throw();
+            const char *getStackTrace() const;
 
         private:
             char *message;
+            std::string stack;
     };
 
+std::string get_stack_trace();
+void catch_signals();
+void reportCrash(const std::string &error);
 }
 
 
