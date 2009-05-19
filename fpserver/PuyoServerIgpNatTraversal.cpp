@@ -46,7 +46,7 @@ void PuyoIgpNatTraversal::PunchPool::dispatchInformations(String guestAddress, i
     
     // Message for the pool guest
     Message *peerBMsg = mbox->createMessage();
-    Dirigeable *dirBMsg = dynamic_cast<Dirigeable *>(peerAMsg);
+    Dirigeable *dirBMsg = dynamic_cast<Dirigeable *>(peerBMsg);
     peerBMsg->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL);
     peerBMsg->addString("PPOOL", punchPoolName);
     peerBMsg->addBoolProperty("RELIABLE", true);
