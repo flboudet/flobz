@@ -42,26 +42,32 @@ PuyoServerV2::~PuyoServerV2() {
 }
 
 void PuyoServerV2::onMessage(Message &msg) {
-    try {
-        // Gets the address of the sender of the message
-        Dirigeable &dirMsg = dynamic_cast<Dirigeable &>(msg);
-        PeerAddress address = dirMsg.getPeerAddress();
-        
-        switch (msg.getInt("CMD")) {
-            // A client will send an alive message periodically to inform the server it is still connected
-            case PUYO_IGP_ALIVE:
-                server->onIgpAlive(msg, address);
-                break;
+    // We let the messagebox handle the exception because its
+    // default behaviour is to disconnect the peer, which is fine.
+    // try {}
+
+    // Ohoh! What is this strange message?
+    if (!msg.hasInt("CMD")) return;
+
+    // Gets the address of the sender of the message
+    Dirigeable &dirMsg = dynamic_cast<Dirigeable &>(msg);
+    PeerAddress address = dirMsg.getPeerAddress();
+
+    switch (msg.getInt("CMD")) {
+        // A client will send an alive message periodically to inform the server it is still connected
+        case PUYO_IGP_ALIVE:
+            server->onIgpAlive(msg, address);
+            break;
             // A client will send a chat message to communicate with the other connected clients
-            case PUYO_IGP_CHAT:
-                server->onIgpChat(msg);
-                break;
-            default:
-                break;
-        }
-    } catch (Exception e) {
-        e.printMessage();
-    } // XXX Handle exceptions?
+        case PUYO_IGP_CHAT:
+            server->onIgpChat(msg);
+            break;
+        case PUYO_IGP_GAME_OVER:
+            server->onIgpGameOver(msg);
+            break;
+        default:
+            break;
+    }
 }
  
 void PuyoServerV2::idle()

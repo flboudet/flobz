@@ -15,6 +15,8 @@ public:
     void onIgpChat(ios_fc::Message &msg);
     // Check if a peer reached timeout.
     void checkTimeouts();
+    // A game is over
+    void onIgpGameOver(ios_fc::Message &msg);
 
 private:
     // Called when a peer connects
@@ -183,6 +185,41 @@ void Server::onPeerDisconnect(Peer *peer) {
         newMsg->send();
     }
     delete newMsg;
+}
+
+struct PlayerGameStat
+{
+    int combo_count[24]; //
+    int explode_count; //
+    int drop_count; //
+    int ghost_sent_count; //
+    double time_left;
+    bool is_dead;
+    bool is_winner;
+    int points; //
+    int total_points;
+};
+
+void Server::onIgpGameOver(ios_fc::Message &msg) {
+    int winner = msg.getInt("WINNER");
+    int gameId = msg.getInt("GAMEID");
+    ios_fc::String name1 = msg.getString("NAME1");
+    ios_fc::String name2 = msg.getString("NAME2");
+    PlayerGameStat gameStat;
+    gameStat.points = msg.getInt("SCORE");
+    gameStat.total_points = msg.getInt("TOTAL_SCORE");
+    for (int i = 0 ; i < 24 ; i++) {
+        ios_fc::String messageName = ios_fc::String("COMBO_COUNT") + i;
+        gameStat.combo_count[i] = msg.getInt(messageName);
+    }
+    gameStat.explode_count = msg.getInt("EXPLODE_COUNT");
+    gameStat.drop_count = msg.getInt("DROP_COUNT");
+    gameStat.ghost_sent_count = msg.getInt("GHOST_SENT_COUNT");
+    gameStat.time_left = msg.getFloat("TIME_LEFT");
+    gameStat.is_dead = msg.getBool("IS_DEAD");
+    gameStat.is_winner = msg.getBool("IS_WINNER");
+    printf("Game %d with %s and %s won by %d\n", gameId, name1.c_str(), name2.c_str(), winner);
+    // TODO: Log
 }
 
 }}}

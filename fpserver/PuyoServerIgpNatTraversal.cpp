@@ -87,8 +87,12 @@ void PuyoIgpNatTraversal::PunchPool::sendSyncMessage(PeerAddress destAddress, Me
 void PuyoIgpNatTraversal::onMessage(Message &msg)
 {
     //printf("Message recu!\n");
+    if (!msg.hasInt("CMD")) return;
     switch (msg.getInt("CMD")) {
         case PUYO_IGP_NAT_TRAVERSAL: {
+            if (!msg.hasString("PPOOL")) return;
+            if (!msg.hasString("LSOCKADDR")) return;
+            if (!msg.hasInt("LPORTNUM")) return;
             Dirigeable &dirMsg = dynamic_cast<Dirigeable &>(msg);
             PeerAddress address = dirMsg.getPeerAddress();
             IgpMessage::IgpPeerAddressImpl *impl =
@@ -116,6 +120,7 @@ void PuyoIgpNatTraversal::onMessage(Message &msg)
         }
         case PUYO_IGP_NAT_TRAVERSAL_SYNC: {
             printf("NAT TRAVERSAL SYNC\n");
+            if (!msg.hasString("PPOOL")) return;
             String poolName = msg.getString("PPOOL");
             Dirigeable &dirMsg = dynamic_cast<Dirigeable &>(msg);
             PeerAddress address = dirMsg.getPeerAddress();
