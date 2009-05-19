@@ -64,6 +64,7 @@ void DummyMetaServerConnection::fetch()
 vector<PuyoServer> DummyMetaServerConnection::getServers() const
 {
     vector<PuyoServer> result;
+    result.push_back(PuyoServer("immunity.local", 4567, "immunity"));
     result.push_back(PuyoServer("durandal.local", 4567, "durandal"));
     result.push_back(PuyoServer("gfive.local", 4567, "gfive"));
     return result;
@@ -71,24 +72,30 @@ vector<PuyoServer> DummyMetaServerConnection::getServers() const
 
 HttpMetaServerConnection::HttpMetaServerConnection(String hostName, String hostPath, int portNum, PuyoMetaServerConnectionResponder *responder)
   : AbstractPuyoMetaServerConnection(responder), m_doc(NULL),
-    m_hostName(hostName), m_hostPath(hostPath), m_portNum(portNum)
+    m_hostName(hostName), m_hostPath(hostPath), m_portNum(portNum), m_nErrors(0)
 {
     GameUIDefaults::GAME_LOOP->addIdle(this);
 }
 
 HttpMetaServerConnection::~HttpMetaServerConnection()
 {
+    GameUIDefaults::GAME_LOOP->removeIdle(this);
     if (m_doc != NULL)
         delete m_doc;
 }
 
 void HttpMetaServerConnection::fetch()
 {
+    if (m_nErrors > 5) {
+        GameUIDefaults::GAME_LOOP->removeIdle(this);
+        return;
+    }
     try {
         m_servers.clear();
         m_doc = new HttpDocument(m_hostName, m_hostPath, m_portNum);
     } catch (Exception e) {
         e.printMessage();
+        m_nErrors += 1;
         m_doc = NULL;
     }
 }
@@ -100,6 +107,10 @@ std::vector<PuyoServer> HttpMetaServerConnection::getServers() const
 
 void HttpMetaServerConnection::idle(double currentTime)
 {
+    if (m_nErrors > 5) {
+        GameUIDefaults::GAME_LOOP->removeIdle(this);
+        return;
+    }
     if (m_doc == NULL) return;
     try {
 		if (m_doc->documentIsReady()) {
@@ -119,6 +130,7 @@ void HttpMetaServerConnection::idle(double currentTime)
         }
     } catch (Exception e) { // Erreur dans la reception du fichier
         e.printMessage();
+        m_nErrors += 1;
     }
 }
 
@@ -136,7 +148,7 @@ PuyoServerList::PuyoServerList(PuyoServerListResponder *responder)
   nbserv = GetIntPreference(kInternetMetaServerNumberKey, 1);
   for (int i = 1; i <= nbserv; i++)
   {
-    GetStrPreference (String(kInternetMetaServerKey)+i, servname, i==1?"www.ios-software.com":"Error", 256);
+    GetStrPreference (String(kInternetMetaServerKey)+i, servname, i==1?"aley.fovea.cc":"Error", 256);
     GetStrPreference (String(kInternetMetaServerPathKey)+i, servpath, i==1?"/flobopuyo/fpservers":"/fpservers", 1024);
     m_metaservers.push_back(new HttpMetaServerConnection(servname, servpath,
                               GetIntPreference (String(kInternetMetaServerPortKey)+i, 80), this));

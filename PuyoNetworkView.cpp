@@ -24,8 +24,11 @@
  */
 
 #include "PuyoNetworkView.h"
+#include "PuyoIgpDefs.h"
+#include <memory>
 
 extern char *p1name;
+extern char *p2name;
 
 Message *PuyoNetworkView::createStateMessage(bool paused)
 {
@@ -223,3 +226,45 @@ void PuyoNetworkView::sendEndOfGameMessage(int messageType)
     delete message;
 }
 
+
+void PuyoInternetNetworkView::gameWin()
+{
+    PuyoNetworkView::gameWin();
+    sendGameResultToServer(1);
+}
+
+void PuyoInternetNetworkView::gameLost()
+{
+    PuyoNetworkView::gameLost();
+    sendGameResultToServer(2);
+}
+
+void PuyoInternetNetworkView::sendGameResultToServer(int winner)
+{
+    return; // Buggy for now... disabled TODO
+    if (igpbox == NULL) return;
+    igpbox->bind(1);
+    std::auto_ptr<Message> message (igpbox->createMessage());
+    message->addInt   ("CMD",   PUYO_IGP_GAME_OVER);
+    message->addInt   ("WINNER", winner);
+    message->addInt   (PuyoMessage::GAMEID, gameId);
+    message->addString(PuyoMessage::NAME1,  p1name);
+    message->addString(PuyoMessage::NAME2,  p2name);
+    PlayerGameStat &gameStat = attachedGame->getGameStat();
+    message->addInt(PuyoMessage::SCORE, gameStat.points);
+    message->addInt(PuyoMessage::TOTAL_SCORE, gameStat.total_points);
+    for (int i = 0 ; i < 24 ; i++) {
+        String messageName = String(PuyoMessage::COMBO_COUNT) + i;
+        message->addInt(messageName, gameStat.combo_count[i]);
+    }
+    message->addInt(PuyoMessage::EXPLODE_COUNT, gameStat.explode_count);
+    message->addInt(PuyoMessage::DROP_COUNT, gameStat.drop_count);
+    message->addInt(PuyoMessage::GHOST_SENT_COUNT, gameStat.ghost_sent_count);
+    message->addFloat(PuyoMessage::TIME_LEFT, gameStat.time_left);
+    message->addBool(PuyoMessage::IS_DEAD, gameStat.is_dead);
+    message->addBool(PuyoMessage::IS_WINNER, gameStat.is_winner);
+
+    message->addBoolProperty("RELIABLE", true);
+    message->send();
+    // delete message; auto_ptr will delete it! (even if exception is thrown, which is nice of him)
+}

@@ -20,6 +20,8 @@ enum {
   extern const char *TYPE;
   extern const char *GAMEID;
   extern const char *NAME;
+  extern const char *NAME1;
+  extern const char *NAME2;
   extern const char *PUYOS;
   extern const char *PAUSED;
   extern const char *SCORE;

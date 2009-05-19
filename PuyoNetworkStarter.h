@@ -45,7 +45,7 @@ private:
 
 class PuyoNetworkGameWidget : public PuyoGameWidget, MessageListener, ChatBoxDelegate {
 public:
-    PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL);
+    PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, ios_fc::IgpMessageBox *igpbox = NULL);
     ~PuyoNetworkGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
@@ -65,7 +65,7 @@ private:
     ios_fc::MessageBox &mbox;
     PuyoLocalGameFactory attachedLocalGameFactory;
     PuyoNetworkGameFactory attachedNetworkGameFactory;
-    PuyoNetworkView localArea;
+    PuyoNetworkView *localArea;
     PuyoView networkArea;
     PuyoCombinedEventPlayer playercontroller;
     PuyoNullPlayer dummyPlayerController;

@@ -3,6 +3,8 @@ namespace PuyoMessage {
 const char *TYPE          = "TYPE";
 const char *GAMEID        = "ID";
 const char *NAME          = "NAME";
+const char *NAME1         = "NAME1";
+const char *NAME2         = "NAME2";
 const char *PUYOS         = "PUYOS";
 const char *PAUSED        = "PAUSED";
 const char *SCORE         = "SCORE";

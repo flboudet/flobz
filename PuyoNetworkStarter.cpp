@@ -39,23 +39,28 @@ PuyoGame *PuyoNetworkGameFactory::createPuyoGame(PuyoFactory *attachedPuyoFactor
     return new PuyoNetworkGame(attachedPuyoFactory, msgBox, gameId);
 }
 
-PuyoNetworkGameWidget::PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction)
+PuyoNetworkGameWidget::PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, ios_fc::IgpMessageBox *igpbox)
     : attachedPuyoThemeSet(puyoThemeSet), attachedRandom(randomSeed, 5), mbox(mbox), attachedLocalGameFactory(&attachedRandom),
-      attachedNetworkGameFactory(&attachedRandom, mbox, gameId), localArea(&attachedLocalGameFactory, &attachedPuyoThemeSet, &levelTheme,
-            1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, gameId, painter),
+      attachedNetworkGameFactory(&attachedRandom, mbox, gameId),
+      localArea((igpbox!=NULL) ?
+                new PuyoInternetNetworkView(&attachedLocalGameFactory, &attachedPuyoThemeSet, &levelTheme,
+                                            1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, gameId, painter, igpbox) :
+                new PuyoNetworkView(&attachedLocalGameFactory, &attachedPuyoThemeSet, &levelTheme,
+                                            1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, gameId, painter)),
       networkArea(&attachedNetworkGameFactory, &attachedPuyoThemeSet, &levelTheme,
             1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
-      playercontroller(localArea), dummyPlayerController(networkArea), syncMsgReceived(false), syncMsgSent(false), chatBox(*this),
+      playercontroller(*localArea), dummyPlayerController(networkArea), syncMsgReceived(false), syncMsgSent(false), chatBox(*this),
       brokenNetworkWidget("etherdown.gsl"), networkIsBroken(false)
 {
     mbox.addListener(this);
-    initialize(localArea, networkArea, playercontroller, dummyPlayerController, levelTheme, gameOverAction);
+    initialize(*localArea, networkArea, playercontroller, dummyPlayerController, levelTheme, gameOverAction);
     setLives(-1);
 }
 
 PuyoNetworkGameWidget::~PuyoNetworkGameWidget()
 {
     mbox.removeListener(this);
+    delete(localArea);
 }
 
 void PuyoNetworkGameWidget::cycle()

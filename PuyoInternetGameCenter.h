@@ -47,6 +47,7 @@ public:
     bool isDenied() const;
     String getDenyString() const { return m_denyString; }
     String getDenyStringMore() const { return m_denyStringMore; }
+    virtual IgpMessageBox *getIgpBox() { return &mbox; }
     // Temporaire
     void punch();
 protected:

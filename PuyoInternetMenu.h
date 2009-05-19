@@ -86,6 +86,7 @@ public:
     virtual ~AbstractPuyoMetaServerConnection() {}
     virtual void fetch() = 0;
     virtual std::vector<PuyoServer> getServers() const = 0;
+    virtual bool failed() const { return false; }
 protected:
     virtual void onServerListHasChanged();
 private:
@@ -107,11 +108,13 @@ public:
     virtual std::vector<PuyoServer> getServers() const;
     // IdleComponent implementation
     virtual void idle(double currentTime);
+    virtual bool failed() const { return m_nErrors > 5; }
 private:
     HttpDocument *m_doc;
     String m_hostName, m_hostPath;
     int m_portNum;
     std::vector<PuyoServer> m_servers;
+    int m_nErrors;
 };
 
 

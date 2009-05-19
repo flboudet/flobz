@@ -105,7 +105,7 @@ class PuyoView : public PuyoDelegate {
     void companionDidTurn(PuyoPuyo *companionPuyo, PuyoPuyo *fallingPuyo, bool counterclockwise);
     void puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow);
     void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase);
-    void gameLost();
+    virtual void gameLost();
     int getPlayerId() const { return (xOffset < 320) ? 1 : 2; }
     virtual void gameWin();
     void setShowNextPuyos(bool show) { m_showNextPuyos = show; }

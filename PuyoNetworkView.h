@@ -30,6 +30,7 @@
 #include "PuyoView.h"
 
 #include "ios_messagebox.h"
+#include "ios_igpmessagebox.h"
 using namespace ios_fc;
 
 class PuyoNetworkView : public PuyoView {
@@ -61,11 +62,11 @@ class PuyoNetworkView : public PuyoView {
     void puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow);
     void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase);
     virtual void gameWin();
-    void gameLost();
+    virtual void gameLost();
 
     void sendStateMessage(bool paused = false);
 
-private:
+protected:
     void sendEndOfGameMessage(int messageType);
 
     MessageBox *mbox;
@@ -79,6 +80,27 @@ private:
     AdvancedBuffer<int> didFallBuffer;
     AdvancedBuffer<int> willVanishBuffer;
     int badPuyos;
+};
+
+class PuyoInternetNetworkView : public PuyoNetworkView {
+    public:
+        PuyoInternetNetworkView(PuyoGameFactory *attachedPuyoGameFactory,
+                                AnimatedPuyoSetTheme *attachedPuyoThemeSet,
+                                PuyoLevelTheme *attachedLevelTheme,
+                                int xOffset, int yOffset,
+                                int nXOffset, int nYOffset, MessageBox *mbox, int gameId,
+                                DrawTarget &painterToUse, IgpMessageBox *igpbox)
+          : PuyoNetworkView(attachedPuyoGameFactory,
+                             attachedPuyoThemeSet,
+                             attachedLevelTheme,
+                             xOffset, yOffset,
+                             nXOffset, nYOffset, mbox, gameId, painterToUse),
+          igpbox(igpbox) {}
+        virtual void gameWin();
+        virtual void gameLost();
+    private:
+        void sendGameResultToServer(int winner);
+        IgpMessageBox *igpbox;
 };
 
 #endif // _PUYONETWORKVIEW

@@ -29,6 +29,7 @@
 #include "ios_memory.h"
 #include "ios_dirigeable.h"
 #include "ios_messagebox.h"
+#include "ios_igpmessagebox.h"
 
 using namespace ios_fc;
 
@@ -88,6 +89,8 @@ public:
     virtual void setStatus(int status) {}
     virtual String getSelfName() { return "Myself"; }
     virtual String getOpponentName() { return "Opponent"; }
+    // Optional server managing the game center.
+    virtual IgpMessageBox *getIgpBox() { return NULL; }
 protected:
     AdvancedBuffer<PuyoNetGameCenterListener *> listeners;
     class GamerPeer;
