@@ -52,6 +52,7 @@ public:
 private:
     int sendSerialID;
     int destIdent;
+    bool m_isCorrupted;
 };
 
 }
