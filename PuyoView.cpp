@@ -38,9 +38,9 @@
 PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 		   AnimatedPuyoSetTheme *attachedThemeSet,
            PuyoLevelTheme *attachedLevelTheme,
-		   int xOffset, int yOffset, int nXOffset, int nYOffset, DrawTarget &painterToUse)
+		   int xOffset, int yOffset, int nXOffset, int nYOffset)
   : m_showNextPuyos(true), attachedThemeSet(attachedThemeSet), attachedLevelTheme(attachedLevelTheme),
-    attachedPuyoFactory(this), attachedPainter(painterToUse), delayBeforeGameOver(60)
+    attachedPuyoFactory(this), delayBeforeGameOver(60)
 {
     //printf("Constructeur du PuyoView\n");
 	attachedGame = attachedPuyoGameFactory->createPuyoGame(&attachedPuyoFactory);
@@ -162,9 +162,8 @@ void PuyoView::rotateRight()
 }
 
 
-void PuyoView::render()
+void PuyoView::render(DrawTarget *dt)
 {
-
 	IosRect drect;
     IosRect vrect;
 	vrect.x = xOffset;
@@ -172,18 +171,18 @@ void PuyoView::render()
 	vrect.w = TSIZE * PUYODIMX;
 	vrect.h = TSIZE * PUYODIMY;
 
-        bool displayFallings = this->cycleAllowed();
+    bool displayFallings = this->cycleAllowed();
 
     for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
         AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
-        if (displayFallings || !currentPuyo->isFalling()) currentPuyo->renderShadow();
+        if (displayFallings || !currentPuyo->isFalling()) currentPuyo->renderShadow(dt);
     }
  	for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
         AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
-        if (displayFallings || !currentPuyo->isFalling()) currentPuyo->render();
+        if (displayFallings || !currentPuyo->isFalling()) currentPuyo->render(dt);
     }
     // drawing the walhalla
-    attachedPuyoFactory.renderWalhalla();
+    attachedPuyoFactory.renderWalhalla(dt);
 
     if (m_showNextPuyos) {
         drect.x = nXOffset;
@@ -199,8 +198,8 @@ void PuyoView::render()
             drect.y = nYOffset + TSIZE;
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;
-            attachedPainter.renderCopy(currentSurface, NULL, &drect);
-            attachedPainter.renderCopy(nextPuyoTheme->getEyeSurfaceForIndex(0), NULL, &drect);
+            dt->renderCopy(currentSurface, NULL, &drect);
+            dt->renderCopy(nextPuyoTheme->getEyeSurfaceForIndex(0), NULL, &drect);
         }
         AnimatedPuyoTheme *nextCompanionTheme =
             attachedThemeSet->getAnimatedPuyoTheme(attachedGame->getNextCompanion());
@@ -210,8 +209,8 @@ void PuyoView::render()
             drect.y = nYOffset;
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;
-            attachedPainter.renderCopy(currentSurface, NULL, &drect);
-            attachedPainter.renderCopy(nextCompanionTheme->getEyeSurfaceForIndex(0), NULL, &drect);
+            dt->renderCopy(currentSurface, NULL, &drect);
+            dt->renderCopy(nextCompanionTheme->getEyeSurfaceForIndex(0), NULL, &drect);
         }
     }
 
@@ -219,17 +218,17 @@ void PuyoView::render()
     if (viewAnimations.size() > 0) {
         Animation *currentAnimation = viewAnimations[0];
         if (!currentAnimation->isFinished()) {
-            currentAnimation->draw(0);
+            currentAnimation->draw(0, dt);
         }
     }
 }
 
-void PuyoView::renderOverlay()
+void PuyoView::renderOverlay(DrawTarget *dt)
 {
-    attachedStatDisplay->draw();
+    attachedStatDisplay->draw(dt);
 }
 
-void PuyoView::renderNeutral()
+void PuyoView::renderNeutral(DrawTarget *dt)
 {
 	IosRect drect;
     int neutralPuyos = attachedGame->getNeutralPuyos();
@@ -247,7 +246,7 @@ void PuyoView::renderNeutral()
 		drect.y = drect_y_base - giantNeutral->h;
 		drect.w = giantNeutral->w;
 		drect.h = giantNeutral->h;
-		attachedPainter.renderCopy(giantNeutral, NULL, &drect);
+		dt->renderCopy(giantNeutral, NULL, &drect);
 		drect_x += giantNeutral->w;
 	}
     for (int cpt = 0 ; cpt < numBigNeutral ; cpt++) {
@@ -255,7 +254,7 @@ void PuyoView::renderNeutral()
 		drect.y = drect_y_base - bigNeutral->h;
 		drect.w = bigNeutral->w;
 		drect.h = bigNeutral->h;
-		attachedPainter.renderCopy(bigNeutral, NULL, &drect);
+		dt->renderCopy(bigNeutral, NULL, &drect);
 		drect_x += bigNeutral->w;
 	}
     for (int cpt = 0 ; cpt < numNeutral ; cpt++) {
@@ -263,7 +262,7 @@ void PuyoView::renderNeutral()
 		drect.y = drect_y_base - neutral->h;
 		drect.w = neutral->w;
 		drect.h = neutral->h;
-		attachedPainter.renderCopy(neutral, NULL, &drect);
+		dt->renderCopy(neutral, NULL, &drect);
 		drect_x += neutral->w;
 	}
 }

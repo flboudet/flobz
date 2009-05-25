@@ -107,24 +107,22 @@ bool AnimatedPuyo::isRenderingAnimation() const
     return animation->isEnabled();
 }
 
-void AnimatedPuyo::render()
+void AnimatedPuyo::render(DrawTarget *dt)
 {
     PuyoGame *attachedGame = attachedView->getAttachedGame();
     PuyoAnimation *animation = getCurrentAnimation();
     if (!isRenderingAnimation()) {
-        renderAt(getScreenCoordinateX(), getScreenCoordinateY());
+        renderAt(getScreenCoordinateX(), getScreenCoordinateY(), dt);
     }
     else {
         if (!animation->isFinished()) {
-            animation->draw(attachedGame->getSemiMove());
+            animation->draw(attachedGame->getSemiMove(), dt);
         }
     }
 }
 
-void AnimatedPuyo::renderAt(int X, int Y)
+void AnimatedPuyo::renderAt(int X, int Y, DrawTarget *dt)
 {
-    DrawTarget &painter = attachedView->getPainter();
-
     if (attachedView == NULL)
         return;
     if (!visibilityFlag)
@@ -142,51 +140,50 @@ void AnimatedPuyo::renderAt(int X, int Y)
         drect.w = currentSurface->w;
         drect.h = currentSurface->h;
 
-        painter.renderCopy(currentSurface, NULL, &drect);
+        dt->renderCopy(currentSurface, NULL, &drect);
 
         /* Main puyo show */
         /* TODO: Investigate why, during network game, the falling puyo starts by being neutral */
         if ((this == attachedGame->getFallingPuyo()) && (getPuyoState() != PUYO_NEUTRAL))
-            painter.renderCopy(attachedTheme->getCircleSurfaceForIndex((smallTicksCount >> 2) & 0x1F, m_currentCompressedState), NULL, &drect);
+            dt->renderCopy(attachedTheme->getCircleSurfaceForIndex((smallTicksCount >> 2) & 0x1F, m_currentCompressedState), NULL, &drect);
 
         /* Eye management */
         if (getPuyoState() != PUYO_NEUTRAL) {
             int eyePhase = (puyoEyeState + SDL_GetTicks()) % 8192;
             if (eyePhase < 100)
-                painter.renderCopy(attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState), NULL, &drect);
+                dt->renderCopy(attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState), NULL, &drect);
             else if (eyePhase < 200)
-                painter.renderCopy(attachedTheme->getEyeSurfaceForIndex(2, m_currentCompressedState), NULL, &drect);
+                dt->renderCopy(attachedTheme->getEyeSurfaceForIndex(2, m_currentCompressedState), NULL, &drect);
             else if (eyePhase < 300)
-                painter.renderCopy(attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState), NULL, &drect);
+                dt->renderCopy(attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState), NULL, &drect);
             else
-                painter.renderCopy(attachedTheme->getEyeSurfaceForIndex(0, m_currentCompressedState), NULL, &drect);
+                dt->renderCopy(attachedTheme->getEyeSurfaceForIndex(0, m_currentCompressedState), NULL, &drect);
         }
     }
 }
 
-void AnimatedPuyo::renderShadow()
+void AnimatedPuyo::renderShadow(DrawTarget *dt)
 {
     if (!visibilityFlag)
         return;
     if (!isRenderingAnimation()) {
-        renderShadowAt(getScreenCoordinateX(), getScreenCoordinateY());
+        renderShadowAt(getScreenCoordinateX(), getScreenCoordinateY(), dt);
     }
 }
 
-void AnimatedPuyo::renderShadowAt(int X, int Y)
+void AnimatedPuyo::renderShadowAt(int X, int Y, DrawTarget *dt)
 {
     if (getPuyoState() != PUYO_NEUTRAL) {
         IosSurface *currentSurface;
         currentSurface = attachedTheme->getShadowSurface(m_currentCompressedState);
         if (currentSurface != NULL) {
             IosRect drect;
-            DrawTarget &painter = attachedView->getPainter();
             drect.x = X;
             drect.y = Y;
 
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;
-            painter.renderCopy(currentSurface, NULL, &drect);
+            dt->renderCopy(currentSurface, NULL, &drect);
         }
     }
 }
@@ -253,11 +250,11 @@ void AnimatedPuyoFactory::deletePuyo(PuyoPuyo *target)
 }
 
 
-void AnimatedPuyoFactory::renderWalhalla()
+void AnimatedPuyoFactory::renderWalhalla(DrawTarget *dt)
 {
     for (int i = puyoWalhalla.size() - 1 ; i >= 0 ; i--) {
         AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(puyoWalhalla[i]);
-        currentPuyo->render();
+        currentPuyo->render(dt);
     }
 }
 

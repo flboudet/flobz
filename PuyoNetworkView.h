@@ -39,10 +39,9 @@ class PuyoNetworkView : public PuyoView {
 		    AnimatedPuyoSetTheme *attachedPuyoThemeSet,
             PuyoLevelTheme *attachedLevelTheme,
 		    int xOffset, int yOffset,
-                    int nXOffset, int nYOffset, MessageBox *mbox, int gameId,
-                    DrawTarget &painterToUse)
+                    int nXOffset, int nYOffset, MessageBox *mbox, int gameId)
         : PuyoView(attachedPuyoGameFactory, attachedPuyoThemeSet, attachedLevelTheme,
-		   xOffset, yOffset, nXOffset, nYOffset, painterToUse),
+		   xOffset, yOffset, nXOffset, nYOffset),
           mbox(mbox), gameId(gameId), badPuyos(0) {}
 
     void cycleGame();
@@ -89,12 +88,12 @@ class PuyoInternetNetworkView : public PuyoNetworkView {
                                 PuyoLevelTheme *attachedLevelTheme,
                                 int xOffset, int yOffset,
                                 int nXOffset, int nYOffset, MessageBox *mbox, int gameId,
-                                DrawTarget &painterToUse, IgpMessageBox *igpbox)
+                                IgpMessageBox *igpbox)
           : PuyoNetworkView(attachedPuyoGameFactory,
                              attachedPuyoThemeSet,
                              attachedLevelTheme,
                              xOffset, yOffset,
-                             nXOffset, nYOffset, mbox, gameId, painterToUse),
+                             nXOffset, nYOffset, mbox, gameId),
           igpbox(igpbox) {}
         virtual void gameWin();
         virtual void gameLost();

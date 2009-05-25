@@ -50,7 +50,7 @@ public:
     bool isFinished() const;
     bool isEnabled() const;
     virtual void cycle() = 0;
-    virtual void draw(int semiMove) {}
+    virtual void draw(int semiMove, DrawTarget *dt) {}
     int getTag() const { return m_tag; }
     bool getExclusive() const { return m_exclusive; }
 protected:
@@ -89,7 +89,7 @@ class NeutralAnimation : public PuyoAnimation {
     NeutralAnimation(AnimatedPuyo &puyo, int delay, AnimationSynchronizer *synchronizer);
     virtual ~NeutralAnimation();
     void cycle();
-    void draw(int semiMove);
+    void draw(int semiMove, DrawTarget *dt);
   private:
     int X, Y, currentY;
     float step;
@@ -135,7 +135,7 @@ public:
     FallingAnimation(AnimatedPuyo &puyo,
                      int originY, int xOffset, int yOffset, int step);
     void cycle();
-    void draw(int semiMove);
+    void draw(int semiMove, DrawTarget *dt);
 private:
     int xOffset, yOffset, step, off;
     int X, Y;
@@ -151,7 +151,7 @@ public:
     VanishAnimation(AnimatedPuyo &puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int puyoNum, int groupSize, int groupNum, int phase);
     virtual ~VanishAnimation();
     void cycle();
-    void draw(int semiMove);
+    void draw(int semiMove, DrawTarget *dt);
 private:
     int xOffset, yOffset;
     int X, Y, iter, color;
@@ -170,7 +170,7 @@ public:
     VanishSoundAnimation(int phase, AnimationSynchronizer *synchronizer, float soundPadding);
     virtual ~VanishSoundAnimation();
     void cycle();
-    void draw(int semiMove);
+    void draw(int semiMove, DrawTarget *dt);
 private:
     int phase;
     int step;
@@ -184,7 +184,7 @@ public:
     NeutralPopAnimation(AnimatedPuyo &puyo, int delay, AnimationSynchronizer *synchronizer);
     virtual ~NeutralPopAnimation();
     void cycle();
-    void draw(int semiMove);
+    void draw(int semiMove, DrawTarget *dt);
 private:
     AnimationSynchronizer *synchronizer;
     int iter, delay;
@@ -198,7 +198,7 @@ public:
     SmoothBounceAnimation(AnimatedPuyo &puyo, AnimationSynchronizer *synchronizer, int depth = 10);
     virtual ~SmoothBounceAnimation();
     void cycle();
-    void draw(int semiMove);
+    void draw(int semiMove, DrawTarget *dt);
 private:
     int bounceOffset, bouncePhase, bounceMax;
     int origX, origY;
@@ -210,7 +210,7 @@ public:
     GameOverFallAnimation(AnimatedPuyo &puyo, int delay);
     virtual ~GameOverFallAnimation();
     void cycle();
-    void draw(int semiMove);
+    void draw(int semiMove, DrawTarget *dt);
 private:
     int delay;
     int Y;

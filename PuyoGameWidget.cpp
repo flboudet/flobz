@@ -214,59 +214,67 @@ void PuyoGameWidget::cycle()
   }
 }
 
+void PuyoGameWidget::drawBackground(DrawTarget *dt)
+{
+    dt->renderCopy(attachedLevelTheme->getBackground(), NULL, NULL);
+}
+
+void PuyoGameWidget::drawGameAreas(DrawTarget *dt)
+{
+    areaA->render(dt);
+    areaB->render(dt);
+}
+
+void PuyoGameWidget::drawGameNeutrals(DrawTarget *dt)
+{
+    areaA->renderNeutral(dt);
+    areaB->renderNeutral(dt);
+}
+
 void PuyoGameWidget::draw(DrawTarget *dt)
 {
-    // Render the background
-    painter.renderCopy(attachedLevelTheme->getBackground(), NULL, NULL);
-    if (!paused) {
-        // Rendering puyo views
-        areaA->render();
-        areaB->render();
-
-        // Rendering the grids
-        IosRect drect;
-        IosSurface * grid = attachedLevelTheme->getGrid();
-        if (grid != NULL) {
-            drect.x = 21;
-            drect.y = -1;
-            drect.w = grid->w;
-            drect.h = grid->h;
-            painter.renderCopy(grid, NULL, &drect);
-            drect.x = 407;
-            drect.y = -1;
-            drect.w = grid->w;
-            drect.h = grid->h;
-            painter.renderCopy(grid, NULL, &drect);
-        }
-
-        // Rendering the foreground animation
-        if (m_foregroundAnimation != NULL)
-            styrolyse_draw(m_foregroundAnimation);
-
-        // Rendering the neutral puyos
-        areaA->renderNeutral();
-        areaB->renderNeutral();
-
-        // Rendering the lives
-        if (displayLives && (lives>=0) && (lives<=3))
-        {
-            IosSurface * liveImage = attachedLevelTheme->getLifeForIndex(lives);
-            drect.x = painter.w / 2 - liveImage->w / 2;
-            drect.y = 436;
-            drect.w = liveImage->w;
-            drect.h = liveImage->h;
-            painter.renderCopy(liveImage, NULL, &drect);
-        }
-
-        // Drawing the painter
-        // TODO: Fix
-        // painter.draw();
+    if (paused) {
+        dt->renderCopy(painterGameScreen, NULL, NULL);
+        return;
     }
-    // Disabled for direct draw
-    //dt->renderCopy(painterGameScreen, NULL, NULL);
+    // Render the background
+    drawBackground(dt);
+    // Rendering puyo views
+    drawGameAreas(dt);
+    // Rendering the grids
+    IosRect drect;
+    IosSurface * grid = attachedLevelTheme->getGrid();
+    if (grid != NULL) {
+        drect.x = 21;
+        drect.y = -1;
+        drect.w = grid->w;
+        drect.h = grid->h;
+        dt->renderCopy(grid, NULL, &drect);
+        drect.x = 407;
+        drect.y = -1;
+        drect.w = grid->w;
+        drect.h = grid->h;
+        dt->renderCopy(grid, NULL, &drect);
+    }
 
+    // Rendering the foreground animation
+    if (m_foregroundAnimation != NULL)
+        styrolyse_draw(m_foregroundAnimation);
+
+    // Rendering the neutral puyos
+    drawGameNeutrals(dt);
+
+    // Rendering the lives
+    if (displayLives && (lives>=0) && (lives<=3))
+    {
+        IosSurface * liveImage = attachedLevelTheme->getLifeForIndex(lives);
+        drect.x = dt->w / 2 - liveImage->w / 2;
+        drect.y = 436;
+        drect.w = liveImage->w;
+        drect.h = liveImage->h;
+        dt->renderCopy(liveImage, NULL, &drect);
+    }
     // Rendering the game speed meter
-    // Should be moved to the painter
     IosRect speedRect;
     IosSurface * speedFront = attachedLevelTheme->getSpeedMeter(true);
     IosSurface * speedBack  = attachedLevelTheme->getSpeedMeter(false);
@@ -275,7 +283,6 @@ void PuyoGameWidget::draw(DrawTarget *dt)
     speedRect.h = gameSpeed * 6;
     speedRect.y = speedFront->h - speedRect.h;
 
-    IosRect drect;
     drect.x = attachedLevelTheme->getSpeedMeterX() - speedRect.w / 2;
     drect.y = attachedLevelTheme->getSpeedMeterY() - speedRect.h;
     drect.w = speedRect.w;
@@ -288,16 +295,12 @@ void PuyoGameWidget::draw(DrawTarget *dt)
     speedBlackRect.y = 0;
     drectBlack.y = attachedLevelTheme->getSpeedMeterY() - speedFront->h;
     drectBlack.h = speedBlackRect.h;
-
     dt->renderCopy(speedBack,&speedBlackRect,&drectBlack);
-    if (!paused)
-        dt->renderCopy(speedFront,&speedRect, &drect);
-    else
-        dt->renderCopy(speedBack,&speedRect, &drect);
+    dt->renderCopy(speedFront,&speedRect, &drect);
 
     // Rendering the scores
-    areaA->renderOverlay();
-    areaB->renderOverlay();
+    areaA->renderOverlay(dt);
+    areaB->renderOverlay(dt);
     /*
     SoFont *fontBl = NULL;
     int blinkingPointsA = 0; int blinkingPointsB = 0;
@@ -337,7 +340,7 @@ void PuyoGameWidget::draw(DrawTarget *dt)
     }
     */
     // Rendering the player names
-    IosFont *font = (paused ? GameUIDefaults::FONT_INACTIVE : GameUIDefaults::FONT_TEXT);
+    IosFont *font = GameUIDefaults::FONT_TEXT;
     dt->putStringCenteredXY(font, 130, 460, playerOneName);
     dt->putStringCenteredXY(font, 510, 460, playerTwoName);
 }
@@ -349,6 +352,8 @@ void PuyoGameWidget::addSubWidget(Widget *subWidget)
 
 void PuyoGameWidget::pause()
 {
+    //painterGameScreen->setAlpha(IOS_ALPHA_OPAQUE);
+    draw(painterGameScreen);
     paused = true;
     IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
     iimLib.convertToGray(painterGameScreen);
@@ -358,8 +363,6 @@ void PuyoGameWidget::pause()
 void PuyoGameWidget::resume()
 {
     paused = false;
-    // TODO: Fix
-    //painter.redrawAll();
 }
 
 void PuyoGameWidget::eventOccured(GameControlEvent *event)

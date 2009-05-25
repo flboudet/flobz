@@ -2,6 +2,7 @@
 #define PUYO_GAME_ABSTRACT_H
 
 #include "iosfc/ios_fc.h"
+#include "drawcontext.h"
 
 struct PlayerGameStat
 {
@@ -23,7 +24,7 @@ class PlayerGameStatDisplay
     public:
         PlayerGameStatDisplay(const ios_fc::String &player_name, PlayerGameStat &stat, int player);
         ~PlayerGameStatDisplay();
-        void draw() const;
+        void draw(DrawTarget *dt) const;
         void gameIsOver();
 
     private:

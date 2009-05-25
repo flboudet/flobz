@@ -28,7 +28,6 @@
 #include "PuyoNetworkView.h"
 #include "PuyoNetworkGame.h"
 
-#include "SDL_Painter.h"
 #include "IosImgProcess.h"
 #include "audio.h"
 
@@ -185,11 +184,11 @@ PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoTheme
     attachedRandom(5), attachedGameFactory(&attachedRandom),
     areaA(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
             1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE,
-            BSIZE+ESIZE, painter),
+            BSIZE+ESIZE),
     areaB(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
             1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE,
             CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE,
-            BSIZE+ESIZE, painter),
+            BSIZE+ESIZE),
     controllerA(areaA, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left,
             GameControlEvent::kPlayer1Right,
             GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),

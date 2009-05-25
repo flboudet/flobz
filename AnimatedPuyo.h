@@ -27,7 +27,6 @@
 #define _ANIMATEDPUYO
 
 #include "ios_memory.h"
-#include "SDL_Painter.h"
 #include "PuyoGame.h"
 #include "PuyoAnimations.h"
 
@@ -49,10 +48,10 @@ public:
     void flushAnimations();
     void flushAnimations(int animationTag);
     void cycleAnimation();
-    void render();
-    void renderAt(int X, int Y);
-    void renderShadow();
-    void renderShadowAt(int X, int Y);
+    void render(DrawTarget *dt);
+    void renderAt(int X, int Y, DrawTarget *dt);
+    void renderShadow(DrawTarget *dt);
+    void renderShadowAt(int X, int Y, DrawTarget *dt);
     bool isRenderingAnimation() const;
     void setVisible(bool flag) { visibilityFlag = flag; }
     bool getVisible() const { return visibilityFlag; }
@@ -84,7 +83,7 @@ public:
     virtual ~AnimatedPuyoFactory();
     virtual PuyoPuyo *createPuyo(PuyoState state);
     virtual void deletePuyo(PuyoPuyo *target);
-    void renderWalhalla();
+    void renderWalhalla(DrawTarget *dt);
     void cycleWalhalla();
 private:
     AdvancedBuffer<PuyoPuyo *> puyoWalhalla;

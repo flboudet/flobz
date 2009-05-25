@@ -24,11 +24,10 @@ PlayerGameStatDisplay::~PlayerGameStatDisplay()
 {
 }
 
-void PlayerGameStatDisplay::draw() const
+void PlayerGameStatDisplay::draw(DrawTarget *dt) const
 {
     char txt[4096];
     sprintf(txt, "%d", stat.points);
-    DrawTarget *dt = GameUIDefaults::GAME_LOOP->getDrawContext();
     dt->setClipRect(NULL);
     dt->putStringCenteredXY(GameUIDefaults::FONT_FUNNY, 300 + player * 40, 360 - player * 40, txt);
 }

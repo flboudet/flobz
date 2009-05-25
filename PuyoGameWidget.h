@@ -68,6 +68,11 @@ public:
     void initialize();
     void cycle();
     void draw(DrawTarget *dt);
+    // Draw subsets
+    virtual void drawBackground(DrawTarget *dt);
+    virtual void drawGameAreas(DrawTarget *dt);
+    virtual void drawGameNeutrals(DrawTarget *dt);
+
     void pause();
     void resume();
     bool isFocusable() { return !paused; }

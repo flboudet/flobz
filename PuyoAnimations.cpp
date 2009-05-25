@@ -27,7 +27,6 @@
 #include "AnimatedPuyo.h"
 #include "PuyoView.h"
 #include "IosImgProcess.h"
-#include "SDL_Painter.h"
 #include "audio.h"
 
 /* Base class implementation */
@@ -97,9 +96,9 @@ void NeutralAnimation::cycle()
     }
 }
 
-void NeutralAnimation::draw(int semiMove)
+void NeutralAnimation::draw(int semiMove, DrawTarget *dt)
 {
-    attachedPuyo.renderAt(X, currentY);
+    attachedPuyo.renderAt(X, currentY, dt);
 }
 
 /* Animation synchronization helper */
@@ -273,7 +272,7 @@ void FallingAnimation::cycle()
     }
 }
 
-void FallingAnimation::draw(int semiMove)
+void FallingAnimation::draw(int semiMove, DrawTarget *dt)
 {
     IosRect drect;
     drect.x = X;
@@ -284,8 +283,8 @@ void FallingAnimation::draw(int semiMove)
             if (i>=0)
                 coordY += BOUNCING_OFFSET[i];
     }
-    attachedPuyo.renderShadowAt(X, coordY);
-    attachedPuyo.renderAt(X, coordY);
+    attachedPuyo.renderShadowAt(X, coordY, dt);
+    attachedPuyo.renderAt(X, coordY, dt);
 
     // TODO : Reactiver le EyeSwirl !
     //if (attachedPuyo.getPuyoState() != PUYO_NEUTRAL)
@@ -344,16 +343,15 @@ void VanishAnimation::cycle()
     }
 }
 
-void VanishAnimation::draw(int semiMove)
+void VanishAnimation::draw(int semiMove, DrawTarget *dt)
 {
     if (iter < (10 + delay)) {
         if (iter % 2 == 0) {
-            attachedPuyo.renderAt(X, Y);
+            attachedPuyo.renderAt(X, Y, dt);
         }
     }
     else {
 		AnimatedPuyoTheme *theme = attachedPuyo.getAttachedTheme();
-        DrawTarget &painter = attachedPuyo.getAttachedView()->getPainter();
 
         IosRect drect, xrect;
         int iter2 = iter - 10 - delay;
@@ -368,22 +366,22 @@ void VanishAnimation::draw(int semiMove)
             drect.w = shrinkingSurface->w;
             drect.h = shrinkingSurface->h;
 
-            painter.renderCopy(shrinkingSurface, NULL, &drect);
+            dt->renderCopy(shrinkingSurface, NULL, &drect);
             int xrectY = Y + (int)(2.5 * pow(iter - 16 - delay, 2) - 108);
             xrect.w = explodingSurface->w;
             xrect.h = explodingSurface->h;
             xrect.x = X - iter2 * iter2;
             xrect.y = xrectY;
-            painter.renderCopy(explodingSurface, NULL, &xrect);
+            dt->renderCopy(explodingSurface, NULL, &xrect);
             xrect.x = X - iter2;
             xrect.y = xrectY + iter2;
-            painter.renderCopy(explodingSurface, NULL, &xrect);
+            dt->renderCopy(explodingSurface, NULL, &xrect);
             xrect.x = X + iter2;
             xrect.y = xrectY + iter2;
-            painter.renderCopy(explodingSurface, NULL, &xrect);
+            dt->renderCopy(explodingSurface, NULL, &xrect);
             xrect.x = X + iter2 * iter2;
             xrect.y = xrectY;
-            painter.renderCopy(explodingSurface, NULL, &xrect);
+            dt->renderCopy(explodingSurface, NULL, &xrect);
         }
     }
 }
@@ -420,7 +418,7 @@ void VanishSoundAnimation::cycle()
     }
 }
 
-void VanishSoundAnimation::draw(int semiMove)
+void VanishSoundAnimation::draw(int semiMove, DrawTarget *dt)
 {
     // do nothing
 }
@@ -466,22 +464,21 @@ void NeutralPopAnimation::cycle()
     }
 }
 
-void NeutralPopAnimation::draw(int semiMove)
+void NeutralPopAnimation::draw(int semiMove, DrawTarget *dt)
 {
-    DrawTarget &painter = attachedPuyo.getAttachedView()->getPainter();
     IosRect drect;
     drect.x = X;
     drect.y = Y;
     drect.w = neutralPop[0]->w;
     drect.h = neutralPop[0]->h;
     if (iter - delay < 20) {
-        painter.renderCopy(neutralPop[0], NULL, &drect);
+        dt->renderCopy(neutralPop[0], NULL, &drect);
     }
     else if (iter - delay < 23) {
-        painter.renderCopy(neutralPop[1], NULL, &drect);
+        dt->renderCopy(neutralPop[1], NULL, &drect);
     }
     else if (iter - delay < 26) {
-        painter.renderCopy(neutralPop[2], NULL, &drect);
+        dt->renderCopy(neutralPop[2], NULL, &drect);
     }
 }
 
@@ -524,9 +521,9 @@ void SmoothBounceAnimation::cycle()
     }
 }
 
-void SmoothBounceAnimation::draw(int semiMove)
+void SmoothBounceAnimation::draw(int semiMove, DrawTarget *dt)
 {
-    attachedPuyo.renderAt(origX, origY + bounceOffset);
+    attachedPuyo.renderAt(origX, origY + bounceOffset, dt);
 }
 
 GameOverFallAnimation::GameOverFallAnimation(AnimatedPuyo &puyo, int delay)
@@ -552,8 +549,8 @@ void GameOverFallAnimation::cycle()
     else delay--;
 }
 
-void GameOverFallAnimation::draw(int semiMove)
+void GameOverFallAnimation::draw(int semiMove, DrawTarget *dt)
 {
-    attachedPuyo.renderAt(attachedPuyo.getScreenCoordinateX(), Y);
+    attachedPuyo.renderAt(attachedPuyo.getScreenCoordinateX(), Y, dt);
 }
 

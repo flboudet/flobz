@@ -44,11 +44,11 @@ PuyoNetworkGameWidget::PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet,
       attachedNetworkGameFactory(&attachedRandom, mbox, gameId),
       localArea((igpbox!=NULL) ?
                 new PuyoInternetNetworkView(&attachedLocalGameFactory, &attachedPuyoThemeSet, &levelTheme,
-                                            1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, gameId, painter, igpbox) :
+                                            1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, gameId, igpbox) :
                 new PuyoNetworkView(&attachedLocalGameFactory, &attachedPuyoThemeSet, &levelTheme,
-                                            1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, gameId, painter)),
+                                            1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, gameId)),
       networkArea(&attachedNetworkGameFactory, &attachedPuyoThemeSet, &levelTheme,
-            1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
+            1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE),
       playercontroller(*localArea), dummyPlayerController(networkArea), syncMsgReceived(false), syncMsgSent(false), chatBox(*this),
       brokenNetworkWidget("etherdown.gsl"), networkIsBroken(false)
 {

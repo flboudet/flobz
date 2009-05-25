@@ -66,12 +66,12 @@ class PuyoView : public PuyoDelegate {
     PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 	     AnimatedPuyoSetTheme *attachedThemeSet,
          PuyoLevelTheme *attachedLevelTheme,
-	     int xOffset, int yOffset, int nXOffset, int nYOffset, DrawTarget &painterToUse);
+	     int xOffset, int yOffset, int nXOffset, int nYOffset);
     virtual ~PuyoView();
     void setEnemyGame(PuyoGame *enemyGame);
-    void render();
-    void renderOverlay();
-    void renderNeutral();
+    void render(DrawTarget *dt);
+    void renderOverlay(DrawTarget *dt);
+    void renderNeutral(DrawTarget *dt);
     void cycleAnimation();
     virtual void cycleGame();
     void allowCycle() { cycleAllowance++; }
@@ -84,7 +84,6 @@ class PuyoView : public PuyoDelegate {
 
     int getValenceForPuyo(PuyoPuyo *puyo) const;
     PuyoGame *getAttachedGame() const { return attachedGame; }
-    DrawTarget & getPainter() const { return attachedPainter; }
 
     bool isGameOver() const;
 
@@ -122,7 +121,6 @@ class PuyoView : public PuyoDelegate {
     PuyoGame *attachedGame, *enemyGame;
     AdvancedBuffer<Animation *> viewAnimations;
     int cycleAllowance;
-    DrawTarget &attachedPainter;
     int delayBeforeGameOver;
     bool newMetaCycleStart;
     PlayerGameStatDisplay *attachedStatDisplay;

@@ -54,9 +54,9 @@ SinglePlayerStandardLayoutGameWidget::SinglePlayerStandardLayoutGameWidget(Anima
       attachedRandom(nColors),
       attachedGameFactory(&attachedRandom),
       areaA(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
-            1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, painter),
+            1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE),
       areaB(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
-            1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE, painter),
+            1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE),
       playercontroller(areaA)
 
 {
