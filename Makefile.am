@@ -16,7 +16,7 @@ flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
 # Optional sources for network gaming support
 if ENABLE_NETWORK
 flobopuyo_SOURCES+=PuyoNetworkStarter.cpp PuyoNetworkView.cpp PuyoNetworkGame.cpp \
-          PuyoNetworkMenu.cpp PuyoInternetMenu.cpp PuyoNetCenterMenu.cpp \
+          PuyoNetworkMenu.cpp PuyoInternetMenu.cpp PuyoInternetBot.cpp PuyoNetCenterMenu.cpp \
           PuyoNetGameCenter.cpp PuyoInternetGameCenter.cpp PuyoLanGameCenter.cpp\
           PuyoNatTraversal.cpp PuyoMessageDef.cpp
 endif
@@ -33,7 +33,7 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            PuyoIA.h PuyoScoring.h PuyoMain.h \
            glSDL.h PuyoIgpDefs.h PuyoScreenTransition.h \
            HallOfFame.h PuyoInternetGameCenter.h PuyoSinglePlayerStarter.h \
-           HiScores.h PuyoInternetMenu.h PuyoStarter.h \
+           HiScores.h PuyoInternetMenu.h PuyoInternetBot.h PuyoStarter.h \
            LevelThemeMenu.h PuyoLanGameCenter.h PuyoStatsWidget.h \
            MainMenu.h PuyoLocalizedDictionary.h  PuyoStory.h \
            MainScreen.h PuyoLocalMenu.h PuyoStrings.h \

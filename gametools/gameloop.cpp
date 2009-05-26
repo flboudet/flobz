@@ -204,7 +204,7 @@ void GameLoop::run()
   {
     double currentTime = getCurrentTime();
     idle(currentTime);
-    if (drawRequested()) {
+    if ((m_dc != NULL) && drawRequested()) {
       currentTime = getCurrentTime();
       // Ensure at least a frame every deltaDrawTimeMax gets drawn
       if ((!isLate(currentTime)) || (currentTime - lastDrawTime > deltaDrawTimeMax)) {
@@ -309,6 +309,7 @@ bool GameLoop::isLate(double currentTime) const
 void GameLoop::draw()
 {
   DrawContext *dc = getDrawContext();
+  if (dc == NULL) return;
 
   for (int i = 0; i < drawables.size(); ++i) {
     if (drawables[i] != NULL)
@@ -316,7 +317,7 @@ void GameLoop::draw()
     else
         printf("INVALID DRAWABLE\n");
   }
-  m_dc->flip();
+  if (m_dc != NULL) m_dc->flip();
 }
 
 bool GameLoop::moveToFront(DrawableComponent *gc)

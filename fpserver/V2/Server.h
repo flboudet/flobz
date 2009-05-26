@@ -5,6 +5,27 @@ namespace flobopuyo {
 namespace server {
 namespace v2 {
 
+struct GameResultInPool {
+    int gameid;
+    String name1;
+    String name2;
+    int winner;
+    int explode_count;
+    int drop_count;
+    bool is_dead;
+    bool is_winner;
+};
+
+class GameResultPool : public std::vector<GameResultInPool> {
+public:
+    enum SimilarResult {
+        SIMILAR,
+        SIMILAR_BUT_SUSPECT,
+        NO_SIMILAR
+    };
+    Similarity contains(const GameResultInPool &result) const;
+};
+
 class Server {
 public:
     Server(ios_fc::IgpVirtualPeerMessageBox &mbox) : mMbox(mbox), mTimeMsBeforePeerTimeout(5000.) {}
@@ -218,8 +239,13 @@ void Server::onIgpGameOver(ios_fc::Message &msg) {
     gameStat.time_left = msg.getFloat("TIME_LEFT");
     gameStat.is_dead = msg.getBool("IS_DEAD");
     gameStat.is_winner = msg.getBool("IS_WINNER");
+
+    // Store the result into a temporary pool.
+    // If the pool already contains a result for this game (sent by the other player),
+    // then log the result.
+    // Except if the result are different (the 2 players claims victory).
+    // In this case, give penalty points to both... (p = p*2 + 1)
     printf("Game %d with %s and %s won by %d\n", gameId, name1.c_str(), name2.c_str(), winner);
-    // TODO: Log
 }
 
 }}}
