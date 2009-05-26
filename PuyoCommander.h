@@ -10,13 +10,17 @@
 #include "NotifyCenter.h"
 #include "audio.h"
 #include "MainScreen.h"
+#include <memory>
 
 using namespace gameui;
 
 class PuyoCommander : public MessageListener, NotificationResponder
 {
   public:
-    PuyoCommander(String dataDir, bool fullscreen, int maxDataPackNumber=-1);
+    PuyoCommander(String dataDir, int maxDataPackNumber=-1);
+    void initWithGUI(bool fullscreen);
+    void initWithoutGUI();
+
     virtual ~PuyoCommander();
     void onMessage(Message &message);
 
@@ -34,14 +38,14 @@ class PuyoCommander : public MessageListener, NotificationResponder
     const PuyoDataPathManager &getDataPathManager() { return dataPathManager; }
     const char * getLocalizedString(const char * originalString) const;
 
-    const FramePicture *getWindowFramePicture() const { return &m_windowFramePicture; }
-    const FramePicture *getButtonFramePicture() const { return &m_buttonIdleFramePicture; }
-    const FramePicture *getButtonDownFramePicture() const { return &m_buttonDownFramePicture; }
-    const FramePicture *getButtonOverFramePicture() const { return &m_buttonOverFramePicture; }
-    const FramePicture *getEditFieldFramePicture() const { return &m_textFieldIdleFramePicture; }
-    const FramePicture *getEditFieldOverFramePicture() const { return &m_textFieldIdleFramePicture; }
-    const FramePicture *getSeparatorFramePicture() const { return &m_separatorFramePicture; }
-    const FramePicture *getListFramePicture() const { return &m_listFramePicture; }
+    const FramePicture *getWindowFramePicture() const { return m_windowFramePicture.get(); }
+    const FramePicture *getButtonFramePicture() const { return m_buttonIdleFramePicture.get(); }
+    const FramePicture *getButtonDownFramePicture() const { return m_buttonDownFramePicture.get(); }
+    const FramePicture *getButtonOverFramePicture() const { return m_buttonOverFramePicture.get(); }
+    const FramePicture *getEditFieldFramePicture() const { return m_textFieldIdleFramePicture.get(); }
+    const FramePicture *getEditFieldOverFramePicture() const { return m_textFieldIdleFramePicture.get(); }
+    const FramePicture *getSeparatorFramePicture() const { return m_separatorFramePicture.get(); }
+    const FramePicture *getListFramePicture() const { return m_listFramePicture.get(); }
     IosSurface * getSwitchOnPicture() { return m_switchOnImage; }
     IosSurface * getSwitchOffPicture() { return m_switchOffImage; }
     IosSurface * getRadioOnPicture() { return m_radioOnImage; }
@@ -79,11 +83,13 @@ class PuyoCommander : public MessageListener, NotificationResponder
     IosSurface   *m_switchOnImage, *m_switchOffImage;
     IosSurface   *m_radioOnImage, *m_radioOffImage;
     IosSurface   *m_upArrow, *m_downArrow, *m_leftArrow, *m_rightArrow;
-    FramePicture m_windowFramePicture;
-    FramePicture m_buttonIdleFramePicture, m_buttonDownFramePicture, m_buttonOverFramePicture;
-    FramePicture m_textFieldIdleFramePicture;
-    FramePicture m_separatorFramePicture;
-    FramePicture m_listFramePicture;
+    std::auto_ptr<FramePicture> m_windowFramePicture;
+    std::auto_ptr<FramePicture> m_buttonIdleFramePicture;
+    std::auto_ptr<FramePicture> m_buttonDownFramePicture;
+    std::auto_ptr<FramePicture> m_buttonOverFramePicture;
+    std::auto_ptr<FramePicture> m_textFieldIdleFramePicture;
+    std::auto_ptr<FramePicture> m_separatorFramePicture;
+    std::auto_ptr<FramePicture> m_listFramePicture;
 };
 
 extern class PuyoCommander *theCommander;

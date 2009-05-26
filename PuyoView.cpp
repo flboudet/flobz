@@ -40,22 +40,39 @@ PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
            PuyoLevelTheme *attachedLevelTheme,
 		   int xOffset, int yOffset, int nXOffset, int nYOffset)
   : m_showNextPuyos(true), attachedThemeSet(attachedThemeSet), attachedLevelTheme(attachedLevelTheme),
-    attachedPuyoFactory(this), delayBeforeGameOver(60)
+    attachedPuyoFactory(this), delayBeforeGameOver(60), haveDisplay(true)
 {
     //printf("Constructeur du PuyoView\n");
+    initCommon(attachedPuyoGameFactory);
+    initDisplay(xOffset, yOffset, nXOffset, nYOffset);
+}
+
+void PuyoView::initCommon(PuyoGameFactory *attachedPuyoGameFactory)
+{
 	attachedGame = attachedPuyoGameFactory->createPuyoGame(&attachedPuyoFactory);
     attachedGame->setDelegate(this);
+	gameRunning = true;
+	enemyGame = NULL;
+    skippedCycle = false;
+    cycleAllowance = 0;
+    newMetaCycleStart = false;
+}
+
+void PuyoView::initDisplay(int xOffset, int yOffset, int nXOffset, int nYOffset)
+{
     attachedStatDisplay = new PlayerGameStatDisplay("Player TODO", attachedGame->getGameStat(), xOffset < 320 ? 0 : 1);
 
 	this->xOffset = xOffset;
 	this->yOffset = yOffset - TSIZE;
 	this->nXOffset = nXOffset;
 	this->nYOffset = nYOffset;
-	gameRunning = true;
-	enemyGame = NULL;
-    skippedCycle = false;
-    cycleAllowance = 0;
-    newMetaCycleStart = false;
+}
+
+PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory)
+  : attachedThemeSet(NULL), attachedLevelTheme(NULL),
+    attachedPuyoFactory(this), delayBeforeGameOver(60), haveDisplay(false)
+{
+    initCommon(attachedPuyoGameFactory);
 }
 
 PuyoView::~PuyoView()
@@ -70,6 +87,7 @@ void PuyoView::setEnemyGame(PuyoGame *enemyGame)
 
 int PuyoView::getValenceForPuyo(PuyoPuyo *puyo) const
 {
+    if (!haveDisplay) return 0;
     int i = puyo->getPuyoX();
     int j = puyo->getPuyoY();
     PuyoState currentPuyoState = puyo->getPuyoState();
@@ -96,37 +114,38 @@ bool PuyoView::isGameOver() const
 
 void PuyoView::cycleAnimation(void)
 {
-    // Handle end of game
-    if (!gameRunning) {
-        delayBeforeGameOver--;
-        if (delayBeforeGameOver < 0)
-            attachedStatDisplay->gameIsOver();
-    }
-
-    // Cycling every puyo's animation
-	for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
-		AnimatedPuyo *currentPuyo =
-        (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
-		currentPuyo->cycleAnimation();
-	}
-    // Cycling dead puyo's animations
-    attachedPuyoFactory.cycleWalhalla();
-
-    // Cycling view's animations
-    if (viewAnimations.size() > 0) {
-        Animation *currentAnimation = viewAnimations[0];
-        if (currentAnimation->isFinished()) {
-            viewAnimations.removeKeepOrder(currentAnimation);
-            delete currentAnimation;
+    if (haveDisplay) {
+        // Handle end of game
+        if (!gameRunning) {
+            delayBeforeGameOver--;
+            if (delayBeforeGameOver < 0)
+                attachedStatDisplay->gameIsOver();
         }
-        else {
-            currentAnimation->cycle();
+
+        // Cycling every puyo's animation
+        for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
+            AnimatedPuyo *currentPuyo =
+              (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
+            currentPuyo->cycleAnimation();
+        }
+        // Cycling dead puyo's animations
+        attachedPuyoFactory.cycleWalhalla();
+
+        // Cycling view's animations
+        if (viewAnimations.size() > 0) {
+            Animation *currentAnimation = viewAnimations[0];
+            if (currentAnimation->isFinished()) {
+                viewAnimations.removeKeepOrder(currentAnimation);
+                delete currentAnimation;
+            }
+            else {
+                currentAnimation->cycle();
+            }
         }
     }
 
     // If there is a skipped cycle to do, do it
     if (attachedGame->isEndOfCycle() && attachedGame->isGameRunning() && !newMetaCycleStart) cycleGame();
-
 }
 
 void PuyoView::cycleGame()
@@ -164,6 +183,7 @@ void PuyoView::rotateRight()
 
 void PuyoView::render(DrawTarget *dt)
 {
+    if (!haveDisplay) return;
 	IosRect drect;
     IosRect vrect;
 	vrect.x = xOffset;
@@ -225,11 +245,13 @@ void PuyoView::render(DrawTarget *dt)
 
 void PuyoView::renderOverlay(DrawTarget *dt)
 {
+    if (!haveDisplay) return;
     attachedStatDisplay->draw(dt);
 }
 
 void PuyoView::renderNeutral(DrawTarget *dt)
 {
+    if (!haveDisplay) return;
 	IosRect drect;
     int neutralPuyos = attachedGame->getNeutralPuyos();
     int numGiantNeutral = (neutralPuyos / PUYODIMX) / 4;
@@ -268,6 +290,7 @@ void PuyoView::renderNeutral(DrawTarget *dt)
 }
 
 void PuyoView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex) {
+    if (!haveDisplay) return;
     int x = neutralPuyo->getPuyoX();
     int y = neutralPuyo->getPuyoY();
     AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
@@ -282,6 +305,7 @@ void PuyoView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex) {
 
 void PuyoView::fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
 {
+    if (!haveDisplay) return;
     ((AnimatedPuyo *)fallingPuyo)->flushAnimations(ANIMATION_H);
     ((AnimatedPuyo *)companionPuyo)->flushAnimations(ANIMATION_H);
 	((AnimatedPuyo *)fallingPuyo)->addAnimation(new MovingHAnimation(*(AnimatedPuyo *)fallingPuyo, TSIZE, 4));
@@ -290,6 +314,7 @@ void PuyoView::fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuy
 
 void PuyoView::fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
 {
+    if (!haveDisplay) return;
     ((AnimatedPuyo *)fallingPuyo)->flushAnimations(ANIMATION_H);
     ((AnimatedPuyo *)companionPuyo)->flushAnimations(ANIMATION_H);
 	((AnimatedPuyo *)fallingPuyo)->addAnimation(new MovingHAnimation(*(AnimatedPuyo *)fallingPuyo, -TSIZE, 4));
@@ -298,6 +323,7 @@ void PuyoView::fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPu
 
 void PuyoView::fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
 {
+    if (!haveDisplay) return;
     ((AnimatedPuyo *)fallingPuyo)->flushAnimations(ANIMATION_V);
     ((AnimatedPuyo *)companionPuyo)->flushAnimations(ANIMATION_V);
 	((AnimatedPuyo *)fallingPuyo)->addAnimation(new MovingVAnimation(*(AnimatedPuyo *)fallingPuyo, -TSIZE/2, 4));
@@ -306,6 +332,7 @@ void PuyoView::fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companion
 
 void PuyoView::companionDidTurn(PuyoPuyo *companionPuyo, PuyoPuyo *fallingPuyo, bool counterclockwise)
 {
+    if (!haveDisplay) return;
     if ((companionPuyo != NULL) && (fallingPuyo != NULL)) { // Just to be sure of what we get if data comes from network
         ((AnimatedPuyo *)companionPuyo)->setPartner(((AnimatedPuyo *)fallingPuyo));
         ((AnimatedPuyo *)companionPuyo)->flushAnimations(ANIMATION_ROTATE);
@@ -316,12 +343,14 @@ void PuyoView::companionDidTurn(PuyoPuyo *companionPuyo, PuyoPuyo *fallingPuyo, 
 
 void PuyoView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow)
 {
+    if (!haveDisplay) return;
     ((AnimatedPuyo *)puyo)->flushAnimations();
     ((AnimatedPuyo *)puyo)->addAnimation(new FallingAnimation(*(AnimatedPuyo *)puyo, originY, xOffset, yOffset, nFalledBelow));
 }
 
 void PuyoView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase)
 {
+    if (!haveDisplay) return;
     double groupPadding = 0.;
     AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
     for (int i = 0, j = puyoGroup.size() ; i < j ; i++) {
@@ -395,6 +424,7 @@ void PuyoView::gameLost()
 {
     attachedGame->getGameStat().is_winner = false;
     gameRunning = false;
+    if (!haveDisplay) return;
     for (int i = 0 ; i <= PUYODIMX ; i++) {
         for (int j = 0 ; j <= PUYODIMY ; j++) {
             if (attachedGame->getPuyoAt(i, j) != NULL) {

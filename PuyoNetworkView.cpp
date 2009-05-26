@@ -241,30 +241,30 @@ void PuyoInternetNetworkView::gameLost()
 
 void PuyoInternetNetworkView::sendGameResultToServer(int winner)
 {
-    return; // Buggy for now... disabled TODO
     if (igpbox == NULL) return;
     igpbox->bind(1);
     std::auto_ptr<Message> message (igpbox->createMessage());
     message->addInt   ("CMD",   PUYO_IGP_GAME_OVER);
     message->addInt   ("WINNER", winner);
-    message->addInt   (PuyoMessage::GAMEID, gameId);
-    message->addString(PuyoMessage::NAME1,  p1name);
-    message->addString(PuyoMessage::NAME2,  p2name);
+    message->addInt   ("GAMEID", gameId);
+    message->addString("NAME1",  p1name);
+    message->addString("NAME2",  p2name);
     PlayerGameStat &gameStat = attachedGame->getGameStat();
-    message->addInt(PuyoMessage::SCORE, gameStat.points);
-    message->addInt(PuyoMessage::TOTAL_SCORE, gameStat.total_points);
+    message->addInt("SCORE", gameStat.points);
+    message->addInt("TOTAL_SCORE", gameStat.total_points);
     for (int i = 0 ; i < 24 ; i++) {
-        String messageName = String(PuyoMessage::COMBO_COUNT) + i;
+        String messageName = String("COMBO_COUNT") + i;
         message->addInt(messageName, gameStat.combo_count[i]);
     }
-    message->addInt(PuyoMessage::EXPLODE_COUNT, gameStat.explode_count);
-    message->addInt(PuyoMessage::DROP_COUNT, gameStat.drop_count);
-    message->addInt(PuyoMessage::GHOST_SENT_COUNT, gameStat.ghost_sent_count);
-    message->addFloat(PuyoMessage::TIME_LEFT, gameStat.time_left);
-    message->addBool(PuyoMessage::IS_DEAD, gameStat.is_dead);
-    message->addBool(PuyoMessage::IS_WINNER, gameStat.is_winner);
+    message->addInt("EXPLODE_COUNT", gameStat.explode_count);
+    message->addInt("DROP_COUNT", gameStat.drop_count);
+    message->addInt("GHOST_SENT_COUNT", gameStat.ghost_sent_count);
+    message->addFloat("TIME_LEFT", gameStat.time_left);
+    message->addBool("IS_DEAD", gameStat.is_dead);
+    message->addBool("IS_WINNER", gameStat.is_winner);
 
     message->addBoolProperty("RELIABLE", true);
     message->send();
     // delete message; auto_ptr will delete it! (even if exception is thrown, which is nice of him)
 }
+

@@ -14,7 +14,7 @@
 #include "ios_filepath.h"
 
 #ifndef DATADIR
-char *DATADIR = "data";
+static const char *DATADIR = "data";
 #endif
 
 using namespace ios_fc;
@@ -65,9 +65,10 @@ static void help()
     cout << "usage: ./flobopuyo [options]" << endl;
     cout << endl;
     cout << "options are:" << endl;
-    cout << "  -win           enable windowed mode" << endl;
-    cout << "  -maxpack {n}   use data pack n (0..2)" << endl;
-    cout << "  -gsl {file}    launch a gsl script" << endl;
+    cout << "  -win                          enable windowed mode" << endl;
+    cout << "  -maxpack {n}                  use data pack n (0..2)" << endl;
+    cout << "  -gsl {file}                   launch a gsl script" << endl;
+    cout << "  -ia {name}:{server}:{port}    connect a bot to a server" << endl;
     cout << endl;
     cout << "(c)2007, by iOS-Software (G.Borios, F.Boudet, J.C.Hoelt)." << endl;
     exit(0);
@@ -97,6 +98,7 @@ int main(int argc, char *argv[])
 
     bool fs = true;
     const char *gsl_screen = NULL;
+    const char *connect_ia = NULL;
 
     for (i=1; i<argc; i++)
     {
@@ -114,6 +116,10 @@ int main(int argc, char *argv[])
             if (++i < argc)
                 gsl_screen = argv[i];
         }
+        if (strcmp(argv[i], "-ia") == 0) {
+            if (++i < argc)
+                connect_ia = argv[i];
+        }
     }
 
     if (!FilePath(DATADIR).exists())
@@ -125,6 +131,8 @@ int main(int argc, char *argv[])
     try {
         if (gsl_screen != NULL)
             fp.debug_gsl(gsl_screen);
+        else if (connect_ia != NULL)
+            fp.connect_ia(connect_ia);
         else
             fp.run();
     }

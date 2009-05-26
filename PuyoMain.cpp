@@ -8,6 +8,9 @@
 #ifdef SDL13_GFX
 #include "sdl_drawcontext/sdl13/sdl13_drawcontext.h"
 #endif
+#ifdef ENABLE_NETWORK_INTERNET
+#include "PuyoInternetBot.h"
+#endif
 
 // To be moved elsewhere
 static const char * kFullScreenPref = "Config.FullScreen";
@@ -19,6 +22,10 @@ static const char * kScreenHeightPref = "Config.ScreenHeight";
 
 
 PuyoMain::PuyoMain(String dataDir, bool fullscreen, int maxDataPackNumber)
+: m_dataDir(dataDir), m_fullscreen(fullscreen), m_maxDataPackNumber(maxDataPackNumber)
+{}
+
+void PuyoMain::initWithGUI()
 {
     initSDL();
     loop = GameUIDefaults::GAME_LOOP;
@@ -27,22 +34,30 @@ PuyoMain::PuyoMain(String dataDir, bool fullscreen, int maxDataPackNumber)
     int requestedHeight = GetIntPreference(kScreenHeightPref, 480);
 #ifdef SDL12_GFX
     m_drawContext = new SDL12_DrawContext(640, 480,
-                                          GetIntPreference(kFullScreenPref, fullscreen),
+                                          GetIntPreference(kFullScreenPref, m_fullscreen),
                                           "FloboPuyo by iOS-Software");
 #endif
 #ifdef SDL13_GFX
     m_drawContext = new SDL13_DrawContext(640, 480,
-                                          GetIntPreference(kFullScreenPref, fullscreen),
+                                          GetIntPreference(kFullScreenPref, m_fullscreen),
                                           "FloboPuyo by iOS-Software");
 #endif
     // Give the DrawContext to the GameLoop
     loop->setDrawContext(m_drawContext);
     // Create the PuyoCommander singleton
-    new PuyoCommander(dataDir, fullscreen, maxDataPackNumber);
+    PuyoCommander *pc = new PuyoCommander(m_dataDir, m_maxDataPackNumber);
+    pc->initWithGUI(m_fullscreen);
     initMenus();
     cursor = new GameCursor(theCommander->getDataPathManager().getPath("gfx/cursor.png"));
     loop->addDrawable(cursor);
     loop->addIdle(cursor);
+}
+
+void PuyoMain::initWithoutGUI()
+{
+    loop = GameUIDefaults::GAME_LOOP;
+    PuyoCommander *pc = new PuyoCommander(m_dataDir, m_maxDataPackNumber);
+    pc->initWithoutGUI();
 }
 
 /* Initialize SDL context */
@@ -78,24 +93,60 @@ void PuyoMain::initSDL()
 #endif
 }
 
-/* Init SDL display */
-void PuyoMain::initDisplay(int w, int h, bool fullscreen, bool useGL)
-{
-
-}
-
 void PuyoMain::run()
 {
+  initWithGUI();
   GameUIDefaults::SCREEN_STACK->push(mainScreen);
   GameUIDefaults::GAME_LOOP->run();
 }
 
 void PuyoMain::debug_gsl(String gsl_script)
 {
+  initWithGUI();
   GameUIDefaults::SCREEN_STACK->push(mainScreen);
   StoryScreen story_screen(gsl_script);
   GameUIDefaults::SCREEN_STACK->push(&story_screen);
   GameUIDefaults::GAME_LOOP->run();
+}
+
+void PuyoMain::connect_ia(String param)
+{
+#ifdef ENABLE_NETWORK_INTERNET
+  String name   = "Herbert";
+  String server = "aley.fovea.cc";
+  int port      = 4567;
+  int what = 1;
+  int first = 0;
+  for (int i=0; i<=param.length(); ++i) {
+      if ((param[i] == 0) || (param[i] == ':')) {
+          if (what == 1) {
+              name = param.substring(first, i);
+              first = i+1;
+              what++;
+          } else if (what == 2) {
+              server = param.substring(first, i);
+              first = i+1;
+              what++;
+          } else if (what == 3) {
+              port = atoi(param.substring(first, i).c_str());
+              first = i+1;
+              what++;
+          }
+      }
+  }
+  std::cout << name.c_str() << ":" << server.c_str() << ":" << port << std::endl;
+  int level     = 1;
+  String password = "";
+
+  initWithoutGUI();
+
+  PuyoInternetBot bot(level);
+  bot.connect(server, port, name, password);
+
+  GameUIDefaults::GAME_LOOP->addIdle(&bot);
+  GameUIDefaults::GAME_LOOP->run();
+  GameUIDefaults::GAME_LOOP->removeIdle(&bot);
+#endif
 }
 
 void PuyoMain::initMenus()

@@ -28,7 +28,7 @@
 #include "AnimatedPuyoTheme.h"
 
 AnimatedPuyo::AnimatedPuyo(PuyoState state, AnimatedPuyoSetTheme *themeSet, PuyoView *attachedView)
-    : PuyoPuyo(state), smallTicksCount(0), attachedTheme(themeSet->getAnimatedPuyoTheme(state)),
+    : PuyoPuyo(state), smallTicksCount(0), attachedTheme(themeSet != NULL ? themeSet->getAnimatedPuyoTheme(state) : NULL),
       m_currentCompressedState(0), m_partner(NULL), m_offsetX(0), m_offsetY(0), m_angle(0)
 {
     puyoEyeState = random() % 8192;

@@ -63,10 +63,15 @@ public:
  */
 class PuyoView : public PuyoDelegate {
   public:
+    // Create a PuyoView with graphical feedback
     PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 	     AnimatedPuyoSetTheme *attachedThemeSet,
          PuyoLevelTheme *attachedLevelTheme,
 	     int xOffset, int yOffset, int nXOffset, int nYOffset);
+
+    // Create a PuyoView without graphical feedback
+    PuyoView(PuyoGameFactory *attachedPuyoGameFactory);
+
     virtual ~PuyoView();
     void setEnemyGame(PuyoGame *enemyGame);
     void render(DrawTarget *dt);
@@ -124,6 +129,10 @@ class PuyoView : public PuyoDelegate {
     int delayBeforeGameOver;
     bool newMetaCycleStart;
     PlayerGameStatDisplay *attachedStatDisplay;
+
+    void initCommon(PuyoGameFactory *attachedPuyoGameFactory);
+    void initDisplay(int xOffset, int yOffset, int nXOffset, int nYOffset);
+    bool haveDisplay;
 };
 
 #endif // _PUYOVIEW

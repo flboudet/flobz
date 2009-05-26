@@ -38,7 +38,7 @@ static const char * kInternetMetaServerNumberKey = "Menu.Internet.MetaServer.Num
 
 static const char * kInternetPasswordKey = "Menu.Internet.Password";
 static const char * kInternetCurrentServerKey = "Menu.Internet.CurrentServer";
-static const char * kInternetCurrentServerDefaultValue = "durandal.ios-software.com";
+static const char * kInternetCurrentServerDefaultValue = "aley.fovea.cc";
 static const char * kInternetCurrentServerPortKey = "Menu.Internet.CurrentServer.Port";
 static const char * kInternetCurrentServerPortDefaultValue = "4567";
 
@@ -109,6 +109,9 @@ void HttpMetaServerConnection::idle(double currentTime)
 {
     if (m_nErrors > 5) {
         GameUIDefaults::GAME_LOOP->removeIdle(this);
+        m_servers.push_back(PuyoServer("aley.fovea.cc", 4567, String("")));
+        m_servers.push_back(PuyoServer("localhost", 4567, String("")));
+        onServerListHasChanged();
         return;
     }
     if (m_doc == NULL) return;

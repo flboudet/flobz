@@ -35,6 +35,10 @@ using namespace ios_fc;
 
 class PuyoNetworkView : public PuyoView {
   public:
+    PuyoNetworkView(PuyoGameFactory *attachedPuyoGameFactory, MessageBox *mbox, int gameId)
+        : PuyoView(attachedPuyoGameFactory),
+          mbox(mbox), gameId(gameId), badPuyos(0) {}
+
     PuyoNetworkView(PuyoGameFactory *attachedPuyoGameFactory,
 		    AnimatedPuyoSetTheme *attachedPuyoThemeSet,
             PuyoLevelTheme *attachedLevelTheme,
@@ -83,6 +87,12 @@ protected:
 
 class PuyoInternetNetworkView : public PuyoNetworkView {
     public:
+        PuyoInternetNetworkView(PuyoGameFactory *attachedPuyoGameFactory, MessageBox *mbox, int gameId,
+                                IgpMessageBox *igpbox)
+          : PuyoNetworkView(attachedPuyoGameFactory, mbox, gameId)
+          , igpbox(igpbox)
+        {}
+
         PuyoInternetNetworkView(PuyoGameFactory *attachedPuyoGameFactory,
                                 AnimatedPuyoSetTheme *attachedPuyoThemeSet,
                                 PuyoLevelTheme *attachedLevelTheme,

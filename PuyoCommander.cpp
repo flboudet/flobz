@@ -39,23 +39,28 @@ void SinglePlayerGameAction::action()
 
 /* Build the PuyoCommander */
 
-PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
-  : dataPathManager(dataDir),
-    m_windowFramePicture(25, 28, 25, 19, 26, 23),
-    m_buttonIdleFramePicture(13, 10, 13, 12, 7, 13),
-    m_buttonDownFramePicture(13, 10, 13, 12, 7, 13),
-    m_buttonOverFramePicture(13, 10, 13, 12, 7, 13),
-    m_textFieldIdleFramePicture(5, 23, 4, 6, 10, 3),
-    m_separatorFramePicture(63, 2, 63, 2, 4, 2),
-    m_listFramePicture(5, 23, 4, 6, 10, 3)
+PuyoCommander::PuyoCommander(String dataDir, int maxDataPackNumber)
+  : dataPathManager(dataDir)
 {
-  //SDL_Delay(500);
   loop = GameUIDefaults::GAME_LOOP;
   mbox = NULL;
   theCommander = this;
 
   if (maxDataPackNumber != -1)
-    dataPathManager.setMaxPackNumber(maxDataPackNumber);
+      dataPathManager.setMaxPackNumber(maxDataPackNumber);
+}
+
+void PuyoCommander::initWithGUI(bool fs)
+{
+  m_windowFramePicture = std::auto_ptr<FramePicture>(new FramePicture(25, 28, 25, 19, 26, 23));
+  m_buttonIdleFramePicture = std::auto_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
+  m_buttonDownFramePicture = std::auto_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
+  m_buttonOverFramePicture = std::auto_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
+  m_textFieldIdleFramePicture = std::auto_ptr<FramePicture>(new FramePicture(5, 23, 4, 6, 10, 3));
+  m_separatorFramePicture = std::auto_ptr<FramePicture>(new FramePicture(63, 2, 63, 2, 4, 2));
+  m_listFramePicture = std::auto_ptr<FramePicture>(new FramePicture(5, 23, 4, 6, 10, 3));
+
+  //SDL_Delay(500);
   loadPreferences(fs);
   gameui::GlobalNotificationCenter.addListener(getFullScreenKey(),this);
 
@@ -64,31 +69,36 @@ PuyoCommander::PuyoCommander(String dataDir, bool fs, int maxDataPackNumber)
   initAudio();
   initFonts();
 
-    // Loading the frame images, and setting up the frames
-    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
-    m_switchOnImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/switch-on.png"));
-    m_switchOffImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/switch-off.png"));
-    m_radioOnImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/radio-on.png"));
-    m_radioOffImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/radio-off.png"));
-    m_upArrow = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png"));
-    m_downArrow = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png"));
-    m_leftArrow = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/leftarrow.png"));
-    m_rightArrow = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/rightarrow.png"));
+  // Loading the frame images, and setting up the frames
+  IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
+  m_switchOnImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/switch-on.png"));
+  m_switchOffImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/switch-off.png"));
+  m_radioOnImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/radio-on.png"));
+  m_radioOffImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/radio-off.png"));
+  m_upArrow = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/uparrow.png"));
+  m_downArrow = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/downarrow.png"));
+  m_leftArrow = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/leftarrow.png"));
+  m_rightArrow = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/rightarrow.png"));
 
-    m_frameImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/frame.png"));
-    m_buttonIdleImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/button.png"));
-    m_buttonDownImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/buttondown.png"));
-    m_buttonOverImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/buttonover.png"));
-    m_textFieldIdleImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/editfield.png"));
-    m_separatorImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/separator.png"));
-    m_listIdleImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/listborder.png"));
-    m_windowFramePicture.setFrameSurface(m_frameImage);
-    m_buttonIdleFramePicture.setFrameSurface(m_buttonIdleImage);
-    m_buttonDownFramePicture.setFrameSurface(m_buttonDownImage);
-    m_buttonOverFramePicture.setFrameSurface(m_buttonOverImage);
-    m_textFieldIdleFramePicture.setFrameSurface(m_textFieldIdleImage);
-    m_separatorFramePicture.setFrameSurface(m_separatorImage);
-    m_listFramePicture.setFrameSurface(m_listIdleImage);
+  m_frameImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/frame.png"));
+  m_buttonIdleImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/button.png"));
+  m_buttonDownImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/buttondown.png"));
+  m_buttonOverImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/buttonover.png"));
+  m_textFieldIdleImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/editfield.png"));
+  m_separatorImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/separator.png"));
+  m_listIdleImage = iimLib.load_Absolute_DisplayFormatAlpha(dataPathManager.getPath("gfx/listborder.png"));
+  m_windowFramePicture->setFrameSurface(m_frameImage);
+  m_buttonIdleFramePicture->setFrameSurface(m_buttonIdleImage);
+  m_buttonDownFramePicture->setFrameSurface(m_buttonDownImage);
+  m_buttonOverFramePicture->setFrameSurface(m_buttonOverImage);
+  m_textFieldIdleFramePicture->setFrameSurface(m_textFieldIdleImage);
+  m_separatorFramePicture->setFrameSurface(m_separatorImage);
+  m_listFramePicture->setFrameSurface(m_listIdleImage);
+}
+
+void PuyoCommander::initWithoutGUI()
+{
+  initLocale();
 }
 
 PuyoCommander::~PuyoCommander()
@@ -223,7 +233,7 @@ void PuyoCommander::setFullScreen(bool fullScreen)
     if (fullScreen != this->fullscreen) {
         this->fullscreen = fullScreen;
         SetBoolPreference(kFullScreenPref, fullscreen);
-        if (SDL_WM_ToggleFullScreen(loop->getSurface())==0)
+        if (SDL_WM_ToggleFullScreen(loop->getSurface()) == 0)
         {
           // This should not be necessary (and actually prevents Windows
           // going from fullscreen to windowed mode)

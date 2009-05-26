@@ -9,11 +9,17 @@ class PuyoMain
 public:
     PuyoMain(String dataDir, bool fullscreen, int maxDataPackNumber=-1);
     void run();
+    void connect_ia(String params);
     void debug_gsl(String gsl_script);
 private:
+    void initWithGUI();
+    void initWithoutGUI();
     void initMenus();
     void initSDL();
-    void initDisplay(int w, int h, bool fullscreen, bool useGL);
+
+    String m_dataDir;
+    bool m_fullscreen;
+    int m_maxDataPackNumber;
 
     DrawContext *m_drawContext;
     GameLoop   *loop;
