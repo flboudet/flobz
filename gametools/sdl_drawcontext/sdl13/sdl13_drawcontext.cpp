@@ -165,8 +165,8 @@ IosSurface *SDL13_IosFont::createSurface(SDL_Surface *src)
 
 // IosSurface implementation
 
-SDL13_IosSurface::SDL13_IosSurface(SDL_Surface *surf, SDL13_DrawContext &drawContext)
-    : m_surf(surf), m_tex(0), m_flippedSurf(NULL), m_texFlipped(0), m_drawContext(drawContext)
+SDL13_IosSurface::SDL13_IosSurface(SDL_Surface *surf, SDL13_DrawContext &drawContext, bool alpha)
+    : m_alpha(alpha), m_surf(surf), m_tex(0), m_flippedSurf(NULL), m_texFlipped(0), m_drawContext(drawContext)
 {
     w = m_surf->w;
     h = m_surf->h;
@@ -193,14 +193,11 @@ SDL13_IosSurface::~SDL13_IosSurface()
 SDL_TextureID SDL13_IosSurface::getTexture()
 {
     if (m_tex == 0) {
-        //if (! SDL_ISPIXELFORMAT_ALPHA(m_surf->format)) {
-        //    cout << "No alpha!" << endl;
-        //}
-        //if (SDL_ISPIXELFORMAT_INDEXED(m_surf->format)) {
-        //    cout << "Indexed!" << endl;
-        //}
-        m_tex = SDL_CreateTextureFromSurface(SDL_PIXELFORMAT_ARGB8888, m_surf);
-        SDL_SetTextureBlendMode(m_tex, SDL_BLENDMODE_BLEND);
+        m_tex = SDL_CreateTextureFromSurface(
+            m_alpha ? SDL_PIXELFORMAT_ARGB8888 : SDL_PIXELFORMAT_RGB888,
+            m_surf);
+        SDL_SetTextureBlendMode(
+            m_tex, m_alpha ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
     }
     return m_tex;
 }
@@ -277,7 +274,7 @@ void SDL13_IosSurface::fillRect(const IosRect *rect, const RGBA &color)
 
 IosSurface * SDL13_IIMLibrary::create_DisplayFormat(int w, int h)
 {
-    return new SDL13_IosSurface(iim_sdlsurface_create_rgb(w, h), m_drawContext);
+    return new SDL13_IosSurface(iim_sdlsurface_create_rgb(w, h), m_drawContext, false);
 }
 
 IosSurface * SDL13_IIMLibrary::create_DisplayFormatAlpha(int w, int h)
@@ -308,6 +305,8 @@ IosSurface * SDL13_IIMLibrary::load_Absolute_DisplayFormatAlpha(const char *path
 #else
     retsurf = tmpsurf;
 #endif
+    SDL_SetSurfaceBlendMode(retsurf, SDL_BLENDMODE_BLEND);
+    SDL_SetSurfaceScaleMode(retsurf, SDL_TEXTURESCALEMODE_FAST);
     return new SDL13_IosSurface(retsurf, m_drawContext);
 }
 

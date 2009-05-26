@@ -17,7 +17,7 @@ class SDL13_DrawContext;
 class SDL13_IosSurface : public IosSurface
 {
 public:
-    SDL13_IosSurface(SDL_Surface *surf, SDL13_DrawContext &drawContext);
+    SDL13_IosSurface(SDL_Surface *surf, SDL13_DrawContext &drawContext, bool alpha=true);
     virtual ~SDL13_IosSurface();
     void setAlpha(unsigned char alpha);
 public:
@@ -34,6 +34,7 @@ public:
     virtual void setClipRect(IosRect *rect);
     virtual void fillRect(const IosRect *rect, const RGBA &color);
 public:
+    bool m_alpha;
     SDL_Surface *m_surf;
     SDL_TextureID m_tex;
     SDL_Surface *m_flippedSurf;
