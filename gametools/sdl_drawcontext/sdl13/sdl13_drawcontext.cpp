@@ -382,7 +382,7 @@ SDL13_DrawContext::SDL13_DrawContext(int w, int h, bool fullscreen, const char *
         exit(0);
     }
     SDL_SetFullscreenDisplayMode(&possibleMode);
-    SDL_WindowID wid = SDL_CreateWindow("Test SDL 1.3",
+    wid = SDL_CreateWindow("Test SDL 1.3",
                                         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                         w, h,/*SDL_WINDOW_FULLSCREEN |*/ SDL_WINDOW_OPENGL);
     SDL_CreateRenderer(wid, 1,
@@ -402,6 +402,12 @@ SDL13_DrawContext::SDL13_DrawContext(int w, int h, bool fullscreen, const char *
     SDL_GetDisplayMode(SDL_GetCurrentVideoDisplay(), &m_mode);
 
     TTF_Init();
+}
+
+void SDL13_DrawContext::setFullScreen(bool fullscreen)
+{
+    cout << "SetFullScreen " << fullscreen << endl;
+    SDL_SetWindowFullscreen(wid, fullscreen ? 1 : 0);
 }
 
 void SDL13_DrawContext::flip()
