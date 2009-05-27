@@ -4,13 +4,16 @@
 #include "PuyoCommander.h"
 #include "drawcontext.h"
 
-class PuyoMain
+class PuyoMain : NotificationResponder
 {
 public:
     PuyoMain(String dataDir, bool fullscreen, int maxDataPackNumber=-1);
+    virtual ~PuyoMain();
     void run();
     void connect_ia(String params);
     void debug_gsl(String gsl_script);
+protected:
+    void notificationOccured(String identifier, void * context);
 private:
     void initWithGUI();
     void initWithoutGUI();

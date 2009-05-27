@@ -25,6 +25,11 @@ PuyoMain::PuyoMain(String dataDir, bool fullscreen, int maxDataPackNumber)
 : m_dataDir(dataDir), m_fullscreen(fullscreen), m_maxDataPackNumber(maxDataPackNumber)
 {}
 
+PuyoMain::~PuyoMain()
+{
+    gameui::GlobalNotificationCenter.removeListener(theCommander->getFullScreenKey(), this);
+}
+
 void PuyoMain::initWithGUI()
 {
     initSDL();
@@ -51,6 +56,8 @@ void PuyoMain::initWithGUI()
     cursor = new GameCursor(theCommander->getDataPathManager().getPath("gfx/cursor.png"));
     loop->addDrawable(cursor);
     loop->addIdle(cursor);
+
+    gameui::GlobalNotificationCenter.addListener(theCommander->getFullScreenKey(),this);
 }
 
 void PuyoMain::initWithoutGUI()
@@ -162,4 +169,16 @@ void PuyoMain::initMenus()
   mainScreen->pushMenu(trubudu);
 }
 
+void PuyoMain::notificationOccured(String identifier, void * context)
+{
+    if (identifier == theCommander->getFullScreenKey()) {
+        SetBoolPreference(kFullScreenPref, *(bool *)context);
+#ifdef SDL12_GFX
+        static_cast<SDL12_DrawContext *>(m_drawContext)->setFullScreen(*(bool *)context);
+#endif
+#ifdef SDL13_GFX
+        static_cast<SDL13_DrawContext *>(m_drawContext)->setFullScreen(*(bool *)context);
+#endif
+    }
+}
 

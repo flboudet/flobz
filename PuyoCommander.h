@@ -7,14 +7,13 @@
 #include "PuyoDataPathManager.h"
 #include "PuyoLocalizedDictionary.h"
 #include "GameCursor.h"
-#include "NotifyCenter.h"
 #include "audio.h"
 #include "MainScreen.h"
 #include <memory>
 
 using namespace gameui;
 
-class PuyoCommander : public MessageListener, NotificationResponder
+class PuyoCommander
 {
   public:
     PuyoCommander(String dataDir, int maxDataPackNumber=-1);
@@ -22,15 +21,10 @@ class PuyoCommander : public MessageListener, NotificationResponder
     void initWithoutGUI();
 
     virtual ~PuyoCommander();
-    void onMessage(Message &message);
-
-    void notificationOccured(String identifier, void * context);
 
     bool getMusic();
     bool getSoundFx();
     String getFullScreenKey(void) const;
-    bool getFullScreen() const { return fullscreen; }
-    void setFullScreen(bool fullScreen);
     bool getGlSDL() const { return useGL; }
     void setGlSDL(bool useGL);
     void setCursorVisible(bool visible) {} // TODO: Find a solution cursor->setVisible(visible); }
@@ -74,7 +68,6 @@ class PuyoCommander : public MessageListener, NotificationResponder
 
     AudioManager globalAudioManager;
 
-    bool fullscreen;
     bool useGL;
     IosSurface   *m_frameImage, *m_buttonIdleImage, *m_buttonDownImage, *m_buttonOverImage;
     IosSurface   *m_textFieldIdleImage;

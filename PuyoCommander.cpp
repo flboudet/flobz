@@ -5,9 +5,8 @@
 #include "preferences.h"
 #include "audio.h"
 #include "MainMenu.h"
-#include "PuyoSinglePlayerStarter.h"
-
-#include "PuyoNetworkStarter.h"
+//#include "PuyoSinglePlayerStarter.h"
+//#include "PuyoNetworkStarter.h"
 
 using namespace gameui;
 
@@ -62,7 +61,6 @@ void PuyoCommander::initWithGUI(bool fs)
 
   //SDL_Delay(500);
   loadPreferences(fs);
-  gameui::GlobalNotificationCenter.addListener(getFullScreenKey(),this);
 
   initLocale();
   initGameControls();
@@ -109,7 +107,6 @@ PuyoCommander::~PuyoCommander()
   delete m_buttonOverImage;
   delete m_textFieldIdleImage;
   delete m_separatorImage;
-  gameui::GlobalNotificationCenter.removeListener(getFullScreenKey(),this);
 }
 
 extern char *dataFolder;
@@ -195,12 +192,6 @@ void PuyoCommander::initFonts()
 }
 
 
-void PuyoCommander::notificationOccured(String identifier, void * context)
-{
-    if (identifier == kFullScreenPref) {
-        setFullScreen(*(bool *)context);
-    }
-}
 /*
 void PuyoCommander::setMusic(bool music)
 {
@@ -227,29 +218,6 @@ String PuyoCommander::getFullScreenKey(void) const
     return String(kFullScreenPref);
 }
 
-void PuyoCommander::setFullScreen(bool fullScreen)
-{
-#ifdef DISABLED
-    if (fullScreen != this->fullscreen) {
-        this->fullscreen = fullScreen;
-        SetBoolPreference(kFullScreenPref, fullscreen);
-        if (SDL_WM_ToggleFullScreen(loop->getSurface()) == 0)
-        {
-          // This should not be necessary (and actually prevents Windows
-          // going from fullscreen to windowed mode)
-          //SDL_QuitSubSystem(SDL_INIT_VIDEO);
-          //SDL_InitSubSystem(SDL_INIT_VIDEO);
-
-            //initDisplay(GetIntPreference(kScreenWidthPref, 640),
-            //        GetIntPreference(kScreenHeightPref, 480), fullscreen, useGL);
-        }
-        /* Workaround for cursor showing in MacOS X fullscreen mode */
-        SDL_ShowCursor(SDL_ENABLE);
-        SDL_ShowCursor(SDL_DISABLE);
-    }
-#endif
-}
-
 void PuyoCommander::setGlSDL(bool useGL)
 {
 }
@@ -259,7 +227,7 @@ void PuyoCommander::loadPreferences(bool fs)
 {
   DBG_PRINT("loadPreferences()\n");
   /* Load Preferences */
-  fullscreen = fs ? GetBoolPreference(kFullScreenPref, true) : false;
+  //fullscreen = fs ? GetBoolPreference(kFullScreenPref, true) : false;
 #ifdef HAVE_OPENGL
   useGL = GetBoolPreference(kOpenGLPref, false);
 #else
@@ -267,5 +235,4 @@ void PuyoCommander::loadPreferences(bool fs)
 #endif
 }
 
-void PuyoCommander::onMessage(Message &msb) {}
 

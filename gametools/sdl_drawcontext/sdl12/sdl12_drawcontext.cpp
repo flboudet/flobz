@@ -314,6 +314,14 @@ SDL12_DrawContext::SDL12_DrawContext(int w, int h, bool fullscreen, const char *
     TTF_Init();
 }
 
+void SDL12_DrawContext::setFullScreen(bool fullscreen)
+{
+    SDL_WM_ToggleFullScreen(display);
+    /* Workaround for cursor showing in MacOS X fullscreen mode */
+    SDL_ShowCursor(SDL_ENABLE);
+    SDL_ShowCursor(SDL_DISABLE);
+}
+
 void SDL12_DrawContext::flip()
 {
 #define BENCHMARKS

@@ -62,6 +62,8 @@ public:
     virtual void setClipRect(IosRect *rect);
     virtual void fillRect(const IosRect *rect, const RGBA &color);
     virtual void putString(IosFont *font, int x, int y, const char *text);
+    // Specific methods
+    void setFullScreen(bool fullscreen);
 private:
     SDL_Surface *display;
     SDL12_IIMLibrary m_iimLib;
