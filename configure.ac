@@ -87,6 +87,7 @@ if test "x$SDL_CONFIG" = "xnone"; then
     case $host_os in
         darwin*)
 	    SDL_LIBS="-framework SDL -framework SDL_image -framework SDL_mixer -framework SDL_ttf -framework Cocoa"
+            ENABLE_SDL12_GFX="true"
     esac
 else
     if test -n "$LDPREFIX" -a -r `$SDL_CONFIG --prefix`/lib/libSDL.la
