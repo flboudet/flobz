@@ -1,7 +1,6 @@
 #ifndef _GAME_CONT_H
 #define _GAME_CONT_H
 
-#include "glSDL.h"
 #include "InputManager.h"
 
 /**

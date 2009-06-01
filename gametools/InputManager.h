@@ -1,8 +1,12 @@
 #ifndef _INPUT_SW_MAN_H
 #define _INPUT_SW_MAN_H
 
-#include "glSDL.h"
 #include <string.h>
+#ifdef MACOSX
+#include <SDL/SDL.h>
+#else
+#include <SDL.h>
+#endif
 
 const int JOYSTICK_THRESHOLD = 28000;
 

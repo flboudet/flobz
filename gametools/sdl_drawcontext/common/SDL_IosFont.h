@@ -8,6 +8,7 @@
 #include "drawcontext.h"
 #ifdef MACOSX
 #include <SDL/SDL.h>
+#include <SDL_ttf/SDL_ttf.h>
 #else
 #include <SDL.h>
 #include <SDL_ttf.h>
