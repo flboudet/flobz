@@ -146,7 +146,6 @@ void PuyoCommander::initFonts()
   IosFont * textFont;
   IosFont * funnyFont;
 
-#ifdef ENABLE_TTF
   Locales_Init(); // Make sure locales are detected.
   String font, funny_path;
   try {
@@ -167,22 +166,7 @@ void PuyoCommander::initFonts()
   textFont = iimLib.createFont(font, 17, Font_GREY);
   funnyFont = iimLib.createFont(funny_path, 24, Font_STD);
   storyFont = iimLib.createFont(font, 17, Font_STORY);
-#else
-  smallFontInfo = SoFont_new();
-  IIM_Surface *font3b = IIM_Load_Absolute_DisplayFormatAlpha (dataPathManager.getPath("gfx/font3b.png"));
-  IIM_Surface *font4b = IIM_Load_Absolute_DisplayFormatAlpha (dataPathManager.getPath("gfx/font4b.png"));
-  IIM_Surface *font6b = iim_surface_shift_hsv(font4b, 170, -.5, -.2);
-  IIM_Surface *font5b = iim_surface_shift_hsv(font3b, 170, -.5, -.2);
 
-  SoFont_load(darkFont, IIM_Load_Absolute_DisplayFormatAlpha (dataPathManager.getPath("gfx/fontdark.png")));
-  SoFont_load(menuFont, font3b);
-  SoFont_load(smallFont, font4b);
-  SoFont_load(smallFontInfo, font6b);
-  SoFont_load(textFont, font5b);
-  funnyFont = menuFont;
-
-  storyFont = darkFont;
-#endif
   GameUIDefaults::FONT              = menuFont;
   GameUIDefaults::FONT_TEXT         = textFont;
   GameUIDefaults::FONT_INACTIVE     = darkFont;
