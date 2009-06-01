@@ -4,13 +4,9 @@
 #include "gameloop.h"
 #include "IosImgProcess.h"
 
-class GameCursor : public DrawableComponent, public CycledComponent
+namespace Cursor
 {
-public:
-    GameCursor(const char *cursorImage);
-    virtual ~GameCursor();
-    virtual void onEvent(GameControlEvent *event);
-    virtual void cycle();
+
     // SDL events
     enum {
         MOVE = 0,
@@ -21,6 +17,24 @@ public:
         CursorEventArg(int x, int y) : x(x), y(y) {}
         int x, y;
     };
+}
+
+class AbstractCursor
+{
+public:
+    virtual void setVisible(bool visible) {}
+    virtual void setObscured(bool obscured) {}
+};
+
+class GameCursor : public AbstractCursor,
+                   public DrawableComponent,
+                   public CycledComponent
+{
+public:
+    GameCursor(const char *cursorImage);
+    virtual ~GameCursor();
+    virtual void onEvent(GameControlEvent *event);
+    virtual void cycle();
     void setVisible(bool visible) { this->visible = visible; }
     void setObscured(bool obscured) { this->obscured = obscured; }
 protected:

@@ -39,7 +39,7 @@ void SinglePlayerGameAction::action()
 /* Build the PuyoCommander */
 
 PuyoCommander::PuyoCommander(String dataDir, int maxDataPackNumber)
-  : dataPathManager(dataDir)
+  : dataPathManager(dataDir), m_cursor(NULL)
 {
   loop = GameUIDefaults::GAME_LOOP;
   mbox = NULL;
@@ -235,4 +235,13 @@ void PuyoCommander::loadPreferences(bool fs)
 #endif
 }
 
+void PuyoCommander::registerCursor(AbstractCursor *cursor)
+{
+    m_cursor = cursor;
+}
 
+void PuyoCommander::setCursorVisible(bool visible)
+{
+    if (m_cursor != NULL)
+        m_cursor->setVisible(visible);
+}

@@ -27,7 +27,10 @@ class PuyoCommander
     String getFullScreenKey(void) const;
     bool getGlSDL() const { return useGL; }
     void setGlSDL(bool useGL);
-    void setCursorVisible(bool visible) {} // TODO: Find a solution cursor->setVisible(visible); }
+
+    // Cursor management
+    void registerCursor(AbstractCursor *cursor);
+    void setCursorVisible(bool visible);
 
     const PuyoDataPathManager &getDataPathManager() { return dataPathManager; }
     const char * getLocalizedString(const char * originalString) const;
@@ -83,6 +86,8 @@ class PuyoCommander
     std::auto_ptr<FramePicture> m_textFieldIdleFramePicture;
     std::auto_ptr<FramePicture> m_separatorFramePicture;
     std::auto_ptr<FramePicture> m_listFramePicture;
+
+    AbstractCursor *m_cursor;
 };
 
 extern class PuyoCommander *theCommander;

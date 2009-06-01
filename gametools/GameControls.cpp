@@ -51,32 +51,32 @@ void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
   result->cursorEvent = GameControlEvent::kCursorNone;
   result->isUp = true;
   result->caught = false;
-    
+
   if (e.type == SDL_QUIT)
     result->cursorEvent = GameControlEvent::kQuit;
-  
+
   if (e.type == SDL_USEREVENT) {
     switch (e.user.code) {
-    case GameCursor::MOVE: {
+    case Cursor::MOVE: {
         result->isUp = false;
         result->cursorEvent = GameControlEvent::kGameMouseMoved;
-        GameCursor::CursorEventArg *arg = (GameCursor::CursorEventArg *)e.user.data1;
+        Cursor::CursorEventArg *arg = (Cursor::CursorEventArg *)e.user.data1;
         result->x = arg->x;
         result->y = arg->y;
         delete arg;
         } break;
-    case GameCursor::MOUSE_DOWN: {
+    case Cursor::MOUSE_DOWN: {
         result->isUp = false;
         result->cursorEvent = GameControlEvent::kGameMouseClicked;
-        GameCursor::CursorEventArg *arg = (GameCursor::CursorEventArg *)e.user.data1;
+        Cursor::CursorEventArg *arg = (Cursor::CursorEventArg *)e.user.data1;
         result->x = arg->x;
         result->y = arg->y;
         delete arg;
         } break;
-    case GameCursor::MOUSE_UP: {
+    case Cursor::MOUSE_UP: {
         result->isUp = true;
         result->cursorEvent = GameControlEvent::kGameMouseClicked;
-        GameCursor::CursorEventArg *arg = (GameCursor::CursorEventArg *)e.user.data1;
+        Cursor::CursorEventArg *arg = (Cursor::CursorEventArg *)e.user.data1;
         result->x = arg->x;
         result->y = arg->y;
         delete arg;
@@ -90,7 +90,7 @@ void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
 
   if (input->isQuit())
     result->cursorEvent = GameControlEvent::kQuit;
-  
+
   if (input->isValidate())
     result->cursorEvent = GameControlEvent::kStart;
 
@@ -190,25 +190,25 @@ void saveControls()
     SetIntPreference("v50_P1Down",             keyControls[kPlayer1DownControl]->id());
     SetIntPreference("v50_P1Clockwise",        keyControls[kPlayer1ClockwiseControl]->id());
     SetIntPreference("v50_P1Counterclockwise", keyControls[kPlayer1CounterclockwiseControl]->id());
-    
+
     SetStrPreference("v50_P1LeftS",             keyControls[kPlayer1LeftControl]->name());
     SetStrPreference("v50_P1RightS",            keyControls[kPlayer1RightControl]->name());
     SetStrPreference("v50_P1DownS",             keyControls[kPlayer1DownControl]->name());
     SetStrPreference("v50_P1ClockwiseS",        keyControls[kPlayer1ClockwiseControl]->name());
     SetStrPreference("v50_P1CounterclockwiseS", keyControls[kPlayer1CounterclockwiseControl]->name());
-    
+
     SetIntPreference("v50_AltP1Left",             keyAlternateControls[kPlayer1LeftControl]->id());
     SetIntPreference("v50_AltP1Right",            keyAlternateControls[kPlayer1RightControl]->id());
     SetIntPreference("v50_AltP1Down",             keyAlternateControls[kPlayer1DownControl]->id());
     SetIntPreference("v50_AltP1Clockwise",        keyAlternateControls[kPlayer1ClockwiseControl]->id());
     SetIntPreference("v50_AltP1Counterclockwise", keyAlternateControls[kPlayer1CounterclockwiseControl]->id());
-    
+
     SetStrPreference("v50_AltP1LeftS",             keyAlternateControls[kPlayer1LeftControl]->name());
     SetStrPreference("v50_AltP1RightS",            keyAlternateControls[kPlayer1RightControl]->name());
     SetStrPreference("v50_AltP1DownS",             keyAlternateControls[kPlayer1DownControl]->name());
     SetStrPreference("v50_AltP1ClockwiseS",        keyAlternateControls[kPlayer1ClockwiseControl]->name());
     SetStrPreference("v50_AltP1CounterclockwiseS", keyAlternateControls[kPlayer1CounterclockwiseControl]->name());
-    
+
     SetIntPreference("v50_P2Left",             keyControls[kPlayer2LeftControl]->id());
     SetIntPreference("v50_P2Right",            keyControls[kPlayer2RightControl]->id());
     SetIntPreference("v50_P2Down",             keyControls[kPlayer2DownControl]->id());
@@ -220,7 +220,7 @@ void saveControls()
     SetStrPreference("v50_P2DownS",             keyControls[kPlayer2DownControl]->name());
     SetStrPreference("v50_P2ClockwiseS",        keyControls[kPlayer2ClockwiseControl]->name());
     SetStrPreference("v50_P2CounterclockwiseS", keyControls[kPlayer2CounterclockwiseControl]->name());
-    
+
     SetIntPreference("v50_AltP2Left",             keyAlternateControls[kPlayer2LeftControl]->id());
     SetIntPreference("v50_AltP2Right",            keyAlternateControls[kPlayer2RightControl]->id());
     SetIntPreference("v50_AltP2Down",             keyAlternateControls[kPlayer2DownControl]->id());
@@ -254,7 +254,7 @@ void loadControls()
    GetStrPreference("v50_P1CounterclockwiseS", name, keyControls[kPlayer1CounterclockwiseControl]->name());
    id = GetIntPreference("v50_P1Counterclockwise",  keyControls[kPlayer1CounterclockwiseControl]->id());
    keyControls[kPlayer1CounterclockwiseControl] = new InputFromIDAndName(id, name);
-   
+
    GetStrPreference("v50_AltP1LeftS", name, keyAlternateControls[kPlayer1LeftControl]->name());
    id = GetIntPreference("v50_AltP1Left",  keyAlternateControls[kPlayer1LeftControl]->id());
    keyAlternateControls[kPlayer1LeftControl]  = new InputFromIDAndName(id, name);
@@ -270,7 +270,7 @@ void loadControls()
    GetStrPreference("v50_AltP1CounterclockwiseS", name, keyAlternateControls[kPlayer1CounterclockwiseControl]->name());
    id = GetIntPreference("v50_AltP1Counterclockwise",  keyAlternateControls[kPlayer1CounterclockwiseControl]->id());
    keyAlternateControls[kPlayer1CounterclockwiseControl] = new InputFromIDAndName(id, name);
-   
+
    GetStrPreference("v50_P2LeftS", name, keyControls[kPlayer2LeftControl]->name());
    id = GetIntPreference("v50_P2Left",  keyControls[kPlayer2LeftControl]->id());
    keyControls[kPlayer2LeftControl]  = new InputFromIDAndName(id, name);
@@ -286,7 +286,7 @@ void loadControls()
    GetStrPreference("v50_P2CounterclockwiseS", name, keyControls[kPlayer2CounterclockwiseControl]->name());
    id = GetIntPreference("v50_P2Counterclockwise",  keyControls[kPlayer2CounterclockwiseControl]->id());
    keyControls[kPlayer2CounterclockwiseControl] = new InputFromIDAndName(id, name);
-   
+
    GetStrPreference("v50_AltP2LeftS", name, keyAlternateControls[kPlayer2LeftControl]->name());
    id = GetIntPreference("v50_AltP2Left",  keyAlternateControls[kPlayer2LeftControl]->id());
    keyAlternateControls[kPlayer2LeftControl]  = new InputFromIDAndName(id, name);

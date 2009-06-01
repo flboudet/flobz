@@ -56,7 +56,7 @@ void PuyoMain::initWithGUI()
     cursor = new GameCursor(theCommander->getDataPathManager().getPath("gfx/cursor.png"));
     loop->addDrawable(cursor);
     loop->addIdle(cursor);
-
+    theCommander->registerCursor(cursor);
     gameui::GlobalNotificationCenter.addListener(theCommander->getFullScreenKey(),this);
 }
 

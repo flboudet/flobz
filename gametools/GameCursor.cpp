@@ -2,6 +2,7 @@
 #include "GameCursor.h"
 #include "gameui.h"
 using namespace gameui;
+using namespace Cursor;
 
 GameCursor::GameCursor(const char *cursorImage) : CycledComponent(0.01), idleDx(0), idleDy(0), visible(true), obscured(true)
 {
@@ -48,12 +49,12 @@ void GameCursor::onEvent(GameControlEvent *event)
         break;
     case SDL_MOUSEBUTTONDOWN:
         if (event->sdl_event.button.button == SDL_BUTTON_LEFT) {
-            pushMouseEvent(event->sdl_event.button.x, event->sdl_event.button.y, GameCursor::MOUSE_DOWN);
+            pushMouseEvent(event->sdl_event.button.x, event->sdl_event.button.y, MOUSE_DOWN);
         }
         break;
     case SDL_MOUSEBUTTONUP:
         if (event->sdl_event.button.button == SDL_BUTTON_LEFT) {
-            pushMouseEvent(event->sdl_event.button.x, event->sdl_event.button.y, GameCursor::MOUSE_UP);
+            pushMouseEvent(event->sdl_event.button.x, event->sdl_event.button.y, MOUSE_UP);
         }
         break;
     default:
@@ -81,7 +82,7 @@ void GameCursor::setCursorPosition(int x, int y)
     // Push an SDL user event corresponding to the moving of our game cursor
     SDL_Event moveEvent;
     moveEvent.type = SDL_USEREVENT;
-    moveEvent.user.code = GameCursor::MOVE;
+    moveEvent.user.code = MOVE;
     moveEvent.user.data1 = new CursorEventArg(x, y);
     SDL_PushEvent(&moveEvent);
 
