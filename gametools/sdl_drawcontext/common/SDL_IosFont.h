@@ -3,7 +3,7 @@
 
 #include <string>
 #include <map>
-#include <queue>
+#include <list>
 
 #include "drawcontext.h"
 #ifdef MACOSX
@@ -31,11 +31,21 @@ private:
 protected:
     virtual IosSurface *createSurface(SDL_Surface *src) = 0;
 private:
+    struct CachedSurface;
+    typedef std::map<std::string, CachedSurface> CachedSurfacesMap;
+    typedef std::list<CachedSurface *> CachedSurfacesList;
+    struct CachedSurface {
+        CachedSurface(IosSurface *surf) : surf(surf) {}
+        IosSurface *surf;
+        CachedSurfacesMap::iterator  mapIter;
+        CachedSurfacesList::iterator listIter;
+    };
+private:
     IosFontFx m_fx;
     int m_height;
     TTF_Font *m_font;
-    typedef std::map<std::string, IosSurface *> CachedSurfacesMap;
     CachedSurfacesMap m_cacheMap;
+    CachedSurfacesList m_cacheList;
     RGBA m_precomputed[8][8][64][16];
 };
 

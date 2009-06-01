@@ -1,8 +1,11 @@
+#include <iostream>
 #include <math.h>
 #include "IosImgProcess.h"
 #include "SDL_IosFont.h"
 
 using namespace std;
+
+#define MAX_CACHED_SURFACES 40
 
 // IosFont implementation
 SDL_IosFont::SDL_IosFont(const char *path, int size, IosFontFx fx)
@@ -18,7 +21,7 @@ SDL_IosFont::~SDL_IosFont()
     TTF_CloseFont(m_font);
     for (CachedSurfacesMap::iterator iter = m_cacheMap.begin() ;
          iter != m_cacheMap.end() ; iter++) {
-        delete (iter->second);
+        delete (iter->second.surf);
     }
 }
 
@@ -57,12 +60,27 @@ IosSurface * SDL_IosFont::getFromCache(const char *text)
     CachedSurfacesMap::iterator iter = m_cacheMap.find(text);
     if (iter == m_cacheMap.end())
         return NULL;
-    return iter->second;
+    // Put the found cached surface in front of the cache list
+    m_cacheList.splice(m_cacheList.begin(), m_cacheList, iter->second.listIter);
+    return iter->second.surf;
 }
 
 void SDL_IosFont::storeInCache(const char *text, IosSurface *surf)
 {
-    m_cacheMap[text] = surf;
+    CachedSurfacesMap::iterator storedIter =
+        (m_cacheMap.insert(
+            pair<std::string, CachedSurface>
+            (text, CachedSurface(surf)))).first;
+    storedIter->second.mapIter = storedIter;
+    storedIter->second.listIter =
+        m_cacheList.insert(m_cacheList.begin(), &(storedIter->second));
+    // Remove oldest surfaces from the cache
+    while (m_cacheList.size() > MAX_CACHED_SURFACES) {
+        CachedSurface *cache = m_cacheList.back();
+        delete cache->surf;
+        m_cacheMap.erase(cache->mapIter);
+        m_cacheList.pop_back();
+    }
 }
 
 // Precompute the font effect function values from discretized alpha and positions.
