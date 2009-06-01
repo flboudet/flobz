@@ -447,7 +447,8 @@ void SinglePlayerStarterAction::performBackToMenu()
 {
   // Rewind screen stack
   Screen *screenToTrans = GameUIDefaults::SCREEN_STACK->top();
-  m_mainScreen->transitionFromScreen(*screenToTrans);
+  if (m_mainScreen != NULL)
+    m_mainScreen->transitionFromScreen(*screenToTrans);
   GameUIDefaults::SCREEN_STACK->pop();
   delete m_hiScoreScreen;
   // Restore initial values to the reused action
