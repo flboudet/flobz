@@ -76,6 +76,7 @@ void PuyoGameScreen::onEvent(GameControlEvent *cevent)
     if (!cevent->isUp) {
         switch (cevent->cursorEvent) {
         case GameControlEvent::kStart:
+        case GameControlEvent::kGameMouseClicked:
             pressedFromGameWidget = startPressed();
             break;
         case GameControlEvent::kBack:
