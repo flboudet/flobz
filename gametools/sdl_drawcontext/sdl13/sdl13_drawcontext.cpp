@@ -412,7 +412,6 @@ void SDL13_DrawContext::setFullScreen(bool fullscreen)
 
 void SDL13_DrawContext::flip()
 {
-#define BENCHMARKS
 #ifdef BENCHMARKS
   static double nFrames = 0.0;
   static double t0 = 0.0;

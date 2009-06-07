@@ -29,7 +29,7 @@
 
 AnimatedPuyo::AnimatedPuyo(PuyoState state, AnimatedPuyoSetTheme *themeSet, PuyoView *attachedView)
     : PuyoPuyo(state), smallTicksCount(0), attachedTheme(themeSet != NULL ? themeSet->getAnimatedPuyoTheme(state) : NULL),
-      m_currentCompressedState(0), m_partner(NULL), m_offsetX(0), m_offsetY(0), m_angle(0)
+      m_currentCompressedState(0), m_partner(NULL), m_offsetX(0), m_offsetY(0), m_angle(0), m_displayEyes(true)
 {
     puyoEyeState = random() % 8192;
     visibilityFlag = true;
@@ -148,7 +148,7 @@ void AnimatedPuyo::renderAt(int X, int Y, DrawTarget *dt)
             dt->renderCopy(attachedTheme->getCircleSurfaceForIndex((smallTicksCount >> 2) & 0x1F, m_currentCompressedState), NULL, &drect);
 
         /* Eye management */
-        if (getPuyoState() != PUYO_NEUTRAL) {
+        if ((getPuyoState() != PUYO_NEUTRAL) && (m_displayEyes)) {
             int eyePhase = (puyoEyeState + SDL_GetTicks()) % 8192;
             if (eyePhase < 100)
                 dt->renderCopy(attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState), NULL, &drect);
@@ -225,7 +225,7 @@ int AnimatedPuyo::getScreenCoordinateY() const
 }
 
 AnimatedPuyoFactory::AnimatedPuyoFactory(PuyoView *attachedView)
-  : attachedView(attachedView)
+  : attachedView(attachedView), m_showEyes(true)
 {
     this->attachedThemeSet = attachedView->getPuyoThemeSet();
 }
@@ -241,7 +241,9 @@ AnimatedPuyoFactory::~AnimatedPuyoFactory()
 
 PuyoPuyo *AnimatedPuyoFactory::createPuyo(PuyoState state)
 {
-    return new AnimatedPuyo(state, attachedThemeSet, attachedView);
+    AnimatedPuyo *result = new AnimatedPuyo(state, attachedThemeSet, attachedView);
+    result->setShowEyes(m_showEyes);
+    return result;
 }
 
 void AnimatedPuyoFactory::deletePuyo(PuyoPuyo *target)

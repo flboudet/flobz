@@ -64,6 +64,7 @@ public:
     void setOffsetX(int offsetX) { m_offsetX = offsetX; }
     void setOffsetY(int offsetY) { m_offsetY = offsetY; }
     void setRotation(float angle) { m_angle = angle; }
+    void setShowEyes(bool show) { m_displayEyes = show; }
 private:
     AdvancedBuffer<PuyoAnimation *> animationQueue;
     int puyoEyeState;
@@ -75,6 +76,7 @@ private:
     AnimatedPuyo *m_partner;
     int m_offsetX, m_offsetY;
     float m_angle;
+    bool m_displayEyes;
 };
 
 class AnimatedPuyoFactory : public PuyoFactory {
@@ -85,10 +87,12 @@ public:
     virtual void deletePuyo(PuyoPuyo *target);
     void renderWalhalla(DrawTarget *dt);
     void cycleWalhalla();
+    void setShowEyes(bool show) { m_showEyes = show; }
 private:
     AdvancedBuffer<PuyoPuyo *> puyoWalhalla;
     PuyoView *attachedView;
     AnimatedPuyoSetTheme *attachedThemeSet;
+    bool m_showEyes;
 };
 
 

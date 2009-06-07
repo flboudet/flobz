@@ -113,9 +113,11 @@ class PuyoView : public PuyoDelegate {
     int getPlayerId() const { return (xOffset < 320) ? 1 : 2; }
     virtual void gameWin();
     void setShowNextPuyos(bool show) { m_showNextPuyos = show; }
+    void setShowShadows(bool show) { m_showShadows = show; }
+    void setShowEyes(bool show) { attachedPuyoFactory.setShowEyes(show); }
   protected:
     bool cycleAllowed();
-    bool m_showNextPuyos;
+    bool m_showNextPuyos, m_showShadows, m_showEyes;
     bool skippedCycle;
     bool gameRunning;
     int xOffset, yOffset;

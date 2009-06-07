@@ -39,7 +39,8 @@ PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 		   AnimatedPuyoSetTheme *attachedThemeSet,
            PuyoLevelTheme *attachedLevelTheme,
 		   int xOffset, int yOffset, int nXOffset, int nYOffset)
-  : m_showNextPuyos(true), attachedThemeSet(attachedThemeSet), attachedLevelTheme(attachedLevelTheme),
+  : m_showNextPuyos(true), m_showShadows(true),
+    attachedThemeSet(attachedThemeSet), attachedLevelTheme(attachedLevelTheme),
     attachedPuyoFactory(this), delayBeforeGameOver(60), haveDisplay(true)
 {
     //printf("Constructeur du PuyoView\n");
@@ -192,11 +193,14 @@ void PuyoView::render(DrawTarget *dt)
 	vrect.h = TSIZE * PUYODIMY;
 
     bool displayFallings = this->cycleAllowed();
-
-    for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
-        AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
-        if (displayFallings || !currentPuyo->isFalling()) currentPuyo->renderShadow(dt);
+    // Render shadows
+    if (m_showShadows) {
+        for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
+            AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
+            if (displayFallings || !currentPuyo->isFalling()) currentPuyo->renderShadow(dt);
+        }
     }
+    // Render puyos
  	for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
         AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
         if (displayFallings || !currentPuyo->isFalling()) currentPuyo->render(dt);
