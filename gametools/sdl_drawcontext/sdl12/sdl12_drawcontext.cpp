@@ -1,3 +1,4 @@
+#include <vector>
 #include "drawcontext.h"
 #include "sdl12_drawcontext.h"
 #include "IosImgProcess.h"
