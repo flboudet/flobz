@@ -223,6 +223,7 @@ void AudioManager::clearMusicCache()
 #endif
 }
 
+#ifdef USE_AUDIO
 static Mix_Chunk *CustomMix_LoadWAV(const char *fileName, int volume)
 {
     if (!audio_supported) return NULL;
@@ -235,7 +236,8 @@ static Mix_Chunk *CustomMix_LoadWAV(const char *fileName, int volume)
       Mix_VolumeChunk (result, volume);
     return result;
 }
-
+#endif
+#ifdef USE_AUDIO
 static Mix_Music *CustomMix_LoadMUS(const char *fileName)
 {
     if (!audio_supported) return NULL;
@@ -248,7 +250,7 @@ static Mix_Music *CustomMix_LoadMUS(const char *fileName)
         printf("Mix_LoadMUS(\"%s\"): %s\n", (const char *)filePath, Mix_GetError());
     return result;
 }
-
+#endif
 void AudioManager::preloadMusic(const char *fileName)
 {
 #ifdef USE_AUDIO
@@ -451,10 +453,18 @@ void AudioManager::soundOnOff(bool state)
 
 bool AudioManager::isMusicOn()
 {
+#ifdef USE_AUDIO
   return music_on;
+#else
+    return false;
+#endif
 }
 
 bool AudioManager::isSoundOn()
 {
+#ifdef USE_AUDIO
   return sound_on;
+#else
+    return false;
+#endif
 }

@@ -194,7 +194,7 @@ SDL_TextureID SDL13_IosSurface::getTexture()
 {
     if (m_tex == 0) {
         m_tex = SDL_CreateTextureFromSurface(
-            m_alpha ? SDL_PIXELFORMAT_ARGB8888 : SDL_PIXELFORMAT_RGB888,
+            m_alpha ? SDL_PIXELFORMAT_ABGR8888/*SDL_PIXELFORMAT_ARGB8888*/ : /*SDL_PIXELFORMAT_RGB888*/SDL_PIXELFORMAT_BGR24,
             m_surf);
         SDL_SetTextureBlendMode(
             m_tex, m_alpha ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
@@ -208,7 +208,7 @@ SDL_TextureID SDL13_IosSurface::getFlippedTexture()
         if (m_flippedSurf == NULL) {
             m_flippedSurf = iim_sdlsurface_mirror_h(m_surf);
         }
-        m_texFlipped = SDL_CreateTextureFromSurface(SDL_PIXELFORMAT_ARGB8888, m_flippedSurf);
+        m_texFlipped = SDL_CreateTextureFromSurface(SDL_PIXELFORMAT_ABGR8888/*SDL_PIXELFORMAT_ARGB8888*/, m_flippedSurf);
         SDL_SetTextureBlendMode(m_texFlipped, SDL_BLENDMODE_BLEND);
     }
     return m_texFlipped;
@@ -221,7 +221,7 @@ SDL_TextureID SDL13_IosSurface::getTexture(int angle)
             // Generated rotated image.
             m_rotated[angle] = iim_sdlsurface_rotate(m_surf, angle * 10);
         }
-        m_texRotated[angle] = SDL_CreateTextureFromSurface(SDL_PIXELFORMAT_ARGB8888, m_rotated[angle]);
+        m_texRotated[angle] = SDL_CreateTextureFromSurface(SDL_PIXELFORMAT_ABGR8888/*SDL_PIXELFORMAT_ARGB8888*/, m_rotated[angle]);
         SDL_SetTextureBlendMode(m_texRotated[angle], SDL_BLENDMODE_BLEND);
     }
     return m_texRotated[angle];
@@ -371,36 +371,42 @@ IosFont *SDL13_IIMLibrary::createFont(const char *path, int size, IosFontFx fx)
 SDL13_DrawContext::SDL13_DrawContext(int w, int h, bool fullscreen, const char *caption)
     : m_iimLib(*this), m_clipRectPtr(NULL)
 {
+    cerr << "Building DrawContext..." << endl;
     SDL_DisplayMode wishedMode, possibleMode;
     wishedMode.format = SDL_PIXELFORMAT_ARGB8888;
-    wishedMode.w = 640;
-    wishedMode.h = 480;
+    wishedMode.w = w;
+    wishedMode.h = h;
     wishedMode.refresh_rate = 0;
     wishedMode.driverdata = NULL;
     if (SDL_GetClosestDisplayMode(&wishedMode, &possibleMode) == NULL) {
         cout << "Impossible display mode" << endl;
         exit(0);
     }
+    cerr << "Building DrawContext 2..." << endl;
     SDL_SetFullscreenDisplayMode(&possibleMode);
+    cerr << "Building DrawContext 3..." << endl;
     wid = SDL_CreateWindow("Test SDL 1.3",
                                         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                        w, h,/*SDL_WINDOW_FULLSCREEN |*/ SDL_WINDOW_OPENGL);
-    SDL_CreateRenderer(wid, 1,
+                                        w, h, SDL_WINDOW_BORDERLESS | SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL);
+    cerr << "Building DrawContext 3,5..." << endl;
+    SDL_CreateRenderer(wid, 0,
                        SDL_RENDERER_PRESENTVSYNC |
                        SDL_RENDERER_PRESENTFLIP3 |
                        SDL_RENDERER_ACCELERATED);
+    cerr << "Building DrawContext 3,7..." << endl;
     SDL_ShowWindow(wid);
     if (SDL_SelectRenderer(wid) != 0) {
         cout << "Window doesn't have a renderer" << endl;
         exit(0);
     }
+    cerr << "Building DrawContext 4..." << endl;
     SDL_GetWindowSize(wid, &(this->w), &(this->h));
     atexit(SDL_Quit);
     SDL_ShowCursor(SDL_DISABLE);
     SDL_SetWindowTitle(wid, caption);
     SDL_SetRenderDrawBlendMode(SDL_BLENDMODE_BLEND);
     SDL_GetDisplayMode(SDL_GetCurrentVideoDisplay(), &m_mode);
-
+    cerr << "Building DrawContext 5..." << endl;
     TTF_Init();
 }
 
@@ -412,6 +418,7 @@ void SDL13_DrawContext::setFullScreen(bool fullscreen)
 
 void SDL13_DrawContext::flip()
 {
+//#define BENCHMARKS
 #ifdef BENCHMARKS
   static double nFrames = 0.0;
   static double t0 = 0.0;

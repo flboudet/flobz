@@ -104,6 +104,9 @@ public:
     virtual void setScreenToPaused(bool fromControls);
     virtual void setScreenToResumed(bool fromControls);
     virtual void actionAfterGameOver(bool fromControls);
+    // Display player names properties
+    void setDisplayPlayerOneName(bool display) { m_displayPlayerOneName = display; }
+    void setDisplayPlayerTwoName(bool display) { m_displayPlayerTwoName = display; }
 protected:
     virtual void associatedScreenHasBeenSet(PuyoGameScreen *associatedScreen) {}
 
@@ -149,7 +152,7 @@ protected:
     };
     Styrolyse *m_foregroundAnimation;
     StyrolysePainterClient m_styroPainter;
-
+    bool m_displayPlayerOneName, m_displayPlayerTwoName;
     void priv_initialize();
 };
 

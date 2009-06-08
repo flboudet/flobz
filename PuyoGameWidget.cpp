@@ -57,7 +57,7 @@ PuyoGameWidget::PuyoGameWidget(GameOptions game_options, bool withGUI)
       MinSpeed(game_options.MIN_SPEED), MaxSpeed(game_options.MAX_SPEED),
       blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
       playerOneName(p1name), playerTwoName(p2name),
-      m_foregroundAnimation(NULL)
+      m_foregroundAnimation(NULL), m_displayPlayerOneName(true), m_displayPlayerTwoName(true)
 {
     if (withGUI) {
         IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
@@ -368,8 +368,10 @@ void PuyoGameWidget::draw(DrawTarget *dt)
     */
     // Rendering the player names
     IosFont *font = GameUIDefaults::FONT_TEXT;
-    dt->putStringCenteredXY(font, 130, 460, playerOneName);
-    dt->putStringCenteredXY(font, 510, 460, playerTwoName);
+    if (m_displayPlayerOneName)
+        dt->putStringCenteredXY(font, 130, 460, playerOneName);
+    if (m_displayPlayerTwoName)
+        dt->putStringCenteredXY(font, 510, 460, playerTwoName);
 }
 
 void PuyoGameWidget::addSubWidget(Widget *subWidget)

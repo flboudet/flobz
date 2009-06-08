@@ -6,6 +6,7 @@
 #include "goomsl.h"
 #include "goomsl_private.h"
 #include "goomsl_yacc.h"
+
 void yyerror(char *);
 void yyparse(void);
 
@@ -72,7 +73,7 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
            // META_QueueError("Imported File Not Found", yytext+1);
            goto endImport;
         }
-        
+
         /* open the imported file */
         tmp_yyin = fopen( fullName, "r" );
         if ( ! tmp_yyin )
@@ -131,7 +132,7 @@ printf("taille pile:%d\n", includeStackPtr);
 <INITIAL>"external"              { return EXTERNAL; }
 <INITIAL>"struct"                { return STRUCT;   }
 <INITIAL>"not"                   { return NOT;      }
-<INITIAL>"while"                 { return WHILE;    } 
+<INITIAL>"while"                 { return WHILE;    }
 <INITIAL>"do"                    { return DO;       }
 <INITIAL>"for"                   { return FOR;      }
 <INITIAL>"in"                    { return IN;       }
