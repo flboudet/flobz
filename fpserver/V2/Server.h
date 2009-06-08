@@ -7,8 +7,8 @@ namespace v2 {
 
 struct GameResultInPool {
     int gameid;
-    String name1;
-    String name2;
+    ios_fc::String name1;
+    ios_fc::String name2;
     int winner;
     int explode_count;
     int drop_count;
@@ -23,7 +23,7 @@ public:
         SIMILAR_BUT_SUSPECT,
         NO_SIMILAR
     };
-    Similarity contains(const GameResultInPool &result) const;
+    SimilarResult contains(const GameResultInPool &result) const;
 };
 
 class Server {

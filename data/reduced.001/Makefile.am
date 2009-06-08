@@ -2,5 +2,5 @@
 fpdata = $(datadir)/flobopuyo
 fpdatadir = $(fpdata)/reduced.001
 dist_fpdata_DATA = 
-SUBDIRS =  gfx story theme
+SUBDIRS =  gfx story theme music
 

@@ -8,3 +8,6 @@
     mypos.y=100.0
     //[put_text: text="toto" pos=mypos text_index=4.0]
     sprite::@face_sprite display=@face_display
+
+<face_update>
+    music: command="game"

@@ -39,33 +39,60 @@ PuyoGame *PuyoNetworkGameFactory::createPuyoGame(PuyoFactory *attachedPuyoFactor
     return new PuyoNetworkGame(attachedPuyoFactory, msgBox, gameId);
 }
 
-PuyoNetworkGameWidget::PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, ios_fc::IgpMessageBox *igpbox)
-    : attachedPuyoThemeSet(puyoThemeSet), attachedRandom(randomSeed, 5), mbox(mbox), attachedLocalGameFactory(&attachedRandom),
-      attachedNetworkGameFactory(&attachedRandom, mbox, gameId),
-      localArea((igpbox!=NULL) ?
-                new PuyoInternetNetworkView(&attachedLocalGameFactory, &attachedPuyoThemeSet, &levelTheme,
-                                            1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, gameId, igpbox) :
-                new PuyoNetworkView(&attachedLocalGameFactory, &attachedPuyoThemeSet, &levelTheme,
-                                            1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, gameId)),
-      networkArea(&attachedNetworkGameFactory, &attachedPuyoThemeSet, &levelTheme,
-            1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE),
-      playercontroller(*localArea), dummyPlayerController(networkArea), syncMsgReceived(false), syncMsgSent(false), chatBox(*this),
-      brokenNetworkWidget("etherdown.gsl"), networkIsBroken(false)
+PuyoNetworkGameWidget::PuyoNetworkGameWidget()
+    : syncMsgReceived(false), syncMsgSent(false), chatBox(NULL),
+      brokenNetworkWidget(NULL), networkIsBroken(false)
 {
-    mbox.addListener(this);
-    initialize(*localArea, networkArea, playercontroller, dummyPlayerController, levelTheme, gameOverAction);
+}
+
+void PuyoNetworkGameWidget::initWithGUI(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, ios_fc::IgpMessageBox *igpbox)
+{
+    attachedPuyoThemeSet = &puyoThemeSet;
+    attachedRandom = std::auto_ptr<PuyoRandomSystem>(new PuyoRandomSystem(randomSeed, 5));
+    this->mbox = &mbox;
+    attachedLocalGameFactory   = std::auto_ptr<PuyoLocalGameFactory>(new PuyoLocalGameFactory(attachedRandom.get()));
+    attachedNetworkGameFactory = std::auto_ptr<PuyoNetworkGameFactory>(new PuyoNetworkGameFactory(attachedRandom.get(), mbox, gameId));
+    if (igpbox != NULL) {
+        localArea = std::auto_ptr<PuyoNetworkView>(new PuyoInternetNetworkView(attachedLocalGameFactory.get(), attachedPuyoThemeSet, &levelTheme,
+                                            1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, gameId, igpbox));
+    }
+    else {
+        localArea = std::auto_ptr<PuyoNetworkView>(new PuyoNetworkView(attachedLocalGameFactory.get(), attachedPuyoThemeSet, &levelTheme,
+                                    1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, gameId));
+    }
+    networkArea = std::auto_ptr<PuyoView>(new PuyoView(attachedNetworkGameFactory.get(), attachedPuyoThemeSet, &levelTheme,
+                                                       1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE,
+                                                       CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE));
+    playercontroller = std::auto_ptr<PuyoCombinedEventPlayer>(new PuyoCombinedEventPlayer(*localArea));
+    dummyPlayerController = std::auto_ptr<PuyoNullPlayer>(new PuyoNullPlayer(*networkArea));
+    this->mbox->addListener(this);
+    chatBox = std::auto_ptr<ChatBox>(new ChatBox(*this));
+    brokenNetworkWidget = std::auto_ptr<StoryWidget>(new StoryWidget("etherdown.gsl"));
+    networkIsBroken = false;
+    PuyoGameWidget::initWithGUI(*localArea, *networkArea, *playercontroller, *dummyPlayerController, levelTheme, gameOverAction);
     setLives(-1);
+}
+
+void PuyoNetworkGameWidget::initWithoutGUI(ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, ios_fc::IgpMessageBox *igpbox)
+{
+    this->mbox->addListener(this);
+    //PuyoGameWidget::initWithoutGUI(*localArea, networkArea, playercontroller, dummyPlayerController, levelTheme, gameOverAction);
+    setLives(-1);
+}
+
+void PuyoNetworkGameWidget::connectIA(int level)
+{
 }
 
 PuyoNetworkGameWidget::~PuyoNetworkGameWidget()
 {
-    mbox.removeListener(this);
-    delete(localArea);
+    mbox->removeListener(this);
+    // delete(localArea);
 }
 
 void PuyoNetworkGameWidget::cycle()
 {
-    mbox.idle();
+    mbox->idle();
     if (!syncMsgSent) {
         sendSyncMsg();
         syncMsgSent = true;
@@ -80,13 +107,15 @@ void PuyoNetworkGameWidget::cycle()
         }
         if (curDate - lastMessageDate > 5000.) {
             if (!networkIsBroken) {
-                associatedScreen->add(&brokenNetworkWidget);
+                if (withGUI)
+                    associatedScreen->add(brokenNetworkWidget.get());
                 networkIsBroken = true;
             }
             //printf("Network problem!\n");
         }
         else if (networkIsBroken == true) {
-            associatedScreen->remove(&brokenNetworkWidget);
+            if (withGUI)
+                associatedScreen->remove(brokenNetworkWidget.get());
             networkIsBroken = false;
         }
         PuyoGameWidget::cycle();
@@ -119,7 +148,7 @@ void PuyoNetworkGameWidget::onMessage(Message &message)
             PuyoGameWidget::abort();
             break;
         case PuyoMessage::kGameChat:
-            chatBox.addChat(message.getString("NAME"), message.getString("TEXT"));
+            chatBox->addChat(message.getString("NAME"), message.getString("TEXT"));
             printf("%s: %s\n", (const char *)message.getString("NAME"), (const char *)message.getString("TEXT"));
             break;
         default:
@@ -131,7 +160,7 @@ void PuyoNetworkGameWidget::setScreenToPaused(bool fromControls)
 {
     // If the pause is from a controller, we have to send the pause information to the other peer
     if (fromControls) {
-        ios_fc::Message *message = mbox.createMessage();
+        ios_fc::Message *message = mbox->createMessage();
         message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGamePause);
         message->addBoolProperty("RELIABLE", true);
         message->send();
@@ -145,7 +174,7 @@ void PuyoNetworkGameWidget::setScreenToResumed(bool fromControls)
 {
     // If the resume is from a controller, we have to send the resume information to the other peer
     if (fromControls) {
-        ios_fc::Message *message = mbox.createMessage();
+        ios_fc::Message *message = mbox->createMessage();
         message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameResume);
         message->addBoolProperty("RELIABLE", true);
         message->send();
@@ -156,7 +185,7 @@ void PuyoNetworkGameWidget::setScreenToResumed(bool fromControls)
 
 void PuyoNetworkGameWidget::abort()
 {
-    ios_fc::Message *message = mbox.createMessage();
+    ios_fc::Message *message = mbox->createMessage();
     message->addInt(PuyoMessage::TYPE,   PuyoMessage::kGameAbort);
     message->addBoolProperty("RELIABLE", true);
     message->send();
@@ -169,7 +198,7 @@ void PuyoNetworkGameWidget::actionAfterGameOver(bool fromControls)
     fprintf(stderr, "ACTIONAFTERGAMEOVER\n");
     // If the resume is from a controller, we have to send the resume information to the other peer
     if (fromControls) {
-        ios_fc::Message *message = mbox.createMessage();
+        ios_fc::Message *message = mbox->createMessage();
         message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameNext);
         message->addBoolProperty("RELIABLE", true);
         message->send();
@@ -180,25 +209,25 @@ void PuyoNetworkGameWidget::actionAfterGameOver(bool fromControls)
 
 void PuyoNetworkGameWidget::sendChat(String chatText)
 {
-    ios_fc::Message *message = mbox.createMessage();
+    ios_fc::Message *message = mbox->createMessage();
     message->addInt(PuyoMessage::TYPE,   PuyoMessage::kGameChat);
     message->addString("NAME",   getPlayerOneName());
     message->addString("TEXT",   chatText);
     message->addBoolProperty("RELIABLE", true);
     message->send();
-    chatBox.addChat(getPlayerOneName(), chatText);
+    chatBox->addChat(getPlayerOneName(), chatText);
     delete message;
 }
 
 void PuyoNetworkGameWidget::associatedScreenHasBeenSet(PuyoGameScreen *associatedScreen)
 {
-    associatedScreen->getPauseMenu().add(&chatBox);
+    associatedScreen->getPauseMenu().add(chatBox.get());
     associatedScreen->getPauseMenu().pauseMenuTop = 5;
 }
 
 void PuyoNetworkGameWidget::sendSyncMsg()
 {
-    ios_fc::Message *message = mbox.createMessage();
+    ios_fc::Message *message = mbox->createMessage();
     message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameStart);
     message->addString  (PuyoMessage::NAME,   p1name);
     message->addBoolProperty("RELIABLE", true);
@@ -208,7 +237,7 @@ void PuyoNetworkGameWidget::sendSyncMsg()
 
 void PuyoNetworkGameWidget::sendAliveMsg()
 {
-    ios_fc::Message *message = mbox.createMessage();
+    ios_fc::Message *message = mbox->createMessage();
     message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameAlive);
     message->send();
     delete message;

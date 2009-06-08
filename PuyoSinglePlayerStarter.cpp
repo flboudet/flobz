@@ -35,14 +35,14 @@ PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(int lifes, String aiFace)
     setLives(lifes);
 }
 
-void PuyoSinglePlayerGameWidget::initialize(PuyoView &areaA, PuyoView &areaB,
+void PuyoSinglePlayerGameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB,
                                             PuyoPlayer &playercontroller,
                                             PuyoLevelTheme &levelTheme,
                                             int level,
                                             Action *gameOverAction)
 {
     opponentcontroller = new PuyoIA(level, areaB);
-    PuyoGameWidget::initialize(areaA, areaB, playercontroller, *opponentcontroller,
+    PuyoGameWidget::initWithGUI(areaA, areaB, playercontroller, *opponentcontroller,
                                levelTheme, gameOverAction);
     addSubWidget(&killLeftCheat);
     addSubWidget(&killRightCheat);
@@ -60,7 +60,7 @@ SinglePlayerStandardLayoutGameWidget::SinglePlayerStandardLayoutGameWidget(Anima
       playercontroller(areaA)
 
 {
-    initialize(areaA, areaB, playercontroller, levelTheme, level, gameOverAction);
+    initWithGUI(areaA, areaB, playercontroller, levelTheme, level, gameOverAction);
 }
 
 PuyoSinglePlayerGameWidget::~PuyoSinglePlayerGameWidget()

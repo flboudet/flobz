@@ -56,7 +56,7 @@
 [end_level]
 
 [start_level]
-    level.levelName           = "Unnamed level"
+    level.levelName           = "Aliens tavern"
     level.opponentStory       = "story6.gsl"
     level.opponentName        = "Zklogh"
     level.opponentAI          = "zklogh.gsl"

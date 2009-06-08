@@ -8,3 +8,4 @@ import <interlevel.gsl>
   
 <update>
   update_lib
+  music: command="level3"

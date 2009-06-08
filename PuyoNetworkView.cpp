@@ -27,9 +27,6 @@
 #include "PuyoIgpDefs.h"
 #include <memory>
 
-extern char *p1name;
-extern char *p2name;
-
 Message *PuyoNetworkView::createStateMessage(bool paused)
 {
     // preparation des infos */

@@ -197,7 +197,7 @@ PuyoTwoPlayerGameWidget::PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoTheme
             GameControlEvent::kPlayer2Right,
             GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight)
 {
-    initialize(areaA, areaB, controllerA, controllerB, levelTheme, gameOverAction);
+    initWithGUI(areaA, areaB, controllerA, controllerB, levelTheme, gameOverAction);
 }
 
 GameOptions GameOptions::FromLevel(int level) {

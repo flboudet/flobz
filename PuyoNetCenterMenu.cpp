@@ -35,7 +35,9 @@ public:
       : mbox(mbox), randomSeed(randomSeed), igpbox(igpbox), gameId(0) {}
     PuyoGameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
-        return new PuyoNetworkGameWidget(puyoThemeSet, levelTheme, mbox, gameId++, randomSeed++, gameOverAction, igpbox);
+        PuyoNetworkGameWidget *negawi = new PuyoNetworkGameWidget();
+        negawi->initWithGUI(puyoThemeSet, levelTheme, mbox, gameId++, randomSeed++, gameOverAction, igpbox);
+        return negawi;
     }
 private:
     ios_fc::MessageBox &mbox;

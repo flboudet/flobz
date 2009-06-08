@@ -19,7 +19,7 @@ struct _StyrolyseClient {
   void  (*freeImage) (StyrolyseClient *_this, void *image);
   void  (*putText)   (StyrolyseClient *_this, int x, int y, const char *text);
   const char *(*getText)   (StyrolyseClient *_this, const char *text);
-  void (*playMusic) (StyrolyseClient *_this, const char *fileName);
+  void (*music) (StyrolyseClient *_this, const char *command);
   void (*playSound) (StyrolyseClient *_this, const char *fileName, int volume);
   char *(*resolveFilePath)(StyrolyseClient *_this, const char *file_name);
 };

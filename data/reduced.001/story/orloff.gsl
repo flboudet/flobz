@@ -26,6 +26,7 @@ import <libface.gsl>
 
 # Update function: called every animation cycle
 <update>
+  [face_update]
 
   # orloff plays in a straight forward manner and doesn't look at the incoming puyos
   @AI_ThinkDepth = 1

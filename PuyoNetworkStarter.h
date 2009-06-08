@@ -45,7 +45,10 @@ private:
 
 class PuyoNetworkGameWidget : public PuyoGameWidget, MessageListener, ChatBoxDelegate {
 public:
-    PuyoNetworkGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, ios_fc::IgpMessageBox *igpbox = NULL);
+    PuyoNetworkGameWidget();
+    void initWithGUI(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, ios_fc::IgpMessageBox *igpbox = NULL);
+    void initWithoutGUI(ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, ios_fc::IgpMessageBox *igpbox = NULL);
+    void connectIA(int level);
     ~PuyoNetworkGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
@@ -60,21 +63,21 @@ protected:
 private:
     void sendSyncMsg();
     void sendAliveMsg();
-    AnimatedPuyoSetTheme &attachedPuyoThemeSet;
-    PuyoRandomSystem attachedRandom;
-    ios_fc::MessageBox &mbox;
-    PuyoLocalGameFactory attachedLocalGameFactory;
-    PuyoNetworkGameFactory attachedNetworkGameFactory;
-    PuyoNetworkView *localArea;
-    PuyoView networkArea;
-    PuyoCombinedEventPlayer playercontroller;
-    PuyoNullPlayer dummyPlayerController;
+    AnimatedPuyoSetTheme *attachedPuyoThemeSet; // optional
+    std::auto_ptr<PuyoRandomSystem> attachedRandom;
+    ios_fc::MessageBox *mbox;
+    std::auto_ptr<PuyoLocalGameFactory> attachedLocalGameFactory;
+    std::auto_ptr<PuyoNetworkGameFactory> attachedNetworkGameFactory;
+    std::auto_ptr<PuyoNetworkView> localArea;
+    std::auto_ptr<PuyoView> networkArea;
+    std::auto_ptr<PuyoCombinedEventPlayer> playercontroller;
+    std::auto_ptr<PuyoNullPlayer> dummyPlayerController;
     bool syncMsgReceived, syncMsgSent;
     double lastMessageDate, lastAliveMessageSentDate;
     // Chat zone
-    ChatBox chatBox;
+    std::auto_ptr<ChatBox> chatBox; // optional
     // Network broken animation
-    StoryWidget brokenNetworkWidget;
+    std::auto_ptr<StoryWidget> brokenNetworkWidget; // optional
     bool networkIsBroken;
 };
 

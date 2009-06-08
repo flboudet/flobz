@@ -35,7 +35,7 @@
 class PuyoSinglePlayerGameWidget : public PuyoGameWidget, public Action {
 public:
     PuyoSinglePlayerGameWidget(int lifes, String aiFace);
-    void initialize(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &playercontroller, PuyoLevelTheme &levelTheme, int level, Action *gameOverAction);
+    void initWithGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &playercontroller, PuyoLevelTheme &levelTheme, int level, Action *gameOverAction);
     virtual ~PuyoSinglePlayerGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();

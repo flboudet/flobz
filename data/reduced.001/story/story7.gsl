@@ -7,4 +7,5 @@ import <interlevel.gsl>
   sprite_list_lib
   
 <update>
+  music: command="level7"
   update_lib

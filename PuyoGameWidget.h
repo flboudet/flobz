@@ -58,14 +58,16 @@ struct GameOptions
 class PuyoGameWidget : public GarbageCollectableItem,
                        public gameui::Widget, CycledComponent {
 public:
-    PuyoGameWidget(GameOptions options = GameOptions());
+    PuyoGameWidget(GameOptions options = GameOptions(), bool withGUI = true);
     void setGameOptions(GameOptions options);
     virtual ~PuyoGameWidget();
-    void initialize(PuyoView &areaA, PuyoView &areaB,
-                    PuyoPlayer &controllerA, PuyoPlayer &controllerB,
-                    PuyoLevelTheme &levelTheme,
-                    gameui::Action *gameOverAction = NULL);
-    void initialize();
+    void initWithGUI(PuyoView &areaA, PuyoView &areaB,
+                     PuyoPlayer &controllerA, PuyoPlayer &controllerB,
+                     PuyoLevelTheme &levelTheme,
+                     gameui::Action *gameOverAction = NULL);
+    void initWithoutGUI(PuyoView &areaA, PuyoView &areaB,
+                     PuyoPlayer &controllerA, PuyoPlayer &controllerB,
+                     gameui::Action *gameOverAction = NULL);
     void cycle();
     void draw(DrawTarget *dt);
     // Draw subsets
@@ -85,8 +87,8 @@ public:
     void setLives(int l) { lives = l; }
     bool isGameARunning() const { return attachedGameA->isGameRunning(); }
     bool isGameBRunning() const { return attachedGameB->isGameRunning(); }
-    void setPlayerOneName(String newName) { playerOneName = newName; }
-    void setPlayerTwoName(String newName) { playerTwoName = newName; }
+    void setPlayerOneName(String newName);
+    void setPlayerTwoName(String newName);
     String getPlayerOneName() const { return playerOneName; }
     PlayerGameStat &getStatPlayerOne() { return attachedGameA->getGameStat(); }
     PlayerGameStat &getStatPlayerTwo() { return attachedGameB->getGameStat(); }
@@ -112,6 +114,7 @@ protected:
 				int clipx, int clipy, int clipw, int cliph, int flipped);
     static void styro_freeImage(StyrolyseClient *_this, void *image);
 
+    bool withGUI;
     PuyoGameScreen *associatedScreen;
     DrawTarget &painter;
     IosSurface *painterGameScreen;
@@ -146,6 +149,8 @@ protected:
     };
     Styrolyse *m_foregroundAnimation;
     StyrolysePainterClient m_styroPainter;
+
+    void priv_initialize();
 };
 
 // Should be moved elsewhere

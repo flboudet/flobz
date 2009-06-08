@@ -16,7 +16,7 @@ import <libface.gsl>
     @AI_RotationMethod = 0
     
     # Init the sprite for the face lib with zklogh
-    [face_init: name="introlevel/unmapped-mini.png"]
+    [face_init: name="introlevel/alien.png"]
 
 
 # This allows you to specify which sprite to draw and the drawing order
@@ -27,4 +27,5 @@ import <libface.gsl>
 
 # Update function: called every animation cycle
 <update>
+    [face_update]
 

@@ -34,7 +34,7 @@ import <libface.gsl>
 
 # Update function: called every animation cycle
 <update>
-
+  [face_update]
   # mechapuyo becomes more straightforward when the game goes high
   # to avoid being trapped with too much construction
   @AI_ThinkDepth = 2

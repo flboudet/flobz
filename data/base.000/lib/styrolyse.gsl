@@ -110,7 +110,7 @@ struct <Display:
 external <draw: Sprite &this, Display display>
 external <gettext: string text> : string
 external <mod: int numerator, int denominator> : int
-external <music: string file>
+external <music: string command>
 external <put_text: string text, Vec2 pos, float text_index>
 external <random> : float
 external <sin: float value> : float

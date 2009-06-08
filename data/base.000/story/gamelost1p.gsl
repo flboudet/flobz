@@ -16,7 +16,7 @@
   @blueStar.parent="@puyo"
   @greenStar.parent="@puyo"
 
-  music: file="flobopuyo_gameover.xm"
+  music: command="game over"
 
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw

@@ -11,5 +11,5 @@
 <update>
   # Update function: called every animation cycle
 
-  music: file="flobopuyo_menu.xm"
+  music: command="menu"
 

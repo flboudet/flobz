@@ -2,6 +2,7 @@
 #include "PuyoStrings.h"
 #include "preferences.h"
 #include "PuyoNetworkView.h"
+#include "PuyoNetworkStarter.h"
 
 class PIBNGCListener : public PuyoNetGameCenterListener {
 private:
@@ -38,26 +39,42 @@ public:
         std::cout << "onGameInvitationCanceledReceived" << std::endl;
     }
 
-    std::auto_ptr<PuyoRandomSystem> m_myAttachedRandom;
-    std::auto_ptr<PuyoLocalGameFactory> m_myAttachedPuyoGameFactory;
+    /*
+    std::auto_ptr<PuyoRandomSystem> m_myRandom;
+    std::auto_ptr<PuyoLocalGameFactory> m_myGameFactory;
     std::auto_ptr<PuyoInternetNetworkView> m_myView;
     std::auto_ptr<PuyoIA> m_myAI;
 
+    std::auto_ptr<PuyoRandomSystem> m_opRandom;
+    std::auto_ptr<PuyoNetworkGameFactory> m_opGameFactory;
+    std::auto_ptr<PuyoView> m_opView;
+    */
+    std::auto_ptr<PuyoNetworkGameWidget> m_Negawi; // the NEtwork GAme WIdget
+
     virtual void onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation) {
         std::cout << "onGameGrantedWithMessagebox" << std::endl;
-        // My view
-        m_opponent = mbox;
-        m_myAttachedRandom = std::auto_ptr<PuyoRandomSystem>(new PuyoRandomSystem(5, invitation.gameRandomSeed));
-        m_myAttachedPuyoGameFactory = std::auto_ptr<PuyoLocalGameFactory>(new PuyoLocalGameFactory(m_myAttachedRandom.get()));
         int gameId = 0;
         IgpMessageBox *igpbox = m_gc.getIgpBox();
-        m_myView = std::auto_ptr<PuyoInternetNetworkView>(new PuyoInternetNetworkView(m_myAttachedPuyoGameFactory.get(), mbox, gameId, igpbox));
+        /*
+        // My view
+        m_opponent = mbox;
+        m_myRandom = std::auto_ptr<PuyoRandomSystem>(new PuyoRandomSystem(5, invitation.gameRandomSeed));
+        m_myGameFactory = std::auto_ptr<PuyoLocalGameFactory>(new PuyoLocalGameFactory(m_myRandom.get()));
+        m_myView = std::auto_ptr<PuyoInternetNetworkView>(new PuyoInternetNetworkView(m_myGameFactory.get(), mbox, gameId, igpbox));
         m_myAI = std::auto_ptr<PuyoIA>(new PuyoIA(m_level, *m_myView));
         // Remote view
         // TODO
+        m_opRandom = std::auto_ptr<PuyoRandomSystem>(new PuyoRandomSystem(5, invitation.gameRandomSeed));
+        m_opGameFactory = std::auto_ptr<PuyoNetworkGameFactory>(new PuyoNetworkGameFactory(m_opRandom.get(), *mbox, gameId));
+        m_opView = std::auto_ptr<PuyoView>(new PuyoView(m_opGameFactory.get()));
+        */
+        m_Negawi = std::auto_ptr<PuyoNetworkGameWidget>(new PuyoNetworkGameWidget());
+        m_Negawi->initWithoutGUI(*mbox, gameId, invitation.gameRandomSeed, NULL, igpbox);
+        m_Negawi->connectIA(m_level);
     }
 
     virtual void idle(double currentTime) {
+        // Nothing happens...
     }
     
     virtual ~PIBNGCListener() {

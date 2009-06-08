@@ -72,6 +72,8 @@ class PuyoView : public PuyoDelegate {
     // Create a PuyoView without graphical feedback
     PuyoView(PuyoGameFactory *attachedPuyoGameFactory);
 
+    void setPlayerNames(const char *p1, const char *p2) { p1name = p1; p2name = p2; }
+
     virtual ~PuyoView();
     void setEnemyGame(PuyoGame *enemyGame);
     void render(DrawTarget *dt);
@@ -116,6 +118,7 @@ class PuyoView : public PuyoDelegate {
     void setShowShadows(bool show) { m_showShadows = show; }
     void setShowEyes(bool show) { attachedPuyoFactory.setShowEyes(show); }
   protected:
+    String p1name, p2name;
     bool cycleAllowed();
     bool m_showNextPuyos, m_showShadows, m_showEyes;
     bool skippedCycle;

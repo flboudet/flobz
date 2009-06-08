@@ -120,10 +120,10 @@ static const char *getText(StyrolyseClient *_this, const char *text)
     return ((StoryWidget::PuyoStoryStyrolyseClient *)_this)->widget->getText(text);
 }
 
-static void playMusic(StyrolyseClient *_this, const char *fileName)
+static void music(StyrolyseClient *_this, const char *command)
 {
     //AudioManager::playMusic(theCommander->getDataPathManager().getPath(String("/music/") + fileName));
-    AudioManager::playMusic(fileName);
+    AudioManager::music(command);
 }
 
 static void playSound(StyrolyseClient *_this, const char *fileName, int volume)
@@ -169,7 +169,7 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
     client.styroClient.freeImage = freeImage;
     client.styroClient.putText   = putText;
     client.styroClient.getText   = ::getText;
-    client.styroClient.playMusic = ::playMusic;
+    client.styroClient.music     = ::music;
     client.styroClient.playSound = ::playSound;
     client.styroClient.resolveFilePath = ::pathResolverFunction;
     client.widget = this;

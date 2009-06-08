@@ -35,8 +35,6 @@ float @kaoriDestX
 <update>
   # Update function: called every animation cycle
 
-  music: file="flobopuyo_menu.xm"
-
   @kaori.image = "kaori_title/kaori_title.png"
   (@kaori.curframe > 1.0)? @kaori.image = "kaori_title/kaori_title2.png"
 
@@ -62,6 +60,7 @@ float @kaoriDestX
       @kaoriDestX=20.0
       @isFullScreen = 0
     }
+    music: command="menu"
   }
   (@inNetGameCenter = 1)? {
     (@isFullScreen = 0)? {
@@ -69,6 +68,7 @@ float @kaoriDestX
       @kaoriDestX=-300.0
       @isFullScreen = 1
     }
+    music: command="network menu"
   }
   move::@kaori   fcycle=@kaoriMovesFCycle      x=@kaoriDestX y=@kaori.pos.y
   

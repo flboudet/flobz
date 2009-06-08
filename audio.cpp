@@ -21,13 +21,14 @@ static Uint16 audio_format;
 static int    audio_channels;
 
 static float sound_volume   = 1.0f;
-static float music_volume   = 0.5f;
+static float music_volume   = 1.0f;
 
 static bool sound_on = false;
 static bool music_on = false;
 static bool music_starting = false;
 
 static std::string music_current = "";
+static std::string music_command = "";
 
 #endif
 
@@ -141,6 +142,8 @@ void AudioManager::init()
 
     music_volume = ((float)GetIntPreference(kMusicVolume, 100))/100.0f;
     sound_volume = ((float)GetIntPreference(kSoundVolume, 100))/100.0f;
+
+    if (music_on) loadMusic("pop.xm");
 #endif
 }
 
@@ -178,7 +181,7 @@ void AudioManager::notificationOccured(String identifier, void * context)
 {
 #ifdef USE_AUDIO
     if (identifier == kMusicVolume) {
-        musicVolume((float)*(int *)context);
+        // musicVolume((float)*(int *)context);
     } else
         if (identifier == kSoundVolume) {
             soundVolume((float)*(int *)context);
@@ -260,11 +263,12 @@ void AudioManager::preloadMusic(const char *fileName)
 #endif
 }
 
-void AudioManager::playMusic(const char *fileName)
+void AudioManager::loadMusic(const char *fileName)
 {
 #ifdef USE_AUDIO
   if ((!music_starting) && ((!audio_supported) || (music_current == fileName))) return;
     music_current = fileName;
+    printf("Loading %s\n", fileName);
 
     if (music_on)
     {
@@ -273,6 +277,77 @@ void AudioManager::playMusic(const char *fileName)
       Mix_HaltMusic();
       if (music != NULL) Mix_PlayMusic(music, -1);
     }
+#endif
+}
+
+void AudioManager::music(const char *command)
+{
+#ifdef USE_AUDIO
+  static const int MSTART[5] = {1, 12, 15, 22, 34};
+  static const int MGAME[4] = { MSTART[4], MSTART[3], MSTART[0], MSTART[2] };
+
+  if (((!music_on) && (!audio_supported)) || (music_command == command)) return;
+  music_command = command;
+  if (music_command == "menu") {
+      Mix_SetMusicPosition(MSTART[1]);
+      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.3));
+  }
+  else if (music_command == "credits") {
+      Mix_SetMusicPosition(MSTART[0]);
+      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+  }
+  else if (music_command == "network menu") {
+      Mix_SetMusicPosition(MSTART[2]);
+      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.3));
+  }
+  else if (music_command == "level1") {
+      Mix_SetMusicPosition(MGAME[0]);
+      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+  }
+  else if (music_command == "level2") {
+      Mix_SetMusicPosition(MGAME[1]);
+      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+  }
+  else if (music_command == "level3") {
+      Mix_SetMusicPosition(MGAME[2]);
+      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+  }
+  else if (music_command == "level4") {
+      Mix_SetMusicPosition(MGAME[3]);
+      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+  }
+  else if (music_command == "level5") {
+      Mix_SetMusicPosition(MGAME[0]);
+      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+  }
+  else if (music_command == "level6") {
+      Mix_SetMusicPosition(MGAME[1]);
+      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+  }
+  else if (music_command == "level7") {
+      Mix_SetMusicPosition(MGAME[2]);
+      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+  }
+  else if (music_command == "level8") {
+      Mix_SetMusicPosition(MGAME[3]);
+      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+  }
+  else if (music_command == "level9") {
+      Mix_SetMusicPosition(MGAME[0]);
+      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+  }
+  /*else if (music_command == "game") { keep music of interlevel for now.
+      Mix_SetMusicPosition(MSTART[rand()%4]);
+      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+  }*/
+  else if (music_command == "game won") {
+      Mix_SetMusicPosition(15);
+      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+  }
+  else if (music_command == "game over") {
+      Mix_SetMusicPosition(15);
+      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+  }
 #endif
 }
 
@@ -355,7 +430,7 @@ void AudioManager::musicOnOff(bool state)
     char tmp[lenght+1];
     music_current.copy(tmp,lenght,0);
     tmp[lenght] = 0;
-    playMusic(tmp);
+    loadMusic(tmp);
     music_starting = false;
   }
   else

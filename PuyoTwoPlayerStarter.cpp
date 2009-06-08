@@ -37,7 +37,7 @@ PuyoTwoPlayersGameWidget::PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThe
                                                      GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight),
                                                      opponentFace(aiFace)
 {
-    initialize(areaA, areaB, playercontrollerA, playercontrollerB, levelTheme, gameOverAction);
+    initWithGUI(areaA, areaB, playercontrollerA, playercontrollerB, levelTheme, gameOverAction);
     setLives(-1);
 }
 

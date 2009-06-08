@@ -16,7 +16,8 @@ class AudioManager : public gameui::NotificationResponder
   static void close();
   
   static void preloadMusic(const char *fileName);
-  static void playMusic(const char *fileName);
+  static void loadMusic(const char *fileName);
+  static void music(const char *command);
   static void clearMusicCache();
 
   static void preloadSound(const char *sName, float volume);

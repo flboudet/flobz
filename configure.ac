@@ -347,6 +347,7 @@ data/reduced.001/gfx/ending/Makefile
 data/reduced.001/gfx/introlevel/Makefile
 data/reduced.001/story/Makefile
 data/reduced.001/theme/Makefile
+data/reduced.001/music/Makefile
 data/reduced.001/theme/Reduced.fptheme/Makefile
 data/reduced.001/theme/Reduced.fptheme/locale/Makefile
 data/reduced.001/theme/Reduced.fptheme/locale/fr/Makefile

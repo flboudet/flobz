@@ -38,8 +38,19 @@ void PuyoGameWidget::setGameOptions(GameOptions game_options)
     MaxSpeed = game_options.MAX_SPEED;
 }
 
-PuyoGameWidget::PuyoGameWidget(GameOptions game_options)
-    : CycledComponent(TIME_BETWEEN_GAME_CYCLES), associatedScreen(NULL),
+void PuyoGameWidget::setPlayerOneName(String newName) {
+    playerOneName = newName;
+    areaA->setPlayerNames(playerOneName, playerTwoName);
+    areaB->setPlayerNames(playerOneName, playerTwoName);
+}
+void PuyoGameWidget::setPlayerTwoName(String newName) {
+    playerTwoName = newName;
+    areaA->setPlayerNames(playerOneName, playerTwoName);
+    areaB->setPlayerNames(playerOneName, playerTwoName);
+}
+
+PuyoGameWidget::PuyoGameWidget(GameOptions game_options, bool withGUI)
+    : CycledComponent(TIME_BETWEEN_GAME_CYCLES), withGUI(withGUI), associatedScreen(NULL),
       painter(*(GameUIDefaults::GAME_LOOP->getDrawContext())), cyclesBeforeGameCycle(0),
       cyclesBeforeSpeedIncreases(game_options.CYCLES_BEFORE_SPEED_INCREASES),
       tickCounts(0), cycles(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(0),
@@ -48,22 +59,38 @@ PuyoGameWidget::PuyoGameWidget(GameOptions game_options)
       playerOneName(p1name), playerTwoName(p2name),
       m_foregroundAnimation(NULL)
 {
-    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
-    painterGameScreen = iimLib.create_DisplayFormat(GameUIDefaults::GAME_LOOP->getDrawContext()->w, GameUIDefaults::GAME_LOOP->getDrawContext()->h);
+    if (withGUI) {
+        IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
+        painterGameScreen = iimLib.create_DisplayFormat(GameUIDefaults::GAME_LOOP->getDrawContext()->w, GameUIDefaults::GAME_LOOP->getDrawContext()->h);
+    }
 }
 
-void PuyoGameWidget::initialize(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
+void PuyoGameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
 {
     this->areaA = &areaA;
     this->areaB = &areaB;
+    areaA.setPlayerNames(playerOneName, playerTwoName);
+    areaB.setPlayerNames(playerOneName, playerTwoName);
     this->controllerA = &controllerA;
     this->controllerB = &controllerB;
     this->attachedLevelTheme = &levelTheme;
     this->gameOverAction = gameOverAction;
-    initialize();
+    priv_initialize();
+}
+void PuyoGameWidget::initWithoutGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, Action *gameOverAction)
+{
+    this->areaA = &areaA;
+    this->areaB = &areaB;
+    areaA.setPlayerNames(playerOneName, playerTwoName);
+    areaB.setPlayerNames(playerOneName, playerTwoName);
+    this->controllerA = &controllerA;
+    this->controllerB = &controllerB;
+    this->attachedLevelTheme = NULL;
+    this->gameOverAction = gameOverAction;
+    priv_initialize();
 }
 
-void PuyoGameWidget::initialize()
+void PuyoGameWidget::priv_initialize()
 {
     once = false;
     gameover = false;
@@ -77,7 +104,7 @@ void PuyoGameWidget::initialize()
       m_styroPainter.m_styroClient.freeImage = styro_freeImage;
       m_styroPainter.m_styroClient.putText   = NULL;
       m_styroPainter.m_styroClient.getText   = NULL;
-      m_styroPainter.m_styroClient.playMusic = NULL;
+      m_styroPainter.m_styroClient.music = NULL;
       m_styroPainter.m_styroClient.playSound = NULL;
       m_styroPainter.m_styroClient.resolveFilePath = NULL;
       m_styroPainter.m_painter = &painter;
