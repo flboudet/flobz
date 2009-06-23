@@ -87,12 +87,15 @@ void PuyoSinglePlayerGameWidget::cycle()
         ai.fastDropDelta = opponent.getIntegerValue("@AI_FastDropDelta");
         ai.thinkDepth = opponent.getIntegerValue("@AI_ThinkDepth");
         opponentcontroller->setAIParameters(ai);
-    }
-    if (faceTicks == 100) {
+
+        opponent.setIntegerValue("@maxHeightLeft", attachedGameA->getColumnHeigth(2));
+        opponent.setIntegerValue("@maxHeightRight", attachedGameB->getColumnHeigth(2));
         opponent.setIntegerValue("@maxHeightPlayer", attachedGameA->getColumnHeigth(2));
         opponent.setIntegerValue("@maxHeightAI", attachedGameB->getColumnHeigth(2));
         opponent.setIntegerValue("@neutralsForPlayer", attachedGameA->getNeutralPuyos());
         opponent.setIntegerValue("@neutralsForAI", attachedGameB->getNeutralPuyos());
+    }
+    if (faceTicks == 100) {
         faceTicks = 0;
     }
     PuyoGameWidget::cycle();

@@ -111,6 +111,7 @@ class GameLoop
     void removeDrawable(DrawableComponent *gc);
     void removeIdle(IdleComponent *gc);
     void garbageCollect(GarbageCollectableItem *item);
+    void garbageCollectNow(); // run garbage collector.
     void run();
 
     // Reordering of drawable elements

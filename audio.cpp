@@ -285,8 +285,9 @@ void AudioManager::loadMusic(const char *fileName)
 void AudioManager::music(const char *command)
 {
 #ifdef USE_AUDIO
-  static const int MSTART[5] = {1, 12, 15, 22, 34};
+  static const int MSTART[6] = {1, 12, 15, 22, 34, 0x28};
   static const int MGAME[4] = { MSTART[4], MSTART[3], MSTART[0], MSTART[2] };
+  static const int FGAME[4] = { MSTART[5], MSTART[3], MSTART[0], MSTART[2] };
 
   if (((!music_on) && (!audio_supported)) || (music_command == command)) return;
   music_command = command;
@@ -306,9 +307,17 @@ void AudioManager::music(const char *command)
       Mix_SetMusicPosition(MGAME[0]);
       Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
   }
+  else if (music_command == "level1-speed") {
+      Mix_SetMusicPosition(FGAME[0]);
+      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.8));
+  }
   else if (music_command == "level2") {
       Mix_SetMusicPosition(MGAME[1]);
       Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+  }
+  else if (music_command == "level2-speed") {
+      Mix_SetMusicPosition(FGAME[1]);
+      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.8));
   }
   else if (music_command == "level3") {
       Mix_SetMusicPosition(MGAME[2]);

@@ -137,6 +137,7 @@ void PuyoGameWidget::priv_initialize()
 
 PuyoGameWidget::~PuyoGameWidget()
 {
+    dead();
     for (unsigned int i=0; i<puyoFX.size(); ++i)
         delete puyoFX[i];
     if (m_foregroundAnimation != NULL) {

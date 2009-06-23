@@ -195,7 +195,6 @@ void PuyoNetworkGameWidget::abort()
 
 void PuyoNetworkGameWidget::actionAfterGameOver(bool fromControls)
 {
-    fprintf(stderr, "ACTIONAFTERGAMEOVER\n");
     // If the resume is from a controller, we have to send the resume information to the other peer
     if (fromControls) {
         ios_fc::Message *message = mbox->createMessage();

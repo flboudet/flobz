@@ -10,4 +10,4 @@
     sprite::@face_sprite display=@face_display
 
 <face_update>
-    music: command="game"
+    //music: command="game"

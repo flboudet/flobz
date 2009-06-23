@@ -189,3 +189,9 @@ external <strcmp: string s1, string s2> : int
     }
   }
 
+<stress> : int 
+    (@maxHeightRight >  @maxHeightLeft)? stress = @maxHeightRight
+    (@maxHeightRight <= @maxHeightLeft)? stress = @maxHeightLeft
+    stress -= 4
+    (stress < 0)? stress = 0
+

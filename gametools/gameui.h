@@ -73,6 +73,8 @@ bool isDirectionEvent(GameControlEvent *event);
     public:
       Widget(WidgetContainer *parent = NULL);
       virtual ~Widget();
+      void dead() { m_isDead = true; }
+      bool isDead() const { return m_isDead; }
 
       virtual bool drawRequested() const { return _drawRequested; }
       virtual void requestDraw(bool fromParent = false);
@@ -140,6 +142,7 @@ bool isDirectionEvent(GameControlEvent *event);
       Vec3    size;
       Vec3    position;
     protected:
+      bool    m_isDead;
       bool    hidden;
     private:
       bool    focus;

@@ -236,9 +236,19 @@ void PuyoInternetNetworkView::gameLost()
     sendGameResultToServer(2);
 }
 
+// Save and restore IgpMessageBox bound peer.
+class SaveIgpBound {
+    public:
+        IgpMessageBox *igpbox;
+        int saveBound;
+        SaveIgpBound(IgpMessageBox *igpbox) : igpbox(igpbox), saveBound(igpbox->getBound()) {}
+        ~SaveIgpBound() { igpbox->bind(saveBound); }
+};
+
 void PuyoInternetNetworkView::sendGameResultToServer(int winner)
 {
     if (igpbox == NULL) return;
+    SaveIgpBound saveIgpBound(igpbox);
     igpbox->bind(1);
     std::auto_ptr<Message> message (igpbox->createMessage());
     message->addInt   ("CMD",   PUYO_IGP_GAME_OVER);
@@ -263,5 +273,6 @@ void PuyoInternetNetworkView::sendGameResultToServer(int winner)
     message->addBoolProperty("RELIABLE", true);
     message->send();
     // delete message; auto_ptr will delete it! (even if exception is thrown, which is nice of him)
+    // SaveIgpBound restore bound peer.
 }
 

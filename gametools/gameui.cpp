@@ -39,7 +39,7 @@ namespace gameui {
     //
     Widget::Widget(WidgetContainer *parent)
         : parent(parent), preferedSize(0,0,0), size(0,0,0),
-        position(0,0,0), hidden(false), focus(false), focusable(false), _drawRequested(true), receiveUp(false)
+        position(0,0,0), m_isDead(false), hidden(false), focus(false), focusable(false), _drawRequested(true), receiveUp(false)
     {
         for (int i = 0; i < GAMEUIENUM_LAST; ++i)
             actions[i] = NULL;
@@ -639,6 +639,7 @@ namespace gameui {
         ev.sdl_event.type = SDL_NOEVENT;
 
         Widget *child = getChild(activeWidget);
+        if (child->isDead()) return false;
         child->giveFocus();
         child->eventOccured(&ev);
         return child->haveFocus();

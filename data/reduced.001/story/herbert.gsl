@@ -36,7 +36,11 @@ import <libface.gsl>
 # Update function: called every animation cycle
 <update>
   [face_update]
+
   # Herbert doesn't like the stress and becomes dumb when stressed
   @AI_ThinkDepth = 1
   (@maxHeightAI > 6) ? @AI_ThinkDepth = 0
 
+  # Vary the music when herbert is under stress
+  ([stress] = 0)? music: command="level1"
+  ([stress] > 2)? music: command="level1-speed"

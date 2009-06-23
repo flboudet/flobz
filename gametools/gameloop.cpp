@@ -215,6 +215,16 @@ void GameLoop::run()
   }
 }
 
+void GameLoop::garbageCollectNow() {
+  while (garbageCollector.size() > 0) {
+#ifdef DEBUG_GAMELOOP
+    printf("GARBAGE COLLECTABLE REMOVED\n");
+#endif
+    delete garbageCollector[0];
+    garbageCollector.removeAt(0);
+  }
+}
+
 void GameLoop::idle(double currentTime)
 {
   int i, idles_size_at_start;
@@ -278,13 +288,7 @@ void GameLoop::idle(double currentTime)
   }
 
   // 3b- garbage collector for passive remove
-  while (garbageCollector.size() > 0) {
-#ifdef DEBUG_GAMELOOP
-    printf("GARBAGE COLLECTABLE REMOVED\n");
-#endif
-    delete garbageCollector[0];
-    garbageCollector.removeAt(0);
-  }
+  garbageCollectNow();
 }
 
 bool GameLoop::drawRequested() const

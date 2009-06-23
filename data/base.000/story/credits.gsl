@@ -95,7 +95,7 @@ import <flying_flobo.gsl>
     (@credits_state >= @CREDITS_GYOM)? {
         displayPos.x = -230.0 + (@fcycle - @CREDITS_GYOM_T)*3.6
         displayPos.y = 430.0
-        put_text: text="Guillaume \"Gyom\" Borios\nArtificial Intelligence and GUI" pos=displayPos text_index=100.0
+        put_text: text="Guillaume \"Gyom\" Borios\nArtificial Intelligence and UI" pos=displayPos text_index=100.0
     }
     lk_sprite_list
 
