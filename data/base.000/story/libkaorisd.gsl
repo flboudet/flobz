@@ -155,7 +155,7 @@
     }
     (@lk_waiting_anim = @LK_WAITING_LOOK_LEFT_RIGHT)? {
         @lk_sprite.nbframes = 2.0
-        @lk_sprite.framespeed = 0.05
+        @lk_sprite.framespeed = 0.2
         @lk_sprite.image = "sdkaori/waiting_b_01.png"
         (@lk_sprite.curframe >= 1.0)? @lk_sprite.image = "sdkaori/waiting_b_02.png"
         @LK_WAITING_DURATION = 160.0
