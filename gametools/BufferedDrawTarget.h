@@ -2,6 +2,7 @@
 #define _BUFFEREDDRAWTARGET_
 
 #include <vector>
+#include <list>
 #include "drawcontext.h"
 
 class BufferedDrawTarget : public DrawTarget
@@ -17,15 +18,27 @@ public:
     void flush();
     IosSurface *getSurface();
 private:
-    struct DrawElt {
-        DrawElt(IosSurface *surf, IosRect &srcRect, IosRect &dstRect)
+    struct DrawOperation {
+        DrawOperation() {}
+        DrawOperation(IosSurface *surf, IosRect &srcRect, IosRect &dstRect)
             : surf(surf), srcRect(srcRect), dstRect(dstRect) {}
         IosSurface *surf;
         IosRect     srcRect;
         IosRect     dstRect;
     };
-    std::vector<DrawElt> m_drawList[2];
-    std::vector<DrawElt> *m_frontList, *m_backList;
+    struct DrawTreeNode {
+        DrawTreeNode() : innerNodes(NULL) {}
+        DrawTreeNode(DrawOperation &op);
+        ~DrawTreeNode();
+        void appendDrawOperation(DrawOperation &drawOp);
+        void draw(DrawTarget *dt, DrawTreeNode &backNode);
+        IosRect nodeRect;
+        DrawOperation drawOperation;
+        typedef std::list<DrawTreeNode> DrawTreeNodeList;
+        DrawTreeNodeList *innerNodes;
+    };
+    DrawTreeNode m_rootNodes[2];
+    DrawTreeNode *m_frontRoot, *m_backRoot;
     DrawContext *m_dc;
     IosSurface *m_cache;
     bool m_dirty;
