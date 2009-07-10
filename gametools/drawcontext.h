@@ -10,7 +10,43 @@ struct IosRect
     //    : x(x), y(y), w(w), h(h) {}
     int x, y;
     int w, h;
+    inline bool hasIntersection(IosRect &rect) const;
+    inline bool equals(const IosRect &rect) const;
 };
+
+bool IosRect::hasIntersection(IosRect &rect) const
+{
+    int Amin, Amax, Bmin, Bmax;
+    /* Horizontal intersection */
+    Amin = x;
+    Amax = Amin + w;
+    Bmin = rect.x;
+    Bmax = Bmin + rect.w;
+    if (Bmin > Amin)
+        Amin = Bmin;
+    if (Bmax < Amax)
+        Amax = Bmax;
+    if (Amax <= Amin)
+        return false;
+    /* Vertical intersection */
+    Amin = y;
+    Amax = Amin + h;
+    Bmin = rect.y;
+    Bmax = Bmin + rect.h;
+    if (Bmin > Amin)
+        Amin = Bmin;
+    if (Bmax < Amax)
+        Amax = Bmax;
+    if (Amax <= Amin)
+        return false;
+    return true;
+}
+
+bool IosRect::equals(const IosRect &rect) const
+{
+    return ((h == rect.h) && (w == rect.w)
+            && (x == rect.x) && (y == rect.y));
+}
 
 struct IosRectC
 {
