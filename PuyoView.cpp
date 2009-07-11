@@ -370,7 +370,7 @@ void PuyoView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNu
     }
     viewAnimations.add(new VanishSoundAnimation(phase, synchronizer, groupPadding / puyoGroup.size()));
 
-/*
+    // "pastaga" management
     if (groupNum == 0) {
       static const char * sound_yahoohoo[7] = {
         NULL, "yahoohoo.wav", "woho.wav", "pastaga.wav",
@@ -396,7 +396,7 @@ void PuyoView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNu
       }
       if (index>1) AudioManager::playSound(sound_yahoohoo[index], volume_yahoohoo[index]);
     }
-*/
+
 }
 
 void PuyoView::gameDidEndCycle()
