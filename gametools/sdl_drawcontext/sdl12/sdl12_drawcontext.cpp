@@ -329,7 +329,7 @@ void SDL12_DrawContext::flip()
 #ifdef BENCHMARKS
   static double nFrames = 0.0;
   static double t0 = 0.0;
-  static char fps[] = "FPS: .....   ";
+  static char fps[255] = "FPS: .....   ";
   static double minFPS = 100000.0;
   static double t1 = 0.0;
 
