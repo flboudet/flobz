@@ -9,5 +9,5 @@ libgoomsl_la_SOURCES=goomsl_yacc.y goomsl_lex.l goomsl_hash.cpp goomsl_heap.c go
 libgoomsl_la_CXXFLAGS = -I$(top_srcdir)/iosfc
 
 EXTRA_DIST=goomsl.h goomsl_hash.h goomsl_heap.h \
-           goomsl_private.h goomsl_yacc.h jitc_x86.h
+           goomsl_private.h jitc_x86.h
 

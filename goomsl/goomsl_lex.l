@@ -5,7 +5,14 @@
 #include <string.h>
 #include "goomsl.h"
 #include "goomsl_private.h"
+// xcode and automake have different ways
+// to prefix yacc files. I have not found
+// a proper way to generate it.
+#ifdef XCODE_STYLE_YACC
+#include "goomsl_yacc.tab.h"
+#else
 #include "goomsl_yacc.h"
+#endif
 
 void yyerror(char *);
 void yyparse(void);
