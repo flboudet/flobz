@@ -1,6 +1,7 @@
 #ifndef _SDL12_DRAWCONTEXT_H_
 #define _SDL12_DRAWCONTEXT_H_
 
+#include <string>
 #include "drawcontext.h"
 #ifdef MACOSX
 #include <SDL/SDL.h>
@@ -65,6 +66,9 @@ public:
     // Specific methods
     void setFullScreen(bool fullscreen);
 private:
+    void initDisplay(bool fullscreen);
+
+    std::string m_caption;
     SDL_Surface *display;
     SDL12_IIMLibrary m_iimLib;
 };

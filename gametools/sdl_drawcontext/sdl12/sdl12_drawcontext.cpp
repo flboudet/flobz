@@ -1,3 +1,4 @@
+#include <iostream>
 #include <vector>
 #include "drawcontext.h"
 #include "sdl12_drawcontext.h"
@@ -300,6 +301,15 @@ IosFont *SDL12_IIMLibrary::createFont(const char *path, int size, IosFontFx fx)
 // DrawContext implementation
 
 SDL12_DrawContext::SDL12_DrawContext(int w, int h, bool fullscreen, const char *caption)
+  : m_caption(caption)
+{
+    this->h = h;
+    this->w = w;
+    initDisplay(fullscreen);
+    TTF_Init();
+}
+
+void SDL12_DrawContext::initDisplay(bool fullscreen)
 {
     display = SDL_SetVideoMode(w, h, 0, SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));
     if (display == NULL) {
@@ -307,17 +317,16 @@ SDL12_DrawContext::SDL12_DrawContext(int w, int h, bool fullscreen, const char *
                 SDL_GetError());
         exit(1);
     }
-    this->h = display->h;
-    this->w = display->w;
     atexit(SDL_Quit);
     SDL_ShowCursor(SDL_DISABLE);
-    SDL_WM_SetCaption(caption, NULL);
-    TTF_Init();
+    SDL_WM_SetCaption(m_caption.c_str(), NULL);
 }
 
 void SDL12_DrawContext::setFullScreen(bool fullscreen)
 {
-    SDL_WM_ToggleFullScreen(display);
+    if (SDL_WM_ToggleFullScreen(display) == 0) {
+        initDisplay(fullscreen);
+    }
     /* Workaround for cursor showing in MacOS X fullscreen mode */
     SDL_ShowCursor(SDL_ENABLE);
     SDL_ShowCursor(SDL_DISABLE);
