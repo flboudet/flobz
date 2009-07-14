@@ -611,6 +611,10 @@ bool isDirectionEvent(GameControlEvent *event);
       bool editionMode;
       String previousValue;
       void init(IosFont *fontActive, IosFont *fontInactive);
+
+      void press(GameControlEvent *event);
+      void cancel(GameControlEvent *event);
+      void changeTo(GameControlEvent *event);
   };
 
   class ToggleButton : public Button {

@@ -43,6 +43,7 @@ typedef struct GameControlEvent {
 	bool caught;
     int x, y;
 	void setCaught() { caught = true; }
+    bool isJoystick;
 } GameControlEvent;
 
 

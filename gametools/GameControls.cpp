@@ -51,6 +51,7 @@ void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
   result->cursorEvent = GameControlEvent::kCursorNone;
   result->isUp = true;
   result->caught = false;
+  result->isJoystick = false;
 
   if (e.type == SDL_QUIT)
     result->cursorEvent = GameControlEvent::kQuit;
@@ -87,6 +88,8 @@ void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
   }
   if (input == NULL)
     return;
+
+  result->isJoystick = input->isJoystick();
 
   if (input->isQuit())
     result->cursorEvent = GameControlEvent::kQuit;
@@ -154,9 +157,13 @@ void initGameControls()
 
 bool tryChangeControl(int control, bool alternate, SDL_Event e, GameControlEvent *result)
 {
-  InputSwitch *input  = switchForEvent(&e);
-  if (input == NULL)
+  printf("switchForEvent?\n");
+  InputSwitch *input = switchForEvent(&e);
+  if (input == NULL) {
+    printf("input is null\n");
     return false;
+  }
+  printf("switchForEvent!\n");
 
   getControlEvent(e,input,result);
 

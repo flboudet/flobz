@@ -36,6 +36,8 @@ class InputSwitch
     virtual bool isPause()      const { return false; }
     virtual bool isQuit()       const { return false; }
 
+    virtual bool isJoystick()   const { return false; }
+
   private:
     bool isup;
 };
@@ -91,6 +93,7 @@ class JoystickSwitch : public InputSwitch
 
     virtual bool isValidate()  const;
     virtual bool isCancel()    const;
+    virtual bool isJoystick()  const { return true; }
 };
 
 class JoystickAxisSwitch : public InputSwitch
@@ -110,6 +113,7 @@ class JoystickAxisSwitch : public InputSwitch
     virtual bool isArrowDown() const;
     virtual bool isArrowLeft()  const;
     virtual bool isArrowRight() const;
+    virtual bool isJoystick()  const { return true; }
 };
 
 class InputFromIDAndName : public InputSwitch

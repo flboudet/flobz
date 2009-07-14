@@ -1838,45 +1838,66 @@ namespace gameui {
             setAction(ON_START, action);
     }
 
+    void ControlInputWidget::cancel(GameControlEvent *event)
+    {
+        if (!editionMode) return;
+        setValue(previousValue);
+        editionMode = false;
+        if (event != NULL) event->caught = true;
+    }
+    void ControlInputWidget::press(GameControlEvent *event)
+    {
+        if (editionMode) return;
+        editionMode = true;
+        previousValue = getValue();
+        setValue("<Press>");
+    }
+
+    void ControlInputWidget::changeTo(GameControlEvent *event)
+    {
+        GameControlEvent result;
+        if (tryChangeControl(control, alternate, event->sdl_event, &result)) {
+            char temp[255];
+            getKeyName(control, alternate, temp);
+            setValue(temp);
+            editionMode = false;
+        }
+    }
+
     void ControlInputWidget::eventOccured(GameControlEvent *event)
     {
-        if (event->cursorEvent == GameControlEvent::kStart) {
-            editionMode = !editionMode;
-            if (editionMode == true) {
-                previousValue = getValue();
-                setValue("<Press>");
-            }
-            else {
-                setValue(getValue().substring(0, getValue().length() - 1));
-                Action *action = getAction(ON_START);
-                if (action)
-                    action->action();
-            }
+        // if evenement joystick et editionMode alors traiter le cas.
+        if (event->isJoystick && editionMode && (event->cursorEvent != GameControlEvent::kBack)) {
+            printf("XXXXX\n");
+            changeTo(event);
+        }
+        else if (event->cursorEvent == GameControlEvent::kStart) {
+            if (editionMode == false)
+                press(event);
+            else
+                cancel(event);
+        }
+        else if (event->cursorEvent == GameControlEvent::kGameMouseClicked) {
+            Vec3 widPosition = getPosition();
+            Vec3 widSize = getSize();
+            if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
+                    && (widPosition.x + widSize.x >= widPosition.x) && (widPosition.y + widSize.y >= event->y))
+                press(event);
         }
         else if (editionMode == true) {
-            if (event->cursorEvent == GameControlEvent::kBack) {
-                setValue(previousValue);
-                editionMode = false;
-            }
-            else {
-                GameControlEvent result;
-                if (tryChangeControl(control, alternate, event->sdl_event, &result)) {
-                    char temp[255];
-                    getKeyName(control, alternate, temp);
-                    setValue(temp);
-                    editionMode = false;
-                }
-            }
+            if (event->cursorEvent == GameControlEvent::kBack)
+                cancel(event);
+            else
+                changeTo(event);
         }
-        else {
-            if (isDirectionEvent(event))
-                lostFocus();
-        }
+        else if (isDirectionEvent(event))
+            lostFocus();
     }
 
     void ControlInputWidget::lostFocus() {
         Text::lostFocus();
         font = fontInactive;
+        if (editionMode) cancel(NULL);
         requestDraw();
     }
 
