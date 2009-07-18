@@ -5,8 +5,6 @@
 #include "preferences.h"
 #include "audio.h"
 #include "MainMenu.h"
-//#include "PuyoSinglePlayerStarter.h"
-//#include "PuyoNetworkStarter.h"
 
 using namespace gameui;
 

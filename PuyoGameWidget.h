@@ -33,7 +33,7 @@
 
 /**
  * This object represents all the game options needed as a parameter
- * to the PuyoGameWidget
+ * to the GameWidget
  */
 struct GameOptions
 {
@@ -55,12 +55,12 @@ struct GameOptions
  * Represents the full featured game widget, with the two players game views.
  * Handles user input.
  */
-class PuyoGameWidget : public GarbageCollectableItem,
+class GameWidget : public GarbageCollectableItem,
                        public gameui::Widget, CycledComponent {
 public:
-    PuyoGameWidget(GameOptions options = GameOptions(), bool withGUI = true);
+    GameWidget(GameOptions options = GameOptions(), bool withGUI = true);
     void setGameOptions(GameOptions options);
-    virtual ~PuyoGameWidget();
+    virtual ~GameWidget();
     void initWithGUI(PuyoView &areaA, PuyoView &areaB,
                      PuyoPlayer &controllerA, PuyoPlayer &controllerB,
                      PuyoLevelTheme &levelTheme,

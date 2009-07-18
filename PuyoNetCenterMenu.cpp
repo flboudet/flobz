@@ -29,11 +29,11 @@
 #include "ios_time.h"
 #include <sstream>
 
-class PuyoNetworkTwoPlayerGameWidgetFactory : public PuyoGameWidgetFactory {
+class PuyoNetworkTwoPlayerGameWidgetFactory : public GameWidgetFactory {
 public:
     PuyoNetworkTwoPlayerGameWidgetFactory(ios_fc::MessageBox &mbox, unsigned int randomSeed, ios_fc::IgpMessageBox *igpbox/* = NULL */)
       : mbox(mbox), randomSeed(randomSeed), igpbox(igpbox), gameId(0) {}
-    PuyoGameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String centerFace, Action *gameOverAction)
+    GameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
         PuyoNetworkGameWidget *negawi = new PuyoNetworkGameWidget();
         negawi->initWithGUI(puyoThemeSet, levelTheme, mbox, gameId++, randomSeed++, gameOverAction, igpbox);

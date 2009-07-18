@@ -32,11 +32,11 @@
 #include "goomsl/goomsl_hash.h"
 #include <vector>
 
-class PuyoSinglePlayerGameWidget : public PuyoGameWidget, public Action {
+class SinglePlayerGameWidget : public GameWidget, public Action {
 public:
-    PuyoSinglePlayerGameWidget(int lifes, String aiFace);
+    SinglePlayerGameWidget(int lifes, String aiFace);
     void initWithGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &playercontroller, PuyoLevelTheme &levelTheme, int level, Action *gameOverAction);
-    virtual ~PuyoSinglePlayerGameWidget();
+    virtual ~SinglePlayerGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
     StoryWidget *getOpponent();
@@ -52,7 +52,7 @@ protected:
     PuyoCheatCodeManager killLeftCheat, killRightCheat;
 };
 
-class SinglePlayerStandardLayoutGameWidget : public PuyoSinglePlayerGameWidget
+class SinglePlayerStandardLayoutGameWidget : public SinglePlayerGameWidget
 {
 public:
     SinglePlayerStandardLayoutGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
@@ -72,7 +72,7 @@ private:
 class SinglePlayerFactory {
 public:
     virtual String getPlayerName() const = 0;
-    virtual PuyoSinglePlayerGameWidget *createGameWidget
+    virtual SinglePlayerGameWidget *createGameWidget
         (AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme,
          int level, int nColors, int lifes, String aiFace,
          Action *gameOverAction) = 0;
@@ -83,7 +83,7 @@ public:
  * Implementation of SinglePlayerFactory with the standard game layout
  */
 class SinglePlayerStandardLayoutFactory : public SinglePlayerFactory {
-    virtual PuyoSinglePlayerGameWidget *createGameWidget
+    virtual SinglePlayerGameWidget *createGameWidget
     (AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme,
      int level, int nColors, int lifes, String aiFace,
      Action *gameOverAction);
@@ -270,7 +270,7 @@ private:
     int m_remainingLifes;
     StoryScreen *m_introStory, *m_opponentStory;
     PuyoGameScreen *m_gameScreen;
-    PuyoSinglePlayerGameWidget *m_gameWidget;
+    SinglePlayerGameWidget *m_gameWidget;
     StoryWidget *m_matchLostAnimation;
     PuyoTwoPlayersStatsWidget *m_statsWidget;
     PlayerGameStat &m_playerStat;

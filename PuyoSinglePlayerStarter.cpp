@@ -26,7 +26,7 @@
 #include "PuyoSinglePlayerStarter.h"
 #include "PuyoView.h"
 
-PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(int lifes, String aiFace)
+SinglePlayerGameWidget::SinglePlayerGameWidget(int lifes, String aiFace)
     : opponentcontroller(NULL),
       faceTicks(0), opponent(aiFace),
       killLeftCheat("killleft", this),
@@ -35,21 +35,21 @@ PuyoSinglePlayerGameWidget::PuyoSinglePlayerGameWidget(int lifes, String aiFace)
     setLives(lifes);
 }
 
-void PuyoSinglePlayerGameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB,
+void SinglePlayerGameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB,
                                             PuyoPlayer &playercontroller,
                                             PuyoLevelTheme &levelTheme,
                                             int level,
                                             Action *gameOverAction)
 {
     opponentcontroller = new PuyoIA(level, areaB);
-    PuyoGameWidget::initWithGUI(areaA, areaB, playercontroller, *opponentcontroller,
+    GameWidget::initWithGUI(areaA, areaB, playercontroller, *opponentcontroller,
                                levelTheme, gameOverAction);
     addSubWidget(&killLeftCheat);
     addSubWidget(&killRightCheat);
 }
 
 SinglePlayerStandardLayoutGameWidget::SinglePlayerStandardLayoutGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
-  : PuyoSinglePlayerGameWidget(lifes, aiFace),
+  : SinglePlayerGameWidget(lifes, aiFace),
       attachedPuyoThemeSet(puyoThemeSet),
       attachedRandom(nColors),
       attachedGameFactory(&attachedRandom),
@@ -63,13 +63,13 @@ SinglePlayerStandardLayoutGameWidget::SinglePlayerStandardLayoutGameWidget(Anima
     initWithGUI(areaA, areaB, playercontroller, levelTheme, level, gameOverAction);
 }
 
-PuyoSinglePlayerGameWidget::~PuyoSinglePlayerGameWidget()
+SinglePlayerGameWidget::~SinglePlayerGameWidget()
 {
     if (opponentcontroller != NULL)
         delete opponentcontroller;
 }
 
-void PuyoSinglePlayerGameWidget::cycle()
+void SinglePlayerGameWidget::cycle()
 {
     faceTicks += 1;
     if (faceTicks == 1) {
@@ -98,15 +98,15 @@ void PuyoSinglePlayerGameWidget::cycle()
     if (faceTicks == 100) {
         faceTicks = 0;
     }
-    PuyoGameWidget::cycle();
+    GameWidget::cycle();
 }
 
-StoryWidget *PuyoSinglePlayerGameWidget::getOpponent()
+StoryWidget *SinglePlayerGameWidget::getOpponent()
 {
     return &opponent;
 }
 
-void PuyoSinglePlayerGameWidget::action(Widget *sender, int actionType,
+void SinglePlayerGameWidget::action(Widget *sender, int actionType,
                                         GameControlEvent *event)
 {
     if (sender == static_cast<Widget *>(&killLeftCheat))
@@ -115,7 +115,7 @@ void PuyoSinglePlayerGameWidget::action(Widget *sender, int actionType,
         addGameBHandicap(PUYODIMY);
 }
 
-PuyoSinglePlayerGameWidget *SinglePlayerStandardLayoutFactory::createGameWidget
+SinglePlayerGameWidget *SinglePlayerStandardLayoutFactory::createGameWidget
           (AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme,
            int level, int nColors, int lifes, String aiFace,
            Action *gameOverAction)

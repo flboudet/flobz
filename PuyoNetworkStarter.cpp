@@ -69,14 +69,14 @@ void PuyoNetworkGameWidget::initWithGUI(AnimatedPuyoSetTheme &puyoThemeSet, Puyo
     chatBox = std::auto_ptr<ChatBox>(new ChatBox(*this));
     brokenNetworkWidget = std::auto_ptr<StoryWidget>(new StoryWidget("etherdown.gsl"));
     networkIsBroken = false;
-    PuyoGameWidget::initWithGUI(*localArea, *networkArea, *playercontroller, *dummyPlayerController, levelTheme, gameOverAction);
+    GameWidget::initWithGUI(*localArea, *networkArea, *playercontroller, *dummyPlayerController, levelTheme, gameOverAction);
     setLives(-1);
 }
 
 void PuyoNetworkGameWidget::initWithoutGUI(ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, ios_fc::IgpMessageBox *igpbox)
 {
     this->mbox->addListener(this);
-    //PuyoGameWidget::initWithoutGUI(*localArea, networkArea, playercontroller, dummyPlayerController, levelTheme, gameOverAction);
+    //GameWidget::initWithoutGUI(*localArea, networkArea, playercontroller, dummyPlayerController, levelTheme, gameOverAction);
     setLives(-1);
 }
 
@@ -118,7 +118,7 @@ void PuyoNetworkGameWidget::cycle()
                 associatedScreen->remove(brokenNetworkWidget.get());
             networkIsBroken = false;
         }
-        PuyoGameWidget::cycle();
+        GameWidget::cycle();
     }
 }
 
@@ -145,7 +145,7 @@ void PuyoNetworkGameWidget::onMessage(Message &message)
             actionAfterGameOver(false);
             break;
         case PuyoMessage::kGameAbort:
-            PuyoGameWidget::abort();
+            GameWidget::abort();
             break;
         case PuyoMessage::kGameChat:
             chatBox->addChat(message.getString("NAME"), message.getString("TEXT"));
@@ -167,7 +167,7 @@ void PuyoNetworkGameWidget::setScreenToPaused(bool fromControls)
         delete message;
     }
     lastAliveMessageSentDate = ios_fc::getTimeMs();
-    PuyoGameWidget::setScreenToPaused(fromControls);
+    GameWidget::setScreenToPaused(fromControls);
 }
 
 void PuyoNetworkGameWidget::setScreenToResumed(bool fromControls)
@@ -180,7 +180,7 @@ void PuyoNetworkGameWidget::setScreenToResumed(bool fromControls)
         message->send();
         delete message;
     }
-    PuyoGameWidget::setScreenToResumed(fromControls);
+    GameWidget::setScreenToResumed(fromControls);
 }
 
 void PuyoNetworkGameWidget::abort()
@@ -190,7 +190,7 @@ void PuyoNetworkGameWidget::abort()
     message->addBoolProperty("RELIABLE", true);
     message->send();
     delete message;
-    PuyoGameWidget::abort();
+    GameWidget::abort();
 }
 
 void PuyoNetworkGameWidget::actionAfterGameOver(bool fromControls)
@@ -203,7 +203,7 @@ void PuyoNetworkGameWidget::actionAfterGameOver(bool fromControls)
         message->send();
         delete message;
     }
-    PuyoGameWidget::actionAfterGameOver(fromControls);
+    GameWidget::actionAfterGameOver(fromControls);
 }
 
 void PuyoNetworkGameWidget::sendChat(String chatText)

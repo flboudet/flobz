@@ -55,7 +55,7 @@ struct GameOptions;
 
 class PuyoGameScreen : public Screen, public Action {
 public:
-    PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScreen);
+    PuyoGameScreen(GameWidget &gameWidget, Screen &previousScreen);
     ~PuyoGameScreen();
     void onEvent(GameControlEvent *cevent);
     virtual bool backPressed();
@@ -92,12 +92,12 @@ public:
 private:
     bool paused;
     PuyoPauseMenu pauseMenu;
-    PuyoGameWidget &gameWidget;
+    GameWidget &gameWidget;
     PuyoScreenTransitionWidget transitionWidget;
     StoryWidget *overlayStory;
 };
 
-class PuyoTwoPlayerGameWidget : public PuyoGameWidget {
+class PuyoTwoPlayerGameWidget : public GameWidget {
 public:
     PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction = NULL);
 private:

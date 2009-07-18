@@ -33,7 +33,7 @@
 
 using namespace ios_fc;
 
-PuyoGameScreen::PuyoGameScreen(PuyoGameWidget &gameWidget, Screen &previousScreen)
+PuyoGameScreen::PuyoGameScreen(GameWidget &gameWidget, Screen &previousScreen)
     : Screen(0, 0, 640, 480), paused(false),
       pauseMenu(this),
       gameWidget(gameWidget), transitionWidget(previousScreen, NULL),

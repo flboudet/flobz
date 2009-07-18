@@ -31,25 +31,25 @@
 const char *p1name = "Player1";
 const char *p2name = "Player2";
 
-void PuyoGameWidget::setGameOptions(GameOptions game_options)
+void GameWidget::setGameOptions(GameOptions game_options)
 {
     cyclesBeforeSpeedIncreases = game_options.CYCLES_BEFORE_SPEED_INCREASES;
     MinSpeed = game_options.MIN_SPEED;
     MaxSpeed = game_options.MAX_SPEED;
 }
 
-void PuyoGameWidget::setPlayerOneName(String newName) {
+void GameWidget::setPlayerOneName(String newName) {
     playerOneName = newName;
     areaA->setPlayerNames(playerOneName, playerTwoName);
     areaB->setPlayerNames(playerOneName, playerTwoName);
 }
-void PuyoGameWidget::setPlayerTwoName(String newName) {
+void GameWidget::setPlayerTwoName(String newName) {
     playerTwoName = newName;
     areaA->setPlayerNames(playerOneName, playerTwoName);
     areaB->setPlayerNames(playerOneName, playerTwoName);
 }
 
-PuyoGameWidget::PuyoGameWidget(GameOptions game_options, bool withGUI)
+GameWidget::GameWidget(GameOptions game_options, bool withGUI)
     : CycledComponent(TIME_BETWEEN_GAME_CYCLES), withGUI(withGUI), associatedScreen(NULL),
       painter(*(GameUIDefaults::GAME_LOOP->getDrawContext())), cyclesBeforeGameCycle(0),
       cyclesBeforeSpeedIncreases(game_options.CYCLES_BEFORE_SPEED_INCREASES),
@@ -65,7 +65,7 @@ PuyoGameWidget::PuyoGameWidget(GameOptions game_options, bool withGUI)
     }
 }
 
-void PuyoGameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
+void GameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
 {
     this->areaA = &areaA;
     this->areaB = &areaB;
@@ -77,7 +77,7 @@ void PuyoGameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &c
     this->gameOverAction = gameOverAction;
     priv_initialize();
 }
-void PuyoGameWidget::initWithoutGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, Action *gameOverAction)
+void GameWidget::initWithoutGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, Action *gameOverAction)
 {
     this->areaA = &areaA;
     this->areaB = &areaB;
@@ -90,7 +90,7 @@ void PuyoGameWidget::initWithoutGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer
     priv_initialize();
 }
 
-void PuyoGameWidget::priv_initialize()
+void GameWidget::priv_initialize()
 {
     once = false;
     gameover = false;
@@ -135,7 +135,7 @@ void PuyoGameWidget::priv_initialize()
     // puyoFX.push_back(new PuyoFX("fx/white_star.gsl"));
 }
 
-PuyoGameWidget::~PuyoGameWidget()
+GameWidget::~GameWidget()
 {
     dead();
     for (unsigned int i=0; i<puyoFX.size(); ++i)
@@ -145,7 +145,7 @@ PuyoGameWidget::~PuyoGameWidget()
     }
 }
 
-void PuyoGameWidget::cycle()
+void GameWidget::cycle()
 {
   if (!paused) {
     tickCounts++;
@@ -242,24 +242,24 @@ void PuyoGameWidget::cycle()
   }
 }
 
-void PuyoGameWidget::drawBackground(DrawTarget *dt)
+void GameWidget::drawBackground(DrawTarget *dt)
 {
     dt->renderCopy(attachedLevelTheme->getBackground(), NULL, NULL);
 }
 
-void PuyoGameWidget::drawGameAreas(DrawTarget *dt)
+void GameWidget::drawGameAreas(DrawTarget *dt)
 {
     areaA->render(dt);
     areaB->render(dt);
 }
 
-void PuyoGameWidget::drawGameNeutrals(DrawTarget *dt)
+void GameWidget::drawGameNeutrals(DrawTarget *dt)
 {
     areaA->renderNeutral(dt);
     areaB->renderNeutral(dt);
 }
 
-void PuyoGameWidget::draw(DrawTarget *dt)
+void GameWidget::draw(DrawTarget *dt)
 {
     if (paused) {
         dt->renderCopy(painterGameScreen, NULL, NULL);
@@ -375,12 +375,12 @@ void PuyoGameWidget::draw(DrawTarget *dt)
         dt->putStringCenteredXY(font, 510, 460, playerTwoName);
 }
 
-void PuyoGameWidget::addSubWidget(Widget *subWidget)
+void GameWidget::addSubWidget(Widget *subWidget)
 {
   m_subwidgets.push_back(subWidget);
 }
 
-void PuyoGameWidget::pause()
+void GameWidget::pause()
 {
     //painterGameScreen->setAlpha(IOS_ALPHA_OPAQUE);
     draw(painterGameScreen);
@@ -390,12 +390,12 @@ void PuyoGameWidget::pause()
     requestDraw();
 }
 
-void PuyoGameWidget::resume()
+void GameWidget::resume()
 {
     paused = false;
 }
 
-void PuyoGameWidget::eventOccured(GameControlEvent *event)
+void GameWidget::eventOccured(GameControlEvent *event)
 {
     if (paused)
         lostFocus();
@@ -409,7 +409,7 @@ void PuyoGameWidget::eventOccured(GameControlEvent *event)
     }
 }
 
-bool PuyoGameWidget::startPressed()
+bool GameWidget::startPressed()
 {
     if ((gameover || abortedFlag) && once && (ios_fc::getTimeMs() > gameOverDate + 500)) {
         actionAfterGameOver(true);
@@ -418,7 +418,7 @@ bool PuyoGameWidget::startPressed()
     return false;
 }
 
-bool PuyoGameWidget::backPressed()
+bool GameWidget::backPressed()
 {
     if ((gameover || abortedFlag) && once) {
         actionAfterGameOver(true);
@@ -427,26 +427,26 @@ bool PuyoGameWidget::backPressed()
     return false;
 }
 
-void PuyoGameWidget::actionAfterGameOver(bool fromControls)
+void GameWidget::actionAfterGameOver(bool fromControls)
 {
     if (gameOverAction)
       gameOverAction->action(this, 0, NULL);
 }
 
-void PuyoGameWidget::setScreenToPaused(bool fromControls)
+void GameWidget::setScreenToPaused(bool fromControls)
 {
     if (associatedScreen != NULL)
         associatedScreen->setPaused(fromControls);
 }
 
-void PuyoGameWidget::setScreenToResumed(bool fromControls)
+void GameWidget::setScreenToResumed(bool fromControls)
 {
   if (associatedScreen != NULL)
     if (!fromControls)
       associatedScreen->getPauseMenu().backPressed(false);
 }
 
-void *PuyoGameWidget::styro_loadImage(StyrolyseClient *_this, const char *path)
+void *GameWidget::styro_loadImage(StyrolyseClient *_this, const char *path)
 {
   IosSurface *surface;
   IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
@@ -455,7 +455,7 @@ void *PuyoGameWidget::styro_loadImage(StyrolyseClient *_this, const char *path)
       .combine(path)));
   return surface;
 }
-void PuyoGameWidget::styro_drawImage(StyrolyseClient *_this,
+void GameWidget::styro_drawImage(StyrolyseClient *_this,
 			    void *image, int x, int y,
 			    int clipx, int clipy, int clipw, int cliph, int flipped)
 {
@@ -474,7 +474,7 @@ void PuyoGameWidget::styro_drawImage(StyrolyseClient *_this,
       ((StyrolysePainterClient *)_this)->m_painter->renderCopy(surf, NULL, &rect);
   else ((StyrolysePainterClient *)_this)->m_painter->renderCopyFlipped(surf, NULL, &rect);
 }
-void PuyoGameWidget::styro_freeImage(StyrolyseClient *_this, void *image)
+void GameWidget::styro_freeImage(StyrolyseClient *_this, void *image)
 {
   delete ((IosSurface *)image);
 }

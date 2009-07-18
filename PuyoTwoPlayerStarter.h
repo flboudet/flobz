@@ -35,9 +35,9 @@ public:
     virtual ~PuyoTwoNameProvider() {};
 };
 
-class PuyoTwoPlayersGameWidget : public PuyoGameWidget {
+class TwoPlayersGameWidget : public GameWidget {
 public:
-    PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String aiFace, Action *gameOverAction = NULL);
+    TwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String aiFace, Action *gameOverAction = NULL);
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
     StoryWidget *getOpponent();
@@ -51,23 +51,23 @@ private:
 };
 
 
-class PuyoGameWidgetFactory {
+class GameWidgetFactory {
 public:
-    virtual PuyoGameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String centerFace, Action *gameOverAction) = 0;
-    virtual ~PuyoGameWidgetFactory() {};
+    virtual GameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String centerFace, Action *gameOverAction) = 0;
+    virtual ~GameWidgetFactory() {};
 };
 
-class PuyoLocalTwoPlayerGameWidgetFactory : public PuyoGameWidgetFactory {
+class PuyoLocalTwoPlayerGameWidgetFactory : public GameWidgetFactory {
 public:
-    PuyoGameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String centerFace, Action *gameOverAction)
+    GameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
-        return new PuyoTwoPlayersGameWidget(puyoThemeSet, levelTheme, centerFace, gameOverAction);
+        return new TwoPlayersGameWidget(puyoThemeSet, levelTheme, centerFace, gameOverAction);
     }
 };
 
 class TwoPlayersStarterAction : public Action {
 public:
-    TwoPlayersStarterAction(int difficulty, PuyoGameWidgetFactory &gameWidgetFactory, PuyoTwoNameProvider *nameProvider = NULL);
+    TwoPlayersStarterAction(int difficulty, GameWidgetFactory &gameWidgetFactory, PuyoTwoNameProvider *nameProvider = NULL);
     /**
      * Implements the Action interface
      */
@@ -92,9 +92,9 @@ private:
     void endGameSession();
     State m_state;
     int difficulty;
-    PuyoGameWidgetFactory &gameWidgetFactory;
+    GameWidgetFactory &gameWidgetFactory;
     PuyoGameScreen *gameScreen;
-    PuyoGameWidget *gameWidget;
+    GameWidget *gameWidget;
     PuyoTwoNameProvider *nameProvider;
     StoryWidget *gameLostWidget;
 

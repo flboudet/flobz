@@ -43,7 +43,7 @@ private:
     int gameId;
 };
 
-class PuyoNetworkGameWidget : public PuyoGameWidget, MessageListener, ChatBoxDelegate {
+class PuyoNetworkGameWidget : public GameWidget, MessageListener, ChatBoxDelegate {
 public:
     PuyoNetworkGameWidget();
     void initWithGUI(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, ios_fc::IgpMessageBox *igpbox = NULL);

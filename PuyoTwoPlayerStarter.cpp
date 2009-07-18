@@ -25,7 +25,7 @@
 
 #include "PuyoTwoPlayerStarter.h"
 
-PuyoTwoPlayersGameWidget::PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String aiFace, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
+TwoPlayersGameWidget::TwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String aiFace, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
                                                      attachedRandom(5), attachedGameFactory(&attachedRandom),
                                                      areaA(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
                                                      1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE),
@@ -41,12 +41,12 @@ PuyoTwoPlayersGameWidget::PuyoTwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThe
     setLives(-1);
 }
 
-StoryWidget *PuyoTwoPlayersGameWidget::getOpponent()
+StoryWidget *TwoPlayersGameWidget::getOpponent()
 {
     return &opponentFace;
 }
 
-void PuyoTwoPlayersGameWidget::cycle()
+void TwoPlayersGameWidget::cycle()
 {
     opponentFace.setIntegerValue("@maxHeightLeft", attachedGameA->getColumnHeigth(2));
     opponentFace.setIntegerValue("@maxHeightRight", attachedGameB->getColumnHeigth(2));
@@ -54,10 +54,10 @@ void PuyoTwoPlayersGameWidget::cycle()
     opponentFace.setIntegerValue("@neutralsForRight", attachedGameB->getNeutralPuyos());
     opponentFace.setIntegerValue("@comboPhaseLeft", attachedGameA->getComboPhase());
     opponentFace.setIntegerValue("@comboPhaseRight", attachedGameB->getComboPhase());
-    PuyoGameWidget::cycle();
+    GameWidget::cycle();
 }
 
-TwoPlayersStarterAction::TwoPlayersStarterAction(int difficulty, PuyoGameWidgetFactory &gameWidgetFactory, PuyoTwoNameProvider *nameProvider)
+TwoPlayersStarterAction::TwoPlayersStarterAction(int difficulty, GameWidgetFactory &gameWidgetFactory, PuyoTwoNameProvider *nameProvider)
   : m_state(kNotRunning), difficulty(difficulty), gameWidgetFactory(gameWidgetFactory), gameScreen(NULL),
     nameProvider(nameProvider), gameLostWidget(NULL), currentLevelTheme(NULL), leftVictories(0), rightVictories(0),
     m_statsWidget(NULL), totalPointsPlayerOne_(0), totalPointsPlayerTwo_(0) {}
@@ -150,7 +150,7 @@ void TwoPlayersStarterAction::restartGame()
     AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
     currentLevelTheme = themeManager->getPuyoLevelTheme();
 
-    PuyoGameWidget *newGameWidget = gameWidgetFactory.createGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *currentLevelTheme, currentLevelTheme->getCentralAnimation2P(), this);
+    GameWidget *newGameWidget = gameWidgetFactory.createGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *currentLevelTheme, currentLevelTheme->getCentralAnimation2P(), this);
     PuyoGameScreen *newGameScreen = new PuyoGameScreen(*newGameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
     if (nameProvider != NULL) {
         newGameWidget->setPlayerOneName(nameProvider->getPlayer1Name());
