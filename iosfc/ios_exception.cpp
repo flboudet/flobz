@@ -14,7 +14,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifndef WIN32
 #include <execinfo.h>
+#endif
 #include <cxxabi.h>
 #include <signal.h>
 
@@ -29,10 +31,10 @@ namespace ios_fc {
         void *stack_addrs[max_depth];
         char **stack_strings;
         std::stringstream out;
-
+#ifndef WIN32
         stack_depth = backtrace(stack_addrs, max_depth);
         stack_strings = backtrace_symbols(stack_addrs, stack_depth);
-
+#endif
         out << "Call stack:\n";
 
         for (size_t i = 1; i < stack_depth; i++) {
@@ -116,6 +118,7 @@ namespace ios_fc {
         fprintf(stderr, "From:\n%s\n", stack.c_str());
     }
 
+#ifndef WIN32
     void signal_handler(int sig) {
         static volatile unsigned long _new = 0;
         if (_new)
@@ -143,8 +146,10 @@ namespace ios_fc {
                 break;
         }
     }
+#endif
 
     void catch_signals() {
+#ifndef WIN32
         /* Invalid memory reference */
         signal (SIGSEGV, signal_handler);
         /* Interrupt from keyboard */
@@ -159,6 +164,7 @@ namespace ios_fc {
         signal (SIGTERM, signal_handler);
         /* Illegal Instruction */
         signal (SIGILL, signal_handler);
+#endif
     }
 
     void reportCrash(const std::string &error) {

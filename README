@@ -38,6 +38,6 @@ Install all the SDL* dll somewhere (one "include" and one "lib" folder for all S
 Install the cross-compiler somewhere
 Then type the following lines in a terminal:
 export SDL_CONFIG=<path to your win32 mingw32 sdlconfig>
-./configure -prefix=/usr/local/i586-mingw32 --host=i586-mingw32msvc --build=i686-linux
+./configure -prefix=/usr/local/i586-mingw32 --host=i586-mingw32msvc
 *****************************************
 

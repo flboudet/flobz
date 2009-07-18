@@ -47,7 +47,7 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
 
 flobopuyo_CXXFLAGS = -I$(top_srcdir)/iosfc -I$(top_srcdir)/gametools -I$(top_srcdir)/goomsl $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 flobopuyo_OBJCFLAGS= $(SDL_CFLAGS)
-flobopuyo_LDADD = gametools/libgametools.la goomsl/libgoomsl.la iosfc/libiosfc.la $(SDL_LIBS)
+flobopuyo_LDADD = gametools/libgametools.la goomsl/libgoomsl.la iosfc/libiosfc.la
 
 # Graphic backend configuration
 if ENABLE_SDL12_GFX
@@ -57,6 +57,8 @@ endif
 if ENABLE_SDL13_GFX
 flobopuyo_LDADD+=gametools/sdl_drawcontext/libsdl13_drawcontext.la
 endif
+
+flobopuyo_LDADD+=$(SDL_LIBS)
 
 SUBDIRS = iosfc gametools goomsl data
 
