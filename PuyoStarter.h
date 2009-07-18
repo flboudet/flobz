@@ -33,7 +33,7 @@
 #include "PuyoIA.h"
 #include "PuyoCheatCodeManager.h"
 #include "PuyoPauseMenu.h"
-#include "PuyoGameWidget.h"
+#include "GameWidget.h"
 #include "PuyoCommander.h"
 #include "ios_messagebox.h"
 #include "AnimatedPuyoTheme.h"

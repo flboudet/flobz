@@ -21,7 +21,7 @@
  *
  */
 
-#include "PuyoGameWidget.h"
+#include "GameWidget.h"
 #include "PuyoCommander.h"
 #include "PuyoStarter.h"
 
