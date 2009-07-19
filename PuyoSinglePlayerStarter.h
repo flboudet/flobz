@@ -27,7 +27,7 @@
 
 #include "PuyoStarter.h"
 #include "HiScores.h"
-#include "PuyoStatsWidget.h"
+#include "StatsWidget.h"
 #include "goomsl/goomsl.h"
 #include "goomsl/goomsl_hash.h"
 #include <vector>
@@ -272,7 +272,7 @@ private:
     GameScreen *m_gameScreen;
     SinglePlayerGameWidget *m_gameWidget;
     StoryWidget *m_matchLostAnimation;
-    PuyoTwoPlayersStatsWidget *m_statsWidget;
+    TwoPlayersStatsWidget *m_statsWidget;
     PlayerGameStat &m_playerStat;
 };
 

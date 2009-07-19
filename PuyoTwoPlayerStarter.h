@@ -26,7 +26,7 @@
 #define _PUYOTWOPLAYERSTARTER
 
 #include "PuyoStarter.h"
-#include "PuyoStatsWidget.h"
+#include "StatsWidget.h"
 
 class PuyoTwoNameProvider {
 public:
@@ -100,7 +100,7 @@ private:
 
     PuyoLevelTheme *currentLevelTheme;
     int leftVictories, rightVictories;
-    PuyoTwoPlayersStatsWidget *m_statsWidget;
+    TwoPlayersStatsWidget *m_statsWidget;
     int totalPointsPlayerOne_, totalPointsPlayerTwo_;
 };
 

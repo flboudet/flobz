@@ -7,7 +7,7 @@ flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           PuyoView.cpp PuyoAnimations.cpp AnimatedPuyo.cpp PuyoIA.cpp \
           styrolyse.cpp PuyoStory.cpp ChatBox.cpp LocalizedDictionary.cpp \
           PuyoEventPlayer.cpp PauseMenu.cpp CheatCodeManager.cpp \
-          GameWidget.cpp PuyoStatsWidget.cpp \
+          GameWidget.cpp StatsWidget.cpp \
           PuyoStarter.cpp PuyoSinglePlayerStarter.cpp PuyoTwoPlayerStarter.cpp \
           LocalMenu.cpp OptionMenu.cpp ControlMenu.cpp \
           LevelThemeMenu.cpp ThemeMenu.cpp ScreenTransition.cpp \
@@ -34,7 +34,7 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            PuyoIgpDefs.h ScreenTransition.h \
            HallOfFame.h InternetGameCenter.h PuyoSinglePlayerStarter.h \
            HiScores.h InternetMenu.h PuyoInternetBot.h PuyoStarter.h \
-           LevelThemeMenu.h LanGameCenter.h PuyoStatsWidget.h \
+           LevelThemeMenu.h LanGameCenter.h StatsWidget.h \
            MainMenu.h LocalizedDictionary.h  PuyoStory.h \
            MainScreen.h LocalMenu.h PuyoStrings.h \
            PuyoAnimations.h PuyoMessageDef.h ThemeMenu.h \

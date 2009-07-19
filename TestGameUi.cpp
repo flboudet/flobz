@@ -12,7 +12,7 @@
 #include "FramedEditField.h"
 #include "IosImgProcess.h"
 #include "SwitchedButton.h"
-#include "PuyoStatsWidget.h"
+#include "StatsWidget.h"
 
 using namespace ios_fc;
 using namespace gameui;

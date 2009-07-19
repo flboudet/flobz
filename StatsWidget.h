@@ -1,5 +1,5 @@
 /*
- *  PuyoStatsWidget.h
+ *  StatsWidget.h
  *  flobopuyo
  *
  *  Created by Florent Boudet on 26/05/08.
@@ -15,7 +15,7 @@
 #include "Frame.h"
 #include "PuyoGameAbstract.h"
 
-enum PuyoStatsDirection {
+enum StatsDirection {
     RIGHT_TO_LEFT,
     LEFT_TO_RIGHT
 };
@@ -30,7 +30,7 @@ public:
     void setValue(float value, bool progressive = false);
     float getValue() const { return m_value; }
     void setVisible(bool visible);
-    void setDirection(PuyoStatsDirection dir);
+    void setDirection(StatsDirection dir);
     void setPositiveAttitude(bool positiveAttitude) { m_positiveAttitude = positiveAttitude; }
     void setColorIndex(int colorIndex) { m_colorIndex = colorIndex; }
     enum {
@@ -38,7 +38,7 @@ public:
         PROGRESSION_COMPLETE
     };
 private:
-    PuyoStatsDirection m_dir;
+    StatsDirection m_dir;
     float m_value, m_fromValue, m_targetValue;
     bool m_progressive;
     double m_targetBaseTime;
@@ -60,7 +60,7 @@ class StatsWidget : public gameui::VBox, gameui::Action, IdleComponent {
 public:
     StatsWidget(StatsFormat &statsFormat,
                     PlayerGameStat &stats, PlayerGameStat &opponentStats,
-                    const gameui::FramePicture *framePicture, PuyoStatsDirection dir,
+                    const gameui::FramePicture *framePicture, StatsDirection dir,
                     bool showGlobalScore = false,
                     gameui::Action *action = NULL);
     virtual ~StatsWidget() {}
@@ -70,19 +70,19 @@ public:
     virtual IdleComponent *getIdleComponent() { return this; }
     bool isWinner() const { return m_stats.is_winner; }
 private:
-    PuyoStatsDirection m_dir;
+    StatsDirection m_dir;
     bool m_showGlobalScore;
     gameui::Action *m_action;
     class ComboLine : public gameui::HBox, gameui::Action {
     public:
         ComboLine();
         virtual ~ComboLine() {}
-        void setComboLineInfos(PuyoStatsDirection dir, int tag, String comboText,
+        void setComboLineInfos(StatsDirection dir, int tag, String comboText,
                                int numberOfCombos, int vsNumberOfCombos,
                                int totalNumOfCombos, gameui::Action *progressionCompleteAction);
         virtual void action(Widget *sender, int actionType, GameControlEvent *event);
     private:
-        PuyoStatsDirection m_dir;
+        StatsDirection m_dir;
         int m_tag;
         gameui::Text m_comboLabel;
         Action *m_progressionCompleteAction;
@@ -100,10 +100,10 @@ private:
     SelfVector<Widget*> widgetAutoReleasePool;
 };
 
-class PuyoStatsLegendWidget : public gameui::Frame, public gameui::Action {
+class StatsLegendWidget : public gameui::Frame, public gameui::Action {
 public:
-  PuyoStatsLegendWidget(StatsFormat &statsFormat, StatsWidget &guideWidget, const gameui::FramePicture *framePicture);
-  virtual ~PuyoStatsLegendWidget() {}
+  StatsLegendWidget(StatsFormat &statsFormat, StatsWidget &guideWidget, const gameui::FramePicture *framePicture);
+  virtual ~StatsLegendWidget() {}
   virtual void onWidgetVisibleChanged(bool visible);
   virtual void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
@@ -131,12 +131,12 @@ class StatsResources {
         ~StatsResources();
 };
 
-class PuyoTwoPlayersStatsWidget : public gameui::ZBox, gameui::SliderContainerListener {
+class TwoPlayersStatsWidget : public gameui::ZBox, gameui::SliderContainerListener {
 public:
-    PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats,
+    TwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats,
                               bool showLeftGlobalScore, bool showRightGlobalScore,
                               const gameui::FramePicture *framePicture);
-    virtual ~PuyoTwoPlayersStatsWidget() {}
+    virtual ~TwoPlayersStatsWidget() {}
     virtual void onWidgetVisibleChanged(bool visible);
     /**
      * Notified when the slider is inside the screen, at the end of its sliding movement
@@ -146,7 +146,7 @@ private:
     StatsResources m_res;
     StatsFormat m_statsFormat;
     gameui::SliderContainer m_leftSlider, m_rightSlider, m_legendSlider;
-    PuyoStatsLegendWidget m_legend;
+    StatsLegendWidget m_legend;
     StatsWidget m_leftStats, m_rightStats;
     SelfVector<Widget*> widgetAutoReleasePool;
 };

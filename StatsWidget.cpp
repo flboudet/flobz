@@ -7,7 +7,7 @@
  *
  */
 
-#include "PuyoStatsWidget.h"
+#include "StatsWidget.h"
 #include "PuyoCommander.h"
 
 #define LINE_DURATION 0.8
@@ -196,7 +196,7 @@ void ProgressBarWidget::setValue(float value, bool progressive)
     }
 }
 
-void ProgressBarWidget::setDirection(PuyoStatsDirection dir)
+void ProgressBarWidget::setDirection(StatsDirection dir)
 {
    m_dir = dir;
 }
@@ -221,7 +221,7 @@ StatsFormat::StatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &playerBSt
 
 StatsWidget::StatsWidget(StatsFormat &statsFormat,
                                  PlayerGameStat &stats, PlayerGameStat &opponentStats,
-                                 const gameui::FramePicture *framePicture, PuyoStatsDirection dir,
+                                 const gameui::FramePicture *framePicture, StatsDirection dir,
                                  bool showGlobalScore,
                                  gameui::Action *action)
   : m_dir(dir), m_showGlobalScore(showGlobalScore),
@@ -330,7 +330,7 @@ StatsWidget::ComboLine::ComboLine()
     //add(&m_comboLabel);
 }
 
-void StatsWidget::ComboLine::setComboLineInfos(PuyoStatsDirection dir, int tag, String comboText,
+void StatsWidget::ComboLine::setComboLineInfos(StatsDirection dir, int tag, String comboText,
                                                    int numberOfCombos, int vsNumberOfCombos,
                                                    int totalNumOfCombos, Action *progressionCompleteAction)
 {
@@ -391,7 +391,7 @@ void StatsWidget::ComboLine::action(Widget *sender, int actionType, GameControlE
     }
 }
 
-PuyoStatsLegendWidget::PuyoStatsLegendWidget(StatsFormat &statsFormat, StatsWidget &guideWidget, const gameui::FramePicture *framePicture)
+StatsLegendWidget::StatsLegendWidget(StatsFormat &statsFormat, StatsWidget &guideWidget, const gameui::FramePicture *framePicture)
   : Frame(framePicture), m_statsImage(), m_statsFormat(statsFormat), m_guideWidget(guideWidget)
 {
     setPolicy(USE_MIN_SIZE);
@@ -413,7 +413,7 @@ PuyoStatsLegendWidget::PuyoStatsLegendWidget(StatsFormat &statsFormat, StatsWidg
     add(&m_bottomSeparator);
 }
 
-void PuyoStatsLegendWidget::onWidgetVisibleChanged(bool visible)
+void StatsLegendWidget::onWidgetVisibleChanged(bool visible)
 {
   // Set the size of the different rows
   for (int i = 0 ; i < this->getNumberOfChilds() - 1 ; i++) {
@@ -425,13 +425,13 @@ void PuyoStatsLegendWidget::onWidgetVisibleChanged(bool visible)
   getChild(0)->setPreferedSize(Vec3(0, getChild(0)->getPreferedSize().y + m_guideWidget.getChild(0)->getSize().y + 10));
 }
 
-void PuyoStatsLegendWidget::action(Widget *sender, int actionType, GameControlEvent *event)
+void StatsLegendWidget::action(Widget *sender, int actionType, GameControlEvent *event)
 {
     if (actionType < MAX_DISPLAYED_COMBOS)
         m_legendSlider[actionType].transitionToContent(&m_legendCell[actionType]);
 }
 
-PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats,
+TwoPlayersStatsWidget::TwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats,
                                                      bool showLeftGlobalScore, bool showRightGlobalScore,
                                                      const gameui::FramePicture *framePicture)
   : m_statsFormat(leftPlayerStats, rightPlayerStats),
@@ -489,7 +489,7 @@ PuyoTwoPlayersStatsWidget::PuyoTwoPlayersStatsWidget(PlayerGameStat &leftPlayerS
     widgetAutoReleasePool.add(f3);
 }
 
-void PuyoTwoPlayersStatsWidget::onWidgetVisibleChanged(bool visible)
+void TwoPlayersStatsWidget::onWidgetVisibleChanged(bool visible)
 {
     m_leftSlider.setSlideSide(SliderContainer::SLIDE_FROM_LEFT);
     m_rightSlider.setSlideSide(SliderContainer::SLIDE_FROM_RIGHT);
@@ -501,7 +501,7 @@ void PuyoTwoPlayersStatsWidget::onWidgetVisibleChanged(bool visible)
     m_rightSlider.setBackground(m_rightStats.isWinner() ? ::res->stats_bg_winner : ::res->stats_bg_loser);
 }
 
-void PuyoTwoPlayersStatsWidget::onSlideInside(SliderContainer &slider)
+void TwoPlayersStatsWidget::onSlideInside(SliderContainer &slider)
 {
     if (&slider == &m_leftSlider)
         m_leftStats.startAnimation();
