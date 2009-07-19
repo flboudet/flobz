@@ -26,7 +26,6 @@
 #ifndef _PUYOVIEW
 #define _PUYOVIEW
 
-#include "glSDL.h"
 #include "PuyoGame.h"
 #include "IosImgProcess.h"
 #include "PuyoAnimations.h"

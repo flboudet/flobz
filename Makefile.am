@@ -31,7 +31,7 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            AnimatedPuyoTheme.h PuyoGame.h PauseMenu.h \
            audio.h GameWidget.h PuyoPlayer.h \
            PuyoIA.h PuyoScoring.h PuyoMain.h \
-           glSDL.h PuyoIgpDefs.h ScreenTransition.h \
+           PuyoIgpDefs.h ScreenTransition.h \
            HallOfFame.h InternetGameCenter.h PuyoSinglePlayerStarter.h \
            HiScores.h InternetMenu.h PuyoInternetBot.h PuyoStarter.h \
            LevelThemeMenu.h LanGameCenter.h PuyoStatsWidget.h \

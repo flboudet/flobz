@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #include "PuyoGame.h"
 #include "audio.h"
-#include "glSDL.h"
 #include "preferences.h"
 #include "mt19937ar.h"
 
@@ -90,14 +89,14 @@ String PuyoGame::getDefaultPlayerName(int n)
     {
       defaultName = getenv("USERNAME");
       if ((defaultName == NULL) || (defaultName[0]<32))
-      {            
+      {
         sprintf(defaultName,"Kaori");
       }
     }
-    
+
     strncpy(defaultPlayerName,defaultName,255);
     defaultPlayerName[255]=0;
-    
+
     if ((defaultPlayerName[0]>='a') && (defaultPlayerName[0]<='z'))
     {
       defaultPlayerName[0] += 'A' - 'a';
@@ -120,7 +119,7 @@ String PuyoGame::getDefaultPlayerKey(int n)
 void PuyoGame::setDefaultPlayerName(int n, const char * playerName)
 {
   static char playerKey[50];
-  sprintf(playerKey,"Game.Player.Name.%d",n);  
+  sprintf(playerKey,"Game.Player.Name.%d",n);
   SetStrPreference(playerKey, playerName);
 }
 
@@ -156,7 +155,7 @@ void PuyoLocalGame::InitGame(PuyoRandomSystem *attachedRandom)
     sequenceNr = 0;
     semiMove = 0;
     neutralPuyos = 0;
-    
+
     endOfCycle = false;
     gameRunning = true;
     setFallingAtTop(true);
@@ -176,7 +175,7 @@ void PuyoLocalGame::cycle()
 {
     if (!gameRunning)
         return;
-    
+
     semiMove = 1 - semiMove;
     if (semiMove == 0) {
         if ((!endOfCycle) && (delegate != NULL)) {
@@ -333,12 +332,12 @@ void PuyoLocalGame::rotate(bool left)
         }
     else
         fallingCompanion = newCompanion;
-    
+
     companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
-    
+
     if ((delegate != NULL) && (moved))
         delegate->companionDidTurn(companionPuyo, fallingPuyo, !left);
-    
+
 }
 
 void PuyoLocalGame::rotateLeft()
@@ -748,9 +747,9 @@ void PuyoLocalGame::cycleEnding()
         ++gameStat.combo_count[phase];
         phase++;
     }
-  
+
     gameStat.points += gameLevel * 100 + gameLevel * (phase>0?phase-1:0) * 5000;
-  
+
     neutralPuyos -= score;
     gameStat.ghost_sent_count += score;
 

@@ -14,7 +14,6 @@
 #include "PuyoCommander.h"
 
 #ifdef USE_AUDIO
-#include "glSDL.h"
 static bool   audio_supported = false;
 static int    audio_rate;
 static Uint16 audio_format;
