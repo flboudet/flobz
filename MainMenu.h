@@ -14,7 +14,7 @@
 #include "OptionMenu.h"
 #include "PuyoLocalMenu.h"
 #ifdef ENABLE_NETWORK
-#include "PuyoNetworkMenu.h"
+#include "NetworkMenu.h"
 #endif
 
 /*

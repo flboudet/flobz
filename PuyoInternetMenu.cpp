@@ -26,7 +26,7 @@
 #include "PuyoInternetMenu.h"
 #include "preferences.h"
 #include "PuyoInternetGameCenter.h"
-#include "PuyoNetCenterMenu.h"
+#include "NetCenterMenu.h"
 #include "audio.h"
 
 using namespace std;

@@ -97,9 +97,9 @@ private:
     StoryWidget *overlayStory;
 };
 
-class PuyoTwoPlayerGameWidget : public GameWidget {
+class TwoPlayerGameWidget : public GameWidget {
 public:
-    PuyoTwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction = NULL);
+    TwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction = NULL);
 private:
     AnimatedPuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;

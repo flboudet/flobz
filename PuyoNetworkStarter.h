@@ -29,7 +29,7 @@
 #include "PuyoSinglePlayerStarter.h"
 #include "ios_messagebox.h"
 #include "PuyoNetworkView.h"
-#include "PuyoNetCenterMenu.h"
+#include "NetCenterMenu.h"
 #include "PuyoChatBox.h"
 
 class PuyoNetworkGameFactory : public PuyoGameFactory {

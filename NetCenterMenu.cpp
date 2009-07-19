@@ -23,7 +23,7 @@
  *
  */
 
-#include "PuyoNetCenterMenu.h"
+#include "NetCenterMenu.h"
 #include "PuyoTwoPlayerStarter.h"
 #include "PuyoNetworkStarter.h"
 #include "ios_time.h"

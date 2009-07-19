@@ -23,10 +23,10 @@
  *
  */
 
-#include "PuyoNetworkMenu.h"
+#include "NetworkMenu.h"
 #include "PuyoLanGameCenter.h"
 #include "preferences.h"
-#include "PuyoNetCenterMenu.h"
+#include "NetCenterMenu.h"
 #include "audio.h"
 
 
@@ -38,7 +38,7 @@ class PushLanNetCenterMenuAction : public Action
 public:
     PushLanNetCenterMenuAction(MainScreen * mainScreen, EditField *serverPort, EditField *userName)
         : mainScreen(mainScreen), serverPort(serverPort), userName(userName) {}
-    
+
     void action()
     {
         PuyoLanGameCenter *gameCenter = new PuyoLanGameCenter(atoi(serverPort->getValue()), userName->getValue());
