@@ -30,9 +30,9 @@
 
 using namespace ios_fc;
 
-class PuyoDataPathManager {
+class DataPathManager {
 public:
-    PuyoDataPathManager(String coreDataPath);
+    DataPathManager(String coreDataPath);
     String getPath(String shortPath) const;
     String getPathInPack(String shortPath, int packPathIndex) const { return m_dataPaths[packPathIndex].combine(shortPath); }
     int getNumPacks() const { return m_dataPaths.size(); }

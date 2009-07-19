@@ -24,7 +24,7 @@
  */
 
 
-#include "PuyoChatBox.h"
+#include "ChatBox.h"
 #include "PuyoCommander.h"
 
 using namespace ios_fc;

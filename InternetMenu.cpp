@@ -23,7 +23,7 @@
  *
  */
 
-#include "PuyoInternetMenu.h"
+#include "InternetMenu.h"
 #include "preferences.h"
 #include "PuyoInternetGameCenter.h"
 #include "NetCenterMenu.h"

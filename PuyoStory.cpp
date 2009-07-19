@@ -138,7 +138,7 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
     : IdleComponent(), localeDictionary(NULL), finishedAction(finishedAction), once(false), last_time(-1.), fxMode(fxMode)
 {
     try {
-        localeDictionary = new PuyoLocalizedDictionary(theCommander->getDataPathManager(), "locale/story", screenName);
+        localeDictionary = new LocalizedDictionary(theCommander->getDataPathManager(), "locale/story", screenName);
     } catch (...) {}
 
     if (!classInitialized) {

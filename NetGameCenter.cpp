@@ -24,12 +24,12 @@
  */
  
 
-#include "PuyoNetGameCenter.h"
+#include "NetGameCenter.h"
 #include "ios_time.h"
 
 using namespace ios_fc;
 
-class PuyoNetGameCenter::GamerPeer {
+class NetGameCenter::GamerPeer {
 public:
     GamerPeer(String name, PeerAddress address, int status = PEER_NORMAL, int rank = -1) :
         name(name), address(address), status(status), rank(rank) {}
@@ -39,7 +39,7 @@ public:
     int rank;
 };
 
-class PuyoNetGameCenter::PendingGame {
+class NetGameCenter::PendingGame {
 public:
     PendingGame(GamerPeer *peer, PuyoGameInvitation &invitation) : peer(peer), invitation(invitation), initiateTime(getTimeMs()) {}
     GamerPeer *peer;
@@ -47,7 +47,7 @@ public:
     double initiateTime;
 };
 
-void PuyoNetGameCenter::idle()
+void NetGameCenter::idle()
 {
     double time_ms = getTimeMs();
     for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
@@ -62,7 +62,7 @@ void PuyoNetGameCenter::idle()
     }
 }
 
-void PuyoNetGameCenter::connectPeer(PeerAddress addr, const String name, int status, int rank)
+void NetGameCenter::connectPeer(PeerAddress addr, const String name, int status, int rank)
 {
     //printf("%s vient de se connecter!\n", (const char *)name);
     for (int i = 0, j = peers.size() ; i < j ; i++) {
@@ -84,7 +84,7 @@ void PuyoNetGameCenter::connectPeer(PeerAddress addr, const String name, int sta
     }
 }
 
-void PuyoNetGameCenter::disconnectPeer(PeerAddress addr, const String name)
+void NetGameCenter::disconnectPeer(PeerAddress addr, const String name)
 {
     //printf("%s vient de se deconnecter! (parait il)\n", (const char *)name);
     for (int i = 0, j = peers.size() ; i < j ; i++) {
@@ -113,17 +113,17 @@ void PuyoNetGameCenter::disconnectPeer(PeerAddress addr, const String name)
     //printf("Pas de peer trouve au nom %s\n", (const char *)name);
 }
 
-String PuyoNetGameCenter::getPeerNameAtIndex(int i) const
+String NetGameCenter::getPeerNameAtIndex(int i) const
 {
     return peers[i]->name;
 }
 
-PeerAddress PuyoNetGameCenter::getPeerAddressAtIndex(int i) const
+PeerAddress NetGameCenter::getPeerAddressAtIndex(int i) const
 {
     return peers[i]->address;
 }
 
-PeerAddress PuyoNetGameCenter::getPeerAddressForPeerName(String peerName) const
+PeerAddress NetGameCenter::getPeerAddressForPeerName(String peerName) const
 {
     int i;
     for (i = 0 ; i < peers.size() ; i++) {
@@ -134,7 +134,7 @@ PeerAddress PuyoNetGameCenter::getPeerAddressForPeerName(String peerName) const
     return peers[i]->address;
 }
 
-PuyoPeerInfo PuyoNetGameCenter::getPeerInfoForAddress(PeerAddress &addr) const
+PuyoPeerInfo NetGameCenter::getPeerInfoForAddress(PeerAddress &addr) const
 {
     PuyoPeerInfo info;
     info.status = 0;
@@ -149,7 +149,7 @@ PuyoPeerInfo PuyoNetGameCenter::getPeerInfoForAddress(PeerAddress &addr) const
     return info;
 }
 
-int PuyoNetGameCenter::getPeerStatusForAddress(PeerAddress &addr) const
+int NetGameCenter::getPeerStatusForAddress(PeerAddress &addr) const
 {
     for (int i = 0 ; i < peers.size() ; i++) {
         if (peers[i]->address == addr)
@@ -158,12 +158,12 @@ int PuyoNetGameCenter::getPeerStatusForAddress(PeerAddress &addr) const
     return 0;
 }
 
-int PuyoNetGameCenter::getPeerCount() const
+int NetGameCenter::getPeerCount() const
 {
     return peers.size();
 }
 
-void PuyoNetGameCenter::requestGame(PuyoGameInvitation &invitation)
+void NetGameCenter::requestGame(PuyoGameInvitation &invitation)
 {
     GamerPeer *myPeer = getPeerForAddress(invitation.opponentAddress);
     if (myPeer != NULL) {
@@ -178,14 +178,14 @@ void PuyoNetGameCenter::requestGame(PuyoGameInvitation &invitation)
     }
 }
 
-void PuyoNetGameCenter::acceptGameInvitation(PuyoGameInvitation &invitation)
+void NetGameCenter::acceptGameInvitation(PuyoGameInvitation &invitation)
 {
     GamerPeer *myPeer = getPeerForAddress(invitation.opponentAddress);
     if (myPeer != NULL)
         sendGameAcceptInvitation(invitation);
 }
 
-void PuyoNetGameCenter::cancelGameInvitation(PuyoGameInvitation &invitation)
+void NetGameCenter::cancelGameInvitation(PuyoGameInvitation &invitation)
 {
     GamerPeer *myPeer = getPeerForAddress(invitation.opponentAddress);
     if (myPeer != NULL) {
@@ -199,7 +199,7 @@ void PuyoNetGameCenter::cancelGameInvitation(PuyoGameInvitation &invitation)
     }
 }
 
-void PuyoNetGameCenter::receivedGameInvitation(PuyoGameInvitation &invitation)
+void NetGameCenter::receivedGameInvitation(PuyoGameInvitation &invitation)
 {
     // Retrieving the peer
     GamerPeer *peer = getPeerForAddress(invitation.opponentAddress);
@@ -218,7 +218,7 @@ void PuyoNetGameCenter::receivedGameInvitation(PuyoGameInvitation &invitation)
     }
 }
 
-void PuyoNetGameCenter::receivedGameCanceledWithPeer(String playerName, PeerAddress addr)
+void NetGameCenter::receivedGameCanceledWithPeer(String playerName, PeerAddress addr)
 {
     // Retrieving the peer
     GamerPeer *peer = getPeerForAddress(addr);
@@ -237,7 +237,7 @@ void PuyoNetGameCenter::receivedGameCanceledWithPeer(String playerName, PeerAddr
     }
 }
 
-PuyoNetGameCenter::GamerPeer *PuyoNetGameCenter::getPeerForAddress(PeerAddress addr)
+NetGameCenter::GamerPeer *NetGameCenter::getPeerForAddress(PeerAddress addr)
 {
     for (int i = 0 ; i < peers.size() ; i++) {
         if (peers[i]->address == addr) {

@@ -23,9 +23,9 @@
  *
  */
 
-#include "PuyoNatTraversal.h"
+#include "NatTraversal.h"
 
-PuyoNatTraversal::PuyoNatTraversal(UDPMessageBox &udpmbox, double punchInfoTimeout, double strategyTimeout)
+NatTraversal::NatTraversal(UDPMessageBox &udpmbox, double punchInfoTimeout, double strategyTimeout)
   : udpmbox(udpmbox), igpmbox(new IgpMessageBox(udpmbox)), currentStrategy(TRY_NONE), punchInfoTimeout(punchInfoTimeout), strategyTimeout(strategyTimeout), receivedGarbage(0), udpSocketAddress("127.0.0.1"), igpServerSocketAddress(udpmbox.getDatagramSocket()->getConnectedAddress()), igpServerPortNum(udpmbox.getDatagramSocket()->getConnectedPortNum())
 {
     igpmbox->addListener(this);
@@ -33,7 +33,7 @@ PuyoNatTraversal::PuyoNatTraversal(UDPMessageBox &udpmbox, double punchInfoTimeo
     //printf("GetSocketPortNum(): %d\n", mbox->getDatagramSocket()->getSocketPortNum());
 }
 
-PuyoNatTraversal::~PuyoNatTraversal()
+NatTraversal::~NatTraversal()
 {
     if (igpmbox != NULL) {
         delete igpmbox;
@@ -42,7 +42,7 @@ PuyoNatTraversal::~PuyoNatTraversal()
     udpmbox.removeListener(this);
 }
 
-void PuyoNatTraversal::punch(const String punchPoolName)
+void NatTraversal::punch(const String punchPoolName)
 {
     this->punchPoolName = punchPoolName;
     int prevBound = igpmbox->getBound();
@@ -63,7 +63,7 @@ void PuyoNatTraversal::punch(const String punchPoolName)
     gettingPunchInfo = true;
 }
 
-void PuyoNatTraversal::idle()
+void NatTraversal::idle()
 {
     //printf("En ce moment, je suis associee au port %d\n", udpmbox.getDatagramSocket()->getSocketPortNum());
     double currentTime = getTimeMs();
@@ -134,7 +134,7 @@ void PuyoNatTraversal::idle()
     }
 }
 
-void PuyoNatTraversal::onMessage(Message &msg)
+void NatTraversal::onMessage(Message &msg)
 {
     if (! msg.hasInt("CMD"))
         return;
@@ -183,7 +183,7 @@ void PuyoNatTraversal::onMessage(Message &msg)
     }
 }
 
-void PuyoNatTraversal::sendGarbageMessage()
+void NatTraversal::sendGarbageMessage()
 {
     if (udpPeerAddress == udpmbox.createPeerAddress(udpmbox.getSocketAddress(), udpmbox.getDatagramSocket()->getSocketPortNum()))
         printf("Envoi de messages a moi-meme!!!!!");
@@ -208,7 +208,7 @@ void PuyoNatTraversal::sendGarbageMessage()
       udpmbox.getDatagramSocket()->connect(igpServerSocketAddress, igpServerPortNum);
 }
 
-void PuyoNatTraversal::sendSyncMessage()
+void NatTraversal::sendSyncMessage()
 {
     printf("send SYNC\n");
     //udpmbox.getDatagramSocket()->connect(igpServerSocketAddress, igpServerPortNum);

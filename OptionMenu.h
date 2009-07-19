@@ -28,7 +28,7 @@
 
 #include "gameui.h"
 #include "PuyoCommander.h"
-#include "PuyoThemeMenu.h"
+#include "ThemeMenu.h"
 #include "LevelThemeMenu.h"
 #include "PuyoControlMenu.h"
 #include "SwitchedButton.h"
@@ -62,7 +62,7 @@ private:
     MusicPrefSwitch musicButton;
     FSPrefSwitch fullScreenButton;
     ControlMenu controlMenu;
-    PuyoThemeMenu themeMenu;
+    ThemeMenu themeMenu;
     LevelThemeMenu levelMenu;
     PuyoPushMenuAction changeThemeAction, changeLevelAction, changeControlsAction;
     Button changePuyoThemeButton;

@@ -183,12 +183,12 @@ void NetCenterPlayerList::PlayerSelectedAction::action()
 
 class SayAction : public Action {
 public:
-    SayAction(PuyoNetGameCenter *netCenter, Text *message) : netCenter(netCenter), message(message) {}
+    SayAction(NetGameCenter *netCenter, Text *message) : netCenter(netCenter), message(message) {}
     void action() {
       netCenter->sendMessage(message->getValue());
     }
 private:
-    PuyoNetGameCenter *netCenter;
+    NetGameCenter *netCenter;
     Text *message;
 };
 
@@ -202,7 +202,7 @@ String NetCenterTwoNameProvider::getPlayer2Name() const
     return netCenter.getOpponentName();
 }
 
-NetCenterMenu::NetCenterMenu(MainScreen *mainScreen, PuyoNetGameCenter *netCenter,
+NetCenterMenu::NetCenterMenu(MainScreen *mainScreen, NetGameCenter *netCenter,
                              String title, GameLoop *loop)
     : MainScreenMenu(mainScreen, loop),
       topFrame(theCommander->getWindowFramePicture()),

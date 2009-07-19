@@ -30,13 +30,13 @@
 #include "OptionMenu.h"
 
 /**
- * The class PuyoPauseMenu implements the ingame pause menu shown
+ * The class PauseMenu implements the ingame pause menu shown
  * when the player presses the pause button (usually esc)
  */
-class PuyoPauseMenu : public VBox, public Action, public SliderContainerListener {
+class PauseMenu : public VBox, public Action, public SliderContainerListener {
 public:
-    PuyoPauseMenu(Action *pauseAction);
-    virtual ~PuyoPauseMenu();
+    PauseMenu(Action *pauseAction);
+    virtual ~PauseMenu();
     int pauseMenuTop, pauseMenuLeft;
     void backPressed(bool fromControls = true);
     // Action handler

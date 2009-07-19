@@ -28,12 +28,12 @@
 
 #include "ios_igpmessagebox.h"
 #include "ios_udpmessagebox.h"
-#include "PuyoNetGameCenter.h"
-#include "PuyoNatTraversal.h"
+#include "NetGameCenter.h"
+#include "NatTraversal.h"
 
 using namespace ios_fc;
 
-class PuyoInternetGameCenter : public PuyoNetGameCenter, public MessageListener {
+class PuyoInternetGameCenter : public NetGameCenter, public MessageListener {
 public:
     PuyoInternetGameCenter(const String hostName, int portNum, const String name, const String password);
     void sendMessage(const String msgText);
@@ -63,7 +63,7 @@ private:
     int portNum;
     IgpMessageBox mbox;
     UDPMessageBox *p2pmbox;
-    PuyoNatTraversal *p2pNatTraversal;
+    NatTraversal *p2pNatTraversal;
     String p2pPunchName;
     bool tryNatTraversal;
     const String name;

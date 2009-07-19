@@ -23,11 +23,11 @@
  *
  */
 
-#include "PuyoCheatCodeManager.h"
+#include "CheatCodeManager.h"
 
 using namespace gameui;
 
-void PuyoCheatCodeManager::eventOccured(GameControlEvent *event)
+void CheatCodeManager::eventOccured(GameControlEvent *event)
 {
     if (event->sdl_event.type != SDL_KEYDOWN)
         return;

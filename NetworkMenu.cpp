@@ -24,7 +24,7 @@
  */
 
 #include "NetworkMenu.h"
-#include "PuyoLanGameCenter.h"
+#include "LanGameCenter.h"
 #include "preferences.h"
 #include "NetCenterMenu.h"
 #include "audio.h"
@@ -41,7 +41,7 @@ public:
 
     void action()
     {
-        PuyoLanGameCenter *gameCenter = new PuyoLanGameCenter(atoi(serverPort->getValue()), userName->getValue());
+        LanGameCenter *gameCenter = new LanGameCenter(atoi(serverPort->getValue()), userName->getValue());
         NetCenterMenu *newNetCenterMenu =
 	  new NetCenterMenu(mainScreen, gameCenter,
 			    theCommander->getLocalizedString("LAN Game Center"));

@@ -27,7 +27,7 @@
 #include "gameui.h"
 #include "PuyoGame.h"
 #include "PuyoPlayer.h"
-#include "PuyoCheatCodeManager.h"
+#include "CheatCodeManager.h"
 #include "AnimatedPuyoTheme.h"
 #include "PuyoStory.h"
 

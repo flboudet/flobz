@@ -23,23 +23,28 @@
  *
  */
 
-#ifndef _PUYO_CHEAT_CODE_MANAGER_H
-#define _PUYO_CHEAT_CODE_MANAGER_H
+#ifndef _PUYOLOCALIZEDDICTIONARY
+#define _PUYOLOCALIZEDDICTIONARY
 
-#include "gameui.h"
-#include "GameControls.h"
+#include "ios_hash.h"
+#include "DataPathManager.h"
 
-class PuyoCheatCodeManager : public gameui::Widget {
+using namespace ios_fc;
+
+class LocalizedDictionary {
 public:
-    PuyoCheatCodeManager(String cheatCode, gameui::Action *cheatAction)
-      : cheatCode(cheatCode), cheatAction(cheatAction), cheatCodeLength(cheatCode.length()), currentPosition(0) {}
-    void eventOccured(GameControlEvent *event);
+    LocalizedDictionary(const DataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName);
+    const char * getLocalizedString(const char * originalString,  bool copyIfNotThere = false);
+    ~LocalizedDictionary();
 private:
-    String cheatCode;
-    gameui::Action *cheatAction;
-    int cheatCodeLength;
-    int currentPosition;
+    void * dictionary;
+    String stdName;
+    const DataPathManager &datapathManager;
 };
 
-#endif // _PUYO_CHEAT_CODE_MANAGER_H
+void Locales_Init();
+extern char *PreferedLocales[];
+extern int PreferedLocalesCount;
+
+#endif // _PUYOLOCALIZEDDICTIONARY
 

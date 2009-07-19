@@ -23,7 +23,7 @@
  *
  */
 
-#include "PuyoLanGameCenter.h"
+#include "LanGameCenter.h"
 #include "ios_time.h"
 
 #define MULTICASTGROUP "224.0.0.247"
@@ -39,7 +39,7 @@ enum {
     PUYO_UDP_GAME_CANCEL
 };
 
-PuyoLanGameCenter::PuyoLanGameCenter(int portNum, const String name)
+LanGameCenter::LanGameCenter(int portNum, const String name)
     : socket(portNum), mbox(&socket), name(name),
       timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages),
       timeMsBetweenTwoNetworkInterfacesDetection(10000.), lastNetworkInterfacesDetection(getTimeMs()),
@@ -54,12 +54,12 @@ PuyoLanGameCenter::PuyoLanGameCenter(int portNum, const String name)
     sendAliveMessage();
 }
 
-PuyoLanGameCenter::~PuyoLanGameCenter()
+LanGameCenter::~LanGameCenter()
 {
     sendDisconnectMessage();
 }
 
-void PuyoLanGameCenter::onMessage(Message &msg)
+void LanGameCenter::onMessage(Message &msg)
 {
     try {
       if (!msg.hasInt("CMD"))
@@ -72,13 +72,13 @@ void PuyoLanGameCenter::onMessage(Message &msg)
 	break;
       case PUYO_UDP_ALIVE: {
 	  Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-	  PuyoNetGameCenter::connectPeer(dir.getPeerAddress(), msg.getString("NAME"), msg.getInt("STATUS"));
+	  NetGameCenter::connectPeer(dir.getPeerAddress(), msg.getString("NAME"), msg.getInt("STATUS"));
         }
 	break;
       case PUYO_UDP_DISCONNECT: {
           Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
           //printf("Message de deconnexion recu de %s...\n", (const char *)(msg.getString("NAME")));
-          PuyoNetGameCenter::disconnectPeer(dir.getPeerAddress(), msg.getString("NAME"));
+          NetGameCenter::disconnectPeer(dir.getPeerAddress(), msg.getString("NAME"));
       }
 	break;
         case PUYO_UDP_GAME_REQUEST: {
@@ -117,12 +117,12 @@ void PuyoLanGameCenter::onMessage(Message &msg)
     }
 }
 
-void PuyoLanGameCenter::onPeerDisconnect(const PeerAddress &address)
+void LanGameCenter::onPeerDisconnect(const PeerAddress &address)
 {
   disconnectPeer(address, String("Unknown"));
 }
 
-void PuyoLanGameCenter::sendMessage(const String msgText)
+void LanGameCenter::sendMessage(const String msgText)
 {
   for (int i = 0, j = getPeerCount() ; i < j ; i++) {
     Message *msg = mbox.createMessage();
@@ -138,7 +138,7 @@ void PuyoLanGameCenter::sendMessage(const String msgText)
   }
 }
 
-void PuyoLanGameCenter::idle()
+void LanGameCenter::idle()
 {
     if (gameGranted) {
       grantGame(grantedInvitation);
@@ -155,26 +155,26 @@ void PuyoLanGameCenter::idle()
         networkInterfaces = requester.getInterfaces();
         lastNetworkInterfacesDetection = time_ms;
     }
-    PuyoNetGameCenter::idle();
+    NetGameCenter::idle();
 }
 
-void PuyoLanGameCenter::setStatus(int status)
+void LanGameCenter::setStatus(int status)
 {
     this->status = status;
     sendAliveMessage();
 }
 
-String PuyoLanGameCenter::getSelfName()
+String LanGameCenter::getSelfName()
 {
     return name;
 }
 
-String PuyoLanGameCenter::getOpponentName()
+String LanGameCenter::getOpponentName()
 {
     return opponentName;
 }
 
-void PuyoLanGameCenter::sendAliveMessage()
+void LanGameCenter::sendAliveMessage()
 {
     try {
         for (unsigned int i = 0 ; i < networkInterfaces.size() ; i++) {
@@ -200,7 +200,7 @@ void PuyoLanGameCenter::sendAliveMessage()
     }
 }
 
-void PuyoLanGameCenter::sendDisconnectMessage()
+void LanGameCenter::sendDisconnectMessage()
 {
     for (int i = 0 ; i < networkInterfaces.size() ; i++) {
         NetworkInterface &ifs = networkInterfaces[i];
@@ -219,7 +219,7 @@ void PuyoLanGameCenter::sendDisconnectMessage()
     }
 }
 
-void PuyoLanGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
+void LanGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
 {
   opponentName = invitation.opponentName;
   Message *msg = mbox.createMessage();
@@ -237,7 +237,7 @@ void PuyoLanGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
   grantedInvitation = invitation;
 }
 
-void PuyoLanGameCenter::sendGameAcceptInvitation(PuyoGameInvitation &invitation)
+void LanGameCenter::sendGameAcceptInvitation(PuyoGameInvitation &invitation)
 {
   opponentName = invitation.opponentName;
   Message *msg = mbox.createMessage();
@@ -254,7 +254,7 @@ void PuyoLanGameCenter::sendGameAcceptInvitation(PuyoGameInvitation &invitation)
   grantedInvitation = invitation;
 }
 
-void PuyoLanGameCenter::grantGame(PuyoGameInvitation &invitation)
+void LanGameCenter::grantGame(PuyoGameInvitation &invitation)
 {
     setStatus(PEER_PLAYING);
     mbox.bind(invitation.opponentAddress);
@@ -263,7 +263,7 @@ void PuyoLanGameCenter::grantGame(PuyoGameInvitation &invitation)
     }
 }
 
-void PuyoLanGameCenter::sendGameCancelInvitation(PuyoGameInvitation &invitation)
+void LanGameCenter::sendGameCancelInvitation(PuyoGameInvitation &invitation)
 {
   Message *msg = mbox.createMessage();
   Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
@@ -277,7 +277,7 @@ void PuyoLanGameCenter::sendGameCancelInvitation(PuyoGameInvitation &invitation)
   delete msg;
 }
 
-void PuyoLanGameCenter::onPlayerConnect(String playerName, PeerAddress playerAddress)
+void LanGameCenter::onPlayerConnect(String playerName, PeerAddress playerAddress)
 {
     // When a new player connects, send an alive message
     sendAliveMessage();

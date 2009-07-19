@@ -23,13 +23,13 @@
  *
  */
 
-#include "PuyoLocalMenu.h"
+#include "LocalMenu.h"
 #include "AnimatedPuyoTheme.h"
 #include "ScreenTransition.h"
 
 class NoNameAction : public Action {
     public:
-        NoNameAction(PuyoLocalizedDictionary &locale, EditField &field)
+        NoNameAction(LocalizedDictionary &locale, EditField &field)
           : locale(locale), field(field)
         {}
 
@@ -41,7 +41,7 @@ class NoNameAction : public Action {
             }
         }
     private:
-        PuyoLocalizedDictionary locale;
+        LocalizedDictionary locale;
         EditField &field;
 };
 

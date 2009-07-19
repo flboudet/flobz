@@ -28,16 +28,16 @@
 
 #include "ios_datagramsocket.h"
 #include "ios_udpmessagebox.h"
-#include "PuyoNetGameCenter.h"
+#include "NetGameCenter.h"
 #include "ios_networkinterfacerequester.h"
 #include "ios_udpmessage.h"
 
 using namespace ios_fc;
 
-class PuyoLanGameCenter : public PuyoNetGameCenter, public MessageListener, public SessionListener, PuyoNetGameCenterListener {
+class LanGameCenter : public NetGameCenter, public MessageListener, public SessionListener, NetGameCenterListener {
 public:
-    PuyoLanGameCenter(int portNum, const String name);
-    virtual ~PuyoLanGameCenter();
+    LanGameCenter(int portNum, const String name);
+    virtual ~LanGameCenter();
     void sendMessage(const String msgText);
     void idle();
     void setStatus(int status);
@@ -46,7 +46,7 @@ public:
     void onPeerDisconnect(const PeerAddress &address);
     String getSelfName();
     String getOpponentName();
-// PuyoNetGameCenterListener implementation
+// NetGameCenterListener implementation
     virtual void onChatMessage(const String &msgAuthor, const String &msg) {}
     virtual void onPlayerConnect(String playerName, PeerAddress playerAddress);
     virtual void onPlayerDisconnect(String playerName, PeerAddress playerAddress) {}

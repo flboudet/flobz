@@ -127,7 +127,7 @@ static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
 	FilePath tmp0(GlobalCurrentPath);
 	String tmp1 = FilePath::combine(FilePath::combine("theme",tmp0.basename()),"locale");
-	PuyoLocalizedDictionary localeDictionary(theCommander->getDataPathManager(), tmp1, "theme");
+	LocalizedDictionary localeDictionary(theCommander->getDataPathManager(), tmp1, "theme");
 
 	const char * newName  = (const char *) GSL_GLOBAL_PTR(gsl, "puyoset.name");
 	const char * newLName = localeDictionary.getLocalizedString(String(newName),true);
@@ -185,7 +185,7 @@ static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
 	FilePath tmp0(GlobalCurrentPath);
 	String tmp1 = FilePath::combine(FilePath::combine("theme",tmp0.basename()),"locale");
-	PuyoLocalizedDictionary localeDictionary(theCommander->getDataPathManager(), tmp1, "theme");
+	LocalizedDictionary localeDictionary(theCommander->getDataPathManager(), tmp1, "theme");
 
 	  const char * newName  = (const char *) GSL_GLOBAL_PTR(gsl, "level.name");
 	  const char * newLName = localeDictionary.getLocalizedString(String(newName),true);

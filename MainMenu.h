@@ -12,7 +12,7 @@
 
 #include "HallOfFame.h"
 #include "OptionMenu.h"
-#include "PuyoLocalMenu.h"
+#include "LocalMenu.h"
 #ifdef ENABLE_NETWORK
 #include "NetworkMenu.h"
 #endif

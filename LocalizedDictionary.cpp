@@ -35,7 +35,7 @@
 #endif
 #include "windows.h"
 #endif
-#include "PuyoLocalizedDictionary.h"
+#include "LocalizedDictionary.h"
 #include "ios_memory.h"
 #include <stdio.h>
 #include <ext/hash_map>
@@ -269,7 +269,7 @@ static str_dictionnary dictionaries;
 
 
 
-PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName) : dictionary(NULL), datapathManager(datapathManager)
+LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName) : dictionary(NULL), datapathManager(datapathManager)
 {
   signed int i;
 
@@ -336,7 +336,7 @@ PuyoLocalizedDictionary::PuyoLocalizedDictionary(const PuyoDataPathManager &data
   //fprintf(stderr,"-----Refcount++ = %d (%s)\n",myDictEntry->refcount,(const char *)stdName);
 }
 
-PuyoLocalizedDictionary::~PuyoLocalizedDictionary()
+LocalizedDictionary::~LocalizedDictionary()
 {
   str_dictionnary::iterator iter = dictionaries.find(std::string((const char *)stdName));
 
@@ -374,7 +374,7 @@ PuyoLocalizedDictionary::~PuyoLocalizedDictionary()
   }
 }
 
-const char * PuyoLocalizedDictionary::getLocalizedString(const char * originalString, bool copyIfNotThere)
+const char * LocalizedDictionary::getLocalizedString(const char * originalString, bool copyIfNotThere)
 {
     char * result = (char *) ((*(str_dictionnary *)dictionary)[std::string(originalString)]);
     if (result != NULL) {

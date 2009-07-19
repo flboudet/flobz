@@ -23,11 +23,11 @@
  *
  */
 
-#include "PuyoDataPathManager.h"
+#include "DataPathManager.h"
 
 #define isnum(X) ((X>='0') && (X<='9'))
 
-PuyoDataPathManager::PuyoDataPathManager(String coreDataPath) : m_coreDataPath(coreDataPath)
+DataPathManager::DataPathManager(String coreDataPath) : m_coreDataPath(coreDataPath)
 {
     SelfVector<String> dataFiles = m_coreDataPath.listFiles();
     SelfVector<String> wellFormattedNames;
@@ -62,7 +62,7 @@ PuyoDataPathManager::PuyoDataPathManager(String coreDataPath) : m_coreDataPath(c
     }
 }
 
-String PuyoDataPathManager::getPath(String shortPath) const
+String DataPathManager::getPath(String shortPath) const
 {
 #ifdef FLOBOPUYODEBUG
     printf("Recherche de %s\n", (const char *)shortPath);
@@ -78,7 +78,7 @@ String PuyoDataPathManager::getPath(String shortPath) const
     throw Exception(String("File ") + shortPath + " not found !");
 }
 
-void PuyoDataPathManager::setMaxPackNumber(int maxPackNumber)
+void DataPathManager::setMaxPackNumber(int maxPackNumber)
 {
     for (int i = m_dataPaths.size() - 1 ; i >= 0 ; i--) {
         const String &currentFile = m_dataPaths[i].getPathString();

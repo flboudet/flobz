@@ -113,7 +113,7 @@ extern char *dataFolder;
 /* Initialise the default dictionnary */
 void PuyoCommander::initLocale()
 {
-  locale = new PuyoLocalizedDictionary(dataPathManager, "locale", "main");
+  locale = new LocalizedDictionary(dataPathManager, "locale", "main");
 }
 
 /* Global translator */

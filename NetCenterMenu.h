@@ -33,7 +33,7 @@
 #include "PuyoCommander.h"
 #include "PuyoInternetGameCenter.h"
 #include "PuyoTwoPlayerStarter.h"
-#include "PuyoChatBox.h"
+#include "ChatBox.h"
 #include "RadioButton.h"
 
 class NetCenterMenu;
@@ -112,16 +112,16 @@ class NetCenterMenu;
 
 class NetCenterTwoNameProvider : public PuyoTwoNameProvider {
 public:
-    NetCenterTwoNameProvider(PuyoNetGameCenter &netCenter) : netCenter(netCenter) {}
+    NetCenterTwoNameProvider(NetGameCenter &netCenter) : netCenter(netCenter) {}
     String getPlayer1Name() const;
     String getPlayer2Name() const;
 private:
-    PuyoNetGameCenter &netCenter;
+    NetGameCenter &netCenter;
 };
 
-class NetCenterMenu : public MainScreenMenu, PuyoNetGameCenterListener, ChatBoxDelegate {
+class NetCenterMenu : public MainScreenMenu, NetGameCenterListener, ChatBoxDelegate {
 public:
-    NetCenterMenu(MainScreen *mainScreen, PuyoNetGameCenter *netCenter,
+    NetCenterMenu(MainScreen *mainScreen, NetGameCenter *netCenter,
                   String title, GameLoop *loop = NULL);
     ~NetCenterMenu();
     virtual void build();
@@ -163,7 +163,7 @@ private:
     PuyoPopMenuAction backAction;
     NetCenterPlayerList playerList;
     NetCenterCycled cycled;
-    PuyoNetGameCenter *netCenter;
+    NetGameCenter *netCenter;
     ZBox container;
     NetCenterDialogMenu *onScreenDialog;
     bool shouldSelfDestroy;

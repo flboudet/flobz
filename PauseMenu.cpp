@@ -23,9 +23,9 @@
  *
  */
 
-#include "PuyoPauseMenu.h"
+#include "PauseMenu.h"
 
-PuyoPauseMenu::PuyoPauseMenu(Action *pauseAction)
+PauseMenu::PauseMenu(Action *pauseAction)
     : topSeparator(0, 10), pauseVBox(theCommander->getWindowFramePicture()),
       pauseTitleFrame(theCommander->getSeparatorFramePicture()),
       menuTitle(theCommander->getLocalizedString("Pause")), 
@@ -67,11 +67,11 @@ PuyoPauseMenu::PuyoPauseMenu(Action *pauseAction)
     optionsBox.add(&optionsButtonsBox);
 }
 
-PuyoPauseMenu::~PuyoPauseMenu()
+PauseMenu::~PauseMenu()
 {
 }
 
-void PuyoPauseMenu::action(Widget *sender, int actionType, GameControlEvent *event)
+void PauseMenu::action(Widget *sender, int actionType, GameControlEvent *event)
 {
   if (sender == &optionsButton) {
     pauseContainer.transitionToContent(&optionsBox);
@@ -89,7 +89,7 @@ void PuyoPauseMenu::action(Widget *sender, int actionType, GameControlEvent *eve
   }
 }
 
-void PuyoPauseMenu::backPressed(bool fromControls)
+void PauseMenu::backPressed(bool fromControls)
 {
   if (!fromControls || (pauseContainer.getContentWidget() == &pauseVBox)) {
     pauseContainer.transitionToContent(NULL);
@@ -99,14 +99,14 @@ void PuyoPauseMenu::backPressed(bool fromControls)
   }
 }
 
-void PuyoPauseMenu::onSlideInside(SliderContainer &slider)
+void PauseMenu::onSlideInside(SliderContainer &slider)
 {
   if (slider.getContentWidget() == NULL) {
       m_pauseAction->action(this, KPauseMenuClosed_Continue, NULL);
   }
 }
 
-void PuyoPauseMenu::onWidgetAdded(WidgetContainer *parent)
+void PauseMenu::onWidgetAdded(WidgetContainer *parent)
 {
   pauseContainer.transitionToContent(&pauseVBox);
 }

@@ -4,7 +4,7 @@
 #include "PuyoNetworkView.h"
 #include "PuyoNetworkStarter.h"
 
-class PIBNGCListener : public PuyoNetGameCenterListener {
+class PIBNGCListener : public NetGameCenterListener {
 private:
     PuyoInternetGameCenter &m_gc;
     int m_level;

@@ -4,8 +4,8 @@
 #include "gameui.h"
 #include "Frame.h"
 #include "PuyoStory.h"
-#include "PuyoDataPathManager.h"
-#include "PuyoLocalizedDictionary.h"
+#include "DataPathManager.h"
+#include "LocalizedDictionary.h"
 #include "GameCursor.h"
 #include "audio.h"
 #include "MainScreen.h"
@@ -32,7 +32,7 @@ class PuyoCommander
     void registerCursor(AbstractCursor *cursor);
     void setCursorVisible(bool visible);
 
-    const PuyoDataPathManager &getDataPathManager() { return dataPathManager; }
+    const DataPathManager &getDataPathManager() { return dataPathManager; }
     const char * getLocalizedString(const char * originalString) const;
 
     const FramePicture *getWindowFramePicture() const { return m_windowFramePicture.get(); }
@@ -63,11 +63,11 @@ class PuyoCommander
     void initAudio();
     void initFonts();
 
-    PuyoDataPathManager dataPathManager;
+    DataPathManager dataPathManager;
 
     MessageBox *mbox;
     GameLoop   *loop;
-    PuyoLocalizedDictionary * locale;
+    LocalizedDictionary * locale;
 
     AudioManager globalAudioManager;
 

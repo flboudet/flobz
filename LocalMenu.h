@@ -45,7 +45,7 @@ public:
     String getPlayerName() const;
 private:
     VBox buttonsBox;
-    PuyoLocalizedDictionary locale;
+    LocalizedDictionary locale;
     EditFieldWithLabel editPlayerName;
     Frame screenTitleFrame;
     Text screenTitle;
@@ -64,7 +64,7 @@ public:
     String getPlayer2Name() const;
 private:
     VBox buttonsBox;
-    PuyoLocalizedDictionary locale;
+    LocalizedDictionary locale;
     PuyoLocalTwoPlayerGameWidgetFactory gameWidgetFactory;
     EditFieldWithLabel editPlayer1Name, editPlayer2Name;
     Frame screenTitleFrame;

@@ -23,7 +23,7 @@
  *
  */
 
-#include "PuyoThemeMenu.h"
+#include "ThemeMenu.h"
 #include "preferences.h"
 #include "PuyoStrings.h"
 #include "AnimatedPuyoTheme.h"
@@ -230,7 +230,7 @@ void PuyoThemePreview::themeSelected(String themeName)
 
 /*****************************************************************************/
 
-PuyoThemeMenu::PuyoThemeMenu(MainScreen *mainScreen)
+ThemeMenu::ThemeMenu(MainScreen *mainScreen)
     : MainScreenMenu(mainScreen),
       screenTitleFrame(theCommander->getSeparatorFramePicture()),
       themeMenuTitle(theCommander->getLocalizedString("Puyo theme")), popAction(mainScreen),
@@ -239,7 +239,7 @@ PuyoThemeMenu::PuyoThemeMenu(MainScreen *mainScreen)
 {
 }
 
-void PuyoThemeMenu::build() {
+void ThemeMenu::build() {
     setPolicy(USE_MIN_SIZE);
     screenTitleFrame.setPreferedSize(Vec3(0, 20));
     screenTitleFrame.add(&themeMenuTitle);

@@ -42,7 +42,7 @@ public:
     int gameSpeed;
 };
 
-class PuyoNetGameCenterListener {
+class NetGameCenterListener {
 public:
     virtual void onChatMessage(const String &msgAuthor, const String &msg) = 0;
     virtual void onPlayerConnect(String playerName, PeerAddress playerAddress) = 0;
@@ -51,7 +51,7 @@ public:
     virtual void onGameInvitationReceived(PuyoGameInvitation &invitation) = 0;
     virtual void onGameInvitationCanceledReceived(PuyoGameInvitation &invitation) = 0;
     virtual void onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation) = 0;
-    virtual ~PuyoNetGameCenterListener() {};
+    virtual ~NetGameCenterListener() {};
 };
 
 enum PuyoPeerStatus {
@@ -64,10 +64,10 @@ struct PuyoPeerInfo {
     int rank;
 };
 
-class PuyoNetGameCenter {
+class NetGameCenter {
 public:
-    PuyoNetGameCenter() : pendingGameTimeout(30000.) {}
-    virtual ~PuyoNetGameCenter() {}
+    NetGameCenter() : pendingGameTimeout(30000.) {}
+    virtual ~NetGameCenter() {}
     virtual void sendMessage(const String msgText) = 0;
     // Request a new game
     void requestGame(PuyoGameInvitation &invitation);
@@ -82,8 +82,8 @@ public:
     PuyoPeerInfo getPeerInfoForAddress(PeerAddress &addr) const;
     int getPeerStatusForAddress(PeerAddress &addr) const;
     int getPeerCount() const;
-    void addListener(PuyoNetGameCenterListener *r) { listeners.add(r); }
-    void removeListener(PuyoNetGameCenterListener *r) { listeners.remove(r); }
+    void addListener(NetGameCenterListener *r) { listeners.add(r); }
+    void removeListener(NetGameCenterListener *r) { listeners.remove(r); }
     void connectPeer(PeerAddress addr, const String name, int status = PEER_NORMAL, int rank = -1);
     void disconnectPeer(PeerAddress addr, const String name);
     virtual void setStatus(int status) {}
@@ -92,7 +92,7 @@ public:
     // Optional server managing the game center.
     virtual IgpMessageBox *getIgpBox() { return NULL; }
 protected:
-    AdvancedBuffer<PuyoNetGameCenterListener *> listeners;
+    AdvancedBuffer<NetGameCenterListener *> listeners;
     class GamerPeer;
     AdvancedBuffer<GamerPeer *> peers;
     class PendingGame;

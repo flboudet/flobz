@@ -35,10 +35,10 @@
 
 using namespace ios_fc;
 
-class PuyoNatTraversal : public MessageListener {
+class NatTraversal : public MessageListener {
 public:
-    PuyoNatTraversal(UDPMessageBox &udpmbox, double punchInfoTimeout = 3000., double strategyTimeout = 2000.);
-    virtual ~PuyoNatTraversal();
+    NatTraversal(UDPMessageBox &udpmbox, double punchInfoTimeout = 3000., double strategyTimeout = 2000.);
+    virtual ~NatTraversal();
     void punch(const String punchPoolName);
     void idle();
     void onMessage(Message &message);

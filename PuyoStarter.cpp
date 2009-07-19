@@ -168,10 +168,10 @@ void GameScreen::action(Widget *sender, int actionType, GameControlEvent *event)
 {
   if (sender == &pauseMenu) {
     switch (actionType) {
-    case PuyoPauseMenu::KPauseMenuClosing_Abort:
+    case PauseMenu::KPauseMenuClosing_Abort:
       abort();
       break;
-    case PuyoPauseMenu::KPauseMenuClosed_Continue:
+    case PauseMenu::KPauseMenuClosed_Continue:
       setResumed(true);
       break;
     default:

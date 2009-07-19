@@ -32,7 +32,7 @@
 #include "FramedEditField.h"
 #include "ListView.h"
 #include "PuyoCommander.h"
-#include "PuyoInternetMenu.h"
+#include "InternetMenu.h"
 #include "PuyoInternetGameCenter.h"
 
 
@@ -63,7 +63,7 @@ public:
     NetworkGameMenu(MainScreen * mainScreen);
     void build();
 private:
-    PuyoLocalizedDictionary locale;
+    LocalizedDictionary locale;
     LANGameMenu  lanGameMenu;
     InternetGameMenu *internetGameMenu;
     NetworkInternetAction internetAction;

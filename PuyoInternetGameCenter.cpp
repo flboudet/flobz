@@ -149,7 +149,7 @@ void PuyoInternetGameCenter::idle()
                 guestIgpIdent = static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.opponentAddress.getImpl())->getIgpIdent();
             }
             p2pPunchName = String("punch:") + initiatorIgpIdent + "vs" + guestIgpIdent + ":" + grantedInvitation.gameRandomSeed;
-            p2pNatTraversal = new PuyoNatTraversal(*p2pmbox);
+            p2pNatTraversal = new NatTraversal(*p2pmbox);
             p2pNatTraversal->punch(p2pPunchName);
             gameGrantedStatus = GAMESTATUS_WAITTRAVERSAL;
             break;
@@ -189,7 +189,7 @@ void PuyoInternetGameCenter::idle()
         sendAliveMessage();
         lastAliveMessage = time_ms;
     }
-    PuyoNetGameCenter::idle();
+    NetGameCenter::idle();
 }
 
 void PuyoInternetGameCenter::setStatus(int status)

@@ -3,22 +3,22 @@ ACLOCAL_AMFLAGS=-I m4
 bin_PROGRAMS=flobopuyo
 flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           MainMenu.cpp MainScreen.cpp PuyoMain.cpp \
-          main.cpp PuyoDataPathManager.cpp PuyoGame.cpp PuyoDoomMelt.cpp \
+          main.cpp DataPathManager.cpp PuyoGame.cpp PuyoDoomMelt.cpp \
           PuyoView.cpp PuyoAnimations.cpp AnimatedPuyo.cpp PuyoIA.cpp \
-          styrolyse.cpp PuyoStory.cpp PuyoChatBox.cpp PuyoLocalizedDictionary.cpp \
-          PuyoEventPlayer.cpp PuyoPauseMenu.cpp PuyoCheatCodeManager.cpp \
+          styrolyse.cpp PuyoStory.cpp ChatBox.cpp LocalizedDictionary.cpp \
+          PuyoEventPlayer.cpp PauseMenu.cpp CheatCodeManager.cpp \
           GameWidget.cpp PuyoStatsWidget.cpp \
           PuyoStarter.cpp PuyoSinglePlayerStarter.cpp PuyoTwoPlayerStarter.cpp \
-          PuyoLocalMenu.cpp OptionMenu.cpp PuyoControlMenu.cpp \
-          LevelThemeMenu.cpp PuyoThemeMenu.cpp ScreenTransition.cpp \
+          LocalMenu.cpp OptionMenu.cpp PuyoControlMenu.cpp \
+          LevelThemeMenu.cpp ThemeMenu.cpp ScreenTransition.cpp \
           PuyoGameAbstract.cpp PuyoStrings.cpp AnimatedPuyoTheme.cpp
 
 # Optional sources for network gaming support
 if ENABLE_NETWORK
 flobopuyo_SOURCES+=PuyoNetworkStarter.cpp PuyoNetworkView.cpp PuyoNetworkGame.cpp \
-          NetworkMenu.cpp PuyoInternetMenu.cpp PuyoInternetBot.cpp NetCenterMenu.cpp \
-          PuyoNetGameCenter.cpp PuyoInternetGameCenter.cpp PuyoLanGameCenter.cpp\
-          PuyoNatTraversal.cpp PuyoMessageDef.cpp
+          NetworkMenu.cpp InternetMenu.cpp PuyoInternetBot.cpp NetCenterMenu.cpp \
+          NetGameCenter.cpp PuyoInternetGameCenter.cpp LanGameCenter.cpp\
+          NatTraversal.cpp PuyoMessageDef.cpp
 endif
 
 # If we are building for Mac OS X, we also need to compile the SDLMain wrapper
@@ -28,21 +28,21 @@ endif
 
 EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            AnimatedPuyo.h PuyoGameAbstract.h OptionMenu.h \
-           AnimatedPuyoTheme.h PuyoGame.h PuyoPauseMenu.h \
+           AnimatedPuyoTheme.h PuyoGame.h PauseMenu.h \
            audio.h GameWidget.h PuyoPlayer.h \
            PuyoIA.h PuyoScoring.h PuyoMain.h \
            glSDL.h PuyoIgpDefs.h ScreenTransition.h \
            HallOfFame.h PuyoInternetGameCenter.h PuyoSinglePlayerStarter.h \
-           HiScores.h PuyoInternetMenu.h PuyoInternetBot.h PuyoStarter.h \
-           LevelThemeMenu.h PuyoLanGameCenter.h PuyoStatsWidget.h \
-           MainMenu.h PuyoLocalizedDictionary.h  PuyoStory.h \
-           MainScreen.h PuyoLocalMenu.h PuyoStrings.h \
-           PuyoAnimations.h PuyoMessageDef.h PuyoThemeMenu.h \
-           PuyoChatBox.h PuyoNatTraversal.h PuyoTwoPlayerStarter.h \
-           PuyoCheatCodeManager.h NetCenterMenu.h PuyoView.h \
-           PuyoCommander.h PuyoNetGameCenter.h SDLMain.h \
+           HiScores.h InternetMenu.h PuyoInternetBot.h PuyoStarter.h \
+           LevelThemeMenu.h LanGameCenter.h PuyoStatsWidget.h \
+           MainMenu.h LocalizedDictionary.h  PuyoStory.h \
+           MainScreen.h LocalMenu.h PuyoStrings.h \
+           PuyoAnimations.h PuyoMessageDef.h ThemeMenu.h \
+           ChatBox.h NatTraversal.h PuyoTwoPlayerStarter.h \
+           CheatCodeManager.h NetCenterMenu.h PuyoView.h \
+           PuyoCommander.h NetGameCenter.h SDLMain.h \
            PuyoControlMenu.h PuyoNetworkGame.h styrolyse.h \
-           PuyoDataPathManager.h NetworkMenu.h \
+           DataPathManager.h NetworkMenu.h \
            PuyoDoomMelt.h PuyoNetworkStarter.h
 
 flobopuyo_CXXFLAGS = -I$(top_srcdir)/iosfc -I$(top_srcdir)/gametools -I$(top_srcdir)/goomsl $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)

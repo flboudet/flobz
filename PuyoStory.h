@@ -34,7 +34,7 @@ class GameScreen;
 
 #include "gameui.h"
 #include "ScreenTransition.h"
-#include "PuyoLocalizedDictionary.h"
+#include "LocalizedDictionary.h"
 
 extern int NB_STORIES;
 
@@ -61,7 +61,7 @@ public:
 protected:
 
     /* dictionnary for locale translations */
-    PuyoLocalizedDictionary *localeDictionary;
+    LocalizedDictionary *localeDictionary;
     Styrolyse *currentStory;
     Action *finishedAction;
     bool once;

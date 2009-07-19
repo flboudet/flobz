@@ -49,7 +49,7 @@ protected:
     PuyoIA *opponentcontroller;
     int faceTicks;
     StoryWidget opponent;
-    PuyoCheatCodeManager killLeftCheat, killRightCheat;
+    CheatCodeManager killLeftCheat, killRightCheat;
 };
 
 class SinglePlayerStandardLayoutGameWidget : public SinglePlayerGameWidget

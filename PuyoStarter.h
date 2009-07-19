@@ -31,8 +31,8 @@
 #include "PuyoGame.h"
 #include "PuyoEventPlayer.h"
 #include "PuyoIA.h"
-#include "PuyoCheatCodeManager.h"
-#include "PuyoPauseMenu.h"
+#include "CheatCodeManager.h"
+#include "PauseMenu.h"
 #include "GameWidget.h"
 #include "PuyoCommander.h"
 #include "ios_messagebox.h"
@@ -80,7 +80,7 @@ public:
     virtual void setResumed(bool fromControls);
     /** Returns the ingame pause menu widget
      */
-    PuyoPauseMenu & getPauseMenu() { return pauseMenu; }
+    PauseMenu & getPauseMenu() { return pauseMenu; }
     /** Notification on screen visibility change
      * @param visible  true if the scren is visible, otherwise false
      */
@@ -91,7 +91,7 @@ public:
     virtual void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
     bool paused;
-    PuyoPauseMenu pauseMenu;
+    PauseMenu pauseMenu;
     GameWidget &gameWidget;
     ScreenTransitionWidget transitionWidget;
     StoryWidget *overlayStory;
