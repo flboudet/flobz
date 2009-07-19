@@ -242,7 +242,7 @@ StoryScreen::StoryScreen(String screenName, Screen &previousScreen, Action *fini
 {
     add(&storyWidget);
     if (shouldAddTransition) {
-        transitionWidget = new PuyoScreenTransitionWidget(previousScreen, NULL);
+        transitionWidget = new ScreenTransitionWidget(previousScreen, NULL);
         add(transitionWidget);
     }
 }
@@ -260,7 +260,7 @@ void StoryScreen::transitionFromScreen(Screen &fromScreen)
         remove(transitionWidget);
         delete(transitionWidget);
     }
-    transitionWidget = new PuyoScreenTransitionWidget(fromScreen, NULL);
+    transitionWidget = new ScreenTransitionWidget(fromScreen, NULL);
     add(transitionWidget);
 }
 

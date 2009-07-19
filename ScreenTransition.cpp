@@ -23,25 +23,39 @@
  *
  */
 
-#ifndef _PUYOSCREENTRANSITION
-#define _PUYOSCREENTRANSITION
+#include "ScreenTransition.h"
 
-#include "gameui.h"
-#include "PuyoDoomMelt.h"
 
-using namespace gameui;
 
-class PuyoScreenTransitionWidget : public Widget, public CycledComponent {
-public:
-    PuyoScreenTransitionWidget(Screen &fromScreen, Action *transitionFinishedAction);
-    virtual ~PuyoScreenTransitionWidget();
-    void cycle();
-    void draw(DrawTarget *dt);
-    IdleComponent *getIdleComponent() { return this; }
-private:
-    IosSurface *fromSurface;
-    Action *transitionFinishedAction;
-    DoomMelt *melt;
-};
+ScreenTransitionWidget::ScreenTransitionWidget(Screen &fromScreen, Action *transitionFinishedAction)
+    : CycledComponent(.03), transitionFinishedAction(transitionFinishedAction)
+{
+    melt = doom_melt_new();
+    DrawContext *dc = GameUIDefaults::GAME_LOOP->getDrawContext();
+    fromSurface = dc->getIIMLibrary().create_DisplayFormat(dc->getWidth(), dc->getHeight());
+    fromScreen.drawAnyway(fromSurface);
+    doom_melt_start(melt, fromSurface);
+}
 
-#endif // _PUYOSCREENTRANSITION
+ScreenTransitionWidget::~ScreenTransitionWidget()
+{
+    doom_melt_delete(melt);
+    delete fromSurface;
+}
+
+void ScreenTransitionWidget::cycle()
+{
+    if (!doom_melt_finished(melt)) {
+        doom_melt_update(melt);
+        requestDraw();
+    }
+    //transitionFinishedAction.action();
+}
+
+void ScreenTransitionWidget::draw(DrawTarget *dt)
+{
+    //toScreen.drawAnyway(screen);
+    dt->setClipRect(NULL);
+    doom_melt_display(melt, dt);
+}
+

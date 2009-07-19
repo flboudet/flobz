@@ -23,7 +23,7 @@
  *
  */
 
-#include "PuyoOptionMenu.h"
+#include "OptionMenu.h"
 #include "preferences.h"
 #include "PuyoStrings.h"
 #include "audio.h"

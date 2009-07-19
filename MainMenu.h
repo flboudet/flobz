@@ -11,7 +11,7 @@
 #define _MAIN_MENU_H_
 
 #include "HallOfFame.h"
-#include "PuyoOptionMenu.h"
+#include "OptionMenu.h"
 #include "PuyoLocalMenu.h"
 #ifdef ENABLE_NETWORK
 #include "PuyoNetworkMenu.h"

@@ -59,7 +59,7 @@ public:
     void actionAfterGameOver(bool fromControls);
     virtual void sendChat(String chatText);
 protected:
-    void associatedScreenHasBeenSet(PuyoGameScreen *associatedScreen);
+    void associatedScreenHasBeenSet(GameScreen *associatedScreen);
 private:
     void sendSyncMsg();
     void sendAliveMsg();

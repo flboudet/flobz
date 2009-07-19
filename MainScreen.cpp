@@ -65,7 +65,7 @@ void MainScreen::transitionFromScreen(Screen &fromScreen)
         remove(transition);
         delete(transition);
     }
-    transition = new PuyoScreenTransitionWidget(fromScreen, NULL);
+    transition = new ScreenTransitionWidget(fromScreen, NULL);
     add(transition);
     setMenuDimensions();
 }

@@ -554,7 +554,7 @@ void SinglePlayerMatch::performMatchPlaying()
          m_levelData->getIALevel(), m_levelData->getNColors(), m_remainingLifes,
          m_levelData->getIAFace(), this);
   m_gameWidget->setGameOptions(m_levelData->getGameOptions());
-  m_gameScreen = new PuyoGameScreen(*m_gameWidget, *m_opponentStory);
+  m_gameScreen = new GameScreen(*m_gameWidget, *m_opponentStory);
   m_gameWidget->setPlayerOneName(m_spFactory->getPlayerName());
   m_gameWidget->setPlayerTwoName(m_levelData->getIAName());
   m_gameWidget->getStatPlayerOne().total_points = m_playerStat.total_points;

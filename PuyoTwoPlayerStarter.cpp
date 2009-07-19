@@ -107,7 +107,7 @@ void TwoPlayersStarterAction::startGame()
 
     gameWidget = gameWidgetFactory.createGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *currentLevelTheme, currentLevelTheme->getCentralAnimation2P(), this);
     gameWidget->setGameOptions(GameOptions::FromLevel(difficulty));
-    gameScreen = new PuyoGameScreen(*gameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
+    gameScreen = new GameScreen(*gameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
     if (nameProvider != NULL) {
         gameWidget->setPlayerOneName(nameProvider->getPlayer1Name());
         gameWidget->setPlayerTwoName(nameProvider->getPlayer2Name());
@@ -151,7 +151,7 @@ void TwoPlayersStarterAction::restartGame()
     currentLevelTheme = themeManager->getPuyoLevelTheme();
 
     GameWidget *newGameWidget = gameWidgetFactory.createGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *currentLevelTheme, currentLevelTheme->getCentralAnimation2P(), this);
-    PuyoGameScreen *newGameScreen = new PuyoGameScreen(*newGameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
+    GameScreen *newGameScreen = new GameScreen(*newGameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
     if (nameProvider != NULL) {
         newGameWidget->setPlayerOneName(nameProvider->getPlayer1Name());
         newGameWidget->setPlayerTwoName(nameProvider->getPlayer2Name());

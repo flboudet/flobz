@@ -33,7 +33,7 @@
 
 using namespace ios_fc;
 
-PuyoGameScreen::PuyoGameScreen(GameWidget &gameWidget, Screen &previousScreen)
+GameScreen::GameScreen(GameWidget &gameWidget, Screen &previousScreen)
     : Screen(0, 0, 640, 480), paused(false),
       pauseMenu(this),
       gameWidget(gameWidget), transitionWidget(previousScreen, NULL),
@@ -58,7 +58,7 @@ PuyoGameScreen::PuyoGameScreen(GameWidget &gameWidget, Screen &previousScreen)
     gameWidget.setAssociatedScreen(this);
 }
 
-PuyoGameScreen::~PuyoGameScreen()
+GameScreen::~GameScreen()
 {
 #ifdef DEBUG_GAMELOOP
   printf("GameScreen %x deleted\n", this);
@@ -70,7 +70,7 @@ PuyoGameScreen::~PuyoGameScreen()
   activeFX = NULL;
 }
 
-void PuyoGameScreen::onEvent(GameControlEvent *cevent)
+void GameScreen::onEvent(GameControlEvent *cevent)
 {
     bool pressedFromGameWidget = false;
     if (!cevent->isUp) {
@@ -90,12 +90,12 @@ void PuyoGameScreen::onEvent(GameControlEvent *cevent)
         Screen::onEvent(cevent);
 }
 
-bool PuyoGameScreen::startPressed()
+bool GameScreen::startPressed()
 {
     return gameWidget.startPressed();
 }
 
-bool PuyoGameScreen::backPressed()
+bool GameScreen::backPressed()
 {
     if (gameWidget.backPressed())
         return true;
@@ -113,7 +113,7 @@ bool PuyoGameScreen::backPressed()
     return false;
 }
 
-void PuyoGameScreen::setPaused(bool fromControls)
+void GameScreen::setPaused(bool fromControls)
 {
     if (!paused) {
         if (gameWidget.getOpponent() != NULL)
@@ -130,7 +130,7 @@ void PuyoGameScreen::setPaused(bool fromControls)
     }
 }
 
-void PuyoGameScreen::setResumed(bool fromControls)
+void GameScreen::setResumed(bool fromControls)
 {
     if (paused) {
         paused = false;
@@ -148,23 +148,23 @@ void PuyoGameScreen::setResumed(bool fromControls)
     }
 }
 
-void PuyoGameScreen::abort()
+void GameScreen::abort()
 {
     gameWidget.abort();
 }
 
-void PuyoGameScreen::setOverlayStory(StoryWidget *story)
+void GameScreen::setOverlayStory(StoryWidget *story)
 {
   overlayStory = story;
   this->add(story);
 }
 
-void PuyoGameScreen::onScreenVisibleChanged(bool visible)
+void GameScreen::onScreenVisibleChanged(bool visible)
 {
     theCommander->setCursorVisible(!visible);
 }
 
-void PuyoGameScreen::action(Widget *sender, int actionType, GameControlEvent *event)
+void GameScreen::action(Widget *sender, int actionType, GameControlEvent *event)
 {
   if (sender == &pauseMenu) {
     switch (actionType) {

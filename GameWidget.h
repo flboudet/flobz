@@ -100,7 +100,7 @@ public:
     void addGameBHandicap(int handicap) {attachedGameB->increaseNeutralPuyos((handicap>10?10:handicap) * PUYODIMX); attachedGameB->dropNeutrals();}
     void addSubWidget(Widget *subWidget);
     // A deplacer
-    void setAssociatedScreen(PuyoGameScreen *associatedScreen) { this->associatedScreen = associatedScreen; associatedScreenHasBeenSet(associatedScreen); };
+    void setAssociatedScreen(GameScreen *associatedScreen) { this->associatedScreen = associatedScreen; associatedScreenHasBeenSet(associatedScreen); };
     virtual void setScreenToPaused(bool fromControls);
     virtual void setScreenToResumed(bool fromControls);
     virtual void actionAfterGameOver(bool fromControls);
@@ -108,7 +108,7 @@ public:
     void setDisplayPlayerOneName(bool display) { m_displayPlayerOneName = display; }
     void setDisplayPlayerTwoName(bool display) { m_displayPlayerTwoName = display; }
 protected:
-    virtual void associatedScreenHasBeenSet(PuyoGameScreen *associatedScreen) {}
+    virtual void associatedScreenHasBeenSet(GameScreen *associatedScreen) {}
 
     // Styrolyse methods
     static void *styro_loadImage(StyrolyseClient *_this, const char *path);
@@ -118,7 +118,7 @@ protected:
     static void styro_freeImage(StyrolyseClient *_this, void *image);
 
     bool withGUI;
-    PuyoGameScreen *associatedScreen;
+    GameScreen *associatedScreen;
     DrawTarget &painter;
     IosSurface *painterGameScreen;
     PuyoLevelTheme *attachedLevelTheme;

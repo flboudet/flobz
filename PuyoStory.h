@@ -26,14 +26,14 @@
 #ifndef PUYO_STORY_H
 #define PUYO_STORY_H
 
-class PuyoGameScreen;
+class GameScreen;
 
 #include "SDL.h"
 #include "SDL_image.h"
 #include "styrolyse.h"
 
 #include "gameui.h"
-#include "PuyoScreenTransition.h"
+#include "ScreenTransition.h"
 #include "PuyoLocalizedDictionary.h"
 
 extern int NB_STORIES;
@@ -80,11 +80,11 @@ public:
     bool supportFX(const char *str) const;
     PuyoFX *clone() const;
 
-    void setGameScreen(PuyoGameScreen *screen) { this->screen = screen; }
-    PuyoGameScreen *getGameScreen() const { return screen; }
+    void setGameScreen(GameScreen *screen) { this->screen = screen; }
+    GameScreen *getGameScreen() const { return screen; }
 private:
     String fxName;
-    PuyoGameScreen *screen;
+    GameScreen *screen;
 };
 
 class StoryScreen : public Screen {
@@ -102,7 +102,7 @@ public:
     StoryWidget * getStoryWidget() { return &storyWidget; }
 protected:
     StoryWidget storyWidget;
-    PuyoScreenTransitionWidget *transitionWidget;
+    ScreenTransitionWidget *transitionWidget;
 private:
     Action *finishedAction;
 };

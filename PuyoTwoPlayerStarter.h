@@ -93,7 +93,7 @@ private:
     State m_state;
     int difficulty;
     GameWidgetFactory &gameWidgetFactory;
-    PuyoGameScreen *gameScreen;
+    GameScreen *gameScreen;
     GameWidget *gameWidget;
     PuyoTwoNameProvider *nameProvider;
     StoryWidget *gameLostWidget;

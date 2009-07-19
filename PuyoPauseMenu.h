@@ -27,7 +27,7 @@
 #define _PUYO_PAUSE_MENU_H
 
 #include "Frame.h"
-#include "PuyoOptionMenu.h"
+#include "OptionMenu.h"
 
 /**
  * The class PuyoPauseMenu implements the ingame pause menu shown

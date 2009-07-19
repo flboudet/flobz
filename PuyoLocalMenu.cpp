@@ -25,7 +25,7 @@
 
 #include "PuyoLocalMenu.h"
 #include "AnimatedPuyoTheme.h"
-#include "PuyoScreenTransition.h"
+#include "ScreenTransition.h"
 
 class NoNameAction : public Action {
     public:

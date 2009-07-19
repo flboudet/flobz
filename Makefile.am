@@ -9,8 +9,8 @@ flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           PuyoEventPlayer.cpp PuyoPauseMenu.cpp PuyoCheatCodeManager.cpp \
           GameWidget.cpp PuyoStatsWidget.cpp \
           PuyoStarter.cpp PuyoSinglePlayerStarter.cpp PuyoTwoPlayerStarter.cpp \
-          PuyoLocalMenu.cpp PuyoOptionMenu.cpp PuyoControlMenu.cpp \
-          LevelThemeMenu.cpp PuyoThemeMenu.cpp PuyoScreenTransition.cpp \
+          PuyoLocalMenu.cpp OptionMenu.cpp PuyoControlMenu.cpp \
+          LevelThemeMenu.cpp PuyoThemeMenu.cpp ScreenTransition.cpp \
           PuyoGameAbstract.cpp PuyoStrings.cpp AnimatedPuyoTheme.cpp
 
 # Optional sources for network gaming support
@@ -27,11 +27,11 @@ flobopuyo_SOURCES+=SDLMain.m
 endif
 
 EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
-           AnimatedPuyo.h PuyoGameAbstract.h PuyoOptionMenu.h \
+           AnimatedPuyo.h PuyoGameAbstract.h OptionMenu.h \
            AnimatedPuyoTheme.h PuyoGame.h PuyoPauseMenu.h \
            audio.h GameWidget.h PuyoPlayer.h \
            PuyoIA.h PuyoScoring.h PuyoMain.h \
-           glSDL.h PuyoIgpDefs.h PuyoScreenTransition.h \
+           glSDL.h PuyoIgpDefs.h ScreenTransition.h \
            HallOfFame.h PuyoInternetGameCenter.h PuyoSinglePlayerStarter.h \
            HiScores.h PuyoInternetMenu.h PuyoInternetBot.h PuyoStarter.h \
            LevelThemeMenu.h PuyoLanGameCenter.h PuyoStatsWidget.h \

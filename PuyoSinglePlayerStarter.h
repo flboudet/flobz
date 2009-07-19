@@ -269,7 +269,7 @@ private:
     SinglePlayerFactory *m_spFactory;
     int m_remainingLifes;
     StoryScreen *m_introStory, *m_opponentStory;
-    PuyoGameScreen *m_gameScreen;
+    GameScreen *m_gameScreen;
     SinglePlayerGameWidget *m_gameWidget;
     StoryWidget *m_matchLostAnimation;
     PuyoTwoPlayersStatsWidget *m_statsWidget;

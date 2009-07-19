@@ -37,7 +37,7 @@
 #include "PuyoCommander.h"
 #include "ios_messagebox.h"
 #include "AnimatedPuyoTheme.h"
-#include "PuyoScreenTransition.h"
+#include "ScreenTransition.h"
 #include "PuyoStrings.h"
 
 class PuyoLocalGameFactory : public PuyoGameFactory {
@@ -50,13 +50,13 @@ private:
     PuyoRandomSystem *attachedRandom;
 };
 
-class PuyoGameScreen;
+class GameScreen;
 struct GameOptions;
 
-class PuyoGameScreen : public Screen, public Action {
+class GameScreen : public Screen, public Action {
 public:
-    PuyoGameScreen(GameWidget &gameWidget, Screen &previousScreen);
-    ~PuyoGameScreen();
+    GameScreen(GameWidget &gameWidget, Screen &previousScreen);
+    ~GameScreen();
     void onEvent(GameControlEvent *cevent);
     virtual bool backPressed();
     virtual bool startPressed();
@@ -93,7 +93,7 @@ private:
     bool paused;
     PuyoPauseMenu pauseMenu;
     GameWidget &gameWidget;
-    PuyoScreenTransitionWidget transitionWidget;
+    ScreenTransitionWidget transitionWidget;
     StoryWidget *overlayStory;
 };
 

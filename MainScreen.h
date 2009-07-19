@@ -43,7 +43,7 @@ class MainScreen : public PuyoScreen, public gameui::SliderContainerListener {
     StoryWidget *fgStory, *bgStory;
     Stack<Widget*> menuStack;
     Stack<bool> fullScreenStack;
-    PuyoScreenTransitionWidget *transition;
+    ScreenTransitionWidget *transition;
     bool nextFullScreen;
 };
 
