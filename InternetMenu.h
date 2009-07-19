@@ -35,7 +35,7 @@
 #include "ListView.h"
 #include "PuyoCommander.h"
 #include "InternetMenu.h"
-#include "PuyoInternetGameCenter.h"
+#include "InternetGameCenter.h"
 #include <vector>
 
 using namespace ios_fc;
@@ -155,7 +155,7 @@ public:
     void setSelectedServer(const String &s, int port);
     virtual void idle(double currentTime);
     virtual IdleComponent *getIdleComponent() { return this; }
-    void enterNetCenterMenu(PuyoInternetGameCenter *gameCenter);
+    void enterNetCenterMenu(InternetGameCenter *gameCenter);
     // PuyoServerListResponder implementation
     virtual void PuyoServerListHasChanged(PuyoServerList &serverList);
 private:

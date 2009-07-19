@@ -27,7 +27,7 @@
 #define _PUYOSCREENTRANSITION
 
 #include "gameui.h"
-#include "PuyoDoomMelt.h"
+#include "DoomMelt.h"
 
 using namespace gameui;
 

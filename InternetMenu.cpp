@@ -25,7 +25,7 @@
 
 #include "InternetMenu.h"
 #include "preferences.h"
-#include "PuyoInternetGameCenter.h"
+#include "InternetGameCenter.h"
 #include "NetCenterMenu.h"
 #include "audio.h"
 
@@ -454,14 +454,14 @@ void PuyoInternetErrorDialog::action(Widget *sender, int actionType, GameControl
 class PuyoInternetConnectDialog : public PuyoInternetDialog, public Action
 {
 public:
-    PuyoInternetConnectDialog(String serverName, PuyoInternetGameCenter *gameCenter, InternetGameMenu *owner);
+    PuyoInternetConnectDialog(String serverName, InternetGameCenter *gameCenter, InternetGameMenu *owner);
     virtual ~PuyoInternetConnectDialog();
     virtual void idle(double currentTime);
     void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
     Text m_messageL1, m_messageL2;
     FramedButton m_cancelButton;
-    PuyoInternetGameCenter *m_gameCenter;
+    InternetGameCenter *m_gameCenter;
     InternetGameMenu *m_owner;
     double m_startTime;
     bool m_timeout;
@@ -470,7 +470,7 @@ private:
 
 const double PuyoInternetConnectDialog::CONNECT_TIMEOUT = 5.;
 
-PuyoInternetConnectDialog::PuyoInternetConnectDialog(String serverName, PuyoInternetGameCenter *gameCenter, InternetGameMenu *owner)
+PuyoInternetConnectDialog::PuyoInternetConnectDialog(String serverName, InternetGameCenter *gameCenter, InternetGameMenu *owner)
     : PuyoInternetDialog("Connecting"),
       m_messageL1("Connecting to server"), m_messageL2(serverName),
       m_cancelButton(theCommander->getLocalizedString("Cancel"), this,
@@ -525,7 +525,7 @@ void PuyoInternetConnectDialog::action(Widget *sender, int actionType, GameContr
   }
 }
 
-void InternetGameMenu::enterNetCenterMenu(PuyoInternetGameCenter *gameCenter)
+void InternetGameMenu::enterNetCenterMenu(InternetGameCenter *gameCenter)
 {
     NetCenterMenu *newNetCenterMenu = new NetCenterMenu(mainScreen, gameCenter,
                       theCommander->getLocalizedString("Internet Game Center"));
@@ -537,7 +537,7 @@ void InternetGameMenu::action(Widget *sender, int actionType, GameControlEvent *
 {
     if (sender == this->joinButton.getButton()) {
         try {
-            PuyoInternetGameCenter *gameCenter = new PuyoInternetGameCenter(serverName.getEditField().getValue(),
+            InternetGameCenter *gameCenter = new InternetGameCenter(serverName.getEditField().getValue(),
                                                                             atoi(serverPort.getEditField().getValue()), playerName.getEditField().getValue(), password.getEditField().getValue());
             PuyoInternetConnectDialog *connectionDialog = new PuyoInternetConnectDialog(serverName.getEditField().getValue(), gameCenter, this);
             this->getParentScreen()->add(connectionDialog);

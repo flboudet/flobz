@@ -17,7 +17,7 @@ class PuyoInternetBot : public IdleComponent
 
   private:
     int m_level;
-    std::auto_ptr<PuyoInternetGameCenter> gameCenter;
+    std::auto_ptr<InternetGameCenter> gameCenter;
     std::auto_ptr<PIBNGCListener> gameCenterListener;
 };
 

@@ -30,7 +30,7 @@
 #include "PuyoCommander.h"
 #include "ThemeMenu.h"
 #include "LevelThemeMenu.h"
-#include "PuyoControlMenu.h"
+#include "ControlMenu.h"
 #include "SwitchedButton.h"
 
 class OptionMenu;

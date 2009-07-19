@@ -33,7 +33,7 @@
 #include "ListView.h"
 #include "PuyoCommander.h"
 #include "InternetMenu.h"
-#include "PuyoInternetGameCenter.h"
+#include "InternetGameCenter.h"
 
 
 class LANGameMenu : public MainScreenMenu {

@@ -31,7 +31,7 @@
 #include "Frame.h"
 #include "FramedButton.h"
 #include "PuyoCommander.h"
-#include "PuyoInternetGameCenter.h"
+#include "InternetGameCenter.h"
 #include "PuyoTwoPlayerStarter.h"
 #include "ChatBox.h"
 #include "RadioButton.h"

@@ -6,11 +6,11 @@
 
 class PIBNGCListener : public NetGameCenterListener {
 private:
-    PuyoInternetGameCenter &m_gc;
+    InternetGameCenter &m_gc;
     int m_level;
     MessageBox *m_opponent;
 public:
-    PIBNGCListener(PuyoInternetGameCenter &gc, int level) : m_gc(gc), m_level(level), m_opponent(NULL) {
+    PIBNGCListener(InternetGameCenter &gc, int level) : m_gc(gc), m_level(level), m_opponent(NULL) {
     }
 
     virtual void onChatMessage(const String &msgAuthor, const String &msg) {
@@ -87,7 +87,7 @@ PuyoInternetBot::PuyoInternetBot(int level)
 
 void PuyoInternetBot::connect(String server, int port, String name, String password)
 {
-    gameCenter = std::auto_ptr<PuyoInternetGameCenter>(new PuyoInternetGameCenter(server, port, name, password));
+    gameCenter = std::auto_ptr<InternetGameCenter>(new InternetGameCenter(server, port, name, password));
     gameCenterListener = std::auto_ptr<PIBNGCListener>(new PIBNGCListener(*gameCenter, m_level));
     gameCenter->addListener(gameCenterListener.get());
     std::cout << "Trying to connect..." << std::endl;
@@ -95,7 +95,7 @@ void PuyoInternetBot::connect(String server, int port, String name, String passw
         gameCenter->idle();
         if (gameCenter->isDenied()) {
             std::cout << "Denied: " << gameCenter->getDenyString() << std::endl;
-            gameCenter = std::auto_ptr<PuyoInternetGameCenter>(NULL);
+            gameCenter = std::auto_ptr<InternetGameCenter>(NULL);
             return;
         } 
     }

@@ -33,7 +33,7 @@
 #include "audio.h"
 #include "IosImgProcess.h"
 #include "HiScores.h"
-#include "PuyoDoomMelt.h"
+#include "DoomMelt.h"
 
 PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 		   AnimatedPuyoSetTheme *attachedThemeSet,

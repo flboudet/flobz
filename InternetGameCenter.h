@@ -33,9 +33,9 @@
 
 using namespace ios_fc;
 
-class PuyoInternetGameCenter : public NetGameCenter, public MessageListener {
+class InternetGameCenter : public NetGameCenter, public MessageListener {
 public:
-    PuyoInternetGameCenter(const String hostName, int portNum, const String name, const String password);
+    InternetGameCenter(const String hostName, int portNum, const String name, const String password);
     void sendMessage(const String msgText);
     void idle();
     void onMessage(Message &msg);

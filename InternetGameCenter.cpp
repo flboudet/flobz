@@ -23,16 +23,16 @@
  *
  */
 
-#include "PuyoInternetGameCenter.h"
+#include "InternetGameCenter.h"
 #include "PuyoIgpDefs.h"
 #include "ios_igpmessage.h"
 #include "ios_time.h"
 
 using namespace ios_fc;
 
-const int PuyoInternetGameCenter::fpipVersion = 0x00000001;
+const int InternetGameCenter::fpipVersion = 0x00000001;
 
-PuyoInternetGameCenter::PuyoInternetGameCenter(const String hostName, int portNum, const String name, const String password)
+InternetGameCenter::InternetGameCenter(const String hostName, int portNum, const String name, const String password)
   : hostName(hostName), portNum(portNum), mbox(hostName, portNum), p2pmbox(NULL), p2pNatTraversal(NULL), tryNatTraversal(true), name(name), password(password), status(PEER_NORMAL),
     timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages), gameGrantedStatus(GAMESTATUS_IDLE),
     m_isAccepted(false), m_isDenied(false), m_denyString(""), m_denyStringMore("")
@@ -41,7 +41,7 @@ PuyoInternetGameCenter::PuyoInternetGameCenter(const String hostName, int portNu
     sendAliveMessage();
 }
 
-void PuyoInternetGameCenter::sendAliveMessage()
+void InternetGameCenter::sendAliveMessage()
 {
     int prevBound = mbox.getBound();
     mbox.bind(1);
@@ -57,7 +57,7 @@ void PuyoInternetGameCenter::sendAliveMessage()
     mbox.bind(prevBound);
 }
 
-void PuyoInternetGameCenter::sendMessage(const String msgText)
+void InternetGameCenter::sendMessage(const String msgText)
 {
     //printf("Envoi du msg:%s\n", (const char *)msgText);
     int prevBound = mbox.getBound();
@@ -73,7 +73,7 @@ void PuyoInternetGameCenter::sendMessage(const String msgText)
     mbox.bind(prevBound);
 }
 
-void PuyoInternetGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
+void InternetGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
 {
     opponentName = invitation.opponentName;
     invitation.initiatorAddress = mbox.getSelfAddress();
@@ -91,7 +91,7 @@ void PuyoInternetGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
     grantedInvitation = invitation;
 }
 
-void PuyoInternetGameCenter::sendGameAcceptInvitation(PuyoGameInvitation &invitation)
+void InternetGameCenter::sendGameAcceptInvitation(PuyoGameInvitation &invitation)
 {
     opponentName = invitation.opponentName;
     Message *msg = mbox.createMessage();
@@ -110,7 +110,7 @@ void PuyoInternetGameCenter::sendGameAcceptInvitation(PuyoGameInvitation &invita
     grantedInvitation = invitation;
 }
 
-void PuyoInternetGameCenter::grantGameToMBox(MessageBox &thembox)
+void InternetGameCenter::grantGameToMBox(MessageBox &thembox)
 {
     setStatus(PEER_PLAYING);
     for (int i = 0, j = listeners.size() ; i < j ; i++) {
@@ -118,7 +118,7 @@ void PuyoInternetGameCenter::grantGameToMBox(MessageBox &thembox)
     }
 }
 
-void PuyoInternetGameCenter::sendGameCancelInvitation(PuyoGameInvitation &invitation)
+void InternetGameCenter::sendGameCancelInvitation(PuyoGameInvitation &invitation)
 {
     Message *msg = mbox.createMessage();
     msg->addBoolProperty("RELIABLE", true);
@@ -131,7 +131,7 @@ void PuyoInternetGameCenter::sendGameCancelInvitation(PuyoGameInvitation &invita
     delete msg;
 }
 
-void PuyoInternetGameCenter::idle()
+void InternetGameCenter::idle()
 {
     static int idleCount = 0;
     switch (gameGrantedStatus) {
@@ -192,33 +192,33 @@ void PuyoInternetGameCenter::idle()
     NetGameCenter::idle();
 }
 
-void PuyoInternetGameCenter::setStatus(int status)
+void InternetGameCenter::setStatus(int status)
 {
     this->status = status;
     sendAliveMessage();
 }
 
-String PuyoInternetGameCenter::getSelfName()
+String InternetGameCenter::getSelfName()
 {
     return name;
 }
 
-String PuyoInternetGameCenter::getOpponentName()
+String InternetGameCenter::getOpponentName()
 {
     return opponentName;
 }
 
-bool PuyoInternetGameCenter::isConnected() const
+bool InternetGameCenter::isConnected() const
 {
     return (mbox.isConnected()) && (m_isAccepted);
 }
 
-bool PuyoInternetGameCenter::isDenied() const
+bool InternetGameCenter::isDenied() const
 {
     return (mbox.isConnected()) && (m_isDenied);
 }
 
-void PuyoInternetGameCenter::punch()
+void InternetGameCenter::punch()
 {
     int prevBound = mbox.getBound();
     mbox.bind(1);
@@ -230,7 +230,7 @@ void PuyoInternetGameCenter::punch()
     mbox.bind(prevBound);
 }
 
-void PuyoInternetGameCenter::onMessage(Message &msg)
+void InternetGameCenter::onMessage(Message &msg)
 {
     //printf("Cool, un msg!\n");
     try {

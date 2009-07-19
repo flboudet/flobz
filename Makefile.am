@@ -3,13 +3,13 @@ ACLOCAL_AMFLAGS=-I m4
 bin_PROGRAMS=flobopuyo
 flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           MainMenu.cpp MainScreen.cpp PuyoMain.cpp \
-          main.cpp DataPathManager.cpp PuyoGame.cpp PuyoDoomMelt.cpp \
+          main.cpp DataPathManager.cpp PuyoGame.cpp DoomMelt.cpp \
           PuyoView.cpp PuyoAnimations.cpp AnimatedPuyo.cpp PuyoIA.cpp \
           styrolyse.cpp PuyoStory.cpp ChatBox.cpp LocalizedDictionary.cpp \
           PuyoEventPlayer.cpp PauseMenu.cpp CheatCodeManager.cpp \
           GameWidget.cpp PuyoStatsWidget.cpp \
           PuyoStarter.cpp PuyoSinglePlayerStarter.cpp PuyoTwoPlayerStarter.cpp \
-          LocalMenu.cpp OptionMenu.cpp PuyoControlMenu.cpp \
+          LocalMenu.cpp OptionMenu.cpp ControlMenu.cpp \
           LevelThemeMenu.cpp ThemeMenu.cpp ScreenTransition.cpp \
           PuyoGameAbstract.cpp PuyoStrings.cpp AnimatedPuyoTheme.cpp
 
@@ -17,7 +17,7 @@ flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
 if ENABLE_NETWORK
 flobopuyo_SOURCES+=PuyoNetworkStarter.cpp PuyoNetworkView.cpp PuyoNetworkGame.cpp \
           NetworkMenu.cpp InternetMenu.cpp PuyoInternetBot.cpp NetCenterMenu.cpp \
-          NetGameCenter.cpp PuyoInternetGameCenter.cpp LanGameCenter.cpp\
+          NetGameCenter.cpp InternetGameCenter.cpp LanGameCenter.cpp\
           NatTraversal.cpp PuyoMessageDef.cpp
 endif
 
@@ -32,7 +32,7 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            audio.h GameWidget.h PuyoPlayer.h \
            PuyoIA.h PuyoScoring.h PuyoMain.h \
            glSDL.h PuyoIgpDefs.h ScreenTransition.h \
-           HallOfFame.h PuyoInternetGameCenter.h PuyoSinglePlayerStarter.h \
+           HallOfFame.h InternetGameCenter.h PuyoSinglePlayerStarter.h \
            HiScores.h InternetMenu.h PuyoInternetBot.h PuyoStarter.h \
            LevelThemeMenu.h LanGameCenter.h PuyoStatsWidget.h \
            MainMenu.h LocalizedDictionary.h  PuyoStory.h \
@@ -41,9 +41,9 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            ChatBox.h NatTraversal.h PuyoTwoPlayerStarter.h \
            CheatCodeManager.h NetCenterMenu.h PuyoView.h \
            PuyoCommander.h NetGameCenter.h SDLMain.h \
-           PuyoControlMenu.h PuyoNetworkGame.h styrolyse.h \
+           ControlMenu.h PuyoNetworkGame.h styrolyse.h \
            DataPathManager.h NetworkMenu.h \
-           PuyoDoomMelt.h PuyoNetworkStarter.h
+           DoomMelt.h PuyoNetworkStarter.h
 
 flobopuyo_CXXFLAGS = -I$(top_srcdir)/iosfc -I$(top_srcdir)/gametools -I$(top_srcdir)/goomsl $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 flobopuyo_OBJCFLAGS= $(SDL_CFLAGS)

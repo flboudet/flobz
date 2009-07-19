@@ -1,4 +1,4 @@
-#include "PuyoControlMenu.h"
+#include "ControlMenu.h"
 #include "preferences.h"
 #include "PuyoStrings.h"
 
