@@ -133,7 +133,6 @@ bool CycledComponent::isLate(double currentTime) const
 
 GameLoop::GameLoop() : timeDrift(0), lastDrawTime(getCurrentTime()), deltaDrawTimeMax(2.) {
   finished = false;
-  display = NULL;
   opengl_mode = false;
 }
 

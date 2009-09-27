@@ -137,9 +137,6 @@ class GameLoop
 
     double timeDrift;
     double lastDrawTime, deltaDrawTimeMax;
-    // obsolete
-    SDL_Surface *surface;
-    SDL_Surface *display;
 
     Vector<DrawableComponent> drawables;
     Vector<IdleComponent>     idles;
