@@ -3,6 +3,12 @@
 
 #include "InputManager.h"
 
+#ifdef MACOSX
+#include <SDL/SDL.h>
+#else
+#include "SDL.h"
+#endif
+
 /**
  * This class represents an SDL event transcripted into a game event.
  * It manages the mapping between SDL events and game events using
@@ -69,6 +75,13 @@ bool tryChangeControl(int control, bool alternate, SDL_Event e, GameControlEvent
 
 void saveControls();
 void loadControls();
+
+class EventManager
+{
+public:
+    virtual ~EventManager() {}
+    virtual bool pollEvent(GameControlEvent &controlEvent) = 0;
+};
 
 #endif
 

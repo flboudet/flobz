@@ -2,11 +2,6 @@
 #define _GAMELOOP_H
 
 #include "ios_fc.h"
-#ifdef MACOSX
-#include <SDL/SDL.h>
-#else
-#include "SDL.h"
-#endif
 #include "drawcontext.h"
 #include "GameControls.h"
 
@@ -105,6 +100,8 @@ class GameLoop
 
     void setDrawContext(DrawContext *dc) { m_dc = dc; }
     DrawContext *getDrawContext() const { return m_dc; }
+    void setEventManager(EventManager *em) { m_em = em; }
+    EventManager *getEventManager() const { return m_em; }
 
     void addDrawable(DrawableComponent *gc);
     void addIdle(IdleComponent *gc);
@@ -124,16 +121,13 @@ class GameLoop
     bool drawRequested() const;
     bool isLate(double currentTime) const;
 
-    void setOpenGLMode(bool state) {
-        this->opengl_mode = state;
-    }
-
     static inline double getCurrentTime() {
       return 0.001 * (double)SDL_GetTicks();
     }
 
   private:
     DrawContext *m_dc;
+    EventManager *m_em;
 
     double timeDrift;
     double lastDrawTime, deltaDrawTimeMax;
@@ -142,7 +136,6 @@ class GameLoop
     Vector<IdleComponent>     idles;
     Vector<GarbageCollectableItem> garbageCollector;
     bool finished;
-    bool opengl_mode;
 };
 
 #endif // _GAMELOOP_H

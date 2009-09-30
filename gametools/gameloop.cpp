@@ -1,10 +1,6 @@
 #include "gameloop.h"
 #include "gameui.h"
 
-#ifdef HAVE_OPENGL
-#include "SDL_opengl.h"
-#endif
-
 DrawableComponent::DrawableComponent()
   : parentLoop(NULL), _drawRequested(false)
 {
@@ -133,7 +129,6 @@ bool CycledComponent::isLate(double currentTime) const
 
 GameLoop::GameLoop() : timeDrift(0), lastDrawTime(getCurrentTime()), deltaDrawTimeMax(2.) {
   finished = false;
-  opengl_mode = false;
 }
 
 void GameLoop::addDrawable(DrawableComponent *gc)
@@ -233,14 +228,9 @@ void GameLoop::idle(double currentTime)
   //Vector<IdleComponent> idlesCpy = idles.dup();
 
   // 1- process events
-  SDL_Event e;
-  while (SDL_PollEvent (&e)) {
-
-    GameControlEvent controlEvent;
-    getControlEvent(e, &controlEvent);
-
+  GameControlEvent controlEvent;
+  while (m_em->pollEvent(controlEvent)) {
     for (i=0; i < idles_size_at_start; ++i) {
-
       if (idles[i]) {
 #ifdef DEBUG_GAMELOOP
 	printf("onEvent called on idle %x!\n", idles[i]);
@@ -249,9 +239,7 @@ void GameLoop::idle(double currentTime)
         idles[i]->onEvent(&controlEvent);
       }
     }
-
     if (controlEvent.cursorEvent == GameControlEvent::kQuit) { // TODO: Laisser libre l'utilisateur ?
-      SDL_Quit();
       exit(0);
     }
   }

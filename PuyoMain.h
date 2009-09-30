@@ -25,6 +25,8 @@ private:
     int m_maxDataPackNumber;
 
     DrawContext *m_drawContext;
+    EventManager *m_eventManager;
+
     GameLoop   *loop;
     MainScreen *mainScreen;
     GameCursor *cursor;
