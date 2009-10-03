@@ -1,6 +1,8 @@
 #ifndef _GAME_CONT_H
 #define _GAME_CONT_H
 
+#include <stdint.h>
+
 #include "InputManager.h"
 
 #ifdef MACOSX
@@ -16,6 +18,9 @@
  */
 typedef struct GameControlEvent {
 	GameControlEvent() : caught(false) {}
+    /**
+     * Corresponds to an event interpreted during game phase
+     */
     enum {
         kGameNone,
         kPauseGame,
@@ -31,6 +36,9 @@ typedef struct GameControlEvent {
         kPlayer2Down,
         kGameLastKey
     } gameEvent;
+    /**
+     * Corresponds to an event during GUI navigation
+     */
     enum {
         kCursorNone,
         kUp,
@@ -44,12 +52,20 @@ typedef struct GameControlEvent {
         kGameMouseClicked,
         kCursorLastKey
     } cursorEvent;
+    /**
+     * Corresponds to an event during keyboard input
+     */
+    enum {
+        kKeyboardNone,
+        kKeyboardDown,
+        kKeyboardUp
+    } keyboardEvent;
     bool isUp;
-    SDL_Event sdl_event;
+    bool isJoystick;
 	bool caught;
     int x, y;
+    uint16_t unicodeKeySym;
 	void setCaught() { caught = true; }
-    bool isJoystick;
 } GameControlEvent;
 
 

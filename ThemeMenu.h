@@ -44,7 +44,6 @@ class PuyoThemePicturePreview : public Widget, public IdleComponent {
 
     protected:
       void draw(DrawTarget *dt);
-      SoFont *font;
 
     private:
       String label;

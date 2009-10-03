@@ -29,9 +29,9 @@ using namespace gameui;
 
 void CheatCodeManager::eventOccured(GameControlEvent *event)
 {
-    if (event->sdl_event.type != SDL_KEYDOWN)
+    if (event->keyboardEvent != GameControlEvent::kKeyboardDown)
         return;
-    if (event->sdl_event.key.keysym.sym == cheatCode[currentPosition])
+    if (event->unicodeKeySym == cheatCode[currentPosition])
         currentPosition++;
     else
         currentPosition = 0;

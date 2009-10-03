@@ -44,7 +44,6 @@ class LevelThemePicturePreview : public Widget, public IdleComponent {
 
     protected:
       void draw(SDL_Surface *screen);
-      SoFont *font;
       void updatePicture(void);
 
     private:

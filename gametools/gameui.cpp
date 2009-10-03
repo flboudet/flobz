@@ -633,10 +633,10 @@ namespace gameui {
     bool Box::giveFocusToActiveWidget()
     {
         GameControlEvent ev;
-        ev.cursorEvent = GameControlEvent::kCursorNone;
-        ev.gameEvent   = GameControlEvent::kGameNone;
-        ev.isUp        = false;
-        ev.sdl_event.type = SDL_NOEVENT;
+        ev.cursorEvent   = GameControlEvent::kCursorNone;
+        ev.keyboardEvent = GameControlEvent::kKeyboardNone;
+        ev.gameEvent     = GameControlEvent::kGameNone;
+        ev.isUp          = false;
 
         Widget *child = getChild(activeWidget);
         if (child->isDead()) return false;
@@ -1145,18 +1145,13 @@ namespace gameui {
     Screen::Screen(float x, float y, float width, float height, GameLoop *loop)
         : DrawableComponent(),
         IdleComponent(),
-        rootContainer(this, loop), bg(NULL), autoReleaseFlag(false)
+        rootContainer(this, loop), autoReleaseFlag(false)
     {
         rootContainer.setPosition(Vec3(x, y, 1.0f));
         rootContainer.setPreferedSize(Vec3(width, height, 1.0f));
         rootContainer.setSize(Vec3(width, height, 1.0f));
         rootContainer.giveFocus();
         grabEventsOnWidget(&rootContainer);
-    }
-
-    void Screen::setBackground(IIM_Surface *bg)
-    {
-        this->bg = bg;
     }
 
     void Screen::draw(DrawTarget *dt)
@@ -1642,17 +1637,16 @@ namespace gameui {
             else if (!editOnFocus)
                 shouldHandleKbdInput = !handleJoystickEdit(event);
             // Keyboard input is also supported
-            if ((shouldHandleKbdInput) && (event->sdl_event.type == SDL_KEYDOWN)) {
-                SDL_Event e = event->sdl_event;
+            if ((shouldHandleKbdInput) && (event->keyboardEvent == GameControlEvent::kKeyboardDown)) {
                 char ch = 0;
-
-                if ((e.key.keysym.unicode & 0xFF80) == 0) {
-                    ch = e.key.keysym.unicode & 0x7F;
+                // Ascii character
+                if ((event->unicodeKeySym & 0xFF80) == 0) {
+                    ch = event->unicodeKeySym & 0x7F;
                 }
+                // International character
                 else {
-#ifdef ENABLE_TTF
                     String newValue = getValue();
-                    Uint16 unicode = e.key.keysym.unicode;
+                    Uint16 unicode = event->unicodeKeySym;
                     char utf8[5];
                     int nchars = utf16_to_utf8(unicode, utf8);
                     printf("%d\n", nchars);
@@ -1661,18 +1655,13 @@ namespace gameui {
                         newValue += "_";
                     }
                     setValue(newValue,false);
-#else
-                    printf("Not supported.\n");
-#endif
                 }
-
-                if (e.key.keysym.sym == SDLK_BACKSPACE) {
+                // Backspace handling
+                if (event->unicodeKeySym == 0x0008) {
                     if (getValue().length() > 1) {
                         int last=getValue().length() - 2;
-#ifdef ENABLE_TTF
                         while ((getValue()[last] & 0xc0) == 0x80)
                             last--;
-#endif
                         String newValue = getValue().substring(0, last);
                         newValue += "_";
                         setValue(newValue,false);
@@ -1855,6 +1844,7 @@ namespace gameui {
 
     void ControlInputWidget::changeTo(GameControlEvent *event)
     {
+#ifdef TODO
         GameControlEvent result;
         if (tryChangeControl(control, alternate, event->sdl_event, &result)) {
             char temp[255];
@@ -1862,6 +1852,7 @@ namespace gameui {
             setValue(temp);
             editionMode = false;
         }
+#endif
     }
 
     void ControlInputWidget::eventOccured(GameControlEvent *event)
@@ -1931,75 +1922,7 @@ namespace gameui {
         setPreferedSize(Vec3(width, height, 1.0));
     }
 
-#ifdef DISABLED
-    //
-    // ListWidget
-    //
 
-    ListWidget::ListWidget(int size, IosSurface *downArrow, GameLoop *loop) : HBox(loop), size(size), used(0), button("---")
-    {
-        setPolicy(USE_MIN_SIZE);
-        upButton.setImage(downArrow);
-        downButton.setImage(downArrow);
-        scrollerBox.setPreferedSize(Vec3(16, (size+2) + GameUIDefaults::FONT->getHeight()*size));
-        listBox.setPreferedSize(Vec3(150,(size+2) + GameUIDefaults::FONT->getHeight()*size, 1));
-        scrollerBox.add(&upButton);
-        scrollerBox.add(&downButton);
-        for (int i=0; i<size; ++i) {
-            button.mdontMove=true;
-            listBox.add(&button);
-        }
-        HBox::add(&listBox);
-        HBox::add(&scrollerBox);
-    }
-
-    void ListWidget::set(int pos, Button *widget)
-    {
-        widget->mdontMove = true;
-        listBox.changeChild(pos, widget);
-    }
-
-    void ListWidget::add(Button *widget)
-    {
-        if(used>=size) return;
-        set(used++, widget);
-    }
-
-    void ListWidget::clear()
-    {
-        used = 0;
-        for (int i=0; i<size; ++i) {
-            Button *b = new Button("---");
-            set(i,b);
-        }
-    }
-
-    void ListWidget::draw(SDL_Surface *screen)
-    {
-        SDL_Rect dstrect;
-
-        dstrect.x = getPosition().x;
-        dstrect.y = getPosition().y;
-        dstrect.h = getSize().y;
-        dstrect.w = getSize().x;
-        SDL_FillRect(screen, &dstrect, 0x55555555);
-
-        dstrect.x = listBox.getPosition().x;
-        dstrect.y = listBox.getPosition().y;
-        dstrect.h = listBox.getSize().y;
-        dstrect.w = listBox.getSize().x;
-        SDL_FillRect(screen, &dstrect, 0xFFFFFFFF);
-
-        dstrect.x = scrollerBox.getPosition().x;
-        dstrect.y = scrollerBox.getPosition().y;
-        dstrect.h = scrollerBox.getSize().y;
-        dstrect.w = scrollerBox.getSize().x;
-        SDL_FillRect(screen, &dstrect, 0xFFFFFF00);
-
-        // TODO: Fix
-        // HBox::draw(screen);
-    }
-#endif
 
     //
     // ScreenStack

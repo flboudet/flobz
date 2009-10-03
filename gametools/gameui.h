@@ -2,11 +2,9 @@
 #define GAMEUI_H
 
 #include <vector>
-#include "SDL_Painter.h"
 #include "GameControls.h"
 #include "ios_fc.h"
 #include "vec3.h"
-#include "sofont.h"
 #include "gameloop.h"
 
 namespace gameui {
@@ -424,7 +422,6 @@ bool isDirectionEvent(GameControlEvent *event);
     public:
       Screen(float x, float y, float width, float height, GameLoop *loop = NULL);
       virtual ~Screen() {}
-      void setBackground(IIM_Surface *bg);
       void draw(DrawTarget *dt);
       virtual void drawAnyway(DrawTarget *dt);
       bool drawRequested() const { if (isVisible()) return rootContainer.drawRequested(); return false;}
@@ -468,7 +465,6 @@ bool isDirectionEvent(GameControlEvent *event);
     private:
       // The root container of the screen
       ScreenRootContainer rootContainer;
-      IIM_Surface *bg;
       bool hidden;
       bool autoReleaseFlag;
       std::vector<Widget *> m_grabbedWidgets;

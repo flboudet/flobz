@@ -35,6 +35,7 @@ void GameCursor::draw(DrawTarget *dt)
 
 void GameCursor::onEvent(GameControlEvent *event)
 {
+#ifdef TODO
     switch (event->sdl_event.type) {
     case SDL_MOUSEMOTION:
         setCursorPosition(event->sdl_event.motion.x,  event->sdl_event.motion.y);
@@ -60,6 +61,7 @@ void GameCursor::onEvent(GameControlEvent *event)
     default:
         break;
     }
+#endif
 }
 
 void GameCursor::cycle()

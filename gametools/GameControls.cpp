@@ -46,17 +46,20 @@ void getKeyName(int gameEvent, bool alternate, char *keyName)
 
 void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
 {
-  result->sdl_event   = e;
-  result->gameEvent   = GameControlEvent::kGameNone;
-  result->cursorEvent = GameControlEvent::kCursorNone;
-  result->isUp = true;
+  result->gameEvent     = GameControlEvent::kGameNone;
+  result->cursorEvent   = GameControlEvent::kCursorNone;
+  result->keyboardEvent = GameControlEvent::kKeyboardNone;
+  result->isUp   = true;
   result->caught = false;
   result->isJoystick = false;
+  result->unicodeKeySym = 0;
 
-  if (e.type == SDL_QUIT)
+  switch (e.type) {
+  case SDL_QUIT:
     result->cursorEvent = GameControlEvent::kQuit;
-
-  if (e.type == SDL_USEREVENT) {
+    break;
+  // Mouse handling
+  case SDL_USEREVENT: {
     switch (e.user.code) {
     case Cursor::MOVE: {
         result->isUp = false;
@@ -86,6 +89,18 @@ void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
         break;
     }
   }
+  case SDL_KEYDOWN:
+      result->keyboardEvent = GameControlEvent::kKeyboardDown;
+      result->unicodeKeySym = e.key.keysym.unicode;
+      break;
+  case SDL_KEYUP:
+      result->keyboardEvent = GameControlEvent::kKeyboardUp;
+      result->unicodeKeySym = e.key.keysym.unicode;
+      break;
+  default:
+      break;
+  }
+  // Game event handling
   if (input == NULL)
     return;
 
