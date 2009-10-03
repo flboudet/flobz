@@ -13,6 +13,7 @@
 #define LINE_DURATION 0.8
 
 using namespace gameui;
+using namespace event_manager;
 
 static StatsResources *res;
 

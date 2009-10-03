@@ -32,6 +32,7 @@
 #include "audio.h"
 
 using namespace ios_fc;
+using namespace event_manager;
 
 GameScreen::GameScreen(GameWidget &gameWidget, Screen &previousScreen)
     : Screen(0, 0, 640, 480), paused(false),
@@ -75,11 +76,11 @@ void GameScreen::onEvent(GameControlEvent *cevent)
     bool pressedFromGameWidget = false;
     if (!cevent->isUp) {
         switch (cevent->cursorEvent) {
-        case GameControlEvent::kStart:
-        case GameControlEvent::kGameMouseClicked:
+        case kStart:
+        case kGameMouseDown:
             pressedFromGameWidget = startPressed();
             break;
-        case GameControlEvent::kBack:
+        case kBack:
             pressedFromGameWidget = backPressed();
             break;
         default:
@@ -190,12 +191,10 @@ TwoPlayerGameWidget::TwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, Puy
             1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE,
             CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE,
             BSIZE+ESIZE),
-    controllerA(areaA, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left,
-            GameControlEvent::kPlayer1Right,
-            GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
-    controllerB(areaB, GameControlEvent::kPlayer2Down, GameControlEvent::kPlayer2Left,
-            GameControlEvent::kPlayer2Right,
-            GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight)
+    controllerA(areaA, kPlayer1Down, kPlayer1Left, kPlayer1Right,
+            kPlayer1TurnLeft, kPlayer1TurnRight),
+    controllerB(areaB, kPlayer2Down, kPlayer2Left, kPlayer2Right,
+            kPlayer2TurnLeft, kPlayer2TurnRight)
 {
     initWithGUI(areaA, areaB, controllerA, controllerB, levelTheme, gameOverAction);
 }

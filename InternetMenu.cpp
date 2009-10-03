@@ -30,6 +30,7 @@
 #include "audio.h"
 
 using namespace std;
+using namespace event_manager;
 
 static const char * kInternetMetaServerKey = "Menu.Internet.MetaServer.";
 static const char * kInternetMetaServerPathKey = "Menu.Internet.MetaServer.Path.";
@@ -436,7 +437,7 @@ PuyoInternetErrorDialog::PuyoInternetErrorDialog(String errorMessageL1, String e
     m_contentBox.add(&m_errorMessageL1);
     m_contentBox.add(&m_errorMessageL2);
     m_contentBox.add(&m_okButton);
-    setSize(Vec3(450.0f, 200.0f)); 
+    setSize(Vec3(450.0f, 200.0f));
 }
 
 PuyoInternetErrorDialog::~PuyoInternetErrorDialog()

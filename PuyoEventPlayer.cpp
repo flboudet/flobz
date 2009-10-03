@@ -25,6 +25,8 @@
 
 #include "PuyoEventPlayer.h"
 
+using namespace event_manager;
+
 PuyoEventPlayer::PuyoEventPlayer(PuyoView &view,
 						     int downEvent, int leftEvent, int rightEvent,
 						     int turnLeftEvent, int turnRightEvent)
@@ -114,17 +116,17 @@ bool PuyoEventPlayer::keyShouldRepeat(int &key)
 PuyoCombinedEventPlayer::PuyoCombinedEventPlayer(PuyoView &view)
     : PuyoPlayer(view),
       player1controller(view,
-                        GameControlEvent::kPlayer1Down,
-                        GameControlEvent::kPlayer1Left,
-                        GameControlEvent::kPlayer1Right,
-                        GameControlEvent::kPlayer1TurnLeft,
-                        GameControlEvent::kPlayer1TurnRight),
+                        kPlayer1Down,
+                        kPlayer1Left,
+                        kPlayer1Right,
+                        kPlayer1TurnLeft,
+                        kPlayer1TurnRight),
       player2controller(view,
-                        GameControlEvent::kPlayer2Down,
-                        GameControlEvent::kPlayer2Left,
-                        GameControlEvent::kPlayer2Right,
-                        GameControlEvent::kPlayer2TurnLeft,
-                        GameControlEvent::kPlayer2TurnRight)
+                        kPlayer2Down,
+                        kPlayer2Left,
+                        kPlayer2Right,
+                        kPlayer2TurnLeft,
+                        kPlayer2TurnRight)
 {
 }
 

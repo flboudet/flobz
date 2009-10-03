@@ -26,10 +26,11 @@
 #include "CheatCodeManager.h"
 
 using namespace gameui;
+using namespace event_manager;
 
 void CheatCodeManager::eventOccured(GameControlEvent *event)
 {
-    if (event->keyboardEvent != GameControlEvent::kKeyboardDown)
+    if (event->keyboardEvent != kKeyboardDown)
         return;
     if (event->unicodeKeySym == cheatCode[currentPosition])
         currentPosition++;

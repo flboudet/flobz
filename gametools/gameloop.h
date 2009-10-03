@@ -46,7 +46,7 @@ class IdleComponent
     virtual bool isLate(double currentTime) const { return false; }
 
     /// perform some computation if you're interested in events.
-    virtual void onEvent(GameControlEvent *event) {}
+    virtual void onEvent(event_manager::GameControlEvent *event) {}
 
     virtual void setPause(bool paused);
     bool getPause() const;
@@ -100,8 +100,8 @@ class GameLoop
 
     void setDrawContext(DrawContext *dc) { m_dc = dc; }
     DrawContext *getDrawContext() const { return m_dc; }
-    void setEventManager(EventManager *em) { m_em = em; }
-    EventManager *getEventManager() const { return m_em; }
+    void setEventManager(event_manager::EventManager *em) { m_em = em; }
+    event_manager::EventManager *getEventManager() const { return m_em; }
 
     void addDrawable(DrawableComponent *gc);
     void addIdle(IdleComponent *gc);
@@ -127,7 +127,7 @@ class GameLoop
 
   private:
     DrawContext *m_dc;
-    EventManager *m_em;
+    event_manager::EventManager *m_em;
 
     double timeDrift;
     double lastDrawTime, deltaDrawTimeMax;

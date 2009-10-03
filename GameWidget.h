@@ -78,7 +78,7 @@ public:
     void pause();
     void resume();
     bool isFocusable() { return !paused; }
-    void eventOccured(GameControlEvent *event);
+    void eventOccured(event_manager::GameControlEvent *event);
     bool backPressed();
     bool startPressed();
     IdleComponent *getIdleComponent() { return this; }

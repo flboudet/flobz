@@ -74,7 +74,7 @@ public:
     PuyoThemeSelectionBox();
     virtual ~PuyoThemeSelectionBox();
     void build();
-    void action(Widget *sender, int actionType, GameControlEvent *event);
+    void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
 private:
     PuyoThemePreview themePreview;
     Image *prevButton, *nextButton;

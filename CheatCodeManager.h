@@ -33,7 +33,7 @@ class CheatCodeManager : public gameui::Widget {
 public:
     CheatCodeManager(String cheatCode, gameui::Action *cheatAction)
       : cheatCode(cheatCode), cheatAction(cheatAction), cheatCodeLength(cheatCode.length()), currentPosition(0) {}
-    void eventOccured(GameControlEvent *event);
+    void eventOccured(event_manager::GameControlEvent *event);
 private:
     String cheatCode;
     gameui::Action *cheatAction;

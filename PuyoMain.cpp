@@ -15,6 +15,7 @@
 #endif
 
 using namespace std;
+using namespace event_manager;
 
 // To be moved elsewhere
 static const char * kFullScreenPref = "Config.FullScreen";

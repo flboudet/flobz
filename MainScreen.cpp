@@ -11,6 +11,7 @@
 #include "PuyoCommander.h"
 
 using namespace gameui;
+using namespace event_manager;
 
 #define WIDTH  640
 #define HEIGHT 480
@@ -78,9 +79,9 @@ void MainScreen::onEvent(GameControlEvent *cevent)
     if (cevent->isUp)
         return;
     switch (cevent->cursorEvent) {
-    case GameControlEvent::kStart:
+    case kStart:
         break;
-    case GameControlEvent::kBack:
+    case kBack:
         popMenu();
         break;
       default:

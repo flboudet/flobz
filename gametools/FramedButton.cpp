@@ -1,5 +1,7 @@
 #include "FramedButton.h"
 
+using namespace event_manager;
+
 namespace gameui {
 
 FramedButton::FramedButton(const String &label, Action *action,
@@ -24,7 +26,7 @@ void FramedButton::setValue(String value)
 
 void FramedButton::eventOccured(GameControlEvent *event)
 {
-    if (event->cursorEvent == GameControlEvent::kGameMouseClicked) {
+    if (event->cursorEvent == kGameMouseDown) {
         Vec3 widPosition = getPosition();
         Vec3 widSize = getSize();
         // If we click inside the frame
@@ -39,8 +41,8 @@ void FramedButton::eventOccured(GameControlEvent *event)
             if (event->y < buttonPosition.y) event->y = (int)ceil(buttonPosition.y);
             if (event->y > buttonPosition.y + buttonSize.y) event->y = (int)floor(buttonPosition.y + buttonSize.y);
         }
-    }    
-    
+    }
+
     // Push the event to the widget
     Frame::eventOccured(event);
 }

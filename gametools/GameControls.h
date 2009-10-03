@@ -5,61 +5,71 @@
 
 #include "InputManager.h"
 
-#ifdef MACOSX
-#include <SDL/SDL.h>
-#else
-#include "SDL.h"
-#endif
+namespace event_manager
+{
 
 /**
- * This class represents an SDL event transcripted into a game event.
- * It manages the mapping between SDL events and game events using
- * the user's preferences
+ * Corresponds to an event interpreted during game phase
+ */
+enum GameEventType {
+    kGameNone,
+    kPauseGame,
+    kPlayer1Left,
+    kPlayer1Right,
+    kPlayer1TurnLeft,
+    kPlayer1TurnRight,
+    kPlayer1Down,
+    kPlayer2Left,
+    kPlayer2Right,
+    kPlayer2TurnLeft,
+    kPlayer2TurnRight,
+    kPlayer2Down,
+    kGameLastKey
+};
+
+/**
+ * Corresponds to an event during GUI navigation
+ */
+enum CursorEventType {
+    kCursorNone,
+    kUp,
+    kDown,
+    kLeft,
+    kRight,
+    kStart,
+    kBack,
+    kQuit,
+    kGameMouseMoved,
+    kGameMouseDown,
+    kGameMouseUp,
+    kCursorLastKey
+};
+
+/**
+ * Corresponds to an event during keyboard input
+ */
+enum KeyboardEventType {
+    kKeyboardNone,
+    kKeyboardDown,
+    kKeyboardUp,
+    kKeyboardLastKey
+};
+
+/**
+ * Representation of any kind of user input event happening
+ * in the game. Depending on the scope of the object monitoring
+ * the event, it can be either/both:
+ *  - a game event
+ *  - a cursor event (navigation in the GUI, including mouse handling)
+ *  - a keyboard event (for keyboard input)
+ * GameControlEvent is independant of the underlying
+ * event handling backend.
  */
 typedef struct GameControlEvent {
 	GameControlEvent() : caught(false) {}
-    /**
-     * Corresponds to an event interpreted during game phase
-     */
-    enum {
-        kGameNone,
-        kPauseGame,
-        kPlayer1Left,
-        kPlayer1Right,
-        kPlayer1TurnLeft,
-        kPlayer1TurnRight,
-        kPlayer1Down,
-        kPlayer2Left,
-        kPlayer2Right,
-        kPlayer2TurnLeft,
-        kPlayer2TurnRight,
-        kPlayer2Down,
-        kGameLastKey
-    } gameEvent;
-    /**
-     * Corresponds to an event during GUI navigation
-     */
-    enum {
-        kCursorNone,
-        kUp,
-        kDown,
-        kLeft,
-        kRight,
-        kStart,
-        kBack,
-        kQuit,
-        kGameMouseMoved,
-        kGameMouseClicked,
-        kCursorLastKey
-    } cursorEvent;
-    /**
-     * Corresponds to an event during keyboard input
-     */
-    enum {
-        kKeyboardNone,
-        kKeyboardDown,
-        kKeyboardUp
-    } keyboardEvent;
+    GameEventType     gameEvent;
+    CursorEventType   cursorEvent;
+    KeyboardEventType keyboardEvent;
     bool isUp;
     bool isJoystick;
 	bool caught;
@@ -68,6 +78,18 @@ typedef struct GameControlEvent {
 	void setCaught() { caught = true; }
 } GameControlEvent;
 
+/**
+ * Abstract interface to an event handling backend
+ */
+class EventManager
+{
+public:
+    virtual ~EventManager() {}
+    virtual bool pollEvent(GameControlEvent &controlEvent) = 0;
+    virtual void pushMouseEvent(int x, int y, CursorEventType type) = 0;
+};
+
+// TODO: move all that crap elsewhere
 
 enum {
     kPlayer1LeftControl             = 0,
@@ -92,12 +114,7 @@ bool tryChangeControl(int control, bool alternate, SDL_Event e, GameControlEvent
 void saveControls();
 void loadControls();
 
-class EventManager
-{
-public:
-    virtual ~EventManager() {}
-    virtual bool pollEvent(GameControlEvent &controlEvent) = 0;
-};
+} // namespace
 
 #endif
 

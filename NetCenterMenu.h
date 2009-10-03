@@ -44,7 +44,7 @@ public:
     virtual ~NetCenterDialogMenu();
     void build();
     // Notification
-    virtual void eventOccured(GameControlEvent *event);
+    virtual void eventOccured(event_manager::GameControlEvent *event);
 public:
     PuyoGameInvitation associatedInvitation;
 private:
@@ -139,7 +139,7 @@ public:
     void selfDestroy() { shouldSelfDestroy = true; }
     virtual void sendChat(String chatText);
     // Notification
-    virtual void eventOccured(GameControlEvent *event);
+    virtual void eventOccured(event_manager::GameControlEvent *event);
     virtual void onWidgetVisibleChanged(bool visible);
     virtual void onWidgetRemoved(WidgetContainer *parent);
 private:

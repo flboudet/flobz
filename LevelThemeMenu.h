@@ -77,7 +77,7 @@ public:
     LevelThemeSelectionBox();
     virtual ~LevelThemeSelectionBox();
     void build();
-    void action(Widget *sender, int actionType, GameControlEvent *event);
+    void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
 private:
     LevelThemePreview themePreview;
     Image *prevButton, *nextButton;

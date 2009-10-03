@@ -57,7 +57,7 @@ class GameScreen : public Screen, public Action {
 public:
     GameScreen(GameWidget &gameWidget, Screen &previousScreen);
     ~GameScreen();
-    void onEvent(GameControlEvent *cevent);
+    void onEvent(event_manager::GameControlEvent *cevent);
     virtual bool backPressed();
     virtual bool startPressed();
     virtual void abort();
@@ -88,7 +88,7 @@ public:
     /**
      * Implements the Action interface
      */
-    virtual void action(Widget *sender, int actionType, GameControlEvent *event);
+    virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
 private:
     bool paused;
     PauseMenu pauseMenu;

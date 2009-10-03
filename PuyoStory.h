@@ -92,7 +92,7 @@ public:
     StoryScreen(String screenName, Screen &previousScreen, Action *finishedAction = NULL, bool shouldAddTransition = true);
     StoryScreen(String screenName);
     virtual ~StoryScreen();
-    void onEvent(GameControlEvent *cevent);
+    void onEvent(event_manager::GameControlEvent *cevent);
     void transitionFromScreen(Screen &fromScreen);
     /* Notification on screen visibility change
      * @param visible  true if the scren is visible, otherwise false

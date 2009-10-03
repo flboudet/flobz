@@ -30,7 +30,7 @@ class ScrollWidget : public Widget {
 public:
     ScrollWidget(ScrollInfoProvider &siProvider);
     virtual ~ScrollWidget();
-    virtual void eventOccured(GameControlEvent *event);
+    virtual void eventOccured(event_manager::GameControlEvent *event);
 protected:
     virtual void draw(DrawTarget *dt);
 private:
@@ -60,10 +60,10 @@ public:
     void addEntry(ListViewEntry *entry);
     void removeEntry(ListViewEntry *entry);
     ListViewEntry *getEntryAt(int index) const { return entries[index]; }
-    virtual void eventOccured(GameControlEvent *event);
+    virtual void eventOccured(event_manager::GameControlEvent *event);
     virtual IdleComponent *getIdleComponent() { return this; }
     // Action
-    virtual void action(Widget *sender, int actionType, GameControlEvent *event);
+    virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
     // CycledComponent
     virtual void cycle();
     // ScrollInfoProvider

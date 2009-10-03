@@ -36,12 +36,12 @@ namespace gameui {
     GAMEUIENUM_LAST
   };
 
-bool isDirectionEvent(GameControlEvent *event);
+bool isDirectionEvent(event_manager::GameControlEvent *event);
 
   class Action {
     public:
       virtual void action() {}
-      virtual void action(Widget *sender, int actionType, GameControlEvent *event) { action(); }
+      virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event) { action(); }
       virtual ~Action() {}
   };
 
@@ -93,7 +93,7 @@ bool isDirectionEvent(GameControlEvent *event);
       Vec3 getSize() const               { return size; }
 
       // default behaviour is to lose the focus
-      virtual void eventOccured(GameControlEvent *event);
+      virtual void eventOccured(event_manager::GameControlEvent *event);
 
       virtual bool isFocusable() const { return focusable; }
 
@@ -214,7 +214,7 @@ bool isDirectionEvent(GameControlEvent *event);
        * Handles and eventually propagates an event on the widget tree of the box container
        * @param event the game event
        */
-      virtual void eventOccured(GameControlEvent *event);
+      virtual void eventOccured(event_manager::GameControlEvent *event);
       virtual void giveFocus();
       virtual void lostFocus();
       virtual void setFocusable(bool foc);
@@ -227,9 +227,9 @@ bool isDirectionEvent(GameControlEvent *event);
       virtual float getOtherAxis(const Vec3 &v3) const = 0;
       virtual void setSortingAxe(Vec3 &v3, float value) = 0;
       virtual void setOtherAxis(Vec3 &v3, float value) = 0;
-      virtual bool isPrevEvent(GameControlEvent *event) const = 0;
-      virtual bool isNextEvent(GameControlEvent *event) const = 0;
-      virtual bool isOtherDirection(GameControlEvent *event) const = 0;
+      virtual bool isPrevEvent(event_manager::GameControlEvent *event) const = 0;
+      virtual bool isNextEvent(event_manager::GameControlEvent *event) const = 0;
+      virtual bool isOtherDirection(event_manager::GameControlEvent *event) const = 0;
 
       GameUIEnum policy;
       int     innerMargin;
@@ -239,8 +239,8 @@ bool isDirectionEvent(GameControlEvent *event);
       virtual bool giveFocusToActiveWidget();
 
     private:
-      void handleMouseFocus(GameControlEvent *event);
-      void handleKeyboardFocus(GameControlEvent *event);
+      void handleMouseFocus(event_manager::GameControlEvent *event);
+      void handleKeyboardFocus(event_manager::GameControlEvent *event);
       //Events
       Action *onRollDownAction, *onRollUpAction;
   };
@@ -255,9 +255,9 @@ bool isDirectionEvent(GameControlEvent *event);
       void  setSortingAxe(Vec3 &v3, float value)       { v3.y = value; }
       virtual float getOtherAxis(const Vec3 &v3) const { return v3.x; }
       virtual void setOtherAxis(Vec3 &v3, float value) { v3.x = value; }
-      bool isPrevEvent(GameControlEvent *event) const;
-      bool isNextEvent(GameControlEvent *event) const;
-      bool isOtherDirection(GameControlEvent *event) const;
+      bool isPrevEvent(event_manager::GameControlEvent *event) const;
+      bool isNextEvent(event_manager::GameControlEvent *event) const;
+      bool isOtherDirection(event_manager::GameControlEvent *event) const;
   };
 
 
@@ -270,9 +270,9 @@ bool isDirectionEvent(GameControlEvent *event);
       void  setSortingAxe(Vec3 &v3, float value)       { v3.x = value; }
       virtual float getOtherAxis(const Vec3 &v3) const { return v3.y; }
       virtual void setOtherAxis(Vec3 &v3, float value) { v3.y = value; }
-      bool isPrevEvent(GameControlEvent *event) const;
-      bool isNextEvent(GameControlEvent *event) const;
-      bool isOtherDirection(GameControlEvent *event) const;
+      bool isPrevEvent(event_manager::GameControlEvent *event) const;
+      bool isNextEvent(event_manager::GameControlEvent *event) const;
+      bool isOtherDirection(event_manager::GameControlEvent *event) const;
   };
 
 
@@ -284,15 +284,15 @@ bool isDirectionEvent(GameControlEvent *event);
 
       virtual void giveFocus() { Box::giveFocus(); }
       virtual void lostFocus() { Box::lostFocus(); }
-      virtual void eventOccured(GameControlEvent *event);
+      virtual void eventOccured(event_manager::GameControlEvent *event);
     protected:
       float getSortingAxe(const Vec3 &v3) const        { return v3.z;  }
       void  setSortingAxe(Vec3 &v3, float value)       { v3.z = value; }
       virtual float getOtherAxis(const Vec3 &v3) const { return v3.x; }
       virtual void setOtherAxis(Vec3 &v3, float value) { v3.x = value; }
-      bool isPrevEvent(GameControlEvent *event) const;
-      bool isNextEvent(GameControlEvent *event) const;
-      bool isOtherDirection(GameControlEvent *event) const;
+      bool isPrevEvent(event_manager::GameControlEvent *event) const;
+      bool isNextEvent(event_manager::GameControlEvent *event) const;
+      bool isOtherDirection(event_manager::GameControlEvent *event) const;
   };
 
   class SliderContainer;
@@ -374,7 +374,7 @@ bool isDirectionEvent(GameControlEvent *event);
     protected:
       // Implements Widget
       virtual void draw(DrawTarget *dt);
-      void eventOccured(GameControlEvent *event);
+      void eventOccured(event_manager::GameControlEvent *event);
       void addContentWidget();
       void endSlideInside(bool inside);
 
@@ -429,7 +429,7 @@ bool isDirectionEvent(GameControlEvent *event);
        * Propagates an event on the widget tree of the screen
        * @param event the game event
        */
-      virtual void onEvent(GameControlEvent *event);
+      virtual void onEvent(event_manager::GameControlEvent *event);
       void remove(Widget *child) { rootContainer.remove(child); }
       void add(Widget *child) { rootContainer.add(child); }
       virtual void hide() { hidden = true; onScreenVisibleChanged(isVisible()); }
@@ -530,7 +530,7 @@ bool isDirectionEvent(GameControlEvent *event);
     virtual void onWidgetVisibleChanged(bool visible) { Widget::onWidgetVisibleChanged(visible); }
     virtual void onWidgetAdded(WidgetContainer *parent) { Widget::onWidgetAdded(parent); }
     virtual void onWidgetRemoved(WidgetContainer *parent) { Widget::onWidgetRemoved(parent); }
-    virtual void eventOccured(GameControlEvent *event);
+    virtual void eventOccured(event_manager::GameControlEvent *event);
     // Events
     void setOnStartAction(Action *onStartAction) { setAction(ON_START, onStartAction); setFocusable(true); }
     void setOnMouseUpAction(Action *onMouseUpAction) { setAction(ON_MOUSEUP, onMouseUpAction); setFocusable(true); setReceiveUpEvents(true); }
@@ -547,7 +547,7 @@ bool isDirectionEvent(GameControlEvent *event);
       Button(const String &label, IosFont *fontActive = NULL, IosFont *fontInactive = NULL);
       Button(const String &label, Action *action);
 
-      void eventOccured(GameControlEvent *event);
+      void eventOccured(event_manager::GameControlEvent *event);
 
       void lostFocus();
       void giveFocus();
@@ -564,8 +564,8 @@ bool isDirectionEvent(GameControlEvent *event);
       EditField(const String &defaultText, Action *action = NULL);
       EditField(const String &defaultText, const String &persistentID);
 
-      void eventOccured(GameControlEvent *event);
-      bool handleJoystickEdit(GameControlEvent *event);
+      void eventOccured(event_manager::GameControlEvent *event);
+      bool handleJoystickEdit(event_manager::GameControlEvent *event);
       void setValue(String value, bool persistent = true);
 
       void lostFocus();
@@ -587,14 +587,14 @@ bool isDirectionEvent(GameControlEvent *event);
       bool repeat;
       double repeat_date;
       double repeat_speed;
-      GameControlEvent repeatEvent;
+      event_manager::GameControlEvent repeatEvent;
   };
 
   class ControlInputWidget : public Text {
     public:
       ControlInputWidget(int control, bool alternate, Action *action = NULL);
 
-      void eventOccured(GameControlEvent *event);
+      void eventOccured(event_manager::GameControlEvent *event);
 
       void lostFocus();
       void giveFocus();
@@ -608,9 +608,9 @@ bool isDirectionEvent(GameControlEvent *event);
       String previousValue;
       void init(IosFont *fontActive, IosFont *fontInactive);
 
-      void press(GameControlEvent *event);
-      void cancel(GameControlEvent *event);
-      void changeTo(GameControlEvent *event);
+      void press(event_manager::GameControlEvent *event);
+      void cancel(event_manager::GameControlEvent *event);
+      void changeTo(event_manager::GameControlEvent *event);
   };
 
   class ToggleButton : public Button {
@@ -697,7 +697,7 @@ bool isDirectionEvent(GameControlEvent *event);
   	  	Widget* getVisibleChild(int i);
   		void updateShownWidgets(void);
   		void arrangeWidgets(void);
-  		void eventOccured(GameControlEvent *event);
+  		void eventOccured(event_manager::GameControlEvent *event);
   		int lastvisible;
   		int firstvisible;
   		bool isItemVisible(int id);

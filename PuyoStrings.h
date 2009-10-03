@@ -56,17 +56,17 @@ extern const char *kLevelEasy;
 extern const char *kLevelMedium;
 extern const char *kLevelHard;
 
-extern const char *kPlayer1Left;
-extern const char *kPlayer1Right;
-extern const char *kPlayer1Down;
-extern const char *kPlayer1Clockwise;
-extern const char *kPlayer1Counterclockwise;
+extern const char *kSPlayer1Left;
+extern const char *kSPlayer1Right;
+extern const char *kSPlayer1Down;
+extern const char *kSPlayer1Clockwise;
+extern const char *kSPlayer1Counterclockwise;
 
-extern const char *kPlayer2Left;
-extern const char *kPlayer2Right;
-extern const char *kPlayer2Down;
-extern const char *kPlayer2Clockwise;
-extern const char *kPlayer2Counterclockwise;
+extern const char *kSPlayer2Left;
+extern const char *kSPlayer2Right;
+extern const char *kSPlayer2Down;
+extern const char *kSPlayer2Clockwise;
+extern const char *kSPlayer2Counterclockwise;
 
 extern const char *kRules01;
 extern const char *kRules02;

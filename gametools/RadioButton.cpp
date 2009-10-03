@@ -1,6 +1,8 @@
 #include "RadioButton.h"
 #include "preferences.h"
 
+using namespace event_manager;
+
 namespace gameui {
 
     //

@@ -40,7 +40,7 @@ public:
     int pauseMenuTop, pauseMenuLeft;
     void backPressed(bool fromControls = true);
     // Action handler
-    virtual void action(Widget *sender, int actionType, GameControlEvent *event);
+    virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
     /**
      * Notify that the slider is outside of the screen, before sliding back inside
      */

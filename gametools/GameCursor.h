@@ -33,7 +33,7 @@ class GameCursor : public AbstractCursor,
 public:
     GameCursor(const char *cursorImage);
     virtual ~GameCursor();
-    virtual void onEvent(GameControlEvent *event);
+    virtual void onEvent(event_manager::GameControlEvent *event);
     virtual void cycle();
     void setVisible(bool visible) { this->visible = visible; }
     void setObscured(bool obscured) { this->obscured = obscured; }

@@ -13,7 +13,7 @@ public:
   virtual ~FramedButton() {}
   virtual void setValue(String value);
   Button *getButton() { return &m_button; }
-  void eventOccured(GameControlEvent *event);
+  void eventOccured(event_manager::GameControlEvent *event);
 private:
   Button m_button;
 };

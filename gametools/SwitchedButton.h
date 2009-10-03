@@ -11,7 +11,7 @@ namespace gameui {
         SwitchedButton(String label, bool defaultValue,
                        IosSurface *trueSurface, IosSurface *falseSurface, String prefKey, Action * altResponder=NULL);
         virtual ~SwitchedButton();
-        virtual void action(Widget *sender, int actionType, GameControlEvent *event);
+        virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
         void notificationOccured(String identifier, void * context);
         bool getState();
         void setState(bool _state);

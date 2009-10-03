@@ -3,6 +3,8 @@
 #include "audio.h"
 #include "AnimatedPuyoTheme.h"
 
+using namespace event_manager;
+
 extern IosFont *storyFont;
 
 DrawTarget *sstory;
@@ -276,14 +278,12 @@ void StoryScreen::onEvent(GameControlEvent *cevent)
 {
     bool passEvent = true;
     switch (cevent->cursorEvent) {
-    case GameControlEvent::kBack:
-    case GameControlEvent::kStart:
-    case GameControlEvent::kGameMouseClicked:
-        if (cevent->isUp)
-            break;
+    case kBack:
+    case kStart:
+    case kGameMouseDown:
         if (finishedAction != NULL) {
-	  finishedAction->action(&storyWidget, 0, cevent);
-	    passEvent = false;
+            finishedAction->action(&storyWidget, 0, cevent);
+            passEvent = false;
         }
         break;
     default:

@@ -28,6 +28,8 @@
 #include "PuyoStrings.h"
 #include "AnimatedPuyoTheme.h"
 
+using namespace event_manager;
+
 LevelThemeSelectionBox::LevelThemeSelectionBox()
     : themePreview(), Spacer0(), Spacer1(), Spacer2(), Spacer3()
 {

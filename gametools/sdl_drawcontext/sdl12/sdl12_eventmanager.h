@@ -9,10 +9,12 @@
 #include "SDL.h"
 #endif
 
-class SDL12_EventManager : public EventManager
+class SDL12_EventManager : public event_manager::EventManager
 {
 public:
-    virtual bool pollEvent(GameControlEvent &controlEvent);
+
+    virtual bool pollEvent(event_manager::GameControlEvent &controlEvent);
+    virtual void pushMouseEvent(int x, int y, event_manager::CursorEventType type);
 };
 
 #endif // _SDL12_EVENTMANAGER_H_

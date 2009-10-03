@@ -2,6 +2,15 @@
 #include "preferences.h"
 #include "GameCursor.h"
 
+#ifdef MACOSX
+#include <SDL/SDL.h>
+#else
+#include "SDL.h"
+#endif
+
+namespace event_manager
+{
+
 #define NB_CONTROLS 10
 static InputSwitch *keyControls[NB_CONTROLS] =
 {
@@ -46,9 +55,9 @@ void getKeyName(int gameEvent, bool alternate, char *keyName)
 
 void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
 {
-  result->gameEvent     = GameControlEvent::kGameNone;
-  result->cursorEvent   = GameControlEvent::kCursorNone;
-  result->keyboardEvent = GameControlEvent::kKeyboardNone;
+  result->gameEvent     = kGameNone;
+  result->cursorEvent   = kCursorNone;
+  result->keyboardEvent = kKeyboardNone;
   result->isUp   = true;
   result->caught = false;
   result->isJoystick = false;
@@ -56,14 +65,14 @@ void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
 
   switch (e.type) {
   case SDL_QUIT:
-    result->cursorEvent = GameControlEvent::kQuit;
+    result->cursorEvent = kQuit;
     break;
   // Mouse handling
   case SDL_USEREVENT: {
     switch (e.user.code) {
     case Cursor::MOVE: {
         result->isUp = false;
-        result->cursorEvent = GameControlEvent::kGameMouseMoved;
+        result->cursorEvent = kGameMouseMoved;
         Cursor::CursorEventArg *arg = (Cursor::CursorEventArg *)e.user.data1;
         result->x = arg->x;
         result->y = arg->y;
@@ -71,7 +80,7 @@ void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
         } break;
     case Cursor::MOUSE_DOWN: {
         result->isUp = false;
-        result->cursorEvent = GameControlEvent::kGameMouseClicked;
+        result->cursorEvent = kGameMouseDown;
         Cursor::CursorEventArg *arg = (Cursor::CursorEventArg *)e.user.data1;
         result->x = arg->x;
         result->y = arg->y;
@@ -79,7 +88,7 @@ void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
         } break;
     case Cursor::MOUSE_UP: {
         result->isUp = true;
-        result->cursorEvent = GameControlEvent::kGameMouseClicked;
+        result->cursorEvent = kGameMouseUp;
         Cursor::CursorEventArg *arg = (Cursor::CursorEventArg *)e.user.data1;
         result->x = arg->x;
         result->y = arg->y;
@@ -90,11 +99,11 @@ void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
     }
   }
   case SDL_KEYDOWN:
-      result->keyboardEvent = GameControlEvent::kKeyboardDown;
+      result->keyboardEvent = kKeyboardDown;
       result->unicodeKeySym = e.key.keysym.unicode;
       break;
   case SDL_KEYUP:
-      result->keyboardEvent = GameControlEvent::kKeyboardUp;
+      result->keyboardEvent = kKeyboardUp;
       result->unicodeKeySym = e.key.keysym.unicode;
       break;
   default:
@@ -107,52 +116,52 @@ void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
   result->isJoystick = input->isJoystick();
 
   if (input->isQuit())
-    result->cursorEvent = GameControlEvent::kQuit;
+    result->cursorEvent = kQuit;
 
   if (input->isValidate())
-    result->cursorEvent = GameControlEvent::kStart;
+    result->cursorEvent = kStart;
 
   if (input->isCancel())
-    result->cursorEvent = GameControlEvent::kBack;
+    result->cursorEvent = kBack;
 
   if (input->isArrowDown())
-    result->cursorEvent = GameControlEvent::kDown;
+    result->cursorEvent = kDown;
 
   if (input->isArrowUp())
-    result->cursorEvent = GameControlEvent::kUp;
+    result->cursorEvent = kUp;
 
   if (input->isArrowLeft())
-    result->cursorEvent = GameControlEvent::kLeft;
+    result->cursorEvent = kLeft;
 
   if (input->isArrowRight())
-    result->cursorEvent = GameControlEvent::kRight;
+    result->cursorEvent = kRight;
 
   if (input->isPause())
-    result->gameEvent = GameControlEvent::kPauseGame;
+    result->gameEvent = kPauseGame;
 
   result->isUp = input->isUp();
 
   if ((*input == *keyControls[kPlayer1LeftControl]) || (*input == *keyAlternateControls[kPlayer1LeftControl]))
-    result->gameEvent = GameControlEvent::kPlayer1Left;
+    result->gameEvent = kPlayer1Left;
   if ((*input == *keyControls[kPlayer1RightControl]) || (*input == *keyAlternateControls[kPlayer1RightControl]))
-    result->gameEvent = GameControlEvent::kPlayer1Right;
+    result->gameEvent = kPlayer1Right;
   if ((*input == *keyControls[kPlayer1ClockwiseControl]) || (*input == *keyAlternateControls[kPlayer1ClockwiseControl]))
-    result->gameEvent = GameControlEvent::kPlayer1TurnRight;
+    result->gameEvent = kPlayer1TurnRight;
   if ((*input == *keyControls[kPlayer1CounterclockwiseControl]) || (*input == *keyAlternateControls[kPlayer1CounterclockwiseControl]))
-    result->gameEvent = GameControlEvent::kPlayer1TurnLeft;
+    result->gameEvent = kPlayer1TurnLeft;
   if ((*input == *keyControls[kPlayer1DownControl]) || (*input == *keyAlternateControls[kPlayer1DownControl]))
-    result->gameEvent = GameControlEvent::kPlayer1Down;
+    result->gameEvent = kPlayer1Down;
 
   if ((*input == *keyControls[kPlayer2LeftControl]) || (*input == *keyAlternateControls[kPlayer2LeftControl]))
-    result->gameEvent = GameControlEvent::kPlayer2Left;
+    result->gameEvent = kPlayer2Left;
   if ((*input == *keyControls[kPlayer2RightControl]) || (*input == *keyAlternateControls[kPlayer2RightControl]))
-    result->gameEvent = GameControlEvent::kPlayer2Right;
+    result->gameEvent = kPlayer2Right;
   if ((*input == *keyControls[kPlayer2ClockwiseControl]) || (*input == *keyAlternateControls[kPlayer2ClockwiseControl]))
-    result->gameEvent = GameControlEvent::kPlayer2TurnRight;
+    result->gameEvent = kPlayer2TurnRight;
   if ((*input == *keyControls[kPlayer2CounterclockwiseControl]) || (*input == *keyAlternateControls[kPlayer2CounterclockwiseControl]))
-    result->gameEvent = GameControlEvent::kPlayer2TurnLeft;
+    result->gameEvent = kPlayer2TurnLeft;
   if ((*input == *keyControls[kPlayer2DownControl]) || (*input == *keyAlternateControls[kPlayer2DownControl]))
-    result->gameEvent = GameControlEvent::kPlayer2Down;
+    result->gameEvent = kPlayer2Down;
 }
 
 void getControlEvent(SDL_Event e, GameControlEvent *result)
@@ -182,7 +191,7 @@ bool tryChangeControl(int control, bool alternate, SDL_Event e, GameControlEvent
 
   getControlEvent(e,input,result);
 
-  if (result->cursorEvent == GameControlEvent::kQuit)
+  if (result->cursorEvent == kQuit)
     goto ret_false;
 
   if (input->isUp())
@@ -325,3 +334,5 @@ void loadControls()
    id = GetIntPreference("v50_AltP2Counterclockwise",  keyAlternateControls[kPlayer2CounterclockwiseControl]->id());
    keyAlternateControls[kPlayer2CounterclockwiseControl] = new InputFromIDAndName(id, name);
 }
+
+} // namespace

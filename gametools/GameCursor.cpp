@@ -2,6 +2,7 @@
 #include "GameCursor.h"
 #include "gameui.h"
 using namespace gameui;
+using namespace event_manager;
 using namespace Cursor;
 
 GameCursor::GameCursor(const char *cursorImage) : CycledComponent(0.01), idleDx(0), idleDy(0), visible(true), obscured(true)

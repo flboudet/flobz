@@ -25,6 +25,7 @@
 #include "PuyoCommander.h"
 #include "PuyoStarter.h"
 
+using namespace event_manager;
 
 #define TIME_BETWEEN_GAME_CYCLES 0.02
 #define TIME_TO_FINISH_GAME_WITH_BONUS 150.0

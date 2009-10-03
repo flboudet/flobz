@@ -44,7 +44,7 @@ public:
      * Implements the Action interface
      */
     virtual void action(Widget *sender, int actionType,
-                        GameControlEvent *event);
+                        event_manager::GameControlEvent *event);
 protected:
     PuyoIA *opponentcontroller;
     int faceTicks;
@@ -181,7 +181,7 @@ public:
      * Implements the Action interface
      */
     virtual void action(Widget *sender, int actionType,
-			GameControlEvent *event);
+			event_manager::GameControlEvent *event);
 private:
     void stateMachine();
     void performMatchPlaying(bool skipIntroduction = false,
@@ -227,7 +227,7 @@ public:
      * Implements the Action interface
      */
     virtual void action(Widget *sender, int actionType,
-			GameControlEvent *event);
+			event_manager::GameControlEvent *event);
     enum State {
       kNotRunning,
       kStoryIntroduction,

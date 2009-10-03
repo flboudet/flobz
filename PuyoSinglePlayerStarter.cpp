@@ -26,6 +26,8 @@
 #include "PuyoSinglePlayerStarter.h"
 #include "PuyoView.h"
 
+using namespace event_manager;
+
 SinglePlayerGameWidget::SinglePlayerGameWidget(int lifes, String aiFace)
     : opponentcontroller(NULL),
       faceTicks(0), opponent(aiFace),

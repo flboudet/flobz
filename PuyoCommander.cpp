@@ -7,6 +7,7 @@
 #include "MainMenu.h"
 
 using namespace gameui;
+using namespace event_manager;
 
 PuyoCommander *theCommander = NULL;
 IosFont *storyFont;

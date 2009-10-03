@@ -8,6 +8,8 @@
 #define MIN_REPEAT_TIME 100.0
 #define REPEAT_TIME 300.0
 
+using namespace event_manager;
+
 namespace gameui {
 
     GameUIEnum   GameUIDefaults::CONTAINER_POLICY = USE_MAX_SIZE;
@@ -23,13 +25,13 @@ namespace gameui {
 
     bool isDirectionEvent(GameControlEvent *event)
     {
-        if (event->cursorEvent == GameControlEvent::kUp)
+        if (event->cursorEvent == kUp)
             return true;
-        if (event->cursorEvent == GameControlEvent::kRight)
+        if (event->cursorEvent == kRight)
             return true;
-        if (event->cursorEvent == GameControlEvent::kLeft)
+        if (event->cursorEvent == kLeft)
             return true;
-        if (event->cursorEvent == GameControlEvent::kDown)
+        if (event->cursorEvent == kDown)
             return true;
         return false;
     }
@@ -518,7 +520,7 @@ namespace gameui {
             return;
 
         // If the event is a mouse moved event, search and focus the widget beneath the cursor
-        if (event->cursorEvent == GameControlEvent::kGameMouseMoved) {
+        if (event->cursorEvent == kGameMouseMoved) {
             Widget *child = getChild(activeWidget);
             for (int i = 0 ; i < this->getNumberOfChilds() ; i++) {
                 Widget *wid = this->getChild(i);
@@ -633,9 +635,9 @@ namespace gameui {
     bool Box::giveFocusToActiveWidget()
     {
         GameControlEvent ev;
-        ev.cursorEvent   = GameControlEvent::kCursorNone;
-        ev.keyboardEvent = GameControlEvent::kKeyboardNone;
-        ev.gameEvent     = GameControlEvent::kGameNone;
+        ev.cursorEvent   = kCursorNone;
+        ev.keyboardEvent = kKeyboardNone;
+        ev.gameEvent     = kGameNone;
         ev.isUp          = false;
 
         Widget *child = getChild(activeWidget);
@@ -682,18 +684,18 @@ namespace gameui {
     //
     bool HBox::isPrevEvent(GameControlEvent *event) const
     {
-        return event->cursorEvent == GameControlEvent::kLeft;
+        return event->cursorEvent == kLeft;
     }
 
     bool HBox::isNextEvent(GameControlEvent *event) const
     {
-        return event->cursorEvent == GameControlEvent::kRight;
+        return event->cursorEvent == kRight;
     }
 
     bool HBox::isOtherDirection(GameControlEvent *event) const
     {
-        return (event->cursorEvent == GameControlEvent::kUp)
-            ||   (event->cursorEvent == GameControlEvent::kDown);
+        return (event->cursorEvent == kUp)
+            ||   (event->cursorEvent == kDown);
     }
 
 
@@ -702,16 +704,16 @@ namespace gameui {
     //
     bool VBox::isPrevEvent(GameControlEvent *event) const
     {
-        return event->cursorEvent == GameControlEvent::kUp;
+        return event->cursorEvent == kUp;
     }
     bool VBox::isNextEvent(GameControlEvent *event) const
     {
-        return event->cursorEvent == GameControlEvent::kDown;
+        return event->cursorEvent == kDown;
     }
     bool VBox::isOtherDirection(GameControlEvent *event) const
     {
-        return (event->cursorEvent == GameControlEvent::kRight)
-            ||   (event->cursorEvent == GameControlEvent::kLeft);
+        return (event->cursorEvent == kRight)
+            ||   (event->cursorEvent == kLeft);
     }
 
     //
@@ -727,10 +729,10 @@ namespace gameui {
     }
     bool ZBox::isOtherDirection(GameControlEvent *event) const
     {
-        return (event->cursorEvent == GameControlEvent::kRight)
-            ||   (event->cursorEvent == GameControlEvent::kLeft)
-            ||   (event->cursorEvent == GameControlEvent::kUp)
-            ||   (event->cursorEvent == GameControlEvent::kDown);
+        return (event->cursorEvent == kRight)
+            ||   (event->cursorEvent == kLeft)
+            ||   (event->cursorEvent == kUp)
+            ||   (event->cursorEvent == kDown);
     }
     void ZBox::widgetMustRedraw(Widget *wid)
     {
@@ -1059,8 +1061,8 @@ namespace gameui {
         while (!childHaveFocus);
         arrangeWidgets();
         GameControlEvent ev;
-        ev.cursorEvent = GameControlEvent::kStart;
-        ev.gameEvent   = GameControlEvent::kGameNone;
+        ev.cursorEvent = kStart;
+        ev.gameEvent   = kGameNone;
         ev.isUp        = false;
         getChild(activeWidget)->eventOccured(&ev);
     }
@@ -1399,9 +1401,9 @@ namespace gameui {
         bool clicked = false;
         if (isDirectionEvent(event) && !event->isUp)
             lostFocus();
-        if (event->cursorEvent == GameControlEvent::kStart)
+        if (event->cursorEvent == kStart)
             clicked = true;
-        if (event->cursorEvent == GameControlEvent::kGameMouseClicked) {
+        if (event->cursorEvent == kGameMouseDown) {
             Vec3 widPosition = getPosition();
             Vec3 widSize = getSize();
             if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
@@ -1456,9 +1458,9 @@ namespace gameui {
 
         if (isDirectionEvent(event))
             lostFocus();
-        if (event->cursorEvent == GameControlEvent::kStart)
+        if (event->cursorEvent == kStart)
             clicked = true;
-        if (event->cursorEvent == GameControlEvent::kGameMouseClicked) {
+        if (event->cursorEvent == kGameMouseDown) {
             Vec3 widPosition = getPosition();
             Vec3 widSize = getSize();
             if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
@@ -1595,7 +1597,7 @@ namespace gameui {
             }
         }
 
-        if (event->cursorEvent == GameControlEvent::kStart) {
+        if (event->cursorEvent == kStart) {
             editionMode = !editionMode;
             if (editionMode == true) {
                 previousValue = getValue();
@@ -1611,7 +1613,7 @@ namespace gameui {
             }
             shouldHandleKbdInput = false;
         }
-        else if ((event->cursorEvent == GameControlEvent::kGameMouseClicked) && (editionMode == false)) {
+        else if ((event->cursorEvent == kGameMouseDown) && (editionMode == false)) {
             Vec3 widPosition = getPosition();
             Vec3 widSize = getSize();
             if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
@@ -1624,7 +1626,7 @@ namespace gameui {
         }
         else if (editionMode == true) {
             // kBack => Cancel current entry
-            if (event->cursorEvent == GameControlEvent::kBack) {
+            if (event->cursorEvent == kBack) {
                 if (!editOnFocus) {
                     setValue(previousValue, false);
                     editionMode = false;
@@ -1637,7 +1639,7 @@ namespace gameui {
             else if (!editOnFocus)
                 shouldHandleKbdInput = !handleJoystickEdit(event);
             // Keyboard input is also supported
-            if ((shouldHandleKbdInput) && (event->keyboardEvent == GameControlEvent::kKeyboardDown)) {
+            if ((shouldHandleKbdInput) && (event->keyboardEvent == kKeyboardDown)) {
                 char ch = 0;
                 // Ascii character
                 if ((event->unicodeKeySym & 0xFF80) == 0) {
@@ -1689,7 +1691,7 @@ namespace gameui {
         static const char CHAR_ORDER[] = "/:-. _ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?@";
         bool handled = false;
         // kUp => Change last char of the entry (forward)
-        if (event->cursorEvent == GameControlEvent::kUp) {
+        if (event->cursorEvent == kUp) {
             String newValue = getValue();
             while (newValue.length() <= 1)
                 newValue += '_';
@@ -1714,7 +1716,7 @@ namespace gameui {
             handled = true;
         }
         // kDown => Change last char of the entry (downward)
-        else if (event->cursorEvent == GameControlEvent::kDown) {
+        else if (event->cursorEvent == kDown) {
             String newValue = getValue();
             while (newValue.length() <= 1)
                 newValue += '_';
@@ -1739,7 +1741,7 @@ namespace gameui {
             handled = true;
         }
         // kLeft => Like Backspace
-        else if (event->cursorEvent == GameControlEvent::kLeft) {
+        else if (event->cursorEvent == kLeft) {
             if (getValue().length() > 1) {
                 int last=getValue().length() - 2;
 #ifdef ENABLE_TTF
@@ -1756,7 +1758,7 @@ namespace gameui {
             }
         }
         // kRight => Duplicate last char
-        else if (event->cursorEvent == GameControlEvent::kRight) {
+        else if (event->cursorEvent == kRight) {
             String newValue = getValue();
             newValue[newValue.length() - 1] = newValue[newValue.length() - 2];
             newValue += "_";
@@ -1858,17 +1860,17 @@ namespace gameui {
     void ControlInputWidget::eventOccured(GameControlEvent *event)
     {
         // if evenement joystick et editionMode alors traiter le cas.
-        if (event->isJoystick && editionMode && (event->cursorEvent != GameControlEvent::kBack)) {
+        if (event->isJoystick && editionMode && (event->cursorEvent != kBack)) {
             printf("XXXXX\n");
             changeTo(event);
         }
-        else if (event->cursorEvent == GameControlEvent::kStart) {
+        else if (event->cursorEvent == kStart) {
             if (editionMode == false)
                 press(event);
             else
                 cancel(event);
         }
-        else if (event->cursorEvent == GameControlEvent::kGameMouseClicked) {
+        else if (event->cursorEvent == kGameMouseDown) {
             Vec3 widPosition = getPosition();
             Vec3 widSize = getSize();
             if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
@@ -1876,7 +1878,7 @@ namespace gameui {
                 press(event);
         }
         else if (editionMode == true) {
-            if (event->cursorEvent == GameControlEvent::kBack)
+            if (event->cursorEvent == kBack)
                 cancel(event);
             else
                 changeTo(event);

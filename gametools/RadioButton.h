@@ -10,7 +10,7 @@ namespace gameui {
     public:
         RadioButton(int defaultValue, IosSurface *trueSurface, IosSurface *falseSurface, String prefKey);
         virtual ~RadioButton();
-        virtual void action(Widget *sender, int actionType, GameControlEvent *event);
+        virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
         void notificationOccured(String identifier, void * context);
         int getState();
         void setState(int _value);

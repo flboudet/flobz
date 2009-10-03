@@ -1,6 +1,8 @@
 #include "SwitchedButton.h"
 #include "preferences.h"
 
+using namespace event_manager;
+
 namespace gameui {
 
     //

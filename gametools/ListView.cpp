@@ -9,6 +9,8 @@
 
 #include "ListView.h"
 
+using namespace event_manager;
+
 namespace gameui {
 
 ScrollWidget::ScrollWidget(ScrollInfoProvider &siProvider)
@@ -28,7 +30,7 @@ void ScrollWidget::eventOccured(GameControlEvent *event)
 {
     if (isDirectionEvent(event))
             lostFocus();
-    if (event->cursorEvent == GameControlEvent::kGameMouseClicked) {
+    if (event->cursorEvent == kGameMouseDown) {
         if (event->isUp) {
             if (m_grabbing) {
                 getParentScreen()->ungrabEventsOnWidget(this);
@@ -61,7 +63,7 @@ void ScrollWidget::eventOccured(GameControlEvent *event)
             }
         }
     }
-    else if (event->cursorEvent == GameControlEvent::kGameMouseMoved) {
+    else if (event->cursorEvent == kGameMouseMoved) {
         if (m_grabbing) {
             Vec3 widPosition = getPosition();
             Vec3 widSize = getSize();

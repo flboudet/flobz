@@ -35,7 +35,7 @@
 class PuyoEventPlayer : public PuyoPlayer {
 public:
     PuyoEventPlayer(PuyoView &view, int downEvent, int leftEvent, int rightEvent, int turnLeftEvent, int turnRightEvent);
-    void eventOccured(GameControlEvent *event);
+    void eventOccured(event_manager::GameControlEvent *event);
     void cycle();
 private:
     bool keyShouldRepeat(int &key);
@@ -54,7 +54,7 @@ private:
 class PuyoCombinedEventPlayer : public PuyoPlayer {
 public:
     PuyoCombinedEventPlayer(PuyoView &view);
-    void eventOccured(GameControlEvent *event);
+    void eventOccured(event_manager::GameControlEvent *event);
     void cycle();
 private:
     PuyoEventPlayer player1controller;

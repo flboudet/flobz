@@ -1,5 +1,7 @@
 #include "FramedEditField.h"
 
+using namespace event_manager;
+
 namespace gameui {
 
 FramedEditField::FramedEditField(const String &label, Action *action,
@@ -34,8 +36,8 @@ void FramedEditField::initFramedEditField(const FramePicture *framePicture, cons
 
     void FramedEditField::eventOccured(GameControlEvent *event)
     {
-        if (event->cursorEvent == GameControlEvent::kGameMouseMoved
-            || event->cursorEvent == GameControlEvent::kGameMouseClicked) {
+        if (event->cursorEvent == kGameMouseMoved
+            || event->cursorEvent == kGameMouseDown) {
             Vec3 widPosition = getPosition();
             Vec3 widSize = getSize();
             // If we click inside the frame
@@ -50,12 +52,12 @@ void FramedEditField::initFramedEditField(const FramePicture *framePicture, cons
                 if (event->y < buttonPosition.y) event->y = (int)ceil(buttonPosition.y);
                 if (event->y > buttonPosition.y + buttonSize.y) event->y = (int)floor(buttonPosition.y + buttonSize.y);
             }
-        }    
-        
+        }
+
         // Push the event to the widget
         Frame::eventOccured(event);
     }
-    
+
 
 //
 // EditFieldWithLabel
@@ -88,7 +90,7 @@ EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, String
   add(&m_editField);
 }
 
-    
+
 EditFieldWithLabel::~EditFieldWithLabel()
 {
 }

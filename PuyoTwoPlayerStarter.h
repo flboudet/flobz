@@ -72,7 +72,7 @@ public:
      * Implements the Action interface
      */
     virtual void action(Widget *sender, int actionType,
-			GameControlEvent *event);
+			event_manager::GameControlEvent *event);
 private:
     enum State {
       kNotRunning,

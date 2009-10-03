@@ -31,7 +31,7 @@ class MainScreen : public PuyoScreen, public gameui::SliderContainerListener {
     void popMenu();
     void build() {}
     void transitionFromScreen(Screen &fromScreen);
-    void onEvent(GameControlEvent *cevent);
+    void onEvent(event_manager::GameControlEvent *cevent);
     // SliderContainerListener implementation
     /**
      * Notify that the slider is outside of the screen, before sliding back inside

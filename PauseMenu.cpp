@@ -24,11 +24,12 @@
  */
 
 #include "PauseMenu.h"
+using namespace event_manager;
 
 PauseMenu::PauseMenu(Action *pauseAction)
     : topSeparator(0, 10), pauseVBox(theCommander->getWindowFramePicture()),
       pauseTitleFrame(theCommander->getSeparatorFramePicture()),
-      menuTitle(theCommander->getLocalizedString("Pause")), 
+      menuTitle(theCommander->getLocalizedString("Pause")),
       continueButton(theCommander->getLocalizedString("Continue game"), this),
       optionsButton(theCommander->getLocalizedString("Options"), this),
       audioButton(),

@@ -24,6 +24,7 @@
  */
 
 #include "PuyoTwoPlayerStarter.h"
+using namespace event_manager;
 
 TwoPlayersGameWidget::TwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String aiFace, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
                                                      attachedRandom(5), attachedGameFactory(&attachedRandom),
@@ -31,10 +32,10 @@ TwoPlayersGameWidget::TwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, P
                                                      1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE),
                                                      areaB(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
                                                      1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE),
-                                                     playercontrollerA(areaA, GameControlEvent::kPlayer1Down, GameControlEvent::kPlayer1Left, GameControlEvent::kPlayer1Right,
-                                                     GameControlEvent::kPlayer1TurnLeft, GameControlEvent::kPlayer1TurnRight),
-                                                     playercontrollerB(areaB, GameControlEvent::kPlayer2Down, GameControlEvent::kPlayer2Left, GameControlEvent::kPlayer2Right,
-                                                     GameControlEvent::kPlayer2TurnLeft, GameControlEvent::kPlayer2TurnRight),
+                                                     playercontrollerA(areaA, kPlayer1Down, kPlayer1Left, kPlayer1Right,
+                                                     kPlayer1TurnLeft, kPlayer1TurnRight),
+                                                     playercontrollerB(areaB, kPlayer2Down, kPlayer2Left, kPlayer2Right,
+                                                     kPlayer2TurnLeft, kPlayer2TurnRight),
                                                      opponentFace(aiFace)
 {
     initWithGUI(areaA, areaB, playercontrollerA, playercontrollerB, levelTheme, gameOverAction);

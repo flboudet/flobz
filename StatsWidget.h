@@ -64,7 +64,7 @@ public:
                     bool showGlobalScore = false,
                     gameui::Action *action = NULL);
     virtual ~StatsWidget() {}
-    virtual void action(Widget *sender, int actionType, GameControlEvent *event);
+    virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
     void startAnimation();
     virtual void idle(double currentTime);
     virtual IdleComponent *getIdleComponent() { return this; }
@@ -80,7 +80,7 @@ private:
         void setComboLineInfos(StatsDirection dir, int tag, String comboText,
                                int numberOfCombos, int vsNumberOfCombos,
                                int totalNumOfCombos, gameui::Action *progressionCompleteAction);
-        virtual void action(Widget *sender, int actionType, GameControlEvent *event);
+        virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
     private:
         StatsDirection m_dir;
         int m_tag;
@@ -105,7 +105,7 @@ public:
   StatsLegendWidget(StatsFormat &statsFormat, StatsWidget &guideWidget, const gameui::FramePicture *framePicture);
   virtual ~StatsLegendWidget() {}
   virtual void onWidgetVisibleChanged(bool visible);
-  virtual void action(Widget *sender, int actionType, GameControlEvent *event);
+  virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
 private:
   gameui::Image m_statsImage;
   StatsFormat &m_statsFormat;

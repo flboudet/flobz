@@ -1,6 +1,8 @@
 #include "gameloop.h"
 #include "gameui.h"
 
+using namespace event_manager;
+
 DrawableComponent::DrawableComponent()
   : parentLoop(NULL), _drawRequested(false)
 {
@@ -239,7 +241,7 @@ void GameLoop::idle(double currentTime)
         idles[i]->onEvent(&controlEvent);
       }
     }
-    if (controlEvent.cursorEvent == GameControlEvent::kQuit) { // TODO: Laisser libre l'utilisateur ?
+    if (controlEvent.cursorEvent == kQuit) { // TODO: Laisser libre l'utilisateur ?
       exit(0);
     }
   }

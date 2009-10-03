@@ -29,6 +29,8 @@
 #include "ios_time.h"
 #include <sstream>
 
+using namespace event_manager;
+
 class PuyoNetworkTwoPlayerGameWidgetFactory : public GameWidgetFactory {
 public:
     PuyoNetworkTwoPlayerGameWidgetFactory(ios_fc::MessageBox &mbox, unsigned int randomSeed, ios_fc::IgpMessageBox *igpbox/* = NULL */)
@@ -102,7 +104,7 @@ void NetCenterDialogMenu::eventOccured(GameControlEvent *event)
     SliderContainer::eventOccured(event);
     // We intercept the back event so it will do the same as the cancel action
     switch (event->cursorEvent) {
-        case GameControlEvent::kBack:
+        case kBack:
             event->caught = true;
             cancelAction.action();
             break;
@@ -350,7 +352,7 @@ void NetCenterMenu::eventOccured(GameControlEvent *event)
     // to go to the previous menu by hitting the back button.
     // (otherwise, it's too easy to disconnect by mistake)
     switch (event->cursorEvent) {
-        case GameControlEvent::kBack:
+        case kBack:
             event->caught = true;
             break;
     default:
