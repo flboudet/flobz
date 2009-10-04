@@ -65,7 +65,8 @@ enum KeyboardEventType {
  * GameControlEvent is independant of the underlying
  * event handling backend.
  */
-typedef struct GameControlEvent {
+class GameControlEvent {
+public:
 	GameControlEvent() : caught(false) {}
     GameEventType     gameEvent;
     CursorEventType   cursorEvent;
@@ -76,7 +77,7 @@ typedef struct GameControlEvent {
     int x, y;
     uint16_t unicodeKeySym;
 	void setCaught() { caught = true; }
-} GameControlEvent;
+};
 
 /**
  * Abstract interface to an event handling backend

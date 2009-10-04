@@ -67,37 +67,6 @@ void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
   case SDL_QUIT:
     result->cursorEvent = kQuit;
     break;
-  // Mouse handling
-  case SDL_USEREVENT: {
-    switch (e.user.code) {
-    case Cursor::MOVE: {
-        result->isUp = false;
-        result->cursorEvent = kGameMouseMoved;
-        Cursor::CursorEventArg *arg = (Cursor::CursorEventArg *)e.user.data1;
-        result->x = arg->x;
-        result->y = arg->y;
-        delete arg;
-        } break;
-    case Cursor::MOUSE_DOWN: {
-        result->isUp = false;
-        result->cursorEvent = kGameMouseDown;
-        Cursor::CursorEventArg *arg = (Cursor::CursorEventArg *)e.user.data1;
-        result->x = arg->x;
-        result->y = arg->y;
-        delete arg;
-        } break;
-    case Cursor::MOUSE_UP: {
-        result->isUp = true;
-        result->cursorEvent = kGameMouseUp;
-        Cursor::CursorEventArg *arg = (Cursor::CursorEventArg *)e.user.data1;
-        result->x = arg->x;
-        result->y = arg->y;
-        delete arg;
-        } break;
-    default:
-        break;
-    }
-  }
   case SDL_KEYDOWN:
       result->keyboardEvent = kKeyboardDown;
       result->unicodeKeySym = e.key.keysym.unicode;

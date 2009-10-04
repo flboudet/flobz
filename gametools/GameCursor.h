@@ -28,26 +28,23 @@ public:
 
 class GameCursor : public AbstractCursor,
                    public DrawableComponent,
-                   public CycledComponent
+                   public IdleComponent
 {
 public:
     GameCursor(const char *cursorImage);
     virtual ~GameCursor();
     virtual void onEvent(event_manager::GameControlEvent *event);
-    virtual void cycle();
     void setVisible(bool visible) { this->visible = visible; }
     void setObscured(bool obscured) { this->obscured = obscured; }
 protected:
     virtual void draw(DrawTarget *dt);
 private:
     void setCursorPosition(int x, int y);
-    void pushMouseEvent(int x, int y, int eventType);
 
     IosSurface * cursorSurface;
     int blitX, blitY;
     int prevblitX, prevblitY;
     float blitAngle, tgtBlitAngle;
-    int idleDx, idleDy;
     bool visible;
     bool obscured;
 };

@@ -5,7 +5,7 @@ using namespace gameui;
 using namespace event_manager;
 using namespace Cursor;
 
-GameCursor::GameCursor(const char *cursorImage) : CycledComponent(0.01), idleDx(0), idleDy(0), visible(true), obscured(true)
+GameCursor::GameCursor(const char *cursorImage) : visible(true), obscured(true)
 {
     IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
     cursorSurface = iimLib.load_Absolute_DisplayFormatAlpha(cursorImage);
@@ -36,40 +36,9 @@ void GameCursor::draw(DrawTarget *dt)
 
 void GameCursor::onEvent(GameControlEvent *event)
 {
-#ifdef TODO
-    switch (event->sdl_event.type) {
-    case SDL_MOUSEMOTION:
-        setCursorPosition(event->sdl_event.motion.x,  event->sdl_event.motion.y);
-        break;
-    case SDL_JOYAXISMOTION:
-        if (event->sdl_event.jaxis.axis == 2) {
-            idleDy = event->sdl_event.jaxis.value / 5000;
-        }
-        else if (event->sdl_event.jaxis.axis == 3) {
-            idleDx = event->sdl_event.jaxis.value / 5000;
-        }
-        break;
-    case SDL_MOUSEBUTTONDOWN:
-        if (event->sdl_event.button.button == SDL_BUTTON_LEFT) {
-            pushMouseEvent(event->sdl_event.button.x, event->sdl_event.button.y, MOUSE_DOWN);
-        }
-        break;
-    case SDL_MOUSEBUTTONUP:
-        if (event->sdl_event.button.button == SDL_BUTTON_LEFT) {
-            pushMouseEvent(event->sdl_event.button.x, event->sdl_event.button.y, MOUSE_UP);
-        }
-        break;
-    default:
-        break;
+    if (event->cursorEvent == kGameMouseMoved) {
+        setCursorPosition(event->x, event->y);
     }
-#endif
-}
-
-void GameCursor::cycle()
-{
-    if ((idleDx * idleDx) + (idleDy * idleDy) < 1)
-        return;
-    setCursorPosition(blitX + idleDx, blitY + idleDy);
 }
 
 void GameCursor::setCursorPosition(int x, int y)
@@ -82,13 +51,6 @@ void GameCursor::setCursorPosition(int x, int y)
         x = this->DrawableComponent::parentLoop->getDrawContext()->getWidth();
     if (y > this->DrawableComponent::parentLoop->getDrawContext()->getHeight())
         y = this->DrawableComponent::parentLoop->getDrawContext()->getHeight();
-    // Push an SDL user event corresponding to the moving of our game cursor
-    SDL_Event moveEvent;
-    moveEvent.type = SDL_USEREVENT;
-    moveEvent.user.code = MOVE;
-    moveEvent.user.data1 = new CursorEventArg(x, y);
-    SDL_PushEvent(&moveEvent);
-
     blitX = x;
     blitY = y;
     int dx = prevblitX - blitX;
@@ -120,15 +82,4 @@ void GameCursor::setCursorPosition(int x, int y)
     else if (blitAngle < -180.)
         blitAngle += 360.;
 }
-
-void GameCursor::pushMouseEvent(int x, int y, int eventType)
-{
-    // Push an SDL user event corresponding to the click of our game cursor
-    SDL_Event mouseEvent;
-    mouseEvent.type = SDL_USEREVENT;
-    mouseEvent.user.code = eventType;
-    mouseEvent.user.data1 = new CursorEventArg(x, y);
-    SDL_PushEvent(&mouseEvent);
-}
-
 
