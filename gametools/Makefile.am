@@ -14,6 +14,6 @@ EXTRA_DIST=FramedButton.h FramedEditField.h Frame.h \
            ListView.h mt19937ar.h NotifyCenter.h \
            preferences.h RadioButton.h scrollingtext.h \
            SDL_Painter.h sofont.h SwitchedButton.h vec3.h \
-	   drawcontext.h BufferedDrawTarget.h
+	   drawcontext.h audiomanager.h BufferedDrawTarget.h
 
 SUBDIRS=sdl_drawcontext

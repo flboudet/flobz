@@ -3,11 +3,12 @@ if ENABLE_SDL12_GFX
 noinst_LTLIBRARIES=libsdl12_drawcontext.la
 
 libsdl12_drawcontext_la_SOURCES=common/SDL_IosFont.cpp \
+          common/SDL_AudioManager.cpp \
           sdl12/sdl12_drawcontext.cpp sdl12/sdl12_eventmanager.cpp
 
 libsdl12_drawcontext_la_CXXFLAGS = -I$(srcdir)/common -I$(srcdir)/sdl12 -I$(top_srcdir)/gametools -I$(top_srcdir)/iosfc $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 
-EXTRA_DIST=common/SDL_IosFont.h sdl12/sdl12_drawcontext.h sdl12/sdl12_eventmanager.h
+EXTRA_DIST=common/SDL_IosFont.h common/SDL_AudioManager.h sdl12/sdl12_drawcontext.h sdl12/sdl12_eventmanager.h
 
 endif
 
