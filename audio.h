@@ -1,6 +1,7 @@
 #ifndef _AUDIO_H
 #define _AUDIO_H
 
+#include "audiomanager.h"
 #include "NotifyCenter.h"
 
 /// AUDIO
@@ -14,7 +15,7 @@ class AudioManager : public gameui::NotificationResponder
 
   static void init();
   static void close();
-  
+
   static void preloadMusic(const char *fileName);
   static void loadMusic(const char *fileName);
   static void music(const char *command);
@@ -28,17 +29,19 @@ class AudioManager : public gameui::NotificationResponder
   static const char * soundVolumeKey(void);
   static const char * musicOnOffKey(void);
   static const char * soundOnOffKey(void);
-    
+
   static void musicVolume(float volume); // Volume in [0.0f, 1.0f] interval
   static void soundVolume(float volume); // Volume in [0.0f, 1.0f] interval
   static void musicOnOff(bool state);
   static void soundOnOff(bool state);
-    
+
   static bool isMusicOn();
   static bool isSoundOn();
 
   void notificationOccured(String identifier, void * context);
 
+private:
+    static audio_manager::AudioManager *m_audioManager;
 };
 
 

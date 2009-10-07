@@ -24,6 +24,7 @@ public:
     virtual void setMusicVolume(float volume) = 0;
     virtual Music *loadMusic(const char *fileName) = 0;
     virtual void playMusic(Music *music) = 0;
+    virtual void stopMusic() = 0;
     virtual void setMusicPosition(double position) = 0;
 
     virtual void setSoundEnabled(bool enabled) = 0;

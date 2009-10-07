@@ -25,16 +25,17 @@ class SDL_AudioManager : public audio_manager::AudioManager
 public:
     SDL_AudioManager();
     virtual ~SDL_AudioManager();
-    virtual void setMusicEnabled(bool enabled) = 0;
-    virtual void setMusicVolume(float volume) = 0;
-    virtual audio_manager::Music *loadMusic(const char *fileName) = 0;
-    virtual void playMusic(audio_manager::Music *music) = 0;
-    virtual void setMusicPosition(double position) = 0;
+    virtual void setMusicEnabled(bool enabled);
+    virtual void setMusicVolume(float volume);
+    virtual audio_manager::Music *loadMusic(const char *fileName);
+    virtual void playMusic(audio_manager::Music *music);
+    virtual void stopMusic();
+    virtual void setMusicPosition(double position);
 
-    virtual void setSoundEnabled(bool enabled) = 0;
-    virtual void setSoundVolume(float volume) = 0;
-    virtual audio_manager::Sound *loadSound(const char *fileName) = 0;
-    virtual void playSound(audio_manager::Sound *sound, float volume, float balance) = 0;
+    virtual void setSoundEnabled(bool enabled);
+    virtual void setSoundVolume(float volume);
+    virtual audio_manager::Sound *loadSound(const char *fileName);
+    virtual void playSound(audio_manager::Sound *sound, float volume, float balance);
 private:
     bool   m_audio_supported;
     int    m_audio_rate;

@@ -4,13 +4,11 @@
 
 #define TIMEMS_BETWEEN_SAME_SOUND 10.0
 
-#ifdef USE_AUDIO
-#include <SDL_mixer.h>
-#endif
-
 #include <vector>
 #include <map>
 #include <string>
+
+#include "sdl_drawcontext/common/SDL_AudioManager.h"
 #include "PuyoCommander.h"
 
 #ifdef USE_AUDIO
@@ -120,21 +118,19 @@ class Cache
         bool empty() const { return nameVector.size() == 0; }
 };
 
-#ifdef USE_AUDIO
-Cache<Mix_Chunk> chunkCache(64);
-Cache<Mix_Music> musicCache(6);
-#endif
+Cache<audio_manager::Sound> chunkCache(64);
+Cache<audio_manager::Music> musicCache(6);
+
+
+audio_manager::AudioManager * AudioManager::m_audioManager;
 
 void AudioManager::init()
 {
 
-#ifdef USE_AUDIO
-    audio_supported = (Mix_OpenAudio (MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 2048) == 0);
+    m_audioManager = new SDL_AudioManager();
+
+    audio_supported = true;
     if (!audio_supported) return;
-
-    Mix_QuerySpec (&audio_rate, &audio_format, &audio_channels);
-
-    Mix_AllocateChannels(16);
 
     music_on = GetBoolPreference(kMusic,true);
     sound_on = GetBoolPreference(kSound,true);
@@ -143,7 +139,7 @@ void AudioManager::init()
     sound_volume = ((float)GetIntPreference(kSoundVolume, 100))/100.0f;
 
     if (music_on) loadMusic("pop.xm");
-#endif
+
 }
 
 void AudioManager::close()
@@ -201,9 +197,9 @@ void AudioManager::clearSoundCache()
 
     while (!chunkCache.empty())
     {
-        Mix_Chunk *removed = chunkCache.removeOne();
+        audio_manager::Sound *removed = chunkCache.removeOne();
         if (removed)
-            Mix_FreeChunk(removed);
+            delete removed;
     }
 #endif
 }
@@ -215,14 +211,14 @@ void AudioManager::clearMusicCache()
 
     while (!musicCache.empty())
     {
-        Mix_Music *removed = musicCache.removeOne();
+        audio_manager::Music *removed = musicCache.removeOne();
         if (removed)
-            Mix_FreeMusic(removed);
+            delete removed;
     }
 #endif
 }
 
-#ifdef USE_AUDIO
+#ifdef UNUSED
 static Mix_Chunk *CustomMix_LoadWAV(const char *fileName, int volume)
 {
     if (!audio_supported) return NULL;
@@ -236,54 +232,34 @@ static Mix_Chunk *CustomMix_LoadWAV(const char *fileName, int volume)
     return result;
 }
 #endif
-#ifdef USE_AUDIO
-static Mix_Music *CustomMix_LoadMUS(const char *fileName)
-{
-    if (!audio_supported) return NULL;
 
-    String filePath = theCommander->getDataPathManager().getPath(FilePath("music").combine(fileName));
-    Mix_Music *result;
-
-    result = Mix_LoadMUS(filePath);
-    if (!result)
-        printf("Mix_LoadMUS(\"%s\"): %s\n", (const char *)filePath, Mix_GetError());
-    return result;
-}
-#endif
 void AudioManager::preloadMusic(const char *fileName)
 {
-#ifdef USE_AUDIO
-    if (!audio_supported) return;
-
+    //if (!audio_supported) return;
     if (musicCache.contains(fileName)) return;
 
-    Mix_Music *music   = CustomMix_LoadMUS (fileName);
-    Mix_Music *removed = musicCache.add(fileName, music);
+    String filePath = theCommander->getDataPathManager().getPath(FilePath("music").combine(fileName));
+    audio_manager::Music *music   = m_audioManager->loadMusic(filePath);
+    audio_manager::Music *removed = musicCache.add(fileName, music);
     if (removed)
-        Mix_FreeMusic(removed);
-#endif
+        delete removed;
 }
 
 void AudioManager::loadMusic(const char *fileName)
 {
-#ifdef USE_AUDIO
   if ((!music_starting) && ((!audio_supported) || (music_current == fileName))) return;
     music_current = fileName;
-    printf("Loading %s\n", fileName);
-
     if (music_on)
     {
       preloadMusic(fileName);
-      Mix_Music *music = musicCache.veryGet(fileName);
-      Mix_HaltMusic();
-      if (music != NULL) Mix_PlayMusic(music, -1);
+      audio_manager::Music *music = musicCache.veryGet(fileName);
+      if (music != NULL)
+          m_audioManager->playMusic(music);
     }
-#endif
 }
 
 void AudioManager::music(const char *command)
 {
-#ifdef USE_AUDIO
   static const int MSTART[6] = {1, 12, 15, 22, 34, 0x28};
   static const int MGAME[4] = { MSTART[4], MSTART[3], MSTART[0], MSTART[2] };
   static const int FGAME[4] = { MSTART[5], MSTART[3], MSTART[0], MSTART[2] };
@@ -291,133 +267,122 @@ void AudioManager::music(const char *command)
   if (((!music_on) && (!audio_supported)) || (music_command == command)) return;
   music_command = command;
   if (music_command == "menu") {
-      Mix_SetMusicPosition(MSTART[1]);
-      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.3));
+      m_audioManager->setMusicPosition(MSTART[1]);
+      m_audioManager->setMusicVolume((int) ((float)MIX_MAX_VOLUME * music_volume * 0.3));
   }
   else if (music_command == "credits") {
-      Mix_SetMusicPosition(MSTART[0]);
-      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicPosition(MSTART[0]);
+      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
   }
   else if (music_command == "network menu") {
-      Mix_SetMusicPosition(MSTART[2]);
-      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.3));
+      m_audioManager->setMusicPosition(MSTART[2]);
+      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.3));
   }
   else if (music_command == "level1") {
-      Mix_SetMusicPosition(MGAME[0]);
-      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicPosition(MGAME[0]);
+      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
   }
   else if (music_command == "level1-speed") {
-      Mix_SetMusicPosition(FGAME[0]);
-      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.8));
+      m_audioManager->setMusicPosition(FGAME[0]);
+      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.8));
   }
   else if (music_command == "level2") {
-      Mix_SetMusicPosition(MGAME[1]);
-      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicPosition(MGAME[1]);
+      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
   }
   else if (music_command == "level2-speed") {
-      Mix_SetMusicPosition(FGAME[1]);
-      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.8));
+      m_audioManager->setMusicPosition(FGAME[1]);
+      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.8));
   }
   else if (music_command == "level3") {
-      Mix_SetMusicPosition(MGAME[2]);
-      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicPosition(MGAME[2]);
+      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
   }
   else if (music_command == "level4") {
-      Mix_SetMusicPosition(MGAME[3]);
-      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicPosition(MGAME[3]);
+      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
   }
   else if (music_command == "level5") {
-      Mix_SetMusicPosition(MGAME[0]);
-      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicPosition(MGAME[0]);
+      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
   }
   else if (music_command == "level6") {
-      Mix_SetMusicPosition(MGAME[1]);
-      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicPosition(MGAME[1]);
+      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
   }
   else if (music_command == "level7") {
-      Mix_SetMusicPosition(MGAME[2]);
-      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicPosition(MGAME[2]);
+      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
   }
   else if (music_command == "level8") {
-      Mix_SetMusicPosition(MGAME[3]);
-      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicPosition(MGAME[3]);
+      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
   }
   else if (music_command == "level9") {
-      Mix_SetMusicPosition(MGAME[0]);
-      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicPosition(MGAME[0]);
+      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
   }
   /*else if (music_command == "game") { keep music of interlevel for now.
       Mix_SetMusicPosition(MSTART[rand()%4]);
-      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
   }*/
   else if (music_command == "game won") {
-      Mix_SetMusicPosition(15);
-      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicPosition(15);
+      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
   }
   else if (music_command == "game over") {
-      Mix_SetMusicPosition(15);
-      Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicPosition(15);
+      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
   }
-#endif
 }
 
 void AudioManager::preloadSound(const char *fileName, float volume)
 {
-#ifdef USE_AUDIO
-    if (!audio_supported) return;
+    // if (!audio_supported) return;
 
     if (chunkCache.contains(fileName)) return;
 
-    Mix_Chunk *chunk   = CustomMix_LoadWAV (fileName, (int)(volume * MIX_MAX_VOLUME));
-    Mix_Chunk *removed = chunkCache.add(fileName, chunk);
+    String filePath = theCommander->getDataPathManager().getPath(FilePath("sfx").combine(fileName));
+    audio_manager::Sound *chunk   = m_audioManager->loadSound(filePath);
+    //, (int)(volume * MIX_MAX_VOLUME));
+    audio_manager::Sound *removed = chunkCache.add(fileName, chunk);
     if (removed)
-        Mix_FreeChunk(removed);
-#endif
+        delete removed;
 }
 
 void AudioManager::playSound(const char *fileName, float volume, float balance)
 {
-#ifdef USE_AUDIO
-    if ((!audio_supported) || (!sound_on)) return;
+    //if ((!audio_supported) || (!sound_on)) return;
 
     preloadSound(fileName, volume);
     std::string c = fileName;
     if (ios_fc::getTimeMs() - chunkCache.veryGetLastUse(c) < TIMEMS_BETWEEN_SAME_SOUND)
         return;
 
-    Mix_Chunk *chunk = chunkCache.veryGet(c);
+    audio_manager::Sound *chunk = chunkCache.veryGet(c);
     if (chunk != NULL) {
-        int channel = Mix_PlayChannel (-1, chunk, 0);
-        Uint8 leftVolume = (Uint8)(255.*((-balance + 1.)/2.));
-        Mix_SetPanning(channel, leftVolume, 255-leftVolume);
+        m_audioManager->playSound(chunk, volume, balance);
     }
-#endif
 }
 
 void AudioManager::musicVolume(float volume)
 {
-#ifdef USE_AUDIO
-    if (!audio_supported) return;
-
+    //if (!audio_supported) return;
     if (music_on)
     {
-        Mix_VolumeMusic ((int) ((float)MIX_MAX_VOLUME * volume));
+        m_audioManager->setMusicVolume(volume);
     }
     music_volume = volume;
-#endif
 }
 
 void AudioManager::soundVolume(float volume)
 {
-#ifdef USE_AUDIO
-    if (!audio_supported) return;
-
+    //if (!audio_supported) return;
     if (sound_on)
     {
-        Mix_Volume (-1, (int) ((float)MIX_MAX_VOLUME * volume));
+        m_audioManager->setSoundVolume(volume);
     }
     sound_volume = volume;
-#endif
 }
 
 const char * AudioManager::musicVolumeKey(void) { return kMusicVolume; }
@@ -427,7 +392,6 @@ const char * AudioManager::soundOnOffKey(void)  { return kSound; }
 
 void AudioManager::musicOnOff(bool state)
 {
-#ifdef USE_AUDIO
   if ((!audio_supported) || (music_on == state)) return;
 
   music_on = state;
@@ -445,34 +409,23 @@ void AudioManager::musicOnOff(bool state)
   }
   else
   {
-    Mix_HaltMusic();
+      m_audioManager->stopMusic();
   }
-#endif
 }
 
 void AudioManager::soundOnOff(bool state)
 {
-#ifdef USE_AUDIO
   if ((!audio_supported) || (sound_on == state)) return;
 
   sound_on = state;
-#endif
 }
 
 bool AudioManager::isMusicOn()
 {
-#ifdef USE_AUDIO
   return music_on;
-#else
-    return false;
-#endif
 }
 
 bool AudioManager::isSoundOn()
 {
-#ifdef USE_AUDIO
   return sound_on;
-#else
-    return false;
-#endif
 }

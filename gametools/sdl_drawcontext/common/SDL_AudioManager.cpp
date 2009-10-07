@@ -62,6 +62,11 @@ void SDL_AudioManager::playMusic(Music *music)
         Mix_PlayMusic(static_cast<SDL_AM_Music *>(music)->m_music, -1);
 }
 
+void SDL_AudioManager::stopMusic()
+{
+    Mix_HaltMusic();
+}
+
 void SDL_AudioManager::setMusicPosition(double position)
 {
     Mix_SetMusicPosition(position);
