@@ -8,7 +8,6 @@
 #include <map>
 #include <string>
 
-#include "sdl_drawcontext/common/SDL_AudioManager.h"
 #include "PuyoCommander.h"
 
 #ifdef USE_AUDIO
@@ -127,7 +126,7 @@ audio_manager::AudioManager * AudioManager::m_audioManager;
 void AudioManager::init()
 {
 
-    m_audioManager = new SDL_AudioManager();
+    m_audioManager = GameUIDefaults::GAME_LOOP->getAudioManager();
 
     audio_supported = true;
     if (!audio_supported) return;
@@ -146,7 +145,6 @@ void AudioManager::close()
 {
 #ifdef USE_AUDIO
     if (!audio_supported) return;
-    Mix_CloseAudio();
     clearMusicCache();
     clearSoundCache();
 #endif
@@ -268,59 +266,59 @@ void AudioManager::music(const char *command)
   music_command = command;
   if (music_command == "menu") {
       m_audioManager->setMusicPosition(MSTART[1]);
-      m_audioManager->setMusicVolume((int) ((float)MIX_MAX_VOLUME * music_volume * 0.3));
+      m_audioManager->setMusicVolume(music_volume * 0.3);
   }
   else if (music_command == "credits") {
       m_audioManager->setMusicPosition(MSTART[0]);
-      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicVolume(music_volume * 0.3);
   }
   else if (music_command == "network menu") {
       m_audioManager->setMusicPosition(MSTART[2]);
-      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.3));
+      m_audioManager->setMusicVolume(music_volume * 0.3);
   }
   else if (music_command == "level1") {
       m_audioManager->setMusicPosition(MGAME[0]);
-      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicVolume(music_volume * 0.3);
   }
   else if (music_command == "level1-speed") {
       m_audioManager->setMusicPosition(FGAME[0]);
-      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.8));
+      m_audioManager->setMusicVolume(music_volume * 0.3);
   }
   else if (music_command == "level2") {
       m_audioManager->setMusicPosition(MGAME[1]);
-      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicVolume(music_volume * 0.3);
   }
   else if (music_command == "level2-speed") {
       m_audioManager->setMusicPosition(FGAME[1]);
-      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.8));
+      m_audioManager->setMusicVolume(music_volume * 0.3);
   }
   else if (music_command == "level3") {
       m_audioManager->setMusicPosition(MGAME[2]);
-      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicVolume(music_volume * 0.3);
   }
   else if (music_command == "level4") {
       m_audioManager->setMusicPosition(MGAME[3]);
-      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicVolume(music_volume * 0.3);
   }
   else if (music_command == "level5") {
       m_audioManager->setMusicPosition(MGAME[0]);
-      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicVolume(music_volume * 0.3);
   }
   else if (music_command == "level6") {
       m_audioManager->setMusicPosition(MGAME[1]);
-      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicVolume(music_volume * 0.3);
   }
   else if (music_command == "level7") {
       m_audioManager->setMusicPosition(MGAME[2]);
-      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicVolume(music_volume * 0.3);
   }
   else if (music_command == "level8") {
       m_audioManager->setMusicPosition(MGAME[3]);
-      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicVolume(music_volume * 0.3);
   }
   else if (music_command == "level9") {
       m_audioManager->setMusicPosition(MGAME[0]);
-      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicVolume(music_volume * 0.3);
   }
   /*else if (music_command == "game") { keep music of interlevel for now.
       Mix_SetMusicPosition(MSTART[rand()%4]);
@@ -328,11 +326,11 @@ void AudioManager::music(const char *command)
   }*/
   else if (music_command == "game won") {
       m_audioManager->setMusicPosition(15);
-      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicVolume(music_volume * 0.3);
   }
   else if (music_command == "game over") {
       m_audioManager->setMusicPosition(15);
-      m_audioManager->setMusicVolume ((int) ((float)MIX_MAX_VOLUME * music_volume * 0.7));
+      m_audioManager->setMusicVolume(music_volume * 0.3);
   }
 }
 

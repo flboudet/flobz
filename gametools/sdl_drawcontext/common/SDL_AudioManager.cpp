@@ -36,6 +36,7 @@ SDL_AudioManager::SDL_AudioManager()
 
 SDL_AudioManager::~SDL_AudioManager()
 {
+    Mix_CloseAudio();
 }
 
 void SDL_AudioManager::setMusicEnabled(bool enabled)
@@ -44,6 +45,7 @@ void SDL_AudioManager::setMusicEnabled(bool enabled)
 
 void SDL_AudioManager::setMusicVolume(float volume)
 {
+    Mix_VolumeMusic((int)((float)MIX_MAX_VOLUME * volume));
 }
 
 Music *SDL_AudioManager::loadMusic(const char *fileName)

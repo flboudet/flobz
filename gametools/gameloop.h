@@ -3,6 +3,7 @@
 
 #include "ios_fc.h"
 #include "drawcontext.h"
+#include "audiomanager.h"
 #include "GameControls.h"
 
 using namespace ios_fc;
@@ -102,6 +103,8 @@ class GameLoop
     DrawContext *getDrawContext() const { return m_dc; }
     void setEventManager(event_manager::EventManager *em) { m_em = em; }
     event_manager::EventManager *getEventManager() const { return m_em; }
+    void setAudioManager(audio_manager::AudioManager *am) { m_am = am; }
+    audio_manager::AudioManager *getAudioManager() const { return m_am; }
 
     void addDrawable(DrawableComponent *gc);
     void addIdle(IdleComponent *gc);
@@ -128,6 +131,7 @@ class GameLoop
   private:
     DrawContext *m_dc;
     event_manager::EventManager *m_em;
+    audio_manager::AudioManager *m_am;
 
     double timeDrift;
     double lastDrawTime, deltaDrawTimeMax;

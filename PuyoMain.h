@@ -26,6 +26,7 @@ private:
 
     DrawContext *m_drawContext;
     event_manager::EventManager *m_eventManager;
+    audio_manager::AudioManager *m_audioManager;
 
     GameLoop   *loop;
     MainScreen *mainScreen;

@@ -126,10 +126,7 @@ const char * PuyoCommander::getLocalizedString(const char * originalString) cons
 /* Initialize the audio if necessary */
 void PuyoCommander::initAudio()
 {
-#ifdef USE_AUDIO
-  DBG_PRINT("initAudio()\n");
   AudioManager::init();
-#endif
 }
 
 

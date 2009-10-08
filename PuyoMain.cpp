@@ -6,6 +6,7 @@
 #ifdef SDL12_GFX
 #include "sdl_drawcontext/sdl12/sdl12_drawcontext.h"
 #include "sdl_drawcontext/sdl12/sdl12_eventmanager.h"
+#include "sdl_drawcontext/common/SDL_AudioManager.h"
 #endif
 #ifdef SDL13_GFX
 #include "sdl_drawcontext/sdl13/sdl13_drawcontext.h"
@@ -47,6 +48,7 @@ void PuyoMain::initWithGUI()
                                           GetBoolPreference(kFullScreenPref, m_fullscreen),
                                           "FloboPuyo by iOS-Software");
     m_eventManager = new SDL12_EventManager();
+    m_audioManager = new SDL_AudioManager();
 #endif
 #ifdef SDL13_GFX
     m_drawContext = new SDL13_DrawContext(640, 480,
@@ -57,6 +59,8 @@ void PuyoMain::initWithGUI()
     loop->setDrawContext(m_drawContext);
     // Give the EventManager to the GameLoop
     loop->setEventManager(m_eventManager);
+    // Give the AudioManager to the GameLoop
+    loop->setAudioManager(m_audioManager);
     // Create the PuyoCommander singleton
     PuyoCommander *pc = new PuyoCommander(m_dataDir, m_maxDataPackNumber);
     pc->initWithGUI(m_fullscreen);
