@@ -31,6 +31,8 @@ MainScreen::MainScreen(StoryWidget *fgStory, StoryWidget *bgStory)
 	}
     setMenuDimensions();
     container.addListener(*this);
+    container.setWhipSound(theCommander->getWhipSound());
+    container.setWhopSound(theCommander->getWhopSound());
 }
 
 MainScreen::~MainScreen()

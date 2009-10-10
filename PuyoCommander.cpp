@@ -106,6 +106,9 @@ PuyoCommander::~PuyoCommander()
   delete m_buttonOverImage;
   delete m_textFieldIdleImage;
   delete m_separatorImage;
+  delete m_slideSound;
+  delete m_whipSound;
+  delete m_whopSound;
 }
 
 extern char *dataFolder;
@@ -126,7 +129,11 @@ const char * PuyoCommander::getLocalizedString(const char * originalString) cons
 /* Initialize the audio if necessary */
 void PuyoCommander::initAudio()
 {
-  AudioManager::init();
+    m_slideSound = loop->getAudioManager()->loadSound(dataPathManager.getPath(FilePath("sfx").combine("slide.wav")));
+    m_whipSound = loop->getAudioManager()->loadSound(dataPathManager.getPath(FilePath("sfx").combine("whip.wav")));
+    m_whopSound = loop->getAudioManager()->loadSound(dataPathManager.getPath(FilePath("sfx").combine("whop.wav")));
+    GameUIDefaults::SLIDE_SOUND = m_slideSound;
+    AudioManager::init();
 }
 
 

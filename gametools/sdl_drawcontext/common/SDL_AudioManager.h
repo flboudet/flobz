@@ -35,7 +35,7 @@ public:
     virtual void setSoundEnabled(bool enabled);
     virtual void setSoundVolume(float volume);
     virtual audio_manager::Sound *loadSound(const char *fileName);
-    virtual void playSound(audio_manager::Sound *sound, float volume, float balance);
+    virtual void playSound(audio_manager::Sound *sound, float volume = 1.0, float balance = 0.0f);
 private:
     bool   m_audio_supported;
     int    m_audio_rate;

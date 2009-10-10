@@ -1,8 +1,5 @@
 #include "gameui.h"
-#define ENABLE_DIRTY_CODE
-#ifdef ENABLE_DIRTY_CODE
-#include "../audio.h"
-#endif
+#include "audiomanager.h"
 #include "preferences.h"
 
 #define MIN_REPEAT_TIME 100.0
@@ -22,6 +19,7 @@ namespace gameui {
     IosFont      *GameUIDefaults::FONT_FUNNY       = NULL;
     GameLoop    *GameUIDefaults::GAME_LOOP        = new GameLoop();
     ScreenStack *GameUIDefaults::SCREEN_STACK     = new ScreenStack();
+    audio_manager::Sound *GameUIDefaults::SLIDE_SOUND = NULL;
 
     bool isDirectionEvent(GameControlEvent *event)
     {
@@ -757,7 +755,8 @@ namespace gameui {
         , contentWidget(NULL), previousWidget(NULL)
         , slideStartTime(0.0), currentTime(0.0)
         , bg(NULL), sliding(false), slideout(false)
-	, backgroundVisible(true)
+        , backgroundVisible(true)
+        , m_whipSound(NULL), m_whopSound(NULL)
     {
     }
 
@@ -821,9 +820,8 @@ namespace gameui {
             sliding = true;
             slideout= true;
             previousWidget->lostFocus();
-#ifdef ENABLE_DIRTY_CODE
-            AudioManager::playSound("whop.wav", .1);
-#endif
+            if (m_whopSound != NULL)
+                getGameLoop()->getAudioManager()->playSound(m_whopSound);
         }
         else
         {
@@ -832,9 +830,8 @@ namespace gameui {
                 sliding = true;
                 slideout= false;
                 addContentWidget();
-#ifdef ENABLE_DIRTY_CODE
-                AudioManager::playSound("whip.wav", .1);
-#endif
+                if (m_whipSound != NULL)
+                    getGameLoop()->getAudioManager()->playSound(m_whipSound);
             }
             else
             {
@@ -885,9 +882,8 @@ namespace gameui {
                     slideStartTime = currentTime;
                     slideout = false;
 					addContentWidget();
-#ifdef ENABLE_DIRTY_CODE
-                    AudioManager::playSound("whip.wav", .1);
-#endif
+                    if (m_whipSound != NULL)
+                        getGameLoop()->getAudioManager()->playSound(m_whipSound);
                 }
                 else // Stop here
                 {
@@ -1230,7 +1226,8 @@ namespace gameui {
     //
 
     Text::Text()
-        : label(""), offset(0.0,0.0,0.0), m_textAlign(TEXT_LEFT_ALIGN), m_autoSize(true), mdontMove(true)
+        : label(""), offset(0.0,0.0,0.0), m_textAlign(TEXT_LEFT_ALIGN),
+          m_autoSize(true), mdontMove(true), m_slideSound(GameUIDefaults::SLIDE_SOUND)
     {
         this->font = GameUIDefaults::FONT_TEXT;
         setPreferedSize(Vec3(m_autoSize?this->font->getTextWidth(label):0.0f, this->font->getHeight(), 1.0));
@@ -1239,7 +1236,9 @@ namespace gameui {
     }
 
     Text::Text(const String &label, IosFont *font, bool autosize)
-        : font(font), label(label), offset(0.0,0.0,0.0), m_textAlign(TEXT_LEFT_ALIGN), m_autoSize(autosize), mdontMove(true)
+        : font(font), label(label), offset(0.0,0.0,0.0),
+          m_textAlign(TEXT_LEFT_ALIGN), m_autoSize(autosize),
+          mdontMove(true), m_slideSound(GameUIDefaults::SLIDE_SOUND)
     {
         if (font == NULL) this->font = GameUIDefaults::FONT_TEXT;
         setPreferedSize(Vec3(m_autoSize?this->font->getTextWidth(label):0.0f, this->font->getHeight(), 1.0));
@@ -1324,9 +1323,8 @@ namespace gameui {
     void Text::boing()
     {
         startMoving = true;
-#ifdef ENABLE_DIRTY_CODE
-        AudioManager::playSound("slide.wav", .5);
-#endif
+        if (m_slideSound != NULL)
+            GameUIDefaults::GAME_LOOP->getAudioManager()->playSound(m_slideSound);
     }
 
 

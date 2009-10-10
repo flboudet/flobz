@@ -51,6 +51,8 @@ class PuyoCommander
     IosSurface * getDownArrow() { return m_downArrow; }
     IosSurface * getLeftArrow() { return m_leftArrow; }
     IosSurface * getRightArrow() { return m_rightArrow; }
+    audio_manager::Sound * getWhipSound() const { return m_whipSound; }
+    audio_manager::Sound * getWhopSound() const { return m_whopSound; }
   private:
 
     friend class SinglePlayerGameAction;
@@ -86,6 +88,9 @@ class PuyoCommander
     std::auto_ptr<FramePicture> m_textFieldIdleFramePicture;
     std::auto_ptr<FramePicture> m_separatorFramePicture;
     std::auto_ptr<FramePicture> m_listFramePicture;
+
+    audio_manager::Sound *m_slideSound;
+    audio_manager::Sound *m_whipSound, *m_whopSound;
 
     AbstractCursor *m_cursor;
 };

@@ -30,7 +30,7 @@ public:
     virtual void setSoundEnabled(bool enabled) = 0;
     virtual void setSoundVolume(float volume) = 0;
     virtual Sound *loadSound(const char *fileName) = 0;
-    virtual void playSound(Sound *sound, float volume, float balance) = 0;
+    virtual void playSound(Sound *sound, float volume = 1.0, float balance = 0.0f) = 0;
 };
 
 }

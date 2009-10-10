@@ -58,6 +58,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       static IosFont      *FONT_FUNNY;
       static GameLoop    *GAME_LOOP;
       static ScreenStack *SCREEN_STACK;
+      static audio_manager::Sound *SLIDE_SOUND;
   };
 
 
@@ -349,7 +350,8 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
        */
       void setBackground(IosSurface *bg) { this->bg = bg; }
       void setBackgroundVisible(bool visible) { backgroundVisible = visible; }
-
+      void setWhipSound(audio_manager::Sound *whip) { m_whipSound = whip; }
+      void setWhopSound(audio_manager::Sound *whop) { m_whopSound = whop; }
       /**
        * Adds a new listener to the events of the SliderContainer widget
        * @param listener   the reference of the new listener object
@@ -402,6 +404,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       bool backgroundVisible;
       std::vector<SliderContainerListener *> listeners;
       int m_outsidePosition;
+      audio_manager::Sound *m_whipSound, *m_whopSound;
   };
 
   /**
@@ -511,7 +514,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       bool moving;
       TextAlign m_textAlign;
       bool m_autoSize;
-
+      audio_manager::Sound *m_slideSound;
     public:
       bool mdontMove;
   };
