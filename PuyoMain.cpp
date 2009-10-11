@@ -10,6 +10,8 @@
 #endif
 #ifdef SDL13_GFX
 #include "sdl_drawcontext/sdl13/sdl13_drawcontext.h"
+#include "sdl_drawcontext/sdl13/sdl13_eventmanager.h"
+#include "sdl_drawcontext/common/SDL_AudioManager.h"
 #endif
 #ifdef ENABLE_NETWORK_INTERNET
 #include "PuyoInternetBot.h"
@@ -54,6 +56,8 @@ void PuyoMain::initWithGUI()
     m_drawContext = new SDL13_DrawContext(640, 480,
                                           GetBoolPreference(kFullScreenPref, m_fullscreen),
                                           "FloboPuyo by iOS-Software");
+    m_eventManager = new SDL13_EventManager();
+    m_audioManager = new SDL_AudioManager();
 #endif
     // Give the DrawContext to the GameLoop
     loop->setDrawContext(m_drawContext);

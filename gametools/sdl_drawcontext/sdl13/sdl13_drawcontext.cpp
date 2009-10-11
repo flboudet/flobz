@@ -387,9 +387,9 @@ SDL13_DrawContext::SDL13_DrawContext(int w, int h, bool fullscreen, const char *
     cerr << "Building DrawContext 3..." << endl;
     wid = SDL_CreateWindow("Test SDL 1.3",
                                         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                        w, h, SDL_WINDOW_BORDERLESS | SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL);
+                                        w, h, SDL_WINDOW_OPENGL);
     cerr << "Building DrawContext 3,5..." << endl;
-    SDL_CreateRenderer(wid, 0,
+    SDL_CreateRenderer(wid, 1,
                        SDL_RENDERER_PRESENTVSYNC |
                        SDL_RENDERER_PRESENTFLIP3 |
                        SDL_RENDERER_ACCELERATED);
