@@ -35,7 +35,7 @@ using namespace ios_fc;
 using namespace event_manager;
 
 GameScreen::GameScreen(GameWidget &gameWidget, Screen &previousScreen)
-    : Screen(0, 0, 640, 480), paused(false),
+    : Screen(), paused(false),
       pauseMenu(this),
       gameWidget(gameWidget), transitionWidget(previousScreen, NULL),
       overlayStory(NULL)

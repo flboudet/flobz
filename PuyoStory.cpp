@@ -239,7 +239,7 @@ const char *StoryWidget::getText(const char *text) const
 }
 
 StoryScreen::StoryScreen(String screenName, Screen &previousScreen, Action *finishedAction, bool shouldAddTransition)
-    : Screen(0, 0, 640, 480), storyWidget(screenName, finishedAction),
+    : Screen(), storyWidget(screenName, finishedAction),
       transitionWidget(NULL), finishedAction(finishedAction)
 {
     add(&storyWidget);
@@ -250,7 +250,7 @@ StoryScreen::StoryScreen(String screenName, Screen &previousScreen, Action *fini
 }
 
 StoryScreen::StoryScreen(String screenName)
-    : Screen(0, 0, 640, 480), storyWidget(screenName, NULL),
+    : Screen(), storyWidget(screenName, NULL),
       transitionWidget(NULL), finishedAction(NULL)
 {
     add(&storyWidget);

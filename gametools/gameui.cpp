@@ -1140,10 +1140,28 @@ namespace gameui {
     // Screen
     //
 
+    Screen::Screen(GameLoop *loop)
+        : DrawableComponent(),
+        IdleComponent(),
+        rootContainer(this, loop), autoReleaseFlag(false)
+    {
+        GameLoop *curLoop = loop;
+        if (loop == NULL)
+            curLoop = GameUIDefaults::GAME_LOOP;
+        int height = curLoop->getDrawContext()->getHeight();
+        int width = curLoop->getDrawContext()->getWidth();
+        initWithDimensions(0, 0, width, height);
+    }
+
     Screen::Screen(float x, float y, float width, float height, GameLoop *loop)
         : DrawableComponent(),
         IdleComponent(),
         rootContainer(this, loop), autoReleaseFlag(false)
+    {
+        initWithDimensions(x, y, width, height);
+    }
+
+    void Screen::initWithDimensions(float x, float y, float width, float height)
     {
         rootContainer.setPosition(Vec3(x, y, 1.0f));
         rootContainer.setPreferedSize(Vec3(width, height, 1.0f));

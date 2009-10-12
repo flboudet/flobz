@@ -423,6 +423,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
    */
   class Screen : public GarbageCollectableItem, public DrawableComponent, public IdleComponent {
     public:
+      Screen(GameLoop *loop = NULL);
       Screen(float x, float y, float width, float height, GameLoop *loop = NULL);
       virtual ~Screen() {}
       void draw(DrawTarget *dt);
@@ -466,6 +467,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       virtual void onScreenVisibleChanged(bool visible);
 
     private:
+      void initWithDimensions(float x, float y, float width, float height);
       // The root container of the screen
       ScreenRootContainer rootContainer;
       bool hidden;
