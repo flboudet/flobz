@@ -41,7 +41,8 @@ PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 		   int xOffset, int yOffset, int nXOffset, int nYOffset)
   : m_showNextPuyos(true), m_showShadows(true),
     attachedThemeSet(attachedThemeSet), attachedLevelTheme(attachedLevelTheme),
-    attachedPuyoFactory(this), delayBeforeGameOver(60), haveDisplay(true)
+    attachedPuyoFactory(this), delayBeforeGameOver(60), haveDisplay(true),
+    neutralXOffset(-1), neutralYOffset(-1)
 {
     //printf("Constructeur du PuyoView\n");
     initCommon(attachedPuyoGameFactory);
@@ -71,7 +72,8 @@ void PuyoView::initDisplay(int xOffset, int yOffset, int nXOffset, int nYOffset)
 
 PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory)
   : attachedThemeSet(NULL), attachedLevelTheme(NULL),
-    attachedPuyoFactory(this), delayBeforeGameOver(60), haveDisplay(false)
+    attachedPuyoFactory(this), delayBeforeGameOver(60), haveDisplay(false),
+    neutralXOffset(-1), neutralYOffset(-1)
 {
     initCommon(attachedPuyoGameFactory);
 }
@@ -261,8 +263,9 @@ void PuyoView::renderNeutral(DrawTarget *dt)
     int numGiantNeutral = (neutralPuyos / PUYODIMX) / 4;
     int numBigNeutral = (neutralPuyos / PUYODIMX) % 4;
 	int numNeutral = neutralPuyos % PUYODIMX;
-    int drect_x = xOffset;
-    int drect_y_base =  yOffset + 3 + TSIZE + TSIZE;
+    int drect_x = (neutralXOffset == -1 ? xOffset : neutralXOffset);
+    int drect_y_base =  (neutralYOffset == -1 ?
+                         yOffset + 3 + TSIZE + TSIZE : neutralYOffset);
     IosSurface *neutral = attachedLevelTheme->getNeutralIndicator();
     IosSurface *bigNeutral = attachedLevelTheme->getBigNeutralIndicator();
     IosSurface *giantNeutral = attachedLevelTheme->getGiantNeutralIndicator();

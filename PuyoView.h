@@ -116,6 +116,10 @@ class PuyoView : public PuyoDelegate {
     void setShowNextPuyos(bool show) { m_showNextPuyos = show; }
     void setShowShadows(bool show) { m_showShadows = show; }
     void setShowEyes(bool show) { attachedPuyoFactory.setShowEyes(show); }
+    void setNeutralPuyosDisplayPosition(int x, int y) {
+        neutralXOffset = x;
+        neutralYOffset = y;
+    }
   protected:
     String p1name, p2name;
     bool cycleAllowed();
@@ -124,6 +128,7 @@ class PuyoView : public PuyoDelegate {
     bool gameRunning;
     int xOffset, yOffset;
     int nXOffset, nYOffset;
+    int neutralXOffset, neutralYOffset;
     AnimatedPuyoSetTheme *attachedThemeSet;
     PuyoLevelTheme *attachedLevelTheme;
     AnimatedPuyoFactory attachedPuyoFactory;
