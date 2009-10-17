@@ -1,3 +1,4 @@
+#include <string.h>
 #include "PuyoStory.h"
 #include "PuyoCommander.h"
 #include "audio.h"
@@ -25,12 +26,12 @@ static char *pathResolverFunction (StyrolyseClient *_this, const char *path)
 // "@state.type"
 int extract_state_and_type(const char *s, int *state, int *type)
 {
-    char *first;
+    const char *first;
     first = strchr(s,'@');
     if(first != NULL){
         *state = atoi(first+1);
     }
-    char *second;
+    const char *second;
     second = strchr(s,'.');
     if(second != NULL){
         *type = atoi(second+1);

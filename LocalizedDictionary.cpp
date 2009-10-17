@@ -41,6 +41,7 @@
 #include <ext/hash_map>
 #include <cstring>
 #include <string>
+#include <stdint.h>
 
 static bool readLine(FILE *dictionaryFile, String &lineRead)
 {
@@ -54,7 +55,7 @@ static bool readLine(FILE *dictionaryFile, String &lineRead)
         if (result && (newChar[0] != 10) && (newChar[0] != 13))
             newLineRead += newChar;
     } while (result && (newChar[0] != 10) && (newChar[0] != 13));
-    
+
     // Converting the escape sequences
     if (result) {
         const char *text = newLineRead;
@@ -100,7 +101,7 @@ void Locales_Init()
   int i;
 
   if (!systemInitiated) {
-    
+
 #ifdef DEBUG
     fprintf(stdout,"Languages detection...\n");
 #endif
@@ -114,7 +115,7 @@ void Locales_Init()
     prefArray = (CFArrayRef) CFPreferencesCopyValue(CFSTR("AppleLanguages"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
     PreferedLocalesCount = (prefArray ? CFArrayGetCount(prefArray) : 0);
     if (PreferedLocalesCount > kPuyoMaxPreferedLanguage) PreferedLocalesCount = kPuyoMaxPreferedLanguage;
-    
+
     for (i = 0; i < PreferedLocalesCount; i++) {
         localeIdentifier = (CFStringRef)CFArrayGetValueAtIndex(prefArray, i);
         CFStringGetCString(localeIdentifier, canonicalLocale, 32, kCFStringEncodingUTF8);
@@ -123,7 +124,7 @@ void Locales_Init()
         canonicalLocale[2] = 0;
         PreferedLocales[i] = strdup(canonicalLocale);
     }
-    
+
 #else
 
 #ifdef WIN32
@@ -175,7 +176,7 @@ void Locales_Init()
     for (i = 0; i < PreferedLocalesCount; i++)
       fprintf(stdout,"User prefered language %d : %s\n",i,PreferedLocales[i]);
 #endif
-    
+
     systemInitiated = true;
   }
 }
@@ -201,12 +202,12 @@ struct SuperFastHashString {
         uint32_t len = datas.size();
         uint32_t hash = len, tmp;
         int rem;
-        
+
         if (len <= 0 || data == NULL) return 0;
-        
+
         rem = len & 3;
         len >>= 2;
-        
+
         /* Main loop */
         for (;len > 0; len--) {
             hash  += get16bits (data);
@@ -215,7 +216,7 @@ struct SuperFastHashString {
             data  += 2*sizeof (uint16_t);
             hash  += hash >> 11;
         }
-        
+
         /* Handle end cases */
         switch (rem) {
             case 3: hash += get16bits (data);
@@ -231,7 +232,7 @@ struct SuperFastHashString {
                 hash ^= hash << 10;
                 hash += hash >> 1;
         }
-        
+
         /* Force "avalanching" of final 127 bits */
         hash ^= hash << 3;
         hash += hash >> 5;
@@ -239,7 +240,7 @@ struct SuperFastHashString {
         hash += hash >> 17;
         hash ^= hash << 25;
         hash += hash >> 6;
-        
+
         return hash;
     }
 };
@@ -262,8 +263,8 @@ static str_dictionnary dictionaries;
 
 
 
-    
-/*************************************************************************************/    
+
+/*************************************************************************************/
 
 
 
@@ -278,18 +279,18 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
 
   stdName = FilePath::combine(dictionaryDirectory, dictionaryName);
   dictionaryEntry * myDictEntry = (dictionaryEntry *)dictionaries[std::string((const char *)stdName)];
-  
+
   if (myDictEntry == NULL)
   {
     myDictEntry = (dictionaryEntry *)malloc(sizeof(dictionaryEntry));
     myDictEntry->dictionary = new str_dictionnary;
     myDictEntry->refcount=0;
     dictionaries[std::string((const char *)stdName)] = (void *)myDictEntry;
-    
+
     /* Get the first matching dictionary */
     bool found = false;
     for (i = PreferedLocalesCount - 1; i >= 0 ; i--) {
-    
+
         /* try to open the dictionary for the selected locale */
         String locale(PreferedLocales[i]);
         String directoryName = FilePath::combine(dictionaryDirectory, locale);
@@ -297,7 +298,7 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
         FILE *dictionaryFile = NULL;
 
         try { dictionaryFile = fopen(datapathManager.getPath(dictFilePath), "r"); } catch (Exception &e) { }
-        
+
         if (dictionaryFile != NULL)
         {
             /* Read all the entries in the dictionary file */
@@ -330,7 +331,7 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
     if (!found) fprintf(stdout,"No dictionary found in %s for %s\n",(const char *)datapathManager.getPath(dictionaryDirectory),dictionaryName);
 #endif
   }
-  
+
   myDictEntry->refcount++;
   dictionary = (void*)(myDictEntry->dictionary);
   //fprintf(stderr,"-----Refcount++ = %d (%s)\n",myDictEntry->refcount,(const char *)stdName);
@@ -347,17 +348,17 @@ LocalizedDictionary::~LocalizedDictionary()
     //fprintf(stderr,"-----Refcount-- = %d (%s)\n",myDictEntry->refcount,(const char *)stdName);
     if (myDictEntry->refcount <= 0) {
       //fprintf(stderr,"-----Destroying %s.\n",(const char *)stdName);
-        
+
         for (str_dictionnary::iterator it = myDictEntry->dictionary->begin(); it != myDictEntry->dictionary->end(); it++)
       {
           free(it->second);
       }
       myDictEntry->dictionary->clear();
-        
+
       delete myDictEntry->dictionary;
 
       free(myDictEntry);
-        
+
         dictionaries.erase(iter);
         /* clean up a bit before leaving
         fprintf(stderr,"-----Languages cleanup...\n");
