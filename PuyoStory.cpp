@@ -278,6 +278,7 @@ StoryScreen::~StoryScreen()
 void StoryScreen::onEvent(GameControlEvent *cevent)
 {
     bool passEvent = true;
+    if (! cevent->isUp)
     switch (cevent->cursorEvent) {
     case kBack:
     case kStart:
