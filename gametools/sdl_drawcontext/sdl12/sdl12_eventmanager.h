@@ -17,6 +17,10 @@ public:
     SDL12_EventManager();
     virtual bool pollEvent(event_manager::GameControlEvent &controlEvent);
     virtual void pushMouseEvent(int x, int y, event_manager::CursorEventType type);
+    // Control settings handling
+    virtual ios_fc::String getControlName(int controlType, bool alternate);
+    virtual bool   changeControl(int controlType, bool alternate, event_manager::GameControlEvent &event);
+    virtual void   saveControls();
     // CycledComponent implementation
     virtual void cycle();
 private:

@@ -791,8 +791,8 @@ namespace gameui {
         if (bg != NULL && backgroundVisible)
         {
             IosRect rect;
-            rect.x = (Sint16)getPosition().x - (bg->w - getSize().x)/2;
-            rect.y = (Sint16)getPosition().y - (bg->h - getSize().y)/2;
+            rect.x = (int16_t)getPosition().x - (bg->w - getSize().x)/2;
+            rect.y = (int16_t)getPosition().y - (bg->h - getSize().y)/2;
             dt->renderCopy(bg, NULL, &rect);
         }
         ZBox::draw(dt);
@@ -1664,7 +1664,7 @@ namespace gameui {
                 // International character
                 else {
                     String newValue = getValue();
-                    Uint16 unicode = event->unicodeKeySym;
+                    uint16_t unicode = event->unicodeKeySym;
                     char utf8[5];
                     int nchars = utf16_to_utf8(unicode, utf8);
                     printf("%d\n", nchars);
@@ -1839,8 +1839,10 @@ namespace gameui {
     {
         char temp[255];
         init(NULL,NULL);
+#ifdef TODO
         getKeyName(control, alternate, temp);
         setValue(temp);
+#endif
         if (action != NULL)
             setAction(ON_START, action);
     }

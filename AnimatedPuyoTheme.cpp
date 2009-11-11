@@ -75,7 +75,7 @@ String GlobalCurrentPath;
 #define ADD_PICTURE(A) { bool tmp = loadPictureAt(path,&(A),defpath); OK = OK && tmp; if (tmp == false) fprintf(stderr,"Unable to load %s\n",(char *)path); }
 #define LOG { fprintf(stderr,"Logged __FILE__ __LINE__"); }
 
-#ifdef DEBUG
+#ifdef DEBUG_THEMES
 #define DEBUG_PARAM_MISSING(p,n,o) { if (p==NULL) fprintf(stderr,"Parameter %s missing in %s __FILE__ __LINE__",n,o); exit(0); }
 #define ASSERT_RANGE(min,max,value) { if ((value < min) || (value > max)) { fprintf(stderr, "Value out of range __FILE__ __LINE__"); exit(0); } }
 #else
@@ -255,7 +255,7 @@ StandardAnimatedPuyoTheme::StandardAnimatedPuyoTheme(const String path, const ch
 
     _cached = false;
 
-#ifdef DEBUG
+#ifdef DEBUG_THEMES
     counter = 0;
 #endif
 
@@ -305,7 +305,7 @@ StandardAnimatedPuyoTheme::StandardAnimatedPuyoTheme(const String path, const ch
 
 StandardAnimatedPuyoTheme::~StandardAnimatedPuyoTheme(void)
 {
-#ifdef DEBUG
+#ifdef DEBUG_THEMES
     if (counter > 0) fprintf(stderr,"AnimatedPuyoTheme released while in use !!!");
 #endif
 
@@ -324,7 +324,7 @@ StandardAnimatedPuyoTheme::~StandardAnimatedPuyoTheme(void)
 IosSurface * StandardAnimatedPuyoTheme::getShrunkSurface(PuyoPictureType picture, int index, int compression)
 {
 
-#ifdef DEBUG
+#ifdef DEBUG_THEMES
     ASSERT_RANGE(PUYO_FACES,PUYO_SHADOWS,picture);
     int max;
     switch (picture)
@@ -400,7 +400,7 @@ IosSurface * StandardAnimatedPuyoTheme::getShrunkSurface(PuyoPictureType picture
 IosSurface * StandardAnimatedPuyoTheme::getSurface(PuyoPictureType picture, int index)
 {
 
-#ifdef DEBUG
+#ifdef DEBUG_THEMES
     ASSERT_RANGE(PUYO_FACES,PUYO_SHADOWS,picture);
     int max;
     switch (picture)
@@ -577,7 +577,7 @@ bool StandardAnimatedPuyoTheme::cache(void)
     return OK;
 }
 
-#ifdef DEBUG
+#ifdef DEBUG_THEMES
 void StandardAnimatedPuyoTheme::retain(void) { counter++; }
 void StandardAnimatedPuyoTheme::release(void)
 {
@@ -655,7 +655,7 @@ AnimatedPuyoSetTheme::AnimatedPuyoSetTheme(const String path, const String name,
 
     _numberOfPuyos = 0;
     _neutral = NULL;
-#ifdef DEBUG
+#ifdef DEBUG_THEMES
     counter = 0;
 #endif
 }
@@ -663,7 +663,7 @@ AnimatedPuyoSetTheme::AnimatedPuyoSetTheme(const String path, const String name,
 
 AnimatedPuyoSetTheme::~AnimatedPuyoSetTheme(void)
 {
-#ifdef DEBUG
+#ifdef DEBUG_THEMES
     if (counter > 0) fprintf(stderr,"AnimatedPuyoSetTheme released while in use !!!");
 #endif
 
@@ -785,7 +785,7 @@ bool AnimatedPuyoSetTheme::cache(void)
     return retour;
 }
 
-#ifdef DEBUG
+#ifdef DEBUG_THEMES
 void AnimatedPuyoSetTheme::retain(void) { counter++; }
 void AnimatedPuyoSetTheme::release(void)
 {
@@ -814,14 +814,14 @@ PuyoLevelTheme::PuyoLevelTheme(const String path, const String name, const Strin
 
     _cached = false;
 
-#ifdef DEBUG
+#ifdef DEBUG_THEMES
     counter = 0;
 #endif
 }
 
 PuyoLevelTheme::~PuyoLevelTheme(void)
 {
-#ifdef DEBUG
+#ifdef DEBUG_THEMES
     if (counter > 0) fprintf(stderr,"PuyoLevelTheme released while used !!!\n");
 #endif
 
@@ -1099,7 +1099,7 @@ AnimatedPuyoThemeManager::AnimatedPuyoThemeManager(bool useAltLocation)
 
     // Load the themes from the list
     for (int i = 0 ; i < themeFolders.size() ; i++) {
-#ifdef DEBUG
+#ifdef DEBUG_THEMES
         printf("Loading theme %s\n", (const char *)themeFolders[i]);
 #endif
         loadTheme(themeFolders[i]);

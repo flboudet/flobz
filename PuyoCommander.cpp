@@ -16,9 +16,6 @@ static const char * kFullScreenPref = "Config.FullScreen";
 #ifdef HAVE_OPENGL
 static const char * kOpenGLPref     = "Config.OpenGL";
 #endif
-static const char * kScreenWidthPref = "Config.ScreenWidth";
-static const char * kScreenHeightPref = "Config.ScreenHeight";
-
 
 
 /*
@@ -62,7 +59,6 @@ void PuyoCommander::initWithGUI(bool fs)
   loadPreferences(fs);
 
   initLocale();
-  initGameControls();
   initAudio();
   initFonts();
 

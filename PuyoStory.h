@@ -28,8 +28,6 @@
 
 class GameScreen;
 
-#include "SDL.h"
-#include "SDL_image.h"
 #include "styrolyse.h"
 
 #include "gameui.h"

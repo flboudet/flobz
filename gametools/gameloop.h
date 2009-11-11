@@ -125,7 +125,7 @@ class GameLoop
     bool isLate(double currentTime) const;
 
     static inline double getCurrentTime() {
-      return 0.001 * (double)SDL_GetTicks();
+		return ios_fc::getUnixTime();
     }
 
   private:

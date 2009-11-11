@@ -34,7 +34,7 @@ static int fallingTable[PUYODIMX] = {0, 3, 1, 4, 2, 5};
 
 PuyoRandomSystem::PuyoRandomSystem(int numColors) : numColors(numColors)
 {
-    init_genrand(SDL_GetTicks());
+    init_genrand(fmod(ios_fc::getTimeMs(), 100000.));
 }
 
 PuyoRandomSystem::PuyoRandomSystem(unsigned long seed, int numColors) : numColors(numColors)

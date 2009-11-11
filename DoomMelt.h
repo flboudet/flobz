@@ -21,7 +21,6 @@
 #define _PUYODOOMMELT
 
 #include "drawcontext.h"
-#include "IosImgProcess.h"
 
 typedef struct _DoomMelt DoomMelt;
 

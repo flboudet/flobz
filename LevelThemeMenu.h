@@ -41,15 +41,14 @@ class LevelThemePicturePreview : public Widget, public IdleComponent {
 
         void build();
         void themeSelected(PuyoLevelTheme * theme);
-
+        void draw(DrawTarget *dt);
     protected:
-      void draw(SDL_Surface *screen);
-      void updatePicture(void);
+      void updatePicture(DrawTarget *dt);
 
     private:
       String label;
-      IIM_Surface * picture;
-      IIM_Surface * lilback;
+      IosSurface * picture;
+      IosSurface * lilback;
       double offsetX;
       double offsetY;
       bool shouldRecache;

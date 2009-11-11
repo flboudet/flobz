@@ -10,11 +10,7 @@
 
 #include "PuyoCommander.h"
 
-#ifdef USE_AUDIO
 static bool   audio_supported = false;
-static int    audio_rate;
-static Uint16 audio_format;
-static int    audio_channels;
 
 static float sound_volume   = 1.0f;
 static float music_volume   = 1.0f;
@@ -25,8 +21,6 @@ static bool music_starting = false;
 
 static std::string music_current = "";
 static std::string music_command = "";
-
-#endif
 
 static const char * kMusicVolume = "AudioManager.Music.Volume";
 static const char * kSoundVolume = "AudioManager.FX.Volume";
@@ -143,36 +137,29 @@ void AudioManager::init()
 
 void AudioManager::close()
 {
-#ifdef USE_AUDIO
     if (!audio_supported) return;
     clearMusicCache();
     clearSoundCache();
-#endif
 }
 
 AudioManager::AudioManager()
 {
-#ifdef USE_AUDIO
     GlobalNotificationCenter.addListener(String(kMusicVolume), this);
     GlobalNotificationCenter.addListener(String(kSoundVolume), this);
     GlobalNotificationCenter.addListener(String(kMusic), this);
     GlobalNotificationCenter.addListener(String(kSound), this);
-#endif
 }
 
 AudioManager::~AudioManager()
 {
-#ifdef USE_AUDIO
     GlobalNotificationCenter.removeListener(String(kMusicVolume), this);
     GlobalNotificationCenter.removeListener(String(kSoundVolume), this);
     GlobalNotificationCenter.removeListener(String(kMusic), this);
     GlobalNotificationCenter.removeListener(String(kSound), this);
-#endif
 }
 
 void AudioManager::notificationOccured(String identifier, void * context)
 {
-#ifdef USE_AUDIO
     if (identifier == kMusicVolume) {
         // musicVolume((float)*(int *)context);
     } else
@@ -185,12 +172,10 @@ void AudioManager::notificationOccured(String identifier, void * context)
                 if (identifier == kSound) {
                     soundOnOff(*(bool *)context);
                 }
-#endif
 }
 
 void AudioManager::clearSoundCache()
 {
-#ifdef USE_AUDIO
     if (!audio_supported) return;
 
     while (!chunkCache.empty())
@@ -199,12 +184,10 @@ void AudioManager::clearSoundCache()
         if (removed)
             delete removed;
     }
-#endif
 }
 
 void AudioManager::clearMusicCache()
 {
-#ifdef USE_AUDIO
     if (!audio_supported) return;
 
     while (!musicCache.empty())
@@ -213,7 +196,6 @@ void AudioManager::clearMusicCache()
         if (removed)
             delete removed;
     }
-#endif
 }
 
 #ifdef UNUSED

@@ -194,7 +194,6 @@ void GameLoop::garbageCollect(GarbageCollectableItem *item)
 
 void GameLoop::run()
 {
-  SDL_EnableUNICODE(1);
   draw();
   while (!finished)
   {

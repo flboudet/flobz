@@ -31,7 +31,6 @@
 #include "AnimatedPuyo.h"
 #include "PuyoGame.h"
 #include "audio.h"
-#include "IosImgProcess.h"
 #include "HiScores.h"
 #include "DoomMelt.h"
 

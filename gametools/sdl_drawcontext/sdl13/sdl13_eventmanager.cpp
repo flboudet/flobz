@@ -10,7 +10,9 @@ struct CursorEventArg {
 SDL13_EventManager::SDL13_EventManager()
     : CycledComponent(0.01), m_idleDx(0), m_idleDy(0),
       m_mouseX(0), m_mouseY(0)
-{}
+{
+	SDL_EnableUNICODE(1);
+}
 
 bool SDL13_EventManager::pollEvent(GameControlEvent &controlEvent)
 {

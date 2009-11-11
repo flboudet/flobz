@@ -132,39 +132,39 @@ LevelThemePicturePreview::LevelThemePicturePreview()
 
 LevelThemePicturePreview::~LevelThemePicturePreview()
 {
-      if (lilback != NULL) IIM_Free(lilback);
-      if (picture != NULL) IIM_Free(picture);
+      if (lilback != NULL) delete lilback;
+      if (picture != NULL) delete picture;
 }
 
-void LevelThemePicturePreview::draw(SDL_Surface *screen)
+void LevelThemePicturePreview::draw(DrawTarget *dt)
 {
-	updatePicture();
+	updatePicture(dt);
     if (lilback != NULL)
     {
-      IIM_Rect r;
+      IosRect r;
       Vec3 size = getSize();
       Vec3 pos = getPosition();
-      r.x = (Sint16)(pos.x+offsetX);
-      r.y = (Sint16)(pos.y+offsetY);
-      r.w = (Sint16)(size.x);
-      r.h = (Sint16)(size.y);
-      IIM_BlitSurface(lilback, NULL, screen, &r);
+      r.x = (int16_t)(pos.x+offsetX);
+      r.y = (int16_t)(pos.y+offsetY);
+      r.w = (int16_t)(size.x);
+      r.h = (int16_t)(size.y);
+      dt->renderCopy(lilback, NULL, &r);
     }
 }
 
-void LevelThemePicturePreview::updatePicture(void)
+void LevelThemePicturePreview::updatePicture(DrawTarget *dt)
 {
     // TODO: Fix
 #ifdef DISABLED
     if ((curTheme != NULL) && (shouldRecache == true))
     {
-      if (picture != NULL) IIM_Free(picture);
-      IIM_Rect r;
+      if (picture != NULL) delete picture;
+      IosRect r;
       // TODO : Draw the oponent.
       // Background
       picture = iim_surface_duplicate(curTheme->getBackground());
       // Grids
-      IIM_Surface * grid = curTheme->getGrid();
+      IosSurface * grid = curTheme->getGrid();
       if (grid != NULL) {
 	r.x = 21;
 	r.y = -1;

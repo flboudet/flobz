@@ -1,4 +1,4 @@
-#include "InputManager.h"
+#include "SDL_InputSwitch.h"
 #include <stdlib.h>
 
 typedef struct SdlKeyName {

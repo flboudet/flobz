@@ -2,7 +2,6 @@
 #define _GameCursor_H
 
 #include "gameloop.h"
-#include "IosImgProcess.h"
 
 namespace Cursor
 {

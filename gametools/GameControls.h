@@ -2,8 +2,7 @@
 #define _GAME_CONT_H
 
 #include <stdint.h>
-
-#include "InputManager.h"
+#include "ios_fc.h"
 
 namespace event_manager
 {
@@ -88,6 +87,10 @@ public:
     virtual ~EventManager() {}
     virtual bool pollEvent(GameControlEvent &controlEvent) = 0;
     virtual void pushMouseEvent(int x, int y, CursorEventType type) = 0;
+    // Control settings handling
+    virtual ios_fc::String getControlName(int controlType, bool alternate) = 0;
+    virtual bool   changeControl(int controlType, bool alternate, GameControlEvent &event) = 0;
+    virtual void   saveControls() = 0;
 };
 
 // TODO: move all that crap elsewhere
@@ -104,16 +107,9 @@ enum {
     kPlayer2ClockwiseControl        = 8,
     kPlayer2CounterclockwiseControl = 9
 };
-
-
-void initGameControls();
-void getControlEvent(SDL_Event e, GameControlEvent *result);
-
+    
 void getKeyName(int control, bool alternate, char *keyName);
-bool tryChangeControl(int control, bool alternate, SDL_Event e, GameControlEvent *result);
 
-void saveControls();
-void loadControls();
 
 } // namespace
 

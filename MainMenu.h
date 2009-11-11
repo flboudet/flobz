@@ -22,7 +22,11 @@
  */
 class ExitAction : public Action {
   public:
-    void action() { SDL_Quit(); exit(0); }
+    void action() {
+		// TODO: Fix
+		// SDL_Quit();
+		exit(0);
+	}
 };
 
 class SinglePlayerGameAction : public Action {

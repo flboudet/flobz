@@ -27,7 +27,6 @@
 #define _PUYOVIEW
 
 #include "PuyoGame.h"
-#include "IosImgProcess.h"
 #include "PuyoAnimations.h"
 #include "AnimatedPuyo.h"
 #include "AnimatedPuyoTheme.h"

@@ -143,14 +143,14 @@ void PuyoThemePicturePreview::draw(DrawTarget *dt)
     {
       IosRect r;
       Vec3 size = getSize();
-      r.x = (Sint16)(getPosition().x+(size.x-NUMBER_OF_PUYOS*ONEPUYO+(NUMBER_OF_PUYOS-1)*ONEPUYO/4.0)/2.0);
-      r.y = (Sint16)(getPosition().y+(size.y-ONEPUYO)/2.0);
+      r.x = (int16_t)(getPosition().x+(size.x-NUMBER_OF_PUYOS*ONEPUYO+(NUMBER_OF_PUYOS-1)*ONEPUYO/4.0)/2.0);
+      r.y = (int16_t)(getPosition().y+(size.y-ONEPUYO)/2.0);
       r.h = 0;
       r.w = 0;
       for (int i=0; i<NUMBER_OF_PUYOS; i++)
       {
         IosRect rect = r;
-        rect.x += (Sint16)((i*3*ONEPUYO)/4);
+        rect.x += (int16_t)((i*3*ONEPUYO)/4);
         AnimatedPuyoTheme * t = curTheme->getAnimatedPuyoTheme((PuyoState)(PUYO_BLUE+i));
         dt->renderCopy(t->getSurface(PUYO_SHADOWS,0), NULL, &rect);
         dt->renderCopy(t->getSurface(PUYO_FACES,0), NULL, &rect);

@@ -1,6 +1,7 @@
 #include "GameControls.h"
 #include "preferences.h"
 #include "GameCursor.h"
+#include "SDL_InputManager.h"
 
 #ifdef MACOSX
 #include <SDL/SDL.h>

@@ -6,7 +6,8 @@ using namespace event_manager;
 
 void ControlMenu::BackSaveAction::action()
 {
-    saveControls();
+    // TODO: Fix
+    //theCommander->saveControls();
     mainScreen->popMenu();
 }
 

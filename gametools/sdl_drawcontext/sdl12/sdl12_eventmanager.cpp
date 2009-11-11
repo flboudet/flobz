@@ -1,6 +1,133 @@
 #include "sdl12_eventmanager.h"
+#include "common/SDL_InputSwitch.h"
 
+using namespace ios_fc;
 using namespace event_manager;
+
+#define NB_CONTROLS 10
+static InputSwitch *keyControls[NB_CONTROLS] =
+{
+    new KeyInputSwitch(SDLK_s,true),
+    new KeyInputSwitch(SDLK_f,true),
+    new KeyInputSwitch(SDLK_d,true),
+    new KeyInputSwitch(SDLK_UNKNOWN,true),
+    new KeyInputSwitch(SDLK_e,true),
+    new KeyInputSwitch(SDLK_LEFT,true),
+    new KeyInputSwitch(SDLK_RIGHT,true),
+    new KeyInputSwitch(SDLK_DOWN,true),
+    new KeyInputSwitch(SDLK_UNKNOWN,true),
+    new KeyInputSwitch(SDLK_UP,true)
+};
+
+static InputSwitch *keyAlternateControls[NB_CONTROLS] =
+{
+    new JoystickAxisSwitch(0, 0, false, false),
+    new JoystickAxisSwitch(0, 0, true, false),
+    new JoystickAxisSwitch(0, 1, true, false),
+    new JoystickSwitch(0, 1, false),
+    new JoystickSwitch(0, 0, false),
+    new JoystickAxisSwitch(1, 0, false, false),
+    new JoystickAxisSwitch(1, 0, true, false),
+    new JoystickAxisSwitch(1, 1, true, false),
+    new JoystickSwitch(1, 1, false),
+    new JoystickSwitch(1, 0, false)
+};
+
+static void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
+{
+    result->gameEvent     = kGameNone;
+    result->cursorEvent   = kCursorNone;
+    result->keyboardEvent = kKeyboardNone;
+    result->isUp   = true;
+    result->caught = false;
+    result->isJoystick = false;
+    result->unicodeKeySym = 0;
+    
+    switch (e.type) {
+        case SDL_QUIT:
+            result->cursorEvent = kQuit;
+            break;
+        case SDL_KEYDOWN:
+            result->keyboardEvent = kKeyboardDown;
+            result->unicodeKeySym = e.key.keysym.unicode;
+            break;
+        case SDL_KEYUP:
+            result->keyboardEvent = kKeyboardUp;
+            result->unicodeKeySym = e.key.keysym.unicode;
+            break;
+        default:
+            break;
+    }
+    // Game event handling
+    if (input == NULL)
+        return;
+    
+    result->isJoystick = input->isJoystick();
+    
+    if (input->isQuit())
+        result->cursorEvent = kQuit;
+    
+    if (input->isValidate())
+        result->cursorEvent = kStart;
+    
+    if (input->isCancel())
+        result->cursorEvent = kBack;
+    
+    if (input->isArrowDown())
+        result->cursorEvent = kDown;
+    
+    if (input->isArrowUp())
+        result->cursorEvent = kUp;
+    
+    if (input->isArrowLeft())
+        result->cursorEvent = kLeft;
+    
+    if (input->isArrowRight())
+        result->cursorEvent = kRight;
+    
+    if (input->isPause())
+        result->gameEvent = kPauseGame;
+    
+    result->isUp = input->isUp();
+    
+    if ((*input == *keyControls[kPlayer1LeftControl]) || (*input == *keyAlternateControls[kPlayer1LeftControl]))
+        result->gameEvent = kPlayer1Left;
+    if ((*input == *keyControls[kPlayer1RightControl]) || (*input == *keyAlternateControls[kPlayer1RightControl]))
+        result->gameEvent = kPlayer1Right;
+    if ((*input == *keyControls[kPlayer1ClockwiseControl]) || (*input == *keyAlternateControls[kPlayer1ClockwiseControl]))
+        result->gameEvent = kPlayer1TurnRight;
+    if ((*input == *keyControls[kPlayer1CounterclockwiseControl]) || (*input == *keyAlternateControls[kPlayer1CounterclockwiseControl]))
+        result->gameEvent = kPlayer1TurnLeft;
+    if ((*input == *keyControls[kPlayer1DownControl]) || (*input == *keyAlternateControls[kPlayer1DownControl]))
+        result->gameEvent = kPlayer1Down;
+    
+    if ((*input == *keyControls[kPlayer2LeftControl]) || (*input == *keyAlternateControls[kPlayer2LeftControl]))
+        result->gameEvent = kPlayer2Left;
+    if ((*input == *keyControls[kPlayer2RightControl]) || (*input == *keyAlternateControls[kPlayer2RightControl]))
+        result->gameEvent = kPlayer2Right;
+    if ((*input == *keyControls[kPlayer2ClockwiseControl]) || (*input == *keyAlternateControls[kPlayer2ClockwiseControl]))
+        result->gameEvent = kPlayer2TurnRight;
+    if ((*input == *keyControls[kPlayer2CounterclockwiseControl]) || (*input == *keyAlternateControls[kPlayer2CounterclockwiseControl]))
+        result->gameEvent = kPlayer2TurnLeft;
+    if ((*input == *keyControls[kPlayer2DownControl]) || (*input == *keyAlternateControls[kPlayer2DownControl]))
+        result->gameEvent = kPlayer2Down;
+}
+
+static void getControlEvent(SDL_Event e, GameControlEvent *result)
+{
+    InputSwitch *input  = switchForEvent(&e);
+    getControlEvent(e, input, result);
+    
+    if (input)
+        delete input;
+}
+
+// TODO: correct
+/*static void initGameControls()
+{
+    initControllers();
+    loadControls();
+}*/
 
 struct CursorEventArg {
     CursorEventArg(int x, int y) : x(x), y(y) {}
@@ -10,7 +137,9 @@ struct CursorEventArg {
 SDL12_EventManager::SDL12_EventManager()
     : CycledComponent(0.01), m_idleDx(0), m_idleDy(0),
       m_mouseX(0), m_mouseY(0)
-{}
+{
+	SDL_EnableUNICODE(1);
+}
 
 bool SDL12_EventManager::pollEvent(GameControlEvent &controlEvent)
 {
@@ -34,6 +163,29 @@ void SDL12_EventManager::pushMouseEvent(int x, int y,
     mouseEvent.user.code = type;
     mouseEvent.user.data1 = new CursorEventArg(x, y);
     SDL_PushEvent(&mouseEvent);
+}
+
+ios_fc::String SDL12_EventManager::getControlName(int controlType, bool alternate)
+{
+    ios_fc::String controlName("           ");
+    if (alternate) {
+        if (keyAlternateControls[controlType])
+            controlName = keyAlternateControls[controlType]->name();
+    }
+    else {
+        if (keyControls[controlType])
+            controlName = keyControls[controlType]->name();
+    }
+    return controlName;
+}
+
+bool SDL12_EventManager::changeControl(int controlType, bool alternate, GameControlEvent &event)
+{
+    return true;
+}
+
+void SDL12_EventManager::saveControls()
+{
 }
 
 void SDL12_EventManager::translateMouseEvent(const SDL_Event &sdl_event,

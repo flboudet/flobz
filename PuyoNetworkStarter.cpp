@@ -30,10 +30,9 @@
 #include "ios_time.h"
 #include "PuyoMessageDef.h"
 
+// TODO: investigate WTF is this
 extern const char *p1name;
 extern const char *p2name;
-
-extern IIM_Surface *perso[2];
 
 PuyoGame *PuyoNetworkGameFactory::createPuyoGame(PuyoFactory *attachedPuyoFactory) {
     return new PuyoNetworkGame(attachedPuyoFactory, msgBox, gameId);

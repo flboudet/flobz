@@ -116,7 +116,6 @@ void GameWidget::priv_initialize()
 		        attachedLevelTheme->getForegroundAnimation())),
 		      (StyrolyseClient *)(&m_styroPainter), false);
     }
-    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
 
     // Setting up games
     attachedGameA = this->areaA->getAttachedGame();

@@ -28,7 +28,6 @@
 #include "PuyoNetworkView.h"
 #include "PuyoNetworkGame.h"
 
-#include "IosImgProcess.h"
 #include "audio.h"
 
 using namespace ios_fc;

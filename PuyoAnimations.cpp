@@ -26,7 +26,6 @@
 #include "PuyoAnimations.h"
 #include "AnimatedPuyo.h"
 #include "PuyoView.h"
-#include "IosImgProcess.h"
 #include "audio.h"
 
 /* Base class implementation */

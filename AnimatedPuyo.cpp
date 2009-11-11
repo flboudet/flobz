@@ -149,7 +149,7 @@ void AnimatedPuyo::renderAt(int X, int Y, DrawTarget *dt)
 
         /* Eye management */
         if ((getPuyoState() != PUYO_NEUTRAL) && (m_displayEyes)) {
-            int eyePhase = (puyoEyeState + SDL_GetTicks()) % 8192;
+            int eyePhase = fmod((puyoEyeState + ios_fc::getTimeMs()), 8192.);
             if (eyePhase < 100)
                 dt->renderCopy(attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState), NULL, &drect);
             else if (eyePhase < 200)
