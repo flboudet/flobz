@@ -124,6 +124,8 @@ AC_SEARCH_LIBS([TTF_Init],
 	     [AC_MSG_ERROR([*** SDL_ttf lib not found! Get SDL_ttf from
 http://www.libsdl.org/projects/SDL_ttf/index.html])])
 
+AC_SEARCH_LIBS([glGetError], [GL])
+
 SDL_LIBS=$LIBS
 LIBS=$OLD_LIBS
 
@@ -131,6 +133,7 @@ AC_SUBST([SDL_LIBS])
 AC_SUBST([SDL_IMAGE_LIBS])
 AC_SUBST([SDL_MIXER_LIBS])
 AC_SUBST([SDL_TTF_LIBS])
+AC_SUBST([GL_LIBS])
 
 AC_SEARCH_LIBS([gethostbyname], [nsl])
 
@@ -187,6 +190,8 @@ You should install development package.])])
 
 AC_CHECK_HEADER(sqlite3.h, ENABLE_SQLITE=true, ENABLE_SQLITE=false)
 
+AC_CHECK_HEADER(GL/gl.h, ENABLE_OPENGL=true, ENABLE_OPENGL=false)
+
 CPPFLAGS=$OLD_CPPFLAGS
 CXXFLAGS=$OLD_CXXFLAGS
 
@@ -238,6 +243,15 @@ else
   AC_MSG_RESULT([TTF Disabled])
 fi
 
+if test "x$ENABLE_OPENGL_GFX" = "xtrue"; then
+  AC_MSG_RESULT([OpenGL Enabled])
+  FPFEATURES="$FPFEATURES -DOPENGL_GFX=1"
+  ENABLE_SDL12_GFX="false"
+  ENABLE_SDL13_GFX="false"
+else
+  AC_MSG_RESULT([OpenGL Disabled])
+fi
+
 if test "x$ENABLE_SDL12_GFX" = "xtrue"; then
   AC_MSG_RESULT([SDL 1.2 Enabled])
   FPFEATURES="$FPFEATURES -DSDL12_GFX=1"
@@ -284,6 +298,7 @@ esac
 AM_CONDITIONAL([MACOSX], [test x$MACOSX = xtrue])
 AM_CONDITIONAL([WIN32], [test x$WIN32 = xtrue])
 
+AM_CONDITIONAL([ENABLE_OPENGL_GFX], [test x$ENABLE_OPENGL_GFX = xtrue])
 AM_CONDITIONAL([ENABLE_SDL12_GFX], [test x$ENABLE_SDL12_GFX = xtrue])
 AM_CONDITIONAL([ENABLE_SDL13_GFX], [test x$ENABLE_SDL13_GFX = xtrue])
 AM_CONDITIONAL([ENABLE_NETWORK], [test x$ENABLE_NETWORK = xtrue])
@@ -296,6 +311,7 @@ AC_SUBST([FPFEATURES])
 AC_CONFIG_FILES([
 Makefile gametools/Makefile iosfc/Makefile goomsl/Makefile
 gametools/sdl_drawcontext/Makefile
+gametools/opengl_drawcontext/Makefile
 data/Makefile
 data/base.000/Makefile
 data/base.000/gfx/Makefile

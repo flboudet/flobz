@@ -58,6 +58,10 @@ if ENABLE_SDL13_GFX
 flobopuyo_LDADD+=gametools/sdl_drawcontext/libsdl13_drawcontext.la
 endif
 
+if ENABLE_OPENGL_GFX
+flobopuyo_LDADD+=gametools/opengl_drawcontext/libopengl_drawcontext.la
+endif
+
 flobopuyo_LDADD+=$(SDL_LIBS)
 
 SUBDIRS = iosfc gametools goomsl data

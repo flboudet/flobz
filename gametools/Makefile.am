@@ -16,4 +16,4 @@ EXTRA_DIST=FramedButton.h FramedEditField.h Frame.h \
            SDL_Painter.h sofont.h SwitchedButton.h vec3.h \
 	   drawcontext.h audiomanager.h BufferedDrawTarget.h
 
-SUBDIRS=sdl_drawcontext
+SUBDIRS=sdl_drawcontext opengl_drawcontext

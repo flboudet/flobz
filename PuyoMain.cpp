@@ -13,6 +13,11 @@
 #include "sdl_drawcontext/sdl13/sdl13_eventmanager.h"
 #include "sdl_drawcontext/common/SDL_AudioManager.h"
 #endif
+#ifdef OPENGL_GFX
+#include "opengl_drawcontext/OpenGL_drawcontext.h"
+#include "opengl_drawcontext/OpenGL_eventmanager.h"
+#include "opengl_drawcontext/OpenGL_AudioManager.h"
+#endif
 #ifdef ENABLE_NETWORK_INTERNET
 #include "PuyoInternetBot.h"
 #endif
@@ -59,6 +64,13 @@ void PuyoMain::initWithGUI()
     m_eventManager = new SDL13_EventManager();
     m_audioManager = new SDL_AudioManager();
 #endif
+#ifdef OPENGL_GFX
+    m_drawContext = new OpenGL_DrawContext(640, 480,
+					   GetBoolPreference(kFullScreenPref, m_fullscreen),
+					   "FloboPuyo by iOS-Software");
+    m_eventManager = new OpenGL_EventManager();
+    m_audioManager = new OpenGL_AudioManager();
+#endif
     // Give the DrawContext to the GameLoop
     loop->setDrawContext(m_drawContext);
     // Give the EventManager to the GameLoop
@@ -84,9 +96,17 @@ void PuyoMain::initWithoutGUI()
     pc->initWithoutGUI();
 }
 
+#ifdef SDL13_GFX
+#define SDL_GFX
+#endif
+#ifdef SDL12_GFX
+#define SDL_GFX
+#endif
+
 /* Initialize SDL context */
 void PuyoMain::initSDL()
 {
+#ifdef SDL_GFX
   DBG_PRINT("initSDL()\n");
   int init_flags = SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK;
 
@@ -114,6 +134,7 @@ void PuyoMain::initSDL()
     fprintf(stderr, "SDL initialisation error:  %s\n", SDL_GetError());
     exit(1);
   }
+#endif
 #endif
 }
 
