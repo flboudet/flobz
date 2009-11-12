@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <string.h>
-#include "IosImgProcess.h"
 #ifdef MACOSX
 #include <CoreFoundation/CoreFoundation.h>
 #include "SDL_main.h"
