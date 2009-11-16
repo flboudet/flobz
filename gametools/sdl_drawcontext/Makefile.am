@@ -19,6 +19,7 @@ noinst_LTLIBRARIES=libsdl13_drawcontext.la
 libsdl13_drawcontext_la_SOURCES=common/SDL_IosFont.cpp \
           common/SDL_AudioManager.cpp \
           common/SDL_InputSwitch.cpp \
+          common/IosImgProcess.cpp \
           sdl13/sdl13_drawcontext.cpp sdl13/sdl13_eventmanager.cpp
 
 libsdl13_drawcontext_la_CXXFLAGS = -I$(srcdir)/common -I$(srcdir)/sdl13 -I$(top_srcdir)/gametools -I$(top_srcdir)/iosfc $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
