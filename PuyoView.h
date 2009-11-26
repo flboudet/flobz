@@ -119,6 +119,14 @@ class PuyoView : public PuyoDelegate {
         neutralXOffset = x;
         neutralYOffset = y;
     }
+    void setPosition(int x, int y) {
+        this->xOffset = x;
+        this->yOffset = y - TSIZE;
+    }
+    void setNextPuyosPosition(int x, int y) {
+        this->nXOffset = x;
+        this->nYOffset = y;
+    }
   protected:
     String p1name, p2name;
     bool cycleAllowed();

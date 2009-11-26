@@ -60,6 +60,7 @@ public:
     virtual void sendChat(String chatText);
 protected:
     void associatedScreenHasBeenSet(GameScreen *associatedScreen);
+    virtual PuyoPlayer *createLocalPlayer();
 private:
     void sendSyncMsg();
     void sendAliveMsg();
@@ -68,9 +69,11 @@ private:
     ios_fc::MessageBox *mbox;
     std::auto_ptr<PuyoLocalGameFactory> attachedLocalGameFactory;
     std::auto_ptr<PuyoNetworkGameFactory> attachedNetworkGameFactory;
+protected:
     std::auto_ptr<PuyoNetworkView> localArea;
     std::auto_ptr<PuyoView> networkArea;
-    std::auto_ptr<PuyoCombinedEventPlayer> playercontroller;
+private:
+    std::auto_ptr<PuyoPlayer> playercontroller;
     std::auto_ptr<PuyoNullPlayer> dummyPlayerController;
     bool syncMsgReceived, syncMsgSent;
     double lastMessageDate, lastAliveMessageSentDate;

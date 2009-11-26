@@ -44,6 +44,11 @@ PuyoNetworkGameWidget::PuyoNetworkGameWidget()
 {
 }
 
+PuyoPlayer *PuyoNetworkGameWidget::createLocalPlayer()
+{
+    return new PuyoCombinedEventPlayer(*localArea);
+}
+
 void PuyoNetworkGameWidget::initWithGUI(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, ios_fc::IgpMessageBox *igpbox)
 {
     attachedPuyoThemeSet = &puyoThemeSet;
@@ -62,7 +67,7 @@ void PuyoNetworkGameWidget::initWithGUI(AnimatedPuyoSetTheme &puyoThemeSet, Puyo
     networkArea = std::auto_ptr<PuyoView>(new PuyoView(attachedNetworkGameFactory.get(), attachedPuyoThemeSet, &levelTheme,
                                                        1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE,
                                                        CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE));
-    playercontroller = std::auto_ptr<PuyoCombinedEventPlayer>(new PuyoCombinedEventPlayer(*localArea));
+    playercontroller = std::auto_ptr<PuyoPlayer>(createLocalPlayer());
     dummyPlayerController = std::auto_ptr<PuyoNullPlayer>(new PuyoNullPlayer(*networkArea));
     this->mbox->addListener(this);
     chatBox = std::auto_ptr<ChatBox>(new ChatBox(*this));
