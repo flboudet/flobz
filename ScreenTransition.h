@@ -26,21 +26,37 @@
 #ifndef _PUYOSCREENTRANSITION
 #define _PUYOSCREENTRANSITION
 
+#include <memory>
 #include "gameui.h"
 #include "DoomMelt.h"
 
 using namespace gameui;
 
-class ScreenTransitionWidget : public Widget, public CycledComponent {
+/**
+ * All ScreenTransitionWidgets have to inherit this class
+ */
+class ScreenTransitionWidget : public Widget
+{
 public:
-    ScreenTransitionWidget(Screen &fromScreen, Action *transitionFinishedAction);
-    virtual ~ScreenTransitionWidget();
+    ScreenTransitionWidget(Screen &fromScreen);
+    virtual ~ScreenTransitionWidget() {}
+protected:
+    IosSurface *getFromSurface() const { return m_fromSurface.get(); }
+private:
+    std::auto_ptr<IosSurface> m_fromSurface;
+};
+
+/**
+ * Default implementation (doom melt effect)
+ */
+class DoomMeltScreenTransitionWidget : public ScreenTransitionWidget, public CycledComponent {
+public:
+    DoomMeltScreenTransitionWidget(Screen &fromScreen);
+    virtual ~DoomMeltScreenTransitionWidget();
     void cycle();
     void draw(DrawTarget *dt);
     IdleComponent *getIdleComponent() { return this; }
 private:
-    IosSurface *fromSurface;
-    Action *transitionFinishedAction;
     DoomMelt *melt;
 };
 

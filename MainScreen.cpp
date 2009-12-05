@@ -68,7 +68,7 @@ void MainScreen::transitionFromScreen(Screen &fromScreen)
         remove(transition);
         delete(transition);
     }
-    transition = new ScreenTransitionWidget(fromScreen, NULL);
+    transition = theCommander->createScreenTransition(fromScreen);
     add(transition);
     setMenuDimensions();
 }

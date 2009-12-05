@@ -32,9 +32,14 @@ class PuyoCommander
     void registerCursor(AbstractCursor *cursor);
     void setCursorVisible(bool visible);
 
+    // Transition widget factory
+    virtual ScreenTransitionWidget *createScreenTransition(Screen &fromScreen) const;
+
+    // Data path management
     const DataPathManager &getDataPathManager() { return dataPathManager; }
     const char * getLocalizedString(const char * originalString) const;
 
+    // Common resources accessor
     const FramePicture *getWindowFramePicture() const { return m_windowFramePicture.get(); }
     const FramePicture *getButtonFramePicture() const { return m_buttonIdleFramePicture.get(); }
     const FramePicture *getButtonDownFramePicture() const { return m_buttonDownFramePicture.get(); }

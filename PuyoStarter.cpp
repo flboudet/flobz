@@ -36,7 +36,8 @@ using namespace event_manager;
 GameScreen::GameScreen(GameWidget &gameWidget, Screen &previousScreen)
     : Screen(), paused(false),
       pauseMenu(this),
-      gameWidget(gameWidget), transitionWidget(previousScreen, NULL),
+      gameWidget(gameWidget),
+      transitionWidget(theCommander->createScreenTransition(previousScreen)),
       overlayStory(NULL)
 {
 #ifdef DEBUG_GAMELOOP
@@ -54,7 +55,7 @@ GameScreen::GameScreen(GameWidget &gameWidget, Screen &previousScreen)
         add((*activeFX)[i]);
         (*activeFX)[i]->setGameScreen(this);
     }
-    add(&transitionWidget);
+    add(transitionWidget.get());
     gameWidget.setAssociatedScreen(this);
 }
 

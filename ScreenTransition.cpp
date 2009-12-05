@@ -27,34 +27,36 @@
 
 
 
-ScreenTransitionWidget::ScreenTransitionWidget(Screen &fromScreen, Action *transitionFinishedAction)
-    : CycledComponent(.03), transitionFinishedAction(transitionFinishedAction)
+ScreenTransitionWidget::ScreenTransitionWidget(Screen &fromScreen)
+{
+    DrawContext *dc = GameUIDefaults::GAME_LOOP->getDrawContext();
+    m_fromSurface.reset(dc->getIIMLibrary().create_DisplayFormat(dc->getWidth(), dc->getHeight()));
+    fromScreen.drawAnyway(m_fromSurface.get());
+}
+
+DoomMeltScreenTransitionWidget::DoomMeltScreenTransitionWidget(Screen &fromScreen)
+    : ScreenTransitionWidget(fromScreen),
+      CycledComponent(.03)
 {
     melt = doom_melt_new();
-    DrawContext *dc = GameUIDefaults::GAME_LOOP->getDrawContext();
-    fromSurface = dc->getIIMLibrary().create_DisplayFormat(dc->getWidth(), dc->getHeight());
-    fromScreen.drawAnyway(fromSurface);
-    doom_melt_start(melt, fromSurface);
+    doom_melt_start(melt, getFromSurface());
 }
 
-ScreenTransitionWidget::~ScreenTransitionWidget()
+DoomMeltScreenTransitionWidget::~DoomMeltScreenTransitionWidget()
 {
     doom_melt_delete(melt);
-    delete fromSurface;
 }
 
-void ScreenTransitionWidget::cycle()
+void DoomMeltScreenTransitionWidget::cycle()
 {
     if (!doom_melt_finished(melt)) {
         doom_melt_update(melt);
         requestDraw();
     }
-    //transitionFinishedAction.action();
 }
 
-void ScreenTransitionWidget::draw(DrawTarget *dt)
+void DoomMeltScreenTransitionWidget::draw(DrawTarget *dt)
 {
-    //toScreen.drawAnyway(screen);
     dt->setClipRect(NULL);
     doom_melt_display(melt, dt);
 }

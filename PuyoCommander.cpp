@@ -218,6 +218,11 @@ void PuyoCommander::loadPreferences(bool fs)
 #endif
 }
 
+ScreenTransitionWidget *PuyoCommander::createScreenTransition(Screen &fromScreen) const
+{
+    return new DoomMeltScreenTransitionWidget(fromScreen);
+}
+
 void PuyoCommander::registerCursor(AbstractCursor *cursor)
 {
     m_cursor = cursor;

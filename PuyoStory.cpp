@@ -245,7 +245,7 @@ StoryScreen::StoryScreen(String screenName, Screen &previousScreen, Action *fini
 {
     add(&storyWidget);
     if (shouldAddTransition) {
-        transitionWidget = new ScreenTransitionWidget(previousScreen, NULL);
+        transitionWidget = theCommander->createScreenTransition(previousScreen);
         add(transitionWidget);
     }
 }
@@ -263,7 +263,7 @@ void StoryScreen::transitionFromScreen(Screen &fromScreen)
         remove(transitionWidget);
         delete(transitionWidget);
     }
-    transitionWidget = new ScreenTransitionWidget(fromScreen, NULL);
+    transitionWidget = theCommander->createScreenTransition(fromScreen);
     add(transitionWidget);
 }
 
