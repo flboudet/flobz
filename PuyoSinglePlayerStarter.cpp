@@ -127,6 +127,11 @@ SinglePlayerGameWidget *SinglePlayerStandardLayoutFactory::createGameWidget
                                           aiFace, gameOverAction);
 }
 
+StatsWidgetDimensions SinglePlayerStandardLayoutFactory::getStatsWidgetDimensions() const
+{
+    return StatsWidgetDimensions(416, 194, 50);
+}
+
 PuyoLevelDefinitions *PuyoLevelDefinitions::currentDefinition = NULL;
 
 PuyoLevelDefinitions::PuyoLevelDefinitions(String levelDefinitionFile)
@@ -592,8 +597,7 @@ void SinglePlayerMatch::performMatchLostAnimation()
 void SinglePlayerMatch::performMatchScores(State scoreState)
 {
   m_state = scoreState;
-  StatsWidgetDimensions dimensions(416, 194, 50);
-  //StatsWidgetDimensions(416, 20, 5);
+    StatsWidgetDimensions dimensions = m_spFactory->getStatsWidgetDimensions();
   m_statsWidget = new TwoPlayersStatsWidget(this->m_gameWidget->getStatPlayerOne(), this->m_gameWidget->getStatPlayerTwo(), true, false, theCommander->getWindowFramePicture(), dimensions);
   m_gameScreen->add(m_statsWidget);
 }

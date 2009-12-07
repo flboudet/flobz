@@ -76,6 +76,7 @@ public:
         (AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme,
          int level, int nColors, int lifes, String aiFace,
          Action *gameOverAction) = 0;
+    virtual StatsWidgetDimensions getStatsWidgetDimensions() const = 0;
     virtual ~SinglePlayerFactory() {};
 };
 
@@ -87,6 +88,7 @@ class SinglePlayerStandardLayoutFactory : public SinglePlayerFactory {
     (AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme,
      int level, int nColors, int lifes, String aiFace,
      Action *gameOverAction);
+    virtual StatsWidgetDimensions getStatsWidgetDimensions() const;
 };
 
 class PuyoLevelDefinitions {
