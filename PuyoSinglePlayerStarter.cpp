@@ -592,7 +592,9 @@ void SinglePlayerMatch::performMatchLostAnimation()
 void SinglePlayerMatch::performMatchScores(State scoreState)
 {
   m_state = scoreState;
-  m_statsWidget = new TwoPlayersStatsWidget(this->m_gameWidget->getStatPlayerOne(), this->m_gameWidget->getStatPlayerTwo(), true, false, theCommander->getWindowFramePicture());
+  StatsWidgetDimensions dimensions(416, 194, 50);
+  //StatsWidgetDimensions(416, 20, 5);
+  m_statsWidget = new TwoPlayersStatsWidget(this->m_gameWidget->getStatPlayerOne(), this->m_gameWidget->getStatPlayerTwo(), true, false, theCommander->getWindowFramePicture(), dimensions);
   m_gameScreen->add(m_statsWidget);
 }
 

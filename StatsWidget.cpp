@@ -221,10 +221,11 @@ StatsFormat::StatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &playerBSt
 
 
 StatsWidget::StatsWidget(StatsFormat &statsFormat,
-                                 PlayerGameStat &stats, PlayerGameStat &opponentStats,
-                                 const gameui::FramePicture *framePicture, StatsDirection dir,
-                                 bool showGlobalScore,
-                                 gameui::Action *action)
+                         StatsWidgetDimensions &dimensions,
+                         PlayerGameStat &stats, PlayerGameStat &opponentStats,
+                         const gameui::FramePicture *framePicture, StatsDirection dir,
+                         bool showGlobalScore,
+                         gameui::Action *action)
   : m_dir(dir), m_showGlobalScore(showGlobalScore),
     m_action(action), m_statsFormat(statsFormat),
     m_stats(stats), m_opponentStats(opponentStats),
@@ -240,6 +241,7 @@ StatsWidget::StatsWidget(StatsFormat &statsFormat,
     add(txt);
     add(img1);
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++) {
+        m_comboLines[i].setDimensions(dimensions);
         add(&m_comboLines[i]);
     }
     Separator *sep = new Separator();
@@ -340,7 +342,7 @@ void StatsWidget::ComboLine::setComboLineInfos(StatsDirection dir, int tag, Stri
     m_dir = dir;
 
     m_currentValue.setAutoSize(false);
-    m_currentValue.setPreferedSize(Vec3(50));
+    m_currentValue.setPreferedSize(Vec3(m_dimensions.m_comboLineValueWidth));
 
     if (m_dir == LEFT_TO_RIGHT) {
         m_currentValue.setTextAlign(TEXT_LEFT_ALIGN);
@@ -434,15 +436,16 @@ void StatsLegendWidget::action(Widget *sender, int actionType, GameControlEvent 
 
 TwoPlayersStatsWidget::TwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats,
                                                      bool showLeftGlobalScore, bool showRightGlobalScore,
-                                                     const gameui::FramePicture *framePicture)
+                                                     const gameui::FramePicture *framePicture, StatsWidgetDimensions &dimensions)
   : m_statsFormat(leftPlayerStats, rightPlayerStats),
     m_legend(m_statsFormat, m_leftStats, NULL/*framePicture*/),
-    m_leftStats(m_statsFormat, leftPlayerStats, rightPlayerStats, NULL, RIGHT_TO_LEFT, showLeftGlobalScore, &m_legend),
-    m_rightStats(m_statsFormat, rightPlayerStats, leftPlayerStats, NULL, LEFT_TO_RIGHT, showRightGlobalScore)
+    m_leftStats(m_statsFormat, dimensions, leftPlayerStats, rightPlayerStats, NULL, RIGHT_TO_LEFT, showLeftGlobalScore, &m_legend),
+    m_rightStats(m_statsFormat, dimensions, rightPlayerStats, leftPlayerStats, NULL, LEFT_TO_RIGHT, showRightGlobalScore),
+    m_height(dimensions.m_height), m_legendWidth(dimensions.m_legendWidth)
 {
-    m_legendSlider.setPreferedSize(Vec3(194., 416.));
-    m_leftSlider.setPreferedSize(Vec3(0., 416.));
-    m_rightSlider.setPreferedSize(Vec3(0., 416.));
+    m_legendSlider.setPreferedSize(Vec3(m_legendWidth, m_height));
+    m_leftSlider.setPreferedSize(Vec3(0., m_height));
+    m_rightSlider.setPreferedSize(Vec3(0., m_height));
     HBox *backBox = new HBox();
     VBox *v1 = new VBox();
     Separator *sep1 = new Separator();
@@ -450,7 +453,7 @@ TwoPlayersStatsWidget::TwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, Pl
     v1->add(sep1);
     backBox->add(v1);
     VBox *v3 = new VBox();
-    v3->setPreferedSize(Vec3(194., 0.));
+    v3->setPreferedSize(Vec3(m_legendWidth, 0.));
     backBox->add(v3);
     VBox *v2 = new VBox();
     Separator *sep2 = new Separator();
@@ -463,7 +466,7 @@ TwoPlayersStatsWidget::TwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, Pl
     frontBox->add(f1);
     VBox *f3 = new VBox();
     Separator *sep3 = new Separator();
-    f3->setPreferedSize(Vec3(194., 0.));
+    f3->setPreferedSize(Vec3(m_legendWidth, 0.));
     f3->add(&m_legendSlider);
     f3->add(sep3);
     frontBox->add(f3);

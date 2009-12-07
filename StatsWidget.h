@@ -20,6 +20,18 @@ enum StatsDirection {
     LEFT_TO_RIGHT
 };
 
+struct StatsWidgetDimensions {
+    StatsWidgetDimensions(float height, float legendWidth,
+                          float comboLineValueWidth)
+        : m_height(height), m_legendWidth(legendWidth),
+          m_comboLineValueWidth(comboLineValueWidth) {}
+    StatsWidgetDimensions()
+        : m_height(0), m_legendWidth(0),
+          m_comboLineValueWidth(0) {}
+    float m_height, m_legendWidth;
+    float m_comboLineValueWidth;
+};
+
 class ProgressBarWidget : public gameui::Widget, IdleComponent {
 public:
     ProgressBarWidget(gameui::Action *associatedAction);
@@ -59,10 +71,11 @@ struct StatsFormat {
 class StatsWidget : public gameui::VBox, gameui::Action, IdleComponent {
 public:
     StatsWidget(StatsFormat &statsFormat,
-                    PlayerGameStat &stats, PlayerGameStat &opponentStats,
-                    const gameui::FramePicture *framePicture, StatsDirection dir,
-                    bool showGlobalScore = false,
-                    gameui::Action *action = NULL);
+                StatsWidgetDimensions &dimensions,
+                PlayerGameStat &stats, PlayerGameStat &opponentStats,
+                const gameui::FramePicture *framePicture, StatsDirection dir,
+                bool showGlobalScore = false,
+                gameui::Action *action = NULL);
     virtual ~StatsWidget() {}
     virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
     void startAnimation();
@@ -80,8 +93,12 @@ private:
         void setComboLineInfos(StatsDirection dir, int tag, String comboText,
                                int numberOfCombos, int vsNumberOfCombos,
                                int totalNumOfCombos, gameui::Action *progressionCompleteAction);
+        void setDimensions(StatsWidgetDimensions &dimensions) {
+            m_dimensions = dimensions;
+        }
         virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
     private:
+        StatsWidgetDimensions m_dimensions;
         StatsDirection m_dir;
         int m_tag;
         gameui::Text m_comboLabel;
@@ -135,7 +152,7 @@ class TwoPlayersStatsWidget : public gameui::ZBox, gameui::SliderContainerListen
 public:
     TwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, PlayerGameStat &rightPlayerStats,
                               bool showLeftGlobalScore, bool showRightGlobalScore,
-                              const gameui::FramePicture *framePicture);
+                              const gameui::FramePicture *framePicture, StatsWidgetDimensions &dimensions);
     virtual ~TwoPlayersStatsWidget() {}
     virtual void onWidgetVisibleChanged(bool visible);
     /**
@@ -148,6 +165,7 @@ private:
     gameui::SliderContainer m_leftSlider, m_rightSlider, m_legendSlider;
     StatsLegendWidget m_legend;
     StatsWidget m_leftStats, m_rightStats;
+    float m_height, m_legendWidth;
     SelfVector<Widget*> widgetAutoReleasePool;
 };
 
