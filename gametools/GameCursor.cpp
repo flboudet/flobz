@@ -7,8 +7,8 @@ using namespace Cursor;
 
 GameCursor::GameCursor(const char *cursorImage) : visible(true), obscured(true)
 {
-    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
-    cursorSurface = iimLib.load_Absolute_DisplayFormatAlpha(cursorImage);
+    ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
+    cursorSurface = iimLib.loadImage(IMAGE_RGBA, cursorImage);
     blitX = 0;
     blitY = 0;
     prevblitX = 0;
@@ -31,7 +31,7 @@ void GameCursor::draw(DrawTarget *dt)
     float anglerad = angle * M_PI / 180.0;
     float nvx = (-sin(anglerad) * 0.5) * cursorSurface->w;
     float nvy = (-cos(anglerad) * 0.5) * cursorSurface->h;
-    dt->renderRotatedCentered(cursorSurface, (int)angle, (int)(blitX - nvx), (int)(blitY - nvy));
+    dt->drawRotatedCentered(cursorSurface, (int)angle, (int)(blitX - nvx), (int)(blitY - nvy));
 }
 
 void GameCursor::onEvent(GameControlEvent *event)

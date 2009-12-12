@@ -145,7 +145,7 @@ void _column_draw (column_t *column, IosSurface *meltImage, DrawTarget *display)
     image_rect.x = column->x;
     image_rect.h = meltImage->h - tmp;
 
-    display->renderCopy(meltImage, &image_rect, &dest_rect);
+    display->draw(meltImage, &image_rect, &dest_rect);
 }
 
 void _column_think (column_t *column, int *isFinished)

@@ -152,9 +152,9 @@ void PuyoThemePicturePreview::draw(DrawTarget *dt)
         IosRect rect = r;
         rect.x += (int16_t)((i*3*ONEPUYO)/4);
         AnimatedPuyoTheme * t = curTheme->getAnimatedPuyoTheme((PuyoState)(PUYO_BLUE+i));
-        dt->renderCopy(t->getSurface(PUYO_SHADOWS,0), NULL, &rect);
-        dt->renderCopy(t->getSurface(PUYO_FACES,0), NULL, &rect);
-        dt->renderCopy(t->getSurface(PUYO_EYES,imageForIndex(eyes[i])), NULL, &rect);
+        dt->draw(t->getSurface(PUYO_SHADOWS,0), NULL, &rect);
+        dt->draw(t->getSurface(PUYO_FACES,0), NULL, &rect);
+        dt->draw(t->getSurface(PUYO_EYES,imageForIndex(eyes[i])), NULL, &rect);
       }
     }
 }

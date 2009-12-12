@@ -148,7 +148,7 @@ void LevelThemePicturePreview::draw(DrawTarget *dt)
       r.y = (int16_t)(pos.y+offsetY);
       r.w = (int16_t)(size.x);
       r.h = (int16_t)(size.y);
-      dt->renderCopy(lilback, NULL, &r);
+      dt->draw(lilback, NULL, &r);
     }
 }
 

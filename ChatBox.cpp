@@ -56,8 +56,8 @@ ChatBox::ChatBox(ChatBoxDelegate &delegate)
     delegate(delegate), chatAction(this), chatInputLabel(theCommander->getLocalizedString("Say:")),
     chatInput(theCommander->getLocalizedString("Hello"), &chatAction,theCommander->getEditFieldFramePicture(),theCommander->getEditFieldFramePicture()),
     chatInputFrameSurface(
-        GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary()
-        .load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/chatzone.png"))),
+        GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary()
+        .loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/chatzone.png"))),
     chatInputFramePicture(chatInputFrameSurface, 31, 10, 25, 9, 6, 15),
     chatInputContainerFrame(&chatInputFramePicture),
     height(8), lines(new (HBox *[height])), names(new (Text *[height])), texts(new (Text *[height]))

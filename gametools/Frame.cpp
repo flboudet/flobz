@@ -29,8 +29,14 @@ void FramePicture::setFrameSurface(IosSurface *frameSurface)
   if (frameSurface)
   {
     m_frameSurface = frameSurface;
-    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
-    m_contentColor = iimLib.getRGBA(frameSurface, m_leftW, m_topH);
+	if (frameSurface->haveAbility(IMAGE_READ)) {
+		m_contentColor = frameSurface->readRGBA(m_leftW, m_topH);
+		frameSurface->dropAbility(IMAGE_READ);
+	}
+	else {
+		fprintf(stderr, "WARNING: Cannot read pixel color of a FramePicture: %s\n", frameSurface->name.c_str()); 
+		m_contentColor.red = m_contentColor.green = m_contentColor.blue = m_contentColor.alpha = 0;
+	}
   }
 }
 
@@ -51,31 +57,35 @@ void FramePicture::render(DrawTarget *surf) const
   if (m_frameSurface != NULL) {
     int surfW = surf->w;
     int surfH = surf->h;
-    m_frameSurface->setAlpha(IOS_ALPHA_OPAQUE);
+    if(m_frameSurface->isOpaque() != true) {
+		//->setAlpha(IOS_ALPHA_OPAQUE);
+		fprintf(stderr, "WARNING: FramePicture not opaque: %s\n", m_frameSurface->name.c_str()); 
+		assert(m_frameSurface->isOpaque() == true);
+	}
     // Draw the corners first
     // Top left corner
     IosRect src_rect = {0, 0, m_leftW, m_topH};
     IosRect dst_rect = {0, 0, m_leftW, m_topH};
-    surf->renderCopy(m_frameSurface, &src_rect, &dst_rect);
+    surf->draw(m_frameSurface, &src_rect, &dst_rect);
     // Top right corner
     src_rect.x = m_leftW + m_middleW; src_rect.y = 0; src_rect.w = m_rightW; src_rect.h = m_topH;
     dst_rect.x = surfW - m_rightW; dst_rect.y = 0; dst_rect.w = m_rightW; dst_rect.h = m_topH;
-    surf->renderCopy(m_frameSurface, &src_rect, &dst_rect);
+    surf->draw(m_frameSurface, &src_rect, &dst_rect);
     // Bottom left corner
     src_rect.x = 0; src_rect.y = m_topH + m_middleH; src_rect.w = m_leftW; src_rect.h = m_bottomH;
     dst_rect.x = 0; dst_rect.y = surfH - m_bottomH; dst_rect.w = m_leftW; dst_rect.h = m_bottomH;
-    surf->renderCopy(m_frameSurface, &src_rect, &dst_rect);
+    surf->draw(m_frameSurface, &src_rect, &dst_rect);
     // Bottom right corner
     src_rect.x = m_leftW + m_middleW; src_rect.y = m_topH + m_middleH; src_rect.w = m_rightW; src_rect.h = m_bottomH;
     dst_rect.x = surfW - m_rightW; dst_rect.y = surfH - m_bottomH; dst_rect.w = m_rightW; dst_rect.h = m_bottomH;
-    surf->renderCopy(m_frameSurface, &src_rect, &dst_rect);
+    surf->draw(m_frameSurface, &src_rect, &dst_rect);
     // Top edge
     src_rect.x = m_leftW; src_rect.y = 0; src_rect.w = m_middleW; src_rect.h = m_topH;
     dst_rect.y = 0; dst_rect.w = m_middleW; dst_rect.h = m_topH;
     for (dst_rect.x = m_leftW ; dst_rect.x < surfW - m_rightW ; dst_rect.x += m_middleW) {
         if (dst_rect.x + m_middleW > surfW - m_rightW)
             dst_rect.w = src_rect.w = surfW - m_rightW - dst_rect.x;
-        surf->renderCopy(m_frameSurface, &src_rect, &dst_rect);
+        surf->draw(m_frameSurface, &src_rect, &dst_rect);
     }
     // Bottom edge
     src_rect.x = m_leftW; src_rect.y = m_topH + m_middleH; src_rect.w = m_middleW; src_rect.h = m_bottomH;
@@ -83,7 +93,7 @@ void FramePicture::render(DrawTarget *surf) const
     for (dst_rect.x = m_leftW ; dst_rect.x < surfW - m_rightW ; dst_rect.x += m_middleW) {
         if (dst_rect.x + m_middleW > surfW - m_rightW)
             dst_rect.w = src_rect.w = surfW - m_rightW - dst_rect.x;
-        surf->renderCopy(m_frameSurface, &src_rect, &dst_rect);
+        surf->draw(m_frameSurface, &src_rect, &dst_rect);
     }
     // Left edge
     src_rect.x = 0; src_rect.y = m_topH; src_rect.w = m_leftW; src_rect.h = m_middleH;
@@ -91,7 +101,7 @@ void FramePicture::render(DrawTarget *surf) const
     for (dst_rect.y = m_topH ; dst_rect.y < surfH - m_bottomH ; dst_rect.y += m_middleH) {
         if (dst_rect.y + m_middleH > surfH - m_bottomH)
             dst_rect.h = src_rect.h = surfH - m_bottomH - dst_rect.y;
-        surf->renderCopy(m_frameSurface, &src_rect, &dst_rect);
+        surf->draw(m_frameSurface, &src_rect, &dst_rect);
     }
     // Right edge
     src_rect.x = m_leftW + m_middleW; src_rect.y = m_topH; src_rect.w = m_rightW; src_rect.h = m_middleH;
@@ -99,7 +109,7 @@ void FramePicture::render(DrawTarget *surf) const
     for (dst_rect.y = m_topH ; dst_rect.y < surfH - m_bottomH ; dst_rect.y += m_middleH) {
         if (dst_rect.y + m_middleH > surfH - m_bottomH)
             dst_rect.h = src_rect.h = surfH - m_bottomH - dst_rect.y;
-        surf->renderCopy(m_frameSurface, &src_rect, &dst_rect);
+        surf->draw(m_frameSurface, &src_rect, &dst_rect);
     }
     // Content rect
     src_rect.x = m_leftW; src_rect.y = m_topH; src_rect.w = surfW - m_leftW - m_rightW; src_rect.h = surfH - m_topH - m_bottomH;
@@ -141,13 +151,13 @@ void Frame::draw(DrawTarget *dt)
       cacheSurface(m_bgFocus, m_focusedSurface);
       // Drawing the background
       if (m_borderVisible)
-        dt->renderCopy(m_bgFocus, &srcrect, &dstrect);
+        dt->draw(m_bgFocus, &srcrect, &dstrect);
     }
     else if (m_frameSurface) {
       cacheSurface(m_bgSurface, m_frameSurface);
       // Drawing the background
       if (m_borderVisible)
-        dt->renderCopy(m_bgSurface, &srcrect, &dstrect);
+        dt->draw(m_bgSurface, &srcrect, &dstrect);
     }
     VBox::draw(dt);
 }
@@ -159,8 +169,8 @@ void Frame::cacheSurface(IosSurface * &cachedSurface, const FramePicture *frameP
   if ((cachedSurface == NULL) || ((int)(bsize.x) != cachedSurface->w) || ((int)(bsize.y) != cachedSurface->h)) {
     if (cachedSurface != NULL)
       delete cachedSurface;
-    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
-    cachedSurface = iimLib.create_DisplayFormatAlpha((int)(bsize.x), (int)(bsize.y));
+    ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
+    cachedSurface = iimLib.createImage(IMAGE_RGBA, (int)(bsize.x), (int)(bsize.y));
     framePicture->render(cachedSurface);
   }
 }

@@ -61,8 +61,8 @@ GameWidget::GameWidget(GameOptions game_options, bool withGUI)
       m_foregroundAnimation(NULL), m_displayPlayerOneName(true), m_displayPlayerTwoName(true)
 {
     if (withGUI) {
-        IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
-        painterGameScreen = iimLib.create_DisplayFormat(GameUIDefaults::GAME_LOOP->getDrawContext()->w, GameUIDefaults::GAME_LOOP->getDrawContext()->h);
+        ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
+        painterGameScreen = iimLib.createImage(IMAGE_RGB, GameUIDefaults::GAME_LOOP->getDrawContext()->w, GameUIDefaults::GAME_LOOP->getDrawContext()->h);
     }
 }
 
@@ -244,7 +244,7 @@ void GameWidget::cycle()
 
 void GameWidget::drawBackground(DrawTarget *dt)
 {
-    dt->renderCopy(attachedLevelTheme->getBackground(), NULL, NULL);
+    dt->draw(attachedLevelTheme->getBackground(), NULL, NULL);
 }
 
 void GameWidget::drawGameAreas(DrawTarget *dt)
@@ -262,7 +262,7 @@ void GameWidget::drawGameNeutrals(DrawTarget *dt)
 void GameWidget::draw(DrawTarget *dt)
 {
     if (paused) {
-        dt->renderCopy(painterGameScreen, NULL, NULL);
+        dt->draw(painterGameScreen, NULL, NULL);
         return;
     }
     // Render the background
@@ -277,12 +277,12 @@ void GameWidget::draw(DrawTarget *dt)
         drect.y = -1;
         drect.w = grid->w;
         drect.h = grid->h;
-        dt->renderCopy(grid, NULL, &drect);
+        dt->draw(grid, NULL, &drect);
         drect.x = 407;
         drect.y = -1;
         drect.w = grid->w;
         drect.h = grid->h;
-        dt->renderCopy(grid, NULL, &drect);
+        dt->draw(grid, NULL, &drect);
     }
 
     // Rendering the foreground animation
@@ -300,7 +300,7 @@ void GameWidget::draw(DrawTarget *dt)
         drect.y = 436;
         drect.w = liveImage->w;
         drect.h = liveImage->h;
-        dt->renderCopy(liveImage, NULL, &drect);
+        dt->draw(liveImage, NULL, &drect);
     }
     // Rendering the game speed meter
     IosRect speedRect;
@@ -323,8 +323,8 @@ void GameWidget::draw(DrawTarget *dt)
     speedBlackRect.y = 0;
     drectBlack.y = attachedLevelTheme->getSpeedMeterY() - speedFront->h;
     drectBlack.h = speedBlackRect.h;
-    dt->renderCopy(speedBack,&speedBlackRect,&drectBlack);
-    dt->renderCopy(speedFront,&speedRect, &drect);
+    dt->draw(speedBack,&speedBlackRect,&drectBlack);
+    dt->draw(speedFront,&speedRect, &drect);
 
     // Rendering the scores
     areaA->renderOverlay(dt);
@@ -385,8 +385,7 @@ void GameWidget::pause()
     //painterGameScreen->setAlpha(IOS_ALPHA_OPAQUE);
     draw(painterGameScreen);
     paused = true;
-    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
-    iimLib.convertToGray(painterGameScreen);
+    painterGameScreen->convertToGray();
     requestDraw();
 }
 
@@ -449,9 +448,9 @@ void GameWidget::setScreenToResumed(bool fromControls)
 void *GameWidget::styro_loadImage(StyrolyseClient *_this, const char *path)
 {
   IosSurface *surface;
-  IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
-  surface = iimLib.load_Absolute_DisplayFormatAlpha
-    ((FilePath(((StyrolysePainterClient *)_this)->m_theme->getThemeRootPath())
+  ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
+  surface = iimLib.loadImage
+    (IMAGE_RGBA, (FilePath(((StyrolysePainterClient *)_this)->m_theme->getThemeRootPath())
       .combine(path)));
   return surface;
 }
@@ -471,8 +470,8 @@ void GameWidget::styro_drawImage(StyrolyseClient *_this,
   cliprect.h = cliph;
   ((StyrolysePainterClient *)_this)->m_painter->setClipRect(&cliprect);
   if (!flipped)
-      ((StyrolysePainterClient *)_this)->m_painter->renderCopy(surf, NULL, &rect);
-  else ((StyrolysePainterClient *)_this)->m_painter->renderCopyFlipped(surf, NULL, &rect);
+      ((StyrolysePainterClient *)_this)->m_painter->draw(surf, NULL, &rect);
+  else ((StyrolysePainterClient *)_this)->m_painter->drawHFlipped(surf, NULL, &rect);
 }
 void GameWidget::styro_freeImage(StyrolyseClient *_this, void *image)
 {

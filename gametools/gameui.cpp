@@ -793,7 +793,7 @@ namespace gameui {
             IosRect rect;
             rect.x = (int16_t)getPosition().x - (bg->w - getSize().x)/2;
             rect.y = (int16_t)getPosition().y - (bg->h - getSize().y)/2;
-            dt->renderCopy(bg, NULL, &rect);
+            dt->draw(bg, NULL, &rect);
         }
         ZBox::draw(dt);
     }
@@ -1394,12 +1394,11 @@ namespace gameui {
         }
         if (haveFocus() ^ m_invertFocusMode) {
             if (m_focusedImage == NULL) {
-                IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
-                m_focusedImage = iimLib.shiftHSV(m_image, 0., 0., m_invertFocusMode ? -0.3 : 0.3);
+				m_focusedImage = m_image->shiftHSV(0,0,m_invertFocusMode ? -0.3 : 0.3);
             }
             imageToDraw = m_focusedImage;
         }
-        dt->renderCopy(imageToDraw, NULL, &dstRect);
+        dt->draw(imageToDraw, NULL, &dstRect);
     }
 
     void Image::setInvertedFocus(bool mode)
@@ -1837,9 +1836,9 @@ namespace gameui {
     ControlInputWidget::ControlInputWidget(int control, bool alternate, Action *action)
         : Text("<Not set>", NULL), control(control), alternate(alternate)
     {
-        char temp[255];
         init(NULL,NULL);
 #ifdef TODO
+        char temp[255];
         getKeyName(control, alternate, temp);
         setValue(temp);
 #endif

@@ -223,8 +223,8 @@ void PuyoView::render(DrawTarget *dt)
             drect.y = nYOffset + TSIZE;
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;
-            dt->renderCopy(currentSurface, NULL, &drect);
-            dt->renderCopy(nextPuyoTheme->getEyeSurfaceForIndex(0), NULL, &drect);
+            dt->draw(currentSurface, NULL, &drect);
+            dt->draw(nextPuyoTheme->getEyeSurfaceForIndex(0), NULL, &drect);
         }
         AnimatedPuyoTheme *nextCompanionTheme =
             attachedThemeSet->getAnimatedPuyoTheme(attachedGame->getNextCompanion());
@@ -234,8 +234,8 @@ void PuyoView::render(DrawTarget *dt)
             drect.y = nYOffset;
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;
-            dt->renderCopy(currentSurface, NULL, &drect);
-            dt->renderCopy(nextCompanionTheme->getEyeSurfaceForIndex(0), NULL, &drect);
+            dt->draw(currentSurface, NULL, &drect);
+            dt->draw(nextCompanionTheme->getEyeSurfaceForIndex(0), NULL, &drect);
         }
     }
 
@@ -274,7 +274,7 @@ void PuyoView::renderNeutral(DrawTarget *dt)
 		drect.y = drect_y_base - giantNeutral->h;
 		drect.w = giantNeutral->w;
 		drect.h = giantNeutral->h;
-		dt->renderCopy(giantNeutral, NULL, &drect);
+		dt->draw(giantNeutral, NULL, &drect);
 		drect_x += giantNeutral->w;
 	}
     for (int cpt = 0 ; cpt < numBigNeutral ; cpt++) {
@@ -282,7 +282,7 @@ void PuyoView::renderNeutral(DrawTarget *dt)
 		drect.y = drect_y_base - bigNeutral->h;
 		drect.w = bigNeutral->w;
 		drect.h = bigNeutral->h;
-		dt->renderCopy(bigNeutral, NULL, &drect);
+		dt->draw(bigNeutral, NULL, &drect);
 		drect_x += bigNeutral->w;
 	}
     for (int cpt = 0 ; cpt < numNeutral ; cpt++) {
@@ -290,7 +290,7 @@ void PuyoView::renderNeutral(DrawTarget *dt)
 		drect.y = drect_y_base - neutral->h;
 		drect.w = neutral->w;
 		drect.h = neutral->h;
-		dt->renderCopy(neutral, NULL, &drect);
+		dt->draw(neutral, NULL, &drect);
 		drect_x += neutral->w;
 	}
 }

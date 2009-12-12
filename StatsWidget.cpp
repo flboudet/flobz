@@ -19,38 +19,34 @@ static StatsResources *res;
 
 StatsResources::StatsResources()
 {
-    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
+    ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
     res = this;
-    rope_elt = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/rope.png"));
-    ring_left = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/ring.png"));
-    ring_right = iimLib.mirrorH(ring_left);
-    puyo_left[0][0] = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_1.png"));
-    puyo_left[0][1] = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_2.png"));
-    puyo_left[0][2] = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_3.png"));
-    puyo_left[0][3] = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_4.png"));
-    puyo_left_mask = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_mask.png"));
-    puyo_right[0][0] = iimLib.mirrorH(puyo_left[0][0]);
-    puyo_right[0][1] = iimLib.mirrorH(puyo_left[0][1]);
-    puyo_right[0][2] = iimLib.mirrorH(puyo_left[0][2]);
-    puyo_right[0][3] = iimLib.mirrorH(puyo_left[0][3]);
-    puyo_right_mask = iimLib.mirrorH(puyo_left_mask);
+    rope_elt = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/progressbar/rope.png"));
+    ring_left = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/progressbar/ring.png"));
+    ring_right = ring_left->mirrorH();
+    puyo_left[0][0] = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_1.png"));
+    puyo_left[0][1] = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_2.png"));
+    puyo_left[0][2] = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_3.png"));
+    puyo_left[0][3] = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_4.png"));
+    puyo_left_mask = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_mask.png"));
+    for (int i=0; i<4; ++i)
+	puyo_right[0][i] = puyo_left[0][i]->mirrorH();
+    puyo_right_mask = puyo_left_mask->mirrorH();
 
     for (int i = 0 ; i < 4 ; i++) {
-        puyo_left[1][i] = iimLib.shiftHueMasked(puyo_left[0][i], puyo_left_mask, 30.);
-        puyo_right[1][i] = iimLib.shiftHueMasked(puyo_right[0][i], puyo_right_mask, 30.);
-        puyo_left[2][i] = iimLib.shiftHueMasked(puyo_left[0][i], puyo_left_mask, 60.);
-        puyo_right[2][i] = iimLib.shiftHueMasked(puyo_right[0][i], puyo_right_mask, 60.);
-        puyo_left[3][i] = iimLib.shiftHueMasked(puyo_left[0][i], puyo_left_mask, 90.);
-        puyo_right[3][i] = iimLib.shiftHueMasked(puyo_right[0][i], puyo_right_mask, 90.);
-    }
-    separator = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/separator.png"));
-    titleImage = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath(String("gfx/stats_title.png")));
+		for (int j=1; j<4; ++j) {
+			puyo_left[j][i] = puyo_left[0][i]->shiftHue(30.*j, puyo_left_mask);
+			puyo_right[j][i] = puyo_right[0][i]->shiftHue(30.*j, puyo_right_mask);
+		}
+	}
+    separator = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/separator.png"));
+    titleImage = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath(String("gfx/stats_title.png")));
     for (int numCombo = 0 ; numCombo < MAX_DISPLAYED_COMBOS ; numCombo++) {
         String pictureName = theCommander->getDataPathManager().getPath(String("gfx/combo") + (numCombo+1) + String("x_stat.png"));
-        comboImage[numCombo] = iimLib.load_Absolute_DisplayFormatAlpha(pictureName);
+        comboImage[numCombo] = iimLib.loadImage(IMAGE_RGBA, pictureName);
     }
-    stats_bg_winner = iimLib.load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/stats-bg.png"));
-    stats_bg_loser = iimLib.shiftHue(stats_bg_winner, 180);
+    stats_bg_winner = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/stats-bg.png"));
+    stats_bg_loser = stats_bg_winner->shiftHue(180);
 }
 
 StatsResources::~StatsResources()
@@ -111,9 +107,9 @@ void ProgressBarWidget::draw(DrawTarget *dt)
     dstrect.h = bsize.y;
     dstrect.w = 10;
     if (m_dir == LEFT_TO_RIGHT)
-        dt->renderCopy(res->ring_right, NULL, &dstrect);
+        dt->draw(res->ring_right, NULL, &dstrect);
     else
-        dt->renderCopy(res->ring_left, NULL, &dstrect);
+        dt->draw(res->ring_left, NULL, &dstrect);
     for (int i=1; i<=n_rope_elt; ++i) {
 
         dstrect.w = IMG_ROPE_ELT_WIDTH;
@@ -146,18 +142,18 @@ void ProgressBarWidget::draw(DrawTarget *dt)
         else {
             dstrect.x = bpos.x + (bsize.x - dstrect.x - IMG_ROPE_ELT_WIDTH) - IMG_RING_WIDTH - 1;
         }
-        dt->renderCopy(res->rope_elt, NULL, &dstrect);
+        dt->draw(res->rope_elt, NULL, &dstrect);
     }
     dstrect.w = res->puyo_right[0][0]->w;
     dstrect.h = res->puyo_right[0][0]->h;
     dstrect.y = bpos.y;
     if (m_dir == LEFT_TO_RIGHT) {
         dstrect.x = bpos.x + rope_size + IMG_RING_WIDTH - 4;
-        dt->renderCopy(res->puyo_right[m_colorIndex][m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)], NULL, &dstrect);
+        dt->draw(res->puyo_right[m_colorIndex][m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)], NULL, &dstrect);
     }
     else {
         dstrect.x = bpos.x + bsize.x - rope_size - IMG_RING_WIDTH - IMG_PUYO_WIDTH + 4;
-        dt->renderCopy(res->puyo_left[m_colorIndex][m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)], NULL, &dstrect);
+        dt->draw(res->puyo_left[m_colorIndex][m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)], NULL, &dstrect);
     }
 }
 

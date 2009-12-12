@@ -85,22 +85,22 @@ String GlobalCurrentPath;
 
 static bool loadPictureAt(const char * path, IosSurface ** dst, const char * fallback)
 {
-    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
-    *dst = iimLib.load_Absolute_DisplayFormatAlpha(path);
-    if (*dst == NULL) *dst = iimLib.load_Absolute_DisplayFormatAlpha(fallback);
+    ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
+    *dst = iimLib.loadImage(IMAGE_RGBA, path);
+    if (*dst == NULL) *dst = iimLib.loadImage(IMAGE_RGBA, fallback);
     return (*dst != NULL);
 }
 
 static bool loadPictureWithOffset(const char * path, IosSurface ** dst, const char * fallback, float offset)
 {
-    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
-    IosSurface *tmp = iimLib.load_Absolute_DisplayFormatAlpha(path);
+    ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
+    IosSurface *tmp = iimLib.loadImage(IMAGE_RGBA, path);
     if (tmp == NULL)
     {
-        tmp = iimLib.load_Absolute_DisplayFormatAlpha(fallback);
+        tmp = iimLib.loadImage(IMAGE_RGBA, fallback);
     }
     if (tmp == NULL) return false;
-    *dst = iimLib.shiftHue(tmp,offset);
+    *dst = tmp->shiftHue(offset);
     delete tmp;
     return (*dst != NULL);
 }
@@ -113,8 +113,7 @@ static bool copyPictureWithOffset(IIM_Surface * src, IIM_Surface ** dst, IIM_Sur
 */
 static bool copyPictureWithLuminosity(IosSurface * src, IosSurface ** dst, IosSurface * fallback, float lum)
 {
-    IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
-    *dst = iimLib.setValue(src, lum);
+    *dst = src->setValue(lum);
     return (*dst != NULL);
 }
 
@@ -384,13 +383,9 @@ IosSurface * StandardAnimatedPuyoTheme::getShrunkSurface(PuyoPictureType picture
         default:
             break;
     }
-    //fprintf(stderr,"1-%p - %p\n",myImage, myImage[0]);
     if (myImage && myImage[0]) {
-        //fprintf(stderr,"2-%p - %p\n",myImage[0],myImage[compression]);
         if (myImage[compression] == NULL) {
-            IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
-            myImage[compression] = iimLib.resizeAlpha(myImage[0], myImage[0]->w, (myImage[0]->h - compression));
-            //fprintf(stderr,"3-%p - %p\n",myImage[0],myImage[compression]);
+            myImage[compression] = myImage[0]->resizeAlpha(myImage[0]->w, (myImage[0]->h - compression));
         }
         return myImage[compression];
     }

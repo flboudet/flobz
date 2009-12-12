@@ -84,9 +84,9 @@ namespace ios_fc {
     const char *DBG_PRINT_PREFIX = "...";
 
     Exception::Exception(const char *exception)
-      : message(strdup(exception))
     {
         stack = get_stack_trace();
+		message = strdup((std::string(exception)+std::string("\n")+stack).c_str());
     }
 
     Exception::~Exception() throw ()
@@ -95,13 +95,13 @@ namespace ios_fc {
     }
 
     Exception::Exception(const Exception &e)
-      : message(strdup(e.message))
     {
         std::stringstream newstack;
         newstack << get_stack_trace();
         newstack << "  Which was caused by:\n";
         newstack << e.stack;
         stack = newstack.str();
+		message = strdup((std::string(e.message)+std::string("\n")+stack).c_str());
     }
 
     const char *Exception::what() const throw () {

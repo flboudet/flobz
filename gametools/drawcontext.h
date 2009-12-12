@@ -2,6 +2,18 @@
 #define _DRAWCONTEXT_H_
 
 #include "rgba.h"
+#include <stdlib.h>
+#include <string>
+
+enum ImageType {
+	IMAGE_RGBA = 1,
+	IMAGE_RGB = 2
+};
+
+// Image Special Powers (Abilities)
+typedef int ImageSpecialAbility;
+const ImageSpecialAbility IMAGE_NO_ABILITY = 0;
+const ImageSpecialAbility IMAGE_READ = 1;
 
 struct IosRect
 {
@@ -64,15 +76,21 @@ class DrawTarget
 {
 public:
     virtual ~DrawTarget() {}
-    virtual void renderCopy(IosSurface *surf, IosRect *srcRect, IosRect *dstRect) {}
-    virtual void renderCopyFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect) {}
-    virtual void renderRotatedCentered(IosSurface *surf, int angle, int x, int y) {}
-    virtual void setClipRect(IosRect *rect) {}
-    virtual void fillRect(const IosRect *rect, const RGBA &color) {}
-    virtual void putString(IosFont *font, int x, int y, const char *text) {}
+
+    virtual void setClipRect(IosRect *rect) = 0;
+	
+    virtual void draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect) = 0;
+    virtual void drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect) = 0;
+    virtual void drawRotatedCentered(IosSurface *surf, int angle, int x, int y) = 0;
+	
+	virtual void fillRect(const IosRect *rect, const RGBA &color) = 0;
+
+    virtual void putString(IosFont *font, int x, int y, const char *text) = 0;
     void putStringCenteredXY(IosFont *font, int x, int y, const char *text);
+
 public:
     int h, w;
+	std::string name;
 };
 
 #define IOS_ALPHA_TRANSPARENT 0
@@ -80,7 +98,20 @@ public:
 class IosSurface : public DrawTarget
 {
 public:
-    virtual void setAlpha(unsigned char alpha) = 0;
+    //virtual void setAlpha(unsigned char alpha) = 0;
+	virtual bool isOpaque() const = 0;
+	
+	virtual bool haveAbility(int ability) const = 0;
+	virtual void dropAbility(int ability) = 0;
+    virtual RGBA readRGBA(int x, int y) = 0;
+	
+    virtual IosSurface *shiftHue(float hue_offset, IosSurface *mask = NULL) = 0;
+    virtual IosSurface *shiftHSV(float h, float s, float v) = 0;
+    virtual IosSurface *setValue(float value) = 0;
+	
+    virtual IosSurface * resizeAlpha(int width, int height) = 0;
+    virtual IosSurface * mirrorH() = 0;
+    virtual void         convertToGray() = 0;
 };
 
 enum IosFontFx
@@ -100,23 +131,14 @@ public:
     virtual int getLineSkip() = 0;
 };
 
-class IIMLibrary
+class ImageLibrary
 {
 public:
-    virtual IosSurface * create_DisplayFormat(int w, int h) = 0;
-    virtual IosSurface * create_DisplayFormatAlpha(int w, int h) = 0;
-    virtual IosSurface * load_Absolute_DisplayFormatAlpha(const char *path) = 0;
-    virtual RGBA         getRGBA(IosSurface *surf, int x, int y) = 0;
-    virtual IosSurface * shiftHue(IosSurface *surf, float hue_offset) = 0;
-    virtual IosSurface * shiftHueMasked(IosSurface *surf, IosSurface *mask, float hue_offset) = 0;
-    virtual IosSurface * shiftHSV(IosSurface *surf, float h, float s, float v) = 0;
-    virtual IosSurface * setValue(IosSurface *surf, float value) = 0;
-    virtual IosSurface * resizeAlpha(IosSurface *surf, int width, int height) = 0;
-    virtual IosSurface * mirrorH(IosSurface *surf) = 0;
-    virtual void         convertToGray(IosSurface *surf) = 0;
+    virtual IosSurface * createImage(ImageType type, int w, int h, ImageSpecialAbility specialAbility = 0) = 0;
+    virtual IosSurface * loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0) = 0;
     virtual IosFont    * createFont(const char *path, int size, IosFontFx fx = Font_STD) = 0;
 protected:
-    virtual ~IIMLibrary() {}
+    virtual ~ImageLibrary() {}
 };
 
 class DrawContext : public DrawTarget
@@ -127,7 +149,7 @@ public:
     virtual void flip() = 0;
     virtual int getHeight() const = 0;
     virtual int getWidth() const = 0;
-    virtual IIMLibrary & getIIMLibrary() = 0;
+    virtual ImageLibrary &getImageLibrary() = 0;
 };
 
 

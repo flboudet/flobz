@@ -65,9 +65,9 @@ class StyroImage
                 }
             }
             else {
-                IIMLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary();
+                ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
                 String imgPath = theCommander->getDataPathManager().getPath(FilePath("gfx").combine(path));
-                surface = iimLib.load_Absolute_DisplayFormatAlpha(imgPath);
+                surface = iimLib.loadImage(IMAGE_RGBA, imgPath);
             }
         }
 
@@ -103,8 +103,8 @@ static void  drawImage (StyrolyseClient *_this, void *image, int x, int y,
   cliprect.w = clipw;
   cliprect.h = cliph;
   sstory->setClipRect(&cliprect);
-  if (!flipped) sstory->renderCopy(surf, NULL, &rect);
-  else sstory->renderCopyFlipped(surf, NULL, &rect);
+  if (!flipped) sstory->draw(surf, NULL, &rect);
+  else sstory->drawHFlipped(surf, NULL, &rect);
 }
 
 static void  freeImage (StyrolyseClient *_this, void *image)

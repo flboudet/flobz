@@ -30,7 +30,7 @@
 ScreenTransitionWidget::ScreenTransitionWidget(Screen &fromScreen)
 {
     DrawContext *dc = GameUIDefaults::GAME_LOOP->getDrawContext();
-    m_fromSurface.reset(dc->getIIMLibrary().create_DisplayFormat(dc->getWidth(), dc->getHeight()));
+    m_fromSurface.reset(dc->getImageLibrary().createImage(IMAGE_RGB, dc->getWidth(), dc->getHeight()));
     fromScreen.drawAnyway(m_fromSurface.get());
 }
 

@@ -140,24 +140,24 @@ void AnimatedPuyo::renderAt(int X, int Y, DrawTarget *dt)
         drect.w = currentSurface->w;
         drect.h = currentSurface->h;
 
-        dt->renderCopy(currentSurface, NULL, &drect);
+        dt->draw(currentSurface, NULL, &drect);
 
         /* Main puyo show */
         /* TODO: Investigate why, during network game, the falling puyo starts by being neutral */
         if ((this == attachedGame->getFallingPuyo()) && (getPuyoState() != PUYO_NEUTRAL))
-            dt->renderCopy(attachedTheme->getCircleSurfaceForIndex((smallTicksCount >> 2) & 0x1F, m_currentCompressedState), NULL, &drect);
+            dt->draw(attachedTheme->getCircleSurfaceForIndex((smallTicksCount >> 2) & 0x1F, m_currentCompressedState), NULL, &drect);
 
         /* Eye management */
         if ((getPuyoState() != PUYO_NEUTRAL) && (m_displayEyes)) {
             int eyePhase = fmod((puyoEyeState + ios_fc::getTimeMs()), 8192.);
             if (eyePhase < 100)
-                dt->renderCopy(attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState), NULL, &drect);
+                dt->draw(attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState), NULL, &drect);
             else if (eyePhase < 200)
-                dt->renderCopy(attachedTheme->getEyeSurfaceForIndex(2, m_currentCompressedState), NULL, &drect);
+                dt->draw(attachedTheme->getEyeSurfaceForIndex(2, m_currentCompressedState), NULL, &drect);
             else if (eyePhase < 300)
-                dt->renderCopy(attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState), NULL, &drect);
+                dt->draw(attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState), NULL, &drect);
             else
-                dt->renderCopy(attachedTheme->getEyeSurfaceForIndex(0, m_currentCompressedState), NULL, &drect);
+                dt->draw(attachedTheme->getEyeSurfaceForIndex(0, m_currentCompressedState), NULL, &drect);
         }
     }
 }
@@ -183,7 +183,7 @@ void AnimatedPuyo::renderShadowAt(int X, int Y, DrawTarget *dt)
 
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;
-            dt->renderCopy(currentSurface, NULL, &drect);
+            dt->draw(currentSurface, NULL, &drect);
         }
     }
 }

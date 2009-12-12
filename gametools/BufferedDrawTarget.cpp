@@ -5,7 +5,7 @@ BufferedDrawTarget::BufferedDrawTarget(DrawContext *dc)
       m_dirty(false)
 {
     h = dc->h; w = dc->w;
-    m_cache = m_dc->getIIMLibrary().create_DisplayFormat(dc->w, dc->h);
+    m_cache = m_dc->getImageLibrary().createImage(IMAGE_RGB, dc->w, dc->h);
 }
 
 BufferedDrawTarget::~BufferedDrawTarget()
@@ -19,7 +19,7 @@ BufferedDrawTarget::~BufferedDrawTarget()
         iosrect.x = 0, iosrect.y = 0, iosrect) \
         : (*iosrectptr))
 
-void BufferedDrawTarget::renderCopy(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
+void BufferedDrawTarget::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
     IosRect lsrcRect, ldstRect;
     DrawOperation newOp(surf,
@@ -63,7 +63,7 @@ void BufferedDrawTarget::DrawTreeNode::appendDrawOperation(DrawOperation &drawOp
 
 void BufferedDrawTarget::DrawTreeNode::draw(DrawTarget *dt, DrawTreeNode &backNode)
 {
-    dt->renderCopy(drawOperation.surf, &drawOperation.srcRect, &drawOperation.dstRect);
+    dt->draw(drawOperation.surf, &drawOperation.srcRect, &drawOperation.dstRect);
     if (innerNodes != NULL) {
         for (DrawTreeNodeList::iterator iter = innerNodes->begin() ;
              iter != innerNodes->end() ; iter++) {
@@ -85,7 +85,7 @@ void BufferedDrawTarget::flush()
 #ifdef DISABLED
     for (std::vector<DrawElt>::iterator iter = m_frontList->begin() ;
          iter != m_frontList->end() ; iter++) {
-        m_cache->renderCopy(iter->surf, &(iter->srcRect), &(iter->dstRect));
+        m_cache->draw(iter->surf, &(iter->srcRect), &(iter->dstRect));
     }
     m_backList->clear();
     std::vector<DrawElt> *backList = m_backList;

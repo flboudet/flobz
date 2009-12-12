@@ -10,9 +10,9 @@ class BufferedDrawTarget : public DrawTarget
 public:
     BufferedDrawTarget(DrawContext *dc);
     virtual ~BufferedDrawTarget();
-    virtual void renderCopy(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
-    //virtual void renderCopyFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
-    //virtual void renderRotatedCentered(IosSurface *surf, int angle, int x, int y);
+    virtual void draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
+    //virtual void drawFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
+    //virtual void drawRotatedCentered(IosSurface *surf, int angle, int x, int y);
     //virtual void fillRect(const IosRect *rect, const RGBA &color);
 public:
     void flush();

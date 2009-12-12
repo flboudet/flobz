@@ -365,22 +365,22 @@ void VanishAnimation::draw(int semiMove, DrawTarget *dt)
             drect.w = shrinkingSurface->w;
             drect.h = shrinkingSurface->h;
 
-            dt->renderCopy(shrinkingSurface, NULL, &drect);
+            dt->draw(shrinkingSurface, NULL, &drect);
             int xrectY = Y + (int)(2.5 * pow(iter - 16 - delay, 2) - 108);
             xrect.w = explodingSurface->w;
             xrect.h = explodingSurface->h;
             xrect.x = X - iter2 * iter2;
             xrect.y = xrectY;
-            dt->renderCopy(explodingSurface, NULL, &xrect);
+            dt->draw(explodingSurface, NULL, &xrect);
             xrect.x = X - iter2;
             xrect.y = xrectY + iter2;
-            dt->renderCopy(explodingSurface, NULL, &xrect);
+            dt->draw(explodingSurface, NULL, &xrect);
             xrect.x = X + iter2;
             xrect.y = xrectY + iter2;
-            dt->renderCopy(explodingSurface, NULL, &xrect);
+            dt->draw(explodingSurface, NULL, &xrect);
             xrect.x = X + iter2 * iter2;
             xrect.y = xrectY;
-            dt->renderCopy(explodingSurface, NULL, &xrect);
+            dt->draw(explodingSurface, NULL, &xrect);
         }
     }
 }
@@ -471,13 +471,13 @@ void NeutralPopAnimation::draw(int semiMove, DrawTarget *dt)
     drect.w = neutralPop[0]->w;
     drect.h = neutralPop[0]->h;
     if (iter - delay < 20) {
-        dt->renderCopy(neutralPop[0], NULL, &drect);
+        dt->draw(neutralPop[0], NULL, &drect);
     }
     else if (iter - delay < 23) {
-        dt->renderCopy(neutralPop[1], NULL, &drect);
+        dt->draw(neutralPop[1], NULL, &drect);
     }
     else if (iter - delay < 26) {
-        dt->renderCopy(neutralPop[2], NULL, &drect);
+        dt->draw(neutralPop[2], NULL, &drect);
     }
 }
 
