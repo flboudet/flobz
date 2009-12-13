@@ -9,9 +9,22 @@
 #include "GameCursor.h"
 #include "audio.h"
 #include "MainScreen.h"
+#include "ResourceManager.h"
 #include <memory>
 
 using namespace gameui;
+
+class IosSurfaceFactory : public ResourceFactory<IosSurface>
+{
+public:
+    IosSurfaceFactory(DataPathManager &dataPathManager)
+        : m_dataPathManager(dataPathManager) {}
+    virtual IosSurface *create(const char *resourcePath);
+private:
+    DataPathManager &m_dataPathManager;
+};
+typedef ResourceReference<IosSurface> IosSurfaceRef;
+typedef ResourceManager<IosSurface>   IosSurfaceResourceManager;
 
 class PuyoCommander
 {
@@ -34,6 +47,9 @@ class PuyoCommander
 
     // Transition widget factory
     virtual ScreenTransitionWidget *createScreenTransition(Screen &fromScreen) const;
+
+    // Resource managers
+    IosSurfaceResourceManager &getIosSurfaceResourceManager() const { return *m_surfaceResManager; }
 
     // Data path management
     const DataPathManager &getDataPathManager() { return dataPathManager; }
@@ -58,6 +74,9 @@ class PuyoCommander
     IosSurface * getRightArrow() { return m_rightArrow; }
     audio_manager::Sound * getWhipSound() const { return m_whipSound; }
     audio_manager::Sound * getWhopSound() const { return m_whopSound; }
+  protected:
+    // Resource manager factory
+    virtual void createResourceManagers();
   private:
 
     friend class SinglePlayerGameAction;
@@ -71,6 +90,9 @@ class PuyoCommander
     void initFonts();
 
     DataPathManager dataPathManager;
+    // Resource Managers
+    IosSurfaceFactory m_surfaceFactory;
+    std::auto_ptr<IosSurfaceResourceManager> m_surfaceResManager;
 
     MessageBox *mbox;
     GameLoop   *loop;
@@ -79,7 +101,8 @@ class PuyoCommander
     AudioManager globalAudioManager;
 
     bool useGL;
-    IosSurface   *m_frameImage, *m_buttonIdleImage, *m_buttonDownImage, *m_buttonOverImage;
+    IosSurfaceRef m_frameImage;
+    IosSurface   *m_buttonIdleImage, *m_buttonDownImage, *m_buttonOverImage;
     IosSurface   *m_textFieldIdleImage;
     IosSurface   *m_separatorImage;
     IosSurface   *m_listIdleImage;

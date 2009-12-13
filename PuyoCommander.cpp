@@ -17,6 +17,11 @@ static const char * kFullScreenPref = "Config.FullScreen";
 static const char * kOpenGLPref     = "Config.OpenGL";
 #endif
 
+IosSurface *IosSurfaceFactory::create(const char *resourcePath)
+{
+    ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
+    return iimLib.loadImage(IMAGE_RGB, m_dataPathManager.getPath(resourcePath));
+}
 
 /*
  * THE MENUS
@@ -35,7 +40,7 @@ void SinglePlayerGameAction::action()
 /* Build the PuyoCommander */
 
 PuyoCommander::PuyoCommander(String dataDir, int maxDataPackNumber)
-  : dataPathManager(dataDir), m_cursor(NULL)
+  : dataPathManager(dataDir), m_surfaceFactory(dataPathManager), m_cursor(NULL)
 {
   loop = GameUIDefaults::GAME_LOOP;
   mbox = NULL;
@@ -43,6 +48,7 @@ PuyoCommander::PuyoCommander(String dataDir, int maxDataPackNumber)
 
   if (maxDataPackNumber != -1)
       dataPathManager.setMaxPackNumber(maxDataPackNumber);
+  createResourceManagers();
 }
 
 void PuyoCommander::initWithGUI(bool fs)
@@ -55,7 +61,6 @@ void PuyoCommander::initWithGUI(bool fs)
   m_separatorFramePicture = std::auto_ptr<FramePicture>(new FramePicture(63, 2, 63, 2, 4, 2));
   m_listFramePicture = std::auto_ptr<FramePicture>(new FramePicture(5, 23, 4, 6, 10, 3));
 
-  //SDL_Delay(500);
   loadPreferences(fs);
 
   initLocale();
@@ -73,13 +78,14 @@ void PuyoCommander::initWithGUI(bool fs)
   m_leftArrow = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/leftarrow.png"));
   m_rightArrow = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/rightarrow.png"));
 
-  m_frameImage = iimLib.loadImage(IMAGE_RGB, dataPathManager.getPath("gfx/frame.png"));
+  m_frameImage = m_surfaceResManager->getResource("gfx/frame.png");
   m_buttonIdleImage = iimLib.loadImage(IMAGE_RGB, dataPathManager.getPath("gfx/button.png"));
   m_buttonDownImage = iimLib.loadImage(IMAGE_RGB, dataPathManager.getPath("gfx/buttondown.png"));
   m_buttonOverImage = iimLib.loadImage(IMAGE_RGB, dataPathManager.getPath("gfx/buttonover.png"));
   m_textFieldIdleImage = iimLib.loadImage(IMAGE_RGB, dataPathManager.getPath("gfx/editfield.png"));
   m_separatorImage = iimLib.loadImage(IMAGE_RGB, dataPathManager.getPath("gfx/separator.png"));
   m_listIdleImage = iimLib.loadImage(IMAGE_RGB, dataPathManager.getPath("gfx/listborder.png"));
+
   m_windowFramePicture->setFrameSurface(m_frameImage);
   m_buttonIdleFramePicture->setFrameSurface(m_buttonIdleImage);
   m_buttonDownFramePicture->setFrameSurface(m_buttonDownImage);
@@ -96,7 +102,7 @@ void PuyoCommander::initWithoutGUI()
 
 PuyoCommander::~PuyoCommander()
 {
-  delete m_frameImage;
+  //delete m_frameImage;
   delete m_buttonIdleImage;
   delete m_buttonDownImage;
   delete m_buttonOverImage;
@@ -232,4 +238,9 @@ void PuyoCommander::setCursorVisible(bool visible)
 {
     if (m_cursor != NULL)
         m_cursor->setVisible(visible);
+}
+
+void PuyoCommander::createResourceManagers()
+{
+    m_surfaceResManager.reset(new SimpleResourceManager<IosSurface>(m_surfaceFactory));
 }
