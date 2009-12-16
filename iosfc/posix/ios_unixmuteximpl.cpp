@@ -57,6 +57,9 @@ namespace ios_fc {
         }
     };
 
+    PThreadMutexFactory pthreadMutexFactory;
+
+    MutexFactory *Mutex::factory = &pthreadMutexFactory;
 
 } // namespace
 
