@@ -427,8 +427,8 @@ PuyoInternetErrorDialog::PuyoInternetErrorDialog(String errorMessageL1, String e
   : PuyoInternetDialog(theCommander->getLocalizedString("Error")), m_errorMessageL1(errorMessageL1),
     m_errorMessageL2(errorMessageL2), m_okButton(theCommander->getLocalizedString("OK"), this,
 	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
-    m_errorIconImage(GameUIDefaults::GAME_LOOP->getDrawContext()->getIIMLibrary()
-                     .load_Absolute_DisplayFormatAlpha(theCommander->getDataPathManager().getPath("gfx/errorpuyo.png"))),
+    m_errorIconImage(GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary()
+                     .loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/errorpuyo.png"))),
     m_errorIcon(m_errorIconImage)
 {
     m_contentBox.setInnerMargin(10);

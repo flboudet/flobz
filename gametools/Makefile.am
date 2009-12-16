@@ -1,6 +1,6 @@
 noinst_LTLIBRARIES=libgametools.la
 
-libgametools_la_SOURCES=SDL_Painter.cpp GameCursor.cpp \
+libgametools_la_SOURCES=GameCursor.cpp \
          preferences.cpp gameloop.cpp gameui.cpp \
          ListView.cpp Frame.cpp FramedButton.cpp FramedEditField.cpp \
 	 mt19937ar.cpp SwitchedButton.cpp RadioButton.cpp NotifyCenter.cpp \
@@ -13,7 +13,7 @@ EXTRA_DIST=FramedButton.h FramedEditField.h Frame.h \
            gameui.h \
            ListView.h mt19937ar.h NotifyCenter.h \
            preferences.h RadioButton.h scrollingtext.h \
-           SDL_Painter.h SwitchedButton.h vec3.h \
+           SwitchedButton.h vec3.h \
 	   drawcontext.h audiomanager.h BufferedDrawTarget.h
 
 SUBDIRS=sdl_drawcontext opengl_drawcontext

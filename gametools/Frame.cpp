@@ -6,7 +6,7 @@
  *  Copyright 2008 __MyCompanyName__. All rights reserved.
  *
  */
-
+#include <assert.h>
 #include "Frame.h"
 
 namespace gameui {
@@ -34,7 +34,7 @@ void FramePicture::setFrameSurface(IosSurface *frameSurface)
 		frameSurface->dropAbility(IMAGE_READ);
 	}
 	else {
-		fprintf(stderr, "WARNING: Cannot read pixel color of a FramePicture: %s\n", frameSurface->name.c_str()); 
+		fprintf(stderr, "WARNING: Cannot read pixel color of a FramePicture: %s\n", frameSurface->name.c_str());
 		m_contentColor.red = m_contentColor.green = m_contentColor.blue = m_contentColor.alpha = 0;
 	}
   }
@@ -59,7 +59,7 @@ void FramePicture::render(DrawTarget *surf) const
     int surfH = surf->h;
     if(m_frameSurface->isOpaque() != true) {
 		//->setAlpha(IOS_ALPHA_OPAQUE);
-		fprintf(stderr, "WARNING: FramePicture not opaque: %s\n", m_frameSurface->name.c_str()); 
+		fprintf(stderr, "WARNING: FramePicture not opaque: %s\n", m_frameSurface->name.c_str());
 		assert(m_frameSurface->isOpaque() == true);
 	}
     // Draw the corners first
