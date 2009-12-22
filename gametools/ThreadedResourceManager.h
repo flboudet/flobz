@@ -33,6 +33,8 @@ public:
         typename ResourceMap::iterator resIter = m_resources.find(resourcePath);
         if (resIter == m_resources.end()) {
             T *res = m_factory.create(resourcePath);
+            if (res == NULL)
+                return ResourceReference<T>();
             ResourceHolder<T> *resHolder = new ResourceHolder<T>(res);
             m_resources[resourcePath] = resHolder;
             return ResourceReference<T>(resHolder);
@@ -52,6 +54,8 @@ public:
                 if (m_resources.find(resourcePath) != m_resources.end())
                     continue;
                 T *res = m_factory.create(resourcePath.c_str());
+                if (res == NULL)
+                    continue;
                 ResourceHolder<T> *resHolder = new ResourceHolder<T>(res);
                 m_resources[resourcePath] = resHolder;
             }

@@ -25,11 +25,25 @@ public:
     ResourceReference()
         : m_ownerResHolder(NULL) {}
     ResourceReference(ResourceHolder<T> *ownerResHolder)
-        : m_ownerResHolder(ownerResHolder){ m_ownerResHolder->m_numRefs++; }
-    ~ResourceReference() { m_ownerResHolder->m_numRefs--; }
+        : m_ownerResHolder(ownerResHolder){
+        if (m_ownerResHolder != NULL)
+            m_ownerResHolder->m_numRefs++;
+    }
+    ~ResourceReference() {
+        if (m_ownerResHolder != NULL)
+            m_ownerResHolder->m_numRefs--;
+    }
     operator T *() {
+        if (m_ownerResHolder == NULL)
+            return NULL;
         return m_ownerResHolder->m_res;
     }
+    T *get() const {
+        if (m_ownerResHolder == NULL)
+            return NULL;
+        return m_ownerResHolder->m_res;
+    }
+    bool empty() const { return m_ownerResHolder == NULL; }
 private:
     ResourceHolder<T> *m_ownerResHolder;
 };
@@ -70,6 +84,8 @@ public:
         typename ResourceMap::iterator resIter = m_resources.find(resourcePath);
         if (resIter == m_resources.end()) {
             T *res = m_factory.create(resourcePath);
+            if (res == NULL)
+                return ResourceReference<T>();
             ResourceHolder<T> *resHolder = new ResourceHolder<T>(res);
             m_resources[resourcePath] = resHolder;
             return ResourceReference<T>(resHolder);
