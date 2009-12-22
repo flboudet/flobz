@@ -18,7 +18,8 @@ class IosSurfaceFactory : public ResourceFactory<IosSurface>
 public:
     IosSurfaceFactory(DataPathManager &dataPathManager)
         : m_dataPathManager(dataPathManager) {}
-    virtual IosSurface *create(const char *resourcePath);
+    virtual IosSurface *create(const std::string &resourcePath);
+    virtual void destroy(IosSurface *res);
 private:
     DataPathManager &m_dataPathManager;
 };

@@ -48,46 +48,47 @@ private:
     ResourceHolder<T> *m_ownerResHolder;
 };
 
-template <typename T>
+template <typename T, typename K=std::string>
 class ResourceFactory
 {
 public:
-    virtual T *create(const char *resourcePath) = 0;
+    virtual T *create(const K &resourceKey) = 0;
+    virtual void destroy(T *res) = 0;
 };
 
-template <typename T>
+template <typename T, typename K=std::string>
 class ResourceManager
 {
 public:
     ResourceManager(ResourceFactory<T> &factory)
         : m_factory(factory) {}
-    virtual void cacheResource(const char *resourcePath) = 0;
-    virtual ResourceReference<T> getResource(const char *resourcePath) = 0;
+    virtual void cacheResource(const K &resourceKey) = 0;
+    virtual ResourceReference<T> getResource(const K &resourceKey) = 0;
 protected:
     ResourceFactory<T> &m_factory;
 };
 
-template <typename T>
-class SimpleResourceManager : public ResourceManager<T>
+template <typename T, typename K=std::string>
+class SimpleResourceManager : public ResourceManager<T, K>
 {
 private:
-    typedef typename std::map<std::string, ResourceHolder<T> * > ResourceMap;
+    typedef typename std::map<K, ResourceHolder<T> * > ResourceMap;
     ResourceMap m_resources;
 protected:
     using ResourceManager<T>::m_factory;
 public:
     SimpleResourceManager(ResourceFactory<T> &factory)
         : ResourceManager<T>(factory) {}
-    virtual void cacheResource(const char *resourcePath) {}
-    virtual ResourceReference<T> getResource(const char *resourcePath)
+    virtual void cacheResource(const K &resourceKey) {}
+    virtual ResourceReference<T> getResource(const K &resourceKey)
     {
-        typename ResourceMap::iterator resIter = m_resources.find(resourcePath);
+        typename ResourceMap::iterator resIter = m_resources.find(resourceKey);
         if (resIter == m_resources.end()) {
-            T *res = m_factory.create(resourcePath);
+            T *res = m_factory.create(resourceKey);
             if (res == NULL)
                 return ResourceReference<T>();
             ResourceHolder<T> *resHolder = new ResourceHolder<T>(res);
-            m_resources[resourcePath] = resHolder;
+            m_resources[resourceKey] = resHolder;
             return ResourceReference<T>(resHolder);
         }
         else {

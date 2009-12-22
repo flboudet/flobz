@@ -18,10 +18,10 @@ static const char * kFullScreenPref = "Config.FullScreen";
 static const char * kOpenGLPref     = "Config.OpenGL";
 #endif
 
-IosSurface *IosSurfaceFactory::create(const char *resourcePath)
+IosSurface *IosSurfaceFactory::create(const std::string &resourcePath)
 {
     try {
-        String fullPath = m_dataPathManager.getPath(resourcePath);
+        String fullPath = m_dataPathManager.getPath(resourcePath.c_str());
         ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
         IosSurface *newSurface = iimLib.loadImage(IMAGE_RGB, fullPath);
         newSurface->enableExceptionOnDeletion(true);
@@ -30,6 +30,12 @@ IosSurface *IosSurfaceFactory::create(const char *resourcePath)
     catch (Exception e) {
         return NULL;
     }
+}
+
+void IosSurfaceFactory::destroy(IosSurface *res)
+{
+    res->enableExceptionOnDeletion(false);
+    delete res;
 }
 
 /*
