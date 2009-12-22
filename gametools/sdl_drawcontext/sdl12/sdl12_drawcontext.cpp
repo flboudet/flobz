@@ -14,6 +14,9 @@ static IosFont *DBG_FONT = NULL;
 
 using namespace std;
 
+// Ugly fix
+SDL_Surface *globalDisplay = NULL;
+
 #define IOSRECTPTR_TO_SDL(iosrectptr, sdlrect) \
     ((iosrectptr == NULL) ? NULL : \
     ( sdlrect.h = iosrectptr->h, sdlrect.w = iosrectptr->w, \
@@ -77,6 +80,11 @@ inline static void renderCopy_(SDL_Surface *dest, IosSurface *surf, IosRect *src
     SDL12_IosSurface *sSurf = static_cast<SDL12_IosSurface *>(surf);
     SDL_BlitSurface(sSurf->m_surf, IOSRECTPTR_TO_SDL(srcRect, sSrcRect),
                     dest, IOSRECTPTR_TO_SDL(dstRect, sDstRect));
+    // Ugly fix
+    if (dest != globalDisplay) {
+        SDL_Rect emptyRect = {0, 0, 1, 1};
+        SDL_BlitSurface(sSurf->m_surf, &emptyRect, globalDisplay, &emptyRect);
+    }
 }
 
 inline static void renderCopyFlipped_(SDL_Surface *dest,
@@ -91,6 +99,11 @@ inline static void renderCopyFlipped_(SDL_Surface *dest,
     SDL_Rect sSrcRect, sDstRect;
     SDL_BlitSurface(sSurf->m_flippedSurf, IOSRECTPTR_TO_SDL(srcRect, sSrcRect),
                     dest, IOSRECTPTR_TO_SDL(dstRect, sDstRect));
+    // Ugly fix
+    if (dest != globalDisplay) {
+        SDL_Rect emptyRect = {0, 0, 1, 1};
+        SDL_BlitSurface(sSurf->m_surf, &emptyRect, globalDisplay, &emptyRect);
+    }
 }
 
 inline static void renderRotatedCentered_(SDL_Surface *dest,
@@ -113,6 +126,11 @@ inline static void renderRotatedCentered_(SDL_Surface *dest,
     rect.w = surf->w;
     rect.h = surf->h;
     SDL_BlitSurface(sSurf->m_rotated[angle], NULL, dest, &rect);
+    // Ugly fix
+    if (dest != globalDisplay) {
+        SDL_Rect emptyRect = {0, 0, 1, 1};
+        SDL_BlitSurface(sSurf->m_surf, &emptyRect, globalDisplay, &emptyRect);
+    }
 }
 
 inline static void setClipRect_(SDL_Surface *surf, IosRect *rect)
@@ -339,6 +357,7 @@ void SDL12_DrawContext::initDisplay(bool fullscreen)
                 SDL_GetError());
         exit(1);
     }
+    globalDisplay = display; // Ugly fix
     atexit(SDL_Quit);
     SDL_ShowCursor(SDL_DISABLE);
     SDL_WM_SetCaption(m_caption.c_str(), NULL);
