@@ -419,7 +419,7 @@ public:
 private:
     Text m_errorMessageL1, m_errorMessageL2;
     FramedButton m_okButton;
-    IosSurface *m_errorIconImage;
+    IosSurfaceRef m_errorIconImage;
     Image m_errorIcon;
 };
 
@@ -427,8 +427,7 @@ PuyoInternetErrorDialog::PuyoInternetErrorDialog(String errorMessageL1, String e
   : PuyoInternetDialog(theCommander->getLocalizedString("Error")), m_errorMessageL1(errorMessageL1),
     m_errorMessageL2(errorMessageL2), m_okButton(theCommander->getLocalizedString("OK"), this,
 	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
-    m_errorIconImage(GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary()
-                     .loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/errorpuyo.png"))),
+    m_errorIconImage(theCommander->getSurface(IMAGE_RGBA, "gfx/errorpuyo.png")),
     m_errorIcon(m_errorIconImage)
 {
     m_contentBox.setInnerMargin(10);
@@ -442,7 +441,6 @@ PuyoInternetErrorDialog::PuyoInternetErrorDialog(String errorMessageL1, String e
 
 PuyoInternetErrorDialog::~PuyoInternetErrorDialog()
 {
-    delete m_errorIconImage;
 }
 
 void PuyoInternetErrorDialog::action(Widget *sender, int actionType, GameControlEvent *event)

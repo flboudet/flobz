@@ -77,23 +77,22 @@ void PuyoCommander::initWithGUI(bool fs)
   initFonts();
 
   // Loading the frame images, and setting up the frames
-  ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
-  m_switchOnImage = iimLib.loadImage(IMAGE_RGBA, dataPathManager.getPath("gfx/switch-on.png"));
-  m_switchOffImage = iimLib.loadImage(IMAGE_RGBA, dataPathManager.getPath("gfx/switch-off.png"));
-  m_radioOnImage = iimLib.loadImage(IMAGE_RGBA, dataPathManager.getPath("gfx/radio-on.png"));
-  m_radioOffImage = iimLib.loadImage(IMAGE_RGBA, dataPathManager.getPath("gfx/radio-off.png"));
-  m_upArrow = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/uparrow.png"));
-  m_downArrow = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/downarrow.png"));
-  m_leftArrow = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/leftarrow.png"));
-  m_rightArrow = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/rightarrow.png"));
+  m_switchOnImage = getSurface(IMAGE_RGBA, "gfx/switch-on.png");
+  m_switchOffImage = getSurface(IMAGE_RGBA, "gfx/switch-off.png");
+  m_radioOnImage = getSurface(IMAGE_RGBA, "gfx/radio-on.png");
+  m_radioOffImage = getSurface(IMAGE_RGBA, "gfx/radio-off.png");
+  m_upArrow = getSurface(IMAGE_RGBA, "gfx/uparrow.png");
+  m_downArrow = getSurface(IMAGE_RGBA, "gfx/downarrow.png");
+  m_leftArrow = getSurface(IMAGE_RGBA, "gfx/leftarrow.png");
+  m_rightArrow = getSurface(IMAGE_RGBA, "gfx/rightarrow.png");
 
-  m_frameImage = m_surfaceResManager->getResource("gfx/frame.png");
-  m_buttonIdleImage = iimLib.loadImage(IMAGE_RGB, dataPathManager.getPath("gfx/button.png"));
-  m_buttonDownImage = iimLib.loadImage(IMAGE_RGB, dataPathManager.getPath("gfx/buttondown.png"));
-  m_buttonOverImage = iimLib.loadImage(IMAGE_RGB, dataPathManager.getPath("gfx/buttonover.png"));
-  m_textFieldIdleImage = iimLib.loadImage(IMAGE_RGB, dataPathManager.getPath("gfx/editfield.png"));
-  m_separatorImage = iimLib.loadImage(IMAGE_RGB, dataPathManager.getPath("gfx/separator.png"));
-  m_listIdleImage = iimLib.loadImage(IMAGE_RGB, dataPathManager.getPath("gfx/listborder.png"));
+  m_frameImage = getSurface(IMAGE_RGB, "gfx/frame.png");
+  m_buttonIdleImage = getSurface(IMAGE_RGB, "gfx/button.png");
+  m_buttonDownImage = getSurface(IMAGE_RGB, "gfx/buttondown.png");
+  m_buttonOverImage = getSurface(IMAGE_RGB, "gfx/buttonover.png");
+  m_textFieldIdleImage = getSurface(IMAGE_RGB, "gfx/editfield.png");
+  m_separatorImage = getSurface(IMAGE_RGB, "gfx/separator.png");
+  m_listIdleImage = getSurface(IMAGE_RGB, "gfx/listborder.png");
 
   m_windowFramePicture->setFrameSurface(m_frameImage);
   m_buttonIdleFramePicture->setFrameSurface(m_buttonIdleImage);
@@ -111,12 +110,6 @@ void PuyoCommander::initWithoutGUI()
 
 PuyoCommander::~PuyoCommander()
 {
-  //delete m_frameImage;
-  delete m_buttonIdleImage;
-  delete m_buttonDownImage;
-  delete m_buttonOverImage;
-  delete m_textFieldIdleImage;
-  delete m_separatorImage;
   delete m_slideSound;
   delete m_whipSound;
   delete m_whopSound;

@@ -29,6 +29,7 @@
 #include "FramedEditField.h"
 #include "ios_memory.h"
 #include "ios_messagebox.h"
+#include "PuyoCommander.h"
 
 using namespace ios_fc;
 using namespace gameui;
@@ -61,7 +62,7 @@ private:
     ChatAction chatAction;
     Text chatInputLabel;
     FramedEditField chatInput;
-    IosSurface *chatInputFrameSurface;
+    IosSurfaceRef chatInputFrameSurface;
     FramePicture chatInputFramePicture;
     Frame chatInputContainerFrame;
     HBox chatInputContainer;

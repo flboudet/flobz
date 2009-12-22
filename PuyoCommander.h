@@ -103,13 +103,13 @@ class PuyoCommander
 
     bool useGL;
     IosSurfaceRef m_frameImage;
-    IosSurface   *m_buttonIdleImage, *m_buttonDownImage, *m_buttonOverImage;
-    IosSurface   *m_textFieldIdleImage;
-    IosSurface   *m_separatorImage;
-    IosSurface   *m_listIdleImage;
-    IosSurface   *m_switchOnImage, *m_switchOffImage;
-    IosSurface   *m_radioOnImage, *m_radioOffImage;
-    IosSurface   *m_upArrow, *m_downArrow, *m_leftArrow, *m_rightArrow;
+    IosSurfaceRef m_buttonIdleImage, m_buttonDownImage, m_buttonOverImage;
+    IosSurfaceRef m_textFieldIdleImage;
+    IosSurfaceRef m_separatorImage;
+    IosSurfaceRef m_listIdleImage;
+    IosSurfaceRef m_switchOnImage, m_switchOffImage;
+    IosSurfaceRef m_radioOnImage, m_radioOffImage;
+    IosSurfaceRef m_upArrow, m_downArrow, m_leftArrow, m_rightArrow;
     std::auto_ptr<FramePicture> m_windowFramePicture;
     std::auto_ptr<FramePicture> m_buttonIdleFramePicture;
     std::auto_ptr<FramePicture> m_buttonDownFramePicture;
