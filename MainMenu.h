@@ -10,6 +10,7 @@
 #ifndef _MAIN_MENU_H_
 #define _MAIN_MENU_H_
 
+#include "MainScreen.h"
 #include "HallOfFame.h"
 #include "OptionMenu.h"
 #include "LocalMenu.h"

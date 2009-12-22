@@ -10,6 +10,7 @@
 #ifndef _PUYO_STATS_WIDGET_H
 #define _PUYO_STATS_WIDGET_H
 
+#include "PuyoCommander.h"
 #include "gameloop.h"
 #include "gameui.h"
 #include "Frame.h"
@@ -135,15 +136,19 @@ private:
 
 class StatsResources {
     public:
-        IosSurface *rope_elt;
-        IosSurface *ring_left, *ring_right;
-        IosSurface *puyo_right[4][4];
+        IosSurfaceRef rope_elt;
+        IosSurfaceRef ring_left;
+        IosSurfaceRef originalPuyoLeft[4];
+        std::auto_ptr<IosSurface> ring_right;
+        IosSurface * puyo_right[4][4];
         IosSurface *puyo_left[4][4];
-        IosSurface *puyo_left_mask, *puyo_right_mask;
-        IosSurface *stats_bg_winner, *stats_bg_loser;
-        IosSurface *separator;
-        IosSurface *titleImage;
-        IosSurface *comboImage[MAX_DISPLAYED_COMBOS];
+        IosSurfaceRef puyo_left_mask;
+        std::auto_ptr<IosSurface> puyo_right_mask;
+        IosSurfaceRef stats_bg_winner;
+        std::auto_ptr<IosSurface> stats_bg_loser;
+        IosSurfaceRef separator;
+        IosSurfaceRef titleImage;
+        IosSurfaceRef comboImage[MAX_DISPLAYED_COMBOS];
         StatsResources();
         ~StatsResources();
 };

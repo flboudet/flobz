@@ -5,6 +5,7 @@
 #include "preferences.h"
 #include "audio.h"
 #include "MainMenu.h"
+//#include "ThreadedResourceManager.h"
 
 using namespace gameui;
 using namespace event_manager;
@@ -19,8 +20,16 @@ static const char * kOpenGLPref     = "Config.OpenGL";
 
 IosSurface *IosSurfaceFactory::create(const char *resourcePath)
 {
-    ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
-    return iimLib.loadImage(IMAGE_RGB, m_dataPathManager.getPath(resourcePath));
+    try {
+        String fullPath = m_dataPathManager.getPath(resourcePath);
+        ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
+        IosSurface *newSurface = iimLib.loadImage(IMAGE_RGB, fullPath);
+        newSurface->enableExceptionOnDeletion(true);
+        return newSurface;
+    }
+    catch (Exception e) {
+        return NULL;
+    }
 }
 
 /*
@@ -229,6 +238,17 @@ ScreenTransitionWidget *PuyoCommander::createScreenTransition(Screen &fromScreen
     return new DoomMeltScreenTransitionWidget(fromScreen);
 }
 
+// Resource management
+void PuyoCommander::cacheSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility)
+{
+    m_surfaceResManager->cacheResource(path);
+}
+
+IosSurfaceRef PuyoCommander::getSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility)
+{
+    return m_surfaceResManager->getResource(path);
+}
+
 void PuyoCommander::registerCursor(AbstractCursor *cursor)
 {
     m_cursor = cursor;
@@ -243,4 +263,5 @@ void PuyoCommander::setCursorVisible(bool visible)
 void PuyoCommander::createResourceManagers()
 {
     m_surfaceResManager.reset(new SimpleResourceManager<IosSurface>(m_surfaceFactory));
+    //m_surfaceResManager.reset(new ThreadedResourceManager<IosSurface>(m_surfaceFactory));
 }

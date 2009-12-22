@@ -46,36 +46,25 @@ int extract_state_and_type(const char *s, int *state, int *type)
 }
 
 
-class StyroImage
+StyroImage::StyroImage(const char *path, bool removePrefix)
+    : path(path), surface(NULL)
 {
-    public:
-        String path;
-        IosSurface *surface;
-
-        StyroImage(const char *path) : path(path)
-        {
-            if (path[0] == '@') {
-                int state = 0;
-                int type = 0;
-                if (extract_state_and_type(path,&state,&type)==0){
-                    surface =  getPuyoThemeManger()->getAnimatedPuyoSetTheme()->getAnimatedPuyoTheme((PuyoState)state)->getSurface((PuyoPictureType)state, 0);
-                }
-                else{
-                    surface = NULL;
-                }
-            }
-            else {
-                ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
-                String imgPath = theCommander->getDataPathManager().getPath(FilePath("gfx").combine(path));
-                surface = iimLib.loadImage(IMAGE_RGBA, imgPath);
-            }
+    if (path[0] == '@') {
+        int state = 0;
+        int type = 0;
+        if (extract_state_and_type(path,&state,&type)==0){
+            surface =  getPuyoThemeManger()->getAnimatedPuyoSetTheme()->getAnimatedPuyoTheme((PuyoState)state)->getSurface((PuyoPictureType)state, 0);
         }
-
-        ~StyroImage() {
-            if (path[0] != '@')
-                delete surface;
-        }
-};
+    }
+    else {
+        String imgPath = (removePrefix ? String(path)
+                          : FilePath("gfx").combine(path));
+        surfaceRef = theCommander->getSurface(IMAGE_RGBA, imgPath);
+        if (surfaceRef.empty())
+            throw Exception(String("Image ") + imgPath + " not found!");
+        surface = surfaceRef;
+    }
+}
 
 static void *loadImage (StyrolyseClient *_this, const char *path)
 {

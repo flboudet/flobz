@@ -3,12 +3,11 @@
 
 #include "gameui.h"
 #include "Frame.h"
-#include "PuyoStory.h"
 #include "DataPathManager.h"
 #include "LocalizedDictionary.h"
 #include "GameCursor.h"
+#include "ScreenTransition.h"
 #include "audio.h"
-#include "MainScreen.h"
 #include "ResourceManager.h"
 #include <memory>
 
@@ -49,7 +48,9 @@ class PuyoCommander
     virtual ScreenTransitionWidget *createScreenTransition(Screen &fromScreen) const;
 
     // Resource managers
-    IosSurfaceResourceManager &getIosSurfaceResourceManager() const { return *m_surfaceResManager; }
+    void cacheSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0);
+    IosSurfaceRef getSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0);
+    void cacheSound(const char *path);
 
     // Data path management
     const DataPathManager &getDataPathManager() { return dataPathManager; }

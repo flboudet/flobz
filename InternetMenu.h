@@ -34,7 +34,7 @@
 #include "FramedEditField.h"
 #include "ListView.h"
 #include "PuyoCommander.h"
-#include "InternetMenu.h"
+#include "MainScreen.h"
 #include "InternetGameCenter.h"
 #include <vector>
 

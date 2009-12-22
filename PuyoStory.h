@@ -29,7 +29,7 @@
 class GameScreen;
 
 #include "styrolyse.h"
-
+#include "PuyoCommander.h"
 #include "gameui.h"
 #include "ScreenTransition.h"
 #include "LocalizedDictionary.h"
@@ -38,7 +38,14 @@ extern int NB_STORIES;
 
 using namespace gameui;
 
-class PuyoCommander;
+class StyroImage
+{
+public:
+    String path;
+    IosSurfaceRef surfaceRef;
+    IosSurface   *surface;
+    StyroImage(const char *path, bool removePrefix=false);
+};
 
 class StoryWidget : public Widget, public IdleComponent {
 public:

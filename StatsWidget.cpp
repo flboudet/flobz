@@ -21,51 +21,49 @@ StatsResources::StatsResources()
 {
     ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
     res = this;
-    rope_elt = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/progressbar/rope.png"));
-    ring_left = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/progressbar/ring.png"));
-    ring_right = ring_left->mirrorH();
-    puyo_left[0][0] = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_1.png"));
-    puyo_left[0][1] = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_2.png"));
-    puyo_left[0][2] = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_3.png"));
-    puyo_left[0][3] = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_4.png"));
-    puyo_left_mask = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/progressbar/puyo_left_mask.png"));
+    rope_elt = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/rope.png");
+    ring_left = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/ring.png");
+    ring_right.reset(ring_left.get()->mirrorH());
+    ring_right.reset(ring_left.get()->mirrorH());
+    originalPuyoLeft[0] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_1.png");
+    originalPuyoLeft[1] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_2.png");
+    originalPuyoLeft[2] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_3.png");
+    originalPuyoLeft[3] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_4.png");
+    puyo_left[0][0] = originalPuyoLeft[0];
+    puyo_left[0][1] = originalPuyoLeft[1];
+    puyo_left[0][2] = originalPuyoLeft[2];
+    puyo_left[0][3] = originalPuyoLeft[3];
+    puyo_left_mask = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_mask.png");
     for (int i=0; i<4; ++i)
-	puyo_right[0][i] = puyo_left[0][i]->mirrorH();
-    puyo_right_mask = puyo_left_mask->mirrorH();
+        puyo_right[0][i] = puyo_left[0][i]->mirrorH();
+    puyo_right_mask.reset(puyo_left_mask.get()->mirrorH());
 
     for (int i = 0 ; i < 4 ; i++) {
 		for (int j=1; j<4; ++j) {
 			puyo_left[j][i] = puyo_left[0][i]->shiftHue(30.*j, puyo_left_mask);
-			puyo_right[j][i] = puyo_right[0][i]->shiftHue(30.*j, puyo_right_mask);
+			puyo_right[j][i] = puyo_right[0][i]->shiftHue(30.*j, puyo_right_mask.get());
 		}
 	}
-    separator = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/separator.png"));
-    titleImage = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath(String("gfx/stats_title.png")));
+    separator = theCommander->getSurface(IMAGE_RGBA, "gfx/separator.png");
+    titleImage = theCommander->getSurface(IMAGE_RGBA, "gfx/stats_title.png");
     for (int numCombo = 0 ; numCombo < MAX_DISPLAYED_COMBOS ; numCombo++) {
-        String pictureName = theCommander->getDataPathManager().getPath(String("gfx/combo") + (numCombo+1) + String("x_stat.png"));
-        comboImage[numCombo] = iimLib.loadImage(IMAGE_RGBA, pictureName);
+        String pictureName = String("gfx/combo") + (numCombo+1) + "x_stat.png";
+        comboImage[numCombo] = theCommander->getSurface(IMAGE_RGBA, pictureName);
     }
-    stats_bg_winner = iimLib.loadImage(IMAGE_RGBA, theCommander->getDataPathManager().getPath("gfx/stats-bg.png"));
-    stats_bg_loser = stats_bg_winner->shiftHue(180);
+    stats_bg_winner = theCommander->getSurface(IMAGE_RGBA, "gfx/stats-bg.png");
+    stats_bg_loser.reset(stats_bg_winner.get()->shiftHue(180));
+    stats_bg_loser.reset(stats_bg_winner.get()->shiftHue(180));
 }
 
 StatsResources::~StatsResources()
 {
-    delete rope_elt;
     for (int i = 0 ; i < 4 ; i++) {
         for (int j = 0 ; j < 4 ; j++) {
-            delete puyo_left[i][j];
+            if (i != 0) // Not deleting the original images since they come from the resource manager
+                delete puyo_left[i][j];
             delete puyo_right[i][j];
         }
     }
-    delete puyo_left_mask;
-    delete puyo_right_mask;
-    delete stats_bg_winner;
-    delete stats_bg_loser;
-    delete separator;
-    delete titleImage;
-    for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++)
-        delete comboImage[i];
 }
 
 ProgressBarWidget::ProgressBarWidget(Action *associatedAction)
@@ -107,7 +105,7 @@ void ProgressBarWidget::draw(DrawTarget *dt)
     dstrect.h = bsize.y;
     dstrect.w = 10;
     if (m_dir == LEFT_TO_RIGHT)
-        dt->draw(res->ring_right, NULL, &dstrect);
+        dt->draw(res->ring_right.get(), NULL, &dstrect);
     else
         dt->draw(res->ring_left, NULL, &dstrect);
     for (int i=1; i<=n_rope_elt; ++i) {
@@ -497,8 +495,8 @@ void TwoPlayersStatsWidget::onWidgetVisibleChanged(bool visible)
     m_leftSlider.transitionToContent(&m_leftStats);
     m_rightSlider.transitionToContent(&m_rightStats);
     m_legendSlider.transitionToContent(&m_legend);
-    m_leftSlider.setBackground(m_leftStats.isWinner() ? ::res->stats_bg_winner : ::res->stats_bg_loser);
-    m_rightSlider.setBackground(m_rightStats.isWinner() ? ::res->stats_bg_winner : ::res->stats_bg_loser);
+    m_leftSlider.setBackground(m_leftStats.isWinner() ? ::res->stats_bg_winner.get() : ::res->stats_bg_loser.get());
+    m_rightSlider.setBackground(m_rightStats.isWinner() ? ::res->stats_bg_winner.get() : ::res->stats_bg_loser.get());
 }
 
 void TwoPlayersStatsWidget::onSlideInside(SliderContainer &slider)

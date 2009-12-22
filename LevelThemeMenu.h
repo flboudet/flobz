@@ -27,6 +27,7 @@
 #define LEVEL_THEME_MENU_H
 
 #include "gameui.h"
+#include "MainScreen.h"
 #include "PuyoCommander.h"
 #include "AnimatedPuyoTheme.h"
 

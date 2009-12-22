@@ -1,6 +1,7 @@
 #ifndef _PUYO_MAIN_H_
 #define _PUYO_MAIN_H_
 
+#include "MainScreen.h"
 #include "PuyoCommander.h"
 #include "drawcontext.h"
 

@@ -112,8 +112,7 @@ void GameWidget::priv_initialize()
       m_styroPainter.m_theme = attachedLevelTheme;
       m_foregroundAnimation =
 	styrolyse_new((const char *)
-		      (FilePath(attachedLevelTheme->getThemeRootPath()).combine(
-		        attachedLevelTheme->getForegroundAnimation())),
+                  attachedLevelTheme->getForegroundAnimation(),
 		      (StyrolyseClient *)(&m_styroPainter), false);
     }
 
@@ -447,35 +446,34 @@ void GameWidget::setScreenToResumed(bool fromControls)
 
 void *GameWidget::styro_loadImage(StyrolyseClient *_this, const char *path)
 {
-  IosSurface *surface;
-  ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
-  surface = iimLib.loadImage
-    (IMAGE_RGBA, (FilePath(((StyrolysePainterClient *)_this)->m_theme->getThemeRootPath())
-      .combine(path)));
-  return surface;
+    StyroImage *image;
+    image = new StyroImage(
+        FilePath(((StyrolysePainterClient *)_this)->m_theme->getThemeRootPath())
+      .combine(path), true);
+  return image;
 }
 void GameWidget::styro_drawImage(StyrolyseClient *_this,
 			    void *image, int x, int y,
 			    int clipx, int clipy, int clipw, int cliph, int flipped)
 {
-    IosSurface *surf = (IosSurface *)image;
-  IosRect  rect, cliprect;
-  rect.x = x;
-  rect.y = y;
-  rect.h = surf->h;
-  rect.w = surf->w;
-  cliprect.x = clipx;
-  cliprect.y = clipy;
-  cliprect.w = clipw;
-  cliprect.h = cliph;
-  ((StyrolysePainterClient *)_this)->m_painter->setClipRect(&cliprect);
-  if (!flipped)
-      ((StyrolysePainterClient *)_this)->m_painter->draw(surf, NULL, &rect);
-  else ((StyrolysePainterClient *)_this)->m_painter->drawHFlipped(surf, NULL, &rect);
+    StyroImage *surf = (StyroImage *)image;
+    IosRect  rect, cliprect;
+    rect.x = x;
+    rect.y = y;
+    rect.h = surf->surface->h;
+    rect.w = surf->surface->w;
+    cliprect.x = clipx;
+    cliprect.y = clipy;
+    cliprect.w = clipw;
+    cliprect.h = cliph;
+    ((StyrolysePainterClient *)_this)->m_painter->setClipRect(&cliprect);
+    if (!flipped)
+        ((StyrolysePainterClient *)_this)->m_painter->draw(surf->surface, NULL, &rect);
+    else ((StyrolysePainterClient *)_this)->m_painter->drawHFlipped(surf->surface, NULL, &rect);
 }
 void GameWidget::styro_freeImage(StyrolyseClient *_this, void *image)
 {
-  delete ((IosSurface *)image);
+  delete ((StyroImage *)image);
 }
 
 std::vector<PuyoFX*> *activeFX = NULL;

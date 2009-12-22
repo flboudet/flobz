@@ -29,6 +29,7 @@
 #include "gametools/drawcontext.h"
 #include "iosfc/ios_memory.h"
 #include "iosfc/ios_vector.h"
+#include "PuyoCommander.h"
 #include "PuyoGame.h"
 
 #define NUMBER_OF_PUYOS 5
@@ -97,6 +98,8 @@ private:
     char * _eyes;
     float _color_offset;
 
+    IosSurfaceRef _puyoOriginalCircle;
+    IosSurfaceRef _puyoOriginalShadow;
     IosSurface * _puyoFaces[NUMBER_OF_PUYO_FACES][MAX_COMPRESSED];
     IosSurface * _puyoCircles[NUMBER_OF_PUYO_CIRCLES][MAX_COMPRESSED];
     IosSurface * _puyoShadow[MAX_COMPRESSED];
@@ -125,8 +128,8 @@ private:
     String imageFullPath;
     String imageDefaultPath;
     String faceName;
-    IosSurface * _puyoNeutral;
-    IosSurface * _puyoNeutralPop[3];
+    IosSurfaceRef _puyoNeutral;
+    IosSurfaceRef _puyoNeutralPop[3];
     bool _cached;
 };
 
@@ -208,10 +211,10 @@ public:
     int getSpeedMeterX() const { return _speedMeterX; }
     int getSpeedMeterY() const { return _speedMeterY; }
 
-    const String getGameLostLeftAnimation2P() const { return _gamelost_left_2p; }
-    const String getGameLostRightAnimation2P() const { return _gamelost_right_2p; }
-    const String getCentralAnimation2P() const { return _animation_2p; }
-    const String getForegroundAnimation() const { return _foreground_animation; }
+    const String getGameLostLeftAnimation2P() const;
+    const String getGameLostRightAnimation2P() const;
+    const String getCentralAnimation2P() const;
+    const String getForegroundAnimation() const;
 private:
     String _path;
     String _name;
@@ -231,14 +234,14 @@ private:
     String _animation_2p;
     String _foreground_animation;
 
-    IosSurface * _levelLives[NUMBER_OF_LIVES];
-    IosSurface * _levelBackground;
-    IosSurface * _levelGrid;
-    IosSurface * _levelMeter[2];
+    IosSurfaceRef _levelLives[NUMBER_OF_LIVES];
+    IosSurfaceRef _levelBackground;
+    IosSurfaceRef _levelGrid;
+    IosSurfaceRef _levelMeter[2];
 
-    IosSurface * _neutralIndicator;
-    IosSurface * _bigNeutralIndicator;
-    IosSurface * _giantNeutralIndicator;
+    IosSurfaceRef _neutralIndicator;
+    IosSurfaceRef _bigNeutralIndicator;
+    IosSurfaceRef _giantNeutralIndicator;
 
     int _speedMeterX, _speedMeterY;
 

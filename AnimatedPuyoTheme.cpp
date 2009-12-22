@@ -44,7 +44,7 @@
 
 const char *defaultThemeName = "theme/Classic.fptheme";
 static const char * themeFolderExtension = ".fptheme";
-static char * defaultThemeFolder = NULL;
+static char * defaultThemeFolder = strdup(defaultThemeName);//NULL;
 
 static const char * DEFAULTPATH(void)
 {
@@ -72,7 +72,7 @@ String GlobalCurrentPath;
 
 #define NOT_IMPLEMENTED { fprintf(stderr,"Not Implemented __FILE__ __LINE__"); }
 #define CACHE_IT_OR_DIE { if (_cached == false) { if (cache() == false) exit(0); } }
-#define ADD_PICTURE(A) { bool tmp = loadPictureAt(path,&(A),defpath); OK = OK && tmp; if (tmp == false) fprintf(stderr,"Unable to load %s\n",(char *)path); }
+#define ADD_PICTURE(A) { bool tmp = loadPictureAt(path,A,defpath); OK = OK && tmp; if (tmp == false) fprintf(stderr,"Unable to load %s\n",(char *)path); }
 #define LOG { fprintf(stderr,"Logged __FILE__ __LINE__"); }
 
 #ifdef DEBUG_THEMES
@@ -83,25 +83,23 @@ String GlobalCurrentPath;
 #define ASSERT_RANGE(min,max,value) { }
 #endif
 
-static bool loadPictureAt(const char * path, IosSurface ** dst, const char * fallback)
+static bool loadPictureAt(const char * path, IosSurfaceRef &dst, const char * fallback)
 {
-    ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
-    *dst = iimLib.loadImage(IMAGE_RGBA, path);
-    if (*dst == NULL) *dst = iimLib.loadImage(IMAGE_RGBA, fallback);
-    return (*dst != NULL);
+    IosSurfaceRef tmp = theCommander->getSurface(IMAGE_RGBA, path);
+    if (tmp.empty())
+        tmp = theCommander->getSurface(IMAGE_RGBA, fallback);
+    dst = tmp;
+    return (! tmp.empty());
 }
 
 static bool loadPictureWithOffset(const char * path, IosSurface ** dst, const char * fallback, float offset)
 {
-    ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
-    IosSurface *tmp = iimLib.loadImage(IMAGE_RGBA, path);
-    if (tmp == NULL)
-    {
-        tmp = iimLib.loadImage(IMAGE_RGBA, fallback);
-    }
-    if (tmp == NULL) return false;
-    *dst = tmp->shiftHue(offset);
-    delete tmp;
+    IosSurfaceRef tmp = theCommander->getSurface(IMAGE_RGBA, path);
+    if (tmp.empty())
+        tmp = theCommander->getSurface(IMAGE_RGBA, fallback);
+    if (tmp.empty())
+        return false;
+    *dst = tmp.get()->shiftHue(offset);
     return (*dst != NULL);
 }
 /*
@@ -477,12 +475,13 @@ void StandardAnimatedPuyoTheme::releaseCached(void)
     for (j=0; j<NUMBER_OF_PUYO_CIRCLES; j++)
     {
         for (i=0; i<MAX_COMPRESSED; i++) {
+            if (j == 0 && i == 0) continue;
             if (_puyoCircles[j][i] != NULL) delete _puyoCircles[j][i];
             _puyoCircles[j][i] = NULL;
         }
     }
 
-    for (i=0; i<MAX_COMPRESSED; i++) {
+    for (i=1; i<MAX_COMPRESSED; i++) {
         if (_puyoShadow[i] != NULL) delete _puyoShadow[i];
         _puyoShadow[i] = NULL;
     }
@@ -536,7 +535,8 @@ bool StandardAnimatedPuyoTheme::cache(void)
     }
     snprintf(path, sizeof(path), "%s/%s-puyo-border.png",fullPath,_face);
     snprintf(defpath, sizeof(defpath), "%s/%s-puyo-border.png",DEFAULTPATH(),_face);
-    ADD_PICTURE(_puyoCircles[0][0]);
+    ADD_PICTURE(_puyoOriginalCircle);
+    _puyoCircles[0][0] = _puyoOriginalCircle;
     for (int i = 1; i<NUMBER_OF_PUYO_CIRCLES; i++)
     {
         OK = OK && copyPictureWithLuminosity(_puyoCircles[0][0],&(_puyoCircles[i][0]),NULL,sin(3.14f/2.0f+i*3.14f/64.0f)*0.6f+0.2f);
@@ -544,8 +544,8 @@ bool StandardAnimatedPuyoTheme::cache(void)
 
     snprintf(path, sizeof(path), "%s/%s-puyo-shadow.png",fullPath,_face);
     snprintf(defpath, sizeof(defpath), "%s/%s-puyo-shadow.png",DEFAULTPATH(),_face);
-    ADD_PICTURE(_puyoShadow[0])
-
+    ADD_PICTURE(_puyoOriginalShadow);
+    _puyoShadow[0] = _puyoOriginalShadow;
     for (j=0; j<NUMBER_OF_PUYO_EXPLOSIONS; j++)
     {
         snprintf(path, sizeof(path), "%s/%s-puyo-explosion-%d.png",fullPath,_explosions,j);
@@ -616,10 +616,10 @@ IosSurface *NeutralAnimatedPuyoTheme::getExplodingSurfaceForIndex(int index, int
 bool NeutralAnimatedPuyoTheme::cache(void)
 {
     bool OK = true;
-    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + ".png", &(_puyoNeutral), imageDefaultPath + "/" + faceName + ".png");
-    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-1.png", &(_puyoNeutralPop[0]), imageDefaultPath + "/" + faceName + "-neutral-1.png");
-    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-2.png", &(_puyoNeutralPop[1]), imageDefaultPath + "/" + faceName + "-neutral-2.png");
-    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-3.png", &(_puyoNeutralPop[2]), imageDefaultPath + "/" + faceName + "-neutral-3.png");
+    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + ".png", _puyoNeutral, imageDefaultPath + "/" + faceName + ".png");
+    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-1.png", _puyoNeutralPop[0], imageDefaultPath + "/" + faceName + "-neutral-1.png");
+    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-2.png", _puyoNeutralPop[1], imageDefaultPath + "/" + faceName + "-neutral-2.png");
+    OK = OK && loadPictureAt(imageFullPath + "/" + faceName + "-neutral-3.png", _puyoNeutralPop[2], imageDefaultPath + "/" + faceName + "-neutral-3.png");
     _cached = true;
     return OK;
 }
@@ -627,14 +627,6 @@ bool NeutralAnimatedPuyoTheme::cache(void)
 void NeutralAnimatedPuyoTheme::releaseCached(void)
 {
     if (_cached) {
-        if (_puyoNeutral != NULL) delete _puyoNeutral;
-        _puyoNeutral = NULL;
-        if (_puyoNeutralPop[0] != NULL) delete _puyoNeutralPop[0];
-        _puyoNeutralPop[0] = NULL;
-        if (_puyoNeutralPop[1] != NULL) delete _puyoNeutralPop[1];
-        _puyoNeutralPop[1] = NULL;
-        if (_puyoNeutralPop[2] != NULL) delete _puyoNeutralPop[2];
-        _puyoNeutralPop[2] = NULL;
         _cached = false;
     }
 }
@@ -798,15 +790,6 @@ PuyoLevelTheme::PuyoLevelTheme(const String path, const String name, const Strin
     DEBUG_PARAM_MISSING(path,"path","PuyoLevelTheme")
     DEBUG_PARAM_MISSING(name,"name","PuyoLevelTheme")
 
-    _lives = NULL;
-    _background = NULL;
-    _grid = NULL;
-    _speed_meter = NULL;
-
-    _neutralIndicator = NULL;
-    _bigNeutralIndicator = NULL;
-    _giantNeutralIndicator = NULL;
-
     _cached = false;
 
 #ifdef DEBUG_THEMES
@@ -863,28 +846,6 @@ const String PuyoLevelTheme::getLocalizedName(void)
 void PuyoLevelTheme::releaseCached(void)
 {
     unsigned int i;
-
-    for (i=0; i<NUMBER_OF_LIVES; i++)
-    {
-        if (_levelLives[i] != NULL) delete _levelLives[i];
-        _levelLives[i] = NULL;
-    }
-    if (_levelBackground != NULL) delete _levelBackground;
-    _levelBackground = NULL;
-    if (_levelGrid != NULL) delete _levelGrid;
-    _levelGrid = NULL;
-    if (_levelMeter[0] != NULL) delete _levelMeter[0];
-    _levelMeter[0] = NULL;
-    if (_levelMeter[1] != NULL) delete _levelMeter[1];
-    _levelMeter[1] = NULL;
-
-    if (_neutralIndicator != NULL) free(_neutralIndicator);
-    if (_bigNeutralIndicator != NULL) free(_bigNeutralIndicator);
-    if (_giantNeutralIndicator != NULL) free(_giantNeutralIndicator);
-    _neutralIndicator = NULL;
-    _bigNeutralIndicator = NULL;
-    _giantNeutralIndicator = NULL;
-
     _cached = false;
 }
 
@@ -1039,6 +1000,30 @@ bool PuyoLevelTheme::cache(void)
     return OK;
 }
 
+const String PuyoLevelTheme::getGameLostLeftAnimation2P() const
+{
+    return _gamelost_left_2p;
+}
+
+const String PuyoLevelTheme::getGameLostRightAnimation2P() const
+{
+    return _gamelost_right_2p;
+}
+
+const String PuyoLevelTheme::getCentralAnimation2P() const
+{
+    return _animation_2p;
+}
+
+const String PuyoLevelTheme::getForegroundAnimation() const
+{
+    if (_foreground_animation == "")
+        return "";
+    else
+        return theCommander->getDataPathManager().getPath(
+            FilePath(getThemeRootPath()).combine(
+            _foreground_animation));
+}
 
 
 //**************************************************************************************
@@ -1048,7 +1033,7 @@ bool PuyoLevelTheme::cache(void)
 
 static void loadTheme(String fullPath)
 {
-    String scriptPath = FilePath::combine(fullPath, "Description.gsl");
+    String scriptPath = theCommander->getDataPathManager().getPath(FilePath::combine(fullPath, "Description.gsl"));
 
     // Verify input file
     struct stat s;
@@ -1088,9 +1073,11 @@ AnimatedPuyoThemeManager::AnimatedPuyoThemeManager(bool useAltLocation)
 
     // List the themes in the various pack folders
     SelfVector<String> themeFolders;
-    for (int i = 0 ; i < theCommander->getDataPathManager().getNumPacks() ; i++) {
-        getThemeListInPath(theCommander->getDataPathManager().getPathInPack("theme", i), themeFolders);
-    }
+    //for (int i = 0 ; i < theCommander->getDataPathManager().getNumPacks() ; i++) {
+    //    getThemeListInPath(theCommander->getDataPathManager().getPathInPack("theme", i), themeFolders);
+    //}
+    themeFolders.add("theme/Classic.fptheme");
+    themeFolders.add("theme/Reduced.fptheme");
 
     // Load the themes from the list
     for (int i = 0 ; i < themeFolders.size() ; i++) {
