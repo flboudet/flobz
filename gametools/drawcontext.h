@@ -1,6 +1,7 @@
 #ifndef _DRAWCONTEXT_H_
 #define _DRAWCONTEXT_H_
 
+#include "ios_fc.h"
 #include "rgba.h"
 #include <stdlib.h>
 #include <string>
@@ -78,11 +79,11 @@ public:
     virtual ~DrawTarget() {}
 
     virtual void setClipRect(IosRect *rect) = 0;
-	
+
     virtual void draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect) = 0;
     virtual void drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect) = 0;
     virtual void drawRotatedCentered(IosSurface *surf, int angle, int x, int y) = 0;
-	
+
 	virtual void fillRect(const IosRect *rect, const RGBA &color) = 0;
 
     virtual void putString(IosFont *font, int x, int y, const char *text) = 0;
@@ -98,20 +99,30 @@ public:
 class IosSurface : public DrawTarget
 {
 public:
+    IosSurface() : m_enableExceptionOnDeletion(false) {}
+    ~IosSurface() {
+        if (m_enableExceptionOnDeletion)
+            throw ios_fc::Exception("IosSurface forbidden deletion");
+    }
+public:
     //virtual void setAlpha(unsigned char alpha) = 0;
 	virtual bool isOpaque() const = 0;
-	
+
 	virtual bool haveAbility(int ability) const = 0;
 	virtual void dropAbility(int ability) = 0;
     virtual RGBA readRGBA(int x, int y) = 0;
-	
+
     virtual IosSurface *shiftHue(float hue_offset, IosSurface *mask = NULL) = 0;
     virtual IosSurface *shiftHSV(float h, float s, float v) = 0;
     virtual IosSurface *setValue(float value) = 0;
-	
+
     virtual IosSurface * resizeAlpha(int width, int height) = 0;
     virtual IosSurface * mirrorH() = 0;
     virtual void         convertToGray() = 0;
+    // Deletion protection
+    void enableExceptionOnDeletion(bool enable) {m_enableExceptionOnDeletion = enable;}
+private:
+    bool m_enableExceptionOnDeletion;
 };
 
 enum IosFontFx
