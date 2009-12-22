@@ -26,12 +26,12 @@ static YY_BUFFER_STATE includeStack[MAX_IMPORT_DEPTH];
 static int includeStackPtr = 0;
 
 #define UP_INCLUDE_STACK() \
-        if ( --includeStackPtr < 0 ) { printf("fin include stack\n");\
+        if ( --includeStackPtr < 0 ) {\
             includeStackPtr = 0; \
             yyterminate(); \
         } \
         else \
-        { printf("depile include stack\n");\
+        { \
             fclose(yyin); \
             yy_delete_buffer( YY_CURRENT_BUFFER ); \
             yy_switch_to_buffer( includeStack[includeStackPtr] ); \
@@ -62,14 +62,13 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
 
 "import"        {  BEGIN IMPORT; }
 <IMPORT>[ \t]*  ;
-<IMPORT>\<[^<>\n]+\> {printf("empile include stack\n");
+<IMPORT>\<[^<>\n]+\> {
         FILE *tmp_yyin = NULL;
         char* fullName = NULL;
         yytext[strlen(yytext)-1] = 0;
 
         if ( includeStackPtr >= MAX_IMPORT_DEPTH )
         {
-           //META_QueueError("Includes nested too deeply", yytext+1);
            goto endImport;
         }
 
@@ -77,7 +76,6 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
         fullName = gsl_create_full_filepath( currentGoomSL, (char*) yytext+1 );
         if ( fullName == NULL )
         {
-           // META_QueueError("Imported File Not Found", yytext+1);
            goto endImport;
         }
 
@@ -85,7 +83,6 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
         tmp_yyin = fopen( fullName, "r" );
         if ( ! tmp_yyin )
         {
-           // META_QueueError("Imported File Not Found", yytext+1);
            goto endImport;
         }
 
@@ -98,7 +95,6 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
         includeStack[includeStackPtr++]   = YY_CURRENT_BUFFER;
         //GPI_LineNumber = (int*)(META_GTI_LineNumber+includeStackPtr);
         //(*GPI_LineNumber) = 1;
-printf("taille pile:%d\n", includeStackPtr);
         yyin = tmp_yyin;
 
         /* changement de buffer d'entree pour le bovin */
