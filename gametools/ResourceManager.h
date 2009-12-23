@@ -60,12 +60,12 @@ template <typename T, typename K=std::string>
 class ResourceManager
 {
 public:
-    ResourceManager(ResourceFactory<T> &factory)
+    ResourceManager(ResourceFactory<T, K> &factory)
         : m_factory(factory) {}
     virtual void cacheResource(const K &resourceKey) = 0;
     virtual ResourceReference<T> getResource(const K &resourceKey) = 0;
 protected:
-    ResourceFactory<T> &m_factory;
+    ResourceFactory<T, K> &m_factory;
 };
 
 template <typename T, typename K=std::string>
@@ -75,10 +75,10 @@ private:
     typedef typename std::map<K, ResourceHolder<T> * > ResourceMap;
     ResourceMap m_resources;
 protected:
-    using ResourceManager<T>::m_factory;
+    using ResourceManager<T, K>::m_factory;
 public:
-    SimpleResourceManager(ResourceFactory<T> &factory)
-        : ResourceManager<T>(factory) {}
+    SimpleResourceManager(ResourceFactory<T, K> &factory)
+        : ResourceManager<T, K>(factory) {}
     virtual void cacheResource(const K &resourceKey) {}
     virtual ResourceReference<T> getResource(const K &resourceKey)
     {

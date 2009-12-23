@@ -13,18 +13,40 @@
 
 using namespace gameui;
 
-class IosSurfaceFactory : public ResourceFactory<IosSurface>
+class IosSurfaceResourceKey {
+public:
+    IosSurfaceResourceKey(ImageType type, const std::string &path, ImageSpecialAbility specialAbility)
+        : path(path), type(type), specialAbility(specialAbility) {}
+    bool operator =(const IosSurfaceResourceKey k) const {
+        return  ((this->path == k.path) &&
+                 (this->type == k.type) &&
+                 (this->specialAbility == k.specialAbility));
+    }
+    bool operator < (const IosSurfaceResourceKey k) const {
+        if (this->path == k.path) {
+            if (this->type == k.type)
+                return this->specialAbility < k.specialAbility;
+            return this->type < k.type;
+        }
+        return (this->path < k.path);
+    }
+    std::string path;
+    ImageType type;
+    ImageSpecialAbility specialAbility;
+};
+
+class IosSurfaceFactory : public ResourceFactory<IosSurface, IosSurfaceResourceKey>
 {
 public:
     IosSurfaceFactory(DataPathManager &dataPathManager)
         : m_dataPathManager(dataPathManager) {}
-    virtual IosSurface *create(const std::string &resourcePath);
+    virtual IosSurface *create(const IosSurfaceResourceKey &resourceKey);
     virtual void destroy(IosSurface *res);
 private:
     DataPathManager &m_dataPathManager;
 };
 typedef ResourceReference<IosSurface> IosSurfaceRef;
-typedef ResourceManager<IosSurface>   IosSurfaceResourceManager;
+typedef ResourceManager<IosSurface, IosSurfaceResourceKey> IosSurfaceResourceManager;
 
 class PuyoCommander
 {

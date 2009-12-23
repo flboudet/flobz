@@ -18,10 +18,10 @@ static const char * kFullScreenPref = "Config.FullScreen";
 static const char * kOpenGLPref     = "Config.OpenGL";
 #endif
 
-IosSurface *IosSurfaceFactory::create(const std::string &resourcePath)
+IosSurface *IosSurfaceFactory::create(const IosSurfaceResourceKey &resourceKey)
 {
     try {
-        String fullPath = m_dataPathManager.getPath(resourcePath.c_str());
+        String fullPath = m_dataPathManager.getPath(resourceKey.path.c_str());
         ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
         IosSurface *newSurface = iimLib.loadImage(IMAGE_RGB, fullPath);
         newSurface->enableExceptionOnDeletion(true);
@@ -240,12 +240,12 @@ ScreenTransitionWidget *PuyoCommander::createScreenTransition(Screen &fromScreen
 // Resource management
 void PuyoCommander::cacheSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility)
 {
-    m_surfaceResManager->cacheResource(path);
+    m_surfaceResManager->cacheResource(IosSurfaceResourceKey(type, path, specialAbility));
 }
 
 IosSurfaceRef PuyoCommander::getSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility)
 {
-    return m_surfaceResManager->getResource(path);
+    return m_surfaceResManager->getResource(IosSurfaceResourceKey(type, path, specialAbility));
 }
 
 void PuyoCommander::registerCursor(AbstractCursor *cursor)
@@ -261,6 +261,6 @@ void PuyoCommander::setCursorVisible(bool visible)
 
 void PuyoCommander::createResourceManagers()
 {
-    m_surfaceResManager.reset(new SimpleResourceManager<IosSurface>(m_surfaceFactory));
+    m_surfaceResManager.reset(new SimpleResourceManager<IosSurface, IosSurfaceResourceKey>(m_surfaceFactory));
     //m_surfaceResManager.reset(new ThreadedResourceManager<IosSurface>(m_surfaceFactory));
 }
