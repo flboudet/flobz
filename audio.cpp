@@ -28,93 +28,6 @@ static const char * kSoundVolume = "AudioManager.FX.Volume";
 static const char * kMusic       = "AudioManager.Music.State";
 static const char * kSound       = "AudioManager.FX.State";
 
-template <typename T>
-class Cache
-{
-    private:
-        typedef std::vector<std::string>   NameVector;
-        typedef std::map<std::string, double> LastUseMap;
-        typedef std::map<std::string, T*>  TMap;
-
-        NameVector   nameVector;
-        TMap         tMap;
-        LastUseMap   lastUseMap;
-
-        double          curTime;
-        int          maxT;
-
-    public:
-        Cache(int maxT) : curTime(0.0), maxT(maxT) {}
-
-        bool contains(const std::string &c)
-        {
-            NameVector::iterator it = nameVector.begin();
-            while (it != nameVector.end()) {
-                if (*it == c) {
-                    return true;
-                }
-                ++it;
-            }
-            return false;
-        }
-
-        /* Like get, but does not check if 'c' is in the cache.
-         *
-         * Make sure that "this->contains(c)" is true.
-         */
-        T* veryGet(const std::string &c)
-        {
-            lastUseMap[c] = ios_fc::getTimeMs();
-            return tMap[c];
-        }
-
-        /* Return the time of the last use of 'c'.
-         *
-         * Make sure that "this->contains(c)" is true.
-         */
-        double veryGetLastUse(std::string &c)
-        {
-            return lastUseMap[c];
-        }
-
-        T* add(const std::string &c, T* t)
-        {
-            T* ret = NULL;
-            if (nameVector.size() >= (unsigned int)maxT)
-                ret = removeOne();
-
-            nameVector.push_back(c);
-            tMap[c] = t;
-            curTime = ios_fc::getTimeMs();
-            lastUseMap[c] = curTime - TIMEMS_BETWEEN_SAME_SOUND - 0.0001;
-
-            return ret;
-        }
-
-        T* removeOne()
-        {
-            NameVector::iterator oldest = nameVector.begin();
-            NameVector::iterator it     = nameVector.begin();
-            while (it != nameVector.end())
-            {
-                if (lastUseMap[*it] < lastUseMap[*oldest])
-                    oldest = it;
-                ++it;
-            }
-
-            T* t = tMap[*oldest];
-            tMap.erase(*oldest);
-            lastUseMap.erase(*oldest);
-            nameVector.erase(oldest);
-            return t;
-        }
-
-        bool empty() const { return nameVector.size() == 0; }
-};
-
-Cache<audio_manager::Music> musicCache(6);
-
-
 audio_manager::AudioManager * AudioManager::m_audioManager;
 
 void AudioManager::init()
@@ -180,39 +93,18 @@ void AudioManager::clearSoundCache()
 
 void AudioManager::clearMusicCache()
 {
-    if (!audio_supported) return;
-
-    while (!musicCache.empty())
-    {
-        audio_manager::Music *removed = musicCache.removeOne();
-        if (removed)
-            delete removed;
-    }
 }
 
 void AudioManager::preloadMusic(const char *fileName)
 {
-    //if (!audio_supported) return;
-    if (musicCache.contains(fileName)) return;
-
-    String filePath = theCommander->getDataPathManager().getPath(FilePath("music").combine(fileName));
-    audio_manager::Music *music   = m_audioManager->loadMusic(filePath);
-    audio_manager::Music *removed = musicCache.add(fileName, music);
-    if (removed)
-        delete removed;
+    theCommander->cacheMusic(FilePath("music").combine(fileName));
 }
 
 void AudioManager::loadMusic(const char *fileName)
 {
-  if ((!music_starting) && ((!audio_supported) || (music_current == fileName))) return;
-    music_current = fileName;
-    if (music_on)
-    {
-      preloadMusic(fileName);
-      audio_manager::Music *music = musicCache.veryGet(fileName);
-      if (music != NULL)
-          m_audioManager->playMusic(music);
-    }
+    MusicRef music = theCommander->getMusic(FilePath("music").combine(fileName));
+    if (music.get() != NULL)
+        m_audioManager->playMusic(music);
 }
 
 void AudioManager::music(const char *command)

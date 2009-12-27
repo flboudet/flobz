@@ -55,6 +55,23 @@ void SoundFactory::destroy(audio_manager::Sound *res)
     delete res;
 }
 
+audio_manager::Music * MusicFactory::create(const std::string &path)
+{
+    try {
+        String fullPath = m_dataPathManager.getPath(path.c_str());
+        audio_manager::Music *newMusic = GameUIDefaults::GAME_LOOP->getAudioManager()->loadMusic(fullPath);
+        return newMusic;
+    }
+    catch (Exception e) {
+        return NULL;
+    }
+}
+
+void MusicFactory::destroy(audio_manager::Music *res)
+{
+    delete res;
+}
+
 
 /*
  * THE MENUS
@@ -76,6 +93,7 @@ PuyoCommander::PuyoCommander(String dataDir, int maxDataPackNumber)
   : dataPathManager(dataDir),
     m_surfaceFactory(dataPathManager),
     m_soundFactory(dataPathManager),
+    m_musicFactory(dataPathManager),
     m_cursor(NULL)
 {
   loop = GameUIDefaults::GAME_LOOP;
@@ -276,6 +294,16 @@ SoundRef PuyoCommander::getSound(const char *path)
     return m_soundResManager->getResource(path);
 }
 
+void PuyoCommander::cacheMusic(const char *path)
+{
+    m_musicResManager->cacheResource(path);
+}
+
+MusicRef PuyoCommander::getMusic(const char *path)
+{
+    return m_musicResManager->getResource(path);
+}
+
 void PuyoCommander::registerCursor(AbstractCursor *cursor)
 {
     m_cursor = cursor;
@@ -292,4 +320,5 @@ void PuyoCommander::createResourceManagers()
     m_surfaceResManager.reset(new SimpleResourceManager<IosSurface, IosSurfaceResourceKey>(m_surfaceFactory));
     //m_surfaceResManager.reset(new ThreadedResourceManager<IosSurface>(m_surfaceFactory));
     m_soundResManager.reset(new SimpleResourceManager<audio_manager::Sound>(m_soundFactory));
+    m_musicResManager.reset(new SimpleResourceManager<audio_manager::Music>(m_musicFactory));
 }

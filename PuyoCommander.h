@@ -67,12 +67,29 @@ private:
     DataPathManager &m_dataPathManager;
 };
 
+/**
+ * Factory for Music resources
+ */
+class MusicFactory : public ResourceFactory<audio_manager::Music>
+{
+public:
+    MusicFactory(DataPathManager &dataPathManager)
+        : m_dataPathManager(dataPathManager) {}
+    virtual audio_manager::Music *create(const std::string &path);
+    virtual void destroy(audio_manager::Music *res);
+private:
+    DataPathManager &m_dataPathManager;
+};
+
 // IosSurface resources
 typedef ResourceReference<IosSurface> IosSurfaceRef;
 typedef ResourceManager<IosSurface, IosSurfaceResourceKey> IosSurfaceResourceManager;
-// IosSound resources
+// Sound resources
 typedef ResourceReference<audio_manager::Sound> SoundRef;
 typedef ResourceManager<audio_manager::Sound> SoundResourceManager;
+// Music resources
+typedef ResourceReference<audio_manager::Music> MusicRef;
+typedef ResourceManager<audio_manager::Music> MusicResourceManager;
 
 class PuyoCommander
 {
@@ -101,6 +118,8 @@ class PuyoCommander
     IosSurfaceRef getSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0);
     void cacheSound(const char *path);
     SoundRef getSound(const char *path);
+    void cacheMusic(const char *path);
+    MusicRef getMusic(const char *path);
 
     // Data path management
     const DataPathManager &getDataPathManager() { return dataPathManager; }
@@ -146,6 +165,8 @@ class PuyoCommander
     std::auto_ptr<IosSurfaceResourceManager> m_surfaceResManager;
     SoundFactory m_soundFactory;
     std::auto_ptr<SoundResourceManager> m_soundResManager;
+    MusicFactory m_musicFactory;
+    std::auto_ptr<MusicResourceManager> m_musicResManager;
 
     MessageBox *mbox;
     GameLoop   *loop;
