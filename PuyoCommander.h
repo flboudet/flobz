@@ -13,6 +13,10 @@
 
 using namespace gameui;
 
+/**
+ * Resource key for IosSurface management.
+ * Makes an unique key for an ImageType, path, Ability association
+ */
 class IosSurfaceResourceKey {
 public:
     IosSurfaceResourceKey(ImageType type, const std::string &path, ImageSpecialAbility specialAbility)
@@ -35,6 +39,9 @@ public:
     ImageSpecialAbility specialAbility;
 };
 
+/**
+ * Factory for IosSurface resources
+ */
 class IosSurfaceFactory : public ResourceFactory<IosSurface, IosSurfaceResourceKey>
 {
 public:
@@ -45,8 +52,27 @@ public:
 private:
     DataPathManager &m_dataPathManager;
 };
+
+/**
+ * Factory for Sound resources
+ */
+class SoundFactory : public ResourceFactory<audio_manager::Sound>
+{
+public:
+    SoundFactory(DataPathManager &dataPathManager)
+        : m_dataPathManager(dataPathManager) {}
+    virtual audio_manager::Sound *create(const std::string &path);
+    virtual void destroy(audio_manager::Sound *res);
+private:
+    DataPathManager &m_dataPathManager;
+};
+
+// IosSurface resources
 typedef ResourceReference<IosSurface> IosSurfaceRef;
 typedef ResourceManager<IosSurface, IosSurfaceResourceKey> IosSurfaceResourceManager;
+// IosSound resources
+typedef ResourceReference<audio_manager::Sound> SoundRef;
+typedef ResourceManager<audio_manager::Sound> SoundResourceManager;
 
 class PuyoCommander
 {
@@ -74,6 +100,7 @@ class PuyoCommander
     void cacheSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0);
     IosSurfaceRef getSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0);
     void cacheSound(const char *path);
+    SoundRef getSound(const char *path);
 
     // Data path management
     const DataPathManager &getDataPathManager() { return dataPathManager; }
@@ -117,6 +144,8 @@ class PuyoCommander
     // Resource Managers
     IosSurfaceFactory m_surfaceFactory;
     std::auto_ptr<IosSurfaceResourceManager> m_surfaceResManager;
+    SoundFactory m_soundFactory;
+    std::auto_ptr<SoundResourceManager> m_soundResManager;
 
     MessageBox *mbox;
     GameLoop   *loop;
@@ -141,8 +170,9 @@ class PuyoCommander
     std::auto_ptr<FramePicture> m_separatorFramePicture;
     std::auto_ptr<FramePicture> m_listFramePicture;
 
-    audio_manager::Sound *m_slideSound;
-    audio_manager::Sound *m_whipSound, *m_whopSound;
+    SoundRef m_slideSound;
+    SoundRef m_whipSound;
+    SoundRef m_whopSound;
 
     AbstractCursor *m_cursor;
 };

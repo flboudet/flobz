@@ -33,7 +33,7 @@ public:
         if (m_ownerResHolder != NULL)
             m_ownerResHolder->m_numRefs--;
     }
-    operator T *() {
+    operator T *() const {
         if (m_ownerResHolder == NULL)
             return NULL;
         return m_ownerResHolder->m_res;

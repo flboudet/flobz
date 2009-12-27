@@ -23,7 +23,7 @@ IosSurface *IosSurfaceFactory::create(const IosSurfaceResourceKey &resourceKey)
     try {
         String fullPath = m_dataPathManager.getPath(resourceKey.path.c_str());
         ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
-        IosSurface *newSurface = iimLib.loadImage(IMAGE_RGB, fullPath);
+        IosSurface *newSurface = iimLib.loadImage(resourceKey.type, fullPath, resourceKey.specialAbility);
         newSurface->enableExceptionOnDeletion(true);
         return newSurface;
     }
@@ -37,6 +37,24 @@ void IosSurfaceFactory::destroy(IosSurface *res)
     res->enableExceptionOnDeletion(false);
     delete res;
 }
+
+audio_manager::Sound * SoundFactory::create(const std::string &path)
+{
+    try {
+        String fullPath = m_dataPathManager.getPath(path.c_str());
+        audio_manager::Sound *newSound = GameUIDefaults::GAME_LOOP->getAudioManager()->loadSound(fullPath);
+        return newSound;
+    }
+    catch (Exception e) {
+        return NULL;
+    }
+}
+
+void SoundFactory::destroy(audio_manager::Sound *res)
+{
+    delete res;
+}
+
 
 /*
  * THE MENUS
@@ -55,7 +73,10 @@ void SinglePlayerGameAction::action()
 /* Build the PuyoCommander */
 
 PuyoCommander::PuyoCommander(String dataDir, int maxDataPackNumber)
-  : dataPathManager(dataDir), m_surfaceFactory(dataPathManager), m_cursor(NULL)
+  : dataPathManager(dataDir),
+    m_surfaceFactory(dataPathManager),
+    m_soundFactory(dataPathManager),
+    m_cursor(NULL)
 {
   loop = GameUIDefaults::GAME_LOOP;
   mbox = NULL;
@@ -116,9 +137,6 @@ void PuyoCommander::initWithoutGUI()
 
 PuyoCommander::~PuyoCommander()
 {
-  delete m_slideSound;
-  delete m_whipSound;
-  delete m_whopSound;
 }
 
 extern char *dataFolder;
@@ -139,9 +157,9 @@ const char * PuyoCommander::getLocalizedString(const char * originalString) cons
 /* Initialize the audio if necessary */
 void PuyoCommander::initAudio()
 {
-    m_slideSound = loop->getAudioManager()->loadSound(dataPathManager.getPath(FilePath("sfx").combine("slide.wav")));
-    m_whipSound = loop->getAudioManager()->loadSound(dataPathManager.getPath(FilePath("sfx").combine("whip.wav")));
-    m_whopSound = loop->getAudioManager()->loadSound(dataPathManager.getPath(FilePath("sfx").combine("whop.wav")));
+    m_slideSound = getSound(FilePath("sfx").combine("slide.wav"));
+    m_whipSound = getSound(FilePath("sfx").combine("whip.wav"));
+    m_whopSound = getSound(FilePath("sfx").combine("whop.wav"));
     GameUIDefaults::SLIDE_SOUND = m_slideSound;
     AudioManager::init();
 }
@@ -248,6 +266,16 @@ IosSurfaceRef PuyoCommander::getSurface(ImageType type, const char *path, ImageS
     return m_surfaceResManager->getResource(IosSurfaceResourceKey(type, path, specialAbility));
 }
 
+void PuyoCommander::cacheSound(const char *path)
+{
+    m_soundResManager->cacheResource(path);
+}
+
+SoundRef PuyoCommander::getSound(const char *path)
+{
+    return m_soundResManager->getResource(path);
+}
+
 void PuyoCommander::registerCursor(AbstractCursor *cursor)
 {
     m_cursor = cursor;
@@ -263,4 +291,5 @@ void PuyoCommander::createResourceManagers()
 {
     m_surfaceResManager.reset(new SimpleResourceManager<IosSurface, IosSurfaceResourceKey>(m_surfaceFactory));
     //m_surfaceResManager.reset(new ThreadedResourceManager<IosSurface>(m_surfaceFactory));
+    m_soundResManager.reset(new SimpleResourceManager<audio_manager::Sound>(m_soundFactory));
 }

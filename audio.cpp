@@ -10,6 +10,7 @@
 
 #include "PuyoCommander.h"
 
+static std::map<std::string, double> lastUsedTimestamp;
 static bool   audio_supported = false;
 
 static float sound_volume   = 1.0f;
@@ -111,7 +112,6 @@ class Cache
         bool empty() const { return nameVector.size() == 0; }
 };
 
-Cache<audio_manager::Sound> chunkCache(64);
 Cache<audio_manager::Music> musicCache(6);
 
 
@@ -176,14 +176,6 @@ void AudioManager::notificationOccured(String identifier, void * context)
 
 void AudioManager::clearSoundCache()
 {
-    if (!audio_supported) return;
-
-    while (!chunkCache.empty())
-    {
-        audio_manager::Sound *removed = chunkCache.removeOne();
-        if (removed)
-            delete removed;
-    }
 }
 
 void AudioManager::clearMusicCache()
@@ -197,21 +189,6 @@ void AudioManager::clearMusicCache()
             delete removed;
     }
 }
-
-#ifdef UNUSED
-static Mix_Chunk *CustomMix_LoadWAV(const char *fileName, int volume)
-{
-    if (!audio_supported) return NULL;
-
-    String filePath = theCommander->getDataPathManager().getPath(FilePath("sfx").combine(fileName));
-    Mix_Chunk *result;
-
-    result = Mix_LoadWAV(filePath);
-    if (result)
-      Mix_VolumeChunk (result, volume);
-    return result;
-}
-#endif
 
 void AudioManager::preloadMusic(const char *fileName)
 {
@@ -318,31 +295,20 @@ void AudioManager::music(const char *command)
 
 void AudioManager::preloadSound(const char *fileName, float volume)
 {
-    // if (!audio_supported) return;
-
-    if (chunkCache.contains(fileName)) return;
-
-    String filePath = theCommander->getDataPathManager().getPath(FilePath("sfx").combine(fileName));
-    audio_manager::Sound *chunk   = m_audioManager->loadSound(filePath);
-    //, (int)(volume * MIX_MAX_VOLUME));
-    audio_manager::Sound *removed = chunkCache.add(fileName, chunk);
-    if (removed)
-        delete removed;
+    theCommander->cacheSound(FilePath("sfx").combine(fileName));
 }
 
 void AudioManager::playSound(const char *fileName, float volume, float balance)
 {
-    //if ((!audio_supported) || (!sound_on)) return;
-
-    preloadSound(fileName, volume);
-    std::string c = fileName;
-    if (ios_fc::getTimeMs() - chunkCache.veryGetLastUse(c) < TIMEMS_BETWEEN_SAME_SOUND)
+    double currentTime = ios_fc::getTimeMs();
+    std::map<std::string, double>::iterator iter =
+        lastUsedTimestamp.find(fileName);
+    if ((iter != lastUsedTimestamp.end())
+        && (currentTime - iter->second < TIMEMS_BETWEEN_SAME_SOUND))
         return;
-
-    audio_manager::Sound *chunk = chunkCache.veryGet(c);
-    if (chunk != NULL) {
-        m_audioManager->playSound(chunk, volume, balance);
-    }
+    SoundRef sound   = theCommander->getSound(FilePath("sfx").combine(fileName));
+    m_audioManager->playSound(sound, volume, balance);
+    lastUsedTimestamp[fileName] = currentTime;
 }
 
 void AudioManager::musicVolume(float volume)
