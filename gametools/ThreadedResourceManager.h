@@ -6,37 +6,39 @@
 #include "ios_thread.h"
 #include "ios_mutex.h"
 
-template <typename T>
-class ThreadedResourceManager : public ResourceManager<T>, ios_fc::Runnable
+template <typename T, typename K=std::string>
+class ThreadedResourceManager
+    : public ResourceManager<T, K>, ios_fc::Runnable
 {
 private:
-    typedef typename std::map<std::string, ResourceHolder<T> * > ResourceMap;
+    typedef typename std::map<K, ResourceHolder<T> * > ResourceMap;
     ResourceMap m_resources;
-    std::vector<std::string> m_loadList;
+    std::vector<K> m_loadList;
     ios_fc::Thread m_backgroundThread;
     ios_fc::Mutex  m_loadListMutex, m_loadLockMutex, m_resourcesMutex;
 protected:
-    using ResourceManager<T>::m_factory;
+    using ResourceManager<T, K>::m_factory;
 public:
-    ThreadedResourceManager(ResourceFactory<T> &factory)
-        : ResourceManager<T>(factory), m_backgroundThread(this) {
+    ThreadedResourceManager(ResourceFactory<T, K> &factory)
+        : ResourceManager<T, K>(factory), m_backgroundThread(this) {
         m_loadLockMutex.lock();
         m_backgroundThread.run();
     }
-    virtual void cacheResource(const char *resourcePath) {
+    virtual void cacheResource(const K &resourceKey) {
         ios_fc::Lock lock(m_loadListMutex);
-        m_loadList.push_back(resourcePath);
+        m_loadList.push_back(resourceKey);
         m_loadLockMutex.unlock();
     }
-    virtual ResourceReference<T> getResource(const char *resourcePath)
+    virtual ResourceReference<T> getResource(const K &resourceKey)
     {
-        typename ResourceMap::iterator resIter = m_resources.find(resourcePath);
+        ios_fc::Lock lockResources(m_resourcesMutex);
+        typename ResourceMap::iterator resIter = m_resources.find(resourceKey);
         if (resIter == m_resources.end()) {
-            T *res = m_factory.create(resourcePath);
+            T *res = m_factory.create(resourceKey);
             if (res == NULL)
                 return ResourceReference<T>();
             ResourceHolder<T> *resHolder = new ResourceHolder<T>(res);
-            m_resources[resourcePath] = resHolder;
+            m_resources[resourceKey] = resHolder;
             return ResourceReference<T>(resHolder);
         }
         else {
@@ -46,20 +48,24 @@ public:
     virtual void run() {
         m_loadLockMutex.lock();
         {
-            ios_fc::Lock lock(m_loadListMutex);
-            for (std::vector<std::string>::iterator iter = m_loadList.begin() ;
-                 iter != m_loadList.end() ; iter++) {
-                std::string &resourcePath = *iter;
+            std::vector<K> loadListCopy;
+            {
+                ios_fc::Lock lock(m_loadListMutex);
+                loadListCopy = m_loadList;
+                m_loadList.clear();
+            }
+            for (typename std::vector<K>::iterator iter = loadListCopy.begin() ;
+                 iter != loadListCopy.end() ; iter++) {
+                K &resourceKey = *iter;
                 ios_fc::Lock lockResources(m_resourcesMutex);
-                if (m_resources.find(resourcePath) != m_resources.end())
+                if (m_resources.find(resourceKey) != m_resources.end())
                     continue;
-                T *res = m_factory.create(resourcePath.c_str());
+                T *res = m_factory.create(resourceKey);
                 if (res == NULL)
                     continue;
                 ResourceHolder<T> *resHolder = new ResourceHolder<T>(res);
-                m_resources[resourcePath] = resHolder;
+                m_resources[resourceKey] = resHolder;
             }
-            m_loadList.clear();
         }
     }
 };
