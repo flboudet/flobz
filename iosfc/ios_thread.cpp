@@ -31,12 +31,12 @@ namespace ios_fc {
     {
         this->owner = owner;
     }
-    
+
     void ThreadImpl::threadStartFunction()
     {
         owner->startFunction();
     }
-    
+
     void ThreadImpl::threadEndFunction()
     {
         if (owner != NULL)
@@ -44,25 +44,26 @@ namespace ios_fc {
         else
             delete(this);
     }
-    
-    
+
+
     ThreadImpl *ThreadFactory::proceedCreation(Thread *owner)
     {
         ThreadImpl *result = createThread();
         result->setOwner(owner);
         return result;
     }
-    
-    
+
+
     Thread::Thread() : isSelfContained(true), attachedRunnable(NULL), threadRunning(false)
     {
         impl = factory->proceedCreation(this);
     }
-    
+
     Thread::Thread(Runnable *runnable) : isSelfContained(false), attachedRunnable(runnable), threadRunning(false)
     {
+        impl = factory->proceedCreation(this);
     }
-    
+
     Thread::~Thread()
     {
         if (threadRunning)
@@ -70,7 +71,7 @@ namespace ios_fc {
         else
             delete impl;
     }
-    
+
     void Thread::launch()
     {
         if (!threadRunning) {
@@ -79,33 +80,33 @@ namespace ios_fc {
         }
         else throw Exception("Thread already running...");
     }
-    
+
     void Thread::cancel()
     {
         if (!threadRunning)
             throw Exception("Thread was not running...");
         impl->cancel();
     }
-    
+
     void Thread::detach()
     {
         if (!threadRunning)
             throw Exception("Thread was not running...");
         impl->detach();
     }
-    
+
     void Thread::join()
     {
         if (!threadRunning)
             throw Exception("Thread was not running...");
         impl->join();
     }
-    
+
     bool Thread::isRunning() const
     {
         return threadRunning;
     }
-    
+
     void Thread::startFunction()
     {
         threadRunning = true;
