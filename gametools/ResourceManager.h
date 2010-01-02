@@ -12,7 +12,8 @@ class ResourceHolder
 {
 public:
     ResourceHolder(T *res) : m_res(res), m_numRefs(0) {}
-private:
+    virtual ~ResourceHolder() {}
+protected:
     T *m_res;
     int m_numRefs;
     friend class ResourceReference<T>;
