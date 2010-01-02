@@ -105,7 +105,7 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
     }
 
 <INITIAL>"#RST_LINE#"             { currentGoomSL->num_lines = 0; }
-<INITIAL>"#FILE ".*"#"            { currentGoomSL->num_lines = 0; printf("%s\n", yytext); }
+<INITIAL>"#FILE ".*"#"            { currentGoomSL->num_lines = 0; }
 <INITIAL>"#"[^\n]*                { /* ignore preprocessor lines */ }
 
 <INITIAL>"/*"                { BEGIN C_COMMENT; }
