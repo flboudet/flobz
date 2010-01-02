@@ -12,6 +12,22 @@ DrawTarget *sstory;
 
 /* Implementation of the Styrolyse Client */
 
+void cachePicture(StyrolyseClient *_this, int mode, const char *path)
+{
+    ImageType type = (mode == 1 ? IMAGE_RGBA : IMAGE_RGB);
+    theCommander->cacheSurface(type, path);
+}
+
+void cacheSound(StyrolyseClient *_this, const char *path)
+{
+    theCommander->cacheSound(path);
+}
+
+void cacheMusic(StyrolyseClient *_this, const char *path)
+{
+    theCommander->cacheMusic(path);
+}
+
 static char *pathResolverFunction (StyrolyseClient *_this, const char *path)
 {
   try {
@@ -164,6 +180,9 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
     client.styroClient.music     = ::music;
     client.styroClient.playSound = ::playSound;
     client.styroClient.resolveFilePath = ::pathResolverFunction;
+    client.styroClient.cachePicture = ::cachePicture;
+    client.styroClient.cacheSound   = ::cacheSound;
+    client.styroClient.cacheMusic   = ::cacheMusic;
     client.widget = this;
 
     currentStory = styrolyse_new((const char *)fullPath, (StyrolyseClient *)(&client), fxMode);

@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 /* #define USE_SDL */
-  
+
 typedef struct _Styrolyse Styrolyse;
 typedef struct _StyrolyseClient StyrolyseClient;
 
@@ -22,6 +22,9 @@ struct _StyrolyseClient {
   void (*music) (StyrolyseClient *_this, const char *command);
   void (*playSound) (StyrolyseClient *_this, const char *fileName, int volume);
   char *(*resolveFilePath)(StyrolyseClient *_this, const char *file_name);
+  void (*cachePicture)(StyrolyseClient *_this, int mode, const char *path);
+  void (*cacheSound)(StyrolyseClient *_this, const char *path);
+  void (*cacheMusic)(StyrolyseClient *_this, const char *path);
 };
 
 void styrolyse_init(const char *styrolyse_path, const char *styrolyse_path_nofx, const char *styrolyse_path_fx);

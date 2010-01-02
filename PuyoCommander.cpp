@@ -5,8 +5,9 @@
 #include "preferences.h"
 #include "audio.h"
 #include "MainMenu.h"
-//#include "ThreadedResourceManager.h"
-
+#ifdef THREADED_RESOURCE_MANAGER
+#include "ThreadedResourceManager.h"
+#endif
 using namespace gameui;
 using namespace event_manager;
 
@@ -18,9 +19,17 @@ static const char * kFullScreenPref = "Config.FullScreen";
 static const char * kOpenGLPref     = "Config.OpenGL";
 #endif
 
+#ifdef PRODUCE_CACHE_FILE
+FILE *cacheOutputGsl;
+#endif
+
 IosSurface *IosSurfaceFactory::create(const IosSurfaceResourceKey &resourceKey)
 {
     try {
+#ifdef PRODUCE_CACHE_FILE
+        fprintf(cacheOutputGsl, "  [cache_picture: path=\"%s\" mode=%d]\n",
+                resourceKey.path.c_str(), resourceKey.type);
+#endif
         String fullPath = m_dataPathManager.getPath(resourceKey.path.c_str());
         ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
         IosSurface *newSurface = iimLib.loadImage(resourceKey.type, fullPath, resourceKey.specialAbility);
@@ -41,6 +50,9 @@ void IosSurfaceFactory::destroy(IosSurface *res)
 audio_manager::Sound * SoundFactory::create(const std::string &path)
 {
     try {
+#ifdef PRODUCE_CACHE_FILE
+        fprintf(cacheOutputGsl, "  [cache_sound: path=\"%s\"]\n", path.c_str());
+#endif
         String fullPath = m_dataPathManager.getPath(path.c_str());
         audio_manager::Sound *newSound = GameUIDefaults::GAME_LOOP->getAudioManager()->loadSound(fullPath);
         return newSound;
@@ -58,6 +70,9 @@ void SoundFactory::destroy(audio_manager::Sound *res)
 audio_manager::Music * MusicFactory::create(const std::string &path)
 {
     try {
+#ifdef PRODUCE_CACHE_FILE
+        fprintf(cacheOutputGsl, "  [cache_music: path=\"%s\"]\n", path.c_str());
+#endif
         String fullPath = m_dataPathManager.getPath(path.c_str());
         audio_manager::Music *newMusic = GameUIDefaults::GAME_LOOP->getAudioManager()->loadMusic(fullPath);
         return newMusic;
@@ -96,6 +111,9 @@ PuyoCommander::PuyoCommander(String dataDir, int maxDataPackNumber)
     m_musicFactory(dataPathManager),
     m_cursor(NULL)
 {
+#ifdef PRODUCE_CACHE_FILE
+  cacheOutputGsl = fopen("cache.gsl", "w");
+#endif
   loop = GameUIDefaults::GAME_LOOP;
   mbox = NULL;
   theCommander = this;
@@ -317,8 +335,13 @@ void PuyoCommander::setCursorVisible(bool visible)
 
 void PuyoCommander::createResourceManagers()
 {
+#ifdef THREADED_RESOURCE_MANAGER
+    m_surfaceResManager.reset(new ThreadedResourceManager<IosSurface, IosSurfaceResourceKey>(m_surfaceFactory));
+    m_soundResManager.reset(new ThreadedResourceManager<audio_manager::Sound>(m_soundFactory));
+    m_musicResManager.reset(new ThreadedResourceManager<audio_manager::Music>(m_musicFactory));
+#else
     m_surfaceResManager.reset(new SimpleResourceManager<IosSurface, IosSurfaceResourceKey>(m_surfaceFactory));
-    //m_surfaceResManager.reset(new ThreadedResourceManager<IosSurface>(m_surfaceFactory));
     m_soundResManager.reset(new SimpleResourceManager<audio_manager::Sound>(m_soundFactory));
     m_musicResManager.reset(new SimpleResourceManager<audio_manager::Music>(m_musicFactory));
+#endif
 }

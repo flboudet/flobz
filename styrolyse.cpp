@@ -15,7 +15,7 @@ struct _Styrolyse {
 
   char fname[512];
   GoomSL *gsl;
-  
+
   /* client app */
   StyrolyseClient *client;
 
@@ -75,16 +75,16 @@ void put_text(GoomSL *gsl, GoomHash *global, GoomHash *local)
   {
     // if end of src or dst string, break
     if ( (text[m] == 0) || ((size_t)m >= sizeof(txt) - 1) ) break;
-    
+
     // test for new character
     if ((text[m] & 0xC0) != 0x80) n++;
-    
+
     // if not needed, break
     if (n>i) break;
-    
+
     // copy byte
     txt[m]=text[m];
-      
+
     // Next byte
     m++;
   }
@@ -102,7 +102,7 @@ Vec2 global_sprite_get_position(GoomSL *gsl, const char *name)
   Vec2 v;
   v.x = 0.0;
   v.y = 0.0;
-  
+
   if (strcmp(name, "none") == 0) return v;
 
   char *vx_s = (char*)malloc(strlen(name)+7);
@@ -129,7 +129,7 @@ Vec2 global_sprite_get_position(GoomSL *gsl, const char *name)
   {
     fprintf(stderr, "STYROLYSE: INVALID PARENT, '%s'\n", name);
   }
-  
+
   free(vx_s);
   free(vy_s);
   free(parent_s);
@@ -152,7 +152,7 @@ void styro_sound(GoomSL *gsl, GoomHash *global, GoomHash *local)
 void styro_gettext(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
     static bool firstTime = true;
-    
+
     const char *text = styrolyse->client->getText(styrolyse->client, (const char *)GSL_LOCAL_PTR  (gsl, local, "text"));
 
     int *globalPtrReturn = (int*)goom_hash_get(gsl_globals(gsl), "gettext")->ptr;
@@ -165,6 +165,25 @@ void styro_gettext(GoomSL *gsl, GoomHash *global, GoomHash *local)
     int newPtrId = gsl_malloc(gsl, strlen(text)+1); // allocate a new pointer (should we allow realloc?)
     strcpy((char*)gsl_get_ptr(gsl, newPtrId), text);
     *globalPtrReturn = newPtrId;
+}
+
+void styro_cache_picture(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    const char *path = (const char *)GSL_LOCAL_PTR(gsl, local, "path");
+    int mode = GSL_LOCAL_INT(gsl, local, "mode");
+    styrolyse->client->cachePicture(styrolyse->client, mode, path);
+}
+
+void styro_cache_sound(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    const char *path = (const char *)GSL_LOCAL_PTR(gsl, local, "path");
+    styrolyse->client->cacheSound(styrolyse->client, path);
+}
+
+void styro_cache_music(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    const char *path = (const char *)GSL_LOCAL_PTR(gsl, local, "path");
+    styrolyse->client->cacheMusic(styrolyse->client, path);
 }
 
 void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
@@ -216,6 +235,9 @@ static void sbind(GoomSL *gsl)
 {
   gsl_bind_function(gsl, "draw",     sprite_draw);
   gsl_bind_function(gsl, "gettext",  styro_gettext);
+  gsl_bind_function(gsl, "cache_picture", styro_cache_picture);
+  gsl_bind_function(gsl, "cache_sound",   styro_cache_sound);
+  gsl_bind_function(gsl, "cache_music",   styro_cache_music);
   gsl_bind_function(gsl, "mod",      styro_mod);
   gsl_bind_function(gsl, "music",    styro_music);
   gsl_bind_function(gsl, "put_text", put_text);
