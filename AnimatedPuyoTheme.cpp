@@ -1073,19 +1073,13 @@ AnimatedPuyoThemeManager::AnimatedPuyoThemeManager(bool useAltLocation)
     globalManager = this;
 
     // List the themes in the various pack folders
-    SelfVector<String> themeFolders;
-    //for (int i = 0 ; i < theCommander->getDataPathManager().getNumPacks() ; i++) {
-    //    getThemeListInPath(theCommander->getDataPathManager().getPathInPack("theme", i), themeFolders);
-    //}
-    themeFolders.add("theme/iPhoneDefault.fptheme");
-    //themeFolders.add("theme/Reduced.fptheme");
-
-    // Load the themes from the list
+    SelfVector<String> themeFolders = theCommander->getDataPathManager().getEntriesAtPath("theme");
+    // Load the themes from the list (only those matching the correct extension)
     for (int i = 0 ; i < themeFolders.size() ; i++) {
-#ifdef DEBUG_THEMES
-        printf("Loading theme %s\n", (const char *)themeFolders[i]);
-#endif
-        loadTheme(themeFolders[i]);
+        if (themeFolders[i].substring(themeFolders[i].size() - 8)
+            == themeFolderExtension) {
+            loadTheme(themeFolders[i]);
+        }
     }
 }
 
@@ -1275,18 +1269,3 @@ AdvancedBuffer<PuyoLevelTheme *> * AnimatedPuyoThemeManager::getPuyoLevelThemeOb
 {
   return &themes;
 }
-
-void AnimatedPuyoThemeManager::getThemeListInPath(const char *path, SelfVector<String> &resultVector) const
-{
-    FilePath filePath(path);
-    if (!filePath.exists())
-        return;
-    SelfVector<String> pathContent = filePath.listFiles();
-    for (int i = 0 ; i < pathContent.size() ; i++) {
-        String currentPath = pathContent[i];
-        if (strstr(currentPath, themeFolderExtension) != NULL) {
-            resultVector.add(FilePath::combine(path, currentPath));
-        }
-    }
-}
-

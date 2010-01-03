@@ -281,7 +281,6 @@ public:
     void addLevel(PuyoLevelTheme *);
 
 private:
-    void getThemeListInPath(const char *path, SelfVector<String> &resultVector) const;
     AdvancedBuffer<const char *> themeList;
     AdvancedBuffer<const char *> puyoSetList;
 

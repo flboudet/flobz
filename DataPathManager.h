@@ -34,7 +34,8 @@ class DataPathManager {
 public:
     DataPathManager(String coreDataPath);
     String getPath(String shortPath) const;
-    String getPathInPack(String shortPath, int packPathIndex) const { return m_dataPaths[packPathIndex].combine(shortPath); }
+    String getPathInPack(String shortPath, int packPathIndex) const;
+    SelfVector<String> getEntriesAtPath(String shortPath) const;
     int getNumPacks() const { return m_dataPaths.size(); }
     void setMaxPackNumber(int maxPackNumber);
 private:

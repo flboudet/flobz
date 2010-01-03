@@ -64,18 +64,37 @@ DataPathManager::DataPathManager(String coreDataPath) : m_coreDataPath(coreDataP
 
 String DataPathManager::getPath(String shortPath) const
 {
-#ifdef FLOBOPUYODEBUG
-    printf("Recherche de %s\n", (const char *)shortPath);
-#endif
     for (int i = 0 ; i < m_dataPaths.size() ; i++) {
-#ifdef FLOBOPUYODEBUG
-        printf("Dans %s\n", (const char *)(m_dataPaths[i].getPathString()));
-#endif
         FilePath testPath(m_dataPaths[i].combine(shortPath));
         if (testPath.exists())
             return testPath.getPathString();
     }
     throw Exception(String("File ") + shortPath + " not found !");
+}
+
+String DataPathManager::getPathInPack(String shortPath, int packPathIndex) const
+{
+    FilePath testPath(m_dataPaths[packPathIndex].combine(shortPath));
+    if (testPath.exists())
+        return testPath.getPathString();
+    throw Exception(String("File ") + shortPath + " not found !");
+}
+
+SelfVector<String> DataPathManager::getEntriesAtPath(String shortPath) const
+{
+    FilePath rshortPath(shortPath);
+    SelfVector<String> result;
+    for (int i = 0 ; i < m_dataPaths.size() ; i++) {
+        FilePath testPath(m_dataPaths[i].combine(shortPath));
+        if (testPath.exists()) {
+            SelfVector<String> existingFilesInPack = testPath.listFiles();
+            for (int j = 0 ; j < existingFilesInPack.size() ; j++)
+            {
+                result.add(rshortPath.combine(existingFilesInPack[j]));
+            }
+        }
+    }
+    return result;
 }
 
 void DataPathManager::setMaxPackNumber(int maxPackNumber)
