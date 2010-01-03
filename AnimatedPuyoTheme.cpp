@@ -94,9 +94,10 @@ static bool loadPictureAt(const char * path, IosSurfaceRef &dst, const char * fa
 
 static bool loadPictureWithOffset(const char * path, IosSurface ** dst, const char * fallback, float offset)
 {
-    IosSurfaceRef tmp = theCommander->getSurface(IMAGE_RGBA, path);
+    IosSurfaceRef tmp = theCommander->getSurface(IMAGE_RGBA, path, IMAGE_READ); // TODO Drop CPU buffer when fini avec lui
+    // TODO 2 pour que ca soit propre, creer l'ability: IMAGE_HSV_OPERATIONS
     if (tmp.empty())
-        tmp = theCommander->getSurface(IMAGE_RGBA, fallback);
+        tmp = theCommander->getSurface(IMAGE_RGBA, fallback, IMAGE_READ);
     if (tmp.empty())
         return false;
     *dst = tmp.get()->shiftHue(offset);
@@ -1076,8 +1077,8 @@ AnimatedPuyoThemeManager::AnimatedPuyoThemeManager(bool useAltLocation)
     //for (int i = 0 ; i < theCommander->getDataPathManager().getNumPacks() ; i++) {
     //    getThemeListInPath(theCommander->getDataPathManager().getPathInPack("theme", i), themeFolders);
     //}
-    themeFolders.add("theme/Classic.fptheme");
-    themeFolders.add("theme/Reduced.fptheme");
+    themeFolders.add("theme/iPhoneDefault.fptheme");
+    //themeFolders.add("theme/Reduced.fptheme");
 
     // Load the themes from the list
     for (int i = 0 ; i < themeFolders.size() ; i++) {
