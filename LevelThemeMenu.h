@@ -48,8 +48,8 @@ class LevelThemePicturePreview : public Widget, public IdleComponent {
 
     private:
       String label;
-      IosSurface * picture;
-      IosSurface * lilback;
+      std::auto_ptr<IosSurface> picture;
+      std::auto_ptr<IosSurface> lilback;
       double offsetX;
       double offsetY;
       bool shouldRecache;

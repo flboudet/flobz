@@ -126,20 +126,17 @@ LevelThemePicturePreview::LevelThemePicturePreview()
       shouldRecache = true;
       shouldResize = true;
       curTheme = NULL;
-      picture = lilback = NULL;
       setPreferedSize(Vec3(ONELEVELX, ONELEVELY, 1.0));
 }
 
 LevelThemePicturePreview::~LevelThemePicturePreview()
 {
-      if (lilback != NULL) delete lilback;
-      if (picture != NULL) delete picture;
 }
 
 void LevelThemePicturePreview::draw(DrawTarget *dt)
 {
 	updatePicture(dt);
-    if (lilback != NULL)
+    if (lilback.get() != NULL)
     {
       IosRect r;
       Vec3 size = getSize();
@@ -148,60 +145,56 @@ void LevelThemePicturePreview::draw(DrawTarget *dt)
       r.y = (int16_t)(pos.y+offsetY);
       r.w = (int16_t)(size.x);
       r.h = (int16_t)(size.y);
-      dt->draw(lilback, NULL, &r);
+      dt->draw(lilback.get(), NULL, &r);
     }
 }
 
 void LevelThemePicturePreview::updatePicture(DrawTarget *dt)
 {
-    // TODO: Fix
-#ifdef DISABLED
-    if ((curTheme != NULL) && (shouldRecache == true))
-    {
-      if (picture != NULL) delete picture;
-      IosRect r;
-      // TODO : Draw the oponent.
-      // Background
-      picture = iim_surface_duplicate(curTheme->getBackground());
-      // Grids
-      IosSurface * grid = curTheme->getGrid();
-      if (grid != NULL) {
-	r.x = 21;
-	r.y = -1;
-	r.w = grid->w;
-	r.h = grid->h;
-	IIM_BlitSurface(grid, NULL, picture->surf, &r);
-	r.x = 407;
-	r.y = -1;
-	IIM_BlitSurface(grid, NULL, picture->surf, &r);
-      }
-      // Speed meter
-      IIM_Surface * speedFront = curTheme->getSpeedMeter(true);
-      IIM_Surface * speedBack  = curTheme->getSpeedMeter(false);
-      r.x = curTheme->getSpeedMeterX() - speedBack->w / 2;
-      r.y = curTheme->getSpeedMeterY() - speedBack->h;
-      r.w = speedBack->w;
-      r.h = speedBack->h;
-      IIM_Rect r2;
-      IIM_BlitSurface(speedBack, NULL, picture->surf, &r);
-      r2.x = 0;
-      r2.y = speedFront->h/2;
-      r2.w = speedFront->w;
-      r2.h = speedFront->h/2;
-      r.y += speedFront->h/2;
-      IIM_BlitSurface(speedFront, &r2, picture->surf, &r);
-      shouldRecache = false;
-      shouldResize = true;
+    if ((curTheme != NULL) && (shouldRecache == true)) {
+        ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
+        IosSurface *background = curTheme->getBackground();
+        picture.reset(iimLib.createImage(IMAGE_RGB, background->w, background->h));
+        // Draw background
+        picture->draw(background, NULL, NULL);
+        // Draw Grids
+        IosRect r;
+        IosSurface *grid = curTheme->getGrid();
+        if (grid != NULL) {
+            r.x = 21;
+            r.y = -1;
+            r.w = grid->w;
+            r.h = grid->h;
+            picture->draw(grid, NULL, &r);
+            r.x = 407;
+            r.y = -1;
+            picture->draw(grid, NULL, &r);
+        }
+        // Speed meter
+        IosSurface *speedFront = curTheme->getSpeedMeter(true);
+        IosSurface *speedBack  = curTheme->getSpeedMeter(false);
+        r.x = curTheme->getSpeedMeterX() - speedBack->w / 2;
+        r.y = curTheme->getSpeedMeterY() - speedBack->h;
+        r.w = speedBack->w;
+        r.h = speedBack->h;
+        IosRect r2;
+        picture->draw(speedBack, NULL, &r);
+        r2.x = 0;
+        r2.y = speedFront->h/2;
+        r2.w = speedFront->w;
+        r2.h = speedFront->h/2;
+        r.y += speedFront->h/2;
+        picture->draw(speedFront, &r2, &r);
+        // Set status indicators
+        shouldRecache = false;
+        shouldResize = true;
     }
-
-    if ((shouldResize) && (picture!=NULL))
-    {
-      if (lilback != NULL) IIM_Free(lilback);
-	  Vec3 s=getSize();
-      lilback = iim_surface_resize(picture,(int)s.x,(int)s.y);
-      shouldResize = false;
+    if ((shouldResize) && (picture.get() != NULL)) {
+        // Scale down
+        Vec3 s=getSize();
+        lilback.reset(picture->resizeAlpha((int)s.x,(int)s.y));
+        shouldResize = false;
     }
-#endif
 }
 
 void LevelThemePicturePreview::themeSelected(PuyoLevelTheme * theme)
