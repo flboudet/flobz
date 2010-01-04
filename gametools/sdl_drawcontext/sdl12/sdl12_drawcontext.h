@@ -21,6 +21,7 @@ public:
     virtual void drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
     virtual void drawRotatedCentered(IosSurface *surf, int angle, int x, int y);
     virtual void setClipRect(IosRect *rect);
+    virtual void setBlendMode(ImageBlendMode mode);
     virtual void fillRect(const IosRect *rect, const RGBA &color);
     virtual void putString(IosFont *font, int x, int y, const char *text);
 public:
@@ -42,6 +43,7 @@ public:
     SDL_Surface *m_surf;
     SDL_Surface *m_flippedSurf;
     SDL_Surface *m_rotated[36];
+    ImageBlendMode m_blendMode;
 };
 
 class SDL12_ImageLibrary : public ImageLibrary
@@ -68,6 +70,7 @@ public:
     virtual void drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
     virtual void drawRotatedCentered(IosSurface *surf, int angle, int x, int y);
     virtual void setClipRect(IosRect *rect);
+    virtual void setBlendMode(ImageBlendMode mode);
     virtual void fillRect(const IosRect *rect, const RGBA &color);
     virtual void putString(IosFont *font, int x, int y, const char *text);
     // Specific methods
@@ -76,6 +79,7 @@ private:
     void initDisplay(bool fullscreen);
 
     std::string m_caption;
+    ImageBlendMode m_blendMode;
     SDL_Surface *display;
     SDL12_ImageLibrary m_imageLib;
 };

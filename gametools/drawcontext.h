@@ -11,6 +11,11 @@ enum ImageType {
 	IMAGE_RGB = 2
 };
 
+enum ImageBlendMode {
+    IMAGE_COPY,
+    IMAGE_BLEND
+};
+
 // Image Special Powers (Abilities)
 typedef int ImageSpecialAbility;
 const ImageSpecialAbility IMAGE_NO_ABILITY = 0;
@@ -79,6 +84,7 @@ public:
     virtual ~DrawTarget() {}
 
     virtual void setClipRect(IosRect *rect) = 0;
+    virtual void setBlendMode(ImageBlendMode mode) = 0;
 
     virtual void draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect) = 0;
     virtual void drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect) = 0;
@@ -105,7 +111,6 @@ public:
             throw ios_fc::Exception("IosSurface forbidden deletion");
     }
 public:
-    //virtual void setAlpha(unsigned char alpha) = 0;
 	virtual bool isOpaque() const = 0;
 
 	virtual bool haveAbility(int ability) const = 0;

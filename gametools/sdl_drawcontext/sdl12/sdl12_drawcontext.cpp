@@ -74,12 +74,16 @@ int SplitString(const string& input,
 }
 
 // DrawTarget common functions for SDL12_IosSurface and SDL12_DrawContext
-inline static void renderCopy_(SDL_Surface *dest, IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
+inline static void renderCopy_(SDL_Surface *dest, IosSurface *surf, IosRect *srcRect, IosRect *dstRect, ImageBlendMode blendMode=IMAGE_BLEND)
 {
     SDL_Rect sSrcRect, sDstRect;
     SDL12_IosSurface *sSurf = static_cast<SDL12_IosSurface *>(surf);
+    if (blendMode == IMAGE_COPY)
+        SDL_SetAlpha(sSurf->m_surf, SDL_RLEACCEL, SDL_ALPHA_OPAQUE);
     SDL_BlitSurface(sSurf->m_surf, IOSRECTPTR_TO_SDL(srcRect, sSrcRect),
                     dest, IOSRECTPTR_TO_SDL(dstRect, sDstRect));
+    if (blendMode == IMAGE_COPY)
+        SDL_SetAlpha(sSurf->m_surf, SDL_SRCALPHA | SDL_RLEACCEL, SDL_ALPHA_OPAQUE);
     // Ugly fix
     if (dest != globalDisplay) {
         SDL_Rect emptyRect = {0, 0, 1, 1};
@@ -183,7 +187,7 @@ IosSurface *SDL12_IosFont::createSurface(SDL_Surface *src)
 // IosSurface implementation
 
 SDL12_IosSurface::SDL12_IosSurface(SDL_Surface *surf)
-    : m_surf(surf), m_flippedSurf(NULL)
+    : m_surf(surf), m_flippedSurf(NULL), m_blendMode(IMAGE_BLEND)
 {
     w = m_surf->w;
     h = m_surf->h;
@@ -207,7 +211,7 @@ SDL12_IosSurface::~SDL12_IosSurface()
 
 void SDL12_IosSurface::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
-    renderCopy_(m_surf, surf, srcRect, dstRect);
+    renderCopy_(m_surf, surf, srcRect, dstRect, m_blendMode);
 }
 
 void SDL12_IosSurface::drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
@@ -223,6 +227,11 @@ void SDL12_IosSurface::drawRotatedCentered(IosSurface *surf, int angle, int x, i
 void SDL12_IosSurface::setClipRect(IosRect *rect)
 {
     setClipRect_(m_surf, rect);
+}
+
+void SDL12_IosSurface::setBlendMode(ImageBlendMode mode)
+{
+    m_blendMode = mode;
 }
 
 void SDL12_IosSurface::fillRect(const IosRect *rect, const RGBA &color)
@@ -320,13 +329,20 @@ IosSurface * SDL12_ImageLibrary::loadImage(ImageType type, const char *path, Ima
     if (tmpsurf==NULL) {
         return NULL;
     }
-    retsurf = SDL_DisplayFormatAlpha(tmpsurf);
+    switch (type) {
+    case IMAGE_RGB:
+        retsurf = SDL_DisplayFormat(tmpsurf);
+        break;
+    case IMAGE_RGBA:
+    default:
+        retsurf = SDL_DisplayFormatAlpha(tmpsurf);
+    }
     if (retsurf==NULL) {
         perror("Texture conversion failed (is Display initialized?)\n");
         SDL_FreeSurface (tmpsurf);
         return NULL;
     }
-    SDL_SetAlpha (retsurf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
+    SDL_SetAlpha (retsurf, SDL_SRCALPHA | SDL_RLEACCEL, SDL_ALPHA_OPAQUE);
     SDL_FreeSurface (tmpsurf);
     return new SDL12_IosSurface(retsurf);
 }
@@ -341,7 +357,7 @@ IosFont *SDL12_ImageLibrary::createFont(const char *path, int size, IosFontFx fx
 // DrawContext implementation
 
 SDL12_DrawContext::SDL12_DrawContext(int w, int h, bool fullscreen, const char *caption)
-  : m_caption(caption)
+  : m_caption(caption), m_blendMode(IMAGE_BLEND)
 {
     this->h = h;
     this->w = w;
@@ -421,7 +437,7 @@ ImageLibrary & SDL12_DrawContext::getImageLibrary()
 // DrawTarget implementation
 void SDL12_DrawContext::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
-    renderCopy_(display, surf, srcRect, dstRect);
+    renderCopy_(display, surf, srcRect, dstRect, m_blendMode);
 }
 
 void SDL12_DrawContext::drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
@@ -442,6 +458,11 @@ void SDL12_DrawContext::fillRect(const IosRect *rect, const RGBA &color)
 void SDL12_DrawContext::setClipRect(IosRect *rect)
 {
     setClipRect_(display, rect);
+}
+
+void SDL12_DrawContext::setBlendMode(ImageBlendMode mode)
+{
+    m_blendMode = mode;
 }
 
 void SDL12_DrawContext::putString(IosFont *font, int x, int y, const char *text)

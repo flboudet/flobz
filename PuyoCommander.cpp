@@ -149,13 +149,13 @@ void PuyoCommander::initWithGUI(bool fs)
   m_leftArrow = getSurface(IMAGE_RGBA, "gfx/leftarrow.png");
   m_rightArrow = getSurface(IMAGE_RGBA, "gfx/rightarrow.png");
 
-  m_frameImage = getSurface(IMAGE_RGB, "gfx/frame.png");
-  m_buttonIdleImage = getSurface(IMAGE_RGB, "gfx/button.png");
-  m_buttonDownImage = getSurface(IMAGE_RGB, "gfx/buttondown.png");
-  m_buttonOverImage = getSurface(IMAGE_RGB, "gfx/buttonover.png");
-  m_textFieldIdleImage = getSurface(IMAGE_RGB, "gfx/editfield.png");
-  m_separatorImage = getSurface(IMAGE_RGB, "gfx/separator.png");
-  m_listIdleImage = getSurface(IMAGE_RGB, "gfx/listborder.png");
+  m_frameImage = getSurface(IMAGE_RGBA, "gfx/frame.png");
+  m_buttonIdleImage = getSurface(IMAGE_RGBA, "gfx/button.png");
+  m_buttonDownImage = getSurface(IMAGE_RGBA, "gfx/buttondown.png");
+  m_buttonOverImage = getSurface(IMAGE_RGBA, "gfx/buttonover.png");
+  m_textFieldIdleImage = getSurface(IMAGE_RGBA, "gfx/editfield.png");
+  m_separatorImage = getSurface(IMAGE_RGBA, "gfx/separator.png");
+  m_listIdleImage = getSurface(IMAGE_RGBA, "gfx/listborder.png");
 
   m_windowFramePicture->setFrameSurface(m_frameImage);
   m_buttonIdleFramePicture->setFrameSurface(m_buttonIdleImage);

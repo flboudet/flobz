@@ -57,11 +57,7 @@ void FramePicture::render(DrawTarget *surf) const
   if (m_frameSurface != NULL) {
     int surfW = surf->w;
     int surfH = surf->h;
-    if(m_frameSurface->isOpaque() != true) {
-		//->setAlpha(IOS_ALPHA_OPAQUE);
-		fprintf(stderr, "WARNING: FramePicture not opaque: %s\n", m_frameSurface->name.c_str());
-		assert(m_frameSurface->isOpaque() == true);
-	}
+    surf->setBlendMode(IMAGE_COPY);
     // Draw the corners first
     // Top left corner
     IosRect src_rect = {0, 0, m_leftW, m_topH};
