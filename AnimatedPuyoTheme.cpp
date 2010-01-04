@@ -73,6 +73,7 @@ String GlobalCurrentPath;
 #define NOT_IMPLEMENTED { fprintf(stderr,"Not Implemented __FILE__ __LINE__"); }
 #define CACHE_IT_OR_DIE { if (_cached == false) { if (cache() == false) exit(0); } }
 #define ADD_PICTURE(A) { bool tmp = loadPictureAt(path,A,defpath); OK = OK && tmp; if (tmp == false) fprintf(stderr,"Unable to load %s\n",(char *)path); }
+#define ADD_MODIFIABLE_PICTURE(A) { bool tmp = loadPictureAt(path,A,defpath, IMAGE_READ); OK = OK && tmp; if (tmp == false) fprintf(stderr,"Unable to load %s\n",(char *)path); }
 #define LOG { fprintf(stderr,"Logged __FILE__ __LINE__"); }
 
 #ifdef DEBUG_THEMES
@@ -83,11 +84,11 @@ String GlobalCurrentPath;
 #define ASSERT_RANGE(min,max,value) { }
 #endif
 
-static bool loadPictureAt(const char * path, IosSurfaceRef &dst, const char * fallback)
+static bool loadPictureAt(const char * path, IosSurfaceRef &dst, const char * fallback, int specialAbility = 0)
 {
-    IosSurfaceRef tmp = theCommander->getSurface(IMAGE_RGBA, path);
+    IosSurfaceRef tmp = theCommander->getSurface(IMAGE_RGBA, path, specialAbility);
     if (tmp.empty())
-        tmp = theCommander->getSurface(IMAGE_RGBA, fallback);
+        tmp = theCommander->getSurface(IMAGE_RGBA, fallback, specialAbility);
     dst = tmp;
     return (! tmp.empty());
 }
@@ -536,7 +537,7 @@ bool StandardAnimatedPuyoTheme::cache(void)
     }
     snprintf(path, sizeof(path), "%s/%s-puyo-border.png",fullPath,_face);
     snprintf(defpath, sizeof(defpath), "%s/%s-puyo-border.png",DEFAULTPATH(),_face);
-    ADD_PICTURE(_puyoOriginalCircle);
+    ADD_MODIFIABLE_PICTURE(_puyoOriginalCircle);
     _puyoCircles[0][0] = _puyoOriginalCircle;
     for (int i = 1; i<NUMBER_OF_PUYO_CIRCLES; i++)
     {

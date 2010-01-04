@@ -22,13 +22,13 @@ StatsResources::StatsResources()
     ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
     res = this;
     rope_elt = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/rope.png");
-    ring_left = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/ring.png");
+    ring_left = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/ring.png", IMAGE_READ);
     ring_right.reset(ring_left.get()->mirrorH());
     ring_right.reset(ring_left.get()->mirrorH());
-    originalPuyoLeft[0] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_1.png");
-    originalPuyoLeft[1] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_2.png");
-    originalPuyoLeft[2] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_3.png");
-    originalPuyoLeft[3] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_4.png");
+    originalPuyoLeft[0] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_1.png", IMAGE_READ);
+    originalPuyoLeft[1] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_2.png", IMAGE_READ);
+    originalPuyoLeft[2] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_3.png", IMAGE_READ);
+    originalPuyoLeft[3] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_4.png", IMAGE_READ);
     puyo_left[0][0] = originalPuyoLeft[0];
     puyo_left[0][1] = originalPuyoLeft[1];
     puyo_left[0][2] = originalPuyoLeft[2];
