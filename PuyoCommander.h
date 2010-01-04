@@ -147,6 +147,13 @@ class PuyoCommander
   protected:
     // Resource manager factory
     virtual void createResourceManagers();
+    // Resource Managers
+    IosSurfaceFactory m_surfaceFactory;
+    std::auto_ptr<IosSurfaceResourceManager> m_surfaceResManager;
+    SoundFactory m_soundFactory;
+    std::auto_ptr<SoundResourceManager> m_soundResManager;
+    MusicFactory m_musicFactory;
+    std::auto_ptr<MusicResourceManager> m_musicResManager;    
   private:
 
     friend class SinglePlayerGameAction;
@@ -160,13 +167,6 @@ class PuyoCommander
     void initFonts();
 
     DataPathManager dataPathManager;
-    // Resource Managers
-    IosSurfaceFactory m_surfaceFactory;
-    std::auto_ptr<IosSurfaceResourceManager> m_surfaceResManager;
-    SoundFactory m_soundFactory;
-    std::auto_ptr<SoundResourceManager> m_soundResManager;
-    MusicFactory m_musicFactory;
-    std::auto_ptr<MusicResourceManager> m_musicResManager;
 
     MessageBox *mbox;
     GameLoop   *loop;
