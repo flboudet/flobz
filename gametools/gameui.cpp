@@ -793,6 +793,7 @@ namespace gameui {
             IosRect rect;
             rect.x = (int16_t)getPosition().x - (bg->w - getSize().x)/2;
             rect.y = (int16_t)getPosition().y - (bg->h - getSize().y)/2;
+            rect.h = bg->h; rect.w = bg->w;
             dt->draw(bg, NULL, &rect);
         }
         ZBox::draw(dt);
