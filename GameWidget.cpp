@@ -243,7 +243,8 @@ void GameWidget::cycle()
 
 void GameWidget::drawBackground(DrawTarget *dt)
 {
-    dt->draw(attachedLevelTheme->getBackground(), NULL, NULL);
+    IosRect dtRect = { 0, 0, dt->w, dt->h };
+    dt->draw(attachedLevelTheme->getBackground(), &dtRect, &dtRect);
 }
 
 void GameWidget::drawGameAreas(DrawTarget *dt)
