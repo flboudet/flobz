@@ -298,7 +298,7 @@ bool GameLoop::isLate(double currentTime) const
   return false;
 }
 
-void GameLoop::draw()
+void GameLoop::draw(bool flip)
 {
   DrawContext *dc = getDrawContext();
   if (dc == NULL) return;
@@ -309,6 +309,8 @@ void GameLoop::draw()
     else
         printf("INVALID DRAWABLE\n");
   }
+  if (!flip)
+      return;
   if (m_dc != NULL) m_dc->flip();
 }
 

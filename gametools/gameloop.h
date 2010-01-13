@@ -119,7 +119,7 @@ class GameLoop
     bool moveToBack(DrawableComponent *gc);
 
     void idle(double currentTime);
-    void draw();
+    void draw(bool flip = true);
 
     bool drawRequested() const;
     bool isLate(double currentTime) const;
