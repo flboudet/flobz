@@ -967,8 +967,8 @@ bool PuyoLevelTheme::cache(void)
     }
 
     // BACKGROUND
-    snprintf(path, sizeof(path), "%s/%s-background.jpg",fullPath,_background);
-    snprintf(defpath, sizeof(defpath), "%s/%s-background.jpg",DEFAULTPATH(),_background);
+    snprintf(path, sizeof(path), "%s/%s",fullPath,_background);
+    snprintf(defpath, sizeof(defpath), "%s/%s",DEFAULTPATH(),_background);
     ADD_PICTURE(_levelBackground)
 
     // GRID
