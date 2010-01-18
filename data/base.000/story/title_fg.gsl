@@ -22,6 +22,9 @@ float @kaoriDestX
   @isFullScreen = 1
   flying_flobo_init
 
+  # Cache resources for future use
+import <cache.gsl>
+
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
   # This also allows you to specify the drawing order
@@ -71,5 +74,5 @@ float @kaoriDestX
     music: command="network menu"
   }
   move::@kaori   fcycle=@kaoriMovesFCycle      x=@kaoriDestX y=@kaori.pos.y
-  
+
   (@cycle = 1000)? @finished = 1

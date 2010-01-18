@@ -41,13 +41,13 @@ external <end_level>
 
 <start_description>
     author = "iOS-Software"
-    
+
 <end_description>
 
 <start_puyoset>
     puyoset.name        = "Unamed"
     puyoset.description = "Some puyos..."
-    
+
     puyoset.P1.face      = "round"
     puyoset.P1.offset    = 0.0
     puyoset.P1.eye       = "normal"
@@ -78,8 +78,8 @@ external <end_level>
 <start_level>
     level.name          = "Unamed"
     level.description   = "Somewhere..."
-    
-    level.background    = "columns"
+
+    level.background    = "columns-background.jpg"
     level.speedmeter    = "fire"
     level.lives         = "heart"
     level.grid          = "metal"

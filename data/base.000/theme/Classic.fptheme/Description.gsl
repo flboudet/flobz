@@ -58,6 +58,6 @@
 [start_level]
     level.name          = "Basic level"
     level.description   = "The main arena."
-    level.background    = "columns"
+    level.background    = "columns-background.jpg"
 [end_level]
 

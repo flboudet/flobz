@@ -35,7 +35,7 @@
 [start_level]
     level.name          = "Kaori's farm"
     level.description   = "Her favorite place to play."
-    level.background    = "farm"
+    level.background    = "farm-background.jpg"
     level.speedmeter_x = 320
     level.speedmeter_y = 130
 [end_level]
@@ -43,7 +43,7 @@
 [start_level]
     level.name          = "The forest"
     level.description   = "Her favorite place to play."
-    level.background    = "forest"
+    level.background    = "forest-background.jpg"
     level.speedmeter_x = 320
     level.speedmeter_y = 130
 [end_level]
@@ -51,7 +51,7 @@
 [start_level]
     level.name          = "The mansion"
     level.description   = "A place full of secrets."
-    level.background    = "mansion"
+    level.background    = "mansion-background.jpg"
     level.speedmeter_x = 320
     level.speedmeter_y = 130
     level.grid          = "mansion"
@@ -60,7 +60,7 @@
 [start_level]
     level.name          = "Near the city"
     level.description   = "A place full of secrets."
-    level.background    = "landfill"
+    level.background    = "landfill-background.jpg"
     level.speedmeter_x = 320
     level.speedmeter_y = 130
     level.grid          = "mansion"
