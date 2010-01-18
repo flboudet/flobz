@@ -93,7 +93,7 @@ static void *loadImage (StyrolyseClient *_this, const char *path)
 }
 
 
-static void  drawImage (StyrolyseClient *_this, void *image, int x, int y,
+static void  drawImage (StyrolyseClient *_this, void *image, int x, int y, int w, int h,
                  int clipx, int clipy, int clipw, int cliph, int flipped)
 {
   StyroImage  *simg = (StyroImage*)image;
@@ -101,8 +101,15 @@ static void  drawImage (StyrolyseClient *_this, void *image, int x, int y,
   IosRect  rect, cliprect;
   rect.x = x;
   rect.y = y;
-  rect.h = surf->h;
-  rect.w = surf->w;
+  if (w < 0) {
+    rect.h = surf->h;
+    rect.w = surf->w;
+  }
+  else {
+      rect.h = h;
+      rect.w = w;
+  }
+
   cliprect.x = clipx;
   cliprect.y = clipy;
   cliprect.w = clipw;

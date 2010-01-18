@@ -267,6 +267,9 @@ void GameWidget::draw(DrawTarget *dt)
     }
     // Render the background
     drawBackground(dt);
+    // Rendering the opponent
+    if (getOpponent() != NULL)
+        getOpponent()->draw(dt);
     // Rendering puyo views
     drawGameAreas(dt);
     // Rendering the grids
@@ -329,44 +332,6 @@ void GameWidget::draw(DrawTarget *dt)
     // Rendering the scores
     areaA->renderOverlay(dt);
     areaB->renderOverlay(dt);
-    /*
-    SoFont *fontBl = NULL;
-    int blinkingPointsA = 0; int blinkingPointsB = 0;
-    char text[1024];
-
-    if (!paused) {
-        double time = TIME_TO_FINISH_GAME_WITH_BONUS - (double)cycles * TIME_BETWEEN_GAME_CYCLES;
-        if (time < 0.0) time = 0.0;
-        double min  = floor(time / 60.0);
-        double sec  = floor(time - min * 60.0);
-        sprintf(text, "%01.0f:%02.0f", min, sec);
-        fontBl = theCommander->menuFont;
-        SoFont_CenteredString_XY (fontBl, display,
-                                  320, 380,   text, NULL);
-
-//    if ((blinkingPointsA % 2) == 0)
-//        fontBl = theCommander->smallFont;
-//    else
-//        fontBl = theCommander->menuFont;
-//        sprintf(text, "<< %d", attachedGameA->getPoints());
-//        SoFont_CenteredString_XY (fontBl, display,
-//                                  300, 380,   text, NULL);
-//
-//        if ((blinkingPointsB % 2) == 0)
-//            fontBl = theCommander->smallFont;
-//        else
-//            fontBl = theCommander->menuFont;
-//
-//        sprintf(text, "%d >>", attachedGameB->getPoints());
-//        SoFont_CenteredString_XY (fontBl, display,
-//                                  340, 395, text, NULL);
-
-        // Rendering the player names
-        SoFont *font = (paused?theCommander->darkFont:theCommander->menuFont);
-        SoFont_CenteredString_XY (font, screen, 130, 460, playerOneName, NULL);
-        SoFont_CenteredString_XY (font, screen, 510, 460, playerTwoName, NULL);
-    }
-    */
     // Rendering the player names
     IosFont *font = GameUIDefaults::FONT_TEXT;
     if (m_displayPlayerOneName)
@@ -454,7 +419,7 @@ void *GameWidget::styro_loadImage(StyrolyseClient *_this, const char *path)
   return image;
 }
 void GameWidget::styro_drawImage(StyrolyseClient *_this,
-			    void *image, int x, int y,
+			    void *image, int x, int y, int w, int h,
 			    int clipx, int clipy, int clipw, int cliph, int flipped)
 {
     StyroImage *surf = (StyroImage *)image;

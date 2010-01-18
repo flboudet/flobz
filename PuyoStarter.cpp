@@ -48,7 +48,7 @@ GameScreen::GameScreen(GameWidget &gameWidget, Screen &previousScreen)
 #endif
     add(&gameWidget);
     if (gameWidget.getOpponent() != NULL)
-        add(gameWidget.getOpponent());
+        GameUIDefaults::GAME_LOOP->addIdle(gameWidget.getOpponent());
 
     activeFX = &gameWidget.getPuyoFX();
     for (unsigned int i=0; i<activeFX->size(); ++i) {

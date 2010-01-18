@@ -191,6 +191,8 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
     const char *path = (const char *)GSL_LOCAL_PTR  (gsl, local, "&this.image");
     int         x    = (int)GSL_LOCAL_FLOAT(gsl, local, "&this.pos.x");
     int         y    = (int)GSL_LOCAL_FLOAT(gsl, local, "&this.pos.y");
+    int         w    = (int)GSL_LOCAL_FLOAT(gsl, local, "&this.size.x");
+    int         h    = (int)GSL_LOCAL_FLOAT(gsl, local, "&this.size.y");
     int        fl    = (int)GSL_LOCAL_INT(gsl, local, "&this.flipped");
     int        dx    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.x");
     int        dy    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.y");
@@ -220,7 +222,7 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
         styrolyse->client->putText(styrolyse->client,x,y,txt);
     }
     else {
-        styrolyse->client->drawImage(styrolyse->client, data, x+dx, y+dy, dx, dy, dw, dh, fl);
+        styrolyse->client->drawImage(styrolyse->client, data, x+dx, y+dy, w, h, dx, dy, dw, dh, fl);
     }
 }
 
