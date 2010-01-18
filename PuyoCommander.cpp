@@ -33,7 +33,8 @@ IosSurface *IosSurfaceFactory::create(const IosSurfaceResourceKey &resourceKey)
         String fullPath = m_dataPathManager.getPath(resourceKey.path.c_str());
         ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
         IosSurface *newSurface = iimLib.loadImage(resourceKey.type, fullPath, resourceKey.specialAbility);
-        newSurface->enableExceptionOnDeletion(true);
+        if (newSurface != NULL)
+            newSurface->enableExceptionOnDeletion(true);
         return newSurface;
     }
     catch (Exception e) {

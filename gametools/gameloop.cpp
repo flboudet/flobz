@@ -282,7 +282,7 @@ void GameLoop::idle(double currentTime)
 bool GameLoop::drawRequested() const
 {
   for (int i = 0; i < drawables.size(); ++i) {
-    if (drawables[i]->drawRequested())
+    if ((drawables[i] != NULL) && (drawables[i]->drawRequested()))
       return true;
   }
   return false;
