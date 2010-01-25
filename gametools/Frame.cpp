@@ -32,6 +32,7 @@ void FramePicture::setFrameSurface(IosSurface *frameSurface)
 	if (frameSurface->haveAbility(IMAGE_READ)) {
 		m_contentColor = frameSurface->readRGBA(m_leftW, m_topH);
 		frameSurface->dropAbility(IMAGE_READ);
+		fprintf(stderr, "FramePicture: %s, rgb=%i %i %i\n", frameSurface->name.c_str(), m_contentColor.red,m_contentColor.green,m_contentColor.blue);
 	}
 	else {
 		fprintf(stderr, "WARNING: Cannot read pixel color of a FramePicture: %s\n", frameSurface->name.c_str());
@@ -58,10 +59,16 @@ void FramePicture::render(DrawTarget *surf) const
     int surfW = surf->w;
     int surfH = surf->h;
     surf->setBlendMode(IMAGE_COPY);
-    // Draw the corners first
+	IosRect src_rect;
+    IosRect dst_rect;
+	// Content rect
+	src_rect.x = m_leftW; src_rect.y = m_topH; src_rect.w = surfW - m_leftW - m_rightW; src_rect.h = surfH - m_topH - m_bottomH;
+	surf->fillRect(&src_rect, m_contentColor);
+
+	// Draw the corners first
     // Top left corner
-    IosRect src_rect = {0, 0, m_leftW, m_topH};
-    IosRect dst_rect = {0, 0, m_leftW, m_topH};
+    src_rect.x = src_rect. y = 0; src_rect.w = m_leftW; src_rect.h = m_topH;
+	dst_rect = src_rect; // dst_rect = {0, 0, m_leftW, m_topH};
     surf->draw(m_frameSurface, &src_rect, &dst_rect);
     // Top right corner
     src_rect.x = m_leftW + m_middleW; src_rect.y = 0; src_rect.w = m_rightW; src_rect.h = m_topH;
@@ -107,9 +114,6 @@ void FramePicture::render(DrawTarget *surf) const
             dst_rect.h = src_rect.h = surfH - m_bottomH - dst_rect.y;
         surf->draw(m_frameSurface, &src_rect, &dst_rect);
     }
-    // Content rect
-    src_rect.x = m_leftW; src_rect.y = m_topH; src_rect.w = surfW - m_leftW - m_rightW; src_rect.h = surfH - m_topH - m_bottomH;
-    surf->fillRect(&src_rect, m_contentColor);
   }
 }
 
