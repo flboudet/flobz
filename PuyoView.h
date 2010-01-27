@@ -92,8 +92,8 @@ class PuyoView : public PuyoDelegate {
 
     bool isGameOver() const;
 
-    int getScreenCoordinateX(int X) const { return X * TSIZE + xOffset; }
-    int getScreenCoordinateY(int Y) const { return Y * TSIZE + yOffset; }
+    int getScreenCoordinateX(int X) const { return X * TSIZE + m_xOffset; }
+    int getScreenCoordinateY(int Y) const { return Y * TSIZE + m_yOffset; }
 
     AnimatedPuyoSetTheme *getPuyoThemeSet() const { return attachedThemeSet; }
 
@@ -110,7 +110,7 @@ class PuyoView : public PuyoDelegate {
     void puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow);
     void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase);
     virtual void gameLost();
-    int getPlayerId() const { return (xOffset < 320) ? 1 : 2; }
+    int getPlayerId() const { return (m_xOffset < 320) ? 1 : 2; }
     virtual void gameWin();
     void setShowNextPuyos(bool show) { m_showNextPuyos = show; }
     void setShowShadows(bool show) { m_showShadows = show; }
@@ -120,12 +120,12 @@ class PuyoView : public PuyoDelegate {
         neutralYOffset = y;
     }
     void setPosition(int x, int y) {
-        this->xOffset = x;
-        this->yOffset = y - TSIZE;
+        this->m_xOffset = x;
+        this->m_yOffset = y - TSIZE;
     }
     void setNextPuyosPosition(int x, int y) {
-        this->nXOffset = x;
-        this->nYOffset = y;
+        this->m_nXOffset = x;
+        this->m_nYOffset = y;
     }
   protected:
     String p1name, p2name;
@@ -133,8 +133,8 @@ class PuyoView : public PuyoDelegate {
     bool m_showNextPuyos, m_showShadows, m_showEyes;
     bool skippedCycle;
     bool gameRunning;
-    int xOffset, yOffset;
-    int nXOffset, nYOffset;
+    int m_xOffset, m_yOffset;
+    int m_nXOffset, m_nYOffset;
     int neutralXOffset, neutralYOffset;
     AnimatedPuyoSetTheme *attachedThemeSet;
     PuyoLevelTheme *attachedLevelTheme;

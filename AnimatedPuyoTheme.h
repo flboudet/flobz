@@ -192,6 +192,12 @@ public:
     bool setSpeedMeter(const char * speedmeter);
     bool setNeutralIndicator(const char * neutralIndicator);
     void setSpeedMeterXY(int x, int y) {_speedMeterX = x; _speedMeterY = y;}
+    void setLifeDisplayXY(int x, int y) {_lifeDisplayX = x; _lifeDisplayY = y;}
+    void setPuyobanXY(int playerId, int x, int y) {_puyobanX[playerId] = x; _puyobanY[playerId] = y;}
+    void setNextPuyosXY(int playerId, int x, int y) {_nextPuyosX[playerId] = x; _nextPuyosY[playerId] = y;}
+    void setNeutralDisplayXY(int playerId, int x, int y) {_neutralDisplayX[playerId] = x; _neutralDisplayY[playerId] = y;}
+    void setShouldDisplayNext(int playerId, bool shouldDisplayNext) {_shouldDisplayNext[playerId] = shouldDisplayNext; }
+    void setPuyobanScale(int playerId, float puyobanScale) {_puyobanScale[playerId] = puyobanScale;}
     void setAnimations(String gamelost_left_2p, String gamelost_right_2p, String animation_2p) {
         _gamelost_left_2p = gamelost_left_2p;
         _gamelost_right_2p = gamelost_right_2p;
@@ -208,8 +214,18 @@ public:
     IosSurface * getBigNeutralIndicator();
     IosSurface * getGiantNeutralIndicator();
 
-    int getSpeedMeterX() const { return _speedMeterX; }
-    int getSpeedMeterY() const { return _speedMeterY; }
+    int getSpeedMeterX() const  { return _speedMeterX; }
+    int getSpeedMeterY() const  { return _speedMeterY; }
+    int getLifeDisplayX() const { return _lifeDisplayX; }
+    int getLifeDisplayY() const { return _lifeDisplayY; }
+    int getPuyobanX(int playerId) const { return _puyobanX[playerId]; }
+    int getPuyobanY(int playerId) const { return _puyobanY[playerId]; }
+    int getNextPuyosX(int playerId) const { return _nextPuyosX[playerId]; }
+    int getNextPuyosY(int playerId) const { return _nextPuyosY[playerId]; }
+    int getNeutralDisplayX(int playerId) const { return _neutralDisplayX[playerId]; }
+    int getNeutralDisplayY(int playerId) const { return _neutralDisplayY[playerId]; }
+    bool getShouldDisplayNext(int playerId) const { return _shouldDisplayNext[playerId]; }
+    float getPuyobanScale(int playerId) const { return _puyobanScale[playerId]; }
 
     const String getGameLostLeftAnimation2P() const;
     const String getGameLostRightAnimation2P() const;
@@ -244,6 +260,12 @@ private:
     IosSurfaceRef _giantNeutralIndicator;
 
     int _speedMeterX, _speedMeterY;
+    int _lifeDisplayX, _lifeDisplayY;
+    int _puyobanX[2], _puyobanY[2];
+    int _nextPuyosX[2], _nextPuyosY[2];
+    int _neutralDisplayX[2], _neutralDisplayY[2];
+    bool _shouldDisplayNext[2];
+    float _puyobanScale[2];
 
     bool _cached;
 

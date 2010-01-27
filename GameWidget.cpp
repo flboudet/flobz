@@ -299,8 +299,8 @@ void GameWidget::draw(DrawTarget *dt)
     if (displayLives && (lives>=0) && (lives<=3))
     {
         IosSurface * liveImage = attachedLevelTheme->getLifeForIndex(lives);
-        drect.x = dt->w / 2 - liveImage->w / 2;
-        drect.y = 436;
+        drect.x = attachedLevelTheme->getLifeDisplayX();
+        drect.y = attachedLevelTheme->getLifeDisplayY();
         drect.w = liveImage->w;
         drect.h = liveImage->h;
         dt->draw(liveImage, NULL, &drect);

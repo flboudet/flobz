@@ -63,10 +63,10 @@ void PuyoView::initDisplay(int xOffset, int yOffset, int nXOffset, int nYOffset)
 {
     attachedStatDisplay = new PlayerGameStatDisplay("Player TODO", attachedGame->getGameStat(), xOffset < 320 ? 0 : 1);
 
-	this->xOffset = xOffset;
-	this->yOffset = yOffset - TSIZE;
-	this->nXOffset = nXOffset;
-	this->nYOffset = nYOffset;
+	this->m_xOffset = xOffset;
+	this->m_yOffset = yOffset - TSIZE;
+	this->m_nXOffset = nXOffset;
+	this->m_nYOffset = nYOffset;
 }
 
 PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory)
@@ -188,8 +188,8 @@ void PuyoView::render(DrawTarget *dt)
     if (!haveDisplay) return;
 	IosRect drect;
     IosRect vrect;
-	vrect.x = xOffset;
-	vrect.y = yOffset;
+	vrect.x = m_xOffset;
+	vrect.y = m_yOffset;
 	vrect.w = TSIZE * PUYODIMX;
 	vrect.h = TSIZE * PUYODIMY;
 
@@ -210,8 +210,8 @@ void PuyoView::render(DrawTarget *dt)
     attachedPuyoFactory.renderWalhalla(dt);
 
     if (m_showNextPuyos) {
-        drect.x = nXOffset;
-        drect.y = nYOffset;
+        drect.x = m_nXOffset;
+        drect.y = m_nYOffset;
         drect.w = TSIZE;
         drect.h = TSIZE * 2;
         // Drawing next puyos
@@ -219,8 +219,8 @@ void PuyoView::render(DrawTarget *dt)
             attachedThemeSet->getAnimatedPuyoTheme(attachedGame->getNextFalling());
         IosSurface *currentSurface = nextPuyoTheme->getPuyoSurfaceForValence(0);
         if (currentSurface != NULL) {
-            drect.x = nXOffset;
-            drect.y = nYOffset + TSIZE;
+            drect.x = m_nXOffset;
+            drect.y = m_nYOffset + TSIZE;
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;
             dt->draw(currentSurface, NULL, &drect);
@@ -230,8 +230,8 @@ void PuyoView::render(DrawTarget *dt)
             attachedThemeSet->getAnimatedPuyoTheme(attachedGame->getNextCompanion());
         currentSurface = nextCompanionTheme->getPuyoSurfaceForValence(0);
         if (currentSurface != NULL) {
-            drect.x = nXOffset;
-            drect.y = nYOffset;
+            drect.x = m_nXOffset;
+            drect.y = m_nYOffset;
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;
             dt->draw(currentSurface, NULL, &drect);
@@ -262,9 +262,9 @@ void PuyoView::renderNeutral(DrawTarget *dt)
     int numGiantNeutral = (neutralPuyos / PUYODIMX) / 4;
     int numBigNeutral = (neutralPuyos / PUYODIMX) % 4;
 	int numNeutral = neutralPuyos % PUYODIMX;
-    int drect_x = (neutralXOffset == -1 ? xOffset : neutralXOffset);
+    int drect_x = (neutralXOffset == -1 ? m_xOffset : neutralXOffset);
     int drect_y_base =  (neutralYOffset == -1 ?
-                         yOffset + 3 + TSIZE + TSIZE : neutralYOffset);
+                         m_yOffset + 3 + TSIZE + TSIZE : neutralYOffset);
     IosSurface *neutral = attachedLevelTheme->getNeutralIndicator();
     IosSurface *bigNeutral = attachedLevelTheme->getBigNeutralIndicator();
     IosSurface *giantNeutral = attachedLevelTheme->getGiantNeutralIndicator();
@@ -351,7 +351,7 @@ void PuyoView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalled
 {
     if (!haveDisplay) return;
     ((AnimatedPuyo *)puyo)->flushAnimations();
-    ((AnimatedPuyo *)puyo)->addAnimation(new FallingAnimation(*(AnimatedPuyo *)puyo, originY, xOffset, yOffset, nFalledBelow));
+    ((AnimatedPuyo *)puyo)->addAnimation(new FallingAnimation(*(AnimatedPuyo *)puyo, originY, m_xOffset, m_yOffset, nFalledBelow));
 }
 
 void PuyoView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase)
@@ -363,7 +363,7 @@ void PuyoView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNu
         AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(puyoGroup[i]);
         PuyoAnimation *newAnimation;
         if (currentPuyo->getPuyoState() != PUYO_NEUTRAL)
-            newAnimation = new VanishAnimation(*currentPuyo, i*2 , xOffset, yOffset, synchronizer, i, puyoGroup.size(), groupNum, phase);
+            newAnimation = new VanishAnimation(*currentPuyo, i*2 , m_xOffset, m_yOffset, synchronizer, i, puyoGroup.size(), groupNum, phase);
         else
             newAnimation = new NeutralPopAnimation(*currentPuyo, i*2, synchronizer);
         currentPuyo->addAnimation(newAnimation);

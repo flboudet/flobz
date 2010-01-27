@@ -180,6 +180,24 @@ static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
     globalManager->addPuyoSet(theme);
 }
 
+static void loadPuyobanDefinition(GoomSL *gsl, int playerId, PuyoLevelTheme *theme)
+{
+    String variablePrefix = String("level.puyoban_p") + playerId;
+    theme->setPuyobanXY(playerId,
+                        GSL_GLOBAL_INT(gsl, variablePrefix + ".display.x"),
+                        GSL_GLOBAL_INT(gsl, variablePrefix + ".display.y"));
+    theme->setNextPuyosXY(playerId,
+                          GSL_GLOBAL_INT(gsl, variablePrefix + ".next.x"),
+                          GSL_GLOBAL_INT(gsl, variablePrefix + ".next.y"));
+    theme->setNeutralDisplayXY(playerId,
+                               GSL_GLOBAL_INT(gsl, variablePrefix + ".neutral_display.x"),
+                               GSL_GLOBAL_INT(gsl, variablePrefix + ".neutral_display.y"));
+    theme->setShouldDisplayNext(playerId,
+                                GSL_GLOBAL_INT(gsl, variablePrefix + ".should_display_next"));
+    theme->setPuyobanScale(playerId,
+                           GSL_GLOBAL_FLOAT(gsl, variablePrefix + ".scale"));
+}
+
 static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
 	FilePath tmp0(GlobalCurrentPath);
@@ -211,7 +229,10 @@ static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     theme->setGrid((const char *) GSL_GLOBAL_PTR(gsl, "level.grid"));
     theme->setSpeedMeter((const char *) GSL_GLOBAL_PTR(gsl, "level.speedmeter"));
     theme->setNeutralIndicator((const char *) GSL_GLOBAL_PTR(gsl, "level.neutralindicator"));
-    theme->setSpeedMeterXY(GSL_GLOBAL_INT(gsl, "level.speedmeter_x"), GSL_GLOBAL_INT(gsl, "level.speedmeter_y"));
+    theme->setSpeedMeterXY(GSL_GLOBAL_INT(gsl, "level.speedmeter_display.x"), GSL_GLOBAL_INT(gsl, "level.speedmeter_display.y"));
+    theme->setLifeDisplayXY(GSL_GLOBAL_INT(gsl, "level.life_display.x"), GSL_GLOBAL_INT(gsl, "level.life_display.y"));
+    loadPuyobanDefinition(gsl, 1, theme);
+    loadPuyobanDefinition(gsl, 2, theme);
     theme->setAnimations((const char *) GSL_GLOBAL_PTR(gsl, "level.gamelost_left_2p"),
                          (const char *) GSL_GLOBAL_PTR(gsl, "level.gamelost_right_2p"),
                          (const char *) GSL_GLOBAL_PTR(gsl, "level.animation_2p"));

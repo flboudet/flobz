@@ -1,5 +1,16 @@
 [ThemeDefinition]
 
+struct <Point:
+    int x,
+    int y>
+
+struct <PuyobanDefinition:
+    Point display,
+    int   should_display_next,
+    Point next,
+    Point neutral_display,
+    float scale>
+
 struct <Puyo:
     string face,
     string eye,
@@ -28,8 +39,10 @@ struct <Level:
     string gamelost_left_2p,
     string gamelost_right_2p,
     string animation_2p,
-    int speedmeter_x,
-    int speedmeter_y,
+    Point  speedmeter_display,
+    Point  life_display,
+    PuyobanDefinition puyoban_p1,
+    PuyobanDefinition puyoban_p2,
     string foreground_animation>
 
 PuyoSet puyoset
@@ -85,8 +98,28 @@ external <end_level>
     level.grid          = "metal"
 
     level.neutralindicator = "glass"
-    level.speedmeter_x = 320
-    level.speedmeter_y = 170
+    level.speedmeter_display.x = 320
+    level.speedmeter_display.y = 170
+    level.life_display.x = 310
+    level.life_display.y = 438
+
+    level.puyoban_p1.display.x = 33
+    level.puyoban_p1.display.y = 0
+    level.puyoban_p1.should_display_next = 1
+    level.puyoban_p1.next.x = 240
+    level.puyoban_p1.next.y = 64
+    level.puyoban_p1.neutral_display.x = 33
+    level.puyoban_p1.neutral_display.y = 67
+    level.puyoban_p1.scale = 1.0
+
+    level.puyoban_p2.display.x = 417
+    level.puyoban_p2.display.y = 0
+    level.puyoban_p2.should_display_next = 1
+    level.puyoban_p2.next.x = 368
+    level.puyoban_p2.next.y = 64
+    level.puyoban_p2.neutral_display.x = 417
+    level.puyoban_p2.neutral_display.y = 67
+    level.puyoban_p2.scale = 1.0
 
     level.gamelost_left_2p = "gamelost2p_left.gsl"
     level.gamelost_right_2p = "gamelost2p_right.gsl"
