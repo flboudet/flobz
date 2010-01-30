@@ -192,6 +192,12 @@ static void loadPuyobanDefinition(GoomSL *gsl, int playerId, PuyoLevelTheme *the
     theme->setNeutralDisplayXY(playerId,
                                GSL_GLOBAL_INT(gsl, variablePrefix + ".neutral_display.x"),
                                GSL_GLOBAL_INT(gsl, variablePrefix + ".neutral_display.y"));
+    theme->setNameDisplayXY(playerId,
+                            GSL_GLOBAL_INT(gsl, variablePrefix + ".name_display.x"),
+                            GSL_GLOBAL_INT(gsl, variablePrefix + ".name_display.y"));
+    theme->setScoreDisplayXY(playerId,
+                             GSL_GLOBAL_INT(gsl, variablePrefix + ".score_display.x"),
+                             GSL_GLOBAL_INT(gsl, variablePrefix + ".score_display.y"));
     theme->setShouldDisplayNext(playerId,
                                 GSL_GLOBAL_INT(gsl, variablePrefix + ".should_display_next"));
     theme->setShouldDisplayShadows(playerId,

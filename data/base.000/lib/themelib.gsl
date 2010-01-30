@@ -11,6 +11,8 @@ struct <PuyobanDefinition:
     int   should_display_eyes,
     Point next,
     Point neutral_display,
+    Point name_display,
+    Point score_display,
     float scale>
 
 struct <Puyo:
@@ -114,6 +116,10 @@ external <end_level>
     level.puyoban_p1.next.y = 64
     level.puyoban_p1.neutral_display.x = 33
     level.puyoban_p1.neutral_display.y = 35
+    level.puyoban_p1.name_display.x = 130
+    level.puyoban_p1.name_display.y = 460
+    level.puyoban_p1.score_display.x = 300
+    level.puyoban_p1.score_display.y = 360
     level.puyoban_p1.scale = 1.0
 
     level.puyoban_p2.display.x = 417
@@ -125,6 +131,10 @@ external <end_level>
     level.puyoban_p2.next.y = 64
     level.puyoban_p2.neutral_display.x = 417
     level.puyoban_p2.neutral_display.y = 35
+    level.puyoban_p2.name_display.x = 510
+    level.puyoban_p2.name_display.y = 460
+    level.puyoban_p2.score_display.x = 340
+    level.puyoban_p2.score_display.y = 320
     level.puyoban_p2.scale = 1.0
 
     level.gamelost_left_2p = "gamelost2p_left.gsl"

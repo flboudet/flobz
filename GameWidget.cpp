@@ -290,14 +290,11 @@ void GameWidget::draw(DrawTarget *dt)
         drect.h = grid->h;
         dt->draw(grid, NULL, &drect);
     }
-
     // Rendering the foreground animation
     if (m_foregroundAnimation != NULL)
         styrolyse_draw(m_foregroundAnimation);
-
     // Rendering the neutral puyos
     drawGameNeutrals(dt);
-
     // Rendering the lives
     if (displayLives && (lives>=0) && (lives<=3))
     {
@@ -316,31 +313,33 @@ void GameWidget::draw(DrawTarget *dt)
     speedRect.w = speedFront->w;
     speedRect.h = gameSpeed * 6;
     speedRect.y = speedFront->h - speedRect.h;
-
     drect.x = attachedLevelTheme->getSpeedMeterX() - speedRect.w / 2;
     drect.y = attachedLevelTheme->getSpeedMeterY() - speedRect.h;
     drect.w = speedRect.w;
     drect.h = speedRect.h;
-
     IosRect speedBlackRect = speedRect;
     IosRect drectBlack     = drect;
-
     speedBlackRect.h = speedFront->h - speedRect.h;
     speedBlackRect.y = 0;
     drectBlack.y = attachedLevelTheme->getSpeedMeterY() - speedFront->h;
     drectBlack.h = speedBlackRect.h;
     dt->draw(speedBack,&speedBlackRect,&drectBlack);
     dt->draw(speedFront,&speedRect, &drect);
-
     // Rendering the scores
     areaA->renderOverlay(dt);
     areaB->renderOverlay(dt);
     // Rendering the player names
     IosFont *font = GameUIDefaults::FONT_TEXT;
     if (m_displayPlayerOneName)
-        dt->putStringCenteredXY(font, 130, 460, playerOneName);
+        dt->putStringCenteredXY(font,
+                                attachedLevelTheme->getNameDisplayX(0),
+                                attachedLevelTheme->getNameDisplayY(0),
+                                playerOneName);
     if (m_displayPlayerTwoName)
-        dt->putStringCenteredXY(font, 510, 460, playerTwoName);
+        dt->putStringCenteredXY(font,
+                                attachedLevelTheme->getNameDisplayX(1),
+                                attachedLevelTheme->getNameDisplayY(1),
+                                playerTwoName);
 }
 
 void GameWidget::addSubWidget(Widget *subWidget)

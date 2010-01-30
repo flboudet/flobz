@@ -196,6 +196,8 @@ public:
     void setPuyobanXY(int playerId, int x, int y) {_puyobanX[playerId] = x; _puyobanY[playerId] = y;}
     void setNextPuyosXY(int playerId, int x, int y) {_nextPuyosX[playerId] = x; _nextPuyosY[playerId] = y;}
     void setNeutralDisplayXY(int playerId, int x, int y) {_neutralDisplayX[playerId] = x; _neutralDisplayY[playerId] = y;}
+    void setNameDisplayXY(int playerId, int x, int y) {_nameDisplayX[playerId] = x; _nameDisplayY[playerId] = y;}
+    void setScoreDisplayXY(int playerId, int x, int y) {_scoreDisplayX[playerId] = x; _scoreDisplayY[playerId] = y;}
     void setShouldDisplayNext(int playerId, bool shouldDisplayNext) {_shouldDisplayNext[playerId] = shouldDisplayNext; }
     void setShouldDisplayShadows(int playerId, bool shouldDisplayShadows) {_shouldDisplayShadows[playerId] = shouldDisplayShadows; }
     void setShouldDisplayEyes(int playerId, bool shouldDisplayEyes) {_shouldDisplayEyes[playerId] = shouldDisplayEyes; }
@@ -226,6 +228,10 @@ public:
     int getNextPuyosY(int playerId) const { return _nextPuyosY[playerId]; }
     int getNeutralDisplayX(int playerId) const { return _neutralDisplayX[playerId]; }
     int getNeutralDisplayY(int playerId) const { return _neutralDisplayY[playerId]; }
+    int getNameDisplayX(int playerId) const { return _nameDisplayX[playerId]; }
+    int getNameDisplayY(int playerId) const { return _nameDisplayY[playerId]; }
+    int getScoreDisplayX(int playerId) const { return _scoreDisplayX[playerId]; }
+    int getScoreDisplayY(int playerId) const { return _scoreDisplayY[playerId]; }
     bool getShouldDisplayNext(int playerId) const { return _shouldDisplayNext[playerId]; }
     bool getShouldDisplayShadows(int playerId) const { return _shouldDisplayShadows[playerId]; }
     bool getShouldDisplayEyes(int playerId) const { return _shouldDisplayEyes[playerId]; }
@@ -268,6 +274,8 @@ private:
     int _puyobanX[2], _puyobanY[2];
     int _nextPuyosX[2], _nextPuyosY[2];
     int _neutralDisplayX[2], _neutralDisplayY[2];
+    int _nameDisplayX[2], _nameDisplayY[2];
+    int _scoreDisplayX[2], _scoreDisplayY[2];
     bool _shouldDisplayNext[2], _shouldDisplayShadows[2], _shouldDisplayEyes[2];
     float _puyobanScale[2];
 
