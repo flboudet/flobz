@@ -24,11 +24,11 @@
         Vec2 offset_end
         offset_start.y = 144.0
         offset_end.y   = 104.0
-        (player = 1)? {
+        (player = 0)? {
             offset_start.x = 124.0 - 53.0
             offset_end.x   = 124.0 - 53.0
         }
-        (player = 2)? {
+        (player = 1)? {
             offset_start.x = 640.0 - 124.0 - 53.0
             offset_end.x   = 640.0 - 124.0 - 53.0
         }

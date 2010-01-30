@@ -38,7 +38,7 @@ PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
 		   AnimatedPuyoSetTheme *attachedThemeSet,
            PuyoLevelTheme *attachedLevelTheme,
 		   int xOffset, int yOffset, int nXOffset, int nYOffset)
-  : m_showNextPuyos(true), m_showShadows(true),
+  : m_playerId(0), m_showNextPuyos(true), m_showShadows(true),
     attachedThemeSet(attachedThemeSet), attachedLevelTheme(attachedLevelTheme),
     attachedPuyoFactory(this), delayBeforeGameOver(60), haveDisplay(true),
     neutralXOffset(-1), neutralYOffset(-1)

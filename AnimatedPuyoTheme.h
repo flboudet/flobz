@@ -197,6 +197,8 @@ public:
     void setNextPuyosXY(int playerId, int x, int y) {_nextPuyosX[playerId] = x; _nextPuyosY[playerId] = y;}
     void setNeutralDisplayXY(int playerId, int x, int y) {_neutralDisplayX[playerId] = x; _neutralDisplayY[playerId] = y;}
     void setShouldDisplayNext(int playerId, bool shouldDisplayNext) {_shouldDisplayNext[playerId] = shouldDisplayNext; }
+    void setShouldDisplayShadows(int playerId, bool shouldDisplayShadows) {_shouldDisplayShadows[playerId] = shouldDisplayShadows; }
+    void setShouldDisplayEyes(int playerId, bool shouldDisplayEyes) {_shouldDisplayEyes[playerId] = shouldDisplayEyes; }
     void setPuyobanScale(int playerId, float puyobanScale) {_puyobanScale[playerId] = puyobanScale;}
     void setAnimations(String gamelost_left_2p, String gamelost_right_2p, String animation_2p) {
         _gamelost_left_2p = gamelost_left_2p;
@@ -225,6 +227,8 @@ public:
     int getNeutralDisplayX(int playerId) const { return _neutralDisplayX[playerId]; }
     int getNeutralDisplayY(int playerId) const { return _neutralDisplayY[playerId]; }
     bool getShouldDisplayNext(int playerId) const { return _shouldDisplayNext[playerId]; }
+    bool getShouldDisplayShadows(int playerId) const { return _shouldDisplayShadows[playerId]; }
+    bool getShouldDisplayEyes(int playerId) const { return _shouldDisplayEyes[playerId]; }
     float getPuyobanScale(int playerId) const { return _puyobanScale[playerId]; }
 
     const String getGameLostLeftAnimation2P() const;
@@ -264,7 +268,7 @@ private:
     int _puyobanX[2], _puyobanY[2];
     int _nextPuyosX[2], _nextPuyosY[2];
     int _neutralDisplayX[2], _neutralDisplayY[2];
-    bool _shouldDisplayNext[2];
+    bool _shouldDisplayNext[2], _shouldDisplayShadows[2], _shouldDisplayEyes[2];
     float _puyobanScale[2];
 
     bool _cached;

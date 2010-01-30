@@ -18,11 +18,11 @@
         @show_flash = 0.63
         offset_start.x = -16.0
         offset_start.y = -4.0
-        (player = 1)? {
+        (player = 0)? {
             offset_end.x = 428.0
             offset_end.y = 0.0
         }
-        (player = 2)? {
+        (player = 1)? {
             offset_end.x = 43.0
             offset_end.y = 0.0
         }

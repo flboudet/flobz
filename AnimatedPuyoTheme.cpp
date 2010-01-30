@@ -182,7 +182,7 @@ static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local)
 
 static void loadPuyobanDefinition(GoomSL *gsl, int playerId, PuyoLevelTheme *theme)
 {
-    String variablePrefix = String("level.puyoban_p") + playerId;
+    String variablePrefix = String("level.puyoban_p") + (playerId+1);
     theme->setPuyobanXY(playerId,
                         GSL_GLOBAL_INT(gsl, variablePrefix + ".display.x"),
                         GSL_GLOBAL_INT(gsl, variablePrefix + ".display.y"));
@@ -194,6 +194,10 @@ static void loadPuyobanDefinition(GoomSL *gsl, int playerId, PuyoLevelTheme *the
                                GSL_GLOBAL_INT(gsl, variablePrefix + ".neutral_display.y"));
     theme->setShouldDisplayNext(playerId,
                                 GSL_GLOBAL_INT(gsl, variablePrefix + ".should_display_next"));
+    theme->setShouldDisplayShadows(playerId,
+                                   GSL_GLOBAL_INT(gsl, variablePrefix + ".should_display_shadows"));
+    theme->setShouldDisplayEyes(playerId,
+                                GSL_GLOBAL_INT(gsl, variablePrefix + ".should_display_eyes"));
     theme->setPuyobanScale(playerId,
                            GSL_GLOBAL_FLOAT(gsl, variablePrefix + ".scale"));
 }
@@ -231,8 +235,8 @@ static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     theme->setNeutralIndicator((const char *) GSL_GLOBAL_PTR(gsl, "level.neutralindicator"));
     theme->setSpeedMeterXY(GSL_GLOBAL_INT(gsl, "level.speedmeter_display.x"), GSL_GLOBAL_INT(gsl, "level.speedmeter_display.y"));
     theme->setLifeDisplayXY(GSL_GLOBAL_INT(gsl, "level.life_display.x"), GSL_GLOBAL_INT(gsl, "level.life_display.y"));
+    loadPuyobanDefinition(gsl, 0, theme);
     loadPuyobanDefinition(gsl, 1, theme);
-    loadPuyobanDefinition(gsl, 2, theme);
     theme->setAnimations((const char *) GSL_GLOBAL_PTR(gsl, "level.gamelost_left_2p"),
                          (const char *) GSL_GLOBAL_PTR(gsl, "level.gamelost_right_2p"),
                          (const char *) GSL_GLOBAL_PTR(gsl, "level.animation_2p"));

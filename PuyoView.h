@@ -110,7 +110,10 @@ class PuyoView : public PuyoDelegate {
     void puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow);
     void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase);
     virtual void gameLost();
-    int getPlayerId() const { return (m_xOffset < 320) ? 1 : 2; }
+
+    // Accessors
+    int getPlayerId() const { return m_playerId; }
+    void setPlayerId(int playerId) { m_playerId = playerId; }
     virtual void gameWin();
     void setShowNextPuyos(bool show) { m_showNextPuyos = show; }
     void setShowShadows(bool show) { m_showShadows = show; }
@@ -128,6 +131,7 @@ class PuyoView : public PuyoDelegate {
         this->m_nYOffset = y;
     }
   protected:
+    int m_playerId;
     String p1name, p2name;
     bool cycleAllowed();
     bool m_showNextPuyos, m_showShadows, m_showEyes;

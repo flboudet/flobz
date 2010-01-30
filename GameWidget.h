@@ -108,6 +108,7 @@ public:
     void setDisplayPlayerOneName(bool display) { m_displayPlayerOneName = display; }
     void setDisplayPlayerTwoName(bool display) { m_displayPlayerTwoName = display; }
 protected:
+    void setupGameAreaLayout(PuyoView *area, int playerId);
     virtual void associatedScreenHasBeenSet(GameScreen *associatedScreen) {}
 
     // Styrolyse methods

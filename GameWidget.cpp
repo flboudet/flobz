@@ -121,7 +121,10 @@ void GameWidget::priv_initialize()
     attachedGameB = this->areaB->getAttachedGame();
     this->areaA->setEnemyGame(attachedGameB);
     this->areaB->setEnemyGame(attachedGameA);
-    //printf("Ennemis positionnes! %x, %x\n", attachedGameA, attachedGameB);
+
+    // Setting up layouts for areaA and B
+    setupGameAreaLayout(areaA, 0);
+    setupGameAreaLayout(areaB, 1);
 
     setReceiveUpEvents(true);
     setFocusable(true);
@@ -408,6 +411,26 @@ void GameWidget::setScreenToResumed(bool fromControls)
   if (associatedScreen != NULL)
     if (!fromControls)
       associatedScreen->getPauseMenu().backPressed(false);
+}
+
+void GameWidget::setupGameAreaLayout(PuyoView *area, int playerId)
+{
+    area->setPlayerId(playerId);
+    area->setPosition(
+        attachedLevelTheme->getPuyobanX(playerId),
+        attachedLevelTheme->getPuyobanY(playerId));
+    area->setNextPuyosPosition(
+        attachedLevelTheme->getNextPuyosX(playerId),
+        attachedLevelTheme->getNextPuyosY(playerId));
+    area->setNeutralPuyosDisplayPosition(
+        attachedLevelTheme->getNeutralDisplayX(playerId),
+        attachedLevelTheme->getNeutralDisplayY(playerId));
+    area->setShowNextPuyos(
+        attachedLevelTheme->getShouldDisplayNext(playerId));
+    area->setShowShadows(
+        attachedLevelTheme->getShouldDisplayShadows(playerId));
+    area->setShowEyes(
+        attachedLevelTheme->getShouldDisplayEyes(playerId));
 }
 
 void *GameWidget::styro_loadImage(StyrolyseClient *_this, const char *path)
