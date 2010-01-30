@@ -75,8 +75,8 @@ class PuyoView : public PuyoDelegate {
     virtual ~PuyoView();
     void setEnemyGame(PuyoGame *enemyGame);
     void render(DrawTarget *dt);
-    void renderOverlay(DrawTarget *dt);
     void renderNeutral(DrawTarget *dt);
+    void renderScore(DrawTarget *dt);
     void cycleAnimation();
     virtual void cycleGame();
     void allowCycle() { cycleAllowance++; }
@@ -130,6 +130,9 @@ class PuyoView : public PuyoDelegate {
         this->m_nXOffset = x;
         this->m_nYOffset = y;
     }
+    void setScoreDisplayPosition(int x, int y) {
+        m_scoreDisplay->setPosition(x, y);
+    }
   protected:
     int m_playerId;
     String p1name, p2name;
@@ -148,7 +151,7 @@ class PuyoView : public PuyoDelegate {
     int cycleAllowance;
     int delayBeforeGameOver;
     bool newMetaCycleStart;
-    PlayerGameStatDisplay *attachedStatDisplay;
+    std::auto_ptr<PlayerGameStatDisplay> m_scoreDisplay;
 
     void initCommon(PuyoGameFactory *attachedPuyoGameFactory);
     void initDisplay(int xOffset, int yOffset, int nXOffset, int nYOffset);

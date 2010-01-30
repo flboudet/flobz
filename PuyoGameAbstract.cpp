@@ -14,10 +14,9 @@ PlayerGameStat::PlayerGameStat(int p)
     total_points = 0;
 }
 
-PlayerGameStatDisplay::PlayerGameStatDisplay(const ios_fc::String &player_name, PlayerGameStat &stat, int player)
-    : player_name(player_name), stat(stat), player(player)
+PlayerGameStatDisplay::PlayerGameStatDisplay(PlayerGameStat &stat)
+    : stat(stat), m_x(0), m_y(0)
 {
-    display_stats = 0;
 }
 
 PlayerGameStatDisplay::~PlayerGameStatDisplay()
@@ -29,12 +28,5 @@ void PlayerGameStatDisplay::draw(DrawTarget *dt) const
     char txt[4096];
     sprintf(txt, "%d", stat.points);
     dt->setClipRect(NULL);
-    dt->putStringCenteredXY(GameUIDefaults::FONT_FUNNY, 300 + player * 40, 360 - player * 40, txt);
-}
-
-void PlayerGameStatDisplay::gameIsOver()
-{
-    if (display_stats == 0)
-        display_stats_start = ios_fc::getTimeMs();
-    display_stats = 1;
+    dt->putStringCenteredXY(GameUIDefaults::FONT_FUNNY, m_x, m_y, txt);
 }

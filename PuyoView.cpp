@@ -52,6 +52,7 @@ void PuyoView::initCommon(PuyoGameFactory *attachedPuyoGameFactory)
 {
 	attachedGame = attachedPuyoGameFactory->createPuyoGame(&attachedPuyoFactory);
     attachedGame->setDelegate(this);
+    m_scoreDisplay.reset(new PlayerGameStatDisplay(attachedGame->getGameStat()));
 	gameRunning = true;
 	enemyGame = NULL;
     skippedCycle = false;
@@ -61,8 +62,6 @@ void PuyoView::initCommon(PuyoGameFactory *attachedPuyoGameFactory)
 
 void PuyoView::initDisplay(int xOffset, int yOffset, int nXOffset, int nYOffset)
 {
-    attachedStatDisplay = new PlayerGameStatDisplay("Player TODO", attachedGame->getGameStat(), xOffset < 320 ? 0 : 1);
-
 	this->m_xOffset = xOffset;
 	this->m_yOffset = yOffset - TSIZE;
 	this->m_nXOffset = nXOffset;
@@ -120,8 +119,6 @@ void PuyoView::cycleAnimation(void)
         // Handle end of game
         if (!gameRunning) {
             delayBeforeGameOver--;
-            if (delayBeforeGameOver < 0)
-                attachedStatDisplay->gameIsOver();
         }
 
         // Cycling every puyo's animation
@@ -248,12 +245,6 @@ void PuyoView::render(DrawTarget *dt)
     }
 }
 
-void PuyoView::renderOverlay(DrawTarget *dt)
-{
-    if (!haveDisplay) return;
-    attachedStatDisplay->draw(dt);
-}
-
 void PuyoView::renderNeutral(DrawTarget *dt)
 {
     if (!haveDisplay) return;
@@ -293,6 +284,11 @@ void PuyoView::renderNeutral(DrawTarget *dt)
 		dt->draw(neutral, NULL, &drect);
 		drect_x += neutral->w;
 	}
+}
+
+void PuyoView::renderScore(DrawTarget *dt)
+{
+    m_scoreDisplay->draw(dt);
 }
 
 void PuyoView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex) {

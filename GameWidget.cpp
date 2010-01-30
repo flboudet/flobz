@@ -326,8 +326,8 @@ void GameWidget::draw(DrawTarget *dt)
     dt->draw(speedBack,&speedBlackRect,&drectBlack);
     dt->draw(speedFront,&speedRect, &drect);
     // Rendering the scores
-    areaA->renderOverlay(dt);
-    areaB->renderOverlay(dt);
+    areaA->renderScore(dt);
+    areaB->renderScore(dt);
     // Rendering the player names
     IosFont *font = GameUIDefaults::FONT_TEXT;
     if (m_displayPlayerOneName)
@@ -430,6 +430,9 @@ void GameWidget::setupGameAreaLayout(PuyoView *area, int playerId)
         attachedLevelTheme->getShouldDisplayShadows(playerId));
     area->setShowEyes(
         attachedLevelTheme->getShouldDisplayEyes(playerId));
+    area->setScoreDisplayPosition(
+        attachedLevelTheme->getScoreDisplayX(playerId),
+        attachedLevelTheme->getScoreDisplayY(playerId));
 }
 
 void *GameWidget::styro_loadImage(StyrolyseClient *_this, const char *path)

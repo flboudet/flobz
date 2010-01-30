@@ -21,18 +21,16 @@ struct PlayerGameStat
 
 class PlayerGameStatDisplay
 {
-    public:
-        PlayerGameStatDisplay(const ios_fc::String &player_name, PlayerGameStat &stat, int player);
-        ~PlayerGameStatDisplay();
-        void draw(DrawTarget *dt) const;
-        void gameIsOver();
-
-    private:
-        ios_fc::String player_name;
-        PlayerGameStat &stat;
-        int player;
-        double display_stats_start;
-        int display_stats;
+public:
+    PlayerGameStatDisplay(PlayerGameStat &stat);
+    ~PlayerGameStatDisplay();
+    void draw(DrawTarget *dt) const;
+    // Accessors
+    void setPosition(int x, int y) { m_x = x; m_y = y; }
+private:
+    PlayerGameStat &stat;
+    int m_x, m_y;
+    int player;
 };
 
 
