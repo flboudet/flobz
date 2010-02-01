@@ -518,7 +518,7 @@ namespace gameui {
             return;
 
         // If the event is a mouse moved event, search and focus the widget beneath the cursor
-        if (event->cursorEvent == kGameMouseMoved) {
+        if ((event->cursorEvent == kGameMouseMoved) || (event->cursorEvent == kGameMouseDown)) {
             Widget *child = getChild(activeWidget);
             for (int i = 0 ; i < this->getNumberOfChilds() ; i++) {
                 Widget *wid = this->getChild(i);
