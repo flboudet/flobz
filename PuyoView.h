@@ -63,13 +63,14 @@ class PuyoView : public PuyoDelegate {
   public:
     // Create a PuyoView with graphical feedback
     PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
-	     AnimatedPuyoSetTheme *attachedThemeSet,
-         PuyoLevelTheme *attachedLevelTheme,
-	     int xOffset, int yOffset, int nXOffset, int nYOffset);
+             int playerId,
+             AnimatedPuyoSetTheme *attachedThemeSet,
+             PuyoLevelTheme *attachedLevelTheme);
 
     // Create a PuyoView without graphical feedback
     PuyoView(PuyoGameFactory *attachedPuyoGameFactory);
 
+    void setupLayout(int playerId);
     void setPlayerNames(const char *p1, const char *p2) { p1name = p1; p2name = p2; }
 
     virtual ~PuyoView();
@@ -154,7 +155,6 @@ class PuyoView : public PuyoDelegate {
     std::auto_ptr<PlayerGameStatDisplay> m_scoreDisplay;
 
     void initCommon(PuyoGameFactory *attachedPuyoGameFactory);
-    void initDisplay(int xOffset, int yOffset, int nXOffset, int nYOffset);
     bool haveDisplay;
 };
 

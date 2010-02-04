@@ -28,10 +28,8 @@ using namespace event_manager;
 
 TwoPlayersGameWidget::TwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String aiFace, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
                                                      attachedRandom(5), attachedGameFactory(&attachedRandom),
-                                                     areaA(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
-                                                     1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE),
-                                                     areaB(&attachedGameFactory, &attachedPuyoThemeSet, &levelTheme,
-                                                     1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE),
+                                                     areaA(&attachedGameFactory, 0, &attachedPuyoThemeSet, &levelTheme),
+                                                     areaB(&attachedGameFactory, 1, &attachedPuyoThemeSet, &levelTheme),
                                                      playercontrollerA(areaA, kPlayer1Down, kPlayer1Left, kPlayer1Right,
                                                      kPlayer1TurnLeft, kPlayer1TurnRight),
                                                      playercontrollerB(areaB, kPlayer2Down, kPlayer2Left, kPlayer2Right,

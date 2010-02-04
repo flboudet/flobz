@@ -57,16 +57,13 @@ void PuyoNetworkGameWidget::initWithGUI(AnimatedPuyoSetTheme &puyoThemeSet, Puyo
     attachedLocalGameFactory   = std::auto_ptr<PuyoLocalGameFactory>(new PuyoLocalGameFactory(attachedRandom.get()));
     attachedNetworkGameFactory = std::auto_ptr<PuyoNetworkGameFactory>(new PuyoNetworkGameFactory(attachedRandom.get(), mbox, gameId));
     if (igpbox != NULL) {
-        localArea = std::auto_ptr<PuyoNetworkView>(new PuyoInternetNetworkView(attachedLocalGameFactory.get(), attachedPuyoThemeSet, &levelTheme,
-                                            1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, gameId, igpbox));
+        localArea = std::auto_ptr<PuyoNetworkView>(new PuyoInternetNetworkView(attachedLocalGameFactory.get(), 0, attachedPuyoThemeSet, &levelTheme,
+                                            &mbox, gameId, igpbox));
     }
     else {
-        localArea = std::auto_ptr<PuyoNetworkView>(new PuyoNetworkView(attachedLocalGameFactory.get(), attachedPuyoThemeSet, &levelTheme,
-                                    1 + CSIZE, BSIZE-TSIZE, CSIZE + PUYODIMX*TSIZE + FSIZE, BSIZE+ESIZE, &mbox, gameId));
+        localArea = std::auto_ptr<PuyoNetworkView>(new PuyoNetworkView(attachedLocalGameFactory.get(), 0, attachedPuyoThemeSet, &levelTheme, &mbox, gameId));
     }
-    networkArea = std::auto_ptr<PuyoView>(new PuyoView(attachedNetworkGameFactory.get(), attachedPuyoThemeSet, &levelTheme,
-                                                       1 + CSIZE + PUYODIMX*TSIZE + DSIZE, BSIZE-TSIZE,
-                                                       CSIZE + PUYODIMX*TSIZE + DSIZE - FSIZE - TSIZE, BSIZE+ESIZE));
+    networkArea = std::auto_ptr<PuyoView>(new PuyoView(attachedNetworkGameFactory.get(), 1, attachedPuyoThemeSet, &levelTheme));
     playercontroller = std::auto_ptr<PuyoPlayer>(createLocalPlayer());
     dummyPlayerController = std::auto_ptr<PuyoNullPlayer>(new PuyoNullPlayer(*networkArea));
     this->mbox->addListener(this);

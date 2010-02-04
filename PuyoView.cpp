@@ -32,27 +32,42 @@
 #include "PuyoGame.h"
 #include "audio.h"
 #include "HiScores.h"
-#include "DoomMelt.h"
 
 PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
-		   AnimatedPuyoSetTheme *attachedThemeSet,
-           PuyoLevelTheme *attachedLevelTheme,
-		   int xOffset, int yOffset, int nXOffset, int nYOffset)
-  : m_playerId(0), m_showNextPuyos(true), m_showShadows(true),
+                   int playerId,
+                   AnimatedPuyoSetTheme *attachedThemeSet,
+                   PuyoLevelTheme *attachedLevelTheme)
+  : m_playerId(playerId), m_showNextPuyos(true), m_showShadows(true),
     attachedThemeSet(attachedThemeSet), attachedLevelTheme(attachedLevelTheme),
     attachedPuyoFactory(this), delayBeforeGameOver(60), haveDisplay(true),
+    m_xOffset(0), m_yOffset(- TSIZE), m_nXOffset(0), m_nYOffset(0),
     neutralXOffset(-1), neutralYOffset(-1)
 {
-    //printf("Constructeur du PuyoView\n");
+    setupLayout(playerId);
     initCommon(attachedPuyoGameFactory);
-    initDisplay(xOffset, yOffset, nXOffset, nYOffset);
+    setScoreDisplayPosition(attachedLevelTheme->getScoreDisplayX(playerId),
+                            attachedLevelTheme->getScoreDisplayY(playerId));
+}
+
+void PuyoView::setupLayout(int playerId)
+{
+    setPlayerId(playerId);
+    setPosition(attachedLevelTheme->getPuyobanX(playerId),
+                attachedLevelTheme->getPuyobanY(playerId));
+    setNextPuyosPosition(attachedLevelTheme->getNextPuyosX(playerId),
+                         attachedLevelTheme->getNextPuyosY(playerId));
+    setNeutralPuyosDisplayPosition(attachedLevelTheme->getNeutralDisplayX(playerId),
+                                   attachedLevelTheme->getNeutralDisplayY(playerId));
+    setShowNextPuyos(attachedLevelTheme->getShouldDisplayNext(playerId));
+    setShowShadows(attachedLevelTheme->getShouldDisplayShadows(playerId));
+    setShowEyes(attachedLevelTheme->getShouldDisplayEyes(playerId));
 }
 
 void PuyoView::initCommon(PuyoGameFactory *attachedPuyoGameFactory)
 {
 	attachedGame = attachedPuyoGameFactory->createPuyoGame(&attachedPuyoFactory);
-    attachedGame->setDelegate(this);
     m_scoreDisplay.reset(new PlayerGameStatDisplay(attachedGame->getGameStat()));
+    attachedGame->setDelegate(this);
 	gameRunning = true;
 	enemyGame = NULL;
     skippedCycle = false;
@@ -60,19 +75,12 @@ void PuyoView::initCommon(PuyoGameFactory *attachedPuyoGameFactory)
     newMetaCycleStart = false;
 }
 
-void PuyoView::initDisplay(int xOffset, int yOffset, int nXOffset, int nYOffset)
-{
-	this->m_xOffset = xOffset;
-	this->m_yOffset = yOffset - TSIZE;
-	this->m_nXOffset = nXOffset;
-	this->m_nYOffset = nYOffset;
-}
-
 PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory)
   : attachedThemeSet(NULL), attachedLevelTheme(NULL),
     attachedPuyoFactory(this), delayBeforeGameOver(60), haveDisplay(false),
     neutralXOffset(-1), neutralYOffset(-1)
 {
+    m_scoreDisplay.reset(new PlayerGameStatDisplay(attachedGame->getGameStat()));
     initCommon(attachedPuyoGameFactory);
 }
 
