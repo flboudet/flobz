@@ -27,9 +27,11 @@ public:
     void draw(DrawTarget *dt) const;
     // Accessors
     void setPosition(int x, int y) { m_x = x; m_y = y; }
+    void setFont(IosFont *font) { m_font = font; }
 private:
     PlayerGameStat &stat;
     int m_x, m_y;
+    IosFont *m_font;
     int player;
 };
 

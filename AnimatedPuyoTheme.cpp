@@ -208,6 +208,18 @@ static void loadPuyobanDefinition(GoomSL *gsl, int playerId, PuyoLevelTheme *the
                            GSL_GLOBAL_FLOAT(gsl, variablePrefix + ".scale"));
 }
 
+static IosFontRef loadFontDefinition(GoomSL *gsl, const String &fontName)
+{
+    String variablePrefix = String("level.") + fontName;
+    String fontPath = (const char *) GSL_GLOBAL_PTR(gsl, variablePrefix + ".path");
+    if (fontPath == "__FONT__") {
+        fontPath = theCommander->getLocalizedFontName();
+    }
+    int fontSize     = GSL_GLOBAL_INT(gsl, variablePrefix + ".size");
+    IosFontFx fontFx = (IosFontFx)(GSL_GLOBAL_INT(gsl, variablePrefix + ".fx"));
+    return theCommander->getFont(fontPath, fontSize, fontFx);
+}
+
 static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
 	FilePath tmp0(GlobalCurrentPath);
@@ -243,6 +255,8 @@ static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     theme->setLifeDisplayXY(GSL_GLOBAL_INT(gsl, "level.life_display.x"), GSL_GLOBAL_INT(gsl, "level.life_display.y"));
     loadPuyobanDefinition(gsl, 0, theme);
     loadPuyobanDefinition(gsl, 1, theme);
+    theme->setPlayerNameFont(loadFontDefinition(gsl, "playerNameFont"));
+    theme->setScoreFont(loadFontDefinition(gsl, "scoreFont"));
     theme->setAnimations((const char *) GSL_GLOBAL_PTR(gsl, "level.gamelost_left_2p"),
                          (const char *) GSL_GLOBAL_PTR(gsl, "level.gamelost_right_2p"),
                          (const char *) GSL_GLOBAL_PTR(gsl, "level.animation_2p"));

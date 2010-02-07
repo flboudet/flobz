@@ -47,6 +47,7 @@ PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
     initCommon(attachedPuyoGameFactory);
     setScoreDisplayPosition(attachedLevelTheme->getScoreDisplayX(playerId),
                             attachedLevelTheme->getScoreDisplayY(playerId));
+    m_scoreDisplay->setFont(attachedLevelTheme->getScoreFont());
 }
 
 void PuyoView::setupLayout(int playerId)

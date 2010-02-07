@@ -202,6 +202,8 @@ public:
     void setShouldDisplayShadows(int playerId, bool shouldDisplayShadows) {_shouldDisplayShadows[playerId] = shouldDisplayShadows; }
     void setShouldDisplayEyes(int playerId, bool shouldDisplayEyes) {_shouldDisplayEyes[playerId] = shouldDisplayEyes; }
     void setPuyobanScale(int playerId, float puyobanScale) {_puyobanScale[playerId] = puyobanScale;}
+    void setPlayerNameFont(const IosFontRef &font) {_playerNameFont = font;}
+    void setScoreFont(const IosFontRef &font) {_scoreFont = font; }
     void setAnimations(String gamelost_left_2p, String gamelost_right_2p, String animation_2p) {
         _gamelost_left_2p = gamelost_left_2p;
         _gamelost_right_2p = gamelost_right_2p;
@@ -236,6 +238,8 @@ public:
     bool getShouldDisplayShadows(int playerId) const { return _shouldDisplayShadows[playerId]; }
     bool getShouldDisplayEyes(int playerId) const { return _shouldDisplayEyes[playerId]; }
     float getPuyobanScale(int playerId) const { return _puyobanScale[playerId]; }
+    IosFont *getPlayerNameFont() const { return _playerNameFont; }
+    IosFont *getScoreFont() const { return _scoreFont; }
 
     const String getGameLostLeftAnimation2P() const;
     const String getGameLostRightAnimation2P() const;
@@ -268,6 +272,9 @@ private:
     IosSurfaceRef _neutralIndicator;
     IosSurfaceRef _bigNeutralIndicator;
     IosSurfaceRef _giantNeutralIndicator;
+    
+    IosFontRef _scoreFont;
+    IosFontRef _playerNameFont;
 
     int _speedMeterX, _speedMeterY;
     int _lifeDisplayX, _lifeDisplayY;

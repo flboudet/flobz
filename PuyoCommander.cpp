@@ -231,6 +231,7 @@ void PuyoCommander::initFonts()
     Locales_Init(); // Make sure locales are detected.
     String fontName, funnyFontName;
     fontName = locale->getLocalizedString("__FONT__");
+    m_localizedFontName = fontName;
     funnyFontName = "gfx/zill_spills.ttf";
     /*try {
      font = dataPathManager.getPath(locale->getLocalizedString("__FONT__"));

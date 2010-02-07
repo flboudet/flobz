@@ -189,6 +189,7 @@ class PuyoCommander
     IosSurface * getRightArrow() { return m_rightArrow; }
     audio_manager::Sound * getWhipSound() const { return m_whipSound; }
     audio_manager::Sound * getWhopSound() const { return m_whopSound; }
+    const String &getLocalizedFontName() const { return m_localizedFontName; }
   protected:
     // Resource manager factory
     virtual void createResourceManagers();
@@ -240,6 +241,7 @@ protected:
     std::auto_ptr<FramePicture> m_separatorFramePicture;
     std::auto_ptr<FramePicture> m_listFramePicture;
     
+    String m_localizedFontName;
     IosFontRef m_darkFont;
     IosFontRef m_menuFont;
     IosFontRef m_smallFont;

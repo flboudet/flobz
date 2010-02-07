@@ -325,7 +325,7 @@ void GameWidget::draw(DrawTarget *dt)
     areaA->renderScore(dt);
     areaB->renderScore(dt);
     // Rendering the player names
-    IosFont *font = GameUIDefaults::FONT_TEXT;
+    IosFont *font = attachedLevelTheme->getPlayerNameFont();
     if (m_displayPlayerOneName)
         dt->putStringCenteredXY(font,
                                 attachedLevelTheme->getNameDisplayX(0),
