@@ -19,7 +19,6 @@ static StatsResources *res;
 
 StatsResources::StatsResources()
 {
-    ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
     res = this;
     rope_elt = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/rope.png");
     ring_left = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/ring.png", IMAGE_READ);

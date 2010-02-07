@@ -21,7 +21,7 @@ class IosSurfaceResourceKey {
 public:
     IosSurfaceResourceKey(ImageType type, const std::string &path, ImageSpecialAbility specialAbility)
         : path(path), type(type), specialAbility(specialAbility) {}
-    bool operator =(const IosSurfaceResourceKey k) const {
+    bool operator ==(const IosSurfaceResourceKey k) const {
         return  ((this->path == k.path) &&
                  (this->type == k.type) &&
                  (this->specialAbility == k.specialAbility));
@@ -40,6 +40,32 @@ public:
 };
 
 /**
+ * Resource key for IosFont management.
+ * Makes an unique key for an ImageType, path, Ability association
+ */
+class IosFontResourceKey {
+public:
+    IosFontResourceKey(const std::string &path, int size, IosFontFx fx = Font_STD)
+    : path(path), size(size), fx(fx) {}
+    bool operator ==(const IosFontResourceKey k) const {
+        return  ((this->path == k.path) &&
+                 (this->size == k.size) &&
+                 (this->fx == k.fx));
+    }
+    bool operator < (const IosFontResourceKey k) const {
+        if (this->path == k.path) {
+            if (this->size == k.size)
+                return this->fx < k.fx;
+            return this->size < k.size;
+        }
+        return (this->path < k.path);
+    }
+    std::string path;
+    int size;
+    IosFontFx fx;
+};
+
+/**
  * Factory for IosSurface resources
  */
 class IosSurfaceFactory : public ResourceFactory<IosSurface, IosSurfaceResourceKey>
@@ -49,6 +75,20 @@ public:
         : m_dataPathManager(dataPathManager) {}
     virtual IosSurface *create(const IosSurfaceResourceKey &resourceKey);
     virtual void destroy(IosSurface *res);
+private:
+    DataPathManager &m_dataPathManager;
+};
+
+/**
+ * Factory for IosFont resources
+ */
+class IosFontFactory : public ResourceFactory<IosFont, IosFontResourceKey>
+{
+public:
+    IosFontFactory(DataPathManager &dataPathManager)
+    : m_dataPathManager(dataPathManager) {}
+    virtual IosFont *create(const IosFontResourceKey &resourceKey);
+    virtual void destroy(IosFont *res);
 private:
     DataPathManager &m_dataPathManager;
 };
@@ -84,6 +124,9 @@ private:
 // IosSurface resources
 typedef ResourceReference<IosSurface> IosSurfaceRef;
 typedef ResourceManager<IosSurface, IosSurfaceResourceKey> IosSurfaceResourceManager;
+// Font resources
+typedef ResourceReference<IosFont> IosFontRef;
+typedef ResourceManager<IosFont, IosFontResourceKey> IosFontResourceManager;
 // Sound resources
 typedef ResourceReference<audio_manager::Sound> SoundRef;
 typedef ResourceManager<audio_manager::Sound> SoundResourceManager;
@@ -116,6 +159,8 @@ class PuyoCommander
     // Resource managers
     void cacheSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0);
     IosSurfaceRef getSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0);
+    void cacheFont(const char *path, int size, IosFontFx fx = Font_STD);
+    IosFontRef getFont(const char *path, int size, IosFontFx fx = Font_STD);
     void cacheSound(const char *path);
     SoundRef getSound(const char *path);
     void cacheMusic(const char *path);
@@ -147,13 +192,21 @@ class PuyoCommander
   protected:
     // Resource manager factory
     virtual void createResourceManagers();
+    // Font creation function
+    virtual void initFonts();
     // Resource Managers
     IosSurfaceFactory m_surfaceFactory;
     std::auto_ptr<IosSurfaceResourceManager> m_surfaceResManager;
+    IosFontFactory m_fontFactory;
+    std::auto_ptr<IosFontResourceManager> m_fontResManager;
     SoundFactory m_soundFactory;
     std::auto_ptr<SoundResourceManager> m_soundResManager;
     MusicFactory m_musicFactory;
-    std::auto_ptr<MusicResourceManager> m_musicResManager;    
+    std::auto_ptr<MusicResourceManager> m_musicResManager;
+    // Data path management
+    DataPathManager dataPathManager;
+    // Localization management
+    LocalizedDictionary * locale;
   private:
 
     friend class SinglePlayerGameAction;
@@ -164,17 +217,13 @@ class PuyoCommander
     void loadPreferences(bool fs);
     void initLocale();
     void initAudio();
-    void initFonts();
-
-    DataPathManager dataPathManager;
 
     MessageBox *mbox;
     GameLoop   *loop;
-    LocalizedDictionary * locale;
-
     AudioManager globalAudioManager;
 
     bool useGL;
+protected:
     IosSurfaceRef m_frameImage;
     IosSurfaceRef m_buttonIdleImage, m_buttonDownImage, m_buttonOverImage;
     IosSurfaceRef m_textFieldIdleImage;
@@ -190,6 +239,13 @@ class PuyoCommander
     std::auto_ptr<FramePicture> m_textFieldIdleFramePicture;
     std::auto_ptr<FramePicture> m_separatorFramePicture;
     std::auto_ptr<FramePicture> m_listFramePicture;
+    
+    IosFontRef m_darkFont;
+    IosFontRef m_menuFont;
+    IosFontRef m_smallFont;
+    IosFontRef m_smallFontInfo;
+    IosFontRef m_textFont;
+    IosFontRef m_funnyFont;
 
     SoundRef m_slideSound;
     SoundRef m_whipSound;

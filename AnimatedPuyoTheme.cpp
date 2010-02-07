@@ -878,7 +878,6 @@ const String PuyoLevelTheme::getLocalizedName(void)
 
 void PuyoLevelTheme::releaseCached(void)
 {
-    unsigned int i;
     _cached = false;
 }
 

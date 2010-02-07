@@ -12,7 +12,7 @@ using namespace gameui;
 using namespace event_manager;
 
 PuyoCommander *theCommander = NULL;
-IosFont *storyFont;
+IosFont *storyFont; // TODO: remove
 
 static const char * kFullScreenPref = "Config.FullScreen";
 #ifdef HAVE_OPENGL
@@ -45,6 +45,28 @@ IosSurface *IosSurfaceFactory::create(const IosSurfaceResourceKey &resourceKey)
 void IosSurfaceFactory::destroy(IosSurface *res)
 {
     res->enableExceptionOnDeletion(false);
+    delete res;
+}
+
+IosFont *IosFontFactory::create(const IosFontResourceKey &resourceKey)
+{
+    try {
+#ifdef PRODUCE_CACHE_FILE
+        fprintf(cacheOutputGsl, "  [cache_picture: path=\"%s\" mode=%d]\n",
+                resourceKey.path.c_str(), resourceKey.type);
+#endif
+        String fullPath = m_dataPathManager.getPath(resourceKey.path.c_str());
+        ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
+        IosFont *newFont = iimLib.createFont(fullPath, resourceKey.size, resourceKey.fx);
+        return newFont;
+    }
+    catch (Exception e) {
+        return NULL;
+    }
+}
+
+void IosFontFactory::destroy(IosFont *res)
+{
     delete res;
 }
 
@@ -108,6 +130,7 @@ void SinglePlayerGameAction::action()
 PuyoCommander::PuyoCommander(String dataDir, int maxDataPackNumber)
   : dataPathManager(dataDir),
     m_surfaceFactory(dataPathManager),
+    m_fontFactory(dataPathManager),
     m_soundFactory(dataPathManager),
     m_musicFactory(dataPathManager),
     m_cursor(NULL)
@@ -205,42 +228,34 @@ void PuyoCommander::initAudio()
 /* load fonts and set them for use in the GUI */
 void PuyoCommander::initFonts()
 {
-  DBG_PRINT("initFonts()\n");
-
-  IosFont * darkFont;
-  IosFont * menuFont;
-  IosFont * smallFont;
-  IosFont * smallFontInfo;
-  IosFont * textFont;
-  IosFont * funnyFont;
-
-  Locales_Init(); // Make sure locales are detected.
-  String font, funny_path;
-  try {
-    font = dataPathManager.getPath(locale->getLocalizedString("__FONT__"));
-  }
-  catch (ios_fc::Exception) {
-    fprintf(stderr,"Font %s not found.\n", (const char *)font);
-    font = dataPathManager.getPath("gfx/font.ttf");
-    fprintf(stderr,"Using default font %s.\n", (const char *)font);
-  }
-  funny_path = getDataPathManager().getPath("gfx/zill_spills.ttf");
-
-  ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
-  darkFont = iimLib.createFont(font, 17, Font_DARK);
-  menuFont = iimLib.createFont(font, 17, Font_STD);
-  smallFont = iimLib.createFont(font, 12, Font_STD);
-  smallFontInfo = iimLib.createFont(font, 12, Font_DARK);
-  textFont = iimLib.createFont(font, 17, Font_GREY);
-  funnyFont = iimLib.createFont(funny_path, 24, Font_STD);
-  storyFont = iimLib.createFont(font, 17, Font_STORY);
-
-  GameUIDefaults::FONT              = menuFont;
-  GameUIDefaults::FONT_TEXT         = textFont;
-  GameUIDefaults::FONT_INACTIVE     = darkFont;
-  GameUIDefaults::FONT_SMALL_INFO   = smallFontInfo;
-  GameUIDefaults::FONT_SMALL_ACTIVE = smallFont;
-  GameUIDefaults::FONT_FUNNY        = funnyFont;
+    Locales_Init(); // Make sure locales are detected.
+    String fontName, funnyFontName;
+    fontName = locale->getLocalizedString("__FONT__");
+    funnyFontName = "gfx/zill_spills.ttf";
+    /*try {
+     font = dataPathManager.getPath(locale->getLocalizedString("__FONT__"));
+     }
+     catch (ios_fc::Exception) {
+     fprintf(stderr,"Font %s not found.\n", (const char *)font);
+     font = dataPathManager.getPath("gfx/font.ttf");
+     fprintf(stderr,"Using default font %s.\n", (const char *)font);
+     }
+     funny_path = getDataPathManager().getPath("gfx/zill_spills.ttf");*/
+    
+    m_darkFont = getFont(fontName, 17, Font_DARK);
+    m_menuFont = getFont(fontName, 17, Font_STD);
+    m_smallFont = getFont(fontName, 12, Font_STD);
+    m_smallFontInfo = getFont(fontName, 12, Font_DARK);
+    m_textFont = getFont(fontName, 17, Font_GREY);
+    m_funnyFont = getFont(funnyFontName, 24, Font_STD);
+    storyFont = getFont(fontName, 17, Font_STORY);
+    
+    GameUIDefaults::FONT              = m_menuFont;
+    GameUIDefaults::FONT_TEXT         = m_textFont;
+    GameUIDefaults::FONT_INACTIVE     = m_darkFont;
+    GameUIDefaults::FONT_SMALL_INFO   = m_smallFontInfo;
+    GameUIDefaults::FONT_SMALL_ACTIVE = m_smallFont;
+    GameUIDefaults::FONT_FUNNY        = m_funnyFont;
 }
 
 
@@ -303,6 +318,16 @@ IosSurfaceRef PuyoCommander::getSurface(ImageType type, const char *path, ImageS
     return m_surfaceResManager->getResource(IosSurfaceResourceKey(type, path, specialAbility));
 }
 
+void PuyoCommander::cacheFont(const char *path, int size, IosFontFx fx)
+{
+    m_fontResManager->cacheResource(IosFontResourceKey(path, size, fx));
+}
+
+IosFontRef PuyoCommander::getFont(const char *path, int size, IosFontFx fx)
+{
+    return m_fontResManager->getResource(IosFontResourceKey(path, size, fx));
+}
+
 void PuyoCommander::cacheSound(const char *path)
 {
     m_soundResManager->cacheResource(path);
@@ -338,10 +363,12 @@ void PuyoCommander::createResourceManagers()
 {
 #ifdef THREADED_RESOURCE_MANAGER
     m_surfaceResManager.reset(new ThreadedResourceManager<IosSurface, IosSurfaceResourceKey>(m_surfaceFactory));
+    m_fontResManager.reset(new ThreadedResourceManager<IosFont, IosFontResourceKey>(m_fontFactory));
     m_soundResManager.reset(new ThreadedResourceManager<audio_manager::Sound>(m_soundFactory));
     m_musicResManager.reset(new ThreadedResourceManager<audio_manager::Music>(m_musicFactory));
 #else
     m_surfaceResManager.reset(new SimpleResourceManager<IosSurface, IosSurfaceResourceKey>(m_surfaceFactory));
+    m_fontResManager.reset(new SimpleResourceManager<IosFont, IosFontResourceKey>(m_fontFactory));
     m_soundResManager.reset(new SimpleResourceManager<audio_manager::Sound>(m_soundFactory));
     m_musicResManager.reset(new SimpleResourceManager<audio_manager::Music>(m_musicFactory));
 #endif
