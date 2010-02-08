@@ -4,6 +4,11 @@ struct <Point:
     int x,
     int y>
 
+struct <Font:
+    string path,
+    int    size,
+    int    fx>
+
 struct <PuyobanDefinition:
     Point display,
     int   should_display_next,
@@ -47,6 +52,8 @@ struct <Level:
     Point  life_display,
     PuyobanDefinition puyoban_p1,
     PuyobanDefinition puyoban_p2,
+    Font   playerNameFont,
+    Font   scoreFont,
     string foreground_animation>
 
 PuyoSet puyoset
@@ -137,6 +144,14 @@ external <end_level>
     level.puyoban_p2.score_display.y = 320
     level.puyoban_p2.scale = 1.0
 
+    level.playerNameFont.path = "__FONT__"
+    level.playerNameFont.size = 17
+    level.playerNameFont.fx   = 2
+    
+    level.scoreFont.path = "gfx/zill_spills.ttf"
+    level.scoreFont.size = 24
+    level.scoreFont.fx   = 0
+    
     level.gamelost_left_2p = "gamelost2p_left.gsl"
     level.gamelost_right_2p = "gamelost2p_right.gsl"
     level.animation_2p = "little_kaori.gsl"
