@@ -43,6 +43,7 @@ private:
     int    m_audio_channels;
 
     bool m_music_on;
+    bool m_sound_on;
 };
 
 #endif // _SDL_AUDIOMANAGER_H_

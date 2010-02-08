@@ -231,31 +231,23 @@ const char * AudioManager::soundOnOffKey(void)  { return kSound; }
 void AudioManager::musicOnOff(bool state)
 {
   if ((!audio_supported) || (music_on == state)) return;
-
   music_on = state;
+  m_audioManager->setMusicEnabled(state);
 
   if (music_on)
   {
-    music_starting = true;
-    musicVolume(music_volume);
-    int lenght = music_current.size();
-    char tmp[lenght+1];
-    music_current.copy(tmp,lenght,0);
-    tmp[lenght] = 0;
-    loadMusic(tmp);
-    music_starting = false;
-  }
-  else
-  {
-      m_audioManager->stopMusic();
+    loadMusic("pop.xm");
+    std::string lastCommand = music_command;
+    music_command = "";
+    music(lastCommand.c_str());
   }
 }
 
 void AudioManager::soundOnOff(bool state)
 {
   if ((!audio_supported) || (sound_on == state)) return;
-
   sound_on = state;
+  m_audioManager->setSoundEnabled(state);
 }
 
 bool AudioManager::isMusicOn()

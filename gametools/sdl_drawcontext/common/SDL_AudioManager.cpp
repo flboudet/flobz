@@ -24,7 +24,7 @@ SDL_AM_Sound::~SDL_AM_Sound()
 }
 
 SDL_AudioManager::SDL_AudioManager()
-    : m_music_on(true)
+    : m_music_on(true), m_sound_on(true)
 {
     m_audio_supported = (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 2048) == 0);
     if (!m_audio_supported)
@@ -41,6 +41,9 @@ SDL_AudioManager::~SDL_AudioManager()
 
 void SDL_AudioManager::setMusicEnabled(bool enabled)
 {
+    if (! enabled)
+        Mix_HaltMusic();
+    m_music_on = enabled;
 }
 
 void SDL_AudioManager::setMusicVolume(float volume)
@@ -76,6 +79,7 @@ void SDL_AudioManager::setMusicPosition(double position)
 
 void SDL_AudioManager::setSoundEnabled(bool enabled)
 {
+    m_sound_on = enabled;
 }
 
 void SDL_AudioManager::setSoundVolume(float volume)
@@ -91,6 +95,8 @@ Sound *SDL_AudioManager::loadSound(const char *fileName)
 
 void SDL_AudioManager::playSound(Sound *sound, float volume, float balance)
 {
+    if (! m_sound_on)
+        return;
     int channel = Mix_PlayChannel (-1, static_cast<SDL_AM_Sound *>(sound)->m_chunk, 0);
     Uint8 leftVolume = (Uint8)(255.*((-balance + 1.)/2.));
     Mix_SetPanning(channel, leftVolume, 255-leftVolume);
