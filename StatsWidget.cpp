@@ -439,6 +439,8 @@ TwoPlayersStatsWidget::TwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, Pl
     m_legendSlider.setPreferedSize(Vec3(m_legendWidth, m_height));
     m_leftSlider.setPreferedSize(Vec3(0., m_height));
     m_rightSlider.setPreferedSize(Vec3(0., m_height));
+    m_leftSlider.setBackgroundOffset(dimensions.m_leftBackgroundOffset);
+    m_rightSlider.setBackgroundOffset(dimensions.m_rightBackgroundOffset);
     HBox *backBox = new HBox();
     VBox *v1 = new VBox();
     Separator *sep1 = new Separator();

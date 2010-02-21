@@ -140,7 +140,7 @@ void TwoPlayersStarterAction::gameOver()
 void TwoPlayersStarterAction::gameScores()
 {
   m_state = kMatchScores;
-  StatsWidgetDimensions dimensions(416, 194, 50);
+  StatsWidgetDimensions dimensions(416, 194, 50, Vec3(0, 0), Vec3(0, 0));
   m_statsWidget = new TwoPlayersStatsWidget(this->gameWidget->getStatPlayerOne(), this->gameWidget->getStatPlayerTwo(), true, true, theCommander->getWindowFramePicture(), dimensions);
   gameScreen->add(m_statsWidget);
 }

@@ -751,6 +751,7 @@ namespace gameui {
 
     SliderContainer::SliderContainer(GameLoop *loop)
         : ZBox(loop), IdleComponent()
+        , m_backgroundOffset(0, 0)
         , m_slideSide(SLIDE_FROM_RIGHT), slidingTime(.45)
         , contentWidget(NULL), previousWidget(NULL)
         , slideStartTime(0.0), currentTime(0.0)
@@ -791,8 +792,8 @@ namespace gameui {
         if (bg != NULL && backgroundVisible)
         {
             IosRect rect;
-            rect.x = (int16_t)getPosition().x - (bg->w - getSize().x)/2;
-            rect.y = (int16_t)getPosition().y - (bg->h - getSize().y)/2;
+            rect.x = (int16_t)getPosition().x - (bg->w - getSize().x)/2 + m_backgroundOffset.x;
+            rect.y = (int16_t)getPosition().y - (bg->h - getSize().y)/2 + m_backgroundOffset.y;
             rect.h = bg->h; rect.w = bg->w;
             dt->draw(bg, NULL, &rect);
         }

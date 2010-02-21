@@ -350,6 +350,11 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
        */
       void setBackground(IosSurface *bg) { this->bg = bg; }
       void setBackgroundVisible(bool visible) { backgroundVisible = visible; }
+      /**
+       * Change the offset on the background image position.
+       * The image will be shifted from its center by the given offset.
+       */
+      void setBackgroundOffset(const Vec3 &offset) { m_backgroundOffset = offset; }
       void setWhipSound(audio_manager::Sound *whip) { m_whipSound = whip; }
       void setWhopSound(audio_manager::Sound *whop) { m_whopSound = whop; }
       /**
@@ -391,6 +396,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       virtual void onSlideInside();
 
     private:
+      Vec3 m_backgroundOffset;
       SlideFromSide m_slideSide;
       double slidingTime;
       Widget *contentWidget;

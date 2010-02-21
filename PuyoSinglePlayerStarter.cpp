@@ -127,7 +127,7 @@ SinglePlayerGameWidget *SinglePlayerStandardLayoutFactory::createGameWidget
 
 StatsWidgetDimensions SinglePlayerStandardLayoutFactory::getStatsWidgetDimensions() const
 {
-    return StatsWidgetDimensions(416, 194, 50);
+    return StatsWidgetDimensions(416, 194, 50, Vec3(0, 0), Vec3(0, 0));
 }
 
 PuyoLevelDefinitions *PuyoLevelDefinitions::currentDefinition = NULL;

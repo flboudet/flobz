@@ -23,14 +23,18 @@ enum StatsDirection {
 
 struct StatsWidgetDimensions {
     StatsWidgetDimensions(float height, float legendWidth,
-                          float comboLineValueWidth)
+                          float comboLineValueWidth,
+                          Vec3 leftBackgroundOffset, Vec3 rightBackgroundOffset)
         : m_height(height), m_legendWidth(legendWidth),
-          m_comboLineValueWidth(comboLineValueWidth) {}
+          m_comboLineValueWidth(comboLineValueWidth),
+          m_leftBackgroundOffset(leftBackgroundOffset),
+          m_rightBackgroundOffset(rightBackgroundOffset) {}
     StatsWidgetDimensions()
         : m_height(0), m_legendWidth(0),
           m_comboLineValueWidth(0) {}
     float m_height, m_legendWidth;
     float m_comboLineValueWidth;
+    Vec3  m_leftBackgroundOffset, m_rightBackgroundOffset;
 };
 
 class ProgressBarWidget : public gameui::Widget, IdleComponent {
@@ -63,7 +67,7 @@ private:
     int m_colorIndex;
 };
 
-#define MAX_DISPLAYED_COMBOS 4 // TODO: More
+#define MAX_DISPLAYED_COMBOS 5 // TODO: More
 struct StatsFormat {
     StatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &playerBStats);
     int m_comboIndirection[MAX_DISPLAYED_COMBOS+1];
