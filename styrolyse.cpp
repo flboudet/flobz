@@ -198,6 +198,8 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
     int        dy    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.y");
     int        dw    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.width");
     int        dh    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.height");
+    float  scalex    = (float)GSL_LOCAL_FLOAT(gsl, local, "&this.scale.x");
+    float  scaley    = (float)GSL_LOCAL_FLOAT(gsl, local, "&this.scale.y");
 
     const char *parent = (const char*)GSL_LOCAL_PTR(gsl, local, "&this.parent");
     Vec2 parentPos = global_sprite_get_position(gsl, parent);
@@ -222,7 +224,7 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
         styrolyse->client->putText(styrolyse->client,x,y,txt);
     }
     else {
-        styrolyse->client->drawImage(styrolyse->client, data, x+dx, y+dy, w, h, dx, dy, dw, dh, fl);
+        styrolyse->client->drawImage(styrolyse->client, data, x+dx, y+dy, w, h, dx, dy, dw, dh, fl, scalex, scaley);
     }
 }
 

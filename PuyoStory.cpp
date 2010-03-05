@@ -94,7 +94,7 @@ static void *loadImage (StyrolyseClient *_this, const char *path)
 
 
 static void  drawImage (StyrolyseClient *_this, void *image, int x, int y, int w, int h,
-                 int clipx, int clipy, int clipw, int cliph, int flipped)
+                 int clipx, int clipy, int clipw, int cliph, int flipped, float scalex, float scaley)
 {
   StyroImage  *simg = (StyroImage*)image;
   IosSurface *surf = simg->surface;
@@ -115,8 +115,12 @@ static void  drawImage (StyrolyseClient *_this, void *image, int x, int y, int w
   cliprect.w = clipw;
   cliprect.h = cliph;
   sstory->setClipRect(&cliprect);
-  if (!flipped) sstory->draw(surf, NULL, &rect);
-  else sstory->drawHFlipped(surf, NULL, &rect);
+  if (flipped)
+	  sstory->drawHFlipped(surf, NULL, &rect);
+  else if (fabs(scalex - 1.0f) > 0.001f)
+	  sstory->drawScaled(surf, NULL, &rect, scalex,scaley);
+  else
+	  sstory->draw(surf, NULL, &rect);
 }
 
 static void  freeImage (StyrolyseClient *_this, void *image)

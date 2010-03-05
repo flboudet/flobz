@@ -418,7 +418,7 @@ void *GameWidget::styro_loadImage(StyrolyseClient *_this, const char *path)
 }
 void GameWidget::styro_drawImage(StyrolyseClient *_this,
 			    void *image, int x, int y, int w, int h,
-			    int clipx, int clipy, int clipw, int cliph, int flipped)
+			    int clipx, int clipy, int clipw, int cliph, int flipped, float scaleX, float scaleY)
 {
     StyroImage *surf = (StyroImage *)image;
     IosRect  rect, cliprect;
@@ -431,9 +431,12 @@ void GameWidget::styro_drawImage(StyrolyseClient *_this,
     cliprect.w = clipw;
     cliprect.h = cliph;
     ((StyrolysePainterClient *)_this)->m_painter->setClipRect(&cliprect);
-    if (!flipped)
+    if (flipped)
+		((StyrolysePainterClient *)_this)->m_painter->drawHFlipped(surf->surface, NULL, &rect);
+    else if (fabs(scaleX - 1.0f) > 0.001f)
+		((StyrolysePainterClient *)_this)->m_painter->drawScaled(surf->surface, NULL, &rect, scaleX, scaleY);
+	else		
         ((StyrolysePainterClient *)_this)->m_painter->draw(surf->surface, NULL, &rect);
-    else ((StyrolysePainterClient *)_this)->m_painter->drawHFlipped(surf->surface, NULL, &rect);
 }
 void GameWidget::styro_freeImage(StyrolyseClient *_this, void *image)
 {

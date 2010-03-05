@@ -89,6 +89,7 @@ public:
     virtual void draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect) = 0;
     virtual void drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect) = 0;
     virtual void drawRotatedCentered(IosSurface *surf, int angle, int x, int y) = 0;
+    virtual void drawScaled(IosSurface *surf, IosRect *srcRect, IosRect *dstRect, float scalex, float scaley) = 0;
 
 	virtual void fillRect(const IosRect *rect, const RGBA &color) = 0;
 
