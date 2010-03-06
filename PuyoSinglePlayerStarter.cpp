@@ -132,6 +132,7 @@ StatsWidgetDimensions SinglePlayerStandardLayoutFactory::getStatsWidgetDimension
 
 PuyoLevelDefinitions *PuyoLevelDefinitions::currentDefinition = NULL;
 
+extern void store_preferences_to_gsl(GoomSL*);
 PuyoLevelDefinitions::PuyoLevelDefinitions(String levelDefinitionFile)
 {
     GoomSL * gsl = gsl_new();
@@ -142,6 +143,7 @@ PuyoLevelDefinitions::PuyoLevelDefinitions(String levelDefinitionFile)
     gsl_compile(gsl,fbuffer);
     currentDefinition = this;
     gsl_bind_function(gsl, "end_level",  PuyoLevelDefinitions::end_level);
+	store_preferences_to_gsl(gsl);
     gsl_execute(gsl);
     free(fbuffer);
     gsl_free(gsl);
