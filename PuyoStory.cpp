@@ -258,6 +258,7 @@ const char *StoryWidget::getText(const char *text) const
     return localeDictionary->getLocalizedString(text);
 }
 
+
 StoryScreen::StoryScreen(String screenName, Screen &previousScreen, Action *finishedAction, bool shouldAddTransition)
     : Screen(), storyWidget(screenName, finishedAction),
       transitionWidget(NULL), finishedAction(finishedAction)

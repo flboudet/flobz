@@ -321,12 +321,27 @@ void styrolyse_event(Styrolyse *_this, const char *event, float x, float y, int 
     gsl_execute(_this->gsl);
 }
 
+#include "AppModel.h"
 void styrolyse_execute(Styrolyse *_this, int mode, float delta_t)
 {
   /* mutexifier cette fonction si multi-thread */
     if (delta_t > 0.04) delta_t = 0.04;
     GSL_GLOBAL_INT(_this->gsl, "@mode") = mode;
     GSL_GLOBAL_FLOAT(_this->gsl, "@delta_t") = delta_t;
+
+	// applications preferences...
+	if (GSL_HAS_GLOBAL(_this->gsl, "@liteVersion")) {
+	GSL_GLOBAL_INT(_this->gsl, "@liteVersion") = getPrefIsLite();
+	GSL_GLOBAL_INT(_this->gsl, "@bluetoothGameLocked") = getPrefBluetoothGameLocked();
+	GSL_GLOBAL_INT(_this->gsl, "@internetGameLocked") = getPrefInternetGameLocked();
+	GSL_GLOBAL_INT(_this->gsl, "@level3Locked") = getPrefLevel3Locked();
+	GSL_GLOBAL_INT(_this->gsl, "@level4Locked") = getPrefLevel4Locked();
+	GSL_GLOBAL_INT(_this->gsl, "@level5Locked") = getPrefLevel5Locked();
+	GSL_GLOBAL_INT(_this->gsl, "@level6Locked") = getPrefLevel6Locked();
+	GSL_GLOBAL_INT(_this->gsl, "@level7Locked") = getPrefLevel7Locked();
+	GSL_GLOBAL_INT(_this->gsl, "@level8Locked") = getPrefLevel8Locked();
+	GSL_GLOBAL_INT(_this->gsl, "@level9Locked") = getPrefLevel9Locked();
+	}
     styrolyse = _this;
     gsl_execute(_this->gsl);
 }
