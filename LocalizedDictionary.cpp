@@ -24,7 +24,6 @@
  */
 
 /* This class is not thread safe */
-
 #ifdef MACOSX
 #include <CoreFoundation/CoreFoundation.h>
 #endif

@@ -184,14 +184,14 @@ public:
      */
     virtual void action(Widget *sender, int actionType,
 			event_manager::GameControlEvent *event);
-private:
-    void stateMachine();
-    void performMatchPlaying(bool skipIntroduction = false,
+protected:
+    virtual void stateMachine();
+    virtual void performMatchPlaying(bool skipIntroduction = false,
 			     bool popScreen = false);
-    void performEndOfMatch();
-    void performHiScoreScreen(String gameOverStoryName);
-    void performBackToMenu();
-    void performGameWon();
+    virtual void performEndOfMatch();
+    virtual void performHiScoreScreen(String gameOverStoryName);
+    virtual void performBackToMenu();
+    virtual void performGameWon();
 
     enum State {
       kGameNotStarted,

@@ -419,15 +419,8 @@ void SinglePlayerStarterAction::performEndOfMatch()
   }
 }
 
-bool getPrefIsLite();
-void initiateBuyMeScreen();
 void SinglePlayerStarterAction::performGameWon()
 {
-	if (getPrefIsLite()) {
-		performHiScoreScreen("gamewon_highscores_1p.gsl");
-		initiateBuyMeScreen();
-	}
-	else {
     m_state = kGameWon;
     m_gameWonScreen = new StoryScreen("gamewon_1p.gsl", *(GameUIDefaults::SCREEN_STACK->top()), this);
     GameUIDefaults::SCREEN_STACK->pop();
@@ -436,7 +429,6 @@ void SinglePlayerStarterAction::performGameWon()
       delete m_currentMatch;
       m_currentMatch = NULL;
     }
-	}
 }
 
 void SinglePlayerStarterAction::performHiScoreScreen(String gameOverStoryName)
