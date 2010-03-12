@@ -78,7 +78,8 @@ class PuyoIA : public virtual PuyoPlayer {
     virtual ~PuyoIA();
     virtual void cycle();
     void setAIParameters(const AIParameters &ai);
-
+	int getLevel() const { return this->level; }
+	
   private:
     PuyoState extractColor(PuyoState A) const;
     PuyoOrientation extractOrientation(int D) const;
@@ -99,6 +100,7 @@ class PuyoIA : public virtual PuyoPlayer {
     bool readyToDrop;
 
     AIParameters params;
+	int level;
   
     PuyoBinom current, next;
     unsigned int bestl1;

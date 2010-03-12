@@ -88,6 +88,7 @@ void SinglePlayerGameWidget::cycle()
         ai.thinkDepth = opponent.getIntegerValue("@AI_ThinkDepth");
         opponentcontroller->setAIParameters(ai);
 
+		opponent.setIntegerValue("@AI_PlayingLevel", opponentcontroller->getLevel());
         opponent.setIntegerValue("@maxHeightLeft", attachedGameA->getColumnHeigth(2));
         opponent.setIntegerValue("@maxHeightRight", attachedGameB->getColumnHeigth(2));
         opponent.setIntegerValue("@maxHeightPlayer", attachedGameA->getColumnHeigth(2));

@@ -259,7 +259,7 @@ inline void columnCompress(const unsigned int x, GridState * const grid)
 
   while (ydst < last) // Tant qu'on a pas rempli dst
   {
-    if ( ysrc < last ) // Si on n'a pas ŽpuisŽ src
+    if ( ysrc < last ) // Si on n'a pas Ã©puisÃ© src
     {
       PuyoState state = (PuyoState)(*grid)[x][ysrc];
       if (state != PUYO_EMPTY) // Si src n'est pas vide
@@ -555,7 +555,7 @@ PuyoIA::PuyoIA(int level, PuyoView &targetView)
   params.fastDropDelta = PUYODIMY; // puyo height relative to column height before fast drop
   params.thinkDepth = 2;
   params.speedFactor = level>0?level:1;
-
+  this->level = level;
 }
 
 void PuyoIA::setAIParameters(const AIParameters &ai)
