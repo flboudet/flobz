@@ -60,7 +60,7 @@ namespace gameui {
             m_altResponder->action(this, actionType, event);
             return;
         }
-        if ((actionType == ON_MOUSEUP) || (actionType == ON_MOUSEUP)) {
+        if (actionType == ON_ACTION) {
             bool val = !stateValue;
             gameui::GlobalNotificationCenter.notify(notifKey, &val);
         }

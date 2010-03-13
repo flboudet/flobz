@@ -153,9 +153,9 @@ ListView::ListView(int size, IosSurface *upArrow, IosSurface *downArrow,
     listBox.setPolicy(USE_MAX_SIZE);
     upButton.setImage(upArrow);
     downButton.setImage(downArrow);
-    upButton.setOnStartAction(this);
+    upButton.setOnMouseDownAction(this);
     upButton.setOnMouseUpAction(this);
-    downButton.setOnStartAction(this);
+    downButton.setOnMouseDownAction(this);
     downButton.setOnMouseUpAction(this);
     scrollerBox.setPreferedSize(Vec3(16., 0.));
     scrollerBox.setPolicy(USE_MIN_SIZE);
@@ -208,11 +208,11 @@ void ListView::eventOccured(GameControlEvent *event)
 void ListView::action(Widget *sender, int actionType, GameControlEvent *event)
 {
     switch (actionType) {
-        case ON_START:
+        case ON_MOUSE_DOWN:
             m_clickedButton = sender;
             handleButtons();
             break;
-        case ON_MOUSEUP:
+        case ON_MOUSE_UP:
             m_clickedButton = NULL;
             break;
         default:
@@ -253,12 +253,12 @@ void ListView::resyncLabels()
     int lastVisible = size < (int)entries.size() ? firstVisible + size : firstVisible + entries.size();
     for (int i = firstVisible ; i < lastVisible ; i++) {
         buttons[i-firstVisible]->setValue(entries[i]->m_text);
-        buttons[i-firstVisible]->setAction(ON_START, entries[i]->m_action);
+        buttons[i-firstVisible]->setAction(ON_ACTION, entries[i]->m_action);
         buttons[i-firstVisible]->setFocusable(true);
     }
     for (int i = lastVisible ; i < firstVisible + size ; i++) {
         buttons[i-firstVisible]->setValue("");
-        buttons[i-firstVisible]->setAction(ON_START, NULL);
+        buttons[i-firstVisible]->setAction(ON_ACTION, NULL);
         buttons[i-firstVisible]->setFocusable(false);
     }
 }

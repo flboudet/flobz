@@ -26,7 +26,7 @@ void FramedButton::setValue(String value)
 
 void FramedButton::eventOccured(GameControlEvent *event)
 {
-    if (event->cursorEvent == kGameMouseDown) {
+    if ((event->cursorEvent == kGameMouseUp) || (event->cursorEvent == kGameMouseDown)) {
         Vec3 widPosition = getPosition();
         Vec3 widSize = getSize();
         // If we click inside the frame

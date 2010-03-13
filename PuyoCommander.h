@@ -134,6 +134,20 @@ typedef ResourceManager<audio_manager::Sound> SoundResourceManager;
 typedef ResourceReference<audio_manager::Music> MusicRef;
 typedef ResourceManager<audio_manager::Music> MusicResourceManager;
 
+class PuyoApplicationState
+{
+public:
+    enum UIState {
+		IN_GAME, IN_MENU
+	};
+	PuyoApplicationState() : ui(IN_MENU), difficulty(0), level(0), playerScore(0) {}
+
+	UIState ui;
+	int difficulty;
+	int level;
+	int playerScore;
+};
+
 class PuyoCommander
 {
   public:
@@ -190,6 +204,11 @@ class PuyoCommander
     audio_manager::Sound * getWhipSound() const { return m_whipSound; }
     audio_manager::Sound * getWhopSound() const { return m_whopSound; }
     const String &getLocalizedFontName() const { return m_localizedFontName; }
+	
+	// Application state
+	const PuyoApplicationState &appState() const { return m_appState; }
+	PuyoApplicationState &appState() { return m_appState; }
+	
   protected:
     // Resource manager factory
     virtual void createResourceManagers();
@@ -254,6 +273,7 @@ protected:
     SoundRef m_whopSound;
 
     AbstractCursor *m_cursor;
+	PuyoApplicationState m_appState;
 };
 
 extern class PuyoCommander *theCommander;

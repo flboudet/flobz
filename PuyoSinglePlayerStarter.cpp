@@ -48,6 +48,10 @@ void SinglePlayerGameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB,
                                levelTheme, gameOverAction);
     addSubWidget(&killLeftCheat);
     addSubWidget(&killRightCheat);
+	int scoringLevel = 4 - level / 15;
+	if (scoringLevel < 1) scoringLevel = 1;
+	areaA.getAttachedGame()->setScoringLevel(scoringLevel);
+	areaB.getAttachedGame()->setScoringLevel(scoringLevel);
 }
 
 SinglePlayerStandardLayoutGameWidget::SinglePlayerStandardLayoutGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)

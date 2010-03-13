@@ -7,6 +7,8 @@
 #include "vec3.h"
 #include "gameloop.h"
 
+#define SLOPPY_FOCUS 1
+
 namespace gameui {
 
   class Widget;
@@ -26,13 +28,13 @@ namespace gameui {
   class Action;
   class ScreenStack;
 
-
   enum GameUIEnum {
     USE_MAX_SIZE = 0,
     USE_MIN_SIZE,
     USE_MAX_SIZE_NO_MARGIN,
-    ON_START,
-    ON_MOUSEUP,
+	ON_ACTION, // Renamed ON_START to make sure I forgot nothing.
+    ON_MOUSE_UP, // Mouse UP and DOWN are now distinct events (for list scroll and stuff like that)
+    ON_MOUSE_DOWN,
     GAMEUIENUM_LAST
   };
 
@@ -181,7 +183,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
 
       virtual void onWidgetVisibleChanged(bool visible);
 
-      Widget *getChild(int i)     const  { return childs[i]; }
+      Widget *getChild(int i)     const  { if (i >= 0) return childs[i]; else return NULL; }
       void    changeChild(int i, Widget *w);
       int     getNumberOfChilds() const  { return childs.size(); }
     protected:
@@ -543,8 +545,9 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
     virtual void onWidgetRemoved(WidgetContainer *parent) { Widget::onWidgetRemoved(parent); }
     virtual void eventOccured(event_manager::GameControlEvent *event);
     // Events
-    void setOnStartAction(Action *onStartAction) { setAction(ON_START, onStartAction); setFocusable(true); }
-    void setOnMouseUpAction(Action *onMouseUpAction) { setAction(ON_MOUSEUP, onMouseUpAction); setFocusable(true); setReceiveUpEvents(true); }
+    void setOnAction(Action *onAction) { setAction(ON_ACTION, onAction); setFocusable(true); setReceiveUpEvents(true); }
+    void setOnMouseDownAction(Action *onMouseDownAction) { setAction(ON_MOUSE_DOWN, onMouseDownAction); setFocusable(true); }
+	void setOnMouseUpAction(Action *onMouseUpAction) { setAction(ON_MOUSE_UP, onMouseUpAction); setFocusable(true); setReceiveUpEvents(true); }
   protected:
     virtual void draw(DrawTarget *dt);
   private:

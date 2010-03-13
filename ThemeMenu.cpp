@@ -68,7 +68,7 @@ void PuyoThemeSelectionBox::build()
     add(&Spacer0);
 
     prevButton->setFocusable(size > 1);
-    prevButton->setOnStartAction(this);
+    prevButton->setOnAction(this);
     prevButton->setInvertedFocus(true);
     add(prevButton);
 
@@ -82,7 +82,7 @@ void PuyoThemeSelectionBox::build()
     add(&Spacer2);
 
     nextButton->setFocusable(size > 1);
-    nextButton->setOnStartAction(this);
+    nextButton->setOnAction(this);
     nextButton->setInvertedFocus(true);
     add(nextButton);
 

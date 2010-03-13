@@ -65,7 +65,7 @@ LocalGameMenu::LocalGameMenu(MainScreen *mainScreen)
       back(locale.getLocalizedString("Back"), &popAction)
 {
     EditField &editName = editPlayerName.getEditField();
-    editName.setAction(ON_START, new NoNameAction(locale, editName));
+    editName.setAction(ON_ACTION, new NoNameAction(locale, editName));
 }
 
 void LocalGameMenu::build() {

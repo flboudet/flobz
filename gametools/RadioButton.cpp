@@ -63,7 +63,7 @@ namespace gameui {
 
     void RadioButton::action(Widget *sender, int actionType, GameControlEvent *event)
     {
-        if ((actionType == ON_MOUSEUP) || (actionType == ON_MOUSEUP)) {
+        if (actionType == ON_ACTION) {
             vector<SwitchedButton *>::iterator myIntVectorIterator;
             int pos = 1;
             for(myIntVectorIterator = buttons.begin();

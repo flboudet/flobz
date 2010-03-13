@@ -34,6 +34,8 @@ namespace gameui {
         return false;
     }
 
+	static Action DUMMY_ACTION;
+	
     //
     // Widget
     //
@@ -42,7 +44,7 @@ namespace gameui {
         position(0,0,0), m_isDead(false), hidden(false), focus(false), focusable(false), _drawRequested(true), receiveUp(false)
     {
         for (int i = 0; i < GAMEUIENUM_LAST; ++i)
-            actions[i] = NULL;
+            actions[i] = &DUMMY_ACTION;
         requestDraw();
     }
 
@@ -516,6 +518,12 @@ namespace gameui {
         // If the box is a zbox, don't perform mouse management
         if (axis == 3.0f)
             return;
+		
+		// Sloppy Focus
+		if (event->cursorEvent == kGameMouseUp) {
+			lostFocus();
+			return;
+		}
 
         // If the event is a mouse moved event, search and focus the widget beneath the cursor
         if ((event->cursorEvent == kGameMouseMoved) || (event->cursorEvent == kGameMouseDown)) {
@@ -1415,22 +1423,26 @@ namespace gameui {
 
     void Image::eventOccured(GameControlEvent *event)
     {
-        bool clicked = false;
         if (isDirectionEvent(event) && !event->isUp)
             lostFocus();
         if (event->cursorEvent == kStart)
-            clicked = true;
-        if (event->cursorEvent == kGameMouseDown) {
+            getAction(ON_ACTION)->action(this, ON_ACTION, event); // clicked = true;
+        else if (event->cursorEvent == kGameMouseUp) {
             Vec3 widPosition = getPosition();
             Vec3 widSize = getSize();
             if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
-                    && (widPosition.x + widSize.x >= widPosition.x) && (widPosition.y + widSize.y >= event->y))
-                clicked = true;
+				&& (widPosition.x + widSize.x >= widPosition.x) && (widPosition.y + widSize.y >= event->y)) {
+                getAction(ON_MOUSE_UP)->action(this, ON_MOUSE_UP, event);
+                getAction(ON_ACTION)->action(this, ON_ACTION, event);
+			}
         }
-        if (clicked) {
-            Action *action = (event->isUp ? getAction(ON_MOUSEUP) : getAction(ON_START));
-            if (action)
-                action->action(this, event->isUp ? ON_MOUSEUP : ON_START, event);
+		else if (event->cursorEvent == kGameMouseDown) {
+            Vec3 widPosition = getPosition();
+            Vec3 widSize = getSize();
+            if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
+				&& (widPosition.x + widSize.x >= widPosition.x) && (widPosition.y + widSize.y >= event->y)) {
+                getAction(ON_MOUSE_DOWN)->action(this, ON_MOUSE_DOWN, event);
+			}
         }
     }
 
@@ -1462,7 +1474,8 @@ namespace gameui {
         : Text(label, NULL)
     {
         init(NULL,NULL);
-        setAction(ON_START, action);
+        setAction(ON_ACTION, action);
+        setReceiveUpEvents(true);
         setValue(label);
     }
 
@@ -1470,14 +1483,11 @@ namespace gameui {
     {
         bool clicked = false;
 
-        if (event->isUp)
-            return;
-
-        if (isDirectionEvent(event))
+        if (isDirectionEvent(event) && !event->isUp)
             lostFocus();
-        if (event->cursorEvent == kStart)
+        if (event->cursorEvent == kStart && !event->isUp)
             clicked = true;
-        if (event->cursorEvent == kGameMouseDown) {
+        if (event->cursorEvent == kGameMouseUp) {
             Vec3 widPosition = getPosition();
             Vec3 widSize = getSize();
             if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
@@ -1485,10 +1495,9 @@ namespace gameui {
                 clicked = true;
         }
         if (clicked) {
-//            fprintf(stderr,"clicked...\n");
-            Action *action = getAction(ON_START);
+            Action *action = getAction(ON_ACTION);
             if (action)
-                action->action(this, ON_START, event);
+                action->action(this, ON_ACTION, event);
         }
     }
 
@@ -1540,7 +1549,7 @@ namespace gameui {
     {
         init(NULL,NULL);
         if (action != NULL)
-            setAction(ON_START, action);
+            setAction(ON_ACTION, action);
     }
 
     void EditField::setValue(String value, bool persistent)
@@ -1624,7 +1633,7 @@ namespace gameui {
                 editionMode = true;
                 setValue(getValue().substring(0, getValue().length() - 1));
                 editionMode = false;
-                Action *action = getAction(ON_START);
+                Action *action = getAction(ON_ACTION);
                 if (action)
                     action->action();
             }
@@ -1794,7 +1803,7 @@ namespace gameui {
         if (editionMode == true && !editOnFocus)  {
             setValue(getValue().substring(0, getValue().length() - 1));
             editionMode = false;
-            Action *action = getAction(ON_START);
+            Action *action = getAction(ON_ACTION);
             if (action)
               action->action();
             editionMode = false;
@@ -1845,7 +1854,7 @@ namespace gameui {
         setValue(temp);
 #endif
         if (action != NULL)
-            setAction(ON_START, action);
+            setAction(ON_ACTION, action);
     }
 
     void ControlInputWidget::cancel(GameControlEvent *event)

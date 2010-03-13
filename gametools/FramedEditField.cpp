@@ -37,7 +37,8 @@ void FramedEditField::initFramedEditField(const FramePicture *framePicture, cons
     void FramedEditField::eventOccured(GameControlEvent *event)
     {
         if (event->cursorEvent == kGameMouseMoved
-            || event->cursorEvent == kGameMouseDown) {
+            || event->cursorEvent == kGameMouseDown
+			|| event->cursorEvent == kGameMouseUp) {
             Vec3 widPosition = getPosition();
             Vec3 widSize = getSize();
             // If we click inside the frame

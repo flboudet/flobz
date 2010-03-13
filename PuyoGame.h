@@ -205,6 +205,9 @@ public:
 
     virtual PlayerGameStat &getGameStat() { return gameStat; }
     virtual void setGameStat(PlayerGameStat &stat) { gameStat = stat; }
+	
+	virtual void setScoringLevel(int gameLevel) {}
+
 protected:
     PuyoDelegate *delegate;
     PuyoFactory *attachedFactory;
@@ -260,7 +263,7 @@ public:
     int getSemiMove() const { return semiMove; }
     bool isPhaseReady(void);
     
-    void setGameLevel(int gameLevel) { this->gameLevel = gameLevel; }
+    void setScoringLevel(int gameLevel) { this->gameLevel = gameLevel; }
 
 private:
     void InitGame(PuyoRandomSystem *attachedRandom);
