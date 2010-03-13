@@ -321,21 +321,21 @@ void styrolyse_event(Styrolyse *_this, const char *event, float x, float y, int 
     gsl_execute(_this->gsl);
 }
 
-#include "AppModel.h"
+#include "GlobalHack.h"
 void store_preferences_to_gsl(GoomSL *gsl)
 {
 	// applications preferences...
 	if (GSL_HAS_GLOBAL(gsl, "@liteVersion")) {
-		GSL_GLOBAL_INT(gsl, "@liteVersion") = getPrefIsLite();
-		GSL_GLOBAL_INT(gsl, "@bluetoothGameLocked") = getPrefBluetoothGameLocked();
-		GSL_GLOBAL_INT(gsl, "@internetGameLocked") = getPrefInternetGameLocked();
-		GSL_GLOBAL_INT(gsl, "@level3Locked") = getPrefLevel3Locked();
-		GSL_GLOBAL_INT(gsl, "@level4Locked") = getPrefLevel4Locked();
-		GSL_GLOBAL_INT(gsl, "@level5Locked") = getPrefLevel5Locked();
-		GSL_GLOBAL_INT(gsl, "@level6Locked") = getPrefLevel6Locked();
-		GSL_GLOBAL_INT(gsl, "@level7Locked") = getPrefLevel7Locked();
-		GSL_GLOBAL_INT(gsl, "@level8Locked") = getPrefLevel8Locked();
-		GSL_GLOBAL_INT(gsl, "@level9Locked") = getPrefLevel9Locked();
+		GSL_GLOBAL_INT(gsl, "@liteVersion") = GlobalHack_getPrefIsLite();
+		GSL_GLOBAL_INT(gsl, "@bluetoothGameLocked") = GlobalHack_getPrefBluetoothGameLocked();
+		GSL_GLOBAL_INT(gsl, "@internetGameLocked") = GlobalHack_getPrefInternetGameLocked();
+		GSL_GLOBAL_INT(gsl, "@level3Locked") = GlobalHack_getPrefLevel3Locked();
+		GSL_GLOBAL_INT(gsl, "@level4Locked") = GlobalHack_getPrefLevel4Locked();
+		GSL_GLOBAL_INT(gsl, "@level5Locked") = GlobalHack_getPrefLevel5Locked();
+		GSL_GLOBAL_INT(gsl, "@level6Locked") = GlobalHack_getPrefLevel6Locked();
+		GSL_GLOBAL_INT(gsl, "@level7Locked") = GlobalHack_getPrefLevel7Locked();
+		GSL_GLOBAL_INT(gsl, "@level8Locked") = GlobalHack_getPrefLevel8Locked();
+		GSL_GLOBAL_INT(gsl, "@level9Locked") = GlobalHack_getPrefLevel9Locked();
 	}
 }
 

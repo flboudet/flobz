@@ -163,6 +163,9 @@ public:
     void refresh();
     virtual ~PuyoGameOver1PScreen();
 private:
+	HBox titleBox;
+	Text titleText;
+	Text titleScore;
     Text names[kHiScoresNumber], points[kHiScoresNumber];
     VBox hiScoreNameBox, hiScorePointBox;
     HBox hiScoreBox;

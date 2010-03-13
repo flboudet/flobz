@@ -128,7 +128,6 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       SDL_FillRect(screen,&r,0x2468AC22);*/
     };
 
-
       virtual void setPosition(const Vec3 &v3)   { position = v3; }
       virtual void setSize(const Vec3 &v3)       { size     = v3; }
       virtual void setParent(WidgetContainer *p) { parent   =  p; }

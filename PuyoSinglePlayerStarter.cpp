@@ -303,10 +303,16 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousSc
             points[i].setFont(GameUIDefaults::FONT);
         }
     }
+	titleText.setFont(GameUIDefaults::FONT_INACTIVE);
+	titleText.setValue(theCommander->getLocalizedString("Your Final Score:"));
+	titleScore.setFont(GameUIDefaults::FONT);
+	titleBox.add(&titleText);
+	titleBox.add(&titleScore);
 
     hiScoreBox.add(&hiScoreNameBox);
     hiScoreBox.add(&hiScorePointBox);
 
+	add(&titleBox);
     add(&hiScoreBox);
     //add(transitionWidget);
     refresh();
@@ -322,6 +328,17 @@ void PuyoGameOver1PScreen::refresh()
         points[i].setValue(tmp);
     }
 
+	{
+		char tmp[256];
+		sprintf(tmp, "%d", playerStat.total_points);
+		titleScore.setValue(tmp);
+		Vec3 titlePos = titleBox.getPosition();
+		titlePos.x = storyWidget.getIntegerValue("@hiScoreTopBox.x");
+		titlePos.y = storyWidget.getIntegerValue("@hiScoreTopBox.y");
+		titleBox.setPosition(titlePos);
+		titleBox.setSize(Vec3(storyWidget.getIntegerValue("@hiScoreTopBox.w"),
+							  storyWidget.getIntegerValue("@hiScoreTopBox.h"), 0));
+	}
     Vec3 hiScorePos = hiScoreBox.getPosition();
     hiScorePos.x = storyWidget.getIntegerValue("@hiScoreBox.x");
     hiScorePos.y = storyWidget.getIntegerValue("@hiScoreBox.y");
