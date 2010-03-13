@@ -162,7 +162,10 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     if (fallingStepBuffer.size() > 0) {
         if (delegate != NULL) {
             for (int i = 0, j = fallingStepBuffer.size() ; i+1 < j ; i += 2) {
-                delegate->fallingsDidFallingStep(findPuyo(fallingStepBuffer[i]), findPuyo(fallingStepBuffer[i+1]));
+                PuyoPuyo *fallingPuyo = findPuyo(fallingStepBuffer[i]);
+                PuyoPuyo *companionPuyo = findPuyo(fallingStepBuffer[i+1]);
+                if ((fallingPuyo != NULL) && (companionPuyo != NULL))
+                    delegate->fallingsDidFallingStep(fallingPuyo, companionPuyo);
             }
         }
     }
@@ -171,7 +174,10 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     if (turnBuffer.size() > 0) {
         if (delegate != NULL) {
             for (int i = 0, j = turnBuffer.size() ; i+2 < j ; i += 3) {
-                delegate->companionDidTurn(findPuyo(turnBuffer[i]), findPuyo(turnBuffer[i+1]), turnBuffer[i+2]);
+                PuyoPuyo *companionPuyo = findPuyo(turnBuffer[i]);
+                PuyoPuyo *fallingPuyo = findPuyo(turnBuffer[i+1]);
+                if ((fallingPuyo != NULL) && (companionPuyo != NULL))
+                    delegate->companionDidTurn(companionPuyo, fallingPuyo, turnBuffer[i+2]);
             }
         }
     }

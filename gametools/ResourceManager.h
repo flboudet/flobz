@@ -13,6 +13,8 @@ class ResourceHolder
 public:
     ResourceHolder(T *res) : m_res(res), m_numRefs(0) {}
     virtual ~ResourceHolder() {}
+    int getNumRefs() const { return m_numRefs; }
+    T *getResource() const { return m_res; }
 protected:
     T *m_res;
     int m_numRefs;
@@ -30,9 +32,22 @@ public:
         if (m_ownerResHolder != NULL)
             m_ownerResHolder->m_numRefs++;
     }
+    ResourceReference(const ResourceReference<T> &res)
+        : m_ownerResHolder(res.m_ownerResHolder){
+        if (m_ownerResHolder != NULL)
+            m_ownerResHolder->m_numRefs++;
+    }
     ~ResourceReference() {
         if (m_ownerResHolder != NULL)
             m_ownerResHolder->m_numRefs--;
+    }
+    ResourceReference<T> & operator = (const ResourceReference<T> &res) {
+        if (m_ownerResHolder != NULL)
+            m_ownerResHolder->m_numRefs--;
+        m_ownerResHolder = res.m_ownerResHolder;
+        if (m_ownerResHolder != NULL)
+            m_ownerResHolder->m_numRefs++;
+        return *this;
     }
     operator T *() const {
         if (m_ownerResHolder == NULL)
@@ -63,8 +78,10 @@ class ResourceManager
 public:
     ResourceManager(ResourceFactory<T, K> &factory)
         : m_factory(factory) {}
+    virtual ~ResourceManager() {}
     virtual void cacheResource(const K &resourceKey) = 0;
     virtual ResourceReference<T> getResource(const K &resourceKey) = 0;
+    virtual void freeUnusedResources() = 0;
 protected:
     ResourceFactory<T, K> &m_factory;
 };
@@ -94,6 +111,24 @@ public:
         }
         else {
             return ResourceReference<T>(resIter->second);
+        }
+    }
+    virtual void freeUnusedResources()
+    {
+        typedef std::vector<typename ResourceMap::iterator> ResourceMapIteratorVector;
+        ResourceMapIteratorVector entriesToErase;
+        for (typename ResourceMap::iterator resIter = m_resources.begin() ;
+             resIter != m_resources.end() ; resIter++) {
+            ResourceHolder<T> *resHolder = resIter->second;
+            if (resHolder->getNumRefs() == 0) {
+                m_factory.destroy(resHolder->getResource());
+                delete resHolder;
+                entriesToErase.push_back(resIter);
+            }
+        }
+        for (typename ResourceMapIteratorVector::iterator iter = entriesToErase.begin() ;
+             iter != entriesToErase.end() ; iter++) {
+            m_resources.erase(*iter);
         }
     }
 };

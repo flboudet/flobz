@@ -349,6 +349,14 @@ MusicRef PuyoCommander::getMusic(const char *path)
     return m_musicResManager->getResource(path);
 }
 
+void PuyoCommander::freeUnusedResources()
+{
+    m_surfaceResManager->freeUnusedResources();
+    //m_fontResManager->freeUnusedResources();
+    m_soundResManager->freeUnusedResources();
+    //m_musicResManager->freeUnusedResources();
+}
+
 void PuyoCommander::registerCursor(AbstractCursor *cursor)
 {
     m_cursor = cursor;

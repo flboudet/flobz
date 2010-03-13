@@ -179,6 +179,7 @@ class PuyoCommander
     SoundRef getSound(const char *path);
     void cacheMusic(const char *path);
     MusicRef getMusic(const char *path);
+    void freeUnusedResources();
 
     // Data path management
     const DataPathManager &getDataPathManager() { return dataPathManager; }
