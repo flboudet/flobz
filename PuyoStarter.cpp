@@ -87,9 +87,8 @@ void GameScreen::onEvent(GameControlEvent *cevent)
             break;
         }
     }
-	if (cevent->cursorEvent == kGameMouseUp) {
+	if (cevent->cursorEvent == kGameMouseUp)
 		pressedFromGameWidget = startPressed();
-	}
 
     if (!pressedFromGameWidget)
         Screen::onEvent(cevent);
