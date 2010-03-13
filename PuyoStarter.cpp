@@ -77,7 +77,7 @@ void GameScreen::onEvent(GameControlEvent *cevent)
     if (!cevent->isUp) {
         switch (cevent->cursorEvent) {
         case kStart:
-        //case kGameMouseUp:
+        // case kGameMouseUp:
             pressedFromGameWidget = startPressed();
             break;
         case kBack:
@@ -87,6 +87,10 @@ void GameScreen::onEvent(GameControlEvent *cevent)
             break;
         }
     }
+	if (cevent->cursorEvent == kGameMouseUp) {
+		pressedFromGameWidget = startPressed();
+	}
+
     if (!pressedFromGameWidget)
         Screen::onEvent(cevent);
 }

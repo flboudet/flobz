@@ -128,19 +128,19 @@ void AudioManager::music(const char *command)
       m_audioManager->setMusicVolume(music_volume * 0.3);
   }
   else if (music_command == "level1") {
-      m_audioManager->setMusicPosition(MGAME[0]);
-      m_audioManager->setMusicVolume(music_volume * 0.3);
-  }
-  else if (music_command == "level1-speed") {
-      m_audioManager->setMusicPosition(FGAME[0]);
-      m_audioManager->setMusicVolume(music_volume * 0.3);
-  }
-  else if (music_command == "level2") {
       m_audioManager->setMusicPosition(MGAME[1]);
       m_audioManager->setMusicVolume(music_volume * 0.3);
   }
-  else if (music_command == "level2-speed") {
+  else if (music_command == "level1-speed") {
       m_audioManager->setMusicPosition(FGAME[1]);
+      m_audioManager->setMusicVolume(music_volume * 0.3);
+  }
+  else if (music_command == "level2") {
+      m_audioManager->setMusicPosition(MGAME[0]);
+      m_audioManager->setMusicVolume(music_volume * 0.3);
+  }
+  else if (music_command == "level2-speed") {
+      m_audioManager->setMusicPosition(FGAME[0]);
       m_audioManager->setMusicVolume(music_volume * 0.3);
   }
   else if (music_command == "level3") {
