@@ -94,6 +94,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
 
       Vec3 getPosition() const           { return position; }
       Vec3 getSize() const               { return size; }
+	  bool isMostlyInside(int x, int y) const; // returns true if x,y is inside the widget bbox.
 
       // default behaviour is to lose the focus
       virtual void eventOccured(event_manager::GameControlEvent *event);

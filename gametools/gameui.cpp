@@ -109,6 +109,18 @@ namespace gameui {
         if (idle != NULL)
             GameUIDefaults::GAME_LOOP->removeIdle(idle);
     }
+	
+	bool Widget::isMostlyInside(int x, int y) const
+	{
+		Vec3 widPosition = getPosition();
+		Vec3 widSize = getSize();
+		widPosition.x -= 10;
+		widPosition.y -= 10;
+		widSize.x += 20;
+		widSize.y += 20;
+		return ((widPosition.x <= x) && (widPosition.y <= y)
+				&& (widPosition.x + widSize.x >= widPosition.x) && (widPosition.y + widSize.y >= y));
+	}
 
     Screen *Widget::getParentScreen() const
     {
@@ -501,6 +513,12 @@ namespace gameui {
             return;
         // Send the event to the active child. If the child doesn't gives up the focus, we're done.
         child->eventOccured(event);
+
+		// Sloppy Focus
+		if (event->cursorEvent == kGameMouseUp) {
+			lostFocus();
+			return;
+		}		
         if (child->haveFocus()) return;
 
         // Keyboard focus management
@@ -518,29 +536,21 @@ namespace gameui {
         // If the box is a zbox, don't perform mouse management
         if (axis == 3.0f)
             return;
-		
-		// Sloppy Focus
-		if (event->cursorEvent == kGameMouseUp) {
-			lostFocus();
-			return;
-		}
 
         // If the event is a mouse moved event, search and focus the widget beneath the cursor
         if ((event->cursorEvent == kGameMouseMoved) || (event->cursorEvent == kGameMouseDown)) {
             Widget *child = getChild(activeWidget);
             for (int i = 0 ; i < this->getNumberOfChilds() ; i++) {
                 Widget *wid = this->getChild(i);
-                Vec3 widPosition = wid->getPosition();
-                Vec3 widSize = wid->getSize();
-                if ((wid->isFocusable()) && (widPosition.x < event->x) && (widPosition.y < event->y)
-                    && (widPosition.x + widSize.x > event->x) && (widPosition.y + widSize.y > event->y) && (activeWidget != i)) {
+                if ((wid->isFocusable()) && wid->isMostlyInside(event->x, event->y) && !wid->haveFocus()) {
                     if (child != NULL)
                         child->lostFocus();
                     activeWidget = i;
                     wid->giveFocus();
-                }
+				}
             }
-        }
+			if (child != NULL && child->haveFocus() && !child->isMostlyInside(event->x, event->y)) child->lostFocus();
+		}
     }
 
     void Box::handleKeyboardFocus(GameControlEvent *event)
@@ -1421,6 +1431,7 @@ namespace gameui {
         requestDraw();
     }
 
+
     void Image::eventOccured(GameControlEvent *event)
     {
         if (isDirectionEvent(event) && !event->isUp)
@@ -1428,19 +1439,13 @@ namespace gameui {
         if (event->cursorEvent == kStart)
             getAction(ON_ACTION)->action(this, ON_ACTION, event); // clicked = true;
         else if (event->cursorEvent == kGameMouseUp) {
-            Vec3 widPosition = getPosition();
-            Vec3 widSize = getSize();
-            if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
-				&& (widPosition.x + widSize.x >= widPosition.x) && (widPosition.y + widSize.y >= event->y)) {
+			if (isMostlyInside(event->x, event->y)) {
                 getAction(ON_MOUSE_UP)->action(this, ON_MOUSE_UP, event);
                 getAction(ON_ACTION)->action(this, ON_ACTION, event);
 			}
         }
 		else if (event->cursorEvent == kGameMouseDown) {
-            Vec3 widPosition = getPosition();
-            Vec3 widSize = getSize();
-            if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
-				&& (widPosition.x + widSize.x >= widPosition.x) && (widPosition.y + widSize.y >= event->y)) {
+			if (isMostlyInside(event->x, event->y)) {
                 getAction(ON_MOUSE_DOWN)->action(this, ON_MOUSE_DOWN, event);
 			}
         }
@@ -1461,6 +1466,7 @@ namespace gameui {
         font = fontInactive;
         setFocusable(true);
         mdontMove = false;
+		setReceiveUpEvents(true);
     }
 
     Button::Button(const String &label, IosFont *fontActive, IosFont *fontInactive)
@@ -1475,7 +1481,6 @@ namespace gameui {
     {
         init(NULL,NULL);
         setAction(ON_ACTION, action);
-        setReceiveUpEvents(true);
         setValue(label);
     }
 
@@ -1488,16 +1493,14 @@ namespace gameui {
         if (event->cursorEvent == kStart && !event->isUp)
             clicked = true;
         if (event->cursorEvent == kGameMouseUp) {
-            Vec3 widPosition = getPosition();
-            Vec3 widSize = getSize();
-            if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
-                    && (widPosition.x + widSize.x >= event->x) && (widPosition.y + widSize.y >= event->y))
+			if (isMostlyInside(event->x, event->y))
                 clicked = true;
         }
         if (clicked) {
             Action *action = getAction(ON_ACTION);
             if (action)
                 action->action(this, ON_ACTION, event);
+			boing();
         }
     }
 
@@ -1507,9 +1510,8 @@ namespace gameui {
         requestDraw();
     }
 
-
     void Button::giveFocus() {
-        if (!haveFocus()) boing();
+        //if (!haveFocus()) boing(); (boing may cause "mouse_up" not to be catched)
         Text::giveFocus();
         font = fontActive;
         requestDraw();

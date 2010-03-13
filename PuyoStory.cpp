@@ -298,11 +298,11 @@ StoryScreen::~StoryScreen()
 void StoryScreen::onEvent(GameControlEvent *cevent)
 {
     bool passEvent = true;
-    if (! cevent->isUp)
+    if ((!cevent->isUp) ||(cevent->cursorEvent==kGameMouseUp))
     switch (cevent->cursorEvent) {
     case kBack:
     case kStart:
-    case kGameMouseDown:
+    case kGameMouseUp:
         if (finishedAction != NULL) {
             finishedAction->action(&storyWidget, 0, cevent);
             passEvent = false;

@@ -26,12 +26,9 @@ void FramedButton::setValue(String value)
 
 void FramedButton::eventOccured(GameControlEvent *event)
 {
-    if ((event->cursorEvent == kGameMouseUp) || (event->cursorEvent == kGameMouseDown)) {
-        Vec3 widPosition = getPosition();
-        Vec3 widSize = getSize();
+    if ((event->cursorEvent == kGameMouseUp) || (event->cursorEvent == kGameMouseMoved) || (event->cursorEvent == kGameMouseDown)) {
         // If we click inside the frame
-        if ((widPosition.x <= event->x) && (widPosition.y <= event->y)
-            && (widPosition.x + widSize.x >= event->x) && (widPosition.y + widSize.y >= event->y))
+        if (isMostlyInside(event->x, event->y))
         {
             // Reposition the click so it's inside the widget
             Vec3 buttonPosition = m_button.getPosition();

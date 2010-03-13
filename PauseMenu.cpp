@@ -47,7 +47,7 @@ PauseMenu::PauseMenu(Action *pauseAction)
     pauseTitleFrame.setPreferedSize(Vec3(0, 20));
     pauseVBox.add(&pauseTitleFrame);
     buttonsBox.add(&continueButton);
-    buttonsBox.add(&optionsButton);
+    //buttonsBox.add(&optionsButton);
     buttonsBox.add(&abortButton);
     pauseVBox.add(&buttonsBox);
     pauseContainer.addListener(*this);
@@ -58,14 +58,14 @@ PauseMenu::PauseMenu(Action *pauseAction)
     add(&topBox);
 
     // Options menu
-    optionsTitleFrame.add(&optionsTitle);
+    /*optionsTitleFrame.add(&optionsTitle);
     optionsTitleFrame.setPreferedSize(Vec3(0, 20));
     optionsBox.add(&optionsTitleFrame);
     optionsButtonsBox.add(&audioButton);
     optionsButtonsBox.add(&musicButton);
     optionsButtonsBox.add(&fullScreenButton);
     optionsButtonsBox.add(&optionsBack);
-    optionsBox.add(&optionsButtonsBox);
+    optionsBox.add(&optionsButtonsBox);*/
 }
 
 PauseMenu::~PauseMenu()
