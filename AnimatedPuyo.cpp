@@ -76,8 +76,10 @@ void AnimatedPuyo::flushAnimations(int animationTag)
 {
     for (int i = animationQueue.size() - 1 ; i >= 0 ; i--) {
         PuyoAnimation *anim = animationQueue[i];
-        if (anim->getTag() == animationTag)
+        if (anim->getTag() == animationTag) {
             animationQueue.removeKeepOrder(anim);
+            delete anim;
+        }
     }
 }
 
@@ -92,6 +94,7 @@ void AnimatedPuyo::cycleAnimation()
             animation->cycle();
             if (animation->isFinished()) {
                 animationQueue.removeKeepOrder(animation);
+                delete animation;
                 i--;
                 exclusive = false;
             }

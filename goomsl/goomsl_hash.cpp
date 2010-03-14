@@ -105,10 +105,16 @@ void goom_hash_free(GoomHash *_this) {
 
 void goom_hash_put(GoomHash *_this, const char *key, GHashValue value) {
     if (_this == NULL) return;
-    int len    = strlen(key);
-	char *key2 = (char*)malloc(len+1);
-	memcpy(key2,key,len+1);
-    _this->root[key2] = value;
+    gg_str_hashmap::iterator it = _this->root.find(key);
+    if (it == _this->root.end()) {
+        int len    = strlen(key);
+        char *key2 = (char*)malloc(len+1);
+        memcpy(key2,key,len+1);
+        _this->root[key2] = value;
+    }
+    else {
+        _this->root[key] = value;
+    }
 }
 
 GHashValue *goom_hash_get(GoomHash *_this, const char *key) {
