@@ -38,6 +38,7 @@ public:
     void setBorderVisible(bool borderVisible) { m_borderVisible = borderVisible; }
     bool getBorderVisible() const { return m_borderVisible; }
     void setFocusedPicture(const FramePicture *focusedSurface) { m_focusedSurface = focusedSurface; }
+    void freeMemory();
 private:
     void cacheSurface(IosSurface * &cachedSurface, const FramePicture *framePicture);
     const FramePicture *m_frameSurface;

@@ -58,7 +58,8 @@ public:
     void setIntegerValue(String varName, int value);
     int getIntegerValue(String varName) const;
     const char *getText(const char *text) const;
-
+    void freeMemory();
+    
     struct PuyoStoryStyrolyseClient {
         StyrolyseClient styroClient;
         StoryWidget *widget;

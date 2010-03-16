@@ -175,5 +175,17 @@ void Frame::cacheSurface(IosSurface * &cachedSurface, const FramePicture *frameP
   }
 }
 
+void Frame::freeMemory()
+{
+    if (m_bgSurface != NULL) {
+        delete m_bgSurface;
+        m_bgSurface = NULL;
+    }
+    if (m_bgFocus != NULL) {
+        delete m_bgFocus;
+        m_bgFocus = NULL;
+    }
+}
+
 }
 

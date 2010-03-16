@@ -258,6 +258,11 @@ const char *StoryWidget::getText(const char *text) const
     return localeDictionary->getLocalizedString(text);
 }
 
+void StoryWidget::freeMemory()
+{
+    styrolyse_reduce_memory(currentStory);
+}
+
 
 StoryScreen::StoryScreen(String screenName, Screen &previousScreen, Action *finishedAction, bool shouldAddTransition)
     : Screen(), storyWidget(screenName, finishedAction),
