@@ -33,6 +33,7 @@ void styrolyse_init(const char *styrolyse_path, const char *styrolyse_path_nofx,
 Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client, int fxMode);
 void styrolyse_reload(Styrolyse *_this);
 void styrolyse_free(Styrolyse *_this);
+void styrolyse_reduce_memory(Styrolyse *_this);
 void styrolyse_update(Styrolyse *_this, float delta_t);
 int  styrolyse_finished(Styrolyse *_this);
 void styrolyse_draw(Styrolyse *_this);

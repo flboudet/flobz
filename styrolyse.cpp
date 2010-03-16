@@ -306,6 +306,13 @@ void styrolyse_free(Styrolyse *_this)
   free(_this);
 }
 
+void styrolyse_reduce_memory(Styrolyse *_this)
+{
+    styrolyse = _this;
+    goom_hash_for_each(_this->images, images_free_from_hash);
+    goom_hash_clear(_this->images);
+}
+
 void styrolyse_event(Styrolyse *_this, const char *event, float x, float y, int player)
 {
   if (!_this->gsl) return;

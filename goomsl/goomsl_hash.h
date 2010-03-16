@@ -16,6 +16,7 @@ typedef union {
 GoomHash *goom_hash_new();
 void      goom_hash_free(GoomHash *gh);
 
+void goom_hash_clear(GoomHash *_this);
 void goom_hash_put(GoomHash *gh, const char *key, GHashValue value);
 GHashValue *goom_hash_get(GoomHash *gh, const char *key);
 

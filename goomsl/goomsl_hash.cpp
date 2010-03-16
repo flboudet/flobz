@@ -103,6 +103,10 @@ void goom_hash_free(GoomHash *_this) {
 	delete _this;
 }
 
+void goom_hash_clear(GoomHash *_this) {
+    _this->root.clear();
+}
+
 void goom_hash_put(GoomHash *_this, const char *key, GHashValue value) {
     if (_this == NULL) return;
     gg_str_hashmap::iterator it = _this->root.find(key);
