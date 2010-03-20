@@ -48,8 +48,9 @@ void SinglePlayerGameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB,
                                levelTheme, gameOverAction);
     addSubWidget(&killLeftCheat);
     addSubWidget(&killRightCheat);
-	int scoringLevel = 4 - level / 15;
+	int scoringLevel = 30/level;
 	if (scoringLevel < 1) scoringLevel = 1;
+	if (scoringLevel > 10) scoringLevel = 10;
 	areaA.getAttachedGame()->setScoringLevel(scoringLevel);
 	areaB.getAttachedGame()->setScoringLevel(scoringLevel);
 }
