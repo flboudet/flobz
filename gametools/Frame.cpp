@@ -32,7 +32,7 @@ void FramePicture::setFrameSurface(IosSurface *frameSurface)
 	if (frameSurface->haveAbility(IMAGE_READ)) {
 		m_contentColor = frameSurface->readRGBA(m_leftW, m_topH);
 		frameSurface->dropAbility(IMAGE_READ);
-		fprintf(stderr, "FramePicture: %s, rgb=%i %i %i\n", frameSurface->name.c_str(), m_contentColor.red,m_contentColor.green,m_contentColor.blue);
+		//fprintf(stderr, "FramePicture: %s, rgb=%i %i %i\n", frameSurface->name.c_str(), m_contentColor.red,m_contentColor.green,m_contentColor.blue);
 	}
 	else {
 		fprintf(stderr, "WARNING: Cannot read pixel color of a FramePicture: %s\n", frameSurface->name.c_str());
