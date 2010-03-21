@@ -37,9 +37,30 @@ struct StatsWidgetDimensions {
     Vec3  m_leftBackgroundOffset, m_rightBackgroundOffset;
 };
 
+#define MAX_DISPLAYED_COMBOS 5 // TODO: More
+class StatsResources {
+public:
+    IosSurfaceRef rope_elt;
+    IosSurfaceRef ring_left;
+    IosSurfaceRef originalPuyoLeft[4];
+    std::auto_ptr<IosSurface> ring_right;
+    IosSurface * puyo_right[4][4];
+    IosSurface *puyo_left[4][4];
+    IosSurfaceRef puyo_left_mask;
+    std::auto_ptr<IosSurface> puyo_right_mask;
+    IosSurfaceRef stats_bg_winner;
+    std::auto_ptr<IosSurface> stats_bg_loser;
+    IosSurfaceRef separator;
+    IosSurfaceRef titleImage;
+    IosSurfaceRef comboImage[MAX_DISPLAYED_COMBOS];
+public:
+    StatsResources();
+    ~StatsResources();
+};
+
 class ProgressBarWidget : public gameui::Widget, IdleComponent {
 public:
-    ProgressBarWidget(gameui::Action *associatedAction);
+    ProgressBarWidget(StatsResources &res, gameui::Action *associatedAction);
     virtual ~ProgressBarWidget() {}
     void draw(DrawTarget *dt);
     void idle(double currentTime);
@@ -55,6 +76,7 @@ public:
         PROGRESSION_COMPLETE
     };
 private:
+    StatsResources &m_res;
     StatsDirection m_dir;
     float m_value, m_fromValue, m_targetValue;
     bool m_progressive;
@@ -67,7 +89,6 @@ private:
     int m_colorIndex;
 };
 
-#define MAX_DISPLAYED_COMBOS 5 // TODO: More
 struct StatsFormat {
     StatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &playerBStats);
     int m_comboIndirection[MAX_DISPLAYED_COMBOS+1];
@@ -75,7 +96,7 @@ struct StatsFormat {
 
 class StatsWidget : public gameui::VBox, gameui::Action, IdleComponent {
 public:
-    StatsWidget(StatsFormat &statsFormat,
+    StatsWidget(StatsResources &res, StatsFormat &statsFormat,
                 StatsWidgetDimensions &dimensions,
                 PlayerGameStat &stats, PlayerGameStat &opponentStats,
                 const gameui::FramePicture *framePicture, StatsDirection dir,
@@ -88,12 +109,13 @@ public:
     virtual IdleComponent *getIdleComponent() { return this; }
     bool isWinner() const { return m_stats.is_winner; }
 private:
+    StatsResources &m_res;
     StatsDirection m_dir;
     bool m_showGlobalScore;
     gameui::Action *m_action;
     class ComboLine : public gameui::HBox, gameui::Action {
     public:
-        ComboLine();
+        ComboLine(StatsResources &res);
         virtual ~ComboLine() {}
         void setComboLineInfos(StatsDirection dir, int tag, String comboText,
                                int numberOfCombos, int vsNumberOfCombos,
@@ -115,7 +137,7 @@ private:
     StatsFormat &m_statsFormat;
     PlayerGameStat &m_stats, &m_opponentStats;
     gameui::Text m_statTitle;
-    ComboLine m_comboLines[MAX_DISPLAYED_COMBOS];
+    std::vector<ComboLine *> m_comboLines;
     int m_maxCombo;
     gameui::Text m_score, m_globalScore;
     double m_startTime;
@@ -124,7 +146,8 @@ private:
 
 class StatsLegendWidget : public gameui::Frame, public gameui::Action {
 public:
-  StatsLegendWidget(StatsFormat &statsFormat, StatsWidget &guideWidget, const gameui::FramePicture *framePicture);
+  StatsLegendWidget(StatsFormat &statsFormat, StatsWidget &guideWidget,
+                    const gameui::FramePicture *framePicture, StatsResources &res);
   virtual ~StatsLegendWidget() {}
   virtual void onWidgetVisibleChanged(bool visible);
   virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
@@ -136,25 +159,6 @@ private:
   gameui::SliderContainer m_legendSlider[MAX_DISPLAYED_COMBOS];
   gameui::HBox m_legendCell[MAX_DISPLAYED_COMBOS];
   gameui::Image m_legendImage[MAX_DISPLAYED_COMBOS];
-};
-
-class StatsResources {
-    public:
-        IosSurfaceRef rope_elt;
-        IosSurfaceRef ring_left;
-        IosSurfaceRef originalPuyoLeft[4];
-        std::auto_ptr<IosSurface> ring_right;
-        IosSurface * puyo_right[4][4];
-        IosSurface *puyo_left[4][4];
-        IosSurfaceRef puyo_left_mask;
-        std::auto_ptr<IosSurface> puyo_right_mask;
-        IosSurfaceRef stats_bg_winner;
-        std::auto_ptr<IosSurface> stats_bg_loser;
-        IosSurfaceRef separator;
-        IosSurfaceRef titleImage;
-        IosSurfaceRef comboImage[MAX_DISPLAYED_COMBOS];
-        StatsResources();
-        ~StatsResources();
 };
 
 class TwoPlayersStatsWidget : public gameui::ZBox, gameui::SliderContainerListener {

@@ -15,11 +15,8 @@
 using namespace gameui;
 using namespace event_manager;
 
-static StatsResources *res;
-
 StatsResources::StatsResources()
 {
-    res = this;
     rope_elt = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/rope.png");
     ring_left = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/ring.png", IMAGE_READ);
     ring_right.reset(ring_left.get()->mirrorH());
@@ -49,8 +46,7 @@ StatsResources::StatsResources()
         String pictureName = String("gfx/combo") + (numCombo+1) + "x_stat.png";
         comboImage[numCombo] = theCommander->getSurface(IMAGE_RGBA, pictureName);
     }
-    stats_bg_winner = theCommander->getSurface(IMAGE_RGBA, "gfx/stats-bg.png");
-    stats_bg_loser.reset(stats_bg_winner.get()->shiftHue(180));
+    stats_bg_winner = theCommander->getSurface(IMAGE_RGBA, "gfx/stats-bg.png", IMAGE_READ);
     stats_bg_loser.reset(stats_bg_winner.get()->shiftHue(180));
 }
 
@@ -65,8 +61,9 @@ StatsResources::~StatsResources()
     }
 }
 
-ProgressBarWidget::ProgressBarWidget(Action *associatedAction)
-  : m_value(0.), m_targetValue(0.), m_progressive(false), m_progressiveDuration(LINE_DURATION), m_visible(true),
+ProgressBarWidget::ProgressBarWidget(StatsResources &res, Action *associatedAction)
+  : m_res(res), m_value(0.), m_targetValue(0.), m_progressive(false),
+    m_progressiveDuration(LINE_DURATION), m_visible(true),
     m_associatedAction(associatedAction), m_positiveAttitude(true)
 {
     setPreferedSize(Vec3(0, 32));
@@ -104,9 +101,9 @@ void ProgressBarWidget::draw(DrawTarget *dt)
     dstrect.h = bsize.y;
     dstrect.w = 10;
     if (m_dir == LEFT_TO_RIGHT)
-        dt->draw(res->ring_right.get(), NULL, &dstrect);
+        dt->draw(m_res.ring_right.get(), NULL, &dstrect);
     else
-        dt->draw(res->ring_left, NULL, &dstrect);
+        dt->draw(m_res.ring_left, NULL, &dstrect);
     for (int i=1; i<=n_rope_elt; ++i) {
 
         dstrect.w = IMG_ROPE_ELT_WIDTH;
@@ -139,18 +136,18 @@ void ProgressBarWidget::draw(DrawTarget *dt)
         else {
             dstrect.x = bpos.x + (bsize.x - dstrect.x - IMG_ROPE_ELT_WIDTH) - IMG_RING_WIDTH - 1;
         }
-        dt->draw(res->rope_elt, NULL, &dstrect);
+        dt->draw(m_res.rope_elt, NULL, &dstrect);
     }
-    dstrect.w = res->puyo_right[0][0]->w;
-    dstrect.h = res->puyo_right[0][0]->h;
+    dstrect.w = m_res.puyo_right[0][0]->w;
+    dstrect.h = m_res.puyo_right[0][0]->h;
     dstrect.y = bpos.y;
     if (m_dir == LEFT_TO_RIGHT) {
         dstrect.x = bpos.x + rope_size + IMG_RING_WIDTH - 4;
-        dt->draw(res->puyo_right[m_colorIndex][m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)], NULL, &dstrect);
+        dt->draw(m_res.puyo_right[m_colorIndex][m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)], NULL, &dstrect);
     }
     else {
         dstrect.x = bpos.x + bsize.x - rope_size - IMG_RING_WIDTH - IMG_PUYO_WIDTH + 4;
-        dt->draw(res->puyo_left[m_colorIndex][m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)], NULL, &dstrect);
+        dt->draw(m_res.puyo_left[m_colorIndex][m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)], NULL, &dstrect);
     }
 }
 
@@ -213,34 +210,38 @@ StatsFormat::StatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &playerBSt
 }
 
 
-StatsWidget::StatsWidget(StatsFormat &statsFormat,
+StatsWidget::StatsWidget(StatsResources &res, StatsFormat &statsFormat,
                          StatsWidgetDimensions &dimensions,
                          PlayerGameStat &stats, PlayerGameStat &opponentStats,
                          const gameui::FramePicture *framePicture, StatsDirection dir,
                          bool showGlobalScore,
                          gameui::Action *action)
-  : m_dir(dir), m_showGlobalScore(showGlobalScore),
+  : m_res(res), m_dir(dir), m_showGlobalScore(showGlobalScore),
     m_action(action), m_statsFormat(statsFormat),
     m_stats(stats), m_opponentStats(opponentStats),
-    m_statTitle("Combos"), m_maxCombo(0), m_startTime(-1)
+    m_statTitle("Combos"),
+    m_maxCombo(0), m_startTime(-1)
 {
     setPolicy(USE_MIN_SIZE);
     setInnerMargin(15);
 
     // Create Layout
     Text *txt = new Text(stats.is_winner?"WINNER":"LOSER");
-    Image *img1 = new Image(res->separator);
+    Image *img1 = new Image(res.separator);
     img1->setPreferedSize(Vec3(128, 50));
     add(txt);
     add(img1);
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++) {
-        m_comboLines[i].setDimensions(dimensions);
-        add(&m_comboLines[i]);
+        ComboLine *newComboLine = new ComboLine(res);
+        newComboLine->setDimensions(dimensions);
+        add(newComboLine);
+        widgetAutoReleasePool.add(newComboLine);
+        m_comboLines.push_back(newComboLine);
     }
     Separator *sep = new Separator();
     sep->setPreferedSize(Vec3(128, 24));
     add(sep);
-    Image *img2 = new Image(res->separator);
+    Image *img2 = new Image(res.separator);
     img2->setPreferedSize(Vec3(128, 8));
     add(img2);
 
@@ -302,7 +303,7 @@ void StatsWidget::action(Widget *sender, int actionType, GameControlEvent *event
         return;
     int currentComboIndex = m_statsFormat.m_comboIndirection[comboIndirectionIndex];
     if (currentComboIndex != -1)
-        m_comboLines[comboIndirectionIndex].setComboLineInfos(m_dir, comboIndirectionIndex, String(""),
+        m_comboLines[comboIndirectionIndex]->setComboLineInfos(m_dir, comboIndirectionIndex, String(""),
                                                         m_stats.combo_count[currentComboIndex],
                                                         m_opponentStats.combo_count[currentComboIndex],
                                                         m_maxCombo, this);
@@ -312,7 +313,7 @@ void StatsWidget::startAnimation()
 {
     int currentComboIndex = m_statsFormat.m_comboIndirection[0];
     if (currentComboIndex != -1)
-        m_comboLines[0].setComboLineInfos(m_dir, 0, String(""),
+        m_comboLines[0]->setComboLineInfos(m_dir, 0, String(""),
                                           m_stats.combo_count[currentComboIndex],
                                           m_opponentStats.combo_count[currentComboIndex],
                                           m_maxCombo, this);
@@ -320,8 +321,8 @@ void StatsWidget::startAnimation()
         m_action->action(this, 0, NULL);
 }
 
-StatsWidget::ComboLine::ComboLine()
-  : m_progressBar(this)
+StatsWidget::ComboLine::ComboLine(StatsResources &res)
+  : m_progressBar(res, this)
 {
     //add(&m_comboLabel);
 }
@@ -387,19 +388,20 @@ void StatsWidget::ComboLine::action(Widget *sender, int actionType, GameControlE
     }
 }
 
-StatsLegendWidget::StatsLegendWidget(StatsFormat &statsFormat, StatsWidget &guideWidget, const gameui::FramePicture *framePicture)
+StatsLegendWidget::StatsLegendWidget(StatsFormat &statsFormat, StatsWidget &guideWidget,
+                                     const gameui::FramePicture *framePicture, StatsResources &res)
   : Frame(framePicture), m_statsImage(), m_statsFormat(statsFormat), m_guideWidget(guideWidget)
 {
     setPolicy(USE_MIN_SIZE);
     setInnerMargin(10);
     // Load title image
-    m_statsImage.setImage(res->titleImage);
+    m_statsImage.setImage(res.titleImage);
     m_statsImage.setAlign(IMAGE_CENTERED);
     add(&m_statsImage);
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++) {
         int numCombo = m_statsFormat.m_comboIndirection[i];
         if (numCombo != -1) {
-            m_legendImage[i].setImage(res->comboImage[numCombo]);
+            m_legendImage[i].setImage(res.comboImage[numCombo]);
             m_legendImage[i].setAlign(IMAGE_CENTERED);
             m_legendCell[i].add(&m_legendImage[i]);
         }
@@ -431,9 +433,9 @@ TwoPlayersStatsWidget::TwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, Pl
                                                      bool showLeftGlobalScore, bool showRightGlobalScore,
                                                      const gameui::FramePicture *framePicture, StatsWidgetDimensions &dimensions)
   : m_statsFormat(leftPlayerStats, rightPlayerStats),
-    m_legend(m_statsFormat, m_leftStats, NULL/*framePicture*/),
-    m_leftStats(m_statsFormat, dimensions, leftPlayerStats, rightPlayerStats, NULL, RIGHT_TO_LEFT, showLeftGlobalScore, &m_legend),
-    m_rightStats(m_statsFormat, dimensions, rightPlayerStats, leftPlayerStats, NULL, LEFT_TO_RIGHT, showRightGlobalScore),
+    m_legend(m_statsFormat, m_leftStats, NULL, m_res),
+    m_leftStats(m_res, m_statsFormat, dimensions, leftPlayerStats, rightPlayerStats, NULL, RIGHT_TO_LEFT, showLeftGlobalScore, &m_legend),
+    m_rightStats(m_res, m_statsFormat, dimensions, rightPlayerStats, leftPlayerStats, NULL, LEFT_TO_RIGHT, showRightGlobalScore),
     m_height(dimensions.m_height), m_legendWidth(dimensions.m_legendWidth)
 {
     m_legendSlider.setPreferedSize(Vec3(m_legendWidth, m_height));
@@ -496,8 +498,8 @@ void TwoPlayersStatsWidget::onWidgetVisibleChanged(bool visible)
     m_leftSlider.transitionToContent(&m_leftStats);
     m_rightSlider.transitionToContent(&m_rightStats);
     m_legendSlider.transitionToContent(&m_legend);
-    m_leftSlider.setBackground(m_leftStats.isWinner() ? ::res->stats_bg_winner.get() : ::res->stats_bg_loser.get());
-    m_rightSlider.setBackground(m_rightStats.isWinner() ? ::res->stats_bg_winner.get() : ::res->stats_bg_loser.get());
+    m_leftSlider.setBackground(m_leftStats.isWinner() ? m_res.stats_bg_winner.get() : m_res.stats_bg_loser.get());
+    m_rightSlider.setBackground(m_rightStats.isWinner() ? m_res.stats_bg_winner.get() : m_res.stats_bg_loser.get());
 }
 
 void TwoPlayersStatsWidget::onSlideInside(SliderContainer &slider)
