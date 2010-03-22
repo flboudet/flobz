@@ -5,18 +5,27 @@ using namespace event_manager;
 namespace gameui {
 
 FramedButton::FramedButton(const String &label, Action *action,
-			   const FramePicture *btnPicture, const FramePicture *focusedPicture)
-  : Frame(btnPicture), m_button(label, action)
+			   const FramePicture *btnPicture, const FramePicture *focusedPicture,
+               IosFont *fontActive, IosFont *fontInactive, IosSurface *image)
+  : Frame(btnPicture), m_button(label, fontActive, fontInactive)
 {
   m_button.mdontMove = true;
+  m_button.setAction(ON_ACTION, action);
   setFocusedPicture(focusedPicture);
   Vec3 preferedSize = m_button.getPreferedSize();
   preferedSize.x += 25;
   preferedSize.y = 28;
-  setPreferedSize(preferedSize);
   setFocusable(true);
-  //m_button.setFocusable(false);
-  add(&m_button);
+  if (image != NULL) {
+      m_image.setImage(image);
+      m_separator.setPreferedSize(Vec3(2, 0));
+      m_box.add(&m_image);
+      m_box.add(&m_separator);
+      preferedSize.x += 2 + image->w;
+  }
+  m_box.add(&m_button);
+  add(&m_box);
+  setPreferedSize(preferedSize);
 }
 
 void FramedButton::setValue(String value)
