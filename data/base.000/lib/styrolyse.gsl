@@ -64,6 +64,7 @@ struct <Sprite:
   Vec2   pos,
   Vec2   size,
   Vec2   dest,
+  Vec2   scale,
   int    flipped,
   float  dcycle,
   string image,
@@ -91,6 +92,8 @@ struct <Display:
   new_sprite.pos.y     = y
   new_sprite.size.x    = -1.
   new_sprite.size.y    = -1.
+  new_sprite.scale.x    = 1.
+  new_sprite.scale.y    = 1.
   new_sprite.dest.x    = x
   new_sprite.dest.y    = y
   new_sprite.flipped   = 0

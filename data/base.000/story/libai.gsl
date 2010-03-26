@@ -32,6 +32,22 @@ int @neutralsForAI
   # Depth of AI analysis. 0 = drops randomly, 1 = tries every combinations, 2 = tries every combinations with the next puyos as well
   int @AI_ThinkDepth = 2
 
+  int @AI_PlayingLevel = 0
+
+<AI_LevelRectif>
+	  (@AI_PlayingLevel >= 25)? {
+		@AI_FastDropDelta /= 4
+        @AI_PotentialSuppression /= 4
+		@AI_CriticalHeight /= 2
+		(@AI_RotationMethod = 0)? @AI_RotationMethod = 1
+      }
+	  (@AI_PlayingLevel > 14)? (@AI_PlayingLevel < 20)? {
+		@AI_FastDropDelta *= 2
+		@AI_FastDropDelta /= 3
+        @AI_PotentialSuppression *= 2
+        @AI_PotentialSuppression /= 3
+      }
+
 <AI_Gyom> // Nohoho maker
       AI_Init
       @AI_RealSuppression      = 2

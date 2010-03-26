@@ -63,13 +63,18 @@ struct <ShootingSaucer:
   shoot_saucer::&this
   &this.autoShoot = 1
   &this.targetNextShoot = @fcycle + 20.0
-  
+
 <init>
   HiScoreBoxPosition   @hiScoreBox
   @hiScoreBox.x = 180
   @hiScoreBox.y = 180
   @hiScoreBox.w = 300
   @hiScoreBox.h = 230
+  HiScoreBoxPosition   @hiScoreTopBox
+  @hiScoreTopBox.x = 30
+  @hiScoreTopBox.y = 5
+  @hiScoreTopBox.w = 240
+  @hiScoreTopBox.h = 25
 
   # Init function: called when script is loaded
   Display @screen = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
@@ -98,7 +103,7 @@ struct <ShootingSaucer:
   saucer::@saucer1 display=@screen
   saucer::@saucer3 display=@screen
   sprite::@hallOfFame display=@screen
-  
+
 
 <update>
   # Update function: called every animation cycle
