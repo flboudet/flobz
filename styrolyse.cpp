@@ -6,6 +6,7 @@
 #include <math.h>
 #include <ios_filepath.h>
 #include <ios_memory.h>
+#include <preferences.h>
 
 static char *scriptPath0 = NULL;
 static char *scriptPath_fx = NULL;
@@ -60,6 +61,14 @@ void styro_mod(GoomSL *gsl, GoomHash *global, GoomHash *local)
     int numerator = GSL_LOCAL_INT(gsl, local, "numerator");
     int denominator = GSL_LOCAL_INT(gsl, local, "denominator");
     GSL_GLOBAL_INT(gsl, "mod") = numerator % denominator;
+}
+
+static void styro_get_BoolPreference(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    char *name  = (char*)GSL_LOCAL_PTR(gsl, local, "name");
+    int def     = GSL_LOCAL_INT(gsl, local, "default");
+    GSL_GLOBAL_INT(gsl, "getBoolPreference")
+        = GetBoolPreference(name, def);
 }
 
 void put_text(GoomSL *gsl, GoomHash *global, GoomHash *local)
@@ -249,6 +258,7 @@ static void sbind(GoomSL *gsl)
   gsl_bind_function(gsl, "sin",      styro_sin);
   gsl_bind_function(gsl, "sound",    styro_sound);
   gsl_bind_function(gsl, "strcmp",   styro_strcmp);
+  gsl_bind_function(gsl, "getBoolPreference", styro_get_BoolPreference);
 // gsl_bind_function(gsl, "f2i",      styro_f2i);
 }
 
@@ -328,31 +338,12 @@ void styrolyse_event(Styrolyse *_this, const char *event, float x, float y, int 
     gsl_execute(_this->gsl);
 }
 
-#include "GlobalHack.h"
-void store_preferences_to_gsl(GoomSL *gsl)
-{
-	// applications preferences...
-	if (GSL_HAS_GLOBAL(gsl, "@liteVersion")) {
-		GSL_GLOBAL_INT(gsl, "@liteVersion") = GlobalHack_getPrefIsLite();
-		GSL_GLOBAL_INT(gsl, "@bluetoothGameLocked") = GlobalHack_getPrefBluetoothGameLocked();
-		GSL_GLOBAL_INT(gsl, "@internetGameLocked") = GlobalHack_getPrefInternetGameLocked();
-		GSL_GLOBAL_INT(gsl, "@level3Locked") = GlobalHack_getPrefLevel3Locked();
-		GSL_GLOBAL_INT(gsl, "@level4Locked") = GlobalHack_getPrefLevel4Locked();
-		GSL_GLOBAL_INT(gsl, "@level5Locked") = GlobalHack_getPrefLevel5Locked();
-		GSL_GLOBAL_INT(gsl, "@level6Locked") = GlobalHack_getPrefLevel6Locked();
-		GSL_GLOBAL_INT(gsl, "@level7Locked") = GlobalHack_getPrefLevel7Locked();
-		GSL_GLOBAL_INT(gsl, "@level8Locked") = GlobalHack_getPrefLevel8Locked();
-		GSL_GLOBAL_INT(gsl, "@level9Locked") = GlobalHack_getPrefLevel9Locked();
-	}
-}
-
 void styrolyse_execute(Styrolyse *_this, int mode, float delta_t)
 {
   /* mutexifier cette fonction si multi-thread */
     if (delta_t > 0.04) delta_t = 0.04;
     GSL_GLOBAL_INT(_this->gsl, "@mode") = mode;
     GSL_GLOBAL_FLOAT(_this->gsl, "@delta_t") = delta_t;
-	store_preferences_to_gsl(_this->gsl);
     styrolyse = _this;
     gsl_execute(_this->gsl);
 }

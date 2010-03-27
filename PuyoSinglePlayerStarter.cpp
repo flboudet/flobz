@@ -25,6 +25,7 @@
 
 #include "PuyoSinglePlayerStarter.h"
 #include "PuyoView.h"
+#include "preferences.h"
 
 using namespace event_manager;
 
@@ -138,7 +139,6 @@ StatsWidgetDimensions SinglePlayerStandardLayoutFactory::getStatsWidgetDimension
 
 PuyoLevelDefinitions *PuyoLevelDefinitions::currentDefinition = NULL;
 
-extern void store_preferences_to_gsl(GoomSL*);
 PuyoLevelDefinitions::PuyoLevelDefinitions(String levelDefinitionFile)
 {
     GoomSL * gsl = gsl_new();
@@ -149,7 +149,7 @@ PuyoLevelDefinitions::PuyoLevelDefinitions(String levelDefinitionFile)
     gsl_compile(gsl,fbuffer);
     currentDefinition = this;
     gsl_bind_function(gsl, "end_level",  PuyoLevelDefinitions::end_level);
-	store_preferences_to_gsl(gsl);
+    gsl_bind_function(gsl, "getBoolPreference", PuyoLevelDefinitions::get_BoolPreference);
     gsl_execute(gsl);
     free(fbuffer);
     gsl_free(gsl);
@@ -176,6 +176,14 @@ void PuyoLevelDefinitions::addLevelDefinition(String levelName, String introStor
 
 PuyoLevelDefinitions::SelIA::SelIA(int level, int nColors) : level(level), nColors(nColors)
 {
+}
+
+void PuyoLevelDefinitions::get_BoolPreference(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    char *name  = (char*)GSL_LOCAL_PTR(gsl, local, "name");
+    int def     = GSL_LOCAL_INT(gsl, local, "default");
+    GSL_GLOBAL_INT(gsl, "getBoolPreference")
+        = GetBoolPreference(name, def);
 }
 
 void PuyoLevelDefinitions::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)

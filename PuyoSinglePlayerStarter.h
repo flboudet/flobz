@@ -130,6 +130,7 @@ private:
 			    SelIA easySettings,
 			    SelIA mediumSettings, SelIA hardSettings);
     static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local);
+    static void get_BoolPreference(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static PuyoLevelDefinitions *currentDefinition;
     AdvancedBuffer<LevelDefinition *> levelDefinitions;
 };

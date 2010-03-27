@@ -22,6 +22,7 @@ struct <Level:
 Level   level
 
 external <end_level>
+external <getBoolPreference: string name, int default> : int
 
 <start_level>
     level.levelName           = "Untitled level"

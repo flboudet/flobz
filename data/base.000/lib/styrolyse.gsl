@@ -125,6 +125,7 @@ external <random> : float
 external <sin: float value> : float
 external <sound: string file, float volume>
 external <strcmp: string s1, string s2> : int
+external <getBoolPreference: string name, int default> : int
 
 <cos: float value> : float
   cos = [sin: value=value + 1.57079632679]

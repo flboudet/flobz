@@ -117,10 +117,13 @@ static void  drawImage (StyrolyseClient *_this, void *image, int x, int y, int w
   sstory->setClipRect(&cliprect);
   if (flipped)
 	  sstory->drawHFlipped(surf, NULL, &rect);
-  else if (fabs(scalex - 1.0f) > 0.001f)
-	  sstory->drawScaled(surf, NULL, &rect, scalex,scaley);
-  else
+  else {
+      if (fabs(scalex - 1.0f) > 0.001f) {
+          rect.w *= scalex;
+          rect.h *= scaley;
+      }
 	  sstory->draw(surf, NULL, &rect);
+  }
 }
 
 static void  freeImage (StyrolyseClient *_this, void *image)

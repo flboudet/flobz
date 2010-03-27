@@ -433,10 +433,13 @@ void GameWidget::styro_drawImage(StyrolyseClient *_this,
     ((StyrolysePainterClient *)_this)->m_painter->setClipRect(&cliprect);
     if (flipped)
 		((StyrolysePainterClient *)_this)->m_painter->drawHFlipped(surf->surface, NULL, &rect);
-    else if (fabs(scaleX - 1.0f) > 0.001f)
-		((StyrolysePainterClient *)_this)->m_painter->drawScaled(surf->surface, NULL, &rect, scaleX, scaleY);
-	else		
+    else {
+        if (fabs(scaleX - 1.0f) > 0.001f) {
+            rect.w *= scaleX;
+            rect.h *= scaleY;
+        }
         ((StyrolysePainterClient *)_this)->m_painter->draw(surf->surface, NULL, &rect);
+    }
 }
 void GameWidget::styro_freeImage(StyrolyseClient *_this, void *image)
 {
