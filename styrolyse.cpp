@@ -6,7 +6,7 @@
 #include <math.h>
 #include <ios_filepath.h>
 #include <ios_memory.h>
-#include <preferences.h>
+#include "preferences.h"
 
 static char *scriptPath0 = NULL;
 static char *scriptPath_fx = NULL;
