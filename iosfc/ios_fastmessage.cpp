@@ -33,26 +33,43 @@ void FastMessage::addInt(const String &key, int value)
     copy_uint32(append_key_reserve_data(INTEGER, key, 4), value);
 }
 
+void FastMessage::addBool(const String key, bool value)
+{
+    copy_char8(append_key_reserve_data(INTEGER, key, 1), value?0xFF:0x00);
+}
+
+void FastMessage::addFloat(const String key, double value)
+{
+    copy_float64(append_key_reserve_data(INTEGER, key, 8), value);
+}
+
 void FastMessage::addString(const String &key, const String &value)
 {
     size_t valueSize = value.size();
-    void *valueBuffer = append_key_reserve_data(INTEGER, key, valueSize+2);
+    void *valueBuffer = append_key_reserve_data(STRING, key, valueSize+2);
     copy_uint16(valueBuffer, valueSize);
     Memory::memcpy((char *)valueBuffer + 2, value, valueSize);
 }
 
 void FastMessage::addIntArray(const String &key, const Buffer<int> &value)
 {
-    size_t keySize = key.size();
-    m_headerRecords[m_headerRecordsCount++] = HeaderRecord(INTEGER, m_dataOffset,
-                                            m_dataOffset+keySize);
-    Memory::memcpy((char *)m_data+m_dataOffset, (const char *)key, keySize);
     size_t valueSize = value.size();
-    m_dataOffset += keySize;
+    void *valueBuffer = append_key_reserve_data(INTEGER_ARRAY, key, valueSize*4 + 2);
+    copy_uint16(valueBuffer, valueSize);
     for (int i = 0 ; i < valueSize ; i++) {
-        int32_t curValue = value[i];
-        copy_uint32((char *)m_data + m_dataOffset, curValue);
-        m_dataOffset += 4;
+        copy_uint32(valueBuffer, value[i]);
+        valueBuffer = (char *)valueBuffer + 4;
+    }
+}
+
+void FastMessage::addCharArray(const String key, const Buffer<char> value)
+{
+    size_t valueSize = value.size();
+    void *valueBuffer = append_key_reserve_data(INTEGER_ARRAY, key, valueSize + 2);
+    copy_uint16(valueBuffer, valueSize);
+    for (int i = 0 ; i < valueSize ; i++) {
+        copy_char8(valueBuffer, value[i]);
+        valueBuffer = (char *)valueBuffer + 1;
     }
 }
 

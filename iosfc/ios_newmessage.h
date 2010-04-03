@@ -25,15 +25,12 @@ class NewMessage
 
     virtual VoidBuffer serialize() = 0;
     virtual void addInt       (const String &key, int value) = 0;
-#ifdef DISABLED
     virtual void addBool      (const String key, bool value) = 0;
     virtual void addFloat     (const String key, double value) = 0;
-#endif
     virtual void addString    (const String &key, const String &value) = 0;
     virtual void addIntArray  (const String &key, const Buffer<int> &value) = 0;
-#ifdef DISABLED
     virtual void addCharArray (const String key, const Buffer<char> value) = 0;
-
+#ifdef DISABLED
     bool hasInt       (const String key) const = 0;
     bool hasBool      (const String key) const = 0;
     bool hasFloat     (const String key) const = 0;

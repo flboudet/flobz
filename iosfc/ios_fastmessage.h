@@ -8,7 +8,11 @@
 namespace ios_fc {
 
 enum ValueType {
-    INTEGER=1
+    INTEGER=1,
+    BOOL=2,
+    FLOAT=3,
+    STRING=4,
+    INTEGER_ARRAY = 5
 };
 
 struct HeaderRecord {
@@ -31,19 +35,28 @@ public:
 
     virtual VoidBuffer serialize();
     virtual void addInt(const String &key, int value);
+    virtual void addBool(const String key, bool value);
+    virtual void addFloat(const String key, double value);
     virtual void addString(const String &key, const String &value);
     virtual void addIntArray(const String &key, const Buffer<int> &value);
+    virtual void addCharArray(const String key, const Buffer<char> value);
 
     virtual int getInt(const String &key) const;
 private:
     inline uint16_t get_uint16(void *src) const {
         return *(uint16_t *)src;
     }
+    inline void copy_char8(void *dest, int8_t src) {
+        *((int8_t *)dest) = src;
+    }
     inline void copy_uint16(void *dest, uint16_t src) {
         *((uint16_t *)dest) = src;
     }
     inline void copy_uint32(void *dest, uint32_t src) {
         *((uint32_t *)dest) = src;
+    }
+    inline void copy_float64(void *dest, double src) {
+        *((double *)dest) = src;
     }
     inline void * append_key_reserve_data(uint16_t type, const char *key, size_t dataSize) {
         // TODO: check buffer overflow
