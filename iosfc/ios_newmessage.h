@@ -43,14 +43,13 @@ class NewMessage
     bool hasFloat     (const String key, double value)  const = 0;
     bool hasString    (const String key, String value) const = 0;
 #endif
-    virtual int getInt       (const String &key) const = 0;
+    virtual int                getInt       (const String &key) const = 0;
+    virtual bool               getBool      (const String &key) const = 0;
+    virtual double             getFloat     (const String &key) const = 0;
+    virtual const String       getString    (const String &key) const = 0;
+    virtual const Buffer<int>  getIntArray  (const String &key) const = 0;
+    virtual const Buffer<char> getCharArray (const String &key) const = 0;
 #ifdef DISABLED
-    bool               getBool      (const String key) const = 0;
-    double             getFloat     (const String key) const = 0;
-    const String       getString    (const String key) const = 0;
-    const Buffer<int>  getIntArray  (const String key) const = 0;
-    const Buffer<char> getCharArray (const String key) const = 0;
-
     virtual void addIntProperty   (const String key, const int value) = 0;
     virtual void addBoolProperty  (const String key, const bool property) = 0;
 
@@ -61,13 +60,6 @@ class NewMessage
     bool getBoolProperty  (const String key) const = 0;
 
     virtual void send() const = 0;
-
-  protected:
-    Message();
-
-  private:
-    HashMap datas;
-    HashMap intProperties;
 #endif
 };
 

@@ -75,7 +75,47 @@ void FastMessage::addCharArray(const String key, const Buffer<char> value)
 
 int FastMessage::getInt(const String &key) const
 {
-    return get_uint16(get_data_for_key(key));
+    return get_uint32(get_data_for_key(key));
+}
+
+bool FastMessage::getBool(const String &key) const
+{
+    return (get_char8(get_data_for_key(key)) != 0);
+}
+
+double FastMessage::getFloat(const String &key) const
+{
+    return get_float64(get_data_for_key(key));
+}
+
+const String FastMessage::getString(const String &key) const
+{
+    void *stringAddress = get_data_for_key(key);
+    size_t stringSize = get_uint16(stringAddress);
+    char buf[stringSize+1];
+    Memory::memcpy(buf, (char *)stringAddress+2, stringSize);
+    buf[stringSize] = 0;
+    return buf;
+}
+
+const Buffer<int> FastMessage::getIntArray(const String &key) const
+{
+    void *address = get_data_for_key(key);
+    size_t size = get_uint16(address);
+    Buffer<int> result(size);
+    uint32_t *currentValue = (uint32_t *)((char *)address + 2);
+    for (int i = 0 ; i < size ; i++) {
+        result[i] = get_uint32(currentValue++);
+    }
+    return result;
+}
+
+const Buffer<char> FastMessage::getCharArray(const String &key) const
+{
+    void *address = get_data_for_key(key);
+    size_t size = get_uint16(address);
+    Buffer<char> result((char *)address + 2, size);
+    return result;
 }
 
 VoidBuffer FastMessage::serialize()

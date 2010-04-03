@@ -41,10 +41,24 @@ public:
     virtual void addIntArray(const String &key, const Buffer<int> &value);
     virtual void addCharArray(const String key, const Buffer<char> value);
 
-    virtual int getInt(const String &key) const;
+    virtual int    getInt(const String &key) const;
+    virtual bool   getBool(const String &key) const;
+    virtual double getFloat(const String &key) const;
+    virtual const String       getString    (const String &key) const;
+    virtual const Buffer<int>  getIntArray  (const String &key) const;
+    virtual const Buffer<char> getCharArray (const String &key) const;
 private:
+    inline int8_t get_char8(void *src) const {
+        return *(int8_t *)src;
+    }
     inline uint16_t get_uint16(void *src) const {
         return *(uint16_t *)src;
+    }
+    inline uint32_t get_uint32(void *src) const {
+        return *(uint32_t *)src;
+    }
+    inline double get_float64(void *src) const {
+        return *(double *)src;
     }
     inline void copy_char8(void *dest, int8_t src) {
         *((int8_t *)dest) = src;
