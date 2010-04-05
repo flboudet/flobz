@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <stdint.h>
-#include "ios_newmessage.h"
+#include "ios_message.h"
 
 namespace ios_fc {
 
@@ -30,7 +30,7 @@ struct HeaderRecord {
     uint16_t valOffset;
 };
 
-class FastMessage : public NewMessage
+class FastMessage : public Message
 {
 public:
     FastMessage();

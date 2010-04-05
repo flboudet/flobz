@@ -7,7 +7,7 @@
 namespace ios_fc {
 
 
-class NewMessage
+class Message
 {
   public:
 
@@ -21,7 +21,7 @@ class NewMessage
       PropertyException(const String name) : Exception(String("Error in Message Property ") + name + "'") {}
     };
 
-    virtual ~NewMessage() {}
+    virtual ~Message() {}
 
     virtual VoidBuffer serialize() = 0;
     virtual void addInt       (const String &key, int value) = 0;
