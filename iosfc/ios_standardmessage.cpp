@@ -48,31 +48,31 @@ namespace ios_fc {
 
   void StandardMessage::addInt(const String &key, int value)
   {
-    Message::addInt(key,value);
+    BaseMessage::addInt(key,value);
     serialized.add(new String(key + ":" + INTEGER + ":" + value));
   }
 
   void StandardMessage::addBool(const String &key, bool value)
   {
-    Message::addBool(key,value);
+    BaseMessage::addBool(key,value);
     serialized.add(new String(key + ":" + BOOLEAN + ":" + value));
   }
 
   void StandardMessage::addFloat(const String &key, double value)
   {
-    Message::addFloat(key,value);
+    BaseMessage::addFloat(key,value);
     serialized.add(new String(key + ":" + FLOAT + ":" + value));
   }
 
   void StandardMessage::addString(const String &key, const String &value)
   {
-    Message::addString(key,value);
+    BaseMessage::addString(key,value);
     serialized.add(new String(key + ":" + STRING + ":" + value));
   }
 
   void StandardMessage::addIntArray(const String &key, const Buffer<int> &value)
   {
-    Message::addIntArray(key,value);
+    BaseMessage::addIntArray(key,value);
     String *s = new String(key + ":" + INT_ARRAY + ":" + value.size());
     for (int i=0;i<value.size();++i) {
       s->operator+=(String(",") + value[i]);
@@ -82,7 +82,7 @@ namespace ios_fc {
 
   void StandardMessage::addCharArray(const String &key, const Buffer<char> &value)
   {
-    Message::addCharArray(key,value);
+    BaseMessage::addCharArray(key,value);
     String *s = new String(key + ":" + CHAR_ARRAY + ":" + value.size() + ",");
     for (int i=0;i<value.size();++i)
     {
@@ -96,13 +96,13 @@ namespace ios_fc {
 
   void StandardMessage::addIntProperty   (const String &key, int value)
   {
-    Message::addIntProperty(key,value);
+    BaseMessage::addIntProperty(key,value);
     serialized.add(new String(key + ":" + PARAM_INTEGER + ":" + value));
   }
 
   void StandardMessage::addBoolProperty  (const String &key, bool value)
   {
-    Message::addBoolProperty(key,value);
+    BaseMessage::addBoolProperty(key,value);
     serialized.add(new String(key + ":" + PARAM_BOOLEAN + ":" + value));
   }
 
