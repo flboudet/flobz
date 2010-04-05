@@ -84,9 +84,11 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
 
 void PuyoNetworkView::sendStateMessage(bool paused)
 {
+    //double initial = ios_fc::getTimeMs();
     Message *message = createStateMessage(paused);
     message->send();
     delete message;
+    //cout << "Time taken:" << ios_fc::getTimeMs() - initial << endl;
 }
 
 
