@@ -2,13 +2,13 @@
 #define _IOS_MESSAGE_H
 
 #include "ios_memory.h"
-#include "ios_newmessage.h"
+#include "ios_message.h"
 #include "ios_hash.h"
 
 namespace ios_fc {
 
 
-class BaseMessage : public NewMessage
+class BaseMessage : public Message
 {
   public:
 
@@ -48,8 +48,6 @@ class BaseMessage : public NewMessage
 
     int  getIntProperty   (const String &key) const;
     bool getBoolProperty  (const String &key) const;
-
-    virtual void send() = 0;
 
   protected:
     BaseMessage();

@@ -58,9 +58,8 @@ class Message
 
     virtual int  getIntProperty   (const String &key) const = 0;
     virtual bool getBoolProperty  (const String &key) const = 0;
-#ifdef DISABLED
-    virtual void send() const = 0;
-#endif
+
+    virtual void send() = 0;
 };
 
 }
