@@ -33,14 +33,14 @@ void FastMessage::addInt(const String &key, int value)
     copy_uint32(append_key_reserve_data(INTEGER, key, 4), value);
 }
 
-void FastMessage::addBool(const String key, bool value)
+void FastMessage::addBool(const String &key, bool value)
 {
-    copy_char8(append_key_reserve_data(INTEGER, key, 1), value?0xFF:0x00);
+    copy_char8(append_key_reserve_data(BOOL, key, 1), value?0xFF:0x00);
 }
 
-void FastMessage::addFloat(const String key, double value)
+void FastMessage::addFloat(const String &key, double value)
 {
-    copy_float64(append_key_reserve_data(INTEGER, key, 8), value);
+    copy_float64(append_key_reserve_data(FLOAT, key, 8), value);
 }
 
 void FastMessage::addString(const String &key, const String &value)
@@ -62,10 +62,10 @@ void FastMessage::addIntArray(const String &key, const Buffer<int> &value)
     }
 }
 
-void FastMessage::addCharArray(const String key, const Buffer<char> value)
+void FastMessage::addCharArray(const String &key, const Buffer<char> &value)
 {
     size_t valueSize = value.size();
-    void *valueBuffer = append_key_reserve_data(INTEGER_ARRAY, key, valueSize + 2);
+    void *valueBuffer = append_key_reserve_data(CHAR_ARRAY, key, valueSize + 2);
     copy_uint16(valueBuffer, valueSize);
     for (int i = 0 ; i < valueSize ; i++) {
         copy_char8(valueBuffer, value[i]);
@@ -75,22 +75,22 @@ void FastMessage::addCharArray(const String key, const Buffer<char> value)
 
 int FastMessage::getInt(const String &key) const
 {
-    return get_uint32(get_data_for_key(key));
+    return get_uint32(get_data_for_key(key, INTEGER));
 }
 
 bool FastMessage::getBool(const String &key) const
 {
-    return (get_char8(get_data_for_key(key)) != 0);
+    return (get_char8(get_data_for_key(key, BOOL)) != 0);
 }
 
 double FastMessage::getFloat(const String &key) const
 {
-    return get_float64(get_data_for_key(key));
+    return get_float64(get_data_for_key(key, FLOAT));
 }
 
 const String FastMessage::getString(const String &key) const
 {
-    void *stringAddress = get_data_for_key(key);
+    void *stringAddress = get_data_for_key(key, STRING);
     size_t stringSize = get_uint16(stringAddress);
     char buf[stringSize+1];
     Memory::memcpy(buf, (char *)stringAddress+2, stringSize);
@@ -100,7 +100,7 @@ const String FastMessage::getString(const String &key) const
 
 const Buffer<int> FastMessage::getIntArray(const String &key) const
 {
-    void *address = get_data_for_key(key);
+    void *address = get_data_for_key(key, INTEGER_ARRAY);
     size_t size = get_uint16(address);
     Buffer<int> result(size);
     uint32_t *currentValue = (uint32_t *)((char *)address + 2);
@@ -112,10 +112,70 @@ const Buffer<int> FastMessage::getIntArray(const String &key) const
 
 const Buffer<char> FastMessage::getCharArray(const String &key) const
 {
-    void *address = get_data_for_key(key);
+    void *address = get_data_for_key(key, CHAR_ARRAY);
     size_t size = get_uint16(address);
     Buffer<char> result((char *)address + 2, size);
     return result;
+}
+
+bool FastMessage::hasInt(const String &key) const
+{
+    return (get_data_for_key(key, INTEGER, false) != NULL);
+}
+
+bool FastMessage::hasBool(const String &key) const
+{
+    return (get_data_for_key(key, BOOL, false) != NULL);
+}
+
+bool FastMessage::hasFloat(const String &key) const
+{
+    return (get_data_for_key(key, FLOAT, false) != NULL);
+}
+
+bool FastMessage::hasString(const String &key) const
+{
+    return (get_data_for_key(key, STRING, false) != NULL);
+}
+
+bool FastMessage::hasIntArray(const String &key) const
+{
+    return (get_data_for_key(key, INTEGER_ARRAY, false) != NULL);
+}
+
+bool FastMessage::hasCharArray(const String &key) const
+{
+    return (get_data_for_key(key, CHAR_ARRAY, false) != NULL);
+}
+
+void FastMessage::addIntProperty(const String &key, int value)
+{
+    copy_uint32(append_key_reserve_data(PROP_INTEGER, key, 4), value);
+}
+
+void FastMessage::addBoolProperty(const String &key, bool value)
+{
+    copy_char8(append_key_reserve_data(PROP_BOOL, key, 1), value?0xFF:0x00);
+}
+
+bool FastMessage::hasIntProperty(const String &key) const
+{
+    return (get_data_for_key(key, PROP_INTEGER, false) != NULL);
+}
+
+bool FastMessage::hasBoolProperty(const String &key) const
+{
+    return (get_data_for_key(key, PROP_BOOL, false) != NULL);
+}
+
+int FastMessage::getIntProperty(const String &key) const
+{
+    return get_uint32(get_data_for_key(key, PROP_INTEGER));
+}
+
+bool FastMessage::getBoolProperty(const String &key) const
+{
+    return get_char8(get_data_for_key(key, PROP_BOOL));
 }
 
 VoidBuffer FastMessage::serialize()

@@ -9,7 +9,7 @@
  * - Buffer<T>:         simulate a (T*) buffer using VoidBuffer.
  * - AdvancedBuffer<T>: a vector implemented as a Buffer<T>.
  * - String             a string.
- * 
+ *
  * This file is part of the iOS Foundation Classes project.
  *
  * authors:
@@ -118,7 +118,7 @@ namespace ios_fc {
               init_ptr(buf.size());
               Memory::memcpy(ptr(), buf.ptr(), size());
             }
-            
+
             inline VoidBuffer (VoidBuffer &buf)
                 : p(buf.p), offset(0)
             {
@@ -308,7 +308,7 @@ namespace ios_fc {
                 Memory::memcpy(buf.ptr(), ptr(), size());
                 return buf;
             }
-            
+
             inline T * ptr()  const {return (T*)VoidBuffer::ptr();}
             inline int size() const {return VoidBuffer::size() / sizeof(T);}
 
@@ -333,7 +333,7 @@ namespace ios_fc {
                 buf += offset;
                 return buf;
             }
-            
+
             inline const Buffer<T>  operator +  (int offset) const {
                 Buffer<T> buf(*this);
                 buf += offset;
@@ -371,7 +371,7 @@ namespace ios_fc {
                 : Buffer<T>(buf,offset), granularity(buf.granularity), used(buf.used - offset) {}
             inline AdvancedBuffer(const AdvancedBuffer<T>&buf)
                 : Buffer<T>(buf), granularity(buf.granularity), used(buf.used) {}
-			
+
 			inline const AdvancedBuffer<T> operator=(      AdvancedBuffer<T>&buf) {
 				Buffer<T>::operator=(buf);
 				granularity = buf.granularity;
@@ -441,10 +441,10 @@ namespace ios_fc {
                 }
                 this->remove();
             }
-            
+
             inline int capacity() const { return Buffer<T>::size(); }
             inline int size()     const { return used; }
-            
+
             inline T &last()       { return this->ptr()[used-1]; }
             inline T  last() const { return this->ptr()[used-1]; }
 
@@ -483,8 +483,8 @@ namespace ios_fc {
         public:
             String() : buffer(1) { buffer[0]=0; }
             String(const char *str) : buffer(str, strlen(str)+1) {}
-            String(const String &s) : buffer(s.buffer.dup())    {} 
-            
+            String(const String &s) : buffer(s.buffer.dup())    {}
+
             String &operator=(const String &s) {
                 buffer = s.buffer;
                 return *this;
@@ -584,14 +584,14 @@ namespace ios_fc {
                 ret.buffer[ret.buffer.size() - 1] = 0;
                 return ret;
             }
-            
+
             const char *c_str() const     { return (const char*)buffer; }
             operator const char *() const { return (const char*)buffer; }
             char  operator[] (int i) const { return buffer[i]; }
             char &operator[] (int i)       { return buffer[i]; }
-            
+
             inline int getOffset() const { return buffer.getOffset(); }
-            
+
 /*            inline AdvancedBuffer<String*> tokenize(char delim)
             {
               Vector<String> vector;
@@ -606,7 +606,7 @@ namespace ios_fc {
               vector.add = new String(substring(prev, i));
               return vector;
             }*/
-            
+
         protected:
             Buffer<char> buffer;
 
@@ -641,14 +641,14 @@ void *ios_fc::Memory::malloc (int size) {
 }
 
 void *ios_fc::Memory::calloc (int size) {
-    
+
     if (size < 0) IOS_ERROR ("Bad Calloc");
     if (size == 0) size = 1;
     void *ret = ::calloc(1,size);
     if (ret == 0) IOS_ERROR ("Calloc failed, not enough memory?");
 
     addMemoryBlock(ret, size);
-    
+
     return ret;
 }
 
@@ -659,17 +659,17 @@ void *ios_fc::Memory::realloc (void *ptr, int size) {
 
     removeMemoryBlock(ptr);
 //    fprintf(stderr, "REALLOC %x\n",ptr);
-    
+
     void *ret = ::realloc(ptr,size);
     if (ret == 0) IOS_ERROR ("Realloc failed, not enough memory?");
 
     addMemoryBlock(ret, size);
-    
+
     return ret;
 }
 
 void ios_fc::Memory::memcpy (void *dest, const void *src, int len) {
-    
+
     if (len<0) IOS_ERROR ("Bad memcpy");
 
     int idst;
@@ -678,14 +678,14 @@ void ios_fc::Memory::memcpy (void *dest, const void *src, int len) {
 
 //    if (idst < 0) fprintf(stderr, "SPURIOUS memcpy destination");
 //    if (isrc < 0) fprintf(stderr, "SPURIOUS memcpy src");
-    
+
     ::memcpy(dest,src,len);
 }
 
 void ios_fc::Memory::free (void *ptr) {
 
     removeMemoryBlock(ptr);
-    
+
     ::free(ptr);
 }
 

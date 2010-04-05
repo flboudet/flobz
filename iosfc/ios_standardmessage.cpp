@@ -12,7 +12,7 @@ namespace ios_fc {
   static const String CHAR_ARRAY  = "C";
   static const String PARAM_INTEGER = "PI";
   static const String PARAM_BOOLEAN = "PB";
-  
+
   static const String SERIAL_ID   = "SID";
   static const String IS_RELIABLE = "RELIABLE";
 
@@ -34,43 +34,43 @@ namespace ios_fc {
       return getBoolProperty(IS_RELIABLE);
     return false;
   }
-  
+
   int  StandardMessage::getSerialID() const
   {
     return getIntProperty(SERIAL_ID);
   }
-  
-  void StandardMessage::send() const
+
+  void StandardMessage::send()
   {
-    Buffer<char> out = serialize();
+    VoidBuffer out = serialize();
     sendBuffer(out);
   }
 
-  void StandardMessage::addInt(const String key, int value)
+  void StandardMessage::addInt(const String &key, int value)
   {
     Message::addInt(key,value);
     serialized.add(new String(key + ":" + INTEGER + ":" + value));
   }
-  
-  void StandardMessage::addBool(const String key, bool value)
+
+  void StandardMessage::addBool(const String &key, bool value)
   {
     Message::addBool(key,value);
     serialized.add(new String(key + ":" + BOOLEAN + ":" + value));
   }
-  
-  void StandardMessage::addFloat(const String key, double value)
+
+  void StandardMessage::addFloat(const String &key, double value)
   {
     Message::addFloat(key,value);
     serialized.add(new String(key + ":" + FLOAT + ":" + value));
   }
-  
-  void StandardMessage::addString(const String key, const String value)
+
+  void StandardMessage::addString(const String &key, const String &value)
   {
     Message::addString(key,value);
     serialized.add(new String(key + ":" + STRING + ":" + value));
   }
-  
-  void StandardMessage::addIntArray(const String key, const Buffer<int> value)
+
+  void StandardMessage::addIntArray(const String &key, const Buffer<int> &value)
   {
     Message::addIntArray(key,value);
     String *s = new String(key + ":" + INT_ARRAY + ":" + value.size());
@@ -79,8 +79,8 @@ namespace ios_fc {
     }
     serialized.add(s);
   }
-  
-  void StandardMessage::addCharArray(const String key, const Buffer<char> value)
+
+  void StandardMessage::addCharArray(const String &key, const Buffer<char> &value)
   {
     Message::addCharArray(key,value);
     String *s = new String(key + ":" + CHAR_ARRAY + ":" + value.size() + ",");
@@ -93,27 +93,27 @@ namespace ios_fc {
     }
     serialized.add(s);
   }
-  
-  void StandardMessage::addIntProperty   (const String key, const int value)
+
+  void StandardMessage::addIntProperty   (const String &key, int value)
   {
     Message::addIntProperty(key,value);
     serialized.add(new String(key + ":" + PARAM_INTEGER + ":" + value));
   }
-  
-  void StandardMessage::addBoolProperty  (const String key, const bool value)
+
+  void StandardMessage::addBoolProperty  (const String &key, bool value)
   {
     Message::addBoolProperty(key,value);
     serialized.add(new String(key + ":" + PARAM_BOOLEAN + ":" + value));
   }
-      
-  const Buffer<char> StandardMessage::serialize() const
+
+  VoidBuffer StandardMessage::serialize()
   {
     String out = "";
     for (int i=0;i<serialized.size();++i)
     {
       out += *serialized[i] + "\n";
     }
-    return Buffer<char>((const char*)out, out.length());
+    return VoidBuffer((const char*)out, out.length());
   }
 
   StandardMessage::StandardMessage(const Buffer<char> raw)  throw(InvalidMessageException)
@@ -125,10 +125,10 @@ namespace ios_fc {
     String sraw((const char *)tmp_buf);
     int    start = 0;
     int    end   = 0;
-   
+
     //printf("****RAW MSG****\n%s\n********\n", (const char *)tmp_buf);
-    
-    while (true) { 
+
+    while (true) {
       while (sraw[end] && (sraw[end] != '\n'))
         end ++;
 
@@ -141,7 +141,7 @@ namespace ios_fc {
 
       while (line[itype] && (line[itype] != ':')) { itype++; ival++; }
       if (!line[itype]) { checkMessage(); return; }
-      
+
       ival++;
       while (line[ival] && (line[ival] != ':')) { ival++; }
       if (!line[ival]) { checkMessage(); return; }
@@ -194,7 +194,7 @@ namespace ios_fc {
       start = end;
     }
   }
-  
+
   void StandardMessage::checkMessage() throw(InvalidMessageException)
   {
     if (!hasIntProperty(SERIAL_ID))
