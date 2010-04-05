@@ -7,17 +7,6 @@
 
 namespace ios_fc {
 
-enum ValueType {
-    INTEGER=1,
-    BOOL=2,
-    FLOAT=3,
-    STRING=4,
-    INTEGER_ARRAY = 5,
-    CHAR_ARRAY = 6,
-    PROP_INTEGER=11,
-    PROP_BOOL=12
-};
-
 struct HeaderRecord {
     HeaderRecord(uint16_t  type,
                  uint16_t nameOffset,
@@ -66,7 +55,19 @@ public:
 
     virtual int  getIntProperty   (const String &key) const;
     virtual bool getBoolProperty  (const String &key) const;
+    
+    virtual void send() {}
 private:
+    enum ValueType {
+        INTEGER=1,
+        BOOL=2,
+        FLOAT=3,
+        STRING=4,
+        INTEGER_ARRAY = 5,
+        CHAR_ARRAY = 6,
+        PROP_INTEGER=11,
+        PROP_BOOL=12
+    };
     inline int8_t get_char8(void *src) const {
         return *(int8_t *)src;
     }

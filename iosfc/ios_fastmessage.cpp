@@ -56,6 +56,7 @@ void FastMessage::addIntArray(const String &key, const Buffer<int> &value)
     size_t valueSize = value.size();
     void *valueBuffer = append_key_reserve_data(INTEGER_ARRAY, key, valueSize*4 + 2);
     copy_uint16(valueBuffer, valueSize);
+    valueBuffer = (char *)valueBuffer + 2;
     for (int i = 0 ; i < valueSize ; i++) {
         copy_uint32(valueBuffer, value[i]);
         valueBuffer = (char *)valueBuffer + 4;
@@ -67,6 +68,7 @@ void FastMessage::addCharArray(const String &key, const Buffer<char> &value)
     size_t valueSize = value.size();
     void *valueBuffer = append_key_reserve_data(CHAR_ARRAY, key, valueSize + 2);
     copy_uint16(valueBuffer, valueSize);
+    valueBuffer = (char *)valueBuffer + 2;
     for (int i = 0 ; i < valueSize ; i++) {
         copy_char8(valueBuffer, value[i]);
         valueBuffer = (char *)valueBuffer + 1;
