@@ -1,11 +1,11 @@
 #ifndef _IOS_STANDARD_MESSAGE_H
 #define _IOS_STANDARD_MESSAGE_H
 
-#include "ios_message.h"
+#include "ios_basemessage.h"
 
 namespace ios_fc {
 
-  class StandardMessage : public Message {
+  class StandardMessage : public BaseMessage {
     public:
 
       class InvalidMessageException : public Exception {

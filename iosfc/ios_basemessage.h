@@ -8,11 +8,11 @@
 namespace ios_fc {
 
 
-class Message : public NewMessage
+class BaseMessage : public NewMessage
 {
   public:
 
-    virtual ~Message();
+    virtual ~BaseMessage();
 
     virtual void addInt       (const String &key, int value);
     virtual void addBool      (const String &key, bool value);
@@ -52,7 +52,7 @@ class Message : public NewMessage
     virtual void send() = 0;
 
   protected:
-    Message();
+    BaseMessage();
 
   private:
     HashMap datas;

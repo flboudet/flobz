@@ -1,6 +1,6 @@
 #include "ios_memory.h"
 #include "ios_hash.h"
-#include "ios_message.h"
+#include "ios_basemessage.h"
 
 namespace ios_fc {
 
@@ -63,9 +63,9 @@ class ValueCharArray : public Value<Buffer<char> > {
     ValueCharArray(const Buffer<char> array) : Value<Buffer<char> >(array, CHAR_ARRAY) {}
 };
 
-/* class Message */
+/* class BaseMessage */
 
-Message::Message() : datas(), intProperties()
+BaseMessage::BaseMessage() : datas(), intProperties()
 {
 }
 
@@ -74,48 +74,48 @@ class DeleteAction : public HashMapAction {
     void action(HashValue *value) { delete static_cast<ValueInterface*>(value->ptr); }
 };
 
-Message::~Message()
+BaseMessage::~BaseMessage()
 {
   DeleteAction act;
   datas.foreach(&act);
 }
 
-void Message::addInt       (const String &key, int value)
+void BaseMessage::addInt       (const String &key, int value)
 {
   datas.put(key, new ValueInt(value));
 }
 
-void Message::addBool      (const String &key, bool value)
+void BaseMessage::addBool      (const String &key, bool value)
 {
   datas.put(key, new ValueBool(value));
 }
 
-void Message::addFloat      (const String &key, double value)
+void BaseMessage::addFloat      (const String &key, double value)
 {
   datas.put(key, new ValueFloat(value));
 }
 
-void Message::addString    (const String &key, const String &value)
+void BaseMessage::addString    (const String &key, const String &value)
 {
   datas.put(key, new ValueString(value));
 }
 
-void Message::addIntArray  (const String &key, const Buffer<int> &value)
+void BaseMessage::addIntArray  (const String &key, const Buffer<int> &value)
 {
   datas.put(key, new ValueIntArray(value));
 }
 
-void Message::addCharArray  (const String &key, const Buffer<char> &value)
+void BaseMessage::addCharArray  (const String &key, const Buffer<char> &value)
 {
   datas.put(key, new ValueCharArray(value));
 }
 
-void Message::addIntProperty   (const String &key, int value)
+void BaseMessage::addIntProperty   (const String &key, int value)
 {
   intProperties.put(key, value);
 }
 
-void Message::addBoolProperty  (const String &key, bool property)
+void BaseMessage::addBoolProperty  (const String &key, bool property)
 {
   intProperties.put(key, (int)property);
 }
@@ -127,72 +127,72 @@ static ValueInterface *getInterfaceAndCheckType(const HashMap &datas,
 {
   HashValue *hval = datas.get(key);
   if (hval == NULL)
-    throw Message::DataException(key + " does not exists");
+    throw BaseMessage::DataException(key + " does not exists");
 
   ValueInterface *val_interface = static_cast<ValueInterface*>(hval->ptr);
 
   if (val_interface == NULL)
-    throw Message::DataException(key + " has no value");
+    throw BaseMessage::DataException(key + " has no value");
 
   if (val_interface->getType() != type)
-    throw Message::DataException(key + " is not " + stype);
+    throw BaseMessage::DataException(key + " is not " + stype);
 
   return val_interface;
 }
 
-bool Message::hasInt   (const String &key) const
+bool BaseMessage::hasInt   (const String &key) const
 {
   return datas.get(key) != NULL;
 }
 
-bool Message::hasBool      (const String &key) const
+bool BaseMessage::hasBool      (const String &key) const
 {
   return datas.get(key) != NULL;
 }
 
-bool Message::hasFloat      (const String &key) const
+bool BaseMessage::hasFloat      (const String &key) const
 {
   return datas.get(key) != NULL;
 }
 
-bool Message::hasString    (const String &key) const
+bool BaseMessage::hasString    (const String &key) const
 {
   return datas.get(key) != NULL;
 }
 
-bool Message::hasIntArray  (const String &key) const
+bool BaseMessage::hasIntArray  (const String &key) const
 {
   return datas.get(key) != NULL;
 }
 
-bool Message::hasCharArray  (const String &key) const
+bool BaseMessage::hasCharArray  (const String &key) const
 {
   return datas.get(key) != NULL;
 }
 
 
-bool Message::hasInt       (const String key, int value)    const
+bool BaseMessage::hasInt       (const String key, int value)    const
 {
     return hasInt(key) && (getInt(key) == value);
 }
 
-bool Message::hasFloat      (const String key, double value)   const
+bool BaseMessage::hasFloat      (const String key, double value)   const
 {
     return hasFloat(key) && (getFloat(key) == value);
 }
 
-bool Message::hasBool      (const String key, bool value)   const
+bool BaseMessage::hasBool      (const String key, bool value)   const
 {
     return hasBool(key) && (getBool(key) == value);
 }
 
-bool Message::hasString    (const String key, String value) const
+bool BaseMessage::hasString    (const String key, String value) const
 {
     return hasString(key) && (getString(key) == value);
 }
 
 
-int Message::getInt      (const String &key) const
+int BaseMessage::getInt      (const String &key) const
 {
   ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, INTEGER, "Integer");
 
@@ -203,7 +203,7 @@ int Message::getInt      (const String &key) const
   return val_int->getValue();
 }
 
-bool Message::getBool     (const String &key) const
+bool BaseMessage::getBool     (const String &key) const
 {
   ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, BOOLEAN, "Boolean");
 
@@ -214,7 +214,7 @@ bool Message::getBool     (const String &key) const
   return val_bool->getValue();
 }
 
-double Message::getFloat     (const String &key) const
+double BaseMessage::getFloat     (const String &key) const
 {
   ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, FLOAT, "Floatean");
 
@@ -225,7 +225,7 @@ double Message::getFloat     (const String &key) const
   return val_double->getValue();
 }
 
-const String Message::getString   (const String &key) const
+const String BaseMessage::getString   (const String &key) const
 {
   ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, STRING, "String");
 
@@ -236,7 +236,7 @@ const String Message::getString   (const String &key) const
   return val_string->getValue();
 }
 
-const Buffer<int> Message::getIntArray (const String &key) const
+const Buffer<int> BaseMessage::getIntArray (const String &key) const
 {
   ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, INT_ARRAY, "IntArray");
 
@@ -247,7 +247,7 @@ const Buffer<int> Message::getIntArray (const String &key) const
   return val_intarray->getValue();
 }
 
-const Buffer<char> Message::getCharArray (const String &key) const
+const Buffer<char> BaseMessage::getCharArray (const String &key) const
 {
   ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, CHAR_ARRAY, "CharArray");
 
@@ -259,7 +259,7 @@ const Buffer<char> Message::getCharArray (const String &key) const
 }
 
 
-int Message::getIntProperty(const String &key) const
+int BaseMessage::getIntProperty(const String &key) const
 {
   HashValue *hval = intProperties.get(key);
   if (hval == NULL)
@@ -267,7 +267,7 @@ int Message::getIntProperty(const String &key) const
   return hval->i;
 }
 
-bool         Message::getBoolProperty   (const String &key) const
+bool         BaseMessage::getBoolProperty   (const String &key) const
 {
   HashValue *hval = intProperties.get(key);
   if (hval == NULL)
@@ -275,12 +275,12 @@ bool         Message::getBoolProperty   (const String &key) const
   return hval->i;
 }
 
-bool Message::hasIntProperty    (const String &key) const
+bool BaseMessage::hasIntProperty    (const String &key) const
 {
   return intProperties.get(key) != NULL;
 }
 
-bool Message::hasBoolProperty   (const String &key) const
+bool BaseMessage::hasBoolProperty   (const String &key) const
 {
   return intProperties.get(key) != NULL;
 }
