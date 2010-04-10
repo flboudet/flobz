@@ -14,6 +14,13 @@
 
 namespace gameui {
 
+	
+enum FrameStyle {
+	FRAME_NORMAL,
+	FRAME_HIGHLIGHTED,
+	FRAME_LOWLIGHTED
+};
+	
 class FramePicture {
 public:
     FramePicture(IosSurface *frameSurface, int leftW, int middleW, int rightW, int topH, int middleH, int bottomH);
@@ -39,12 +46,14 @@ public:
     bool getBorderVisible() const { return m_borderVisible; }
     void setFocusedPicture(const FramePicture *focusedSurface) { m_focusedSurface = focusedSurface; }
     void freeMemory();
+	void setFrameStyle(FrameStyle fs);
 private:
     void cacheSurface(IosSurface * &cachedSurface, const FramePicture *framePicture);
     const FramePicture *m_frameSurface;
     const FramePicture *m_focusedSurface;
     IosSurface *m_bgSurface, *m_bgFocus;
     bool m_borderVisible;
+	FrameStyle m_style;
 };
 
 }

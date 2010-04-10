@@ -93,6 +93,7 @@ public:
 	virtual void fillRect(const IosRect *rect, const RGBA &color) = 0;
 
     virtual void putString(IosFont *font, int x, int y, const char *text) = 0;
+	virtual void putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text) { putString(font, x,y,text); } // Default DrawTarget have shadow disabled.
     void putStringCenteredXY(IosFont *font, int x, int y, const char *text);
 
 public:

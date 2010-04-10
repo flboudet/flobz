@@ -119,7 +119,8 @@ void FramePicture::render(DrawTarget *surf) const
 
 Frame::Frame(const FramePicture *frameSurface, GameLoop *loop)
   : VBox(loop), m_frameSurface(frameSurface), m_focusedSurface(NULL),
-    m_bgSurface(NULL), m_bgFocus(NULL), m_borderVisible(true)
+    m_bgSurface(NULL), m_bgFocus(NULL), m_borderVisible(true),
+	m_style(FRAME_NORMAL)
 {
     setPolicy(USE_MIN_SIZE);
     setInnerMargin(9);
@@ -131,6 +132,10 @@ Frame::~Frame()
     delete m_bgSurface;
   if (m_bgFocus)
     delete m_bgFocus;
+}
+	
+void Frame::setFrameStyle(FrameStyle style) {
+	m_style = style;
 }
 
 void Frame::draw(DrawTarget *dt)
@@ -147,7 +152,7 @@ void Frame::draw(DrawTarget *dt)
     dstrect.h = (int)(bsize.y);
     dstrect.w = (int)(bsize.x);
 
-    if (haveFocus() && (m_focusedSurface != NULL)) {
+    if ((haveFocus() || m_style == FRAME_HIGHLIGHTED) && (m_style != FRAME_LOWLIGHTED) && (m_focusedSurface != NULL)) {
       cacheSurface(m_bgFocus, m_focusedSurface);
       // Drawing the background
       if (m_borderVisible)

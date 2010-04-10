@@ -507,6 +507,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       String getValue() const { return label; }
       void setFont(IosFont *newFont) { font = newFont; }
       void boing(void);
+	  void setShadow(int x, int y);
 
       // Implements IdleComponent
       virtual void idle(double currentTime);
@@ -525,6 +526,8 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       TextAlign m_textAlign;
       bool m_autoSize;
       audio_manager::Sound *m_slideSound;
+	  bool m_shadow;
+	  int m_shadow_x; int m_shadow_y;
     public:
       bool mdontMove;
   };

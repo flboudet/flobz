@@ -35,18 +35,14 @@ void FramedButton::setValue(String value)
 
 void FramedButton::eventOccured(GameControlEvent *event)
 {
-    if ((event->cursorEvent == kGameMouseUp) || (event->cursorEvent == kGameMouseMoved) || (event->cursorEvent == kGameMouseDown)) {
-        // If we click inside the frame
-        if (isMostlyInside(event->x, event->y))
-        {
-            // Reposition the click so it's inside the widget
-            Vec3 buttonPosition = m_button.getPosition();
-            Vec3 buttonSize = m_button.getSize();
-            if (event->x < buttonPosition.x) event->x = (int)ceil(buttonPosition.x);
-            if (event->x > buttonPosition.x + buttonSize.x) event->x = (int)floor(buttonPosition.x + buttonSize.x);
-            if (event->y < buttonPosition.y) event->y = (int)ceil(buttonPosition.y);
-            if (event->y > buttonPosition.y + buttonSize.y) event->y = (int)floor(buttonPosition.y + buttonSize.y);
-        }
+    if (event->isMouse() && isMostlyInside(event->x, event->y)) {
+		// Reposition the click so it's inside the widget
+		Vec3 buttonPosition = m_button.getPosition();
+		Vec3 buttonSize = m_button.getSize();
+		if (event->x < buttonPosition.x) event->x = (int)ceil(buttonPosition.x) + 1;
+		if (event->x > buttonPosition.x + buttonSize.x) event->x = (int)floor(buttonPosition.x + buttonSize.x) - 1;
+		if (event->y < buttonPosition.y) event->y = (int)ceil(buttonPosition.y) + 1;
+		if (event->y > buttonPosition.y + buttonSize.y) event->y = (int)floor(buttonPosition.y + buttonSize.y) - 1;
     }
 
     // Push the event to the widget

@@ -76,6 +76,7 @@ public:
     int x, y;
     uint16_t unicodeKeySym;
 	void setCaught() { caught = true; }
+	bool isMouse() const { return (cursorEvent == kGameMouseMoved) || (cursorEvent == kGameMouseDown) || (cursorEvent == kGameMouseUp); }
 };
 
 /**

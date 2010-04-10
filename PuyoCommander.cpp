@@ -152,6 +152,7 @@ void PuyoCommander::initWithGUI(bool fs)
   m_windowFramePicture = std::auto_ptr<FramePicture>(new FramePicture(25, 28, 25, 19, 26, 23));
   m_buttonIdleFramePicture = std::auto_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
   m_buttonDownFramePicture = std::auto_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
+  m_buttonSpecialFramePicture = std::auto_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
   m_buttonOverFramePicture = std::auto_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
   m_textFieldIdleFramePicture = std::auto_ptr<FramePicture>(new FramePicture(5, 23, 4, 6, 10, 3));
   m_separatorFramePicture = std::auto_ptr<FramePicture>(new FramePicture(63, 2, 63, 2, 4, 2));
@@ -177,12 +178,14 @@ void PuyoCommander::initWithGUI(bool fs)
   m_buttonIdleImage = getSurface(IMAGE_RGBA, "gfx/button.png");
   m_buttonDownImage = getSurface(IMAGE_RGBA, "gfx/buttondown.png");
   m_buttonOverImage = getSurface(IMAGE_RGBA, "gfx/buttonover.png");
+  m_buttonSpecialImage = getSurface(IMAGE_RGBA, "gfx/buttonspecial.png");
   m_textFieldIdleImage = getSurface(IMAGE_RGBA, "gfx/editfield.png");
   m_separatorImage = getSurface(IMAGE_RGBA, "gfx/separator.png");
   m_listIdleImage = getSurface(IMAGE_RGBA, "gfx/listborder.png");
 
   m_windowFramePicture->setFrameSurface(m_frameImage);
   m_buttonIdleFramePicture->setFrameSurface(m_buttonIdleImage);
+  m_buttonSpecialFramePicture->setFrameSurface(m_buttonSpecialImage);
   m_buttonDownFramePicture->setFrameSurface(m_buttonDownImage);
   m_buttonOverFramePicture->setFrameSurface(m_buttonOverImage);
   m_textFieldIdleFramePicture->setFrameSurface(m_textFieldIdleImage);

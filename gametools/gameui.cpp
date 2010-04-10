@@ -114,12 +114,12 @@ namespace gameui {
 	{
 		Vec3 widPosition = getPosition();
 		Vec3 widSize = getSize();
-		widPosition.x -= 10;
-		widPosition.y -= 10;
-		widSize.x += 20;
-		widSize.y += 20;
+		widPosition.x -= 1;
+		widPosition.y -= 1;
+		widSize.x += 2;
+		widSize.y += 2;
 		return ((widPosition.x <= x) && (widPosition.y <= y)
-				&& (widPosition.x + widSize.x >= widPosition.x) && (widPosition.y + widSize.y >= y));
+				&& (widPosition.x + widSize.x >= x) && (widPosition.y + widSize.y >= y));
 	}
 
     Screen *Widget::getParentScreen() const
@@ -497,59 +497,66 @@ namespace gameui {
 
     void Box::eventOccured(GameControlEvent *event)
     {
-        // If the box has no focusable child, give up the focus
-        if (getNumberOfFocusableChilds() <= 0) {
-            lostFocus();
-            return;
-        }
+		if (event->isMouse()) {
+			// Mouse focus management
+			handleMouseFocus(event);
+		}
+		else { // Keyboard / Joystick management
+			// If the box has no focusable child, give up the focus
+			if (getNumberOfFocusableChilds() <= 0) {
+				lostFocus();
+				return;
+			}
+			
+			// Event transmission to the widget tree
+			Widget *child = getChild(activeWidget);
+			// If the event is a key up event and the child is not interrested, discard the event
+			if ((event->isUp) && (! child->receiveUpEvents()))
+				return;
+			// Send the event to the active child. If the child doesn't gives up the focus, we're done.
+			child->eventOccured(event);
 
-        // Mouse focus management
-        handleMouseFocus(event);
+			// Sloppy Focus
+			//if (event->cursorEvent == kGameMouseUp) {
+			//	lostFocus();
+			//	return;
+			//}		
+			if (child->haveFocus()) return;
 
-        // Event transmission to the widget tree
-        Widget *child = getChild(activeWidget);
-        // If the event is a key up event and the child is not interrested, discard the event
-        if ((event->isUp) && (! child->receiveUpEvents()))
-            return;
-        // Send the event to the active child. If the child doesn't gives up the focus, we're done.
-        child->eventOccured(event);
+			// Keyboard focus management
+			// Discard up events for the keyboard focus management
+			if (event->isUp)
+				return;
 
-		// Sloppy Focus
-		if (event->cursorEvent == kGameMouseUp) {
-			lostFocus();
-			return;
-		}		
-        if (child->haveFocus()) return;
-
-        // Keyboard focus management
-        // Discard up events for the keyboard focus management
-        if (event->isUp)
-            return;
-        handleKeyboardFocus(event);
+			handleKeyboardFocus(event);
+		}
     }
 
     void Box::handleMouseFocus(GameControlEvent *event)
     {
         Vec3 ref(1.0f,2.0f,3.0f);
         float axis = getSortingAxe(ref);
-
         // If the box is a zbox, don't perform mouse management
-        if (axis == 3.0f)
-            return;
+        //if (axis == 3.0f)
+        //     return;
+		//printf("Focus is in a box (axis=%d). y=%d sy=%d\n", (int)axis, (int)getPosition().y, (int)getSize().y);
 
-        // If the event is a mouse moved event, search and focus the widget beneath the cursor
-        if ((event->cursorEvent == kGameMouseMoved) || (event->cursorEvent == kGameMouseDown)) {
-            Widget *child = getChild(activeWidget);
-            for (int i = 0 ; i < this->getNumberOfChilds() ; i++) {
-                Widget *wid = this->getChild(i);
-                if ((wid->isFocusable()) && wid->isMostlyInside(event->x, event->y) && !wid->haveFocus()) {
-                    if (child != NULL)
-                        child->lostFocus();
-                    activeWidget = i;
-                    wid->giveFocus();
+		// Find the widget beneath the cursor.
+		Widget *focusedWidget = NULL;
+		for (int i = 0 ; i < this->getNumberOfChilds() ; i++) {
+			Widget *wid = this->getChild(i);
+			if (wid->isFocusable()) {
+				if (wid->isMostlyInside(event->x, event->y)) {
+					activeWidget = i;
+					focusedWidget = wid;
 				}
-            }
-			if (child != NULL && child->haveFocus() && !child->isMostlyInside(event->x, event->y)) child->lostFocus();
+				else if (wid->haveFocus())
+					wid->lostFocus(); // In anycase, if cursor is outside the widget, he gives up the focus.
+			}
+		}
+		if (focusedWidget != NULL) {
+			focusedWidget->giveFocus();
+			focusedWidget->eventOccured(event);
 		}
     }
 
@@ -1211,7 +1218,7 @@ namespace gameui {
         // If the grabbed widget doesn't have the focus, try to give it
         // (important so that whenever the grabbed widget gives up focus, it will be
         // given back to it)
-        if ((! grabbedWidget->haveFocus()) && (grabbedWidget->isFocusable()))
+        if ((!grabbedWidget->haveFocus()) && (grabbedWidget->isFocusable()))
             grabbedWidget->giveFocus();
         // Pass the event to the last grabbed widget
         grabbedWidget->eventOccured(event);
@@ -1265,7 +1272,7 @@ namespace gameui {
 
     Text::Text()
         : label(""), offset(0.0,0.0,0.0), m_textAlign(TEXT_LEFT_ALIGN),
-          m_autoSize(true), mdontMove(true), m_slideSound(GameUIDefaults::SLIDE_SOUND)
+          m_autoSize(true), mdontMove(true), m_slideSound(GameUIDefaults::SLIDE_SOUND), m_shadow(false)
     {
         this->font = GameUIDefaults::FONT_TEXT;
         setPreferedSize(Vec3(m_autoSize?this->font->getTextWidth(label):0.0f, this->font->getHeight(), 1.0));
@@ -1276,7 +1283,7 @@ namespace gameui {
     Text::Text(const String &label, IosFont *font, bool autosize)
         : font(font), label(label), offset(0.0,0.0,0.0),
           m_textAlign(TEXT_LEFT_ALIGN), m_autoSize(autosize),
-          mdontMove(true), m_slideSound(GameUIDefaults::SLIDE_SOUND)
+          mdontMove(true), m_slideSound(GameUIDefaults::SLIDE_SOUND), m_shadow(false)
     {
         if (font == NULL) this->font = GameUIDefaults::FONT_TEXT;
         setPreferedSize(Vec3(m_autoSize?this->font->getTextWidth(label):0.0f, this->font->getHeight(), 1.0));
@@ -1293,6 +1300,12 @@ namespace gameui {
         if (parent)
             parent->arrangeWidgets();
     }
+	
+	void Text::setShadow(int x, int y) {
+		m_shadow = true;
+		m_shadow_x = x;
+		m_shadow_y = y;
+	}
 
     void Text::draw(DrawTarget *dt)
     {
@@ -1308,26 +1321,26 @@ namespace gameui {
 #endif
       if (isVisible())
       {
+		  int x;
+		  int y;
           switch (m_textAlign) {
               case TEXT_CENTERED:
-                  dt->putString(font,
-                                (int)(offset.x + getPosition().x + (getSize().x-(font->getTextWidth(label)))/2.0f),
-                                (int)(offset.y + getPosition().y + (getSize().y-(font->getHeight()))/2.0f),
-                                (const char*)label);
+                  x = (int)(offset.x + getPosition().x + (getSize().x-(font->getTextWidth(label)))/2.0f);
+				  y = (int)(offset.y + getPosition().y + (getSize().y-(font->getHeight()))/2.0f);
                   break;
               case TEXT_RIGHT_ALIGN:
-                  dt->putString(font,
-                                (int)(offset.x + getPosition().x + getSize().x-(font->getTextWidth(label))),
-                                (int)(offset.y + getPosition().y + (getSize().y-(font->getHeight()))/2.0f),
-                                (const char*)label);
+                  x = (int)(offset.x + getPosition().x + getSize().x-(font->getTextWidth(label)));
+                  y = (int)(offset.y + getPosition().y + (getSize().y-(font->getHeight()))/2.0f);
                   break;
               case TEXT_LEFT_ALIGN:
-                  dt->putString(font,
-                                (int)(offset.x + getPosition().x),
-                                (int)(offset.y + getPosition().y + (getSize().y-(font->getHeight()))/2.0f),
-                                (const char*)label);
+				  x = (int)(offset.x + getPosition().x);
+                  y = (int)(offset.y + getPosition().y + (getSize().y-(font->getHeight()))/2.0f);
                   break;
           }
+		  if (m_shadow)
+			  dt->putStringWithShadow(font, x, y, m_shadow_x, m_shadow_y, (const char*)label);
+		  else
+			  dt->putString(font, x, y, (const char*)label);
       }
     }
 

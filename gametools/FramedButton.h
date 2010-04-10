@@ -6,6 +6,7 @@
 
 namespace gameui {
 
+
 class FramedButton : public Frame {
 public:
   FramedButton(const String &label, Action *action,
