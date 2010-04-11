@@ -19,7 +19,7 @@ class SDL13_IosSurface : public IosSurface
 public:
     SDL13_IosSurface(SDL_Surface *surf, SDL13_DrawContext &drawContext, bool alpha=true);
     virtual ~SDL13_IosSurface();
-    void setAlpha(unsigned char alpha);
+    virtual void setBlendMode(ImageBlendMode mode);
 public:
     SDL_TextureID getTexture();
     SDL_TextureID getFlippedTexture();
@@ -28,11 +28,26 @@ private:
     void releaseTexture();
 public:
     // DrawTarget implementation
-    virtual void renderCopy(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
-    virtual void renderCopyFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
-    virtual void renderRotatedCentered(IosSurface *surf, int angle, int x, int y);
+    virtual void draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
+    virtual void drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
+    virtual void drawRotatedCentered(IosSurface *surf, int angle, int x, int y);
     virtual void setClipRect(IosRect *rect);
     virtual void fillRect(const IosRect *rect, const RGBA &color);
+    virtual void putString(IosFont *font, int x, int y, const char *text);
+    // IosSurface implementation
+    virtual bool isOpaque() const;
+
+	virtual bool haveAbility(int ability) const;
+	virtual void dropAbility(int ability);
+    virtual RGBA readRGBA(int x, int y);
+
+    virtual IosSurface *shiftHue(float hue_offset, IosSurface *mask = NULL);
+    virtual IosSurface *shiftHSV(float h, float s, float v);
+    virtual IosSurface *setValue(float value);
+
+    virtual IosSurface * resizeAlpha(int width, int height);
+    virtual IosSurface * mirrorH();
+    virtual void         convertToGray();
 public:
     bool m_alpha;
     SDL_Surface *m_surf;
@@ -43,24 +58,16 @@ public:
     SDL_TextureID m_texRotated[36];
 private:
     SDL13_DrawContext &m_drawContext;
+    ImageBlendMode m_blendMode;
 };
 
-class SDL13_IIMLibrary : public IIMLibrary
+class SDL13_IIMLibrary : public ImageLibrary
 {
 private:
     SDL13_IIMLibrary(SDL13_DrawContext &drawContext) : m_drawContext(drawContext) {}
 public:
-    virtual IosSurface * create_DisplayFormat(int w, int h);
-    virtual IosSurface * create_DisplayFormatAlpha(int w, int h);
-    virtual IosSurface * load_Absolute_DisplayFormatAlpha(const char *path);
-    virtual RGBA         getRGBA(IosSurface *surf, int x, int y);
-    virtual IosSurface * shiftHue(IosSurface *surf, float hue_offset);
-    virtual IosSurface * shiftHueMasked(IosSurface *surf, IosSurface *mask, float hue_offset);
-    virtual IosSurface * shiftHSV(IosSurface *surf, float h, float s, float v);
-    virtual IosSurface * setValue(IosSurface *surf, float value);
-    virtual IosSurface * resizeAlpha(IosSurface *surf, int width, int height);
-    virtual IosSurface * mirrorH(IosSurface *surf);
-    virtual void         convertToGray(IosSurface *surf);
+    virtual IosSurface * createImage(ImageType type, int w, int h, ImageSpecialAbility specialAbility = 0);
+    virtual IosSurface * loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0);
     virtual IosFont    * createFont(const char *path, int size, IosFontFx fx = Font_STD);
 private:
     SDL13_DrawContext &m_drawContext;
@@ -75,12 +82,13 @@ public:
     virtual void flip();
     virtual int getHeight() const;
     virtual int getWidth() const;
-    virtual IIMLibrary & getIIMLibrary();
+    virtual ImageLibrary & getImageLibrary();
     // DrawTarget implementation
-    virtual void renderCopy(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
-    virtual void renderCopyFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
-    virtual void renderRotatedCentered(IosSurface *surf, int angle, int x, int y);
+    virtual void draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
+    virtual void drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
+    virtual void drawRotatedCentered(IosSurface *surf, int angle, int x, int y);
     virtual void setClipRect(IosRect *rect);
+    virtual void setBlendMode(ImageBlendMode mode);
     virtual void fillRect(const IosRect *rect, const RGBA &color);
     virtual void putString(IosFont *font, int x, int y, const char *text);
     // Specific methods
@@ -90,6 +98,7 @@ private:
     SDL13_IIMLibrary m_iimLib;
     SDL_DisplayMode m_mode;
     SDL_Rect m_clipRect, *m_clipRectPtr;
+    ImageBlendMode m_blendMode;
     friend class SDL13_IIMLibrary;
     friend class SDL13_IosSurface;
 };
