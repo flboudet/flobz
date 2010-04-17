@@ -76,6 +76,7 @@ public:
 private:
     enum State {
       kNotRunning,
+      kMatchGettingStarted,
       kMatchPlaying,
       kMatchWonP1Animation,
       kMatchWonP2Animation,
@@ -85,6 +86,7 @@ private:
      * Performs a step in the match state machine
      */
     void stateMachine();
+    void prepareGame();
     void startGame();
     void gameOver();
     void gameScores();

@@ -80,26 +80,29 @@ void TwoPlayersStarterAction::stateMachine()
 {
   switch (m_state) {
   case kNotRunning:
-    startGame();
-    break;
+      prepareGame();
+      break;
+  case kMatchGettingStarted:
+      startGame();
+      break;
   case kMatchPlaying:
-    gameOver();
-    break;
+      gameOver();
+      break;
   case kMatchWonP1Animation:
-    gameScores();
-    break;
+      gameScores();
+      break;
   case kMatchWonP2Animation:
-    gameScores();
-    break;
+      gameScores();
+      break;
   case kMatchScores:
-    restartGame();
-    break;
+      restartGame();
+      break;
   default:
-    break;
+      break;
   }
 }
 
-void TwoPlayersStarterAction::startGame()
+void TwoPlayersStarterAction::prepareGame()
 {
     AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
     currentLevelTheme = themeManager->getPuyoLevelTheme();
@@ -119,6 +122,14 @@ void TwoPlayersStarterAction::startGame()
         gameWidget->addGameBHandicap(-victoriesDelta);
     }
     GameUIDefaults::SCREEN_STACK->push(gameScreen);
+    gameScreen->setSuspended(true);
+    m_state = kMatchGettingStarted;
+    startGame();
+}
+
+void TwoPlayersStarterAction::startGame()
+{
+    gameScreen->setSuspended(false);
     m_state = kMatchPlaying;
 }
 

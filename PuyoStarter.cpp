@@ -117,6 +117,14 @@ bool GameScreen::backPressed()
     return false;
 }
 
+void GameScreen::setSuspended(bool suspended)
+{
+    if (suspended)
+        gameWidget.pause(false);
+    else
+        gameWidget.resume();
+}
+
 void GameScreen::setPaused(bool fromControls)
 {
     if (!paused) {

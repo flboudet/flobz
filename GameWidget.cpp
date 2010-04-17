@@ -54,7 +54,8 @@ GameWidget::GameWidget(GameOptions game_options, bool withGUI)
     : CycledComponent(TIME_BETWEEN_GAME_CYCLES), withGUI(withGUI), associatedScreen(NULL),
       painter(*(GameUIDefaults::GAME_LOOP->getDrawContext())), cyclesBeforeGameCycle(0),
       cyclesBeforeSpeedIncreases(game_options.CYCLES_BEFORE_SPEED_INCREASES),
-      tickCounts(0), cycles(0), paused(false), displayLives(true), lives(3), abortedFlag(false), gameSpeed(0),
+      tickCounts(0), cycles(0), paused(false), m_obscureScreenOnPause(true),
+      displayLives(true), lives(3), abortedFlag(false), gameSpeed(0),
       MinSpeed(game_options.MIN_SPEED), MaxSpeed(game_options.MAX_SPEED),
       blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
       playerOneName(p1name), playerTwoName(p2name),
@@ -260,7 +261,7 @@ void GameWidget::drawGameNeutrals(DrawTarget *dt)
 
 void GameWidget::draw(DrawTarget *dt)
 {
-    if (paused) {
+    if ((paused) && (m_obscureScreenOnPause)) {
         dt->draw(painterGameScreen, NULL, NULL);
         return;
     }
@@ -343,13 +344,18 @@ void GameWidget::addSubWidget(Widget *subWidget)
   m_subwidgets.push_back(subWidget);
 }
 
-void GameWidget::pause()
+void GameWidget::pause(bool obscureScreen)
 {
-    //painterGameScreen->setAlpha(IOS_ALPHA_OPAQUE);
-    draw(painterGameScreen);
+    m_obscureScreenOnPause = obscureScreen;
+    // Call draw on offscreen surface before setting the game to paused
+    if (m_obscureScreenOnPause)
+        draw(painterGameScreen);
     paused = true;
-    painterGameScreen->convertToGray();
-    requestDraw();
+    // Draw the obscured screen on display
+    if (m_obscureScreenOnPause) {
+        painterGameScreen->convertToGray();
+        requestDraw();
+    }
 }
 
 void GameWidget::resume()

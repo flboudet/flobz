@@ -75,7 +75,7 @@ public:
     virtual void drawGameAreas(DrawTarget *dt);
     virtual void drawGameNeutrals(DrawTarget *dt);
 
-    void pause();
+    void pause(bool obscureScreen = true);
     void resume();
     bool isFocusable() { return !paused; }
     void eventOccured(event_manager::GameControlEvent *event);
@@ -129,7 +129,7 @@ protected:
     int cyclesBeforeSpeedIncreases; // time between speed increases in units of 20ms
     unsigned int tickCounts;
     unsigned long long cycles;
-    bool paused;
+    bool paused, m_obscureScreenOnPause;
     bool displayLives;
     int lives;
     bool once;

@@ -63,6 +63,10 @@ public:
     virtual void abort();
     void setOverlayStory(StoryWidget *story);
     /**
+     * Suspends the game (no pause menu)
+     */
+    void setSuspended(bool suspended);
+    /**
      * Sets the game to paused
      * @param fromControls true if the action leading to the pause comes
      *                     in response to a local input control. In this case,
