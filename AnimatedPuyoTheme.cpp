@@ -261,6 +261,7 @@ static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
                          (const char *) GSL_GLOBAL_PTR(gsl, "level.gamelost_right_2p"),
                          (const char *) GSL_GLOBAL_PTR(gsl, "level.animation_2p"));
     theme->setForegroundAnimation((const char *) GSL_GLOBAL_PTR(gsl, "level.foreground_animation"));
+    theme->setGetReady2PAnimation((const char *) GSL_GLOBAL_PTR(gsl, "level.get_ready_animation"));
     globalManager->addLevel(theme);
 }
 
@@ -1069,6 +1070,11 @@ const String PuyoLevelTheme::getForegroundAnimation() const
         return theCommander->getDataPathManager().getPath(
             FilePath(getThemeRootPath()).combine(
             _foreground_animation));
+}
+
+const String PuyoLevelTheme::getReadyAnimation2P() const
+{
+    return _getReadyAnimation;
 }
 
 

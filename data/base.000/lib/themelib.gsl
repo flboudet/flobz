@@ -54,7 +54,8 @@ struct <Level:
     PuyobanDefinition puyoban_p2,
     Font   playerNameFont,
     Font   scoreFont,
-    string foreground_animation>
+    string foreground_animation,
+    string get_ready_animation>
 
 PuyoSet puyoset
 Level   level
@@ -147,15 +148,16 @@ external <end_level>
     level.playerNameFont.path = "__FONT__"
     level.playerNameFont.size = 17
     level.playerNameFont.fx   = 2
-    
+
     level.scoreFont.path = "gfx/zill_spills.ttf"
     level.scoreFont.size = 24
     level.scoreFont.fx   = 0
-    
+
     level.gamelost_left_2p = "gamelost2p_left.gsl"
     level.gamelost_right_2p = "gamelost2p_right.gsl"
     level.animation_2p = "little_kaori.gsl"
     level.foreground_animation=""
+    level.get_ready_animation=""
 
 <ThemeDefinition>
 [start_puyoset]

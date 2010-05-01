@@ -210,6 +210,7 @@ public:
         _animation_2p = animation_2p;
     }
     void setForegroundAnimation(String foregroundAnimation) { _foreground_animation = foregroundAnimation; }
+    void setGetReady2PAnimation(String getReadyAnimation) { _getReadyAnimation = getReadyAnimation; }
 
     IosSurface * getLifeForIndex(int index);
     IosSurface * getBackground(void);
@@ -245,6 +246,7 @@ public:
     const String getGameLostRightAnimation2P() const;
     const String getCentralAnimation2P() const;
     const String getForegroundAnimation() const;
+    const String getReadyAnimation2P() const;
 private:
     String _path;
     String _name;
@@ -263,6 +265,7 @@ private:
     String _gamelost_right_2p;
     String _animation_2p;
     String _foreground_animation;
+    String _getReadyAnimation;
 
     IosSurfaceRef _levelLives[NUMBER_OF_LIVES];
     IosSurfaceRef _levelBackground;
@@ -272,7 +275,7 @@ private:
     IosSurfaceRef _neutralIndicator;
     IosSurfaceRef _bigNeutralIndicator;
     IosSurfaceRef _giantNeutralIndicator;
-    
+
     IosFontRef _scoreFont;
     IosFontRef _playerNameFont;
 

@@ -124,7 +124,12 @@ void TwoPlayersStarterAction::prepareGame()
     GameUIDefaults::SCREEN_STACK->push(gameScreen);
     gameScreen->setSuspended(true);
     m_state = kMatchGettingStarted;
-    startGame();
+    if (currentLevelTheme->getReadyAnimation2P() == "") {
+        startGame();
+        return;
+    }
+    gameLostWidget = new StoryWidget(currentLevelTheme->getReadyAnimation2P(), this);
+    gameScreen->setOverlayStory(gameLostWidget);
 }
 
 void TwoPlayersStarterAction::startGame()
@@ -138,12 +143,12 @@ void TwoPlayersStarterAction::gameOver()
     if (gameWidget->isGameARunning()) {
         gameLostWidget = new StoryWidget(currentLevelTheme->getGameLostRightAnimation2P(), this);
         leftVictories++;
-	m_state = kMatchWonP1Animation;
+        m_state = kMatchWonP1Animation;
     }
     else {
         gameLostWidget = new StoryWidget(currentLevelTheme->getGameLostLeftAnimation2P(), this);
         rightVictories++;
-	m_state = kMatchWonP2Animation;
+        m_state = kMatchWonP2Animation;
     }
     gameScreen->setOverlayStory(gameLostWidget);
 }
