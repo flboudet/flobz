@@ -238,6 +238,7 @@ public:
       kNotRunning,
       kStoryIntroduction,
       kStory,
+      kMatchGettingStarted,
       kMatchPlaying,
       kMatchLostAnimation,
       kMatchWonScores,
@@ -258,11 +259,13 @@ public:
 private:
     void performStoryIntroduction();
     void performOpponentStory();
-    void performMatchPlaying();
+    void performMatchPrepare();
+    void performMatchStart();
     void performEndOfMatch();
     void performMatchLostAnimation();
     void performMatchScores(State scoreState);
     void trigMatchOverAction();
+    void prepareGame();
     /**
      * Performs a step in the match state machine
      */
@@ -277,7 +280,7 @@ private:
     StoryScreen *m_introStory, *m_opponentStory;
     GameScreen *m_gameScreen;
     SinglePlayerGameWidget *m_gameWidget;
-    StoryWidget *m_matchLostAnimation;
+    StoryWidget *m_getReadyWidget, *m_matchLostAnimation;
     TwoPlayersStatsWidget *m_statsWidget;
     PlayerGameStat &m_playerStat;
 };

@@ -517,6 +517,7 @@ SinglePlayerMatch::SinglePlayerMatch
                  m_remainingLifes(remainingLifes),
                  m_introStory(NULL),
                  m_opponentStory(NULL),
+                 m_getReadyWidget(NULL),
                  m_matchLostAnimation(NULL),
                  m_statsWidget(NULL)
 {
@@ -542,20 +543,24 @@ void SinglePlayerMatch::run()
 void SinglePlayerMatch::action(Widget *sender, int actionType,
 				     GameControlEvent *event)
 {
+  //  cout << "SinglePlayerAction!!! " << actionType << endl;
   if (sender == m_introStory->getStoryWidget()) {
     stateMachine();
   }
   else if (sender == m_opponentStory->getStoryWidget()) {
     stateMachine();
   }
-  else if ((sender == m_gameWidget)
-           && (actionType == GameWidget::GAMEOVER_STARTPRESSED)) {
+  else if (((sender == m_gameWidget)
+            && (actionType == GameWidget::GAMEOVER_STARTPRESSED))
+           || (actionType == GameWidget::GAME_IS_OVER)) {
     stateMachine();
   }
   else if ((sender == m_matchLostAnimation)
            && (m_state == kMatchLostAnimation)) {
     stateMachine();
   }
+  else if (m_state == kMatchGettingStarted)
+      stateMachine();
 }
 
 void SinglePlayerMatch::performStoryIntroduction()
@@ -586,7 +591,7 @@ void SinglePlayerMatch::performOpponentStory()
   m_state = kStory;
 }
 
-void SinglePlayerMatch::performMatchPlaying()
+void SinglePlayerMatch::performMatchPrepare()
 {
   m_gameWidget = m_spFactory->createGameWidget
         (m_levelData->getPuyoTheme(), m_levelData->getLevelTheme(),
@@ -600,7 +605,29 @@ void SinglePlayerMatch::performMatchPlaying()
   GameUIDefaults::SCREEN_STACK->pop();
   GameUIDefaults::SCREEN_STACK->push(m_gameScreen);
   delete m_opponentStory;
-  m_state = kMatchPlaying;
+  prepareGame();
+}
+
+void SinglePlayerMatch::prepareGame()
+{
+    PuyoLevelTheme &currentLevelTheme = m_levelData->getLevelTheme();
+    m_gameScreen->setSuspended(true);
+    m_state = kMatchGettingStarted;
+    if (currentLevelTheme.getReadyAnimation2P() == "") {
+        performMatchStart();
+        return;
+    }
+    m_getReadyWidget = new StoryWidget(currentLevelTheme.getReadyAnimation2P(), this);
+    m_gameScreen->setOverlayStory(m_getReadyWidget);
+}
+
+void SinglePlayerMatch::performMatchStart()
+{
+    if (m_getReadyWidget != NULL) {
+        m_getReadyWidget->setIntegerValue("@start_pressed", 1);
+    }
+    m_gameScreen->setSuspended(false);
+    m_state = kMatchPlaying;
 }
 
 void SinglePlayerMatch::performEndOfMatch()
@@ -653,7 +680,10 @@ void SinglePlayerMatch::stateMachine()
     performOpponentStory();
     break;
   case kStory:
-    performMatchPlaying();
+    performMatchPrepare();
+    break;
+  case kMatchGettingStarted:
+    performMatchStart();
     break;
   case kMatchPlaying:
     performEndOfMatch();
