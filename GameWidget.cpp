@@ -237,7 +237,7 @@ void GameWidget::cycle()
     if (areaB->isGameOver())
       areaA->gameWin();
     if (gameOverAction)
-      gameOverAction->action(this, 0, NULL);
+      gameOverAction->action(this, GAME_IS_OVER, NULL);
   }
 }
 
@@ -267,9 +267,11 @@ void GameWidget::draw(DrawTarget *dt)
     }
     // Render the background
     drawBackground(dt);
-    // Rendering the opponent
-    if (getOpponent() != NULL)
-        getOpponent()->draw(dt);
+    // Rendering the opponent if it is behind the puyos
+    if (attachedLevelTheme->getOpponentIsBehind()) {
+        if (getOpponent() != NULL)
+            getOpponent()->draw(dt);
+    }
     // Rendering puyo views
     drawGameAreas(dt);
     // Rendering the grids
@@ -337,6 +339,11 @@ void GameWidget::draw(DrawTarget *dt)
                                 attachedLevelTheme->getNameDisplayX(1),
                                 attachedLevelTheme->getNameDisplayY(1),
                                 playerTwoName);
+    // Rendering the opponent if it is in front
+    if (! attachedLevelTheme->getOpponentIsBehind()) {
+        if (getOpponent() != NULL)
+            getOpponent()->draw(dt);
+    }
 }
 
 void GameWidget::addSubWidget(Widget *subWidget)
@@ -380,8 +387,11 @@ void GameWidget::eventOccured(GameControlEvent *event)
 bool GameWidget::startPressed()
 {
     if ((gameover || abortedFlag) && once && (ios_fc::getTimeMs() > gameOverDate + 500)) {
-        actionAfterGameOver(true);
+        actionAfterGameOver(true, GAMEOVER_STARTPRESSED);
         return true;
+    }
+    else if (paused) {
+        actionAfterGameOver(true, PAUSED_STARTPRESSED);
     }
     return false;
 }
@@ -389,16 +399,16 @@ bool GameWidget::startPressed()
 bool GameWidget::backPressed()
 {
     if ((gameover || abortedFlag) && once) {
-        actionAfterGameOver(true);
+        actionAfterGameOver(true, GAMEOVER_STARTPRESSED);
         return true;
     }
     return false;
 }
 
-void GameWidget::actionAfterGameOver(bool fromControls)
+void GameWidget::actionAfterGameOver(bool fromControls, int actionType)
 {
     if (gameOverAction)
-      gameOverAction->action(this, 0, NULL);
+      gameOverAction->action(this, actionType, NULL);
 }
 
 void GameWidget::setScreenToPaused(bool fromControls)

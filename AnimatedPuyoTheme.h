@@ -241,6 +241,7 @@ public:
     float getPuyobanScale(int playerId) const { return _puyobanScale[playerId]; }
     IosFont *getPlayerNameFont() const { return _playerNameFont; }
     IosFont *getScoreFont() const { return _scoreFont; }
+    bool getOpponentIsBehind() const { return false; }
 
     const String getGameLostLeftAnimation2P() const;
     const String getGameLostRightAnimation2P() const;

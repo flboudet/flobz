@@ -39,5 +39,6 @@
     level.background    = "blueplastic-background.jpg"
     level.grid          = ""
     level.foreground_animation = "blueplastic_foreground.gsl"
+    level.get_ready_animation  = "getready.gsl"
 [end_level]
 

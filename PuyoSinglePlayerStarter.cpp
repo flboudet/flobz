@@ -548,7 +548,8 @@ void SinglePlayerMatch::action(Widget *sender, int actionType,
   else if (sender == m_opponentStory->getStoryWidget()) {
     stateMachine();
   }
-  else if (sender == m_gameWidget) {
+  else if ((sender == m_gameWidget)
+           && (actionType == GameWidget::GAMEOVER_STARTPRESSED)) {
     stateMachine();
   }
   else if ((sender == m_matchLostAnimation)

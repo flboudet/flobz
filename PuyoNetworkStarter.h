@@ -56,7 +56,7 @@ public:
     void setScreenToPaused(bool fromControls);
     void setScreenToResumed(bool fromControls);
     void abort();
-    void actionAfterGameOver(bool fromControls);
+    void actionAfterGameOver(bool fromControls, int actionType);
     virtual void sendChat(String chatText);
 protected:
     void associatedScreenHasBeenSet(GameScreen *associatedScreen);

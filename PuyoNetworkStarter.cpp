@@ -143,7 +143,7 @@ void PuyoNetworkGameWidget::onMessage(Message &message)
             setScreenToResumed(false);
             break;
         case PuyoMessage::kGameNext:
-            actionAfterGameOver(false);
+            actionAfterGameOver(false, GAMEOVER_STARTPRESSED);
             break;
         case PuyoMessage::kGameAbort:
             GameWidget::abort();
@@ -194,7 +194,7 @@ void PuyoNetworkGameWidget::abort()
     GameWidget::abort();
 }
 
-void PuyoNetworkGameWidget::actionAfterGameOver(bool fromControls)
+void PuyoNetworkGameWidget::actionAfterGameOver(bool fromControls, int actionType)
 {
     // If the resume is from a controller, we have to send the resume information to the other peer
     if (fromControls) {
@@ -204,7 +204,7 @@ void PuyoNetworkGameWidget::actionAfterGameOver(bool fromControls)
         message->send();
         delete message;
     }
-    GameWidget::actionAfterGameOver(fromControls);
+    GameWidget::actionAfterGameOver(fromControls, actionType);
 }
 
 void PuyoNetworkGameWidget::sendChat(String chatText)

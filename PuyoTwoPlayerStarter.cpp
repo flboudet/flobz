@@ -58,29 +58,37 @@ void TwoPlayersGameWidget::cycle()
 
 TwoPlayersStarterAction::TwoPlayersStarterAction(int difficulty, GameWidgetFactory &gameWidgetFactory, PuyoTwoNameProvider *nameProvider)
   : m_state(kNotRunning), difficulty(difficulty), gameWidgetFactory(gameWidgetFactory), gameScreen(NULL),
-    nameProvider(nameProvider), gameLostWidget(NULL), currentLevelTheme(NULL), leftVictories(0), rightVictories(0),
+    nameProvider(nameProvider), gameLostWidget(NULL), m_getReadyWidget(NULL), currentLevelTheme(NULL), leftVictories(0), rightVictories(0),
     m_statsWidget(NULL), totalPointsPlayerOne_(0), totalPointsPlayerTwo_(0) {}
 
 void TwoPlayersStarterAction::action(Widget *sender, int actionType,
                                      GameControlEvent *event)
 {
-  if (m_state == kNotRunning)
-    stateMachine();
+    //cout << "TwoPlayerAction!!! " << actionType << endl;
+  if (m_state == kNotRunning) {
+      stateMachine();
+  }
   else if (sender == gameWidget) {
     if (gameWidget->getAborted())
       endGameSession();
-    else
+    else if (m_state == kMatchGettingStarted)
+        stateMachine();
+    else if (actionType == GameWidget::GAMEOVER_STARTPRESSED)
+      stateMachine();
+    else if (actionType == GameWidget::GAME_IS_OVER)
       stateMachine();
   }
   else if (sender == gameLostWidget)
-    stateMachine();
+      stateMachine();
+  else if (m_state == kMatchGettingStarted)
+      stateMachine();
 }
 
 void TwoPlayersStarterAction::stateMachine()
 {
   switch (m_state) {
   case kNotRunning:
-      prepareGame();
+      prepareGame1stRun();
       break;
   case kMatchGettingStarted:
       startGame();
@@ -95,14 +103,14 @@ void TwoPlayersStarterAction::stateMachine()
       gameScores();
       break;
   case kMatchScores:
-      restartGame();
+      prepareGameNextRun();
       break;
   default:
       break;
   }
 }
 
-void TwoPlayersStarterAction::prepareGame()
+void TwoPlayersStarterAction::prepareGame1stRun()
 {
     AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
     currentLevelTheme = themeManager->getPuyoLevelTheme();
@@ -114,26 +122,27 @@ void TwoPlayersStarterAction::prepareGame()
         gameWidget->setPlayerOneName(nameProvider->getPlayer1Name());
         gameWidget->setPlayerTwoName(nameProvider->getPlayer2Name());
     }
-    int victoriesDelta = leftVictories - rightVictories;
-    if (victoriesDelta > 0) {
-        gameWidget->addGameAHandicap(victoriesDelta);
-    }
-    else if (victoriesDelta != 0) {
-        gameWidget->addGameBHandicap(-victoriesDelta);
-    }
+    leftVictories = 0; rightVictories = 0;
     GameUIDefaults::SCREEN_STACK->push(gameScreen);
+    prepareGame();
+}
+void TwoPlayersStarterAction::prepareGame()
+{
     gameScreen->setSuspended(true);
     m_state = kMatchGettingStarted;
     if (currentLevelTheme->getReadyAnimation2P() == "") {
         startGame();
         return;
     }
-    gameLostWidget = new StoryWidget(currentLevelTheme->getReadyAnimation2P(), this);
-    gameScreen->setOverlayStory(gameLostWidget);
+    m_getReadyWidget = new StoryWidget(currentLevelTheme->getReadyAnimation2P(), this);
+    gameScreen->setOverlayStory(m_getReadyWidget);
 }
 
 void TwoPlayersStarterAction::startGame()
 {
+    if (m_getReadyWidget != NULL) {
+        m_getReadyWidget->setIntegerValue("@start_pressed", 1);
+    }
     gameScreen->setSuspended(false);
     m_state = kMatchPlaying;
 }
@@ -161,7 +170,7 @@ void TwoPlayersStarterAction::gameScores()
   gameScreen->add(m_statsWidget);
 }
 
-void TwoPlayersStarterAction::restartGame()
+void TwoPlayersStarterAction::prepareGameNextRun()
 {
     AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
     currentLevelTheme = themeManager->getPuyoLevelTheme();
@@ -198,8 +207,7 @@ void TwoPlayersStarterAction::restartGame()
     if (m_statsWidget != NULL)
       delete m_statsWidget;
     m_statsWidget = NULL;
-
-    m_state = kMatchPlaying;
+    prepareGame();
 }
 
 void TwoPlayersStarterAction::endGameSession()

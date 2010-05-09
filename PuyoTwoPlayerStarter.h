@@ -87,10 +87,11 @@ private:
      */
     void stateMachine();
     void prepareGame();
+    void prepareGame1stRun();
+    void prepareGameNextRun();
     void startGame();
     void gameOver();
     void gameScores();
-    void restartGame();
     void endGameSession();
     State m_state;
     int difficulty;
@@ -99,6 +100,7 @@ private:
     GameWidget *gameWidget;
     PuyoTwoNameProvider *nameProvider;
     StoryWidget *gameLostWidget;
+    StoryWidget *m_getReadyWidget;
 
     PuyoLevelTheme *currentLevelTheme;
     int leftVictories, rightVictories;

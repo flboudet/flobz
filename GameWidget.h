@@ -58,6 +58,12 @@ struct GameOptions
 class GameWidget : public GarbageCollectableItem,
                        public gameui::Widget, CycledComponent {
 public:
+    enum {
+        PAUSED_STARTPRESSED = 1,
+        GAMEOVER_STARTPRESSED,
+        GAME_IS_OVER,
+    };
+public:
     GameWidget(GameOptions options = GameOptions(), bool withGUI = true);
     void setGameOptions(GameOptions options);
     virtual ~GameWidget();
@@ -103,7 +109,7 @@ public:
     void setAssociatedScreen(GameScreen *associatedScreen) { this->associatedScreen = associatedScreen; associatedScreenHasBeenSet(associatedScreen); };
     virtual void setScreenToPaused(bool fromControls);
     virtual void setScreenToResumed(bool fromControls);
-    virtual void actionAfterGameOver(bool fromControls);
+    virtual void actionAfterGameOver(bool fromControls, int actionType);
     // Display player names properties
     void setDisplayPlayerOneName(bool display) { m_displayPlayerOneName = display; }
     void setDisplayPlayerTwoName(bool display) { m_displayPlayerTwoName = display; }
