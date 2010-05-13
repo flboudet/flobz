@@ -19,7 +19,7 @@ FramePicture::FramePicture(IosSurface *frameSurface, int leftW, int middleW, int
 }
 
 FramePicture::FramePicture(int leftW, int middleW, int rightW, int topH, int middleH, int bottomH)
-    : m_leftW(leftW), m_middleW(middleW), m_rightW(rightW),
+    : m_frameSurface(NULL), m_leftW(leftW), m_middleW(middleW), m_rightW(rightW),
       m_topH(topH), m_middleH(middleH), m_bottomH(bottomH)
 {
 }
