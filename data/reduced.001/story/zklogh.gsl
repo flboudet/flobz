@@ -28,4 +28,5 @@ import <libface.gsl>
 # Update function: called every animation cycle
 <update>
     [face_update]
-
+    ([stress] = 0)? music: command="level6"
+    ([stress] > 2)? music: command="level6-speed"

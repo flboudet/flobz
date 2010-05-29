@@ -127,9 +127,9 @@ void AudioManager::music(const char *command)
   else if (music_command == "level1") {
       m_audioManager->setMusicPosition(MGAME[1]);
   }
-  else if (music_command == "level1-speed") {
-      m_audioManager->setMusicPosition(FGAME[1]);
-  }
+  //else if (music_command == "level1-speed") {
+  //    m_audioManager->setMusicPosition(FGAME[1]);
+  //}
   else if (music_command == "level2") {
       m_audioManager->setMusicPosition(MGAME[0]);
   }
@@ -143,19 +143,25 @@ void AudioManager::music(const char *command)
       m_audioManager->setMusicPosition(MGAME[3]);
   }
   else if (music_command == "level5") {
-      m_audioManager->setMusicPosition(MGAME[0]);
+      m_audioManager->setMusicPosition(MGAME[1]);
   }
   else if (music_command == "level6") {
-      m_audioManager->setMusicPosition(MGAME[1]);
+      m_audioManager->setMusicPosition(MGAME[0]);
+  }
+  else if (music_command == "level6-speed") {
+      m_audioManager->setMusicPosition(FGAME[0]);
   }
   else if (music_command == "level7") {
       m_audioManager->setMusicPosition(MGAME[2]);
   }
   else if (music_command == "level8") {
-      m_audioManager->setMusicPosition(MGAME[3]);
+      m_audioManager->setMusicPosition(MGAME[0]);
+  }
+  else if (music_command == "level8-speed") {
+      m_audioManager->setMusicPosition(FGAME[0]);
   }
   else if (music_command == "level9") {
-      m_audioManager->setMusicPosition(MGAME[0]);
+      m_audioManager->setMusicPosition(MGAME[1]);
   }
   /*else if (music_command == "game") { keep music of interlevel for now.
       Mix_SetMusicPosition(MSTART[rand()%4]);
