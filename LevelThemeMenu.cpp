@@ -92,6 +92,7 @@ void LevelThemeSelectionBox::build()
 
 void LevelThemeSelectionBox::action(Widget *sender, int actionType, GameControlEvent *event)
 {
+    if (!event->isUp) return;
     AdvancedBuffer<const char *> * themes = getPuyoThemeManger()->getPuyoLevelThemeList();
     String pref = getPuyoThemeManger()->getPreferedPuyoLevelThemeName();
     int size = themes->size();

@@ -91,6 +91,7 @@ void PuyoThemeSelectionBox::build()
 
 void PuyoThemeSelectionBox::action(Widget *sender, int actionType, GameControlEvent *event)
 {
+    if (!event->isUp) return;
     AdvancedBuffer<const char *> * themes = getPuyoThemeManger()->getAnimatedPuyoSetThemeList();
     String pref = getPuyoThemeManger()->getPreferedAnimatedPuyoSetThemeName();
     int size = themes->size();
