@@ -1,3 +1,30 @@
+Compile FloboPop for Windows
+
+=== Using Mingw32 ===
+
+REQUIREMENTS:
+* A mingw toolchain
+* NSIS for building the installation package
+* An SDL libraries distribution (containing a working sdl-config command)
+
+1- Configure for cross-compilation
+
+$mkdir build_win
+$../configure -prefix=/usr/local/i586-mingw32 --host=i586-mingw32msvc --build=i686-linux SDL_CONFIG=../win32/SDL-1.2.13/bin/sdl-config
+
+2- Build
+make
+
+you can either build a Windows installer:
+make win_installer
+
+or a zip archive:
+make win_zip_archive
+
+=== Using DevC++ ===
+
+[Not tested for some time, might be outdated]
+
 This folder contain a dev-cpp project to compile for windows.
 
 The prefered way is to use cygwin with the standard Makefile system, but this should work.
