@@ -88,15 +88,25 @@ if test "x$SDL_CONFIG" = "xnone"; then
         darwin*)
 	    SDL_LIBS="-framework SDL -framework SDL_image -framework SDL_mixer -framework SDL_ttf -framework Cocoa"
             ENABLE_SDL12_GFX="true"
+            FRAMEWORKS_DIR="$SYSTEM_ROOT/Library/Frameworks"
+	    SDL_CFLAGS="-I$FRAMEWORKS_DIR/SDL.framework/Headers -I$FRAMEWORKS_DIR/SDL_image.framework/Headers -I$FRAMEWORKS_DIR/SDL_mixer.framework/Headers -I$FRAMEWORKS_DIR/SDL_ttf.framework/Headers"
     esac
 else
     if test -n "$LDPREFIX" -a -r `$SDL_CONFIG --prefix`/lib/libSDL.la
     then SDL_LIBS=`$SDL_CONFIG --prefix`/lib/libSDL.la
     else SDL_LIBS=`$SDL_CONFIG --libs`
     fi
+    SDL_CFLAGS=`$SDL_CONFIG --cflags`
 fi
+
+OLD_CPPFLAGS=$CPPFLAGS
+OLD_CXXFLAGS=$CXXFLAGS
+CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
+CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
+
 OLD_LIBS=$LIBS
-LIBS="$SDL_LIBS"
+#LIBS="$SDL_LIBS"
+LDFLAGS="$SDL_LIBS"
 
 case "`$SDL_CONFIG --version`" in
     1.2.*)
@@ -150,22 +160,6 @@ AC_LANG([C++])
 # This also tells us what namespace hash code lives in.
 AC_CXX_STL_HASH
 AC_CXX_STL_HASH_FUN
-
-
-if test "x$SDL_CONFIG" = "xnone"; then
-    case $host_os in
-        darwin*)
-            FRAMEWORKS_DIR="$SYSTEM_ROOT/Library/Frameworks"
-	    SDL_CFLAGS="-I$FRAMEWORKS_DIR/SDL.framework/Headers -I$FRAMEWORKS_DIR/SDL_image.framework/Headers -I$FRAMEWORKS_DIR/SDL_mixer.framework/Headers -I$FRAMEWORKS_DIR/SDL_ttf.framework/Headers"
-    esac
-else
-  SDL_CFLAGS=`$SDL_CONFIG --cflags`
-fi
-
-OLD_CPPFLAGS=$CPPFLAGS
-OLD_CXXFLAGS=$CXXFLAGS
-CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
-CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
 
 
 AC_CHECK_HEADER([SDL.h],
