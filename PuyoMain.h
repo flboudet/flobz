@@ -3,7 +3,9 @@
 
 #include "MainScreen.h"
 #include "PuyoCommander.h"
+#include "FPDataPathManager.h"
 #include "drawcontext.h"
+#include "CompositeDrawContext.h"
 
 class PuyoMain : NotificationResponder
 {
@@ -25,9 +27,12 @@ private:
     bool m_fullscreen;
     int m_maxDataPackNumber;
 
-    DrawContext *m_drawContext;
+    CompositeDrawContext *m_drawContext;
+    DrawContext *m_nativeDrawContext;
     event_manager::EventManager *m_eventManager;
     audio_manager::AudioManager *m_audioManager;
+
+    FPDataPathManager m_dataPathManager;
 
     GameLoop   *loop;
     MainScreen *mainScreen;

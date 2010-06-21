@@ -3,6 +3,7 @@
 
 #include <string>
 #include "drawcontext.h"
+#include "DataPathManager.h"
 #ifdef MACOSX
 #include <SDL/SDL.h>
 #else
@@ -49,17 +50,20 @@ public:
 class SDL12_ImageLibrary : public ImageLibrary
 {
 public:
+    SDL12_ImageLibrary(DataPathManager &dataPathManager);
     virtual IosSurface * createImage(ImageType type, int w, int h, ImageSpecialAbility specialAbility = 0);
     virtual IosSurface * loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0);
     virtual IosFont    * createFont(const char *path, int size, IosFontFx fx = Font_STD);
 private:
+    DataPathManager &m_dataPathManager;
     friend class SDL12_DrawContext;
 };
 
 class SDL12_DrawContext : public DrawContext
 {
 public:
-    SDL12_DrawContext(int w, int h, bool fullscreen, const char *caption);
+    SDL12_DrawContext(DataPathManager &dataPathManager,
+                      int w, int h, bool fullscreen, const char *caption);
     virtual ~SDL12_DrawContext() {}
     virtual void flip();
     virtual int getHeight() const;
@@ -78,6 +82,7 @@ public:
 private:
     void initDisplay(bool fullscreen);
 
+    DataPathManager &m_dataPathManager;
     std::string m_caption;
     ImageBlendMode m_blendMode;
     SDL_Surface *display;

@@ -3,6 +3,8 @@
 #include "PuyoStrings.h"
 #include "preferences.h"
 #include "MainMenu.h"
+#include "CompositeDrawContext.h"
+#include "PackageDescription.h"
 #ifdef SDL12_GFX
 #include "sdl_drawcontext/sdl12/sdl12_drawcontext.h"
 #include "sdl_drawcontext/sdl12/sdl12_eventmanager.h"
@@ -35,8 +37,13 @@ static const char * kScreenHeightPref = "Config.ScreenHeight";
 
 
 PuyoMain::PuyoMain(String dataDir, bool fullscreen, int maxDataPackNumber)
-: m_dataDir(dataDir), m_fullscreen(fullscreen), m_maxDataPackNumber(maxDataPackNumber)
-{}
+: m_dataDir(dataDir), m_fullscreen(fullscreen),
+  m_maxDataPackNumber(maxDataPackNumber),
+  m_dataPathManager(dataDir)
+{
+    if (maxDataPackNumber != -1)
+        m_dataPathManager.setMaxPackNumber(maxDataPackNumber);
+}
 
 PuyoMain::~PuyoMain()
 {
@@ -51,14 +58,19 @@ void PuyoMain::initWithGUI()
     int requestedWidth = GetIntPreference(kScreenWidthPref, 640);
     int requestedHeight = GetIntPreference(kScreenHeightPref, 480);
 #ifdef SDL12_GFX
-    m_drawContext = new SDL12_DrawContext(640, 480,
+    m_nativeDrawContext = new SDL12_DrawContext(m_dataPathManager, 640, 480,
                                           GetBoolPreference(kFullScreenPref, m_fullscreen),
                                           "FloboPuyo by iOS-Software");
+    //PackageDescription *packDesc = new PackageDescription(m_dataPathManager, *cDC);
+    //IosRect cropRect = {0,0,32,32};
+    //cDC->declareCompositeSurface("data/base.000/theme/Classic.fptheme/fat-puyo-0000.png",
+    //                             "data/base.000/theme/Classic.fptheme/montage_1.png",
+    //                             cropRect);
     m_eventManager = new SDL12_EventManager();
     m_audioManager = new SDL_AudioManager();
 #endif
 #ifdef SDL13_GFX
-    m_drawContext = new SDL13_DrawContext(640, 480,
+    m_nativeDrawContext = new SDL13_DrawContext(640, 480,
                                           GetBoolPreference(kFullScreenPref, m_fullscreen),
                                           "FloboPuyo by iOS-Software");
     m_eventManager = new SDL13_EventManager();
@@ -71,6 +83,8 @@ void PuyoMain::initWithGUI()
     m_eventManager = new OpenGL_EventManager();
     m_audioManager = new OpenGL_AudioManager();
 #endif
+    m_drawContext = new CompositeDrawContext(m_nativeDrawContext);
+    m_dataPathManager.registerDataPackages(*m_drawContext);
     // Give the DrawContext to the GameLoop
     loop->setDrawContext(m_drawContext);
     // Give the EventManager to the GameLoop
@@ -78,10 +92,10 @@ void PuyoMain::initWithGUI()
     // Give the AudioManager to the GameLoop
     loop->setAudioManager(m_audioManager);
     // Create the PuyoCommander singleton
-    PuyoCommander *pc = new PuyoCommander(m_dataDir, m_maxDataPackNumber);
+    PuyoCommander *pc = new PuyoCommander(m_dataPathManager);
     pc->initWithGUI(m_fullscreen);
     initMenus();
-    cursor = new GameCursor(theCommander->getDataPathManager().getPath("gfx/cursor.png"));
+    cursor = new GameCursor("gfx/cursor.png");
     loop->addDrawable(cursor);
     loop->addIdle(cursor);
     loop->addIdle(dynamic_cast<CycledComponent *>(m_eventManager));
@@ -92,7 +106,7 @@ void PuyoMain::initWithGUI()
 void PuyoMain::initWithoutGUI()
 {
     loop = GameUIDefaults::GAME_LOOP;
-    PuyoCommander *pc = new PuyoCommander(m_dataDir, m_maxDataPackNumber);
+    PuyoCommander *pc = new PuyoCommander(m_dataPathManager);
     pc->initWithoutGUI();
 }
 
@@ -212,10 +226,10 @@ void PuyoMain::notificationOccured(String identifier, void * context)
     if (identifier == theCommander->getFullScreenKey()) {
         SetBoolPreference(kFullScreenPref, *(bool *)context);
 #ifdef SDL12_GFX
-        static_cast<SDL12_DrawContext *>(m_drawContext)->setFullScreen(*(bool *)context);
+        static_cast<SDL12_DrawContext *>(m_nativeDrawContext)->setFullScreen(*(bool *)context);
 #endif
 #ifdef SDL13_GFX
-        static_cast<SDL13_DrawContext *>(m_drawContext)->setFullScreen(*(bool *)context);
+        static_cast<SDL13_DrawContext *>(m_nativeDrawContext)->setFullScreen(*(bool *)context);
 #endif
     }
 }

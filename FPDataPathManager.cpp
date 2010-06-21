@@ -23,11 +23,34 @@
  *
  */
 
-#include "DataPathManager.h"
+#include <sstream>
+#include "FPDataPathManager.h"
+#include "PackageDescription.h"
 
 #define isnum(X) ((X>='0') && (X<='9'))
 
-DataPathManager::DataPathManager(String coreDataPath) : m_coreDataPath(coreDataPath)
+FPDataPackage::FPDataPackage(FPDataPathManager *owner,
+                             const char *packagePath,
+                             int packageNumber)
+    : m_owner(owner), m_packageNumber(packageNumber)
+{
+    std::stringstream sstream;
+    sstream << packagePath;
+    m_name = sstream.str();
+}
+
+std::string FPDataPackage::getPath(const char *shortPath) const
+{
+    return (const char *)(m_owner->getPathInPack(shortPath, m_packageNumber));
+}
+
+std::string FPDataPackage::getName() const
+{
+    return m_name;
+}
+
+FPDataPathManager::FPDataPathManager(String coreDataPath)
+    : m_coreDataPath(coreDataPath)
 {
     SelfVector<String> dataFiles = m_coreDataPath.listFiles();
     SelfVector<String> wellFormattedNames;
@@ -62,7 +85,16 @@ DataPathManager::DataPathManager(String coreDataPath) : m_coreDataPath(coreDataP
     }
 }
 
-String DataPathManager::getPath(String shortPath) const
+void FPDataPathManager::registerDataPackages(CompositeDrawContext &cDC)
+{
+    // Now iterate through the datapaths to build PackageDescription
+    for (int i = 0 ; i < m_dataPaths.size() ; i++) {
+        FPDataPackage currentPackage(this, m_dataPaths[i].getPathString(), i);
+        PackageDescription packDesc(*this, currentPackage, cDC);
+    }
+}
+
+String FPDataPathManager::getPath(String shortPath) const
 {
     for (int i = 0 ; i < m_dataPaths.size() ; i++) {
         FilePath testPath(m_dataPaths[i].combine(shortPath));
@@ -72,7 +104,7 @@ String DataPathManager::getPath(String shortPath) const
     throw Exception(String("File ") + shortPath + " not found !");
 }
 
-String DataPathManager::getPathInPack(String shortPath, int packPathIndex) const
+String FPDataPathManager::getPathInPack(String shortPath, int packPathIndex) const
 {
     FilePath testPath(m_dataPaths[packPathIndex].combine(shortPath));
     if (testPath.exists())
@@ -80,7 +112,7 @@ String DataPathManager::getPathInPack(String shortPath, int packPathIndex) const
     throw Exception(String("File ") + shortPath + " not found !");
 }
 
-SelfVector<String> DataPathManager::getEntriesAtPath(String shortPath) const
+SelfVector<String> FPDataPathManager::getEntriesAtPath(String shortPath) const
 {
     FilePath rshortPath(shortPath);
     SelfVector<String> result;
@@ -97,7 +129,7 @@ SelfVector<String> DataPathManager::getEntriesAtPath(String shortPath) const
     return result;
 }
 
-void DataPathManager::setMaxPackNumber(int maxPackNumber)
+void FPDataPathManager::setMaxPackNumber(int maxPackNumber)
 {
     for (int i = m_dataPaths.size() - 1 ; i >= 0 ; i--) {
         const String &currentFile = m_dataPaths[i].getPathString();

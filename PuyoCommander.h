@@ -151,7 +151,7 @@ public:
 class PuyoCommander
 {
   public:
-    PuyoCommander(String dataDir, int maxDataPackNumber=-1);
+    PuyoCommander(DataPathManager &dataPathManager);
     void initWithGUI(bool fullscreen);
     void initWithoutGUI();
 
@@ -206,11 +206,11 @@ class PuyoCommander
     audio_manager::Sound * getWhipSound() const { return m_whipSound; }
     audio_manager::Sound * getWhopSound() const { return m_whopSound; }
     const String &getLocalizedFontName() const { return m_localizedFontName; }
-	
+
 	// Application state
 	const PuyoApplicationState &appState() const { return m_appState; }
 	PuyoApplicationState &appState() { return m_appState; }
-	
+
   protected:
     // Resource manager factory
     virtual void createResourceManagers();
@@ -226,7 +226,7 @@ class PuyoCommander
     MusicFactory m_musicFactory;
     std::auto_ptr<MusicResourceManager> m_musicResManager;
     // Data path management
-    DataPathManager dataPathManager;
+    DataPathManager &dataPathManager;
     // Localization management
     LocalizedDictionary * locale;
   private:
@@ -262,7 +262,7 @@ protected:
     std::auto_ptr<FramePicture> m_textFieldIdleFramePicture;
     std::auto_ptr<FramePicture> m_separatorFramePicture;
     std::auto_ptr<FramePicture> m_listFramePicture;
-    
+
     String m_localizedFontName;
     IosFontRef m_darkFont;
     IosFontRef m_menuFont;

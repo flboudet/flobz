@@ -50,7 +50,10 @@ RGBA CompositeSurface::readRGBA(int x, int y)
 
 IosSurface *CompositeSurface::shiftHue(float hue_offset, IosSurface *mask)
 {
-    return new CompositeSurface(m_baseSurface->shiftHue(hue_offset, mask));
+    if (mask == NULL)
+        return new CompositeSurface(m_baseSurface->shiftHue(hue_offset, NULL));
+    CompositeSurface *m = static_cast<CompositeSurface *>(mask);
+    return new CompositeSurface(m_baseSurface->shiftHue(hue_offset, m->m_baseSurface));
 }
 
 IosSurface *CompositeSurface::shiftHSV(float h, float s, float v)
@@ -93,7 +96,12 @@ void CompositeSurface::setBlendMode(ImageBlendMode mode)
 void CompositeSurface::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
     CompositeSurface *s = static_cast<CompositeSurface *>(surf);
-    m_baseSurface->draw(s->m_baseSurface, srcRect, dstRect);
+    if (!s->m_isCropped)
+        m_baseSurface->draw(s->m_baseSurface, srcRect, dstRect);
+    if (srcRect == NULL) {
+        m_baseSurface->draw(s->m_baseSurface, &(s->m_cropRect), dstRect);
+        return;
+    }
 }
 
 void CompositeSurface::drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)

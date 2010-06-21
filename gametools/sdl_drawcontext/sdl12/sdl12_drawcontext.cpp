@@ -310,6 +310,10 @@ void SDL12_IosSurface::putString(IosFont *font, int x, int y, const char *text)
 
 // IIMLibrary implementation
 
+SDL12_ImageLibrary::SDL12_ImageLibrary(DataPathManager &dataPathManager)
+    : m_dataPathManager(dataPathManager)
+{
+}
 
 IosSurface * SDL12_ImageLibrary::createImage(ImageType type, int w, int h, ImageSpecialAbility specialAbility)
 {
@@ -325,7 +329,8 @@ IosSurface * SDL12_ImageLibrary::createImage(ImageType type, int w, int h, Image
 IosSurface * SDL12_ImageLibrary::loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility)
 {
     SDL_Surface *tmpsurf, *retsurf;
-    tmpsurf = IMG_Load (path);
+    String fullPath = m_dataPathManager.getPath(path);
+    tmpsurf = IMG_Load (fullPath);
     if (tmpsurf==NULL) {
         return NULL;
     }
@@ -356,8 +361,10 @@ IosFont *SDL12_ImageLibrary::createFont(const char *path, int size, IosFontFx fx
 
 // DrawContext implementation
 
-SDL12_DrawContext::SDL12_DrawContext(int w, int h, bool fullscreen, const char *caption)
-  : m_caption(caption), m_blendMode(IMAGE_BLEND)
+SDL12_DrawContext::SDL12_DrawContext(DataPathManager &dataPathManager,
+                                     int w, int h, bool fullscreen, const char *caption)
+  : m_dataPathManager(dataPathManager), m_caption(caption), m_blendMode(IMAGE_BLEND),
+    m_imageLib(dataPathManager)
 {
     this->h = h;
     this->w = w;

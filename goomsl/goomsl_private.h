@@ -76,7 +76,7 @@ typedef struct _NODE_TYPE { /* {{{ */
     } unode;
 } NodeType; /* }}} */
 typedef struct _INSTRUCTION_DATA { /* {{{ */
-  
+
   union {
     void  *var;
     int   *var_int;
@@ -163,30 +163,31 @@ typedef struct _GSL_Struct { /* {{{ */
 } GSL_Struct;
  /* }}} */
 struct _GoomSL { /* {{{ */
+    void *user_field;
     int num_lines;
     Instruction *instr;     /* instruction en cours de construction */
 
     InstructionFlow     *iflow;  /* flow d'instruction 'normal' */
     FastInstructionFlow *fastiflow; /* flow d'instruction optimise */
-    
+
     GoomHash *vars;         /* table de variables */
     int currentNS;
     GoomHash *namespaces[16];
-    
+
     GoomHash *functions;    /* table des fonctions externes */
     GoomSL_FilePathResolver file_path_resolver_function;
-    
+
     GoomHeap *data_heap; /* GSL Heap-like memory space */
-    
+
     int nbStructID;
     GoomHash   *structIDS;
     GSL_Struct **gsl_struct;
     int gsl_struct_size;
-    
+
     int    nbPtr;
     int    ptrArraySize;
     void **ptrArray;
-    
+
     int compilationOK;
 #ifdef USE_JITC_X86
     JitcX86Env *jitc;
@@ -230,7 +231,7 @@ void gsl_commit_compilation(void);
 
 #define INSTR_JUMP     6
 #define INSTR_JZERO    29
-#define INSTR_CALL     36 
+#define INSTR_CALL     36
 #define INSTR_RET      37
 #define INSTR_EXT_CALL 38
 #define INSTR_JNZERO   40

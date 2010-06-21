@@ -3,7 +3,7 @@ ACLOCAL_AMFLAGS=-I m4
 bin_PROGRAMS=flobopuyo
 flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           MainMenu.cpp MainScreen.cpp PuyoMain.cpp \
-          main.cpp DataPathManager.cpp PuyoGame.cpp DoomMelt.cpp \
+          main.cpp FPDataPathManager.cpp PuyoGame.cpp DoomMelt.cpp \
           PuyoView.cpp PuyoAnimations.cpp AnimatedPuyo.cpp PuyoIA.cpp \
           styrolyse.cpp PuyoStory.cpp ChatBox.cpp LocalizedDictionary.cpp \
           PuyoEventPlayer.cpp PauseMenu.cpp CheatCodeManager.cpp \
@@ -11,7 +11,8 @@ flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           PuyoStarter.cpp PuyoSinglePlayerStarter.cpp PuyoTwoPlayerStarter.cpp \
           LocalMenu.cpp OptionMenu.cpp ControlMenu.cpp \
           LevelThemeMenu.cpp ThemeMenu.cpp ScreenTransition.cpp \
-          PuyoGameAbstract.cpp PuyoStrings.cpp AnimatedPuyoTheme.cpp
+          PuyoGameAbstract.cpp PuyoStrings.cpp AnimatedPuyoTheme.cpp \
+          PackageDescription.cpp
 
 # Optional sources for network gaming support
 if ENABLE_NETWORK
@@ -42,8 +43,8 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            CheatCodeManager.h NetCenterMenu.h PuyoView.h \
            PuyoCommander.h NetGameCenter.h SDLMain.h \
            ControlMenu.h PuyoNetworkGame.h styrolyse.h \
-           DataPathManager.h NetworkMenu.h \
-           DoomMelt.h PuyoNetworkStarter.h
+           FPDataPathManager.h NetworkMenu.h \
+           DoomMelt.h PuyoNetworkStarter.h PackageDescription.h
 
 flobopuyo_CXXFLAGS = -I$(top_srcdir)/iosfc -I$(top_srcdir)/gametools -I$(top_srcdir)/goomsl $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 flobopuyo_OBJCFLAGS= $(SDL_CFLAGS)

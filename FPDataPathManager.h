@@ -26,13 +26,31 @@
 #ifndef _PUYODATAPATHMANAGER_H
 #define _PUYODATAPATHMANAGER_H
 
+#include "CompositeDrawContext.h"
+#include "DataPathManager.h"
 #include "ios_filepath.h"
 
 using namespace ios_fc;
 
-class DataPathManager {
+class FPDataPathManager;
+
+class FPDataPackage : public DataPackage {
 public:
-    DataPathManager(String coreDataPath);
+    FPDataPackage(FPDataPathManager *owner,
+                  const char *packagePath,
+                  int packageNumber);
+    virtual std::string getPath(const char *shortPath) const;
+    virtual std::string getName() const;
+private:
+    FPDataPathManager *m_owner;
+    int m_packageNumber;
+    std::string m_name;
+};
+
+class FPDataPathManager : public DataPathManager {
+public:
+    FPDataPathManager(String coreDataPath);
+    void registerDataPackages(CompositeDrawContext &cDC);
     String getPath(String shortPath) const;
     String getPathInPack(String shortPath, int packPathIndex) const;
     SelfVector<String> getEntriesAtPath(String shortPath) const;

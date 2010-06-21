@@ -41,6 +41,9 @@ GoomHash *gsl_globals(GoomSL *_this);
 #define GSL_GLOBAL_INT(gsl,name)   (*(int*)goom_hash_get(gsl_globals(gsl),name)->ptr)
 #define GSL_GLOBAL_FLOAT(gsl,name) (*(float*)goom_hash_get(gsl_globals(gsl),name)->ptr)
 
+#define GSL_SET_USERDATA_PTR(gsl, data) { *((void **)gsl) = (void *)data; }
+#define GSL_GET_USERDATA_PTR(gsl) (*((void **)gsl))
+
 #ifdef __cplusplus
 };
 #endif

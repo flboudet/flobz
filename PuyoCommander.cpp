@@ -30,9 +30,8 @@ IosSurface *IosSurfaceFactory::create(const IosSurfaceResourceKey &resourceKey)
         fprintf(cacheOutputGsl, "  [cache_picture: path=\"%s\" mode=%d]\n",
                 resourceKey.path.c_str(), resourceKey.type);
 #endif
-        String fullPath = m_dataPathManager.getPath(resourceKey.path.c_str());
         ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
-        IosSurface *newSurface = iimLib.loadImage(resourceKey.type, fullPath, resourceKey.specialAbility);
+        IosSurface *newSurface = iimLib.loadImage(resourceKey.type, resourceKey.path.c_str(), resourceKey.specialAbility);
         if (newSurface != NULL)
             newSurface->enableExceptionOnDeletion(true);
         return newSurface;
@@ -127,8 +126,8 @@ void SinglePlayerGameAction::action()
 
 /* Build the PuyoCommander */
 
-PuyoCommander::PuyoCommander(String dataDir, int maxDataPackNumber)
-  : dataPathManager(dataDir),
+PuyoCommander::PuyoCommander(DataPathManager &dataPathManager)
+  : dataPathManager(dataPathManager),
     m_surfaceFactory(dataPathManager),
     m_fontFactory(dataPathManager),
     m_soundFactory(dataPathManager),
@@ -142,8 +141,7 @@ PuyoCommander::PuyoCommander(String dataDir, int maxDataPackNumber)
   mbox = NULL;
   theCommander = this;
 
-  if (maxDataPackNumber != -1)
-      dataPathManager.setMaxPackNumber(maxDataPackNumber);
+
   createResourceManagers();
 }
 
@@ -245,7 +243,7 @@ void PuyoCommander::initFonts()
      fprintf(stderr,"Using default font %s.\n", (const char *)font);
      }
      funny_path = getDataPathManager().getPath("gfx/zill_spills.ttf");*/
-    
+
     m_darkFont = getFont(fontName, 17, Font_DARK);
     m_menuFont = getFont(fontName, 17, Font_STD);
     m_smallFont = getFont(fontName, 12, Font_STD);
@@ -253,7 +251,7 @@ void PuyoCommander::initFonts()
     m_textFont = getFont(fontName, 17, Font_GREY);
     m_funnyFont = getFont(funnyFontName, 24, Font_STD);
     storyFont = getFont(fontName, 17, Font_STORY);
-    
+
     GameUIDefaults::FONT              = m_menuFont;
     GameUIDefaults::FONT_TEXT         = m_textFont;
     GameUIDefaults::FONT_INACTIVE     = m_darkFont;
