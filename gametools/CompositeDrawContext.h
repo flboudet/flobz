@@ -8,6 +8,17 @@
 class CompositeDrawContext;
 class CompositeImageLibrary;
 
+struct BaseSurfaceReference
+{
+    BaseSurfaceReference()
+        : m_baseSurface(NULL), m_refCount(0) {}
+    BaseSurfaceReference(IosSurface *baseSurface)
+        : m_baseSurface(baseSurface), m_refCount(0) {}
+    IosSurface *m_baseSurface;
+    int m_refCount;
+};
+
+
 class CompositeSurfaceDefinition
 {
 public:
@@ -48,22 +59,20 @@ public:
     virtual void drawRotatedCentered(IosSurface *surf, int angle, int x, int y);
 	virtual void fillRect(const IosRect *rect, const RGBA &color);
     virtual void putString(IosFont *font, int x, int y, const char *text);
+    // Specific methods
+    void setBaseSurfaceReference(BaseSurfaceReference *ref,
+                                 std::string &path) {
+        m_ref = ref;
+        m_path = path;
+    }
 private:
     CompositeImageLibrary &m_ownerImageLibrary;
     IosSurface *m_baseSurface;
     bool m_isCropped;
     IosRect m_cropRect;
+    BaseSurfaceReference *m_ref;
+    std::string m_path;
     friend class CompositeDrawContext;
-};
-
-struct BaseSurfaceReference
-{
-    BaseSurfaceReference()
-        : m_baseSurface(NULL), m_refCount(0) {}
-    BaseSurfaceReference(IosSurface *baseSurface)
-        : m_baseSurface(baseSurface), m_refCount(0) {}
-    IosSurface *m_baseSurface;
-    int m_refCount;
 };
 
 class CompositeImageLibrary : public ImageLibrary
@@ -73,6 +82,8 @@ public:
     virtual IosSurface * createImage(ImageType type, int w, int h, ImageSpecialAbility specialAbility = 0);
     virtual IosSurface * loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0);
     virtual IosFont    * createFont(const char *path, int size, IosFontFx fx = Font_STD);
+public:
+    void decrementReference(BaseSurfaceReference &ref, const std::string &path);
 private:
     CompositeDrawContext &m_owner;
     DrawContext  &m_baseDrawContext;

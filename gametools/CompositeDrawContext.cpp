@@ -7,7 +7,7 @@
 CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
                                    IosSurface *baseSurface)
     : m_ownerImageLibrary(ownerImageLibrary),
-      m_baseSurface(baseSurface), m_isCropped(false)
+      m_baseSurface(baseSurface), m_isCropped(false), m_ref(NULL)
 {
     w = baseSurface->w;
     h = baseSurface->h;
@@ -17,7 +17,8 @@ CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
                                    IosSurface *baseSurface,
                                    const IosRect &cropRect)
     : m_ownerImageLibrary(ownerImageLibrary),
-      m_baseSurface(baseSurface), m_isCropped(true), m_cropRect(cropRect)
+      m_baseSurface(baseSurface), m_isCropped(true), m_cropRect(cropRect),
+      m_ref(NULL)
 {
     w = cropRect.w;
     h = cropRect.h;
@@ -25,8 +26,10 @@ CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
 
 CompositeSurface::~CompositeSurface()
 {
-
-    delete m_baseSurface;
+    if (m_ref != NULL)
+        m_ownerImageLibrary.decrementReference(*m_ref, m_path);
+    else
+        delete m_baseSurface;
 }
 
 // IosSurface methods
@@ -169,6 +172,15 @@ IosSurface * CompositeImageLibrary::loadImage(ImageType type, const char *path, 
         baseSurface = existingBaseSurface->second.m_baseSurface;
     }
     return new CompositeSurface(*this, baseSurface, def->getCropRect());
+}
+
+void CompositeImageLibrary::decrementReference(BaseSurfaceReference &ref, const std::string &path)
+{
+    ref.m_refCount--;
+    if (ref.m_refCount <= 0) {
+        delete ref.m_baseSurface;
+        m_baseSurfaceMap.erase(path);
+    }
 }
 
 IosFont * CompositeImageLibrary::createFont(const char *path, int size, IosFontFx fx)
