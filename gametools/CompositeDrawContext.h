@@ -6,6 +6,7 @@
 #include "drawcontext.h"
 
 class CompositeDrawContext;
+class CompositeImageLibrary;
 
 class CompositeSurfaceDefinition
 {
@@ -23,8 +24,10 @@ private:
 class CompositeSurface : public IosSurface
 {
 public:
-    CompositeSurface(IosSurface *baseSurface);
-    CompositeSurface(IosSurface *baseSurface, const IosRect &cropRect);
+    CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
+                     IosSurface *baseSurface);
+    CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
+                     IosSurface *baseSurface, const IosRect &cropRect);
     virtual ~CompositeSurface();
     // IosSurface methods
     virtual bool isOpaque() const;
@@ -46,10 +49,21 @@ public:
 	virtual void fillRect(const IosRect *rect, const RGBA &color);
     virtual void putString(IosFont *font, int x, int y, const char *text);
 private:
+    CompositeImageLibrary &m_ownerImageLibrary;
     IosSurface *m_baseSurface;
     bool m_isCropped;
     IosRect m_cropRect;
     friend class CompositeDrawContext;
+};
+
+struct BaseSurfaceReference
+{
+    BaseSurfaceReference()
+        : m_baseSurface(NULL), m_refCount(0) {}
+    BaseSurfaceReference(IosSurface *baseSurface)
+        : m_baseSurface(baseSurface), m_refCount(0) {}
+    IosSurface *m_baseSurface;
+    int m_refCount;
 };
 
 class CompositeImageLibrary : public ImageLibrary
@@ -63,6 +77,8 @@ private:
     CompositeDrawContext &m_owner;
     DrawContext  &m_baseDrawContext;
     ImageLibrary &m_baseImageLibrary;
+    typedef std::map<std::string, BaseSurfaceReference> BaseSurfaceMap;
+    BaseSurfaceMap m_baseSurfaceMap;
 };
 
 class CompositeDrawContext : public DrawContext

@@ -4,16 +4,20 @@
  * CompositeSurface implementation
  */
 
-CompositeSurface::CompositeSurface(IosSurface *baseSurface)
-    : m_baseSurface(baseSurface), m_isCropped(false)
+CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
+                                   IosSurface *baseSurface)
+    : m_ownerImageLibrary(ownerImageLibrary),
+      m_baseSurface(baseSurface), m_isCropped(false)
 {
     w = baseSurface->w;
     h = baseSurface->h;
 }
 
-CompositeSurface::CompositeSurface(IosSurface *baseSurface,
+CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
+                                   IosSurface *baseSurface,
                                    const IosRect &cropRect)
-    : m_baseSurface(baseSurface), m_isCropped(true), m_cropRect(cropRect)
+    : m_ownerImageLibrary(ownerImageLibrary),
+      m_baseSurface(baseSurface), m_isCropped(true), m_cropRect(cropRect)
 {
     w = cropRect.w;
     h = cropRect.h;
@@ -21,6 +25,7 @@ CompositeSurface::CompositeSurface(IosSurface *baseSurface,
 
 CompositeSurface::~CompositeSurface()
 {
+
     delete m_baseSurface;
 }
 
@@ -51,29 +56,35 @@ RGBA CompositeSurface::readRGBA(int x, int y)
 IosSurface *CompositeSurface::shiftHue(float hue_offset, IosSurface *mask)
 {
     if (mask == NULL)
-        return new CompositeSurface(m_baseSurface->shiftHue(hue_offset, NULL));
+        return new CompositeSurface(m_ownerImageLibrary,
+                                    m_baseSurface->shiftHue(hue_offset, NULL));
     CompositeSurface *m = static_cast<CompositeSurface *>(mask);
-    return new CompositeSurface(m_baseSurface->shiftHue(hue_offset, m->m_baseSurface));
+    return new CompositeSurface(m_ownerImageLibrary,
+                                m_baseSurface->shiftHue(hue_offset, m->m_baseSurface));
 }
 
 IosSurface *CompositeSurface::shiftHSV(float h, float s, float v)
 {
-    return new CompositeSurface(m_baseSurface->shiftHSV(h, s, v));
+    return new CompositeSurface(m_ownerImageLibrary,
+                                m_baseSurface->shiftHSV(h, s, v));
 }
 
 IosSurface *CompositeSurface::setValue(float value)
 {
-    return new CompositeSurface(m_baseSurface->setValue(value));
+    return new CompositeSurface(m_ownerImageLibrary,
+                                m_baseSurface->setValue(value));
 }
 
 IosSurface * CompositeSurface::resizeAlpha(int width, int height)
 {
-    return new CompositeSurface(m_baseSurface->resizeAlpha(width, height));
+    return new CompositeSurface(m_ownerImageLibrary,
+                                m_baseSurface->resizeAlpha(width, height));
 }
 
 IosSurface * CompositeSurface::mirrorH()
 {
-    return new CompositeSurface(m_baseSurface->mirrorH());
+    return new CompositeSurface(m_ownerImageLibrary,
+                                m_baseSurface->mirrorH());
 }
 
 void CompositeSurface::convertToGray()
@@ -138,16 +149,26 @@ CompositeImageLibrary::CompositeImageLibrary(CompositeDrawContext &owner)
 
 IosSurface * CompositeImageLibrary::createImage(ImageType type, int w, int h, ImageSpecialAbility specialAbility)
 {
-    return new CompositeSurface(m_baseImageLibrary.createImage(type, w, h, specialAbility));
+    return new CompositeSurface(*this, m_baseImageLibrary.createImage(type, w, h, specialAbility));
 }
 
 IosSurface * CompositeImageLibrary::loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility)
 {
     CompositeSurfaceDefinition *def = m_owner.getCompositeSurfaceDefinition(path);
     if (def == NULL)
-        return new CompositeSurface(m_baseImageLibrary.loadImage(type, path, specialAbility));
-    IosSurface *baseSurface = m_baseImageLibrary.loadImage(type, def->getPath(), specialAbility);
-    return new CompositeSurface(baseSurface, def->getCropRect());
+        return new CompositeSurface(*this, m_baseImageLibrary.loadImage(type, path, specialAbility));
+    IosSurface *baseSurface;
+    BaseSurfaceMap::iterator existingBaseSurface = m_baseSurfaceMap.find(path);
+    if (existingBaseSurface == m_baseSurfaceMap.end()) {
+        baseSurface = m_baseImageLibrary.loadImage(type, def->getPath(), specialAbility);
+        BaseSurfaceReference newRef(baseSurface);
+        newRef.m_refCount++;
+        m_baseSurfaceMap[path] = newRef;
+    }
+    else {
+        baseSurface = existingBaseSurface->second.m_baseSurface;
+    }
+    return new CompositeSurface(*this, baseSurface, def->getCropRect());
 }
 
 IosFont * CompositeImageLibrary::createFont(const char *path, int size, IosFontFx fx)
