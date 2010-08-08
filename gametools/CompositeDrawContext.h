@@ -60,9 +60,7 @@ public:
 	virtual void fillRect(const IosRect *rect, const RGBA &color);
     virtual void putString(IosFont *font, int x, int y, const char *text);
     // Specific methods
-    void setBaseSurfaceReference(BaseSurfaceReference *ref,
-                                 std::string &path) {
-        m_ref = ref;
+    void setBaseSurfacePath(const char *path) {
         m_path = path;
     }
 private:
@@ -70,7 +68,6 @@ private:
     IosSurface *m_baseSurface;
     bool m_isCropped;
     IosRect m_cropRect;
-    BaseSurfaceReference *m_ref;
     std::string m_path;
     friend class CompositeDrawContext;
 };
@@ -83,7 +80,7 @@ public:
     virtual IosSurface * loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0);
     virtual IosFont    * createFont(const char *path, int size, IosFontFx fx = Font_STD);
 public:
-    void decrementReference(BaseSurfaceReference &ref, const std::string &path);
+    void decrementReference(const std::string &path);
 private:
     CompositeDrawContext &m_owner;
     DrawContext  &m_baseDrawContext;

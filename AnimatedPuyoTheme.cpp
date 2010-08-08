@@ -101,7 +101,10 @@ static bool loadPictureWithOffset(const char * path, IosSurface ** dst, const ch
         tmp = theCommander->getSurface(IMAGE_RGBA, fallback, IMAGE_READ);
     if (tmp.empty())
         return false;
-    *dst = tmp.get()->shiftHue(offset);
+    if (offset == 0.0)
+        *dst = tmp;
+    else
+        *dst = tmp.get()->shiftHue(offset);
     return (*dst != NULL);
 }
 /*

@@ -7,7 +7,7 @@
 CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
                                    IosSurface *baseSurface)
     : m_ownerImageLibrary(ownerImageLibrary),
-      m_baseSurface(baseSurface), m_isCropped(false), m_ref(NULL)
+      m_baseSurface(baseSurface), m_isCropped(false)
 {
     w = baseSurface->w;
     h = baseSurface->h;
@@ -17,8 +17,7 @@ CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
                                    IosSurface *baseSurface,
                                    const IosRect &cropRect)
     : m_ownerImageLibrary(ownerImageLibrary),
-      m_baseSurface(baseSurface), m_isCropped(true), m_cropRect(cropRect),
-      m_ref(NULL)
+      m_baseSurface(baseSurface), m_isCropped(true), m_cropRect(cropRect)
 {
     w = cropRect.w;
     h = cropRect.h;
@@ -26,8 +25,8 @@ CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
 
 CompositeSurface::~CompositeSurface()
 {
-    if (m_ref != NULL)
-        m_ownerImageLibrary.decrementReference(*m_ref, m_path);
+    if (m_path != "")
+        m_ownerImageLibrary.decrementReference(m_path);
     else
         delete m_baseSurface;
 }
@@ -171,15 +170,21 @@ IosSurface * CompositeImageLibrary::loadImage(ImageType type, const char *path, 
     else {
         baseSurface = existingBaseSurface->second.m_baseSurface;
     }
-    return new CompositeSurface(*this, baseSurface, def->getCropRect());
+    CompositeSurface *result = new CompositeSurface(*this, baseSurface, def->getCropRect());
+    result->setBaseSurfacePath(path);
+    return result;
 }
 
-void CompositeImageLibrary::decrementReference(BaseSurfaceReference &ref, const std::string &path)
+void CompositeImageLibrary::decrementReference(const std::string &path)
 {
-    ref.m_refCount--;
-    if (ref.m_refCount <= 0) {
-        delete ref.m_baseSurface;
-        m_baseSurfaceMap.erase(path);
+    BaseSurfaceMap::iterator existingBaseSurface = m_baseSurfaceMap.find(path);
+    if (existingBaseSurface != m_baseSurfaceMap.end()) {
+        BaseSurfaceReference &ref = existingBaseSurface->second;
+        ref.m_refCount--;
+        if (ref.m_refCount <= 0) {
+            delete ref.m_baseSurface;
+            m_baseSurfaceMap.erase(existingBaseSurface);
+        }
     }
 }
 
