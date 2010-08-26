@@ -188,26 +188,41 @@ AC_LANG([C++])
 AC_CXX_STL_HASH
 AC_CXX_STL_HASH_FUN
 
-
+# SDL headers
 AC_CHECK_HEADERS([SDL/SDL.h],
-                 [break],
-                 [AC_MSG_ERROR([*** SDL include files not found!
-You should install SDL development package.])])
+                 [SDL_H_FOUND=1; break],
+                 [])
+if test "x$SDL_H_FOUND" = "x"; then
+    AC_MSG_ERROR([*** SDL include files not found!
+You should install SDL development package.])
+fi
 
+# SDL_image headers
 AC_CHECK_HEADERS([SDL/SDL_image.h SDL_image/SDL_image.h],
-                 [break],
-                 [AC_MSG_ERROR([*** SDL_image include files not found!
-You should install development package.])])
+                 [SDL_IMAGE_H_FOUND=1; break],
+                 [])
+if test "x$SDL_IMAGE_H_FOUND" = "x"; then
+    AC_MSG_ERROR([*** SDL_image include files not found!
+You should install SDL_image development package.])
+fi
 
+# SDL_mixer headers
 AC_CHECK_HEADERS([SDL/SDL_mixer.h SDL_mixer/SDL_mixer.h],
-                 [break],
-                 [AC_MSG_ERROR([*** SDL_mixer include files not found!
-You should install development package.])])
+                 [SDL_MIXER_H_FOUND=1; break],
+                 [])
+if test "x$SDL_MIXER_H_FOUND" = "x"; then
+    AC_MSG_ERROR([*** SDL_mixer include files not found!
+You should install SDL_mixer development package.])
+fi
 
+# SDL_ttf
 AC_CHECK_HEADERS([SDL/SDL_ttf.h SDL_ttf/SDL_ttf.h],
-                 [break],
-                 [AC_MSG_ERROR([*** SDL_ttf include files not found!
-You should install development package.])])
+                 [SDL_TTF_H_FOUND=1; break],
+                 [])
+if test "x$SDL_TTF_H_FOUND" = "x"; then
+    AC_MSG_ERROR([*** SDL_ttf include files not found!
+You should install SDL_ttf development package.])
+fi
 
 AC_CHECK_HEADER(sqlite3.h, ENABLE_SQLITE=true, ENABLE_SQLITE=false)
 
