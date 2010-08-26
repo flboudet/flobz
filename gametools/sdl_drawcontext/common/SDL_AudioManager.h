@@ -1,8 +1,16 @@
 #ifndef _SDL_AUDIOMANAGER_H_
 #define _SDL_AUDIOMANAGER_H_
 
+#include "config.h"
 #include "audiomanager.h"
+
+#ifdef HAVE_SDL_SDL_MIXER_H
+#include <SDL/SDL_mixer.h>
+#else
+#ifdef HAVE_SDL_MIXER_SDL_MIXER_H
 #include <SDL_mixer/SDL_mixer.h>
+#endif
+#endif
 
 class SDL_AM_Music : public audio_manager::Music
 {

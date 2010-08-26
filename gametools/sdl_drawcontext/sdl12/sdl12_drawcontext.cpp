@@ -1,13 +1,18 @@
 #include <iostream>
 #include <vector>
+#include "config.h"
 #include "drawcontext.h"
 #include "sdl12_drawcontext.h"
 #include "IosImgProcess.h"
-#ifdef MACOSX
-#include <SDL_image/SDL_image.h>
-#else
+
+#ifdef HAVE_SDL_SDL_IMAGE_H
 #include <SDL_image.h>
+#else
+#ifdef HAVE_SDL_IMAGE_SDL_IMAGE_H
+#include <SDL_image/SDL_image.h>
 #endif
+#endif
+
 #include "SDL_IosFont.h"
 #include "ios_fc.h"
 static IosFont *DBG_FONT = NULL;

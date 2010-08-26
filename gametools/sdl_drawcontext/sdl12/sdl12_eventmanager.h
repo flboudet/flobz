@@ -4,11 +4,8 @@
 #include <string>
 #include "GameControls.h"
 #include "gameloop.h"
-#ifdef MACOSX
+
 #include <SDL/SDL.h>
-#else
-#include "SDL.h"
-#endif
 
 class SDL12_EventManager : public event_manager::EventManager,
                            public CycledComponent

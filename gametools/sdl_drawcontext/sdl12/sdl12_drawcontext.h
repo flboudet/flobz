@@ -4,11 +4,7 @@
 #include <string>
 #include "drawcontext.h"
 #include "DataPathManager.h"
-#ifdef MACOSX
 #include <SDL/SDL.h>
-#else
-#include "SDL.h"
-#endif
 
 class SDL12_IosSurface : public IosSurface
 {

@@ -5,13 +5,18 @@
 #include <map>
 #include <list>
 
+#include "config.h"
+
 #include "drawcontext.h"
-#ifdef MACOSX
+
 #include <SDL/SDL.h>
-#include <SDL_ttf/SDL_ttf.h>
+
+#ifdef HAVE_SDL_SDL_TTF_H
+#include <SDL/SDL_ttf.h>
 #else
-#include <SDL.h>
-#include <SDL_ttf.h>
+#ifdef HAVE_SDL_TTF_SDL_TTF_H
+#include <SDL_ttf/SDL_ttf.h>
+#endif
 #endif
 
 class SDL_IosFont : public IosFont

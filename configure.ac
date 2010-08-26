@@ -26,7 +26,7 @@ ENABLE_NETWORK_INTERNET=true
 # SDL_LIBS
 # SDL_CFLAGS
 # SDL_VERSION
-# 
+#
 
 
 AC_ARG_ENABLE(universal-binary, [ --enable-universal-binary enables universal-binary compilation on Mac OS X], [universal-binary=yes])
@@ -189,24 +189,24 @@ AC_CXX_STL_HASH
 AC_CXX_STL_HASH_FUN
 
 
-AC_CHECK_HEADER([SDL/SDL.h],
-		[],
-                [AC_MSG_ERROR([*** SDL include files not found!
+AC_CHECK_HEADERS([SDL/SDL.h],
+                 [break],
+                 [AC_MSG_ERROR([*** SDL include files not found!
 You should install SDL development package.])])
 
-AC_CHECK_HEADERS([SDL/SDL_image.h], [SDL_image/SDL_image.h],
-		[],
-			[AC_MSG_ERROR([*** SDL_image include files not found!
+AC_CHECK_HEADERS([SDL/SDL_image.h SDL_image/SDL_image.h],
+                 [break],
+                 [AC_MSG_ERROR([*** SDL_image include files not found!
 You should install development package.])])
 
-AC_CHECK_HEADERS([SDL/SDL_mixer.h], [SDL_mixer/SDL_mixer.h],
-		[],
-			[AC_MSG_ERROR([*** SDL_mixer include files not found!
+AC_CHECK_HEADERS([SDL/SDL_mixer.h SDL_mixer/SDL_mixer.h],
+                 [break],
+                 [AC_MSG_ERROR([*** SDL_mixer include files not found!
 You should install development package.])])
 
-AC_CHECK_HEADERS([SDL/SDL_ttf.h], [SDL_ttf/SDL_ttf.h],
-		[],
-			[AC_MSG_ERROR([*** SDL_ttf include files not found!
+AC_CHECK_HEADERS([SDL/SDL_ttf.h SDL_ttf/SDL_ttf.h],
+                 [break],
+                 [AC_MSG_ERROR([*** SDL_ttf include files not found!
 You should install development package.])])
 
 AC_CHECK_HEADER(sqlite3.h, ENABLE_SQLITE=true, ENABLE_SQLITE=false)
