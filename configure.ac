@@ -12,6 +12,7 @@ AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_SRCDIR([main.cpp])
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIR([m4])
 
 ENABLE_AUDIO=true
 #ENABLE_OPENGL?=false
@@ -19,6 +20,14 @@ ENABLE_TTF=true
 #ENABLE_BENCHMARKS?=false
 ENABLE_NETWORK=true
 ENABLE_NETWORK_INTERNET=true
+
+# Significant environment variables:
+# SDL_CONFIG: path to the sdl-config tool. Ignored if SDL_LIBS is supplied.
+# SDL_LIBS
+# SDL_CFLAGS
+# SDL_VERSION
+# 
+
 
 AC_ARG_ENABLE(universal-binary, [ --enable-universal-binary enables universal-binary compilation on Mac OS X], [universal-binary=yes])
 
@@ -39,9 +48,8 @@ AC_PROG_OBJC
 AC_PROG_LEX
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-#AC_PROG_RANLIB
 AC_DISABLE_SHARED
-AM_PROG_LIBTOOL
+AC_PROG_LIBTOOL
 
 case $host_os in
     darwin*)
@@ -62,42 +70,58 @@ CXXFLAGS="$CXXFLAGS $FPCOMMON_FLAGS"
 CFLAGS="$CFLAGS $FPCOMMON_FLAGS"
 OBJCFLAGS="$OBJCFLAGS $FPCOMMON_FLAGS"
 
-
-# Check for SDL_CONFIG
-if test "x$SDL_CONFIG" = "x"; then
-case $host_os in
-     darwin*)
-         SDL_CONFIG=none
-         ;;
-     *)
-         AC_PATH_PROGS([SDL_CONFIG], [sdl-config sdl11-config], [none])
-         if test "x$SDL_CONFIG" = "xnone"; then
-             AC_MSG_ERROR([*** SDL not found! Get SDL from www.libsdl.org.
-If you already installed it, check it's in the path. If problem remains,
-please send a mail to the address that appears in ./configure --version
-indicating your platform, the version of configure script and the problem.])
-         fi
-esac
+if test "x$SDL_LIBS" = "x"; then
+   # Check for SDL_CONFIG
+   if test "x$SDL_CONFIG" = "x"; then
+   case $host_os in
+   #     darwin*)
+   #         SDL_CONFIG=none
+   #         ;;
+     	 *)
+	     AC_PATH_PROGS([SDL_CONFIG], [sdl-config sdl11-config], [none])
+             if test "x$SDL_CONFIG" = "xnone"; then
+                 AC_MSG_ERROR([*** sdl-config not found!
+Either SDL is not installed, or is installed in a different path.
+You may correct the problem by either:
+  - installing SDL if it is not installed. Get SDL from www.libsdl.org.
+  - setting the SDL_CONFIG variable to the path of the sdl-config program
+  - setting the SDL_LIBS variable to the compilation flags required to
+    link to the SDL libraries, and SDL_CFLAGS to the compilation flags
+    required to compile with the SDL headers.
+    (recommanded on platforms where sdl-config is
+    not available, like the native Mac OS X SDL version)])
+             else
+	       # use sdl-config to build SDL_LIBS
+               if test -n "$LDPREFIX" -a -r `$SDL_CONFIG --prefix`/lib/libSDL.la
+                 then SDL_LIBS=`$SDL_CONFIG --prefix`/lib/libSDL.la
+                 else SDL_LIBS=`$SDL_CONFIG --libs`
+               fi
+               SDL_CFLAGS=`$SDL_CONFIG --cflags`
+               SDL_VERSION=`$SDL_CONFIG --version`
+             fi
+    esac
+    fi
 fi
 
 #######################################################################
 # Checks for libraries.                                               #
 #######################################################################
-if test "x$SDL_CONFIG" = "xnone"; then
-    case $host_os in
-        darwin*)
-	    SDL_LIBS="-framework SDL -framework SDL_image -framework SDL_mixer -framework SDL_ttf -framework Cocoa"
-            ENABLE_SDL12_GFX="true"
-            FRAMEWORKS_DIR="$SYSTEM_ROOT/Library/Frameworks"
-	    SDL_CFLAGS="-I$FRAMEWORKS_DIR/SDL.framework/Headers -I$FRAMEWORKS_DIR/SDL_image.framework/Headers -I$FRAMEWORKS_DIR/SDL_mixer.framework/Headers -I$FRAMEWORKS_DIR/SDL_ttf.framework/Headers"
-    esac
-else
-    if test -n "$LDPREFIX" -a -r `$SDL_CONFIG --prefix`/lib/libSDL.la
-    then SDL_LIBS=`$SDL_CONFIG --prefix`/lib/libSDL.la
-    else SDL_LIBS=`$SDL_CONFIG --libs`
-    fi
-    SDL_CFLAGS=`$SDL_CONFIG --cflags`
-fi
+#if test "x$SDL_CONFIG" = "xnone"; then
+#    case $host_os in
+#        darwin*)
+#	    SDL_LIBS="-framework SDL -framework SDL_image -framework SDL_mixer -framework SDL_ttf -framework Cocoa"
+#            ENABLE_SDL12_GFX="true"
+#            FRAMEWORKS_DIR="$SYSTEM_ROOT/Library/Frameworks"
+#	    SDL_CFLAGS="$SDL_LIBS"
+#"-I$FRAMEWORKS_DIR/SDL.framework/Headers -I$FRAMEWORKS_DIR/SDL_image.framework/Headers -I$FRAMEWORKS_DIR/SDL_mixer.framework/Headers -I$FRAMEWORKS_DIR/SDL_ttf.framework/Headers"
+#    esac
+#if test "x$SDL_CONFIG" = "x"; then
+#    if test -n "$LDPREFIX" -a -r `$SDL_CONFIG --prefix`/lib/libSDL.la
+#    then SDL_LIBS=`$SDL_CONFIG --prefix`/lib/libSDL.la
+#    else SDL_LIBS=`$SDL_CONFIG --libs`
+#    fi
+#    SDL_CFLAGS=`$SDL_CONFIG --cflags`
+#fi
 
 OLD_CPPFLAGS=$CPPFLAGS
 OLD_CXXFLAGS=$CXXFLAGS
@@ -108,7 +132,7 @@ OLD_LIBS=$LIBS
 #LIBS="$SDL_LIBS"
 LDFLAGS="$SDL_LIBS"
 
-case "`$SDL_CONFIG --version`" in
+case "$SDL_VERSION" in
     1.2.*)
         ENABLE_SDL12_GFX="true"
         ;;
@@ -116,7 +140,10 @@ case "`$SDL_CONFIG --version`" in
         ENABLE_SDL13_GFX="true"
         ;;
 esac
-AC_SEARCH_LIBS([SDL_Init], [SDL])
+AC_SEARCH_LIBS([SDL_Init],
+               [SDL],,
+               [AC_MSG_ERROR([*** SDL lib not found! Get SDL from
+http://www.libsdl.org])])
 
 ac_link="$LDPREFIX $ac_link"
 AC_SEARCH_LIBS([IMG_Load],
@@ -162,22 +189,22 @@ AC_CXX_STL_HASH
 AC_CXX_STL_HASH_FUN
 
 
-AC_CHECK_HEADER([SDL.h],
+AC_CHECK_HEADER([SDL/SDL.h],
 		[],
                 [AC_MSG_ERROR([*** SDL include files not found!
 You should install SDL development package.])])
 
-AC_CHECK_HEADER([SDL_image.h],
+AC_CHECK_HEADERS([SDL/SDL_image.h], [SDL_image/SDL_image.h],
 		[],
 			[AC_MSG_ERROR([*** SDL_image include files not found!
 You should install development package.])])
 
-AC_CHECK_HEADER([SDL_mixer.h],
+AC_CHECK_HEADERS([SDL/SDL_mixer.h], [SDL_mixer/SDL_mixer.h],
 		[],
 			[AC_MSG_ERROR([*** SDL_mixer include files not found!
 You should install development package.])])
 
-AC_CHECK_HEADER([SDL_ttf.h],
+AC_CHECK_HEADERS([SDL/SDL_ttf.h], [SDL_ttf/SDL_ttf.h],
 		[],
 			[AC_MSG_ERROR([*** SDL_ttf include files not found!
 You should install development package.])])

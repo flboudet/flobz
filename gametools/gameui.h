@@ -32,7 +32,7 @@ namespace gameui {
     USE_MAX_SIZE = 0,
     USE_MIN_SIZE,
     USE_MAX_SIZE_NO_MARGIN,
-	ON_ACTION, // Renamed ON_START to make sure I forgot nothing.
+    ON_ACTION, // Renamed ON_START to make sure I forgot nothing.
     ON_MOUSE_UP, // Mouse UP and DOWN are now distinct events (for list scroll and stuff like that)
     ON_MOUSE_DOWN,
     GAMEUIENUM_LAST

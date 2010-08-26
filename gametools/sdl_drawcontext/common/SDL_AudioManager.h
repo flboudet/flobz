@@ -2,7 +2,7 @@
 #define _SDL_AUDIOMANAGER_H_
 
 #include "audiomanager.h"
-#include <SDL_mixer.h>
+#include <SDL_mixer/SDL_mixer.h>
 
 class SDL_AM_Music : public audio_manager::Music
 {

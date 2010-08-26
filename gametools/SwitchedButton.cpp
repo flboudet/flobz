@@ -12,7 +12,8 @@ namespace gameui {
     SwitchedButton::SwitchedButton(String label, bool defaultValue,
                                    IosSurface *trueSurface, IosSurface *falseSurface, String prefKey, Action * altResponder)
     : stateImage(), imageTrue(trueSurface), imageFalse(falseSurface),
-    text(label), key(prefKey), persistant(true), m_altResponder(altResponder)
+      text(label, this), key(prefKey),
+      persistant(true), m_altResponder(altResponder)
     {
         if (key == "")
         {
@@ -29,8 +30,8 @@ namespace gameui {
         }
         gameui::GlobalNotificationCenter.addListener(notifKey, this);
         setInnerMargin(0);
-        setFocusable(true);
-        text.setFocusable(false);
+        //setFocusable(true);
+        //text.setFocusable(false);
         stateImage.setFocusable(true);
         setPolicy(USE_MAX_SIZE_NO_MARGIN);
         stateImage.setImage(stateValue ? imageTrue : imageFalse);
@@ -56,11 +57,14 @@ namespace gameui {
 
     void SwitchedButton::action(Widget *sender, int actionType, GameControlEvent *event)
     {
+      cout << "Action type" << actionType << endl;
+      cout << "ON_ACTION=" << ON_ACTION << endl;
         if (m_altResponder != NULL) {
             m_altResponder->action(this, actionType, event);
             return;
         }
-        if (actionType == ON_ACTION) {
+        if ((actionType == ON_ACTION)
+	    || (actionType == ON_MOUSE_UP)) {
             bool val = !stateValue;
             gameui::GlobalNotificationCenter.notify(notifKey, &val);
         }
