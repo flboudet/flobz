@@ -31,8 +31,8 @@
 #include "PuyoAnimations.h"
 
 class PuyoView;
-class AnimatedPuyoTheme;
-class AnimatedPuyoSetTheme;
+class PuyoTheme;
+class PuyoSetTheme;
 
 class AnimatedPuyo : public PuyoPuyo {
 public:
@@ -40,7 +40,7 @@ public:
         PUYO_NORMAL,
         PUYO_CRUNSHED
     };
-    AnimatedPuyo(PuyoState state, AnimatedPuyoSetTheme *themeSet, PuyoView *attachedView);
+    AnimatedPuyo(PuyoState state, PuyoSetTheme *themeSet, PuyoView *attachedView);
     virtual ~AnimatedPuyo();
     void addAnimation(PuyoAnimation *animation);
     PuyoAnimation * getCurrentAnimation() const;
@@ -58,7 +58,7 @@ public:
     PuyoView *getAttachedView() const { return attachedView; }
     int getScreenCoordinateX() const;
     int getScreenCoordinateY() const;
-	AnimatedPuyoTheme *getAttachedTheme() const { return attachedTheme; }
+    const PuyoTheme *getAttachedTheme() const { return attachedTheme; }
     void setAnimatedState(int animatedState) { m_currentCompressedState = animatedState; }
     void setPartner(AnimatedPuyo *partner) { m_partner = partner; }
     void setOffsetX(int offsetX) { m_offsetX = offsetX; }
@@ -71,7 +71,7 @@ private:
     unsigned int smallTicksCount;
     bool visibilityFlag;
     PuyoView *attachedView;
-	AnimatedPuyoTheme *attachedTheme;
+	const PuyoTheme *attachedTheme;
     int m_currentCompressedState;
     AnimatedPuyo *m_partner;
     int m_offsetX, m_offsetY;
@@ -91,7 +91,7 @@ public:
 private:
     AdvancedBuffer<PuyoPuyo *> puyoWalhalla;
     PuyoView *attachedView;
-    AnimatedPuyoSetTheme *attachedThemeSet;
+    PuyoSetTheme *attachedThemeSet;
     bool m_showEyes;
 };
 

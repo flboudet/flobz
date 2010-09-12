@@ -26,47 +26,169 @@
  #ifndef _ANIMATEDPUYOTHEME_H
  #define _ANIMATEDPUYOTHEME_H
 
-#include "gametools/drawcontext.h"
-#include "iosfc/ios_memory.h"
-#include "iosfc/ios_vector.h"
+#include <map>
+#include <memory>
+#include "goomsl/goomsl.h"
+#include "goomsl/goomsl_hash.h"
+#include "LocalizedDictionary.h"
+#include "DataPathManager.h"
+#include "Theme.h"
 #include "PuyoCommander.h"
-#include "PuyoGame.h"
 
-#define NUMBER_OF_PUYOS 5
-
-#define NUMBER_OF_PUYO_FACES 16
-#define NUMBER_OF_PUYO_CIRCLES 32
-#define NUMBER_OF_PUYO_EXPLOSIONS 4
-#define NUMBER_OF_PUYO_DISAPPEAR 4
-#define NUMBER_OF_PUYO_EYES 3
+#define NUMBER_OF_PUYOS_IN_SET 6
+#define NUMBER_OF_PUYOBANS_IN_LEVEL 2
 
 #define NUMBER_OF_LIVES 4
-
 #define MAX_COMPRESSED 32
 
-typedef enum {
-    PUYO_FACES = 0,
-    PUYO_CIRCLES = 1,
-    PUYO_EXPLOSIONS = 2,
-    PUYO_DISAPPEAR = 3,
-    PUYO_EYES = 4,
-    PUYO_SHADOWS = 5
-} PuyoPictureType;
-
-
-
-// Class containing the theme for a puyo
-class AnimatedPuyoTheme {
+class PuyoThemeDescription {
 public:
-    virtual ~AnimatedPuyoTheme() {}
-    virtual IosSurface *getSurface(PuyoPictureType picture, int index) = 0;
-    virtual IosSurface *getShrunkSurface(PuyoPictureType picture, int index, int compression) = 0;
-    virtual IosSurface *getPuyoSurfaceForValence(int valence, int compression = 0) = 0;
-    virtual IosSurface *getEyeSurfaceForIndex(int index, int compression = 0) = 0;
-    virtual IosSurface *getCircleSurfaceForIndex(int index, int compression = 0) = 0;
-    virtual IosSurface *getShadowSurface(int compression = 0) = 0;
-    virtual IosSurface *getShrinkingSurfaceForIndex(int index, int compression = 0) = 0;
-    virtual IosSurface *getExplodingSurfaceForIndex(int index, int compression = 0) = 0;
+    std::string face;
+    std::string disappear;
+    std::string explosion;
+    std::string eye;
+    float colorOffset;
+};
+
+class PuyoSetThemeDescription {
+public:
+    std::string name;
+    std::string localizedName;
+    std::string author;
+    std::string description;
+    std::string localizedDescription;
+    std::string path;
+    PuyoThemeDescription puyoThemeDescriptions[NUMBER_OF_PUYOS_IN_SET];
+};
+
+class PuyobanThemeDefinition {
+public:
+    int displayX, displayY;
+    int nextX, nextY;
+    int neutralDisplayX, neutralDisplayY;
+    int nameDisplayX, nameDisplayY;
+    int scoreDisplayX, scoreDisplayY;
+    bool shouldDisplayNext;
+    bool shouldDisplayShadow;
+    bool shouldDisplayEyes;
+    float scale;
+};
+
+class LevelThemeDescription {
+public:
+    std::string name;
+    std::string localizedName;
+    std::string author;
+    std::string description;
+    std::string localizedDescription;
+    std::string path;
+    std::string lives;
+    std::string background;
+    std::string speedMeter;
+    std::string neutralIndicator;
+
+    std::string gameLostRight2PAnimation;
+    std::string gameLostLeft2PAnimation;
+    std::string animation, fgAnimation;
+    std::string getReadyAnimation;
+
+    int speedMeterX, speedMeterY;
+    int lifeDisplayX, lifeDisplayY;
+
+    PuyobanThemeDefinition puyoban[NUMBER_OF_PUYOBANS_IN_LEVEL];
+};
+
+class ThemeManagerImpl : public ThemeManager {
+public:
+    ThemeManagerImpl(DataPathManager &dataPathManager);
+    virtual PuyoSetTheme * createPuyoSetTheme(const std::string &themeName);
+    virtual LevelTheme   * createLevelTheme(const std::string &themeName);
+
+    virtual const std::vector<std::string> & getPuyoSetThemeList();
+    virtual const std::vector<std::string> & getLevelThemeList();
+private:
+    void loadThemePack(const std::string &path);
+    static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local);
+    static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local);
+    static void end_description(GoomSL *gsl, GoomHash *global, GoomHash *local);
+    static void loadPuyobanDefinition(GoomSL *gsl, int playerId, PuyobanThemeDefinition &puyoban);
+
+    static const char * s_themeFolderExtension;
+
+    static const char *s_key_PuyoFace[NUMBER_OF_PUYOS_IN_SET];
+    static const char *s_key_PuyoDisappear[NUMBER_OF_PUYOS_IN_SET];
+    static const char *s_key_PuyoExplosion[NUMBER_OF_PUYOS_IN_SET];
+    static const char *s_key_PuyoEye[NUMBER_OF_PUYOS_IN_SET];
+    static const char *s_key_PuyoColorOffset[NUMBER_OF_PUYOS_IN_SET];
+
+    DataPathManager &m_dataPathManager;
+    std::string m_themePackLoadingPath;
+
+    std::vector<std::string> m_puyoSetThemeList;
+    std::vector<std::string> m_levelThemeList;
+    std::map<std::string, PuyoSetThemeDescription> m_puyoSetThemeDescriptions;
+    std::map<std::string, LevelThemeDescription> m_levelThemeDescriptions;
+    std::auto_ptr<LocalizedDictionary> m_localeDictionary;
+};
+
+class PuyoThemeImpl : public PuyoTheme {
+public:
+    PuyoThemeImpl(const PuyoThemeDescription &desc, const std::string &path);
+    virtual IosSurface *getPuyoSurfaceForValence(int valence, int compression = 0) const;
+    virtual IosSurface *getEyeSurfaceForIndex(int index, int compression = 0) const;
+    virtual IosSurface *getCircleSurfaceForIndex(int index, int compression = 0) const;
+    virtual IosSurface *getShadowSurface(int compression = 0) const;
+    virtual IosSurface *getShrinkingSurfaceForIndex(int index, int compression = 0) const;
+    virtual IosSurface *getExplodingSurfaceForIndex(int index, int compression = 0) const;
+private:
+    const PuyoThemeDescription &m_desc;
+    const std::string &m_path;
+
+    mutable IosSurface* m_faces[NUMBER_OF_PUYO_FACES][MAX_COMPRESSED];
+    mutable IosSurfaceRef m_baseFaces[NUMBER_OF_PUYO_FACES];
+
+    mutable IosSurface* m_eyes[NUMBER_OF_PUYO_EYES][MAX_COMPRESSED];
+    mutable IosSurfaceRef m_baseEyes[NUMBER_OF_PUYO_EYES];
+
+    mutable IosSurface* m_circles[NUMBER_OF_PUYO_CIRCLES][MAX_COMPRESSED];
+    mutable IosSurfaceRef m_baseCircle;
+
+    mutable IosSurface *m_shadows[MAX_COMPRESSED];
+    mutable IosSurfaceRef m_baseShadow;
+};
+
+class NeutralPuyoThemeImpl : public PuyoTheme {
+public:
+    NeutralPuyoThemeImpl(const PuyoThemeDescription &desc, const std::string &path);
+    virtual IosSurface *getPuyoSurfaceForValence(int valence, int compression = 0) const;
+    virtual IosSurface *getEyeSurfaceForIndex(int index, int compression = 0) const;
+    virtual IosSurface *getCircleSurfaceForIndex(int index, int compression = 0) const;
+    virtual IosSurface *getShadowSurface(int compression = 0) const;
+    virtual IosSurface *getShrinkingSurfaceForIndex(int index, int compression = 0) const;
+    virtual IosSurface *getExplodingSurfaceForIndex(int index, int compression = 0) const;
+private:
+    const PuyoThemeDescription &m_desc;
+    const std::string &m_path;
+    mutable IosSurface *m_faces[MAX_COMPRESSED];
+    mutable IosSurfaceRef m_baseFace;
+};
+
+class PuyoSetThemeImpl : public PuyoSetTheme {
+public:
+    PuyoSetThemeImpl(const PuyoSetThemeDescription &desc);
+    virtual const std::string & getName() const;
+    virtual const std::string & getLocalizedName() const;
+    virtual const std::string & getAuthor() const;
+    virtual const std::string & getComments() const;
+    virtual const PuyoTheme & getPuyoTheme(PuyoState state) const;
+private:
+    const PuyoSetThemeDescription &m_desc;
+    std::auto_ptr<PuyoTheme> m_puyoThemes[NUMBER_OF_PUYOS_IN_SET];
+};
+
+
+#ifdef DISABLED
+class PuyoThemeImpl : public PuyoTheme {
 };
 
 class StandardAnimatedPuyoTheme : public AnimatedPuyoTheme {
@@ -336,6 +458,8 @@ private:
 
 // Call the following accessor to get the global theme manager
 AnimatedPuyoThemeManager * getPuyoThemeManger(void);
+#endif
+
 
 #endif // _ANIMATEDPUYOTHEME_H
 

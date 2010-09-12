@@ -5,6 +5,7 @@
 #include "preferences.h"
 #include "audio.h"
 #include "MainMenu.h"
+#include "AnimatedPuyoTheme.h"
 #ifdef THREADED_RESOURCE_MANAGER
 #include "ThreadedResourceManager.h"
 #endif
@@ -15,9 +16,6 @@ PuyoCommander *theCommander = NULL;
 IosFont *storyFont; // TODO: remove
 
 static const char * kFullScreenPref = "Config.FullScreen";
-#ifdef HAVE_OPENGL
-static const char * kOpenGLPref     = "Config.OpenGL";
-#endif
 
 #ifdef PRODUCE_CACHE_FILE
 FILE *cacheOutputGsl;
@@ -109,6 +107,37 @@ void MusicFactory::destroy(audio_manager::Music *res)
     delete res;
 }
 
+PuyoSetThemeFactory::PuyoSetThemeFactory(ThemeManager &themeManager)
+    : m_themeManager(themeManager)
+{
+}
+
+PuyoSetTheme *PuyoSetThemeFactory::create(const std::string &name)
+{
+    cout << "Asked for creation of puyoset theme " << name << endl;
+    return m_themeManager.createPuyoSetTheme(name);
+}
+
+void PuyoSetThemeFactory::destroy(PuyoSetTheme *res)
+{
+    delete res;
+}
+
+LevelThemeFactory::LevelThemeFactory(ThemeManager &themeManager)
+    : m_themeManager(themeManager)
+{
+}
+
+LevelTheme *LevelThemeFactory::create(const std::string &name)
+{
+    cout << "Asked for creation of level theme " << name << endl;
+    return m_themeManager.createLevelTheme(name);
+}
+
+void LevelThemeFactory::destroy(LevelTheme *res)
+{
+    delete res;
+}
 
 /*
  * THE MENUS
@@ -128,17 +157,19 @@ void SinglePlayerGameAction::action()
 
 PuyoCommander::PuyoCommander(DataPathManager &dataPathManager)
   : dataPathManager(dataPathManager),
+    m_themeManager(new ThemeManagerImpl(dataPathManager)),
     m_surfaceFactory(dataPathManager),
     m_fontFactory(dataPathManager),
     m_soundFactory(dataPathManager),
     m_musicFactory(dataPathManager),
+    m_puyoSetThemeFactory(*m_themeManager),
+    m_levelThemeFactory(*m_themeManager),
     m_cursor(NULL)
 {
 #ifdef PRODUCE_CACHE_FILE
   cacheOutputGsl = fopen("cache.gsl", "w");
 #endif
   loop = GameUIDefaults::GAME_LOOP;
-  mbox = NULL;
   theCommander = this;
 
 
@@ -260,6 +291,21 @@ void PuyoCommander::initFonts()
     GameUIDefaults::FONT_FUNNY        = m_funnyFont;
 }
 
+void PuyoCommander::initThemes()
+{
+#ifdef DISABLED
+    // List the themes in the various pack folders
+    SelfVector<String> themeFolders = getDataPathManager().getEntriesAtPath("theme");
+    // Load the themes from the list (only those matching the correct extension)
+    for (int i = 0 ; i < themeFolders.size() ; i++) {
+        if (themeFolders[i].substring(themeFolders[i].size() - 8)
+            == themeFolderExtension) {
+            cout << "Theme to be loaded: " << (const char *)(themeFolders[i]); << endl;
+            //loadTheme(themeFolders[i]);
+        }
+    }
+#endif
+}
 
 /*
 void PuyoCommander::setMusic(bool music)
@@ -287,21 +333,12 @@ String PuyoCommander::getFullScreenKey(void) const
     return String(kFullScreenPref);
 }
 
-void PuyoCommander::setGlSDL(bool useGL)
-{
-}
-
 /* load a few important preferences for display */
 void PuyoCommander::loadPreferences(bool fs)
 {
   DBG_PRINT("loadPreferences()\n");
   /* Load Preferences */
   //fullscreen = fs ? GetBoolPreference(kFullScreenPref, true) : false;
-#ifdef HAVE_OPENGL
-  useGL = GetBoolPreference(kOpenGLPref, false);
-#else
-  useGL = false;
-#endif
 }
 
 ScreenTransitionWidget *PuyoCommander::createScreenTransition(Screen &fromScreen) const
@@ -350,6 +387,46 @@ MusicRef PuyoCommander::getMusic(const char *path)
     return m_musicResManager->getResource(path);
 }
 
+PuyoSetThemeRef PuyoCommander::getPuyoSetTheme(const char *name)
+{
+    return m_puyoSetThemeResManager->getResource(name);
+}
+
+PuyoSetThemeRef PuyoCommander::getDefaultPuyoSetTheme()
+{
+    return getPuyoSetTheme(getDefaultPuyoSetThemeName().c_str());
+}
+
+const std::string &PuyoCommander::getDefaultPuyoSetThemeName() const
+{
+    return "";
+}
+
+const std::vector<std::string> &PuyoCommander::getPuyoSetThemeList() const
+{
+    return m_themeManager->getPuyoSetThemeList();
+}
+
+LevelThemeRef PuyoCommander::getLevelTheme(const char *name)
+{
+    return m_levelThemeResManager->getResource(name);
+}
+
+LevelThemeRef PuyoCommander::getDefaultLevelTheme()
+{
+    return getLevelTheme(getDefaultLevelThemeName().c_str());
+}
+
+const std::string &PuyoCommander::getDefaultLevelThemeName() const
+{
+    return "";
+}
+
+const std::vector<std::string> &PuyoCommander::getLevelThemeList() const
+{
+    return m_themeManager->getLevelThemeList();
+}
+
 void PuyoCommander::freeUnusedResources()
 {
     m_surfaceResManager->freeUnusedResources();
@@ -381,5 +458,7 @@ void PuyoCommander::createResourceManagers()
     m_fontResManager.reset(new SimpleResourceManager<IosFont, IosFontResourceKey>(m_fontFactory));
     m_soundResManager.reset(new SimpleResourceManager<audio_manager::Sound>(m_soundFactory));
     m_musicResManager.reset(new SimpleResourceManager<audio_manager::Music>(m_musicFactory));
+    m_puyoSetThemeResManager.reset(new SimpleResourceManager<PuyoSetTheme>(m_puyoSetThemeFactory));
+    m_levelThemeResManager.reset(new SimpleResourceManager<LevelTheme>(m_levelThemeFactory));
 #endif
 }

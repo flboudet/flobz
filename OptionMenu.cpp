@@ -74,10 +74,13 @@ void OptionMenu::build() {
     buttonsBox.add(&audioButton);
     buttonsBox.add(&musicButton);
     buttonsBox.add(&fullScreenButton);
+    // TODO: complete
+#ifdef DISABLED
     if (getPuyoThemeManger()->getAnimatedPuyoSetThemeList()->size() > 1)
         buttonsBox.add(&changePuyoThemeButton);
     if (getPuyoThemeManger()->getPuyoLevelThemeList()->size() > 1)
         buttonsBox.add(&changeLevelThemeButton);
+#endif
     buttonsBox.add(&changeControlsButton);
     buttonsBox.add(&backButton);
     add(&buttonsBox);

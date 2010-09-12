@@ -8,6 +8,7 @@
 #include "GameCursor.h"
 #include "ScreenTransition.h"
 #include "audio.h"
+#include "Theme.h"
 #include "ResourceManager.h"
 #include <memory>
 
@@ -121,6 +122,32 @@ private:
     DataPathManager &m_dataPathManager;
 };
 
+/**
+ * Factory for PuyoSetTheme resources
+ */
+class PuyoSetThemeFactory : public ResourceFactory<PuyoSetTheme>
+{
+public:
+    PuyoSetThemeFactory(ThemeManager &themeManager);
+    virtual PuyoSetTheme *create(const std::string &name);
+    virtual void destroy(PuyoSetTheme *res);
+private:
+    ThemeManager &m_themeManager;
+};
+
+/**
+ * Factory for LevelTheme resources
+ */
+class LevelThemeFactory : public ResourceFactory<LevelTheme>
+{
+public:
+    LevelThemeFactory(ThemeManager &themeManager);
+    virtual LevelTheme *create(const std::string &name);
+    virtual void destroy(LevelTheme *res);
+private:
+    ThemeManager &m_themeManager;
+};
+
 // IosSurface resources
 typedef ResourceReference<IosSurface> IosSurfaceRef;
 typedef ResourceManager<IosSurface, IosSurfaceResourceKey> IosSurfaceResourceManager;
@@ -133,6 +160,11 @@ typedef ResourceManager<audio_manager::Sound> SoundResourceManager;
 // Music resources
 typedef ResourceReference<audio_manager::Music> MusicRef;
 typedef ResourceManager<audio_manager::Music> MusicResourceManager;
+// Theme resources
+typedef ResourceReference<PuyoSetTheme> PuyoSetThemeRef;
+typedef ResourceManager<PuyoSetTheme> PuyoSetThemeResourceManager;
+typedef ResourceReference<LevelTheme> LevelThemeRef;
+typedef ResourceManager<LevelTheme> LevelThemeResourceManager;
 
 class PuyoApplicationState
 {
@@ -160,8 +192,6 @@ class PuyoCommander
     bool getMusic();
     bool getSoundFx();
     String getFullScreenKey(void) const;
-    bool getGlSDL() const { return useGL; }
-    void setGlSDL(bool useGL);
 
     // Cursor management
     void registerCursor(AbstractCursor *cursor);
@@ -179,6 +209,16 @@ class PuyoCommander
     SoundRef getSound(const char *path);
     void cacheMusic(const char *path);
     MusicRef getMusic(const char *path);
+    PuyoSetThemeRef getPuyoSetTheme(const char *name);
+    PuyoSetThemeRef getDefaultPuyoSetTheme();
+    const std::string &getDefaultPuyoSetThemeName() const;
+    const std::vector<std::string> &getPuyoSetThemeList() const;
+
+    LevelThemeRef getLevelTheme(const char *name);
+    LevelThemeRef getDefaultLevelTheme();
+    const std::string &getDefaultLevelThemeName() const;
+    const std::vector<std::string> &getLevelThemeList() const;
+
     void freeUnusedResources();
 
     // Data path management
@@ -216,7 +256,10 @@ class PuyoCommander
     virtual void createResourceManagers();
     // Font creation function
     virtual void initFonts();
+    // Theme initialisation function
+    virtual void initThemes();
     // Resource Managers
+    std::auto_ptr<ThemeManager> m_themeManager;
     IosSurfaceFactory m_surfaceFactory;
     std::auto_ptr<IosSurfaceResourceManager> m_surfaceResManager;
     IosFontFactory m_fontFactory;
@@ -225,6 +268,10 @@ class PuyoCommander
     std::auto_ptr<SoundResourceManager> m_soundResManager;
     MusicFactory m_musicFactory;
     std::auto_ptr<MusicResourceManager> m_musicResManager;
+    PuyoSetThemeFactory m_puyoSetThemeFactory;
+    std::auto_ptr<PuyoSetThemeResourceManager> m_puyoSetThemeResManager;
+    LevelThemeFactory m_levelThemeFactory;
+    std::auto_ptr<LevelThemeResourceManager> m_levelThemeResManager;
     // Data path management
     DataPathManager &dataPathManager;
     // Localization management
@@ -240,11 +287,8 @@ class PuyoCommander
     void initLocale();
     void initAudio();
 
-    MessageBox *mbox;
     GameLoop   *loop;
     AudioManager globalAudioManager;
-
-    bool useGL;
 protected:
     IosSurfaceRef m_frameImage;
     IosSurfaceRef m_buttonIdleImage, m_buttonDownImage, m_buttonOverImage, m_buttonSpecialImage;

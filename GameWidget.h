@@ -28,7 +28,7 @@
 #include "PuyoGame.h"
 #include "PuyoPlayer.h"
 #include "CheatCodeManager.h"
-#include "AnimatedPuyoTheme.h"
+#include "Theme.h"
 #include "PuyoStory.h"
 
 /**
@@ -69,7 +69,7 @@ public:
     virtual ~GameWidget();
     void initWithGUI(PuyoView &areaA, PuyoView &areaB,
                      PuyoPlayer &controllerA, PuyoPlayer &controllerB,
-                     PuyoLevelTheme &levelTheme,
+                     LevelTheme &levelTheme,
                      gameui::Action *gameOverAction = NULL);
     void initWithoutGUI(PuyoView &areaA, PuyoView &areaB,
                      PuyoPlayer &controllerA, PuyoPlayer &controllerB,
@@ -127,7 +127,7 @@ protected:
     GameScreen *associatedScreen;
     DrawTarget &painter;
     IosSurface *painterGameScreen;
-    PuyoLevelTheme *attachedLevelTheme;
+    LevelTheme *attachedLevelTheme;
     PuyoView *areaA, *areaB;
     PuyoPlayer *controllerA, *controllerB;
     PuyoGame *attachedGameA, *attachedGameB;
@@ -154,7 +154,7 @@ protected:
     struct StyrolysePainterClient {
       StyrolyseClient m_styroClient;
       DrawTarget *m_painter;
-      PuyoLevelTheme *m_theme;
+      LevelTheme *m_theme;
     };
     Styrolyse *m_foregroundAnimation;
     StyrolysePainterClient m_styroPainter;

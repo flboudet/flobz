@@ -11,8 +11,8 @@ flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           PuyoStarter.cpp PuyoSinglePlayerStarter.cpp PuyoTwoPlayerStarter.cpp \
           LocalMenu.cpp OptionMenu.cpp ControlMenu.cpp \
           LevelThemeMenu.cpp ThemeMenu.cpp ScreenTransition.cpp \
-          PuyoGameAbstract.cpp PuyoStrings.cpp AnimatedPuyoTheme.cpp \
-          PackageDescription.cpp
+          PuyoGameAbstract.cpp PuyoStrings.cpp \
+          PackageDescription.cpp AnimatedPuyoTheme.cpp
 
 # Optional sources for network gaming support
 if ENABLE_NETWORK
@@ -29,7 +29,7 @@ endif
 
 EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            AnimatedPuyo.h PuyoGameAbstract.h OptionMenu.h \
-           AnimatedPuyoTheme.h PuyoGame.h PauseMenu.h \
+           PuyoGame.h PauseMenu.h \
            audio.h GameWidget.h PuyoPlayer.h \
            PuyoIA.h PuyoScoring.h PuyoMain.h \
            PuyoIgpDefs.h ScreenTransition.h \
@@ -44,7 +44,8 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            PuyoCommander.h NetGameCenter.h SDLMain.h \
            ControlMenu.h PuyoNetworkGame.h styrolyse.h \
            FPDataPathManager.h NetworkMenu.h \
-           DoomMelt.h PuyoNetworkStarter.h PackageDescription.h
+           DoomMelt.h PuyoNetworkStarter.h PackageDescription.h \
+           Theme.h
 
 flobopuyo_CXXFLAGS = -I$(top_srcdir)/iosfc -I$(top_srcdir)/gametools -I$(top_srcdir)/goomsl $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 flobopuyo_OBJCFLAGS= $(SDL_CFLAGS)

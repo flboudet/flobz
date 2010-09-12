@@ -192,7 +192,7 @@ void GameScreen::action(Widget *sender, int actionType, GameControlEvent *event)
   }
 }
 
-TwoPlayerGameWidget::TwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction)
+TwoPlayerGameWidget::TwoPlayerGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, Action *gameOverAction)
 : attachedPuyoThemeSet(puyoThemeSet),
     attachedRandom(5), attachedGameFactory(&attachedRandom),
     areaA(&attachedGameFactory, 0, &attachedPuyoThemeSet, &levelTheme),

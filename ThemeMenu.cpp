@@ -26,7 +26,7 @@
 #include "ThemeMenu.h"
 #include "preferences.h"
 #include "PuyoStrings.h"
-#include "AnimatedPuyoTheme.h"
+#include "Theme.h"
 
 using namespace event_manager;
 
@@ -53,6 +53,7 @@ PuyoThemeSelectionBox::~PuyoThemeSelectionBox()
 void PuyoThemeSelectionBox::build()
 {
     themePreview.build();
+#ifdef DISABLED
     AdvancedBuffer<const char *> * themes = getPuyoThemeManger()->getAnimatedPuyoSetThemeList();
     String pref = getPuyoThemeManger()->getPreferedAnimatedPuyoSetThemeName();
     int size = themes->size();
@@ -65,6 +66,7 @@ void PuyoThemeSelectionBox::build()
             found = true;
         }
     }
+
     add(&Spacer0);
 
     prevButton->setFocusable(size > 1);
@@ -78,6 +80,7 @@ void PuyoThemeSelectionBox::build()
         themePreview.themeSelected((*themes)[0]);
         getPuyoThemeManger()->setPreferedAnimatedPuyoSetTheme((*themes)[0]);
     }
+
     add(&themePreview);
     add(&Spacer2);
 
@@ -85,12 +88,13 @@ void PuyoThemeSelectionBox::build()
     nextButton->setOnAction(this);
     nextButton->setInvertedFocus(true);
     add(nextButton);
-
+#endif
     add(&Spacer3);
 }
 
 void PuyoThemeSelectionBox::action(Widget *sender, int actionType, GameControlEvent *event)
 {
+#ifdef DISABLED
     if (!event->isUp) return;
     AdvancedBuffer<const char *> * themes = getPuyoThemeManger()->getAnimatedPuyoSetThemeList();
     String pref = getPuyoThemeManger()->getPreferedAnimatedPuyoSetThemeName();
@@ -113,6 +117,7 @@ void PuyoThemeSelectionBox::action(Widget *sender, int actionType, GameControlEv
         themePreview.themeSelected((*themes)[currentTheme]);
         getPuyoThemeManger()->setPreferedAnimatedPuyoSetTheme((*themes)[currentTheme]);
     }
+#endif
 }
 
 
@@ -152,15 +157,15 @@ void PuyoThemePicturePreview::draw(DrawTarget *dt)
       {
         IosRect rect = r;
         rect.x += (int16_t)((i*3*ONEPUYO)/4);
-        AnimatedPuyoTheme * t = curTheme->getAnimatedPuyoTheme((PuyoState)(PUYO_BLUE+i));
-        dt->draw(t->getSurface(PUYO_SHADOWS,0), NULL, &rect);
-        dt->draw(t->getSurface(PUYO_FACES,0), NULL, &rect);
-        dt->draw(t->getSurface(PUYO_EYES,imageForIndex(eyes[i])), NULL, &rect);
+        const PuyoTheme &t = curTheme->getPuyoTheme((PuyoState)(PUYO_BLUE+i));
+        dt->draw(t.getShadowSurface(), NULL, &rect);
+        dt->draw(t.getPuyoSurfaceForValence(0), NULL, &rect);
+        dt->draw(t.getEyeSurfaceForIndex(imageForIndex(eyes[i])), NULL, &rect);
       }
     }
 }
 
-void PuyoThemePicturePreview::themeSelected(AnimatedPuyoSetTheme *  theme)
+void PuyoThemePicturePreview::themeSelected(PuyoSetTheme *  theme)
 {
     curTheme = theme;
     //requestDraw();
@@ -213,8 +218,9 @@ PuyoThemePreview::~PuyoThemePreview() {}
 
 void PuyoThemePreview::themeSelected(String themeName)
 {
+#ifdef DISABLED
 #define _ComputeVZoneSize(A,B) Vec3(A.x>B.x?A.x:B.x,A.y+B.y+GameUIDefaults::SPACING,1.0)
-    AnimatedPuyoSetTheme * curTheme = getPuyoThemeManger()->getAnimatedPuyoSetTheme(themeName);
+    PuyoSetTheme * curTheme = getPuyoThemeManger()->getAnimatedPuyoSetTheme(themeName);
     name.setFont(GameUIDefaults::FONT_TEXT);
     name.setValue(curTheme->getLocalizedName());
     author.setFont(GameUIDefaults::FONT_SMALL_INFO);
@@ -228,6 +234,7 @@ void PuyoThemePreview::themeSelected(String themeName)
     setPreferedSize(_ComputeVZoneSize(one,picture.getPreferedSize()));
     if (parent)
       parent->arrangeWidgets();
+#endif
 }
 
 

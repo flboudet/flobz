@@ -41,8 +41,8 @@ class PuyoNetworkView : public PuyoView {
 
     PuyoNetworkView(PuyoGameFactory *attachedPuyoGameFactory,
             int playerId,
-		    AnimatedPuyoSetTheme *attachedPuyoThemeSet,
-            PuyoLevelTheme *attachedLevelTheme,
+		    PuyoSetTheme *attachedPuyoThemeSet,
+            LevelTheme *attachedLevelTheme,
 		    MessageBox *mbox, int gameId)
         : PuyoView(attachedPuyoGameFactory, playerId, attachedPuyoThemeSet, attachedLevelTheme),
           mbox(mbox), gameId(gameId), badPuyos(0) {}
@@ -94,8 +94,8 @@ class PuyoInternetNetworkView : public PuyoNetworkView {
 
         PuyoInternetNetworkView(PuyoGameFactory *attachedPuyoGameFactory,
                                 int playerId,
-                                AnimatedPuyoSetTheme *attachedPuyoThemeSet,
-                                PuyoLevelTheme *attachedLevelTheme,
+                                PuyoSetTheme *attachedPuyoThemeSet,
+                                LevelTheme *attachedLevelTheme,
                                 MessageBox *mbox, int gameId,
                                 IgpMessageBox *igpbox)
           : PuyoNetworkView(attachedPuyoGameFactory,

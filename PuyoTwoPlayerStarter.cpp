@@ -26,7 +26,7 @@
 #include "PuyoTwoPlayerStarter.h"
 using namespace event_manager;
 
-TwoPlayersGameWidget::TwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String aiFace, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
+TwoPlayersGameWidget::TwoPlayersGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, String aiFace, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
                                                      attachedRandom(5), attachedGameFactory(&attachedRandom),
                                                      areaA(&attachedGameFactory, 0, &attachedPuyoThemeSet, &levelTheme),
                                                      areaB(&attachedGameFactory, 1, &attachedPuyoThemeSet, &levelTheme),
@@ -112,10 +112,9 @@ void TwoPlayersStarterAction::stateMachine()
 
 void TwoPlayersStarterAction::prepareGame1stRun()
 {
-    AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
-    currentLevelTheme = themeManager->getPuyoLevelTheme();
+    currentLevelTheme = theCommander->getDefaultLevelTheme();
 
-    gameWidget = gameWidgetFactory.createGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *currentLevelTheme, currentLevelTheme->getCentralAnimation2P(), this);
+    gameWidget = gameWidgetFactory.createGameWidget(*(theCommander->getDefaultPuyoSetTheme()), *currentLevelTheme, currentLevelTheme->getCentralAnimation2P().c_str(), this);
     gameWidget->setGameOptions(GameOptions::FromLevel(difficulty));
     gameScreen = new GameScreen(*gameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
     if (nameProvider != NULL) {
@@ -134,7 +133,7 @@ void TwoPlayersStarterAction::prepareGame()
         startGame();
         return;
     }
-    m_getReadyWidget = new StoryWidget(currentLevelTheme->getReadyAnimation2P(), this);
+    m_getReadyWidget = new StoryWidget(currentLevelTheme->getReadyAnimation2P().c_str(), this);
     gameScreen->setOverlayStory(m_getReadyWidget);
 }
 
@@ -150,12 +149,12 @@ void TwoPlayersStarterAction::startGame()
 void TwoPlayersStarterAction::gameOver()
 {
     if (gameWidget->isGameARunning()) {
-        gameLostWidget = new StoryWidget(currentLevelTheme->getGameLostRightAnimation2P(), this);
+        gameLostWidget = new StoryWidget(currentLevelTheme->getGameLostRightAnimation2P().c_str(), this);
         leftVictories++;
         m_state = kMatchWonP1Animation;
     }
     else {
-        gameLostWidget = new StoryWidget(currentLevelTheme->getGameLostLeftAnimation2P(), this);
+        gameLostWidget = new StoryWidget(currentLevelTheme->getGameLostLeftAnimation2P().c_str(), this);
         rightVictories++;
         m_state = kMatchWonP2Animation;
     }
@@ -172,10 +171,9 @@ void TwoPlayersStarterAction::gameScores()
 
 void TwoPlayersStarterAction::prepareGameNextRun()
 {
-    AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
-    currentLevelTheme = themeManager->getPuyoLevelTheme();
+    currentLevelTheme = theCommander->getDefaultLevelTheme();
 
-    GameWidget *newGameWidget = gameWidgetFactory.createGameWidget(*(themeManager->getAnimatedPuyoSetTheme()), *currentLevelTheme, currentLevelTheme->getCentralAnimation2P(), this);
+    GameWidget *newGameWidget = gameWidgetFactory.createGameWidget(*(theCommander->getDefaultPuyoSetTheme()), *currentLevelTheme, currentLevelTheme->getCentralAnimation2P().c_str(), this);
     GameScreen *newGameScreen = new GameScreen(*newGameWidget, *(GameUIDefaults::SCREEN_STACK->top()));
     if (nameProvider != NULL) {
         newGameWidget->setPlayerOneName(nameProvider->getPlayer1Name());

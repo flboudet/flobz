@@ -26,10 +26,11 @@
 #ifndef _PUYOVIEW
 #define _PUYOVIEW
 
+#include <memory>
 #include "PuyoGame.h"
 #include "PuyoAnimations.h"
 #include "AnimatedPuyo.h"
-#include "AnimatedPuyoTheme.h"
+#include "Theme.h"
 
 #define TSIZE 32
 #define ASIZE 32
@@ -64,8 +65,8 @@ class PuyoView : public PuyoDelegate {
     // Create a PuyoView with graphical feedback
     PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
              int playerId,
-             AnimatedPuyoSetTheme *attachedThemeSet,
-             PuyoLevelTheme *attachedLevelTheme);
+             PuyoSetTheme *attachedThemeSet,
+             LevelTheme *attachedLevelTheme);
 
     // Create a PuyoView without graphical feedback
     PuyoView(PuyoGameFactory *attachedPuyoGameFactory);
@@ -96,7 +97,7 @@ class PuyoView : public PuyoDelegate {
     int getScreenCoordinateX(int X) const { return X * TSIZE + m_xOffset; }
     int getScreenCoordinateY(int Y) const { return Y * TSIZE + m_yOffset; }
 
-    AnimatedPuyoSetTheme *getPuyoThemeSet() const { return attachedThemeSet; }
+    PuyoSetTheme *getPuyoThemeSet() const { return attachedThemeSet; }
 
     bool isNewMetaCycleStart() { return newMetaCycleStart; }
     void clearMetaCycleStart() { newMetaCycleStart = false; }
@@ -144,8 +145,8 @@ class PuyoView : public PuyoDelegate {
     int m_xOffset, m_yOffset;
     int m_nXOffset, m_nYOffset;
     int neutralXOffset, neutralYOffset;
-    AnimatedPuyoSetTheme *attachedThemeSet;
-    PuyoLevelTheme *attachedLevelTheme;
+    PuyoSetTheme *attachedThemeSet;
+    LevelTheme *attachedLevelTheme;
     AnimatedPuyoFactory attachedPuyoFactory;
     PuyoGame *attachedGame, *enemyGame;
     AdvancedBuffer<Animation *> viewAnimations;

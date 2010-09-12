@@ -46,7 +46,7 @@ private:
 class PuyoNetworkGameWidget : public GameWidget, MessageListener, ChatBoxDelegate {
 public:
     PuyoNetworkGameWidget();
-    void initWithGUI(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, ios_fc::IgpMessageBox *igpbox = NULL);
+    void initWithGUI(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, ios_fc::IgpMessageBox *igpbox = NULL);
     void initWithoutGUI(ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, ios_fc::IgpMessageBox *igpbox = NULL);
     void connectIA(int level);
     ~PuyoNetworkGameWidget();
@@ -64,7 +64,7 @@ protected:
 private:
     void sendSyncMsg();
     void sendAliveMsg();
-    AnimatedPuyoSetTheme *attachedPuyoThemeSet; // optional
+    PuyoSetTheme *attachedPuyoThemeSet; // optional
     std::auto_ptr<PuyoRandomSystem> attachedRandom;
     ios_fc::MessageBox *mbox;
     std::auto_ptr<PuyoLocalGameFactory> attachedLocalGameFactory;

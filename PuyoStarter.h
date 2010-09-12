@@ -36,7 +36,7 @@
 #include "GameWidget.h"
 #include "PuyoCommander.h"
 #include "ios_messagebox.h"
-#include "AnimatedPuyoTheme.h"
+#include "Theme.h"
 #include "ScreenTransition.h"
 #include "PuyoStrings.h"
 
@@ -103,9 +103,9 @@ private:
 
 class TwoPlayerGameWidget : public GameWidget {
 public:
-    TwoPlayerGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, Action *gameOverAction = NULL);
+    TwoPlayerGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, Action *gameOverAction = NULL);
 private:
-    AnimatedPuyoSetTheme &attachedPuyoThemeSet;
+    PuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;
     PuyoLocalGameFactory attachedGameFactory;
     PuyoView areaA, areaB;

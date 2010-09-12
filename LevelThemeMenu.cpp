@@ -26,7 +26,7 @@
 #include "LevelThemeMenu.h"
 #include "preferences.h"
 #include "PuyoStrings.h"
-#include "AnimatedPuyoTheme.h"
+#include "Theme.h"
 
 using namespace event_manager;
 
@@ -53,15 +53,15 @@ LevelThemeSelectionBox::~LevelThemeSelectionBox()
 void LevelThemeSelectionBox::build()
 {
     themePreview.build();
-    AdvancedBuffer<const char *> * themes = getPuyoThemeManger()->getPuyoLevelThemeList();
-    String pref = getPuyoThemeManger()->getPreferedPuyoLevelThemeName();
-    int size = themes->size();
+    const std::vector<std::string> &themes = theCommander->getLevelThemeList();
+    std::string pref = theCommander->getDefaultLevelThemeName();
+    int size = themes.size();
     bool found = false;
-    for (int i = 0; i < size; i++)
-    {
-        if (pref == (*themes)[i])
+    for (std::vector<std::string>::const_iterator iter
+             = themes.begin() ; iter != themes.end() ; iter++) {
+        if (pref == *iter)
         {
-            themePreview.themeSelected(pref);
+            themePreview.setSelectedTheme(pref);
             found = true;
         }
     }
@@ -76,8 +76,7 @@ void LevelThemeSelectionBox::build()
     add(&Spacer1);
     if (found == false && size > 0)
     {
-        themePreview.themeSelected((*themes)[0]);
-        getPuyoThemeManger()->setPreferedPuyoLevelTheme((*themes)[0]);
+        themePreview.setSelectedTheme(themes[0]);
     }
     add(&themePreview);
     add(&Spacer2);
@@ -93,26 +92,28 @@ void LevelThemeSelectionBox::build()
 void LevelThemeSelectionBox::action(Widget *sender, int actionType, GameControlEvent *event)
 {
     if (!event->isUp) return;
-    AdvancedBuffer<const char *> * themes = getPuyoThemeManger()->getPuyoLevelThemeList();
-    String pref = getPuyoThemeManger()->getPreferedPuyoLevelThemeName();
-    int size = themes->size();
+    const std::vector<std::string> &themes = theCommander->getLevelThemeList();
+    std::string pref = theCommander->getDefaultLevelThemeName();
+    int size = themes.size();
     if (size <= 0) return;
 
-    int currentTheme;
+    int currentTheme = 0;
     // get the selected theme id or zero if the prefered theme if not there
-    for (currentTheme = size-1; currentTheme > 0; --currentTheme)
-    {
-        if (pref == (*themes)[currentTheme]) break;
+    for (std::vector<std::string>::const_iterator iter
+             = themes.begin() ; iter != themes.end() ; iter++, currentTheme++) {
+        if (pref == *iter) {
+            break;
+        }
     }
     if (sender == prevButton) {
         (currentTheme <= 0) ? currentTheme = size - 1 : currentTheme--;
-        themePreview.themeSelected((*themes)[currentTheme]);
-        getPuyoThemeManger()->setPreferedPuyoLevelTheme((*themes)[currentTheme]);
+        themePreview.setSelectedTheme(themes[currentTheme]);
+        //getPuyoThemeManger()->setPreferedPuyoLevelTheme((*themes)[currentTheme]);
     }
     else if (sender == nextButton) {
         currentTheme = (currentTheme+1)%size;
-        themePreview.themeSelected((*themes)[currentTheme]);
-        getPuyoThemeManger()->setPreferedPuyoLevelTheme((*themes)[currentTheme]);
+        themePreview.setSelectedTheme(themes[currentTheme]);
+        //getPuyoThemeManger()->setPreferedPuyoLevelTheme((*themes)[currentTheme]);
     }
 }
 
@@ -198,7 +199,7 @@ void LevelThemePicturePreview::updatePicture(DrawTarget *dt)
     }
 }
 
-void LevelThemePicturePreview::themeSelected(PuyoLevelTheme * theme)
+void LevelThemePicturePreview::themeSelected(LevelTheme * theme)
 {
     if (theme != NULL)
     {
@@ -246,14 +247,14 @@ void LevelThemePreview::build() {
 
 LevelThemePreview::~LevelThemePreview() {}
 
-void LevelThemePreview::themeSelected(String themeName)
+void LevelThemePreview::setSelectedTheme(std::string themeName)
 {
 #define _ComputeVZoneSize(A,B) Vec3(A.x>B.x?A.x:B.x,A.y+B.y+GameUIDefaults::SPACING,1.0)
-    PuyoLevelTheme * curTheme = getPuyoThemeManger()->getPuyoLevelTheme(themeName);
-    if (curTheme->getAuthor() == "iOS-Software") name.setValue(curTheme->getLocalizedName());
-    else name.setValue(themeName+" ("+curTheme->getAuthor()+")");
+    LevelTheme * curTheme = theCommander->getLevelTheme(themeName.c_str());
+    if (curTheme->getAuthor() == "iOS-Software") name.setValue(curTheme->getLocalizedName().c_str());
+    //else name.setValue(themeName+" ("+curTheme->getAuthor()+")");
     //author.setValue(curTheme->getAuthor());
-    description.setValue(curTheme->getComments());
+    description.setValue(curTheme->getComments().c_str());
     Vec3 one=_ComputeVZoneSize(name.getPreferedSize(),description.getPreferedSize());
     setPreferedSize(_ComputeVZoneSize(one,picture.getPreferedSize()));
     if (parent)

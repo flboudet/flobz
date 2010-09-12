@@ -1,6 +1,6 @@
 /**
  * iosfc::FilePath: Platform-independant path operations
- * 
+ *
  * This file is part of the iOS Foundation Classes project.
  *
  * authors:
@@ -28,6 +28,7 @@
 
 #include "ios_memory.h"
 #include "ios_vector.h"
+#include <string>
 
 namespace ios_fc {
 
@@ -36,8 +37,10 @@ public:
     FilePath(const String &path);
     FilePath(const FilePath &origin);
     String combine(const String &path) const;
+    //std::string combine(const std::string &path) const;
     String basename(void) const;
     static String combine(const String &path1, const String &path2);
+    //static std::string combine(const std::string &path1, const std::string path2);
     SelfVector<String> listFiles();
     bool exists() const;
     const String &getPathString() const { return path; }

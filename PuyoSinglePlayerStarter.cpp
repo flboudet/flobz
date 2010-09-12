@@ -40,7 +40,7 @@ SinglePlayerGameWidget::SinglePlayerGameWidget(int lifes, String aiFace)
 
 void SinglePlayerGameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB,
                                             PuyoPlayer &playercontroller,
-                                            PuyoLevelTheme &levelTheme,
+                                            LevelTheme &levelTheme,
                                             int level,
                                             Action *gameOverAction)
 {
@@ -56,7 +56,7 @@ void SinglePlayerGameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB,
 	areaB.getAttachedGame()->setScoringLevel(scoringLevel);
 }
 
-SinglePlayerStandardLayoutGameWidget::SinglePlayerStandardLayoutGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
+SinglePlayerStandardLayoutGameWidget::SinglePlayerStandardLayoutGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
   : SinglePlayerGameWidget(lifes, aiFace),
       attachedPuyoThemeSet(puyoThemeSet),
       attachedRandom(nColors),
@@ -123,7 +123,7 @@ void SinglePlayerGameWidget::action(Widget *sender, int actionType,
 }
 
 SinglePlayerGameWidget *SinglePlayerStandardLayoutFactory::createGameWidget
-          (AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme,
+          (PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme,
            int level, int nColors, int lifes, String aiFace,
            Action *gameOverAction)
 {
@@ -212,12 +212,11 @@ PuyoSingleGameLevelData::PuyoSingleGameLevelData(int gameLevel, int difficulty,
   : gameLevel(gameLevel), difficulty(difficulty),
     levelDefinition(levelDefinitions.getLevelDefinition(gameLevel))
 {
-    AnimatedPuyoThemeManager * themeManager = getPuyoThemeManger();
-    themeToUse = themeManager->getAnimatedPuyoSetTheme();
+    themeToUse = theCommander->getDefaultPuyoSetTheme();
     if (levelDefinition->backgroundTheme == "Prefs.DefaultTheme")
-        levelThemeToUse = themeManager->getPuyoLevelTheme();
+        levelThemeToUse = theCommander->getDefaultLevelTheme();
     else
-        levelThemeToUse = themeManager->getPuyoLevelTheme(levelDefinition->backgroundTheme);
+        levelThemeToUse = theCommander->getLevelTheme(levelDefinition->backgroundTheme);
 }
 
 PuyoSingleGameLevelData::~PuyoSingleGameLevelData()
@@ -244,12 +243,12 @@ String PuyoSingleGameLevelData::getGameOverStory() const
     return levelDefinition->gameOverStory;
 }
 
-AnimatedPuyoSetTheme &PuyoSingleGameLevelData::getPuyoTheme() const
+PuyoSetTheme &PuyoSingleGameLevelData::getPuyoTheme() const
 {
     return *themeToUse;
 }
 
-PuyoLevelTheme &PuyoSingleGameLevelData::getLevelTheme() const
+LevelTheme &PuyoSingleGameLevelData::getLevelTheme() const
 {
     return *levelThemeToUse;
 }
@@ -610,14 +609,14 @@ void SinglePlayerMatch::performMatchPrepare()
 
 void SinglePlayerMatch::prepareGame()
 {
-    PuyoLevelTheme &currentLevelTheme = m_levelData->getLevelTheme();
+    LevelTheme &currentLevelTheme = m_levelData->getLevelTheme();
     m_gameScreen->setSuspended(true);
     m_state = kMatchGettingStarted;
     if (currentLevelTheme.getReadyAnimation2P() == "") {
         performMatchStart();
         return;
     }
-    m_getReadyWidget = new StoryWidget(currentLevelTheme.getReadyAnimation2P(), this);
+    m_getReadyWidget = new StoryWidget(currentLevelTheme.getReadyAnimation2P().c_str(), this);
     m_gameScreen->setOverlayStory(m_getReadyWidget);
 }
 

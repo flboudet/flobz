@@ -350,7 +350,7 @@ void VanishAnimation::draw(int semiMove, DrawTarget *dt)
         }
     }
     else {
-		AnimatedPuyoTheme *theme = attachedPuyo.getAttachedTheme();
+		const PuyoTheme *theme = attachedPuyo.getAttachedTheme();
 
         IosRect drect, xrect;
         int iter2 = iter - 10 - delay;
@@ -428,7 +428,7 @@ NeutralPopAnimation::NeutralPopAnimation(AnimatedPuyo &puyo, int delay, Animatio
 {
     synchronizer->push();
     synchronizer->incrementUsage();
-    AnimatedPuyoTheme *attachedTheme = attachedPuyo.getAttachedTheme();
+    const PuyoTheme *attachedTheme = attachedPuyo.getAttachedTheme();
     neutralPop[0] = attachedTheme->getExplodingSurfaceForIndex(0);
     neutralPop[1] = attachedTheme->getExplodingSurfaceForIndex(1);
     neutralPop[2] = attachedTheme->getExplodingSurfaceForIndex(2);

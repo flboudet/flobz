@@ -35,7 +35,7 @@
 class SinglePlayerGameWidget : public GameWidget, public Action {
 public:
     SinglePlayerGameWidget(int lifes, String aiFace);
-    void initWithGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &playercontroller, PuyoLevelTheme &levelTheme, int level, Action *gameOverAction);
+    void initWithGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &playercontroller, LevelTheme &levelTheme, int level, Action *gameOverAction);
     virtual ~SinglePlayerGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
@@ -55,9 +55,9 @@ protected:
 class SinglePlayerStandardLayoutGameWidget : public SinglePlayerGameWidget
 {
 public:
-    SinglePlayerStandardLayoutGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
+    SinglePlayerStandardLayoutGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
 private:
-    AnimatedPuyoSetTheme &attachedPuyoThemeSet;
+    PuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;
     PuyoLocalGameFactory attachedGameFactory;
     PuyoView areaA, areaB;
@@ -73,7 +73,7 @@ class SinglePlayerFactory {
 public:
     virtual String getPlayerName() const = 0;
     virtual SinglePlayerGameWidget *createGameWidget
-        (AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme,
+        (PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme,
          int level, int nColors, int lifes, String aiFace,
          Action *gameOverAction) = 0;
     virtual StatsWidgetDimensions getStatsWidgetDimensions() const = 0;
@@ -85,7 +85,7 @@ public:
  */
 class SinglePlayerStandardLayoutFactory : public SinglePlayerFactory {
     virtual SinglePlayerGameWidget *createGameWidget
-    (AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme,
+    (PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme,
      int level, int nColors, int lifes, String aiFace,
      Action *gameOverAction);
     virtual StatsWidgetDimensions getStatsWidgetDimensions() const;
@@ -143,8 +143,8 @@ public:
     String getStory() const;
     String getGameLostStory() const;
     String getGameOverStory() const;
-    AnimatedPuyoSetTheme &getPuyoTheme() const;
-    PuyoLevelTheme &getLevelTheme() const;
+    PuyoSetTheme &getPuyoTheme() const;
+    LevelTheme &getLevelTheme() const;
     int getIALevel() const;
     String getIAName() const;
     String getIAFace() const;
@@ -153,8 +153,8 @@ public:
 private:
     int gameLevel, difficulty;
     PuyoLevelDefinitions::LevelDefinition *levelDefinition;
-    AnimatedPuyoSetTheme *themeToUse;
-    PuyoLevelTheme *levelThemeToUse;
+    PuyoSetTheme *themeToUse;
+    LevelTheme *levelThemeToUse;
 };
 
 class PuyoGameOver1PScreen : public StoryScreen {

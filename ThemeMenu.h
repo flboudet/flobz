@@ -23,12 +23,12 @@
  *
  */
 
-#ifndef PUYO_THEME_MENU_H
-#define PUYO_THEME_MENU_H
+#ifndef _THEME_MENU_H
+#define _THEME_MENU_H
 
 #include "gameui.h"
 #include "PuyoCommander.h"
-#include "AnimatedPuyoTheme.h"
+#include "Theme.h"
 #include "LevelThemeMenu.h"
 
 class PuyoThemePicturePreview : public Widget, public IdleComponent {
@@ -40,14 +40,14 @@ class PuyoThemePicturePreview : public Widget, public IdleComponent {
         virtual IdleComponent *getIdleComponent() { return this; }
 
         void build();
-        void themeSelected(AnimatedPuyoSetTheme * theme);
+        void themeSelected(PuyoSetTheme * theme);
 
     protected:
       void draw(DrawTarget *dt);
 
     private:
       String label;
-      AnimatedPuyoSetTheme * curTheme;
+      PuyoSetTheme * curTheme;
       double offsetX;
       double offsetY;
       int eyes[NUMBER_OF_PUYOS];

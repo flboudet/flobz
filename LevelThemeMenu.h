@@ -29,7 +29,7 @@
 #include "gameui.h"
 #include "MainScreen.h"
 #include "PuyoCommander.h"
-#include "AnimatedPuyoTheme.h"
+#include "Theme.h"
 
 class LevelThemePicturePreview : public Widget, public IdleComponent {
     public:
@@ -41,7 +41,7 @@ class LevelThemePicturePreview : public Widget, public IdleComponent {
 		void setSize(const Vec3 &v3);
 
         void build();
-        void themeSelected(PuyoLevelTheme * theme);
+        void themeSelected(LevelTheme * theme);
         void draw(DrawTarget *dt);
     protected:
       void updatePicture(DrawTarget *dt);
@@ -54,7 +54,7 @@ class LevelThemePicturePreview : public Widget, public IdleComponent {
       double offsetY;
       bool shouldRecache;
       bool shouldResize;
-      PuyoLevelTheme * curTheme;
+      LevelTheme * curTheme;
 };
 
 class LevelThemePreview : public VBox {
@@ -63,7 +63,7 @@ class LevelThemePreview : public VBox {
         virtual ~LevelThemePreview();
 
         void build();
-        void themeSelected(String themeName);
+        void setSelectedTheme(std::string themeName);
 
     private:
         Text name;

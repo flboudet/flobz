@@ -37,12 +37,12 @@ public:
 
 class TwoPlayersGameWidget : public GameWidget {
 public:
-    TwoPlayersGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String aiFace, Action *gameOverAction = NULL);
+    TwoPlayersGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, String aiFace, Action *gameOverAction = NULL);
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
     StoryWidget *getOpponent();
 private:
-    AnimatedPuyoSetTheme &attachedPuyoThemeSet;
+    PuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;
     PuyoLocalGameFactory attachedGameFactory;
     PuyoView areaA, areaB;
@@ -53,13 +53,13 @@ private:
 
 class GameWidgetFactory {
 public:
-    virtual GameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String centerFace, Action *gameOverAction) = 0;
+    virtual GameWidget *createGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, String centerFace, Action *gameOverAction) = 0;
     virtual ~GameWidgetFactory() {};
 };
 
 class PuyoLocalTwoPlayerGameWidgetFactory : public GameWidgetFactory {
 public:
-    GameWidget *createGameWidget(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, String centerFace, Action *gameOverAction)
+    GameWidget *createGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
         return new TwoPlayersGameWidget(puyoThemeSet, levelTheme, centerFace, gameOverAction);
     }
@@ -102,7 +102,7 @@ private:
     StoryWidget *gameLostWidget;
     StoryWidget *m_getReadyWidget;
 
-    PuyoLevelTheme *currentLevelTheme;
+    LevelTheme *currentLevelTheme;
     int leftVictories, rightVictories;
     TwoPlayersStatsWidget *m_statsWidget;
     int totalPointsPlayerOne_, totalPointsPlayerTwo_;

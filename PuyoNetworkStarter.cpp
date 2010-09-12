@@ -49,7 +49,7 @@ PuyoPlayer *PuyoNetworkGameWidget::createLocalPlayer()
     return new PuyoCombinedEventPlayer(*localArea);
 }
 
-void PuyoNetworkGameWidget::initWithGUI(AnimatedPuyoSetTheme &puyoThemeSet, PuyoLevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, ios_fc::IgpMessageBox *igpbox)
+void PuyoNetworkGameWidget::initWithGUI(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, ios_fc::IgpMessageBox *igpbox)
 {
     attachedPuyoThemeSet = &puyoThemeSet;
     attachedRandom = std::auto_ptr<PuyoRandomSystem>(new PuyoRandomSystem(randomSeed, 5));

@@ -67,7 +67,7 @@ GameWidget::GameWidget(GameOptions game_options, bool withGUI)
     }
 }
 
-void GameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, PuyoLevelTheme &levelTheme, Action *gameOverAction)
+void GameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, LevelTheme &levelTheme, Action *gameOverAction)
 {
     this->areaA = &areaA;
     this->areaB = &areaB;
@@ -112,9 +112,8 @@ void GameWidget::priv_initialize()
       m_styroPainter.m_painter = &painter;
       m_styroPainter.m_theme = attachedLevelTheme;
       m_foregroundAnimation =
-	styrolyse_new((const char *)
-                  attachedLevelTheme->getForegroundAnimation(),
-		      (StyrolyseClient *)(&m_styroPainter), false);
+	styrolyse_new(attachedLevelTheme->getForegroundAnimation().c_str(),
+                  (StyrolyseClient *)(&m_styroPainter), false);
     }
 
     // Setting up games
@@ -128,9 +127,9 @@ void GameWidget::priv_initialize()
 
     // Load and preload a few FX for the game
     for (int i=0; i<15; ++i)
-        puyoFX.push_back(new PuyoFX("fx/vanish.gsl"));
+        puyoFX.push_back(new PuyoFX("fx/vanish.gsl", *(areaA->getPuyoThemeSet())));
     for (int i=0; i<3; ++i)
-        puyoFX.push_back(new PuyoFX("fx/combo.gsl"));
+        puyoFX.push_back(new PuyoFX("fx/combo.gsl", *(areaA->getPuyoThemeSet())));
     // puyoFX.push_back(new PuyoFX("fx/white_star.gsl"));
 }
 
@@ -427,8 +426,8 @@ void GameWidget::setScreenToResumed(bool fromControls)
 void *GameWidget::styro_loadImage(StyrolyseClient *_this, const char *path)
 {
     StyroImage *image;
-    image = new StyroImage(
-        FilePath(((StyrolysePainterClient *)_this)->m_theme->getThemeRootPath())
+    image = new StyroImage(_this,
+        FilePath(((StyrolysePainterClient *)_this)->m_theme->getThemeRootPath().c_str())
       .combine(path), true);
   return image;
 }

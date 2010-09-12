@@ -2,7 +2,7 @@
 #include "PuyoStory.h"
 #include "PuyoCommander.h"
 #include "audio.h"
-#include "AnimatedPuyoTheme.h"
+#include "Theme.h"
 
 using namespace event_manager;
 
@@ -62,14 +62,19 @@ int extract_state_and_type(const char *s, int *state, int *type)
 }
 
 
-StyroImage::StyroImage(const char *path, bool removePrefix)
+StyroImage::StyroImage(StyrolyseClient *_this,
+                       const char *path, bool removePrefix)
     : path(path), surface(NULL)
 {
     if (path[0] == '@') {
         int state = 0;
         int type = 0;
-        if (extract_state_and_type(path,&state,&type)==0){
-            surface =  getPuyoThemeManger()->getAnimatedPuyoSetTheme()->getAnimatedPuyoTheme((PuyoState)state)->getSurface((PuyoPictureType)state, 0);
+        const PuyoSetTheme *attachedTheme = ((StoryWidget::PuyoStoryStyrolyseClient *)_this)->attachedTheme;
+        if ((attachedTheme != NULL)
+            && (extract_state_and_type(path,&state,&type)==0)) {
+#ifdef TODO
+            surface =  attachedTheme->getPuyoTheme((PuyoState)state).getSurface((PuyoPictureType)state, 0);
+#endif
         }
     }
     else {
@@ -85,7 +90,7 @@ StyroImage::StyroImage(const char *path, bool removePrefix)
 static void *loadImage (StyrolyseClient *_this, const char *path)
 {
   try {
-      return new StyroImage(path);
+      return new StyroImage(_this, path);
   }
   catch (Exception e) {
     return NULL;
@@ -198,6 +203,7 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
     client.styroClient.cacheSound   = ::cacheSound;
     client.styroClient.cacheMusic   = ::cacheMusic;
     client.widget = this;
+    client.attachedTheme = NULL;
 
     currentStory = styrolyse_new((const char *)fullPath, (StyrolyseClient *)(&client), fxMode);
     //styrolyse_setuserpointer(currentStory, this);
@@ -330,9 +336,11 @@ void StoryScreen::onScreenVisibleChanged(bool visible)
 }
 
 
-PuyoFX::PuyoFX(String fxName)
+PuyoFX::PuyoFX(String fxName, const PuyoSetTheme &puyoSetTheme)
     : StoryWidget(fxName,NULL,true), fxName(fxName)
-{}
+{
+    client.attachedTheme = &puyoSetTheme;
+}
 
 bool PuyoFX::busy() const
 {
@@ -350,7 +358,7 @@ bool PuyoFX::supportFX(const char *fx) const
 
 PuyoFX *PuyoFX::clone() const
 {
-    PuyoFX *fx = new PuyoFX(fxName);
+    PuyoFX *fx = new PuyoFX(fxName, *client.attachedTheme);
     fx->setGameScreen(screen);
     return fx;
 }

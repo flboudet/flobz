@@ -24,7 +24,6 @@
  */
 
 #include "LocalMenu.h"
-#include "AnimatedPuyoTheme.h"
 #include "ScreenTransition.h"
 
 class NoNameAction : public Action {

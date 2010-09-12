@@ -44,7 +44,8 @@ public:
     String path;
     IosSurfaceRef surfaceRef;
     IosSurface   *surface;
-    StyroImage(const char *path, bool removePrefix=false);
+    StyroImage(StyrolyseClient *_this,
+               const char *path, bool removePrefix=false);
 };
 
 class StoryWidget : public Widget, public IdleComponent {
@@ -59,10 +60,11 @@ public:
     int getIntegerValue(String varName) const;
     const char *getText(const char *text) const;
     void freeMemory();
-    
+
     struct PuyoStoryStyrolyseClient {
         StyrolyseClient styroClient;
         StoryWidget *widget;
+        const PuyoSetTheme *attachedTheme;
     };
 protected:
 
@@ -80,7 +82,7 @@ protected:
 
 class PuyoFX : public StoryWidget {
 public:
-    PuyoFX(String fxName);
+    PuyoFX(String fxName, const PuyoSetTheme &puyoSetTheme);
     void postEvent(const char *name, float x, float y, int player);
     bool busy() const;
     bool supportFX(const char *str) const;

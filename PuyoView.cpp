@@ -35,8 +35,8 @@
 
 PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
                    int playerId,
-                   AnimatedPuyoSetTheme *attachedThemeSet,
-                   PuyoLevelTheme *attachedLevelTheme)
+                   PuyoSetTheme *attachedThemeSet,
+                   LevelTheme *attachedLevelTheme)
   : m_playerId(playerId), m_showNextPuyos(true), m_showShadows(true),
     attachedThemeSet(attachedThemeSet), attachedLevelTheme(attachedLevelTheme),
     attachedPuyoFactory(this), delayBeforeGameOver(60), haveDisplay(true),
@@ -221,27 +221,27 @@ void PuyoView::render(DrawTarget *dt)
         drect.w = TSIZE;
         drect.h = TSIZE * 2;
         // Drawing next puyos
-        AnimatedPuyoTheme *nextPuyoTheme =
-            attachedThemeSet->getAnimatedPuyoTheme(attachedGame->getNextFalling());
-        IosSurface *currentSurface = nextPuyoTheme->getPuyoSurfaceForValence(0);
+        const PuyoTheme &nextPuyoTheme =
+            attachedThemeSet->getPuyoTheme(attachedGame->getNextFalling());
+        IosSurface *currentSurface = nextPuyoTheme.getPuyoSurfaceForValence(0);
         if (currentSurface != NULL) {
             drect.x = m_nXOffset;
             drect.y = m_nYOffset + TSIZE;
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;
             dt->draw(currentSurface, NULL, &drect);
-            dt->draw(nextPuyoTheme->getEyeSurfaceForIndex(0), NULL, &drect);
+            dt->draw(nextPuyoTheme.getEyeSurfaceForIndex(0), NULL, &drect);
         }
-        AnimatedPuyoTheme *nextCompanionTheme =
-            attachedThemeSet->getAnimatedPuyoTheme(attachedGame->getNextCompanion());
-        currentSurface = nextCompanionTheme->getPuyoSurfaceForValence(0);
+        const PuyoTheme &nextCompanionTheme =
+            attachedThemeSet->getPuyoTheme(attachedGame->getNextCompanion());
+        currentSurface = nextCompanionTheme.getPuyoSurfaceForValence(0);
         if (currentSurface != NULL) {
             drect.x = m_nXOffset;
             drect.y = m_nYOffset;
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;
             dt->draw(currentSurface, NULL, &drect);
-            dt->draw(nextCompanionTheme->getEyeSurfaceForIndex(0), NULL, &drect);
+            dt->draw(nextCompanionTheme.getEyeSurfaceForIndex(0), NULL, &drect);
         }
     }
 
