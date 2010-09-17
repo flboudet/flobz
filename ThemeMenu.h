@@ -60,7 +60,7 @@ class PuyoThemePreview : public VBox {
         virtual ~PuyoThemePreview();
 
         void build();
-        void themeSelected(String themeName);
+        void themeSelected(const std::string &themeName);
 
     private:
         Text name;

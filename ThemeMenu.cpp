@@ -53,42 +53,32 @@ PuyoThemeSelectionBox::~PuyoThemeSelectionBox()
 void PuyoThemeSelectionBox::build()
 {
     themePreview.build();
-#ifdef DISABLED
-    AdvancedBuffer<const char *> * themes = getPuyoThemeManger()->getAnimatedPuyoSetThemeList();
-    String pref = getPuyoThemeManger()->getPreferedAnimatedPuyoSetThemeName();
-    int size = themes->size();
+    const std::vector<std::string> &themes = theCommander->getPuyoSetThemeList();
+    int size = themes.size();
+    std::string preferedTheme = themes[0]; // TODO: get from prefs
+    // Select the prefered theme
     bool found = false;
-    for (int i = 0; i < size; i++)
-    {
-        if (pref == (*themes)[i])
-        {
-            themePreview.themeSelected(pref);
-            found = true;
-        }
+    for (std::vector<std::string>::const_iterator iter = themes.begin() ;
+         (iter != themes.end()) && (!found); iter ++) {
+        themePreview.themeSelected(preferedTheme);
+        found = true;
     }
-
+    if (!found) {
+        themePreview.themeSelected(themes[0]);
+        // TODO: set in prefs
+    }
     add(&Spacer0);
-
     prevButton->setFocusable(size > 1);
     prevButton->setOnAction(this);
     prevButton->setInvertedFocus(true);
     add(prevButton);
-
     add(&Spacer1);
-    if (found == false && size > 0)
-    {
-        themePreview.themeSelected((*themes)[0]);
-        getPuyoThemeManger()->setPreferedAnimatedPuyoSetTheme((*themes)[0]);
-    }
-
     add(&themePreview);
     add(&Spacer2);
-
     nextButton->setFocusable(size > 1);
     nextButton->setOnAction(this);
     nextButton->setInvertedFocus(true);
     add(nextButton);
-#endif
     add(&Spacer3);
 }
 
@@ -216,17 +206,16 @@ void PuyoThemePreview::build() {
 
 PuyoThemePreview::~PuyoThemePreview() {}
 
-void PuyoThemePreview::themeSelected(String themeName)
+void PuyoThemePreview::themeSelected(const std::string &themeName)
 {
-#ifdef DISABLED
 #define _ComputeVZoneSize(A,B) Vec3(A.x>B.x?A.x:B.x,A.y+B.y+GameUIDefaults::SPACING,1.0)
-    PuyoSetTheme * curTheme = getPuyoThemeManger()->getAnimatedPuyoSetTheme(themeName);
+    PuyoSetThemeRef curTheme = theCommander->getPuyoSetTheme(themeName.c_str());
     name.setFont(GameUIDefaults::FONT_TEXT);
-    name.setValue(curTheme->getLocalizedName());
+    name.setValue(curTheme->getLocalizedName().c_str());
     author.setFont(GameUIDefaults::FONT_SMALL_INFO);
-    author.setValue(curTheme->getAuthor());
+    author.setValue(curTheme->getAuthor().c_str());
     description.setFont(GameUIDefaults::FONT_SMALL_INFO);
-    description.setValue(curTheme->getComments());
+    description.setValue(curTheme->getComments().c_str());
     picture.themeSelected(curTheme);
     Vec3 marges(0.0,MARGIN,0.0);
     Vec3 one=_ComputeVZoneSize(name.getPreferedSize(),author.getPreferedSize());
@@ -234,7 +223,6 @@ void PuyoThemePreview::themeSelected(String themeName)
     setPreferedSize(_ComputeVZoneSize(one,picture.getPreferedSize()));
     if (parent)
       parent->arrangeWidgets();
-#endif
 }
 
 

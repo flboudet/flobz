@@ -37,7 +37,7 @@ const char * ThemeManagerImpl::s_key_PuyoFace[NUMBER_OF_PUYOS_IN_SET] = {
     "puyoset.P3.face",
     "puyoset.P4.face",
     "puyoset.P5.face",
-    "puyoset.neutral.face"
+    "puyoset.Neutral.face"
 };
 const char * ThemeManagerImpl::s_key_PuyoDisappear[NUMBER_OF_PUYOS_IN_SET] = {
     "puyoset.P1.disappear",
@@ -45,7 +45,7 @@ const char * ThemeManagerImpl::s_key_PuyoDisappear[NUMBER_OF_PUYOS_IN_SET] = {
     "puyoset.P3.disappear",
     "puyoset.P4.disappear",
     "puyoset.P5.disappear",
-    "puyoset.neutral.face"
+    "puyoset.Neutral.face"
 };
 const char * ThemeManagerImpl::s_key_PuyoExplosion[NUMBER_OF_PUYOS_IN_SET] = {
     "puyoset.P1.explosion",
@@ -53,7 +53,7 @@ const char * ThemeManagerImpl::s_key_PuyoExplosion[NUMBER_OF_PUYOS_IN_SET] = {
     "puyoset.P3.explosion",
     "puyoset.P4.explosion",
     "puyoset.P5.explosion",
-    "puyoset.neutral.face"
+    "puyoset.Neutral.face"
 };
 const char * ThemeManagerImpl::s_key_PuyoEye[NUMBER_OF_PUYOS_IN_SET] = {
     "puyoset.P1.eye",
@@ -61,7 +61,7 @@ const char * ThemeManagerImpl::s_key_PuyoEye[NUMBER_OF_PUYOS_IN_SET] = {
     "puyoset.P3.eye",
     "puyoset.P4.eye",
     "puyoset.P5.eye",
-    "puyoset.neutral.face"
+    "puyoset.Neutral.face"
 };
 const char * ThemeManagerImpl::s_key_PuyoColorOffset[NUMBER_OF_PUYOS_IN_SET] = {
     "puyoset.P1.offset",
@@ -69,7 +69,7 @@ const char * ThemeManagerImpl::s_key_PuyoColorOffset[NUMBER_OF_PUYOS_IN_SET] = {
     "puyoset.P3.offset",
     "puyoset.P4.offset",
     "puyoset.P5.offset",
-    "puyoset.neutral.face"
+    "puyoset.Neutral.face"
 };
 
 ThemeManagerImpl::ThemeManagerImpl(DataPathManager &dataPathManager)
@@ -82,13 +82,14 @@ ThemeManagerImpl::ThemeManagerImpl(DataPathManager &dataPathManager)
         if (themeFolders[i].substring(themeFolders[i].size() - 8)
             == s_themeFolderExtension) {
             cout << "Theme to be loaded: " << (const char *)(themeFolders[i]) << endl;
-            //loadTheme(themeFolders[i]);
+            loadThemePack((const char *)themeFolders[i]);
         }
     }
 }
 
 PuyoSetTheme * ThemeManagerImpl::createPuyoSetTheme(const std::string &themeName)
 {
+    cout << "Creating theme impl " << themeName << endl;
     std::map<std::string, PuyoSetThemeDescription>::iterator iter
         = m_puyoSetThemeDescriptions.find(themeName);
     if (iter == m_puyoSetThemeDescriptions.end())
@@ -154,7 +155,7 @@ void ThemeManagerImpl::end_puyoset(GoomSL *gsl, GoomHash *global,
     newThemeDescription.name = themeName;
     newThemeDescription.localizedName = localizedThemeName;
     newThemeDescription.author = (const char *)(GSL_GLOBAL_PTR(gsl, "author"));
-    newThemeDescription.description = (const char *)(GSL_GLOBAL_PTR(gsl, "description"));
+    //newThemeDescription.description = (const char *)(GSL_GLOBAL_PTR(gsl, "description"));
     newThemeDescription.localizedDescription = themeMgr->m_localeDictionary->getLocalizedString(newThemeDescription.description.c_str(),true);
     newThemeDescription.path = themeMgr->m_themePackLoadingPath;
     for (int i = 0 ; i < NUMBER_OF_PUYOS_IN_SET ; i++) {
@@ -178,11 +179,12 @@ void ThemeManagerImpl::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     newThemeDescription.name = themeName;
     newThemeDescription.localizedName = localizedThemeName;
     newThemeDescription.author = (const char *)(GSL_GLOBAL_PTR(gsl, "author"));
-    newThemeDescription.description = (const char *)(GSL_GLOBAL_PTR(gsl, "description"));
+    // TODO newThemeDescription.description = (const char *)(GSL_GLOBAL_PTR(gsl, "description"));
     newThemeDescription.localizedDescription = themeMgr->m_localeDictionary->getLocalizedString(newThemeDescription.description.c_str(),true);
 
     newThemeDescription.lives = (const char *) GSL_GLOBAL_PTR(gsl, "level.lives");
     newThemeDescription.background = (const char *) GSL_GLOBAL_PTR(gsl, "level.background");
+    newThemeDescription.grid = (const char *) GSL_GLOBAL_PTR(gsl, "level.grid");
     newThemeDescription.speedMeter = (const char *) GSL_GLOBAL_PTR(gsl, "level.speedmeter");
     newThemeDescription.neutralIndicator = (const char *) GSL_GLOBAL_PTR(gsl, "level.neutralindicator");
 
@@ -200,7 +202,7 @@ void ThemeManagerImpl::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     for (int i = 0 ; i < NUMBER_OF_PUYOBANS_IN_LEVEL ; i++)
         loadPuyobanDefinition(gsl, 0, newThemeDescription.puyoban[i]);
 
-    themeMgr->m_levelThemeList.push_back(localizedThemeName);
+    // TODO themeMgr->m_levelThemeList.push_back(localizedThemeName);
 #ifdef DISABLED
     theme->setPlayerNameFont(loadFontDefinition(gsl, "playerNameFont"));
     theme->setScoreFont(loadFontDefinition(gsl, "scoreFont"));
@@ -269,7 +271,25 @@ const std::string & PuyoSetThemeImpl::getComments() const
 
 const PuyoTheme & PuyoSetThemeImpl::getPuyoTheme(PuyoState state) const
 {
-    return *((PuyoTheme *)NULL);
+    switch (state) {
+    case PUYO_FALLINGBLUE:
+    case PUYO_BLUE:
+        return *m_puyoThemes[0];
+    case PUYO_FALLINGRED:
+    case PUYO_RED:
+        return *m_puyoThemes[1];
+    case PUYO_FALLINGGREEN:
+    case PUYO_GREEN:
+        return *m_puyoThemes[2];
+    case PUYO_FALLINGVIOLET:
+    case PUYO_VIOLET:
+        return *m_puyoThemes[3];
+    case PUYO_FALLINGYELLOW:
+    case PUYO_YELLOW:
+        return *m_puyoThemes[4];
+    default:
+        return *m_puyoThemes[5];
+    }
 }
 
 
@@ -278,6 +298,18 @@ const PuyoTheme & PuyoSetThemeImpl::getPuyoTheme(PuyoState state) const
 PuyoThemeImpl::PuyoThemeImpl(const PuyoThemeDescription &desc, const std::string &path)
     : m_desc(desc), m_path(path)
 {
+    // Initializing the arrays of pointers
+    for (int i = 0 ; i < NUMBER_OF_PUYO_FACES ; i++)
+        for (int j = 0 ; j < MAX_COMPRESSED ; j++)
+            m_faces[i][j] = NULL;
+    for (int i = 0 ; i < NUMBER_OF_PUYO_EYES ; i++)
+        for (int j = 0 ; j < MAX_COMPRESSED ; j++)
+            m_eyes[i][j] = NULL;
+    for (int i = 0 ; i < NUMBER_OF_PUYO_CIRCLES ; i++)
+        for (int j = 0 ; j < MAX_COMPRESSED ; j++)
+            m_circles[i][j] = NULL;
+    for (int j = 0 ; j < MAX_COMPRESSED ; j++)
+        m_shadows[j] = NULL;
 }
 
 IosSurface *PuyoThemeImpl::getPuyoSurfaceForValence(int valence, int compression) const
@@ -427,6 +459,147 @@ IosSurface *NeutralPuyoThemeImpl::getShrinkingSurfaceForIndex(int index, int com
 IosSurface *NeutralPuyoThemeImpl::getExplodingSurfaceForIndex(int index, int compression) const
 {
 }
+
+
+
+
+
+
+LevelThemeImpl::LevelThemeImpl(const LevelThemeDescription &desc,
+                               const std::string &path)
+    : m_desc(desc), m_path(path)
+{
+}
+
+const std::string & LevelThemeImpl::getName() const
+{
+    return m_desc.name;
+}
+
+const std::string & LevelThemeImpl::getLocalizedName() const
+{
+    return m_desc.localizedName;
+}
+
+const std::string & LevelThemeImpl::getAuthor() const
+{
+    return m_desc.author;
+}
+
+const std::string & LevelThemeImpl::getComments() const
+{
+    return m_desc.description;
+}
+
+IosSurface * LevelThemeImpl::getLifeForIndex(int index) const
+{
+    IosSurfaceRef &result = m_lifes[index];
+    if (result.get() == NULL) {
+        ostringstream osstream;
+        osstream << m_path << "/" << m_desc.lives << "-lives-" << index << ".png";
+        result = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str());
+    }
+    return result;
+}
+
+IosSurface * LevelThemeImpl::getResource(IosSurfaceRef &ref, const std::string &resName, const char *resSuffix) const
+{
+    if (ref.get() == NULL) {
+        ostringstream osstream;
+        osstream << m_path << "/" << resName << resSuffix;
+        ref = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str());
+    }
+    return ref;
+}
+
+IosSurface * LevelThemeImpl::getBackground(void) const
+{
+    return getResource(m_background, m_desc.background, "");
+}
+
+IosSurface * LevelThemeImpl::getGrid(void) const
+{
+    return getResource(m_grid, m_desc.grid, "-background-grid.png");
+}
+
+IosSurface * LevelThemeImpl::getSpeedMeter(bool front) const
+{
+    if (front)
+        return getResource(m_speedMeterFront, m_desc.speedMeter, "-background-meter-above.png");
+    return getResource(m_speedMeterBack, m_desc.speedMeter, "-background-meter-below.png");
+}
+
+IosSurface * LevelThemeImpl::getNeutralIndicator() const
+{
+    return getResource(m_neutralIndicator, m_desc.neutralIndicator, "-small.png");
+}
+
+IosSurface * LevelThemeImpl::getBigNeutralIndicator() const
+{
+    return getResource(m_bigNeutralIndicator, m_desc.neutralIndicator, ".png");
+}
+
+IosSurface * LevelThemeImpl::getGiantNeutralIndicator() const
+{
+    return getResource(m_giantNeutralIndicator, m_desc.neutralIndicator, "-giant.png");
+}
+
+IosFont *LevelThemeImpl::getPlayerNameFont() const
+{
+    return NULL;
+}
+
+IosFont *LevelThemeImpl::getScoreFont() const
+{
+    return NULL;
+}
+
+int LevelThemeImpl::getSpeedMeterX() const
+{ return m_desc.speedMeterX; }
+
+int LevelThemeImpl::getSpeedMeterY() const
+{ return m_desc.speedMeterY; }
+
+int LevelThemeImpl::getLifeDisplayX() const
+{ return m_desc.lifeDisplayX; }
+
+int LevelThemeImpl::getLifeDisplayY() const
+{ return m_desc.lifeDisplayY; }
+
+int LevelThemeImpl::getPuyobanX(int playerId) const
+{ return m_desc.puyoban[playerId].displayX; }
+
+int LevelThemeImpl::getPuyobanY(int playerId) const
+{ return m_desc.puyoban[playerId].displayY; }
+
+int LevelThemeImpl::getNextPuyosX(int playerId) const
+{ return m_desc.puyoban[playerId].nextX; }
+
+int LevelThemeImpl::getNextPuyosY(int playerId) const
+{ return m_desc.puyoban[playerId].nextY; }
+
+#ifdef DISABLED
+int LevelThemeImpl::getNeutralDisplayX(int playerId) const;
+int LevelThemeImpl::getNeutralDisplayY(int playerId) const;
+int LevelThemeImpl::getNameDisplayX(int playerId) const;
+int LevelThemeImpl::getNameDisplayY(int playerId) const;
+int LevelThemeImpl::getScoreDisplayX(int playerId) const;
+int LevelThemeImpl::getScoreDisplayY(int playerId) const;
+float LevelThemeImpl::getPuyobanScale(int playerId) const;
+
+bool LevelThemeImpl::getShouldDisplayNext(int playerId) const;
+bool LevelThemeImpl::getShouldDisplayShadows(int playerId) const;
+bool LevelThemeImpl::getShouldDisplayEyes(int playerId) const;
+bool LevelThemeImpl::getOpponentIsBehind() const;
+
+const std::string LevelThemeImpl::getGameLostLeftAnimation2P() const;
+const std::string LevelThemeImpl::getGameLostRightAnimation2P() const;
+const std::string LevelThemeImpl::getCentralAnimation2P() const;
+const std::string LevelThemeImpl::getForegroundAnimation() const;
+const std::string LevelThemeImpl::getReadyAnimation2P() const;
+
+const std::string LevelThemeImpl::getThemeRootPath() const;
+#endif
 
 #ifdef DISABLED
 

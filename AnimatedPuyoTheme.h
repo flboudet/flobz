@@ -84,6 +84,7 @@ public:
     std::string path;
     std::string lives;
     std::string background;
+    std::string grid;
     std::string speedMeter;
     std::string neutralIndicator;
 
@@ -186,6 +187,65 @@ private:
     std::auto_ptr<PuyoTheme> m_puyoThemes[NUMBER_OF_PUYOS_IN_SET];
 };
 
+class LevelThemeImpl : public LevelTheme {
+public:
+    LevelThemeImpl(const LevelThemeDescription &desc,
+                   const std::string &path);
+    virtual const std::string & getName() const;
+    virtual const std::string & getLocalizedName() const;
+    virtual const std::string & getAuthor() const;
+    virtual const std::string & getComments() const;
+    virtual IosSurface * getLifeForIndex(int index) const;
+    virtual IosSurface * getBackground(void) const;
+    virtual IosSurface * getGrid(void) const;
+    virtual IosSurface * getSpeedMeter(bool front) const;
+    virtual IosSurface * getNeutralIndicator() const;
+    virtual IosSurface * getBigNeutralIndicator() const;
+    virtual IosSurface * getGiantNeutralIndicator() const;
+    // Fonts
+    virtual IosFont *getPlayerNameFont() const ;
+    virtual IosFont *getScoreFont() const;
+    // Positions and dimensions of the Puyoban
+    virtual int getSpeedMeterX() const;
+    virtual int getSpeedMeterY() const;
+    virtual int getLifeDisplayX() const;
+    virtual int getLifeDisplayY() const;
+    virtual int getPuyobanX(int playerId) const;
+    virtual int getPuyobanY(int playerId) const;
+    virtual int getNextPuyosX(int playerId) const;
+    virtual int getNextPuyosY(int playerId) const;
+    virtual int getNeutralDisplayX(int playerId) const;
+    virtual int getNeutralDisplayY(int playerId) const;
+    virtual int getNameDisplayX(int playerId) const;
+    virtual int getNameDisplayY(int playerId) const;
+    virtual int getScoreDisplayX(int playerId) const;
+    virtual int getScoreDisplayY(int playerId) const;
+    virtual float getPuyobanScale(int playerId) const;
+    // Behaviour of the Puyoban
+    virtual bool getShouldDisplayNext(int playerId) const;
+    virtual bool getShouldDisplayShadows(int playerId) const;
+    virtual bool getShouldDisplayEyes(int playerId) const;
+    virtual bool getOpponentIsBehind() const;
+    // Animation names
+    virtual const std::string getGameLostLeftAnimation2P() const;
+    virtual const std::string getGameLostRightAnimation2P() const;
+    virtual const std::string getCentralAnimation2P() const;
+    virtual const std::string getForegroundAnimation() const;
+    virtual const std::string getReadyAnimation2P() const;
+    // Misc
+    virtual const std::string getThemeRootPath() const;
+private:
+    inline IosSurface * getResource(IosSurfaceRef &ref,
+                                    const std::string &resName,
+                                    const char *resSuffix) const;
+    const LevelThemeDescription &m_desc;
+    const std::string &m_path;
+    mutable IosSurfaceRef m_lifes[NUMBER_OF_LIVES];
+    mutable IosSurfaceRef m_background;
+    mutable IosSurfaceRef m_grid;
+    mutable IosSurfaceRef m_speedMeterFront, m_speedMeterBack;
+    mutable IosSurfaceRef m_neutralIndicator, m_bigNeutralIndicator, m_giantNeutralIndicator;
+};
 
 #ifdef DISABLED
 class PuyoThemeImpl : public PuyoTheme {

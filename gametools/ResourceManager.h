@@ -54,6 +54,11 @@ public:
             return NULL;
         return m_ownerResHolder->m_res;
     }
+    T * operator ->()  const {
+        if (m_ownerResHolder == NULL)
+            return NULL;
+        return m_ownerResHolder->m_res;
+    }
     T *get() const {
         if (m_ownerResHolder == NULL)
             return NULL;
