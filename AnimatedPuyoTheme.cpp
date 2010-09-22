@@ -89,7 +89,7 @@ ThemeManagerImpl::ThemeManagerImpl(DataPathManager &dataPathManager)
 
 PuyoSetTheme * ThemeManagerImpl::createPuyoSetTheme(const std::string &themeName)
 {
-    cout << "Creating theme impl " << themeName << endl;
+    cout << "Creating puyoset theme impl " << themeName << endl;
     std::map<std::string, PuyoSetThemeDescription>::iterator iter
         = m_puyoSetThemeDescriptions.find(themeName);
     if (iter == m_puyoSetThemeDescriptions.end())
@@ -99,7 +99,17 @@ PuyoSetTheme * ThemeManagerImpl::createPuyoSetTheme(const std::string &themeName
 
 LevelTheme   * ThemeManagerImpl::createLevelTheme(const std::string &themeName)
 {
-    return NULL;
+    cout << "Creating level theme impl " << themeName << endl;
+    std::map<std::string, LevelThemeDescription>::iterator iter
+        = m_levelThemeDescriptions.find(themeName);
+    if (iter == m_levelThemeDescriptions.end())
+        return NULL;
+    if (themeName == m_levelThemeList[1])
+        return new LevelThemeImpl(iter->second);
+    if (m_defaultLevelTheme.get() == NULL) {
+        m_defaultLevelTheme.reset(new LevelThemeImpl(m_levelThemeDescriptions[m_levelThemeList[1]]));
+    }
+    return new LevelThemeImpl(iter->second, m_defaultLevelTheme.get());
 }
 
 const std::vector<std::string> & ThemeManagerImpl::getPuyoSetThemeList()
@@ -181,6 +191,7 @@ void ThemeManagerImpl::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     newThemeDescription.author = (const char *)(GSL_GLOBAL_PTR(gsl, "author"));
     // TODO newThemeDescription.description = (const char *)(GSL_GLOBAL_PTR(gsl, "description"));
     newThemeDescription.localizedDescription = themeMgr->m_localeDictionary->getLocalizedString(newThemeDescription.description.c_str(),true);
+    newThemeDescription.path = themeMgr->m_themePackLoadingPath;
 
     newThemeDescription.lives = (const char *) GSL_GLOBAL_PTR(gsl, "level.lives");
     newThemeDescription.background = (const char *) GSL_GLOBAL_PTR(gsl, "level.background");
@@ -202,7 +213,7 @@ void ThemeManagerImpl::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     for (int i = 0 ; i < NUMBER_OF_PUYOBANS_IN_LEVEL ; i++)
         loadPuyobanDefinition(gsl, 0, newThemeDescription.puyoban[i]);
 
-    // TODO themeMgr->m_levelThemeList.push_back(localizedThemeName);
+    themeMgr->m_levelThemeList.push_back(localizedThemeName);
 #ifdef DISABLED
     theme->setPlayerNameFont(loadFontDefinition(gsl, "playerNameFont"));
     theme->setScoreFont(loadFontDefinition(gsl, "scoreFont"));
@@ -465,9 +476,8 @@ IosSurface *NeutralPuyoThemeImpl::getExplodingSurfaceForIndex(int index, int com
 
 
 
-LevelThemeImpl::LevelThemeImpl(const LevelThemeDescription &desc,
-                               const std::string &path)
-    : m_desc(desc), m_path(path)
+LevelThemeImpl::LevelThemeImpl(const LevelThemeDescription &desc, LevelThemeImpl *defaultTheme)
+    : m_desc(desc), m_path(desc.path), m_defaultTheme(defaultTheme)
 {
 }
 
@@ -494,7 +504,7 @@ const std::string & LevelThemeImpl::getComments() const
 IosSurface * LevelThemeImpl::getLifeForIndex(int index) const
 {
     IosSurfaceRef &result = m_lifes[index];
-    if (result.get() == NULL) {
+    if (result.empty()) {
         ostringstream osstream;
         osstream << m_path << "/" << m_desc.lives << "-lives-" << index << ".png";
         result = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str());
@@ -502,24 +512,32 @@ IosSurface * LevelThemeImpl::getLifeForIndex(int index) const
     return result;
 }
 
-IosSurface * LevelThemeImpl::getResource(IosSurfaceRef &ref, const std::string &resName, const char *resSuffix) const
+IosSurfaceRef &LevelThemeImpl::getResource(IosSurfaceRef &ref, const std::string &resName, const char *resSuffix) const
 {
-    if (ref.get() == NULL) {
+    if (ref.empty()) {
         ostringstream osstream;
         osstream << m_path << "/" << resName << resSuffix;
+        cout << "getresource " << osstream.str() << endl;
         ref = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str());
+        if ((ref.empty()) && (m_defaultTheme != NULL)) {
+            ref = m_defaultTheme->getResource(ref, resName, resSuffix);
+        }
     }
     return ref;
 }
 
-IosSurface * LevelThemeImpl::getBackground(void) const
+IosSurface * LevelThemeImpl::getBackground() const
 {
-    return getResource(m_background, m_desc.background, "");
+    IosSurfaceRef &result = getResource(m_background, m_desc.background, "");
+    return result;
 }
 
-IosSurface * LevelThemeImpl::getGrid(void) const
+IosSurface * LevelThemeImpl::getGrid() const
 {
-    return getResource(m_grid, m_desc.grid, "-background-grid.png");
+    if (m_desc.grid == "")
+        return NULL;
+    IosSurfaceRef &result = getResource(m_grid, m_desc.grid, "-background-grid.png");
+    return result;
 }
 
 IosSurface * LevelThemeImpl::getSpeedMeter(bool front) const
@@ -578,28 +596,56 @@ int LevelThemeImpl::getNextPuyosX(int playerId) const
 int LevelThemeImpl::getNextPuyosY(int playerId) const
 { return m_desc.puyoban[playerId].nextY; }
 
-#ifdef DISABLED
-int LevelThemeImpl::getNeutralDisplayX(int playerId) const;
-int LevelThemeImpl::getNeutralDisplayY(int playerId) const;
-int LevelThemeImpl::getNameDisplayX(int playerId) const;
-int LevelThemeImpl::getNameDisplayY(int playerId) const;
-int LevelThemeImpl::getScoreDisplayX(int playerId) const;
-int LevelThemeImpl::getScoreDisplayY(int playerId) const;
-float LevelThemeImpl::getPuyobanScale(int playerId) const;
+int LevelThemeImpl::getNeutralDisplayX(int playerId) const
+{ return m_desc.puyoban[playerId].neutralDisplayX; }
 
-bool LevelThemeImpl::getShouldDisplayNext(int playerId) const;
-bool LevelThemeImpl::getShouldDisplayShadows(int playerId) const;
-bool LevelThemeImpl::getShouldDisplayEyes(int playerId) const;
-bool LevelThemeImpl::getOpponentIsBehind() const;
+int LevelThemeImpl::getNeutralDisplayY(int playerId) const
+{ return m_desc.puyoban[playerId].neutralDisplayY; }
 
-const std::string LevelThemeImpl::getGameLostLeftAnimation2P() const;
-const std::string LevelThemeImpl::getGameLostRightAnimation2P() const;
-const std::string LevelThemeImpl::getCentralAnimation2P() const;
-const std::string LevelThemeImpl::getForegroundAnimation() const;
-const std::string LevelThemeImpl::getReadyAnimation2P() const;
+int LevelThemeImpl::getNameDisplayX(int playerId) const
+{ return m_desc.puyoban[playerId].nameDisplayX; }
 
-const std::string LevelThemeImpl::getThemeRootPath() const;
-#endif
+int LevelThemeImpl::getNameDisplayY(int playerId) const
+{ return m_desc.puyoban[playerId].nameDisplayY; }
+
+int LevelThemeImpl::getScoreDisplayX(int playerId) const
+{ return m_desc.puyoban[playerId].scoreDisplayX; }
+
+int LevelThemeImpl::getScoreDisplayY(int playerId) const
+{ return m_desc.puyoban[playerId].scoreDisplayY; }
+
+float LevelThemeImpl::getPuyobanScale(int playerId) const
+{ return m_desc.puyoban[playerId].scale; }
+
+bool LevelThemeImpl::getShouldDisplayNext(int playerId) const
+{ return m_desc.puyoban[playerId].shouldDisplayNext; }
+
+bool LevelThemeImpl::getShouldDisplayShadows(int playerId) const
+{ return m_desc.puyoban[playerId].shouldDisplayShadow; }
+
+bool LevelThemeImpl::getShouldDisplayEyes(int playerId) const
+{ return m_desc.puyoban[playerId].shouldDisplayEyes; }
+
+bool LevelThemeImpl::getOpponentIsBehind() const
+{ return false; }
+
+const std::string LevelThemeImpl::getGameLostLeftAnimation2P() const
+{ return m_desc.gameLostLeft2PAnimation; }
+
+const std::string LevelThemeImpl::getGameLostRightAnimation2P() const
+{ return m_desc.gameLostRight2PAnimation; }
+
+const std::string LevelThemeImpl::getCentralAnimation2P() const
+{ return m_desc.animation; }
+
+const std::string LevelThemeImpl::getForegroundAnimation() const
+{ return m_desc.fgAnimation; }
+
+const std::string LevelThemeImpl::getReadyAnimation2P() const
+{ return m_desc.getReadyAnimation; }
+
+const std::string LevelThemeImpl::getThemeRootPath() const
+{ return m_path; }
 
 #ifdef DISABLED
 

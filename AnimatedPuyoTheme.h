@@ -99,39 +99,6 @@ public:
     PuyobanThemeDefinition puyoban[NUMBER_OF_PUYOBANS_IN_LEVEL];
 };
 
-class ThemeManagerImpl : public ThemeManager {
-public:
-    ThemeManagerImpl(DataPathManager &dataPathManager);
-    virtual PuyoSetTheme * createPuyoSetTheme(const std::string &themeName);
-    virtual LevelTheme   * createLevelTheme(const std::string &themeName);
-
-    virtual const std::vector<std::string> & getPuyoSetThemeList();
-    virtual const std::vector<std::string> & getLevelThemeList();
-private:
-    void loadThemePack(const std::string &path);
-    static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local);
-    static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local);
-    static void end_description(GoomSL *gsl, GoomHash *global, GoomHash *local);
-    static void loadPuyobanDefinition(GoomSL *gsl, int playerId, PuyobanThemeDefinition &puyoban);
-
-    static const char * s_themeFolderExtension;
-
-    static const char *s_key_PuyoFace[NUMBER_OF_PUYOS_IN_SET];
-    static const char *s_key_PuyoDisappear[NUMBER_OF_PUYOS_IN_SET];
-    static const char *s_key_PuyoExplosion[NUMBER_OF_PUYOS_IN_SET];
-    static const char *s_key_PuyoEye[NUMBER_OF_PUYOS_IN_SET];
-    static const char *s_key_PuyoColorOffset[NUMBER_OF_PUYOS_IN_SET];
-
-    DataPathManager &m_dataPathManager;
-    std::string m_themePackLoadingPath;
-
-    std::vector<std::string> m_puyoSetThemeList;
-    std::vector<std::string> m_levelThemeList;
-    std::map<std::string, PuyoSetThemeDescription> m_puyoSetThemeDescriptions;
-    std::map<std::string, LevelThemeDescription> m_levelThemeDescriptions;
-    std::auto_ptr<LocalizedDictionary> m_localeDictionary;
-};
-
 class PuyoThemeImpl : public PuyoTheme {
 public:
     PuyoThemeImpl(const PuyoThemeDescription &desc, const std::string &path);
@@ -189,15 +156,14 @@ private:
 
 class LevelThemeImpl : public LevelTheme {
 public:
-    LevelThemeImpl(const LevelThemeDescription &desc,
-                   const std::string &path);
+    LevelThemeImpl(const LevelThemeDescription &desc, LevelThemeImpl *defaultTheme = NULL);
     virtual const std::string & getName() const;
     virtual const std::string & getLocalizedName() const;
     virtual const std::string & getAuthor() const;
     virtual const std::string & getComments() const;
     virtual IosSurface * getLifeForIndex(int index) const;
-    virtual IosSurface * getBackground(void) const;
-    virtual IosSurface * getGrid(void) const;
+    virtual IosSurface * getBackground() const;
+    virtual IosSurface * getGrid() const;
     virtual IosSurface * getSpeedMeter(bool front) const;
     virtual IosSurface * getNeutralIndicator() const;
     virtual IosSurface * getBigNeutralIndicator() const;
@@ -235,7 +201,7 @@ public:
     // Misc
     virtual const std::string getThemeRootPath() const;
 private:
-    inline IosSurface * getResource(IosSurfaceRef &ref,
+    inline IosSurfaceRef & getResource(IosSurfaceRef &ref,
                                     const std::string &resName,
                                     const char *resSuffix) const;
     const LevelThemeDescription &m_desc;
@@ -245,6 +211,43 @@ private:
     mutable IosSurfaceRef m_grid;
     mutable IosSurfaceRef m_speedMeterFront, m_speedMeterBack;
     mutable IosSurfaceRef m_neutralIndicator, m_bigNeutralIndicator, m_giantNeutralIndicator;
+
+    LevelThemeImpl *m_defaultTheme;
+};
+
+class ThemeManagerImpl : public ThemeManager {
+public:
+    ThemeManagerImpl(DataPathManager &dataPathManager);
+    virtual PuyoSetTheme * createPuyoSetTheme(const std::string &themeName);
+    virtual LevelTheme   * createLevelTheme(const std::string &themeName);
+
+    virtual const std::vector<std::string> & getPuyoSetThemeList();
+    virtual const std::vector<std::string> & getLevelThemeList();
+private:
+    void loadThemePack(const std::string &path);
+    static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local);
+    static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local);
+    static void end_description(GoomSL *gsl, GoomHash *global, GoomHash *local);
+    static void loadPuyobanDefinition(GoomSL *gsl, int playerId, PuyobanThemeDefinition &puyoban);
+
+    static const char * s_themeFolderExtension;
+
+    static const char *s_key_PuyoFace[NUMBER_OF_PUYOS_IN_SET];
+    static const char *s_key_PuyoDisappear[NUMBER_OF_PUYOS_IN_SET];
+    static const char *s_key_PuyoExplosion[NUMBER_OF_PUYOS_IN_SET];
+    static const char *s_key_PuyoEye[NUMBER_OF_PUYOS_IN_SET];
+    static const char *s_key_PuyoColorOffset[NUMBER_OF_PUYOS_IN_SET];
+
+    DataPathManager &m_dataPathManager;
+    std::string m_themePackLoadingPath;
+
+    std::vector<std::string> m_puyoSetThemeList;
+    std::vector<std::string> m_levelThemeList;
+    std::map<std::string, PuyoSetThemeDescription> m_puyoSetThemeDescriptions;
+    std::map<std::string, LevelThemeDescription> m_levelThemeDescriptions;
+    std::auto_ptr<LocalizedDictionary> m_localeDictionary;
+
+    std::auto_ptr<LevelThemeImpl> m_defaultLevelTheme;
 };
 
 #ifdef DISABLED
