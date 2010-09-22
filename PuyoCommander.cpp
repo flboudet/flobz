@@ -399,7 +399,8 @@ PuyoSetThemeRef PuyoCommander::getDefaultPuyoSetTheme()
 
 const std::string &PuyoCommander::getDefaultPuyoSetThemeName() const
 {
-    return "";
+    // TODO: real implementation
+    return m_themeManager->getPuyoSetThemeList()[0];
 }
 
 const std::vector<std::string> &PuyoCommander::getPuyoSetThemeList() const
@@ -419,7 +420,8 @@ LevelThemeRef PuyoCommander::getDefaultLevelTheme()
 
 const std::string &PuyoCommander::getDefaultLevelThemeName() const
 {
-    return "";
+    // TODO: real implementation
+    return m_themeManager->getLevelThemeList()[0];
 }
 
 const std::vector<std::string> &PuyoCommander::getLevelThemeList() const

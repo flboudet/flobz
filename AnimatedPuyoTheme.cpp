@@ -73,7 +73,8 @@ const char * ThemeManagerImpl::s_key_PuyoColorOffset[NUMBER_OF_PUYOS_IN_SET] = {
 };
 
 ThemeManagerImpl::ThemeManagerImpl(DataPathManager &dataPathManager)
-    : m_dataPathManager(dataPathManager)
+    : m_dataPathManager(dataPathManager),
+      m_defaultLevelThemeName("Basic level")
 {
     // List the themes in the various pack folders
     SelfVector<String> themeFolders = dataPathManager.getEntriesAtPath("theme");
@@ -104,12 +105,12 @@ LevelTheme   * ThemeManagerImpl::createLevelTheme(const std::string &themeName)
         = m_levelThemeDescriptions.find(themeName);
     if (iter == m_levelThemeDescriptions.end())
         return NULL;
-    if (themeName == m_levelThemeList[1])
-        return new LevelThemeImpl(iter->second);
+    if (themeName == m_defaultLevelThemeName)
+        return new LevelThemeImpl(iter->second, m_dataPathManager);
     if (m_defaultLevelTheme.get() == NULL) {
-        m_defaultLevelTheme.reset(new LevelThemeImpl(m_levelThemeDescriptions[m_levelThemeList[1]]));
+        m_defaultLevelTheme.reset(new LevelThemeImpl(m_levelThemeDescriptions[m_defaultLevelThemeName], m_dataPathManager));
     }
-    return new LevelThemeImpl(iter->second, m_defaultLevelTheme.get());
+    return new LevelThemeImpl(iter->second, m_dataPathManager, m_defaultLevelTheme.get());
 }
 
 const std::vector<std::string> & ThemeManagerImpl::getPuyoSetThemeList()
@@ -161,11 +162,11 @@ void ThemeManagerImpl::end_puyoset(GoomSL *gsl, GoomHash *global,
     ThemeManagerImpl *themeMgr = (ThemeManagerImpl *)GSL_GET_USERDATA_PTR(gsl);
 	const char * themeName  = (const char *) GSL_GLOBAL_PTR(gsl, "puyoset.name");
 	const char * localizedThemeName = themeMgr->m_localeDictionary->getLocalizedString(themeName,true);
-    PuyoSetThemeDescription &newThemeDescription = themeMgr->m_puyoSetThemeDescriptions[localizedThemeName];
+    PuyoSetThemeDescription &newThemeDescription = themeMgr->m_puyoSetThemeDescriptions[themeName];
     newThemeDescription.name = themeName;
     newThemeDescription.localizedName = localizedThemeName;
     newThemeDescription.author = (const char *)(GSL_GLOBAL_PTR(gsl, "author"));
-    //newThemeDescription.description = (const char *)(GSL_GLOBAL_PTR(gsl, "description"));
+    newThemeDescription.description = (const char *)(GSL_GLOBAL_PTR(gsl, "puyoset.description"));
     newThemeDescription.localizedDescription = themeMgr->m_localeDictionary->getLocalizedString(newThemeDescription.description.c_str(),true);
     newThemeDescription.path = themeMgr->m_themePackLoadingPath;
     for (int i = 0 ; i < NUMBER_OF_PUYOS_IN_SET ; i++) {
@@ -177,7 +178,7 @@ void ThemeManagerImpl::end_puyoset(GoomSL *gsl, GoomHash *global,
         currentPuyoThemeDescription.eye =       (const char *)GSL_GLOBAL_PTR(gsl, s_key_PuyoEye[i]);
         currentPuyoThemeDescription.colorOffset = GSL_GLOBAL_FLOAT(gsl, s_key_PuyoColorOffset[i]);
     }
-    themeMgr->m_puyoSetThemeList.push_back(localizedThemeName);
+    themeMgr->m_puyoSetThemeList.push_back(themeName);
 }
 
 void ThemeManagerImpl::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
@@ -185,11 +186,11 @@ void ThemeManagerImpl::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     ThemeManagerImpl *themeMgr = (ThemeManagerImpl *)GSL_GET_USERDATA_PTR(gsl);
     const char * themeName  = (const char *) GSL_GLOBAL_PTR(gsl, "level.name");
     const char * localizedThemeName = themeMgr->m_localeDictionary->getLocalizedString(themeName,true);
-    LevelThemeDescription &newThemeDescription = themeMgr->m_levelThemeDescriptions[localizedThemeName];
+    LevelThemeDescription &newThemeDescription = themeMgr->m_levelThemeDescriptions[themeName];
     newThemeDescription.name = themeName;
     newThemeDescription.localizedName = localizedThemeName;
     newThemeDescription.author = (const char *)(GSL_GLOBAL_PTR(gsl, "author"));
-    // TODO newThemeDescription.description = (const char *)(GSL_GLOBAL_PTR(gsl, "description"));
+    newThemeDescription.description = (const char *)(GSL_GLOBAL_PTR(gsl, "level.description"));
     newThemeDescription.localizedDescription = themeMgr->m_localeDictionary->getLocalizedString(newThemeDescription.description.c_str(),true);
     newThemeDescription.path = themeMgr->m_themePackLoadingPath;
 
@@ -210,14 +211,13 @@ void ThemeManagerImpl::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     newThemeDescription.lifeDisplayX = GSL_GLOBAL_INT(gsl, "level.life_display.x");
     newThemeDescription.lifeDisplayY = GSL_GLOBAL_INT(gsl, "level.life_display.y");
 
+    loadFontDefinition(gsl, "playerNameFont", newThemeDescription.playerNameFont);
+    loadFontDefinition(gsl, "scoreFont", newThemeDescription.scoreFont);
+
     for (int i = 0 ; i < NUMBER_OF_PUYOBANS_IN_LEVEL ; i++)
         loadPuyobanDefinition(gsl, 0, newThemeDescription.puyoban[i]);
 
-    themeMgr->m_levelThemeList.push_back(localizedThemeName);
-#ifdef DISABLED
-    theme->setPlayerNameFont(loadFontDefinition(gsl, "playerNameFont"));
-    theme->setScoreFont(loadFontDefinition(gsl, "scoreFont"));
-#endif
+    themeMgr->m_levelThemeList.push_back(themeName);
 }
 
 void ThemeManagerImpl::end_description(GoomSL *gsl, GoomHash *global, GoomHash *local)
@@ -244,11 +244,16 @@ void ThemeManagerImpl::loadPuyobanDefinition(GoomSL *gsl, int playerId, PuyobanT
     puyoban.scale = GSL_GLOBAL_FLOAT(gsl, variablePrefix + ".scale");
 }
 
-
-
-
-
-
+void ThemeManagerImpl::loadFontDefinition(GoomSL *gsl, const char *fontName, FontDefinition &font)
+{
+    ostringstream fontPathVar, fontSizeVar, fontFxVar;
+    fontPathVar << "level." << fontName << ".path";
+    fontSizeVar << "level." << fontName << ".size";
+    fontFxVar << "level." << fontName << ".fx";
+    font.fontPath = (const char *) GSL_GLOBAL_PTR(gsl, fontPathVar.str().c_str());
+    font.fontSize     = GSL_GLOBAL_INT(gsl, fontSizeVar.str().c_str());
+    font.fontFx = (IosFontFx)(GSL_GLOBAL_INT(gsl, fontFxVar.str().c_str()));
+}
 
 PuyoSetThemeImpl::PuyoSetThemeImpl(const PuyoSetThemeDescription &desc)
     : m_desc(desc)
@@ -476,8 +481,10 @@ IosSurface *NeutralPuyoThemeImpl::getExplodingSurfaceForIndex(int index, int com
 
 
 
-LevelThemeImpl::LevelThemeImpl(const LevelThemeDescription &desc, LevelThemeImpl *defaultTheme)
-    : m_desc(desc), m_path(desc.path), m_defaultTheme(defaultTheme)
+LevelThemeImpl::LevelThemeImpl(const LevelThemeDescription &desc,
+                               DataPathManager &dataPathManager,
+                               LevelThemeImpl *defaultTheme)
+    : m_desc(desc), m_path(desc.path), m_dataPathManager(dataPathManager), m_defaultTheme(defaultTheme)
 {
 }
 
@@ -508,6 +515,9 @@ IosSurface * LevelThemeImpl::getLifeForIndex(int index) const
         ostringstream osstream;
         osstream << m_path << "/" << m_desc.lives << "-lives-" << index << ".png";
         result = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str());
+        if ((result.empty()) && (m_defaultTheme != NULL)) {
+            return m_defaultTheme->getLifeForIndex(index);
+        }
     }
     return result;
 }
@@ -564,12 +574,26 @@ IosSurface * LevelThemeImpl::getGiantNeutralIndicator() const
 
 IosFont *LevelThemeImpl::getPlayerNameFont() const
 {
-    return NULL;
+    if (m_playerNameFont.empty()) {
+        string fontPath = m_desc.playerNameFont.fontPath;
+        if (fontPath == "__FONT__") {
+            fontPath = theCommander->getLocalizedFontName();
+        }
+        m_playerNameFont = theCommander->getFont(fontPath.c_str(), m_desc.playerNameFont.fontSize, m_desc.playerNameFont.fontFx);
+    }
+    return m_playerNameFont;
 }
 
 IosFont *LevelThemeImpl::getScoreFont() const
 {
-    return NULL;
+    if (m_scoreFont.empty()) {
+        string fontPath = m_desc.scoreFont.fontPath;
+        if (fontPath == "__FONT__") {
+            fontPath = theCommander->getLocalizedFontName();
+        }
+        m_scoreFont = theCommander->getFont(fontPath.c_str(), m_desc.scoreFont.fontSize, m_desc.scoreFont.fontFx);
+    }
+    return m_scoreFont;
 }
 
 int LevelThemeImpl::getSpeedMeterX() const
@@ -630,19 +654,35 @@ bool LevelThemeImpl::getOpponentIsBehind() const
 { return false; }
 
 const std::string LevelThemeImpl::getGameLostLeftAnimation2P() const
-{ return m_desc.gameLostLeft2PAnimation; }
+{
+    std::string animPath = m_path + "/" + m_desc.gameLostLeft2PAnimation;
+    return std::string(m_dataPathManager.getPath(animPath.c_str()));
+}
 
 const std::string LevelThemeImpl::getGameLostRightAnimation2P() const
-{ return m_desc.gameLostRight2PAnimation; }
+{
+    std::string animPath = m_path + "/" + m_desc.gameLostRight2PAnimation;
+    return std::string(m_dataPathManager.getPath(animPath.c_str()));
+}
 
 const std::string LevelThemeImpl::getCentralAnimation2P() const
-{ return m_desc.animation; }
+{
+    std::string animPath = m_path + "/" + m_desc.animation;
+    return std::string(m_dataPathManager.getPath(animPath.c_str()));
+}
 
 const std::string LevelThemeImpl::getForegroundAnimation() const
-{ return m_desc.fgAnimation; }
+{
+    std::string animPath = m_path + "/" + m_desc.fgAnimation;
+    return std::string(m_dataPathManager.getPath(animPath.c_str()));
+}
 
 const std::string LevelThemeImpl::getReadyAnimation2P() const
-{ return m_desc.getReadyAnimation; }
+{
+    return m_desc.getReadyAnimation;
+    //std::string animPath = m_path + "/" + m_desc.getReadyAnimation;
+    //return std::string(m_dataPathManager.getPath(animPath.c_str()));
+}
 
 const std::string LevelThemeImpl::getThemeRootPath() const
 { return m_path; }

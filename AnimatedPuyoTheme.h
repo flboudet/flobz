@@ -74,6 +74,13 @@ public:
     float scale;
 };
 
+class FontDefinition {
+public:
+    std::string fontPath;
+    int fontSize;
+    IosFontFx fontFx;
+};
+
 class LevelThemeDescription {
 public:
     std::string name;
@@ -97,6 +104,7 @@ public:
     int lifeDisplayX, lifeDisplayY;
 
     PuyobanThemeDefinition puyoban[NUMBER_OF_PUYOBANS_IN_LEVEL];
+    FontDefinition playerNameFont, scoreFont;
 };
 
 class PuyoThemeImpl : public PuyoTheme {
@@ -156,7 +164,9 @@ private:
 
 class LevelThemeImpl : public LevelTheme {
 public:
-    LevelThemeImpl(const LevelThemeDescription &desc, LevelThemeImpl *defaultTheme = NULL);
+    LevelThemeImpl(const LevelThemeDescription &desc,
+                   DataPathManager &dataPathManager,
+                   LevelThemeImpl *defaultTheme = NULL);
     virtual const std::string & getName() const;
     virtual const std::string & getLocalizedName() const;
     virtual const std::string & getAuthor() const;
@@ -206,13 +216,14 @@ private:
                                     const char *resSuffix) const;
     const LevelThemeDescription &m_desc;
     const std::string &m_path;
+    DataPathManager &m_dataPathManager;
+    LevelThemeImpl *m_defaultTheme;
     mutable IosSurfaceRef m_lifes[NUMBER_OF_LIVES];
     mutable IosSurfaceRef m_background;
     mutable IosSurfaceRef m_grid;
     mutable IosSurfaceRef m_speedMeterFront, m_speedMeterBack;
     mutable IosSurfaceRef m_neutralIndicator, m_bigNeutralIndicator, m_giantNeutralIndicator;
-
-    LevelThemeImpl *m_defaultTheme;
+    mutable IosFontRef    m_playerNameFont, m_scoreFont;
 };
 
 class ThemeManagerImpl : public ThemeManager {
@@ -229,6 +240,7 @@ private:
     static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void end_description(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void loadPuyobanDefinition(GoomSL *gsl, int playerId, PuyobanThemeDefinition &puyoban);
+    static void loadFontDefinition(GoomSL *gsl, const char * fontName, FontDefinition &font);
 
     static const char * s_themeFolderExtension;
 
@@ -247,6 +259,7 @@ private:
     std::map<std::string, LevelThemeDescription> m_levelThemeDescriptions;
     std::auto_ptr<LocalizedDictionary> m_localeDictionary;
 
+    std::string m_defaultLevelThemeName;
     std::auto_ptr<LevelThemeImpl> m_defaultLevelTheme;
 };
 
