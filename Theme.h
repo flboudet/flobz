@@ -41,14 +41,11 @@
 
 #define NUMBER_OF_PUYOS 5
 
-typedef enum {
-    PUYO_FACES = 0,
-    PUYO_CIRCLES = 1,
-    PUYO_EXPLOSIONS = 2,
-    PUYO_DISAPPEAR = 3,
-    PUYO_EYES = 4,
-    PUYO_SHADOWS = 5
-} PuyoPictureType;
+#define NUMBER_OF_PUYOS_IN_SET 6
+#define NUMBER_OF_PUYOBANS_IN_LEVEL 2
+
+#define NUMBER_OF_LIVES 4
+#define MAX_COMPRESSED 32
 
 /**
  * The ThemeDescriptionInterface provides informations
@@ -72,8 +69,12 @@ public:
     virtual IosSurface *getEyeSurfaceForIndex(int index, int compression = 0) const = 0;
     virtual IosSurface *getCircleSurfaceForIndex(int index, int compression = 0) const = 0;
     virtual IosSurface *getShadowSurface(int compression = 0) const = 0;
-    virtual IosSurface *getShrinkingSurfaceForIndex(int index, int compression = 0) const = 0;
-    virtual IosSurface *getExplodingSurfaceForIndex(int index, int compression = 0) const = 0;
+    virtual IosSurface *getShrinkingSurfaceForIndex(int index) const = 0;
+    virtual IosSurface *getExplodingSurfaceForIndex(int index) const = 0;
+protected:
+    PuyoTheme() {}
+private:
+    PuyoTheme(const PuyoTheme &theme) {}
 };
 
 /**

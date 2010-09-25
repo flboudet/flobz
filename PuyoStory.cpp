@@ -72,9 +72,28 @@ StyroImage::StyroImage(StyrolyseClient *_this,
         const PuyoSetTheme *attachedTheme = ((StoryWidget::PuyoStoryStyrolyseClient *)_this)->attachedTheme;
         if ((attachedTheme != NULL)
             && (extract_state_and_type(path,&state,&type)==0)) {
-#ifdef TODO
-            surface =  attachedTheme->getPuyoTheme((PuyoState)state).getSurface((PuyoPictureType)state, 0);
-#endif
+            const PuyoTheme &theme = attachedTheme->getPuyoTheme((PuyoState)state);
+            switch (type) {
+            case 0: // PUYO_FACES
+                surface = theme.getPuyoSurfaceForValence(0);
+                break;
+            case 1: // PUYO_CIRCLES
+                surface = theme.getCircleSurfaceForIndex(0);
+                break;
+            case 2: // PUYO_EXPLOSIONS
+                surface = theme.getExplodingSurfaceForIndex(0);
+                break;
+            case 3: //PUYO_DISAPPEAR
+                surface = theme.getShrinkingSurfaceForIndex(0);
+                break;
+            case 4: //PUYO_EYES
+                surface = theme.getEyeSurfaceForIndex(0);
+                break;
+            case 5: //PUYO_SHADOWS
+            default:
+                surface = theme.getShadowSurface();
+                break;
+            }
         }
     }
     else {
