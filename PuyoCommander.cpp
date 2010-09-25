@@ -399,8 +399,18 @@ PuyoSetThemeRef PuyoCommander::getDefaultPuyoSetTheme()
 
 const std::string &PuyoCommander::getDefaultPuyoSetThemeName() const
 {
-    // TODO: real implementation
-    return m_themeManager->getPuyoSetThemeList()[0];
+    if (m_defaultPuyoSetThemeName == "") {
+        char out[256];
+        GetStrPreference ("puyoset_theme", out, m_themeManager->getPuyoSetThemeList()[0].c_str());
+        m_defaultPuyoSetThemeName = out;
+    }
+    return m_defaultPuyoSetThemeName;
+}
+
+void PuyoCommander::setDefaultPuyoSetThemeName(const char *name)
+{
+    m_defaultPuyoSetThemeName = name;
+    SetStrPreference ("puyoset_theme", name);
 }
 
 const std::vector<std::string> &PuyoCommander::getPuyoSetThemeList() const
@@ -420,8 +430,18 @@ LevelThemeRef PuyoCommander::getDefaultLevelTheme()
 
 const std::string &PuyoCommander::getDefaultLevelThemeName() const
 {
-    // TODO: real implementation
-    return m_themeManager->getLevelThemeList()[0];
+    if (m_defaultLevelThemeName == "") {
+        char out[256];
+        GetStrPreference ("level_theme", out, m_themeManager->getLevelThemeList()[0].c_str());
+        m_defaultLevelThemeName = out;
+    }
+    return m_defaultLevelThemeName;
+}
+
+void PuyoCommander::setDefaultLevelThemeName(const char *name)
+{
+    m_defaultLevelThemeName = name;
+    SetStrPreference ("level_theme", name);
 }
 
 const std::vector<std::string> &PuyoCommander::getLevelThemeList() const

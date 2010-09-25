@@ -212,11 +212,13 @@ class PuyoCommander
     PuyoSetThemeRef getPuyoSetTheme(const char *name);
     PuyoSetThemeRef getDefaultPuyoSetTheme();
     const std::string &getDefaultPuyoSetThemeName() const;
+    void setDefaultPuyoSetThemeName(const char *name);
     const std::vector<std::string> &getPuyoSetThemeList() const;
 
     LevelThemeRef getLevelTheme(const char *name);
     LevelThemeRef getDefaultLevelTheme();
     const std::string &getDefaultLevelThemeName() const;
+    void setDefaultLevelThemeName(const char *name);
     const std::vector<std::string> &getLevelThemeList() const;
 
     void freeUnusedResources();
@@ -321,6 +323,9 @@ protected:
 
     AbstractCursor *m_cursor;
 	PuyoApplicationState m_appState;
+
+    mutable std::string m_defaultPuyoSetThemeName;
+    mutable std::string m_defaultLevelThemeName;
 };
 
 extern class PuyoCommander *theCommander;

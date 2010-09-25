@@ -55,7 +55,7 @@ void PuyoThemeSelectionBox::build()
     themePreview.build();
     const std::vector<std::string> &themes = theCommander->getPuyoSetThemeList();
     int size = themes.size();
-    std::string preferedTheme = themes[0]; // TODO: get from prefs
+    std::string preferedTheme = theCommander->getDefaultPuyoSetThemeName();
     // Select the prefered theme
     bool found = false;
     for (std::vector<std::string>::const_iterator iter = themes.begin() ;
@@ -65,7 +65,7 @@ void PuyoThemeSelectionBox::build()
     }
     if (!found) {
         themePreview.themeSelected(themes[0]);
-        // TODO: set in prefs
+        theCommander->setDefaultPuyoSetThemeName(themes[0].c_str());
     }
     add(&Spacer0);
     prevButton->setFocusable(size > 1);
@@ -84,30 +84,28 @@ void PuyoThemeSelectionBox::build()
 
 void PuyoThemeSelectionBox::action(Widget *sender, int actionType, GameControlEvent *event)
 {
-#ifdef DISABLED
     if (!event->isUp) return;
-    AdvancedBuffer<const char *> * themes = getPuyoThemeManger()->getAnimatedPuyoSetThemeList();
-    String pref = getPuyoThemeManger()->getPreferedAnimatedPuyoSetThemeName();
-    int size = themes->size();
+    const std::vector<std::string> &themes = theCommander->getPuyoSetThemeList();
+    std::string pref = theCommander->getDefaultPuyoSetThemeName();
+    int size = themes.size();
     if (size <= 0) return;
 
     int currentTheme;
     // get the selected theme id or zero if the prefered theme if not there
     for (currentTheme = size-1; currentTheme > 0; --currentTheme)
     {
-        if (pref == (*themes)[currentTheme]) break;
+        if (pref == themes[currentTheme]) break;
     }
     if (sender == prevButton) {
         (currentTheme <= 0) ? currentTheme = size - 1 : currentTheme--;
-        themePreview.themeSelected((*themes)[currentTheme]);
-        getPuyoThemeManger()->setPreferedAnimatedPuyoSetTheme((*themes)[currentTheme]);
+        themePreview.themeSelected(themes[currentTheme]);
+        theCommander->setDefaultPuyoSetThemeName(themes[currentTheme].c_str());
     }
     else if (sender == nextButton) {
         currentTheme = (currentTheme+1)%size;
-        themePreview.themeSelected((*themes)[currentTheme]);
-        getPuyoThemeManger()->setPreferedAnimatedPuyoSetTheme((*themes)[currentTheme]);
+        themePreview.themeSelected(themes[currentTheme]);
+        theCommander->setDefaultPuyoSetThemeName(themes[currentTheme].c_str());
     }
-#endif
 }
 
 

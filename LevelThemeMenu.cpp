@@ -108,12 +108,12 @@ void LevelThemeSelectionBox::action(Widget *sender, int actionType, GameControlE
     if (sender == prevButton) {
         (currentTheme <= 0) ? currentTheme = size - 1 : currentTheme--;
         themePreview.setSelectedTheme(themes[currentTheme]);
-        //getPuyoThemeManger()->setPreferedPuyoLevelTheme((*themes)[currentTheme]);
+        theCommander->setDefaultLevelThemeName(themes[currentTheme].c_str());
     }
     else if (sender == nextButton) {
         currentTheme = (currentTheme+1)%size;
         themePreview.setSelectedTheme(themes[currentTheme]);
-        //getPuyoThemeManger()->setPreferedPuyoLevelTheme((*themes)[currentTheme]);
+        theCommander->setDefaultLevelThemeName(themes[currentTheme].c_str());
     }
 }
 
