@@ -74,6 +74,7 @@ const char * ThemeManagerImpl::s_key_PuyoColorOffset[NUMBER_OF_PUYOS_IN_SET] = {
 
 ThemeManagerImpl::ThemeManagerImpl(DataPathManager &dataPathManager)
     : m_dataPathManager(dataPathManager),
+      m_defaultPuyoSetThemeName("Classic"),
       m_defaultLevelThemeName("Basic level")
 {
     // List the themes in the various pack folders
@@ -95,7 +96,12 @@ PuyoSetTheme * ThemeManagerImpl::createPuyoSetTheme(const std::string &themeName
         = m_puyoSetThemeDescriptions.find(themeName);
     if (iter == m_puyoSetThemeDescriptions.end())
         return NULL;
-    return new PuyoSetThemeImpl(iter->second);
+    if (themeName == m_defaultPuyoSetThemeName)
+        return new PuyoSetThemeImpl(iter->second);
+    if (m_defaultPuyoSetTheme.get() == NULL) {
+        m_defaultPuyoSetTheme.reset(new PuyoSetThemeImpl(m_puyoSetThemeDescriptions[m_defaultPuyoSetThemeName]));
+    }
+    return new PuyoSetThemeImpl(iter->second, m_defaultPuyoSetTheme.get());
 }
 
 LevelTheme   * ThemeManagerImpl::createLevelTheme(const std::string &themeName)
@@ -255,14 +261,22 @@ void ThemeManagerImpl::loadFontDefinition(GoomSL *gsl, const char *fontName, Fon
     font.fontFx = (IosFontFx)(GSL_GLOBAL_INT(gsl, fontFxVar.str().c_str()));
 }
 
-PuyoSetThemeImpl::PuyoSetThemeImpl(const PuyoSetThemeDescription &desc)
-    : m_desc(desc)
+PuyoSetThemeImpl::PuyoSetThemeImpl(const PuyoSetThemeDescription &desc,
+                                   PuyoSetTheme *defaultTheme)
+    : m_desc(desc), m_defaultTheme(defaultTheme)
 {
     for (int i = 0 ; i < NUMBER_OF_PUYOS_IN_SET-1 ; i++) {
-        m_puyoThemes[i].reset(new PuyoThemeImpl(desc.puyoThemeDescriptions[i], desc.path));
+        if (m_defaultTheme == NULL)
+            m_puyoThemes[i].reset(new PuyoThemeImpl(desc.puyoThemeDescriptions[i], desc.path));
+        else {
+            m_puyoThemes[i].reset(new PuyoThemeImpl(desc.puyoThemeDescriptions[i], desc.path, &(m_defaultTheme->getPuyoTheme((PuyoState)i))));
+        }
     }
     // Neutral puyo is a special case
-    m_puyoThemes[NUMBER_OF_PUYOS_IN_SET-1].reset(new NeutralPuyoThemeImpl(desc.puyoThemeDescriptions[NUMBER_OF_PUYOS_IN_SET-1], desc.path));
+    if (m_defaultTheme == NULL)
+        m_puyoThemes[NUMBER_OF_PUYOS_IN_SET-1].reset(new NeutralPuyoThemeImpl(desc.puyoThemeDescriptions[NUMBER_OF_PUYOS_IN_SET-1], desc.path));
+    else
+        m_puyoThemes[NUMBER_OF_PUYOS_IN_SET-1].reset(new NeutralPuyoThemeImpl(desc.puyoThemeDescriptions[NUMBER_OF_PUYOS_IN_SET-1], desc.path, &(m_defaultTheme->getPuyoTheme(PUYO_NEUTRAL))));
 }
 
 const std::string & PuyoSetThemeImpl::getName() const
@@ -309,12 +323,16 @@ const PuyoTheme & PuyoSetThemeImpl::getPuyoTheme(PuyoState state) const
 }
 
 
-BasePuyoThemeImpl::BasePuyoThemeImpl(const PuyoThemeDescription &desc, const std::string &path)
-    : m_desc(desc), m_path(path)
+BasePuyoThemeImpl::BasePuyoThemeImpl(const PuyoThemeDescription &desc,
+                                     const std::string &path,
+                                     const PuyoTheme *defaultTheme)
+    : m_desc(desc), m_path(path), m_defaultTheme(defaultTheme)
 {}
 
-PuyoThemeImpl::PuyoThemeImpl(const PuyoThemeDescription &desc, const std::string &path)
-    : BasePuyoThemeImpl(desc, path)
+PuyoThemeImpl::PuyoThemeImpl(const PuyoThemeDescription &desc,
+                             const std::string &path,
+                             const PuyoTheme *defaultTheme)
+    : BasePuyoThemeImpl(desc, path, defaultTheme)
 {
     // Initializing the arrays of pointers
     for (int i = 0 ; i < NUMBER_OF_PUYO_FACES ; i++)
@@ -353,10 +371,14 @@ IosSurface *PuyoThemeImpl::getPuyoSurfaceForValence(int valence, int compression
             }
         }
         // Create the compressed image
-        if (compression != 0)
-            ref = uncompressed->resizeAlpha(uncompressed->w,
-                                            uncompressed->h - compression);
+        if (uncompressed != NULL) {
+            if (compression != 0)
+                ref = uncompressed->resizeAlpha(uncompressed->w,
+                                                uncompressed->h - compression);
+        }
     }
+    if ((ref == NULL) && (m_defaultTheme != NULL))
+        return m_defaultTheme->getPuyoSurfaceForValence(valence, compression);
     return ref;
 }
 
@@ -372,11 +394,15 @@ IosSurface *PuyoThemeImpl::getEyeSurfaceForIndex(int index, int compression) con
             m_baseEyes[index] = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), IMAGE_READ);
             uncompressed = m_baseEyes[index];
         }
-        // Create the compressed image
-        if (compression != 0)
-            ref = uncompressed->resizeAlpha(uncompressed->w,
-                                            uncompressed->h - compression);
+        if (uncompressed != NULL) {
+            // Create the compressed image
+            if (compression != 0)
+                ref = uncompressed->resizeAlpha(uncompressed->w,
+                                                uncompressed->h - compression);
+        }
     }
+    if ((ref == NULL) && (m_defaultTheme != NULL))
+        return m_defaultTheme->getEyeSurfaceForIndex(index, compression);
     return ref;
 }
 
@@ -396,10 +422,14 @@ IosSurface *PuyoThemeImpl::getCircleSurfaceForIndex(int index, int compression) 
             uncompressed = m_baseCircle.get()->setValue(sin(3.14f/2.0f+index*3.14f/64.0f)*0.6f+0.2f);
         }
         // Create the compressed image
-        if (compression != 0)
-            ref = uncompressed->resizeAlpha(uncompressed->w,
-                                            uncompressed->h - compression);
+        if (uncompressed != NULL) {
+            if (compression != 0)
+                ref = uncompressed->resizeAlpha(uncompressed->w,
+                                                uncompressed->h - compression);
+        }
     }
+    if ((ref == NULL) && (m_defaultTheme != NULL))
+        return m_defaultTheme->getCircleSurfaceForIndex(index, compression);
     return ref;
 }
 
@@ -416,10 +446,14 @@ IosSurface *PuyoThemeImpl::getShadowSurface(int compression) const
             uncompressed = m_baseShadow;
         }
         // Create the compressed image
-        if (compression != 0)
-            ref = uncompressed->resizeAlpha(uncompressed->w,
-                                            uncompressed->h - compression);
+        if (uncompressed != NULL) {
+            if (compression != 0)
+                ref = uncompressed->resizeAlpha(uncompressed->w,
+                                                uncompressed->h - compression);
+        }
     }
+    if ((ref == NULL) && (m_defaultTheme != NULL))
+        return m_defaultTheme->getShadowSurface(compression);
     return ref;
 }
 
@@ -431,6 +465,8 @@ IosSurface *PuyoThemeImpl::getShrinkingSurfaceForIndex(int index) const
         osstream << m_path << "/" << m_desc.face << "-puyo-disappear-" << index << ".png";
         ref = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), IMAGE_READ);
     }
+    if ((ref == NULL) && (m_defaultTheme != NULL))
+        return m_defaultTheme->getShrinkingSurfaceForIndex(index);
     return ref;
 }
 
@@ -442,11 +478,15 @@ IosSurface *PuyoThemeImpl::getExplodingSurfaceForIndex(int index) const
         osstream << m_path << "/" << m_desc.face << "-puyo-explosion-" << index << ".png";
         ref = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), IMAGE_READ);
     }
+    if ((ref == NULL) && (m_defaultTheme != NULL))
+        return m_defaultTheme->getExplodingSurfaceForIndex(index);
     return ref;
 }
 
-NeutralPuyoThemeImpl::NeutralPuyoThemeImpl(const PuyoThemeDescription &desc, const std::string &path)
-    : BasePuyoThemeImpl(desc, path)
+NeutralPuyoThemeImpl::NeutralPuyoThemeImpl(const PuyoThemeDescription &desc,
+                                           const std::string &path,
+                                           const PuyoTheme *defaultTheme)
+    : BasePuyoThemeImpl(desc, path, defaultTheme)
 {
     // Initializing the arrays of pointers
     for (int j = 0 ; j < MAX_COMPRESSED ; j++)
@@ -466,10 +506,14 @@ IosSurface *NeutralPuyoThemeImpl::getPuyoSurfaceForValence(int valence, int comp
             uncompressed = m_baseFace;
         }
         // Create the compressed image
-        if (compression != 0)
-            ref = uncompressed->resizeAlpha(uncompressed->w,
-                                            uncompressed->h - compression);
+        if (uncompressed != NULL) {
+            if (compression != 0)
+                ref = uncompressed->resizeAlpha(uncompressed->w,
+                                                uncompressed->h - compression);
+        }
     }
+    if ((ref == NULL) && (m_defaultTheme != NULL))
+        return m_defaultTheme->getPuyoSurfaceForValence(valence, compression);
     return ref;
 }
 
@@ -495,6 +539,8 @@ IosSurface *NeutralPuyoThemeImpl::getShrinkingSurfaceForIndex(int index) const
         osstream << m_path << "/" << m_desc.face << "-neutral-" << index << ".png";
         ref = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), IMAGE_READ);
     }
+    if ((ref == NULL) && (m_defaultTheme != NULL))
+        return m_defaultTheme->getShrinkingSurfaceForIndex(index);
     return ref;
 }
 

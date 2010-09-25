@@ -103,15 +103,20 @@ public:
 
 class BasePuyoThemeImpl : public PuyoTheme {
 public:
-    BasePuyoThemeImpl(const PuyoThemeDescription &desc, const std::string &path);
+    BasePuyoThemeImpl(const PuyoThemeDescription &desc,
+                      const std::string &path,
+                      const PuyoTheme *defaultTheme = NULL);
 protected:
     const PuyoThemeDescription &m_desc;
     const std::string &m_path;
+    const PuyoTheme *m_defaultTheme;
 };
 
 class PuyoThemeImpl : public BasePuyoThemeImpl {
 public:
-    PuyoThemeImpl(const PuyoThemeDescription &desc, const std::string &path);
+    PuyoThemeImpl(const PuyoThemeDescription &desc,
+                  const std::string &path,
+                  const PuyoTheme *defaultTheme = NULL);
     virtual IosSurface *getPuyoSurfaceForValence(int valence, int compression = 0) const;
     virtual IosSurface *getEyeSurfaceForIndex(int index, int compression = 0) const;
     virtual IosSurface *getCircleSurfaceForIndex(int index, int compression = 0) const;
@@ -137,7 +142,9 @@ private:
 
 class NeutralPuyoThemeImpl : public BasePuyoThemeImpl {
 public:
-    NeutralPuyoThemeImpl(const PuyoThemeDescription &desc, const std::string &path);
+    NeutralPuyoThemeImpl(const PuyoThemeDescription &desc,
+                         const std::string &path,
+                         const PuyoTheme *defaultTheme = NULL);
     virtual IosSurface *getPuyoSurfaceForValence(int valence, int compression = 0) const;
     virtual IosSurface *getEyeSurfaceForIndex(int index, int compression = 0) const;
     virtual IosSurface *getCircleSurfaceForIndex(int index, int compression = 0) const;
@@ -152,7 +159,8 @@ private:
 
 class PuyoSetThemeImpl : public PuyoSetTheme {
 public:
-    PuyoSetThemeImpl(const PuyoSetThemeDescription &desc);
+    PuyoSetThemeImpl(const PuyoSetThemeDescription &desc,
+                     PuyoSetTheme *defaultTheme = NULL);
     virtual const std::string & getName() const;
     virtual const std::string & getLocalizedName() const;
     virtual const std::string & getAuthor() const;
@@ -161,6 +169,7 @@ public:
 private:
     const PuyoSetThemeDescription &m_desc;
     std::auto_ptr<PuyoTheme> m_puyoThemes[NUMBER_OF_PUYOS_IN_SET];
+    PuyoSetTheme *m_defaultTheme;
 };
 
 class LevelThemeImpl : public LevelTheme {
@@ -259,6 +268,9 @@ private:
     std::map<std::string, PuyoSetThemeDescription> m_puyoSetThemeDescriptions;
     std::map<std::string, LevelThemeDescription> m_levelThemeDescriptions;
     std::auto_ptr<LocalizedDictionary> m_localeDictionary;
+
+    std::string m_defaultPuyoSetThemeName;
+    std::auto_ptr<PuyoSetTheme> m_defaultPuyoSetTheme;
 
     std::string m_defaultLevelThemeName;
     std::auto_ptr<LevelThemeImpl> m_defaultLevelTheme;
