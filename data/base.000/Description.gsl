@@ -1,58 +1,10 @@
-[start_graphic]
-graphic.key = "gfx/title/F.png"
-graphic.path = "gfx/title/montage_title.png"
-initRect::graphic.crop x=0 y=0 w=108 h=167
+[start_graphic: path="gfx/title/montage_title.png"]
+[define_crop: key="gfx/title/F.png"  x=0 y=0 w=108 h=167]
+[define_crop: key="gfx/title/L.png"  x=108 y=0 w=70 h=133]
+[define_crop: key="gfx/title/B.png"  x=178 y=0 w=70 h=142]
+[define_crop: key="gfx/title/P.png"  x=0 y=167 w=86 h=139]
+[define_crop: key="gfx/title/P2.png" x=86 y=167 w=75 h=155]
+[define_crop: key="gfx/title/O.png"  x=161 y=167 w=65 h=77]
+[define_crop: key="gfx/title/O2.png" x=161 y=244 w=62 h=72]
+[define_crop: key="gfx/title/O3.png" x=161 y=316 w=60 h=61]
 [end_graphic]
-
-[start_graphic]
-graphic.key = "gfx/title/L.png"
-graphic.path = "gfx/title/montage_title.png"
-initRect::graphic.crop x=108 y=0 w=70 h=133
-[end_graphic]
-
-[start_graphic]
-graphic.key = "gfx/title/B.png"
-graphic.path = "gfx/title/montage_title.png"
-initRect::graphic.crop x=178 y=0 w=70 h=142
-[end_graphic]
-
-[start_graphic]
-graphic.key = "gfx/title/P.png"
-graphic.path = "gfx/title/montage_title.png"
-initRect::graphic.crop x=0 y=167 w=86 h=139
-[end_graphic]
-
-[start_graphic]
-graphic.key = "gfx/title/P2.png"
-graphic.path = "gfx/title/montage_title.png"
-initRect::graphic.crop x=86 y=167 w=75 h=155
-[end_graphic]
-
-[start_graphic]
-graphic.key = "gfx/title/O.png"
-graphic.path = "gfx/title/montage_title.png"
-initRect::graphic.crop x=161 y=167 w=65 h=77
-[end_graphic]
-
-[start_graphic]
-graphic.key = "gfx/title/O2.png"
-graphic.path = "gfx/title/montage_title.png"
-initRect::graphic.crop x=161 y=244 w=62 h=72
-[end_graphic]
-
-[start_graphic]
-graphic.key = "gfx/title/O3.png"
-graphic.path = "gfx/title/montage_title.png"
-initRect::graphic.crop x=161 y=316 w=60 h=61
-[end_graphic]
-
-
-
-
-/*
-[start_graphic]
-graphic.key = "theme/Classic.fptheme/round-puyo-0000.png"
-graphic.path = "theme/Classic.fptheme/montage_2.png"
-initRect::graphic.crop x=0 y=0 w=32 h=32
-[end_graphic]
-*/

@@ -5,22 +5,31 @@
 
 using namespace std;
 
+void PackageDescription::start_graphic(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    PackageDescription *packageDesc = (PackageDescription *)GSL_GET_USERDATA_PTR(gsl);
+    const char * path = (const char *)GSL_LOCAL_PTR(gsl, local, "path");
+    packageDesc->m_graphicBeingDefinedPath = path;
+}
+void PackageDescription::define_crop(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    PackageDescription *packageDesc = (PackageDescription *)GSL_GET_USERDATA_PTR(gsl);
+    const char * key = (const char *)GSL_LOCAL_PTR(gsl, local, "key");
+    IosRect graphicRect = { GSL_LOCAL_INT(gsl, local, "x"),
+                            GSL_LOCAL_INT(gsl, local, "y"),
+                            GSL_LOCAL_INT(gsl, local, "w"),
+                            GSL_LOCAL_INT(gsl, local, "h") };
+    packageDesc->m_cDC.declareCompositeSurface(key,
+               packageDesc->m_graphicBeingDefinedPath.c_str(), graphicRect);
+}
 void PackageDescription::end_graphic(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
-    cout << "end_graphic" << endl;
-    PackageDescription *packDesc = (PackageDescription *)(GSL_GET_USERDATA_PTR(gsl));
-    const char * graphicKey  = (const char *) GSL_GLOBAL_PTR(gsl, "graphic.key");
-    const char * graphicPath = (const char *) GSL_GLOBAL_PTR(gsl, "graphic.path");
-    IosRect graphicRect = { GSL_GLOBAL_INT(gsl, "graphic.crop.x"),
-                            GSL_GLOBAL_INT(gsl, "graphic.crop.y"),
-                            GSL_GLOBAL_INT(gsl, "graphic.crop.w"),
-                            GSL_GLOBAL_INT(gsl, "graphic.crop.h") };
-    packDesc->m_cDC.declareCompositeSurface(graphicKey, graphicPath, graphicRect);
-    cout << "Declare " << graphicKey << endl;
 }
 
 void PackageDescription::sbind(GoomSL *gsl)
 {
+    gsl_bind_function(gsl, "start_graphic", start_graphic);
+    gsl_bind_function(gsl, "define_crop",   define_crop);
     gsl_bind_function(gsl, "end_graphic",   end_graphic);
 }
 

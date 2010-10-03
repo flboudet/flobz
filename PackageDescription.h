@@ -8,6 +8,8 @@
 class PackageDescription
 {
 public:
+    static void start_graphic(GoomSL *gsl, GoomHash *global, GoomHash *local);
+    static void define_crop(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void end_graphic(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void sbind(GoomSL *gsl);
 public:
@@ -16,6 +18,7 @@ public:
                        CompositeDrawContext &cDC);
 private:
     CompositeDrawContext &m_cDC;
+    std::string m_graphicBeingDefinedPath;
 };
 
 #endif // _PACKAGEDESCRIPTION_H_
