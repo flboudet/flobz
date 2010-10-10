@@ -28,6 +28,9 @@
 #include "DataPathManager.h"
 #include "AnimatedPuyoTheme.h"
 
+#include "CompositeDrawContext.h"
+#include "PackageDescription.h"
+
 using namespace std;
 
 const char * ThemeManagerImpl::s_themeFolderExtension = ".fptheme";
@@ -83,7 +86,7 @@ ThemeManagerImpl::ThemeManagerImpl(DataPathManager &dataPathManager)
     for (int i = 0 ; i < themeFolders.size() ; i++) {
         if (themeFolders[i].substring(themeFolders[i].size() - 8)
             == s_themeFolderExtension) {
-            cout << "Theme to be loaded: " << (const char *)(themeFolders[i]) << endl;
+            //cout << "Theme to be loaded: " << (const char *)(themeFolders[i]) << endl;
             loadThemePack((const char *)themeFolders[i]);
         }
     }
@@ -91,7 +94,7 @@ ThemeManagerImpl::ThemeManagerImpl(DataPathManager &dataPathManager)
 
 PuyoSetTheme * ThemeManagerImpl::createPuyoSetTheme(const std::string &themeName)
 {
-    cout << "Creating puyoset theme impl " << themeName << endl;
+    //cout << "Creating puyoset theme impl " << themeName << endl;
     std::map<std::string, PuyoSetThemeDescription>::iterator iter
         = m_puyoSetThemeDescriptions.find(themeName);
     if (iter == m_puyoSetThemeDescriptions.end())
@@ -106,7 +109,7 @@ PuyoSetTheme * ThemeManagerImpl::createPuyoSetTheme(const std::string &themeName
 
 LevelTheme   * ThemeManagerImpl::createLevelTheme(const std::string &themeName)
 {
-    cout << "Creating level theme impl " << themeName << endl;
+    //cout << "Creating level theme impl " << themeName << endl;
     std::map<std::string, LevelThemeDescription>::iterator iter
         = m_levelThemeDescriptions.find(themeName);
     if (iter == m_levelThemeDescriptions.end())
@@ -149,12 +152,20 @@ void ThemeManagerImpl::loadThemePack(const std::string &path)
     GoomSL * gsl = gsl_new();
     if (!gsl) return;
     String libPath = m_dataPathManager.getPath("lib/themelib.gsl");
+    String packageLibPath = m_dataPathManager.getPath("lib/packagelib.gsl");
     char * fbuffer = gsl_init_buffer((const char *)libPath);
+    gsl_append_file_to_buffer(packageLibPath, &fbuffer);
     gsl_append_file_to_buffer(scriptPath, &fbuffer);
     gsl_compile(gsl,fbuffer);
     gsl_bind_function(gsl, "end_puyoset",     ThemeManagerImpl::end_puyoset);
     gsl_bind_function(gsl, "end_level",       ThemeManagerImpl::end_level);
     gsl_bind_function(gsl, "end_description", ThemeManagerImpl::end_description);
+    // ugly bit
+    DrawContext *dc = GameUIDefaults::GAME_LOOP->getDrawContext();
+    CompositeDrawContext *cDC = dynamic_cast<CompositeDrawContext *>(dc);
+    if (cDC != NULL)
+        PackageDescription packageDesc(gsl, *cDC);
+    // end of ugly bit
     GSL_SET_USERDATA_PTR(gsl, this);
     gsl_execute(gsl);
     gsl_free(gsl);

@@ -5,15 +5,32 @@
 
 using namespace std;
 
+void PackageDescription::gsl_strcat(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    static bool firstTime = true;
+    const char *a = (const char *)GSL_LOCAL_PTR(gsl, local, "a");
+    const char *b = (const char *)GSL_LOCAL_PTR  (gsl, local, "b");
+    int *globalPtrReturn = (int*)goom_hash_get(gsl_globals(gsl), "strcat")->ptr;
+    if ((!firstTime) && (gsl_get_ptr(gsl, *globalPtrReturn))) {
+        gsl_free_ptr(gsl, *globalPtrReturn);
+        firstTime = false;
+    }
+    int newPtrId = gsl_malloc(gsl, strlen(a)+strlen(b)+1); // allocate a new pointer (should we allow realloc?)
+    char *returnPtr = (char*)gsl_get_ptr(gsl, newPtrId);
+    strcpy(returnPtr, a);
+    strcat(returnPtr, b);
+    *globalPtrReturn = newPtrId;
+}
+
 void PackageDescription::start_graphic(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
-    PackageDescription *packageDesc = (PackageDescription *)GSL_GET_USERDATA_PTR(gsl);
+    PackageDescription *packageDesc = (PackageDescription *)GSL_GET_USERDATA2_PTR(gsl);
     const char * path = (const char *)GSL_LOCAL_PTR(gsl, local, "path");
     packageDesc->m_graphicBeingDefinedPath = path;
 }
 void PackageDescription::define_crop(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
-    PackageDescription *packageDesc = (PackageDescription *)GSL_GET_USERDATA_PTR(gsl);
+    PackageDescription *packageDesc = (PackageDescription *)GSL_GET_USERDATA2_PTR(gsl);
     const char * key = (const char *)GSL_LOCAL_PTR(gsl, local, "key");
     IosRect graphicRect = { GSL_LOCAL_INT(gsl, local, "x"),
                             GSL_LOCAL_INT(gsl, local, "y"),
@@ -28,6 +45,7 @@ void PackageDescription::end_graphic(GoomSL *gsl, GoomHash *global, GoomHash *lo
 
 void PackageDescription::sbind(GoomSL *gsl)
 {
+    gsl_bind_function(gsl, "strcat", gsl_strcat);
     gsl_bind_function(gsl, "start_graphic", start_graphic);
     gsl_bind_function(gsl, "define_crop",   define_crop);
     gsl_bind_function(gsl, "end_graphic",   end_graphic);
@@ -38,7 +56,6 @@ PackageDescription::PackageDescription(DataPathManager &dataPathManager,
                                        CompositeDrawContext &cDC)
     : m_cDC(cDC)
 {
-    cout << "PackageDescription" << endl;
     String libPath = dataPathManager.getPath("lib/packagelib.gsl");
     String scriptPath;
     try {
@@ -50,7 +67,7 @@ PackageDescription::PackageDescription(DataPathManager &dataPathManager,
     }
     GoomSL * gsl = gsl_new();
     if (!gsl) return;
-    GSL_SET_USERDATA_PTR(gsl, this);
+    GSL_SET_USERDATA2_PTR(gsl, this);
 //dataPathManager.getPath("Description.gsl");
     char * fbuffer = gsl_init_buffer((const char *)libPath);
     gsl_append_file_to_buffer((const char *)scriptPath, &fbuffer);
@@ -59,6 +76,12 @@ PackageDescription::PackageDescription(DataPathManager &dataPathManager,
     gsl_execute(gsl);
     gsl_free(gsl);
     free(fbuffer);
-    cout << "PackageDescription end" << endl;
 }
 
+PackageDescription::PackageDescription(GoomSL *gsl,
+                                       CompositeDrawContext &cDC)
+    : m_cDC(cDC)
+{
+    GSL_SET_USERDATA2_PTR(gsl, this);
+    sbind(gsl);
+}

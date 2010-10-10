@@ -1,3 +1,4 @@
+external <strcat: string a, string b> : string
 external <start_graphic: string path>
 external <define_crop: string key, int x, int y, int w, int h>
 external <end_graphic>

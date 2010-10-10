@@ -8,6 +8,7 @@
 class PackageDescription
 {
 public:
+    static void gsl_strcat(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void start_graphic(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void define_crop(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void end_graphic(GoomSL *gsl, GoomHash *global, GoomHash *local);
@@ -15,6 +16,8 @@ public:
 public:
     PackageDescription(DataPathManager &dataPathManager,
                        DataPackage     &package,
+                       CompositeDrawContext &cDC);
+    PackageDescription(GoomSL *gsl,
                        CompositeDrawContext &cDC);
 private:
     CompositeDrawContext &m_cDC;

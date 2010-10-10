@@ -81,6 +81,7 @@ public:
     virtual IosFont    * createFont(const char *path, int size, IosFontFx fx = Font_STD);
 public:
     void decrementReference(const std::string &path);
+    DrawContext &getBaseDrawContext() const;
 private:
     CompositeDrawContext &m_owner;
     DrawContext  &m_baseDrawContext;

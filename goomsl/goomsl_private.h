@@ -163,7 +163,7 @@ typedef struct _GSL_Struct { /* {{{ */
 } GSL_Struct;
  /* }}} */
 struct _GoomSL { /* {{{ */
-    void *user_field;
+    void *user_field, *user_field_2;
     int num_lines;
     Instruction *instr;     /* instruction en cours de construction */
 

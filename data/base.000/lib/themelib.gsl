@@ -160,6 +160,7 @@ external <end_level>
     level.get_ready_animation=""
 
 <ThemeDefinition>
-[start_puyoset]
-[start_level]
-[start_description]
+    [start_puyoset]
+    [start_level]
+    [start_description]
+

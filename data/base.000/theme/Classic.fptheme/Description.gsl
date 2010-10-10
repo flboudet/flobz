@@ -21,6 +21,68 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+[dummy]
+
+<puyo_set_images: string prefix, int ox, int oy>
+    [define_crop: key=[strcat: a=prefix b="0000.png"] x=ox    y=oy    w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="0001.png"] x=ox+32 y=oy    w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="0010.png"] x=ox+64 y=oy    w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="0011.png"] x=ox+96 y=oy    w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="0100.png"] x=ox    y=oy+32 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="0101.png"] x=ox+32 y=oy+32 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="0110.png"] x=ox+64 y=oy+32 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="0111.png"] x=ox+96 y=oy+32 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="1000.png"] x=ox    y=oy+64 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="1001.png"] x=ox+32 y=oy+64 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="1010.png"] x=ox+64 y=oy+64 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="1011.png"] x=ox+96 y=oy+64 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="1100.png"] x=ox    y=oy+96 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="1101.png"] x=ox+32 y=oy+96 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="1110.png"] x=ox+64 y=oy+96 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="1111.png"] x=ox+96 y=oy+96 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="disappear-0.png"] x=ox    y=oy+128 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="disappear-1.png"] x=ox+32 y=oy+128 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="disappear-2.png"] x=ox+64 y=oy+128 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="disappear-3.png"] x=ox+96 y=oy+128 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="explosion-0.png"] x=ox    y=oy+160 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="explosion-1.png"] x=ox+32 y=oy+160 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="explosion-2.png"] x=ox+64 y=oy+160 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="explosion-3.png"] x=ox+96 y=oy+160 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="border.png"] x=ox y=oy+192 w=32 h=32]
+    [define_crop: key=[strcat: a=prefix b="shadow.png"] x=ox+40 y=oy+192 w=40 h=40]
+
+# There is a stupid bug in gsl, requiring to call a method after the end of the last function declaration
+<dummy>
+
+[start_graphic: path="theme/Classic.fptheme/montage_1.png"]
+  [puyo_set_images: prefix="theme/Classic.fptheme/fat-puyo-" ox=0 oy=0]
+  [puyo_set_images: prefix="theme/Classic.fptheme/horizontal-puyo-" ox=128 oy=0]
+[end_graphic]
+
+[start_graphic: path="theme/Classic.fptheme/montage_2.png"]
+  [puyo_set_images: prefix="theme/Classic.fptheme/round-puyo-" ox=0 oy=0]
+  [puyo_set_images: prefix="theme/Classic.fptheme/vertical-puyo-" ox=128 oy=0]
+[end_graphic]
+
+[start_graphic: path="theme/Classic.fptheme/montage_3.png"]
+  [puyo_set_images: prefix="theme/Classic.fptheme/square-puyo-" ox=0 oy=0]
+  [define_crop: key="theme/Classic.fptheme/glass.png"             x=128 y=0  w=32 h=32]
+  [define_crop: key="theme/Classic.fptheme/glass-neutral-1.png"   x=160 y=0  w=32 h=32]
+  [define_crop: key="theme/Classic.fptheme/glass-neutral-2.png"   x=192 y=0  w=32 h=32]
+  [define_crop: key="theme/Classic.fptheme/glass-neutral-3.png"   x=224 y=0  w=32 h=32]
+  [define_crop: key="theme/Classic.fptheme/normal-puyo-eye-0.png" x=128 y=32 w=32 h=32]
+  [define_crop: key="theme/Classic.fptheme/normal-puyo-eye-1.png" x=160 y=32 w=32 h=32]
+  [define_crop: key="theme/Classic.fptheme/normal-puyo-eye-2.png" x=192 y=32 w=32 h=32]
+  [define_crop: key="theme/Classic.fptheme/glass-giant.png"       x=224 y=32 w=32 h=32]
+  [define_crop: key="theme/Classic.fptheme/upper-puyo-eye-0.png"  x=128 y=64 w=32 h=32]
+  [define_crop: key="theme/Classic.fptheme/upper-puyo-eye-1.png"  x=160 y=64 w=32 h=32]
+  [define_crop: key="theme/Classic.fptheme/upper-puyo-eye-2.png"  x=192 y=64 w=32 h=32]
+  [define_crop: key="theme/Classic.fptheme/glass-small.png"       x=224 y=64 w=16 h=16]
+  [define_crop: key="theme/Classic.fptheme/heart-lives-0.png"     x=128 y=96 w=32 h=32]
+  [define_crop: key="theme/Classic.fptheme/heart-lives-1.png"     x=160 y=96 w=32 h=32]
+  [define_crop: key="theme/Classic.fptheme/heart-lives-2.png"     x=192 y=96 w=32 h=32]
+  [define_crop: key="theme/Classic.fptheme/heart-lives-3.png"     x=224 y=96 w=32 h=32]
+[end_graphic]
 
 /******************* Default Theme for the game *******************/
 /**** Don't modify, if you want more themes, create your own ! ****/
@@ -42,14 +104,22 @@
     puyoset.name         = "Invaders"
     puyoset.description  = "Puyos for everyone (color blindness aware)."
     puyoset.P2.face      = "fat"
-    puyoset.P2.offset    = 72.0
+    puyoset.P2.explosion = "fat"
+    puyoset.P2.disappear = "fat"
+    puyoset.P2.offset    = 0.
     puyoset.P2.eye       = "upper"
     puyoset.P3.face      = "vertical"
-    puyoset.P3.offset    = 144.0
+    puyoset.P3.explosion = "vertical"
+    puyoset.P3.disappear = "vertical"
+    puyoset.P3.offset    = 0.
     puyoset.P4.face      = "horizontal"
-    puyoset.P4.offset    = 216.0
-    puyoset.P5.offset    = 288.0
+    puyoset.P4.explosion = "horizontal"
+    puyoset.P4.disappear = "horizontal"
+    puyoset.P4.offset    = 0.
+    puyoset.P5.offset    = 0.
     puyoset.P5.face      = "square"
+    puyoset.P5.explosion = "square"
+    puyoset.P5.disappear = "square"
     puyoset.P5.eye       = "upper"
 [end_puyoset]
 
@@ -60,4 +130,3 @@
     level.description   = "The main arena."
     level.background    = "columns-background.jpg"
 [end_level]
-

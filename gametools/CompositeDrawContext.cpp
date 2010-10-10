@@ -1,4 +1,7 @@
+#include <memory>
 #include "CompositeDrawContext.h"
+
+using namespace std;
 
 /**
  * CompositeSurface implementation
@@ -57,12 +60,21 @@ RGBA CompositeSurface::readRGBA(int x, int y)
 
 IosSurface *CompositeSurface::shiftHue(float hue_offset, IosSurface *mask)
 {
+    IosSurface *srcSurface = m_baseSurface;
+    auto_ptr<IosSurface> tempSurface;
+    if (m_isCropped) {
+        DrawContext &baseDC = m_ownerImageLibrary.getBaseDrawContext();
+        tempSurface.reset(baseDC.getImageLibrary().createImage(IMAGE_RGBA, m_cropRect.w, m_cropRect.h, IMAGE_READ));
+        tempSurface->setBlendMode(IMAGE_COPY);
+        tempSurface->draw(m_baseSurface, &m_cropRect, NULL);
+        srcSurface = tempSurface.get();
+    }
     if (mask == NULL)
         return new CompositeSurface(m_ownerImageLibrary,
-                                    m_baseSurface->shiftHue(hue_offset, NULL));
+                                    srcSurface->shiftHue(hue_offset, NULL));
     CompositeSurface *m = static_cast<CompositeSurface *>(mask);
     return new CompositeSurface(m_ownerImageLibrary,
-                                m_baseSurface->shiftHue(hue_offset, m->m_baseSurface));
+                                srcSurface->shiftHue(hue_offset, m->m_baseSurface));
 }
 
 IosSurface *CompositeSurface::shiftHSV(float h, float s, float v)
@@ -73,14 +85,32 @@ IosSurface *CompositeSurface::shiftHSV(float h, float s, float v)
 
 IosSurface *CompositeSurface::setValue(float value)
 {
+    IosSurface *srcSurface = m_baseSurface;
+    auto_ptr<IosSurface> tempSurface;
+    if (m_isCropped) {
+        DrawContext &baseDC = m_ownerImageLibrary.getBaseDrawContext();
+        tempSurface.reset(baseDC.getImageLibrary().createImage(IMAGE_RGBA, m_cropRect.w, m_cropRect.h, IMAGE_READ));
+        tempSurface->setBlendMode(IMAGE_COPY);
+        tempSurface->draw(m_baseSurface, &m_cropRect, NULL);
+        srcSurface = tempSurface.get();
+    }
     return new CompositeSurface(m_ownerImageLibrary,
-                                m_baseSurface->setValue(value));
+                                srcSurface->setValue(value));
 }
 
 IosSurface * CompositeSurface::resizeAlpha(int width, int height)
 {
+    IosSurface *srcSurface = m_baseSurface;
+    auto_ptr<IosSurface> tempSurface;
+    if (m_isCropped) {
+        DrawContext &baseDC = m_ownerImageLibrary.getBaseDrawContext();
+        tempSurface.reset(baseDC.getImageLibrary().createImage(IMAGE_RGBA, m_cropRect.w, m_cropRect.h, IMAGE_READ));
+        tempSurface->setBlendMode(IMAGE_COPY);
+        tempSurface->draw(m_baseSurface, &m_cropRect, NULL);
+        srcSurface = tempSurface.get();
+    }
     return new CompositeSurface(m_ownerImageLibrary,
-                                m_baseSurface->resizeAlpha(width, height));
+                                srcSurface->resizeAlpha(width, height));
 }
 
 IosSurface * CompositeSurface::mirrorH()
@@ -147,6 +177,11 @@ CompositeImageLibrary::CompositeImageLibrary(CompositeDrawContext &owner)
     : m_owner(owner), m_baseDrawContext(owner.getBaseDrawContext()),
       m_baseImageLibrary(m_baseDrawContext.getImageLibrary())
 {
+}
+
+DrawContext & CompositeImageLibrary::getBaseDrawContext() const
+{
+    return m_owner.getBaseDrawContext();
 }
 
 IosSurface * CompositeImageLibrary::createImage(ImageType type, int w, int h, ImageSpecialAbility specialAbility)

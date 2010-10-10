@@ -44,6 +44,9 @@ GoomHash *gsl_globals(GoomSL *_this);
 #define GSL_SET_USERDATA_PTR(gsl, data) { *((void **)gsl) = (void *)data; }
 #define GSL_GET_USERDATA_PTR(gsl) (*((void **)gsl))
 
+#define GSL_SET_USERDATA2_PTR(gsl, data) { ((void **)gsl)[1] = (void *)data; }
+#define GSL_GET_USERDATA2_PTR(gsl) (((void **)gsl)[1])
+
 #ifdef __cplusplus
 };
 #endif
