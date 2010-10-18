@@ -100,6 +100,7 @@ IosSurface *CompositeSurface::setValue(float value)
 
 IosSurface * CompositeSurface::resizeAlpha(int width, int height)
 {
+#ifdef DISABLED
     IosSurface *srcSurface = m_baseSurface;
     auto_ptr<IosSurface> tempSurface;
     if (m_isCropped) {
@@ -111,6 +112,16 @@ IosSurface * CompositeSurface::resizeAlpha(int width, int height)
     }
     return new CompositeSurface(m_ownerImageLibrary,
                                 srcSurface->resizeAlpha(width, height));
+#endif
+    if (m_path != "") {
+        IosRect cropRect = m_cropRect;
+        //cropRect.w = width; cropRect.h = height;
+        CompositeSurface *result = new CompositeSurface(m_ownerImageLibrary, m_baseSurface, cropRect);
+        result->setBaseSurfacePath(m_path.c_str());
+        // Increment reference!
+        return result;
+    }
+    return NULL;
 }
 
 IosSurface * CompositeSurface::mirrorH()
@@ -195,12 +206,12 @@ IosSurface * CompositeImageLibrary::loadImage(ImageType type, const char *path, 
     if (def == NULL)
         return new CompositeSurface(*this, m_baseImageLibrary.loadImage(type, path, specialAbility));
     IosSurface *baseSurface;
-    BaseSurfaceMap::iterator existingBaseSurface = m_baseSurfaceMap.find(path);
+    BaseSurfaceMap::iterator existingBaseSurface = m_baseSurfaceMap.find(def->getPath());
     if (existingBaseSurface == m_baseSurfaceMap.end()) {
         baseSurface = m_baseImageLibrary.loadImage(type, def->getPath(), specialAbility);
         BaseSurfaceReference newRef(baseSurface);
         newRef.m_refCount++;
-        m_baseSurfaceMap[path] = newRef;
+        m_baseSurfaceMap[def->getPath()] = newRef;
     }
     else {
         baseSurface = existingBaseSurface->second.m_baseSurface;
