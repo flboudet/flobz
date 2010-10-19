@@ -119,7 +119,7 @@ public:
                   const PuyoTheme *defaultTheme = NULL);
     virtual IosSurface *getPuyoSurfaceForValence(int valence, int compression = 0) const;
     virtual IosSurface *getEyeSurfaceForIndex(int index, int compression = 0) const;
-    virtual IosSurface *getCircleSurfaceForIndex(int index, int compression = 0) const;
+    virtual IosSurface *getCircleSurfaceForIndex(int index) const;
     virtual IosSurface *getShadowSurface(int compression = 0) const;
     virtual IosSurface *getShrinkingSurfaceForIndex(int index) const;
     virtual IosSurface *getExplodingSurfaceForIndex(int index) const;
@@ -130,7 +130,7 @@ private:
     mutable IosSurface* m_eyes[NUMBER_OF_PUYO_EYES][MAX_COMPRESSED];
     mutable IosSurfaceRef m_baseEyes[NUMBER_OF_PUYO_EYES];
 
-    mutable IosSurface* m_circles[NUMBER_OF_PUYO_CIRCLES][MAX_COMPRESSED];
+    mutable IosSurface* m_circles[NUMBER_OF_PUYO_CIRCLES];
     mutable IosSurfaceRef m_baseCircle;
 
     mutable IosSurface *m_shadows[MAX_COMPRESSED];
@@ -147,7 +147,7 @@ public:
                          const PuyoTheme *defaultTheme = NULL);
     virtual IosSurface *getPuyoSurfaceForValence(int valence, int compression = 0) const;
     virtual IosSurface *getEyeSurfaceForIndex(int index, int compression = 0) const;
-    virtual IosSurface *getCircleSurfaceForIndex(int index, int compression = 0) const;
+    virtual IosSurface *getCircleSurfaceForIndex(int index) const;
     virtual IosSurface *getShadowSurface(int compression = 0) const;
     virtual IosSurface *getShrinkingSurfaceForIndex(int index) const;
     virtual IosSurface *getExplodingSurfaceForIndex(int index) const;

@@ -353,8 +353,7 @@ PuyoThemeImpl::PuyoThemeImpl(const PuyoThemeDescription &desc,
         for (int j = 0 ; j < MAX_COMPRESSED ; j++)
             m_eyes[i][j] = NULL;
     for (int i = 0 ; i < NUMBER_OF_PUYO_CIRCLES ; i++)
-        for (int j = 0 ; j < MAX_COMPRESSED ; j++)
-            m_circles[i][j] = NULL;
+            m_circles[i] = NULL;
     for (int j = 0 ; j < MAX_COMPRESSED ; j++)
         m_shadows[j] = NULL;
 }
@@ -417,30 +416,20 @@ IosSurface *PuyoThemeImpl::getEyeSurfaceForIndex(int index, int compression) con
     return ref;
 }
 
-IosSurface *PuyoThemeImpl::getCircleSurfaceForIndex(int index, int compression) const
+IosSurface *PuyoThemeImpl::getCircleSurfaceForIndex(int index) const
 {
-    IosSurface * &ref = m_circles[index][compression];
+    IosSurface * &ref = m_circles[index];
     if (ref == NULL) {
-        IosSurface * &uncompressed = m_circles[index][0];
-        // Do we need to load the uncompressed image?
-        if (uncompressed == NULL) {
-            // Do we need to load the reference image?
-            if (m_baseCircle.get() == NULL) {
-                ostringstream osstream;
-                osstream << m_path << "/" << m_desc.face << "-puyo-border.png";
-                m_baseCircle = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), IMAGE_READ);
-            }
-            uncompressed = m_baseCircle.get()->setValue(sin(3.14f/2.0f+index*3.14f/64.0f)*0.6f+0.2f);
+        // Do we need to load the reference image?
+        if (m_baseCircle.get() == NULL) {
+            ostringstream osstream;
+            osstream << m_path << "/" << m_desc.face << "-puyo-border.png";
+            m_baseCircle = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), IMAGE_READ);
         }
-        // Create the compressed image
-        if (uncompressed != NULL) {
-            if (compression != 0)
-                ref = uncompressed->resizeAlpha(uncompressed->w,
-                                                uncompressed->h - compression);
-        }
+        ref = m_baseCircle.get()->setValue(sin(3.14f/2.0f+index*3.14f/64.0f)*0.6f+0.2f);
     }
     if ((ref == NULL) && (m_defaultTheme != NULL))
-        return m_defaultTheme->getCircleSurfaceForIndex(index, compression);
+        return m_defaultTheme->getCircleSurfaceForIndex(index);
     return ref;
 }
 
@@ -533,7 +522,7 @@ IosSurface *NeutralPuyoThemeImpl::getEyeSurfaceForIndex(int index, int compressi
     return NULL;
 }
 
-IosSurface *NeutralPuyoThemeImpl::getCircleSurfaceForIndex(int index, int compression) const
+IosSurface *NeutralPuyoThemeImpl::getCircleSurfaceForIndex(int index) const
 {
     return NULL;
 }

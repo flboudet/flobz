@@ -147,8 +147,10 @@ void AnimatedPuyo::renderAt(int X, int Y, DrawTarget *dt)
 
         /* Main puyo show */
         /* TODO: Investigate why, during network game, the falling puyo starts by being neutral */
-        if ((this == attachedGame->getFallingPuyo()) && (getPuyoState() != PUYO_NEUTRAL))
-            dt->draw(attachedTheme->getCircleSurfaceForIndex((smallTicksCount >> 2) & 0x1F, m_currentCompressedState), NULL, &drect);
+        if ((this == attachedGame->getFallingPuyo())
+            && (getPuyoState() != PUYO_NEUTRAL)
+            && (m_currentCompressedState == 0))
+            dt->draw(attachedTheme->getCircleSurfaceForIndex((smallTicksCount >> 2) & 0x1F), NULL, &drect);
 
         /* Eye management */
         if ((getPuyoState() != PUYO_NEUTRAL) && (m_displayEyes)) {

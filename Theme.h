@@ -67,7 +67,7 @@ public:
     virtual ~PuyoTheme() {}
     virtual IosSurface *getPuyoSurfaceForValence(int valence, int compression = 0) const = 0;
     virtual IosSurface *getEyeSurfaceForIndex(int index, int compression = 0) const = 0;
-    virtual IosSurface *getCircleSurfaceForIndex(int index, int compression = 0) const = 0;
+    virtual IosSurface *getCircleSurfaceForIndex(int index) const = 0;
     virtual IosSurface *getShadowSurface(int compression = 0) const = 0;
     virtual IosSurface *getShrinkingSurfaceForIndex(int index) const = 0;
     virtual IosSurface *getExplodingSurfaceForIndex(int index) const = 0;

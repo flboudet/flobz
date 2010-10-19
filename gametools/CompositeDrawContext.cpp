@@ -1,3 +1,4 @@
+#include <iostream>
 #include <memory>
 #include "CompositeDrawContext.h"
 
@@ -118,10 +119,24 @@ IosSurface * CompositeSurface::resizeAlpha(int width, int height)
         //cropRect.w = width; cropRect.h = height;
         CompositeSurface *result = new CompositeSurface(m_ownerImageLibrary, m_baseSurface, cropRect);
         result->setBaseSurfacePath(m_path.c_str());
+        result->w = width;
+        result->h = height;
         // Increment reference!
         return result;
     }
+    cout << "WILL CRASH!!!" << endl;
     return NULL;
+        IosSurface *srcSurface = m_baseSurface;
+    auto_ptr<IosSurface> tempSurface;
+    if (m_isCropped) {
+        DrawContext &baseDC = m_ownerImageLibrary.getBaseDrawContext();
+        tempSurface.reset(baseDC.getImageLibrary().createImage(IMAGE_RGBA, m_cropRect.w, m_cropRect.h, IMAGE_READ));
+        tempSurface->setBlendMode(IMAGE_COPY);
+        tempSurface->draw(m_baseSurface, &m_cropRect, NULL);
+        srcSurface = tempSurface.get();
+    }
+    return new CompositeSurface(m_ownerImageLibrary,
+                                srcSurface->resizeAlpha(width, height));
 }
 
 IosSurface * CompositeSurface::mirrorH()
@@ -156,6 +171,7 @@ void CompositeSurface::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect
         m_baseSurface->draw(s->m_baseSurface, &(s->m_cropRect), dstRect);
         return;
     }
+    // TODO: srcRect != NULL
 }
 
 void CompositeSurface::drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
