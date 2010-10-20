@@ -4,7 +4,7 @@
 namespace ios_fc {
 
 // TODO: throw exceptions
-	
+
 template <typename X>
 class SharedPtr
 {
@@ -15,7 +15,7 @@ class SharedPtr
 
 			Ref(X *px) : px(px), refCount(1) {}
 			~Ref() { if (px) delete px; }
-			
+
 			void inc() { refCount++; }
 			void dec() { refCount--; }
 		};
@@ -30,13 +30,13 @@ class SharedPtr
 		SharedPtr(X* px = NULL)  { ref = new Ref(px); }
 		SharedPtr(const SharedPtr<X> &ptr) : ref(ptr.ref) { ref->inc(); }
 		~SharedPtr()                                { dec(); }
-		
+
 		SharedPtr &operator= (const SharedPtr<X> &ptr) {
 			dec();
 			ref = ptr.ref;
 			ref->inc();
                         return *this;
-		} 
+		}
 
 		void release()        { ref->px = NULL;     }
 		X *get()        const { return ref->px;  }

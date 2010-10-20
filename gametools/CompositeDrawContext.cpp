@@ -3,13 +3,14 @@
 #include "CompositeDrawContext.h"
 
 using namespace std;
+using namespace ios_fc;
 
 /**
  * CompositeSurface implementation
  */
 
 CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
-                                   IosSurface *baseSurface)
+                                   SharedPtr<IosSurface> baseSurface)
     : m_ownerImageLibrary(ownerImageLibrary),
       m_baseSurface(baseSurface), m_isCropped(false)
 {
@@ -18,7 +19,7 @@ CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
 }
 
 CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
-                                   IosSurface *baseSurface,
+                                   SharedPtr<IosSurface> baseSurface,
                                    const IosRect &cropRect)
     : m_ownerImageLibrary(ownerImageLibrary),
       m_baseSurface(baseSurface), m_isCropped(true), m_cropRect(cropRect)
@@ -29,10 +30,6 @@ CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
 
 CompositeSurface::~CompositeSurface()
 {
-    if (m_path != "")
-        m_ownerImageLibrary.decrementReference(m_path);
-    else
-        delete m_baseSurface;
 }
 
 // IosSurface methods
@@ -61,13 +58,13 @@ RGBA CompositeSurface::readRGBA(int x, int y)
 
 IosSurface *CompositeSurface::shiftHue(float hue_offset, IosSurface *mask)
 {
-    IosSurface *srcSurface = m_baseSurface;
+    IosSurface *srcSurface = m_baseSurface.get();
     auto_ptr<IosSurface> tempSurface;
     if (m_isCropped) {
         DrawContext &baseDC = m_ownerImageLibrary.getBaseDrawContext();
         tempSurface.reset(baseDC.getImageLibrary().createImage(IMAGE_RGBA, m_cropRect.w, m_cropRect.h, IMAGE_READ));
         tempSurface->setBlendMode(IMAGE_COPY);
-        tempSurface->draw(m_baseSurface, &m_cropRect, NULL);
+        tempSurface->draw(m_baseSurface.get(), &m_cropRect, NULL);
         srcSurface = tempSurface.get();
     }
     if (mask == NULL)
@@ -75,7 +72,7 @@ IosSurface *CompositeSurface::shiftHue(float hue_offset, IosSurface *mask)
                                     srcSurface->shiftHue(hue_offset, NULL));
     CompositeSurface *m = static_cast<CompositeSurface *>(mask);
     return new CompositeSurface(m_ownerImageLibrary,
-                                srcSurface->shiftHue(hue_offset, m->m_baseSurface));
+                                srcSurface->shiftHue(hue_offset, m->m_baseSurface.get()));
 }
 
 IosSurface *CompositeSurface::shiftHSV(float h, float s, float v)
@@ -86,13 +83,13 @@ IosSurface *CompositeSurface::shiftHSV(float h, float s, float v)
 
 IosSurface *CompositeSurface::setValue(float value)
 {
-    IosSurface *srcSurface = m_baseSurface;
+    IosSurface *srcSurface = m_baseSurface.get();
     auto_ptr<IosSurface> tempSurface;
     if (m_isCropped) {
         DrawContext &baseDC = m_ownerImageLibrary.getBaseDrawContext();
         tempSurface.reset(baseDC.getImageLibrary().createImage(IMAGE_RGBA, m_cropRect.w, m_cropRect.h, IMAGE_READ));
         tempSurface->setBlendMode(IMAGE_COPY);
-        tempSurface->draw(m_baseSurface, &m_cropRect, NULL);
+        tempSurface->draw(m_baseSurface.get(), &m_cropRect, NULL);
         srcSurface = tempSurface.get();
     }
     return new CompositeSurface(m_ownerImageLibrary,
@@ -101,42 +98,26 @@ IosSurface *CompositeSurface::setValue(float value)
 
 IosSurface * CompositeSurface::resizeAlpha(int width, int height)
 {
-#ifdef DISABLED
-    IosSurface *srcSurface = m_baseSurface;
-    auto_ptr<IosSurface> tempSurface;
-    if (m_isCropped) {
-        DrawContext &baseDC = m_ownerImageLibrary.getBaseDrawContext();
-        tempSurface.reset(baseDC.getImageLibrary().createImage(IMAGE_RGBA, m_cropRect.w, m_cropRect.h, IMAGE_READ));
-        tempSurface->setBlendMode(IMAGE_COPY);
-        tempSurface->draw(m_baseSurface, &m_cropRect, NULL);
-        srcSurface = tempSurface.get();
+    if (true) {
+        IosSurface *srcSurface = m_baseSurface.get();
+        auto_ptr<IosSurface> tempSurface;
+        if (m_isCropped) {
+            DrawContext &baseDC = m_ownerImageLibrary.getBaseDrawContext();
+            tempSurface.reset(baseDC.getImageLibrary().createImage(IMAGE_RGBA, m_cropRect.w, m_cropRect.h, IMAGE_READ));
+            tempSurface->setBlendMode(IMAGE_COPY);
+            tempSurface->draw(m_baseSurface.get(), &m_cropRect, NULL);
+            srcSurface = tempSurface.get();
+        }
+        return new CompositeSurface(m_ownerImageLibrary,
+                                    srcSurface->resizeAlpha(width, height));
     }
-    return new CompositeSurface(m_ownerImageLibrary,
-                                srcSurface->resizeAlpha(width, height));
-#endif
-    if (m_path != "") {
-        IosRect cropRect = m_cropRect;
-        //cropRect.w = width; cropRect.h = height;
-        CompositeSurface *result = new CompositeSurface(m_ownerImageLibrary, m_baseSurface, cropRect);
-        result->setBaseSurfacePath(m_path.c_str());
-        result->w = width;
-        result->h = height;
-        // Increment reference!
-        return result;
-    }
-    cout << "WILL CRASH!!!" << endl;
-    return NULL;
-        IosSurface *srcSurface = m_baseSurface;
-    auto_ptr<IosSurface> tempSurface;
-    if (m_isCropped) {
-        DrawContext &baseDC = m_ownerImageLibrary.getBaseDrawContext();
-        tempSurface.reset(baseDC.getImageLibrary().createImage(IMAGE_RGBA, m_cropRect.w, m_cropRect.h, IMAGE_READ));
-        tempSurface->setBlendMode(IMAGE_COPY);
-        tempSurface->draw(m_baseSurface, &m_cropRect, NULL);
-        srcSurface = tempSurface.get();
-    }
-    return new CompositeSurface(m_ownerImageLibrary,
-                                srcSurface->resizeAlpha(width, height));
+    IosRect cropRect = m_cropRect;
+    //cropRect.w = width; cropRect.h = height;
+    CompositeSurface *result = new CompositeSurface(m_ownerImageLibrary, m_baseSurface, cropRect);
+    //result->setBaseSurfacePath(m_path.c_str());
+    result->w = width;
+    result->h = height;
+    return result;
 }
 
 IosSurface * CompositeSurface::mirrorH()
@@ -166,9 +147,9 @@ void CompositeSurface::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect
 {
     CompositeSurface *s = static_cast<CompositeSurface *>(surf);
     if (!s->m_isCropped)
-        m_baseSurface->draw(s->m_baseSurface, srcRect, dstRect);
+        m_baseSurface->draw(s->m_baseSurface.get(), srcRect, dstRect);
     if (srcRect == NULL) {
-        m_baseSurface->draw(s->m_baseSurface, &(s->m_cropRect), dstRect);
+        m_baseSurface->draw(s->m_baseSurface.get(), &(s->m_cropRect), dstRect);
         return;
     }
     // TODO: srcRect != NULL
@@ -177,13 +158,13 @@ void CompositeSurface::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect
 void CompositeSurface::drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
     CompositeSurface *s = static_cast<CompositeSurface *>(surf);
-    m_baseSurface->drawHFlipped(s->m_baseSurface, srcRect, dstRect);
+    m_baseSurface->drawHFlipped(s->m_baseSurface.get(), srcRect, dstRect);
 }
 
 void CompositeSurface::drawRotatedCentered(IosSurface *surf, int angle, int x, int y)
 {
     CompositeSurface *s = static_cast<CompositeSurface *>(surf);
-    m_baseSurface->drawRotatedCentered(s->m_baseSurface, angle, x, y);
+    m_baseSurface->drawRotatedCentered(s->m_baseSurface.get(), angle, x, y);
 }
 
 void CompositeSurface::fillRect(const IosRect *rect, const RGBA &color)
@@ -221,33 +202,17 @@ IosSurface * CompositeImageLibrary::loadImage(ImageType type, const char *path, 
     CompositeSurfaceDefinition *def = m_owner.getCompositeSurfaceDefinition(path);
     if (def == NULL)
         return new CompositeSurface(*this, m_baseImageLibrary.loadImage(type, path, specialAbility));
-    IosSurface *baseSurface;
+    SharedPtr<IosSurface> baseSurface;
     BaseSurfaceMap::iterator existingBaseSurface = m_baseSurfaceMap.find(def->getPath());
     if (existingBaseSurface == m_baseSurfaceMap.end()) {
-        baseSurface = m_baseImageLibrary.loadImage(type, def->getPath(), specialAbility);
-        BaseSurfaceReference newRef(baseSurface);
-        newRef.m_refCount++;
-        m_baseSurfaceMap[def->getPath()] = newRef;
+        baseSurface = SharedPtr<IosSurface>(m_baseImageLibrary.loadImage(type, def->getPath(), specialAbility));
+        m_baseSurfaceMap[def->getPath()] = baseSurface;
     }
     else {
-        baseSurface = existingBaseSurface->second.m_baseSurface;
+        baseSurface = existingBaseSurface->second;
     }
     CompositeSurface *result = new CompositeSurface(*this, baseSurface, def->getCropRect());
-    result->setBaseSurfacePath(path);
     return result;
-}
-
-void CompositeImageLibrary::decrementReference(const std::string &path)
-{
-    BaseSurfaceMap::iterator existingBaseSurface = m_baseSurfaceMap.find(path);
-    if (existingBaseSurface != m_baseSurfaceMap.end()) {
-        BaseSurfaceReference &ref = existingBaseSurface->second;
-        ref.m_refCount--;
-        if (ref.m_refCount <= 0) {
-            delete ref.m_baseSurface;
-            m_baseSurfaceMap.erase(existingBaseSurface);
-        }
-    }
 }
 
 IosFont * CompositeImageLibrary::createFont(const char *path, int size, IosFontFx fx)
@@ -282,11 +247,11 @@ void CompositeDrawContext::draw(IosSurface *surf, IosRect *srcRect, IosRect *dst
 {
     CompositeSurface *s = static_cast<CompositeSurface *>(surf);
     if (! s->m_isCropped) {
-        m_baseDrawContext->draw(s->m_baseSurface, srcRect, dstRect);
+        m_baseDrawContext->draw(s->m_baseSurface.get(), srcRect, dstRect);
         return;
     }
     if (srcRect == NULL) {
-        m_baseDrawContext->draw(s->m_baseSurface, &(s->m_cropRect), dstRect);
+        m_baseDrawContext->draw(s->m_baseSurface.get(), &(s->m_cropRect), dstRect);
         return;
     }
 }
@@ -294,13 +259,13 @@ void CompositeDrawContext::draw(IosSurface *surf, IosRect *srcRect, IosRect *dst
 void CompositeDrawContext::drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
     CompositeSurface *s = static_cast<CompositeSurface *>(surf);
-    m_baseDrawContext->drawHFlipped(s->m_baseSurface, srcRect, dstRect);
+    m_baseDrawContext->drawHFlipped(s->m_baseSurface.get(), srcRect, dstRect);
 }
 
 void CompositeDrawContext::drawRotatedCentered(IosSurface *surf, int angle, int x, int y)
 {
     CompositeSurface *s = static_cast<CompositeSurface *>(surf);
-    m_baseDrawContext->drawRotatedCentered(s->m_baseSurface, angle, x, y);
+    m_baseDrawContext->drawRotatedCentered(s->m_baseSurface.get(), angle, x, y);
 }
 
 void CompositeDrawContext::fillRect(const IosRect *rect, const RGBA &color)

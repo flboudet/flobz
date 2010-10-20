@@ -4,19 +4,70 @@
 #include <string>
 #include <map>
 #include "drawcontext.h"
+#include "ios_ptr.h"
 
 class CompositeDrawContext;
 class CompositeImageLibrary;
 
-struct BaseSurfaceReference
+#ifdef DISABLED
+template <typename T>
+class SharedReference
 {
-    BaseSurfaceReference()
-        : m_baseSurface(NULL), m_refCount(0) {}
-    BaseSurfaceReference(IosSurface *baseSurface)
-        : m_baseSurface(baseSurface), m_refCount(0) {}
-    IosSurface *m_baseSurface;
-    int m_refCount;
+public:
+    SharedReference(T *p)
+        : m_p(p), m_refCount(1) {}
+    T *m_p;
+    volatile int m_refCount;
 };
+
+template <typename T>
+class SharedPtr
+{
+public:
+    SharedPtr()
+        : m_ref(NULL) {}
+    SharedPtr(T *p)
+        : m_ref(p == NULL?NULL:new SharedReference<T>(p)) {}
+    SharedPtr(const SharedPtr &s)
+        : m_ref(s.m_ref) {
+        if (m_ref != NULL)
+            ++(m_ref->m_refCount);
+    }
+    ~SharedPtr() {
+        if ((m_ref != NULL)
+            && (--(m_ref->m_refCount) == 0)) {
+            delete m_ref->m_p;
+            delete m_ref;
+        }
+    }
+    void reset(T *p) {
+        if ((m_ref != NULL)
+            && (--(m_ref->m_refCount) == 0)) {
+            delete m_ref->m_p;
+            delete m_ref;
+        }
+        m_ref = (p == NULL?NULL:new SharedReference<T>(p));
+    }
+    /*operator T *() const {
+        if (m_ref == NULL)
+            return NULL;
+        return m_ref->m_p;
+    }*/
+    T * operator ->()  const {
+        //if (m_ref == NULL)
+        //    return NULL;
+        return m_ref->m_p;
+    }
+    T *get() const {
+        if (m_ref == NULL)
+            return NULL;
+        return m_ref->m_p;
+    }
+    bool empty() const { return m_ref == NULL; }
+private:
+    SharedReference<T> *m_ref;
+};
+#endif
 
 
 class CompositeSurfaceDefinition
@@ -36,9 +87,9 @@ class CompositeSurface : public IosSurface
 {
 public:
     CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
-                     IosSurface *baseSurface);
+                     ios_fc::SharedPtr<IosSurface> baseSurface);
     CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
-                     IosSurface *baseSurface, const IosRect &cropRect);
+                     ios_fc::SharedPtr<IosSurface> baseSurface, const IosRect &cropRect);
     virtual ~CompositeSurface();
     // IosSurface methods
     virtual bool isOpaque() const;
@@ -59,16 +110,11 @@ public:
     virtual void drawRotatedCentered(IosSurface *surf, int angle, int x, int y);
 	virtual void fillRect(const IosRect *rect, const RGBA &color);
     virtual void putString(IosFont *font, int x, int y, const char *text);
-    // Specific methods
-    void setBaseSurfacePath(const char *path) {
-        m_path = path;
-    }
 private:
     CompositeImageLibrary &m_ownerImageLibrary;
-    IosSurface *m_baseSurface;
+    ios_fc::SharedPtr<IosSurface> m_baseSurface;
     bool m_isCropped;
     IosRect m_cropRect;
-    std::string m_path;
     friend class CompositeDrawContext;
 };
 
@@ -80,13 +126,12 @@ public:
     virtual IosSurface * loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0);
     virtual IosFont    * createFont(const char *path, int size, IosFontFx fx = Font_STD);
 public:
-    void decrementReference(const std::string &path);
     DrawContext &getBaseDrawContext() const;
 private:
     CompositeDrawContext &m_owner;
     DrawContext  &m_baseDrawContext;
     ImageLibrary &m_baseImageLibrary;
-    typedef std::map<std::string, BaseSurfaceReference> BaseSurfaceMap;
+    typedef std::map<std::string, ios_fc::SharedPtr<IosSurface> > BaseSurfaceMap;
     BaseSurfaceMap m_baseSurfaceMap;
 };
 

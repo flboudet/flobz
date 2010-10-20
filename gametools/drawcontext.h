@@ -167,6 +167,8 @@ public:
     virtual int getHeight() const = 0;
     virtual int getWidth() const = 0;
     virtual ImageLibrary &getImageLibrary() = 0;
+    // Query for drawcontext abilities
+    virtual bool hasScale() const { return false; }
 };
 
 
