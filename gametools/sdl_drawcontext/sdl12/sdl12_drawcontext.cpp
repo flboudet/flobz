@@ -377,6 +377,13 @@ SDL12_DrawContext::SDL12_DrawContext(DataPathManager &dataPathManager,
     TTF_Init();
 }
 
+ImageSpecialAbility SDL12_DrawContext::guessRequiredImageAbility(const ImageOperationList &list)
+{
+    // SDL 1.2 always allows access to surface data, so our answer is not important
+    // Always answer IMAGE_READ
+    return IMAGE_READ;
+}
+
 void SDL12_DrawContext::initDisplay(bool fullscreen)
 {
     display = SDL_SetVideoMode(w, h, 0, SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));

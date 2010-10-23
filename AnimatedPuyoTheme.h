@@ -106,10 +106,12 @@ public:
     BasePuyoThemeImpl(const PuyoThemeDescription &desc,
                       const std::string &path,
                       const PuyoTheme *defaultTheme = NULL);
+    virtual ~BasePuyoThemeImpl();
 protected:
     const PuyoThemeDescription &m_desc;
     const std::string &m_path;
     const PuyoTheme *m_defaultTheme;
+    mutable std::vector<IosSurface *> m_surfaceBin;
 };
 
 class PuyoThemeImpl : public BasePuyoThemeImpl {
@@ -136,8 +138,11 @@ private:
     mutable IosSurface *m_shadows[MAX_COMPRESSED];
     mutable IosSurfaceRef m_baseShadow;
 
-    mutable IosSurfaceRef m_shrinking[NUMBER_OF_PUYO_DISAPPEAR];
-    mutable IosSurfaceRef m_explosion[NUMBER_OF_PUYO_EXPLOSIONS];
+    mutable IosSurface *m_shrinking[NUMBER_OF_PUYO_DISAPPEAR];
+    mutable IosSurfaceRef m_baseShrinking[NUMBER_OF_PUYO_DISAPPEAR];
+
+    mutable IosSurface *m_explosion[NUMBER_OF_PUYO_EXPLOSIONS];
+    mutable IosSurfaceRef m_baseExplosion[NUMBER_OF_PUYO_EXPLOSIONS];
 };
 
 class NeutralPuyoThemeImpl : public BasePuyoThemeImpl {

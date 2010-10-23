@@ -357,6 +357,12 @@ IosSurfaceRef PuyoCommander::getSurface(ImageType type, const char *path, ImageS
     return m_surfaceResManager->getResource(IosSurfaceResourceKey(type, path, specialAbility));
 }
 
+IosSurfaceRef PuyoCommander::getSurface(ImageType type, const char *path, const ImageOperationList &list)
+{
+    ImageSpecialAbility specialAbility = GameUIDefaults::GAME_LOOP->getDrawContext()->guessRequiredImageAbility(list);
+    return m_surfaceResManager->getResource(IosSurfaceResourceKey(type, path, specialAbility));
+}
+
 void PuyoCommander::cacheFont(const char *path, int size, IosFontFx fx)
 {
     m_fontResManager->cacheResource(IosFontResourceKey(path, size, fx));

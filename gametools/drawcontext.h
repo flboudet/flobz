@@ -158,6 +158,24 @@ protected:
     virtual ~ImageLibrary() {}
 };
 
+/**
+ * List of operations that can be performed on a surface.
+ * Used for guessRequiredImageAbility()
+ */
+struct ImageOperationList
+{
+    ImageOperationList()
+        : shiftHue(false), shiftHSV(false), setValue(false),
+          resizeAlpha(false), mirrorH(false), convertToGray(false)
+    {}
+    bool shiftHue;
+    bool shiftHSV;
+    bool setValue;
+    bool resizeAlpha;
+    bool mirrorH;
+    bool convertToGray;
+};
+
 class DrawContext : public DrawTarget
 {
 public:
@@ -168,7 +186,8 @@ public:
     virtual int getWidth() const = 0;
     virtual ImageLibrary &getImageLibrary() = 0;
     // Query for drawcontext abilities
-    virtual bool hasScale() const { return false; }
+    virtual bool hasScaleAbility() const { return false; }
+    virtual ImageSpecialAbility guessRequiredImageAbility(const ImageOperationList &list) = 0;
 };
 
 

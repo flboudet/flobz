@@ -73,6 +73,8 @@ public:
     virtual void setBlendMode(ImageBlendMode mode);
     virtual void fillRect(const IosRect *rect, const RGBA &color);
     virtual void putString(IosFont *font, int x, int y, const char *text);
+    // Query for drawcontext abilities
+    virtual ImageSpecialAbility guessRequiredImageAbility(const ImageOperationList &list);
     // Specific methods
     void setFullScreen(bool fullscreen);
 private:

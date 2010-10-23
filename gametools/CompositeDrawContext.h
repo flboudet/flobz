@@ -151,6 +151,9 @@ public:
     virtual ImageLibrary &getImageLibrary() {
         return m_imageLibrary;
     }
+    // Query for drawcontext abilities
+    virtual bool hasScaleAbility() const;
+    virtual ImageSpecialAbility guessRequiredImageAbility(const ImageOperationList &list);
     // DrawTarget implementation
     virtual void setClipRect(IosRect *rect);
     virtual void setBlendMode(ImageBlendMode mode);

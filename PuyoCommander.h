@@ -203,6 +203,7 @@ class PuyoCommander
     // Resource managers
     void cacheSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0);
     IosSurfaceRef getSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0);
+    IosSurfaceRef getSurface(ImageType type, const char *path, const ImageOperationList &list);
     void cacheFont(const char *path, int size, IosFontFx fx = Font_STD);
     IosFontRef getFont(const char *path, int size, IosFontFx fx = Font_STD);
     void cacheSound(const char *path);

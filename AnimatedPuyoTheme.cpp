@@ -340,22 +340,34 @@ BasePuyoThemeImpl::BasePuyoThemeImpl(const PuyoThemeDescription &desc,
     : m_desc(desc), m_path(path), m_defaultTheme(defaultTheme)
 {}
 
+BasePuyoThemeImpl::~BasePuyoThemeImpl()
+{
+    for (std::vector<IosSurface *>::iterator iter = m_surfaceBin.begin() ;
+         iter != m_surfaceBin.end() ; iter++) {
+        delete (*iter);
+    }
+}
+
 PuyoThemeImpl::PuyoThemeImpl(const PuyoThemeDescription &desc,
                              const std::string &path,
                              const PuyoTheme *defaultTheme)
     : BasePuyoThemeImpl(desc, path, defaultTheme)
 {
     // Initializing the arrays of pointers
-    for (int i = 0 ; i < NUMBER_OF_PUYO_FACES ; i++)
-        for (int j = 0 ; j < MAX_COMPRESSED ; j++)
+    for (int i = 0 ; i < NUMBER_OF_PUYO_FACES ; ++i)
+        for (int j = 0 ; j < MAX_COMPRESSED ; ++j)
             m_faces[i][j] = NULL;
-    for (int i = 0 ; i < NUMBER_OF_PUYO_EYES ; i++)
-        for (int j = 0 ; j < MAX_COMPRESSED ; j++)
+    for (int i = 0 ; i < NUMBER_OF_PUYO_EYES ; ++i)
+        for (int j = 0 ; j < MAX_COMPRESSED ; ++j)
             m_eyes[i][j] = NULL;
-    for (int i = 0 ; i < NUMBER_OF_PUYO_CIRCLES ; i++)
+    for (int i = 0 ; i < NUMBER_OF_PUYO_CIRCLES ; ++i)
             m_circles[i] = NULL;
-    for (int j = 0 ; j < MAX_COMPRESSED ; j++)
+    for (int j = 0 ; j < MAX_COMPRESSED ; ++j)
         m_shadows[j] = NULL;
+    for (int i = 0 ; i < NUMBER_OF_PUYO_DISAPPEAR ; ++i)
+        m_shrinking[i] = NULL;
+    for (int i = 0 ; i < NUMBER_OF_PUYO_EXPLOSIONS ; ++i)
+        m_explosion[i] = NULL;
 }
 
 IosSurface *PuyoThemeImpl::getPuyoSurfaceForValence(int valence, int compression) const
@@ -371,20 +383,30 @@ IosSurface *PuyoThemeImpl::getPuyoSurfaceForValence(int valence, int compression
                      << ((valence&4)>>2)
                      << ((valence&2)>>1)
                      << (valence&1) << ".png";
+            ImageOperationList opList;
+            opList.resizeAlpha = true;
             if (m_desc.colorOffset == 0) {
-                m_baseFaces[valence] = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), IMAGE_READ);
+                m_baseFaces[valence] = theCommander->getSurface(IMAGE_RGBA,
+                                                                osstream.str().c_str(),
+                                                                opList);
                 uncompressed = m_baseFaces[valence];
             }
             else {
-                IosSurfaceRef baseFace = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), IMAGE_READ);
+                opList.shiftHue = true;
+                IosSurfaceRef baseFace = theCommander->getSurface(IMAGE_RGBA,
+                                                                  osstream.str().c_str(),
+                                                                  opList);
                 uncompressed = baseFace.get()->shiftHue(m_desc.colorOffset);
+                m_surfaceBin.push_back(uncompressed);
             }
         }
         // Create the compressed image
         if (uncompressed != NULL) {
-            if (compression != 0)
+            if (compression != 0) {
                 ref = uncompressed->resizeAlpha(uncompressed->w,
                                                 uncompressed->h - compression);
+                m_surfaceBin.push_back(ref);
+            }
         }
     }
     if ((ref == NULL) && (m_defaultTheme != NULL))
@@ -401,14 +423,20 @@ IosSurface *PuyoThemeImpl::getEyeSurfaceForIndex(int index, int compression) con
         if (uncompressed == NULL) {
             ostringstream osstream;
             osstream << m_path << "/" << m_desc.eye << "-puyo-eye-" << index << ".png";
-            m_baseEyes[index] = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), IMAGE_READ);
+            ImageOperationList opList;
+            opList.resizeAlpha = true;
+            m_baseEyes[index] = theCommander->getSurface(IMAGE_RGBA,
+                                                         osstream.str().c_str(),
+                                                         opList);
             uncompressed = m_baseEyes[index];
         }
         if (uncompressed != NULL) {
             // Create the compressed image
-            if (compression != 0)
+            if (compression != 0) {
                 ref = uncompressed->resizeAlpha(uncompressed->w,
                                                 uncompressed->h - compression);
+                m_surfaceBin.push_back(ref);
+            }
         }
     }
     if ((ref == NULL) && (m_defaultTheme != NULL))
@@ -424,9 +452,12 @@ IosSurface *PuyoThemeImpl::getCircleSurfaceForIndex(int index) const
         if (m_baseCircle.get() == NULL) {
             ostringstream osstream;
             osstream << m_path << "/" << m_desc.face << "-puyo-border.png";
-            m_baseCircle = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), IMAGE_READ);
+            ImageOperationList opList;
+            opList.setValue = true;
+            m_baseCircle = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
         }
         ref = m_baseCircle.get()->setValue(sin(3.14f/2.0f+index*3.14f/64.0f)*0.6f+0.2f);
+        m_surfaceBin.push_back(ref);
     }
     if ((ref == NULL) && (m_defaultTheme != NULL))
         return m_defaultTheme->getCircleSurfaceForIndex(index);
@@ -442,14 +473,18 @@ IosSurface *PuyoThemeImpl::getShadowSurface(int compression) const
         if (uncompressed == NULL) {
             ostringstream osstream;
             osstream << m_path << "/" << m_desc.face << "-puyo-shadow.png";
-            m_baseShadow = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), IMAGE_READ);
+            ImageOperationList opList;
+            opList.resizeAlpha = true;
+            m_baseShadow = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
             uncompressed = m_baseShadow;
         }
         // Create the compressed image
         if (uncompressed != NULL) {
-            if (compression != 0)
+            if (compression != 0) {
                 ref = uncompressed->resizeAlpha(uncompressed->w,
                                                 uncompressed->h - compression);
+                m_surfaceBin.push_back(ref);
+            }
         }
     }
     if ((ref == NULL) && (m_defaultTheme != NULL))
@@ -459,11 +494,21 @@ IosSurface *PuyoThemeImpl::getShadowSurface(int compression) const
 
 IosSurface *PuyoThemeImpl::getShrinkingSurfaceForIndex(int index) const
 {
-    IosSurfaceRef &ref = m_shrinking[index];
+    IosSurface *ref = m_shrinking[index];
     if (ref == NULL) {
         ostringstream osstream;
         osstream << m_path << "/" << m_desc.face << "-puyo-disappear-" << index << ".png";
-        ref = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), IMAGE_READ);
+        ImageOperationList opList;
+        if (m_desc.colorOffset == 0) {
+            m_baseShrinking[index] = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
+            ref = m_baseShrinking[index];
+        }
+        else {
+            opList.shiftHue = true;
+            IosSurfaceRef base = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
+            ref = base.get()->shiftHue(m_desc.colorOffset);
+            m_surfaceBin.push_back(ref);
+        }
     }
     if ((ref == NULL) && (m_defaultTheme != NULL))
         return m_defaultTheme->getShrinkingSurfaceForIndex(index);
@@ -472,11 +517,21 @@ IosSurface *PuyoThemeImpl::getShrinkingSurfaceForIndex(int index) const
 
 IosSurface *PuyoThemeImpl::getExplodingSurfaceForIndex(int index) const
 {
-    IosSurfaceRef &ref = m_explosion[index];
+    IosSurface *ref = m_explosion[index];
     if (ref == NULL) {
         ostringstream osstream;
         osstream << m_path << "/" << m_desc.face << "-puyo-explosion-" << index << ".png";
-        ref = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), IMAGE_READ);
+        ImageOperationList opList;
+        if (m_desc.colorOffset == 0) {
+            m_baseExplosion[index] = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
+            ref = m_baseExplosion[index];
+        }
+        else {
+            opList.shiftHue = true;
+            IosSurfaceRef base = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
+            ref = base.get()->shiftHue(m_desc.colorOffset);
+            m_surfaceBin.push_back(ref);
+        }
     }
     if ((ref == NULL) && (m_defaultTheme != NULL))
         return m_defaultTheme->getExplodingSurfaceForIndex(index);
@@ -502,14 +557,18 @@ IosSurface *NeutralPuyoThemeImpl::getPuyoSurfaceForValence(int valence, int comp
         if (uncompressed == NULL) {
             ostringstream osstream;
             osstream << m_path << "/" << m_desc.face << ".png";
-            m_baseFace = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), IMAGE_READ);
+            ImageOperationList opList;
+            opList.resizeAlpha = true;
+            m_baseFace = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
             uncompressed = m_baseFace;
         }
         // Create the compressed image
         if (uncompressed != NULL) {
-            if (compression != 0)
+            if (compression != 0) {
                 ref = uncompressed->resizeAlpha(uncompressed->w,
                                                 uncompressed->h - compression);
+                m_surfaceBin.push_back(ref);
+            }
         }
     }
     if ((ref == NULL) && (m_defaultTheme != NULL))
@@ -537,7 +596,8 @@ IosSurface *NeutralPuyoThemeImpl::getShrinkingSurfaceForIndex(int index) const
     if (ref == NULL) {
         ostringstream osstream;
         osstream << m_path << "/" << m_desc.face << "-neutral-" << index << ".png";
-        ref = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), IMAGE_READ);
+        ImageOperationList opList;
+        ref = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
     }
     if ((ref == NULL) && (m_defaultTheme != NULL))
         return m_defaultTheme->getShrinkingSurfaceForIndex(index);
@@ -587,7 +647,8 @@ IosSurface * LevelThemeImpl::getLifeForIndex(int index) const
     if (result.empty()) {
         ostringstream osstream;
         osstream << m_path << "/" << m_desc.lives << "-lives-" << index << ".png";
-        result = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str());
+        ImageOperationList opList;
+        result = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
         if ((result.empty()) && (m_defaultTheme != NULL)) {
             return m_defaultTheme->getLifeForIndex(index);
         }
@@ -600,7 +661,8 @@ IosSurfaceRef &LevelThemeImpl::getResource(IosSurfaceRef &ref, const std::string
     if (ref.empty()) {
         ostringstream osstream;
         osstream << m_path << "/" << resName << resSuffix;
-        ref = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str());
+        ImageOperationList opList;
+        ref = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
         if ((ref.empty()) && (m_defaultTheme != NULL)) {
             ref = m_defaultTheme->getResource(ref, resName, resSuffix);
         }

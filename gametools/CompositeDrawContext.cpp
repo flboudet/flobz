@@ -98,7 +98,9 @@ IosSurface *CompositeSurface::setValue(float value)
 
 IosSurface * CompositeSurface::resizeAlpha(int width, int height)
 {
-    if (true) {
+    // If the DC doesnt'have the ability to scale graphics when drawing,
+    // create a new surface with the rescaled graphics
+    if (! m_ownerImageLibrary.getBaseDrawContext().hasScaleAbility()) {
         IosSurface *srcSurface = m_baseSurface.get();
         auto_ptr<IosSurface> tempSurface;
         if (m_isCropped) {
@@ -111,10 +113,9 @@ IosSurface * CompositeSurface::resizeAlpha(int width, int height)
         return new CompositeSurface(m_ownerImageLibrary,
                                     srcSurface->resizeAlpha(width, height));
     }
-    IosRect cropRect = m_cropRect;
-    //cropRect.w = width; cropRect.h = height;
-    CompositeSurface *result = new CompositeSurface(m_ownerImageLibrary, m_baseSurface, cropRect);
-    //result->setBaseSurfacePath(m_path.c_str());
+    // Otherwise, just create a new CompositeSurface with the same croprect
+    // and base surface, and change its dimensions
+    CompositeSurface *result = new CompositeSurface(m_ownerImageLibrary, m_baseSurface, m_cropRect);
     result->w = width;
     result->h = height;
     return result;
@@ -229,6 +230,16 @@ CompositeDrawContext::CompositeDrawContext(DrawContext *baseDrawContext)
 {
     w = baseDrawContext->w;
     h = baseDrawContext->h;
+}
+
+bool CompositeDrawContext::hasScaleAbility() const
+{
+    return m_baseDrawContext->hasScaleAbility();
+}
+
+ImageSpecialAbility CompositeDrawContext::guessRequiredImageAbility(const ImageOperationList &list)
+{
+    return m_baseDrawContext->guessRequiredImageAbility(list);
 }
 
 // DrawTarget implementation
