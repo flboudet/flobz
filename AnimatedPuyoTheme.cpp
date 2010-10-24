@@ -789,20 +789,17 @@ bool LevelThemeImpl::getOpponentIsBehind() const
 
 const std::string LevelThemeImpl::getGameLostLeftAnimation2P() const
 {
-    std::string animPath = m_path + "/" + m_desc.gameLostLeft2PAnimation;
-    return std::string(m_dataPathManager.getPath(animPath.c_str()));
+    return m_desc.gameLostLeft2PAnimation;
 }
 
 const std::string LevelThemeImpl::getGameLostRightAnimation2P() const
 {
-    std::string animPath = m_path + "/" + m_desc.gameLostRight2PAnimation;
-    return std::string(m_dataPathManager.getPath(animPath.c_str()));
+    return m_desc.gameLostRight2PAnimation;
 }
 
 const std::string LevelThemeImpl::getCentralAnimation2P() const
 {
-    std::string animPath = m_path + "/" + m_desc.animation;
-    return std::string(m_dataPathManager.getPath(animPath.c_str()));
+    return m_desc.animation;
 }
 
 const std::string LevelThemeImpl::getForegroundAnimation() const
