@@ -115,6 +115,7 @@ private:
     ios_fc::SharedPtr<IosSurface> m_baseSurface;
     bool m_isCropped;
     IosRect m_cropRect;
+    ImageBlendMode m_blendMode;
     friend class CompositeDrawContext;
 };
 

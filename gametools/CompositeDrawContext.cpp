@@ -12,7 +12,7 @@ using namespace ios_fc;
 CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
                                    SharedPtr<IosSurface> baseSurface)
     : m_ownerImageLibrary(ownerImageLibrary),
-      m_baseSurface(baseSurface), m_isCropped(false)
+      m_baseSurface(baseSurface), m_isCropped(false), m_blendMode(IMAGE_COPY)
 {
     w = baseSurface->w;
     h = baseSurface->h;
@@ -22,7 +22,7 @@ CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
                                    SharedPtr<IosSurface> baseSurface,
                                    const IosRect &cropRect)
     : m_ownerImageLibrary(ownerImageLibrary),
-      m_baseSurface(baseSurface), m_isCropped(true), m_cropRect(cropRect)
+      m_baseSurface(baseSurface), m_isCropped(true), m_cropRect(cropRect), m_blendMode(IMAGE_COPY)
 {
     w = cropRect.w;
     h = cropRect.h;
@@ -140,8 +140,11 @@ void CompositeSurface::setClipRect(IosRect *rect)
 
 void CompositeSurface::setBlendMode(ImageBlendMode mode)
 {
-    //if (!m_isComposite)
-    m_baseSurface->setBlendMode(mode);
+    if (!m_isCropped) {
+        m_baseSurface->setBlendMode(mode);
+        return;
+    }
+    m_blendMode = mode;
 }
 
 void CompositeSurface::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
@@ -149,6 +152,7 @@ void CompositeSurface::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect
     CompositeSurface *s = static_cast<CompositeSurface *>(surf);
     if (!s->m_isCropped)
         m_baseSurface->draw(s->m_baseSurface.get(), srcRect, dstRect);
+    s->m_baseSurface->setBlendMode(m_blendMode);
     if (srcRect == NULL) {
         m_baseSurface->draw(s->m_baseSurface.get(), &(s->m_cropRect), dstRect);
         return;
@@ -270,7 +274,14 @@ void CompositeDrawContext::draw(IosSurface *surf, IosRect *srcRect, IosRect *dst
 void CompositeDrawContext::drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
     CompositeSurface *s = static_cast<CompositeSurface *>(surf);
-    m_baseDrawContext->drawHFlipped(s->m_baseSurface.get(), srcRect, dstRect);
+    if (! s->m_isCropped) {
+        m_baseDrawContext->drawHFlipped(s->m_baseSurface.get(), srcRect, dstRect);
+        return;
+    }
+    if (srcRect == NULL) {
+        m_baseDrawContext->drawHFlipped(s->m_baseSurface.get(), &(s->m_cropRect), dstRect);
+        return;
+    }
 }
 
 void CompositeDrawContext::drawRotatedCentered(IosSurface *surf, int angle, int x, int y)
