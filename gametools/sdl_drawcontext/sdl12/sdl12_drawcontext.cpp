@@ -260,7 +260,11 @@ void SDL12_IosSurface::dropAbility(int ability)
 
 RGBA SDL12_IosSurface::readRGBA(int x, int y)
 {
-    return iim_surface_get_rgba(m_surf, x, y);
+    bool srclocked = false;
+    if(SDL_MUSTLOCK(m_surf)) srclocked = (SDL_LockSurface(m_surf) == 0);
+    RGBA result = iim_surface_get_rgba(m_surf, x, y);
+    if(srclocked) SDL_UnlockSurface(m_surf);
+    return result;
 }
 
 IosSurface *SDL12_IosSurface::shiftHue(float hue_offset, IosSurface *mask)
