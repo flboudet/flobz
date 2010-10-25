@@ -35,7 +35,7 @@ namespace gameui {
     }
 
 	static Action DUMMY_ACTION;
-	
+
     //
     // Widget
     //
@@ -109,7 +109,7 @@ namespace gameui {
         if (idle != NULL)
             GameUIDefaults::GAME_LOOP->removeIdle(idle);
     }
-	
+
 	bool Widget::isMostlyInside(int x, int y) const
 	{
 		Vec3 widPosition = getPosition();
@@ -507,7 +507,7 @@ namespace gameui {
 				lostFocus();
 				return;
 			}
-			
+
 			// Event transmission to the widget tree
 			Widget *child = getChild(activeWidget);
 			// If the event is a key up event and the child is not interrested, discard the event
@@ -520,7 +520,7 @@ namespace gameui {
 			//if (event->cursorEvent == kGameMouseUp) {
 			//	lostFocus();
 			//	return;
-			//}		
+			//}
 			if (child->haveFocus()) return;
 
 			// Keyboard focus management
@@ -1300,7 +1300,7 @@ namespace gameui {
         if (parent)
             parent->arrangeWidgets();
     }
-	
+
 	void Text::setShadow(int x, int y) {
 		m_shadow = true;
 		m_shadow_x = x;
@@ -1863,11 +1863,8 @@ namespace gameui {
         : Text("<Not set>", NULL), control(control), alternate(alternate)
     {
         init(NULL,NULL);
-#ifdef TODO
-        char temp[255];
-        getKeyName(control, alternate, temp);
-        setValue(temp);
-#endif
+        String controlName = GameUIDefaults::GAME_LOOP->getEventManager()->getControlName(control, alternate);
+        setValue(controlName);
         if (action != NULL)
             setAction(ON_ACTION, action);
     }
@@ -1889,19 +1886,21 @@ namespace gameui {
 
     void ControlInputWidget::changeTo(GameControlEvent *event)
     {
-#ifdef TODO
         GameControlEvent result;
-        if (tryChangeControl(control, alternate, event->sdl_event, &result)) {
-            char temp[255];
-            getKeyName(control, alternate, temp);
-            setValue(temp);
+        EventManager * evm = GameUIDefaults::GAME_LOOP->getEventManager();
+        if (evm->changeControl(control, alternate, *event)) {
+            String controlName = evm->getControlName(control, alternate);
+            setValue(controlName);
             editionMode = false;
         }
-#endif
     }
 
     void ControlInputWidget::eventOccured(GameControlEvent *event)
     {
+        if ((event->cursorEvent == kCursorNone)
+            && (event->keyboardEvent == kKeyboardNone)
+            && (event->gameEvent == kGameNone))
+            return;
         // if evenement joystick et editionMode alors traiter le cas.
         if (event->isJoystick && editionMode && (event->cursorEvent != kBack)) {
             printf("XXXXX\n");

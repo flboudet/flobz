@@ -42,7 +42,8 @@ static void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *r
     result->caught = false;
     result->isJoystick = false;
     result->unicodeKeySym = 0;
-    
+    result->keySym = 0;
+
     switch (e.type) {
         case SDL_QUIT:
             result->cursorEvent = kQuit;
@@ -50,10 +51,12 @@ static void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *r
         case SDL_KEYDOWN:
             result->keyboardEvent = kKeyboardDown;
             result->unicodeKeySym = e.key.keysym.unicode;
+            result->keySym = e.key.keysym.sym;
             break;
         case SDL_KEYUP:
             result->keyboardEvent = kKeyboardUp;
             result->unicodeKeySym = e.key.keysym.unicode;
+            result->keySym = e.key.keysym.sym;
             break;
         default:
             break;
@@ -61,35 +64,35 @@ static void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *r
     // Game event handling
     if (input == NULL)
         return;
-    
+
     result->isJoystick = input->isJoystick();
-    
+
     if (input->isQuit())
         result->cursorEvent = kQuit;
-    
+
     if (input->isValidate())
         result->cursorEvent = kStart;
-    
+
     if (input->isCancel())
         result->cursorEvent = kBack;
-    
+
     if (input->isArrowDown())
         result->cursorEvent = kDown;
-    
+
     if (input->isArrowUp())
         result->cursorEvent = kUp;
-    
+
     if (input->isArrowLeft())
         result->cursorEvent = kLeft;
-    
+
     if (input->isArrowRight())
         result->cursorEvent = kRight;
-    
+
     if (input->isPause())
         result->gameEvent = kPauseGame;
-    
+
     result->isUp = input->isUp();
-    
+
     if ((*input == *keyControls[kPlayer1LeftControl]) || (*input == *keyAlternateControls[kPlayer1LeftControl]))
         result->gameEvent = kPlayer1Left;
     if ((*input == *keyControls[kPlayer1RightControl]) || (*input == *keyAlternateControls[kPlayer1RightControl]))
@@ -100,7 +103,7 @@ static void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *r
         result->gameEvent = kPlayer1TurnLeft;
     if ((*input == *keyControls[kPlayer1DownControl]) || (*input == *keyAlternateControls[kPlayer1DownControl]))
         result->gameEvent = kPlayer1Down;
-    
+
     if ((*input == *keyControls[kPlayer2LeftControl]) || (*input == *keyAlternateControls[kPlayer2LeftControl]))
         result->gameEvent = kPlayer2Left;
     if ((*input == *keyControls[kPlayer2RightControl]) || (*input == *keyAlternateControls[kPlayer2RightControl]))
@@ -117,7 +120,7 @@ static void getControlEvent(SDL_Event e, GameControlEvent *result)
 {
     InputSwitch *input  = switchForEvent(&e);
     getControlEvent(e, input, result);
-    
+
     if (input)
         delete input;
 }
@@ -181,7 +184,19 @@ ios_fc::String SDL12_EventManager::getControlName(int controlType, bool alternat
 
 bool SDL12_EventManager::changeControl(int controlType, bool alternate, GameControlEvent &event)
 {
-    return true;
+    InputSwitch * &inputToChange = alternate? keyAlternateControls[controlType]
+                                            : keyControls[controlType];
+    if (event.keyboardEvent == kKeyboardDown) {
+        delete inputToChange;
+        inputToChange = new KeyInputSwitch(event.keySym, true);
+        return true;
+    }
+    else if (event.isJoystick) {
+        delete inputToChange;
+        inputToChange = new KeyInputSwitch(event.keySym, true);
+        return true;
+    }
+    return false;
 }
 
 void SDL12_EventManager::saveControls()

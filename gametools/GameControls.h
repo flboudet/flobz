@@ -75,6 +75,7 @@ public:
 	bool caught;
     int x, y;
     uint16_t unicodeKeySym;
+    uint16_t keySym;
 	void setCaught() { caught = true; }
 	bool isMouse() const { return (cursorEvent == kGameMouseMoved) || (cursorEvent == kGameMouseDown) || (cursorEvent == kGameMouseUp); }
 };
@@ -108,7 +109,7 @@ enum {
     kPlayer2ClockwiseControl        = 8,
     kPlayer2CounterclockwiseControl = 9
 };
-    
+
 void getKeyName(int control, bool alternate, char *keyName);
 
 
