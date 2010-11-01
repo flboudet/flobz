@@ -74,8 +74,6 @@ void OptionMenu::build() {
     buttonsBox.add(&audioButton);
     buttonsBox.add(&musicButton);
     buttonsBox.add(&fullScreenButton);
-    cout << "Found " << theCommander->getPuyoSetThemeList().size() << " puyoset themes " << endl;
-    cout << "Found " << theCommander->getLevelThemeList().size() << " level themes " << endl;
     if (theCommander->getPuyoSetThemeList().size() > 1)
         buttonsBox.add(&changePuyoThemeButton);
     if (theCommander->getLevelThemeList().size() > 1)

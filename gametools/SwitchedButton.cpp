@@ -45,20 +45,21 @@ namespace gameui {
 
     void SwitchedButton::lostFocus()
     {
+        HBox::lostFocus();
         stateImage.lostFocus();
         text.lostFocus();
     }
 
     void SwitchedButton::giveFocus()
     {
+        HBox::giveFocus();
         stateImage.giveFocus();
         text.giveFocus();
+        setActiveWidget(1);
     }
 
     void SwitchedButton::action(Widget *sender, int actionType, GameControlEvent *event)
     {
-      cout << "Action type" << actionType << endl;
-      cout << "ON_ACTION=" << ON_ACTION << endl;
         if (m_altResponder != NULL) {
             m_altResponder->action(this, actionType, event);
             return;

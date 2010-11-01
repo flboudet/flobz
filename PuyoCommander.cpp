@@ -114,7 +114,6 @@ PuyoSetThemeFactory::PuyoSetThemeFactory(ThemeManager &themeManager)
 
 PuyoSetTheme *PuyoSetThemeFactory::create(const std::string &name)
 {
-    cout << "Asked for creation of puyoset theme " << name << endl;
     return m_themeManager.createPuyoSetTheme(name);
 }
 
@@ -130,7 +129,6 @@ LevelThemeFactory::LevelThemeFactory(ThemeManager &themeManager)
 
 LevelTheme *LevelThemeFactory::create(const std::string &name)
 {
-    cout << "Asked for creation of level theme " << name << endl;
     return m_themeManager.createLevelTheme(name);
 }
 
