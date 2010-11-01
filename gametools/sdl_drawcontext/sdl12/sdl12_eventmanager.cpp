@@ -1,11 +1,34 @@
+#include <iostream>
+#include <sstream>
+#include "preferences.h"
 #include "sdl12_eventmanager.h"
 #include "common/SDL_InputSwitch.h"
 
+using namespace std;
 using namespace ios_fc;
 using namespace event_manager;
 
 #define NB_CONTROLS 10
-static InputSwitch *keyControls[NB_CONTROLS] =
+
+#ifdef DISABLED
+static int defaultKeyControls[NB_CONTROLS] = {
+    SDLK_s,
+    SDLK_f,
+    SDLK_d,
+    SDLK_UNKNOWN,
+    SDLK_e,
+    SDLK_LEFT,
+    SDLK_RIGHT,
+    SDLK_DOWN,
+    SDLK_UNKNOWN,
+    SDLK_UP
+};
+#endif
+
+//static ind defaultAlternateKeyControls[NB_CONTROLS] = {
+//};
+
+static InputSwitch *defaultKeyControls[NB_CONTROLS] =
 {
     new KeyInputSwitch(SDLK_s,true),
     new KeyInputSwitch(SDLK_f,true),
@@ -19,7 +42,7 @@ static InputSwitch *keyControls[NB_CONTROLS] =
     new KeyInputSwitch(SDLK_UP,true)
 };
 
-static InputSwitch *keyAlternateControls[NB_CONTROLS] =
+static InputSwitch *defaultKeyAlternateControls[NB_CONTROLS] =
 {
     new JoystickAxisSwitch(0, 0, false, false),
     new JoystickAxisSwitch(0, 0, true, false),
@@ -32,6 +55,9 @@ static InputSwitch *keyAlternateControls[NB_CONTROLS] =
     new JoystickSwitch(1, 1, false),
     new JoystickSwitch(1, 0, false)
 };
+
+static InputSwitch *keyControls[NB_CONTROLS];
+static InputSwitch *keyAlternateControls[NB_CONTROLS];
 
 static void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
 {
@@ -142,6 +168,23 @@ SDL12_EventManager::SDL12_EventManager()
       m_mouseX(0), m_mouseY(0)
 {
 	SDL_EnableUNICODE(1);
+    // get defaults from prefs
+    for (int i = 0 ; i < NB_CONTROLS ; i++) {
+        char result[256];
+        ostringstream osstream;
+        osstream << "key." << i;
+        string defaultKeyStr = defaultKeyControls[i]->toString();
+        GetStrPreference (osstream.str().c_str(), result, defaultKeyStr.c_str());
+        keyControls[i] = InputSwitch::createFromString(result);
+    }
+    for (int i = 0 ; i < NB_CONTROLS ; i++) {
+        char result[256];
+        ostringstream osstream;
+        osstream << "altkey." << i;
+        string defaultKeyStr = defaultKeyAlternateControls[i]->toString();
+        GetStrPreference (osstream.str().c_str(), result, defaultKeyStr.c_str());
+        keyAlternateControls[i] = InputSwitch::createFromString(result);
+    }
 }
 
 bool SDL12_EventManager::pollEvent(GameControlEvent &controlEvent)
@@ -201,6 +244,18 @@ bool SDL12_EventManager::changeControl(int controlType, bool alternate, GameCont
 
 void SDL12_EventManager::saveControls()
 {
+    for (int i = 0 ; i < NB_CONTROLS ; i++) {
+        ostringstream osstream;
+        osstream << "key." << i;
+        string prefKeyStr = keyControls[i]->toString();
+        SetStrPreference (osstream.str().c_str(), prefKeyStr.c_str());
+    }
+    for (int i = 0 ; i < NB_CONTROLS ; i++) {
+        ostringstream osstream;
+        osstream << "altkey." << i;
+        string prefKeyStr = keyAlternateControls[i]->toString();
+        SetStrPreference (osstream.str().c_str(), prefKeyStr.c_str());
+    }
 }
 
 void SDL12_EventManager::translateMouseEvent(const SDL_Event &sdl_event,

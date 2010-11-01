@@ -1,6 +1,7 @@
 #ifndef _INPUT_SW_MAN_H
 #define _INPUT_SW_MAN_H
 
+#include <string>
 #include <string.h>
 #ifdef MACOSX
 #include <SDL/SDL.h>
@@ -16,6 +17,8 @@ class InputSwitch
 
     InputSwitch(bool isup = false) : isup(isup) {}
     virtual ~InputSwitch() {}
+    static InputSwitch *createFromString(std::string str);
+
     virtual const char *name() const = 0;
     virtual int id() const = 0;
 
@@ -38,7 +41,8 @@ class InputSwitch
 
     virtual bool isJoystick()   const { return false; }
 
-  private:
+    virtual std::string toString() const = 0;
+  protected:
     bool isup;
 };
 
@@ -57,6 +61,7 @@ class KeyInputSwitch : public InputSwitch
 #else
     KeyInputSwitch(int keysym, bool isup, SDLMod keymod = KMOD_NONE);
 #endif
+    KeyInputSwitch(std::string str);
     const char *name() const;
     int id() const;
 
@@ -68,6 +73,8 @@ class KeyInputSwitch : public InputSwitch
     virtual bool isCancel()    const;
     virtual bool isPause()     const;
     virtual bool isQuit()      const;
+
+    virtual std::string toString() const;
 
   private:
     int keysym;
@@ -88,12 +95,15 @@ class JoystickSwitch : public InputSwitch
 
   public:
     JoystickSwitch(int which, int button, bool isup);
+    JoystickSwitch(std::string str);
     const char *name() const;
     int id() const;
 
     virtual bool isValidate()  const;
     virtual bool isCancel()    const;
     virtual bool isJoystick()  const { return true; }
+
+    virtual std::string toString() const;
 };
 
 class JoystickAxisSwitch : public InputSwitch
@@ -106,6 +116,7 @@ class JoystickAxisSwitch : public InputSwitch
 
   public:
     JoystickAxisSwitch(int which, int axis, bool maximum, bool isup);
+    JoystickAxisSwitch(std::string str);
     const char *name() const;
     int id() const;
 
@@ -114,6 +125,8 @@ class JoystickAxisSwitch : public InputSwitch
     virtual bool isArrowLeft()  const;
     virtual bool isArrowRight() const;
     virtual bool isJoystick()  const { return true; }
+
+    virtual std::string toString() const;
 };
 
 class InputFromIDAndName : public InputSwitch

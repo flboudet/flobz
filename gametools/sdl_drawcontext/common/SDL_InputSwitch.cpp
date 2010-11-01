@@ -1,5 +1,9 @@
 #include "SDL_InputSwitch.h"
 #include <stdlib.h>
+#include <iostream>
+#include <sstream>
+
+using namespace std;
 
 typedef struct SdlKeyName {
   int key;
@@ -81,6 +85,20 @@ static SDL_Joystick *joystick[16];
 static int numJoysticks;
 static int axisSave[16][16];
 
+InputSwitch *InputSwitch::createFromString(std::string str)
+{
+    istringstream iss(str);
+    string inputType;
+    iss >> inputType;
+    if (inputType == "KEY")
+        return new KeyInputSwitch(str);
+    else if (inputType == "JSWITCH")
+        return new JoystickSwitch(str);
+    else if (inputType == "JAXIS")
+        return new JoystickAxisSwitch(str);
+    return NULL;
+}
+
 /* KEY Input */
 #if SDL_VERSION_ATLEAST(1, 3, 0)
 KeyInputSwitch::KeyInputSwitch(int keysym, bool isup, Uint16 keymod)
@@ -89,6 +107,24 @@ KeyInputSwitch::KeyInputSwitch(int keysym, bool isup, SDLMod keymod)
 #endif
   : InputSwitch(isup), keysym(keysym), keymod(keymod) {
   keyName[0] = 0;
+}
+
+KeyInputSwitch::KeyInputSwitch(std::string str)
+    : InputSwitch(false)
+{
+    istringstream iss(str);
+    int tmpkeymod;
+    string inputType;
+    iss >> inputType;
+    iss >> isup;
+    iss >> keysym;
+    iss >> tmpkeymod;
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+    keymod = tmpkeymod;
+#else
+    keymod = (SDLMod)tmpkeymod;
+#endif
+    keyName[0] = 0;
 }
 
 const char *KeyInputSwitch::name() const {
@@ -141,6 +177,12 @@ bool KeyInputSwitch::isQuit()    const {
 #endif
 }
 
+std::string KeyInputSwitch::toString() const
+{
+    ostringstream osstream;
+    osstream << "KEY " << isup << " " << keysym << " " << keymod;
+    return osstream.str();
+}
 
 /* JOY BUTTON */
 
@@ -148,6 +190,18 @@ JoystickSwitch::JoystickSwitch(int which, int button, bool isup)
 : InputSwitch(isup),which(which),button(button)
 {
   keyName[0] = 0;
+}
+
+JoystickSwitch::JoystickSwitch(std::string str)
+    : InputSwitch(false)
+{
+    istringstream iss(str);
+    string inputType;
+    iss >> inputType;
+    iss >> isup;
+    iss >> which;
+    iss >> button;
+    keyName[0] = 0;
 }
 
 const char *JoystickSwitch::name() const {
@@ -168,12 +222,32 @@ bool JoystickSwitch::isCancel()    const {
   return button == 2;
 }
 
+std::string JoystickSwitch::toString() const
+{
+    ostringstream osstream;
+    osstream << "JSWITCH " << isup << " " << which << " " << button;
+    return osstream.str();
+}
+
 /* JOY AXIS SWITCH */
 
 JoystickAxisSwitch::JoystickAxisSwitch(int which, int axis, bool maximum, bool isup)
   : InputSwitch(isup),which(which),axis(axis),maximum(maximum)
 {
   keyName[0] = 0;
+}
+
+JoystickAxisSwitch::JoystickAxisSwitch(std::string str)
+    : InputSwitch(false)
+{
+    istringstream iss(str);
+    string inputType;
+    iss >> inputType;
+    iss >> isup;
+    iss >> which;
+    iss >> axis;
+    iss >> maximum;
+    keyName[0] = 0;
 }
 
 const char *JoystickAxisSwitch::name() const {
@@ -199,6 +273,13 @@ bool JoystickAxisSwitch::isArrowLeft()   const {
 bool JoystickAxisSwitch::isArrowRight() const {
   return (axis == 0) && (maximum);
 }
+std::string JoystickAxisSwitch::toString() const
+{
+    ostringstream osstream;
+    osstream << "JAXIS "  << isup << " " << which << " " << axis << " " << maximum;
+    return osstream.str();
+}
+
 /** EVENT HANDLERS */
 
 InputSwitch *waitInputSwitch()
