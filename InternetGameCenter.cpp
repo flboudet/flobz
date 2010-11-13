@@ -136,9 +136,13 @@ void InternetGameCenter::idle()
     static int idleCount = 0;
     switch (gameGrantedStatus) {
         case GAMESTATUS_STARTTRAVERSAL:
+            // The game has been accepted, negociation is pending
+            for (int i = 0, j = listeners.size() ; i < j ; i++) {
+                listeners[i]->onGameAcceptedNegociationPending(grantedInvitation);
+            }
             p2pmbox = new UDPMessageBox(hostName, 0, portNum);
             printf("grantedAddr:%d\n", static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.opponentAddress.getImpl())->getIgpIdent());
-            
+
             int initiatorIgpIdent, guestIgpIdent;
             if (grantedInvitation.initiatorAddress == grantedInvitation.opponentAddress) { // The opponent invited me
                 initiatorIgpIdent = static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.initiatorAddress.getImpl())->getIgpIdent();
@@ -306,7 +310,7 @@ void InternetGameCenter::onMessage(Message &msg)
                 if (tryNatTraversal)
                     gameGrantedStatus = GAMESTATUS_STARTTRAVERSAL;
                 else
-                    gameGrantedStatus = GAMESTATUS_GRANTED_IGP; 
+                    gameGrantedStatus = GAMESTATUS_GRANTED_IGP;
             }
                 break;
             case PUYO_IGP_GAME_CANCEL:

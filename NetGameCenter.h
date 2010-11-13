@@ -50,6 +50,7 @@ public:
     virtual void onPlayerUpdated(String playerName, PeerAddress playerAddress) = 0;
     virtual void onGameInvitationReceived(PuyoGameInvitation &invitation) = 0;
     virtual void onGameInvitationCanceledReceived(PuyoGameInvitation &invitation) = 0;
+    virtual void onGameAcceptedNegociationPending(PuyoGameInvitation &invitation) {}
     virtual void onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation) = 0;
     virtual ~NetGameCenterListener() {};
 };

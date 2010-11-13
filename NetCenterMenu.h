@@ -40,7 +40,7 @@ class NetCenterMenu;
 
 class NetCenterDialogMenu : public SliderContainer {
 public:
-    NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvitation &associatedInvitation, String title, String message, String optLine, bool hasAcceptButton);
+    NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvitation &associatedInvitation, String title, String message, String optLine, bool hasAcceptButton, bool hasCancelButton=true);
     virtual ~NetCenterDialogMenu();
     void build();
     // Notification
@@ -59,7 +59,7 @@ private:
     };
     Frame menu;
     NetCenterDialogMenuAction cancelAction, acceptAction;
-    bool hasAcceptButton;
+    bool hasAcceptButton, hasCancelButton;
     HBox buttons;
     Frame titleFrame;
     Text dialogTitle, dialogMsg, * optMsg;
@@ -131,6 +131,7 @@ public:
     void onPlayerUpdated(String playerName, PeerAddress playerAddress);
     void onGameInvitationReceived(PuyoGameInvitation &invitation);
     void onGameInvitationCanceledReceived(PuyoGameInvitation &invitation);
+    void onGameAcceptedNegociationPending(PuyoGameInvitation &invitation);
     void onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation);
     void grantCurrentGame();
     void cancelCurrentGame();

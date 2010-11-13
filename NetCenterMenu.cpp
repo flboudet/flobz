@@ -55,10 +55,11 @@ void NetCenterDialogMenu::NetCenterDialogMenuAction::action()
     else targetMenu->cancelCurrentGame();
 }
 
-NetCenterDialogMenu::NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvitation &associatedInvitation, String title, String message, String optLine, bool hasAcceptButton)
+NetCenterDialogMenu::NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvitation &associatedInvitation, String title, String message, String optLine, bool hasAcceptButton, bool hasCancelButton)
     : associatedInvitation(associatedInvitation),
       menu(theCommander->getWindowFramePicture()),
-      cancelAction(targetMenu, true), acceptAction(targetMenu, false), hasAcceptButton(hasAcceptButton),
+      cancelAction(targetMenu, true), acceptAction(targetMenu, false),
+      hasAcceptButton(hasAcceptButton), hasCancelButton(hasCancelButton),
       titleFrame(theCommander->getSeparatorFramePicture()),
       dialogTitle(title), dialogMsg(message), optMsg(NULL),
       acceptButton(theCommander->getLocalizedString("Accept"), &acceptAction,
@@ -93,7 +94,8 @@ void NetCenterDialogMenu::build()
     }
     if (hasAcceptButton)
         buttons.add(&acceptButton);
-    buttons.add(&cancelButton);
+    if (hasCancelButton)
+        buttons.add(&cancelButton);
     menu.add(&buttons);
     getParentScreen()->grabEventsOnWidget(this);
     transitionToContent(&menu);
@@ -391,6 +393,18 @@ void NetCenterMenu::cancelCurrentGame()
     }
 }
 
+void NetCenterMenu::onGameAcceptedNegociationPending(PuyoGameInvitation &invitation)
+{
+    container.remove(onScreenDialog);
+    delete onScreenDialog;
+    onScreenDialog = new NetCenterDialogMenu(this, invitation, theCommander->getLocalizedString("Negociating game"),
+                                             theCommander->getLocalizedString("A game is being prepared with"),
+                                             invitation.opponentName, false, false);
+    container.add(onScreenDialog);
+    onScreenDialog->build();
+    this->focus(onScreenDialog);
+}
+
 void NetCenterMenu::onGameInvitationCanceledReceived(PuyoGameInvitation &invitation)
 {
     if (this->onScreenDialog != NULL) {
@@ -405,9 +419,9 @@ void NetCenterMenu::onGameInvitationCanceledReceived(PuyoGameInvitation &invitat
 void NetCenterMenu::onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation)
 {
     PuyoNetworkTwoPlayerGameWidgetFactory *factory = new PuyoNetworkTwoPlayerGameWidgetFactory(*mbox, invitation.gameRandomSeed, netCenter->getIgpBox());
-    TwoPlayersStarterAction *starterAction = new TwoPlayersStarterAction(invitation.gameSpeed, *factory, &nameProvider);
-
-    starterAction->action(this, NULL, 0);
+    //TwoPlayersStarterAction *starterAction = new TwoPlayersStarterAction(invitation.gameSpeed, *factory, &nameProvider);
+    NetworkGameStateMachine *starter = new NetworkGameStateMachine(*factory, mbox, invitation.gameSpeed, &nameProvider);
+    starter->evaluate();
 
     if (this->onScreenDialog != NULL) {
         container.remove(onScreenDialog);

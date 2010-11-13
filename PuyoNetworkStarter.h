@@ -27,6 +27,7 @@
 
 #include "PuyoStarter.h"
 #include "PuyoSinglePlayerStarter.h"
+#include "PuyoTwoPlayerStarter.h"
 #include "ios_messagebox.h"
 #include "PuyoNetworkView.h"
 #include "NetCenterMenu.h"
@@ -62,7 +63,6 @@ protected:
     void associatedScreenHasBeenSet(GameScreen *associatedScreen);
     virtual PuyoPlayer *createLocalPlayer();
 private:
-    void sendSyncMsg();
     void sendAliveMsg();
     PuyoSetTheme *attachedPuyoThemeSet; // optional
     std::auto_ptr<PuyoRandomSystem> attachedRandom;
@@ -75,7 +75,6 @@ protected:
 private:
     std::auto_ptr<PuyoPlayer> playercontroller;
     std::auto_ptr<PuyoNullPlayer> dummyPlayerController;
-    bool syncMsgReceived, syncMsgSent;
     double lastMessageDate, lastAliveMessageSentDate;
     // Chat zone
     std::auto_ptr<ChatBox> chatBox; // optional
@@ -84,5 +83,55 @@ private:
     bool networkIsBroken;
 };
 
+class NetSynchronizeState : public GameState, MessageListener, CycledComponent
+{
+public:
+    NetSynchronizeState(ios_fc::MessageBox *mbox,
+                        int synID);
+    // GameState implementation
+    virtual void enterState();
+    virtual void exitState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // MessageListener implementation
+    void onMessage(Message &);
+    // CycledComponent implementation
+    virtual void cycle();
+    // Own methods
+    void setNextState(GameState *nextState) {
+        m_nextState = nextState;
+    }
+    void setFailedState(GameState *failedState) {
+        m_failedState = failedState;
+    }
+private:
+    void sendSyncMessage();
+    void sendAckMessage();
+private:
+    ios_fc::MessageBox *m_mbox;
+    int m_synID;
+    bool m_synchronized;
+    bool m_ackSent;
+    GameState *m_nextState, *m_failedState;
+};
+
+class NetworkGameStateMachine : public GameStateMachine
+{
+public:
+    NetworkGameStateMachine(GameWidgetFactory &gameWidgetFactory,
+                            ios_fc::MessageBox *mbox,
+                            int gameSpeed,
+                            PuyoTwoNameProvider *nameProvider = NULL);
+private:
+    SharedMatchAssets m_sharedAssets;
+    auto_ptr<SetupMatchState>       m_setupMatch;
+    auto_ptr<WaitPlayersReadyState> m_waitPlayersReady;
+    auto_ptr<NetSynchronizeState>   m_synchroBeforeStart;
+    auto_ptr<MatchPlayingState>     m_matchPlaying;
+    auto_ptr<MatchIsOverState>      m_matchIsOver;
+    auto_ptr<DisplayStatsState>     m_displayStats;
+    auto_ptr<NetSynchronizeState>   m_synchroAfterStats;
+    auto_ptr<LeaveGameState>        m_leaveGame;
+};
 
 #endif // _PUYONETWORKSTARTER

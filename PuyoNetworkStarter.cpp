@@ -39,7 +39,7 @@ PuyoGame *PuyoNetworkGameFactory::createPuyoGame(PuyoFactory *attachedPuyoFactor
 }
 
 PuyoNetworkGameWidget::PuyoNetworkGameWidget()
-    : syncMsgReceived(false), syncMsgSent(false), chatBox(NULL),
+    : chatBox(NULL),
       brokenNetworkWidget(NULL), networkIsBroken(false)
 {
 }
@@ -94,33 +94,27 @@ PuyoNetworkGameWidget::~PuyoNetworkGameWidget()
 void PuyoNetworkGameWidget::cycle()
 {
     mbox->idle();
-    if (!syncMsgSent) {
-        sendSyncMsg();
-        syncMsgSent = true;
+    double curDate = ios_fc::getTimeMs();
+    if (paused) {
+        if (curDate - lastAliveMessageSentDate > 2000.) {
+            sendAliveMsg();
+            lastAliveMessageSentDate = curDate;
+        }
     }
-    if (syncMsgReceived) {
-        double curDate = ios_fc::getTimeMs();
-        if (paused) {
-            if (curDate - lastAliveMessageSentDate > 2000.) {
-                sendAliveMsg();
-                lastAliveMessageSentDate = curDate;
-            }
-        }
-        if (curDate - lastMessageDate > 5000.) {
-            if (!networkIsBroken) {
-                if (withGUI)
-                    associatedScreen->add(brokenNetworkWidget.get());
-                networkIsBroken = true;
-            }
-            //printf("Network problem!\n");
-        }
-        else if (networkIsBroken == true) {
+    if (curDate - lastMessageDate > 5000.) {
+        if (!networkIsBroken) {
             if (withGUI)
-                associatedScreen->remove(brokenNetworkWidget.get());
-            networkIsBroken = false;
+                associatedScreen->add(brokenNetworkWidget.get());
+            networkIsBroken = true;
         }
-        GameWidget::cycle();
+        //printf("Network problem!\n");
     }
+    else if (networkIsBroken == true) {
+        if (withGUI)
+            associatedScreen->remove(brokenNetworkWidget.get());
+        networkIsBroken = false;
+    }
+    GameWidget::cycle();
 }
 
 void PuyoNetworkGameWidget::onMessage(Message &message)
@@ -133,9 +127,6 @@ void PuyoNetworkGameWidget::onMessage(Message &message)
     lastMessageDate = ios_fc::getTimeMs();
     int msgType = message.getInt(PuyoMessage::TYPE);
     switch (msgType) {
-        case PuyoMessage::kGameStart:
-            syncMsgReceived = true;
-            break;
         case PuyoMessage::kGamePause:
             setScreenToPaused(false);
             break;
@@ -225,16 +216,6 @@ void PuyoNetworkGameWidget::associatedScreenHasBeenSet(GameScreen *associatedScr
     associatedScreen->getPauseMenu().pauseMenuTop = 5;
 }
 
-void PuyoNetworkGameWidget::sendSyncMsg()
-{
-    ios_fc::Message *message = mbox->createMessage();
-    message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameStart);
-    message->addString  (PuyoMessage::NAME,   p1name);
-    message->addBoolProperty("RELIABLE", true);
-    message->send();
-    delete message;
-}
-
 void PuyoNetworkGameWidget::sendAliveMsg()
 {
     ios_fc::Message *message = mbox->createMessage();
@@ -243,5 +224,117 @@ void PuyoNetworkGameWidget::sendAliveMsg()
     delete message;
 }
 
+//---------------------------------
+// NetSynchronizeState
+//---------------------------------
+NetSynchronizeState::NetSynchronizeState(ios_fc::MessageBox *mbox,
+                                         int synID)
+    : CycledComponent(0.1), m_mbox(mbox), m_synID(synID)
+{
+}
 
+void NetSynchronizeState::enterState()
+{
+    cout << "NetSynchronizeState("<<m_synID<<")::enterState()" << endl;
+    GameUIDefaults::GAME_LOOP->addIdle(this);
+    m_synchronized = false;
+    m_ackSent = false;
+    m_mbox->addListener(this);
+    // Send synchro message
+    sendSyncMessage();
+}
+
+void NetSynchronizeState::exitState()
+{
+    GameUIDefaults::GAME_LOOP->removeIdle(this);
+    m_mbox->removeListener(this);
+}
+
+bool NetSynchronizeState::evaluate()
+{
+    return (m_synchronized && m_ackSent);
+}
+
+GameState *NetSynchronizeState::getNextState()
+{
+    return m_nextState;
+}
+
+void NetSynchronizeState::onMessage(Message &message)
+{
+    if (!message.hasInt(PuyoMessage::TYPE))
+        return;
+    int msgType = message.getInt(PuyoMessage::TYPE);
+    if ((msgType == PuyoMessage::kGameSync)
+        || (msgType == PuyoMessage::kGameAck)){
+        if (!message.hasInt("SynID"))
+            return;
+        int synID = message.getInt("SynID");
+        if (synID == m_synID) {
+            if (msgType == PuyoMessage::kGameSync) {
+                if (!m_ackSent) {
+                    sendAckMessage();
+                    m_ackSent = true;
+                }
+                evaluateStateMachine();
+            }
+            else {
+                m_synchronized = true;
+                evaluateStateMachine();
+            }
+        }
+    }
+}
+
+void NetSynchronizeState::cycle()
+{
+    sendSyncMessage();
+}
+
+void NetSynchronizeState::sendSyncMessage()
+{
+    auto_ptr<ios_fc::Message> message(m_mbox->createMessage());
+    message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameSync);
+    message->addInt     ("SynID", m_synID);
+    message->send();
+}
+
+void NetSynchronizeState::sendAckMessage()
+{
+    auto_ptr<ios_fc::Message> message(m_mbox->createMessage());
+    message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameAck);
+    message->addInt     ("SynID", m_synID);
+    message->addBoolProperty("RELIABLE", true);
+    message->send();
+}
+
+//---------------------------------
+// Two players network game state machine
+//---------------------------------
+NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory &gameWidgetFactory,
+                                                 ios_fc::MessageBox *mbox,
+                                                 int gameSpeed,
+                                                 PuyoTwoNameProvider *nameProvider)
+{
+    // Creating the different game states
+    m_setupMatch.reset(new SetupMatchState(gameWidgetFactory, gameSpeed, nameProvider, m_sharedAssets));
+    m_waitPlayersReady.reset(new WaitPlayersReadyState(m_sharedAssets));
+    m_synchroBeforeStart.reset(new NetSynchronizeState(mbox, 1));
+    m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));
+    m_matchIsOver.reset(new MatchIsOverState(m_sharedAssets));
+    m_displayStats.reset(new DisplayStatsState(m_sharedAssets));
+    m_synchroAfterStats.reset(new NetSynchronizeState(mbox, 10));
+    m_leaveGame.reset(new LeaveGameState(m_sharedAssets));
+    // Linking the states together
+    m_setupMatch->setNextState(m_waitPlayersReady.get());
+    m_waitPlayersReady->setNextState(m_synchroBeforeStart.get());
+    m_synchroBeforeStart->setNextState(m_matchPlaying.get());
+    m_matchPlaying->setNextState(m_matchIsOver.get());
+    m_matchPlaying->setAbortedState(m_leaveGame.get());
+    m_matchIsOver->setNextState(m_displayStats.get());
+    m_displayStats->setNextState(m_synchroAfterStats.get());
+    m_synchroAfterStats->setNextState(m_setupMatch.get());
+    // Initializing the state machine
+    setInitialState(m_setupMatch.get());
+}
 

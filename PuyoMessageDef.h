@@ -15,6 +15,8 @@ enum {
     kGameChat     = 7,
     kGameAlive    = 8,
     kGameOverWon  = 9,
+    kGameSync     = 10,
+    kGameAck      = 11,
 };
 
   extern const char *TYPE;

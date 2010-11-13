@@ -98,7 +98,6 @@ public:
                     SharedMatchAssets &sharedMatchAssets);
     // GameState implementation
     virtual void enterState();
-    virtual void exitState();
     virtual bool evaluate();
     virtual GameState *getNextState();
     // Action implementation
@@ -235,55 +234,12 @@ public:
 private:
     GameStateMachine m_stateMachine;
     SharedMatchAssets m_sharedAssets;
-    auto_ptr<SetupMatchState> m_setupMatch;
+    auto_ptr<SetupMatchState>       m_setupMatch;
     auto_ptr<WaitPlayersReadyState> m_waitPlayersReady;
     auto_ptr<MatchPlayingState>     m_matchPlaying;
     auto_ptr<MatchIsOverState>      m_matchIsOver;
     auto_ptr<DisplayStatsState>     m_displayStats;
-    auto_ptr<LeaveGameState>       m_leaveGame;
-};
-
-class TwoPlayersStarterAction : public Action {
-public:
-    TwoPlayersStarterAction(int difficulty, GameWidgetFactory &gameWidgetFactory, PuyoTwoNameProvider *nameProvider = NULL);
-    /**
-     * Implements the Action interface
-     */
-    virtual void action(Widget *sender, int actionType,
-			event_manager::GameControlEvent *event);
-private:
-    enum State {
-      kNotRunning,
-      kMatchGettingStarted,
-      kMatchPlaying,
-      kMatchWonP1Animation,
-      kMatchWonP2Animation,
-      kMatchScores,
-    };
-    /**
-     * Performs a step in the match state machine
-     */
-    void stateMachine();
-    void prepareGame();
-    void prepareGame1stRun();
-    void prepareGameNextRun();
-    void startGame();
-    void gameOver();
-    void gameScores();
-    void endGameSession();
-    State m_state;
-    int difficulty;
-    GameWidgetFactory &gameWidgetFactory;
-    GameScreen *gameScreen;
-    GameWidget *gameWidget;
-    PuyoTwoNameProvider *nameProvider;
-    StoryWidget *gameLostWidget;
-    StoryWidget *m_getReadyWidget;
-
-    LevelTheme *currentLevelTheme;
-    int leftVictories, rightVictories;
-    TwoPlayersStatsWidget *m_statsWidget;
-    int totalPointsPlayerOne_, totalPointsPlayerTwo_;
+    auto_ptr<LeaveGameState>        m_leaveGame;
 };
 
 #endif // _PUYOTWOPLAYERSTARTER
