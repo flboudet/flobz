@@ -65,6 +65,11 @@ public:
         return m_ownerResHolder->m_res;
     }
     bool empty() const { return m_ownerResHolder == NULL; }
+    void release() {
+        if (m_ownerResHolder != NULL)
+            m_ownerResHolder->m_numRefs--;
+        m_ownerResHolder = NULL;
+    }
 private:
     ResourceHolder<T> *m_ownerResHolder;
 };
