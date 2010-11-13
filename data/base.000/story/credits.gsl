@@ -40,7 +40,7 @@ import <flying_flobo.gsl>
 
     # Flying flobo
     flying_flobo_init
-    @flying_flobo_TitleDisplayXBase = 60.0
+    @flying_flobo_TitleDisplayXBase = 100.0
     @flying_flobo_TitleDisplayYBase = -110.0
     @flying_flobo_AmplitudeWaveTitle = 10.0
 
@@ -57,7 +57,7 @@ import <flying_flobo.gsl>
     (@credits_state >= @CREDITS_PROUDLY_PRESENTS)? {
         displayPos.x = 230.0
         displayPos.y = 170.0
-        (@fcycle >= @CREDITS_ALL_T + 420.0)? 
+        (@fcycle >= @CREDITS_ALL_T + 420.0)?
             displayPos.y = 170.0 - (@fcycle - 420.0 - @CREDITS_ALL_T)*0.5
         put_text: text="Proudly offered by..." pos=displayPos text_index=(@fcycle - @CREDITS_PROUDLY_PRESENTS_T)/2.0
     }
@@ -66,7 +66,7 @@ import <flying_flobo.gsl>
         displayPos.y = 320.0 - (@fcycle - @CREDITS_FOVEA_TEAM_T)/2.7
         (displayPos.x > 245.0)? displayPos.x = 245.0
         (displayPos.y < 200.0)? displayPos.y = 200.0
-        (@fcycle >= @CREDITS_ALL_T + 420.0)? 
+        (@fcycle >= @CREDITS_ALL_T + 420.0)?
             displayPos.y = 200.0 - (@fcycle - 420.0 - @CREDITS_ALL_T)*0.5
         put_text: text="The Fovea team!" pos=displayPos text_index=(@fcycle - @CREDITS_FOVEA_TEAM_T)
         (@credits_state <= @CREDITS_INTERLUDE_3)? {
