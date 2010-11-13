@@ -74,20 +74,12 @@ public:
     void initWithoutGUI(PuyoView &areaA, PuyoView &areaB,
                      PuyoPlayer &controllerA, PuyoPlayer &controllerB,
                      gameui::Action *gameOverAction = NULL);
-    void cycle();
-    void draw(DrawTarget *dt);
-    // Draw subsets
-    virtual void drawBackground(DrawTarget *dt);
-    virtual void drawGameAreas(DrawTarget *dt);
-    virtual void drawGameNeutrals(DrawTarget *dt);
-
+    // Specific methods
+    void setGameOverAction(gameui::Action *gameOverAction);
     void pause(bool obscureScreen = true);
     void resume();
-    bool isFocusable() { return !paused; }
-    void eventOccured(event_manager::GameControlEvent *event);
     bool backPressed();
     bool startPressed();
-    IdleComponent *getIdleComponent() { return this; }
     virtual void abort() { abortedFlag = true; }
     bool getAborted() const { return abortedFlag; }
     void setLives(int l) { lives = l; }
@@ -105,14 +97,31 @@ public:
     void addGameAHandicap(int handicap) {attachedGameA->increaseNeutralPuyos((handicap>10?10:handicap) * PUYODIMX); attachedGameA->dropNeutrals();}
     void addGameBHandicap(int handicap) {attachedGameB->increaseNeutralPuyos((handicap>10?10:handicap) * PUYODIMX); attachedGameB->dropNeutrals();}
     void addSubWidget(Widget *subWidget);
+    // Display player names properties
+    void setDisplayPlayerOneName(bool display) { m_displayPlayerOneName = display; }
+    void setDisplayPlayerTwoName(bool display) { m_displayPlayerTwoName = display; }
+
+    // CycledComponent methods
+    void cycle();
+    void eventOccured(event_manager::GameControlEvent *event);
+
+    // Widget methods
+    void draw(DrawTarget *dt);
+    bool isFocusable() { return !paused; }
+    IdleComponent *getIdleComponent() { return this; }
+
+    // Draw subfunctions (in order to subclass GameWidget with modified look)
+    virtual void drawBackground(DrawTarget *dt);
+    virtual void drawGameAreas(DrawTarget *dt);
+    virtual void drawGameNeutrals(DrawTarget *dt);
+
+
     // A deplacer
     void setAssociatedScreen(GameScreen *associatedScreen) { this->associatedScreen = associatedScreen; associatedScreenHasBeenSet(associatedScreen); };
     virtual void setScreenToPaused(bool fromControls);
     virtual void setScreenToResumed(bool fromControls);
     virtual void actionAfterGameOver(bool fromControls, int actionType);
-    // Display player names properties
-    void setDisplayPlayerOneName(bool display) { m_displayPlayerOneName = display; }
-    void setDisplayPlayerTwoName(bool display) { m_displayPlayerTwoName = display; }
+
 protected:
     virtual void associatedScreenHasBeenSet(GameScreen *associatedScreen) {}
 

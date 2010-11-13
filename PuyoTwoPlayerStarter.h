@@ -25,6 +25,7 @@
 #ifndef _PUYOTWOPLAYERSTARTER
 #define _PUYOTWOPLAYERSTARTER
 
+#include "GameStateMachine.h"
 #include "PuyoStarter.h"
 #include "StatsWidget.h"
 
@@ -63,6 +64,183 @@ public:
     {
         return new TwoPlayersGameWidget(puyoThemeSet, levelTheme, centerFace, gameOverAction);
     }
+};
+
+struct SharedMatchAssets
+{
+    SharedMatchAssets() {
+        release();
+    }
+    PuyoSetThemeRef m_currentPuyoSetTheme;
+    LevelThemeRef m_currentLevelTheme;
+    std::auto_ptr<GameWidget> m_gameWidget;
+    std::auto_ptr<GameScreen> m_gameScreen;
+    int m_leftVictories, m_leftTotal;
+    int m_rightVictories, m_rightTotal;
+    void release() {
+        m_currentPuyoSetTheme.release();
+        m_currentLevelTheme.release();
+        m_gameWidget.reset(NULL);
+        m_gameScreen.reset(NULL);
+        m_leftVictories = 0;
+        m_rightVictories = 0;
+        m_leftTotal = 0;
+        m_rightTotal = 0;
+    }
+};
+
+class SetupMatchState : public GameState, public Action
+{
+public:
+    SetupMatchState(GameWidgetFactory &gameWidgetFactory,
+                    int difficulty,
+                    PuyoTwoNameProvider *nameProvider,
+                    SharedMatchAssets &sharedMatchAssets);
+    // GameState implementation
+    virtual void enterState();
+    virtual void exitState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // Action implementation
+    virtual void action(Widget *sender, int actionType,
+                        event_manager::GameControlEvent *event);
+    // Own methods
+    void setNextState(GameState *nextState) {
+        m_nextState = nextState;
+    }
+private:
+    GameWidgetFactory &m_gameWidgetFactory;
+    int m_difficulty;
+    PuyoTwoNameProvider *m_nameProvider;
+    SharedMatchAssets &m_sharedAssets;
+    GameState *m_nextState;
+};
+
+class WaitPlayersReadyState : public GameState, public Action
+{
+public:
+    WaitPlayersReadyState(SharedMatchAssets &sharedMatchAssets);
+    // GameState implementation
+    virtual void enterState();
+    virtual void exitState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // Action implementation
+    virtual void action(Widget *sender, int actionType,
+                        event_manager::GameControlEvent *event);
+    // Own methods
+    void setNextState(GameState *nextState) {
+        m_nextState = nextState;
+    }
+private:
+    SharedMatchAssets &m_sharedAssets;
+    bool m_playersAreReady;
+    auto_ptr<StoryWidget> m_getReadyWidget;
+    GameState *m_nextState;
+};
+
+class MatchPlayingState : public GameState, public Action
+{
+public:
+    MatchPlayingState(SharedMatchAssets &sharedMatchAssets);
+    // GameState implementation
+    virtual void enterState();
+    virtual void exitState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // Action implementation
+    virtual void action(Widget *sender, int actionType,
+                        event_manager::GameControlEvent *event);
+    // Own methods
+    void setNextState(GameState *nextState) {
+        m_nextState = nextState;
+    }
+    void setAbortedState(GameState *abortedState) {
+        m_abortedState = abortedState;
+    }
+private:
+    SharedMatchAssets &m_sharedAssets;
+    bool m_gameIsOver;
+    GameState *m_nextState, *m_abortedState;
+};
+
+class MatchIsOverState : public GameState, public Action
+{
+public:
+    MatchIsOverState(SharedMatchAssets &sharedMatchAssets);
+    // GameState implementation
+    virtual void enterState();
+    virtual void exitState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // Action implementation
+    virtual void action(Widget *sender, int actionType,
+                        event_manager::GameControlEvent *event);
+    // Own methods
+    void setNextState(GameState *nextState) {
+        m_nextState = nextState;
+    }
+private:
+    SharedMatchAssets &m_sharedAssets;
+    std::auto_ptr<StoryWidget> m_gameLostWidget;
+    bool m_aknowledged;
+    GameState *m_nextState;
+};
+
+class DisplayStatsState : public GameState, public Action
+{
+public:
+    DisplayStatsState(SharedMatchAssets &sharedMatchAssets);
+    // GameState implementation
+    virtual void enterState();
+    virtual void exitState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // Action implementation
+    virtual void action(Widget *sender, int actionType,
+                        event_manager::GameControlEvent *event);
+    // Own methods
+    void setNextState(GameState *nextState) {
+        m_nextState = nextState;
+    }
+private:
+    SharedMatchAssets &m_sharedAssets;
+    bool m_aknowledged;
+    auto_ptr<TwoPlayersStatsWidget> m_statsWidget;
+    GameState *m_nextState;
+};
+
+class LeaveGameState : public GameState
+{
+public:
+    LeaveGameState(SharedMatchAssets &sharedMatchAssets);
+    // GameState implementation
+    virtual void enterState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+private:
+    SharedMatchAssets &m_sharedAssets;
+};
+
+
+
+class AltTwoPlayersStarterAction : public Action {
+public:
+    AltTwoPlayersStarterAction(int difficulty, GameWidgetFactory &gameWidgetFactory, PuyoTwoNameProvider *nameProvider = NULL);
+    /**
+     * Implements the Action interface
+     */
+    virtual void action(Widget *sender, int actionType,
+			event_manager::GameControlEvent *event);
+private:
+    GameStateMachine m_stateMachine;
+    SharedMatchAssets m_sharedAssets;
+    auto_ptr<SetupMatchState> m_setupMatch;
+    auto_ptr<WaitPlayersReadyState> m_waitPlayersReady;
+    auto_ptr<MatchPlayingState>     m_matchPlaying;
+    auto_ptr<MatchIsOverState>      m_matchIsOver;
+    auto_ptr<DisplayStatsState>     m_displayStats;
+    auto_ptr<LeaveGameState>       m_leaveGame;
 };
 
 class TwoPlayersStarterAction : public Action {

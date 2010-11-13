@@ -143,6 +143,11 @@ GameWidget::~GameWidget()
     }
 }
 
+void GameWidget::setGameOverAction(gameui::Action *gameOverAction)
+{
+    this->gameOverAction = gameOverAction;
+}
+
 void GameWidget::cycle()
 {
   if (!paused) {

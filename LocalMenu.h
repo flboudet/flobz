@@ -69,9 +69,9 @@ private:
     EditFieldWithLabel editPlayer1Name, editPlayer2Name;
     Frame screenTitleFrame;
     Text screenTitle;
-    TwoPlayersStarterAction easyAction;
-    TwoPlayersStarterAction mediumAction;
-    TwoPlayersStarterAction hardAction;
+    AltTwoPlayersStarterAction easyAction;
+    AltTwoPlayersStarterAction mediumAction;
+    AltTwoPlayersStarterAction hardAction;
     PuyoPopMenuAction popAction;
     Button easy, medium, hard, back;
 };
