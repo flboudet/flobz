@@ -92,7 +92,6 @@ void SetupMatchState::enterState()
     newGameWidget->getStatPlayerTwo().total_points = m_sharedAssets.m_rightTotal;
     // Setup handicap
     int victoriesDelta = m_sharedAssets.m_leftVictories - m_sharedAssets.m_rightVictories;
-    cout << "victories delta=" << victoriesDelta << endl;
     if (victoriesDelta > 0) {
         newGameWidget->addGameAHandicap(victoriesDelta);
     }
@@ -104,6 +103,8 @@ void SetupMatchState::enterState()
     // Handle eventual game enchainment
     if (m_sharedAssets.m_gameScreen.get() != NULL) {
         GameUIDefaults::SCREEN_STACK->pop();
+        GameUIDefaults::GAME_LOOP->garbageCollect(m_sharedAssets.m_gameWidget.release());
+        GameUIDefaults::GAME_LOOP->garbageCollect(m_sharedAssets.m_gameScreen.release());
     }
     m_sharedAssets.m_gameWidget.reset(newGameWidget);
     m_sharedAssets.m_gameScreen.reset(newGameScreen);
@@ -257,6 +258,7 @@ void MatchIsOverState::enterState()
 void MatchIsOverState::exitState()
 {
     m_sharedAssets.m_gameWidget->setGameOverAction(NULL);
+    m_gameLostWidget.reset(NULL);
 }
 
 bool MatchIsOverState::evaluate()
@@ -303,6 +305,7 @@ void DisplayStatsState::enterState()
 void DisplayStatsState::exitState()
 {
     m_sharedAssets.m_gameWidget->setGameOverAction(NULL);
+    m_statsWidget.reset(NULL);
 }
 
 bool DisplayStatsState::evaluate()

@@ -1373,6 +1373,7 @@ namespace gameui {
 
     void Text::boing()
     {
+        if (moving) return;
         startMoving = true;
         if (m_slideSound != NULL)
             GameUIDefaults::GAME_LOOP->getAudioManager()->playSound(m_slideSound);
@@ -1513,7 +1514,7 @@ namespace gameui {
             Action *action = getAction(ON_ACTION);
             if (action)
                 action->action(this, ON_ACTION, event);
-			boing();
+			//boing();
         }
     }
 
@@ -1524,7 +1525,7 @@ namespace gameui {
     }
 
     void Button::giveFocus() {
-        //if (!haveFocus()) boing(); (boing may cause "mouse_up" not to be catched)
+        if (!haveFocus()) boing();// (boing may cause "mouse_up" not to be catched)
         Text::giveFocus();
         font = fontActive;
         requestDraw();
@@ -1827,7 +1828,7 @@ namespace gameui {
     }
 
     void EditField::giveFocus() {
-        if (!haveFocus()) boing();
+        //if (!haveFocus()) boing();
         Text::giveFocus();
         font = fontActive;
         if (editOnFocus) {
