@@ -657,16 +657,12 @@ namespace gameui {
 
     bool Box::giveFocusToActiveWidget()
     {
-        GameControlEvent ev;
-        ev.cursorEvent   = kCursorNone;
-        ev.keyboardEvent = kKeyboardNone;
-        ev.gameEvent     = kGameNone;
-        ev.isUp          = false;
+        auto_ptr<GameControlEvent> ev(getGameLoop()->getEventManager()->createGameControlEvent());
 
         Widget *child = getChild(activeWidget);
         if (child->isDead()) return false;
         child->giveFocus();
-        child->eventOccured(&ev);
+        child->eventOccured(ev.get());
         return child->haveFocus();
     }
 
@@ -1083,11 +1079,9 @@ namespace gameui {
         }
         while (!childHaveFocus);
         arrangeWidgets();
-        GameControlEvent ev;
-        ev.cursorEvent = kStart;
-        ev.gameEvent   = kGameNone;
-        ev.isUp        = false;
-        getChild(activeWidget)->eventOccured(&ev);
+        auto_ptr<GameControlEvent> ev;
+        ev->cursorEvent = kStart;
+        getChild(activeWidget)->eventOccured(ev.get());
     }
 
     void HScrollList::arrangeWidgets()
@@ -1581,17 +1575,16 @@ namespace gameui {
         if (repeat) {
             double t = ios_fc::getTimeMs() - repeat_date;
             if (t > repeat_speed) {
-                GameControlEvent e = repeatEvent;
+                GameControlEvent *e = repeatEvent.get();
                 double save_repeat_speed = repeat_speed;
 
-                eventOccured(&e);
+                eventOccured(e);
 
                 repeat_speed = save_repeat_speed * 0.66;
                 if (repeat_speed < MIN_REPEAT_TIME)
                     repeat_speed = MIN_REPEAT_TIME;
                 repeat_date = ios_fc::getTimeMs();
                 repeat = true;
-                repeatEvent = e;
             }
         }
     }
@@ -1719,7 +1712,7 @@ namespace gameui {
                 }
                 repeat = true;
                 repeat_date = ios_fc::getTimeMs();
-                repeatEvent = *event;
+                repeatEvent.reset(event->clone());
             }
         }
         else {
@@ -1754,7 +1747,7 @@ namespace gameui {
             setValue(newValue,false);
             repeat = true;
             repeat_date = ios_fc::getTimeMs();
-            repeatEvent = *event;
+            repeatEvent.reset(event->clone());
             handled = true;
         }
         // kDown => Change last char of the entry (downward)
@@ -1779,7 +1772,7 @@ namespace gameui {
             setValue(newValue,false);
             repeat = true;
             repeat_date = ios_fc::getTimeMs();
-            repeatEvent = *event;
+            repeatEvent.reset(event->clone());
             handled = true;
         }
         // kLeft => Like Backspace
@@ -1795,7 +1788,7 @@ namespace gameui {
                 setValue(newValue,false);
                 repeat = true;
                 repeat_date = ios_fc::getTimeMs();
-                repeatEvent = *event;
+                repeatEvent.reset(event->clone());
                 handled = true;
             }
         }
@@ -1807,7 +1800,7 @@ namespace gameui {
             setValue(newValue,false);
             repeat = true;
             repeat_date = ios_fc::getTimeMs();
-            repeatEvent = *event;
+            repeatEvent.reset(event->clone());
             handled = true;
         }
         return handled;
@@ -1856,7 +1849,7 @@ namespace gameui {
 
         font = fontInactive;
         editionMode = false;
-
+        GameUIDefaults::GAME_LOOP->getEventManager()->setEnableJoyMouseEmulation(true);
         setFocusable(true);
     }
 
@@ -1875,39 +1868,41 @@ namespace gameui {
         if (!editionMode) return;
         setValue(previousValue);
         editionMode = false;
+        GameUIDefaults::GAME_LOOP->getEventManager()->setEnableJoyMouseEmulation(true);
         if (event != NULL) event->caught = true;
     }
     void ControlInputWidget::press(GameControlEvent *event)
     {
         if (editionMode) return;
         editionMode = true;
+        GameUIDefaults::GAME_LOOP->getEventManager()->setEnableJoyMouseEmulation(false);
         previousValue = getValue();
         setValue("<Press>");
     }
 
     void ControlInputWidget::changeTo(GameControlEvent *event)
     {
-        GameControlEvent result;
         EventManager * evm = GameUIDefaults::GAME_LOOP->getEventManager();
         if (evm->changeControl(control, alternate, *event)) {
             String controlName = evm->getControlName(control, alternate);
             setValue(controlName);
             editionMode = false;
+            GameUIDefaults::GAME_LOOP->getEventManager()->setEnableJoyMouseEmulation(true);
         }
     }
 
     void ControlInputWidget::eventOccured(GameControlEvent *event)
     {
+        // if evenement joystick et editionMode alors traiter le cas.
+        if (event->isJoystick && editionMode && (event->cursorEvent != kBack)) {
+            changeTo(event);
+            return;
+        }
         if ((event->cursorEvent == kCursorNone)
             && (event->keyboardEvent == kKeyboardNone)
             && (event->gameEvent == kGameNone))
             return;
-        // if evenement joystick et editionMode alors traiter le cas.
-        if (event->isJoystick && editionMode && (event->cursorEvent != kBack)) {
-            printf("XXXXX\n");
-            changeTo(event);
-        }
-        else if (event->cursorEvent == kStart) {
+        if (event->cursorEvent == kStart) {
             if (editionMode == false)
                 press(event);
             else

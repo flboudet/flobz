@@ -10,21 +10,6 @@ using namespace event_manager;
 
 #define NB_CONTROLS 10
 
-#ifdef DISABLED
-static int defaultKeyControls[NB_CONTROLS] = {
-    SDLK_s,
-    SDLK_f,
-    SDLK_d,
-    SDLK_UNKNOWN,
-    SDLK_e,
-    SDLK_LEFT,
-    SDLK_RIGHT,
-    SDLK_DOWN,
-    SDLK_UNKNOWN,
-    SDLK_UP
-};
-#endif
-
 //static ind defaultAlternateKeyControls[NB_CONTROLS] = {
 //};
 
@@ -59,7 +44,7 @@ static InputSwitch *defaultKeyAlternateControls[NB_CONTROLS] =
 static InputSwitch *keyControls[NB_CONTROLS];
 static InputSwitch *keyAlternateControls[NB_CONTROLS];
 
-static void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *result)
+static void getControlEvent(SDL_Event &e, InputSwitch *input, GameControlEvent *result)
 {
     result->gameEvent     = kGameNone;
     result->cursorEvent   = kCursorNone;
@@ -88,6 +73,7 @@ static void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *r
             break;
     }
     // Game event handling
+    static_cast<SDL_GameControlEvent *>(result)->m_inputSwitch.reset(input);
     if (input == NULL)
         return;
 
@@ -142,13 +128,10 @@ static void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *r
         result->gameEvent = kPlayer2Down;
 }
 
-static void getControlEvent(SDL_Event e, GameControlEvent *result)
+static void getControlEvent(SDL_Event &e, GameControlEvent *result)
 {
     InputSwitch *input  = switchForEvent(&e);
     getControlEvent(e, input, result);
-
-    if (input)
-        delete input;
 }
 
 // TODO: correct
@@ -163,11 +146,21 @@ struct CursorEventArg {
     int x, y;
 };
 
+SDL_GameControlEvent::SDL_GameControlEvent()
+{
+}
+
+GameControlEvent *SDL_GameControlEvent::clone()
+{
+    return new SDL_GameControlEvent(*this);
+}
+
 SDL12_EventManager::SDL12_EventManager()
     : CycledComponent(0.01), m_idleDx(0), m_idleDy(0),
-      m_mouseX(0), m_mouseY(0)
+      m_mouseX(0), m_mouseY(0), m_disableJoyMouseEmulation(false)
 {
 	SDL_EnableUNICODE(1);
+    initControllers();
     // get defaults from prefs
     for (int i = 0 ; i < NB_CONTROLS ; i++) {
         char result[256];
@@ -185,6 +178,11 @@ SDL12_EventManager::SDL12_EventManager()
         GetStrPreference (osstream.str().c_str(), result, defaultKeyStr.c_str());
         keyAlternateControls[i] = InputSwitch::createFromString(result);
     }
+}
+
+GameControlEvent *SDL12_EventManager::createGameControlEvent() const
+{
+    return new SDL_GameControlEvent();
 }
 
 bool SDL12_EventManager::pollEvent(GameControlEvent &controlEvent)
@@ -227,16 +225,13 @@ ios_fc::String SDL12_EventManager::getControlName(int controlType, bool alternat
 
 bool SDL12_EventManager::changeControl(int controlType, bool alternate, GameControlEvent &event)
 {
+    SDL_GameControlEvent &sdlevent = static_cast<SDL_GameControlEvent &>(event);
     InputSwitch * &inputToChange = alternate? keyAlternateControls[controlType]
                                             : keyControls[controlType];
-    if (event.keyboardEvent == kKeyboardDown) {
+    InputSwitch *newInputSwitch = sdlevent.m_inputSwitch.release();
+    if (newInputSwitch != NULL) {
         delete inputToChange;
-        inputToChange = new KeyInputSwitch(event.keySym, true);
-        return true;
-    }
-    else if (event.isJoystick) {
-        delete inputToChange;
-        inputToChange = new KeyInputSwitch(event.keySym, true);
+        inputToChange = newInputSwitch;
         return true;
     }
     return false;
@@ -258,6 +253,11 @@ void SDL12_EventManager::saveControls()
     }
 }
 
+void SDL12_EventManager::setEnableJoyMouseEmulation(bool enabled)
+{
+    m_disableJoyMouseEmulation = !enabled;
+}
+
 void SDL12_EventManager::translateMouseEvent(const SDL_Event &sdl_event,
                                              GameControlEvent &controlEvent)
 {
@@ -271,10 +271,12 @@ void SDL12_EventManager::translateMouseEvent(const SDL_Event &sdl_event,
         controlEvent.y = m_mouseY;
         break;
     case SDL_JOYAXISMOTION:
-        if (sdl_event.jaxis.axis == 2) {
+        if (m_disableJoyMouseEmulation)
+            break;
+        if (sdl_event.jaxis.axis == 3) {
             m_idleDy = sdl_event.jaxis.value / 5000;
         }
-        else if (sdl_event.jaxis.axis == 3) {
+        else if (sdl_event.jaxis.axis == 2) {
             m_idleDx = sdl_event.jaxis.value / 5000;
         }
         break;

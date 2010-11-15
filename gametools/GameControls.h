@@ -66,7 +66,7 @@ enum KeyboardEventType {
  */
 class GameControlEvent {
 public:
-	GameControlEvent() : caught(false) {}
+    virtual ~GameControlEvent() {}
     GameEventType     gameEvent;
     CursorEventType   cursorEvent;
     KeyboardEventType keyboardEvent;
@@ -78,6 +78,13 @@ public:
     uint16_t keySym;
 	void setCaught() { caught = true; }
 	bool isMouse() const { return (cursorEvent == kGameMouseMoved) || (cursorEvent == kGameMouseDown) || (cursorEvent == kGameMouseUp); }
+    virtual GameControlEvent *clone() = 0;
+protected:
+    GameControlEvent()
+        : gameEvent(kGameNone),
+          cursorEvent(kCursorNone),
+          keyboardEvent(kKeyboardNone),
+          isUp(false), isJoystick(false), caught(false) {}
 };
 
 /**
@@ -87,12 +94,14 @@ class EventManager
 {
 public:
     virtual ~EventManager() {}
+    virtual GameControlEvent *createGameControlEvent() const = 0;
     virtual bool pollEvent(GameControlEvent &controlEvent) = 0;
     virtual void pushMouseEvent(int x, int y, CursorEventType type) = 0;
     // Control settings handling
     virtual ios_fc::String getControlName(int controlType, bool alternate) = 0;
     virtual bool   changeControl(int controlType, bool alternate, GameControlEvent &event) = 0;
     virtual void   saveControls() = 0;
+    virtual void setEnableJoyMouseEmulation(bool enabled) = 0;
 };
 
 // TODO: move all that crap elsewhere

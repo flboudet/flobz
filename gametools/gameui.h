@@ -2,6 +2,7 @@
 #define GAMEUI_H
 
 #include <vector>
+#include <memory>
 #include "GameControls.h"
 #include "ios_fc.h"
 #include "vec3.h"
@@ -604,7 +605,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       bool repeat;
       double repeat_date;
       double repeat_speed;
-      event_manager::GameControlEvent repeatEvent;
+      std::auto_ptr<event_manager::GameControlEvent> repeatEvent;
   };
 
   class ControlInputWidget : public Text {

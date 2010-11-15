@@ -229,18 +229,18 @@ void GameLoop::idle(double currentTime)
   //Vector<IdleComponent> idlesCpy = idles.dup();
 
   // 1- process events
-  GameControlEvent controlEvent;
-  while (m_em->pollEvent(controlEvent)) {
+  auto_ptr<GameControlEvent> controlEvent(m_em->createGameControlEvent());
+  while (m_em->pollEvent(*controlEvent)) {
     for (i=0; i < idles_size_at_start; ++i) {
       if (idles[i]) {
 #ifdef DEBUG_GAMELOOP
 	printf("onEvent called on idle %x!\n", idles[i]);
 	fflush(stdout);
 #endif
-        idles[i]->onEvent(&controlEvent);
+        idles[i]->onEvent(controlEvent.get());
       }
     }
-    if (controlEvent.cursorEvent == kQuit) { // TODO: Laisser libre l'utilisateur ?
+    if (controlEvent->cursorEvent == kQuit) { // TODO: Laisser libre l'utilisateur ?
       exit(0);
     }
   }
