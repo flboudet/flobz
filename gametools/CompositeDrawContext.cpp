@@ -30,6 +30,10 @@ CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
 
 CompositeSurface::~CompositeSurface()
 {
+    // Me and the ImageLibrary
+    if (m_baseSurface.refcount() == 2) {
+        m_ownerImageLibrary.unregisterImage(m_baseSurface.get());
+    }
 }
 
 // IosSurface methods
@@ -223,6 +227,17 @@ IosSurface * CompositeImageLibrary::loadImage(ImageType type, const char *path, 
 IosFont * CompositeImageLibrary::createFont(const char *path, int size, IosFontFx fx)
 {
     return m_baseImageLibrary.createFont(path, size, fx);
+}
+
+void CompositeImageLibrary::unregisterImage(IosSurface *image)
+{
+    for (BaseSurfaceMap::iterator iter = m_baseSurfaceMap.begin();
+         iter != m_baseSurfaceMap.end() ; ++iter) {
+        if (iter->second.get() == image) {
+            m_baseSurfaceMap.erase(iter);
+            return;
+        }
+    }
 }
 
 /**

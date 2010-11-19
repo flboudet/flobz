@@ -128,6 +128,7 @@ public:
     virtual IosFont    * createFont(const char *path, int size, IosFontFx fx = Font_STD);
 public:
     DrawContext &getBaseDrawContext() const;
+    void unregisterImage(IosSurface *image);
 private:
     CompositeDrawContext &m_owner;
     DrawContext  &m_baseDrawContext;

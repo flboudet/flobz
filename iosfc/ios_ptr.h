@@ -40,6 +40,7 @@ class SharedPtr
 
 		void release()        { ref->px = NULL;     }
 		X *get()        const { return ref->px;  }
+        int refcount() const  { return ref->refCount; }
 		X &operator*()  const { return *ref->px; }
 		X *operator->() const { return ref->px;  }
 		bool operator!() const { return (ref->px == NULL); }
