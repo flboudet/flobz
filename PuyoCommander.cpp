@@ -12,6 +12,8 @@
 using namespace gameui;
 using namespace event_manager;
 
+extern void FBLog(const char *txt);
+
 PuyoCommander *theCommander = NULL;
 IosFont *storyFont; // TODO: remove
 
@@ -176,6 +178,8 @@ PuyoCommander::PuyoCommander(DataPathManager &dataPathManager)
 
 void PuyoCommander::initWithGUI(bool fs)
 {
+	FBLog("PuyoCommander::initWithGUI() entered");
+
   m_windowFramePicture = std::auto_ptr<FramePicture>(new FramePicture(25, 28, 25, 19, 26, 23));
   m_buttonIdleFramePicture = std::auto_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
   m_buttonDownFramePicture = std::auto_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
@@ -185,11 +189,24 @@ void PuyoCommander::initWithGUI(bool fs)
   m_separatorFramePicture = std::auto_ptr<FramePicture>(new FramePicture(63, 2, 63, 2, 4, 2));
   m_listFramePicture = std::auto_ptr<FramePicture>(new FramePicture(5, 23, 4, 6, 10, 3));
 
+	FBLog("PuyoCommander::initWithGUI() loading prefs");
+
   loadPreferences(fs);
 
+	FBLog("PuyoCommander::initWithGUI() init locales");
+
   initLocale();
+	
+	FBLog("PuyoCommander::initWithGUI() init audio");
+
   initAudio();
+	
+	FBLog("PuyoCommander::initWithGUI() init fonts");
+
   initFonts();
+	
+	FBLog("PuyoCommander::initWithGUI() loading images");
+
 
   // Loading the frame images, and setting up the frames
   m_switchOnImage = getSurface(IMAGE_RGBA, "gfx/switch-on.png");
@@ -210,6 +227,8 @@ void PuyoCommander::initWithGUI(bool fs)
   m_separatorImage = getSurface(IMAGE_RGBA, "gfx/separator.png");
   m_listIdleImage = getSurface(IMAGE_RGBA, "gfx/listborder.png");
 
+	FBLog("PuyoCommander::initWithGUI() configuring frames");
+
   m_windowFramePicture->setFrameSurface(m_frameImage);
   m_buttonIdleFramePicture->setFrameSurface(m_buttonIdleImage);
   m_buttonSpecialFramePicture->setFrameSurface(m_buttonSpecialImage);
@@ -218,6 +237,8 @@ void PuyoCommander::initWithGUI(bool fs)
   m_textFieldIdleFramePicture->setFrameSurface(m_textFieldIdleImage);
   m_separatorFramePicture->setFrameSurface(m_separatorImage);
   m_listFramePicture->setFrameSurface(m_listIdleImage);
+    FBLog("PuyoCommander::initWithGUI() completed");
+
 }
 
 void PuyoCommander::initWithoutGUI()
@@ -396,22 +417,28 @@ PuyoSetThemeRef PuyoCommander::getPuyoSetTheme(const char *name)
     return m_puyoSetThemeResManager->getResource(name);
 }
 
-PuyoSetThemeRef PuyoCommander::getDefaultPuyoSetTheme()
+PuyoSetThemeRef PuyoCommander::getPreferedPuyoSetTheme()
 {
-    return getPuyoSetTheme(getDefaultPuyoSetThemeName().c_str());
+    return getPuyoSetTheme(getPreferedPuyoSetThemeName().c_str());
 }
 
-const std::string &PuyoCommander::getDefaultPuyoSetThemeName() const
+const std::string &PuyoCommander::getPreferedPuyoSetThemeName() const
 {
     if (m_defaultPuyoSetThemeName == "") {
         char out[256];
-        GetStrPreference ("puyoset_theme", out, m_themeManager->getPuyoSetThemeList()[0].c_str());
+        GetStrPreference ("puyoset_theme", out, getDefaultPuyoSetThemeName().c_str());
         m_defaultPuyoSetThemeName = out;
     }
     return m_defaultPuyoSetThemeName;
 }
 
-void PuyoCommander::setDefaultPuyoSetThemeName(const char *name)
+const std::string PuyoCommander::getDefaultPuyoSetThemeName() const
+{
+    return m_themeManager->getPuyoSetThemeList()[0];
+}
+
+
+void PuyoCommander::setPreferedPuyoSetThemeName(const char *name)
 {
     m_defaultPuyoSetThemeName = name;
     SetStrPreference ("puyoset_theme", name);
@@ -427,22 +454,27 @@ LevelThemeRef PuyoCommander::getLevelTheme(const char *name)
     return m_levelThemeResManager->getResource(name);
 }
 
-LevelThemeRef PuyoCommander::getDefaultLevelTheme()
+LevelThemeRef PuyoCommander::getPreferedLevelTheme()
 {
-    return getLevelTheme(getDefaultLevelThemeName().c_str());
+    return getLevelTheme(getPreferedLevelThemeName().c_str());
 }
 
-const std::string &PuyoCommander::getDefaultLevelThemeName() const
+const std::string &PuyoCommander::getPreferedLevelThemeName() const
 {
     if (m_defaultLevelThemeName == "") {
         char out[256];
-        GetStrPreference ("level_theme", out, m_themeManager->getLevelThemeList()[0].c_str());
+        GetStrPreference ("level_theme", out, getDefaultLevelThemeName().c_str());
         m_defaultLevelThemeName = out;
     }
     return m_defaultLevelThemeName;
 }
 
-void PuyoCommander::setDefaultLevelThemeName(const char *name)
+const std::string PuyoCommander::getDefaultLevelThemeName() const
+{
+    return m_themeManager->getLevelThemeList()[0];
+}
+
+void PuyoCommander::setPreferedLevelThemeName(const char *name)
 {
     m_defaultLevelThemeName = name;
     SetStrPreference ("level_theme", name);

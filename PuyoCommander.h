@@ -210,18 +210,21 @@ class PuyoCommander
     SoundRef getSound(const char *path);
     void cacheMusic(const char *path);
     MusicRef getMusic(const char *path);
+    
     PuyoSetThemeRef getPuyoSetTheme(const char *name);
-    PuyoSetThemeRef getDefaultPuyoSetTheme();
-    const std::string &getDefaultPuyoSetThemeName() const;
-    void setDefaultPuyoSetThemeName(const char *name);
+    PuyoSetThemeRef getPreferedPuyoSetTheme();
+    const std::string &getPreferedPuyoSetThemeName() const;
+    void setPreferedPuyoSetThemeName(const char *name);
     const std::vector<std::string> &getPuyoSetThemeList() const;
+    virtual const std::string getDefaultPuyoSetThemeName() const;
 
     LevelThemeRef getLevelTheme(const char *name);
-    LevelThemeRef getDefaultLevelTheme();
-    const std::string &getDefaultLevelThemeName() const;
-    void setDefaultLevelThemeName(const char *name);
+    LevelThemeRef getPreferedLevelTheme();
+    const std::string &getPreferedLevelThemeName() const;
+    void setPreferedLevelThemeName(const char *name);
     const std::vector<std::string> &getLevelThemeList() const;
-
+    virtual const std::string getDefaultLevelThemeName() const;
+    
     void freeUnusedResources();
 
     // Data path management

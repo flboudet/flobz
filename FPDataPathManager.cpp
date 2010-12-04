@@ -23,9 +23,12 @@
  *
  */
 
+#include <iostream>
 #include <sstream>
 #include "FPDataPathManager.h"
 #include "PackageDescription.h"
+
+using namespace std;
 
 #define isnum(X) ((X>='0') && (X<='9'))
 
@@ -81,12 +84,14 @@ FPDataPathManager::FPDataPathManager(String coreDataPath)
             m_dataPaths.add(new FilePath(m_coreDataPath.combine(wellFormattedNames[biggestFileIndex])));
             wellFormattedNumbers.removeAt(biggestFileIndex);
             wellFormattedNames.removeAt(biggestFileIndex);
+            cout << "dataPathsSize: " << m_dataPaths.size() << " ; " << &m_dataPaths << endl;
         }
     }
 }
 
 void FPDataPathManager::registerDataPackages(CompositeDrawContext &cDC)
 {
+    cout << "dataPathsSize: " << m_dataPaths.size() << " ; " << &m_dataPaths << endl;
     // Now iterate through the datapaths to build PackageDescription
     for (int i = 0 ; i < m_dataPaths.size() ; i++) {
         FPDataPackage currentPackage(this, m_dataPaths[i].getPathString(), i);

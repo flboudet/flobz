@@ -36,11 +36,14 @@
 #endif
 #include "LocalizedDictionary.h"
 #include "ios_memory.h"
+#include <iostream>
 #include <stdio.h>
 #include <ext/hash_map>
 #include <cstring>
 #include <string>
 #include <stdint.h>
+
+extern void FBLog(const char *txt);
 
 static bool readLine(FILE *dictionaryFile, String &lineRead)
 {
@@ -89,7 +92,9 @@ static bool readLine(FILE *dictionaryFile, String &lineRead)
 /* English is the default */
 #define kPuyoDefaultPreferedLanguage "en"
 /* Additionnaly we'll try at most 10 user languages */
+#ifndef kPuyoMaxPreferedLanguage
 #define kPuyoMaxPreferedLanguage 10
+#endif
 
 char *PreferedLocales[kPuyoMaxPreferedLanguage+1]; // +1 for the default one
 int   PreferedLocalesCount = 0;
@@ -272,13 +277,15 @@ static str_dictionnary dictionaries;
 LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName) : dictionary(NULL), datapathManager(datapathManager)
 {
   signed int i;
-
+    
+    FBLog("LocalizedDictionary::LocalizedDictionary() 1");
   /* First create the prefered languages list whenever needed */
   Locales_Init();
 
+    FBLog("LocalizedDictionary::LocalizedDictionary() 2");
   stdName = FilePath::combine(dictionaryDirectory, dictionaryName);
   dictionaryEntry * myDictEntry = (dictionaryEntry *)dictionaries[std::string((const char *)stdName)];
-
+    FBLog("LocalizedDictionary::LocalizedDictionary() 3");
   if (myDictEntry == NULL)
   {
     myDictEntry = (dictionaryEntry *)malloc(sizeof(dictionaryEntry));
@@ -295,9 +302,12 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
         String directoryName = FilePath::combine(dictionaryDirectory, locale);
         String dictFilePath = FilePath::combine(directoryName, dictionaryName) + ".dic";
         FILE *dictionaryFile = NULL;
-
-        try { dictionaryFile = fopen(datapathManager.getPath(dictFilePath), "r"); } catch (Exception &e) { }
-
+        FBLog("LocalizedDictionary::LocalizedDictionary() 4");
+        try {
+            dictionaryFile = fopen(datapathManager.getPath(dictFilePath), "r");
+        }
+        catch (...) {}
+        FBLog("LocalizedDictionary::LocalizedDictionary() 5");
         if (dictionaryFile != NULL)
         {
             /* Read all the entries in the dictionary file */
@@ -318,21 +328,22 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
                 }
             }
             fclose(dictionaryFile);
-#ifdef DEBUG
-            fprintf(stdout,"Found dictionary %s\n",(const char *)datapathManager.getPath(dictFilePath));
-#endif
+//#ifdef DEBUG
+//            fprintf(stdout,"Found dictionary %s\n",(const char *)datapathManager.getPath(dictFilePath));
+//#endif
             found = true;
         }
     }
     // Should we look for any eligible dictionnary now?
     // By now we don't bother since english (en) should be there or we return the original strings anyway.
-#ifdef DEBUG
-    if (!found) fprintf(stdout,"No dictionary found in %s for %s\n",(const char *)datapathManager.getPath(dictionaryDirectory),dictionaryName);
-#endif
+//#ifdef DEBUG
+//    if (!found) fprintf(stdout,"No dictionary found in %s for %s\n",(const char *)datapathManager.getPath(dictionaryDirectory),dictionaryName);
+//#endif
   }
 
   myDictEntry->refcount++;
   dictionary = (void*)(myDictEntry->dictionary);
+    FBLog("LocalizedDictionary::LocalizedDictionary() end");
   //fprintf(stderr,"-----Refcount++ = %d (%s)\n",myDictEntry->refcount,(const char *)stdName);
 }
 

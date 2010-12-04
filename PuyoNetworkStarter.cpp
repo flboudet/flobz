@@ -318,22 +318,30 @@ NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory &gameWidgetFa
 {
     // Creating the different game states
     m_setupMatch.reset(new SetupMatchState(gameWidgetFactory, gameSpeed, nameProvider, m_sharedAssets));
-    m_waitPlayersReady.reset(new WaitPlayersReadyState(m_sharedAssets));
-    m_synchroBeforeStart.reset(new NetSynchronizeState(mbox, 1));
+    m_enterPlayersReady.reset(new EnterPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
+    m_synchroGetReady.reset(new NetSynchronizeState(mbox, 1));
+    m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
+    //m_waitPlayersReady.reset(new WaitPlayersReadyState(m_sharedAssets));
+    m_synchroBeforeStart.reset(new NetSynchronizeState(mbox, 2));
     m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));
     m_matchIsOver.reset(new MatchIsOverState(m_sharedAssets));
     m_displayStats.reset(new DisplayStatsState(m_sharedAssets));
     m_synchroAfterStats.reset(new NetSynchronizeState(mbox, 10));
     m_leaveGame.reset(new LeaveGameState(m_sharedAssets));
+    
     // Linking the states together
-    m_setupMatch->setNextState(m_waitPlayersReady.get());
-    m_waitPlayersReady->setNextState(m_synchroBeforeStart.get());
+    m_setupMatch->setNextState(m_enterPlayersReady.get());
+    m_enterPlayersReady->setNextState(m_synchroGetReady.get());
+    m_synchroGetReady->setNextState(m_exitPlayersReady.get());
+    m_exitPlayersReady->setNextState(m_synchroBeforeStart.get());
+    //m_waitPlayersReady->setNextState(m_synchroBeforeStart.get());
     m_synchroBeforeStart->setNextState(m_matchPlaying.get());
     m_matchPlaying->setNextState(m_matchIsOver.get());
     m_matchPlaying->setAbortedState(m_leaveGame.get());
     m_matchIsOver->setNextState(m_displayStats.get());
     m_displayStats->setNextState(m_synchroAfterStats.get());
     m_synchroAfterStats->setNextState(m_setupMatch.get());
+    
     // Initializing the state machine
     setInitialState(m_setupMatch.get());
 }

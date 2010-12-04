@@ -75,8 +75,8 @@ void SetupMatchState::enterState()
 {
     cout << "SetupMatchState::enterState()" << endl;
     // Prepare 1st run
-    m_sharedAssets.m_currentLevelTheme = theCommander->getDefaultLevelTheme();
-    m_sharedAssets.m_currentPuyoSetTheme = theCommander->getDefaultPuyoSetTheme();
+    m_sharedAssets.m_currentLevelTheme = theCommander->getPreferedLevelTheme();
+    m_sharedAssets.m_currentPuyoSetTheme = theCommander->getPreferedPuyoSetTheme();
     // Create the gamewidget and register as the gamewidget's action
     GameWidget *newGameWidget =
         m_gameWidgetFactory.createGameWidget(*(m_sharedAssets.m_currentPuyoSetTheme),
@@ -128,6 +128,96 @@ GameState *SetupMatchState::getNextState()
 void SetupMatchState::action(Widget *sender, int actionType,
                              event_manager::GameControlEvent *event)
 {
+}
+
+//---------------------------------
+// EnterPlayerReadyState
+//---------------------------------
+EnterPlayerReadyState::EnterPlayerReadyState(SharedMatchAssets &sharedMatchAssets,
+                                             SharedGetReadyAssets &sharedGetReadyAssets)
+: CycledComponent(0.1), m_sharedAssets(sharedMatchAssets),
+m_sharedGetReadyAssets(sharedGetReadyAssets),
+m_getReadyDisplayed(false), m_nextState(NULL)
+{
+}
+
+void EnterPlayerReadyState::enterState()
+{
+    cout << "EnterPlayerReadyState::enterState()" << endl;
+    if (m_sharedAssets.m_currentLevelTheme->getReadyAnimation2P() == "") {
+        return;
+    }
+    m_sharedGetReadyAssets.m_getReadyWidget.reset(new StoryWidget(m_sharedAssets.m_currentLevelTheme->getReadyAnimation2P().c_str(), this));
+    m_sharedAssets.m_gameWidget->setGameOverAction(this);
+    m_sharedAssets.m_gameScreen->setOverlayStory(m_sharedGetReadyAssets.m_getReadyWidget.get());
+    GameUIDefaults::GAME_LOOP->addIdle(this);
+}
+
+void EnterPlayerReadyState::exitState()
+{
+    m_sharedAssets.m_gameWidget->setGameOverAction(NULL);
+    GameUIDefaults::GAME_LOOP->removeIdle(this);
+}
+
+bool EnterPlayerReadyState::evaluate()
+{
+    return m_getReadyDisplayed;
+}
+
+GameState *EnterPlayerReadyState::getNextState()
+{
+    return m_nextState;
+}
+
+void EnterPlayerReadyState::action(Widget *sender, int actionType,
+                                   event_manager::GameControlEvent *event)
+{
+    if (sender == m_sharedGetReadyAssets.m_getReadyWidget.get()) {
+        m_sharedGetReadyAssets.m_getReadyWidget.reset(NULL);
+    }
+    else {
+        //m_getReadyDisplayed = true;
+    }
+
+    evaluateStateMachine();
+}
+
+void EnterPlayerReadyState::cycle()
+{
+    StoryWidget *story = m_sharedGetReadyAssets.m_getReadyWidget.get();
+    if (story->getIntegerValue("@getready_displayed") == 1) {
+        m_getReadyDisplayed = true;
+        evaluateStateMachine();
+    }
+}
+
+//---------------------------------
+// ExitPlayerReadyState
+//---------------------------------
+ExitPlayerReadyState::ExitPlayerReadyState(SharedMatchAssets &sharedMatchAssets,
+                                           SharedGetReadyAssets &sharedGetReadyAssets)
+: m_sharedAssets(sharedMatchAssets),
+m_sharedGetReadyAssets(sharedGetReadyAssets),
+m_nextState(NULL)
+{
+}
+
+void ExitPlayerReadyState::enterState()
+{
+    cout << "ExitPlayerReadyState::enterState()" << endl;
+    if (m_sharedGetReadyAssets.m_getReadyWidget.get() == NULL)
+        return;
+    m_sharedGetReadyAssets.m_getReadyWidget->setIntegerValue("@start_pressed", 1);
+}
+
+bool ExitPlayerReadyState::evaluate()
+{
+    return true;
+}
+
+GameState *ExitPlayerReadyState::getNextState()
+{
+    return m_nextState;
 }
 
 //---------------------------------

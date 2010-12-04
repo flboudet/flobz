@@ -57,6 +57,7 @@ public:
     int getNumPacks() const { return m_dataPaths.size(); }
     void setMaxPackNumber(int maxPackNumber);
 private:
+    FPDataPathManager(FPDataPathManager &mgr) : m_coreDataPath(mgr.m_coreDataPath) {}
     FilePath m_coreDataPath;
     SelfVector<FilePath> m_dataPaths;
 };

@@ -55,7 +55,7 @@ void PuyoThemeSelectionBox::build()
     themePreview.build();
     const std::vector<std::string> &themes = theCommander->getPuyoSetThemeList();
     int size = themes.size();
-    std::string preferedTheme = theCommander->getDefaultPuyoSetThemeName();
+    std::string preferedTheme = theCommander->getPreferedPuyoSetThemeName();
     // Select the prefered theme
     bool found = false;
     for (std::vector<std::string>::const_iterator iter = themes.begin() ;
@@ -65,7 +65,7 @@ void PuyoThemeSelectionBox::build()
     }
     if (!found) {
         themePreview.themeSelected(themes[0]);
-        theCommander->setDefaultPuyoSetThemeName(themes[0].c_str());
+        theCommander->setPreferedPuyoSetThemeName(themes[0].c_str());
     }
     add(&Spacer0);
     prevButton->setFocusable(size > 1);
@@ -86,7 +86,7 @@ void PuyoThemeSelectionBox::action(Widget *sender, int actionType, GameControlEv
 {
     if (!event->isUp) return;
     const std::vector<std::string> &themes = theCommander->getPuyoSetThemeList();
-    std::string pref = theCommander->getDefaultPuyoSetThemeName();
+    std::string pref = theCommander->getPreferedPuyoSetThemeName();
     int size = themes.size();
     if (size <= 0) return;
 
@@ -99,12 +99,12 @@ void PuyoThemeSelectionBox::action(Widget *sender, int actionType, GameControlEv
     if (sender == prevButton) {
         (currentTheme <= 0) ? currentTheme = size - 1 : currentTheme--;
         themePreview.themeSelected(themes[currentTheme]);
-        theCommander->setDefaultPuyoSetThemeName(themes[currentTheme].c_str());
+        theCommander->setPreferedPuyoSetThemeName(themes[currentTheme].c_str());
     }
     else if (sender == nextButton) {
         currentTheme = (currentTheme+1)%size;
         themePreview.themeSelected(themes[currentTheme]);
-        theCommander->setDefaultPuyoSetThemeName(themes[currentTheme].c_str());
+        theCommander->setPreferedPuyoSetThemeName(themes[currentTheme].c_str());
     }
 }
 

@@ -54,7 +54,7 @@ void LevelThemeSelectionBox::build()
 {
     themePreview.build();
     const std::vector<std::string> &themes = theCommander->getLevelThemeList();
-    std::string pref = theCommander->getDefaultLevelThemeName();
+    std::string pref = theCommander->getPreferedLevelThemeName();
     int size = themes.size();
     bool found = false;
     for (std::vector<std::string>::const_iterator iter
@@ -93,7 +93,7 @@ void LevelThemeSelectionBox::action(Widget *sender, int actionType, GameControlE
 {
     if (!event->isUp) return;
     const std::vector<std::string> &themes = theCommander->getLevelThemeList();
-    std::string pref = theCommander->getDefaultLevelThemeName();
+    std::string pref = theCommander->getPreferedLevelThemeName();
     int size = themes.size();
     if (size <= 0) return;
 
@@ -108,12 +108,12 @@ void LevelThemeSelectionBox::action(Widget *sender, int actionType, GameControlE
     if (sender == prevButton) {
         (currentTheme <= 0) ? currentTheme = size - 1 : currentTheme--;
         themePreview.setSelectedTheme(themes[currentTheme]);
-        theCommander->setDefaultLevelThemeName(themes[currentTheme].c_str());
+        theCommander->setPreferedLevelThemeName(themes[currentTheme].c_str());
     }
     else if (sender == nextButton) {
         currentTheme = (currentTheme+1)%size;
         themePreview.setSelectedTheme(themes[currentTheme]);
-        theCommander->setDefaultLevelThemeName(themes[currentTheme].c_str());
+        theCommander->setPreferedLevelThemeName(themes[currentTheme].c_str());
     }
 }
 

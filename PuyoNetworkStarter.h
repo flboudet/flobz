@@ -124,8 +124,12 @@ public:
                             PuyoTwoNameProvider *nameProvider = NULL);
 private:
     SharedMatchAssets m_sharedAssets;
+    SharedGetReadyAssets m_sharedGetReadyAssets;
     auto_ptr<SetupMatchState>       m_setupMatch;
-    auto_ptr<WaitPlayersReadyState> m_waitPlayersReady;
+    auto_ptr<EnterPlayerReadyState> m_enterPlayersReady;
+    auto_ptr<NetSynchronizeState>   m_synchroGetReady;
+    auto_ptr<ExitPlayerReadyState>  m_exitPlayersReady;
+    //auto_ptr<WaitPlayersReadyState> m_waitPlayersReady;
     auto_ptr<NetSynchronizeState>   m_synchroBeforeStart;
     auto_ptr<MatchPlayingState>     m_matchPlaying;
     auto_ptr<MatchIsOverState>      m_matchIsOver;

@@ -212,9 +212,9 @@ PuyoSingleGameLevelData::PuyoSingleGameLevelData(int gameLevel, int difficulty,
   : gameLevel(gameLevel), difficulty(difficulty),
     levelDefinition(levelDefinitions.getLevelDefinition(gameLevel))
 {
-    themeToUse = theCommander->getDefaultPuyoSetTheme();
+    themeToUse = theCommander->getPreferedPuyoSetTheme();
     if (levelDefinition->backgroundTheme == "Prefs.DefaultTheme")
-        levelThemeToUse = theCommander->getDefaultLevelTheme();
+        levelThemeToUse = theCommander->getPreferedLevelTheme();
     else
         levelThemeToUse = theCommander->getLevelTheme(levelDefinition->backgroundTheme);
 }

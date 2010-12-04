@@ -4,6 +4,8 @@
 #include "audio.h"
 #include "Theme.h"
 
+extern void FBLog(const char *txt);
+
 using namespace event_manager;
 
 extern IosFont *storyFont;
@@ -183,10 +185,13 @@ bool StoryWidget::classInitialized = false;
 StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
     : IdleComponent(), localeDictionary(NULL), finishedAction(finishedAction), once(false), last_time(-1.), fxMode(fxMode)
 {
+    FBLog("StoryWidget::StoryWidget()");
     try {
         localeDictionary = new LocalizedDictionary(theCommander->getDataPathManager(), "locale/story", screenName);
-    } catch (...) {}
-
+    } catch (...) {
+        FBLog("StoryWidget::StoryWidget() locale error");
+    }
+    FBLog("StoryWidget::StoryWidget() 1");
     if (!classInitialized) {
         String path0 = theCommander->getDataPathManager().getPath("lib/styrolyse.gsl");
         String path1 = theCommander->getDataPathManager().getPath("lib/nofx.gsl");
@@ -194,7 +199,7 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
         styrolyse_init(path0.c_str(), path1.c_str(), path2.c_str());
         classInitialized = true;
     }
-
+    FBLog("StoryWidget::StoryWidget() 2");
     FILE *test = NULL;
     try {
         fullPath = theCommander->getDataPathManager().getPath(String("story/") + screenName);
@@ -207,6 +212,7 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
         fullPath = theCommander->getDataPathManager().getPath("story/error.gsl");
     }
     else fclose(test);
+    FBLog("StoryWidget::StoryWidget() 3");
     String storyLocalePath;
 
     // Initializing the styrolyse client
@@ -222,9 +228,10 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
     client.styroClient.cacheSound   = ::cacheSound;
     client.styroClient.cacheMusic   = ::cacheMusic;
     client.widget = this;
+    FBLog("StoryWidget::StoryWidget() styrolyse_new");
     client.attachedTheme = NULL;
-
     currentStory = styrolyse_new((const char *)fullPath, (StyrolyseClient *)(&client), fxMode);
+    FBLog("StoryWidget::StoryWidget() styrolyse_new finished");
     //styrolyse_setuserpointer(currentStory, this);
     //sstory = createStorySurface();
 }

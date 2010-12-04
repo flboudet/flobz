@@ -114,7 +114,53 @@ private:
     SharedMatchAssets &m_sharedAssets;
     GameState *m_nextState;
 };
-
+struct SharedGetReadyAssets
+{
+    auto_ptr<StoryWidget> m_getReadyWidget;
+};
+class EnterPlayerReadyState : public GameState, public Action, CycledComponent
+{
+public:
+    EnterPlayerReadyState(SharedMatchAssets &sharedMatchAssets,
+                          SharedGetReadyAssets &sharedGetReadyAssets);
+    // GameState implementation
+    virtual void enterState();
+    virtual void exitState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // Action implementation
+    virtual void action(Widget *sender, int actionType,
+                        event_manager::GameControlEvent *event);
+    // CycledComponent implementation
+    virtual void cycle();
+    // Own methods
+    void setNextState(GameState *nextState) {
+        m_nextState = nextState;
+    }
+private:
+    SharedMatchAssets &m_sharedAssets;
+    SharedGetReadyAssets &m_sharedGetReadyAssets;
+    bool m_getReadyDisplayed;
+    GameState *m_nextState;
+};
+class ExitPlayerReadyState : public GameState
+{
+public:
+    ExitPlayerReadyState(SharedMatchAssets &sharedMatchAssets,
+                         SharedGetReadyAssets &sharedGetReadyAssets);
+    // GameState implementation
+    virtual void enterState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // Own methods
+    void setNextState(GameState *nextState) {
+        m_nextState = nextState;
+    }
+private:
+    SharedMatchAssets &m_sharedAssets;
+    SharedGetReadyAssets &m_sharedGetReadyAssets;
+    GameState *m_nextState;
+};
 class WaitPlayersReadyState : public GameState, public Action
 {
 public:
