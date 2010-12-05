@@ -5,6 +5,7 @@ import <flying_flobo.gsl>
 <init>
     Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
     Sprite @sky = [new_sprite: image="introlevel/skynight.jpg" x=0.0 y=0.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
+    Sprite @fovea = [new_sprite: image="fovea.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
 
     lk_init
 
@@ -47,6 +48,7 @@ import <flying_flobo.gsl>
 <sprite_list>
     Vec2 displayPos
     sprite::@sky display=@display
+    sprite::@fovea display=@display
     (@credits_state >= @CREDITS_ALL)? {
         displayPos.x = 40.0
         displayPos.y = 460.0 - (@fcycle - @CREDITS_ALL_T)*0.5

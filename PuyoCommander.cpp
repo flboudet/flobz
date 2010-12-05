@@ -1,5 +1,6 @@
 /* strings to translate */
 
+#include "GTLog.h"
 #include "PuyoCommander.h"
 #include "PuyoStrings.h"
 #include "preferences.h"
@@ -11,8 +12,6 @@
 #endif
 using namespace gameui;
 using namespace event_manager;
-
-extern void FBLog(const char *txt);
 
 PuyoCommander *theCommander = NULL;
 IosFont *storyFont; // TODO: remove
@@ -178,7 +177,7 @@ PuyoCommander::PuyoCommander(DataPathManager &dataPathManager)
 
 void PuyoCommander::initWithGUI(bool fs)
 {
-	FBLog("PuyoCommander::initWithGUI() entered");
+  GTLogTrace("PuyoCommander::initWithGUI() entered");
 
   m_windowFramePicture = std::auto_ptr<FramePicture>(new FramePicture(25, 28, 25, 19, 26, 23));
   m_buttonIdleFramePicture = std::auto_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
@@ -189,23 +188,23 @@ void PuyoCommander::initWithGUI(bool fs)
   m_separatorFramePicture = std::auto_ptr<FramePicture>(new FramePicture(63, 2, 63, 2, 4, 2));
   m_listFramePicture = std::auto_ptr<FramePicture>(new FramePicture(5, 23, 4, 6, 10, 3));
 
-	FBLog("PuyoCommander::initWithGUI() loading prefs");
+  GTLogTrace("PuyoCommander::initWithGUI() loading prefs");
 
   loadPreferences(fs);
 
-	FBLog("PuyoCommander::initWithGUI() init locales");
+  GTLogTrace("PuyoCommander::initWithGUI() init locales");
 
   initLocale();
-	
-	FBLog("PuyoCommander::initWithGUI() init audio");
+
+  GTLogTrace("PuyoCommander::initWithGUI() init audio");
 
   initAudio();
-	
-	FBLog("PuyoCommander::initWithGUI() init fonts");
+
+  GTLogTrace("PuyoCommander::initWithGUI() init fonts");
 
   initFonts();
-	
-	FBLog("PuyoCommander::initWithGUI() loading images");
+
+  GTLogTrace("PuyoCommander::initWithGUI() loading images");
 
 
   // Loading the frame images, and setting up the frames
@@ -227,7 +226,7 @@ void PuyoCommander::initWithGUI(bool fs)
   m_separatorImage = getSurface(IMAGE_RGBA, "gfx/separator.png");
   m_listIdleImage = getSurface(IMAGE_RGBA, "gfx/listborder.png");
 
-	FBLog("PuyoCommander::initWithGUI() configuring frames");
+  GTLogTrace("PuyoCommander::initWithGUI() configuring frames");
 
   m_windowFramePicture->setFrameSurface(m_frameImage);
   m_buttonIdleFramePicture->setFrameSurface(m_buttonIdleImage);
@@ -237,7 +236,7 @@ void PuyoCommander::initWithGUI(bool fs)
   m_textFieldIdleFramePicture->setFrameSurface(m_textFieldIdleImage);
   m_separatorFramePicture->setFrameSurface(m_separatorImage);
   m_listFramePicture->setFrameSurface(m_listIdleImage);
-    FBLog("PuyoCommander::initWithGUI() completed");
+  GTLogTrace("PuyoCommander::initWithGUI() completed");
 
 }
 

@@ -1,6 +1,6 @@
 noinst_LTLIBRARIES=libgametools.la
 
-libgametools_la_SOURCES=GameCursor.cpp \
+libgametools_la_SOURCES=GTLog.cpp GameCursor.cpp \
          preferences.cpp gameloop.cpp gameui.cpp GameStateMachine.cpp \
          ListView.cpp Frame.cpp FramedButton.cpp FramedEditField.cpp \
 	 mt19937ar.cpp SwitchedButton.cpp RadioButton.cpp NotifyCenter.cpp \
@@ -8,7 +8,7 @@ libgametools_la_SOURCES=GameCursor.cpp \
 
 libgametools_la_CXXFLAGS = -I$(top_srcdir) -I$(top_srcdir)/iosfc $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 
-EXTRA_DIST=FramedButton.h FramedEditField.h Frame.h \
+EXTRA_DIST=GTLog.h FramedButton.h FramedEditField.h Frame.h \
            GameControls.h GameCursor.h gameloop.h \
            gameui.h GameStateMachine.h \
            ListView.h mt19937ar.h NotifyCenter.h \

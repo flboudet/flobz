@@ -34,6 +34,7 @@
 #endif
 #include "windows.h"
 #endif
+#include "GTLog.h"
 #include "LocalizedDictionary.h"
 #include "ios_memory.h"
 #include <iostream>
@@ -42,8 +43,6 @@
 #include <cstring>
 #include <string>
 #include <stdint.h>
-
-extern void FBLog(const char *txt);
 
 static bool readLine(FILE *dictionaryFile, String &lineRead)
 {
@@ -277,15 +276,15 @@ static str_dictionnary dictionaries;
 LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName) : dictionary(NULL), datapathManager(datapathManager)
 {
   signed int i;
-    
-    FBLog("LocalizedDictionary::LocalizedDictionary() 1");
+
+    GTLogTrace("LocalizedDictionary::LocalizedDictionary() 1");
   /* First create the prefered languages list whenever needed */
   Locales_Init();
 
-    FBLog("LocalizedDictionary::LocalizedDictionary() 2");
+    GTLogTrace("LocalizedDictionary::LocalizedDictionary() 2");
   stdName = FilePath::combine(dictionaryDirectory, dictionaryName);
   dictionaryEntry * myDictEntry = (dictionaryEntry *)dictionaries[std::string((const char *)stdName)];
-    FBLog("LocalizedDictionary::LocalizedDictionary() 3");
+    GTLogTrace("LocalizedDictionary::LocalizedDictionary() 3");
   if (myDictEntry == NULL)
   {
     myDictEntry = (dictionaryEntry *)malloc(sizeof(dictionaryEntry));
@@ -302,12 +301,12 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
         String directoryName = FilePath::combine(dictionaryDirectory, locale);
         String dictFilePath = FilePath::combine(directoryName, dictionaryName) + ".dic";
         FILE *dictionaryFile = NULL;
-        FBLog("LocalizedDictionary::LocalizedDictionary() 4");
+        GTLogTrace("LocalizedDictionary::LocalizedDictionary() 4");
         try {
             dictionaryFile = fopen(datapathManager.getPath(dictFilePath), "r");
         }
         catch (...) {}
-        FBLog("LocalizedDictionary::LocalizedDictionary() 5");
+        GTLogTrace("LocalizedDictionary::LocalizedDictionary() 5");
         if (dictionaryFile != NULL)
         {
             /* Read all the entries in the dictionary file */
@@ -343,7 +342,7 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
 
   myDictEntry->refcount++;
   dictionary = (void*)(myDictEntry->dictionary);
-    FBLog("LocalizedDictionary::LocalizedDictionary() end");
+  GTLogTrace("LocalizedDictionary::LocalizedDictionary() end");
   //fprintf(stderr,"-----Refcount++ = %d (%s)\n",myDictEntry->refcount,(const char *)stdName);
 }
 

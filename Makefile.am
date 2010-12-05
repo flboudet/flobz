@@ -66,7 +66,7 @@ endif
 
 flobopuyo_LDADD+=$(SDL_LIBS)
 
-SUBDIRS = iosfc gametools goomsl data
+SUBDIRS = iosfc gametools goomsl data fpserver
 
 # Mac OS X Targets
 

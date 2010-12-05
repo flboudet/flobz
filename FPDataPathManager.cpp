@@ -84,7 +84,6 @@ FPDataPathManager::FPDataPathManager(String coreDataPath)
             m_dataPaths.add(new FilePath(m_coreDataPath.combine(wellFormattedNames[biggestFileIndex])));
             wellFormattedNumbers.removeAt(biggestFileIndex);
             wellFormattedNames.removeAt(biggestFileIndex);
-            cout << "dataPathsSize: " << m_dataPaths.size() << " ; " << &m_dataPaths << endl;
         }
     }
 }

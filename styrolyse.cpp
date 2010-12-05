@@ -1,3 +1,4 @@
+#include "GTLog.h"
 #include "goomsl.h"
 #include "styrolyse.h"
 #include <stdio.h>
@@ -12,7 +13,6 @@ static char *scriptPath0 = NULL;
 static char *scriptPath_fx = NULL;
 static char *scriptPath_nofx = NULL;
 
-extern void FBLog(const char *txt);
 
 struct _Styrolyse {
 
@@ -300,9 +300,9 @@ Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client, int fxMode)
     gsl_bind_path_resolver(_this->gsl, pathResolverFunction);
     _this->images = goom_hash_new();
     strncpy(_this->fname, fname, 512);
-    FBLog("styrolyse_new() styrolyse_reload");
+    GTLogTrace("styrolyse_new() styrolyse_reload");
     styrolyse_reload(_this);
-    FBLog("styrolyse_new() finished");
+    GTLogTrace("styrolyse_new() finished");
     return _this;
 }
 
@@ -363,9 +363,9 @@ void styrolyse_reload(Styrolyse *_this)
         gsl_append_file_to_buffer(scriptPath_fx, &fbuffer);
     gsl_append_file_to_buffer(_this->fname, &fbuffer);
     styrolyse = _this;
-    FBLog("styrolyse_new() gsl_compile");
+    GTLogTrace("styrolyse_new() gsl_compile");
     gsl_compile(_this->gsl,fbuffer);
-    FBLog("styrolyse_new() gsl_compile finished");
+    GTLogTrace("styrolyse_new() gsl_compile finished");
     sbind(_this->gsl);
     free(fbuffer);
     styrolyse_execute(_this, 0, 0.0);
