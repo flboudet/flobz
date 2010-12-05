@@ -135,7 +135,9 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     if (addNeutrals.size() > 0) {
        if (delegate != NULL) {
             for (int i = 0, j = addNeutrals.size() ; i+1 < j ; i += 2) {
-                delegate->gameDidAddNeutral(findPuyo(addNeutrals[i]), addNeutrals[i+1]);
+                PuyoPuyo *neutral = findPuyo(addNeutrals[i]);
+                if (neutral != NULL)
+                    delegate->gameDidAddNeutral(neutral, addNeutrals[i+1]);
             }
         }
     }
@@ -144,7 +146,10 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     if (moveLeftBuffer.size() > 0) {
         if (delegate != NULL) {
             for (int i = 0, j = moveLeftBuffer.size() ; i+1 < j ; i += 2) {
-                delegate->fallingsDidMoveLeft(findPuyo(moveLeftBuffer[i]), findPuyo(moveLeftBuffer[i+1]));
+                PuyoPuyo *falling = findPuyo(moveLeftBuffer[i]);
+                PuyoPuyo *companion = findPuyo(moveLeftBuffer[i+1]);
+                if ((falling != NULL) && (companion != NULL))
+                    delegate->fallingsDidMoveLeft(falling, companion);
             }
         }
     }
@@ -153,7 +158,10 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     if (moveRightBuffer.size() > 0) {
         if (delegate != NULL) {
             for (int i = 0, j = moveRightBuffer.size() ; i+1 < j ; i += 2) {
-                delegate->fallingsDidMoveRight(findPuyo(moveRightBuffer[i]), findPuyo(moveRightBuffer[i+1]));
+                PuyoPuyo *falling = findPuyo(moveRightBuffer[i]);
+                PuyoPuyo *companion = findPuyo(moveRightBuffer[i+1]);
+                if ((falling != NULL) && (companion != NULL))
+                    delegate->fallingsDidMoveRight(falling, companion);
             }
         }
     }
@@ -186,7 +194,9 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     if (didFall.size() > 0) {
        if (delegate != NULL) {
             for (int i = 0, j = didFall.size() ; i+3 < j ; i += 4) {
-                delegate->puyoDidFall(findPuyo(didFall[i]), didFall[i+1], didFall[i+2], didFall[i+3]);
+                PuyoPuyo *didFallPuyo = findPuyo(didFall[i]);
+                if (didFallPuyo != NULL)
+                    delegate->puyoDidFall(didFallPuyo, didFall[i+1], didFall[i+2], didFall[i+3]);
             }
         }
     }
@@ -202,7 +212,9 @@ void PuyoNetworkGame::synchronizeState(Message &message)
                 int groupNumber = willVanish[i++];
                 int numberOfPuyosInGroup = willVanish[i++];
                 for (int index = 0 ; index < numberOfPuyosInGroup ; index++) {
-                    temporaryGroup.add(findPuyo(willVanish[i + index]));
+                    PuyoPuyo *vanishedPuyo = findPuyo(willVanish[i + index]);
+                    if (vanishedPuyo != NULL)
+                        temporaryGroup.add(vanishedPuyo);
                 }
                 delegate->puyoWillVanish(temporaryGroup, groupNumber, numPhase);
                 i += numberOfPuyosInGroup;
