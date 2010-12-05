@@ -4,8 +4,9 @@ import <flying_flobo.gsl>
 
 <init>
     Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+    Display @movingDisplay = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
     Sprite @sky = [new_sprite: image="introlevel/skynight.jpg" x=0.0 y=0.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
-    Sprite @fovea = [new_sprite: image="fovea.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
+    Sprite @fovea = [new_sprite: image="fovea.png" x=640.0 y=100.0 curframe=0.0 framespeed=0.0 nbframes=1.0]
 
     lk_init
 
@@ -48,11 +49,11 @@ import <flying_flobo.gsl>
 <sprite_list>
     Vec2 displayPos
     sprite::@sky display=@display
-    sprite::@fovea display=@display
+    sprite::@fovea display=@movingDisplay
     (@credits_state >= @CREDITS_ALL)? {
         displayPos.x = 40.0
         displayPos.y = 460.0 - (@fcycle - @CREDITS_ALL_T)*0.5
-        put_text: text="We would also like to warmly thank every one who supported us with\nreally apprieciated contributions.\n           \nSouad \"Sousou\" El Merhebi\n-- for the website and lot of beta-testing\n        \nTania \"Gnia\" Garcia\n-- for its always original ideas\n        \nOur families...\n        \nOur friends...\n                           \nAnd friends of friends!\n \n \n \n \n \n                                            Thank you all" pos=displayPos text_index=(@fcycle-@CREDITS_ALL_T)*0.625
+        put_text: text="We would also like to warmly thank every one who supported us with\nreally apprieciated contributions.\n           \nSouad \"Sousou\" El Merhebi\n-- for the website and lot of beta-testing\n        \nTania \"Lemonpeel\" Garcia\n-- for her always original ideas\n        \nOur families...\n        \nOur friends...\n                           \nAnd friends of friends!\n \n \n \n \n \n                                            Thank you all" pos=displayPos text_index=(@fcycle-@CREDITS_ALL_T)*0.625
         (@fcycle >= @CREDITS_ALL_T + 420.0)? @flying_flobo_TitleDisplayYBase = -110.0 - (@fcycle - 420.0 - @CREDITS_ALL_T)*0.5
     }
     flying_flobo_sprite_list
@@ -64,6 +65,7 @@ import <flying_flobo.gsl>
         put_text: text="Proudly offered by..." pos=displayPos text_index=(@fcycle - @CREDITS_PROUDLY_PRESENTS_T)/2.0
     }
     (@credits_state >= @CREDITS_FOVEA_TEAM)? {
+        move::@fovea fcycle=@CREDITS_FOVEA_TEAM_T+120.0 x=260.0 y=100.0
         displayPos.x = 20.0 + (@fcycle - @CREDITS_FOVEA_TEAM_T)/1.4
         displayPos.y = 320.0 - (@fcycle - @CREDITS_FOVEA_TEAM_T)/2.7
         (displayPos.x > 245.0)? displayPos.x = 245.0
