@@ -1,11 +1,17 @@
 #ifndef _GTLOG_T_
 #define _GTLOG_T_
 
+#define GTLOG_ENABLETRACES 1
+
 #ifdef GTLOG_ENABLETRACES
 
-#define GTLogTrace(txt) {        \
+#define GTLogTrace(txt) { \
+    char *GTLogTraceArray; \
+    GTLogTraceArray = (char*)malloc(strlen(txt) + strlen(__FUNCTION__) + 3); \
+    sprintf(GTLogTraceArray, "%s: %s", __FUNCTION__, txt); \
     Logger::instance.logln(txt); \
-    }
+    free(GTLogTraceArray); \
+}
 
 #else
 
@@ -13,6 +19,10 @@
 
 #endif
 
+#define GTCheckInterval(value, min, max, errorMessage) { \
+    if (value < min || value > max) \
+        GTLogTrace(errorMessage); \
+}
 
 class LoggerImpl {
 public:

@@ -27,6 +27,7 @@
 #include "PuyoMessageDef.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "GTLog.h"
 
 using namespace PuyoMessage;
 
@@ -68,14 +69,20 @@ void PuyoNetworkGame::onMessage(Message &message)
             case kGameOverLost:
             case kGameOverWon:
                 gameStat.points = message.getInt(SCORE);
+                GTCheckInterval(gameStat.points, 0, 999999999, "points is invalid");
                 gameStat.total_points = message.getInt(TOTAL_SCORE);
+                GTCheckInterval(gameStat.total_points, 0, 999999999, "total_points is invalid");
                 for (int i = 0 ; i < 24 ; i++) {
                     String messageName = String(COMBO_COUNT) + i;
                     gameStat.combo_count[i] = message.getInt(messageName);
+                    GTCheckInterval(gameStat.combo_count[i], 0, 999, "combo_count is invalid");
                 }
                 gameStat.explode_count = message.getInt(EXPLODE_COUNT);
+                GTCheckInterval(gameStat.explode_count, 0, 999999, "explode_count is invalid");
                 gameStat.drop_count = message.getInt(DROP_COUNT);
+                GTCheckInterval(gameStat.drop_count, 0, 999999, "drop_count is invalid");
                 gameStat.ghost_sent_count = message.getInt(GHOST_SENT_COUNT);
+                GTCheckInterval(gameStat.ghost_sent_count, 0, 9999999, "ghost_sent_count is invalid");
                 gameStat.time_left = message.getFloat(TIME_LEFT);
                 gameStat.is_dead = message.getBool(IS_DEAD);
                 gameStat.is_winner = message.getBool(IS_WINNER);
@@ -84,37 +91,47 @@ void PuyoNetworkGame::onMessage(Message &message)
                     delegate->gameLost();
                 break;
             default:
+                GTLogTrace("Invalid message type");
                 break;
         }
     }
     catch (Exception e) {
-        printf("Message invalide 2!\n");
+        GTLogTrace("Invalid Message...");
     }
 }
 
 void PuyoNetworkGame::synchronizeState(Message &message)
 {
     gameStat.points = message.getInt(SCORE);
+    GTCheckInterval(gameStat.points, 0, 999999999, "points is invalid");
     nextFalling = (PuyoState)(message.getInt(NEXT_F));
+    GTCheckInterval(nextFalling, 0, 20, "nextFalling is invalid");
     nextCompanion = (PuyoState)(message.getInt(NEXT_C));
+    GTCheckInterval(nextCompanion, 0, 20, "nextCompanion is invalid");
     semiMove = message.getInt(SEMI_MOVE);
 
     Buffer<int> puyos = message.getIntArray(PUYOS);
     int i = 0;
-    while (i < puyos.size()) {
+    while (i+3 < puyos.size()) {
         int currentPuyoID = puyos[i];
+        int puyoState = puyos[i+1];
+        GTCheckInterval(puyoState, 0, 20, "puyoState is invalid");
         PuyoPuyo *currentPuyo = findPuyo(currentPuyoID);
         if (currentPuyo == NULL) {
-            currentPuyo = attachedFactory->createPuyo((PuyoState)(puyos[i+1]));
+            currentPuyo = attachedFactory->createPuyo((PuyoState)puyoState);
             currentPuyo->setID(currentPuyoID);
             puyoVector.add(currentPuyo);
         }
         else {
-            currentPuyo->setPuyoState((PuyoState)(puyos[i+1]));
+            currentPuyo->setPuyoState((PuyoState)puyoState);
         }
         currentPuyo->setFlag();
         setPuyoAt(currentPuyo->getPuyoX(), currentPuyo->getPuyoY(), NULL);
-        setPuyoAt(puyos[i+2], puyos[i+3], currentPuyo);
+        int posX = puyos[i+2];
+        int posY = puyos[i+3];
+        GTCheckInterval(posX, 0, PUYODIMX, "Puyo X is invalid");
+        GTCheckInterval(posY, 0, PUYODIMX, "Puyo X is invalid");
+        setPuyoAt(posX, posY, currentPuyo);
         i += 4;
     }
 
