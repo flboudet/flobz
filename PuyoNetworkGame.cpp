@@ -129,8 +129,8 @@ void PuyoNetworkGame::synchronizeState(Message &message)
         setPuyoAt(currentPuyo->getPuyoX(), currentPuyo->getPuyoY(), NULL);
         int posX = puyos[i+2];
         int posY = puyos[i+3];
-        GTCheckInterval(posX, 0, PUYODIMX, "Puyo X is invalid");
-        GTCheckInterval(posY, 0, PUYODIMX, "Puyo X is invalid");
+        GTCheckInterval(posX, -1, PUYODIMX+1, "Puyo X is invalid");
+        GTCheckInterval(posY, -1, PUYODIMY+1, "Puyo Y is invalid");
         setPuyoAt(posX, posY, currentPuyo);
         i += 4;
     }

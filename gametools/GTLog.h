@@ -7,7 +7,7 @@
 
 #define GTLogTrace(txt) { \
     char *GTLogTraceArray; \
-    GTLogTraceArray = (char*)malloc(strlen(txt) + strlen(__FUNCTION__) + 3); \
+    GTLogTraceArray = (char*)malloc(strlen(txt) + strlen(__FUNCTION__) + 4); \
     sprintf(GTLogTraceArray, "%s: %s", __FUNCTION__, txt); \
     Logger::instance.logln(txt); \
     free(GTLogTraceArray); \
@@ -20,9 +20,13 @@
 #endif
 
 #define GTCheckInterval(value, min, max, errorMessage) { \
-    if (value < min || value > max) \
-        GTLogTrace(errorMessage); \
-}
+    if (value < min || value > max) { \
+        char *GTCheckIntervalArray; \
+        GTCheckIntervalArray = (char*)malloc(strlen(errorMessage) + 128); \
+        sprintf(GTCheckIntervalArray, "%s: %d", errorMessage, (int)value); \
+        GTLogTrace(GTCheckIntervalArray); \
+        free(GTCheckIntervalArray); \
+}}
 
 class LoggerImpl {
 public:
