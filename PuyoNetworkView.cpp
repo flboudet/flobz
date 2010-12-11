@@ -27,7 +27,7 @@
 #include "PuyoIgpDefs.h"
 #include <memory>
 
-Message *PuyoNetworkView::createStateMessage(bool paused)
+Message *PuyoNetworkView::createStateMessage(bool sendFullMessage)
 {
     // preparation des infos */
     int puyoCount = attachedGame->getPuyoCount();
@@ -40,7 +40,7 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
         buffer.add(currentPuyo->getPuyoX());
         buffer.add(currentPuyo->getPuyoY());
     }
-    neutralsBuffer.flush();
+    neutralsBuffer.flush(); // TODO: Voir ce que deviennent ces flush
     moveLeftBuffer.flush();
     moveRightBuffer.flush();
     fallingStepBuffer.flush();
@@ -54,13 +54,15 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
     message->addInt     (PuyoMessage::GAMEID, gameId);
     message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameState);
     message->addString  (PuyoMessage::NAME,   p1name);
-    message->addBool    (PuyoMessage::PAUSED, paused);
-    message->addIntArray(PuyoMessage::PUYOS,  buffer);
+    message->addBool    (PuyoMessage::PAUSED, false); // paused);
     message->addInt     (PuyoMessage::SCORE,  attachedGame->getGameStat().points);
     message->addInt     (PuyoMessage::NEXT_F, attachedGame->getNextFalling());
     message->addInt     (PuyoMessage::NEXT_C, attachedGame->getNextCompanion());
     message->addInt     (PuyoMessage::SEMI_MOVE, attachedGame->getSemiMove());
     message->addInt     (PuyoMessage::CURRENT_NEUTRALS, attachedGame->getNeutralPuyos());
+
+    if (sendFullMessage)
+        message->addIntArray(PuyoMessage::PUYOS,  buffer);
 
     message->addIntArray(PuyoMessage::ADD_NEUTRALS,  neutralsBuffer);
     message->addIntArray(PuyoMessage::MV_L,moveLeftBuffer);
@@ -69,6 +71,7 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
     message->addIntArray(PuyoMessage::COMPANION_TURN,compTurnBuffer);
     message->addIntArray(PuyoMessage::DID_FALL,      didFallBuffer);
     message->addIntArray(PuyoMessage::WILL_VANISH,   willVanishBuffer);
+
     message->addInt     (PuyoMessage::NUMBER_BAD_PUYOS, badPuyos);
 
     // clear des infos ayant ete envoyee
@@ -82,10 +85,10 @@ Message *PuyoNetworkView::createStateMessage(bool paused)
     return message;
 }
 
-void PuyoNetworkView::sendStateMessage(bool paused)
+void PuyoNetworkView::sendStateMessage(bool sendFullMessage)
 {
     //double initial = ios_fc::getTimeMs();
-    Message *message = createStateMessage(paused);
+    Message *message = createStateMessage(sendFullMessage);
     message->send();
     delete message;
     //cout << "Time taken:" << ios_fc::getTimeMs() - initial << endl;
@@ -95,7 +98,7 @@ void PuyoNetworkView::sendStateMessage(bool paused)
 void PuyoNetworkView::cycleGame()
 {
     PuyoView::cycleGame();
-    sendStateMessage();
+    sendStateMessage(true);
 }
 
 void PuyoNetworkView::moveLeft()

@@ -37,7 +37,7 @@ class PuyoNetworkView : public PuyoView {
   public:
     PuyoNetworkView(PuyoGameFactory *attachedPuyoGameFactory, MessageBox *mbox, int gameId)
         : PuyoView(attachedPuyoGameFactory),
-          mbox(mbox), gameId(gameId), badPuyos(0) {}
+          mbox(mbox), gameId(gameId), badPuyos(0), lastFullMessage(-1) {}
 
     PuyoNetworkView(PuyoGameFactory *attachedPuyoGameFactory,
             int playerId,
@@ -45,7 +45,7 @@ class PuyoNetworkView : public PuyoView {
             LevelTheme *attachedLevelTheme,
 		    MessageBox *mbox, int gameId)
         : PuyoView(attachedPuyoGameFactory, playerId, attachedPuyoThemeSet, attachedLevelTheme),
-          mbox(mbox), gameId(gameId), badPuyos(0) {}
+          mbox(mbox), gameId(gameId), badPuyos(0), lastFullMessage(-1) {}
 
     void cycleGame();
 
@@ -66,14 +66,14 @@ class PuyoNetworkView : public PuyoView {
     virtual void gameWin();
     virtual void gameLost();
 
-    void sendStateMessage(bool paused = false);
+    void sendStateMessage(bool sendFullMessage = false);
 
 protected:
     void sendEndOfGameMessage(int messageType);
 
     MessageBox *mbox;
     int gameId;
-    Message *createStateMessage(bool paused);
+    Message *createStateMessage(bool sendFullMessage);
     AdvancedBuffer<int> neutralsBuffer;
     AdvancedBuffer<int> moveLeftBuffer;
     AdvancedBuffer<int> moveRightBuffer;
@@ -82,6 +82,7 @@ protected:
     AdvancedBuffer<int> didFallBuffer;
     AdvancedBuffer<int> willVanishBuffer;
     int badPuyos;
+    double lastFullMessage;
 };
 
 class PuyoInternetNetworkView : public PuyoNetworkView {

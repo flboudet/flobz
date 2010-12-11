@@ -110,31 +110,33 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     GTCheckInterval(nextCompanion, 0, 20, "nextCompanion is invalid");
     semiMove = message.getInt(SEMI_MOVE);
 
-    Buffer<int> puyos = message.getIntArray(PUYOS);
-    int i = 0;
-    while (i+3 < puyos.size()) {
-        int currentPuyoID = puyos[i];
-        int puyoState = puyos[i+1];
-        GTCheckInterval(puyoState, 0, 20, "puyoState is invalid");
-        PuyoPuyo *currentPuyo = findPuyo(currentPuyoID);
-        if (currentPuyo == NULL) {
-            currentPuyo = attachedFactory->createPuyo((PuyoState)puyoState);
-            currentPuyo->setID(currentPuyoID);
-            puyoVector.add(currentPuyo);
+    if (message.hasIntArray(PUYOS)) {
+        Buffer<int> puyos = message.getIntArray(PUYOS);
+        int i = 0;
+        while (i+3 < puyos.size()) {
+            int currentPuyoID = puyos[i];
+            int puyoState = puyos[i+1];
+            GTCheckInterval(puyoState, 0, 20, "puyoState is invalid");
+            PuyoPuyo *currentPuyo = findPuyo(currentPuyoID);
+            if (currentPuyo == NULL) {
+                currentPuyo = attachedFactory->createPuyo((PuyoState)puyoState);
+                currentPuyo->setID(currentPuyoID);
+                puyoVector.add(currentPuyo);
+            }
+            else {
+                currentPuyo->setPuyoState((PuyoState)puyoState);
+            }
+            currentPuyo->setFlag();
+            setPuyoAt(currentPuyo->getPuyoX(), currentPuyo->getPuyoY(), NULL);
+            int posX = puyos[i+2];
+            int posY = puyos[i+3];
+            GTCheckInterval(posX, 0, PUYODIMX, "Puyo X is invalid");
+            GTCheckInterval(posY, 0, PUYODIMY, "Puyo Y is invalid");
+            setPuyoAt(posX, posY, currentPuyo);
+            i += 4;
         }
-        else {
-            currentPuyo->setPuyoState((PuyoState)puyoState);
-        }
-        currentPuyo->setFlag();
-        setPuyoAt(currentPuyo->getPuyoX(), currentPuyo->getPuyoY(), NULL);
-        int posX = puyos[i+2];
-        int posY = puyos[i+3];
-        GTCheckInterval(posX, -1, PUYODIMX+1, "Puyo X is invalid");
-        GTCheckInterval(posY, -1, PUYODIMY+1, "Puyo Y is invalid");
-        setPuyoAt(posX, posY, currentPuyo);
-        i += 4;
     }
-
+    
     for (int i = puyoVector.size() - 1 ; i >= 0 ; i--) {
         PuyoPuyo *currentPuyo = puyoVector[i];
         if (currentPuyo->getFlag()) {
