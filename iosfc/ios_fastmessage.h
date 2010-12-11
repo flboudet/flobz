@@ -24,6 +24,7 @@ class FastMessage : public Message
 public:
     FastMessage();
     FastMessage(VoidBuffer &serializedData);
+    virtual ~FastMessage();
 
     virtual VoidBuffer serialize();
     virtual void addInt(const String &key, int value);
@@ -55,7 +56,7 @@ public:
 
     virtual int  getIntProperty   (const String &key) const;
     virtual bool getBoolProperty  (const String &key) const;
-    
+
     virtual void send() {}
 private:
     enum ValueType {
@@ -93,8 +94,20 @@ private:
         *((double *)dest) = src;
     }
     inline void * append_key_reserve_data(uint16_t type, const char *key, size_t dataSize) {
-        // TODO: check buffer overflow
         size_t keySize = strlen(key);
+        // Check header buffer overflow
+        while (m_headerRecordsCount * sizeof(m_headerRecordsCount) >= m_headerSize) {
+            m_headerSize *= 2;
+            m_header = Memory::realloc(m_header, m_headerSize);
+            m_headerRecords = (HeaderRecord *)((char *)m_header + 2);
+            // TODO: handle allocation error
+        }
+        // Check data buffer overflow
+        while (m_dataOffset + keySize + dataSize >= m_dataSize) {
+            m_dataSize *= 2;
+            m_data = Memory::realloc(m_data, m_dataSize);
+            // TODO: handle allocation error
+        }
         m_headerRecords[m_headerRecordsCount++]
             = HeaderRecord(type, m_dataOffset, m_dataOffset+keySize);
         Memory::memcpy((char *)m_data+m_dataOffset, (const char *)key, keySize);
@@ -121,8 +134,10 @@ private:
     }
 private:
     void         *m_header;
+    size_t        m_headerSize;
     HeaderRecord *m_headerRecords;
     void         *m_data;
+    size_t        m_dataSize;
     size_t m_headerRecordsCount;
     size_t m_dataOffset;
 };

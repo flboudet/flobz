@@ -8,8 +8,10 @@ namespace ios_fc {
 FastMessage::FastMessage()
     : m_headerRecordsCount(0), m_dataOffset(0)
 {
-    m_header = Memory::malloc(1024);
-    m_data = Memory::malloc(1024);
+    m_headerSize = 1024;
+    m_dataSize = 1024;
+    m_header = Memory::malloc(m_headerSize);
+    m_data = Memory::malloc(m_dataSize);
     m_headerRecords = (HeaderRecord *)((char *)m_header + 2);
 }
 
@@ -26,6 +28,14 @@ FastMessage::FastMessage(VoidBuffer &serializedData)
     m_headerRecords = (HeaderRecord *)((char *)m_header + 2);
 
     m_headerRecordsCount = (headerSize-2) / sizeof(HeaderRecord);
+    m_headerSize = headerSize;
+    m_dataSize = dataSize;
+}
+
+FastMessage::~FastMessage()
+{
+    Memory::free(m_header);
+    Memory::free(m_data);
 }
 
 void FastMessage::addInt(const String &key, int value)
@@ -184,7 +194,8 @@ VoidBuffer FastMessage::serialize()
 {
     size_t headerOffset = 2 + m_headerRecordsCount * sizeof(HeaderRecord);
     copy_uint16(m_header, headerOffset);
-    VoidBuffer result(m_header, headerOffset + m_dataOffset);
+    VoidBuffer result(headerOffset + m_dataOffset);
+    Memory::memcpy(result, (char *)m_header, headerOffset);
     Memory::memcpy((char *)result+headerOffset, m_data, m_dataOffset);
     return result;
 }
