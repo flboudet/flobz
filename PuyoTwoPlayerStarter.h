@@ -258,13 +258,15 @@ private:
 class LeaveGameState : public GameState
 {
 public:
-    LeaveGameState(SharedMatchAssets &sharedMatchAssets);
+    LeaveGameState(SharedMatchAssets &sharedMatchAssets,
+                   Action *actionToCallWhenLeft = NULL);
     // GameState implementation
     virtual void enterState();
     virtual bool evaluate();
     virtual GameState *getNextState();
 private:
     SharedMatchAssets &m_sharedAssets;
+    Action *m_actionToCallWhenLeft;
 };
 
 

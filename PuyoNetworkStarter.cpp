@@ -314,7 +314,8 @@ void NetSynchronizeState::sendAckMessage()
 NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory &gameWidgetFactory,
                                                  ios_fc::MessageBox *mbox,
                                                  int gameSpeed,
-                                                 PuyoTwoNameProvider *nameProvider)
+                                                 PuyoTwoNameProvider *nameProvider,
+                                                 Action *endOfSessionAction)
 {
     // Creating the different game states
     m_setupMatch.reset(new SetupMatchState(gameWidgetFactory, gameSpeed, nameProvider, m_sharedAssets));
@@ -327,7 +328,7 @@ NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory &gameWidgetFa
     m_matchIsOver.reset(new MatchIsOverState(m_sharedAssets));
     m_displayStats.reset(new DisplayStatsState(m_sharedAssets));
     m_synchroAfterStats.reset(new NetSynchronizeState(mbox, 10));
-    m_leaveGame.reset(new LeaveGameState(m_sharedAssets));
+    m_leaveGame.reset(new LeaveGameState(m_sharedAssets, endOfSessionAction));
     
     // Linking the states together
     m_setupMatch->setNextState(m_enterPlayersReady.get());

@@ -418,8 +418,10 @@ void DisplayStatsState::action(Widget *sender, int actionType,
 //---------------------------------
 // LeaveGameState
 //---------------------------------
-LeaveGameState::LeaveGameState(SharedMatchAssets &sharedMatchAssets)
-    : m_sharedAssets(sharedMatchAssets)
+LeaveGameState::LeaveGameState(SharedMatchAssets &sharedMatchAssets,
+                               Action *actionToCallWhenLeft)
+    : m_sharedAssets(sharedMatchAssets),
+      m_actionToCallWhenLeft(actionToCallWhenLeft)
 {
 }
 
@@ -431,6 +433,8 @@ void LeaveGameState::enterState()
     if (menuScreen != NULL)
         menuScreen->transitionFromScreen(*(m_sharedAssets.m_gameScreen));
     m_sharedAssets.release();
+    if (m_actionToCallWhenLeft != NULL)
+        m_actionToCallWhenLeft->action(NULL, 0, NULL);
 }
 
 bool LeaveGameState::evaluate()
