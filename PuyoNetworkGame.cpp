@@ -100,6 +100,17 @@ void PuyoNetworkGame::onMessage(Message &message)
     }
 }
 
+void PuyoNetworkGame::synchronizePuyo(int *buffer) {
+    PuyoPuyo *puyo = findPuyo(buffer[0]);
+    PuyoState puyoState = (PuyoState)buffer[1];
+    GTCheckInterval(puyoState, 0, 20, "puyoState is invalid");
+    puyo->setPuyoState(puyoState);
+    setPuyoAt(puyo->getPuyoX(), puyo->getPuyoY(), NULL);
+    int posX = buffer[2]; GTCheckInterval(posX, 0, PUYODIMX, "Puyo X is invalid");
+    int posY = buffer[3]; GTCheckInterval(posY, 0, PUYODIMY, "Puyo Y is invalid");
+    setPuyoAt(posX, posY, puyo);    
+}
+
 void PuyoNetworkGame::synchronizeState(Message &message)
 {
     gameStat.points = message.getInt(SCORE);
@@ -116,36 +127,27 @@ void PuyoNetworkGame::synchronizeState(Message &message)
         while (i+3 < puyos.size()) {
             int currentPuyoID = puyos[i];
             int puyoState = puyos[i+1];
-            GTCheckInterval(puyoState, 0, 20, "puyoState is invalid");
             PuyoPuyo *currentPuyo = findPuyo(currentPuyoID);
             if (currentPuyo == NULL) {
                 currentPuyo = attachedFactory->createPuyo((PuyoState)puyoState);
                 currentPuyo->setID(currentPuyoID);
                 puyoVector.add(currentPuyo);
             }
-            else {
-                currentPuyo->setPuyoState((PuyoState)puyoState);
-            }
-            currentPuyo->setFlag();
-            setPuyoAt(currentPuyo->getPuyoX(), currentPuyo->getPuyoY(), NULL);
-            int posX = puyos[i+2];
-            int posY = puyos[i+3];
-            GTCheckInterval(posX, 0, PUYODIMX, "Puyo X is invalid");
-            GTCheckInterval(posY, 0, PUYODIMY, "Puyo Y is invalid");
-            setPuyoAt(posX, posY, currentPuyo);
+            synchronizePuyo(puyos+i);
             i += 4;
         }
-    }
-    
-    for (int i = puyoVector.size() - 1 ; i >= 0 ; i--) {
-        PuyoPuyo *currentPuyo = puyoVector[i];
-        if (currentPuyo->getFlag()) {
-            currentPuyo->unsetFlag();
-        }
-        else {
-            setPuyoAt(currentPuyo->getPuyoX(), currentPuyo->getPuyoY(), NULL);
-            puyoVector.removeAt(i);
-            attachedFactory->deletePuyo(currentPuyo);
+
+        // Remove the puyos that were not flagged.
+        for (int i = puyoVector.size() - 1 ; i >= 0 ; i--) {
+            PuyoPuyo *currentPuyo = puyoVector[i];
+            if (currentPuyo->getFlag()) {
+                currentPuyo->unsetFlag();
+            }
+            else {
+                setPuyoAt(currentPuyo->getPuyoX(), currentPuyo->getPuyoY(), NULL);
+                puyoVector.removeAt(i);
+                attachedFactory->deletePuyo(currentPuyo);
+            }
         }
     }
 
@@ -164,11 +166,14 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     Buffer<int> moveLeftBuffer= message.getIntArray(MV_L);
     if (moveLeftBuffer.size() > 0) {
         if (delegate != NULL) {
-            for (int i = 0, j = moveLeftBuffer.size() ; i+1 < j ; i += 2) {
+            for (int i = 0, j = moveLeftBuffer.size() ; i+7 < j ; i += 8) {
                 PuyoPuyo *falling = findPuyo(moveLeftBuffer[i]);
-                PuyoPuyo *companion = findPuyo(moveLeftBuffer[i+1]);
-                if ((falling != NULL) && (companion != NULL))
+                PuyoPuyo *companion = findPuyo(moveLeftBuffer[i+4]);
+                if ((falling != NULL) && (companion != NULL)) {
+                    synchronizePuyo(moveLeftBuffer+i);
+                    synchronizePuyo(moveLeftBuffer+i+4);
                     delegate->fallingsDidMoveLeft(falling, companion);
+                }
             }
         }
     }
@@ -176,11 +181,14 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     Buffer<int> moveRightBuffer= message.getIntArray(MV_R);
     if (moveRightBuffer.size() > 0) {
         if (delegate != NULL) {
-            for (int i = 0, j = moveRightBuffer.size() ; i+1 < j ; i += 2) {
+            for (int i = 0, j = moveRightBuffer.size() ; i+7 < j ; i += 8) {
                 PuyoPuyo *falling = findPuyo(moveRightBuffer[i]);
-                PuyoPuyo *companion = findPuyo(moveRightBuffer[i+1]);
-                if ((falling != NULL) && (companion != NULL))
+                PuyoPuyo *companion = findPuyo(moveRightBuffer[i+4]);
+                if ((falling != NULL) && (companion != NULL)) {
+                    synchronizePuyo(moveRightBuffer+i);
+                    synchronizePuyo(moveRightBuffer+i+4);
                     delegate->fallingsDidMoveRight(falling, companion);
+                }
             }
         }
     }
