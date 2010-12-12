@@ -25,12 +25,12 @@
 
 #include "PuyoNetworkView.h"
 #include "PuyoIgpDefs.h"
+#include "GTLog.h"
 #include <memory>
 
 Message *PuyoNetworkView::createStateMessage(bool sendFullMessage)
 {
     // preparation des infos */
-    int puyoCount = attachedGame->getPuyoCount();
     
     neutralsBuffer.flush(); // TODO: Voir ce que deviennent ces flush
     moveLeftBuffer.flush();
@@ -43,6 +43,7 @@ Message *PuyoNetworkView::createStateMessage(bool sendFullMessage)
     // creation du message
     Message *message = mbox->createMessage();
 
+    // TODO: Send some of those only in full messages
     message->addInt     (PuyoMessage::GAMEID, gameId);
     message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameState);
     message->addString  (PuyoMessage::NAME,   p1name);
@@ -54,6 +55,7 @@ Message *PuyoNetworkView::createStateMessage(bool sendFullMessage)
     message->addInt     (PuyoMessage::CURRENT_NEUTRALS, attachedGame->getNeutralPuyos());
 
     if (sendFullMessage) {
+        int puyoCount = attachedGame->getPuyoCount();
         AdvancedBuffer<int> buffer(puyoCount * 4);
         for (int i = 0 ; i < puyoCount ; i++) {
             PuyoPuyo *currentPuyo = attachedGame->getPuyoAtIndex(i);
@@ -62,7 +64,7 @@ Message *PuyoNetworkView::createStateMessage(bool sendFullMessage)
             buffer.add(currentPuyo->getPuyoX());
             buffer.add(currentPuyo->getPuyoY());
         }
-        message->addIntArray(PuyoMessage::PUYOS,  buffer);
+        message->addIntArray(PuyoMessage::PUYOS, buffer);
     }
 
     // TODO: Add those only if not empty

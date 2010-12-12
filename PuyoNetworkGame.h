@@ -70,7 +70,7 @@ public:
 private:
     void synchronizeState(Message &message);
     void setPuyoAt(int X, int Y, PuyoPuyo *newPuyo);
-    void synchronizePuyo(int *buffer);
+    void synchronizePuyo(Buffer<int> buffer);
     PuyoPuyo *findPuyo(int puyoID);
     PuyoPuyo *puyoCells[PUYODIMX * (PUYODIMY+1)];
     PuyoState nextFalling, nextCompanion;

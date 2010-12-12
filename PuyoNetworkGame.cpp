@@ -100,15 +100,23 @@ void PuyoNetworkGame::onMessage(Message &message)
     }
 }
 
-void PuyoNetworkGame::synchronizePuyo(int *buffer) {
-    PuyoPuyo *puyo = findPuyo(buffer[0]);
-    PuyoState puyoState = (PuyoState)buffer[1];
-    GTCheckInterval(puyoState, 0, 20, "puyoState is invalid");
-    puyo->setPuyoState(puyoState);
+void PuyoNetworkGame::synchronizePuyo(Buffer<int> buffer) {
+    int puyoID    = buffer[0];
+    int puyoState = buffer[1]; GTCheckInterval(puyoState, 0, 20, "puyoState is invalid");
+    int posX      = buffer[2]; GTCheckInterval(posX, 0, PUYODIMX, "Puyo X is invalid");
+    int posY      = buffer[3]; GTCheckInterval(posY, 0, PUYODIMY, "Puyo Y is invalid");
+    PuyoPuyo *puyo = findPuyo(puyoID);
+    if (puyo == NULL) {
+        puyo = attachedFactory->createPuyo((PuyoState)puyoState);
+        puyo->setID(puyoID);
+        puyoVector.add(puyo);
+    }
+    else {
+        puyo->setPuyoState((PuyoState)puyoState);
+    }
     setPuyoAt(puyo->getPuyoX(), puyo->getPuyoY(), NULL);
-    int posX = buffer[2]; GTCheckInterval(posX, 0, PUYODIMX, "Puyo X is invalid");
-    int posY = buffer[3]; GTCheckInterval(posY, 0, PUYODIMY, "Puyo Y is invalid");
-    setPuyoAt(posX, posY, puyo);    
+    setPuyoAt(posX, posY, puyo);
+    puyo->setFlag(); // TODO: return puyo and to this in synchromessage
 }
 
 void PuyoNetworkGame::synchronizeState(Message &message)
@@ -123,19 +131,8 @@ void PuyoNetworkGame::synchronizeState(Message &message)
 
     if (message.hasIntArray(PUYOS)) {
         Buffer<int> puyos = message.getIntArray(PUYOS);
-        int i = 0;
-        while (i+3 < puyos.size()) {
-            int currentPuyoID = puyos[i];
-            int puyoState = puyos[i+1];
-            PuyoPuyo *currentPuyo = findPuyo(currentPuyoID);
-            if (currentPuyo == NULL) {
-                currentPuyo = attachedFactory->createPuyo((PuyoState)puyoState);
-                currentPuyo->setID(currentPuyoID);
-                puyoVector.add(currentPuyo);
-            }
+        for (int i = 0; i+3 < puyos.size(); i += 4)
             synchronizePuyo(puyos+i);
-            i += 4;
-        }
 
         // Remove the puyos that were not flagged.
         for (int i = puyoVector.size() - 1 ; i >= 0 ; i--) {
