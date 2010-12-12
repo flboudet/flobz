@@ -1,10 +1,13 @@
 <init>
   # Init function: called when script is loaded
-  Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
-  Sprite @get_ready  = [new_sprite: image="get_ready.png"  x=150.0   y=-100.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  float @getready_left = 0.0
+  Display @display  = [new_display: x=0.0 y=0.0 width=320.0 height=480.0]
+  Sprite @get_ready  = [new_sprite: image="get_ready.png"  x=@getready_left   y=-100.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   int @start_pressed = 0
+  int @getready_displayed = 0
   float @appearCycle = 30.0
-  float @disappearCycle = 60.0
+  float @displayedCycle = 60.0
+  float @disappearCycle = 6000.0
 
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
@@ -15,9 +18,11 @@
   # Update function: called every animation cycle
   (@start_pressed = 1)? (@fcycle < @disappearCycle)? @disappearCycle = @fcycle
   (@disappearCycle < @appearCycle+1.0)? @disappearCycle=@appearCycle+1.0
-  move::@get_ready fcycle=@appearCycle-10.00 x=150.0 y=-150.0
-  move::@get_ready fcycle=@appearCycle x=150.0 y=150.0
-  # move::@get_ready fcycle=@disappearCycle x=150.0 y=150.0
+  move::@get_ready fcycle=@appearCycle-10.00 x=@getready_left y=-150.0
+  move::@get_ready fcycle=@appearCycle x=@getready_left y=150.0
+  # move::@get_ready fcycle=@disappearCycle x=@getready_left y=150.0
+  (@fcycle > @displayedCycle)?
+    @getready_displayed = 1
   (@fcycle > @disappearCycle)?
-    move::@get_ready fcycle=@disappearCycle+10.00 x=150.0 y=600.0
+    move::@get_ready fcycle=@disappearCycle+10.00 x=@getready_left y=600.0
   (@fcycle > @disappearCycle+10.0)? @finished = 1

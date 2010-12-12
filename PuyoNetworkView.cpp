@@ -31,7 +31,7 @@
 Message *PuyoNetworkView::createStateMessage(bool sendFullMessage)
 {
     // preparation des infos */
-    
+
     neutralsBuffer.flush(); // TODO: Voir ce que deviennent ces flush
     moveLeftBuffer.flush();
     moveRightBuffer.flush();
@@ -160,7 +160,13 @@ void PuyoNetworkView::fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *co
 {
     PuyoView::fallingsDidFallingStep(fallingPuyo, companionPuyo);
     fallingStepBuffer.add(fallingPuyo->getID());
+    fallingStepBuffer.add(fallingPuyo->getPuyoState());
+    fallingStepBuffer.add(fallingPuyo->getPuyoX());
+    fallingStepBuffer.add(fallingPuyo->getPuyoY());
     fallingStepBuffer.add(companionPuyo->getID());
+    fallingStepBuffer.add(companionPuyo->getPuyoState());
+    fallingStepBuffer.add(companionPuyo->getPuyoX());
+    fallingStepBuffer.add(companionPuyo->getPuyoY());
 }
 
 void PuyoNetworkView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex)
@@ -181,8 +187,14 @@ void PuyoNetworkView::gameDidEndCycle()
 void PuyoNetworkView::companionDidTurn(PuyoPuyo *companionPuyo, PuyoPuyo *fallingPuyo, bool counterclockwise)
 {
     PuyoView::companionDidTurn(companionPuyo, fallingPuyo, counterclockwise);
-    compTurnBuffer.add(companionPuyo->getID());
     compTurnBuffer.add(fallingPuyo->getID());
+    compTurnBuffer.add(fallingPuyo->getPuyoState());
+    compTurnBuffer.add(fallingPuyo->getPuyoX());
+    compTurnBuffer.add(fallingPuyo->getPuyoY());
+    compTurnBuffer.add(companionPuyo->getID());
+    compTurnBuffer.add(companionPuyo->getPuyoState());
+    compTurnBuffer.add(companionPuyo->getPuyoX());
+    compTurnBuffer.add(companionPuyo->getPuyoY());
     compTurnBuffer.add(counterclockwise);
 }
 
@@ -190,6 +202,9 @@ void PuyoNetworkView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int 
 {
     PuyoView::puyoDidFall(puyo, originX, originY, nFalledBelow);
     didFallBuffer.add(puyo->getID());
+    didFallBuffer.add(puyo->getPuyoState());
+    didFallBuffer.add(puyo->getPuyoX());
+    didFallBuffer.add(puyo->getPuyoY());
     didFallBuffer.add(originX);
     didFallBuffer.add(originY);
     didFallBuffer.add(nFalledBelow);

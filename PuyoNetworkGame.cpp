@@ -164,11 +164,11 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     if (moveLeftBuffer.size() > 0) {
         if (delegate != NULL) {
             for (int i = 0, j = moveLeftBuffer.size() ; i+7 < j ; i += 8) {
+                synchronizePuyo(moveLeftBuffer+i);
+                synchronizePuyo(moveLeftBuffer+i+4);
                 PuyoPuyo *falling = findPuyo(moveLeftBuffer[i]);
                 PuyoPuyo *companion = findPuyo(moveLeftBuffer[i+4]);
                 if ((falling != NULL) && (companion != NULL)) {
-                    synchronizePuyo(moveLeftBuffer+i);
-                    synchronizePuyo(moveLeftBuffer+i+4);
                     delegate->fallingsDidMoveLeft(falling, companion);
                 }
             }
@@ -179,11 +179,11 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     if (moveRightBuffer.size() > 0) {
         if (delegate != NULL) {
             for (int i = 0, j = moveRightBuffer.size() ; i+7 < j ; i += 8) {
+                synchronizePuyo(moveRightBuffer+i);
+                synchronizePuyo(moveRightBuffer+i+4);
                 PuyoPuyo *falling = findPuyo(moveRightBuffer[i]);
                 PuyoPuyo *companion = findPuyo(moveRightBuffer[i+4]);
                 if ((falling != NULL) && (companion != NULL)) {
-                    synchronizePuyo(moveRightBuffer+i);
-                    synchronizePuyo(moveRightBuffer+i+4);
                     delegate->fallingsDidMoveRight(falling, companion);
                 }
             }
@@ -193,9 +193,11 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     Buffer<int> fallingStepBuffer= message.getIntArray(MV_D);
     if (fallingStepBuffer.size() > 0) {
         if (delegate != NULL) {
-            for (int i = 0, j = fallingStepBuffer.size() ; i+1 < j ; i += 2) {
+            for (int i = 0, j = fallingStepBuffer.size() ; i+7 < j ; i += 8) {
+                synchronizePuyo(fallingStepBuffer+i);
+                synchronizePuyo(fallingStepBuffer+i+4);
                 PuyoPuyo *fallingPuyo = findPuyo(fallingStepBuffer[i]);
-                PuyoPuyo *companionPuyo = findPuyo(fallingStepBuffer[i+1]);
+                PuyoPuyo *companionPuyo = findPuyo(fallingStepBuffer[i+4]);
                 if ((fallingPuyo != NULL) && (companionPuyo != NULL))
                     delegate->fallingsDidFallingStep(fallingPuyo, companionPuyo);
             }
@@ -205,11 +207,13 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     Buffer<int> turnBuffer= message.getIntArray(COMPANION_TURN);
     if (turnBuffer.size() > 0) {
         if (delegate != NULL) {
-            for (int i = 0, j = turnBuffer.size() ; i+2 < j ; i += 3) {
-                PuyoPuyo *companionPuyo = findPuyo(turnBuffer[i]);
-                PuyoPuyo *fallingPuyo = findPuyo(turnBuffer[i+1]);
+            for (int i = 0, j = turnBuffer.size() ; i+8 < j ; i += 9) {
+                synchronizePuyo(turnBuffer+i);
+                synchronizePuyo(turnBuffer+i+4);
+                PuyoPuyo *fallingPuyo = findPuyo(turnBuffer[i]);
+                PuyoPuyo *companionPuyo = findPuyo(turnBuffer[i+4]);
                 if ((fallingPuyo != NULL) && (companionPuyo != NULL))
-                    delegate->companionDidTurn(companionPuyo, fallingPuyo, turnBuffer[i+2]);
+                    delegate->companionDidTurn(companionPuyo, fallingPuyo, turnBuffer[i+8]);
             }
         }
     }
@@ -217,10 +221,11 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     Buffer<int> didFall= message.getIntArray(DID_FALL);
     if (didFall.size() > 0) {
        if (delegate != NULL) {
-            for (int i = 0, j = didFall.size() ; i+3 < j ; i += 4) {
+            for (int i = 0, j = didFall.size() ; i+6 < j ; i += 7) {
+                synchronizePuyo(didFall+i);
                 PuyoPuyo *didFallPuyo = findPuyo(didFall[i]);
                 if (didFallPuyo != NULL)
-                    delegate->puyoDidFall(didFallPuyo, didFall[i+1], didFall[i+2], didFall[i+3]);
+                    delegate->puyoDidFall(didFallPuyo, didFall[i+4], didFall[i+5], didFall[i+6]);
             }
         }
     }
