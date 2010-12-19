@@ -87,7 +87,7 @@ class NetSynchronizeState : public GameState, MessageListener, CycledComponent
 {
 public:
     NetSynchronizeState(ios_fc::MessageBox *mbox,
-                        int synID);
+                        int synID, double timeoutSec = 10.);
     // GameState implementation
     virtual void enterState();
     virtual void exitState();
@@ -110,7 +110,9 @@ private:
 private:
     ios_fc::MessageBox *m_mbox;
     int m_synID;
-    bool m_synchronized;
+    int m_cyclesTimeout;
+    int m_cyclesCounter;
+    bool m_synchronized, m_failed;
     bool m_ackSent;
     GameState *m_nextState, *m_failedState;
 };

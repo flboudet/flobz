@@ -228,8 +228,8 @@ void PuyoNetworkGameWidget::sendAliveMsg()
 // NetSynchronizeState
 //---------------------------------
 NetSynchronizeState::NetSynchronizeState(ios_fc::MessageBox *mbox,
-                                         int synID)
-    : CycledComponent(0.1), m_mbox(mbox), m_synID(synID)
+                                         int synID, double timeoutSec)
+    : CycledComponent(0.1), m_mbox(mbox), m_synID(synID), m_cyclesTimeout(timeoutSec/0.1)
 {
 }
 
@@ -238,7 +238,9 @@ void NetSynchronizeState::enterState()
     cout << "NetSynchronizeState("<<m_synID<<")::enterState()" << endl;
     GameUIDefaults::GAME_LOOP->addIdle(this);
     m_synchronized = false;
+    m_failed = false;
     m_ackSent = false;
+    m_cyclesCounter = 0;
     m_mbox->addListener(this);
     // Send synchro message
     sendSyncMessage();
@@ -252,11 +254,13 @@ void NetSynchronizeState::exitState()
 
 bool NetSynchronizeState::evaluate()
 {
-    return (m_synchronized && m_ackSent);
+    return ((m_synchronized && m_ackSent) || (m_failed));
 }
 
 GameState *NetSynchronizeState::getNextState()
 {
+    if (m_failed)
+        return m_failedState;
     return m_nextState;
 }
 
@@ -288,6 +292,10 @@ void NetSynchronizeState::onMessage(Message &message)
 
 void NetSynchronizeState::cycle()
 {
+    if (m_cyclesCounter++ == m_cyclesTimeout) {
+        m_failed = true;
+        evaluateStateMachine();
+    }
     sendSyncMessage();
 }
 
@@ -329,7 +337,7 @@ NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory &gameWidgetFa
     m_displayStats.reset(new DisplayStatsState(m_sharedAssets));
     m_synchroAfterStats.reset(new NetSynchronizeState(mbox, 10));
     m_leaveGame.reset(new LeaveGameState(m_sharedAssets, endOfSessionAction));
-    
+
     // Linking the states together
     m_setupMatch->setNextState(m_enterPlayersReady.get());
     m_enterPlayersReady->setNextState(m_synchroGetReady.get());
@@ -342,7 +350,7 @@ NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory &gameWidgetFa
     m_matchIsOver->setNextState(m_displayStats.get());
     m_displayStats->setNextState(m_synchroAfterStats.get());
     m_synchroAfterStats->setNextState(m_setupMatch.get());
-    
+
     // Initializing the state machine
     setInitialState(m_setupMatch.get());
 }
