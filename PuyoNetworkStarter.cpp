@@ -342,14 +342,17 @@ NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory &gameWidgetFa
     m_setupMatch->setNextState(m_enterPlayersReady.get());
     m_enterPlayersReady->setNextState(m_synchroGetReady.get());
     m_synchroGetReady->setNextState(m_exitPlayersReady.get());
+    m_synchroGetReady->setFailedState(m_leaveGame.get());
     m_exitPlayersReady->setNextState(m_synchroBeforeStart.get());
     //m_waitPlayersReady->setNextState(m_synchroBeforeStart.get());
     m_synchroBeforeStart->setNextState(m_matchPlaying.get());
+    m_synchroBeforeStart->setFailedState(m_leaveGame.get());
     m_matchPlaying->setNextState(m_matchIsOver.get());
     m_matchPlaying->setAbortedState(m_leaveGame.get());
     m_matchIsOver->setNextState(m_displayStats.get());
     m_displayStats->setNextState(m_synchroAfterStats.get());
     m_synchroAfterStats->setNextState(m_setupMatch.get());
+    m_synchroAfterStats->setFailedState(m_leaveGame.get());
 
     // Initializing the state machine
     setInitialState(m_setupMatch.get());
