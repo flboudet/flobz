@@ -1,7 +1,7 @@
 <init>
   # Init function: called when script is loaded
-  float @getready_left = 0.0
-  Display @display  = [new_display: x=0.0 y=0.0 width=320.0 height=480.0]
+  float @getready_left = 150.0
+  Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
   Sprite @get_ready  = [new_sprite: image="get_ready.png"  x=@getready_left   y=-100.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   int @start_pressed = 0
   int @getready_displayed = 0

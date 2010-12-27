@@ -1,0 +1,15 @@
+<init>
+  float @net_failure_left = 640.0
+  Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+  Sprite @net_failure  = [new_sprite: image="netfailure/networkfailure.png"  x=@net_failure_left   y=150.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @bkgnd  = [new_sprite: image="netfailure/networkfailure_bkgnd.jpg"  x=0.0   y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+
+<sprite_list>
+  # Call the 'sprite' function for each sprite you want to update/draw
+  # This also allows you to specify the drawing order
+  sprite::@bkgnd  display = @display
+  sprite::@net_failure  display = @display
+
+<update>
+  # Update function: called every animation cycle
+  @net_failure.pos.x = 280.0 + [sin: value=1.5+(@fcycle/10.0)]*80.0
