@@ -416,6 +416,46 @@ void DisplayStatsState::action(Widget *sender, int actionType,
 }
 
 //---------------------------------
+// DisplayStoryScreenState
+//---------------------------------
+DisplayStoryScreenState::DisplayStoryScreenState(const char *screenName)
+    : m_screenName(screenName)
+{
+}
+
+void DisplayStoryScreenState::enterState()
+{
+    m_storyScreen.reset(new StoryScreen(m_screenName.c_str(),
+                                        *(GameUIDefaults::SCREEN_STACK->top()),
+                                        this));
+    GameUIDefaults::SCREEN_STACK->push(m_storyScreen.get());
+    m_acknowledged = false;
+}
+
+void DisplayStoryScreenState::exitState()
+{
+    GameUIDefaults::SCREEN_STACK->pop();
+    m_storyScreen.reset(NULL);
+}
+
+bool DisplayStoryScreenState::evaluate()
+{
+    return m_acknowledged;
+}
+
+GameState *DisplayStoryScreenState::getNextState()
+{
+    return m_nextState;
+}
+
+void DisplayStoryScreenState::action(Widget *sender, int actionType,
+                                     event_manager::GameControlEvent *event)
+{
+    m_acknowledged = true;
+    evaluateStateMachine();
+}
+
+//---------------------------------
 // LeaveGameState
 //---------------------------------
 LeaveGameState::LeaveGameState(SharedMatchAssets &sharedMatchAssets,

@@ -46,6 +46,10 @@ private:
 
 class PuyoNetworkGameWidget : public GameWidget, MessageListener, ChatBoxDelegate {
 public:
+    enum {
+        NETWORK_FAILURE = GAME_IS_OVER+1
+    };
+public:
     PuyoNetworkGameWidget();
     void initWithGUI(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, ios_fc::IgpMessageBox *igpbox = NULL);
     void initWithoutGUI(ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, ios_fc::IgpMessageBox *igpbox = NULL);
@@ -81,8 +85,12 @@ private:
     // Network broken animation
     std::auto_ptr<StoryWidget> brokenNetworkWidget; // optional
     bool networkIsBroken;
+    double m_networkTimeoutWarning, m_networkTimeoutError;
 };
 
+/**
+ * Wait for peers of a network game to synchronize
+ */
 class NetSynchronizeState : public GameState, MessageListener, CycledComponent
 {
 public:
@@ -117,6 +125,29 @@ private:
     GameState *m_nextState, *m_failedState;
 };
 
+/**
+ * Make the match play until it is finished or aborted
+ * Slightly overloaded network version to handle network errors
+ */
+class NetMatchPlayingState : public MatchPlayingState
+{
+public:
+    NetMatchPlayingState(SharedMatchAssets &sharedMatchAssets);
+    // GameState implementation
+    virtual void enterState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // Action implementation
+    virtual void action(Widget *sender, int actionType,
+                        event_manager::GameControlEvent *event);
+    void setNetworkFailedState(GameState *netfailState) {
+        m_netfailState = netfailState;
+    }
+private:
+    bool m_networkFailure;
+    GameState *m_netfailState;
+};
+
 class NetworkGameStateMachine : public GameStateMachine
 {
 public:
@@ -126,19 +157,20 @@ public:
                             PuyoTwoNameProvider *nameProvider = NULL,
                             Action *endOfSessionAction = NULL);
 private:
-    SharedMatchAssets m_sharedAssets;
-    SharedGetReadyAssets m_sharedGetReadyAssets;
-    auto_ptr<SetupMatchState>       m_setupMatch;
-    auto_ptr<EnterPlayerReadyState> m_enterPlayersReady;
-    auto_ptr<NetSynchronizeState>   m_synchroGetReady;
-    auto_ptr<ExitPlayerReadyState>  m_exitPlayersReady;
+    SharedMatchAssets           m_sharedAssets;
+    SharedGetReadyAssets        m_sharedGetReadyAssets;
+    auto_ptr<SetupMatchState>         m_setupMatch;
+    auto_ptr<EnterPlayerReadyState>   m_enterPlayersReady;
+    auto_ptr<NetSynchronizeState>     m_synchroGetReady;
+    auto_ptr<ExitPlayerReadyState>    m_exitPlayersReady;
     //auto_ptr<WaitPlayersReadyState> m_waitPlayersReady;
-    auto_ptr<NetSynchronizeState>   m_synchroBeforeStart;
-    auto_ptr<MatchPlayingState>     m_matchPlaying;
-    auto_ptr<MatchIsOverState>      m_matchIsOver;
-    auto_ptr<DisplayStatsState>     m_displayStats;
-    auto_ptr<NetSynchronizeState>   m_synchroAfterStats;
-    auto_ptr<LeaveGameState>        m_leaveGame;
+    auto_ptr<NetSynchronizeState>     m_synchroBeforeStart;
+    auto_ptr<NetMatchPlayingState>       m_matchPlaying;
+    auto_ptr<MatchIsOverState>        m_matchIsOver;
+    auto_ptr<DisplayStatsState>       m_displayStats;
+    auto_ptr<NetSynchronizeState>     m_synchroAfterStats;
+    auto_ptr<DisplayStoryScreenState> m_networkErrorScreen;
+    auto_ptr<LeaveGameState>          m_leaveGame;
 };
 
 #endif // _PUYONETWORKSTARTER

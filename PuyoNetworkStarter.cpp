@@ -30,17 +30,15 @@
 #include "ios_time.h"
 #include "PuyoMessageDef.h"
 
-// TODO: investigate WTF is this
-extern const char *p1name;
-extern const char *p2name;
-
 PuyoGame *PuyoNetworkGameFactory::createPuyoGame(PuyoFactory *attachedPuyoFactory) {
     return new PuyoNetworkGame(attachedPuyoFactory, msgBox, gameId);
 }
 
 PuyoNetworkGameWidget::PuyoNetworkGameWidget()
     : chatBox(NULL),
-      brokenNetworkWidget(NULL), networkIsBroken(false)
+      brokenNetworkWidget(NULL), networkIsBroken(false),
+      m_networkTimeoutWarning(5000.),
+      m_networkTimeoutError(15000.)
 {
 }
 
@@ -101,19 +99,26 @@ void PuyoNetworkGameWidget::cycle()
             lastAliveMessageSentDate = curDate;
         }
     }
-    if (curDate - lastMessageDate > 5000.) {
+    // Management of network timeouts
+    // (what to do when the network stops responding?)
+    if (curDate - lastMessageDate > m_networkTimeoutWarning) {
         if (!networkIsBroken) {
             if (withGUI)
                 associatedScreen->add(brokenNetworkWidget.get());
             networkIsBroken = true;
         }
-        //printf("Network problem!\n");
+        else if (curDate - lastMessageDate > m_networkTimeoutError) {
+            // Call network failure action
+            if (gameOverAction)
+                gameOverAction->action(this, NETWORK_FAILURE, NULL);
+        }
     }
     else if (networkIsBroken == true) {
         if (withGUI)
             associatedScreen->remove(brokenNetworkWidget.get());
         networkIsBroken = false;
     }
+    // Let the game behave
     GameWidget::cycle();
 }
 
@@ -317,6 +322,48 @@ void NetSynchronizeState::sendAckMessage()
 }
 
 //---------------------------------
+// NetMatchPlayingState
+//---------------------------------
+NetMatchPlayingState::NetMatchPlayingState(SharedMatchAssets &sharedMatchAssets)
+    : MatchPlayingState(sharedMatchAssets)
+{
+}
+
+void NetMatchPlayingState::enterState()
+{
+    m_networkFailure = false;
+    MatchPlayingState::enterState();
+}
+
+bool NetMatchPlayingState::evaluate()
+{
+    if (m_networkFailure)
+        return true;
+    return MatchPlayingState::evaluate();
+}
+
+GameState *NetMatchPlayingState::getNextState()
+{
+    if (m_networkFailure)
+        return m_netfailState;
+    return MatchPlayingState::getNextState();
+}
+
+void NetMatchPlayingState::action(Widget *sender, int actionType,
+                                  event_manager::GameControlEvent *event)
+{
+    switch (actionType) {
+        case PuyoNetworkGameWidget::NETWORK_FAILURE:
+            m_networkFailure = true;
+            evaluateStateMachine();
+            break;
+        default:
+            MatchPlayingState::action(sender, actionType, event);
+            break;
+    }
+}
+
+//---------------------------------
 // Two players network game state machine
 //---------------------------------
 NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory &gameWidgetFactory,
@@ -332,27 +379,29 @@ NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory &gameWidgetFa
     m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     //m_waitPlayersReady.reset(new WaitPlayersReadyState(m_sharedAssets));
     m_synchroBeforeStart.reset(new NetSynchronizeState(mbox, 2));
-    m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));
+    m_matchPlaying.reset(new NetMatchPlayingState(m_sharedAssets));
     m_matchIsOver.reset(new MatchIsOverState(m_sharedAssets));
     m_displayStats.reset(new DisplayStatsState(m_sharedAssets));
     m_synchroAfterStats.reset(new NetSynchronizeState(mbox, 10));
+    m_networkErrorScreen.reset(new DisplayStoryScreenState("netfailure.gsl"));
     m_leaveGame.reset(new LeaveGameState(m_sharedAssets, endOfSessionAction));
 
     // Linking the states together
     m_setupMatch->setNextState(m_enterPlayersReady.get());
     m_enterPlayersReady->setNextState(m_synchroGetReady.get());
     m_synchroGetReady->setNextState(m_exitPlayersReady.get());
-    m_synchroGetReady->setFailedState(m_leaveGame.get());
+    m_synchroGetReady->setFailedState(m_networkErrorScreen.get());
     m_exitPlayersReady->setNextState(m_synchroBeforeStart.get());
-    //m_waitPlayersReady->setNextState(m_synchroBeforeStart.get());
     m_synchroBeforeStart->setNextState(m_matchPlaying.get());
-    m_synchroBeforeStart->setFailedState(m_leaveGame.get());
+    m_synchroBeforeStart->setFailedState(m_networkErrorScreen.get());
     m_matchPlaying->setNextState(m_matchIsOver.get());
     m_matchPlaying->setAbortedState(m_leaveGame.get());
+    m_matchPlaying->setNetworkFailedState(m_networkErrorScreen.get());
     m_matchIsOver->setNextState(m_displayStats.get());
     m_displayStats->setNextState(m_synchroAfterStats.get());
     m_synchroAfterStats->setNextState(m_setupMatch.get());
-    m_synchroAfterStats->setFailedState(m_leaveGame.get());
+    m_synchroAfterStats->setFailedState(m_networkErrorScreen.get());
+    m_networkErrorScreen->setNextState(m_leaveGame.get());
 
     // Initializing the state machine
     setInitialState(m_setupMatch.get());

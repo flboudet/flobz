@@ -184,6 +184,9 @@ private:
     GameState *m_nextState;
 };
 
+/**
+ * Make the match play until it is finished or aborted
+ */
 class MatchPlayingState : public GameState, public Action
 {
 public:
@@ -255,6 +258,36 @@ private:
     GameState *m_nextState;
 };
 
+/**
+ * Display a story screen, and wait for the user to acknowledge
+ * or the story to end
+ */
+class DisplayStoryScreenState : public GameState, public Action
+{
+public:
+    DisplayStoryScreenState(const char *screenName);
+    // GameState implementation
+    virtual void enterState();
+    virtual void exitState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // Action implementation
+    virtual void action(Widget *sender, int actionType,
+                        event_manager::GameControlEvent *event);
+    // Own methods
+    void setNextState(GameState *nextState) {
+        m_nextState = nextState;
+    }
+private:
+    std::string m_screenName;
+    bool m_acknowledged;
+    std::auto_ptr<StoryScreen> m_storyScreen;
+    GameState *m_nextState;
+};
+
+/**
+ * Leave the game and rewind to the previous screen
+ */
 class LeaveGameState : public GameState
 {
 public:
