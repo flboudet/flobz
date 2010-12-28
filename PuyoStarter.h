@@ -32,8 +32,8 @@
 #include "PuyoEventPlayer.h"
 #include "PuyoIA.h"
 #include "CheatCodeManager.h"
-#include "PauseMenu.h"
 #include "GameWidget.h"
+#include "GameScreen.h"
 #include "PuyoCommander.h"
 #include "ios_messagebox.h"
 #include "Theme.h"
@@ -50,56 +50,7 @@ private:
     PuyoRandomSystem *attachedRandom;
 };
 
-class GameScreen;
 struct GameOptions;
-
-class GameScreen : public Screen, public Action {
-public:
-    GameScreen(GameWidget &gameWidget, Screen &previousScreen);
-    ~GameScreen();
-    void onEvent(event_manager::GameControlEvent *cevent);
-    virtual bool backPressed();
-    virtual bool startPressed();
-    virtual void abort();
-    void setOverlayStory(StoryWidget *story);
-    /**
-     * Suspends the game (no pause menu)
-     */
-    void setSuspended(bool suspended);
-    /**
-     * Sets the game to paused
-     * @param fromControls true if the action leading to the pause comes
-     *                     in response to a local input control. In this case,
-     *                     the action will get forwarded to the opponent in
-     *                     a network game. Otherwise it won't.
-     */
-    virtual void setPaused(bool fromControls);
-    /**
-     * Sets the game to resumed
-     * @param fromControls true if the action leading to the pause comes
-     *                     in response to a local input control. In this case,
-     *                     the action will get forwarded to the opponent in
-     *                     a network game. Otherwise it won't.
-     */
-    virtual void setResumed(bool fromControls);
-    /** Returns the ingame pause menu widget
-     */
-    PauseMenu & getPauseMenu() { return pauseMenu; }
-    /** Notification on screen visibility change
-     * @param visible  true if the scren is visible, otherwise false
-     */
-    virtual void onScreenVisibleChanged(bool visible);
-    /**
-     * Implements the Action interface
-     */
-    virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
-private:
-    bool paused;
-    PauseMenu pauseMenu;
-    GameWidget &gameWidget;
-    std::auto_ptr<ScreenTransitionWidget> transitionWidget;
-    StoryWidget *overlayStory;
-};
 
 class TwoPlayerGameWidget : public GameWidget {
 public:

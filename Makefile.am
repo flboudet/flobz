@@ -7,7 +7,8 @@ flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           PuyoView.cpp PuyoAnimations.cpp AnimatedPuyo.cpp PuyoIA.cpp \
           styrolyse.cpp PuyoStory.cpp ChatBox.cpp LocalizedDictionary.cpp \
           PuyoEventPlayer.cpp PauseMenu.cpp CheatCodeManager.cpp \
-          GameWidget.cpp StatsWidget.cpp \
+          GameWidget.cpp GameScreen.cpp StatsWidget.cpp \
+          LocalGameStates.cpp \
           PuyoStarter.cpp PuyoSinglePlayerStarter.cpp PuyoTwoPlayerStarter.cpp \
           LocalMenu.cpp OptionMenu.cpp ControlMenu.cpp \
           LevelThemeMenu.cpp ThemeMenu.cpp ScreenTransition.cpp \
@@ -30,7 +31,7 @@ endif
 EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            AnimatedPuyo.h PuyoGameAbstract.h OptionMenu.h \
            PuyoGame.h PauseMenu.h \
-           audio.h GameWidget.h PuyoPlayer.h \
+           audio.h GameWidget.h GameScreen.h PuyoPlayer.h \
            PuyoIA.h PuyoScoring.h PuyoMain.h \
            PuyoIgpDefs.h ScreenTransition.h \
            HallOfFame.h InternetGameCenter.h PuyoSinglePlayerStarter.h \
@@ -39,7 +40,8 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            MainMenu.h LocalizedDictionary.h  PuyoStory.h \
            MainScreen.h LocalMenu.h PuyoStrings.h \
            PuyoAnimations.h PuyoMessageDef.h ThemeMenu.h \
-           ChatBox.h NatTraversal.h PuyoTwoPlayerStarter.h \
+           ChatBox.h NatTraversal.h LocalGameStates.h \
+           PuyoTwoPlayerStarter.h \
            CheatCodeManager.h NetCenterMenu.h PuyoView.h \
            PuyoCommander.h NetGameCenter.h SDLMain.h \
            ControlMenu.h PuyoNetworkGame.h styrolyse.h \
