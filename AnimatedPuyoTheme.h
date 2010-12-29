@@ -99,6 +99,8 @@ public:
 
     PuyobanThemeDefinition puyoban[NUMBER_OF_PUYOBANS_IN_LEVEL];
     FontDefinition playerNameFont, scoreFont;
+    
+    bool opponentIsBehind;
 };
 
 class BasePuyoThemeImpl : public PuyoTheme {

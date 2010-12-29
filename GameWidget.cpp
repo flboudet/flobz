@@ -126,7 +126,7 @@ void GameWidget::priv_initialize()
     setFocusable(true);
 
     // Load and preload a few FX for the game
-    for (int i=0; i<15; ++i)
+    for (int i=0; i<3; ++i)
         puyoFX.push_back(new PuyoFX("fx/vanish.gsl", *(areaA->getPuyoThemeSet())));
     for (int i=0; i<3; ++i)
         puyoFX.push_back(new PuyoFX("fx/combo.gsl", *(areaA->getPuyoThemeSet())));

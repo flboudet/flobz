@@ -228,6 +228,7 @@ void ThemeManagerImpl::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     newThemeDescription.lifeDisplayX = GSL_GLOBAL_INT(gsl, "level.life_display.x");
     newThemeDescription.lifeDisplayY = GSL_GLOBAL_INT(gsl, "level.life_display.y");
 
+    newThemeDescription.opponentIsBehind = (GSL_GLOBAL_INT(gsl, "level.opponent_is_behind") == 0 ? false : true);
     loadFontDefinition(gsl, "playerNameFont", newThemeDescription.playerNameFont);
     loadFontDefinition(gsl, "scoreFont", newThemeDescription.scoreFont);
 
@@ -785,7 +786,7 @@ bool LevelThemeImpl::getShouldDisplayEyes(int playerId) const
 { return m_desc.puyoban[playerId].shouldDisplayEyes; }
 
 bool LevelThemeImpl::getOpponentIsBehind() const
-{ return false; }
+{ return m_desc.opponentIsBehind; }
 
 const std::string LevelThemeImpl::getGameLostLeftAnimation2P() const
 {
