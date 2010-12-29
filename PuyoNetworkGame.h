@@ -26,6 +26,7 @@
 #ifndef PUYONETWORKGAME_H
 #define PUYONETWORKGAME_H
 
+#include <map>
 #include "PuyoGame.h"
 #include "ios_messagebox.h"
 
@@ -35,28 +36,28 @@ class PuyoNetworkGame : public PuyoGame, MessageListener {
 public:
     PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox, int gameId = 0);
     ~PuyoNetworkGame();
-    
+
     virtual void onMessage(Message &);
-    
+
     virtual void cycle();
-    
+
     virtual PuyoPuyo *getPuyoAt(int X, int Y) const;
-    
+
     // List access to the PuyoPuyo objects
     virtual int getPuyoCount() const;
     virtual PuyoPuyo *getPuyoAtIndex(int index) const;
-    
+
     virtual PuyoState getNextFalling();
     virtual PuyoState getNextCompanion();
-    
+
     virtual PuyoState getCompanionState() const;
     virtual PuyoState getFallingState() const;
     virtual int getFallingX() const;
     virtual int getFallingY() const;
-    
+
     virtual int getFallingCompanionDir() const;
     virtual PuyoPuyo *getFallingPuyo() const;
-    
+
     virtual void increaseNeutralPuyos(int incr);
     virtual int getNeutralPuyos() const;
     virtual void dropNeutrals();
@@ -78,6 +79,7 @@ private:
     MessageBox &msgBox;
     int gameId;
     AdvancedBuffer<PuyoPuyo *> puyoVector;
+    std::map<int, PuyoPuyo *> m_puyoMap;
     int semiMove;
     int neutralPuyos, sentBadPuyos;
     bool gameRunning;

@@ -40,14 +40,12 @@ Message *PuyoNetworkView::createStateMessage(bool sendFullMessage)
     didFallBuffer.flush();
     willVanishBuffer.flush();
 
-    // creation du message
+    // Create the message
     Message *message = mbox->createMessage();
 
     // TODO: Send some of those only in full messages
     message->addInt     (PuyoMessage::GAMEID, gameId);
     message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameState);
-    message->addString  (PuyoMessage::NAME,   p1name);
-    // message->addBool    (PuyoMessage::PAUSED, false); // paused);
     message->addInt     (PuyoMessage::SCORE,  attachedGame->getGameStat().points);
     message->addInt     (PuyoMessage::NEXT_F, attachedGame->getNextFalling());
     message->addInt     (PuyoMessage::NEXT_C, attachedGame->getNextCompanion());
@@ -68,17 +66,24 @@ Message *PuyoNetworkView::createStateMessage(bool sendFullMessage)
     }
 
     // TODO: Add those only if not empty
-    message->addIntArray(PuyoMessage::ADD_NEUTRALS,  neutralsBuffer);
-    message->addIntArray(PuyoMessage::MV_L,moveLeftBuffer);
-    message->addIntArray(PuyoMessage::MV_R,moveRightBuffer);
-    message->addIntArray(PuyoMessage::MV_D,fallingStepBuffer);
-    message->addIntArray(PuyoMessage::COMPANION_TURN,compTurnBuffer);
-    message->addIntArray(PuyoMessage::DID_FALL,      didFallBuffer);
-    message->addIntArray(PuyoMessage::WILL_VANISH,   willVanishBuffer);
+    if (neutralsBuffer.size() > 0)
+        message->addIntArray(PuyoMessage::ADD_NEUTRALS,  neutralsBuffer);
+    if (moveLeftBuffer.size() > 0)
+        message->addIntArray(PuyoMessage::MV_L,moveLeftBuffer);
+    if (moveRightBuffer.size() > 0)
+        message->addIntArray(PuyoMessage::MV_R,moveRightBuffer);
+    if (fallingStepBuffer.size() > 0)
+        message->addIntArray(PuyoMessage::MV_D,fallingStepBuffer);
+    if (compTurnBuffer.size() > 0)
+        message->addIntArray(PuyoMessage::COMPANION_TURN,compTurnBuffer);
+    if (didFallBuffer.size() > 0)
+        message->addIntArray(PuyoMessage::DID_FALL, didFallBuffer);
+    if (willVanishBuffer.size() > 0)
+        message->addIntArray(PuyoMessage::WILL_VANISH,   willVanishBuffer);
 
     message->addInt     (PuyoMessage::NUMBER_BAD_PUYOS, badPuyos);
 
-    // clear des infos ayant ete envoyee
+    // Clear the buffers after they have been sent
     neutralsBuffer.clear();
     moveLeftBuffer.clear();
     moveRightBuffer.clear();

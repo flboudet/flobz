@@ -110,6 +110,7 @@ void PuyoNetworkGame::synchronizePuyo(Buffer<int> buffer) {
         puyo = attachedFactory->createPuyo((PuyoState)puyoState);
         puyo->setID(puyoID);
         puyoVector.add(puyo);
+        m_puyoMap[puyoID] = puyo;
     }
     else {
         puyo->setPuyoState((PuyoState)puyoState);
@@ -143,115 +144,123 @@ void PuyoNetworkGame::synchronizeState(Message &message)
             else {
                 setPuyoAt(currentPuyo->getPuyoX(), currentPuyo->getPuyoY(), NULL);
                 puyoVector.removeAt(i);
+                m_puyoMap.erase(currentPuyo->getID());
                 attachedFactory->deletePuyo(currentPuyo);
             }
         }
     }
 
     // Notifications
-    Buffer<int> addNeutrals= message.getIntArray(ADD_NEUTRALS);
-    if (addNeutrals.size() > 0) {
-       if (delegate != NULL) {
-            for (int i = 0, j = addNeutrals.size() ; i+4 < j ; i += 5) {
-                synchronizePuyo(addNeutrals+i);
-                PuyoPuyo *neutral = findPuyo(addNeutrals[i]);
-                if (neutral != NULL)
-                    delegate->gameDidAddNeutral(neutral, addNeutrals[i+4]);
-            }
-        }
-    }
-
-    Buffer<int> moveLeftBuffer= message.getIntArray(MV_L);
-    if (moveLeftBuffer.size() > 0) {
-        if (delegate != NULL) {
-            for (int i = 0, j = moveLeftBuffer.size() ; i+7 < j ; i += 8) {
-                synchronizePuyo(moveLeftBuffer+i);
-                synchronizePuyo(moveLeftBuffer+i+4);
-                PuyoPuyo *falling = findPuyo(moveLeftBuffer[i]);
-                PuyoPuyo *companion = findPuyo(moveLeftBuffer[i+4]);
-                if ((falling != NULL) && (companion != NULL)) {
-                    delegate->fallingsDidMoveLeft(falling, companion);
+    if (message.hasIntArray(ADD_NEUTRALS)) {
+        Buffer<int> addNeutrals= message.getIntArray(ADD_NEUTRALS);
+        if (addNeutrals.size() > 0) {
+            if (delegate != NULL) {
+                for (int i = 0, j = addNeutrals.size() ; i+4 < j ; i += 5) {
+                    synchronizePuyo(addNeutrals+i);
+                    PuyoPuyo *neutral = findPuyo(addNeutrals[i]);
+                    if (neutral != NULL)
+                        delegate->gameDidAddNeutral(neutral, addNeutrals[i+4]);
                 }
             }
         }
     }
-
-    Buffer<int> moveRightBuffer= message.getIntArray(MV_R);
-    if (moveRightBuffer.size() > 0) {
-        if (delegate != NULL) {
-            for (int i = 0, j = moveRightBuffer.size() ; i+7 < j ; i += 8) {
-                synchronizePuyo(moveRightBuffer+i);
-                synchronizePuyo(moveRightBuffer+i+4);
-                PuyoPuyo *falling = findPuyo(moveRightBuffer[i]);
-                PuyoPuyo *companion = findPuyo(moveRightBuffer[i+4]);
-                if ((falling != NULL) && (companion != NULL)) {
-                    delegate->fallingsDidMoveRight(falling, companion);
+    if (message.hasIntArray(MV_L)) {
+        Buffer<int> moveLeftBuffer= message.getIntArray(MV_L);
+        if (moveLeftBuffer.size() > 0) {
+            if (delegate != NULL) {
+                for (int i = 0, j = moveLeftBuffer.size() ; i+7 < j ; i += 8) {
+                    synchronizePuyo(moveLeftBuffer+i);
+                    synchronizePuyo(moveLeftBuffer+i+4);
+                    PuyoPuyo *falling = findPuyo(moveLeftBuffer[i]);
+                    PuyoPuyo *companion = findPuyo(moveLeftBuffer[i+4]);
+                    if ((falling != NULL) && (companion != NULL)) {
+                        delegate->fallingsDidMoveLeft(falling, companion);
+                    }
                 }
             }
         }
     }
-
-    Buffer<int> fallingStepBuffer= message.getIntArray(MV_D);
-    if (fallingStepBuffer.size() > 0) {
-        if (delegate != NULL) {
-            for (int i = 0, j = fallingStepBuffer.size() ; i+7 < j ; i += 8) {
-                synchronizePuyo(fallingStepBuffer+i);
-                synchronizePuyo(fallingStepBuffer+i+4);
-                PuyoPuyo *fallingPuyo = findPuyo(fallingStepBuffer[i]);
-                PuyoPuyo *companionPuyo = findPuyo(fallingStepBuffer[i+4]);
-                if ((fallingPuyo != NULL) && (companionPuyo != NULL))
-                    delegate->fallingsDidFallingStep(fallingPuyo, companionPuyo);
-            }
-        }
-    }
-
-    Buffer<int> turnBuffer= message.getIntArray(COMPANION_TURN);
-    if (turnBuffer.size() > 0) {
-        if (delegate != NULL) {
-            for (int i = 0, j = turnBuffer.size() ; i+8 < j ; i += 9) {
-                synchronizePuyo(turnBuffer+i);
-                synchronizePuyo(turnBuffer+i+4);
-                PuyoPuyo *fallingPuyo = findPuyo(turnBuffer[i]);
-                PuyoPuyo *companionPuyo = findPuyo(turnBuffer[i+4]);
-                if ((fallingPuyo != NULL) && (companionPuyo != NULL))
-                    delegate->companionDidTurn(companionPuyo, fallingPuyo, turnBuffer[i+8]);
-            }
-        }
-    }
-
-    Buffer<int> didFall= message.getIntArray(DID_FALL);
-    if (didFall.size() > 0) {
-       if (delegate != NULL) {
-            for (int i = 0, j = didFall.size() ; i+6 < j ; i += 7) {
-                synchronizePuyo(didFall+i);
-                PuyoPuyo *didFallPuyo = findPuyo(didFall[i]);
-                if (didFallPuyo != NULL)
-                    delegate->puyoDidFall(didFallPuyo, didFall[i+4], didFall[i+5], didFall[i+6]);
-            }
-        }
-    }
-
-    Buffer<int> willVanish= message.getIntArray(WILL_VANISH);
-    if (willVanish.size() > 0) {
-       if (delegate != NULL) {
-            int i = 0;
-            AdvancedBuffer<PuyoPuyo *> temporaryGroup;
-            while (i < willVanish.size()) {
-                temporaryGroup.clear();
-                int numPhase = willVanish[i++];
-                int groupNumber = willVanish[i++];
-                int numberOfPuyosInGroup = willVanish[i++];
-                for (int index = 0 ; index < numberOfPuyosInGroup ; index++) {
-                    PuyoPuyo *vanishedPuyo = findPuyo(willVanish[i + index]);
-                    if (vanishedPuyo != NULL)
-                        temporaryGroup.add(vanishedPuyo);
+    if (message.hasIntArray(MV_R)) {
+        Buffer<int> moveRightBuffer= message.getIntArray(MV_R);
+        if (moveRightBuffer.size() > 0) {
+            if (delegate != NULL) {
+                for (int i = 0, j = moveRightBuffer.size() ; i+7 < j ; i += 8) {
+                    synchronizePuyo(moveRightBuffer+i);
+                    synchronizePuyo(moveRightBuffer+i+4);
+                    PuyoPuyo *falling = findPuyo(moveRightBuffer[i]);
+                    PuyoPuyo *companion = findPuyo(moveRightBuffer[i+4]);
+                    if ((falling != NULL) && (companion != NULL)) {
+                        delegate->fallingsDidMoveRight(falling, companion);
+                    }
                 }
-                delegate->puyoWillVanish(temporaryGroup, groupNumber, numPhase);
-                i += numberOfPuyosInGroup;
             }
         }
     }
-
+    if (message.hasIntArray(MV_D)) {
+        Buffer<int> fallingStepBuffer= message.getIntArray(MV_D);
+        if (fallingStepBuffer.size() > 0) {
+            if (delegate != NULL) {
+                for (int i = 0, j = fallingStepBuffer.size() ; i+7 < j ; i += 8) {
+                    synchronizePuyo(fallingStepBuffer+i);
+                    synchronizePuyo(fallingStepBuffer+i+4);
+                    PuyoPuyo *fallingPuyo = findPuyo(fallingStepBuffer[i]);
+                    PuyoPuyo *companionPuyo = findPuyo(fallingStepBuffer[i+4]);
+                    if ((fallingPuyo != NULL) && (companionPuyo != NULL))
+                        delegate->fallingsDidFallingStep(fallingPuyo, companionPuyo);
+                }
+            }
+        }
+    }
+    if (message.hasIntArray(COMPANION_TURN)) {
+        Buffer<int> turnBuffer= message.getIntArray(COMPANION_TURN);
+        if (turnBuffer.size() > 0) {
+            if (delegate != NULL) {
+                for (int i = 0, j = turnBuffer.size() ; i+8 < j ; i += 9) {
+                    synchronizePuyo(turnBuffer+i);
+                    synchronizePuyo(turnBuffer+i+4);
+                    PuyoPuyo *fallingPuyo = findPuyo(turnBuffer[i]);
+                    PuyoPuyo *companionPuyo = findPuyo(turnBuffer[i+4]);
+                    if ((fallingPuyo != NULL) && (companionPuyo != NULL))
+                        delegate->companionDidTurn(companionPuyo, fallingPuyo, turnBuffer[i+8]);
+                }
+            }
+        }
+    }
+    if (message.hasIntArray(DID_FALL)) {
+        Buffer<int> didFall= message.getIntArray(DID_FALL);
+        if (didFall.size() > 0) {
+            if (delegate != NULL) {
+                for (int i = 0, j = didFall.size() ; i+6 < j ; i += 7) {
+                    synchronizePuyo(didFall+i);
+                    PuyoPuyo *didFallPuyo = findPuyo(didFall[i]);
+                    if (didFallPuyo != NULL)
+                        delegate->puyoDidFall(didFallPuyo, didFall[i+4], didFall[i+5], didFall[i+6]);
+                }
+            }
+        }
+    }
+    if (message.hasIntArray(WILL_VANISH)) {
+        Buffer<int> willVanish= message.getIntArray(WILL_VANISH);
+        if (willVanish.size() > 0) {
+            if (delegate != NULL) {
+                int i = 0;
+                AdvancedBuffer<PuyoPuyo *> temporaryGroup;
+                while (i < willVanish.size()) {
+                    temporaryGroup.clear();
+                    int numPhase = willVanish[i++];
+                    int groupNumber = willVanish[i++];
+                    int numberOfPuyosInGroup = willVanish[i++];
+                    for (int index = 0 ; index < numberOfPuyosInGroup ; index++) {
+                        PuyoPuyo *vanishedPuyo = findPuyo(willVanish[i + index]);
+                        if (vanishedPuyo != NULL)
+                            temporaryGroup.add(vanishedPuyo);
+                    }
+                    delegate->puyoWillVanish(temporaryGroup, groupNumber, numPhase);
+                    i += numberOfPuyosInGroup;
+                }
+            }
+        }
+    }
     int badPuyos = message.getInt(NUMBER_BAD_PUYOS);
     if (badPuyos > sentBadPuyos) {
         neutralPuyos = sentBadPuyos - badPuyos;
@@ -265,14 +274,12 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     neutralPuyos = message.getInt(CURRENT_NEUTRALS);
 }
 
-PuyoPuyo *PuyoNetworkGame::findPuyo(int puyoID)
+inline PuyoPuyo *PuyoNetworkGame::findPuyo(int puyoID)
 {
-    for (int i = 0, j = puyoVector.size() ; i < j ; i++) {
-        PuyoPuyo *currentPuyo = puyoVector[i];
-        if (currentPuyo->getID() == puyoID)
-            return currentPuyo;
-    }
-    return NULL;
+    std::map<int, PuyoPuyo *>::iterator found = m_puyoMap.find(puyoID);
+    if (found == m_puyoMap.end())
+        return NULL;
+    return found->second;
 }
 
 void PuyoNetworkGame::cycle()
