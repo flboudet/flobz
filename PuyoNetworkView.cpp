@@ -173,6 +173,9 @@ void PuyoNetworkView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex)
 {
     PuyoView::gameDidAddNeutral(neutralPuyo, neutralIndex);
     neutralsBuffer.add(neutralPuyo->getID());
+    neutralsBuffer.add(neutralPuyo->getPuyoState());
+    neutralsBuffer.add(neutralPuyo->getPuyoX());
+    neutralsBuffer.add(neutralPuyo->getPuyoY());
     neutralsBuffer.add(neutralIndex);
 }
 

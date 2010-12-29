@@ -255,6 +255,8 @@ void NetSynchronizeState::exitState()
 {
     GameUIDefaults::GAME_LOOP->removeIdle(this);
     m_mbox->removeListener(this);
+    m_failed = false;
+    m_ackSent = false;
 }
 
 bool NetSynchronizeState::evaluate()

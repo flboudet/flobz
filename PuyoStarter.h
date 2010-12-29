@@ -50,8 +50,6 @@ private:
     PuyoRandomSystem *attachedRandom;
 };
 
-struct GameOptions;
-
 class TwoPlayerGameWidget : public GameWidget {
 public:
     TwoPlayerGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, Action *gameOverAction = NULL);

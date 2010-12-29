@@ -152,10 +152,11 @@ void PuyoNetworkGame::synchronizeState(Message &message)
     Buffer<int> addNeutrals= message.getIntArray(ADD_NEUTRALS);
     if (addNeutrals.size() > 0) {
        if (delegate != NULL) {
-            for (int i = 0, j = addNeutrals.size() ; i+1 < j ; i += 2) {
+            for (int i = 0, j = addNeutrals.size() ; i+4 < j ; i += 5) {
+                synchronizePuyo(addNeutrals+i);
                 PuyoPuyo *neutral = findPuyo(addNeutrals[i]);
                 if (neutral != NULL)
-                    delegate->gameDidAddNeutral(neutral, addNeutrals[i+1]);
+                    delegate->gameDidAddNeutral(neutral, addNeutrals[i+4]);
             }
         }
     }

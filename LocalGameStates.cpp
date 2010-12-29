@@ -394,6 +394,7 @@ DisplayStoryScreenState::DisplayStoryScreenState(const char *screenName)
 
 void DisplayStoryScreenState::enterState()
 {
+    cout << "DisplayStoryScreenState::enterState()" << endl;
     m_storyScreen.reset(new StoryScreen(m_screenName.c_str(),
                                         *(GameUIDefaults::SCREEN_STACK->top()),
                                         this));
