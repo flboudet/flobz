@@ -352,9 +352,8 @@ private:
     SharedGetReadyAssets m_sharedGetReadyAssets;
     GameState *m_nextState;
 
-    auto_ptr<DisplayStoryScreenState> m_introStoryScreen;
-    auto_ptr<DisplayStoryScreenState> m_opponentStoryScreen;
-
+    std::auto_ptr<DisplayStoryScreenState> m_introStoryScreen;
+    std::auto_ptr<DisplayStoryScreenState> m_opponentStoryScreen;
     std::auto_ptr<SetupMatchState>       m_setupMatch;
     std::auto_ptr<EnterPlayerReadyState> m_enterPlayersReady;
     std::auto_ptr<ExitPlayerReadyState>  m_exitPlayersReady;
@@ -379,19 +378,10 @@ private:
     GameStateMachine m_stateMachine;
     std::auto_ptr<PuyoLevelDefinitions> m_levelDefinitions;
     std::auto_ptr<AltTweakedGameWidgetFactory> m_gameWidgetFactory;
-    SharedMatchAssets    m_sharedAssets;
-    SharedGetReadyAssets m_sharedGetReadyAssets;
+    SharedGameAssets     m_sharedGameAssets;
 
-    auto_ptr<DisplayStoryScreenState> m_introStoryScreen;
-    auto_ptr<DisplayStoryScreenState> m_opponentStoryScreen;
-
-    std::auto_ptr<SetupMatchState>       m_setupMatch;
-    std::auto_ptr<EnterPlayerReadyState> m_enterPlayersReady;
-    std::auto_ptr<ExitPlayerReadyState>  m_exitPlayersReady;
-    std::auto_ptr<MatchPlayingState>     m_matchPlaying;
-    std::auto_ptr<MatchIsOverState>      m_matchIsOver;
-    std::auto_ptr<DisplayStatsState>     m_displayStats;
-    std::auto_ptr<LeaveGameState>        m_leaveGame;
+    std::auto_ptr<SinglePlayerMatchState> m_playMatch;
+    std::auto_ptr<LeaveGameState>         m_leaveGame;
 };
 
 #endif // _PUYOSINGLEPLAYERSTARTER
