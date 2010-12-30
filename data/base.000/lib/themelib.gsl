@@ -50,6 +50,7 @@ struct <Level:
     string animation_2p,
     Point  speedmeter_display,
     Point  life_display,
+    int    opponent_is_behind,
     PuyobanDefinition puyoban_p1,
     PuyobanDefinition puyoban_p2,
     Font   playerNameFont,
@@ -114,6 +115,7 @@ external <end_level>
     level.speedmeter_display.y = 170
     level.life_display.x = 310
     level.life_display.y = 438
+    level.opponent_is_behind = 0
 
     level.puyoban_p1.display.x = 33
     level.puyoban_p1.display.y = 0

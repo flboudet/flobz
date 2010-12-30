@@ -49,7 +49,7 @@ private:
     EditFieldWithLabel editPlayerName;
     Frame screenTitleFrame;
     Text screenTitle;
-    SinglePlayerStarterAction easyAction;
+    AltSinglePlayerStarterAction easyAction;
     SinglePlayerStarterAction mediumAction;
     SinglePlayerStarterAction hardAction;
     PuyoPopMenuAction popAction;

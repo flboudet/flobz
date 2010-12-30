@@ -702,3 +702,141 @@ void SinglePlayerMatch::stateMachine()
     break;
   }
 }
+
+AltTweakedGameWidgetFactory::AltTweakedGameWidgetFactory(PuyoLevelDefinitions::LevelDefinition *levelDef)
+    : m_levelDef(levelDef)
+{
+}
+
+GameWidget *AltTweakedGameWidgetFactory::createGameWidget(PuyoSetTheme &puyoThemeSet,
+                                         LevelTheme &levelTheme,
+                                         String centerFace,
+                                         Action *gameOverAction)
+{
+    return new SinglePlayerStandardLayoutGameWidget(puyoThemeSet, levelTheme,
+                                                    1/*level*/, m_levelDef->easySettings.nColors, 3,
+                                                    m_levelDef->opponent, gameOverAction);
+}
+
+//---------------------------------
+// SinglePlayerMatchState
+//---------------------------------
+SinglePlayerMatchState::SinglePlayerMatchState(SharedGameAssets *sharedGameAssets)
+    : m_sharedGameAssets(sharedGameAssets)
+{
+}
+
+void SinglePlayerMatchState::enterState()
+{
+    // Creating the different game states
+    if (m_sharedGameAssets->levelDef->introStory == "")
+        m_introStoryScreen.reset(NULL);
+    else
+        m_introStoryScreen.reset(new DisplayStoryScreenState(m_sharedGameAssets->levelDef->introStory));
+    m_opponentStoryScreen.reset(new DisplayStoryScreenState(m_sharedGameAssets->levelDef->opponentStory));
+    m_setupMatch.reset(new SetupMatchState(*this, m_sharedGameAssets->difficulty, this, m_sharedAssets));
+    m_enterPlayersReady.reset(new EnterPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
+    m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
+    m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));
+    m_matchIsOver.reset(new MatchIsOverState(m_sharedAssets));
+    m_displayStats.reset(new DisplayStatsState(m_sharedAssets));
+    m_leaveMatch.reset(new CallActionState(this, LEAVE_MATCH));
+    m_abortGame.reset(new CallActionState(this, ABORT_GAME));
+    // Linking the states together
+    if (m_introStoryScreen.get() != NULL)
+        m_introStoryScreen->setNextState(m_opponentStoryScreen.get());
+    m_opponentStoryScreen->setNextState(m_setupMatch.get());
+    m_setupMatch->setNextState(m_enterPlayersReady.get());
+    m_enterPlayersReady->setNextState(m_exitPlayersReady.get());
+    m_exitPlayersReady->setNextState(m_matchPlaying.get());
+    m_matchPlaying->setNextState(m_matchIsOver.get());
+    m_matchPlaying->setAbortedState(m_abortGame.get());
+    m_matchIsOver->setNextState(m_displayStats.get());
+    m_displayStats->setNextState(m_leaveMatch.get());
+    // Initializing the state machine
+    if (m_introStoryScreen.get() != NULL)
+        m_stateMachine.setInitialState(m_introStoryScreen.get());
+    else
+        m_stateMachine.setInitialState(m_opponentStoryScreen.get());
+    m_stateMachine.reset();
+    m_stateMachine.evaluate();
+}
+
+void SinglePlayerMatchState::exitState()
+{
+}
+
+bool SinglePlayerMatchState::evaluate()
+{
+}
+
+GameState *SinglePlayerMatchState::getNextState()
+{
+}
+
+GameWidget *SinglePlayerMatchState::createGameWidget(PuyoSetTheme &puyoThemeSet,
+                                         LevelTheme &levelTheme,
+                                         String centerFace,
+                                         Action *gameOverAction)
+{
+    return new SinglePlayerStandardLayoutGameWidget(puyoThemeSet, levelTheme,
+                                                    m_sharedGameAssets->difficulty, m_sharedGameAssets->levelDef->easySettings.nColors, 3,
+                                                    m_sharedGameAssets->levelDef->opponent, gameOverAction);
+}
+
+void SinglePlayerMatchState::action(Widget *sender, int actionType,
+                                    event_manager::GameControlEvent *event)
+{
+    switch (actionType) {
+    case LEAVE_MATCH:
+        break;
+    case ABORT_GAME:
+    default:
+        break;
+    }
+}
+
+AltSinglePlayerStarterAction::AltSinglePlayerStarterAction(MainScreen *mainScreen, int difficulty,
+                                                             SinglePlayerFactory *spFactory)
+{
+    m_levelDefinitions.reset(new PuyoLevelDefinitions(theCommander->getDataPathManager().getPath("/story/levels.gsl")));
+    PuyoLevelDefinitions::LevelDefinition *levelDef = m_levelDefinitions->getLevelDefinition(0);
+    m_gameWidgetFactory.reset(new AltTweakedGameWidgetFactory(levelDef));
+    // Creating the different game states
+    if (levelDef->introStory == "")
+        m_introStoryScreen.reset(NULL);
+    else
+        m_introStoryScreen.reset(new DisplayStoryScreenState(levelDef->introStory));
+    m_opponentStoryScreen.reset(new DisplayStoryScreenState(levelDef->opponentStory));
+    m_setupMatch.reset(new SetupMatchState(*m_gameWidgetFactory, difficulty, m_gameWidgetFactory.get(), m_sharedAssets));
+    m_enterPlayersReady.reset(new EnterPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
+    m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
+    m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));
+    m_matchIsOver.reset(new MatchIsOverState(m_sharedAssets));
+    m_displayStats.reset(new DisplayStatsState(m_sharedAssets));
+    m_leaveGame.reset(new LeaveGameState(m_sharedAssets));
+    // Linking the states together
+    if (m_introStoryScreen.get() != NULL)
+        m_introStoryScreen->setNextState(m_opponentStoryScreen.get());
+    m_opponentStoryScreen->setNextState(m_setupMatch.get());
+    m_setupMatch->setNextState(m_enterPlayersReady.get());
+    m_enterPlayersReady->setNextState(m_exitPlayersReady.get());
+    m_exitPlayersReady->setNextState(m_matchPlaying.get());
+    m_matchPlaying->setNextState(m_matchIsOver.get());
+    m_matchPlaying->setAbortedState(m_leaveGame.get());
+    m_matchIsOver->setNextState(m_displayStats.get());
+    m_displayStats->setNextState(m_leaveGame.get());
+    // Initializing the state machine
+    if (m_introStoryScreen.get() != NULL)
+        m_stateMachine.setInitialState(m_introStoryScreen.get());
+    else
+        m_stateMachine.setInitialState(m_opponentStoryScreen.get());
+}
+
+void AltSinglePlayerStarterAction::action(Widget *sender, int actionType,
+                                        event_manager::GameControlEvent *event)
+{
+    m_stateMachine.reset();
+    m_stateMachine.evaluate();
+}
+

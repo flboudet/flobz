@@ -25,6 +25,8 @@
 #ifndef _PUYOSINGLEPLAYERSTARTER
 #define _PUYOSINGLEPLAYERSTARTER
 
+#include "GameStateMachine.h"
+#include "LocalGameStates.h"
 #include "PuyoStarter.h"
 #include "HiScores.h"
 #include "StatsWidget.h"
@@ -283,6 +285,113 @@ private:
     StoryWidget *m_getReadyWidget, *m_matchLostAnimation;
     TwoPlayersStatsWidget *m_statsWidget;
     PlayerGameStat &m_playerStat;
+};
+
+class AltTweakedGameWidgetFactory : public GameWidgetFactory,
+                                    public PuyoTwoNameProvider
+{
+public:
+    AltTweakedGameWidgetFactory(PuyoLevelDefinitions::LevelDefinition *levelDef);
+public:
+    virtual String getPlayer1Name() const
+    { return "bob"; }
+    virtual String getPlayer2Name() const
+    { return "bobette"; }
+public:
+    virtual GameWidget *createGameWidget(PuyoSetTheme &puyoThemeSet,
+                                         LevelTheme &levelTheme,
+                                         String centerFace,
+                                         Action *gameOverAction);
+private:
+    PuyoLevelDefinitions::LevelDefinition *m_levelDef;
+};
+
+struct SharedGameAssets
+{
+    int difficulty;
+    PuyoLevelDefinitions::LevelDefinition *levelDef;
+};
+
+class SinglePlayerMatchState : public GameState,
+                               public GameWidgetFactory,
+                               public PuyoTwoNameProvider,
+                               public Action
+{
+public:
+    SinglePlayerMatchState(SharedGameAssets *sharedGameAssets);
+    // GameState implementation
+    virtual void enterState();
+    virtual void exitState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // PuyoTwoNameProvider implementation
+    virtual String getPlayer1Name() const
+    { return "bob"; }
+    virtual String getPlayer2Name() const
+    { return "bobette"; }
+    // GameWidgetFactory implementation
+    virtual GameWidget *createGameWidget(PuyoSetTheme &puyoThemeSet,
+                                         LevelTheme &levelTheme,
+                                         String centerFace,
+                                         Action *gameOverAction);
+    // Action implementation
+    virtual void action(Widget *sender, int actionType,
+                        event_manager::GameControlEvent *event);
+    // Own methods
+    void setNextState(GameState *nextState) {
+        m_nextState = nextState;
+    }
+private:
+    enum {
+        LEAVE_MATCH,
+        ABORT_GAME
+    };
+    GameStateMachine m_stateMachine;
+    SharedGameAssets *m_sharedGameAssets;
+    SharedMatchAssets m_sharedAssets;
+    SharedGetReadyAssets m_sharedGetReadyAssets;
+    GameState *m_nextState;
+
+    auto_ptr<DisplayStoryScreenState> m_introStoryScreen;
+    auto_ptr<DisplayStoryScreenState> m_opponentStoryScreen;
+
+    std::auto_ptr<SetupMatchState>       m_setupMatch;
+    std::auto_ptr<EnterPlayerReadyState> m_enterPlayersReady;
+    std::auto_ptr<ExitPlayerReadyState>  m_exitPlayersReady;
+    std::auto_ptr<MatchPlayingState>     m_matchPlaying;
+    std::auto_ptr<MatchIsOverState>      m_matchIsOver;
+    std::auto_ptr<DisplayStatsState>     m_displayStats;
+    std::auto_ptr<CallActionState>       m_abortGame;
+    std::auto_ptr<CallActionState>       m_leaveMatch;
+};
+
+//class SinglePlayerMatchStateMachine : public GameStateMachine
+class AltSinglePlayerStarterAction : public Action {
+public:
+    AltSinglePlayerStarterAction(MainScreen *mainScreen, int difficulty,
+                                  SinglePlayerFactory *spFactory);//(int difficulty, PuyoTwoNameProvider *nameProvider = NULL);
+    /**
+     * Implements the Action interface
+     */
+    virtual void action(Widget *sender, int actionType,
+			event_manager::GameControlEvent *event);
+private:
+    GameStateMachine m_stateMachine;
+    std::auto_ptr<PuyoLevelDefinitions> m_levelDefinitions;
+    std::auto_ptr<AltTweakedGameWidgetFactory> m_gameWidgetFactory;
+    SharedMatchAssets    m_sharedAssets;
+    SharedGetReadyAssets m_sharedGetReadyAssets;
+
+    auto_ptr<DisplayStoryScreenState> m_introStoryScreen;
+    auto_ptr<DisplayStoryScreenState> m_opponentStoryScreen;
+
+    std::auto_ptr<SetupMatchState>       m_setupMatch;
+    std::auto_ptr<EnterPlayerReadyState> m_enterPlayersReady;
+    std::auto_ptr<ExitPlayerReadyState>  m_exitPlayersReady;
+    std::auto_ptr<MatchPlayingState>     m_matchPlaying;
+    std::auto_ptr<MatchIsOverState>      m_matchIsOver;
+    std::auto_ptr<DisplayStatsState>     m_displayStats;
+    std::auto_ptr<LeaveGameState>        m_leaveGame;
 };
 
 #endif // _PUYOSINGLEPLAYERSTARTER

@@ -64,13 +64,13 @@ private:
     GameStateMachine m_stateMachine;
     SharedMatchAssets m_sharedAssets;
     SharedGetReadyAssets        m_sharedGetReadyAssets;
-    auto_ptr<SetupMatchState>       m_setupMatch;
-    auto_ptr<EnterPlayerReadyState> m_enterPlayersReady;
-    auto_ptr<ExitPlayerReadyState>  m_exitPlayersReady;
-    auto_ptr<MatchPlayingState>     m_matchPlaying;
-    auto_ptr<MatchIsOverState>      m_matchIsOver;
-    auto_ptr<DisplayStatsState>     m_displayStats;
-    auto_ptr<LeaveGameState>        m_leaveGame;
+    std::auto_ptr<SetupMatchState>       m_setupMatch;
+    std::auto_ptr<EnterPlayerReadyState> m_enterPlayersReady;
+    std::auto_ptr<ExitPlayerReadyState>  m_exitPlayersReady;
+    std::auto_ptr<MatchPlayingState>     m_matchPlaying;
+    std::auto_ptr<MatchIsOverState>      m_matchIsOver;
+    std::auto_ptr<DisplayStatsState>     m_displayStats;
+    std::auto_ptr<LeaveGameState>        m_leaveGame;
 };
 
 #endif // _PUYOTWOPLAYERSTARTER

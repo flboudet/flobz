@@ -457,3 +457,26 @@ GameState *LeaveGameState::getNextState()
     return NULL;
 }
 
+//---------------------------------
+// CallActionState
+//---------------------------------
+CallActionState::CallActionState(Action *actionToCall, int actionType)
+    : m_actionToCall(actionToCall), m_actionType(actionType)
+{
+}
+
+void CallActionState::enterState()
+{
+    cout << "CallAction::enterState()" << endl;
+    m_actionToCall->action(NULL, m_actionType, NULL);
+}
+
+bool CallActionState::evaluate()
+{
+    return false;
+}
+
+GameState *CallActionState::getNextState()
+{
+    return NULL;
+}

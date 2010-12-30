@@ -22,7 +22,9 @@
  *
  *
  */
+
 #ifndef _LOCALGAMESTATES_H
+#define _LOCALGAMESTATES_H
 
 #include "GameStateMachine.h"
 #include "GameWidget.h"
@@ -38,7 +40,10 @@ public:
 
 class GameWidgetFactory {
 public:
-    virtual GameWidget *createGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, String centerFace, Action *gameOverAction) = 0;
+    virtual GameWidget *createGameWidget(PuyoSetTheme &puyoThemeSet,
+                                         LevelTheme &levelTheme,
+                                         String centerFace,
+                                         Action *gameOverAction) = 0;
     virtual ~GameWidgetFactory() {};
 };
 
@@ -294,6 +299,23 @@ public:
 private:
     SharedMatchAssets &m_sharedAssets;
     Action *m_actionToCallWhenLeft;
+};
+
+/**
+ * Call an action on entering the state
+ * (useful to mark the end of a sub- state machine)
+ */
+class CallActionState : public GameState
+{
+public:
+    CallActionState(Action *actionToCall, int actionType);
+    // GameState implementation
+    virtual void enterState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+private:
+    Action *m_actionToCall;
+    int     m_actionType;
 };
 
 #endif // _LOCALGAMESTATES_H
