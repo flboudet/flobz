@@ -125,14 +125,17 @@ void Local2PlayersGameMenu::build()
     add(&buttonsBox);
 }
 
-String Local2PlayersGameMenu::getPlayer1Name() const
+String Local2PlayersGameMenu::getPlayerName(int playerNumber) const
 {
-  String playerName = editPlayer1Name.getEditField().getValue();
-  return playerName;
-}
-
-String Local2PlayersGameMenu::getPlayer2Name() const
-{
-  String playerName = editPlayer2Name.getEditField().getValue();
-  return playerName;
+  switch (playerNumber) {
+  case 0:  {
+    String player0Name = editPlayer1Name.getEditField().getValue();
+    return player0Name;
+  }
+  case 1:
+  default: {
+    String player1Name = editPlayer2Name.getEditField().getValue();
+    return player1Name;
+  }
+  }
 }

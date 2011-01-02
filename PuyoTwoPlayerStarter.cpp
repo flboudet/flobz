@@ -59,7 +59,7 @@ void TwoPlayersGameWidget::cycle()
 //---------------------------------
 // Two players local game state machine
 //---------------------------------
-AltTwoPlayersStarterAction::AltTwoPlayersStarterAction(int difficulty, GameWidgetFactory &gameWidgetFactory, PuyoTwoNameProvider *nameProvider)
+AltTwoPlayersStarterAction::AltTwoPlayersStarterAction(int difficulty, GameWidgetFactory &gameWidgetFactory, PlayerNameProvider *nameProvider)
 {
     // Creating the different game states
     m_setupMatch.reset(new SetupMatchState(gameWidgetFactory, difficulty, nameProvider, m_sharedAssets));

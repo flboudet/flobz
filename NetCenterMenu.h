@@ -110,11 +110,10 @@ private:
 
 class NetCenterMenu;
 
-class NetCenterTwoNameProvider : public PuyoTwoNameProvider {
+class NetCenterTwoNameProvider : public PlayerNameProvider {
 public:
     NetCenterTwoNameProvider(NetGameCenter &netCenter) : netCenter(netCenter) {}
-    String getPlayer1Name() const;
-    String getPlayer2Name() const;
+    String getPlayerName(int playerNumber) const;
 private:
     NetGameCenter &netCenter;
 };

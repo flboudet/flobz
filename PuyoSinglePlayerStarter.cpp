@@ -719,6 +719,61 @@ GameWidget *AltTweakedGameWidgetFactory::createGameWidget(PuyoSetTheme &puyoThem
 }
 
 //---------------------------------
+// SinglePlayerMatchIsOverState
+//---------------------------------
+SinglePlayerMatchIsOverState::SinglePlayerMatchIsOverState(SharedGameAssets *sharedGameAssets,
+                                                           SharedMatchAssets *sharedMatchAssets)
+    : m_sharedGameAssets(sharedGameAssets),
+      m_sharedMatchAssets(sharedMatchAssets),
+      m_aknowledged(false)
+{
+}
+
+void SinglePlayerMatchIsOverState::enterState()
+{
+    cout << "SinglePlayerMatchIsOver::enterState()" << endl;
+    m_aknowledged = false;
+    if (m_sharedMatchAssets->m_gameWidget->isGameARunning()) {
+        m_aknowledged = true;
+        m_sharedMatchAssets->m_leftVictories++;
+    }
+    else {
+        m_gameLostWidget.reset(new StoryWidget(m_sharedGameAssets->levelDef->gameLostStory, this));
+	m_sharedMatchAssets->m_gameScreen->setOverlayStory(m_gameLostWidget.get());
+        m_sharedMatchAssets->m_rightVictories++;
+    }
+    m_sharedMatchAssets->m_leftTotal  += m_sharedMatchAssets->m_gameWidget->getStatPlayerOne().points;
+    m_sharedMatchAssets->m_rightTotal += m_sharedMatchAssets->m_gameWidget->getStatPlayerTwo().points;
+    m_sharedMatchAssets->m_gameWidget->setGameOverAction(this);
+}
+
+void SinglePlayerMatchIsOverState::exitState()
+{
+    m_sharedMatchAssets->m_gameWidget->setGameOverAction(NULL);
+    m_gameLostWidget.reset(NULL);
+}
+
+bool SinglePlayerMatchIsOverState::evaluate()
+{
+    return m_aknowledged;
+}
+
+GameState *SinglePlayerMatchIsOverState::getNextState()
+{
+    return m_nextState;
+}
+
+void SinglePlayerMatchIsOverState::action(Widget *sender, int actionType,
+                        event_manager::GameControlEvent *event)
+{
+    if (sender == m_gameLostWidget.get()) {
+        m_gameLostWidget.reset(NULL);
+    }
+    m_aknowledged = true;
+    evaluateStateMachine();
+}
+
+//---------------------------------
 // SinglePlayerMatchState
 //---------------------------------
 SinglePlayerMatchState::SinglePlayerMatchState(SharedGameAssets *sharedGameAssets)
@@ -728,6 +783,7 @@ SinglePlayerMatchState::SinglePlayerMatchState(SharedGameAssets *sharedGameAsset
 
 void SinglePlayerMatchState::enterState()
 {
+    m_nextState = NULL;
     // Creating the different game states
     if (m_sharedGameAssets->levelDef->introStory == "")
         m_introStoryScreen.reset(NULL);
@@ -738,7 +794,7 @@ void SinglePlayerMatchState::enterState()
     m_enterPlayersReady.reset(new EnterPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));
-    m_matchIsOver.reset(new MatchIsOverState(m_sharedAssets));
+    m_matchIsOver.reset(new SinglePlayerMatchIsOverState(m_sharedGameAssets, &m_sharedAssets));
     m_displayStats.reset(new DisplayStatsState(m_sharedAssets));
     m_leaveMatch.reset(new CallActionState(this, LEAVE_MATCH));
     m_abortGame.reset(new CallActionState(this, ABORT_GAME));
@@ -769,10 +825,26 @@ void SinglePlayerMatchState::exitState()
 
 bool SinglePlayerMatchState::evaluate()
 {
+    if (m_nextState == NULL)
+        return false;
+    return true;
 }
 
 GameState *SinglePlayerMatchState::getNextState()
 {
+    return m_nextState;
+}
+
+String SinglePlayerMatchState::getPlayerName(int playerNumber) const
+{
+    switch (playerNumber) {
+    case 0:
+      return m_sharedGameAssets->playerName.c_str();
+	break;
+    case 1:
+    default:
+        return m_sharedGameAssets->levelDef->opponentName;
+    }
 }
 
 GameWidget *SinglePlayerMatchState::createGameWidget(PuyoSetTheme &puyoThemeSet,
@@ -790,9 +862,15 @@ void SinglePlayerMatchState::action(Widget *sender, int actionType,
 {
     switch (actionType) {
     case LEAVE_MATCH:
+      //m_playerStat.total_points += m_gameWidget->getStatPlayerOne().points;
+        if (m_sharedAssets.m_gameWidget->isGameARunning())
+            m_nextState = m_victoriousState;
+	else
+            m_nextState = m_humiliatedState;
         break;
     case ABORT_GAME:
     default:
+        m_nextState = m_abortedState;
         break;
     }
 }
@@ -804,7 +882,7 @@ AltSinglePlayerStarterAction::AltSinglePlayerStarterAction(MainScreen *mainScree
     PuyoLevelDefinitions::LevelDefinition *levelDef = m_levelDefinitions->getLevelDefinition(0);
     m_gameWidgetFactory.reset(new AltTweakedGameWidgetFactory(levelDef));
     // Initializeing the shared game assets with random data
-    m_sharedGameAssets.difficulty = 1;
+    m_sharedGameAssets.difficulty = 1;//difficulty;
     m_sharedGameAssets.levelDef = levelDef;
     // Creating the different game states
     m_playMatch.reset(new SinglePlayerMatchState(&m_sharedGameAssets));
@@ -817,6 +895,7 @@ AltSinglePlayerStarterAction::AltSinglePlayerStarterAction(MainScreen *mainScree
 void AltSinglePlayerStarterAction::action(Widget *sender, int actionType,
                                         event_manager::GameControlEvent *event)
 {
+    m_sharedGameAssets.playerName = "Bob l'eponge";
     m_stateMachine.reset();
     m_stateMachine.evaluate();
 }

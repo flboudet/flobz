@@ -196,14 +196,15 @@ private:
     Text *message;
 };
 
-String NetCenterTwoNameProvider::getPlayer1Name() const
+String NetCenterTwoNameProvider::getPlayerName(int playerNumber) const
 {
-    return netCenter.getSelfName();
-}
-
-String NetCenterTwoNameProvider::getPlayer2Name() const
-{
-    return netCenter.getOpponentName();
+    switch (playerNumber) {
+    case 0:
+        return netCenter.getSelfName();
+    case 1:
+    default:
+	return netCenter.getOpponentName();
+    }
 }
 
 NetCenterMenu::NetCenterMenu(MainScreen *mainScreen, NetGameCenter *netCenter,

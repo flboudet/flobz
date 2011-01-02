@@ -288,15 +288,13 @@ private:
 };
 
 class AltTweakedGameWidgetFactory : public GameWidgetFactory,
-                                    public PuyoTwoNameProvider
+                                    public PlayerNameProvider
 {
 public:
     AltTweakedGameWidgetFactory(PuyoLevelDefinitions::LevelDefinition *levelDef);
 public:
-    virtual String getPlayer1Name() const
+    virtual String getPlayerName(int playerNumber) const
     { return "bob"; }
-    virtual String getPlayer2Name() const
-    { return "bobette"; }
 public:
     virtual GameWidget *createGameWidget(PuyoSetTheme &puyoThemeSet,
                                          LevelTheme &levelTheme,
@@ -308,13 +306,46 @@ private:
 
 struct SharedGameAssets
 {
+    std::string playerName;
     int difficulty;
     PuyoLevelDefinitions::LevelDefinition *levelDef;
 };
 
+/**
+ * Display the animation when the match is over (1P mode)
+ */
+class SinglePlayerMatchIsOverState : public GameState, public Action
+{
+public:
+    SinglePlayerMatchIsOverState(SharedGameAssets *sharedGameAssets,
+				 SharedMatchAssets *sharedMatchAssets);
+    // GameState implementation
+    virtual void enterState();
+    virtual void exitState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // Action implementation
+    virtual void action(Widget *sender, int actionType,
+                        event_manager::GameControlEvent *event);
+    // Own methods
+    void setNextState(GameState *nextState) {
+        m_nextState = nextState;
+    }
+private:
+    SharedGameAssets *m_sharedGameAssets;
+    SharedMatchAssets *m_sharedMatchAssets;
+    std::auto_ptr<StoryWidget> m_gameLostWidget;
+    bool m_aknowledged;
+    GameState *m_nextState;
+};
+
+/**
+ * Sub-state machine implementing the behaviour of a single match
+ * against a computer opponent in single-player mode
+ */
 class SinglePlayerMatchState : public GameState,
                                public GameWidgetFactory,
-                               public PuyoTwoNameProvider,
+                               public PlayerNameProvider,
                                public Action
 {
 public:
@@ -324,11 +355,8 @@ public:
     virtual void exitState();
     virtual bool evaluate();
     virtual GameState *getNextState();
-    // PuyoTwoNameProvider implementation
-    virtual String getPlayer1Name() const
-    { return "bob"; }
-    virtual String getPlayer2Name() const
-    { return "bobette"; }
+    // PlayerNameProvider implementation
+    virtual String getPlayerName(int playerNumber) const;
     // GameWidgetFactory implementation
     virtual GameWidget *createGameWidget(PuyoSetTheme &puyoThemeSet,
                                          LevelTheme &levelTheme,
@@ -338,8 +366,14 @@ public:
     virtual void action(Widget *sender, int actionType,
                         event_manager::GameControlEvent *event);
     // Own methods
-    void setNextState(GameState *nextState) {
-        m_nextState = nextState;
+    void setAbortedState(GameState *abortedState) {
+        m_abortedState = abortedState;
+    }
+    void setVictoriousState(GameState *victoriousState) {
+        m_victoriousState = victoriousState;
+    }
+    void setHumiliatedState(GameState *humiliatedState) {
+        m_humiliatedState = humiliatedState;
     }
 private:
     enum {
@@ -351,6 +385,7 @@ private:
     SharedMatchAssets m_sharedAssets;
     SharedGetReadyAssets m_sharedGetReadyAssets;
     GameState *m_nextState;
+    GameState *m_abortedState, *m_victoriousState, *m_humiliatedState;
 
     std::auto_ptr<DisplayStoryScreenState> m_introStoryScreen;
     std::auto_ptr<DisplayStoryScreenState> m_opponentStoryScreen;
@@ -358,7 +393,7 @@ private:
     std::auto_ptr<EnterPlayerReadyState> m_enterPlayersReady;
     std::auto_ptr<ExitPlayerReadyState>  m_exitPlayersReady;
     std::auto_ptr<MatchPlayingState>     m_matchPlaying;
-    std::auto_ptr<MatchIsOverState>      m_matchIsOver;
+    std::auto_ptr<SinglePlayerMatchIsOverState> m_matchIsOver;
     std::auto_ptr<DisplayStatsState>     m_displayStats;
     std::auto_ptr<CallActionState>       m_abortGame;
     std::auto_ptr<CallActionState>       m_leaveMatch;
@@ -368,7 +403,7 @@ private:
 class AltSinglePlayerStarterAction : public Action {
 public:
     AltSinglePlayerStarterAction(MainScreen *mainScreen, int difficulty,
-                                  SinglePlayerFactory *spFactory);//(int difficulty, PuyoTwoNameProvider *nameProvider = NULL);
+                                  SinglePlayerFactory *spFactory);//(int difficulty, PlayerNameProvider *nameProvider = NULL);
     /**
      * Implements the Action interface
      */

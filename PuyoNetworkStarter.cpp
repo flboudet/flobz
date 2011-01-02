@@ -371,7 +371,7 @@ void NetMatchPlayingState::action(Widget *sender, int actionType,
 NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory &gameWidgetFactory,
                                                  ios_fc::MessageBox *mbox,
                                                  int gameSpeed,
-                                                 PuyoTwoNameProvider *nameProvider,
+                                                 PlayerNameProvider *nameProvider,
                                                  Action *endOfSessionAction)
 {
     // Creating the different game states

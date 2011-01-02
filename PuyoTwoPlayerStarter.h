@@ -54,7 +54,8 @@ public:
 
 class AltTwoPlayersStarterAction : public Action {
 public:
-    AltTwoPlayersStarterAction(int difficulty, GameWidgetFactory &gameWidgetFactory, PuyoTwoNameProvider *nameProvider = NULL);
+    AltTwoPlayersStarterAction(int difficulty, GameWidgetFactory &gameWidgetFactory,
+                               PlayerNameProvider *nameProvider = NULL);
     /**
      * Implements the Action interface
      */

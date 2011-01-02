@@ -56,12 +56,11 @@ private:
     Button easy, medium, hard, back;
 };
 
-class Local2PlayersGameMenu : public MainScreenMenu, public PuyoTwoNameProvider {
+class Local2PlayersGameMenu : public MainScreenMenu, public PlayerNameProvider {
 public:
     Local2PlayersGameMenu(MainScreen *mainScreen);
     void build();
-    String getPlayer1Name() const;
-    String getPlayer2Name() const;
+    String getPlayerName(int playerNumber) const;
 private:
     VBox buttonsBox;
     LocalizedDictionary locale;

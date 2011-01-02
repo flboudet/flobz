@@ -30,7 +30,7 @@
 //---------------------------------
 SetupMatchState::SetupMatchState(GameWidgetFactory &gameWidgetFactory,
                                  int difficulty,
-                                 PuyoTwoNameProvider *nameProvider,
+                                 PlayerNameProvider *nameProvider,
                                  SharedMatchAssets &sharedMatchAssets)
   : m_gameWidgetFactory(gameWidgetFactory),
     m_difficulty(difficulty),
@@ -53,8 +53,8 @@ void SetupMatchState::enterState()
                                              m_sharedAssets.m_currentLevelTheme->getCentralAnimation2P().c_str(), NULL);
     newGameWidget->setGameOptions(GameOptions::FromLevel(m_difficulty));
     if (m_nameProvider != NULL) {
-        newGameWidget->setPlayerOneName(m_nameProvider->getPlayer1Name());
-        newGameWidget->setPlayerTwoName(m_nameProvider->getPlayer2Name());
+        newGameWidget->setPlayerOneName(m_nameProvider->getPlayerName(0));
+        newGameWidget->setPlayerTwoName(m_nameProvider->getPlayerName(1));
     }
     // Setup total points
     newGameWidget->getStatPlayerOne().total_points = m_sharedAssets.m_leftTotal;
@@ -394,7 +394,7 @@ DisplayStoryScreenState::DisplayStoryScreenState(const char *screenName)
 
 void DisplayStoryScreenState::enterState()
 {
-    cout << "DisplayStoryScreenState::enterState()" << endl;
+    cout << "DisplayStoryScreenState(" << m_screenName << ")::enterState()" << endl;
     m_storyScreen.reset(new StoryScreen(m_screenName.c_str(),
                                         *(GameUIDefaults::SCREEN_STACK->top()),
                                         this));

@@ -154,7 +154,7 @@ public:
     NetworkGameStateMachine(GameWidgetFactory &gameWidgetFactory,
                             ios_fc::MessageBox *mbox,
                             int gameSpeed,
-                            PuyoTwoNameProvider *nameProvider = NULL,
+                            PlayerNameProvider *nameProvider = NULL,
                             Action *endOfSessionAction = NULL);
 private:
     SharedMatchAssets           m_sharedAssets;

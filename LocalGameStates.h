@@ -31,11 +31,10 @@
 #include "GameScreen.h"
 #include "StatsWidget.h"
 
-class PuyoTwoNameProvider {
+class PlayerNameProvider {
 public:
-    virtual String getPlayer1Name() const = 0;
-    virtual String getPlayer2Name() const = 0;
-    virtual ~PuyoTwoNameProvider() {};
+    virtual String getPlayerName(int playerNumber) const = 0;
+    virtual ~PlayerNameProvider() {};
 };
 
 class GameWidgetFactory {
@@ -75,7 +74,7 @@ class SetupMatchState : public GameState, public Action
 public:
     SetupMatchState(GameWidgetFactory &gameWidgetFactory,
                     int difficulty,
-                    PuyoTwoNameProvider *nameProvider,
+                    PlayerNameProvider *nameProvider,
                     SharedMatchAssets &sharedMatchAssets);
     // GameState implementation
     virtual void enterState();
@@ -91,7 +90,7 @@ public:
 private:
     GameWidgetFactory &m_gameWidgetFactory;
     int m_difficulty;
-    PuyoTwoNameProvider *m_nameProvider;
+    PlayerNameProvider *m_nameProvider;
     SharedMatchAssets &m_sharedAssets;
     GameState *m_nextState;
 };
