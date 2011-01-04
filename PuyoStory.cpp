@@ -316,7 +316,7 @@ StoryScreen::StoryScreen(String screenName)
     add(&storyWidget);
 }
 
-void StoryScreen::transitionFromScreen(Screen &fromScreen)
+void StoryScreen::onTransitionFromScreen(Screen &fromScreen)
 {
     if (transitionWidget != NULL) {
         remove(transitionWidget);

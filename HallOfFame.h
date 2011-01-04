@@ -20,7 +20,6 @@ class PopToMainScreenAction : public Action
             : mainScreen(mainScreen), fromScreen(fromScreen)
         {}
         void action() {
-            mainScreen->transitionFromScreen(*fromScreen);
             GameUIDefaults::SCREEN_STACK->pop();
         }
         void setFromScreen(Screen *screen) {
@@ -39,7 +38,6 @@ class PushHallOfFameAction : public Action
             : storyScreen(storyScreen), fromScreen(fromScreen)
         {}
         void action() {
-            storyScreen->transitionFromScreen(*fromScreen);
             GameUIDefaults::SCREEN_STACK->push(storyScreen);
             storyScreen->refresh();
         }
@@ -57,7 +55,6 @@ class PushStoryScreenAction : public Action
         {}
         void action() {
             storyScreen->getStoryWidget()->reset();
-            storyScreen->transitionFromScreen(*fromScreen);
             GameUIDefaults::SCREEN_STACK->push(storyScreen);
         }
     private:

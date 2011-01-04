@@ -23,7 +23,48 @@
  *
  */
 
+#include "GTLog.h"
 #include "LocalGameStates.h"
+
+//---------------------------------
+// PushScreenState
+//---------------------------------
+class PushScreenState::GhostScreen : public gameui::Screen
+{
+public:
+    GhostScreen(GameLoop *loop = NULL)
+        : gameui::Screen(loop),
+          m_parentScreen(GameUIDefaults::SCREEN_STACK->top()) {}
+    void drawAnyway(DrawTarget *dt) {
+        m_parentScreen->addToGameLoop(m_parentScreen->getGameLoop());
+        m_parentScreen->show();
+        m_parentScreen->drawAnyway(dt);
+        m_parentScreen->hide();
+        m_parentScreen->removeFromGameLoopActive();
+    }
+    void draw(DrawTarget *dt) {
+        m_parentScreen->draw(dt);
+    }
+private:
+    gameui::Screen *m_parentScreen;
+};
+void PushScreenState::enterState()
+{
+    m_ghostScreen.reset(new GhostScreen());
+    GameUIDefaults::SCREEN_STACK->push(m_ghostScreen.get());
+}
+void PushScreenState::exitState()
+{
+    GameUIDefaults::GAME_LOOP->garbageCollect(m_ghostScreen.release());
+}
+bool PushScreenState::evaluate()
+{
+    return true;
+}
+GameState *PushScreenState::getNextState()
+{
+    return m_nextState;
+}
 
 //---------------------------------
 // SetupMatchState
@@ -42,7 +83,7 @@ SetupMatchState::SetupMatchState(GameWidgetFactory &gameWidgetFactory,
 
 void SetupMatchState::enterState()
 {
-    cout << "SetupMatchState::enterState()" << endl;
+    GTLogTrace("SetupMatchState::enterState()");
     // Prepare 1st run
     m_sharedAssets.m_currentLevelTheme = theCommander->getPreferedLevelTheme();
     m_sharedAssets.m_currentPuyoSetTheme = theCommander->getPreferedPuyoSetTheme();
@@ -67,17 +108,15 @@ void SetupMatchState::enterState()
     else if (victoriesDelta != 0) {
         newGameWidget->addGameBHandicap(-victoriesDelta);
     }
-    GameScreen *newGameScreen =
-        new GameScreen(*(newGameWidget), *(GameUIDefaults::SCREEN_STACK->top()));
+    GameScreen *newGameScreen = new GameScreen(*(newGameWidget));
     // Handle eventual game enchainment
     if (m_sharedAssets.m_gameScreen.get() != NULL) {
-        GameUIDefaults::SCREEN_STACK->pop();
         GameUIDefaults::GAME_LOOP->garbageCollect(m_sharedAssets.m_gameWidget.release());
         GameUIDefaults::GAME_LOOP->garbageCollect(m_sharedAssets.m_gameScreen.release());
     }
     m_sharedAssets.m_gameWidget.reset(newGameWidget);
     m_sharedAssets.m_gameScreen.reset(newGameScreen);
-    GameUIDefaults::SCREEN_STACK->push(m_sharedAssets.m_gameScreen.get());
+    GameUIDefaults::SCREEN_STACK->swap(m_sharedAssets.m_gameScreen.get());
     // Set the game initially paused
     m_sharedAssets.m_gameScreen->setSuspended(true);
 }
@@ -112,7 +151,7 @@ m_getReadyDisplayed(false), m_nextState(NULL)
 
 void EnterPlayerReadyState::enterState()
 {
-    cout << "EnterPlayerReadyState::enterState()" << endl;
+    GTLogTrace("EnterPlayerReadyState::enterState()");
     if (m_sharedAssets.m_currentLevelTheme->getReadyAnimation2P() == "") {
         return;
     }
@@ -173,7 +212,7 @@ m_nextState(NULL)
 
 void ExitPlayerReadyState::enterState()
 {
-    cout << "ExitPlayerReadyState::enterState()" << endl;
+    GTLogTrace("ExitPlayerReadyState::enterState()");
     if (m_sharedGetReadyAssets.m_getReadyWidget.get() == NULL)
         return;
     m_sharedGetReadyAssets.m_getReadyWidget->setIntegerValue("@start_pressed", 1);
@@ -201,7 +240,7 @@ WaitPlayersReadyState::WaitPlayersReadyState(SharedMatchAssets &sharedMatchAsset
 
 void WaitPlayersReadyState::enterState()
 {
-    cout << "WaitPlayersReadyState::enterState()" << endl;
+    GTLogTrace("WaitPlayersReadyState::enterState()");
     m_playersAreReady = false;
     if (m_sharedAssets.m_currentLevelTheme->getReadyAnimation2P() == "") {
         m_playersAreReady = true;
@@ -253,7 +292,7 @@ MatchPlayingState::MatchPlayingState(SharedMatchAssets &sharedMatchAssets)
 
 void MatchPlayingState::enterState()
 {
-    cout << "MatchPlaying::enterState()" << endl;
+    GTLogTrace("MatchPlaying::enterState()");
     m_gameIsOver = false;
     m_sharedAssets.m_gameWidget->setGameOverAction(this);
     // Resume the game
@@ -297,7 +336,7 @@ MatchIsOverState::MatchIsOverState(SharedMatchAssets &sharedMatchAssets)
 
 void MatchIsOverState::enterState()
 {
-    cout << "MatchIsOver::enterState()" << endl;
+    GTLogTrace("MatchIsOver::enterState()");
     m_aknowledged = false;
     if (m_sharedAssets.m_gameWidget->isGameARunning()) {
         m_gameLostWidget.reset(new StoryWidget(m_sharedAssets.m_currentLevelTheme->getGameLostRightAnimation2P().c_str(), this));
@@ -351,7 +390,7 @@ DisplayStatsState::DisplayStatsState(SharedMatchAssets &sharedMatchAssets)
 
 void DisplayStatsState::enterState()
 {
-    cout << "DisplayStats::enterState()" << endl;
+    GTLogTrace("DisplayStats::enterState()");
     m_aknowledged = false;
 
     m_sharedAssets.m_gameWidget->setGameOverAction(this);
@@ -394,18 +433,17 @@ DisplayStoryScreenState::DisplayStoryScreenState(const char *screenName)
 
 void DisplayStoryScreenState::enterState()
 {
-    cout << "DisplayStoryScreenState(" << m_screenName << ")::enterState()" << endl;
+    GTLogTrace("DisplayStoryScreenState(%s)::enterState()", m_screenName.c_str());
     m_storyScreen.reset(new StoryScreen(m_screenName.c_str(),
                                         *(GameUIDefaults::SCREEN_STACK->top()),
                                         this));
-    GameUIDefaults::SCREEN_STACK->push(m_storyScreen.get());
+    GameUIDefaults::SCREEN_STACK->swap(m_storyScreen.get());
     m_acknowledged = false;
 }
 
 void DisplayStoryScreenState::exitState()
 {
-    GameUIDefaults::SCREEN_STACK->pop();
-    m_storyScreen.reset(NULL);
+    GameUIDefaults::GAME_LOOP->garbageCollect(m_storyScreen.release());
 }
 
 bool DisplayStoryScreenState::evaluate()
@@ -437,11 +475,11 @@ LeaveGameState::LeaveGameState(SharedMatchAssets &sharedMatchAssets,
 
 void LeaveGameState::enterState()
 {
-    cout << "LeaveGame::enterState()" << endl;
+    GTLogTrace("LeaveGame::enterState()");
     GameUIDefaults::SCREEN_STACK->pop();
-    MainScreen *menuScreen = dynamic_cast<MainScreen *>(GameUIDefaults::SCREEN_STACK->top());
-    if (menuScreen != NULL)
-        menuScreen->transitionFromScreen(*(m_sharedAssets.m_gameScreen));
+    //MainScreen *menuScreen = dynamic_cast<MainScreen *>(GameUIDefaults::SCREEN_STACK->top());
+    //if (menuScreen != NULL)
+    //    menuScreen->transitionFromScreen(*(m_sharedAssets.m_gameScreen));
     m_sharedAssets.release();
     if (m_actionToCallWhenLeft != NULL)
         m_actionToCallWhenLeft->action(NULL, 0, NULL);
@@ -467,7 +505,7 @@ CallActionState::CallActionState(Action *actionToCall, int actionType)
 
 void CallActionState::enterState()
 {
-    cout << "CallAction::enterState()" << endl;
+    GTLogTrace("CallAction::enterState()");
     m_actionToCall->action(NULL, m_actionType, NULL);
 }
 

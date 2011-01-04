@@ -18,10 +18,9 @@ using namespace event_manager;
 #define MENU_X 235
 #define MENU_Y 225
 
-PuyoScreen::PuyoScreen() : Screen(0,0,WIDTH,HEIGHT) {}
-
 MainScreen::MainScreen(StoryWidget *fgStory, StoryWidget *bgStory)
-    : fgStory(fgStory), bgStory(bgStory), transition(NULL), nextFullScreen(false)
+    : Screen(0,0,WIDTH,HEIGHT), fgStory(fgStory), bgStory(bgStory),
+      transition(NULL), nextFullScreen(false)
 {
     if (bgStory != NULL)
         add(bgStory);
@@ -62,7 +61,7 @@ void MainScreen::popMenu()
     menuStack.pop();
 }
 
-void MainScreen::transitionFromScreen(Screen &fromScreen)
+void MainScreen::onTransitionFromScreen(Screen &fromScreen)
 {
     if (transition != NULL) {
         remove(transition);
@@ -75,7 +74,7 @@ void MainScreen::transitionFromScreen(Screen &fromScreen)
 
 void MainScreen::onEvent(GameControlEvent *cevent)
 {
-    PuyoScreen::onEvent(cevent);
+    gameui::Screen::onEvent(cevent);
 	if (cevent->caught != false)
 		return;
     if (cevent->isUp)

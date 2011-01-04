@@ -1164,7 +1164,7 @@ namespace gameui {
     Screen::Screen(GameLoop *loop)
         : DrawableComponent(),
         IdleComponent(),
-        rootContainer(this, loop), autoReleaseFlag(false)
+        rootContainer(this, loop)
     {
         GameLoop *curLoop = loop;
         if (loop == NULL)
@@ -1177,7 +1177,7 @@ namespace gameui {
     Screen::Screen(float x, float y, float width, float height, GameLoop *loop)
         : DrawableComponent(),
         IdleComponent(),
-        rootContainer(this, loop), autoReleaseFlag(false)
+        rootContainer(this, loop)
     {
         initWithDimensions(x, y, width, height);
     }
@@ -1237,12 +1237,6 @@ namespace gameui {
     void Screen::focus(Widget *w)
     {
         rootContainer.focus(w);
-    }
-
-    void Screen::autoRelease()
-    {
-        if (autoReleaseFlag)
-            GameUIDefaults::GAME_LOOP->garbageCollect(this);
     }
 
     void Screen::grabEventsOnWidget(Widget *widget)
@@ -1978,28 +1972,44 @@ namespace gameui {
         this->loop = loop;
     }
 
-    void ScreenStack::push(Screen *screen) {
+    void ScreenStack::push(Screen *screen)
+    {
         checkLoop();
         if (stack.size() > 0) {
-            stack.top()->hide();
+            screen->onTransitionFromScreen(*(stack.top()));
             stack.top()->removeFromGameLoopActive();
+            stack.top()->hide();
         }
         screen->show();
         screen->giveFocus();
         screen->addToGameLoop(screen->getGameLoop());
         stack.push(screen);
-        loop->addDrawable(screen);
-        loop->addIdle(screen);
     }
 
-    void ScreenStack::pop() {
+    void ScreenStack::pop()
+    {
         Screen *topScreen = stack.top();
         topScreen->removeFromGameLoopActive();
-        topScreen->hide();
         stack.pop();
         stack.top()->show();
         stack.top()->addToGameLoop(stack.top()->getGameLoop());
-        topScreen->autoRelease();
+        stack.top()->onTransitionFromScreen(*topScreen);
+        topScreen->hide();
+    }
+
+    void ScreenStack::swap(Screen *screen)
+    {
+        checkLoop();
+        if (stack.size() > 0) {
+            screen->onTransitionFromScreen(*(stack.top()));
+            stack.top()->removeFromGameLoopActive();
+            stack.top()->hide();
+        }
+        screen->show();
+        screen->giveFocus();
+        screen->addToGameLoop(screen->getGameLoop());
+        stack.pop();
+        stack.push(screen);
     }
 
     //

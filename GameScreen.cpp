@@ -28,11 +28,10 @@
 using namespace ios_fc;
 using namespace event_manager;
 
-GameScreen::GameScreen(GameWidget &gameWidget, Screen &previousScreen)
+GameScreen::GameScreen(GameWidget &gameWidget)
     : Screen(), paused(false),
       pauseMenu(this),
       gameWidget(gameWidget),
-      transitionWidget(theCommander->createScreenTransition(previousScreen)),
       overlayStory(NULL)
 {
 #ifdef DEBUG_GAMELOOP
@@ -50,7 +49,6 @@ GameScreen::GameScreen(GameWidget &gameWidget, Screen &previousScreen)
         add((*activeFX)[i]);
         (*activeFX)[i]->setGameScreen(this);
     }
-    add(transitionWidget.get());
     gameWidget.setAssociatedScreen(this);
 }
 
@@ -87,6 +85,12 @@ void GameScreen::onEvent(GameControlEvent *cevent)
 
     if (!pressedFromGameWidget)
         Screen::onEvent(cevent);
+}
+
+void GameScreen::onTransitionFromScreen(Screen &fromScreen)
+{
+    transitionWidget.reset(theCommander->createScreenTransition(fromScreen));
+    add(transitionWidget.get());
 }
 
 bool GameScreen::startPressed()

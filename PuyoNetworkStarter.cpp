@@ -375,6 +375,7 @@ NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory &gameWidgetFa
                                                  Action *endOfSessionAction)
 {
     // Creating the different game states
+    m_pushGameScreen.reset(new PushScreenState());
     m_setupMatch.reset(new SetupMatchState(gameWidgetFactory, gameSpeed, nameProvider, m_sharedAssets));
     m_enterPlayersReady.reset(new EnterPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_synchroGetReady.reset(new NetSynchronizeState(mbox, 1));
@@ -389,6 +390,7 @@ NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory &gameWidgetFa
     m_leaveGame.reset(new LeaveGameState(m_sharedAssets, endOfSessionAction));
 
     // Linking the states together
+    m_pushGameScreen->setNextState(m_setupMatch.get());
     m_setupMatch->setNextState(m_enterPlayersReady.get());
     m_enterPlayersReady->setNextState(m_synchroGetReady.get());
     m_synchroGetReady->setNextState(m_exitPlayersReady.get());
@@ -406,6 +408,6 @@ NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory &gameWidgetFa
     m_networkErrorScreen->setNextState(m_leaveGame.get());
 
     // Initializing the state machine
-    setInitialState(m_setupMatch.get());
+    setInitialState(m_pushGameScreen.get());
 }
 

@@ -1,31 +1,38 @@
 #ifndef _GTLOG_T_
 #define _GTLOG_T_
 
+// From GC common/util.h
+#ifdef __GNUC__
+# define HAVE_PRINTF_ATTR 1
+# define PRINTF(FMT,X) __attribute__ (( __format__ ( __printf__, FMT, X)))
+# define   likely(x)  __builtin_expect((x),1)
+# define unlikely(x)  __builtin_expect((x),0)
+#else
+# define HAVE_PRINTF_ATTR 0
+# define PRINTF(FMT,X)
+# define   likely(x)  (x)
+# define unlikely(x)  (x)
+#endif
+
 #define GTLOG_ENABLETRACES 1
 
 #ifdef GTLOG_ENABLETRACES
 
-#define GTLogTrace(txt) { \
-    char *GTLogTraceArray; \
-    GTLogTraceArray = (char*)malloc(strlen(txt) + strlen(__FUNCTION__) + 4); \
-    sprintf(GTLogTraceArray, "%s: %s", __FUNCTION__, txt); \
-    Logger::instance.logln(txt); \
-    free(GTLogTraceArray); \
-}
+#define GTLogTrace(__fmt, ...) do { \
+    char GTLogTraceArray[512]; \
+    snprintf(GTLogTraceArray, 512, "%s:" __fmt, __FUNCTION__, ## __VA_ARGS__); \
+    Logger::instance.logln(GTLogTraceArray); \
+} while(0)
 
 #else
 
-#define GTLogTrace(txt) { }
+#define GTLogTrace(__fmt, ...) { }
 
 #endif
 
 #define GTCheckInterval(value, min, max, errorMessage) { \
     if (value < min || value > max) { \
-        char *GTCheckIntervalArray; \
-        GTCheckIntervalArray = (char*)malloc(strlen(errorMessage) + 128); \
-        sprintf(GTCheckIntervalArray, "%s: %d", errorMessage, (int)value); \
-        GTLogTrace(GTCheckIntervalArray); \
-        free(GTCheckIntervalArray); \
+        GTLogTrace("%s: %d", errorMessage, (int)value); \
 }}
 
 class LoggerImpl {

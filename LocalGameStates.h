@@ -69,6 +69,35 @@ struct SharedMatchAssets
     }
 };
 
+/**
+ * Short: Always call this as the first state of a game.
+ * Pushes a dummy screen on the screen stack.
+ * All further states that manipulate the screen stack
+ * will normally swap with the topmost screen, so we need
+ * to put a dummy screen at the top before the first swap
+ * (otherwise the menu screen would be swapped)
+ */
+class PushScreenState : public GameState
+{
+public:
+    // GameState implementation
+    virtual void enterState();
+    virtual void exitState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // Own methods
+    void setNextState(GameState *nextState) {
+        m_nextState = nextState;
+    }
+private:
+    class GhostScreen;
+    std::auto_ptr<GhostScreen> m_ghostScreen;
+    GameState *m_nextState;
+};
+
+/**
+ * Setups the match screen, ready for a new game
+ */
 class SetupMatchState : public GameState, public Action
 {
 public:
@@ -285,6 +314,7 @@ private:
 
 /**
  * Leave the game and rewind to the previous screen
+ * TODO: make this state deprecated
  */
 class LeaveGameState : public GameState
 {

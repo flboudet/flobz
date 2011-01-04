@@ -308,6 +308,7 @@ struct SharedGameAssets
 {
     std::string playerName;
     int difficulty;
+    int lifes;
     PuyoLevelDefinitions::LevelDefinition *levelDef;
 };
 
@@ -375,6 +376,9 @@ public:
     void setHumiliatedState(GameState *humiliatedState) {
         m_humiliatedState = humiliatedState;
     }
+    SharedMatchAssets *getMatchAssets() {
+        return &m_sharedAssets;
+    }
 private:
     enum {
         LEAVE_MATCH,
@@ -399,6 +403,29 @@ private:
     std::auto_ptr<CallActionState>       m_leaveMatch;
 };
 
+/**
+ * Performs the logic between a won match and the next match
+ */
+class StoryModePrepareNextMatchState : public GameState, public Action
+{
+public:
+    StoryModePrepareNextMatchState(SharedGameAssets *sharedGameAssets);
+    // GameState implementation
+    virtual void enterState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // Own methods
+    void setNextState(GameState *nextState) {
+        m_nextState = nextState;
+    }
+    void reset();
+private:
+    SharedGameAssets *m_sharedGameAssets;
+    int m_currentLevel;
+    std::auto_ptr<PuyoLevelDefinitions> m_levelDefProvider;
+    GameState *m_nextState;
+};
+
 //class SinglePlayerMatchStateMachine : public GameStateMachine
 class AltSinglePlayerStarterAction : public Action {
 public:
@@ -415,6 +442,8 @@ private:
     std::auto_ptr<AltTweakedGameWidgetFactory> m_gameWidgetFactory;
     SharedGameAssets     m_sharedGameAssets;
 
+    std::auto_ptr<PushScreenState> m_pushGameScreen;
+    std::auto_ptr<StoryModePrepareNextMatchState> m_prepareNextMatch;
     std::auto_ptr<SinglePlayerMatchState> m_playMatch;
     std::auto_ptr<LeaveGameState>         m_leaveGame;
 };

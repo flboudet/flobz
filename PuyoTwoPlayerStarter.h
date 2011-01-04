@@ -65,6 +65,7 @@ private:
     GameStateMachine m_stateMachine;
     SharedMatchAssets m_sharedAssets;
     SharedGetReadyAssets        m_sharedGetReadyAssets;
+    std::auto_ptr<PushScreenState>       m_pushGameScreen;
     std::auto_ptr<SetupMatchState>       m_setupMatch;
     std::auto_ptr<EnterPlayerReadyState> m_enterPlayersReady;
     std::auto_ptr<ExitPlayerReadyState>  m_exitPlayersReady;

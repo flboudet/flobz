@@ -468,8 +468,6 @@ void SinglePlayerStarterAction::performHiScoreScreen(String gameOverStoryName)
 		     *(GameUIDefaults::SCREEN_STACK->top()),
                      this, m_spFactory->getPlayerName(),
                      m_playerStat);
-  Screen *screenToTrans = GameUIDefaults::SCREEN_STACK->top();
-  m_hiScoreScreen->transitionFromScreen(*screenToTrans);
   m_hiScoreScreen->refresh();
   GameUIDefaults::SCREEN_STACK->pop();
   GameUIDefaults::SCREEN_STACK->push(m_hiScoreScreen);
@@ -486,9 +484,6 @@ void SinglePlayerStarterAction::performHiScoreScreen(String gameOverStoryName)
 void SinglePlayerStarterAction::performBackToMenu()
 {
   // Rewind screen stack
-  Screen *screenToTrans = GameUIDefaults::SCREEN_STACK->top();
-  if (m_mainScreen != NULL)
-    m_mainScreen->transitionFromScreen(*screenToTrans);
   GameUIDefaults::SCREEN_STACK->pop();
   delete m_hiScoreScreen;
   // Restore initial values to the reused action
@@ -597,7 +592,7 @@ void SinglePlayerMatch::performMatchPrepare()
          m_levelData->getIALevel(), m_levelData->getNColors(), m_remainingLifes,
          m_levelData->getIAFace(), this);
   m_gameWidget->setGameOptions(m_levelData->getGameOptions());
-  m_gameScreen = new GameScreen(*m_gameWidget, *m_opponentStory);
+  m_gameScreen = new GameScreen(*m_gameWidget);
   m_gameWidget->setPlayerOneName(m_spFactory->getPlayerName());
   m_gameWidget->setPlayerTwoName(m_levelData->getIAName());
   m_gameWidget->getStatPlayerOne().total_points = m_playerStat.total_points;
@@ -853,7 +848,9 @@ GameWidget *SinglePlayerMatchState::createGameWidget(PuyoSetTheme &puyoThemeSet,
                                          Action *gameOverAction)
 {
     return new SinglePlayerStandardLayoutGameWidget(puyoThemeSet, levelTheme,
-                                                    m_sharedGameAssets->difficulty, m_sharedGameAssets->levelDef->easySettings.nColors, 3,
+                                                    m_sharedGameAssets->difficulty,
+                                                    m_sharedGameAssets->levelDef->easySettings.nColors,
+                                                    m_sharedGameAssets->lifes,
                                                     m_sharedGameAssets->levelDef->opponent, gameOverAction);
 }
 
@@ -863,39 +860,80 @@ void SinglePlayerMatchState::action(Widget *sender, int actionType,
     switch (actionType) {
     case LEAVE_MATCH:
       //m_playerStat.total_points += m_gameWidget->getStatPlayerOne().points;
-        if (m_sharedAssets.m_gameWidget->isGameARunning())
+        if (m_sharedAssets.m_gameWidget->isGameARunning()) {
             m_nextState = m_victoriousState;
-	else
+        }
+        else {
             m_nextState = m_humiliatedState;
+            m_sharedGameAssets->lifes--;
+        }
         break;
     case ABORT_GAME:
     default:
         m_nextState = m_abortedState;
         break;
     }
+    evaluateStateMachine();
 }
+
+//---------------------------------
+// StoryModePrepareNextMatchState
+//---------------------------------
+StoryModePrepareNextMatchState::StoryModePrepareNextMatchState(SharedGameAssets *sharedGameAssets)
+    : m_sharedGameAssets(sharedGameAssets)
+{
+    m_levelDefProvider.reset(new PuyoLevelDefinitions(theCommander->getDataPathManager().getPath("/story/levels.gsl")));
+    reset();
+}
+
+void StoryModePrepareNextMatchState::enterState()
+{
+    m_sharedGameAssets->levelDef = m_levelDefProvider->getLevelDefinition(++m_currentLevel);
+}
+
+bool StoryModePrepareNextMatchState::evaluate()
+{
+    return true;
+}
+
+GameState *StoryModePrepareNextMatchState::getNextState()
+{
+    return m_nextState;
+}
+
+void StoryModePrepareNextMatchState::reset()
+{
+    m_currentLevel = -1;
+}
+
+
 
 AltSinglePlayerStarterAction::AltSinglePlayerStarterAction(MainScreen *mainScreen, int difficulty,
                                                              SinglePlayerFactory *spFactory)
 {
-    m_levelDefinitions.reset(new PuyoLevelDefinitions(theCommander->getDataPathManager().getPath("/story/levels.gsl")));
-    PuyoLevelDefinitions::LevelDefinition *levelDef = m_levelDefinitions->getLevelDefinition(0);
-    m_gameWidgetFactory.reset(new AltTweakedGameWidgetFactory(levelDef));
-    // Initializeing the shared game assets with random data
+    // Initializing the shared game assets with random data
     m_sharedGameAssets.difficulty = 1;//difficulty;
-    m_sharedGameAssets.levelDef = levelDef;
     // Creating the different game states
+    m_pushGameScreen.reset(new PushScreenState());
+    m_prepareNextMatch.reset(new StoryModePrepareNextMatchState(&m_sharedGameAssets));
     m_playMatch.reset(new SinglePlayerMatchState(&m_sharedGameAssets));
-    //m_leaveGame.reset(new LeaveGameState(m_sharedAssets));
+    m_leaveGame.reset(new LeaveGameState(*(m_playMatch->getMatchAssets())));
     // Linking the states together
+    m_pushGameScreen->setNextState(m_prepareNextMatch.get());
+    m_prepareNextMatch->setNextState(m_playMatch.get());
+    m_playMatch->setVictoriousState(m_prepareNextMatch.get());
+    m_playMatch->setHumiliatedState(m_playMatch.get());
+    m_playMatch->setAbortedState(m_leaveGame.get());
     // Initializing the state machine
-    m_stateMachine.setInitialState(m_playMatch.get());
+    m_stateMachine.setInitialState(m_pushGameScreen.get());
 }
 
 void AltSinglePlayerStarterAction::action(Widget *sender, int actionType,
                                         event_manager::GameControlEvent *event)
 {
     m_sharedGameAssets.playerName = "Bob l'eponge";
+    m_sharedGameAssets.lifes = 3;
+    m_prepareNextMatch->reset();
     m_stateMachine.reset();
     m_stateMachine.evaluate();
 }

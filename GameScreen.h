@@ -32,9 +32,12 @@
 
 class GameScreen : public Screen, public Action {
 public:
-    GameScreen(GameWidget &gameWidget, Screen &previousScreen);
+    GameScreen(GameWidget &gameWidget);
     ~GameScreen();
-    void onEvent(event_manager::GameControlEvent *cevent);
+    // Screen implementation
+    virtual void onEvent(event_manager::GameControlEvent *cevent);
+    virtual void onTransitionFromScreen(Screen &fromScreen);
+    // Own methods
     virtual bool backPressed();
     virtual bool startPressed();
     virtual void abort();

@@ -14,24 +14,19 @@
 #include "Frame.h"
 #include "PuyoStory.h"
 
-class PuyoScreen : public gameui::Screen {
-  public:
-    PuyoScreen();
-    virtual ~PuyoScreen() {}
-    virtual void build() = 0;
-};
-
 class MainScreenMenu;
 
-class MainScreen : public PuyoScreen, public gameui::SliderContainerListener {
+class MainScreen : public gameui::Screen, public gameui::SliderContainerListener {
   public:
     MainScreen(StoryWidget *fgStory = NULL, StoryWidget *bgStory = NULL);
     ~MainScreen();
+    // Screen implementation
+    virtual void onEvent(event_manager::GameControlEvent *cevent);
+    virtual void onTransitionFromScreen(Screen &fromScreen);
+    // Own methods
     void pushMenu(MainScreenMenu *menu, bool fullScreen = false);
     void popMenu();
     void build() {}
-    void transitionFromScreen(Screen &fromScreen);
-    void onEvent(event_manager::GameControlEvent *cevent);
     // SliderContainerListener implementation
     /**
      * Notify that the slider is outside of the screen, before sliding back inside

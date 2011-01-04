@@ -474,7 +474,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
 
       // screen callbacks
       virtual void onScreenVisibleChanged(bool visible);
-
+      virtual void onTransitionFromScreen(Screen &fromScreen) {}
     private:
       void initWithDimensions(float x, float y, float width, float height);
       // The root container of the screen
@@ -674,6 +674,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
 
       void push(Screen *screen);
       void pop();
+      void swap(Screen *screen);
       Screen * top() const {return stack.top();}
 
     private:

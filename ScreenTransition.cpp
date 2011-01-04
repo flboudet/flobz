@@ -53,6 +53,10 @@ void DoomMeltScreenTransitionWidget::cycle()
         doom_melt_update(melt);
         requestDraw();
     }
+    else {
+        releaseFromSurface();
+        parentLoop->removeIdle(this);
+    }
 }
 
 void DoomMeltScreenTransitionWidget::draw(DrawTarget *dt)

@@ -159,18 +159,18 @@ public:
 private:
     SharedMatchAssets           m_sharedAssets;
     SharedGetReadyAssets        m_sharedGetReadyAssets;
-    auto_ptr<SetupMatchState>         m_setupMatch;
-    auto_ptr<EnterPlayerReadyState>   m_enterPlayersReady;
-    auto_ptr<NetSynchronizeState>     m_synchroGetReady;
-    auto_ptr<ExitPlayerReadyState>    m_exitPlayersReady;
-    //auto_ptr<WaitPlayersReadyState> m_waitPlayersReady;
-    auto_ptr<NetSynchronizeState>     m_synchroBeforeStart;
-    auto_ptr<NetMatchPlayingState>       m_matchPlaying;
-    auto_ptr<MatchIsOverState>        m_matchIsOver;
-    auto_ptr<DisplayStatsState>       m_displayStats;
-    auto_ptr<NetSynchronizeState>     m_synchroAfterStats;
-    auto_ptr<DisplayStoryScreenState> m_networkErrorScreen;
-    auto_ptr<LeaveGameState>          m_leaveGame;
+    std::auto_ptr<PushScreenState>         m_pushGameScreen;
+    std::auto_ptr<SetupMatchState>         m_setupMatch;
+    std::auto_ptr<EnterPlayerReadyState>   m_enterPlayersReady;
+    std::auto_ptr<NetSynchronizeState>     m_synchroGetReady;
+    std::auto_ptr<ExitPlayerReadyState>    m_exitPlayersReady;
+    std::auto_ptr<NetSynchronizeState>     m_synchroBeforeStart;
+    std::auto_ptr<NetMatchPlayingState>    m_matchPlaying;
+    std::auto_ptr<MatchIsOverState>        m_matchIsOver;
+    std::auto_ptr<DisplayStatsState>       m_displayStats;
+    std::auto_ptr<NetSynchronizeState>     m_synchroAfterStats;
+    std::auto_ptr<DisplayStoryScreenState> m_networkErrorScreen;
+    std::auto_ptr<LeaveGameState>          m_leaveGame;
 };
 
 #endif // _PUYONETWORKSTARTER

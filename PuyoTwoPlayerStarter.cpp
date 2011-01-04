@@ -62,6 +62,7 @@ void TwoPlayersGameWidget::cycle()
 AltTwoPlayersStarterAction::AltTwoPlayersStarterAction(int difficulty, GameWidgetFactory &gameWidgetFactory, PlayerNameProvider *nameProvider)
 {
     // Creating the different game states
+    m_pushGameScreen.reset(new PushScreenState());
     m_setupMatch.reset(new SetupMatchState(gameWidgetFactory, difficulty, nameProvider, m_sharedAssets));
     m_enterPlayersReady.reset(new EnterPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
@@ -70,6 +71,7 @@ AltTwoPlayersStarterAction::AltTwoPlayersStarterAction(int difficulty, GameWidge
     m_displayStats.reset(new DisplayStatsState(m_sharedAssets));
     m_leaveGame.reset(new LeaveGameState(m_sharedAssets));
     // Linking the states together
+    m_pushGameScreen->setNextState(m_setupMatch.get());
     m_setupMatch->setNextState(m_enterPlayersReady.get());
     m_enterPlayersReady->setNextState(m_exitPlayersReady.get());
     m_exitPlayersReady->setNextState(m_matchPlaying.get());
@@ -78,7 +80,7 @@ AltTwoPlayersStarterAction::AltTwoPlayersStarterAction(int difficulty, GameWidge
     m_matchIsOver->setNextState(m_displayStats.get());
     m_displayStats->setNextState(m_setupMatch.get());
     // Initializing the state machine
-    m_stateMachine.setInitialState(m_setupMatch.get());
+    m_stateMachine.setInitialState(m_pushGameScreen.get());
 }
 
 void AltTwoPlayersStarterAction::action(Widget *sender, int actionType,
