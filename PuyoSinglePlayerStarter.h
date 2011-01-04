@@ -415,14 +415,18 @@ public:
     virtual bool evaluate();
     virtual GameState *getNextState();
     // Own methods
-    void setNextState(GameState *nextState) {
-        m_nextState = nextState;
+    void setNextMatchState(GameState *nextMatchState) {
+        m_nextMatchState = nextMatchState;
+    }
+    void setGameWonState(GameState *gameWonState) {
+        m_gameWonState = gameWonState;
     }
     void reset();
 private:
     SharedGameAssets *m_sharedGameAssets;
     int m_currentLevel;
     std::auto_ptr<PuyoLevelDefinitions> m_levelDefProvider;
+    GameState *m_nextMatchState, *m_gameWonState;
     GameState *m_nextState;
 };
 
@@ -444,8 +448,9 @@ private:
 
     std::auto_ptr<PushScreenState> m_pushGameScreen;
     std::auto_ptr<StoryModePrepareNextMatchState> m_prepareNextMatch;
-    std::auto_ptr<SinglePlayerMatchState> m_playMatch;
-    std::auto_ptr<LeaveGameState>         m_leaveGame;
+    std::auto_ptr<SinglePlayerMatchState>  m_playMatch;
+    std::auto_ptr<DisplayStoryScreenState> m_gameWon;
+    std::auto_ptr<LeaveGameState>          m_leaveGame;
 };
 
 #endif // _PUYOSINGLEPLAYERSTARTER

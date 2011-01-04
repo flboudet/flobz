@@ -97,8 +97,7 @@ private:
 
 class StoryScreen : public Screen {
 public:
-    StoryScreen(String screenName, Screen &previousScreen, Action *finishedAction = NULL, bool shouldAddTransition = true);
-    StoryScreen(String screenName);
+    StoryScreen(String screenName, Action *finishedAction = NULL, bool shouldAddTransition = true);
     virtual ~StoryScreen();
     // Screen implementation
     virtual void onEvent(event_manager::GameControlEvent *cevent);

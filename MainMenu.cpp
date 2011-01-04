@@ -18,7 +18,7 @@ optionMenu        (mainScreen),
 popFromHallScreenAction(mainScreen, &hallOfFameScreen),
 popFromCreditsAction(mainScreen, &creditsScreen),
 hallOfFameScreen(*mainScreen, &popFromHallScreenAction),
-creditsScreen("credits.gsl", *mainScreen, &popFromCreditsAction, false),
+creditsScreen("credits.gsl", &popFromCreditsAction, false),
 // Create action for buttons
 singlePlayerGameAction(&localGameMenu, mainScreen),
 twoPlayersGameAction(&local2PlayersGameMenu, mainScreen),

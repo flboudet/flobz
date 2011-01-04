@@ -293,7 +293,7 @@ GameOptions PuyoSingleGameLevelData::getGameOptions() const
 
 PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousScreen,
         Action *finishedAction, String playerName, const PlayerGameStat &playerPoints, bool initialTransition)
-        : StoryScreen(screenName, previousScreen, finishedAction, initialTransition),
+        : StoryScreen(screenName, finishedAction, initialTransition),
         playerName(playerName), playerStat(playerPoints)
 {
     static const char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
@@ -452,7 +452,7 @@ void SinglePlayerStarterAction::performEndOfMatch()
 void SinglePlayerStarterAction::performGameWon()
 {
     m_state = kGameWon;
-    m_gameWonScreen = new StoryScreen("gamewon_1p.gsl", *(GameUIDefaults::SCREEN_STACK->top()), this);
+    m_gameWonScreen = new StoryScreen("gamewon_1p.gsl", this);
     GameUIDefaults::SCREEN_STACK->pop();
     GameUIDefaults::SCREEN_STACK->push(m_gameWonScreen);
     if (m_currentMatch != NULL) {
@@ -559,8 +559,7 @@ void SinglePlayerMatch::action(Widget *sender, int actionType,
 
 void SinglePlayerMatch::performStoryIntroduction()
 {
-  m_introStory = new StoryScreen(m_levelData->getIntroStory(),
-			*(GameUIDefaults::SCREEN_STACK->top()), this);
+  m_introStory = new StoryScreen(m_levelData->getIntroStory(), this);
   if (m_popScreen)
     GameUIDefaults::SCREEN_STACK->pop();
   GameUIDefaults::SCREEN_STACK->push(m_introStory);
@@ -569,8 +568,7 @@ void SinglePlayerMatch::performStoryIntroduction()
 
 void SinglePlayerMatch::performOpponentStory()
 {
-  m_opponentStory = new StoryScreen(m_levelData->getStory(),
-                         *(GameUIDefaults::SCREEN_STACK->top()), this);
+  m_opponentStory = new StoryScreen(m_levelData->getStory(), this);
   // If we went from an introduction story, remove it from display
   if (m_introStory != NULL)
     GameUIDefaults::SCREEN_STACK->pop();
@@ -888,7 +886,14 @@ StoryModePrepareNextMatchState::StoryModePrepareNextMatchState(SharedGameAssets 
 
 void StoryModePrepareNextMatchState::enterState()
 {
-    m_sharedGameAssets->levelDef = m_levelDefProvider->getLevelDefinition(++m_currentLevel);
+    ++m_currentLevel;
+    if (m_levelDefProvider->getNumLevels() > m_currentLevel) {
+        m_sharedGameAssets->levelDef = m_levelDefProvider->getLevelDefinition(m_currentLevel);
+        m_nextState = m_nextMatchState;
+    }
+    else { // The game is won, there is no more levels
+        m_nextState = m_gameWonState;
+    }
 }
 
 bool StoryModePrepareNextMatchState::evaluate()
@@ -917,13 +922,16 @@ AltSinglePlayerStarterAction::AltSinglePlayerStarterAction(MainScreen *mainScree
     m_pushGameScreen.reset(new PushScreenState());
     m_prepareNextMatch.reset(new StoryModePrepareNextMatchState(&m_sharedGameAssets));
     m_playMatch.reset(new SinglePlayerMatchState(&m_sharedGameAssets));
+    m_gameWon.reset(new DisplayStoryScreenState("gamewon_1p.gsl"));
     m_leaveGame.reset(new LeaveGameState(*(m_playMatch->getMatchAssets())));
     // Linking the states together
     m_pushGameScreen->setNextState(m_prepareNextMatch.get());
-    m_prepareNextMatch->setNextState(m_playMatch.get());
+    m_prepareNextMatch->setNextMatchState(m_playMatch.get());
+    m_prepareNextMatch->setGameWonState(m_gameWon.get());
     m_playMatch->setVictoriousState(m_prepareNextMatch.get());
     m_playMatch->setHumiliatedState(m_playMatch.get());
     m_playMatch->setAbortedState(m_leaveGame.get());
+    m_gameWon->setNextState(m_leaveGame.get());
     // Initializing the state machine
     m_stateMachine.setInitialState(m_pushGameScreen.get());
 }

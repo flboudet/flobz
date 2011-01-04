@@ -298,20 +298,9 @@ void StoryWidget::freeMemory()
 }
 
 
-StoryScreen::StoryScreen(String screenName, Screen &previousScreen, Action *finishedAction, bool shouldAddTransition)
+StoryScreen::StoryScreen(String screenName, Action *finishedAction, bool shouldAddTransition)
     : Screen(), storyWidget(screenName, finishedAction),
       transitionWidget(NULL), finishedAction(finishedAction)
-{
-    add(&storyWidget);
-    if (shouldAddTransition) {
-        transitionWidget = theCommander->createScreenTransition(previousScreen);
-        add(transitionWidget);
-    }
-}
-
-StoryScreen::StoryScreen(String screenName)
-    : Screen(), storyWidget(screenName, NULL),
-      transitionWidget(NULL), finishedAction(NULL)
 {
     add(&storyWidget);
 }

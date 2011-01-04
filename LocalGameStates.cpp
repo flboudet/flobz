@@ -435,7 +435,6 @@ void DisplayStoryScreenState::enterState()
 {
     GTLogTrace("DisplayStoryScreenState(%s)::enterState()", m_screenName.c_str());
     m_storyScreen.reset(new StoryScreen(m_screenName.c_str(),
-                                        *(GameUIDefaults::SCREEN_STACK->top()),
                                         this));
     GameUIDefaults::SCREEN_STACK->swap(m_storyScreen.get());
     m_acknowledged = false;
