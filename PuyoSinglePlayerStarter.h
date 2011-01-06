@@ -161,7 +161,7 @@ private:
 
 class PuyoGameOver1PScreen : public StoryScreen {
 public:
-    PuyoGameOver1PScreen(String screenName, Screen &previousScreen, Action *finishedAction,
+    PuyoGameOver1PScreen(String screenName, Action *finishedAction,
             String playerName, const PlayerGameStat &playerPoints, bool initialTransition=false);
     void refresh();
     virtual ~PuyoGameOver1PScreen();
@@ -341,6 +341,36 @@ private:
 };
 
 /**
+ * Show the story mode Hall of Fame
+ */
+class StoryModeDisplayHallOfFameState : public GameState, public Action
+{
+public:
+    StoryModeDisplayHallOfFameState(SharedGameAssets *sharedGameAssets,
+                                    SharedMatchAssets *sharedMatchAssets,
+                                    const char *storyName="");
+    // GameState implementation
+    virtual void enterState();
+    virtual void exitState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // Own methods
+    void setNextState(GameState *nextState) {
+        m_nextState = nextState;
+    }
+    // Action implementation
+    virtual void action(Widget *sender, int actionType,
+                        event_manager::GameControlEvent *event);
+private:
+    SharedGameAssets  *m_sharedGameAssets;
+    SharedMatchAssets *m_sharedMatchAssets;
+    std::string m_storyName;
+    GameState *m_nextState;
+    std::auto_ptr<PuyoGameOver1PScreen> m_gameOverScreen;
+    bool m_acknowledged;
+};
+
+/**
  * Sub-state machine implementing the behaviour of a single match
  * against a computer opponent in single-player mode
  */
@@ -376,6 +406,9 @@ public:
     void setHumiliatedState(GameState *humiliatedState) {
         m_humiliatedState = humiliatedState;
     }
+    void setGameLostState(GameState *gameLostState) {
+        m_gameLostState = gameLostState;
+    }
     SharedMatchAssets *getMatchAssets() {
         return &m_sharedAssets;
     }
@@ -389,7 +422,8 @@ private:
     SharedMatchAssets m_sharedAssets;
     SharedGetReadyAssets m_sharedGetReadyAssets;
     GameState *m_nextState;
-    GameState *m_abortedState, *m_victoriousState, *m_humiliatedState;
+    GameState *m_abortedState, *m_victoriousState;
+    GameState *m_gameLostState, *m_humiliatedState;
 
     std::auto_ptr<DisplayStoryScreenState> m_introStoryScreen;
     std::auto_ptr<DisplayStoryScreenState> m_opponentStoryScreen;
@@ -406,7 +440,7 @@ private:
 /**
  * Performs the logic between a won match and the next match
  */
-class StoryModePrepareNextMatchState : public GameState, public Action
+class StoryModePrepareNextMatchState : public GameState
 {
 public:
     StoryModePrepareNextMatchState(SharedGameAssets *sharedGameAssets);
@@ -430,6 +464,8 @@ private:
     GameState *m_nextState;
 };
 
+
+
 //class SinglePlayerMatchStateMachine : public GameStateMachine
 class AltSinglePlayerStarterAction : public Action {
 public:
@@ -450,6 +486,8 @@ private:
     std::auto_ptr<StoryModePrepareNextMatchState> m_prepareNextMatch;
     std::auto_ptr<SinglePlayerMatchState>  m_playMatch;
     std::auto_ptr<DisplayStoryScreenState> m_gameWon;
+    std::auto_ptr<StoryModeDisplayHallOfFameState> m_gameLostHoF;
+    std::auto_ptr<StoryModeDisplayHallOfFameState> m_gameWonHoF;
     std::auto_ptr<LeaveGameState>          m_leaveGame;
 };
 

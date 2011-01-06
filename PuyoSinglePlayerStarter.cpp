@@ -23,6 +23,7 @@
  *
  */
 
+#include "GTLog.h"
 #include "PuyoSinglePlayerStarter.h"
 #include "PuyoView.h"
 #include "preferences.h"
@@ -291,7 +292,7 @@ GameOptions PuyoSingleGameLevelData::getGameOptions() const
   return GameOptions::FromLevel(difficulty);
 }
 
-PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName, Screen &previousScreen,
+PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName,
         Action *finishedAction, String playerName, const PlayerGameStat &playerPoints, bool initialTransition)
         : StoryScreen(screenName, finishedAction, initialTransition),
         playerName(playerName), playerStat(playerPoints)
@@ -465,7 +466,6 @@ void SinglePlayerStarterAction::performHiScoreScreen(String gameOverStoryName)
 {
   m_state = kHiScoreScreen;
   m_hiScoreScreen = new PuyoGameOver1PScreen(gameOverStoryName,
-		     *(GameUIDefaults::SCREEN_STACK->top()),
                      this, m_spFactory->getPlayerName(),
                      m_playerStat);
   m_hiScoreScreen->refresh();
@@ -862,8 +862,13 @@ void SinglePlayerMatchState::action(Widget *sender, int actionType,
             m_nextState = m_victoriousState;
         }
         else {
-            m_nextState = m_humiliatedState;
-            m_sharedGameAssets->lifes--;
+            if (m_sharedGameAssets->lifes == 0) {
+                m_nextState = m_gameLostState;
+            }
+            else {
+                m_nextState = m_humiliatedState;
+                m_sharedGameAssets->lifes--;
+            }
         }
         break;
     case ABORT_GAME:
@@ -911,7 +916,52 @@ void StoryModePrepareNextMatchState::reset()
     m_currentLevel = -1;
 }
 
+//---------------------------------
+// StoryModeDisplayHallOfFameState
+//---------------------------------
+StoryModeDisplayHallOfFameState::StoryModeDisplayHallOfFameState(SharedGameAssets *sharedGameAssets,
+                                                                 SharedMatchAssets *sharedMatchAssets,
+                                                                 const char *storyName)
+    : m_storyName(storyName), m_sharedGameAssets(sharedGameAssets), m_sharedMatchAssets(sharedMatchAssets)
+{
+}
 
+void StoryModeDisplayHallOfFameState::enterState()
+{
+    if (m_storyName == "") {
+        m_storyName = m_sharedGameAssets->levelDef->gameOverStory;
+    }
+    GTLogTrace("StoryModeDisplayHallOfFameState(%s)::enterState()", m_storyName.c_str());
+    std::string &playerName = m_sharedGameAssets->playerName;
+    const PlayerGameStat &playerPoints = m_sharedMatchAssets->m_gameWidget->getStatPlayerOne();
+    m_gameOverScreen.reset(new PuyoGameOver1PScreen(m_storyName.c_str(),
+                                        this, playerName.c_str(), playerPoints));
+    GameUIDefaults::SCREEN_STACK->swap(m_gameOverScreen.get());
+    m_gameOverScreen->refresh();
+    m_acknowledged = false;
+}
+
+void StoryModeDisplayHallOfFameState::exitState()
+{
+    GameUIDefaults::GAME_LOOP->garbageCollect(m_gameOverScreen.release());
+}
+
+bool StoryModeDisplayHallOfFameState::evaluate()
+{
+    return m_acknowledged;
+}
+
+GameState *StoryModeDisplayHallOfFameState::getNextState()
+{
+    return m_nextState;
+}
+
+void StoryModeDisplayHallOfFameState::action(Widget *sender, int actionType,
+                        event_manager::GameControlEvent *event)
+{
+    m_acknowledged = true;
+    evaluateStateMachine();
+}
 
 AltSinglePlayerStarterAction::AltSinglePlayerStarterAction(MainScreen *mainScreen, int difficulty,
                                                              SinglePlayerFactory *spFactory)
@@ -923,6 +973,8 @@ AltSinglePlayerStarterAction::AltSinglePlayerStarterAction(MainScreen *mainScree
     m_prepareNextMatch.reset(new StoryModePrepareNextMatchState(&m_sharedGameAssets));
     m_playMatch.reset(new SinglePlayerMatchState(&m_sharedGameAssets));
     m_gameWon.reset(new DisplayStoryScreenState("gamewon_1p.gsl"));
+    m_gameLostHoF.reset(new StoryModeDisplayHallOfFameState(&m_sharedGameAssets, m_playMatch->getMatchAssets()));
+    m_gameWonHoF.reset(new StoryModeDisplayHallOfFameState(&m_sharedGameAssets, m_playMatch->getMatchAssets(), "gamewon_highscore_1p.gsl"));
     m_leaveGame.reset(new LeaveGameState(*(m_playMatch->getMatchAssets())));
     // Linking the states together
     m_pushGameScreen->setNextState(m_prepareNextMatch.get());
@@ -930,8 +982,11 @@ AltSinglePlayerStarterAction::AltSinglePlayerStarterAction(MainScreen *mainScree
     m_prepareNextMatch->setGameWonState(m_gameWon.get());
     m_playMatch->setVictoriousState(m_prepareNextMatch.get());
     m_playMatch->setHumiliatedState(m_playMatch.get());
+    m_playMatch->setGameLostState(m_gameLostHoF.get());
     m_playMatch->setAbortedState(m_leaveGame.get());
-    m_gameWon->setNextState(m_leaveGame.get());
+    m_gameWon->setNextState(m_gameWonHoF.get());
+    m_gameWonHoF->setNextState(m_leaveGame.get());
+    m_gameLostHoF->setNextState(m_leaveGame.get());
     // Initializing the state machine
     m_stateMachine.setInitialState(m_pushGameScreen.get());
 }

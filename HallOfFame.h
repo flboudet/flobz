@@ -5,8 +5,8 @@
 
 class HallOfFameScreen : public PuyoGameOver1PScreen {
     public:
-        HallOfFameScreen(Screen &previousScreen, Action *finishedAction)
-            : PuyoGameOver1PScreen("gamewon_highscores_1p.gsl",previousScreen,finishedAction,"NONE",PlayerGameStat(-1))
+        HallOfFameScreen(Action *finishedAction)
+            : PuyoGameOver1PScreen("gamewon_highscores_1p.gsl",finishedAction,"NONE",PlayerGameStat(-1))
         {}
 };
 
@@ -16,26 +16,19 @@ class HallOfFameScreen : public PuyoGameOver1PScreen {
 class PopToMainScreenAction : public Action
 {
     public:
-        PopToMainScreenAction(MainScreen *mainScreen, Screen *fromScreen = NULL)
-            : mainScreen(mainScreen), fromScreen(fromScreen)
+        PopToMainScreenAction()
         {}
         void action() {
             GameUIDefaults::SCREEN_STACK->pop();
         }
-        void setFromScreen(Screen *screen) {
-            fromScreen = screen;
-        }
-    private:
-        MainScreen *mainScreen;
-        Screen *fromScreen;
 };
 
 /// Action to open the Hall of Fame
 class PushHallOfFameAction : public Action
 {
     public:
-        PushHallOfFameAction(HallOfFameScreen *storyScreen, Screen *fromScreen)
-            : storyScreen(storyScreen), fromScreen(fromScreen)
+        PushHallOfFameAction(HallOfFameScreen *storyScreen)
+            : storyScreen(storyScreen)
         {}
         void action() {
             GameUIDefaults::SCREEN_STACK->push(storyScreen);
