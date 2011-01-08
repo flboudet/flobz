@@ -86,12 +86,6 @@ String LocalGameMenu::getPlayerName(int playerNumber) const
   return playerName;
 }
 
-String LocalGameMenu::getPlayerName() const
-{
-  String playerName = editPlayerName.getEditField().getValue();
-  return playerName;
-}
-
 Local2PlayersGameMenu::Local2PlayersGameMenu(MainScreen *mainScreen)
     : MainScreenMenu(mainScreen),
       locale(theCommander->getDataPathManager(), "locale", "main"),

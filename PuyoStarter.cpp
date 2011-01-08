@@ -25,14 +25,11 @@
 
 #include "PuyoStarter.h"
 #include "PuyoView.h"
-#include "PuyoNetworkView.h"
-#include "PuyoNetworkGame.h"
-
-#include "audio.h"
+#include "gameui.h"
 
 using namespace ios_fc;
 using namespace event_manager;
-
+using namespace gameui;
 
 
 TwoPlayerGameWidget::TwoPlayerGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, Action *gameOverAction)

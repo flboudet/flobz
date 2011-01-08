@@ -26,19 +26,10 @@
 #ifndef _PUYOSTARTER
 #define _PUYOSTARTER
 
-#include <vector>
-
-#include "PuyoGame.h"
+#include "PuyoView.h"
 #include "PuyoEventPlayer.h"
 #include "PuyoIA.h"
-#include "CheatCodeManager.h"
 #include "GameWidget.h"
-#include "GameScreen.h"
-#include "PuyoCommander.h"
-#include "ios_messagebox.h"
-#include "Theme.h"
-#include "ScreenTransition.h"
-#include "PuyoStrings.h"
 
 class PuyoLocalGameFactory : public PuyoGameFactory {
 public:
@@ -52,7 +43,7 @@ private:
 
 class TwoPlayerGameWidget : public GameWidget {
 public:
-    TwoPlayerGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, Action *gameOverAction = NULL);
+    TwoPlayerGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, gameui::Action *gameOverAction = NULL);
 private:
     PuyoSetTheme &attachedPuyoThemeSet;
     PuyoRandomSystem attachedRandom;

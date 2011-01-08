@@ -148,28 +148,6 @@ private:
     AdvancedBuffer<LevelDefinition *> levelDefinitions;
 };
 
-class PuyoSingleGameLevelData {
-public:
-    PuyoSingleGameLevelData(int gameLevel, int difficulty, PuyoLevelDefinitions &levelDefinitions);
-    ~PuyoSingleGameLevelData();
-    String getIntroStory() const;
-    String getStory() const;
-    String getGameLostStory() const;
-    String getGameOverStory() const;
-    PuyoSetTheme &getPuyoTheme() const;
-    LevelTheme &getLevelTheme() const;
-    int getIALevel() const;
-    String getIAName() const;
-    String getIAFace() const;
-    int getNColors() const;
-    GameOptions getGameOptions() const;
-private:
-    int gameLevel, difficulty;
-    PuyoLevelDefinitions::LevelDefinition *levelDefinition;
-    PuyoSetTheme *themeToUse;
-    LevelTheme *levelThemeToUse;
-};
-
 class PuyoGameOver1PScreen : public StoryScreen {
 public:
     PuyoGameOver1PScreen(String screenName, Action *finishedAction,
@@ -187,134 +165,6 @@ private:
     PlayerGameStat playerStat;
 };
 
-class SinglePlayerMatch;
-
-/**
- * State machine managing a single player game session
- */
-class SinglePlayerStarterAction : public Action {
-public:
-    SinglePlayerStarterAction(MainScreen *mainScreen, int difficulty,
-			      SinglePlayerFactory *spFactory);
-    /**
-     * Implements the Action interface
-     */
-    virtual void action(Widget *sender, int actionType,
-			event_manager::GameControlEvent *event);
-protected:
-    virtual void stateMachine();
-    virtual void performMatchPlaying(bool skipIntroduction = false,
-			     bool popScreen = false);
-    virtual void performEndOfMatch();
-    virtual void performHiScoreScreen(String gameOverStoryName);
-    virtual void performBackToMenu();
-    virtual void performGameWon();
-
-    enum State {
-      kGameNotStarted,
-      kMatchPlaying,
-      kGameWon,
-      kGameOver,
-      kHiScoreScreen
-    };
-    MainScreen *m_mainScreen;
-    State m_state;
-    SinglePlayerFactory *m_spFactory;
-    int m_currentLevel, m_lifes, m_difficulty;
-    SinglePlayerMatch *m_currentMatch;
-    PuyoGameOver1PScreen *m_hiScoreScreen;
-    StoryScreen *m_gameWonScreen;
-    PuyoLevelDefinitions m_levelDefinitions;
-    PlayerGameStat m_playerStat;
-};
-
-/**
- * State machine managing a single player match against an opponent
- */
-class SinglePlayerMatch : public Action, public Widget {
-public:
-    SinglePlayerMatch(PlayerGameStat &playerStat,
-              Action *gameOverAction,
-		      PuyoSingleGameLevelData *levelData,
-		      bool skipIntroduction = false,
-                      bool popScreen = false,
-		      SinglePlayerFactory *spFactory = NULL,
-		      int remainingLifes = 0);
-    virtual ~SinglePlayerMatch();
-    void run();
-    /**
-     * Implements the Action interface
-     */
-    virtual void action(Widget *sender, int actionType,
-			event_manager::GameControlEvent *event);
-    enum State {
-      kNotRunning,
-      kStoryIntroduction,
-      kStory,
-      kMatchGettingStarted,
-      kMatchPlaying,
-      kMatchLostAnimation,
-      kMatchWonScores,
-      kMatchLostScores,
-      kMatchOverWon,
-      kMatchOverLost,
-      kMatchOverAborted
-    };
-    /**
-     * Returns the current state of the match
-     */
-    State getState() const { return m_state; }
-    /**
-     * Returns the game over story name of the opponent
-     */
-    String getGameOverStoryName() const
-      { return m_levelData->getGameOverStory(); }
-private:
-    void performStoryIntroduction();
-    void performOpponentStory();
-    void performMatchPrepare();
-    void performMatchStart();
-    void performEndOfMatch();
-    void performMatchLostAnimation();
-    void performMatchScores(State scoreState);
-    void trigMatchOverAction();
-    void prepareGame();
-    /**
-     * Performs a step in the match state machine
-     */
-    void stateMachine();
-    State m_state;
-    Action *m_matchOverAction;
-    PuyoSingleGameLevelData *m_levelData;
-    bool m_skipIntroduction;
-    bool m_popScreen;
-    SinglePlayerFactory *m_spFactory;
-    int m_remainingLifes;
-    StoryScreen *m_introStory, *m_opponentStory;
-    GameScreen *m_gameScreen;
-    SinglePlayerGameWidget *m_gameWidget;
-    StoryWidget *m_getReadyWidget, *m_matchLostAnimation;
-    TwoPlayersStatsWidget *m_statsWidget;
-    PlayerGameStat &m_playerStat;
-};
-
-class AltTweakedGameWidgetFactory : public GameWidgetFactory,
-                                    public PlayerNameProvider
-{
-public:
-    AltTweakedGameWidgetFactory(PuyoLevelDefinitions::LevelDefinition *levelDef);
-public:
-    virtual String getPlayerName(int playerNumber) const
-    { return "bob"; }
-public:
-    virtual GameWidget *createGameWidget(PuyoSetTheme &puyoThemeSet,
-                                         LevelTheme &levelTheme,
-                                         String centerFace,
-                                         Action *gameOverAction);
-private:
-    PuyoLevelDefinitions::LevelDefinition *m_levelDef;
-};
-
 struct SharedGameAssets
 {
     std::string    playerName;
@@ -327,10 +177,10 @@ struct SharedGameAssets
 /**
  * Display the animation when the match is over (1P mode)
  */
-class SinglePlayerMatchIsOverState : public GameState, public Action
+class StoryModeMatchIsOverState : public GameState, public Action
 {
 public:
-    SinglePlayerMatchIsOverState(SharedGameAssets *sharedGameAssets,
+    StoryModeMatchIsOverState(SharedGameAssets *sharedGameAssets,
 				 SharedMatchAssets *sharedMatchAssets);
     // GameState implementation
     virtual void enterState();
@@ -386,13 +236,13 @@ private:
  * Sub-state machine implementing the behaviour of a single match
  * against a computer opponent in single-player mode
  */
-class SinglePlayerMatchState : public GameState,
+class StoryModeMatchState : public GameState,
                                public GameWidgetFactory,
                                public PlayerNameProvider,
                                public Action
 {
 public:
-    SinglePlayerMatchState(SharedGameAssets *sharedGameAssets);
+    StoryModeMatchState(SharedGameAssets *sharedGameAssets);
     // GameState implementation
     virtual void enterState();
     virtual void exitState();
@@ -443,7 +293,7 @@ private:
     std::auto_ptr<EnterPlayerReadyState> m_enterPlayersReady;
     std::auto_ptr<ExitPlayerReadyState>  m_exitPlayersReady;
     std::auto_ptr<MatchPlayingState>     m_matchPlaying;
-    std::auto_ptr<SinglePlayerMatchIsOverState> m_matchIsOver;
+    std::auto_ptr<StoryModeMatchIsOverState> m_matchIsOver;
     std::auto_ptr<DisplayStatsState>     m_displayStats;
     std::auto_ptr<CallActionState>       m_abortGame;
     std::auto_ptr<CallActionState>       m_leaveMatch;
@@ -478,11 +328,11 @@ private:
 
 
 
-//class SinglePlayerMatchStateMachine : public GameStateMachine
-class AltSinglePlayerStarterAction : public Action {
+//class StoryModeMatchStateMachine : public GameStateMachine
+class StoryModeStarterAction : public Action {
 public:
-    AltSinglePlayerStarterAction(GameDifficulty difficulty,
-                                 PlayerNameProvider *nameProvider = NULL);
+    StoryModeStarterAction(GameDifficulty difficulty,
+                           PlayerNameProvider *nameProvider = NULL);
     /**
      * Implements the Action interface
      */
@@ -492,12 +342,11 @@ private:
     PlayerNameProvider *m_nameProvider;
     GameStateMachine m_stateMachine;
     std::auto_ptr<PuyoLevelDefinitions> m_levelDefinitions;
-    std::auto_ptr<AltTweakedGameWidgetFactory> m_gameWidgetFactory;
     SharedGameAssets     m_sharedGameAssets;
 
     std::auto_ptr<PushScreenState> m_pushGameScreen;
     std::auto_ptr<StoryModePrepareNextMatchState> m_prepareNextMatch;
-    std::auto_ptr<SinglePlayerMatchState>  m_playMatch;
+    std::auto_ptr<StoryModeMatchState>  m_playMatch;
     std::auto_ptr<DisplayStoryScreenState> m_gameWon;
     std::auto_ptr<StoryModeDisplayHallOfFameState> m_gameLostHoF;
     std::auto_ptr<StoryModeDisplayHallOfFameState> m_gameWonHoF;

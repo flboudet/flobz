@@ -8,6 +8,7 @@
  */
 
 #include "MainMenu.h"
+#include "PuyoStrings.h"
 
 MainRealMenu::MainRealMenu(MainScreen * mainScreen) :
 // Create sub screens

@@ -32,23 +32,21 @@
 #include "PuyoSinglePlayerStarter.h"
 #include "PuyoTwoPlayerStarter.h"
 
-class LocalGameMenu : public MainScreenMenu, public PlayerNameProvider,
-                      public SinglePlayerStandardLayoutFactory {
+class LocalGameMenu : public MainScreenMenu, public PlayerNameProvider {
 public:
     LocalGameMenu(MainScreen *mainScreen);
     void build();
     // PlayerNameProvider implementation
     virtual String getPlayerName(int playerNumber) const;
-    String getPlayerName() const; // TODO: remove
 private:
     VBox buttonsBox;
     LocalizedDictionary locale;
     EditFieldWithLabel editPlayerName;
     Frame screenTitleFrame;
     Text screenTitle;
-    AltSinglePlayerStarterAction easyAction;
-    AltSinglePlayerStarterAction mediumAction;
-    AltSinglePlayerStarterAction hardAction;
+    StoryModeStarterAction easyAction;
+    StoryModeStarterAction mediumAction;
+    StoryModeStarterAction hardAction;
     PuyoPopMenuAction popAction;
     Button easy, medium, hard, back;
 };

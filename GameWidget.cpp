@@ -22,8 +22,7 @@
  */
 
 #include "GameWidget.h"
-#include "PuyoCommander.h"
-#include "PuyoStarter.h"
+#include "GameScreen.h"
 
 using namespace event_manager;
 
