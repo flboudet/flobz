@@ -102,7 +102,7 @@ class SetupMatchState : public GameState, public Action
 {
 public:
     SetupMatchState(GameWidgetFactory &gameWidgetFactory,
-                    int difficulty,
+                    GameOptions gameOptions,
                     PlayerNameProvider *nameProvider,
                     SharedMatchAssets &sharedMatchAssets);
     // GameState implementation
@@ -116,12 +116,20 @@ public:
     void setNextState(GameState *nextState) {
         m_nextState = nextState;
     }
+    void setHandicapOnVictorious(bool enable) {
+        m_handicapOnVictorious = enable;
+    }
+    void setAccountTotalOnPlayerB(bool enable) {
+        m_accountTotalOnPlayerB = enable;
+    }
 private:
     GameWidgetFactory &m_gameWidgetFactory;
-    int m_difficulty;
+    GameOptions m_gameOptions;
     PlayerNameProvider *m_nameProvider;
     SharedMatchAssets &m_sharedAssets;
     GameState *m_nextState;
+    bool m_handicapOnVictorious;
+    bool m_accountTotalOnPlayerB;
 };
 struct SharedGetReadyAssets
 {

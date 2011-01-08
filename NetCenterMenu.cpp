@@ -420,8 +420,7 @@ void NetCenterMenu::onGameInvitationCanceledReceived(PuyoGameInvitation &invitat
 void NetCenterMenu::onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation)
 {
     PuyoNetworkTwoPlayerGameWidgetFactory *factory = new PuyoNetworkTwoPlayerGameWidgetFactory(*mbox, invitation.gameRandomSeed, netCenter->getIgpBox());
-    //TwoPlayersStarterAction *starterAction = new TwoPlayersStarterAction(invitation.gameSpeed, *factory, &nameProvider);
-    NetworkGameStateMachine *starter = new NetworkGameStateMachine(*factory, mbox, invitation.gameSpeed, &nameProvider);
+    NetworkGameStateMachine *starter = new NetworkGameStateMachine(*factory, mbox, (GameDifficulty)(invitation.gameSpeed), &nameProvider);
     starter->evaluate();
 
     if (this->onScreenDialog != NULL) {

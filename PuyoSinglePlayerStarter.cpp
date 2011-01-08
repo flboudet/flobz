@@ -289,7 +289,7 @@ String PuyoSingleGameLevelData::getIAFace() const
 
 GameOptions PuyoSingleGameLevelData::getGameOptions() const
 {
-  return GameOptions::FromLevel(difficulty);
+  return GameOptions::fromDifficulty((GameDifficulty)difficulty);
 }
 
 PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName,
@@ -783,7 +783,7 @@ void SinglePlayerMatchState::enterState()
     else
         m_introStoryScreen.reset(new DisplayStoryScreenState(m_sharedGameAssets->levelDef->introStory));
     m_opponentStoryScreen.reset(new DisplayStoryScreenState(m_sharedGameAssets->levelDef->opponentStory));
-    m_setupMatch.reset(new SetupMatchState(*this, m_sharedGameAssets->difficulty, this, m_sharedAssets));
+    m_setupMatch.reset(new SetupMatchState(*this, m_sharedGameAssets->gameOptions, this, m_sharedAssets));
     m_enterPlayersReady.reset(new EnterPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));
@@ -791,6 +791,9 @@ void SinglePlayerMatchState::enterState()
     m_displayStats.reset(new DisplayStatsState(m_sharedAssets));
     m_leaveMatch.reset(new CallActionState(this, LEAVE_MATCH));
     m_abortGame.reset(new CallActionState(this, ABORT_GAME));
+    // Additional state setup
+    m_setupMatch->setHandicapOnVictorious(false);
+    m_setupMatch->setAccountTotalOnPlayerB(false);
     // Linking the states together
     if (m_introStoryScreen.get() != NULL)
         m_introStoryScreen->setNextState(m_opponentStoryScreen.get());
@@ -846,8 +849,8 @@ GameWidget *SinglePlayerMatchState::createGameWidget(PuyoSetTheme &puyoThemeSet,
                                          Action *gameOverAction)
 {
     return new SinglePlayerStandardLayoutGameWidget(puyoThemeSet, levelTheme,
-                                                    m_sharedGameAssets->difficulty,
-                                                    m_sharedGameAssets->levelDef->easySettings.nColors,
+                                                    m_sharedGameAssets->levelDef->getAISettings(m_sharedGameAssets->difficulty).level,
+                                                    m_sharedGameAssets->levelDef->getAISettings(m_sharedGameAssets->difficulty).nColors,
                                                     m_sharedGameAssets->lifes,
                                                     m_sharedGameAssets->levelDef->opponent, gameOverAction);
 }
@@ -963,11 +966,13 @@ void StoryModeDisplayHallOfFameState::action(Widget *sender, int actionType,
     evaluateStateMachine();
 }
 
-AltSinglePlayerStarterAction::AltSinglePlayerStarterAction(MainScreen *mainScreen, int difficulty,
-                                                             SinglePlayerFactory *spFactory)
+AltSinglePlayerStarterAction::AltSinglePlayerStarterAction(GameDifficulty difficulty,
+                                                           PlayerNameProvider *nameProvider)
+    : m_nameProvider(nameProvider)
 {
-    // Initializing the shared game assets with random data
-    m_sharedGameAssets.difficulty = 1;//difficulty;
+    // Initializing the shared game assets
+    m_sharedGameAssets.difficulty = difficulty;
+    m_sharedGameAssets.gameOptions = GameOptions::fromDifficulty(difficulty);
     // Creating the different game states
     m_pushGameScreen.reset(new PushScreenState());
     m_prepareNextMatch.reset(new StoryModePrepareNextMatchState(&m_sharedGameAssets));
@@ -994,7 +999,10 @@ AltSinglePlayerStarterAction::AltSinglePlayerStarterAction(MainScreen *mainScree
 void AltSinglePlayerStarterAction::action(Widget *sender, int actionType,
                                         event_manager::GameControlEvent *event)
 {
-    m_sharedGameAssets.playerName = "Bob l'eponge";
+    if (m_nameProvider == NULL)
+        m_sharedGameAssets.playerName = "Player";
+    else
+        m_sharedGameAssets.playerName = m_nameProvider->getPlayerName(0);
     m_sharedGameAssets.lifes = 3;
     m_prepareNextMatch->reset();
     m_stateMachine.reset();

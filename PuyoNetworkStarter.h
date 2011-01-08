@@ -153,7 +153,7 @@ class NetworkGameStateMachine : public GameStateMachine
 public:
     NetworkGameStateMachine(GameWidgetFactory &gameWidgetFactory,
                             ios_fc::MessageBox *mbox,
-                            int gameSpeed,
+                            GameDifficulty difficulty,
                             PlayerNameProvider *nameProvider = NULL,
                             Action *endOfSessionAction = NULL);
 private:

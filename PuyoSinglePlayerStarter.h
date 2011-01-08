@@ -96,30 +96,41 @@ class SinglePlayerStandardLayoutFactory : public SinglePlayerFactory {
 class PuyoLevelDefinitions {
 public:
     struct SelIA {
-      SelIA(int level, int nColors);
+        SelIA(int level, int nColors);
         int level;
         int nColors;
     };
     struct LevelDefinition {
-      LevelDefinition(String levelName, String introStory,
-		      String opponentStory, String opponentName, String opponent,
-              String backgroundTheme, String gameLostStory, String gameOverStory,
-		      SelIA easySettings, SelIA mediumSettings, SelIA hardSettings)
-	: levelName(levelName), introStory(introStory),
-	   opponentStory(opponentStory),  opponentName(opponentName), opponent(opponent),
-       backgroundTheme(backgroundTheme), gameLostStory(gameLostStory), gameOverStory(gameOverStory),
-	   easySettings(easySettings), mediumSettings(mediumSettings), hardSettings(hardSettings) {}
-      String levelName;
-      String introStory;
-      String opponentStory;
-      String opponentName;
-      String opponent;
-      String backgroundTheme;
-      String gameLostStory;
-      String gameOverStory;
-      SelIA easySettings;
-      SelIA mediumSettings;
-      SelIA hardSettings;
+        LevelDefinition(String levelName, String introStory,
+                        String opponentStory, String opponentName, String opponent,
+                        String backgroundTheme, String gameLostStory, String gameOverStory,
+                        SelIA easySettings, SelIA mediumSettings, SelIA hardSettings)
+            : levelName(levelName), introStory(introStory),
+              opponentStory(opponentStory),  opponentName(opponentName), opponent(opponent),
+              backgroundTheme(backgroundTheme), gameLostStory(gameLostStory), gameOverStory(gameOverStory),
+              easySettings(easySettings), mediumSettings(mediumSettings), hardSettings(hardSettings) {}
+        String levelName;
+        String introStory;
+        String opponentStory;
+        String opponentName;
+        String opponent;
+        String backgroundTheme;
+        String gameLostStory;
+        String gameOverStory;
+        SelIA easySettings;
+        SelIA mediumSettings;
+        SelIA hardSettings;
+        const SelIA & getAISettings(GameDifficulty difficulty) const {
+            switch (difficulty) {
+            case EASY:
+                return easySettings;
+            case MEDIUM:
+                return mediumSettings;
+            case HARD:
+            default:
+                return hardSettings;
+            }
+        }
     };
     PuyoLevelDefinitions(String levelDefinitionFile);
     LevelDefinition *getLevelDefinition(int levelNumber) { return levelDefinitions[levelNumber]; }
@@ -306,9 +317,10 @@ private:
 
 struct SharedGameAssets
 {
-    std::string playerName;
-    int difficulty;
-    int lifes;
+    std::string    playerName;
+    GameDifficulty difficulty;
+    GameOptions    gameOptions;
+    int            lifes;
     PuyoLevelDefinitions::LevelDefinition *levelDef;
 };
 
@@ -469,14 +481,15 @@ private:
 //class SinglePlayerMatchStateMachine : public GameStateMachine
 class AltSinglePlayerStarterAction : public Action {
 public:
-    AltSinglePlayerStarterAction(MainScreen *mainScreen, int difficulty,
-                                  SinglePlayerFactory *spFactory);//(int difficulty, PlayerNameProvider *nameProvider = NULL);
+    AltSinglePlayerStarterAction(GameDifficulty difficulty,
+                                 PlayerNameProvider *nameProvider = NULL);
     /**
      * Implements the Action interface
      */
     virtual void action(Widget *sender, int actionType,
 			event_manager::GameControlEvent *event);
 private:
+    PlayerNameProvider *m_nameProvider;
     GameStateMachine m_stateMachine;
     std::auto_ptr<PuyoLevelDefinitions> m_levelDefinitions;
     std::auto_ptr<AltTweakedGameWidgetFactory> m_gameWidgetFactory;

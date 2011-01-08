@@ -48,21 +48,4 @@ TwoPlayerGameWidget::TwoPlayerGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme 
     initWithGUI(areaA, areaB, controllerA, controllerB, levelTheme, gameOverAction);
 }
 
-GameOptions GameOptions::FromLevel(int level) {
-    GameOptions go;
-    switch(level) {
-        case 0:
-            go.MIN_SPEED = 4;
-            go.MAX_SPEED = 20;
-            break;
-        case 1:
-            go.MIN_SPEED = 2;
-            go.MAX_SPEED = 15;
-            break;
-        case 2:
-            go.MIN_SPEED = 1;
-            go.MAX_SPEED = 8;
-            break;
-    }
-    return go;
-}
+

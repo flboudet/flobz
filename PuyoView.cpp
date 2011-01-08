@@ -305,7 +305,7 @@ void PuyoView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex) {
     int x = neutralPuyo->getPuyoX();
     int y = neutralPuyo->getPuyoY();
     AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
-    ((AnimatedPuyo *)neutralPuyo)->addAnimation(new NeutralAnimation(*((AnimatedPuyo *)neutralPuyo), neutralIndex * 4, synchronizer));
+    ((AnimatedPuyo *)neutralPuyo)->addAnimation(new NeutralAnimation(*((AnimatedPuyo *)neutralPuyo), neutralIndex * 2, synchronizer));
     for (int i = y ; i < PUYODIMY ; i++) {
         AnimatedPuyo *belowPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAt(x, i));
         if (belowPuyo != NULL) {

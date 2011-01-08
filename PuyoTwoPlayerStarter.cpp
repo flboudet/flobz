@@ -59,11 +59,11 @@ void TwoPlayersGameWidget::cycle()
 //---------------------------------
 // Two players local game state machine
 //---------------------------------
-AltTwoPlayersStarterAction::AltTwoPlayersStarterAction(int difficulty, GameWidgetFactory &gameWidgetFactory, PlayerNameProvider *nameProvider)
+AltTwoPlayersStarterAction::AltTwoPlayersStarterAction(GameDifficulty difficulty, GameWidgetFactory &gameWidgetFactory, PlayerNameProvider *nameProvider)
 {
     // Creating the different game states
     m_pushGameScreen.reset(new PushScreenState());
-    m_setupMatch.reset(new SetupMatchState(gameWidgetFactory, difficulty, nameProvider, m_sharedAssets));
+    m_setupMatch.reset(new SetupMatchState(gameWidgetFactory, GameOptions::fromDifficulty(difficulty), nameProvider, m_sharedAssets));
     m_enterPlayersReady.reset(new EnterPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));

@@ -32,6 +32,15 @@
 #include "PuyoStory.h"
 
 /**
+ * The standard difficulty levels, affecting the speed of the game
+ */
+typedef enum GameDifficulty {
+    EASY=0,
+    MEDIUM=1,
+    HARD=2
+} GameDifficulty;
+
+/**
  * This object represents all the game options needed as a parameter
  * to the GameWidget
  */
@@ -43,7 +52,7 @@ struct GameOptions
         CYCLES_BEFORE_SPEED_INCREASES = 240;
     }
 
-    static GameOptions FromLevel(int level);
+    static GameOptions fromDifficulty(GameDifficulty difficulty);
 
     int MIN_SPEED;
     int MAX_SPEED;

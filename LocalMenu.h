@@ -32,17 +32,14 @@
 #include "PuyoSinglePlayerStarter.h"
 #include "PuyoTwoPlayerStarter.h"
 
-typedef enum SinglePlayerLevel {
-    EASY=0,
-    MEDIUM=1,
-    HARD=2
-} SinglePlayerLevel;
-
-class LocalGameMenu : public MainScreenMenu, public SinglePlayerStandardLayoutFactory {
+class LocalGameMenu : public MainScreenMenu, public PlayerNameProvider,
+                      public SinglePlayerStandardLayoutFactory {
 public:
     LocalGameMenu(MainScreen *mainScreen);
     void build();
-    String getPlayerName() const;
+    // PlayerNameProvider implementation
+    virtual String getPlayerName(int playerNumber) const;
+    String getPlayerName() const; // TODO: remove
 private:
     VBox buttonsBox;
     LocalizedDictionary locale;
@@ -50,8 +47,8 @@ private:
     Frame screenTitleFrame;
     Text screenTitle;
     AltSinglePlayerStarterAction easyAction;
-    SinglePlayerStarterAction mediumAction;
-    SinglePlayerStarterAction hardAction;
+    AltSinglePlayerStarterAction mediumAction;
+    AltSinglePlayerStarterAction hardAction;
     PuyoPopMenuAction popAction;
     Button easy, medium, hard, back;
 };

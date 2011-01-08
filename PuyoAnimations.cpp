@@ -79,7 +79,7 @@ void NeutralAnimation::cycle()
     }
     else {
         currentY += (int)step;
-        step += 0.5;
+        step += 0.8;
         if (currentY >= Y) {
             int choosenSound = random() % 2;
             // TODO jeko

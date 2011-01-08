@@ -70,14 +70,16 @@ GameState *PushScreenState::getNextState()
 // SetupMatchState
 //---------------------------------
 SetupMatchState::SetupMatchState(GameWidgetFactory &gameWidgetFactory,
-                                 int difficulty,
+                                 GameOptions gameOptions,
                                  PlayerNameProvider *nameProvider,
                                  SharedMatchAssets &sharedMatchAssets)
   : m_gameWidgetFactory(gameWidgetFactory),
-    m_difficulty(difficulty),
+    m_gameOptions(gameOptions),
     m_nameProvider(nameProvider),
     m_sharedAssets(sharedMatchAssets),
-    m_nextState(NULL)
+    m_nextState(NULL),
+    m_handicapOnVictorious(true),
+    m_accountTotalOnPlayerB(true)
 {
 }
 
@@ -92,21 +94,24 @@ void SetupMatchState::enterState()
         m_gameWidgetFactory.createGameWidget(*(m_sharedAssets.m_currentPuyoSetTheme),
                                              *(m_sharedAssets.m_currentLevelTheme),
                                              m_sharedAssets.m_currentLevelTheme->getCentralAnimation2P().c_str(), NULL);
-    newGameWidget->setGameOptions(GameOptions::FromLevel(m_difficulty));
+    newGameWidget->setGameOptions(m_gameOptions);
     if (m_nameProvider != NULL) {
         newGameWidget->setPlayerOneName(m_nameProvider->getPlayerName(0));
         newGameWidget->setPlayerTwoName(m_nameProvider->getPlayerName(1));
     }
     // Setup total points
     newGameWidget->getStatPlayerOne().total_points = m_sharedAssets.m_leftTotal;
-    newGameWidget->getStatPlayerTwo().total_points = m_sharedAssets.m_rightTotal;
-    // Setup handicap
-    int victoriesDelta = m_sharedAssets.m_leftVictories - m_sharedAssets.m_rightVictories;
-    if (victoriesDelta > 0) {
-        newGameWidget->addGameAHandicap(victoriesDelta);
-    }
-    else if (victoriesDelta != 0) {
-        newGameWidget->addGameBHandicap(-victoriesDelta);
+    if (m_accountTotalOnPlayerB)
+        newGameWidget->getStatPlayerTwo().total_points = m_sharedAssets.m_rightTotal;
+    // Optionnaly setup handicap
+    if (m_handicapOnVictorious) {
+        int victoriesDelta = m_sharedAssets.m_leftVictories - m_sharedAssets.m_rightVictories;
+        if (victoriesDelta > 0) {
+            newGameWidget->addGameAHandicap(victoriesDelta);
+        }
+        else if (victoriesDelta != 0) {
+            newGameWidget->addGameBHandicap(-victoriesDelta);
+        }
     }
     GameScreen *newGameScreen = new GameScreen(*(newGameWidget));
     // Handle eventual game enchainment

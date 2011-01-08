@@ -300,7 +300,7 @@ Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client, int fxMode)
     gsl_bind_path_resolver(_this->gsl, pathResolverFunction);
     _this->images = goom_hash_new();
     strncpy(_this->fname, fname, 512);
-    GTLogTrace("styrolyse_new() styrolyse_reload");
+    GTLogTrace("styrolyse_new(%s) styrolyse_reload", fname);
     styrolyse_reload(_this);
     GTLogTrace("styrolyse_new() finished");
     return _this;

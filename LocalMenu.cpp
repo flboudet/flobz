@@ -54,9 +54,9 @@ LocalGameMenu::LocalGameMenu(MainScreen *mainScreen)
 		     theCommander->getEditFieldOverFramePicture(), 150),
       screenTitleFrame(theCommander->getSeparatorFramePicture()),
       screenTitle(locale.getLocalizedString("Choose Game Level")),
-      easyAction(mainScreen,   EASY,   this),
-      mediumAction(mainScreen, MEDIUM, this),
-      hardAction(mainScreen,   HARD,   this),
+      easyAction(EASY, this),
+      mediumAction(MEDIUM, this),
+      hardAction(HARD,   this),
       popAction(mainScreen),
       easy(locale.getLocalizedString("Beginner"), &easyAction),
       medium(locale.getLocalizedString("Normal"), &mediumAction),
@@ -78,6 +78,12 @@ void LocalGameMenu::build() {
     buttonsBox.add(&editPlayerName);
     buttonsBox.add(&back);
     add(&buttonsBox);
+}
+
+String LocalGameMenu::getPlayerName(int playerNumber) const
+{
+  String playerName = editPlayerName.getEditField().getValue();
+  return playerName;
 }
 
 String LocalGameMenu::getPlayerName() const

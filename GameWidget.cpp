@@ -32,6 +32,26 @@ using namespace event_manager;
 const char *p1name = "Player1";
 const char *p2name = "Player2";
 
+GameOptions GameOptions::fromDifficulty(GameDifficulty difficulty) {
+    GameOptions go;
+    switch(difficulty) {
+    case EASY:
+        go.MIN_SPEED = 4;
+        go.MAX_SPEED = 20;
+        break;
+    case MEDIUM:
+        go.MIN_SPEED = 2;
+        go.MAX_SPEED = 15;
+        break;
+    case HARD:
+    default:
+        go.MIN_SPEED = 1;
+        go.MAX_SPEED = 8;
+        break;
+    }
+    return go;
+}
+
 void GameWidget::setGameOptions(GameOptions game_options)
 {
     cyclesBeforeSpeedIncreases = game_options.CYCLES_BEFORE_SPEED_INCREASES;
