@@ -151,7 +151,7 @@ private:
 class NetworkGameStateMachine : public GameStateMachine
 {
 public:
-    NetworkGameStateMachine(GameWidgetFactory &gameWidgetFactory,
+    NetworkGameStateMachine(GameWidgetFactory  *gameWidgetFactory,
                             ios_fc::MessageBox *mbox,
                             GameDifficulty difficulty,
                             PlayerNameProvider *nameProvider = NULL,

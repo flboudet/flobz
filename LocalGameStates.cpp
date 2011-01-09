@@ -69,10 +69,10 @@ GameState *PushScreenState::getNextState()
 //---------------------------------
 // SetupMatchState
 //---------------------------------
-SetupMatchState::SetupMatchState(GameWidgetFactory &gameWidgetFactory,
-                                 GameOptions gameOptions,
+SetupMatchState::SetupMatchState(GameWidgetFactory  *gameWidgetFactory,
+                                 GameOptions         gameOptions,
                                  PlayerNameProvider *nameProvider,
-                                 SharedMatchAssets &sharedMatchAssets)
+                                 SharedMatchAssets  *sharedMatchAssets)
   : m_gameWidgetFactory(gameWidgetFactory),
     m_gameOptions(gameOptions),
     m_nameProvider(nameProvider),
@@ -87,25 +87,25 @@ void SetupMatchState::enterState()
 {
     GTLogTrace("SetupMatchState::enterState()");
     // Prepare 1st run
-    m_sharedAssets.m_currentLevelTheme = theCommander->getPreferedLevelTheme();
-    m_sharedAssets.m_currentPuyoSetTheme = theCommander->getPreferedPuyoSetTheme();
+    m_sharedAssets->m_currentLevelTheme = theCommander->getPreferedLevelTheme();
+    m_sharedAssets->m_currentPuyoSetTheme = theCommander->getPreferedPuyoSetTheme();
     // Create the gamewidget and register as the gamewidget's action
     GameWidget *newGameWidget =
-        m_gameWidgetFactory.createGameWidget(*(m_sharedAssets.m_currentPuyoSetTheme),
-                                             *(m_sharedAssets.m_currentLevelTheme),
-                                             m_sharedAssets.m_currentLevelTheme->getCentralAnimation2P().c_str(), NULL);
+        m_gameWidgetFactory->createGameWidget(*(m_sharedAssets->m_currentPuyoSetTheme),
+                                              *(m_sharedAssets->m_currentLevelTheme),
+                                              m_sharedAssets->m_currentLevelTheme->getCentralAnimation2P().c_str(), NULL);
     newGameWidget->setGameOptions(m_gameOptions);
     if (m_nameProvider != NULL) {
         newGameWidget->setPlayerOneName(m_nameProvider->getPlayerName(0));
         newGameWidget->setPlayerTwoName(m_nameProvider->getPlayerName(1));
     }
     // Setup total points
-    newGameWidget->getStatPlayerOne().total_points = m_sharedAssets.m_leftTotal;
+    newGameWidget->getStatPlayerOne().total_points = m_sharedAssets->m_leftTotal;
     if (m_accountTotalOnPlayerB)
-        newGameWidget->getStatPlayerTwo().total_points = m_sharedAssets.m_rightTotal;
+        newGameWidget->getStatPlayerTwo().total_points = m_sharedAssets->m_rightTotal;
     // Optionnaly setup handicap
     if (m_handicapOnVictorious) {
-        int victoriesDelta = m_sharedAssets.m_leftVictories - m_sharedAssets.m_rightVictories;
+        int victoriesDelta = m_sharedAssets->m_leftVictories - m_sharedAssets->m_rightVictories;
         if (victoriesDelta > 0) {
             newGameWidget->addGameAHandicap(victoriesDelta);
         }
@@ -115,15 +115,15 @@ void SetupMatchState::enterState()
     }
     GameScreen *newGameScreen = new GameScreen(*(newGameWidget));
     // Handle eventual game enchainment
-    if (m_sharedAssets.m_gameScreen.get() != NULL) {
-        GameUIDefaults::GAME_LOOP->garbageCollect(m_sharedAssets.m_gameWidget.release());
-        GameUIDefaults::GAME_LOOP->garbageCollect(m_sharedAssets.m_gameScreen.release());
+    if (m_sharedAssets->m_gameScreen.get() != NULL) {
+        GameUIDefaults::GAME_LOOP->garbageCollect(m_sharedAssets->m_gameWidget.release());
+        GameUIDefaults::GAME_LOOP->garbageCollect(m_sharedAssets->m_gameScreen.release());
     }
-    m_sharedAssets.m_gameWidget.reset(newGameWidget);
-    m_sharedAssets.m_gameScreen.reset(newGameScreen);
-    GameUIDefaults::SCREEN_STACK->swap(m_sharedAssets.m_gameScreen.get());
+    m_sharedAssets->m_gameWidget.reset(newGameWidget);
+    m_sharedAssets->m_gameScreen.reset(newGameScreen);
+    GameUIDefaults::SCREEN_STACK->swap(m_sharedAssets->m_gameScreen.get());
     // Set the game initially paused
-    m_sharedAssets.m_gameScreen->setSuspended(true);
+    m_sharedAssets->m_gameScreen->setSuspended(true);
 }
 
 bool SetupMatchState::evaluate()

@@ -244,6 +244,9 @@ public:
     void setGameLostState(GameState *gameLostState) {
         m_gameLostState = gameLostState;
     }
+    void setGameWidgetFactory(GameWidgetFactory *factory) {
+        m_gameWidgetFactory = factory;
+    }
     SharedMatchAssets *getMatchAssets() {
         return &m_sharedAssets;
     }
@@ -256,6 +259,7 @@ private:
     SharedGameAssets *m_sharedGameAssets;
     SharedMatchAssets m_sharedAssets;
     SharedGetReadyAssets m_sharedGetReadyAssets;
+    GameWidgetFactory *m_gameWidgetFactory;
     GameState *m_nextState;
     GameState *m_abortedState, *m_victoriousState;
     GameState *m_gameLostState, *m_humiliatedState;
@@ -311,7 +315,7 @@ public:
      */
     virtual void action(Widget *sender, int actionType,
 			event_manager::GameControlEvent *event);
-private:
+protected:
     PlayerNameProvider *m_nameProvider;
     GameStateMachine m_stateMachine;
     SharedGameAssets     m_sharedGameAssets;

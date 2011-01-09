@@ -101,10 +101,10 @@ private:
 class SetupMatchState : public GameState, public Action
 {
 public:
-    SetupMatchState(GameWidgetFactory &gameWidgetFactory,
+    SetupMatchState(GameWidgetFactory *gameWidgetFactory,
                     GameOptions gameOptions,
                     PlayerNameProvider *nameProvider,
-                    SharedMatchAssets &sharedMatchAssets);
+                    SharedMatchAssets *sharedMatchAssets);
     // GameState implementation
     virtual void enterState();
     virtual bool evaluate();
@@ -123,10 +123,10 @@ public:
         m_accountTotalOnPlayerB = enable;
     }
 private:
-    GameWidgetFactory &m_gameWidgetFactory;
-    GameOptions m_gameOptions;
+    GameWidgetFactory  *m_gameWidgetFactory;
+    GameOptions         m_gameOptions;
     PlayerNameProvider *m_nameProvider;
-    SharedMatchAssets &m_sharedAssets;
+    SharedMatchAssets  *m_sharedAssets;
     GameState *m_nextState;
     bool m_handicapOnVictorious;
     bool m_accountTotalOnPlayerB;

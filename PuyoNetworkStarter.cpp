@@ -368,7 +368,7 @@ void NetMatchPlayingState::action(Widget *sender, int actionType,
 //---------------------------------
 // Two players network game state machine
 //---------------------------------
-NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory &gameWidgetFactory,
+NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory  *gameWidgetFactory,
                                                  ios_fc::MessageBox *mbox,
                                                  GameDifficulty difficulty,
                                                  PlayerNameProvider *nameProvider,
@@ -376,7 +376,7 @@ NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory &gameWidgetFa
 {
     // Creating the different game states
     m_pushGameScreen.reset(new PushScreenState());
-    m_setupMatch.reset(new SetupMatchState(gameWidgetFactory, GameOptions::fromDifficulty(difficulty), nameProvider, m_sharedAssets));
+    m_setupMatch.reset(new SetupMatchState(gameWidgetFactory, GameOptions::fromDifficulty(difficulty), nameProvider, &m_sharedAssets));
     m_enterPlayersReady.reset(new EnterPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_synchroGetReady.reset(new NetSynchronizeState(mbox, 1));
     m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));

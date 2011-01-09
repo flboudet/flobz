@@ -320,7 +320,8 @@ void StoryModeMatchIsOverState::action(Widget *sender, int actionType,
 // StoryModeMatchState
 //---------------------------------
 StoryModeMatchState::StoryModeMatchState(SharedGameAssets *sharedGameAssets)
-    : m_sharedGameAssets(sharedGameAssets)
+    : m_sharedGameAssets(sharedGameAssets),
+      m_gameWidgetFactory(this)
 {
 }
 
@@ -333,7 +334,7 @@ void StoryModeMatchState::enterState()
     else
         m_introStoryScreen.reset(new DisplayStoryScreenState(m_sharedGameAssets->levelDef->introStory));
     m_opponentStoryScreen.reset(new DisplayStoryScreenState(m_sharedGameAssets->levelDef->opponentStory));
-    m_setupMatch.reset(new SetupMatchState(*this, m_sharedGameAssets->gameOptions, this, m_sharedAssets));
+    m_setupMatch.reset(new SetupMatchState(m_gameWidgetFactory, m_sharedGameAssets->gameOptions, this, &m_sharedAssets));
     m_enterPlayersReady.reset(new EnterPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));

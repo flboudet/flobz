@@ -54,7 +54,7 @@ public:
 
 class AltTwoPlayersStarterAction : public Action {
 public:
-    AltTwoPlayersStarterAction(GameDifficulty difficulty, GameWidgetFactory &gameWidgetFactory,
+    AltTwoPlayersStarterAction(GameDifficulty difficulty, GameWidgetFactory *gameWidgetFactory,
                                PlayerNameProvider *nameProvider = NULL);
     /**
      * Implements the Action interface
