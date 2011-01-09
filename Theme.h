@@ -126,6 +126,14 @@ public:
     virtual bool getShouldDisplayShadows(int playerId) const = 0;
     virtual bool getShouldDisplayEyes(int playerId) const    = 0;
     virtual bool getOpponentIsBehind() const   = 0;
+    // Stats widget dimensions
+    virtual int getStatsHeight() const = 0;
+    virtual int getStatsLegendWidth() const = 0;
+    virtual int getStatsComboLineValueWidth() const = 0;
+    virtual int getStatsLeftBackgroundOffsetX() const = 0;
+    virtual int getStatsLeftBackgroundOffsetY() const = 0;
+    virtual int getStatsRightBackgroundOffsetX() const = 0;
+    virtual int getStatsRightBackgroundOffsetY() const = 0;
     // Animation names
     virtual const std::string getGameLostLeftAnimation2P() const  = 0;
     virtual const std::string getGameLostRightAnimation2P() const = 0;

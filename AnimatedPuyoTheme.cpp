@@ -229,6 +229,15 @@ void ThemeManagerImpl::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     newThemeDescription.lifeDisplayY = GSL_GLOBAL_INT(gsl, "level.life_display.y");
 
     newThemeDescription.opponentIsBehind = (GSL_GLOBAL_INT(gsl, "level.opponent_is_behind") == 0 ? false : true);
+
+    newThemeDescription.statsHeight = GSL_GLOBAL_INT(gsl, "level.stats.height");
+    newThemeDescription.statsLegendWidth = GSL_GLOBAL_INT(gsl, "level.stats.legend_width");
+    newThemeDescription.statsComboLineValueWidth = GSL_GLOBAL_INT(gsl, "level.stats.combo_line_value_width");
+    newThemeDescription.statsLeftBackgroundOffsetX = GSL_GLOBAL_INT(gsl, "level.stats.left_background_offset.x");
+    newThemeDescription.statsLeftBackgroundOffsetY = GSL_GLOBAL_INT(gsl, "level.stats.left_background_offset.y");
+    newThemeDescription.statsRightBackgroundOffsetX = GSL_GLOBAL_INT(gsl, "level.stats.right_background_offset.x");
+    newThemeDescription.statsRightBackgroundOffsetY = GSL_GLOBAL_INT(gsl, "level.stats.right_background_offset.y");
+
     loadFontDefinition(gsl, "playerNameFont", newThemeDescription.playerNameFont);
     loadFontDefinition(gsl, "scoreFont", newThemeDescription.scoreFont);
 
@@ -787,6 +796,27 @@ bool LevelThemeImpl::getShouldDisplayEyes(int playerId) const
 
 bool LevelThemeImpl::getOpponentIsBehind() const
 { return m_desc.opponentIsBehind; }
+
+int LevelThemeImpl::getStatsHeight() const
+{ return m_desc.statsHeight; }
+
+int LevelThemeImpl::getStatsLegendWidth() const
+{ return m_desc.statsLegendWidth; }
+
+int LevelThemeImpl::getStatsComboLineValueWidth() const
+{ return m_desc.statsComboLineValueWidth; }
+
+int LevelThemeImpl::getStatsLeftBackgroundOffsetX() const
+{ return m_desc.statsLeftBackgroundOffsetX; }
+
+int LevelThemeImpl::getStatsLeftBackgroundOffsetY() const
+{ return m_desc.statsLeftBackgroundOffsetY; }
+
+int LevelThemeImpl::getStatsRightBackgroundOffsetX() const
+{ return m_desc.statsRightBackgroundOffsetX; }
+
+int LevelThemeImpl::getStatsRightBackgroundOffsetY() const
+{ return m_desc.statsRightBackgroundOffsetY; }
 
 const std::string LevelThemeImpl::getGameLostLeftAnimation2P() const
 {

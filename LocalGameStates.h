@@ -289,6 +289,7 @@ public:
 private:
     SharedMatchAssets &m_sharedAssets;
     bool m_aknowledged;
+    StatsWidgetDimensions m_dimensions;
     auto_ptr<TwoPlayersStatsWidget> m_statsWidget;
     GameState *m_nextState;
 };

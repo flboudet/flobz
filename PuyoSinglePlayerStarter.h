@@ -66,33 +66,6 @@ private:
     PuyoCombinedEventPlayer playercontroller;
 };
 
-/**
- * This class provides objects that are used during the game,
- * such as the player name, the player controller,
- * and the screen layout.
- */
-class SinglePlayerFactory {
-public:
-    virtual String getPlayerName() const = 0;
-    virtual SinglePlayerGameWidget *createGameWidget
-        (PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme,
-         int level, int nColors, int lifes, String aiFace,
-         Action *gameOverAction) = 0;
-    virtual StatsWidgetDimensions getStatsWidgetDimensions() const = 0;
-    virtual ~SinglePlayerFactory() {};
-};
-
-/**
- * Implementation of SinglePlayerFactory with the standard game layout
- */
-class SinglePlayerStandardLayoutFactory : public SinglePlayerFactory {
-    virtual SinglePlayerGameWidget *createGameWidget
-    (PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme,
-     int level, int nColors, int lifes, String aiFace,
-     Action *gameOverAction);
-    virtual StatsWidgetDimensions getStatsWidgetDimensions() const;
-};
-
 class PuyoLevelDefinitions {
 public:
     struct SelIA {
@@ -319,9 +292,9 @@ public:
     }
     void reset();
 private:
+    static std::auto_ptr<PuyoLevelDefinitions> m_levelDefProvider;
     SharedGameAssets *m_sharedGameAssets;
     int m_currentLevel;
-    std::auto_ptr<PuyoLevelDefinitions> m_levelDefProvider;
     GameState *m_nextMatchState, *m_gameWonState;
     GameState *m_nextState;
 };
@@ -341,7 +314,6 @@ public:
 private:
     PlayerNameProvider *m_nameProvider;
     GameStateMachine m_stateMachine;
-    std::auto_ptr<PuyoLevelDefinitions> m_levelDefinitions;
     SharedGameAssets     m_sharedGameAssets;
 
     std::auto_ptr<PushScreenState> m_pushGameScreen;

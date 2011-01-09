@@ -9,6 +9,13 @@ struct <Font:
     int    size,
     int    fx>
 
+struct <StatsDimension:
+    int   height,
+    int   legend_width,
+    int   combo_line_value_width,
+    Point left_background_offset,
+    Point right_background_offset>
+
 struct <PuyobanDefinition:
     Point display,
     int   should_display_next,
@@ -51,6 +58,7 @@ struct <Level:
     Point  speedmeter_display,
     Point  life_display,
     int    opponent_is_behind,
+    StatsDimension stats,
     PuyobanDefinition puyoban_p1,
     PuyobanDefinition puyoban_p2,
     Font   playerNameFont,
@@ -116,6 +124,14 @@ external <end_level>
     level.life_display.x = 310
     level.life_display.y = 438
     level.opponent_is_behind = 0
+
+    level.stats.height = 416
+    level.stats.legend_width = 194
+    level.stats.combo_line_value_width = 50
+    level.stats.left_background_offset.x = 0
+    level.stats.left_background_offset.y = 0
+    level.stats.right_background_offset.x = 0
+    level.stats.right_background_offset.y = 0
 
     level.puyoban_p1.display.x = 33
     level.puyoban_p1.display.y = 0

@@ -99,8 +99,12 @@ public:
 
     PuyobanThemeDefinition puyoban[NUMBER_OF_PUYOBANS_IN_LEVEL];
     FontDefinition playerNameFont, scoreFont;
-    
+
     bool opponentIsBehind;
+
+    int statsHeight, statsLegendWidth, statsComboLineValueWidth;
+    int statsLeftBackgroundOffsetX, statsLeftBackgroundOffsetY;
+    int statsRightBackgroundOffsetX, statsRightBackgroundOffsetY;
 };
 
 class BasePuyoThemeImpl : public PuyoTheme {
@@ -219,6 +223,14 @@ public:
     virtual bool getShouldDisplayShadows(int playerId) const;
     virtual bool getShouldDisplayEyes(int playerId) const;
     virtual bool getOpponentIsBehind() const;
+    // Stats widget dimensions
+    virtual int getStatsHeight() const;
+    virtual int getStatsLegendWidth() const;
+    virtual int getStatsComboLineValueWidth() const;
+    virtual int getStatsLeftBackgroundOffsetX() const;
+    virtual int getStatsLeftBackgroundOffsetY() const;
+    virtual int getStatsRightBackgroundOffsetX() const;
+    virtual int getStatsRightBackgroundOffsetY() const;
     // Animation names
     virtual const std::string getGameLostLeftAnimation2P() const;
     virtual const std::string getGameLostRightAnimation2P() const;

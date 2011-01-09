@@ -123,21 +123,6 @@ void SinglePlayerGameWidget::action(Widget *sender, int actionType,
         addGameBHandicap(PUYODIMY);
 }
 
-SinglePlayerGameWidget *SinglePlayerStandardLayoutFactory::createGameWidget
-          (PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme,
-           int level, int nColors, int lifes, String aiFace,
-           Action *gameOverAction)
-{
-    return new SinglePlayerStandardLayoutGameWidget(puyoThemeSet, levelTheme,
-                                          level, nColors, lifes,
-                                          aiFace, gameOverAction);
-}
-
-StatsWidgetDimensions SinglePlayerStandardLayoutFactory::getStatsWidgetDimensions() const
-{
-    return StatsWidgetDimensions(416, 194, 50, Vec3(0, 0), Vec3(0, 0));
-}
-
 PuyoLevelDefinitions *PuyoLevelDefinitions::currentDefinition = NULL;
 
 PuyoLevelDefinitions::PuyoLevelDefinitions(String levelDefinitionFile)
@@ -208,15 +193,6 @@ void PuyoLevelDefinitions::end_level(GoomSL *gsl, GoomHash *global, GoomHash *lo
 					easySettings, mediumSettings, hardSettings);
 }
 
-
-    //themeToUse = theCommander->getPreferedPuyoSetTheme();
-    //if (levelDefinition->backgroundTheme == "Prefs.DefaultTheme")
-    //    levelThemeToUse = theCommander->getPreferedLevelTheme();
-    //else
-    //    levelThemeToUse = theCommander->getLevelTheme(levelDefinition->backgroundTheme);
-
-
-
 PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName,
         Action *finishedAction, String playerName, const PlayerGameStat &playerPoints, bool initialTransition)
         : StoryScreen(screenName, finishedAction, initialTransition),
@@ -248,7 +224,6 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName,
 
 	add(&titleBox);
     add(&hiScoreBox);
-    //add(transitionWidget);
     refresh();
 }
 
@@ -423,7 +398,13 @@ GameWidget *StoryModeMatchState::createGameWidget(PuyoSetTheme &puyoThemeSet,
                                          String centerFace,
                                          Action *gameOverAction)
 {
-    return new SinglePlayerStandardLayoutGameWidget(puyoThemeSet, levelTheme,
+    m_sharedAssets.m_currentPuyoSetTheme = theCommander->getPreferedPuyoSetTheme();
+    if (m_sharedGameAssets->levelDef->backgroundTheme == "Prefs.DefaultTheme")
+        m_sharedAssets.m_currentLevelTheme = theCommander->getPreferedLevelTheme();
+    else
+        m_sharedAssets.m_currentLevelTheme = theCommander->getLevelTheme(m_sharedGameAssets->levelDef->backgroundTheme);
+    return new SinglePlayerStandardLayoutGameWidget(*(m_sharedAssets.m_currentPuyoSetTheme),
+                                                    *(m_sharedAssets.m_currentLevelTheme),
                                                     m_sharedGameAssets->levelDef->getAISettings(m_sharedGameAssets->difficulty).level,
                                                     m_sharedGameAssets->levelDef->getAISettings(m_sharedGameAssets->difficulty).nColors,
                                                     m_sharedGameAssets->lifes,
@@ -460,10 +441,12 @@ void StoryModeMatchState::action(Widget *sender, int actionType,
 //---------------------------------
 // StoryModePrepareNextMatchState
 //---------------------------------
+std::auto_ptr<PuyoLevelDefinitions> StoryModePrepareNextMatchState::m_levelDefProvider;
 StoryModePrepareNextMatchState::StoryModePrepareNextMatchState(SharedGameAssets *sharedGameAssets)
     : m_sharedGameAssets(sharedGameAssets)
 {
-    m_levelDefProvider.reset(new PuyoLevelDefinitions(theCommander->getDataPathManager().getPath("/story/levels.gsl")));
+    if (m_levelDefProvider.get() == NULL)
+        m_levelDefProvider.reset(new PuyoLevelDefinitions(theCommander->getDataPathManager().getPath("/story/levels.gsl")));
     reset();
 }
 

@@ -389,7 +389,8 @@ void MatchIsOverState::action(Widget *sender, int actionType,
 //---------------------------------
 DisplayStatsState::DisplayStatsState(SharedMatchAssets &sharedMatchAssets)
     : m_sharedAssets(sharedMatchAssets),
-      m_aknowledged(false)
+      m_aknowledged(false),
+      m_dimensions(416, 194, 50, Vec3(0, 0), Vec3(0, 0))
 {
 }
 
@@ -397,10 +398,17 @@ void DisplayStatsState::enterState()
 {
     GTLogTrace("DisplayStats::enterState()");
     m_aknowledged = false;
-
+    LevelTheme *lvlTheme = m_sharedAssets.m_currentLevelTheme;
+    m_dimensions = StatsWidgetDimensions(
+        lvlTheme->getStatsHeight(),
+        lvlTheme->getStatsLegendWidth(),
+        lvlTheme->getStatsComboLineValueWidth(),
+        Vec3(lvlTheme->getStatsLeftBackgroundOffsetX(),
+             lvlTheme->getStatsLeftBackgroundOffsetY()),
+        Vec3(lvlTheme->getStatsRightBackgroundOffsetX(),
+             lvlTheme->getStatsRightBackgroundOffsetY()));
     m_sharedAssets.m_gameWidget->setGameOverAction(this);
-    StatsWidgetDimensions dimensions(416, 194, 50, Vec3(0, 0), Vec3(0, 0));
-    m_statsWidget.reset(new TwoPlayersStatsWidget(m_sharedAssets.m_gameWidget->getStatPlayerOne(), m_sharedAssets.m_gameWidget->getStatPlayerTwo(), true, true, theCommander->getWindowFramePicture(), dimensions));
+    m_statsWidget.reset(new TwoPlayersStatsWidget(m_sharedAssets.m_gameWidget->getStatPlayerOne(), m_sharedAssets.m_gameWidget->getStatPlayerTwo(), true, true, theCommander->getWindowFramePicture(), m_dimensions));
     m_sharedAssets.m_gameScreen->add(m_statsWidget.get());
     // TODO: the stats widget must be released when the screen is removed
 }
