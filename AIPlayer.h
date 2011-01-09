@@ -1,4 +1,4 @@
-//  FloboPuyo/PuyoIA.h AI header for FloboPuyo
+//  FloboPuyo/AIPlayer.h AI header for FloboPuyo
 //  Copyright (C) 2007 Guillaume Borios <gyom@ios-software.com>
 //
 //  iOS-Software <http://www.ios-software.com>
@@ -71,11 +71,11 @@ typedef struct {
 
 typedef unsigned char GridState[IA_TABLEDIMX][IA_TABLEDIMY];
 
-class PuyoIA : public virtual PuyoPlayer {
+class AIPlayer : public virtual PuyoPlayer {
 
   public:
-    PuyoIA(int level, PuyoView &targetView);
-    virtual ~PuyoIA();
+    AIPlayer(int level, PuyoView &targetView);
+    virtual ~AIPlayer();
     virtual void cycle();
     void setAIParameters(const AIParameters &ai);
 	int getLevel() const { return this->level; }

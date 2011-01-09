@@ -1,4 +1,4 @@
-//  FloboPuyo/PuyoIA.h AI header for FloboPuyo
+//  FloboPuyo/AIPlayer.h AI header for FloboPuyo
 //  Copyright (C) 2007 Guillaume Borios <gyom@ios-software.com>
 //
 //  iOS-Software <http://www.ios-software.com>
@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <string.h>
-#include "PuyoIA.h"
+#include "AIPlayer.h"
 
 static const PuyoCoordinates nullPosition = {0,0};
 static const PuyoBinom nullBinom = {PUYO_EMPTY,PUYO_EMPTY,Left,nullPosition};
@@ -462,7 +462,7 @@ bool dropBinom(const PuyoBinom binom, const GridState * const src, GridState * c
   return true;
 }
 
-int PuyoIA::makeEvaluation(const GridEvaluation * const referenceOne, const PuyoBinom puyos, const GridState * const grid)
+int AIPlayer::makeEvaluation(const GridEvaluation * const referenceOne, const PuyoBinom puyos, const GridState * const grid)
 {
   int rR,rP;
   
@@ -514,7 +514,7 @@ int PuyoIA::makeEvaluation(const GridEvaluation * const referenceOne, const Puyo
   return r;
 }
 
-bool PuyoIA::selectIfBetterEvaluation(int * const best, const GridEvaluation * const newOne, const PuyoBinom puyos, const GridState * const grid)
+bool AIPlayer::selectIfBetterEvaluation(int * const best, const GridEvaluation * const newOne, const PuyoBinom puyos, const GridState * const grid)
 {
   int n = makeEvaluation(newOne, puyos, grid);
   int r = *best;
@@ -527,7 +527,7 @@ bool PuyoIA::selectIfBetterEvaluation(int * const best, const GridEvaluation * c
 }
 
 
-PuyoIA::PuyoIA(int level, PuyoView &targetView)
+AIPlayer::AIPlayer(int level, PuyoView &targetView)
 : PuyoPlayer(targetView)
 {
   internalGrid = NULL;
@@ -558,19 +558,19 @@ PuyoIA::PuyoIA(int level, PuyoView &targetView)
   this->level = level;
 }
 
-void PuyoIA::setAIParameters(const AIParameters &ai)
+void AIPlayer::setAIParameters(const AIParameters &ai)
 {
   int a = params.speedFactor;
   params = ai;
   params.speedFactor = a;
 }
 
-PuyoIA::~PuyoIA()
+AIPlayer::~AIPlayer()
 {
   if (internalGrid != NULL) free(internalGrid);
 }
 
-PuyoState PuyoIA::extractColor(PuyoState A) const
+PuyoState AIPlayer::extractColor(PuyoState A) const
 {
   switch (A) {
     case PUYO_FALLINGBLUE:
@@ -596,7 +596,7 @@ PuyoState PuyoIA::extractColor(PuyoState A) const
 }
 
 static const PuyoOrientation GameToIAOrientation[4] = {Below,Left,Above,Right};
-PuyoOrientation PuyoIA::extractOrientation(int D) const
+PuyoOrientation AIPlayer::extractOrientation(int D) const
 {
   if (D<0 || D>3) {
     fprintf(stderr,"Error in AI : unknown puyo orientation!!\nExiting...\n");
@@ -606,7 +606,7 @@ PuyoOrientation PuyoIA::extractOrientation(int D) const
 }
 
 static const int IAToGameOrientation[4] = {1,2,0,3};
-int PuyoIA::revertOrientation(PuyoOrientation D) const
+int AIPlayer::revertOrientation(PuyoOrientation D) const
 {
   if (D<0 || D>3) {
     fprintf(stderr,"Error in AI : unknown puyo orientation bis!!\nExiting...\n");
@@ -615,7 +615,7 @@ int PuyoIA::revertOrientation(PuyoOrientation D) const
   return IAToGameOrientation[D];
 }
 
-void PuyoIA::extractGrid(void)
+void AIPlayer::extractGrid(void)
 {
   // Alloc a grid if not already done
   if (internalGrid == NULL) internalGrid = (GridState *)malloc(sizeof(GridState));
@@ -691,7 +691,7 @@ bool canReach(const PuyoBinom binom, const PuyoBinom dest, GridState * const int
   return true;
 }
 
-void PuyoIA::decide(int partial, int depth)
+void AIPlayer::decide(int partial, int depth)
 {
   //fprintf(stderr, "  Decision %d on %d - Depth = %d\n",partial+1,DISPATCHCYCLES,depth);
   if (partial == 0)
@@ -808,7 +808,7 @@ void PuyoIA::decide(int partial, int depth)
 // positions are expression as Game references
 static const signed char rotationMatrix[4 /*target*/][4 /*current*/] = {{0,-1,2,1},{1,0,-1,2},{2,1,0,-1},{-1,2,1,0}};
 
-void PuyoIA::cycle()
+void AIPlayer::cycle()
 {
   // If no falling puyo, no need to play
   if (attachedGame->getFallingPuyo() == NULL || !attachedGame->isGameRunning()) 

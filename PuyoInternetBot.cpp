@@ -43,7 +43,7 @@ public:
     std::auto_ptr<PuyoRandomSystem> m_myRandom;
     std::auto_ptr<PuyoLocalGameFactory> m_myGameFactory;
     std::auto_ptr<PuyoInternetNetworkView> m_myView;
-    std::auto_ptr<PuyoIA> m_myAI;
+    std::auto_ptr<AIPlayer> m_myAI;
 
     std::auto_ptr<PuyoRandomSystem> m_opRandom;
     std::auto_ptr<PuyoNetworkGameFactory> m_opGameFactory;
@@ -61,7 +61,7 @@ public:
         m_myRandom = std::auto_ptr<PuyoRandomSystem>(new PuyoRandomSystem(5, invitation.gameRandomSeed));
         m_myGameFactory = std::auto_ptr<PuyoLocalGameFactory>(new PuyoLocalGameFactory(m_myRandom.get()));
         m_myView = std::auto_ptr<PuyoInternetNetworkView>(new PuyoInternetNetworkView(m_myGameFactory.get(), mbox, gameId, igpbox));
-        m_myAI = std::auto_ptr<PuyoIA>(new PuyoIA(m_level, *m_myView));
+        m_myAI = std::auto_ptr<AIPlayer>(new AIPlayer(m_level, *m_myView));
         // Remote view
         // TODO
         m_opRandom = std::auto_ptr<PuyoRandomSystem>(new PuyoRandomSystem(5, invitation.gameRandomSeed));

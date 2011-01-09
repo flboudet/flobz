@@ -48,7 +48,7 @@ public:
     virtual void action(Widget *sender, int actionType,
                         event_manager::GameControlEvent *event);
 protected:
-    PuyoIA *opponentcontroller;
+    AIPlayer *opponentcontroller;
     int faceTicks;
     StoryWidget opponent;
     CheatCodeManager killLeftCheat, killRightCheat;
@@ -66,7 +66,7 @@ private:
     PuyoCombinedEventPlayer playercontroller;
 };
 
-class PuyoLevelDefinitions {
+class StoryModeLevelsDefinition {
 public:
     struct SelIA {
         SelIA(int level, int nColors);
@@ -105,10 +105,10 @@ public:
             }
         }
     };
-    PuyoLevelDefinitions(String levelDefinitionFile);
+    StoryModeLevelsDefinition(String levelDefinitionFile);
     LevelDefinition *getLevelDefinition(int levelNumber) { return levelDefinitions[levelNumber]; }
     int getNumLevels() const { return levelDefinitions.size(); }
-    virtual ~PuyoLevelDefinitions();
+    virtual ~StoryModeLevelsDefinition();
 private:
     void addLevelDefinition(String levelName, String introStory,
 			    String opponentStory, String opponentName, String opponent,
@@ -117,7 +117,7 @@ private:
 			    SelIA mediumSettings, SelIA hardSettings);
     static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void get_BoolPreference(GoomSL *gsl, GoomHash *global, GoomHash *local);
-    static PuyoLevelDefinitions *currentDefinition;
+    static StoryModeLevelsDefinition *currentDefinition;
     AdvancedBuffer<LevelDefinition *> levelDefinitions;
 };
 
@@ -144,7 +144,7 @@ struct SharedGameAssets
     GameDifficulty difficulty;
     GameOptions    gameOptions;
     int            lifes;
-    PuyoLevelDefinitions::LevelDefinition *levelDef;
+    StoryModeLevelsDefinition::LevelDefinition *levelDef;
 };
 
 /**
@@ -292,7 +292,7 @@ public:
     }
     void reset();
 private:
-    static std::auto_ptr<PuyoLevelDefinitions> m_levelDefProvider;
+    static std::auto_ptr<StoryModeLevelsDefinition> m_levelDefProvider;
     SharedGameAssets *m_sharedGameAssets;
     int m_currentLevel;
     GameState *m_nextMatchState, *m_gameWonState;

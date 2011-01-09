@@ -28,7 +28,7 @@
 
 #include "PuyoView.h"
 #include "PuyoEventPlayer.h"
-#include "PuyoIA.h"
+#include "AIPlayer.h"
 #include "GameWidget.h"
 
 class PuyoLocalGameFactory : public PuyoGameFactory {

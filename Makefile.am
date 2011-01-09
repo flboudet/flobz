@@ -4,7 +4,7 @@ bin_PROGRAMS=flobopuyo
 flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           MainMenu.cpp MainScreen.cpp PuyoMain.cpp \
           main.cpp FPDataPathManager.cpp PuyoGame.cpp DoomMelt.cpp \
-          PuyoView.cpp PuyoAnimations.cpp AnimatedPuyo.cpp PuyoIA.cpp \
+          PuyoView.cpp PuyoAnimations.cpp AnimatedPuyo.cpp AIPlayer.cpp \
           styrolyse.cpp PuyoStory.cpp ChatBox.cpp LocalizedDictionary.cpp \
           PuyoEventPlayer.cpp PauseMenu.cpp CheatCodeManager.cpp \
           GameWidget.cpp GameScreen.cpp StatsWidget.cpp \
@@ -32,7 +32,7 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            AnimatedPuyo.h PuyoGameAbstract.h OptionMenu.h \
            PuyoGame.h PauseMenu.h \
            audio.h GameWidget.h GameScreen.h PuyoPlayer.h \
-           PuyoIA.h PuyoScoring.h PuyoMain.h \
+           AIPlayer.h PuyoScoring.h PuyoMain.h \
            PuyoIgpDefs.h ScreenTransition.h \
            HallOfFame.h InternetGameCenter.h PuyoSinglePlayerStarter.h \
            HiScores.h InternetMenu.h PuyoInternetBot.h PuyoStarter.h \

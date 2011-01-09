@@ -45,7 +45,7 @@ void SinglePlayerGameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB,
                                             int level,
                                             Action *gameOverAction)
 {
-    opponentcontroller = new PuyoIA(level, areaB);
+    opponentcontroller = new AIPlayer(level, areaB);
     GameWidget::initWithGUI(areaA, areaB, playercontroller, *opponentcontroller,
                                levelTheme, gameOverAction);
     addSubWidget(&killLeftCheat);
@@ -123,9 +123,9 @@ void SinglePlayerGameWidget::action(Widget *sender, int actionType,
         addGameBHandicap(PUYODIMY);
 }
 
-PuyoLevelDefinitions *PuyoLevelDefinitions::currentDefinition = NULL;
+StoryModeLevelsDefinition *StoryModeLevelsDefinition::currentDefinition = NULL;
 
-PuyoLevelDefinitions::PuyoLevelDefinitions(String levelDefinitionFile)
+StoryModeLevelsDefinition::StoryModeLevelsDefinition(String levelDefinitionFile)
 {
     GoomSL * gsl = gsl_new();
     if (!gsl) return;
@@ -134,21 +134,21 @@ PuyoLevelDefinitions::PuyoLevelDefinitions(String levelDefinitionFile)
     gsl_append_file_to_buffer(levelDefinitionFile, &fbuffer);
     gsl_compile(gsl,fbuffer);
     currentDefinition = this;
-    gsl_bind_function(gsl, "end_level",  PuyoLevelDefinitions::end_level);
-    gsl_bind_function(gsl, "getBoolPreference", PuyoLevelDefinitions::get_BoolPreference);
+    gsl_bind_function(gsl, "end_level",  StoryModeLevelsDefinition::end_level);
+    gsl_bind_function(gsl, "getBoolPreference", StoryModeLevelsDefinition::get_BoolPreference);
     gsl_execute(gsl);
     free(fbuffer);
     gsl_free(gsl);
 }
 
-PuyoLevelDefinitions::~PuyoLevelDefinitions()
+StoryModeLevelsDefinition::~StoryModeLevelsDefinition()
 {
   for (int i = 0 ; i < levelDefinitions.size() ; i++) {
     delete levelDefinitions[i];
   }
 }
 
-void PuyoLevelDefinitions::addLevelDefinition(String levelName, String introStory,
+void StoryModeLevelsDefinition::addLevelDefinition(String levelName, String introStory,
 					      String opponentStory, String opponentName,
 					      String opponent, String backgroundTheme,
 					      String gameLostStory, String gameOverStory,
@@ -160,11 +160,11 @@ void PuyoLevelDefinitions::addLevelDefinition(String levelName, String introStor
 					   easySettings, mediumSettings, hardSettings));
 }
 
-PuyoLevelDefinitions::SelIA::SelIA(int level, int nColors) : level(level), nColors(nColors)
+StoryModeLevelsDefinition::SelIA::SelIA(int level, int nColors) : level(level), nColors(nColors)
 {
 }
 
-void PuyoLevelDefinitions::get_BoolPreference(GoomSL *gsl, GoomHash *global, GoomHash *local)
+void StoryModeLevelsDefinition::get_BoolPreference(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
     char *name  = (char*)GSL_LOCAL_PTR(gsl, local, "name");
     int def     = GSL_LOCAL_INT(gsl, local, "default");
@@ -172,7 +172,7 @@ void PuyoLevelDefinitions::get_BoolPreference(GoomSL *gsl, GoomHash *global, Goo
         = GetBoolPreference(name, def);
 }
 
-void PuyoLevelDefinitions::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
+void StoryModeLevelsDefinition::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
   const char * levelName = (const char *) GSL_GLOBAL_PTR(gsl, "level.levelName");
   const char * introStory = (const char *) GSL_GLOBAL_PTR(gsl, "level.introStory");
@@ -441,12 +441,12 @@ void StoryModeMatchState::action(Widget *sender, int actionType,
 //---------------------------------
 // StoryModePrepareNextMatchState
 //---------------------------------
-std::auto_ptr<PuyoLevelDefinitions> StoryModePrepareNextMatchState::m_levelDefProvider;
+std::auto_ptr<StoryModeLevelsDefinition> StoryModePrepareNextMatchState::m_levelDefProvider;
 StoryModePrepareNextMatchState::StoryModePrepareNextMatchState(SharedGameAssets *sharedGameAssets)
     : m_sharedGameAssets(sharedGameAssets)
 {
     if (m_levelDefProvider.get() == NULL)
-        m_levelDefProvider.reset(new PuyoLevelDefinitions(theCommander->getDataPathManager().getPath("/story/levels.gsl")));
+        m_levelDefProvider.reset(new StoryModeLevelsDefinition(theCommander->getDataPathManager().getPath("/story/levels.gsl")));
     reset();
 }
 
