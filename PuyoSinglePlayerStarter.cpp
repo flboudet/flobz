@@ -45,7 +45,12 @@ void SinglePlayerGameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB,
                                             int level,
                                             Action *gameOverAction)
 {
-    opponentcontroller = new AIPlayer(level, areaB);
+    // Jeko's corrected_level ensures easier games on easiest levels
+    int corrected_level = level;
+    if (level > 12) corrected_level = level + (3 - lives) / 2; // Half of medium level, make sure the player do not loose 3 times the same oponent.
+    if (level >= 20) corrected_level = level + (3 - lives); // Easy level, make sure the player do always loose the same oponent.
+    opponentcontroller = new AIPlayer(corrected_level, areaB);
+    
     GameWidget::initWithGUI(areaA, areaB, playercontroller, *opponentcontroller,
                                levelTheme, gameOverAction);
     addSubWidget(&killLeftCheat);
