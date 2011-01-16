@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "ios_udpmessagebox.h"
+#include "ios_fastmessage.h"
 #include "ios_udpmessage.h"
 #include "ios_socketaddress.h"
 #include "ios_time.h"
@@ -43,11 +44,11 @@ public:
     void sendQueue();
 
     void idle(double time_ms);
-    void handleMessage(UDPMessage &message, int messageSerialID);
+    void handleMessage(UDPMessage<FastMessage> &message, int messageSerialID);
     void handleAck(int messageSerialID);
 
     // Members
-    
+
     PeerAddress address;
     UDPRawMessage *waitingForAckMessage;
     AdvancedBuffer<UDPRawMessage*> outQueue;
@@ -180,7 +181,7 @@ void UDPMessageBox::KnownPeer::idle(double time_ms)
             waitingForAckMessage->send();
         }
     }
-    
+
     // Handle peer timeout
     timeMsSinceLastMessage += elapsed_ms;
     if (timeMsSinceLastMessage >= owner.getTimeMsBeforePeerTimeout()) {
@@ -189,10 +190,10 @@ void UDPMessageBox::KnownPeer::idle(double time_ms)
     }
 }
 
-void UDPMessageBox::KnownPeer::handleMessage(UDPMessage &incomingMessage, int messageSerialID)
+void UDPMessageBox::KnownPeer::handleMessage(UDPMessage<FastMessage> &incomingMessage, int messageSerialID)
 {
     timeMsSinceLastMessage = 0;
-    
+
     // Handle message with inconsistent serial ID
     if ((messageSerialID >= 0) && (messageSerialID < receiveSerialID)) {
         // peer reset
@@ -202,13 +203,13 @@ void UDPMessageBox::KnownPeer::handleMessage(UDPMessage &incomingMessage, int me
             return;
         }
     }
-    
+
     // We should acknowledge every reliable message
     if (incomingMessage.isReliable()) {
-        UDPMessage acknowledgeMessage(-messageSerialID, owner, incomingMessage.getPeerAddress());
+        UDPMessage<FastMessage> acknowledgeMessage(-messageSerialID, owner, incomingMessage.getPeerAddress());
         acknowledgeMessage.send();
     }
-    
+
     // Drop if message has been received twice  or has come after the next one
     if (messageSerialID <= receiveSerialID) {
         // Message dropped
@@ -272,25 +273,25 @@ UDPMessageBox::~UDPMessageBox()
 void UDPMessageBox::idle()
 {
     double time_ms = getTimeMs();
-      
+
     char receiveData[2048];
     Buffer<char> receiveBuffer(receiveData, 2048);
-    
+
     // Known peers idle task
     for (int i = 0, j = knownPeers.size() ; i < j ; i++) {
         knownPeers[i]->idle(time_ms);
     }
-    
+
     while (socket->available()) {
         Datagram receivedDatagram = socket->receive(receiveBuffer);
         //printf("message UDP recu dans l'UDP Message Box de %s:%d !\n", (const char *)(receivedDatagram.getAddress().asString()), receivedDatagram.getPortNum());
         try {
             if (receivedDatagram.getSize() > 0) {
-                UDPMessage incomingMessage(Buffer<char>((char *)(receivedDatagram.getMessage()), receivedDatagram.getSize()),
+                UDPMessage<FastMessage> incomingMessage(Buffer<char>((char *)(receivedDatagram.getMessage()), receivedDatagram.getSize()),
                                            *this, receivedDatagram.getAddress(), receivedDatagram.getPortNum());
-                
+
                 int messageSerialID = incomingMessage.getSerialID();
-                
+
                 // ACK message MUST be handled here, because sender address might not be the same as replier one
                 if (messageSerialID < 0) {
                     for (int i = 0, j = knownPeers.size() ; i < j ; i++) {
@@ -309,7 +310,7 @@ void UDPMessageBox::idle()
                 }
             }
         }
-        catch (UDPMessage::InvalidMessageException e) {
+        catch (Message::InvalidMessageException e) {
             receiveBuffer[2047] = 0;
             printf("Message dropped : %s\n", (const char *)receiveBuffer);
             // Do nothing
@@ -321,14 +322,14 @@ void UDPMessageBox::sendUDP(Buffer<char> buffer, int id, bool reliable, PeerAddr
 {
     UDPRawMessage *rawMessage = new UDPRawMessage(buffer, id, reliable,
 						  addr, portNum, *socket);
-    
+
     // Service messages must be sent imediately
     if (id <= 0) {
         rawMessage->send();
         delete rawMessage;
         return;
     }
-    
+
     KnownPeer *currentPeer = findPeer(peerAddr);
     if (currentPeer == NULL) {
         currentPeer = new KnownPeer(peerAddr, 0, *this);
@@ -339,8 +340,8 @@ void UDPMessageBox::sendUDP(Buffer<char> buffer, int id, bool reliable, PeerAddr
 
 Message * UDPMessageBox::createMessage()
 {
-    UDPMessage *newMessage;
-    newMessage = new UDPMessage(++sendSerialID, *this,
+    UDPMessage<FastMessage> *newMessage;
+    newMessage = new UDPMessage<FastMessage>(++sendSerialID, *this,
 				defaultAddress, defaultPort);
     return newMessage;
 }
@@ -376,7 +377,7 @@ void UDPMessageBox::removeSessionListener(SessionListener *l)
 
 void UDPMessageBox::bind(PeerAddress addr)
 {
-    UDPMessage::UDPPeerAddressImpl *newPeerAddressImpl = dynamic_cast<UDPMessage::UDPPeerAddressImpl *>(addr.getImpl());
+    UDPPeerAddressImpl *newPeerAddressImpl = dynamic_cast<UDPPeerAddressImpl *>(addr.getImpl());
     if (newPeerAddressImpl != NULL) {
         defaultAddress = newPeerAddressImpl->getAddress();
         defaultPort = newPeerAddressImpl->getPortNum();

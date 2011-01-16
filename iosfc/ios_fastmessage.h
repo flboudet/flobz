@@ -23,7 +23,7 @@ class FastMessage : public Message
 {
 public:
     FastMessage();
-    FastMessage(VoidBuffer &serializedData);
+    FastMessage(const VoidBuffer &serializedData);
     virtual ~FastMessage();
 
     virtual VoidBuffer serialize();

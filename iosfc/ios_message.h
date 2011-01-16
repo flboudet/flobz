@@ -9,16 +9,21 @@ namespace ios_fc {
 
 class Message
 {
-  public:
+public:
 
     class DataException : public Exception {
-      public:
-      DataException(const String name) : Exception(String("Error in Message Data '") + name + "'") {}
+    public:
+        DataException(const String name) : Exception(String("Error in Message Data '") + name + "'") {}
     };
 
     class PropertyException : public Exception {
-      public:
-      PropertyException(const String name) : Exception(String("Error in Message Property ") + name + "'") {}
+    public:
+        PropertyException(const String name) : Exception(String("Error in Message Property ") + name + "'") {}
+    };
+
+    class InvalidMessageException : public Exception {
+    public:
+        InvalidMessageException() : Exception("Invalid Message") {}
     };
 
     virtual ~Message() {}

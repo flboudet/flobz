@@ -7,12 +7,6 @@ namespace ios_fc {
 
   class StandardMessage : public BaseMessage {
     public:
-
-      class InvalidMessageException : public Exception {
-        public:
-          InvalidMessageException() : Exception("Invalid Message") {}
-      };
-
       StandardMessage(int serialID);
       StandardMessage(const Buffer<char> serialized) throw(InvalidMessageException);
       virtual ~StandardMessage();

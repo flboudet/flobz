@@ -15,7 +15,7 @@ FastMessage::FastMessage()
     m_headerRecords = (HeaderRecord *)((char *)m_header + 2);
 }
 
-FastMessage::FastMessage(VoidBuffer &serializedData)
+FastMessage::FastMessage(const VoidBuffer &serializedData)
 {
     size_t headerSize = get_uint16(serializedData);
     size_t dataSize = serializedData.size() - headerSize;

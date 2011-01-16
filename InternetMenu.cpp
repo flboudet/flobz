@@ -23,6 +23,7 @@
  *
  */
 
+#include "ios_standardmessage.h"
 #include "InternetMenu.h"
 #include "preferences.h"
 #include "InternetGameCenter.h"
