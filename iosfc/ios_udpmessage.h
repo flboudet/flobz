@@ -2,22 +2,15 @@
 #define _IOS_UDP_MESSAGE_H
 
 #include "ios_message.h"
-#include "ios_udpmessagebox.h"
+#include "ios_udpmessageboxbase.h"
 #include "ios_dirigeable.h"
 
 namespace ios_fc {
 
+namespace _private_udpmessagebox {
+
 static const char *SERIAL_ID   = "SID";
 static const char *IS_RELIABLE = "RELIABLE";
-
-class UDPPeerAddress : public PeerAddress {
-public:
-    UDPPeerAddress(PeerAddressImpl *impl) : PeerAddress(impl) {}
-    UDPPeerAddress(const PeerAddress &a) : PeerAddress(a) {}
-    UDPPeerAddress(const SocketAddress &addr, int portNum);
-    SocketAddress getSocketAddress() const;
-    int getPortNum() const;
-};
 
 class UDPPeerAddressImpl : public PeerAddressImpl {
 public:
@@ -34,12 +27,18 @@ private:
     int port;
 };
 
-template <typename T>
-class UDPMessage : public T, public Dirigeable {
+class UDPMessageInterface : public virtual Message, public virtual Dirigeable {
 public:
-    UDPMessage(int serialID, UDPMessageBox &owner, SocketAddress address, int port);
-    UDPMessage(int serialID, UDPMessageBox &owner, const PeerAddress &address);
-    UDPMessage(const VoidBuffer &serialized, UDPMessageBox &owner, SocketAddress address, int port) throw(Message::InvalidMessageException);
+    virtual int  getSerialID() const = 0;
+    virtual bool isReliable() const = 0;
+};
+
+template <typename T>
+class UDPMessage : public virtual UDPMessageInterface, public T {
+public:
+    UDPMessage(int serialID, UDPMessageBoxBase &owner, SocketAddress address, int port);
+    UDPMessage(int serialID, UDPMessageBoxBase &owner, const PeerAddress &address);
+    UDPMessage(const VoidBuffer &serialized, UDPMessageBoxBase &owner, SocketAddress address, int port) throw(Message::InvalidMessageException);
     virtual ~UDPMessage() {}
     // Message implementation
     virtual void send();
@@ -50,11 +49,11 @@ public:
     PeerAddress getBroadcastAddress();
     void setPeerAddress(PeerAddress);
     void addPeerAddress(const String key, const PeerAddress &value);
-    // Own methods
+    // UDPMessageInterface implementation
     int  getSerialID() const;
     bool isReliable() const;
 private:
-    UDPMessageBox &owner;
+    UDPMessageBoxBase &owner;
     UDPPeerAddressImpl *peerAddressImpl;
     PeerAddress peerAddress;
 
@@ -63,7 +62,7 @@ private:
 };
 
 template <typename T>
-UDPMessage<T>::UDPMessage(int serialID, UDPMessageBox &owner, SocketAddress address, int port)
+UDPMessage<T>::UDPMessage(int serialID, UDPMessageBoxBase &owner, SocketAddress address, int port)
     : owner(owner),
       peerAddressImpl(new UDPPeerAddressImpl(address, port)),
       peerAddress(peerAddressImpl)
@@ -72,7 +71,7 @@ UDPMessage<T>::UDPMessage(int serialID, UDPMessageBox &owner, SocketAddress addr
 }
 
 template <typename T>
-UDPMessage<T>::UDPMessage(int serialID, UDPMessageBox &owner, const PeerAddress &address)
+UDPMessage<T>::UDPMessage(int serialID, UDPMessageBoxBase &owner, const PeerAddress &address)
     : owner(owner),
       peerAddressImpl(static_cast<UDPPeerAddressImpl *>(address.getImpl())),
       peerAddress(address)
@@ -81,7 +80,7 @@ UDPMessage<T>::UDPMessage(int serialID, UDPMessageBox &owner, const PeerAddress 
 }
 
 template <typename T>
-UDPMessage<T>::UDPMessage(const VoidBuffer &serialized, UDPMessageBox &owner, SocketAddress address, int port)  throw(Message::InvalidMessageException)
+UDPMessage<T>::UDPMessage(const VoidBuffer &serialized, UDPMessageBoxBase &owner, SocketAddress address, int port)  throw(Message::InvalidMessageException)
 : T(serialized), owner(owner),
   peerAddressImpl(new UDPPeerAddressImpl(address, port)),
   peerAddress(peerAddressImpl)
@@ -104,7 +103,7 @@ PeerAddress UDPMessage<T>::getPeerAddress(const String key)
 template <typename T>
 PeerAddress UDPMessage<T>::getBroadcastAddress()
 {
-    return PeerAddress(new UDPPeerAddressImpl(owner.getBroadcastAddress(), peerAddressImpl->getPortNum()));
+    return PeerAddress(new UDPPeerAddressImpl(owner.getDatagramSocket()->getBroadcastAddress(), peerAddressImpl->getPortNum()));
 }
 
 template <typename T>
@@ -142,6 +141,17 @@ bool UDPMessage<T>::isReliable() const
         return T::getBoolProperty(IS_RELIABLE);
     return false;
 }
+
+}
+
+class UDPPeerAddress : public PeerAddress {
+public:
+    UDPPeerAddress(PeerAddressImpl *impl) : PeerAddress(impl) {}
+    UDPPeerAddress(const PeerAddress &a) : PeerAddress(a) {}
+    UDPPeerAddress(const SocketAddress &addr, int portNum);
+    SocketAddress getSocketAddress() const;
+    int getPortNum() const;
+};
 
 }
 

@@ -37,7 +37,7 @@ using namespace ios_fc;
 
 class NatTraversal : public MessageListener {
 public:
-    NatTraversal(UDPMessageBox &udpmbox, double punchInfoTimeout = 3000., double strategyTimeout = 2000.);
+    NatTraversal(UDPMessageBoxBase &udpmbox, double punchInfoTimeout = 3000., double strategyTimeout = 2000.);
     virtual ~NatTraversal();
     void punch(const String punchPoolName);
     void idle();
@@ -47,8 +47,8 @@ public:
 private:
     void sendGarbageMessage();
     void sendSyncMessage();
-    
-    UDPMessageBox &udpmbox;
+
+    UDPMessageBoxBase &udpmbox;
     IgpMessageBox *igpmbox;
     String peerAddressString, peerLocalAddressString;
     int peerPortNum, peerLocalPortNum;

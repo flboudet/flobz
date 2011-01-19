@@ -1,3 +1,4 @@
+#include "ios_fastmessage.h"
 #include "ios_datagramsocket.h"
 #include "ios_udpmessagebox.h"
 #include "ios_igpmessagelistener.h"
@@ -20,21 +21,21 @@ int main(int argc, const char * argv[])
     if (argc >= 3) protocol = atoi(argv[2]);
     fprintf(stderr, "Usage %s [port number] [protocol number]\n", argv[0]);
     fprintf(stderr, "Starting server at port %d, using protocol %d\n", port, protocol);
-  
+
     try {
     Selector serverSelector;
     DatagramSocket serverSocket(port);
-    UDPMessageBox messageBox(&serverSocket);
+    UDPMessageBox<FastMessage> messageBox(&serverSocket);
     IgpMessageListener listener(messageBox);
-    
+
     messageBox.addListener(&listener);
     messageBox.addSessionListener(&listener);
     serverSelector.addSelectable(&serverSocket);
-    
+
     IgpVirtualPeerMessageBox igpMBox(listener, 1);
     PuyoIgpNatTraversal natPuncher(igpMBox, listener);
     igpMBox.addListener(&natPuncher);
-    
+
     PuyoServer *responder;
     switch (protocol) {
         case 1: responder = new PuyoServerV1(igpMBox); break;

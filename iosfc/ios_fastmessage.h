@@ -19,7 +19,7 @@ struct HeaderRecord {
     uint16_t valOffset;
 };
 
-class FastMessage : public Message
+class FastMessage : public virtual Message
 {
 public:
     FastMessage();

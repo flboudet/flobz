@@ -19,6 +19,7 @@
  *
  */
 
+#include "ios_fastmessage.h"
 #include "ios_igpmessagebox.h"
 #include "ios_udpmessagebox.h"
 #include "ios_igpmessage.h"
@@ -33,7 +34,7 @@ namespace ios_fc {
     private:
         IgpMessageBox &owner;
     };
-    
+
     IgpMessageBoxMessage::IgpMessageBoxMessage(int serialID, IgpMessageBox &owner, int igpPeerIdent) : IgpMessage(serialID, igpPeerIdent), owner(owner)
     {
     }
@@ -42,19 +43,19 @@ namespace ios_fc {
     : IgpMessage(serialized, igpPeerIdent), owner(owner)
     {
     }
-  
+
     void IgpMessageBoxMessage::sendBuffer(Buffer<char> out) const
     {
         owner.sendBuffer(out, isReliable(), igpPeerIdent);
     }
-    
+
     // IgpMessageBox implementation
-    IgpMessageBox::IgpMessageBox(const String hostName, int portID) : mbox(new UDPMessageBox(hostName, 0, portID)), ownMessageBox(true), igpClient(new IGPClient(*mbox)), sendSerialID(0)
+    IgpMessageBox::IgpMessageBox(const String hostName, int portID) : mbox(new UDPMessageBox<FastMessage>(hostName, 0, portID)), ownMessageBox(true), igpClient(new IGPClient(*mbox)), sendSerialID(0)
     {
         igpClient->addListener(this);
     }
-    
-    IgpMessageBox::IgpMessageBox(const String hostName, int portID, int igpIdent) : mbox(new UDPMessageBox(hostName, 0, portID)), ownMessageBox(true), igpClient(new IGPClient(*mbox, igpIdent)), sendSerialID(0)
+
+    IgpMessageBox::IgpMessageBox(const String hostName, int portID, int igpIdent) : mbox(new UDPMessageBox<FastMessage>(hostName, 0, portID)), ownMessageBox(true), igpClient(new IGPClient(*mbox, igpIdent)), sendSerialID(0)
     {
         igpClient->addListener(this);
     }
@@ -90,7 +91,7 @@ namespace ios_fc {
     {
         igpClient->sendMessage(igpDestIdent, out, reliable);
     }
-    
+
     void IgpMessageBox::onMessage(VoidBuffer message, int origIdent, int destIdent)
     {
         try {
@@ -104,7 +105,7 @@ namespace ios_fc {
             e.printMessage();
         }
     }
-    
+
     void IgpMessageBox::bind(PeerAddress addr)
     {
         IgpMessage::IgpPeerAddressImpl *peerAddressImpl = dynamic_cast<IgpMessage::IgpPeerAddressImpl *>(addr.getImpl());
@@ -113,7 +114,7 @@ namespace ios_fc {
         }
         else throw Exception("Incompatible peer address type!");
     }
-    
+
     PeerAddress IgpMessageBox::getSelfAddress() const
     {
         return PeerAddress(new IgpMessage::IgpPeerAddressImpl(igpClient->getIgpIdent()));

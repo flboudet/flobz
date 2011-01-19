@@ -19,66 +19,66 @@
  *
  */
 
-#ifndef _IOS_UDP_MESSAGE_BOX_H
-#define _IOS_UDP_MESSAGE_BOX_H
+#ifndef _IOS_UDPMESSAGEBOX_H_
+#define _IOS_UDPMESSAGEBOX_H_
 
-#include "ios_memory.h"
-#include "ios_messagebox.h"
-#include "ios_datagramsocket.h"
-#include "ios_socketaddress.h"
-#include "ios_dirigeable.h"
+#include "ios_udpmessageboxbase.h"
+#include "ios_udpmessage.h"
 
 namespace ios_fc {
 
-class UDPMessageBox;
-class UDPRawMessage;
-
-class UDPMessageBox : public MessageBox, public SessionManager {
+template <typename T>
+class UDPMessageBox : public UDPMessageBoxBase {
 public:
     UDPMessageBox(String address, int localPort, int remotePort);
     UDPMessageBox(DatagramSocket *socket);
-    virtual ~UDPMessageBox();
-    void idle();
-    Message * createMessage();
-    void sendUDP(Buffer<char> buffer, int id, bool reliable, PeerAddress peerAddr, SocketAddress addr, int portNum);
-    SocketAddress getBroadcastAddress() const { return socket->getBroadcastAddress(); }
-    SocketAddress getSocketAddress() const { return socket->getSocketAddress(); }
-    DatagramSocket *getDatagramSocket() const { return socket; }
-    // Session manager
-    void addSessionListener(SessionListener *l);
-    void removeSessionListener(SessionListener *l);
-    
-    // Accessors
-    inline int getTimeMsBeforeResendingReliable() const { return timeMsBeforeResendingReliable; }
-    inline int getTimeMsBeforeReliableTimeout()  const  { return timeMsBeforeReliableTimeout; }
-    inline int getTimeMsBeforePeerTimeout()      const  { return timeMsBeforePeerTimeout; }
-    
-    void bind(PeerAddress addr);
-    PeerAddress getBound() const;
-    PeerAddress createPeerAddress(SocketAddress address, int portNum) const;
+    virtual Message * createMessage();
+protected:
+    virtual ios_fc::_private_udpmessagebox::UDPMessageInterface * createMessageFromSerialized(const VoidBuffer &serialized, SocketAddress address, int port);
+    virtual void sendAckMessage(int serialID, const PeerAddress &address);
 private:
-    struct KnownPeer;
-    KnownPeer *findPeer(PeerAddress address);
-    // For KnownPeers
-    void warnListeners(Message &message);
-    
-    SocketAddress defaultAddress;
-    int defaultPort;
-    DatagramSocket *socket;
-    int sendSerialID;
-    AdvancedBuffer<KnownPeer*> knownPeers;
-    // UDP Messagebox parameters
-    int timeMsBeforeResendingReliable;
-    int timeMsBeforeReliableTimeout;
-    int timeMsBeforePeerTimeout;
-    
-    // Session manager
-    AdvancedBuffer<SessionListener *> sessionListeners;
-
     UDPMessageBox (const UDPMessageBox&);
     void operator=(const UDPMessageBox&);
 };
 
+/// Implementation
+template <typename T>
+UDPMessageBox<T>::UDPMessageBox(String address, int localPort, int remotePort)
+    : UDPMessageBoxBase(address, localPort, remotePort)
+{}
+
+template <typename T>
+UDPMessageBox<T>::UDPMessageBox(DatagramSocket *socket)
+    : UDPMessageBoxBase(socket)
+{}
+
+template <typename T>
+Message * UDPMessageBox<T>::createMessage()
+{
+    ios_fc::_private_udpmessagebox::UDPMessage<T> *newMessage;
+    newMessage = new ios_fc::_private_udpmessagebox::UDPMessage<T>(++sendSerialID, *this,
+				defaultAddress, defaultPort);
+    return newMessage;
 }
 
-#endif // _IOS_UDP_MESSAGE_BOX_H
+template <typename T>
+ios_fc::_private_udpmessagebox::UDPMessageInterface *
+UDPMessageBox<T>::createMessageFromSerialized(const VoidBuffer &serialized, SocketAddress address, int port)
+{
+    ios_fc::_private_udpmessagebox::UDPMessage<T> *incomingMessage
+        = new ios_fc::_private_udpmessagebox::UDPMessage<T>(serialized, *this,
+                                                            address, port);
+    return incomingMessage;
+}
+
+template <typename T>
+void UDPMessageBox<T>::sendAckMessage(int serialID, const PeerAddress &address)
+{
+    ios_fc::_private_udpmessagebox::UDPMessage<T>
+        acknowledgeMessage(-serialID, *this, address);
+    acknowledgeMessage.send();
+}
+
+}
+
+#endif

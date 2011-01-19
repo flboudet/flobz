@@ -140,7 +140,7 @@ void InternetGameCenter::idle()
             for (int i = 0, j = listeners.size() ; i < j ; i++) {
                 listeners[i]->onGameAcceptedNegociationPending(grantedInvitation);
             }
-            p2pmbox = new UDPMessageBox(hostName, 0, portNum);
+            p2pmbox = new FPInternetP2PMessageBox(hostName, 0, portNum);
             printf("grantedAddr:%d\n", static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.opponentAddress.getImpl())->getIgpIdent());
 
             int initiatorIgpIdent, guestIgpIdent;

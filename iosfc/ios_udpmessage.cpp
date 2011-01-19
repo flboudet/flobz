@@ -5,13 +5,13 @@
 namespace ios_fc {
 
 UDPPeerAddress::UDPPeerAddress(const SocketAddress &addr, int portNum)
-    : PeerAddress(new UDPPeerAddressImpl(addr, portNum))
+    : PeerAddress(new ios_fc::_private_udpmessagebox::UDPPeerAddressImpl(addr, portNum))
 {
 }
 
 SocketAddress UDPPeerAddress::getSocketAddress() const
 {
-    UDPPeerAddressImpl *peerAddressImpl = dynamic_cast<UDPPeerAddressImpl *>(getImpl());
+    ios_fc::_private_udpmessagebox::UDPPeerAddressImpl *peerAddressImpl = dynamic_cast<ios_fc::_private_udpmessagebox::UDPPeerAddressImpl *>(getImpl());
     if (peerAddressImpl != NULL) {
         return peerAddressImpl->getAddress();
     }
@@ -20,7 +20,7 @@ SocketAddress UDPPeerAddress::getSocketAddress() const
 
 int UDPPeerAddress::getPortNum() const
 {
-    UDPPeerAddressImpl *peerAddressImpl = dynamic_cast<UDPPeerAddressImpl *>(getImpl());
+    ios_fc::_private_udpmessagebox::UDPPeerAddressImpl *peerAddressImpl = dynamic_cast<ios_fc::_private_udpmessagebox::UDPPeerAddressImpl *>(getImpl());
     if (peerAddressImpl != NULL) {
         return peerAddressImpl->getPortNum();
     }

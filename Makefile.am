@@ -43,7 +43,7 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            ChatBox.h NatTraversal.h LocalGameStates.h \
            PuyoTwoPlayerStarter.h \
            CheatCodeManager.h NetCenterMenu.h PuyoView.h \
-           PuyoCommander.h NetGameCenter.h SDLMain.h \
+           PuyoCommander.h NetworkDefinitions.h NetGameCenter.h SDLMain.h \
            ControlMenu.h PuyoNetworkGame.h styrolyse.h \
            FPDataPathManager.h NetworkMenu.h \
            DoomMelt.h PuyoNetworkStarter.h PackageDescription.h \

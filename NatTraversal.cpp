@@ -25,12 +25,10 @@
 
 #include "NatTraversal.h"
 
-NatTraversal::NatTraversal(UDPMessageBox &udpmbox, double punchInfoTimeout, double strategyTimeout)
+NatTraversal::NatTraversal(UDPMessageBoxBase &udpmbox, double punchInfoTimeout, double strategyTimeout)
   : udpmbox(udpmbox), igpmbox(new IgpMessageBox(udpmbox)), currentStrategy(TRY_NONE), punchInfoTimeout(punchInfoTimeout), strategyTimeout(strategyTimeout), receivedGarbage(0), udpSocketAddress("127.0.0.1"), igpServerSocketAddress(udpmbox.getDatagramSocket()->getConnectedAddress()), igpServerPortNum(udpmbox.getDatagramSocket()->getConnectedPortNum())
 {
     igpmbox->addListener(this);
-    //printf("GetSocketAddress(): %s\n", (const char *)(mbox->getSocketAddress().asString()));
-    //printf("GetSocketPortNum(): %d\n", mbox->getDatagramSocket()->getSocketPortNum());
 }
 
 NatTraversal::~NatTraversal()
@@ -48,9 +46,9 @@ void NatTraversal::punch(const String punchPoolName)
     int prevBound = igpmbox->getBound();
     igpmbox->bind(1);
     Message *punchMsg = igpmbox->createMessage();
-    String localSocketAddress = udpmbox.getSocketAddress().asString();
+    String localSocketAddress = udpmbox.getDatagramSocket()->getSocketAddress().asString();
     int localPortNum = udpmbox.getDatagramSocket()->getSocketPortNum();
-    
+
     punchMsg->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL);
     punchMsg->addString("PPOOL", punchPoolName);
     punchMsg->addString("LSOCKADDR", localSocketAddress);
@@ -82,7 +80,7 @@ void NatTraversal::idle()
                 udpSocketPortNum = peerPortNum;
                 //udpmbox.getDatagramSocket()->connect(sockPubAddr, peerPortNum);
                 udpPeerAddress = udpmbox.createPeerAddress(udpSocketAddress, udpSocketPortNum);
-                
+
                 udpmbox.addListener(this);
                 currentStrategy = TRY_PUBLICADDR;
                 timeToNextStrategy = currentTime + strategyTimeout;
@@ -146,13 +144,13 @@ void NatTraversal::onMessage(Message &msg)
             peerLocalPortNum = msg.getInt("LPORTNUM");
             printf("Peer:    %s:%d\n", (const char *)peerAddressString, peerPortNum);
             printf("Peer(L): %s:%d\n", (const char *)peerLocalAddressString, peerLocalPortNum);
-            
+
             // Destroy the igp messagebox
             //delete igpmbox;
             //igpmbox = NULL;
             gettingPunchInfo = false;
             udpmbox.getDatagramSocket()->disconnect();
-            
+
             // Connect the udp messagebox to the local address of the peer
             /*SocketAddress sockLocAddr(peerLocalAddressString);
             udpmbox.addListener(this);
@@ -185,7 +183,7 @@ void NatTraversal::onMessage(Message &msg)
 
 void NatTraversal::sendGarbageMessage()
 {
-    if (udpPeerAddress == udpmbox.createPeerAddress(udpmbox.getSocketAddress(), udpmbox.getDatagramSocket()->getSocketPortNum()))
+    if (udpPeerAddress == udpmbox.createPeerAddress(udpmbox.getDatagramSocket()->getSocketAddress(), udpmbox.getDatagramSocket()->getSocketPortNum()))
         printf("Envoi de messages a moi-meme!!!!!");
     //printf("Envoi garbage\n");
     bool connectedState = udpmbox.getDatagramSocket()->getConnected();
@@ -194,11 +192,11 @@ void NatTraversal::sendGarbageMessage()
     //PeerAddress prevBound = udpmbox.getBound();
     //udpmbox.bind(udpPeerAddress);
     Message *garbMsg = udpmbox.createMessage();
-    
+
     garbMsg->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL_GARBAGE);
     garbMsg->addString("GARBAGE", "GNU is not free software");
     garbMsg->addInt("RCV", receivedGarbage);
-    
+
     Dirigeable *dirigeableMsg = dynamic_cast<Dirigeable *>(garbMsg);
     dirigeableMsg->setPeerAddress(udpPeerAddress);
     garbMsg->send();

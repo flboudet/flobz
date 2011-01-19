@@ -65,8 +65,8 @@ public:
     virtual void idle(double currentTime);
     bool answeredToPing() const;
 private:
-    UDPMessageBox m_pingBox;
-    IGPClient m_igpclient;
+    ios_fc::UDPMessageBox<ios_fc::FastMessage> m_pingBox;
+    ios_fc::IGPClient m_igpclient;
     IGPClient::PingTransaction *m_pingTransaction;
     PingablePuyoServerResponder *m_responder;
     bool m_alreadyReported;

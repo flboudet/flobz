@@ -26,12 +26,9 @@
 #ifndef _PUYOINTERNETGAMECENTER_H
 #define _PUYOINTERNETGAMECENTER_H
 
-#include "ios_igpmessagebox.h"
-#include "ios_udpmessagebox.h"
+#include "NetworkDefinitions.h"
 #include "NetGameCenter.h"
 #include "NatTraversal.h"
-
-using namespace ios_fc;
 
 class InternetGameCenter : public NetGameCenter, public MessageListener {
 public:
@@ -57,12 +54,12 @@ protected:
 private:
     void sendAliveMessage();
     void grantGameToMBox(MessageBox &thembox);
-    
+
     static const int fpipVersion;
     const String hostName;
     int portNum;
-    IgpMessageBox mbox;
-    UDPMessageBox *p2pmbox;
+    FPServerMessageBox mbox;
+    FPInternetP2PMessageBox *p2pmbox;
     NatTraversal *p2pNatTraversal;
     String p2pPunchName;
     bool tryNatTraversal;

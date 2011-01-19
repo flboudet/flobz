@@ -26,13 +26,9 @@
 #ifndef _PUYOLANGAMECENTER_H
 #define _PUYOLANGAMECENTER_H
 
-#include "ios_datagramsocket.h"
-#include "ios_udpmessagebox.h"
+#include "NetworkDefinitions.h"
 #include "NetGameCenter.h"
 #include "ios_networkinterfacerequester.h"
-#include "ios_udpmessage.h"
-
-using namespace ios_fc;
 
 class LanGameCenter : public NetGameCenter, public MessageListener, public SessionListener, NetGameCenterListener {
 public:
@@ -63,7 +59,7 @@ private:
     void sendDisconnectMessage();
     void grantGame(PuyoGameInvitation &invitation);
     DatagramSocket socket;
-    UDPMessageBox mbox;
+    FPLANMessageBox mbox;
     const String name;
     double timeMsBetweenTwoAliveMessages, lastAliveMessage;
     double timeMsBetweenTwoNetworkInterfacesDetection, lastNetworkInterfacesDetection;
@@ -71,7 +67,7 @@ private:
     PuyoGameInvitation grantedInvitation;
     int status;
     String opponentName;
-    
+
     SocketAddress multicastAddress, loopbackAddress;
     NetworkInterfaceRequester requester;
     std::vector<NetworkInterface> networkInterfaces;
