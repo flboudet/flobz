@@ -60,6 +60,10 @@ case $host_os in
 	        FPCOMMON_FLAGS="$FPCOMMON_FLAGS -arch ppc -arch i386 -mmacosx-version-min=10.3"
                 LDFLAGS="$LDFLAGS -isysroot $SYSTEM_ROOT -Wl,-syslibroot,$SYSTEM_ROOT -arch ppc -arch i386"
             fi
+	    ADDITIONAL_FRAMEWORKS_DIRECTORY="$ADDITIONAL_FRAMEWORKS_DIRECTORY"
+	    ADDITIONAL_FRAMEWORKS="$ADDITIONAL_FRAMEWORKS"
+	    AC_SUBST([ADDITIONAL_FRAMEWORKS])
+	    AC_SUBST([ADDITIONAL_FRAMEWORKS_DIRECTORY])
             ;;
     *)
             ;;
@@ -356,6 +360,7 @@ data/base.000/gfx/city/Makefile
 data/base.000/gfx/etherdown/Makefile
 data/base.000/gfx/kaori_gamelost/Makefile
 data/base.000/gfx/kaori_title/Makefile
+data/base.000/gfx/netfailure/Makefile
 data/base.000/gfx/progressbar/Makefile
 data/base.000/gfx/sdkaori/Makefile
 data/base.000/gfx/title/Makefile

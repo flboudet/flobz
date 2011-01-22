@@ -75,21 +75,20 @@ SUBDIRS = iosfc gametools goomsl data fpserver
 bundle_name = $(abs_top_builddir)/FloboPuyo.app
 macimage_name=flobopuyo-$(VERSION)-mac$(REVISION)
 
-mac-bundle:
+mac-bundle: flobopuyo
 	rm -Rf "$(bundle_name)"
 	mkdir -p "$(bundle_name)/Contents/MacOS"
 	mkdir -p "$(bundle_name)/Contents/Resources"
 	mkdir -p "$(bundle_name)/Contents/Frameworks"
 	echo "APPL????" > "$(bundle_name)/Contents/PkgInfo"
 	sed "s/@[@]VERSION[@]@/$(VERSION)$(REVISION)/" $(top_srcdir)/mac/Info.plist > "$(bundle_name)/Contents/Info.plist"
-	cp mac/icon.icns "$(bundle_name)/Contents/Resources/"
+	cp $(abs_top_srcdir)/mac/icon.icns "$(bundle_name)/Contents/Resources/"
 	cp $(bin_PROGRAMS) "$(bundle_name)/Contents/MacOS/"
 	$(MAKE) $(AM_MAKEFLAGS) install fpdata="$(bundle_name)/Contents/Resources/data" datarootdir="$(bundle_name)/Contents/Resources" bindir="$(bundle_name)/Contents/MacOS"
 	strip -u -r $(bundle_name)/Contents/MacOS/flobopuyo
-	cp -RP "$(SYSTEM_ROOT)/Library/Frameworks/SDL.framework" "$(bundle_name)/Contents/Frameworks"
-	cp -RP "$(SYSTEM_ROOT)/Library/Frameworks/SDL_image.framework" "$(bundle_name)/Contents/Frameworks"
-	cp -RP "$(SYSTEM_ROOT)/Library/Frameworks/SDL_mixer.framework" "$(bundle_name)/Contents/Frameworks"
-	cp -RP "$(SYSTEM_ROOT)/Library/Frameworks/SDL_ttf.framework" "$(bundle_name)/Contents/Frameworks"
+	for FWNAME in $(ADDITIONAL_FRAMEWORKS) ; do \
+	  cp -RP "$(ADDITIONAL_FRAMEWORKS_DIRECTORY)/$${FWNAME}.framework" "$(bundle_name)/Contents/Frameworks"; \
+	done
 	strip -x $(bundle_name)/Contents/Frameworks/SDL*/SDL*
 
 mac-package: mac-bundle
