@@ -26,6 +26,8 @@
 #include "GTLog.h"
 #include "LocalGameStates.h"
 
+using namespace event_manager;
+
 //---------------------------------
 // PushScreenState
 //---------------------------------
@@ -160,6 +162,7 @@ void EnterPlayerReadyState::enterState()
     if (m_sharedAssets.m_currentLevelTheme->getReadyAnimation2P() == "") {
         return;
     }
+    m_getReadyDisplayed = false;
     m_sharedGetReadyAssets.m_getReadyWidget.reset(new StoryWidget(m_sharedAssets.m_currentLevelTheme->getReadyAnimation2P().c_str(), this));
     m_sharedAssets.m_gameWidget->setGameOverAction(this);
     m_sharedAssets.m_gameScreen->setOverlayStory(m_sharedGetReadyAssets.m_getReadyWidget.get());
@@ -201,6 +204,20 @@ void EnterPlayerReadyState::cycle()
     if (story->getIntegerValue("@getready_displayed") == 1) {
         m_getReadyDisplayed = true;
         evaluateStateMachine();
+    }
+}
+
+void EnterPlayerReadyState::onEvent(GameControlEvent *cevent)
+{
+    if (!cevent->isUp) {
+        switch (cevent->cursorEvent) {
+            case kStart:
+                m_getReadyDisplayed = true;
+                evaluateStateMachine();
+                break;
+            default:
+                break;
+        }
     }
 }
 

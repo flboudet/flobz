@@ -154,6 +154,7 @@ public:
                         event_manager::GameControlEvent *event);
     // CycledComponent implementation
     virtual void cycle();
+    virtual void onEvent(event_manager::GameControlEvent *cevent);
     // Own methods
     void setNextState(GameState *nextState) {
         m_nextState = nextState;
