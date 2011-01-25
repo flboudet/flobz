@@ -835,6 +835,8 @@ const std::string LevelThemeImpl::getCentralAnimation2P() const
 
 const std::string LevelThemeImpl::getForegroundAnimation() const
 {
+    if (m_desc.fgAnimation == "")
+        return "";
     std::string animPath = m_path + "/" + m_desc.fgAnimation;
     return std::string(m_dataPathManager.getPath(animPath.c_str()));
 }

@@ -129,4 +129,5 @@
     level.name          = "Basic level"
     level.description   = "The main arena."
     level.background    = "columns-background.jpg"
+    level.get_ready_animation  = "getready.gsl"
 [end_level]
