@@ -1680,7 +1680,6 @@ namespace gameui {
                     uint16_t unicode = event->unicodeKeySym;
                     char utf8[5];
                     int nchars = utf16_to_utf8(unicode, utf8);
-                    printf("%d\n", nchars);
                     for (int i=0; i<nchars; ++i) {
                         newValue[newValue.length() - 1] = utf8[i];
                         newValue += "_";
@@ -1688,7 +1687,8 @@ namespace gameui {
                     setValue(newValue,false);
                 }
                 // Backspace handling
-                if (event->unicodeKeySym == 0x0008) {
+                if ((event->unicodeKeySym == 0x0008)
+		    || (event->unicodeKeySym == 0x007F)) {
                     if (getValue().length() > 1) {
                         int last=getValue().length() - 2;
                         while ((getValue()[last] & 0xc0) == 0x80)
