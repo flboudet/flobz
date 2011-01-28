@@ -433,7 +433,9 @@ const std::string &PuyoCommander::getPreferedPuyoSetThemeName() const
 
 const std::string PuyoCommander::getDefaultPuyoSetThemeName() const
 {
-    return m_themeManager->getPuyoSetThemeList()[0];
+    // TODO: provide a way to set the default theme in the data
+    //return m_themeManager->getPuyoSetThemeList()[0];
+    return m_themeManager->getPuyoSetThemeList()[m_themeManager->getPuyoSetThemeList().size() - 1];
 }
 
 

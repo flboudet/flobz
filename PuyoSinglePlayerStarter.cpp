@@ -50,7 +50,7 @@ void SinglePlayerGameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB,
     if (level > 12) corrected_level = level + (3 - lives) / 2; // Half of medium level, make sure the player do not loose 3 times the same oponent.
     if (level >= 20) corrected_level = level + (3 - lives); // Easy level, make sure the player do always loose the same oponent.
     opponentcontroller = new AIPlayer(corrected_level, areaB);
-    
+
     GameWidget::initWithGUI(areaA, areaB, playercontroller, *opponentcontroller,
                                levelTheme, gameOverAction);
     addSubWidget(&killLeftCheat);
@@ -543,7 +543,7 @@ StoryModeStarterAction::StoryModeStarterAction(GameDifficulty difficulty,
     m_playMatch.reset(new StoryModeMatchState(&m_sharedGameAssets));
     m_gameWon.reset(new DisplayStoryScreenState("gamewon_1p.gsl"));
     m_gameLostHoF.reset(new StoryModeDisplayHallOfFameState(&m_sharedGameAssets, m_playMatch->getMatchAssets()));
-    m_gameWonHoF.reset(new StoryModeDisplayHallOfFameState(&m_sharedGameAssets, m_playMatch->getMatchAssets(), "gamewon_highscore_1p.gsl"));
+    m_gameWonHoF.reset(new StoryModeDisplayHallOfFameState(&m_sharedGameAssets, m_playMatch->getMatchAssets(), "gamewon_highscores_1p.gsl"));
     m_leaveGame.reset(new LeaveGameState(*(m_playMatch->getMatchAssets())));
     // Linking the states together
     m_pushGameScreen->setNextState(m_prepareNextMatch.get());
