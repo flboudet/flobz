@@ -54,7 +54,7 @@ import <flying_flobo.gsl>
         displayPos.x = 40.0
         displayPos.y = 460.0 - (@fcycle - @CREDITS_ALL_T)*0.5
         put_text: text="We would also like to warmly thank every one who supported us with\nreally apprieciated contributions.\n           \nSouad \"Sousou\" El Merhebi\n-- for the website and lot of beta-testing\n        \nTania \"Lemonpeel\" Garcia\n-- for her always original ideas\n        \nOur families...\n        \nOur friends...\n                           \nAnd friends of friends!\n \n \n \n \n \n                                            Thank you all" pos=displayPos text_index=(@fcycle-@CREDITS_ALL_T)*0.625
-        (@fcycle >= @CREDITS_ALL_T + 420.0)? @flying_flobo_TitleDisplayYBase = -110.0 - (@fcycle - 420.0 - @CREDITS_ALL_T)*0.5
+        (@fcycle >= @CREDITS_ALL_T + 380.0)? @flying_flobo_TitleDisplayYBase = -110.0 - (@fcycle - 380.0 - @CREDITS_ALL_T)*0.5
     }
     flying_flobo_sprite_list
     (@credits_state >= @CREDITS_PROUDLY_PRESENTS)? {
@@ -62,17 +62,22 @@ import <flying_flobo.gsl>
         displayPos.y = 170.0
         (@fcycle >= @CREDITS_ALL_T + 420.0)?
             displayPos.y = 170.0 - (@fcycle - 420.0 - @CREDITS_ALL_T)*0.5
+        (@fcycle >= @CREDITS_FOVEA_TEAM_T)? {
+            displayPos.y = 170.0 - (@fcycle - @CREDITS_FOVEA_TEAM_T)*2.
+        }
         put_text: text="Proudly offered by..." pos=displayPos text_index=(@fcycle - @CREDITS_PROUDLY_PRESENTS_T)/2.0
     }
     (@credits_state >= @CREDITS_FOVEA_TEAM)? {
-        move::@fovea fcycle=@CREDITS_FOVEA_TEAM_T+120.0 x=260.0 y=100.0
+        move::@fovea fcycle=@CREDITS_FOVEA_TEAM_T+120.0 x=260.0 y=110.0
         displayPos.x = 20.0 + (@fcycle - @CREDITS_FOVEA_TEAM_T)/1.4
         displayPos.y = 320.0 - (@fcycle - @CREDITS_FOVEA_TEAM_T)/2.7
         (displayPos.x > 245.0)? displayPos.x = 245.0
         (displayPos.y < 200.0)? displayPos.y = 200.0
-        (@fcycle >= @CREDITS_ALL_T + 420.0)?
-            displayPos.y = 200.0 - (@fcycle - 420.0 - @CREDITS_ALL_T)*0.5
-        put_text: text="The Fovea team!" pos=displayPos text_index=(@fcycle - @CREDITS_FOVEA_TEAM_T)
+        (@fcycle >= @CREDITS_ALL_T + 380.0)? {
+            @movingDisplay.y = 0. - (@fcycle - 380.0 - @CREDITS_ALL_T)*0.5
+            displayPos.y = 200.0 - (@fcycle - 380.0 - @CREDITS_ALL_T)*0.5
+        }
+        # put_text: text="The Fovea team!" pos=displayPos text_index=(@fcycle - @CREDITS_FOVEA_TEAM_T)
         (@credits_state <= @CREDITS_INTERLUDE_3)? {
         (@fcycle >= @CREDITS_FOVEA_TEAM_T + 50.0)? {
             displayPos.x = 100.0 - (@fcycle - @CREDITS_FOVEA_TEAM_T - 50.0)/5.0
