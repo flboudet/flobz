@@ -1,7 +1,7 @@
 ACLOCAL_AMFLAGS=-I m4
 
-bin_PROGRAMS=flobopuyo
-flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
+bin_PROGRAMS=flobopop
+flobopop_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           MainMenu.cpp MainScreen.cpp PuyoMain.cpp \
           main.cpp FPDataPathManager.cpp PuyoGame.cpp DoomMelt.cpp \
           PuyoView.cpp PuyoAnimations.cpp AnimatedPuyo.cpp AIPlayer.cpp \
@@ -17,7 +17,7 @@ flobopuyo_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
 
 # Optional sources for network gaming support
 if ENABLE_NETWORK
-flobopuyo_SOURCES+=PuyoNetworkStarter.cpp PuyoNetworkView.cpp PuyoNetworkGame.cpp \
+flobopop_SOURCES+=PuyoNetworkStarter.cpp PuyoNetworkView.cpp PuyoNetworkGame.cpp \
           NetworkMenu.cpp InternetMenu.cpp PuyoInternetBot.cpp NetCenterMenu.cpp \
           NetGameCenter.cpp InternetGameCenter.cpp LanGameCenter.cpp\
           NatTraversal.cpp PuyoMessageDef.cpp
@@ -25,7 +25,7 @@ endif
 
 # If we are building for Mac OS X, we also need to compile the SDLMain wrapper
 if MACOSX
-flobopuyo_SOURCES+=SDLMain.m
+flobopop_SOURCES+=SDLMain.m
 endif
 
 EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
@@ -49,33 +49,33 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            DoomMelt.h PuyoNetworkStarter.h PackageDescription.h \
            Theme.h
 
-flobopuyo_CXXFLAGS = -I$(top_srcdir)/iosfc -I$(top_srcdir)/gametools -I$(top_srcdir)/goomsl $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
-flobopuyo_OBJCFLAGS= $(SDL_CFLAGS)
-flobopuyo_LDADD = gametools/libgametools.la goomsl/libgoomsl.la iosfc/libiosfc.la
+flobopop_CXXFLAGS = -I$(top_srcdir)/iosfc -I$(top_srcdir)/gametools -I$(top_srcdir)/goomsl $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
+flobopop_OBJCFLAGS= $(SDL_CFLAGS)
+flobopop_LDADD = gametools/libgametools.la goomsl/libgoomsl.la iosfc/libiosfc.la
 
 # Graphic backend configuration
 if ENABLE_SDL12_GFX
-flobopuyo_LDADD+=gametools/sdl_drawcontext/libsdl12_drawcontext.la
+flobopop_LDADD+=gametools/sdl_drawcontext/libsdl12_drawcontext.la
 endif
 
 if ENABLE_SDL13_GFX
-flobopuyo_LDADD+=gametools/sdl_drawcontext/libsdl13_drawcontext.la
+flobopop_LDADD+=gametools/sdl_drawcontext/libsdl13_drawcontext.la
 endif
 
 if ENABLE_OPENGL_GFX
-flobopuyo_LDADD+=gametools/opengl_drawcontext/libopengl_drawcontext.la
+flobopop_LDADD+=gametools/opengl_drawcontext/libopengl_drawcontext.la
 endif
 
-flobopuyo_LDADD+=$(SDL_LIBS)
+flobopop_LDADD+=$(SDL_LIBS)
 
 SUBDIRS = iosfc gametools goomsl data fpserver
 
 # Mac OS X Targets
 
-bundle_name = $(abs_top_builddir)/FloboPuyo.app
-macimage_name=flobopuyo-$(VERSION)-mac$(REVISION)
+bundle_name = $(abs_top_builddir)/FloboPop.app
+macimage_name=flobopop-$(VERSION)-mac$(REVISION)
 
-mac-bundle: flobopuyo
+mac-bundle: flobopop
 	rm -Rf "$(bundle_name)"
 	mkdir -p "$(bundle_name)/Contents/MacOS"
 	mkdir -p "$(bundle_name)/Contents/Resources"
@@ -85,7 +85,7 @@ mac-bundle: flobopuyo
 	cp $(abs_top_srcdir)/mac/icon.icns "$(bundle_name)/Contents/Resources/"
 	cp $(bin_PROGRAMS) "$(bundle_name)/Contents/MacOS/"
 	$(MAKE) $(AM_MAKEFLAGS) install fpdata="$(bundle_name)/Contents/Resources/data" datarootdir="$(bundle_name)/Contents/Resources" bindir="$(bundle_name)/Contents/MacOS"
-	strip -u -r $(bundle_name)/Contents/MacOS/flobopuyo
+	strip -u -r $(bundle_name)/Contents/MacOS/flobopop
 	for FWNAME in $(ADDITIONAL_FRAMEWORKS) ; do \
 	  cp -RP "$(ADDITIONAL_FRAMEWORKS_DIRECTORY)/$${FWNAME}.framework" "$(bundle_name)/Contents/Frameworks"; \
 	done
@@ -122,7 +122,7 @@ win_binary_distribution:
 win_installer: win_binary_distribution
 	cd $(windistdir) \
 	&& makensis -NOCD $(abs_top_srcdir)/win32/installer.nsi \
-	&& mv FloboPuyoSetup.exe $(wininstaller)
+	&& mv FloboPopSetup.exe $(wininstaller)
 
 win_zip_archive: win_binary_distribution
 	rm -f $(winziparchive)
