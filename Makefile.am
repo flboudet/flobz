@@ -26,6 +26,7 @@ endif
 # If we are building for Mac OS X, we also need to compile the SDLMain wrapper
 if MACOSX
 flobopop_SOURCES+=SDLMain.m
+flobopop_SOURCES+=validatereceipt.m
 endif
 
 EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \

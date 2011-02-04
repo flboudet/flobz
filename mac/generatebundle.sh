@@ -16,7 +16,7 @@ BUILD_ARCH="x86_64 i386 ppc"
 ADDITIONAL_FRAMEWORKS_DIRECTORY="/Users/flobo/Library/Frameworks"
 ADDITIONAL_FRAMEWORKS="SDL SDL_image SDL_ttf SDL_mixer"
 
-SDL_LIBS="-F${ADDITIONAL_FRAMEWORKS_DIRECTORY} -framework Cocoa"
+SDL_LIBS="-F${ADDITIONAL_FRAMEWORKS_DIRECTORY} -framework Cocoa -framework Security -framework IOKit -lssl -lcrypto"
 for FWNAME in ${ADDITIONAL_FRAMEWORKS}
 do
     SDL_LIBS="${SDL_LIBS} -framework ${FWNAME}"
