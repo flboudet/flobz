@@ -21,6 +21,7 @@ float @kaoriDestX
   Sprite @bigpuyo = [new_sprite: image="happypuyo.png" x = 500.0 y=480.0 curframe=0.0 framespeed=0.15 nbframes=1.0]
   @isFullScreen = 1
   flying_flobo_init
+  Sprite @appStore = [new_sprite: image="app_store.png" x=20.0 y=490.0 curframe=0.0  framespeed=0.15 nbframes=1.0]
 
   # Cache resources for future use
 import <cache.gsl>
@@ -34,6 +35,7 @@ import <cache.gsl>
   sprite::@kaori display=@display
   sprite::@kaorieyes display=@display
   sprite::@bigpuyo display=@display
+  sprite::@appStore display=@display
 
 <update>
   # Update function: called every animation cycle
@@ -74,5 +76,8 @@ import <cache.gsl>
     music: command="network menu"
   }
   move::@kaori   fcycle=@kaoriMovesFCycle      x=@kaoriDestX y=@kaori.pos.y
-
+  move::@appStore fcycle=70.0 x=20.0 y=490.0
+  move::@appStore fcycle=100.0 x=20.0 y=415.0
+  move::@appStore fcycle=200.0 x=20.0 y=415.0
+  move::@appStore fcycle=230.0 x=20.0 y=490.0
   (@cycle = 1000)? @finished = 1
