@@ -251,8 +251,10 @@ void LevelThemePreview::setSelectedTheme(std::string themeName)
 {
 #define _ComputeVZoneSize(A,B) Vec3(A.x>B.x?A.x:B.x,A.y+B.y+GameUIDefaults::SPACING,1.0)
     LevelTheme * curTheme = theCommander->getLevelTheme(themeName.c_str());
-    if (curTheme->getAuthor() == "iOS-Software") name.setValue(curTheme->getLocalizedName().c_str());
-    //else name.setValue(themeName+" ("+curTheme->getAuthor()+")");
+    if (curTheme->getAuthor() == "iOS-Software")
+        name.setValue(curTheme->getLocalizedName().c_str());
+    else
+        name.setValue((themeName+" ("+curTheme->getAuthor()+")").c_str());
     //author.setValue(curTheme->getAuthor());
     description.setValue(curTheme->getComments().c_str());
     Vec3 one=_ComputeVZoneSize(name.getPreferedSize(),description.getPreferedSize());

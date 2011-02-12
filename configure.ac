@@ -18,8 +18,8 @@ ENABLE_AUDIO=true
 #ENABLE_OPENGL?=false
 ENABLE_TTF=true
 #ENABLE_BENCHMARKS?=false
-ENABLE_NETWORK=true
-ENABLE_NETWORK_INTERNET=true
+#ENABLE_NETWORK=true
+#ENABLE_NETWORK_INTERNET=yes
 
 # Significant environment variables:
 # SDL_CONFIG: path to the sdl-config tool. Ignored if SDL_LIBS is supplied.
@@ -30,6 +30,15 @@ ENABLE_NETWORK_INTERNET=true
 
 
 AC_ARG_ENABLE(universal-binary, [ --enable-universal-binary enables universal-binary compilation on Mac OS X], [universal-binary=yes])
+
+AC_ARG_ENABLE(network,
+       [AS_HELP_STRING([--enable-network], [enables network support])],
+       [ENABLE_NETWORK=$enablevar], [ENABLE_NETWORK=yes])
+
+AC_ARG_ENABLE(network-internet,
+       [AS_HELP_STRING([--enable-network-internet],
+                [enables network-internet support])],
+       [ENABLE_NETWORK_INTERNET=$enablevar], [ENABLE_NETWORK_INTERNET=yes])
 
 #AC_ARG_ENABLE([audio],
 #              [AS_HELP_STRING([--enable-audio],
@@ -306,14 +315,14 @@ else
   AC_MSG_RESULT([SDL 1.3 Disabled])
 fi
 
-if test "x$ENABLE_NETWORK" = "xtrue"; then
+if test "x$ENABLE_NETWORK" = "xyes"; then
   AC_MSG_RESULT([Network Gaming Enabled])
   FPFEATURES="$FPFEATURES -DENABLE_NETWORK=1"
 else
   AC_MSG_RESULT([Network Gaming Disabled])
 fi
 
-if test "x$ENABLE_NETWORK_INTERNET" = "xtrue"; then
+if test "x$ENABLE_NETWORK_INTERNET" = "xyes"; then
   AC_MSG_RESULT([Network Gaming (Internet) Enabled])
   FPFEATURES="$FPFEATURES -DENABLE_NETWORK_INTERNET=1"
 else
@@ -341,8 +350,8 @@ AM_CONDITIONAL([WIN32], [test x$WIN32 = xtrue])
 AM_CONDITIONAL([ENABLE_OPENGL_GFX], [test x$ENABLE_OPENGL_GFX = xtrue])
 AM_CONDITIONAL([ENABLE_SDL12_GFX], [test x$ENABLE_SDL12_GFX = xtrue])
 AM_CONDITIONAL([ENABLE_SDL13_GFX], [test x$ENABLE_SDL13_GFX = xtrue])
-AM_CONDITIONAL([ENABLE_NETWORK], [test x$ENABLE_NETWORK = xtrue])
-AM_CONDITIONAL([ENABLE_NETWORK_INTERNET], [test x$ENABLE_NETWORK_INTERNET = xtrue])
+AM_CONDITIONAL([ENABLE_NETWORK], [test x$ENABLE_NETWORK = xyes])
+AM_CONDITIONAL([ENABLE_NETWORK_INTERNET], [test x$ENABLE_NETWORK_INTERNET = xyes])
 AM_CONDITIONAL([ENABLE_NETWORK_SERVER], [test x$ENABLE_SQLITE = xtrue])
 
 AC_SUBST([SYSTEM_ROOT])
@@ -377,6 +386,7 @@ data/base.000/story/fx/Makefile
 data/base.000/theme/Makefile
 data/base.000/theme/Classic.fptheme/Makefile
 data/base.000/theme/Classic.fptheme/locale/Makefile
+data/base.000/theme/Classic.fptheme/locale/en/Makefile
 data/base.000/theme/Classic.fptheme/locale/fr/Makefile
 data/complete.002/Makefile
 data/complete.002/gfx/Makefile
@@ -407,6 +417,7 @@ data/reduced.001/theme/Makefile
 data/reduced.001/music/Makefile
 data/reduced.001/theme/Reduced.fptheme/Makefile
 data/reduced.001/theme/Reduced.fptheme/locale/Makefile
+data/reduced.001/theme/Reduced.fptheme/locale/en/Makefile
 data/reduced.001/theme/Reduced.fptheme/locale/fr/Makefile
 fpserver/Makefile
 iphone/Makefile

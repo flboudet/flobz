@@ -2,5 +2,5 @@
 fpdata = $(datadir)/flobopuyo
 fpdatadir = $(fpdata)/base.000/theme/Classic.fptheme/locale
 dist_fpdata_DATA = 
-SUBDIRS =  fr
+SUBDIRS =  fr en
 
