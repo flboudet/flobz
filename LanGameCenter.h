@@ -61,6 +61,7 @@ private:
     DatagramSocket socket;
     FPLANMessageBox mbox;
     const String name;
+    int m_uuid;
     double timeMsBetweenTwoAliveMessages, lastAliveMessage;
     double timeMsBetweenTwoNetworkInterfacesDetection, lastNetworkInterfacesDetection;
     bool gameGranted;

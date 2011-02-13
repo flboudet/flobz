@@ -254,7 +254,7 @@ void ListView::resyncLabels()
     for (int i = firstVisible ; i < lastVisible ; i++) {
         buttons[i-firstVisible]->setValue(entries[i]->m_text);
         buttons[i-firstVisible]->setAction(ON_ACTION, entries[i]->m_action);
-        buttons[i-firstVisible]->setFocusable(true);
+        buttons[i-firstVisible]->setFocusable(entries[i]->m_enabled);
     }
     for (int i = lastVisible ; i < firstVisible + size ; i++) {
         buttons[i-firstVisible]->setValue("");

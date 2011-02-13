@@ -71,9 +71,9 @@ class NetCenterPlayerList : public ListView {
 public:
     NetCenterPlayerList(int size, NetCenterMenu *targetMenu, IosSurface *upArrow, IosSurface *downArrow, GameLoop *loop = NULL);
     virtual ~NetCenterPlayerList();
-    void addNewPlayer(String playerName, PeerAddress playerAddress, const PuyoPeerInfo &info);
+    void addNewPlayer(String playerName, PeerAddress playerAddress, const PeerInfo &info);
     void removePlayer(PeerAddress playerAddress);
-    void updatePlayer(String playerName, PeerAddress playerAddress, const PuyoPeerInfo &info);
+    void updatePlayer(String playerName, PeerAddress playerAddress, const PeerInfo &info);
 private:
     class PlayerSelectedAction : public Action {
     public:
@@ -81,17 +81,17 @@ private:
         : targetMenu(targetMenu), address(address), playerName(playerName) {}
         void action();
     private:
-        NetCenterMenu *targetMenu;
         PeerAddress address;
+        NetCenterMenu *targetMenu;
         String playerName;
     };
     class PlayerEntry : public ListViewEntry {
     public:
-        PlayerEntry(String playerName, PeerAddress playerAddress, const PuyoPeerInfo &info, Action *action)
+        PlayerEntry(String playerName, PeerAddress playerAddress, const PeerInfo &info, Action *action)
         : ListViewEntry(getRankString(info.rank) + playerName + getStatusString(info.status), action),
         playerAddress(playerAddress), status(info.status), rank(info.rank), action(action) {}
         ~PlayerEntry() { delete action; }
-        void updateEntry(String playerName, const PuyoPeerInfo &info) {
+        void updateEntry(String playerName, const PeerInfo &info) {
             setText(getRankString(info.rank) + playerName + getStatusString(info.status));
             this->status = status;
             this->rank = rank;

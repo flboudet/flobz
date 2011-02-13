@@ -46,6 +46,7 @@ LanGameCenter::LanGameCenter(int portNum, const String name)
       gameGranted(false), status(PEER_NORMAL), multicastAddress(MULTICASTGROUP), loopbackAddress("127.0.0.1"),
       networkInterfaces(requester.getInterfaces()), mcastPeerAddress(multicastAddress, portNum)
 {
+    m_uuid = (int)getTimeMs();
     socket.joinGroup(multicastAddress);
     mbox.addListener(this);
     SessionManager &mboxSession = dynamic_cast<SessionManager &>(mbox);
@@ -71,9 +72,15 @@ void LanGameCenter::onMessage(Message &msg)
 	}
 	break;
       case PUYO_UDP_ALIVE: {
-	  Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-	  NetGameCenter::connectPeer(dir.getPeerAddress(), msg.getString("NAME"), msg.getInt("STATUS"));
-        }
+          Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
+          int uuid = msg.getInt("UUID");
+          int status = msg.getInt("STATUS");
+          bool self = false;
+          if (uuid == m_uuid) {
+              self = true;
+          }
+          NetGameCenter::connectPeer(dir.getPeerAddress(), msg.getString("NAME"), status, -1, self);
+      }
 	break;
       case PUYO_UDP_DISCONNECT: {
           Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
@@ -185,10 +192,11 @@ void LanGameCenter::sendAliveMessage()
             Message *msg = mbox.createMessage();
             Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
             dirMsg->setPeerAddress(mcastPeerAddress);
-            
+
             msg->addInt("CMD", PUYO_UDP_ALIVE);
             msg->addString("NAME", name);
             msg->addInt("STATUS", status);
+            msg->addInt("UUID", m_uuid);
             msg->send();
             delete msg;
         }
@@ -210,7 +218,7 @@ void LanGameCenter::sendDisconnectMessage()
         Message *msg = mbox.createMessage();
         Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
         dirMsg->setPeerAddress(mcastPeerAddress);
-        
+
         msg->addInt("CMD", PUYO_UDP_DISCONNECT);
         msg->addString("NAME", name);
         msg->send();

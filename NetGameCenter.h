@@ -55,14 +55,15 @@ public:
     virtual ~NetGameCenterListener() {};
 };
 
-enum PuyoPeerStatus {
+enum PeerStatus {
   PEER_NORMAL = 0,
-  PEER_PLAYING = 1
+  PEER_PLAYING = 1,
 };
 
-struct PuyoPeerInfo {
+struct PeerInfo {
     int status;
     int rank;
+    bool self;
 };
 
 class NetGameCenter {
@@ -80,12 +81,12 @@ public:
     String getPeerNameAtIndex(int i) const;
     PeerAddress getPeerAddressAtIndex(int i) const;
     PeerAddress getPeerAddressForPeerName(String peerName) const;
-    PuyoPeerInfo getPeerInfoForAddress(PeerAddress &addr) const;
+    PeerInfo getPeerInfoForAddress(PeerAddress &addr) const;
     int getPeerStatusForAddress(PeerAddress &addr) const;
     int getPeerCount() const;
     void addListener(NetGameCenterListener *r) { listeners.add(r); }
     void removeListener(NetGameCenterListener *r) { listeners.remove(r); }
-    void connectPeer(PeerAddress addr, const String name, int status = PEER_NORMAL, int rank = -1);
+    void connectPeer(PeerAddress addr, const String name, int status = PEER_NORMAL, int rank = -1, bool self = false);
     void disconnectPeer(PeerAddress addr, const String name);
     virtual void setStatus(int status) {}
     virtual String getSelfName() { return "Myself"; }

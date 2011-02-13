@@ -148,10 +148,12 @@ NetCenterPlayerList::~NetCenterPlayerList()
 {
 }
 
-void NetCenterPlayerList::addNewPlayer(String playerName, PeerAddress playerAddress, const PuyoPeerInfo &info)
+void NetCenterPlayerList::addNewPlayer(String playerName, PeerAddress playerAddress, const PeerInfo &info)
 {
     Action *playerSelectedAction = new PlayerSelectedAction(targetMenu, playerAddress, playerName);
     PlayerEntry *newEntry = new PlayerEntry(playerName, playerAddress, info, playerSelectedAction);
+    if (info.self)
+        newEntry->setEnabled(false);
     entries.add(newEntry);
     addEntry(newEntry);
 }
@@ -169,7 +171,7 @@ void NetCenterPlayerList::removePlayer(PeerAddress playerAddress)
     }
 }
 
-void NetCenterPlayerList::updatePlayer(String playerName, PeerAddress playerAddress, const PuyoPeerInfo &info)
+void NetCenterPlayerList::updatePlayer(String playerName, PeerAddress playerAddress, const PeerInfo &info)
 {
     for (int i = 0 ; i < entries.size() ; i++) {
         if (entries[i]->playerAddress == playerAddress) {
@@ -231,7 +233,7 @@ NetCenterMenu::NetCenterMenu(MainScreen *mainScreen, NetGameCenter *netCenter,
     // Adding all the already connected peers to the list
     for (int i = 0 ; i < netCenter->getPeerCount() ; i++) {
         PeerAddress curPeerAddress = netCenter->getPeerAddressAtIndex(i);
-        PuyoPeerInfo curPeerInfo = netCenter->getPeerInfoForAddress(curPeerAddress);
+        PeerInfo curPeerInfo = netCenter->getPeerInfoForAddress(curPeerAddress);
         playerList.addNewPlayer(netCenter->getPeerNameAtIndex(i), curPeerAddress, curPeerInfo);
     }
 }
@@ -302,7 +304,7 @@ void NetCenterMenu::onChatMessage(const String &msgAuthor, const String &msg)
 
 void NetCenterMenu::onPlayerConnect(String playerName, PeerAddress playerAddress)
 {
-    PuyoPeerInfo info = netCenter->getPeerInfoForAddress(playerAddress);
+    PeerInfo info = netCenter->getPeerInfoForAddress(playerAddress);
     playerList.addNewPlayer(playerName, playerAddress, info);
 }
 
@@ -313,7 +315,7 @@ void NetCenterMenu::onPlayerDisconnect(String playerName, PeerAddress playerAddr
 
 void NetCenterMenu::onPlayerUpdated(String playerName, PeerAddress playerAddress)
 {
-    PuyoPeerInfo info = netCenter->getPeerInfoForAddress(playerAddress);
+    PeerInfo info = netCenter->getPeerInfoForAddress(playerAddress);
     playerList.updatePlayer(playerName, playerAddress, info);
 }
 

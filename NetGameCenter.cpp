@@ -22,7 +22,7 @@
  *
  *
  */
- 
+
 
 #include "NetGameCenter.h"
 #include "ios_time.h"
@@ -31,12 +31,13 @@ using namespace ios_fc;
 
 class NetGameCenter::GamerPeer {
 public:
-    GamerPeer(String name, PeerAddress address, int status = PEER_NORMAL, int rank = -1) :
-        name(name), address(address), status(status), rank(rank) {}
+    GamerPeer(String name, PeerAddress address, int status = PEER_NORMAL, int rank = -1, bool self=false) :
+        name(name), address(address), status(status), rank(rank), self(self) {}
     String name;
     PeerAddress address;
     int status;
     int rank;
+    bool self;
 };
 
 class NetGameCenter::PendingGame {
@@ -62,7 +63,7 @@ void NetGameCenter::idle()
     }
 }
 
-void NetGameCenter::connectPeer(PeerAddress addr, const String name, int status, int rank)
+void NetGameCenter::connectPeer(PeerAddress addr, const String name, int status, int rank, bool self)
 {
     //printf("%s vient de se connecter!\n", (const char *)name);
     for (int i = 0, j = peers.size() ; i < j ; i++) {
@@ -70,6 +71,7 @@ void NetGameCenter::connectPeer(PeerAddress addr, const String name, int status,
             if (peers[i]->status != status) {
                 peers[i]->status = status;
                 peers[i]->rank = rank;
+                peers[i]->self = self;
                 for (int i = 0, j = listeners.size() ; i < j ; i++) {
                     listeners[i]->onPlayerUpdated(name, addr);
                 }
@@ -78,7 +80,7 @@ void NetGameCenter::connectPeer(PeerAddress addr, const String name, int status,
         }
     }
     // Peer is not known. Add to list
-    peers.add(new GamerPeer(name, addr, status, rank));
+    peers.add(new GamerPeer(name, addr, status, rank, self));
     for (int i = 0, j = listeners.size() ; i < j ; i++) {
         listeners[i]->onPlayerConnect(name, addr);
     }
@@ -134,15 +136,17 @@ PeerAddress NetGameCenter::getPeerAddressForPeerName(String peerName) const
     return peers[i]->address;
 }
 
-PuyoPeerInfo NetGameCenter::getPeerInfoForAddress(PeerAddress &addr) const
+PeerInfo NetGameCenter::getPeerInfoForAddress(PeerAddress &addr) const
 {
-    PuyoPeerInfo info;
+    PeerInfo info;
     info.status = 0;
     info.rank = -1;
+    info.self = false;
     for (int i = 0 ; i < peers.size() ; i++) {
         if (peers[i]->address == addr) {
             info.status = peers[i]->status;
             info.rank = peers[i]->rank;
+            info.self = peers[i]->self;
             return info;
         }
     }
