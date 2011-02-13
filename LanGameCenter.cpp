@@ -77,7 +77,6 @@ void LanGameCenter::onMessage(Message &msg)
           int status = msg.getInt("STATUS");
           bool self = false;
           if (uuid == m_uuid) {
-              printf("self uuid: %d\n", uuid);
               self = true;
           }
           NetGameCenter::connectPeer(dir.getPeerAddress(), msg.getString("NAME"), status, -1, self);
