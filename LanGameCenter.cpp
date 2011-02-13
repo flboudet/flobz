@@ -46,7 +46,7 @@ LanGameCenter::LanGameCenter(int portNum, const String name)
       gameGranted(false), status(PEER_NORMAL), multicastAddress(MULTICASTGROUP), loopbackAddress("127.0.0.1"),
       networkInterfaces(requester.getInterfaces()), mcastPeerAddress(multicastAddress, portNum)
 {
-    m_uuid = (int)getTimeMs();
+    m_uuid = (int)((int64_t)getTimeMs() % 0xFFFFFFFF);
     socket.joinGroup(multicastAddress);
     mbox.addListener(this);
     SessionManager &mboxSession = dynamic_cast<SessionManager &>(mbox);
@@ -77,6 +77,7 @@ void LanGameCenter::onMessage(Message &msg)
           int status = msg.getInt("STATUS");
           bool self = false;
           if (uuid == m_uuid) {
+              printf("self uuid: %d\n", uuid);
               self = true;
           }
           NetGameCenter::connectPeer(dir.getPeerAddress(), msg.getString("NAME"), status, -1, self);
