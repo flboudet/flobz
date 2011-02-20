@@ -295,13 +295,13 @@ void StoryModeMatchIsOverState::enterState()
     }
     else {
         m_gameLostWidget.reset(new StoryWidget(m_sharedGameAssets->levelDef->gameLostStory, this));
-	m_sharedMatchAssets->m_gameScreen->setOverlayStory(m_gameLostWidget.get());
+        m_sharedMatchAssets->m_gameScreen->setOverlayStory(m_gameLostWidget.get());
         m_sharedMatchAssets->m_rightVictories++;
+        m_sharedMatchAssets->m_gameScreen->addAction(this);
     }
     m_sharedMatchAssets->m_leftTotal  += m_sharedMatchAssets->m_gameWidget->getStatPlayerOne().points;
     m_sharedMatchAssets->m_rightTotal += m_sharedMatchAssets->m_gameWidget->getStatPlayerTwo().points;
     m_sharedMatchAssets->m_gameWidget->setGameOverAction(this);
-    m_sharedMatchAssets->m_gameScreen->addAction(this);
 }
 
 void StoryModeMatchIsOverState::exitState()
