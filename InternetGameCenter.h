@@ -58,7 +58,8 @@ private:
     static const int fpipVersion;
     const String hostName;
     int portNum;
-    FPServerMessageBox mbox;
+    FPServerMessageBox m_udpmbox;
+    FPServerIGPMessageBox mbox;
     FPInternetP2PMessageBox *p2pmbox;
     NatTraversal *p2pNatTraversal;
     String p2pPunchName;

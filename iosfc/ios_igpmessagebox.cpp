@@ -21,7 +21,6 @@
 
 #include "ios_fastmessage.h"
 #include "ios_igpmessagebox.h"
-#include "ios_udpmessagebox.h"
 #include "ios_igpmessage.h"
 
 namespace ios_fc {
@@ -50,22 +49,12 @@ namespace ios_fc {
     }
 
     // IgpMessageBox implementation
-    IgpMessageBox::IgpMessageBox(const String hostName, int portID) : mbox(new UDPMessageBox<FastMessage>(hostName, 0, portID)), ownMessageBox(true), igpClient(new IGPClient(*mbox)), sendSerialID(0)
+    IgpMessageBox::IgpMessageBox(MessageBox *mbox) : mbox(mbox), ownMessageBox(false), igpClient(new IGPClient(*mbox)), sendSerialID(0)
     {
         igpClient->addListener(this);
     }
 
-    IgpMessageBox::IgpMessageBox(const String hostName, int portID, int igpIdent) : mbox(new UDPMessageBox<FastMessage>(hostName, 0, portID)), ownMessageBox(true), igpClient(new IGPClient(*mbox, igpIdent)), sendSerialID(0)
-    {
-        igpClient->addListener(this);
-    }
-
-    IgpMessageBox::IgpMessageBox(MessageBox &mbox) : mbox(&mbox), ownMessageBox(false), igpClient(new IGPClient(mbox)), sendSerialID(0)
-    {
-        igpClient->addListener(this);
-    }
-
-    IgpMessageBox::IgpMessageBox(MessageBox &mbox, int igpIdent) : mbox(&mbox), ownMessageBox(false), igpClient(new IGPClient(mbox, igpIdent)), sendSerialID(0)
+    IgpMessageBox::IgpMessageBox(MessageBox *mbox, int igpIdent) : mbox(mbox), ownMessageBox(false), igpClient(new IGPClient(*mbox, igpIdent)), sendSerialID(0)
     {
         igpClient->addListener(this);
     }
@@ -74,7 +63,7 @@ namespace ios_fc {
     {
       delete igpClient;
       if (ownMessageBox)
-	delete mbox;
+          delete mbox;
     }
 
     void IgpMessageBox::idle()

@@ -33,10 +33,8 @@ namespace ios_fc {
 
 class IgpMessageBox : public MessageBox, IGPClientMessageListener {
 public:
-    IgpMessageBox(const String hostName, int portID);
-    IgpMessageBox(const String hostName, int portID, int igpIdent);
-    IgpMessageBox(MessageBox &mbox);
-    IgpMessageBox(MessageBox &mbox, int igpIdent);
+    IgpMessageBox(MessageBox *mbox);
+    IgpMessageBox(MessageBox *mbox, int igpIdent);
     virtual ~IgpMessageBox();
     virtual void idle();
     virtual Message * createMessage();

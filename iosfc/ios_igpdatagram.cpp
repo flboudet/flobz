@@ -1,6 +1,6 @@
 /**
  * iosfc::IGPDatagram: contains an object for handling IGP messages.
- * 
+ *
  * This file is part of the iOS Foundation Classes project.
  *
  * authors:
@@ -57,7 +57,7 @@ bool IGPDatagram::isIgpDatagram(Message &rawMsg)
     case IgpPing:
         return true;
     case ServerMsgToClient:
-        if (! rawMsg.hasInt(IGPMSG))
+        if (! rawMsg.hasCharArray(IGPMSG))
             return false;
         return true;
     default:

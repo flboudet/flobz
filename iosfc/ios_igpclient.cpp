@@ -1,6 +1,6 @@
 /**
  * iosfc::IGPClient: a reusable class to communicate with an IGP server
- * 
+ *
  * This file is part of the iOS Foundation Classes project.
  *
  * authors:
@@ -22,7 +22,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
  */
- 
+
 #include "ios_igpclient.h"
 #include "ios_exception.h"
 #include "ios_igpdatagram.h"

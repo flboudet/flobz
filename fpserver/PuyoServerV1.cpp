@@ -33,7 +33,7 @@ void PuyoServerV1::onMessage(Message &msg)
         PeerAddress address = dirMsg.getPeerAddress();
         // Gets the version of the FPIP protocol used by the client
         int protocolVersion = msg.getInt("V");
-        
+
         switch (msg.getInt("CMD")) {
             // A client will send an alive message periodically to inform the server it is still connected
             case PUYO_IGP_ALIVE:
@@ -70,7 +70,7 @@ void PuyoServerV1::onMessage(Message &msg)
         }
     } catch (Exception e) {}
 }
- 
+
 void PuyoServerV1::idle()
 {
     double time_ms = getTimeMs();
@@ -124,7 +124,7 @@ void PuyoServerV1::connectPeer(PeerAddress addr, int fpipVersion, const String n
         accept = false;
         denyErrorString = "Too many connected players";
     }
-    
+
     if (accept) {
         // Send accept message
         Message *acceptMsg = mbox.createMessage();
@@ -134,12 +134,12 @@ void PuyoServerV1::connectPeer(PeerAddress addr, int fpipVersion, const String n
         dirAccept->setPeerAddress(addr);
         acceptMsg->send();
         delete acceptMsg;
-        
+
         // Create the new peer
         GamePeer *newPeer = new GamePeer(addr, name);
         newPeer->lastUpdate = getTimeMs();
         printf("Nouveau peer: %s\n", (const char *)name);
-        
+
         // Envoyer tous les peers connectes au petit nouveau
         for (int i = 0, j = peers.size() ; i < j ; i++) {
             Message *newMsg = mbox.createMessage();
@@ -155,7 +155,7 @@ void PuyoServerV1::connectPeer(PeerAddress addr, int fpipVersion, const String n
         }
         // Inserer le petit nouveau a la liste
         peers.add(newPeer);
-        
+
         // Envoyer l'info de connexion a tous les peers
         Message *newMsg = mbox.createMessage();
         newMsg->addBoolProperty("RELIABLE", true);

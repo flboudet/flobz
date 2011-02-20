@@ -23,17 +23,19 @@
  *
  */
 
+#include <iostream>
 #include "InternetGameCenter.h"
 #include "PuyoIgpDefs.h"
 #include "ios_igpmessage.h"
 #include "ios_time.h"
 
+using namespace std;
 using namespace ios_fc;
 
 const int InternetGameCenter::fpipVersion = 0x00000001;
 
 InternetGameCenter::InternetGameCenter(const String hostName, int portNum, const String name, const String password)
-  : hostName(hostName), portNum(portNum), mbox(hostName, portNum), p2pmbox(NULL), p2pNatTraversal(NULL), tryNatTraversal(true), name(name), password(password), status(PEER_NORMAL),
+  : hostName(hostName), portNum(portNum), m_udpmbox(hostName, 0, portNum), mbox(&m_udpmbox), p2pmbox(NULL), p2pNatTraversal(NULL), tryNatTraversal(true), name(name), password(password), status(PEER_NORMAL),
     timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages), gameGrantedStatus(GAMESTATUS_IDLE),
     m_isAccepted(false), m_isDenied(false), m_denyString(""), m_denyStringMore("")
 {
