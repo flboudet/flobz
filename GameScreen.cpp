@@ -173,6 +173,7 @@ void GameScreen::setOverlayStory(StoryWidget *story)
 void GameScreen::onScreenVisibleChanged(bool visible)
 {
     theCommander->setCursorVisible(!visible);
+    Screen::onScreenVisibleChanged(visible);
 }
 
 void GameScreen::action(Widget *sender, int actionType, GameControlEvent *event)

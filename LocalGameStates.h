@@ -249,6 +249,7 @@ class MatchIsOverState : public GameState, public Action
 {
 public:
     MatchIsOverState(SharedMatchAssets &sharedMatchAssets);
+    virtual ~MatchIsOverState();
     // GameState implementation
     virtual void enterState();
     virtual void exitState();
@@ -275,6 +276,7 @@ class DisplayStatsState : public GameState, public Action
 {
 public:
     DisplayStatsState(SharedMatchAssets &sharedMatchAssets);
+    virtual ~DisplayStatsState();
     // GameState implementation
     virtual void enterState();
     virtual void exitState();

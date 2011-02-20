@@ -2,6 +2,7 @@
 #define GAMEUI_H
 
 #include <vector>
+#include <list>
 #include <memory>
 #include "GameControls.h"
 #include "ios_fc.h"
@@ -48,6 +49,19 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       virtual ~Action() {}
   };
 
+  /**
+   * A root class providing basic action registration and propagation
+   */
+  class ActionableBase {
+  public:
+      // actions
+      void addAction(Action *a);
+      void removeAction(Action *a);
+  protected:
+      void propagateAction(Widget *sender, int actionType, event_manager::GameControlEvent *event);
+  private:
+      std::list<Action *> m_actions;
+  };
 
   class GameUIDefaults {
     public:
@@ -63,7 +77,6 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       static ScreenStack *SCREEN_STACK;
       static audio_manager::Sound *SLIDE_SOUND;
   };
-
 
   class Widget {
 
@@ -430,7 +443,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
   /**
    * Represents a full screen for containing widgets
    */
-  class Screen : public GarbageCollectableItem, public DrawableComponent, public IdleComponent {
+  class Screen : public GarbageCollectableItem, public DrawableComponent, public IdleComponent, public ActionableBase {
     public:
       Screen(GameLoop *loop = NULL);
       Screen(float x, float y, float width, float height, GameLoop *loop = NULL);
@@ -475,6 +488,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       // screen callbacks
       virtual void onScreenVisibleChanged(bool visible);
       virtual void onTransitionFromScreen(Screen &fromScreen) {}
+
     private:
       void initWithDimensions(float x, float y, float width, float height);
       // The root container of the screen

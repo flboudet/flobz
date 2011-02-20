@@ -36,6 +36,22 @@ namespace gameui {
 
 	static Action DUMMY_ACTION;
 
+
+    void ActionableBase::addAction(Action *a) {
+        m_actions.push_back(a);
+    }
+    void ActionableBase::removeAction(Action *a) {
+        m_actions.remove(a);
+    }
+
+    void ActionableBase::propagateAction(Widget *sender, int actionType, event_manager::GameControlEvent *event)
+    {
+        for (std::list<Action *>::reverse_iterator iter = m_actions.rbegin() ;
+             iter != m_actions.rend() ; ++iter) {
+            (*iter)->action(sender, actionType, event);
+        }
+    }
+
     //
     // Widget
     //
@@ -1227,6 +1243,7 @@ namespace gameui {
     void Screen::onScreenVisibleChanged(bool visible)
     {
         rootContainer.onWidgetVisibleChanged(visible);
+        propagateAction((Widget *)this, 0, NULL);
     }
 
     void Screen::giveFocus()

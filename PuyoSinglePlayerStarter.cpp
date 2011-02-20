@@ -277,9 +277,17 @@ StoryModeMatchIsOverState::StoryModeMatchIsOverState(SharedGameAssets *sharedGam
 {
 }
 
+StoryModeMatchIsOverState::~StoryModeMatchIsOverState()
+{
+    if (m_gameLostWidget.get() != NULL) {
+        m_gameLostWidget->getParentScreen()->removeAction(this);
+        m_gameLostWidget.reset(NULL);
+    }
+}
+
 void StoryModeMatchIsOverState::enterState()
 {
-    cout << "StoryModeMatchIsOver::enterState()" << endl;
+    GTLogTrace("StoryModeMatchIsOver::enterState()");
     m_aknowledged = false;
     if (m_sharedMatchAssets->m_gameWidget->isGameARunning()) {
         m_aknowledged = true;
@@ -293,12 +301,12 @@ void StoryModeMatchIsOverState::enterState()
     m_sharedMatchAssets->m_leftTotal  += m_sharedMatchAssets->m_gameWidget->getStatPlayerOne().points;
     m_sharedMatchAssets->m_rightTotal += m_sharedMatchAssets->m_gameWidget->getStatPlayerTwo().points;
     m_sharedMatchAssets->m_gameWidget->setGameOverAction(this);
+    m_sharedMatchAssets->m_gameScreen->addAction(this);
 }
 
 void StoryModeMatchIsOverState::exitState()
 {
     m_sharedMatchAssets->m_gameWidget->setGameOverAction(NULL);
-    m_gameLostWidget.reset(NULL);
 }
 
 bool StoryModeMatchIsOverState::evaluate()
@@ -314,8 +322,10 @@ GameState *StoryModeMatchIsOverState::getNextState()
 void StoryModeMatchIsOverState::action(Widget *sender, int actionType,
                         event_manager::GameControlEvent *event)
 {
-    if (sender == m_gameLostWidget.get()) {
+    if (sender == (Widget *)(m_gameLostWidget->getParentScreen())) {
+        m_gameLostWidget->getParentScreen()->removeAction(this);
         m_gameLostWidget.reset(NULL);
+        return;
     }
     m_aknowledged = true;
     evaluateStateMachine();

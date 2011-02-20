@@ -122,8 +122,8 @@ void SetupMatchState::enterState()
         GameUIDefaults::GAME_LOOP->garbageCollect(m_sharedAssets->m_gameScreen.release());
     }
     m_sharedAssets->m_gameWidget.reset(newGameWidget);
+    GameUIDefaults::SCREEN_STACK->swap(newGameScreen);
     m_sharedAssets->m_gameScreen.reset(newGameScreen);
-    GameUIDefaults::SCREEN_STACK->swap(m_sharedAssets->m_gameScreen.get());
     // Set the game initially paused
     m_sharedAssets->m_gameScreen->setSuspended(true);
 }
@@ -356,6 +356,14 @@ MatchIsOverState::MatchIsOverState(SharedMatchAssets &sharedMatchAssets)
 {
 }
 
+MatchIsOverState::~MatchIsOverState()
+{
+    if (m_gameLostWidget.get() != NULL) {
+        m_gameLostWidget->getParentScreen()->removeAction(this);
+        m_gameLostWidget.reset(NULL);
+    }
+}
+
 void MatchIsOverState::enterState()
 {
     GTLogTrace("MatchIsOver::enterState()");
@@ -372,13 +380,12 @@ void MatchIsOverState::enterState()
     m_sharedAssets.m_rightTotal += m_sharedAssets.m_gameWidget->getStatPlayerTwo().points;
     m_sharedAssets.m_gameWidget->setGameOverAction(this);
     m_sharedAssets.m_gameScreen->setOverlayStory(m_gameLostWidget.get());
-    // TODO: m_gameLostWidget must be released when the screen is removed
+    m_sharedAssets.m_gameScreen->addAction(this);
 }
 
 void MatchIsOverState::exitState()
 {
     m_sharedAssets.m_gameWidget->setGameOverAction(NULL);
-    m_gameLostWidget.reset(NULL);
 }
 
 bool MatchIsOverState::evaluate()
@@ -397,6 +404,10 @@ void MatchIsOverState::action(Widget *sender, int actionType,
     if (sender == m_gameLostWidget.get()) {
         m_gameLostWidget.reset(NULL);
     }
+    else if (sender == (Widget *)(m_gameLostWidget->getParentScreen())) {
+        m_gameLostWidget->getParentScreen()->removeAction(this);
+        m_gameLostWidget.reset(NULL);
+    }
     m_aknowledged = true;
     evaluateStateMachine();
 }
@@ -409,6 +420,14 @@ DisplayStatsState::DisplayStatsState(SharedMatchAssets &sharedMatchAssets)
       m_aknowledged(false),
       m_dimensions(416, 194, 50, Vec3(0, 0), Vec3(0, 0))
 {
+}
+
+DisplayStatsState::~DisplayStatsState()
+{
+    if (m_statsWidget.get() != NULL) {
+        m_statsWidget->getParentScreen()->removeAction(this);
+        m_statsWidget.reset(NULL);
+    }
 }
 
 void DisplayStatsState::enterState()
@@ -427,13 +446,12 @@ void DisplayStatsState::enterState()
     m_sharedAssets.m_gameWidget->setGameOverAction(this);
     m_statsWidget.reset(new TwoPlayersStatsWidget(m_sharedAssets.m_gameWidget->getStatPlayerOne(), m_sharedAssets.m_gameWidget->getStatPlayerTwo(), true, true, theCommander->getWindowFramePicture(), m_dimensions));
     m_sharedAssets.m_gameScreen->add(m_statsWidget.get());
-    // TODO: the stats widget must be released when the screen is removed
+    m_sharedAssets.m_gameScreen->addAction(this);
 }
 
 void DisplayStatsState::exitState()
 {
     m_sharedAssets.m_gameWidget->setGameOverAction(NULL);
-    m_statsWidget.reset(NULL);
 }
 
 bool DisplayStatsState::evaluate()
@@ -449,8 +467,14 @@ GameState *DisplayStatsState::getNextState()
 void DisplayStatsState::action(Widget *sender, int actionType,
                         event_manager::GameControlEvent *event)
 {
-    m_aknowledged = true;
-    evaluateStateMachine();
+    if (sender == (Widget *)(m_statsWidget->getParentScreen())) {
+        m_statsWidget->getParentScreen()->removeAction(this);
+        m_statsWidget.reset(NULL);
+    }
+    else {
+        m_aknowledged = true;
+        evaluateStateMachine();
+    }
 }
 
 //---------------------------------

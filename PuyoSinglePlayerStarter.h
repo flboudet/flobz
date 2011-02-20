@@ -155,6 +155,7 @@ class StoryModeMatchIsOverState : public GameState, public Action
 public:
     StoryModeMatchIsOverState(SharedGameAssets *sharedGameAssets,
 				 SharedMatchAssets *sharedMatchAssets);
+    virtual ~StoryModeMatchIsOverState();
     // GameState implementation
     virtual void enterState();
     virtual void exitState();
