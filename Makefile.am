@@ -86,11 +86,9 @@ mac-bundle: flobopop
 	cp $(abs_top_srcdir)/mac/icon.icns "$(bundle_name)/Contents/Resources/"
 	cp $(bin_PROGRAMS) "$(bundle_name)/Contents/MacOS/"
 	$(MAKE) $(AM_MAKEFLAGS) install fpdata="$(bundle_name)/Contents/Resources/data" datarootdir="$(bundle_name)/Contents/Resources" bindir="$(bundle_name)/Contents/MacOS"
-	strip -u -r $(bundle_name)/Contents/MacOS/flobopop
 	for FWNAME in $(ADDITIONAL_FRAMEWORKS) ; do \
 	  cp -RP "$(ADDITIONAL_FRAMEWORKS_DIRECTORY)/$${FWNAME}.framework" "$(bundle_name)/Contents/Frameworks"; \
 	done
-	strip -x $(bundle_name)/Contents/Frameworks/SDL*/SDL*
 
 mac-package: mac-bundle
 	rm -rf $(macimage_name)

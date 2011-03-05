@@ -11,7 +11,7 @@ cd -P -- "$(dirname -- "$prog")" && pwd -P
 
 SOURCE_DIRECTORY="${where_am_i}/.."
 BUILD_DIRECTORY="$PWD/build_mac"
-BUILD_ARCH="x86_64 i386"
+BUILD_ARCH="i386"
 
 ADDITIONAL_FRAMEWORKS_DIRECTORY="/Users/flobo/Library/Frameworks"
 ADDITIONAL_FRAMEWORKS="SDL SDL_image SDL_ttf SDL_mixer"
@@ -36,6 +36,7 @@ make -j3
 make -j3 mac-bundle
 
 # Additional steps to compensate bad scripting
+rm -rf FloboPop.app/Content/MacOS/fpserver
 rm -rf FloboPop.app/Contents/Resources/data/complete.002
 codesign -f -v -s "3rd Party Mac Developer Application: Fovea" "FloboPop.app"
 
