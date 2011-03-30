@@ -10,7 +10,9 @@
 #import <sys/param.h> /* for MAXPATHLEN */
 #import <unistd.h>
 
+#ifdef ENABLE_MAC_RECEIPT
 #import "validatereceipt.h"
+#endif
 
 @interface NSApplication(MissingFunction)
 - (void)setAppleMenu:(NSMenu *)menu;
@@ -293,7 +295,7 @@ static void CustomApplicationMain (int argc, char **argv)
 
 @end
 
-
+#ifdef ENABLE_MAC_RECEIPT
 void checkITunesReceipt()
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
@@ -309,6 +311,7 @@ void checkITunesReceipt()
     }
     [pool release];
 }
+#endif
 
 #ifdef main
 #  undef main
@@ -319,7 +322,9 @@ void checkITunesReceipt()
 int main (int argc, char **argv)
 {
     NSLog(@"Entering main!");
+#ifdef ENABLE_MAC_RECEIPT
     checkITunesReceipt();
+#endif
     /* Copy the arguments into a global variable */
     /* This is passed if we are launched by double-clicking */
     if ( argc >= 2 && strncmp (argv[1], "-psn", 4) == 0 ) {
