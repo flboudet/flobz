@@ -32,7 +32,7 @@ endif
 
 flobopop_LDADD+=$(SDL_LIBS)
 
-SUBDIRS = iosfc gametools goomsl data fpserver
+SUBDIRS = iosfc gametools goomsl common fpcore data fpserver
 
 # Mac OS X Targets
 

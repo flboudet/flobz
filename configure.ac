@@ -360,6 +360,7 @@ AC_SUBST([FPFEATURES])
 
 AC_CONFIG_FILES([
 Makefile
+common/Makefile
 fpcore/Makefile
 gametools/Makefile
 gametools/sdl_drawcontext/Makefile
