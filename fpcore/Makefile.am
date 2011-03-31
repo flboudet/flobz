@@ -22,7 +22,7 @@ libfpcore_la_SOURCES+=PuyoNetworkStarter.cpp PuyoNetworkView.cpp PuyoNetworkGame
           NatTraversal.cpp PuyoMessageDef.cpp
 endif
 
-libfpcore_la_CXXFLAGS = -I$(top_srcdir)/iosfc -I$(top_srcdir)/goomsl -I$(top_srcdir)/gametools $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
+libfpcore_la_CXXFLAGS = -I$(top_srcdir)/common -I$(top_srcdir)/iosfc -I$(top_srcdir)/goomsl -I$(top_srcdir)/gametools $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 
 EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            AnimatedPuyo.h PuyoGameAbstract.h OptionMenu.h \
