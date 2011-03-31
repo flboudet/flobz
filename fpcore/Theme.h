@@ -28,7 +28,7 @@
 
 #include <string>
 #include <vector>
-#include "gametools/drawcontext.h"
+#include "drawcontext.h"
 #include "PuyoGame.h"
 
 // Theme Interfaces

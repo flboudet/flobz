@@ -1,7 +1,7 @@
 #ifndef PUYO_GAME_ABSTRACT_H
 #define PUYO_GAME_ABSTRACT_H
 
-#include "iosfc/ios_fc.h"
+#include "ios_fc.h"
 #include "drawcontext.h"
 
 struct PlayerGameStat

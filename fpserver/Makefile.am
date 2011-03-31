@@ -3,7 +3,7 @@ bin_PROGRAMS=fpserver
 fpserver_SOURCES=PuyoServerIgpNatTraversal.cpp  PuyoServerMain.cpp \
                  PuyoServerV1.cpp PuyoServerV2.cpp
 
-fpserver_CXXFLAGS = -I$(top_srcdir) -I$(top_srcdir)/iosfc
+fpserver_CXXFLAGS = -I$(top_srcdir)/common -I$(top_srcdir)/iosfc
 fpserver_LDADD = -L../iosfc -liosfc -lsqlite3
 endif
 EXTRA_DIST=PuyoServerIgpNatTraversal.cpp PuyoServerMain.cpp  \

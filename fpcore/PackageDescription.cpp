@@ -1,7 +1,7 @@
 #include <iostream>
 #include "PackageDescription.h"
-#include "goomsl/goomsl.h"
-#include "goomsl/goomsl_hash.h"
+#include "goomsl.h"
+#include "goomsl_hash.h"
 
 using namespace std;
 

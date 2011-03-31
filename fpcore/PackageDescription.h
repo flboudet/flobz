@@ -3,7 +3,7 @@
 
 #include "CompositeDrawContext.h"
 #include "DataPathManager.h"
-#include "goomsl/goomsl.h"
+#include "goomsl.h"
 
 class PackageDescription
 {

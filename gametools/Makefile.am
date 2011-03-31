@@ -6,7 +6,7 @@ libgametools_la_SOURCES=GTLog.cpp GameCursor.cpp \
 	 mt19937ar.cpp SwitchedButton.cpp RadioButton.cpp NotifyCenter.cpp \
 	 BufferedDrawTarget.cpp CompositeDrawContext.cpp
 
-libgametools_la_CXXFLAGS = -I$(top_srcdir) -I$(top_srcdir)/iosfc $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
+libgametools_la_CXXFLAGS = -I$(top_srcdir)/iosfc $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 
 EXTRA_DIST=GTLog.h FramedButton.h FramedEditField.h Frame.h \
            GameControls.h GameCursor.h gameloop.h \

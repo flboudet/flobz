@@ -4,11 +4,19 @@
  * This program is released under the terms of the GNU Lesser General Public Licence.
  */
 %{
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <string.h>
-    #include "goomsl.h"
-    #include "goomsl_private.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "goomsl.h"
+#include "goomsl_private.h"
+// xcode and automake have different ways
+// to prefix yacc files. I have not found
+// a proper way to generate it.
+#ifdef XCODE_STYLE_YACC
+#include "goomsl_yacc.tab.h"
+#else
+#include "goomsl_yacc.h"
+#endif
 
 #define STRUCT_ALIGNMENT 16
 /* #define VERBOSE  */
@@ -175,7 +183,7 @@
       fblk++;
       s->fBlock[fblk].size = 0;
       s->fBlock[fblk].data = 0;
-      
+
       /* Finally prepare pointers */
       ALIGN_ADDR(consumed, i_align);
       for (i = 0; i < s->nbFields; ++i)
@@ -202,7 +210,7 @@
     {
       /* Prepare the struct: ie calculate internal storage format */
       gsl_prepare_struct(gsl_struct, STRUCT_ALIGNMENT, STRUCT_ALIGNMENT, STRUCT_ALIGNMENT);
-      
+
       /* If the struct does not already exists */
       if (gsl_get_struct_id(name) < 0)
       {
@@ -217,7 +225,7 @@
         currentGoomSL->gsl_struct[id] = gsl_struct;
       }
     } /* }}} */
-    
+
     /* Creates a field for a struct */
     GSL_StructField *gsl_new_struct_field(const char *name, int type)
     {
@@ -226,7 +234,7 @@
       field->type = type;
       return field;
     }
-    
+
     /* Create as field for a struct which will be a struct itself */
     GSL_StructField *gsl_new_struct_field_struct(const char *name, const char *type)
     {
@@ -306,7 +314,7 @@
           }
        }
     }
-    
+
     /* Declare a variable which will be a struct */
     static void gsl_struct_decl(GoomHash *namespace, const char *struct_name, const char *name)
     {
@@ -330,7 +338,7 @@
     {
         gsl_declare_var(currentGoomSL->vars, name, id, NULL);
     }
-    
+
     /* FLOAT */
     static void gsl_float_decl_local(const char *name)
     {
@@ -530,7 +538,7 @@
         if (expr->unode.opr.nbOp == 2) {
           commit_node(expr->unode.opr.op[toAdd],1);
         }
-    
+
         /* redefine the ADD node now as the computed variable */
         nodeFreeInternals(expr);
         *expr = *tmpcpy;
@@ -613,7 +621,7 @@
     static void precommit_mul(NodeType *mul) {
         precommit_expr(mul,"mul",INSTR_MUL);
     } /* }}} */
-    
+
     /* DIV */
     static NodeType *new_div(NodeType *expr1, NodeType *expr2) { /* {{{ */
         return new_expr2("div", OPR_DIV, expr1, expr2);
@@ -660,7 +668,7 @@
         commit_node(call->unode.opr.op[0],0);
         tmpcpy = nodeClone(tmp);
         commit_node(new_set(tmp,new_var(call->str,call->line_number)),0);
-        
+
         nodeFreeInternals(call);
         *call = *tmpcpy;
         free(tmpcpy);
@@ -673,7 +681,7 @@
         precommit_node(set->unode.opr.op[0]);
         precommit_node(set->unode.opr.op[1]);
         tmp = set->unode.opr.op[0];
-        
+
         stmp[0] = 0;
         if (set->unode.opr.op[0]->type == CONST_INT_NODE) {
             sprintf(stmp,"_i_tmp_%i",allocateTemp());
@@ -702,7 +710,7 @@
         commit_node(tmp,instr!=INSTR_SET);
         commit_node(set->unode.opr.op[1],1);
     } /* }}} */
-    
+
     /* NOT */
     static NodeType *new_not(NodeType *expr1) { /* {{{ */
         return new_expr1("not", OPR_NOT, expr1);
@@ -716,7 +724,7 @@
         currentGoomSL->instr = gsl_instr_init(currentGoomSL, "not", INSTR_NOT, 1, set->line_number);
         gsl_instr_add_param(currentGoomSL->instr, "|dummy|", TYPE_LABEL);
     } /* }}} */
-    
+
     /* EQU */
     static NodeType *new_equ(NodeType *expr1, NodeType *expr2) { /* {{{ */
         return new_expr2("isequal", OPR_EQU, expr1, expr2);
@@ -724,7 +732,7 @@
     static void commit_equ(NodeType *mul) {
         commit_test2(mul,"isequal",INSTR_ISEQUAL);
     } /* }}} */
-    
+
     /* INF */
     static NodeType *new_low(NodeType *expr1, NodeType *expr2) { /* {{{ */
         return new_expr2("islower", OPR_LOW, expr1, expr2);
@@ -747,7 +755,7 @@
         char start_while[1024], test_while[1024];
         sprintf(start_while, "|start_while_%d|", lbl);
         sprintf(test_while, "|test_while_%d|", lbl);
-       
+
         GSL_PUT_JUMP(test_while,node->line_number);
         GSL_PUT_LABEL(start_while,node->line_number);
 
@@ -787,9 +795,9 @@
 #ifdef VERBOSE
         printf("ret\n");
 #endif
-        
+
         GSL_PUT_LABEL(tmp_loop, node->line_number);
-        
+
         while (cur != NULL)
         {
           NodeType *x, *var, *tmp;
@@ -798,14 +806,14 @@
           x   = nodeClone(node->unode.opr.op[0]);
           var = nodeClone(cur->unode.opr.op[0]);
           commit_node(new_set(x, var),0);
-          
+
           /* 2: instr */
           currentGoomSL->instr = gsl_instr_init(currentGoomSL, "call", INSTR_CALL, 1, node->line_number);
           gsl_instr_add_param(currentGoomSL->instr, tmp_func, TYPE_LABEL);
 #ifdef VERBOSE
           printf("call %s\n", tmp_func);
 #endif
-          
+
           /* 3: var=x */
           x   = nodeClone(node->unode.opr.op[0]);
           var = cur->unode.opr.op[0];
@@ -839,7 +847,7 @@
     static NodeType *new_block(NodeType *lastNode) { /* {{{ */
         NodeType *blk = new_op("block", OPR_BLOCK, 2);
         blk->unode.opr.op[0] = new_nop("start_of_block");
-        blk->unode.opr.op[1] = lastNode;        
+        blk->unode.opr.op[1] = lastNode;
         return blk;
     }
     static void commit_block(NodeType *node) {
@@ -875,7 +883,7 @@
         printf("ret\n");
 #endif
     } /* }}} */
-    
+
     /* AFFECTATION LIST */
     static NodeType *new_affec_list(NodeType *set, NodeType *next) /* {{{ */
     {
@@ -965,7 +973,7 @@
             }
         }
     }
-    
+
     static void commit_ext_call(NodeType *node) {
         NodeType *alafter = new_affect_list_after(node->unode.opr.op[0]);
         commit_node(node->unode.opr.op[0],0);
@@ -976,7 +984,7 @@
 #endif
         commit_node(alafter,0);
     }
-    
+
     static void commit_call(NodeType *node) {
         NodeType *alafter = new_affect_list_after(node->unode.opr.op[0]);
         commit_node(node->unode.opr.op[0],0);
@@ -1060,7 +1068,7 @@
         rootNode = 0;
         lastNode = 0;
     } /* }}} */
-    
+
     void precommit_node(NodeType *node)
     { /* {{{ */
         /* do here stuff for expression.. for exemple */
@@ -1073,11 +1081,11 @@
                 case OPR_CALL_EXPR: precommit_call_expr(node); break;
             }
     } /* }}} */
-    
+
     void commit_node(NodeType *node, int releaseIfTmp)
     { /* {{{ */
         if (node == 0) return;
-        
+
         switch(node->type) {
             case OPR_NODE:
                 switch(node->unode.opr.type) {
@@ -1115,7 +1123,7 @@
         }
         if (releaseIfTmp && is_tmp_expr(node))
           releaseTemp(get_tmp_id(node));
-        
+
         nodeFree(node);
     } /* }}} */
 
@@ -1138,7 +1146,7 @@
     void nodeFreeInternals(NodeType *node) {
         free(node->str); /* {{{ */
     } /* }}} */
-    
+
     void nodeFree(NodeType *node) {
         nodeFreeInternals(node); /* {{{ */
         free(node);
@@ -1171,12 +1179,12 @@
         }
         return node;
     } /* }}} */
-    
+
     NodeType *new_nop(const char *str) {
         NodeType *node = new_op(str, EMPTY_NODE, 0); /* {{{ */
         return node;
     } /* }}} */
-    
+
     NodeType *new_op(const char *str, int type, int nbOp) {
         int i; /* {{{ */
         NodeType *node = nodeNew(str, OPR_NODE, currentGoomSL->num_lines);
@@ -1214,7 +1222,7 @@
     GSL_Struct *gsl_struct;
     GSL_StructField *gsl_struct_field;
   };
-  
+
 %token <strValue>   LTYPE_INTEGER
 %token <strValue>   LTYPE_FLOAT
 %token <strValue>   LTYPE_VAR
@@ -1226,7 +1234,7 @@
 %type <nPtr> expression constValue instruction test func_call func_call_expression
 %type <nPtr> start_block affectation_list affectation_in_list affectation declaration
 %type <nPtr> var_list_content var_list
-%type <strValue> task_name ext_task_name 
+%type <strValue> task_name ext_task_name
 %type <namespace> leave_namespace
 %type <gsl_struct> struct_members
 %type <gsl_struct_field> struct_member
@@ -1346,17 +1354,17 @@ start_block: { $$ = new_block(lastNode); lastNode = $$->unode.opr.op[0]; }
 
 expression: LTYPE_VAR   { $$ = new_var($1,currentGoomSL->num_lines); }
           | constValue  { $$ = $1; }
-          | expression '*' expression { $$ = new_mul($1,$3); } 
-          | expression '/' expression { $$ = new_div($1,$3); } 
-          | expression '+' expression { $$ = new_add($1,$3); } 
-          | expression '-' expression { $$ = new_sub($1,$3); } 
+          | expression '*' expression { $$ = new_mul($1,$3); }
+          | expression '/' expression { $$ = new_div($1,$3); }
+          | expression '+' expression { $$ = new_add($1,$3); }
+          | expression '-' expression { $$ = new_sub($1,$3); }
           | '-' expression            { $$ = new_neg($2);    }
           | '(' expression ')'        { $$ = $2; }
           | func_call_expression      { $$ = $1; }
           ;
 
-test: expression '=' expression { $$ = new_equ($1,$3); } 
-    | expression '<' expression { $$ = new_low($1,$3); } 
+test: expression '=' expression { $$ = new_equ($1,$3); }
+    | expression '<' expression { $$ = new_low($1,$3); }
     | expression '>' expression { $$ = new_low($3,$1); }
     | expression SUP_EQ expression { $$ = new_not(new_low($1,$3)); }
     | expression LOW_EQ expression { $$ = new_not(new_low($3,$1)); }
@@ -1365,8 +1373,8 @@ test: expression '=' expression { $$ = new_equ($1,$3); }
     ;
 
 constValue: LTYPE_FLOAT   { $$ = new_constFloat($1,currentGoomSL->num_lines); }
-          | LTYPE_INTEGER { $$ = new_constInt($1,currentGoomSL->num_lines); } 
-          | LTYPE_PTR     { $$ = new_constPtr($1,currentGoomSL->num_lines); } 
+          | LTYPE_INTEGER { $$ = new_constInt($1,currentGoomSL->num_lines); }
+          | LTYPE_PTR     { $$ = new_constPtr($1,currentGoomSL->num_lines); }
           ;
 
 /* ---------------- Function Calls ------------------ */
@@ -1381,7 +1389,7 @@ func_call_expression:
             '[' task_name leave_namespace ']'                      { $$ = new_call_expr($2,NULL); }
           | '[' task_name ':' affectation_list ']' leave_namespace { $$ = new_call_expr($2,$4); }
           ;
-             
+
 affectation_list: affectation_in_list affectation_list     { $$ = new_affec_list($1,$2);   }
             | affectation_in_list                          { $$ = new_affec_list($1,NULL); }
 
@@ -1399,7 +1407,7 @@ affectation_in_list: LTYPE_VAR '=' leave_namespace expression {
 /* ------------ Misc ---------- */
 
 opt_nl: '\n' | ;
-           
+
 
 %%
 

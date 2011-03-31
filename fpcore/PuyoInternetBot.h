@@ -1,7 +1,7 @@
 #ifndef PUYOINTERNETBOT_H
 #define PUYOINTERNETBOT_H
 
-#include "gametools/gameui.h"
+#include "gameui.h"
 #include "MainMenu.h"
 #include <memory>
 

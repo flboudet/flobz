@@ -30,8 +30,8 @@
 #include "PuyoStarter.h"
 #include "HiScores.h"
 #include "StatsWidget.h"
-#include "goomsl/goomsl.h"
-#include "goomsl/goomsl_hash.h"
+#include "goomsl.h"
+#include "goomsl_hash.h"
 #include <vector>
 
 class SinglePlayerGameWidget : public GameWidget, public Action {

@@ -10,7 +10,7 @@ AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
-AC_CONFIG_SRCDIR([main.cpp])
+AC_CONFIG_SRCDIR([fpcore/main.cpp])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -359,9 +359,12 @@ AC_SUBST([SYSTEM_ROOT])
 AC_SUBST([FPFEATURES])
 
 AC_CONFIG_FILES([
-Makefile gametools/Makefile iosfc/Makefile goomsl/Makefile
+Makefile
+fpcore/Makefile
+gametools/Makefile
 gametools/sdl_drawcontext/Makefile
 gametools/opengl_drawcontext/Makefile
+iosfc/Makefile goomsl/Makefile
 data/Makefile
 data/base.000/Makefile
 data/base.000/gfx/Makefile
@@ -421,6 +424,6 @@ data/reduced.001/theme/Reduced.fptheme/locale/Makefile
 data/reduced.001/theme/Reduced.fptheme/locale/en/Makefile
 data/reduced.001/theme/Reduced.fptheme/locale/fr/Makefile
 fpserver/Makefile
-iphone/Makefile
+mobile/Makefile
 ])
 AC_OUTPUT

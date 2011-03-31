@@ -28,8 +28,8 @@
 
 #include <map>
 #include <memory>
-#include "goomsl/goomsl.h"
-#include "goomsl/goomsl_hash.h"
+#include "goomsl.h"
+#include "goomsl_hash.h"
 #include "LocalizedDictionary.h"
 #include "DataPathManager.h"
 #include "Theme.h"
