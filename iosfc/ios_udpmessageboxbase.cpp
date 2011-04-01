@@ -241,24 +241,9 @@ void UDPMessageBoxBase::KnownPeer::handleAck(int messageSerialID)
     }
 }
 
-UDPMessageBoxBase::UDPMessageBoxBase(const String address,
-			     int localPort, int remotePort)
-    : defaultAddress(address)
-    , defaultPort(remotePort)
-    , socket(new DatagramSocket(localPort))
-    , sendSerialID(0)
-    , knownPeers()
-    , timeMsBeforeResendingReliable(500)
-    , timeMsBeforeReliableTimeout(60000) // 1 minute
-    , timeMsBeforePeerTimeout(60000) // 1 minute
-    , sessionListeners()
-{
-    socket->connect(defaultAddress, remotePort);
-}
-
 UDPMessageBoxBase::UDPMessageBoxBase(DatagramSocket *socket)
-    : defaultAddress("localhost")
-    , defaultPort(socket->getSocketPortNum())
+    : defaultAddress(socket->getConnectedAddress())
+    , defaultPort(socket->getConnectedPortNum())
     , socket(socket)
     , sendSerialID(0)
     , knownPeers()

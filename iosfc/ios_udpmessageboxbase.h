@@ -36,7 +36,6 @@ class UDPMessageInterface;
 
 class UDPMessageBoxBase : public MessageBox, public SessionManager {
 public:
-    UDPMessageBoxBase(String address, int localPort, int remotePort);
     UDPMessageBoxBase(DatagramSocket *socket);
     virtual ~UDPMessageBoxBase();
     // Message box

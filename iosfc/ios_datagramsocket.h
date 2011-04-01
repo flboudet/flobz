@@ -76,7 +76,6 @@ namespace ios_fc {
     /// @brief Manage an UDP socket, for Datagram based network communication.
     class DatagramSocket : public Selectable {
     public:
-//        DatagramSocket(const String hostName, int localPortNum, int remotePortNum);
         DatagramSocket(int localPortNum);
         DatagramSocket();
         DatagramSocket(DatagramSocketImpl *impl);

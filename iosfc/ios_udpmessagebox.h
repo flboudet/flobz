@@ -30,7 +30,6 @@ namespace ios_fc {
 template <typename T>
 class UDPMessageBox : public UDPMessageBoxBase {
 public:
-    UDPMessageBox(String address, int localPort, int remotePort);
     UDPMessageBox(DatagramSocket *socket);
     virtual Message * createMessage();
 protected:
@@ -42,11 +41,6 @@ private:
 };
 
 /// Implementation
-template <typename T>
-UDPMessageBox<T>::UDPMessageBox(String address, int localPort, int remotePort)
-    : UDPMessageBoxBase(address, localPort, remotePort)
-{}
-
 template <typename T>
 UDPMessageBox<T>::UDPMessageBox(DatagramSocket *socket)
     : UDPMessageBoxBase(socket)
