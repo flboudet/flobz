@@ -44,7 +44,7 @@ public:
     bool isDenied() const;
     String getDenyString() const { return m_denyString; }
     String getDenyStringMore() const { return m_denyStringMore; }
-    virtual IgpMessageBox *getIgpBox() { return &mbox; }
+    virtual IgpMessageBox *getIgpBox() { return m_igpmbox.get(); }
     // Temporaire
     void punch();
 protected:
@@ -58,10 +58,12 @@ private:
     static const int fpipVersion;
     const String hostName;
     int portNum;
-    FPServerMessageBox m_udpmbox;
-    FPServerIGPMessageBox mbox;
-    FPInternetP2PMessageBox *p2pmbox;
-    NatTraversal *p2pNatTraversal;
+    std::auto_ptr<DatagramSocket>          m_udpSocket;
+    std::auto_ptr<FPServerMessageBox>      m_udpmbox;
+    std::auto_ptr<FPServerIGPMessageBox>   m_igpmbox;
+    std::auto_ptr<DatagramSocket>          m_p2pSocket;
+    std::auto_ptr<FPInternetP2PMessageBox> m_p2pmbox;
+    std::auto_ptr<NatTraversal>            m_p2pNatTraversal;
     String p2pPunchName;
     bool tryNatTraversal;
     const String name;

@@ -24,6 +24,7 @@
  */
 
 #include <iostream>
+#include "GTLog.h"
 #include "InternetGameCenter.h"
 #include "PuyoIgpDefs.h"
 #include "ios_igpmessage.h"
@@ -35,19 +36,24 @@ using namespace ios_fc;
 const int InternetGameCenter::fpipVersion = 0x00000001;
 
 InternetGameCenter::InternetGameCenter(const String hostName, int portNum, const String name, const String password)
-  : hostName(hostName), portNum(portNum), m_udpmbox(hostName, 0, portNum), mbox(&m_udpmbox), p2pmbox(NULL), p2pNatTraversal(NULL), tryNatTraversal(true), name(name), password(password), status(PEER_NORMAL),
+  : hostName(hostName), portNum(portNum), tryNatTraversal(true),
+    name(name), password(password), status(PEER_NORMAL),
     timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages), gameGrantedStatus(GAMESTATUS_IDLE),
     m_isAccepted(false), m_isDenied(false), m_denyString(""), m_denyStringMore("")
 {
-    mbox.addListener(this);
+    m_udpSocket.reset(new DatagramSocket());
+    m_udpSocket->connect(SocketAddress(hostName), portNum);
+    m_udpmbox.reset(new FPServerMessageBox(m_udpSocket.get()));
+    m_igpmbox.reset(new FPServerIGPMessageBox(m_udpmbox.get()));
+    m_igpmbox->addListener(this);
     sendAliveMessage();
 }
 
 void InternetGameCenter::sendAliveMessage()
 {
-    int prevBound = mbox.getBound();
-    mbox.bind(1);
-    Message *msg = mbox.createMessage();
+    int prevBound = m_igpmbox->getBound();
+    m_igpmbox->bind(1);
+    Message *msg = m_igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("V", fpipVersion);
     msg->addInt("CMD", PUYO_IGP_ALIVE);
@@ -56,15 +62,15 @@ void InternetGameCenter::sendAliveMessage()
     msg->addInt("STATUS", status);
     msg->send();
     delete msg;
-    mbox.bind(prevBound);
+    m_igpmbox->bind(prevBound);
 }
 
 void InternetGameCenter::sendMessage(const String msgText)
 {
     //printf("Envoi du msg:%s\n", (const char *)msgText);
-    int prevBound = mbox.getBound();
-    mbox.bind(1);
-    Message *msg = mbox.createMessage();
+    int prevBound = m_igpmbox->getBound();
+    m_igpmbox->bind(1);
+    Message *msg = m_igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("V", fpipVersion);
     msg->addInt("CMD", PUYO_IGP_CHAT);
@@ -72,14 +78,14 @@ void InternetGameCenter::sendMessage(const String msgText)
     msg->addString("MSG", msgText);
     msg->send();
     delete msg;
-    mbox.bind(prevBound);
+    m_igpmbox->bind(prevBound);
 }
 
 void InternetGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
 {
     opponentName = invitation.opponentName;
-    invitation.initiatorAddress = mbox.getSelfAddress();
-    Message *msg = mbox.createMessage();
+    invitation.initiatorAddress = m_igpmbox->getSelfAddress();
+    Message *msg = m_igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("CMD", PUYO_IGP_GAME_REQUEST);
     msg->addString("ORGNAME", name);
@@ -96,7 +102,7 @@ void InternetGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
 void InternetGameCenter::sendGameAcceptInvitation(PuyoGameInvitation &invitation)
 {
     opponentName = invitation.opponentName;
-    Message *msg = mbox.createMessage();
+    Message *msg = m_igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("CMD", PUYO_IGP_GAME_ACCEPT);
     msg->addString("ORGNAME", name);
@@ -122,7 +128,7 @@ void InternetGameCenter::grantGameToMBox(MessageBox &thembox)
 
 void InternetGameCenter::sendGameCancelInvitation(PuyoGameInvitation &invitation)
 {
-    Message *msg = mbox.createMessage();
+    Message *msg = m_igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("CMD", PUYO_IGP_GAME_CANCEL);
     msg->addString("ORGNAME", name);
@@ -135,61 +141,61 @@ void InternetGameCenter::sendGameCancelInvitation(PuyoGameInvitation &invitation
 
 void InternetGameCenter::idle()
 {
-    static int idleCount = 0;
     switch (gameGrantedStatus) {
         case GAMESTATUS_STARTTRAVERSAL:
             // The game has been accepted, negociation is pending
             for (int i = 0, j = listeners.size() ; i < j ; i++) {
                 listeners[i]->onGameAcceptedNegociationPending(grantedInvitation);
             }
-            p2pmbox = new FPInternetP2PMessageBox(hostName, 0, portNum);
-            printf("grantedAddr:%d\n", static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.opponentAddress.getImpl())->getIgpIdent());
+            m_p2pSocket.reset(new DatagramSocket());
+            m_p2pSocket->connect(SocketAddress(hostName), portNum);
+            m_p2pmbox.reset(new FPInternetP2PMessageBox(m_p2pSocket.get()));
+            //printf("grantedAddr:%d\n", static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.opponentAddress.getImpl())->getIgpIdent());
 
             int initiatorIgpIdent, guestIgpIdent;
-            if (grantedInvitation.initiatorAddress == grantedInvitation.opponentAddress) { // The opponent invited me
+            if (grantedInvitation.initiatorAddress == grantedInvitation.opponentAddress) {
+                // The opponent invited me
                 initiatorIgpIdent = static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.initiatorAddress.getImpl())->getIgpIdent();
-                guestIgpIdent = static_cast<IgpMessage::IgpPeerAddressImpl *>(mbox.getSelfAddress().getImpl())->getIgpIdent();
+                guestIgpIdent = static_cast<IgpMessage::IgpPeerAddressImpl *>(m_igpmbox->getSelfAddress().getImpl())->getIgpIdent();
             }
-            else { // I invited the opponent
+            else {
+                // I invited the opponent
                 initiatorIgpIdent = static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.initiatorAddress.getImpl())->getIgpIdent();
                 guestIgpIdent = static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.opponentAddress.getImpl())->getIgpIdent();
             }
             p2pPunchName = String("punch:") + initiatorIgpIdent + "vs" + guestIgpIdent + ":" + grantedInvitation.gameRandomSeed;
-            p2pNatTraversal = new NatTraversal(*p2pmbox);
-            p2pNatTraversal->punch(p2pPunchName);
+            m_p2pNatTraversal.reset(new NatTraversal(*m_p2pmbox));
+            m_p2pNatTraversal->punch(p2pPunchName);
             gameGrantedStatus = GAMESTATUS_WAITTRAVERSAL;
             break;
         case GAMESTATUS_WAITTRAVERSAL:
-            p2pNatTraversal->idle();
-            if (p2pNatTraversal->hasFailed()) {
-                delete p2pNatTraversal;
-                p2pNatTraversal = NULL;
-                delete p2pmbox;
-                p2pmbox = NULL;
+            m_p2pNatTraversal->idle();
+            if (m_p2pNatTraversal->hasFailed()) {
+                m_p2pNatTraversal.reset();
+                m_p2pmbox.reset();
                 gameGrantedStatus = GAMESTATUS_GRANTED_IGP;
-		printf("NAT traversal failed, falling back to IGP\n");
+                GTLogTrace("NAT traversal failed, falling back to IGP");
             }
-            else if (p2pNatTraversal->hasSucceeded()) {
-                delete p2pNatTraversal;
-                p2pNatTraversal = NULL;
+            else if (m_p2pNatTraversal->hasSucceeded()) {
+                m_p2pNatTraversal.reset();
                 gameGrantedStatus = GAMESTATUS_GRANTED_P2P;
-		printf("NAT traversal succeeded, going peer-to-peer\n");
+                GTLogTrace("NAT traversal succeeded, going peer-to-peer");
             }
             break;
         case GAMESTATUS_GRANTED_P2P:
-            grantGameToMBox(*p2pmbox);
+            grantGameToMBox(*m_p2pmbox);
             gameGrantedStatus = GAMESTATUS_IDLE;
             break;
         case GAMESTATUS_GRANTED_IGP:
-            mbox.bind(grantedInvitation.opponentAddress);
-            grantGameToMBox(mbox);
+            m_igpmbox->bind(grantedInvitation.opponentAddress);
+            grantGameToMBox(*m_igpmbox);
             gameGrantedStatus = GAMESTATUS_IDLE;
             break;
         case GAMESTATUS_IDLE:
         default:
             break;
     }
-    mbox.idle();
+    m_igpmbox->idle();
     double time_ms = getTimeMs();
     if ((time_ms - lastAliveMessage) >= timeMsBetweenTwoAliveMessages) {
         sendAliveMessage();
@@ -216,24 +222,24 @@ String InternetGameCenter::getOpponentName()
 
 bool InternetGameCenter::isConnected() const
 {
-    return (mbox.isConnected()) && (m_isAccepted);
+    return (m_igpmbox->isConnected()) && (m_isAccepted);
 }
 
 bool InternetGameCenter::isDenied() const
 {
-    return (mbox.isConnected()) && (m_isDenied);
+    return (m_igpmbox->isConnected()) && (m_isDenied);
 }
 
 void InternetGameCenter::punch()
 {
-    int prevBound = mbox.getBound();
-    mbox.bind(1);
-    Message *msg = mbox.createMessage();
+    int prevBound = m_igpmbox->getBound();
+    m_igpmbox->bind(1);
+    Message *msg = m_igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL);
     msg->send();
     delete msg;
-    mbox.bind(prevBound);
+    m_igpmbox->bind(prevBound);
 }
 
 void InternetGameCenter::onMessage(Message &msg)
