@@ -33,6 +33,7 @@ public:
     PeerAddressImpl() : usage(0) {}
     virtual ~PeerAddressImpl() {}
     virtual bool operator == (const PeerAddressImpl &) const = 0;
+    virtual bool operator < (const PeerAddressImpl &a) const = 0;
     inline int getUsage() const { return usage; }
     inline void incrementUsage() { usage++; }
     inline void decrementUsage() {
@@ -57,12 +58,19 @@ public:
         if (impl) impl->incrementUsage();
         return *this;
     }
-    bool operator == (const PeerAddress &a) const {
+    inline bool operator == (const PeerAddress &a) const {
         if (impl == a.impl) return true;
         if (impl == NULL) return false;
         if (a.impl == NULL) return false;
         return (*impl == *(a.impl));
     } 
+    inline bool operator < (const PeerAddress &a) const {
+        if (impl == a.impl) return false;
+        if (impl == NULL) return true;
+        if (a.impl == NULL) return false;
+        return (*impl < *(a.impl));
+        return false;
+    }
     inline PeerAddressImpl *getImpl() const { return impl; }
 private:
     PeerAddressImpl *impl;

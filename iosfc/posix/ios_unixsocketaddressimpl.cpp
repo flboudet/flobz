@@ -45,6 +45,12 @@ bool UnixSocketAddressImpl::operator == (const SocketAddressImpl &a) const
     return (address == comp.address);
 }
 
+bool UnixSocketAddressImpl::operator < (const SocketAddressImpl &a) const
+{
+    const UnixSocketAddressImpl &comp = dynamic_cast<const UnixSocketAddressImpl &>(a);
+    return (address < comp.address);
+}
+
 String UnixSocketAddressImpl::asString() const
 {
   String result;

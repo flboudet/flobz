@@ -35,6 +35,7 @@ namespace ios_fc {
         UnixSocketAddressImpl(in_addr_t address);
         in_addr_t getAddress() const { return address; }
         bool operator == (const SocketAddressImpl &) const;
+        bool operator < (const SocketAddressImpl &) const;
 	String asString() const;
     private:
         in_addr_t address;

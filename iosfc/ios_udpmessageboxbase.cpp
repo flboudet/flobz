@@ -111,18 +111,14 @@ UDPMessageBoxBase::KnownPeer::KnownPeer(const PeerAddress &address, int receiveS
     , timeMsSinceLastMessage(0)
     , lastIdle(0)
 {
-    owner.knownPeers.add(this);
-    for (int i = 0, j = owner.sessionListeners.size() ; i < j ; i++) {
-        owner.sessionListeners[i]->onPeerConnect(address);
+    for (std::list<SessionListener *>::iterator listIter = owner.m_sessionListeners.begin() ;
+         listIter != owner.m_sessionListeners.end() ; ++listIter) {
+        (*listIter)->onPeerConnect(address);
     }
 }
 
 UDPMessageBoxBase::KnownPeer::~KnownPeer()
 {
-    for (int i = 0, j = owner.sessionListeners.size() ; i < j ; i++) {
-        owner.sessionListeners[i]->onPeerDisconnect(address);
-    }
-    owner.knownPeers.remove(this);
     for (int i = 0, j = outQueue.size() ; i < j ; i++) {
         delete outQueue[i];
     }
@@ -190,8 +186,8 @@ void UDPMessageBoxBase::KnownPeer::idle(double time_ms)
     // Handle peer timeout
     timeMsSinceLastMessage += elapsed_ms;
     if (timeMsSinceLastMessage >= owner.getTimeMsBeforePeerTimeout()) {
-        printf("Peer disconnected!\n");
-        delete this;
+        //printf("Peer disconnected!\n");
+        owner.deletePeer(address);
     }
 }
 
@@ -203,8 +199,8 @@ void UDPMessageBoxBase::KnownPeer::handleMessage(UDPMessageInterface &incomingMe
     if ((messageSerialID >= 0) && (messageSerialID < receiveSerialID)) {
         // peer reset
         if ((messageSerialID <= 10) || (receiveSerialID - messageSerialID > 10)) {
-            printf("Peer reset!\n");
-            delete(this);
+            //printf("Peer reset!\n");
+            owner.deletePeer(address);
             return;
         }
     }
@@ -246,17 +242,18 @@ UDPMessageBoxBase::UDPMessageBoxBase(DatagramSocket *socket)
     , defaultPort(socket->getConnectedPortNum())
     , socket(socket)
     , sendSerialID(0)
-    , knownPeers()
     , timeMsBeforeResendingReliable(500)
     , timeMsBeforeReliableTimeout(60000) // 1 minute
     , timeMsBeforePeerTimeout(60000) // 1 minute
-    , sessionListeners()
 {
 }
 
 UDPMessageBoxBase::~UDPMessageBoxBase()
 {
-  while(knownPeers.size()>0) delete knownPeers[0];
+    for (std::map<PeerAddress, KnownPeer*>::iterator iter = m_knownPeers.begin() ;
+         iter != m_knownPeers.end() ; ++iter) {
+        delete iter->second;
+    }
 }
 
 void UDPMessageBoxBase::idle()
@@ -267,8 +264,9 @@ void UDPMessageBoxBase::idle()
     Buffer<char> receiveBuffer(receiveData, 2048);
 
     // Known peers idle task
-    for (int i = 0, j = knownPeers.size() ; i < j ; i++) {
-        knownPeers[i]->idle(time_ms);
+    for (std::map<PeerAddress, KnownPeer*>::iterator iter = m_knownPeers.begin() ;
+         iter != m_knownPeers.end() ; ++iter) {
+        iter->second->idle(time_ms);
     }
 
     while (socket->available()) {
@@ -282,8 +280,9 @@ void UDPMessageBoxBase::idle()
 
                 // ACK message MUST be handled here, because sender address might not be the same as replier one
                 if (messageSerialID < 0) {
-                    for (int i = 0, j = knownPeers.size() ; i < j ; i++) {
-                        knownPeers[i]->handleAck(messageSerialID);
+                    for (std::map<PeerAddress, KnownPeer*>::iterator iter = m_knownPeers.begin() ;
+                         iter != m_knownPeers.end() ; ++iter) {
+                        iter->second->handleAck(messageSerialID);
                     }
                 }
                 // Else give the message to the known peer
@@ -293,6 +292,7 @@ void UDPMessageBoxBase::idle()
                         currentPeer = new KnownPeer(incomingMessage->getPeerAddress(),
                                                     messageSerialID <= 0 ? 0 : messageSerialID - 1,
                                                     *this);
+                        m_knownPeers[incomingMessage->getPeerAddress()] = currentPeer;
                     }
                     currentPeer->handleMessage(*incomingMessage, messageSerialID);
                 }
@@ -300,7 +300,7 @@ void UDPMessageBoxBase::idle()
         }
         catch (Message::InvalidMessageException e) {
             receiveBuffer[2047] = 0;
-            printf("Message dropped : %s\n", (const char *)receiveBuffer);
+            //printf("Message dropped : %s\n", (const char *)receiveBuffer);
             // Do nothing
         }
     }
@@ -321,6 +321,7 @@ void UDPMessageBoxBase::sendUDP(Buffer<char> buffer, int id, bool reliable, Peer
     KnownPeer *currentPeer = findPeer(peerAddr);
     if (currentPeer == NULL) {
         currentPeer = new KnownPeer(peerAddr, 0, *this);
+        m_knownPeers[peerAddr] = currentPeer;
     }
     currentPeer->outQueue.add(rawMessage);
     currentPeer->sendQueue();
@@ -328,13 +329,23 @@ void UDPMessageBoxBase::sendUDP(Buffer<char> buffer, int id, bool reliable, Peer
 
 UDPMessageBoxBase::KnownPeer *UDPMessageBoxBase::findPeer(PeerAddress address)
 {
-    for (int i = 0, j = knownPeers.size() ; i < j ; i++) {
-        KnownPeer *currentPeer = knownPeers[i];
-        if (currentPeer->address == address) {
-            return currentPeer;
-        }
+    std::map<PeerAddress, KnownPeer*>::iterator iter = m_knownPeers.find(address);
+    if (iter == m_knownPeers.end())
+        return NULL;
+    return iter->second;
+}
+
+void UDPMessageBoxBase::deletePeer(PeerAddress address)
+{
+    std::map<PeerAddress, KnownPeer*>::iterator iter = m_knownPeers.find(address);
+    if (iter == m_knownPeers.end())
+        return;
+    for (std::list<SessionListener *>::iterator listIter = m_sessionListeners.begin() ;
+         listIter != m_sessionListeners.end() ; ++listIter) {
+        (*listIter)->onPeerDisconnect(address);
     }
-    return NULL;
+    delete iter->second;
+    m_knownPeers.erase(iter);
 }
 
 void UDPMessageBoxBase::warnListeners(Message &message)
@@ -347,12 +358,12 @@ void UDPMessageBoxBase::warnListeners(Message &message)
 
 void UDPMessageBoxBase::addSessionListener(SessionListener *l)
 {
-    sessionListeners.add(l);
+    m_sessionListeners.push_back(l);
 }
 
 void UDPMessageBoxBase::removeSessionListener(SessionListener *l)
 {
-    sessionListeners.remove(l);
+    m_sessionListeners.remove(l);
 }
 
 void UDPMessageBoxBase::bind(PeerAddress addr)

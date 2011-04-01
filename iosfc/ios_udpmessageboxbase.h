@@ -22,6 +22,8 @@
 #ifndef _IOS_UDP_MESSAGE_BOX_BASE_H
 #define _IOS_UDP_MESSAGE_BOX_BASE_H
 
+#include <list>
+#include <map>
 #include "ios_memory.h"
 #include "ios_messagebox.h"
 #include "ios_datagramsocket.h"
@@ -65,17 +67,18 @@ public:
 private:
     struct KnownPeer;
     KnownPeer *findPeer(PeerAddress address);
+    void deletePeer(PeerAddress address);
     // For KnownPeers
     void warnListeners(Message &message);
     DatagramSocket *socket;
-    AdvancedBuffer<KnownPeer*> knownPeers;
+    std::map<PeerAddress, KnownPeer*> m_knownPeers;
     // UDP Messagebox parameters
     int timeMsBeforeResendingReliable;
     int timeMsBeforeReliableTimeout;
     int timeMsBeforePeerTimeout;
 
     // Session manager
-    AdvancedBuffer<SessionListener *> sessionListeners;
+    std::list<SessionListener *> m_sessionListeners;
 };
 
 }

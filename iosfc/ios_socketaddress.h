@@ -39,6 +39,7 @@ namespace ios_fc {
         }
         virtual ~SocketAddressImpl() {}
         virtual bool operator == (const SocketAddressImpl &) const = 0;
+        virtual bool operator < (const SocketAddressImpl &a) const = 0;
 	virtual String asString() const = 0;
     private:
         int usage;
@@ -64,6 +65,9 @@ namespace ios_fc {
         }
         bool operator == (const SocketAddress &a) const {
             return (*impl == *(a.impl));
+        }
+        bool operator < (const SocketAddress &a) const {
+            return (*impl < *(a.impl));
         } 
         SocketAddressImpl *getImpl() const { return impl; }
 	String asString() const { return impl->asString(); }

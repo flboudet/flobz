@@ -53,6 +53,10 @@ namespace ios_fc {
             const IgpPeerAddressImpl &comp = dynamic_cast<const IgpPeerAddressImpl &>(a);
             return (comp.igpIdent == igpIdent);
         }
+        virtual bool operator < (const PeerAddressImpl &a) const {
+            const IgpPeerAddressImpl &comp = dynamic_cast<const IgpPeerAddressImpl &>(a);
+            return (igpIdent < comp.igpIdent);
+        }
         inline int getIgpIdent() const { return igpIdent; }
     private:
         int igpIdent;

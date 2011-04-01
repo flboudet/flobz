@@ -22,6 +22,12 @@ public:
         const UDPPeerAddressImpl &comp = dynamic_cast<const UDPPeerAddressImpl &>(a);
         return (comp.port == port) && (comp.address == address);
     }
+    virtual bool operator < (const PeerAddressImpl &a) const {
+        const UDPPeerAddressImpl &comp = dynamic_cast<const UDPPeerAddressImpl &>(a);
+        if (comp.address == address)
+            return port < comp.port;
+        return address < comp.address;
+    }
 private:
     SocketAddress address;
     int port;
