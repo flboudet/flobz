@@ -24,17 +24,20 @@
  */
 
 #include "PauseMenu.h"
+#include "PuyoCommander.h"
+
 using namespace event_manager;
+using namespace gameui;
 
 PauseMenu::PauseMenu(Action *pauseAction)
     : topSeparator(0, 10), pauseVBox(theCommander->getWindowFramePicture()),
       pauseTitleFrame(theCommander->getSeparatorFramePicture()),
       menuTitle(theCommander->getLocalizedString("Pause")),
       continueButton(theCommander->getLocalizedString("Continue game"), this),
-      optionsButton(theCommander->getLocalizedString("Options"), this),
-      audioButton(),
-      musicButton(),
-      fullScreenButton(),
+      //optionsButton(theCommander->getLocalizedString("Options"), this),
+      //audioButton(),
+      //musicButton(),
+      //fullScreenButton(),
       abortButton(theCommander->getLocalizedString("Abort game"), this),
       optionsBox(theCommander->getWindowFramePicture()),
       optionsTitleFrame(theCommander->getSeparatorFramePicture()),
@@ -74,13 +77,13 @@ PauseMenu::~PauseMenu()
 
 void PauseMenu::action(Widget *sender, int actionType, GameControlEvent *event)
 {
-  if (sender == &optionsButton) {
+  /*if (sender == &optionsButton) {
     pauseContainer.transitionToContent(&optionsBox);
   }
   else if (sender == &optionsBack) {
     pauseContainer.transitionToContent(&pauseVBox);
-  }
-  else if (sender == &continueButton) {
+  }*/
+  if (sender == &continueButton) {
       pauseContainer.transitionToContent(NULL);
       m_pauseAction->action(this, KPauseMenuClosing_Continue, event);
   }

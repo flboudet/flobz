@@ -30,7 +30,6 @@
 #include "PuyoTwoPlayerStarter.h"
 #include "ios_messagebox.h"
 #include "PuyoNetworkView.h"
-#include "NetCenterMenu.h"
 #include "ChatBox.h"
 
 class PuyoNetworkGameFactory : public PuyoGameFactory {

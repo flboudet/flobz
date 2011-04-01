@@ -26,26 +26,28 @@
 #ifndef _PUYO_PAUSE_MENU_H
 #define _PUYO_PAUSE_MENU_H
 
+#include "gameui.h"
 #include "Frame.h"
-#include "OptionMenu.h"
+//#include "OptionMenu.h"
 
 /**
  * The class PauseMenu implements the ingame pause menu shown
  * when the player presses the pause button (usually esc)
  */
-class PauseMenu : public VBox, public Action, public SliderContainerListener {
+class PauseMenu : public gameui::VBox,
+                  public gameui::Action, public gameui::SliderContainerListener {
 public:
-    PauseMenu(Action *pauseAction);
+    PauseMenu(gameui::Action *pauseAction);
     virtual ~PauseMenu();
     int pauseMenuTop, pauseMenuLeft;
     void backPressed(bool fromControls = true);
     // Action handler
-    virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
+    virtual void action(gameui::Widget *sender, int actionType, event_manager::GameControlEvent *event);
     /**
      * Notify that the slider is outside of the screen, before sliding back inside
      */
-    virtual void onSlideInside(SliderContainer &slider);
-    virtual void onWidgetAdded(WidgetContainer *parent);
+    virtual void onSlideInside(gameui::SliderContainer &slider);
+    virtual void onWidgetAdded(gameui::WidgetContainer *parent);
     /**
      * The different action types sent by the pause menu
      */
@@ -55,24 +57,25 @@ public:
         KPauseMenuClosed_Continue
     };
 private:
-    SliderContainer pauseContainer;
-    Separator topSeparator;
-    HBox topBox;
-    Frame pauseVBox;
-    Frame pauseTitleFrame;
-    Text menuTitle;
-    VBox buttonsBox;
-    Button continueButton, optionsButton;
-    AudioPrefSwitch audioButton;
-    MusicPrefSwitch musicButton;
-    FSPrefSwitch fullScreenButton;
-    Button abortButton;
-    Frame optionsBox;
-    Frame optionsTitleFrame;
-    Text optionsTitle;
-    VBox optionsButtonsBox;
-    Button optionsBack;
-    Action *m_pauseAction;
+    gameui::SliderContainer pauseContainer;
+    gameui::Separator topSeparator;
+    gameui::HBox topBox;
+    gameui::Frame pauseVBox;
+    gameui::Frame pauseTitleFrame;
+    gameui::Text menuTitle;
+    gameui::VBox buttonsBox;
+    gameui::Button continueButton;
+    //Button optionsButton;
+    //AudioPrefSwitch audioButton;
+    //MusicPrefSwitch musicButton;
+    //FSPrefSwitch fullScreenButton;
+    gameui::Button abortButton;
+    gameui::Frame optionsBox;
+    gameui::Frame optionsTitleFrame;
+    gameui::Text optionsTitle;
+    gameui::VBox optionsButtonsBox;
+    gameui::Button optionsBack;
+    gameui::Action *m_pauseAction;
 };
 
 #endif // _PUYO_PAUSE_MENU_H
