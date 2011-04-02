@@ -219,10 +219,14 @@ void PuyoServerList::puyoServerDidPing(PingablePuyoServer &server)
 
 PingablePuyoServer::PingablePuyoServer(String hostName, int portNum, String path, PingablePuyoServerResponder *responder)
   : PuyoServer(hostName, portNum, path),
-    m_pingBox(hostName, 0, portNum), m_igpclient(m_pingBox, false), m_responder(responder), m_alreadyReported(false)
+    m_responder(responder), m_alreadyReported(false)
 {
+    m_pingSocket.reset(new DatagramSocket());
+    m_pingSocket->connect(hostName, portNum);
+    m_pingBox.reset(new FPServerMessageBox(m_pingSocket.get()));
+    m_igpclient.reset(new IGPClient(*m_pingBox, false));
     GameUIDefaults::GAME_LOOP->addIdle(this);
-    m_pingTransaction = m_igpclient.ping(10000., 1000.);
+    m_pingTransaction = m_igpclient->ping(10000., 1000.);
 }
 
 PingablePuyoServer::~PingablePuyoServer()
@@ -233,7 +237,7 @@ PingablePuyoServer::~PingablePuyoServer()
 void PingablePuyoServer::idle(double currentTime)
 {
     if (!m_pingTransaction->completed())
-        m_igpclient.idle();
+        m_igpclient->idle();
     else {
         if ((!m_alreadyReported) && (m_pingTransaction->success())) {
             m_alreadyReported = true;

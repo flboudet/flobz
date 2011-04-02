@@ -26,6 +26,7 @@
 #ifndef _PUYOINTERNETGAMECENTER_H
 #define _PUYOINTERNETGAMECENTER_H
 
+#include <memory>
 #include "NetworkDefinitions.h"
 #include "NetGameCenter.h"
 #include "NatTraversal.h"

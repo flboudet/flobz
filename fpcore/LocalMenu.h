@@ -28,6 +28,7 @@
 
 #include "gameui.h"
 #include "FramedEditField.h"
+#include "MainScreen.h"
 #include "PuyoCommander.h"
 #include "PuyoSinglePlayerStarter.h"
 #include "PuyoTwoPlayerStarter.h"

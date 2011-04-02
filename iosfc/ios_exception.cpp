@@ -14,11 +14,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifndef WIN32
+#ifdef GENERATE_BACKTRACE
 #include <execinfo.h>
-#endif
 #include <cxxabi.h>
 #include <signal.h>
+#endif
 
 using namespace std;
 
@@ -31,10 +31,11 @@ namespace ios_fc {
         void *stack_addrs[max_depth];
         char **stack_strings;
         std::stringstream out;
-#ifndef WIN32
+#ifdef GENERATE_BACKTRACE
         stack_depth = backtrace(stack_addrs, max_depth);
         stack_strings = backtrace_symbols(stack_addrs, stack_depth);
 #endif
+#ifdef GENERATE_BACKTRACE
         out << "Call stack:\n";
 
         for (size_t i = 1; i < stack_depth; i++) {
@@ -77,6 +78,7 @@ namespace ios_fc {
             free(function);
         }
         free(stack_strings); // malloc()ed by backtrace_symbols
+#endif
         return out.str();
     }
 
@@ -118,7 +120,7 @@ namespace ios_fc {
         fprintf(stderr, "From:\n%s\n", stack.c_str());
     }
 
-#ifndef WIN32
+#ifdef GENERATE_BACKTRACE
     void signal_handler(int sig) {
         static volatile unsigned long _new = 0;
         if (_new)
@@ -149,7 +151,7 @@ namespace ios_fc {
 #endif
 
     void catch_signals() {
-#ifndef WIN32
+#ifdef GENERATE_BACKTRACE
         /* Invalid memory reference */
         signal (SIGSEGV, signal_handler);
         /* Interrupt from keyboard */

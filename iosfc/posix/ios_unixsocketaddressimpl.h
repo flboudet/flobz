@@ -18,12 +18,13 @@
  *
  *
  */
- 
+
 #ifndef _IOSUNIXSOCKETADDRESSIMPL
 #define _IOSUNIXSOCKETADDRESSIMPL
 
 #include <netdb.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include "ios_memory.h"
 #include "ios_socketaddress.h"
 

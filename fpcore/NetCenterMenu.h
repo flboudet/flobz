@@ -30,6 +30,7 @@
 #include "ListView.h"
 #include "Frame.h"
 #include "FramedButton.h"
+#include "MainScreen.h"
 #include "PuyoCommander.h"
 #include "InternetGameCenter.h"
 #include "PuyoTwoPlayerStarter.h"

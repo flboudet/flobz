@@ -51,7 +51,9 @@ void UnixThreadImpl::launch()
 
 void UnixThreadImpl::cancel()
 {
+#ifndef ANDROID
     pthread_cancel(threadRef);
+#endif
 }
 
 void UnixThreadImpl::detach()

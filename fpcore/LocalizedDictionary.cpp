@@ -34,12 +34,13 @@
 #endif
 #include "windows.h"
 #endif
+#include "config.h"
 #include "GTLog.h"
 #include "LocalizedDictionary.h"
 #include "ios_memory.h"
 #include <iostream>
 #include <stdio.h>
-#include <ext/hash_map>
+#include HASH_MAP_H
 #include <cstring>
 #include <string>
 #include <stdint.h>
