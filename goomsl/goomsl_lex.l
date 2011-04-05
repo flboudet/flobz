@@ -20,22 +20,22 @@ void yyparse(void);
 GoomSL *currentGoomSL;
 static int  string_size;
 static char string[1024];
-
-#define MAX_IMPORT_DEPTH 10
-static YY_BUFFER_STATE includeStack[MAX_IMPORT_DEPTH];
-static int includeStackPtr = 0;
-
+  
+#define YY_INPUT(buf,result,max_size) { \
+    result = currentGoomSL->read_file_function(currentGoomSL, buf, (goomsl_file)yyin, max_size); \
+    }\
+    \
+    
 #define UP_INCLUDE_STACK() \
-        if ( --includeStackPtr < 0 ) {\
-            includeStackPtr = 0; \
-            yyterminate(); \
-        } \
-        else \
-        { \
-            fclose(yyin); \
-            yy_delete_buffer( YY_CURRENT_BUFFER ); \
-            yy_switch_to_buffer( includeStack[includeStackPtr] ); \
-        }
+    if (yy_buffer_stack_top == 0) {\
+        yyterminate(); \
+    } \
+    else { \
+    if (yyin != NULL) { \
+    currentGoomSL->close_file_function(currentGoomSL, (goomsl_file)yyin); \
+    } \
+    yypop_buffer_state(); \
+    }
 
 %}
 
@@ -67,11 +67,6 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
         char* fullName = NULL;
         yytext[strlen(yytext)-1] = 0;
 
-        if ( includeStackPtr >= MAX_IMPORT_DEPTH )
-        {
-           goto endImport;
-        }
-
         /* TODO: build the absolute path name */
         fullName = gsl_create_full_filepath( currentGoomSL, (char*) yytext+1 );
         if ( fullName == NULL )
@@ -80,7 +75,7 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
         }
 
         /* open the imported file */
-        tmp_yyin = fopen( fullName, "r" );
+        tmp_yyin = (FILE *)(currentGoomSL->open_file_function(currentGoomSL, fullName));
         if ( ! tmp_yyin )
         {
            goto endImport;
@@ -91,14 +86,12 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
         {
            free( fullName );
         }
-
-        includeStack[includeStackPtr++]   = YY_CURRENT_BUFFER;
         //GPI_LineNumber = (int*)(META_GTI_LineNumber+includeStackPtr);
         //(*GPI_LineNumber) = 1;
         yyin = tmp_yyin;
 
         /* changement de buffer d'entree pour le bovin */
-        yy_switch_to_buffer( yy_create_buffer( yyin, YY_BUF_SIZE ) );
+        yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
 
         endImport:
         BEGIN(INITIAL);

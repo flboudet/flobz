@@ -162,6 +162,8 @@ typedef struct _GSL_Struct { /* {{{ */
   Block fBlock[64];
 } GSL_Struct;
  /* }}} */
+
+#define PARSEBUF_STACKSIZE 10
 struct _GoomSL { /* {{{ */
     void *user_field, *user_field_2;
     int num_lines;
@@ -176,7 +178,13 @@ struct _GoomSL { /* {{{ */
 
     GoomHash *functions;    /* table des fonctions externes */
     GoomSL_FilePathResolver file_path_resolver_function;
-
+    /* File acess functions */
+    GoomSL_OpenFile  open_file_function;
+    GoomSL_CloseFile close_file_function;
+    GoomSL_ReadFile  read_file_function;
+    /* Parse buffers stack */
+    void * parsebuf_stack[PARSEBUF_STACKSIZE];
+    
     GoomHeap *data_heap; /* GSL Heap-like memory space */
 
     int nbStructID;

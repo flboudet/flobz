@@ -153,10 +153,10 @@ void ThemeManagerImpl::loadThemePack(const std::string &path)
     if (!gsl) return;
     String libPath = m_dataPathManager.getPath("lib/themelib.gsl");
     String packageLibPath = m_dataPathManager.getPath("lib/packagelib.gsl");
-    char * fbuffer = gsl_init_buffer((const char *)libPath);
-    gsl_append_file_to_buffer(packageLibPath, &fbuffer);
-    gsl_append_file_to_buffer(scriptPath, &fbuffer);
-    gsl_compile(gsl,fbuffer);
+    gsl_push_file(gsl, (const char *)libPath);
+    gsl_push_file(gsl, (const char *)packageLibPath);
+    gsl_push_file(gsl, (const char *)scriptPath);
+    gsl_compile(gsl);
     gsl_bind_function(gsl, "end_puyoset",     ThemeManagerImpl::end_puyoset);
     gsl_bind_function(gsl, "end_level",       ThemeManagerImpl::end_level);
     gsl_bind_function(gsl, "end_description", ThemeManagerImpl::end_description);
@@ -169,7 +169,6 @@ void ThemeManagerImpl::loadThemePack(const std::string &path)
     GSL_SET_USERDATA_PTR(gsl, this);
     gsl_execute(gsl);
     gsl_free(gsl);
-    free(fbuffer);
     m_localeDictionary.reset(NULL);
 }
 

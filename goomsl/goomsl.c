@@ -1309,10 +1309,17 @@ void gsl_fast_iflow_free(FastInstructionFlow *fastiflow)
   free(fastiflow);
 }
 
+/* Size of default input buffer. */
+#ifndef YY_BUF_SIZE
+#define YY_BUF_SIZE 16384
+#endif
 typedef void * YY_BUFFER_STATE;
 YY_BUFFER_STATE yy_scan_string(const char *str);
 void yy_delete_buffer(YY_BUFFER_STATE buffer);
 void yyparse(void);
+void yy_switch_to_buffer (YY_BUFFER_STATE new_buffer  );
+YY_BUFFER_STATE yy_create_buffer (FILE *file,int size  );
+void yypush_buffer_state (YY_BUFFER_STATE new_buffer  );
 
 GoomHash *gsl_globals(GoomSL *_this)
 {
@@ -1348,53 +1355,83 @@ static void ext_f2i(GoomSL *gsl, GoomHash *global, GoomHash *local)
 }
 
 /**
+ * Default file access functions
+ */
+goomsl_file gsl_default_open(GoomSL *gsl, const char *file_name)
+{
+    FILE *f = fopen(file_name,"rt");
+    return (goomsl_file)f;
+}
+
+void gsl_default_close(GoomSL *gsl, goomsl_file file)
+{
+    FILE *f = (FILE *)file;
+    fclose(f);
+}
+
+int gsl_default_read(GoomSL *gsl, void *buffer, goomsl_file file, int read_size)
+{
+    FILE *f = (FILE *)file;
+    return fread(buffer,1,read_size,f);
+}
+
+/**
  *
  */
-void gsl_compile(GoomSL *_currentGoomSL, const char *script)
-{ /* {{{ */
-  char *script_and_externals;
+void gsl_compile(GoomSL *_currentGoomSL)
+{
   static const char *sBinds =
-    "external <charAt: string value, int index> : int\n"
-    "external <f2i: float value> : int\n"
-    "external <i2f: int value> : float\n";
+  "external <charAt: string value, int index> : int\n"
+  "external <f2i: float value> : int\n"
+  "external <i2f: int value> : float\n";
   YY_BUFFER_STATE currentBuffer;
+  YY_BUFFER_STATE sbindsBuffer;
+  int once = 1;
 
 #ifdef VERBOSE
   printf("\n=== Starting Compilation ===\n");
 #endif
-
-  script_and_externals = malloc(strlen(script) + strlen(sBinds) + 2);
-  strcpy(script_and_externals, sBinds);
-  strcat(script_and_externals, script);
-
+  
   /* 0- reset */
   currentGoomSL = _currentGoomSL;
   reset_scanner(currentGoomSL);
-
+  
   /* 1- create the syntaxic tree */
-  currentBuffer = yy_scan_string(script_and_externals);
+  sbindsBuffer = yy_scan_string(sBinds);
+  for (int i = PARSEBUF_STACKSIZE-1 ; i >= 0 ; --i) {
+    if (_currentGoomSL->parsebuf_stack[i] != NULL) {
+      if (once) {
+        yy_switch_to_buffer(_currentGoomSL->parsebuf_stack[i]);
+        currentBuffer = _currentGoomSL->parsebuf_stack[i];
+        once = 0;
+      }
+      else
+        yypush_buffer_state(_currentGoomSL->parsebuf_stack[i]);
+      _currentGoomSL->parsebuf_stack[i] = NULL;
+    }
+  }
+  yypush_buffer_state(sbindsBuffer);
   yyparse();
   yy_delete_buffer(currentBuffer);
   
   /* 2- generate code */
   gsl_commit_compilation();
-
+  
   /* 3- resolve symbols */
   calculate_labels(currentGoomSL->iflow);
-
+  
   /* 4- optimize code */
   gsl_create_fast_iflow();
-
+  
   /* 5- bind a few internal functions */
   gsl_bind_function(currentGoomSL, "charAt", ext_charAt);
   gsl_bind_function(currentGoomSL, "f2i", ext_f2i);
   gsl_bind_function(currentGoomSL, "i2f", ext_i2f);
-  free(script_and_externals);
   
 #ifdef VERBOSE
   printf("=== Compilation done. # of lines: %d. # of instr: %d ===\n", currentGoomSL->num_lines, currentGoomSL->iflow->number);
 #endif
-} /* }}} */
+}
 
 void gsl_execute(GoomSL *scanner)
 { /* {{{ */
@@ -1415,6 +1452,9 @@ GoomSL *gsl_new(void)
   gss->vars  = goom_hash_new();
   gss->functions = goom_hash_new();
   gss->file_path_resolver_function = NULL;
+  gss->open_file_function  = gsl_default_open;
+  gss->close_file_function = gsl_default_close;
+  gss->read_file_function  = gsl_default_read;
   gss->nbStructID  = 0;
   gss->structIDS   = goom_hash_new();
   gss->gsl_struct_size = 32;
@@ -1424,6 +1464,9 @@ GoomSL *gsl_new(void)
   gss->data_heap = goom_heap_new();
   gss->fastiflow = NULL;
 
+  for (int i = 0 ; i < PARSEBUF_STACKSIZE ; ++i)
+    gss->parsebuf_stack[i] = NULL;
+  
   reset_scanner(gss);
 
   gss->compilationOK = 0;
@@ -1484,83 +1527,29 @@ void gsl_free(GoomSL *gss)
   free(gss);
 } /* }}} */
 
-
-static int gsl_nb_import;
-static char gsl_already_imported[256][256];
-
-char *gsl_init_buffer(const char *fname)
+void gsl_push_file  (GoomSL *scanner, const char *file_name)
 {
-    char *fbuffer;
-    fbuffer = (char*)malloc(512);
-    fbuffer[0]=0;
-    gsl_nb_import = 0;
-    if (fname)
-      gsl_append_file_to_buffer(fname,&fbuffer);
-    return fbuffer;
-}
-
-static char *gsl_read_file(const char *fname)
-{
-  FILE *f;
-  char *buffer;
-  int fsize;
-  f = fopen(fname,"rt");
-  if (!f) {
-    fprintf(stderr, "ERROR: Could not load file %s\n", fname);
-    exit(1);
+  YY_BUFFER_STATE *b;
+  for (int i = 0 ; i < PARSEBUF_STACKSIZE ; ++i) {
+    if (scanner->parsebuf_stack[i] == NULL) {
+      b = &(scanner->parsebuf_stack[i]);
+      break;
+    }
   }
-  fseek(f,0,SEEK_END);
-  fsize = ftell(f);
-  rewind(f);
-  buffer = (char*)malloc(fsize+512);
-  fread(buffer,1,fsize,f);
-  fclose(f);
-  buffer[fsize]=0;
-  return buffer;
+  FILE *f = (FILE *)(scanner->open_file_function(scanner, file_name));
+  *b = yy_create_buffer( f, YY_BUF_SIZE );
 }
 
-void gsl_append_file_to_buffer(const char *fname, char **buffer)
+void gsl_push_script(GoomSL *scanner, const char *script)
 {
-    char *fbuffer;
-    int size,fsize,i=0;
-    char reset_msg[256];
-    
-    /* look if the file have not been already imported */
-    for (i=0;i<gsl_nb_import;++i) {
-      if (strcmp(gsl_already_imported[i], fname) == 0)
-        return;
+  YY_BUFFER_STATE *b;
+  for (int i = 0 ; i < PARSEBUF_STACKSIZE ; ++i) {
+    if (scanner->parsebuf_stack[i] == NULL) {
+      b = &(scanner->parsebuf_stack[i]);
+      break;
     }
-    
-    /* add fname to the already imported files. */
-    strcpy(gsl_already_imported[gsl_nb_import++], fname);
-
-    /* load the file */
-    fbuffer = gsl_read_file(fname);
-    fsize = strlen(fbuffer);
-        
-    /* look for #import */
-    while (fbuffer[i]) {
-      if ((fbuffer[i]=='#') && (fbuffer[i+1]=='i')) {
-        char impName[256];
-        int j;
-        while (fbuffer[i] && (fbuffer[i]!=' '))
-          i++;
-        i++;
-        j=0;
-        while (fbuffer[i] && (fbuffer[i]!='\n'))
-          impName[j++] = fbuffer[i++];
-        impName[j++] = 0;
-        gsl_append_file_to_buffer(impName, buffer);
-      }
-      i++;
-    }
-    
-    sprintf(reset_msg, "\n#FILE %s#\n#RST_LINE#\n", fname);
-    strcat(*buffer, reset_msg);
-    size=strlen(*buffer);
-    *buffer = (char*)realloc(*buffer, size+fsize+256);
-    strcat((*buffer)+size, fbuffer);
-    free(fbuffer);
+  }
+  *b = yy_scan_string(script);
 }
 
 char *gsl_create_full_filepath(GoomSL *_this, const char *file_name)
@@ -1573,6 +1562,13 @@ char *gsl_create_full_filepath(GoomSL *_this, const char *file_name)
 void gsl_bind_path_resolver(GoomSL *_this, GoomSL_FilePathResolver path_resolver_function)
 {
     _this->file_path_resolver_function = path_resolver_function;
+}
+
+void gsl_bind_file_functions(GoomSL *_this, GoomSL_OpenFile open_function, GoomSL_CloseFile close_function, GoomSL_ReadFile read_function)
+{
+    _this->open_file_function  = open_function;
+    _this->close_file_function = close_function;
+    _this->read_file_function  = read_function;
 }
 
 

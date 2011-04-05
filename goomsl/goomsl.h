@@ -11,19 +11,26 @@ typedef struct _GoomSL GoomSL;
 typedef void (*GoomSL_ExternalFunction)(GoomSL *gsl, GoomHash *global_vars, GoomHash *local_vars);
 typedef char *(*GoomSL_FilePathResolver)(GoomSL *gsl, const char *file_name);
 
+typedef void * goomsl_file;
+typedef goomsl_file (*GoomSL_OpenFile)(GoomSL *gsl, const char *file_name);
+typedef void (*GoomSL_CloseFile)(GoomSL *gsl, goomsl_file file);
+typedef int (*GoomSL_ReadFile)(GoomSL *gsl, void *buffer, goomsl_file file, int read_size);
+
 GoomSL*gsl_new(void);
 void   gsl_free(GoomSL *gss);
 
-char *gsl_init_buffer(const char *file_name);
-void  gsl_append_file_to_buffer(const char *file_name, char **buffer);
 char *gsl_create_full_filepath(GoomSL *_this, const char *file_name);
 
-void   gsl_compile (GoomSL *scanner, const char *script);
+void   gsl_push_file  (GoomSL *scanner, const char *file_name);
+void   gsl_push_script(GoomSL *scanner, const char *script);
+    
+void   gsl_compile (GoomSL *scanner);
 void   gsl_execute (GoomSL *scanner);
 int    gsl_is_compiled  (GoomSL *gss);
 void   gsl_bind_function(GoomSL *gss, const char *fname, GoomSL_ExternalFunction func);
 void   gsl_bind_path_resolver(GoomSL *_this, GoomSL_FilePathResolver path_resolver_function);
-
+void   gsl_bind_file_functions(GoomSL *_this, GoomSL_OpenFile open_function, GoomSL_CloseFile close_function, GoomSL_ReadFile read_function);
+    
 int    gsl_malloc  (GoomSL *_this, int size);
 void  *gsl_get_ptr (GoomSL *_this, int id);
 void   gsl_free_ptr(GoomSL *_this, int id);

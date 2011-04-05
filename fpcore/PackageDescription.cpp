@@ -68,14 +68,12 @@ PackageDescription::PackageDescription(DataPathManager &dataPathManager,
     GoomSL * gsl = gsl_new();
     if (!gsl) return;
     GSL_SET_USERDATA2_PTR(gsl, this);
-//dataPathManager.getPath("Description.gsl");
-    char * fbuffer = gsl_init_buffer((const char *)libPath);
-    gsl_append_file_to_buffer((const char *)scriptPath, &fbuffer);
-    gsl_compile(gsl,fbuffer);
+    gsl_push_file(gsl, (const char *)libPath);
+    gsl_push_file(gsl, (const char *)scriptPath);
+    gsl_compile(gsl);
     sbind(gsl);
     gsl_execute(gsl);
     gsl_free(gsl);
-    free(fbuffer);
 }
 
 PackageDescription::PackageDescription(GoomSL *gsl,

@@ -135,14 +135,13 @@ StoryModeLevelsDefinition::StoryModeLevelsDefinition(String levelDefinitionFile)
     GoomSL * gsl = gsl_new();
     if (!gsl) return;
     String libPath = theCommander->getDataPathManager().getPath("/lib/levellib.gsl");
-    char * fbuffer = gsl_init_buffer((const char *)libPath);
-    gsl_append_file_to_buffer(levelDefinitionFile, &fbuffer);
-    gsl_compile(gsl,fbuffer);
+    gsl_push_file(gsl, (const char *)libPath);
+    gsl_push_file(gsl, levelDefinitionFile);
+    gsl_compile(gsl);
     currentDefinition = this;
     gsl_bind_function(gsl, "end_level",  StoryModeLevelsDefinition::end_level);
     gsl_bind_function(gsl, "getBoolPreference", StoryModeLevelsDefinition::get_BoolPreference);
     gsl_execute(gsl);
-    free(fbuffer);
     gsl_free(gsl);
 }
 

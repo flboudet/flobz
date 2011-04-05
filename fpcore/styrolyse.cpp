@@ -354,20 +354,18 @@ void styrolyse_execute(Styrolyse *_this, int mode, float delta_t)
 
 void styrolyse_reload(Styrolyse *_this)
 {
-    char *fbuffer;
     if (!_this->gsl) return;
-    fbuffer = gsl_init_buffer(scriptPath0);
+    gsl_push_file(_this->gsl, scriptPath0);
     if (scriptPath_nofx && !_this->fxMode)
-        gsl_append_file_to_buffer(scriptPath_nofx, &fbuffer);
+        gsl_push_file(_this->gsl, scriptPath_nofx);
     if (scriptPath_fx && _this->fxMode)
-        gsl_append_file_to_buffer(scriptPath_fx, &fbuffer);
-    gsl_append_file_to_buffer(_this->fname, &fbuffer);
+        gsl_push_file(_this->gsl, scriptPath_fx);
+    gsl_push_file(_this->gsl, _this->fname);
     styrolyse = _this;
     GTLogTrace("styrolyse_new() gsl_compile");
-    gsl_compile(_this->gsl,fbuffer);
+    gsl_compile(_this->gsl);
     GTLogTrace("styrolyse_new() gsl_compile finished");
     sbind(_this->gsl);
-    free(fbuffer);
     styrolyse_execute(_this, 0, 0.0);
 }
 
