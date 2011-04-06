@@ -28,9 +28,13 @@ void   gsl_compile (GoomSL *scanner);
 void   gsl_execute (GoomSL *scanner);
 int    gsl_is_compiled  (GoomSL *gss);
 void   gsl_bind_function(GoomSL *gss, const char *fname, GoomSL_ExternalFunction func);
+
 void   gsl_bind_path_resolver(GoomSL *_this, GoomSL_FilePathResolver path_resolver_function);
 void   gsl_bind_file_functions(GoomSL *_this, GoomSL_OpenFile open_function, GoomSL_CloseFile close_function, GoomSL_ReadFile read_function);
-    
+
+void  gsl_set_userdata(GoomSL *_this, const char *key, const void *data);
+void *gsl_get_userdata(GoomSL *_this, const char *key);
+
 int    gsl_malloc  (GoomSL *_this, int size);
 void  *gsl_get_ptr (GoomSL *_this, int id);
 void   gsl_free_ptr(GoomSL *_this, int id);
@@ -50,9 +54,6 @@ GoomHash *gsl_globals(GoomSL *_this);
 
 #define GSL_SET_USERDATA_PTR(gsl, data) { *((void **)gsl) = (void *)data; }
 #define GSL_GET_USERDATA_PTR(gsl) (*((void **)gsl))
-
-#define GSL_SET_USERDATA2_PTR(gsl, data) { ((void **)gsl)[1] = (void *)data; }
-#define GSL_GET_USERDATA2_PTR(gsl) (((void **)gsl)[1])
 
 #ifdef __cplusplus
 };

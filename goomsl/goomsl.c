@@ -1410,6 +1410,7 @@ void gsl_compile(GoomSL *_currentGoomSL)
       _currentGoomSL->parsebuf_stack[i] = NULL;
     }
   }
+  currentGoomSL->current_file = NULL;
   yypush_buffer_state(sbindsBuffer);
   yyparse();
   yy_delete_buffer(currentBuffer);
@@ -1446,8 +1447,10 @@ void gsl_execute(GoomSL *scanner)
 
 GoomSL *gsl_new(void)
 { /* {{{ */
+  int i;
   GoomSL *gss = (GoomSL*)malloc(sizeof(GoomSL));
 
+  gss->user_data = NULL;
   gss->iflow = iflow_new();
   gss->vars  = goom_hash_new();
   gss->functions = goom_hash_new();
@@ -1464,8 +1467,10 @@ GoomSL *gsl_new(void)
   gss->data_heap = goom_heap_new();
   gss->fastiflow = NULL;
 
-  for (int i = 0 ; i < PARSEBUF_STACKSIZE ; ++i)
+  for (i = 0 ; i < PARSEBUF_STACKSIZE ; ++i)
     gss->parsebuf_stack[i] = NULL;
+  for (i = 0 ; i < PARSEBUF_STACKSIZE ; ++i)
+    gss->bufferfile_map[i].b = NULL;
   
   reset_scanner(gss);
 
@@ -1504,6 +1509,8 @@ static void functions_deletator(GoomHash *caller, const char *key, GHashValue *v
 void gsl_free(GoomSL *gss)
 { /* {{{ */
   int i;
+  if (gss->user_data != NULL)
+    goom_hash_free(gss->user_data);
   iflow_free(gss->iflow);
   goom_hash_free(gss->vars);
   goom_hash_for_each(gss->functions, functions_deletator);
@@ -1536,8 +1543,9 @@ void gsl_push_file  (GoomSL *scanner, const char *file_name)
       break;
     }
   }
-  FILE *f = (FILE *)(scanner->open_file_function(scanner, file_name));
-  *b = yy_create_buffer( f, YY_BUF_SIZE );
+  goomsl_file f = scanner->open_file_function(scanner, file_name);
+  *b = yy_create_buffer( NULL, YY_BUF_SIZE );
+  gsl_set_buffer_input_file(scanner, *b, f);
 }
 
 void gsl_push_script(GoomSL *scanner, const char *script)
@@ -1571,4 +1579,51 @@ void gsl_bind_file_functions(GoomSL *_this, GoomSL_OpenFile open_function, GoomS
     _this->read_file_function  = read_function;
 }
 
+void gsl_set_buffer_input_file(GoomSL *_this, YY_BUFFER_STATE buf, goomsl_file file)
+{
+  int i;
+  for (i = 0 ; i < PARSEBUF_STACKSIZE ; ++i) {
+    if (_this->bufferfile_map[i].b == NULL) {
+      _this->bufferfile_map[i].b = buf;
+      _this->bufferfile_map[i].f = file;
+      break;
+    }
+  }
+}
 
+goomsl_file gsl_get_buffer_input_file(GoomSL *_this, YY_BUFFER_STATE buf)
+{
+  int i;
+  for (i = 0 ; i < PARSEBUF_STACKSIZE ; ++i) {
+    if (_this->bufferfile_map[i].b == buf) {
+      return  _this->bufferfile_map[i].f;
+    }
+  }
+}
+
+void gsl_forget_buffer_input_file(GoomSL *_this, YY_BUFFER_STATE buf)
+{
+  int i;
+  for (i = 0 ; i < PARSEBUF_STACKSIZE ; ++i) {
+    if (_this->bufferfile_map[i].b == buf) {
+      _this->bufferfile_map[i].b = NULL;
+      _this->bufferfile_map[i].f = NULL;
+      break;
+    }
+  }
+}
+
+void  gsl_set_userdata(GoomSL *_this, const char *key, const void *data)
+{
+  if (_this->user_data == NULL)
+    _this->user_data = goom_hash_new();
+  goom_hash_put_ptr(_this->user_data, key, data);
+}
+
+void *gsl_get_userdata(GoomSL *_this, const char *key)
+{
+  if (_this->user_data == NULL)
+    return NULL;
+  GHashValue *result = goom_hash_get(_this->user_data, key);
+  return result == NULL ? NULL : result->ptr;
+}

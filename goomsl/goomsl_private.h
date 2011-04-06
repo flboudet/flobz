@@ -164,8 +164,13 @@ typedef struct _GSL_Struct { /* {{{ */
  /* }}} */
 
 #define PARSEBUF_STACKSIZE 10
+struct _BufferFileIndirection {
+    void *b;
+    goomsl_file f;
+};
 struct _GoomSL { /* {{{ */
-    void *user_field, *user_field_2;
+    void *user_field;
+    GoomHash *user_data;
     int num_lines;
     Instruction *instr;     /* instruction en cours de construction */
 
@@ -184,6 +189,9 @@ struct _GoomSL { /* {{{ */
     GoomSL_ReadFile  read_file_function;
     /* Parse buffers stack */
     void * parsebuf_stack[PARSEBUF_STACKSIZE];
+    /* Buffer goomsl_file indirection */
+    struct _BufferFileIndirection bufferfile_map[PARSEBUF_STACKSIZE];
+    goomsl_file current_file;
     
     GoomHeap *data_heap; /* GSL Heap-like memory space */
 
@@ -220,6 +228,10 @@ GoomHash *gsl_leavenamespace(void);
 GoomHash *gsl_find_namespace(const char *name);
 
 void gsl_commit_compilation(void);
+
+void gsl_set_buffer_input_file(GoomSL *_this, void *buf, goomsl_file file);
+goomsl_file gsl_get_buffer_input_file(GoomSL *_this, void *buf);
+void gsl_forget_buffer_input_file(GoomSL *_this, void *buf);
 
 /* #define TYPE_PARAM    1 */
 

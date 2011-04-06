@@ -20,9 +20,10 @@ void yyparse(void);
 GoomSL *currentGoomSL;
 static int  string_size;
 static char string[1024];
-  
+
+    
 #define YY_INPUT(buf,result,max_size) { \
-    result = currentGoomSL->read_file_function(currentGoomSL, buf, (goomsl_file)yyin, max_size); \
+    result = currentGoomSL->read_file_function(currentGoomSL, buf, currentGoomSL->current_file, max_size); \
     }\
     \
     
@@ -31,11 +32,14 @@ static char string[1024];
         yyterminate(); \
     } \
     else { \
-    if (yyin != NULL) { \
-    currentGoomSL->close_file_function(currentGoomSL, (goomsl_file)yyin); \
+    if (currentGoomSL->current_file != NULL) { \
+    currentGoomSL->close_file_function(currentGoomSL, currentGoomSL->current_file); \
+    gsl_forget_buffer_input_file(currentGoomSL, YY_CURRENT_BUFFER); \
     } \
     yypop_buffer_state(); \
+    currentGoomSL->current_file = gsl_get_buffer_input_file(currentGoomSL, YY_CURRENT_BUFFER); \
     }
+
 
 %}
 
@@ -63,8 +67,9 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
 "import"        {  BEGIN IMPORT; }
 <IMPORT>[ \t]*  ;
 <IMPORT>\<[^<>\n]+\> {
-        FILE *tmp_yyin = NULL;
+        goomsl_file *newfile = NULL;
         char* fullName = NULL;
+        YY_BUFFER_STATE b;
         yytext[strlen(yytext)-1] = 0;
 
         /* TODO: build the absolute path name */
@@ -75,9 +80,10 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
         }
 
         /* open the imported file */
-        tmp_yyin = (FILE *)(currentGoomSL->open_file_function(currentGoomSL, fullName));
-        if ( ! tmp_yyin )
+        newfile = currentGoomSL->open_file_function(currentGoomSL, fullName);
+        if ( ! newfile )
         {
+           fprintf(stderr, "Warning: file not found %s, ignored\n", fullName);
            goto endImport;
         }
 
@@ -88,10 +94,12 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
         }
         //GPI_LineNumber = (int*)(META_GTI_LineNumber+includeStackPtr);
         //(*GPI_LineNumber) = 1;
-        yyin = tmp_yyin;
+        currentGoomSL->current_file = newfile;
 
         /* changement de buffer d'entree pour le bovin */
-        yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
+        b = yy_create_buffer( NULL, YY_BUF_SIZE );
+        gsl_set_buffer_input_file(currentGoomSL, b, newfile);
+        yypush_buffer_state(b);
 
         endImport:
         BEGIN(INITIAL);
