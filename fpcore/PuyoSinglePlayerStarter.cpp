@@ -27,6 +27,7 @@
 #include "PuyoSinglePlayerStarter.h"
 #include "PuyoView.h"
 #include "preferences.h"
+#include "GSLFileAccessWrapper.h"
 
 using namespace event_manager;
 
@@ -134,8 +135,8 @@ StoryModeLevelsDefinition::StoryModeLevelsDefinition(String levelDefinitionFile)
 {
     GoomSL * gsl = gsl_new();
     if (!gsl) return;
-    String libPath = theCommander->getDataPathManager().getPath("/lib/levellib.gsl");
-    gsl_push_file(gsl, (const char *)libPath);
+    GSLFA_setupWrapper(gsl, &(theCommander->getDataPathManager()));
+    gsl_push_file(gsl, "/lib/levellib.gsl");
     gsl_push_file(gsl, levelDefinitionFile);
     gsl_compile(gsl);
     currentDefinition = this;
@@ -460,13 +461,13 @@ std::auto_ptr<StoryModeLevelsDefinition> StoryModePrepareNextMatchState::m_level
 StoryModePrepareNextMatchState::StoryModePrepareNextMatchState(SharedGameAssets *sharedGameAssets)
     : m_sharedGameAssets(sharedGameAssets)
 {
-    if (m_levelDefProvider.get() == NULL)
-        m_levelDefProvider.reset(new StoryModeLevelsDefinition(theCommander->getDataPathManager().getPath("/story/levels.gsl")));
     reset();
 }
 
 void StoryModePrepareNextMatchState::enterState()
 {
+    if (m_levelDefProvider.get() == NULL)
+        m_levelDefProvider.reset(new StoryModeLevelsDefinition("/story/levels.gsl"));
     ++m_currentLevel;
     if (m_levelDefProvider->getNumLevels() > m_currentLevel) {
         m_sharedGameAssets->levelDef = m_levelDefProvider->getLevelDefinition(m_currentLevel);

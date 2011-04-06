@@ -1,7 +1,8 @@
 #include <iostream>
+#include "GTLog.h"
 #include "PackageDescription.h"
 #include "goomsl.h"
-#include "goomsl_hash.h"
+#include "GSLFileAccessWrapper.h"
 
 using namespace std;
 
@@ -24,13 +25,13 @@ void PackageDescription::gsl_strcat(GoomSL *gsl, GoomHash *global, GoomHash *loc
 
 void PackageDescription::start_graphic(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
-    PackageDescription *packageDesc = (PackageDescription *)GSL_GET_USERDATA2_PTR(gsl);
+    PackageDescription *packageDesc = (PackageDescription *)gsl_get_userdata(gsl, "PackageDescription");
     const char * path = (const char *)GSL_LOCAL_PTR(gsl, local, "path");
     packageDesc->m_graphicBeingDefinedPath = path;
 }
 void PackageDescription::define_crop(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
-    PackageDescription *packageDesc = (PackageDescription *)GSL_GET_USERDATA2_PTR(gsl);
+    PackageDescription *packageDesc = (PackageDescription *)gsl_get_userdata(gsl, "PackageDescription");
     const char * key = (const char *)GSL_LOCAL_PTR(gsl, local, "key");
     IosRect graphicRect = { GSL_LOCAL_INT(gsl, local, "x"),
                             GSL_LOCAL_INT(gsl, local, "y"),
@@ -56,10 +57,8 @@ PackageDescription::PackageDescription(DataPathManager &dataPathManager,
                                        CompositeDrawContext &cDC)
     : m_cDC(cDC)
 {
-    String libPath = dataPathManager.getPath("lib/packagelib.gsl");
-    String scriptPath;
     try {
-        scriptPath = package.getPath("Description.gsl").c_str();
+        package.getPath("Description.gsl").c_str();
     }
     catch (...) {
         cerr << "Warning: No description file in package " << package.getName() << endl;
@@ -67,9 +66,10 @@ PackageDescription::PackageDescription(DataPathManager &dataPathManager,
     }
     GoomSL * gsl = gsl_new();
     if (!gsl) return;
-    GSL_SET_USERDATA2_PTR(gsl, this);
-    gsl_push_file(gsl, (const char *)libPath);
-    gsl_push_file(gsl, (const char *)scriptPath);
+    GSLFA_setupWrapper(gsl, &dataPathManager, &package);
+    gsl_set_userdata(gsl, "PackageDescription", this);
+    gsl_push_file(gsl, "/lib/packagelib.gsl");
+    gsl_push_file(gsl, "@/Description.gsl");
     gsl_compile(gsl);
     sbind(gsl);
     gsl_execute(gsl);
@@ -80,6 +80,6 @@ PackageDescription::PackageDescription(GoomSL *gsl,
                                        CompositeDrawContext &cDC)
     : m_cDC(cDC)
 {
-    GSL_SET_USERDATA2_PTR(gsl, this);
+    gsl_set_userdata(gsl, "PackageDescription", this);
     sbind(gsl);
 }

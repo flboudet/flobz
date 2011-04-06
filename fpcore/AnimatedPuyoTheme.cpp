@@ -27,7 +27,7 @@
 #include <sstream>
 #include "DataPathManager.h"
 #include "AnimatedPuyoTheme.h"
-
+#include "GSLFileAccessWrapper.h"
 #include "CompositeDrawContext.h"
 #include "PackageDescription.h"
 
@@ -135,27 +135,18 @@ const std::vector<std::string> & ThemeManagerImpl::getLevelThemeList()
 void ThemeManagerImpl::loadThemePack(const std::string &path)
 {
     FilePath themePath(path.c_str());
-    String scriptPath = m_dataPathManager.getPath(themePath.combine("Description.gsl"));
 	String themeDictionaryPath = FilePath::combine(FilePath::combine("theme",themePath.basename()),"locale");
 	m_localeDictionary.reset(new LocalizedDictionary(m_dataPathManager, themeDictionaryPath, "theme"));
     m_themePackLoadingPath = path;
 
-#ifdef DISABLED
-    // Verify input file
-    struct stat s;
-    if (stat((const char *)scriptPath,&s) == -1)
-    {
-        fprintf(stderr,"Couldn't load theme from %s. Ignoring.\n",(const char *)scriptPath);
-        return;
-    }
-#endif
     GoomSL * gsl = gsl_new();
     if (!gsl) return;
-    String libPath = m_dataPathManager.getPath("lib/themelib.gsl");
-    String packageLibPath = m_dataPathManager.getPath("lib/packagelib.gsl");
-    gsl_push_file(gsl, (const char *)libPath);
-    gsl_push_file(gsl, (const char *)packageLibPath);
-    gsl_push_file(gsl, (const char *)scriptPath);
+    //String libPath = m_dataPathManager.getPath("lib/themelib.gsl");
+    //String packageLibPath = m_dataPathManager.getPath("lib/packagelib.gsl");
+    GSLFA_setupWrapper(gsl, &m_dataPathManager);
+    gsl_push_file(gsl, "/lib/themelib.gsl");
+    gsl_push_file(gsl, "/lib/packagelib.gsl");
+    gsl_push_file(gsl, themePath.combine("Description.gsl"));
     gsl_compile(gsl);
     gsl_bind_function(gsl, "end_puyoset",     ThemeManagerImpl::end_puyoset);
     gsl_bind_function(gsl, "end_level",       ThemeManagerImpl::end_level);

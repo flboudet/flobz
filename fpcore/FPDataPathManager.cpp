@@ -32,6 +32,23 @@ using namespace std;
 
 #define isnum(X) ((X>='0') && (X<='9'))
 
+
+FPDataInputStream::FPDataInputStream(const char *fname)
+{
+    m_f = fopen(fname, "r");
+}
+
+FPDataInputStream::~FPDataInputStream()
+{
+    fclose(m_f);
+}
+
+int FPDataInputStream::streamRead(void *buffer, int size)
+{
+    return fread(buffer, 1, size, m_f);
+}
+
+
 FPDataPackage::FPDataPackage(FPDataPathManager *owner,
                              const char *packagePath,
                              int packageNumber)
@@ -50,6 +67,12 @@ std::string FPDataPackage::getPath(const char *shortPath) const
 std::string FPDataPackage::getName() const
 {
     return m_name;
+}
+
+DataInputStream *FPDataPackage::openDataInputStream(const char *shortPath)
+{
+    std::string path = getPath(shortPath);
+    return new FPDataInputStream(path.c_str());
 }
 
 FPDataPathManager::FPDataPathManager(String coreDataPath)
@@ -143,4 +166,9 @@ void FPDataPathManager::setMaxPackNumber(int maxPackNumber)
     }
 }
 
+DataInputStream *FPDataPathManager::openDataInputStream(const char *shortPath)
+{
+    String path = getPath(shortPath);
+    return new FPDataInputStream(path);
+}
 

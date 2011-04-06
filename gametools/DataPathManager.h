@@ -30,13 +30,24 @@
 
 using namespace ios_fc;
 
-class DataPackage {
+class DataInputStream {
+public:
+    virtual ~DataInputStream() {}
+    virtual int streamRead(void *buffer, int size) = 0;
+};
+
+class DataProvider {
+public:
+    virtual DataInputStream *openDataInputStream(const char *shortPath) = 0;
+};
+
+class DataPackage : public DataProvider {
 public:
     virtual std::string getPath(const char *shortPath) const = 0;
     virtual std::string getName() const = 0;
 };
 
-class DataPathManager {
+class DataPathManager : public DataProvider {
 public:
     virtual String getPath(String shortPath) const = 0;
     virtual SelfVector<String> getEntriesAtPath(String shortPath) const = 0;

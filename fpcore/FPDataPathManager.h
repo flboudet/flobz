@@ -41,19 +41,31 @@ public:
                   int packageNumber);
     virtual std::string getPath(const char *shortPath) const;
     virtual std::string getName() const;
+    virtual DataInputStream *openDataInputStream(const char *shortPath);
 private:
     FPDataPathManager *m_owner;
     int m_packageNumber;
     std::string m_name;
 };
 
+class FPDataInputStream : public DataInputStream {
+public:
+    FPDataInputStream(const char *fname);
+    virtual ~FPDataInputStream();
+    virtual int streamRead(void *buffer, int size);
+private:
+    FILE *m_f;
+};
+
 class FPDataPathManager : public DataPathManager {
 public:
     FPDataPathManager(String coreDataPath);
+    virtual String getPath(String shortPath) const;
+    virtual SelfVector<String> getEntriesAtPath(String shortPath) const;
+    virtual DataInputStream *openDataInputStream(const char *shortPath);
+    // Own methods
     void registerDataPackages(CompositeDrawContext &cDC);
-    String getPath(String shortPath) const;
     String getPathInPack(String shortPath, int packPathIndex) const;
-    SelfVector<String> getEntriesAtPath(String shortPath) const;
     int getNumPacks() const { return m_dataPaths.size(); }
     void setMaxPackNumber(int maxPackNumber);
 private:
