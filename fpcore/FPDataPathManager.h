@@ -41,7 +41,7 @@ public:
                   int packageNumber);
     virtual std::string getPath(const char *shortPath) const;
     virtual std::string getName() const;
-    virtual DataInputStream *openDataInputStream(const char *shortPath);
+    virtual DataInputStream *openDataInputStream(const char *shortPath) const;
 private:
     FPDataPathManager *m_owner;
     int m_packageNumber;
@@ -62,7 +62,7 @@ public:
     FPDataPathManager(String coreDataPath);
     virtual String getPath(String shortPath) const;
     virtual SelfVector<String> getEntriesAtPath(String shortPath) const;
-    virtual DataInputStream *openDataInputStream(const char *shortPath);
+    virtual DataInputStream *openDataInputStream(const char *shortPath) const;
     // Own methods
     void registerDataPackages(CompositeDrawContext &cDC);
     String getPathInPack(String shortPath, int packPathIndex) const;

@@ -38,7 +38,7 @@ public:
 
 class DataProvider {
 public:
-    virtual DataInputStream *openDataInputStream(const char *shortPath) = 0;
+    virtual DataInputStream *openDataInputStream(const char *shortPath) const = 0;
 };
 
 class DataPackage : public DataProvider {

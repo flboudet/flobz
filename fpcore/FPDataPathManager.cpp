@@ -69,7 +69,7 @@ std::string FPDataPackage::getName() const
     return m_name;
 }
 
-DataInputStream *FPDataPackage::openDataInputStream(const char *shortPath)
+DataInputStream *FPDataPackage::openDataInputStream(const char *shortPath) const
 {
     std::string path = getPath(shortPath);
     return new FPDataInputStream(path.c_str());
@@ -166,7 +166,7 @@ void FPDataPathManager::setMaxPackNumber(int maxPackNumber)
     }
 }
 
-DataInputStream *FPDataPathManager::openDataInputStream(const char *shortPath)
+DataInputStream *FPDataPathManager::openDataInputStream(const char *shortPath) const
 {
     String path = getPath(shortPath);
     return new FPDataInputStream(path);

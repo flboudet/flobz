@@ -23,6 +23,9 @@ struct _StyrolyseClient {
   void (*music) (StyrolyseClient *_this, const char *command);
   void (*playSound) (StyrolyseClient *_this, const char *fileName, int volume);
   char *(*resolveFilePath)(StyrolyseClient *_this, const char *file_name);
+  void *(*openFile)(StyrolyseClient *_this, const char *file_name);
+  void (*closeFile)(StyrolyseClient *_this, void *file);
+  int (*readFile)(StyrolyseClient *_this, void *buffer, void *file, int read_size);
   void (*cachePicture)(StyrolyseClient *_this, int mode, const char *path);
   void (*cacheSound)(StyrolyseClient *_this, const char *path);
   void (*cacheMusic)(StyrolyseClient *_this, const char *path);

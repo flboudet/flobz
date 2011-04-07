@@ -32,12 +32,29 @@ void cacheMusic(StyrolyseClient *_this, const char *path)
 static char *pathResolverFunction (StyrolyseClient *_this, const char *path)
 {
   try {
-    String rsvPath = theCommander->getDataPathManager().getPath(FilePath("story").combine(path));
+    String rsvPath = FilePath("/story").combine(path);
     return strdup((const char *)rsvPath);
   }
   catch (Exception e) {
     return strdup(path);
   }
+}
+
+static void *openFileFunction(StyrolyseClient *_this, const char *file_name)
+{
+    return (void *)(theCommander->getDataPathManager().openDataInputStream(file_name));
+}
+
+static void closeFileFunction(StyrolyseClient *_this, void *file)
+{
+    DataInputStream *s = (DataInputStream *)file;
+    delete s;
+}
+
+static int readFileFunction(StyrolyseClient *_this, void *buffer, void *file, int read_size)
+{
+    DataInputStream *s = (DataInputStream *)file;
+    return s->streamRead(buffer, read_size);
 }
 
 // "@state.type"
@@ -192,25 +209,21 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
     }
     GTLogTrace("StoryWidget::StoryWidget() 1");
     if (!classInitialized) {
-        String path0 = theCommander->getDataPathManager().getPath("lib/styrolyse.gsl");
-        String path1 = theCommander->getDataPathManager().getPath("lib/nofx.gsl");
-        String path2 = theCommander->getDataPathManager().getPath("lib/fx.gsl");
+        String path0 = "/lib/styrolyse.gsl";
+        String path1 = "/lib/nofx.gsl";
+        String path2 = "/lib/fx.gsl";
         styrolyse_init(path0.c_str(), path1.c_str(), path2.c_str());
         classInitialized = true;
     }
     GTLogTrace("StoryWidget::StoryWidget() 2");
-    FILE *test = NULL;
     try {
-        fullPath = theCommander->getDataPathManager().getPath(String("story/") + screenName);
-        test = fopen((const char *)fullPath, "r");
+        fullPath = String("/story/") + screenName;
+        theCommander->getDataPathManager().getPath(fullPath);
     }
     catch (Exception e) {
-    }
-    if (test == NULL) {
         printf("GSL NOT FOUND: %s (%s)\n", screenName.c_str(), (const char *)fullPath);
-        fullPath = theCommander->getDataPathManager().getPath("story/error.gsl");
+        fullPath = "/story/error.gsl";
     }
-    else fclose(test);
     GTLogTrace("StoryWidget::StoryWidget() 3");
     String storyLocalePath;
 
@@ -223,6 +236,9 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
     client.styroClient.music     = ::music;
     client.styroClient.playSound = ::playSound;
     client.styroClient.resolveFilePath = ::pathResolverFunction;
+    client.styroClient.openFile = ::openFileFunction;
+    client.styroClient.closeFile = ::closeFileFunction;
+    client.styroClient.readFile = ::readFileFunction;
     client.styroClient.cachePicture = ::cachePicture;
     client.styroClient.cacheSound   = ::cacheSound;
     client.styroClient.cacheMusic   = ::cacheMusic;

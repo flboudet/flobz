@@ -31,6 +31,23 @@ using namespace event_manager;
 const char *p1name = "Player1";
 const char *p2name = "Player2";
 
+static void *openFileFunction(StyrolyseClient *_this, const char *file_name)
+{
+    return (void *)(theCommander->getDataPathManager().openDataInputStream(file_name));
+}
+
+static void closeFileFunction(StyrolyseClient *_this, void *file)
+{
+    DataInputStream *s = (DataInputStream *)file;
+    delete s;
+}
+
+static int readFileFunction(StyrolyseClient *_this, void *buffer, void *file, int read_size)
+{
+    DataInputStream *s = (DataInputStream *)file;
+    return s->streamRead(buffer, read_size);
+}
+
 GameOptions GameOptions::fromDifficulty(GameDifficulty difficulty) {
     GameOptions go;
     switch(difficulty) {
@@ -128,6 +145,10 @@ void GameWidget::priv_initialize()
       m_styroPainter.m_styroClient.music = NULL;
       m_styroPainter.m_styroClient.playSound = NULL;
       m_styroPainter.m_styroClient.resolveFilePath = NULL;
+      m_styroPainter.m_styroClient.openFile = openFileFunction;
+      m_styroPainter.m_styroClient.closeFile = closeFileFunction;
+      m_styroPainter.m_styroClient.readFile = readFileFunction;
+
       m_styroPainter.m_painter = &painter;
       m_styroPainter.m_theme = attachedLevelTheme;
       m_foregroundAnimation =

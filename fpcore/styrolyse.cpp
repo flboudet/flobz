@@ -239,9 +239,22 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
     }
 }
 
-char *pathResolverFunction(GoomSL *gsl, const char *path)
+static char *pathResolverFunction(GoomSL *gsl, const char *path)
 {
     return styrolyse->client->resolveFilePath(styrolyse->client, path);
+}
+
+static goomsl_file openFileFunction(GoomSL *gsl, const char *file_name)
+{
+    return (goomsl_file)(styrolyse->client->openFile(styrolyse->client, file_name));
+}
+static void closeFileFunction(GoomSL *gsl, goomsl_file file)
+{
+    styrolyse->client->closeFile(styrolyse->client, file);
+}
+static int readFileFunction(GoomSL *gsl, void *buffer, goomsl_file file, int read_size)
+{
+    styrolyse->client->readFile(styrolyse->client, buffer, file, read_size);
 }
 
 /**/
@@ -297,7 +310,9 @@ Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client, int fxMode)
     _this->client = client;
     _this->gsl =  gsl_new();
     _this->fxMode = fxMode;
+    styrolyse = _this;
     gsl_bind_path_resolver(_this->gsl, pathResolverFunction);
+    gsl_bind_file_functions(_this->gsl, openFileFunction, closeFileFunction, readFileFunction);
     _this->images = goom_hash_new();
     strncpy(_this->fname, fname, 512);
     GTLogTrace("styrolyse_new(%s) styrolyse_reload", fname);

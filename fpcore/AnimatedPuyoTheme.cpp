@@ -827,15 +827,12 @@ const std::string LevelThemeImpl::getForegroundAnimation() const
 {
     if (m_desc.fgAnimation == "")
         return "";
-    std::string animPath = m_path + "/" + m_desc.fgAnimation;
-    return std::string(m_dataPathManager.getPath(animPath.c_str()));
+    return  m_path + "/" + m_desc.fgAnimation;
 }
 
 const std::string LevelThemeImpl::getReadyAnimation2P() const
 {
     return m_desc.getReadyAnimation;
-    //std::string animPath = m_path + "/" + m_desc.getReadyAnimation;
-    //return std::string(m_dataPathManager.getPath(animPath.c_str()));
 }
 
 const std::string LevelThemeImpl::getThemeRootPath() const
