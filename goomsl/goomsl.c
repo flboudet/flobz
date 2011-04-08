@@ -65,7 +65,7 @@
 
  /* }}} */
 /* {{{ definition of the validation error types */
-static const char *VALIDATE_OK = "ok"; 
+static const char *VALIDATE_OK = "ok";
 #define VALIDATE_ERROR "error while validating "
 #define VALIDATE_TODO "todo"
 #define VALIDATE_SYNTHAX_ERROR "synthax error"
@@ -337,7 +337,7 @@ const char *gsl_instr_validate(Instruction *_this)
 
   switch (_this->id) {
 
-    /* set */ 
+    /* set */
     case INSTR_SET:
       return validate(_this,
           INSTR_SETF_VAR_FLOAT, INSTR_SETF_VAR_VAR,
@@ -505,7 +505,7 @@ void iflow_execute(FastInstructionFlow *_this, GoomSL *gsl)
   while (1)
   {
     int i;
-#ifdef TRACE_SCRIPT 
+#ifdef TRACE_SCRIPT
     printf("execute "); gsl_instr_display(instr[ip].proto); printf("\n");
 #endif
     switch (instr[ip].id) {
@@ -759,7 +759,7 @@ void iflow_execute(FastInstructionFlow *_this, GoomSL *gsl)
           ++i;
         }
         ++ip; break;
-        
+
       case INSTR_DIVS_VAR_VAR:
         /* process integers */
         i=0;
@@ -893,7 +893,7 @@ static void reset_scanner(GoomSL *gss)
 
   goom_hash_free(gss->structIDS);
   gss->structIDS  = goom_hash_new();
-  
+
   while (gss->nbStructID > 0) {
     int i;
     gss->nbStructID--;
@@ -981,7 +981,7 @@ static int powerOfTwo(int i)
 
   JITC_JUMP_LABEL(jitc, "__very_end__");
   JITC_ADD_LABEL (jitc, "__very_start__");
-  
+
   for (i=0;i<number;++i) {
     Instruction *instr = currentGoomSL->iflow->instr[i];
     switch (instr->id) {
@@ -1104,7 +1104,7 @@ static int powerOfTwo(int i)
             coef   = (long)floor(dcoef);
             dcoef -= floor(dcoef);
             if (dcoef < 0.5) coef += 1;
-            
+
             jitc_add(jitc, "mov  eax, [$d]", instr->data.udest.var_int);
             jitc_add(jitc, "mov  edx, $d",   coef);
             jitc_add(jitc, "imul edx");
@@ -1197,7 +1197,7 @@ static int powerOfTwo(int i)
           int loop = DEST_STRUCT_SIZE / sizeof(int);
           int dst  = (int)pDEST_VAR;
           int src  = (int)pSRC_VAR;
-        
+
           while (loop--) {
             jitc_add(jitc,"mov eax, [$d]", src);
             jitc_add(jitc,"mov [$d], eax", dst);
@@ -1387,18 +1387,19 @@ void gsl_compile(GoomSL *_currentGoomSL)
   YY_BUFFER_STATE currentBuffer;
   YY_BUFFER_STATE sbindsBuffer;
   int once = 1;
+  int i;
 
 #ifdef VERBOSE
   printf("\n=== Starting Compilation ===\n");
 #endif
-  
+
   /* 0- reset */
   currentGoomSL = _currentGoomSL;
   reset_scanner(currentGoomSL);
-  
+
   /* 1- create the syntaxic tree */
   sbindsBuffer = yy_scan_string(sBinds);
-  for (int i = PARSEBUF_STACKSIZE-1 ; i >= 0 ; --i) {
+  for (i = PARSEBUF_STACKSIZE-1 ; i >= 0 ; --i) {
     if (_currentGoomSL->parsebuf_stack[i] != NULL) {
       if (once) {
         yy_switch_to_buffer(_currentGoomSL->parsebuf_stack[i]);
@@ -1414,21 +1415,21 @@ void gsl_compile(GoomSL *_currentGoomSL)
   yypush_buffer_state(sbindsBuffer);
   yyparse();
   yy_delete_buffer(currentBuffer);
-  
+
   /* 2- generate code */
   gsl_commit_compilation();
-  
+
   /* 3- resolve symbols */
   calculate_labels(currentGoomSL->iflow);
-  
+
   /* 4- optimize code */
   gsl_create_fast_iflow();
-  
+
   /* 5- bind a few internal functions */
   gsl_bind_function(currentGoomSL, "charAt", ext_charAt);
   gsl_bind_function(currentGoomSL, "f2i", ext_f2i);
   gsl_bind_function(currentGoomSL, "i2f", ext_i2f);
-  
+
 #ifdef VERBOSE
   printf("=== Compilation done. # of lines: %d. # of instr: %d ===\n", currentGoomSL->num_lines, currentGoomSL->iflow->number);
 #endif
@@ -1471,7 +1472,7 @@ GoomSL *gsl_new(void)
     gss->parsebuf_stack[i] = NULL;
   for (i = 0 ; i < PARSEBUF_STACKSIZE ; ++i)
     gss->bufferfile_map[i].b = NULL;
-  
+
   reset_scanner(gss);
 
   gss->compilationOK = 0;
@@ -1525,7 +1526,7 @@ void gsl_free(GoomSL *gss)
     free(gss->gsl_struct[gss->nbStructID]);
   }
     free(gss->gsl_struct);
-  
+
   goom_heap_delete(gss->data_heap);
   gsl_fast_iflow_free(gss->fastiflow);
 
@@ -1536,8 +1537,9 @@ void gsl_free(GoomSL *gss)
 
 void gsl_push_file  (GoomSL *scanner, const char *file_name)
 {
+  int i;
   YY_BUFFER_STATE *b;
-  for (int i = 0 ; i < PARSEBUF_STACKSIZE ; ++i) {
+  for (i = 0 ; i < PARSEBUF_STACKSIZE ; ++i) {
     if (scanner->parsebuf_stack[i] == NULL) {
       b = &(scanner->parsebuf_stack[i]);
       break;
@@ -1550,8 +1552,9 @@ void gsl_push_file  (GoomSL *scanner, const char *file_name)
 
 void gsl_push_script(GoomSL *scanner, const char *script)
 {
+  int i;
   YY_BUFFER_STATE *b;
-  for (int i = 0 ; i < PARSEBUF_STACKSIZE ; ++i) {
+  for (i = 0 ; i < PARSEBUF_STACKSIZE ; ++i) {
     if (scanner->parsebuf_stack[i] == NULL) {
       b = &(scanner->parsebuf_stack[i]);
       break;
@@ -1617,7 +1620,7 @@ void  gsl_set_userdata(GoomSL *_this, const char *key, const void *data)
 {
   if (_this->user_data == NULL)
     _this->user_data = goom_hash_new();
-  goom_hash_put_ptr(_this->user_data, key, data);
+  goom_hash_put_ptr(_this->user_data, key, (void *)data);
 }
 
 void *gsl_get_userdata(GoomSL *_this, const char *key)

@@ -1,6 +1,6 @@
 /**
  * iosfc::FilePath: Platform-independant path operations
- * 
+ *
  * This file is part of the iOS Foundation Classes project.
  *
  * authors:
@@ -34,16 +34,16 @@ namespace ios_fc {
     FilePath::FilePath(const String &path) : path(path)
     {
     }
-    
+
     SelfVector<String> FilePath::listFiles()
     {
         struct	dirent	*dptr;
         DIR	*dirp;
         SelfVector<String> result;
         if((dirp=opendir(path))==NULL) {
-            fprintf(stderr,"Error opening %s ",(const char *)path);
+            std::string errorMessage("Error opening ");
             perror("dirlist");
-            exit(1);
+            throw Exception((errorMessage + (const char *)path).c_str());
         }
         dptr = readdir(dirp);
         while(dptr != NULL) {
@@ -58,12 +58,12 @@ namespace ios_fc {
     {
         return combine(this->path, path);
     }
-    
+
     String FilePath::combine(const String &path1, const String &path2)
     {
         return String(path1 + "/" + path2);
     }
-    
+
     bool FilePath::exists() const
     {
         struct stat s;
@@ -73,7 +73,7 @@ namespace ios_fc {
         }
         return true;
     }
-    
+
     String FilePath::basename(void) const
     {
       int size = this->path.size();
