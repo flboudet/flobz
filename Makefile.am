@@ -2,20 +2,14 @@ ACLOCAL_AMFLAGS=-I m4
 
 bin_PROGRAMS=flobopop
 flobopop_SOURCES=
-
-# If we are building for Mac OS X, we also need to compile the SDLMain wrapper
-if MACOSX
-flobopop_SOURCES+=SDLMain.m
-if ENABLE_MAC_RECEIPT
-flobopop_SOURCES+=validatereceipt.m
-endif
-endif
-
-EXTRA_DIST=
-
 flobopop_CXXFLAGS = -I$(top_srcdir)/iosfc -I$(top_srcdir)/gametools -I$(top_srcdir)/goomsl $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 flobopop_OBJCFLAGS= $(SDL_CFLAGS)
-flobopop_LDADD = fpcore/libfpcore.la gametools/libgametools.la goomsl/libgoomsl.la iosfc/libiosfc.la
+flobopop_LDADD=fpcore/libfpcore.la gametools/libgametools.la goomsl/libgoomsl.la iosfc/libiosfc.la
+
+# Force the C++ linker
+nodist_EXTRA_flobopop_SOURCES=dummy.cpp
+
+EXTRA_DIST=
 
 # Graphic backend configuration
 if ENABLE_SDL12_GFX
@@ -33,6 +27,11 @@ endif
 flobopop_LDADD+=$(SDL_LIBS)
 
 SUBDIRS = iosfc gametools goomsl common fpcore data fpserver
+
+if MACOSX
+SUBDIRS+=mac
+flobopop_LDADD+=mac/libfpmac.la
+endif
 
 # Mac OS X Targets
 

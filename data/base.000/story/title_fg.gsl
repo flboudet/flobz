@@ -24,7 +24,7 @@ float @kaoriDestX
   Sprite @appStore = [new_sprite: image="app_store.png" x=20.0 y=490.0 curframe=0.0  framespeed=0.15 nbframes=1.0]
 
   # Cache resources for future use
-import <cache.gsl>
+#import <cache.gsl>
 
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw

@@ -425,6 +425,7 @@ data/reduced.001/theme/Reduced.fptheme/locale/Makefile
 data/reduced.001/theme/Reduced.fptheme/locale/en/Makefile
 data/reduced.001/theme/Reduced.fptheme/locale/fr/Makefile
 fpserver/Makefile
+mac/Makefile
 mobile/Makefile
 ])
 AC_OUTPUT

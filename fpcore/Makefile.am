@@ -12,7 +12,7 @@ libfpcore_la_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           LocalMenu.cpp OptionMenu.cpp ControlMenu.cpp \
           LevelThemeMenu.cpp ThemeMenu.cpp ScreenTransition.cpp \
           PuyoGameAbstract.cpp PuyoStrings.cpp \
-          PackageDescription.cpp AnimatedPuyoTheme.cpp
+          PackageDescription.cpp AnimatedPuyoTheme.cpp GSLFileAccessWrapper.cpp
 
 # Optional sources for network gaming support
 if ENABLE_NETWORK
@@ -39,9 +39,9 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            ChatBox.h NatTraversal.h LocalGameStates.h \
            PuyoTwoPlayerStarter.h \
            CheatCodeManager.h NetCenterMenu.h PuyoView.h \
-           PuyoCommander.h NetworkDefinitions.h NetGameCenter.h SDLMain.h \
+           PuyoCommander.h NetworkDefinitions.h NetGameCenter.h \
            ControlMenu.h PuyoNetworkGame.h styrolyse.h \
            FPDataPathManager.h NetworkMenu.h \
            DoomMelt.h PuyoNetworkStarter.h PackageDescription.h \
-           Theme.h
+           Theme.h GSLFileAccessWrapper.h
 
