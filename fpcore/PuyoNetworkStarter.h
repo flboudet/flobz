@@ -169,6 +169,7 @@ private:
     std::auto_ptr<DisplayStatsState>       m_displayStats;
     std::auto_ptr<NetSynchronizeState>     m_synchroAfterStats;
     std::auto_ptr<DisplayStoryScreenState> m_networkErrorScreen;
+    std::auto_ptr<NetSynchronizeState>     m_synchroOnAbort;
     std::auto_ptr<LeaveGameState>          m_leaveGame;
 };
 

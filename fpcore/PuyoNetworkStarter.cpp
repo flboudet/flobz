@@ -91,7 +91,6 @@ PuyoNetworkGameWidget::~PuyoNetworkGameWidget()
 
 void PuyoNetworkGameWidget::cycle()
 {
-    mbox->idle();
     double curDate = ios_fc::getTimeMs();
     if (paused) {
         if (curDate - lastAliveMessageSentDate > 2000.) {
@@ -120,6 +119,7 @@ void PuyoNetworkGameWidget::cycle()
     }
     // Let the game behave
     GameWidget::cycle();
+    mbox->idle();
 }
 
 void PuyoNetworkGameWidget::onMessage(Message &message)
@@ -273,6 +273,8 @@ GameState *NetSynchronizeState::getNextState()
 
 void NetSynchronizeState::onMessage(Message &message)
 {
+    if (evaluate())
+        return;
     if (!message.hasInt(PuyoMessage::TYPE))
         return;
     int msgType = message.getInt(PuyoMessage::TYPE);
@@ -387,6 +389,7 @@ NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory  *gameWidgetF
     m_displayStats.reset(new DisplayStatsState(m_sharedAssets));
     m_synchroAfterStats.reset(new NetSynchronizeState(mbox, 10));
     m_networkErrorScreen.reset(new DisplayStoryScreenState("netfailure.gsl"));
+    m_synchroOnAbort.reset(new NetSynchronizeState(mbox, 20));
     m_leaveGame.reset(new LeaveGameState(m_sharedAssets, endOfSessionAction));
 
     // Linking the states together
@@ -399,8 +402,10 @@ NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory  *gameWidgetF
     m_synchroBeforeStart->setNextState(m_matchPlaying.get());
     m_synchroBeforeStart->setFailedState(m_networkErrorScreen.get());
     m_matchPlaying->setNextState(m_matchIsOver.get());
-    m_matchPlaying->setAbortedState(m_leaveGame.get());
+    m_matchPlaying->setAbortedState(m_synchroOnAbort.get());
     m_matchPlaying->setNetworkFailedState(m_networkErrorScreen.get());
+    m_synchroOnAbort->setNextState(m_leaveGame.get());
+    m_synchroOnAbort->setFailedState(m_networkErrorScreen.get());
     m_matchIsOver->setNextState(m_displayStats.get());
     m_displayStats->setNextState(m_synchroAfterStats.get());
     m_synchroAfterStats->setNextState(m_setupMatch.get());
