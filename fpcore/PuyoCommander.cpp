@@ -165,14 +165,15 @@ PuyoCommander::PuyoCommander(DataPathManager &dataPathManager)
     m_levelThemeFactory(*m_themeManager),
     m_cursor(NULL)
 {
+  GTLogTrace("PuyoCommander constructor");
 #ifdef PRODUCE_CACHE_FILE
   cacheOutputGsl = fopen("cache.gsl", "w");
 #endif
   loop = GameUIDefaults::GAME_LOOP;
   theCommander = this;
 
-
   createResourceManagers();
+  GTLogTrace("PuyoCommander constructor finished");
 }
 
 void PuyoCommander::initWithGUI(bool fs)

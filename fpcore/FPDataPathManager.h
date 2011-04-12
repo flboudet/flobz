@@ -63,8 +63,8 @@ public:
     virtual String getPath(String shortPath) const;
     virtual SelfVector<String> getEntriesAtPath(String shortPath) const;
     virtual DataInputStream *openDataInputStream(const char *shortPath) const;
+    virtual void registerDataPackages(CompositeDrawContext &cDC);
     // Own methods
-    void registerDataPackages(CompositeDrawContext &cDC);
     String getPathInPack(String shortPath, int packPathIndex) const;
     int getNumPacks() const { return m_dataPaths.size(); }
     void setMaxPackNumber(int maxPackNumber);
