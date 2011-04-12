@@ -45,14 +45,14 @@
 #include <string>
 #include <stdint.h>
 
-static bool readLine(FILE *dictionaryFile, String &lineRead)
+static bool readLine(DataInputStream *dictionaryFile, String &lineRead)
 {
     bool result = true;
     char newChar[2];
     newChar[1] = 0;
     String newLineRead;
     do {
-        if (fread(newChar, 1, 1, dictionaryFile) != 1)
+        if (dictionaryFile->streamRead(newChar, 1) != 1)
             result = false;
         if (result && (newChar[0] != 10) && (newChar[0] != 13))
             newLineRead += newChar;
@@ -301,21 +301,21 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
         String locale(PreferedLocales[i]);
         String directoryName = FilePath::combine(dictionaryDirectory, locale);
         String dictFilePath = FilePath::combine(directoryName, dictionaryName) + ".dic";
-        FILE *dictionaryFile = NULL;
+        DataInputStream *dictionaryStream = NULL;
         GTLogTrace("LocalizedDictionary::LocalizedDictionary() 4");
         try {
-            dictionaryFile = fopen(datapathManager.getPath(dictFilePath), "r");
+            dictionaryStream = datapathManager.openDataInputStream(dictFilePath);
         }
         catch (...) {}
         GTLogTrace("LocalizedDictionary::LocalizedDictionary() 5");
-        if (dictionaryFile != NULL)
+        if (dictionaryStream != NULL)
         {
             /* Read all the entries in the dictionary file */
             String keyString, valueString;
             bool fileOk;
-            fileOk = readLine(dictionaryFile, keyString);
+            fileOk = readLine(dictionaryStream, keyString);
             while (fileOk) {
-                fileOk = readLine(dictionaryFile, valueString);
+                fileOk = readLine(dictionaryStream, valueString);
                 if (fileOk) {
                     std::string key((const char *)keyString);
                     void * old = (*(myDictEntry->dictionary))[key];
@@ -323,11 +323,11 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
                     char * newstring = strdup(valueString);
                     (*(myDictEntry->dictionary))[key] = (void *)newstring;
                     do {
-                        fileOk = readLine(dictionaryFile, keyString);
+                        fileOk = readLine(dictionaryStream, keyString);
                     } while (fileOk && (keyString == ""));
                 }
             }
-            fclose(dictionaryFile);
+            delete dictionaryStream;
 //#ifdef DEBUG
 //            fprintf(stdout,"Found dictionary %s\n",(const char *)datapathManager.getPath(dictFilePath));
 //#endif
