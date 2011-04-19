@@ -271,7 +271,9 @@ void InternetGameCenter::onMessage(Message &msg)
                 int rank = 0;
                 if (msg.hasInt("RANK"))
                     rank = msg.getInt("RANK");
-                connectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"), msg.getInt("STATUS"), rank);
+                PeerAddress peerAddress = dir.getPeerAddress("ADDR");
+                PeerAddress selfAddress = m_igpmbox->getSelfAddress();
+                connectPeer(peerAddress, msg.getString("NAME"), msg.getInt("STATUS"), rank, peerAddress == selfAddress);
             }
                 break;
             case PUYO_IGP_DISCONNECT:

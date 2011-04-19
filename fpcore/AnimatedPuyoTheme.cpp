@@ -588,6 +588,7 @@ IosSurface *NeutralPuyoThemeImpl::getCircleSurfaceForIndex(int index) const
 
 IosSurface *NeutralPuyoThemeImpl::getShadowSurface(int compression) const
 {
+    return NULL;
 }
 
 IosSurface *NeutralPuyoThemeImpl::getShrinkingSurfaceForIndex(int index) const

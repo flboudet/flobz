@@ -52,6 +52,8 @@ public:
     void handleMessage(UDPMessageInterface &message, int messageSerialID);
     void handleAck(int messageSerialID);
 
+    double getTimeMsSinceLastMessage() { return timeMsSinceLastMessage; }
+    
     // Members
 
     PeerAddress address;
@@ -185,10 +187,6 @@ void UDPMessageBoxBase::KnownPeer::idle(double time_ms)
 
     // Handle peer timeout
     timeMsSinceLastMessage += elapsed_ms;
-    if (timeMsSinceLastMessage >= owner.getTimeMsBeforePeerTimeout()) {
-        //printf("Peer disconnected!\n");
-        owner.deletePeer(address);
-    }
 }
 
 void UDPMessageBoxBase::KnownPeer::handleMessage(UDPMessageInterface &incomingMessage, int messageSerialID)
@@ -265,8 +263,14 @@ void UDPMessageBoxBase::idle()
 
     // Known peers idle task
     for (std::map<PeerAddress, KnownPeer*>::iterator iter = m_knownPeers.begin() ;
-         iter != m_knownPeers.end() ; ++iter) {
-        iter->second->idle(time_ms);
+         iter != m_knownPeers.end() ; ) {
+        std::map<PeerAddress, KnownPeer*>::iterator currentIter = iter++;
+        currentIter->second->idle(time_ms);
+        // Handle peer timeout
+        if (currentIter->second->getTimeMsSinceLastMessage() >= getTimeMsBeforePeerTimeout()) {
+            //printf("Peer disconnected!\n");
+            deletePeer(currentIter->first);
+        }
     }
 
     while (socket->available()) {
