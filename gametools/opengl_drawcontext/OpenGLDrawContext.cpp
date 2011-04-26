@@ -407,11 +407,11 @@ static std::string toString(const std::wstring &s0)
     return s2;
 }
 
-
-static int gCurrentFBO = 0;
-static int gScreenFBO = 0;
 static GLfloat *gCurrentMatrix = NULL;
+
+
 static void iglBindFramebufferOES(GLuint i, GLfloat *matrix) {
+    static int gCurrentFBO = 0;
 	gCurrentMatrix = matrix;
 	if (i == gCurrentFBO) return;
 #ifdef OPENGLES
@@ -422,20 +422,6 @@ static void iglBindFramebufferOES(GLuint i, GLfloat *matrix) {
 	/* if (matrix) glLoadMatrixf(matrix); */
 	gCurrentFBO = i;
 }
-
-/*
- static GLfloat *prevPrint = NULL;
- void printMatrix(GLfloat *matrix, const char *txt) {
- if (gCurrentFBO == 7) printf("txt=%s\n", txt);
- if (matrix == prevPrint) return;
- prevPrint=matrix;
- printf("matrix(0x%08x) %s =\n",matrix, txt);
- for (int i=0; i<2; ++i) {
- for (int j=0; j<2; ++j) printf("%1.10f ", matrix[i*4+j]);
- printf("\n");
- }
- }
- */
 
 
 class OpenGLIosFont : public IosFont
@@ -569,85 +555,83 @@ private:
 	}
 	inline bool noRef() const { return m_nRef <= 0; }
 
-	inline void genTexture() {
-		if (!m_textureOK) {
-			glEnable(GL_TEXTURE_2D); GL_GET_ERROR();
-			glGenTextures(1, &m_texture); GL_GET_ERROR();
-			glBindTexture(GL_TEXTURE_2D, m_texture); GL_GET_ERROR();
-			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);   GL_GET_ERROR();
-            if (m_rawImage.get() != NULL) {
-                if (! m_rawImage->compressed) {
-                    glTexImage2D(GL_TEXTURE_2D, 0, m_format, m_p2w, m_p2h, 0, m_format, GL_UNSIGNED_BYTE, m_rawImage->data);
-                    GL_GET_ERROR();
-                }
-                else {
-                    glCompressedTexImage2D(GL_TEXTURE_2D, 0, m_format, m_p2w, m_p2h, 0, m_rawImage->dataSize, m_rawImage->data);
-                    GL_GET_ERROR();
-                }
-                if (! m_preserveRawData)
-                    m_rawImage = NULL;
+	inline GLuint getTexture() {
+        // If the texture has already been created, return the texture
+		if (m_textureOK)
+            return m_texture;
+        // Otherwise, generate the texture and return its identifiant
+        glEnable(GL_TEXTURE_2D); GL_GET_ERROR();
+        glGenTextures(1, &m_texture); GL_GET_ERROR();
+        glBindTexture(GL_TEXTURE_2D, m_texture); GL_GET_ERROR();
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);   GL_GET_ERROR();
+        if (m_rawImage.get() != NULL) {
+            if (! m_rawImage->compressed) {
+                glTexImage2D(GL_TEXTURE_2D, 0, m_format, m_p2w, m_p2h, 0, m_format, GL_UNSIGNED_BYTE, m_rawImage->data);
+                GL_GET_ERROR();
             }
             else {
-                GLubyte *emptyData;
-                switch (m_format) {
-                    case GL_RGB:
-                        emptyData = (GLubyte *)malloc(3 * m_p2w * m_p2h);
-                        break;
-                    default:
-                        emptyData = (GLubyte *)malloc(4 * m_p2w * m_p2h);
-                        break;
-                }
-                glTexImage2D(GL_TEXTURE_2D, 0, m_format, m_p2w, m_p2h, 0, m_format, GL_UNSIGNED_BYTE, emptyData);
-                free(emptyData);
+                glCompressedTexImage2D(GL_TEXTURE_2D, 0, m_format, m_p2w, m_p2h, 0, m_rawImage->dataSize, m_rawImage->data);
+                GL_GET_ERROR();
             }
-			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); GL_GET_ERROR();
-			//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); GL_GET_ERROR();
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); GL_GET_ERROR();
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); GL_GET_ERROR();
-            m_textureOK = true;
-		}
+            if (! m_preserveRawData)
+                m_rawImage = NULL;
+        }
+        else {
+            GLubyte *emptyData;
+            switch (m_format) {
+                case GL_RGB:
+                    emptyData = (GLubyte *)malloc(3 * m_p2w * m_p2h);
+                    break;
+                default:
+                    emptyData = (GLubyte *)malloc(4 * m_p2w * m_p2h);
+                    break;
+            }
+            glTexImage2D(GL_TEXTURE_2D, 0, m_format, m_p2w, m_p2h, 0, m_format, GL_UNSIGNED_BYTE, emptyData);
+            free(emptyData);
+        }
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); GL_GET_ERROR();
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); GL_GET_ERROR();
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); GL_GET_ERROR();
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); GL_GET_ERROR();
+        m_textureOK = true;
+        return m_texture;
 	}
 
-	inline void genFBO() {
-		if (!m_fbo) {
-			//Setup Texture Framebuffer
-			GL_GET_ERROR();
-			bindTexture(); // Makes sure texture is ready
+	inline GLuint getFBO() {
+        // If the texture framebuffer exists, return it
+		if (m_fbo)
+            return m_fbo;
+        // Else setup Texture Framebuffer
+        bindTexture(); // Makes sure texture is ready
 #ifdef OPENGLES
-			glGenFramebuffersOES(1, &m_fbo); GL_GET_ERROR();
-			iglBindFramebufferOES(m_fbo,NULL); GL_GET_ERROR();
-			glFramebufferTexture2DOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_TEXTURE_2D, m_texture, 0); GL_GET_ERROR();
-			if (glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES) != GL_FRAMEBUFFER_COMPLETE_OES) {
-				GTLogTrace("Failed to make complete framebuffer object %x",  glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES));
-			}
+        glGenFramebuffersOES(1, &m_fbo); GL_GET_ERROR();
+        iglBindFramebufferOES(m_fbo,NULL); GL_GET_ERROR();
+        glFramebufferTexture2DOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_TEXTURE_2D, m_texture, 0); GL_GET_ERROR();
+        if (glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES) != GL_FRAMEBUFFER_COMPLETE_OES) {
+            GTLogTrace("Failed to make complete framebuffer object %x",  glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES));
+        }
 #else
-            glGenFramebuffersEXT(1, &m_fbo); GL_GET_ERROR();
-			iglBindFramebufferOES(m_fbo,NULL); GL_GET_ERROR();
-			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_texture, 0); GL_GET_ERROR();
-			if (glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) != GL_FRAMEBUFFER_COMPLETE_EXT) {
-				GTLogTrace("Failed to make complete framebuffer object %x",  glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT));
-			}
+        glGenFramebuffersEXT(1, &m_fbo); GL_GET_ERROR();
+        iglBindFramebufferOES(m_fbo,NULL); GL_GET_ERROR();
+        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_texture, 0); GL_GET_ERROR();
+        if (glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) != GL_FRAMEBUFFER_COMPLETE_EXT) {
+            GTLogTrace("Failed to make complete framebuffer object %x",  glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT));
+        }
 #endif
-			// Setup OpenGL projection
-			glPushMatrix();
-			/*glLoadIdentity();
-             glViewport(0, 0, this->m_w, this->m_h);
-             glOrthof(0.0, (GLfloat) this->m_w, (GLfloat) this->m_h, 0.0, 0.0, 1.0);*/
-			glTranslatef(0.0f, m_h, 0.0f);
-			glScalef(1,-1,1);
-			glGetFloatv(GL_MODELVIEW_MATRIX,&m_matrix[0]);
-			glPopMatrix(); GL_GET_ERROR();
-		}
-	}
-
-	inline void bindFBO() {
-		genFBO();
-		iglBindFramebufferOES(m_fbo,&m_matrix[0]);
+        // Setup OpenGL projection
+        glPushMatrix();
+        /*glLoadIdentity();
+         glViewport(0, 0, this->m_w, this->m_h);
+         glOrthof(0.0, (GLfloat) this->m_w, (GLfloat) this->m_h, 0.0, 0.0, 1.0);*/
+        glTranslatef(0.0f, m_h, 0.0f);
+        glScalef(1,-1,1);
+        glGetFloatv(GL_MODELVIEW_MATRIX,&m_matrix[0]);
+        glPopMatrix(); GL_GET_ERROR();
+        return m_fbo;
 	}
 
 	inline void bindTexture() {
-		genTexture();
-		glBindTexture(GL_TEXTURE_2D, m_texture); GL_GET_ERROR();
+		glBindTexture(GL_TEXTURE_2D, getTexture()); GL_GET_ERROR();
 		glEnable(GL_TEXTURE_2D); GL_GET_ERROR();
 	}
 	inline void unbindTexture() {
@@ -780,7 +764,8 @@ public:
 	//
 	// OpenGL code
 	//
-	virtual void bindFBO();
+	inline void bindSurface();
+    inline void unbindSurface();
 	void applyBlendMode(ImageBlendMode mode);
 	enum ToGlDrawMode { NORMAL = 0, X_FLIP = 1, SCALED = 2};
 	void drawToGL(IosRect *pSrcRect, IosRect *pDstRect, int targetHeight, ToGlDrawMode mode = NORMAL, float sx=0.0f,float sy=0.0f);
@@ -918,36 +903,39 @@ void IosGLSurfaceRef::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
     SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
-    m_ref->bindFBO();
+    bindSurface();
     IosRect *pSrcRect, *pDstRect;
     fixRects(srcRect, dstRect, surf, this, &pSrcRect, &pDstRect);
     IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef*>(surf);
     ipSurf->applyBlendMode(m_mode);
     ipSurf->drawToGL(pSrcRect, pDstRect, this->h);
+    unbindSurface();
 }
 
 void IosGLSurfaceRef::drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
     SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
-    m_ref->bindFBO();
+    bindSurface();
     IosRect *pSrcRect, *pDstRect;
     fixRects(srcRect, dstRect, surf, this, &pSrcRect, &pDstRect);
     IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef*>(surf);
     ipSurf->applyBlendMode(m_mode);
     ipSurf->drawToGL(pSrcRect, pDstRect, this->h, X_FLIP);
+    unbindSurface();
 }
 
 void IosGLSurfaceRef::drawScaled(IosSurface *surf, IosRect *srcRect, IosRect *dstRect, float scalex, float scaley)
 {
     SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
-    m_ref->bindFBO();
+    bindSurface();
     IosRect *pSrcRect, *pDstRect;
     fixRects(srcRect, dstRect, surf, this, &pSrcRect, &pDstRect);
     IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef*>(surf);
     ipSurf->applyBlendMode(m_mode);
     ipSurf->drawToGL(pSrcRect, pDstRect, this->h, SCALED, scalex, scaley);
+    unbindSurface();
 }
 
 void IosGLSurfaceRef::drawRotatedCentered(IosSurface *surf, int angle, int x, int y)
@@ -964,37 +952,45 @@ void IosGLSurfaceRef::fillRect(const IosRect *rect, const RGBA &color)
 {
     SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
-    m_ref->bindFBO();
+    bindSurface();
     // Let's get lazy!
     glClearColor(color.red/255.0f, color.green/255.0f, color.blue/255.0f, color.alpha/255.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     // TODO (That's totally out of spec, but FloboPop doesn't need more than this)
+    unbindSurface();
 }
 
 void IosGLSurfaceRef::putString(IosFont *font, int x, int y, const char *text)
 {
     SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
-    m_ref->bindFBO();
+    bindSurface();
     OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
     ifont->print(x,y,text);
+    unbindSurface();
 }
 
 void IosGLSurfaceRef::putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text)
 {
     SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
-    m_ref->bindFBO();
+    bindSurface();
     OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
-    ifont->printWithShadow(x,y,shadow_x,shadow_y,text);
+    ifont->printWithShadow(x,y,shadow_x,shadow_y,text);    
+    unbindSurface();
 }
 
 //
 // OpenGL code
 //
-void IosGLSurfaceRef::bindFBO()
+void IosGLSurfaceRef::bindSurface()
 {
-    m_ref->bindFBO();
+    iglBindFramebufferOES(m_ref->getFBO(),m_ref->m_matrix);
+}
+
+void IosGLSurfaceRef::unbindSurface()
+{
+    iglBindFramebufferOES(m_backendUtil->m_defaultFBO, NULL);
 }
 
 void IosGLSurfaceRef::applyBlendMode(ImageBlendMode mode)
@@ -1114,7 +1110,7 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, int targetH
     }
 #ifdef DISABLED
     else if (mode == NORMAL) {
-        if (gCurrentFBO != gScreenFBO) {
+        if (false) { //(gCurrentFBO != gScreenFBO) {
             // this code is a little funny because the viewport is upside down vs SDL's coordinate system
             GLint cropRect[4];
             cropRect[0] = pSrcRect->x;
@@ -1161,7 +1157,9 @@ ret:
 
 
 
-
+OpenGLImageLibrary::OpenGLImageLibrary(OpenGLBackendUtil *backendUtil)
+: m_backendUtil(backendUtil)
+{}
 
 IosSurface * OpenGLImageLibrary::createImage(ImageType type, int w, int h, ImageSpecialAbility specialAbility)
 {
@@ -1169,151 +1167,6 @@ IosSurface * OpenGLImageLibrary::createImage(ImageType type, int w, int h, Image
 	OpenGLTexture *s = new OpenGLTexture(m_backendUtil->toGL(type), w, h);
 	return new IosGLSurfaceRef(m_backendUtil, s);
 }
-
-#ifdef DISABLED
-
-static char gPVRTexIdentifier[5] = "PVR!";
-#define PVR_TEXTURE_FLAG_TYPE_MASK	0xff
-enum
-{
-	kPVRTextureFlagTypePVRTC_2 = 24,
-	kPVRTextureFlagTypePVRTC_4
-};
-typedef struct _PVRTexHeader
-{
-	uint32_t headerLength;
-	uint32_t height;
-	uint32_t width;
-	uint32_t numMipmaps;
-	uint32_t flags;
-	uint32_t dataLength;
-	uint32_t bpp;
-	uint32_t bitmaskRed;
-	uint32_t bitmaskGreen;
-	uint32_t bitmaskBlue;
-	uint32_t bitmaskAlpha;
-	uint32_t pvrTag;
-	uint32_t numSurfs;
-} PVRTexHeader;
-
-
-IosSurface * loadPvrTexture(ImageType type, const char *path, ImageSpecialAbility specialAbility)
-{
-    // Load the PVR file into a buffer
-    struct stat fileStat;
-    FILE *pvrFile = fopen(path, "r");
-    if (pvrFile == NULL) {
-        return NULL;
-    }
-    fstat(fileno(pvrFile), &fileStat);
-    void *buf = malloc(fileStat.st_size);
-    char *cbuf = (char *)buf;
-    size_t bufsize = 0;
-    do {
-        cbuf += fread(cbuf, 1, fileStat.st_blksize, pvrFile);
-    } while (feof(pvrFile) == 0);
-    fclose(pvrFile);
-    bufsize = cbuf - (char *)buf;
-
-    // Unpack PVR data
-    BOOL success = FALSE;
-    BOOL hasAlpha;
-	PVRTexHeader *header = NULL;
-	uint32_t flags, pvrTag;
-	uint32_t dataLength = 0, dataOffset = 0, dataSize = 0;
-	uint32_t blockSize = 0, widthBlocks = 0, heightBlocks = 0;
-	uint32_t width = 0, height = 0, bpp = 4;
-	uint8_t *bytes = NULL;
-	uint32_t formatFlags;
-    GLenum internalFormat;
-    void *pvrData;
-
-	header = (PVRTexHeader *)buf;
-
-	pvrTag = CFSwapInt32LittleToHost(header->pvrTag);
-
-	if (gPVRTexIdentifier[0] != ((pvrTag >>  0) & 0xff) ||
-		gPVRTexIdentifier[1] != ((pvrTag >>  8) & 0xff) ||
-		gPVRTexIdentifier[2] != ((pvrTag >> 16) & 0xff) ||
-		gPVRTexIdentifier[3] != ((pvrTag >> 24) & 0xff))
-	{
-        free(buf);
-		return NULL;
-	}
-
-	flags = CFSwapInt32LittleToHost(header->flags);
-	formatFlags = flags & PVR_TEXTURE_FLAG_TYPE_MASK;
-
-	if (formatFlags == kPVRTextureFlagTypePVRTC_4 || formatFlags == kPVRTextureFlagTypePVRTC_2)
-	{
-		if (formatFlags == kPVRTextureFlagTypePVRTC_4)
-			internalFormat = GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
-		else if (formatFlags == kPVRTextureFlagTypePVRTC_2)
-			internalFormat = GL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
-
-		width = CFSwapInt32LittleToHost(header->width);
-		height = CFSwapInt32LittleToHost(header->height);
-
-		if (CFSwapInt32LittleToHost(header->bitmaskAlpha))
-			hasAlpha = TRUE;
-		else
-			hasAlpha = FALSE;
-
-		dataLength = CFSwapInt32LittleToHost(header->dataLength);
-
-		bytes = ((uint8_t *)buf) + sizeof(PVRTexHeader);
-
-		// Calculate the data size for each texture level and respect the minimum number of blocks
-		while (dataOffset < dataLength)
-		{
-			if (formatFlags == kPVRTextureFlagTypePVRTC_4)
-			{
-				blockSize = 4 * 4; // Pixel by pixel block size for 4bpp
-				widthBlocks = width / 4;
-				heightBlocks = height / 4;
-				bpp = 4;
-			}
-			else
-			{
-				blockSize = 8 * 4; // Pixel by pixel block size for 2bpp
-				widthBlocks = width / 8;
-				heightBlocks = height / 4;
-				bpp = 2;
-			}
-
-			// Clamp to minimum number of blocks
-			if (widthBlocks < 2)
-				widthBlocks = 2;
-			if (heightBlocks < 2)
-				heightBlocks = 2;
-
-			dataSize = widthBlocks * heightBlocks * ((blockSize  * bpp) / 8);
-			pvrData = bytes+dataOffset;
-			dataOffset += dataSize;
-			//width = MAX(width >> 1, 1);
-			//height = MAX(height >> 1, 1);
-		}
-		success = TRUE;
-    }
-    if (success) {
-        // TODO: rewrite the function to avoid copying the PVR texture to a new buffer
-        GLubyte *data = (GLubyte *)malloc(dataSize);
-        memcpy(data, pvrData, dataSize);
-        free(buf);
-        IosGLSurface *surf = new IosGLSurface(internalFormat, width, height, width, height, (GLubyte *)data, dataSize, true);
-        surf->setOpaque(type == IMAGE_RGB ? true : false);
-        return new IosGLSurfaceRef(surf);
-    }
-    free(buf);
-    return NULL;
-}
-
-#endif
-
-OpenGLImageLibrary::OpenGLImageLibrary(OpenGLBackendUtil *backendUtil)
-    : m_backendUtil(backendUtil)
-{}
-
 
 IosSurface * OpenGLImageLibrary::loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility)
 {
@@ -1340,16 +1193,6 @@ void OpenGLDrawContext::init(OpenGLBackendUtil *backendUtil, int width, int heig
     this->h = height;
     this->w = width;
 
-    // Create default framebuffer object. The backing will be allocated for the current layer in -resizeFromLayer
-#ifdef DISABLED
-    glGenFramebuffersOES(1, &defaultFramebuffer); GL_GET_ERROR();
-    glGenRenderbuffersOES(1, &colorRenderbuffer); GL_GET_ERROR();
-    iglBindFramebufferOES(defaultFramebuffer, NULL); GL_GET_ERROR();
-    glBindRenderbufferOES(GL_RENDERBUFFER_OES, colorRenderbuffer); GL_GET_ERROR();
-    glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, colorRenderbuffer); GL_GET_ERROR();
-    gScreenFBO = defaultFramebuffer;
-#endif
-
     // Setup OpenGL projection
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -1371,8 +1214,9 @@ void OpenGLDrawContext::init(OpenGLBackendUtil *backendUtil, int width, int heig
 }
 
 void OpenGLDrawContext::bindFBO() {
-	iglBindFramebufferOES(defaultFramebuffer, matrix);
+	//iglBindFramebufferOES(defaultFramebuffer, matrix);
 	//iglBindFramebufferOES(1); GL_GET_ERROR();
+    gCurrentMatrix = matrix;
 }
 
 int OpenGLDrawContext::getHeight() const
@@ -1395,6 +1239,7 @@ void OpenGLDrawContext::flip()
     //SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
     BENCH.draw();
+    gCurrentMatrix = matrix;
 #ifdef DISABLED
     iglBindFramebufferOES(defaultFramebuffer, matrix);
     GL_GET_ERROR();

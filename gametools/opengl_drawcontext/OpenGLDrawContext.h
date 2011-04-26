@@ -10,6 +10,7 @@
 #define _OPENGL_DRAW_CONTEXT_H_
 
 #include <memory>
+#include "config.h"
 
 #ifdef IOS
 #include <OpenGLES/ES1/gl.h>
@@ -51,6 +52,7 @@ public:
 class OpenGLBackendUtil
 {
 public:
+    OpenGLBackendUtil() : m_defaultFBO(0) {}
     virtual unsigned short * utf8ToUnicode(const char *utf8Text, unsigned short *unicodeTextBuffer, size_t unicodeTextBufferSize) = 0;
     virtual OpenGLRawImage * loadImage(ImageType type, const char *path) = 0;
     virtual void ensureContextIsActive() = 0;
@@ -65,6 +67,7 @@ public:
         }
         return GL_RGBA;
     }
+    GLuint m_defaultFBO;
 };
 
 class OpenGLImageLibrary : public ImageLibrary
@@ -110,8 +113,6 @@ private:
     OpenGLBackendUtil *m_backendUtil;
 private:
     std::auto_ptr<OpenGLImageLibrary> iimLib;
-    // The OpenGL names for the framebuffer and renderbuffer used to render to this view
-	GLuint defaultFramebuffer, colorRenderbuffer;
 	GLfloat matrix[16];
 	void bindFBO();
 };

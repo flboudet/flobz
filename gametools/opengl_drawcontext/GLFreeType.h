@@ -3,6 +3,7 @@
 
 #include <map>
 #include <vector>
+#include "config.h"
 
 #ifdef IOS
 #import <OpenGLES/ES1/gl.h>
