@@ -23,6 +23,8 @@
 
 #include "drawcontext.h"
 
+class OpenGLDrawContext;
+
 class OpenGLRawImage
 {
 public:
@@ -73,12 +75,13 @@ public:
 class OpenGLImageLibrary : public ImageLibrary
 {
 public:
-    OpenGLImageLibrary(OpenGLBackendUtil *backendUtil);
+    OpenGLImageLibrary(OpenGLDrawContext *owner, OpenGLBackendUtil *backendUtil);
     virtual ~OpenGLImageLibrary() {}
     virtual IosSurface * createImage(ImageType type, int w, int h, ImageSpecialAbility abilities);
     virtual IosSurface * loadImage(ImageType type, const char *path, ImageSpecialAbility abilities);
     virtual IosFont    * createFont(const char *path, int size, IosFontFx fx = Font_STD);
 private:
+    OpenGLDrawContext *m_owner;
     OpenGLBackendUtil *m_backendUtil;
 };
 
@@ -113,8 +116,8 @@ private:
     OpenGLBackendUtil *m_backendUtil;
 private:
     std::auto_ptr<OpenGLImageLibrary> iimLib;
+public:
 	GLfloat matrix[16];
-	void bindFBO();
 };
 
 #endif // _OPENGL_DRAW_CONTEXT_H_

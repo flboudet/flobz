@@ -407,20 +407,23 @@ static std::string toString(const std::wstring &s0)
     return s2;
 }
 
-static GLfloat *gCurrentMatrix = NULL;
 
 
 static void iglBindFramebufferOES(GLuint i, GLfloat *matrix) {
     static int gCurrentFBO = 0;
-	gCurrentMatrix = matrix;
-	if (i == gCurrentFBO) return;
+    static GLfloat *gCurrentMatrix = NULL;
+	if (i != gCurrentFBO) {
 #ifdef OPENGLES
-	glBindFramebufferOES(GL_FRAMEBUFFER_OES, i);
+        glBindFramebufferOES(GL_FRAMEBUFFER_OES, i);
 #else
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, i);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, i);
 #endif
-	/* if (matrix) glLoadMatrixf(matrix); */
+    }
+	if ((matrix) && (matrix != gCurrentMatrix)) {
+        glLoadMatrixf(matrix);
+    }
 	gCurrentFBO = i;
+    gCurrentMatrix = matrix;
 }
 
 
@@ -467,10 +470,7 @@ public:
 		printWithShadow(x,y,1.0f,2.0f,txt);
 	}
 	void printWithShadow(float x, float y, float sx, float sy, const char *txt) {
-		if (gCurrentMatrix) {
-			glPushMatrix();
-			glLoadMatrixf(gCurrentMatrix);
-		}
+		// TODO: ensure correct matrix
 
 		glEnable(GL_BLEND); GL_GET_ERROR();
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); GL_GET_ERROR();
@@ -492,17 +492,10 @@ public:
         mCustomFont->printUnicode(x,y, utxt);
 
 		glColor4ub(0xFF,0xFF,0xFF,0xFF);
-		if (gCurrentMatrix)
-			glPopMatrix();
 	}
 	void printCentered(float x, float y, const char *txt) {
-		if (gCurrentMatrix) {
-			glPushMatrix();
-			glLoadMatrixf(gCurrentMatrix);
-		}
+        // TODO: ensure correct matrix
         mCustomFont->printCenteredUnicode(x,y, m_backendUtil->utf8ToUnicode(txt, mWorkingBuffer, sizeof(mWorkingBuffer)));
-		if (gCurrentMatrix)
-			glPopMatrix();
 	}
 };
 
@@ -735,7 +728,7 @@ public:
 	ImageBlendMode m_mode;
 	bool gray, hflip;
 public:
-	IosGLSurfaceRef(OpenGLBackendUtil *backendUtil, OpenGLTexture *s);
+	IosGLSurfaceRef(OpenGLDrawContext *owner, OpenGLBackendUtil *backendUtil, OpenGLTexture *s);
 	IosGLSurfaceRef(IosGLSurfaceRef *s);
 	virtual ~IosGLSurfaceRef();
 	virtual bool isOpaque() const;
@@ -771,11 +764,12 @@ public:
 	void drawToGL(IosRect *pSrcRect, IosRect *pDstRect, int targetHeight, ToGlDrawMode mode = NORMAL, float sx=0.0f,float sy=0.0f);
 
 private:
+    OpenGLDrawContext *m_owner;
     OpenGLBackendUtil *m_backendUtil;
 };
 
-IosGLSurfaceRef::IosGLSurfaceRef(OpenGLBackendUtil *backendUtil, OpenGLTexture *s)
-    : m_ref(s), m_backendUtil(backendUtil)
+IosGLSurfaceRef::IosGLSurfaceRef(OpenGLDrawContext *owner, OpenGLBackendUtil *backendUtil, OpenGLTexture *s)
+    : m_ref(s), m_owner(owner), m_backendUtil(backendUtil)
 {
     this->h = m_ref->m_h;
     this->w = m_ref->m_w;
@@ -843,7 +837,7 @@ IosSurface *IosGLSurfaceRef::shiftHue(float hue_offset, IosSurface *mask)
         }
         OpenGLRawImage *newRawImage = new MallocedOpenGLRawImage(GL_RGBA, m_ref->m_w, m_ref->m_h, m_ref->m_p2w, m_ref->m_p2h, newData);
         OpenGLTexture* retSurf = new OpenGLTexture(newRawImage);
-        IosGLSurfaceRef *ret = new IosGLSurfaceRef(m_backendUtil, retSurf);
+        IosGLSurfaceRef *ret = new IosGLSurfaceRef(m_owner, m_backendUtil, retSurf);
         ret->copyDrawMode(this);
         return ret;
     }
@@ -863,7 +857,7 @@ IosSurface *IosGLSurfaceRef::setValue(float value)
         GLubyte *newData = image_rgba_shift_hsv(rawImage, m_ref->m_p2w, m_ref->m_p2h, 0, 0, value);
         OpenGLRawImage *newRawImage = new MallocedOpenGLRawImage(GL_RGBA, m_ref->m_w, m_ref->m_h, m_ref->m_p2w, m_ref->m_p2h, newData);
         OpenGLTexture* retSurf = new OpenGLTexture(newRawImage);
-        IosGLSurfaceRef *ret = new IosGLSurfaceRef(m_backendUtil, retSurf);
+        IosGLSurfaceRef *ret = new IosGLSurfaceRef(m_owner, m_backendUtil, retSurf);
         ret->copyDrawMode(this);
         return ret;
     }
@@ -985,12 +979,12 @@ void IosGLSurfaceRef::putStringWithShadow(IosFont *font, int x, int y, int shado
 //
 void IosGLSurfaceRef::bindSurface()
 {
-    iglBindFramebufferOES(m_ref->getFBO(),m_ref->m_matrix);
+    iglBindFramebufferOES(m_ref->getFBO(), m_ref->m_matrix);
 }
 
 void IosGLSurfaceRef::unbindSurface()
 {
-    iglBindFramebufferOES(m_backendUtil->m_defaultFBO, NULL);
+    iglBindFramebufferOES(m_backendUtil->m_defaultFBO, m_owner->matrix);
 }
 
 void IosGLSurfaceRef::applyBlendMode(ImageBlendMode mode)
@@ -1157,15 +1151,15 @@ ret:
 
 
 
-OpenGLImageLibrary::OpenGLImageLibrary(OpenGLBackendUtil *backendUtil)
-: m_backendUtil(backendUtil)
+OpenGLImageLibrary::OpenGLImageLibrary(OpenGLDrawContext *owner, OpenGLBackendUtil *backendUtil)
+: m_owner(owner), m_backendUtil(backendUtil)
 {}
 
 IosSurface * OpenGLImageLibrary::createImage(ImageType type, int w, int h, ImageSpecialAbility specialAbility)
 {
     SCOPED_GL_LOCK;
 	OpenGLTexture *s = new OpenGLTexture(m_backendUtil->toGL(type), w, h);
-	return new IosGLSurfaceRef(m_backendUtil, s);
+	return new IosGLSurfaceRef(m_owner, m_backendUtil, s);
 }
 
 IosSurface * OpenGLImageLibrary::loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility)
@@ -1173,7 +1167,7 @@ IosSurface * OpenGLImageLibrary::loadImage(ImageType type, const char *path, Ima
     SCOPED_GL_LOCK;
     OpenGLRawImage *image = m_backendUtil->loadImage(type, path);
     OpenGLTexture *tex = new OpenGLTexture(image, (specialAbility & IMAGE_READ));
-    IosSurface *result = new IosGLSurfaceRef(m_backendUtil, tex);
+    IosSurface *result = new IosGLSurfaceRef(m_owner, m_backendUtil, tex);
 	result->name = path;
     return result;
 }
@@ -1210,13 +1204,7 @@ void OpenGLDrawContext::init(OpenGLBackendUtil *backendUtil, int width, int heig
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f); GL_GET_ERROR();
 
     // Setup Image Library
-    iimLib.reset(new OpenGLImageLibrary(backendUtil));
-}
-
-void OpenGLDrawContext::bindFBO() {
-	//iglBindFramebufferOES(defaultFramebuffer, matrix);
-	//iglBindFramebufferOES(1); GL_GET_ERROR();
-    gCurrentMatrix = matrix;
+    iimLib.reset(new OpenGLImageLibrary(this, backendUtil));
 }
 
 int OpenGLDrawContext::getHeight() const
@@ -1239,7 +1227,6 @@ void OpenGLDrawContext::flip()
     //SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
     BENCH.draw();
-    gCurrentMatrix = matrix;
 #ifdef DISABLED
     iglBindFramebufferOES(defaultFramebuffer, matrix);
     GL_GET_ERROR();
@@ -1256,7 +1243,6 @@ void OpenGLDrawContext::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRec
 {
     SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
-	this->bindFBO();
 	IosRect *pSrcRect, *pDstRect;
 	fixRects(srcRect, dstRect, surf, this, &pSrcRect, &pDstRect);
 	IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef *> (surf);
@@ -1275,7 +1261,6 @@ void OpenGLDrawContext::drawRotatedCentered(IosSurface *surf, int angle, int x, 
 void OpenGLDrawContext::drawScaled(IosSurface *surf, IosRect *srcRect, IosRect *dstRect, float sx, float sy) {
     SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
-	this->bindFBO();
 	IosRect *pSrcRect, *pDstRect;
 	fixRects(srcRect, dstRect, surf, this, &pSrcRect, &pDstRect);
 	IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef *> (surf);
@@ -1285,7 +1270,6 @@ void OpenGLDrawContext::drawScaled(IosSurface *surf, IosRect *srcRect, IosRect *
 void OpenGLDrawContext::drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect) {
     SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
-	this->bindFBO();
 	IosRect *pSrcRect, *pDstRect;
 	fixRects(srcRect, dstRect, surf, this, &pSrcRect, &pDstRect);
 	IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef *> (surf);
@@ -1302,14 +1286,12 @@ void OpenGLDrawContext::fillRect(const IosRect *rect, const RGBA &color) {
 void OpenGLDrawContext::putString(IosFont *font, int x, int y, const char *text) {
 	SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
-	this->bindFBO();
 	OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
 	ifont->print(x,y,text);
 }
 void OpenGLDrawContext::putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text) {
 	SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
-	this->bindFBO();
 	OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
 	ifont->printWithShadow(x,y,shadow_x,shadow_y,text);
 }
@@ -1317,7 +1299,6 @@ void OpenGLDrawContext::putStringWithShadow(IosFont *font, int x, int y, int sha
 void OpenGLDrawContext::putStringCenteredXY(IosFont *font, int x, int y, const char *text) {
 	SCOPED_GL_LOCK;
 	m_backendUtil->ensureContextIsActive();
-	this->bindFBO();
 	OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
 	ifont->printCentered(x,y-ifont->getHeight()/2,text);
 }
