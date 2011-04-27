@@ -97,7 +97,6 @@ public:
 public:
     virtual void draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
     virtual void drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
-	virtual void drawScaled(IosSurface *surf, IosRect *srcRect, IosRect *dstRect, float scaledx, float scaley);
     virtual void drawRotatedCentered(IosSurface *surf, int angle, int x, int y);
     virtual void setClipRect(IosRect *rect);
     virtual void setBlendMode(ImageBlendMode mode) {}

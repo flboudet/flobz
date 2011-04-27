@@ -15,9 +15,6 @@
 
 using namespace  flobopop;
 
-//static ios_fc::Mutex *glMutex;
-#define SCOPED_GL_LOCK
-//ios_fc::Lock glLock(*glMutex)
 
 #define GL_GET_ERROR() \
 while(1) {\
@@ -421,9 +418,9 @@ static void iglBindFramebufferOES(GLuint i, GLfloat *matrix) {
     }
 	if ((matrix) && (matrix != gCurrentMatrix)) {
         glLoadMatrixf(matrix);
+        gCurrentMatrix = matrix;
     }
 	gCurrentFBO = i;
-    gCurrentMatrix = matrix;
 }
 
 
@@ -616,8 +613,20 @@ private:
         /*glLoadIdentity();
          glViewport(0, 0, this->m_w, this->m_h);
          glOrthof(0.0, (GLfloat) this->m_w, (GLfloat) this->m_h, 0.0, 0.0, 1.0);*/
-        glTranslatef(0.0f, m_h, 0.0f);
+        glTranslatef(0.0f, 480.0f, 0.0f);
         glScalef(1,-1,1);
+#ifdef DISABLED
+        /*glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();*/
+        //glViewport(0, 0, m_w, m_h);
+#ifdef OPENGLES
+        glOrthof(0.0, (GLfloat) m_w, (GLfloat) m_h, 0.0, 0.0, 1.0); GL_GET_ERROR();
+#else
+        glOrtho(0.0, (GLfloat) m_w, (GLfloat) m_h, 0.0, 0.0, 1.0); GL_GET_ERROR();
+#endif
+#endif
         glGetFloatv(GL_MODELVIEW_MATRIX,&m_matrix[0]);
         glPopMatrix(); GL_GET_ERROR();
         return m_fbo;
@@ -748,7 +757,6 @@ public:
     virtual void setBlendMode(ImageBlendMode mode);
     virtual void draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
     virtual void drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
-	virtual void drawScaled(IosSurface *surf, IosRect *srcRect, IosRect *dstRect, float scalex, float scaley);
 	virtual void drawRotatedCentered(IosSurface *surf, int angle, int x, int y);
 	virtual void fillRect(const IosRect *rect, const RGBA &color);
     virtual void putString(IosFont *font, int x, int y, const char *text);
@@ -760,8 +768,8 @@ public:
 	inline void bindSurface();
     inline void unbindSurface();
 	void applyBlendMode(ImageBlendMode mode);
-	enum ToGlDrawMode { NORMAL = 0, X_FLIP = 1, SCALED = 2};
-	void drawToGL(IosRect *pSrcRect, IosRect *pDstRect, int targetHeight, ToGlDrawMode mode = NORMAL, float sx=0.0f,float sy=0.0f);
+	enum ToGlDrawMode { NORMAL = 0, X_FLIP = 1};
+	void drawToGL(IosRect *pSrcRect, IosRect *pDstRect,  ToGlDrawMode mode = NORMAL, float sx=0.0f,float sy=0.0f);
 
 private:
     OpenGLDrawContext *m_owner;
@@ -823,7 +831,6 @@ void IosGLSurfaceRef::copyDrawMode(IosGLSurfaceRef *ref)
 
 IosSurface *IosGLSurfaceRef::shiftHue(float hue_offset, IosSurface *mask)
 {
-    SCOPED_GL_LOCK;
     GLubyte *rawImage = m_ref->getRawImageData();
     if ((rawImage != NULL) && (m_ref->m_format == GL_RGBA) && (hue_offset != 0)) {
         GLubyte *newData;
@@ -851,7 +858,6 @@ IosSurface *IosGLSurfaceRef::shiftHSV(float h, float s, float v)
 
 IosSurface *IosGLSurfaceRef::setValue(float value)
 {
-    SCOPED_GL_LOCK;
     GLubyte *rawImage = m_ref->getRawImageData();
     if ((rawImage != NULL) && (m_ref->m_format == GL_RGBA) && (value != 0)) {
         GLubyte *newData = image_rgba_shift_hsv(rawImage, m_ref->m_p2w, m_ref->m_p2h, 0, 0, value);
@@ -895,40 +901,25 @@ void IosGLSurfaceRef::setBlendMode(ImageBlendMode mode)
 
 void IosGLSurfaceRef::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
-    SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
     bindSurface();
     IosRect *pSrcRect, *pDstRect;
     fixRects(srcRect, dstRect, surf, this, &pSrcRect, &pDstRect);
     IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef*>(surf);
     ipSurf->applyBlendMode(m_mode);
-    ipSurf->drawToGL(pSrcRect, pDstRect, this->h);
+    ipSurf->drawToGL(pSrcRect, pDstRect);
     unbindSurface();
 }
 
 void IosGLSurfaceRef::drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
-    SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
     bindSurface();
     IosRect *pSrcRect, *pDstRect;
     fixRects(srcRect, dstRect, surf, this, &pSrcRect, &pDstRect);
     IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef*>(surf);
     ipSurf->applyBlendMode(m_mode);
-    ipSurf->drawToGL(pSrcRect, pDstRect, this->h, X_FLIP);
-    unbindSurface();
-}
-
-void IosGLSurfaceRef::drawScaled(IosSurface *surf, IosRect *srcRect, IosRect *dstRect, float scalex, float scaley)
-{
-    SCOPED_GL_LOCK;
-    m_backendUtil->ensureContextIsActive();
-    bindSurface();
-    IosRect *pSrcRect, *pDstRect;
-    fixRects(srcRect, dstRect, surf, this, &pSrcRect, &pDstRect);
-    IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef*>(surf);
-    ipSurf->applyBlendMode(m_mode);
-    ipSurf->drawToGL(pSrcRect, pDstRect, this->h, SCALED, scalex, scaley);
+    ipSurf->drawToGL(pSrcRect, pDstRect, X_FLIP);
     unbindSurface();
 }
 
@@ -944,7 +935,6 @@ void IosGLSurfaceRef::drawRotatedCentered(IosSurface *surf, int angle, int x, in
 
 void IosGLSurfaceRef::fillRect(const IosRect *rect, const RGBA &color)
 {
-    SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
     bindSurface();
     // Let's get lazy!
@@ -956,7 +946,6 @@ void IosGLSurfaceRef::fillRect(const IosRect *rect, const RGBA &color)
 
 void IosGLSurfaceRef::putString(IosFont *font, int x, int y, const char *text)
 {
-    SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
     bindSurface();
     OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
@@ -966,7 +955,6 @@ void IosGLSurfaceRef::putString(IosFont *font, int x, int y, const char *text)
 
 void IosGLSurfaceRef::putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text)
 {
-    SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
     bindSurface();
     OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
@@ -1008,8 +996,10 @@ void IosGLSurfaceRef::applyBlendMode(ImageBlendMode mode)
     }
 }
 
-void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, int targetHeight, ToGlDrawMode mode, float sx,float sy)
+void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMode mode, float sx,float sy)
 {
+    //if (mode == NORMAL)
+    //    mode = SCALED;
 #ifdef BENCH_BLIT
     BENCH.set_num_methods(2);
     switch(BENCH.current_method()) {
@@ -1022,11 +1012,7 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, int targetH
             break;
     }
 #endif
-    if (mode != SCALED)
-        sx = sy = 1.0f; // Because X_FLIP supports scaling images..
-
-    if ((mode == NORMAL) && gray) // NORMAL mode doesn't support glColor-ing ?
-        mode = SCALED;
+    sx = sy = 1.0f; // Because X_FLIP supports scaling images..
 
     if (gray) {
         // MEGA EFFECT POUR LA PAUSE (Bidouille qui ne marche que pour une image plein ecran...
@@ -1080,20 +1066,28 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, int targetH
         glEnableClientState(GL_VERTEX_ARRAY);
         glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, &faces[0]);
     }
-    else { //if (mode == SCALED) {
+    else {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         GLfloat texcoord[8];
         GLfloat vertices[8];
         GLushort faces[4] = {0,1,2,3};
-        texcoord[0] = (GLfloat)(pSrcRect->x) / m_ref->m_p2w;             texcoord[1] = (GLfloat)(pSrcRect->y) / m_ref->m_p2h;
-        texcoord[2] = (GLfloat)(pSrcRect->x+pSrcRect->w) / m_ref->m_p2w; texcoord[3] = (GLfloat)(pSrcRect->y) / m_ref->m_p2h;
-        texcoord[4] = (GLfloat)(pSrcRect->x) / m_ref->m_p2w;             texcoord[5] = (GLfloat)(pSrcRect->y+pSrcRect->h) / m_ref->m_p2h;
-        texcoord[6] = (GLfloat)(pSrcRect->x+pSrcRect->w) / m_ref->m_p2w; texcoord[7] = (GLfloat)(pSrcRect->y+pSrcRect->h) / m_ref->m_p2h;
-        vertices[0] = pDstRect->x;                vertices[1] = pDstRect->y;
-        vertices[2] = pDstRect->x+pDstRect->w*sx; vertices[3] = pDstRect->y;
-        vertices[4] = pDstRect->x;                vertices[5] = pDstRect->y+pDstRect->h*sy;
-        vertices[6] = pDstRect->x+pDstRect->w*sx; vertices[7] = pDstRect->y+pDstRect->h*sy;
+        texcoord[0] = (GLfloat)(pSrcRect->x) / m_ref->m_p2w;
+        texcoord[1] = (GLfloat)(pSrcRect->y) / m_ref->m_p2h;
+        texcoord[2] = (GLfloat)(pSrcRect->x+pSrcRect->w) / m_ref->m_p2w;
+        texcoord[3] = (GLfloat)(pSrcRect->y) / m_ref->m_p2h;
+        texcoord[4] = (GLfloat)(pSrcRect->x) / m_ref->m_p2w;
+        texcoord[5] = (GLfloat)(pSrcRect->y+pSrcRect->h) / m_ref->m_p2h;
+        texcoord[6] = (GLfloat)(pSrcRect->x+pSrcRect->w) / m_ref->m_p2w;
+        texcoord[7] = (GLfloat)(pSrcRect->y+pSrcRect->h) / m_ref->m_p2h;
+        vertices[0] = pDstRect->x;
+        vertices[1] = pDstRect->y;
+        vertices[2] = pDstRect->x+pDstRect->w;
+        vertices[3] = pDstRect->y;
+        vertices[4] = pDstRect->x;
+        vertices[5] = pDstRect->y+pDstRect->h;
+        vertices[6] = pDstRect->x+pDstRect->w;
+        vertices[7] = pDstRect->y+pDstRect->h;
         glTexCoordPointer(2, GL_FLOAT, 0, &texcoord[0]);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glVertexPointer(2, GL_FLOAT, 0, &vertices[0]);
@@ -1102,48 +1096,6 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, int targetH
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); GL_GET_ERROR();
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); GL_GET_ERROR();
     }
-#ifdef DISABLED
-    else if (mode == NORMAL) {
-        if (false) { //(gCurrentFBO != gScreenFBO) {
-            // this code is a little funny because the viewport is upside down vs SDL's coordinate system
-            GLint cropRect[4];
-            cropRect[0] = pSrcRect->x;
-            cropRect[1] = pSrcRect->y;
-            cropRect[2] = pSrcRect->w;
-            cropRect[3] = pSrcRect->h;
-            // TODO get rid of those crapy check... just understand the root of the problem.
-            if (cropRect[0] < 0) goto ret;
-            if (cropRect[1] < 0) goto ret;
-            if (cropRect[2] < 0) goto ret;
-            if (cropRect[3] < 0) goto ret;
-            if (cropRect[0] > this->w) goto ret;
-            if (cropRect[2] > this->w) goto ret;
-            if (cropRect[1] > this->h) goto ret;
-            if (cropRect[3] > this->h) goto ret;
-            glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, cropRect); GL_GET_ERROR();
-            glDrawTexiOES(pDstRect->x, pDstRect->y, 0, pDstRect->w, pDstRect->h); GL_GET_ERROR();
-        }
-        else {
-            GLint cropRect[4];
-            cropRect[0] = pSrcRect->x;
-            cropRect[1] = pSrcRect->y + pSrcRect->h;
-            cropRect[2] = pSrcRect->w;
-            cropRect[3] = -pSrcRect->h;
-            // TODO get rid of those crapy check... just understand the root of the problem.
-            if (cropRect[0] < 0) goto ret;
-            if (cropRect[1] < 0) goto ret;
-            if (cropRect[2] < 0) goto ret;
-            if (cropRect[3] > 0) goto ret;
-            if (cropRect[0] > this->w) goto ret;
-            if (cropRect[2] > this->w) goto ret;
-            if (cropRect[1] > this->h) goto ret;
-            if (cropRect[3] < -this->h) goto ret;
-            glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_CROP_RECT_OES, cropRect); GL_GET_ERROR();
-            glDrawTexiOES(pDstRect->x, targetHeight - pDstRect->y - pDstRect->h, 0, pDstRect->w, pDstRect->h); GL_GET_ERROR();
-        }
-    }
-#endif
-
 ret:
     if (gray) glColor4ub(0xff,0xff,0xff,0xff);
     m_ref->unbindTexture();
@@ -1157,14 +1109,12 @@ OpenGLImageLibrary::OpenGLImageLibrary(OpenGLDrawContext *owner, OpenGLBackendUt
 
 IosSurface * OpenGLImageLibrary::createImage(ImageType type, int w, int h, ImageSpecialAbility specialAbility)
 {
-    SCOPED_GL_LOCK;
 	OpenGLTexture *s = new OpenGLTexture(m_backendUtil->toGL(type), w, h);
 	return new IosGLSurfaceRef(m_owner, m_backendUtil, s);
 }
 
 IosSurface * OpenGLImageLibrary::loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility)
 {
-    SCOPED_GL_LOCK;
     OpenGLRawImage *image = m_backendUtil->loadImage(type, path);
     OpenGLTexture *tex = new OpenGLTexture(image, (specialAbility & IMAGE_READ));
     IosSurface *result = new IosGLSurfaceRef(m_owner, m_backendUtil, tex);
@@ -1182,7 +1132,6 @@ void OpenGLDrawContext::init(OpenGLBackendUtil *backendUtil, int width, int heig
 {
     m_backendUtil = backendUtil;
     //glMutex = new ios_fc::Mutex();
-    SCOPED_GL_LOCK;
     // Retrieve the correct view size
     this->h = height;
     this->w = width;
@@ -1198,7 +1147,7 @@ void OpenGLDrawContext::init(OpenGLBackendUtil *backendUtil, int width, int heig
 #else
     glOrtho(0.0, (GLfloat) this->w, (GLfloat) this->h, 0.0, 0.0, 1.0); GL_GET_ERROR();
 #endif
-	glGetFloatv(GL_MODELVIEW_MATRIX, &this->matrix[0]);
+	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 
 	// Setup some defaults.
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f); GL_GET_ERROR();
@@ -1224,7 +1173,6 @@ ImageLibrary & OpenGLDrawContext::getImageLibrary()
 
 void OpenGLDrawContext::flip()
 {
-    //SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
     BENCH.draw();
 #ifdef DISABLED
@@ -1241,13 +1189,12 @@ void OpenGLDrawContext::flip()
 
 void OpenGLDrawContext::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
-    SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
 	IosRect *pSrcRect, *pDstRect;
 	fixRects(srcRect, dstRect, surf, this, &pSrcRect, &pDstRect);
 	IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef *> (surf);
 	ipSurf->applyBlendMode(IMAGE_BLEND);
-	ipSurf->drawToGL(pSrcRect, pDstRect, this->h);
+	ipSurf->drawToGL(pSrcRect, pDstRect);
 }
 
 void OpenGLDrawContext::drawRotatedCentered(IosSurface *surf, int angle, int x, int y) {
@@ -1258,23 +1205,13 @@ void OpenGLDrawContext::drawRotatedCentered(IosSurface *surf, int angle, int x, 
      IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef *> (surf);
      ipSurf->drawToGL(pSrcRect, pDstRect, this->h);*/
 }
-void OpenGLDrawContext::drawScaled(IosSurface *surf, IosRect *srcRect, IosRect *dstRect, float sx, float sy) {
-    SCOPED_GL_LOCK;
-    m_backendUtil->ensureContextIsActive();
-	IosRect *pSrcRect, *pDstRect;
-	fixRects(srcRect, dstRect, surf, this, &pSrcRect, &pDstRect);
-	IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef *> (surf);
-	ipSurf->applyBlendMode(IMAGE_BLEND);
-	ipSurf->drawToGL(pSrcRect, pDstRect, this->h, IosGLSurfaceRef::SCALED, sx, sy);
-}
 void OpenGLDrawContext::drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect) {
-    SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
 	IosRect *pSrcRect, *pDstRect;
 	fixRects(srcRect, dstRect, surf, this, &pSrcRect, &pDstRect);
 	IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef *> (surf);
 	ipSurf->applyBlendMode(IMAGE_BLEND);
-	ipSurf->drawToGL(pSrcRect, pDstRect, this->h, IosGLSurfaceRef::X_FLIP);
+	ipSurf->drawToGL(pSrcRect, pDstRect, IosGLSurfaceRef::X_FLIP);
 }
 
 void OpenGLDrawContext::setClipRect(IosRect *rect) {
@@ -1284,20 +1221,17 @@ void OpenGLDrawContext::fillRect(const IosRect *rect, const RGBA &color) {
 }
 
 void OpenGLDrawContext::putString(IosFont *font, int x, int y, const char *text) {
-	SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
 	OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
 	ifont->print(x,y,text);
 }
 void OpenGLDrawContext::putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text) {
-	SCOPED_GL_LOCK;
     m_backendUtil->ensureContextIsActive();
 	OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
 	ifont->printWithShadow(x,y,shadow_x,shadow_y,text);
 }
 
 void OpenGLDrawContext::putStringCenteredXY(IosFont *font, int x, int y, const char *text) {
-	SCOPED_GL_LOCK;
 	m_backendUtil->ensureContextIsActive();
 	OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
 	ifont->printCentered(x,y-ifont->getHeight()/2,text);
