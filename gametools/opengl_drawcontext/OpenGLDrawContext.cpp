@@ -643,7 +643,7 @@ private:
 };
 
 OpenGLTexture::OpenGLTexture(GLint format, int w, int h)
-: m_format(format), m_opaque(m_format==GL_RGB?true:false)
+: m_preserveRawData(false), m_format(format), m_opaque(m_format==GL_RGB?true:false)
 {
     m_h = h;
     m_w = w;
