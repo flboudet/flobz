@@ -13,7 +13,7 @@ using namespace ios_fc;
 namespace flobopuyo {
 namespace server {
 
-PuyoServerV1::PuyoServerV1(IgpVirtualPeerMessageBox &mbox)
+PuyoServerV1::PuyoServerV1(ios_fc::MessageBox &mbox)
  : mbox(mbox), timeMsBeforePeerTimeout(5000.), m_maxPeersAllowed(0)
 {
 }

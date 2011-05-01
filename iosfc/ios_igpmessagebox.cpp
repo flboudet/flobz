@@ -21,92 +21,50 @@
 
 #include "ios_fastmessage.h"
 #include "ios_igpmessagebox.h"
-#include "ios_igpmessage.h"
 
 namespace ios_fc {
 
-    class IgpMessageBoxMessage : public IgpMessage {
-    public:
-        IgpMessageBoxMessage(int serialID, IgpMessageBox &owner, int igpPeerIdent);
-        IgpMessageBoxMessage(const Buffer<char> serialized, IgpMessageBox &owner, int igpPeerIdent) throw(InvalidMessageException);
-        void sendBuffer(Buffer<char> out) const;
-    private:
-        IgpMessageBox &owner;
-    };
-
-    IgpMessageBoxMessage::IgpMessageBoxMessage(int serialID, IgpMessageBox &owner, int igpPeerIdent) : IgpMessage(serialID, igpPeerIdent), owner(owner)
-    {
-    }
-
-    IgpMessageBoxMessage::IgpMessageBoxMessage(const Buffer<char> serialized, IgpMessageBox &owner, int igpPeerIdent) throw(InvalidMessageException)
-    : IgpMessage(serialized, igpPeerIdent), owner(owner)
-    {
-    }
-
-    void IgpMessageBoxMessage::sendBuffer(Buffer<char> out) const
-    {
-        owner.sendBuffer(out, isReliable(), igpPeerIdent);
-    }
-
-    // IgpMessageBox implementation
-    IgpMessageBox::IgpMessageBox(MessageBox *mbox) : mbox(mbox), ownMessageBox(false), igpClient(new IGPClient(*mbox)), sendSerialID(0)
+    // IgpMessageBoxBase implementation
+    IgpMessageBoxBase::IgpMessageBoxBase(MessageBox *mbox) : mbox(mbox), ownMessageBox(false), igpClient(new IGPClient(*mbox)), sendSerialID(0)
     {
         igpClient->addListener(this);
     }
 
-    IgpMessageBox::IgpMessageBox(MessageBox *mbox, int igpIdent) : mbox(mbox), ownMessageBox(false), igpClient(new IGPClient(*mbox, igpIdent)), sendSerialID(0)
+    IgpMessageBoxBase::IgpMessageBoxBase(MessageBox *mbox, int igpIdent) : mbox(mbox), ownMessageBox(false), igpClient(new IGPClient(*mbox, igpIdent)), sendSerialID(0)
     {
         igpClient->addListener(this);
     }
 
-    IgpMessageBox::~IgpMessageBox()
+    IgpMessageBoxBase::~IgpMessageBoxBase()
     {
       delete igpClient;
       if (ownMessageBox)
           delete mbox;
     }
 
-    void IgpMessageBox::idle()
+    void IgpMessageBoxBase::idle()
     {
         igpClient->idle();
     }
 
-    Message * IgpMessageBox::createMessage()
-    {
-        return new IgpMessageBoxMessage(++sendSerialID, *this, destIdent);
-    }
-
-    void IgpMessageBox::sendBuffer(VoidBuffer out, bool reliable, int igpDestIdent)
+    void IgpMessageBoxBase::sendBuffer(VoidBuffer out, bool reliable, int igpDestIdent)
     {
         igpClient->sendMessage(igpDestIdent, out, reliable);
     }
 
-    void IgpMessageBox::onMessage(VoidBuffer message, int origIdent, int destIdent)
+    void IgpMessageBoxBase::bind(PeerAddress addr)
     {
-        try {
-            IgpMessageBoxMessage incomingMessage(message, *this, origIdent);
-            for (int i = 0, j = listeners.size() ; i < j ; i++) {
-                MessageListener *currentListener = listeners[i];
-                currentListener->onMessage(incomingMessage);
-            }
-        }
-        catch (Exception e) {
-            e.printMessage();
-        }
-    }
-
-    void IgpMessageBox::bind(PeerAddress addr)
-    {
-        IgpMessage::IgpPeerAddressImpl *peerAddressImpl = dynamic_cast<IgpMessage::IgpPeerAddressImpl *>(addr.getImpl());
+        IgpPeerAddressImpl *peerAddressImpl = dynamic_cast<IgpPeerAddressImpl *>(addr.getImpl());
         if (peerAddressImpl != NULL) {
             destIdent = peerAddressImpl->getIgpIdent();
         }
         else throw Exception("Incompatible peer address type!");
     }
 
-    PeerAddress IgpMessageBox::getSelfAddress() const
+    PeerAddress IgpMessageBoxBase::getSelfAddress() const
     {
-        return PeerAddress(new IgpMessage::IgpPeerAddressImpl(igpClient->getIgpIdent()));
+        return PeerAddress(new IgpPeerAddressImpl(igpClient->getIgpIdent()));
     }
+    
 }
 

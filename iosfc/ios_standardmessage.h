@@ -11,10 +11,6 @@ namespace ios_fc {
       StandardMessage(const Buffer<char> serialized) throw(InvalidMessageException);
       virtual ~StandardMessage();
 
-      bool isReliable() const;
-      int  getSerialID() const;
-      void send();
-
       virtual void addInt       (const String &key, int value);
       virtual void addBool      (const String &key, bool value);
       virtual void addFloat     (const String &key, double value);
@@ -28,8 +24,7 @@ namespace ios_fc {
       virtual VoidBuffer serialize();
 
     private:
-      virtual void sendBuffer(Buffer<char> out) const {}
-
+      
       AdvancedBuffer<String *> serialized;
       void checkMessage() throw(InvalidMessageException);
   };

@@ -28,24 +28,6 @@ namespace ios_fc {
       delete serialized[i];
   }
 
-  bool StandardMessage::isReliable() const
-  {
-    if (hasBoolProperty(IS_RELIABLE))
-      return getBoolProperty(IS_RELIABLE);
-    return false;
-  }
-
-  int  StandardMessage::getSerialID() const
-  {
-    return getIntProperty(SERIAL_ID);
-  }
-
-  void StandardMessage::send()
-  {
-    VoidBuffer out = serialize();
-    sendBuffer(out);
-  }
-
   void StandardMessage::addInt(const String &key, int value)
   {
     BaseMessage::addInt(key,value);

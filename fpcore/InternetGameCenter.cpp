@@ -155,13 +155,13 @@ void InternetGameCenter::idle()
             int initiatorIgpIdent, guestIgpIdent;
             if (grantedInvitation.initiatorAddress == grantedInvitation.opponentAddress) {
                 // The opponent invited me
-                initiatorIgpIdent = static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.initiatorAddress.getImpl())->getIgpIdent();
-                guestIgpIdent = static_cast<IgpMessage::IgpPeerAddressImpl *>(m_igpmbox->getSelfAddress().getImpl())->getIgpIdent();
+                initiatorIgpIdent = static_cast<IgpPeerAddressImpl *>(grantedInvitation.initiatorAddress.getImpl())->getIgpIdent();
+                guestIgpIdent = static_cast<IgpPeerAddressImpl *>(m_igpmbox->getSelfAddress().getImpl())->getIgpIdent();
             }
             else {
                 // I invited the opponent
-                initiatorIgpIdent = static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.initiatorAddress.getImpl())->getIgpIdent();
-                guestIgpIdent = static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.opponentAddress.getImpl())->getIgpIdent();
+                initiatorIgpIdent = static_cast<IgpPeerAddressImpl *>(grantedInvitation.initiatorAddress.getImpl())->getIgpIdent();
+                guestIgpIdent = static_cast<IgpPeerAddressImpl *>(grantedInvitation.opponentAddress.getImpl())->getIgpIdent();
             }
             p2pPunchName = String("punch:") + initiatorIgpIdent + "vs" + guestIgpIdent + ":" + grantedInvitation.gameRandomSeed;
             m_p2pNatTraversal.reset(new NatTraversal(*m_p2pmbox));

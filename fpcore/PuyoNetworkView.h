@@ -29,8 +29,8 @@
 #include "PuyoMessageDef.h"
 #include "PuyoView.h"
 
-#include "ios_messagebox.h"
-#include "ios_igpmessagebox.h"
+#include "NetworkDefinitions.h"
+
 using namespace ios_fc;
 
 class PuyoNetworkView : public PuyoView {
@@ -88,7 +88,7 @@ protected:
 class PuyoInternetNetworkView : public PuyoNetworkView {
     public:
         PuyoInternetNetworkView(PuyoGameFactory *attachedPuyoGameFactory, MessageBox *mbox, int gameId,
-                                IgpMessageBox *igpbox)
+                                FPServerIGPMessageBox *igpbox)
           : PuyoNetworkView(attachedPuyoGameFactory, mbox, gameId)
           , igpbox(igpbox)
         {}
@@ -98,7 +98,7 @@ class PuyoInternetNetworkView : public PuyoNetworkView {
                                 PuyoSetTheme *attachedPuyoThemeSet,
                                 LevelTheme *attachedLevelTheme,
                                 MessageBox *mbox, int gameId,
-                                IgpMessageBox *igpbox)
+                                FPServerIGPMessageBox *igpbox)
           : PuyoNetworkView(attachedPuyoGameFactory,
                              playerId,
                              attachedPuyoThemeSet,
@@ -109,7 +109,7 @@ class PuyoInternetNetworkView : public PuyoNetworkView {
         virtual void gameLost();
     private:
         void sendGameResultToServer(int winner);
-        IgpMessageBox *igpbox;
+        FPServerIGPMessageBox *igpbox;
 };
 
 #endif // _PUYONETWORKVIEW

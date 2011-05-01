@@ -8,7 +8,7 @@ namespace server {
 
 class PuyoServerV1 : public PuyoServer {
 public:
-    PuyoServerV1(ios_fc::IgpVirtualPeerMessageBox &mbox);
+    PuyoServerV1(ios_fc::MessageBox &mbox);
     bool checkVersion(int clientVersion) const;
     void onMessage(ios_fc::Message &msg);
     void idle();
@@ -19,7 +19,7 @@ private:
     void connectPeer(ios_fc::PeerAddress addr, int fpipVersion, const ios_fc::String name, int status);
     void updatePeer(GamePeer *peer, int status);
 
-    ios_fc::IgpVirtualPeerMessageBox &mbox;
+    ios_fc::MessageBox &mbox;
     ios_fc::AdvancedBuffer<GamePeer *>peers;
     double timeMsBeforePeerTimeout;
     int m_maxPeersAllowed;

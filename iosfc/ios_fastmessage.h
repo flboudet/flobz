@@ -57,7 +57,6 @@ public:
     virtual int  getIntProperty   (const String &key) const;
     virtual bool getBoolProperty  (const String &key) const;
 
-    virtual void send() {}
 private:
     enum ValueType {
         INTEGER=1,

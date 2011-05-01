@@ -64,7 +64,7 @@ public:
     virtual int  getIntProperty   (const String &key) const = 0;
     virtual bool getBoolProperty  (const String &key) const = 0;
 
-    virtual void send() = 0;
+    virtual void send() {}
 };
 
 }

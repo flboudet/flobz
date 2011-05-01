@@ -24,9 +24,10 @@
  */
 
 #include "NatTraversal.h"
+#include "NetworkDefinitions.h"
 
 NatTraversal::NatTraversal(UDPMessageBoxBase &udpmbox, double punchInfoTimeout, double strategyTimeout)
-  : udpmbox(udpmbox), igpmbox(new IgpMessageBox(&udpmbox)), currentStrategy(TRY_NONE), punchInfoTimeout(punchInfoTimeout), strategyTimeout(strategyTimeout), receivedGarbage(0), udpSocketAddress("127.0.0.1"), igpServerSocketAddress(udpmbox.getDatagramSocket()->getConnectedAddress()), igpServerPortNum(udpmbox.getDatagramSocket()->getConnectedPortNum())
+  : udpmbox(udpmbox), igpmbox(new FPServerIGPMessageBox(&udpmbox)), currentStrategy(TRY_NONE), punchInfoTimeout(punchInfoTimeout), strategyTimeout(strategyTimeout), receivedGarbage(0), udpSocketAddress("127.0.0.1"), igpServerSocketAddress(udpmbox.getDatagramSocket()->getConnectedAddress()), igpServerPortNum(udpmbox.getDatagramSocket()->getConnectedPortNum())
 {
     igpmbox->addListener(this);
 }

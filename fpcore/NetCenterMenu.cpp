@@ -33,7 +33,7 @@ using namespace event_manager;
 
 class PuyoNetworkTwoPlayerGameWidgetFactory : public GameWidgetFactory {
 public:
-    PuyoNetworkTwoPlayerGameWidgetFactory(ios_fc::MessageBox &mbox, unsigned int randomSeed, ios_fc::IgpMessageBox *igpbox/* = NULL */)
+    PuyoNetworkTwoPlayerGameWidgetFactory(ios_fc::MessageBox &mbox, unsigned int randomSeed, FPServerIGPMessageBox *igpbox/* = NULL */)
       : mbox(mbox), randomSeed(randomSeed), igpbox(igpbox), gameId(0) {}
     GameWidget *createGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
@@ -44,7 +44,7 @@ public:
 private:
     ios_fc::MessageBox &mbox;
     unsigned int randomSeed;
-    ios_fc::IgpMessageBox *igpbox;
+    FPServerIGPMessageBox *igpbox;
     int gameId;
 };
 

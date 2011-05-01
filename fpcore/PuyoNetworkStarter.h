@@ -50,8 +50,8 @@ public:
     };
 public:
     PuyoNetworkGameWidget();
-    void initWithGUI(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, ios_fc::IgpMessageBox *igpbox = NULL);
-    void initWithoutGUI(ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, ios_fc::IgpMessageBox *igpbox = NULL);
+    void initWithGUI(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, FPServerIGPMessageBox *igpbox = NULL);
+    void initWithoutGUI(ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, FPServerIGPMessageBox *igpbox = NULL);
     void connectIA(int level);
     ~PuyoNetworkGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }

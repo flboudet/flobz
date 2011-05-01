@@ -30,81 +30,8 @@
 
 namespace ios_fc {
 
-class IgpVirtualPeerMessage : public IgpMessage {
-public:
-    IgpVirtualPeerMessage(int serialID, IgpVirtualPeerMessageBox &owner, int igpPeerIdent);
-    IgpVirtualPeerMessage(const Buffer<char> serialized, IgpVirtualPeerMessageBox &owner, int igpPeerIdent) throw(InvalidMessageException);
-    void sendBuffer(Buffer<char> out) const;
-private:
-    IgpVirtualPeerMessageBox &owner;
-};
 
 
-IgpVirtualPeerMessage::IgpVirtualPeerMessage(int serialID, IgpVirtualPeerMessageBox &owner, int igpPeerIdent) : IgpMessage(serialID, igpPeerIdent), owner(owner)
-{
-}
 
-IgpVirtualPeerMessage::IgpVirtualPeerMessage(const Buffer<char> serialized, IgpVirtualPeerMessageBox &owner, int igpPeerIdent) throw(InvalidMessageException)
-: IgpMessage(serialized, igpPeerIdent), owner(owner)
-{
-}
-
-void IgpVirtualPeerMessage::sendBuffer(Buffer<char> out) const
-{
-    owner.sendBuffer(out, isReliable(), igpPeerIdent);
-}
-
-// IgpVirtualPeerMessageBox
-
-IgpVirtualPeerMessageBox::IgpVirtualPeerMessageBox(IgpMessageListener &igpListener, int igpIdent)
-    : IgpVirtualPeer(&igpListener, igpIdent), sendSerialID(0), m_isCorrupted(false)
-{
-}
-
-IgpVirtualPeerMessageBox::IgpVirtualPeerMessageBox(IgpMessageListener &igpListener)
-    : IgpVirtualPeer(&igpListener), sendSerialID(0), m_isCorrupted(false)
-{
-}
-
-// Implement MessageBox
-Message * IgpVirtualPeerMessageBox::createMessage()
-{
-    return new IgpVirtualPeerMessage(++sendSerialID, *this, destIdent);
-}
-
-// Implement IgpPeer
-void IgpVirtualPeerMessageBox::messageReceived(VoidBuffer message, int origIgpIdent, bool reliable)
-{
-    if (m_isCorrupted) return;
-    try {
-        IgpVirtualPeerMessage incomingMessage(message, *this, origIgpIdent);
-        for (int i = 0, j = listeners.size() ; i < j ; i++) {
-            MessageListener *currentListener = listeners[i];
-            currentListener->onMessage(incomingMessage);
-        }
-    }
-    catch (Exception e) {
-        fprintf(stderr, "Exception occured. We consider that the peer is corrupted!\n");
-        e.printMessage();
-        m_isCorrupted = true;
-    }
-}
-
-// Own member functions
-void IgpVirtualPeerMessageBox::sendBuffer(VoidBuffer out, bool reliable, int igpDestIdent)
-{
-    if (m_isCorrupted) return;
-    sendMessageToAddress(out, igpDestIdent, reliable);
-}
-
-void IgpVirtualPeerMessageBox::bind(PeerAddress addr)
-{
-    if (m_isCorrupted) return;
-    IgpMessage::IgpPeerAddressImpl *peerAddressImpl = dynamic_cast<IgpMessage::IgpPeerAddressImpl *>(addr.getImpl());
-    if (peerAddressImpl != NULL) {
-        destIdent = peerAddressImpl->getIgpIdent();
-    }
-    else throw Exception("Incompatible peer address type!");
-}
 
 }

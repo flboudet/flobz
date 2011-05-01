@@ -95,8 +95,8 @@ void PuyoIgpNatTraversal::onMessage(Message &msg)
             if (!msg.hasInt("LPORTNUM")) return;
             Dirigeable &dirMsg = dynamic_cast<Dirigeable &>(msg);
             PeerAddress address = dirMsg.getPeerAddress();
-            IgpMessage::IgpPeerAddressImpl *impl =
-                static_cast<IgpMessage::IgpPeerAddressImpl *>(address.getImpl());
+            IgpPeerAddressImpl *impl =
+                static_cast<IgpPeerAddressImpl *>(address.getImpl());
             printf("Demande de peeraddress udp du peer igp %d\n", impl->getIgpIdent());
             UDPPeerAddress udpAddress = igpListener.getPeerAddress(impl->getIgpIdent());
             printf("Peer:  %s:%d\n", (const char *)(udpAddress.getSocketAddress().asString()), udpAddress.getPortNum());

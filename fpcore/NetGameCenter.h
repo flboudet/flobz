@@ -29,7 +29,7 @@
 #include "ios_memory.h"
 #include "ios_dirigeable.h"
 #include "ios_messagebox.h"
-#include "ios_igpmessagebox.h"
+#include "NetworkDefinitions.h"
 
 using namespace ios_fc;
 
@@ -92,7 +92,7 @@ public:
     virtual String getSelfName() { return "Myself"; }
     virtual String getOpponentName() { return "Opponent"; }
     // Optional server managing the game center.
-    virtual IgpMessageBox *getIgpBox() { return NULL; }
+    virtual FPServerIGPMessageBox *getIgpBox() { return NULL; }
 protected:
     AdvancedBuffer<NetGameCenterListener *> listeners;
     class GamerPeer;

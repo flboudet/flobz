@@ -28,7 +28,7 @@ public:
 
 class Server {
 public:
-    Server(ios_fc::IgpVirtualPeerMessageBox &mbox) : mMbox(mbox), mTimeMsBeforePeerTimeout(5000.) {}
+    Server(ios_fc::MessageBox &mbox) : mMbox(mbox), mTimeMsBeforePeerTimeout(5000.) {}
 
     // Process alive messages
     void onIgpAlive(ios_fc::Message &msg, ios_fc::PeerAddress &address);
@@ -49,7 +49,7 @@ private:
 
     Database mDB;
     PeersList mPeers;
-    ios_fc::IgpVirtualPeerMessageBox &mMbox; // Message box
+    ios_fc::MessageBox &mMbox; // Message box
     double mTimeMsBeforePeerTimeout;         // Peers are disconnected when last update gets older than this
 };
 

@@ -36,6 +36,6 @@ typedef ios_fc::UDPMessageBox<ios_fc::FastMessage> FPInternetP2PMessageBox;
 
 typedef ios_fc::UDPMessageBox<ios_fc::FastMessage> FPServerMessageBox;
 
-typedef ios_fc::IgpMessageBox FPServerIGPMessageBox;
+typedef ios_fc::IgpMessageBox<ios_fc::FastMessage> FPServerIGPMessageBox;
 
 #endif // _NETWORKDEFINITIONS_H_

@@ -284,9 +284,9 @@ void PuyoInternetNetworkView::gameLost()
 // Save and restore IgpMessageBox bound peer.
 class SaveIgpBound {
     public:
-        IgpMessageBox *igpbox;
+        FPServerIGPMessageBox *igpbox;
         int saveBound;
-        SaveIgpBound(IgpMessageBox *igpbox) : igpbox(igpbox), saveBound(igpbox->getBound()) {}
+        SaveIgpBound(FPServerIGPMessageBox *igpbox) : igpbox(igpbox), saveBound(igpbox->getBound()) {}
         ~SaveIgpBound() { igpbox->bind(saveBound); }
 };
 

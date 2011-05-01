@@ -28,48 +28,7 @@
 
 namespace ios_fc {
     
-    IgpMessage::IgpMessage(int serialID, int igpPeerIdent) : StandardMessage(serialID), igpPeerIdent(igpPeerIdent)
-    {
-    }
 
-    IgpMessage::IgpMessage(const Buffer<char> serialized, int igpPeerIdent) throw(InvalidMessageException)
-    : StandardMessage(serialized), igpPeerIdent(igpPeerIdent)
-    {
-    }
-    
-    // Dirigeable
-    PeerAddress IgpMessage::getPeerAddress()
-    {
-        return PeerAddress(new IgpPeerAddressImpl(igpPeerIdent));
-    }
-    
-    PeerAddress IgpMessage::getBroadcastAddress()
-    {
-        return PeerAddress(new IgpPeerAddressImpl(0));
-    }
-    
-    void IgpMessage::setPeerAddress(PeerAddress newPeerAddress)
-    {
-        IgpPeerAddressImpl *newPeerAddressImpl = dynamic_cast<IgpPeerAddressImpl *>(newPeerAddress.getImpl());
-        if (newPeerAddressImpl != NULL) {
-            igpPeerIdent = newPeerAddressImpl->getIgpIdent();
-        }
-        else throw Exception("Incompatible peer address type!");
-    }
-    
-    void IgpMessage::addPeerAddress(const String key, const PeerAddress &value)
-    {
-        IgpPeerAddressImpl *peerAddressImpl = dynamic_cast<IgpPeerAddressImpl *>(value.getImpl());
-        if (peerAddressImpl != NULL) {
-            addInt(key, peerAddressImpl->getIgpIdent());
-        }
-        else throw Exception("Incompatible peer address type!");
-    }
-    
-    PeerAddress IgpMessage::getPeerAddress(const String key)
-    {
-        return PeerAddress(new IgpPeerAddressImpl(getInt(key)));
-    }
 
 }
 

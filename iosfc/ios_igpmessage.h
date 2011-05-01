@@ -31,22 +31,24 @@
 #include "ios_dirigeable.h"
 
 namespace ios_fc {
-    class IgpMessage : public StandardMessage, public Dirigeable {
+
+    template <typename T>
+    class IgpMessage : public T, public Dirigeable {
     public:
         IgpMessage(int serialID, int igpPeerIdent);
-        IgpMessage(const Buffer<char> serialized, int igpPeerIdent) throw(InvalidMessageException);
+        IgpMessage(const Buffer<char> serialized, int igpPeerIdent) throw (Message::InvalidMessageException);
         // Dirigeable
         PeerAddress getPeerAddress();
         PeerAddress getBroadcastAddress();
         void setPeerAddress(PeerAddress);
         void addPeerAddress(const String key, const PeerAddress &value);
         PeerAddress getPeerAddress(const String key);
-        class IgpPeerAddressImpl; // A revoir
     protected:
         int igpPeerIdent;
+        static const char * SERIAL_ID;//   = "SID";
     };
 
-    class IgpMessage::IgpPeerAddressImpl : public PeerAddressImpl {
+    class IgpPeerAddressImpl : public PeerAddressImpl {
     public:
         IgpPeerAddressImpl(int igpIdent) : igpIdent(igpIdent) {}
         virtual bool operator == (const PeerAddressImpl &a) const {
@@ -61,6 +63,60 @@ namespace ios_fc {
     private:
         int igpIdent;
     };
+    
+    template <typename T>
+    const char * IgpMessage<T>::SERIAL_ID = "SID";
+
+    template <typename T>
+    IgpMessage<T>::IgpMessage(int serialID, int igpPeerIdent) : igpPeerIdent(igpPeerIdent)
+    {
+        T::addIntProperty(SERIAL_ID, serialID);
+    }
+    
+    template <typename T>
+    IgpMessage<T>::IgpMessage(const Buffer<char> serialized, int igpPeerIdent) throw(Message::InvalidMessageException)
+    : T(serialized), igpPeerIdent(igpPeerIdent)
+    {
+    }
+    
+    // Dirigeable
+    template <typename T>
+    PeerAddress IgpMessage<T>::getPeerAddress()
+    {
+        return PeerAddress(new IgpPeerAddressImpl(igpPeerIdent));
+    }
+    
+    template <typename T>
+    PeerAddress IgpMessage<T>::getBroadcastAddress()
+    {
+        return PeerAddress(new IgpPeerAddressImpl(0));
+    }
+    
+    template <typename T>
+    void IgpMessage<T>::setPeerAddress(PeerAddress newPeerAddress)
+    {
+        IgpPeerAddressImpl *newPeerAddressImpl = dynamic_cast<IgpPeerAddressImpl *>(newPeerAddress.getImpl());
+        if (newPeerAddressImpl != NULL) {
+            igpPeerIdent = newPeerAddressImpl->getIgpIdent();
+        }
+        else throw Exception("Incompatible peer address type!");
+    }
+    
+    template <typename T>
+    void IgpMessage<T>::addPeerAddress(const String key, const PeerAddress &value)
+    {
+        IgpPeerAddressImpl *peerAddressImpl = dynamic_cast<IgpPeerAddressImpl *>(value.getImpl());
+        if (peerAddressImpl != NULL) {
+            T::addInt(key, peerAddressImpl->getIgpIdent());
+        }
+        else throw Exception("Incompatible peer address type!");
+    }
+    
+    template <typename T>
+    PeerAddress IgpMessage<T>::getPeerAddress(const String key)
+    {
+        return PeerAddress(new IgpPeerAddressImpl(T::getInt(key)));
+    }
 }
 
 #endif // _IGPMESSAGE_H

@@ -32,7 +32,7 @@ int main(int argc, const char * argv[])
     messageBox.addSessionListener(&listener);
     serverSelector.addSelectable(&serverSocket);
 
-    IgpVirtualPeerMessageBox igpMBox(listener, 1);
+    IgpVirtualPeerMessageBox<FastMessage> igpMBox(listener, 1);
     PuyoIgpNatTraversal natPuncher(igpMBox, listener);
     igpMBox.addListener(&natPuncher);
 

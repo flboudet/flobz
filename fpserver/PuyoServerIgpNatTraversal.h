@@ -11,14 +11,14 @@ using namespace ios_fc;
 
 class PuyoIgpNatTraversal : public MessageListener {
 public:
-    PuyoIgpNatTraversal(IgpVirtualPeerMessageBox &mbox, IgpMessageListener &listener) : mbox(mbox), igpListener(listener), timeMsBeforePunchTimeout(5000.) {}
+    PuyoIgpNatTraversal(MessageBox &mbox, IgpMessageListener &listener) : mbox(mbox), igpListener(listener), timeMsBeforePunchTimeout(5000.) {}
     void onMessage(Message &msg);
     void idle();
 private:
     class PunchPool;
     void updatePeer(PeerAddress addr, const String name, int status);
 
-    IgpVirtualPeerMessageBox &mbox;
+    MessageBox &mbox;
     IgpMessageListener &igpListener;
     double timeMsBeforePunchTimeout;
     AdvancedBuffer<PunchPool *> pools;

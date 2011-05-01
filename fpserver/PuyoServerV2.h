@@ -13,7 +13,7 @@ namespace v2 {
 class PuyoServerV2 : public PuyoServer {
 
 public:
-    PuyoServerV2(ios_fc::IgpVirtualPeerMessageBox &mbox);
+    PuyoServerV2(ios_fc::MessageBox &mbox);
     ~PuyoServerV2();
     void onMessage(ios_fc::Message &msg);
     void idle();

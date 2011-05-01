@@ -54,7 +54,7 @@ public:
     virtual void onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation) {
         std::cout << "onGameGrantedWithMessagebox" << std::endl;
         int gameId = 0;
-        IgpMessageBox *igpbox = m_gc.getIgpBox();
+        FPServerIGPMessageBox *igpbox = m_gc.getIgpBox();
         /*
         // My view
         m_opponent = mbox;

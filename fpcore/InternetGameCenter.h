@@ -45,7 +45,7 @@ public:
     bool isDenied() const;
     String getDenyString() const { return m_denyString; }
     String getDenyStringMore() const { return m_denyStringMore; }
-    virtual IgpMessageBox *getIgpBox() { return m_igpmbox.get(); }
+    virtual FPServerIGPMessageBox *getIgpBox() { return m_igpmbox.get(); }
     // Temporaire
     void punch();
 protected:

@@ -26,26 +26,25 @@
 #include "ios_messagebox.h"
 #include "ios_igpclient.h"
 #include "ios_dirigeable.h"
+#include "ios_igpmessage.h"
 
 namespace ios_fc {
 
 // IGP stands for Ios Gateway Protocol
 
-class IgpMessageBox : public MessageBox, IGPClientMessageListener {
+class IgpMessageBoxBase : public MessageBox, IGPClientMessageListener {
 public:
-    IgpMessageBox(MessageBox *mbox);
-    IgpMessageBox(MessageBox *mbox, int igpIdent);
-    virtual ~IgpMessageBox();
+    IgpMessageBoxBase(MessageBox *mbox);
+    IgpMessageBoxBase(MessageBox *mbox, int igpIdent);
+    virtual ~IgpMessageBoxBase();
     virtual void idle();
-    virtual Message * createMessage();
     void sendBuffer(VoidBuffer out, bool reliable, int igpDestIdent);
-    void onMessage(VoidBuffer message, int origIdent, int destIdent);
     void bind(int igpIdent) { destIdent = igpIdent; }
     void bind(PeerAddress addr); // a revoir
     int getBound() const { return destIdent; }
     PeerAddress getSelfAddress() const; // a revoir
     bool isConnected() const { return igpClient->isEnabled(); }
- private:
+ protected:
     MessageBox *mbox;
     bool ownMessageBox;
     IGPClient *igpClient;
@@ -53,6 +52,82 @@ public:
     int destIdent;
 };
 
+template <typename T>
+class IgpMessageBox : public IgpMessageBoxBase {
+public:
+    IgpMessageBox(MessageBox *mbox);
+    IgpMessageBox(MessageBox *mbox, int igpIdent);
+    virtual Message * createMessage();
+    virtual void onMessage(VoidBuffer message, int origIdent, int destIdent);
+};
+
+template <typename T>
+class IgpMessageBoxMessage : public IgpMessage<T> {
+public:
+    IgpMessageBoxMessage(int serialID, IgpMessageBox<T> &owner, int igpPeerIdent);
+    IgpMessageBoxMessage(const Buffer<char> serialized, IgpMessageBox<T> &owner, int igpPeerIdent) throw(Message::InvalidMessageException);
+    virtual void send();
+    bool isReliable() const {
+        if (T::hasBoolProperty("RELIABLE"))
+            return T::getBoolProperty("RELIABLE");
+        return false;
+    }
+private:
+    IgpMessageBox<T> &owner;
+};
+
+template <typename T>
+IgpMessageBoxMessage<T>::IgpMessageBoxMessage(int serialID, IgpMessageBox<T> &owner, int igpPeerIdent) : IgpMessage<T>(serialID, igpPeerIdent), owner(owner)
+{}
+
+template <typename T>
+    IgpMessageBoxMessage<T>::IgpMessageBoxMessage(const Buffer<char> serialized, IgpMessageBox<T> &owner, int igpPeerIdent) throw(Message::InvalidMessageException)
+    : IgpMessage<T>(serialized, igpPeerIdent), owner(owner)
+{}
+
+/*template <typename T>
+void IgpMessageBoxMessage<T>::sendBuffer(Buffer<char> out) const
+{
+    owner.sendBuffer(out, T::isReliable(), IgpMessageBoxMessage<T>::igpPeerIdent);
+}*/
+    
+template <typename T>
+void IgpMessageBoxMessage<T>::send()
+{
+    VoidBuffer out = T::serialize();
+    owner.sendBuffer(out, isReliable(), IgpMessageBoxMessage<T>::igpPeerIdent);
+}
+
+template <typename T>
+IgpMessageBox<T>::IgpMessageBox(MessageBox *mbox)
+    : IgpMessageBoxBase(mbox)
+{}
+
+template <typename T>
+IgpMessageBox<T>::IgpMessageBox(MessageBox *mbox, int igpIdent)
+    : IgpMessageBoxBase(mbox, igpIdent)
+{}
+
+template <typename T>
+Message * IgpMessageBox<T>::createMessage()
+{
+    return new IgpMessageBoxMessage<T>(++(IgpMessageBoxBase::sendSerialID), *this, IgpMessageBoxBase::destIdent);
+}
+
+template <typename T>
+void IgpMessageBox<T>::onMessage(VoidBuffer message, int origIdent, int destIdent)
+    {
+        try {
+            IgpMessageBoxMessage<T> incomingMessage(message, *this, origIdent);
+            for (int i = 0, j = listeners.size() ; i < j ; i++) {
+                MessageListener *currentListener = listeners[i];
+                currentListener->onMessage(incomingMessage);
+            }
+        }
+        catch (Exception e) {
+            e.printMessage();
+        }
+    }
 }
 
 #endif // _IOS_IGPMESSAGE_BOX_H

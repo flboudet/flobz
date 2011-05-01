@@ -49,7 +49,7 @@ private:
     void sendSyncMessage();
 
     UDPMessageBoxBase &udpmbox;
-    IgpMessageBox *igpmbox;
+    IgpMessageBoxBase *igpmbox;
     String peerAddressString, peerLocalAddressString;
     int peerPortNum, peerLocalPortNum;
     enum {

@@ -33,7 +33,7 @@ namespace server {
 // ----------------
 // Public interface
 // ----------------
-PuyoServerV2::PuyoServerV2(IgpVirtualPeerMessageBox &mbox)
+PuyoServerV2::PuyoServerV2(ios_fc::MessageBox &mbox)
  : server(new v2::Server(mbox))
 {}
 
