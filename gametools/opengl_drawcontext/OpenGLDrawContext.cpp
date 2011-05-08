@@ -958,7 +958,7 @@ void IosGLSurfaceRef::putStringWithShadow(IosFont *font, int x, int y, int shado
     m_backendUtil->ensureContextIsActive();
     bindSurface();
     OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
-    ifont->printWithShadow(x,y,shadow_x,shadow_y,text);    
+    ifont->printWithShadow(x,y,shadow_x,shadow_y,text);
     unbindSurface();
 }
 
@@ -1199,6 +1199,13 @@ void OpenGLDrawContext::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRec
 
 void OpenGLDrawContext::drawRotatedCentered(IosSurface *surf, int angle, int x, int y) {
 	// TODO: Rotate.
+    m_backendUtil->ensureContextIsActive();
+	IosRect *pSrcRect, *pDstRect;
+    IosRect dstRect = {x, y, surf->w, surf->h};
+	fixRects(NULL, &dstRect, surf, this, &pSrcRect, &pDstRect);
+	IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef *> (surf);
+	ipSurf->applyBlendMode(IMAGE_BLEND);
+	ipSurf->drawToGL(pSrcRect, pDstRect);
 	/*this->bindFBO();
      IosRect *pSrcRect, *pDstRect;
      fixRects(NULL, NULL, surf, this, &pSrcRect, &pDstRect);

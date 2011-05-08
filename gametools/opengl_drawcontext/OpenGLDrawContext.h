@@ -11,14 +11,22 @@
 
 #include <memory>
 #include "config.h"
-
-#ifdef IOS
-#include <OpenGLES/ES1/gl.h>
-#include <OpenGLES/ES1/glext.h>
-#else
 #define GL_GLEXT_PROTOTYPES
+
+#ifdef HAVE_GL_GL_H
 #include <GL/gl.h>
+#elif defined (HAVE_OPENGL_GL_H)
+#include <OpenGL/gl.h>
+#elif defined (IOS)
+#include <OpenGLES/ES1/gl.h>
+#endif
+
+#ifdef HAVE_GL_GLEXT_H
 #include <GL/glext.h>
+#elif defined (HAVE_OPENGL_GLEXT_H)
+#include <OpenGL/glext.h>
+#elif defined (IOS)
+#include <OpenGLES/ES1/glext.h>
 #endif
 
 #include "drawcontext.h"

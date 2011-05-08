@@ -6,6 +6,9 @@
 #include "CompositeDrawContext.h"
 #include "PackageDescription.h"
 #ifdef SDL12_GFX
+#ifdef OPENGL_GFX
+#include "sdl_drawcontext/sdl12/sdl12_opengl_drawcontext.h"
+#endif
 #include "sdl_drawcontext/sdl12/sdl12_drawcontext.h"
 #include "sdl_drawcontext/sdl12/sdl12_eventmanager.h"
 #include "sdl_drawcontext/common/SDL_AudioManager.h"
@@ -14,11 +17,6 @@
 #include "sdl_drawcontext/sdl13/sdl13_drawcontext.h"
 #include "sdl_drawcontext/sdl13/sdl13_eventmanager.h"
 #include "sdl_drawcontext/common/SDL_AudioManager.h"
-#endif
-#ifdef OPENGL_GFX
-#include "opengl_drawcontext/OpenGL_drawcontext.h"
-#include "opengl_drawcontext/OpenGL_eventmanager.h"
-#include "opengl_drawcontext/OpenGL_AudioManager.h"
 #endif
 #ifdef ENABLE_NETWORK_INTERNET
 #include "PuyoInternetBot.h"
@@ -58,9 +56,15 @@ void PuyoMain::initWithGUI()
     int requestedWidth = GetIntPreference(kScreenWidthPref, 640);
     int requestedHeight = GetIntPreference(kScreenHeightPref, 480);
 #ifdef SDL12_GFX
+#ifdef OPENGL_GFX
+    m_nativeDrawContext = new SDL12_OpenGL_DrawContext(&m_dataPathManager, 640, 480,
+                                          GetBoolPreference(kFullScreenPref, m_fullscreen),
+                                          "FloboPop by iOS-Software");
+#else
     m_nativeDrawContext = new SDL12_DrawContext(m_dataPathManager, 640, 480,
                                           GetBoolPreference(kFullScreenPref, m_fullscreen),
-                                          "FloboPuyo by iOS-Software");
+                                          "FloboPop by iOS-Software");
+#endif
     //PackageDescription *packDesc = new PackageDescription(m_dataPathManager, *cDC);
     //IosRect cropRect = {0,0,32,32};
     //cDC->declareCompositeSurface("data/base.000/theme/Classic.fptheme/fat-puyo-0000.png",
@@ -72,16 +76,9 @@ void PuyoMain::initWithGUI()
 #ifdef SDL13_GFX
     m_nativeDrawContext = new SDL13_DrawContext(640, 480,
                                           GetBoolPreference(kFullScreenPref, m_fullscreen),
-                                          "FloboPuyo by iOS-Software");
+                                          "FloboPop by iOS-Software");
     m_eventManager = new SDL13_EventManager();
     m_audioManager = new SDL_AudioManager();
-#endif
-#ifdef OPENGL_GFX
-    m_drawContext = new OpenGL_DrawContext(640, 480,
-					   GetBoolPreference(kFullScreenPref, m_fullscreen),
-					   "FloboPuyo by iOS-Software");
-    m_eventManager = new OpenGL_EventManager();
-    m_audioManager = new OpenGL_AudioManager();
 #endif
     m_drawContext = new CompositeDrawContext(m_nativeDrawContext);
     m_dataPathManager.registerDataPackages(*m_drawContext);

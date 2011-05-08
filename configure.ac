@@ -5,7 +5,7 @@
 # Configuration                                                       #
 #######################################################################
 
-AC_INIT([flobopuyo], [1.0], [flobo@ios-software.com])
+AC_INIT([flobopop], [1.0], [flobo@ios-software.com])
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -15,11 +15,8 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
 ENABLE_AUDIO=true
-#ENABLE_OPENGL?=false
 ENABLE_TTF=true
 #ENABLE_BENCHMARKS?=false
-#ENABLE_NETWORK=true
-#ENABLE_NETWORK_INTERNET=yes
 
 # Significant environment variables:
 # SDL_CONFIG: path to the sdl-config tool. Ignored if SDL_LIBS is supplied.
@@ -29,16 +26,19 @@ ENABLE_TTF=true
 #
 
 
-AC_ARG_ENABLE(universal-binary, [ --enable-universal-binary enables universal-binary compilation on Mac OS X], [universal-binary=yes])
-
 AC_ARG_ENABLE(network,
        [AS_HELP_STRING([--enable-network], [enables network support])],
-       [ENABLE_NETWORK=$enablevar], [ENABLE_NETWORK=yes])
+       [ENABLE_NETWORK=$enableval], [ENABLE_NETWORK=yes])
 
 AC_ARG_ENABLE(network-internet,
        [AS_HELP_STRING([--enable-network-internet],
                 [enables network-internet support])],
-       [ENABLE_NETWORK_INTERNET=$enablevar], [ENABLE_NETWORK_INTERNET=yes])
+       [ENABLE_NETWORK_INTERNET=$enableval], [ENABLE_NETWORK_INTERNET=yes])
+
+AC_ARG_ENABLE(opengl-gfx,
+       [AS_HELP_STRING([--enable-opengl-gfx],
+                [enables openGL graphics support])],
+       [ENABLE_OPENGL_GFX=$enableval], [ENABLE_OPENGL_GFX=no])
 
 #AC_ARG_ENABLE([audio],
 #              [AS_HELP_STRING([--enable-audio],
@@ -63,12 +63,6 @@ AC_PROG_LIBTOOL
 case $host_os in
     darwin*)
 	    FPCOMMON_FLAGS="$FPCOMMON_FLAGS -DMACOSX"
-            if test x$universal-binary = xyes; then
-                SYSTEM_ROOT="/Developer/SDKs/MacOSX10.4u.sdk"
-                CPPFLAGS="$CPPFLAGS -isysroot $SYSTEM_ROOT"
-	        FPCOMMON_FLAGS="$FPCOMMON_FLAGS -arch ppc -arch i386 -mmacosx-version-min=10.3"
-                LDFLAGS="$LDFLAGS -isysroot $SYSTEM_ROOT -Wl,-syslibroot,$SYSTEM_ROOT -arch ppc -arch i386"
-            fi
 	    ADDITIONAL_FRAMEWORKS_DIRECTORY="$ADDITIONAL_FRAMEWORKS_DIRECTORY"
 	    ADDITIONAL_FRAMEWORKS="$ADDITIONAL_FRAMEWORKS"
 	    AC_SUBST([ADDITIONAL_FRAMEWORKS])
@@ -237,9 +231,29 @@ if test "x$SDL_TTF_H_FOUND" = "x"; then
 You should install SDL_ttf development package.])
 fi
 
-AC_CHECK_HEADER(sqlite3.h, ENABLE_SQLITE=true, ENABLE_SQLITE=false)
+# OpenGL support if enabled
+if test "x$ENABLE_OPENGL_GFX" = "xyes"; then
+AC_CHECK_HEADERS([GL/gl.h OpenGL/gl.h],
+                 [GL_H_FOUND=1; break],
+                 [])
+if test "x$GL_H_FOUND" = "x"; then
+    ENABLE_OPENGL_GFX=no
+fi
+AC_CHECK_HEADERS([GL/glext.h OpenGL/glext.h],
+                 [GLEXT_H_FOUND=1; break], [],
+                 [#ifdef HAVE_GL_GL_H
+#include <GL/gl.h>
+#endif
+#ifdef HAVE_OPENGL_GL_H
+#include <OpenGL/gl.h>
+#endif
+])
+if test "x$GLEXT_H_FOUND" = "x"; then
+    ENABLE_OPENGL_GFX=no
+fi
+fi
 
-AC_CHECK_HEADER(GL/gl.h, ENABLE_OPENGL=true, ENABLE_OPENGL=false)
+AC_CHECK_HEADER(sqlite3.h, ENABLE_SQLITE=true, ENABLE_SQLITE=false)
 
 CPPFLAGS=$OLD_CPPFLAGS
 CXXFLAGS=$OLD_CXXFLAGS
@@ -292,11 +306,9 @@ else
   AC_MSG_RESULT([TTF Disabled])
 fi
 
-if test "x$ENABLE_OPENGL_GFX" = "xtrue"; then
+if test "x$ENABLE_OPENGL_GFX" = "xyes"; then
   AC_MSG_RESULT([OpenGL Enabled])
   FPFEATURES="$FPFEATURES -DOPENGL_GFX=1"
-  ENABLE_SDL12_GFX="false"
-  ENABLE_SDL13_GFX="false"
 else
   AC_MSG_RESULT([OpenGL Disabled])
 fi
@@ -347,7 +359,7 @@ esac
 AM_CONDITIONAL([MACOSX], [test x$MACOSX = xtrue])
 AM_CONDITIONAL([WIN32], [test x$WIN32 = xtrue])
 
-AM_CONDITIONAL([ENABLE_OPENGL_GFX], [test x$ENABLE_OPENGL_GFX = xtrue])
+AM_CONDITIONAL([ENABLE_OPENGL_GFX], [test x$ENABLE_OPENGL_GFX = xyes])
 AM_CONDITIONAL([ENABLE_SDL12_GFX], [test x$ENABLE_SDL12_GFX = xtrue])
 AM_CONDITIONAL([ENABLE_SDL13_GFX], [test x$ENABLE_SDL13_GFX = xtrue])
 AM_CONDITIONAL([ENABLE_NETWORK], [test x$ENABLE_NETWORK = xyes])
