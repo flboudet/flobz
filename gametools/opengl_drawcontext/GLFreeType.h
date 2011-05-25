@@ -5,10 +5,14 @@
 #include <vector>
 #include "config.h"
 
-#ifdef IOS
-#import <OpenGLES/ES1/gl.h>
-#else
+#ifdef HAVE_GL_GL_H
 #include <GL/gl.h>
+#elif defined (HAVE_OPENGL_GL_H)
+#include <OpenGL/gl.h>
+#elif defined (IOS)
+#include <OpenGLES/ES1/gl.h>
+#elif defined (ANDROID)
+#include <GLES/gl.h>
 #endif
 
 //FreeType Headers

@@ -154,8 +154,10 @@ void CompositeSurface::setBlendMode(ImageBlendMode mode)
 void CompositeSurface::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
     CompositeSurface *s = static_cast<CompositeSurface *>(surf);
-    if (!s->m_isCropped)
+    if (!s->m_isCropped) {
         m_baseSurface->draw(s->m_baseSurface.get(), srcRect, dstRect);
+        return;
+    }
     s->m_baseSurface->setBlendMode(m_blendMode);
     if (srcRect == NULL) {
         m_baseSurface->draw(s->m_baseSurface.get(), &(s->m_cropRect), dstRect);

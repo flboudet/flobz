@@ -19,6 +19,8 @@
 #include <OpenGL/gl.h>
 #elif defined (IOS)
 #include <OpenGLES/ES1/gl.h>
+#elif defined (ANDROID)
+#include <GLES/gl.h>
 #endif
 
 #ifdef HAVE_GL_GLEXT_H
@@ -27,6 +29,8 @@
 #include <OpenGL/glext.h>
 #elif defined (IOS)
 #include <OpenGLES/ES1/glext.h>
+#elif defined (ANDROID)
+#include <GLES/glext.h>
 #endif
 
 #include "drawcontext.h"
