@@ -456,7 +456,7 @@ IosSurface *PuyoThemeImpl::getCircleSurfaceForIndex(int index) const
             opList.setValue = true;
             m_baseCircle = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
         }
-        ref = m_baseCircle.get()->setValue(sin(3.14f/2.0f+index*3.14f/64.0f)*0.6f+0.2f);
+        ref = m_baseCircle.get()->setAlpha(sin(3.14f/2.0f+index*3.14f/64.0f)*0.6f+0.2f);
         m_surfaceBin.push_back(ref);
     }
     if ((ref == NULL) && (m_defaultTheme != NULL))

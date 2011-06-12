@@ -121,6 +121,7 @@ public:
     virtual IosSurface *shiftHue(float hue_offset, IosSurface *mask = NULL) = 0;
     virtual IosSurface *shiftHSV(float h, float s, float v) = 0;
     virtual IosSurface *setValue(float value) = 0;
+    virtual IosSurface *setAlpha(float alpha) = 0;
 
     virtual IosSurface * resizeAlpha(int width, int height) = 0;
     virtual IosSurface * mirrorH() = 0;

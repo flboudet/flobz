@@ -11,7 +11,6 @@ class SDL12_IosSurface : public IosSurface
 public:
     SDL12_IosSurface(SDL_Surface *surf);
     virtual ~SDL12_IosSurface();
-    //void setAlpha(unsigned char alpha);
 public:
     // DrawTarget implementation
     virtual void draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
@@ -32,6 +31,7 @@ public:
     virtual IosSurface *shiftHue(float hue_offset, IosSurface *mask = NULL);
     virtual IosSurface *shiftHSV(float h, float s, float v);
     virtual IosSurface *setValue(float value);
+    virtual IosSurface *setAlpha(float alpha);
 
     virtual IosSurface * resizeAlpha(int width, int height);
     virtual IosSurface * mirrorH();

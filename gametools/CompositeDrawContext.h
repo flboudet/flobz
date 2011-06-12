@@ -99,6 +99,7 @@ public:
     virtual IosSurface *shiftHue(float hue_offset, IosSurface *mask = NULL);
     virtual IosSurface *shiftHSV(float h, float s, float v);
     virtual IosSurface *setValue(float value);
+    virtual IosSurface *setAlpha(float alpha);
     virtual IosSurface * resizeAlpha(int width, int height);
     virtual IosSurface * mirrorH();
     virtual void         convertToGray();

@@ -100,6 +100,21 @@ IosSurface *CompositeSurface::setValue(float value)
                                 srcSurface->setValue(value));
 }
 
+IosSurface *CompositeSurface::setAlpha(float alpha)
+{
+    IosSurface *srcSurface = m_baseSurface.get();
+    auto_ptr<IosSurface> tempSurface;
+    if (m_isCropped) {
+        DrawContext &baseDC = m_ownerImageLibrary.getBaseDrawContext();
+        tempSurface.reset(baseDC.getImageLibrary().createImage(IMAGE_RGBA, m_cropRect.w, m_cropRect.h, IMAGE_READ));
+        tempSurface->setBlendMode(IMAGE_COPY);
+        tempSurface->draw(m_baseSurface.get(), &m_cropRect, NULL);
+        srcSurface = tempSurface.get();
+    }
+    return new CompositeSurface(m_ownerImageLibrary,
+                                srcSurface->setAlpha(alpha));
+}
+
 IosSurface * CompositeSurface::resizeAlpha(int width, int height)
 {
     // If the DC doesnt'have the ability to scale graphics when drawing,

@@ -7,6 +7,7 @@
 //
 
 #include <math.h>
+#include <string>
 #include "OpenGLDrawContext.h"
 #include "GTLog.h"
 #include "ios_mutex.h"
@@ -570,10 +571,10 @@ private:
             GLubyte *emptyData;
             switch (m_format) {
                 case GL_RGB:
-                    emptyData = (GLubyte *)malloc(3 * m_p2w * m_p2h);
+                    emptyData = (GLubyte *)calloc(3 * m_p2w * m_p2h, 1);
                     break;
                 default:
-                    emptyData = (GLubyte *)malloc(4 * m_p2w * m_p2h);
+                    emptyData = (GLubyte *)calloc(4 * m_p2w * m_p2h, 1);
                     break;
             }
             glTexImage2D(GL_TEXTURE_2D, 0, m_format, m_p2w, m_p2h, 0, m_format, GL_UNSIGNED_BYTE, emptyData);
@@ -748,6 +749,7 @@ public:
     virtual IosSurface *shiftHue(float hue_offset, IosSurface *mask = NULL);
     virtual IosSurface *shiftHSV(float h, float s, float v);
     virtual IosSurface *setValue(float value);
+    virtual IosSurface *setAlpha(float alpha);
     virtual IosSurface * resizeAlpha(int width, int height);
     virtual IosSurface * mirrorH();
     virtual void convertToGray();
@@ -774,10 +776,12 @@ public:
 private:
     OpenGLDrawContext *m_owner;
     OpenGLBackendUtil *m_backendUtil;
+protected:
+    float m_alpha;
 };
 
 IosGLSurfaceRef::IosGLSurfaceRef(OpenGLDrawContext *owner, OpenGLBackendUtil *backendUtil, OpenGLTexture *s)
-    : m_ref(s), m_owner(owner), m_backendUtil(backendUtil)
+    : m_ref(s), m_owner(owner), m_backendUtil(backendUtil), m_alpha(1.0)
 {
     this->h = m_ref->m_h;
     this->w = m_ref->m_w;
@@ -788,7 +792,7 @@ IosGLSurfaceRef::IosGLSurfaceRef(OpenGLDrawContext *owner, OpenGLBackendUtil *ba
 }
 
 IosGLSurfaceRef::IosGLSurfaceRef(IosGLSurfaceRef *s)
-    : m_ref(s->m_ref), m_backendUtil(s->m_backendUtil)
+    : m_ref(s->m_ref), m_backendUtil(s->m_backendUtil), m_alpha(1.0)
 {
     this->h = m_ref->m_h;
     this->w = m_ref->m_w;
@@ -868,6 +872,13 @@ IosSurface *IosGLSurfaceRef::setValue(float value)
         return ret;
     }
     return new IosGLSurfaceRef(this);
+}
+
+IosSurface *IosGLSurfaceRef::setAlpha(float alpha)
+{
+    IosGLSurfaceRef *result = new IosGLSurfaceRef(this);
+    result->m_alpha = alpha;
+    return result;
 }
 
 IosSurface * IosGLSurfaceRef::resizeAlpha(int width, int height)
@@ -1088,6 +1099,10 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMod
         vertices[5] = pDstRect->y+pDstRect->h;
         vertices[6] = pDstRect->x+pDstRect->w;
         vertices[7] = pDstRect->y+pDstRect->h;
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glColor4f(1.0f,1.0f,1.0f,m_alpha);
+
         glTexCoordPointer(2, GL_FLOAT, 0, &texcoord[0]);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glVertexPointer(2, GL_FLOAT, 0, &vertices[0]);

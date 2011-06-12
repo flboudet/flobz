@@ -4,18 +4,6 @@
    Sven Olsen, 2003
    */
 
-//OpenGL Headers 
-// #include <windows.h>		//(the GL headers need it)
-#if defined(__APPLE_CC__)
-//#include <OpenGLES/EAGL.h>
-#include <OpenGLES/ES1/gl.h>
-#include <OpenGLES/ES1/glext.h>
-//#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
-
 //Include our header file.
 #include "GLFreeType.h"
 
@@ -40,7 +28,7 @@ namespace flobopop {
 
 int GLFONT_SCREEN_HEIGHT;
 float GLFONT_letter_spacing;
-    
+
 //Inside of this namespace, give ourselves the ability
 //to write just "vector" instead of "std::vector"
 using std::vector;
@@ -65,7 +53,7 @@ using std::string;
         glDeleteTextures(1, &texture);
         GL_GET_ERROR();
     }
-    
+
     ///Create a display list coresponding to the give character.
     void make_dlist ( FT_Face face, unsigned short ch, unsigned int h, GlyphData &glyphData) {
 
@@ -110,7 +98,7 @@ using std::string;
         // Is The FreeType Bitmap Otherwise.
         for(int j=0; j <height;j++) for(int i=0; i < width; i++) {
             expanded_data[2*(i+j*width)] = 255;
-            expanded_data[2*(i+j*width)+1] = (i>=bitmap.width || j>=bitmap.rows) ? 
+            expanded_data[2*(i+j*width)+1] = (i>=bitmap.width || j>=bitmap.rows) ?
               0 : bitmap.buffer[i + bitmap.width*j];
         }
         GL_GET_ERROR();
@@ -133,8 +121,8 @@ using std::string;
 
         //Now we need to account for the fact that many of
         //our textures are filled with empty padding space.
-        //We figure what portion of the texture is used by 
-        //the actual character and store that information in 
+        //We figure what portion of the texture is used by
+        //the actual character and store that information in
         //the x and y variables, then when we draw the
         //quad, we will only reference the parts of the texture
         //that we contain the character itself.
@@ -142,7 +130,7 @@ using std::string;
                 y=(float)bitmap.rows / (float)height;
 
         //Here we draw the texturemaped quads.
-        //The bitmap that we got from FreeType was not 
+        //The bitmap that we got from FreeType was not
         //oriented quite like we would like it to be,
         //so we need to link the texture to the quad
         //so that the result will be properly aligned.
@@ -182,7 +170,7 @@ using std::string;
         this->h=h;
 
         //Create and initilize a freetype font library.
-        if (FT_Init_FreeType( &library )) 
+        if (FT_Init_FreeType( &library ))
             throw std::runtime_error("FT_Init_FreeType failed");
 
         //The object in which Freetype holds information on a given
@@ -191,7 +179,7 @@ using std::string;
         //This is where we load in the font information from the file.
         //Of all the places where the code might die, this is the most likely,
         //as FT_New_Face will die if the font file does not exist or is somehow broken.
-        if (FT_New_Face( library, fname, 0, &face )) 
+        if (FT_New_Face( library, fname, 0, &face ))
             throw std::runtime_error("FT_New_Face failed (there is probably a problem with your font file)");
 
         //For some twisted reason, Freetype measures font size
@@ -199,7 +187,7 @@ using std::string;
         //h pixels high, we need to request a size of h*64.
         //(h << 6 is just a prettier way of writting h*64)
         FT_Set_Char_Size( face, h << 6, h << 6, 96, 96);
-        
+
         //This is where we actually create each of the fonts display lists.
         //for(unsigned short i=0;i<256;i++)
         //    make_dlist(face,i,h,asciiGlyphes[i]);
@@ -209,23 +197,23 @@ using std::string;
         //We don't need the face information now that the display
         //lists have been created, so we free the assosiated resources.
         FT_Done_Face(face);
-        
+
         //Ditto for the library.
         FT_Done_FreeType(library);
-        
+
         //We have to clean the map of non-ascii characters
         for (GlyphMap::iterator iter = nonAsciiGlyphes.begin() ;
              iter != nonAsciiGlyphes.end() ; iter++) {
             delete (iter->second);
         }
     }
-	
+
 	float GLFont::getWidthUnicode(const unsigned short *text)  {
         if (text == NULL)
             return 0.;
         MultiLine lines;
         textToLines(text, lines);
-		
+
         float width = 0.0f;
         for(unsigned int i=0;i<lines.size();i++) {
             float w = 0.0f;
@@ -286,9 +274,9 @@ using std::string;
         MultiLine lines;
         textToLines(text, lines);
 
-        //glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT  | GL_ENABLE_BIT | GL_TRANSFORM_BIT);	
+        //glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT  | GL_ENABLE_BIT | GL_TRANSFORM_BIT);
         //glMatrixMode(GL_MODELVIEW);
-        
+
         glDisable(GL_LIGHTING);
         glEnable(GL_TEXTURE_2D);
         glDisable(GL_DEPTH_TEST);
