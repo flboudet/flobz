@@ -209,13 +209,23 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
     int        dy    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.y");
     int        dw    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.width");
     int        dh    = (int)GSL_LOCAL_FLOAT(gsl, local, "display.height");
+    float dscalex    = (float)GSL_LOCAL_FLOAT(gsl, local, "display.scale.x");
+    float dscaley    = (float)GSL_LOCAL_FLOAT(gsl, local, "display.scale.y");
     float  scalex    = (float)GSL_LOCAL_FLOAT(gsl, local, "&this.scale.x");
     float  scaley    = (float)GSL_LOCAL_FLOAT(gsl, local, "&this.scale.y");
 
+    dw *= dscalex;
+    dh *= dscaley;
+    scalex *= dscalex;
+    scaley *= dscaley;
+    
     const char *parent = (const char*)GSL_LOCAL_PTR(gsl, local, "&this.parent");
     Vec2 parentPos = global_sprite_get_position(gsl, parent);
     x += (int)parentPos.x;
     y += (int)parentPos.y;
+    
+    x *= dscalex;
+    y *= dscaley;
 
     GHashValue  *img  = goom_hash_get(styrolyse->images, path);
     void        *data = NULL;

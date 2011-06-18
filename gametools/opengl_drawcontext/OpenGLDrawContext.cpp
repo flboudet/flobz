@@ -516,8 +516,8 @@ int OpenGLIosFont::getLineSkip()
 class OpenGLTexture
 {
 public:
-    OpenGLTexture(GLint format, int w, int h);
-    OpenGLTexture(OpenGLRawImage *rawImage, bool preserveRawData=false);
+    OpenGLTexture(OpenGLDrawContext *owner, GLint format, int w, int h);
+    OpenGLTexture(OpenGLDrawContext *owner, OpenGLRawImage *rawImage, bool preserveRawData=false);
 	~OpenGLTexture();
     RGBA readRGBA(int x, int y);
     void setOpaque(bool opaque) { m_opaque = opaque; }
@@ -525,6 +525,7 @@ public:
     GLubyte *getRawImageData() const;
 private:
 	friend class IosGLSurfaceRef;
+    OpenGLDrawContext *m_owner;
     ios_fc::SharedPtr<OpenGLRawImage> m_rawImage;
     bool m_preserveRawData;
     GLuint m_fbo;
@@ -611,11 +612,11 @@ private:
 #endif
         // Setup OpenGL projection
         glPushMatrix();
+        //glViewport(0, 0, this->m_w, this->m_h);
         /*glLoadIdentity();
-         glViewport(0, 0, this->m_w, this->m_h);
          glOrthof(0.0, (GLfloat) this->m_w, (GLfloat) this->m_h, 0.0, 0.0, 1.0);*/
         glTranslatef(0.0f, 480.0f, 0.0f);
-        glScalef(1,-1,1);
+        glScalef(m_owner->getPixelRatioX(),-m_owner->getPixelRatioY(),1);
 #ifdef DISABLED
         /*glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -643,8 +644,8 @@ private:
 	}
 };
 
-OpenGLTexture::OpenGLTexture(GLint format, int w, int h)
-: m_preserveRawData(false), m_format(format), m_opaque(m_format==GL_RGB?true:false)
+OpenGLTexture::OpenGLTexture(OpenGLDrawContext *owner, GLint format, int w, int h)
+: m_owner(owner), m_preserveRawData(false), m_format(format), m_opaque(m_format==GL_RGB?true:false)
 {
     m_h = h;
     m_w = w;
@@ -656,8 +657,8 @@ OpenGLTexture::OpenGLTexture(GLint format, int w, int h)
     m_nRef = 0;
 }
 
-OpenGLTexture::OpenGLTexture(OpenGLRawImage *rawImage, bool preserveRawData)
-: m_rawImage(rawImage), m_preserveRawData(preserveRawData), m_format(rawImage->format), m_opaque(m_format==GL_RGB?true:false)
+OpenGLTexture::OpenGLTexture(OpenGLDrawContext *owner, OpenGLRawImage *rawImage, bool preserveRawData)
+: m_owner(owner), m_rawImage(rawImage), m_preserveRawData(preserveRawData), m_format(rawImage->format), m_opaque(m_format==GL_RGB?true:false)
 {
     m_h = rawImage->height;
     m_w = rawImage->width;
@@ -847,7 +848,7 @@ IosSurface *IosGLSurfaceRef::shiftHue(float hue_offset, IosSurface *mask)
                                                   rawMask, maskSurf->m_ref->m_p2w, maskSurf->m_ref->m_p2h,hue_offset);
         }
         OpenGLRawImage *newRawImage = new MallocedOpenGLRawImage(GL_RGBA, m_ref->m_w, m_ref->m_h, m_ref->m_p2w, m_ref->m_p2h, newData);
-        OpenGLTexture* retSurf = new OpenGLTexture(newRawImage);
+        OpenGLTexture* retSurf = new OpenGLTexture(m_owner, newRawImage);
         IosGLSurfaceRef *ret = new IosGLSurfaceRef(m_owner, m_backendUtil, retSurf);
         ret->copyDrawMode(this);
         return ret;
@@ -866,7 +867,7 @@ IosSurface *IosGLSurfaceRef::setValue(float value)
     if ((rawImage != NULL) && (m_ref->m_format == GL_RGBA) && (value != 0)) {
         GLubyte *newData = image_rgba_shift_hsv(rawImage, m_ref->m_p2w, m_ref->m_p2h, 0, 0, value);
         OpenGLRawImage *newRawImage = new MallocedOpenGLRawImage(GL_RGBA, m_ref->m_w, m_ref->m_h, m_ref->m_p2w, m_ref->m_p2h, newData);
-        OpenGLTexture* retSurf = new OpenGLTexture(newRawImage);
+        OpenGLTexture* retSurf = new OpenGLTexture(m_owner, newRawImage);
         IosGLSurfaceRef *ret = new IosGLSurfaceRef(m_owner, m_backendUtil, retSurf);
         ret->copyDrawMode(this);
         return ret;
@@ -1099,8 +1100,6 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMod
         vertices[5] = pDstRect->y+pDstRect->h;
         vertices[6] = pDstRect->x+pDstRect->w;
         vertices[7] = pDstRect->y+pDstRect->h;
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glColor4f(1.0f,1.0f,1.0f,m_alpha);
 
         glTexCoordPointer(2, GL_FLOAT, 0, &texcoord[0]);
@@ -1124,14 +1123,14 @@ OpenGLImageLibrary::OpenGLImageLibrary(OpenGLDrawContext *owner, OpenGLBackendUt
 
 IosSurface * OpenGLImageLibrary::createImage(ImageType type, int w, int h, ImageSpecialAbility specialAbility)
 {
-	OpenGLTexture *s = new OpenGLTexture(m_backendUtil->toGL(type), w, h);
+	OpenGLTexture *s = new OpenGLTexture(m_owner, m_backendUtil->toGL(type), w, h);
 	return new IosGLSurfaceRef(m_owner, m_backendUtil, s);
 }
 
 IosSurface * OpenGLImageLibrary::loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility)
 {
     OpenGLRawImage *image = m_backendUtil->loadImage(type, path);
-    OpenGLTexture *tex = new OpenGLTexture(image, (specialAbility & IMAGE_READ));
+    OpenGLTexture *tex = new OpenGLTexture(m_owner, image, (specialAbility & IMAGE_READ));
     IosSurface *result = new IosGLSurfaceRef(m_owner, m_backendUtil, tex);
 	result->name = path;
     return result;
@@ -1143,22 +1142,25 @@ IosFont * OpenGLImageLibrary::createFont(const char *path, int size, IosFontFx f
 }
 
 
-void OpenGLDrawContext::init(OpenGLBackendUtil *backendUtil, int width, int height)
+void OpenGLDrawContext::init(OpenGLBackendUtil *backendUtil, int width, int height, int viewportWidth, int viewportHeight)
 {
     m_backendUtil = backendUtil;
     //glMutex = new ios_fc::Mutex();
     // Retrieve the correct view size
     this->h = height;
     this->w = width;
+    m_viewportWidth = (viewportWidth == 0 ? width : viewportWidth);
+    m_viewportHeight = (viewportHeight == 0 ? height : viewportHeight);
 
     // Setup OpenGL projection
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glViewport(0, 0, this->w, this->h);
+    glViewport(0, 0, m_viewportWidth, m_viewportHeight);
 #ifdef OPENGLES
     glOrthof(0.0, (GLfloat) this->w, (GLfloat) this->h, 0.0, 0.0, 1.0); GL_GET_ERROR();
+
 #else
     glOrtho(0.0, (GLfloat) this->w, (GLfloat) this->h, 0.0, 0.0, 1.0); GL_GET_ERROR();
 #endif
@@ -1205,11 +1207,35 @@ void OpenGLDrawContext::flip()
 void OpenGLDrawContext::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
     m_backendUtil->ensureContextIsActive();
+    //glTranslatef(160.0f, 0.0f, 0.0f);
 	IosRect *pSrcRect, *pDstRect;
 	fixRects(srcRect, dstRect, surf, this, &pSrcRect, &pDstRect);
-	IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef *> (surf);
+    IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef *> (surf);
 	ipSurf->applyBlendMode(IMAGE_BLEND);
-	ipSurf->drawToGL(pSrcRect, pDstRect);
+    if (m_clipRectPtr == NULL) {
+        ipSurf->drawToGL(pSrcRect, pDstRect);
+    }
+    else {
+        // SrcRect computation
+        IosRect sSrcResult;
+        float scalex = 1.f, scaley = 1.f;
+        if ((pSrcRect->h != 0 && pDstRect->h != 0) && (pSrcRect->h != pDstRect->h))
+            scaley = (float)pSrcRect->h / (float)pDstRect->h;
+        if ((pSrcRect->w != 0 && pDstRect->w != 0) && (pSrcRect->w != pDstRect->w))
+            scalex = (float)pSrcRect->w / (float)pDstRect->w;
+        IosRect srcClip = {m_clipRect.x - pDstRect->x + pSrcRect->x,
+            m_clipRect.y - pDstRect->y + pSrcRect->y,
+            scalex*m_clipRect.w,
+            scaley*m_clipRect.h };
+        if (! pSrcRect->hasIntersection(srcClip, sSrcResult))
+            return;
+        // DstRect computation
+        IosRect sDstResult;
+        if (! pDstRect->hasIntersection(m_clipRect, sDstResult))
+            return;
+        ipSurf->drawToGL(&sSrcResult, &sDstResult);
+    }
+    //glTranslatef(-160.0f, 0.0f, 0.0f);
 }
 
 void OpenGLDrawContext::drawRotatedCentered(IosSurface *surf, int angle, int x, int y) {
@@ -1237,6 +1263,12 @@ void OpenGLDrawContext::drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect
 }
 
 void OpenGLDrawContext::setClipRect(IosRect *rect) {
+    if (rect == NULL)
+        m_clipRectPtr = NULL;
+    else {
+        m_clipRect = *rect;
+        m_clipRectPtr = &m_clipRect;
+    }
 }
 
 void OpenGLDrawContext::fillRect(const IosRect *rect, const RGBA &color) {

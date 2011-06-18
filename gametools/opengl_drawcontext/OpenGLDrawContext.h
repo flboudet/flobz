@@ -100,7 +100,9 @@ private:
 class OpenGLDrawContext : public DrawContext
 {
 public:
-    void init(OpenGLBackendUtil *backendUtil, int width, int height);
+    OpenGLDrawContext() : m_clipRectPtr(NULL) {}
+    virtual ~OpenGLDrawContext() {}
+    void init(OpenGLBackendUtil *backendUtil, int width, int height, int viewportWidth = 0, int viewportHeight = 0);
 public:
     virtual int getHeight() const;
     virtual int getWidth() const;
@@ -123,10 +125,15 @@ public:
     // Performance measurement
     void startFrame();
     void endFrame();
+    // Special properties
+    float getPixelRatioX() const { return (float)w / (float)m_viewportWidth; }
+    float getPixelRatioY() const { return (float)h / (float)m_viewportHeight; }
 private:
     OpenGLBackendUtil *m_backendUtil;
 private:
     std::auto_ptr<OpenGLImageLibrary> iimLib;
+    IosRect m_clipRect, *m_clipRectPtr;
+    int m_viewportWidth, m_viewportHeight;
 public:
 	GLfloat matrix[16];
 };
