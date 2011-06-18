@@ -3,10 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h> // Conforms to ANSI "C 89", is that OK?
-#ifdef MACOSX
-#include <SDL_image/SDL_image.h>
-#else
+#include "config.h"
+#ifdef HAVE_SDL_SDL_IMAGE_H
 #include <SDL_image.h>
+#else
+#ifdef HAVE_SDL_IMAGE_SDL_IMAGE_H
+#include <SDL_image/SDL_image.h>
+#endif
 #endif
 
 /** Image loading... free... conversion */
