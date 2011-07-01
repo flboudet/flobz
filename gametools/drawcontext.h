@@ -215,6 +215,8 @@ public:
     virtual int getHeight() const = 0;
     virtual int getWidth() const = 0;
     virtual ImageLibrary &getImageLibrary() = 0;
+    // Special operations
+    virtual void setOffset(int offX, int offY) {}
     // Query for drawcontext abilities
     virtual bool hasScaleAbility() const { return false; }
     virtual ImageSpecialAbility guessRequiredImageAbility(const ImageOperationList &list) = 0;

@@ -13,6 +13,7 @@
 MainRealMenu::MainRealMenu(MainScreen * mainScreen) :
 // Create sub screens
 MainScreenMenu(mainScreen),
+soloGameMenu      (mainScreen),
 localGameMenu     (mainScreen),
 local2PlayersGameMenu(mainScreen),
 optionMenu        (mainScreen),
@@ -21,12 +22,14 @@ popFromCreditsAction(),
 hallOfFameScreen(&popFromHallScreenAction),
 creditsScreen("credits.gsl", &popFromCreditsAction, false),
 // Create action for buttons
+soloGameAction(&soloGameMenu, mainScreen),
 singlePlayerGameAction(&localGameMenu, mainScreen),
 twoPlayersGameAction(&local2PlayersGameMenu, mainScreen),
 optionAction(&optionMenu, mainScreen),
 hallOfFameAction(&hallOfFameScreen),
 creditsAction(&creditsScreen, mainScreen),
 // Create buttons
+soloGameButton(theCommander->getLocalizedString("Solo Game"), &soloGameAction),
 singlePlayerGameButton(theCommander->getLocalizedString(kSinglePlayerGame), &singlePlayerGameAction),
 twoPlayersGameButton(theCommander->getLocalizedString("Two Players Game"), &twoPlayersGameAction),
 optionButton(theCommander->getLocalizedString("Options"), &optionAction),
@@ -51,6 +54,7 @@ void MainRealMenu::build() {
   localGameMenu.build();
   local2PlayersGameMenu.build();
   optionMenu.build();
+  add(&soloGameButton);
   add(&singlePlayerGameButton);
   add(&twoPlayersGameButton);
 #ifdef ENABLE_NETWORK

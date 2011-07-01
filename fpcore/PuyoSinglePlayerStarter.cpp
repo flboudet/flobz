@@ -52,7 +52,7 @@ void SinglePlayerGameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB,
     if (level >= 20) corrected_level = level + (3 - lives); // Easy level, make sure the player do always loose the same oponent.
     opponentcontroller = new AIPlayer(corrected_level, areaB);
 
-    GameWidget::initWithGUI(areaA, areaB, playercontroller, *opponentcontroller,
+    GameWidget2P::initWithGUI(areaA, areaB, playercontroller, *opponentcontroller,
                                levelTheme, gameOverAction);
     addSubWidget(&killLeftCheat);
     addSubWidget(&killRightCheat);
@@ -112,7 +112,7 @@ void SinglePlayerGameWidget::cycle()
     if (faceTicks == 100) {
         faceTicks = 0;
     }
-    GameWidget::cycle();
+    GameWidget2P::cycle();
 }
 
 StoryWidget *SinglePlayerGameWidget::getOpponent()

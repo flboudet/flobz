@@ -41,7 +41,7 @@ private:
     PuyoRandomSystem *attachedRandom;
 };
 
-class TwoPlayerGameWidget : public GameWidget {
+class TwoPlayerGameWidget : public GameWidget2P {
 public:
     TwoPlayerGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, gameui::Action *gameOverAction = NULL);
 private:

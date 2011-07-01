@@ -1145,6 +1145,8 @@ IosFont * OpenGLImageLibrary::createFont(const char *path, int size, IosFontFx f
 void OpenGLDrawContext::init(OpenGLBackendUtil *backendUtil, int width, int height, int viewportWidth, int viewportHeight)
 {
     m_backendUtil = backendUtil;
+    m_offsetX = 0.f;
+    m_offsetY = 0.f;
     //glMutex = new ios_fc::Mutex();
     // Retrieve the correct view size
     this->h = height;
@@ -1207,7 +1209,7 @@ void OpenGLDrawContext::flip()
 void OpenGLDrawContext::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
 {
     m_backendUtil->ensureContextIsActive();
-    //glTranslatef(160.0f, 0.0f, 0.0f);
+    glTranslatef(m_offsetX, m_offsetY, 0.0f);
 	IosRect *pSrcRect, *pDstRect;
 	fixRects(srcRect, dstRect, surf, this, &pSrcRect, &pDstRect);
     IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef *> (surf);
@@ -1228,14 +1230,15 @@ void OpenGLDrawContext::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRec
             scalex*m_clipRect.w,
             scaley*m_clipRect.h };
         if (! pSrcRect->hasIntersection(srcClip, sSrcResult))
-            return;
+            goto END;
         // DstRect computation
         IosRect sDstResult;
         if (! pDstRect->hasIntersection(m_clipRect, sDstResult))
-            return;
+            goto END;
         ipSurf->drawToGL(&sSrcResult, &sDstResult);
     }
-    //glTranslatef(-160.0f, 0.0f, 0.0f);
+END:
+    glTranslatef(-m_offsetX, -m_offsetY, 0.0f);
 }
 
 void OpenGLDrawContext::drawRotatedCentered(IosSurface *surf, int angle, int x, int y) {
@@ -1289,6 +1292,12 @@ void OpenGLDrawContext::putStringCenteredXY(IosFont *font, int x, int y, const c
 	m_backendUtil->ensureContextIsActive();
 	OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
 	ifont->printCentered(x,y-ifont->getHeight()/2,text);
+}
+
+void OpenGLDrawContext::setOffset(int offX, int offY)
+{
+    m_offsetX = offX;
+    m_offsetY = offY;
 }
 
 void OpenGLDrawContext::startFrame()

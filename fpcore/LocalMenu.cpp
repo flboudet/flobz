@@ -32,7 +32,8 @@ class NoNameAction : public Action {
           : locale(locale), field(field)
         {}
 
-        virtual void action() {
+
+    virtual void action() {
             String s = field.getValue();
             if (s == "") {
                 s = locale.getLocalizedString("NoName");
@@ -43,6 +44,44 @@ class NoNameAction : public Action {
         LocalizedDictionary locale;
         EditField &field;
 };
+
+SoloGameMenu::SoloGameMenu(MainScreen *mainScreen)
+  : MainScreenMenu(mainScreen)
+{
+    m_editPlayerName.reset(new EditFieldWithLabel(
+                               theCommander->getLocalizedString("Player:"),
+                               PuyoGame::getDefaultPlayerName(0),
+                               PuyoGame::getDefaultPlayerKey(0),
+                               theCommander->getEditFieldFramePicture(),
+                               theCommander->getEditFieldOverFramePicture(), 150));
+    m_screenTitleFrame.reset(new Frame(theCommander->getSeparatorFramePicture()));
+    m_screenTitle.reset(new Text(theCommander->getLocalizedString("Choose Game Level")));
+    m_easyAction.reset(new SoloModeStarterAction(EASY, this));
+    m_mediumAction.reset(new SoloModeStarterAction(MEDIUM, this));
+    m_hardAction.reset(new SoloModeStarterAction(HARD,   this));
+    m_popAction.reset(new PuyoPopMenuAction(mainScreen));
+    m_easy.reset(new   Button(theCommander->getLocalizedString("Beginner"), m_easyAction.get()));
+    m_medium.reset(new Button(theCommander->getLocalizedString("Normal"), m_mediumAction.get()));
+    m_hard.reset(new   Button(theCommander->getLocalizedString("Expert"), m_hardAction.get()));
+    m_back.reset(new   Button(theCommander->getLocalizedString("Back"), m_popAction.get()));
+
+    setPolicy(USE_MIN_SIZE);
+    m_screenTitleFrame->add(m_screenTitle.get());
+    add(m_screenTitleFrame.get());
+    m_screenTitleFrame->setPreferedSize(Vec3(0, 20));
+    m_buttonsBox.add(m_easy.get());
+    m_buttonsBox.add(m_medium.get());
+    m_buttonsBox.add(m_hard.get());
+    m_buttonsBox.add(m_editPlayerName.get());
+    m_buttonsBox.add(m_back.get());
+    add(&m_buttonsBox);
+}
+
+String SoloGameMenu::getPlayerName(int playerNumber) const
+{
+    String playerName = "toto";//editPlayerName.getEditField().getValue();
+    return playerName;
+}
 
 LocalGameMenu::LocalGameMenu(MainScreen *mainScreen)
     : MainScreenMenu(mainScreen),

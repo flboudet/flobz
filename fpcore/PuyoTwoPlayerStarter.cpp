@@ -53,7 +53,7 @@ void TwoPlayersGameWidget::cycle()
     opponentFace.setIntegerValue("@neutralsForRight", attachedGameB->getNeutralPuyos());
     opponentFace.setIntegerValue("@comboPhaseLeft", attachedGameA->getComboPhase());
     opponentFace.setIntegerValue("@comboPhaseRight", attachedGameB->getComboPhase());
-    GameWidget::cycle();
+    GameWidget2P::cycle();
 }
 
 //---------------------------------

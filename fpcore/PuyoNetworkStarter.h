@@ -43,7 +43,7 @@ private:
     int gameId;
 };
 
-class PuyoNetworkGameWidget : public GameWidget, MessageListener, ChatBoxDelegate {
+class PuyoNetworkGameWidget : public GameWidget2P, MessageListener, ChatBoxDelegate {
 public:
     enum {
         NETWORK_FAILURE = GAME_IS_OVER+1

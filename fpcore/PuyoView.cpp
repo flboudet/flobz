@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <unistd.h>
+#include "GTLog.h"
 #include "PuyoView.h"
 #include "PuyoAnimations.h"
 #include "AnimatedPuyo.h"
@@ -81,7 +82,6 @@ PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory)
     attachedPuyoFactory(this), delayBeforeGameOver(60), haveDisplay(false),
     neutralXOffset(-1), neutralYOffset(-1)
 {
-    m_scoreDisplay.reset(new PlayerGameStatDisplay(attachedGame->getGameStat()));
     initCommon(attachedPuyoGameFactory);
 }
 
@@ -300,7 +300,7 @@ void PuyoView::renderScore(DrawTarget *dt)
     m_scoreDisplay->draw(dt);
 }
 
-void PuyoView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex) {
+void PuyoView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex, int totalNeutral) {
     if (!haveDisplay) return;
     int x = neutralPuyo->getPuyoX();
     int y = neutralPuyo->getPuyoY();
@@ -311,6 +311,15 @@ void PuyoView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex) {
         if (belowPuyo != NULL) {
             belowPuyo->addAnimation(new SmoothBounceAnimation(*belowPuyo, synchronizer));
         }
+    }
+    if ((neutralIndex == 2) && (totalNeutral > 4)) {
+        if (totalNeutral > 20)
+            totalNeutral = 20;
+        int duration = totalNeutral * 3;
+        int shakeCount = totalNeutral / 4.f;
+        float amplY = totalNeutral * 2.f;
+        Animation *shakingAnimation = new ScreenShakingAnimation(duration, shakeCount, 0.f, amplY, 1.0f, synchronizer);
+        viewAnimations.add(shakingAnimation);
     }
 }
 
@@ -363,6 +372,7 @@ void PuyoView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNu
 {
     if (!haveDisplay) return;
     double groupPadding = 0.;
+    // Exploding puyo animation
     AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
     for (int i = 0, j = puyoGroup.size() ; i < j ; i++) {
         AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(puyoGroup[i]);
@@ -376,7 +386,6 @@ void PuyoView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNu
         groupPadding += newAnimation->getPuyoSoundPadding();
     }
     viewAnimations.add(new VanishSoundAnimation(phase, synchronizer, groupPadding / puyoGroup.size()));
-
     // "pastaga" management
     if (groupNum == 0) {
       static const char * sound_yahoohoo[7] = {
@@ -444,8 +453,8 @@ void PuyoView::gameLost()
             }
         }
     }
+    Animation *shakingAnimation = new ScreenShakingAnimation(80, 12, 10.f, 5.f, 1.f);
+    viewAnimations.add(shakingAnimation);
+    AudioManager::playSound("earthquake.wav", 1.0);
 }
-
-
-
 

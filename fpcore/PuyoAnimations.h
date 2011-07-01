@@ -217,5 +217,25 @@ private:
     int yAccel;
 };
 
+class ScreenShakingAnimation : public Animation {
+public:
+    ScreenShakingAnimation(int duration, int shakeCount,
+                           float amplX, float amplY,
+                           float smoothFactor,
+                           AnimationSynchronizer *synchronizer = NULL);
+    virtual ~ScreenShakingAnimation();
+    void cycle();
+    void draw(int semiMove, DrawTarget *dt);
+private:
+    int m_iter;
+    int m_duration, m_shakeCount;
+    float m_amplX, m_amplY;
+    float m_smoothFactor;
+    AnimationSynchronizer *m_synchronizer;
+    float m_sineStep;
+    float m_sine;
+    DrawContext *m_dc;
+};
+
 #endif // _PUYOANIMATIONS
 

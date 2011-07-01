@@ -30,8 +30,27 @@
 #include "FramedEditField.h"
 #include "MainScreen.h"
 #include "PuyoCommander.h"
+#include "SoloGameStarter.h"
 #include "PuyoSinglePlayerStarter.h"
 #include "PuyoTwoPlayerStarter.h"
+
+class SoloGameMenu : public MainScreenMenu, public PlayerNameProvider {
+public:
+    SoloGameMenu(MainScreen *mainScreen);
+    // PlayerNameProvider implementation
+    virtual String getPlayerName(int playerNumber) const;
+    void build() {}
+private:
+    VBox m_buttonsBox;
+    std::auto_ptr<EditFieldWithLabel> m_editPlayerName;
+    std::auto_ptr<Frame> m_screenTitleFrame;
+    std::auto_ptr<Text> m_screenTitle;
+    std::auto_ptr<Button> m_easy, m_medium, m_hard, m_back;
+    std::auto_ptr<SoloModeStarterAction> m_easyAction;
+    std::auto_ptr<SoloModeStarterAction> m_mediumAction;
+    std::auto_ptr<SoloModeStarterAction> m_hardAction;
+    std::auto_ptr<PuyoPopMenuAction> m_popAction;
+};
 
 class LocalGameMenu : public MainScreenMenu, public PlayerNameProvider {
 public:

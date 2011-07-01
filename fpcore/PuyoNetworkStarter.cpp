@@ -68,7 +68,7 @@ void PuyoNetworkGameWidget::initWithGUI(PuyoSetTheme &puyoThemeSet, LevelTheme &
     chatBox = std::auto_ptr<ChatBox>(new ChatBox(*this));
     brokenNetworkWidget = std::auto_ptr<StoryWidget>(new StoryWidget("etherdown.gsl"));
     networkIsBroken = false;
-    GameWidget::initWithGUI(*localArea, *networkArea, *playercontroller, *dummyPlayerController, levelTheme, gameOverAction);
+    GameWidget2P::initWithGUI(*localArea, *networkArea, *playercontroller, *dummyPlayerController, levelTheme, gameOverAction);
     setLives(-1);
 }
 
@@ -118,7 +118,7 @@ void PuyoNetworkGameWidget::cycle()
         networkIsBroken = false;
     }
     // Let the game behave
-    GameWidget::cycle();
+    GameWidget2P::cycle();
     mbox->idle();
 }
 
@@ -142,7 +142,7 @@ void PuyoNetworkGameWidget::onMessage(Message &message)
             actionAfterGameOver(false, GAMEOVER_STARTPRESSED);
             break;
         case PuyoMessage::kGameAbort:
-            GameWidget::abort();
+            GameWidget2P::abort();
             break;
         case PuyoMessage::kGameChat:
             chatBox->addChat(message.getString("NAME"), message.getString("TEXT"));
@@ -164,7 +164,7 @@ void PuyoNetworkGameWidget::setScreenToPaused(bool fromControls)
         delete message;
     }
     lastAliveMessageSentDate = ios_fc::getTimeMs();
-    GameWidget::setScreenToPaused(fromControls);
+    GameWidget2P::setScreenToPaused(fromControls);
 }
 
 void PuyoNetworkGameWidget::setScreenToResumed(bool fromControls)
@@ -177,7 +177,7 @@ void PuyoNetworkGameWidget::setScreenToResumed(bool fromControls)
         message->send();
         delete message;
     }
-    GameWidget::setScreenToResumed(fromControls);
+    GameWidget2P::setScreenToResumed(fromControls);
 }
 
 void PuyoNetworkGameWidget::abort()
@@ -187,7 +187,7 @@ void PuyoNetworkGameWidget::abort()
     message->addBoolProperty("RELIABLE", true);
     message->send();
     delete message;
-    GameWidget::abort();
+    GameWidget2P::abort();
 }
 
 void PuyoNetworkGameWidget::actionAfterGameOver(bool fromControls, int actionType)
@@ -200,7 +200,7 @@ void PuyoNetworkGameWidget::actionAfterGameOver(bool fromControls, int actionTyp
         message->send();
         delete message;
     }
-    GameWidget::actionAfterGameOver(fromControls, actionType);
+    GameWidget2P::actionAfterGameOver(fromControls, actionType);
 }
 
 void PuyoNetworkGameWidget::sendChat(String chatText)

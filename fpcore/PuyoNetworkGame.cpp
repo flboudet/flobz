@@ -159,7 +159,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
                     synchronizePuyo(addNeutrals+i);
                     PuyoPuyo *neutral = findPuyo(addNeutrals[i]);
                     if (neutral != NULL)
-                        delegate->gameDidAddNeutral(neutral, addNeutrals[i+4]);
+                        delegate->gameDidAddNeutral(neutral, addNeutrals[i+4], addNeutrals[i+5]);
                 }
             }
         }

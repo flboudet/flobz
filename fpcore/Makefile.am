@@ -8,7 +8,7 @@ libfpcore_la_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           PuyoEventPlayer.cpp PauseMenu.cpp CheatCodeManager.cpp \
           GameWidget.cpp GameScreen.cpp StatsWidget.cpp \
           LocalGameStates.cpp \
-          PuyoStarter.cpp PuyoSinglePlayerStarter.cpp PuyoTwoPlayerStarter.cpp \
+          PuyoStarter.cpp SoloGameStarter.cpp PuyoSinglePlayerStarter.cpp PuyoTwoPlayerStarter.cpp \
           LocalMenu.cpp OptionMenu.cpp ControlMenu.cpp \
           LevelThemeMenu.cpp ThemeMenu.cpp ScreenTransition.cpp \
           PuyoGameAbstract.cpp PuyoStrings.cpp \
@@ -29,7 +29,7 @@ EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
            PuyoGame.h PauseMenu.h \
            audio.h GameWidget.h GameScreen.h PuyoPlayer.h \
            AIPlayer.h PuyoScoring.h PuyoMain.h \
-           ScreenTransition.h \
+           ScreenTransition.h SoloGameStarter.h \
            HallOfFame.h InternetGameCenter.h PuyoSinglePlayerStarter.h \
            HiScores.h InternetMenu.h PuyoInternetBot.h PuyoStarter.h \
            LevelThemeMenu.h LanGameCenter.h StatsWidget.h \

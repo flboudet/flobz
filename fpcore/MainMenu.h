@@ -44,6 +44,7 @@ public:
     void build();
 
 private:
+    SoloGameMenu          soloGameMenu;
     LocalGameMenu         localGameMenu;
     Local2PlayersGameMenu local2PlayersGameMenu;
     OptionMenu            optionMenu;
@@ -51,6 +52,7 @@ private:
     PopToMainScreenAction popFromHallScreenAction, popFromCreditsAction;
     HallOfFameScreen      hallOfFameScreen; // Comes from PuyoSinglePlayerStarter.cpp
     StoryScreen           creditsScreen;
+    PuyoPushMenuAction    soloGameAction;
     PuyoPushMenuAction    singlePlayerGameAction;
     PuyoPushMenuAction    twoPlayersGameAction;
     PuyoPushMenuAction    optionAction;
@@ -58,6 +60,7 @@ private:
     PushStoryScreenAction creditsAction;
     ExitAction exitAction;
 
+    Button soloGameButton;
     Button singlePlayerGameButton;
     Button twoPlayersGameButton;
     Button optionButton;

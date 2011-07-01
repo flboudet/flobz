@@ -84,7 +84,8 @@ struct <Display:
   float x,
   float y,
   float width,
-  float height>
+  float height,
+  Vec2  scale>
 
 <new_sprite: float x, float y, string image, float curframe, float framespeed, float nbframes> : Sprite
   new_sprite.parent    = "none"
@@ -139,6 +140,8 @@ external <getBoolPreference: string name, int default> : int
   new_display.y = y
   new_display.width  = width
   new_display.height = height
+  new_display.scale.x = 1.0
+  new_display.scale.y = 1.0
 
 <sprite: Sprite &this, Display display>
   float diff = &this.dcycle - @fcycle

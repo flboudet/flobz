@@ -22,46 +22,75 @@
  *
  *
  */
-#ifndef _PUYOTWOPLAYERSTARTER
-#define _PUYOTWOPLAYERSTARTER
+#ifndef _SOLOGAMESTARTER_H_
+#define _SOLOGAMESTARTER_H_
 
 #include "GameStateMachine.h"
 #include "PuyoStarter.h"
 #include "LocalGameStates.h"
 
-class TwoPlayersGameWidget : public GameWidget2P {
+class SoloGameWidget : public GameWidget, CycledComponent {
 public:
-    TwoPlayersGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, String aiFace, Action *gameOverAction = NULL);
-    bool didPlayerWon() const { return isGameARunning(); }
-    void cycle();
-    StoryWidget *getOpponent();
+    SoloGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, Action *gameOverAction = NULL);
+    // GameWidget implementation
+    virtual void setGameOptions(GameOptions options);
+    //
+    virtual void pause(bool obscureScreen = true);
+    virtual void resume();
+    // Callbacks
+    virtual bool backPressed();
+    virtual bool startPressed();
+    virtual void abort();
+    virtual bool getAborted() const;
+    //
+    virtual StoryWidget *getOpponent();
+    // TODO: Make this N-players generic (N from 1 to +inf)
+    virtual void setPlayerOneName(String newName);
+    virtual void setPlayerTwoName(String newName);
+    virtual PlayerGameStat &getStatPlayerOne();
+    virtual PlayerGameStat &getStatPlayerTwo();
+    virtual void addGameAHandicap(int handicap);
+    virtual void addGameBHandicap(int handicap);
+    virtual bool isGameARunning() const;
+    // CycledComponent implementation
+    virtual void cycle();
+    // Widget methods
+    void draw(DrawTarget *dt);
+    bool isFocusable() { return !paused; }
+    IdleComponent *getIdleComponent() { return this; }
+    void eventOccured(event_manager::GameControlEvent *event);
 private:
     PuyoSetTheme &attachedPuyoThemeSet;
+    LevelTheme &attachedLevelTheme;
     PuyoRandomSystem attachedRandom;
-    PuyoLocalGameFactory attachedGameFactory;
-    PuyoView areaA, areaB;
-    PuyoEventPlayer playercontrollerA, playercontrollerB;
-    StoryWidget opponentFace;
+    std::auto_ptr<PuyoLocalGameFactory> m_gameFactory;
+    std::auto_ptr<PuyoView>        m_areaA;
+    std::auto_ptr<PuyoCombinedEventPlayer> m_playerController;
+    PlayerGameStat m_gameStat;
+    GameOptions m_options;
+    int m_cyclesBeforeGameCycle;
+    int m_cyclesBeforeLevelRaise;
 };
 
-class PuyoLocalTwoPlayerGameWidgetFactory : public GameWidgetFactory {
+class SoloGameWidgetFactory : public GameWidgetFactory {
 public:
     GameWidget *createGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
-        return new TwoPlayersGameWidget(puyoThemeSet, levelTheme, centerFace, gameOverAction);
+        return new SoloGameWidget(puyoThemeSet, levelTheme, gameOverAction);
     }
 };
 
-class AltTwoPlayersStarterAction : public Action {
+class SoloModeStarterAction : public Action {
 public:
-    AltTwoPlayersStarterAction(GameDifficulty difficulty, GameWidgetFactory *gameWidgetFactory,
-                               PlayerNameProvider *nameProvider = NULL);
+    SoloModeStarterAction(GameDifficulty difficulty,
+                          PlayerNameProvider *nameProvider = NULL);
     /**
      * Implements the Action interface
      */
     virtual void action(Widget *sender, int actionType,
 			event_manager::GameControlEvent *event);
 private:
+    SoloGameWidgetFactory m_gameWidgetFactory;
     GameStateMachine m_stateMachine;
     SharedMatchAssets m_sharedAssets;
     SharedGetReadyAssets        m_sharedGetReadyAssets;
@@ -71,8 +100,7 @@ private:
     std::auto_ptr<ExitPlayerReadyState>  m_exitPlayersReady;
     std::auto_ptr<MatchPlayingState>     m_matchPlaying;
     std::auto_ptr<MatchIsOverState>      m_matchIsOver;
-    std::auto_ptr<DisplayStatsState>     m_displayStats;
     std::auto_ptr<LeaveGameState>        m_leaveGame;
 };
 
-#endif // _PUYOTWOPLAYERSTARTER
+#endif // _SOLOGAMESTARTER_H_

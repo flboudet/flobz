@@ -399,7 +399,7 @@ void PuyoLocalGame::dropNeutrals()
     if (neutralPuyos < 0) {
         gameStat.points -= gameLevel * neutralPuyos * 1000;
     }
-
+    int totalNeutral = neutralPuyos;
     int idNeutral = 0;
     while (neutralPuyos > 0)
     {
@@ -420,7 +420,7 @@ void PuyoLocalGame::dropNeutrals()
         puyoVector.add(newNeutral);
         setPuyoAt(posX, posY, newNeutral);
         if (delegate != NULL)
-          delegate->gameDidAddNeutral(newNeutral, idNeutral++);
+          delegate->gameDidAddNeutral(newNeutral, idNeutral++, totalNeutral);
       }
     }
     neutralPuyos = 0;
@@ -432,6 +432,25 @@ bool PuyoLocalGame::isPhaseReady(void)
   bool r = (phaseReady == 2);
   if (r) phaseReady = 0;
   return r;
+}
+
+void PuyoLocalGame::addNeutralLayer()
+{
+    // Raise everything up
+    for (int j = 1 ; j < PUYODIMY ; ++j) {
+        for (int i = 0 ; i < PUYODIMX ; ++i) {
+            PuyoPuyo *currentPuyo = getPuyoAt(i, j);
+            if (currentPuyo != NULL) {
+                setPuyoAt(i, j, NULL);
+                setPuyoAt(i, j-1, currentPuyo);
+            }
+        }
+    }
+    for (int i = 0 ; i < PUYODIMX ; ++i) {
+        PuyoPuyo *newNeutral = attachedFactory->createPuyo(PUYO_NEUTRAL);
+        puyoVector.add(newNeutral);
+        setPuyoAt(i, PUYODIMY-1, newNeutral);
+    }
 }
 
 void PuyoLocalGame::setFallingAtTop(bool gameConstruction)

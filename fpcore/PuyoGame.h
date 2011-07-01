@@ -129,7 +129,7 @@ class PuyoDefaultFactory : public PuyoFactory {
 
 class PuyoDelegate {
 public:
-  virtual void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex) = 0;
+  virtual void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex, int totalNeutral) = 0;
   virtual void companionDidTurn(PuyoPuyo *companionPuyo,
 				PuyoPuyo *fallingPuyo,
 				bool counterclockwise) = 0;
@@ -147,35 +147,35 @@ class PuyoGame {
 public:
     PuyoGame(PuyoFactory *attachedFactory);
     PuyoGame();
-    
+
     virtual ~PuyoGame() {}
     virtual void setDelegate(PuyoDelegate *delegate);
     virtual void cycle() = 0;
-    
+
     static const char * getPlayerName(int n);
     static String getDefaultPlayerName(int n);
     static String getDefaultPlayerKey(int n);
     static void setDefaultPlayerName(int n, const char * playerName);
-    /*  
+    /*
         // Get the state of the puyo at the indicated coordinates
         PuyoState getPuyoCellAt(int X, int Y) const;
     */
     // Get the puyo at the indicated coordinates
     virtual PuyoPuyo *getPuyoAt(int X, int Y) const = 0;
-    
+
     // List access to the PuyoPuyo objects
     virtual int getPuyoCount() const = 0;
     virtual PuyoPuyo *getPuyoAtIndex(int index) const = 0;
-    
+
     virtual void moveLeft() {}
     virtual void moveRight() {}
     virtual void rotate(bool left) {}
     virtual void rotateLeft() {}
     virtual void rotateRight() {}
-    
+
     virtual PuyoState getNextFalling() = 0;
     virtual PuyoState getNextCompanion() = 0;
-    
+
     virtual PuyoState getCompanionState() const = 0;
     virtual PuyoState getFallingState() const = 0;
     virtual int getFallingX() const = 0;
@@ -188,7 +188,7 @@ public:
      */
     virtual int getFallingCompanionDir() const = 0;
     virtual PuyoPuyo *getFallingPuyo() const = 0;
-    
+
     virtual void increaseNeutralPuyos(int incr) = 0;
     virtual int  getNeutralPuyos() const = 0;
     virtual int  getGameTotalNeutralPuyos() const { return 0; }
@@ -200,14 +200,15 @@ public:
     virtual int  getSamePuyoAround(int X, int Y, PuyoState color) = 0;
     virtual int  getSemiMove() const = 0;
     virtual int  getComboPhase() const = 0;
-    
+
     virtual bool isPhaseReady(void) { return true; }
 
     virtual PlayerGameStat &getGameStat() { return gameStat; }
     virtual void setGameStat(PlayerGameStat &stat) { gameStat = stat; }
-	
+
 	virtual void setScoringLevel(int gameLevel) {}
 
+    virtual void addNeutralLayer() {}
 protected:
     PuyoDelegate *delegate;
     PuyoFactory *attachedFactory;
@@ -220,16 +221,16 @@ public:
     PuyoLocalGame(PuyoRandomSystem *attachedRandom);
     virtual ~PuyoLocalGame();
     void cycle();
-    
+
     // Get the state of the puyo at the indicated coordinates
     PuyoState getPuyoCellAt(int X, int Y) const;
     // Get the puyo at the indicated coordinates
     PuyoPuyo *getPuyoAt(int X, int Y) const;
-    
+
     // List access to the PuyoPuyo objects
     int getPuyoCount() const;
     PuyoPuyo *getPuyoAtIndex(int index) const;
-    
+
     void moveLeft();
     void moveRight();
     void rotate(bool left);
@@ -239,7 +240,7 @@ public:
     PuyoState getNextCompanion();
     PuyoState getCompanionState() const { return companionPuyo->getPuyoState(); }
     PuyoState getFallingState() const { return fallingPuyo->getPuyoState(); }
-    
+
     int getFallingX() const { return fallingPuyo->getPuyoX(); }
     int getFallingY() const { return fallingPuyo->getPuyoY(); }
     int getCompanionX() const { return companionPuyo->getPuyoX(); }
@@ -248,7 +249,7 @@ public:
     int getFallingCompanionY() const;
     int getFallingCompanionDir() const { return fallingCompanion; }
     PuyoPuyo *getFallingPuyo() const { return fallingPuyo; }
-    
+
     void increaseNeutralPuyos(int incr);
     int getNeutralPuyos() const;
     int getGameTotalNeutralPuyos() const;
@@ -259,19 +260,20 @@ public:
     int getMaxColumnHeight() const;
     int getSamePuyoAround(int X, int Y, PuyoState color);
     int  getComboPhase() const {return phase; }
-    
+
     int getSemiMove() const { return semiMove; }
     bool isPhaseReady(void);
-    
+
     void setScoringLevel(int gameLevel) { this->gameLevel = gameLevel; }
 
+    virtual void addNeutralLayer();
 private:
     void InitGame(PuyoRandomSystem *attachedRandom);
     // Set the state of the puyo at the indicated coordinates (not recommanded)
     void setPuyoCellAt(int X, int Y, PuyoState value);
     // Set the puyo at the indicated coordinates
     void setPuyoAt(int X, int Y, PuyoPuyo *newPuyo);
-    
+
     void setFallingAtTop(bool gameConstruction = false);
     int getFallY(int X, int Y) const;
     void cycleEnding();
@@ -279,19 +281,19 @@ private:
     void deleteMarkedPuyosAt(int X, int Y);
     int removePuyos();
     void notifyReductions();
-    
+
     bool gameRunning;
     bool endOfCycle;
-    
+
     // The falling is the puyo you couldn't control,
     // whereas you can make the companion turn around the falling puyo
     PuyoPuyo *fallingPuyo, *companionPuyo;
     int fallingX, fallingY;
-    
+
     // Position of the companion is relative of the falling puyo
     // 0 = up 1 = left 2 = down 3 = up
     unsigned char fallingCompanion;
-    
+
     PuyoPuyo *puyoCells[PUYODIMX * (PUYODIMY+1)];
     PuyoRandomSystem *attachedRandom;
     int sequenceNr;
@@ -299,10 +301,10 @@ private:
     int neutralPuyos;
     int phase;
     int semiMove;
-    
+
     // This is not really a puyo, it is instead an indicator for the edges of the game
     PuyoPuyo *unmoveablePuyo;
-    
+
     // We are keeping a list of current puyos
     AdvancedBuffer<PuyoPuyo *> puyoVector;
     int nbFalled;

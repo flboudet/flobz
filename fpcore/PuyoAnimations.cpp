@@ -23,6 +23,7 @@
  *
  */
 
+#include "GTLog.h"
 #include "PuyoAnimations.h"
 #include "AnimatedPuyo.h"
 #include "PuyoView.h"
@@ -553,3 +554,55 @@ void GameOverFallAnimation::draw(int semiMove, DrawTarget *dt)
     attachedPuyo.renderAt(attachedPuyo.getScreenCoordinateX(), Y, dt);
 }
 
+
+ScreenShakingAnimation::ScreenShakingAnimation(int duration, int shakeCount,
+                                               float amplX, float amplY,
+                                               float smoothFactor,
+                                               AnimationSynchronizer *synchronizer)
+    : m_iter(0),
+      m_duration(duration), m_shakeCount(shakeCount),
+      m_amplX(amplX), m_amplY(amplY),
+      m_smoothFactor(smoothFactor),
+      m_synchronizer(synchronizer),
+      m_sine(0),
+      m_dc(NULL)
+{
+    m_sineStep = (M_PI * m_shakeCount * 2) / m_duration;
+    if (m_synchronizer != NULL)
+        m_synchronizer->incrementUsage();
+    m_exclusive = false;
+}
+
+ScreenShakingAnimation::~ScreenShakingAnimation()
+{
+    if (m_dc != NULL) {
+        m_dc->setOffset(0, 0);
+    }
+    if (m_synchronizer != NULL)
+        m_synchronizer->decrementUsage();
+}
+
+void ScreenShakingAnimation::cycle()
+{
+    if (m_synchronizer != NULL)
+        if (! m_synchronizer->isSynchronized())
+            return;
+    ++m_iter;
+    if (m_iter > m_duration)
+        finishedFlag = true;
+    m_sine += m_sineStep;
+}
+
+void ScreenShakingAnimation::draw(int semiMove, DrawTarget *dt)
+{
+    if (m_synchronizer != NULL)
+        if (! m_synchronizer->isSynchronized())
+            return;
+    DrawContext *dc = dynamic_cast<DrawContext *>(dt);
+    if (dc != NULL) {
+        m_dc = dc;
+        float sine = sin(m_sine);
+        float smooth = (float)(m_duration - m_iter) / (float)m_duration;// * m_smoothFactor;
+        m_dc->setOffset((sine * m_amplX) * smooth,  (sine * m_amplY) * smooth);
+    }
+}

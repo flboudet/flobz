@@ -268,6 +268,11 @@ CompositeDrawContext::CompositeDrawContext(DrawContext *baseDrawContext)
     h = baseDrawContext->h;
 }
 
+void CompositeDrawContext::setOffset(int offX, int offY)
+{
+    m_baseDrawContext->setOffset(offX, offY);
+}
+
 bool CompositeDrawContext::hasScaleAbility() const
 {
     return m_baseDrawContext->hasScaleAbility();

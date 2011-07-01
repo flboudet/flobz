@@ -34,7 +34,7 @@
 #include "goomsl_hash.h"
 #include <vector>
 
-class SinglePlayerGameWidget : public GameWidget, public Action {
+class SinglePlayerGameWidget : public GameWidget2P, public Action {
 public:
     SinglePlayerGameWidget(int lifes, String aiFace);
     void initWithGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &playercontroller, LevelTheme &levelTheme, int level, Action *gameOverAction);

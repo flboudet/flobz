@@ -106,7 +106,7 @@ class PuyoView : public PuyoDelegate {
 	virtual void fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
 	virtual void fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
 	virtual void fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
-    void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex);
+    void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex, int totalNeutral);
     void gameDidEndCycle();
     void companionDidTurn(PuyoPuyo *companionPuyo, PuyoPuyo *fallingPuyo, bool counterclockwise);
     void puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow);

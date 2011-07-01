@@ -118,6 +118,8 @@ public:
     virtual void putString(IosFont *font, int x, int y, const char *text);
 	virtual void putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text);
     void putStringCenteredXY(IosFont *font, int x, int y, const char *text);
+    // Special operations
+    virtual void setOffset(int offX, int offY);
 	// Query for drawcontext abilities
     virtual bool hasScaleAbility() const { return true; }
     virtual ImageSpecialAbility guessRequiredImageAbility(const ImageOperationList &list);
@@ -134,6 +136,7 @@ private:
     std::auto_ptr<OpenGLImageLibrary> iimLib;
     IosRect m_clipRect, *m_clipRectPtr;
     int m_viewportWidth, m_viewportHeight;
+    GLfloat m_offsetX, m_offsetY;
 public:
 	GLfloat matrix[16];
 };

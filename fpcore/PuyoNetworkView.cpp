@@ -174,14 +174,15 @@ void PuyoNetworkView::fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *co
     fallingStepBuffer.add(companionPuyo->getPuyoY());
 }
 
-void PuyoNetworkView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex)
+void PuyoNetworkView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex, int totalNeutral)
 {
-    PuyoView::gameDidAddNeutral(neutralPuyo, neutralIndex);
+    PuyoView::gameDidAddNeutral(neutralPuyo, neutralIndex, totalNeutral);
     neutralsBuffer.add(neutralPuyo->getID());
     neutralsBuffer.add(neutralPuyo->getPuyoState());
     neutralsBuffer.add(neutralPuyo->getPuyoX());
     neutralsBuffer.add(neutralPuyo->getPuyoY());
     neutralsBuffer.add(neutralIndex);
+    neutralsBuffer.add(totalNeutral);
 }
 
 void PuyoNetworkView::gameDidEndCycle()

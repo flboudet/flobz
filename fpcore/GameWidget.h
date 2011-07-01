@@ -59,13 +59,13 @@ struct GameOptions
     int CYCLES_BEFORE_SPEED_INCREASES;
 };
 
-
 /**
  * Represents the full featured game widget, with the two players game views.
  * Handles user input.
  */
 class GameWidget : public GarbageCollectableItem,
-                       public gameui::Widget, CycledComponent {
+                   public gameui::Widget
+{
 public:
     enum {
         PAUSED_STARTPRESSED = 1,
@@ -73,9 +73,58 @@ public:
         GAME_IS_OVER,
     };
 public:
-    GameWidget(GameOptions options = GameOptions(), bool withGUI = true);
+    GameWidget();
+    virtual ~GameWidget() {}
+public:
+    // A deplacer
+    void setAssociatedScreen(GameScreen *associatedScreen) { this->associatedScreen = associatedScreen; associatedScreenHasBeenSet(associatedScreen); };
+    virtual void associatedScreenHasBeenSet(GameScreen *associatedScreen) {}
+    virtual void setGameOverAction(gameui::Action *gameOverAction) {
+        this->gameOverAction = gameOverAction;
+    }
+    //
+    virtual std::vector<PuyoFX*> &getPuyoFX()  { return puyoFX; }
+public:
+    virtual void setGameOptions(GameOptions options) = 0;
+    //
+    virtual void pause(bool obscureScreen = true) = 0;
+    virtual void resume() = 0;
+    // A deplacer
+    virtual void setScreenToPaused(bool fromControls);
+    virtual void setScreenToResumed(bool fromControls);
+    // Callbacks
+    virtual bool backPressed()  {}
+    virtual bool startPressed() {}
+    virtual void abort() = 0;
+    virtual bool getAborted() const = 0;
+    //
+    virtual StoryWidget *getOpponent() = 0;
+    //
+    // TODO: Make this N-players generic (N from 1 to +inf)
+    virtual void setPlayerOneName(String newName) = 0;
+    virtual void setPlayerTwoName(String newName) = 0;
+    virtual PlayerGameStat &getStatPlayerOne() = 0;
+    virtual PlayerGameStat &getStatPlayerTwo()  = 0;
+    virtual void addGameAHandicap(int handicap) = 0;
+    virtual void addGameBHandicap(int handicap) = 0;
+    virtual bool isGameARunning() const = 0;
+protected:
+    gameui::Action *gameOverAction;
+    GameScreen *associatedScreen;
+    std::vector<PuyoFX*> puyoFX;
+};
+
+/**
+ * Represents the full featured game widget, with the two players game views.
+ * Handles user input.
+ */
+class GameWidget2P : public GameWidget, CycledComponent
+{
+public:
+    GameWidget2P(GameOptions options = GameOptions(), bool withGUI = true);
+    virtual ~GameWidget2P();
+public:
     void setGameOptions(GameOptions options);
-    virtual ~GameWidget();
     void initWithGUI(PuyoView &areaA, PuyoView &areaB,
                      PuyoPlayer &controllerA, PuyoPlayer &controllerB,
                      LevelTheme &levelTheme,
@@ -84,7 +133,6 @@ public:
                      PuyoPlayer &controllerA, PuyoPlayer &controllerB,
                      gameui::Action *gameOverAction = NULL);
     // Specific methods
-    void setGameOverAction(gameui::Action *gameOverAction);
     void pause(bool obscureScreen = true);
     void resume();
     bool backPressed();
@@ -102,7 +150,6 @@ public:
     void setStatPlayerOne(PlayerGameStat &gameStat) { attachedGameA->setGameStat(gameStat); }
     void setStatPlayerTwo(PlayerGameStat &gameStat) { attachedGameB->setGameStat(gameStat); }
     virtual StoryWidget *getOpponent() { return NULL; }
-    virtual std::vector<PuyoFX*> &getPuyoFX() { return puyoFX; }
     void addGameAHandicap(int handicap) {attachedGameA->increaseNeutralPuyos((handicap>10?10:handicap) * PUYODIMX); attachedGameA->dropNeutrals();}
     void addGameBHandicap(int handicap) {attachedGameB->increaseNeutralPuyos((handicap>10?10:handicap) * PUYODIMX); attachedGameB->dropNeutrals();}
     void addSubWidget(Widget *subWidget);
@@ -124,16 +171,10 @@ public:
     virtual void drawGameAreas(DrawTarget *dt);
     virtual void drawGameNeutrals(DrawTarget *dt);
 
-
     // A deplacer
-    void setAssociatedScreen(GameScreen *associatedScreen) { this->associatedScreen = associatedScreen; associatedScreenHasBeenSet(associatedScreen); };
-    virtual void setScreenToPaused(bool fromControls);
-    virtual void setScreenToResumed(bool fromControls);
     virtual void actionAfterGameOver(bool fromControls, int actionType);
 
 protected:
-    virtual void associatedScreenHasBeenSet(GameScreen *associatedScreen) {}
-
     // Styrolyse methods
     static void *styro_loadImage(StyrolyseClient *_this, const char *path);
     static void styro_drawImage(StyrolyseClient *_this,
@@ -142,7 +183,6 @@ protected:
     static void styro_freeImage(StyrolyseClient *_this, void *image);
 
     bool withGUI;
-    GameScreen *associatedScreen;
     DrawTarget &painter;
     IosSurface *painterGameScreen;
     LevelTheme *attachedLevelTheme;
@@ -157,14 +197,12 @@ protected:
     bool displayLives;
     int lives;
     bool once;
-    gameui::Action *gameOverAction;
     bool gameover;
     bool abortedFlag;
     int gameSpeed; // from 0 (MinSpeed) to 20 (MaxSpeed)
     int MinSpeed,MaxSpeed; // in units of 20ms
     int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
     String playerOneName, playerTwoName;
-    std::vector<PuyoFX*> puyoFX;
     std::vector<gameui::Widget *> m_subwidgets;
     bool skipGameCycleA, skipGameCycleB;
     double gameOverDate;

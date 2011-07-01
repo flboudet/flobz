@@ -154,6 +154,8 @@ public:
     virtual ImageLibrary &getImageLibrary() {
         return m_imageLibrary;
     }
+    // Special operations
+    virtual void setOffset(int offX, int offY);
     // Query for drawcontext abilities
     virtual bool hasScaleAbility() const;
     virtual ImageSpecialAbility guessRequiredImageAbility(const ImageOperationList &list);

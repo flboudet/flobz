@@ -31,10 +31,6 @@ ScreenTransitionWidget::ScreenTransitionWidget(Screen &fromScreen)
 {
     DrawContext *dc = GameUIDefaults::GAME_LOOP->getDrawContext();
     m_fromSurface.reset(dc->getImageLibrary().createImage(IMAGE_RGB, dc->getWidth(), dc->getHeight()));
-    m_fromSurface->setBlendMode(IMAGE_COPY);
-    IosRect rect = {0, 0, dc->getWidth(), dc->getHeight()};
-    RGBA color = {255, 0, 0, 255};
-    m_fromSurface->fillRect(&rect, color);
     fromScreen.drawAnyway(m_fromSurface.get());
 }
 

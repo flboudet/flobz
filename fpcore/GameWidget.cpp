@@ -68,26 +68,44 @@ GameOptions GameOptions::fromDifficulty(GameDifficulty difficulty) {
     return go;
 }
 
-void GameWidget::setGameOptions(GameOptions game_options)
+GameWidget::GameWidget()
+  : gameOverAction(NULL), associatedScreen(NULL)
+{
+}
+
+void GameWidget::setScreenToPaused(bool fromControls)
+{
+    if (associatedScreen != NULL)
+        associatedScreen->setPaused(fromControls);
+}
+
+void GameWidget::setScreenToResumed(bool fromControls)
+{
+  if (associatedScreen != NULL)
+    if (!fromControls)
+      associatedScreen->getPauseMenu().backPressed(false);
+}
+
+void GameWidget2P::setGameOptions(GameOptions game_options)
 {
     cyclesBeforeSpeedIncreases = game_options.CYCLES_BEFORE_SPEED_INCREASES;
     MinSpeed = game_options.MIN_SPEED;
     MaxSpeed = game_options.MAX_SPEED;
 }
 
-void GameWidget::setPlayerOneName(String newName) {
+void GameWidget2P::setPlayerOneName(String newName) {
     playerOneName = newName;
     areaA->setPlayerNames(playerOneName, playerTwoName);
     areaB->setPlayerNames(playerOneName, playerTwoName);
 }
-void GameWidget::setPlayerTwoName(String newName) {
+void GameWidget2P::setPlayerTwoName(String newName) {
     playerTwoName = newName;
     areaA->setPlayerNames(playerOneName, playerTwoName);
     areaB->setPlayerNames(playerOneName, playerTwoName);
 }
 
-GameWidget::GameWidget(GameOptions game_options, bool withGUI)
-    : CycledComponent(TIME_BETWEEN_GAME_CYCLES), withGUI(withGUI), associatedScreen(NULL),
+GameWidget2P::GameWidget2P(GameOptions game_options, bool withGUI)
+    : CycledComponent(TIME_BETWEEN_GAME_CYCLES), withGUI(withGUI),
       painter(*(GameUIDefaults::GAME_LOOP->getDrawContext())), cyclesBeforeGameCycle(0),
       cyclesBeforeSpeedIncreases(game_options.CYCLES_BEFORE_SPEED_INCREASES),
       tickCounts(0), cycles(0), paused(false), m_obscureScreenOnPause(true),
@@ -103,7 +121,7 @@ GameWidget::GameWidget(GameOptions game_options, bool withGUI)
     }
 }
 
-void GameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, LevelTheme &levelTheme, Action *gameOverAction)
+void GameWidget2P::initWithGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, LevelTheme &levelTheme, Action *gameOverAction)
 {
     this->areaA = &areaA;
     this->areaB = &areaB;
@@ -115,7 +133,7 @@ void GameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &contr
     this->gameOverAction = gameOverAction;
     priv_initialize();
 }
-void GameWidget::initWithoutGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, Action *gameOverAction)
+void GameWidget2P::initWithoutGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, Action *gameOverAction)
 {
     this->areaA = &areaA;
     this->areaB = &areaB;
@@ -128,7 +146,7 @@ void GameWidget::initWithoutGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &co
     priv_initialize();
 }
 
-void GameWidget::priv_initialize()
+void GameWidget2P::priv_initialize()
 {
     once = false;
     gameover = false;
@@ -173,7 +191,7 @@ void GameWidget::priv_initialize()
     // puyoFX.push_back(new PuyoFX("fx/white_star.gsl"));
 }
 
-GameWidget::~GameWidget()
+GameWidget2P::~GameWidget2P()
 {
     dead();
     for (unsigned int i=0; i<puyoFX.size(); ++i)
@@ -183,12 +201,7 @@ GameWidget::~GameWidget()
     }
 }
 
-void GameWidget::setGameOverAction(gameui::Action *gameOverAction)
-{
-    this->gameOverAction = gameOverAction;
-}
-
-void GameWidget::cycle()
+void GameWidget2P::cycle()
 {
   if (!paused) {
     tickCounts++;
@@ -285,25 +298,25 @@ void GameWidget::cycle()
   }
 }
 
-void GameWidget::drawBackground(DrawTarget *dt)
+void GameWidget2P::drawBackground(DrawTarget *dt)
 {
     IosRect dtRect = { 0, 0, dt->w, dt->h };
     dt->draw(attachedLevelTheme->getBackground(), &dtRect, &dtRect);
 }
 
-void GameWidget::drawGameAreas(DrawTarget *dt)
+void GameWidget2P::drawGameAreas(DrawTarget *dt)
 {
     areaA->render(dt);
     areaB->render(dt);
 }
 
-void GameWidget::drawGameNeutrals(DrawTarget *dt)
+void GameWidget2P::drawGameNeutrals(DrawTarget *dt)
 {
     areaA->renderNeutral(dt);
     areaB->renderNeutral(dt);
 }
 
-void GameWidget::draw(DrawTarget *dt)
+void GameWidget2P::draw(DrawTarget *dt)
 {
     if ((paused) && (m_obscureScreenOnPause)) {
         dt->draw(painterGameScreen, NULL, NULL);
@@ -390,12 +403,12 @@ void GameWidget::draw(DrawTarget *dt)
     }
 }
 
-void GameWidget::addSubWidget(Widget *subWidget)
+void GameWidget2P::addSubWidget(Widget *subWidget)
 {
   m_subwidgets.push_back(subWidget);
 }
 
-void GameWidget::pause(bool obscureScreen)
+void GameWidget2P::pause(bool obscureScreen)
 {
     m_obscureScreenOnPause = obscureScreen;
     // Call draw on offscreen surface before setting the game to paused
@@ -409,12 +422,12 @@ void GameWidget::pause(bool obscureScreen)
     }
 }
 
-void GameWidget::resume()
+void GameWidget2P::resume()
 {
     paused = false;
 }
 
-void GameWidget::eventOccured(GameControlEvent *event)
+void GameWidget2P::eventOccured(GameControlEvent *event)
 {
     if (paused)
         lostFocus();
@@ -428,7 +441,7 @@ void GameWidget::eventOccured(GameControlEvent *event)
     }
 }
 
-bool GameWidget::startPressed()
+bool GameWidget2P::startPressed()
 {
     if ((gameover || abortedFlag) && once && (ios_fc::getTimeMs() > gameOverDate + 500)) {
         actionAfterGameOver(true, GAMEOVER_STARTPRESSED);
@@ -440,7 +453,7 @@ bool GameWidget::startPressed()
     return false;
 }
 
-bool GameWidget::backPressed()
+bool GameWidget2P::backPressed()
 {
     if ((gameover || abortedFlag) && once) {
         actionAfterGameOver(true, GAMEOVER_STARTPRESSED);
@@ -449,26 +462,13 @@ bool GameWidget::backPressed()
     return false;
 }
 
-void GameWidget::actionAfterGameOver(bool fromControls, int actionType)
+void GameWidget2P::actionAfterGameOver(bool fromControls, int actionType)
 {
     if (gameOverAction)
       gameOverAction->action(this, actionType, NULL);
 }
 
-void GameWidget::setScreenToPaused(bool fromControls)
-{
-    if (associatedScreen != NULL)
-        associatedScreen->setPaused(fromControls);
-}
-
-void GameWidget::setScreenToResumed(bool fromControls)
-{
-  if (associatedScreen != NULL)
-    if (!fromControls)
-      associatedScreen->getPauseMenu().backPressed(false);
-}
-
-void *GameWidget::styro_loadImage(StyrolyseClient *_this, const char *path)
+void *GameWidget2P::styro_loadImage(StyrolyseClient *_this, const char *path)
 {
     StyroImage *image;
     image = new StyroImage(_this,
@@ -476,7 +476,7 @@ void *GameWidget::styro_loadImage(StyrolyseClient *_this, const char *path)
       .combine(path), true);
   return image;
 }
-void GameWidget::styro_drawImage(StyrolyseClient *_this,
+void GameWidget2P::styro_drawImage(StyrolyseClient *_this,
 			    void *image, int x, int y, int w, int h,
 			    int clipx, int clipy, int clipw, int cliph, int flipped, float scaleX, float scaleY)
 {
@@ -501,7 +501,7 @@ void GameWidget::styro_drawImage(StyrolyseClient *_this,
         ((StyrolysePainterClient *)_this)->m_painter->draw(surf->surface, NULL, &rect);
     }
 }
-void GameWidget::styro_freeImage(StyrolyseClient *_this, void *image)
+void GameWidget2P::styro_freeImage(StyrolyseClient *_this, void *image)
 {
   delete ((StyroImage *)image);
 }
