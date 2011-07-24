@@ -34,6 +34,7 @@
 #endif
 
 #include "drawcontext.h"
+#include "DataPathManager.h"
 
 class OpenGLDrawContext;
 
@@ -71,6 +72,11 @@ public:
     virtual OpenGLRawImage * loadImage(ImageType type, const char *path) = 0;
     virtual void ensureContextIsActive() = 0;
     virtual void flip() = 0;
+
+    // Eventually, to be removed because data access
+    // should be encapsulated by the OpenGLBackendUtil...
+    // ...but this is not the case for fonts yet!
+    virtual DataPathManager * getdataPathManager() const = 0;
 
     static GLenum toGL(ImageType type) {
         switch (type) {

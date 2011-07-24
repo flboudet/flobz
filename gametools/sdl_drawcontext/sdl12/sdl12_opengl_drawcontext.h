@@ -22,6 +22,7 @@ public:
     virtual OpenGLRawImage * loadImage(ImageType type, const char *path);
     virtual void ensureContextIsActive();
     virtual void flip();
+    virtual DataPathManager * getdataPathManager() const { return m_dataPathManager; }
 private:
     OpenGLRawImage * loadImagePNG(ImageType type, const char *path);
     OpenGLRawImage * loadImageJPG(ImageType type, const char *path);

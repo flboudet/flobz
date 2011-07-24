@@ -438,7 +438,24 @@ public:
 	OpenGLIosFont(OpenGLBackendUtil *backendUtil, const char *path, int size, IosFontFx fx = Font_STD)
     : m_backendUtil(backendUtil)
     {
-		mCustomFont = new GLFont(path, size, 0.0f);
+        std::auto_ptr<DataInputStream> fontFile(m_backendUtil->getdataPathManager()->openDataInputStream(path));
+        // Read all the data file and store it in a buffer
+        int chunkSize = 4096;
+        int dataSize = chunkSize;
+        char *data = (char *)(malloc(dataSize));
+        int offset = 0;
+        int fsize = 0;
+        int readSize = 0;
+        do {
+            readSize = fontFile->streamRead(data + offset, chunkSize);
+            fsize += readSize;
+            if (readSize == chunkSize) {
+                dataSize += chunkSize;
+                offset += chunkSize;
+                data = (char *)(realloc(data, dataSize));
+            }
+        } while (readSize == chunkSize);
+            mCustomFont = new GLFont(data, fsize, size, 0.0f);
 		mSize = size;
 		mFX = fx;
 	}

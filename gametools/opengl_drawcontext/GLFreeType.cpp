@@ -163,7 +163,7 @@ using std::string;
 
 
 
-    void GLFont::init(const char * fname, unsigned int h, float letter_spacing) {
+    void GLFont::init(void *data, int size, unsigned int h, float letter_spacing) {
         this->letter_spacing = letter_spacing;
         GLFONT_letter_spacing = letter_spacing;
 
@@ -179,25 +179,27 @@ using std::string;
         //This is where we load in the font information from the file.
         //Of all the places where the code might die, this is the most likely,
         //as FT_New_Face will die if the font file does not exist or is somehow broken.
+#ifdef DISABLED
         if (FT_New_Face( library, fname, 0, &face ))
             throw std::runtime_error("FT_New_Face failed (there is probably a problem with your font file)");
+#endif
+        if (FT_New_Memory_Face(library, (FT_Byte *)data,
+                               size, 0, &face ))
+            throw std::runtime_error("FT_New_Face failed (there is probably a problem with your font file)");
+        m_data = data;
 
         //For some twisted reason, Freetype measures font size
         //in terms of 1/64ths of pixels.  Thus, to make a font
         //h pixels high, we need to request a size of h*64.
         //(h << 6 is just a prettier way of writting h*64)
         FT_Set_Char_Size( face, h << 6, h << 6, 96, 96);
-
-        //This is where we actually create each of the fonts display lists.
-        //for(unsigned short i=0;i<256;i++)
-        //    make_dlist(face,i,h,asciiGlyphes[i]);
     }
 
     void GLFont::clean() {
         //We don't need the face information now that the display
         //lists have been created, so we free the assosiated resources.
         FT_Done_Face(face);
-
+        free(m_data);
         //Ditto for the library.
         FT_Done_FreeType(library);
 

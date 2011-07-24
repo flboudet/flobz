@@ -56,6 +56,9 @@ namespace flobopop {
         typedef std::vector<unsigned short> Line;
         typedef std::vector<Line> MultiLine;
 
+        // Font file data
+        void *m_data;
+
         inline GlyphData & getGlyphData(unsigned short ch) {
             //if (ch < 256)
             //    return asciiGlyphes[ch];
@@ -93,7 +96,12 @@ namespace flobopop {
         }
 
     public:
-        GLFont(const char *fname, unsigned int h, float letter_spacing) { init(fname, h, letter_spacing); }
+        /**
+         * Create a GLFont from in-memory data.
+         * Note: data must be malloced, and GLFont takes ownership of this pointer.
+         * Don't free() data on your own!
+         */
+        GLFont(void *data, int size, unsigned int h, float letter_spacing) { init(data, size, h, letter_spacing); }
         GLFont() {}
         ~GLFont() {}
 
@@ -101,7 +109,7 @@ namespace flobopop {
 
         //The init function will create a font of
         //of the height h from the file fname.
-        void init(const char * fname, unsigned int h, float letter_spacing);
+        void init(void *data, int size, unsigned int h, float letter_spacing);
 
         //Free all the resources assosiated with the font.
         void clean();

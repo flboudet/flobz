@@ -53,9 +53,8 @@ IosFont *IosFontFactory::create(const IosFontResourceKey &resourceKey)
         fprintf(cacheOutputGsl, "  [cache_picture: path=\"%s\" mode=%d]\n",
                 resourceKey.path.c_str(), resourceKey.type);
 #endif
-        String fullPath = m_dataPathManager.getPath(resourceKey.path.c_str());
         ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
-        IosFont *newFont = iimLib.createFont(fullPath, resourceKey.size, resourceKey.fx);
+        IosFont *newFont = iimLib.createFont(resourceKey.path.c_str(), resourceKey.size, resourceKey.fx);
         return newFont;
     }
     catch (Exception e) {
