@@ -386,26 +386,6 @@ static __inline__ int power_of_2(int input)
  void print(float x, float y, const wchar_t *fmt, ...) ;
  void printCentered(float x, float y, const wchar_t *fmt, ...);
  */
-static std::wstring toWString(const std::string &s0)
-{
-    wchar_t *s1 = new wchar_t[s0.size() + 1];
-    for (unsigned int j=0; j<s0.size(); ++j) s1[j] = s0[j];
-    s1[s0.size()] = 0;
-    std::wstring s2 = s1;
-    delete[] s1;
-    return s2;
-}
-static std::string toString(const std::wstring &s0)
-{
-    char *s1 = new char[s0.size() + 1];
-    for (unsigned int j=0; j<s0.size(); ++j) s1[j] = s0[j];
-    s1[s0.size()] = 0;
-    std::string s2 = s1;
-    delete[] s1;
-    return s2;
-}
-
-
 
 static void iglBindFramebufferOES(GLuint i, GLfloat *matrix) {
     static int gCurrentFBO = 0;
@@ -485,17 +465,15 @@ public:
 		printWithShadow(x,y,1.0f,2.0f,txt);
 	}
 	void printWithShadow(float x, float y, float sx, float sy, const char *txt) {
+        unsigned short *utxt = m_backendUtil->utf8ToUnicode(txt, mWorkingBuffer, sizeof(mWorkingBuffer));
 		// TODO: ensure correct matrix
-
 		glEnable(GL_BLEND); GL_GET_ERROR();
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); GL_GET_ERROR();
-		unsigned short *utxt = m_backendUtil->utf8ToUnicode(txt, mWorkingBuffer, sizeof(mWorkingBuffer));
 		glColor4ub(0,0,0, 0xc0);
         //mCustomFont->printUnicode(x+sx+0.5f,y+sy, utxt);
         mCustomFont->printUnicode(x+sx/*-0.5f*/,y+sy, utxt);
         /*mCustomFont->printUnicode(x+sx-0.5f,y+sy-0.5f, utxt);
          mCustomFont->printUnicode(x+sx+0.5f,y+sy-0.5f, utxt);*/
-
 		switch (mFX) {
 			case Font_STD: glColor4ub(0xEF,0xA2,0x43,0xFF); break;
 			case Font_DARK: glColor4ub(0x43,0x89,0xEF,0xFF); break;
@@ -505,7 +483,6 @@ public:
 
 		}
         mCustomFont->printUnicode(x,y, utxt);
-
 		glColor4ub(0xFF,0xFF,0xFF,0xFF);
 	}
 	void printCentered(float x, float y, const char *txt) {
@@ -964,6 +941,27 @@ void IosGLSurfaceRef::drawRotatedCentered(IosSurface *surf, int angle, int x, in
 
 void IosGLSurfaceRef::fillRect(const IosRect *rect, const RGBA &color)
 {
+#ifdef BETTERIMPLEMENTATION
+    // The alpha blending is not correctly handled
+    m_backendUtil->ensureContextIsActive();
+    bindSurface();
+    GLfloat vertices[8];
+    GLushort faces[4] = {0,1,2,3};
+    vertices[0] = rect->x;
+    vertices[1] = rect->y;
+    vertices[2] = rect->x+rect->w;
+    vertices[3] = rect->y;
+    vertices[4] = rect->x;
+    vertices[5] = rect->y+rect->h;
+    vertices[6] = rect->x+rect->w;
+    vertices[7] = rect->y+rect->h;
+    glDisable(GL_TEXTURE_2D); GL_GET_ERROR();
+    glColor4f(color.red/255.0f, color.green/255.0f, color.blue/255.0f, color.alpha/255.0f);
+    glVertexPointer(2, GL_FLOAT, 0, &vertices[0]);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, &faces[0]);
+    unbindSurface();
+#else
     m_backendUtil->ensureContextIsActive();
     bindSurface();
     // Let's get lazy!
@@ -971,6 +969,7 @@ void IosGLSurfaceRef::fillRect(const IosRect *rect, const RGBA &color)
     glClear(GL_COLOR_BUFFER_BIT);
     // TODO (That's totally out of spec, but FloboPop doesn't need more than this)
     unbindSurface();
+#endif
 }
 
 void IosGLSurfaceRef::putString(IosFont *font, int x, int y, const char *text)
@@ -1242,10 +1241,10 @@ void OpenGLDrawContext::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRec
             scaley = (float)pSrcRect->h / (float)pDstRect->h;
         if ((pSrcRect->w != 0 && pDstRect->w != 0) && (pSrcRect->w != pDstRect->w))
             scalex = (float)pSrcRect->w / (float)pDstRect->w;
-        IosRect srcClip = {m_clipRect.x - pDstRect->x + pSrcRect->x,
-            m_clipRect.y - pDstRect->y + pSrcRect->y,
-            scalex*m_clipRect.w,
-            scaley*m_clipRect.h };
+        IosRect srcClip = {(m_clipRect.x - pDstRect->x)*scalex + pSrcRect->x,
+            (m_clipRect.y - pDstRect->y)*scaley + pSrcRect->y,
+            (float)m_clipRect.w*scalex,
+            (float)m_clipRect.h*scaley };
         if (! pSrcRect->hasIntersection(srcClip, sSrcResult))
             goto END;
         // DstRect computation
@@ -1292,6 +1291,22 @@ void OpenGLDrawContext::setClipRect(IosRect *rect) {
 }
 
 void OpenGLDrawContext::fillRect(const IosRect *rect, const RGBA &color) {
+    GLfloat vertices[8];
+    GLushort faces[4] = {0,1,2,3};
+    vertices[0] = rect->x;
+    vertices[1] = rect->y;
+    vertices[2] = rect->x+rect->w;
+    vertices[3] = rect->y;
+    vertices[4] = rect->x;
+    vertices[5] = rect->y+rect->h;
+    vertices[6] = rect->x+rect->w;
+    vertices[7] = rect->y+rect->h;
+    glDisable(GL_TEXTURE_2D); GL_GET_ERROR();
+    glColor4f(color.red/255.0f, color.green/255.0f, color.blue/255.0f, color.alpha/255.0f);
+    glVertexPointer(2, GL_FLOAT, 0, &vertices[0]);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, &faces[0]);
+    glEnable(GL_TEXTURE_2D); GL_GET_ERROR();
 }
 
 void OpenGLDrawContext::putString(IosFont *font, int x, int y, const char *text) {

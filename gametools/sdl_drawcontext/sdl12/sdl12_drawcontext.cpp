@@ -368,7 +368,8 @@ IosSurface * SDL12_ImageLibrary::loadImage(ImageType type, const char *path, Ima
 
 IosFont *SDL12_ImageLibrary::createFont(const char *path, int size, IosFontFx fx)
 {
-    IosFont *result = new SDL12_IosFont(path, size, fx);
+    String fullPath = m_dataPathManager.getPath(path);
+    IosFont *result = new SDL12_IosFont(fullPath, size, fx);
     DBG_FONT = result;
     return result;
 }

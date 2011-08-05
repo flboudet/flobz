@@ -198,7 +198,7 @@ OpenGLRawImage * SDL12_OpenGLBackendUtil::loadImagePNG(ImageType type, const cha
     //Color type. (RGB, RGBA, Luminance, luminance alpha... palette... etc)
     png_uint_32 color_type = png_get_color_type(pngPtr, infoPtr);
 
-    GTLogTrace("Image dimensions: %ux%u chan:%u bitdepth:%u", imgWidth, imgHeight, channels, bitdepth);
+    //GTLogTrace("Image dimensions: %ux%u chan:%u bitdepth:%u", imgWidth, imgHeight, channels, bitdepth);
     switch (color_type) {
     case PNG_COLOR_TYPE_PALETTE:
         png_set_palette_to_rgb(pngPtr);
@@ -346,7 +346,7 @@ OpenGLRawImage * SDL12_OpenGLBackendUtil::loadImageJPG(ImageType type, const cha
     cinfo.src = (struct jpeg_source_mgr *)(&src);
 
     jpeg_read_header(&cinfo, TRUE);
-    GTLogTrace("jpeg dimensions:%ux%u", cinfo.image_width, cinfo.image_height);
+    //GTLogTrace("jpeg dimensions:%ux%u", cinfo.image_width, cinfo.image_height);
     png_uint_32 po2Width =  power_of_2(cinfo.image_width);
     png_uint_32 po2Height = power_of_2(cinfo.image_height);
     int rowsize = (po2Width*3);
@@ -354,7 +354,6 @@ OpenGLRawImage * SDL12_OpenGLBackendUtil::loadImageJPG(ImageType type, const cha
     char *dataPtr = imgData;
     jpeg_start_decompress(&cinfo);
     while (cinfo.output_scanline < cinfo.output_height) {
-        GTLogTrace("scanline");
         jpeg_read_scanlines(&cinfo, (JSAMPARRAY)(&dataPtr), 1);
         dataPtr += rowsize;
     }
