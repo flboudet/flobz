@@ -1261,11 +1261,17 @@ void OpenGLDrawContext::drawRotatedCentered(IosSurface *surf, int angle, int x, 
 	// TODO: Rotate.
     m_backendUtil->ensureContextIsActive();
 	IosRect *pSrcRect, *pDstRect;
-    IosRect dstRect = {x, y, surf->w, surf->h};
+    IosRect dstRect = {x - (surf->w/2.), y - (surf->h/2.), surf->w, surf->h};
 	fixRects(NULL, &dstRect, surf, this, &pSrcRect, &pDstRect);
 	IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef *> (surf);
 	ipSurf->applyBlendMode(IMAGE_BLEND);
+    glTranslatef(x, y, 0.0f);
+    glRotatef(360-angle, 0, 0, 1);
+    glTranslatef(-x, -y, 0.0f);
 	ipSurf->drawToGL(pSrcRect, pDstRect);
+    glTranslatef(x, y, 0.0f);
+    glRotatef(-(360-angle), 0, 0, 1);
+    glTranslatef(-x, -y, 0.0f);
 	/*this->bindFBO();
      IosRect *pSrcRect, *pDstRect;
      fixRects(NULL, NULL, surf, this, &pSrcRect, &pDstRect);
