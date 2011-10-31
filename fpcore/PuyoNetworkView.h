@@ -54,7 +54,7 @@ class PuyoNetworkView : public PuyoView {
     void rotateLeft();
     void rotateRight();
 
-    // PuyoDelegate methods
+    // GameListener methods
     virtual void fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
 	virtual void fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
 	virtual void fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);

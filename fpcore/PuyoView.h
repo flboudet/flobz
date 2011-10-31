@@ -60,7 +60,7 @@ public:
  * The PuyoGame is owned by the PuyoView and created
  * through a PuyoGameFactory.
  */
-class PuyoView : public PuyoDelegate {
+class PuyoView : public GameListener {
   public:
     // Create a PuyoView with graphical feedback
     PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
@@ -102,7 +102,7 @@ class PuyoView : public PuyoDelegate {
     bool isNewMetaCycleStart() { return newMetaCycleStart; }
     void clearMetaCycleStart() { newMetaCycleStart = false; }
 
-    // PuyoDelegate methods
+    // GameListener methods
 	virtual void fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
 	virtual void fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
 	virtual void fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);

@@ -69,7 +69,7 @@ void PuyoView::initCommon(PuyoGameFactory *attachedPuyoGameFactory)
 {
 	attachedGame = attachedPuyoGameFactory->createPuyoGame(&attachedPuyoFactory);
     m_scoreDisplay.reset(new PlayerGameStatDisplay(attachedGame->getGameStat()));
-    attachedGame->setDelegate(this);
+    attachedGame->addGameListener(this);
 	gameRunning = true;
 	enemyGame = NULL;
     skippedCycle = false;

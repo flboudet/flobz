@@ -29,7 +29,7 @@
 #include "PuyoStarter.h"
 #include "LocalGameStates.h"
 
-class SoloGameWidget : public GameWidget, CycledComponent {
+class SoloGameWidget : public GameWidget, GameListener, CycledComponent {
 public:
     SoloGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, Action *gameOverAction = NULL);
     // GameWidget implementation
@@ -52,6 +52,8 @@ public:
     virtual void addGameAHandicap(int handicap);
     virtual void addGameBHandicap(int handicap);
     virtual bool isGameARunning() const;
+    // GameListener implementation
+    virtual void gameDidEndCycle();
     // CycledComponent implementation
     virtual void cycle();
     // Widget methods

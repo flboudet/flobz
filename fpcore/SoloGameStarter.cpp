@@ -39,6 +39,15 @@ SoloGameWidget::SoloGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelThem
     //setLives(-1);
     setReceiveUpEvents(true);
     setFocusable(true);
+    m_areaA->getAttachedGame()->addGameListener(this);
+}
+
+void SoloGameWidget::gameDidEndCycle()
+{
+    if (m_cyclesBeforeLevelRaise == 0) {
+        m_areaA->getAttachedGame()->addNeutralLayer();
+        m_cyclesBeforeLevelRaise = 800;
+    }
 }
 
 void SoloGameWidget::cycle()
@@ -52,11 +61,11 @@ void SoloGameWidget::cycle()
         m_cyclesBeforeGameCycle = 10;
     }
     if (m_cyclesBeforeLevelRaise == 0) {
-        m_areaA->getAttachedGame()->addNeutralLayer();
-        m_cyclesBeforeLevelRaise = 200;
+    }
+    else {
+        m_cyclesBeforeLevelRaise--;
     }
     m_cyclesBeforeGameCycle--;
-    m_cyclesBeforeLevelRaise--;
     requestDraw();
 }
 

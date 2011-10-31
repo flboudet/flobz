@@ -59,17 +59,15 @@ int PuyoPuyo::lastID = 0;
 PuyoGame::PuyoGame()
 {
     attachedFactory = new PuyoDefaultFactory();
-    delegate = NULL;
 }
 
 PuyoGame::PuyoGame(PuyoFactory *attachedFactory) : attachedFactory(attachedFactory)
 {
-    delegate = NULL;
 }
 
-void PuyoGame::setDelegate(PuyoDelegate *delegate)
+void PuyoGame::addGameListener(GameListener *listener)
 {
-    this->delegate = delegate;
+    m_listeners.push_back(listener);
 }
 
 const char * PuyoGame::getPlayerName(int n)
@@ -178,15 +176,16 @@ void PuyoLocalGame::cycle()
 
     semiMove = 1 - semiMove;
     if (semiMove == 0) {
-        if ((!endOfCycle) && (delegate != NULL)) {
-            delegate->fallingsDidFallingStep(fallingPuyo, companionPuyo);
+        if (!endOfCycle) {
+            for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
+                 iter != m_listeners.end() ; ++iter)
+                (*iter)->fallingsDidFallingStep(fallingPuyo, companionPuyo);
         }
         return;
     }
     if (endOfCycle) {
         cycleEnding();
-        if (delegate != NULL)
-            notifyReductions();
+        notifyReductions();
         return;
     }
     if ((fallingY >= 0)&&(getPuyoCellAt(fallingX, fallingY+1) > PUYO_EMPTY) || (getPuyoCellAt(getFallingCompanionX(), getFallingCompanionY()+1) > PUYO_EMPTY)) {
@@ -194,13 +193,14 @@ void PuyoLocalGame::cycle()
         fallingPuyo->setPuyoState((PuyoState)(fallingPuyo->getPuyoState()+PUYO_STILL));
         setPuyoAt(getFallingCompanionX(), getFallY(getFallingCompanionX(), getFallingCompanionY()), companionPuyo);
         companionPuyo->setPuyoState((PuyoState)(companionPuyo->getPuyoState()+PUYO_STILL));
-        if (delegate != NULL) {
-            delegate->puyoDidFall(fallingPuyo, fallingX, fallingY, fallingCompanion == 0 ? 1 : 0);
-            delegate->puyoDidFall(companionPuyo, getFallingCompanionX(), getFallingCompanionY(), fallingCompanion == 0 ? 0 : 1);
-            gameStat.drop_count += 2;
-            fallingY = -10;
-            notifyReductions();
+        for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
+             iter != m_listeners.end() ; ++iter) {
+            (*iter)->puyoDidFall(fallingPuyo, fallingX, fallingY, fallingCompanion == 0 ? 1 : 0);
+            (*iter)->puyoDidFall(companionPuyo, getFallingCompanionX(), getFallingCompanionY(), fallingCompanion == 0 ? 0 : 1);
         }
+        gameStat.drop_count += 2;
+        fallingY = -10;
+        notifyReductions();
         endOfCycle = true;
     }
     else {
@@ -208,8 +208,9 @@ void PuyoLocalGame::cycle()
         if (phaseReady == 1) phaseReady = 2;
         fallingPuyo->setPuyoXY(fallingX, fallingY);
         companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
-		if (delegate != NULL) {
-			delegate->fallingsDidFallingStep(fallingPuyo, companionPuyo);
+        for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
+             iter != m_listeners.end() ; ++iter) {
+			(*iter)->fallingsDidFallingStep(fallingPuyo, companionPuyo);
 		}
         // Increase points
         switch (gameLevel)
@@ -278,8 +279,10 @@ void PuyoLocalGame::moveLeft()
     fallingPuyo->setPuyoXY(fallingX, fallingY);
     companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
 
-    if ((delegate != NULL) && (moved))
-        delegate->fallingsDidMoveLeft(fallingPuyo, companionPuyo);
+    if (moved)
+        for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
+             iter != m_listeners.end() ; ++iter)
+        (*iter)->fallingsDidMoveLeft(fallingPuyo, companionPuyo);
 }
 
 void PuyoLocalGame::moveRight()
@@ -296,8 +299,10 @@ void PuyoLocalGame::moveRight()
     fallingPuyo->setPuyoXY(fallingX, fallingY);
     companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
 
-    if ((delegate != NULL) && (moved))
-        delegate->fallingsDidMoveRight(fallingPuyo, companionPuyo);
+    if (moved)
+        for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
+             iter != m_listeners.end() ; ++iter)
+            (*iter)->fallingsDidMoveRight(fallingPuyo, companionPuyo);
 }
 
 void PuyoLocalGame::rotate(bool left)
@@ -335,8 +340,10 @@ void PuyoLocalGame::rotate(bool left)
 
     companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
 
-    if ((delegate != NULL) && (moved))
-        delegate->companionDidTurn(companionPuyo, fallingPuyo, !left);
+    if (moved)
+        for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
+             iter != m_listeners.end() ; ++iter)
+            (*iter)->companionDidTurn(companionPuyo, fallingPuyo, !left);
 
 }
 
@@ -419,8 +426,9 @@ void PuyoLocalGame::dropNeutrals()
         PuyoPuyo *newNeutral = attachedFactory->createPuyo(PUYO_NEUTRAL);
         puyoVector.add(newNeutral);
         setPuyoAt(posX, posY, newNeutral);
-        if (delegate != NULL)
-          delegate->gameDidAddNeutral(newNeutral, idNeutral++, totalNeutral);
+        for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
+             iter != m_listeners.end() ; ++iter)
+            (*iter)->gameDidAddNeutral(newNeutral, idNeutral++, totalNeutral);
       }
     }
     neutralPuyos = 0;
@@ -443,6 +451,9 @@ void PuyoLocalGame::addNeutralLayer()
             if (currentPuyo != NULL) {
                 setPuyoAt(i, j, NULL);
                 setPuyoAt(i, j-1, currentPuyo);
+                for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
+                     iter != m_listeners.end() ; ++iter)
+                    (*iter)->puyoDidFall(currentPuyo, i, j, 1);
             }
         }
     }
@@ -450,38 +461,43 @@ void PuyoLocalGame::addNeutralLayer()
         PuyoPuyo *newNeutral = attachedFactory->createPuyo(PUYO_NEUTRAL);
         puyoVector.add(newNeutral);
         setPuyoAt(i, PUYODIMY-1, newNeutral);
+        for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
+             iter != m_listeners.end() ; ++iter)
+            (*iter)->puyoDidFall(newNeutral, i, PUYODIMY, 1);
     }
 }
 
 void PuyoLocalGame::setFallingAtTop(bool gameConstruction)
 {
-  if (delegate != NULL)
-    delegate->gameDidEndCycle();
+    for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
+         iter != m_listeners.end() ; ++iter)
+        (*iter)->gameDidEndCycle();
 
-  if (!gameConstruction) {
-    dropNeutrals();
+    if (!gameConstruction) {
+        dropNeutrals();
         if (getPuyoCellAt((PUYODIMX-1)/2, 1) != PUYO_EMPTY) {
             gameRunning = false;
-            if (delegate != NULL)
-                delegate->gameLost();
+            for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
+                 iter != m_listeners.end() ; ++iter)
+                (*iter)->gameLost();
             return;
         }
-  }
+    }
 
-  // Creating the new falling puyo and its companion
-  fallingX = (PUYODIMX-1)/2;
-  fallingY = 1;
-  fallingCompanion = 2;
-  fallingPuyo = attachedFactory->createPuyo(attachedRandom->getPuyoForSequence(sequenceNr++));
-  companionPuyo = attachedFactory->createPuyo(attachedRandom->getPuyoForSequence(sequenceNr++));
-  fallingPuyo->setPuyoXY(fallingX, fallingY);
-  companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
-  puyoVector.add(fallingPuyo);
-  puyoVector.add(companionPuyo);
+    // Creating the new falling puyo and its companion
+    fallingX = (PUYODIMX-1)/2;
+    fallingY = 1;
+    fallingCompanion = 2;
+    fallingPuyo = attachedFactory->createPuyo(attachedRandom->getPuyoForSequence(sequenceNr++));
+    companionPuyo = attachedFactory->createPuyo(attachedRandom->getPuyoForSequence(sequenceNr++));
+    fallingPuyo->setPuyoXY(fallingX, fallingY);
+    companionPuyo->setPuyoXY(getFallingCompanionX(), getFallingCompanionY());
+    puyoVector.add(fallingPuyo);
+    puyoVector.add(companionPuyo);
 
-  endOfCycle = false;
-  semiMove = 0;
-  phase = 0;
+    endOfCycle = false;
+    semiMove = 0;
+    phase = 0;
 }
 
 int PuyoLocalGame::getFallingCompanionX() const
@@ -691,8 +707,9 @@ int PuyoLocalGame::removePuyos()
                     PuyoPuyo *currentPuyo = getPuyoAt(i, j);
                     setPuyoAt(i, j, NULL);
                     setPuyoAt(i, newJ, currentPuyo);
-                    if (delegate != NULL) {
-                        delegate->puyoDidFall(currentPuyo, i, j, feltBelow);
+                    for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
+                         iter != m_listeners.end() ; ++iter) {
+                        (*iter)->puyoDidFall(currentPuyo, i, j, feltBelow);
                         feltBelow++;
                     }
                 }
@@ -737,8 +754,9 @@ void PuyoLocalGame::notifyReductions()
                     // If there is more than 4 puyo in the group, let's notify it
                     if (removedCount >= 4) {
                         markPuyoAt(i, j, false, true);
-                        if (delegate != NULL)
-                            delegate->puyoWillVanish(removedPuyos, puyoGroupNumber++, phase+1);
+                        for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
+                             iter != m_listeners.end() ; ++iter)
+                            (*iter)->puyoWillVanish(removedPuyos, puyoGroupNumber++, phase+1);
                     }
                     else {
                         markPuyoAt(i, j, false, true);

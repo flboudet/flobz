@@ -26,6 +26,8 @@
 #include "PuyoGameAbstract.h"
 
 #include "ios_memory.h"
+#include <vector>
+
 using namespace ios_fc;
 
 #ifndef PUYOGAME_H
@@ -127,20 +129,20 @@ class PuyoDefaultFactory : public PuyoFactory {
   }
 };
 
-class PuyoDelegate {
+class GameListener {
 public:
-  virtual void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex, int totalNeutral) = 0;
+  virtual void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex, int totalNeutral) {}
   virtual void companionDidTurn(PuyoPuyo *companionPuyo,
 				PuyoPuyo *fallingPuyo,
-				bool counterclockwise) = 0;
-  virtual void fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo) = 0;
-  virtual void fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo) = 0;
-  virtual void fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo) = 0;
-  virtual void puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow) = 0;
-  virtual void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase) = 0;
-  virtual void gameDidEndCycle() = 0;
-  virtual void gameLost() = 0;
-  virtual ~PuyoDelegate() {};
+				bool counterclockwise) {}
+  virtual void fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo) {}
+  virtual void fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo) {}
+  virtual void fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo) {}
+  virtual void puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow) {}
+  virtual void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase) {}
+  virtual void gameDidEndCycle() {}
+  virtual void gameLost() {}
+  virtual ~GameListener() {};
 };
 
 class PuyoGame {
@@ -149,7 +151,7 @@ public:
     PuyoGame();
 
     virtual ~PuyoGame() {}
-    virtual void setDelegate(PuyoDelegate *delegate);
+    virtual void addGameListener(GameListener *listener);
     virtual void cycle() = 0;
 
     static const char * getPlayerName(int n);
@@ -210,7 +212,8 @@ public:
 
     virtual void addNeutralLayer() {}
 protected:
-    PuyoDelegate *delegate;
+    typedef std::vector<GameListener *> GameListenerPtrVector;
+    GameListenerPtrVector m_listeners;
     PuyoFactory *attachedFactory;
     PlayerGameStat gameStat;
 };

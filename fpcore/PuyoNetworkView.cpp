@@ -134,7 +134,7 @@ void PuyoNetworkView::rotateRight()
     sendStateMessage();
 }
 
-// PuyoDelegate methods
+// GameListener methods
 void PuyoNetworkView::fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
 {
     PuyoView::fallingsDidMoveLeft(fallingPuyo, companionPuyo);
