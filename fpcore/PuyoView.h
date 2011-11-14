@@ -117,7 +117,7 @@ class PuyoView : public GameListener {
     int getPlayerId() const { return m_playerId; }
     void setPlayerId(int playerId) { m_playerId = playerId; }
     virtual void gameWin();
-    void setShowNextPuyos(bool show) { m_showNextPuyos = show; }
+    void setShowNextFlobos(bool show) { m_showNextFlobos = show; }
     void setShowShadows(bool show) { m_showShadows = show; }
     void setShowEyes(bool show) { attachedFloboFactory.setShowEyes(show); }
     void setNeutralFlobosDisplayPosition(int x, int y) {
@@ -128,7 +128,7 @@ class PuyoView : public GameListener {
         this->m_xOffset = x;
         this->m_yOffset = y - TSIZE;
     }
-    void setNextPuyosPosition(int x, int y) {
+    void setNextFlobosPosition(int x, int y) {
         this->m_nXOffset = x;
         this->m_nYOffset = y;
     }
@@ -139,7 +139,7 @@ class PuyoView : public GameListener {
     int m_playerId;
     String p1name, p2name;
     bool cycleAllowed();
-    bool m_showNextPuyos, m_showShadows, m_showEyes;
+    bool m_showNextFlobos, m_showShadows, m_showEyes;
     bool skippedCycle;
     bool gameRunning;
     int m_xOffset, m_yOffset;

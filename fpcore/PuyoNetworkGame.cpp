@@ -44,10 +44,10 @@ PuyoNetworkGame::PuyoNetworkGame(FloboFactory *attachedFactory, MessageBox &msgB
     msgBox.addListener(this);
     semiMove = 0;
     neutralFlobos = 0;
-    sentBadPuyos = 0;
+    sentBadFlobos = 0;
     for (int i = 0 ; i < FLOBOBAN_DIMX ; i++) {
 		for (int j = 0 ; j <= FLOBOBAN_DIMY ; j++) {
-            setPuyoAt(i, j, NULL);
+            setFloboAt(i, j, NULL);
 		}
 	}
 }
@@ -111,14 +111,14 @@ void PuyoNetworkGame::synchronizePuyo(Buffer<int> buffer) {
     if (puyo == NULL) {
         puyo = attachedFactory->createFlobo((FloboState)puyoState);
         puyo->setID(floboID);
-        puyoVector.add(puyo);
+        floboVector.add(puyo);
         m_puyoMap[floboID] = puyo;
     }
     else {
         puyo->setFloboState((FloboState)puyoState);
     }
-    setPuyoAt(puyo->getFloboX(), puyo->getFloboY(), NULL);
-    setPuyoAt(posX, posY, puyo);
+    setFloboAt(puyo->getFloboX(), puyo->getFloboY(), NULL);
+    setFloboAt(posX, posY, puyo);
     puyo->setFlag(); // TODO: return puyo and to this in synchromessage
 }
 
@@ -138,16 +138,16 @@ void PuyoNetworkGame::synchronizeState(Message &message)
             synchronizePuyo(flobos+i);
 
         // Remove the flobos that were not flagged.
-        for (int i = puyoVector.size() - 1 ; i >= 0 ; i--) {
-            Flobo *currentPuyo = puyoVector[i];
-            if (currentPuyo->getFlag()) {
-                currentPuyo->unsetFlag();
+        for (int i = floboVector.size() - 1 ; i >= 0 ; i--) {
+            Flobo *currentFlobo = floboVector[i];
+            if (currentFlobo->getFlag()) {
+                currentFlobo->unsetFlag();
             }
             else {
-                setPuyoAt(currentPuyo->getFloboX(), currentPuyo->getFloboY(), NULL);
-                puyoVector.removeAt(i);
-                m_puyoMap.erase(currentPuyo->getID());
-                attachedFactory->deleteFlobo(currentPuyo);
+                setFloboAt(currentFlobo->getFloboX(), currentFlobo->getFloboY(), NULL);
+                floboVector.removeAt(i);
+                m_puyoMap.erase(currentFlobo->getID());
+                attachedFactory->deleteFlobo(currentFlobo);
             }
         }
     }
@@ -250,8 +250,8 @@ void PuyoNetworkGame::synchronizeState(Message &message)
                 temporaryGroup.clear();
                 int numPhase = willVanish[i++];
                 int groupNumber = willVanish[i++];
-                int numberOfPuyosInGroup = willVanish[i++];
-                for (int index = 0 ; index < numberOfPuyosInGroup ; index++) {
+                int numberOfFlobosInGroup = willVanish[i++];
+                for (int index = 0 ; index < numberOfFlobosInGroup ; index++) {
                     Flobo *vanishedPuyo = findPuyo(willVanish[i + index]);
                     if (vanishedPuyo != NULL)
                         temporaryGroup.add(vanishedPuyo);
@@ -259,19 +259,19 @@ void PuyoNetworkGame::synchronizeState(Message &message)
                 for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                      iter != m_listeners.end() ; ++iter)
                 (*iter)->floboWillVanish(temporaryGroup, groupNumber, numPhase);
-                i += numberOfPuyosInGroup;
+                i += numberOfFlobosInGroup;
             }
         }
     }
-    int badPuyos = message.getInt(NUMBER_BAD_PUYOS);
-    if (badPuyos > sentBadPuyos) {
-        neutralFlobos = sentBadPuyos - badPuyos;
+    int badFlobos = message.getInt(NUMBER_BAD_PUYOS);
+    if (badFlobos > sentBadFlobos) {
+        neutralFlobos = sentBadFlobos - badFlobos;
         for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
              iter != m_listeners.end() ; ++iter) {
             (*iter)->gameDidEndCycle();
         }
         neutralFlobos = 0;
-        sentBadPuyos = badPuyos;
+        sentBadFlobos = badFlobos;
     }
 
     neutralFlobos = message.getInt(CURRENT_NEUTRALS);
@@ -293,25 +293,25 @@ Flobo *PuyoNetworkGame::getFloboAt(int X, int Y) const
 {
     if ((X >= FLOBOBAN_DIMX) || (Y >= FLOBOBAN_DIMY) || (X < 0) || (Y < 0))
 		return NULL;
-    return puyoCells[X + Y * FLOBOBAN_DIMX];
+    return floboCells[X + Y * FLOBOBAN_DIMX];
 }
 
-void PuyoNetworkGame::setPuyoAt(int X, int Y, Flobo *newPuyo)
+void PuyoNetworkGame::setFloboAt(int X, int Y, Flobo *newFlobo)
 {
-    puyoCells[X + Y * FLOBOBAN_DIMX] = newPuyo;
-    if (newPuyo != NULL)
-        newPuyo->setFloboXY(X, Y);
+    floboCells[X + Y * FLOBOBAN_DIMX] = newFlobo;
+    if (newFlobo != NULL)
+        newFlobo->setFloboXY(X, Y);
 }
 
 // List access to the Flobo objects
 int PuyoNetworkGame::getFloboCount() const
 {
-    return puyoVector.size();
+    return floboVector.size();
 }
 
 Flobo *PuyoNetworkGame::getFloboAtIndex(int index) const
 {
-    return puyoVector[index];
+    return floboVector[index];
 }
 
 FloboState PuyoNetworkGame::getNextFalling()

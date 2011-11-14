@@ -112,8 +112,8 @@ public:
     virtual int getLifeDisplayY() const = 0;
     virtual int getPuyobanX(int playerId) const = 0;
     virtual int getPuyobanY(int playerId) const = 0;
-    virtual int getNextPuyosX(int playerId) const = 0;
-    virtual int getNextPuyosY(int playerId) const = 0;
+    virtual int getNextFlobosX(int playerId) const = 0;
+    virtual int getNextFlobosY(int playerId) const = 0;
     virtual int getNeutralDisplayX(int playerId) const = 0;
     virtual int getNeutralDisplayY(int playerId) const = 0;
     virtual int getNameDisplayX(int playerId) const    = 0;

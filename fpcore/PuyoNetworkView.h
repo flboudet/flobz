@@ -37,7 +37,7 @@ class PuyoNetworkView : public PuyoView {
   public:
     PuyoNetworkView(FloboGameFactory *attachedFloboGameFactory, MessageBox *mbox, int gameId)
         : PuyoView(attachedFloboGameFactory),
-          mbox(mbox), gameId(gameId), badPuyos(0), lastFullMessage(-1) {}
+          mbox(mbox), gameId(gameId), badFlobos(0), lastFullMessage(-1) {}
 
     PuyoNetworkView(FloboGameFactory *attachedFloboGameFactory,
             int playerId,
@@ -45,7 +45,7 @@ class PuyoNetworkView : public PuyoView {
             LevelTheme *attachedLevelTheme,
 		    MessageBox *mbox, int gameId)
         : PuyoView(attachedFloboGameFactory, playerId, attachedPuyoThemeSet, attachedLevelTheme),
-          mbox(mbox), gameId(gameId), badPuyos(0), lastFullMessage(-1) {}
+          mbox(mbox), gameId(gameId), badFlobos(0), lastFullMessage(-1) {}
 
     void cycleGame();
 
@@ -81,7 +81,7 @@ protected:
     AdvancedBuffer<int> compTurnBuffer;
     AdvancedBuffer<int> didFallBuffer;
     AdvancedBuffer<int> willVanishBuffer;
-    int badPuyos;
+    int badFlobos;
     double lastFullMessage;
 };
 

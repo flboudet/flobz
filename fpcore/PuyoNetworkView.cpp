@@ -56,11 +56,11 @@ Message *PuyoNetworkView::createStateMessage(bool sendFullMessage)
         int puyoCount = attachedGame->getFloboCount();
         AdvancedBuffer<int> buffer(puyoCount * 4);
         for (int i = 0 ; i < puyoCount ; i++) {
-            Flobo *currentPuyo = attachedGame->getFloboAtIndex(i);
-            buffer.add(currentPuyo->getID());
-            buffer.add(currentPuyo->getFloboState());
-            buffer.add(currentPuyo->getFloboX());
-            buffer.add(currentPuyo->getFloboY());
+            Flobo *currentFlobo = attachedGame->getFloboAtIndex(i);
+            buffer.add(currentFlobo->getID());
+            buffer.add(currentFlobo->getFloboState());
+            buffer.add(currentFlobo->getFloboX());
+            buffer.add(currentFlobo->getFloboY());
         }
         message->addIntArray(PuyoMessage::PUYOS, buffer);
     }
@@ -81,7 +81,7 @@ Message *PuyoNetworkView::createStateMessage(bool sendFullMessage)
     if (willVanishBuffer.size() > 0)
         message->addIntArray(PuyoMessage::WILL_VANISH,   willVanishBuffer);
 
-    message->addInt     (PuyoMessage::NUMBER_BAD_PUYOS, badPuyos);
+    message->addInt     (PuyoMessage::NUMBER_BAD_PUYOS, badFlobos);
 
     // Clear the buffers after they have been sent
     neutralsBuffer.clear();
@@ -189,7 +189,7 @@ void PuyoNetworkView::gameDidEndCycle()
 {
     PuyoView::gameDidEndCycle();
     if (attachedGame->getNeutralFlobos() < 0)
-        badPuyos -= attachedGame->getNeutralFlobos();
+        badFlobos -= attachedGame->getNeutralFlobos();
     sendStateMessage(true);
 }
 
@@ -227,8 +227,8 @@ void PuyoNetworkView::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int g
     willVanishBuffer.add(floboGroup.size());
     for (int i = 0 ; i < floboGroup.size() ; i++)
     {
-        Flobo *currentPuyo = floboGroup[i];
-        willVanishBuffer.add(currentPuyo->getID());
+        Flobo *currentFlobo = floboGroup[i];
+        willVanishBuffer.add(currentFlobo->getID());
     }
 }
 

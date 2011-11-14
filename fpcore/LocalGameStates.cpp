@@ -90,10 +90,10 @@ void SetupMatchState::enterState()
     GTLogTrace("SetupMatchState::enterState()");
     // Prepare 1st run
     m_sharedAssets->m_currentLevelTheme = theCommander->getPreferedLevelTheme();
-    m_sharedAssets->m_currentPuyoSetTheme = theCommander->getPreferedPuyoSetTheme();
+    m_sharedAssets->m_currentFloboSetTheme = theCommander->getPreferedPuyoSetTheme();
     // Create the gamewidget and register as the gamewidget's action
     GameWidget *newGameWidget =
-        m_gameWidgetFactory->createGameWidget(*(m_sharedAssets->m_currentPuyoSetTheme),
+        m_gameWidgetFactory->createGameWidget(*(m_sharedAssets->m_currentFloboSetTheme),
                                               *(m_sharedAssets->m_currentLevelTheme),
                                               m_sharedAssets->m_currentLevelTheme->getCentralAnimation2P().c_str(), NULL);
     newGameWidget->setGameOptions(m_gameOptions);

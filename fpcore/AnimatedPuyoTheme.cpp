@@ -177,13 +177,13 @@ void ThemeManagerImpl::end_floboset(GoomSL *gsl, GoomHash *global,
     newThemeDescription.localizedDescription = themeMgr->m_localeDictionary->getLocalizedString(newThemeDescription.description.c_str(),true);
     newThemeDescription.path = themeMgr->m_themePackLoadingPath;
     for (int i = 0 ; i < NUMBER_OF_PUYOS_IN_SET ; i++) {
-        PuyoThemeDescription &currentPuyoThemeDescription =
+        PuyoThemeDescription &currentFloboThemeDescription =
             newThemeDescription.puyoThemeDescriptions[i];
-        currentPuyoThemeDescription.face =      (const char *)GSL_GLOBAL_PTR(gsl, s_key_PuyoFace[i]);
-        currentPuyoThemeDescription.disappear = (const char *)GSL_GLOBAL_PTR(gsl, s_key_PuyoDisappear[i]);
-        currentPuyoThemeDescription.explosion = (const char *)GSL_GLOBAL_PTR(gsl, s_key_PuyoExplosion[i]);
-        currentPuyoThemeDescription.eye =       (const char *)GSL_GLOBAL_PTR(gsl, s_key_PuyoEye[i]);
-        currentPuyoThemeDescription.colorOffset = GSL_GLOBAL_FLOAT(gsl, s_key_PuyoColorOffset[i]);
+        currentFloboThemeDescription.face =      (const char *)GSL_GLOBAL_PTR(gsl, s_key_PuyoFace[i]);
+        currentFloboThemeDescription.disappear = (const char *)GSL_GLOBAL_PTR(gsl, s_key_PuyoDisappear[i]);
+        currentFloboThemeDescription.explosion = (const char *)GSL_GLOBAL_PTR(gsl, s_key_PuyoExplosion[i]);
+        currentFloboThemeDescription.eye =       (const char *)GSL_GLOBAL_PTR(gsl, s_key_PuyoEye[i]);
+        currentFloboThemeDescription.colorOffset = GSL_GLOBAL_FLOAT(gsl, s_key_PuyoColorOffset[i]);
     }
     themeMgr->m_puyoSetThemeList.push_back(themeName);
 }
@@ -749,10 +749,10 @@ int LevelThemeImpl::getPuyobanX(int playerId) const
 int LevelThemeImpl::getPuyobanY(int playerId) const
 { return m_desc.puyoban[playerId].displayY; }
 
-int LevelThemeImpl::getNextPuyosX(int playerId) const
+int LevelThemeImpl::getNextFlobosX(int playerId) const
 { return m_desc.puyoban[playerId].nextX; }
 
-int LevelThemeImpl::getNextPuyosY(int playerId) const
+int LevelThemeImpl::getNextFlobosY(int playerId) const
 { return m_desc.puyoban[playerId].nextY; }
 
 int LevelThemeImpl::getNeutralDisplayX(int playerId) const

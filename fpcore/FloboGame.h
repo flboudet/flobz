@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -114,7 +114,7 @@ private:
     bool flag, bmark;
 };
 
-// The flobos must be created by a factory to ensure custom puyo creation
+// The flobos must be created by a factory to ensure custom flobo creation
 class FloboFactory {
  public:
   virtual Flobo *createFlobo(FloboState state) = 0;
@@ -138,7 +138,7 @@ public:
   virtual void fallingsDidMoveLeft(Flobo *fallingFlobo, Flobo *companionFlobo) {}
   virtual void fallingsDidMoveRight(Flobo *fallingFlobo, Flobo *companionFlobo) {}
   virtual void fallingsDidFallingStep(Flobo *fallingFlobo, Flobo *companionFlobo) {}
-  virtual void floboDidFall(Flobo *puyo, int originX, int originY, int nFalledBelow) {}
+  virtual void floboDidFall(Flobo *flobo, int originX, int originY, int nFalledBelow) {}
   virtual void floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase) {}
   virtual void gameDidEndCycle() {}
   virtual void gameLost() {}
@@ -154,11 +154,7 @@ public:
     virtual void addGameListener(GameListener *listener);
     virtual void cycle() = 0;
 
-    /*
-        // Get the state of the puyo at the indicated coordinates
-        FloboState getPuyoCellAt(int X, int Y) const;
-    */
-    // Get the puyo at the indicated coordinates
+    // Get the flobo at the indicated coordinates
     virtual Flobo *getFloboAt(int X, int Y) const = 0;
 
     // List access to the Flobo objects
@@ -216,9 +212,7 @@ public:
     virtual ~FloboLocalGame();
     void cycle();
 
-    // Get the state of the puyo at the indicated coordinates
-    FloboState getPuyoCellAt(int X, int Y) const;
-    // Get the puyo at the indicated coordinates
+    // Get the flobo at the indicated coordinates
     Flobo *getFloboAt(int X, int Y) const;
 
     // List access to the Flobo objects
@@ -263,32 +257,34 @@ public:
     virtual void addNeutralLayer();
 private:
     void InitGame(RandomSystem *attachedRandom);
-    // Set the state of the puyo at the indicated coordinates (not recommanded)
-    void setPuyoCellAt(int X, int Y, FloboState value);
-    // Set the puyo at the indicated coordinates
-    void setPuyoAt(int X, int Y, Flobo *newPuyo);
+    // Get the state of the flobo at the indicated coordinates
+    FloboState getFloboCellAt(int X, int Y) const;
+    // Set the state of the flobo at the indicated coordinates (not recommanded)
+    void setFloboCellAt(int X, int Y, FloboState value);
+    // Set the flobo at the indicated coordinates
+    void setFloboAt(int X, int Y, Flobo *newFlobo);
 
     void setFallingAtTop(bool gameConstruction = false);
     int getFallY(int X, int Y) const;
     void cycleEnding();
-    void markPuyoAt(int X, int Y, bool mark, bool includeNeutral);
-    void deleteMarkedPuyosAt(int X, int Y);
-    int removePuyos();
+    void markFloboAt(int X, int Y, bool mark, bool includeNeutral);
+    void deleteMarkedFlobosAt(int X, int Y);
+    int removeFlobos();
     void notifyReductions();
 
     bool gameRunning;
     bool endOfCycle;
 
-    // The falling is the puyo you couldn't control,
-    // whereas you can make the companion turn around the falling puyo
+    // The falling is the flobo you couldn't control,
+    // whereas you can make the companion turn around the falling flobo
     Flobo *fallingFlobo, *companionFlobo;
     int fallingX, fallingY;
 
-    // Position of the companion is relative of the falling puyo
+    // Position of the companion is relative of the falling flobo
     // 0 = up 1 = left 2 = down 3 = up
     unsigned char fallingCompanion;
 
-    Flobo *puyoCells[FLOBOBAN_DIMX * (FLOBOBAN_DIMY+1)];
+    Flobo *floboCells[FLOBOBAN_DIMX * (FLOBOBAN_DIMY+1)];
     RandomSystem *attachedRandom;
     int sequenceNr;
     int phaseReady;
@@ -296,11 +292,11 @@ private:
     int phase;
     int semiMove;
 
-    // This is not really a puyo, it is instead an indicator for the edges of the game
-    Flobo *unmoveablePuyo;
+    // This is not really a flobo, it is instead an indicator for the edges of the game
+    Flobo *unmoveableFlobo;
 
     // We are keeping a list of current flobos
-    AdvancedBuffer<Flobo *> puyoVector;
+    AdvancedBuffer<Flobo *> floboVector;
     int nbFalled;
 
     // Game level for points calculation

@@ -51,14 +51,14 @@ struct SharedMatchAssets
     SharedMatchAssets() {
         release();
     }
-    PuyoSetThemeRef m_currentPuyoSetTheme;
+    PuyoSetThemeRef m_currentFloboSetTheme;
     LevelThemeRef m_currentLevelTheme;
     std::auto_ptr<GameWidget> m_gameWidget;
     std::auto_ptr<GameScreen> m_gameScreen;
     int m_leftVictories, m_leftTotal;
     int m_rightVictories, m_rightTotal;
     void release() {
-        m_currentPuyoSetTheme.release();
+        m_currentFloboSetTheme.release();
         m_currentLevelTheme.release();
         m_gameWidget.reset(NULL);
         m_gameScreen.reset(NULL);

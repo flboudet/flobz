@@ -38,7 +38,7 @@ PuyoView::PuyoView(FloboGameFactory *attachedFloboGameFactory,
                    int playerId,
                    PuyoSetTheme *attachedThemeSet,
                    LevelTheme *attachedLevelTheme)
-  : m_playerId(playerId), m_showNextPuyos(true), m_showShadows(true),
+  : m_playerId(playerId), m_showNextFlobos(true), m_showShadows(true),
     attachedThemeSet(attachedThemeSet), attachedLevelTheme(attachedLevelTheme),
     attachedFloboFactory(this), delayBeforeGameOver(60), haveDisplay(true),
     m_xOffset(0), m_yOffset(- TSIZE), m_nXOffset(0), m_nYOffset(0),
@@ -56,11 +56,11 @@ void PuyoView::setupLayout(int playerId)
     setPlayerId(playerId);
     setPosition(attachedLevelTheme->getPuyobanX(playerId),
                 attachedLevelTheme->getPuyobanY(playerId));
-    setNextPuyosPosition(attachedLevelTheme->getNextPuyosX(playerId),
-                         attachedLevelTheme->getNextPuyosY(playerId));
+    setNextFlobosPosition(attachedLevelTheme->getNextFlobosX(playerId),
+                         attachedLevelTheme->getNextFlobosY(playerId));
     setNeutralFlobosDisplayPosition(attachedLevelTheme->getNeutralDisplayX(playerId),
                                    attachedLevelTheme->getNeutralDisplayY(playerId));
-    setShowNextPuyos(attachedLevelTheme->getShouldDisplayNext(playerId));
+    setShowNextFlobos(attachedLevelTheme->getShouldDisplayNext(playerId));
     setShowShadows(attachedLevelTheme->getShouldDisplayShadows(playerId));
     setShowEyes(attachedLevelTheme->getShouldDisplayEyes(playerId));
 }
@@ -132,9 +132,9 @@ void PuyoView::cycleAnimation(void)
 
         // Cycling every puyo's animation
         for (int i = 0, j = attachedGame->getFloboCount() ; i < j ; i++) {
-            AnimatedPuyo *currentPuyo =
+            AnimatedPuyo *currentFlobo =
               (AnimatedPuyo *)(attachedGame->getFloboAtIndex(i));
-            currentPuyo->cycleAnimation();
+            currentFlobo->cycleAnimation();
         }
         // Cycling dead puyo's animations
         attachedFloboFactory.cycleWalhalla();
@@ -203,19 +203,19 @@ void PuyoView::render(DrawTarget *dt)
     // Render shadows
     if (m_showShadows) {
         for (int i = 0, j = attachedGame->getFloboCount() ; i < j ; i++) {
-            AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getFloboAtIndex(i));
-            if (displayFallings || !currentPuyo->isFalling()) currentPuyo->renderShadow(dt);
+            AnimatedPuyo *currentFlobo = (AnimatedPuyo *)(attachedGame->getFloboAtIndex(i));
+            if (displayFallings || !currentFlobo->isFalling()) currentFlobo->renderShadow(dt);
         }
     }
     // Render flobos
  	for (int i = 0, j = attachedGame->getFloboCount() ; i < j ; i++) {
-        AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getFloboAtIndex(i));
-        if (displayFallings || !currentPuyo->isFalling()) currentPuyo->render(dt);
+        AnimatedPuyo *currentFlobo = (AnimatedPuyo *)(attachedGame->getFloboAtIndex(i));
+        if (displayFallings || !currentFlobo->isFalling()) currentFlobo->render(dt);
     }
     // drawing the walhalla
     attachedFloboFactory.renderWalhalla(dt);
 
-    if (m_showNextPuyos) {
+    if (m_showNextFlobos) {
         drect.x = m_nXOffset;
         drect.y = m_nYOffset;
         drect.w = TSIZE;
@@ -375,13 +375,13 @@ void PuyoView::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum
     // Exploding puyo animation
     AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
     for (int i = 0, j = floboGroup.size() ; i < j ; i++) {
-        AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(floboGroup[i]);
+        AnimatedPuyo *currentFlobo = static_cast<AnimatedPuyo *>(floboGroup[i]);
         PuyoAnimation *newAnimation;
-        if (currentPuyo->getFloboState() != FLOBO_NEUTRAL)
-            newAnimation = new VanishAnimation(*currentPuyo, i*2 , m_xOffset, m_yOffset, synchronizer, i, floboGroup.size(), groupNum, phase);
+        if (currentFlobo->getFloboState() != FLOBO_NEUTRAL)
+            newAnimation = new VanishAnimation(*currentFlobo, i*2 , m_xOffset, m_yOffset, synchronizer, i, floboGroup.size(), groupNum, phase);
         else
-            newAnimation = new NeutralPopAnimation(*currentPuyo, i*2, synchronizer);
-        currentPuyo->addAnimation(newAnimation);
+            newAnimation = new NeutralPopAnimation(*currentFlobo, i*2, synchronizer);
+        currentFlobo->addAnimation(newAnimation);
         // Compute the center of the vanishing flobos padding
         groupPadding += newAnimation->getPuyoSoundPadding();
     }
@@ -449,8 +449,8 @@ void PuyoView::gameLost()
     for (int i = 0 ; i <= FLOBOBAN_DIMX ; i++) {
         for (int j = 0 ; j <= FLOBOBAN_DIMY ; j++) {
             if (attachedGame->getFloboAt(i, j) != NULL) {
-                AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(attachedGame->getFloboAt(i, j));
-                currentPuyo->addAnimation(new GameOverFallAnimation(*currentPuyo, (j - FLOBOBAN_DIMY) + abs((FLOBOBAN_DIMX / 2) - i) * 5));
+                AnimatedPuyo *currentFlobo = static_cast<AnimatedPuyo *>(attachedGame->getFloboAt(i, j));
+                currentFlobo->addAnimation(new GameOverFallAnimation(*currentFlobo, (j - FLOBOBAN_DIMY) + abs((FLOBOBAN_DIMX / 2) - i) * 5));
             }
         }
     }

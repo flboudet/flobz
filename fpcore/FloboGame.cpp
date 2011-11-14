@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -87,13 +87,13 @@ void FloboLocalGame::InitGame(RandomSystem *attachedRandom)
     nbFalled = 0;
     phaseReady = 2;
     int i, j;
-    unmoveablePuyo = attachedFactory->createFlobo(FLOBO_UNMOVEABLE);
+    unmoveableFlobo = attachedFactory->createFlobo(FLOBO_UNMOVEABLE);
     for (i = 0 ; i < FLOBOBAN_DIMX ; i++) {
         for (j = 0 ; j <= FLOBOBAN_DIMY ; j++) {
             if (j == FLOBOBAN_DIMY)
-                setPuyoAt(i, j, unmoveablePuyo);
+                setFloboAt(i, j, unmoveableFlobo);
             else
-                setPuyoAt(i, j, NULL);
+                setFloboAt(i, j, NULL);
         }
     }
     this->attachedRandom = attachedRandom;
@@ -110,9 +110,9 @@ void FloboLocalGame::InitGame(RandomSystem *attachedRandom)
 
 FloboLocalGame::~FloboLocalGame()
 {
-    delete unmoveablePuyo;
-    for (int i = 0 ; i < puyoVector.size() ; i++) {
-        delete puyoVector[i];
+    delete unmoveableFlobo;
+    for (int i = 0 ; i < floboVector.size() ; i++) {
+        delete floboVector[i];
     }
 }
 
@@ -135,10 +135,10 @@ void FloboLocalGame::cycle()
         notifyReductions();
         return;
     }
-    if ((fallingY >= 0)&&(getPuyoCellAt(fallingX, fallingY+1) > FLOBO_EMPTY) || (getPuyoCellAt(getFallingCompanionX(), getFallingCompanionY()+1) > FLOBO_EMPTY)) {
-        setPuyoAt(fallingX, getFallY(fallingX, fallingY), fallingFlobo);
+    if ((fallingY >= 0)&&(getFloboCellAt(fallingX, fallingY+1) > FLOBO_EMPTY) || (getFloboCellAt(getFallingCompanionX(), getFallingCompanionY()+1) > FLOBO_EMPTY)) {
+        setFloboAt(fallingX, getFallY(fallingX, fallingY), fallingFlobo);
         fallingFlobo->setFloboState((FloboState)(fallingFlobo->getFloboState()+FLOBO_STILL));
-        setPuyoAt(getFallingCompanionX(), getFallY(getFallingCompanionX(), getFallingCompanionY()), companionFlobo);
+        setFloboAt(getFallingCompanionX(), getFallY(getFallingCompanionX(), getFallingCompanionY()), companionFlobo);
         companionFlobo->setFloboState((FloboState)(companionFlobo->getFloboState()+FLOBO_STILL));
         for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
              iter != m_listeners.end() ; ++iter) {
@@ -177,38 +177,38 @@ void FloboLocalGame::cycle()
     }
 }
 
-// Get the state of the puyo at the indicated coordinates
-FloboState FloboLocalGame::getPuyoCellAt(int X, int Y) const
+// Get the state of the flobo at the indicated coordinates
+FloboState FloboLocalGame::getFloboCellAt(int X, int Y) const
 {
-    Flobo *thePuyo = getFloboAt(X, Y);
-    if (thePuyo)
-        return thePuyo->getFloboState();
+    Flobo *theFlobo = getFloboAt(X, Y);
+    if (theFlobo)
+        return theFlobo->getFloboState();
     return FLOBO_EMPTY;
 }
 
-// Get the puyo at the indicated coordinates
+// Get the flobo at the indicated coordinates
 Flobo *FloboLocalGame::getFloboAt(int X, int Y) const
 {
     if ((X >= FLOBOBAN_DIMX) || (Y >= FLOBOBAN_DIMY) || (X < 0) || (Y < 0))
-        return unmoveablePuyo;
+        return unmoveableFlobo;
     if (!endOfCycle) {
         if ((X == fallingX) && (Y == fallingY))
             return fallingFlobo;
         if ((X == getFallingCompanionX()) && (Y == getFallingCompanionY()))
             return companionFlobo;
     }
-    return puyoCells[X + Y * FLOBOBAN_DIMX];
+    return floboCells[X + Y * FLOBOBAN_DIMX];
 }
 
 // List access to the Flobo objects
 int FloboLocalGame::getFloboCount() const
 {
-    return puyoVector.size();
+    return floboVector.size();
 }
 
 Flobo *FloboLocalGame::getFloboAtIndex(int index) const
 {
-    return puyoVector[index];
+    return floboVector[index];
 }
 
 void FloboLocalGame::moveLeft()
@@ -217,8 +217,8 @@ void FloboLocalGame::moveLeft()
         return;
     }
     bool moved = false;
-    if (((fallingY<0)&&(fallingX>0))||((getPuyoCellAt(fallingX-1, fallingY) <= FLOBO_EMPTY)
-     && (getPuyoCellAt(getFallingCompanionX()-1, getFallingCompanionY()) <= FLOBO_EMPTY))) {
+    if (((fallingY<0)&&(fallingX>0))||((getFloboCellAt(fallingX-1, fallingY) <= FLOBO_EMPTY)
+     && (getFloboCellAt(getFallingCompanionX()-1, getFallingCompanionY()) <= FLOBO_EMPTY))) {
 		moved = true;
 		fallingX--;
     }
@@ -238,8 +238,8 @@ void FloboLocalGame::moveRight()
         return;
     }
     bool moved = false;
-    if (((fallingY<0)&&(fallingX<FLOBOBAN_DIMX-1))||((getPuyoCellAt(fallingX+1, fallingY) <= FLOBO_EMPTY)
-        && (getPuyoCellAt(getFallingCompanionX()+1, getFallingCompanionY()) <= FLOBO_EMPTY))) {
+    if (((fallingY<0)&&(fallingX<FLOBOBAN_DIMX-1))||((getFloboCellAt(fallingX+1, fallingY) <= FLOBO_EMPTY)
+        && (getFloboCellAt(getFallingCompanionX()+1, getFallingCompanionY()) <= FLOBO_EMPTY))) {
 	moved = true;
         fallingX++;
     }
@@ -265,10 +265,10 @@ void FloboLocalGame::rotate(bool left)
     int newCompanionX = getFallingCompanionX();
     int newCompanionY = getFallingCompanionY();
     fallingCompanion = backupCompanion;
-    if (getPuyoCellAt(newCompanionX, newCompanionY) > FLOBO_EMPTY) {
+    if (getFloboCellAt(newCompanionX, newCompanionY) > FLOBO_EMPTY) {
         newX = fallingX + (fallingX - newCompanionX);
         newY = fallingY + (fallingY - newCompanionY);
-        if (getPuyoCellAt(newX, newY) > FLOBO_EMPTY) {
+        if (getFloboCellAt(newX, newY) > FLOBO_EMPTY) {
             moved = false;
         }
         else {
@@ -326,21 +326,21 @@ int FloboLocalGame::getNeutralFlobos() const
 
 
 
-// Set the state of the puyo at the indicated coordinates (not recommanded)
-void FloboLocalGame::setPuyoCellAt(int X, int Y, FloboState value)
+// Set the state of the flobo at the indicated coordinates (not recommanded)
+void FloboLocalGame::setFloboCellAt(int X, int Y, FloboState value)
 {
     /*if ((X > FLOBOBAN_DIMX) || (Y > FLOBOBAN_DIMY))
         return;*/
-  if (puyoCells[X + Y * FLOBOBAN_DIMX])
-    puyoCells[X + Y * FLOBOBAN_DIMX]->setFloboState(value);
+  if (floboCells[X + Y * FLOBOBAN_DIMX])
+    floboCells[X + Y * FLOBOBAN_DIMX]->setFloboState(value);
 };
 
-// Set the puyo at the indicated coordinates
-void FloboLocalGame::setPuyoAt(int X, int Y, Flobo *newPuyo)
+// Set the flobo at the indicated coordinates
+void FloboLocalGame::setFloboAt(int X, int Y, Flobo *newFlobo)
 {
-    puyoCells[X + Y * FLOBOBAN_DIMX] = newPuyo;
-    if (newPuyo != NULL)
-        newPuyo->setFloboXY(X, Y);
+    floboCells[X + Y * FLOBOBAN_DIMX] = newFlobo;
+    if (newFlobo != NULL)
+        newFlobo->setFloboXY(X, Y);
 }
 
 int FloboLocalGame::getGameTotalNeutralFlobos() const
@@ -367,12 +367,12 @@ void FloboLocalGame::dropNeutrals()
         int posX = fallingTable[(nbFalled++) % FLOBOBAN_DIMX];
         int posY = getFallY(posX, 2);
         neutralFlobos -= 1;
-        if (getPuyoCellAt(posX, posY) != FLOBO_EMPTY)
+        if (getFloboCellAt(posX, posY) != FLOBO_EMPTY)
             continue;
-        // Creating a new neutral puyo
+        // Creating a new neutral flobo
         Flobo *newNeutral = attachedFactory->createFlobo(FLOBO_NEUTRAL);
-        puyoVector.add(newNeutral);
-        setPuyoAt(posX, posY, newNeutral);
+        floboVector.add(newNeutral);
+        setFloboAt(posX, posY, newNeutral);
         for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
              iter != m_listeners.end() ; ++iter)
             (*iter)->gameDidAddNeutral(newNeutral, idNeutral++, totalNeutral);
@@ -394,20 +394,20 @@ void FloboLocalGame::addNeutralLayer()
     // Raise everything up
     for (int j = 1 ; j < FLOBOBAN_DIMY ; ++j) {
         for (int i = 0 ; i < FLOBOBAN_DIMX ; ++i) {
-            Flobo *currentPuyo = getFloboAt(i, j);
-            if (currentPuyo != NULL) {
-                setPuyoAt(i, j, NULL);
-                setPuyoAt(i, j-1, currentPuyo);
+            Flobo *currentFlobo = getFloboAt(i, j);
+            if (currentFlobo != NULL) {
+                setFloboAt(i, j, NULL);
+                setFloboAt(i, j-1, currentFlobo);
                 for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                      iter != m_listeners.end() ; ++iter)
-                    (*iter)->floboDidFall(currentPuyo, i, j, 1);
+                    (*iter)->floboDidFall(currentFlobo, i, j, 1);
             }
         }
     }
     for (int i = 0 ; i < FLOBOBAN_DIMX ; ++i) {
         Flobo *newNeutral = attachedFactory->createFlobo(FLOBO_NEUTRAL);
-        puyoVector.add(newNeutral);
-        setPuyoAt(i, FLOBOBAN_DIMY-1, newNeutral);
+        floboVector.add(newNeutral);
+        setFloboAt(i, FLOBOBAN_DIMY-1, newNeutral);
         for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
              iter != m_listeners.end() ; ++iter)
             (*iter)->floboDidFall(newNeutral, i, FLOBOBAN_DIMY, 1);
@@ -422,7 +422,7 @@ void FloboLocalGame::setFallingAtTop(bool gameConstruction)
 
     if (!gameConstruction) {
         dropNeutrals();
-        if (getPuyoCellAt((FLOBOBAN_DIMX-1)/2, 1) != FLOBO_EMPTY) {
+        if (getFloboCellAt((FLOBOBAN_DIMX-1)/2, 1) != FLOBO_EMPTY) {
             gameRunning = false;
             for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                  iter != m_listeners.end() ; ++iter)
@@ -431,7 +431,7 @@ void FloboLocalGame::setFallingAtTop(bool gameConstruction)
         }
     }
 
-    // Creating the new falling puyo and its companion
+    // Creating the new falling flobo and its companion
     fallingX = (FLOBOBAN_DIMX-1)/2;
     fallingY = 1;
     fallingCompanion = 2;
@@ -439,8 +439,8 @@ void FloboLocalGame::setFallingAtTop(bool gameConstruction)
     companionFlobo = attachedFactory->createFlobo(attachedRandom->getFloboStateForSequence(sequenceNr++));
     fallingFlobo->setFloboXY(fallingX, fallingY);
     companionFlobo->setFloboXY(getFallingCompanionX(), getFallingCompanionY());
-    puyoVector.add(fallingFlobo);
-    puyoVector.add(companionFlobo);
+    floboVector.add(fallingFlobo);
+    floboVector.add(companionFlobo);
 
     endOfCycle = false;
     semiMove = 0;
@@ -468,7 +468,7 @@ int FloboLocalGame::getFallingCompanionY() const
 int FloboLocalGame::getFallY(int X, int Y) const
 {
     int result = Y + 1;
-    while (getPuyoCellAt(X, result) == FLOBO_EMPTY)
+    while (getFloboCellAt(X, result) == FLOBO_EMPTY)
         result++;
     return result - 1;
 }
@@ -477,7 +477,7 @@ int FloboLocalGame::getColumnHeigth(int colNum) const
 {
   int result = 0;
   for (int i = 0 ; i < FLOBOBAN_DIMY ; i++) {
-    if (getPuyoCellAt(colNum, i) > FLOBO_EMPTY)
+    if (getFloboCellAt(colNum, i) > FLOBO_EMPTY)
       result++;
   }
   return result;
@@ -513,28 +513,28 @@ int FloboLocalGame::getSameFloboAround(int X, int Y, FloboState color)
     for (int i=nFound-1;i>=0;--i) {
       X = mx[i];
       Y = my[i];
-      if ((Y+1<FLOBOBAN_DIMY)&&!marked[X][Y+1] && (getPuyoCellAt(X,Y+1) == color)) {
+      if ((Y+1<FLOBOBAN_DIMY)&&!marked[X][Y+1] && (getFloboCellAt(X,Y+1) == color)) {
           again = true;
           mx[nFound] = X;
           my[nFound] = Y+1;
           marked[X][Y+1] = 1;
           nFound++;
       }
-      if ((X+1<FLOBOBAN_DIMX) && !marked[X+1][Y] && (getPuyoCellAt(X+1,Y) == color)) {
+      if ((X+1<FLOBOBAN_DIMX) && !marked[X+1][Y] && (getFloboCellAt(X+1,Y) == color)) {
           again = true;
           mx[nFound] = X+1;
           my[nFound] = Y;
           marked[X+1][Y] = 1;
           nFound++;
       }
-      if ((X-1>=0) && !marked[X-1][Y] && (getPuyoCellAt(X-1,Y) == color)) {
+      if ((X-1>=0) && !marked[X-1][Y] && (getFloboCellAt(X-1,Y) == color)) {
           again = true;
           mx[nFound] = X-1;
           my[nFound] = Y;
           marked[X-1][Y] = 1;
           nFound++;
       }
-      if ((Y-1>=0) && !marked[X][Y-1] && (getPuyoCellAt(X,Y-1) == color)) {
+      if ((Y-1>=0) && !marked[X][Y-1] && (getFloboCellAt(X,Y-1) == color)) {
           again = true;
           mx[nFound] = X;
           my[nFound] = Y-1;
@@ -546,37 +546,37 @@ int FloboLocalGame::getSameFloboAround(int X, int Y, FloboState color)
   return nFound;
 }
 
-void FloboLocalGame::markPuyoAt(int X, int Y, bool mark, bool includeNeutral)
+void FloboLocalGame::markFloboAt(int X, int Y, bool mark, bool includeNeutral)
 {
-    Flobo *currentPuyo = getFloboAt(X, Y);
-    if (currentPuyo->isMarked() == mark)
+    Flobo *currentFlobo = getFloboAt(X, Y);
+    if (currentFlobo->isMarked() == mark)
         return;
-    FloboState currentFloboState = getPuyoCellAt(X, Y);
-    currentPuyo->setMark(mark);
-    if (getPuyoCellAt(X-1, Y) == currentFloboState)
-        markPuyoAt(X-1, Y, mark, includeNeutral);
-    if (getPuyoCellAt(X+1, Y) == currentFloboState)
-        markPuyoAt(X+1, Y, mark, includeNeutral);
-    if (getPuyoCellAt(X, Y-1) == currentFloboState)
-        markPuyoAt(X, Y-1, mark, includeNeutral);
-    if (getPuyoCellAt(X, Y+1) == currentFloboState)
-        markPuyoAt(X, Y+1, mark, includeNeutral);
+    FloboState currentFloboState = getFloboCellAt(X, Y);
+    currentFlobo->setMark(mark);
+    if (getFloboCellAt(X-1, Y) == currentFloboState)
+        markFloboAt(X-1, Y, mark, includeNeutral);
+    if (getFloboCellAt(X+1, Y) == currentFloboState)
+        markFloboAt(X+1, Y, mark, includeNeutral);
+    if (getFloboCellAt(X, Y-1) == currentFloboState)
+        markFloboAt(X, Y-1, mark, includeNeutral);
+    if (getFloboCellAt(X, Y+1) == currentFloboState)
+        markFloboAt(X, Y+1, mark, includeNeutral);
     if (includeNeutral) {
-        if (getPuyoCellAt(X-1, Y) == FLOBO_NEUTRAL)
+        if (getFloboCellAt(X-1, Y) == FLOBO_NEUTRAL)
             getFloboAt(X-1, Y)->setMark(mark);
-        if (getPuyoCellAt(X+1, Y) == FLOBO_NEUTRAL)
+        if (getFloboCellAt(X+1, Y) == FLOBO_NEUTRAL)
             getFloboAt(X+1, Y)->setMark(mark);
-        if (getPuyoCellAt(X, Y-1) == FLOBO_NEUTRAL)
+        if (getFloboCellAt(X, Y-1) == FLOBO_NEUTRAL)
             getFloboAt(X, Y-1)->setMark(mark);
-        if (getPuyoCellAt(X, Y+1) == FLOBO_NEUTRAL)
+        if (getFloboCellAt(X, Y+1) == FLOBO_NEUTRAL)
             getFloboAt(X, Y+1)->setMark(mark);
     }
 }
 
 // delete the marked flobos and the neutral next to them
-void FloboLocalGame::deleteMarkedPuyosAt(int X, int Y)
+void FloboLocalGame::deleteMarkedFlobosAt(int X, int Y)
 {
-  puyoVector.remove(getFloboAt(X, Y));
+  floboVector.remove(getFloboAt(X, Y));
   if (getFloboAt(X,Y) == companionFlobo) {
     attachedFactory->deleteFlobo(getFloboAt(X, Y));
     companionFlobo = NULL;
@@ -587,59 +587,59 @@ void FloboLocalGame::deleteMarkedPuyosAt(int X, int Y)
   } else {
     attachedFactory->deleteFlobo(getFloboAt(X, Y));
   }
-  setPuyoAt(X, Y, NULL);
+  setFloboAt(X, Y, NULL);
     if (getFloboAt(X-1, Y)->isMarked())
-        deleteMarkedPuyosAt(X-1, Y);
+        deleteMarkedFlobosAt(X-1, Y);
     if (getFloboAt(X+1, Y)->isMarked())
-        deleteMarkedPuyosAt(X+1, Y);
+        deleteMarkedFlobosAt(X+1, Y);
     if (getFloboAt(X, Y-1)->isMarked())
-        deleteMarkedPuyosAt(X, Y-1);
+        deleteMarkedFlobosAt(X, Y-1);
     if (getFloboAt(X, Y+1)->isMarked())
-        deleteMarkedPuyosAt(X, Y+1);
-    if (getPuyoCellAt(X-1, Y) == FLOBO_NEUTRAL) {
-        puyoVector.remove(getFloboAt(X-1, Y));
+        deleteMarkedFlobosAt(X, Y+1);
+    if (getFloboCellAt(X-1, Y) == FLOBO_NEUTRAL) {
+        floboVector.remove(getFloboAt(X-1, Y));
         attachedFactory->deleteFlobo(getFloboAt(X-1, Y));
-        setPuyoAt(X-1, Y, NULL);
+        setFloboAt(X-1, Y, NULL);
     }
-    if (getPuyoCellAt(X+1, Y) == FLOBO_NEUTRAL) {
-        puyoVector.remove(getFloboAt(X+1, Y));
+    if (getFloboCellAt(X+1, Y) == FLOBO_NEUTRAL) {
+        floboVector.remove(getFloboAt(X+1, Y));
         attachedFactory->deleteFlobo(getFloboAt(X+1, Y));
-        setPuyoAt(X+1, Y, NULL);
+        setFloboAt(X+1, Y, NULL);
     }
-    if (getPuyoCellAt(X, Y-1) == FLOBO_NEUTRAL) {
-        puyoVector.remove(getFloboAt(X, Y-1));
+    if (getFloboCellAt(X, Y-1) == FLOBO_NEUTRAL) {
+        floboVector.remove(getFloboAt(X, Y-1));
         attachedFactory->deleteFlobo(getFloboAt(X, Y-1));
-        setPuyoAt(X, Y-1, NULL);
+        setFloboAt(X, Y-1, NULL);
     }
-    if (getPuyoCellAt(X, Y+1) == FLOBO_NEUTRAL) {
-        puyoVector.remove(getFloboAt(X, Y+1));
+    if (getFloboCellAt(X, Y+1) == FLOBO_NEUTRAL) {
+        floboVector.remove(getFloboAt(X, Y+1));
         attachedFactory->deleteFlobo(getFloboAt(X, Y+1));
-        setPuyoAt(X, Y+1, NULL);
+        setFloboAt(X, Y+1, NULL);
     }
 }
 
-int FloboLocalGame::removePuyos()
+int FloboLocalGame::removeFlobos()
 {
-    int globalRemovedPuyos = 0;
+    int globalRemovedFlobos = 0;
     /* First, we will mark all the flobos that need to be removed */
     for (int i = 0 ; i < FLOBOBAN_DIMX ; i++) {
         for (int j = 0 ; j <= FLOBOBAN_DIMY ; j++) {
-            FloboState currentPuyo = getPuyoCellAt(i, j);
-            if ((currentPuyo >= FLOBO_BLUE) && (currentPuyo <= FLOBO_YELLOW)) {
-                int removedPuyos = 0;
-                markPuyoAt(i, j, true, false);
-                for (int u = 0, v = puyoVector.size() ; u < v ; u++) {
-                    if (puyoVector[u]->isMarked()) {
-                        removedPuyos++;
+            FloboState currentFlobo = getFloboCellAt(i, j);
+            if ((currentFlobo >= FLOBO_BLUE) && (currentFlobo <= FLOBO_YELLOW)) {
+                int removedFlobos = 0;
+                markFloboAt(i, j, true, false);
+                for (int u = 0, v = floboVector.size() ; u < v ; u++) {
+                    if (floboVector[u]->isMarked()) {
+                        removedFlobos++;
                     }
                 }
-                //printf("Removed for %d, %d : %d\n", i, j, removedPuyos);
-                if (removedPuyos >= 4) {
-                    globalRemovedPuyos += removedPuyos;
-                    deleteMarkedPuyosAt(i, j);
+                //printf("Removed for %d, %d : %d\n", i, j, removedFlobos);
+                if (removedFlobos >= 4) {
+                    globalRemovedFlobos += removedFlobos;
+                    deleteMarkedFlobosAt(i, j);
                 }
                 else
-                    markPuyoAt(i, j, false, false);
+                    markFloboAt(i, j, false, false);
             }
         }
     }
@@ -647,30 +647,30 @@ int FloboLocalGame::removePuyos()
     for (int i = 0 ; i < FLOBOBAN_DIMX ; i++) {
         int feltBelow = 0;
         for (int j = FLOBOBAN_DIMY - 1 ; j > 0 ; j--) {
-            FloboState currentFloboState = getPuyoCellAt(i, j);
+            FloboState currentFloboState = getFloboCellAt(i, j);
             if ((currentFloboState >= FLOBO_BLUE) && (currentFloboState <= FLOBO_NEUTRAL)) {
                 int newJ = getFallY(i, j);
                 if (newJ != j) {
-                    Flobo *currentPuyo = getFloboAt(i, j);
-                    setPuyoAt(i, j, NULL);
-                    setPuyoAt(i, newJ, currentPuyo);
+                    Flobo *currentFlobo = getFloboAt(i, j);
+                    setFloboAt(i, j, NULL);
+                    setFloboAt(i, newJ, currentFlobo);
                     for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                          iter != m_listeners.end() ; ++iter) {
-                        (*iter)->floboDidFall(currentPuyo, i, j, feltBelow);
+                        (*iter)->floboDidFall(currentFlobo, i, j, feltBelow);
                         feltBelow++;
                     }
                 }
             }
         }
     }
-    return globalRemovedPuyos;
+    return globalRemovedFlobos;
 }
 
 
 void FloboLocalGame::notifyReductions()
 {
-    AdvancedBuffer<Flobo *> removedPuyos;
-    // Clearing every puyo's flag
+    AdvancedBuffer<Flobo *> removedFlobos;
+    // Clearing every flobo's flag
     for (int i = 0, j = getFloboCount() ; i < j ; i++) {
         getFloboAtIndex(i)->unsetFlag();
     }
@@ -678,35 +678,35 @@ void FloboLocalGame::notifyReductions()
     int floboGroupNumber = 0;
     for (int j = 0 ; j < FLOBOBAN_DIMY ; j++) {
         for (int i = 0 ; i <= FLOBOBAN_DIMX ; i++) {
-            Flobo *puyoToMark = getFloboAt(i, j);
-            // If the puyo exists and is not flagged, then
-            if ((puyoToMark != NULL) && (! puyoToMark->getFlag())) {
-                FloboState initialFloboState = puyoToMark->getFloboState();
+            Flobo *floboToMark = getFloboAt(i, j);
+            // If the flobo exists and is not flagged, then
+            if ((floboToMark != NULL) && (! floboToMark->getFlag())) {
+                FloboState initialFloboState = floboToMark->getFloboState();
                 // I really would have liked to skip this stupid test
                 if ((initialFloboState >= FLOBO_BLUE) && (initialFloboState <= FLOBO_YELLOW)) {
-                    markPuyoAt(i, j, true, true);
+                    markFloboAt(i, j, true, true);
 
-                    // Collecting every marked puyo in a vector
-                    removedPuyos.clear();
+                    // Collecting every marked flobo in a vector
+                    removedFlobos.clear();
                     int removedCount = 0;
-                    for (int u = 0, v = puyoVector.size() ; u < v ; u++) {
-                        Flobo *markedPuyo = puyoVector[u];
-                        if (markedPuyo->isMarked()) {
-                            markedPuyo->setFlag();
-                            removedPuyos.add(markedPuyo);
-                            if (markedPuyo->getFloboState() != FLOBO_NEUTRAL)
+                    for (int u = 0, v = floboVector.size() ; u < v ; u++) {
+                        Flobo *markedFlobo = floboVector[u];
+                        if (markedFlobo->isMarked()) {
+                            markedFlobo->setFlag();
+                            removedFlobos.add(markedFlobo);
+                            if (markedFlobo->getFloboState() != FLOBO_NEUTRAL)
                                 removedCount++;
                         }
                     }
-                    // If there is more than 4 puyo in the group, let's notify it
+                    // If there is more than 4 flobos in the group, let's notify it
                     if (removedCount >= 4) {
-                        markPuyoAt(i, j, false, true);
+                        markFloboAt(i, j, false, true);
                         for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                              iter != m_listeners.end() ; ++iter)
-                            (*iter)->floboWillVanish(removedPuyos, floboGroupNumber++, phase+1);
+                            (*iter)->floboWillVanish(removedFlobos, floboGroupNumber++, phase+1);
                     }
                     else {
-                        markPuyoAt(i, j, false, true);
+                        markFloboAt(i, j, false, true);
                     }
                 }
             }
@@ -716,7 +716,7 @@ void FloboLocalGame::notifyReductions()
 
 void FloboLocalGame::cycleEnding()
 {
-    int score = removePuyos();
+    int score = removeFlobos();
     gameStat.explode_count += score;
 
     if (score >= 4) {

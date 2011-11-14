@@ -92,8 +92,8 @@ class AIPlayer : public virtual PuyoPlayer {
     GridState * internalGrid;
     int decisionMade;
     bool shouldRedecide;
-    int lastNumberOfBadPuyos;
-    int totalNumberOfBadPuyos;
+    int lastNumberOfBadFlobos;
+    int totalNumberOfBadFlobos;
     PuyoBinom objective;
     int lastLineSeen;
     int currentCycle;

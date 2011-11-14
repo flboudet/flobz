@@ -39,7 +39,7 @@ const char *kMusicVolume = "MusicVolume";
 const char *kAudioVolume = "AudioVolume";
 
 const char *kCongratulations = "Congratulations!!!";
-const char *kPuyosInvasion   = "                        You stopped Puyo's invasion.\n"
+const char *kFlobosInvasion   = "                        You stopped Puyo's invasion.\n"
 "                         Peace on Earth is restored!!";
 
 const char *kAudioFX     = "Audio FX";
@@ -66,11 +66,11 @@ const char *kSPlayer2Down   = "P2 Down:";
 const char *kSPlayer2Clockwise        = "P2 Turn R:";
 const char *kSPlayer2Counterclockwise = "P2 Turn L:";
 
-const char *kRules01 = "Puyos are fancy smiling bubbles...";
+const char *kRules01 = "Flobos are fancy smiling bubbles...";
 const char *kRules02 = "But they can really be invading sometimes!";
 const char *kRules03 = "Send them away by making groups of 4 or more.";
 const char *kRules04 = "Try to make large groups, or many at the same time";
-const char *kRules05 = "to send more bad ghost Puyos to your opponent.";
+const char *kRules05 = "to send more bad ghost Flobos to your opponent.";
 
 const char *kAbout01 = "FloboPuyo is an iOS-software production.\t\t";
 const char *kAbout02 = "Puyo's world Meta God:\t\t";

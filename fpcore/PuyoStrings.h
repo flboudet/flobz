@@ -42,7 +42,7 @@ extern const char *kMusicVolume;
 extern const char *kAudioVolume;
 
 extern const char *kCongratulations;
-extern const char *kPuyosInvasion;
+extern const char *kFlobosInvasion;
 
 extern const char *kAudioFX;
 extern const char *kMusic;

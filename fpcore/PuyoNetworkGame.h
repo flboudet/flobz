@@ -70,18 +70,18 @@ public:
     virtual int  getComboPhase() const { return comboPhase; }
 private:
     void synchronizeState(Message &message);
-    void setPuyoAt(int X, int Y, Flobo *newPuyo);
+    void setFloboAt(int X, int Y, Flobo *newFlobo);
     void synchronizePuyo(Buffer<int> buffer);
     Flobo *findPuyo(int floboID);
-    Flobo *puyoCells[FLOBOBAN_DIMX * (FLOBOBAN_DIMY+1)];
+    Flobo *floboCells[FLOBOBAN_DIMX * (FLOBOBAN_DIMY+1)];
     FloboState nextFalling, nextCompanion;
     Flobo *fakePuyo;
     MessageBox &msgBox;
     int gameId;
-    AdvancedBuffer<Flobo *> puyoVector;
+    AdvancedBuffer<Flobo *> floboVector;
     std::map<int, Flobo *> m_puyoMap;
     int semiMove;
-    int neutralFlobos, sentBadPuyos;
+    int neutralFlobos, sentBadFlobos;
     bool gameRunning;
     int comboPhase;
 };

@@ -307,7 +307,7 @@ void dropNeutrals(int number, int totalFromStart, GridState * const grid, GridSt
     }    
 }
 
-bool dropPuyos(const PuyoBinom binom, GridState * const grid)
+bool dropFlobos(const PuyoBinom binom, GridState * const grid)
 {
   int x, h, g;
 
@@ -452,8 +452,8 @@ bool dropBinom(const PuyoBinom binom, const GridState * const src, GridState * c
   // Copy the matrix
   if (src != NULL) copyGrid(dst,src);
 
-  // Drop the Puyos and return false if not possible
-  if (dropPuyos(binom, dst) == false) return false;
+  // Drop the Flobos and return false if not possible
+  if (dropFlobos(binom, dst) == false) return false;
 
   // Delete all eligible groups
   while (suppressGroups(dst, evaluation) == true) {};
@@ -533,8 +533,8 @@ AIPlayer::AIPlayer(int level, PuyoView &targetView)
   internalGrid = NULL;
   decisionMade = 0;
   shouldRedecide = false;
-  lastNumberOfBadPuyos = 0;
-  totalNumberOfBadPuyos = 0;
+  lastNumberOfBadFlobos = 0;
+  totalNumberOfBadFlobos = 0;
   attachedGame = targetView.getAttachedGame();
   objective = nullBinom;
   lastLineSeen = FLOBOBAN_DIMY+1;
@@ -626,10 +626,10 @@ void AIPlayer::extractGrid(void)
     int height = 0;
     for (int j = 0; j < IA_FLOBOBAN_DIMY; j++)
     {
-      Flobo * thePuyo = attachedGame->getFloboAt(i,(FLOBOBAN_DIMY-1)-j);
-      if (thePuyo != NULL)
+      Flobo * theFlobo = attachedGame->getFloboAt(i,(FLOBOBAN_DIMY-1)-j);
+      if (theFlobo != NULL)
       {
-        FloboState state = thePuyo->getFloboState();
+        FloboState state = theFlobo->getFloboState();
         if (state >= FLOBO_STILL)
         {
           (* internalGrid)[i][j] = state;
@@ -775,7 +775,7 @@ void AIPlayer::decide(int partial, int depth)
             GridState state1bis;
             GridState state2;
             
-            dropNeutrals(lastNumberOfBadPuyos-evaluation1.puyoSuppressed, totalNumberOfBadPuyos, &state1bis, &state1);  
+            dropNeutrals(lastNumberOfBadFlobos-evaluation1.puyoSuppressed, totalNumberOfBadFlobos, &state1bis, &state1);  
             
             // drop the binom (including destroying eligible groups) and eval board if game not lost
             if (canReach(originalPuyo, next, &state1bis, 1) && dropBinom(next, &state1bis, &state2, &evaluation2))
@@ -818,10 +818,10 @@ void AIPlayer::cycle()
   
   int currentLine = attachedGame->getFallingY();
   int currentColumn = attachedGame->getFallingX();
-  int currentNumberOfBadPuyos = attachedGame->getNeutralFlobos();
-  int currentTotalNumberOfBadPuyos = attachedGame->getGameTotalNeutralFlobos();
+  int currentNumberOfBadFlobos = attachedGame->getNeutralFlobos();
+  int currentTotalNumberOfBadFlobos = attachedGame->getGameTotalNeutralFlobos();
     
-  // If we start with new flobos or restart because new bad Puyos came
+  // If we start with new flobos or restart because new bad Flobos came
   if (attachedGame->isPhaseReady())
   {
     //fprintf(stderr, "Thinking\n");
@@ -831,11 +831,11 @@ void AIPlayer::cycle()
     decisionMade = 0;
     // Should not decide again if we didn't decide yet !
     shouldRedecide = false;
-    lastNumberOfBadPuyos = currentNumberOfBadPuyos;
-    totalNumberOfBadPuyos = currentTotalNumberOfBadPuyos;
+    lastNumberOfBadFlobos = currentNumberOfBadFlobos;
+    totalNumberOfBadFlobos = currentTotalNumberOfBadFlobos;
   } else {
       // If we did not start, test if we should restart because new bad flobos arrived
-      if (currentNumberOfBadPuyos != lastNumberOfBadPuyos) {
+      if (currentNumberOfBadFlobos != lastNumberOfBadFlobos) {
           //fprintf(stderr, "RE-Thinking\n");
           // Reset the cycle counter
           currentCycle = 0;
@@ -843,8 +843,8 @@ void AIPlayer::cycle()
           decisionMade = 0;
           // Should not decide again if we didn't decide yet !
           shouldRedecide = true;
-          lastNumberOfBadPuyos = currentNumberOfBadPuyos;
-          totalNumberOfBadPuyos = currentTotalNumberOfBadPuyos;
+          lastNumberOfBadFlobos = currentNumberOfBadFlobos;
+          totalNumberOfBadFlobos = currentTotalNumberOfBadFlobos;
       }
   }
 

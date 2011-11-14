@@ -410,12 +410,12 @@ GameWidget *StoryModeMatchState::createGameWidget(PuyoSetTheme &puyoThemeSet,
                                          String centerFace,
                                          Action *gameOverAction)
 {
-    m_sharedAssets.m_currentPuyoSetTheme = theCommander->getPreferedPuyoSetTheme();
+    m_sharedAssets.m_currentFloboSetTheme = theCommander->getPreferedPuyoSetTheme();
     if (m_sharedGameAssets->levelDef->backgroundTheme == "Prefs.DefaultTheme")
         m_sharedAssets.m_currentLevelTheme = theCommander->getPreferedLevelTheme();
     else
         m_sharedAssets.m_currentLevelTheme = theCommander->getLevelTheme(m_sharedGameAssets->levelDef->backgroundTheme);
-    return new SinglePlayerStandardLayoutGameWidget(*(m_sharedAssets.m_currentPuyoSetTheme),
+    return new SinglePlayerStandardLayoutGameWidget(*(m_sharedAssets.m_currentFloboSetTheme),
                                                     *(m_sharedAssets.m_currentLevelTheme),
                                                     m_sharedGameAssets->levelDef->getAISettings(m_sharedGameAssets->difficulty).level,
                                                     m_sharedGameAssets->levelDef->getAISettings(m_sharedGameAssets->difficulty).nColors,

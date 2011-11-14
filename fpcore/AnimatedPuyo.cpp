@@ -238,9 +238,9 @@ AnimatedFloboFactory::AnimatedFloboFactory(PuyoView *attachedView)
 AnimatedFloboFactory::~AnimatedFloboFactory()
 {
     while (puyoWalhalla.size() > 0) {
-        Flobo *currentPuyo = puyoWalhalla[0];
+        Flobo *currentFlobo = puyoWalhalla[0];
         puyoWalhalla.removeAt(0);
-        delete currentPuyo;
+        delete currentFlobo;
     }
 }
 
@@ -260,20 +260,20 @@ void AnimatedFloboFactory::deleteFlobo(Flobo *target)
 void AnimatedFloboFactory::renderWalhalla(DrawTarget *dt)
 {
     for (int i = puyoWalhalla.size() - 1 ; i >= 0 ; i--) {
-        AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(puyoWalhalla[i]);
-        currentPuyo->render(dt);
+        AnimatedPuyo *currentFlobo = static_cast<AnimatedPuyo *>(puyoWalhalla[i]);
+        currentFlobo->render(dt);
     }
 }
 
 void AnimatedFloboFactory::cycleWalhalla()
 {
     for (int i = puyoWalhalla.size() - 1 ; i >= 0 ; i--) {
-        AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(puyoWalhalla[i]);
-        if (currentPuyo->getCurrentAnimation() != NULL) {
-            currentPuyo->cycleAnimation();
+        AnimatedPuyo *currentFlobo = static_cast<AnimatedPuyo *>(puyoWalhalla[i]);
+        if (currentFlobo->getCurrentAnimation() != NULL) {
+            currentFlobo->cycleAnimation();
         } else {
             puyoWalhalla.removeAt(i);
-            delete currentPuyo;
+            delete currentFlobo;
         }
     }
 }
