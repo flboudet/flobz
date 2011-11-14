@@ -35,6 +35,8 @@ public:
     virtual ~SDL_AudioManager();
     virtual void setMusicEnabled(bool enabled);
     virtual void setMusicVolume(float volume);
+    virtual bool getMusicEnabled() const;
+    virtual float getMusicVolume() const;
     virtual audio_manager::Music *loadMusic(const char *fileName);
     virtual void playMusic(audio_manager::Music *music);
     virtual void stopMusic();
@@ -42,6 +44,8 @@ public:
 
     virtual void setSoundEnabled(bool enabled);
     virtual void setSoundVolume(float volume);
+    virtual bool getSoundEnabled() const;
+    virtual float getSoundVolume() const;
     virtual audio_manager::Sound *loadSound(const char *fileName);
     virtual void playSound(audio_manager::Sound *sound, float volume = 1.0, float balance = 0.0f);
 private:
@@ -52,6 +56,7 @@ private:
 
     bool m_music_on;
     bool m_sound_on;
+    float m_musicVolume, m_soundVolume;
 };
 
 #endif // _SDL_AUDIOMANAGER_H_

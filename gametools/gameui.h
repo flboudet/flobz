@@ -8,6 +8,7 @@
 #include "ios_fc.h"
 #include "vec3.h"
 #include "gameloop.h"
+#include "PreferencesManager.h"
 
 #define SLOPPY_FOCUS 1
 
@@ -594,7 +595,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
   class EditField : public Text {
     public:
       EditField(const String &defaultText, Action *action = NULL);
-      EditField(const String &defaultText, const String &persistentID);
+      EditField(const String &defaultText, const String &persistentID, PreferencesManager *prefMgr);
 
       void eventOccured(event_manager::GameControlEvent *event);
       bool handleJoystickEdit(event_manager::GameControlEvent *event);
@@ -607,6 +608,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       void idle(double currentTime);
 
     private:
+      PreferencesManager *m_prefMgr;
       IosFont *fontActive;
       IosFont *fontInactive;
       bool editionMode;

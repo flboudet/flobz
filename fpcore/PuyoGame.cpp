@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #include "PuyoGame.h"
 #include "audio.h"
-#include "preferences.h"
 #include "mt19937ar.h"
 
 static int fallingTable[PUYODIMX] = {0, 3, 1, 4, 2, 5};
@@ -69,58 +68,6 @@ void PuyoGame::addGameListener(GameListener *listener)
 {
     m_listeners.push_back(listener);
 }
-
-const char * PuyoGame::getPlayerName(int n)
-{
-  static char playerName[256];
-  GetStrPreference(PuyoGame::getDefaultPlayerKey(n), playerName, PuyoGame::getDefaultPlayerName(n));
-  return playerName;
-}
-
-String PuyoGame::getDefaultPlayerName(int n)
-{
-  char defaultPlayerName[256];
-  if (n <= 0)
-  {
-    char * defaultName = getenv("USER");
-    if ((defaultName == NULL) || (defaultName[0]<32))
-    {
-      defaultName = getenv("USERNAME");
-      if ((defaultName == NULL) || (defaultName[0]<32))
-      {
-        sprintf(defaultName,"Kaori");
-      }
-    }
-
-    strncpy(defaultPlayerName,defaultName,255);
-    defaultPlayerName[255]=0;
-
-    if ((defaultPlayerName[0]>='a') && (defaultPlayerName[0]<='z'))
-    {
-      defaultPlayerName[0] += 'A' - 'a';
-    }
-  }
-  else
-  {
-    sprintf(defaultPlayerName,"Player %d",n);
-  }
-  return String(defaultPlayerName);
-}
-
-String PuyoGame::getDefaultPlayerKey(int n)
-{
-  char playerKey[50];
-  sprintf(playerKey,"Game.Player.Name.%d",n);
-  return String(playerKey);
-}
-
-void PuyoGame::setDefaultPlayerName(int n, const char * playerName)
-{
-  static char playerKey[50];
-  sprintf(playerKey,"Game.Player.Name.%d",n);
-  SetStrPreference(playerKey, playerName);
-}
-
 
 // PuyoLocalGame implementation
 PuyoLocalGame::PuyoLocalGame(PuyoRandomSystem *attachedRandom,

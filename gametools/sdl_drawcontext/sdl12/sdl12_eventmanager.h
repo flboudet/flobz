@@ -5,6 +5,7 @@
 #include <string>
 #include "GameControls.h"
 #include "gameloop.h"
+#include "PreferencesManager.h"
 
 #include <SDL/SDL.h>
 
@@ -22,7 +23,7 @@ class SDL12_EventManager : public event_manager::EventManager,
                            public CycledComponent
 {
 public:
-    SDL12_EventManager();
+    SDL12_EventManager(PreferencesManager *prefMgr);
     virtual event_manager::GameControlEvent *createGameControlEvent() const;
     virtual bool pollEvent(event_manager::GameControlEvent &controlEvent);
     virtual void pushMouseEvent(int x, int y, event_manager::CursorEventType type);
@@ -36,6 +37,7 @@ public:
 private:
     void translateMouseEvent(const SDL_Event &sdl_event,
                              event_manager::GameControlEvent &controlEvent);
+    PreferencesManager *m_prefMgr;
     int m_idleDx, m_idleDy;
     int m_mouseX, m_mouseY;
     bool m_disableJoyMouseEmulation;

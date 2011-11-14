@@ -1,5 +1,4 @@
 #include "SwitchedButton.h"
-#include "preferences.h"
 
 using namespace event_manager;
 
@@ -10,8 +9,10 @@ namespace gameui {
     //
 
     SwitchedButton::SwitchedButton(String label, bool defaultValue,
-                                   IosSurface *trueSurface, IosSurface *falseSurface, String prefKey, Action * altResponder)
-    : stateImage(), imageTrue(trueSurface), imageFalse(falseSurface),
+                                   IosSurface *trueSurface, IosSurface *falseSurface, String prefKey,
+                                   PreferencesManager *prefMgr,
+                                   Action * altResponder)
+    : m_prefMgr(prefMgr), stateImage(), imageTrue(trueSurface), imageFalse(falseSurface),
       text(label, this), key(prefKey),
       persistant(true), m_altResponder(altResponder)
     {
@@ -24,7 +25,7 @@ namespace gameui {
             stateValue = defaultValue;
             persistant = false;
         } else {
-            stateValue = (bool)GetBoolPreference(key, defaultValue);
+            stateValue = prefMgr->getBoolPreference(key, defaultValue);
             persistant = true;
             notifKey = key;
         }
@@ -81,7 +82,7 @@ namespace gameui {
         }
         stateValue = *(bool*)(context);
         stateImage.setImage(stateValue ? imageTrue : imageFalse);
-        if (persistant) SetBoolPreference((const char*)key, (bool)stateValue);
+        if (persistant) m_prefMgr->setBoolPreference((const char*)key, (bool)stateValue);
         autoSetPreferedSize();
     }
 

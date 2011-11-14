@@ -24,7 +24,8 @@ SDL_AM_Sound::~SDL_AM_Sound()
 }
 
 SDL_AudioManager::SDL_AudioManager()
-    : m_music_on(true), m_sound_on(true)
+    : m_music_on(true), m_sound_on(true),
+      m_musicVolume(1.), m_soundVolume(1.)
 {
     m_audio_supported = (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 2048) == 0);
     if (!m_audio_supported)
@@ -48,7 +49,18 @@ void SDL_AudioManager::setMusicEnabled(bool enabled)
 
 void SDL_AudioManager::setMusicVolume(float volume)
 {
+    m_musicVolume = volume;
     Mix_VolumeMusic((int)((float)MIX_MAX_VOLUME * volume));
+}
+
+bool SDL_AudioManager::getMusicEnabled() const
+{
+    return m_music_on;
+}
+
+float SDL_AudioManager::getMusicVolume() const
+{
+    return m_musicVolume;
 }
 
 Music *SDL_AudioManager::loadMusic(const char *fileName)
@@ -84,6 +96,16 @@ void SDL_AudioManager::setSoundEnabled(bool enabled)
 
 void SDL_AudioManager::setSoundVolume(float volume)
 {
+}
+
+bool SDL_AudioManager::getSoundEnabled() const
+{
+    return m_sound_on;
+}
+
+float SDL_AudioManager::getSoundVolume() const
+{
+    return m_soundVolume;
 }
 
 Sound *SDL_AudioManager::loadSound(const char *fileName)

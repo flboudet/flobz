@@ -54,6 +54,7 @@ public:
     virtual bool isGameARunning() const;
     // GameListener implementation
     virtual void gameDidEndCycle();
+    virtual void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase);
     // CycledComponent implementation
     virtual void cycle();
     // Widget methods

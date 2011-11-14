@@ -10,6 +10,7 @@
 #include "audio.h"
 #include "Theme.h"
 #include "ResourceManager.h"
+#include "PreferencesManager.h"
 #include <memory>
 
 using namespace gameui;
@@ -183,14 +184,13 @@ public:
 class PuyoCommander
 {
   public:
-    PuyoCommander(DataPathManager &dataPathManager);
+    PuyoCommander(DataPathManager *dataPathManager,
+                  PreferencesManager *preferencesManager);
     void initWithGUI(bool fullscreen);
     void initWithoutGUI();
 
     virtual ~PuyoCommander();
 
-    bool getMusic();
-    bool getSoundFx();
     String getFullScreenKey(void) const;
 
     // Cursor management
@@ -210,7 +210,7 @@ class PuyoCommander
     SoundRef getSound(const char *path);
     void cacheMusic(const char *path);
     MusicRef getMusic(const char *path);
-    
+
     PuyoSetThemeRef getPuyoSetTheme(const char *name);
     PuyoSetThemeRef getPreferedPuyoSetTheme();
     const std::string &getPreferedPuyoSetThemeName() const;
@@ -224,13 +224,14 @@ class PuyoCommander
     void setPreferedLevelThemeName(const char *name);
     const std::vector<std::string> &getLevelThemeList() const;
     virtual const std::string getDefaultLevelThemeName() const;
-    
+
     void freeUnusedResources();
 
     // Data path management
-    const DataPathManager &getDataPathManager() { return dataPathManager; }
+    const DataPathManager &getDataPathManager() { return *m_dataPathManager; }
     const char * getLocalizedString(const char * originalString) const;
-
+    // Preferences management
+    PreferencesManager *getPreferencesManager() const { return m_preferencesManager; }
     // Common resources accessor
     const FramePicture *getWindowFramePicture() const { return m_windowFramePicture.get(); }
     const FramePicture *getButtonFramePicture() const { return m_buttonIdleFramePicture.get(); }
@@ -264,6 +265,9 @@ class PuyoCommander
     virtual void initFonts();
     // Theme initialisation function
     virtual void initThemes();
+    // Data path management
+    DataPathManager *m_dataPathManager;
+    PreferencesManager *m_preferencesManager;
     // Resource Managers
     std::auto_ptr<ThemeManager> m_themeManager;
     IosSurfaceFactory m_surfaceFactory;
@@ -278,8 +282,6 @@ class PuyoCommander
     std::auto_ptr<PuyoSetThemeResourceManager> m_puyoSetThemeResManager;
     LevelThemeFactory m_levelThemeFactory;
     std::auto_ptr<LevelThemeResourceManager> m_levelThemeResManager;
-    // Data path management
-    DataPathManager &dataPathManager;
     // Localization management
     LocalizedDictionary * locale;
   private:
@@ -289,7 +291,6 @@ class PuyoCommander
     friend class MainMenu;
     friend class NetworkGameMenu;
 
-    void loadPreferences(bool fs);
     void initLocale();
     void initAudio();
 

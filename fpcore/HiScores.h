@@ -1,12 +1,12 @@
 #ifndef _HISCORE
 #define _HISCORE
 
+#include <string>
+
 #define kHiScoresNumber 10
 
-#define kHiScoreNameLenght 20
-
 typedef struct hiscore {
-  char name[kHiScoreNameLenght+1];
+  std::string name;
   int  score;
 } hiscore;
 

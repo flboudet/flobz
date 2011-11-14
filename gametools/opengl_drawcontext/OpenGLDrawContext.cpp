@@ -688,11 +688,11 @@ RGBA OpenGLTexture::readRGBA(int x, int y)
         c.alpha = 255;
     }
     else if (m_format == GL_RGBA) {
-        GLubyte *base = (GLubyte *)(m_rawImage->data) + (x + y * m_p2w) * 3;
-        c.red = base[1];
-        c.green = base[2];
-        c.blue = base[3];
-        c.alpha = base[0]; // XXX, WHY THE HELL IS THE BUFFER IN ARGB? but it works... on my simulator...
+        GLubyte *base = (GLubyte *)(m_rawImage->data) + (x + y * m_p2w) * 4;
+        c.red = base[0];
+        c.green = base[1];
+        c.blue = base[2];
+        c.alpha = base[3];
     }
     return c;
 }

@@ -3,6 +3,7 @@
 
 #include "MainScreen.h"
 #include "PuyoCommander.h"
+#include "PreferencesManager.h"
 #include "FPDataPathManager.h"
 #include "drawcontext.h"
 #include "CompositeDrawContext.h"
@@ -19,7 +20,6 @@ protected:
     void notificationOccured(String identifier, void * context);
 private:
     void initWithGUI();
-    void initWithoutGUI();
     void initMenus();
     void initSDL();
 
@@ -27,6 +27,7 @@ private:
     bool m_fullscreen;
     int m_maxDataPackNumber;
 
+    PreferencesManager *m_preferencesManager;
     CompositeDrawContext *m_drawContext;
     DrawContext *m_nativeDrawContext;
     event_manager::EventManager *m_eventManager;

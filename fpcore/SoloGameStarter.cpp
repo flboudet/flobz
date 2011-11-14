@@ -24,6 +24,8 @@
  */
 
 #include "SoloGameStarter.h"
+#include "GTLog.h"
+
 using namespace event_manager;
 
 #define TIME_BETWEEN_GAME_CYCLES 0.02
@@ -48,6 +50,12 @@ void SoloGameWidget::gameDidEndCycle()
         m_areaA->getAttachedGame()->addNeutralLayer();
         m_cyclesBeforeLevelRaise = 800;
     }
+    //m_areaA->getAttachedGame()->increaseNeutralPuyos(6);
+}
+
+void SoloGameWidget::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase)
+{
+    GTLogTrace("Combo with phase=%d", phase);
 }
 
 void SoloGameWidget::cycle()
@@ -57,7 +65,9 @@ void SoloGameWidget::cycle()
     // Animations
     m_areaA->cycleAnimation();
     if (m_cyclesBeforeGameCycle == 0) {
-        m_areaA->cycleGame();
+        if (! m_areaA->isNewMetaCycleStart())
+            m_areaA->cycleGame();
+        m_areaA->clearMetaCycleStart();
         m_cyclesBeforeGameCycle = 10;
     }
     if (m_cyclesBeforeLevelRaise == 0) {

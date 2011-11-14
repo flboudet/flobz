@@ -1,14 +1,11 @@
 #include <string.h>
 #include "audio.h"
-#include "preferences.h"
-
-#define TIMEMS_BETWEEN_SAME_SOUND 10.0
-
 #include <vector>
 #include <map>
 #include <string>
-
 #include "PuyoCommander.h"
+
+#define TIMEMS_BETWEEN_SAME_SOUND 10.0
 
 static std::map<std::string, double> lastUsedTimestamp;
 static bool   audio_supported = false;
@@ -32,27 +29,20 @@ audio_manager::AudioManager * AudioManager::m_audioManager;
 
 void AudioManager::init()
 {
-
     m_audioManager = GameUIDefaults::GAME_LOOP->getAudioManager();
-
     audio_supported = true;
     if (!audio_supported) return;
-
-    music_on = GetBoolPreference(kMusic,true);
-    sound_on = GetBoolPreference(kSound,true);
-
-    music_volume = ((float)GetIntPreference(kMusicVolume, 100))/100.0f;
-    sound_volume = ((float)GetIntPreference(kSoundVolume, 100))/100.0f;
-
-    if (music_on) loadMusic("pop.xm");
-
+    music_on = theCommander->getPreferencesManager()->getBoolPreference(kMusic,true);
+    sound_on = theCommander->getPreferencesManager()->getBoolPreference(kSound,true);
+    music_volume = ((float)(theCommander->getPreferencesManager()->getIntPreference(kMusicVolume, 100)))/100.0f;
+    sound_volume = ((float)(theCommander->getPreferencesManager()->getIntPreference(kSoundVolume, 100)))/100.0f;
+    if (music_on)
+        loadMusic("pop.xm");
 }
 
 void AudioManager::close()
 {
     if (!audio_supported) return;
-    clearMusicCache();
-    clearSoundCache();
 }
 
 AudioManager::AudioManager()
@@ -74,25 +64,24 @@ AudioManager::~AudioManager()
 void AudioManager::notificationOccured(String identifier, void * context)
 {
     if (identifier == kMusicVolume) {
-        // musicVolume((float)*(int *)context);
-    } else
-        if (identifier == kSoundVolume) {
-            soundVolume((float)*(int *)context);
-        } else
-            if (identifier == kMusic) {
-                musicOnOff(*(bool *)context);
-            } else
-                if (identifier == kSound) {
-                    soundOnOff(*(bool *)context);
-                }
-}
-
-void AudioManager::clearSoundCache()
-{
-}
-
-void AudioManager::clearMusicCache()
-{
+        m_audioManager->setMusicVolume((float)*(int *)context);
+    }
+    else if (identifier == kSoundVolume) {
+        m_audioManager->setSoundVolume((float)*(int *)context);
+    }
+    else if (identifier == kMusic) {
+        bool enabled = *(bool *)context;
+        m_audioManager->setMusicEnabled(enabled);
+        if (enabled) {
+            loadMusic("pop.xm");
+            std::string prevCommand = music_command;
+            music_command = "";
+            music(music_command.c_str());
+        }
+    }
+    else if (identifier == kSound) {
+        m_audioManager->setSoundEnabled(*(bool *)context);
+    }
 }
 
 void AudioManager::preloadMusic(const char *fileName)
@@ -113,7 +102,7 @@ void AudioManager::music(const char *command)
   static const int MGAME[4] = { MSTART[4], MSTART[3], MSTART[0], MSTART[2] };
   static const int FGAME[4] = { MSTART[5], MSTART[3], MSTART[0], MSTART[2] };
 
-  if (((!music_on) && (!audio_supported)) || (music_command == command)) return;
+  if ((!audio_supported) || (music_command == command)) return;
   music_command = command;
   if (music_command == "menu") {
       m_audioManager->setMusicPosition(MSTART[1]);
@@ -193,59 +182,11 @@ void AudioManager::playSound(const char *fileName, float volume, float balance)
     lastUsedTimestamp[fileName] = currentTime;
 }
 
-void AudioManager::musicVolume(float volume)
-{
-    //if (!audio_supported) return;
-    if (music_on)
-    {
-        m_audioManager->setMusicVolume(volume);
-    }
-    music_volume = volume;
-}
 
-void AudioManager::soundVolume(float volume)
-{
-    //if (!audio_supported) return;
-    if (sound_on)
-    {
-        m_audioManager->setSoundVolume(volume);
-    }
-    sound_volume = volume;
-}
 
 const char * AudioManager::musicVolumeKey(void) { return kMusicVolume; }
 const char * AudioManager::soundVolumeKey(void) { return kSoundVolume; }
 const char * AudioManager::musicOnOffKey(void)  { return kMusic; }
 const char * AudioManager::soundOnOffKey(void)  { return kSound; }
 
-void AudioManager::musicOnOff(bool state)
-{
-  if ((!audio_supported) || (music_on == state)) return;
-  music_on = state;
-  m_audioManager->setMusicEnabled(state);
 
-  if (music_on)
-  {
-    loadMusic("pop.xm");
-    std::string lastCommand = music_command;
-    music_command = "";
-    music(lastCommand.c_str());
-  }
-}
-
-void AudioManager::soundOnOff(bool state)
-{
-  if ((!audio_supported) || (sound_on == state)) return;
-  sound_on = state;
-  m_audioManager->setSoundEnabled(state);
-}
-
-bool AudioManager::isMusicOn()
-{
-  return music_on;
-}
-
-bool AudioManager::isSoundOn()
-{
-  return sound_on;
-}

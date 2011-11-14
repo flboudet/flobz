@@ -24,28 +24,26 @@
  */
 
 #include "OptionMenu.h"
-#include "preferences.h"
 #include "PuyoStrings.h"
-#include "audio.h"
 
 MusicPrefSwitch::MusicPrefSwitch()
 : gameui::SwitchedButton(theCommander->getLocalizedString(kMusic), true,
                          theCommander->getSwitchOnPicture(), theCommander->getSwitchOffPicture(),
-                         String(AudioManager::musicOnOffKey()))
+                         String(AudioManager::musicOnOffKey()), theCommander->getPreferencesManager())
 {
 }
 
 AudioPrefSwitch::AudioPrefSwitch()
 : gameui::SwitchedButton(theCommander->getLocalizedString(kAudioFX), true,
                          theCommander->getSwitchOnPicture(), theCommander->getSwitchOffPicture(),
-                         String(AudioManager::soundOnOffKey()))
+                         String(AudioManager::soundOnOffKey()), theCommander->getPreferencesManager())
 {
 }
 
 FSPrefSwitch::FSPrefSwitch()
 : gameui::SwitchedButton(theCommander->getLocalizedString(kFullScreen), true,
                          theCommander->getSwitchOnPicture(), theCommander->getSwitchOffPicture(),
-                         String(theCommander->getFullScreenKey()))
+                         String(theCommander->getFullScreenKey()), theCommander->getPreferencesManager())
 {
 }
 

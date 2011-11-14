@@ -11,9 +11,9 @@ FramedEditField::FramedEditField(const String &label, Action *action,
   initFramedEditField(framePicture, focusedPicture);
 }
 
-FramedEditField::FramedEditField(const String &defaultText, const String &persistentID,
+FramedEditField::FramedEditField(const String &defaultText, const String &persistentID, PreferencesManager *prefMgr,
 				 const FramePicture *framePicture, const FramePicture *focusedPicture)
-  : Frame(framePicture), m_editField(defaultText, persistentID)
+  : Frame(framePicture), m_editField(defaultText, persistentID, prefMgr)
 {
   initFramedEditField(framePicture, focusedPicture);
 }
@@ -77,10 +77,10 @@ EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, Action
   add(&m_editField);
 }
 
-EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, String persistentID,
+EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, String persistentID, PreferencesManager *prefMgr,
 				       const FramePicture *framePicture, const FramePicture *focusedPicture,
 				       int width)
-  : m_editField(defaultValue, persistentID, framePicture, focusedPicture),
+  : m_editField(defaultValue, persistentID, prefMgr, framePicture, focusedPicture),
     text(label)
 {
     innerMargin = 0.0f;

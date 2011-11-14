@@ -1,6 +1,5 @@
 #include "PuyoInternetBot.h"
 #include "PuyoStrings.h"
-#include "preferences.h"
 #include "PuyoNetworkView.h"
 #include "PuyoNetworkStarter.h"
 
@@ -76,7 +75,7 @@ public:
     virtual void idle(double currentTime) {
         // Nothing happens...
     }
-    
+
     virtual ~PIBNGCListener() {
     }
 };
@@ -97,7 +96,7 @@ void PuyoInternetBot::connect(String server, int port, String name, String passw
             std::cout << "Denied: " << gameCenter->getDenyString() << std::endl;
             gameCenter = std::auto_ptr<InternetGameCenter>(NULL);
             return;
-        } 
+        }
     }
     std::cout << "Connected." << std::endl;
 }

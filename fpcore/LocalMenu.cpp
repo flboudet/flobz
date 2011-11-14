@@ -25,6 +25,7 @@
 
 #include "LocalMenu.h"
 #include "ScreenTransition.h"
+#include "PlayerNameUtils.h"
 
 class NoNameAction : public Action {
     public:
@@ -50,8 +51,9 @@ SoloGameMenu::SoloGameMenu(MainScreen *mainScreen)
 {
     m_editPlayerName.reset(new EditFieldWithLabel(
                                theCommander->getLocalizedString("Player:"),
-                               PuyoGame::getDefaultPlayerName(0),
-                               PuyoGame::getDefaultPlayerKey(0),
+                               PlayerNameUtils::getDefaultPlayerName(0).c_str(),
+                               PlayerNameUtils::getDefaultPlayerKey(0).c_str(),
+                               theCommander->getPreferencesManager(),
                                theCommander->getEditFieldFramePicture(),
                                theCommander->getEditFieldOverFramePicture(), 150));
     m_screenTitleFrame.reset(new Frame(theCommander->getSeparatorFramePicture()));
@@ -87,8 +89,9 @@ LocalGameMenu::LocalGameMenu(MainScreen *mainScreen)
     : MainScreenMenu(mainScreen),
       locale(theCommander->getDataPathManager(), "locale", "main"),
       editPlayerName(locale.getLocalizedString("Player:"),
-		     PuyoGame::getDefaultPlayerName(0),
-		     PuyoGame::getDefaultPlayerKey(0),
+		     PlayerNameUtils::getDefaultPlayerName(0).c_str(),
+		     PlayerNameUtils::getDefaultPlayerKey(0).c_str(),
+             theCommander->getPreferencesManager(),
 		     theCommander->getEditFieldFramePicture(),
 		     theCommander->getEditFieldOverFramePicture(), 150),
       screenTitleFrame(theCommander->getSeparatorFramePicture()),
@@ -129,13 +132,15 @@ Local2PlayersGameMenu::Local2PlayersGameMenu(MainScreen *mainScreen)
     : MainScreenMenu(mainScreen),
       locale(theCommander->getDataPathManager(), "locale", "main"),
       editPlayer1Name(locale.getLocalizedString("Player 1:"),
-		      PuyoGame::getDefaultPlayerName(1),
-		      PuyoGame::getDefaultPlayerKey(1),
+		      PlayerNameUtils::getDefaultPlayerName(1).c_str(),
+		      PlayerNameUtils::getDefaultPlayerKey(1).c_str(),
+              theCommander->getPreferencesManager(),
 		      theCommander->getEditFieldFramePicture(),
 		      theCommander->getEditFieldOverFramePicture(), 150),
       editPlayer2Name(locale.getLocalizedString("Player 2:"),
-		      PuyoGame::getDefaultPlayerName(2),
-		      PuyoGame::getDefaultPlayerKey(2),
+		      PlayerNameUtils::getDefaultPlayerName(2).c_str(),
+		      PlayerNameUtils::getDefaultPlayerKey(2).c_str(),
+              theCommander->getPreferencesManager(),
 		      theCommander->getEditFieldFramePicture(),
 		      theCommander->getEditFieldOverFramePicture(), 150),
       screenTitleFrame(theCommander->getSeparatorFramePicture()),

@@ -3,13 +3,15 @@
 
 #include "gameui.h"
 #include "NotifyCenter.h"
+#include "PreferencesManager.h"
 
 namespace gameui {
 
     class SwitchedButton : public HBox, Action, NotificationResponder {
     public:
         SwitchedButton(String label, bool defaultValue,
-                       IosSurface *trueSurface, IosSurface *falseSurface, String prefKey, Action * altResponder=NULL);
+                       IosSurface *trueSurface, IosSurface *falseSurface,
+                       String prefKey, PreferencesManager *prefMgr, Action * altResponder=NULL);
         virtual ~SwitchedButton();
         virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
         void notificationOccured(String identifier, void * context);
@@ -20,6 +22,7 @@ namespace gameui {
 
     private:
         void autoSetPreferedSize();
+        PreferencesManager *m_prefMgr;
         Image stateImage;
         IosSurface * imageTrue;
         IosSurface * imageFalse;

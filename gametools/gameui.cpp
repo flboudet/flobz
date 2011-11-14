@@ -1,6 +1,5 @@
 #include "gameui.h"
 #include "audiomanager.h"
-#include "preferences.h"
 
 #define MIN_REPEAT_TIME 100.0
 #define REPEAT_TIME 300.0
@@ -1556,17 +1555,16 @@ namespace gameui {
         setReceiveUpEvents(true);
     }
 
-    EditField::EditField(const String &defaultText, const String &persistentID)
-        : Text(defaultText, NULL, false), persistence(persistentID), editOnFocus(false)
+    EditField::EditField(const String &defaultText, const String &persistentID, PreferencesManager *prefMgr)
+        : m_prefMgr(prefMgr), Text(defaultText, NULL, false), persistence(persistentID), editOnFocus(false)
     {
-        char mytext[256];
-        GetStrPreference(persistentID, mytext, defaultText);
-        setValue(mytext);
+        std::string mytext = m_prefMgr->getStrPreference(persistentID, defaultText);
+        setValue(mytext.c_str());
         init(NULL,NULL);
     }
 
     EditField::EditField(const String &defaultText,  Action *action)
-        : Text(defaultText, NULL, false), persistence(""), editOnFocus(false)
+        : m_prefMgr(NULL), Text(defaultText, NULL, false), persistence(""), editOnFocus(false)
     {
         init(NULL,NULL);
         if (action != NULL)
@@ -1576,7 +1574,7 @@ namespace gameui {
     void EditField::setValue(String value, bool persistent)
     {
         Text::setValue(value);
-        if (persistent && (persistence != "")) SetStrPreference(persistence, getValue());
+        if (persistent && (persistence != "")) m_prefMgr->setStrPreference(persistence, getValue());
     }
 
     void EditField::idle(double currentTime)

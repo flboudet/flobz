@@ -25,10 +25,9 @@
 
 #include "ios_standardmessage.h"
 #include "InternetMenu.h"
-#include "preferences.h"
 #include "InternetGameCenter.h"
 #include "NetCenterMenu.h"
-#include "audio.h"
+#include "PlayerNameUtils.h"
 
 using namespace std;
 using namespace event_manager;
@@ -142,21 +141,21 @@ void HttpMetaServerConnection::idle(double currentTime)
 PuyoServerList::PuyoServerList(PuyoServerListResponder *responder)
   : m_responder(responder)
 {
-  char servname[256];
-  char servpath[1024];
-  int nbserv;
+    std::string servname;
+    std::string servpath;
+    int nbserv;
 
-  // For debugging purpose
-  //m_metaservers.push_back(new DummyMetaServerConnection(this));
+    // For debugging purpose
+    //m_metaservers.push_back(new DummyMetaServerConnection(this));
 
-  // Making a meta-server list from prefs
-  nbserv = GetIntPreference(kInternetMetaServerNumberKey, 1);
-  for (int i = 1; i <= nbserv; i++)
-  {
-    GetStrPreference (String(kInternetMetaServerKey)+i, servname, i==1?"aley.fovea.cc":"Error", 256);
-    GetStrPreference (String(kInternetMetaServerPathKey)+i, servpath, i==1?"/flobopuyo/fpservers":"/fpservers", 1024);
-    m_metaservers.push_back(new HttpMetaServerConnection(servname, servpath,
-                              GetIntPreference (String(kInternetMetaServerPortKey)+i, 80), this));
+    // Making a meta-server list from prefs
+    nbserv = theCommander->getPreferencesManager()->getIntPreference(kInternetMetaServerNumberKey, 1);
+    for (int i = 1; i <= nbserv; i++)
+    {
+        servname = theCommander->getPreferencesManager()->getStrPreference(String(kInternetMetaServerKey)+i, i==1?"aley.fovea.cc":"Error");
+        servpath = theCommander->getPreferencesManager()->getStrPreference (String(kInternetMetaServerPathKey)+i, i==1?"/flobopuyo/fpservers":"/fpservers");
+        m_metaservers.push_back(new HttpMetaServerConnection(servname.c_str(), servpath.c_str(),
+                                                             theCommander->getPreferencesManager()->getIntPreference(String(kInternetMetaServerPortKey)+i, 80), this));
   }
 }
 
@@ -281,13 +280,17 @@ InternetGameMenu::InternetGameMenu(MainScreen * mainScreen)
     serverText(theCommander->getLocalizedString("Server"), NULL, false),
     portText(theCommander->getLocalizedString("Port"), NULL, false),
     container(),
-    playerName(PuyoGame::getPlayerName(-2), PuyoGame::getDefaultPlayerKey(-2),
-	       theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
-    password("", kInternetPasswordKey,
+    playerName(PlayerNameUtils::getPlayerName(-2).c_str(), PlayerNameUtils::getDefaultPlayerKey(-2).c_str(),
+               theCommander->getPreferencesManager(),
+               theCommander->getEditFieldFramePicture(),
+               theCommander->getEditFieldOverFramePicture()),
+    password("", kInternetPasswordKey, theCommander->getPreferencesManager(),
 	       theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
     serverName(kInternetCurrentServerDefaultValue,kInternetCurrentServerKey,
-	       theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
+               theCommander->getPreferencesManager(),
+               theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
     serverPort(kInternetCurrentServerPortDefaultValue,kInternetCurrentServerPortKey,
+               theCommander->getPreferencesManager(),
 	       theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
     backAction(mainScreen),
     joinButton(theCommander->getLocalizedString("Join"), this,

@@ -7,7 +7,6 @@
 #include <math.h>
 #include <ios_filepath.h>
 #include <ios_memory.h>
-#include "preferences.h"
 
 static char *scriptPath0 = NULL;
 static char *scriptPath_fx = NULL;
@@ -70,7 +69,9 @@ static void styro_get_BoolPreference(GoomSL *gsl, GoomHash *global, GoomHash *lo
     char *name  = (char*)GSL_LOCAL_PTR(gsl, local, "name");
     int def     = GSL_LOCAL_INT(gsl, local, "default");
     GSL_GLOBAL_INT(gsl, "getBoolPreference")
-        = GetBoolPreference(name, def);
+        = true;
+    //TODO: make it work
+    //theCommander->getPreferencesManager()->getBoolPreference(name, def);
 }
 
 void put_text(GoomSL *gsl, GoomHash *global, GoomHash *local)
@@ -218,12 +219,12 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
     dh *= dscaley;
     scalex *= dscalex;
     scaley *= dscaley;
-    
+
     const char *parent = (const char*)GSL_LOCAL_PTR(gsl, local, "&this.parent");
     Vec2 parentPos = global_sprite_get_position(gsl, parent);
     x += (int)parentPos.x;
     y += (int)parentPos.y;
-    
+
     x *= dscalex;
     y *= dscaley;
 

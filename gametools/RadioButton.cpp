@@ -1,5 +1,4 @@
 #include "RadioButton.h"
-#include "preferences.h"
 
 using namespace event_manager;
 
@@ -9,8 +8,8 @@ namespace gameui {
     // RadioButton
     //
 
-    RadioButton::RadioButton(int defaultValue, IosSurface *trueSurface, IosSurface *falseSurface, String prefKey)
-    : imageTrue(trueSurface), imageFalse(falseSurface),
+    RadioButton::RadioButton(int defaultValue, IosSurface *trueSurface, IosSurface *falseSurface, String prefKey, PreferencesManager *prefMgr)
+    : m_prefMgr(prefMgr), imageTrue(trueSurface), imageFalse(falseSurface),
     key(prefKey), persistant(true)
     {
         if (key == "")
@@ -22,7 +21,7 @@ namespace gameui {
             stateValue = defaultValue;
             persistant = false;
         } else {
-            stateValue = (int)GetIntPreference(key, defaultValue);
+            stateValue = prefMgr->getIntPreference(key, defaultValue);
             persistant = true;
             notifKey = key;
         }
@@ -45,7 +44,7 @@ namespace gameui {
     void RadioButton::addButton(String _label)
     {
         bool value = (stateValue == (int)buttons.size()+1);
-        SwitchedButton * newButton = new SwitchedButton(_label, value, imageTrue, imageFalse, String(""), this);
+        SwitchedButton * newButton = new SwitchedButton(_label, value, imageTrue, imageFalse, String(""), m_prefMgr, this);
         HBox * mySpacer = new HBox();
         HBox * myContainer = new HBox();
         buttons.push_back(newButton);
@@ -100,7 +99,7 @@ namespace gameui {
         } else {
             fprintf(stderr, "RadioButton received out of bound notification '%s' item %d for size %d,\n",(const char *)notifKey, stateValue, (int)buttons.size());
         }
-        if (persistant) SetIntPreference((const char*)key, (int)stateValue);
+        if (persistant) m_prefMgr->setIntPreference((const char*)key, (int)stateValue);
     }
 
     int RadioButton::getState()

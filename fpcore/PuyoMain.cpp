@@ -1,7 +1,6 @@
 #include <iostream>
 #include "PuyoMain.h"
 #include "PuyoStrings.h"
-#include "preferences.h"
 #include "MainMenu.h"
 #include "CompositeDrawContext.h"
 #include "PackageDescription.h"
@@ -21,6 +20,8 @@
 #ifdef ENABLE_NETWORK_INTERNET
 #include "PuyoInternetBot.h"
 #endif
+
+#include "PosixPreferencesManager.h"
 
 using namespace std;
 using namespace event_manager;
@@ -52,17 +53,30 @@ void PuyoMain::initWithGUI()
 {
     initSDL();
     loop = GameUIDefaults::GAME_LOOP;
+    // Create the Preferences Manager
+    std::string prefFilePath;
+#ifndef _WIN32
+    char * h = getenv("HOME");
+    if (h != NULL) {
+        prefFilePath = h;
+        prefFilePath += "/.flobopoprc";
+    }
+#else
+    // TODO: a better path for WIN32
+    prefFilePath = "./.flobopuyorc";
+#endif
+    m_preferencesManager = new PosixPreferencesManager(prefFilePath.c_str());
     // Create the DrawContext
-    int requestedWidth = GetIntPreference(kScreenWidthPref, 640);
-    int requestedHeight = GetIntPreference(kScreenHeightPref, 480);
+    int requestedWidth = m_preferencesManager->getIntPreference(kScreenWidthPref, 640);
+    int requestedHeight = m_preferencesManager->getIntPreference(kScreenHeightPref, 480);
 #ifdef SDL12_GFX
 #ifdef OPENGL_GFX
     m_nativeDrawContext = new SDL12_OpenGL_DrawContext(&m_dataPathManager, 640, 480,
-                                          GetBoolPreference(kFullScreenPref, m_fullscreen),
+                                          m_preferencesManager->getBoolPreference(kFullScreenPref, m_fullscreen),
                                           "FloboPop by iOS-Software");
 #else
     m_nativeDrawContext = new SDL12_DrawContext(m_dataPathManager, 640, 480,
-                                          GetBoolPreference(kFullScreenPref, m_fullscreen),
+                                          m_preferencesManager->getBoolPreference(kFullScreenPref, m_fullscreen),
                                           "FloboPop by iOS-Software");
 #endif
     //PackageDescription *packDesc = new PackageDescription(m_dataPathManager, *cDC);
@@ -70,12 +84,12 @@ void PuyoMain::initWithGUI()
     //cDC->declareCompositeSurface("data/base.000/theme/Classic.fptheme/fat-puyo-0000.png",
     //                             "data/base.000/theme/Classic.fptheme/montage_1.png",
     //                             cropRect);
-    m_eventManager = new SDL12_EventManager();
+    m_eventManager = new SDL12_EventManager(m_preferencesManager);
     m_audioManager = new SDL_AudioManager();
 #endif
 #ifdef SDL13_GFX
     m_nativeDrawContext = new SDL13_DrawContext(640, 480,
-                                          GetBoolPreference(kFullScreenPref, m_fullscreen),
+                                          m_preferencesManager->getBoolPreference(kFullScreenPref, m_fullscreen),
                                           "FloboPop by iOS-Software");
     m_eventManager = new SDL13_EventManager();
     m_audioManager = new SDL_AudioManager();
@@ -89,7 +103,7 @@ void PuyoMain::initWithGUI()
     // Give the AudioManager to the GameLoop
     loop->setAudioManager(m_audioManager);
     // Create the PuyoCommander singleton
-    PuyoCommander *pc = new PuyoCommander(m_dataPathManager);
+    PuyoCommander *pc = new PuyoCommander(&m_dataPathManager, m_preferencesManager);
     pc->initWithGUI(m_fullscreen);
     initMenus();
     cursor = new GameCursor("gfx/cursor.png");
@@ -98,13 +112,6 @@ void PuyoMain::initWithGUI()
     loop->addIdle(dynamic_cast<CycledComponent *>(m_eventManager));
     theCommander->registerCursor(cursor);
     gameui::GlobalNotificationCenter.addListener(theCommander->getFullScreenKey(),this);
-}
-
-void PuyoMain::initWithoutGUI()
-{
-    loop = GameUIDefaults::GAME_LOOP;
-    PuyoCommander *pc = new PuyoCommander(m_dataPathManager);
-    pc->initWithoutGUI();
 }
 
 #ifdef SDL13_GFX
@@ -194,7 +201,7 @@ void PuyoMain::connect_ia(String param)
   int level     = 1;
   String password = "";
 
-  initWithoutGUI();
+  //initWithoutGUI();
 
   PuyoInternetBot bot(level);
   bot.connect(server, port, name, password);
@@ -221,7 +228,7 @@ void PuyoMain::initMenus()
 void PuyoMain::notificationOccured(String identifier, void * context)
 {
     if (identifier == theCommander->getFullScreenKey()) {
-        SetBoolPreference(kFullScreenPref, *(bool *)context);
+        theCommander->getPreferencesManager()->setBoolPreference(kFullScreenPref, *(bool *)context);
 #ifdef SDL12_GFX
         static_cast<SDL12_DrawContext *>(m_nativeDrawContext)->setFullScreen(*(bool *)context);
 #endif

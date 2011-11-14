@@ -3,7 +3,6 @@
 #include "GTLog.h"
 #include "PuyoCommander.h"
 #include "PuyoStrings.h"
-#include "preferences.h"
 #include "audio.h"
 #include "MainMenu.h"
 #include "AnimatedPuyoTheme.h"
@@ -153,13 +152,15 @@ void SinglePlayerGameAction::action()
 
 /* Build the PuyoCommander */
 
-PuyoCommander::PuyoCommander(DataPathManager &dataPathManager)
-  : dataPathManager(dataPathManager),
-    m_themeManager(new ThemeManagerImpl(dataPathManager)),
-    m_surfaceFactory(dataPathManager),
-    m_fontFactory(dataPathManager),
-    m_soundFactory(dataPathManager),
-    m_musicFactory(dataPathManager),
+PuyoCommander::PuyoCommander(DataPathManager *dataPathManager,
+                             PreferencesManager *preferencesManager)
+  : m_dataPathManager(dataPathManager),
+    m_preferencesManager(preferencesManager),
+    m_themeManager(new ThemeManagerImpl(*dataPathManager)),
+    m_surfaceFactory(*dataPathManager),
+    m_fontFactory(*dataPathManager),
+    m_soundFactory(*dataPathManager),
+    m_musicFactory(*dataPathManager),
     m_puyoSetThemeFactory(*m_themeManager),
     m_levelThemeFactory(*m_themeManager),
     m_cursor(NULL)
@@ -187,10 +188,6 @@ void PuyoCommander::initWithGUI(bool fs)
   m_textFieldIdleFramePicture = std::auto_ptr<FramePicture>(new FramePicture(5, 23, 4, 6, 10, 3));
   m_separatorFramePicture = std::auto_ptr<FramePicture>(new FramePicture(63, 2, 63, 2, 4, 2));
   m_listFramePicture = std::auto_ptr<FramePicture>(new FramePicture(5, 23, 4, 6, 10, 3));
-
-  GTLogTrace("PuyoCommander::initWithGUI() loading prefs");
-
-  loadPreferences(fs);
 
   GTLogTrace("PuyoCommander::initWithGUI() init locales");
 
@@ -255,7 +252,7 @@ extern char *dataFolder;
 /* Initialise the default dictionnary */
 void PuyoCommander::initLocale()
 {
-  locale = new LocalizedDictionary(dataPathManager, "locale", "main");
+  locale = new LocalizedDictionary(*m_dataPathManager, "locale", "main");
 }
 
 /* Global translator */
@@ -325,38 +322,9 @@ void PuyoCommander::initThemes()
 #endif
 }
 
-/*
-void PuyoCommander::setMusic(bool music)
-{
-  AudioManager::musicOnOff(music);
-}
-
-void PuyoCommander::setSoundFx(bool fx)
-{
-  AudioManager::soundOnOff(fx);
-}
-*/
-bool PuyoCommander::getMusic()
-{
-  return AudioManager::isMusicOn();
-}
-
-bool PuyoCommander::getSoundFx()
-{
-  return AudioManager::isSoundOn();
-}
-
 String PuyoCommander::getFullScreenKey(void) const
 {
     return String(kFullScreenPref);
-}
-
-/* load a few important preferences for display */
-void PuyoCommander::loadPreferences(bool fs)
-{
-  DBG_PRINT("loadPreferences()\n");
-  /* Load Preferences */
-  //fullscreen = fs ? GetBoolPreference(kFullScreenPref, true) : false;
 }
 
 ScreenTransitionWidget *PuyoCommander::createScreenTransition(Screen &fromScreen) const
@@ -424,9 +392,7 @@ PuyoSetThemeRef PuyoCommander::getPreferedPuyoSetTheme()
 const std::string &PuyoCommander::getPreferedPuyoSetThemeName() const
 {
     if (m_defaultPuyoSetThemeName == "") {
-        char out[256];
-        GetStrPreference ("puyoset_theme", out, getDefaultPuyoSetThemeName().c_str());
-        m_defaultPuyoSetThemeName = out;
+        m_defaultPuyoSetThemeName = m_preferencesManager->getStrPreference ("puyoset_theme", getDefaultPuyoSetThemeName().c_str());
     }
     return m_defaultPuyoSetThemeName;
 }
@@ -442,7 +408,7 @@ const std::string PuyoCommander::getDefaultPuyoSetThemeName() const
 void PuyoCommander::setPreferedPuyoSetThemeName(const char *name)
 {
     m_defaultPuyoSetThemeName = name;
-    SetStrPreference ("puyoset_theme", name);
+    m_preferencesManager->setStrPreference ("puyoset_theme", name);
 }
 
 const std::vector<std::string> &PuyoCommander::getPuyoSetThemeList() const
@@ -463,9 +429,7 @@ LevelThemeRef PuyoCommander::getPreferedLevelTheme()
 const std::string &PuyoCommander::getPreferedLevelThemeName() const
 {
     if (m_defaultLevelThemeName == "") {
-        char out[256];
-        GetStrPreference ("level_theme", out, getDefaultLevelThemeName().c_str());
-        m_defaultLevelThemeName = out;
+        m_defaultLevelThemeName = m_preferencesManager->getStrPreference ("level_theme", getDefaultLevelThemeName().c_str());
     }
     return m_defaultLevelThemeName;
 }
@@ -478,7 +442,7 @@ const std::string PuyoCommander::getDefaultLevelThemeName() const
 void PuyoCommander::setPreferedLevelThemeName(const char *name)
 {
     m_defaultLevelThemeName = name;
-    SetStrPreference ("level_theme", name);
+    m_preferencesManager->setStrPreference ("level_theme", name);
 }
 
 const std::vector<std::string> &PuyoCommander::getLevelThemeList() const

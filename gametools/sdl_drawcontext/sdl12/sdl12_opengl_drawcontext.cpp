@@ -53,9 +53,18 @@ static inline int utf8_to_utf16(const unsigned char * &src)
         src++;
         return utf8[0];
     }
-    else {
+    else if (utf8[0] < 0xC2) {
+        GTLogTrace("Bad Unicode!");
+        src++;
+        return '.';
+    }
+    else if (utf8[0] < 0xE0) {
         src += 2;
-        return (utf8[1] & 0xc0) | ((utf8[0] & 0xe0) << 6);
+        return (((int)utf8[0] & 0x1F) << 6) | ((int)utf8[1] & 0x3F);
+    }
+    else if (utf8[0] < 0xF0) {
+        src += 3;
+        return (((int)utf8[0] & 0x1F) << 12) | (((int)utf8[1] & 0x3F) << 6) | ((int)utf8[2] & 0x3F);
     }
 }
 

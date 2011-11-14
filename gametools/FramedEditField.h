@@ -10,7 +10,7 @@ class FramedEditField : public Frame {
 public:
   FramedEditField(const String &label, Action *action,
 		  const FramePicture *framePicture, const FramePicture *focusedPicture);
-  FramedEditField(const String &defaultText, const String &persistentID,
+  FramedEditField(const String &defaultText, const String &persistentID, PreferencesManager *prefMgr,
 		  const FramePicture *framePicture, const FramePicture *focusedPicture);
   virtual ~FramedEditField() {}
   virtual void setValue(String value);
@@ -27,7 +27,7 @@ public:
   EditFieldWithLabel(String label, String defaultValue, Action *action,
 		     const FramePicture *framePicture, const FramePicture *focusedPicture,
 		     int width = 0);
-  EditFieldWithLabel(String label, String defaultValue, String persistentID,
+  EditFieldWithLabel(String label, String defaultValue, String persistentID, PreferencesManager *prefMgr,
 		     const FramePicture *framePicture, const FramePicture *focusedPicture,
 		     int width = 0);
   virtual ~EditFieldWithLabel();

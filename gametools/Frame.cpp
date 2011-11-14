@@ -8,6 +8,7 @@
  */
 #include <assert.h>
 #include "Frame.h"
+#include "GTLog.h"
 
 namespace gameui {
 
@@ -133,7 +134,7 @@ Frame::~Frame()
   if (m_bgFocus)
     delete m_bgFocus;
 }
-	
+
 void Frame::setFrameStyle(FrameStyle style) {
 	m_style = style;
 }

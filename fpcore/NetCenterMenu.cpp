@@ -225,7 +225,7 @@ NetCenterMenu::NetCenterMenu(MainScreen *mainScreen, NetGameCenter *netCenter,
       shouldSelfDestroy(false), nameProvider(*netCenter),
       chatBox(*this),
       topSeparator(0, 5), middleSeparator(0, 5), bottomSeparator(0, 5),
-      m_speedSelector(1, theCommander->getRadioOnPicture(), theCommander->getRadioOffPicture(), "Config.TwoPlayerGameDifficulty")
+      m_speedSelector(1, theCommander->getRadioOnPicture(), theCommander->getRadioOffPicture(), "Config.TwoPlayerGameDifficulty", theCommander->getPreferencesManager())
 {
     GameUIDefaults::GAME_LOOP->addIdle(&cycled);
     this->setBorderVisible(false);

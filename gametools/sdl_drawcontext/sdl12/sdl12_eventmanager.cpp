@@ -1,6 +1,5 @@
 #include <iostream>
 #include <sstream>
-#include "preferences.h"
 #include "sdl12_eventmanager.h"
 #include "common/SDL_InputSwitch.h"
 
@@ -155,28 +154,27 @@ GameControlEvent *SDL_GameControlEvent::clone()
     return new SDL_GameControlEvent(*this);
 }
 
-SDL12_EventManager::SDL12_EventManager()
-    : CycledComponent(0.01), m_idleDx(0), m_idleDy(0),
+SDL12_EventManager::SDL12_EventManager(PreferencesManager *prefMgr)
+    : CycledComponent(0.01),
+      m_prefMgr(prefMgr), m_idleDx(0), m_idleDy(0),
       m_mouseX(0), m_mouseY(0), m_disableJoyMouseEmulation(false)
 {
 	SDL_EnableUNICODE(1);
     initControllers();
     // get defaults from prefs
     for (int i = 0 ; i < NB_CONTROLS ; i++) {
-        char result[256];
         ostringstream osstream;
         osstream << "key." << i;
         string defaultKeyStr = defaultKeyControls[i]->toString();
-        GetStrPreference (osstream.str().c_str(), result, defaultKeyStr.c_str());
-        keyControls[i] = InputSwitch::createFromString(result);
+        std::string result = m_prefMgr->getStrPreference (osstream.str().c_str(), defaultKeyStr.c_str());
+        keyControls[i] = InputSwitch::createFromString(result.c_str());
     }
     for (int i = 0 ; i < NB_CONTROLS ; i++) {
-        char result[256];
         ostringstream osstream;
         osstream << "altkey." << i;
         string defaultKeyStr = defaultKeyAlternateControls[i]->toString();
-        GetStrPreference (osstream.str().c_str(), result, defaultKeyStr.c_str());
-        keyAlternateControls[i] = InputSwitch::createFromString(result);
+        std::string result = m_prefMgr->getStrPreference (osstream.str().c_str(), defaultKeyStr.c_str());
+        keyAlternateControls[i] = InputSwitch::createFromString(result.c_str());
     }
 }
 
@@ -243,13 +241,13 @@ void SDL12_EventManager::saveControls()
         ostringstream osstream;
         osstream << "key." << i;
         string prefKeyStr = keyControls[i]->toString();
-        SetStrPreference (osstream.str().c_str(), prefKeyStr.c_str());
+        m_prefMgr->setStrPreference(osstream.str().c_str(), prefKeyStr.c_str());
     }
     for (int i = 0 ; i < NB_CONTROLS ; i++) {
         ostringstream osstream;
         osstream << "altkey." << i;
         string prefKeyStr = keyAlternateControls[i]->toString();
-        SetStrPreference (osstream.str().c_str(), prefKeyStr.c_str());
+        m_prefMgr->setStrPreference(osstream.str().c_str(), prefKeyStr.c_str());
     }
 }
 

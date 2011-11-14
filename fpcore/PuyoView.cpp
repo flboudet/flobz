@@ -421,6 +421,7 @@ void PuyoView::gameDidEndCycle()
 		if (attachedGame->getNeutralPuyos() < 0)
 			enemyGame->increaseNeutralPuyos(- attachedGame->getNeutralPuyos());
 	}
+    GTLogTrace("NewMetaCycleStart");
     newMetaCycleStart = true;
 }
 

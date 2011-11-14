@@ -109,6 +109,7 @@
 #include <utility>              // for pair<>
 #include <iterator>             // for facts about iterator tags
 #include <google/type_traits.h> // for true_type, integral_constant, etc.
+#include <stddef.h>
 
 _START_GOOGLE_NAMESPACE_
 

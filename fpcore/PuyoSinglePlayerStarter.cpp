@@ -24,9 +24,9 @@
  */
 
 #include "GTLog.h"
+#include "PuyoStrings.h"
 #include "PuyoSinglePlayerStarter.h"
 #include "PuyoView.h"
-#include "preferences.h"
 #include "GSLFileAccessWrapper.h"
 
 using namespace event_manager;
@@ -174,7 +174,7 @@ void StoryModeLevelsDefinition::get_BoolPreference(GoomSL *gsl, GoomHash *global
     char *name  = (char*)GSL_LOCAL_PTR(gsl, local, "name");
     int def     = GSL_LOCAL_INT(gsl, local, "default");
     GSL_GLOBAL_INT(gsl, "getBoolPreference")
-        = GetBoolPreference(name, def);
+        = theCommander->getPreferencesManager()->getBoolPreference(name, def);
 }
 
 void StoryModeLevelsDefinition::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
@@ -203,10 +203,6 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName,
         : StoryScreen(screenName, finishedAction, initialTransition),
         playerName(playerName), playerStat(playerPoints)
 {
-    static const char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
-    "Satanas", "Doctor X", "Tania", "Mr Gyom",
-    "The Duke","Jeko","--------" };
-
     initHiScores(AI_NAMES);
     int scorePlace = setHiScore(playerStat.total_points, playerName);
 
@@ -238,7 +234,7 @@ void PuyoGameOver1PScreen::refresh()
     for (int i = 0 ; i < kHiScoresNumber ; i++) {
         char tmp[256];
         sprintf(tmp, "%d", scores[i].score);
-        names[i].setValue(scores[i].name);
+        names[i].setValue(scores[i].name.c_str());
         points[i].setValue(tmp);
     }
 

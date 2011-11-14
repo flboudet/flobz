@@ -84,6 +84,6 @@ const char *kSinglePlayerGame = "Single Player Game";
 const char *kTwoPlayersGame = "Two Players Game";
 const char *kNetGame = "Network Game";
 
-const char *AI_NAMES[] = { "Fanzy", "Garou", "Big Rabbit", "Gizmo",
-  "Satanas", "Doctor X", "Tanya", "Mr Gyom",
-"The Duke","Jeko","--------" };
+const char *AI_NAMES[] = { "Herbert", "Garou", "Big Rabbit", "Gizmo",
+  "Satanas", "A. Mc Flurry", "Tania", "Mr Gyom",
+"The Dude","Jeko","--------" };

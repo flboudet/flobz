@@ -1,5 +1,4 @@
 #include "ControlMenu.h"
-#include "preferences.h"
 #include "PuyoStrings.h"
 
 using namespace event_manager;

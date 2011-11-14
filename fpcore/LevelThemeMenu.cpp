@@ -24,7 +24,6 @@
  */
 
 #include "LevelThemeMenu.h"
-#include "preferences.h"
 #include "PuyoStrings.h"
 #include "Theme.h"
 

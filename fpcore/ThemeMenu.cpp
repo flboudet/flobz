@@ -24,7 +24,6 @@
  */
 
 #include "ThemeMenu.h"
-#include "preferences.h"
 #include "PuyoStrings.h"
 #include "Theme.h"
 

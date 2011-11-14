@@ -25,10 +25,8 @@
 
 #include "NetworkMenu.h"
 #include "LanGameCenter.h"
-#include "preferences.h"
 #include "NetCenterMenu.h"
-#include "audio.h"
-
+#include "PlayerNameUtils.h"
 
 using namespace ios_fc;
 
@@ -54,17 +52,17 @@ private:
     EditField *userName;
 };
 
-#include "PuyoGame.h"
 
 LANGameMenu::LANGameMenu(MainScreen * mainScreen)
   : MainScreenMenu(mainScreen),
     titleFrame(theCommander->getSeparatorFramePicture()),
     lanTitle(theCommander->getLocalizedString("LAN Game")),
     playerNameLabel(theCommander->getLocalizedString("Player name:"),
-                    PuyoGame::getDefaultPlayerName(-1), PuyoGame::getDefaultPlayerKey(-1),
-		    theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
+                    PlayerNameUtils::getDefaultPlayerName(-1).c_str(), PlayerNameUtils::getDefaultPlayerKey(-1).c_str(),
+                    theCommander->getPreferencesManager(),
+                    theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
     portNumLabel(theCommander->getLocalizedString("Port number:"), "6581", NULL,
-		 theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
+                 theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
     cancelAction(mainScreen),
     startButton(theCommander->getLocalizedString("Start!"),
                 new PushLanNetCenterMenuAction(mainScreen, &(portNumLabel.getEditField()),
