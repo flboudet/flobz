@@ -30,8 +30,8 @@
 #include "ios_time.h"
 #include "PuyoMessageDef.h"
 
-PuyoGame *PuyoNetworkGameFactory::createPuyoGame(PuyoFactory *attachedPuyoFactory) {
-    return new PuyoNetworkGame(attachedPuyoFactory, msgBox, gameId);
+FloboGame *PuyoNetworkGameFactory::createFloboGame(FloboFactory *attachedFloboFactory) {
+    return new PuyoNetworkGame(attachedFloboFactory, msgBox, gameId);
 }
 
 PuyoNetworkGameWidget::PuyoNetworkGameWidget()
@@ -50,9 +50,9 @@ PuyoPlayer *PuyoNetworkGameWidget::createLocalPlayer()
 void PuyoNetworkGameWidget::initWithGUI(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, FPServerIGPMessageBox *igpbox)
 {
     attachedPuyoThemeSet = &puyoThemeSet;
-    attachedRandom = std::auto_ptr<PuyoRandomSystem>(new PuyoRandomSystem(randomSeed, 5));
+    attachedRandom = std::auto_ptr<RandomSystem>(new RandomSystem(randomSeed, 5));
     this->mbox = &mbox;
-    attachedLocalGameFactory   = std::auto_ptr<PuyoLocalGameFactory>(new PuyoLocalGameFactory(attachedRandom.get()));
+    attachedLocalGameFactory   = std::auto_ptr<FloboLocalGameFactory>(new FloboLocalGameFactory(attachedRandom.get()));
     attachedNetworkGameFactory = std::auto_ptr<PuyoNetworkGameFactory>(new PuyoNetworkGameFactory(attachedRandom.get(), mbox, gameId));
     if (igpbox != NULL) {
         localArea = std::auto_ptr<PuyoNetworkView>(new PuyoInternetNetworkView(attachedLocalGameFactory.get(), 0, attachedPuyoThemeSet, &levelTheme,

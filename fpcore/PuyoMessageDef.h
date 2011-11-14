@@ -1,5 +1,5 @@
-#ifndef _PUYO_MESSAGE_DEF_H
-#define _PUYO_MESSAGE_DEF_H
+#ifndef _FLOBO_MESSAGE_DEF_H
+#define _FLOBO_MESSAGE_DEF_H
 
 /* y'a des conflits de nommage... */
 namespace PuyoMessage {

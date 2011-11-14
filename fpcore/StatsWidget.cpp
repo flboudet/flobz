@@ -83,13 +83,13 @@ void ProgressBarWidget::draw(DrawTarget *dt)
     RGBA bgColor = { 0x11, 0x66, 0x66, 0x66 };
     dt->fillRect(&dstrect, bgColor);
 
-    static const int IMG_PUYO_WIDTH = 52;
+    static const int IMG_FLOBO_WIDTH = 52;
     static const int IMG_RING_WIDTH = 0;
     static const int IMG_ROPE_ELT_WIDTH = 8;
     static const int IMG_ROPE_ELT_HEIGHT = 8;
 
-    int rope_targetSize = (bsize.x - IMG_RING_WIDTH - IMG_PUYO_WIDTH) * m_targetValue;
-    int rope_size = (bsize.x - IMG_RING_WIDTH - IMG_PUYO_WIDTH) * m_value;
+    int rope_targetSize = (bsize.x - IMG_RING_WIDTH - IMG_FLOBO_WIDTH) * m_targetValue;
+    int rope_size = (bsize.x - IMG_RING_WIDTH - IMG_FLOBO_WIDTH) * m_value;
     int n_rope_elt = 3 * rope_targetSize / (2 * IMG_ROPE_ELT_WIDTH);
     if (n_rope_elt < 8) n_rope_elt = 8;
 
@@ -146,7 +146,7 @@ void ProgressBarWidget::draw(DrawTarget *dt)
         dt->draw(m_res.puyo_right[m_colorIndex][m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)], NULL, &dstrect);
     }
     else {
-        dstrect.x = bpos.x + bsize.x - rope_size - IMG_RING_WIDTH - IMG_PUYO_WIDTH + 4;
+        dstrect.x = bpos.x + bsize.x - rope_size - IMG_RING_WIDTH - IMG_FLOBO_WIDTH + 4;
         dt->draw(m_res.puyo_left[m_colorIndex][m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)], NULL, &dstrect);
     }
 }

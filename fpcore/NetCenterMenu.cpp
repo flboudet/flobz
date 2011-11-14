@@ -55,7 +55,7 @@ void NetCenterDialogMenu::NetCenterDialogMenuAction::action()
     else targetMenu->cancelCurrentGame();
 }
 
-NetCenterDialogMenu::NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvitation &associatedInvitation, String title, String message, String optLine, bool hasAcceptButton, bool hasCancelButton)
+NetCenterDialogMenu::NetCenterDialogMenu(NetCenterMenu *targetMenu, FloboGameInvitation &associatedInvitation, String title, String message, String optLine, bool hasAcceptButton, bool hasCancelButton)
     : associatedInvitation(associatedInvitation),
       menu(theCommander->getWindowFramePicture()),
       cancelAction(targetMenu, true), acceptAction(targetMenu, false),
@@ -319,7 +319,7 @@ void NetCenterMenu::onPlayerUpdated(String playerName, PeerAddress playerAddress
     playerList.updatePlayer(playerName, playerAddress, info);
 }
 
-void NetCenterMenu::onGameInvitationReceived(PuyoGameInvitation &invitation)
+void NetCenterMenu::onGameInvitationReceived(FloboGameInvitation &invitation)
 {
     // If already waiting for a game, cancel the invitation
     if (this->onScreenDialog != NULL) {
@@ -396,7 +396,7 @@ void NetCenterMenu::cancelCurrentGame()
     }
 }
 
-void NetCenterMenu::onGameAcceptedNegociationPending(PuyoGameInvitation &invitation)
+void NetCenterMenu::onGameAcceptedNegociationPending(FloboGameInvitation &invitation)
 {
     container.remove(onScreenDialog);
     delete onScreenDialog;
@@ -408,7 +408,7 @@ void NetCenterMenu::onGameAcceptedNegociationPending(PuyoGameInvitation &invitat
     this->focus(onScreenDialog);
 }
 
-void NetCenterMenu::onGameInvitationCanceledReceived(PuyoGameInvitation &invitation)
+void NetCenterMenu::onGameInvitationCanceledReceived(FloboGameInvitation &invitation)
 {
     if (this->onScreenDialog != NULL) {
         if (invitation.opponentAddress == onScreenDialog->associatedInvitation.opponentAddress) {
@@ -419,7 +419,7 @@ void NetCenterMenu::onGameInvitationCanceledReceived(PuyoGameInvitation &invitat
     }
 }
 
-void NetCenterMenu::onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation)
+void NetCenterMenu::onGameGrantedWithMessagebox(MessageBox *mbox, FloboGameInvitation &invitation)
 {
     PuyoNetworkTwoPlayerGameWidgetFactory *factory = new PuyoNetworkTwoPlayerGameWidgetFactory(*mbox, invitation.gameRandomSeed, netCenter->getIgpBox());
     NetworkGameStateMachine *starter = new NetworkGameStateMachine(factory, mbox, (GameDifficulty)(invitation.gameSpeed), &nameProvider);
@@ -434,7 +434,7 @@ void NetCenterMenu::onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvita
 
 void NetCenterMenu::playerSelected(PeerAddress playerAddress, String playerName)
 {
-    PuyoGameInvitation invitation;
+    FloboGameInvitation invitation;
     invitation.gameRandomSeed = (unsigned long)(fmod(getTimeMs(), (double)0xFFFFFFFF));
     invitation.opponentAddress = playerAddress;
     invitation.gameSpeed = m_speedSelector.getState() - 1;

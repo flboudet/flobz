@@ -1,5 +1,5 @@
-#ifndef PUYO_STRINGS_H
-#define PUYO_STRINGS_H
+#ifndef FLOBO_STRINGS_H
+#define FLOBO_STRINGS_H
 
 extern const char *kYouDidIt;
 extern const char *kNextLevel;

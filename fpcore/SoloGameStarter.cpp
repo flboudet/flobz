@@ -34,7 +34,7 @@ SoloGameWidget::SoloGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelThem
     : CycledComponent(TIME_BETWEEN_GAME_CYCLES),
       attachedPuyoThemeSet(puyoThemeSet), attachedLevelTheme(levelTheme), attachedRandom(5), m_cyclesBeforeGameCycle(0), m_cyclesBeforeLevelRaise(0)
 {
-    m_gameFactory.reset(new PuyoLocalGameFactory(&attachedRandom));
+    m_gameFactory.reset(new FloboLocalGameFactory(&attachedRandom));
     m_areaA.reset(new PuyoView(m_gameFactory.get(), 0, &puyoThemeSet, &levelTheme));
     m_playerController.reset(new PuyoCombinedEventPlayer(*m_areaA));
     //initWithGUI(*m_areaA, NULL, *m_playerController, NULL, levelTheme, gameOverAction);
@@ -50,10 +50,10 @@ void SoloGameWidget::gameDidEndCycle()
         m_areaA->getAttachedGame()->addNeutralLayer();
         m_cyclesBeforeLevelRaise = 800;
     }
-    //m_areaA->getAttachedGame()->increaseNeutralPuyos(6);
+    //m_areaA->getAttachedGame()->increaseNeutralFlobos(6);
 }
 
-void SoloGameWidget::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase)
+void SoloGameWidget::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase)
 {
     GTLogTrace("Combo with phase=%d", phase);
 }

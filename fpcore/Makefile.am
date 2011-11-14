@@ -2,7 +2,7 @@ noinst_LTLIBRARIES=libfpcore.la
 
 libfpcore_la_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           MainMenu.cpp MainScreen.cpp PuyoMain.cpp \
-          main.cpp FPDataPathManager.cpp PuyoGame.cpp DoomMelt.cpp \
+          main.cpp FPDataPathManager.cpp FloboGame.cpp DoomMelt.cpp \
           PuyoView.cpp PuyoAnimations.cpp AnimatedPuyo.cpp AIPlayer.cpp \
           styrolyse.cpp PuyoStory.cpp ChatBox.cpp LocalizedDictionary.cpp \
           PuyoEventPlayer.cpp PauseMenu.cpp CheatCodeManager.cpp \
@@ -11,7 +11,7 @@ libfpcore_la_SOURCES=audio.cpp HiScores.cpp PuyoCommander.cpp \
           PuyoStarter.cpp SoloGameStarter.cpp PuyoSinglePlayerStarter.cpp PuyoTwoPlayerStarter.cpp \
           LocalMenu.cpp OptionMenu.cpp ControlMenu.cpp \
           LevelThemeMenu.cpp ThemeMenu.cpp ScreenTransition.cpp \
-          PuyoGameAbstract.cpp PuyoStrings.cpp \
+          FloboGameAbstract.cpp PuyoStrings.cpp \
           PackageDescription.cpp AnimatedPuyoTheme.cpp GSLFileAccessWrapper.cpp \
 	  PlayerNameUtils.cpp
 
@@ -26,8 +26,8 @@ endif
 libfpcore_la_CXXFLAGS = -I$(top_srcdir)/common -I$(top_srcdir)/iosfc -I$(top_srcdir)/goomsl -I$(top_srcdir)/gametools $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 
 EXTRA_DIST=PuyoEventPlayer.h PuyoNetworkView.h \
-           AnimatedPuyo.h PuyoGameAbstract.h OptionMenu.h \
-           PuyoGame.h PauseMenu.h \
+           AnimatedPuyo.h FloboGameAbstract.h OptionMenu.h \
+           FloboGame.h PauseMenu.h \
            audio.h GameWidget.h GameScreen.h PuyoPlayer.h \
            AIPlayer.h PuyoScoring.h PuyoMain.h \
            ScreenTransition.h SoloGameStarter.h \

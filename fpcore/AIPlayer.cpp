@@ -23,7 +23,7 @@
 #include "AIPlayer.h"
 
 static const PuyoCoordinates nullPosition = {0,0};
-static const PuyoBinom nullBinom = {PUYO_EMPTY,PUYO_EMPTY,Left,nullPosition};
+static const PuyoBinom nullBinom = {FLOBO_EMPTY,FLOBO_EMPTY,Left,nullPosition};
 static const GridEvaluation nullEvaluation = {0,0,0,0,0,0};
 
 #define copyGrid(dst,src) memcpy((void *)dst, (void *)src, sizeof(GridState))
@@ -39,27 +39,27 @@ inline int columnHeight(const unsigned int x, const GridState * const grid)
 inline int stripedColumnHeight(const unsigned int x, const GridState * const grid)
 {
   int h = (*grid)[x][HEIGHTS_ROW];
-  while ((h>0) && ((*grid)[x][h-1] == PUYO_NEUTRAL)) h--;
+  while ((h>0) && ((*grid)[x][h-1] == FLOBO_NEUTRAL)) h--;
   return h;
 }
 
 
 inline int normalColumnHeight(const unsigned int x, const GridState * const grid)
 {
-  if ((*grid)[x][0] != PUYO_EMPTY)
+  if ((*grid)[x][0] != FLOBO_EMPTY)
   {
-    int y = IA_PUYODIMY-1;
-    while ((y>0) && ((*grid)[x][y] == PUYO_EMPTY)) y--;
+    int y = IA_FLOBOBAN_DIMY-1;
+    while ((y>0) && ((*grid)[x][y] == FLOBO_EMPTY)) y--;
     return y+1;
   }
   else return 0;
 }
 
-bool removeSamePuyoAround(int X, int Y, const PuyoState color, GridState * const tab, GridEvaluation * const evaluation)
+bool removeSameFloboAround(int X, int Y, const FloboState color, GridState * const tab, GridEvaluation * const evaluation)
 {
   GridState marked;
-  unsigned char mx[IA_PUYODIMY*IA_PUYODIMX];
-  unsigned char my[IA_PUYODIMX*IA_PUYODIMY];
+  unsigned char mx[IA_FLOBOBAN_DIMY*IA_FLOBOBAN_DIMX];
+  unsigned char my[IA_FLOBOBAN_DIMX*IA_FLOBOBAN_DIMY];
   int  nFound = 1;
 
   mx[0] = X;
@@ -73,7 +73,7 @@ bool removeSamePuyoAround(int X, int Y, const PuyoState color, GridState * const
     X = mx[i];
     Y = my[i];
 
-    if (Y+1<IA_PUYODIMY) {
+    if (Y+1<IA_FLOBOBAN_DIMY) {
       if (marked[X][Y+1] == 0) {
         if ((*tab)[X][Y+1] == color) {
           mx[nFound] = X;
@@ -93,7 +93,7 @@ bool removeSamePuyoAround(int X, int Y, const PuyoState color, GridState * const
         marked[X][Y-1] = 1;
       }
     }
-    if (X+1<IA_PUYODIMX) {
+    if (X+1<IA_FLOBOBAN_DIMX) {
       if (marked[X+1][Y] == 0) {
         if ((*tab)[X+1][Y] == color) {
           mx[nFound] = X+1;
@@ -127,22 +127,22 @@ bool removeSamePuyoAround(int X, int Y, const PuyoState color, GridState * const
     X = mx[i];
     Y = my[i];
 
-    (*tab)[X][Y] = PUYO_EMPTY;
+    (*tab)[X][Y] = FLOBO_EMPTY;
 
-    if ((Y+1<IA_PUYODIMY) && ((*tab)[X][Y+1] == PUYO_NEUTRAL)) {
-        (*tab)[X][Y+1] = PUYO_EMPTY;
+    if ((Y+1<IA_FLOBOBAN_DIMY) && ((*tab)[X][Y+1] == FLOBO_NEUTRAL)) {
+        (*tab)[X][Y+1] = FLOBO_EMPTY;
         evaluation->neutralSuppressed++;
     }
-    if ((Y>0) && ((*tab)[X][Y-1] == PUYO_NEUTRAL)) {
-        (*tab)[X][Y-1] = PUYO_EMPTY;
+    if ((Y>0) && ((*tab)[X][Y-1] == FLOBO_NEUTRAL)) {
+        (*tab)[X][Y-1] = FLOBO_EMPTY;
         evaluation->neutralSuppressed++;
     }
-    if ((X+1<IA_PUYODIMX) && ((*tab)[X+1][Y] == PUYO_NEUTRAL)) {
-        (*tab)[X+1][Y] = PUYO_EMPTY;
+    if ((X+1<IA_FLOBOBAN_DIMX) && ((*tab)[X+1][Y] == FLOBO_NEUTRAL)) {
+        (*tab)[X+1][Y] = FLOBO_EMPTY;
         evaluation->neutralSuppressed++;
     }
-    if ((X>0) && ((*tab)[X-1][Y] == PUYO_NEUTRAL)) {
-        (*tab)[X-1][Y] = PUYO_EMPTY;
+    if ((X>0) && ((*tab)[X-1][Y] == FLOBO_NEUTRAL)) {
+        (*tab)[X-1][Y] = FLOBO_EMPTY;
         evaluation->neutralSuppressed++;
     }
   }
@@ -151,11 +151,11 @@ bool removeSamePuyoAround(int X, int Y, const PuyoState color, GridState * const
 }
 
 
-bool countSamePuyoAround(int X, int Y, const PuyoState color, GridState * const tab, GridEvaluation * const evaluation)
+bool countSameFloboAround(int X, int Y, const FloboState color, GridState * const tab, GridEvaluation * const evaluation)
 {
   GridState marked;
-  unsigned char mx[IA_PUYODIMY*IA_PUYODIMX];
-  unsigned char my[IA_PUYODIMX*IA_PUYODIMY];
+  unsigned char mx[IA_FLOBOBAN_DIMY*IA_FLOBOBAN_DIMX];
+  unsigned char my[IA_FLOBOBAN_DIMX*IA_FLOBOBAN_DIMY];
   int  nFound = 1;
 
   mx[0] = X;
@@ -169,7 +169,7 @@ bool countSamePuyoAround(int X, int Y, const PuyoState color, GridState * const 
     X = mx[i];
     Y = my[i];
 
-    if (Y+1<IA_PUYODIMY) {
+    if (Y+1<IA_FLOBOBAN_DIMY) {
       if (marked[X][Y+1] == 0) {
         if ((*tab)[X][Y+1] == color) {
           mx[nFound] = X;
@@ -189,7 +189,7 @@ bool countSamePuyoAround(int X, int Y, const PuyoState color, GridState * const 
         } else marked[X][Y-1] = 2;
       }
     }
-    if (X+1<IA_PUYODIMX) {
+    if (X+1<IA_FLOBOBAN_DIMX) {
       if (marked[X+1][Y] == 0) {
         if ((*tab)[X+1][Y] == color) {
           mx[nFound] = X+1;
@@ -224,22 +224,22 @@ bool countSamePuyoAround(int X, int Y, const PuyoState color, GridState * const 
     X = mx[i];
     Y = my[i];
 
-    (*tab)[X][Y] = PUYO_EMPTY;
+    (*tab)[X][Y] = FLOBO_EMPTY;
 
-    if ((Y+1<IA_PUYODIMY) && ((*tab)[X][Y+1] == PUYO_NEUTRAL)) {
-        (*tab)[X][Y+1] = PUYO_EMPTY;
+    if ((Y+1<IA_FLOBOBAN_DIMY) && ((*tab)[X][Y+1] == FLOBO_NEUTRAL)) {
+        (*tab)[X][Y+1] = FLOBO_EMPTY;
         evaluation->neutralSuppressed++;
     }
-    if ((Y>0) && ((*tab)[X][Y-1] == PUYO_NEUTRAL)) {
-        (*tab)[X][Y-1] = PUYO_EMPTY;
+    if ((Y>0) && ((*tab)[X][Y-1] == FLOBO_NEUTRAL)) {
+        (*tab)[X][Y-1] = FLOBO_EMPTY;
         evaluation->neutralSuppressed++;
     }
-    if ((X+1<IA_PUYODIMX) && ((*tab)[X+1][Y] == PUYO_NEUTRAL)) {
-        (*tab)[X+1][Y] = PUYO_EMPTY;
+    if ((X+1<IA_FLOBOBAN_DIMX) && ((*tab)[X+1][Y] == FLOBO_NEUTRAL)) {
+        (*tab)[X+1][Y] = FLOBO_EMPTY;
         evaluation->neutralSuppressed++;
     }
-    if ((X>0) && ((*tab)[X-1][Y] == PUYO_NEUTRAL)) {
-        (*tab)[X-1][Y] = PUYO_EMPTY;
+    if ((X>0) && ((*tab)[X-1][Y] == FLOBO_NEUTRAL)) {
+        (*tab)[X-1][Y] = FLOBO_EMPTY;
         evaluation->neutralSuppressed++;
     }
   }
@@ -251,18 +251,18 @@ bool countSamePuyoAround(int X, int Y, const PuyoState color, GridState * const 
 inline void columnCompress(const unsigned int x, GridState * const grid)
 {
   int ydst = 0, ysrc = 0;
-  int last = IA_PUYODIMY;
+  int last = IA_FLOBOBAN_DIMY;
   int height = 0;
   
 	// on oublie les cases vides en haut de colonne
-  while ( (last > 0) && ((*grid)[x][last-1] == PUYO_EMPTY) ) last--;
+  while ( (last > 0) && ((*grid)[x][last-1] == FLOBO_EMPTY) ) last--;
 
   while (ydst < last) // Tant qu'on a pas rempli dst
   {
     if ( ysrc < last ) // Si on n'a pas épuisé src
     {
-      PuyoState state = (PuyoState)(*grid)[x][ysrc];
-      if (state != PUYO_EMPTY) // Si src n'est pas vide
+      FloboState state = (FloboState)(*grid)[x][ysrc];
+      if (state != FLOBO_EMPTY) // Si src n'est pas vide
       {
         // On recopie et on passe au dst suivant
         if (ysrc != ydst) (*grid)[x][ydst] = state;
@@ -272,16 +272,16 @@ inline void columnCompress(const unsigned int x, GridState * const grid)
       // src suivant
       ysrc++;
     }
-    else // Fin du remplissage avec PUYO_EMPTY
+    else // Fin du remplissage avec FLOBO_EMPTY
     {
-      (*grid)[x][ydst] = PUYO_EMPTY;
+      (*grid)[x][ydst] = FLOBO_EMPTY;
       ydst++;
     }
   }
   (*grid)[x][HEIGHTS_ROW] = height;
 }
 
-static int fallingTable[PUYODIMX] = {0, 3, 1, 4, 2, 5};
+static int fallingTable[FLOBOBAN_DIMX] = {0, 3, 1, 4, 2, 5};
 
 void dropNeutrals(int number, int totalFromStart, GridState * const grid, GridState * const src)
 {
@@ -289,19 +289,19 @@ void dropNeutrals(int number, int totalFromStart, GridState * const grid, GridSt
     while (number > 0)
     {
         int cycleNeutral;
-        if (number >= IA_PUYODIMX)
-            cycleNeutral = IA_PUYODIMX;
+        if (number >= IA_FLOBOBAN_DIMX)
+            cycleNeutral = IA_FLOBOBAN_DIMX;
         else
             cycleNeutral = number;
         for (int i = 0 ; i < cycleNeutral ; i++)
         {
-            int posX = fallingTable[(totalFromStart++) % IA_PUYODIMX];
+            int posX = fallingTable[(totalFromStart++) % IA_FLOBOBAN_DIMX];
             int posY = (*grid)[posX][HEIGHTS_ROW];
             number--;
-            if (((*grid)[posX][posY] = PUYO_EMPTY) || (posY >= IA_PUYODIMY))
+            if (((*grid)[posX][posY] = FLOBO_EMPTY) || (posY >= IA_FLOBOBAN_DIMY))
                 continue;
             // Creating a new neutral puyo
-            (*grid)[posX][posY] = PUYO_NEUTRAL;
+            (*grid)[posX][posY] = FLOBO_NEUTRAL;
             (*grid)[posX][HEIGHTS_ROW]++;
         }
     }    
@@ -316,23 +316,23 @@ bool dropPuyos(const PuyoBinom binom, GridState * const grid)
   switch (binom.orientation)
   {
   case Above:
-    if (h + 1 >= IA_PUYODIMY) return false;
+    if (h + 1 >= IA_FLOBOBAN_DIMY) return false;
     (*grid)[x][h]   = binom.falling;
     (*grid)[x][h+1] = binom.companion;
     (*grid)[x][HEIGHTS_ROW] = h + 2;
     break;
 
   case Below:
-    if (h + 1 >= IA_PUYODIMY) return false;
+    if (h + 1 >= IA_FLOBOBAN_DIMY) return false;
     (*grid)[x][h+1] = binom.falling;
     (*grid)[x][h]   = binom.companion;
     (*grid)[x][HEIGHTS_ROW] = h + 2;
     break;
 
   case Left:
-    if (h >= IA_PUYODIMY) return false;
+    if (h >= IA_FLOBOBAN_DIMY) return false;
     g = columnHeight(x-1, grid);
-    if (g >= IA_PUYODIMY) return false;
+    if (g >= IA_FLOBOBAN_DIMY) return false;
     (*grid)[x][h]   = binom.falling;
     (*grid)[x-1][g] = binom.companion;
     ((*grid)[x][HEIGHTS_ROW]) = h + 1;
@@ -340,9 +340,9 @@ bool dropPuyos(const PuyoBinom binom, GridState * const grid)
     break;
 
   case Right:
-    if (h >= IA_PUYODIMY) return false;
+    if (h >= IA_FLOBOBAN_DIMY) return false;
     g = columnHeight(x+1, grid);
-    if (g >= IA_PUYODIMY) return false;
+    if (g >= IA_FLOBOBAN_DIMY) return false;
     (*grid)[x][h]   = binom.falling;
     (*grid)[x+1][g] = binom.companion;
     ((*grid)[x][HEIGHTS_ROW]) = h + 1;
@@ -355,8 +355,8 @@ bool dropPuyos(const PuyoBinom binom, GridState * const grid)
 
 
 // Those combinations can place the binoms everywhere on x
-// except x=0 with companion left and x=IA_PUYODIMX-1 with companion right
-#define MAXCOMBINATION (IA_PUYODIMX*4)-2
+// except x=0 with companion left and x=IA_FLOBOBAN_DIMX-1 with companion right
+#define MAXCOMBINATION (IA_FLOBOBAN_DIMX*4)-2
 #define DISPATCHCYCLES 4
 inline void serialPosition(unsigned int serialnr /* from 1 to MAXCOMBINATION */, PuyoBinom * binom)
 {
@@ -369,20 +369,20 @@ bool suppressGroups(GridState * const dst, GridEvaluation * const evaluation)
 {
   bool didSomething = false;
   // for each position, try to remove a group
-  for (unsigned int x = 0;  x < IA_PUYODIMX; x++)
+  for (unsigned int x = 0;  x < IA_FLOBOBAN_DIMX; x++)
   {
-    for (unsigned int y = 0; y < IA_PUYODIMY; y++)
+    for (unsigned int y = 0; y < IA_FLOBOBAN_DIMY; y++)
     {
-      PuyoState color = (PuyoState)(*dst)[x][y];
-      if ((color != PUYO_EMPTY) && (color != PUYO_NEUTRAL))
+      FloboState color = (FloboState)(*dst)[x][y];
+      if ((color != FLOBO_EMPTY) && (color != FLOBO_NEUTRAL))
       {
-        didSomething |= removeSamePuyoAround(x, y, color, dst, evaluation);
+        didSomething |= removeSameFloboAround(x, y, color, dst, evaluation);
       }
     }
   }
 
-  // compress the columns by dropping floatting puyos left
-  for (unsigned int x = 0;  x < IA_PUYODIMX; x++)
+  // compress the columns by dropping floatting flobos left
+  for (unsigned int x = 0;  x < IA_FLOBOBAN_DIMX; x++)
   {
     columnCompress(x, dst);
   }  
@@ -397,11 +397,11 @@ void evalWith(const GridState * const grid, const GridEvaluation * const originE
   GridState tmp;
   GridEvaluation evaluation;
 
-  // Evaluate the potential to destroy more puyos
+  // Evaluate the potential to destroy more flobos
 
   // for each puyo except the lower line and the columns top
   evaluation = nullEvaluation;
-  for (int x = 0;  x < IA_PUYODIMX; x++)
+  for (int x = 0;  x < IA_FLOBOBAN_DIMX; x++)
   {
     int h = columnHeight(x, grid);
     if (h > realEvaluation->height) realEvaluation->height = h;
@@ -410,17 +410,17 @@ void evalWith(const GridState * const grid, const GridEvaluation * const originE
     for (int y = 1;  y < h-1; y++)
     {
       // if free on the left or free on the right
-      if ( ((x > 0) && ((*grid)[x-1][y] == PUYO_EMPTY)) || ((x < IA_PUYODIMX-1) && ((*grid)[x+1][y] == PUYO_EMPTY)))
+      if ( ((x > 0) && ((*grid)[x-1][y] == FLOBO_EMPTY)) || ((x < IA_FLOBOBAN_DIMX-1) && ((*grid)[x+1][y] == FLOBO_EMPTY)))
       {
         // then try to remove it and see what happens
         copyGrid(&tmp,grid);
-        tmp[x][y] = PUYO_EMPTY;
+        tmp[x][y] = FLOBO_EMPTY;
         columnCompress(x,&tmp);
         evaluation = nullEvaluation;
         int r;
         for (r=0; suppressGroups(&tmp, &evaluation); r++) {};
         // if we used more than 1 round more neutrals willbe dropped to the ennemy
-        if (r>1) evaluation.puyoSuppressed += (r-1)*PUYODIMX;
+        if (r>1) evaluation.puyoSuppressed += (r-1)*FLOBOBAN_DIMX;
         if (evaluation.puyoSuppressed > realEvaluation->puyoSuppressedPotential)
         {
           realEvaluation->puyoSuppressedPotential = evaluation.puyoSuppressed;
@@ -432,19 +432,19 @@ void evalWith(const GridState * const grid, const GridEvaluation * const originE
   // count the groups of more than 1 puyo
   evaluation = nullEvaluation;
   copyGrid(&tmp,grid);
-  for (int x = 0;  x < IA_PUYODIMX; x++)
+  for (int x = 0;  x < IA_FLOBOBAN_DIMX; x++)
   {
     int h = stripedColumnHeight(x, grid);
     for (int y = 0;  y < h; y++)
     {
-      if ((tmp[x][y] != PUYO_EMPTY) && (tmp[x][y] != PUYO_NEUTRAL))
+      if ((tmp[x][y] != FLOBO_EMPTY) && (tmp[x][y] != FLOBO_NEUTRAL))
       {
-        countSamePuyoAround(x, y, (PuyoState)tmp[x][y], &tmp, &evaluation);
+        countSameFloboAround(x, y, (FloboState)tmp[x][y], &tmp, &evaluation);
       }
     }
   }
   int d = evaluation.puyoSuppressed - originEvaluation->puyoSuppressed;
-  if (d>0) realEvaluation->puyoGrouped = d;
+  if (d>0) realEvaluation->floboGrouped = d;
 }
 
 bool dropBinom(const PuyoBinom binom, const GridState * const src, GridState * const dst, GridEvaluation * const evaluation)
@@ -462,11 +462,11 @@ bool dropBinom(const PuyoBinom binom, const GridState * const src, GridState * c
   return true;
 }
 
-int AIPlayer::makeEvaluation(const GridEvaluation * const referenceOne, const PuyoBinom puyos, const GridState * const grid)
+int AIPlayer::makeEvaluation(const GridEvaluation * const referenceOne, const PuyoBinom flobos, const GridState * const grid)
 {
   int rR,rP;
   
-  rR = (2 * referenceOne->puyoSuppressed + 2 * referenceOne->neutralSuppressed + referenceOne->puyoGrouped);
+  rR = (2 * referenceOne->puyoSuppressed + 2 * referenceOne->neutralSuppressed + referenceOne->floboGrouped);
   rR *= params.realSuppressionValue;
 
   if (params.criticalHeight > referenceOne->height)
@@ -481,9 +481,9 @@ int AIPlayer::makeEvaluation(const GridEvaluation * const referenceOne, const Pu
   }
 
   int pos1, pos2;
-  pos1 = puyos.position.x;
+  pos1 = flobos.position.x;
   pos2 = pos1;
-  switch (puyos.orientation)
+  switch (flobos.orientation)
   {
     case Right:
       pos2 = pos1+1;
@@ -500,13 +500,13 @@ int AIPlayer::makeEvaluation(const GridEvaluation * const referenceOne, const Pu
   if (params.criticalHeight > referenceOne->height)
   {
 
-  for (int x = 0;  x < IA_PUYODIMX; x++)
+  for (int x = 0;  x < IA_FLOBOBAN_DIMX; x++)
   {
-    c += IA_PUYODIMY - abs(params.columnScalar[x] - (int)(*grid)[x][HEIGHTS_ROW]);
+    c += IA_FLOBOBAN_DIMY - abs(params.columnScalar[x] - (int)(*grid)[x][HEIGHTS_ROW]);
   }
-  c*=IA_PUYODIMX;
+  c*=IA_FLOBOBAN_DIMX;
   }
-  else c = IA_PUYODIMY * IA_PUYODIMX * IA_PUYODIMX + 2 * IA_PUYODIMY;
+  else c = IA_FLOBOBAN_DIMY * IA_FLOBOBAN_DIMX * IA_FLOBOBAN_DIMX + 2 * IA_FLOBOBAN_DIMY;
     c += params.columnScalar[pos1] - (int)(*grid)[pos1][HEIGHTS_ROW];
     c += params.columnScalar[pos2] - (int)(*grid)[pos2][HEIGHTS_ROW];
 
@@ -514,9 +514,9 @@ int AIPlayer::makeEvaluation(const GridEvaluation * const referenceOne, const Pu
   return r;
 }
 
-bool AIPlayer::selectIfBetterEvaluation(int * const best, const GridEvaluation * const newOne, const PuyoBinom puyos, const GridState * const grid)
+bool AIPlayer::selectIfBetterEvaluation(int * const best, const GridEvaluation * const newOne, const PuyoBinom flobos, const GridState * const grid)
 {
-  int n = makeEvaluation(newOne, puyos, grid);
+  int n = makeEvaluation(newOne, flobos, grid);
   int r = *best;
   if (n > r)
   {
@@ -537,7 +537,7 @@ AIPlayer::AIPlayer(int level, PuyoView &targetView)
   totalNumberOfBadPuyos = 0;
   attachedGame = targetView.getAttachedGame();
   objective = nullBinom;
-  lastLineSeen = PUYODIMY+1;
+  lastLineSeen = FLOBOBAN_DIMY+1;
   currentCycle = 0;
   readyToDrop = false;
 
@@ -552,7 +552,7 @@ AIPlayer::AIPlayer(int level, PuyoView &targetView)
   params.columnScalar[4] = 1;
   params.columnScalar[5] = 1;
   params.rotationMethod = 0; // negative (right), null (shortest), positive(left)
-  params.fastDropDelta = PUYODIMY; // puyo height relative to column height before fast drop
+  params.fastDropDelta = FLOBOBAN_DIMY; // puyo height relative to column height before fast drop
   params.thinkDepth = 2;
   params.speedFactor = level>0?level:1;
   this->level = level;
@@ -570,29 +570,29 @@ AIPlayer::~AIPlayer()
   if (internalGrid != NULL) free(internalGrid);
 }
 
-PuyoState AIPlayer::extractColor(PuyoState A) const
+FloboState AIPlayer::extractColor(FloboState A) const
 {
   switch (A) {
-    case PUYO_FALLINGBLUE:
-    case PUYO_BLUE:
-      return PUYO_BLUE;
-    case PUYO_FALLINGRED:
-    case PUYO_RED:
-      return PUYO_RED;
-    case PUYO_FALLINGGREEN:
-    case PUYO_GREEN:
-      return PUYO_GREEN;
-    case PUYO_FALLINGVIOLET:
-    case PUYO_VIOLET:
-      return PUYO_VIOLET;
-    case PUYO_FALLINGYELLOW:
-    case PUYO_YELLOW:
-      return PUYO_YELLOW;
+    case FLOBO_FALLINGBLUE:
+    case FLOBO_BLUE:
+      return FLOBO_BLUE;
+    case FLOBO_FALLINGRED:
+    case FLOBO_RED:
+      return FLOBO_RED;
+    case FLOBO_FALLINGGREEN:
+    case FLOBO_GREEN:
+      return FLOBO_GREEN;
+    case FLOBO_FALLINGVIOLET:
+    case FLOBO_VIOLET:
+      return FLOBO_VIOLET;
+    case FLOBO_FALLINGYELLOW:
+    case FLOBO_YELLOW:
+      return FLOBO_YELLOW;
     default:
       fprintf(stderr,"Error in AI : unknown puyo color %d %d!!\nExiting...\n",(int)A,(int)attachedGame->isGameRunning());
       exit(0);
   }
-  return PUYO_EMPTY;
+  return FLOBO_EMPTY;
 }
 
 static const PuyoOrientation GameToIAOrientation[4] = {Below,Left,Above,Right};
@@ -621,24 +621,24 @@ void AIPlayer::extractGrid(void)
   if (internalGrid == NULL) internalGrid = (GridState *)malloc(sizeof(GridState));
 
   // Fill the grid with current data
-  for (int i = 0; i < IA_PUYODIMX; i++)
+  for (int i = 0; i < IA_FLOBOBAN_DIMX; i++)
   {
     int height = 0;
-    for (int j = 0; j < IA_PUYODIMY; j++)
+    for (int j = 0; j < IA_FLOBOBAN_DIMY; j++)
     {
-      PuyoPuyo * thePuyo = attachedGame->getPuyoAt(i,(PUYODIMY-1)-j);
+      Flobo * thePuyo = attachedGame->getFloboAt(i,(FLOBOBAN_DIMY-1)-j);
       if (thePuyo != NULL)
       {
-        PuyoState state = thePuyo->getPuyoState();
-        if (state >= PUYO_STILL)
+        FloboState state = thePuyo->getFloboState();
+        if (state >= FLOBO_STILL)
         {
           (* internalGrid)[i][j] = state;
           height++;
-        } else (* internalGrid)[i][j] = PUYO_EMPTY;
+        } else (* internalGrid)[i][j] = FLOBO_EMPTY;
       }
       else
       {
-        (* internalGrid)[i][j] = PUYO_EMPTY;
+        (* internalGrid)[i][j] = FLOBO_EMPTY;
       }
     }
     (* internalGrid)[i][HEIGHTS_ROW] = height;
@@ -666,7 +666,7 @@ bool canReach(const PuyoBinom binom, const PuyoBinom dest, GridState * const int
   }
  
     minBinomY = ((minBinomY-duration) >= 0) ? minBinomY-duration : 0;
-  //if (minBinomY >= IA_PUYODIMY) return true;
+  //if (minBinomY >= IA_FLOBOBAN_DIMY) return true;
   
   int minDestX = dest.position.x;
   int maxDestX = dest.position.x;
@@ -683,10 +683,10 @@ bool canReach(const PuyoBinom binom, const PuyoBinom dest, GridState * const int
   }
   
   if (minBinomX < maxDestX)
-    for (int i = minBinomX;  i <= maxDestX; i++) if ((*internalGrid)[i][minBinomY] != PUYO_EMPTY) return false;
+    for (int i = minBinomX;  i <= maxDestX; i++) if ((*internalGrid)[i][minBinomY] != FLOBO_EMPTY) return false;
   
   if (maxBinomX > minDestX)
-    for (int i = minDestX;  i <= maxBinomX; i++) if ((*internalGrid)[i][minBinomY] != PUYO_EMPTY) return false;
+    for (int i = minDestX;  i <= maxBinomX; i++) if ((*internalGrid)[i][minBinomY] != FLOBO_EMPTY) return false;
   
   return true;
 }
@@ -697,16 +697,16 @@ void AIPlayer::decide(int partial, int depth)
   if (partial == 0)
   {
     // get puyo binoms to drop
-    PuyoState etat;
+    FloboState etat;
     etat = attachedGame->getFallingState();
-    if (etat == PUYO_EMPTY) return;
+    if (etat == FLOBO_EMPTY) return;
     current.falling     = extractColor(etat);
     etat = attachedGame->getCompanionState();
-    if (etat == PUYO_EMPTY) return;
+    if (etat == FLOBO_EMPTY) return;
     current.companion   = extractColor(etat);
     current.orientation = extractOrientation(attachedGame->getFallingCompanionDir());
     current.position.x  = attachedGame->getFallingX();
-    current.position.y  = PUYODIMY - attachedGame->getFallingY();
+    current.position.y  = FLOBOBAN_DIMY - attachedGame->getFallingY();
     
     originalPuyo = current;
     
@@ -714,7 +714,7 @@ void AIPlayer::decide(int partial, int depth)
     next.companion      = extractColor(attachedGame->getNextCompanion());
     next.orientation    = Left;
     next.position.x     = 0;
-    next.position.y     = IA_PUYODIMY+1;
+    next.position.y     = IA_FLOBOBAN_DIMY+1;
 
     bestl1=1;
     foundOne = false;
@@ -796,7 +796,7 @@ void AIPlayer::decide(int partial, int depth)
       break;
       
     default:
-      objective.position.x = (random() % IA_PUYODIMX);
+      objective.position.x = (random() % IA_FLOBOBAN_DIMX);
       objective.orientation = (PuyoOrientation)(random() % 4);
       break;
   }
@@ -811,17 +811,17 @@ static const signed char rotationMatrix[4 /*target*/][4 /*current*/] = {{0,-1,2,
 void AIPlayer::cycle()
 {
   // If no falling puyo, no need to play
-  if (attachedGame->getFallingPuyo() == NULL || !attachedGame->isGameRunning()) 
+  if (attachedGame->getFallingFlobo() == NULL || !attachedGame->isGameRunning()) 
   {
     return;
   }
   
   int currentLine = attachedGame->getFallingY();
   int currentColumn = attachedGame->getFallingX();
-  int currentNumberOfBadPuyos = attachedGame->getNeutralPuyos();
-  int currentTotalNumberOfBadPuyos = attachedGame->getGameTotalNeutralPuyos();
+  int currentNumberOfBadPuyos = attachedGame->getNeutralFlobos();
+  int currentTotalNumberOfBadPuyos = attachedGame->getGameTotalNeutralFlobos();
     
-  // If we start with new puyos or restart because new bad Puyos came
+  // If we start with new flobos or restart because new bad Puyos came
   if (attachedGame->isPhaseReady())
   {
     //fprintf(stderr, "Thinking\n");
@@ -834,7 +834,7 @@ void AIPlayer::cycle()
     lastNumberOfBadPuyos = currentNumberOfBadPuyos;
     totalNumberOfBadPuyos = currentTotalNumberOfBadPuyos;
   } else {
-      // If we did not start, test if we should restart because new bad puyos arrived
+      // If we did not start, test if we should restart because new bad flobos arrived
       if (currentNumberOfBadPuyos != lastNumberOfBadPuyos) {
           //fprintf(stderr, "RE-Thinking\n");
           // Reset the cycle counter
@@ -880,7 +880,7 @@ void AIPlayer::cycle()
   if (readyToDrop)
   {
     if (internalGrid == NULL) extractGrid();
-    if ((PUYODIMY-1-currentLine) - ((* internalGrid)[currentColumn][HEIGHTS_ROW] + (objective.orientation == Below)?1:0) <= params.fastDropDelta) targetView.cycleGame();
+    if ((FLOBOBAN_DIMY-1-currentLine) - ((* internalGrid)[currentColumn][HEIGHTS_ROW] + (objective.orientation == Below)?1:0) <= params.fastDropDelta) targetView.cycleGame();
   }
   
   // Else try to move at the specified frequency

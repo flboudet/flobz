@@ -50,7 +50,7 @@ void NatTraversal::punch(const String punchPoolName)
     String localSocketAddress = udpmbox.getDatagramSocket()->getSocketAddress().asString();
     int localPortNum = udpmbox.getDatagramSocket()->getSocketPortNum();
 
-    punchMsg->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL);
+    punchMsg->addInt("CMD", FLOBO_IGP_NAT_TRAVERSAL);
     punchMsg->addString("PPOOL", punchPoolName);
     punchMsg->addString("LSOCKADDR", localSocketAddress);
     punchMsg->addInt("LPORTNUM", localPortNum);
@@ -138,7 +138,7 @@ void NatTraversal::onMessage(Message &msg)
     if (! msg.hasInt("CMD"))
         return;
     switch (msg.getInt("CMD")) {
-        case PUYO_IGP_NAT_TRAVERSAL: {
+        case FLOBO_IGP_NAT_TRAVERSAL: {
             peerAddressString = msg.getString("SOCKADDR");
             peerLocalAddressString = msg.getString("LSOCKADDR");
             peerPortNum = msg.getInt("PORTNUM");
@@ -160,7 +160,7 @@ void NatTraversal::onMessage(Message &msg)
             udpmbox.bind(peerAddr);*/
             break;
         }
-        case PUYO_IGP_NAT_TRAVERSAL_GARBAGE:
+        case FLOBO_IGP_NAT_TRAVERSAL_GARBAGE:
             //printf("Garbage msg received: %s (%d)\n", (const char *)(msg.getString("GARBAGE")), msg.getInt("RCV"));
             receivedGarbage++;
             if ((msg.getInt("RCV") > 0) && (currentStrategy != SYNCING) && (currentStrategy != SUCCESS) && (currentStrategy != FAILED)) {
@@ -169,7 +169,7 @@ void NatTraversal::onMessage(Message &msg)
                 sendSyncMessage();
             }
             break;
-        case PUYO_IGP_NAT_TRAVERSAL_SYNC:
+        case FLOBO_IGP_NAT_TRAVERSAL_SYNC:
              currentStrategy = SUCCESS;
              printf("Punching is a success!\n");
              // Destroy the igp messagebox
@@ -194,7 +194,7 @@ void NatTraversal::sendGarbageMessage()
     //udpmbox.bind(udpPeerAddress);
     Message *garbMsg = udpmbox.createMessage();
 
-    garbMsg->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL_GARBAGE);
+    garbMsg->addInt("CMD", FLOBO_IGP_NAT_TRAVERSAL_GARBAGE);
     garbMsg->addString("GARBAGE", "GNU is not free software");
     garbMsg->addInt("RCV", receivedGarbage);
 
@@ -214,7 +214,7 @@ void NatTraversal::sendSyncMessage()
     int prevBound = igpmbox->getBound();
     igpmbox->bind(1);
     Message *message = igpmbox->createMessage();
-    message->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL_SYNC);
+    message->addInt("CMD", FLOBO_IGP_NAT_TRAVERSAL_SYNC);
     message->addString("PPOOL", punchPoolName);
     message->addBoolProperty("RELIABLE", true);
     message->send();

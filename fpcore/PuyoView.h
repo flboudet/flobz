@@ -27,7 +27,7 @@
 #define _PUYOVIEW
 
 #include <memory>
-#include "PuyoGame.h"
+#include "FloboGame.h"
 #include "PuyoAnimations.h"
 #include "AnimatedPuyo.h"
 #include "Theme.h"
@@ -42,40 +42,40 @@
 
 /**
  * Abstract class serving as a factory
- * for the PuyoView to create the corresponding PuyoGame.
+ * for the PuyoView to create the corresponding FloboGame.
  * Implemented in the following classes:
- * - PuyoLocalGameFactory, to be used with a PuyoView on a game
+ * - FloboLocalGameFactory, to be used with a PuyoView on a game
  *   playing on the local computer,
  * - PuyoRemoteGameFactory, to be used with a PuyoView to display
  *   a game playing on a distant computer.
  */
-class PuyoGameFactory {
+class FloboGameFactory {
 public:
-    virtual PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory) = 0;
-    virtual ~PuyoGameFactory() {};
+    virtual FloboGame *createFloboGame(FloboFactory *attachedFloboFactory) = 0;
+    virtual ~FloboGameFactory() {};
 };
 
 /**
- * PuyoView is the graphical representation of a PuyoGame.
- * The PuyoGame is owned by the PuyoView and created
- * through a PuyoGameFactory.
+ * PuyoView is the graphical representation of a FloboGame.
+ * The FloboGame is owned by the PuyoView and created
+ * through a FloboGameFactory.
  */
 class PuyoView : public GameListener {
   public:
     // Create a PuyoView with graphical feedback
-    PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
+    PuyoView(FloboGameFactory *attachedFloboGameFactory,
              int playerId,
              PuyoSetTheme *attachedThemeSet,
              LevelTheme *attachedLevelTheme);
 
     // Create a PuyoView without graphical feedback
-    PuyoView(PuyoGameFactory *attachedPuyoGameFactory);
+    PuyoView(FloboGameFactory *attachedFloboGameFactory);
 
     void setupLayout(int playerId);
     void setPlayerNames(const char *p1, const char *p2) { p1name = p1; p2name = p2; }
 
     virtual ~PuyoView();
-    void setEnemyGame(PuyoGame *enemyGame);
+    void setEnemyGame(FloboGame *enemyGame);
     void render(DrawTarget *dt);
     void renderNeutral(DrawTarget *dt);
     void renderScore(DrawTarget *dt);
@@ -89,8 +89,8 @@ class PuyoView : public GameListener {
     virtual void rotateLeft();
     virtual void rotateRight();
 
-    int getValenceForPuyo(PuyoPuyo *puyo) const;
-    PuyoGame *getAttachedGame() const { return attachedGame; }
+    int getValenceForPuyo(Flobo *puyo) const;
+    FloboGame *getAttachedGame() const { return attachedGame; }
 
     bool isGameOver() const;
 
@@ -103,14 +103,14 @@ class PuyoView : public GameListener {
     void clearMetaCycleStart() { newMetaCycleStart = false; }
 
     // GameListener methods
-	virtual void fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
-	virtual void fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
-	virtual void fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
-    void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex, int totalNeutral);
+	virtual void fallingsDidMoveLeft(Flobo *fallingFlobo, Flobo *companionFlobo);
+	virtual void fallingsDidMoveRight(Flobo *fallingFlobo, Flobo *companionFlobo);
+	virtual void fallingsDidFallingStep(Flobo *fallingFlobo, Flobo *companionFlobo);
+    void gameDidAddNeutral(Flobo *neutralFlobo, int neutralIndex, int totalNeutral);
     void gameDidEndCycle();
-    void companionDidTurn(PuyoPuyo *companionPuyo, PuyoPuyo *fallingPuyo, bool counterclockwise);
-    void puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow);
-    void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase);
+    void companionDidTurn(Flobo *companionFlobo, Flobo *fallingFlobo, bool counterclockwise);
+    void floboDidFall(Flobo *puyo, int originX, int originY, int nFalledBelow);
+    void floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase);
     virtual void gameLost();
 
     // Accessors
@@ -119,8 +119,8 @@ class PuyoView : public GameListener {
     virtual void gameWin();
     void setShowNextPuyos(bool show) { m_showNextPuyos = show; }
     void setShowShadows(bool show) { m_showShadows = show; }
-    void setShowEyes(bool show) { attachedPuyoFactory.setShowEyes(show); }
-    void setNeutralPuyosDisplayPosition(int x, int y) {
+    void setShowEyes(bool show) { attachedFloboFactory.setShowEyes(show); }
+    void setNeutralFlobosDisplayPosition(int x, int y) {
         neutralXOffset = x;
         neutralYOffset = y;
     }
@@ -147,15 +147,15 @@ class PuyoView : public GameListener {
     int neutralXOffset, neutralYOffset;
     PuyoSetTheme *attachedThemeSet;
     LevelTheme *attachedLevelTheme;
-    AnimatedPuyoFactory attachedPuyoFactory;
-    PuyoGame *attachedGame, *enemyGame;
+    AnimatedFloboFactory attachedFloboFactory;
+    FloboGame *attachedGame, *enemyGame;
     AdvancedBuffer<Animation *> viewAnimations;
     int cycleAllowance;
     int delayBeforeGameOver;
     bool newMetaCycleStart;
     std::auto_ptr<PlayerGameStatDisplay> m_scoreDisplay;
 
-    void initCommon(PuyoGameFactory *attachedPuyoGameFactory);
+    void initCommon(FloboGameFactory *attachedFloboGameFactory);
     bool haveDisplay;
 };
 

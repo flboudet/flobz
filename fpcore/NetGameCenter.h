@@ -33,7 +33,7 @@
 
 using namespace ios_fc;
 
-class PuyoGameInvitation {
+class FloboGameInvitation {
 public:
     PeerAddress initiatorAddress;
     String opponentName;
@@ -48,10 +48,10 @@ public:
     virtual void onPlayerConnect(String playerName, PeerAddress playerAddress) = 0;
     virtual void onPlayerDisconnect(String playerName, PeerAddress playerAddress) = 0;
     virtual void onPlayerUpdated(String playerName, PeerAddress playerAddress) = 0;
-    virtual void onGameInvitationReceived(PuyoGameInvitation &invitation) = 0;
-    virtual void onGameInvitationCanceledReceived(PuyoGameInvitation &invitation) = 0;
-    virtual void onGameAcceptedNegociationPending(PuyoGameInvitation &invitation) {}
-    virtual void onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation) = 0;
+    virtual void onGameInvitationReceived(FloboGameInvitation &invitation) = 0;
+    virtual void onGameInvitationCanceledReceived(FloboGameInvitation &invitation) = 0;
+    virtual void onGameAcceptedNegociationPending(FloboGameInvitation &invitation) {}
+    virtual void onGameGrantedWithMessagebox(MessageBox *mbox, FloboGameInvitation &invitation) = 0;
     virtual ~NetGameCenterListener() {};
 };
 
@@ -72,11 +72,11 @@ public:
     virtual ~NetGameCenter() {}
     virtual void sendMessage(const String msgText) = 0;
     // Request a new game
-    void requestGame(PuyoGameInvitation &invitation);
+    void requestGame(FloboGameInvitation &invitation);
     // Accept a game invitation
-    void acceptGameInvitation(PuyoGameInvitation &invitation);
+    void acceptGameInvitation(FloboGameInvitation &invitation);
     // Cancel a game invitation
-    void cancelGameInvitation(PuyoGameInvitation &invitation);
+    void cancelGameInvitation(FloboGameInvitation &invitation);
     virtual void idle();
     String getPeerNameAtIndex(int i) const;
     PeerAddress getPeerAddressAtIndex(int i) const;
@@ -101,14 +101,14 @@ protected:
     AdvancedBuffer<PendingGame *> pendingGames;
     GamerPeer *getPeerForAddress(PeerAddress addr);
     // Should be called by implementations when an invitation is received
-    void receivedGameInvitation(PuyoGameInvitation &invitation);
+    void receivedGameInvitation(FloboGameInvitation &invitation);
     void receivedGameCanceledWithPeer(String playerName, PeerAddress addr);
     // Implement the sending of the game request
-    virtual void sendGameRequest(PuyoGameInvitation &invitation) = 0;
+    virtual void sendGameRequest(FloboGameInvitation &invitation) = 0;
     // Implement the sending of the acceptation of a game
-    virtual void sendGameAcceptInvitation(PuyoGameInvitation &invitation) = 0;
+    virtual void sendGameAcceptInvitation(FloboGameInvitation &invitation) = 0;
     // Implement the sending of the cancelation of a game
-    virtual void sendGameCancelInvitation(PuyoGameInvitation &invitation) = 0;
+    virtual void sendGameCancelInvitation(FloboGameInvitation &invitation) = 0;
     double pendingGameTimeout;
 };
 

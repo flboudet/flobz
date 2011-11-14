@@ -31,12 +31,12 @@
 using namespace ios_fc;
 
 enum {
-    PUYO_UDP_ALIVE,
-    PUYO_UDP_DISCONNECT,
-    PUYO_UDP_CHAT,
-    PUYO_UDP_GAME_REQUEST,
-    PUYO_UDP_GAME_ACCEPT,
-    PUYO_UDP_GAME_CANCEL
+    FLOBO_UDP_ALIVE,
+    FLOBO_UDP_DISCONNECT,
+    FLOBO_UDP_CHAT,
+    FLOBO_UDP_GAME_REQUEST,
+    FLOBO_UDP_GAME_ACCEPT,
+    FLOBO_UDP_GAME_CANCEL
 };
 
 LanGameCenter::LanGameCenter(int portNum, const String name)
@@ -66,12 +66,12 @@ void LanGameCenter::onMessage(Message &msg)
       if (!msg.hasInt("CMD"))
             return;
       switch (msg.getInt("CMD")) {
-      case PUYO_UDP_CHAT:
+      case FLOBO_UDP_CHAT:
 	for (int i = 0, j = listeners.size() ; i < j ; i++) {
 	  listeners[i]->onChatMessage(msg.getString("NAME"), msg.getString("MSG"));
 	}
 	break;
-      case PUYO_UDP_ALIVE: {
+      case FLOBO_UDP_ALIVE: {
           Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
           int uuid = msg.getInt("UUID");
           int status = msg.getInt("STATUS");
@@ -82,15 +82,15 @@ void LanGameCenter::onMessage(Message &msg)
           NetGameCenter::connectPeer(dir.getPeerAddress(), msg.getString("NAME"), status, -1, self);
       }
 	break;
-      case PUYO_UDP_DISCONNECT: {
+      case FLOBO_UDP_DISCONNECT: {
           Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
           //printf("Message de deconnexion recu de %s...\n", (const char *)(msg.getString("NAME")));
           NetGameCenter::disconnectPeer(dir.getPeerAddress(), msg.getString("NAME"));
       }
 	break;
-        case PUYO_UDP_GAME_REQUEST: {
+        case FLOBO_UDP_GAME_REQUEST: {
             Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-            PuyoGameInvitation invitation;
+            FloboGameInvitation invitation;
             invitation.opponentAddress = dir.getPeerAddress();
             invitation.opponentName = msg.getString("ORGNAME");
             if (msg.hasInt("RNDSEED"))
@@ -104,13 +104,13 @@ void LanGameCenter::onMessage(Message &msg)
             receivedGameInvitation(invitation);
         }
 	break;
-      case PUYO_UDP_GAME_ACCEPT: {
+      case FLOBO_UDP_GAME_ACCEPT: {
           Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
           if (grantedInvitation.opponentAddress == dir.getPeerAddress());
             grantGame(grantedInvitation);
       }
 	break;
-      case PUYO_UDP_GAME_CANCEL:  {
+      case FLOBO_UDP_GAME_CANCEL:  {
           Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
 	  receivedGameCanceledWithPeer(msg.getString("ORGNAME"), dir.getPeerAddress());
         }
@@ -137,7 +137,7 @@ void LanGameCenter::sendMessage(const String msgText)
     dirMsg->setPeerAddress(getPeerAddressAtIndex(i));
 
     msg->addBoolProperty("RELIABLE", true);
-    msg->addInt("CMD", PUYO_UDP_CHAT);
+    msg->addInt("CMD", FLOBO_UDP_CHAT);
     msg->addString("NAME", name);
     msg->addString("MSG", msgText);
     msg->send();
@@ -193,7 +193,7 @@ void LanGameCenter::sendAliveMessage()
             Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
             dirMsg->setPeerAddress(mcastPeerAddress);
 
-            msg->addInt("CMD", PUYO_UDP_ALIVE);
+            msg->addInt("CMD", FLOBO_UDP_ALIVE);
             msg->addString("NAME", name);
             msg->addInt("STATUS", status);
             msg->addInt("UUID", m_uuid);
@@ -219,7 +219,7 @@ void LanGameCenter::sendDisconnectMessage()
         Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
         dirMsg->setPeerAddress(mcastPeerAddress);
 
-        msg->addInt("CMD", PUYO_UDP_DISCONNECT);
+        msg->addInt("CMD", FLOBO_UDP_DISCONNECT);
         msg->addString("NAME", name);
         msg->send();
         //printf("Message de deconnexion envoye...\n");
@@ -227,7 +227,7 @@ void LanGameCenter::sendDisconnectMessage()
     }
 }
 
-void LanGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
+void LanGameCenter::sendGameRequest(FloboGameInvitation &invitation)
 {
   opponentName = invitation.opponentName;
   Message *msg = mbox.createMessage();
@@ -235,7 +235,7 @@ void LanGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
   dirMsg->setPeerAddress(invitation.opponentAddress);
 
   msg->addBoolProperty("RELIABLE", true);
-  msg->addInt("CMD", PUYO_UDP_GAME_REQUEST);
+  msg->addInt("CMD", FLOBO_UDP_GAME_REQUEST);
   msg->addString("ORGNAME", name);
   msg->addString("DSTNAME", invitation.opponentName);
   msg->addInt("RNDSEED", invitation.gameRandomSeed);
@@ -245,7 +245,7 @@ void LanGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
   grantedInvitation = invitation;
 }
 
-void LanGameCenter::sendGameAcceptInvitation(PuyoGameInvitation &invitation)
+void LanGameCenter::sendGameAcceptInvitation(FloboGameInvitation &invitation)
 {
   opponentName = invitation.opponentName;
   Message *msg = mbox.createMessage();
@@ -253,7 +253,7 @@ void LanGameCenter::sendGameAcceptInvitation(PuyoGameInvitation &invitation)
   dirMsg->setPeerAddress(invitation.opponentAddress);
 
   msg->addBoolProperty("RELIABLE", true);
-  msg->addInt("CMD", PUYO_UDP_GAME_ACCEPT);
+  msg->addInt("CMD", FLOBO_UDP_GAME_ACCEPT);
   msg->addString("ORGNAME", name);
   msg->addString("DSTNAME", invitation.opponentName);
   msg->send();
@@ -262,7 +262,7 @@ void LanGameCenter::sendGameAcceptInvitation(PuyoGameInvitation &invitation)
   grantedInvitation = invitation;
 }
 
-void LanGameCenter::grantGame(PuyoGameInvitation &invitation)
+void LanGameCenter::grantGame(FloboGameInvitation &invitation)
 {
     setStatus(PEER_PLAYING);
     mbox.bind(invitation.opponentAddress);
@@ -271,14 +271,14 @@ void LanGameCenter::grantGame(PuyoGameInvitation &invitation)
     }
 }
 
-void LanGameCenter::sendGameCancelInvitation(PuyoGameInvitation &invitation)
+void LanGameCenter::sendGameCancelInvitation(FloboGameInvitation &invitation)
 {
   Message *msg = mbox.createMessage();
   Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
   dirMsg->setPeerAddress(invitation.opponentAddress);
 
   msg->addBoolProperty("RELIABLE", true);
-  msg->addInt("CMD", PUYO_UDP_GAME_CANCEL);
+  msg->addInt("CMD", FLOBO_UDP_GAME_CANCEL);
   msg->addString("ORGNAME", name);
   msg->addString("DSTNAME", invitation.opponentName);
   msg->send();

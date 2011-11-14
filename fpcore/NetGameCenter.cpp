@@ -42,9 +42,9 @@ public:
 
 class NetGameCenter::PendingGame {
 public:
-    PendingGame(GamerPeer *peer, PuyoGameInvitation &invitation) : peer(peer), invitation(invitation), initiateTime(getTimeMs()) {}
+    PendingGame(GamerPeer *peer, FloboGameInvitation &invitation) : peer(peer), invitation(invitation), initiateTime(getTimeMs()) {}
     GamerPeer *peer;
-    PuyoGameInvitation invitation;
+    FloboGameInvitation invitation;
     double initiateTime;
 };
 
@@ -167,7 +167,7 @@ int NetGameCenter::getPeerCount() const
     return peers.size();
 }
 
-void NetGameCenter::requestGame(PuyoGameInvitation &invitation)
+void NetGameCenter::requestGame(FloboGameInvitation &invitation)
 {
     GamerPeer *myPeer = getPeerForAddress(invitation.opponentAddress);
     if (myPeer != NULL) {
@@ -182,14 +182,14 @@ void NetGameCenter::requestGame(PuyoGameInvitation &invitation)
     }
 }
 
-void NetGameCenter::acceptGameInvitation(PuyoGameInvitation &invitation)
+void NetGameCenter::acceptGameInvitation(FloboGameInvitation &invitation)
 {
     GamerPeer *myPeer = getPeerForAddress(invitation.opponentAddress);
     if (myPeer != NULL)
         sendGameAcceptInvitation(invitation);
 }
 
-void NetGameCenter::cancelGameInvitation(PuyoGameInvitation &invitation)
+void NetGameCenter::cancelGameInvitation(FloboGameInvitation &invitation)
 {
     GamerPeer *myPeer = getPeerForAddress(invitation.opponentAddress);
     if (myPeer != NULL) {
@@ -203,7 +203,7 @@ void NetGameCenter::cancelGameInvitation(PuyoGameInvitation &invitation)
     }
 }
 
-void NetGameCenter::receivedGameInvitation(PuyoGameInvitation &invitation)
+void NetGameCenter::receivedGameInvitation(FloboGameInvitation &invitation)
 {
     // Retrieving the peer
     GamerPeer *peer = getPeerForAddress(invitation.opponentAddress);

@@ -37,8 +37,8 @@ public:
     StoryWidget *getOpponent();
 private:
     PuyoSetTheme &attachedPuyoThemeSet;
-    PuyoRandomSystem attachedRandom;
-    PuyoLocalGameFactory attachedGameFactory;
+    RandomSystem attachedRandom;
+    FloboLocalGameFactory attachedGameFactory;
     PuyoView areaA, areaB;
     PuyoEventPlayer playercontrollerA, playercontrollerB;
     StoryWidget opponentFace;

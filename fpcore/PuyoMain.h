@@ -1,5 +1,5 @@
-#ifndef _PUYO_MAIN_H_
-#define _PUYO_MAIN_H_
+#ifndef _FLOBO_MAIN_H_
+#define _FLOBO_MAIN_H_
 
 #include "MainScreen.h"
 #include "PuyoCommander.h"
@@ -40,5 +40,5 @@ private:
     GameCursor *cursor;
 };
 
-#endif // _PUYO_MAIN_H_
+#endif // _FLOBO_MAIN_H_
 

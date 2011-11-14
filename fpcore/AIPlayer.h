@@ -23,17 +23,17 @@
 
 // Redefine the table size to our needs
 // same columns number
-#define IA_PUYODIMX (PUYODIMX)
-#define IA_TABLEDIMX (PUYODIMX)
+#define IA_FLOBOBAN_DIMX (FLOBOBAN_DIMX)
+#define IA_TABLEDIMX (FLOBOBAN_DIMX)
 // only visible rows (=rows-2), + one to keep colmun heights
-#define IA_PUYODIMY (PUYODIMY-2)
-#define IA_TABLEDIMY (IA_PUYODIMY+1)
+#define IA_FLOBOBAN_DIMY (FLOBOBAN_DIMY-2)
+#define IA_TABLEDIMY (IA_FLOBOBAN_DIMY+1)
 
 typedef struct {
   int realSuppressionValue;
   int potentialSuppressionValue;
   int criticalHeight;
-  int columnScalar[IA_PUYODIMX];
+  int columnScalar[IA_FLOBOBAN_DIMX];
   int rotationMethod;
   int fastDropDelta;
   int thinkDepth;
@@ -54,8 +54,8 @@ typedef struct {
 
 
 typedef struct {
-  PuyoState falling;
-  PuyoState companion;
+  FloboState falling;
+  FloboState companion;
   PuyoOrientation orientation;
   PuyoCoordinates position;
 } PuyoBinom;
@@ -63,7 +63,7 @@ typedef struct {
 typedef struct {
   int puyoSuppressedPotential;
   int neutralSuppressedPotential;
-  int puyoGrouped;
+  int floboGrouped;
   int puyoSuppressed;
   int neutralSuppressed;
   int height;
@@ -81,13 +81,13 @@ class AIPlayer : public virtual PuyoPlayer {
 	int getLevel() const { return this->level; }
 	
   private:
-    PuyoState extractColor(PuyoState A) const;
+    FloboState extractColor(FloboState A) const;
     PuyoOrientation extractOrientation(int D) const;
     int revertOrientation(PuyoOrientation D) const;
     void extractGrid(void);
     void decide(int partial, int depth);
-    int makeEvaluation(const GridEvaluation * const referenceOne, const PuyoBinom puyos, const GridState * const grid);
-    bool selectIfBetterEvaluation(int * const referenceOne, const GridEvaluation * const newOne, const PuyoBinom puyos, const GridState * const grid);
+    int makeEvaluation(const GridEvaluation * const referenceOne, const PuyoBinom flobos, const GridState * const grid);
+    bool selectIfBetterEvaluation(int * const referenceOne, const GridEvaluation * const newOne, const PuyoBinom flobos, const GridState * const grid);
 
     GridState * internalGrid;
     int decisionMade;

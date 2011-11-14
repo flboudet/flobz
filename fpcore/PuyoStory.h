@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef PUYO_STORY_H
-#define PUYO_STORY_H
+#ifndef FLOBO_STORY_H
+#define FLOBO_STORY_H
 
 class GameScreen;
 

@@ -49,8 +49,8 @@ void TwoPlayersGameWidget::cycle()
 {
     opponentFace.setIntegerValue("@maxHeightLeft", attachedGameA->getColumnHeigth(2));
     opponentFace.setIntegerValue("@maxHeightRight", attachedGameB->getColumnHeigth(2));
-    opponentFace.setIntegerValue("@neutralsForLeft", attachedGameA->getNeutralPuyos());
-    opponentFace.setIntegerValue("@neutralsForRight", attachedGameB->getNeutralPuyos());
+    opponentFace.setIntegerValue("@neutralsForLeft", attachedGameA->getNeutralFlobos());
+    opponentFace.setIntegerValue("@neutralsForRight", attachedGameB->getNeutralFlobos());
     opponentFace.setIntegerValue("@comboPhaseLeft", attachedGameA->getComboPhase());
     opponentFace.setIntegerValue("@comboPhaseRight", attachedGameB->getComboPhase());
     GameWidget2P::cycle();

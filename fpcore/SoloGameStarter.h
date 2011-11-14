@@ -54,7 +54,7 @@ public:
     virtual bool isGameARunning() const;
     // GameListener implementation
     virtual void gameDidEndCycle();
-    virtual void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase);
+    virtual void floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase);
     // CycledComponent implementation
     virtual void cycle();
     // Widget methods
@@ -65,8 +65,8 @@ public:
 private:
     PuyoSetTheme &attachedPuyoThemeSet;
     LevelTheme &attachedLevelTheme;
-    PuyoRandomSystem attachedRandom;
-    std::auto_ptr<PuyoLocalGameFactory> m_gameFactory;
+    RandomSystem attachedRandom;
+    std::auto_ptr<FloboLocalGameFactory> m_gameFactory;
     std::auto_ptr<PuyoView>        m_areaA;
     std::auto_ptr<PuyoCombinedEventPlayer> m_playerController;
     PlayerGameStat m_gameStat;

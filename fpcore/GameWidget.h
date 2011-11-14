@@ -21,11 +21,11 @@
  *
  */
 
-#ifndef _PUYO_GAME_WIDGET_H
-#define _PUYO_GAME_WIDGET_H
+#ifndef _FLOBO_GAME_WIDGET_H
+#define _FLOBO_GAME_WIDGET_H
 
 #include "gameui.h"
-#include "PuyoGame.h"
+#include "FloboGame.h"
 #include "PuyoPlayer.h"
 #include "CheatCodeManager.h"
 #include "Theme.h"
@@ -150,8 +150,8 @@ public:
     void setStatPlayerOne(PlayerGameStat &gameStat) { attachedGameA->setGameStat(gameStat); }
     void setStatPlayerTwo(PlayerGameStat &gameStat) { attachedGameB->setGameStat(gameStat); }
     virtual StoryWidget *getOpponent() { return NULL; }
-    void addGameAHandicap(int handicap) {attachedGameA->increaseNeutralPuyos((handicap>10?10:handicap) * PUYODIMX); attachedGameA->dropNeutrals();}
-    void addGameBHandicap(int handicap) {attachedGameB->increaseNeutralPuyos((handicap>10?10:handicap) * PUYODIMX); attachedGameB->dropNeutrals();}
+    void addGameAHandicap(int handicap) {attachedGameA->increaseNeutralFlobos((handicap>10?10:handicap) * FLOBOBAN_DIMX); attachedGameA->dropNeutrals();}
+    void addGameBHandicap(int handicap) {attachedGameB->increaseNeutralFlobos((handicap>10?10:handicap) * FLOBOBAN_DIMX); attachedGameB->dropNeutrals();}
     void addSubWidget(Widget *subWidget);
     // Display player names properties
     void setDisplayPlayerOneName(bool display) { m_displayPlayerOneName = display; }
@@ -188,7 +188,7 @@ protected:
     LevelTheme *attachedLevelTheme;
     PuyoView *areaA, *areaB;
     PuyoPlayer *controllerA, *controllerB;
-    PuyoGame *attachedGameA, *attachedGameB;
+    FloboGame *attachedGameA, *attachedGameB;
     int cyclesBeforeGameCycle;
     int cyclesBeforeSpeedIncreases; // time between speed increases in units of 20ms
     unsigned int tickCounts;
@@ -221,5 +221,5 @@ protected:
 // Should be moved elsewhere
 extern std::vector<PuyoFX*> *activeFX;
 
-#endif // _PUYO_GAME_WIDGET_H
+#endif // _FLOBO_GAME_WIDGET_H
 

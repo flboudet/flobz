@@ -33,7 +33,7 @@ void PuyoIgpNatTraversal::PunchPool::dispatchInformations(String guestAddress, i
     // Message for the pool creator
     Message *peerAMsg = mbox->createMessage();
     Dirigeable *dirAMsg = dynamic_cast<Dirigeable *>(peerAMsg);
-    peerAMsg->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL);
+    peerAMsg->addInt("CMD", FLOBO_IGP_NAT_TRAVERSAL);
     peerAMsg->addString("PPOOL", punchPoolName);
     peerAMsg->addBoolProperty("RELIABLE", true);
     peerAMsg->addString("SOCKADDR", guestAddress);
@@ -47,7 +47,7 @@ void PuyoIgpNatTraversal::PunchPool::dispatchInformations(String guestAddress, i
     // Message for the pool guest
     Message *peerBMsg = mbox->createMessage();
     Dirigeable *dirBMsg = dynamic_cast<Dirigeable *>(peerBMsg);
-    peerBMsg->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL);
+    peerBMsg->addInt("CMD", FLOBO_IGP_NAT_TRAVERSAL);
     peerBMsg->addString("PPOOL", punchPoolName);
     peerBMsg->addBoolProperty("RELIABLE", true);
     peerBMsg->addString("SOCKADDR", creatorAddress);
@@ -77,7 +77,7 @@ void PuyoIgpNatTraversal::PunchPool::sendSyncMessage(PeerAddress destAddress, Me
 {
      Message *peerMsg = mbox->createMessage();
     Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(peerMsg);
-    peerMsg->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL_SYNC);
+    peerMsg->addInt("CMD", FLOBO_IGP_NAT_TRAVERSAL_SYNC);
     peerMsg->addBoolProperty("RELIABLE", true);
     dirMsg->setPeerAddress(destAddress);
     peerMsg->send();
@@ -89,7 +89,7 @@ void PuyoIgpNatTraversal::onMessage(Message &msg)
     //printf("Message recu!\n");
     if (!msg.hasInt("CMD")) return;
     switch (msg.getInt("CMD")) {
-        case PUYO_IGP_NAT_TRAVERSAL: {
+        case FLOBO_IGP_NAT_TRAVERSAL: {
             if (!msg.hasString("PPOOL")) return;
             if (!msg.hasString("LSOCKADDR")) return;
             if (!msg.hasInt("LPORTNUM")) return;
@@ -118,7 +118,7 @@ void PuyoIgpNatTraversal::onMessage(Message &msg)
                                     msg.getString("LSOCKADDR"), msg.getInt("LPORTNUM"), address));
             break;
         }
-        case PUYO_IGP_NAT_TRAVERSAL_SYNC: {
+        case FLOBO_IGP_NAT_TRAVERSAL_SYNC: {
             printf("NAT TRAVERSAL SYNC\n");
             if (!msg.hasString("PPOOL")) return;
             String poolName = msg.getString("PPOOL");

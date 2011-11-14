@@ -49,9 +49,9 @@ public:
     // Temporaire
     void punch();
 protected:
-    void sendGameRequest(PuyoGameInvitation &invitation);
-    void sendGameAcceptInvitation(PuyoGameInvitation &invitation);
-    void sendGameCancelInvitation(PuyoGameInvitation &invitation);
+    void sendGameRequest(FloboGameInvitation &invitation);
+    void sendGameAcceptInvitation(FloboGameInvitation &invitation);
+    void sendGameCancelInvitation(FloboGameInvitation &invitation);
 private:
     void sendAliveMessage();
     void grantGameToMBox(MessageBox &thembox);
@@ -71,7 +71,7 @@ private:
     const String password;
     int status;
     double timeMsBetweenTwoAliveMessages, lastAliveMessage;
-    PuyoGameInvitation grantedInvitation;
+    FloboGameInvitation grantedInvitation;
     enum GameStatus {
         GAMESTATUS_IDLE,
         GAMESTATUS_STARTTRAVERSAL,

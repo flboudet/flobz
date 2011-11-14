@@ -60,8 +60,8 @@ public:
     SinglePlayerStandardLayoutGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
 private:
     PuyoSetTheme &attachedPuyoThemeSet;
-    PuyoRandomSystem attachedRandom;
-    PuyoLocalGameFactory attachedGameFactory;
+    RandomSystem attachedRandom;
+    FloboLocalGameFactory attachedGameFactory;
     PuyoView areaA, areaB;
     PuyoCombinedEventPlayer playercontroller;
 };
@@ -121,12 +121,12 @@ private:
     AdvancedBuffer<LevelDefinition *> levelDefinitions;
 };
 
-class PuyoGameOver1PScreen : public StoryScreen {
+class FloboGameOver1PScreen : public StoryScreen {
 public:
-    PuyoGameOver1PScreen(String screenName, Action *finishedAction,
+    FloboGameOver1PScreen(String screenName, Action *finishedAction,
             String playerName, const PlayerGameStat &playerPoints, bool initialTransition=false);
     void refresh();
-    virtual ~PuyoGameOver1PScreen();
+    virtual ~FloboGameOver1PScreen();
 private:
 	HBox titleBox;
 	Text titleText;
@@ -202,7 +202,7 @@ private:
     SharedMatchAssets *m_sharedMatchAssets;
     std::string m_storyName;
     GameState *m_nextState;
-    std::auto_ptr<PuyoGameOver1PScreen> m_gameOverScreen;
+    std::auto_ptr<FloboGameOver1PScreen> m_gameOverScreen;
     bool m_acknowledged;
 };
 

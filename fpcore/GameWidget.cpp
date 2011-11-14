@@ -324,7 +324,7 @@ void GameWidget2P::draw(DrawTarget *dt)
     }
     // Render the background
     drawBackground(dt);
-    // Rendering the opponent if it is behind the puyos
+    // Rendering the opponent if it is behind the flobos
     if (attachedLevelTheme->getOpponentIsBehind()) {
         if (getOpponent() != NULL)
             getOpponent()->draw(dt);
@@ -349,7 +349,7 @@ void GameWidget2P::draw(DrawTarget *dt)
     // Rendering the foreground animation
     if (m_foregroundAnimation != NULL)
         styrolyse_draw(m_foregroundAnimation);
-    // Rendering the neutral puyos
+    // Rendering the neutral flobos
     drawGameNeutrals(dt);
     // Rendering the lives
     if (displayLives && (lives>=0) && (lives<=3))

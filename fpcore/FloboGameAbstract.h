@@ -1,5 +1,5 @@
-#ifndef PUYO_GAME_ABSTRACT_H
-#define PUYO_GAME_ABSTRACT_H
+#ifndef FLOBO_GAME_ABSTRACT_H
+#define FLOBO_GAME_ABSTRACT_H
 
 #include "ios_fc.h"
 #include "drawcontext.h"

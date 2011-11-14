@@ -27,8 +27,8 @@
 #include "PuyoView.h"
 #include "Theme.h"
 
-AnimatedPuyo::AnimatedPuyo(PuyoState state, PuyoSetTheme *themeSet, PuyoView *attachedView)
-    : PuyoPuyo(state), smallTicksCount(0), attachedTheme(themeSet != NULL ? &(themeSet->getPuyoTheme(state)) : NULL),
+AnimatedPuyo::AnimatedPuyo(FloboState state, PuyoSetTheme *themeSet, PuyoView *attachedView)
+    : Flobo(state), smallTicksCount(0), attachedTheme(themeSet != NULL ? &(themeSet->getPuyoTheme(state)) : NULL),
       m_currentCompressedState(0), m_partner(NULL), m_offsetX(0), m_offsetY(0), m_angle(0), m_displayEyes(true)
 {
     puyoEyeState = random() % 8192;
@@ -112,7 +112,7 @@ bool AnimatedPuyo::isRenderingAnimation() const
 
 void AnimatedPuyo::render(DrawTarget *dt)
 {
-    PuyoGame *attachedGame = attachedView->getAttachedGame();
+    FloboGame *attachedGame = attachedView->getAttachedGame();
     PuyoAnimation *animation = getCurrentAnimation();
     if (!isRenderingAnimation()) {
         renderAt(getScreenCoordinateX(), getScreenCoordinateY(), dt);
@@ -130,7 +130,7 @@ void AnimatedPuyo::renderAt(int X, int Y, DrawTarget *dt)
         return;
     if (!visibilityFlag)
         return;
-    PuyoGame *attachedGame = attachedView->getAttachedGame();
+    FloboGame *attachedGame = attachedView->getAttachedGame();
 
     IosRect drect;
 
@@ -147,13 +147,13 @@ void AnimatedPuyo::renderAt(int X, int Y, DrawTarget *dt)
 
         /* Main puyo show */
         /* TODO: Investigate why, during network game, the falling puyo starts by being neutral */
-        if ((this == attachedGame->getFallingPuyo())
-            && (getPuyoState() != PUYO_NEUTRAL)
+        if ((this == attachedGame->getFallingFlobo())
+            && (getFloboState() != FLOBO_NEUTRAL)
             && (m_currentCompressedState == 0))
             dt->draw(attachedTheme->getCircleSurfaceForIndex((smallTicksCount >> 2) & 0x1F), NULL, &drect);
 
         /* Eye management */
-        if ((getPuyoState() != PUYO_NEUTRAL) && (m_displayEyes)) {
+        if ((getFloboState() != FLOBO_NEUTRAL) && (m_displayEyes)) {
             int eyePhase = fmod((puyoEyeState + ios_fc::getTimeMs()), 8192.);
             if (eyePhase < 100)
                 dt->draw(attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState), NULL, &drect);
@@ -178,7 +178,7 @@ void AnimatedPuyo::renderShadow(DrawTarget *dt)
 
 void AnimatedPuyo::renderShadowAt(int X, int Y, DrawTarget *dt)
 {
-    if (getPuyoState() != PUYO_NEUTRAL) {
+    if (getFloboState() != FLOBO_NEUTRAL) {
         IosSurface *currentSurface;
         currentSurface = attachedTheme->getShadowSurface(m_currentCompressedState);
         if (currentSurface != NULL) {
@@ -196,14 +196,14 @@ void AnimatedPuyo::renderShadowAt(int X, int Y, DrawTarget *dt)
 int AnimatedPuyo::getScreenCoordinateX() const
 {
     if ((m_angle == 0.) || (m_partner == NULL))
-        return attachedView->getScreenCoordinateX(getPuyoX()) + m_offsetX;
-    if (m_partner->getPuyoX() == getPuyoX()) {
-        if (m_partner->getPuyoY() < getPuyoY())
+        return attachedView->getScreenCoordinateX(getFloboX()) + m_offsetX;
+    if (m_partner->getFloboX() == getFloboX()) {
+        if (m_partner->getFloboY() < getFloboY())
             return (m_partner->getScreenCoordinateX()) - sin(m_angle) * TSIZE;
         else
             return (m_partner->getScreenCoordinateX()) + sin(m_angle) * TSIZE;
     }
-    else if (m_partner->getPuyoX() < getPuyoX())
+    else if (m_partner->getFloboX() < getFloboX())
         return (m_partner->getScreenCoordinateX()) + cos(m_angle) * TSIZE;
     else
         return (m_partner->getScreenCoordinateX()) - cos(m_angle) * TSIZE;
@@ -212,52 +212,52 @@ int AnimatedPuyo::getScreenCoordinateX() const
 int AnimatedPuyo::getScreenCoordinateY() const
 {
     if ((m_angle == 0.) || (m_partner == NULL)) {
-        if (getPuyoState() < PUYO_EMPTY)
+        if (getFloboState() < FLOBO_EMPTY)
             if (attachedView->getAttachedGame()->getSemiMove())
-                return (attachedView->getScreenCoordinateY(getPuyoY()) -  TSIZE / 2) + m_offsetY;
-        return attachedView->getScreenCoordinateY(getPuyoY()) + m_offsetY;
+                return (attachedView->getScreenCoordinateY(getFloboY()) -  TSIZE / 2) + m_offsetY;
+        return attachedView->getScreenCoordinateY(getFloboY()) + m_offsetY;
     }
-    if (m_partner->getPuyoY() == getPuyoY()) {
-        if (m_partner->getPuyoX() < getPuyoX())
+    if (m_partner->getFloboY() == getFloboY()) {
+        if (m_partner->getFloboX() < getFloboX())
             return (m_partner->getScreenCoordinateY()) + sin(m_angle) * TSIZE;
         else
             return (m_partner->getScreenCoordinateY()) - sin(m_angle) * TSIZE;
     }
-    else if (m_partner->getPuyoY() < getPuyoY())
+    else if (m_partner->getFloboY() < getFloboY())
         return (m_partner->getScreenCoordinateY()) + cos(m_angle) * TSIZE;
     else
         return (m_partner->getScreenCoordinateY()) - cos(m_angle) * TSIZE;
 }
 
-AnimatedPuyoFactory::AnimatedPuyoFactory(PuyoView *attachedView)
+AnimatedFloboFactory::AnimatedFloboFactory(PuyoView *attachedView)
   : attachedView(attachedView), m_showEyes(true)
 {
     this->attachedThemeSet = attachedView->getPuyoThemeSet();
 }
 
-AnimatedPuyoFactory::~AnimatedPuyoFactory()
+AnimatedFloboFactory::~AnimatedFloboFactory()
 {
     while (puyoWalhalla.size() > 0) {
-        PuyoPuyo *currentPuyo = puyoWalhalla[0];
+        Flobo *currentPuyo = puyoWalhalla[0];
         puyoWalhalla.removeAt(0);
         delete currentPuyo;
     }
 }
 
-PuyoPuyo *AnimatedPuyoFactory::createPuyo(PuyoState state)
+Flobo *AnimatedFloboFactory::createFlobo(FloboState state)
 {
     AnimatedPuyo *result = new AnimatedPuyo(state, attachedThemeSet, attachedView);
     result->setShowEyes(m_showEyes);
     return result;
 }
 
-void AnimatedPuyoFactory::deletePuyo(PuyoPuyo *target)
+void AnimatedFloboFactory::deleteFlobo(Flobo *target)
 {
     puyoWalhalla.add(target);
 }
 
 
-void AnimatedPuyoFactory::renderWalhalla(DrawTarget *dt)
+void AnimatedFloboFactory::renderWalhalla(DrawTarget *dt)
 {
     for (int i = puyoWalhalla.size() - 1 ; i >= 0 ; i--) {
         AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(puyoWalhalla[i]);
@@ -265,7 +265,7 @@ void AnimatedPuyoFactory::renderWalhalla(DrawTarget *dt)
     }
 }
 
-void AnimatedPuyoFactory::cycleWalhalla()
+void AnimatedFloboFactory::cycleWalhalla()
 {
     for (int i = puyoWalhalla.size() - 1 ; i >= 0 ; i--) {
         AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(puyoWalhalla[i]);

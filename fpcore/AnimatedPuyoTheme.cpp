@@ -35,44 +35,44 @@ using namespace std;
 
 const char * ThemeManagerImpl::s_themeFolderExtension = ".fptheme";
 const char * ThemeManagerImpl::s_key_PuyoFace[NUMBER_OF_PUYOS_IN_SET] = {
-    "puyoset.P1.face",
-    "puyoset.P2.face",
-    "puyoset.P3.face",
-    "puyoset.P4.face",
-    "puyoset.P5.face",
-    "puyoset.Neutral.face"
+    "floboset.P1.face",
+    "floboset.P2.face",
+    "floboset.P3.face",
+    "floboset.P4.face",
+    "floboset.P5.face",
+    "floboset.Neutral.face"
 };
 const char * ThemeManagerImpl::s_key_PuyoDisappear[NUMBER_OF_PUYOS_IN_SET] = {
-    "puyoset.P1.disappear",
-    "puyoset.P2.disappear",
-    "puyoset.P3.disappear",
-    "puyoset.P4.disappear",
-    "puyoset.P5.disappear",
-    "puyoset.Neutral.face"
+    "floboset.P1.disappear",
+    "floboset.P2.disappear",
+    "floboset.P3.disappear",
+    "floboset.P4.disappear",
+    "floboset.P5.disappear",
+    "floboset.Neutral.face"
 };
 const char * ThemeManagerImpl::s_key_PuyoExplosion[NUMBER_OF_PUYOS_IN_SET] = {
-    "puyoset.P1.explosion",
-    "puyoset.P2.explosion",
-    "puyoset.P3.explosion",
-    "puyoset.P4.explosion",
-    "puyoset.P5.explosion",
-    "puyoset.Neutral.face"
+    "floboset.P1.explosion",
+    "floboset.P2.explosion",
+    "floboset.P3.explosion",
+    "floboset.P4.explosion",
+    "floboset.P5.explosion",
+    "floboset.Neutral.face"
 };
 const char * ThemeManagerImpl::s_key_PuyoEye[NUMBER_OF_PUYOS_IN_SET] = {
-    "puyoset.P1.eye",
-    "puyoset.P2.eye",
-    "puyoset.P3.eye",
-    "puyoset.P4.eye",
-    "puyoset.P5.eye",
-    "puyoset.Neutral.face"
+    "floboset.P1.eye",
+    "floboset.P2.eye",
+    "floboset.P3.eye",
+    "floboset.P4.eye",
+    "floboset.P5.eye",
+    "floboset.Neutral.face"
 };
 const char * ThemeManagerImpl::s_key_PuyoColorOffset[NUMBER_OF_PUYOS_IN_SET] = {
-    "puyoset.P1.offset",
-    "puyoset.P2.offset",
-    "puyoset.P3.offset",
-    "puyoset.P4.offset",
-    "puyoset.P5.offset",
-    "puyoset.Neutral.face"
+    "floboset.P1.offset",
+    "floboset.P2.offset",
+    "floboset.P3.offset",
+    "floboset.P4.offset",
+    "floboset.P5.offset",
+    "floboset.Neutral.face"
 };
 
 ThemeManagerImpl::ThemeManagerImpl(DataPathManager &dataPathManager)
@@ -92,9 +92,9 @@ ThemeManagerImpl::ThemeManagerImpl(DataPathManager &dataPathManager)
     }
 }
 
-PuyoSetTheme * ThemeManagerImpl::createPuyoSetTheme(const std::string &themeName)
+PuyoSetTheme * ThemeManagerImpl::createFloboSetTheme(const std::string &themeName)
 {
-    //cout << "Creating puyoset theme impl " << themeName << endl;
+    //cout << "Creating floboset theme impl " << themeName << endl;
     std::map<std::string, PuyoSetThemeDescription>::iterator iter
         = m_puyoSetThemeDescriptions.find(themeName);
     if (iter == m_puyoSetThemeDescriptions.end())
@@ -148,7 +148,7 @@ void ThemeManagerImpl::loadThemePack(const std::string &path)
     gsl_push_file(gsl, "/lib/packagelib.gsl");
     gsl_push_file(gsl, themePath.combine("Description.gsl"));
     gsl_compile(gsl);
-    gsl_bind_function(gsl, "end_puyoset",     ThemeManagerImpl::end_puyoset);
+    gsl_bind_function(gsl, "end_floboset",     ThemeManagerImpl::end_floboset);
     gsl_bind_function(gsl, "end_level",       ThemeManagerImpl::end_level);
     gsl_bind_function(gsl, "end_description", ThemeManagerImpl::end_description);
     // ugly bit
@@ -163,17 +163,17 @@ void ThemeManagerImpl::loadThemePack(const std::string &path)
     m_localeDictionary.reset(NULL);
 }
 
-void ThemeManagerImpl::end_puyoset(GoomSL *gsl, GoomHash *global,
+void ThemeManagerImpl::end_floboset(GoomSL *gsl, GoomHash *global,
                                           GoomHash *local)
 {
     ThemeManagerImpl *themeMgr = (ThemeManagerImpl *)GSL_GET_USERDATA_PTR(gsl);
-	const char * themeName  = (const char *) GSL_GLOBAL_PTR(gsl, "puyoset.name");
+	const char * themeName  = (const char *) GSL_GLOBAL_PTR(gsl, "floboset.name");
 	const char * localizedThemeName = themeMgr->m_localeDictionary->getLocalizedString(themeName,true);
     PuyoSetThemeDescription &newThemeDescription = themeMgr->m_puyoSetThemeDescriptions[themeName];
     newThemeDescription.name = themeName;
     newThemeDescription.localizedName = localizedThemeName;
     newThemeDescription.author = (const char *)(GSL_GLOBAL_PTR(gsl, "author"));
-    newThemeDescription.description = (const char *)(GSL_GLOBAL_PTR(gsl, "puyoset.description"));
+    newThemeDescription.description = (const char *)(GSL_GLOBAL_PTR(gsl, "floboset.description"));
     newThemeDescription.localizedDescription = themeMgr->m_localeDictionary->getLocalizedString(newThemeDescription.description.c_str(),true);
     newThemeDescription.path = themeMgr->m_themePackLoadingPath;
     for (int i = 0 ; i < NUMBER_OF_PUYOS_IN_SET ; i++) {
@@ -280,14 +280,14 @@ PuyoSetThemeImpl::PuyoSetThemeImpl(const PuyoSetThemeDescription &desc,
         if (m_defaultTheme == NULL)
             m_puyoThemes[i].reset(new PuyoThemeImpl(desc.puyoThemeDescriptions[i], desc.path));
         else {
-            m_puyoThemes[i].reset(new PuyoThemeImpl(desc.puyoThemeDescriptions[i], desc.path, &(m_defaultTheme->getPuyoTheme((PuyoState)i))));
+            m_puyoThemes[i].reset(new PuyoThemeImpl(desc.puyoThemeDescriptions[i], desc.path, &(m_defaultTheme->getPuyoTheme((FloboState)i))));
         }
     }
     // Neutral puyo is a special case
     if (m_defaultTheme == NULL)
         m_puyoThemes[NUMBER_OF_PUYOS_IN_SET-1].reset(new NeutralPuyoThemeImpl(desc.puyoThemeDescriptions[NUMBER_OF_PUYOS_IN_SET-1], desc.path));
     else
-        m_puyoThemes[NUMBER_OF_PUYOS_IN_SET-1].reset(new NeutralPuyoThemeImpl(desc.puyoThemeDescriptions[NUMBER_OF_PUYOS_IN_SET-1], desc.path, &(m_defaultTheme->getPuyoTheme(PUYO_NEUTRAL))));
+        m_puyoThemes[NUMBER_OF_PUYOS_IN_SET-1].reset(new NeutralPuyoThemeImpl(desc.puyoThemeDescriptions[NUMBER_OF_PUYOS_IN_SET-1], desc.path, &(m_defaultTheme->getPuyoTheme(FLOBO_NEUTRAL))));
 }
 
 const std::string & PuyoSetThemeImpl::getName() const
@@ -310,23 +310,23 @@ const std::string & PuyoSetThemeImpl::getComments() const
     return m_desc.description;
 }
 
-const PuyoTheme & PuyoSetThemeImpl::getPuyoTheme(PuyoState state) const
+const PuyoTheme & PuyoSetThemeImpl::getPuyoTheme(FloboState state) const
 {
     switch (state) {
-    case PUYO_FALLINGBLUE:
-    case PUYO_BLUE:
+    case FLOBO_FALLINGBLUE:
+    case FLOBO_BLUE:
         return *m_puyoThemes[0];
-    case PUYO_FALLINGRED:
-    case PUYO_RED:
+    case FLOBO_FALLINGRED:
+    case FLOBO_RED:
         return *m_puyoThemes[1];
-    case PUYO_FALLINGGREEN:
-    case PUYO_GREEN:
+    case FLOBO_FALLINGGREEN:
+    case FLOBO_GREEN:
         return *m_puyoThemes[2];
-    case PUYO_FALLINGVIOLET:
-    case PUYO_VIOLET:
+    case FLOBO_FALLINGVIOLET:
+    case FLOBO_VIOLET:
         return *m_puyoThemes[3];
-    case PUYO_FALLINGYELLOW:
-    case PUYO_YELLOW:
+    case FLOBO_FALLINGYELLOW:
+    case FLOBO_YELLOW:
         return *m_puyoThemes[4];
     default:
         return *m_puyoThemes[5];
@@ -354,19 +354,19 @@ PuyoThemeImpl::PuyoThemeImpl(const PuyoThemeDescription &desc,
     : BasePuyoThemeImpl(desc, path, defaultTheme)
 {
     // Initializing the arrays of pointers
-    for (int i = 0 ; i < NUMBER_OF_PUYO_FACES ; ++i)
+    for (int i = 0 ; i < NUMBER_OF_FLOBO_FACES ; ++i)
         for (int j = 0 ; j < MAX_COMPRESSED ; ++j)
             m_faces[i][j] = NULL;
-    for (int i = 0 ; i < NUMBER_OF_PUYO_EYES ; ++i)
+    for (int i = 0 ; i < NUMBER_OF_FLOBO_EYES ; ++i)
         for (int j = 0 ; j < MAX_COMPRESSED ; ++j)
             m_eyes[i][j] = NULL;
-    for (int i = 0 ; i < NUMBER_OF_PUYO_CIRCLES ; ++i)
+    for (int i = 0 ; i < NUMBER_OF_FLOBO_CIRCLES ; ++i)
             m_circles[i] = NULL;
     for (int j = 0 ; j < MAX_COMPRESSED ; ++j)
         m_shadows[j] = NULL;
-    for (int i = 0 ; i < NUMBER_OF_PUYO_DISAPPEAR ; ++i)
+    for (int i = 0 ; i < NUMBER_OF_FLOBO_DISAPPEAR ; ++i)
         m_shrinking[i] = NULL;
-    for (int i = 0 ; i < NUMBER_OF_PUYO_EXPLOSIONS ; ++i)
+    for (int i = 0 ; i < NUMBER_OF_FLOBO_EXPLOSIONS ; ++i)
         m_explosion[i] = NULL;
 }
 

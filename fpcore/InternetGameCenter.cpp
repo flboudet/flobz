@@ -56,7 +56,7 @@ void InternetGameCenter::sendAliveMessage()
     Message *msg = m_igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("V", fpipVersion);
-    msg->addInt("CMD", PUYO_IGP_ALIVE);
+    msg->addInt("CMD", FLOBO_IGP_ALIVE);
     msg->addString("NAME", name);
     msg->addString("PASSWD", password);
     msg->addInt("STATUS", status);
@@ -73,7 +73,7 @@ void InternetGameCenter::sendMessage(const String msgText)
     Message *msg = m_igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("V", fpipVersion);
-    msg->addInt("CMD", PUYO_IGP_CHAT);
+    msg->addInt("CMD", FLOBO_IGP_CHAT);
     msg->addString("NAME", name);
     msg->addString("MSG", msgText);
     msg->send();
@@ -81,13 +81,13 @@ void InternetGameCenter::sendMessage(const String msgText)
     m_igpmbox->bind(prevBound);
 }
 
-void InternetGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
+void InternetGameCenter::sendGameRequest(FloboGameInvitation &invitation)
 {
     opponentName = invitation.opponentName;
     invitation.initiatorAddress = m_igpmbox->getSelfAddress();
     Message *msg = m_igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
-    msg->addInt("CMD", PUYO_IGP_GAME_REQUEST);
+    msg->addInt("CMD", FLOBO_IGP_GAME_REQUEST);
     msg->addString("ORGNAME", name);
     msg->addString("DSTNAME", invitation.opponentName);
     msg->addInt("RNDSEED", invitation.gameRandomSeed);
@@ -99,12 +99,12 @@ void InternetGameCenter::sendGameRequest(PuyoGameInvitation &invitation)
     grantedInvitation = invitation;
 }
 
-void InternetGameCenter::sendGameAcceptInvitation(PuyoGameInvitation &invitation)
+void InternetGameCenter::sendGameAcceptInvitation(FloboGameInvitation &invitation)
 {
     opponentName = invitation.opponentName;
     Message *msg = m_igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
-    msg->addInt("CMD", PUYO_IGP_GAME_ACCEPT);
+    msg->addInt("CMD", FLOBO_IGP_GAME_ACCEPT);
     msg->addString("ORGNAME", name);
     msg->addString("DSTNAME", invitation.opponentName);
     Dirigeable *dirNew = dynamic_cast<Dirigeable *>(msg);
@@ -126,11 +126,11 @@ void InternetGameCenter::grantGameToMBox(MessageBox &thembox)
     }
 }
 
-void InternetGameCenter::sendGameCancelInvitation(PuyoGameInvitation &invitation)
+void InternetGameCenter::sendGameCancelInvitation(FloboGameInvitation &invitation)
 {
     Message *msg = m_igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
-    msg->addInt("CMD", PUYO_IGP_GAME_CANCEL);
+    msg->addInt("CMD", FLOBO_IGP_GAME_CANCEL);
     msg->addString("ORGNAME", name);
     msg->addString("DSTNAME", invitation.opponentName);
     Dirigeable *dirNew = dynamic_cast<Dirigeable *>(msg);
@@ -236,7 +236,7 @@ void InternetGameCenter::punch()
     m_igpmbox->bind(1);
     Message *msg = m_igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
-    msg->addInt("CMD", PUYO_IGP_NAT_TRAVERSAL);
+    msg->addInt("CMD", FLOBO_IGP_NAT_TRAVERSAL);
     msg->send();
     delete msg;
     m_igpmbox->bind(prevBound);
@@ -249,10 +249,10 @@ void InternetGameCenter::onMessage(Message &msg)
         if (!msg.hasInt("CMD"))
             return;
         switch (msg.getInt("CMD")) {
-            case PUYO_IGP_ACCEPT:
+            case FLOBO_IGP_ACCEPT:
                 m_isAccepted = true;
                 break;
-            case PUYO_IGP_DENY:
+            case FLOBO_IGP_DENY:
                 m_isDenied = true;
                 m_denyString = msg.getString("MSG");
                 if (msg.hasString("MSG_MORE"))
@@ -260,12 +260,12 @@ void InternetGameCenter::onMessage(Message &msg)
                 else
                     m_denyStringMore = "";
                 break;
-            case PUYO_IGP_CHAT:
+            case FLOBO_IGP_CHAT:
                 for (int i = 0, j = listeners.size() ; i < j ; i++) {
                     listeners[i]->onChatMessage(msg.getString("NAME"), msg.getString("MSG"));
                 }
                 break;
-            case PUYO_IGP_CONNECT:
+            case FLOBO_IGP_CONNECT:
             {
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
                 int rank = 0;
@@ -276,13 +276,13 @@ void InternetGameCenter::onMessage(Message &msg)
                 connectPeer(peerAddress, msg.getString("NAME"), msg.getInt("STATUS"), rank, peerAddress == selfAddress);
             }
                 break;
-            case PUYO_IGP_DISCONNECT:
+            case FLOBO_IGP_DISCONNECT:
             {
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
                 disconnectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"));
             }
                 break;
-            case PUYO_IGP_STATUSCHANGE:
+            case FLOBO_IGP_STATUSCHANGE:
             {
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
                 int rank = 0;
@@ -291,11 +291,11 @@ void InternetGameCenter::onMessage(Message &msg)
                 connectPeer(dir.getPeerAddress("ADDR"), msg.getString("NAME"), msg.getInt("STATUS"), rank);
             }
                 break;
-            case PUYO_IGP_GAME_REQUEST:
+            case FLOBO_IGP_GAME_REQUEST:
             {
                 //printf("Une partie contre %s?\n", (const char *)msg.getString("ORGNAME"));
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-                PuyoGameInvitation invitation;
+                FloboGameInvitation invitation;
                 invitation.initiatorAddress = dir.getPeerAddress();
                 invitation.opponentAddress = dir.getPeerAddress();
                 invitation.opponentName = msg.getString("ORGNAME");
@@ -310,7 +310,7 @@ void InternetGameCenter::onMessage(Message &msg)
                 receivedGameInvitation(invitation);
             }
                 break;
-            case PUYO_IGP_GAME_ACCEPT:
+            case FLOBO_IGP_GAME_ACCEPT:
             {
                 //printf("%s accepte la partie!\n", (const char *)msg.getString("ORGNAME"));
     	        setStatus(PEER_PLAYING);
@@ -323,7 +323,7 @@ void InternetGameCenter::onMessage(Message &msg)
                     gameGrantedStatus = GAMESTATUS_GRANTED_IGP;
             }
                 break;
-            case PUYO_IGP_GAME_CANCEL:
+            case FLOBO_IGP_GAME_CANCEL:
             {
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
                 receivedGameCanceledWithPeer(msg.getString("ORGNAME"), dir.getPeerAddress());

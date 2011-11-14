@@ -1,5 +1,5 @@
-#ifndef PUYO_SERVERV2_PEERSLIST_H
-#define PUYO_SERVERV2_PEERSLIST_H
+#ifndef FLOBO_SERVERV2_PEERSLIST_H
+#define FLOBO_SERVERV2_PEERSLIST_H
 
 namespace flobopuyo {
 namespace server {

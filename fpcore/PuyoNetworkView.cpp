@@ -50,17 +50,17 @@ Message *PuyoNetworkView::createStateMessage(bool sendFullMessage)
     message->addInt     (PuyoMessage::NEXT_F, attachedGame->getNextFalling());
     message->addInt     (PuyoMessage::NEXT_C, attachedGame->getNextCompanion());
     message->addInt     (PuyoMessage::SEMI_MOVE, attachedGame->getSemiMove());
-    message->addInt     (PuyoMessage::CURRENT_NEUTRALS, attachedGame->getNeutralPuyos());
+    message->addInt     (PuyoMessage::CURRENT_NEUTRALS, attachedGame->getNeutralFlobos());
 
     if (sendFullMessage) {
-        int puyoCount = attachedGame->getPuyoCount();
+        int puyoCount = attachedGame->getFloboCount();
         AdvancedBuffer<int> buffer(puyoCount * 4);
         for (int i = 0 ; i < puyoCount ; i++) {
-            PuyoPuyo *currentPuyo = attachedGame->getPuyoAtIndex(i);
+            Flobo *currentPuyo = attachedGame->getFloboAtIndex(i);
             buffer.add(currentPuyo->getID());
-            buffer.add(currentPuyo->getPuyoState());
-            buffer.add(currentPuyo->getPuyoX());
-            buffer.add(currentPuyo->getPuyoY());
+            buffer.add(currentPuyo->getFloboState());
+            buffer.add(currentPuyo->getFloboX());
+            buffer.add(currentPuyo->getFloboY());
         }
         message->addIntArray(PuyoMessage::PUYOS, buffer);
     }
@@ -135,52 +135,52 @@ void PuyoNetworkView::rotateRight()
 }
 
 // GameListener methods
-void PuyoNetworkView::fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
+void PuyoNetworkView::fallingsDidMoveLeft(Flobo *fallingFlobo, Flobo *companionFlobo)
 {
-    PuyoView::fallingsDidMoveLeft(fallingPuyo, companionPuyo);
-    moveLeftBuffer.add(fallingPuyo->getID());
-    moveLeftBuffer.add(fallingPuyo->getPuyoState());
-    moveLeftBuffer.add(fallingPuyo->getPuyoX());
-    moveLeftBuffer.add(fallingPuyo->getPuyoY());
-    moveLeftBuffer.add(companionPuyo->getID());
-    moveLeftBuffer.add(companionPuyo->getPuyoState());
-    moveLeftBuffer.add(companionPuyo->getPuyoX());
-    moveLeftBuffer.add(companionPuyo->getPuyoY());
+    PuyoView::fallingsDidMoveLeft(fallingFlobo, companionFlobo);
+    moveLeftBuffer.add(fallingFlobo->getID());
+    moveLeftBuffer.add(fallingFlobo->getFloboState());
+    moveLeftBuffer.add(fallingFlobo->getFloboX());
+    moveLeftBuffer.add(fallingFlobo->getFloboY());
+    moveLeftBuffer.add(companionFlobo->getID());
+    moveLeftBuffer.add(companionFlobo->getFloboState());
+    moveLeftBuffer.add(companionFlobo->getFloboX());
+    moveLeftBuffer.add(companionFlobo->getFloboY());
 }
 
-void PuyoNetworkView::fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
+void PuyoNetworkView::fallingsDidMoveRight(Flobo *fallingFlobo, Flobo *companionFlobo)
 {
-    PuyoView::fallingsDidMoveRight(fallingPuyo, companionPuyo);
-    moveRightBuffer.add(fallingPuyo->getID());
-    moveRightBuffer.add(fallingPuyo->getPuyoState());
-    moveRightBuffer.add(fallingPuyo->getPuyoX());
-    moveRightBuffer.add(fallingPuyo->getPuyoY());
-    moveRightBuffer.add(companionPuyo->getID());
-    moveRightBuffer.add(companionPuyo->getPuyoState());
-    moveRightBuffer.add(companionPuyo->getPuyoX());
-    moveRightBuffer.add(companionPuyo->getPuyoY());
+    PuyoView::fallingsDidMoveRight(fallingFlobo, companionFlobo);
+    moveRightBuffer.add(fallingFlobo->getID());
+    moveRightBuffer.add(fallingFlobo->getFloboState());
+    moveRightBuffer.add(fallingFlobo->getFloboX());
+    moveRightBuffer.add(fallingFlobo->getFloboY());
+    moveRightBuffer.add(companionFlobo->getID());
+    moveRightBuffer.add(companionFlobo->getFloboState());
+    moveRightBuffer.add(companionFlobo->getFloboX());
+    moveRightBuffer.add(companionFlobo->getFloboY());
 }
 
-void PuyoNetworkView::fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
+void PuyoNetworkView::fallingsDidFallingStep(Flobo *fallingFlobo, Flobo *companionFlobo)
 {
-    PuyoView::fallingsDidFallingStep(fallingPuyo, companionPuyo);
-    fallingStepBuffer.add(fallingPuyo->getID());
-    fallingStepBuffer.add(fallingPuyo->getPuyoState());
-    fallingStepBuffer.add(fallingPuyo->getPuyoX());
-    fallingStepBuffer.add(fallingPuyo->getPuyoY());
-    fallingStepBuffer.add(companionPuyo->getID());
-    fallingStepBuffer.add(companionPuyo->getPuyoState());
-    fallingStepBuffer.add(companionPuyo->getPuyoX());
-    fallingStepBuffer.add(companionPuyo->getPuyoY());
+    PuyoView::fallingsDidFallingStep(fallingFlobo, companionFlobo);
+    fallingStepBuffer.add(fallingFlobo->getID());
+    fallingStepBuffer.add(fallingFlobo->getFloboState());
+    fallingStepBuffer.add(fallingFlobo->getFloboX());
+    fallingStepBuffer.add(fallingFlobo->getFloboY());
+    fallingStepBuffer.add(companionFlobo->getID());
+    fallingStepBuffer.add(companionFlobo->getFloboState());
+    fallingStepBuffer.add(companionFlobo->getFloboX());
+    fallingStepBuffer.add(companionFlobo->getFloboY());
 }
 
-void PuyoNetworkView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex, int totalNeutral)
+void PuyoNetworkView::gameDidAddNeutral(Flobo *neutralFlobo, int neutralIndex, int totalNeutral)
 {
-    PuyoView::gameDidAddNeutral(neutralPuyo, neutralIndex, totalNeutral);
-    neutralsBuffer.add(neutralPuyo->getID());
-    neutralsBuffer.add(neutralPuyo->getPuyoState());
-    neutralsBuffer.add(neutralPuyo->getPuyoX());
-    neutralsBuffer.add(neutralPuyo->getPuyoY());
+    PuyoView::gameDidAddNeutral(neutralFlobo, neutralIndex, totalNeutral);
+    neutralsBuffer.add(neutralFlobo->getID());
+    neutralsBuffer.add(neutralFlobo->getFloboState());
+    neutralsBuffer.add(neutralFlobo->getFloboX());
+    neutralsBuffer.add(neutralFlobo->getFloboY());
     neutralsBuffer.add(neutralIndex);
     neutralsBuffer.add(totalNeutral);
 }
@@ -188,46 +188,46 @@ void PuyoNetworkView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex,
 void PuyoNetworkView::gameDidEndCycle()
 {
     PuyoView::gameDidEndCycle();
-    if (attachedGame->getNeutralPuyos() < 0)
-        badPuyos -= attachedGame->getNeutralPuyos();
+    if (attachedGame->getNeutralFlobos() < 0)
+        badPuyos -= attachedGame->getNeutralFlobos();
     sendStateMessage(true);
 }
 
-void PuyoNetworkView::companionDidTurn(PuyoPuyo *companionPuyo, PuyoPuyo *fallingPuyo, bool counterclockwise)
+void PuyoNetworkView::companionDidTurn(Flobo *companionFlobo, Flobo *fallingFlobo, bool counterclockwise)
 {
-    PuyoView::companionDidTurn(companionPuyo, fallingPuyo, counterclockwise);
-    compTurnBuffer.add(fallingPuyo->getID());
-    compTurnBuffer.add(fallingPuyo->getPuyoState());
-    compTurnBuffer.add(fallingPuyo->getPuyoX());
-    compTurnBuffer.add(fallingPuyo->getPuyoY());
-    compTurnBuffer.add(companionPuyo->getID());
-    compTurnBuffer.add(companionPuyo->getPuyoState());
-    compTurnBuffer.add(companionPuyo->getPuyoX());
-    compTurnBuffer.add(companionPuyo->getPuyoY());
+    PuyoView::companionDidTurn(companionFlobo, fallingFlobo, counterclockwise);
+    compTurnBuffer.add(fallingFlobo->getID());
+    compTurnBuffer.add(fallingFlobo->getFloboState());
+    compTurnBuffer.add(fallingFlobo->getFloboX());
+    compTurnBuffer.add(fallingFlobo->getFloboY());
+    compTurnBuffer.add(companionFlobo->getID());
+    compTurnBuffer.add(companionFlobo->getFloboState());
+    compTurnBuffer.add(companionFlobo->getFloboX());
+    compTurnBuffer.add(companionFlobo->getFloboY());
     compTurnBuffer.add(counterclockwise);
 }
 
-void PuyoNetworkView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow)
+void PuyoNetworkView::floboDidFall(Flobo *puyo, int originX, int originY, int nFalledBelow)
 {
-    PuyoView::puyoDidFall(puyo, originX, originY, nFalledBelow);
+    PuyoView::floboDidFall(puyo, originX, originY, nFalledBelow);
     didFallBuffer.add(puyo->getID());
-    didFallBuffer.add(puyo->getPuyoState());
-    didFallBuffer.add(puyo->getPuyoX());
-    didFallBuffer.add(puyo->getPuyoY());
+    didFallBuffer.add(puyo->getFloboState());
+    didFallBuffer.add(puyo->getFloboX());
+    didFallBuffer.add(puyo->getFloboY());
     didFallBuffer.add(originX);
     didFallBuffer.add(originY);
     didFallBuffer.add(nFalledBelow);
 }
 
-void PuyoNetworkView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase)
+void PuyoNetworkView::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase)
 {
-    PuyoView::puyoWillVanish(puyoGroup, groupNum, phase);
+    PuyoView::floboWillVanish(floboGroup, groupNum, phase);
     willVanishBuffer.add(phase);
     willVanishBuffer.add(groupNum);
-    willVanishBuffer.add(puyoGroup.size());
-    for (int i = 0 ; i < puyoGroup.size() ; i++)
+    willVanishBuffer.add(floboGroup.size());
+    for (int i = 0 ; i < floboGroup.size() ; i++)
     {
-        PuyoPuyo *currentPuyo = puyoGroup[i];
+        Flobo *currentPuyo = floboGroup[i];
         willVanishBuffer.add(currentPuyo->getID());
     }
 }
@@ -297,7 +297,7 @@ void PuyoInternetNetworkView::sendGameResultToServer(int winner)
     SaveIgpBound saveIgpBound(igpbox);
     igpbox->bind(1);
     std::auto_ptr<Message> message (igpbox->createMessage());
-    message->addInt   ("CMD",   PUYO_IGP_GAME_OVER);
+    message->addInt   ("CMD",   FLOBO_IGP_GAME_OVER);
     message->addInt   ("WINNER", winner);
     message->addInt   ("GAMEID", gameId);
     message->addString("NAME1",  p1name);

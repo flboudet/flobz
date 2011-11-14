@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _PUYO_EVENT_PLAYER_H
-#define _PUYO_EVENT_PLAYER_H
+#ifndef _FLOBO_EVENT_PLAYER_H
+#define _FLOBO_EVENT_PLAYER_H
 
 #include "PuyoPlayer.h"
 
@@ -61,5 +61,5 @@ private:
     PuyoEventPlayer player2controller;
 };
 
-#endif // _PUYO_EVENT_PLAYER_H
+#endif // _FLOBO_EVENT_PLAYER_H
 

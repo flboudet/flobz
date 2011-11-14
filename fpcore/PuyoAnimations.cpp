@@ -136,8 +136,8 @@ void AnimationSynchronizer::decrementUsage()
 }
 
 /* Companion turning around main puyo animation */
-TurningAnimation::TurningAnimation(AnimatedPuyo &companionPuyo,
-                                   bool counterclockwise) : PuyoAnimation(companionPuyo), NUMSTEPS(6)
+TurningAnimation::TurningAnimation(AnimatedPuyo &companionFlobo,
+                                   bool counterclockwise) : PuyoAnimation(companionFlobo), NUMSTEPS(6)
 {
     enabled = false;
     m_exclusive = false;
@@ -224,7 +224,7 @@ FallingAnimation::FallingAnimation(AnimatedPuyo &puyo, int originY, int xOffset,
     this->yOffset = yOffset;
     this->off     = off;
     this->step    = 0;
-    this->X  = (attachedPuyo.getPuyoX()*TSIZE) + xOffset;
+    this->X  = (attachedPuyo.getFloboX()*TSIZE) + xOffset;
     this->Y  = (originY*TSIZE) + yOffset;
     bouncing = BOUNCING_OFFSET_NUM + off;
     attachedPuyo.getAttachedView()->disallowCycle();
@@ -235,13 +235,13 @@ void FallingAnimation::cycle()
 {
     Y += step++;
 
-    if (Y >= (attachedPuyo.getPuyoY()*TSIZE) + yOffset)
+    if (Y >= (attachedPuyo.getFloboY()*TSIZE) + yOffset)
     {
         if (!m_once) {
             AudioManager::playSound("bam1.wav", .3, getPuyoSoundPadding());
             m_once = true;
         }
-        Y = (attachedPuyo.getPuyoY()*TSIZE) + yOffset;
+        Y = (attachedPuyo.getFloboY()*TSIZE) + yOffset;
         if (bouncing == BOUNCING_OFFSET_NUM + off) attachedPuyo.getAttachedView()->allowCycle();
 
         bouncing--;
@@ -252,7 +252,7 @@ void FallingAnimation::cycle()
 //            AudioManager::playSound("bam1.wav", .3);
 //            EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
 //            EventFX("end_falling", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
-//            attachedPuyo.setAnimatedState(AnimatedPuyo::PUYO_NORMAL);
+//            attachedPuyo.setAnimatedState(AnimatedPuyo::FLOBO_NORMAL);
 //            attachedPuyo.getAttachedView()->allowCycle();
 //=======
             //EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
@@ -287,7 +287,7 @@ void FallingAnimation::draw(int semiMove, DrawTarget *dt)
     attachedPuyo.renderAt(X, coordY, dt);
 
     // TODO : Reactiver le EyeSwirl !
-    //if (attachedPuyo.getPuyoState() != PUYO_NEUTRAL)
+    //if (attachedPuyo.getFloboState() != FLOBO_NEUTRAL)
     //   painter.requestDraw(puyoEyesSwirl[(bouncing/2)%4], &drect);
 }
 
@@ -296,11 +296,11 @@ VanishAnimation::VanishAnimation(AnimatedPuyo &puyo, int delay, int xOffset, int
 {
     this->xOffset = xOffset;
     this->yOffset = yOffset;
-    this->X = (attachedPuyo.getPuyoX()*TSIZE) + xOffset;
-    this->Y = (attachedPuyo.getPuyoY()*TSIZE) + yOffset;
-    this->color = attachedPuyo.getPuyoState();
-    if (color > PUYO_EMPTY)
-        color -= PUYO_BLUE;
+    this->X = (attachedPuyo.getFloboX()*TSIZE) + xOffset;
+    this->Y = (attachedPuyo.getFloboY()*TSIZE) + yOffset;
+    this->color = attachedPuyo.getFloboState();
+    if (color > FLOBO_EMPTY)
+        color -= FLOBO_BLUE;
     iter = 0;
     once = false;
     enabled = false;

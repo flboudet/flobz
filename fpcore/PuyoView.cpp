@@ -30,22 +30,22 @@
 #include "PuyoView.h"
 #include "PuyoAnimations.h"
 #include "AnimatedPuyo.h"
-#include "PuyoGame.h"
+#include "FloboGame.h"
 #include "audio.h"
 #include "HiScores.h"
 
-PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory,
+PuyoView::PuyoView(FloboGameFactory *attachedFloboGameFactory,
                    int playerId,
                    PuyoSetTheme *attachedThemeSet,
                    LevelTheme *attachedLevelTheme)
   : m_playerId(playerId), m_showNextPuyos(true), m_showShadows(true),
     attachedThemeSet(attachedThemeSet), attachedLevelTheme(attachedLevelTheme),
-    attachedPuyoFactory(this), delayBeforeGameOver(60), haveDisplay(true),
+    attachedFloboFactory(this), delayBeforeGameOver(60), haveDisplay(true),
     m_xOffset(0), m_yOffset(- TSIZE), m_nXOffset(0), m_nYOffset(0),
     neutralXOffset(-1), neutralYOffset(-1)
 {
     setupLayout(playerId);
-    initCommon(attachedPuyoGameFactory);
+    initCommon(attachedFloboGameFactory);
     setScoreDisplayPosition(attachedLevelTheme->getScoreDisplayX(playerId),
                             attachedLevelTheme->getScoreDisplayY(playerId));
     m_scoreDisplay->setFont(attachedLevelTheme->getScoreFont());
@@ -58,16 +58,16 @@ void PuyoView::setupLayout(int playerId)
                 attachedLevelTheme->getPuyobanY(playerId));
     setNextPuyosPosition(attachedLevelTheme->getNextPuyosX(playerId),
                          attachedLevelTheme->getNextPuyosY(playerId));
-    setNeutralPuyosDisplayPosition(attachedLevelTheme->getNeutralDisplayX(playerId),
+    setNeutralFlobosDisplayPosition(attachedLevelTheme->getNeutralDisplayX(playerId),
                                    attachedLevelTheme->getNeutralDisplayY(playerId));
     setShowNextPuyos(attachedLevelTheme->getShouldDisplayNext(playerId));
     setShowShadows(attachedLevelTheme->getShouldDisplayShadows(playerId));
     setShowEyes(attachedLevelTheme->getShouldDisplayEyes(playerId));
 }
 
-void PuyoView::initCommon(PuyoGameFactory *attachedPuyoGameFactory)
+void PuyoView::initCommon(FloboGameFactory *attachedFloboGameFactory)
 {
-	attachedGame = attachedPuyoGameFactory->createPuyoGame(&attachedPuyoFactory);
+	attachedGame = attachedFloboGameFactory->createFloboGame(&attachedFloboFactory);
     m_scoreDisplay.reset(new PlayerGameStatDisplay(attachedGame->getGameStat()));
     attachedGame->addGameListener(this);
 	gameRunning = true;
@@ -77,12 +77,12 @@ void PuyoView::initCommon(PuyoGameFactory *attachedPuyoGameFactory)
     newMetaCycleStart = false;
 }
 
-PuyoView::PuyoView(PuyoGameFactory *attachedPuyoGameFactory)
+PuyoView::PuyoView(FloboGameFactory *attachedFloboGameFactory)
   : attachedThemeSet(NULL), attachedLevelTheme(NULL),
-    attachedPuyoFactory(this), delayBeforeGameOver(60), haveDisplay(false),
+    attachedFloboFactory(this), delayBeforeGameOver(60), haveDisplay(false),
     neutralXOffset(-1), neutralYOffset(-1)
 {
-    initCommon(attachedPuyoGameFactory);
+    initCommon(attachedFloboGameFactory);
 }
 
 PuyoView::~PuyoView()
@@ -90,29 +90,29 @@ PuyoView::~PuyoView()
     delete attachedGame;
 }
 
-void PuyoView::setEnemyGame(PuyoGame *enemyGame)
+void PuyoView::setEnemyGame(FloboGame *enemyGame)
 {
 	this->enemyGame = enemyGame;
 }
 
-int PuyoView::getValenceForPuyo(PuyoPuyo *puyo) const
+int PuyoView::getValenceForPuyo(Flobo *puyo) const
 {
     if (!haveDisplay) return 0;
-    int i = puyo->getPuyoX();
-    int j = puyo->getPuyoY();
-    PuyoState currentPuyoState = puyo->getPuyoState();
-    AnimatedPuyo *down  = (AnimatedPuyo *)(attachedGame->getPuyoAt(i, j+1));
-    AnimatedPuyo *right = (AnimatedPuyo *)(attachedGame->getPuyoAt(i+1, j));
-    AnimatedPuyo *up    = (AnimatedPuyo *)(attachedGame->getPuyoAt(i, j-1));
-    AnimatedPuyo *left  = (AnimatedPuyo *)(attachedGame->getPuyoAt(i-1, j));
+    int i = puyo->getFloboX();
+    int j = puyo->getFloboY();
+    FloboState currentFloboState = puyo->getFloboState();
+    AnimatedPuyo *down  = (AnimatedPuyo *)(attachedGame->getFloboAt(i, j+1));
+    AnimatedPuyo *right = (AnimatedPuyo *)(attachedGame->getFloboAt(i+1, j));
+    AnimatedPuyo *up    = (AnimatedPuyo *)(attachedGame->getFloboAt(i, j-1));
+    AnimatedPuyo *left  = (AnimatedPuyo *)(attachedGame->getFloboAt(i-1, j));
 
-    PuyoState downState = (down == NULL) || (down->isRenderingAnimation()) ? PUYO_EMPTY : down->getPuyoState();
-    PuyoState rightState = (right == NULL) || (right->isRenderingAnimation()) ? PUYO_EMPTY : right->getPuyoState();
-    PuyoState upState = (up == NULL) || (up->isRenderingAnimation()) ? PUYO_EMPTY : up->getPuyoState();
-    PuyoState leftState = (left == NULL)   || (left->isRenderingAnimation()) ? PUYO_EMPTY : left->getPuyoState();
+    FloboState downState = (down == NULL) || (down->isRenderingAnimation()) ? FLOBO_EMPTY : down->getFloboState();
+    FloboState rightState = (right == NULL) || (right->isRenderingAnimation()) ? FLOBO_EMPTY : right->getFloboState();
+    FloboState upState = (up == NULL) || (up->isRenderingAnimation()) ? FLOBO_EMPTY : up->getFloboState();
+    FloboState leftState = (left == NULL)   || (left->isRenderingAnimation()) ? FLOBO_EMPTY : left->getFloboState();
 
-	return (leftState  == currentPuyoState ? 0x8 : 0) | (upState  == currentPuyoState ? 0x4 : 0) |
-	       (rightState == currentPuyoState ? 0x2 : 0) | (downState == currentPuyoState ? 0x1 : 0);
+	return (leftState  == currentFloboState ? 0x8 : 0) | (upState  == currentFloboState ? 0x4 : 0) |
+	       (rightState == currentFloboState ? 0x2 : 0) | (downState == currentFloboState ? 0x1 : 0);
 }
 
 bool PuyoView::isGameOver() const
@@ -131,13 +131,13 @@ void PuyoView::cycleAnimation(void)
         }
 
         // Cycling every puyo's animation
-        for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
+        for (int i = 0, j = attachedGame->getFloboCount() ; i < j ; i++) {
             AnimatedPuyo *currentPuyo =
-              (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
+              (AnimatedPuyo *)(attachedGame->getFloboAtIndex(i));
             currentPuyo->cycleAnimation();
         }
         // Cycling dead puyo's animations
-        attachedPuyoFactory.cycleWalhalla();
+        attachedFloboFactory.cycleWalhalla();
 
         // Cycling view's animations
         if (viewAnimations.size() > 0) {
@@ -196,31 +196,31 @@ void PuyoView::render(DrawTarget *dt)
     IosRect vrect;
 	vrect.x = m_xOffset;
 	vrect.y = m_yOffset;
-	vrect.w = TSIZE * PUYODIMX;
-	vrect.h = TSIZE * PUYODIMY;
+	vrect.w = TSIZE * FLOBOBAN_DIMX;
+	vrect.h = TSIZE * FLOBOBAN_DIMY;
 
     bool displayFallings = this->cycleAllowed();
     // Render shadows
     if (m_showShadows) {
-        for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
-            AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
+        for (int i = 0, j = attachedGame->getFloboCount() ; i < j ; i++) {
+            AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getFloboAtIndex(i));
             if (displayFallings || !currentPuyo->isFalling()) currentPuyo->renderShadow(dt);
         }
     }
-    // Render puyos
- 	for (int i = 0, j = attachedGame->getPuyoCount() ; i < j ; i++) {
-        AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAtIndex(i));
+    // Render flobos
+ 	for (int i = 0, j = attachedGame->getFloboCount() ; i < j ; i++) {
+        AnimatedPuyo *currentPuyo = (AnimatedPuyo *)(attachedGame->getFloboAtIndex(i));
         if (displayFallings || !currentPuyo->isFalling()) currentPuyo->render(dt);
     }
     // drawing the walhalla
-    attachedPuyoFactory.renderWalhalla(dt);
+    attachedFloboFactory.renderWalhalla(dt);
 
     if (m_showNextPuyos) {
         drect.x = m_nXOffset;
         drect.y = m_nYOffset;
         drect.w = TSIZE;
         drect.h = TSIZE * 2;
-        // Drawing next puyos
+        // Drawing next flobos
         const PuyoTheme &nextPuyoTheme =
             attachedThemeSet->getPuyoTheme(attachedGame->getNextFalling());
         IosSurface *currentSurface = nextPuyoTheme.getPuyoSurfaceForValence(0);
@@ -258,10 +258,10 @@ void PuyoView::renderNeutral(DrawTarget *dt)
 {
     if (!haveDisplay) return;
 	IosRect drect;
-    int neutralPuyos = attachedGame->getNeutralPuyos();
-    int numGiantNeutral = (neutralPuyos / PUYODIMX) / 4;
-    int numBigNeutral = (neutralPuyos / PUYODIMX) % 4;
-	int numNeutral = neutralPuyos % PUYODIMX;
+    int neutralFlobos = attachedGame->getNeutralFlobos();
+    int numGiantNeutral = (neutralFlobos / FLOBOBAN_DIMX) / 4;
+    int numBigNeutral = (neutralFlobos / FLOBOBAN_DIMX) % 4;
+	int numNeutral = neutralFlobos % FLOBOBAN_DIMX;
     int drect_x = (neutralXOffset == -1 ? m_xOffset : neutralXOffset);
     int drect_y_base =  (neutralYOffset == -1 ?
                          m_yOffset + 3 + TSIZE + TSIZE : neutralYOffset);
@@ -300,14 +300,14 @@ void PuyoView::renderScore(DrawTarget *dt)
     m_scoreDisplay->draw(dt);
 }
 
-void PuyoView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex, int totalNeutral) {
+void PuyoView::gameDidAddNeutral(Flobo *neutralFlobo, int neutralIndex, int totalNeutral) {
     if (!haveDisplay) return;
-    int x = neutralPuyo->getPuyoX();
-    int y = neutralPuyo->getPuyoY();
+    int x = neutralFlobo->getFloboX();
+    int y = neutralFlobo->getFloboY();
     AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
-    ((AnimatedPuyo *)neutralPuyo)->addAnimation(new NeutralAnimation(*((AnimatedPuyo *)neutralPuyo), neutralIndex * 2, synchronizer));
-    for (int i = y ; i < PUYODIMY ; i++) {
-        AnimatedPuyo *belowPuyo = (AnimatedPuyo *)(attachedGame->getPuyoAt(x, i));
+    ((AnimatedPuyo *)neutralFlobo)->addAnimation(new NeutralAnimation(*((AnimatedPuyo *)neutralFlobo), neutralIndex * 2, synchronizer));
+    for (int i = y ; i < FLOBOBAN_DIMY ; i++) {
+        AnimatedPuyo *belowPuyo = (AnimatedPuyo *)(attachedGame->getFloboAt(x, i));
         if (belowPuyo != NULL) {
             belowPuyo->addAnimation(new SmoothBounceAnimation(*belowPuyo, synchronizer));
         }
@@ -323,69 +323,69 @@ void PuyoView::gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex, int to
     }
 }
 
-void PuyoView::fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
+void PuyoView::fallingsDidMoveLeft(Flobo *fallingFlobo, Flobo *companionFlobo)
 {
     if (!haveDisplay) return;
-    ((AnimatedPuyo *)fallingPuyo)->flushAnimations(ANIMATION_H);
-    ((AnimatedPuyo *)companionPuyo)->flushAnimations(ANIMATION_H);
-	((AnimatedPuyo *)fallingPuyo)->addAnimation(new MovingHAnimation(*(AnimatedPuyo *)fallingPuyo, TSIZE, 4));
-    ((AnimatedPuyo *)companionPuyo)->addAnimation(new MovingHAnimation(*(AnimatedPuyo *)companionPuyo, TSIZE, 4));
+    ((AnimatedPuyo *)fallingFlobo)->flushAnimations(ANIMATION_H);
+    ((AnimatedPuyo *)companionFlobo)->flushAnimations(ANIMATION_H);
+	((AnimatedPuyo *)fallingFlobo)->addAnimation(new MovingHAnimation(*(AnimatedPuyo *)fallingFlobo, TSIZE, 4));
+    ((AnimatedPuyo *)companionFlobo)->addAnimation(new MovingHAnimation(*(AnimatedPuyo *)companionFlobo, TSIZE, 4));
 }
 
-void PuyoView::fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
+void PuyoView::fallingsDidMoveRight(Flobo *fallingFlobo, Flobo *companionFlobo)
 {
     if (!haveDisplay) return;
-    ((AnimatedPuyo *)fallingPuyo)->flushAnimations(ANIMATION_H);
-    ((AnimatedPuyo *)companionPuyo)->flushAnimations(ANIMATION_H);
-	((AnimatedPuyo *)fallingPuyo)->addAnimation(new MovingHAnimation(*(AnimatedPuyo *)fallingPuyo, -TSIZE, 4));
-    ((AnimatedPuyo *)companionPuyo)->addAnimation(new MovingHAnimation(*(AnimatedPuyo *)companionPuyo, -TSIZE, 4));
+    ((AnimatedPuyo *)fallingFlobo)->flushAnimations(ANIMATION_H);
+    ((AnimatedPuyo *)companionFlobo)->flushAnimations(ANIMATION_H);
+	((AnimatedPuyo *)fallingFlobo)->addAnimation(new MovingHAnimation(*(AnimatedPuyo *)fallingFlobo, -TSIZE, 4));
+    ((AnimatedPuyo *)companionFlobo)->addAnimation(new MovingHAnimation(*(AnimatedPuyo *)companionFlobo, -TSIZE, 4));
 }
 
-void PuyoView::fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo)
+void PuyoView::fallingsDidFallingStep(Flobo *fallingFlobo, Flobo *companionFlobo)
 {
     if (!haveDisplay) return;
-    ((AnimatedPuyo *)fallingPuyo)->flushAnimations(ANIMATION_V);
-    ((AnimatedPuyo *)companionPuyo)->flushAnimations(ANIMATION_V);
-	((AnimatedPuyo *)fallingPuyo)->addAnimation(new MovingVAnimation(*(AnimatedPuyo *)fallingPuyo, -TSIZE/2, 4));
-    ((AnimatedPuyo *)companionPuyo)->addAnimation(new MovingVAnimation(*(AnimatedPuyo *)companionPuyo, -TSIZE/2, 4));
+    ((AnimatedPuyo *)fallingFlobo)->flushAnimations(ANIMATION_V);
+    ((AnimatedPuyo *)companionFlobo)->flushAnimations(ANIMATION_V);
+	((AnimatedPuyo *)fallingFlobo)->addAnimation(new MovingVAnimation(*(AnimatedPuyo *)fallingFlobo, -TSIZE/2, 4));
+    ((AnimatedPuyo *)companionFlobo)->addAnimation(new MovingVAnimation(*(AnimatedPuyo *)companionFlobo, -TSIZE/2, 4));
 }
 
-void PuyoView::companionDidTurn(PuyoPuyo *companionPuyo, PuyoPuyo *fallingPuyo, bool counterclockwise)
+void PuyoView::companionDidTurn(Flobo *companionFlobo, Flobo *fallingFlobo, bool counterclockwise)
 {
     if (!haveDisplay) return;
-    if ((companionPuyo != NULL) && (fallingPuyo != NULL)) { // Just to be sure of what we get if data comes from network
-        ((AnimatedPuyo *)companionPuyo)->setPartner(((AnimatedPuyo *)fallingPuyo));
-        ((AnimatedPuyo *)companionPuyo)->flushAnimations(ANIMATION_ROTATE);
-        ((AnimatedPuyo *)companionPuyo)->addAnimation(new TurningAnimation(*(AnimatedPuyo *)companionPuyo,
+    if ((companionFlobo != NULL) && (fallingFlobo != NULL)) { // Just to be sure of what we get if data comes from network
+        ((AnimatedPuyo *)companionFlobo)->setPartner(((AnimatedPuyo *)fallingFlobo));
+        ((AnimatedPuyo *)companionFlobo)->flushAnimations(ANIMATION_ROTATE);
+        ((AnimatedPuyo *)companionFlobo)->addAnimation(new TurningAnimation(*(AnimatedPuyo *)companionFlobo,
                                                                            counterclockwise));
     }
 }
 
-void PuyoView::puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow)
+void PuyoView::floboDidFall(Flobo *puyo, int originX, int originY, int nFalledBelow)
 {
     if (!haveDisplay) return;
     ((AnimatedPuyo *)puyo)->flushAnimations();
     ((AnimatedPuyo *)puyo)->addAnimation(new FallingAnimation(*(AnimatedPuyo *)puyo, originY, m_xOffset, m_yOffset, nFalledBelow));
 }
 
-void PuyoView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase)
+void PuyoView::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase)
 {
     if (!haveDisplay) return;
     double groupPadding = 0.;
     // Exploding puyo animation
     AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
-    for (int i = 0, j = puyoGroup.size() ; i < j ; i++) {
-        AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(puyoGroup[i]);
+    for (int i = 0, j = floboGroup.size() ; i < j ; i++) {
+        AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(floboGroup[i]);
         PuyoAnimation *newAnimation;
-        if (currentPuyo->getPuyoState() != PUYO_NEUTRAL)
-            newAnimation = new VanishAnimation(*currentPuyo, i*2 , m_xOffset, m_yOffset, synchronizer, i, puyoGroup.size(), groupNum, phase);
+        if (currentPuyo->getFloboState() != FLOBO_NEUTRAL)
+            newAnimation = new VanishAnimation(*currentPuyo, i*2 , m_xOffset, m_yOffset, synchronizer, i, floboGroup.size(), groupNum, phase);
         else
             newAnimation = new NeutralPopAnimation(*currentPuyo, i*2, synchronizer);
         currentPuyo->addAnimation(newAnimation);
-        // Compute the center of the vanishing puyos padding
+        // Compute the center of the vanishing flobos padding
         groupPadding += newAnimation->getPuyoSoundPadding();
     }
-    viewAnimations.add(new VanishSoundAnimation(phase, synchronizer, groupPadding / puyoGroup.size()));
+    viewAnimations.add(new VanishSoundAnimation(phase, synchronizer, groupPadding / floboGroup.size()));
     // "pastaga" management
     if (groupNum == 0) {
       static const char * sound_yahoohoo[7] = {
@@ -418,8 +418,8 @@ void PuyoView::puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNu
 void PuyoView::gameDidEndCycle()
 {
 	if (enemyGame != NULL) {
-		if (attachedGame->getNeutralPuyos() < 0)
-			enemyGame->increaseNeutralPuyos(- attachedGame->getNeutralPuyos());
+		if (attachedGame->getNeutralFlobos() < 0)
+			enemyGame->increaseNeutralFlobos(- attachedGame->getNeutralFlobos());
 	}
     GTLogTrace("NewMetaCycleStart");
     newMetaCycleStart = true;
@@ -446,11 +446,11 @@ void PuyoView::gameLost()
     attachedGame->getGameStat().is_winner = false;
     gameRunning = false;
     if (!haveDisplay) return;
-    for (int i = 0 ; i <= PUYODIMX ; i++) {
-        for (int j = 0 ; j <= PUYODIMY ; j++) {
-            if (attachedGame->getPuyoAt(i, j) != NULL) {
-                AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(attachedGame->getPuyoAt(i, j));
-                currentPuyo->addAnimation(new GameOverFallAnimation(*currentPuyo, (j - PUYODIMY) + abs((PUYODIMX / 2) - i) * 5));
+    for (int i = 0 ; i <= FLOBOBAN_DIMX ; i++) {
+        for (int j = 0 ; j <= FLOBOBAN_DIMY ; j++) {
+            if (attachedGame->getFloboAt(i, j) != NULL) {
+                AnimatedPuyo *currentPuyo = static_cast<AnimatedPuyo *>(attachedGame->getFloboAt(i, j));
+                currentPuyo->addAnimation(new GameOverFallAnimation(*currentPuyo, (j - FLOBOBAN_DIMY) + abs((FLOBOBAN_DIMX / 2) - i) * 5));
             }
         }
     }

@@ -1,5 +1,5 @@
-#ifndef PUYO_SERVERV2_SERVER_H
-#define PUYO_SERVERV2_SERVER_H
+#ifndef FLOBO_SERVERV2_SERVER_H
+#define FLOBO_SERVERV2_SERVER_H
 
 namespace flobopuyo {
 namespace server {
@@ -100,7 +100,7 @@ void Server::onIgpChat(ios_fc::Message &msg)
     ios_fc::Message *newMsg = mMbox.createMessage();
     try {
         newMsg->addBoolProperty("RELIABLE", true);
-        newMsg->addInt("CMD", PUYO_IGP_CHAT);
+        newMsg->addInt("CMD", FLOBO_IGP_CHAT);
         newMsg->addString("NAME", msg.getString("NAME"));
         newMsg->addString("MSG", msg.getString("MSG"));
         ios_fc::Dirigeable *dirNew = dynamic_cast<ios_fc::Dirigeable *>(newMsg);
@@ -172,7 +172,7 @@ void Server::onPeerUpdate(Peer *peer, int status)
         // Send a STATUSCHANGE message to the other peers
         ios_fc::Message *newMsg = mMbox.createMessage();
         newMsg->addBoolProperty("RELIABLE", true);
-        newMsg->addInt("CMD", PUYO_IGP_STATUSCHANGE);
+        newMsg->addInt("CMD", FLOBO_IGP_STATUSCHANGE);
         newMsg->addString("NAME", peer->name);
         newMsg->addInt("RANK", peer->rank);
         newMsg->addInt("STATUS", status);
@@ -193,7 +193,7 @@ void Server::onPeerDisconnect(Peer *peer) {
     // Build disconnect message
     ios_fc::Message *newMsg = mMbox.createMessage();
     newMsg->addBoolProperty("RELIABLE", true);
-    newMsg->addInt("CMD", PUYO_IGP_DISCONNECT);
+    newMsg->addInt("CMD", FLOBO_IGP_DISCONNECT);
     newMsg->addString("NAME", peer->name);
     ios_fc::Dirigeable *dirNew = dynamic_cast<ios_fc::Dirigeable *>(newMsg);
     dirNew->addPeerAddress("ADDR", peer->addr);

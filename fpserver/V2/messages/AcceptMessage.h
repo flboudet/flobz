@@ -14,7 +14,7 @@ public:
     AcceptMessage(ios_fc::MessageBox &mbox) {
         msg = mbox.createMessage();
         msg->addBoolProperty("RELIABLE", true);
-        msg->addInt("CMD", PUYO_IGP_ACCEPT);
+        msg->addInt("CMD", FLOBO_IGP_ACCEPT);
     }
 
     ~AcceptMessage() {

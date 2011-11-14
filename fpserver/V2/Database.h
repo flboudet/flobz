@@ -1,5 +1,5 @@
-#ifndef PUYO_SERVERV2_DATABASE_H
-#define PUYO_SERVERV2_DATABASE_H
+#ifndef FLOBO_SERVERV2_DATABASE_H
+#define FLOBO_SERVERV2_DATABASE_H
 
 namespace flobopuyo {
 namespace server {

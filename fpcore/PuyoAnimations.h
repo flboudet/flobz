@@ -31,7 +31,7 @@ void EventFX(const char *name, float x, float y, int player);
 #include <stdlib.h>
 #include <math.h>
 #include "drawcontext.h"
-#include "PuyoGame.h"
+#include "FloboGame.h"
 
 class AnimatedPuyo;
 
@@ -60,7 +60,7 @@ protected:
     int m_tag;
 };
 
-/* Abstract animation class for puyos */
+/* Abstract animation class for flobos */
 class PuyoAnimation : public Animation{
 public:
     PuyoAnimation(AnimatedPuyo &puyo):attachedPuyo(puyo) {}
@@ -100,7 +100,7 @@ class NeutralAnimation : public PuyoAnimation {
 /* Companion turning around main puyo animation */
 class TurningAnimation : public PuyoAnimation {
 public:
-    TurningAnimation(AnimatedPuyo &companionPuyo, bool counterclockwise);
+    TurningAnimation(AnimatedPuyo &companionFlobo, bool counterclockwise);
     void cycle();
 private:
     int cpt;

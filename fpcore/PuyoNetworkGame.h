@@ -27,61 +27,61 @@
 #define PUYONETWORKGAME_H
 
 #include <map>
-#include "PuyoGame.h"
+#include "FloboGame.h"
 #include "ios_messagebox.h"
 
 using namespace ios_fc;
 
-class PuyoNetworkGame : public PuyoGame, MessageListener {
+class PuyoNetworkGame : public FloboGame, MessageListener {
 public:
-    PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox, int gameId = 0);
+    PuyoNetworkGame(FloboFactory *attachedFactory, MessageBox &msgBox, int gameId = 0);
     ~PuyoNetworkGame();
 
     virtual void onMessage(Message &);
 
     virtual void cycle();
 
-    virtual PuyoPuyo *getPuyoAt(int X, int Y) const;
+    virtual Flobo *getFloboAt(int X, int Y) const;
 
-    // List access to the PuyoPuyo objects
-    virtual int getPuyoCount() const;
-    virtual PuyoPuyo *getPuyoAtIndex(int index) const;
+    // List access to the Flobo objects
+    virtual int getFloboCount() const;
+    virtual Flobo *getFloboAtIndex(int index) const;
 
-    virtual PuyoState getNextFalling();
-    virtual PuyoState getNextCompanion();
+    virtual FloboState getNextFalling();
+    virtual FloboState getNextCompanion();
 
-    virtual PuyoState getCompanionState() const;
-    virtual PuyoState getFallingState() const;
+    virtual FloboState getCompanionState() const;
+    virtual FloboState getFallingState() const;
     virtual int getFallingX() const;
     virtual int getFallingY() const;
 
     virtual int getFallingCompanionDir() const;
-    virtual PuyoPuyo *getFallingPuyo() const;
+    virtual Flobo *getFallingFlobo() const;
 
-    virtual void increaseNeutralPuyos(int incr);
-    virtual int getNeutralPuyos() const;
+    virtual void increaseNeutralFlobos(int incr);
+    virtual int getNeutralFlobos() const;
     virtual void dropNeutrals();
     virtual bool isGameRunning() const;
     virtual bool isEndOfCycle() const;
     virtual int getColumnHeigth(int colNum) const;
     virtual int getMaxColumnHeight() const;
-    virtual int getSamePuyoAround(int X, int Y, PuyoState color);
+    virtual int getSameFloboAround(int X, int Y, FloboState color);
     virtual int getSemiMove() const;
     virtual int  getComboPhase() const { return comboPhase; }
 private:
     void synchronizeState(Message &message);
-    void setPuyoAt(int X, int Y, PuyoPuyo *newPuyo);
+    void setPuyoAt(int X, int Y, Flobo *newPuyo);
     void synchronizePuyo(Buffer<int> buffer);
-    PuyoPuyo *findPuyo(int puyoID);
-    PuyoPuyo *puyoCells[PUYODIMX * (PUYODIMY+1)];
-    PuyoState nextFalling, nextCompanion;
-    PuyoPuyo *fakePuyo;
+    Flobo *findPuyo(int floboID);
+    Flobo *puyoCells[FLOBOBAN_DIMX * (FLOBOBAN_DIMY+1)];
+    FloboState nextFalling, nextCompanion;
+    Flobo *fakePuyo;
     MessageBox &msgBox;
     int gameId;
-    AdvancedBuffer<PuyoPuyo *> puyoVector;
-    std::map<int, PuyoPuyo *> m_puyoMap;
+    AdvancedBuffer<Flobo *> puyoVector;
+    std::map<int, Flobo *> m_puyoMap;
     int semiMove;
-    int neutralPuyos, sentBadPuyos;
+    int neutralFlobos, sentBadPuyos;
     bool gameRunning;
     int comboPhase;
 };

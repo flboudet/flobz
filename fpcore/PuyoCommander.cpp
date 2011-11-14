@@ -113,7 +113,7 @@ PuyoSetThemeFactory::PuyoSetThemeFactory(ThemeManager &themeManager)
 
 PuyoSetTheme *PuyoSetThemeFactory::create(const std::string &name)
 {
-    return m_themeManager.createPuyoSetTheme(name);
+    return m_themeManager.createFloboSetTheme(name);
 }
 
 void PuyoSetThemeFactory::destroy(PuyoSetTheme *res)
@@ -392,7 +392,7 @@ PuyoSetThemeRef PuyoCommander::getPreferedPuyoSetTheme()
 const std::string &PuyoCommander::getPreferedPuyoSetThemeName() const
 {
     if (m_defaultPuyoSetThemeName == "") {
-        m_defaultPuyoSetThemeName = m_preferencesManager->getStrPreference ("puyoset_theme", getDefaultPuyoSetThemeName().c_str());
+        m_defaultPuyoSetThemeName = m_preferencesManager->getStrPreference ("floboset_theme", getDefaultPuyoSetThemeName().c_str());
     }
     return m_defaultPuyoSetThemeName;
 }
@@ -408,7 +408,7 @@ const std::string PuyoCommander::getDefaultPuyoSetThemeName() const
 void PuyoCommander::setPreferedPuyoSetThemeName(const char *name)
 {
     m_defaultPuyoSetThemeName = name;
-    m_preferencesManager->setStrPreference ("puyoset_theme", name);
+    m_preferencesManager->setStrPreference ("floboset_theme", name);
 }
 
 const std::vector<std::string> &PuyoCommander::getPuyoSetThemeList() const

@@ -36,7 +36,7 @@ void PuyoServerV1::onMessage(Message &msg)
 
         switch (msg.getInt("CMD")) {
             // A client will send an alive message periodically to inform the server it is still connected
-            case PUYO_IGP_ALIVE:
+            case FLOBO_IGP_ALIVE:
             {
                 GamePeer *currentPeer = getPeer(address);
                 if (currentPeer != NULL)
@@ -46,13 +46,13 @@ void PuyoServerV1::onMessage(Message &msg)
                 break;
                 }
             // A client will send a chat message to communicate with the other connected clients
-            case PUYO_IGP_CHAT:
+            case FLOBO_IGP_CHAT:
                 printf("Message de %s: %s\n", (const char *)msg.getString("NAME"), (const char *)msg.getString("MSG"));
             {
                 Message *newMsg = mbox.createMessage();
                 try {
                     newMsg->addBoolProperty("RELIABLE", true);
-                    newMsg->addInt("CMD", PUYO_IGP_CHAT);
+                    newMsg->addInt("CMD", FLOBO_IGP_CHAT);
                     newMsg->addString("NAME", msg.getString("NAME"));
                     newMsg->addString("MSG", msg.getString("MSG"));
                     Dirigeable *dirNew = dynamic_cast<Dirigeable *>(newMsg);
@@ -81,7 +81,7 @@ void PuyoServerV1::idle()
             // Build disconnect message
             Message *newMsg = mbox.createMessage();
             newMsg->addBoolProperty("RELIABLE", true);
-            newMsg->addInt("CMD", PUYO_IGP_DISCONNECT);
+            newMsg->addInt("CMD", FLOBO_IGP_DISCONNECT);
             newMsg->addString("NAME", currentPeer->name);
             Dirigeable *dirNew = dynamic_cast<Dirigeable *>(newMsg);
             dirNew->addPeerAddress("ADDR", currentPeer->addr);
@@ -129,7 +129,7 @@ void PuyoServerV1::connectPeer(PeerAddress addr, int fpipVersion, const String n
         // Send accept message
         Message *acceptMsg = mbox.createMessage();
         acceptMsg->addBoolProperty("RELIABLE", true);
-        acceptMsg->addInt("CMD", PUYO_IGP_ACCEPT);
+        acceptMsg->addInt("CMD", FLOBO_IGP_ACCEPT);
         Dirigeable *dirAccept = dynamic_cast<Dirigeable *>(acceptMsg);
         dirAccept->setPeerAddress(addr);
         acceptMsg->send();
@@ -144,7 +144,7 @@ void PuyoServerV1::connectPeer(PeerAddress addr, int fpipVersion, const String n
         for (int i = 0, j = peers.size() ; i < j ; i++) {
             Message *newMsg = mbox.createMessage();
             newMsg->addBoolProperty("RELIABLE", true);
-            newMsg->addInt("CMD", PUYO_IGP_CONNECT);
+            newMsg->addInt("CMD", FLOBO_IGP_CONNECT);
             newMsg->addString("NAME", peers[i]->name);
             newMsg->addInt("STATUS", peers[i]->status);
             Dirigeable *dirNew = dynamic_cast<Dirigeable *>(newMsg);
@@ -159,7 +159,7 @@ void PuyoServerV1::connectPeer(PeerAddress addr, int fpipVersion, const String n
         // Envoyer l'info de connexion a tous les peers
         Message *newMsg = mbox.createMessage();
         newMsg->addBoolProperty("RELIABLE", true);
-        newMsg->addInt("CMD", PUYO_IGP_CONNECT);
+        newMsg->addInt("CMD", FLOBO_IGP_CONNECT);
         newMsg->addString("NAME", name);
         newMsg->addInt("STATUS", status);
         Dirigeable *dirNew = dynamic_cast<Dirigeable *>(newMsg);
@@ -175,7 +175,7 @@ void PuyoServerV1::connectPeer(PeerAddress addr, int fpipVersion, const String n
         // Send deny message
         Message *denyMsg = mbox.createMessage();
         denyMsg->addBoolProperty("RELIABLE", true);
-        denyMsg->addInt("CMD", PUYO_IGP_DENY);
+        denyMsg->addInt("CMD", FLOBO_IGP_DENY);
         denyMsg->addString("MSG", denyErrorString);
         Dirigeable *dirDeny = dynamic_cast<Dirigeable *>(denyMsg);
         dirDeny->setPeerAddress(addr);
@@ -192,7 +192,7 @@ void PuyoServerV1::updatePeer(GamePeer *peer, int status)
         // Send a STATUSCHANGE message to the other peers
         Message *newMsg = mbox.createMessage();
         newMsg->addBoolProperty("RELIABLE", true);
-        newMsg->addInt("CMD", PUYO_IGP_STATUSCHANGE);
+        newMsg->addInt("CMD", FLOBO_IGP_STATUSCHANGE);
         newMsg->addString("NAME", peer->name);
         newMsg->addInt("STATUS", status);
         Dirigeable *dirNew = dynamic_cast<Dirigeable *>(newMsg);

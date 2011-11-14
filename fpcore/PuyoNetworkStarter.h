@@ -32,13 +32,13 @@
 #include "PuyoNetworkView.h"
 #include "ChatBox.h"
 
-class PuyoNetworkGameFactory : public PuyoGameFactory {
+class PuyoNetworkGameFactory : public FloboGameFactory {
 public:
-    PuyoNetworkGameFactory(PuyoRandomSystem *attachedRandom, MessageBox &msgBox, int gameId): attachedRandom(attachedRandom), msgBox(msgBox), gameId(gameId) {}
-    PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory);
+    PuyoNetworkGameFactory(RandomSystem *attachedRandom, MessageBox &msgBox, int gameId): attachedRandom(attachedRandom), msgBox(msgBox), gameId(gameId) {}
+    FloboGame *createFloboGame(FloboFactory *attachedFloboFactory);
     int getGameId() { return gameId; }
 private:
-    PuyoRandomSystem *attachedRandom;
+    RandomSystem *attachedRandom;
     MessageBox &msgBox;
     int gameId;
 };
@@ -68,9 +68,9 @@ protected:
 private:
     void sendAliveMsg();
     PuyoSetTheme *attachedPuyoThemeSet; // optional
-    std::auto_ptr<PuyoRandomSystem> attachedRandom;
+    std::auto_ptr<RandomSystem> attachedRandom;
     ios_fc::MessageBox *mbox;
-    std::auto_ptr<PuyoLocalGameFactory> attachedLocalGameFactory;
+    std::auto_ptr<FloboLocalGameFactory> attachedLocalGameFactory;
     std::auto_ptr<PuyoNetworkGameFactory> attachedNetworkGameFactory;
 protected:
     std::auto_ptr<PuyoNetworkView> localArea;

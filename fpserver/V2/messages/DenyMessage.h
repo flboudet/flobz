@@ -14,7 +14,7 @@ public:
     DenyMessage(ios_fc::MessageBox &mbox, const ios_fc::String &errorString, const ios_fc::String &errorStringMore) {
         msg = mbox.createMessage();
         msg->addBoolProperty("RELIABLE", true);
-        msg->addInt("CMD", PUYO_IGP_DENY);
+        msg->addInt("CMD", FLOBO_IGP_DENY);
         msg->addString("MSG", errorString);
         msg->addString("MSG_MORE", errorStringMore);
     }

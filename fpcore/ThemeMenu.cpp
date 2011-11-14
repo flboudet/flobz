@@ -126,8 +126,8 @@ PuyoThemePicturePreview::PuyoThemePicturePreview()
 
 static int imageForIndex(int i)
 {
-    if (i<NUMBER_OF_PUYO_EYES) return i;
-    else return 2*(NUMBER_OF_PUYO_EYES-1)-i;
+    if (i<NUMBER_OF_FLOBO_EYES) return i;
+    else return 2*(NUMBER_OF_FLOBO_EYES-1)-i;
 }
 
 void PuyoThemePicturePreview::draw(DrawTarget *dt)
@@ -144,7 +144,7 @@ void PuyoThemePicturePreview::draw(DrawTarget *dt)
       {
         IosRect rect = r;
         rect.x += (int16_t)((i*3*ONEPUYO)/4);
-        const PuyoTheme &t = curTheme->getPuyoTheme((PuyoState)(PUYO_BLUE+i));
+        const PuyoTheme &t = curTheme->getPuyoTheme((FloboState)(FLOBO_BLUE+i));
         dt->draw(t.getShadowSurface(), NULL, &rect);
         dt->draw(t.getPuyoSurfaceForValence(0), NULL, &rect);
         dt->draw(t.getEyeSurfaceForIndex(imageForIndex(eyes[i])), NULL, &rect);
@@ -171,7 +171,7 @@ void PuyoThemePicturePreview::idle(double currentTime)
         {
             refresh = true;
             eyes[i]++;
-            if (eyes[i] > 2*(NUMBER_OF_PUYO_EYES-1)) eyes[i] = 0;
+            if (eyes[i] > 2*(NUMBER_OF_FLOBO_EYES-1)) eyes[i] = 0;
         }
         else
         {

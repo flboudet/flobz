@@ -1,5 +1,5 @@
-#ifndef PUYO_SCORING_H
-#define PUYO_SCORING_H
+#ifndef FLOBO_SCORING_H
+#define FLOBO_SCORING_H
 
 inline int countPoints(int groupSize, int phase)
 {

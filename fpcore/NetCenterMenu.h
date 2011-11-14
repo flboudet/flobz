@@ -41,13 +41,13 @@ class NetCenterMenu;
 
 class NetCenterDialogMenu : public SliderContainer {
 public:
-    NetCenterDialogMenu(NetCenterMenu *targetMenu, PuyoGameInvitation &associatedInvitation, String title, String message, String optLine, bool hasAcceptButton, bool hasCancelButton=true);
+    NetCenterDialogMenu(NetCenterMenu *targetMenu, FloboGameInvitation &associatedInvitation, String title, String message, String optLine, bool hasAcceptButton, bool hasCancelButton=true);
     virtual ~NetCenterDialogMenu();
     void build();
     // Notification
     virtual void eventOccured(event_manager::GameControlEvent *event);
 public:
-    PuyoGameInvitation associatedInvitation;
+    FloboGameInvitation associatedInvitation;
 private:
     class NetCenterDialogMenuAction : public Action {
     public:
@@ -129,10 +129,10 @@ public:
     void onPlayerConnect(String playerName, PeerAddress playerAddress);
     void onPlayerDisconnect(String playerName, PeerAddress playerAddress);
     void onPlayerUpdated(String playerName, PeerAddress playerAddress);
-    void onGameInvitationReceived(PuyoGameInvitation &invitation);
-    void onGameInvitationCanceledReceived(PuyoGameInvitation &invitation);
-    void onGameAcceptedNegociationPending(PuyoGameInvitation &invitation);
-    void onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation);
+    void onGameInvitationReceived(FloboGameInvitation &invitation);
+    void onGameInvitationCanceledReceived(FloboGameInvitation &invitation);
+    void onGameAcceptedNegociationPending(FloboGameInvitation &invitation);
+    void onGameGrantedWithMessagebox(MessageBox *mbox, FloboGameInvitation &invitation);
     void grantCurrentGame();
     void cancelCurrentGame();
     void cycle();

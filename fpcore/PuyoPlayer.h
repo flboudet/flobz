@@ -27,7 +27,7 @@
 #define PUYOPLAYER_H
 
 #include "PuyoView.h"
-#include "PuyoGame.h"
+#include "FloboGame.h"
 #include "GameControls.h"
 
 class PuyoPlayer {
@@ -38,7 +38,7 @@ public:
     virtual ~PuyoPlayer() {}
 protected:
     PuyoView &targetView;
-    PuyoGame *attachedGame;
+    FloboGame *attachedGame;
 };
 
 class PuyoNullPlayer : public PuyoPlayer {

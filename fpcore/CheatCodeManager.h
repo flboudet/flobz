@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _PUYO_CHEAT_CODE_MANAGER_H
-#define _PUYO_CHEAT_CODE_MANAGER_H
+#ifndef _FLOBO_CHEAT_CODE_MANAGER_H
+#define _FLOBO_CHEAT_CODE_MANAGER_H
 
 #include "gameui.h"
 #include "GameControls.h"
@@ -41,5 +41,5 @@ private:
     int currentPosition;
 };
 
-#endif // _PUYO_CHEAT_CODE_MANAGER_H
+#endif // _FLOBO_CHEAT_CODE_MANAGER_H
 

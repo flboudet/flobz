@@ -27,20 +27,20 @@
 #define _ANIMATEDPUYO
 
 #include "ios_memory.h"
-#include "PuyoGame.h"
+#include "FloboGame.h"
 #include "PuyoAnimations.h"
 
 class PuyoView;
 class PuyoTheme;
 class PuyoSetTheme;
 
-class AnimatedPuyo : public PuyoPuyo {
+class AnimatedPuyo : public Flobo {
 public:
-    enum AnimatedPuyoState {
-        PUYO_NORMAL,
-        PUYO_CRUNSHED
+    enum AnimatedFloboState {
+        FLOBO_NORMAL,
+        FLOBO_CRUNSHED
     };
-    AnimatedPuyo(PuyoState state, PuyoSetTheme *themeSet, PuyoView *attachedView);
+    AnimatedPuyo(FloboState state, PuyoSetTheme *themeSet, PuyoView *attachedView);
     virtual ~AnimatedPuyo();
     void addAnimation(PuyoAnimation *animation);
     PuyoAnimation * getCurrentAnimation() const;
@@ -79,17 +79,17 @@ private:
     bool m_displayEyes;
 };
 
-class AnimatedPuyoFactory : public PuyoFactory {
+class AnimatedFloboFactory : public FloboFactory {
 public:
-    AnimatedPuyoFactory(PuyoView *attachedView);
-    virtual ~AnimatedPuyoFactory();
-    virtual PuyoPuyo *createPuyo(PuyoState state);
-    virtual void deletePuyo(PuyoPuyo *target);
+    AnimatedFloboFactory(PuyoView *attachedView);
+    virtual ~AnimatedFloboFactory();
+    virtual Flobo *createFlobo(FloboState state);
+    virtual void deleteFlobo(Flobo *target);
     void renderWalhalla(DrawTarget *dt);
     void cycleWalhalla();
     void setShowEyes(bool show) { m_showEyes = show; }
 private:
-    AdvancedBuffer<PuyoPuyo *> puyoWalhalla;
+    AdvancedBuffer<Flobo *> puyoWalhalla;
     PuyoView *attachedView;
     PuyoSetTheme *attachedThemeSet;
     bool m_showEyes;

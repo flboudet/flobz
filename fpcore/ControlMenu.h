@@ -1,5 +1,5 @@
-#ifndef PUYO_CONTROL_MENU_H
-#define PUYO_CONTROL_MENU_H
+#ifndef FLOBO_CONTROL_MENU_H
+#define FLOBO_CONTROL_MENU_H
 
 #include "gameui.h"
 #include "MainScreen.h"

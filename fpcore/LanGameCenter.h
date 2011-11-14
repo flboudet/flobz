@@ -47,17 +47,17 @@ public:
     virtual void onPlayerConnect(String playerName, PeerAddress playerAddress);
     virtual void onPlayerDisconnect(String playerName, PeerAddress playerAddress) {}
     virtual void onPlayerUpdated(String playerName, PeerAddress playerAddress) {}
-    virtual void onGameInvitationReceived(PuyoGameInvitation &invitation) {}
-    virtual void onGameInvitationCanceledReceived(PuyoGameInvitation &invitation) {}
-    virtual void onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation) {}
+    virtual void onGameInvitationReceived(FloboGameInvitation &invitation) {}
+    virtual void onGameInvitationCanceledReceived(FloboGameInvitation &invitation) {}
+    virtual void onGameGrantedWithMessagebox(MessageBox *mbox, FloboGameInvitation &invitation) {}
 protected:
-    void sendGameRequest(PuyoGameInvitation &invitation);
-    void sendGameAcceptInvitation(PuyoGameInvitation &invitation);
-    void sendGameCancelInvitation(PuyoGameInvitation &invitation);
+    void sendGameRequest(FloboGameInvitation &invitation);
+    void sendGameAcceptInvitation(FloboGameInvitation &invitation);
+    void sendGameCancelInvitation(FloboGameInvitation &invitation);
 private:
     void sendAliveMessage();
     void sendDisconnectMessage();
-    void grantGame(PuyoGameInvitation &invitation);
+    void grantGame(FloboGameInvitation &invitation);
     DatagramSocket socket;
     FPLANMessageBox mbox;
     const String name;
@@ -65,7 +65,7 @@ private:
     double timeMsBetweenTwoAliveMessages, lastAliveMessage;
     double timeMsBetweenTwoNetworkInterfacesDetection, lastNetworkInterfacesDetection;
     bool gameGranted;
-    PuyoGameInvitation grantedInvitation;
+    FloboGameInvitation grantedInvitation;
     int status;
     String opponentName;
 

@@ -31,14 +31,14 @@
 #include "AIPlayer.h"
 #include "GameWidget.h"
 
-class PuyoLocalGameFactory : public PuyoGameFactory {
+class FloboLocalGameFactory : public FloboGameFactory {
 public:
-    PuyoLocalGameFactory(PuyoRandomSystem *attachedRandom): attachedRandom(attachedRandom) {}
-    PuyoGame *createPuyoGame(PuyoFactory *attachedPuyoFactory) {
-        return new PuyoLocalGame(attachedRandom, attachedPuyoFactory);
+    FloboLocalGameFactory(RandomSystem *attachedRandom): attachedRandom(attachedRandom) {}
+    FloboGame *createFloboGame(FloboFactory *attachedFloboFactory) {
+        return new FloboLocalGame(attachedRandom, attachedFloboFactory);
     }
 private:
-    PuyoRandomSystem *attachedRandom;
+    RandomSystem *attachedRandom;
 };
 
 class TwoPlayerGameWidget : public GameWidget2P {
@@ -46,8 +46,8 @@ public:
     TwoPlayerGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, gameui::Action *gameOverAction = NULL);
 private:
     PuyoSetTheme &attachedPuyoThemeSet;
-    PuyoRandomSystem attachedRandom;
-    PuyoLocalGameFactory attachedGameFactory;
+    RandomSystem attachedRandom;
+    FloboLocalGameFactory attachedGameFactory;
     PuyoView areaA, areaB;
     PuyoEventPlayer controllerA, controllerB;
 };

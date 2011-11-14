@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _PUYO_PAUSE_MENU_H
-#define _PUYO_PAUSE_MENU_H
+#ifndef _FLOBO_PAUSE_MENU_H
+#define _FLOBO_PAUSE_MENU_H
 
 #include "gameui.h"
 #include "Frame.h"
@@ -78,5 +78,5 @@ private:
     gameui::Action *m_pauseAction;
 };
 
-#endif // _PUYO_PAUSE_MENU_H
+#endif // _FLOBO_PAUSE_MENU_H
 

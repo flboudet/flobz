@@ -55,14 +55,14 @@ void PuyoServerV2::onMessage(Message &msg) {
 
     switch (msg.getInt("CMD")) {
         // A client will send an alive message periodically to inform the server it is still connected
-        case PUYO_IGP_ALIVE:
+        case FLOBO_IGP_ALIVE:
             server->onIgpAlive(msg, address);
             break;
             // A client will send a chat message to communicate with the other connected clients
-        case PUYO_IGP_CHAT:
+        case FLOBO_IGP_CHAT:
             server->onIgpChat(msg);
             break;
-        case PUYO_IGP_GAME_OVER:
+        case FLOBO_IGP_GAME_OVER:
             server->onIgpGameOver(msg);
             break;
         default:

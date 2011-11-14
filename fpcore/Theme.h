@@ -29,15 +29,15 @@
 #include <string>
 #include <vector>
 #include "drawcontext.h"
-#include "PuyoGame.h"
+#include "FloboGame.h"
 
 // Theme Interfaces
 
-#define NUMBER_OF_PUYO_FACES 16
-#define NUMBER_OF_PUYO_CIRCLES 32
-#define NUMBER_OF_PUYO_EXPLOSIONS 4
-#define NUMBER_OF_PUYO_DISAPPEAR 4
-#define NUMBER_OF_PUYO_EYES 3
+#define NUMBER_OF_FLOBO_FACES 16
+#define NUMBER_OF_FLOBO_CIRCLES 32
+#define NUMBER_OF_FLOBO_EXPLOSIONS 4
+#define NUMBER_OF_FLOBO_DISAPPEAR 4
+#define NUMBER_OF_FLOBO_EYES 3
 
 #define NUMBER_OF_PUYOS 5
 
@@ -85,7 +85,7 @@ class PuyoSetTheme : public ThemeDescriptionInterface {
 public:
     virtual ~PuyoSetTheme(void) {}
     // Accessor to the PuyoThemes
-    virtual const PuyoTheme & getPuyoTheme(PuyoState state) const = 0;
+    virtual const PuyoTheme & getPuyoTheme(FloboState state) const = 0;
 };
 
 /**
@@ -147,7 +147,7 @@ public:
 class ThemeManager {
 public:
     virtual ~ ThemeManager() {}
-    virtual PuyoSetTheme * createPuyoSetTheme(const std::string &themeName) = 0;
+    virtual PuyoSetTheme * createFloboSetTheme(const std::string &themeName) = 0;
     virtual LevelTheme   * createLevelTheme(const std::string &themeName) = 0;
 
     virtual const std::vector<std::string> & getPuyoSetThemeList() = 0;

@@ -35,16 +35,16 @@ using namespace ios_fc;
 
 class PuyoNetworkView : public PuyoView {
   public:
-    PuyoNetworkView(PuyoGameFactory *attachedPuyoGameFactory, MessageBox *mbox, int gameId)
-        : PuyoView(attachedPuyoGameFactory),
+    PuyoNetworkView(FloboGameFactory *attachedFloboGameFactory, MessageBox *mbox, int gameId)
+        : PuyoView(attachedFloboGameFactory),
           mbox(mbox), gameId(gameId), badPuyos(0), lastFullMessage(-1) {}
 
-    PuyoNetworkView(PuyoGameFactory *attachedPuyoGameFactory,
+    PuyoNetworkView(FloboGameFactory *attachedFloboGameFactory,
             int playerId,
 		    PuyoSetTheme *attachedPuyoThemeSet,
             LevelTheme *attachedLevelTheme,
 		    MessageBox *mbox, int gameId)
-        : PuyoView(attachedPuyoGameFactory, playerId, attachedPuyoThemeSet, attachedLevelTheme),
+        : PuyoView(attachedFloboGameFactory, playerId, attachedPuyoThemeSet, attachedLevelTheme),
           mbox(mbox), gameId(gameId), badPuyos(0), lastFullMessage(-1) {}
 
     void cycleGame();
@@ -55,14 +55,14 @@ class PuyoNetworkView : public PuyoView {
     void rotateRight();
 
     // GameListener methods
-    virtual void fallingsDidMoveLeft(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
-	virtual void fallingsDidMoveRight(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
-	virtual void fallingsDidFallingStep(PuyoPuyo *fallingPuyo, PuyoPuyo *companionPuyo);
-    void gameDidAddNeutral(PuyoPuyo *neutralPuyo, int neutralIndex, int totalNeutral);
+    virtual void fallingsDidMoveLeft(Flobo *fallingFlobo, Flobo *companionFlobo);
+	virtual void fallingsDidMoveRight(Flobo *fallingFlobo, Flobo *companionFlobo);
+	virtual void fallingsDidFallingStep(Flobo *fallingFlobo, Flobo *companionFlobo);
+    void gameDidAddNeutral(Flobo *neutralFlobo, int neutralIndex, int totalNeutral);
     void gameDidEndCycle();
-    void companionDidTurn(PuyoPuyo *companionPuyo, PuyoPuyo *fallingPuyo, bool counterclockwise);
-    void puyoDidFall(PuyoPuyo *puyo, int originX, int originY, int nFalledBelow);
-    void puyoWillVanish(AdvancedBuffer<PuyoPuyo *> &puyoGroup, int groupNum, int phase);
+    void companionDidTurn(Flobo *companionFlobo, Flobo *fallingFlobo, bool counterclockwise);
+    void floboDidFall(Flobo *puyo, int originX, int originY, int nFalledBelow);
+    void floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase);
     virtual void gameWin();
     virtual void gameLost();
 
@@ -87,19 +87,19 @@ protected:
 
 class PuyoInternetNetworkView : public PuyoNetworkView {
     public:
-        PuyoInternetNetworkView(PuyoGameFactory *attachedPuyoGameFactory, MessageBox *mbox, int gameId,
+        PuyoInternetNetworkView(FloboGameFactory *attachedFloboGameFactory, MessageBox *mbox, int gameId,
                                 FPServerIGPMessageBox *igpbox)
-          : PuyoNetworkView(attachedPuyoGameFactory, mbox, gameId)
+          : PuyoNetworkView(attachedFloboGameFactory, mbox, gameId)
           , igpbox(igpbox)
         {}
 
-        PuyoInternetNetworkView(PuyoGameFactory *attachedPuyoGameFactory,
+        PuyoInternetNetworkView(FloboGameFactory *attachedFloboGameFactory,
                                 int playerId,
                                 PuyoSetTheme *attachedPuyoThemeSet,
                                 LevelTheme *attachedLevelTheme,
                                 MessageBox *mbox, int gameId,
                                 FPServerIGPMessageBox *igpbox)
-          : PuyoNetworkView(attachedPuyoGameFactory,
+          : PuyoNetworkView(attachedFloboGameFactory,
                              playerId,
                              attachedPuyoThemeSet,
                              attachedLevelTheme,

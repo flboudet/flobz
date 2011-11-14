@@ -132,23 +132,23 @@ public:
     virtual IosSurface *getShrinkingSurfaceForIndex(int index) const;
     virtual IosSurface *getExplodingSurfaceForIndex(int index) const;
 private:
-    mutable IosSurface* m_faces[NUMBER_OF_PUYO_FACES][MAX_COMPRESSED];
-    mutable IosSurfaceRef m_baseFaces[NUMBER_OF_PUYO_FACES];
+    mutable IosSurface* m_faces[NUMBER_OF_FLOBO_FACES][MAX_COMPRESSED];
+    mutable IosSurfaceRef m_baseFaces[NUMBER_OF_FLOBO_FACES];
 
-    mutable IosSurface* m_eyes[NUMBER_OF_PUYO_EYES][MAX_COMPRESSED];
-    mutable IosSurfaceRef m_baseEyes[NUMBER_OF_PUYO_EYES];
+    mutable IosSurface* m_eyes[NUMBER_OF_FLOBO_EYES][MAX_COMPRESSED];
+    mutable IosSurfaceRef m_baseEyes[NUMBER_OF_FLOBO_EYES];
 
-    mutable IosSurface* m_circles[NUMBER_OF_PUYO_CIRCLES];
+    mutable IosSurface* m_circles[NUMBER_OF_FLOBO_CIRCLES];
     mutable IosSurfaceRef m_baseCircle;
 
     mutable IosSurface *m_shadows[MAX_COMPRESSED];
     mutable IosSurfaceRef m_baseShadow;
 
-    mutable IosSurface *m_shrinking[NUMBER_OF_PUYO_DISAPPEAR];
-    mutable IosSurfaceRef m_baseShrinking[NUMBER_OF_PUYO_DISAPPEAR];
+    mutable IosSurface *m_shrinking[NUMBER_OF_FLOBO_DISAPPEAR];
+    mutable IosSurfaceRef m_baseShrinking[NUMBER_OF_FLOBO_DISAPPEAR];
 
-    mutable IosSurface *m_explosion[NUMBER_OF_PUYO_EXPLOSIONS];
-    mutable IosSurfaceRef m_baseExplosion[NUMBER_OF_PUYO_EXPLOSIONS];
+    mutable IosSurface *m_explosion[NUMBER_OF_FLOBO_EXPLOSIONS];
+    mutable IosSurfaceRef m_baseExplosion[NUMBER_OF_FLOBO_EXPLOSIONS];
 };
 
 class NeutralPuyoThemeImpl : public BasePuyoThemeImpl {
@@ -165,7 +165,7 @@ public:
 private:
     mutable IosSurface *m_faces[MAX_COMPRESSED];
     mutable IosSurfaceRef m_baseFace;
-    mutable IosSurfaceRef m_shrinking[NUMBER_OF_PUYO_DISAPPEAR];
+    mutable IosSurfaceRef m_shrinking[NUMBER_OF_FLOBO_DISAPPEAR];
 };
 
 class PuyoSetThemeImpl : public PuyoSetTheme {
@@ -176,7 +176,7 @@ public:
     virtual const std::string & getLocalizedName() const;
     virtual const std::string & getAuthor() const;
     virtual const std::string & getComments() const;
-    virtual const PuyoTheme & getPuyoTheme(PuyoState state) const;
+    virtual const PuyoTheme & getPuyoTheme(FloboState state) const;
 private:
     const PuyoSetThemeDescription &m_desc;
     std::auto_ptr<PuyoTheme> m_puyoThemes[NUMBER_OF_PUYOS_IN_SET];
@@ -258,14 +258,14 @@ private:
 class ThemeManagerImpl : public ThemeManager {
 public:
     ThemeManagerImpl(DataPathManager &dataPathManager);
-    virtual PuyoSetTheme * createPuyoSetTheme(const std::string &themeName);
+    virtual PuyoSetTheme * createFloboSetTheme(const std::string &themeName);
     virtual LevelTheme   * createLevelTheme(const std::string &themeName);
 
     virtual const std::vector<std::string> & getPuyoSetThemeList();
     virtual const std::vector<std::string> & getLevelThemeList();
 private:
     void loadThemePack(const std::string &path);
-    static void end_puyoset(GoomSL *gsl, GoomHash *global, GoomHash *local);
+    static void end_floboset(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void end_description(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void loadPuyobanDefinition(GoomSL *gsl, int playerId, PuyobanThemeDefinition &puyoban);

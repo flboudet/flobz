@@ -36,17 +36,17 @@ PuyoNetworkGame::~PuyoNetworkGame()
   msgBox.removeListener(this);
 }
 
-PuyoNetworkGame::PuyoNetworkGame(PuyoFactory *attachedFactory, MessageBox &msgBox, int gameId)
-  : PuyoGame(attachedFactory), nextFalling(PUYO_BLUE), nextCompanion(PUYO_BLUE),
+PuyoNetworkGame::PuyoNetworkGame(FloboFactory *attachedFactory, MessageBox &msgBox, int gameId)
+  : FloboGame(attachedFactory), nextFalling(FLOBO_BLUE), nextCompanion(FLOBO_BLUE),
     msgBox(msgBox), gameId(gameId), gameRunning(true), comboPhase(0)
 {
-    fakePuyo = attachedFactory->createPuyo(PUYO_FALLINGRED);
+    fakePuyo = attachedFactory->createFlobo(FLOBO_FALLINGRED);
     msgBox.addListener(this);
     semiMove = 0;
-    neutralPuyos = 0;
+    neutralFlobos = 0;
     sentBadPuyos = 0;
-    for (int i = 0 ; i < PUYODIMX ; i++) {
-		for (int j = 0 ; j <= PUYODIMY ; j++) {
+    for (int i = 0 ; i < FLOBOBAN_DIMX ; i++) {
+		for (int j = 0 ; j <= FLOBOBAN_DIMY ; j++) {
             setPuyoAt(i, j, NULL);
 		}
 	}
@@ -103,21 +103,21 @@ void PuyoNetworkGame::onMessage(Message &message)
 }
 
 void PuyoNetworkGame::synchronizePuyo(Buffer<int> buffer) {
-    int puyoID    = buffer[0];
+    int floboID    = buffer[0];
     int puyoState = buffer[1]; GTCheckInterval(puyoState, 0, 20, "puyoState is invalid");
-    int posX      = buffer[2]; GTCheckInterval(posX, 0, PUYODIMX, "Puyo X is invalid");
-    int posY      = buffer[3]; GTCheckInterval(posY, 0, PUYODIMY, "Puyo Y is invalid");
-    PuyoPuyo *puyo = findPuyo(puyoID);
+    int posX      = buffer[2]; GTCheckInterval(posX, 0, FLOBOBAN_DIMX, "Puyo X is invalid");
+    int posY      = buffer[3]; GTCheckInterval(posY, 0, FLOBOBAN_DIMY, "Puyo Y is invalid");
+    Flobo *puyo = findPuyo(floboID);
     if (puyo == NULL) {
-        puyo = attachedFactory->createPuyo((PuyoState)puyoState);
-        puyo->setID(puyoID);
+        puyo = attachedFactory->createFlobo((FloboState)puyoState);
+        puyo->setID(floboID);
         puyoVector.add(puyo);
-        m_puyoMap[puyoID] = puyo;
+        m_puyoMap[floboID] = puyo;
     }
     else {
-        puyo->setPuyoState((PuyoState)puyoState);
+        puyo->setFloboState((FloboState)puyoState);
     }
-    setPuyoAt(puyo->getPuyoX(), puyo->getPuyoY(), NULL);
+    setPuyoAt(puyo->getFloboX(), puyo->getFloboY(), NULL);
     setPuyoAt(posX, posY, puyo);
     puyo->setFlag(); // TODO: return puyo and to this in synchromessage
 }
@@ -126,28 +126,28 @@ void PuyoNetworkGame::synchronizeState(Message &message)
 {
     gameStat.points = message.getInt(SCORE);
     GTCheckInterval(gameStat.points, 0, 999999999, "points is invalid");
-    nextFalling = (PuyoState)(message.getInt(NEXT_F));
+    nextFalling = (FloboState)(message.getInt(NEXT_F));
     GTCheckInterval(nextFalling, 0, 20, "nextFalling is invalid");
-    nextCompanion = (PuyoState)(message.getInt(NEXT_C));
+    nextCompanion = (FloboState)(message.getInt(NEXT_C));
     GTCheckInterval(nextCompanion, 0, 20, "nextCompanion is invalid");
     semiMove = message.getInt(SEMI_MOVE);
 
     if (message.hasIntArray(PUYOS)) {
-        Buffer<int> puyos = message.getIntArray(PUYOS);
-        for (int i = 0; i+3 < puyos.size(); i += 4)
-            synchronizePuyo(puyos+i);
+        Buffer<int> flobos = message.getIntArray(PUYOS);
+        for (int i = 0; i+3 < flobos.size(); i += 4)
+            synchronizePuyo(flobos+i);
 
-        // Remove the puyos that were not flagged.
+        // Remove the flobos that were not flagged.
         for (int i = puyoVector.size() - 1 ; i >= 0 ; i--) {
-            PuyoPuyo *currentPuyo = puyoVector[i];
+            Flobo *currentPuyo = puyoVector[i];
             if (currentPuyo->getFlag()) {
                 currentPuyo->unsetFlag();
             }
             else {
-                setPuyoAt(currentPuyo->getPuyoX(), currentPuyo->getPuyoY(), NULL);
+                setPuyoAt(currentPuyo->getFloboX(), currentPuyo->getFloboY(), NULL);
                 puyoVector.removeAt(i);
                 m_puyoMap.erase(currentPuyo->getID());
-                attachedFactory->deletePuyo(currentPuyo);
+                attachedFactory->deleteFlobo(currentPuyo);
             }
         }
     }
@@ -158,7 +158,7 @@ void PuyoNetworkGame::synchronizeState(Message &message)
         if (addNeutrals.size() > 0) {
             for (int i = 0, j = addNeutrals.size() ; i+4 < j ; i += 5) {
                 synchronizePuyo(addNeutrals+i);
-                PuyoPuyo *neutral = findPuyo(addNeutrals[i]);
+                Flobo *neutral = findPuyo(addNeutrals[i]);
                 if (neutral != NULL)
                     for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                          iter != m_listeners.end() ; ++iter)
@@ -172,8 +172,8 @@ void PuyoNetworkGame::synchronizeState(Message &message)
             for (int i = 0, j = moveLeftBuffer.size() ; i+7 < j ; i += 8) {
                 synchronizePuyo(moveLeftBuffer+i);
                 synchronizePuyo(moveLeftBuffer+i+4);
-                PuyoPuyo *falling = findPuyo(moveLeftBuffer[i]);
-                PuyoPuyo *companion = findPuyo(moveLeftBuffer[i+4]);
+                Flobo *falling = findPuyo(moveLeftBuffer[i]);
+                Flobo *companion = findPuyo(moveLeftBuffer[i+4]);
                 if ((falling != NULL) && (companion != NULL)) {
                     for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                          iter != m_listeners.end() ; ++iter)
@@ -188,8 +188,8 @@ void PuyoNetworkGame::synchronizeState(Message &message)
             for (int i = 0, j = moveRightBuffer.size() ; i+7 < j ; i += 8) {
                 synchronizePuyo(moveRightBuffer+i);
                 synchronizePuyo(moveRightBuffer+i+4);
-                PuyoPuyo *falling = findPuyo(moveRightBuffer[i]);
-                PuyoPuyo *companion = findPuyo(moveRightBuffer[i+4]);
+                Flobo *falling = findPuyo(moveRightBuffer[i]);
+                Flobo *companion = findPuyo(moveRightBuffer[i+4]);
                 if ((falling != NULL) && (companion != NULL)) {
                     for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                          iter != m_listeners.end() ; ++iter)
@@ -204,12 +204,12 @@ void PuyoNetworkGame::synchronizeState(Message &message)
             for (int i = 0, j = fallingStepBuffer.size() ; i+7 < j ; i += 8) {
                 synchronizePuyo(fallingStepBuffer+i);
                 synchronizePuyo(fallingStepBuffer+i+4);
-                PuyoPuyo *fallingPuyo = findPuyo(fallingStepBuffer[i]);
-                PuyoPuyo *companionPuyo = findPuyo(fallingStepBuffer[i+4]);
-                if ((fallingPuyo != NULL) && (companionPuyo != NULL))
+                Flobo *fallingFlobo = findPuyo(fallingStepBuffer[i]);
+                Flobo *companionFlobo = findPuyo(fallingStepBuffer[i+4]);
+                if ((fallingFlobo != NULL) && (companionFlobo != NULL))
                     for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                          iter != m_listeners.end() ; ++iter)
-                        (*iter)->fallingsDidFallingStep(fallingPuyo, companionPuyo);
+                        (*iter)->fallingsDidFallingStep(fallingFlobo, companionFlobo);
             }
         }
     }
@@ -219,12 +219,12 @@ void PuyoNetworkGame::synchronizeState(Message &message)
             for (int i = 0, j = turnBuffer.size() ; i+8 < j ; i += 9) {
                 synchronizePuyo(turnBuffer+i);
                 synchronizePuyo(turnBuffer+i+4);
-                PuyoPuyo *fallingPuyo = findPuyo(turnBuffer[i]);
-                PuyoPuyo *companionPuyo = findPuyo(turnBuffer[i+4]);
-                if ((fallingPuyo != NULL) && (companionPuyo != NULL))
+                Flobo *fallingFlobo = findPuyo(turnBuffer[i]);
+                Flobo *companionFlobo = findPuyo(turnBuffer[i+4]);
+                if ((fallingFlobo != NULL) && (companionFlobo != NULL))
                     for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                          iter != m_listeners.end() ; ++iter)
-                        (*iter)->companionDidTurn(companionPuyo, fallingPuyo, turnBuffer[i+8]);
+                        (*iter)->companionDidTurn(companionFlobo, fallingFlobo, turnBuffer[i+8]);
             }
         }
     }
@@ -233,11 +233,11 @@ void PuyoNetworkGame::synchronizeState(Message &message)
         if (didFall.size() > 0) {
             for (int i = 0, j = didFall.size() ; i+6 < j ; i += 7) {
                 synchronizePuyo(didFall+i);
-                PuyoPuyo *didFallPuyo = findPuyo(didFall[i]);
+                Flobo *didFallPuyo = findPuyo(didFall[i]);
                 if (didFallPuyo != NULL)
                     for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                          iter != m_listeners.end() ; ++iter)
-                        (*iter)->puyoDidFall(didFallPuyo, didFall[i+4], didFall[i+5], didFall[i+6]);
+                        (*iter)->floboDidFall(didFallPuyo, didFall[i+4], didFall[i+5], didFall[i+6]);
             }
         }
     }
@@ -245,41 +245,41 @@ void PuyoNetworkGame::synchronizeState(Message &message)
         Buffer<int> willVanish= message.getIntArray(WILL_VANISH);
         if (willVanish.size() > 0) {
             int i = 0;
-            AdvancedBuffer<PuyoPuyo *> temporaryGroup;
+            AdvancedBuffer<Flobo *> temporaryGroup;
             while (i < willVanish.size()) {
                 temporaryGroup.clear();
                 int numPhase = willVanish[i++];
                 int groupNumber = willVanish[i++];
                 int numberOfPuyosInGroup = willVanish[i++];
                 for (int index = 0 ; index < numberOfPuyosInGroup ; index++) {
-                    PuyoPuyo *vanishedPuyo = findPuyo(willVanish[i + index]);
+                    Flobo *vanishedPuyo = findPuyo(willVanish[i + index]);
                     if (vanishedPuyo != NULL)
                         temporaryGroup.add(vanishedPuyo);
                 }
                 for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                      iter != m_listeners.end() ; ++iter)
-                (*iter)->puyoWillVanish(temporaryGroup, groupNumber, numPhase);
+                (*iter)->floboWillVanish(temporaryGroup, groupNumber, numPhase);
                 i += numberOfPuyosInGroup;
             }
         }
     }
     int badPuyos = message.getInt(NUMBER_BAD_PUYOS);
     if (badPuyos > sentBadPuyos) {
-        neutralPuyos = sentBadPuyos - badPuyos;
+        neutralFlobos = sentBadPuyos - badPuyos;
         for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
              iter != m_listeners.end() ; ++iter) {
             (*iter)->gameDidEndCycle();
         }
-        neutralPuyos = 0;
+        neutralFlobos = 0;
         sentBadPuyos = badPuyos;
     }
 
-    neutralPuyos = message.getInt(CURRENT_NEUTRALS);
+    neutralFlobos = message.getInt(CURRENT_NEUTRALS);
 }
 
-inline PuyoPuyo *PuyoNetworkGame::findPuyo(int puyoID)
+inline Flobo *PuyoNetworkGame::findPuyo(int floboID)
 {
-    std::map<int, PuyoPuyo *>::iterator found = m_puyoMap.find(puyoID);
+    std::map<int, Flobo *>::iterator found = m_puyoMap.find(floboID);
     if (found == m_puyoMap.end())
         return NULL;
     return found->second;
@@ -289,49 +289,49 @@ void PuyoNetworkGame::cycle()
 {
 }
 
-PuyoPuyo *PuyoNetworkGame::getPuyoAt(int X, int Y) const
+Flobo *PuyoNetworkGame::getFloboAt(int X, int Y) const
 {
-    if ((X >= PUYODIMX) || (Y >= PUYODIMY) || (X < 0) || (Y < 0))
+    if ((X >= FLOBOBAN_DIMX) || (Y >= FLOBOBAN_DIMY) || (X < 0) || (Y < 0))
 		return NULL;
-    return puyoCells[X + Y * PUYODIMX];
+    return puyoCells[X + Y * FLOBOBAN_DIMX];
 }
 
-void PuyoNetworkGame::setPuyoAt(int X, int Y, PuyoPuyo *newPuyo)
+void PuyoNetworkGame::setPuyoAt(int X, int Y, Flobo *newPuyo)
 {
-    puyoCells[X + Y * PUYODIMX] = newPuyo;
+    puyoCells[X + Y * FLOBOBAN_DIMX] = newPuyo;
     if (newPuyo != NULL)
-        newPuyo->setPuyoXY(X, Y);
+        newPuyo->setFloboXY(X, Y);
 }
 
-// List access to the PuyoPuyo objects
-int PuyoNetworkGame::getPuyoCount() const
+// List access to the Flobo objects
+int PuyoNetworkGame::getFloboCount() const
 {
     return puyoVector.size();
 }
 
-PuyoPuyo *PuyoNetworkGame::getPuyoAtIndex(int index) const
+Flobo *PuyoNetworkGame::getFloboAtIndex(int index) const
 {
     return puyoVector[index];
 }
 
-PuyoState PuyoNetworkGame::getNextFalling()
+FloboState PuyoNetworkGame::getNextFalling()
 {
     return nextFalling;
 }
 
-PuyoState PuyoNetworkGame::getNextCompanion()
+FloboState PuyoNetworkGame::getNextCompanion()
 {
     return nextCompanion;
 }
 
-PuyoState PuyoNetworkGame::getCompanionState() const
+FloboState PuyoNetworkGame::getCompanionState() const
 {
-    return PUYO_FALLINGRED;
+    return FLOBO_FALLINGRED;
 }
 
-PuyoState PuyoNetworkGame::getFallingState() const
+FloboState PuyoNetworkGame::getFallingState() const
 {
-    return PUYO_FALLINGRED;
+    return FLOBO_FALLINGRED;
 }
 
 int PuyoNetworkGame::getFallingX() const
@@ -349,18 +349,18 @@ int PuyoNetworkGame::getFallingCompanionDir() const
     return 1;
 }
 
-PuyoPuyo *PuyoNetworkGame::getFallingPuyo() const
+Flobo *PuyoNetworkGame::getFallingFlobo() const
 {
     return fakePuyo;
 }
 
-void PuyoNetworkGame::increaseNeutralPuyos(int incr)
+void PuyoNetworkGame::increaseNeutralFlobos(int incr)
 {
 }
 
-int PuyoNetworkGame::getNeutralPuyos() const
+int PuyoNetworkGame::getNeutralFlobos() const
 {
-    return neutralPuyos;
+    return neutralFlobos;
 }
 
 void PuyoNetworkGame::dropNeutrals()
@@ -387,7 +387,7 @@ int PuyoNetworkGame::getMaxColumnHeight() const
     return 0;
 }
 
-int PuyoNetworkGame::getSamePuyoAround(int X, int Y, PuyoState color)
+int PuyoNetworkGame::getSameFloboAround(int X, int Y, FloboState color)
 {
     return 0;
 }

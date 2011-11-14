@@ -14,7 +14,7 @@ public:
     ConnectMessage(ios_fc::MessageBox &mbox, Peer *peer) {
         msg = mbox.createMessage();
         msg->addBoolProperty("RELIABLE", true);
-        msg->addInt("CMD", PUYO_IGP_CONNECT);
+        msg->addInt("CMD", FLOBO_IGP_CONNECT);
         msg->addString("NAME", peer->name);
         msg->addInt("RANK", peer->rank);
         msg->addInt("STATUS", peer->status);

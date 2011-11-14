@@ -28,42 +28,42 @@ public:
         std::cout << "onPlayerUpdated" << std::endl;
     }
 
-    virtual void onGameInvitationReceived(PuyoGameInvitation &invitation) {
+    virtual void onGameInvitationReceived(FloboGameInvitation &invitation) {
         std::cout << "onGameInvitationReceived" << std::endl;
         if (m_opponent == NULL)
             m_gc.acceptGameInvitation(invitation);
     }
 
-    virtual void onGameInvitationCanceledReceived(PuyoGameInvitation &invitation) {
+    virtual void onGameInvitationCanceledReceived(FloboGameInvitation &invitation) {
         std::cout << "onGameInvitationCanceledReceived" << std::endl;
     }
 
     /*
-    std::auto_ptr<PuyoRandomSystem> m_myRandom;
-    std::auto_ptr<PuyoLocalGameFactory> m_myGameFactory;
+    std::auto_ptr<RandomSystem> m_myRandom;
+    std::auto_ptr<FloboLocalGameFactory> m_myGameFactory;
     std::auto_ptr<PuyoInternetNetworkView> m_myView;
     std::auto_ptr<AIPlayer> m_myAI;
 
-    std::auto_ptr<PuyoRandomSystem> m_opRandom;
+    std::auto_ptr<RandomSystem> m_opRandom;
     std::auto_ptr<PuyoNetworkGameFactory> m_opGameFactory;
     std::auto_ptr<PuyoView> m_opView;
     */
     std::auto_ptr<PuyoNetworkGameWidget> m_Negawi; // the NEtwork GAme WIdget
 
-    virtual void onGameGrantedWithMessagebox(MessageBox *mbox, PuyoGameInvitation &invitation) {
+    virtual void onGameGrantedWithMessagebox(MessageBox *mbox, FloboGameInvitation &invitation) {
         std::cout << "onGameGrantedWithMessagebox" << std::endl;
         int gameId = 0;
         FPServerIGPMessageBox *igpbox = m_gc.getIgpBox();
         /*
         // My view
         m_opponent = mbox;
-        m_myRandom = std::auto_ptr<PuyoRandomSystem>(new PuyoRandomSystem(5, invitation.gameRandomSeed));
-        m_myGameFactory = std::auto_ptr<PuyoLocalGameFactory>(new PuyoLocalGameFactory(m_myRandom.get()));
+        m_myRandom = std::auto_ptr<RandomSystem>(new RandomSystem(5, invitation.gameRandomSeed));
+        m_myGameFactory = std::auto_ptr<FloboLocalGameFactory>(new FloboLocalGameFactory(m_myRandom.get()));
         m_myView = std::auto_ptr<PuyoInternetNetworkView>(new PuyoInternetNetworkView(m_myGameFactory.get(), mbox, gameId, igpbox));
         m_myAI = std::auto_ptr<AIPlayer>(new AIPlayer(m_level, *m_myView));
         // Remote view
         // TODO
-        m_opRandom = std::auto_ptr<PuyoRandomSystem>(new PuyoRandomSystem(5, invitation.gameRandomSeed));
+        m_opRandom = std::auto_ptr<RandomSystem>(new RandomSystem(5, invitation.gameRandomSeed));
         m_opGameFactory = std::auto_ptr<PuyoNetworkGameFactory>(new PuyoNetworkGameFactory(m_opRandom.get(), *mbox, gameId));
         m_opView = std::auto_ptr<PuyoView>(new PuyoView(m_opGameFactory.get()));
         */

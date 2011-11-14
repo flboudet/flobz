@@ -3,10 +3,10 @@
 
 #include "PuyoSinglePlayerStarter.h"
 
-class HallOfFameScreen : public PuyoGameOver1PScreen {
+class HallOfFameScreen : public FloboGameOver1PScreen {
     public:
         HallOfFameScreen(Action *finishedAction)
-            : PuyoGameOver1PScreen("gamewon_highscores_1p.gsl",finishedAction,"NONE",PlayerGameStat(-1))
+            : FloboGameOver1PScreen("gamewon_highscores_1p.gsl",finishedAction,"NONE",PlayerGameStat(-1))
         {}
 };
 

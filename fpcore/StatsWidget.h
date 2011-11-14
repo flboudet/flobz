@@ -7,14 +7,14 @@
  *
  */
 
-#ifndef _PUYO_STATS_WIDGET_H
-#define _PUYO_STATS_WIDGET_H
+#ifndef _FLOBO_STATS_WIDGET_H
+#define _FLOBO_STATS_WIDGET_H
 
 #include "PuyoCommander.h"
 #include "gameloop.h"
 #include "gameui.h"
 #include "Frame.h"
-#include "PuyoGameAbstract.h"
+#include "FloboGameAbstract.h"
 
 enum StatsDirection {
     RIGHT_TO_LEFT,
@@ -182,5 +182,5 @@ private:
     SelfVector<Widget*> widgetAutoReleasePool;
 };
 
-#endif // _PUYO_STATS_WIDGET_H
+#endif // _FLOBO_STATS_WIDGET_H
 

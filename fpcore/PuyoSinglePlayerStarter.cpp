@@ -106,8 +106,8 @@ void SinglePlayerGameWidget::cycle()
         opponent.setIntegerValue("@maxHeightRight", attachedGameB->getColumnHeigth(2));
         opponent.setIntegerValue("@maxHeightPlayer", attachedGameA->getColumnHeigth(2));
         opponent.setIntegerValue("@maxHeightAI", attachedGameB->getColumnHeigth(2));
-        opponent.setIntegerValue("@neutralsForPlayer", attachedGameA->getNeutralPuyos());
-        opponent.setIntegerValue("@neutralsForAI", attachedGameB->getNeutralPuyos());
+        opponent.setIntegerValue("@neutralsForPlayer", attachedGameA->getNeutralFlobos());
+        opponent.setIntegerValue("@neutralsForAI", attachedGameB->getNeutralFlobos());
     }
     if (faceTicks == 100) {
         faceTicks = 0;
@@ -124,9 +124,9 @@ void SinglePlayerGameWidget::action(Widget *sender, int actionType,
                                         GameControlEvent *event)
 {
     if (sender == static_cast<Widget *>(&killLeftCheat))
-        addGameAHandicap(PUYODIMY);
+        addGameAHandicap(FLOBOBAN_DIMY);
     else if (sender == static_cast<Widget *>(&killRightCheat))
-        addGameBHandicap(PUYODIMY);
+        addGameBHandicap(FLOBOBAN_DIMY);
 }
 
 StoryModeLevelsDefinition *StoryModeLevelsDefinition::currentDefinition = NULL;
@@ -198,7 +198,7 @@ void StoryModeLevelsDefinition::end_level(GoomSL *gsl, GoomHash *global, GoomHas
 					easySettings, mediumSettings, hardSettings);
 }
 
-PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName,
+FloboGameOver1PScreen::FloboGameOver1PScreen(String screenName,
         Action *finishedAction, String playerName, const PlayerGameStat &playerPoints, bool initialTransition)
         : StoryScreen(screenName, finishedAction, initialTransition),
         playerName(playerName), playerStat(playerPoints)
@@ -228,7 +228,7 @@ PuyoGameOver1PScreen::PuyoGameOver1PScreen(String screenName,
     refresh();
 }
 
-void PuyoGameOver1PScreen::refresh()
+void FloboGameOver1PScreen::refresh()
 {
     hiscore *scores = getHiScores();
     for (int i = 0 ; i < kHiScoresNumber ; i++) {
@@ -258,7 +258,7 @@ void PuyoGameOver1PScreen::refresh()
                             storyWidget.getIntegerValue("@hiScoreBox.h"), 0));
 }
 
-PuyoGameOver1PScreen::~PuyoGameOver1PScreen()
+FloboGameOver1PScreen::~FloboGameOver1PScreen()
 {
 }
 
@@ -507,7 +507,7 @@ void StoryModeDisplayHallOfFameState::enterState()
     GTLogTrace("StoryModeDisplayHallOfFameState(%s)::enterState()", m_storyName.c_str());
     std::string &playerName = m_sharedGameAssets->playerName;
     const PlayerGameStat &playerPoints = m_sharedMatchAssets->m_gameWidget->getStatPlayerOne();
-    m_gameOverScreen.reset(new PuyoGameOver1PScreen(m_storyName.c_str(),
+    m_gameOverScreen.reset(new FloboGameOver1PScreen(m_storyName.c_str(),
                                         this, playerName.c_str(), playerPoints));
     GameUIDefaults::SCREEN_STACK->swap(m_gameOverScreen.get());
     m_gameOverScreen->refresh();
