@@ -228,7 +228,7 @@ void FloboThemePreview::themeSelected(const std::string &themeName)
 ThemeMenu::ThemeMenu(MainScreen *mainScreen)
     : MainScreenMenu(mainScreen),
       screenTitleFrame(theCommander->getSeparatorFramePicture()),
-      themeMenuTitle(theCommander->getLocalizedString("Puyo theme")), popAction(mainScreen),
+      themeMenuTitle(theCommander->getLocalizedString("Flobo theme")), popAction(mainScreen),
       backButton(theCommander->getLocalizedString("Back"), &popAction),
       themeList()
 {

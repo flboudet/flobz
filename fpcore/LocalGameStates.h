@@ -39,7 +39,7 @@ public:
 
 class GameWidgetFactory {
 public:
-    virtual GameWidget *createGameWidget(FloboSetTheme &puyoThemeSet,
+    virtual GameWidget *createGameWidget(FloboSetTheme &floboSetTheme,
                                          LevelTheme &levelTheme,
                                          String centerFace,
                                          Action *gameOverAction) = 0;

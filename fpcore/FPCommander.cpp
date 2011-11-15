@@ -161,7 +161,7 @@ FPCommander::FPCommander(DataPathManager *dataPathManager,
     m_fontFactory(*dataPathManager),
     m_soundFactory(*dataPathManager),
     m_musicFactory(*dataPathManager),
-    m_puyoSetThemeFactory(*m_themeManager),
+    m_floboSetThemeFactory(*m_themeManager),
     m_levelThemeFactory(*m_themeManager),
     m_cursor(NULL)
 {
@@ -381,7 +381,7 @@ MusicRef FPCommander::getMusic(const char *path)
 
 FloboSetThemeRef FPCommander::getFloboSetTheme(const char *name)
 {
-    return m_puyoSetThemeResManager->getResource(name);
+    return m_floboSetThemeResManager->getResource(name);
 }
 
 FloboSetThemeRef FPCommander::getPreferedFloboSetTheme()
@@ -481,7 +481,7 @@ void FPCommander::createResourceManagers()
     m_fontResManager.reset(new SimpleResourceManager<IosFont, IosFontResourceKey>(m_fontFactory));
     m_soundResManager.reset(new SimpleResourceManager<audio_manager::Sound>(m_soundFactory));
     m_musicResManager.reset(new SimpleResourceManager<audio_manager::Music>(m_musicFactory));
-    m_puyoSetThemeResManager.reset(new SimpleResourceManager<FloboSetTheme>(m_puyoSetThemeFactory));
+    m_floboSetThemeResManager.reset(new SimpleResourceManager<FloboSetTheme>(m_floboSetThemeFactory));
     m_levelThemeResManager.reset(new SimpleResourceManager<LevelTheme>(m_levelThemeFactory));
 #endif
 }

@@ -26,12 +26,12 @@
 #define _SOLOGAMESTARTER_H_
 
 #include "GameStateMachine.h"
-#include "PuyoStarter.h"
 #include "LocalGameStates.h"
+#include "EventPlayer.h"
 
 class SoloGameWidget : public GameWidget, GameListener, CycledComponent {
 public:
-    SoloGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, Action *gameOverAction = NULL);
+    SoloGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, Action *gameOverAction = NULL);
     // GameWidget implementation
     virtual void setGameOptions(GameOptions options);
     //
@@ -77,9 +77,9 @@ private:
 
 class SoloGameWidgetFactory : public GameWidgetFactory {
 public:
-    GameWidget *createGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
+    GameWidget *createGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
-        return new SoloGameWidget(puyoThemeSet, levelTheme, gameOverAction);
+        return new SoloGameWidget(floboSetTheme, levelTheme, gameOverAction);
     }
 };
 

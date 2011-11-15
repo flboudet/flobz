@@ -22,16 +22,16 @@
  *
  *
  */
-#ifndef _PUYOTWOPLAYERSTARTER
-#define _PUYOTWOPLAYERSTARTER
+#ifndef _TWOPLAYERSGAMESTARTER_H_
+#define _TWOPLAYERSGAMESTARTER_H_
 
 #include "GameStateMachine.h"
-#include "PuyoStarter.h"
 #include "LocalGameStates.h"
+#include "EventPlayer.h"
 
 class TwoPlayersGameWidget : public GameWidget2P {
 public:
-    TwoPlayersGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, String aiFace, Action *gameOverAction = NULL);
+    TwoPlayersGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, String aiFace, Action *gameOverAction = NULL);
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
     StoryWidget *getOpponent();
@@ -44,11 +44,11 @@ private:
     StoryWidget opponentFace;
 };
 
-class PuyoLocalTwoPlayerGameWidgetFactory : public GameWidgetFactory {
+class LocalTwoPlayersGameWidgetFactory : public GameWidgetFactory {
 public:
-    GameWidget *createGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
+    GameWidget *createGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
-        return new TwoPlayersGameWidget(puyoThemeSet, levelTheme, centerFace, gameOverAction);
+        return new TwoPlayersGameWidget(floboSetTheme, levelTheme, centerFace, gameOverAction);
     }
 };
 
@@ -75,4 +75,4 @@ private:
     std::auto_ptr<LeaveGameState>        m_leaveGame;
 };
 
-#endif // _PUYOTWOPLAYERSTARTER
+#endif // _TWOPLAYERSGAMESTARTER_H_

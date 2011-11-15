@@ -366,10 +366,10 @@ void StoryScreen::onScreenVisibleChanged(bool visible)
 }
 
 
-VisualFX::VisualFX(String fxName, const FloboSetTheme &puyoSetTheme)
+VisualFX::VisualFX(String fxName, const FloboSetTheme &floboSetTheme)
     : StoryWidget(fxName,NULL,true), fxName(fxName)
 {
-    client.attachedTheme = &puyoSetTheme;
+    client.attachedTheme = &floboSetTheme;
 }
 
 bool VisualFX::busy() const

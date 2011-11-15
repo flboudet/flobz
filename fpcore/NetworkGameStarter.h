@@ -22,12 +22,11 @@
  *
  *
  */
-#ifndef _PUYONETWORKSTARTER
-#define _PUYONETWORKSTARTER
+#ifndef _NETWORKGAMESTARTER_H_
+#define _NETWORKGAMESTARTER_H_
 
-#include "PuyoStarter.h"
 #include "StoryModeStarter.h"
-#include "PuyoTwoPlayerStarter.h"
+#include "TwoPlayersGameStarter.h"
 #include "ios_messagebox.h"
 #include "NetworkGameView.h"
 #include "ChatBox.h"
@@ -50,7 +49,7 @@ public:
     };
 public:
     NetworkGameWidget();
-    void initWithGUI(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, FPServerIGPMessageBox *igpbox = NULL);
+    void initWithGUI(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, FPServerIGPMessageBox *igpbox = NULL);
     void initWithoutGUI(ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, FPServerIGPMessageBox *igpbox = NULL);
     void connectIA(int level);
     ~NetworkGameWidget();
@@ -173,4 +172,4 @@ private:
     std::auto_ptr<LeaveGameState>          m_leaveGame;
 };
 
-#endif // _PUYONETWORKSTARTER
+#endif // _NETWORKGAMESTARTER_H_

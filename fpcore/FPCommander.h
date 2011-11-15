@@ -278,8 +278,8 @@ class FPCommander
     std::auto_ptr<SoundResourceManager> m_soundResManager;
     MusicFactory m_musicFactory;
     std::auto_ptr<MusicResourceManager> m_musicResManager;
-    FloboSetThemeFactory m_puyoSetThemeFactory;
-    std::auto_ptr<FloboSetThemeResourceManager> m_puyoSetThemeResManager;
+    FloboSetThemeFactory m_floboSetThemeFactory;
+    std::auto_ptr<FloboSetThemeResourceManager> m_floboSetThemeResManager;
     LevelThemeFactory m_levelThemeFactory;
     std::auto_ptr<LevelThemeResourceManager> m_levelThemeResManager;
     // Localization management

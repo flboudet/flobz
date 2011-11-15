@@ -55,6 +55,16 @@ public:
     virtual ~FloboGameFactory() {};
 };
 
+class LocalGameFactory : public FloboGameFactory {
+public:
+    LocalGameFactory(RandomSystem *attachedRandom): attachedRandom(attachedRandom) {}
+    FloboGame *createFloboGame(FloboFactory *attachedFloboFactory) {
+        return new FloboLocalGame(attachedRandom, attachedFloboFactory);
+    }
+private:
+    RandomSystem *attachedRandom;
+};
+
 /**
  * GameView is the graphical representation of a FloboGame.
  * The FloboGame is owned by the GameView and created

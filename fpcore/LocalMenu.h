@@ -32,7 +32,7 @@
 #include "FPCommander.h"
 #include "SoloGameStarter.h"
 #include "StoryModeStarter.h"
-#include "PuyoTwoPlayerStarter.h"
+#include "TwoPlayersGameStarter.h"
 
 class SoloGameMenu : public MainScreenMenu, public PlayerNameProvider {
 public:
@@ -79,7 +79,7 @@ public:
 private:
     VBox buttonsBox;
     LocalizedDictionary locale;
-    PuyoLocalTwoPlayerGameWidgetFactory gameWidgetFactory;
+    LocalTwoPlayersGameWidgetFactory gameWidgetFactory;
     EditFieldWithLabel editPlayer1Name, editPlayer2Name;
     Frame screenTitleFrame;
     Text screenTitle;

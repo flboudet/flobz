@@ -82,7 +82,7 @@ protected:
 
 class VisualFX : public StoryWidget {
 public:
-    VisualFX(String fxName, const FloboSetTheme &puyoSetTheme);
+    VisualFX(String fxName, const FloboSetTheme &floboSetTheme);
     void postEvent(const char *name, float x, float y, int player);
     bool busy() const;
     bool supportFX(const char *str) const;

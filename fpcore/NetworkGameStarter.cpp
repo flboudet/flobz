@@ -23,7 +23,7 @@
  *
  */
 
-#include "PuyoNetworkStarter.h"
+#include "NetworkGameStarter.h"
 #include "FPNetMessageDef.h"
 #include "NetworkGameView.h"
 #include "NetworkGame.h"
@@ -47,9 +47,9 @@ GamePlayer *NetworkGameWidget::createLocalPlayer()
     return new CombinedEventPlayer(*localArea);
 }
 
-void NetworkGameWidget::initWithGUI(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, FPServerIGPMessageBox *igpbox)
+void NetworkGameWidget::initWithGUI(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, FPServerIGPMessageBox *igpbox)
 {
-    attachedFloboThemeSet = &puyoThemeSet;
+    attachedFloboThemeSet = &floboSetTheme;
     attachedRandom = std::auto_ptr<RandomSystem>(new RandomSystem(randomSeed, 5));
     this->mbox = &mbox;
     attachedLocalGameFactory   = std::auto_ptr<LocalGameFactory>(new LocalGameFactory(attachedRandom.get()));

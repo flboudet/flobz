@@ -24,21 +24,21 @@
  */
 
 #include "NetCenterMenu.h"
-#include "PuyoTwoPlayerStarter.h"
-#include "PuyoNetworkStarter.h"
+#include "TwoPlayersGameStarter.h"
+#include "NetworkGameStarter.h"
 #include "ios_time.h"
 #include <sstream>
 
 using namespace event_manager;
 
-class PuyoNetworkTwoPlayerGameWidgetFactory : public GameWidgetFactory {
+class NetworkTwoPlayerGameWidgetFactory : public GameWidgetFactory {
 public:
-    PuyoNetworkTwoPlayerGameWidgetFactory(ios_fc::MessageBox &mbox, unsigned int randomSeed, FPServerIGPMessageBox *igpbox/* = NULL */)
+    NetworkTwoPlayerGameWidgetFactory(ios_fc::MessageBox &mbox, unsigned int randomSeed, FPServerIGPMessageBox *igpbox/* = NULL */)
       : mbox(mbox), randomSeed(randomSeed), igpbox(igpbox), gameId(0) {}
-    GameWidget *createGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
+    GameWidget *createGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
         NetworkGameWidget *negawi = new NetworkGameWidget();
-        negawi->initWithGUI(puyoThemeSet, levelTheme, mbox, gameId++, randomSeed++, gameOverAction, igpbox);
+        negawi->initWithGUI(floboSetTheme, levelTheme, mbox, gameId++, randomSeed++, gameOverAction, igpbox);
         return negawi;
     }
 private:
@@ -421,7 +421,7 @@ void NetCenterMenu::onGameInvitationCanceledReceived(FloboGameInvitation &invita
 
 void NetCenterMenu::onGameGrantedWithMessagebox(MessageBox *mbox, FloboGameInvitation &invitation)
 {
-    PuyoNetworkTwoPlayerGameWidgetFactory *factory = new PuyoNetworkTwoPlayerGameWidgetFactory(*mbox, invitation.gameRandomSeed, netCenter->getIgpBox());
+    NetworkTwoPlayerGameWidgetFactory *factory = new NetworkTwoPlayerGameWidgetFactory(*mbox, invitation.gameRandomSeed, netCenter->getIgpBox());
     NetworkGameStateMachine *starter = new NetworkGameStateMachine(factory, mbox, (GameDifficulty)(invitation.gameSpeed), &nameProvider);
     starter->evaluate();
 

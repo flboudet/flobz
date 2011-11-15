@@ -27,7 +27,8 @@
 
 #include "GameStateMachine.h"
 #include "LocalGameStates.h"
-#include "PuyoStarter.h"
+#include "AIPlayer.h"
+#include "EventPlayer.h"
 #include "HiScores.h"
 #include "StatsWidget.h"
 #include "goomsl.h"
@@ -57,7 +58,7 @@ protected:
 class StoryModeStandardLayoutGameWidget : public StoryModeGameWidget
 {
 public:
-    StoryModeStandardLayoutGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
+    StoryModeStandardLayoutGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
 private:
     FloboSetTheme &attachedFloboThemeSet;
     RandomSystem attachedRandom;
@@ -225,7 +226,7 @@ public:
     // PlayerNameProvider implementation
     virtual String getPlayerName(int playerNumber) const;
     // GameWidgetFactory implementation
-    virtual GameWidget *createGameWidget(FloboSetTheme &puyoThemeSet,
+    virtual GameWidget *createGameWidget(FloboSetTheme &floboSetTheme,
                                          LevelTheme &levelTheme,
                                          String centerFace,
                                          Action *gameOverAction);

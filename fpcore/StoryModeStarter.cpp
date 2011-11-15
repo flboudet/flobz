@@ -63,9 +63,9 @@ void StoryModeGameWidget::initWithGUI(GameView &areaA, GameView &areaB,
 	areaB.getAttachedGame()->setScoringLevel(scoringLevel);
 }
 
-StoryModeStandardLayoutGameWidget::StoryModeStandardLayoutGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
+StoryModeStandardLayoutGameWidget::StoryModeStandardLayoutGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
   : StoryModeGameWidget(lifes, aiFace),
-      attachedFloboThemeSet(puyoThemeSet),
+      attachedFloboThemeSet(floboSetTheme),
       attachedRandom(nColors),
       attachedGameFactory(&attachedRandom),
       areaA(&attachedGameFactory, 0, &attachedFloboThemeSet, &levelTheme),
@@ -405,7 +405,7 @@ String StoryModeMatchState::getPlayerName(int playerNumber) const
     }
 }
 
-GameWidget *StoryModeMatchState::createGameWidget(FloboSetTheme &puyoThemeSet,
+GameWidget *StoryModeMatchState::createGameWidget(FloboSetTheme &floboSetTheme,
                                          LevelTheme &levelTheme,
                                          String centerFace,
                                          Action *gameOverAction)

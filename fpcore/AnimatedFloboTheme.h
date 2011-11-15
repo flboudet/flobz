@@ -97,7 +97,7 @@ public:
     int speedMeterX, speedMeterY;
     int lifeDisplayX, lifeDisplayY;
 
-    FlobobanThemeDefinition puyoban[NUMBER_OF_FLOBOBANS_IN_LEVEL];
+    FlobobanThemeDefinition floboban[NUMBER_OF_FLOBOBANS_IN_LEVEL];
     FontDefinition playerNameFont, scoreFont;
 
     bool opponentIsBehind;
@@ -268,7 +268,7 @@ private:
     static void end_floboset(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void end_description(GoomSL *gsl, GoomHash *global, GoomHash *local);
-    static void loadFlobobanDefinition(GoomSL *gsl, int playerId, FlobobanThemeDefinition &puyoban);
+    static void loadFlobobanDefinition(GoomSL *gsl, int playerId, FlobobanThemeDefinition &floboban);
     static void loadFontDefinition(GoomSL *gsl, const char * fontName, FontDefinition &font);
 
     static const char * s_themeFolderExtension;
@@ -282,9 +282,9 @@ private:
     DataPathManager &m_dataPathManager;
     std::string m_themePackLoadingPath;
 
-    std::vector<std::string> m_puyoSetThemeList;
+    std::vector<std::string> m_floboSetThemeList;
     std::vector<std::string> m_levelThemeList;
-    std::map<std::string, FloboSetThemeDescription> m_puyoSetThemeDescriptions;
+    std::map<std::string, FloboSetThemeDescription> m_floboSetThemeDescriptions;
     std::map<std::string, LevelThemeDescription> m_levelThemeDescriptions;
     std::auto_ptr<LocalizedDictionary> m_localeDictionary;
 

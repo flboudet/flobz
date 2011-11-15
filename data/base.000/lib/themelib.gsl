@@ -16,7 +16,7 @@ struct <StatsDimension:
     Point left_background_offset,
     Point right_background_offset>
 
-struct <PuyobanDefinition:
+struct <FlobobanDefinition:
     Point display,
     int   should_display_next,
     int   should_display_shadows,
@@ -27,22 +27,22 @@ struct <PuyobanDefinition:
     Point score_display,
     float scale>
 
-struct <Puyo:
+struct <Flobo:
     string face,
     string eye,
     string explosion,
     string disappear,
     float offset>
 
-struct <PuyoSet:
+struct <FloboSet:
     string name,
     string description,
-    Puyo P1,
-    Puyo P2,
-    Puyo P3,
-    Puyo P4,
-    Puyo P5,
-    Puyo Neutral>
+    Flobo P1,
+    Flobo P2,
+    Flobo P3,
+    Flobo P4,
+    Flobo P5,
+    Flobo Neutral>
 
 struct <Level:
     string name,
@@ -59,18 +59,18 @@ struct <Level:
     Point  life_display,
     int    opponent_is_behind,
     StatsDimension stats,
-    PuyobanDefinition puyoban_p1,
-    PuyobanDefinition puyoban_p2,
+    FlobobanDefinition floboban_p1,
+    FlobobanDefinition floboban_p2,
     Font   playerNameFont,
     Font   scoreFont,
     string foreground_animation,
     string get_ready_animation>
 
-PuyoSet puyoset
+FloboSet floboset
 Level   level
 string  author
 
-external <end_puyoset>
+external <end_floboset>
 external <end_level>
 
 <start_description>
@@ -78,36 +78,36 @@ external <end_level>
 
 <end_description>
 
-<start_puyoset>
-    puyoset.name        = "Unamed"
-    puyoset.description = "Some puyos..."
+<start_floboset>
+    floboset.name        = "Unamed"
+    floboset.description = "Some flobos..."
 
-    puyoset.P1.face      = "round"
-    puyoset.P1.offset    = 0.0
-    puyoset.P1.eye       = "normal"
-    puyoset.P1.explosion = "round"
-    puyoset.P1.disappear = "round"
-    puyoset.P2.face      = "round"
-    puyoset.P2.offset    = 72.0
-    puyoset.P2.eye       = "normal"
-    puyoset.P2.explosion = "round"
-    puyoset.P2.disappear = "round"
-    puyoset.P3.face      = "round"
-    puyoset.P3.offset    = 144.0
-    puyoset.P3.eye       = "normal"
-    puyoset.P3.explosion = "round"
-    puyoset.P3.disappear = "round"
-    puyoset.P4.face      = "round"
-    puyoset.P4.offset    = 216.0
-    puyoset.P4.eye       = "normal"
-    puyoset.P4.explosion = "round"
-    puyoset.P4.disappear = "round"
-    puyoset.P5.face      = "round"
-    puyoset.P5.offset    = 288.0
-    puyoset.P5.eye       = "normal"
-    puyoset.P5.explosion = "round"
-    puyoset.P5.disappear = "round"
-    puyoset.Neutral.face = "glass"
+    floboset.P1.face      = "round"
+    floboset.P1.offset    = 0.0
+    floboset.P1.eye       = "normal"
+    floboset.P1.explosion = "round"
+    floboset.P1.disappear = "round"
+    floboset.P2.face      = "round"
+    floboset.P2.offset    = 72.0
+    floboset.P2.eye       = "normal"
+    floboset.P2.explosion = "round"
+    floboset.P2.disappear = "round"
+    floboset.P3.face      = "round"
+    floboset.P3.offset    = 144.0
+    floboset.P3.eye       = "normal"
+    floboset.P3.explosion = "round"
+    floboset.P3.disappear = "round"
+    floboset.P4.face      = "round"
+    floboset.P4.offset    = 216.0
+    floboset.P4.eye       = "normal"
+    floboset.P4.explosion = "round"
+    floboset.P4.disappear = "round"
+    floboset.P5.face      = "round"
+    floboset.P5.offset    = 288.0
+    floboset.P5.eye       = "normal"
+    floboset.P5.explosion = "round"
+    floboset.P5.disappear = "round"
+    floboset.Neutral.face = "glass"
 
 <start_level>
     level.name          = "Unamed"
@@ -133,35 +133,35 @@ external <end_level>
     level.stats.right_background_offset.x = 0
     level.stats.right_background_offset.y = 0
 
-    level.puyoban_p1.display.x = 33
-    level.puyoban_p1.display.y = 0
-    level.puyoban_p1.should_display_next = 1
-    level.puyoban_p1.should_display_shadows = 1
-    level.puyoban_p1.should_display_eyes = 1
-    level.puyoban_p1.next.x = 240
-    level.puyoban_p1.next.y = 64
-    level.puyoban_p1.neutral_display.x = 33
-    level.puyoban_p1.neutral_display.y = 35
-    level.puyoban_p1.name_display.x = 130
-    level.puyoban_p1.name_display.y = 460
-    level.puyoban_p1.score_display.x = 300
-    level.puyoban_p1.score_display.y = 360
-    level.puyoban_p1.scale = 1.0
+    level.floboban_p1.display.x = 33
+    level.floboban_p1.display.y = 0
+    level.floboban_p1.should_display_next = 1
+    level.floboban_p1.should_display_shadows = 1
+    level.floboban_p1.should_display_eyes = 1
+    level.floboban_p1.next.x = 240
+    level.floboban_p1.next.y = 64
+    level.floboban_p1.neutral_display.x = 33
+    level.floboban_p1.neutral_display.y = 35
+    level.floboban_p1.name_display.x = 130
+    level.floboban_p1.name_display.y = 460
+    level.floboban_p1.score_display.x = 300
+    level.floboban_p1.score_display.y = 360
+    level.floboban_p1.scale = 1.0
 
-    level.puyoban_p2.display.x = 417
-    level.puyoban_p2.display.y = 0
-    level.puyoban_p2.should_display_next = 1
-    level.puyoban_p2.should_display_shadows = 1
-    level.puyoban_p2.should_display_eyes = 1
-    level.puyoban_p2.next.x = 368
-    level.puyoban_p2.next.y = 64
-    level.puyoban_p2.neutral_display.x = 417
-    level.puyoban_p2.neutral_display.y = 35
-    level.puyoban_p2.name_display.x = 510
-    level.puyoban_p2.name_display.y = 460
-    level.puyoban_p2.score_display.x = 340
-    level.puyoban_p2.score_display.y = 320
-    level.puyoban_p2.scale = 1.0
+    level.floboban_p2.display.x = 417
+    level.floboban_p2.display.y = 0
+    level.floboban_p2.should_display_next = 1
+    level.floboban_p2.should_display_shadows = 1
+    level.floboban_p2.should_display_eyes = 1
+    level.floboban_p2.next.x = 368
+    level.floboban_p2.next.y = 64
+    level.floboban_p2.neutral_display.x = 417
+    level.floboban_p2.neutral_display.y = 35
+    level.floboban_p2.name_display.x = 510
+    level.floboban_p2.name_display.y = 460
+    level.floboban_p2.score_display.x = 340
+    level.floboban_p2.score_display.y = 320
+    level.floboban_p2.scale = 1.0
 
     level.playerNameFont.path = "__FONT__"
     level.playerNameFont.size = 17
@@ -178,7 +178,7 @@ external <end_level>
     level.get_ready_animation=""
 
 <ThemeDefinition>
-    [start_puyoset]
+    [start_floboset]
     [start_level]
     [start_description]
 

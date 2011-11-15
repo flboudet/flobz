@@ -1,7 +1,7 @@
 #include "InternetBot.h"
 #include "PuyoStrings.h"
 #include "NetworkGameView.h"
-#include "PuyoNetworkStarter.h"
+#include "NetworkGameStarter.h"
 
 class PIBNGCListener : public NetGameCenterListener {
 private:

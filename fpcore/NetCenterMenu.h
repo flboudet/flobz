@@ -33,7 +33,7 @@
 #include "MainScreen.h"
 #include "FPCommander.h"
 #include "InternetGameCenter.h"
-#include "PuyoTwoPlayerStarter.h"
+#include "TwoPlayersGameStarter.h"
 #include "ChatBox.h"
 #include "RadioButton.h"
 

@@ -96,13 +96,13 @@ FloboSetTheme * ThemeManagerImpl::createFloboSetTheme(const std::string &themeNa
 {
     //cout << "Creating floboset theme impl " << themeName << endl;
     std::map<std::string, FloboSetThemeDescription>::iterator iter
-        = m_puyoSetThemeDescriptions.find(themeName);
-    if (iter == m_puyoSetThemeDescriptions.end())
+        = m_floboSetThemeDescriptions.find(themeName);
+    if (iter == m_floboSetThemeDescriptions.end())
         return NULL;
     if (themeName == m_defaultFloboSetThemeName)
         return new FloboSetThemeImpl(iter->second);
     if (m_defaultFloboSetTheme.get() == NULL) {
-        m_defaultFloboSetTheme.reset(new FloboSetThemeImpl(m_puyoSetThemeDescriptions[m_defaultFloboSetThemeName]));
+        m_defaultFloboSetTheme.reset(new FloboSetThemeImpl(m_floboSetThemeDescriptions[m_defaultFloboSetThemeName]));
     }
     return new FloboSetThemeImpl(iter->second, m_defaultFloboSetTheme.get());
 }
@@ -124,7 +124,7 @@ LevelTheme   * ThemeManagerImpl::createLevelTheme(const std::string &themeName)
 
 const std::vector<std::string> & ThemeManagerImpl::getFloboSetThemeList()
 {
-    return m_puyoSetThemeList;
+    return m_floboSetThemeList;
 }
 
 const std::vector<std::string> & ThemeManagerImpl::getLevelThemeList()
@@ -169,7 +169,7 @@ void ThemeManagerImpl::end_floboset(GoomSL *gsl, GoomHash *global,
     ThemeManagerImpl *themeMgr = (ThemeManagerImpl *)GSL_GET_USERDATA_PTR(gsl);
 	const char * themeName  = (const char *) GSL_GLOBAL_PTR(gsl, "floboset.name");
 	const char * localizedThemeName = themeMgr->m_localeDictionary->getLocalizedString(themeName,true);
-    FloboSetThemeDescription &newThemeDescription = themeMgr->m_puyoSetThemeDescriptions[themeName];
+    FloboSetThemeDescription &newThemeDescription = themeMgr->m_floboSetThemeDescriptions[themeName];
     newThemeDescription.name = themeName;
     newThemeDescription.localizedName = localizedThemeName;
     newThemeDescription.author = (const char *)(GSL_GLOBAL_PTR(gsl, "author"));
@@ -185,7 +185,7 @@ void ThemeManagerImpl::end_floboset(GoomSL *gsl, GoomHash *global,
         currentFloboThemeDescription.eye =       (const char *)GSL_GLOBAL_PTR(gsl, s_key_PuyoEye[i]);
         currentFloboThemeDescription.colorOffset = GSL_GLOBAL_FLOAT(gsl, s_key_PuyoColorOffset[i]);
     }
-    themeMgr->m_puyoSetThemeList.push_back(themeName);
+    themeMgr->m_floboSetThemeList.push_back(themeName);
 }
 
 void ThemeManagerImpl::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
@@ -232,7 +232,7 @@ void ThemeManagerImpl::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     loadFontDefinition(gsl, "scoreFont", newThemeDescription.scoreFont);
 
     for (int i = 0 ; i < NUMBER_OF_FLOBOBANS_IN_LEVEL ; i++)
-        loadFlobobanDefinition(gsl, i, newThemeDescription.puyoban[i]);
+        loadFlobobanDefinition(gsl, i, newThemeDescription.floboban[i]);
 
     themeMgr->m_levelThemeList.push_back(themeName);
 }
@@ -242,23 +242,23 @@ void ThemeManagerImpl::end_description(GoomSL *gsl, GoomHash *global, GoomHash *
 	// TODO !!!
 }
 
-void ThemeManagerImpl::loadFlobobanDefinition(GoomSL *gsl, int playerId, FlobobanThemeDefinition &puyoban)
+void ThemeManagerImpl::loadFlobobanDefinition(GoomSL *gsl, int playerId, FlobobanThemeDefinition &floboban)
 {
-    String variablePrefix = String("level.puyoban_p") + (playerId+1);
-    puyoban.displayX = GSL_GLOBAL_INT(gsl, variablePrefix + ".display.x");
-    puyoban.displayY = GSL_GLOBAL_INT(gsl, variablePrefix + ".display.y");
-    puyoban.nextX = GSL_GLOBAL_INT(gsl, variablePrefix + ".next.x");
-    puyoban.nextY = GSL_GLOBAL_INT(gsl, variablePrefix + ".next.y");
-    puyoban.neutralDisplayX = GSL_GLOBAL_INT(gsl, variablePrefix + ".neutral_display.x");
-    puyoban.neutralDisplayY = GSL_GLOBAL_INT(gsl, variablePrefix + ".neutral_display.y");
-    puyoban.nameDisplayX = GSL_GLOBAL_INT(gsl, variablePrefix + ".name_display.x");
-    puyoban.nameDisplayY = GSL_GLOBAL_INT(gsl, variablePrefix + ".name_display.y");
-    puyoban.scoreDisplayX = GSL_GLOBAL_INT(gsl, variablePrefix + ".score_display.x");
-    puyoban.scoreDisplayY = GSL_GLOBAL_INT(gsl, variablePrefix + ".score_display.y");
-    puyoban.shouldDisplayNext = GSL_GLOBAL_INT(gsl, variablePrefix + ".should_display_next");
-    puyoban.shouldDisplayShadow = GSL_GLOBAL_INT(gsl, variablePrefix + ".should_display_shadows");
-    puyoban.shouldDisplayEyes = GSL_GLOBAL_INT(gsl, variablePrefix + ".should_display_eyes");
-    puyoban.scale = GSL_GLOBAL_FLOAT(gsl, variablePrefix + ".scale");
+    String variablePrefix = String("level.floboban_p") + (playerId+1);
+    floboban.displayX = GSL_GLOBAL_INT(gsl, variablePrefix + ".display.x");
+    floboban.displayY = GSL_GLOBAL_INT(gsl, variablePrefix + ".display.y");
+    floboban.nextX = GSL_GLOBAL_INT(gsl, variablePrefix + ".next.x");
+    floboban.nextY = GSL_GLOBAL_INT(gsl, variablePrefix + ".next.y");
+    floboban.neutralDisplayX = GSL_GLOBAL_INT(gsl, variablePrefix + ".neutral_display.x");
+    floboban.neutralDisplayY = GSL_GLOBAL_INT(gsl, variablePrefix + ".neutral_display.y");
+    floboban.nameDisplayX = GSL_GLOBAL_INT(gsl, variablePrefix + ".name_display.x");
+    floboban.nameDisplayY = GSL_GLOBAL_INT(gsl, variablePrefix + ".name_display.y");
+    floboban.scoreDisplayX = GSL_GLOBAL_INT(gsl, variablePrefix + ".score_display.x");
+    floboban.scoreDisplayY = GSL_GLOBAL_INT(gsl, variablePrefix + ".score_display.y");
+    floboban.shouldDisplayNext = GSL_GLOBAL_INT(gsl, variablePrefix + ".should_display_next");
+    floboban.shouldDisplayShadow = GSL_GLOBAL_INT(gsl, variablePrefix + ".should_display_shadows");
+    floboban.shouldDisplayEyes = GSL_GLOBAL_INT(gsl, variablePrefix + ".should_display_eyes");
+    floboban.scale = GSL_GLOBAL_FLOAT(gsl, variablePrefix + ".scale");
 }
 
 void ThemeManagerImpl::loadFontDefinition(GoomSL *gsl, const char *fontName, FontDefinition &font)
@@ -744,46 +744,46 @@ int LevelThemeImpl::getLifeDisplayY() const
 { return m_desc.lifeDisplayY; }
 
 int LevelThemeImpl::getFlobobanX(int playerId) const
-{ return m_desc.puyoban[playerId].displayX; }
+{ return m_desc.floboban[playerId].displayX; }
 
 int LevelThemeImpl::getFlobobanY(int playerId) const
-{ return m_desc.puyoban[playerId].displayY; }
+{ return m_desc.floboban[playerId].displayY; }
 
 int LevelThemeImpl::getNextFlobosX(int playerId) const
-{ return m_desc.puyoban[playerId].nextX; }
+{ return m_desc.floboban[playerId].nextX; }
 
 int LevelThemeImpl::getNextFlobosY(int playerId) const
-{ return m_desc.puyoban[playerId].nextY; }
+{ return m_desc.floboban[playerId].nextY; }
 
 int LevelThemeImpl::getNeutralDisplayX(int playerId) const
-{ return m_desc.puyoban[playerId].neutralDisplayX; }
+{ return m_desc.floboban[playerId].neutralDisplayX; }
 
 int LevelThemeImpl::getNeutralDisplayY(int playerId) const
-{ return m_desc.puyoban[playerId].neutralDisplayY; }
+{ return m_desc.floboban[playerId].neutralDisplayY; }
 
 int LevelThemeImpl::getNameDisplayX(int playerId) const
-{ return m_desc.puyoban[playerId].nameDisplayX; }
+{ return m_desc.floboban[playerId].nameDisplayX; }
 
 int LevelThemeImpl::getNameDisplayY(int playerId) const
-{ return m_desc.puyoban[playerId].nameDisplayY; }
+{ return m_desc.floboban[playerId].nameDisplayY; }
 
 int LevelThemeImpl::getScoreDisplayX(int playerId) const
-{ return m_desc.puyoban[playerId].scoreDisplayX; }
+{ return m_desc.floboban[playerId].scoreDisplayX; }
 
 int LevelThemeImpl::getScoreDisplayY(int playerId) const
-{ return m_desc.puyoban[playerId].scoreDisplayY; }
+{ return m_desc.floboban[playerId].scoreDisplayY; }
 
 float LevelThemeImpl::getFlobobanScale(int playerId) const
-{ return m_desc.puyoban[playerId].scale; }
+{ return m_desc.floboban[playerId].scale; }
 
 bool LevelThemeImpl::getShouldDisplayNext(int playerId) const
-{ return m_desc.puyoban[playerId].shouldDisplayNext; }
+{ return m_desc.floboban[playerId].shouldDisplayNext; }
 
 bool LevelThemeImpl::getShouldDisplayShadows(int playerId) const
-{ return m_desc.puyoban[playerId].shouldDisplayShadow; }
+{ return m_desc.floboban[playerId].shouldDisplayShadow; }
 
 bool LevelThemeImpl::getShouldDisplayEyes(int playerId) const
-{ return m_desc.puyoban[playerId].shouldDisplayEyes; }
+{ return m_desc.floboban[playerId].shouldDisplayEyes; }
 
 bool LevelThemeImpl::getOpponentIsBehind() const
 { return m_desc.opponentIsBehind; }
