@@ -5,7 +5,7 @@ const char *GAMEID        = "ID";
 const char *NAME          = "NAME";
 const char *NAME1         = "NAME1";
 const char *NAME2         = "NAME2";
-const char *PUYOS         = "PUYOS";
+const char *FLOBOS         = "FLOBOS";
 const char *PAUSED        = "PAUSED";
 const char *SCORE         = "SCORE";
 const char *TOTAL_SCORE   = "TOTAL_SCORE";
@@ -30,6 +30,6 @@ const char *COMPANION_TURN = "COMPANION_TURN";
 const char *DID_FALL       = "DID_FALL";
 const char *WILL_VANISH    = "WILL_VANISH";
 const char *CURRENT_NEUTRALS = "CURRENT_NEUTRALS";
-const char *NUMBER_BAD_PUYOS = "NUMBER_BAD_PUYOS";
+const char *NUMBER_BAD_FLOBOS = "NUMBER_BAD_FLOBOS";
 
 };

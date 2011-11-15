@@ -24,7 +24,7 @@
  */
 
 #include "MainScreen.h"
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 
 using namespace gameui;
 using namespace event_manager;

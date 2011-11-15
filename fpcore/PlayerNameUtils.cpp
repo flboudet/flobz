@@ -1,5 +1,5 @@
 #include "PlayerNameUtils.h"
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 #include <string.h>
 
 std::string PlayerNameUtils::getPlayerName(int n)

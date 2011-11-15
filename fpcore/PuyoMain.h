@@ -2,7 +2,7 @@
 #define _FLOBO_MAIN_H_
 
 #include "MainScreen.h"
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 #include "PreferencesManager.h"
 #include "FPDataPathManager.h"
 #include "drawcontext.h"

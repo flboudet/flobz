@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -25,7 +25,7 @@
 
 
 #include "ChatBox.h"
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 
 using namespace ios_fc;
 

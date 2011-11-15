@@ -8,7 +8,7 @@
  */
 
 #include "StatsWidget.h"
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 
 #define LINE_DURATION 0.8
 

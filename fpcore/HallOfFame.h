@@ -1,12 +1,12 @@
 #ifndef HALL_OF_FAME_H
 #define HALL_OF_FAME_H
 
-#include "PuyoSinglePlayerStarter.h"
+#include "StoryModeStarter.h"
 
-class HallOfFameScreen : public FloboGameOver1PScreen {
+class HallOfFameScreen : public GameOver1PScreen {
     public:
         HallOfFameScreen(Action *finishedAction)
-            : FloboGameOver1PScreen("gamewon_highscores_1p.gsl",finishedAction,"NONE",PlayerGameStat(-1))
+            : GameOver1PScreen("gamewon_highscores_1p.gsl",finishedAction,"NONE",PlayerGameStat(-1))
         {}
 };
 

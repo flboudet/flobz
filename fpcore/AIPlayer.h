@@ -1,4 +1,4 @@
-//  FloboPuyo/AIPlayer.h AI header for FloboPuyo
+//  FloboPop/AIPlayer.h AI header for FloboPop
 //  Copyright (C) 2007 Guillaume Borios <gyom@ios-software.com>
 //
 //  iOS-Software <http://www.ios-software.com>

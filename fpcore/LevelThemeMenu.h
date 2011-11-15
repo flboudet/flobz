@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -28,7 +28,7 @@
 
 #include "gameui.h"
 #include "MainScreen.h"
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 #include "Theme.h"
 
 class LevelThemePicturePreview : public Widget, public IdleComponent {

@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -31,7 +31,7 @@
 #include "Frame.h"
 #include "FramedButton.h"
 #include "MainScreen.h"
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 #include "InternetGameCenter.h"
 #include "PuyoTwoPlayerStarter.h"
 #include "ChatBox.h"

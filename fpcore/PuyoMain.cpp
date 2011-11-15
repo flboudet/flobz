@@ -102,8 +102,8 @@ void PuyoMain::initWithGUI()
     loop->setEventManager(m_eventManager);
     // Give the AudioManager to the GameLoop
     loop->setAudioManager(m_audioManager);
-    // Create the PuyoCommander singleton
-    PuyoCommander *pc = new PuyoCommander(&m_dataPathManager, m_preferencesManager);
+    // Create the FPCommander singleton
+    FPCommander *pc = new FPCommander(&m_dataPathManager, m_preferencesManager);
     pc->initWithGUI(m_fullscreen);
     initMenus();
     cursor = new GameCursor("gfx/cursor.png");

@@ -1,5 +1,5 @@
 #include "FloboGameAbstract.h"
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 #include "gameui.h"
 
 PlayerGameStat::PlayerGameStat(int p)

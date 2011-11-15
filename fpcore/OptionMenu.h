@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -27,7 +27,7 @@
 #define _PUYOOPTIONMENU
 
 #include "gameui.h"
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 #include "ThemeMenu.h"
 #include "LevelThemeMenu.h"
 #include "ControlMenu.h"

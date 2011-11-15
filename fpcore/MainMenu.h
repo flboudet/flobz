@@ -50,7 +50,7 @@ private:
     OptionMenu            optionMenu;
 
     PopToMainScreenAction popFromHallScreenAction, popFromCreditsAction;
-    HallOfFameScreen      hallOfFameScreen; // Comes from PuyoSinglePlayerStarter.cpp
+    HallOfFameScreen      hallOfFameScreen; // Comes from StoryModeStarter.cpp
     StoryScreen           creditsScreen;
     PushMainScreenMenuAction    soloGameAction;
     PushMainScreenMenuAction    singlePlayerGameAction;

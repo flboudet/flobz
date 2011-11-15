@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -33,13 +33,13 @@
 
 using namespace ios_fc;
 
-class PuyoNetworkView : public GameView {
+class NetworkGameView : public GameView {
   public:
-    PuyoNetworkView(FloboGameFactory *attachedFloboGameFactory, MessageBox *mbox, int gameId)
+    NetworkGameView(FloboGameFactory *attachedFloboGameFactory, MessageBox *mbox, int gameId)
         : GameView(attachedFloboGameFactory),
           mbox(mbox), gameId(gameId), badFlobos(0), lastFullMessage(-1) {}
 
-    PuyoNetworkView(FloboGameFactory *attachedFloboGameFactory,
+    NetworkGameView(FloboGameFactory *attachedFloboGameFactory,
             int playerId,
 		    FloboSetTheme *attachedFloboThemeSet,
             LevelTheme *attachedLevelTheme,
@@ -85,21 +85,21 @@ protected:
     double lastFullMessage;
 };
 
-class PuyoInternetNetworkView : public PuyoNetworkView {
+class InternetGameView : public NetworkGameView {
     public:
-        PuyoInternetNetworkView(FloboGameFactory *attachedFloboGameFactory, MessageBox *mbox, int gameId,
+        InternetGameView(FloboGameFactory *attachedFloboGameFactory, MessageBox *mbox, int gameId,
                                 FPServerIGPMessageBox *igpbox)
-          : PuyoNetworkView(attachedFloboGameFactory, mbox, gameId)
+          : NetworkGameView(attachedFloboGameFactory, mbox, gameId)
           , igpbox(igpbox)
         {}
 
-        PuyoInternetNetworkView(FloboGameFactory *attachedFloboGameFactory,
+        InternetGameView(FloboGameFactory *attachedFloboGameFactory,
                                 int playerId,
                                 FloboSetTheme *attachedFloboThemeSet,
                                 LevelTheme *attachedLevelTheme,
                                 MessageBox *mbox, int gameId,
                                 FPServerIGPMessageBox *igpbox)
-          : PuyoNetworkView(attachedFloboGameFactory,
+          : NetworkGameView(attachedFloboGameFactory,
                              playerId,
                              attachedFloboThemeSet,
                              attachedLevelTheme,

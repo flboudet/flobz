@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -25,13 +25,13 @@
 
 #include "GTLog.h"
 #include "PuyoStrings.h"
-#include "PuyoSinglePlayerStarter.h"
+#include "StoryModeStarter.h"
 #include "GameView.h"
 #include "GSLFileAccessWrapper.h"
 
 using namespace event_manager;
 
-SinglePlayerGameWidget::SinglePlayerGameWidget(int lifes, String aiFace)
+StoryModeGameWidget::StoryModeGameWidget(int lifes, String aiFace)
     : opponentcontroller(NULL),
       faceTicks(0), opponent(aiFace),
       killLeftCheat("killleft", this),
@@ -40,7 +40,7 @@ SinglePlayerGameWidget::SinglePlayerGameWidget(int lifes, String aiFace)
     setLives(lifes);
 }
 
-void SinglePlayerGameWidget::initWithGUI(GameView &areaA, GameView &areaB,
+void StoryModeGameWidget::initWithGUI(GameView &areaA, GameView &areaB,
                                             GamePlayer &playercontroller,
                                             LevelTheme &levelTheme,
                                             int level,
@@ -63,8 +63,8 @@ void SinglePlayerGameWidget::initWithGUI(GameView &areaA, GameView &areaB,
 	areaB.getAttachedGame()->setScoringLevel(scoringLevel);
 }
 
-SinglePlayerStandardLayoutGameWidget::SinglePlayerStandardLayoutGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
-  : SinglePlayerGameWidget(lifes, aiFace),
+StoryModeStandardLayoutGameWidget::StoryModeStandardLayoutGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
+  : StoryModeGameWidget(lifes, aiFace),
       attachedFloboThemeSet(puyoThemeSet),
       attachedRandom(nColors),
       attachedGameFactory(&attachedRandom),
@@ -76,13 +76,13 @@ SinglePlayerStandardLayoutGameWidget::SinglePlayerStandardLayoutGameWidget(Flobo
     initWithGUI(areaA, areaB, playercontroller, levelTheme, level, gameOverAction);
 }
 
-SinglePlayerGameWidget::~SinglePlayerGameWidget()
+StoryModeGameWidget::~StoryModeGameWidget()
 {
     if (opponentcontroller != NULL)
         delete opponentcontroller;
 }
 
-void SinglePlayerGameWidget::cycle()
+void StoryModeGameWidget::cycle()
 {
     faceTicks += 1;
     if (faceTicks == 1) {
@@ -115,12 +115,12 @@ void SinglePlayerGameWidget::cycle()
     GameWidget2P::cycle();
 }
 
-StoryWidget *SinglePlayerGameWidget::getOpponent()
+StoryWidget *StoryModeGameWidget::getOpponent()
 {
     return &opponent;
 }
 
-void SinglePlayerGameWidget::action(Widget *sender, int actionType,
+void StoryModeGameWidget::action(Widget *sender, int actionType,
                                         GameControlEvent *event)
 {
     if (sender == static_cast<Widget *>(&killLeftCheat))
@@ -198,7 +198,7 @@ void StoryModeLevelsDefinition::end_level(GoomSL *gsl, GoomHash *global, GoomHas
 					easySettings, mediumSettings, hardSettings);
 }
 
-FloboGameOver1PScreen::FloboGameOver1PScreen(String screenName,
+GameOver1PScreen::GameOver1PScreen(String screenName,
         Action *finishedAction, String playerName, const PlayerGameStat &playerPoints, bool initialTransition)
         : StoryScreen(screenName, finishedAction, initialTransition),
         playerName(playerName), playerStat(playerPoints)
@@ -228,7 +228,7 @@ FloboGameOver1PScreen::FloboGameOver1PScreen(String screenName,
     refresh();
 }
 
-void FloboGameOver1PScreen::refresh()
+void GameOver1PScreen::refresh()
 {
     hiscore *scores = getHiScores();
     for (int i = 0 ; i < kHiScoresNumber ; i++) {
@@ -258,7 +258,7 @@ void FloboGameOver1PScreen::refresh()
                             storyWidget.getIntegerValue("@hiScoreBox.h"), 0));
 }
 
-FloboGameOver1PScreen::~FloboGameOver1PScreen()
+GameOver1PScreen::~GameOver1PScreen()
 {
 }
 
@@ -415,7 +415,7 @@ GameWidget *StoryModeMatchState::createGameWidget(FloboSetTheme &puyoThemeSet,
         m_sharedAssets.m_currentLevelTheme = theCommander->getPreferedLevelTheme();
     else
         m_sharedAssets.m_currentLevelTheme = theCommander->getLevelTheme(m_sharedGameAssets->levelDef->backgroundTheme);
-    return new SinglePlayerStandardLayoutGameWidget(*(m_sharedAssets.m_currentFloboSetTheme),
+    return new StoryModeStandardLayoutGameWidget(*(m_sharedAssets.m_currentFloboSetTheme),
                                                     *(m_sharedAssets.m_currentLevelTheme),
                                                     m_sharedGameAssets->levelDef->getAISettings(m_sharedGameAssets->difficulty).level,
                                                     m_sharedGameAssets->levelDef->getAISettings(m_sharedGameAssets->difficulty).nColors,
@@ -507,7 +507,7 @@ void StoryModeDisplayHallOfFameState::enterState()
     GTLogTrace("StoryModeDisplayHallOfFameState(%s)::enterState()", m_storyName.c_str());
     std::string &playerName = m_sharedGameAssets->playerName;
     const PlayerGameStat &playerPoints = m_sharedMatchAssets->m_gameWidget->getStatPlayerOne();
-    m_gameOverScreen.reset(new FloboGameOver1PScreen(m_storyName.c_str(),
+    m_gameOverScreen.reset(new GameOver1PScreen(m_storyName.c_str(),
                                         this, playerName.c_str(), playerPoints));
     GameUIDefaults::SCREEN_STACK->swap(m_gameOverScreen.get());
     m_gameOverScreen->refresh();

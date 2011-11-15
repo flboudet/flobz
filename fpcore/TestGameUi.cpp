@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
     loop->setSurface(display);
     atexit(SDL_Quit); 
     SDL_ShowCursor(SDL_DISABLE);
-    SDL_WM_SetCaption("FloboPuyo by iOS-Software",NULL);
+    SDL_WM_SetCaption("FloboPop by iOS-Software",NULL);
   
     // Font par défaut
     SoFont *darkFont = SoFont_new();

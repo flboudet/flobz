@@ -1,7 +1,7 @@
 /* strings to translate */
 
 #include "GTLog.h"
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 #include "PuyoStrings.h"
 #include "audio.h"
 #include "MainMenu.h"
@@ -12,7 +12,7 @@
 using namespace gameui;
 using namespace event_manager;
 
-PuyoCommander *theCommander = NULL;
+FPCommander *theCommander = NULL;
 IosFont *storyFont; // TODO: remove
 
 static const char * kFullScreenPref = "Config.FullScreen";
@@ -145,14 +145,14 @@ void LevelThemeFactory::destroy(LevelTheme *res)
  */
 void SinglePlayerGameAction::action()
 {
-  /*PuyoStarter *starter = new PuyoSinglePlayerStarter(theCommander, 5, FLOBO, 0);
+  /*PuyoStarter *starter = new StoryModeStarter(theCommander, 5, FLOBO, 0);
   starter->run(0,0,0,0,0);
   GameUIDefaults::SCREEN_STACK->push(starter);*/
 }
 
-/* Build the PuyoCommander */
+/* Build the FPCommander */
 
-PuyoCommander::PuyoCommander(DataPathManager *dataPathManager,
+FPCommander::FPCommander(DataPathManager *dataPathManager,
                              PreferencesManager *preferencesManager)
   : m_dataPathManager(dataPathManager),
     m_preferencesManager(preferencesManager),
@@ -165,7 +165,7 @@ PuyoCommander::PuyoCommander(DataPathManager *dataPathManager,
     m_levelThemeFactory(*m_themeManager),
     m_cursor(NULL)
 {
-  GTLogTrace("PuyoCommander constructor");
+  GTLogTrace("FPCommander constructor");
 #ifdef PRODUCE_CACHE_FILE
   cacheOutputGsl = fopen("cache.gsl", "w");
 #endif
@@ -173,12 +173,12 @@ PuyoCommander::PuyoCommander(DataPathManager *dataPathManager,
   theCommander = this;
 
   createResourceManagers();
-  GTLogTrace("PuyoCommander constructor finished");
+  GTLogTrace("FPCommander constructor finished");
 }
 
-void PuyoCommander::initWithGUI(bool fs)
+void FPCommander::initWithGUI(bool fs)
 {
-  GTLogTrace("PuyoCommander::initWithGUI() entered");
+  GTLogTrace("FPCommander::initWithGUI() entered");
 
   m_windowFramePicture = std::auto_ptr<FramePicture>(new FramePicture(25, 28, 25, 19, 26, 23));
   m_buttonIdleFramePicture = std::auto_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
@@ -189,19 +189,19 @@ void PuyoCommander::initWithGUI(bool fs)
   m_separatorFramePicture = std::auto_ptr<FramePicture>(new FramePicture(63, 2, 63, 2, 4, 2));
   m_listFramePicture = std::auto_ptr<FramePicture>(new FramePicture(5, 23, 4, 6, 10, 3));
 
-  GTLogTrace("PuyoCommander::initWithGUI() init locales");
+  GTLogTrace("FPCommander::initWithGUI() init locales");
 
   initLocale();
 
-  GTLogTrace("PuyoCommander::initWithGUI() init audio");
+  GTLogTrace("FPCommander::initWithGUI() init audio");
 
   initAudio();
 
-  GTLogTrace("PuyoCommander::initWithGUI() init fonts");
+  GTLogTrace("FPCommander::initWithGUI() init fonts");
 
   initFonts();
 
-  GTLogTrace("PuyoCommander::initWithGUI() loading images");
+  GTLogTrace("FPCommander::initWithGUI() loading images");
 
 
   // Loading the frame images, and setting up the frames
@@ -223,7 +223,7 @@ void PuyoCommander::initWithGUI(bool fs)
   m_separatorImage = getSurface(IMAGE_RGBA, "gfx/separator.png");
   m_listIdleImage = getSurface(IMAGE_RGBA, "gfx/listborder.png");
 
-  GTLogTrace("PuyoCommander::initWithGUI() configuring frames");
+  GTLogTrace("FPCommander::initWithGUI() configuring frames");
 
   m_windowFramePicture->setFrameSurface(m_frameImage);
   m_buttonIdleFramePicture->setFrameSurface(m_buttonIdleImage);
@@ -233,16 +233,16 @@ void PuyoCommander::initWithGUI(bool fs)
   m_textFieldIdleFramePicture->setFrameSurface(m_textFieldIdleImage);
   m_separatorFramePicture->setFrameSurface(m_separatorImage);
   m_listFramePicture->setFrameSurface(m_listIdleImage);
-  GTLogTrace("PuyoCommander::initWithGUI() completed");
+  GTLogTrace("FPCommander::initWithGUI() completed");
 
 }
 
-void PuyoCommander::initWithoutGUI()
+void FPCommander::initWithoutGUI()
 {
   initLocale();
 }
 
-PuyoCommander::~PuyoCommander()
+FPCommander::~FPCommander()
 {
 }
 
@@ -250,19 +250,19 @@ extern char *dataFolder;
 #include <string>
 
 /* Initialise the default dictionnary */
-void PuyoCommander::initLocale()
+void FPCommander::initLocale()
 {
   locale = new LocalizedDictionary(*m_dataPathManager, "locale", "main");
 }
 
 /* Global translator */
-const char * PuyoCommander::getLocalizedString(const char * originalString) const
+const char * FPCommander::getLocalizedString(const char * originalString) const
 {
   return locale->getLocalizedString(originalString);
 }
 
 /* Initialize the audio if necessary */
-void PuyoCommander::initAudio()
+void FPCommander::initAudio()
 {
     m_slideSound = getSound(FilePath("sfx").combine("slide.wav"));
     m_whipSound = getSound(FilePath("sfx").combine("whip.wav"));
@@ -273,7 +273,7 @@ void PuyoCommander::initAudio()
 
 
 /* load fonts and set them for use in the GUI */
-void PuyoCommander::initFonts()
+void FPCommander::initFonts()
 {
     Locales_Init(); // Make sure locales are detected.
     String fontName, funnyFontName;
@@ -306,7 +306,7 @@ void PuyoCommander::initFonts()
     GameUIDefaults::FONT_FUNNY        = m_funnyFont;
 }
 
-void PuyoCommander::initThemes()
+void FPCommander::initThemes()
 {
 #ifdef DISABLED
     // List the themes in the various pack folders
@@ -322,74 +322,74 @@ void PuyoCommander::initThemes()
 #endif
 }
 
-String PuyoCommander::getFullScreenKey(void) const
+String FPCommander::getFullScreenKey(void) const
 {
     return String(kFullScreenPref);
 }
 
-ScreenTransitionWidget *PuyoCommander::createScreenTransition(Screen &fromScreen) const
+ScreenTransitionWidget *FPCommander::createScreenTransition(Screen &fromScreen) const
 {
     return new DoomMeltScreenTransitionWidget(fromScreen);
 }
 
 // Resource management
-void PuyoCommander::cacheSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility)
+void FPCommander::cacheSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility)
 {
     m_surfaceResManager->cacheResource(IosSurfaceResourceKey(type, path, specialAbility));
 }
 
-IosSurfaceRef PuyoCommander::getSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility)
+IosSurfaceRef FPCommander::getSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility)
 {
     return m_surfaceResManager->getResource(IosSurfaceResourceKey(type, path, specialAbility));
 }
 
-IosSurfaceRef PuyoCommander::getSurface(ImageType type, const char *path, const ImageOperationList &list)
+IosSurfaceRef FPCommander::getSurface(ImageType type, const char *path, const ImageOperationList &list)
 {
     ImageSpecialAbility specialAbility = GameUIDefaults::GAME_LOOP->getDrawContext()->guessRequiredImageAbility(list);
     return m_surfaceResManager->getResource(IosSurfaceResourceKey(type, path, specialAbility));
 }
 
-void PuyoCommander::cacheFont(const char *path, int size, IosFontFx fx)
+void FPCommander::cacheFont(const char *path, int size, IosFontFx fx)
 {
     m_fontResManager->cacheResource(IosFontResourceKey(path, size, fx));
 }
 
-IosFontRef PuyoCommander::getFont(const char *path, int size, IosFontFx fx)
+IosFontRef FPCommander::getFont(const char *path, int size, IosFontFx fx)
 {
     return m_fontResManager->getResource(IosFontResourceKey(path, size, fx));
 }
 
-void PuyoCommander::cacheSound(const char *path)
+void FPCommander::cacheSound(const char *path)
 {
     m_soundResManager->cacheResource(path);
 }
 
-SoundRef PuyoCommander::getSound(const char *path)
+SoundRef FPCommander::getSound(const char *path)
 {
     return m_soundResManager->getResource(path);
 }
 
-void PuyoCommander::cacheMusic(const char *path)
+void FPCommander::cacheMusic(const char *path)
 {
     m_musicResManager->cacheResource(path);
 }
 
-MusicRef PuyoCommander::getMusic(const char *path)
+MusicRef FPCommander::getMusic(const char *path)
 {
     return m_musicResManager->getResource(path);
 }
 
-FloboSetThemeRef PuyoCommander::getFloboSetTheme(const char *name)
+FloboSetThemeRef FPCommander::getFloboSetTheme(const char *name)
 {
     return m_puyoSetThemeResManager->getResource(name);
 }
 
-FloboSetThemeRef PuyoCommander::getPreferedFloboSetTheme()
+FloboSetThemeRef FPCommander::getPreferedFloboSetTheme()
 {
     return getFloboSetTheme(getPreferedFloboSetThemeName().c_str());
 }
 
-const std::string &PuyoCommander::getPreferedFloboSetThemeName() const
+const std::string &FPCommander::getPreferedFloboSetThemeName() const
 {
     if (m_defaultFloboSetThemeName == "") {
         m_defaultFloboSetThemeName = m_preferencesManager->getStrPreference ("floboset_theme", getDefaultFloboSetThemeName().c_str());
@@ -397,7 +397,7 @@ const std::string &PuyoCommander::getPreferedFloboSetThemeName() const
     return m_defaultFloboSetThemeName;
 }
 
-const std::string PuyoCommander::getDefaultFloboSetThemeName() const
+const std::string FPCommander::getDefaultFloboSetThemeName() const
 {
     // TODO: provide a way to set the default theme in the data
     //return m_themeManager->getFloboSetThemeList()[0];
@@ -405,28 +405,28 @@ const std::string PuyoCommander::getDefaultFloboSetThemeName() const
 }
 
 
-void PuyoCommander::setPreferedFloboSetThemeName(const char *name)
+void FPCommander::setPreferedFloboSetThemeName(const char *name)
 {
     m_defaultFloboSetThemeName = name;
     m_preferencesManager->setStrPreference ("floboset_theme", name);
 }
 
-const std::vector<std::string> &PuyoCommander::getFloboSetThemeList() const
+const std::vector<std::string> &FPCommander::getFloboSetThemeList() const
 {
     return m_themeManager->getFloboSetThemeList();
 }
 
-LevelThemeRef PuyoCommander::getLevelTheme(const char *name)
+LevelThemeRef FPCommander::getLevelTheme(const char *name)
 {
     return m_levelThemeResManager->getResource(name);
 }
 
-LevelThemeRef PuyoCommander::getPreferedLevelTheme()
+LevelThemeRef FPCommander::getPreferedLevelTheme()
 {
     return getLevelTheme(getPreferedLevelThemeName().c_str());
 }
 
-const std::string &PuyoCommander::getPreferedLevelThemeName() const
+const std::string &FPCommander::getPreferedLevelThemeName() const
 {
     if (m_defaultLevelThemeName == "") {
         m_defaultLevelThemeName = m_preferencesManager->getStrPreference ("level_theme", getDefaultLevelThemeName().c_str());
@@ -434,23 +434,23 @@ const std::string &PuyoCommander::getPreferedLevelThemeName() const
     return m_defaultLevelThemeName;
 }
 
-const std::string PuyoCommander::getDefaultLevelThemeName() const
+const std::string FPCommander::getDefaultLevelThemeName() const
 {
     return m_themeManager->getLevelThemeList()[0];
 }
 
-void PuyoCommander::setPreferedLevelThemeName(const char *name)
+void FPCommander::setPreferedLevelThemeName(const char *name)
 {
     m_defaultLevelThemeName = name;
     m_preferencesManager->setStrPreference ("level_theme", name);
 }
 
-const std::vector<std::string> &PuyoCommander::getLevelThemeList() const
+const std::vector<std::string> &FPCommander::getLevelThemeList() const
 {
     return m_themeManager->getLevelThemeList();
 }
 
-void PuyoCommander::freeUnusedResources()
+void FPCommander::freeUnusedResources()
 {
     m_surfaceResManager->freeUnusedResources();
     //m_fontResManager->freeUnusedResources();
@@ -458,18 +458,18 @@ void PuyoCommander::freeUnusedResources()
     //m_musicResManager->freeUnusedResources();
 }
 
-void PuyoCommander::registerCursor(AbstractCursor *cursor)
+void FPCommander::registerCursor(AbstractCursor *cursor)
 {
     m_cursor = cursor;
 }
 
-void PuyoCommander::setCursorVisible(bool visible)
+void FPCommander::setCursorVisible(bool visible)
 {
     if (m_cursor != NULL)
         m_cursor->setVisible(visible);
 }
 
-void PuyoCommander::createResourceManagers()
+void FPCommander::createResourceManagers()
 {
 #ifdef THREADED_RESOURCE_MANAGER
     m_surfaceResManager.reset(new ThreadedResourceManager<IosSurface, IosSurfaceResourceKey>(m_surfaceFactory));

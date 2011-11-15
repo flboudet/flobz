@@ -3,7 +3,7 @@
 
 #include "gameui.h"
 #include "MainScreen.h"
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 #include "Frame.h"
 #include "FramedButton.h"
 

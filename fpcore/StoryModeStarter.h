@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -22,8 +22,8 @@
  *
  *
  */
-#ifndef _PUYOSINGLEPLAYERSTARTER
-#define _PUYOSINGLEPLAYERSTARTER
+#ifndef _STORYMODESTARTER_H_
+#define _STORYMODESTARTER_H_
 
 #include "GameStateMachine.h"
 #include "LocalGameStates.h"
@@ -34,11 +34,11 @@
 #include "goomsl_hash.h"
 #include <vector>
 
-class SinglePlayerGameWidget : public GameWidget2P, public Action {
+class StoryModeGameWidget : public GameWidget2P, public Action {
 public:
-    SinglePlayerGameWidget(int lifes, String aiFace);
+    StoryModeGameWidget(int lifes, String aiFace);
     void initWithGUI(GameView &areaA, GameView &areaB, GamePlayer &playercontroller, LevelTheme &levelTheme, int level, Action *gameOverAction);
-    virtual ~SinglePlayerGameWidget();
+    virtual ~StoryModeGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
     StoryWidget *getOpponent();
@@ -54,10 +54,10 @@ protected:
     CheatCodeManager killLeftCheat, killRightCheat;
 };
 
-class SinglePlayerStandardLayoutGameWidget : public SinglePlayerGameWidget
+class StoryModeStandardLayoutGameWidget : public StoryModeGameWidget
 {
 public:
-    SinglePlayerStandardLayoutGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
+    StoryModeStandardLayoutGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
 private:
     FloboSetTheme &attachedFloboThemeSet;
     RandomSystem attachedRandom;
@@ -121,12 +121,12 @@ private:
     AdvancedBuffer<LevelDefinition *> levelDefinitions;
 };
 
-class FloboGameOver1PScreen : public StoryScreen {
+class GameOver1PScreen : public StoryScreen {
 public:
-    FloboGameOver1PScreen(String screenName, Action *finishedAction,
+    GameOver1PScreen(String screenName, Action *finishedAction,
             String playerName, const PlayerGameStat &playerPoints, bool initialTransition=false);
     void refresh();
-    virtual ~FloboGameOver1PScreen();
+    virtual ~GameOver1PScreen();
 private:
 	HBox titleBox;
 	Text titleText;
@@ -202,7 +202,7 @@ private:
     SharedMatchAssets *m_sharedMatchAssets;
     std::string m_storyName;
     GameState *m_nextState;
-    std::auto_ptr<FloboGameOver1PScreen> m_gameOverScreen;
+    std::auto_ptr<GameOver1PScreen> m_gameOverScreen;
     bool m_acknowledged;
 };
 
@@ -330,6 +330,6 @@ protected:
     std::auto_ptr<LeaveGameState>          m_leaveGame;
 };
 
-#endif // _PUYOSINGLEPLAYERSTARTER
+#endif // _STORYMODESTARTER_H_
 
 

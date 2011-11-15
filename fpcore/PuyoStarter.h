@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _PUYOSTARTER
-#define _PUYOSTARTER
+#ifndef _FLOBOSTARTER
+#define _FLOBOSTARTER
 
 #include "GameView.h"
 #include "EventPlayer.h"
@@ -52,5 +52,5 @@ private:
     EventPlayer controllerA, controllerB;
 };
 
-#endif // _PUYOSTARTER
+#endif // _FLOBOSTARTER
 

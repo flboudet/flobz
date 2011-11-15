@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -26,15 +26,15 @@
 #define _PUYONETWORKSTARTER
 
 #include "PuyoStarter.h"
-#include "PuyoSinglePlayerStarter.h"
+#include "StoryModeStarter.h"
 #include "PuyoTwoPlayerStarter.h"
 #include "ios_messagebox.h"
-#include "PuyoNetworkView.h"
+#include "NetworkGameView.h"
 #include "ChatBox.h"
 
-class PuyoNetworkGameFactory : public FloboGameFactory {
+class NetworkGameFactory : public FloboGameFactory {
 public:
-    PuyoNetworkGameFactory(RandomSystem *attachedRandom, MessageBox &msgBox, int gameId): attachedRandom(attachedRandom), msgBox(msgBox), gameId(gameId) {}
+    NetworkGameFactory(RandomSystem *attachedRandom, MessageBox &msgBox, int gameId): attachedRandom(attachedRandom), msgBox(msgBox), gameId(gameId) {}
     FloboGame *createFloboGame(FloboFactory *attachedFloboFactory);
     int getGameId() { return gameId; }
 private:
@@ -43,17 +43,17 @@ private:
     int gameId;
 };
 
-class PuyoNetworkGameWidget : public GameWidget2P, MessageListener, ChatBoxDelegate {
+class NetworkGameWidget : public GameWidget2P, MessageListener, ChatBoxDelegate {
 public:
     enum {
         NETWORK_FAILURE = GAME_IS_OVER+1
     };
 public:
-    PuyoNetworkGameWidget();
+    NetworkGameWidget();
     void initWithGUI(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, FPServerIGPMessageBox *igpbox = NULL);
     void initWithoutGUI(ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, FPServerIGPMessageBox *igpbox = NULL);
     void connectIA(int level);
-    ~PuyoNetworkGameWidget();
+    ~NetworkGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
     void onMessage(Message &);
@@ -71,9 +71,9 @@ private:
     std::auto_ptr<RandomSystem> attachedRandom;
     ios_fc::MessageBox *mbox;
     std::auto_ptr<LocalGameFactory> attachedLocalGameFactory;
-    std::auto_ptr<PuyoNetworkGameFactory> attachedNetworkGameFactory;
+    std::auto_ptr<NetworkGameFactory> attachedNetworkGameFactory;
 protected:
-    std::auto_ptr<PuyoNetworkView> localArea;
+    std::auto_ptr<NetworkGameView> localArea;
     std::auto_ptr<GameView> networkArea;
 private:
     std::auto_ptr<GamePlayer> playercontroller;

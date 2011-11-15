@@ -1,7 +1,7 @@
 #include <string.h>
 #include "GTLog.h"
-#include "PuyoStory.h"
-#include "PuyoCommander.h"
+#include "Story.h"
+#include "FPCommander.h"
 #include "audio.h"
 #include "Theme.h"
 
@@ -87,7 +87,7 @@ StyroImage::StyroImage(StyrolyseClient *_this,
     if (path[0] == '@') {
         int state = 0;
         int type = 0;
-        const FloboSetTheme *attachedTheme = ((StoryWidget::PuyoStoryStyrolyseClient *)_this)->attachedTheme;
+        const FloboSetTheme *attachedTheme = ((StoryWidget::StoryStyrolyseClient *)_this)->attachedTheme;
         if ((attachedTheme != NULL)
             && (extract_state_and_type(path,&state,&type)==0)) {
             const FloboTheme &theme = attachedTheme->getFloboTheme((FloboState)state);
@@ -181,7 +181,7 @@ static void putText (StyrolyseClient *_this, int x, int y, const char *text)
 
 static const char *getText(StyrolyseClient *_this, const char *text)
 {
-    return ((StoryWidget::PuyoStoryStyrolyseClient *)_this)->widget->getText(text);
+    return ((StoryWidget::StoryStyrolyseClient *)_this)->widget->getText(text);
 }
 
 static void music(StyrolyseClient *_this, const char *command)

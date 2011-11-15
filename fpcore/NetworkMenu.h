@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -31,7 +31,7 @@
 #include "FramedButton.h"
 #include "FramedEditField.h"
 #include "ListView.h"
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 #include "MainScreen.h"
 #include "InternetMenu.h"
 #include "InternetGameCenter.h"

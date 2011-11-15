@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -37,7 +37,7 @@ public:
       : mbox(mbox), randomSeed(randomSeed), igpbox(igpbox), gameId(0) {}
     GameWidget *createGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
-        PuyoNetworkGameWidget *negawi = new PuyoNetworkGameWidget();
+        NetworkGameWidget *negawi = new NetworkGameWidget();
         negawi->initWithGUI(puyoThemeSet, levelTheme, mbox, gameId++, randomSeed++, gameOverAction, igpbox);
         return negawi;
     }

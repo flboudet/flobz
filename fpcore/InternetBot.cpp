@@ -1,6 +1,6 @@
 #include "InternetBot.h"
 #include "PuyoStrings.h"
-#include "PuyoNetworkView.h"
+#include "NetworkGameView.h"
 #include "PuyoNetworkStarter.h"
 
 class PIBNGCListener : public NetGameCenterListener {
@@ -41,14 +41,14 @@ public:
     /*
     std::auto_ptr<RandomSystem> m_myRandom;
     std::auto_ptr<LocalGameFactory> m_myGameFactory;
-    std::auto_ptr<PuyoInternetNetworkView> m_myView;
+    std::auto_ptr<InternetGameView> m_myView;
     std::auto_ptr<AIPlayer> m_myAI;
 
     std::auto_ptr<RandomSystem> m_opRandom;
-    std::auto_ptr<PuyoNetworkGameFactory> m_opGameFactory;
+    std::auto_ptr<NetworkGameFactory> m_opGameFactory;
     std::auto_ptr<GameView> m_opView;
     */
-    std::auto_ptr<PuyoNetworkGameWidget> m_Negawi; // the NEtwork GAme WIdget
+    std::auto_ptr<NetworkGameWidget> m_Negawi; // the NEtwork GAme WIdget
 
     virtual void onGameGrantedWithMessagebox(MessageBox *mbox, FloboGameInvitation &invitation) {
         std::cout << "onGameGrantedWithMessagebox" << std::endl;
@@ -59,15 +59,15 @@ public:
         m_opponent = mbox;
         m_myRandom = std::auto_ptr<RandomSystem>(new RandomSystem(5, invitation.gameRandomSeed));
         m_myGameFactory = std::auto_ptr<LocalGameFactory>(new LocalGameFactory(m_myRandom.get()));
-        m_myView = std::auto_ptr<PuyoInternetNetworkView>(new PuyoInternetNetworkView(m_myGameFactory.get(), mbox, gameId, igpbox));
+        m_myView = std::auto_ptr<InternetGameView>(new InternetGameView(m_myGameFactory.get(), mbox, gameId, igpbox));
         m_myAI = std::auto_ptr<AIPlayer>(new AIPlayer(m_level, *m_myView));
         // Remote view
         // TODO
         m_opRandom = std::auto_ptr<RandomSystem>(new RandomSystem(5, invitation.gameRandomSeed));
-        m_opGameFactory = std::auto_ptr<PuyoNetworkGameFactory>(new PuyoNetworkGameFactory(m_opRandom.get(), *mbox, gameId));
+        m_opGameFactory = std::auto_ptr<NetworkGameFactory>(new NetworkGameFactory(m_opRandom.get(), *mbox, gameId));
         m_opView = std::auto_ptr<GameView>(new GameView(m_opGameFactory.get()));
         */
-        m_Negawi = std::auto_ptr<PuyoNetworkGameWidget>(new PuyoNetworkGameWidget());
+        m_Negawi = std::auto_ptr<NetworkGameWidget>(new NetworkGameWidget());
         m_Negawi->initWithoutGUI(*mbox, gameId, invitation.gameRandomSeed, NULL, igpbox);
         m_Negawi->connectIA(m_level);
     }

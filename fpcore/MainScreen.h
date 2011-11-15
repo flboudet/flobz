@@ -28,7 +28,7 @@
 
 #include "gameui.h"
 #include "Frame.h"
-#include "PuyoStory.h"
+#include "Story.h"
 
 class MainScreenMenu;
 

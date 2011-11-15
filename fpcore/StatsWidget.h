@@ -10,7 +10,7 @@
 #ifndef _FLOBO_STATS_WIDGET_H
 #define _FLOBO_STATS_WIDGET_H
 
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 #include "gameloop.h"
 #include "gameui.h"
 #include "Frame.h"

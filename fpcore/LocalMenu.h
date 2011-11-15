@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -29,9 +29,9 @@
 #include "gameui.h"
 #include "FramedEditField.h"
 #include "MainScreen.h"
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 #include "SoloGameStarter.h"
-#include "PuyoSinglePlayerStarter.h"
+#include "StoryModeStarter.h"
 #include "PuyoTwoPlayerStarter.h"
 
 class SoloGameMenu : public MainScreenMenu, public PlayerNameProvider {

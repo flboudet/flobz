@@ -181,15 +181,15 @@ public:
 	int playerScore;
 };
 
-class PuyoCommander
+class FPCommander
 {
   public:
-    PuyoCommander(DataPathManager *dataPathManager,
+    FPCommander(DataPathManager *dataPathManager,
                   PreferencesManager *preferencesManager);
     void initWithGUI(bool fullscreen);
     void initWithoutGUI();
 
-    virtual ~PuyoCommander();
+    virtual ~FPCommander();
 
     String getFullScreenKey(void) const;
 
@@ -333,6 +333,6 @@ protected:
     mutable std::string m_defaultLevelThemeName;
 };
 
-extern class PuyoCommander *theCommander;
+extern class FPCommander *theCommander;
 
 #endif // _PUYOCOMMANDER

@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -29,7 +29,7 @@
 class GameScreen;
 
 #include "styrolyse.h"
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 #include "gameui.h"
 #include "ScreenTransition.h"
 #include "LocalizedDictionary.h"
@@ -61,7 +61,7 @@ public:
     const char *getText(const char *text) const;
     void freeMemory();
 
-    struct PuyoStoryStyrolyseClient {
+    struct StoryStyrolyseClient {
         StyrolyseClient styroClient;
         StoryWidget *widget;
         const FloboSetTheme *attachedTheme;
@@ -74,7 +74,7 @@ protected:
     Action *finishedAction;
     bool once;
     static bool classInitialized;
-    PuyoStoryStyrolyseClient client;
+    StoryStyrolyseClient client;
     double last_time;
     bool fxMode;
     String fullPath;

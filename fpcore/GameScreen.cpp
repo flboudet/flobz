@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -106,7 +106,7 @@ bool GameScreen::backPressed()
         // Seems complicated.
         // The pause method is called from the game widget
         // because this method is virtual and can be overloaded
-        // (see PuyoNetworkGameWidget)
+        // (see NetworkGameWidget)
         gameWidget.setScreenToPaused(true);
     }
     else {

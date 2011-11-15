@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _PUYOSCREENTRANSITION
-#define _PUYOSCREENTRANSITION
+#ifndef _FLOBOSCREENTRANSITION
+#define _FLOBOSCREENTRANSITION
 
 #include <memory>
 #include "gameui.h"
@@ -61,4 +61,4 @@ private:
     DoomMelt *melt;
 };
 
-#endif // _PUYOSCREENTRANSITION
+#endif // _FLOBOSCREENTRANSITION

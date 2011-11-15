@@ -5,7 +5,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #endif
 
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 #include "gametools/SDL_Painter.h"
 
 

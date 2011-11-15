@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef PUYONETWORKGAME_H
-#define PUYONETWORKGAME_H
+#ifndef _NETWORKGAME_H_
+#define _NETWORKGAME_H_
 
 #include <map>
 #include "FloboGame.h"
@@ -32,10 +32,10 @@
 
 using namespace ios_fc;
 
-class PuyoNetworkGame : public FloboGame, MessageListener {
+class NetworkGame : public FloboGame, MessageListener {
 public:
-    PuyoNetworkGame(FloboFactory *attachedFactory, MessageBox &msgBox, int gameId = 0);
-    ~PuyoNetworkGame();
+    NetworkGame(FloboFactory *attachedFactory, MessageBox &msgBox, int gameId = 0);
+    ~NetworkGame();
 
     virtual void onMessage(Message &);
 
@@ -71,15 +71,15 @@ public:
 private:
     void synchronizeState(Message &message);
     void setFloboAt(int X, int Y, Flobo *newFlobo);
-    void synchronizePuyo(Buffer<int> buffer);
-    Flobo *findPuyo(int floboID);
+    void synchronizeFlobo(Buffer<int> buffer);
+    Flobo *findFlobo(int floboID);
     Flobo *floboCells[FLOBOBAN_DIMX * (FLOBOBAN_DIMY+1)];
     FloboState nextFalling, nextCompanion;
-    Flobo *fakePuyo;
+    Flobo *fakeFlobo;
     MessageBox &msgBox;
     int gameId;
     AdvancedBuffer<Flobo *> floboVector;
-    std::map<int, Flobo *> m_puyoMap;
+    std::map<int, Flobo *> m_floboMap;
     int semiMove;
     int neutralFlobos, sentBadFlobos;
     bool gameRunning;
@@ -87,4 +87,4 @@ private:
 };
 
 
-#endif // PUYONETWORKGAME_H
+#endif // _NETWORKGAME_H_

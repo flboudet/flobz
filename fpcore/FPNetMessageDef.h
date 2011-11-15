@@ -24,7 +24,7 @@ enum {
   extern const char *NAME;
   extern const char *NAME1;
   extern const char *NAME2;
-  extern const char *PUYOS;
+  extern const char *FLOBOS;
   extern const char *PAUSED;
   extern const char *SCORE;
   extern const char *TOTAL_SCORE;
@@ -49,7 +49,7 @@ enum {
   extern const char *DID_FALL;
   extern const char *WILL_VANISH;
   extern const char *CURRENT_NEUTRALS;
-  extern const char *NUMBER_BAD_PUYOS;
+  extern const char *NUMBER_BAD_FLOBOS;
 
 };
 

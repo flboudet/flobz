@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -24,7 +24,7 @@
  */
 
 #include "PauseMenu.h"
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 
 using namespace event_manager;
 using namespace gameui;

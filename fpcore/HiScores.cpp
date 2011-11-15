@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "PuyoCommander.h"
+#include "FPCommander.h"
 #include "HiScores.h"
 
 static hiscore HS[kHiScoresNumber];

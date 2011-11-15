@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -29,7 +29,7 @@
 #include "GamePlayer.h"
 #include "CheatCodeManager.h"
 #include "Theme.h"
-#include "PuyoStory.h"
+#include "Story.h"
 
 /**
  * The standard difficulty levels, affecting the speed of the game

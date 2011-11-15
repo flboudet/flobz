@@ -25,16 +25,16 @@
 
 #include "PuyoNetworkStarter.h"
 #include "FPNetMessageDef.h"
-#include "PuyoNetworkView.h"
-#include "PuyoNetworkGame.h"
+#include "NetworkGameView.h"
+#include "NetworkGame.h"
 #include "ios_time.h"
 #include "FPNetMessageDef.h"
 
-FloboGame *PuyoNetworkGameFactory::createFloboGame(FloboFactory *attachedFloboFactory) {
-    return new PuyoNetworkGame(attachedFloboFactory, msgBox, gameId);
+FloboGame *NetworkGameFactory::createFloboGame(FloboFactory *attachedFloboFactory) {
+    return new NetworkGame(attachedFloboFactory, msgBox, gameId);
 }
 
-PuyoNetworkGameWidget::PuyoNetworkGameWidget()
+NetworkGameWidget::NetworkGameWidget()
     : chatBox(NULL),
       brokenNetworkWidget(NULL), networkIsBroken(false),
       m_networkTimeoutWarning(5000.),
@@ -42,24 +42,24 @@ PuyoNetworkGameWidget::PuyoNetworkGameWidget()
 {
 }
 
-GamePlayer *PuyoNetworkGameWidget::createLocalPlayer()
+GamePlayer *NetworkGameWidget::createLocalPlayer()
 {
     return new CombinedEventPlayer(*localArea);
 }
 
-void PuyoNetworkGameWidget::initWithGUI(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, FPServerIGPMessageBox *igpbox)
+void NetworkGameWidget::initWithGUI(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, FPServerIGPMessageBox *igpbox)
 {
     attachedFloboThemeSet = &puyoThemeSet;
     attachedRandom = std::auto_ptr<RandomSystem>(new RandomSystem(randomSeed, 5));
     this->mbox = &mbox;
     attachedLocalGameFactory   = std::auto_ptr<LocalGameFactory>(new LocalGameFactory(attachedRandom.get()));
-    attachedNetworkGameFactory = std::auto_ptr<PuyoNetworkGameFactory>(new PuyoNetworkGameFactory(attachedRandom.get(), mbox, gameId));
+    attachedNetworkGameFactory = std::auto_ptr<NetworkGameFactory>(new NetworkGameFactory(attachedRandom.get(), mbox, gameId));
     if (igpbox != NULL) {
-        localArea = std::auto_ptr<PuyoNetworkView>(new PuyoInternetNetworkView(attachedLocalGameFactory.get(), 0, attachedFloboThemeSet, &levelTheme,
+        localArea = std::auto_ptr<NetworkGameView>(new InternetGameView(attachedLocalGameFactory.get(), 0, attachedFloboThemeSet, &levelTheme,
                                             &mbox, gameId, igpbox));
     }
     else {
-        localArea = std::auto_ptr<PuyoNetworkView>(new PuyoNetworkView(attachedLocalGameFactory.get(), 0, attachedFloboThemeSet, &levelTheme, &mbox, gameId));
+        localArea = std::auto_ptr<NetworkGameView>(new NetworkGameView(attachedLocalGameFactory.get(), 0, attachedFloboThemeSet, &levelTheme, &mbox, gameId));
     }
     networkArea = std::auto_ptr<GameView>(new GameView(attachedNetworkGameFactory.get(), 1, attachedFloboThemeSet, &levelTheme));
     playercontroller = std::auto_ptr<GamePlayer>(createLocalPlayer());
@@ -72,24 +72,24 @@ void PuyoNetworkGameWidget::initWithGUI(FloboSetTheme &puyoThemeSet, LevelTheme 
     setLives(-1);
 }
 
-void PuyoNetworkGameWidget::initWithoutGUI(ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, FPServerIGPMessageBox *igpbox)
+void NetworkGameWidget::initWithoutGUI(ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, FPServerIGPMessageBox *igpbox)
 {
     this->mbox->addListener(this);
     //GameWidget::initWithoutGUI(*localArea, networkArea, playercontroller, dummyPlayerController, levelTheme, gameOverAction);
     setLives(-1);
 }
 
-void PuyoNetworkGameWidget::connectIA(int level)
+void NetworkGameWidget::connectIA(int level)
 {
 }
 
-PuyoNetworkGameWidget::~PuyoNetworkGameWidget()
+NetworkGameWidget::~NetworkGameWidget()
 {
     mbox->removeListener(this);
     // delete(localArea);
 }
 
-void PuyoNetworkGameWidget::cycle()
+void NetworkGameWidget::cycle()
 {
     double curDate = ios_fc::getTimeMs();
     if (paused) {
@@ -122,7 +122,7 @@ void PuyoNetworkGameWidget::cycle()
     mbox->idle();
 }
 
-void PuyoNetworkGameWidget::onMessage(Message &message)
+void NetworkGameWidget::onMessage(Message &message)
 {
     if (message.hasInt(FPNetMessage::GAMEID)) {
         lastMessageDate = ios_fc::getTimeMs();
@@ -153,7 +153,7 @@ void PuyoNetworkGameWidget::onMessage(Message &message)
     }
 }
 
-void PuyoNetworkGameWidget::setScreenToPaused(bool fromControls)
+void NetworkGameWidget::setScreenToPaused(bool fromControls)
 {
     // If the pause is from a controller, we have to send the pause information to the other peer
     if (fromControls) {
@@ -167,7 +167,7 @@ void PuyoNetworkGameWidget::setScreenToPaused(bool fromControls)
     GameWidget2P::setScreenToPaused(fromControls);
 }
 
-void PuyoNetworkGameWidget::setScreenToResumed(bool fromControls)
+void NetworkGameWidget::setScreenToResumed(bool fromControls)
 {
     // If the resume is from a controller, we have to send the resume information to the other peer
     if (fromControls) {
@@ -180,7 +180,7 @@ void PuyoNetworkGameWidget::setScreenToResumed(bool fromControls)
     GameWidget2P::setScreenToResumed(fromControls);
 }
 
-void PuyoNetworkGameWidget::abort()
+void NetworkGameWidget::abort()
 {
     ios_fc::Message *message = mbox->createMessage();
     message->addInt(FPNetMessage::TYPE,   FPNetMessage::kGameAbort);
@@ -190,7 +190,7 @@ void PuyoNetworkGameWidget::abort()
     GameWidget2P::abort();
 }
 
-void PuyoNetworkGameWidget::actionAfterGameOver(bool fromControls, int actionType)
+void NetworkGameWidget::actionAfterGameOver(bool fromControls, int actionType)
 {
     // If the resume is from a controller, we have to send the resume information to the other peer
     if (fromControls) {
@@ -203,7 +203,7 @@ void PuyoNetworkGameWidget::actionAfterGameOver(bool fromControls, int actionTyp
     GameWidget2P::actionAfterGameOver(fromControls, actionType);
 }
 
-void PuyoNetworkGameWidget::sendChat(String chatText)
+void NetworkGameWidget::sendChat(String chatText)
 {
     ios_fc::Message *message = mbox->createMessage();
     message->addInt(FPNetMessage::TYPE,   FPNetMessage::kGameChat);
@@ -215,13 +215,13 @@ void PuyoNetworkGameWidget::sendChat(String chatText)
     delete message;
 }
 
-void PuyoNetworkGameWidget::associatedScreenHasBeenSet(GameScreen *associatedScreen)
+void NetworkGameWidget::associatedScreenHasBeenSet(GameScreen *associatedScreen)
 {
     associatedScreen->getPauseMenu().add(chatBox.get());
     associatedScreen->getPauseMenu().pauseMenuTop = 5;
 }
 
-void PuyoNetworkGameWidget::sendAliveMsg()
+void NetworkGameWidget::sendAliveMsg()
 {
     ios_fc::Message *message = mbox->createMessage();
     message->addInt     (FPNetMessage::TYPE,   FPNetMessage::kGameAlive);
@@ -357,7 +357,7 @@ void NetMatchPlayingState::action(Widget *sender, int actionType,
                                   event_manager::GameControlEvent *event)
 {
     switch (actionType) {
-        case PuyoNetworkGameWidget::NETWORK_FAILURE:
+        case NetworkGameWidget::NETWORK_FAILURE:
             m_networkFailure = true;
             evaluateStateMachine();
             break;
