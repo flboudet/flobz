@@ -26,7 +26,7 @@
 #include "GTLog.h"
 #include "PuyoStrings.h"
 #include "PuyoSinglePlayerStarter.h"
-#include "PuyoView.h"
+#include "GameView.h"
 #include "GSLFileAccessWrapper.h"
 
 using namespace event_manager;
@@ -40,8 +40,8 @@ SinglePlayerGameWidget::SinglePlayerGameWidget(int lifes, String aiFace)
     setLives(lifes);
 }
 
-void SinglePlayerGameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB,
-                                            PuyoPlayer &playercontroller,
+void SinglePlayerGameWidget::initWithGUI(GameView &areaA, GameView &areaB,
+                                            GamePlayer &playercontroller,
                                             LevelTheme &levelTheme,
                                             int level,
                                             Action *gameOverAction)
@@ -63,13 +63,13 @@ void SinglePlayerGameWidget::initWithGUI(PuyoView &areaA, PuyoView &areaB,
 	areaB.getAttachedGame()->setScoringLevel(scoringLevel);
 }
 
-SinglePlayerStandardLayoutGameWidget::SinglePlayerStandardLayoutGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
+SinglePlayerStandardLayoutGameWidget::SinglePlayerStandardLayoutGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
   : SinglePlayerGameWidget(lifes, aiFace),
-      attachedPuyoThemeSet(puyoThemeSet),
+      attachedFloboThemeSet(puyoThemeSet),
       attachedRandom(nColors),
       attachedGameFactory(&attachedRandom),
-      areaA(&attachedGameFactory, 0, &attachedPuyoThemeSet, &levelTheme),
-      areaB(&attachedGameFactory, 1, &attachedPuyoThemeSet, &levelTheme),
+      areaA(&attachedGameFactory, 0, &attachedFloboThemeSet, &levelTheme),
+      areaB(&attachedGameFactory, 1, &attachedFloboThemeSet, &levelTheme),
       playercontroller(areaA)
 
 {
@@ -405,12 +405,12 @@ String StoryModeMatchState::getPlayerName(int playerNumber) const
     }
 }
 
-GameWidget *StoryModeMatchState::createGameWidget(PuyoSetTheme &puyoThemeSet,
+GameWidget *StoryModeMatchState::createGameWidget(FloboSetTheme &puyoThemeSet,
                                          LevelTheme &levelTheme,
                                          String centerFace,
                                          Action *gameOverAction)
 {
-    m_sharedAssets.m_currentFloboSetTheme = theCommander->getPreferedPuyoSetTheme();
+    m_sharedAssets.m_currentFloboSetTheme = theCommander->getPreferedFloboSetTheme();
     if (m_sharedGameAssets->levelDef->backgroundTheme == "Prefs.DefaultTheme")
         m_sharedAssets.m_currentLevelTheme = theCommander->getPreferedLevelTheme();
     else

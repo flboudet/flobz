@@ -1,4 +1,4 @@
-namespace PuyoMessage {
+namespace FPNetMessage {
 
 const char *TYPE          = "TYPE";
 const char *GAMEID        = "ID";

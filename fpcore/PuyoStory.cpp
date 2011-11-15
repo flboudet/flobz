@@ -87,13 +87,13 @@ StyroImage::StyroImage(StyrolyseClient *_this,
     if (path[0] == '@') {
         int state = 0;
         int type = 0;
-        const PuyoSetTheme *attachedTheme = ((StoryWidget::PuyoStoryStyrolyseClient *)_this)->attachedTheme;
+        const FloboSetTheme *attachedTheme = ((StoryWidget::PuyoStoryStyrolyseClient *)_this)->attachedTheme;
         if ((attachedTheme != NULL)
             && (extract_state_and_type(path,&state,&type)==0)) {
-            const PuyoTheme &theme = attachedTheme->getPuyoTheme((FloboState)state);
+            const FloboTheme &theme = attachedTheme->getFloboTheme((FloboState)state);
             switch (type) {
             case 0: // FLOBO_FACES
-                surface = theme.getPuyoSurfaceForValence(0);
+                surface = theme.getFloboSurfaceForValence(0);
                 break;
             case 1: // FLOBO_CIRCLES
                 surface = theme.getCircleSurfaceForIndex(0);
@@ -366,18 +366,18 @@ void StoryScreen::onScreenVisibleChanged(bool visible)
 }
 
 
-PuyoFX::PuyoFX(String fxName, const PuyoSetTheme &puyoSetTheme)
+VisualFX::VisualFX(String fxName, const FloboSetTheme &puyoSetTheme)
     : StoryWidget(fxName,NULL,true), fxName(fxName)
 {
     client.attachedTheme = &puyoSetTheme;
 }
 
-bool PuyoFX::busy() const
+bool VisualFX::busy() const
 {
     return getIntegerValue("@busy") != 0;
 }
 
-bool PuyoFX::supportFX(const char *fx) const
+bool VisualFX::supportFX(const char *fx) const
 {
     String haystack(styrolyse_getstr(currentStory, "@supported_fx"));
     String needle(fx);
@@ -386,14 +386,14 @@ bool PuyoFX::supportFX(const char *fx) const
     return (strstr(haystack.c_str(), needle.c_str()) != NULL);
 }
 
-PuyoFX *PuyoFX::clone() const
+VisualFX *VisualFX::clone() const
 {
-    PuyoFX *fx = new PuyoFX(fxName, *client.attachedTheme);
+    VisualFX *fx = new VisualFX(fxName, *client.attachedTheme);
     fx->setGameScreen(screen);
     return fx;
 }
 
-void PuyoFX::postEvent(const char *name, float x, float y, int player)
+void VisualFX::postEvent(const char *name, float x, float y, int player)
 {
     styrolyse_event(currentStory, name, x, y, player);
 }

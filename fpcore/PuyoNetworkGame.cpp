@@ -24,12 +24,12 @@
  */
 
 #include "PuyoNetworkGame.h"
-#include "PuyoMessageDef.h"
+#include "FPNetMessageDef.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include "GTLog.h"
 
-using namespace PuyoMessage;
+using namespace FPNetMessage;
 
 PuyoNetworkGame::~PuyoNetworkGame()
 {

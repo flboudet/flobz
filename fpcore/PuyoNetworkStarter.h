@@ -50,7 +50,7 @@ public:
     };
 public:
     PuyoNetworkGameWidget();
-    void initWithGUI(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, FPServerIGPMessageBox *igpbox = NULL);
+    void initWithGUI(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, FPServerIGPMessageBox *igpbox = NULL);
     void initWithoutGUI(ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, FPServerIGPMessageBox *igpbox = NULL);
     void connectIA(int level);
     ~PuyoNetworkGameWidget();
@@ -64,20 +64,20 @@ public:
     virtual void sendChat(String chatText);
 protected:
     void associatedScreenHasBeenSet(GameScreen *associatedScreen);
-    virtual PuyoPlayer *createLocalPlayer();
+    virtual GamePlayer *createLocalPlayer();
 private:
     void sendAliveMsg();
-    PuyoSetTheme *attachedPuyoThemeSet; // optional
+    FloboSetTheme *attachedFloboThemeSet; // optional
     std::auto_ptr<RandomSystem> attachedRandom;
     ios_fc::MessageBox *mbox;
-    std::auto_ptr<FloboLocalGameFactory> attachedLocalGameFactory;
+    std::auto_ptr<LocalGameFactory> attachedLocalGameFactory;
     std::auto_ptr<PuyoNetworkGameFactory> attachedNetworkGameFactory;
 protected:
     std::auto_ptr<PuyoNetworkView> localArea;
-    std::auto_ptr<PuyoView> networkArea;
+    std::auto_ptr<GameView> networkArea;
 private:
-    std::auto_ptr<PuyoPlayer> playercontroller;
-    std::auto_ptr<PuyoNullPlayer> dummyPlayerController;
+    std::auto_ptr<GamePlayer> playercontroller;
+    std::auto_ptr<GameNullPlayer> dummyPlayerController;
     double lastMessageDate, lastAliveMessageSentDate;
     // Chat zone
     std::auto_ptr<ChatBox> chatBox; // optional

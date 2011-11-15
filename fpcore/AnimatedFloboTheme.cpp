@@ -26,7 +26,7 @@
 #include <iostream>
 #include <sstream>
 #include "DataPathManager.h"
-#include "AnimatedPuyoTheme.h"
+#include "AnimatedFloboTheme.h"
 #include "GSLFileAccessWrapper.h"
 #include "CompositeDrawContext.h"
 #include "PackageDescription.h"
@@ -34,7 +34,7 @@
 using namespace std;
 
 const char * ThemeManagerImpl::s_themeFolderExtension = ".fptheme";
-const char * ThemeManagerImpl::s_key_PuyoFace[NUMBER_OF_PUYOS_IN_SET] = {
+const char * ThemeManagerImpl::s_key_PuyoFace[NUMBER_OF_FLOBOS_IN_SET] = {
     "floboset.P1.face",
     "floboset.P2.face",
     "floboset.P3.face",
@@ -42,7 +42,7 @@ const char * ThemeManagerImpl::s_key_PuyoFace[NUMBER_OF_PUYOS_IN_SET] = {
     "floboset.P5.face",
     "floboset.Neutral.face"
 };
-const char * ThemeManagerImpl::s_key_PuyoDisappear[NUMBER_OF_PUYOS_IN_SET] = {
+const char * ThemeManagerImpl::s_key_PuyoDisappear[NUMBER_OF_FLOBOS_IN_SET] = {
     "floboset.P1.disappear",
     "floboset.P2.disappear",
     "floboset.P3.disappear",
@@ -50,7 +50,7 @@ const char * ThemeManagerImpl::s_key_PuyoDisappear[NUMBER_OF_PUYOS_IN_SET] = {
     "floboset.P5.disappear",
     "floboset.Neutral.face"
 };
-const char * ThemeManagerImpl::s_key_PuyoExplosion[NUMBER_OF_PUYOS_IN_SET] = {
+const char * ThemeManagerImpl::s_key_PuyoExplosion[NUMBER_OF_FLOBOS_IN_SET] = {
     "floboset.P1.explosion",
     "floboset.P2.explosion",
     "floboset.P3.explosion",
@@ -58,7 +58,7 @@ const char * ThemeManagerImpl::s_key_PuyoExplosion[NUMBER_OF_PUYOS_IN_SET] = {
     "floboset.P5.explosion",
     "floboset.Neutral.face"
 };
-const char * ThemeManagerImpl::s_key_PuyoEye[NUMBER_OF_PUYOS_IN_SET] = {
+const char * ThemeManagerImpl::s_key_PuyoEye[NUMBER_OF_FLOBOS_IN_SET] = {
     "floboset.P1.eye",
     "floboset.P2.eye",
     "floboset.P3.eye",
@@ -66,7 +66,7 @@ const char * ThemeManagerImpl::s_key_PuyoEye[NUMBER_OF_PUYOS_IN_SET] = {
     "floboset.P5.eye",
     "floboset.Neutral.face"
 };
-const char * ThemeManagerImpl::s_key_PuyoColorOffset[NUMBER_OF_PUYOS_IN_SET] = {
+const char * ThemeManagerImpl::s_key_PuyoColorOffset[NUMBER_OF_FLOBOS_IN_SET] = {
     "floboset.P1.offset",
     "floboset.P2.offset",
     "floboset.P3.offset",
@@ -77,7 +77,7 @@ const char * ThemeManagerImpl::s_key_PuyoColorOffset[NUMBER_OF_PUYOS_IN_SET] = {
 
 ThemeManagerImpl::ThemeManagerImpl(DataPathManager &dataPathManager)
     : m_dataPathManager(dataPathManager),
-      m_defaultPuyoSetThemeName("Classic"),
+      m_defaultFloboSetThemeName("Classic"),
       m_defaultLevelThemeName("Basic level")
 {
     // List the themes in the various pack folders
@@ -92,19 +92,19 @@ ThemeManagerImpl::ThemeManagerImpl(DataPathManager &dataPathManager)
     }
 }
 
-PuyoSetTheme * ThemeManagerImpl::createFloboSetTheme(const std::string &themeName)
+FloboSetTheme * ThemeManagerImpl::createFloboSetTheme(const std::string &themeName)
 {
     //cout << "Creating floboset theme impl " << themeName << endl;
-    std::map<std::string, PuyoSetThemeDescription>::iterator iter
+    std::map<std::string, FloboSetThemeDescription>::iterator iter
         = m_puyoSetThemeDescriptions.find(themeName);
     if (iter == m_puyoSetThemeDescriptions.end())
         return NULL;
-    if (themeName == m_defaultPuyoSetThemeName)
-        return new PuyoSetThemeImpl(iter->second);
-    if (m_defaultPuyoSetTheme.get() == NULL) {
-        m_defaultPuyoSetTheme.reset(new PuyoSetThemeImpl(m_puyoSetThemeDescriptions[m_defaultPuyoSetThemeName]));
+    if (themeName == m_defaultFloboSetThemeName)
+        return new FloboSetThemeImpl(iter->second);
+    if (m_defaultFloboSetTheme.get() == NULL) {
+        m_defaultFloboSetTheme.reset(new FloboSetThemeImpl(m_puyoSetThemeDescriptions[m_defaultFloboSetThemeName]));
     }
-    return new PuyoSetThemeImpl(iter->second, m_defaultPuyoSetTheme.get());
+    return new FloboSetThemeImpl(iter->second, m_defaultFloboSetTheme.get());
 }
 
 LevelTheme   * ThemeManagerImpl::createLevelTheme(const std::string &themeName)
@@ -122,7 +122,7 @@ LevelTheme   * ThemeManagerImpl::createLevelTheme(const std::string &themeName)
     return new LevelThemeImpl(iter->second, m_dataPathManager, m_defaultLevelTheme.get());
 }
 
-const std::vector<std::string> & ThemeManagerImpl::getPuyoSetThemeList()
+const std::vector<std::string> & ThemeManagerImpl::getFloboSetThemeList()
 {
     return m_puyoSetThemeList;
 }
@@ -169,15 +169,15 @@ void ThemeManagerImpl::end_floboset(GoomSL *gsl, GoomHash *global,
     ThemeManagerImpl *themeMgr = (ThemeManagerImpl *)GSL_GET_USERDATA_PTR(gsl);
 	const char * themeName  = (const char *) GSL_GLOBAL_PTR(gsl, "floboset.name");
 	const char * localizedThemeName = themeMgr->m_localeDictionary->getLocalizedString(themeName,true);
-    PuyoSetThemeDescription &newThemeDescription = themeMgr->m_puyoSetThemeDescriptions[themeName];
+    FloboSetThemeDescription &newThemeDescription = themeMgr->m_puyoSetThemeDescriptions[themeName];
     newThemeDescription.name = themeName;
     newThemeDescription.localizedName = localizedThemeName;
     newThemeDescription.author = (const char *)(GSL_GLOBAL_PTR(gsl, "author"));
     newThemeDescription.description = (const char *)(GSL_GLOBAL_PTR(gsl, "floboset.description"));
     newThemeDescription.localizedDescription = themeMgr->m_localeDictionary->getLocalizedString(newThemeDescription.description.c_str(),true);
     newThemeDescription.path = themeMgr->m_themePackLoadingPath;
-    for (int i = 0 ; i < NUMBER_OF_PUYOS_IN_SET ; i++) {
-        PuyoThemeDescription &currentFloboThemeDescription =
+    for (int i = 0 ; i < NUMBER_OF_FLOBOS_IN_SET ; i++) {
+        FloboThemeDescription &currentFloboThemeDescription =
             newThemeDescription.puyoThemeDescriptions[i];
         currentFloboThemeDescription.face =      (const char *)GSL_GLOBAL_PTR(gsl, s_key_PuyoFace[i]);
         currentFloboThemeDescription.disappear = (const char *)GSL_GLOBAL_PTR(gsl, s_key_PuyoDisappear[i]);
@@ -231,8 +231,8 @@ void ThemeManagerImpl::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     loadFontDefinition(gsl, "playerNameFont", newThemeDescription.playerNameFont);
     loadFontDefinition(gsl, "scoreFont", newThemeDescription.scoreFont);
 
-    for (int i = 0 ; i < NUMBER_OF_PUYOBANS_IN_LEVEL ; i++)
-        loadPuyobanDefinition(gsl, i, newThemeDescription.puyoban[i]);
+    for (int i = 0 ; i < NUMBER_OF_FLOBOBANS_IN_LEVEL ; i++)
+        loadFlobobanDefinition(gsl, i, newThemeDescription.puyoban[i]);
 
     themeMgr->m_levelThemeList.push_back(themeName);
 }
@@ -242,7 +242,7 @@ void ThemeManagerImpl::end_description(GoomSL *gsl, GoomHash *global, GoomHash *
 	// TODO !!!
 }
 
-void ThemeManagerImpl::loadPuyobanDefinition(GoomSL *gsl, int playerId, PuyobanThemeDefinition &puyoban)
+void ThemeManagerImpl::loadFlobobanDefinition(GoomSL *gsl, int playerId, FlobobanThemeDefinition &puyoban)
 {
     String variablePrefix = String("level.puyoban_p") + (playerId+1);
     puyoban.displayX = GSL_GLOBAL_INT(gsl, variablePrefix + ".display.x");
@@ -272,45 +272,45 @@ void ThemeManagerImpl::loadFontDefinition(GoomSL *gsl, const char *fontName, Fon
     font.fontFx = (IosFontFx)(GSL_GLOBAL_INT(gsl, fontFxVar.str().c_str()));
 }
 
-PuyoSetThemeImpl::PuyoSetThemeImpl(const PuyoSetThemeDescription &desc,
-                                   PuyoSetTheme *defaultTheme)
+FloboSetThemeImpl::FloboSetThemeImpl(const FloboSetThemeDescription &desc,
+                                   FloboSetTheme *defaultTheme)
     : m_desc(desc), m_defaultTheme(defaultTheme)
 {
-    for (int i = 0 ; i < NUMBER_OF_PUYOS_IN_SET-1 ; i++) {
+    for (int i = 0 ; i < NUMBER_OF_FLOBOS_IN_SET-1 ; i++) {
         if (m_defaultTheme == NULL)
-            m_puyoThemes[i].reset(new PuyoThemeImpl(desc.puyoThemeDescriptions[i], desc.path));
+            m_puyoThemes[i].reset(new FloboThemeImpl(desc.puyoThemeDescriptions[i], desc.path));
         else {
-            m_puyoThemes[i].reset(new PuyoThemeImpl(desc.puyoThemeDescriptions[i], desc.path, &(m_defaultTheme->getPuyoTheme((FloboState)i))));
+            m_puyoThemes[i].reset(new FloboThemeImpl(desc.puyoThemeDescriptions[i], desc.path, &(m_defaultTheme->getFloboTheme((FloboState)i))));
         }
     }
     // Neutral puyo is a special case
     if (m_defaultTheme == NULL)
-        m_puyoThemes[NUMBER_OF_PUYOS_IN_SET-1].reset(new NeutralPuyoThemeImpl(desc.puyoThemeDescriptions[NUMBER_OF_PUYOS_IN_SET-1], desc.path));
+        m_puyoThemes[NUMBER_OF_FLOBOS_IN_SET-1].reset(new NeutralFloboThemeImpl(desc.puyoThemeDescriptions[NUMBER_OF_FLOBOS_IN_SET-1], desc.path));
     else
-        m_puyoThemes[NUMBER_OF_PUYOS_IN_SET-1].reset(new NeutralPuyoThemeImpl(desc.puyoThemeDescriptions[NUMBER_OF_PUYOS_IN_SET-1], desc.path, &(m_defaultTheme->getPuyoTheme(FLOBO_NEUTRAL))));
+        m_puyoThemes[NUMBER_OF_FLOBOS_IN_SET-1].reset(new NeutralFloboThemeImpl(desc.puyoThemeDescriptions[NUMBER_OF_FLOBOS_IN_SET-1], desc.path, &(m_defaultTheme->getFloboTheme(FLOBO_NEUTRAL))));
 }
 
-const std::string & PuyoSetThemeImpl::getName() const
+const std::string & FloboSetThemeImpl::getName() const
 {
     return m_desc.name;
 }
 
-const std::string & PuyoSetThemeImpl::getLocalizedName() const
+const std::string & FloboSetThemeImpl::getLocalizedName() const
 {
     return m_desc.localizedName;
 }
 
-const std::string & PuyoSetThemeImpl::getAuthor() const
+const std::string & FloboSetThemeImpl::getAuthor() const
 {
     return m_desc.author;
 }
 
-const std::string & PuyoSetThemeImpl::getComments() const
+const std::string & FloboSetThemeImpl::getComments() const
 {
     return m_desc.description;
 }
 
-const PuyoTheme & PuyoSetThemeImpl::getPuyoTheme(FloboState state) const
+const FloboTheme & FloboSetThemeImpl::getFloboTheme(FloboState state) const
 {
     switch (state) {
     case FLOBO_FALLINGBLUE:
@@ -334,13 +334,13 @@ const PuyoTheme & PuyoSetThemeImpl::getPuyoTheme(FloboState state) const
 }
 
 
-BasePuyoThemeImpl::BasePuyoThemeImpl(const PuyoThemeDescription &desc,
+BaseFloboThemeImpl::BaseFloboThemeImpl(const FloboThemeDescription &desc,
                                      const std::string &path,
-                                     const PuyoTheme *defaultTheme)
+                                     const FloboTheme *defaultTheme)
     : m_desc(desc), m_path(path), m_defaultTheme(defaultTheme)
 {}
 
-BasePuyoThemeImpl::~BasePuyoThemeImpl()
+BaseFloboThemeImpl::~BaseFloboThemeImpl()
 {
     for (std::vector<IosSurface *>::iterator iter = m_surfaceBin.begin() ;
          iter != m_surfaceBin.end() ; iter++) {
@@ -348,10 +348,10 @@ BasePuyoThemeImpl::~BasePuyoThemeImpl()
     }
 }
 
-PuyoThemeImpl::PuyoThemeImpl(const PuyoThemeDescription &desc,
+FloboThemeImpl::FloboThemeImpl(const FloboThemeDescription &desc,
                              const std::string &path,
-                             const PuyoTheme *defaultTheme)
-    : BasePuyoThemeImpl(desc, path, defaultTheme)
+                             const FloboTheme *defaultTheme)
+    : BaseFloboThemeImpl(desc, path, defaultTheme)
 {
     // Initializing the arrays of pointers
     for (int i = 0 ; i < NUMBER_OF_FLOBO_FACES ; ++i)
@@ -370,7 +370,7 @@ PuyoThemeImpl::PuyoThemeImpl(const PuyoThemeDescription &desc,
         m_explosion[i] = NULL;
 }
 
-IosSurface *PuyoThemeImpl::getPuyoSurfaceForValence(int valence, int compression) const
+IosSurface *FloboThemeImpl::getFloboSurfaceForValence(int valence, int compression) const
 {
     IosSurface * &ref = m_faces[valence][compression];
     if (ref == NULL) {
@@ -410,11 +410,11 @@ IosSurface *PuyoThemeImpl::getPuyoSurfaceForValence(int valence, int compression
         }
     }
     if ((ref == NULL) && (m_defaultTheme != NULL))
-        return m_defaultTheme->getPuyoSurfaceForValence(valence, compression);
+        return m_defaultTheme->getFloboSurfaceForValence(valence, compression);
     return ref;
 }
 
-IosSurface *PuyoThemeImpl::getEyeSurfaceForIndex(int index, int compression) const
+IosSurface *FloboThemeImpl::getEyeSurfaceForIndex(int index, int compression) const
 {
     IosSurface * &ref = m_eyes[index][compression];
     if (ref == NULL) {
@@ -444,7 +444,7 @@ IosSurface *PuyoThemeImpl::getEyeSurfaceForIndex(int index, int compression) con
     return ref;
 }
 
-IosSurface *PuyoThemeImpl::getCircleSurfaceForIndex(int index) const
+IosSurface *FloboThemeImpl::getCircleSurfaceForIndex(int index) const
 {
     IosSurface * &ref = m_circles[index];
     if (ref == NULL) {
@@ -464,7 +464,7 @@ IosSurface *PuyoThemeImpl::getCircleSurfaceForIndex(int index) const
     return ref;
 }
 
-IosSurface *PuyoThemeImpl::getShadowSurface(int compression) const
+IosSurface *FloboThemeImpl::getShadowSurface(int compression) const
 {
     IosSurface * &ref = m_shadows[compression];
     if (ref == NULL) {
@@ -492,7 +492,7 @@ IosSurface *PuyoThemeImpl::getShadowSurface(int compression) const
     return ref;
 }
 
-IosSurface *PuyoThemeImpl::getShrinkingSurfaceForIndex(int index) const
+IosSurface *FloboThemeImpl::getShrinkingSurfaceForIndex(int index) const
 {
     IosSurface *ref = m_shrinking[index];
     if (ref == NULL) {
@@ -515,7 +515,7 @@ IosSurface *PuyoThemeImpl::getShrinkingSurfaceForIndex(int index) const
     return ref;
 }
 
-IosSurface *PuyoThemeImpl::getExplodingSurfaceForIndex(int index) const
+IosSurface *FloboThemeImpl::getExplodingSurfaceForIndex(int index) const
 {
     IosSurface *ref = m_explosion[index];
     if (ref == NULL) {
@@ -538,17 +538,17 @@ IosSurface *PuyoThemeImpl::getExplodingSurfaceForIndex(int index) const
     return ref;
 }
 
-NeutralPuyoThemeImpl::NeutralPuyoThemeImpl(const PuyoThemeDescription &desc,
+NeutralFloboThemeImpl::NeutralFloboThemeImpl(const FloboThemeDescription &desc,
                                            const std::string &path,
-                                           const PuyoTheme *defaultTheme)
-    : BasePuyoThemeImpl(desc, path, defaultTheme)
+                                           const FloboTheme *defaultTheme)
+    : BaseFloboThemeImpl(desc, path, defaultTheme)
 {
     // Initializing the arrays of pointers
     for (int j = 0 ; j < MAX_COMPRESSED ; j++)
         m_faces[j] = NULL;
 }
 
-IosSurface *NeutralPuyoThemeImpl::getPuyoSurfaceForValence(int valence, int compression) const
+IosSurface *NeutralFloboThemeImpl::getFloboSurfaceForValence(int valence, int compression) const
 {
     IosSurface * &ref = m_faces[compression];
     if (ref == NULL) {
@@ -572,26 +572,26 @@ IosSurface *NeutralPuyoThemeImpl::getPuyoSurfaceForValence(int valence, int comp
         }
     }
     if ((ref == NULL) && (m_defaultTheme != NULL))
-        return m_defaultTheme->getPuyoSurfaceForValence(valence, compression);
+        return m_defaultTheme->getFloboSurfaceForValence(valence, compression);
     return ref;
 }
 
-IosSurface *NeutralPuyoThemeImpl::getEyeSurfaceForIndex(int index, int compression) const
+IosSurface *NeutralFloboThemeImpl::getEyeSurfaceForIndex(int index, int compression) const
 {
     return NULL;
 }
 
-IosSurface *NeutralPuyoThemeImpl::getCircleSurfaceForIndex(int index) const
+IosSurface *NeutralFloboThemeImpl::getCircleSurfaceForIndex(int index) const
 {
     return NULL;
 }
 
-IosSurface *NeutralPuyoThemeImpl::getShadowSurface(int compression) const
+IosSurface *NeutralFloboThemeImpl::getShadowSurface(int compression) const
 {
     return NULL;
 }
 
-IosSurface *NeutralPuyoThemeImpl::getShrinkingSurfaceForIndex(int index) const
+IosSurface *NeutralFloboThemeImpl::getShrinkingSurfaceForIndex(int index) const
 {
     IosSurfaceRef &ref = m_shrinking[index];
     if (ref == NULL) {
@@ -605,7 +605,7 @@ IosSurface *NeutralPuyoThemeImpl::getShrinkingSurfaceForIndex(int index) const
     return ref;
 }
 
-IosSurface *NeutralPuyoThemeImpl::getExplodingSurfaceForIndex(int index) const
+IosSurface *NeutralFloboThemeImpl::getExplodingSurfaceForIndex(int index) const
 {
     return getShrinkingSurfaceForIndex(index);
 }
@@ -743,10 +743,10 @@ int LevelThemeImpl::getLifeDisplayX() const
 int LevelThemeImpl::getLifeDisplayY() const
 { return m_desc.lifeDisplayY; }
 
-int LevelThemeImpl::getPuyobanX(int playerId) const
+int LevelThemeImpl::getFlobobanX(int playerId) const
 { return m_desc.puyoban[playerId].displayX; }
 
-int LevelThemeImpl::getPuyobanY(int playerId) const
+int LevelThemeImpl::getFlobobanY(int playerId) const
 { return m_desc.puyoban[playerId].displayY; }
 
 int LevelThemeImpl::getNextFlobosX(int playerId) const
@@ -773,7 +773,7 @@ int LevelThemeImpl::getScoreDisplayX(int playerId) const
 int LevelThemeImpl::getScoreDisplayY(int playerId) const
 { return m_desc.puyoban[playerId].scoreDisplayY; }
 
-float LevelThemeImpl::getPuyobanScale(int playerId) const
+float LevelThemeImpl::getFlobobanScale(int playerId) const
 { return m_desc.puyoban[playerId].scale; }
 
 bool LevelThemeImpl::getShouldDisplayNext(int playerId) const

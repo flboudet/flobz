@@ -527,8 +527,8 @@ bool AIPlayer::selectIfBetterEvaluation(int * const best, const GridEvaluation *
 }
 
 
-AIPlayer::AIPlayer(int level, PuyoView &targetView)
-: PuyoPlayer(targetView)
+AIPlayer::AIPlayer(int level, GameView &targetView)
+: GamePlayer(targetView)
 {
   internalGrid = NULL;
   decisionMade = 0;

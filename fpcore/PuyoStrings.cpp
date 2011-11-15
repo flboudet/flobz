@@ -32,22 +32,18 @@ const char *k09 = " 9 - ";
 const char *k10 = "10 - ";
 
 const char *kMustRestart1 = "Major Video Mode Change...";
-const char *kMustRestart2 = "This will take effect next time you restart Flobo Puyo.";
+const char *kMustRestart2 = "This will take effect next time you restart FloboPop.";
 const char *kHighScores  = "Hall of Fame";
 
 const char *kMusicVolume = "MusicVolume";
 const char *kAudioVolume = "AudioVolume";
 
-const char *kCongratulations = "Congratulations!!!";
-const char *kFlobosInvasion   = "                        You stopped Puyo's invasion.\n"
-"                         Peace on Earth is restored!!";
-
 const char *kAudioFX     = "Audio FX";
 const char *kMusic       = "Music";
 const char *kFullScreen  = "FullScreen";
 const char *kOpenGL      = "Use OpenGL";
-const char *kChangePuyoTheme = "Puyo theme...";
-const char *kChangePuyoLevel = "Level theme...";
+const char *kChangeFloboTheme = "Flobo theme...";
+const char *kChangeLevelTheme = "Level theme...";
 const char *kControls    = "Change controls...";
 const char *kGameLevel   = "Choose Game Level";
 const char *kLevelEasy   = "Easy";
@@ -66,20 +62,6 @@ const char *kSPlayer2Down   = "P2 Down:";
 const char *kSPlayer2Clockwise        = "P2 Turn R:";
 const char *kSPlayer2Counterclockwise = "P2 Turn L:";
 
-const char *kRules01 = "Flobos are fancy smiling bubbles...";
-const char *kRules02 = "But they can really be invading sometimes!";
-const char *kRules03 = "Send them away by making groups of 4 or more.";
-const char *kRules04 = "Try to make large groups, or many at the same time";
-const char *kRules05 = "to send more bad ghost Flobos to your opponent.";
-
-const char *kAbout01 = "FloboPuyo is an iOS-software production.\t\t";
-const char *kAbout02 = "Puyo's world Meta God:\t\t";
-const char *kAbout03 = "\t\tFlorent 'flobo' Boudet";
-const char *kAbout04 = "X Men:\t\t";
-const char *kAbout05 = "\t\tJean-Christophe 'jeko' Hoelt";
-const char *kAbout06 = "\t\tGuillaume 'gyom' Borios";
-const char *kAbout07 = "Beta Goddess:\t\t";
-const char *kAbout08 = "\t\tTania";
 const char *kSinglePlayerGame = "Single Player Game";
 const char *kTwoPlayersGame = "Two Players Game";
 const char *kNetGame = "Network Game";

@@ -26,7 +26,7 @@
 
 #include "gameui.h"
 #include "FloboGame.h"
-#include "PuyoPlayer.h"
+#include "GamePlayer.h"
 #include "CheatCodeManager.h"
 #include "Theme.h"
 #include "PuyoStory.h"
@@ -83,7 +83,7 @@ public:
         this->gameOverAction = gameOverAction;
     }
     //
-    virtual std::vector<PuyoFX*> &getPuyoFX()  { return puyoFX; }
+    virtual std::vector<VisualFX*> &getVisualFX()  { return puyoFX; }
 public:
     virtual void setGameOptions(GameOptions options) = 0;
     //
@@ -111,7 +111,7 @@ public:
 protected:
     gameui::Action *gameOverAction;
     GameScreen *associatedScreen;
-    std::vector<PuyoFX*> puyoFX;
+    std::vector<VisualFX*> puyoFX;
 };
 
 /**
@@ -125,12 +125,12 @@ public:
     virtual ~GameWidget2P();
 public:
     void setGameOptions(GameOptions options);
-    void initWithGUI(PuyoView &areaA, PuyoView &areaB,
-                     PuyoPlayer &controllerA, PuyoPlayer &controllerB,
+    void initWithGUI(GameView &areaA, GameView &areaB,
+                     GamePlayer &controllerA, GamePlayer &controllerB,
                      LevelTheme &levelTheme,
                      gameui::Action *gameOverAction = NULL);
-    void initWithoutGUI(PuyoView &areaA, PuyoView &areaB,
-                     PuyoPlayer &controllerA, PuyoPlayer &controllerB,
+    void initWithoutGUI(GameView &areaA, GameView &areaB,
+                     GamePlayer &controllerA, GamePlayer &controllerB,
                      gameui::Action *gameOverAction = NULL);
     // Specific methods
     void pause(bool obscureScreen = true);
@@ -186,8 +186,8 @@ protected:
     DrawTarget &painter;
     IosSurface *painterGameScreen;
     LevelTheme *attachedLevelTheme;
-    PuyoView *areaA, *areaB;
-    PuyoPlayer *controllerA, *controllerB;
+    GameView *areaA, *areaB;
+    GamePlayer *controllerA, *controllerB;
     FloboGame *attachedGameA, *attachedGameB;
     int cyclesBeforeGameCycle;
     int cyclesBeforeSpeedIncreases; // time between speed increases in units of 20ms
@@ -219,7 +219,7 @@ protected:
 };
 
 // Should be moved elsewhere
-extern std::vector<PuyoFX*> *activeFX;
+extern std::vector<VisualFX*> *activeFX;
 
 #endif // _FLOBO_GAME_WIDGET_H
 

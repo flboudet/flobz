@@ -31,7 +31,7 @@
 
 class SoloGameWidget : public GameWidget, GameListener, CycledComponent {
 public:
-    SoloGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, Action *gameOverAction = NULL);
+    SoloGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, Action *gameOverAction = NULL);
     // GameWidget implementation
     virtual void setGameOptions(GameOptions options);
     //
@@ -63,12 +63,12 @@ public:
     IdleComponent *getIdleComponent() { return this; }
     void eventOccured(event_manager::GameControlEvent *event);
 private:
-    PuyoSetTheme &attachedPuyoThemeSet;
+    FloboSetTheme &attachedFloboThemeSet;
     LevelTheme &attachedLevelTheme;
     RandomSystem attachedRandom;
-    std::auto_ptr<FloboLocalGameFactory> m_gameFactory;
-    std::auto_ptr<PuyoView>        m_areaA;
-    std::auto_ptr<PuyoCombinedEventPlayer> m_playerController;
+    std::auto_ptr<LocalGameFactory> m_gameFactory;
+    std::auto_ptr<GameView>        m_areaA;
+    std::auto_ptr<CombinedEventPlayer> m_playerController;
     PlayerGameStat m_gameStat;
     GameOptions m_options;
     int m_cyclesBeforeGameCycle;
@@ -77,7 +77,7 @@ private:
 
 class SoloGameWidgetFactory : public GameWidgetFactory {
 public:
-    GameWidget *createGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
+    GameWidget *createGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
         return new SoloGameWidget(puyoThemeSet, levelTheme, gameOverAction);
     }

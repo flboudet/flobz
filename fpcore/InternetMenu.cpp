@@ -62,12 +62,12 @@ void DummyMetaServerConnection::fetch()
     onServerListHasChanged();
 }
 
-vector<PuyoServer> DummyMetaServerConnection::getServers() const
+vector<FPServer> DummyMetaServerConnection::getServers() const
 {
-    vector<PuyoServer> result;
-    result.push_back(PuyoServer("immunity.local", 4567, "immunity"));
-    result.push_back(PuyoServer("durandal.local", 4567, "durandal"));
-    result.push_back(PuyoServer("gfive.local", 4567, "gfive"));
+    vector<FPServer> result;
+    result.push_back(FPServer("immunity.local", 4567, "immunity"));
+    result.push_back(FPServer("durandal.local", 4567, "durandal"));
+    result.push_back(FPServer("gfive.local", 4567, "gfive"));
     return result;
 }
 
@@ -101,7 +101,7 @@ void HttpMetaServerConnection::fetch()
     }
 }
 
-std::vector<PuyoServer> HttpMetaServerConnection::getServers() const
+std::vector<FPServer> HttpMetaServerConnection::getServers() const
 {
     return m_servers;
 }
@@ -110,8 +110,8 @@ void HttpMetaServerConnection::idle(double currentTime)
 {
     if (m_nErrors > 5) {
         GameUIDefaults::GAME_LOOP->removeIdle(this);
-        m_servers.push_back(PuyoServer("aley.fovea.cc", 4567, String("")));
-        m_servers.push_back(PuyoServer("localhost", 4567, String("")));
+        m_servers.push_back(FPServer("aley.fovea.cc", 4567, String("")));
+        m_servers.push_back(FPServer("localhost", 4567, String("")));
         onServerListHasChanged();
         return;
     }
@@ -126,7 +126,7 @@ void HttpMetaServerConnection::idle(double currentTime)
                 String serverName = msg.getString(tmpStr);
                 sprintf(tmpStr, "PORTNUM%.2d", i);
                 int portNum = msg.getInt(tmpStr);
-                m_servers.push_back(PuyoServer(serverName, portNum, String("")));
+                m_servers.push_back(FPServer(serverName, portNum, String("")));
             }
             delete m_doc;
             m_doc = NULL;
@@ -138,7 +138,7 @@ void HttpMetaServerConnection::idle(double currentTime)
     }
 }
 
-PuyoServerList::PuyoServerList(PuyoServerListResponder *responder)
+FPServerList::FPServerList(FPServerListResponder *responder)
   : m_responder(responder)
 {
     std::string servname;
@@ -159,28 +159,28 @@ PuyoServerList::PuyoServerList(PuyoServerListResponder *responder)
   }
 }
 
-PuyoServerList::~PuyoServerList()
+FPServerList::~FPServerList()
 {
     for (std::vector<AbstractPuyoMetaServerConnection *>::iterator iter = m_metaservers.begin() ;
          iter != m_metaservers.end() ; iter++) {
          delete *iter;
     }
-    for (std::vector<PingablePuyoServer *>::iterator iter = m_servers.begin() ;
+    for (std::vector<PingableFPServer *>::iterator iter = m_servers.begin() ;
          iter != m_servers.end() ; iter++) {
          delete *iter;
     }
 }
 
-void PuyoServerList::fetch()
+void FPServerList::fetch()
 {
     // Delete all the already found servers
-    for (std::vector<PingablePuyoServer *>::iterator iter = m_servers.begin() ;
+    for (std::vector<PingableFPServer *>::iterator iter = m_servers.begin() ;
          iter != m_servers.end() ; iter++) {
          delete *iter;
     }
     m_servers.clear();
     // Notify the responder that we have a clear list now
-    m_responder->PuyoServerListHasChanged(*this);
+    m_responder->FPServerListHasChanged(*this);
     // Launch the fetching process
     for (std::vector<AbstractPuyoMetaServerConnection *>::iterator iter = m_metaservers.begin() ;
          iter != m_metaservers.end() ; iter++) {
@@ -188,36 +188,36 @@ void PuyoServerList::fetch()
     }
 }
 
-void PuyoServerList::PuyoMetaServerListHasChanged(AbstractPuyoMetaServerConnection &metaServerConnection)
+void FPServerList::PuyoMetaServerListHasChanged(AbstractPuyoMetaServerConnection &metaServerConnection)
 {
-    vector<PuyoServer> servers = metaServerConnection.getServers();
-    for (std::vector<PuyoServer>::iterator iter = servers.begin() ;
+    vector<FPServer> servers = metaServerConnection.getServers();
+    for (std::vector<FPServer>::iterator iter = servers.begin() ;
          iter != servers.end() ; iter++) {
          printf("List: %s:%d\n", (const char *)(iter->hostName), iter->portNum);
-         m_servers.push_back(new PingablePuyoServer(iter->hostName, iter->portNum, iter->hostPath, this));
+         m_servers.push_back(new PingableFPServer(iter->hostName, iter->portNum, iter->hostPath, this));
     }
 }
 
-std::vector<PuyoServer> PuyoServerList::getServers()
+std::vector<FPServer> FPServerList::getServers()
 {
-    std::vector<PuyoServer> result;
-    for (std::vector<PingablePuyoServer *>::iterator iter = m_servers.begin() ;
+    std::vector<FPServer> result;
+    for (std::vector<PingableFPServer *>::iterator iter = m_servers.begin() ;
          iter != m_servers.end() ; iter++) {
          if ((*iter)->answeredToPing())
-            result.push_back(PuyoServer((*iter)->hostName, (*iter)->portNum, (*iter)->hostPath));
+            result.push_back(FPServer((*iter)->hostName, (*iter)->portNum, (*iter)->hostPath));
     }
     return result;
 }
 
-void PuyoServerList::puyoServerDidPing(PingablePuyoServer &server)
+void FPServerList::puyoServerDidPing(PingableFPServer &server)
 {
-    m_responder->PuyoServerListHasChanged(*this);
+    m_responder->FPServerListHasChanged(*this);
 }
 
 
 
-PingablePuyoServer::PingablePuyoServer(String hostName, int portNum, String path, PingablePuyoServerResponder *responder)
-  : PuyoServer(hostName, portNum, path),
+PingableFPServer::PingableFPServer(String hostName, int portNum, String path, PingableFPServerResponder *responder)
+  : FPServer(hostName, portNum, path),
     m_responder(responder), m_alreadyReported(false)
 {
     m_pingSocket.reset(new DatagramSocket());
@@ -228,12 +228,12 @@ PingablePuyoServer::PingablePuyoServer(String hostName, int portNum, String path
     m_pingTransaction = m_igpclient->ping(10000., 1000.);
 }
 
-PingablePuyoServer::~PingablePuyoServer()
+PingableFPServer::~PingableFPServer()
 {
     delete m_pingTransaction;
 }
 
-void PingablePuyoServer::idle(double currentTime)
+void PingableFPServer::idle(double currentTime)
 {
     if (!m_pingTransaction->completed())
         m_igpclient->idle();
@@ -245,7 +245,7 @@ void PingablePuyoServer::idle(double currentTime)
     }
 }
 
-bool PingablePuyoServer::answeredToPing() const
+bool PingableFPServer::answeredToPing() const
 {
     return m_alreadyReported;
 }
@@ -360,11 +360,11 @@ void InternetGameMenu::build()
     add(&bottomPanel);
 }
 
-class PuyoInternetDialog : public SliderContainer, public SliderContainerListener
+class InternetDialog : public SliderContainer, public SliderContainerListener
 {
 public:
-    PuyoInternetDialog(String dialogTitle);
-    virtual ~PuyoInternetDialog();
+    InternetDialog(String dialogTitle);
+    virtual ~InternetDialog();
     virtual void onSlideInside(SliderContainer &slider);
     void close();
     void idle(double v);
@@ -377,7 +377,7 @@ private:
     bool m_closing, m_closed;
 };
 
-PuyoInternetDialog::PuyoInternetDialog(String dialogTitle)
+InternetDialog::InternetDialog(String dialogTitle)
   : SliderContainer(), m_dialogFrame(theCommander->getWindowFramePicture()),
     m_titleFrame(theCommander->getSeparatorFramePicture()),
     m_titleText(dialogTitle), m_closing(false), m_closed(false)
@@ -393,12 +393,12 @@ PuyoInternetDialog::PuyoInternetDialog(String dialogTitle)
     transitionToContent(&m_dialogFrame);
 }
 
-PuyoInternetDialog::~PuyoInternetDialog()
+InternetDialog::~InternetDialog()
 {
     //this->getParentScreen()->ungrabEventsOnWidget(this);
 }
 
-void PuyoInternetDialog::onSlideInside(SliderContainer &slider)
+void InternetDialog::onSlideInside(SliderContainer &slider)
 {
     if (!m_closing)
         return;
@@ -406,23 +406,23 @@ void PuyoInternetDialog::onSlideInside(SliderContainer &slider)
     m_closed = true;
 }
 
-void PuyoInternetDialog::close()
+void InternetDialog::close()
 {
     m_closing = true;
     transitionToContent(NULL);
 }
 
-void PuyoInternetDialog::idle(double v)
+void InternetDialog::idle(double v)
 {
     SliderContainer::idle(v);
     if (m_closed) delete this;
 }
 
-class PuyoInternetErrorDialog : public PuyoInternetDialog, public Action
+class InternetErrorDialog : public InternetDialog, public Action
 {
 public:
-    PuyoInternetErrorDialog(String errorMessageL1, String errorMessageL2);
-    virtual ~PuyoInternetErrorDialog();
+    InternetErrorDialog(String errorMessageL1, String errorMessageL2);
+    virtual ~InternetErrorDialog();
     virtual void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
     Text m_errorMessageL1, m_errorMessageL2;
@@ -431,8 +431,8 @@ private:
     Image m_errorIcon;
 };
 
-PuyoInternetErrorDialog::PuyoInternetErrorDialog(String errorMessageL1, String errorMessageL2)
-  : PuyoInternetDialog(theCommander->getLocalizedString("Error")), m_errorMessageL1(errorMessageL1),
+InternetErrorDialog::InternetErrorDialog(String errorMessageL1, String errorMessageL2)
+  : InternetDialog(theCommander->getLocalizedString("Error")), m_errorMessageL1(errorMessageL1),
     m_errorMessageL2(errorMessageL2), m_okButton(theCommander->getLocalizedString("OK"), this,
 	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
     m_errorIconImage(theCommander->getSurface(IMAGE_RGBA, "gfx/errorpuyo.png")),
@@ -447,22 +447,22 @@ PuyoInternetErrorDialog::PuyoInternetErrorDialog(String errorMessageL1, String e
     setSize(Vec3(450.0f, 200.0f));
 }
 
-PuyoInternetErrorDialog::~PuyoInternetErrorDialog()
+InternetErrorDialog::~InternetErrorDialog()
 {
 }
 
-void PuyoInternetErrorDialog::action(Widget *sender, int actionType, GameControlEvent *event)
+void InternetErrorDialog::action(Widget *sender, int actionType, GameControlEvent *event)
 {
     if (sender == m_okButton.getButton()) {
         close();
     }
 }
 
-class PuyoInternetConnectDialog : public PuyoInternetDialog, public Action
+class InternetConnectDialog : public InternetDialog, public Action
 {
 public:
-    PuyoInternetConnectDialog(String serverName, InternetGameCenter *gameCenter, InternetGameMenu *owner);
-    virtual ~PuyoInternetConnectDialog();
+    InternetConnectDialog(String serverName, InternetGameCenter *gameCenter, InternetGameMenu *owner);
+    virtual ~InternetConnectDialog();
     virtual void idle(double currentTime);
     void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
@@ -475,10 +475,10 @@ private:
     static const double CONNECT_TIMEOUT;
 };
 
-const double PuyoInternetConnectDialog::CONNECT_TIMEOUT = 5.;
+const double InternetConnectDialog::CONNECT_TIMEOUT = 5.;
 
-PuyoInternetConnectDialog::PuyoInternetConnectDialog(String serverName, InternetGameCenter *gameCenter, InternetGameMenu *owner)
-    : PuyoInternetDialog("Connecting"),
+InternetConnectDialog::InternetConnectDialog(String serverName, InternetGameCenter *gameCenter, InternetGameMenu *owner)
+    : InternetDialog("Connecting"),
       m_messageL1("Connecting to server"), m_messageL2(serverName),
       m_cancelButton(theCommander->getLocalizedString("Cancel"), this,
 		     theCommander->getButtonFramePicture(),
@@ -490,18 +490,18 @@ PuyoInternetConnectDialog::PuyoInternetConnectDialog(String serverName, Internet
     m_contentBox.add(&m_cancelButton);
 }
 
-PuyoInternetConnectDialog::~PuyoInternetConnectDialog()
+InternetConnectDialog::~InternetConnectDialog()
 {
     if (m_gameCenter->isConnected()) {
         m_owner->enterNetCenterMenu(m_gameCenter);
 	return;
     }
     else if ((m_gameCenter->isDenied()) || (m_timeout)) {
-        PuyoInternetErrorDialog *errorDialog;
+        InternetErrorDialog *errorDialog;
 	if (m_timeout)
-	  errorDialog = new PuyoInternetErrorDialog(String("Server didn't answered"), m_messageL2.getValue());
+	  errorDialog = new InternetErrorDialog(String("Server didn't answered"), m_messageL2.getValue());
 	else
-	    errorDialog = new PuyoInternetErrorDialog(m_gameCenter->getDenyString(), m_gameCenter->getDenyStringMore());
+	    errorDialog = new InternetErrorDialog(m_gameCenter->getDenyString(), m_gameCenter->getDenyStringMore());
         m_owner->getParentScreen()->add(errorDialog);
         m_owner->getParentScreen()->grabEventsOnWidget(errorDialog);
         AudioManager::playSound("ebenon.wav", 0.5);
@@ -509,23 +509,23 @@ PuyoInternetConnectDialog::~PuyoInternetConnectDialog()
     delete m_gameCenter;
 }
 
-void PuyoInternetConnectDialog::idle(double currentTime)
+void InternetConnectDialog::idle(double currentTime)
 {
     if (m_startTime == 0.)
         m_startTime = currentTime;
     if (currentTime - m_startTime > CONNECT_TIMEOUT) {
         close();
 	m_timeout = true;
-	PuyoInternetDialog::idle(currentTime);
+	InternetDialog::idle(currentTime);
 	m_startTime = 0.;
     }
     m_gameCenter->idle();
     if ((m_gameCenter->isConnected()) || (m_gameCenter->isDenied()))
         close();
-    PuyoInternetDialog::idle(currentTime);
+    InternetDialog::idle(currentTime);
 }
 
-void PuyoInternetConnectDialog::action(Widget *sender, int actionType, GameControlEvent *event)
+void InternetConnectDialog::action(Widget *sender, int actionType, GameControlEvent *event)
 {
   if (sender == m_cancelButton.getButton()) {
     close();
@@ -546,13 +546,13 @@ void InternetGameMenu::action(Widget *sender, int actionType, GameControlEvent *
         try {
             InternetGameCenter *gameCenter = new InternetGameCenter(serverName.getEditField().getValue(),
                                                                             atoi(serverPort.getEditField().getValue()), playerName.getEditField().getValue(), password.getEditField().getValue());
-            PuyoInternetConnectDialog *connectionDialog = new PuyoInternetConnectDialog(serverName.getEditField().getValue(), gameCenter, this);
+            InternetConnectDialog *connectionDialog = new InternetConnectDialog(serverName.getEditField().getValue(), gameCenter, this);
             this->getParentScreen()->add(connectionDialog);
             this->getParentScreen()->grabEventsOnWidget(connectionDialog);
         } catch (Exception e) {
             fprintf(stderr, "Error while connecting to %s\n", serverName.getEditField().getValue().c_str());
             e.printMessage();
-            PuyoInternetErrorDialog *errorDialog = new PuyoInternetErrorDialog("Cannot connect to", serverName.getEditField().getValue());
+            InternetErrorDialog *errorDialog = new InternetErrorDialog("Cannot connect to", serverName.getEditField().getValue());
             this->getParentScreen()->add(errorDialog);
             this->getParentScreen()->grabEventsOnWidget(errorDialog);
             AudioManager::playSound("ebenon.wav", 0.5);
@@ -594,15 +594,15 @@ void InternetGameMenu::setSelectedServer(const String &serverName, int portNum)
     this->portNum = portNum;
 }
 
-void InternetGameMenu::PuyoServerListHasChanged(PuyoServerList &serverList)
+void InternetGameMenu::FPServerListHasChanged(FPServerList &serverList)
 {
     while (serverListPanel.getFullSize() > 0) {
         ListViewEntry *entry = serverListPanel.getEntryAt(0);
         serverListPanel.removeEntry(entry);
         delete entry;
     }
-    std::vector<PuyoServer> servers = serverList.getServers();
-    for (std::vector<PuyoServer>::iterator iter = servers.begin() ;
+    std::vector<FPServer> servers = serverList.getServers();
+    for (std::vector<FPServer>::iterator iter = servers.begin() ;
          iter != servers.end() ; iter++) {
          serverListPanel.addEntry(new ListViewEntry(iter->hostName,
                                                    new ServerSelectAction(*this, iter->hostName,

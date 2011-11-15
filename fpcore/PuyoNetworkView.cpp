@@ -44,13 +44,13 @@ Message *PuyoNetworkView::createStateMessage(bool sendFullMessage)
     Message *message = mbox->createMessage();
 
     // TODO: Send some of those only in full messages
-    message->addInt     (PuyoMessage::GAMEID, gameId);
-    message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameState);
-    message->addInt     (PuyoMessage::SCORE,  attachedGame->getGameStat().points);
-    message->addInt     (PuyoMessage::NEXT_F, attachedGame->getNextFalling());
-    message->addInt     (PuyoMessage::NEXT_C, attachedGame->getNextCompanion());
-    message->addInt     (PuyoMessage::SEMI_MOVE, attachedGame->getSemiMove());
-    message->addInt     (PuyoMessage::CURRENT_NEUTRALS, attachedGame->getNeutralFlobos());
+    message->addInt     (FPNetMessage::GAMEID, gameId);
+    message->addInt     (FPNetMessage::TYPE,   FPNetMessage::kGameState);
+    message->addInt     (FPNetMessage::SCORE,  attachedGame->getGameStat().points);
+    message->addInt     (FPNetMessage::NEXT_F, attachedGame->getNextFalling());
+    message->addInt     (FPNetMessage::NEXT_C, attachedGame->getNextCompanion());
+    message->addInt     (FPNetMessage::SEMI_MOVE, attachedGame->getSemiMove());
+    message->addInt     (FPNetMessage::CURRENT_NEUTRALS, attachedGame->getNeutralFlobos());
 
     if (sendFullMessage) {
         int puyoCount = attachedGame->getFloboCount();
@@ -62,26 +62,26 @@ Message *PuyoNetworkView::createStateMessage(bool sendFullMessage)
             buffer.add(currentFlobo->getFloboX());
             buffer.add(currentFlobo->getFloboY());
         }
-        message->addIntArray(PuyoMessage::PUYOS, buffer);
+        message->addIntArray(FPNetMessage::PUYOS, buffer);
     }
 
     // TODO: Add those only if not empty
     if (neutralsBuffer.size() > 0)
-        message->addIntArray(PuyoMessage::ADD_NEUTRALS,  neutralsBuffer);
+        message->addIntArray(FPNetMessage::ADD_NEUTRALS,  neutralsBuffer);
     if (moveLeftBuffer.size() > 0)
-        message->addIntArray(PuyoMessage::MV_L,moveLeftBuffer);
+        message->addIntArray(FPNetMessage::MV_L,moveLeftBuffer);
     if (moveRightBuffer.size() > 0)
-        message->addIntArray(PuyoMessage::MV_R,moveRightBuffer);
+        message->addIntArray(FPNetMessage::MV_R,moveRightBuffer);
     if (fallingStepBuffer.size() > 0)
-        message->addIntArray(PuyoMessage::MV_D,fallingStepBuffer);
+        message->addIntArray(FPNetMessage::MV_D,fallingStepBuffer);
     if (compTurnBuffer.size() > 0)
-        message->addIntArray(PuyoMessage::COMPANION_TURN,compTurnBuffer);
+        message->addIntArray(FPNetMessage::COMPANION_TURN,compTurnBuffer);
     if (didFallBuffer.size() > 0)
-        message->addIntArray(PuyoMessage::DID_FALL, didFallBuffer);
+        message->addIntArray(FPNetMessage::DID_FALL, didFallBuffer);
     if (willVanishBuffer.size() > 0)
-        message->addIntArray(PuyoMessage::WILL_VANISH,   willVanishBuffer);
+        message->addIntArray(FPNetMessage::WILL_VANISH,   willVanishBuffer);
 
-    message->addInt     (PuyoMessage::NUMBER_BAD_PUYOS, badFlobos);
+    message->addInt     (FPNetMessage::NUMBER_BAD_PUYOS, badFlobos);
 
     // Clear the buffers after they have been sent
     neutralsBuffer.clear();
@@ -106,38 +106,38 @@ void PuyoNetworkView::sendStateMessage(bool sendFullMessage)
 
 void PuyoNetworkView::cycleGame()
 {
-    PuyoView::cycleGame();
+    GameView::cycleGame();
     sendStateMessage();
 }
 
 void PuyoNetworkView::moveLeft()
 {
-    PuyoView::moveLeft();
+    GameView::moveLeft();
     sendStateMessage();
 }
 
 void PuyoNetworkView::moveRight()
 {
-    PuyoView::moveRight();
+    GameView::moveRight();
     sendStateMessage();
 }
 
 void PuyoNetworkView::rotateLeft()
 {
-    PuyoView::rotateLeft();
+    GameView::rotateLeft();
     sendStateMessage();
 }
 
 void PuyoNetworkView::rotateRight()
 {
-    PuyoView::rotateRight();
+    GameView::rotateRight();
     sendStateMessage();
 }
 
 // GameListener methods
 void PuyoNetworkView::fallingsDidMoveLeft(Flobo *fallingFlobo, Flobo *companionFlobo)
 {
-    PuyoView::fallingsDidMoveLeft(fallingFlobo, companionFlobo);
+    GameView::fallingsDidMoveLeft(fallingFlobo, companionFlobo);
     moveLeftBuffer.add(fallingFlobo->getID());
     moveLeftBuffer.add(fallingFlobo->getFloboState());
     moveLeftBuffer.add(fallingFlobo->getFloboX());
@@ -150,7 +150,7 @@ void PuyoNetworkView::fallingsDidMoveLeft(Flobo *fallingFlobo, Flobo *companionF
 
 void PuyoNetworkView::fallingsDidMoveRight(Flobo *fallingFlobo, Flobo *companionFlobo)
 {
-    PuyoView::fallingsDidMoveRight(fallingFlobo, companionFlobo);
+    GameView::fallingsDidMoveRight(fallingFlobo, companionFlobo);
     moveRightBuffer.add(fallingFlobo->getID());
     moveRightBuffer.add(fallingFlobo->getFloboState());
     moveRightBuffer.add(fallingFlobo->getFloboX());
@@ -163,7 +163,7 @@ void PuyoNetworkView::fallingsDidMoveRight(Flobo *fallingFlobo, Flobo *companion
 
 void PuyoNetworkView::fallingsDidFallingStep(Flobo *fallingFlobo, Flobo *companionFlobo)
 {
-    PuyoView::fallingsDidFallingStep(fallingFlobo, companionFlobo);
+    GameView::fallingsDidFallingStep(fallingFlobo, companionFlobo);
     fallingStepBuffer.add(fallingFlobo->getID());
     fallingStepBuffer.add(fallingFlobo->getFloboState());
     fallingStepBuffer.add(fallingFlobo->getFloboX());
@@ -176,7 +176,7 @@ void PuyoNetworkView::fallingsDidFallingStep(Flobo *fallingFlobo, Flobo *compani
 
 void PuyoNetworkView::gameDidAddNeutral(Flobo *neutralFlobo, int neutralIndex, int totalNeutral)
 {
-    PuyoView::gameDidAddNeutral(neutralFlobo, neutralIndex, totalNeutral);
+    GameView::gameDidAddNeutral(neutralFlobo, neutralIndex, totalNeutral);
     neutralsBuffer.add(neutralFlobo->getID());
     neutralsBuffer.add(neutralFlobo->getFloboState());
     neutralsBuffer.add(neutralFlobo->getFloboX());
@@ -187,7 +187,7 @@ void PuyoNetworkView::gameDidAddNeutral(Flobo *neutralFlobo, int neutralIndex, i
 
 void PuyoNetworkView::gameDidEndCycle()
 {
-    PuyoView::gameDidEndCycle();
+    GameView::gameDidEndCycle();
     if (attachedGame->getNeutralFlobos() < 0)
         badFlobos -= attachedGame->getNeutralFlobos();
     sendStateMessage(true);
@@ -195,7 +195,7 @@ void PuyoNetworkView::gameDidEndCycle()
 
 void PuyoNetworkView::companionDidTurn(Flobo *companionFlobo, Flobo *fallingFlobo, bool counterclockwise)
 {
-    PuyoView::companionDidTurn(companionFlobo, fallingFlobo, counterclockwise);
+    GameView::companionDidTurn(companionFlobo, fallingFlobo, counterclockwise);
     compTurnBuffer.add(fallingFlobo->getID());
     compTurnBuffer.add(fallingFlobo->getFloboState());
     compTurnBuffer.add(fallingFlobo->getFloboX());
@@ -209,7 +209,7 @@ void PuyoNetworkView::companionDidTurn(Flobo *companionFlobo, Flobo *fallingFlob
 
 void PuyoNetworkView::floboDidFall(Flobo *puyo, int originX, int originY, int nFalledBelow)
 {
-    PuyoView::floboDidFall(puyo, originX, originY, nFalledBelow);
+    GameView::floboDidFall(puyo, originX, originY, nFalledBelow);
     didFallBuffer.add(puyo->getID());
     didFallBuffer.add(puyo->getFloboState());
     didFallBuffer.add(puyo->getFloboX());
@@ -221,7 +221,7 @@ void PuyoNetworkView::floboDidFall(Flobo *puyo, int originX, int originY, int nF
 
 void PuyoNetworkView::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase)
 {
-    PuyoView::floboWillVanish(floboGroup, groupNum, phase);
+    GameView::floboWillVanish(floboGroup, groupNum, phase);
     willVanishBuffer.add(phase);
     willVanishBuffer.add(groupNum);
     willVanishBuffer.add(floboGroup.size());
@@ -234,35 +234,35 @@ void PuyoNetworkView::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int g
 
 void PuyoNetworkView::gameWin()
 {
-    PuyoView::gameWin();
-    sendEndOfGameMessage(PuyoMessage::kGameOverWon);
+    GameView::gameWin();
+    sendEndOfGameMessage(FPNetMessage::kGameOverWon);
 }
 
 void PuyoNetworkView::gameLost()
 {
-    PuyoView::gameLost();
-    sendEndOfGameMessage(PuyoMessage::kGameOverLost);
+    GameView::gameLost();
+    sendEndOfGameMessage(FPNetMessage::kGameOverLost);
 }
 
 void PuyoNetworkView::sendEndOfGameMessage(int messageType)
 {
     Message *message = mbox->createMessage();
-    message->addInt     (PuyoMessage::GAMEID, gameId);
-    message->addInt     (PuyoMessage::TYPE,   messageType);
-    message->addString  (PuyoMessage::NAME,   p1name);
+    message->addInt     (FPNetMessage::GAMEID, gameId);
+    message->addInt     (FPNetMessage::TYPE,   messageType);
+    message->addString  (FPNetMessage::NAME,   p1name);
     PlayerGameStat &gameStat = attachedGame->getGameStat();
-    message->addInt(PuyoMessage::SCORE, gameStat.points);
-    message->addInt(PuyoMessage::TOTAL_SCORE, gameStat.total_points);
+    message->addInt(FPNetMessage::SCORE, gameStat.points);
+    message->addInt(FPNetMessage::TOTAL_SCORE, gameStat.total_points);
     for (int i = 0 ; i < 24 ; i++) {
-        String messageName = String(PuyoMessage::COMBO_COUNT) + i;
+        String messageName = String(FPNetMessage::COMBO_COUNT) + i;
         message->addInt(messageName, gameStat.combo_count[i]);
     }
-    message->addInt(PuyoMessage::EXPLODE_COUNT, gameStat.explode_count);
-    message->addInt(PuyoMessage::DROP_COUNT, gameStat.drop_count);
-    message->addInt(PuyoMessage::GHOST_SENT_COUNT, gameStat.ghost_sent_count);
-    message->addFloat(PuyoMessage::TIME_LEFT, gameStat.time_left);
-    message->addBool(PuyoMessage::IS_DEAD, gameStat.is_dead);
-    message->addBool(PuyoMessage::IS_WINNER, gameStat.is_winner);
+    message->addInt(FPNetMessage::EXPLODE_COUNT, gameStat.explode_count);
+    message->addInt(FPNetMessage::DROP_COUNT, gameStat.drop_count);
+    message->addInt(FPNetMessage::GHOST_SENT_COUNT, gameStat.ghost_sent_count);
+    message->addFloat(FPNetMessage::TIME_LEFT, gameStat.time_left);
+    message->addBool(FPNetMessage::IS_DEAD, gameStat.is_dead);
+    message->addBool(FPNetMessage::IS_WINNER, gameStat.is_winner);
 
     message->addBoolProperty("RELIABLE", true);
     message->send();

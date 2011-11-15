@@ -23,21 +23,21 @@
  *
  */
 
-#include "PuyoEventPlayer.h"
+#include "EventPlayer.h"
 
 using namespace event_manager;
 
-PuyoEventPlayer::PuyoEventPlayer(PuyoView &view,
+EventPlayer::EventPlayer(GameView &view,
 						     int downEvent, int leftEvent, int rightEvent,
 						     int turnLeftEvent, int turnRightEvent)
-  : PuyoPlayer(view), downEvent(downEvent), leftEvent(leftEvent), rightEvent(rightEvent),
+  : GamePlayer(view), downEvent(downEvent), leftEvent(leftEvent), rightEvent(rightEvent),
     turnLeftEvent(turnLeftEvent), turnRightEvent(turnRightEvent),
     fpKey_Down(0), fpKey_Left(0), fpKey_Right(0), fpKey_TurnLeft(0), fpKey_TurnRight(0),
     fpKey_Repeat(7), fpKey_Delay(5)
 {
 }
 
-void PuyoEventPlayer::eventOccured(GameControlEvent *event)
+void EventPlayer::eventOccured(GameControlEvent *event)
 {
     int curGameEvent = event->gameEvent;
     if (event->isUp) {
@@ -80,7 +80,7 @@ void PuyoEventPlayer::eventOccured(GameControlEvent *event)
     }
 }
 
-void PuyoEventPlayer::cycle()
+void EventPlayer::cycle()
 {
     // Key repetition
     if (fpKey_Down) {
@@ -105,7 +105,7 @@ void PuyoEventPlayer::cycle()
     }
 }
 
-bool PuyoEventPlayer::keyShouldRepeat(int &key)
+bool EventPlayer::keyShouldRepeat(int &key)
 {
     if (key == 0) return false;
     key++;
@@ -113,8 +113,8 @@ bool PuyoEventPlayer::keyShouldRepeat(int &key)
 }
 
 
-PuyoCombinedEventPlayer::PuyoCombinedEventPlayer(PuyoView &view)
-    : PuyoPlayer(view),
+CombinedEventPlayer::CombinedEventPlayer(GameView &view)
+    : GamePlayer(view),
       player1controller(view,
                         kPlayer1Down,
                         kPlayer1Left,
@@ -130,13 +130,13 @@ PuyoCombinedEventPlayer::PuyoCombinedEventPlayer(PuyoView &view)
 {
 }
 
-void PuyoCombinedEventPlayer::eventOccured(GameControlEvent *event)
+void CombinedEventPlayer::eventOccured(GameControlEvent *event)
 {
     player1controller.eventOccured(event);
     player2controller.eventOccured(event);
 }
 
-void PuyoCombinedEventPlayer::cycle()
+void CombinedEventPlayer::cycle()
 {
     player1controller.cycle();
     player2controller.cycle();

@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -23,13 +23,13 @@
  *
  */
 
-#ifndef _PUYOVIEW
-#define _PUYOVIEW
+#ifndef _FLOBOVIEW_H_
+#define _FLOBOVIEW_H_
 
 #include <memory>
 #include "FloboGame.h"
-#include "PuyoAnimations.h"
-#include "AnimatedPuyo.h"
+#include "FloboAnimations.h"
+#include "AnimatedFlobo.h"
 #include "Theme.h"
 
 #define TSIZE 32
@@ -42,11 +42,11 @@
 
 /**
  * Abstract class serving as a factory
- * for the PuyoView to create the corresponding FloboGame.
+ * for the GameView to create the corresponding FloboGame.
  * Implemented in the following classes:
- * - FloboLocalGameFactory, to be used with a PuyoView on a game
+ * - LocalGameFactory, to be used with a GameView on a game
  *   playing on the local computer,
- * - PuyoRemoteGameFactory, to be used with a PuyoView to display
+ * - RemoteGameFactory, to be used with a GameView to display
  *   a game playing on a distant computer.
  */
 class FloboGameFactory {
@@ -56,25 +56,25 @@ public:
 };
 
 /**
- * PuyoView is the graphical representation of a FloboGame.
- * The FloboGame is owned by the PuyoView and created
+ * GameView is the graphical representation of a FloboGame.
+ * The FloboGame is owned by the GameView and created
  * through a FloboGameFactory.
  */
-class PuyoView : public GameListener {
+class GameView : public GameListener {
   public:
-    // Create a PuyoView with graphical feedback
-    PuyoView(FloboGameFactory *attachedFloboGameFactory,
+    // Create a GameView with graphical feedback
+    GameView(FloboGameFactory *attachedFloboGameFactory,
              int playerId,
-             PuyoSetTheme *attachedThemeSet,
+             FloboSetTheme *attachedThemeSet,
              LevelTheme *attachedLevelTheme);
 
-    // Create a PuyoView without graphical feedback
-    PuyoView(FloboGameFactory *attachedFloboGameFactory);
+    // Create a GameView without graphical feedback
+    GameView(FloboGameFactory *attachedFloboGameFactory);
 
     void setupLayout(int playerId);
     void setPlayerNames(const char *p1, const char *p2) { p1name = p1; p2name = p2; }
 
-    virtual ~PuyoView();
+    virtual ~GameView();
     void setEnemyGame(FloboGame *enemyGame);
     void render(DrawTarget *dt);
     void renderNeutral(DrawTarget *dt);
@@ -89,7 +89,7 @@ class PuyoView : public GameListener {
     virtual void rotateLeft();
     virtual void rotateRight();
 
-    int getValenceForPuyo(Flobo *puyo) const;
+    int getValenceForFlobo(Flobo *flobo) const;
     FloboGame *getAttachedGame() const { return attachedGame; }
 
     bool isGameOver() const;
@@ -97,7 +97,7 @@ class PuyoView : public GameListener {
     int getScreenCoordinateX(int X) const { return X * TSIZE + m_xOffset; }
     int getScreenCoordinateY(int Y) const { return Y * TSIZE + m_yOffset; }
 
-    PuyoSetTheme *getPuyoThemeSet() const { return attachedThemeSet; }
+    FloboSetTheme *getFloboSetTheme() const { return attachedThemeSet; }
 
     bool isNewMetaCycleStart() { return newMetaCycleStart; }
     void clearMetaCycleStart() { newMetaCycleStart = false; }
@@ -109,7 +109,7 @@ class PuyoView : public GameListener {
     void gameDidAddNeutral(Flobo *neutralFlobo, int neutralIndex, int totalNeutral);
     void gameDidEndCycle();
     void companionDidTurn(Flobo *companionFlobo, Flobo *fallingFlobo, bool counterclockwise);
-    void floboDidFall(Flobo *puyo, int originX, int originY, int nFalledBelow);
+    void floboDidFall(Flobo *flobo, int originX, int originY, int nFalledBelow);
     void floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase);
     virtual void gameLost();
 
@@ -145,7 +145,7 @@ class PuyoView : public GameListener {
     int m_xOffset, m_yOffset;
     int m_nXOffset, m_nYOffset;
     int neutralXOffset, neutralYOffset;
-    PuyoSetTheme *attachedThemeSet;
+    FloboSetTheme *attachedThemeSet;
     LevelTheme *attachedLevelTheme;
     AnimatedFloboFactory attachedFloboFactory;
     FloboGame *attachedGame, *enemyGame;
@@ -159,4 +159,4 @@ class PuyoView : public GameListener {
     bool haveDisplay;
 };
 
-#endif // _PUYOVIEW
+#endif // _FLOBOVIEW_H_

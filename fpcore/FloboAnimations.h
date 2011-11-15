@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _PUYOANIMATIONS
-#define _PUYOANIMATIONS
+#ifndef _FLOBOANIMATIONS_H_
+#define _FLOBOANIMATIONS_H_
 
 void EventFX(const char *name, float x, float y, int player);
 
@@ -33,7 +33,7 @@ void EventFX(const char *name, float x, float y, int player);
 #include "drawcontext.h"
 #include "FloboGame.h"
 
-class AnimatedPuyo;
+class AnimatedFlobo;
 
 enum AnimationTag {
     ANIMATION_NO_TAG,
@@ -61,12 +61,12 @@ protected:
 };
 
 /* Abstract animation class for flobos */
-class PuyoAnimation : public Animation{
+class FloboAnimation : public Animation{
 public:
-    PuyoAnimation(AnimatedPuyo &puyo):attachedPuyo(puyo) {}
-    float getPuyoSoundPadding() const;
+    FloboAnimation(AnimatedFlobo &flobo):attachedFlobo(flobo) {}
+    float getSoundPadding() const;
 protected:
-    AnimatedPuyo &attachedPuyo;
+    AnimatedFlobo &attachedFlobo;
 };
 
 /* Animation synchronization helper */
@@ -84,9 +84,9 @@ private:
 };
 
 /* Neutral falling animation */
-class NeutralAnimation : public PuyoAnimation {
+class NeutralAnimation : public FloboAnimation {
   public:
-    NeutralAnimation(AnimatedPuyo &puyo, int delay, AnimationSynchronizer *synchronizer);
+    NeutralAnimation(AnimatedFlobo &flobo, int delay, AnimationSynchronizer *synchronizer);
     virtual ~NeutralAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
@@ -97,10 +97,10 @@ class NeutralAnimation : public PuyoAnimation {
     AnimationSynchronizer *synchronizer;
 };
 
-/* Companion turning around main puyo animation */
-class TurningAnimation : public PuyoAnimation {
+/* Companion turning around main flobo animation */
+class TurningAnimation : public FloboAnimation {
 public:
-    TurningAnimation(AnimatedPuyo &companionFlobo, bool counterclockwise);
+    TurningAnimation(AnimatedFlobo &companionFlobo, bool counterclockwise);
     void cycle();
 private:
     int cpt;
@@ -109,30 +109,30 @@ private:
     const int NUMSTEPS;
 };
 
-/* Puyo moving from one place to another, horizontal axis */
-class MovingHAnimation : public PuyoAnimation {
+/* Flobo moving from one place to another, horizontal axis */
+class MovingHAnimation : public FloboAnimation {
 public:
-    MovingHAnimation(AnimatedPuyo &puyo, int hOffset, int step);
+    MovingHAnimation(AnimatedFlobo &flobo, int hOffset, int step);
     void cycle();
 private:
     int m_cpt, m_hOffset, m_step;
     float m_hOffsetByStep;
 };
 
-/* Puyo moving from one place to another, vertical axis */
-class MovingVAnimation : public PuyoAnimation {
+/* Flobo moving from one place to another, vertical axis */
+class MovingVAnimation : public FloboAnimation {
 public:
-    MovingVAnimation(AnimatedPuyo &puyo, int vOffset, int step);
+    MovingVAnimation(AnimatedFlobo &flobo, int vOffset, int step);
     void cycle();
 private:
     int m_cpt, m_vOffset, m_step;
     float m_vOffsetByStep;
 };
 
-/* Puyo falling and bouncing animation */
-class FallingAnimation : public PuyoAnimation {
+/* Flobo falling and bouncing animation */
+class FallingAnimation : public FloboAnimation {
 public:
-    FallingAnimation(AnimatedPuyo &puyo,
+    FallingAnimation(AnimatedFlobo &flobo,
                      int originY, int xOffset, int yOffset, int step);
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
@@ -145,10 +145,10 @@ private:
     bool m_once;
 };
 
-/* Puyo exploding and vanishing animation */
-class VanishAnimation : public PuyoAnimation {
+/* Flobo exploding and vanishing animation */
+class VanishAnimation : public FloboAnimation {
 public:
-    VanishAnimation(AnimatedPuyo &puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int puyoNum, int groupSize, int groupNum, int phase);
+    VanishAnimation(AnimatedFlobo &flobo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int floboNum, int groupSize, int groupNum, int phase);
     virtual ~VanishAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
@@ -159,7 +159,7 @@ private:
     bool once;
     int delay;
 
-    int puyoNum;
+    int floboNum;
     int groupSize;
     int groupNum;
     int phase;
@@ -179,9 +179,9 @@ private:
     float soundPadding;
 };
 
-class NeutralPopAnimation : public PuyoAnimation {
+class NeutralPopAnimation : public FloboAnimation {
 public:
-    NeutralPopAnimation(AnimatedPuyo &puyo, int delay, AnimationSynchronizer *synchronizer);
+    NeutralPopAnimation(AnimatedFlobo &flobo, int delay, AnimationSynchronizer *synchronizer);
     virtual ~NeutralPopAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
@@ -193,9 +193,9 @@ private:
     IosSurface *neutralPop[3];
 };
 
-class SmoothBounceAnimation : public PuyoAnimation {
+class SmoothBounceAnimation : public FloboAnimation {
 public:
-    SmoothBounceAnimation(AnimatedPuyo &puyo, AnimationSynchronizer *synchronizer, int depth = 10);
+    SmoothBounceAnimation(AnimatedFlobo &flobo, AnimationSynchronizer *synchronizer, int depth = 10);
     virtual ~SmoothBounceAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
@@ -205,9 +205,9 @@ private:
     AnimationSynchronizer *synchronizer;
 };
 
-class GameOverFallAnimation : public PuyoAnimation {
+class GameOverFallAnimation : public FloboAnimation {
 public:
-    GameOverFallAnimation(AnimatedPuyo &puyo, int delay);
+    GameOverFallAnimation(AnimatedFlobo &flobo, int delay);
     virtual ~GameOverFallAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
@@ -237,5 +237,5 @@ private:
     DrawContext *m_dc;
 };
 
-#endif // _PUYOANIMATIONS
+#endif // _FLOBOANIMATIONS_H_
 

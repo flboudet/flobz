@@ -55,8 +55,8 @@ OptionMenu::OptionMenu(MainScreen *mainScreen) : MainScreenMenu(mainScreen),
     fullScreenButton(),
     controlMenu(mainScreen), themeMenu(mainScreen), levelMenu(mainScreen),
     changeThemeAction(&themeMenu, mainScreen), changeLevelAction(&levelMenu, mainScreen), changeControlsAction(&controlMenu, mainScreen, true),
-    changePuyoThemeButton(theCommander->getLocalizedString(kChangePuyoTheme), &changeThemeAction),
-    changeLevelThemeButton(theCommander->getLocalizedString(kChangePuyoLevel), &changeLevelAction),
+    changeFloboThemeButton(theCommander->getLocalizedString(kChangeFloboTheme), &changeThemeAction),
+    changeLevelThemeButton(theCommander->getLocalizedString(kChangeLevelTheme), &changeLevelAction),
     changeControlsButton(theCommander->getLocalizedString(kControls), &changeControlsAction), backAction(mainScreen), backButton(theCommander->getLocalizedString("Back"), &backAction)
 {
 }
@@ -72,8 +72,8 @@ void OptionMenu::build() {
     buttonsBox.add(&audioButton);
     buttonsBox.add(&musicButton);
     buttonsBox.add(&fullScreenButton);
-    if (theCommander->getPuyoSetThemeList().size() > 1)
-        buttonsBox.add(&changePuyoThemeButton);
+    if (theCommander->getFloboSetThemeList().size() > 1)
+        buttonsBox.add(&changeFloboThemeButton);
     if (theCommander->getLevelThemeList().size() > 1)
         buttonsBox.add(&changeLevelThemeButton);
     buttonsBox.add(&changeControlsButton);

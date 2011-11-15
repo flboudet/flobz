@@ -46,7 +46,7 @@ private:
     Text lanTitle;
     VBox buttonsBox;
     EditFieldWithLabel playerNameLabel, portNumLabel;
-    PuyoPopMenuAction cancelAction;
+    PopMainScreenMenuAction cancelAction;
     Button startButton, cancelButton;
 };
 
@@ -68,8 +68,8 @@ private:
     LANGameMenu  lanGameMenu;
     InternetGameMenu *internetGameMenu;
     NetworkInternetAction internetAction;
-    PuyoPushMenuAction lanAction;
-    PuyoPopMenuAction mainScreenPopAction;
+    PushMainScreenMenuAction lanAction;
+    PopMainScreenMenuAction mainScreenPopAction;
     Frame titleFrame;
     Text networkTitleText;
     VBox buttonsBox;

@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -24,11 +24,11 @@
  */
 
 #include "PuyoNetworkStarter.h"
-#include "PuyoMessageDef.h"
+#include "FPNetMessageDef.h"
 #include "PuyoNetworkView.h"
 #include "PuyoNetworkGame.h"
 #include "ios_time.h"
-#include "PuyoMessageDef.h"
+#include "FPNetMessageDef.h"
 
 FloboGame *PuyoNetworkGameFactory::createFloboGame(FloboFactory *attachedFloboFactory) {
     return new PuyoNetworkGame(attachedFloboFactory, msgBox, gameId);
@@ -42,28 +42,28 @@ PuyoNetworkGameWidget::PuyoNetworkGameWidget()
 {
 }
 
-PuyoPlayer *PuyoNetworkGameWidget::createLocalPlayer()
+GamePlayer *PuyoNetworkGameWidget::createLocalPlayer()
 {
-    return new PuyoCombinedEventPlayer(*localArea);
+    return new CombinedEventPlayer(*localArea);
 }
 
-void PuyoNetworkGameWidget::initWithGUI(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, FPServerIGPMessageBox *igpbox)
+void PuyoNetworkGameWidget::initWithGUI(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, FPServerIGPMessageBox *igpbox)
 {
-    attachedPuyoThemeSet = &puyoThemeSet;
+    attachedFloboThemeSet = &puyoThemeSet;
     attachedRandom = std::auto_ptr<RandomSystem>(new RandomSystem(randomSeed, 5));
     this->mbox = &mbox;
-    attachedLocalGameFactory   = std::auto_ptr<FloboLocalGameFactory>(new FloboLocalGameFactory(attachedRandom.get()));
+    attachedLocalGameFactory   = std::auto_ptr<LocalGameFactory>(new LocalGameFactory(attachedRandom.get()));
     attachedNetworkGameFactory = std::auto_ptr<PuyoNetworkGameFactory>(new PuyoNetworkGameFactory(attachedRandom.get(), mbox, gameId));
     if (igpbox != NULL) {
-        localArea = std::auto_ptr<PuyoNetworkView>(new PuyoInternetNetworkView(attachedLocalGameFactory.get(), 0, attachedPuyoThemeSet, &levelTheme,
+        localArea = std::auto_ptr<PuyoNetworkView>(new PuyoInternetNetworkView(attachedLocalGameFactory.get(), 0, attachedFloboThemeSet, &levelTheme,
                                             &mbox, gameId, igpbox));
     }
     else {
-        localArea = std::auto_ptr<PuyoNetworkView>(new PuyoNetworkView(attachedLocalGameFactory.get(), 0, attachedPuyoThemeSet, &levelTheme, &mbox, gameId));
+        localArea = std::auto_ptr<PuyoNetworkView>(new PuyoNetworkView(attachedLocalGameFactory.get(), 0, attachedFloboThemeSet, &levelTheme, &mbox, gameId));
     }
-    networkArea = std::auto_ptr<PuyoView>(new PuyoView(attachedNetworkGameFactory.get(), 1, attachedPuyoThemeSet, &levelTheme));
-    playercontroller = std::auto_ptr<PuyoPlayer>(createLocalPlayer());
-    dummyPlayerController = std::auto_ptr<PuyoNullPlayer>(new PuyoNullPlayer(*networkArea));
+    networkArea = std::auto_ptr<GameView>(new GameView(attachedNetworkGameFactory.get(), 1, attachedFloboThemeSet, &levelTheme));
+    playercontroller = std::auto_ptr<GamePlayer>(createLocalPlayer());
+    dummyPlayerController = std::auto_ptr<GameNullPlayer>(new GameNullPlayer(*networkArea));
     this->mbox->addListener(this);
     chatBox = std::auto_ptr<ChatBox>(new ChatBox(*this));
     brokenNetworkWidget = std::auto_ptr<StoryWidget>(new StoryWidget("etherdown.gsl"));
@@ -124,27 +124,27 @@ void PuyoNetworkGameWidget::cycle()
 
 void PuyoNetworkGameWidget::onMessage(Message &message)
 {
-    if (message.hasInt(PuyoMessage::GAMEID)) {
+    if (message.hasInt(FPNetMessage::GAMEID)) {
         lastMessageDate = ios_fc::getTimeMs();
     }
-    if (!message.hasInt(PuyoMessage::TYPE))
+    if (!message.hasInt(FPNetMessage::TYPE))
         return;
     lastMessageDate = ios_fc::getTimeMs();
-    int msgType = message.getInt(PuyoMessage::TYPE);
+    int msgType = message.getInt(FPNetMessage::TYPE);
     switch (msgType) {
-        case PuyoMessage::kGamePause:
+        case FPNetMessage::kGamePause:
             setScreenToPaused(false);
             break;
-        case PuyoMessage::kGameResume:
+        case FPNetMessage::kGameResume:
             setScreenToResumed(false);
             break;
-        case PuyoMessage::kGameNext:
+        case FPNetMessage::kGameNext:
             actionAfterGameOver(false, GAMEOVER_STARTPRESSED);
             break;
-        case PuyoMessage::kGameAbort:
+        case FPNetMessage::kGameAbort:
             GameWidget2P::abort();
             break;
-        case PuyoMessage::kGameChat:
+        case FPNetMessage::kGameChat:
             chatBox->addChat(message.getString("NAME"), message.getString("TEXT"));
             printf("%s: %s\n", (const char *)message.getString("NAME"), (const char *)message.getString("TEXT"));
             break;
@@ -158,7 +158,7 @@ void PuyoNetworkGameWidget::setScreenToPaused(bool fromControls)
     // If the pause is from a controller, we have to send the pause information to the other peer
     if (fromControls) {
         ios_fc::Message *message = mbox->createMessage();
-        message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGamePause);
+        message->addInt     (FPNetMessage::TYPE,   FPNetMessage::kGamePause);
         message->addBoolProperty("RELIABLE", true);
         message->send();
         delete message;
@@ -172,7 +172,7 @@ void PuyoNetworkGameWidget::setScreenToResumed(bool fromControls)
     // If the resume is from a controller, we have to send the resume information to the other peer
     if (fromControls) {
         ios_fc::Message *message = mbox->createMessage();
-        message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameResume);
+        message->addInt     (FPNetMessage::TYPE,   FPNetMessage::kGameResume);
         message->addBoolProperty("RELIABLE", true);
         message->send();
         delete message;
@@ -183,7 +183,7 @@ void PuyoNetworkGameWidget::setScreenToResumed(bool fromControls)
 void PuyoNetworkGameWidget::abort()
 {
     ios_fc::Message *message = mbox->createMessage();
-    message->addInt(PuyoMessage::TYPE,   PuyoMessage::kGameAbort);
+    message->addInt(FPNetMessage::TYPE,   FPNetMessage::kGameAbort);
     message->addBoolProperty("RELIABLE", true);
     message->send();
     delete message;
@@ -195,7 +195,7 @@ void PuyoNetworkGameWidget::actionAfterGameOver(bool fromControls, int actionTyp
     // If the resume is from a controller, we have to send the resume information to the other peer
     if (fromControls) {
         ios_fc::Message *message = mbox->createMessage();
-        message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameNext);
+        message->addInt     (FPNetMessage::TYPE,   FPNetMessage::kGameNext);
         message->addBoolProperty("RELIABLE", true);
         message->send();
         delete message;
@@ -206,7 +206,7 @@ void PuyoNetworkGameWidget::actionAfterGameOver(bool fromControls, int actionTyp
 void PuyoNetworkGameWidget::sendChat(String chatText)
 {
     ios_fc::Message *message = mbox->createMessage();
-    message->addInt(PuyoMessage::TYPE,   PuyoMessage::kGameChat);
+    message->addInt(FPNetMessage::TYPE,   FPNetMessage::kGameChat);
     message->addString("NAME",   getPlayerOneName());
     message->addString("TEXT",   chatText);
     message->addBoolProperty("RELIABLE", true);
@@ -224,7 +224,7 @@ void PuyoNetworkGameWidget::associatedScreenHasBeenSet(GameScreen *associatedScr
 void PuyoNetworkGameWidget::sendAliveMsg()
 {
     ios_fc::Message *message = mbox->createMessage();
-    message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameAlive);
+    message->addInt     (FPNetMessage::TYPE,   FPNetMessage::kGameAlive);
     message->send();
     delete message;
 }
@@ -275,16 +275,16 @@ void NetSynchronizeState::onMessage(Message &message)
 {
     if (evaluate())
         return;
-    if (!message.hasInt(PuyoMessage::TYPE))
+    if (!message.hasInt(FPNetMessage::TYPE))
         return;
-    int msgType = message.getInt(PuyoMessage::TYPE);
-    if ((msgType == PuyoMessage::kGameSync)
-        || (msgType == PuyoMessage::kGameAck)){
+    int msgType = message.getInt(FPNetMessage::TYPE);
+    if ((msgType == FPNetMessage::kGameSync)
+        || (msgType == FPNetMessage::kGameAck)){
         if (!message.hasInt("SynID"))
             return;
         int synID = message.getInt("SynID");
         if (synID == m_synID) {
-            if (msgType == PuyoMessage::kGameSync) {
+            if (msgType == FPNetMessage::kGameSync) {
                 if (!m_ackSent) {
                     sendAckMessage();
                     m_ackSent = true;
@@ -311,7 +311,7 @@ void NetSynchronizeState::cycle()
 void NetSynchronizeState::sendSyncMessage()
 {
     auto_ptr<ios_fc::Message> message(m_mbox->createMessage());
-    message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameSync);
+    message->addInt     (FPNetMessage::TYPE,   FPNetMessage::kGameSync);
     message->addInt     ("SynID", m_synID);
     message->send();
 }
@@ -319,7 +319,7 @@ void NetSynchronizeState::sendSyncMessage()
 void NetSynchronizeState::sendAckMessage()
 {
     auto_ptr<ios_fc::Message> message(m_mbox->createMessage());
-    message->addInt     (PuyoMessage::TYPE,   PuyoMessage::kGameAck);
+    message->addInt     (FPNetMessage::TYPE,   FPNetMessage::kGameAck);
     message->addInt     ("SynID", m_synID);
     message->addBoolProperty("RELIABLE", true);
     message->send();

@@ -19,7 +19,7 @@
 #ifndef PUYOIA_H
 #define PUYOIA_H
 
-#include "PuyoPlayer.h"
+#include "GamePlayer.h"
 
 // Redefine the table size to our needs
 // same columns number
@@ -71,10 +71,10 @@ typedef struct {
 
 typedef unsigned char GridState[IA_TABLEDIMX][IA_TABLEDIMY];
 
-class AIPlayer : public virtual PuyoPlayer {
+class AIPlayer : public virtual GamePlayer {
 
   public:
-    AIPlayer(int level, PuyoView &targetView);
+    AIPlayer(int level, GameView &targetView);
     virtual ~AIPlayer();
     virtual void cycle();
     void setAIParameters(const AIParameters &ai);

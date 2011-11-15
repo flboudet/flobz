@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -39,10 +39,10 @@
 #define NUMBER_OF_FLOBO_DISAPPEAR 4
 #define NUMBER_OF_FLOBO_EYES 3
 
-#define NUMBER_OF_PUYOS 5
+#define NUMBER_OF_FLOBOS 5
 
-#define NUMBER_OF_PUYOS_IN_SET 6
-#define NUMBER_OF_PUYOBANS_IN_LEVEL 2
+#define NUMBER_OF_FLOBOS_IN_SET 6
+#define NUMBER_OF_FLOBOBANS_IN_LEVEL 2
 
 #define NUMBER_OF_LIVES 4
 #define MAX_COMPRESSED 32
@@ -60,36 +60,36 @@ public:
 };
 
 /**
- * The PuyoTheme interface represents the theme for a single puyo style
+ * The FloboTheme interface represents the theme for a single flobo style
  */
-class PuyoTheme {
+class FloboTheme {
 public:
-    virtual ~PuyoTheme() {}
-    virtual IosSurface *getPuyoSurfaceForValence(int valence, int compression = 0) const = 0;
+    virtual ~FloboTheme() {}
+    virtual IosSurface *getFloboSurfaceForValence(int valence, int compression = 0) const = 0;
     virtual IosSurface *getEyeSurfaceForIndex(int index, int compression = 0) const = 0;
     virtual IosSurface *getCircleSurfaceForIndex(int index) const = 0;
     virtual IosSurface *getShadowSurface(int compression = 0) const = 0;
     virtual IosSurface *getShrinkingSurfaceForIndex(int index) const = 0;
     virtual IosSurface *getExplodingSurfaceForIndex(int index) const = 0;
 protected:
-    PuyoTheme() {}
+    FloboTheme() {}
 private:
-    PuyoTheme(const PuyoTheme &theme) {}
+    FloboTheme(const FloboTheme &theme) {}
 };
 
 /**
- * The PuyoSetTheme interface represents a full-featured collection
- * of PuyoThemes
+ * The FloboSetTheme interface represents a full-featured collection
+ * of FloboThemes
  */
-class PuyoSetTheme : public ThemeDescriptionInterface {
+class FloboSetTheme : public ThemeDescriptionInterface {
 public:
-    virtual ~PuyoSetTheme(void) {}
-    // Accessor to the PuyoThemes
-    virtual const PuyoTheme & getPuyoTheme(FloboState state) const = 0;
+    virtual ~FloboSetTheme(void) {}
+    // Accessor to the FloboThemes
+    virtual const FloboTheme & getFloboTheme(FloboState state) const = 0;
 };
 
 /**
- * The LevelTheme interface represents the theme for a Level (aka Puyoban)
+ * The LevelTheme interface represents the theme for a Level
  */
 class LevelTheme : public ThemeDescriptionInterface {
 public:
@@ -105,13 +105,13 @@ public:
     // Fonts
     virtual IosFont *getPlayerNameFont() const = 0;
     virtual IosFont *getScoreFont() const      = 0;
-    // Positions and dimensions of the Puyoban
+    // Positions and dimensions of the Floboban
     virtual int getSpeedMeterX() const  = 0;
     virtual int getSpeedMeterY() const  = 0;
     virtual int getLifeDisplayX() const = 0;
     virtual int getLifeDisplayY() const = 0;
-    virtual int getPuyobanX(int playerId) const = 0;
-    virtual int getPuyobanY(int playerId) const = 0;
+    virtual int getFlobobanX(int playerId) const = 0;
+    virtual int getFlobobanY(int playerId) const = 0;
     virtual int getNextFlobosX(int playerId) const = 0;
     virtual int getNextFlobosY(int playerId) const = 0;
     virtual int getNeutralDisplayX(int playerId) const = 0;
@@ -120,8 +120,8 @@ public:
     virtual int getNameDisplayY(int playerId) const    = 0;
     virtual int getScoreDisplayX(int playerId) const   = 0;
     virtual int getScoreDisplayY(int playerId) const   = 0;
-    virtual float getPuyobanScale(int playerId) const  = 0;
-    // Behaviour of the Puyoban
+    virtual float getFlobobanScale(int playerId) const  = 0;
+    // Behaviour of the Floboban
     virtual bool getShouldDisplayNext(int playerId) const    = 0;
     virtual bool getShouldDisplayShadows(int playerId) const = 0;
     virtual bool getShouldDisplayEyes(int playerId) const    = 0;
@@ -147,10 +147,10 @@ public:
 class ThemeManager {
 public:
     virtual ~ ThemeManager() {}
-    virtual PuyoSetTheme * createFloboSetTheme(const std::string &themeName) = 0;
+    virtual FloboSetTheme * createFloboSetTheme(const std::string &themeName) = 0;
     virtual LevelTheme   * createLevelTheme(const std::string &themeName) = 0;
 
-    virtual const std::vector<std::string> & getPuyoSetThemeList() = 0;
+    virtual const std::vector<std::string> & getFloboSetThemeList() = 0;
     virtual const std::vector<std::string> & getLevelThemeList() = 0;
 };
 

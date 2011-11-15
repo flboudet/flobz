@@ -24,7 +24,7 @@
  */
 
 #include "PuyoStarter.h"
-#include "PuyoView.h"
+#include "GameView.h"
 #include "gameui.h"
 
 using namespace ios_fc;
@@ -32,11 +32,11 @@ using namespace event_manager;
 using namespace gameui;
 
 
-TwoPlayerGameWidget::TwoPlayerGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, Action *gameOverAction)
-: attachedPuyoThemeSet(puyoThemeSet),
+TwoPlayerGameWidget::TwoPlayerGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, Action *gameOverAction)
+: attachedFloboThemeSet(puyoThemeSet),
     attachedRandom(5), attachedGameFactory(&attachedRandom),
-    areaA(&attachedGameFactory, 0, &attachedPuyoThemeSet, &levelTheme),
-    areaB(&attachedGameFactory, 1, &attachedPuyoThemeSet, &levelTheme),
+    areaA(&attachedGameFactory, 0, &attachedFloboThemeSet, &levelTheme),
+    areaB(&attachedGameFactory, 1, &attachedFloboThemeSet, &levelTheme),
     controllerA(areaA, kPlayer1Down, kPlayer1Left, kPlayer1Right,
             kPlayer1TurnLeft, kPlayer1TurnRight),
     controllerB(areaB, kPlayer2Down, kPlayer2Left, kPlayer2Right,

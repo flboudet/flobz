@@ -31,33 +31,33 @@
 #include "Theme.h"
 #include "LevelThemeMenu.h"
 
-class PuyoThemePicturePreview : public Widget, public IdleComponent {
+class FloboThemePicturePreview : public Widget, public IdleComponent {
     public:
-        PuyoThemePicturePreview();
+        FloboThemePicturePreview();
 
         // Implements IdleComponent
         virtual void idle(double currentTime);
         virtual IdleComponent *getIdleComponent() { return this; }
 
         void build();
-        void themeSelected(PuyoSetTheme * theme);
+        void themeSelected(FloboSetTheme * theme);
 
     protected:
       void draw(DrawTarget *dt);
 
     private:
       String label;
-      PuyoSetTheme * curTheme;
+      FloboSetTheme * curTheme;
       double offsetX;
       double offsetY;
-      int eyes[NUMBER_OF_PUYOS];
+      int eyes[NUMBER_OF_FLOBOS];
       double lastTime;
 };
 
-class PuyoThemePreview : public VBox {
+class FloboThemePreview : public VBox {
     public:
-        PuyoThemePreview();
-        virtual ~PuyoThemePreview();
+        FloboThemePreview();
+        virtual ~FloboThemePreview();
 
         void build();
         void themeSelected(const std::string &themeName);
@@ -65,18 +65,18 @@ class PuyoThemePreview : public VBox {
     private:
         Text name;
         Text author;
-        PuyoThemePicturePreview picture;
+        FloboThemePicturePreview picture;
         Text description;
 };
 
-class PuyoThemeSelectionBox : public HBox, public Action {
+class FloboThemeSelectionBox : public HBox, public Action {
 public:
-    PuyoThemeSelectionBox();
-    virtual ~PuyoThemeSelectionBox();
+    FloboThemeSelectionBox();
+    virtual ~FloboThemeSelectionBox();
     void build();
     void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
 private:
-    PuyoThemePreview themePreview;
+    FloboThemePreview themePreview;
     Image *prevButton, *nextButton;
     ZBox Spacer0, Spacer1, Spacer2, Spacer3;
 };
@@ -89,9 +89,9 @@ private:
     Frame screenTitleFrame;
     Text themeMenuTitle;
     VBox buttonsBox;
-    PuyoPopMenuAction popAction;
+    PopMainScreenMenuAction popAction;
     Button backButton;
-    PuyoThemeSelectionBox themeList;
+    FloboThemeSelectionBox themeList;
 };
 
 #endif

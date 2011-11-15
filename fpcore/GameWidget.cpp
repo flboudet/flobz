@@ -121,7 +121,7 @@ GameWidget2P::GameWidget2P(GameOptions game_options, bool withGUI)
     }
 }
 
-void GameWidget2P::initWithGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, LevelTheme &levelTheme, Action *gameOverAction)
+void GameWidget2P::initWithGUI(GameView &areaA, GameView &areaB, GamePlayer &controllerA, GamePlayer &controllerB, LevelTheme &levelTheme, Action *gameOverAction)
 {
     this->areaA = &areaA;
     this->areaB = &areaB;
@@ -133,7 +133,7 @@ void GameWidget2P::initWithGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &con
     this->gameOverAction = gameOverAction;
     priv_initialize();
 }
-void GameWidget2P::initWithoutGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &controllerA, PuyoPlayer &controllerB, Action *gameOverAction)
+void GameWidget2P::initWithoutGUI(GameView &areaA, GameView &areaB, GamePlayer &controllerA, GamePlayer &controllerB, Action *gameOverAction)
 {
     this->areaA = &areaA;
     this->areaB = &areaB;
@@ -185,10 +185,10 @@ void GameWidget2P::priv_initialize()
 
     // Load and preload a few FX for the game
     for (int i=0; i<3; ++i)
-        puyoFX.push_back(new PuyoFX("fx/vanish.gsl", *(areaA->getPuyoThemeSet())));
+        puyoFX.push_back(new VisualFX("fx/vanish.gsl", *(areaA->getFloboSetTheme())));
     for (int i=0; i<3; ++i)
-        puyoFX.push_back(new PuyoFX("fx/combo.gsl", *(areaA->getPuyoThemeSet())));
-    // puyoFX.push_back(new PuyoFX("fx/white_star.gsl"));
+        puyoFX.push_back(new VisualFX("fx/combo.gsl", *(areaA->getFloboSetTheme())));
+    // puyoFX.push_back(new VisualFX("fx/white_star.gsl"));
 }
 
 GameWidget2P::~GameWidget2P()
@@ -506,7 +506,7 @@ void GameWidget2P::styro_freeImage(StyrolyseClient *_this, void *image)
   delete ((StyroImage *)image);
 }
 
-std::vector<PuyoFX*> *activeFX = NULL;
+std::vector<VisualFX*> *activeFX = NULL;
 
 void EventFX(const char *name, float x, float y, int player)
 {
@@ -514,11 +514,11 @@ void EventFX(const char *name, float x, float y, int player)
 
     /* printf("Simultaneous FX: %d\n", activeFX->size()); */
 
-    PuyoFX *supporting_fx = NULL;
+    VisualFX *supporting_fx = NULL;
     for (unsigned int i=0; i<activeFX->size(); ++i) {
 
         // Find an FX supporting this event
-        PuyoFX *fx = (*activeFX)[i];
+        VisualFX *fx = (*activeFX)[i];
         if (fx->supportFX(name)) {
             supporting_fx = fx;
             // FX not busy, report it the event
@@ -532,7 +532,7 @@ void EventFX(const char *name, float x, float y, int player)
     // All FX are busy, if we find an FX supporting this event
     // we clone it an report the FX to the newly created one.
     if (supporting_fx != NULL) {
-        PuyoFX *fx = supporting_fx->clone();
+        VisualFX *fx = supporting_fx->clone();
         activeFX->push_back(fx);
         fx->getGameScreen()->add(fx);
         fx->postEvent(name, x, y, player);

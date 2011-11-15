@@ -64,11 +64,11 @@ private:
     ControlMenu controlMenu;
     ThemeMenu themeMenu;
     LevelThemeMenu levelMenu;
-    PuyoPushMenuAction changeThemeAction, changeLevelAction, changeControlsAction;
-    Button changePuyoThemeButton;
+    PushMainScreenMenuAction changeThemeAction, changeLevelAction, changeControlsAction;
+    Button changeFloboThemeButton;
     Button changeLevelThemeButton;
     Button changeControlsButton;
-    PuyoPopMenuAction backAction;
+    PopMainScreenMenuAction backAction;
     Button backButton;
 };
 

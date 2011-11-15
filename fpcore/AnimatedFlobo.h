@@ -28,22 +28,22 @@
 
 #include "ios_memory.h"
 #include "FloboGame.h"
-#include "PuyoAnimations.h"
+#include "FloboAnimations.h"
 
-class PuyoView;
-class PuyoTheme;
-class PuyoSetTheme;
+class GameView;
+class FloboTheme;
+class FloboSetTheme;
 
-class AnimatedPuyo : public Flobo {
+class AnimatedFlobo : public Flobo {
 public:
     enum AnimatedFloboState {
         FLOBO_NORMAL,
         FLOBO_CRUNSHED
     };
-    AnimatedPuyo(FloboState state, PuyoSetTheme *themeSet, PuyoView *attachedView);
-    virtual ~AnimatedPuyo();
-    void addAnimation(PuyoAnimation *animation);
-    PuyoAnimation * getCurrentAnimation() const;
+    AnimatedFlobo(FloboState state, FloboSetTheme *themeSet, GameView *attachedView);
+    virtual ~AnimatedFlobo();
+    void addAnimation(FloboAnimation *animation);
+    FloboAnimation * getCurrentAnimation() const;
     void removeCurrentAnimation();
     void flushAnimations();
     void flushAnimations(int animationTag);
@@ -55,25 +55,25 @@ public:
     bool isRenderingAnimation() const;
     void setVisible(bool flag) { visibilityFlag = flag; }
     bool getVisible() const { return visibilityFlag; }
-    PuyoView *getAttachedView() const { return attachedView; }
+    GameView *getAttachedView() const { return attachedView; }
     int getScreenCoordinateX() const;
     int getScreenCoordinateY() const;
-    const PuyoTheme *getAttachedTheme() const { return attachedTheme; }
+    const FloboTheme *getAttachedTheme() const { return attachedTheme; }
     void setAnimatedState(int animatedState) { m_currentCompressedState = animatedState; }
-    void setPartner(AnimatedPuyo *partner) { m_partner = partner; }
+    void setPartner(AnimatedFlobo *partner) { m_partner = partner; }
     void setOffsetX(int offsetX) { m_offsetX = offsetX; }
     void setOffsetY(int offsetY) { m_offsetY = offsetY; }
     void setRotation(float angle) { m_angle = angle; }
     void setShowEyes(bool show) { m_displayEyes = show; }
 private:
-    AdvancedBuffer<PuyoAnimation *> animationQueue;
+    AdvancedBuffer<FloboAnimation *> animationQueue;
     int puyoEyeState;
     unsigned int smallTicksCount;
     bool visibilityFlag;
-    PuyoView *attachedView;
-	const PuyoTheme *attachedTheme;
+    GameView *attachedView;
+	const FloboTheme *attachedTheme;
     int m_currentCompressedState;
-    AnimatedPuyo *m_partner;
+    AnimatedFlobo *m_partner;
     int m_offsetX, m_offsetY;
     float m_angle;
     bool m_displayEyes;
@@ -81,7 +81,7 @@ private:
 
 class AnimatedFloboFactory : public FloboFactory {
 public:
-    AnimatedFloboFactory(PuyoView *attachedView);
+    AnimatedFloboFactory(GameView *attachedView);
     virtual ~AnimatedFloboFactory();
     virtual Flobo *createFlobo(FloboState state);
     virtual void deleteFlobo(Flobo *target);
@@ -90,8 +90,8 @@ public:
     void setShowEyes(bool show) { m_showEyes = show; }
 private:
     AdvancedBuffer<Flobo *> puyoWalhalla;
-    PuyoView *attachedView;
-    PuyoSetTheme *attachedThemeSet;
+    GameView *attachedView;
+    FloboSetTheme *attachedThemeSet;
     bool m_showEyes;
 };
 

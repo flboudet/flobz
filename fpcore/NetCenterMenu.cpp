@@ -35,7 +35,7 @@ class PuyoNetworkTwoPlayerGameWidgetFactory : public GameWidgetFactory {
 public:
     PuyoNetworkTwoPlayerGameWidgetFactory(ios_fc::MessageBox &mbox, unsigned int randomSeed, FPServerIGPMessageBox *igpbox/* = NULL */)
       : mbox(mbox), randomSeed(randomSeed), igpbox(igpbox), gameId(0) {}
-    GameWidget *createGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
+    GameWidget *createGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
         PuyoNetworkGameWidget *negawi = new PuyoNetworkGameWidget();
         negawi->initWithGUI(puyoThemeSet, levelTheme, mbox, gameId++, randomSeed++, gameOverAction, igpbox);

@@ -26,25 +26,25 @@
 #ifndef _PUYONETWORKVIEW
 #define _PUYONETWORKVIEW
 
-#include "PuyoMessageDef.h"
-#include "PuyoView.h"
+#include "FPNetMessageDef.h"
+#include "GameView.h"
 
 #include "NetworkDefinitions.h"
 
 using namespace ios_fc;
 
-class PuyoNetworkView : public PuyoView {
+class PuyoNetworkView : public GameView {
   public:
     PuyoNetworkView(FloboGameFactory *attachedFloboGameFactory, MessageBox *mbox, int gameId)
-        : PuyoView(attachedFloboGameFactory),
+        : GameView(attachedFloboGameFactory),
           mbox(mbox), gameId(gameId), badFlobos(0), lastFullMessage(-1) {}
 
     PuyoNetworkView(FloboGameFactory *attachedFloboGameFactory,
             int playerId,
-		    PuyoSetTheme *attachedPuyoThemeSet,
+		    FloboSetTheme *attachedFloboThemeSet,
             LevelTheme *attachedLevelTheme,
 		    MessageBox *mbox, int gameId)
-        : PuyoView(attachedFloboGameFactory, playerId, attachedPuyoThemeSet, attachedLevelTheme),
+        : GameView(attachedFloboGameFactory, playerId, attachedFloboThemeSet, attachedLevelTheme),
           mbox(mbox), gameId(gameId), badFlobos(0), lastFullMessage(-1) {}
 
     void cycleGame();
@@ -95,13 +95,13 @@ class PuyoInternetNetworkView : public PuyoNetworkView {
 
         PuyoInternetNetworkView(FloboGameFactory *attachedFloboGameFactory,
                                 int playerId,
-                                PuyoSetTheme *attachedPuyoThemeSet,
+                                FloboSetTheme *attachedFloboThemeSet,
                                 LevelTheme *attachedLevelTheme,
                                 MessageBox *mbox, int gameId,
                                 FPServerIGPMessageBox *igpbox)
           : PuyoNetworkView(attachedFloboGameFactory,
                              playerId,
-                             attachedPuyoThemeSet,
+                             attachedFloboThemeSet,
                              attachedLevelTheme,
                              mbox, gameId),
           igpbox(igpbox) {}

@@ -52,10 +52,10 @@ private:
     PopToMainScreenAction popFromHallScreenAction, popFromCreditsAction;
     HallOfFameScreen      hallOfFameScreen; // Comes from PuyoSinglePlayerStarter.cpp
     StoryScreen           creditsScreen;
-    PuyoPushMenuAction    soloGameAction;
-    PuyoPushMenuAction    singlePlayerGameAction;
-    PuyoPushMenuAction    twoPlayersGameAction;
-    PuyoPushMenuAction    optionAction;
+    PushMainScreenMenuAction    soloGameAction;
+    PushMainScreenMenuAction    singlePlayerGameAction;
+    PushMainScreenMenuAction    twoPlayersGameAction;
+    PushMainScreenMenuAction    optionAction;
     PushHallOfFameAction  hallOfFameAction;
     PushStoryScreenAction creditsAction;
     ExitAction exitAction;
@@ -71,11 +71,11 @@ private:
 #ifdef ENABLE_NETWORK
 #ifdef ENABLE_NETWORK_INTERNET
     NetworkGameMenu       networkGameMenu;
-    PuyoPushMenuAction    networkGameAction;
+    PushMainScreenMenuAction    networkGameAction;
     Button                networkGameButton;
 #else
     LANGameMenu           lanGameMenu;
-    PuyoPushMenuAction    lanAction;
+    PushMainScreenMenuAction    lanAction;
     Button                lanGameButton;
 #endif
 #endif

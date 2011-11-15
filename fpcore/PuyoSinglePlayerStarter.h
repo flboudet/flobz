@@ -37,7 +37,7 @@
 class SinglePlayerGameWidget : public GameWidget2P, public Action {
 public:
     SinglePlayerGameWidget(int lifes, String aiFace);
-    void initWithGUI(PuyoView &areaA, PuyoView &areaB, PuyoPlayer &playercontroller, LevelTheme &levelTheme, int level, Action *gameOverAction);
+    void initWithGUI(GameView &areaA, GameView &areaB, GamePlayer &playercontroller, LevelTheme &levelTheme, int level, Action *gameOverAction);
     virtual ~SinglePlayerGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
@@ -57,13 +57,13 @@ protected:
 class SinglePlayerStandardLayoutGameWidget : public SinglePlayerGameWidget
 {
 public:
-    SinglePlayerStandardLayoutGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
+    SinglePlayerStandardLayoutGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
 private:
-    PuyoSetTheme &attachedPuyoThemeSet;
+    FloboSetTheme &attachedFloboThemeSet;
     RandomSystem attachedRandom;
-    FloboLocalGameFactory attachedGameFactory;
-    PuyoView areaA, areaB;
-    PuyoCombinedEventPlayer playercontroller;
+    LocalGameFactory attachedGameFactory;
+    GameView areaA, areaB;
+    CombinedEventPlayer playercontroller;
 };
 
 class StoryModeLevelsDefinition {
@@ -225,7 +225,7 @@ public:
     // PlayerNameProvider implementation
     virtual String getPlayerName(int playerNumber) const;
     // GameWidgetFactory implementation
-    virtual GameWidget *createGameWidget(PuyoSetTheme &puyoThemeSet,
+    virtual GameWidget *createGameWidget(FloboSetTheme &puyoThemeSet,
                                          LevelTheme &levelTheme,
                                          String centerFace,
                                          Action *gameOverAction);

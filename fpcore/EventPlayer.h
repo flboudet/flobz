@@ -26,15 +26,15 @@
 #ifndef _FLOBO_EVENT_PLAYER_H
 #define _FLOBO_EVENT_PLAYER_H
 
-#include "PuyoPlayer.h"
+#include "GamePlayer.h"
 
 /**
- * ThePuyoEventPlayer class implements a PuyoPlayer controlled by
+ * TheEventPlayer class implements a GamePlayer controlled by
  * classic input devices events, ie SDL joystics and keyboard
  */
-class PuyoEventPlayer : public PuyoPlayer {
+class EventPlayer : public GamePlayer {
 public:
-    PuyoEventPlayer(PuyoView &view, int downEvent, int leftEvent, int rightEvent, int turnLeftEvent, int turnRightEvent);
+    EventPlayer(GameView &view, int downEvent, int leftEvent, int rightEvent, int turnLeftEvent, int turnRightEvent);
     void eventOccured(event_manager::GameControlEvent *event);
     void cycle();
 private:
@@ -45,20 +45,20 @@ private:
 };
 
 /**
- * The PuyoCombinedEventPlayer class implements a PuyoPlayer
- * controlled by the combination of two PuyoEventPlayers.
+ * The CombinedEventPlayer class implements a GamePlayer
+ * controlled by the combination of two EventPlayers.
  * The purpose is to have a "union" of the Player 1 and Player 2
  * controllers, so that any joystick or keyboard for either
  * player 1 or player 2 can be used when playing a solo game
  */
-class PuyoCombinedEventPlayer : public PuyoPlayer {
+class CombinedEventPlayer : public GamePlayer {
 public:
-    PuyoCombinedEventPlayer(PuyoView &view);
+    CombinedEventPlayer(GameView &view);
     void eventOccured(event_manager::GameControlEvent *event);
     void cycle();
 private:
-    PuyoEventPlayer player1controller;
-    PuyoEventPlayer player2controller;
+    EventPlayer player1controller;
+    EventPlayer player2controller;
 };
 
 #endif // _FLOBO_EVENT_PLAYER_H

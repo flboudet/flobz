@@ -41,15 +41,12 @@ extern const char *kHighScores;
 extern const char *kMusicVolume;
 extern const char *kAudioVolume;
 
-extern const char *kCongratulations;
-extern const char *kFlobosInvasion;
-
 extern const char *kAudioFX;
 extern const char *kMusic;
 extern const char *kFullScreen;
 extern const char *kOpenGL;
-extern const char *kChangePuyoTheme;
-extern const char *kChangePuyoLevel;
+extern const char *kChangeFloboTheme;
+extern const char *kChangeLevelTheme;
 extern const char *kControls;
 extern const char *kGameLevel;
 extern const char *kLevelEasy;
@@ -68,20 +65,6 @@ extern const char *kSPlayer2Down;
 extern const char *kSPlayer2Clockwise;
 extern const char *kSPlayer2Counterclockwise;
 
-extern const char *kRules01;
-extern const char *kRules02;
-extern const char *kRules03;
-extern const char *kRules04;
-extern const char *kRules05;
-
-extern const char *kAbout01;
-extern const char *kAbout02;
-extern const char *kAbout03;
-extern const char *kAbout04;
-extern const char *kAbout05;
-extern const char *kAbout06;
-extern const char *kAbout07;
-extern const char *kAbout08;
 extern const char *kSinglePlayerGame;
 extern const char *kTwoPlayersGame;
 extern const char *kNetGame;

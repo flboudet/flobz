@@ -161,7 +161,7 @@ private:
     VBox playerbox;
     Text playerListText, chatAreaText;
     FramedButton cancelButton;
-    PuyoPopMenuAction backAction;
+    PopMainScreenMenuAction backAction;
     NetCenterPlayerList playerList;
     NetCenterCycled cycled;
     NetGameCenter *netCenter;

@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -24,9 +24,9 @@
  */
 
 #include "GTLog.h"
-#include "PuyoAnimations.h"
-#include "AnimatedPuyo.h"
-#include "PuyoView.h"
+#include "FloboAnimations.h"
+#include "AnimatedFlobo.h"
+#include "GameView.h"
 #include "audio.h"
 
 /* Base class implementation */
@@ -46,20 +46,20 @@ bool Animation::isEnabled() const
     return enabled;
 }
 
-float PuyoAnimation::getPuyoSoundPadding() const
+float FloboAnimation::getSoundPadding() const
 {
-    return ((float)attachedPuyo.getScreenCoordinateX() / 640.)*2. - 1.;
+    return ((float)attachedFlobo.getScreenCoordinateX() / 640.)*2. - 1.;
 }
 
 /* Neutral falling animation */
-NeutralAnimation::NeutralAnimation(AnimatedPuyo &puyo, int delay, AnimationSynchronizer *synchronizer) : PuyoAnimation(puyo)
+NeutralAnimation::NeutralAnimation(AnimatedFlobo &flobo, int delay, AnimationSynchronizer *synchronizer) : FloboAnimation(flobo)
 {
-    this->X = attachedPuyo.getScreenCoordinateX();
-    this->Y = attachedPuyo.getScreenCoordinateY();
-    this->currentY = attachedPuyo.getAttachedView()->getScreenCoordinateY(0);
+    this->X = attachedFlobo.getScreenCoordinateX();
+    this->Y = attachedFlobo.getScreenCoordinateY();
+    this->currentY = attachedFlobo.getAttachedView()->getScreenCoordinateY(0);
     step = 0;
     this->delay = delay;
-    attachedPuyo.getAttachedView()->disallowCycle();
+    attachedFlobo.getAttachedView()->disallowCycle();
     this->synchronizer = synchronizer;
     synchronizer->incrementUsage();
     synchronizer->push();
@@ -85,12 +85,12 @@ void NeutralAnimation::cycle()
             int choosenSound = random() % 2;
             // TODO jeko
             /*EventFX("neutral_bouncing",
-                attachedPuyo.getScreenCoordinateX() + TSIZE/2,
-                attachedPuyo.getScreenCoordinateY() + TSIZE/2,
-                attachedPuyo.getAttachedView()->getPlayerId());*/
-            AudioManager::playSound(sound_bim[choosenSound], sound_bim_volume[choosenSound], getPuyoSoundPadding());
+                attachedFlobo.getScreenCoordinateX() + TSIZE/2,
+                attachedFlobo.getScreenCoordinateY() + TSIZE/2,
+                attachedFlobo.getAttachedView()->getPlayerId());*/
+            AudioManager::playSound(sound_bim[choosenSound], sound_bim_volume[choosenSound], getSoundPadding());
             finishedFlag = true;
-            attachedPuyo.getAttachedView()->allowCycle();
+            attachedFlobo.getAttachedView()->allowCycle();
             synchronizer->pop();
         }
     }
@@ -98,7 +98,7 @@ void NeutralAnimation::cycle()
 
 void NeutralAnimation::draw(int semiMove, DrawTarget *dt)
 {
-    attachedPuyo.renderAt(X, currentY, dt);
+    attachedFlobo.renderAt(X, currentY, dt);
 }
 
 /* Animation synchronization helper */
@@ -135,9 +135,9 @@ void AnimationSynchronizer::decrementUsage()
         delete this;
 }
 
-/* Companion turning around main puyo animation */
-TurningAnimation::TurningAnimation(AnimatedPuyo &companionFlobo,
-                                   bool counterclockwise) : PuyoAnimation(companionFlobo), NUMSTEPS(6)
+/* Companion turning around main flobo animation */
+TurningAnimation::TurningAnimation(AnimatedFlobo &companionFlobo,
+                                   bool counterclockwise) : FloboAnimation(companionFlobo), NUMSTEPS(6)
 {
     enabled = false;
     m_exclusive = false;
@@ -154,47 +154,47 @@ void TurningAnimation::cycle()
     static const float  sound_fff_volume = .35;
 
     if (cpt == 0) {
-        AudioManager::playSound(sound_fff, sound_fff_volume, getPuyoSoundPadding());
+        AudioManager::playSound(sound_fff, sound_fff_volume, getSoundPadding());
         EventFX("turning",
-                attachedPuyo.getScreenCoordinateX() + TSIZE/2,
-                attachedPuyo.getScreenCoordinateY() + TSIZE/2,
-                attachedPuyo.getAttachedView()->getPlayerId());
+                attachedFlobo.getScreenCoordinateX() + TSIZE/2,
+                attachedFlobo.getScreenCoordinateY() + TSIZE/2,
+                attachedFlobo.getAttachedView()->getPlayerId());
     }
     cpt++;
     angle += step;
     if (cpt == NUMSTEPS) {
         finishedFlag = true;
-        attachedPuyo.setRotation(0.);
+        attachedFlobo.setRotation(0.);
     }
     else
-        attachedPuyo.setRotation(angle);
+        attachedFlobo.setRotation(angle);
 }
 
-/* Puyo moving from one place to another in the horizontal axis */
-MovingHAnimation::MovingHAnimation(AnimatedPuyo &puyo, int hOffset, int step)
-  : PuyoAnimation(puyo), m_cpt(0), m_hOffset(hOffset), m_step(step),
+/* Flobo moving from one place to another in the horizontal axis */
+MovingHAnimation::MovingHAnimation(AnimatedFlobo &flobo, int hOffset, int step)
+  : FloboAnimation(flobo), m_cpt(0), m_hOffset(hOffset), m_step(step),
     m_hOffsetByStep((float)hOffset/(float)step)
 {
     enabled = false;
     m_exclusive = false;
     m_tag = ANIMATION_H;
-    AudioManager::playSound("tick.wav", .35, getPuyoSoundPadding());
+    AudioManager::playSound("tick.wav", .35, getSoundPadding());
     cycle();
 }
 
 void MovingHAnimation::cycle()
 {
     m_cpt++;
-    attachedPuyo.setOffsetX(m_hOffset - m_hOffsetByStep*m_cpt);
+    attachedFlobo.setOffsetX(m_hOffset - m_hOffsetByStep*m_cpt);
     if (m_cpt == m_step) {
         finishedFlag = true;
-        attachedPuyo.setOffsetX(0);
+        attachedFlobo.setOffsetX(0);
     }
 }
 
-/* Puyo moving from one place to another in the vertical axis */
-MovingVAnimation::MovingVAnimation(AnimatedPuyo &puyo, int vOffset, int step)
-  : PuyoAnimation(puyo), m_cpt(0), m_vOffset(vOffset), m_step(step),
+/* Flobo moving from one place to another in the vertical axis */
+MovingVAnimation::MovingVAnimation(AnimatedFlobo &flobo, int vOffset, int step)
+  : FloboAnimation(flobo), m_cpt(0), m_vOffset(vOffset), m_step(step),
     m_vOffsetByStep((float)vOffset/(float)step)
 {
     enabled = false;
@@ -206,43 +206,43 @@ MovingVAnimation::MovingVAnimation(AnimatedPuyo &puyo, int vOffset, int step)
 void MovingVAnimation::cycle()
 {
     m_cpt++;
-    attachedPuyo.setOffsetY(m_vOffset - m_vOffsetByStep*m_cpt);
+    attachedFlobo.setOffsetY(m_vOffset - m_vOffsetByStep*m_cpt);
     if (m_cpt == m_step) {
         finishedFlag = true;
-        attachedPuyo.setOffsetY(0);
+        attachedFlobo.setOffsetY(0);
     }
 }
 
-/* Puyo falling and bouncing animation */
+/* Flobo falling and bouncing animation */
 
 const int FallingAnimation::BOUNCING_OFFSET_NUM = 9;
 const int FallingAnimation::BOUNCING_OFFSET[] = {-3, -4, -3, 0, 3, 6, 8, 6, 3};
 
-FallingAnimation::FallingAnimation(AnimatedPuyo &puyo, int originY, int xOffset, int yOffset, int off) : PuyoAnimation(puyo), m_once(false)
+FallingAnimation::FallingAnimation(AnimatedFlobo &flobo, int originY, int xOffset, int yOffset, int off) : FloboAnimation(flobo), m_once(false)
 {
     this->xOffset = xOffset;
     this->yOffset = yOffset;
     this->off     = off;
     this->step    = 0;
-    this->X  = (attachedPuyo.getFloboX()*TSIZE) + xOffset;
+    this->X  = (attachedFlobo.getFloboX()*TSIZE) + xOffset;
     this->Y  = (originY*TSIZE) + yOffset;
     bouncing = BOUNCING_OFFSET_NUM + off;
-    attachedPuyo.getAttachedView()->disallowCycle();
-    EventFX("start_falling", X+TSIZE/2, Y+TSIZE/2, puyo.getAttachedView()->getPlayerId());
+    attachedFlobo.getAttachedView()->disallowCycle();
+    EventFX("start_falling", X+TSIZE/2, Y+TSIZE/2, flobo.getAttachedView()->getPlayerId());
 }
 
 void FallingAnimation::cycle()
 {
     Y += step++;
 
-    if (Y >= (attachedPuyo.getFloboY()*TSIZE) + yOffset)
+    if (Y >= (attachedFlobo.getFloboY()*TSIZE) + yOffset)
     {
         if (!m_once) {
-            AudioManager::playSound("bam1.wav", .3, getPuyoSoundPadding());
+            AudioManager::playSound("bam1.wav", .3, getSoundPadding());
             m_once = true;
         }
-        Y = (attachedPuyo.getFloboY()*TSIZE) + yOffset;
-        if (bouncing == BOUNCING_OFFSET_NUM + off) attachedPuyo.getAttachedView()->allowCycle();
+        Y = (attachedFlobo.getFloboY()*TSIZE) + yOffset;
+        if (bouncing == BOUNCING_OFFSET_NUM + off) attachedFlobo.getAttachedView()->allowCycle();
 
         bouncing--;
 
@@ -250,24 +250,24 @@ void FallingAnimation::cycle()
             finishedFlag = true;
 //<<<<<<< .mine
 //            AudioManager::playSound("bam1.wav", .3);
-//            EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
-//            EventFX("end_falling", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
-//            attachedPuyo.setAnimatedState(AnimatedPuyo::FLOBO_NORMAL);
-//            attachedPuyo.getAttachedView()->allowCycle();
+//            EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedFlobo.getAttachedView()->getPlayerId());
+//            EventFX("end_falling", X+TSIZE/2,Y+TSIZE/2, attachedFlobo.getAttachedView()->getPlayerId());
+//            attachedFlobo.setAnimatedState(AnimatedFlobo::FLOBO_NORMAL);
+//            attachedFlobo.getAttachedView()->allowCycle();
 //=======
-            //EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
-            //EventFX("end_falling", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
-            attachedPuyo.setAnimatedState(0);
-            //attachedPuyo.getAttachedView()->allowCycle();
+            //EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedFlobo.getAttachedView()->getPlayerId());
+            //EventFX("end_falling", X+TSIZE/2,Y+TSIZE/2, attachedFlobo.getAttachedView()->getPlayerId());
+            attachedFlobo.setAnimatedState(0);
+            //attachedFlobo.getAttachedView()->allowCycle();
 //>>>>>>> .r1012
         }
         else if ((bouncing < BOUNCING_OFFSET_NUM) && (BOUNCING_OFFSET[bouncing] > 0)) {
-            attachedPuyo.setAnimatedState(BOUNCING_OFFSET[bouncing]);
+            attachedFlobo.setAnimatedState(BOUNCING_OFFSET[bouncing]);
             //AudioManager::playSound("bam1.wav", .1);
-            //EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedPuyo.getAttachedView()->getPlayerId());
+            //EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedFlobo.getAttachedView()->getPlayerId());
         }
         else
-            attachedPuyo.setAnimatedState(0);
+            attachedFlobo.setAnimatedState(0);
 
     }
 }
@@ -283,22 +283,18 @@ void FallingAnimation::draw(int semiMove, DrawTarget *dt)
             if (i>=0)
                 coordY += BOUNCING_OFFSET[i];
     }
-    attachedPuyo.renderShadowAt(X, coordY, dt);
-    attachedPuyo.renderAt(X, coordY, dt);
-
-    // TODO : Reactiver le EyeSwirl !
-    //if (attachedPuyo.getFloboState() != FLOBO_NEUTRAL)
-    //   painter.requestDraw(puyoEyesSwirl[(bouncing/2)%4], &drect);
+    attachedFlobo.renderShadowAt(X, coordY, dt);
+    attachedFlobo.renderAt(X, coordY, dt);
 }
 
-/* Puyo exploding and vanishing animation */
-VanishAnimation::VanishAnimation(AnimatedPuyo &puyo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int puyoNum, int groupSize, int groupNum, int phase) : PuyoAnimation(puyo), puyoNum(puyoNum), groupSize(groupSize), groupNum(groupNum), phase(phase)
+/* Flobo exploding and vanishing animation */
+VanishAnimation::VanishAnimation(AnimatedFlobo &flobo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int floboNum, int groupSize, int groupNum, int phase) : FloboAnimation(flobo), floboNum(floboNum), groupSize(groupSize), groupNum(groupNum), phase(phase)
 {
     this->xOffset = xOffset;
     this->yOffset = yOffset;
-    this->X = (attachedPuyo.getFloboX()*TSIZE) + xOffset;
-    this->Y = (attachedPuyo.getFloboY()*TSIZE) + yOffset;
-    this->color = attachedPuyo.getFloboState();
+    this->X = (attachedFlobo.getFloboX()*TSIZE) + xOffset;
+    this->Y = (attachedFlobo.getFloboY()*TSIZE) + yOffset;
+    this->color = attachedFlobo.getFloboState();
     if (color > FLOBO_EMPTY)
         color -= FLOBO_BLUE;
     iter = 0;
@@ -308,7 +304,7 @@ VanishAnimation::VanishAnimation(AnimatedPuyo &puyo, int delay, int xOffset, int
     synchronizer->incrementUsage();
     synchronizer->push();
     this->delay = delay;
-    attachedPuyo.getAttachedView()->disallowCycle();
+    attachedFlobo.getAttachedView()->disallowCycle();
 }
 
 VanishAnimation::~VanishAnimation()
@@ -327,18 +323,18 @@ void VanishAnimation::cycle()
         iter ++;
         if (iter == 1) {
             EventFX("vanish",
-                    attachedPuyo.getScreenCoordinateX() + TSIZE/2,
-                    attachedPuyo.getScreenCoordinateY() + TSIZE/2,
-                    attachedPuyo.getAttachedView()->getPlayerId());
+                    attachedFlobo.getScreenCoordinateX() + TSIZE/2,
+                    attachedFlobo.getScreenCoordinateY() + TSIZE/2,
+                    attachedFlobo.getAttachedView()->getPlayerId());
         }
         if (iter == 20 + delay) {
-            attachedPuyo.getAttachedView()->allowCycle();
-            if ((groupNum == 0) && (puyoNum == 0))
-                EventFX("vanish_phase", groupSize,phase, attachedPuyo.getAttachedView()->getPlayerId());
+            attachedFlobo.getAttachedView()->allowCycle();
+            if ((groupNum == 0) && (floboNum == 0))
+                EventFX("vanish_phase", groupSize,phase, attachedFlobo.getAttachedView()->getPlayerId());
         }
         else if (iter == 50 + delay) {
             finishedFlag = true;
-            attachedPuyo.setVisible(false);
+            attachedFlobo.setVisible(false);
         }
     }
 }
@@ -347,11 +343,11 @@ void VanishAnimation::draw(int semiMove, DrawTarget *dt)
 {
     if (iter < (10 + delay)) {
         if (iter % 2 == 0) {
-            attachedPuyo.renderAt(X, Y, dt);
+            attachedFlobo.renderAt(X, Y, dt);
         }
     }
     else {
-		const PuyoTheme *theme = attachedPuyo.getAttachedTheme();
+		const FloboTheme *theme = attachedFlobo.getAttachedTheme();
 
         IosRect drect, xrect;
         int iter2 = iter - 10 - delay;
@@ -423,13 +419,13 @@ void VanishSoundAnimation::draw(int semiMove, DrawTarget *dt)
     // do nothing
 }
 
-NeutralPopAnimation::NeutralPopAnimation(AnimatedPuyo &puyo, int delay, AnimationSynchronizer *synchronizer)
-    : PuyoAnimation(puyo), synchronizer(synchronizer), iter(0), delay(delay), once(false),
-      X(attachedPuyo.getScreenCoordinateX()), Y(attachedPuyo.getScreenCoordinateY())
+NeutralPopAnimation::NeutralPopAnimation(AnimatedFlobo &flobo, int delay, AnimationSynchronizer *synchronizer)
+    : FloboAnimation(flobo), synchronizer(synchronizer), iter(0), delay(delay), once(false),
+      X(attachedFlobo.getScreenCoordinateX()), Y(attachedFlobo.getScreenCoordinateY())
 {
     synchronizer->push();
     synchronizer->incrementUsage();
-    const PuyoTheme *attachedTheme = attachedPuyo.getAttachedTheme();
+    const FloboTheme *attachedTheme = attachedFlobo.getAttachedTheme();
     neutralPop[0] = attachedTheme->getExplodingSurfaceForIndex(0);
     neutralPop[1] = attachedTheme->getExplodingSurfaceForIndex(1);
     neutralPop[2] = attachedTheme->getExplodingSurfaceForIndex(2);
@@ -450,15 +446,15 @@ void NeutralPopAnimation::cycle()
     else if (synchronizer->isSynchronized()) {
         iter ++;
         if (iter == 17 + delay) {
-            AudioManager::playSound("pop.wav", .25, getPuyoSoundPadding());
+            AudioManager::playSound("pop.wav", .25, getSoundPadding());
             EventFX("neutral_pop",
-                    attachedPuyo.getScreenCoordinateX() + TSIZE/2,
-                    attachedPuyo.getScreenCoordinateY() + TSIZE/2,
-                    attachedPuyo.getAttachedView()->getPlayerId());
+                    attachedFlobo.getScreenCoordinateX() + TSIZE/2,
+                    attachedFlobo.getScreenCoordinateY() + TSIZE/2,
+                    attachedFlobo.getAttachedView()->getPlayerId());
             enabled = true;
         }
         else if (iter == 30 + delay) {
-            attachedPuyo.setVisible(false);
+            attachedFlobo.setVisible(false);
             finishedFlag = true;
         }
     }
@@ -482,15 +478,15 @@ void NeutralPopAnimation::draw(int semiMove, DrawTarget *dt)
     }
 }
 
-SmoothBounceAnimation::SmoothBounceAnimation(AnimatedPuyo &puyo, AnimationSynchronizer *synchronizer, int depth) :
-    PuyoAnimation(puyo), bounceMax(depth)
+SmoothBounceAnimation::SmoothBounceAnimation(AnimatedFlobo &flobo, AnimationSynchronizer *synchronizer, int depth) :
+    FloboAnimation(flobo), bounceMax(depth)
 {
     bounceOffset = 0;
     bouncePhase = 0;
     this->synchronizer = synchronizer;
     synchronizer->incrementUsage();
-    origX = attachedPuyo.getScreenCoordinateX();
-    origY = attachedPuyo.getScreenCoordinateY();
+    origX = attachedFlobo.getScreenCoordinateX();
+    origY = attachedFlobo.getScreenCoordinateY();
     enabled = false;
 }
 
@@ -523,11 +519,11 @@ void SmoothBounceAnimation::cycle()
 
 void SmoothBounceAnimation::draw(int semiMove, DrawTarget *dt)
 {
-    attachedPuyo.renderAt(origX, origY + bounceOffset, dt);
+    attachedFlobo.renderAt(origX, origY + bounceOffset, dt);
 }
 
-GameOverFallAnimation::GameOverFallAnimation(AnimatedPuyo &puyo, int delay)
-    : PuyoAnimation(puyo), delay(delay), Y(attachedPuyo.getScreenCoordinateY()), yAccel(10)
+GameOverFallAnimation::GameOverFallAnimation(AnimatedFlobo &flobo, int delay)
+    : FloboAnimation(flobo), delay(delay), Y(attachedFlobo.getScreenCoordinateY()), yAccel(10)
 {
 }
 
@@ -542,7 +538,7 @@ void GameOverFallAnimation::cycle()
             yAccel -= 1;
         Y -= yAccel;
         if (Y > 480) {
-            attachedPuyo.setVisible(false);
+            attachedFlobo.setVisible(false);
             finishedFlag = true;
         }
     }
@@ -551,7 +547,7 @@ void GameOverFallAnimation::cycle()
 
 void GameOverFallAnimation::draw(int semiMove, DrawTarget *dt)
 {
-    attachedPuyo.renderAt(attachedPuyo.getScreenCoordinateX(), Y, dt);
+    attachedFlobo.renderAt(attachedFlobo.getScreenCoordinateX(), Y, dt);
 }
 
 

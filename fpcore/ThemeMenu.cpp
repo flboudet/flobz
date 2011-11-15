@@ -29,7 +29,7 @@
 
 using namespace event_manager;
 
-PuyoThemeSelectionBox::PuyoThemeSelectionBox()
+FloboThemeSelectionBox::FloboThemeSelectionBox()
     : themePreview(), Spacer0(), Spacer1(), Spacer2(), Spacer3()
 {
     prevButton = new Image(theCommander->getLeftArrow());
@@ -43,18 +43,18 @@ PuyoThemeSelectionBox::PuyoThemeSelectionBox()
     setPolicy(USE_MAX_SIZE_NO_MARGIN);
 }
 
-PuyoThemeSelectionBox::~PuyoThemeSelectionBox()
+FloboThemeSelectionBox::~FloboThemeSelectionBox()
 {
     delete prevButton;
     delete nextButton;
 }
 
-void PuyoThemeSelectionBox::build()
+void FloboThemeSelectionBox::build()
 {
     themePreview.build();
-    const std::vector<std::string> &themes = theCommander->getPuyoSetThemeList();
+    const std::vector<std::string> &themes = theCommander->getFloboSetThemeList();
     int size = themes.size();
-    std::string preferedTheme = theCommander->getPreferedPuyoSetThemeName();
+    std::string preferedTheme = theCommander->getPreferedFloboSetThemeName();
     // Select the prefered theme
     bool found = false;
     for (std::vector<std::string>::const_iterator iter = themes.begin() ;
@@ -64,7 +64,7 @@ void PuyoThemeSelectionBox::build()
     }
     if (!found) {
         themePreview.themeSelected(themes[0]);
-        theCommander->setPreferedPuyoSetThemeName(themes[0].c_str());
+        theCommander->setPreferedFloboSetThemeName(themes[0].c_str());
     }
     add(&Spacer0);
     prevButton->setFocusable(size > 1);
@@ -81,11 +81,11 @@ void PuyoThemeSelectionBox::build()
     add(&Spacer3);
 }
 
-void PuyoThemeSelectionBox::action(Widget *sender, int actionType, GameControlEvent *event)
+void FloboThemeSelectionBox::action(Widget *sender, int actionType, GameControlEvent *event)
 {
     if (!event->isUp) return;
-    const std::vector<std::string> &themes = theCommander->getPuyoSetThemeList();
-    std::string pref = theCommander->getPreferedPuyoSetThemeName();
+    const std::vector<std::string> &themes = theCommander->getFloboSetThemeList();
+    std::string pref = theCommander->getPreferedFloboSetThemeName();
     int size = themes.size();
     if (size <= 0) return;
 
@@ -98,12 +98,12 @@ void PuyoThemeSelectionBox::action(Widget *sender, int actionType, GameControlEv
     if (sender == prevButton) {
         (currentTheme <= 0) ? currentTheme = size - 1 : currentTheme--;
         themePreview.themeSelected(themes[currentTheme]);
-        theCommander->setPreferedPuyoSetThemeName(themes[currentTheme].c_str());
+        theCommander->setPreferedFloboSetThemeName(themes[currentTheme].c_str());
     }
     else if (sender == nextButton) {
         currentTheme = (currentTheme+1)%size;
         themePreview.themeSelected(themes[currentTheme]);
-        theCommander->setPreferedPuyoSetThemeName(themes[currentTheme].c_str());
+        theCommander->setPreferedFloboSetThemeName(themes[currentTheme].c_str());
     }
 }
 
@@ -112,12 +112,12 @@ void PuyoThemeSelectionBox::action(Widget *sender, int actionType, GameControlEv
 
 #define ONEPUYO (32.)
 
-PuyoThemePicturePreview::PuyoThemePicturePreview()
+FloboThemePicturePreview::FloboThemePicturePreview()
 {
-      setPreferedSize(Vec3(NUMBER_OF_PUYOS*ONEPUYO-(NUMBER_OF_PUYOS-1)*ONEPUYO/4.0, ONEPUYO, 1.0));
+      setPreferedSize(Vec3(NUMBER_OF_FLOBOS*ONEPUYO-(NUMBER_OF_FLOBOS-1)*ONEPUYO/4.0, ONEPUYO, 1.0));
       offsetX = offsetY = 0.;
       curTheme = NULL;
-      for (int i=0; i<NUMBER_OF_PUYOS; i++)
+      for (int i=0; i<NUMBER_OF_FLOBOS; i++)
       {
         eyes[i] = 0;
       }
@@ -130,42 +130,42 @@ static int imageForIndex(int i)
     else return 2*(NUMBER_OF_FLOBO_EYES-1)-i;
 }
 
-void PuyoThemePicturePreview::draw(DrawTarget *dt)
+void FloboThemePicturePreview::draw(DrawTarget *dt)
 {
     if (curTheme != NULL)
     {
       IosRect r;
       Vec3 size = getSize();
-      r.x = (int16_t)(getPosition().x+(size.x-NUMBER_OF_PUYOS*ONEPUYO+(NUMBER_OF_PUYOS-1)*ONEPUYO/4.0)/2.0);
+      r.x = (int16_t)(getPosition().x+(size.x-NUMBER_OF_FLOBOS*ONEPUYO+(NUMBER_OF_FLOBOS-1)*ONEPUYO/4.0)/2.0);
       r.y = (int16_t)(getPosition().y+(size.y-ONEPUYO)/2.0);
       r.h = 0;
       r.w = 0;
-      for (int i=0; i<NUMBER_OF_PUYOS; i++)
+      for (int i=0; i<NUMBER_OF_FLOBOS; i++)
       {
         IosRect rect = r;
         rect.x += (int16_t)((i*3*ONEPUYO)/4);
-        const PuyoTheme &t = curTheme->getPuyoTheme((FloboState)(FLOBO_BLUE+i));
+        const FloboTheme &t = curTheme->getFloboTheme((FloboState)(FLOBO_BLUE+i));
         dt->draw(t.getShadowSurface(), NULL, &rect);
-        dt->draw(t.getPuyoSurfaceForValence(0), NULL, &rect);
+        dt->draw(t.getFloboSurfaceForValence(0), NULL, &rect);
         dt->draw(t.getEyeSurfaceForIndex(imageForIndex(eyes[i])), NULL, &rect);
       }
     }
 }
 
-void PuyoThemePicturePreview::themeSelected(PuyoSetTheme *  theme)
+void FloboThemePicturePreview::themeSelected(FloboSetTheme *  theme)
 {
     curTheme = theme;
     //requestDraw();
 }
 
-void PuyoThemePicturePreview::idle(double currentTime)
+void FloboThemePicturePreview::idle(double currentTime)
 {
     bool refresh = false;
 
     if ((currentTime - lastTime) > 0.1)
     {
       //fprintf(stderr,"TIME! %d\n",imageForIndex(eyes[0]));
-      for (int i=0; i<NUMBER_OF_PUYOS; i++)
+      for (int i=0; i<NUMBER_OF_FLOBOS; i++)
       {
         if(eyes[i]>0)
         {
@@ -192,21 +192,21 @@ void PuyoThemePicturePreview::idle(double currentTime)
 
 #define MARGIN (10.)
 
-PuyoThemePreview::PuyoThemePreview() {}
+FloboThemePreview::FloboThemePreview() {}
 
-void PuyoThemePreview::build() {
+void FloboThemePreview::build() {
     add(&name);
     add(&author);
     add(&picture);
     add(&description);
 }
 
-PuyoThemePreview::~PuyoThemePreview() {}
+FloboThemePreview::~FloboThemePreview() {}
 
-void PuyoThemePreview::themeSelected(const std::string &themeName)
+void FloboThemePreview::themeSelected(const std::string &themeName)
 {
 #define _ComputeVZoneSize(A,B) Vec3(A.x>B.x?A.x:B.x,A.y+B.y+GameUIDefaults::SPACING,1.0)
-    PuyoSetThemeRef curTheme = theCommander->getPuyoSetTheme(themeName.c_str());
+    FloboSetThemeRef curTheme = theCommander->getFloboSetTheme(themeName.c_str());
     name.setFont(GameUIDefaults::FONT_TEXT);
     name.setValue(curTheme->getLocalizedName().c_str());
     author.setFont(GameUIDefaults::FONT_SMALL_INFO);

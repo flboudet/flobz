@@ -92,7 +92,7 @@ private:
     Frame screenTitleFrame;
     Text themeMenuTitle;
     VBox buttonsBox;
-    PuyoPopMenuAction popAction;
+    PopMainScreenMenuAction popAction;
     Button backButton;
     LevelThemeSelectionBox themeList;
 };

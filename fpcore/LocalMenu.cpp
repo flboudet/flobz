@@ -61,7 +61,7 @@ SoloGameMenu::SoloGameMenu(MainScreen *mainScreen)
     m_easyAction.reset(new SoloModeStarterAction(EASY, this));
     m_mediumAction.reset(new SoloModeStarterAction(MEDIUM, this));
     m_hardAction.reset(new SoloModeStarterAction(HARD,   this));
-    m_popAction.reset(new PuyoPopMenuAction(mainScreen));
+    m_popAction.reset(new PopMainScreenMenuAction(mainScreen));
     m_easy.reset(new   Button(theCommander->getLocalizedString("Beginner"), m_easyAction.get()));
     m_medium.reset(new Button(theCommander->getLocalizedString("Normal"), m_mediumAction.get()));
     m_hard.reset(new   Button(theCommander->getLocalizedString("Expert"), m_hardAction.get()));

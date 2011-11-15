@@ -35,7 +35,7 @@
 #include "Theme.h"
 #include "PuyoCommander.h"
 
-class PuyoThemeDescription {
+class FloboThemeDescription {
 public:
     std::string face;
     std::string disappear;
@@ -44,7 +44,7 @@ public:
     float colorOffset;
 };
 
-class PuyoSetThemeDescription {
+class FloboSetThemeDescription {
 public:
     std::string name;
     std::string localizedName;
@@ -52,10 +52,10 @@ public:
     std::string description;
     std::string localizedDescription;
     std::string path;
-    PuyoThemeDescription puyoThemeDescriptions[NUMBER_OF_PUYOS_IN_SET];
+    FloboThemeDescription puyoThemeDescriptions[NUMBER_OF_FLOBOS_IN_SET];
 };
 
-class PuyobanThemeDefinition {
+class FlobobanThemeDefinition {
 public:
     int displayX, displayY;
     int nextX, nextY;
@@ -97,7 +97,7 @@ public:
     int speedMeterX, speedMeterY;
     int lifeDisplayX, lifeDisplayY;
 
-    PuyobanThemeDefinition puyoban[NUMBER_OF_PUYOBANS_IN_LEVEL];
+    FlobobanThemeDefinition puyoban[NUMBER_OF_FLOBOBANS_IN_LEVEL];
     FontDefinition playerNameFont, scoreFont;
 
     bool opponentIsBehind;
@@ -107,25 +107,25 @@ public:
     int statsRightBackgroundOffsetX, statsRightBackgroundOffsetY;
 };
 
-class BasePuyoThemeImpl : public PuyoTheme {
+class BaseFloboThemeImpl : public FloboTheme {
 public:
-    BasePuyoThemeImpl(const PuyoThemeDescription &desc,
+    BaseFloboThemeImpl(const FloboThemeDescription &desc,
                       const std::string &path,
-                      const PuyoTheme *defaultTheme = NULL);
-    virtual ~BasePuyoThemeImpl();
+                      const FloboTheme *defaultTheme = NULL);
+    virtual ~BaseFloboThemeImpl();
 protected:
-    const PuyoThemeDescription &m_desc;
+    const FloboThemeDescription &m_desc;
     const std::string &m_path;
-    const PuyoTheme *m_defaultTheme;
+    const FloboTheme *m_defaultTheme;
     mutable std::vector<IosSurface *> m_surfaceBin;
 };
 
-class PuyoThemeImpl : public BasePuyoThemeImpl {
+class FloboThemeImpl : public BaseFloboThemeImpl {
 public:
-    PuyoThemeImpl(const PuyoThemeDescription &desc,
+    FloboThemeImpl(const FloboThemeDescription &desc,
                   const std::string &path,
-                  const PuyoTheme *defaultTheme = NULL);
-    virtual IosSurface *getPuyoSurfaceForValence(int valence, int compression = 0) const;
+                  const FloboTheme *defaultTheme = NULL);
+    virtual IosSurface *getFloboSurfaceForValence(int valence, int compression = 0) const;
     virtual IosSurface *getEyeSurfaceForIndex(int index, int compression = 0) const;
     virtual IosSurface *getCircleSurfaceForIndex(int index) const;
     virtual IosSurface *getShadowSurface(int compression = 0) const;
@@ -151,12 +151,12 @@ private:
     mutable IosSurfaceRef m_baseExplosion[NUMBER_OF_FLOBO_EXPLOSIONS];
 };
 
-class NeutralPuyoThemeImpl : public BasePuyoThemeImpl {
+class NeutralFloboThemeImpl : public BaseFloboThemeImpl {
 public:
-    NeutralPuyoThemeImpl(const PuyoThemeDescription &desc,
+    NeutralFloboThemeImpl(const FloboThemeDescription &desc,
                          const std::string &path,
-                         const PuyoTheme *defaultTheme = NULL);
-    virtual IosSurface *getPuyoSurfaceForValence(int valence, int compression = 0) const;
+                         const FloboTheme *defaultTheme = NULL);
+    virtual IosSurface *getFloboSurfaceForValence(int valence, int compression = 0) const;
     virtual IosSurface *getEyeSurfaceForIndex(int index, int compression = 0) const;
     virtual IosSurface *getCircleSurfaceForIndex(int index) const;
     virtual IosSurface *getShadowSurface(int compression = 0) const;
@@ -168,19 +168,19 @@ private:
     mutable IosSurfaceRef m_shrinking[NUMBER_OF_FLOBO_DISAPPEAR];
 };
 
-class PuyoSetThemeImpl : public PuyoSetTheme {
+class FloboSetThemeImpl : public FloboSetTheme {
 public:
-    PuyoSetThemeImpl(const PuyoSetThemeDescription &desc,
-                     PuyoSetTheme *defaultTheme = NULL);
+    FloboSetThemeImpl(const FloboSetThemeDescription &desc,
+                     FloboSetTheme *defaultTheme = NULL);
     virtual const std::string & getName() const;
     virtual const std::string & getLocalizedName() const;
     virtual const std::string & getAuthor() const;
     virtual const std::string & getComments() const;
-    virtual const PuyoTheme & getPuyoTheme(FloboState state) const;
+    virtual const FloboTheme & getFloboTheme(FloboState state) const;
 private:
-    const PuyoSetThemeDescription &m_desc;
-    std::auto_ptr<PuyoTheme> m_puyoThemes[NUMBER_OF_PUYOS_IN_SET];
-    PuyoSetTheme *m_defaultTheme;
+    const FloboSetThemeDescription &m_desc;
+    std::auto_ptr<FloboTheme> m_puyoThemes[NUMBER_OF_FLOBOS_IN_SET];
+    FloboSetTheme *m_defaultTheme;
 };
 
 class LevelThemeImpl : public LevelTheme {
@@ -202,13 +202,13 @@ public:
     // Fonts
     virtual IosFont *getPlayerNameFont() const ;
     virtual IosFont *getScoreFont() const;
-    // Positions and dimensions of the Puyoban
+    // Positions and dimensions of the Floboban
     virtual int getSpeedMeterX() const;
     virtual int getSpeedMeterY() const;
     virtual int getLifeDisplayX() const;
     virtual int getLifeDisplayY() const;
-    virtual int getPuyobanX(int playerId) const;
-    virtual int getPuyobanY(int playerId) const;
+    virtual int getFlobobanX(int playerId) const;
+    virtual int getFlobobanY(int playerId) const;
     virtual int getNextFlobosX(int playerId) const;
     virtual int getNextFlobosY(int playerId) const;
     virtual int getNeutralDisplayX(int playerId) const;
@@ -217,8 +217,8 @@ public:
     virtual int getNameDisplayY(int playerId) const;
     virtual int getScoreDisplayX(int playerId) const;
     virtual int getScoreDisplayY(int playerId) const;
-    virtual float getPuyobanScale(int playerId) const;
-    // Behaviour of the Puyoban
+    virtual float getFlobobanScale(int playerId) const;
+    // Behaviour of the Floboban
     virtual bool getShouldDisplayNext(int playerId) const;
     virtual bool getShouldDisplayShadows(int playerId) const;
     virtual bool getShouldDisplayEyes(int playerId) const;
@@ -258,38 +258,38 @@ private:
 class ThemeManagerImpl : public ThemeManager {
 public:
     ThemeManagerImpl(DataPathManager &dataPathManager);
-    virtual PuyoSetTheme * createFloboSetTheme(const std::string &themeName);
+    virtual FloboSetTheme * createFloboSetTheme(const std::string &themeName);
     virtual LevelTheme   * createLevelTheme(const std::string &themeName);
 
-    virtual const std::vector<std::string> & getPuyoSetThemeList();
+    virtual const std::vector<std::string> & getFloboSetThemeList();
     virtual const std::vector<std::string> & getLevelThemeList();
 private:
     void loadThemePack(const std::string &path);
     static void end_floboset(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void end_description(GoomSL *gsl, GoomHash *global, GoomHash *local);
-    static void loadPuyobanDefinition(GoomSL *gsl, int playerId, PuyobanThemeDefinition &puyoban);
+    static void loadFlobobanDefinition(GoomSL *gsl, int playerId, FlobobanThemeDefinition &puyoban);
     static void loadFontDefinition(GoomSL *gsl, const char * fontName, FontDefinition &font);
 
     static const char * s_themeFolderExtension;
 
-    static const char *s_key_PuyoFace[NUMBER_OF_PUYOS_IN_SET];
-    static const char *s_key_PuyoDisappear[NUMBER_OF_PUYOS_IN_SET];
-    static const char *s_key_PuyoExplosion[NUMBER_OF_PUYOS_IN_SET];
-    static const char *s_key_PuyoEye[NUMBER_OF_PUYOS_IN_SET];
-    static const char *s_key_PuyoColorOffset[NUMBER_OF_PUYOS_IN_SET];
+    static const char *s_key_PuyoFace[NUMBER_OF_FLOBOS_IN_SET];
+    static const char *s_key_PuyoDisappear[NUMBER_OF_FLOBOS_IN_SET];
+    static const char *s_key_PuyoExplosion[NUMBER_OF_FLOBOS_IN_SET];
+    static const char *s_key_PuyoEye[NUMBER_OF_FLOBOS_IN_SET];
+    static const char *s_key_PuyoColorOffset[NUMBER_OF_FLOBOS_IN_SET];
 
     DataPathManager &m_dataPathManager;
     std::string m_themePackLoadingPath;
 
     std::vector<std::string> m_puyoSetThemeList;
     std::vector<std::string> m_levelThemeList;
-    std::map<std::string, PuyoSetThemeDescription> m_puyoSetThemeDescriptions;
+    std::map<std::string, FloboSetThemeDescription> m_puyoSetThemeDescriptions;
     std::map<std::string, LevelThemeDescription> m_levelThemeDescriptions;
     std::auto_ptr<LocalizedDictionary> m_localeDictionary;
 
-    std::string m_defaultPuyoSetThemeName;
-    std::auto_ptr<PuyoSetTheme> m_defaultPuyoSetTheme;
+    std::string m_defaultFloboSetThemeName;
+    std::auto_ptr<FloboSetTheme> m_defaultFloboSetTheme;
 
     std::string m_defaultLevelThemeName;
     std::auto_ptr<LevelThemeImpl> m_defaultLevelTheme;

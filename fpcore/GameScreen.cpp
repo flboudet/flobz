@@ -44,7 +44,7 @@ GameScreen::GameScreen(GameWidget &gameWidget)
     if (gameWidget.getOpponent() != NULL)
         GameUIDefaults::GAME_LOOP->addIdle(gameWidget.getOpponent());
 
-    activeFX = &gameWidget.getPuyoFX();
+    activeFX = &gameWidget.getVisualFX();
     for (unsigned int i=0; i<activeFX->size(); ++i) {
         add((*activeFX)[i]);
         (*activeFX)[i]->setGameScreen(this);
@@ -129,7 +129,7 @@ void GameScreen::setPaused(bool fromControls)
     if (!paused) {
         if (gameWidget.getOpponent() != NULL)
             gameWidget.getOpponent()->hide();
-        std::vector<PuyoFX*> fx = gameWidget.getPuyoFX();
+        std::vector<VisualFX*> fx = gameWidget.getVisualFX();
         for (unsigned int i=0; i<fx.size(); ++i)
             fx[i]->hide();
         this->add(&pauseMenu);
@@ -147,7 +147,7 @@ void GameScreen::setResumed(bool fromControls)
         paused = false;
         if (gameWidget.getOpponent() != NULL)
             gameWidget.getOpponent()->show();
-        std::vector<PuyoFX*> fx = gameWidget.getPuyoFX();
+        std::vector<VisualFX*> fx = gameWidget.getVisualFX();
         for (unsigned int i=0; i<fx.size(); ++i)
             fx[i]->show();
 	ungrabEventsOnWidget(&pauseMenu);

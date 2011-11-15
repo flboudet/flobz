@@ -90,7 +90,7 @@ void SetupMatchState::enterState()
     GTLogTrace("SetupMatchState::enterState()");
     // Prepare 1st run
     m_sharedAssets->m_currentLevelTheme = theCommander->getPreferedLevelTheme();
-    m_sharedAssets->m_currentFloboSetTheme = theCommander->getPreferedPuyoSetTheme();
+    m_sharedAssets->m_currentFloboSetTheme = theCommander->getPreferedFloboSetTheme();
     // Create the gamewidget and register as the gamewidget's action
     GameWidget *newGameWidget =
         m_gameWidgetFactory->createGameWidget(*(m_sharedAssets->m_currentFloboSetTheme),

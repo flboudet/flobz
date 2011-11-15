@@ -124,14 +124,14 @@ private:
 };
 
 /**
- * Factory for PuyoSetTheme resources
+ * Factory for FloboSetTheme resources
  */
-class PuyoSetThemeFactory : public ResourceFactory<PuyoSetTheme>
+class FloboSetThemeFactory : public ResourceFactory<FloboSetTheme>
 {
 public:
-    PuyoSetThemeFactory(ThemeManager &themeManager);
-    virtual PuyoSetTheme *create(const std::string &name);
-    virtual void destroy(PuyoSetTheme *res);
+    FloboSetThemeFactory(ThemeManager &themeManager);
+    virtual FloboSetTheme *create(const std::string &name);
+    virtual void destroy(FloboSetTheme *res);
 private:
     ThemeManager &m_themeManager;
 };
@@ -162,8 +162,8 @@ typedef ResourceManager<audio_manager::Sound> SoundResourceManager;
 typedef ResourceReference<audio_manager::Music> MusicRef;
 typedef ResourceManager<audio_manager::Music> MusicResourceManager;
 // Theme resources
-typedef ResourceReference<PuyoSetTheme> PuyoSetThemeRef;
-typedef ResourceManager<PuyoSetTheme> PuyoSetThemeResourceManager;
+typedef ResourceReference<FloboSetTheme> FloboSetThemeRef;
+typedef ResourceManager<FloboSetTheme> FloboSetThemeResourceManager;
 typedef ResourceReference<LevelTheme> LevelThemeRef;
 typedef ResourceManager<LevelTheme> LevelThemeResourceManager;
 
@@ -211,12 +211,12 @@ class PuyoCommander
     void cacheMusic(const char *path);
     MusicRef getMusic(const char *path);
 
-    PuyoSetThemeRef getPuyoSetTheme(const char *name);
-    PuyoSetThemeRef getPreferedPuyoSetTheme();
-    const std::string &getPreferedPuyoSetThemeName() const;
-    void setPreferedPuyoSetThemeName(const char *name);
-    const std::vector<std::string> &getPuyoSetThemeList() const;
-    virtual const std::string getDefaultPuyoSetThemeName() const;
+    FloboSetThemeRef getFloboSetTheme(const char *name);
+    FloboSetThemeRef getPreferedFloboSetTheme();
+    const std::string &getPreferedFloboSetThemeName() const;
+    void setPreferedFloboSetThemeName(const char *name);
+    const std::vector<std::string> &getFloboSetThemeList() const;
+    virtual const std::string getDefaultFloboSetThemeName() const;
 
     LevelThemeRef getLevelTheme(const char *name);
     LevelThemeRef getPreferedLevelTheme();
@@ -278,8 +278,8 @@ class PuyoCommander
     std::auto_ptr<SoundResourceManager> m_soundResManager;
     MusicFactory m_musicFactory;
     std::auto_ptr<MusicResourceManager> m_musicResManager;
-    PuyoSetThemeFactory m_puyoSetThemeFactory;
-    std::auto_ptr<PuyoSetThemeResourceManager> m_puyoSetThemeResManager;
+    FloboSetThemeFactory m_puyoSetThemeFactory;
+    std::auto_ptr<FloboSetThemeResourceManager> m_puyoSetThemeResManager;
     LevelThemeFactory m_levelThemeFactory;
     std::auto_ptr<LevelThemeResourceManager> m_levelThemeResManager;
     // Localization management
@@ -329,7 +329,7 @@ protected:
     AbstractCursor *m_cursor;
 	PuyoApplicationState m_appState;
 
-    mutable std::string m_defaultPuyoSetThemeName;
+    mutable std::string m_defaultFloboSetThemeName;
     mutable std::string m_defaultLevelThemeName;
 };
 

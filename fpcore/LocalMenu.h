@@ -49,7 +49,7 @@ private:
     std::auto_ptr<SoloModeStarterAction> m_easyAction;
     std::auto_ptr<SoloModeStarterAction> m_mediumAction;
     std::auto_ptr<SoloModeStarterAction> m_hardAction;
-    std::auto_ptr<PuyoPopMenuAction> m_popAction;
+    std::auto_ptr<PopMainScreenMenuAction> m_popAction;
 };
 
 class LocalGameMenu : public MainScreenMenu, public PlayerNameProvider {
@@ -67,7 +67,7 @@ private:
     StoryModeStarterAction easyAction;
     StoryModeStarterAction mediumAction;
     StoryModeStarterAction hardAction;
-    PuyoPopMenuAction popAction;
+    PopMainScreenMenuAction popAction;
     Button easy, medium, hard, back;
 };
 
@@ -86,7 +86,7 @@ private:
     AltTwoPlayersStarterAction easyAction;
     AltTwoPlayersStarterAction mediumAction;
     AltTwoPlayersStarterAction hardAction;
-    PuyoPopMenuAction popAction;
+    PopMainScreenMenuAction popAction;
     Button easy, medium, hard, back;
 };
 

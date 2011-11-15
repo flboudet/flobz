@@ -18,7 +18,7 @@
 #include "sdl_drawcontext/common/SDL_AudioManager.h"
 #endif
 #ifdef ENABLE_NETWORK_INTERNET
-#include "PuyoInternetBot.h"
+#include "InternetBot.h"
 #endif
 
 #include "PosixPreferencesManager.h"
@@ -203,7 +203,7 @@ void PuyoMain::connect_ia(String param)
 
   //initWithoutGUI();
 
-  PuyoInternetBot bot(level);
+  InternetBot bot(level);
   bot.connect(server, port, name, password);
 
   GameUIDefaults::GAME_LOOP->addIdle(&bot);

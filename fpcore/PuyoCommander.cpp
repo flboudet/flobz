@@ -5,7 +5,7 @@
 #include "PuyoStrings.h"
 #include "audio.h"
 #include "MainMenu.h"
-#include "AnimatedPuyoTheme.h"
+#include "AnimatedFloboTheme.h"
 #ifdef THREADED_RESOURCE_MANAGER
 #include "ThreadedResourceManager.h"
 #endif
@@ -106,17 +106,17 @@ void MusicFactory::destroy(audio_manager::Music *res)
     delete res;
 }
 
-PuyoSetThemeFactory::PuyoSetThemeFactory(ThemeManager &themeManager)
+FloboSetThemeFactory::FloboSetThemeFactory(ThemeManager &themeManager)
     : m_themeManager(themeManager)
 {
 }
 
-PuyoSetTheme *PuyoSetThemeFactory::create(const std::string &name)
+FloboSetTheme *FloboSetThemeFactory::create(const std::string &name)
 {
     return m_themeManager.createFloboSetTheme(name);
 }
 
-void PuyoSetThemeFactory::destroy(PuyoSetTheme *res)
+void FloboSetThemeFactory::destroy(FloboSetTheme *res)
 {
     delete res;
 }
@@ -379,41 +379,41 @@ MusicRef PuyoCommander::getMusic(const char *path)
     return m_musicResManager->getResource(path);
 }
 
-PuyoSetThemeRef PuyoCommander::getPuyoSetTheme(const char *name)
+FloboSetThemeRef PuyoCommander::getFloboSetTheme(const char *name)
 {
     return m_puyoSetThemeResManager->getResource(name);
 }
 
-PuyoSetThemeRef PuyoCommander::getPreferedPuyoSetTheme()
+FloboSetThemeRef PuyoCommander::getPreferedFloboSetTheme()
 {
-    return getPuyoSetTheme(getPreferedPuyoSetThemeName().c_str());
+    return getFloboSetTheme(getPreferedFloboSetThemeName().c_str());
 }
 
-const std::string &PuyoCommander::getPreferedPuyoSetThemeName() const
+const std::string &PuyoCommander::getPreferedFloboSetThemeName() const
 {
-    if (m_defaultPuyoSetThemeName == "") {
-        m_defaultPuyoSetThemeName = m_preferencesManager->getStrPreference ("floboset_theme", getDefaultPuyoSetThemeName().c_str());
+    if (m_defaultFloboSetThemeName == "") {
+        m_defaultFloboSetThemeName = m_preferencesManager->getStrPreference ("floboset_theme", getDefaultFloboSetThemeName().c_str());
     }
-    return m_defaultPuyoSetThemeName;
+    return m_defaultFloboSetThemeName;
 }
 
-const std::string PuyoCommander::getDefaultPuyoSetThemeName() const
+const std::string PuyoCommander::getDefaultFloboSetThemeName() const
 {
     // TODO: provide a way to set the default theme in the data
-    //return m_themeManager->getPuyoSetThemeList()[0];
-    return m_themeManager->getPuyoSetThemeList()[m_themeManager->getPuyoSetThemeList().size() - 1];
+    //return m_themeManager->getFloboSetThemeList()[0];
+    return m_themeManager->getFloboSetThemeList()[m_themeManager->getFloboSetThemeList().size() - 1];
 }
 
 
-void PuyoCommander::setPreferedPuyoSetThemeName(const char *name)
+void PuyoCommander::setPreferedFloboSetThemeName(const char *name)
 {
-    m_defaultPuyoSetThemeName = name;
+    m_defaultFloboSetThemeName = name;
     m_preferencesManager->setStrPreference ("floboset_theme", name);
 }
 
-const std::vector<std::string> &PuyoCommander::getPuyoSetThemeList() const
+const std::vector<std::string> &PuyoCommander::getFloboSetThemeList() const
 {
-    return m_themeManager->getPuyoSetThemeList();
+    return m_themeManager->getFloboSetThemeList();
 }
 
 LevelThemeRef PuyoCommander::getLevelTheme(const char *name)
@@ -481,7 +481,7 @@ void PuyoCommander::createResourceManagers()
     m_fontResManager.reset(new SimpleResourceManager<IosFont, IosFontResourceKey>(m_fontFactory));
     m_soundResManager.reset(new SimpleResourceManager<audio_manager::Sound>(m_soundFactory));
     m_musicResManager.reset(new SimpleResourceManager<audio_manager::Music>(m_musicFactory));
-    m_puyoSetThemeResManager.reset(new SimpleResourceManager<PuyoSetTheme>(m_puyoSetThemeFactory));
+    m_puyoSetThemeResManager.reset(new SimpleResourceManager<FloboSetTheme>(m_puyoSetThemeFactory));
     m_levelThemeResManager.reset(new SimpleResourceManager<LevelTheme>(m_levelThemeFactory));
 #endif
 }

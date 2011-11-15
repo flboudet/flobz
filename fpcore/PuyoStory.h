@@ -64,7 +64,7 @@ public:
     struct PuyoStoryStyrolyseClient {
         StyrolyseClient styroClient;
         StoryWidget *widget;
-        const PuyoSetTheme *attachedTheme;
+        const FloboSetTheme *attachedTheme;
     };
 protected:
 
@@ -80,13 +80,13 @@ protected:
     String fullPath;
 };
 
-class PuyoFX : public StoryWidget {
+class VisualFX : public StoryWidget {
 public:
-    PuyoFX(String fxName, const PuyoSetTheme &puyoSetTheme);
+    VisualFX(String fxName, const FloboSetTheme &puyoSetTheme);
     void postEvent(const char *name, float x, float y, int player);
     bool busy() const;
     bool supportFX(const char *str) const;
-    PuyoFX *clone() const;
+    VisualFX *clone() const;
 
     void setGameScreen(GameScreen *screen) { this->screen = screen; }
     GameScreen *getGameScreen() const { return screen; }

@@ -39,7 +39,7 @@ public:
 
 class GameWidgetFactory {
 public:
-    virtual GameWidget *createGameWidget(PuyoSetTheme &puyoThemeSet,
+    virtual GameWidget *createGameWidget(FloboSetTheme &puyoThemeSet,
                                          LevelTheme &levelTheme,
                                          String centerFace,
                                          Action *gameOverAction) = 0;
@@ -51,7 +51,7 @@ struct SharedMatchAssets
     SharedMatchAssets() {
         release();
     }
-    PuyoSetThemeRef m_currentFloboSetTheme;
+    FloboSetThemeRef m_currentFloboSetTheme;
     LevelThemeRef m_currentLevelTheme;
     std::auto_ptr<GameWidget> m_gameWidget;
     std::auto_ptr<GameScreen> m_gameScreen;

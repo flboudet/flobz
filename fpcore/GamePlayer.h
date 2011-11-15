@@ -26,24 +26,24 @@
 #ifndef PUYOPLAYER_H
 #define PUYOPLAYER_H
 
-#include "PuyoView.h"
+#include "GameView.h"
 #include "FloboGame.h"
 #include "GameControls.h"
 
-class PuyoPlayer {
+class GamePlayer {
 public:
-    PuyoPlayer(PuyoView &view) : targetView(view), attachedGame(view.getAttachedGame()) {}
+    GamePlayer(GameView &view) : targetView(view), attachedGame(view.getAttachedGame()) {}
     virtual void eventOccured(event_manager::GameControlEvent *event) {}
     virtual void cycle() {}
-    virtual ~PuyoPlayer() {}
+    virtual ~GamePlayer() {}
 protected:
-    PuyoView &targetView;
+    GameView &targetView;
     FloboGame *attachedGame;
 };
 
-class PuyoNullPlayer : public PuyoPlayer {
+class GameNullPlayer : public GamePlayer {
 public:
-    PuyoNullPlayer(PuyoView &view) : PuyoPlayer(view) {}
+    GameNullPlayer(GameView &view) : GamePlayer(view) {}
 };
 
 #endif

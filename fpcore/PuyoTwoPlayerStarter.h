@@ -31,22 +31,22 @@
 
 class TwoPlayersGameWidget : public GameWidget2P {
 public:
-    TwoPlayersGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, String aiFace, Action *gameOverAction = NULL);
+    TwoPlayersGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, String aiFace, Action *gameOverAction = NULL);
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
     StoryWidget *getOpponent();
 private:
-    PuyoSetTheme &attachedPuyoThemeSet;
+    FloboSetTheme &attachedFloboThemeSet;
     RandomSystem attachedRandom;
-    FloboLocalGameFactory attachedGameFactory;
-    PuyoView areaA, areaB;
-    PuyoEventPlayer playercontrollerA, playercontrollerB;
+    LocalGameFactory attachedGameFactory;
+    GameView areaA, areaB;
+    EventPlayer playercontrollerA, playercontrollerB;
     StoryWidget opponentFace;
 };
 
 class PuyoLocalTwoPlayerGameWidgetFactory : public GameWidgetFactory {
 public:
-    GameWidget *createGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
+    GameWidget *createGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
         return new TwoPlayersGameWidget(puyoThemeSet, levelTheme, centerFace, gameOverAction);
     }

@@ -1,4 +1,4 @@
-#include "PuyoInternetBot.h"
+#include "InternetBot.h"
 #include "PuyoStrings.h"
 #include "PuyoNetworkView.h"
 #include "PuyoNetworkStarter.h"
@@ -40,13 +40,13 @@ public:
 
     /*
     std::auto_ptr<RandomSystem> m_myRandom;
-    std::auto_ptr<FloboLocalGameFactory> m_myGameFactory;
+    std::auto_ptr<LocalGameFactory> m_myGameFactory;
     std::auto_ptr<PuyoInternetNetworkView> m_myView;
     std::auto_ptr<AIPlayer> m_myAI;
 
     std::auto_ptr<RandomSystem> m_opRandom;
     std::auto_ptr<PuyoNetworkGameFactory> m_opGameFactory;
-    std::auto_ptr<PuyoView> m_opView;
+    std::auto_ptr<GameView> m_opView;
     */
     std::auto_ptr<PuyoNetworkGameWidget> m_Negawi; // the NEtwork GAme WIdget
 
@@ -58,14 +58,14 @@ public:
         // My view
         m_opponent = mbox;
         m_myRandom = std::auto_ptr<RandomSystem>(new RandomSystem(5, invitation.gameRandomSeed));
-        m_myGameFactory = std::auto_ptr<FloboLocalGameFactory>(new FloboLocalGameFactory(m_myRandom.get()));
+        m_myGameFactory = std::auto_ptr<LocalGameFactory>(new LocalGameFactory(m_myRandom.get()));
         m_myView = std::auto_ptr<PuyoInternetNetworkView>(new PuyoInternetNetworkView(m_myGameFactory.get(), mbox, gameId, igpbox));
         m_myAI = std::auto_ptr<AIPlayer>(new AIPlayer(m_level, *m_myView));
         // Remote view
         // TODO
         m_opRandom = std::auto_ptr<RandomSystem>(new RandomSystem(5, invitation.gameRandomSeed));
         m_opGameFactory = std::auto_ptr<PuyoNetworkGameFactory>(new PuyoNetworkGameFactory(m_opRandom.get(), *mbox, gameId));
-        m_opView = std::auto_ptr<PuyoView>(new PuyoView(m_opGameFactory.get()));
+        m_opView = std::auto_ptr<GameView>(new GameView(m_opGameFactory.get()));
         */
         m_Negawi = std::auto_ptr<PuyoNetworkGameWidget>(new PuyoNetworkGameWidget());
         m_Negawi->initWithoutGUI(*mbox, gameId, invitation.gameRandomSeed, NULL, igpbox);
@@ -80,11 +80,11 @@ public:
     }
 };
 
-PuyoInternetBot::PuyoInternetBot(int level)
+InternetBot::InternetBot(int level)
     : m_level(level)
 {}
 
-void PuyoInternetBot::connect(String server, int port, String name, String password)
+void InternetBot::connect(String server, int port, String name, String password)
 {
     gameCenter = std::auto_ptr<InternetGameCenter>(new InternetGameCenter(server, port, name, password));
     gameCenterListener = std::auto_ptr<PIBNGCListener>(new PIBNGCListener(*gameCenter, m_level));
@@ -101,7 +101,7 @@ void PuyoInternetBot::connect(String server, int port, String name, String passw
     std::cout << "Connected." << std::endl;
 }
 
-void PuyoInternetBot::idle(double currentTime)
+void InternetBot::idle(double currentTime)
 {
   if (gameCenter.get() == NULL) return;
   gameCenter->idle();

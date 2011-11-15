@@ -7,10 +7,10 @@
 
 class PIBNGCListener;
 
-class PuyoInternetBot : public IdleComponent
+class InternetBot : public IdleComponent
 {
   public:
-    PuyoInternetBot(int level);
+    InternetBot(int level);
 
     void connect(String server, int port, String name, String password);
     void idle(double currentTime);

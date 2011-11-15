@@ -23,12 +23,12 @@
  *
  */
 
-#include "AnimatedPuyo.h"
-#include "PuyoView.h"
+#include "AnimatedFlobo.h"
+#include "GameView.h"
 #include "Theme.h"
 
-AnimatedPuyo::AnimatedPuyo(FloboState state, PuyoSetTheme *themeSet, PuyoView *attachedView)
-    : Flobo(state), smallTicksCount(0), attachedTheme(themeSet != NULL ? &(themeSet->getPuyoTheme(state)) : NULL),
+AnimatedFlobo::AnimatedFlobo(FloboState state, FloboSetTheme *themeSet, GameView *attachedView)
+    : Flobo(state), smallTicksCount(0), attachedTheme(themeSet != NULL ? &(themeSet->getFloboTheme(state)) : NULL),
       m_currentCompressedState(0), m_partner(NULL), m_offsetX(0), m_offsetY(0), m_angle(0), m_displayEyes(true)
 {
     puyoEyeState = random() % 8192;
@@ -36,34 +36,34 @@ AnimatedPuyo::AnimatedPuyo(FloboState state, PuyoSetTheme *themeSet, PuyoView *a
     this->attachedView = attachedView;
 }
 
-AnimatedPuyo::~AnimatedPuyo()
+AnimatedFlobo::~AnimatedFlobo()
 {
     while (animationQueue.size() > 0)
            removeCurrentAnimation();
 }
 
-void AnimatedPuyo::addAnimation(PuyoAnimation *animation)
+void AnimatedFlobo::addAnimation(FloboAnimation *animation)
 {
     animationQueue.add(animation);
 }
 
-PuyoAnimation * AnimatedPuyo::getCurrentAnimation() const
+FloboAnimation * AnimatedFlobo::getCurrentAnimation() const
 {
     if (animationQueue.size() == 0)
         return NULL;
     return animationQueue[0];
 }
 
-void AnimatedPuyo::removeCurrentAnimation()
+void AnimatedFlobo::removeCurrentAnimation()
 {
     if (animationQueue.size() == 0)
         return;
-    PuyoAnimation *animationToRemove = animationQueue[0];
+    FloboAnimation *animationToRemove = animationQueue[0];
     animationQueue.removeKeepOrder(animationToRemove);
     delete animationToRemove;
 }
 
-void AnimatedPuyo::flushAnimations()
+void AnimatedFlobo::flushAnimations()
 {
     while (getCurrentAnimation() != NULL)
         removeCurrentAnimation();
@@ -72,10 +72,10 @@ void AnimatedPuyo::flushAnimations()
     m_offsetY = 0;
 }
 
-void AnimatedPuyo::flushAnimations(int animationTag)
+void AnimatedFlobo::flushAnimations(int animationTag)
 {
     for (int i = animationQueue.size() - 1 ; i >= 0 ; i--) {
-        PuyoAnimation *anim = animationQueue[i];
+        FloboAnimation *anim = animationQueue[i];
         if (anim->getTag() == animationTag) {
             animationQueue.removeKeepOrder(anim);
             delete anim;
@@ -83,12 +83,12 @@ void AnimatedPuyo::flushAnimations(int animationTag)
     }
 }
 
-void AnimatedPuyo::cycleAnimation()
+void AnimatedFlobo::cycleAnimation()
 {
     bool exclusive = false;
     smallTicksCount+=2;
     for (int i = 0 ; (i < animationQueue.size()) && (!exclusive) ; i++) {
-        PuyoAnimation *animation = animationQueue[i];
+        FloboAnimation *animation = animationQueue[i];
         exclusive = animation->getExclusive();
         if ((!exclusive) || (i == 0)) {
             animation->cycle();
@@ -102,18 +102,18 @@ void AnimatedPuyo::cycleAnimation()
     }
 }
 
-bool AnimatedPuyo::isRenderingAnimation() const
+bool AnimatedFlobo::isRenderingAnimation() const
 {
-    PuyoAnimation *animation = getCurrentAnimation();
+    FloboAnimation *animation = getCurrentAnimation();
     if (animation == NULL)
         return false;
     return animation->isEnabled();
 }
 
-void AnimatedPuyo::render(DrawTarget *dt)
+void AnimatedFlobo::render(DrawTarget *dt)
 {
     FloboGame *attachedGame = attachedView->getAttachedGame();
-    PuyoAnimation *animation = getCurrentAnimation();
+    FloboAnimation *animation = getCurrentAnimation();
     if (!isRenderingAnimation()) {
         renderAt(getScreenCoordinateX(), getScreenCoordinateY(), dt);
     }
@@ -124,7 +124,7 @@ void AnimatedPuyo::render(DrawTarget *dt)
     }
 }
 
-void AnimatedPuyo::renderAt(int X, int Y, DrawTarget *dt)
+void AnimatedFlobo::renderAt(int X, int Y, DrawTarget *dt)
 {
     if (attachedView == NULL)
         return;
@@ -136,7 +136,7 @@ void AnimatedPuyo::renderAt(int X, int Y, DrawTarget *dt)
 
     IosSurface *currentSurface;
 
-    currentSurface = attachedTheme->getPuyoSurfaceForValence(attachedView->getValenceForPuyo(this), m_currentCompressedState);
+    currentSurface = attachedTheme->getFloboSurfaceForValence(attachedView->getValenceForFlobo(this), m_currentCompressedState);
     if (currentSurface != NULL) {
         drect.x = X;
         drect.y = Y;
@@ -167,7 +167,7 @@ void AnimatedPuyo::renderAt(int X, int Y, DrawTarget *dt)
     }
 }
 
-void AnimatedPuyo::renderShadow(DrawTarget *dt)
+void AnimatedFlobo::renderShadow(DrawTarget *dt)
 {
     if (!visibilityFlag)
         return;
@@ -176,7 +176,7 @@ void AnimatedPuyo::renderShadow(DrawTarget *dt)
     }
 }
 
-void AnimatedPuyo::renderShadowAt(int X, int Y, DrawTarget *dt)
+void AnimatedFlobo::renderShadowAt(int X, int Y, DrawTarget *dt)
 {
     if (getFloboState() != FLOBO_NEUTRAL) {
         IosSurface *currentSurface;
@@ -193,7 +193,7 @@ void AnimatedPuyo::renderShadowAt(int X, int Y, DrawTarget *dt)
     }
 }
 
-int AnimatedPuyo::getScreenCoordinateX() const
+int AnimatedFlobo::getScreenCoordinateX() const
 {
     if ((m_angle == 0.) || (m_partner == NULL))
         return attachedView->getScreenCoordinateX(getFloboX()) + m_offsetX;
@@ -209,7 +209,7 @@ int AnimatedPuyo::getScreenCoordinateX() const
         return (m_partner->getScreenCoordinateX()) - cos(m_angle) * TSIZE;
 }
 
-int AnimatedPuyo::getScreenCoordinateY() const
+int AnimatedFlobo::getScreenCoordinateY() const
 {
     if ((m_angle == 0.) || (m_partner == NULL)) {
         if (getFloboState() < FLOBO_EMPTY)
@@ -229,10 +229,10 @@ int AnimatedPuyo::getScreenCoordinateY() const
         return (m_partner->getScreenCoordinateY()) - cos(m_angle) * TSIZE;
 }
 
-AnimatedFloboFactory::AnimatedFloboFactory(PuyoView *attachedView)
+AnimatedFloboFactory::AnimatedFloboFactory(GameView *attachedView)
   : attachedView(attachedView), m_showEyes(true)
 {
-    this->attachedThemeSet = attachedView->getPuyoThemeSet();
+    this->attachedThemeSet = attachedView->getFloboSetTheme();
 }
 
 AnimatedFloboFactory::~AnimatedFloboFactory()
@@ -246,7 +246,7 @@ AnimatedFloboFactory::~AnimatedFloboFactory()
 
 Flobo *AnimatedFloboFactory::createFlobo(FloboState state)
 {
-    AnimatedPuyo *result = new AnimatedPuyo(state, attachedThemeSet, attachedView);
+    AnimatedFlobo *result = new AnimatedFlobo(state, attachedThemeSet, attachedView);
     result->setShowEyes(m_showEyes);
     return result;
 }
@@ -260,7 +260,7 @@ void AnimatedFloboFactory::deleteFlobo(Flobo *target)
 void AnimatedFloboFactory::renderWalhalla(DrawTarget *dt)
 {
     for (int i = puyoWalhalla.size() - 1 ; i >= 0 ; i--) {
-        AnimatedPuyo *currentFlobo = static_cast<AnimatedPuyo *>(puyoWalhalla[i]);
+        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(puyoWalhalla[i]);
         currentFlobo->render(dt);
     }
 }
@@ -268,7 +268,7 @@ void AnimatedFloboFactory::renderWalhalla(DrawTarget *dt)
 void AnimatedFloboFactory::cycleWalhalla()
 {
     for (int i = puyoWalhalla.size() - 1 ; i >= 0 ; i--) {
-        AnimatedPuyo *currentFlobo = static_cast<AnimatedPuyo *>(puyoWalhalla[i]);
+        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(puyoWalhalla[i]);
         if (currentFlobo->getCurrentAnimation() != NULL) {
             currentFlobo->cycleAnimation();
         } else {

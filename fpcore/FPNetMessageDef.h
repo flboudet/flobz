@@ -1,8 +1,8 @@
-#ifndef _FLOBO_MESSAGE_DEF_H
-#define _FLOBO_MESSAGE_DEF_H
+#ifndef _FPNET_MESSAGE_DEF_H_
+#define _FPNET_MESSAGE_DEF_H_
 
 /* y'a des conflits de nommage... */
-namespace PuyoMessage {
+namespace FPNetMessage {
 
 enum {
     kGameState    = 0,

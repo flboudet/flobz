@@ -26,14 +26,14 @@
 #ifndef _PUYOSTARTER
 #define _PUYOSTARTER
 
-#include "PuyoView.h"
-#include "PuyoEventPlayer.h"
+#include "GameView.h"
+#include "EventPlayer.h"
 #include "AIPlayer.h"
 #include "GameWidget.h"
 
-class FloboLocalGameFactory : public FloboGameFactory {
+class LocalGameFactory : public FloboGameFactory {
 public:
-    FloboLocalGameFactory(RandomSystem *attachedRandom): attachedRandom(attachedRandom) {}
+    LocalGameFactory(RandomSystem *attachedRandom): attachedRandom(attachedRandom) {}
     FloboGame *createFloboGame(FloboFactory *attachedFloboFactory) {
         return new FloboLocalGame(attachedRandom, attachedFloboFactory);
     }
@@ -43,13 +43,13 @@ private:
 
 class TwoPlayerGameWidget : public GameWidget2P {
 public:
-    TwoPlayerGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, gameui::Action *gameOverAction = NULL);
+    TwoPlayerGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, gameui::Action *gameOverAction = NULL);
 private:
-    PuyoSetTheme &attachedPuyoThemeSet;
+    FloboSetTheme &attachedFloboThemeSet;
     RandomSystem attachedRandom;
-    FloboLocalGameFactory attachedGameFactory;
-    PuyoView areaA, areaB;
-    PuyoEventPlayer controllerA, controllerB;
+    LocalGameFactory attachedGameFactory;
+    GameView areaA, areaB;
+    EventPlayer controllerA, controllerB;
 };
 
 #endif // _PUYOSTARTER

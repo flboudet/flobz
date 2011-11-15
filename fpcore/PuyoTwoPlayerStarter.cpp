@@ -26,10 +26,10 @@
 #include "PuyoTwoPlayerStarter.h"
 using namespace event_manager;
 
-TwoPlayersGameWidget::TwoPlayersGameWidget(PuyoSetTheme &puyoThemeSet, LevelTheme &levelTheme, String aiFace, Action *gameOverAction) : attachedPuyoThemeSet(puyoThemeSet),
+TwoPlayersGameWidget::TwoPlayersGameWidget(FloboSetTheme &puyoThemeSet, LevelTheme &levelTheme, String aiFace, Action *gameOverAction) : attachedFloboThemeSet(puyoThemeSet),
                                                      attachedRandom(5), attachedGameFactory(&attachedRandom),
-                                                     areaA(&attachedGameFactory, 0, &attachedPuyoThemeSet, &levelTheme),
-                                                     areaB(&attachedGameFactory, 1, &attachedPuyoThemeSet, &levelTheme),
+                                                     areaA(&attachedGameFactory, 0, &attachedFloboThemeSet, &levelTheme),
+                                                     areaB(&attachedGameFactory, 1, &attachedFloboThemeSet, &levelTheme),
                                                      playercontrollerA(areaA, kPlayer1Down, kPlayer1Left, kPlayer1Right,
                                                      kPlayer1TurnLeft, kPlayer1TurnRight),
                                                      playercontrollerB(areaB, kPlayer2Down, kPlayer2Left, kPlayer2Right,
