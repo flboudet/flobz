@@ -31,7 +31,7 @@ AnimatedFlobo::AnimatedFlobo(FloboState state, FloboSetTheme *themeSet, GameView
     : Flobo(state), smallTicksCount(0), attachedTheme(themeSet != NULL ? &(themeSet->getFloboTheme(state)) : NULL),
       m_currentCompressedState(0), m_partner(NULL), m_offsetX(0), m_offsetY(0), m_angle(0), m_displayEyes(true)
 {
-    puyoEyeState = random() % 8192;
+    floboEyeState = random() % 8192;
     visibilityFlag = true;
     this->attachedView = attachedView;
 }
@@ -145,8 +145,8 @@ void AnimatedFlobo::renderAt(int X, int Y, DrawTarget *dt)
 
         dt->draw(currentSurface, NULL, &drect);
 
-        /* Main puyo show */
-        /* TODO: Investigate why, during network game, the falling puyo starts by being neutral */
+        /* Main flobo show */
+        /* TODO: Investigate why, during network game, the falling flobo starts by being neutral */
         if ((this == attachedGame->getFallingFlobo())
             && (getFloboState() != FLOBO_NEUTRAL)
             && (m_currentCompressedState == 0))
@@ -154,7 +154,7 @@ void AnimatedFlobo::renderAt(int X, int Y, DrawTarget *dt)
 
         /* Eye management */
         if ((getFloboState() != FLOBO_NEUTRAL) && (m_displayEyes)) {
-            int eyePhase = fmod((puyoEyeState + ios_fc::getTimeMs()), 8192.);
+            int eyePhase = fmod((floboEyeState + ios_fc::getTimeMs()), 8192.);
             if (eyePhase < 100)
                 dt->draw(attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState), NULL, &drect);
             else if (eyePhase < 200)
@@ -237,9 +237,9 @@ AnimatedFloboFactory::AnimatedFloboFactory(GameView *attachedView)
 
 AnimatedFloboFactory::~AnimatedFloboFactory()
 {
-    while (puyoWalhalla.size() > 0) {
-        Flobo *currentFlobo = puyoWalhalla[0];
-        puyoWalhalla.removeAt(0);
+    while (floboWalhalla.size() > 0) {
+        Flobo *currentFlobo = floboWalhalla[0];
+        floboWalhalla.removeAt(0);
         delete currentFlobo;
     }
 }
@@ -253,26 +253,26 @@ Flobo *AnimatedFloboFactory::createFlobo(FloboState state)
 
 void AnimatedFloboFactory::deleteFlobo(Flobo *target)
 {
-    puyoWalhalla.add(target);
+    floboWalhalla.add(target);
 }
 
 
 void AnimatedFloboFactory::renderWalhalla(DrawTarget *dt)
 {
-    for (int i = puyoWalhalla.size() - 1 ; i >= 0 ; i--) {
-        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(puyoWalhalla[i]);
+    for (int i = floboWalhalla.size() - 1 ; i >= 0 ; i--) {
+        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(floboWalhalla[i]);
         currentFlobo->render(dt);
     }
 }
 
 void AnimatedFloboFactory::cycleWalhalla()
 {
-    for (int i = puyoWalhalla.size() - 1 ; i >= 0 ; i--) {
-        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(puyoWalhalla[i]);
+    for (int i = floboWalhalla.size() - 1 ; i >= 0 ; i--) {
+        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(floboWalhalla[i]);
         if (currentFlobo->getCurrentAnimation() != NULL) {
             currentFlobo->cycleAnimation();
         } else {
-            puyoWalhalla.removeAt(i);
+            floboWalhalla.removeAt(i);
             delete currentFlobo;
         }
     }

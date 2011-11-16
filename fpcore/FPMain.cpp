@@ -1,6 +1,6 @@
 #include <iostream>
-#include "PuyoMain.h"
-#include "PuyoStrings.h"
+#include "FPMain.h"
+#include "FPStrings.h"
 #include "MainMenu.h"
 #include "CompositeDrawContext.h"
 #include "PackageDescription.h"
@@ -35,7 +35,7 @@ static const char * kScreenWidthPref = "Config.ScreenWidth";
 static const char * kScreenHeightPref = "Config.ScreenHeight";
 
 
-PuyoMain::PuyoMain(String dataDir, bool fullscreen, int maxDataPackNumber)
+FPMain::FPMain(String dataDir, bool fullscreen, int maxDataPackNumber)
 : m_dataDir(dataDir), m_fullscreen(fullscreen),
   m_maxDataPackNumber(maxDataPackNumber),
   m_dataPathManager(dataDir)
@@ -44,12 +44,12 @@ PuyoMain::PuyoMain(String dataDir, bool fullscreen, int maxDataPackNumber)
         m_dataPathManager.setMaxPackNumber(maxDataPackNumber);
 }
 
-PuyoMain::~PuyoMain()
+FPMain::~FPMain()
 {
     gameui::GlobalNotificationCenter.removeListener(theCommander->getFullScreenKey(), this);
 }
 
-void PuyoMain::initWithGUI()
+void FPMain::initWithGUI()
 {
     initSDL();
     loop = GameUIDefaults::GAME_LOOP;
@@ -63,7 +63,7 @@ void PuyoMain::initWithGUI()
     }
 #else
     // TODO: a better path for WIN32
-    prefFilePath = "./.flobopuyorc";
+    prefFilePath = "./.flobopoprc";
 #endif
     m_preferencesManager = new PosixPreferencesManager(prefFilePath.c_str());
     // Create the DrawContext
@@ -81,7 +81,7 @@ void PuyoMain::initWithGUI()
 #endif
     //PackageDescription *packDesc = new PackageDescription(m_dataPathManager, *cDC);
     //IosRect cropRect = {0,0,32,32};
-    //cDC->declareCompositeSurface("data/base.000/theme/Classic.fptheme/fat-puyo-0000.png",
+    //cDC->declareCompositeSurface("data/base.000/theme/Classic.fptheme/fat-flobo-0000.png",
     //                             "data/base.000/theme/Classic.fptheme/montage_1.png",
     //                             cropRect);
     m_eventManager = new SDL12_EventManager(m_preferencesManager);
@@ -122,7 +122,7 @@ void PuyoMain::initWithGUI()
 #endif
 
 /* Initialize SDL context */
-void PuyoMain::initSDL()
+void FPMain::initSDL()
 {
 #ifdef SDL_GFX
   DBG_PRINT("initSDL()\n");
@@ -156,14 +156,14 @@ void PuyoMain::initSDL()
 #endif
 }
 
-void PuyoMain::run()
+void FPMain::run()
 {
   initWithGUI();
   GameUIDefaults::SCREEN_STACK->push(mainScreen);
   GameUIDefaults::GAME_LOOP->run();
 }
 
-void PuyoMain::debug_gsl(String gsl_script)
+void FPMain::debug_gsl(String gsl_script)
 {
   initWithGUI();
   GameUIDefaults::SCREEN_STACK->push(mainScreen);
@@ -172,7 +172,7 @@ void PuyoMain::debug_gsl(String gsl_script)
   GameUIDefaults::GAME_LOOP->run();
 }
 
-void PuyoMain::connect_ia(String param)
+void FPMain::connect_ia(String param)
 {
 #ifdef ENABLE_NETWORK_INTERNET
   String name   = "Herbert";
@@ -212,7 +212,7 @@ void PuyoMain::connect_ia(String param)
 #endif
 }
 
-void PuyoMain::initMenus()
+void FPMain::initMenus()
 {
   DBG_PRINT("initMenus()\n");
   //
@@ -225,7 +225,7 @@ void PuyoMain::initMenus()
   mainScreen->pushMenu(trubudu);
 }
 
-void PuyoMain::notificationOccured(String identifier, void * context)
+void FPMain::notificationOccured(String identifier, void * context)
 {
     if (identifier == theCommander->getFullScreenKey()) {
         theCommander->getPreferencesManager()->setBoolPreference(kFullScreenPref, *(bool *)context);

@@ -1,7 +1,7 @@
 noinst_LTLIBRARIES=libfpcore.la
 
 libfpcore_la_SOURCES=audio.cpp HiScores.cpp FPCommander.cpp \
-          MainMenu.cpp MainScreen.cpp PuyoMain.cpp \
+          MainMenu.cpp MainScreen.cpp FPMain.cpp \
           main.cpp FPDataPathManager.cpp FloboGame.cpp DoomMelt.cpp \
           GameView.cpp FloboAnimations.cpp AnimatedFlobo.cpp AIPlayer.cpp \
           styrolyse.cpp Story.cpp ChatBox.cpp LocalizedDictionary.cpp \
@@ -11,7 +11,7 @@ libfpcore_la_SOURCES=audio.cpp HiScores.cpp FPCommander.cpp \
           SoloGameStarter.cpp StoryModeStarter.cpp TwoPlayersGameStarter.cpp \
           LocalMenu.cpp OptionMenu.cpp ControlMenu.cpp \
           LevelThemeMenu.cpp ThemeMenu.cpp ScreenTransition.cpp \
-          FloboGameAbstract.cpp PuyoStrings.cpp \
+          FloboGameAbstract.cpp FPStrings.cpp \
           PackageDescription.cpp AnimatedFloboTheme.cpp GSLFileAccessWrapper.cpp \
 	  PlayerNameUtils.cpp
 
@@ -29,13 +29,13 @@ EXTRA_DIST=EventPlayer.h NetworkGameView.h \
            AnimatedFlobo.h FloboGameAbstract.h OptionMenu.h \
            FloboGame.h PauseMenu.h \
            audio.h GameWidget.h GameScreen.h Player.h \
-           AIPlayer.h PuyoScoring.h PuyoMain.h \
+           AIPlayer.h Scoring.h FPMain.h \
            ScreenTransition.h SoloGameStarter.h \
            HallOfFame.h InternetGameCenter.h StoryModeStarter.h \
            HiScores.h InternetMenu.h InternetBot.h \
            LevelThemeMenu.h LanGameCenter.h StatsWidget.h \
            MainMenu.h LocalizedDictionary.h  Story.h \
-           MainScreen.h LocalMenu.h PuyoStrings.h \
+           MainScreen.h LocalMenu.h FPStrings.h \
            FloboAnimations.h FPNetMessageDef.h ThemeMenu.h \
            ChatBox.h NatTraversal.h LocalGameStates.h \
            TwoPlayersGameStarter.h \

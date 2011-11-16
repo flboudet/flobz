@@ -2,7 +2,7 @@
 #include "ios_igpmessagebox.h"
 #include "ios_udpmessage.h"
 #include "ios_time.h"
-#include "PuyoIgpDefs.h"
+#include "FPIGPDefs.h"
 #include "PuyoNatTraversal.h"
 #include <unistd.h>
 

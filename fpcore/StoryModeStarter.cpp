@@ -24,7 +24,7 @@
  */
 
 #include "GTLog.h"
-#include "PuyoStrings.h"
+#include "FPStrings.h"
 #include "StoryModeStarter.h"
 #include "GameView.h"
 #include "GSLFileAccessWrapper.h"

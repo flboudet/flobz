@@ -185,17 +185,17 @@ void GameWidget2P::priv_initialize()
 
     // Load and preload a few FX for the game
     for (int i=0; i<3; ++i)
-        puyoFX.push_back(new VisualFX("fx/vanish.gsl", *(areaA->getFloboSetTheme())));
+        floboFX.push_back(new VisualFX("fx/vanish.gsl", *(areaA->getFloboSetTheme())));
     for (int i=0; i<3; ++i)
-        puyoFX.push_back(new VisualFX("fx/combo.gsl", *(areaA->getFloboSetTheme())));
-    // puyoFX.push_back(new VisualFX("fx/white_star.gsl"));
+        floboFX.push_back(new VisualFX("fx/combo.gsl", *(areaA->getFloboSetTheme())));
+    // floboFX.push_back(new VisualFX("fx/white_star.gsl"));
 }
 
 GameWidget2P::~GameWidget2P()
 {
     dead();
-    for (unsigned int i=0; i<puyoFX.size(); ++i)
-        delete puyoFX[i];
+    for (unsigned int i=0; i<floboFX.size(); ++i)
+        delete floboFX[i];
     if (m_foregroundAnimation != NULL) {
       styrolyse_free(m_foregroundAnimation);
     }
@@ -329,7 +329,7 @@ void GameWidget2P::draw(DrawTarget *dt)
         if (getOpponent() != NULL)
             getOpponent()->draw(dt);
     }
-    // Rendering puyo views
+    // Rendering flobo views
     drawGameAreas(dt);
     // Rendering the grids
     IosRect drect;

@@ -43,17 +43,17 @@ static const char * kInternetCurrentServerDefaultValue = "aley.fovea.cc";
 static const char * kInternetCurrentServerPortKey = "Menu.Internet.CurrentServer.Port";
 static const char * kInternetCurrentServerPortDefaultValue = "4567";
 
-AbstractPuyoMetaServerConnection::AbstractPuyoMetaServerConnection(PuyoMetaServerConnectionResponder *responder)
+AbstractMetaFPServerConnection::AbstractMetaFPServerConnection(MetaFPServerConnectionResponder *responder)
   : m_responder(responder)
 {}
 
-void AbstractPuyoMetaServerConnection::onServerListHasChanged()
+void AbstractMetaFPServerConnection::onServerListHasChanged()
 {
-    m_responder->PuyoMetaServerListHasChanged(*this);
+    m_responder->metaFPServerListHasChanged(*this);
 }
 
-DummyMetaServerConnection::DummyMetaServerConnection(PuyoMetaServerConnectionResponder *responder)
-  : AbstractPuyoMetaServerConnection(responder)
+DummyMetaServerConnection::DummyMetaServerConnection(MetaFPServerConnectionResponder *responder)
+  : AbstractMetaFPServerConnection(responder)
 {
 }
 
@@ -71,8 +71,8 @@ vector<FPServer> DummyMetaServerConnection::getServers() const
     return result;
 }
 
-HttpMetaServerConnection::HttpMetaServerConnection(String hostName, String hostPath, int portNum, PuyoMetaServerConnectionResponder *responder)
-  : AbstractPuyoMetaServerConnection(responder), m_doc(NULL),
+HttpMetaServerConnection::HttpMetaServerConnection(String hostName, String hostPath, int portNum, MetaFPServerConnectionResponder *responder)
+  : AbstractMetaFPServerConnection(responder), m_doc(NULL),
     m_hostName(hostName), m_hostPath(hostPath), m_portNum(portNum), m_nErrors(0)
 {
     GameUIDefaults::GAME_LOOP->addIdle(this);
@@ -153,7 +153,7 @@ FPServerList::FPServerList(FPServerListResponder *responder)
     for (int i = 1; i <= nbserv; i++)
     {
         servname = theCommander->getPreferencesManager()->getStrPreference(String(kInternetMetaServerKey)+i, i==1?"aley.fovea.cc":"Error");
-        servpath = theCommander->getPreferencesManager()->getStrPreference (String(kInternetMetaServerPathKey)+i, i==1?"/flobopuyo/fpservers":"/fpservers");
+        servpath = theCommander->getPreferencesManager()->getStrPreference (String(kInternetMetaServerPathKey)+i, i==1?"/flobopop/fpservers":"/fpservers");
         m_metaservers.push_back(new HttpMetaServerConnection(servname.c_str(), servpath.c_str(),
                                                              theCommander->getPreferencesManager()->getIntPreference(String(kInternetMetaServerPortKey)+i, 80), this));
   }
@@ -161,7 +161,7 @@ FPServerList::FPServerList(FPServerListResponder *responder)
 
 FPServerList::~FPServerList()
 {
-    for (std::vector<AbstractPuyoMetaServerConnection *>::iterator iter = m_metaservers.begin() ;
+    for (std::vector<AbstractMetaFPServerConnection *>::iterator iter = m_metaservers.begin() ;
          iter != m_metaservers.end() ; iter++) {
          delete *iter;
     }
@@ -182,13 +182,13 @@ void FPServerList::fetch()
     // Notify the responder that we have a clear list now
     m_responder->FPServerListHasChanged(*this);
     // Launch the fetching process
-    for (std::vector<AbstractPuyoMetaServerConnection *>::iterator iter = m_metaservers.begin() ;
+    for (std::vector<AbstractMetaFPServerConnection *>::iterator iter = m_metaservers.begin() ;
          iter != m_metaservers.end() ; iter++) {
          (*iter)->fetch();
     }
 }
 
-void FPServerList::PuyoMetaServerListHasChanged(AbstractPuyoMetaServerConnection &metaServerConnection)
+void FPServerList::metaFPServerListHasChanged(AbstractMetaFPServerConnection &metaServerConnection)
 {
     vector<FPServer> servers = metaServerConnection.getServers();
     for (std::vector<FPServer>::iterator iter = servers.begin() ;
@@ -209,7 +209,7 @@ std::vector<FPServer> FPServerList::getServers()
     return result;
 }
 
-void FPServerList::puyoServerDidPing(PingableFPServer &server)
+void FPServerList::fpServerDidPing(PingableFPServer &server)
 {
     m_responder->FPServerListHasChanged(*this);
 }
@@ -240,7 +240,7 @@ void PingableFPServer::idle(double currentTime)
     else {
         if ((!m_alreadyReported) && (m_pingTransaction->success())) {
             m_alreadyReported = true;
-            m_responder->puyoServerDidPing(*this);
+            m_responder->fpServerDidPing(*this);
         }
     }
 }
@@ -435,7 +435,7 @@ InternetErrorDialog::InternetErrorDialog(String errorMessageL1, String errorMess
   : InternetDialog(theCommander->getLocalizedString("Error")), m_errorMessageL1(errorMessageL1),
     m_errorMessageL2(errorMessageL2), m_okButton(theCommander->getLocalizedString("OK"), this,
 	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
-    m_errorIconImage(theCommander->getSurface(IMAGE_RGBA, "gfx/errorpuyo.png")),
+    m_errorIconImage(theCommander->getSurface(IMAGE_RGBA, "gfx/erroricon.png")),
     m_errorIcon(m_errorIconImage)
 {
     m_contentBox.setInnerMargin(10);

@@ -26,7 +26,7 @@
 #include <iostream>
 #include "GTLog.h"
 #include "InternetGameCenter.h"
-#include "PuyoIgpDefs.h"
+#include "FPIGPDefs.h"
 #include "ios_igpmessage.h"
 #include "ios_time.h"
 

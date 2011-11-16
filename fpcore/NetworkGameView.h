@@ -61,7 +61,7 @@ class NetworkGameView : public GameView {
     void gameDidAddNeutral(Flobo *neutralFlobo, int neutralIndex, int totalNeutral);
     void gameDidEndCycle();
     void companionDidTurn(Flobo *companionFlobo, Flobo *fallingFlobo, bool counterclockwise);
-    void floboDidFall(Flobo *puyo, int originX, int originY, int nFalledBelow);
+    void floboDidFall(Flobo *flobo, int originX, int originY, int nFalledBelow);
     void floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase);
     virtual void gameWin();
     virtual void gameLost();

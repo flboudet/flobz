@@ -22,8 +22,8 @@
 #include <string.h>
 #include "AIPlayer.h"
 
-static const PuyoCoordinates nullPosition = {0,0};
-static const PuyoBinom nullBinom = {FLOBO_EMPTY,FLOBO_EMPTY,Left,nullPosition};
+static const FloboCoordinates nullPosition = {0,0};
+static const FloboBinom nullBinom = {FLOBO_EMPTY,FLOBO_EMPTY,Left,nullPosition};
 static const GridEvaluation nullEvaluation = {0,0,0,0,0,0};
 
 #define copyGrid(dst,src) memcpy((void *)dst, (void *)src, sizeof(GridState))
@@ -120,7 +120,7 @@ bool removeSameFloboAround(int X, int Y, const FloboState color, GridState * con
     return false;
   }
 
-  evaluation->puyoSuppressed += nFound;
+  evaluation->floboSuppressed += nFound;
 
   for (int i = 0; i < nFound; i++)
   {
@@ -217,7 +217,7 @@ bool countSameFloboAround(int X, int Y, const FloboState color, GridState * cons
     return false;
   }
 
-  evaluation->puyoSuppressed += nFound;
+  evaluation->floboSuppressed += nFound;
 
   for (int i = 0; i < nFound; i++)
   {
@@ -300,14 +300,14 @@ void dropNeutrals(int number, int totalFromStart, GridState * const grid, GridSt
             number--;
             if (((*grid)[posX][posY] = FLOBO_EMPTY) || (posY >= IA_FLOBOBAN_DIMY))
                 continue;
-            // Creating a new neutral puyo
+            // Creating a new neutral flobo
             (*grid)[posX][posY] = FLOBO_NEUTRAL;
             (*grid)[posX][HEIGHTS_ROW]++;
         }
     }    
 }
 
-bool dropFlobos(const PuyoBinom binom, GridState * const grid)
+bool dropFlobos(const FloboBinom binom, GridState * const grid)
 {
   int x, h, g;
 
@@ -358,9 +358,9 @@ bool dropFlobos(const PuyoBinom binom, GridState * const grid)
 // except x=0 with companion left and x=IA_FLOBOBAN_DIMX-1 with companion right
 #define MAXCOMBINATION (IA_FLOBOBAN_DIMX*4)-2
 #define DISPATCHCYCLES 4
-inline void serialPosition(unsigned int serialnr /* from 1 to MAXCOMBINATION */, PuyoBinom * binom)
+inline void serialPosition(unsigned int serialnr /* from 1 to MAXCOMBINATION */, FloboBinom * binom)
 {
-  binom->orientation = (PuyoOrientation)(serialnr % 4);
+  binom->orientation = (FloboOrientation)(serialnr % 4);
   binom->position.x = serialnr / 4;
 }
 
@@ -387,7 +387,7 @@ bool suppressGroups(GridState * const dst, GridEvaluation * const evaluation)
     columnCompress(x, dst);
   }  
 
-  // Tell if we remove any puyo
+  // Tell if we remove any flobo
   return didSomething;
 }
 
@@ -399,7 +399,7 @@ void evalWith(const GridState * const grid, const GridEvaluation * const originE
 
   // Evaluate the potential to destroy more flobos
 
-  // for each puyo except the lower line and the columns top
+  // for each flobo except the lower line and the columns top
   evaluation = nullEvaluation;
   for (int x = 0;  x < IA_FLOBOBAN_DIMX; x++)
   {
@@ -420,16 +420,16 @@ void evalWith(const GridState * const grid, const GridEvaluation * const originE
         int r;
         for (r=0; suppressGroups(&tmp, &evaluation); r++) {};
         // if we used more than 1 round more neutrals willbe dropped to the ennemy
-        if (r>1) evaluation.puyoSuppressed += (r-1)*FLOBOBAN_DIMX;
-        if (evaluation.puyoSuppressed > realEvaluation->puyoSuppressedPotential)
+        if (r>1) evaluation.floboSuppressed += (r-1)*FLOBOBAN_DIMX;
+        if (evaluation.floboSuppressed > realEvaluation->floboSuppressedPotential)
         {
-          realEvaluation->puyoSuppressedPotential = evaluation.puyoSuppressed;
+          realEvaluation->floboSuppressedPotential = evaluation.floboSuppressed;
         }
       }
     }
   }
   
-  // count the groups of more than 1 puyo
+  // count the groups of more than 1 flobo
   evaluation = nullEvaluation;
   copyGrid(&tmp,grid);
   for (int x = 0;  x < IA_FLOBOBAN_DIMX; x++)
@@ -443,11 +443,11 @@ void evalWith(const GridState * const grid, const GridEvaluation * const originE
       }
     }
   }
-  int d = evaluation.puyoSuppressed - originEvaluation->puyoSuppressed;
+  int d = evaluation.floboSuppressed - originEvaluation->floboSuppressed;
   if (d>0) realEvaluation->floboGrouped = d;
 }
 
-bool dropBinom(const PuyoBinom binom, const GridState * const src, GridState * const dst, GridEvaluation * const evaluation)
+bool dropBinom(const FloboBinom binom, const GridState * const src, GridState * const dst, GridEvaluation * const evaluation)
 {
   // Copy the matrix
   if (src != NULL) copyGrid(dst,src);
@@ -462,16 +462,16 @@ bool dropBinom(const PuyoBinom binom, const GridState * const src, GridState * c
   return true;
 }
 
-int AIPlayer::makeEvaluation(const GridEvaluation * const referenceOne, const PuyoBinom flobos, const GridState * const grid)
+int AIPlayer::makeEvaluation(const GridEvaluation * const referenceOne, const FloboBinom flobos, const GridState * const grid)
 {
   int rR,rP;
   
-  rR = (2 * referenceOne->puyoSuppressed + 2 * referenceOne->neutralSuppressed + referenceOne->floboGrouped);
+  rR = (2 * referenceOne->floboSuppressed + 2 * referenceOne->neutralSuppressed + referenceOne->floboGrouped);
   rR *= params.realSuppressionValue;
 
   if (params.criticalHeight > referenceOne->height)
   {
-    rP = (referenceOne->neutralSuppressedPotential + referenceOne->puyoSuppressedPotential);
+    rP = (referenceOne->neutralSuppressedPotential + referenceOne->floboSuppressedPotential);
     rP *= params.potentialSuppressionValue;
   }
   else
@@ -514,7 +514,7 @@ int AIPlayer::makeEvaluation(const GridEvaluation * const referenceOne, const Pu
   return r;
 }
 
-bool AIPlayer::selectIfBetterEvaluation(int * const best, const GridEvaluation * const newOne, const PuyoBinom flobos, const GridState * const grid)
+bool AIPlayer::selectIfBetterEvaluation(int * const best, const GridEvaluation * const newOne, const FloboBinom flobos, const GridState * const grid)
 {
   int n = makeEvaluation(newOne, flobos, grid);
   int r = *best;
@@ -552,7 +552,7 @@ AIPlayer::AIPlayer(int level, GameView &targetView)
   params.columnScalar[4] = 1;
   params.columnScalar[5] = 1;
   params.rotationMethod = 0; // negative (right), null (shortest), positive(left)
-  params.fastDropDelta = FLOBOBAN_DIMY; // puyo height relative to column height before fast drop
+  params.fastDropDelta = FLOBOBAN_DIMY; // flobo height relative to column height before fast drop
   params.thinkDepth = 2;
   params.speedFactor = level>0?level:1;
   this->level = level;
@@ -589,27 +589,27 @@ FloboState AIPlayer::extractColor(FloboState A) const
     case FLOBO_YELLOW:
       return FLOBO_YELLOW;
     default:
-      fprintf(stderr,"Error in AI : unknown puyo color %d %d!!\nExiting...\n",(int)A,(int)attachedGame->isGameRunning());
+      fprintf(stderr,"Error in AI : unknown flobo color %d %d!!\nExiting...\n",(int)A,(int)attachedGame->isGameRunning());
       exit(0);
   }
   return FLOBO_EMPTY;
 }
 
-static const PuyoOrientation GameToIAOrientation[4] = {Below,Left,Above,Right};
-PuyoOrientation AIPlayer::extractOrientation(int D) const
+static const FloboOrientation GameToIAOrientation[4] = {Below,Left,Above,Right};
+FloboOrientation AIPlayer::extractOrientation(int D) const
 {
   if (D<0 || D>3) {
-    fprintf(stderr,"Error in AI : unknown puyo orientation!!\nExiting...\n");
+    fprintf(stderr,"Error in AI : unknown flobo orientation!!\nExiting...\n");
     exit(0);  
   }
   return GameToIAOrientation[(int)D];
 }
 
 static const int IAToGameOrientation[4] = {1,2,0,3};
-int AIPlayer::revertOrientation(PuyoOrientation D) const
+int AIPlayer::revertOrientation(FloboOrientation D) const
 {
   if (D<0 || D>3) {
-    fprintf(stderr,"Error in AI : unknown puyo orientation bis!!\nExiting...\n");
+    fprintf(stderr,"Error in AI : unknown flobo orientation bis!!\nExiting...\n");
     exit(0);
   }
   return IAToGameOrientation[D];
@@ -645,7 +645,7 @@ void AIPlayer::extractGrid(void)
   }
 }
 
-bool canReach(const PuyoBinom binom, const PuyoBinom dest, GridState * const internalGrid, int duration)
+bool canReach(const FloboBinom binom, const FloboBinom dest, GridState * const internalGrid, int duration)
 {
   int minBinomY = binom.position.y;
   int minBinomX = binom.position.x;
@@ -696,7 +696,7 @@ void AIPlayer::decide(int partial, int depth)
   //fprintf(stderr, "  Decision %d on %d - Depth = %d\n",partial+1,DISPATCHCYCLES,depth);
   if (partial == 0)
   {
-    // get puyo binoms to drop
+    // get flobo binoms to drop
     FloboState etat;
     etat = attachedGame->getFallingState();
     if (etat == FLOBO_EMPTY) return;
@@ -708,7 +708,7 @@ void AIPlayer::decide(int partial, int depth)
     current.position.x  = attachedGame->getFallingX();
     current.position.y  = FLOBOBAN_DIMY - attachedGame->getFallingY();
     
-    originalPuyo = current;
+    originalFlobo = current;
     
     next.falling        = extractColor(attachedGame->getNextFalling());
     next.companion      = extractColor(attachedGame->getNextCompanion());
@@ -735,7 +735,7 @@ void AIPlayer::decide(int partial, int depth)
         GridState state1;
         
         // drop the binom (including destroying eligible groups) and continue if game not lost
-        if (canReach(originalPuyo, current, internalGrid, 1) && dropBinom(current, internalGrid, &state1, &evaluation1))
+        if (canReach(originalFlobo, current, internalGrid, 1) && dropBinom(current, internalGrid, &state1, &evaluation1))
         {
           evalWith(&state1, &nullEvaluation, &evaluation1);
           
@@ -762,7 +762,7 @@ void AIPlayer::decide(int partial, int depth)
         GridState state1;
         
         // drop the binom (including destroying eligible groups) and continue if game not lost
-        if (canReach(originalPuyo, current, internalGrid, 1) && dropBinom(current, internalGrid, &state1, &evaluation1))
+        if (canReach(originalFlobo, current, internalGrid, 1) && dropBinom(current, internalGrid, &state1, &evaluation1))
         {
           for (unsigned int l2 = 1; l2 <= MAXCOMBINATION; l2++)
           {
@@ -775,10 +775,10 @@ void AIPlayer::decide(int partial, int depth)
             GridState state1bis;
             GridState state2;
             
-            dropNeutrals(lastNumberOfBadFlobos-evaluation1.puyoSuppressed, totalNumberOfBadFlobos, &state1bis, &state1);  
+            dropNeutrals(lastNumberOfBadFlobos-evaluation1.floboSuppressed, totalNumberOfBadFlobos, &state1bis, &state1);  
             
             // drop the binom (including destroying eligible groups) and eval board if game not lost
-            if (canReach(originalPuyo, next, &state1bis, 1) && dropBinom(next, &state1bis, &state2, &evaluation2))
+            if (canReach(originalFlobo, next, &state1bis, 1) && dropBinom(next, &state1bis, &state2, &evaluation2))
             {
               evalWith(&state2, &evaluation1, &evaluation2);
               
@@ -797,7 +797,7 @@ void AIPlayer::decide(int partial, int depth)
       
     default:
       objective.position.x = (random() % IA_FLOBOBAN_DIMX);
-      objective.orientation = (PuyoOrientation)(random() % 4);
+      objective.orientation = (FloboOrientation)(random() % 4);
       break;
   }
 
@@ -810,7 +810,7 @@ static const signed char rotationMatrix[4 /*target*/][4 /*current*/] = {{0,-1,2,
 
 void AIPlayer::cycle()
 {
-  // If no falling puyo, no need to play
+  // If no falling flobo, no need to play
   if (attachedGame->getFallingFlobo() == NULL || !attachedGame->isGameRunning()) 
   {
     return;

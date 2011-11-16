@@ -1,4 +1,4 @@
-/* FloboPuyo
+/* FloboPop
  * Copyright (C) 2004
  *   Florent Boudet        <flobo@ios-software.com>,
  *   Jean-Christophe Hoelt <jeko@ios-software.com>,
@@ -22,9 +22,9 @@
  *
  *
  */
- 
-#ifndef _PUYOIGPDEFS_H
-#define _PUYOIGPDEFS_H
+
+#ifndef _FPIGPDEFS_H
+#define _FPIGPDEFS_H
 
 enum {
     FLOBO_IGP_ALIVE,
@@ -43,5 +43,5 @@ enum {
     FLOBO_IGP_GAME_OVER
 };
 
-#endif // _PUYOIGPDEFS_H
+#endif // _FPIGPDEFS_H
 

@@ -1,6 +1,6 @@
 /*
  *  StatsWidget.cpp
- *  flobopuyo
+ *  flobopop
  *
  *  Created by Florent Boudet on 26/05/08.
  *  Copyright 2008 __MyCompanyName__. All rights reserved.
@@ -21,23 +21,23 @@ StatsResources::StatsResources()
     ring_left = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/ring.png", IMAGE_READ);
     ring_right.reset(ring_left.get()->mirrorH());
     ring_right.reset(ring_left.get()->mirrorH());
-    originalPuyoLeft[0] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_1.png", IMAGE_READ);
-    originalPuyoLeft[1] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_2.png", IMAGE_READ);
-    originalPuyoLeft[2] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_3.png", IMAGE_READ);
-    originalPuyoLeft[3] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_4.png", IMAGE_READ);
-    puyo_left[0][0] = originalPuyoLeft[0];
-    puyo_left[0][1] = originalPuyoLeft[1];
-    puyo_left[0][2] = originalPuyoLeft[2];
-    puyo_left[0][3] = originalPuyoLeft[3];
-    puyo_left_mask = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/puyo_left_mask.png");
+    originalFloboLeft[0] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/flobo_left_1.png", IMAGE_READ);
+    originalFloboLeft[1] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/flobo_left_2.png", IMAGE_READ);
+    originalFloboLeft[2] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/flobo_left_3.png", IMAGE_READ);
+    originalFloboLeft[3] = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/flobo_left_4.png", IMAGE_READ);
+    flobo_left[0][0] = originalFloboLeft[0];
+    flobo_left[0][1] = originalFloboLeft[1];
+    flobo_left[0][2] = originalFloboLeft[2];
+    flobo_left[0][3] = originalFloboLeft[3];
+    flobo_left_mask = theCommander->getSurface(IMAGE_RGBA, "gfx/progressbar/flobo_left_mask.png");
     for (int i=0; i<4; ++i)
-        puyo_right[0][i] = puyo_left[0][i]->mirrorH();
-    puyo_right_mask.reset(puyo_left_mask.get()->mirrorH());
+        flobo_right[0][i] = flobo_left[0][i]->mirrorH();
+    flobo_right_mask.reset(flobo_left_mask.get()->mirrorH());
 
     for (int i = 0 ; i < 4 ; i++) {
 		for (int j=1; j<4; ++j) {
-			puyo_left[j][i] = puyo_left[0][i]->shiftHue(30.*j, puyo_left_mask);
-			puyo_right[j][i] = puyo_right[0][i]->shiftHue(30.*j, puyo_right_mask.get());
+			flobo_left[j][i] = flobo_left[0][i]->shiftHue(30.*j, flobo_left_mask);
+			flobo_right[j][i] = flobo_right[0][i]->shiftHue(30.*j, flobo_right_mask.get());
 		}
 	}
     separator = theCommander->getSurface(IMAGE_RGBA, "gfx/separator.png");
@@ -55,8 +55,8 @@ StatsResources::~StatsResources()
     for (int i = 0 ; i < 4 ; i++) {
         for (int j = 0 ; j < 4 ; j++) {
             if (i != 0) // Not deleting the original images since they come from the resource manager
-                delete puyo_left[i][j];
-            delete puyo_right[i][j];
+                delete flobo_left[i][j];
+            delete flobo_right[i][j];
         }
     }
 }
@@ -138,16 +138,16 @@ void ProgressBarWidget::draw(DrawTarget *dt)
         }
         dt->draw(m_res.rope_elt, NULL, &dstrect);
     }
-    dstrect.w = m_res.puyo_right[0][0]->w;
-    dstrect.h = m_res.puyo_right[0][0]->h;
+    dstrect.w = m_res.flobo_right[0][0]->w;
+    dstrect.h = m_res.flobo_right[0][0]->h;
     dstrect.y = bpos.y;
     if (m_dir == LEFT_TO_RIGHT) {
         dstrect.x = bpos.x + rope_size + IMG_RING_WIDTH - 4;
-        dt->draw(m_res.puyo_right[m_colorIndex][m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)], NULL, &dstrect);
+        dt->draw(m_res.flobo_right[m_colorIndex][m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)], NULL, &dstrect);
     }
     else {
         dstrect.x = bpos.x + bsize.x - rope_size - IMG_RING_WIDTH - IMG_FLOBO_WIDTH + 4;
-        dt->draw(m_res.puyo_left[m_colorIndex][m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)], NULL, &dstrect);
+        dt->draw(m_res.flobo_left[m_colorIndex][m_progressive ? (fmod(m_t, 0.120) > 0.06 ? 0 : 1) : (m_positiveAttitude ? 2 : 3)], NULL, &dstrect);
     }
 }
 

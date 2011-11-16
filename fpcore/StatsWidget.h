@@ -1,6 +1,6 @@
 /*
  *  StatsWidget.h
- *  flobopuyo
+ *  flobopop
  *
  *  Created by Florent Boudet on 26/05/08.
  *  Copyright 2008 __MyCompanyName__. All rights reserved.
@@ -42,12 +42,12 @@ class StatsResources {
 public:
     IosSurfaceRef rope_elt;
     IosSurfaceRef ring_left;
-    IosSurfaceRef originalPuyoLeft[4];
+    IosSurfaceRef originalFloboLeft[4];
     std::auto_ptr<IosSurface> ring_right;
-    IosSurface * puyo_right[4][4];
-    IosSurface *puyo_left[4][4];
-    IosSurfaceRef puyo_left_mask;
-    std::auto_ptr<IosSurface> puyo_right_mask;
+    IosSurface * flobo_right[4][4];
+    IosSurface *flobo_left[4][4];
+    IosSurfaceRef flobo_left_mask;
+    std::auto_ptr<IosSurface> flobo_right_mask;
     IosSurfaceRef stats_bg_winner;
     std::auto_ptr<IosSurface> stats_bg_loser;
     IosSurfaceRef separator;

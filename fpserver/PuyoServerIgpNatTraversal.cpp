@@ -2,7 +2,7 @@
 #include "ios_igpmessage.h"
 #include "ios_udpmessage.h"
 #include "PuyoServerIgpNatTraversal.h"
-#include "PuyoIgpDefs.h"
+#include "FPIGPDefs.h"
 #include "ios_time.h"
 
 class PuyoIgpNatTraversal::PunchPool {

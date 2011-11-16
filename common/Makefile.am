@@ -1,1 +1,1 @@
-EXTRA_DIST=PuyoIgpDefs.h
+EXTRA_DIST=FPIGPDefs.h

@@ -7,7 +7,7 @@
 #include <SDL_main.h>
 #endif
 
-#include "PuyoMain.h"
+#include "FPMain.h"
 #include "ios_exception.h"
 #include "ios_memory.h"
 #include "ios_filepath.h"
@@ -61,7 +61,7 @@ static void displayExceptionMessage(const char * msg)
 
 static void help()
 {
-    cout << "usage: ./flobopuyo [options]" << endl;
+    cout << "usage: ./flobopop [options]" << endl;
     cout << endl;
     cout << "options are:" << endl;
     cout << "  -win                          enable windowed mode" << endl;
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
     else
         dataDir = DATADIR;
 
-    PuyoMain fp(dataDir, fs, maxPackNumber);
+    FPMain fp(dataDir, fs, maxPackNumber);
     try {
         if (gsl_screen != NULL)
             fp.debug_gsl(gsl_screen);

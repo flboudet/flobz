@@ -8,11 +8,11 @@
 #include "drawcontext.h"
 #include "CompositeDrawContext.h"
 
-class PuyoMain : NotificationResponder
+class FPMain : NotificationResponder
 {
 public:
-    PuyoMain(String dataDir, bool fullscreen, int maxDataPackNumber=-1);
-    virtual ~PuyoMain();
+    FPMain(String dataDir, bool fullscreen, int maxDataPackNumber=-1);
+    virtual ~FPMain();
     void run();
     void connect_ia(String params);
     void debug_gsl(String gsl_script);

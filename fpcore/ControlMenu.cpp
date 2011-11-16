@@ -1,5 +1,5 @@
 #include "ControlMenu.h"
-#include "PuyoStrings.h"
+#include "FPStrings.h"
 
 using namespace event_manager;
 

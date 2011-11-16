@@ -52,7 +52,7 @@ public:
     std::string description;
     std::string localizedDescription;
     std::string path;
-    FloboThemeDescription puyoThemeDescriptions[NUMBER_OF_FLOBOS_IN_SET];
+    FloboThemeDescription floboThemeDescriptions[NUMBER_OF_FLOBOS_IN_SET];
 };
 
 class FlobobanThemeDefinition {
@@ -179,7 +179,7 @@ public:
     virtual const FloboTheme & getFloboTheme(FloboState state) const;
 private:
     const FloboSetThemeDescription &m_desc;
-    std::auto_ptr<FloboTheme> m_puyoThemes[NUMBER_OF_FLOBOS_IN_SET];
+    std::auto_ptr<FloboTheme> m_floboThemes[NUMBER_OF_FLOBOS_IN_SET];
     FloboSetTheme *m_defaultTheme;
 };
 
@@ -273,11 +273,11 @@ private:
 
     static const char * s_themeFolderExtension;
 
-    static const char *s_key_PuyoFace[NUMBER_OF_FLOBOS_IN_SET];
-    static const char *s_key_PuyoDisappear[NUMBER_OF_FLOBOS_IN_SET];
-    static const char *s_key_PuyoExplosion[NUMBER_OF_FLOBOS_IN_SET];
-    static const char *s_key_PuyoEye[NUMBER_OF_FLOBOS_IN_SET];
-    static const char *s_key_PuyoColorOffset[NUMBER_OF_FLOBOS_IN_SET];
+    static const char *s_key_FloboFace[NUMBER_OF_FLOBOS_IN_SET];
+    static const char *s_key_FloboDisappear[NUMBER_OF_FLOBOS_IN_SET];
+    static const char *s_key_FloboExplosion[NUMBER_OF_FLOBOS_IN_SET];
+    static const char *s_key_FloboEye[NUMBER_OF_FLOBOS_IN_SET];
+    static const char *s_key_FloboColorOffset[NUMBER_OF_FLOBOS_IN_SET];
 
     DataPathManager &m_dataPathManager;
     std::string m_themePackLoadingPath;

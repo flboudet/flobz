@@ -90,13 +90,13 @@ static bool readLine(DataInputStream *dictionaryFile, String &lineRead)
 }
 
 /* English is the default */
-#define kPuyoDefaultPreferedLanguage "en"
+#define kDefaultPreferedLanguage "en"
 /* Additionnaly we'll try at most 10 user languages */
-#ifndef kPuyoMaxPreferedLanguage
-#define kPuyoMaxPreferedLanguage 10
+#ifndef kMaxPreferedLanguage
+#define kMaxPreferedLanguage 10
 #endif
 
-char *PreferedLocales[kPuyoMaxPreferedLanguage+1]; // +1 for the default one
+char *PreferedLocales[kMaxPreferedLanguage+1]; // +1 for the default one
 int   PreferedLocalesCount = 0;
 static bool  systemInitiated = false;
 
@@ -118,7 +118,7 @@ void Locales_Init()
 
     prefArray = (CFArrayRef) CFPreferencesCopyValue(CFSTR("AppleLanguages"), kCFPreferencesAnyApplication, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
     PreferedLocalesCount = (prefArray ? CFArrayGetCount(prefArray) : 0);
-    if (PreferedLocalesCount > kPuyoMaxPreferedLanguage) PreferedLocalesCount = kPuyoMaxPreferedLanguage;
+    if (PreferedLocalesCount > kMaxPreferedLanguage) PreferedLocalesCount = kMaxPreferedLanguage;
 
     for (i = 0; i < PreferedLocalesCount; i++) {
         localeIdentifier = (CFStringRef)CFArrayGetValueAtIndex(prefArray, i);
@@ -173,7 +173,7 @@ void Locales_Init()
 #endif /* MACOSX */
 
     /* Finally set the default language (the reason for the +1 in PreferedLocales declaration) */
-    PreferedLocales[PreferedLocalesCount] = strdup(kPuyoDefaultPreferedLanguage);
+    PreferedLocales[PreferedLocalesCount] = strdup(kDefaultPreferedLanguage);
     PreferedLocalesCount++;
 
 #ifdef DEBUG

@@ -24,7 +24,7 @@
  */
 
 #include "NetworkGameView.h"
-#include "PuyoIgpDefs.h"
+#include "FPIGPDefs.h"
 #include "GTLog.h"
 #include <memory>
 
@@ -53,9 +53,9 @@ Message *NetworkGameView::createStateMessage(bool sendFullMessage)
     message->addInt     (FPNetMessage::CURRENT_NEUTRALS, attachedGame->getNeutralFlobos());
 
     if (sendFullMessage) {
-        int puyoCount = attachedGame->getFloboCount();
-        AdvancedBuffer<int> buffer(puyoCount * 4);
-        for (int i = 0 ; i < puyoCount ; i++) {
+        int floboCount = attachedGame->getFloboCount();
+        AdvancedBuffer<int> buffer(floboCount * 4);
+        for (int i = 0 ; i < floboCount ; i++) {
             Flobo *currentFlobo = attachedGame->getFloboAtIndex(i);
             buffer.add(currentFlobo->getID());
             buffer.add(currentFlobo->getFloboState());
@@ -207,13 +207,13 @@ void NetworkGameView::companionDidTurn(Flobo *companionFlobo, Flobo *fallingFlob
     compTurnBuffer.add(counterclockwise);
 }
 
-void NetworkGameView::floboDidFall(Flobo *puyo, int originX, int originY, int nFalledBelow)
+void NetworkGameView::floboDidFall(Flobo *flobo, int originX, int originY, int nFalledBelow)
 {
-    GameView::floboDidFall(puyo, originX, originY, nFalledBelow);
-    didFallBuffer.add(puyo->getID());
-    didFallBuffer.add(puyo->getFloboState());
-    didFallBuffer.add(puyo->getFloboX());
-    didFallBuffer.add(puyo->getFloboY());
+    GameView::floboDidFall(flobo, originX, originY, nFalledBelow);
+    didFallBuffer.add(flobo->getID());
+    didFallBuffer.add(flobo->getFloboState());
+    didFallBuffer.add(flobo->getFloboX());
+    didFallBuffer.add(flobo->getFloboY());
     didFallBuffer.add(originX);
     didFallBuffer.add(originY);
     didFallBuffer.add(nFalledBelow);

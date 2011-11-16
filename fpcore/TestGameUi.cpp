@@ -62,13 +62,13 @@ Screen *pscr;
 
 FramePicture *windowFramePict;
 
-class TestPuyoStatsAction : public Action {
+class TestFloboStatsAction : public Action {
 public:
     virtual void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
 };
 
-void TestPuyoStatsAction::action(Widget *sender, int actionType, GameControlEvent *event)
+void TestFloboStatsAction::action(Widget *sender, int actionType, GameControlEvent *event)
 {
     PlayerGameStat stats;
     GameUIDefaults::SCREEN_STACK->top()->add(new StatsWidget(stats, windowFramePict, LEFT_TO_RIGHT));
@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
     //frame.setPreferedSize(Vec3(100, 100));
     FramedButton framedButton1("Hi1", NULL, &fpict2, &fpict3);
     Button bidonButton1("Hi2", &showDialogAction);
-    TestPuyoStatsAction statsAction;
+    TestFloboStatsAction statsAction;
     Button bidonButton2("Stats", &statsAction);
     Button bidonButton3("Hop");
     FramedEditField bidonField("toto", NULL, &fpict2, &fpict2);

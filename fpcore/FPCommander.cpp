@@ -2,7 +2,7 @@
 
 #include "GTLog.h"
 #include "FPCommander.h"
-#include "PuyoStrings.h"
+#include "FPStrings.h"
 #include "audio.h"
 #include "MainMenu.h"
 #include "AnimatedFloboTheme.h"
@@ -145,7 +145,7 @@ void LevelThemeFactory::destroy(LevelTheme *res)
  */
 void SinglePlayerGameAction::action()
 {
-  /*PuyoStarter *starter = new StoryModeStarter(theCommander, 5, FLOBO, 0);
+  /*FloboStarter *starter = new StoryModeStarter(theCommander, 5, FLOBO, 0);
   starter->run(0,0,0,0,0);
   GameUIDefaults::SCREEN_STACK->push(starter);*/
 }

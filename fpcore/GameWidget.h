@@ -83,7 +83,7 @@ public:
         this->gameOverAction = gameOverAction;
     }
     //
-    virtual std::vector<VisualFX*> &getVisualFX()  { return puyoFX; }
+    virtual std::vector<VisualFX*> &getVisualFX()  { return floboFX; }
 public:
     virtual void setGameOptions(GameOptions options) = 0;
     //
@@ -111,7 +111,7 @@ public:
 protected:
     gameui::Action *gameOverAction;
     GameScreen *associatedScreen;
-    std::vector<VisualFX*> puyoFX;
+    std::vector<VisualFX*> floboFX;
 };
 
 /**

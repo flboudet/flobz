@@ -67,7 +67,7 @@ public:
     void setShowEyes(bool show) { m_displayEyes = show; }
 private:
     AdvancedBuffer<FloboAnimation *> animationQueue;
-    int puyoEyeState;
+    int floboEyeState;
     unsigned int smallTicksCount;
     bool visibilityFlag;
     GameView *attachedView;
@@ -89,7 +89,7 @@ public:
     void cycleWalhalla();
     void setShowEyes(bool show) { m_showEyes = show; }
 private:
-    AdvancedBuffer<Flobo *> puyoWalhalla;
+    AdvancedBuffer<Flobo *> floboWalhalla;
     GameView *attachedView;
     FloboSetTheme *attachedThemeSet;
     bool m_showEyes;

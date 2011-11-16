@@ -167,13 +167,13 @@ typedef ResourceManager<FloboSetTheme> FloboSetThemeResourceManager;
 typedef ResourceReference<LevelTheme> LevelThemeRef;
 typedef ResourceManager<LevelTheme> LevelThemeResourceManager;
 
-class PuyoApplicationState
+class FPApplicationState
 {
 public:
     enum UIState {
 		IN_GAME, IN_MENU
 	};
-	PuyoApplicationState() : ui(IN_MENU), difficulty(0), level(0), playerScore(0) {}
+	FPApplicationState() : ui(IN_MENU), difficulty(0), level(0), playerScore(0) {}
 
 	UIState ui;
 	int difficulty;
@@ -255,8 +255,8 @@ class FPCommander
     const String &getLocalizedFontName() const { return m_localizedFontName; }
 
 	// Application state
-	const PuyoApplicationState &appState() const { return m_appState; }
-	PuyoApplicationState &appState() { return m_appState; }
+	const FPApplicationState &appState() const { return m_appState; }
+	FPApplicationState &appState() { return m_appState; }
 
   protected:
     // Resource manager factory
@@ -327,7 +327,7 @@ protected:
     SoundRef m_whopSound;
 
     AbstractCursor *m_cursor;
-	PuyoApplicationState m_appState;
+	FPApplicationState m_appState;
 
     mutable std::string m_defaultFloboSetThemeName;
     mutable std::string m_defaultLevelThemeName;

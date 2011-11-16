@@ -1,5 +1,5 @@
 #include "InternetBot.h"
-#include "PuyoStrings.h"
+#include "FPStrings.h"
 #include "NetworkGameView.h"
 #include "NetworkGameStarter.h"
 

@@ -24,7 +24,7 @@
  */
 
 #include "ThemeMenu.h"
-#include "PuyoStrings.h"
+#include "FPStrings.h"
 #include "Theme.h"
 
 using namespace event_manager;

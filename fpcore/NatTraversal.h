@@ -30,7 +30,7 @@
 #include "ios_igpmessagebox.h"
 #include "ios_udpmessage.h"
 #include "ios_time.h"
-#include "PuyoIgpDefs.h"
+#include "FPIGPDefs.h"
 #include <unistd.h>
 
 using namespace ios_fc;

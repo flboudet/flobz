@@ -1,6 +1,6 @@
 /*
  *  MainMenu.cpp
- *  flobopuyo
+ *  flobopop
  *
  *  Created by Florent Boudet on 18/11/08.
  *  Copyright 2008 __MyCompanyName__. All rights reserved.
@@ -8,7 +8,7 @@
  */
 
 #include "MainMenu.h"
-#include "PuyoStrings.h"
+#include "FPStrings.h"
 
 MainRealMenu::MainRealMenu(MainScreen * mainScreen) :
 // Create sub screens

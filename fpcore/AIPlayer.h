@@ -45,26 +45,26 @@ typedef enum {
   Above = 1,
   Below = 2,
   Right = 3
-} PuyoOrientation;
+} FloboOrientation;
 
 typedef struct {
   unsigned char x;
   unsigned char y;
-} PuyoCoordinates;
+} FloboCoordinates;
 
 
 typedef struct {
   FloboState falling;
   FloboState companion;
-  PuyoOrientation orientation;
-  PuyoCoordinates position;
-} PuyoBinom;
+  FloboOrientation orientation;
+  FloboCoordinates position;
+} FloboBinom;
 
 typedef struct {
-  int puyoSuppressedPotential;
+  int floboSuppressedPotential;
   int neutralSuppressedPotential;
   int floboGrouped;
-  int puyoSuppressed;
+  int floboSuppressed;
   int neutralSuppressed;
   int height;
 } GridEvaluation;
@@ -82,19 +82,19 @@ class AIPlayer : public virtual GamePlayer {
 	
   private:
     FloboState extractColor(FloboState A) const;
-    PuyoOrientation extractOrientation(int D) const;
-    int revertOrientation(PuyoOrientation D) const;
+    FloboOrientation extractOrientation(int D) const;
+    int revertOrientation(FloboOrientation D) const;
     void extractGrid(void);
     void decide(int partial, int depth);
-    int makeEvaluation(const GridEvaluation * const referenceOne, const PuyoBinom flobos, const GridState * const grid);
-    bool selectIfBetterEvaluation(int * const referenceOne, const GridEvaluation * const newOne, const PuyoBinom flobos, const GridState * const grid);
+    int makeEvaluation(const GridEvaluation * const referenceOne, const FloboBinom flobos, const GridState * const grid);
+    bool selectIfBetterEvaluation(int * const referenceOne, const GridEvaluation * const newOne, const FloboBinom flobos, const GridState * const grid);
 
     GridState * internalGrid;
     int decisionMade;
     bool shouldRedecide;
     int lastNumberOfBadFlobos;
     int totalNumberOfBadFlobos;
-    PuyoBinom objective;
+    FloboBinom objective;
     int lastLineSeen;
     int currentCycle;
     bool readyToDrop;
@@ -102,10 +102,10 @@ class AIPlayer : public virtual GamePlayer {
     AIParameters params;
 	int level;
   
-    PuyoBinom current, next;
+    FloboBinom current, next;
     unsigned int bestl1;
     bool foundOne;
-    PuyoBinom originalPuyo;
+    FloboBinom originalFlobo;
     int bestEvaluation;
   
 };

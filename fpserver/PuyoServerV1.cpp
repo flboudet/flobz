@@ -6,7 +6,7 @@
 #include "ios_memory.h"
 #include "ios_dirigeable.h"
 #include "ios_time.h"
-#include "PuyoIgpDefs.h"
+#include "FPIGPDefs.h"
 
 using namespace ios_fc;
 

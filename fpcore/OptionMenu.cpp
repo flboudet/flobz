@@ -24,7 +24,7 @@
  */
 
 #include "OptionMenu.h"
-#include "PuyoStrings.h"
+#include "FPStrings.h"
 
 MusicPrefSwitch::MusicPrefSwitch()
 : gameui::SwitchedButton(theCommander->getLocalizedString(kMusic), true,

@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef _PUYOINTERNETMENU_H
-#define _PUYOINTERNETMENU_H
+#ifndef _INTERNETMENU_H_
+#define _INTERNETMENU_H_
 
 #include "ios_httpdocument.h"
 #include "ios_igpclient.h"
@@ -54,7 +54,7 @@ class PingableFPServer;
 class PingableFPServerResponder {
 public:
     virtual ~PingableFPServerResponder() {}
-    virtual void puyoServerDidPing(PingableFPServer &server) = 0;
+    virtual void fpServerDidPing(PingableFPServer &server) = 0;
 };
 
 class PingableFPServer : public FPServer, public IdleComponent {
@@ -73,37 +73,37 @@ private:
     bool m_alreadyReported;
 };
 
-class AbstractPuyoMetaServerConnection;
+class AbstractMetaFPServerConnection;
 
-class PuyoMetaServerConnectionResponder {
+class MetaFPServerConnectionResponder {
 public:
-    virtual ~PuyoMetaServerConnectionResponder() {}
-    virtual void PuyoMetaServerListHasChanged(AbstractPuyoMetaServerConnection &metaServerConnection) = 0;
+    virtual ~MetaFPServerConnectionResponder() {}
+    virtual void metaFPServerListHasChanged(AbstractMetaFPServerConnection &metaServerConnection) = 0;
 };
 
-class AbstractPuyoMetaServerConnection {
+class AbstractMetaFPServerConnection {
 public:
-    AbstractPuyoMetaServerConnection(PuyoMetaServerConnectionResponder *responder);
-    virtual ~AbstractPuyoMetaServerConnection() {}
+    AbstractMetaFPServerConnection(MetaFPServerConnectionResponder *responder);
+    virtual ~AbstractMetaFPServerConnection() {}
     virtual void fetch() = 0;
     virtual std::vector<FPServer> getServers() const = 0;
     virtual bool failed() const { return false; }
 protected:
     virtual void onServerListHasChanged();
 private:
-    PuyoMetaServerConnectionResponder *m_responder;
+    MetaFPServerConnectionResponder *m_responder;
 };
 
-class DummyMetaServerConnection : public AbstractPuyoMetaServerConnection {
+class DummyMetaServerConnection : public AbstractMetaFPServerConnection {
 public:
-    DummyMetaServerConnection(PuyoMetaServerConnectionResponder *responder);
+    DummyMetaServerConnection(MetaFPServerConnectionResponder *responder);
     virtual void fetch();
     virtual std::vector<FPServer> getServers() const;
 };
 
-class HttpMetaServerConnection : public AbstractPuyoMetaServerConnection, public IdleComponent {
+class HttpMetaServerConnection : public AbstractMetaFPServerConnection, public IdleComponent {
 public:
-    HttpMetaServerConnection(String hostName, String hostPath, int portNum, PuyoMetaServerConnectionResponder *responder);
+    HttpMetaServerConnection(String hostName, String hostPath, int portNum, MetaFPServerConnectionResponder *responder);
     virtual ~HttpMetaServerConnection();
     virtual void fetch();
     virtual std::vector<FPServer> getServers() const;
@@ -128,18 +128,18 @@ public:
     virtual void FPServerListHasChanged(FPServerList &serverList) = 0;
 };
 
-class FPServerList : public PuyoMetaServerConnectionResponder, public PingableFPServerResponder {
+class FPServerList : public MetaFPServerConnectionResponder, public PingableFPServerResponder {
 public:
     FPServerList(FPServerListResponder *responder);
     virtual ~FPServerList();
     void fetch();
     std::vector<FPServer> getServers();
-    // PuyoMetaServerConnectionResponder implementation
-    virtual void PuyoMetaServerListHasChanged(AbstractPuyoMetaServerConnection &metaServerConnection);
+    // MetaFPServerConnectionResponder implementation
+    virtual void metaFPServerListHasChanged(AbstractMetaFPServerConnection &metaServerConnection);
     // PingableFPServerResponder implementation
-    virtual void puyoServerDidPing(PingableFPServer &server);
+    virtual void fpServerDidPing(PingableFPServer &server);
 private:
-    std::vector<AbstractPuyoMetaServerConnection *> m_metaservers;
+    std::vector<AbstractMetaFPServerConnection *> m_metaservers;
     std::vector<PingableFPServer *> m_servers;
     FPServerListResponder *m_responder;
 	int fetching;
@@ -181,5 +181,5 @@ private:
     FramedButton joinButton, backButton;
 };
 
-#endif // _PUYOINTERNETMENU_H
+#endif // _INTERNETMENU_H_
 

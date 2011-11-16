@@ -34,7 +34,7 @@
 using namespace std;
 
 const char * ThemeManagerImpl::s_themeFolderExtension = ".fptheme";
-const char * ThemeManagerImpl::s_key_PuyoFace[NUMBER_OF_FLOBOS_IN_SET] = {
+const char * ThemeManagerImpl::s_key_FloboFace[NUMBER_OF_FLOBOS_IN_SET] = {
     "floboset.P1.face",
     "floboset.P2.face",
     "floboset.P3.face",
@@ -42,7 +42,7 @@ const char * ThemeManagerImpl::s_key_PuyoFace[NUMBER_OF_FLOBOS_IN_SET] = {
     "floboset.P5.face",
     "floboset.Neutral.face"
 };
-const char * ThemeManagerImpl::s_key_PuyoDisappear[NUMBER_OF_FLOBOS_IN_SET] = {
+const char * ThemeManagerImpl::s_key_FloboDisappear[NUMBER_OF_FLOBOS_IN_SET] = {
     "floboset.P1.disappear",
     "floboset.P2.disappear",
     "floboset.P3.disappear",
@@ -50,7 +50,7 @@ const char * ThemeManagerImpl::s_key_PuyoDisappear[NUMBER_OF_FLOBOS_IN_SET] = {
     "floboset.P5.disappear",
     "floboset.Neutral.face"
 };
-const char * ThemeManagerImpl::s_key_PuyoExplosion[NUMBER_OF_FLOBOS_IN_SET] = {
+const char * ThemeManagerImpl::s_key_FloboExplosion[NUMBER_OF_FLOBOS_IN_SET] = {
     "floboset.P1.explosion",
     "floboset.P2.explosion",
     "floboset.P3.explosion",
@@ -58,7 +58,7 @@ const char * ThemeManagerImpl::s_key_PuyoExplosion[NUMBER_OF_FLOBOS_IN_SET] = {
     "floboset.P5.explosion",
     "floboset.Neutral.face"
 };
-const char * ThemeManagerImpl::s_key_PuyoEye[NUMBER_OF_FLOBOS_IN_SET] = {
+const char * ThemeManagerImpl::s_key_FloboEye[NUMBER_OF_FLOBOS_IN_SET] = {
     "floboset.P1.eye",
     "floboset.P2.eye",
     "floboset.P3.eye",
@@ -66,7 +66,7 @@ const char * ThemeManagerImpl::s_key_PuyoEye[NUMBER_OF_FLOBOS_IN_SET] = {
     "floboset.P5.eye",
     "floboset.Neutral.face"
 };
-const char * ThemeManagerImpl::s_key_PuyoColorOffset[NUMBER_OF_FLOBOS_IN_SET] = {
+const char * ThemeManagerImpl::s_key_FloboColorOffset[NUMBER_OF_FLOBOS_IN_SET] = {
     "floboset.P1.offset",
     "floboset.P2.offset",
     "floboset.P3.offset",
@@ -178,12 +178,12 @@ void ThemeManagerImpl::end_floboset(GoomSL *gsl, GoomHash *global,
     newThemeDescription.path = themeMgr->m_themePackLoadingPath;
     for (int i = 0 ; i < NUMBER_OF_FLOBOS_IN_SET ; i++) {
         FloboThemeDescription &currentFloboThemeDescription =
-            newThemeDescription.puyoThemeDescriptions[i];
-        currentFloboThemeDescription.face =      (const char *)GSL_GLOBAL_PTR(gsl, s_key_PuyoFace[i]);
-        currentFloboThemeDescription.disappear = (const char *)GSL_GLOBAL_PTR(gsl, s_key_PuyoDisappear[i]);
-        currentFloboThemeDescription.explosion = (const char *)GSL_GLOBAL_PTR(gsl, s_key_PuyoExplosion[i]);
-        currentFloboThemeDescription.eye =       (const char *)GSL_GLOBAL_PTR(gsl, s_key_PuyoEye[i]);
-        currentFloboThemeDescription.colorOffset = GSL_GLOBAL_FLOAT(gsl, s_key_PuyoColorOffset[i]);
+            newThemeDescription.floboThemeDescriptions[i];
+        currentFloboThemeDescription.face =      (const char *)GSL_GLOBAL_PTR(gsl, s_key_FloboFace[i]);
+        currentFloboThemeDescription.disappear = (const char *)GSL_GLOBAL_PTR(gsl, s_key_FloboDisappear[i]);
+        currentFloboThemeDescription.explosion = (const char *)GSL_GLOBAL_PTR(gsl, s_key_FloboExplosion[i]);
+        currentFloboThemeDescription.eye =       (const char *)GSL_GLOBAL_PTR(gsl, s_key_FloboEye[i]);
+        currentFloboThemeDescription.colorOffset = GSL_GLOBAL_FLOAT(gsl, s_key_FloboColorOffset[i]);
     }
     themeMgr->m_floboSetThemeList.push_back(themeName);
 }
@@ -278,16 +278,16 @@ FloboSetThemeImpl::FloboSetThemeImpl(const FloboSetThemeDescription &desc,
 {
     for (int i = 0 ; i < NUMBER_OF_FLOBOS_IN_SET-1 ; i++) {
         if (m_defaultTheme == NULL)
-            m_puyoThemes[i].reset(new FloboThemeImpl(desc.puyoThemeDescriptions[i], desc.path));
+            m_floboThemes[i].reset(new FloboThemeImpl(desc.floboThemeDescriptions[i], desc.path));
         else {
-            m_puyoThemes[i].reset(new FloboThemeImpl(desc.puyoThemeDescriptions[i], desc.path, &(m_defaultTheme->getFloboTheme((FloboState)i))));
+            m_floboThemes[i].reset(new FloboThemeImpl(desc.floboThemeDescriptions[i], desc.path, &(m_defaultTheme->getFloboTheme((FloboState)i))));
         }
     }
-    // Neutral puyo is a special case
+    // Neutral flobo is a special case
     if (m_defaultTheme == NULL)
-        m_puyoThemes[NUMBER_OF_FLOBOS_IN_SET-1].reset(new NeutralFloboThemeImpl(desc.puyoThemeDescriptions[NUMBER_OF_FLOBOS_IN_SET-1], desc.path));
+        m_floboThemes[NUMBER_OF_FLOBOS_IN_SET-1].reset(new NeutralFloboThemeImpl(desc.floboThemeDescriptions[NUMBER_OF_FLOBOS_IN_SET-1], desc.path));
     else
-        m_puyoThemes[NUMBER_OF_FLOBOS_IN_SET-1].reset(new NeutralFloboThemeImpl(desc.puyoThemeDescriptions[NUMBER_OF_FLOBOS_IN_SET-1], desc.path, &(m_defaultTheme->getFloboTheme(FLOBO_NEUTRAL))));
+        m_floboThemes[NUMBER_OF_FLOBOS_IN_SET-1].reset(new NeutralFloboThemeImpl(desc.floboThemeDescriptions[NUMBER_OF_FLOBOS_IN_SET-1], desc.path, &(m_defaultTheme->getFloboTheme(FLOBO_NEUTRAL))));
 }
 
 const std::string & FloboSetThemeImpl::getName() const
@@ -315,21 +315,21 @@ const FloboTheme & FloboSetThemeImpl::getFloboTheme(FloboState state) const
     switch (state) {
     case FLOBO_FALLINGBLUE:
     case FLOBO_BLUE:
-        return *m_puyoThemes[0];
+        return *m_floboThemes[0];
     case FLOBO_FALLINGRED:
     case FLOBO_RED:
-        return *m_puyoThemes[1];
+        return *m_floboThemes[1];
     case FLOBO_FALLINGGREEN:
     case FLOBO_GREEN:
-        return *m_puyoThemes[2];
+        return *m_floboThemes[2];
     case FLOBO_FALLINGVIOLET:
     case FLOBO_VIOLET:
-        return *m_puyoThemes[3];
+        return *m_floboThemes[3];
     case FLOBO_FALLINGYELLOW:
     case FLOBO_YELLOW:
-        return *m_puyoThemes[4];
+        return *m_floboThemes[4];
     default:
-        return *m_puyoThemes[5];
+        return *m_floboThemes[5];
     }
 }
 
@@ -378,7 +378,7 @@ IosSurface *FloboThemeImpl::getFloboSurfaceForValence(int valence, int compressi
         // Do we need to load the uncompressed image?
         if (uncompressed == NULL) {
             ostringstream osstream;
-            osstream << m_path << "/" << m_desc.face << "-puyo-"
+            osstream << m_path << "/" << m_desc.face << "-flobo-"
                      << ((valence&8)>>3)
                      << ((valence&4)>>2)
                      << ((valence&2)>>1)
@@ -422,7 +422,7 @@ IosSurface *FloboThemeImpl::getEyeSurfaceForIndex(int index, int compression) co
         // Do we need to load the uncompressed image?
         if (uncompressed == NULL) {
             ostringstream osstream;
-            osstream << m_path << "/" << m_desc.eye << "-puyo-eye-" << index << ".png";
+            osstream << m_path << "/" << m_desc.eye << "-flobo-eye-" << index << ".png";
             ImageOperationList opList;
             opList.resizeAlpha = true;
             m_baseEyes[index] = theCommander->getSurface(IMAGE_RGBA,
@@ -451,7 +451,7 @@ IosSurface *FloboThemeImpl::getCircleSurfaceForIndex(int index) const
         // Do we need to load the reference image?
         if (m_baseCircle.get() == NULL) {
             ostringstream osstream;
-            osstream << m_path << "/" << m_desc.face << "-puyo-border.png";
+            osstream << m_path << "/" << m_desc.face << "-flobo-border.png";
             ImageOperationList opList;
             opList.setValue = true;
             m_baseCircle = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
@@ -472,7 +472,7 @@ IosSurface *FloboThemeImpl::getShadowSurface(int compression) const
         // Do we need to load the uncompressed image?
         if (uncompressed == NULL) {
             ostringstream osstream;
-            osstream << m_path << "/" << m_desc.face << "-puyo-shadow.png";
+            osstream << m_path << "/" << m_desc.face << "-flobo-shadow.png";
             ImageOperationList opList;
             opList.resizeAlpha = true;
             m_baseShadow = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
@@ -497,7 +497,7 @@ IosSurface *FloboThemeImpl::getShrinkingSurfaceForIndex(int index) const
     IosSurface *ref = m_shrinking[index];
     if (ref == NULL) {
         ostringstream osstream;
-        osstream << m_path << "/" << m_desc.face << "-puyo-disappear-" << index << ".png";
+        osstream << m_path << "/" << m_desc.face << "-flobo-disappear-" << index << ".png";
         ImageOperationList opList;
         if (m_desc.colorOffset == 0) {
             m_baseShrinking[index] = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
@@ -520,7 +520,7 @@ IosSurface *FloboThemeImpl::getExplodingSurfaceForIndex(int index) const
     IosSurface *ref = m_explosion[index];
     if (ref == NULL) {
         ostringstream osstream;
-        osstream << m_path << "/" << m_desc.face << "-puyo-explosion-" << index << ".png";
+        osstream << m_path << "/" << m_desc.face << "-flobo-explosion-" << index << ".png";
         ImageOperationList opList;
         if (m_desc.colorOffset == 0) {
             m_baseExplosion[index] = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
