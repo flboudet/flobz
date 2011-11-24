@@ -11,12 +11,13 @@ libgametools_la_CXXFLAGS = -I$(top_srcdir)/iosfc $(SDL_CFLAGS) $(AM_CXXFLAGS) $(
 
 EXTRA_DIST=GTLog.h FramedButton.h FramedEditField.h Frame.h \
            GameControls.h GameCursor.h gameloop.h \
-           gameui.h GameStateMachine.h \
+           gameui.h GameStateMachine.h DataPathManager.h \
            ListView.h mt19937ar.h NotifyCenter.h \
            RadioButton.h scrollingtext.h \
            SwitchedButton.h vec3.h \
            drawcontext.h audiomanager.h BufferedDrawTarget.h \
            CompositeDrawContext.h PreferencesManager.h \
-	   PosixPreferencesManager.h
+	   PosixPreferencesManager.h rgba.h ResourceManager.h \
+	   ThreadedResourceManager.h
 
 SUBDIRS=sdl_drawcontext opengl_drawcontext

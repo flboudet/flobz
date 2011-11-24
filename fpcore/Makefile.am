@@ -27,8 +27,8 @@ libfpcore_la_CXXFLAGS = -I$(top_srcdir)/common -I$(top_srcdir)/iosfc -I$(top_src
 
 EXTRA_DIST=EventPlayer.h NetworkGameView.h \
            AnimatedFlobo.h FloboGameAbstract.h OptionMenu.h \
-           FloboGame.h PauseMenu.h \
-           audio.h GameWidget.h GameScreen.h Player.h \
+           AnimatedFloboTheme.h FloboGame.h PauseMenu.h \
+           audio.h GameWidget.h GameScreen.h GamePlayer.h \
            AIPlayer.h Scoring.h FPMain.h \
            ScreenTransition.h SoloGameStarter.h \
            HallOfFame.h InternetGameCenter.h StoryModeStarter.h \

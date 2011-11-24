@@ -20,7 +20,7 @@ EXTRA_DIST=ios_datagramsocket.h ios_dirigeable.h \
            ios_ptr.h ios_sdlsocketimpl.h ios_selectable.h \
            ios_selector.h ios_server.h ios_serversocket.h \
            ios_socketaddress.h ios_socket.h ios_fastmessage.h ios_standardmessage.h \
-           ios_stream.h ios_thread.h ios_time.h ios_translator.h \
+           ios_stream.h ios_thread.h ios_time.h ios_translator.h ios_mutex.h \
            ios_udpmessagebox.h ios_udpmessageboxbase.h ios_udpmessage.h ios_vector.h \
            google/sparse_hash_set google/sparsetable \
            google/dense_hash_map google/type_traits.h \

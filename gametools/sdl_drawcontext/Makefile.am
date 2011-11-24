@@ -30,4 +30,6 @@ libsdl13_drawcontext_la_CXXFLAGS = -I$(srcdir)/common -I$(srcdir)/sdl13 -I$(top_
 endif
 
 
-EXTRA_DIST=common/SDL_IosFont.h common/SDL_AudioManager.h common/SDL_InputSwitch.h common/IosImgProcess.h sdl12/sdl12_drawcontext.h sdl12/sdl12_eventmanager.h sdl13/sdl13_drawcontext.h sdl13/sdl13_eventmanager.h
+EXTRA_DIST=common/SDL_IosFont.h common/SDL_AudioManager.h common/SDL_InputSwitch.h common/IosImgProcess.h sdl12/sdl12_drawcontext.h sdl12/sdl12_eventmanager.h sdl13/sdl13_drawcontext.h sdl13/sdl13_eventmanager.h \
+	sdl12/sdl12_opengl_drawcontext.h
+

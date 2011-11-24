@@ -26,7 +26,7 @@ endif
 
 flobopop_LDADD+=$(SDL_LIBS) -lpng
 
-SUBDIRS = iosfc gametools goomsl common fpcore data fpserver
+SUBDIRS = iosfc gametools goomsl common fpcore data fpserver mobile
 
 if MACOSX
 SUBDIRS+=mac
