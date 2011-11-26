@@ -285,9 +285,9 @@ IosSurface *SDL12_IosSurface::setValue(float value)
     return new SDL12_IosSurface(iim_sdlsurface_set_value(m_surf, value));
 }
 
-IosSurface *SDL12_IosSurface::setAlpha(float value)
+IosSurface *SDL12_IosSurface::setAlpha(float alpha)
 {
-    return NULL; // TODO: IMPLEMENT
+    return new SDL12_IosSurface(iim_sdlsurface_set_alpha(m_surf, alpha));
 }
 
 IosSurface * SDL12_IosSurface::resizeAlpha(int width, int height)

@@ -67,6 +67,11 @@ SDL_Surface *iim_sdlsurface_shift_hue_masked(SDL_Surface *src, SDL_Surface *mask
 SDL_Surface *iim_sdlsurface_set_value(SDL_Surface *src, float value);
 
 /**
+ * Change the alpha (transparency) of each pixel in a surface
+ */
+SDL_Surface *iim_sdlsurface_set_alpha(SDL_Surface *src, float alpha);
+
+/**
 * Resize a surface
  */
 SDL_Surface *iim_sdlsurface_resize(SDL_Surface *src, int width, int height);

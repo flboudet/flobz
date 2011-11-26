@@ -449,6 +449,33 @@ SDL_Surface *iim_sdlsurface_set_value(SDL_Surface *src, float value)
 }
 
 /**
+ * Change the alpha (transparency) of each pixel in a surface
+ */
+SDL_Surface *iim_sdlsurface_set_alpha(SDL_Surface *src, float alpha)
+{
+    SDL_PixelFormat *fmt = src->format;
+    SDL_Surface *ret = SDL_CreateRGBSurface(src->flags, src->w, src->h, 32,
+                                            fmt->Rmask, fmt->Gmask,
+                                            fmt->Bmask, fmt->Amask);
+    bool srclocked = false;
+    if(SDL_MUSTLOCK(src)) srclocked = (SDL_LockSurface(src) == 0);
+    bool retlocked = false;
+    if(SDL_MUSTLOCK(ret)) retlocked = (SDL_LockSurface(ret) == 0);
+    for (int y=src->h; y--;)
+    {
+        for (int x=src->w; x--;)
+        {
+            RGBA rgba = iim_surface_get_rgba(src,x,y);
+            rgba.alpha *= alpha;
+            iim_surface_set_rgba(ret,x,y,rgba);
+        }
+    }
+    if(retlocked) SDL_UnlockSurface(ret);
+    if(srclocked) SDL_UnlockSurface(src);
+    return ret;
+}
+
+/**
 * Resize a surface
  */
 SDL_Surface *iim_sdlsurface_resize(SDL_Surface *src, int width, int height)
