@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef _FLOBO_GAME_WIDGET_H
-#define _FLOBO_GAME_WIDGET_H
+#ifndef _GAME_WIDGET_H
+#define _GAME_WIDGET_H
 
 #include "gameui.h"
 #include "FloboGame.h"
@@ -30,6 +30,32 @@
 #include "CheatCodeManager.h"
 #include "Theme.h"
 #include "Story.h"
+
+
+class StyrolysePainterClient
+{
+    public:
+    StyrolysePainterClient(LevelTheme *theme);
+    virtual ~StyrolysePainterClient();
+    void update();
+    void draw(DrawTarget *dt);
+private:
+    struct ExtendedClient {
+        StyrolyseClient m_styroClient;
+        DrawTarget *m_painter;
+        LevelTheme *m_theme;
+    };
+    ExtendedClient m_client;
+    Styrolyse *m_animation;
+private:
+    // Styrolyse methods
+    static void *styro_loadImage(StyrolyseClient *_this, const char *path);
+    static void styro_drawImage(StyrolyseClient *_this,
+                                void *image, int x, int y, int w, int h,
+                                int clipx, int clipy, int clipw, int cliph, int flipped, float scaleX, float scaleY);
+    static void styro_freeImage(StyrolyseClient *_this, void *image);
+};
+
 
 /**
  * The standard difficulty levels, affecting the speed of the game
@@ -109,6 +135,11 @@ public:
     virtual void addGameBHandicap(int handicap) = 0;
     virtual bool isGameARunning() const = 0;
 protected:
+    void setLevelTheme(LevelTheme *levelTheme);
+    std::auto_ptr<StyrolysePainterClient> m_styroPainter;
+protected:
+    LevelTheme *m_levelTheme;
+protected:
     gameui::Action *gameOverAction;
     GameScreen *associatedScreen;
     std::vector<VisualFX*> floboFX;
@@ -175,17 +206,10 @@ public:
     virtual void actionAfterGameOver(bool fromControls, int actionType);
 
 protected:
-    // Styrolyse methods
-    static void *styro_loadImage(StyrolyseClient *_this, const char *path);
-    static void styro_drawImage(StyrolyseClient *_this,
-				void *image, int x, int y, int w, int h,
-				int clipx, int clipy, int clipw, int cliph, int flipped, float scaleX, float scaleY);
-    static void styro_freeImage(StyrolyseClient *_this, void *image);
 
     bool withGUI;
     DrawTarget &painter;
     IosSurface *painterGameScreen;
-    LevelTheme *attachedLevelTheme;
     GameView *areaA, *areaB;
     GamePlayer *controllerA, *controllerB;
     FloboGame *attachedGameA, *attachedGameB;
@@ -206,14 +230,6 @@ protected:
     std::vector<gameui::Widget *> m_subwidgets;
     bool skipGameCycleA, skipGameCycleB;
     double gameOverDate;
-    // Foreground animation
-    struct StyrolysePainterClient {
-      StyrolyseClient m_styroClient;
-      DrawTarget *m_painter;
-      LevelTheme *m_theme;
-    };
-    Styrolyse *m_foregroundAnimation;
-    StyrolysePainterClient m_styroPainter;
     bool m_displayPlayerOneName, m_displayPlayerTwoName;
     void priv_initialize();
 };
@@ -221,5 +237,5 @@ protected:
 // Should be moved elsewhere
 extern std::vector<VisualFX*> *activeFX;
 
-#endif // _FLOBO_GAME_WIDGET_H
+#endif // _GAME_WIDGET_H
 

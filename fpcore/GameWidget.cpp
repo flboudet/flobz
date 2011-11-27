@@ -48,6 +48,89 @@ static int readFileFunction(StyrolyseClient *_this, void *buffer, void *file, in
     return s->streamRead(buffer, read_size);
 }
 
+
+
+StyrolysePainterClient::StyrolysePainterClient(LevelTheme *theme)
+{
+    // Initializing the styrolyse client
+    m_client.m_styroClient.loadImage = styro_loadImage;
+    m_client.m_styroClient.drawImage = styro_drawImage;
+    m_client.m_styroClient.freeImage = styro_freeImage;
+    m_client.m_styroClient.putText   = NULL;
+    m_client.m_styroClient.getText   = NULL;
+    m_client.m_styroClient.music = NULL;
+    m_client.m_styroClient.playSound = NULL;
+    m_client.m_styroClient.resolveFilePath = NULL;
+    m_client.m_styroClient.openFile = openFileFunction;
+    m_client.m_styroClient.closeFile = closeFileFunction;
+    m_client.m_styroClient.readFile = readFileFunction;
+    m_client.m_painter = NULL;
+    m_client.m_theme = theme;
+    // Initialize the animation
+    m_animation = styrolyse_new(theme->getForegroundAnimation().c_str(),
+                                &(m_client.m_styroClient), false);
+}
+
+StyrolysePainterClient::~StyrolysePainterClient()
+{
+    styrolyse_free(m_animation);
+}
+
+void StyrolysePainterClient::update()
+{
+    styrolyse_update(m_animation, 0.);
+}
+
+void StyrolysePainterClient::draw(DrawTarget *dt)
+{
+    m_client.m_painter = dt;
+    styrolyse_draw(m_animation);
+}
+
+void *StyrolysePainterClient::styro_loadImage(StyrolyseClient *_this, const char *path)
+{
+    StyroImage *image;
+    image = new StyroImage(_this,
+        FilePath(((ExtendedClient *)_this)->m_theme->getThemeRootPath().c_str())
+      .combine(path), true);
+    return image;
+}
+
+void StyrolysePainterClient::styro_drawImage(StyrolyseClient *_this,
+			    void *image, int x, int y, int w, int h,
+			    int clipx, int clipy, int clipw, int cliph, int flipped, float scaleX, float scaleY)
+{
+    StyroImage *surf = (StyroImage *)image;
+    IosRect  rect, cliprect;
+    rect.x = x;
+    rect.y = y;
+    rect.h = surf->surface->h;
+    rect.w = surf->surface->w;
+    cliprect.x = clipx;
+    cliprect.y = clipy;
+    cliprect.w = clipw;
+    cliprect.h = cliph;
+    ((ExtendedClient *)_this)->m_painter->setClipRect(&cliprect);
+    if (flipped)
+		((ExtendedClient *)_this)->m_painter->drawHFlipped(surf->surface, NULL, &rect);
+    else {
+        if (fabs(scaleX - 1.0f) > 0.001f) {
+            rect.w *= scaleX;
+            rect.h *= scaleY;
+        }
+        ((ExtendedClient *)_this)->m_painter->draw(surf->surface, NULL, &rect);
+    }
+}
+
+void StyrolysePainterClient::styro_freeImage(StyrolyseClient *_this, void *image)
+{
+  delete ((StyroImage *)image);
+}
+
+
+
+
+
 GameOptions GameOptions::fromDifficulty(GameDifficulty difficulty) {
     GameOptions go;
     switch(difficulty) {
@@ -69,7 +152,8 @@ GameOptions GameOptions::fromDifficulty(GameDifficulty difficulty) {
 }
 
 GameWidget::GameWidget()
-  : gameOverAction(NULL), associatedScreen(NULL)
+  : m_levelTheme(NULL),
+    gameOverAction(NULL), associatedScreen(NULL)
 {
 }
 
@@ -85,6 +169,14 @@ void GameWidget::setScreenToResumed(bool fromControls)
     if (!fromControls)
       associatedScreen->getPauseMenu().backPressed(false);
 }
+
+void GameWidget::setLevelTheme(LevelTheme *levelTheme)
+{
+    m_levelTheme = levelTheme;
+    if (m_levelTheme->getForegroundAnimation() != "")
+        m_styroPainter.reset(new StyrolysePainterClient(levelTheme));
+}
+
 
 void GameWidget2P::setGameOptions(GameOptions game_options)
 {
@@ -113,7 +205,7 @@ GameWidget2P::GameWidget2P(GameOptions game_options, bool withGUI)
       MinSpeed(game_options.MIN_SPEED), MaxSpeed(game_options.MAX_SPEED),
       blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
       playerOneName(p1name), playerTwoName(p2name),
-      m_foregroundAnimation(NULL), m_displayPlayerOneName(true), m_displayPlayerTwoName(true)
+      m_displayPlayerOneName(true), m_displayPlayerTwoName(true)
 {
     if (withGUI) {
         ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
@@ -129,9 +221,9 @@ void GameWidget2P::initWithGUI(GameView &areaA, GameView &areaB, GamePlayer &con
     areaB.setPlayerNames(playerOneName, playerTwoName);
     this->controllerA = &controllerA;
     this->controllerB = &controllerB;
-    this->attachedLevelTheme = &levelTheme;
     this->gameOverAction = gameOverAction;
     priv_initialize();
+    setLevelTheme(&levelTheme);
 }
 void GameWidget2P::initWithoutGUI(GameView &areaA, GameView &areaB, GamePlayer &controllerA, GamePlayer &controllerB, Action *gameOverAction)
 {
@@ -141,7 +233,7 @@ void GameWidget2P::initWithoutGUI(GameView &areaA, GameView &areaB, GamePlayer &
     areaB.setPlayerNames(playerOneName, playerTwoName);
     this->controllerA = &controllerA;
     this->controllerB = &controllerB;
-    this->attachedLevelTheme = NULL;
+    this->m_levelTheme = NULL;
     this->gameOverAction = gameOverAction;
     priv_initialize();
 }
@@ -152,27 +244,6 @@ void GameWidget2P::priv_initialize()
     gameover = false;
     skipGameCycleA = false;
     skipGameCycleB = false;
-
-    if (attachedLevelTheme->getForegroundAnimation() != "") {
-      // Initializing the styrolyse client
-      m_styroPainter.m_styroClient.loadImage = styro_loadImage;
-      m_styroPainter.m_styroClient.drawImage = styro_drawImage;
-      m_styroPainter.m_styroClient.freeImage = styro_freeImage;
-      m_styroPainter.m_styroClient.putText   = NULL;
-      m_styroPainter.m_styroClient.getText   = NULL;
-      m_styroPainter.m_styroClient.music = NULL;
-      m_styroPainter.m_styroClient.playSound = NULL;
-      m_styroPainter.m_styroClient.resolveFilePath = NULL;
-      m_styroPainter.m_styroClient.openFile = openFileFunction;
-      m_styroPainter.m_styroClient.closeFile = closeFileFunction;
-      m_styroPainter.m_styroClient.readFile = readFileFunction;
-
-      m_styroPainter.m_painter = &painter;
-      m_styroPainter.m_theme = attachedLevelTheme;
-      m_foregroundAnimation =
-	styrolyse_new(attachedLevelTheme->getForegroundAnimation().c_str(),
-                  (StyrolyseClient *)(&m_styroPainter), false);
-    }
 
     // Setting up games
     attachedGameA = this->areaA->getAttachedGame();
@@ -196,9 +267,6 @@ GameWidget2P::~GameWidget2P()
     dead();
     for (unsigned int i=0; i<floboFX.size(); ++i)
         delete floboFX[i];
-    if (m_foregroundAnimation != NULL) {
-      styrolyse_free(m_foregroundAnimation);
-    }
 }
 
 void GameWidget2P::cycle()
@@ -210,8 +278,8 @@ void GameWidget2P::cycle()
     int animCyclesBeforeGameCycles = (MaxSpeed + (((MinSpeed - MaxSpeed) * gameSpeed) / 20));
 
     // Cycling through the foreground animation
-    if (m_foregroundAnimation != NULL)
-      styrolyse_update(m_foregroundAnimation, 0.);
+    if (m_styroPainter.get() != NULL)
+        m_styroPainter->update();
 
     // Controls
     controllerA->cycle();
@@ -301,7 +369,7 @@ void GameWidget2P::cycle()
 void GameWidget2P::drawBackground(DrawTarget *dt)
 {
     IosRect dtRect = { 0, 0, dt->w, dt->h };
-    dt->draw(attachedLevelTheme->getBackground(), &dtRect, &dtRect);
+    dt->draw(m_levelTheme->getBackground(), &dtRect, &dtRect);
 }
 
 void GameWidget2P::drawGameAreas(DrawTarget *dt)
@@ -325,7 +393,7 @@ void GameWidget2P::draw(DrawTarget *dt)
     // Render the background
     drawBackground(dt);
     // Rendering the opponent if it is behind the flobos
-    if (attachedLevelTheme->getOpponentIsBehind()) {
+    if (m_levelTheme->getOpponentIsBehind()) {
         if (getOpponent() != NULL)
             getOpponent()->draw(dt);
     }
@@ -333,7 +401,7 @@ void GameWidget2P::draw(DrawTarget *dt)
     drawGameAreas(dt);
     // Rendering the grids
     IosRect drect;
-    IosSurface * grid = attachedLevelTheme->getGrid();
+    IosSurface * grid = m_levelTheme->getGrid();
     if (grid != NULL) {
         drect.x = 21;
         drect.y = -1;
@@ -347,37 +415,37 @@ void GameWidget2P::draw(DrawTarget *dt)
         dt->draw(grid, NULL, &drect);
     }
     // Rendering the foreground animation
-    if (m_foregroundAnimation != NULL)
-        styrolyse_draw(m_foregroundAnimation);
+    if (m_styroPainter.get() != NULL)
+        m_styroPainter->draw(dt);
     // Rendering the neutral flobos
     drawGameNeutrals(dt);
     // Rendering the lives
     if (displayLives && (lives>=0) && (lives<=3))
     {
-        IosSurface * liveImage = attachedLevelTheme->getLifeForIndex(lives);
-        drect.x = attachedLevelTheme->getLifeDisplayX();
-        drect.y = attachedLevelTheme->getLifeDisplayY();
+        IosSurface * liveImage = m_levelTheme->getLifeForIndex(lives);
+        drect.x = m_levelTheme->getLifeDisplayX();
+        drect.y = m_levelTheme->getLifeDisplayY();
         drect.w = liveImage->w;
         drect.h = liveImage->h;
         dt->draw(liveImage, NULL, &drect);
     }
     // Rendering the game speed meter
     IosRect speedRect;
-    IosSurface * speedFront = attachedLevelTheme->getSpeedMeter(true);
-    IosSurface * speedBack  = attachedLevelTheme->getSpeedMeter(false);
+    IosSurface * speedFront = m_levelTheme->getSpeedMeter(true);
+    IosSurface * speedBack  = m_levelTheme->getSpeedMeter(false);
     speedRect.x = 0;
     speedRect.w = speedFront->w;
     speedRect.h = gameSpeed * 6;
     speedRect.y = speedFront->h - speedRect.h;
-    drect.x = attachedLevelTheme->getSpeedMeterX() - speedRect.w / 2;
-    drect.y = attachedLevelTheme->getSpeedMeterY() - speedRect.h;
+    drect.x = m_levelTheme->getSpeedMeterX() - speedRect.w / 2;
+    drect.y = m_levelTheme->getSpeedMeterY() - speedRect.h;
     drect.w = speedRect.w;
     drect.h = speedRect.h;
     IosRect speedBlackRect = speedRect;
     IosRect drectBlack     = drect;
     speedBlackRect.h = speedFront->h - speedRect.h;
     speedBlackRect.y = 0;
-    drectBlack.y = attachedLevelTheme->getSpeedMeterY() - speedFront->h;
+    drectBlack.y = m_levelTheme->getSpeedMeterY() - speedFront->h;
     drectBlack.h = speedBlackRect.h;
     dt->draw(speedBack,&speedBlackRect,&drectBlack);
     dt->draw(speedFront,&speedRect, &drect);
@@ -385,19 +453,19 @@ void GameWidget2P::draw(DrawTarget *dt)
     areaA->renderScore(dt);
     areaB->renderScore(dt);
     // Rendering the player names
-    IosFont *font = attachedLevelTheme->getPlayerNameFont();
+    IosFont *font = m_levelTheme->getPlayerNameFont();
     if (m_displayPlayerOneName)
         dt->putStringCenteredXY(font,
-                                attachedLevelTheme->getNameDisplayX(0),
-                                attachedLevelTheme->getNameDisplayY(0),
+                                m_levelTheme->getNameDisplayX(0),
+                                m_levelTheme->getNameDisplayY(0),
                                 playerOneName);
     if (m_displayPlayerTwoName)
         dt->putStringCenteredXY(font,
-                                attachedLevelTheme->getNameDisplayX(1),
-                                attachedLevelTheme->getNameDisplayY(1),
+                                m_levelTheme->getNameDisplayX(1),
+                                m_levelTheme->getNameDisplayY(1),
                                 playerTwoName);
     // Rendering the opponent if it is in front
-    if (! attachedLevelTheme->getOpponentIsBehind()) {
+    if (! m_levelTheme->getOpponentIsBehind()) {
         if (getOpponent() != NULL)
             getOpponent()->draw(dt);
     }
@@ -468,43 +536,6 @@ void GameWidget2P::actionAfterGameOver(bool fromControls, int actionType)
       gameOverAction->action(this, actionType, NULL);
 }
 
-void *GameWidget2P::styro_loadImage(StyrolyseClient *_this, const char *path)
-{
-    StyroImage *image;
-    image = new StyroImage(_this,
-        FilePath(((StyrolysePainterClient *)_this)->m_theme->getThemeRootPath().c_str())
-      .combine(path), true);
-  return image;
-}
-void GameWidget2P::styro_drawImage(StyrolyseClient *_this,
-			    void *image, int x, int y, int w, int h,
-			    int clipx, int clipy, int clipw, int cliph, int flipped, float scaleX, float scaleY)
-{
-    StyroImage *surf = (StyroImage *)image;
-    IosRect  rect, cliprect;
-    rect.x = x;
-    rect.y = y;
-    rect.h = surf->surface->h;
-    rect.w = surf->surface->w;
-    cliprect.x = clipx;
-    cliprect.y = clipy;
-    cliprect.w = clipw;
-    cliprect.h = cliph;
-    ((StyrolysePainterClient *)_this)->m_painter->setClipRect(&cliprect);
-    if (flipped)
-		((StyrolysePainterClient *)_this)->m_painter->drawHFlipped(surf->surface, NULL, &rect);
-    else {
-        if (fabs(scaleX - 1.0f) > 0.001f) {
-            rect.w *= scaleX;
-            rect.h *= scaleY;
-        }
-        ((StyrolysePainterClient *)_this)->m_painter->draw(surf->surface, NULL, &rect);
-    }
-}
-void GameWidget2P::styro_freeImage(StyrolyseClient *_this, void *image)
-{
-  delete ((StyroImage *)image);
-}
 
 std::vector<VisualFX*> *activeFX = NULL;
 

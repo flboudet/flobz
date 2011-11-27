@@ -32,7 +32,7 @@ using namespace event_manager;
 
 SoloGameWidget::SoloGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, Action *gameOverAction)
     : CycledComponent(TIME_BETWEEN_GAME_CYCLES),
-      attachedFloboThemeSet(floboSetTheme), attachedLevelTheme(levelTheme), attachedRandom(5), m_cyclesBeforeGameCycle(0), m_cyclesBeforeLevelRaise(0)
+      attachedFloboThemeSet(floboSetTheme), attachedRandom(5), m_cyclesBeforeGameCycle(0), m_cyclesBeforeLevelRaise(0)
 {
     m_gameFactory.reset(new LocalGameFactory(&attachedRandom));
     m_areaA.reset(new GameView(m_gameFactory.get(), 0, &floboSetTheme, &levelTheme));
@@ -42,6 +42,7 @@ SoloGameWidget::SoloGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTh
     setReceiveUpEvents(true);
     setFocusable(true);
     m_areaA->getAttachedGame()->addGameListener(this);
+    setLevelTheme(&levelTheme);
 }
 
 void SoloGameWidget::gameDidEndCycle()
@@ -62,6 +63,9 @@ void SoloGameWidget::cycle()
 {
     // Controls
     m_playerController->cycle();
+    // Cycling through the foreground animation
+    if (m_styroPainter.get() != NULL)
+        m_styroPainter->update();
     // Animations
     m_areaA->cycleAnimation();
     if (m_cyclesBeforeGameCycle == 0) {
@@ -82,8 +86,11 @@ void SoloGameWidget::cycle()
 void SoloGameWidget::draw(DrawTarget *dt)
 {
     IosRect dtRect = { 0, 0, dt->w, dt->h };
-    dt->draw(attachedLevelTheme.getBackground(), &dtRect, &dtRect);
+    dt->draw(m_levelTheme->getBackground(), &dtRect, &dtRect);
     m_areaA->render(dt);
+    // Rendering the foreground animation
+    if (m_styroPainter.get() != NULL)
+        m_styroPainter->draw(dt);
 }
 
 void SoloGameWidget::eventOccured(GameControlEvent *event)

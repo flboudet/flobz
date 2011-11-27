@@ -64,7 +64,6 @@ public:
     void eventOccured(event_manager::GameControlEvent *event);
 private:
     FloboSetTheme &attachedFloboThemeSet;
-    LevelTheme &attachedLevelTheme;
     RandomSystem attachedRandom;
     std::auto_ptr<LocalGameFactory> m_gameFactory;
     std::auto_ptr<GameView>        m_areaA;
