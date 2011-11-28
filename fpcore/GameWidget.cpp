@@ -153,8 +153,12 @@ GameOptions GameOptions::fromDifficulty(GameDifficulty difficulty) {
 
 GameWidget::GameWidget()
   : m_levelTheme(NULL),
-    gameOverAction(NULL), associatedScreen(NULL)
+    gameOverAction(NULL), associatedScreen(NULL),
+    m_paused(false), m_obscureScreenOnPause(true),
+    m_abortedFlag(false)
 {
+    ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
+    m_painterGameScreen = iimLib.createImage(IMAGE_RGB, GameUIDefaults::GAME_LOOP->getDrawContext()->w, GameUIDefaults::GAME_LOOP->getDrawContext()->h);
 }
 
 void GameWidget::setScreenToPaused(bool fromControls)
@@ -176,6 +180,29 @@ void GameWidget::setLevelTheme(LevelTheme *levelTheme)
     if (m_levelTheme->getForegroundAnimation() != "")
         m_styroPainter.reset(new StyrolysePainterClient(levelTheme));
 }
+
+void GameWidget::pause(bool obscureScreen)
+{
+    m_obscureScreenOnPause = obscureScreen;
+    // Call draw on offscreen surface before setting the game to paused
+    if (m_obscureScreenOnPause)
+        draw(m_painterGameScreen);
+    m_paused = true;
+    // Draw the obscured screen on display
+    if (m_obscureScreenOnPause) {
+        m_painterGameScreen->convertToGray();
+        requestDraw();
+    }
+}
+
+void GameWidget::resume()
+{
+    m_paused = false;
+    setFocusable(true);
+}
+
+
+
 
 
 void GameWidget2P::setGameOptions(GameOptions game_options)
@@ -200,17 +227,13 @@ GameWidget2P::GameWidget2P(GameOptions game_options, bool withGUI)
     : CycledComponent(TIME_BETWEEN_GAME_CYCLES), withGUI(withGUI),
       painter(*(GameUIDefaults::GAME_LOOP->getDrawContext())), cyclesBeforeGameCycle(0),
       cyclesBeforeSpeedIncreases(game_options.CYCLES_BEFORE_SPEED_INCREASES),
-      tickCounts(0), cycles(0), paused(false), m_obscureScreenOnPause(true),
-      displayLives(true), lives(3), abortedFlag(false), gameSpeed(0),
+      tickCounts(0), cycles(0),
+      displayLives(true), lives(3), gameSpeed(0),
       MinSpeed(game_options.MIN_SPEED), MaxSpeed(game_options.MAX_SPEED),
       blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
       playerOneName(p1name), playerTwoName(p2name),
       m_displayPlayerOneName(true), m_displayPlayerTwoName(true)
 {
-    if (withGUI) {
-        ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
-        painterGameScreen = iimLib.createImage(IMAGE_RGB, GameUIDefaults::GAME_LOOP->getDrawContext()->w, GameUIDefaults::GAME_LOOP->getDrawContext()->h);
-    }
 }
 
 void GameWidget2P::initWithGUI(GameView &areaA, GameView &areaB, GamePlayer &controllerA, GamePlayer &controllerB, LevelTheme &levelTheme, Action *gameOverAction)
@@ -271,7 +294,7 @@ GameWidget2P::~GameWidget2P()
 
 void GameWidget2P::cycle()
 {
-  if (!paused) {
+  if (!m_paused) {
     tickCounts++;
     cycles++;
 
@@ -354,7 +377,7 @@ void GameWidget2P::cycle()
     requestDraw();
   }
   gameover = (areaA->isGameOver() || areaB->isGameOver());
-  if ((gameover || abortedFlag) && !once) {
+  if ((gameover || getAborted()) && !once) {
     once = true;
     gameOverDate = ios_fc::getTimeMs();
     if (areaA->isGameOver())
@@ -386,8 +409,8 @@ void GameWidget2P::drawGameNeutrals(DrawTarget *dt)
 
 void GameWidget2P::draw(DrawTarget *dt)
 {
-    if ((paused) && (m_obscureScreenOnPause)) {
-        dt->draw(painterGameScreen, NULL, NULL);
+    if ((m_paused) && (m_obscureScreenOnPause)) {
+        dt->draw(m_painterGameScreen, NULL, NULL);
         return;
     }
     // Render the background
@@ -476,28 +499,9 @@ void GameWidget2P::addSubWidget(Widget *subWidget)
   m_subwidgets.push_back(subWidget);
 }
 
-void GameWidget2P::pause(bool obscureScreen)
-{
-    m_obscureScreenOnPause = obscureScreen;
-    // Call draw on offscreen surface before setting the game to paused
-    if (m_obscureScreenOnPause)
-        draw(painterGameScreen);
-    paused = true;
-    // Draw the obscured screen on display
-    if (m_obscureScreenOnPause) {
-        painterGameScreen->convertToGray();
-        requestDraw();
-    }
-}
-
-void GameWidget2P::resume()
-{
-    paused = false;
-}
-
 void GameWidget2P::eventOccured(GameControlEvent *event)
 {
-    if (paused)
+    if (m_paused)
         lostFocus();
     else {
         controllerA->eventOccured(event);
@@ -511,11 +515,11 @@ void GameWidget2P::eventOccured(GameControlEvent *event)
 
 bool GameWidget2P::startPressed()
 {
-    if ((gameover || abortedFlag) && once && (ios_fc::getTimeMs() > gameOverDate + 500)) {
+    if ((gameover || getAborted()) && once && (ios_fc::getTimeMs() > gameOverDate + 500)) {
         actionAfterGameOver(true, GAMEOVER_STARTPRESSED);
         return true;
     }
-    else if (paused) {
+    else if (m_paused) {
         actionAfterGameOver(true, PAUSED_STARTPRESSED);
     }
     return false;
@@ -523,7 +527,7 @@ bool GameWidget2P::startPressed()
 
 bool GameWidget2P::backPressed()
 {
-    if ((gameover || abortedFlag) && once) {
+    if ((gameover || getAborted()) && once) {
         actionAfterGameOver(true, GAMEOVER_STARTPRESSED);
         return true;
     }

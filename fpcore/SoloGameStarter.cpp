@@ -61,30 +61,40 @@ void SoloGameWidget::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int gr
 
 void SoloGameWidget::cycle()
 {
-    // Controls
-    m_playerController->cycle();
-    // Cycling through the foreground animation
-    if (m_styroPainter.get() != NULL)
-        m_styroPainter->update();
-    // Animations
-    m_areaA->cycleAnimation();
-    if (m_cyclesBeforeGameCycle == 0) {
-        if (! m_areaA->isNewMetaCycleStart())
-            m_areaA->cycleGame();
-        m_areaA->clearMetaCycleStart();
-        m_cyclesBeforeGameCycle = 10;
+    if (!m_paused) {
+        // Controls
+        m_playerController->cycle();
+        // Cycling through the foreground animation
+        if (m_styroPainter.get() != NULL)
+            m_styroPainter->update();
+        // Animations
+        m_areaA->cycleAnimation();
+        if (m_cyclesBeforeGameCycle == 0) {
+            if (! m_areaA->isNewMetaCycleStart())
+                m_areaA->cycleGame();
+            m_areaA->clearMetaCycleStart();
+            m_cyclesBeforeGameCycle = 10;
+        }
+        if (m_cyclesBeforeLevelRaise == 0) {
+        }
+        else {
+            m_cyclesBeforeLevelRaise--;
+        }
+        m_cyclesBeforeGameCycle--;
+        requestDraw();
     }
-    if (m_cyclesBeforeLevelRaise == 0) {
+    if (m_areaA->isGameOver() || getAborted()) {
+        if (gameOverAction)
+            gameOverAction->action(this, GAME_IS_OVER, NULL);
     }
-    else {
-        m_cyclesBeforeLevelRaise--;
-    }
-    m_cyclesBeforeGameCycle--;
-    requestDraw();
 }
 
 void SoloGameWidget::draw(DrawTarget *dt)
 {
+    if ((m_paused) && (m_obscureScreenOnPause)) {
+        dt->draw(m_painterGameScreen, NULL, NULL);
+        return;
+    }
     IosRect dtRect = { 0, 0, dt->w, dt->h };
     dt->draw(m_levelTheme->getBackground(), &dtRect, &dtRect);
     m_areaA->render(dt);
@@ -95,7 +105,7 @@ void SoloGameWidget::draw(DrawTarget *dt)
 
 void SoloGameWidget::eventOccured(GameControlEvent *event)
 {
-    if (paused)
+    if (m_paused)
         lostFocus();
     else {
         m_playerController->eventOccured(event);
@@ -110,26 +120,11 @@ void SoloGameWidget::setGameOptions(GameOptions options)
 {
     m_options = options;
 }
-void SoloGameWidget::pause(bool obscureScreen)
-{
-    paused = true;
-}
-void SoloGameWidget::resume()
-{
-    paused = false;
-    setFocusable(true);
-}
 bool SoloGameWidget::backPressed()
 {
     return false;
 }
 bool SoloGameWidget::startPressed()
-{
-    return false;
-}
-void SoloGameWidget::abort()
-{}
-bool SoloGameWidget::getAborted() const
 {
     return false;
 }

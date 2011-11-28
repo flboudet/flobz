@@ -34,14 +34,9 @@ public:
     SoloGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, Action *gameOverAction = NULL);
     // GameWidget implementation
     virtual void setGameOptions(GameOptions options);
-    //
-    virtual void pause(bool obscureScreen = true);
-    virtual void resume();
     // Callbacks
     virtual bool backPressed();
     virtual bool startPressed();
-    virtual void abort();
-    virtual bool getAborted() const;
     //
     virtual StoryWidget *getOpponent();
     // TODO: Make this N-players generic (N from 1 to +inf)
@@ -59,7 +54,6 @@ public:
     virtual void cycle();
     // Widget methods
     void draw(DrawTarget *dt);
-    bool isFocusable() { return !paused; }
     IdleComponent *getIdleComponent() { return this; }
     void eventOccured(event_manager::GameControlEvent *event);
 private:

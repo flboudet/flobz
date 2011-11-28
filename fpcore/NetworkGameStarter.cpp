@@ -92,7 +92,7 @@ NetworkGameWidget::~NetworkGameWidget()
 void NetworkGameWidget::cycle()
 {
     double curDate = ios_fc::getTimeMs();
-    if (paused) {
+    if (m_paused) {
         if (curDate - lastAliveMessageSentDate > 2000.) {
             sendAliveMsg();
             lastAliveMessageSentDate = curDate;

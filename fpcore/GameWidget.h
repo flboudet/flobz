@@ -113,16 +113,16 @@ public:
 public:
     virtual void setGameOptions(GameOptions options) = 0;
     //
-    virtual void pause(bool obscureScreen = true) = 0;
-    virtual void resume() = 0;
+    virtual void pause(bool obscureScreen = true);
+    virtual void resume();
     // A deplacer
     virtual void setScreenToPaused(bool fromControls);
     virtual void setScreenToResumed(bool fromControls);
     // Callbacks
     virtual bool backPressed()  {}
     virtual bool startPressed() {}
-    virtual void abort() = 0;
-    virtual bool getAborted() const = 0;
+    virtual void abort() { m_abortedFlag = true; }
+    virtual bool getAborted() const { return m_abortedFlag; }
     //
     virtual StoryWidget *getOpponent() = 0;
     //
@@ -134,6 +134,8 @@ public:
     virtual void addGameAHandicap(int handicap) = 0;
     virtual void addGameBHandicap(int handicap) = 0;
     virtual bool isGameARunning() const = 0;
+    // Widget methods
+    bool isFocusable() { return !m_paused; }
 protected:
     void setLevelTheme(LevelTheme *levelTheme);
     std::auto_ptr<StyrolysePainterClient> m_styroPainter;
@@ -143,6 +145,10 @@ protected:
     gameui::Action *gameOverAction;
     GameScreen *associatedScreen;
     std::vector<VisualFX*> floboFX;
+protected:
+    bool m_paused, m_obscureScreenOnPause;
+    IosSurface *m_painterGameScreen;
+    bool m_abortedFlag;
 };
 
 /**
@@ -164,12 +170,8 @@ public:
                      GamePlayer &controllerA, GamePlayer &controllerB,
                      gameui::Action *gameOverAction = NULL);
     // Specific methods
-    void pause(bool obscureScreen = true);
-    void resume();
     bool backPressed();
     bool startPressed();
-    virtual void abort() { abortedFlag = true; }
-    bool getAborted() const { return abortedFlag; }
     void setLives(int l) { lives = l; }
     bool isGameARunning() const { return attachedGameA->isGameRunning(); }
     bool isGameBRunning() const { return attachedGameB->isGameRunning(); }
@@ -194,7 +196,6 @@ public:
 
     // Widget methods
     void draw(DrawTarget *dt);
-    bool isFocusable() { return !paused; }
     IdleComponent *getIdleComponent() { return this; }
 
     // Draw subfunctions (in order to subclass GameWidget with modified look)
@@ -209,7 +210,6 @@ protected:
 
     bool withGUI;
     DrawTarget &painter;
-    IosSurface *painterGameScreen;
     GameView *areaA, *areaB;
     GamePlayer *controllerA, *controllerB;
     FloboGame *attachedGameA, *attachedGameB;
@@ -217,12 +217,10 @@ protected:
     int cyclesBeforeSpeedIncreases; // time between speed increases in units of 20ms
     unsigned int tickCounts;
     unsigned long long cycles;
-    bool paused, m_obscureScreenOnPause;
     bool displayLives;
     int lives;
     bool once;
     bool gameover;
-    bool abortedFlag;
     int gameSpeed; // from 0 (MinSpeed) to 20 (MaxSpeed)
     int MinSpeed,MaxSpeed; // in units of 20ms
     int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
