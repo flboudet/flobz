@@ -8,13 +8,13 @@
   Sprite @tears = [new_sprite: image="kaori_gamelost/tears1.png" x = -85.0 y=70.0 curframe=0.0 framespeed=0.5 nbframes=2.0]
   @tears.parent = "@kaori"
 
-  Sprite @puyo      = [new_sprite: image="knockedpuyo.png" x = 700.0 y=500.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @flobo      = [new_sprite: image="knockedflobo.png" x = 700.0 y=500.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @redStar   = [new_sprite: image="redstar.png" x =0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @blueStar  = [new_sprite: image="bluestar.png" x =0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @greenStar = [new_sprite: image="greenstar.png" x =0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
-  @redStar.parent="@puyo"
-  @blueStar.parent="@puyo"
-  @greenStar.parent="@puyo"
+  @redStar.parent="@flobo"
+  @blueStar.parent="@flobo"
+  @greenStar.parent="@flobo"
 
   music: command="game over"
 
@@ -23,7 +23,7 @@
   # This also allows you to specify the drawing order
   sprite::@kaori display=@display
   sprite::@tears display=@display
-  sprite::@puyo display=@display
+  sprite::@flobo display=@display
   sprite::@redStar display=@display
   sprite::@blueStar display=@display
   sprite::@greenStar display=@display
@@ -45,7 +45,7 @@
   @blueStar.pos.y = [cos : value = (@fcycle/4.0) + 2.0943951] * 10.0 - 10.0
   @greenStar.pos.x = [sin : value = (@fcycle/4.0) + 4.18879] * 40.0 + 30.0
   @greenStar.pos.y = [cos : value = (@fcycle/4.0) + 4.18879] * 10.0 - 10.0
-  
-  @puyo.pos.x -= 6.0 * @delta_cycle
-  @puyo.pos.y = 400.0 - ([fabs: x=([sin: value = (@fcycle/10.0)] * 200.0)] / ((@fcycle + 50.0) * 0.01))
+
+  @flobo.pos.x -= 6.0 * @delta_cycle
+  @flobo.pos.y = 400.0 - ([fabs: x=([sin: value = (@fcycle/10.0)] * 200.0)] / ((@fcycle + 50.0) * 0.01))
   (@kaori.pos.y > 200.0)? @finished = 1

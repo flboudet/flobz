@@ -1,6 +1,6 @@
 <flying_saucer_init>
   float @flying_saucer_SPEED = 100.0
-  float @flying_saucer_PuyoAgitation = 8.0 # lower is less
+  float @flying_saucer_Agitation = 8.0 # lower is less
   float @flying_saucer_SaucerXMovement = 1.0
   float @flying_saucer_SaucerY = 165.0
   int   @flying_saucer_CanSwitchSaucerY = 1
@@ -9,7 +9,7 @@
   Display @flying_saucer_display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
 
   Sprite @flying_saucer_saucer  = [new_sprite_simple: image="saucer.png" x=-150.0 y=@flying_saucer_SaucerY]
- 
+
 
 <flying_saucer_sprite_list>
   sprite::@flying_saucer_saucer display=@flying_saucer_display

@@ -6,11 +6,11 @@ float @kaoriMovesFCycle
 float @kaoriDestX
 
 <init>
-  float @BigPuyoDelay = 200.
-  float @BigPuyoShowAfter = @BigPuyoDelay
-  int   @ShowBigPuyo = 0
-  int   @BigPuyoApogee = 0
-  float @ShowBigPuyoInitialCycle = 0.
+  float @BigFloboDelay = 200.
+  float @BigFloboShowAfter = @BigFloboDelay
+  int   @ShowBigFlobo = 0
+  int   @BigFloboApogee = 0
+  float @ShowBigFloboInitialCycle = 0.
 
   # Init function: called when script is loaded
   Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
@@ -18,7 +18,7 @@ float @kaoriDestX
   Sprite @kaori = [new_sprite: image="kaori_title/kaori_title.png" x = -300.0 y=70.0 curframe=0.0 framespeed=0.15 nbframes=2.0]
   Sprite @kaorieyes = [new_sprite: image="kaori_title/kaori_title_eyesclosed.png" x = 92.0 y=83.0 curframe=0.0 framespeed=0.4 nbframes=40.0]
   @kaorieyes.parent = "@kaori"
-  Sprite @bigpuyo = [new_sprite: image="happypuyo.png" x = 500.0 y=480.0 curframe=0.0 framespeed=0.15 nbframes=1.0]
+  Sprite @bigflobo = [new_sprite: image="happyflobo.png" x = 500.0 y=480.0 curframe=0.0 framespeed=0.15 nbframes=1.0]
   @isFullScreen = 1
   flying_flobo_init
   Sprite @appStore = [new_sprite: image="app_store.png" x=20.0 y=490.0 curframe=0.0  framespeed=0.15 nbframes=1.0]
@@ -34,7 +34,7 @@ float @kaoriDestX
   }
   sprite::@kaori display=@display
   sprite::@kaorieyes display=@display
-  sprite::@bigpuyo display=@display
+  sprite::@bigflobo display=@display
   sprite::@appStore display=@display
 
 <update>
@@ -48,16 +48,16 @@ float @kaoriDestX
 
   flying_flobo_update
 
-  (@BigPuyoShowAfter <= @fcycle)? {
-    @ShowBigPuyo = 1
-    @BigPuyoApogee = 0
-    @ShowBigPuyoInitialCycle = @fcycle
-    @BigPuyoShowAfter = @BigPuyoShowAfter + @BigPuyoDelay
+  (@BigFloboShowAfter <= @fcycle)? {
+    @ShowBigFlobo = 1
+    @BigFloboApogee = 0
+    @ShowBigFloboInitialCycle = @fcycle
+    @BigFloboShowAfter = @BigFloboShowAfter + @BigFloboDelay
   }
-  (@ShowBigPuyo = 1)? {
-    @bigpuyo.pos.y = 500.0 - ([fabs: x=([sin: value = ((@fcycle - @ShowBigPuyoInitialCycle)/10.0)] * 300.0)])
-    (@bigpuyo.pos.y < 400.)? @BigPuyoApogee = 1
-    (@BigPuyoApogee = 1)? (@bigpuyo.pos.y > 480.)? @ShowBigPuyo=0
+  (@ShowBigFlobo = 1)? {
+    @bigflobo.pos.y = 500.0 - ([fabs: x=([sin: value = ((@fcycle - @ShowBigFloboInitialCycle)/10.0)] * 300.0)])
+    (@bigflobo.pos.y < 400.)? @BigFloboApogee = 1
+    (@BigFloboApogee = 1)? (@bigflobo.pos.y > 480.)? @ShowBigFlobo=0
   }
   (@inNetGameCenter = 0)? {
     (@isFullScreen = 1)? {

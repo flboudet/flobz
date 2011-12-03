@@ -1,22 +1,22 @@
 <init>
   # Init function: called when script is loaded
-  Display @puyoDisplay = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+  Display @floboDisplay = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
 
-  Sprite @puyo      = [new_sprite: image="knockedpuyo.png" x = 470.0 y=800.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @flobo      = [new_sprite: image="knockedflobo.png" x = 470.0 y=800.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @redStar   = [new_sprite: image="redstar.png" x = 0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @blueStar  = [new_sprite: image="bluestar.png" x = 0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   Sprite @greenStar = [new_sprite: image="greenstar.png" x = 0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
-  @redStar.parent="@puyo"
-  @blueStar.parent="@puyo"
-  @greenStar.parent="@puyo"
-  
+  @redStar.parent="@flobo"
+  @blueStar.parent="@flobo"
+  @greenStar.parent="@flobo"
+
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw
   # This also allows you to specify the drawing order
-  sprite::@puyo display=@puyoDisplay
-  sprite::@redStar display=@puyoDisplay
-  sprite::@blueStar display=@puyoDisplay
-  sprite::@greenStar display=@puyoDisplay
+  sprite::@flobo display=@floboDisplay
+  sprite::@redStar display=@floboDisplay
+  sprite::@blueStar display=@floboDisplay
+  sprite::@greenStar display=@floboDisplay
 
 <update>
   # Update function: called every animation cycle
@@ -27,5 +27,5 @@
   @greenStar.pos.x = [sin : value = (@fcycle/4.0) + 4.18879] * 40.0 + 30.0
   @greenStar.pos.y = [cos : value = (@fcycle/4.0) + 4.18879] * 10.0 - 10.0
 
-  @puyo.pos.y = 400.0 - ([fabs: x=([sin: value = (@fcycle/10.0)] * 200.0)])
+  @flobo.pos.y = 400.0 - ([fabs: x=([sin: value = (@fcycle/10.0)] * 200.0)])
 
