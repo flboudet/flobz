@@ -29,6 +29,19 @@
 #include "LocalGameStates.h"
 #include "EventPlayer.h"
 
+class VuMeter {
+public:
+    VuMeter(Vec3 position, IosSurface *front, IosSurface *back);
+    virtual ~VuMeter() {}
+    void draw(DrawTarget *dt);
+    void setValue(double value) { m_value = value; }
+private:
+    Vec3 m_position;
+    IosSurface *m_front;
+    IosSurface *m_back;
+    double m_value;
+};
+
 class SoloGameWidget : public GameWidget, GameListener, CycledComponent {
 public:
     SoloGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, Action *gameOverAction = NULL);
@@ -66,6 +79,8 @@ private:
     GameOptions m_options;
     int m_cyclesBeforeGameCycle;
     int m_cyclesBeforeLevelRaise;
+    std::auto_ptr<VuMeter> m_comboMeter;
+    double m_comboHandicap;
 };
 
 class SoloGameWidgetFactory : public GameWidgetFactory {

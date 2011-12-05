@@ -179,20 +179,11 @@ using std::string;
         //This is where we load in the font information from the file.
         //Of all the places where the code might die, this is the most likely,
         //as FT_New_Face will die if the font file does not exist or is somehow broken.
-#ifdef DISABLED
-        if (FT_New_Face( library, fname, 0, &face ))
-            throw std::runtime_error("FT_New_Face failed (there is probably a problem with your font file)");
-#endif
         if (FT_New_Memory_Face(library, (FT_Byte *)data,
                                size, 0, &face ))
             throw std::runtime_error("FT_New_Face failed (there is probably a problem with your font file)");
         m_data = data;
-
-        //For some twisted reason, Freetype measures font size
-        //in terms of 1/64ths of pixels.  Thus, to make a font
-        //h pixels high, we need to request a size of h*64.
-        //(h << 6 is just a prettier way of writting h*64)
-        FT_Set_Char_Size( face, h << 6, h << 6, 96, 96);
+        FT_Set_Pixel_Sizes(face, h, h);
     }
 
     void GLFont::clean() {

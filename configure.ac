@@ -40,6 +40,11 @@ AC_ARG_ENABLE(opengl-gfx,
                 [enables openGL graphics support])],
        [ENABLE_OPENGL_GFX=$enableval], [ENABLE_OPENGL_GFX=no])
 
+AC_ARG_ENABLE(null-backends,
+       [AS_HELP_STRING([--enable-null-backends],
+                [enables compilation of the game with null backends (no graphics, no sound, no inputs)])],
+       [ENABLE_NULL_BACKENDS=$enableval], [ENABLE_NULL_BACKENDS=no])
+
 #AC_ARG_ENABLE([audio],
 #              [AS_HELP_STRING([--enable-audio],
 #              [enable audio support @<:@default=yes@:>@])],

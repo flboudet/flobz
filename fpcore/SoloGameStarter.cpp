@@ -28,11 +28,38 @@
 
 using namespace event_manager;
 
+VuMeter::VuMeter(Vec3 position, IosSurface *front, IosSurface *back)
+    : m_position(position), m_front(front), m_back(back)
+{
+}
+
+void VuMeter::draw(DrawTarget *dt)
+{
+    IosRect meterRect, drect;
+    meterRect.x = 0;
+    meterRect.w = m_front->w;
+    meterRect.h = m_front->h * m_value;
+    meterRect.y = m_front->h - meterRect.h;
+    drect.x = m_position.x - meterRect.w / 2;
+    drect.y = m_position.y - meterRect.h;
+    drect.w = meterRect.w;
+    drect.h = meterRect.h;
+    IosRect meterBlackRect = meterRect;
+    IosRect drectBlack     = drect;
+    meterBlackRect.h = m_front->h - meterRect.h;
+    meterBlackRect.y = 0;
+    drectBlack.y = m_position.y - m_front->h;
+    drectBlack.h = meterBlackRect.h;
+    dt->draw(m_back,&meterBlackRect,&drectBlack);
+    dt->draw(m_front,&meterRect, &drect);
+}
+
 #define TIME_BETWEEN_GAME_CYCLES 0.02
 
 SoloGameWidget::SoloGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, Action *gameOverAction)
     : CycledComponent(TIME_BETWEEN_GAME_CYCLES),
-      attachedFloboThemeSet(floboSetTheme), attachedRandom(5), m_cyclesBeforeGameCycle(0), m_cyclesBeforeLevelRaise(0)
+      attachedFloboThemeSet(floboSetTheme), attachedRandom(5), m_cyclesBeforeGameCycle(0), m_cyclesBeforeLevelRaise(0),
+      m_comboHandicap(0.)
 {
     m_gameFactory.reset(new LocalGameFactory(&attachedRandom));
     m_areaA.reset(new GameView(m_gameFactory.get(), 0, &floboSetTheme, &levelTheme));
@@ -43,6 +70,10 @@ SoloGameWidget::SoloGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTh
     setFocusable(true);
     m_areaA->getAttachedGame()->addGameListener(this);
     setLevelTheme(&levelTheme);
+    m_comboMeter.reset(new VuMeter(Vec3(levelTheme.getSpeedMeterX(),
+                                        levelTheme.getSpeedMeterX()),
+                                   levelTheme.getSpeedMeter(true),
+                                   levelTheme.getSpeedMeter(false)));
 }
 
 void SoloGameWidget::gameDidEndCycle()
@@ -51,12 +82,18 @@ void SoloGameWidget::gameDidEndCycle()
         m_areaA->getAttachedGame()->addNeutralLayer();
         m_cyclesBeforeLevelRaise = 800;
     }
-    //m_areaA->getAttachedGame()->increaseNeutralFlobos(6);
 }
 
 void SoloGameWidget::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase)
 {
     GTLogTrace("Combo with phase=%d", phase);
+    if (phase >= 2) {
+        m_comboHandicap -= 20.;
+    }
+    if (phase == 4)
+        m_comboHandicap = 0;
+    if (m_comboHandicap < 0.)
+        m_comboHandicap = 0.;
 }
 
 void SoloGameWidget::cycle()
@@ -81,6 +118,11 @@ void SoloGameWidget::cycle()
             m_cyclesBeforeLevelRaise--;
         }
         m_cyclesBeforeGameCycle--;
+        m_comboHandicap += 0.05;
+        if (m_comboHandicap >= 100.) {
+            m_areaA->getAttachedGame()->increaseNeutralFlobos(6);
+            m_comboHandicap = 0.;
+        }
         requestDraw();
     }
     if (m_areaA->isGameOver() || getAborted()) {
@@ -98,6 +140,9 @@ void SoloGameWidget::draw(DrawTarget *dt)
     IosRect dtRect = { 0, 0, dt->w, dt->h };
     dt->draw(m_levelTheme->getBackground(), &dtRect, &dtRect);
     m_areaA->render(dt);
+    // Rendering the combo meter
+    m_comboMeter->setValue(m_comboHandicap / 100.);
+    m_comboMeter->draw(dt);
     // Rendering the foreground animation
     if (m_styroPainter.get() != NULL)
         m_styroPainter->draw(dt);
