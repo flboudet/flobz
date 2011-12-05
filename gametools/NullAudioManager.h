@@ -7,7 +7,9 @@ class NullAudioManager : public audio_manager::AudioManager
 {
 public:
     virtual void setMusicEnabled(bool enabled) {}
+    virtual bool getMusicEnabled() const { return true; }
     virtual void setMusicVolume(float volume)  {}
+    virtual float getMusicVolume() const { return 1.; }
     virtual audio_manager::Music *loadMusic(const char *fileName) {
         return new audio_manager::Music();
     }
@@ -16,7 +18,10 @@ public:
     virtual void setMusicPosition(double position) {}
 
     virtual void setSoundEnabled(bool enabled) {}
+    virtual bool getSoundEnabled() const { return true; }
     virtual void setSoundVolume(float volume)  {}
+    virtual float getSoundVolume() const { return 1.; }
+
     virtual audio_manager::Sound *loadSound(const char *fileName) {
         return new audio_manager::Sound();
     }

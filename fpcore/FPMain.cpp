@@ -17,6 +17,12 @@
 #include "sdl_drawcontext/sdl13/sdl13_eventmanager.h"
 #include "sdl_drawcontext/common/SDL_AudioManager.h"
 #endif
+#ifdef NULL_BACKENDS
+#include "SlaveEventManager.h"
+#include "NullDrawContext.h"
+#include "NullAudioManager.h"
+#endif
+
 #ifdef ENABLE_NETWORK_INTERNET
 #include "InternetBot.h"
 #endif
@@ -94,6 +100,11 @@ void FPMain::initWithGUI()
     m_eventManager = new SDL13_EventManager();
     m_audioManager = new SDL_AudioManager();
 #endif
+#ifdef NULL_BACKENDS
+    m_nativeDrawContext = new NullDrawContext(640, 480);
+    m_eventManager = new SlaveEventManager();
+    m_audioManager = new NullAudioManager();
+#endif
     m_drawContext = new CompositeDrawContext(m_nativeDrawContext);
     m_dataPathManager.registerDataPackages(*m_drawContext);
     // Give the DrawContext to the GameLoop
@@ -109,7 +120,8 @@ void FPMain::initWithGUI()
     cursor = new GameCursor("gfx/cursor.png");
     loop->addDrawable(cursor);
     loop->addIdle(cursor);
-    loop->addIdle(dynamic_cast<CycledComponent *>(m_eventManager));
+    if (dynamic_cast<CycledComponent *>(m_eventManager) != NULL)
+        loop->addIdle(dynamic_cast<CycledComponent *>(m_eventManager));
     theCommander->registerCursor(cursor);
     gameui::GlobalNotificationCenter.addListener(theCommander->getFullScreenKey(),this);
 }

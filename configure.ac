@@ -311,6 +311,14 @@ else
   AC_MSG_RESULT([TTF Disabled])
 fi
 
+if test "x$ENABLE_NULL_BACKENDS" = "xyes"; then
+  AC_MSG_RESULT([Null Backends Enabled])
+  FPFEATURES="$FPFEATURES -DNULL_BACKENDS=1"
+  ENABLE_OPENGL_GFX=no
+  ENABLE_SDL12_GFX=no
+  ENABLE_SDL13_GFX=no
+fi
+
 if test "x$ENABLE_OPENGL_GFX" = "xyes"; then
   AC_MSG_RESULT([OpenGL Enabled])
   FPFEATURES="$FPFEATURES -DOPENGL_GFX=1"
