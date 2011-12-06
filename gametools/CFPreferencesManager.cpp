@@ -1,10 +1,18 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include "CFPreferencesManager.h"
 
+CFPreferencesManager::CFPreferencesManager()
+{
+}
+
+CFPreferencesManager::~CFPreferencesManager()
+{
+}
+
 bool CFPreferencesManager::getBoolPreference(const char *identifier, bool defaultVal) const
 {
-    bool ret = defaut;
-    CFStringRef key = CFStringCreateWithCString (NULL,name,CFStringGetSystemEncoding());
+    bool ret = defaultVal;
+    CFStringRef key = CFStringCreateWithCString (NULL,identifier,CFStringGetSystemEncoding());
 
     if (key != NULL)
     {
@@ -18,8 +26,8 @@ bool CFPreferencesManager::getBoolPreference(const char *identifier, bool defaul
 
 int CFPreferencesManager::getIntPreference(const char *identifier, int defaultVal) const
 {
-    int ret = defaut;
-    CFStringRef key = CFStringCreateWithCString (NULL,name,CFStringGetSystemEncoding());
+    int ret = defaultVal;
+    CFStringRef key = CFStringCreateWithCString (NULL,identifier,CFStringGetSystemEncoding());
 
     if (key != NULL)
     {
@@ -33,37 +41,34 @@ int CFPreferencesManager::getIntPreference(const char *identifier, int defaultVa
 
 std::string CFPreferencesManager::getStrPreference(const char *identifier, const char *defaultVal) const
 {
-    if ((out==NULL) || (name==NULL)) return;
-
-    if (defaut != NULL)
+    if (identifier==NULL) return "";
+    std::string result;
+    if (defaultVal != NULL)
     {
-        strncpy(out,defaut,bufferSize-1);
-        out[bufferSize-1]=0;
+        result = defaultVal;
     }
-    else out[0]=0;
-
-    CFStringRef nom = CFStringCreateWithCString (NULL,name,CFStringGetSystemEncoding());
-
+    CFStringRef nom = CFStringCreateWithCString (NULL,identifier,CFStringGetSystemEncoding());
     if (nom != NULL)
     {
         CFStringRef value = (CFStringRef)CFPreferencesCopyAppValue(nom,kCFPreferencesCurrentApplication);
-
         if (value != NULL)
         {
             if (CFGetTypeID(value) == CFStringGetTypeID ())
             {
-                if ((!CFStringGetCString (value, out, bufferSize, CFStringGetSystemEncoding())) && (defaut != NULL))
-                    strcpy(out,defaut);
+                char out[255];
+                if (CFStringGetCString (value, out, 255, CFStringGetSystemEncoding()))
+                    result = out;
             }
             CFRelease(value);
         }
         CFRelease(nom);
     }
+    return result;
 }
 
 void CFPreferencesManager::setBoolPreference(const char *identifier, bool value)
 {
-    CFStringRef nom = CFStringCreateWithCString (NULL,name,CFStringGetSystemEncoding());
+    CFStringRef nom = CFStringCreateWithCString (NULL,identifier,CFStringGetSystemEncoding());
     if (nom != NULL)
     {
         CFPreferencesSetAppValue (nom,value?kCFBooleanTrue:kCFBooleanFalse,kCFPreferencesCurrentApplication);
@@ -74,7 +79,7 @@ void CFPreferencesManager::setBoolPreference(const char *identifier, bool value)
 
 void CFPreferencesManager::setIntPreference(const char *identifier, int value)
 {
-    CFStringRef nom = CFStringCreateWithCString (NULL,name,CFStringGetSystemEncoding());
+    CFStringRef nom = CFStringCreateWithCString (NULL,identifier,CFStringGetSystemEncoding());
     if (nom != NULL)
     {
         CFNumberRef aValue = CFNumberCreate(NULL,kCFNumberIntType,&value);
@@ -90,7 +95,7 @@ void CFPreferencesManager::setIntPreference(const char *identifier, int value)
 
 void CFPreferencesManager::setStrPreference(const char *identifier, const char *value)
 {
-    CFStringRef nom = CFStringCreateWithCString (NULL,name,CFStringGetSystemEncoding());
+    CFStringRef nom = CFStringCreateWithCString (NULL,identifier,CFStringGetSystemEncoding());
     if (nom != NULL)
     {
         CFStringRef val = CFStringCreateWithCString (NULL,value,CFStringGetSystemEncoding());

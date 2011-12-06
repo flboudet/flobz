@@ -119,8 +119,8 @@ public:
     virtual void setScreenToPaused(bool fromControls);
     virtual void setScreenToResumed(bool fromControls);
     // Callbacks
-    virtual bool backPressed()  {}
-    virtual bool startPressed() {}
+    virtual bool backPressed()  {return false;}
+    virtual bool startPressed() {return false;}
     virtual void abort() { m_abortedFlag = true; }
     virtual bool getAborted() const { return m_abortedFlag; }
     //
