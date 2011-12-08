@@ -122,6 +122,9 @@ public:
     void setAccountTotalOnPlayerB(bool enable) {
         m_accountTotalOnPlayerB = enable;
     }
+    void setGameWidgetFactory(GameWidgetFactory *factory) {
+        m_gameWidgetFactory = factory;
+    }
 private:
     GameWidgetFactory  *m_gameWidgetFactory;
     GameOptions         m_gameOptions;

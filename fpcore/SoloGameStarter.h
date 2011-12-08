@@ -69,12 +69,12 @@ public:
     void draw(DrawTarget *dt);
     IdleComponent *getIdleComponent() { return this; }
     void eventOccured(event_manager::GameControlEvent *event);
-private:
+protected:
     FloboSetTheme &attachedFloboThemeSet;
     RandomSystem attachedRandom;
     std::auto_ptr<LocalGameFactory> m_gameFactory;
     std::auto_ptr<GameView>        m_areaA;
-    std::auto_ptr<CombinedEventPlayer> m_playerController;
+    std::auto_ptr<GamePlayer> m_playerController;
     PlayerGameStat m_gameStat;
     GameOptions m_options;
     int m_cyclesBeforeGameCycle;
@@ -100,7 +100,7 @@ public:
      */
     virtual void action(Widget *sender, int actionType,
 			event_manager::GameControlEvent *event);
-private:
+protected:
     SoloGameWidgetFactory m_gameWidgetFactory;
     GameStateMachine m_stateMachine;
     SharedMatchAssets m_sharedAssets;

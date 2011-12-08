@@ -24,7 +24,7 @@ if ENABLE_OPENGL_GFX
 flobopop_LDADD+=gametools/opengl_drawcontext/libopengl_drawcontext.la
 endif
 
-flobopop_LDADD+=$(SDL_LIBS) -lpng
+flobopop_LDADD+=$(SDL_LIBS)
 
 SUBDIRS = iosfc gametools goomsl common fpcore data fpserver
 
