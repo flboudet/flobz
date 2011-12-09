@@ -161,6 +161,12 @@ GameWidget::GameWidget()
     m_painterGameScreen = iimLib.createImage(IMAGE_RGB, GameUIDefaults::GAME_LOOP->getDrawContext()->w, GameUIDefaults::GAME_LOOP->getDrawContext()->h);
 }
 
+GameWidget::~GameWidget()
+{
+    for (unsigned int i=0; i<m_visualFX.size(); ++i)
+        delete m_visualFX[i];
+}
+
 void GameWidget::setScreenToPaused(bool fromControls)
 {
     if (associatedScreen != NULL)
@@ -256,7 +262,6 @@ void GameWidget2P::initWithoutGUI(GameView &areaA, GameView &areaB, GamePlayer &
     areaB.setPlayerNames(playerOneName, playerTwoName);
     this->controllerA = &controllerA;
     this->controllerB = &controllerB;
-    this->m_levelTheme = NULL;
     this->gameOverAction = gameOverAction;
     priv_initialize();
 }
@@ -277,19 +282,17 @@ void GameWidget2P::priv_initialize()
     setReceiveUpEvents(true);
     setFocusable(true);
 
+    // TODO: move elsewhere
     // Load and preload a few FX for the game
     for (int i=0; i<3; ++i)
-        floboFX.push_back(new VisualFX("fx/vanish.gsl", *(areaA->getFloboSetTheme())));
+        m_visualFX.push_back(new VisualFX("fx/vanish.gsl", *(areaA->getFloboSetTheme())));
     for (int i=0; i<3; ++i)
-        floboFX.push_back(new VisualFX("fx/combo.gsl", *(areaA->getFloboSetTheme())));
-    // floboFX.push_back(new VisualFX("fx/white_star.gsl"));
+        m_visualFX.push_back(new VisualFX("fx/combo.gsl", *(areaA->getFloboSetTheme())));
 }
 
 GameWidget2P::~GameWidget2P()
 {
     dead();
-    for (unsigned int i=0; i<floboFX.size(); ++i)
-        delete floboFX[i];
 }
 
 void GameWidget2P::cycle()
@@ -392,7 +395,7 @@ void GameWidget2P::cycle()
 void GameWidget2P::drawBackground(DrawTarget *dt)
 {
     IosRect dtRect = { 0, 0, dt->w, dt->h };
-    dt->draw(m_levelTheme->getBackground(), &dtRect, &dtRect);
+    dt->draw(getLevelTheme()->getBackground(), &dtRect, &dtRect);
 }
 
 void GameWidget2P::drawGameAreas(DrawTarget *dt)
@@ -416,7 +419,7 @@ void GameWidget2P::draw(DrawTarget *dt)
     // Render the background
     drawBackground(dt);
     // Rendering the opponent if it is behind the flobos
-    if (m_levelTheme->getOpponentIsBehind()) {
+    if (getLevelTheme()->getOpponentIsBehind()) {
         if (getOpponent() != NULL)
             getOpponent()->draw(dt);
     }
@@ -424,7 +427,7 @@ void GameWidget2P::draw(DrawTarget *dt)
     drawGameAreas(dt);
     // Rendering the grids
     IosRect drect;
-    IosSurface * grid = m_levelTheme->getGrid();
+    IosSurface * grid = getLevelTheme()->getGrid();
     if (grid != NULL) {
         drect.x = 21;
         drect.y = -1;
@@ -445,30 +448,30 @@ void GameWidget2P::draw(DrawTarget *dt)
     // Rendering the lives
     if (displayLives && (lives>=0) && (lives<=3))
     {
-        IosSurface * liveImage = m_levelTheme->getLifeForIndex(lives);
-        drect.x = m_levelTheme->getLifeDisplayX();
-        drect.y = m_levelTheme->getLifeDisplayY();
+        IosSurface * liveImage = getLevelTheme()->getLifeForIndex(lives);
+        drect.x = getLevelTheme()->getLifeDisplayX();
+        drect.y = getLevelTheme()->getLifeDisplayY();
         drect.w = liveImage->w;
         drect.h = liveImage->h;
         dt->draw(liveImage, NULL, &drect);
     }
     // Rendering the game speed meter
     IosRect speedRect;
-    IosSurface * speedFront = m_levelTheme->getSpeedMeter(true);
-    IosSurface * speedBack  = m_levelTheme->getSpeedMeter(false);
+    IosSurface * speedFront = getLevelTheme()->getSpeedMeter(true);
+    IosSurface * speedBack  = getLevelTheme()->getSpeedMeter(false);
     speedRect.x = 0;
     speedRect.w = speedFront->w;
     speedRect.h = gameSpeed * 6;
     speedRect.y = speedFront->h - speedRect.h;
-    drect.x = m_levelTheme->getSpeedMeterX() - speedRect.w / 2;
-    drect.y = m_levelTheme->getSpeedMeterY() - speedRect.h;
+    drect.x = getLevelTheme()->getSpeedMeterX() - speedRect.w / 2;
+    drect.y = getLevelTheme()->getSpeedMeterY() - speedRect.h;
     drect.w = speedRect.w;
     drect.h = speedRect.h;
     IosRect speedBlackRect = speedRect;
     IosRect drectBlack     = drect;
     speedBlackRect.h = speedFront->h - speedRect.h;
     speedBlackRect.y = 0;
-    drectBlack.y = m_levelTheme->getSpeedMeterY() - speedFront->h;
+    drectBlack.y = getLevelTheme()->getSpeedMeterY() - speedFront->h;
     drectBlack.h = speedBlackRect.h;
     dt->draw(speedBack,&speedBlackRect,&drectBlack);
     dt->draw(speedFront,&speedRect, &drect);
@@ -476,19 +479,19 @@ void GameWidget2P::draw(DrawTarget *dt)
     areaA->renderScore(dt);
     areaB->renderScore(dt);
     // Rendering the player names
-    IosFont *font = m_levelTheme->getPlayerNameFont();
+    IosFont *font = getLevelTheme()->getPlayerNameFont();
     if (m_displayPlayerOneName)
         dt->putStringCenteredXY(font,
-                                m_levelTheme->getNameDisplayX(0),
-                                m_levelTheme->getNameDisplayY(0),
+                                getLevelTheme()->getNameDisplayX(0),
+                                getLevelTheme()->getNameDisplayY(0),
                                 playerOneName);
     if (m_displayPlayerTwoName)
         dt->putStringCenteredXY(font,
-                                m_levelTheme->getNameDisplayX(1),
-                                m_levelTheme->getNameDisplayY(1),
+                                getLevelTheme()->getNameDisplayX(1),
+                                getLevelTheme()->getNameDisplayY(1),
                                 playerTwoName);
     // Rendering the opponent if it is in front
-    if (! m_levelTheme->getOpponentIsBehind()) {
+    if (! getLevelTheme()->getOpponentIsBehind()) {
         if (getOpponent() != NULL)
             getOpponent()->draw(dt);
     }

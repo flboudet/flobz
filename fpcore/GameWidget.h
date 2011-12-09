@@ -100,7 +100,7 @@ public:
     };
 public:
     GameWidget();
-    virtual ~GameWidget() {}
+    virtual ~GameWidget();
 public:
     // A deplacer
     void setAssociatedScreen(GameScreen *associatedScreen) { this->associatedScreen = associatedScreen; associatedScreenHasBeenSet(associatedScreen); };
@@ -109,7 +109,7 @@ public:
         this->gameOverAction = gameOverAction;
     }
     //
-    virtual std::vector<VisualFX*> &getVisualFX()  { return floboFX; }
+    virtual std::vector<VisualFX*> &getVisualFX()  { return m_visualFX; }
 public:
     virtual void setGameOptions(GameOptions options) = 0;
     //
@@ -138,13 +138,15 @@ public:
     bool isFocusable() { return !m_paused; }
 protected:
     void setLevelTheme(LevelTheme *levelTheme);
-    std::auto_ptr<StyrolysePainterClient> m_styroPainter;
+    LevelTheme *getLevelTheme() const { return m_levelTheme; }
 protected:
+    std::auto_ptr<StyrolysePainterClient> m_styroPainter;
+private:
     LevelTheme *m_levelTheme;
 protected:
     gameui::Action *gameOverAction;
     GameScreen *associatedScreen;
-    std::vector<VisualFX*> floboFX;
+    std::vector<VisualFX*> m_visualFX;
 protected:
     bool m_paused, m_obscureScreenOnPause;
     IosSurface *m_painterGameScreen;

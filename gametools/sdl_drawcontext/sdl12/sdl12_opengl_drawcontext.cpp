@@ -386,6 +386,10 @@ SDL12_OpenGL_DrawContext::SDL12_OpenGL_DrawContext(DataPathManager *dataPathMana
                                                    const char *caption)
     : m_backendUtil(dataPathManager)
 {
+    // Wait for vertical retrace on swapbuffer
+#ifdef SDL_GL_SWAP_CONTROL
+    SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
+#endif
     display = SDL_SetVideoMode(w, h, 0, SDL_OPENGL|SDL_ANYFORMAT|SDL_HWSURFACE|SDL_DOUBLEBUF|(fullscreen?SDL_FULLSCREEN:0));
     if (display == NULL) {
         fprintf(stderr, "SDL_SetVideoMode error: %s\n",
@@ -395,6 +399,7 @@ SDL12_OpenGL_DrawContext::SDL12_OpenGL_DrawContext(DataPathManager *dataPathMana
     atexit(SDL_Quit);
     SDL_ShowCursor(SDL_DISABLE);
     SDL_WM_SetCaption(caption, NULL);
+    SDL_putenv("__GL_SYNC_TO_VBLANK=1");
     init(&m_backendUtil, w, h);
 }
 

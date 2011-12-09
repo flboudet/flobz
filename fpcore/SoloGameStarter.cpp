@@ -74,6 +74,13 @@ SoloGameWidget::SoloGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTh
                                         levelTheme.getSpeedMeterX()),
                                    levelTheme.getSpeedMeter(true),
                                    levelTheme.getSpeedMeter(false)));
+
+    // TODO: move elsewhere
+    // Load and preload a few FX for the game
+    for (int i=0; i<3; ++i)
+        m_visualFX.push_back(new VisualFX("fx/vanish.gsl", *(m_areaA->getFloboSetTheme())));
+    for (int i=0; i<3; ++i)
+        m_visualFX.push_back(new VisualFX("fx/combo.gsl", *(m_areaA->getFloboSetTheme())));
 }
 
 void SoloGameWidget::gameDidEndCycle()
@@ -138,7 +145,7 @@ void SoloGameWidget::draw(DrawTarget *dt)
         return;
     }
     IosRect dtRect = { 0, 0, dt->w, dt->h };
-    dt->draw(m_levelTheme->getBackground(), &dtRect, &dtRect);
+    dt->draw(getLevelTheme()->getBackground(), &dtRect, &dtRect);
     m_areaA->render(dt);
     // Rendering the combo meter
     m_comboMeter->setValue(m_comboHandicap / 100.);
