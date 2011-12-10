@@ -2,6 +2,7 @@
 #define _SDL12_OPENGL_DRAWCONTEXT_H
 
 #include "opengl_drawcontext/OpenGLDrawContext.h"
+#include "opengl_drawcontext/StandardTextureLoader.h"
 #include "DataPathManager.h"
 #include <SDL/SDL.h>
 
@@ -14,20 +15,12 @@ private:
     SDL_Surface *m_s;
 };
 
-class SDL12_OpenGLBackendUtil : public OpenGLBackendUtil
+class SDL12_OpenGLBackendUtil : public StandardTextureLoader
 {
 public:
     SDL12_OpenGLBackendUtil(DataPathManager *dataPathManager);
-    virtual unsigned short * utf8ToUnicode(const char *utf8Text, unsigned short *unicodeTextBuffer, size_t unicodeTextBufferSize);
-    virtual OpenGLRawImage * loadImage(ImageType type, const char *path);
     virtual void ensureContextIsActive();
     virtual void flip();
-    virtual DataPathManager * getdataPathManager() const { return m_dataPathManager; }
-private:
-    OpenGLRawImage * loadImagePNG(ImageType type, const char *path);
-    OpenGLRawImage * loadImageJPG(ImageType type, const char *path);
-private:
-    DataPathManager *m_dataPathManager;
 };
 
 class SDL12_OpenGL_DrawContext : public OpenGLDrawContext {
@@ -35,9 +28,14 @@ public:
     SDL12_OpenGL_DrawContext(DataPathManager *dataPathManager,
                              int w, int h, bool fullscreen,
                              const char *caption);
+    // Specific methods
+    void setFullScreen(bool fullscreen);
+private:
+    void initDisplay(bool fullScreen);
 private:
     SDL12_OpenGLBackendUtil m_backendUtil;
     SDL_Surface *display;
+    std::string m_caption;
 };
 
 #endif // _SDL12_OPENGL_DRAWCONTEXT_H

@@ -175,6 +175,10 @@ http://www.libsdl.org/projects/SDL_ttf/index.html])])
 
 AC_SEARCH_LIBS([glGetError], [GL])
 
+AC_SEARCH_LIBS([png_set_read_fn], [png])
+
+AC_SEARCH_LIBS([jpeg_read_header], [jpeg])
+
 SDL_LIBS=$LIBS
 LIBS=$OLD_LIBS
 

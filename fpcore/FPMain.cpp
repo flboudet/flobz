@@ -242,7 +242,11 @@ void FPMain::notificationOccured(String identifier, void * context)
     if (identifier == theCommander->getFullScreenKey()) {
         theCommander->getPreferencesManager()->setBoolPreference(kFullScreenPref, *(bool *)context);
 #ifdef SDL12_GFX
+#ifdef OPENGL_GFX
+        static_cast<SDL12_OpenGL_DrawContext *>(m_nativeDrawContext)->setFullScreen(*(bool *)context);
+#else
         static_cast<SDL12_DrawContext *>(m_nativeDrawContext)->setFullScreen(*(bool *)context);
+#endif
 #endif
 #ifdef SDL13_GFX
         static_cast<SDL13_DrawContext *>(m_nativeDrawContext)->setFullScreen(*(bool *)context);
