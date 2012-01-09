@@ -198,70 +198,6 @@ void StoryModeLevelsDefinition::end_level(GoomSL *gsl, GoomHash *global, GoomHas
 					easySettings, mediumSettings, hardSettings);
 }
 
-GameOver1PScreen::GameOver1PScreen(String screenName,
-        Action *finishedAction, String playerName, const PlayerGameStat &playerPoints, bool initialTransition)
-        : StoryScreen(screenName, finishedAction, initialTransition),
-        playerName(playerName), playerStat(playerPoints)
-{
-    initHiScores(AI_NAMES);
-    int scorePlace = setHiScore(playerStat.total_points, playerName);
-
-    for (int i = 0 ; i < kHiScoresNumber ; i++) {
-        hiScoreNameBox.add(&names[i]);
-        hiScorePointBox.add(&points[i]);
-        if (i == scorePlace) {
-            names[i].setFont(GameUIDefaults::FONT);
-            points[i].setFont(GameUIDefaults::FONT);
-        }
-    }
-	titleText.setFont(GameUIDefaults::FONT_INACTIVE);
-	titleText.setValue(theCommander->getLocalizedString("Your Final Score:"));
-	titleScore.setFont(GameUIDefaults::FONT);
-	titleBox.add(&titleText);
-	titleBox.add(&titleScore);
-
-    hiScoreBox.add(&hiScoreNameBox);
-    hiScoreBox.add(&hiScorePointBox);
-
-	add(&titleBox);
-    add(&hiScoreBox);
-    refresh();
-}
-
-void GameOver1PScreen::refresh()
-{
-    hiscore *scores = getHiScores();
-    for (int i = 0 ; i < kHiScoresNumber ; i++) {
-        char tmp[256];
-        sprintf(tmp, "%d", scores[i].score);
-        names[i].setValue(scores[i].name.c_str());
-        points[i].setValue(tmp);
-    }
-
-	{
-		char tmp[256];
-		sprintf(tmp, "%d", playerStat.total_points);
-		titleScore.setValue(tmp);
-		Vec3 titlePos = titleBox.getPosition();
-		titlePos.x = storyWidget.getIntegerValue("@hiScoreTopBox.x");
-		titlePos.y = storyWidget.getIntegerValue("@hiScoreTopBox.y");
-		titleBox.setPosition(titlePos);
-		titleBox.setSize(Vec3(storyWidget.getIntegerValue("@hiScoreTopBox.w"),
-							  storyWidget.getIntegerValue("@hiScoreTopBox.h"), 0));
-	}
-    Vec3 hiScorePos = hiScoreBox.getPosition();
-    hiScorePos.x = storyWidget.getIntegerValue("@hiScoreBox.x");
-    hiScorePos.y = storyWidget.getIntegerValue("@hiScoreBox.y");
-    hiScoreBox.setPosition(hiScorePos);
-
-    hiScoreBox.setSize(Vec3(storyWidget.getIntegerValue("@hiScoreBox.w"),
-                            storyWidget.getIntegerValue("@hiScoreBox.h"), 0));
-}
-
-GameOver1PScreen::~GameOver1PScreen()
-{
-}
-
 //---------------------------------
 // StoryModeMatchIsOverState
 //---------------------------------
@@ -490,51 +426,8 @@ void StoryModePrepareNextMatchState::reset()
 }
 
 //---------------------------------
-// StoryModeDisplayHallOfFameState
+// StoryModeStarterAction
 //---------------------------------
-StoryModeDisplayHallOfFameState::StoryModeDisplayHallOfFameState(SharedGameAssets *sharedGameAssets,
-                                                                 SharedMatchAssets *sharedMatchAssets,
-                                                                 const char *storyName)
-    : m_storyName(storyName), m_sharedGameAssets(sharedGameAssets), m_sharedMatchAssets(sharedMatchAssets)
-{
-}
-
-void StoryModeDisplayHallOfFameState::enterState()
-{
-    if (m_storyName == "") {
-        m_storyName = m_sharedGameAssets->levelDef->gameOverStory;
-    }
-    GTLogTrace("StoryModeDisplayHallOfFameState(%s)::enterState()", m_storyName.c_str());
-    std::string &playerName = m_sharedGameAssets->playerName;
-    const PlayerGameStat &playerPoints = m_sharedMatchAssets->m_gameWidget->getStatPlayerOne();
-    m_gameOverScreen.reset(new GameOver1PScreen(m_storyName.c_str(),
-                                        this, playerName.c_str(), playerPoints));
-    GameUIDefaults::SCREEN_STACK->swap(m_gameOverScreen.get());
-    m_gameOverScreen->refresh();
-    m_acknowledged = false;
-}
-
-void StoryModeDisplayHallOfFameState::exitState()
-{
-    GameUIDefaults::GAME_LOOP->garbageCollect(m_gameOverScreen.release());
-}
-
-bool StoryModeDisplayHallOfFameState::evaluate()
-{
-    return m_acknowledged;
-}
-
-GameState *StoryModeDisplayHallOfFameState::getNextState()
-{
-    return m_nextState;
-}
-
-void StoryModeDisplayHallOfFameState::action(Widget *sender, int actionType,
-                        event_manager::GameControlEvent *event)
-{
-    m_acknowledged = true;
-    evaluateStateMachine();
-}
 
 StoryModeStarterAction::StoryModeStarterAction(GameDifficulty difficulty,
                                                            PlayerNameProvider *nameProvider)
@@ -548,8 +441,8 @@ StoryModeStarterAction::StoryModeStarterAction(GameDifficulty difficulty,
     m_prepareNextMatch.reset(new StoryModePrepareNextMatchState(&m_sharedGameAssets));
     m_playMatch.reset(new StoryModeMatchState(&m_sharedGameAssets));
     m_gameWon.reset(new DisplayStoryScreenState("gamewon_1p.gsl"));
-    m_gameLostHoF.reset(new StoryModeDisplayHallOfFameState(&m_sharedGameAssets, m_playMatch->getMatchAssets()));
-    m_gameWonHoF.reset(new StoryModeDisplayHallOfFameState(&m_sharedGameAssets, m_playMatch->getMatchAssets(), "gamewon_highscores_1p.gsl"));
+    m_gameLostHoF.reset(new DisplayHallOfFameState(m_playMatch->getMatchAssets(), nameProvider, STORY_SCOREBOARD_ID, "", &m_sharedGameAssets));
+    m_gameWonHoF.reset(new DisplayHallOfFameState(m_playMatch->getMatchAssets(), nameProvider, STORY_SCOREBOARD_ID, "gamewon_highscores_1p.gsl"));
     m_leaveGame.reset(new LeaveGameState(*(m_playMatch->getMatchAssets())));
     // Linking the states together
     m_pushGameScreen->setNextState(m_prepareNextMatch.get());

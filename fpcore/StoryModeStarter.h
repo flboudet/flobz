@@ -122,30 +122,19 @@ private:
     AdvancedBuffer<LevelDefinition *> levelDefinitions;
 };
 
-class GameOver1PScreen : public StoryScreen {
-public:
-    GameOver1PScreen(String screenName, Action *finishedAction,
-            String playerName, const PlayerGameStat &playerPoints, bool initialTransition=false);
-    void refresh();
-    virtual ~GameOver1PScreen();
-private:
-	HBox titleBox;
-	Text titleText;
-	Text titleScore;
-    Text names[kHiScoresNumber], points[kHiScoresNumber];
-    VBox hiScoreNameBox, hiScorePointBox;
-    HBox hiScoreBox;
-    String playerName;
-    PlayerGameStat playerStat;
-};
-
-struct SharedGameAssets
+class SharedGameAssets : public StoryNameProvider
 {
+public:
     std::string    playerName;
     GameDifficulty difficulty;
     GameOptions    gameOptions;
     int            lifes;
     StoryModeLevelsDefinition::LevelDefinition *levelDef;
+public:
+    virtual std::string getStoryName() const
+    {
+        return (const char *)(levelDef->gameOverStory);
+    }
 };
 
 /**
@@ -175,36 +164,6 @@ private:
     std::auto_ptr<StoryWidget> m_gameLostWidget;
     bool m_aknowledged;
     GameState *m_nextState;
-};
-
-/**
- * Show the story mode Hall of Fame
- */
-class StoryModeDisplayHallOfFameState : public GameState, public Action
-{
-public:
-    StoryModeDisplayHallOfFameState(SharedGameAssets *sharedGameAssets,
-                                    SharedMatchAssets *sharedMatchAssets,
-                                    const char *storyName="");
-    // GameState implementation
-    virtual void enterState();
-    virtual void exitState();
-    virtual bool evaluate();
-    virtual GameState *getNextState();
-    // Own methods
-    void setNextState(GameState *nextState) {
-        m_nextState = nextState;
-    }
-    // Action implementation
-    virtual void action(Widget *sender, int actionType,
-                        event_manager::GameControlEvent *event);
-private:
-    SharedGameAssets  *m_sharedGameAssets;
-    SharedMatchAssets *m_sharedMatchAssets;
-    std::string m_storyName;
-    GameState *m_nextState;
-    std::auto_ptr<GameOver1PScreen> m_gameOverScreen;
-    bool m_acknowledged;
 };
 
 /**
@@ -326,8 +285,8 @@ protected:
     std::auto_ptr<StoryModePrepareNextMatchState> m_prepareNextMatch;
     std::auto_ptr<StoryModeMatchState>  m_playMatch;
     std::auto_ptr<DisplayStoryScreenState> m_gameWon;
-    std::auto_ptr<StoryModeDisplayHallOfFameState> m_gameLostHoF;
-    std::auto_ptr<StoryModeDisplayHallOfFameState> m_gameWonHoF;
+    std::auto_ptr<DisplayHallOfFameState> m_gameLostHoF;
+    std::auto_ptr<DisplayHallOfFameState> m_gameWonHoF;
     std::auto_ptr<LeaveGameState>          m_leaveGame;
 };
 

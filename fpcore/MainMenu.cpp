@@ -19,6 +19,7 @@ local2PlayersGameMenu(mainScreen),
 optionMenu        (mainScreen),
 popFromHallScreenAction(),
 popFromCreditsAction(),
+hiScores("StoryMode", theCommander->getPreferencesManager(), defaultHiScores),
 hallOfFameScreen(&popFromHallScreenAction),
 creditsScreen("credits.gsl", &popFromCreditsAction, false),
 // Create action for buttons

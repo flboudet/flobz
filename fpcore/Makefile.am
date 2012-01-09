@@ -13,7 +13,7 @@ libfpcore_la_SOURCES=audio.cpp HiScores.cpp FPCommander.cpp \
           LevelThemeMenu.cpp ThemeMenu.cpp ScreenTransition.cpp \
           FloboGameAbstract.cpp FPStrings.cpp \
           PackageDescription.cpp AnimatedFloboTheme.cpp GSLFileAccessWrapper.cpp \
-	  PlayerNameUtils.cpp
+	  PlayerNameUtils.cpp HallOfFame.cpp
 
 # Optional sources for network gaming support
 if ENABLE_NETWORK

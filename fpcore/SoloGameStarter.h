@@ -75,7 +75,6 @@ protected:
     std::auto_ptr<LocalGameFactory> m_gameFactory;
     std::auto_ptr<GameView>        m_areaA;
     std::auto_ptr<GamePlayer> m_playerController;
-    PlayerGameStat m_gameStat;
     GameOptions m_options;
     int m_cyclesBeforeGameCycle;
     int m_cyclesBeforeLevelRaise;
@@ -105,13 +104,14 @@ protected:
     GameStateMachine m_stateMachine;
     SharedMatchAssets m_sharedAssets;
     SharedGetReadyAssets        m_sharedGetReadyAssets;
-    std::auto_ptr<PushScreenState>       m_pushGameScreen;
-    std::auto_ptr<SetupMatchState>       m_setupMatch;
-    std::auto_ptr<EnterPlayerReadyState> m_enterPlayersReady;
-    std::auto_ptr<ExitPlayerReadyState>  m_exitPlayersReady;
-    std::auto_ptr<MatchPlayingState>     m_matchPlaying;
-    std::auto_ptr<MatchIsOverState>      m_matchIsOver;
-    std::auto_ptr<LeaveGameState>        m_leaveGame;
+    std::auto_ptr<PushScreenState>        m_pushGameScreen;
+    std::auto_ptr<SetupMatchState>        m_setupMatch;
+    std::auto_ptr<EnterPlayerReadyState>  m_enterPlayersReady;
+    std::auto_ptr<ExitPlayerReadyState>   m_exitPlayersReady;
+    std::auto_ptr<MatchPlayingState>      m_matchPlaying;
+    std::auto_ptr<MatchIsOverState>       m_matchIsOver;
+    std::auto_ptr<DisplayHallOfFameState> m_hallOfFame;
+    std::auto_ptr<LeaveGameState>         m_leaveGame;
 };
 
 #endif // _SOLOGAMESTARTER_H_

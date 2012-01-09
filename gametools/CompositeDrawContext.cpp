@@ -137,6 +137,7 @@ IosSurface * CompositeSurface::resizeAlpha(int width, int height)
     CompositeSurface *result = new CompositeSurface(m_ownerImageLibrary, m_baseSurface, m_cropRect);
     result->w = width;
     result->h = height;
+    result->m_isCropped = m_isCropped;
     return result;
 }
 

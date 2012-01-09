@@ -30,11 +30,18 @@
 #include "GameWidget.h"
 #include "GameScreen.h"
 #include "StatsWidget.h"
+#include "HallOfFame.h"
 
 class PlayerNameProvider {
 public:
     virtual String getPlayerName(int playerNumber) const = 0;
     virtual ~PlayerNameProvider() {};
+};
+
+class StoryNameProvider {
+public:
+    virtual std::string getStoryName() const = 0;
+    virtual ~StoryNameProvider() {}
 };
 
 class GameWidgetFactory {
@@ -325,6 +332,42 @@ private:
     bool m_acknowledged;
     std::auto_ptr<StoryScreen> m_storyScreen;
     GameState *m_nextState;
+};
+
+/**
+ * Show the Hall of Fame
+ */
+class DisplayHallOfFameState : public GameState, public Action
+{
+public:
+    DisplayHallOfFameState(SharedMatchAssets  *sharedMatchAssets,
+                           PlayerNameProvider *nameProvider,
+                           const char         *scoreBoardId,
+                           const char         *storyName="",
+                           StoryNameProvider  *storyNameProvider = NULL);
+    // GameState implementation
+    virtual void enterState();
+    virtual void exitState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // Own methods
+    void setNextState(GameState *nextState) {
+        m_nextState = nextState;
+    }
+    // Action implementation
+    virtual void action(Widget *sender, int actionType,
+                        event_manager::GameControlEvent *event);
+private:
+    SharedMatchAssets  *m_sharedMatchAssets;
+    PlayerNameProvider *m_nameProvider;
+    std::string m_boardId;
+    std::string m_storyName;
+    StoryNameProvider  *m_storyNameProvider;
+    GameState *m_nextState;
+    std::auto_ptr<GameOverScreen> m_gameOverScreen;
+    std::auto_ptr<LocalStorageHiScoreBoard> m_scoreBoard;
+    HiScoreDefaultBoard m_defaultScoreBoard;
+    bool m_acknowledged;
 };
 
 /**

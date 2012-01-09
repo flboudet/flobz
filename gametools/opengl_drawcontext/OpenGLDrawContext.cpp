@@ -878,7 +878,12 @@ IosSurface *IosGLSurfaceRef::setAlpha(float alpha)
 
 IosSurface * IosGLSurfaceRef::resizeAlpha(int width, int height)
 {
-    return new IosGLSurfaceRef(this); // TODO... easy fix with drawToGl supporting scaling...
+    GTLogTrace("Waz here");
+    IosGLSurfaceRef *result = new IosGLSurfaceRef(this);
+    result->h = height;
+    result->w = width;
+    // TODO: not really implemented (but not really important with the composite drawcontext)
+    return result;
 }
 
 IosSurface * IosGLSurfaceRef::mirrorH()

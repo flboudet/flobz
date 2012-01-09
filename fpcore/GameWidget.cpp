@@ -23,6 +23,7 @@
 
 #include "GameWidget.h"
 #include "GameScreen.h"
+#include "GTLog.h"
 
 using namespace event_manager;
 
@@ -549,8 +550,7 @@ std::vector<VisualFX*> *activeFX = NULL;
 void EventFX(const char *name, float x, float y, int player)
 {
     if (activeFX == NULL) return;
-
-    /* printf("Simultaneous FX: %d\n", activeFX->size()); */
+    GTLogTrace("EventFX trigged with name=%s\n", name);
 
     VisualFX *supporting_fx = NULL;
     for (unsigned int i=0; i<activeFX->size(); ++i) {
@@ -561,6 +561,7 @@ void EventFX(const char *name, float x, float y, int player)
             supporting_fx = fx;
             // FX not busy, report it the event
             if (!fx->busy()) {
+                GTLogTrace("EventFX %s posted\n", name);
                 fx->postEvent(name, x, y, player);
                 return;
             }

@@ -50,6 +50,8 @@ private:
     OptionMenu            optionMenu;
 
     PopToMainScreenAction popFromHallScreenAction, popFromCreditsAction;
+    HiScoreDefaultBoard   defaultHiScores;
+    LocalStorageHiScoreBoard hiScores;
     HallOfFameScreen      hallOfFameScreen; // Comes from StoryModeStarter.cpp
     StoryScreen           creditsScreen;
     PushMainScreenMenuAction    soloGameAction;

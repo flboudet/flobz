@@ -71,7 +71,7 @@ SoloGameWidget::SoloGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTh
     m_areaA->getAttachedGame()->addGameListener(this);
     setLevelTheme(&levelTheme);
     m_comboMeter.reset(new VuMeter(Vec3(levelTheme.getSpeedMeterX(),
-                                        levelTheme.getSpeedMeterX()),
+                                        levelTheme.getSpeedMeterY()),
                                    levelTheme.getSpeedMeter(true),
                                    levelTheme.getSpeedMeter(false)));
 
@@ -81,6 +81,8 @@ SoloGameWidget::SoloGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTh
         m_visualFX.push_back(new VisualFX("fx/vanish.gsl", *(m_areaA->getFloboSetTheme())));
     for (int i=0; i<3; ++i)
         m_visualFX.push_back(new VisualFX("fx/combo.gsl", *(m_areaA->getFloboSetTheme())));
+    for (int i=0; i<3; ++i)
+        m_visualFX.push_back(new VisualFX("fx/starvedcombo.gsl", *(m_areaA->getFloboSetTheme())));
 }
 
 void SoloGameWidget::gameDidEndCycle()
@@ -126,9 +128,13 @@ void SoloGameWidget::cycle()
         }
         m_cyclesBeforeGameCycle--;
         m_comboHandicap += 0.05;
+        if (m_comboHandicap == 75.) {
+            EventFX("vanish", 20, 20, 1);
+        }
         if (m_comboHandicap >= 100.) {
             m_areaA->getAttachedGame()->increaseNeutralFlobos(6);
             m_comboHandicap = 0.;
+            EventFX("starvedcombo", 20, 20, 1);
         }
         requestDraw();
     }
@@ -150,9 +156,13 @@ void SoloGameWidget::draw(DrawTarget *dt)
     // Rendering the combo meter
     m_comboMeter->setValue(m_comboHandicap / 100.);
     m_comboMeter->draw(dt);
+    // Rendering the scores
+    m_areaA->renderScore(dt);
     // Rendering the foreground animation
     if (m_styroPainter.get() != NULL)
         m_styroPainter->draw(dt);
+    // Rendering the neutral puyos
+    m_areaA->renderNeutral(dt);
 }
 
 void SoloGameWidget::eventOccured(GameControlEvent *event)
@@ -190,11 +200,11 @@ void SoloGameWidget::setPlayerTwoName(String newName)
 {}
 PlayerGameStat &SoloGameWidget::getStatPlayerOne()
 {
-    return m_gameStat;
+    return m_areaA->getAttachedGame()->getGameStat();
 }
 PlayerGameStat &SoloGameWidget::getStatPlayerTwo()
 {
-    return m_gameStat;
+    return m_areaA->getAttachedGame()->getGameStat();
 }
 void SoloGameWidget::addGameAHandicap(int handicap)
 {}
@@ -218,6 +228,9 @@ SoloModeStarterAction::SoloModeStarterAction(GameDifficulty difficulty, PlayerNa
     m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));
     m_matchIsOver.reset(new MatchIsOverState(m_sharedAssets));
+    m_hallOfFame.reset(new DisplayHallOfFameState(&m_sharedAssets, nameProvider,
+                                                  SOLO_SCOREBOARD_ID,
+                                                  "gamewon_highscores_1p.gsl"));
     m_leaveGame.reset(new LeaveGameState(m_sharedAssets));
     // Linking the states together
     m_pushGameScreen->setNextState(m_setupMatch.get());
@@ -226,7 +239,8 @@ SoloModeStarterAction::SoloModeStarterAction(GameDifficulty difficulty, PlayerNa
     m_exitPlayersReady->setNextState(m_matchPlaying.get());
     m_matchPlaying->setNextState(m_matchIsOver.get());
     m_matchPlaying->setAbortedState(m_leaveGame.get());
-    m_matchIsOver->setNextState(m_leaveGame.get());
+    m_matchIsOver->setNextState(m_hallOfFame.get());
+    m_hallOfFame->setNextState(m_leaveGame.get());
     // Initializing the state machine
     m_stateMachine.setInitialState(m_pushGameScreen.get());
 }

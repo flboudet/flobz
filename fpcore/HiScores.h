@@ -2,18 +2,38 @@
 #define _HISCORE
 
 #include <string>
+#include <vector>
+#include "PreferencesManager.h"
 
-#define kHiScoresNumber 10
+struct HiScoreEntry {
+    std::string name;
+    int  score;
 
-typedef struct hiscore {
-  std::string name;
-  int  score;
-} hiscore;
+    HiScoreEntry(std::string name, int score)
+        : name(name), score(score) {}
+    HiScoreEntry() : score(0) {}
+    bool operator < (const HiScoreEntry &c)
+    { return score < c.score; }
+};
 
-void initHiScores(const char * const defaultNames[kHiScoresNumber]);
+class HiScoreBoard {
+public:
+    virtual ~HiScoreBoard() {}
+    virtual const HiScoreEntry &getEntry(int rank) const = 0;
+    virtual int getMaxRank() const = 0;
+    virtual int setHiScore(std::string name, int score) = 0;
+};
 
-hiscore * getHiScores(void);
-
-int setHiScore(int score, const char * name);
+class LocalStorageHiScoreBoard : public HiScoreBoard
+{
+public:
+    LocalStorageHiScoreBoard(const char *boardId, PreferencesManager *prefsMgr, HiScoreBoard &defaultScores);
+    virtual const HiScoreEntry &getEntry(int rank) const;
+    virtual int getMaxRank() const;
+    virtual int setHiScore(std::string name, int score);
+private:
+    PreferencesManager *m_prefsMgr;
+    std::vector<HiScoreEntry> m_entries;
+};
 
 #endif // _HISCORE

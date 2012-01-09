@@ -138,8 +138,8 @@ void FloboThemePicturePreview::draw(DrawTarget *dt)
       Vec3 size = getSize();
       r.x = (int16_t)(getPosition().x+(size.x-NUMBER_OF_FLOBOS*ONEPUYO+(NUMBER_OF_FLOBOS-1)*ONEPUYO/4.0)/2.0);
       r.y = (int16_t)(getPosition().y+(size.y-ONEPUYO)/2.0);
-      r.h = 0;
-      r.w = 0;
+      r.h = 32;
+      r.w = 32;
       for (int i=0; i<NUMBER_OF_FLOBOS; i++)
       {
         IosRect rect = r;
@@ -164,7 +164,6 @@ void FloboThemePicturePreview::idle(double currentTime)
 
     if ((currentTime - lastTime) > 0.1)
     {
-      //fprintf(stderr,"TIME! %d\n",imageForIndex(eyes[0]));
       for (int i=0; i<NUMBER_OF_FLOBOS; i++)
       {
         if(eyes[i]>0)

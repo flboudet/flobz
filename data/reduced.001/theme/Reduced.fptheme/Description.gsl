@@ -42,3 +42,24 @@
     level.get_ready_animation  = "getready.gsl"
 [end_level]
 
+[start_level]
+    level.name          = "Blue Plastic Solo"
+    level.description   = "A slick theme for the reduced game"
+    level.background    = "blueplastic-solo.jpg"
+    level.grid          = ""
+    level.foreground_animation = "blueplastic-solo_foreground.gsl"
+    level.get_ready_animation  = "getready.gsl"
+
+    level.speedmeter_display.x = 510
+    level.speedmeter_display.y = 170
+    level.floboban_p1.display.x = 154
+    level.floboban_p1.display.y = 0
+    level.floboban_p1.next.x = 433
+    level.floboban_p1.next.y = 66
+    level.floboban_p1.neutral_display.x = 190
+    level.floboban_p1.neutral_display.y = 35
+    level.floboban_p1.name_display.x = 472
+    level.floboban_p1.name_display.y = 366
+    level.floboban_p1.score_display.x = 472
+    level.floboban_p1.score_display.y = 328
+[end_level]

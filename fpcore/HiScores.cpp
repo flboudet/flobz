@@ -1,72 +1,68 @@
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include "FPCommander.h"
+#include <iostream>
+#include <sstream>
+#include <list>
 #include "HiScores.h"
+#include "GTLog.h"
 
-static hiscore HS[kHiScoresNumber];
-static bool loaded = false;
+#include "FPCommander.h"
 
-void initHiScores(const char * const defaultNames[kHiScoresNumber])
+using namespace std;
+
+LocalStorageHiScoreBoard::LocalStorageHiScoreBoard(const char *boardId, PreferencesManager *prefsMgr, HiScoreBoard &defaultScores)
+    : m_prefsMgr(prefsMgr)
 {
-    if (loaded) return;
-    char HSID[8];
-
-    for (int i=0; i<kHiScoresNumber; i++)
+    std::list<HiScoreEntry> entries;
+    for (int i=0; i < defaultScores.getMaxRank(); ++i)
     {
-        sprintf(HSID,"HSN%2d",i);
-        HS[i].name = theCommander->getPreferencesManager()->getStrPreference(HSID,defaultNames[kHiScoresNumber-i-1]);
-        sprintf(HSID,"HSS%2d",i);
-        HS[i].score = theCommander->getPreferencesManager()->getIntPreference(HSID,(kHiScoresNumber-i) * 10000);
+        const HiScoreEntry & defaultEntry = defaultScores.getEntry(i);
+        HiScoreEntry entry;
+        ostringstream hiScoreNameKey, hiScoreValKey;
+        hiScoreNameKey << "score." << boardId << ".name." << i;
+        hiScoreValKey << "score." << boardId << ".val." << i;
+        entry.name = prefsMgr->getStrPreference(hiScoreNameKey.str().c_str(), defaultEntry.name.c_str());
+        entry.score = prefsMgr->getIntPreference(hiScoreValKey.str().c_str(), defaultEntry.score);
+        entries.push_back(entry);
     }
-    loaded = true;
+    entries.sort();
+    entries.reverse();
+    m_entries.resize(entries.size());
+    entries.reverse();
+    copy(entries.begin(), entries.end(), m_entries.begin());
 }
 
-hiscore * getHiScores(void)
+const HiScoreEntry & LocalStorageHiScoreBoard::getEntry(int rank) const
 {
-    if (loaded!=true)
-    {
-        fprintf(stderr,"getHiscores() called before init, app may crash...");
-        return NULL;
-    }
-    else return  HS;
+    return m_entries[rank];
 }
 
-
-
-
-int setHiScore(int score, const char * name)
+int LocalStorageHiScoreBoard::getMaxRank() const
 {
-  int retour = -1;
-
-  if (loaded!=true)
-  {
-    fprintf(stderr,"setHiscores() called before init, app may crash...");
-    return retour;
-  }
-
-  hiscore tmp, tmp2;
-
-  tmp.name = name;
-  tmp.score = score;
-
-  char HSID[8];
-
-  for (int i=0; i<kHiScoresNumber; i++)
-  {
-    if (tmp.score >= HS[i].score)
-    {
-      if (retour == -1) retour = i;
-
-      sprintf(HSID,"HSN%2d",i);
-      theCommander->getPreferencesManager()->setStrPreference(HSID,tmp.name.c_str());
-      sprintf(HSID,"HSS%2d",i);
-      theCommander->getPreferencesManager()->setIntPreference(HSID,tmp.score);
-
-      tmp2 = HS[i];
-      HS[i] = tmp;
-      tmp = tmp2;
-    }
-  }
-  return retour;
+    return m_entries.size();
 }
+
+int LocalStorageHiScoreBoard::setHiScore(std::string name, int score)
+{
+    HiScoreEntry entry(name, score);
+    std::list<HiScoreEntry> entries;
+    entries.resize(m_entries.size());
+    copy(m_entries.begin(), m_entries.end(), entries.begin());
+    entries.push_back(entry);
+    std::list<HiScoreEntry>::iterator newScore = entries.end();
+    --newScore;
+    entries.sort();
+    entries.reverse();
+    entries.resize(m_entries.size());
+    entries.reverse();
+    int rank = -1;
+    int i = 0;
+    for (std::list<HiScoreEntry>::iterator iter = entries.begin();
+         iter != entries.end() ; ++i, ++iter) {
+        GTLogTrace("%s %d", iter->name.c_str(), iter->score);
+        if (iter == newScore)
+            rank = i;
+        m_entries[i] = *iter;
+    }
+    GTLogTrace("Rank: %d", rank);
+    return rank;
+}
+

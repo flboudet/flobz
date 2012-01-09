@@ -517,6 +517,62 @@ void DisplayStoryScreenState::action(Widget *sender, int actionType,
 }
 
 //---------------------------------
+// DisplayHallOfFameState
+//---------------------------------
+DisplayHallOfFameState::DisplayHallOfFameState(SharedMatchAssets  *sharedMatchAssets,
+                                               PlayerNameProvider *nameProvider,
+                                               const char         *scoreBoardId,
+                                               const char         *storyName,
+                                               StoryNameProvider  *storyNameProvider)
+    : m_boardId(scoreBoardId),
+      m_storyName(storyName), m_sharedMatchAssets(sharedMatchAssets),
+      m_nameProvider(nameProvider),
+      m_storyNameProvider(storyNameProvider)
+{
+}
+
+void DisplayHallOfFameState::enterState()
+{
+    if (m_storyNameProvider != NULL)
+        m_storyName = m_storyNameProvider->getStoryName();
+    GTLogTrace("StoryModeDisplayHallOfFameState(%s)::enterState()", m_storyName.c_str());
+
+    const PlayerGameStat &playerPoints = m_sharedMatchAssets->m_gameWidget->getStatPlayerOne();
+    m_gameOverScreen.reset(new GameOverScreen(m_storyName.c_str(),
+                                              this));
+    m_scoreBoard.reset(new LocalStorageHiScoreBoard(m_boardId.c_str(), theCommander->getPreferencesManager(), m_defaultScoreBoard));
+    m_gameOverScreen->setScoreBoard(m_scoreBoard.get());
+    m_gameOverScreen->setFinalScore(m_nameProvider->getPlayerName(0),
+                                    playerPoints.points +
+                                    playerPoints.total_points);
+    GameUIDefaults::SCREEN_STACK->swap(m_gameOverScreen.get());
+    m_gameOverScreen->refresh();
+    m_acknowledged = false;
+}
+
+void DisplayHallOfFameState::exitState()
+{
+    GameUIDefaults::GAME_LOOP->garbageCollect(m_gameOverScreen.release());
+}
+
+bool DisplayHallOfFameState::evaluate()
+{
+    return m_acknowledged;
+}
+
+GameState *DisplayHallOfFameState::getNextState()
+{
+    return m_nextState;
+}
+
+void DisplayHallOfFameState::action(Widget *sender, int actionType,
+                        event_manager::GameControlEvent *event)
+{
+    m_acknowledged = true;
+    evaluateStateMachine();
+}
+
+//---------------------------------
 // LeaveGameState
 //---------------------------------
 LeaveGameState::LeaveGameState(SharedMatchAssets &sharedMatchAssets,
