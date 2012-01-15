@@ -9,7 +9,7 @@
 using namespace std;
 
 LocalStorageHiScoreBoard::LocalStorageHiScoreBoard(const char *boardId, PreferencesManager *prefsMgr, HiScoreBoard &defaultScores)
-    : m_prefsMgr(prefsMgr)
+    : m_prefsMgr(prefsMgr), m_boardId(boardId)
 {
     std::list<HiScoreEntry> entries;
     for (int i=0; i < defaultScores.getMaxRank(); ++i)
@@ -53,6 +53,7 @@ int LocalStorageHiScoreBoard::setHiScore(std::string name, int score)
     entries.reverse();
     entries.resize(m_entries.size());
     entries.reverse();
+    // Find rank and save entries
     int rank = -1;
     int i = 0;
     for (std::list<HiScoreEntry>::iterator iter = entries.begin();
@@ -61,6 +62,11 @@ int LocalStorageHiScoreBoard::setHiScore(std::string name, int score)
         if (iter == newScore)
             rank = i;
         m_entries[i] = *iter;
+        ostringstream hiScoreNameKey, hiScoreValKey;
+        hiScoreNameKey << "score." << m_boardId << ".name." << i;
+        hiScoreValKey << "score." << m_boardId << ".val." << i;
+        m_prefsMgr->setStrPreference(hiScoreNameKey.str().c_str(), iter->name.c_str());
+        m_prefsMgr->setIntPreference(hiScoreValKey.str().c_str(), iter->score);
     }
     GTLogTrace("Rank: %d", rank);
     return rank;

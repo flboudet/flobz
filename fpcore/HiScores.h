@@ -33,6 +33,7 @@ public:
     virtual int setHiScore(std::string name, int score);
 private:
     PreferencesManager *m_prefsMgr;
+    std::string m_boardId;
     std::vector<HiScoreEntry> m_entries;
 };
 
