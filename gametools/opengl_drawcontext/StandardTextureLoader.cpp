@@ -119,7 +119,7 @@ OpenGLRawImage * StandardTextureLoader::loadImagePNG(ImageType type, const char 
         png_destroy_read_struct(&pngPtr, (png_infopp)0, (png_infopp)0);
         return NULL;
     }
-    png_set_read_fn(pngPtr,(voidp)(pngfile.get()), libpngUserReadData);
+    png_set_read_fn(pngPtr,(void *)(pngfile.get()), libpngUserReadData);
     png_read_info(pngPtr, infoPtr);
 
     png_uint_32 imgWidth =  png_get_image_width(pngPtr, infoPtr);

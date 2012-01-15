@@ -28,10 +28,6 @@ flobopop_LDADD+=$(SDL_LIBS)
 
 SUBDIRS = iosfc gametools goomsl common fpcore data fpserver
 
-if ENABLE_OPENGL_GFX
-SUBDIRS+=mobile
-endif
-
 if MACOSX
 SUBDIRS+=mac
 flobopop_LDADD+=mac/libfpmac.la

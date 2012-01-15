@@ -1,15 +1,5 @@
-#include <libpng/png.h>
-#include <jpeglib.h>
 #include "GTLog.h"
 #include "sdl12_opengl_drawcontext.h"
-#include "config.h"
-#ifdef HAVE_SDL_SDL_IMAGE_H
-#include <SDL_image.h>
-#else
-#ifdef HAVE_SDL_IMAGE_SDL_IMAGE_H
-#include <SDL_image/SDL_image.h>
-#endif
-#endif
 
 SDL12_OpenGLBackendUtil::SDL12_OpenGLBackendUtil(DataPathManager *dataPathManager)
     : StandardTextureLoader(dataPathManager)
