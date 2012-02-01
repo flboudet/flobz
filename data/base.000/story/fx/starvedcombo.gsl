@@ -1,50 +1,26 @@
 <init_fx>
-  Sprite @flash    = [new_sprite: image="starvedcombo.png" x=0.0 y=0.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @flash    = [new_sprite: image="combowanted.png" x=160.0 y=100.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   float @show_flash = 0.0
   @supported_fx = "starvedcombo"
 
 <sprite_list>
   (@show_flash > 0.0)? {
       sprite::@flash display=@display
-      # (@mode = DRAW)? put_text: text=@mytext pos=@flash.pos+popo text_index=999.9
   }
 
 <update>
     @show_flash = @show_flash - @delta_t
     (@show_flash >= 0.0)? {
+        @flash.alpha = @show_flash
+        (@flash.alpha > 1.) ?
+          @flash.alpha = 1.
         @busy = true
-        @display.x = 7.0 * [sin: value=@show_flash*@show_flash*20.0] * @show_flash * @show_flash
-        @display.y = 3.0 * [sin: value=@show_flash*@show_flash*10.0] * @show_flash * @show_flash
     }
     (@show_flash < 0.0)?  @busy = false
 
 <event: string type, Vec2 pos, int player>
     (pos.y > 1.5)? {
-        Vec2 offset_start
-        Vec2 offset_end
-        offset_start.y = 144.0
-        offset_end.y   = 104.0
-        (player = 0)? {
-            offset_start.x = 124.0 - 53.0
-            offset_end.x   = 124.0 - 53.0
-        }
-        (player = 1)? {
-            offset_start.x = 640.0 - 124.0 - 53.0
-            offset_end.x   = 640.0 - 124.0 - 53.0
-        }
-        @show_flash = 1.2
-        @flash.pos  = offset_start
-        @flash.dest = offset_end
-        @flash.dcycle = @fcycle + 2.0
+        [sound: file="redalert.wav" volume=1.0]
+        @show_flash = 1.5
         @busy = true
-
-        (pos.y > 1.9)? @flash.image = "combo2x.png"
-        (pos.y > 2.9)? @flash.image = "combo3x.png"
-        (pos.y > 3.9)? @flash.image = "combo4x.png"
-        (pos.y > 4.9)? @flash.image = "combo5x.png"
-        (pos.y > 5.9)? @flash.image = "combo6x.png"
-        (pos.y > 6.9)? @flash.image = "combo7x.png"
-        (pos.y > 7.9)? @flash.image = "combo8x.png"
-        (pos.y > 8.9)? @flash.image = "combo9x.png"
-        (pos.y > 9.9)? @flash.image = "comboxx.png"
     }

@@ -214,6 +214,7 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
     float dscaley    = (float)GSL_LOCAL_FLOAT(gsl, local, "display.scale.y");
     float  scalex    = (float)GSL_LOCAL_FLOAT(gsl, local, "&this.scale.x");
     float  scaley    = (float)GSL_LOCAL_FLOAT(gsl, local, "&this.scale.y");
+    float   alpha    = (float)GSL_LOCAL_FLOAT(gsl, local, "&this.alpha");
 
     dw *= dscalex;
     dh *= dscaley;
@@ -246,7 +247,7 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
         styrolyse->client->putText(styrolyse->client,x,y,txt);
     }
     else {
-        styrolyse->client->drawImage(styrolyse->client, data, x+dx, y+dy, w, h, dx, dy, dw, dh, fl, scalex, scaley);
+        styrolyse->client->drawImage(styrolyse->client, data, x+dx, y+dy, w, h, dx, dy, dw, dh, fl, scalex, scaley, alpha);
     }
 }
 

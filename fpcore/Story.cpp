@@ -84,6 +84,8 @@ StyroImage::StyroImage(StyrolyseClient *_this,
                        const char *path, bool removePrefix)
     : path(path), surface(NULL)
 {
+    for (int i = 0 ; i < 10 ; ++i)
+        alphaSurface[i] = NULL;
     if (path[0] == '@') {
         int state = 0;
         int type = 0;
@@ -136,10 +138,16 @@ static void *loadImage (StyrolyseClient *_this, const char *path)
 
 
 static void  drawImage (StyrolyseClient *_this, void *image, int x, int y, int w, int h,
-                 int clipx, int clipy, int clipw, int cliph, int flipped, float scalex, float scaley)
+                 int clipx, int clipy, int clipw, int cliph, int flipped, float scalex, float scaley, float alpha)
 {
   StyroImage  *simg = (StyroImage*)image;
   IosSurface *surf = simg->surface;
+  if (alpha != 1.) {
+      int sindex = alpha * 10;
+      if (simg->alphaSurface[sindex] == NULL)
+          simg->alphaSurface[sindex] = surf->setAlpha(sindex / 10.);
+      surf = simg->alphaSurface[sindex];
+  }
   IosRect  rect, cliprect;
   rect.x = x;
   rect.y = y;

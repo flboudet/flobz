@@ -70,7 +70,9 @@ struct <Sprite:
   string image,
   float  curframe,
   float  framespeed,
-  float  nbframes>
+  float  nbframes,
+  float  alpha,
+  float  destalpha>
 
 struct <Balloon:
   Sprite image,
@@ -103,6 +105,8 @@ struct <Display:
   new_sprite.curframe  = curframe
   new_sprite.framespeed = framespeed
   new_sprite.nbframes  = nbframes
+  new_sprite.alpha     = 1.
+  new_sprite.destalpha = 1.
 
 <new_sprite_simple: float x, float y, string image> : Sprite
   new_sprite_simple = [new_sprite: x=x y=y image=image curframe=0.0 framespeed=1.0 nbframes=1.0]
@@ -111,6 +115,14 @@ struct <Display:
   (fcycle > &this.dcycle)? (&this.dcycle <= @fcycle)? {
     &this.dest.x = x
     &this.dest.y = y
+    &this.dcycle = fcycle
+  }
+
+<movealpha: Sprite &this, float fcycle, float x, float y, float alpha>
+  (fcycle > &this.dcycle)? (&this.dcycle <= @fcycle)? {
+    &this.dest.x = x
+    &this.dest.y = y
+    &this.destalpha = alpha
     &this.dcycle = fcycle
   }
 
@@ -152,6 +164,7 @@ external <getBoolPreference: string name, int default> : int
       speed.y   /= diff
       &this.pos.x += speed.x * @delta_cycle
       &this.pos.y += speed.y * @delta_cycle
+      &this.alpha += (&this.destalpha - &this.alpha) / diff
     }
     &this.curframe += &this.framespeed * @delta_cycle
     while &this.curframe >= &this.nbframes do &this.curframe -= &this.nbframes

@@ -81,7 +81,7 @@ SoloGameMenu::SoloGameMenu(MainScreen *mainScreen)
 
 String SoloGameMenu::getPlayerName(int playerNumber) const
 {
-    String playerName = "toto";//editPlayerName.getEditField().getValue();
+    String playerName = m_editPlayerName->getEditField().getValue();
     return playerName;
 }
 

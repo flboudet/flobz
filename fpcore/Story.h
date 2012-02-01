@@ -44,6 +44,7 @@ public:
     String path;
     IosSurfaceRef surfaceRef;
     IosSurface   *surface;
+    IosSurface   *alphaSurface[10];
     StyroImage(StyrolyseClient *_this,
                const char *path, bool removePrefix=false);
 };

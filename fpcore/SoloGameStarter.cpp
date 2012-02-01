@@ -29,7 +29,8 @@
 using namespace event_manager;
 
 VuMeter::VuMeter(Vec3 position, IosSurface *front, IosSurface *back)
-    : m_position(position), m_front(front), m_back(back)
+    : m_position(position), m_front(front), m_back(back),
+      m_targetValue(0.), m_value(0.)
 {
 }
 
@@ -54,12 +55,23 @@ void VuMeter::draw(DrawTarget *dt)
     dt->draw(m_front,&meterRect, &drect);
 }
 
+void VuMeter::step()
+{
+    m_value += (m_targetValue - m_value)/10.;
+}
+
 #define TIME_BETWEEN_GAME_CYCLES 0.02
 
-SoloGameWidget::SoloGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, Action *gameOverAction)
+SoloGameWidget::SoloGameWidget(SoloGameSettings &gameSettings, FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, Action *gameOverAction)
     : CycledComponent(TIME_BETWEEN_GAME_CYCLES),
-      attachedFloboThemeSet(floboSetTheme), attachedRandom(5), m_cyclesBeforeGameCycle(0), m_cyclesBeforeLevelRaise(0),
-      m_comboHandicap(0.)
+      m_cyclesDuration(gameSettings.cyclesDuration),
+      m_levelIncrease(gameSettings.levelIncrease),
+      m_handicapIncrease(gameSettings.handicapIncrease),
+      m_handicapDecreaseOnPhase1(gameSettings.handicapDecreaseOnPhase1),
+      m_handicapDecreaseAbovePhase1(gameSettings.handicapDecreaseAbovePhase1),
+      attachedFloboThemeSet(floboSetTheme), attachedRandom(5),
+      m_cyclesBeforeGameCycle(0), m_cyclesBeforeLevelRaise(1000.),
+      m_comboHandicap(0.), m_comboHandicap75(false), m_comboHandicap85(false)
 {
     m_gameFactory.reset(new LocalGameFactory(&attachedRandom));
     m_areaA.reset(new GameView(m_gameFactory.get(), 0, &floboSetTheme, &levelTheme));
@@ -87,17 +99,18 @@ SoloGameWidget::SoloGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTh
 
 void SoloGameWidget::gameDidEndCycle()
 {
-    if (m_cyclesBeforeLevelRaise == 0) {
+    if (m_cyclesBeforeLevelRaise <= 0.) {
         m_areaA->getAttachedGame()->addNeutralLayer();
-        m_cyclesBeforeLevelRaise = 800;
+        m_cyclesBeforeLevelRaise = 1000.;
     }
 }
 
 void SoloGameWidget::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase)
 {
-    GTLogTrace("Combo with phase=%d", phase);
+    if (phase == 1)
+        m_comboHandicap += m_handicapDecreaseOnPhase1.getValue();
     if (phase >= 2) {
-        m_comboHandicap -= 20.;
+        m_comboHandicap += m_handicapDecreaseAbovePhase1.getValue();
     }
     if (phase == 4)
         m_comboHandicap = 0;
@@ -108,33 +121,48 @@ void SoloGameWidget::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int gr
 void SoloGameWidget::cycle()
 {
     if (!m_paused) {
+        // Game parameters
+        m_cyclesDuration.step();
+        m_levelIncrease.step();
+        m_handicapIncrease.step();
+        m_handicapDecreaseOnPhase1.step();
+        m_handicapDecreaseAbovePhase1.step();
         // Controls
         m_playerController->cycle();
         // Cycling through the foreground animation
         if (m_styroPainter.get() != NULL)
             m_styroPainter->update();
         // Animations
+        m_comboMeter->step();
         m_areaA->cycleAnimation();
         if (m_cyclesBeforeGameCycle == 0) {
             if (! m_areaA->isNewMetaCycleStart())
                 m_areaA->cycleGame();
             m_areaA->clearMetaCycleStart();
-            m_cyclesBeforeGameCycle = 10;
+            m_cyclesBeforeGameCycle = m_cyclesDuration.getValue();
         }
-        if (m_cyclesBeforeLevelRaise == 0) {
+        if (m_cyclesBeforeLevelRaise <= 0.) {
         }
         else {
-            m_cyclesBeforeLevelRaise--;
+            m_cyclesBeforeLevelRaise -= m_levelIncrease.getValue();
         }
         m_cyclesBeforeGameCycle--;
-        m_comboHandicap += 0.05;
-        if (m_comboHandicap == 75.) {
-            EventFX("vanish", 20, 20, 1);
+        m_comboHandicap += m_handicapIncrease.getValue();
+        // Warning events on handicap
+        if ((m_comboHandicap > 75.) && (!m_comboHandicap75)) {
+            EventFX("starvedcombo", 20, 20, 1);
+            m_comboHandicap75 = true;
+        }
+        if ((m_comboHandicap > 85.) && (!m_comboHandicap85)) {
+            EventFX("starvedcombo", 20, 20, 1);
+            m_comboHandicap85 = true;
         }
         if (m_comboHandicap >= 100.) {
             m_areaA->getAttachedGame()->increaseNeutralFlobos(6);
             m_comboHandicap = 0.;
             EventFX("starvedcombo", 20, 20, 1);
+            m_comboHandicap75 = false;
+            m_comboHandicap85 = false;
         }
         requestDraw();
     }
@@ -158,6 +186,12 @@ void SoloGameWidget::draw(DrawTarget *dt)
     m_comboMeter->draw(dt);
     // Rendering the scores
     m_areaA->renderScore(dt);
+    // Rendering the player names
+    IosFont *font = getLevelTheme()->getPlayerNameFont();
+    dt->putStringCenteredXY(font,
+                            getLevelTheme()->getNameDisplayX(0),
+                            getLevelTheme()->getNameDisplayY(0),
+                            m_playerName.c_str());
     // Rendering the foreground animation
     if (m_styroPainter.get() != NULL)
         m_styroPainter->draw(dt);
@@ -195,7 +229,9 @@ StoryWidget *SoloGameWidget::getOpponent()
     return NULL;
 }
 void SoloGameWidget::setPlayerOneName(String newName)
-{}
+{
+    m_playerName = newName;
+}
 void SoloGameWidget::setPlayerTwoName(String newName)
 {}
 PlayerGameStat &SoloGameWidget::getStatPlayerOne()
@@ -221,9 +257,43 @@ bool SoloGameWidget::isGameARunning() const
 //---------------------------------
 SoloModeStarterAction::SoloModeStarterAction(GameDifficulty difficulty, PlayerNameProvider *nameProvider)
 {
+    // Set the game parameters depending on the game difficulty
+    SoloGameSettings gameSettings;
+    switch (difficulty) {
+    case EASY:
+        gameSettings = {
+            { 20.,   -0.0002,  10. }, // cyclesDuration
+            {  1.,    0.,      0. }, // levelIncrease
+            {  0.03,  0.,      0. }, // handicapIncrease;
+            { -7.,    0.,      0. }, // handicapDecreaseOnPhase1;
+            {-40.,    0.,      0. }  // handicapDecreaseAbovePhase1;
+        };
+        break;
+    case MEDIUM:
+        gameSettings = {
+            { 15.,   -0.0002, 5. }, // cyclesDuration
+            {  1.,    0.,     0. }, // levelIncrease
+            {  0.05,  0.,     0. }, // handicapIncrease;
+            { -7.,    0.,     0. }, // handicapDecreaseOnPhase1;
+            {-40.,    0.,     0. }  // handicapDecreaseAbovePhase1;
+        };
+        break;
+    case HARD:
+    default:
+        gameSettings = {
+            {  10.,  -0.0002,  0.   }, // cyclesDuration
+            {  1.,    0.0001,  2.   }, // levelIncrease
+            {  0.05,  0.00001, 0.15 }, // handicapIncrease;
+            { -7.,    0.,      0.   }, // handicapDecreaseOnPhase1;
+            {-40.,    0.,      0.   }  // handicapDecreaseAbovePhase1;
+        };
+        break;
+    };
+    // Creating the game widget factory
+    m_gameWidgetFactory.reset(new SoloGameWidgetFactory(gameSettings));
     // Creating the different game states
     m_pushGameScreen.reset(new PushScreenState());
-    m_setupMatch.reset(new SetupMatchState(&m_gameWidgetFactory, GameOptions::fromDifficulty(difficulty), nameProvider, &m_sharedAssets));
+    m_setupMatch.reset(new SetupMatchState(m_gameWidgetFactory.get(), GameOptions::fromDifficulty(difficulty), nameProvider, &m_sharedAssets));
     m_enterPlayersReady.reset(new EnterPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));

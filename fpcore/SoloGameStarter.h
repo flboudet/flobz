@@ -34,17 +34,63 @@ public:
     VuMeter(Vec3 position, IosSurface *front, IosSurface *back);
     virtual ~VuMeter() {}
     void draw(DrawTarget *dt);
-    void setValue(double value) { m_value = value; }
+    void step();
+    void setValue(double value) { m_targetValue = value; }
 private:
     Vec3 m_position;
     IosSurface *m_front;
     IosSurface *m_back;
+    double m_targetValue;
     double m_value;
+};
+
+struct GameParameterSetting {
+    double initialValue;
+    double evolution;
+    double finalValue;
+};
+
+struct SoloGameSettings {
+    GameParameterSetting cyclesDuration;
+    GameParameterSetting levelIncrease;
+    GameParameterSetting handicapIncrease;
+    GameParameterSetting handicapDecreaseOnPhase1;
+    GameParameterSetting handicapDecreaseAbovePhase1;
+};
+
+class GameParameter {
+public:
+    GameParameter(GameParameterSetting &setting)
+        : setting(setting), value(setting.initialValue), m_steps(0), m_noEvo(false)
+    {
+        if (setting.evolution != 0.)
+            m_steps = (setting.finalValue - setting.initialValue) / setting.evolution;
+        else
+            m_noEvo = true;
+    }
+    double getValue() const { return value; }
+    void step() {
+        if (m_noEvo)
+            return;
+        if (m_steps <= 0) {
+            value = setting.finalValue;
+            m_noEvo = true;
+        }
+        else {
+            value += setting.evolution;
+            --m_steps;
+        }
+    }
+private:
+    GameParameterSetting setting;
+    double value;
+    int m_steps;
+    bool m_noEvo;
 };
 
 class SoloGameWidget : public GameWidget, GameListener, CycledComponent {
 public:
-    SoloGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, Action *gameOverAction = NULL);
+    SoloGameWidget(SoloGameSettings &gameSettings, FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, Action *gameOverAction = NULL);
     // GameWidget implementation
     virtual void setGameOptions(GameOptions options);
     // Callbacks
@@ -70,6 +116,11 @@ public:
     IdleComponent *getIdleComponent() { return this; }
     void eventOccured(event_manager::GameControlEvent *event);
 protected:
+    GameParameter m_cyclesDuration;
+    GameParameter m_levelIncrease;
+    GameParameter m_handicapIncrease;
+    GameParameter m_handicapDecreaseOnPhase1;
+    GameParameter m_handicapDecreaseAbovePhase1;
     FloboSetTheme &attachedFloboThemeSet;
     RandomSystem attachedRandom;
     std::auto_ptr<LocalGameFactory> m_gameFactory;
@@ -77,17 +128,23 @@ protected:
     std::auto_ptr<GamePlayer> m_playerController;
     GameOptions m_options;
     int m_cyclesBeforeGameCycle;
-    int m_cyclesBeforeLevelRaise;
+    double m_cyclesBeforeLevelRaise;
     std::auto_ptr<VuMeter> m_comboMeter;
     double m_comboHandicap;
+    bool m_comboHandicap75, m_comboHandicap85;
+    std::string m_playerName;
 };
 
 class SoloGameWidgetFactory : public GameWidgetFactory {
 public:
+    SoloGameWidgetFactory(SoloGameSettings &gameSettings)
+        : m_gameSettings(gameSettings) {}
     GameWidget *createGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
     {
-        return new SoloGameWidget(floboSetTheme, levelTheme, gameOverAction);
+        return new SoloGameWidget(m_gameSettings, floboSetTheme, levelTheme, gameOverAction);
     }
+private:
+    SoloGameSettings m_gameSettings;
 };
 
 class SoloModeStarterAction : public Action {
@@ -100,7 +157,7 @@ public:
     virtual void action(Widget *sender, int actionType,
 			event_manager::GameControlEvent *event);
 protected:
-    SoloGameWidgetFactory m_gameWidgetFactory;
+    std::auto_ptr<SoloGameWidgetFactory>  m_gameWidgetFactory;
     GameStateMachine m_stateMachine;
     SharedMatchAssets m_sharedAssets;
     SharedGetReadyAssets        m_sharedGetReadyAssets;

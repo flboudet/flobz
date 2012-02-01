@@ -99,7 +99,7 @@ void *StyrolysePainterClient::styro_loadImage(StyrolyseClient *_this, const char
 
 void StyrolysePainterClient::styro_drawImage(StyrolyseClient *_this,
 			    void *image, int x, int y, int w, int h,
-			    int clipx, int clipy, int clipw, int cliph, int flipped, float scaleX, float scaleY)
+			    int clipx, int clipy, int clipw, int cliph, int flipped, float scaleX, float scaleY, float alpha)
 {
     StyroImage *surf = (StyroImage *)image;
     IosRect  rect, cliprect;
