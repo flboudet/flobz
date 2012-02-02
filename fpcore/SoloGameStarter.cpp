@@ -258,10 +258,9 @@ bool SoloGameWidget::isGameARunning() const
 SoloModeStarterAction::SoloModeStarterAction(GameDifficulty difficulty, PlayerNameProvider *nameProvider)
 {
     // Set the game parameters depending on the game difficulty
-    SoloGameSettings gameSettings;
     switch (difficulty) {
     case EASY:
-        gameSettings = {
+        m_gameSettings = {
             { 20.,   -0.0002,  10. }, // cyclesDuration
             {  1.,    0.,      0. }, // levelIncrease
             {  0.03,  0.,      0. }, // handicapIncrease;
@@ -270,7 +269,7 @@ SoloModeStarterAction::SoloModeStarterAction(GameDifficulty difficulty, PlayerNa
         };
         break;
     case MEDIUM:
-        gameSettings = {
+        m_gameSettings = {
             { 15.,   -0.0002, 5. }, // cyclesDuration
             {  1.,    0.,     0. }, // levelIncrease
             {  0.05,  0.,     0. }, // handicapIncrease;
@@ -280,7 +279,7 @@ SoloModeStarterAction::SoloModeStarterAction(GameDifficulty difficulty, PlayerNa
         break;
     case HARD:
     default:
-        gameSettings = {
+        m_gameSettings = {
             {  10.,  -0.0002,  0.   }, // cyclesDuration
             {  1.,    0.0001,  2.   }, // levelIncrease
             {  0.05,  0.00001, 0.15 }, // handicapIncrease;
@@ -290,7 +289,7 @@ SoloModeStarterAction::SoloModeStarterAction(GameDifficulty difficulty, PlayerNa
         break;
     };
     // Creating the game widget factory
-    m_gameWidgetFactory.reset(new SoloGameWidgetFactory(gameSettings));
+    m_gameWidgetFactory.reset(new SoloGameWidgetFactory(m_gameSettings));
     // Creating the different game states
     m_pushGameScreen.reset(new PushScreenState());
     m_setupMatch.reset(new SetupMatchState(m_gameWidgetFactory.get(), GameOptions::fromDifficulty(difficulty), nameProvider, &m_sharedAssets));

@@ -157,6 +157,7 @@ public:
     virtual void action(Widget *sender, int actionType,
 			event_manager::GameControlEvent *event);
 protected:
+    SoloGameSettings m_gameSettings;
     std::auto_ptr<SoloGameWidgetFactory>  m_gameWidgetFactory;
     GameStateMachine m_stateMachine;
     SharedMatchAssets m_sharedAssets;
