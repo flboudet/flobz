@@ -31,7 +31,7 @@ hallOfFameAction(&hallOfFameScreen),
 creditsAction(&creditsScreen, mainScreen),
 // Create buttons
 soloGameButton(theCommander->getLocalizedString("Solo Game"), &soloGameAction),
-singlePlayerGameButton(theCommander->getLocalizedString(kSinglePlayerGame), &singlePlayerGameAction),
+singlePlayerGameButton(theCommander->getLocalizedString("Story-Mode Game"), &singlePlayerGameAction),
 twoPlayersGameButton(theCommander->getLocalizedString("Two Players Game"), &twoPlayersGameAction),
 optionButton(theCommander->getLocalizedString("Options"), &optionAction),
 hallOfFameButton(theCommander->getLocalizedString(kHighScores), &hallOfFameAction),

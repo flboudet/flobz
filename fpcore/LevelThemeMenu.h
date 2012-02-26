@@ -74,11 +74,12 @@ class LevelThemePreview : public VBox {
 
 class LevelThemeSelectionBox : public HBox, public Action {
 public:
-    LevelThemeSelectionBox();
+    LevelThemeSelectionBox(int nbPlayers);
     virtual ~LevelThemeSelectionBox();
     void build();
     void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
 private:
+    int m_nbPlayers;
     LevelThemePreview themePreview;
     Image *prevButton, *nextButton;
     ZBox Spacer0, Spacer1, Spacer2, Spacer3;
@@ -86,7 +87,7 @@ private:
 
 class LevelThemeMenu : public MainScreenMenu {
 public:
-    LevelThemeMenu(MainScreen *mainScreen);
+    LevelThemeMenu(MainScreen *mainScreen, int nbPlayers = 2);
     void build();
 private:
     Frame screenTitleFrame;

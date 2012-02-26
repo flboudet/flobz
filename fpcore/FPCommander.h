@@ -219,11 +219,11 @@ class FPCommander
     virtual const std::string getDefaultFloboSetThemeName() const;
 
     LevelThemeRef getLevelTheme(const char *name);
-    LevelThemeRef getPreferedLevelTheme();
-    const std::string &getPreferedLevelThemeName() const;
-    void setPreferedLevelThemeName(const char *name);
-    const std::vector<std::string> &getLevelThemeList() const;
-    virtual const std::string getDefaultLevelThemeName() const;
+    LevelThemeRef getPreferedLevelTheme(int nbPlayers = 2);
+    const std::string getPreferedLevelThemeName(int nbPlayers = 2) const;
+    void setPreferedLevelThemeName(const char *name, int nbPlayers = 2);
+    std::vector<std::string> getLevelThemeList(int nbPlayers = 2) const;
+    virtual const std::string getDefaultLevelThemeName(int nbPlayers = 2) const;
 
     void freeUnusedResources();
 
@@ -330,7 +330,6 @@ protected:
 	FPApplicationState m_appState;
 
     mutable std::string m_defaultFloboSetThemeName;
-    mutable std::string m_defaultLevelThemeName;
 };
 
 extern class FPCommander *theCommander;

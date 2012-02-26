@@ -77,6 +77,7 @@ public:
 
 class LevelThemeDescription {
 public:
+    int         nbPlayers;
     std::string name;
     std::string localizedName;
     std::string author;
@@ -192,6 +193,7 @@ public:
     virtual const std::string & getLocalizedName() const;
     virtual const std::string & getAuthor() const;
     virtual const std::string & getComments() const;
+    virtual int getNbPlayers() const;
     virtual IosSurface * getLifeForIndex(int index) const;
     virtual IosSurface * getBackground() const;
     virtual IosSurface * getGrid() const;
@@ -262,7 +264,7 @@ public:
     virtual LevelTheme   * createLevelTheme(const std::string &themeName);
 
     virtual const std::vector<std::string> & getFloboSetThemeList();
-    virtual const std::vector<std::string> & getLevelThemeList();
+    virtual std::vector<std::string> getLevelThemeList(int nbPlayers);
 private:
     void loadThemePack(const std::string &path);
     static void end_floboset(GoomSL *gsl, GoomHash *global, GoomHash *local);

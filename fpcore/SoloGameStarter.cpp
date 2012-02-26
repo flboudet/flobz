@@ -292,7 +292,7 @@ SoloModeStarterAction::SoloModeStarterAction(GameDifficulty difficulty, PlayerNa
     m_gameWidgetFactory.reset(new SoloGameWidgetFactory(m_gameSettings));
     // Creating the different game states
     m_pushGameScreen.reset(new PushScreenState());
-    m_setupMatch.reset(new SetupMatchState(m_gameWidgetFactory.get(), GameOptions::fromDifficulty(difficulty), nameProvider, &m_sharedAssets));
+    m_setupMatch.reset(new SetupMatchState(m_gameWidgetFactory.get(), GameOptions::fromDifficulty(difficulty), nameProvider, &m_sharedAssets, 1));
     m_enterPlayersReady.reset(new EnterPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));

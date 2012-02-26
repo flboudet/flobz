@@ -47,6 +47,7 @@ struct <FloboSet:
 struct <Level:
     string name,
     string description,
+    int    nbPlayers,
     string background,
     string speedmeter,
     string neutralindicator,
@@ -112,6 +113,7 @@ external <end_level>
 <start_level>
     level.name          = "Unamed"
     level.description   = "Somewhere..."
+    level.nbPlayers     = 2
 
     level.background    = "columns-background.jpg"
     level.speedmeter    = "fire"

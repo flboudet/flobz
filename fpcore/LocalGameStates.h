@@ -111,7 +111,8 @@ public:
     SetupMatchState(GameWidgetFactory *gameWidgetFactory,
                     GameOptions gameOptions,
                     PlayerNameProvider *nameProvider,
-                    SharedMatchAssets *sharedMatchAssets);
+                    SharedMatchAssets *sharedMatchAssets,
+                    int nbPlayers = 2);
     // GameState implementation
     virtual void enterState();
     virtual bool evaluate();
@@ -133,6 +134,7 @@ public:
         m_gameWidgetFactory = factory;
     }
 private:
+    int m_nbPlayers;
     GameWidgetFactory  *m_gameWidgetFactory;
     GameOptions         m_gameOptions;
     PlayerNameProvider *m_nameProvider;

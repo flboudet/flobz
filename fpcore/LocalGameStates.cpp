@@ -74,8 +74,10 @@ GameState *PushScreenState::getNextState()
 SetupMatchState::SetupMatchState(GameWidgetFactory  *gameWidgetFactory,
                                  GameOptions         gameOptions,
                                  PlayerNameProvider *nameProvider,
-                                 SharedMatchAssets  *sharedMatchAssets)
-  : m_gameWidgetFactory(gameWidgetFactory),
+                                 SharedMatchAssets  *sharedMatchAssets,
+                                 int nbPlayers)
+  : m_nbPlayers(nbPlayers),
+    m_gameWidgetFactory(gameWidgetFactory),
     m_gameOptions(gameOptions),
     m_nameProvider(nameProvider),
     m_sharedAssets(sharedMatchAssets),
@@ -89,7 +91,7 @@ void SetupMatchState::enterState()
 {
     GTLogTrace("SetupMatchState::enterState()");
     // Prepare 1st run
-    m_sharedAssets->m_currentLevelTheme = theCommander->getPreferedLevelTheme();
+    m_sharedAssets->m_currentLevelTheme = theCommander->getPreferedLevelTheme(m_nbPlayers);
     m_sharedAssets->m_currentFloboSetTheme = theCommander->getPreferedFloboSetTheme();
     // Create the gamewidget and register as the gamewidget's action
     GameWidget *newGameWidget =

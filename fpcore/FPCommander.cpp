@@ -1,5 +1,6 @@
 /* strings to translate */
 
+#include <sstream>
 #include "GTLog.h"
 #include "FPCommander.h"
 #include "FPStrings.h"
@@ -421,33 +422,34 @@ LevelThemeRef FPCommander::getLevelTheme(const char *name)
     return m_levelThemeResManager->getResource(name);
 }
 
-LevelThemeRef FPCommander::getPreferedLevelTheme()
+LevelThemeRef FPCommander::getPreferedLevelTheme(int nbPlayers)
 {
-    return getLevelTheme(getPreferedLevelThemeName().c_str());
+    return getLevelTheme(getPreferedLevelThemeName(nbPlayers).c_str());
 }
 
-const std::string &FPCommander::getPreferedLevelThemeName() const
+const std::string FPCommander::getPreferedLevelThemeName(int nbPlayers) const
 {
-    if (m_defaultLevelThemeName == "") {
-        m_defaultLevelThemeName = m_preferencesManager->getStrPreference ("level_theme", getDefaultLevelThemeName().c_str());
-    }
-    return m_defaultLevelThemeName;
+    ostringstream osstream;
+    osstream << "level_theme_" << nbPlayers;
+    std::string result = m_preferencesManager->getStrPreference(osstream.str().c_str(), getDefaultLevelThemeName(nbPlayers).c_str());
+    return result;
 }
 
-const std::string FPCommander::getDefaultLevelThemeName() const
+const std::string FPCommander::getDefaultLevelThemeName(int nbPlayers) const
 {
-    return m_themeManager->getLevelThemeList()[0];
+    return m_themeManager->getLevelThemeList(nbPlayers)[0];
 }
 
-void FPCommander::setPreferedLevelThemeName(const char *name)
+void FPCommander::setPreferedLevelThemeName(const char *name, int nbPlayers)
 {
-    m_defaultLevelThemeName = name;
-    m_preferencesManager->setStrPreference ("level_theme", name);
+    ostringstream osstream;
+    osstream << "level_theme_" << nbPlayers;
+    m_preferencesManager->setStrPreference (osstream.str().c_str(), name);
 }
 
-const std::vector<std::string> &FPCommander::getLevelThemeList() const
+std::vector<std::string> FPCommander::getLevelThemeList(int nbPlayers) const
 {
-    return m_themeManager->getLevelThemeList();
+    return m_themeManager->getLevelThemeList(nbPlayers);
 }
 
 void FPCommander::freeUnusedResources()

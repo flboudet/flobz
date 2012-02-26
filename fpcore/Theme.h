@@ -94,6 +94,7 @@ public:
 class LevelTheme : public ThemeDescriptionInterface {
 public:
     virtual ~LevelTheme() {}
+    virtual int getNbPlayers() const = 0;
     // Surfaces
     virtual IosSurface * getLifeForIndex(int index) const = 0;
     virtual IosSurface * getBackground(void) const = 0;
@@ -151,7 +152,7 @@ public:
     virtual LevelTheme   * createLevelTheme(const std::string &themeName) = 0;
 
     virtual const std::vector<std::string> & getFloboSetThemeList() = 0;
-    virtual const std::vector<std::string> & getLevelThemeList() = 0;
+    virtual std::vector<std::string> getLevelThemeList(int nbPlayers) = 0;
 };
 
 #endif // _THEME_H

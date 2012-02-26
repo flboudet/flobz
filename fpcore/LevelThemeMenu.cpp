@@ -29,8 +29,9 @@
 
 using namespace event_manager;
 
-LevelThemeSelectionBox::LevelThemeSelectionBox()
-    : themePreview(), Spacer0(), Spacer1(), Spacer2(), Spacer3()
+LevelThemeSelectionBox::LevelThemeSelectionBox(int nbPlayers)
+    : m_nbPlayers(nbPlayers),
+      themePreview(), Spacer0(), Spacer1(), Spacer2(), Spacer3()
 {
     prevButton = new Image(theCommander->getLeftArrow());
     nextButton = new Image(theCommander->getRightArrow());
@@ -52,8 +53,8 @@ LevelThemeSelectionBox::~LevelThemeSelectionBox()
 void LevelThemeSelectionBox::build()
 {
     themePreview.build();
-    const std::vector<std::string> &themes = theCommander->getLevelThemeList();
-    std::string pref = theCommander->getPreferedLevelThemeName();
+    std::vector<std::string> themes = theCommander->getLevelThemeList(m_nbPlayers);
+    std::string pref = theCommander->getPreferedLevelThemeName(m_nbPlayers);
     int size = themes.size();
     bool found = false;
     for (std::vector<std::string>::const_iterator iter
@@ -265,12 +266,12 @@ void LevelThemePreview::setSelectedTheme(std::string themeName)
 
 /*****************************************************************************/
 
-LevelThemeMenu::LevelThemeMenu(MainScreen *mainScreen)
+LevelThemeMenu::LevelThemeMenu(MainScreen *mainScreen, int nbPlayers)
     : MainScreenMenu(mainScreen),
       screenTitleFrame(theCommander->getSeparatorFramePicture()),
       themeMenuTitle(theCommander->getLocalizedString("Level theme")), popAction(mainScreen),
       backButton(theCommander->getLocalizedString("Back"), &popAction),
-      themeList()
+      themeList(nbPlayers)
 {
 }
 

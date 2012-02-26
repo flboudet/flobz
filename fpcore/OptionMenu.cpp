@@ -53,10 +53,15 @@ OptionMenu::OptionMenu(MainScreen *mainScreen) : MainScreenMenu(mainScreen),
     audioButton(),
     musicButton(),
     fullScreenButton(),
-    controlMenu(mainScreen), themeMenu(mainScreen), levelMenu(mainScreen),
-    changeThemeAction(&themeMenu, mainScreen), changeLevelAction(&levelMenu, mainScreen), changeControlsAction(&controlMenu, mainScreen, true),
+    controlMenu(mainScreen), themeMenu(mainScreen),
+    m_soloLevelMenu(mainScreen, 1), m_duoLevelMenu(mainScreen, 2),
+    changeThemeAction(&themeMenu, mainScreen),
+    m_changeSoloLevelAction(&m_soloLevelMenu, mainScreen),
+    m_changeDuoLevelAction(&m_duoLevelMenu, mainScreen),
+    changeControlsAction(&controlMenu, mainScreen, true),
     changeFloboThemeButton(theCommander->getLocalizedString(kChangeFloboTheme), &changeThemeAction),
-    changeLevelThemeButton(theCommander->getLocalizedString(kChangeLevelTheme), &changeLevelAction),
+    changeSoloLevelThemeButton(theCommander->getLocalizedString(kChangeLevelTheme), &m_changeSoloLevelAction),
+    changeDuoLevelThemeButton(theCommander->getLocalizedString(kChangeLevelTheme), &m_changeDuoLevelAction),
     changeControlsButton(theCommander->getLocalizedString(kControls), &changeControlsAction), backAction(mainScreen), backButton(theCommander->getLocalizedString("Back"), &backAction)
 {
 }
@@ -64,7 +69,8 @@ OptionMenu::OptionMenu(MainScreen *mainScreen) : MainScreenMenu(mainScreen),
 void OptionMenu::build() {
     controlMenu.build();
     themeMenu.build();
-    levelMenu.build();
+    m_soloLevelMenu.build();
+    m_duoLevelMenu.build();
     setPolicy(USE_MIN_SIZE);
     screenTitleFrame.setPreferedSize(Vec3(0, 20));
     screenTitleFrame.add(&optionTitle);
@@ -74,8 +80,10 @@ void OptionMenu::build() {
     buttonsBox.add(&fullScreenButton);
     if (theCommander->getFloboSetThemeList().size() > 1)
         buttonsBox.add(&changeFloboThemeButton);
-    if (theCommander->getLevelThemeList().size() > 1)
-        buttonsBox.add(&changeLevelThemeButton);
+    if (theCommander->getLevelThemeList(1).size() > 1)
+        buttonsBox.add(&changeSoloLevelThemeButton);
+    if (theCommander->getLevelThemeList(2).size() > 1)
+        buttonsBox.add(&changeDuoLevelThemeButton);
     buttonsBox.add(&changeControlsButton);
     buttonsBox.add(&backButton);
     add(&buttonsBox);

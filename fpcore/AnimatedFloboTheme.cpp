@@ -127,9 +127,15 @@ const std::vector<std::string> & ThemeManagerImpl::getFloboSetThemeList()
     return m_floboSetThemeList;
 }
 
-const std::vector<std::string> & ThemeManagerImpl::getLevelThemeList()
+std::vector<std::string> ThemeManagerImpl::getLevelThemeList(int nbPlayers)
 {
-    return m_levelThemeList;
+    std::vector<std::string> result;
+    for (std::vector<std::string>::const_iterator iter = m_levelThemeList.begin() ;
+         iter != m_levelThemeList.end() ; ++iter) {
+        if (m_levelThemeDescriptions[*iter].nbPlayers == nbPlayers)
+            result.push_back(*iter);
+    }
+    return result;
 }
 
 void ThemeManagerImpl::loadThemePack(const std::string &path)
@@ -199,6 +205,7 @@ void ThemeManagerImpl::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     newThemeDescription.author = (const char *)(GSL_GLOBAL_PTR(gsl, "author"));
     newThemeDescription.description = (const char *)(GSL_GLOBAL_PTR(gsl, "level.description"));
     newThemeDescription.localizedDescription = themeMgr->m_localeDictionary->getLocalizedString(newThemeDescription.description.c_str(),true);
+    newThemeDescription.nbPlayers = GSL_GLOBAL_INT(gsl, "level.nbPlayers");
     newThemeDescription.path = themeMgr->m_themePackLoadingPath;
 
     newThemeDescription.lives = (const char *) GSL_GLOBAL_PTR(gsl, "level.lives");
@@ -640,6 +647,11 @@ const std::string & LevelThemeImpl::getAuthor() const
 const std::string & LevelThemeImpl::getComments() const
 {
     return m_desc.description;
+}
+
+int LevelThemeImpl::getNbPlayers() const
+{
+    return m_desc.nbPlayers;
 }
 
 IosSurface * LevelThemeImpl::getLifeForIndex(int index) const

@@ -45,6 +45,7 @@
 [start_level]
     level.name          = "Blue Plastic Solo"
     level.description   = "A slick theme for the reduced game"
+    level.nbPlayers     = 1
     level.background    = "blueplastic-solo.jpg"
     level.grid          = ""
     level.foreground_animation = "blueplastic-solo_foreground.gsl"

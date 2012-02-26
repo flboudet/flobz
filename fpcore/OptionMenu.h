@@ -63,10 +63,11 @@ private:
     FSPrefSwitch fullScreenButton;
     ControlMenu controlMenu;
     ThemeMenu themeMenu;
-    LevelThemeMenu levelMenu;
-    PushMainScreenMenuAction changeThemeAction, changeLevelAction, changeControlsAction;
+    LevelThemeMenu m_soloLevelMenu, m_duoLevelMenu;
+    PushMainScreenMenuAction changeThemeAction, m_changeSoloLevelAction, m_changeDuoLevelAction, changeControlsAction;
     Button changeFloboThemeButton;
-    Button changeLevelThemeButton;
+    Button changeSoloLevelThemeButton;
+    Button changeDuoLevelThemeButton;
     Button changeControlsButton;
     PopMainScreenMenuAction backAction;
     Button backButton;
