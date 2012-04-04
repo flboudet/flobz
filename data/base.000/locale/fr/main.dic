@@ -4,8 +4,11 @@ gfx/font.ttf
 __DIRECTION__
 ltr
 
-Single Player Game
+Solo Game
 Jeu Solo
+
+Story-Mode Game
+Jeu en mode Histoire
 
 Two Players Game
 Jeu en Duo
@@ -52,7 +55,7 @@ Effets Sonores
 FullScreen
 Plein écran
 
-ON 
+ON
 OUI
 
 OFF
@@ -160,8 +163,8 @@ Invitation à jouer
 Asking for a game
 Demande de jeu
 
-Waiting 
-Attente de 
+Waiting
+Attente de
 
  for confirmation
 ...

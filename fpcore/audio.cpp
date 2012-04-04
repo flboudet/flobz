@@ -36,6 +36,7 @@ void AudioManager::init()
     sound_on = theCommander->getPreferencesManager()->getBoolPreference(kSound,true);
     music_volume = ((float)(theCommander->getPreferencesManager()->getIntPreference(kMusicVolume, 100)))/100.0f;
     sound_volume = ((float)(theCommander->getPreferencesManager()->getIntPreference(kSoundVolume, 100)))/100.0f;
+    m_audioManager->setSoundEnabled(sound_on);
     if (music_on)
         loadMusic("pop.xm");
 }
@@ -162,11 +163,6 @@ void AudioManager::music(const char *command)
   else if (music_command == "game over") {
       m_audioManager->setMusicPosition(15);
   }
-}
-
-void AudioManager::preloadSound(const char *fileName, float volume)
-{
-    theCommander->cacheSound(FilePath("sfx").combine(fileName));
 }
 
 void AudioManager::playSound(const char *fileName, float volume, float balance)

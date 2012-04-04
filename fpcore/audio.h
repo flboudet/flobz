@@ -20,7 +20,7 @@ public:
   static void loadMusic(const char *fileName);
   static void music(const char *command);
 
-  static void preloadSound(const char *sName, float volume);
+  // TODO: remove
   static void playSound(const char *sName, float volume = 1.0, float balance = 0.0f);
 
   static const char * musicVolumeKey(void);

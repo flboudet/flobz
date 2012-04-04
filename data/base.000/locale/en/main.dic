@@ -4,8 +4,11 @@ gfx/font.ttf
 __DIRECTION__
 ltr
 
-Single Player Game
-Single Player Game
+Solo Game
+Solo Game
+
+Story-Mode Game
+Story-Mode Game
 
 Two Players Game
 Two Players Game
@@ -52,8 +55,8 @@ Audio FX
 FullScreen
 FullScreen
 
-ON 
-ON 
+ON
+ON
 
 OFF
 OFF
@@ -160,8 +163,8 @@ Invitation for a game
 Asking for a game
 Asking for a game
 
-Waiting 
-Waiting 
+Waiting
+Waiting
 
  for confirmation
  for confirmation
