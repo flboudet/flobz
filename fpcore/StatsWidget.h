@@ -50,7 +50,6 @@ public:
     std::auto_ptr<IosSurface> flobo_right_mask;
     IosSurfaceRef stats_bg_winner;
     std::auto_ptr<IosSurface> stats_bg_loser;
-    IosSurfaceRef separator;
     IosSurfaceRef titleImage;
     IosSurfaceRef comboImage[MAX_DISPLAYED_COMBOS];
 public:

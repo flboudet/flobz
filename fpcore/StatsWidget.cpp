@@ -40,7 +40,6 @@ StatsResources::StatsResources()
 			flobo_right[j][i] = flobo_right[0][i]->shiftHue(30.*j, flobo_right_mask.get());
 		}
 	}
-    separator = theCommander->getSurface(IMAGE_RGBA, "gfx/separator.png");
     titleImage = theCommander->getSurface(IMAGE_RGBA, "gfx/stats_title.png");
     for (int numCombo = 0 ; numCombo < MAX_DISPLAYED_COMBOS ; numCombo++) {
         String pictureName = String("gfx/combo") + (numCombo+1) + "x_stat.png";
@@ -227,10 +226,13 @@ StatsWidget::StatsWidget(StatsResources &res, StatsFormat &statsFormat,
 
     // Create Layout
     Text *txt = new Text(stats.is_winner?"WINNER":"LOSER");
-    Image *img1 = new Image(res.separator);
-    img1->setPreferedSize(Vec3(128, 50));
+    Frame *img1 = new Frame(theCommander->getSeparatorFramePicture());
+    Separator *sep1 = new Separator();
+    sep1->setPreferedSize(Vec3(128, 42));
+    img1->setPreferedSize(Vec3(128, 8));
     add(txt);
     add(img1);
+    add(sep1);
     for (int i = 0 ; i < MAX_DISPLAYED_COMBOS ; i++) {
         ComboLine *newComboLine = new ComboLine(res);
         newComboLine->setDimensions(dimensions);
@@ -241,7 +243,7 @@ StatsWidget::StatsWidget(StatsResources &res, StatsFormat &statsFormat,
     Separator *sep = new Separator();
     sep->setPreferedSize(Vec3(128, 24));
     add(sep);
-    Image *img2 = new Image(res.separator);
+    Frame *img2 = new Frame(theCommander->getSeparatorFramePicture());
     img2->setPreferedSize(Vec3(128, 8));
     add(img2);
 
@@ -274,6 +276,7 @@ StatsWidget::StatsWidget(StatsResources &res, StatsFormat &statsFormat,
 
     // Prepare un-allocation
     widgetAutoReleasePool.add(sep);
+    widgetAutoReleasePool.add(sep1);
     widgetAutoReleasePool.add(img1);
     widgetAutoReleasePool.add(img2);
     widgetAutoReleasePool.add(txt);
@@ -414,8 +417,8 @@ StatsLegendWidget::StatsLegendWidget(StatsFormat &statsFormat, StatsWidget &guid
 void StatsLegendWidget::onWidgetVisibleChanged(bool visible)
 {
   // Set the size of the different rows
-  for (int i = 0 ; i < this->getNumberOfChilds() - 1 ; i++) {
-    Vec3 elementSize = m_guideWidget.getChild(i+1)->getSize();
+  for (int i = 0 ; i < this->getNumberOfChilds() - 2 ; i++) {
+    Vec3 elementSize = m_guideWidget.getChild(i+2)->getSize();
     getChild(i)->setPreferedSize(Vec3(0, elementSize.y));
   }
   // Special case: the title should have the size of the first 2 items of the guide

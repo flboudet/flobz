@@ -437,7 +437,10 @@ const std::string FPCommander::getPreferedLevelThemeName(int nbPlayers) const
 
 const std::string FPCommander::getDefaultLevelThemeName(int nbPlayers) const
 {
-    return m_themeManager->getLevelThemeList(nbPlayers)[0];
+    std::vector<std::string> result = m_themeManager->getLevelThemeList(nbPlayers);
+    if (result.size() == 0)
+        return "";
+    return result[0];
 }
 
 void FPCommander::setPreferedLevelThemeName(const char *name, int nbPlayers)

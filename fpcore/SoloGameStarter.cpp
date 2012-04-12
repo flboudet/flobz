@@ -258,34 +258,37 @@ bool SoloGameWidget::isGameARunning() const
 SoloModeStarterAction::SoloModeStarterAction(GameDifficulty difficulty, PlayerNameProvider *nameProvider)
 {
     // Set the game parameters depending on the game difficulty
+    SoloGameSettings easySettings = {
+      { 20.,   -0.0002,  10. }, // cyclesDuration
+      {  1.,    0.,      0. }, // levelIncrease
+      {  0.03,  0.,      0. }, // handicapIncrease;
+      { -7.,    0.,      0. }, // handicapDecreaseOnPhase1;
+      {-40.,    0.,      0. }  // handicapDecreaseAbovePhase1;
+    };
+    SoloGameSettings mediumSettings = {
+      { 15.,   -0.0002, 5. }, // cyclesDuration
+      {  1.,    0.,     0. }, // levelIncrease
+      {  0.05,  0.,     0. }, // handicapIncrease;
+      { -7.,    0.,     0. }, // handicapDecreaseOnPhase1;
+      {-40.,    0.,     0. }  // handicapDecreaseAbovePhase1;
+    };
+    SoloGameSettings hardSettings = {
+      {  10.,  -0.0002,  0.   }, // cyclesDuration
+      {  1.,    0.0001,  2.   }, // levelIncrease
+      {  0.05,  0.00001, 0.15 }, // handicapIncrease;
+      { -7.,    0.,      0.   }, // handicapDecreaseOnPhase1;
+      {-40.,    0.,      0.   }  // handicapDecreaseAbovePhase1;
+    };
     switch (difficulty) {
     case EASY:
-        m_gameSettings = {
-            { 20.,   -0.0002,  10. }, // cyclesDuration
-            {  1.,    0.,      0. }, // levelIncrease
-            {  0.03,  0.,      0. }, // handicapIncrease;
-            { -7.,    0.,      0. }, // handicapDecreaseOnPhase1;
-            {-40.,    0.,      0. }  // handicapDecreaseAbovePhase1;
-        };
+        m_gameSettings = easySettings;
         break;
     case MEDIUM:
-        m_gameSettings = {
-            { 15.,   -0.0002, 5. }, // cyclesDuration
-            {  1.,    0.,     0. }, // levelIncrease
-            {  0.05,  0.,     0. }, // handicapIncrease;
-            { -7.,    0.,     0. }, // handicapDecreaseOnPhase1;
-            {-40.,    0.,     0. }  // handicapDecreaseAbovePhase1;
-        };
+        m_gameSettings = mediumSettings;
         break;
     case HARD:
     default:
-        m_gameSettings = {
-            {  10.,  -0.0002,  0.   }, // cyclesDuration
-            {  1.,    0.0001,  2.   }, // levelIncrease
-            {  0.05,  0.00001, 0.15 }, // handicapIncrease;
-            { -7.,    0.,      0.   }, // handicapDecreaseOnPhase1;
-            {-40.,    0.,      0.   }  // handicapDecreaseAbovePhase1;
-        };
+        m_gameSettings = hardSettings;
         break;
     };
     // Creating the game widget factory

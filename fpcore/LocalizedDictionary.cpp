@@ -278,14 +278,11 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
 {
   signed int i;
 
-    GTLogTrace("LocalizedDictionary::LocalizedDictionary() 1");
   /* First create the prefered languages list whenever needed */
   Locales_Init();
 
-    GTLogTrace("LocalizedDictionary::LocalizedDictionary() 2");
   stdName = FilePath::combine(dictionaryDirectory, dictionaryName);
   dictionaryEntry * myDictEntry = (dictionaryEntry *)dictionaries[std::string((const char *)stdName)];
-    GTLogTrace("LocalizedDictionary::LocalizedDictionary() 3");
   if (myDictEntry == NULL)
   {
     myDictEntry = (dictionaryEntry *)malloc(sizeof(dictionaryEntry));
@@ -302,12 +299,10 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
         String directoryName = FilePath::combine(dictionaryDirectory, locale);
         String dictFilePath = FilePath::combine(directoryName, dictionaryName) + ".dic";
         DataInputStream *dictionaryStream = NULL;
-        GTLogTrace("LocalizedDictionary::LocalizedDictionary() 4");
         try {
             dictionaryStream = datapathManager.openDataInputStream(dictFilePath);
         }
         catch (...) {}
-        GTLogTrace("LocalizedDictionary::LocalizedDictionary() 5");
         if (dictionaryStream != NULL)
         {
             /* Read all the entries in the dictionary file */
@@ -343,7 +338,6 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
 
   myDictEntry->refcount++;
   dictionary = (void*)(myDictEntry->dictionary);
-  GTLogTrace("LocalizedDictionary::LocalizedDictionary() end");
   //fprintf(stderr,"-----Refcount++ = %d (%s)\n",myDictEntry->refcount,(const char *)stdName);
 }
 

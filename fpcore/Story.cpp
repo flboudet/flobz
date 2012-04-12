@@ -209,13 +209,12 @@ bool StoryWidget::classInitialized = false;
 StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
     : IdleComponent(), localeDictionary(NULL), finishedAction(finishedAction), once(false), last_time(-1.), fxMode(fxMode)
 {
-    GTLogTrace("StoryWidget::StoryWidget()");
+    GTLogTrace("StoryWidget::StoryWidget(%s)", (const char *)screenName);
     try {
         localeDictionary = new LocalizedDictionary(theCommander->getDataPathManager(), "locale/story", screenName);
     } catch (...) {
         GTLogTrace("StoryWidget::StoryWidget() locale error");
     }
-    GTLogTrace("StoryWidget::StoryWidget() 1");
     if (!classInitialized) {
         String path0 = "/lib/styrolyse.gsl";
         String path1 = "/lib/nofx.gsl";
@@ -223,7 +222,6 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
         styrolyse_init(path0.c_str(), path1.c_str(), path2.c_str());
         classInitialized = true;
     }
-    GTLogTrace("StoryWidget::StoryWidget() 2");
     try {
         fullPath = String("/story/") + screenName;
         theCommander->getDataPathManager().getPath(fullPath);
@@ -232,7 +230,6 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
         printf("GSL NOT FOUND: %s (%s)\n", screenName.c_str(), (const char *)fullPath);
         fullPath = "/story/error.gsl";
     }
-    GTLogTrace("StoryWidget::StoryWidget() 3");
     String storyLocalePath;
 
     // Initializing the styrolyse client
@@ -251,7 +248,7 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
     client.styroClient.cacheSound   = ::cacheSound;
     client.styroClient.cacheMusic   = ::cacheMusic;
     client.widget = this;
-    GTLogTrace("StoryWidget::StoryWidget() styrolyse_new");
+    GTLogTrace("StoryWidget::StoryWidget() styrolyse_new(%s)", (const char *)fullPath);
     client.attachedTheme = NULL;
     currentStory = styrolyse_new((const char *)fullPath, (StyrolyseClient *)(&client), fxMode);
     GTLogTrace("StoryWidget::StoryWidget() styrolyse_new finished");
