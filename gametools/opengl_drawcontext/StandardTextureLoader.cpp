@@ -131,7 +131,7 @@ OpenGLRawImage * StandardTextureLoader::loadImagePNG(ImageType type, const char 
     //Color type. (RGB, RGBA, Luminance, luminance alpha... palette... etc)
     png_uint_32 color_type = png_get_color_type(pngPtr, infoPtr);
 
-    //GTLogTrace("Image dimensions: %ux%u chan:%u bitdepth:%u", imgWidth, imgHeight, channels, bitdepth);
+    // GTLogTrace("Image dimensions: %ux%u chan:%u bitdepth:%u", imgWidth, imgHeight, channels, bitdepth);
     switch (color_type) {
     case PNG_COLOR_TYPE_PALETTE:
         png_set_palette_to_rgb(pngPtr);
@@ -147,6 +147,10 @@ OpenGLRawImage * StandardTextureLoader::loadImagePNG(ImageType type, const char 
     if (png_get_valid(pngPtr, infoPtr, PNG_INFO_tRNS)) {
         png_set_tRNS_to_alpha(pngPtr);
         channels = 4;
+    }
+    if (bitdepth < 8) {
+        png_set_expand(pngPtr);
+        bitdepth = 8;
     }
     if (bitdepth == 16) {
         png_set_strip_16(pngPtr);
