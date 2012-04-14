@@ -24,6 +24,7 @@
  */
 
 #include "GameScreen.h"
+#include "GTLog.h"
 
 using namespace ios_fc;
 using namespace event_manager;
@@ -118,6 +119,8 @@ bool GameScreen::backPressed()
 
 void GameScreen::setSuspended(bool suspended)
 {
+    if (paused)
+        return;
     if (suspended)
         gameWidget.pause(false);
     else
@@ -126,6 +129,7 @@ void GameScreen::setSuspended(bool suspended)
 
 void GameScreen::setPaused(bool fromControls)
 {
+    GTLogTrace("GameScreen::setPaused()");
     if (!paused) {
         if (gameWidget.getOpponent() != NULL)
             gameWidget.getOpponent()->hide();
@@ -133,8 +137,8 @@ void GameScreen::setPaused(bool fromControls)
         for (unsigned int i=0; i<fx.size(); ++i)
             fx[i]->hide();
         this->add(&pauseMenu);
-	pauseMenu.giveFocus();
-	grabEventsOnWidget(&pauseMenu);
+        pauseMenu.giveFocus();
+        grabEventsOnWidget(&pauseMenu);
         paused = true;
         gameWidget.pause();
         theCommander->setCursorVisible(true);
@@ -143,6 +147,7 @@ void GameScreen::setPaused(bool fromControls)
 
 void GameScreen::setResumed(bool fromControls)
 {
+    GTLogTrace("GameScreen::setResumed()");
     if (paused) {
         paused = false;
         if (gameWidget.getOpponent() != NULL)
@@ -150,12 +155,12 @@ void GameScreen::setResumed(bool fromControls)
         std::vector<VisualFX*> fx = gameWidget.getVisualFX();
         for (unsigned int i=0; i<fx.size(); ++i)
             fx[i]->show();
-	ungrabEventsOnWidget(&pauseMenu);
+        ungrabEventsOnWidget(&pauseMenu);
         this->remove(&pauseMenu);
         this->focus(&gameWidget);
         gameWidget.resume();
         theCommander->setCursorVisible(false);
-	gameWidget.setScreenToResumed(fromControls);
+        gameWidget.setScreenToResumed(fromControls);
     }
 }
 

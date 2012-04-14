@@ -190,11 +190,12 @@ void GameWidget::setLevelTheme(LevelTheme *levelTheme)
 
 void GameWidget::pause(bool obscureScreen)
 {
-    m_obscureScreenOnPause = obscureScreen;
     // Call draw on offscreen surface before setting the game to paused
-    if (m_obscureScreenOnPause)
+    if (obscureScreen) {
         draw(m_painterGameScreen);
+    }
     m_paused = true;
+    m_obscureScreenOnPause = obscureScreen;
     // Draw the obscured screen on display
     if (m_obscureScreenOnPause) {
         m_painterGameScreen->convertToGray();

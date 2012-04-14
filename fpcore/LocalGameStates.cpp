@@ -198,7 +198,6 @@ void EnterPlayerReadyState::action(Widget *sender, int actionType,
     else {
         //m_getReadyDisplayed = true;
     }
-
     evaluateStateMachine();
 }
 
