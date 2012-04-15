@@ -388,6 +388,7 @@ void MatchIsOverState::enterState()
 
 void MatchIsOverState::exitState()
 {
+    GTLogTrace("MatchIsOver::exitState()");
     m_sharedAssets.m_gameWidget->setGameOverAction(NULL);
 }
 
@@ -405,12 +406,17 @@ void MatchIsOverState::action(Widget *sender, int actionType,
                         event_manager::GameControlEvent *event)
 {
     if (sender == m_gameLostWidget.get()) {
+        GTLogTrace("MatchIsOver: acknowledged by animation widget");
         m_gameLostWidget.reset(NULL);
     }
-    else if (sender == (Widget *)(m_gameLostWidget->getParentScreen())) {
+    else if ((sender == (Widget *)(m_gameLostWidget->getParentScreen()))
+             || (actionType == GameWidget::GAMEOVER_STARTPRESSED)) {
+        GTLogTrace("MatchIsOver: acknowledged by screen action");
         m_gameLostWidget->getParentScreen()->removeAction(this);
         m_gameLostWidget.reset(NULL);
     }
+    else
+        return;
     m_aknowledged = true;
     evaluateStateMachine();
 }

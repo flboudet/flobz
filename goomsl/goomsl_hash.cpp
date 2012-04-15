@@ -114,6 +114,7 @@ void goom_hash_put(GoomHash *_this, const char *key, GHashValue value) {
         int len    = strlen(key);
         char *key2 = (char*)malloc(len+1);
         memcpy(key2,key,len+1);
+        key2[len] = 0;
         _this->root[key2] = value;
     }
     else {

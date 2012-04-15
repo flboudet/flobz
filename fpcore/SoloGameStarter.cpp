@@ -218,10 +218,18 @@ void SoloGameWidget::setGameOptions(GameOptions options)
 }
 bool SoloGameWidget::backPressed()
 {
+    if (m_areaA->isGameOver() || getAborted()) {
+        gameOverAction->action(this, GAMEOVER_STARTPRESSED, NULL);
+        return true;
+    }
     return false;
 }
 bool SoloGameWidget::startPressed()
 {
+    if (m_areaA->isGameOver() || getAborted()) {
+        gameOverAction->action(this, GAMEOVER_STARTPRESSED, NULL);
+        return true;
+    }
     return false;
 }
 StoryWidget *SoloGameWidget::getOpponent()
