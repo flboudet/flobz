@@ -370,23 +370,6 @@ static __inline__ int power_of_2(int input)
     return value;
 }
 
-/*
- GLFont(const char *fname, unsigned int h, float letter_spacing) { init(fname, h, letter_spacing); }
- GLFont() {}
- ~GLFont() {}
- float letter_spacing;
- //The init function will create a font of
- //of the height h from the file fname.
- void init(const char * fname, unsigned int h, float letter_spacing);
- //Free all the resources assosiated with the font.
- void clean();
- //The flagship function of the library - this thing will print
- //out text at window coordinates x,y, using the font ft_font.
- //The current modelview matrix will also be applied to the text.
- void print(float x, float y, const wchar_t *fmt, ...) ;
- void printCentered(float x, float y, const wchar_t *fmt, ...);
- */
-
 static void iglBindFramebufferOES(GLuint i, GLfloat *matrix) {
     static int gCurrentFBO = 0;
     static GLfloat *gCurrentMatrix = NULL;
@@ -766,7 +749,7 @@ public:
     inline void unbindSurface();
 	void applyBlendMode(ImageBlendMode mode);
 	enum ToGlDrawMode { NORMAL = 0, X_FLIP = 1};
-	void drawToGL(IosRect *pSrcRect, IosRect *pDstRect,  ToGlDrawMode mode = NORMAL, float sx=0.0f,float sy=0.0f);
+	void drawToGL(IosRect *pSrcRect, IosRect *pDstRect,  ToGlDrawMode mode = NORMAL);
 
 private:
     OpenGLDrawContext *m_owner;
@@ -1029,7 +1012,7 @@ void IosGLSurfaceRef::applyBlendMode(ImageBlendMode mode)
     }
 }
 
-void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMode mode, float sx,float sy)
+void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMode mode)
 {
     //if (mode == NORMAL)
     //    mode = SCALED;
@@ -1041,11 +1024,9 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMod
             break;
         case 1:
             mode = SCALED;
-            if (sx == 0.0f) { sx = sy = 1.0f; }
             break;
     }
 #endif
-    sx = sy = 1.0f; // Because X_FLIP supports scaling images..
 
     if (gray) {
         // MEGA EFFECT POUR LA PAUSE (Bidouille qui ne marche que pour une image plein ecran...
@@ -1069,8 +1050,10 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMod
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glColor4f(1.0f,1.0f,1.0f,gray_alpha);
-        sx *= 1.0f + zoom_in;
-        sy *= 1.0f + zoom_in;
+        IosRect nDestRect = *pSrcRect;
+        nDestRect.w *= 1.0f + zoom_in;
+        nDestRect.h *= 1.0f + zoom_in;
+        pDstRect = &nDestRect;
         if (pDstRect) {
             float added = 320.0f * zoom_in;
             pDstRect->x -= added / (4.0f + 2.0f*sin(t*.3));
@@ -1090,9 +1073,9 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMod
         texcoord[6] = (GLfloat)(pSrcRect->x) / m_ref->m_p2w;             texcoord[5] = (GLfloat)(pSrcRect->y+pSrcRect->h) / m_ref->m_p2h;
         texcoord[4] = (GLfloat)(pSrcRect->x+pSrcRect->w) / m_ref->m_p2w; texcoord[7] = (GLfloat)(pSrcRect->y+pSrcRect->h) / m_ref->m_p2h;
         vertices[0] = pDstRect->x;                vertices[1] = pDstRect->y;
-        vertices[2] = pDstRect->x+pDstRect->w*sx; vertices[3] = pDstRect->y;
-        vertices[4] = pDstRect->x;                vertices[5] = pDstRect->y+pDstRect->h*sy;
-        vertices[6] = pDstRect->x+pDstRect->w*sx; vertices[7] = pDstRect->y+pDstRect->h/sy;
+        vertices[2] = pDstRect->x+pDstRect->w; vertices[3] = pDstRect->y;
+        vertices[4] = pDstRect->x;                vertices[5] = pDstRect->y+pDstRect->h;
+        vertices[6] = pDstRect->x+pDstRect->w; vertices[7] = pDstRect->y+pDstRect->h;
         glTexCoordPointer(2, GL_FLOAT, 0, &texcoord[0]);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glVertexPointer(2, GL_FLOAT, 0, &vertices[0]);
