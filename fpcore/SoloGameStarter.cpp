@@ -120,7 +120,8 @@ void SoloGameWidget::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int gr
 
 void SoloGameWidget::cycle()
 {
-    if (!m_paused) {
+    bool isGameOver = m_areaA->isGameOver() || getAborted();
+    if ((!m_paused) && (!isGameOver)) {
         // Game parameters
         m_cyclesDuration.step();
         m_levelIncrease.step();
@@ -166,7 +167,7 @@ void SoloGameWidget::cycle()
         }
         requestDraw();
     }
-    if (m_areaA->isGameOver() || getAborted()) {
+    if (isGameOver) {
         if (gameOverAction)
             gameOverAction->action(this, GAME_IS_OVER, NULL);
     }
