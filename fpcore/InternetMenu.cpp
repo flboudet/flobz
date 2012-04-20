@@ -504,7 +504,7 @@ InternetConnectDialog::~InternetConnectDialog()
 	    errorDialog = new InternetErrorDialog(m_gameCenter->getDenyString(), m_gameCenter->getDenyStringMore());
         m_owner->getParentScreen()->add(errorDialog);
         m_owner->getParentScreen()->grabEventsOnWidget(errorDialog);
-        AudioManager::playSound("ebenon.wav", 0.5);
+        theCommander->playSound("ebenon.wav", 0.5);
     }
     delete m_gameCenter;
 }
@@ -555,7 +555,7 @@ void InternetGameMenu::action(Widget *sender, int actionType, GameControlEvent *
             InternetErrorDialog *errorDialog = new InternetErrorDialog("Cannot connect to", serverName.getEditField().getValue());
             this->getParentScreen()->add(errorDialog);
             this->getParentScreen()->grabEventsOnWidget(errorDialog);
-            AudioManager::playSound("ebenon.wav", 0.5);
+            theCommander->playSound("ebenon.wav", 0.5);
         }
     }
     else if (sender == this->updating.getButton()) {

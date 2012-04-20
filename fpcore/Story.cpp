@@ -192,16 +192,14 @@ static const char *getText(StyrolyseClient *_this, const char *text)
     return ((StoryWidget::StoryStyrolyseClient *)_this)->widget->getText(text);
 }
 
-static void music(StyrolyseClient *_this, const char *command)
+static void music(StyrolyseClient *_this, const char *name)
 {
-    //AudioManager::playMusic(theCommander->getDataPathManager().getPath(String("/music/") + fileName));
-    AudioManager::music(command);
+    theCommander->playMusicTrack(name);
 }
 
 static void playSound(StyrolyseClient *_this, const char *fileName, int volume)
 {
-    //AudioManager::playSound(theCommander->getDataPathManager().getPath(String("/sfx/") + fileName), volume);
-    AudioManager::playSound(fileName, volume);
+    theCommander->playSound(fileName, volume);
 }
 
 bool StoryWidget::classInitialized = false;

@@ -37,10 +37,28 @@ void PackageDescription::define_crop(GoomSL *gsl, GoomHash *global, GoomHash *lo
                             GSL_LOCAL_INT(gsl, local, "y"),
                             GSL_LOCAL_INT(gsl, local, "w"),
                             GSL_LOCAL_INT(gsl, local, "h") };
-    packageDesc->m_cDC.declareCompositeSurface(key,
+    packageDesc->m_cDC->declareCompositeSurface(key,
                packageDesc->m_graphicBeingDefinedPath.c_str(), graphicRect);
 }
 void PackageDescription::end_graphic(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+}
+
+void PackageDescription::start_music(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    PackageDescription *packageDesc = (PackageDescription *)gsl_get_userdata(gsl, "PackageDescription");
+    const char * path = (const char *)GSL_LOCAL_PTR(gsl, local, "path");
+    packageDesc->m_musicBeingDefinedPath = path;
+}
+void PackageDescription::define_track(GoomSL *gsl, GoomHash *global, GoomHash *local)
+{
+    PackageDescription *packageDesc = (PackageDescription *)gsl_get_userdata(gsl, "PackageDescription");
+    const char * key = (const char *)GSL_LOCAL_PTR(gsl, local, "key");
+    int position = GSL_LOCAL_INT(gsl, local, "pos");
+    if (packageDesc->m_jukebox != NULL)
+        packageDesc->m_jukebox->registerTrack(key, packageDesc->m_musicBeingDefinedPath.c_str(), position);
+}
+void PackageDescription::end_music(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
 }
 
@@ -50,12 +68,17 @@ void PackageDescription::sbind(GoomSL *gsl)
     gsl_bind_function(gsl, "start_graphic", start_graphic);
     gsl_bind_function(gsl, "define_crop",   define_crop);
     gsl_bind_function(gsl, "end_graphic",   end_graphic);
+
+    gsl_bind_function(gsl, "start_music",  start_music);
+    gsl_bind_function(gsl, "define_track", define_track);
+    gsl_bind_function(gsl, "end_music",    end_music);
 }
 
 PackageDescription::PackageDescription(DataPathManager &dataPathManager,
                                        DataPackage     &package,
-                                       CompositeDrawContext &cDC)
-    : m_cDC(cDC)
+                                       CompositeDrawContext *cDC,
+                                       Jukebox *jukebox)
+    : m_cDC(cDC), m_jukebox(jukebox)
 {
     try {
         package.getPath("Description.gsl").c_str();
@@ -77,8 +100,9 @@ PackageDescription::PackageDescription(DataPathManager &dataPathManager,
 }
 
 PackageDescription::PackageDescription(GoomSL *gsl,
-                                       CompositeDrawContext &cDC)
-    : m_cDC(cDC)
+                                       CompositeDrawContext *cDC,
+                                       Jukebox *jukebox)
+    : m_cDC(cDC), m_jukebox(jukebox)
 {
     gsl_set_userdata(gsl, "PackageDescription", this);
     sbind(gsl);

@@ -7,6 +7,7 @@
 #include "FPDataPathManager.h"
 #include "drawcontext.h"
 #include "CompositeDrawContext.h"
+#include "audio.h"
 
 class FPMain : NotificationResponder
 {
@@ -32,6 +33,8 @@ private:
     DrawContext *m_nativeDrawContext;
     event_manager::EventManager *m_eventManager;
     audio_manager::AudioManager *m_audioManager;
+
+    Jukebox m_jukebox;
 
     FPDataPathManager m_dataPathManager;
 

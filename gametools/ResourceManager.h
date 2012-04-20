@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 template <typename T>
 class ResourceReference;

@@ -33,6 +33,7 @@
 #include "FloboGame.h"
 #include "audio.h"
 #include "HiScores.h"
+#include "FPCommander.h"
 
 GameView::GameView(FloboGameFactory *attachedFloboGameFactory,
                    int playerId,
@@ -410,7 +411,8 @@ void GameView::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum
           index = random()/(RAND_MAX>>2);
         }
       }
-      if (index>1) AudioManager::playSound(sound_yahoohoo[index], volume_yahoohoo[index]);
+      if (index>1)
+          theCommander->playSound(sound_yahoohoo[index], volume_yahoohoo[index]);
     }
 
 }
@@ -456,6 +458,6 @@ void GameView::gameLost()
     }
     Animation *shakingAnimation = new ScreenShakingAnimation(80, 12, 10.f, 5.f, 1.f);
     viewAnimations.add(shakingAnimation);
-    AudioManager::playSound("earthquake.wav", 1.0);
+    theCommander->playSound("earthquake.wav", 1.0);
 }
 

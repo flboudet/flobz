@@ -27,6 +27,7 @@
 #define _PUYODATAPATHMANAGER_H
 
 #include "CompositeDrawContext.h"
+#include "audio.h"
 #include "DataPathManager.h"
 #include "ios_filepath.h"
 
@@ -63,7 +64,7 @@ public:
     virtual String getPath(String shortPath) const;
     virtual SelfVector<String> getEntriesAtPath(String shortPath) const;
     virtual DataInputStream *openDataInputStream(const char *shortPath) const;
-    virtual void registerDataPackages(CompositeDrawContext &cDC);
+    virtual void registerDataPackages(CompositeDrawContext *cDC, Jukebox *jukebox = NULL);
     // Own methods
     String getPathInPack(String shortPath, int packPathIndex) const;
     int getNumPacks() const { return m_dataPaths.size(); }

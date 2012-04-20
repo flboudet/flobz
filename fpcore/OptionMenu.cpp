@@ -29,14 +29,14 @@
 MusicPrefSwitch::MusicPrefSwitch()
 : gameui::SwitchedButton(theCommander->getLocalizedString(kMusic), true,
                          theCommander->getSwitchOnPicture(), theCommander->getSwitchOffPicture(),
-                         String(AudioManager::musicOnOffKey()), theCommander->getPreferencesManager())
+                         String(AudioHelper::musicOnOffKey()), theCommander->getPreferencesManager())
 {
 }
 
 AudioPrefSwitch::AudioPrefSwitch()
 : gameui::SwitchedButton(theCommander->getLocalizedString(kAudioFX), true,
                          theCommander->getSwitchOnPicture(), theCommander->getSwitchOffPicture(),
-                         String(AudioManager::soundOnOffKey()), theCommander->getPreferencesManager())
+                         String(AudioHelper::soundOnOffKey()), theCommander->getPreferencesManager())
 {
 }
 

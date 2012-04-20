@@ -30,8 +30,6 @@
 
 using namespace ios_fc;
 
-class CompositeDrawContext;
-
 class DataInputStream {
 public:
     virtual ~DataInputStream() {}
@@ -53,7 +51,6 @@ class DataPathManager : public DataProvider {
 public:
     virtual String getPath(String shortPath) const = 0;
     virtual SelfVector<String> getEntriesAtPath(String shortPath) const = 0;
-    virtual void registerDataPackages(CompositeDrawContext &cDC) = 0;
 };
 
 #endif // _DATAPATHMANAGER_H

@@ -111,13 +111,12 @@ FPDataPathManager::FPDataPathManager(String coreDataPath)
     }
 }
 
-void FPDataPathManager::registerDataPackages(CompositeDrawContext &cDC)
+void FPDataPathManager::registerDataPackages(CompositeDrawContext *cDC, Jukebox *jukebox)
 {
-    cout << "dataPathsSize: " << m_dataPaths.size() << " ; " << &m_dataPaths << endl;
     // Now iterate through the datapaths to build PackageDescription
     for (int i = 0 ; i < m_dataPaths.size() ; i++) {
         FPDataPackage currentPackage(this, m_dataPaths[i].getPathString(), i);
-        PackageDescription packDesc(*this, currentPackage, cDC);
+        PackageDescription packDesc(*this, currentPackage, cDC, jukebox);
     }
 }
 

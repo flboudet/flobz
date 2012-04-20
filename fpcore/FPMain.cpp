@@ -106,15 +106,17 @@ void FPMain::initWithGUI()
     m_audioManager = new NullAudioManager();
 #endif
     m_drawContext = new CompositeDrawContext(m_nativeDrawContext);
-    m_dataPathManager.registerDataPackages(*m_drawContext);
     // Give the DrawContext to the GameLoop
     loop->setDrawContext(m_drawContext);
     // Give the EventManager to the GameLoop
     loop->setEventManager(m_eventManager);
     // Give the AudioManager to the GameLoop
     loop->setAudioManager(m_audioManager);
+    // Register data packages
+    m_dataPathManager.registerDataPackages(m_drawContext, &m_jukebox);
     // Create the FPCommander singleton
-    FPCommander *pc = new FPCommander(&m_dataPathManager, m_preferencesManager);
+    FPCommander *pc = new FPCommander(&m_dataPathManager, m_preferencesManager, &m_jukebox);
+
     pc->initWithGUI(m_fullscreen);
     initMenus();
     cursor = new GameCursor("gfx/cursor.png");

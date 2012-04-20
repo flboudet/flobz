@@ -28,6 +28,7 @@
 #include "AnimatedFlobo.h"
 #include "GameView.h"
 #include "audio.h"
+#include "FPCommander.h"
 
 /* Base class implementation */
 Animation::Animation()
@@ -88,7 +89,7 @@ void NeutralAnimation::cycle()
                 attachedFlobo.getScreenCoordinateX() + TSIZE/2,
                 attachedFlobo.getScreenCoordinateY() + TSIZE/2,
                 attachedFlobo.getAttachedView()->getPlayerId());*/
-            AudioManager::playSound(sound_bim[choosenSound], sound_bim_volume[choosenSound], getSoundPadding());
+            theCommander->playSound(sound_bim[choosenSound], sound_bim_volume[choosenSound], getSoundPadding());
             finishedFlag = true;
             attachedFlobo.getAttachedView()->allowCycle();
             synchronizer->pop();
@@ -154,7 +155,7 @@ void TurningAnimation::cycle()
     static const float  sound_fff_volume = .35;
 
     if (cpt == 0) {
-        AudioManager::playSound(sound_fff, sound_fff_volume, getSoundPadding());
+        theCommander->playSound(sound_fff, sound_fff_volume, getSoundPadding());
         EventFX("turning",
                 attachedFlobo.getScreenCoordinateX() + TSIZE/2,
                 attachedFlobo.getScreenCoordinateY() + TSIZE/2,
@@ -178,7 +179,7 @@ MovingHAnimation::MovingHAnimation(AnimatedFlobo &flobo, int hOffset, int step)
     enabled = false;
     m_exclusive = false;
     m_tag = ANIMATION_H;
-    AudioManager::playSound("tick.wav", .35, getSoundPadding());
+    theCommander->playSound("tick.wav", .35, getSoundPadding());
     cycle();
 }
 
@@ -238,7 +239,7 @@ void FallingAnimation::cycle()
     if (Y >= (attachedFlobo.getFloboY()*TSIZE) + yOffset)
     {
         if (!m_once) {
-            AudioManager::playSound("bam1.wav", .3, getSoundPadding());
+            theCommander->playSound("bam1.wav", .3, getSoundPadding());
             m_once = true;
         }
         Y = (attachedFlobo.getFloboY()*TSIZE) + yOffset;
@@ -248,23 +249,10 @@ void FallingAnimation::cycle()
 
         if (bouncing < 0) {
             finishedFlag = true;
-//<<<<<<< .mine
-//            AudioManager::playSound("bam1.wav", .3);
-//            EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedFlobo.getAttachedView()->getPlayerId());
-//            EventFX("end_falling", X+TSIZE/2,Y+TSIZE/2, attachedFlobo.getAttachedView()->getPlayerId());
-//            attachedFlobo.setAnimatedState(AnimatedFlobo::FLOBO_NORMAL);
-//            attachedFlobo.getAttachedView()->allowCycle();
-//=======
-            //EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedFlobo.getAttachedView()->getPlayerId());
-            //EventFX("end_falling", X+TSIZE/2,Y+TSIZE/2, attachedFlobo.getAttachedView()->getPlayerId());
             attachedFlobo.setAnimatedState(0);
-            //attachedFlobo.getAttachedView()->allowCycle();
-//>>>>>>> .r1012
         }
         else if ((bouncing < BOUNCING_OFFSET_NUM) && (BOUNCING_OFFSET[bouncing] > 0)) {
             attachedFlobo.setAnimatedState(BOUNCING_OFFSET[bouncing]);
-            //AudioManager::playSound("bam1.wav", .1);
-            //EventFX("bouncing", X+TSIZE/2,Y+TSIZE/2, attachedFlobo.getAttachedView()->getPlayerId());
         }
         else
             attachedFlobo.setAnimatedState(0);
@@ -408,7 +396,7 @@ void VanishSoundAnimation::cycle()
     else if (synchronizer->isSynchronized()) {
         step++;
         if (step == 1) {
-            AudioManager::playSound(sound_splash[phase-1>7?7:phase-1], sound_splash_volume, soundPadding);
+            theCommander->playSound(sound_splash[phase-1>7?7:phase-1], sound_splash_volume, soundPadding);
             finishedFlag = true;
         }
     }
@@ -446,7 +434,7 @@ void NeutralPopAnimation::cycle()
     else if (synchronizer->isSynchronized()) {
         iter ++;
         if (iter == 17 + delay) {
-            AudioManager::playSound("pop.wav", .25, getSoundPadding());
+            theCommander->playSound("pop.wav", .25, getSoundPadding());
             EventFX("neutral_pop",
                     attachedFlobo.getScreenCoordinateX() + TSIZE/2,
                     attachedFlobo.getScreenCoordinateY() + TSIZE/2,

@@ -1,6 +1,6 @@
 noinst_LTLIBRARIES=libfpcore.la
 
-libfpcore_la_SOURCES=audio.cpp HiScores.cpp FPCommander.cpp \
+libfpcore_la_SOURCES=audio.cpp HiScores.cpp FPResources.cpp FPCommander.cpp \
           MainMenu.cpp MainScreen.cpp FPMain.cpp \
           main.cpp FPDataPathManager.cpp FloboGame.cpp DoomMelt.cpp \
           GameView.cpp FloboAnimations.cpp AnimatedFlobo.cpp AIPlayer.cpp \
@@ -25,7 +25,7 @@ endif
 
 libfpcore_la_CXXFLAGS = -I$(top_srcdir)/common -I$(top_srcdir)/iosfc -I$(top_srcdir)/goomsl -I$(top_srcdir)/gametools $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 
-EXTRA_DIST=EventPlayer.h NetworkGameView.h \
+EXTRA_DIST=EventPlayer.h NetworkGameView.h FPResources.h \
            AnimatedFlobo.h FloboGameAbstract.h OptionMenu.h \
            AnimatedFloboTheme.h FloboGame.h PauseMenu.h \
            audio.h GameWidget.h GameScreen.h GamePlayer.h \

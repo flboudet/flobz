@@ -2,3 +2,6 @@ external <strcat: string a, string b> : string
 external <start_graphic: string path>
 external <define_crop: string key, int x, int y, int w, int h>
 external <end_graphic>
+external <start_music: string path>
+external <define_track: string key, int pos>
+external <end_music>

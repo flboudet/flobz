@@ -161,7 +161,7 @@ void ThemeManagerImpl::loadThemePack(const std::string &path)
     DrawContext *dc = GameUIDefaults::GAME_LOOP->getDrawContext();
     CompositeDrawContext *cDC = dynamic_cast<CompositeDrawContext *>(dc);
     if (cDC != NULL)
-        PackageDescription packageDesc(gsl, *cDC);
+        PackageDescription packageDesc(gsl, cDC);
     // end of ugly bit
     GSL_SET_USERDATA_PTR(gsl, this);
     gsl_execute(gsl);
