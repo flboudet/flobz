@@ -71,7 +71,7 @@ SoloGameWidget::SoloGameWidget(SoloGameSettings &gameSettings, FloboSetTheme &fl
       m_handicapDecreaseAbovePhase1(gameSettings.handicapDecreaseAbovePhase1),
       attachedFloboThemeSet(floboSetTheme), attachedRandom(5),
       m_cyclesBeforeGameCycle(0), m_cyclesBeforeLevelRaise(1000.),
-      m_comboHandicap(0.), m_comboHandicap75(false), m_comboHandicap85(false)
+      m_comboHandicap(0.), m_comboHandicap75(false), m_comboHandicap85(false), m_comboHandicap100(false)
 {
     m_gameFactory.reset(new LocalGameFactory(&attachedRandom));
     m_areaA.reset(new GameView(m_gameFactory.get(), 0, &floboSetTheme, &levelTheme));
@@ -102,6 +102,11 @@ void SoloGameWidget::gameDidEndCycle()
     if (m_cyclesBeforeLevelRaise <= 0.) {
         m_areaA->getAttachedGame()->addNeutralLayer();
         m_cyclesBeforeLevelRaise = 1000.;
+    }
+    if (m_comboHandicap100) {
+        m_comboHandicap100 = false;
+        m_comboHandicap = 0.;
+        EventFX("starvedcombo", 20, 20, 1);
     }
 }
 
@@ -148,7 +153,8 @@ void SoloGameWidget::cycle()
             m_cyclesBeforeLevelRaise -= m_levelIncrease.getValue();
         }
         m_cyclesBeforeGameCycle--;
-        m_comboHandicap += m_handicapIncrease.getValue();
+        if (m_comboHandicap < 100.)
+            m_comboHandicap += m_handicapIncrease.getValue();
         // Warning events on handicap
         if ((m_comboHandicap > 75.) && (!m_comboHandicap75)) {
             EventFX("starvedcombo", 20, 20, 1);
@@ -158,12 +164,11 @@ void SoloGameWidget::cycle()
             EventFX("starvedcombo", 20, 20, 1);
             m_comboHandicap85 = true;
         }
-        if (m_comboHandicap >= 100.) {
+        if ((m_comboHandicap >= 100.) && (!m_comboHandicap100)) {
             m_areaA->getAttachedGame()->increaseNeutralFlobos(6);
-            m_comboHandicap = 0.;
-            EventFX("starvedcombo", 20, 20, 1);
             m_comboHandicap75 = false;
             m_comboHandicap85 = false;
+            m_comboHandicap100 = true;
         }
         requestDraw();
     }

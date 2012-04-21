@@ -131,7 +131,7 @@ protected:
     double m_cyclesBeforeLevelRaise;
     std::auto_ptr<VuMeter> m_comboMeter;
     double m_comboHandicap;
-    bool m_comboHandicap75, m_comboHandicap85;
+    bool m_comboHandicap75, m_comboHandicap85, m_comboHandicap100;
     std::string m_playerName;
 };
 
