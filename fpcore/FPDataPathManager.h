@@ -58,7 +58,13 @@ private:
     FILE *m_f;
 };
 
-class FPDataPathManager : public DataPathManager {
+class AbstractFPDataPathManager : public DataPathManager
+{
+public:
+    virtual void registerDataPackages(CompositeDrawContext *cDC, Jukebox *jukebox = NULL) = 0;
+};
+
+class FPDataPathManager : public AbstractFPDataPathManager {
 public:
     FPDataPathManager(String coreDataPath);
     virtual String getPath(String shortPath) const;
