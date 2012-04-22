@@ -43,8 +43,7 @@ GameScreen::GameScreen(GameWidget &gameWidget)
 #endif
     add(&gameWidget);
     if (gameWidget.getOpponent() != NULL)
-        GameUIDefaults::GAME_LOOP->addIdle(gameWidget.getOpponent());
-
+        add(gameWidget.getOpponent());
     activeFX = &gameWidget.getVisualFX();
     for (unsigned int i=0; i<activeFX->size(); ++i) {
         add((*activeFX)[i]);

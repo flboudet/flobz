@@ -250,8 +250,6 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
     client.attachedTheme = NULL;
     currentStory = styrolyse_new((const char *)fullPath, (StyrolyseClient *)(&client), fxMode);
     GTLogTrace("StoryWidget::StoryWidget() styrolyse_new finished");
-    //styrolyse_setuserpointer(currentStory, this);
-    //sstory = createStorySurface();
 }
 
 StoryWidget::~StoryWidget()
@@ -267,7 +265,6 @@ void StoryWidget::reset()
     currentStory = styrolyse_new((const char *)fullPath, (StyrolyseClient *)(&client), fxMode);
 }
 
-// void StoryWidget::cycle()
 void StoryWidget::idle(double currentTime)
 {
     double delta_t;
@@ -315,7 +312,6 @@ void StoryWidget::freeMemory()
 {
     styrolyse_reduce_memory(currentStory);
 }
-
 
 StoryScreen::StoryScreen(String screenName, Action *finishedAction, bool shouldAddTransition)
     : Screen(), storyWidget(screenName, finishedAction),

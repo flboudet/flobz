@@ -196,7 +196,8 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       void suspendLayout();
       void resumeLayout();
 
-      virtual void onWidgetVisibleChanged(bool visible);
+      virtual void hide();
+      virtual void show();
 
       Widget *getChild(int i)     const  { if (i >= 0) return childs[i]; else return NULL; }
       void    changeChild(int i, Widget *w);
@@ -459,8 +460,8 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       virtual void onEvent(event_manager::GameControlEvent *event);
       void remove(Widget *child) { rootContainer.remove(child); }
       void add(Widget *child) { rootContainer.add(child); }
-      virtual void hide() { hidden = true; onScreenVisibleChanged(isVisible()); }
-      virtual void show() { hidden = false; onScreenVisibleChanged(isVisible());}
+      virtual void hide();
+      virtual void show();
       virtual void onDrawableVisibleChanged(bool visible);
       bool isVisible() const { return !hidden; }
 

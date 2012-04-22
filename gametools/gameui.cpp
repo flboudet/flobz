@@ -70,7 +70,14 @@ namespace gameui {
         }
     }
 
-    void Widget::hide()   { onWidgetVisibleChanged(false);  }
+    void Widget::hide()
+    {
+        IdleComponent *idle = getIdleComponent();
+        if (idle != NULL)
+            idle->setPause(true);
+        onWidgetVisibleChanged(false);
+    }
+
     void Widget::show()
     {
         onWidgetVisibleChanged(true);
@@ -346,12 +353,20 @@ namespace gameui {
         }
     }
 
-    void WidgetContainer::onWidgetVisibleChanged(bool visible)
+    void WidgetContainer::hide()
     {
         for (int i = 0; i < childs.size() ; i++) {
-            childs[i]->onWidgetVisibleChanged(visible);
+            childs[i]->hide();
         }
-        Widget::onWidgetVisibleChanged(visible);
+        Widget::hide();
+    }
+
+    void WidgetContainer::show()
+    {
+        for (int i = 0; i < childs.size() ; i++) {
+            childs[i]->show();
+        }
+        Widget::show();
     }
 
     //
@@ -1233,6 +1248,20 @@ namespace gameui {
         grabbedWidget->eventOccured(event);
     }
 
+    void Screen::hide()
+    {
+        rootContainer.hide();
+        hidden = true;
+        onScreenVisibleChanged(isVisible());
+    }
+
+    void Screen::show()
+    {
+        rootContainer.show();
+        hidden = false;
+        onScreenVisibleChanged(isVisible());
+    }
+
     void Screen::onDrawableVisibleChanged(bool visible)
     {
         hidden = !visible;
@@ -1241,7 +1270,7 @@ namespace gameui {
 
     void Screen::onScreenVisibleChanged(bool visible)
     {
-        rootContainer.onWidgetVisibleChanged(visible);
+        //rootContainer.onWidgetVisibleChanged(visible);
         propagateAction((Widget *)this, 0, NULL);
     }
 
