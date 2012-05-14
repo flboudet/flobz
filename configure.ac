@@ -179,6 +179,8 @@ AC_SEARCH_LIBS([png_set_read_fn], [png])
 
 AC_SEARCH_LIBS([jpeg_read_header], [jpeg])
 
+AC_SEARCH_LIBS([FT_Load_Glyph], [freetype])
+
 SDL_LIBS=$LIBS
 LIBS=$OLD_LIBS
 
@@ -260,6 +262,7 @@ AC_CHECK_HEADERS([GL/glext.h OpenGL/glext.h],
 if test "x$GLEXT_H_FOUND" = "x"; then
     ENABLE_OPENGL_GFX=no
 fi
+
 fi
 
 AC_CHECK_HEADER(sqlite3.h, ENABLE_SQLITE=true, ENABLE_SQLITE=false)

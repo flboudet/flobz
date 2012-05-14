@@ -205,7 +205,7 @@ static void playSound(StyrolyseClient *_this, const char *fileName, int volume)
 bool StoryWidget::classInitialized = false;
 
 StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
-    : IdleComponent(), localeDictionary(NULL), finishedAction(finishedAction), once(false), last_time(-1.), fxMode(fxMode)
+    : IdleComponent(), localeDictionary(NULL), finishedAction(finishedAction), once(false), last_time(-1.), fxMode(fxMode), m_renderEnabled(true)
 {
     GTLogTrace("StoryWidget::StoryWidget(%s)", (const char *)screenName);
     try {
@@ -286,6 +286,11 @@ void StoryWidget::idle(double currentTime)
 void StoryWidget::draw(DrawTarget *dt)
 {
     if (hidden) return;
+    if (!m_renderEnabled) return;
+    render(dt);
+}
+void StoryWidget::render(DrawTarget *dt)
+{
     sstory = dt;
     styrolyse_draw(currentStory);
     dt->setClipRect(NULL);

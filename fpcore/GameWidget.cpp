@@ -423,7 +423,7 @@ void GameWidget2P::draw(DrawTarget *dt)
     // Rendering the opponent if it is behind the flobos
     if (getLevelTheme()->getOpponentIsBehind()) {
         if (getOpponent() != NULL)
-            getOpponent()->draw(dt);
+            getOpponent()->render(dt);
     }
     // Rendering flobo views
     drawGameAreas(dt);
@@ -495,7 +495,7 @@ void GameWidget2P::draw(DrawTarget *dt)
     // Rendering the opponent if it is in front
     if (! getLevelTheme()->getOpponentIsBehind()) {
         if (getOpponent() != NULL)
-            getOpponent()->draw(dt);
+            getOpponent()->render(dt);
     }
 }
 

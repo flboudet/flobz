@@ -62,6 +62,9 @@ public:
     const char *getText(const char *text) const;
     void freeMemory();
 
+    void render(DrawTarget *dt);
+    void setRenderEnabled(bool enabled=true) { m_renderEnabled = enabled; }
+
     struct StoryStyrolyseClient {
         StyrolyseClient styroClient;
         StoryWidget *widget;
@@ -79,6 +82,7 @@ protected:
     double last_time;
     bool fxMode;
     String fullPath;
+    bool m_renderEnabled;
 };
 
 class VisualFX : public StoryWidget {

@@ -42,8 +42,10 @@ GameScreen::GameScreen(GameWidget &gameWidget)
 	 dynamic_cast<DrawableComponent *>(this));
 #endif
     add(&gameWidget);
-    if (gameWidget.getOpponent() != NULL)
+    if (gameWidget.getOpponent() != NULL) {
+        gameWidget.getOpponent()->setRenderEnabled(false);
         add(gameWidget.getOpponent());
+    }
     activeFX = &gameWidget.getVisualFX();
     for (unsigned int i=0; i<activeFX->size(); ++i) {
         add((*activeFX)[i]);
@@ -130,8 +132,6 @@ void GameScreen::setPaused(bool fromControls)
 {
     GTLogTrace("GameScreen::setPaused()");
     if (!paused) {
-        if (gameWidget.getOpponent() != NULL)
-            gameWidget.getOpponent()->hide();
         std::vector<VisualFX*> fx = gameWidget.getVisualFX();
         for (unsigned int i=0; i<fx.size(); ++i)
             fx[i]->hide();
