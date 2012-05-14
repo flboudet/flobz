@@ -1638,12 +1638,12 @@ namespace gameui {
         } else if (src < 0x800) {
             nbytes = 2;
             byte[1] = (src & 0x3f) | 0x80;
-            byte[0] = ((src << 2) & 0xcf00 | 0xc000) >> 8;
+            byte[0] = (((src << 2) & 0xcf00) | 0xc000) >> 8;
         } else {
             nbytes = 3;
             byte[2] = (src & 0x3f) | 0x80;
-            byte[1] = ((src << 2) & 0x3f00 | 0x8000) >> 8;
-            byte[0] = ((src << 4) & 0x3f0000 | 0xe00000) >> 16;
+            byte[1] = (((src << 2) & 0x3f00) | 0x8000) >> 8;
+            byte[0] = (((src << 4) & 0x3f0000) | 0xe00000) >> 16;
         }
 
         for (i = nbytes; i < 4; i++)

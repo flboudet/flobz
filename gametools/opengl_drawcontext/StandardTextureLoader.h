@@ -1,7 +1,7 @@
 #ifndef _STANDARD_TEXTURE_LOADER_H
 #define _STANDARD_TEXTURE_LOADER_H
 
-#include "opengl_drawcontext/OpenGLDrawContext.h"
+#include "OpenGLDrawContext.h"
 #include "DataPathManager.h"
 
 class StandardTextureLoader : public OpenGLBackendUtil
