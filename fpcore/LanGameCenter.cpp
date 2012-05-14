@@ -106,7 +106,7 @@ void LanGameCenter::onMessage(Message &msg)
 	break;
       case FLOBO_UDP_GAME_ACCEPT: {
           Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-          if (grantedInvitation.opponentAddress == dir.getPeerAddress());
+          if (grantedInvitation.opponentAddress == dir.getPeerAddress())
             grantGame(grantedInvitation);
       }
 	break;

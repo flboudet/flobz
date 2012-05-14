@@ -266,7 +266,7 @@ static void closeFileFunction(GoomSL *gsl, goomsl_file file)
 }
 static int readFileFunction(GoomSL *gsl, void *buffer, goomsl_file file, int read_size)
 {
-    styrolyse->client->readFile(styrolyse->client, buffer, file, read_size);
+    return styrolyse->client->readFile(styrolyse->client, buffer, file, read_size);
 }
 
 /**/

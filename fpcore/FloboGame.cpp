@@ -135,7 +135,7 @@ void FloboLocalGame::cycle()
         notifyReductions();
         return;
     }
-    if ((fallingY >= 0)&&(getFloboCellAt(fallingX, fallingY+1) > FLOBO_EMPTY) || (getFloboCellAt(getFallingCompanionX(), getFallingCompanionY()+1) > FLOBO_EMPTY)) {
+    if (((fallingY >= 0)&&(getFloboCellAt(fallingX, fallingY+1) > FLOBO_EMPTY)) || (getFloboCellAt(getFallingCompanionX(), getFallingCompanionY()+1) > FLOBO_EMPTY)) {
         setFloboAt(fallingX, getFallY(fallingX, fallingY), fallingFlobo);
         fallingFlobo->setFloboState((FloboState)(fallingFlobo->getFloboState()+FLOBO_STILL));
         setFloboAt(getFallingCompanionX(), getFallY(getFallingCompanionX(), getFallingCompanionY()), companionFlobo);
