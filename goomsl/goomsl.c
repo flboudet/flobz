@@ -1547,7 +1547,7 @@ void gsl_push_file  (GoomSL *scanner, const char *file_name)
   }
   goomsl_file f = scanner->open_file_function(scanner, file_name);
   *b = yy_create_buffer( NULL, YY_BUF_SIZE );
-  gsl_set_buffer_input_file(scanner, *b, f);
+  gsl_set_buffer_input_file(scanner, *b, f, file_name);
 }
 
 void gsl_push_script(GoomSL *scanner, const char *script)
@@ -1582,13 +1582,14 @@ void gsl_bind_file_functions(GoomSL *_this, GoomSL_OpenFile open_function, GoomS
     _this->read_file_function  = read_function;
 }
 
-void gsl_set_buffer_input_file(GoomSL *_this, YY_BUFFER_STATE buf, goomsl_file file)
+void gsl_set_buffer_input_file(GoomSL *_this, YY_BUFFER_STATE buf, goomsl_file file, const char *fileName)
 {
   int i;
   for (i = 0 ; i < PARSEBUF_STACKSIZE ; ++i) {
     if (_this->bufferfile_map[i].b == NULL) {
       _this->bufferfile_map[i].b = buf;
       _this->bufferfile_map[i].f = file;
+      _this->bufferfile_map[i].fname = strdup(fileName);
       break;
     }
   }
@@ -1602,6 +1603,7 @@ goomsl_file gsl_get_buffer_input_file(GoomSL *_this, YY_BUFFER_STATE buf)
       return  _this->bufferfile_map[i].f;
     }
   }
+  return NULL;
 }
 
 void gsl_forget_buffer_input_file(GoomSL *_this, YY_BUFFER_STATE buf)
@@ -1611,9 +1613,21 @@ void gsl_forget_buffer_input_file(GoomSL *_this, YY_BUFFER_STATE buf)
     if (_this->bufferfile_map[i].b == buf) {
       _this->bufferfile_map[i].b = NULL;
       _this->bufferfile_map[i].f = NULL;
+      free(_this->bufferfile_map[i].fname);
       break;
     }
   }
+}
+
+const char * gsl_get_file_name(GoomSL *_this, goomsl_file file)
+{
+  int i;
+  for (i = 0 ; i < PARSEBUF_STACKSIZE ; ++i) {
+    if (_this->bufferfile_map[i].f == file) {
+      return _this->bufferfile_map[i].fname;
+    }
+  }
+  return NULL;
 }
 
 void  gsl_set_userdata(GoomSL *_this, const char *key, const void *data)

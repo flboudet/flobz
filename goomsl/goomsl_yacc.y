@@ -1174,7 +1174,8 @@
         NodeType *node = nodeNew(str, VAR_NODE, line_number); /* {{{ */
         node->vnamespace = gsl_find_namespace(str);
         if (node->vnamespace == 0) {
-            fprintf(stderr, "ERROR: Line %d, Variable not found: '%s'\n", line_number, str);
+            fprintf(stderr, "ERROR: File %s, Line %d, Variable not found: '%s'\n",
+                gsl_get_file_name(currentGoomSL, currentGoomSL->current_file), line_number, str);
             exit(1);
         }
         return node;

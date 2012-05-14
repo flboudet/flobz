@@ -167,6 +167,7 @@ typedef struct _GSL_Struct { /* {{{ */
 struct _BufferFileIndirection {
     void *b;
     goomsl_file f;
+    char *fname;
 };
 struct _GoomSL { /* {{{ */
     void *user_field;
@@ -229,9 +230,10 @@ GoomHash *gsl_find_namespace(const char *name);
 
 void gsl_commit_compilation(void);
 
-void gsl_set_buffer_input_file(GoomSL *_this, void *buf, goomsl_file file);
+void gsl_set_buffer_input_file(GoomSL *_this, void *buf, goomsl_file file, const char *fileName);
 goomsl_file gsl_get_buffer_input_file(GoomSL *_this, void *buf);
 void gsl_forget_buffer_input_file(GoomSL *_this, void *buf);
+const char * gsl_get_file_name(GoomSL *_this, goomsl_file file);
 
 /* #define TYPE_PARAM    1 */
 

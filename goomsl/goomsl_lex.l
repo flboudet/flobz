@@ -98,7 +98,7 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
 
         /* changement de buffer d'entree pour le bovin */
         b = yy_create_buffer( NULL, YY_BUF_SIZE );
-        gsl_set_buffer_input_file(currentGoomSL, b, newfile);
+        gsl_set_buffer_input_file(currentGoomSL, b, newfile, fullName);
         yypush_buffer_state(b);
 
         endImport:
