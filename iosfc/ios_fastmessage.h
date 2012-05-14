@@ -72,25 +72,34 @@ private:
         return *(int8_t *)src;
     }
     inline uint16_t get_uint16(void *src) const {
-        return *(uint16_t *)src;
+        return ((uint16_t)(((uint8_t *)src)[1]<<8))|((uint8_t *)src)[0];
     }
     inline uint32_t get_uint32(void *src) const {
-        return *(uint32_t *)src;
+        return ((uint32_t)(((uint8_t *)src)[3]<<24))
+        | (((uint8_t *)src)[2]<<16)
+        | (((uint8_t *)src)[1]<<8)
+        | ((uint8_t *)src)[0];
     }
     inline double get_float64(void *src) const {
-        return *(double *)src;
+        double dest;
+        memcpy(&dest, src, 8);
+        return dest;
     }
     inline void copy_char8(void *dest, int8_t src) {
         *((int8_t *)dest) = src;
     }
     inline void copy_uint16(void *dest, uint16_t src) {
-        *((uint16_t *)dest) = src;
+        ((uint8_t *)dest)[1] = src >> 8;
+        ((uint8_t *)dest)[0] = src & 0xFF;
     }
     inline void copy_uint32(void *dest, uint32_t src) {
-        *((uint32_t *)dest) = src;
+        ((uint8_t *)dest)[3] = src >> 24;
+        ((uint8_t *)dest)[2] = (src & 0xFF0000) >> 16;
+        ((uint8_t *)dest)[1] = (src & 0xFF00)   >> 8;
+        ((uint8_t *)dest)[0] = src & 0xFF;
     }
     inline void copy_float64(void *dest, double src) {
-        *((double *)dest) = src;
+        memcpy(dest, &src, 8);
     }
     inline void * append_key_reserve_data(uint16_t type, const char *key, size_t dataSize) {
         size_t keySize = strlen(key);
