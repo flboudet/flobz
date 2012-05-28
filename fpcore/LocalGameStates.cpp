@@ -526,16 +526,77 @@ void DisplayStoryScreenState::action(Widget *sender, int actionType,
 }
 
 //---------------------------------
+// ManageHiScoresState
+//---------------------------------
+ManageHiScoresState::ManageHiScoresState(SharedMatchAssets  *sharedMatchAssets,
+                                         PlayerNameProvider *nameProvider,
+                                         const char         *scoreBoardId,
+                                         const char         *storyName,
+                                         StoryNameProvider  *storyNameProvider)
+    : m_boardId(scoreBoardId),
+      m_sharedMatchAssets(sharedMatchAssets),
+      m_nameProvider(nameProvider)
+{
+    m_newHiScore.reset(new DisplayStoryScreenState("new_hiscore.gsl"));
+    m_displayHallOfFame.reset(new DisplayHallOfFameState(storyName, storyNameProvider));
+    m_endOfStateMachine.reset(new CallActionState(this, 0));
+    m_newHiScore->setNextState(m_displayHallOfFame.get());
+    m_displayHallOfFame->setNextState(m_endOfStateMachine.get());
+}
+
+void ManageHiScoresState::enterState()
+{
+    m_finished = false;
+    // Initializes the score board
+    const PlayerGameStat &playerPoints = m_sharedMatchAssets->m_gameWidget->getStatPlayerOne();
+    m_scoreBoard.reset(new LocalStorageHiScoreBoard(m_boardId.c_str(), theCommander->getPreferencesManager(), m_defaultScoreBoard));
+    // Adds the latest score
+    int rank = m_scoreBoard->setHiScore(m_nameProvider->getPlayerName(0).c_str(),
+                                        playerPoints.points +
+                                        playerPoints.total_points);
+    // Updates the displayHallOfFame state
+    m_displayHallOfFame->setHiScoreBoard(m_scoreBoard.get());
+    m_displayHallOfFame->setFinalScore(m_nameProvider->getPlayerName(0).c_str(),
+                                       playerPoints.points +
+                                       playerPoints.total_points);
+    m_displayHallOfFame->setRank(rank);
+    // Initializing the state machine
+    if (rank == -1)
+        m_stateMachine.setInitialState(m_displayHallOfFame.get());
+    else
+        m_stateMachine.setInitialState(m_newHiScore.get());
+    // Run the state machine
+    m_stateMachine.reset();
+    m_stateMachine.evaluate();
+}
+
+void ManageHiScoresState::exitState()
+{
+}
+
+bool ManageHiScoresState::evaluate()
+{
+    return m_finished;
+}
+
+GameState *ManageHiScoresState::getNextState()
+{
+    return m_nextState;
+}
+
+void ManageHiScoresState::action(Widget *sender, int actionType,
+                                 event_manager::GameControlEvent *event)
+{
+    m_finished = true;
+    evaluateStateMachine();
+}
+
+//---------------------------------
 // DisplayHallOfFameState
 //---------------------------------
-DisplayHallOfFameState::DisplayHallOfFameState(SharedMatchAssets  *sharedMatchAssets,
-                                               PlayerNameProvider *nameProvider,
-                                               const char         *scoreBoardId,
-                                               const char         *storyName,
+DisplayHallOfFameState::DisplayHallOfFameState(const char         *storyName,
                                                StoryNameProvider  *storyNameProvider)
-    : m_boardId(scoreBoardId),
-      m_storyName(storyName), m_sharedMatchAssets(sharedMatchAssets),
-      m_nameProvider(nameProvider),
+    : m_storyName(storyName),
       m_storyNameProvider(storyNameProvider)
 {
 }
@@ -545,15 +606,14 @@ void DisplayHallOfFameState::enterState()
     if (m_storyNameProvider != NULL)
         m_storyName = m_storyNameProvider->getStoryName();
     GTLogTrace("StoryModeDisplayHallOfFameState(%s)::enterState()", m_storyName.c_str());
-
-    const PlayerGameStat &playerPoints = m_sharedMatchAssets->m_gameWidget->getStatPlayerOne();
     m_gameOverScreen.reset(new GameOverScreen(m_storyName.c_str(),
                                               this));
-    m_scoreBoard.reset(new LocalStorageHiScoreBoard(m_boardId.c_str(), theCommander->getPreferencesManager(), m_defaultScoreBoard));
-    m_gameOverScreen->setScoreBoard(m_scoreBoard.get());
-    m_gameOverScreen->setFinalScore(m_nameProvider->getPlayerName(0),
-                                    playerPoints.points +
-                                    playerPoints.total_points);
+
+    //const PlayerGameStat &playerPoints = m_sharedMatchAssets->m_gameWidget->getStatPlayerOne();
+
+    m_gameOverScreen->setScoreBoard(m_scoreBoard);
+    m_gameOverScreen->setFinalScore(m_playerName.c_str(), m_playerScore);
+    m_gameOverScreen->highlightRank(m_rank);
     GameUIDefaults::SCREEN_STACK->swap(m_gameOverScreen.get());
     m_gameOverScreen->refresh();
     m_acknowledged = false;

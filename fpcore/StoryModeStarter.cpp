@@ -441,8 +441,8 @@ StoryModeStarterAction::StoryModeStarterAction(GameDifficulty difficulty,
     m_prepareNextMatch.reset(new StoryModePrepareNextMatchState(&m_sharedGameAssets));
     m_playMatch.reset(new StoryModeMatchState(&m_sharedGameAssets));
     m_gameWon.reset(new DisplayStoryScreenState("gamewon_1p.gsl"));
-    m_gameLostHoF.reset(new DisplayHallOfFameState(m_playMatch->getMatchAssets(), nameProvider, STORY_SCOREBOARD_ID, "", &m_sharedGameAssets));
-    m_gameWonHoF.reset(new DisplayHallOfFameState(m_playMatch->getMatchAssets(), nameProvider, STORY_SCOREBOARD_ID, "gamewon_highscores_1p.gsl"));
+    m_gameLostHoF.reset(new ManageHiScoresState(m_playMatch->getMatchAssets(), nameProvider, STORY_SCOREBOARD_ID, "", &m_sharedGameAssets));
+    m_gameWonHoF.reset(new ManageHiScoresState(m_playMatch->getMatchAssets(), nameProvider, STORY_SCOREBOARD_ID, "gamewon_highscores_1p.gsl"));
     m_leaveGame.reset(new LeaveGameState(*(m_playMatch->getMatchAssets())));
     // Linking the states together
     m_pushGameScreen->setNextState(m_prepareNextMatch.get());

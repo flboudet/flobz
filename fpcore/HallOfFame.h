@@ -18,6 +18,7 @@ public:
     void setScoreBoard(HiScoreBoard *scoreBoard);
     void refresh();
     void setFinalScore(const char *playerName, int points);
+    void highlightRank(int rank);
     virtual ~GameOverScreen();
 private:
 	HBox m_titleBox;

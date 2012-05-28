@@ -67,9 +67,13 @@ void GameOverScreen::setFinalScore(const char *playerName, int points)
     sPoints << points;
     m_titleText.setValue(theCommander->getLocalizedString("Your Final Score:"));
     m_titleScore.setValue(sPoints.str().c_str());
-    if (m_scoreBoard != NULL) {
-        int rank = m_scoreBoard->setHiScore(playerName, points);
-        setScoreBoard(m_scoreBoard);
+}
+
+void GameOverScreen::highlightRank(int rank)
+{
+    if (m_scoreBoard == NULL)
+        return;
+    if (rank >= 0) {
         m_names[rank].setFont(GameUIDefaults::FONT);
         m_points[rank].setFont(GameUIDefaults::FONT);
     }

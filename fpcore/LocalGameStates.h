@@ -342,10 +342,7 @@ private:
 class DisplayHallOfFameState : public GameState, public Action
 {
 public:
-    DisplayHallOfFameState(SharedMatchAssets  *sharedMatchAssets,
-                           PlayerNameProvider *nameProvider,
-                           const char         *scoreBoardId,
-                           const char         *storyName="",
+    DisplayHallOfFameState(const char         *storyName="",
                            StoryNameProvider  *storyNameProvider = NULL);
     // GameState implementation
     virtual void enterState();
@@ -356,19 +353,28 @@ public:
     void setNextState(GameState *nextState) {
         m_nextState = nextState;
     }
+    void setHiScoreBoard(HiScoreBoard *board) {
+        m_scoreBoard = board;
+    }
+    void setFinalScore(const char *playerName, int score) {
+        m_playerName = playerName;
+        m_playerScore = score;
+    }
+    void setRank(int rank) {
+        m_rank = rank;
+    }
     // Action implementation
     virtual void action(Widget *sender, int actionType,
                         event_manager::GameControlEvent *event);
 private:
-    SharedMatchAssets  *m_sharedMatchAssets;
-    PlayerNameProvider *m_nameProvider;
-    std::string m_boardId;
     std::string m_storyName;
     StoryNameProvider  *m_storyNameProvider;
     GameState *m_nextState;
     std::auto_ptr<GameOverScreen> m_gameOverScreen;
-    std::auto_ptr<LocalStorageHiScoreBoard> m_scoreBoard;
-    HiScoreDefaultBoard m_defaultScoreBoard;
+    HiScoreBoard *m_scoreBoard;
+    std::string m_playerName;
+    int m_playerScore;
+    int m_rank;
     bool m_acknowledged;
 };
 
@@ -405,6 +411,44 @@ public:
 private:
     Action *m_actionToCall;
     int     m_actionType;
+};
+
+/**
+ * Manage Hi Scores, provide new hi score animation when necessary
+ */
+class ManageHiScoresState : public GameState, public Action
+{
+public:
+    ManageHiScoresState(SharedMatchAssets  *sharedMatchAssets,
+                        PlayerNameProvider *nameProvider,
+                        const char         *scoreBoardId,
+                        const char         *storyName="",
+                        StoryNameProvider  *storyNameProvider = NULL);
+    // GameState implementation
+    virtual void enterState();
+    virtual void exitState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // Action implementation
+    virtual void action(Widget *sender, int actionType,
+                        event_manager::GameControlEvent *event);
+    // Own methods
+    void setNextState(GameState *nextState) {
+        m_nextState = nextState;
+    }
+private:
+    std::string m_boardId;
+    SharedMatchAssets  *m_sharedMatchAssets;
+    PlayerNameProvider *m_nameProvider;
+    bool m_finished;
+
+    GameState *m_nextState;
+    std::auto_ptr<DisplayStoryScreenState> m_newHiScore;
+    std::auto_ptr<DisplayHallOfFameState> m_displayHallOfFame;
+    std::auto_ptr<CallActionState> m_endOfStateMachine;
+    GameStateMachine m_stateMachine;
+    std::auto_ptr<LocalStorageHiScoreBoard> m_scoreBoard;
+    HiScoreDefaultBoard m_defaultScoreBoard;
 };
 
 #endif // _LOCALGAMESTATES_H

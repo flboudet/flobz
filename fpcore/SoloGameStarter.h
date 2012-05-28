@@ -168,7 +168,7 @@ protected:
     std::auto_ptr<ExitPlayerReadyState>   m_exitPlayersReady;
     std::auto_ptr<MatchPlayingState>      m_matchPlaying;
     std::auto_ptr<MatchIsOverState>       m_matchIsOver;
-    std::auto_ptr<DisplayHallOfFameState> m_hallOfFame;
+    std::auto_ptr<ManageHiScoresState>    m_hallOfFame;
     std::auto_ptr<LeaveGameState>         m_leaveGame;
 };
 

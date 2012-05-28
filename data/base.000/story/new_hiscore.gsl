@@ -1,0 +1,27 @@
+import <libkaorisd.gsl>
+
+<init>
+    Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+    Sprite @bg = [new_sprite_simple: image="intro-main.jpg" x=0.0 y=0.0]
+    lk_init
+
+    float @START_RUNNING = 20.00
+    float @START_JUMPING = @START_RUNNING + (@LK_RUNNING_DURATION/2.)
+    float @STOP_JUMPING = @START_JUMPING + (@LK_HAPPY_DURATION * 4.)
+    float @END_OF_ANIMATION = @STOP_JUMPING + (@LK_RUNNING_DURATION/2.) + 20.0
+
+<sprite_list>
+    sprite::@bg display=@display
+    lk_sprite_list
+
+<update>
+    (@fcycle > @START_RUNNING) ?
+        lk_switch: state = @LK_RUNNING_SIDE_TO_MIDDLE
+    (@fcycle > @START_JUMPING) ?
+        lk_switch: state = @LK_HAPPY
+    (@fcycle > @STOP_JUMPING) ?
+        lk_switch: state = @LK_RUNNING_MIDDLE_TO_SIDE
+    (@fcycle > @END_OF_ANIMATION) ?
+        @finished=1
+
+    lk_update

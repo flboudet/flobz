@@ -285,8 +285,8 @@ protected:
     std::auto_ptr<StoryModePrepareNextMatchState> m_prepareNextMatch;
     std::auto_ptr<StoryModeMatchState>  m_playMatch;
     std::auto_ptr<DisplayStoryScreenState> m_gameWon;
-    std::auto_ptr<DisplayHallOfFameState> m_gameLostHoF;
-    std::auto_ptr<DisplayHallOfFameState> m_gameWonHoF;
+    std::auto_ptr<ManageHiScoresState>     m_gameLostHoF;
+    std::auto_ptr<ManageHiScoresState>     m_gameWonHoF;
     std::auto_ptr<LeaveGameState>          m_leaveGame;
 };
 

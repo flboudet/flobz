@@ -53,7 +53,7 @@
 
     level.speedmeter_display.x = 510
     level.speedmeter_display.y = 170
-    level.floboban_p1.display.x = 154
+    level.floboban_p1.display.x = 162
     level.floboban_p1.display.y = 0
     level.floboban_p1.next.x = 433
     level.floboban_p1.next.y = 66

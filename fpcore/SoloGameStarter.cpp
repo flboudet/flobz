@@ -93,8 +93,10 @@ SoloGameWidget::SoloGameWidget(SoloGameSettings &gameSettings, FloboSetTheme &fl
         m_visualFX.push_back(new VisualFX("fx/vanish.gsl", *(m_areaA->getFloboSetTheme())));
     for (int i=0; i<3; ++i)
         m_visualFX.push_back(new VisualFX("fx/combo.gsl", *(m_areaA->getFloboSetTheme())));
-    for (int i=0; i<3; ++i)
+    for (int i=0; i<1; ++i)
         m_visualFX.push_back(new VisualFX("fx/starvedcombo.gsl", *(m_areaA->getFloboSetTheme())));
+    for (int i=0; i<1; ++i)
+        m_visualFX.push_back(new VisualFX("fx/penaltycleared.gsl", *(m_areaA->getFloboSetTheme())));
 }
 
 void SoloGameWidget::gameDidEndCycle()
@@ -112,6 +114,7 @@ void SoloGameWidget::gameDidEndCycle()
 
 void SoloGameWidget::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase)
 {
+    double prevComboHandicap = m_comboHandicap;
     if (phase == 1)
         m_comboHandicap += m_handicapDecreaseOnPhase1.getValue();
     if (phase >= 2) {
@@ -121,6 +124,9 @@ void SoloGameWidget::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int gr
         m_comboHandicap = 0;
     if (m_comboHandicap < 0.)
         m_comboHandicap = 0.;
+    if ((m_comboHandicap <= 0.) && (prevComboHandicap >= 50.)) {
+        EventFX("penaltycleared", 20, 20, 1);
+    }
 }
 
 void SoloGameWidget::cycle()
@@ -314,7 +320,7 @@ SoloModeStarterAction::SoloModeStarterAction(GameDifficulty difficulty, PlayerNa
     m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));
     m_matchIsOver.reset(new MatchIsOverState(m_sharedAssets));
-    m_hallOfFame.reset(new DisplayHallOfFameState(&m_sharedAssets, nameProvider,
+    m_hallOfFame.reset(new ManageHiScoresState(&m_sharedAssets, nameProvider,
                                                   SOLO_SCOREBOARD_ID,
                                                   "gamewon_highscores_1p.gsl"));
     m_leaveGame.reset(new LeaveGameState(m_sharedAssets));
