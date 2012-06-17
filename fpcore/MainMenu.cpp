@@ -68,7 +68,8 @@ void MainRealMenu::build() {
 #endif
 #endif
   add(&optionButton);
-  add(&hallOfFameButton);
+  // Hall of Fame should be improved to handle multiple boards
+  //add(&hallOfFameButton);
   add(&creditsButton);
   add(&exitButton);
 }

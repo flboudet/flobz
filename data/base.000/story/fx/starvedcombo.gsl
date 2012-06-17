@@ -1,5 +1,5 @@
 <init_fx>
-  Sprite @flash    = [new_sprite: image="combowanted.png" x=160.0 y=100.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  Sprite @flash    = [new_sprite: image="combowanted.png" x=160.0 y=150.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
   float @show_flash = 0.0
   @supported_fx = "starvedcombo"
 

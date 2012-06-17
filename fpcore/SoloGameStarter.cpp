@@ -97,6 +97,8 @@ SoloGameWidget::SoloGameWidget(SoloGameSettings &gameSettings, FloboSetTheme &fl
         m_visualFX.push_back(new VisualFX("fx/starvedcombo.gsl", *(m_areaA->getFloboSetTheme())));
     for (int i=0; i<1; ++i)
         m_visualFX.push_back(new VisualFX("fx/penaltycleared.gsl", *(m_areaA->getFloboSetTheme())));
+    for (int i=0; i<1; ++i)
+        m_visualFX.push_back(new VisualFX("fx/combopenalty.gsl", *(m_areaA->getFloboSetTheme())));
 }
 
 void SoloGameWidget::gameDidEndCycle()
@@ -106,9 +108,12 @@ void SoloGameWidget::gameDidEndCycle()
         m_cyclesBeforeLevelRaise = 1000.;
     }
     if (m_comboHandicap100) {
+        m_comboHandicap75 = false;
+        m_comboHandicap85 = false;
         m_comboHandicap100 = false;
         m_comboHandicap = 0.;
-        EventFX("starvedcombo", 20, 20, 1);
+        if (m_areaA->getAttachedGame()->getNeutralFlobos() > 0)
+            EventFX("combopenalty", 20, 20, 1);
     }
 }
 
@@ -121,9 +126,13 @@ void SoloGameWidget::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int gr
         m_comboHandicap += m_handicapDecreaseAbovePhase1.getValue();
     }
     if (phase == 4)
-        m_comboHandicap = 0;
-    if (m_comboHandicap < 0.)
         m_comboHandicap = 0.;
+    if (m_comboHandicap <= 0.) {
+        m_comboHandicap = 0.;
+        m_comboHandicap75 = false;
+        m_comboHandicap85 = false;
+        m_comboHandicap100 = false;
+    }
     if ((m_comboHandicap <= 0.) && (prevComboHandicap >= 50.)) {
         EventFX("penaltycleared", 20, 20, 1);
     }
@@ -167,13 +176,11 @@ void SoloGameWidget::cycle()
             m_comboHandicap75 = true;
         }
         if ((m_comboHandicap > 85.) && (!m_comboHandicap85)) {
-            EventFX("starvedcombo", 20, 20, 1);
+            // EventFX("starvedcombo", 20, 20, 1);
             m_comboHandicap85 = true;
         }
         if ((m_comboHandicap >= 100.) && (!m_comboHandicap100)) {
             m_areaA->getAttachedGame()->increaseNeutralFlobos(6);
-            m_comboHandicap75 = false;
-            m_comboHandicap85 = false;
             m_comboHandicap100 = true;
         }
         requestDraw();

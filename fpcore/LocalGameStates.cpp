@@ -409,8 +409,10 @@ void MatchIsOverState::action(Widget *sender, int actionType,
         GTLogTrace("MatchIsOver: acknowledged by animation widget");
         m_gameLostWidget.reset(NULL);
     }
-    else if ((sender == (Widget *)(m_gameLostWidget->getParentScreen()))
-             || (actionType == GameWidget::GAMEOVER_STARTPRESSED)) {
+    else if ((actionType == GameWidget::GAMEOVER_STARTPRESSED)
+             || ((m_gameLostWidget.get() != NULL)
+                 && (sender == (Widget *)(m_gameLostWidget->getParentScreen()))))
+        {
         GTLogTrace("MatchIsOver: acknowledged by screen action");
         m_gameLostWidget->getParentScreen()->removeAction(this);
         m_gameLostWidget.reset(NULL);

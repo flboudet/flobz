@@ -63,4 +63,7 @@
     level.floboban_p1.name_display.y = 366
     level.floboban_p1.score_display.x = 472
     level.floboban_p1.score_display.y = 328
+
+    level.gamelost_left_2p = "gamelost1p.gsl"
+    level.gamelost_right_2p = "gamelost1p.gsl"
 [end_level]

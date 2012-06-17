@@ -1,6 +1,13 @@
 #include <stdlib.h>
 #include "SDL_AudioManager.h"
 
+// Workaround for a sdl_mixer bug
+// http://bugzilla.libsdl.org/show_bug.cgi?id=1499
+#define SDLMIKMOD_WORKAROUND
+#ifdef SDLMIKMOD_WORKAROUND
+#include <mikmod.h>
+#endif
+
 using namespace audio_manager;
 
 SDL_AM_Music::SDL_AM_Music(Mix_Music *music)
@@ -75,8 +82,14 @@ void SDL_AudioManager::playMusic(Music *music)
     if (!m_music_on)
         return;
     Mix_HaltMusic();
-    if (music != NULL)
+    if (music != NULL) {
         Mix_PlayMusic(static_cast<SDL_AM_Music *>(music)->m_music, -1);
+#ifdef SDLMIKMOD_WORKAROUND
+        MODULE *mod;
+        mod = Player_GetModule();
+        mod->loop = 1;
+#endif
+    }
 }
 
 void SDL_AudioManager::stopMusic()
