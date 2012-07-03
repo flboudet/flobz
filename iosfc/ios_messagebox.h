@@ -23,6 +23,7 @@
 #ifndef _IOS_MESSAGE_BOX_H
 #define _IOS_MESSAGE_BOX_H
 
+#include <vector>
 #include "ios_vector.h"
 #include "ios_message.h"
 
@@ -36,7 +37,7 @@ public:
 
 class MessageBox {
 public:
-    MessageBox() : listeners() {}
+    MessageBox() {}
     
     virtual ~MessageBox() {}
     virtual void idle() = 0;
@@ -44,7 +45,8 @@ public:
     void removeListener(MessageListener *);
     virtual Message * createMessage() = 0;
 protected:
-    Vector<MessageListener> listeners;
+    typedef std::vector<MessageListener *> ListOfListeners;
+    ListOfListeners listeners;
 };
 
 }

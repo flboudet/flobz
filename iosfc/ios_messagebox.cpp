@@ -24,11 +24,17 @@
 namespace ios_fc {
 
 void MessageBox::addListener(MessageListener *newListener) {
-    listeners.add(newListener);
+    listeners.push_back(newListener);
 }
 
 void MessageBox::removeListener(MessageListener *listener) {
-    listeners.remove(listener);
+    for (ListOfListeners::iterator iter = listeners.begin() ;
+         iter != listeners.end() ; ++iter) {
+        if (*iter == listener) {
+            listeners.erase(iter);
+            iter = listeners.begin();
+        }
+    }
 }
 
 }

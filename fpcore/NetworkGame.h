@@ -34,7 +34,7 @@ using namespace ios_fc;
 
 class NetworkGame : public FloboGame, MessageListener {
 public:
-    NetworkGame(FloboFactory *attachedFactory, MessageBox &msgBox, int gameId = 0);
+    NetworkGame(FloboFactory *attachedFactory, MessageBox *msgBox, int gameId = 0);
     ~NetworkGame();
 
     virtual void onMessage(Message &);
@@ -76,7 +76,7 @@ private:
     Flobo *floboCells[FLOBOBAN_DIMX * (FLOBOBAN_DIMY+1)];
     FloboState nextFalling, nextCompanion;
     Flobo *fakeFlobo;
-    MessageBox &msgBox;
+    MessageBox *msgBox;
     int gameId;
     AdvancedBuffer<Flobo *> floboVector;
     std::map<int, Flobo *> m_floboMap;

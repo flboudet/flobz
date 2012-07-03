@@ -31,7 +31,7 @@
 #include "FPNetMessageDef.h"
 
 FloboGame *NetworkGameFactory::createFloboGame(FloboFactory *attachedFloboFactory) {
-    return new NetworkGame(attachedFloboFactory, msgBox, gameId);
+    return new NetworkGame(attachedFloboFactory, &msgBox, gameId);
 }
 
 NetworkGameWidget::NetworkGameWidget()

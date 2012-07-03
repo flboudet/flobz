@@ -33,15 +33,15 @@ using namespace FPNetMessage;
 
 NetworkGame::~NetworkGame()
 {
-  msgBox.removeListener(this);
+  msgBox->removeListener(this);
 }
 
-NetworkGame::NetworkGame(FloboFactory *attachedFactory, MessageBox &msgBox, int gameId)
+NetworkGame::NetworkGame(FloboFactory *attachedFactory, MessageBox *msgBox, int gameId)
   : FloboGame(attachedFactory), nextFalling(FLOBO_BLUE), nextCompanion(FLOBO_BLUE),
     msgBox(msgBox), gameId(gameId), gameRunning(true), comboPhase(0)
 {
     fakeFlobo = attachedFactory->createFlobo(FLOBO_FALLINGRED);
-    msgBox.addListener(this);
+    msgBox->addListener(this);
     semiMove = 0;
     neutralFlobos = 0;
     sentBadFlobos = 0;
