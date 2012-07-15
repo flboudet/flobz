@@ -132,10 +132,9 @@ void GameView::cycleAnimation(void)
         }
 
         // Cycling every flobo's animation
-        for (int i = 0, j = attachedGame->getFloboCount() ; i < j ; i++) {
-            AnimatedFlobo *currentFlobo =
-              (AnimatedFlobo *)(attachedGame->getFloboAtIndex(i));
-            currentFlobo->cycleAnimation();
+        for (FloboDefaultIterator iter(attachedGame) ;
+             ! iter.end() ; ++iter) {
+            static_cast<AnimatedFlobo *>(iter.get())->cycleAnimation();
         }
         // Cycling dead flobo's animations
         attachedFloboFactory.cycleWalhalla();
@@ -203,14 +202,21 @@ void GameView::render(DrawTarget *dt)
     bool displayFallings = this->cycleAllowed();
     // Render shadows
     if (m_showShadows) {
-        for (int i = 0, j = attachedGame->getFloboCount() ; i < j ; i++) {
-            AnimatedFlobo *currentFlobo = (AnimatedFlobo *)(attachedGame->getFloboAtIndex(i));
+        for (FloboDefaultIterator iter(attachedGame) ;
+             ! iter.end() ; ++iter) {
+            AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(iter.get());
+            if (displayFallings || !currentFlobo->isFalling()) currentFlobo->renderShadow(dt);
+        }
+        for (FloboDefaultIterator iter(attachedGame) ;
+             ! iter.end() ; ++iter) {
+            AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(iter.get());
             if (displayFallings || !currentFlobo->isFalling()) currentFlobo->renderShadow(dt);
         }
     }
     // Render flobos
- 	for (int i = 0, j = attachedGame->getFloboCount() ; i < j ; i++) {
-        AnimatedFlobo *currentFlobo = (AnimatedFlobo *)(attachedGame->getFloboAtIndex(i));
+    for (FloboDefaultIterator iter(attachedGame) ;
+         ! iter.end() ; ++iter) {
+        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(iter.get());
         if (displayFallings || !currentFlobo->isFalling()) currentFlobo->render(dt);
     }
     // drawing the walhalla

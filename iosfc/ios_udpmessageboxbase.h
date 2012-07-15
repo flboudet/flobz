@@ -69,7 +69,6 @@ private:
     KnownPeer *findPeer(PeerAddress address);
     void deletePeer(PeerAddress address);
     // For KnownPeers
-    void warnListeners(Message &message);
     DatagramSocket *socket;
     std::map<PeerAddress, KnownPeer*> m_knownPeers;
     // UDP Messagebox parameters

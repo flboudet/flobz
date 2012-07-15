@@ -90,7 +90,7 @@ void IgpMessageBoxMessage<T>::sendBuffer(Buffer<char> out) const
 {
     owner.sendBuffer(out, T::isReliable(), IgpMessageBoxMessage<T>::igpPeerIdent);
 }*/
-    
+
 template <typename T>
 void IgpMessageBoxMessage<T>::send()
 {
@@ -119,10 +119,7 @@ void IgpMessageBox<T>::onMessage(VoidBuffer message, int origIdent, int destIden
     {
         try {
             IgpMessageBoxMessage<T> incomingMessage(message, *this, origIdent);
-            for (int i = 0, j = listeners.size() ; i < j ; i++) {
-                MessageListener *currentListener = listeners[i];
-                currentListener->onMessage(incomingMessage);
-            }
+            propagateMessageToListeners(incomingMessage);
         }
         catch (Exception e) {
             e.printMessage();

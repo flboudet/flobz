@@ -149,23 +149,25 @@ class FloboGame {
 public:
     FloboGame(FloboFactory *attachedFactory);
     FloboGame();
-
     virtual ~FloboGame() {}
+public: // Listeners management
     virtual void addGameListener(GameListener *listener);
+public:
+    // Perform a cycle in the game state machine
     virtual void cycle() = 0;
-
-    // Get the flobo at the indicated coordinates
-    virtual Flobo *getFloboAt(int X, int Y) const = 0;
-
-    // List access to the Flobo objects
-    virtual int getFloboCount() const = 0;
-    virtual Flobo *getFloboAtIndex(int index) const = 0;
-
+public: // Controls
     virtual void moveLeft() {}
     virtual void moveRight() {}
     virtual void rotate(bool left) {}
     virtual void rotateLeft() {}
     virtual void rotateRight() {}
+public: // Accessors
+    // Get the flobo at the indicated coordinates
+    virtual Flobo *getFloboAt(int X, int Y) const = 0;
+
+    // List access to the Flobo objects
+    virtual int getFloboCount() const = 0;
+    //virtual Flobo *getFloboAtIndex(int index) const = 0;
 
     virtual FloboState getNextFalling() = 0;
     virtual FloboState getNextCompanion() = 0;
@@ -203,6 +205,39 @@ protected:
     GameListenerPtrVector m_listeners;
     FloboFactory *attachedFactory;
     PlayerGameStat gameStat;
+};
+
+class FloboIterator {
+public:
+    virtual Flobo *get() = 0;
+    virtual bool end() = 0;
+    virtual FloboIterator & operator ++() = 0;
+};
+
+class FloboDefaultIterator : public FloboIterator {
+public:
+    FloboDefaultIterator(FloboGame *game)
+        : m_game(game), m_peek(NULL), m_x(0), m_y(0), m_finished(false) {
+        ++(*this);
+    }
+    Flobo *get() { return m_peek; }
+    bool end() { return m_finished; }
+    FloboIterator & operator ++() {
+        do {
+            m_peek = m_game->getFloboAt(m_x++, m_y);
+            if (m_x == FLOBOBAN_DIMX) {
+                m_x = 0; ++m_y;
+            }
+            else if (m_y == FLOBOBAN_DIMY)
+                m_finished = true;
+        } while ((m_peek == NULL) && (! m_finished));
+        return *this;
+    }
+private:
+    FloboGame *m_game;
+    Flobo *m_peek;
+    bool m_finished;
+    int m_x, m_y;
 };
 
 class FloboLocalGame : public FloboGame {

@@ -45,7 +45,7 @@ public:
 
     // List access to the Flobo objects
     virtual int getFloboCount() const;
-    virtual Flobo *getFloboAtIndex(int index) const;
+    //virtual Flobo *getFloboAtIndex(int index) const;
 
     virtual FloboState getNextFalling();
     virtual FloboState getNextCompanion();
@@ -78,7 +78,8 @@ private:
     Flobo *fakeFlobo;
     MessageBox *msgBox;
     int gameId;
-    AdvancedBuffer<Flobo *> floboVector;
+    typedef std::list<Flobo *> FloboPtrList;
+    FloboPtrList m_floboList;
     std::map<int, Flobo *> m_floboMap;
     int semiMove;
     int neutralFlobos, sentBadFlobos;

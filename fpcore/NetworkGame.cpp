@@ -105,13 +105,13 @@ void NetworkGame::onMessage(Message &message)
 void NetworkGame::synchronizeFlobo(Buffer<int> buffer) {
     int floboID    = buffer[0];
     int floboState = buffer[1]; GTCheckInterval(floboState, 0, 20, "floboState is invalid");
-    int posX      = buffer[2]; GTCheckInterval(posX, 0, FLOBOBAN_DIMX, "Flobo X is invalid");
-    int posY      = buffer[3]; GTCheckInterval(posY, 0, FLOBOBAN_DIMY, "Flobo Y is invalid");
+    int posX       = buffer[2]; GTCheckInterval(posX, 0, FLOBOBAN_DIMX, "Flobo X is invalid");
+    int posY       = buffer[3]; GTCheckInterval(posY, 0, FLOBOBAN_DIMY, "Flobo Y is invalid");
     Flobo *flobo = findFlobo(floboID);
     if (flobo == NULL) {
         flobo = attachedFactory->createFlobo((FloboState)floboState);
         flobo->setID(floboID);
-        floboVector.add(flobo);
+        m_floboList.push_back(flobo);
         m_floboMap[floboID] = flobo;
     }
     else {
@@ -138,14 +138,16 @@ void NetworkGame::synchronizeState(Message &message)
             synchronizeFlobo(flobos+i);
 
         // Remove the flobos that were not flagged.
-        for (int i = floboVector.size() - 1 ; i >= 0 ; i--) {
-            Flobo *currentFlobo = floboVector[i];
+        for (FloboPtrList::iterator iter  = m_floboList.begin() ;
+             iter != m_floboList.end() ; ++iter) {
+            Flobo *currentFlobo = *iter;
             if (currentFlobo->getFlag()) {
                 currentFlobo->unsetFlag();
             }
             else {
                 setFloboAt(currentFlobo->getFloboX(), currentFlobo->getFloboY(), NULL);
-                floboVector.removeAt(i);
+                FloboPtrList::iterator removed = iter--;
+                m_floboList.erase(removed);
                 m_floboMap.erase(currentFlobo->getID());
                 attachedFactory->deleteFlobo(currentFlobo);
             }
@@ -156,7 +158,7 @@ void NetworkGame::synchronizeState(Message &message)
     if (message.hasIntArray(ADD_NEUTRALS)) {
         Buffer<int> addNeutrals= message.getIntArray(ADD_NEUTRALS);
         if (addNeutrals.size() > 0) {
-            for (int i = 0, j = addNeutrals.size() ; i+4 < j ; i += 5) {
+            for (int i = 0, j = addNeutrals.size() ; i+5 < j ; i += 6) {
                 synchronizeFlobo(addNeutrals+i);
                 Flobo *neutral = findFlobo(addNeutrals[i]);
                 if (neutral != NULL)
@@ -306,13 +308,15 @@ void NetworkGame::setFloboAt(int X, int Y, Flobo *newFlobo)
 // List access to the Flobo objects
 int NetworkGame::getFloboCount() const
 {
-    return floboVector.size();
+    return m_floboMap.size();
 }
 
+#ifdef DISABLED
 Flobo *NetworkGame::getFloboAtIndex(int index) const
 {
-    return floboVector[index];
+    return m_floboVector[index];
 }
+#endif
 
 FloboState NetworkGame::getNextFalling()
 {

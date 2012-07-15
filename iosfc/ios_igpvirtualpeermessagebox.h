@@ -2,7 +2,7 @@
  * iosfc::IgpVirtualPeerMessageBox: a messagebox designed as a virtual peer
  * for the IgpMessageListener. Handy to implement a custom service on an IGP
  * server.
- * 
+ *
  * This file is part of the iOS Foundation Classes project.
  *
  * authors:
@@ -82,16 +82,16 @@ IgpVirtualPeerMessage<T>::IgpVirtualPeerMessage(const Buffer<char> serialized, I
     : IgpMessage<T>(serialized, igpPeerIdent), owner(owner)
 {
 }
-    
+
 template <typename T>
 void IgpVirtualPeerMessage<T>::send()
 {
     VoidBuffer out = T::serialize();
     owner.sendBuffer(out, isReliable(), IgpVirtualPeerMessage<T>::igpPeerIdent);
 }
-    
+
 // IgpVirtualPeerMessageBox
-    
+
 template <typename T>
 IgpVirtualPeerMessageBox<T>::IgpVirtualPeerMessageBox(IgpMessageListener &igpListener, int igpIdent)
     : IgpVirtualPeer(&igpListener, igpIdent), sendSerialID(0), m_isCorrupted(false)
@@ -103,14 +103,14 @@ IgpVirtualPeerMessageBox<T>::IgpVirtualPeerMessageBox(IgpMessageListener &igpLis
     : IgpVirtualPeer(&igpListener), sendSerialID(0), m_isCorrupted(false)
 {
 }
-    
+
 // Implement MessageBox
 template <typename T>
 Message * IgpVirtualPeerMessageBox<T>::createMessage()
 {
     return new IgpVirtualPeerMessage<T>(++sendSerialID, *this, destIdent);
 }
-    
+
 // Implement IgpPeer
 template <typename T>
 void IgpVirtualPeerMessageBox<T>::messageReceived(VoidBuffer message, int origIgpIdent, bool reliable)
@@ -118,10 +118,7 @@ void IgpVirtualPeerMessageBox<T>::messageReceived(VoidBuffer message, int origIg
     if (m_isCorrupted) return;
     try {
         IgpVirtualPeerMessage<T> incomingMessage(message, *this, origIgpIdent);
-        for (int i = 0, j = listeners.size() ; i < j ; i++) {
-            MessageListener *currentListener = listeners[i];
-            currentListener->onMessage(incomingMessage);
-        }
+        propagateMessageToListeners(incomingMessage);
     }
     catch (Exception e) {
         fprintf(stderr, "Exception occured. We consider that the peer is corrupted!\n");
@@ -129,7 +126,7 @@ void IgpVirtualPeerMessageBox<T>::messageReceived(VoidBuffer message, int origIg
         m_isCorrupted = true;
     }
 }
-    
+
 // Own member functions
 template <typename T>
 void IgpVirtualPeerMessageBox<T>::sendBuffer(VoidBuffer out, bool reliable, int igpDestIdent)
@@ -137,7 +134,7 @@ void IgpVirtualPeerMessageBox<T>::sendBuffer(VoidBuffer out, bool reliable, int 
     if (m_isCorrupted) return;
     sendMessageToAddress(out, igpDestIdent, reliable);
 }
-    
+
 template <typename T>
 void IgpVirtualPeerMessageBox<T>::bind(PeerAddress addr)
 {

@@ -55,8 +55,9 @@ Message *NetworkGameView::createStateMessage(bool sendFullMessage)
     if (sendFullMessage) {
         int floboCount = attachedGame->getFloboCount();
         AdvancedBuffer<int> buffer(floboCount * 4);
-        for (int i = 0 ; i < floboCount ; i++) {
-            Flobo *currentFlobo = attachedGame->getFloboAtIndex(i);
+        for (FloboDefaultIterator iter(attachedGame) ;
+             ! iter.end() ; ++iter) {
+            Flobo *currentFlobo = iter.get();
             buffer.add(currentFlobo->getID());
             buffer.add(currentFlobo->getFloboState());
             buffer.add(currentFlobo->getFloboX());

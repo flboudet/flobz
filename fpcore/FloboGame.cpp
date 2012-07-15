@@ -329,8 +329,6 @@ int FloboLocalGame::getNeutralFlobos() const
 // Set the state of the flobo at the indicated coordinates (not recommanded)
 void FloboLocalGame::setFloboCellAt(int X, int Y, FloboState value)
 {
-    /*if ((X > FLOBOBAN_DIMX) || (Y > FLOBOBAN_DIMY))
-        return;*/
   if (floboCells[X + Y * FLOBOBAN_DIMX])
     floboCells[X + Y * FLOBOBAN_DIMX]->setFloboState(value);
 };

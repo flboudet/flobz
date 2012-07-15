@@ -24,6 +24,13 @@
 namespace ios_fc {
 
 void MessageBox::addListener(MessageListener *newListener) {
+    for (ListOfListeners::iterator iter = listeners.begin() ;
+         iter != listeners.end() ; ++iter) {
+        if (*iter == NULL) {
+            *iter = newListener;
+            return;
+        }
+    }
     listeners.push_back(newListener);
 }
 
@@ -31,9 +38,18 @@ void MessageBox::removeListener(MessageListener *listener) {
     for (ListOfListeners::iterator iter = listeners.begin() ;
          iter != listeners.end() ; ++iter) {
         if (*iter == listener) {
-            listeners.erase(iter);
-            iter = listeners.begin();
+            *iter = NULL;
         }
+    }
+}
+
+void MessageBox::propagateMessageToListeners(Message &message)
+{
+    for (ListOfListeners::const_iterator iter = listeners.begin() ;
+         iter != listeners.end() ; ++iter) {
+        MessageListener *currentListener = *iter;
+        if (currentListener != NULL)
+            currentListener->onMessage(message);
     }
 }
 

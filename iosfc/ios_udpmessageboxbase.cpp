@@ -53,7 +53,7 @@ public:
     void handleAck(int messageSerialID);
 
     double getTimeMsSinceLastMessage() { return timeMsSinceLastMessage; }
-    
+
     // Members
 
     PeerAddress address;
@@ -215,7 +215,7 @@ void UDPMessageBoxBase::KnownPeer::handleMessage(UDPMessageInterface &incomingMe
     else {
         receiveSerialID = messageSerialID;
         // Give the message to every listener
-        owner.warnListeners(incomingMessage);
+        owner.propagateMessageToListeners(incomingMessage);
     }
 }
 
@@ -350,14 +350,6 @@ void UDPMessageBoxBase::deletePeer(PeerAddress address)
     }
     delete iter->second;
     m_knownPeers.erase(iter);
-}
-
-void UDPMessageBoxBase::warnListeners(Message &message)
-{
-    for (int i = 0, j = listeners.size() ; i < j ; i++) {
-        MessageListener *currentListener = listeners[i];
-        currentListener->onMessage(message);
-    }
 }
 
 void UDPMessageBoxBase::addSessionListener(SessionListener *l)
