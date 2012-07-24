@@ -83,6 +83,7 @@ SetupMatchState::SetupMatchState(GameWidgetFactory  *gameWidgetFactory,
     m_sharedAssets(sharedMatchAssets),
     m_nextState(NULL),
     m_handicapOnVictorious(true),
+    m_displayVictories(false),
     m_accountTotalOnPlayerB(true)
 {
 }
@@ -109,6 +110,9 @@ void SetupMatchState::enterState()
     newGameWidget->getStatPlayerOne().total_points = m_sharedAssets->m_leftTotal;
     if (m_accountTotalOnPlayerB)
         newGameWidget->getStatPlayerTwo().total_points = m_sharedAssets->m_rightTotal;
+    // Optionnaly setup victories
+    if (m_displayVictories)
+        newGameWidget->setVictories(m_sharedAssets->m_leftVictories, m_sharedAssets->m_rightVictories);
     // Optionnaly setup handicap
     if (m_handicapOnVictorious) {
         int victoriesDelta = m_sharedAssets->m_leftVictories - m_sharedAssets->m_rightVictories;
@@ -698,3 +702,32 @@ GameState *CallActionState::getNextState()
 {
     return NULL;
 }
+
+//---------------------------------
+// ManageMultiSetsState
+//---------------------------------
+ManageMultiSetsState::ManageMultiSetsState(SharedMatchAssets  *sharedMatchAssets, int nbSets)
+    : m_sharedAssets(sharedMatchAssets), m_nbSets(nbSets)
+{
+}
+
+void ManageMultiSetsState::enterState()
+{
+}
+
+void ManageMultiSetsState::exitState()
+{
+}
+
+bool ManageMultiSetsState::evaluate()
+{
+    return true;
+}
+
+GameState *ManageMultiSetsState::getNextState()
+{
+    if (m_sharedAssets->m_leftVictories + m_sharedAssets->m_rightVictories >= m_nbSets)
+        return m_endOfGameState;
+    return m_nextSetState;
+}
+

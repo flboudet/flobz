@@ -127,6 +127,9 @@ public:
     void setHandicapOnVictorious(bool enable) {
         m_handicapOnVictorious = enable;
     }
+    void setDisplayVictories(bool enable) {
+        m_displayVictories = enable;
+    }
     void setAccountTotalOnPlayerB(bool enable) {
         m_accountTotalOnPlayerB = enable;
     }
@@ -141,6 +144,7 @@ private:
     SharedMatchAssets  *m_sharedAssets;
     GameState *m_nextState;
     bool m_handicapOnVictorious;
+    bool m_displayVictories;
     bool m_accountTotalOnPlayerB;
 };
 struct SharedGetReadyAssets
@@ -450,6 +454,33 @@ private:
     std::auto_ptr<LocalStorageHiScoreBoard> m_scoreBoard;
     HiScoreDefaultBoard m_defaultScoreBoard;
 };
+
+/**
+ * Manage multi-sets in a game
+ */
+class ManageMultiSetsState : public GameState
+{
+public:
+    ManageMultiSetsState(SharedMatchAssets  *sharedMatchAssets, int nbSets);
+    // GameState implementation
+    virtual void enterState();
+    virtual void exitState();
+    virtual bool evaluate();
+    virtual GameState *getNextState();
+    // Own methods
+    void setNextSetState(GameState *nextSetState) {
+        m_nextSetState = nextSetState;
+    }
+    void setEndOfGameState(GameState *endOfGameState) {
+        m_endOfGameState = endOfGameState;
+    }
+private:
+    SharedMatchAssets  *m_sharedAssets;
+    int m_nbSets;
+    GameState *m_nextSetState;
+    GameState *m_endOfGameState;
+};
+
 
 #endif // _LOCALGAMESTATES_H
 

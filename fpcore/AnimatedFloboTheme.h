@@ -66,6 +66,7 @@ public:
     bool shouldDisplayShadow;
     bool shouldDisplayEyes;
     float scale;
+    int trophyDisplayX, trophyDisplayY;
 };
 
 class FontDefinition {
@@ -85,6 +86,7 @@ public:
     std::string localizedDescription;
     std::string path;
     std::string lives;
+    std::string trophy;
     std::string background;
     std::string grid;
     std::string speedMeter;
@@ -201,6 +203,7 @@ public:
     virtual IosSurface * getNeutralIndicator() const;
     virtual IosSurface * getBigNeutralIndicator() const;
     virtual IosSurface * getGiantNeutralIndicator() const;
+    virtual IosSurface * getTrophy() const;
     // Fonts
     virtual IosFont *getPlayerNameFont() const ;
     virtual IosFont *getScoreFont() const;
@@ -220,6 +223,8 @@ public:
     virtual int getScoreDisplayX(int playerId) const;
     virtual int getScoreDisplayY(int playerId) const;
     virtual float getFlobobanScale(int playerId) const;
+    virtual int getTrophyDisplayX(int playerId) const;
+    virtual int getTrophyDisplayY(int playerId) const;
     // Behaviour of the Floboban
     virtual bool getShouldDisplayNext(int playerId) const;
     virtual bool getShouldDisplayShadows(int playerId) const;
@@ -254,6 +259,7 @@ private:
     mutable IosSurfaceRef m_grid;
     mutable IosSurfaceRef m_speedMeterFront, m_speedMeterBack;
     mutable IosSurfaceRef m_neutralIndicator, m_bigNeutralIndicator, m_giantNeutralIndicator;
+    mutable IosSurfaceRef m_trophy;
     mutable IosFontRef    m_playerNameFont, m_scoreFont;
 };
 

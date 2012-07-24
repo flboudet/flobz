@@ -59,7 +59,7 @@ void TwoPlayersGameWidget::cycle()
 //---------------------------------
 // Two players local game state machine
 //---------------------------------
-AltTwoPlayersStarterAction::AltTwoPlayersStarterAction(GameDifficulty difficulty, GameWidgetFactory *gameWidgetFactory, PlayerNameProvider *nameProvider)
+AltTwoPlayersStarterAction::AltTwoPlayersStarterAction(GameDifficulty difficulty, GameWidgetFactory *gameWidgetFactory, PlayerNameProvider *nameProvider, int nbSets)
 {
     // Creating the different game states
     m_pushGameScreen.reset(new PushScreenState());
@@ -70,6 +70,7 @@ AltTwoPlayersStarterAction::AltTwoPlayersStarterAction(GameDifficulty difficulty
     m_matchIsOver.reset(new MatchIsOverState(m_sharedAssets));
     m_displayStats.reset(new DisplayStatsState(m_sharedAssets));
     m_leaveGame.reset(new LeaveGameState(m_sharedAssets));
+    m_manageMultiSets.reset(new ManageMultiSetsState(&m_sharedAssets, nbSets));
     // Linking the states together
     m_pushGameScreen->setNextState(m_setupMatch.get());
     m_setupMatch->setNextState(m_enterPlayersReady.get());
@@ -78,7 +79,16 @@ AltTwoPlayersStarterAction::AltTwoPlayersStarterAction(GameDifficulty difficulty
     m_matchPlaying->setNextState(m_matchIsOver.get());
     m_matchPlaying->setAbortedState(m_leaveGame.get());
     m_matchIsOver->setNextState(m_displayStats.get());
-    m_displayStats->setNextState(m_setupMatch.get());
+    if (nbSets > 0) {
+        m_displayStats->setNextState(m_manageMultiSets.get());
+        m_manageMultiSets->setNextSetState(m_setupMatch.get());
+        m_manageMultiSets->setEndOfGameState(m_leaveGame.get());
+        m_setupMatch->setHandicapOnVictorious(false);
+        m_setupMatch->setDisplayVictories(true);
+    }
+    else {
+        m_displayStats->setNextState(m_setupMatch.get());
+    }
     // Initializing the state machine
     m_stateMachine.setInitialState(m_pushGameScreen.get());
 }

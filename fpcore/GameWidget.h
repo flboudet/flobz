@@ -85,6 +85,18 @@ struct GameOptions
     int CYCLES_BEFORE_SPEED_INCREASES;
 };
 
+class VictoryDisplay {
+public:
+    VictoryDisplay(Vec3 position, IosSurface *trophy, int victories = 0);
+    virtual ~VictoryDisplay() {}
+    void draw(DrawTarget *dt);
+    void setValue(int victories) { m_victories = victories; }
+private:
+    Vec3 m_position;
+    IosSurface *m_trophy;
+    int m_victories;
+};
+
 /**
  * Represents the full featured game widget, with the two players game views.
  * Handles user input.
@@ -129,6 +141,7 @@ public:
     // TODO: Make this N-players generic (N from 1 to +inf)
     virtual void setPlayerOneName(String newName) = 0;
     virtual void setPlayerTwoName(String newName) = 0;
+    virtual void setVictories(int left, int right) {};
     virtual PlayerGameStat &getStatPlayerOne() = 0;
     virtual PlayerGameStat &getStatPlayerTwo()  = 0;
     virtual void addGameAHandicap(int handicap) = 0;
@@ -175,6 +188,7 @@ public:
     bool backPressed();
     bool startPressed();
     void setLives(int l) { lives = l; }
+    void setVictories(int left, int right);
     bool isGameARunning() const { return attachedGameA->isGameRunning(); }
     bool isGameBRunning() const { return attachedGameB->isGameRunning(); }
     void setPlayerOneName(String newName);
@@ -232,6 +246,8 @@ protected:
     double gameOverDate;
     bool m_displayPlayerOneName, m_displayPlayerTwoName;
     void priv_initialize();
+private:
+    std::auto_ptr<VictoryDisplay> m_victoryDisplayA, m_victoryDisplayB;
 };
 
 // Should be moved elsewhere

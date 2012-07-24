@@ -25,6 +25,7 @@ struct <FlobobanDefinition:
     Point neutral_display,
     Point name_display,
     Point score_display,
+    Point trophy_display,
     float scale>
 
 struct <Flobo:
@@ -53,11 +54,13 @@ struct <Level:
     string neutralindicator,
     string lives,
     string grid,
+    string trophy,
     string gamelost_left_2p,
     string gamelost_right_2p,
     string animation_2p,
     Point  speedmeter_display,
     Point  life_display,
+    Point  trophy_display,
     int    opponent_is_behind,
     StatsDimension stats,
     FlobobanDefinition floboban_p1,
@@ -119,6 +122,7 @@ external <end_level>
     level.speedmeter    = "fire"
     level.lives         = "heart"
     level.grid          = "metal"
+    level.trophy        = "trophy.png"
 
     level.neutralindicator = "glass"
     level.speedmeter_display.x = 320
@@ -148,6 +152,8 @@ external <end_level>
     level.floboban_p1.name_display.y = 460
     level.floboban_p1.score_display.x = 300
     level.floboban_p1.score_display.y = 360
+    level.floboban_p1.trophy_display.x = 130
+    level.floboban_p1.trophy_display.y = 430
     level.floboban_p1.scale = 1.0
 
     level.floboban_p2.display.x = 417
@@ -163,6 +169,8 @@ external <end_level>
     level.floboban_p2.name_display.y = 460
     level.floboban_p2.score_display.x = 340
     level.floboban_p2.score_display.y = 320
+    level.floboban_p2.trophy_display.x = 510
+    level.floboban_p2.trophy_display.y = 430
     level.floboban_p2.scale = 1.0
 
     level.playerNameFont.path = "__FONT__"

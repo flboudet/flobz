@@ -152,6 +152,23 @@ GameOptions GameOptions::fromDifficulty(GameDifficulty difficulty) {
     return go;
 }
 
+VictoryDisplay::VictoryDisplay(Vec3 position, IosSurface *trophy, int victories)
+  : m_position(position), m_trophy(trophy), m_victories(victories)
+{
+}
+
+void VictoryDisplay::draw(DrawTarget *dt)
+{
+    if (m_victories == 0)
+        return;
+    int offx = (m_trophy->w * m_victories) / 2;
+    IosRect dst = { m_position.x - offx, m_position.y, m_trophy->w, m_trophy->h };
+    for (int i = 0 ; i < m_victories ; ++i) {
+        dt->draw(m_trophy, NULL, &dst);
+        dst.x += m_trophy->w;
+    }
+}
+
 GameWidget::GameWidget()
   : m_levelTheme(NULL),
     gameOverAction(NULL), associatedScreen(NULL),
@@ -220,6 +237,12 @@ void GameWidget2P::setGameOptions(GameOptions game_options)
     MaxSpeed = game_options.MAX_SPEED;
 }
 
+void GameWidget2P::setVictories(int left, int right)
+{
+    m_victoryDisplayA->setValue(left);
+    m_victoryDisplayB->setValue(right);
+}
+
 void GameWidget2P::setPlayerOneName(String newName) {
     playerOneName = newName;
     areaA->setPlayerNames(playerOneName, playerTwoName);
@@ -255,6 +278,8 @@ void GameWidget2P::initWithGUI(GameView &areaA, GameView &areaB, GamePlayer &con
     this->gameOverAction = gameOverAction;
     priv_initialize();
     setLevelTheme(&levelTheme);
+    m_victoryDisplayA.reset(new VictoryDisplay(Vec3(levelTheme.getTrophyDisplayX(0), levelTheme.getTrophyDisplayY(0)), levelTheme.getTrophy()));
+    m_victoryDisplayB.reset(new VictoryDisplay(Vec3(levelTheme.getTrophyDisplayX(1), levelTheme.getTrophyDisplayY(1)), levelTheme.getTrophy()));
 }
 void GameWidget2P::initWithoutGUI(GameView &areaA, GameView &areaB, GamePlayer &controllerA, GamePlayer &controllerB, Action *gameOverAction)
 {
@@ -457,6 +482,9 @@ void GameWidget2P::draw(DrawTarget *dt)
         drect.h = liveImage->h;
         dt->draw(liveImage, NULL, &drect);
     }
+    // Rendering the victories
+    m_victoryDisplayA->draw(dt);
+    m_victoryDisplayB->draw(dt);
     // Rendering the game speed meter
     IosRect speedRect;
     IosSurface * speedFront = getLevelTheme()->getSpeedMeter(true);

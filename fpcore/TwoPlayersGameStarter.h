@@ -55,7 +55,7 @@ public:
 class AltTwoPlayersStarterAction : public Action {
 public:
     AltTwoPlayersStarterAction(GameDifficulty difficulty, GameWidgetFactory *gameWidgetFactory,
-                               PlayerNameProvider *nameProvider = NULL);
+                               PlayerNameProvider *nameProvider = NULL, int nbSets = 0);
     /**
      * Implements the Action interface
      */
@@ -73,6 +73,7 @@ private:
     std::auto_ptr<MatchIsOverState>      m_matchIsOver;
     std::auto_ptr<DisplayStatsState>     m_displayStats;
     std::auto_ptr<LeaveGameState>        m_leaveGame;
+    std::auto_ptr<ManageMultiSetsState>  m_manageMultiSets;
 };
 
 #endif // _TWOPLAYERSGAMESTARTER_H_

@@ -103,6 +103,7 @@ public:
     virtual IosSurface * getNeutralIndicator() const = 0;
     virtual IosSurface * getBigNeutralIndicator() const = 0;
     virtual IosSurface * getGiantNeutralIndicator() const = 0;
+    virtual IosSurface * getTrophy() const = 0;
     // Fonts
     virtual IosFont *getPlayerNameFont() const = 0;
     virtual IosFont *getScoreFont() const      = 0;
@@ -122,6 +123,8 @@ public:
     virtual int getScoreDisplayX(int playerId) const   = 0;
     virtual int getScoreDisplayY(int playerId) const   = 0;
     virtual float getFlobobanScale(int playerId) const  = 0;
+    virtual int getTrophyDisplayX(int playerId) const = 0;
+    virtual int getTrophyDisplayY(int playerId) const = 0;
     // Behaviour of the Floboban
     virtual bool getShouldDisplayNext(int playerId) const    = 0;
     virtual bool getShouldDisplayShadows(int playerId) const = 0;

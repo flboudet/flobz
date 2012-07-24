@@ -209,6 +209,7 @@ void ThemeManagerImpl::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     newThemeDescription.path = themeMgr->m_themePackLoadingPath;
 
     newThemeDescription.lives = (const char *) GSL_GLOBAL_PTR(gsl, "level.lives");
+    newThemeDescription.trophy = (const char *) GSL_GLOBAL_PTR(gsl, "level.trophy");
     newThemeDescription.background = (const char *) GSL_GLOBAL_PTR(gsl, "level.background");
     newThemeDescription.grid = (const char *) GSL_GLOBAL_PTR(gsl, "level.grid");
     newThemeDescription.speedMeter = (const char *) GSL_GLOBAL_PTR(gsl, "level.speedmeter");
@@ -266,6 +267,8 @@ void ThemeManagerImpl::loadFlobobanDefinition(GoomSL *gsl, int playerId, Floboba
     floboban.shouldDisplayShadow = GSL_GLOBAL_INT(gsl, variablePrefix + ".should_display_shadows");
     floboban.shouldDisplayEyes = GSL_GLOBAL_INT(gsl, variablePrefix + ".should_display_eyes");
     floboban.scale = GSL_GLOBAL_FLOAT(gsl, variablePrefix + ".scale");
+    floboban.trophyDisplayX = GSL_GLOBAL_INT(gsl, variablePrefix + ".trophy_display.x");
+    floboban.trophyDisplayY = GSL_GLOBAL_INT(gsl, variablePrefix + ".trophy_display.y");
 }
 
 void ThemeManagerImpl::loadFontDefinition(GoomSL *gsl, const char *fontName, FontDefinition &font)
@@ -719,6 +722,11 @@ IosSurface * LevelThemeImpl::getGiantNeutralIndicator() const
     return getResource(m_giantNeutralIndicator, m_desc.neutralIndicator, "-giant.png");
 }
 
+IosSurface * LevelThemeImpl::getTrophy() const
+{
+    return getResource(m_trophy, m_desc.trophy, "");
+}
+
 IosFont *LevelThemeImpl::getPlayerNameFont() const
 {
     if (m_playerNameFont.empty()) {
@@ -787,6 +795,12 @@ int LevelThemeImpl::getScoreDisplayY(int playerId) const
 
 float LevelThemeImpl::getFlobobanScale(int playerId) const
 { return m_desc.floboban[playerId].scale; }
+
+int LevelThemeImpl::getTrophyDisplayX(int playerId) const
+{ return m_desc.floboban[playerId].trophyDisplayX; }
+
+int LevelThemeImpl::getTrophyDisplayY(int playerId) const
+{ return m_desc.floboban[playerId].trophyDisplayY; }
 
 bool LevelThemeImpl::getShouldDisplayNext(int playerId) const
 { return m_desc.floboban[playerId].shouldDisplayNext; }
