@@ -69,8 +69,9 @@ AltTwoPlayersStarterAction::AltTwoPlayersStarterAction(GameDifficulty difficulty
     m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));
     m_matchIsOver.reset(new MatchIsOverState(m_sharedAssets));
     m_displayStats.reset(new DisplayStatsState(m_sharedAssets));
+    m_manageMultiSets.reset(new ManageMultiSetsState(&m_sharedAssets, nbSets, nameProvider));
+    m_podium.reset(new DisplayStoryScreenState("end_of_multiset.gsl"));
     m_leaveGame.reset(new LeaveGameState(m_sharedAssets));
-    m_manageMultiSets.reset(new ManageMultiSetsState(&m_sharedAssets, nbSets));
     // Linking the states together
     m_pushGameScreen->setNextState(m_setupMatch.get());
     m_setupMatch->setNextState(m_enterPlayersReady.get());
@@ -82,9 +83,11 @@ AltTwoPlayersStarterAction::AltTwoPlayersStarterAction(GameDifficulty difficulty
     if (nbSets > 0) {
         m_displayStats->setNextState(m_manageMultiSets.get());
         m_manageMultiSets->setNextSetState(m_setupMatch.get());
-        m_manageMultiSets->setEndOfGameState(m_leaveGame.get());
+        m_manageMultiSets->setEndOfGameState(m_podium.get());
+        m_podium->setNextState(m_leaveGame.get());
         m_setupMatch->setHandicapOnVictorious(false);
         m_setupMatch->setDisplayVictories(true);
+        m_podium->setStoryScreenValuesProvider(m_manageMultiSets.get());
     }
     else {
         m_displayStats->setNextState(m_setupMatch.get());

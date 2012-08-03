@@ -306,6 +306,26 @@ int StoryWidget::getIntegerValue(String varName) const
     return styrolyse_secured_getint(currentStory, varName);
 }
 
+void StoryWidget::setFloatValue(String varName, float value)
+{
+    styrolyse_setfloat(currentStory, varName, value);
+}
+
+float StoryWidget::getFloatValue(String varName) const
+{
+    return styrolyse_secured_getfloat(currentStory, varName);
+}
+
+void StoryWidget::setStringValue(String varName, const char * value)
+{
+    styrolyse_setstr(currentStory, varName, value);
+}
+
+std::string StoryWidget::getStringValue(String varName) const
+{
+    return styrolyse_secured_getstr(currentStory, varName);
+}
+
 const char *StoryWidget::getText(const char *text) const
 {
     if (localeDictionary == NULL)

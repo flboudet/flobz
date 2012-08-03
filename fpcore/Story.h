@@ -59,6 +59,10 @@ public:
     IdleComponent *getIdleComponent() { return this; }
     void setIntegerValue(String varName, int value);
     int getIntegerValue(String varName) const;
+    void setFloatValue(String varName, float value);
+    float getFloatValue(String varName) const;
+    void setStringValue(String varName, const char * value);
+    std::string getStringValue(String varName) const;
     const char *getText(const char *text) const;
     void freeMemory();
 

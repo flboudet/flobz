@@ -145,7 +145,7 @@ Local2PlayersGameMenu::Local2PlayersGameMenu(MainScreen *mainScreen)
 		      theCommander->getEditFieldOverFramePicture(), 150),
       screenTitleFrame(theCommander->getSeparatorFramePicture()),
       screenTitle(locale.getLocalizedString("Choose Game Level")),
-      easyAction(EASY, &gameWidgetFactory, this),
+      easyAction(EASY, &gameWidgetFactory, this, 3),
       mediumAction(MEDIUM, &gameWidgetFactory, this),
       hardAction(HARD, &gameWidgetFactory, this), popAction(mainScreen),
       easy(locale.getLocalizedString("Easy"), &easyAction),

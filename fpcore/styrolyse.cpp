@@ -430,9 +430,38 @@ int styrolyse_secured_getint(Styrolyse *_this, const char *varname)
   else throw ios_fc::String("GSL Error, variable ")+ios_fc::String(varname)+ios_fc::String(" in script ")+ios_fc::String(_this->fname)+ios_fc::String(" does not exist\n");
 }
 
+void styrolyse_setfloat(Styrolyse *_this, const char *varname, float value)
+{
+    GSL_GLOBAL_FLOAT(_this->gsl, varname) = value;
+}
+
+float styrolyse_getfloat(Styrolyse *_this, const char *varname)
+{
+    return GSL_GLOBAL_FLOAT(_this->gsl, varname);
+}
+
+float styrolyse_secured_getfloat(Styrolyse *_this, const char *varname)
+{
+  if (GSL_HAS_GLOBAL(_this->gsl, varname))
+  return GSL_GLOBAL_FLOAT(_this->gsl, varname);
+  else throw ios_fc::String("GSL Error, variable ")+ios_fc::String(varname)+ios_fc::String(" in script ")+ios_fc::String(_this->fname)+ios_fc::String(" does not exist\n");
+}
+
+void styrolyse_setstr(Styrolyse *_this, const char *varname, const char * value)
+{
+    strcpy((char*)GSL_GLOBAL_PTR(_this->gsl, varname), value);
+}
+
 const char *styrolyse_getstr(Styrolyse *_this, const char *varname)
 {
     return (const char*)GSL_GLOBAL_PTR(_this->gsl, varname);
+}
+
+const char *styrolyse_secured_getstr(Styrolyse *_this, const char *varname)
+{
+    if (GSL_HAS_GLOBAL(_this->gsl, varname))
+        return (const char*)GSL_GLOBAL_PTR(_this->gsl, varname);
+    else throw ios_fc::String("GSL Error, variable ")+ios_fc::String(varname)+ios_fc::String(" in script ")+ios_fc::String(_this->fname)+ios_fc::String(" does not exist\n");
 }
 
 int  styrolyse_current_cycle(Styrolyse *_this)

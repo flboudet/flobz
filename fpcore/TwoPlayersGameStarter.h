@@ -65,15 +65,16 @@ private:
     GameStateMachine m_stateMachine;
     SharedMatchAssets m_sharedAssets;
     SharedGetReadyAssets        m_sharedGetReadyAssets;
-    std::auto_ptr<PushScreenState>       m_pushGameScreen;
-    std::auto_ptr<SetupMatchState>       m_setupMatch;
-    std::auto_ptr<EnterPlayerReadyState> m_enterPlayersReady;
-    std::auto_ptr<ExitPlayerReadyState>  m_exitPlayersReady;
-    std::auto_ptr<MatchPlayingState>     m_matchPlaying;
-    std::auto_ptr<MatchIsOverState>      m_matchIsOver;
-    std::auto_ptr<DisplayStatsState>     m_displayStats;
-    std::auto_ptr<LeaveGameState>        m_leaveGame;
-    std::auto_ptr<ManageMultiSetsState>  m_manageMultiSets;
+    std::auto_ptr<PushScreenState>         m_pushGameScreen;
+    std::auto_ptr<SetupMatchState>         m_setupMatch;
+    std::auto_ptr<EnterPlayerReadyState>   m_enterPlayersReady;
+    std::auto_ptr<ExitPlayerReadyState>    m_exitPlayersReady;
+    std::auto_ptr<MatchPlayingState>       m_matchPlaying;
+    std::auto_ptr<MatchIsOverState>        m_matchIsOver;
+    std::auto_ptr<DisplayStatsState>       m_displayStats;
+    std::auto_ptr<ManageMultiSetsState>    m_manageMultiSets;
+    std::auto_ptr<DisplayStoryScreenState> m_podium;
+    std::auto_ptr<LeaveGameState>          m_leaveGame;
 };
 
 #endif // _TWOPLAYERSGAMESTARTER_H_

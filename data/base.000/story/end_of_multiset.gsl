@@ -1,0 +1,69 @@
+import <libkaorisd.gsl>
+
+float @leftVictories
+float @rightVictories
+string @leftName
+string @rightName
+
+<init>
+    @leftVictories = 2.
+    @rightVictories = 3.
+    @leftName = "Toto"
+    @rightName = "Titi"
+    int @once = 0
+
+    Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+    Sprite @bg = [new_sprite_simple: image="intro-main.jpg" x=0.0 y=0.0]
+    Sprite @trophy = [new_sprite_simple: image="little_trophy.png" x=100.0 y=100.0]
+    Sprite @looser = [new_sprite: image="sdkaori/waiting_01.png" x=0. y=0. curframe=0.0 framespeed=0.3 nbframes=2.0]
+    lk_init
+
+    float @leftX  = 160.0
+    float @rightX = 480.0
+    float @trophyY = 380.0
+    Vec2 @leftLegend
+    Vec2 @rightLegend
+    @leftLegend.x  = @leftX - 40.0
+    @rightLegend.x = @rightX - 40.0
+    @leftLegend.y  = @trophyY + 50.0
+    @rightLegend.y = @trophyY + 50.0
+
+    @LK_HAPPY_SPRITE_Y = @trophyY - 300.
+    @looser.pos.y = @trophyY - 230.
+    lk_switch: state = @LK_HAPPY
+
+<draw_score: float score, float x, float y>
+    float i = 0.0
+    @trophy.pos.x = x - (40.0 * score / 2.0)
+    @trophy.pos.y = y
+    while i < score do {
+        sprite::@trophy display=@display
+        @trophy.pos.x += 40.0
+        i += 1.0
+    }
+
+<sprite_list>
+    sprite::@bg display=@display
+    [draw_score: score=@leftVictories x=@leftX y=@trophyY]
+    [draw_score: score=@rightVictories x=@rightX y=@trophyY]
+    put_text: text=@leftName pos=@leftLegend text_index=100.
+    put_text: text=@rightName pos=@rightLegend text_index=100.
+    lk_sprite_list
+    sprite::@looser display=@display
+
+<update>
+    (@once = 0) ? {
+      (@leftVictories > @rightVictories) ? {
+        @LK_HAPPY_SPRITE_CENTER_X = @leftX - 130.
+        @looser.pos.x = @rightX - 70.
+        @looser.flipped = 1
+      }
+      (@leftVictories < @rightVictories) ? {
+        @LK_HAPPY_SPRITE_CENTER_X = @rightX - 130.
+        @looser.pos.x = @leftX - 70.
+      }
+      @once = 1
+    }
+    lk_update
+    @looser.image = "sdkaori/waiting_01.png"
+    (@looser.curframe >= 1.0)? @looser.image = "sdkaori/waiting_02.png"

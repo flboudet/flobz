@@ -496,7 +496,7 @@ void DisplayStatsState::action(Widget *sender, int actionType,
 // DisplayStoryScreenState
 //---------------------------------
 DisplayStoryScreenState::DisplayStoryScreenState(const char *screenName)
-    : m_screenName(screenName)
+    : m_screenName(screenName), m_vp(NULL)
 {
 }
 
@@ -505,6 +505,25 @@ void DisplayStoryScreenState::enterState()
     GTLogTrace("DisplayStoryScreenState(%s)::enterState()", m_screenName.c_str());
     m_storyScreen.reset(new StoryScreen(m_screenName.c_str(),
                                         this));
+    // Setup variables value if necessary
+    if (m_vp != NULL) {
+        std::map<std::string, int> ivalues = m_vp->getIntValues();
+        for (std::map<std::string, int>::iterator iter = ivalues.begin() ;
+             iter != ivalues.end() ; ++iter) {
+            m_storyScreen->getStoryWidget()->setIntegerValue(iter->first.c_str(), iter->second);
+        }
+        std::map<std::string, float> fvalues = m_vp->getFloatValues();
+        for (std::map<std::string, float>::iterator iter = fvalues.begin() ;
+             iter != fvalues.end() ; ++iter) {
+            m_storyScreen->getStoryWidget()->setFloatValue(iter->first.c_str(), iter->second);
+        }
+        std::map<std::string, std::string> svalues = m_vp->getStringValues();
+        for (std::map<std::string, std::string>::iterator iter = svalues.begin() ;
+             iter != svalues.end() ; ++iter) {
+            m_storyScreen->getStoryWidget()->setStringValue(iter->first.c_str(), iter->second.c_str());
+        }
+    }
+    // Put the story screen on top of the screen stack
     GameUIDefaults::SCREEN_STACK->swap(m_storyScreen.get());
     m_acknowledged = false;
 }
@@ -706,8 +725,8 @@ GameState *CallActionState::getNextState()
 //---------------------------------
 // ManageMultiSetsState
 //---------------------------------
-ManageMultiSetsState::ManageMultiSetsState(SharedMatchAssets  *sharedMatchAssets, int nbSets)
-    : m_sharedAssets(sharedMatchAssets), m_nbSets(nbSets)
+ManageMultiSetsState::ManageMultiSetsState(SharedMatchAssets  *sharedMatchAssets, int nbSets, PlayerNameProvider *nameProvider)
+    : m_sharedAssets(sharedMatchAssets), m_nameProvider(nameProvider), m_nbSets(nbSets)
 {
 }
 
@@ -731,3 +750,26 @@ GameState *ManageMultiSetsState::getNextState()
     return m_nextSetState;
 }
 
+std::map<std::string, int> ManageMultiSetsState::getIntValues() const
+{
+    std::map<std::string, int> result;
+    return result;
+}
+
+std::map<std::string, float> ManageMultiSetsState::getFloatValues() const
+{
+    std::map<std::string, float> result;
+    result["@leftVictories"] = m_sharedAssets->m_leftVictories;
+    result["@rightVictories"] = m_sharedAssets->m_rightVictories;
+    return result;
+}
+
+std::map<std::string, std::string> ManageMultiSetsState::getStringValues() const
+{
+    std::map<std::string, std::string> result;
+    if (m_nameProvider != NULL) {
+        result["@leftName"] = m_nameProvider->getPlayerName(0);
+        result["@rightName"] = m_nameProvider->getPlayerName(1);
+    }
+    return result;
+}

@@ -314,6 +314,17 @@ private:
 };
 
 /**
+ * Provides variable values to a story from a DisplayStoryScreenState
+ */
+class StoryScreenValuesProvider
+{
+public:
+    virtual std::map<std::string, int>   getIntValues() const = 0;
+    virtual std::map<std::string, float> getFloatValues() const = 0;
+    virtual std::map<std::string, std::string> getStringValues() const = 0;
+};
+
+/**
  * Display a story screen, and wait for the user to acknowledge
  * or the story to end
  */
@@ -333,11 +344,15 @@ public:
     void setNextState(GameState *nextState) {
         m_nextState = nextState;
     }
+    void setStoryScreenValuesProvider(StoryScreenValuesProvider *vp) {
+        m_vp = vp;
+    }
 private:
     std::string m_screenName;
     bool m_acknowledged;
     std::auto_ptr<StoryScreen> m_storyScreen;
     GameState *m_nextState;
+    StoryScreenValuesProvider *m_vp;
 };
 
 /**
@@ -458,15 +473,19 @@ private:
 /**
  * Manage multi-sets in a game
  */
-class ManageMultiSetsState : public GameState
+class ManageMultiSetsState : public GameState, public StoryScreenValuesProvider
 {
 public:
-    ManageMultiSetsState(SharedMatchAssets  *sharedMatchAssets, int nbSets);
+    ManageMultiSetsState(SharedMatchAssets  *sharedMatchAssets, int nbSets, PlayerNameProvider *nameProvider);
     // GameState implementation
     virtual void enterState();
     virtual void exitState();
     virtual bool evaluate();
     virtual GameState *getNextState();
+    // StoryScreenValuesProvider implementation
+    virtual std::map<std::string, int> getIntValues() const;
+    virtual std::map<std::string, float> getFloatValues() const;
+    virtual std::map<std::string, std::string> getStringValues() const;
     // Own methods
     void setNextSetState(GameState *nextSetState) {
         m_nextSetState = nextSetState;
@@ -476,6 +495,7 @@ public:
     }
 private:
     SharedMatchAssets  *m_sharedAssets;
+    PlayerNameProvider *m_nameProvider;
     int m_nbSets;
     GameState *m_nextSetState;
     GameState *m_endOfGameState;

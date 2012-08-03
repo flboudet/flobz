@@ -44,7 +44,14 @@ void styrolyse_draw(Styrolyse *_this);
 void styrolyse_setint(Styrolyse *_this, const char *varname, int value);
 int styrolyse_getint(Styrolyse *_this, const char *varname);
 int styrolyse_secured_getint(Styrolyse *_this, const char *varname);
+
+void styrolyse_setfloat(Styrolyse *_this, const char *varname, float value);
+float styrolyse_getfloat(Styrolyse *_this, const char *varname);
+float styrolyse_secured_getfloat(Styrolyse *_this, const char *varname);
+
+void styrolyse_setstr(Styrolyse *_this, const char *varname, const char * value);
 const char *styrolyse_getstr(Styrolyse *_this, const char *varname);
+const char *styrolyse_secured_getstr(Styrolyse *_this, const char *varname);
 
 void styrolyse_event(Styrolyse *_this, const char *event, float x, float y, int player);
 
