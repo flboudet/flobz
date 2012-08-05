@@ -60,7 +60,6 @@ struct <Level:
     string animation_2p,
     Point  speedmeter_display,
     Point  life_display,
-    Point  trophy_display,
     int    opponent_is_behind,
     StatsDimension stats,
     FlobobanDefinition floboban_p1,
