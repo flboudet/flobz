@@ -153,7 +153,8 @@ public:
                             ios_fc::MessageBox *mbox,
                             GameDifficulty difficulty,
                             PlayerNameProvider *nameProvider = NULL,
-                            Action *endOfSessionAction = NULL);
+                            Action *endOfSessionAction = NULL,
+                            int nbSets = 0);
 private:
     SharedMatchAssets           m_sharedAssets;
     SharedGetReadyAssets        m_sharedGetReadyAssets;
@@ -166,6 +167,8 @@ private:
     std::auto_ptr<NetMatchPlayingState>    m_matchPlaying;
     std::auto_ptr<MatchIsOverState>        m_matchIsOver;
     std::auto_ptr<DisplayStatsState>       m_displayStats;
+    std::auto_ptr<ManageMultiSetsState>    m_manageMultiSets;
+    std::auto_ptr<DisplayStoryScreenState> m_podium;
     std::auto_ptr<NetSynchronizeState>     m_synchroAfterStats;
     std::auto_ptr<DisplayStoryScreenState> m_networkErrorScreen;
     std::auto_ptr<NetSynchronizeState>     m_synchroOnAbort;

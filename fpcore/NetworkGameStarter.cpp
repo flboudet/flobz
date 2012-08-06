@@ -374,7 +374,7 @@ NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory  *gameWidgetF
                                                  ios_fc::MessageBox *mbox,
                                                  GameDifficulty difficulty,
                                                  PlayerNameProvider *nameProvider,
-                                                 Action *endOfSessionAction)
+                                                 Action *endOfSessionAction, int nbSets)
 {
     // Creating the different game states
     m_pushGameScreen.reset(new PushScreenState());
@@ -387,7 +387,9 @@ NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory  *gameWidgetF
     m_matchPlaying.reset(new NetMatchPlayingState(m_sharedAssets));
     m_matchIsOver.reset(new MatchIsOverState(m_sharedAssets));
     m_displayStats.reset(new DisplayStatsState(m_sharedAssets));
+    m_podium.reset(new DisplayStoryScreenState("end_of_multiset.gsl"));
     m_synchroAfterStats.reset(new NetSynchronizeState(mbox, 10));
+    m_manageMultiSets.reset(new ManageMultiSetsState(&m_sharedAssets, nbSets, nameProvider));
     m_networkErrorScreen.reset(new DisplayStoryScreenState("netfailure.gsl"));
     m_synchroOnAbort.reset(new NetSynchronizeState(mbox, 20));
     m_leaveGame.reset(new LeaveGameState(m_sharedAssets, endOfSessionAction));
@@ -408,6 +410,18 @@ NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory  *gameWidgetF
     m_synchroOnAbort->setFailedState(m_networkErrorScreen.get());
     m_matchIsOver->setNextState(m_displayStats.get());
     m_displayStats->setNextState(m_synchroAfterStats.get());
+    if (nbSets > 0) {
+        m_synchroAfterStats->setNextState(m_manageMultiSets.get());
+        m_manageMultiSets->setNextSetState(m_setupMatch.get());
+        m_manageMultiSets->setEndOfGameState(m_podium.get());
+        m_podium->setNextState(m_leaveGame.get());
+        m_setupMatch->setHandicapOnVictorious(false);
+        m_setupMatch->setDisplayVictories(true);
+        m_podium->setStoryScreenValuesProvider(m_manageMultiSets.get());
+    }
+    else {
+        m_synchroAfterStats->setNextState(m_setupMatch.get());
+    }
     m_synchroAfterStats->setNextState(m_setupMatch.get());
     m_synchroAfterStats->setFailedState(m_networkErrorScreen.get());
     m_networkErrorScreen->setNextState(m_leaveGame.get());

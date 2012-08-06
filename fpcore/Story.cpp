@@ -165,13 +165,14 @@ static void  drawImage (StyrolyseClient *_this, void *image, int x, int y, int w
   cliprect.w = clipw;
   cliprect.h = cliph;
   sstory->setClipRect(&cliprect);
-  if (flipped)
+  if (fabs(scalex - 1.0f) > 0.001f) {
+      rect.w *= scalex;
+      rect.h *= scaley;
+  }
+  if (flipped) {
 	  sstory->drawHFlipped(surf, NULL, &rect);
+  }
   else {
-      if (fabs(scalex - 1.0f) > 0.001f) {
-          rect.w *= scalex;
-          rect.h *= scaley;
-      }
 	  sstory->draw(surf, NULL, &rect);
   }
 }
