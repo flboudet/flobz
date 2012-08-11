@@ -745,7 +745,8 @@ bool ManageMultiSetsState::evaluate()
 
 GameState *ManageMultiSetsState::getNextState()
 {
-    if (m_sharedAssets->m_leftVictories + m_sharedAssets->m_rightVictories >= m_nbSets)
+    if ((m_sharedAssets->m_leftVictories >= m_nbSets)
+        || (m_sharedAssets->m_rightVictories >= m_nbSets))
         return m_endOfGameState;
     return m_nextSetState;
 }
