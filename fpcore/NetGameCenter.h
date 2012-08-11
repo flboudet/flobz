@@ -35,11 +35,14 @@ using namespace ios_fc;
 
 class FloboGameInvitation {
 public:
+    FloboGameInvitation();
+public:
     PeerAddress initiatorAddress;
     String opponentName;
     PeerAddress opponentAddress;
     unsigned long gameRandomSeed;
     int gameSpeed;
+    int gameNbSets;
 };
 
 class NetGameCenterListener {

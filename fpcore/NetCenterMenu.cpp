@@ -438,6 +438,7 @@ void NetCenterMenu::playerSelected(PeerAddress playerAddress, String playerName)
     invitation.gameRandomSeed = (unsigned long)(fmod(getTimeMs(), (double)0xFFFFFFFF));
     invitation.opponentAddress = playerAddress;
     invitation.gameSpeed = m_speedSelector.getState() - 1;
+    invitation.gameNbSets = 0; // TODO: allow multisets games
     onScreenDialog = new NetCenterDialogMenu(this, invitation, theCommander->getLocalizedString("Asking for a game"), String(theCommander->getLocalizedString("Waiting ")) + playerName + theCommander->getLocalizedString(" for confirmation"), String(""), false);
     container.add(onScreenDialog);
     onScreenDialog->build();

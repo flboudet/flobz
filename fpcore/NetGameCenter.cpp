@@ -29,6 +29,10 @@
 
 using namespace ios_fc;
 
+FloboGameInvitation::FloboGameInvitation()
+    : gameRandomSeed(0), gameSpeed(0), gameNbSets(0)
+{}
+
 class NetGameCenter::GamerPeer {
 public:
     GamerPeer(String name, PeerAddress address, int status = PEER_NORMAL, int rank = -1, bool self=false) :

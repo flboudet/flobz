@@ -92,6 +92,7 @@ void InternetGameCenter::sendGameRequest(FloboGameInvitation &invitation)
     msg->addString("DSTNAME", invitation.opponentName);
     msg->addInt("RNDSEED", invitation.gameRandomSeed);
     msg->addInt("SPEED", invitation.gameSpeed);
+    msg->addInt("GSETS", invitation.gameNbSets);
     Dirigeable *dirNew = dynamic_cast<Dirigeable *>(msg);
     dirNew->setPeerAddress(invitation.opponentAddress);
     msg->send();
@@ -307,6 +308,10 @@ void InternetGameCenter::onMessage(Message &msg)
                     invitation.gameSpeed = msg.getInt("SPEED");
                 else
                     invitation.gameSpeed = 1; // When there is no seed, fall back to 1 (better than crashing)
+                if (msg.hasInt("GSETS"))
+                    invitation.gameNbSets = msg.getInt("GSETS");
+                else
+                    invitation.gameNbSets = 0;
                 receivedGameInvitation(invitation);
             }
                 break;
