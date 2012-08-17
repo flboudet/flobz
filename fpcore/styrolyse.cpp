@@ -69,7 +69,7 @@ static void styro_get_BoolPreference(GoomSL *gsl, GoomHash *global, GoomHash *lo
     char *name  = (char*)GSL_LOCAL_PTR(gsl, local, "name");
     int def     = GSL_LOCAL_INT(gsl, local, "default");
     GSL_GLOBAL_INT(gsl, "getBoolPreference")
-        = true;
+        = false;
     //TODO: make it work
     //theCommander->getPreferencesManager()->getBoolPreference(name, def);
 }

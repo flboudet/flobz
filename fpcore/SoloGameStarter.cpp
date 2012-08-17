@@ -275,7 +275,7 @@ void SoloGameWidget::addGameBHandicap(int handicap)
 {}
 bool SoloGameWidget::isGameARunning() const
 {
-    return true;
+    return ! m_areaA->isGameOver();
 }
 
 

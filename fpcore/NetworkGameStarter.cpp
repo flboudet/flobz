@@ -422,7 +422,6 @@ NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory  *gameWidgetF
     else {
         m_synchroAfterStats->setNextState(m_setupMatch.get());
     }
-    m_synchroAfterStats->setNextState(m_setupMatch.get());
     m_synchroAfterStats->setFailedState(m_networkErrorScreen.get());
     m_networkErrorScreen->setNextState(m_leaveGame.get());
 
