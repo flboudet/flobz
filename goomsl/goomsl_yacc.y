@@ -1084,10 +1084,15 @@
 
     void commit_node(NodeType *node, int releaseIfTmp)
     { /* {{{ */
-        if (node == 0) return;
-
-        switch(node->type) {
-            case OPR_NODE:
+        int stackDepth = 1;
+        do {
+            NodeType *curnode = node;
+            if (node == 0) {
+                if (--stackDepth == 0)
+                return;
+            }
+            switch(node->type) {
+                case OPR_NODE:
                 switch(node->unode.opr.type) {
                     case OPR_SET:           commit_set(node); break;
                     case OPR_PLUS_EQ:       commit_plus_eq(node); break;
@@ -1107,24 +1112,26 @@
                     case OPR_AFFECT_LIST:   commit_affect_list(node); break;
                     case OPR_FOREACH:       commit_foreach(node); break;
                     case OPR_VAR_LIST:      commit_var_list(node); break;
-#ifdef VERBOSE
+                    #ifdef VERBOSE
                     case EMPTY_NODE:        printf("NOP\n"); break;
-#endif
+                    #endif
                 }
-
-                commit_node(node->unode.opr.next,0); /* recursive for the moment, maybe better to do something iterative? */
+                ++stackDepth;
                 break;
-
-            case VAR_NODE:         gsl_instr_set_namespace(currentGoomSL->instr, node->vnamespace);
-                                   gsl_instr_add_param(currentGoomSL->instr, node->str, TYPE_VAR); break;
-            case CONST_INT_NODE:   gsl_instr_add_param(currentGoomSL->instr, node->str, TYPE_INTEGER); break;
-            case CONST_FLOAT_NODE: gsl_instr_add_param(currentGoomSL->instr, node->str, TYPE_FLOAT); break;
-            case CONST_PTR_NODE:   gsl_instr_add_param(currentGoomSL->instr, node->str, TYPE_PTR); break;
-        }
-        if (releaseIfTmp && is_tmp_expr(node))
-          releaseTemp(get_tmp_id(node));
-
-        nodeFree(node);
+                
+                case VAR_NODE:         gsl_instr_set_namespace(currentGoomSL->instr, node->vnamespace);
+                gsl_instr_add_param(currentGoomSL->instr, node->str, TYPE_VAR); break;
+                case CONST_INT_NODE:   gsl_instr_add_param(currentGoomSL->instr, node->str, TYPE_INTEGER); break;
+                case CONST_FLOAT_NODE: gsl_instr_add_param(currentGoomSL->instr, node->str, TYPE_FLOAT); break;
+                case CONST_PTR_NODE:   gsl_instr_add_param(currentGoomSL->instr, node->str, TYPE_PTR); break;
+            }
+            node = node->unode.opr.next;
+            
+            if (releaseIfTmp && is_tmp_expr(curnode))
+            releaseTemp(get_tmp_id(curnode));
+            
+            nodeFree(curnode);
+        } while (--stackDepth);
     } /* }}} */
 
     NodeType *nodeNew(const char *str, int type, int line_number) {
