@@ -431,23 +431,10 @@ public:
     virtual int getHeight();
     virtual int getLineSkip();
 
-	void print(float x, float y, const char *txt) {
-		/*if (gCurrentMatrix) {
-         glPushMatrix();
-         glLoadMatrixf(gCurrentMatrix);
-         }
-         switch (mFX) {
-         case Font_STD: glColor4ub(0xEF,0xA2,0x43,0xFF); break;
-         case Font_DARK: glColor4ub(0x43,0x89,0xEF,0xFF); break;
-         case Font_GREY: glColor4ub(0xCC,0xCC,0xCC,0xFF); break;
-         }
-         mCustomFont->printUnicode(x,y, utf8ToUnicode(txt));
-         glColor4ub(0xFF,0xFF,0xFF,0xFF);
-         if (gCurrentMatrix)
-         glPopMatrix();*/
-		printWithShadow(x,y,1.0f,2.0f,txt);
+	void print(float x, float y, const char *txt, const RGBA &color) {
+		printWithShadow(x,y,1.0f,2.0f,txt, color);
 	}
-	void printWithShadow(float x, float y, float sx, float sy, const char *txt) {
+	void printWithShadow(float x, float y, float sx, float sy, const char *txt, const RGBA &color) {
         unsigned short *utxt = m_backendUtil->utf8ToUnicode(txt, mWorkingBuffer, sizeof(mWorkingBuffer));
 		// TODO: ensure correct matrix
 		glEnable(GL_BLEND); GL_GET_ERROR();
@@ -457,6 +444,7 @@ public:
         mCustomFont->printUnicode(x+sx/*-0.5f*/,y+sy, utxt);
         /*mCustomFont->printUnicode(x+sx-0.5f,y+sy-0.5f, utxt);
          mCustomFont->printUnicode(x+sx+0.5f,y+sy-0.5f, utxt);*/
+#ifdef DISABLED
 		switch (mFX) {
 			case Font_STD: glColor4ub(0xEF,0xA2,0x43,0xFF); break;
 			case Font_DARK: glColor4ub(0x43,0x89,0xEF,0xFF); break;
@@ -465,6 +453,8 @@ public:
 				glColor4ub(0xe0,0xe0,0xe0, 0xff);
 
 		}
+#endif
+        glColor4ub(color.red,color.green,color.blue, color.alpha);
         mCustomFont->printUnicode(x,y, utxt);
 		glColor4ub(0xFF,0xFF,0xFF,0xFF);
 	}
@@ -739,8 +729,8 @@ public:
     virtual void drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
 	virtual void drawRotatedCentered(IosSurface *surf, int angle, int x, int y);
 	virtual void fillRect(const IosRect *rect, const RGBA &color);
-    virtual void putString(IosFont *font, int x, int y, const char *text);
-	virtual void putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text);
+    virtual void putString(IosFont *font, int x, int y, const char *text, const RGBA &color);
+	virtual void putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text, const RGBA &color);
 
 	//
 	// OpenGL code
@@ -960,21 +950,21 @@ void IosGLSurfaceRef::fillRect(const IosRect *rect, const RGBA &color)
 #endif
 }
 
-void IosGLSurfaceRef::putString(IosFont *font, int x, int y, const char *text)
+void IosGLSurfaceRef::putString(IosFont *font, int x, int y, const char *text, const RGBA &color)
 {
     m_backendUtil->ensureContextIsActive();
     bindSurface();
     OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
-    ifont->print(x,y,text);
+    ifont->print(x,y,text, color);
     unbindSurface();
 }
 
-void IosGLSurfaceRef::putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text)
+void IosGLSurfaceRef::putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text, const RGBA &color)
 {
     m_backendUtil->ensureContextIsActive();
     bindSurface();
     OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
-    ifont->printWithShadow(x,y,shadow_x,shadow_y,text);
+    ifont->printWithShadow(x,y,shadow_x,shadow_y,text, color);
     unbindSurface();
 }
 
@@ -1072,10 +1062,14 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMod
         texcoord[0] = (GLfloat)(pSrcRect->x+pSrcRect->w) / m_ref->m_p2w; texcoord[3] = (GLfloat)(pSrcRect->y) / m_ref->m_p2h;
         texcoord[6] = (GLfloat)(pSrcRect->x) / m_ref->m_p2w;             texcoord[5] = (GLfloat)(pSrcRect->y+pSrcRect->h) / m_ref->m_p2h;
         texcoord[4] = (GLfloat)(pSrcRect->x+pSrcRect->w) / m_ref->m_p2w; texcoord[7] = (GLfloat)(pSrcRect->y+pSrcRect->h) / m_ref->m_p2h;
-        vertices[0] = pDstRect->x;                vertices[1] = pDstRect->y;
-        vertices[2] = pDstRect->x+pDstRect->w; vertices[3] = pDstRect->y;
-        vertices[4] = pDstRect->x;                vertices[5] = pDstRect->y+pDstRect->h;
-        vertices[6] = pDstRect->x+pDstRect->w; vertices[7] = pDstRect->y+pDstRect->h;
+        vertices[0] = pDstRect->x;
+        vertices[1] = pDstRect->y;
+        vertices[2] = pDstRect->x+pDstRect->w;
+        vertices[3] = pDstRect->y;
+        vertices[4] = pDstRect->x;
+        vertices[5] = pDstRect->y+pDstRect->h;
+        vertices[6] = pDstRect->x+pDstRect->w;
+        vertices[7] = pDstRect->y+pDstRect->h;
         glTexCoordPointer(2, GL_FLOAT, 0, &texcoord[0]);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glVertexPointer(2, GL_FLOAT, 0, &vertices[0]);
@@ -1085,6 +1079,8 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMod
     else {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         GLfloat texcoord[8];
         GLfloat vertices[8];
         GLushort faces[4] = {0,1,2,3};
@@ -1303,18 +1299,18 @@ void OpenGLDrawContext::fillRect(const IosRect *rect, const RGBA &color) {
     glEnable(GL_TEXTURE_2D); GL_GET_ERROR();
 }
 
-void OpenGLDrawContext::putString(IosFont *font, int x, int y, const char *text) {
+void OpenGLDrawContext::putString(IosFont *font, int x, int y, const char *text, const RGBA &color) {
     m_backendUtil->ensureContextIsActive();
 	OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
-	ifont->print(x,y,text);
+	ifont->print(x,y,text, color);
 }
-void OpenGLDrawContext::putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text) {
+void OpenGLDrawContext::putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text, const RGBA &color) {
     m_backendUtil->ensureContextIsActive();
 	OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
-	ifont->printWithShadow(x,y,shadow_x,shadow_y,text);
+	ifont->printWithShadow(x,y,shadow_x,shadow_y,text, color);
 }
 
-void OpenGLDrawContext::putStringCenteredXY(IosFont *font, int x, int y, const char *text) {
+void OpenGLDrawContext::putStringCenteredXY(IosFont *font, int x, int y, const char *text, const RGBA &color) {
 	m_backendUtil->ensureContextIsActive();
 	OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
 	ifont->printCentered(x,y-ifont->getHeight()/2,text);

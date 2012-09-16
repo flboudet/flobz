@@ -185,7 +185,7 @@ static void  freeImage (StyrolyseClient *_this, void *image)
 static void putText (StyrolyseClient *_this, int x, int y, const char *text)
 {
     sstory->setClipRect(NULL);
-    sstory->putString(storyFont, x, y, text);
+    sstory->putString(storyFont, x, y, text, GT_WHITE);
 }
 
 static const char *getText(StyrolyseClient *_this, const char *text)

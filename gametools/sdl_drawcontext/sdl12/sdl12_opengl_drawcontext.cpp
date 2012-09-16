@@ -17,16 +17,20 @@ void SDL12_OpenGLBackendUtil::flip()
 
 SDL12_OpenGL_DrawContext::SDL12_OpenGL_DrawContext(DataPathManager *dataPathManager,
                                                    int w, int h, bool fullscreen,
-                                                   const char *caption)
+                                                   const char *caption,
+                                                   int viewportWidth, int viewportHeight)
     : m_backendUtil(dataPathManager), m_caption(caption)
 {
+    if (viewportWidth != 0)
+        initDisplay(fullscreen, viewportWidth, viewportHeight);
+    else
+        initDisplay(fullscreen, w, h);
     this->w = w; this->h = h;
-    initDisplay(fullscreen);
     atexit(SDL_Quit);
-    init(&m_backendUtil, w, h);
+    init(&m_backendUtil, w, h, viewportWidth, viewportHeight);
 }
 
-void SDL12_OpenGL_DrawContext::initDisplay(bool fullscreen)
+void SDL12_OpenGL_DrawContext::initDisplay(bool fullscreen, int w, int h)
 {
     // Wait for vertical retrace on swapbuffer
 #ifdef SDL_GL_SWAP_CONTROL
@@ -45,7 +49,7 @@ void SDL12_OpenGL_DrawContext::initDisplay(bool fullscreen)
 void SDL12_OpenGL_DrawContext::setFullScreen(bool fullscreen)
 {
     if (SDL_WM_ToggleFullScreen(display) == 0) {
-        initDisplay(fullscreen);
+        initDisplay(fullscreen, w, h);
     }
     /* Workaround for cursor showing in MacOS X fullscreen mode */
     SDL_ShowCursor(SDL_ENABLE);

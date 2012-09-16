@@ -199,9 +199,9 @@ void CompositeSurface::fillRect(const IosRect *rect, const RGBA &color)
     m_baseSurface->fillRect(rect, color);
 }
 
-void CompositeSurface::putString(IosFont *font, int x, int y, const char *text)
+void CompositeSurface::putString(IosFont *font, int x, int y, const char *text, const RGBA &color)
 {
-    m_baseSurface->putString(font, x, y, text);
+    m_baseSurface->putString(font, x, y, text, color);
 }
 
 /**
@@ -333,9 +333,9 @@ void CompositeDrawContext::fillRect(const IosRect *rect, const RGBA &color)
     m_baseDrawContext->fillRect(rect, color);
 }
 
-void CompositeDrawContext::putString(IosFont *font, int x, int y, const char *text)
+void CompositeDrawContext::putString(IosFont *font, int x, int y, const char *text, const RGBA &color)
 {
-    m_baseDrawContext->putString(font, x, y, text);
+    m_baseDrawContext->putString(font, x, y, text, color);
 }
 
 // Specific methods

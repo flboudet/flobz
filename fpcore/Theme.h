@@ -106,7 +106,9 @@ public:
     virtual IosSurface * getTrophy() const = 0;
     // Fonts
     virtual IosFont *getPlayerNameFont() const = 0;
+    virtual const RGBA *getPlayerNameColor() const = 0;
     virtual IosFont *getScoreFont() const      = 0;
+    virtual const RGBA *getScoreColor() const  = 0;
     // Positions and dimensions of the Floboban
     virtual int getSpeedMeterX() const  = 0;
     virtual int getSpeedMeterY() const  = 0;

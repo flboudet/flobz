@@ -17,5 +17,8 @@ typedef struct _HSVA {
   uint8_t alpha;
 } HSVA;
 
+extern RGBA GT_WHITE;
+extern RGBA GT_BLACK;
+
 #endif /* _RGBA_H_ */
 

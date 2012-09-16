@@ -32,6 +32,7 @@ private:
     PlayerGameStat &stat;
     int m_x, m_y;
     IosFont *m_font;
+    RGBA m_color;
     int player;
 };
 

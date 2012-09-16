@@ -510,16 +510,17 @@ void GameWidget2P::draw(DrawTarget *dt)
     areaB->renderScore(dt);
     // Rendering the player names
     IosFont *font = getLevelTheme()->getPlayerNameFont();
+    const RGBA *color = getLevelTheme()->getPlayerNameColor();
     if (m_displayPlayerOneName)
         dt->putStringCenteredXY(font,
                                 getLevelTheme()->getNameDisplayX(0),
                                 getLevelTheme()->getNameDisplayY(0),
-                                playerOneName);
+                                playerOneName, *color);
     if (m_displayPlayerTwoName)
         dt->putStringCenteredXY(font,
                                 getLevelTheme()->getNameDisplayX(1),
                                 getLevelTheme()->getNameDisplayY(1),
-                                playerTwoName);
+                                playerTwoName, *color);
     // Rendering the opponent if it is in front
     if (! getLevelTheme()->getOpponentIsBehind()) {
         if (getOpponent() != NULL)

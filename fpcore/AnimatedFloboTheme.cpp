@@ -280,6 +280,7 @@ void ThemeManagerImpl::loadFontDefinition(GoomSL *gsl, const char *fontName, Fon
     font.fontPath = (const char *) GSL_GLOBAL_PTR(gsl, fontPathVar.str().c_str());
     font.fontSize     = GSL_GLOBAL_INT(gsl, fontSizeVar.str().c_str());
     font.fontFx = (IosFontFx)(GSL_GLOBAL_INT(gsl, fontFxVar.str().c_str()));
+    font.fontColor = GT_WHITE;
 }
 
 FloboSetThemeImpl::FloboSetThemeImpl(const FloboSetThemeDescription &desc,

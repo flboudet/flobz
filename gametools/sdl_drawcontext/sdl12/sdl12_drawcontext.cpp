@@ -305,7 +305,7 @@ void SDL12_IosSurface::convertToGray()
     iim_sdlsurface_convert_to_gray(m_surf);
 }
 
-void SDL12_IosSurface::putString(IosFont *font, int x, int y, const char *text)
+void SDL12_IosSurface::putString(IosFont *font, int x, int y, const char *text, const RGBA &color)
 {
     SDL12_IosFont *sFont = static_cast<SDL12_IosFont *>(font);
         vector<string> lines;
@@ -442,7 +442,7 @@ void SDL12_DrawContext::flip()
   nFrames += 1.0;
   if (DBG_FONT != NULL) {
       setClipRect(NULL);
-      putString (DBG_FONT, 16, 16, fps);
+      putString (DBG_FONT, 16, 16, fps, GT_WHITE);
   }
 #endif
   SDL_Flip(display);
@@ -494,7 +494,7 @@ void SDL12_DrawContext::setBlendMode(ImageBlendMode mode)
     m_blendMode = mode;
 }
 
-void SDL12_DrawContext::putString(IosFont *font, int x, int y, const char *text)
+void SDL12_DrawContext::putString(IosFont *font, int x, int y, const char *text, const RGBA &color)
 {
     SDL12_IosFont *sFont = static_cast<SDL12_IosFont *>(font);
         vector<string> lines;

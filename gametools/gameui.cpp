@@ -1305,7 +1305,7 @@ namespace gameui {
 
     Text::Text()
         : label(""), offset(0.0,0.0,0.0), m_textAlign(TEXT_LEFT_ALIGN),
-          m_autoSize(true), mdontMove(true), m_slideSound(GameUIDefaults::SLIDE_SOUND), m_shadow(false)
+          m_autoSize(true), mdontMove(true), m_slideSound(GameUIDefaults::SLIDE_SOUND), m_color(GT_WHITE), m_shadow(false)
     {
         this->font = GameUIDefaults::FONT_TEXT;
         setPreferedSize(Vec3(m_autoSize?this->font->getTextWidth(label):0.0f, this->font->getHeight(), 1.0));
@@ -1371,9 +1371,9 @@ namespace gameui {
                   break;
           }
 		  if (m_shadow)
-			  dt->putStringWithShadow(font, x, y, m_shadow_x, m_shadow_y, (const char*)label);
+			  dt->putStringWithShadow(font, x, y, m_shadow_x, m_shadow_y, (const char*)label, m_color);
 		  else
-			  dt->putString(font, x, y, (const char*)label);
+			  dt->putString(font, x, y, (const char*)label, m_color);
       }
     }
 

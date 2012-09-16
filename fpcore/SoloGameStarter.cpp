@@ -207,10 +207,11 @@ void SoloGameWidget::draw(DrawTarget *dt)
     m_areaA->renderScore(dt);
     // Rendering the player names
     IosFont *font = getLevelTheme()->getPlayerNameFont();
+    const RGBA *color = getLevelTheme()->getPlayerNameColor();
     dt->putStringCenteredXY(font,
                             getLevelTheme()->getNameDisplayX(0),
                             getLevelTheme()->getNameDisplayY(0),
-                            m_playerName.c_str());
+                            m_playerName.c_str(), *color);
     // Rendering the foreground animation
     if (m_styroPainter.get() != NULL)
         m_styroPainter->draw(dt);

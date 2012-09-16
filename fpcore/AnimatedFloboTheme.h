@@ -74,6 +74,7 @@ public:
     std::string fontPath;
     int fontSize;
     IosFontFx fontFx;
+    RGBA fontColor;
 };
 
 class LevelThemeDescription {
@@ -206,7 +207,9 @@ public:
     virtual IosSurface * getTrophy() const;
     // Fonts
     virtual IosFont *getPlayerNameFont() const ;
+    virtual const RGBA *getPlayerNameColor() const { return &m_desc.playerNameFont.fontColor; }
     virtual IosFont *getScoreFont() const;
+    virtual const RGBA *getScoreColor() const { return &m_desc.scoreFont.fontColor; }
     // Positions and dimensions of the Floboban
     virtual int getSpeedMeterX() const;
     virtual int getSpeedMeterY() const;

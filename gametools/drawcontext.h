@@ -121,9 +121,9 @@ public:
 
 	virtual void fillRect(const IosRect *rect, const RGBA &color) = 0;
 
-    virtual void putString(IosFont *font, int x, int y, const char *text) = 0;
-	virtual void putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text) { putString(font, x,y,text); } // Default DrawTarget have shadow disabled.
-    void putStringCenteredXY(IosFont *font, int x, int y, const char *text);
+    virtual void putString(IosFont *font, int x, int y, const char *text, const RGBA &color) = 0;
+	virtual void putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text, const RGBA &color) { putString(font, x,y,text,color); } // Default DrawTarget have shadow disabled.
+    void putStringCenteredXY(IosFont *font, int x, int y, const char *text, const RGBA &color);
 
 public:
     int h, w;
@@ -224,10 +224,10 @@ public:
 
 
 // Implementation
-inline void DrawTarget::putStringCenteredXY(IosFont *font, int x, int y, const char *text)
+inline void DrawTarget::putStringCenteredXY(IosFont *font, int x, int y, const char *text, const RGBA &color)
 {
     putString(font, x - font->getTextWidth(text) / 2,
-              y - font->getHeight() / 2, text);
+              y - font->getHeight() / 2, text, color);
 }
 
 #endif // _DRAWCONTEXT_H_

@@ -543,6 +543,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       TextAlign m_textAlign;
       bool m_autoSize;
       audio_manager::Sound *m_slideSound;
+      RGBA m_color;
 	  bool m_shadow;
 	  int m_shadow_x; int m_shadow_y;
     public:

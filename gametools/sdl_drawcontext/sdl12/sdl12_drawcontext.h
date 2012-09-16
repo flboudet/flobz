@@ -19,7 +19,7 @@ public:
     virtual void setClipRect(IosRect *rect);
     virtual void setBlendMode(ImageBlendMode mode);
     virtual void fillRect(const IosRect *rect, const RGBA &color);
-    virtual void putString(IosFont *font, int x, int y, const char *text);
+    virtual void putString(IosFont *font, int x, int y, const char *text, const RGBA &color);
 public:
     // IosSurface implementation
     virtual bool isOpaque() const;
@@ -72,7 +72,7 @@ public:
     virtual void setClipRect(IosRect *rect);
     virtual void setBlendMode(ImageBlendMode mode);
     virtual void fillRect(const IosRect *rect, const RGBA &color);
-    virtual void putString(IosFont *font, int x, int y, const char *text);
+    virtual void putString(IosFont *font, int x, int y, const char *text, const RGBA &color);
     // Query for drawcontext abilities
     virtual ImageSpecialAbility guessRequiredImageAbility(const ImageOperationList &list);
     // Specific methods

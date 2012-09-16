@@ -27,11 +27,12 @@ class SDL12_OpenGL_DrawContext : public OpenGLDrawContext {
 public:
     SDL12_OpenGL_DrawContext(DataPathManager *dataPathManager,
                              int w, int h, bool fullscreen,
-                             const char *caption);
+                             const char *caption,
+                             int viewportWidth = 0, int viewportHeight = 0);
     // Specific methods
     void setFullScreen(bool fullscreen);
 private:
-    void initDisplay(bool fullScreen);
+    void initDisplay(bool fullScreen, int w, int h);
 private:
     SDL12_OpenGLBackendUtil m_backendUtil;
     SDL_Surface *display;

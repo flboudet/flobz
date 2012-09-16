@@ -110,7 +110,7 @@ public:
     virtual void drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
     virtual void drawRotatedCentered(IosSurface *surf, int angle, int x, int y);
 	virtual void fillRect(const IosRect *rect, const RGBA &color);
-    virtual void putString(IosFont *font, int x, int y, const char *text);
+    virtual void putString(IosFont *font, int x, int y, const char *text, const RGBA &color);
 private:
     CompositeImageLibrary &m_ownerImageLibrary;
     ios_fc::SharedPtr<IosSurface> m_baseSurface;
@@ -166,7 +166,7 @@ public:
     virtual void drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect);
     virtual void drawRotatedCentered(IosSurface *surf, int angle, int x, int y);
 	virtual void fillRect(const IosRect *rect, const RGBA &color);
-    virtual void putString(IosFont *font, int x, int y, const char *text);
+    virtual void putString(IosFont *font, int x, int y, const char *text, const RGBA &color);
     // Specific methods
     DrawContext &getBaseDrawContext() const { return *m_baseDrawContext; }
     void declareCompositeSurface(const char *key,

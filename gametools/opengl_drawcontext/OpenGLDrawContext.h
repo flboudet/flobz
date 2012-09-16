@@ -121,9 +121,9 @@ public:
     virtual void setClipRect(IosRect *rect);
     virtual void setBlendMode(ImageBlendMode mode) {}
     virtual void fillRect(const IosRect *rect, const RGBA &color);
-    virtual void putString(IosFont *font, int x, int y, const char *text);
-	virtual void putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text);
-    void putStringCenteredXY(IosFont *font, int x, int y, const char *text);
+    virtual void putString(IosFont *font, int x, int y, const char *text, const RGBA &color);
+	virtual void putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text, const RGBA &color);
+    void putStringCenteredXY(IosFont *font, int x, int y, const char *text, const RGBA &color);
     // Special operations
     virtual void setOffset(int offX, int offY);
 	// Query for drawcontext abilities

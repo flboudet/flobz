@@ -159,7 +159,7 @@ OpenGLRawImage * StandardTextureLoader::loadImagePNG(ImageType type, const char 
     png_uint_32 po2Width =  power_of_2(imgWidth);
     png_uint_32 po2Height = power_of_2(imgHeight);
     int rowsize = (po2Width*channels*bitdepth)/8;
-    char *imgData = (char *)malloc(rowsize * po2Height);
+    char *imgData = (char *)calloc(rowsize * po2Height, 1);
     png_bytep *rowPtrs = new png_bytep[imgHeight];
     char *dataPtr = imgData;
     for (int i = 0 ; i < imgHeight ; i++) {
