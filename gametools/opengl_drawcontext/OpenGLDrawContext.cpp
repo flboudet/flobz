@@ -1004,20 +1004,6 @@ void IosGLSurfaceRef::applyBlendMode(ImageBlendMode mode)
 
 void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMode mode)
 {
-    //if (mode == NORMAL)
-    //    mode = SCALED;
-#ifdef BENCH_BLIT
-    BENCH.set_num_methods(2);
-    switch(BENCH.current_method()) {
-        case 0:
-            mode = NORMAL;
-            break;
-        case 1:
-            mode = SCALED;
-            break;
-    }
-#endif
-
     if (gray) {
         // MEGA EFFECT POUR LA PAUSE (Bidouille qui ne marche que pour une image plein ecran...
         // Code tres pas beau, mais le resultat est beau ;-)
@@ -1054,62 +1040,49 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMod
     if ((mode != X_FLIP) && hflip)
         mode = X_FLIP;
 
+    GLfloat texcoord[8];
+    GLfloat vertices[8];
+    GLushort faces[4] = {0,1,2,3};
     if ((mode == X_FLIP) || hflip) {
-        GLfloat texcoord[8];
-        GLfloat vertices[8];
-        GLushort faces[4] = {0,1,2,3};
-        texcoord[2] = (GLfloat)(pSrcRect->x) / m_ref->m_p2w;             texcoord[1] = (GLfloat)(pSrcRect->y) / m_ref->m_p2h;
-        texcoord[0] = (GLfloat)(pSrcRect->x+pSrcRect->w) / m_ref->m_p2w; texcoord[3] = (GLfloat)(pSrcRect->y) / m_ref->m_p2h;
-        texcoord[6] = (GLfloat)(pSrcRect->x) / m_ref->m_p2w;             texcoord[5] = (GLfloat)(pSrcRect->y+pSrcRect->h) / m_ref->m_p2h;
-        texcoord[4] = (GLfloat)(pSrcRect->x+pSrcRect->w) / m_ref->m_p2w; texcoord[7] = (GLfloat)(pSrcRect->y+pSrcRect->h) / m_ref->m_p2h;
-        vertices[0] = pDstRect->x;
-        vertices[1] = pDstRect->y;
-        vertices[2] = pDstRect->x+pDstRect->w;
-        vertices[3] = pDstRect->y;
-        vertices[4] = pDstRect->x;
-        vertices[5] = pDstRect->y+pDstRect->h;
-        vertices[6] = pDstRect->x+pDstRect->w;
-        vertices[7] = pDstRect->y+pDstRect->h;
-        glTexCoordPointer(2, GL_FLOAT, 0, &texcoord[0]);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glVertexPointer(2, GL_FLOAT, 0, &vertices[0]);
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, &faces[0]);
+        texcoord[2] = (GLfloat)(pSrcRect->x) / m_ref->m_p2w;
+        texcoord[1] = (GLfloat)(pSrcRect->y) / m_ref->m_p2h;
+        texcoord[0] = (GLfloat)(pSrcRect->x+pSrcRect->w) / m_ref->m_p2w;
+        texcoord[3] = texcoord[1];
+        texcoord[6] = texcoord[2];
+        texcoord[5] = (GLfloat)(pSrcRect->y+pSrcRect->h) / m_ref->m_p2h;
+        texcoord[4] = texcoord[0];
+        texcoord[7] = texcoord[5];
     }
     else {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        GLfloat texcoord[8];
-        GLfloat vertices[8];
-        GLushort faces[4] = {0,1,2,3};
         texcoord[0] = (GLfloat)(pSrcRect->x) / m_ref->m_p2w;
         texcoord[1] = (GLfloat)(pSrcRect->y) / m_ref->m_p2h;
         texcoord[2] = (GLfloat)(pSrcRect->x+pSrcRect->w) / m_ref->m_p2w;
-        texcoord[3] = (GLfloat)(pSrcRect->y) / m_ref->m_p2h;
-        texcoord[4] = (GLfloat)(pSrcRect->x) / m_ref->m_p2w;
+        texcoord[3] = texcoord[1];
+        texcoord[4] = texcoord[0];
         texcoord[5] = (GLfloat)(pSrcRect->y+pSrcRect->h) / m_ref->m_p2h;
-        texcoord[6] = (GLfloat)(pSrcRect->x+pSrcRect->w) / m_ref->m_p2w;
-        texcoord[7] = (GLfloat)(pSrcRect->y+pSrcRect->h) / m_ref->m_p2h;
-        vertices[0] = pDstRect->x;
-        vertices[1] = pDstRect->y;
-        vertices[2] = pDstRect->x+pDstRect->w;
-        vertices[3] = pDstRect->y;
-        vertices[4] = pDstRect->x;
-        vertices[5] = pDstRect->y+pDstRect->h;
-        vertices[6] = pDstRect->x+pDstRect->w;
-        vertices[7] = pDstRect->y+pDstRect->h;
-        glColor4f(1.0f,1.0f,1.0f,m_alpha);
-
-        glTexCoordPointer(2, GL_FLOAT, 0, &texcoord[0]);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glVertexPointer(2, GL_FLOAT, 0, &vertices[0]);
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, &faces[0]);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); GL_GET_ERROR();
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); GL_GET_ERROR();
+        texcoord[6] = texcoord[2];
+        texcoord[7] = texcoord[5];
     }
+    double dx = 0.25, dy = 0.25;
+    vertices[0] = pDstRect->x + dx;
+    vertices[1] = pDstRect->y +dy;
+    vertices[2] = pDstRect->x+pDstRect->w + dx;
+    vertices[3] = vertices[1];
+    vertices[4] = vertices[0];
+    vertices[5] = pDstRect->y+pDstRect->h + dy;
+    vertices[6] = vertices[2];
+    vertices[7] = vertices[5];
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glColor4f(1.0f,1.0f,1.0f,m_alpha);
+    glTexCoordPointer(2, GL_FLOAT, 0, &texcoord[0]);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glVertexPointer(2, GL_FLOAT, 0, &vertices[0]);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, &faces[0]);
+
 ret:
     if (gray) glColor4ub(0xff,0xff,0xff,0xff);
     m_ref->unbindTexture();
