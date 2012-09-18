@@ -174,13 +174,13 @@ void FPCommander::initFonts()
      }
      funny_path = getDataPathManager().getPath("gfx/zill_spills.ttf");*/
 
-    m_darkFont = getFont(fontName, 17, Font_DARK);
-    m_menuFont = getFont(fontName, 17, Font_STD);
-    m_smallFont = getFont(fontName, 12, Font_STD);
-    m_smallFontInfo = getFont(fontName, 12, Font_DARK);
-    m_textFont = getFont(fontName, 17, Font_GREY);
-    m_funnyFont = getFont(funnyFontName, 24, Font_STD);
-    storyFont = getFont(fontName, 17, Font_STORY);
+    m_darkFont = getFont(fontName, 17);
+    m_menuFont = getFont(fontName, 17);
+    m_smallFont = getFont(fontName, 12);
+    m_smallFontInfo = getFont(fontName, 12);
+    m_textFont = getFont(fontName, 17);
+    m_funnyFont = getFont(funnyFontName, 24);
+    storyFont = getFont(fontName, 17);
 
     GameUIDefaults::FONT              = m_menuFont;
     GameUIDefaults::FONT_TEXT         = m_textFont;
@@ -233,14 +233,14 @@ IosSurfaceRef FPCommander::getSurface(ImageType type, const char *path, const Im
     return m_surfaceResManager->getResource(IosSurfaceResourceKey(type, path, specialAbility));
 }
 
-void FPCommander::cacheFont(const char *path, int size, IosFontFx fx)
+void FPCommander::cacheFont(const char *path, int size)
 {
-    m_fontResManager->cacheResource(IosFontResourceKey(path, size, fx));
+    m_fontResManager->cacheResource(IosFontResourceKey(path, size));
 }
 
-IosFontRef FPCommander::getFont(const char *path, int size, IosFontFx fx)
+IosFontRef FPCommander::getFont(const char *path, int size)
 {
-    return m_fontResManager->getResource(IosFontResourceKey(path, size, fx));
+    return m_fontResManager->getResource(IosFontResourceKey(path, size));
 }
 
 void FPCommander::cacheSound(const char *path)

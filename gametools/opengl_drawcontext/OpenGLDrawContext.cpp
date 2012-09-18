@@ -394,11 +394,10 @@ private:
     OpenGLBackendUtil *m_backendUtil;
 	GLFont *mCustomFont;
 	int mSize;
-	IosFontFx mFX;
     unsigned short mWorkingBuffer[256];
 
 public:
-	OpenGLIosFont(OpenGLBackendUtil *backendUtil, const char *path, int size, IosFontFx fx = Font_STD)
+	OpenGLIosFont(OpenGLBackendUtil *backendUtil, const char *path, int size)
     : m_backendUtil(backendUtil)
     {
         std::auto_ptr<DataInputStream> fontFile(m_backendUtil->getdataPathManager()->openDataInputStream(path));
@@ -420,7 +419,6 @@ public:
         } while (readSize == chunkSize);
             mCustomFont = new GLFont(data, fsize, size, 0.0f);
 		mSize = size;
-		mFX = fx;
 	}
 
 	virtual ~OpenGLIosFont() {
@@ -1109,9 +1107,9 @@ IosSurface * OpenGLImageLibrary::loadImage(ImageType type, const char *path, Ima
     return result;
 }
 
-IosFont * OpenGLImageLibrary::createFont(const char *path, int size, IosFontFx fx)
+IosFont * OpenGLImageLibrary::createFont(const char *path, int size)
 {
-    return new OpenGLIosFont(m_backendUtil, path, size, fx);
+    return new OpenGLIosFont(m_backendUtil, path, size);
 }
 
 

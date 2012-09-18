@@ -242,9 +242,9 @@ IosSurface * CompositeImageLibrary::loadImage(ImageType type, const char *path, 
     return result;
 }
 
-IosFont * CompositeImageLibrary::createFont(const char *path, int size, IosFontFx fx)
+IosFont * CompositeImageLibrary::createFont(const char *path, int size)
 {
-    return m_baseImageLibrary.createFont(path, size, fx);
+    return m_baseImageLibrary.createFont(path, size);
 }
 
 void CompositeImageLibrary::unregisterImage(IosSurface *image)

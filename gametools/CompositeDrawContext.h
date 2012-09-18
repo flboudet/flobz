@@ -126,7 +126,7 @@ public:
     CompositeImageLibrary(CompositeDrawContext &owner);
     virtual IosSurface * createImage(ImageType type, int w, int h, ImageSpecialAbility specialAbility = 0);
     virtual IosSurface * loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0);
-    virtual IosFont    * createFont(const char *path, int size, IosFontFx fx = Font_STD);
+    virtual IosFont    * createFont(const char *path, int size);
 public:
     DrawContext &getBaseDrawContext() const;
     void unregisterImage(IosSurface *image);

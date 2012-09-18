@@ -69,11 +69,17 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       static GameUIEnum   CONTAINER_POLICY;
       static float        SPACING;
       static IosFont      *FONT;
+      static RGBA         FONT_COLOR;
       static IosFont      *FONT_INACTIVE;
+      static RGBA         FONT_INACTIVE_COLOR;
       static IosFont     *FONT_TEXT;
+      static RGBA         FONT_TEXT_COLOR;
       static IosFont      *FONT_SMALL_ACTIVE;
+      static RGBA         FONT_SMALL_COLOR;
       static IosFont      *FONT_SMALL_INFO;
+      static RGBA         FONT_SMALL_INFO_COLOR;
       static IosFont      *FONT_FUNNY;
+      static RGBA          FONT_FUNNY_COLOR;
       static GameLoop    *GAME_LOOP;
       static ScreenStack *SCREEN_STACK;
       static audio_manager::Sound *SLIDE_SOUND;
@@ -533,6 +539,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
     protected:
       void draw(DrawTarget *dt);
       IosFont *font;
+      RGBA m_color;
       bool startMoving;
 
     private:
@@ -543,7 +550,6 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       TextAlign m_textAlign;
       bool m_autoSize;
       audio_manager::Sound *m_slideSound;
-      RGBA m_color;
 	  bool m_shadow;
 	  int m_shadow_x; int m_shadow_y;
     public:

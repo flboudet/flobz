@@ -37,24 +37,20 @@ public:
  */
 class IosFontResourceKey {
 public:
-    IosFontResourceKey(const std::string &path, int size, IosFontFx fx = Font_STD)
-    : path(path), size(size), fx(fx) {}
+    IosFontResourceKey(const std::string &path, int size)
+    : path(path), size(size) {}
     bool operator ==(const IosFontResourceKey k) const {
         return  ((this->path == k.path) &&
-                 (this->size == k.size) &&
-                 (this->fx == k.fx));
+                 (this->size == k.size));
     }
     bool operator < (const IosFontResourceKey k) const {
         if (this->path == k.path) {
-            if (this->size == k.size)
-                return this->fx < k.fx;
-            return this->size < k.size;
+            return (this->size < k.size);
         }
         return (this->path < k.path);
     }
     std::string path;
     int size;
-    IosFontFx fx;
 };
 
 /**

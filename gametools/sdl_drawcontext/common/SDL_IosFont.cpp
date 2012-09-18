@@ -8,8 +8,8 @@ using namespace std;
 #define MAX_CACHED_SURFACES 40
 
 // IosFont implementation
-SDL_IosFont::SDL_IosFont(const char *path, int size, IosFontFx fx)
-    : m_fx(fx), m_height(size)
+SDL_IosFont::SDL_IosFont(const char *path, int size)
+    : m_height(size)
 {
     m_font = TTF_OpenFont(path, size);
     m_height = TTF_FontHeight(m_font);
@@ -99,17 +99,17 @@ void SDL_IosFont::precomputeFX()
 
                     HSVA hsva;
                     hsva.alpha = 0.0;
-                    if (m_fx == Font_STD) {
+                    if (true) {
                         hsva.hue = 55.0 - 20.0 * cx;
                         hsva.saturation = 1.25 - l;
                         hsva.value = 1.0;
                     }
-                    else if (m_fx == Font_STORY) {
+                    else if (false) {
                         hsva.hue = 55.0 - 20.0 * cx;
                         hsva.saturation = 1.0;//5 - l;
                         hsva.value = 1.4 - cy;
                     }
-                    else if (m_fx == Font_GREY) {
+                    else if (false) {
                         hsva.hue = 45.0 + 30.0 * cx;
                         hsva.saturation = 1.25 - l;
                         hsva.value = 1.0;

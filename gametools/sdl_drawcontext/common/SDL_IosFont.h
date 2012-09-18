@@ -22,7 +22,7 @@
 class SDL_IosFont : public IosFont
 {
 public:
-    SDL_IosFont(const char *path, int size, IosFontFx fx);
+    SDL_IosFont(const char *path, int size);
     virtual ~SDL_IosFont();
     virtual int getTextWidth(const char *text);
     virtual int getHeight();
@@ -46,7 +46,6 @@ private:
         CachedSurfacesList::iterator listIter;
     };
 private:
-    IosFontFx m_fx;
     int m_height;
     TTF_Font *m_font;
     CachedSurfacesMap m_cacheMap;

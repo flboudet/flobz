@@ -161,14 +161,6 @@ private:
     bool m_enableExceptionOnDeletion;
 };
 
-enum IosFontFx
-{
-    Font_STD,
-    Font_STORY,
-    Font_GREY,
-    Font_DARK
-};
-
 class IosFont
 {
 public:
@@ -183,7 +175,7 @@ class ImageLibrary
 public:
     virtual IosSurface * createImage(ImageType type, int w, int h, ImageSpecialAbility specialAbility = 0) = 0;
     virtual IosSurface * loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0) = 0;
-    virtual IosFont    * createFont(const char *path, int size, IosFontFx fx = Font_STD) = 0;
+    virtual IosFont    * createFont(const char *path, int size) = 0;
 protected:
     virtual ~ImageLibrary() {}
 };

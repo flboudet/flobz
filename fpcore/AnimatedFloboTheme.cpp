@@ -279,7 +279,6 @@ void ThemeManagerImpl::loadFontDefinition(GoomSL *gsl, const char *fontName, Fon
     fontFxVar << "level." << fontName << ".fx";
     font.fontPath = (const char *) GSL_GLOBAL_PTR(gsl, fontPathVar.str().c_str());
     font.fontSize     = GSL_GLOBAL_INT(gsl, fontSizeVar.str().c_str());
-    font.fontFx = (IosFontFx)(GSL_GLOBAL_INT(gsl, fontFxVar.str().c_str()));
     font.fontColor = GT_WHITE;
 }
 
@@ -735,7 +734,7 @@ IosFont *LevelThemeImpl::getPlayerNameFont() const
         if (fontPath == "__FONT__") {
             fontPath = theCommander->getLocalizedFontName();
         }
-        m_playerNameFont = theCommander->getFont(fontPath.c_str(), m_desc.playerNameFont.fontSize, m_desc.playerNameFont.fontFx);
+        m_playerNameFont = theCommander->getFont(fontPath.c_str(), m_desc.playerNameFont.fontSize);
     }
     return m_playerNameFont;
 }
@@ -747,7 +746,7 @@ IosFont *LevelThemeImpl::getScoreFont() const
         if (fontPath == "__FONT__") {
             fontPath = theCommander->getLocalizedFontName();
         }
-        m_scoreFont = theCommander->getFont(fontPath.c_str(), m_desc.scoreFont.fontSize, m_desc.scoreFont.fontFx);
+        m_scoreFont = theCommander->getFont(fontPath.c_str(), m_desc.scoreFont.fontSize);
     }
     return m_scoreFont;
 }

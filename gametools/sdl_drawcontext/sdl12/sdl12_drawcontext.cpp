@@ -175,13 +175,13 @@ inline static void fillRect_(SDL_Surface *surf, const IosRect *rect, const RGBA 
 class SDL12_IosFont : public SDL_IosFont
 {
 public:
-    SDL12_IosFont(const char *path, int size, IosFontFx fx);
+    SDL12_IosFont(const char *path, int size);
 protected:
     virtual IosSurface *createSurface(SDL_Surface *src);
 };
 
-SDL12_IosFont::SDL12_IosFont(const char *path, int size, IosFontFx fx)
-  : SDL_IosFont(path, size, fx)
+SDL12_IosFont::SDL12_IosFont(const char *path, int size)
+  : SDL_IosFont(path, size)
 {}
 
 IosSurface *SDL12_IosFont::createSurface(SDL_Surface *src)
@@ -366,10 +366,10 @@ IosSurface * SDL12_ImageLibrary::loadImage(ImageType type, const char *path, Ima
     return new SDL12_IosSurface(retsurf);
 }
 
-IosFont *SDL12_ImageLibrary::createFont(const char *path, int size, IosFontFx fx)
+IosFont *SDL12_ImageLibrary::createFont(const char *path, int size)
 {
     String fullPath = m_dataPathManager.getPath(path);
-    IosFont *result = new SDL12_IosFont(fullPath, size, fx);
+    IosFont *result = new SDL12_IosFont(fullPath, size);
     DBG_FONT = result;
     return result;
 }

@@ -97,7 +97,7 @@ public:
     virtual ~OpenGLImageLibrary() {}
     virtual IosSurface * createImage(ImageType type, int w, int h, ImageSpecialAbility abilities);
     virtual IosSurface * loadImage(ImageType type, const char *path, ImageSpecialAbility abilities);
-    virtual IosFont    * createFont(const char *path, int size, IosFontFx fx = Font_STD);
+    virtual IosFont    * createFont(const char *path, int size);
 private:
     OpenGLDrawContext *m_owner;
     OpenGLBackendUtil *m_backendUtil;

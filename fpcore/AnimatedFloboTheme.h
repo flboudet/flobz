@@ -73,7 +73,6 @@ class FontDefinition {
 public:
     std::string fontPath;
     int fontSize;
-    IosFontFx fontFx;
     RGBA fontColor;
 };
 

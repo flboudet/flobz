@@ -12,10 +12,15 @@ namespace gameui {
     float        GameUIDefaults::SPACING          = 16.0f;
     IosFont      *GameUIDefaults::FONT             = NULL;
     IosFont      *GameUIDefaults::FONT_TEXT        = NULL;
+    RGBA          GameUIDefaults::FONT_COLOR       = GT_WHITE;
     IosFont      *GameUIDefaults::FONT_INACTIVE    = NULL;
+    RGBA          GameUIDefaults::FONT_INACTIVE_COLOR = GT_WHITE;
     IosFont      *GameUIDefaults::FONT_SMALL_ACTIVE= NULL;
+    RGBA          GameUIDefaults::FONT_SMALL_COLOR = GT_WHITE;
     IosFont      *GameUIDefaults::FONT_SMALL_INFO  = NULL;
+    RGBA          GameUIDefaults::FONT_SMALL_INFO_COLOR = GT_WHITE;
     IosFont      *GameUIDefaults::FONT_FUNNY       = NULL;
+    RGBA          GameUIDefaults::FONT_FUNNY_COLOR = GT_WHITE;
     GameLoop    *GameUIDefaults::GAME_LOOP        = new GameLoop();
     ScreenStack *GameUIDefaults::SCREEN_STACK     = new ScreenStack();
     audio_manager::Sound *GameUIDefaults::SLIDE_SOUND = NULL;
@@ -1305,7 +1310,7 @@ namespace gameui {
 
     Text::Text()
         : label(""), offset(0.0,0.0,0.0), m_textAlign(TEXT_LEFT_ALIGN),
-          m_autoSize(true), mdontMove(true), m_slideSound(GameUIDefaults::SLIDE_SOUND), m_color(GT_WHITE), m_shadow(false)
+          m_autoSize(true), mdontMove(true), m_slideSound(GameUIDefaults::SLIDE_SOUND), m_color(GameUIDefaults::FONT_COLOR), m_shadow(false)
     {
         this->font = GameUIDefaults::FONT_TEXT;
         setPreferedSize(Vec3(m_autoSize?this->font->getTextWidth(label):0.0f, this->font->getHeight(), 1.0));
@@ -1316,7 +1321,7 @@ namespace gameui {
     Text::Text(const String &label, IosFont *font, bool autosize)
         : font(font), label(label), offset(0.0,0.0,0.0),
           m_textAlign(TEXT_LEFT_ALIGN), m_autoSize(autosize),
-          mdontMove(true), m_slideSound(GameUIDefaults::SLIDE_SOUND), m_shadow(false)
+          mdontMove(true), m_slideSound(GameUIDefaults::SLIDE_SOUND), m_color(GameUIDefaults::FONT_COLOR), m_shadow(false)
     {
         if (font == NULL) this->font = GameUIDefaults::FONT_TEXT;
         setPreferedSize(Vec3(m_autoSize?this->font->getTextWidth(label):0.0f, this->font->getHeight(), 1.0));
@@ -1511,6 +1516,7 @@ namespace gameui {
         this->fontInactive = fontInactive;
 
         font = fontInactive;
+        m_color = GameUIDefaults::FONT_INACTIVE_COLOR;
         setFocusable(true);
         mdontMove = false;
 		setReceiveUpEvents(true);

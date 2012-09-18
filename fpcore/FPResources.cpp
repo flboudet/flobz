@@ -39,7 +39,7 @@ IosFont *IosFontFactory::create(const IosFontResourceKey &resourceKey)
                 resourceKey.path.c_str(), resourceKey.type);
 #endif
         ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
-        IosFont *newFont = iimLib.createFont(resourceKey.path.c_str(), resourceKey.size, resourceKey.fx);
+        IosFont *newFont = iimLib.createFont(resourceKey.path.c_str(), resourceKey.size);
         return newFont;
     }
     catch (Exception e) {

@@ -44,7 +44,7 @@ public:
     virtual void drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect) {}
     virtual void drawRotatedCentered(IosSurface *surf, int angle, int x, int y) {}
 	virtual void fillRect(const IosRect *rect, const RGBA &color) {}
-    virtual void putString(IosFont *font, int x, int y, const char *text) {}
+    virtual void putString(IosFont *font, int x, int y, const char *text, const RGBA &color) {}
 };
 
 class NullFont : public IosFont
@@ -64,7 +64,7 @@ public:
     virtual IosSurface * loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility) {
         return new NullSurface(32, 32);
     }
-    virtual IosFont    * createFont(const char *path, int size, IosFontFx fx) {
+    virtual IosFont    * createFont(const char *path, int size) {
         return new NullFont();
     }
 };
