@@ -916,6 +916,14 @@ namespace gameui {
         else m_outsidePosition = 640;
     }
 
+    void SliderContainer::changeContent(Widget *content)
+    {
+        if (contentWidget != NULL)
+            remove(contentWidget);
+        add(content);
+        contentWidget = content;
+    }
+
     void SliderContainer::idle(double currentTime)
     {
         if (sliding && slideStartTime == 0)

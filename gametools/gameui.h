@@ -364,6 +364,11 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
        */
       void transitionToContent(Widget *content);
       /**
+       * Changes content of the slider instantaneously (without transition)
+       * @param content  The widget to be placed inside the slider when the slider slides back
+       */
+      void changeContent(Widget *content);
+      /**
        * Returns the widget contained inside the slider
        * @return  the widget contained inside the slider
        */
