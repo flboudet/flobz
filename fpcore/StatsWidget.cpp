@@ -79,7 +79,7 @@ void ProgressBarWidget::draw(DrawTarget *dt)
     dstrect.y = bpos.y+bsize.y-1;
     dstrect.w = bsize.x;
     dstrect.h = 1;
-    RGBA bgColor = { 0x11, 0x66, 0x66, 0x66 };
+    RGBA bgColor(0x11, 0x66, 0x66, 0x66);
     dt->fillRect(&dstrect, bgColor);
 
     static const int IMG_FLOBO_WIDTH = 52;

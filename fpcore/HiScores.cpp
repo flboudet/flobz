@@ -2,6 +2,7 @@
 #include <sstream>
 #include <list>
 #include "HiScores.h"
+#include "HallOfFame.h"
 #include "GTLog.h"
 
 #include "FPCommander.h"

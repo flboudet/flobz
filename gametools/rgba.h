@@ -3,12 +3,13 @@
 
 #include <stdint.h>
 
-typedef struct _RGBA {
+struct RGBA {
+  RGBA(uint8_t red=0, uint8_t green=0, uint8_t blue=0, uint8_t alpha=0) :red(red),green(green),blue(blue),alpha(alpha) {}
   uint8_t red;
   uint8_t green;
   uint8_t blue;
   uint8_t alpha;
-} RGBA;
+};
 
 typedef struct _HSVA {
   float hue;

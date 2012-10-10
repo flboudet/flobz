@@ -15,7 +15,7 @@ public:
 	virtual bool haveAbility(int ability) const { return true; }
 	virtual void dropAbility(int ability) {}
     virtual RGBA readRGBA(int x, int y) {
-        RGBA rgba = {0, 0, 0, 0};
+        RGBA rgba(0, 0, 0, 0);
         return rgba;
     }
     virtual IosSurface *shiftHue(float hue_offset, IosSurface *mask = NULL) {

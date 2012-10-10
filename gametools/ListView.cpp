@@ -101,7 +101,7 @@ void ScrollWidget::draw(DrawTarget *dt)
     if ((m_bgSurface == NULL) || ((int)(bsize.x) != m_bgSurface->w) || ((int)(bsize.y) != m_bgSurface->h)) {
         if (m_bgSurface != NULL)
             delete m_bgSurface;
-        RGBA color = {0x80, 0x00, 0x00, 0x80};
+        RGBA color (0x80, 0x00, 0x00, 0x80);
         ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
         m_bgSurface = iimLib.createImage(IMAGE_RGBA, (int)(bsize.x), (int)(bsize.y));
         m_bgSurface->fillRect(&srcrect, color);
@@ -120,7 +120,7 @@ void ScrollWidget::draw(DrawTarget *dt)
     // Drawing the thumb
     dstrect.y += firstVisibleOffset;
     dstrect.h = lastVisibleOffset - firstVisibleOffset;
-    RGBA thumbColor = {0xAA, 0xAA, 0xAA, 0xAA};
+    RGBA thumbColor (0xAA, 0xAA, 0xAA, 0xAA);
     dt->fillRect(&dstrect, thumbColor);
 }
 
