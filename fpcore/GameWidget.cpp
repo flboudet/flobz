@@ -34,19 +34,26 @@ const char *p2name = "Player2";
 
 static void *openFileFunction(StyrolyseClient *_this, const char *file_name)
 {
-    return (void *)(theCommander->getDataPathManager().openDataInputStream(file_name));
+    if (theCommander->getDataPathManager().hasDataInputStream(file_name))
+        return (void *)(theCommander->getDataPathManager().openDataInputStream(file_name));
+    else
+        return NULL;
 }
 
 static void closeFileFunction(StyrolyseClient *_this, void *file)
 {
     DataInputStream *s = (DataInputStream *)file;
-    delete s;
+    if (s)
+        delete s;
 }
 
 static int readFileFunction(StyrolyseClient *_this, void *buffer, void *file, int read_size)
 {
     DataInputStream *s = (DataInputStream *)file;
-    return s->streamRead(buffer, read_size);
+    if (s)
+        return s->streamRead(buffer, read_size);
+    else
+        return 0;
 }
 
 

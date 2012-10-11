@@ -81,13 +81,15 @@ ThemeManagerImpl::ThemeManagerImpl(DataPathManager &dataPathManager)
       m_defaultLevelThemeName("Basic level")
 {
     // List the themes in the various pack folders
-    SelfVector<String> themeFolders = dataPathManager.getEntriesAtPath("theme");
-    // Load the themes from the list (only those matching the correct extension)
-    for (int i = 0 ; i < themeFolders.size() ; i++) {
-        if (themeFolders[i].substring(themeFolders[i].size() - 8)
-            == s_themeFolderExtension) {
-            //cout << "Theme to be loaded: " << (const char *)(themeFolders[i]) << endl;
-            loadThemePack((const char *)themeFolders[i]);
+    if (dataPathManager.hasFile("theme")) {
+        SelfVector<String> themeFolders = dataPathManager.getEntriesAtPath("theme");
+        // Load the themes from the list (only those matching the correct extension)
+        for (int i = 0 ; i < themeFolders.size() ; i++) {
+            if (themeFolders[i].substring(themeFolders[i].size() - 8)
+                == s_themeFolderExtension) {
+                //cout << "Theme to be loaded: " << (const char *)(themeFolders[i]) << endl;
+                loadThemePack((const char *)themeFolders[i]);
+            }
         }
     }
 }

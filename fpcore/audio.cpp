@@ -47,6 +47,7 @@ void Jukebox::playTrack()
 
 AudioHelper::AudioHelper()
 {
+    GTLogTrace("addListeners");
     // Listen to notifications
     GlobalNotificationCenter.addListener(String(kMusicVolume), this);
     GlobalNotificationCenter.addListener(String(kSoundVolume), this);
@@ -54,14 +55,21 @@ AudioHelper::AudioHelper()
     GlobalNotificationCenter.addListener(String(kSound), this);
     // Initialize preferences
     m_audioManager = GameUIDefaults::GAME_LOOP->getAudioManager();
+    GTLogTrace("getPrefs");
+    GTLogTrace("PreferenceManager = 0x%x", theCommander->getPreferencesManager());
     m_music_on = theCommander->getPreferencesManager()->getBoolPreference(kMusic,true);
+    GTLogTrace("getPrefs >");
     m_sound_on = theCommander->getPreferencesManager()->getBoolPreference(kSound,true);
+    GTLogTrace("getPrefs >>");
     m_music_volume = ((float)(theCommander->getPreferencesManager()->getIntPreference(kMusicVolume, 100)))/100.0f;
+    GTLogTrace("getPrefs >>>");
     m_sound_volume = ((float)(theCommander->getPreferencesManager()->getIntPreference(kSoundVolume, 100)))/100.0f;
+    GTLogTrace("enable/disable");
     m_audioManager->setSoundEnabled(m_sound_on);
     m_audioManager->setMusicEnabled(m_music_on);
     m_audioManager->setSoundVolume(m_sound_volume);
     m_audioManager->setMusicVolume(m_music_volume);
+    GTLogTrace("done");
 }
 
 AudioHelper::~AudioHelper()

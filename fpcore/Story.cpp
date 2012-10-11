@@ -42,19 +42,26 @@ static char *pathResolverFunction (StyrolyseClient *_this, const char *path)
 
 static void *openFileFunction(StyrolyseClient *_this, const char *file_name)
 {
-    return (void *)(theCommander->getDataPathManager().openDataInputStream(file_name));
+    if (theCommander->getDataPathManager().hasDataInputStream(file_name))
+        return (void *)(theCommander->getDataPathManager().openDataInputStream(file_name));
+    else
+        return NULL;
 }
 
 static void closeFileFunction(StyrolyseClient *_this, void *file)
 {
     DataInputStream *s = (DataInputStream *)file;
-    delete s;
+    if (s)
+        delete s;
 }
 
 static int readFileFunction(StyrolyseClient *_this, void *buffer, void *file, int read_size)
 {
     DataInputStream *s = (DataInputStream *)file;
-    return s->streamRead(buffer, read_size);
+    if (s)
+        return s->streamRead(buffer, read_size);
+    else
+        return 0;
 }
 
 // "@state.type"
@@ -221,11 +228,8 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
         styrolyse_init(path0.c_str(), path1.c_str(), path2.c_str());
         classInitialized = true;
     }
-    try {
-        fullPath = String("/story/") + screenName;
-        theCommander->getDataPathManager().getPath(fullPath);
-    }
-    catch (Exception e) {
+    fullPath = String("/story/") + screenName;
+    if (!theCommander->getDataPathManager().hasFile(fullPath)) {
         printf("GSL NOT FOUND: %s (%s)\n", screenName.c_str(), (const char *)fullPath);
         fullPath = "/story/error.gsl";
     }

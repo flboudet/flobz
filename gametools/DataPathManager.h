@@ -38,19 +38,26 @@ public:
 
 class DataProvider {
 public:
+    virtual bool hasDataInputStream(const char *shortPath) const = 0;
     virtual DataInputStream *openDataInputStream(const char *shortPath) const = 0;
 };
 
 class DataPackage : public DataProvider {
 public:
+    virtual bool hasFile(const char *shortPath) const = 0;
     virtual std::string getPath(const char *shortPath) const = 0;
     virtual std::string getName() const = 0;
+
+    virtual bool hasDataInputStream(const char *shortPath) const { return hasFile(shortPath); }
 };
 
 class DataPathManager : public DataProvider {
 public:
+    virtual bool hasFile(String shortPath) const = 0;
     virtual String getPath(String shortPath) const = 0;
     virtual SelfVector<String> getEntriesAtPath(String shortPath) const = 0;
+    // DataProvider
+    virtual bool hasDataInputStream(const char *shortPath) const { return hasFile(shortPath); }
 };
 
 #endif // _DATAPATHMANAGER_H

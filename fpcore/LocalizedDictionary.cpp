@@ -299,10 +299,8 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
         String directoryName = FilePath::combine(dictionaryDirectory, locale);
         String dictFilePath = FilePath::combine(directoryName, dictionaryName) + ".dic";
         DataInputStream *dictionaryStream = NULL;
-        try {
+        if (datapathManager.hasDataInputStream(dictFilePath))
             dictionaryStream = datapathManager.openDataInputStream(dictFilePath);
-        }
-        catch (...) {}
         if (dictionaryStream != NULL)
         {
             /* Read all the entries in the dictionary file */

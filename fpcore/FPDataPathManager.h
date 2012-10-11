@@ -40,6 +40,7 @@ public:
     FPDataPackage(FPDataPathManager *owner,
                   const char *packagePath,
                   int packageNumber);
+    virtual bool hasFile(const char *shortPath) const;
     virtual std::string getPath(const char *shortPath) const;
     virtual std::string getName() const;
     virtual DataInputStream *openDataInputStream(const char *shortPath) const;
@@ -67,6 +68,7 @@ public:
 class FPDataPathManager : public AbstractFPDataPathManager {
 public:
     FPDataPathManager(String coreDataPath);
+    virtual bool hasFile(String shortPath) const;
     virtual String getPath(String shortPath) const;
     virtual SelfVector<String> getEntriesAtPath(String shortPath) const;
     virtual DataInputStream *openDataInputStream(const char *shortPath) const;

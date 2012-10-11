@@ -20,7 +20,7 @@
 
 #define GTLogTrace(__fmt, ...) do { \
     char GTLogTraceArray[512]; \
-    snprintf(GTLogTraceArray, 512, "%s:" __fmt, __FUNCTION__, ## __VA_ARGS__); \
+    snprintf(GTLogTraceArray, 512, "%s(): " __fmt, __FUNCTION__, ## __VA_ARGS__); \
     Logger::instance.logln(GTLogTraceArray); \
 } while(0)
 

@@ -80,23 +80,34 @@ PackageDescription::PackageDescription(DataPathManager &dataPathManager,
                                        Jukebox *jukebox)
     : m_cDC(cDC), m_jukebox(jukebox)
 {
-    try {
-        package.getPath("Description.gsl").c_str();
+    GTLogTrace("++");
+    if (package.hasFile("Description.gsl")) {
+        /*
+           catch (ios_fc::Exception e) {
+           GTLogTrace("Warning: No description file in package %s", package.getName().c_str());
+           return;
+           }
+           catch (...) {
+           GTLogTrace("Error while checking for a file in package %s", package.getName().c_str());
+           return;
+           } */
+        GoomSL * gsl = gsl_new();
+        GTLogTrace("GSL = 0x%x", gsl);
+        if (!gsl) return;
+        GSLFA_setupWrapper(gsl, &dataPathManager, &package);
+        GTLogTrace("Wrapper Set");
+        gsl_set_userdata(gsl, "PackageDescription", this);
+        gsl_push_file(gsl, "/lib/packagelib.gsl");
+        gsl_push_file(gsl, "@/Description.gsl");
+        gsl_compile(gsl);
+        sbind(gsl);
+        gsl_execute(gsl);
+        gsl_free(gsl);
     }
-    catch (...) {
-        cerr << "Warning: No description file in package " << package.getName() << endl;
-        return;
+    else {
+        GTLogTrace("Warning: No description file in package %s", package.getName().c_str());
     }
-    GoomSL * gsl = gsl_new();
-    if (!gsl) return;
-    GSLFA_setupWrapper(gsl, &dataPathManager, &package);
-    gsl_set_userdata(gsl, "PackageDescription", this);
-    gsl_push_file(gsl, "/lib/packagelib.gsl");
-    gsl_push_file(gsl, "@/Description.gsl");
-    gsl_compile(gsl);
-    sbind(gsl);
-    gsl_execute(gsl);
-    gsl_free(gsl);
+    GTLogTrace("--");
 }
 
 PackageDescription::PackageDescription(GoomSL *gsl,

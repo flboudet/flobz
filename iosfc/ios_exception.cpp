@@ -3,6 +3,9 @@
  *
  * This program is distributed under the terms of the
  * GNU General Public Licence
+ *
+ * ChangeLog:
+ *   2012/10/10: Added backtrace support for android (requires android >= 2.2 and ndk >= r8)
  */
 
 #include "ios_exception.h"
@@ -14,10 +17,34 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#if defined(ANDROID)
+# define USE_UNWIND 1
+#endif
+
 #ifdef GENERATE_BACKTRACE
-#include <execinfo.h>
-#include <cxxabi.h>
-#include <signal.h>
+# if USE_UNWIND
+#  include <unwind.h>
+#  include <dlfcn.h>
+
+
+static _Unwind_Reason_Code my_unwind_trace_func(struct _Unwind_Context* context, void* arg) {
+    void *ip = (void *)_Unwind_GetIP(context);
+    std::stringstream &out = *(std::stringstream*)arg;
+    if(ip) {
+        Dl_info dyldInfo;
+        if (dladdr(ip, &dyldInfo)) {
+            out << " >> " << dyldInfo.dli_sname << "\n";
+        }
+    }
+    return(_URC_NO_REASON);
+}
+
+# else
+#  include <execinfo.h>
+#  include <cxxabi.h>
+#  include <signal.h>
+# endif
 #endif
 
 using namespace std;
@@ -32,10 +59,12 @@ namespace ios_fc {
         char **stack_strings;
         std::stringstream out;
 #ifdef GENERATE_BACKTRACE
+#if USE_UNWIND
+        out << "Call stack:\n";
+        _Unwind_Reason_Code code = _Unwind_Backtrace(my_unwind_trace_func,&out);
+#else
         stack_depth = backtrace(stack_addrs, max_depth);
         stack_strings = backtrace_symbols(stack_addrs, stack_depth);
-#endif
-#ifdef GENERATE_BACKTRACE
         out << "Call stack:\n";
 
         for (size_t i = 1; i < stack_depth; i++) {
@@ -78,6 +107,7 @@ namespace ios_fc {
             free(function);
         }
         free(stack_strings); // malloc()ed by backtrace_symbols
+#endif
 #endif
         return out.str();
     }

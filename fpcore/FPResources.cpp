@@ -58,13 +58,15 @@ audio_manager::Sound * SoundFactory::create(const std::string &path)
 #ifdef PRODUCE_CACHE_FILE
         fprintf(cacheOutputGsl, "  [cache_sound: path=\"%s\"]\n", path.c_str());
 #endif
-        String fullPath = m_dataPathManager.getPath(path.c_str());
-        audio_manager::Sound *newSound = GameUIDefaults::GAME_LOOP->getAudioManager()->loadSound(fullPath);
-        return newSound;
+        if (m_dataPathManager.hasFile(path.c_str())) {
+            String fullPath = m_dataPathManager.getPath(path.c_str());
+            audio_manager::Sound *newSound = GameUIDefaults::GAME_LOOP->getAudioManager()->loadSound(fullPath);
+            return newSound;
+        }
     }
     catch (Exception e) {
-        return NULL;
     }
+    return NULL;
 }
 
 void SoundFactory::destroy(audio_manager::Sound *res)
@@ -78,13 +80,15 @@ audio_manager::Music * MusicFactory::create(const std::string &path)
 #ifdef PRODUCE_CACHE_FILE
         fprintf(cacheOutputGsl, "  [cache_music: path=\"%s\"]\n", path.c_str());
 #endif
-        String fullPath = m_dataPathManager.getPath(path.c_str());
-        audio_manager::Music *newMusic = GameUIDefaults::GAME_LOOP->getAudioManager()->loadMusic(fullPath);
-        return newMusic;
+        if (m_dataPathManager.hasFile(path.c_str())) {
+            String fullPath = m_dataPathManager.getPath(path.c_str());
+            audio_manager::Music *newMusic = GameUIDefaults::GAME_LOOP->getAudioManager()->loadMusic(fullPath);
+            return newMusic;
+        }
     }
     catch (Exception e) {
-        return NULL;
     }
+    return NULL;
 }
 
 void MusicFactory::destroy(audio_manager::Music *res)

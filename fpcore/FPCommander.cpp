@@ -49,7 +49,7 @@ FPCommander::FPCommander(DataPathManager *dataPathManager,
     m_levelThemeFactory(*m_themeManager),
     m_cursor(NULL)
 {
-  GTLogTrace("FPCommander constructor");
+  GTLogTrace("++");
 #ifdef PRODUCE_CACHE_FILE
   cacheOutputGsl = fopen("cache.gsl", "w");
 #endif
@@ -57,8 +57,9 @@ FPCommander::FPCommander(DataPathManager *dataPathManager,
   theCommander = this;
 
   createResourceManagers();
+  GTLogTrace("audioHelper");
   m_audioHelper.reset(new AudioHelper());
-  GTLogTrace("FPCommander constructor finished");
+  GTLogTrace("--");
 }
 
 void FPCommander::initWithGUI(bool fs)
@@ -359,6 +360,7 @@ void FPCommander::setCursorVisible(bool visible)
 
 void FPCommander::createResourceManagers()
 {
+    GTLogTrace("++");
 #ifdef THREADED_RESOURCE_MANAGER
     m_surfaceResManager.reset(new ThreadedResourceManager<IosSurface, IosSurfaceResourceKey>(m_surfaceFactory));
     m_fontResManager.reset(new ThreadedResourceManager<IosFont, IosFontResourceKey>(m_fontFactory));
@@ -372,6 +374,7 @@ void FPCommander::createResourceManagers()
     m_floboSetThemeResManager.reset(new SimpleResourceManager<FloboSetTheme>(m_floboSetThemeFactory));
     m_levelThemeResManager.reset(new SimpleResourceManager<LevelTheme>(m_levelThemeFactory));
 #endif
+    GTLogTrace("--");
 }
 
 void FPCommander::playMusicTrack(const char *trackName)

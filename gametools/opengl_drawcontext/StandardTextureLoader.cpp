@@ -105,6 +105,10 @@ static void libpngUserReadData(png_structp pngPtr, png_bytep data, png_size_t le
 
 OpenGLRawImage * StandardTextureLoader::loadImagePNG(ImageType type, const char *path)
 {
+    if (!m_dataPathManager->hasDataInputStream(path)) {
+        GTLogTrace("ERROR: PNG FILE %s NOT FOUND", path);
+        return NULL;
+    }
     std::auto_ptr<DataInputStream> pngfile(m_dataPathManager->openDataInputStream(path));
     if (pngfile.get() == NULL)
         return NULL;
@@ -260,6 +264,10 @@ static void term_source (j_decompress_ptr cinfo)
 
 OpenGLRawImage * StandardTextureLoader::loadImageJPG(ImageType type, const char *path)
 {
+    if (!m_dataPathManager->hasDataInputStream(path)) {
+        GTLogTrace("ERROR: JPG FILE %s NOT FOUND", path);
+        return NULL;
+    }
     std::auto_ptr<DataInputStream> jpgfile(m_dataPathManager->openDataInputStream(path));
     if (jpgfile.get() == NULL)
         return NULL;

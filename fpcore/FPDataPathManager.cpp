@@ -61,7 +61,17 @@ FPDataPackage::FPDataPackage(FPDataPathManager *owner,
 
 std::string FPDataPackage::getPath(const char *shortPath) const
 {
-    return (const char *)(m_owner->getPathInPack(shortPath, m_packageNumber));
+    String ret = (m_owner->getPathInPack(shortPath, m_packageNumber));
+    if (ret != "")
+        return (const char *) ret;
+    else
+        throw Exception(String("File ") + shortPath + " not found !");
+}
+
+bool FPDataPackage::hasFile(const char *shortPath) const
+{
+    String ret = (m_owner->getPathInPack(shortPath, m_packageNumber));
+    return (ret != "");
 }
 
 std::string FPDataPackage::getName() const
@@ -120,6 +130,16 @@ void FPDataPathManager::registerDataPackages(CompositeDrawContext *cDC, Jukebox 
     }
 }
 
+bool FPDataPathManager::hasFile(String shortPath) const
+{
+    for (int i = 0 ; i < m_dataPaths.size() ; i++) {
+        FilePath testPath(m_dataPaths[i].combine(shortPath));
+        if (testPath.exists())
+            return true;
+    }
+    return false;
+}
+
 String FPDataPathManager::getPath(String shortPath) const
 {
     for (int i = 0 ; i < m_dataPaths.size() ; i++) {
@@ -135,20 +155,24 @@ String FPDataPathManager::getPathInPack(String shortPath, int packPathIndex) con
     FilePath testPath(m_dataPaths[packPathIndex].combine(shortPath));
     if (testPath.exists())
         return testPath.getPathString();
-    throw Exception(String("File ") + shortPath + " not found !");
+    else
+        return "";
+    // throw Exception(String("File ") + shortPath + " not found !");
 }
 
 SelfVector<String> FPDataPathManager::getEntriesAtPath(String shortPath) const
 {
-    FilePath rshortPath(shortPath);
     SelfVector<String> result;
-    for (int i = 0 ; i < m_dataPaths.size() ; i++) {
-        FilePath testPath(m_dataPaths[i].combine(shortPath));
-        if (testPath.exists()) {
-            SelfVector<String> existingFilesInPack = testPath.listFiles();
-            for (int j = 0 ; j < existingFilesInPack.size() ; j++)
-            {
-                result.add(rshortPath.combine(existingFilesInPack[j]));
+    if (hasFile(shortPath)) {
+        FilePath rshortPath(shortPath);
+        for (int i = 0 ; i < m_dataPaths.size() ; i++) {
+            FilePath testPath(m_dataPaths[i].combine(shortPath));
+            if (testPath.exists()) {
+                SelfVector<String> existingFilesInPack = testPath.listFiles();
+                for (int j = 0 ; j < existingFilesInPack.size() ; j++)
+                {
+                    result.add(rshortPath.combine(existingFilesInPack[j]));
+                }
             }
         }
     }
