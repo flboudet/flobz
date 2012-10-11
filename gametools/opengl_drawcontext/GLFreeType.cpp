@@ -16,6 +16,7 @@
 //catch any exceptions that we throw.
 #include <stdexcept>
 
+#ifdef DEBUG
 #define GL_GET_ERROR() \
 while(1) {\
     GLenum err = glGetError(); \
@@ -23,6 +24,9 @@ while(1) {\
        fprintf(stderr, "OpenGL Error: %s:%d, %d\n", __FILE__, __LINE__, err); \
     break; \
 }
+#else
+#define GL_GET_ERROR() {}
+#endif
 
 namespace flobopop {
 
@@ -270,11 +274,12 @@ using std::string;
         //glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT  | GL_ENABLE_BIT | GL_TRANSFORM_BIT);
         //glMatrixMode(GL_MODELVIEW);
 
-        glDisable(GL_LIGHTING);
+        glDisable(GL_LIGHTING); GL_GET_ERROR();
         glEnable(GL_TEXTURE_2D);
         glDisable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        GL_GET_ERROR();
 
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -299,6 +304,7 @@ using std::string;
         //glDisableClientState(GL_VERTEX_ARRAY);
         //glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         glDisable(GL_BLEND);
+        GL_GET_ERROR();
     }
 
 }

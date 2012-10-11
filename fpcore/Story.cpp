@@ -215,7 +215,7 @@ bool StoryWidget::classInitialized = false;
 StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
     : IdleComponent(), localeDictionary(NULL), finishedAction(finishedAction), once(false), last_time(-1.), fxMode(fxMode), m_renderEnabled(true)
 {
-    GTLogTrace("StoryWidget::StoryWidget(%s)", (const char *)screenName);
+    // GTLogTrace("StoryWidget::StoryWidget(%s)", (const char *)screenName);
     try {
         localeDictionary = new LocalizedDictionary(theCommander->getDataPathManager(), "locale/story", screenName);
     } catch (...) {
@@ -251,10 +251,10 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
     client.styroClient.cacheSound   = ::cacheSound;
     client.styroClient.cacheMusic   = ::cacheMusic;
     client.widget = this;
-    GTLogTrace("StoryWidget::StoryWidget() styrolyse_new(%s)", (const char *)fullPath);
+    // GTLogTrace("StoryWidget::StoryWidget() styrolyse_new(%s)", (const char *)fullPath);
     client.attachedTheme = NULL;
     currentStory = styrolyse_new((const char *)fullPath, (StyrolyseClient *)(&client), fxMode);
-    GTLogTrace("StoryWidget::StoryWidget() styrolyse_new finished");
+    // GTLogTrace("StoryWidget::StoryWidget() styrolyse_new finished");
 }
 
 StoryWidget::~StoryWidget()

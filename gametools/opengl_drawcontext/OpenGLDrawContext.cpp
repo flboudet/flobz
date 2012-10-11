@@ -17,6 +17,7 @@
 using namespace  flobopop;
 
 
+#ifdef DEBUG
 #define GL_GET_ERROR() \
 while(1) {\
 GLenum err = glGetError(); \
@@ -24,6 +25,9 @@ if (err != GL_NO_ERROR) \
 GTLogTrace("OpenGL Error: %s:%d, %d\n", __FILE__, __LINE__, err); \
 break; \
 }
+#else
+#define GL_GET_ERROR() {}
+#endif
 
 static float gray_alpha = 1.0f; // XXX: hack pour le menu pause...
 
@@ -375,13 +379,13 @@ static void iglBindFramebufferOES(GLuint i, GLfloat *matrix) {
     static GLfloat *gCurrentMatrix = NULL;
 	if (i != gCurrentFBO) {
 #ifdef OPENGLES
-        glBindFramebufferOES(GL_FRAMEBUFFER_OES, i);
+        glBindFramebufferOES(GL_FRAMEBUFFER_OES, i); GL_GET_ERROR();
 #else
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, i);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, i); GL_GET_ERROR();
 #endif
     }
 	if ((matrix) && (matrix != gCurrentMatrix)) {
-        glLoadMatrixf(matrix);
+        glLoadMatrixf(matrix); GL_GET_ERROR();
         gCurrentMatrix = matrix;
     }
 	gCurrentFBO = i;
@@ -423,6 +427,7 @@ public:
 
 	virtual ~OpenGLIosFont() {
 		mCustomFont->clean();
+        GL_GET_ERROR();
 		delete mCustomFont;
 	}
     virtual int getTextWidth(const char *text);
@@ -452,9 +457,9 @@ public:
 
 		}
 #endif
-        glColor4ub(color.red,color.green,color.blue, color.alpha);
+        glColor4ub(color.red,color.green,color.blue, color.alpha); GL_GET_ERROR();
         mCustomFont->printUnicode(x,y, utxt);
-		glColor4ub(0xFF,0xFF,0xFF,0xFF);
+		glColor4ub(0xFF,0xFF,0xFF,0xFF); GL_GET_ERROR();
 	}
 	void printCentered(float x, float y, const char *txt) {
         // TODO: ensure correct matrix
@@ -517,6 +522,8 @@ private:
 		if (m_textureOK)
             return m_texture;
         // Otherwise, generate the texture and return its identifiant
+        GL_GET_ERROR();
+        GTLogTrace("(%d,%d ... %d,%d) %s", m_w,m_h,m_p2w,m_p2h, ios_fc::get_stack_trace().c_str());
         glEnable(GL_TEXTURE_2D); GL_GET_ERROR();
         glGenTextures(1, &m_texture); GL_GET_ERROR();
         glBindTexture(GL_TEXTURE_2D, m_texture); GL_GET_ERROR();
@@ -543,7 +550,7 @@ private:
                     emptyData = (GLubyte *)calloc(4 * m_p2w * m_p2h, 1);
                     break;
             }
-            glTexImage2D(GL_TEXTURE_2D, 0, m_format, m_p2w, m_p2h, 0, m_format, GL_UNSIGNED_BYTE, emptyData);
+            glTexImage2D(GL_TEXTURE_2D, 0, m_format, m_p2w, m_p2h, 0, m_format, GL_UNSIGNED_BYTE, emptyData); GL_GET_ERROR();
             free(emptyData);
         }
         //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); GL_GET_ERROR();
@@ -576,12 +583,12 @@ private:
         }
 #endif
         // Setup OpenGL projection
-        glPushMatrix();
+        glPushMatrix(); GL_GET_ERROR();
         //glViewport(0, 0, this->m_w, this->m_h);
         /*glLoadIdentity();
          glOrthof(0.0, (GLfloat) this->m_w, (GLfloat) this->m_h, 0.0, 0.0, 1.0);*/
-        glTranslatef(0.0f, 480.0f, 0.0f);
-        glScalef(m_owner->getPixelRatioX(),-m_owner->getPixelRatioY(),1);
+        glTranslatef(0.0f, 480.0f, 0.0f); GL_GET_ERROR();
+        glScalef(m_owner->getPixelRatioX(),-m_owner->getPixelRatioY(),1); GL_GET_ERROR();
 #ifdef DISABLED
         /*glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -600,7 +607,8 @@ private:
 	}
 
 	inline void bindTexture() {
-		glBindTexture(GL_TEXTURE_2D, getTexture()); GL_GET_ERROR();
+        GLuint tex = getTexture();
+		glBindTexture(GL_TEXTURE_2D, tex); GL_GET_ERROR();
 		glEnable(GL_TEXTURE_2D); GL_GET_ERROR();
 	}
 	inline void unbindTexture() {
@@ -932,17 +940,17 @@ void IosGLSurfaceRef::fillRect(const IosRect *rect, const RGBA &color)
     vertices[6] = rect->x+rect->w;
     vertices[7] = rect->y+rect->h;
     glDisable(GL_TEXTURE_2D); GL_GET_ERROR();
-    glColor4f(color.red/255.0f, color.green/255.0f, color.blue/255.0f, color.alpha/255.0f);
-    glVertexPointer(2, GL_FLOAT, 0, &vertices[0]);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, &faces[0]);
+    glColor4f(color.red/255.0f, color.green/255.0f, color.blue/255.0f, color.alpha/255.0f); GL_GET_ERROR();
+    glVertexPointer(2, GL_FLOAT, 0, &vertices[0]); GL_GET_ERROR();
+    glEnableClientState(GL_VERTEX_ARRAY); GL_GET_ERROR();
+    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, &faces[0]); GL_GET_ERROR();
     unbindSurface();
 #else
     m_backendUtil->ensureContextIsActive();
     bindSurface();
     // Let's get lazy!
-    glClearColor(color.red/255.0f, color.green/255.0f, color.blue/255.0f, color.alpha/255.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(color.red/255.0f, color.green/255.0f, color.blue/255.0f, color.alpha/255.0f); GL_GET_ERROR();
+    glClear(GL_COLOR_BUFFER_BIT); GL_GET_ERROR();
     // TODO (That's totally out of spec, but FloboPop doesn't need more than this)
     unbindSurface();
 #endif
@@ -951,6 +959,7 @@ void IosGLSurfaceRef::fillRect(const IosRect *rect, const RGBA &color)
 void IosGLSurfaceRef::putString(IosFont *font, int x, int y, const char *text, const RGBA &color)
 {
     m_backendUtil->ensureContextIsActive();
+    GL_GET_ERROR();
     bindSurface();
     OpenGLIosFont *ifont = static_cast<OpenGLIosFont*> (font);
     ifont->print(x,y,text, color);
@@ -995,7 +1004,7 @@ void IosGLSurfaceRef::applyBlendMode(ImageBlendMode mode)
             return;
         case IMAGE_COPY:
             glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE); GL_GET_ERROR();
-            glDisable(GL_BLEND);
+            glDisable(GL_BLEND); GL_GET_ERROR();
             return;
     }
 }
@@ -1020,9 +1029,9 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMod
         odd = !odd;
 
         float zoom_in = 0.2f + 0.35f * (1.0f+sin(1.1*t)) * 0.5f + 0.25f*sin(t*.11)*cos(t*.14)*sin(1.f+t*.13);
-        glDisable(GL_LIGHTING);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_LIGHTING); GL_GET_ERROR();
+        glEnable(GL_BLEND); GL_GET_ERROR();
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); GL_GET_ERROR();
         glColor4f(1.0f,1.0f,1.0f,gray_alpha);
         IosRect nDestRect = *pSrcRect;
         nDestRect.w *= 1.0f + zoom_in;
@@ -1070,19 +1079,19 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMod
     vertices[5] = pDstRect->y+pDstRect->h + dy;
     vertices[6] = vertices[2];
     vertices[7] = vertices[5];
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glColor4f(1.0f,1.0f,1.0f,m_alpha);
-    glTexCoordPointer(2, GL_FLOAT, 0, &texcoord[0]);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glVertexPointer(2, GL_FLOAT, 0, &vertices[0]);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, &faces[0]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); GL_GET_ERROR();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); GL_GET_ERROR();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); GL_GET_ERROR();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); GL_GET_ERROR();
+    glColor4f(1.0f,1.0f,1.0f,m_alpha); GL_GET_ERROR();
+    glTexCoordPointer(2, GL_FLOAT, 0, &texcoord[0]); GL_GET_ERROR();
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY); GL_GET_ERROR();
+    glVertexPointer(2, GL_FLOAT, 0, &vertices[0]); GL_GET_ERROR();
+    glEnableClientState(GL_VERTEX_ARRAY); GL_GET_ERROR();
+    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, &faces[0]); GL_GET_ERROR();
 
 ret:
-    if (gray) glColor4ub(0xff,0xff,0xff,0xff);
+    if (gray) glColor4ub(0xff,0xff,0xff,0xff); GL_GET_ERROR();
     m_ref->unbindTexture();
 }
 
@@ -1168,7 +1177,7 @@ void OpenGLDrawContext::flip()
 #ifdef DISABLED
     iglBindFramebufferOES(defaultFramebuffer, matrix);
     GL_GET_ERROR();
-    glBindRenderbufferOES(GL_RENDERBUFFER_OES, colorRenderbuffer);
+    glBindRenderbufferOES(GL_RENDERBUFFER_OES, colorRenderbuffer); GL_GET_ERROR();
     GL_GET_ERROR();
 #endif
     m_backendUtil->flip();
@@ -1220,13 +1229,13 @@ void OpenGLDrawContext::drawRotatedCentered(IosSurface *surf, int angle, int x, 
 	fixRects(NULL, &dstRect, surf, this, &pSrcRect, &pDstRect);
 	IosGLSurfaceRef *ipSurf = static_cast<IosGLSurfaceRef *> (surf);
 	ipSurf->applyBlendMode(IMAGE_BLEND);
-    glTranslatef(x, y, 0.0f);
-    glRotatef(360-angle, 0, 0, 1);
-    glTranslatef(-x, -y, 0.0f);
+    glTranslatef(x, y, 0.0f); GL_GET_ERROR();
+    glRotatef(360-angle, 0, 0, 1); GL_GET_ERROR();
+    glTranslatef(-x, -y, 0.0f); GL_GET_ERROR();
 	ipSurf->drawToGL(pSrcRect, pDstRect);
-    glTranslatef(x, y, 0.0f);
-    glRotatef(-(360-angle), 0, 0, 1);
-    glTranslatef(-x, -y, 0.0f);
+    glTranslatef(x, y, 0.0f); GL_GET_ERROR();
+    glRotatef(-(360-angle), 0, 0, 1); GL_GET_ERROR();
+    glTranslatef(-x, -y, 0.0f); GL_GET_ERROR();
 	/*this->bindFBO();
      IosRect *pSrcRect, *pDstRect;
      fixRects(NULL, NULL, surf, this, &pSrcRect, &pDstRect);

@@ -327,9 +327,9 @@ Styrolyse *styrolyse_new(const char *fname, StyrolyseClient *client, int fxMode)
     gsl_bind_file_functions(_this->gsl, openFileFunction, closeFileFunction, readFileFunction);
     _this->images = goom_hash_new();
     strncpy(_this->fname, fname, 512);
-    GTLogTrace("styrolyse_new(%s) styrolyse_reload", fname);
+    // GTLogTrace("styrolyse_new(%s) styrolyse_reload", fname);
     styrolyse_reload(_this);
-    GTLogTrace("styrolyse_new() finished");
+    // GTLogTrace("styrolyse_new() finished");
     return _this;
 }
 
@@ -389,9 +389,9 @@ void styrolyse_reload(Styrolyse *_this)
         gsl_push_file(_this->gsl, scriptPath_fx);
     gsl_push_file(_this->gsl, _this->fname);
     styrolyse = _this;
-    GTLogTrace("styrolyse_new() gsl_compile");
+    // GTLogTrace("styrolyse_new() gsl_compile");
     gsl_compile(_this->gsl);
-    GTLogTrace("styrolyse_new() gsl_compile finished");
+    // GTLogTrace("styrolyse_new() gsl_compile finished");
     sbind(_this->gsl);
     styrolyse_execute(_this, 0, 0.0);
 }
