@@ -521,7 +521,7 @@ SDL_Surface *iim_sdlsurface_resize(SDL_Surface *src, int width, int height)
             blue /= (sizew*sizeh);
             //alpha /= (sizew*sizeh);
             alpha = 255;
-            RGBA finalrgba = {(Uint8)red,(Uint8)green,(Uint8)blue,(Uint8)alpha};
+            RGBA finalrgba((Uint8)red,(Uint8)green,(Uint8)blue,(Uint8)alpha);
             iim_surface_set_rgba(ret,x,y,finalrgba);
         }
     }
@@ -576,7 +576,7 @@ SDL_Surface *iim_sdlsurface_resize_alpha(SDL_Surface *src, int width, int height
             blue /= (sizew*sizeh);
             alpha /= (sizew*sizeh);
             //alpha = 255;
-            RGBA finalrgba = {(Uint8)red,(Uint8)green,(Uint8)blue,(Uint8)alpha};
+            RGBA finalrgba((Uint8)red,(Uint8)green,(Uint8)blue,(Uint8)alpha);
             iim_surface_set_rgba(ret,x,y,finalrgba);
         }
     }
@@ -642,7 +642,7 @@ SDL_Surface *iim_sdlsurface_rotate(SDL_Surface *src, int degrees)
             float vy  = (float)y - cy;
             float fromX = (cosa * vx - sina * vy) + cx;
             float fromY = (sina * vx + cosa * vy) + cy;
-            RGBA rgba = {0,0,0,0};
+            RGBA rgba(0,0,0,0);
             if ((fromX>=0)&&(fromY>=0)&&(fromX<src->w)&&(fromY<src->h-1)) {
 
               float ix = floor(fromX);
