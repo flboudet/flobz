@@ -26,6 +26,7 @@
 #ifndef _DATAPATHMANAGER_H
 #define _DATAPATHMANAGER_H
 
+#include <stdint.h>
 #include "ios_filepath.h"
 
 using namespace ios_fc;
