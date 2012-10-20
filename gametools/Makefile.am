@@ -5,7 +5,7 @@ libgametools_la_SOURCES=GTLog.cpp GameCursor.cpp \
          ListView.cpp Frame.cpp FramedButton.cpp FramedEditField.cpp \
 	 mt19937ar.cpp SwitchedButton.cpp RadioButton.cpp NotifyCenter.cpp \
 	 BufferedDrawTarget.cpp CompositeDrawContext.cpp \
-	 PosixPreferencesManager.cpp SlaveEventManager.cpp rgba.cpp
+	 PosixPreferencesManager.cpp SlaveEventManager.cpp rgba.cpp DataPathManager.cpp
 
 libgametools_la_CXXFLAGS = -I$(top_srcdir)/iosfc $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
 
