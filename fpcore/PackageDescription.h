@@ -12,6 +12,7 @@ public:
     static void gsl_strcat(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void start_graphic(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void define_crop(GoomSL *gsl, GoomHash *global, GoomHash *local);
+    static void define_crop_x(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void end_graphic(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void start_music(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void define_track(GoomSL *gsl, GoomHash *global, GoomHash *local);

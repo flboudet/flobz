@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include "CompositeDrawContext.h"
+#include "GTLog.h"
 
 using namespace std;
 using namespace ios_fc;
@@ -20,12 +21,19 @@ CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
 
 CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
                                    SharedPtr<IosSurface> baseSurface,
-                                   const IosRect &cropRect)
+                                   const IosRect &cropRect,
+                                   int w, int h)
     : m_ownerImageLibrary(ownerImageLibrary),
       m_baseSurface(baseSurface), m_isCropped(true), m_cropRect(cropRect), m_blendMode(IMAGE_COPY)
 {
-    w = cropRect.w;
-    h = cropRect.h;
+    if (w == -1)
+        this->w = cropRect.w;
+    else
+        this->w = w;
+    if (h == -1)
+        this->h = cropRect.h;
+    else
+        this->h = h;
 }
 
 CompositeSurface::~CompositeSurface()
@@ -179,7 +187,11 @@ void CompositeSurface::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRect
         m_baseSurface->draw(s->m_baseSurface.get(), &(s->m_cropRect), dstRect);
         return;
     }
-    // TODO: srcRect != NULL
+    else {
+        // TODO: Manage correctly
+        IosRect ssrcRect(s->m_cropRect);
+        m_baseSurface->draw(s->m_baseSurface.get(), &ssrcRect, dstRect);
+    }
 }
 
 void CompositeSurface::drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
@@ -238,7 +250,7 @@ IosSurface * CompositeImageLibrary::loadImage(ImageType type, const char *path, 
     else {
         baseSurface = existingBaseSurface->second;
     }
-    CompositeSurface *result = new CompositeSurface(*this, baseSurface, def->getCropRect());
+    CompositeSurface *result = new CompositeSurface(*this, baseSurface, def->getCropRect(), def->getW(), def->getH());
     return result;
 }
 
@@ -307,6 +319,11 @@ void CompositeDrawContext::draw(IosSurface *surf, IosRect *srcRect, IosRect *dst
         m_baseDrawContext->draw(s->m_baseSurface.get(), &(s->m_cropRect), dstRect);
         return;
     }
+    else {
+        // TODO: Manage correctly
+        IosRect ssrcRect(s->m_cropRect);
+        m_baseDrawContext->draw(s->m_baseSurface.get(), &ssrcRect, dstRect);
+    }
 }
 
 void CompositeDrawContext::drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect)
@@ -342,17 +359,19 @@ void CompositeDrawContext::putString(IosFont *font, int x, int y, const char *te
 
 void CompositeDrawContext::declareCompositeSurface(const char *key,
                                                    const char *path,
-                                                   IosRect &cropRect)
+                                                   IosRect &cropRect,
+                                                   int destw, int desth)
 {
-    m_compositeSurfaceDefs[key] = CompositeSurfaceDefinition(path, cropRect);
+    m_compositeSurfaceDefs[key] = CompositeSurfaceDefinition(path, cropRect, destw, desth);
 }
 
 void CompositeDrawContext::declareCompositeSurface(const char *key,
                                                    const char *path,
-                                                   int x, int y, int w, int h)
+                                                   int x, int y, int w, int h,
+                                                   int destw, int desth)
 {
     IosRect cropRect = {x, y, w, h};
-    declareCompositeSurface(key, path, cropRect);
+    declareCompositeSurface(key, path, cropRect, destw, desth);
 }
 
 CompositeSurfaceDefinition *CompositeDrawContext::getCompositeSurfaceDefinition(const char *key)

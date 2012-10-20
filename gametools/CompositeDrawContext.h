@@ -74,13 +74,16 @@ class CompositeSurfaceDefinition
 {
 public:
     CompositeSurfaceDefinition() {}
-    CompositeSurfaceDefinition(const char *path, const IosRect &cropRect)
-        : m_path(path), m_cropRect(cropRect) {}
+    CompositeSurfaceDefinition(const char *path, const IosRect &cropRect, int w = -1, int h = -1)
+        : m_path(path), m_cropRect(cropRect), m_w(w), m_h(h) {}
     const char *getPath() const { return m_path.data(); }
     const IosRect &getCropRect() const { return m_cropRect; }
+    int getW() const { return m_w; }
+    int getH() const { return m_h; }
 private:
     std::string m_path;
     IosRect m_cropRect;
+    int m_w, m_h;
 };
 
 class CompositeSurface : public IosSurface
@@ -89,7 +92,7 @@ public:
     CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
                      ios_fc::SharedPtr<IosSurface> baseSurface);
     CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
-                     ios_fc::SharedPtr<IosSurface> baseSurface, const IosRect &cropRect);
+                     ios_fc::SharedPtr<IosSurface> baseSurface, const IosRect &cropRect, int w = -1, int h = -1);
     virtual ~CompositeSurface();
     // IosSurface methods
     virtual bool isOpaque() const;
@@ -171,10 +174,11 @@ public:
     DrawContext &getBaseDrawContext() const { return *m_baseDrawContext; }
     void declareCompositeSurface(const char *key,
                                  const char *path,
-                                 IosRect &cropRect);
+                                 IosRect &cropRect,
+                                 int destw = -1, int desth = -1);
     void declareCompositeSurface(const char *key,
                                  const char *path,
-                                 int x, int y, int w, int h);
+                                 int x, int y, int w, int h, int destw = -1, int desth = -1);
     CompositeSurfaceDefinition *getCompositeSurfaceDefinition(const char *key);
 private:
     DrawContext *m_baseDrawContext;
