@@ -36,6 +36,23 @@ public:
     virtual int streamRead(void *buffer, int size) = 0;
 };
 
+class BufferedStream : public DataInputStream {
+    DataInputStream &m_stream;
+    ios_fc::Buffer<uint8_t>  m_buffer;
+    int              m_index;
+public:
+    BufferedStream(DataInputStream &stream) : m_stream(stream), m_buffer(1024), m_index(0) { load(); }
+    char *gets(char *buffer, int size);
+    int   getc();
+    virtual int streamRead(void *buffer, int size);
+    //virtual int streamSkip(int size);
+
+          ios_fc::VoidBuffer data()       { return m_buffer; }
+    const ios_fc::VoidBuffer data() const { return m_buffer; }
+private:
+    void load();
+};
+
 class DataProvider {
 public:
     virtual bool hasDataInputStream(const char *shortPath) const = 0;
