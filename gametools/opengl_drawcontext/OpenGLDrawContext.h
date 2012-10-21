@@ -136,6 +136,9 @@ public:
     // Special properties
     float getPixelRatioX() const { return (float)w / (float)m_viewportWidth; }
     float getPixelRatioY() const { return (float)h / (float)m_viewportHeight; }
+
+    void unrefGlObjects();
+    void freeGlObjects();
 private:
     OpenGLBackendUtil *m_backendUtil;
 private:

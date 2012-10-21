@@ -482,6 +482,19 @@ int OpenGLIosFont::getLineSkip()
     return 10;
 }
 
+class OpenGLTexture;
+
+class OpenGLTextureLibrary {
+    std::list<OpenGLTexture*> m_list;
+public:
+    void   registerTexture(OpenGLTexture *tex) { m_list.push_back(tex); }
+    void unregisterTexture(OpenGLTexture *tex) { m_list.remove(tex);    }
+
+    void unrefGlObjects();
+    void freeGlObjects();
+};
+OpenGLTextureLibrary g_texLib;
+
 // OpenGL Texture
 class OpenGLTexture
 {
@@ -523,7 +536,7 @@ private:
             return m_texture;
         // Otherwise, generate the texture and return its identifiant
         GL_GET_ERROR();
-        GTLogTrace("(%d,%d ... %d,%d) %s", m_w,m_h,m_p2w,m_p2h, ios_fc::get_stack_trace().c_str());
+        // GTLogTrace("(%d,%d ... %d,%d) %s", m_w,m_h,m_p2w,m_p2h, ios_fc::get_stack_trace().c_str());
         glEnable(GL_TEXTURE_2D); GL_GET_ERROR();
         glGenTextures(1, &m_texture); GL_GET_ERROR();
         glBindTexture(GL_TEXTURE_2D, m_texture); GL_GET_ERROR();
@@ -615,11 +628,49 @@ private:
 		// glBindTexture(GL_TEXTURE_2D, 0);
 		glDisable(GL_TEXTURE_2D); GL_GET_ERROR();
 	}
+
+public:
+    inline void unrefGlObjects() {
+        m_texture = 0;
+        m_textureOK = false;
+        m_fbo = 0;
+    }
+
+    inline void freeGlObjects() {
+        if (m_fbo) {
+#ifdef OPENGLES
+            glDeleteFramebuffersOES(1, &m_fbo); GL_GET_ERROR();
+#else
+            glDeleteFramebuffersEXT(1, &m_fbo); GL_GET_ERROR();
+#endif
+        }
+        if (m_texture) {
+            GTLogTrace("Free surface...");
+            glDeleteTextures(1, &m_texture); GL_GET_ERROR();
+        }
+        unrefGlObjects();
+    }
 };
+
+void OpenGLTextureLibrary::unrefGlObjects() {
+    std::list<OpenGLTexture*>::iterator it = m_list.begin();
+    while (it != m_list.end()) {
+        (*it)->unrefGlObjects();
+        ++it;
+    }
+}
+void OpenGLTextureLibrary::freeGlObjects() {
+    std::list<OpenGLTexture*>::iterator it = m_list.begin();
+    while (it != m_list.end()) {
+        (*it)->freeGlObjects();
+        ++it;
+    }
+}
 
 OpenGLTexture::OpenGLTexture(OpenGLDrawContext *owner, GLint format, int w, int h)
 : m_owner(owner), m_preserveRawData(false), m_format(format), m_opaque(m_format==GL_RGB?true:false)
 {
+    g_texLib.registerTexture(this);
     m_h = h;
     m_w = w;
     m_p2w = power_of_2(w);
@@ -633,6 +684,7 @@ OpenGLTexture::OpenGLTexture(OpenGLDrawContext *owner, GLint format, int w, int 
 OpenGLTexture::OpenGLTexture(OpenGLDrawContext *owner, OpenGLRawImage *rawImage, bool preserveRawData)
 : m_owner(owner), m_rawImage(rawImage), m_preserveRawData(preserveRawData), m_format(rawImage->format), m_opaque(m_format==GL_RGB?true:false)
 {
+    g_texLib.registerTexture(this);
     m_h = rawImage->height;
     m_w = rawImage->width;
     m_p2w = rawImage->p2width;
@@ -644,6 +696,7 @@ OpenGLTexture::OpenGLTexture(OpenGLDrawContext *owner, OpenGLRawImage *rawImage,
 }
 
 OpenGLTexture::~OpenGLTexture() {
+    g_texLib.unregisterTexture(this);
     if (m_fbo) {
 #ifdef OPENGLES
         glDeleteFramebuffersOES(1, &m_fbo); GL_GET_ERROR();
@@ -1310,6 +1363,16 @@ void OpenGLDrawContext::startFrame()
 void OpenGLDrawContext::endFrame()
 {
     BENCH.end_frame();
+}
+
+void OpenGLDrawContext::unrefGlObjects()
+{
+    g_texLib.unrefGlObjects();
+}
+
+void OpenGLDrawContext::freeGlObjects()
+{
+    g_texLib.freeGlObjects();
 }
 
 ImageSpecialAbility OpenGLDrawContext::guessRequiredImageAbility(const ImageOperationList &list)

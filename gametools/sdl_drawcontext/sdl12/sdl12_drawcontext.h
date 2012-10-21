@@ -77,6 +77,7 @@ public:
     virtual ImageSpecialAbility guessRequiredImageAbility(const ImageOperationList &list);
     // Specific methods
     void setFullScreen(bool fullscreen);
+    virtual void resize(int w, int h, bool fullscreen);
 private:
     void initDisplay(bool fullscreen);
 

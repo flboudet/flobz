@@ -28,6 +28,7 @@
 
 #include <stdint.h>
 #include "ios_filepath.h"
+#include <stdint.h>
 
 using namespace ios_fc;
 

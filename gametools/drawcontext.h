@@ -206,6 +206,7 @@ public:
     virtual void flip() = 0;
     virtual int getHeight() const = 0;
     virtual int getWidth() const = 0;
+    virtual void resize(int w, int h, bool fullscreen) = 0;
     virtual ImageLibrary &getImageLibrary() = 0;
     // Special operations
     virtual void setOffset(int offX, int offY) {}

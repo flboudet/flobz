@@ -157,6 +157,7 @@ public:
     virtual ImageLibrary &getImageLibrary() {
         return m_imageLibrary;
     }
+    virtual void resize(int w, int h, bool fullscreen) { m_baseDrawContext->resize(w, h, fullscreen); }
     // Special operations
     virtual void setOffset(int offX, int offY);
     // Query for drawcontext abilities

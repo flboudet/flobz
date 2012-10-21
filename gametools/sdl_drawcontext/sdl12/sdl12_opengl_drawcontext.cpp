@@ -56,3 +56,10 @@ void SDL12_OpenGL_DrawContext::setFullScreen(bool fullscreen)
     SDL_ShowCursor(SDL_DISABLE);
 }
 
+void SDL12_OpenGL_DrawContext::resize(int w, int h, bool fullscreen) {
+    OpenGLDrawContext::freeGlObjects();
+    this->w = w;
+    this->h = h;
+    initDisplay(fullscreen, w, h);
+}
+

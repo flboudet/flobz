@@ -31,6 +31,7 @@ public:
                              int viewportWidth = 0, int viewportHeight = 0);
     // Specific methods
     void setFullScreen(bool fullscreen);
+    void resize(int w, int h, bool fullscreen);
 private:
     void initDisplay(bool fullScreen, int w, int h);
 private:

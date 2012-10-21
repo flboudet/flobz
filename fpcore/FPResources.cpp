@@ -59,7 +59,11 @@ audio_manager::Sound * SoundFactory::create(const std::string &path)
         fprintf(cacheOutputGsl, "  [cache_sound: path=\"%s\"]\n", path.c_str());
 #endif
         if (m_dataPathManager.hasFile(path.c_str())) {
+#ifdef ANDROID
+            String fullPath = path.c_str(); // On Android, the AudioManager will use the datapathmanager...
+#else
             String fullPath = m_dataPathManager.getPath(path.c_str());
+#endif
             audio_manager::Sound *newSound = GameUIDefaults::GAME_LOOP->getAudioManager()->loadSound(fullPath);
             return newSound;
         }
@@ -81,7 +85,11 @@ audio_manager::Music * MusicFactory::create(const std::string &path)
         fprintf(cacheOutputGsl, "  [cache_music: path=\"%s\"]\n", path.c_str());
 #endif
         if (m_dataPathManager.hasFile(path.c_str())) {
+#ifdef ANDROID
+            String fullPath = path.c_str(); // On Android, the AudioManager will use the datapathmanager...
+#else
             String fullPath = m_dataPathManager.getPath(path.c_str());
+#endif
             audio_manager::Music *newMusic = GameUIDefaults::GAME_LOOP->getAudioManager()->loadMusic(fullPath);
             return newMusic;
         }

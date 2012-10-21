@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include "SDL_AudioManager.h"
+#include "ios_exception.h"
+#include "GTLog.h"
 
 // Workaround for a sdl_mixer bug
 // http://bugzilla.libsdl.org/show_bug.cgi?id=1499
@@ -72,6 +74,7 @@ float SDL_AudioManager::getMusicVolume() const
 
 Music *SDL_AudioManager::loadMusic(const char *fileName)
 {
+    GTLogTrace("++ loadMusic: %s\n%s", fileName, ios_fc::get_stack_trace().c_str());
     Mix_Music *music = Mix_LoadMUS(fileName);
     Music *result = new SDL_AM_Music(music);
     return result;
