@@ -13,7 +13,7 @@ libfpcore_la_SOURCES=audio.cpp HiScores.cpp FPResources.cpp FPCommander.cpp \
           LevelThemeMenu.cpp ThemeMenu.cpp ScreenTransition.cpp \
           FloboGameAbstract.cpp FPStrings.cpp \
           PackageDescription.cpp AnimatedFloboTheme.cpp GSLFileAccessWrapper.cpp \
-	  PlayerNameUtils.cpp HallOfFame.cpp
+	  PlayerNameUtils.cpp HallOfFame.cpp ZoomScreenTransition.cpp
 
 # Optional sources for network gaming support
 if ENABLE_NETWORK
@@ -44,5 +44,5 @@ EXTRA_DIST=EventPlayer.h NetworkGameView.h FPResources.h \
            ControlMenu.h NetworkGame.h styrolyse.h \
            FPDataPathManager.h NetworkMenu.h \
            DoomMelt.h NetworkGameStarter.h PackageDescription.h \
-           Theme.h GSLFileAccessWrapper.h PlayerNameUtils.h
+           Theme.h GSLFileAccessWrapper.h PlayerNameUtils.h ZoomScreenTransition.h
 

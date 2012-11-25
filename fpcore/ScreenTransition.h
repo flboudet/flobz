@@ -38,7 +38,8 @@ using namespace gameui;
 class ScreenTransitionWidget : public Widget
 {
 public:
-    ScreenTransitionWidget(Screen &fromScreen);
+    ScreenTransitionWidget(Screen &fromScreen,
+                           ImageType fromScreenImageType = IMAGE_RGB);
     virtual ~ScreenTransitionWidget() {}
 protected:
     IosSurface *getFromSurface() const { return m_fromSurface.get(); }

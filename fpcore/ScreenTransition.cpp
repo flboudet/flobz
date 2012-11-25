@@ -27,10 +27,11 @@
 
 
 
-ScreenTransitionWidget::ScreenTransitionWidget(Screen &fromScreen)
+ScreenTransitionWidget::ScreenTransitionWidget(Screen &fromScreen,
+                                               ImageType fromScreenImageType)
 {
     DrawContext *dc = GameUIDefaults::GAME_LOOP->getDrawContext();
-    m_fromSurface.reset(dc->getImageLibrary().createImage(IMAGE_RGB, dc->getWidth(), dc->getHeight()));
+    m_fromSurface.reset(dc->getImageLibrary().createImage(fromScreenImageType, dc->getWidth(), dc->getHeight()));
     fromScreen.drawAnyway(m_fromSurface.get());
 }
 
