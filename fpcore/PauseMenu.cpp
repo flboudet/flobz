@@ -33,12 +33,16 @@ PauseMenu::PauseMenu(Action *pauseAction)
     : topSeparator(0, 10), pauseVBox(theCommander->getWindowFramePicture()),
       pauseTitleFrame(theCommander->getSeparatorFramePicture()),
       menuTitle(theCommander->getLocalizedString("Pause")),
-      continueButton(theCommander->getLocalizedString("Continue game"), this),
+      continueButton(theCommander->getLocalizedString("Continue game"), this,
+                     theCommander->getButtonFramePicture(),
+                     theCommander->getButtonOverFramePicture()),
       //optionsButton(theCommander->getLocalizedString("Options"), this),
       //audioButton(),
       //musicButton(),
       //fullScreenButton(),
-      abortButton(theCommander->getLocalizedString("Abort game"), this),
+      abortButton(theCommander->getLocalizedString("Abort game"), this,
+                  theCommander->getButtonFramePicture(),
+                  theCommander->getButtonOverFramePicture()),
       optionsBox(theCommander->getWindowFramePicture()),
       optionsTitleFrame(theCommander->getSeparatorFramePicture()),
       optionsTitle(theCommander->getLocalizedString("Options")),
@@ -83,11 +87,11 @@ void PauseMenu::action(Widget *sender, int actionType, GameControlEvent *event)
   else if (sender == &optionsBack) {
     pauseContainer.transitionToContent(&pauseVBox);
   }*/
-  if (sender == &continueButton) {
+  if (sender == continueButton.getButton()) {
       pauseContainer.transitionToContent(NULL);
       m_pauseAction->action(this, KPauseMenuClosing_Continue, event);
   }
-  else if (sender == &abortButton) {
+  else if (sender == abortButton.getButton()) {
       pauseContainer.transitionToContent(NULL);
       m_pauseAction->action(this, KPauseMenuClosing_Abort, event);
   }

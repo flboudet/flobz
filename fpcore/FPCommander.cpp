@@ -189,6 +189,8 @@ void FPCommander::initFonts()
     GameUIDefaults::FONT_SMALL_INFO   = m_smallFontInfo;
     GameUIDefaults::FONT_SMALL_ACTIVE = m_smallFont;
     GameUIDefaults::FONT_FUNNY        = m_funnyFont;
+    GameUIDefaults::FONT_COLOR = GT_WHITE;
+    GameUIDefaults::FONT_INACTIVE_COLOR = GT_WHITE;
 }
 
 void FPCommander::initThemes()

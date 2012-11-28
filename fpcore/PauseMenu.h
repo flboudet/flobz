@@ -28,6 +28,7 @@
 
 #include "gameui.h"
 #include "Frame.h"
+#include "FramedButton.h"
 //#include "OptionMenu.h"
 
 /**
@@ -64,12 +65,12 @@ private:
     gameui::Frame pauseTitleFrame;
     gameui::Text menuTitle;
     gameui::VBox buttonsBox;
-    gameui::Button continueButton;
+    gameui::FramedButton continueButton;
     //Button optionsButton;
     //AudioPrefSwitch audioButton;
     //MusicPrefSwitch musicButton;
     //FSPrefSwitch fullScreenButton;
-    gameui::Button abortButton;
+    gameui::FramedButton abortButton;
     gameui::Frame optionsBox;
     gameui::Frame optionsTitleFrame;
     gameui::Text optionsTitle;
