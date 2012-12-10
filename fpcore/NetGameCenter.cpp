@@ -189,8 +189,9 @@ void NetGameCenter::requestGame(FloboGameInvitation &invitation)
 void NetGameCenter::acceptGameInvitation(FloboGameInvitation &invitation)
 {
     GamerPeer *myPeer = getPeerForAddress(invitation.opponentAddress);
-    if (myPeer != NULL)
+    if (myPeer != NULL) {
         sendGameAcceptInvitation(invitation);
+    }
 }
 
 void NetGameCenter::cancelGameInvitation(FloboGameInvitation &invitation)
@@ -204,6 +205,22 @@ void NetGameCenter::cancelGameInvitation(FloboGameInvitation &invitation)
                 pendingGames[i]->initiateTime = getTimeMs() - pendingGameTimeout;
             }
         }
+    }
+}
+
+void NetGameCenter::grantGameWithMessageBox(FloboGameInvitation &invitation, MessageBox &thembox)
+{
+    GamerPeer *myPeer = getPeerForAddress(invitation.opponentAddress);
+    if (myPeer != NULL) {
+        // Remove from pending games
+        for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
+            if (pendingGames[i]->peer == myPeer)
+                pendingGames.removeAt(i);
+        }
+    }
+    setStatus(PEER_PLAYING);
+    for (int i = 0, j = listeners.size() ; i < j ; i++) {
+        listeners[i]->onGameGrantedWithMessagebox(&thembox, invitation);
     }
 }
 

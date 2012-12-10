@@ -94,6 +94,8 @@ public:
     virtual void setStatus(int status) {}
     virtual String getSelfName() { return "Myself"; }
     virtual String getOpponentName() { return "Opponent"; }
+    // Get the undelying message box (default: NULL)
+    virtual MessageBox *getMessageBox() { return NULL; }
     // Optional server managing the game center.
     virtual FPServerIGPMessageBox *getIgpBox() { return NULL; }
 protected:
@@ -112,6 +114,8 @@ protected:
     virtual void sendGameAcceptInvitation(FloboGameInvitation &invitation) = 0;
     // Implement the sending of the cancelation of a game
     virtual void sendGameCancelInvitation(FloboGameInvitation &invitation) = 0;
+    // Grant the game with a message box
+    void grantGameWithMessageBox(FloboGameInvitation &invitation, MessageBox &thembox);
     double pendingGameTimeout;
 };
 

@@ -119,14 +119,6 @@ void InternetGameCenter::sendGameAcceptInvitation(FloboGameInvitation &invitatio
     grantedInvitation = invitation;
 }
 
-void InternetGameCenter::grantGameToMBox(MessageBox &thembox)
-{
-    setStatus(PEER_PLAYING);
-    for (int i = 0, j = listeners.size() ; i < j ; i++) {
-        listeners[i]->onGameGrantedWithMessagebox(&thembox, grantedInvitation);
-    }
-}
-
 void InternetGameCenter::sendGameCancelInvitation(FloboGameInvitation &invitation)
 {
     Message *msg = m_igpmbox->createMessage();
@@ -184,12 +176,12 @@ void InternetGameCenter::idle()
             }
             break;
         case GAMESTATUS_GRANTED_P2P:
-            grantGameToMBox(*m_p2pmbox);
+            grantGameWithMessageBox(grantedInvitation, *m_p2pmbox);
             gameGrantedStatus = GAMESTATUS_IDLE;
             break;
         case GAMESTATUS_GRANTED_IGP:
             m_igpmbox->bind(grantedInvitation.opponentAddress);
-            grantGameToMBox(*m_igpmbox);
+            grantGameWithMessageBox(grantedInvitation, *m_p2pmbox);
             gameGrantedStatus = GAMESTATUS_IDLE;
             break;
         case GAMESTATUS_IDLE:

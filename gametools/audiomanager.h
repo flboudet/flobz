@@ -4,6 +4,17 @@
 namespace audio_manager
 {
 
+enum AudioPolicy
+{
+    UsesOutput = 0x00,
+    UsesInputAndOutput = 0x01
+};
+enum AudioPolicyModifier
+{
+    ForceOutputOnSpeaker = 0x0100,
+    MixWithOther = 0x1000
+};
+    
 class Music
 {
 public:

@@ -14,8 +14,6 @@
 # define unlikely(x)  (x)
 #endif
 
-#define GTLOG_ENABLETRACES 1
-
 #ifdef GTLOG_ENABLETRACES
 
 #define GTLogTrace(__fmt, ...) do { \

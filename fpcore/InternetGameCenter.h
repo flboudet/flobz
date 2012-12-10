@@ -54,8 +54,7 @@ protected:
     void sendGameCancelInvitation(FloboGameInvitation &invitation);
 private:
     void sendAliveMessage();
-    void grantGameToMBox(MessageBox &thembox);
-
+    
     static const int fpipVersion;
     const String hostName;
     int portNum;

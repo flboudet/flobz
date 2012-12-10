@@ -269,11 +269,8 @@ void LanGameCenter::sendGameAcceptInvitation(FloboGameInvitation &invitation)
 
 void LanGameCenter::grantGame(FloboGameInvitation &invitation)
 {
-    setStatus(PEER_PLAYING);
     mbox.bind(invitation.opponentAddress);
-    for (int i = 0, j = listeners.size() ; i < j ; i++) {
-        listeners[i]->onGameGrantedWithMessagebox(&mbox, invitation);
-    }
+    grantGameWithMessageBox(invitation, mbox);
 }
 
 void LanGameCenter::sendGameCancelInvitation(FloboGameInvitation &invitation)
