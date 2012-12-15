@@ -572,13 +572,17 @@ void ScreenShakingAnimation::cycle()
         if (! m_synchronizer->isSynchronized())
             return;
     ++m_iter;
-    if (m_iter > m_duration)
+    if (m_iter > m_duration) {
+        m_dc->setOffset(0, 0);
         finishedFlag = true;
+    }
     m_sine += m_sineStep;
 }
 
 void ScreenShakingAnimation::draw(int semiMove, DrawTarget *dt)
 {
+    if (finishedFlag)
+        return;
     if (m_synchronizer != NULL)
         if (! m_synchronizer->isSynchronized())
             return;
