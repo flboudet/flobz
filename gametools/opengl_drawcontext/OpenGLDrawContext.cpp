@@ -1003,7 +1003,7 @@ void IosGLSurfaceRef::fillRect(const IosRect *rect, const RGBA &color)
     bindSurface();
     // Let's get lazy!
     glClearColor(color.red/255.0f, color.green/255.0f, color.blue/255.0f, color.alpha/255.0f); GL_GET_ERROR();
-    glClear(GL_COLOR_BUFFER_BIT); GL_GET_ERROR();
+    glClear(GL_COLOR_BUFFER_BIT|GL_STENCIL_BUFFER_BIT); GL_GET_ERROR();
     // TODO (That's totally out of spec, but FloboPop doesn't need more than this)
     unbindSurface();
 #endif

@@ -127,6 +127,7 @@ public:
     //
     virtual void pause(bool obscureScreen = true);
     virtual void resume();
+    bool isPaused() const { return m_paused; }
     // A deplacer
     virtual void setScreenToPaused(bool fromControls);
     virtual void setScreenToResumed(bool fromControls);

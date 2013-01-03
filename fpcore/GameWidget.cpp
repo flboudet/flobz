@@ -547,10 +547,10 @@ void GameWidget2P::eventOccured(GameControlEvent *event)
     else {
         controllerA->eventOccured(event);
         controllerB->eventOccured(event);
-	for (std::vector<gameui::Widget *>::iterator iter = m_subwidgets.begin() ;
-	     iter != m_subwidgets.end() ; iter++) {
-	  (*iter)->eventOccured(event);
-	}
+        for (std::vector<gameui::Widget *>::iterator iter = m_subwidgets.begin() ;
+             iter != m_subwidgets.end() ; iter++) {
+            (*iter)->eventOccured(event);
+        }
     }
 }
 

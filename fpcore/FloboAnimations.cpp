@@ -573,7 +573,8 @@ void ScreenShakingAnimation::cycle()
             return;
     ++m_iter;
     if (m_iter > m_duration) {
-        m_dc->setOffset(0, 0);
+        if (m_dc != NULL)
+            m_dc->setOffset(0, 0);
         finishedFlag = true;
     }
     m_sine += m_sineStep;
