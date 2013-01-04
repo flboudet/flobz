@@ -38,7 +38,7 @@
 class StoryModeGameWidget : public GameWidget2P, public Action {
 public:
     StoryModeGameWidget(int lifes, String aiFace);
-    void initWithGUI(GameView &areaA, GameView &areaB, GamePlayer &playercontroller, LevelTheme &levelTheme, int level, Action *gameOverAction);
+    void initWithGUI(GameView &areaA, GameView &areaB, GamePlayer *playercontroller, LevelTheme &levelTheme, int level, Action *gameOverAction);
     virtual ~StoryModeGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
@@ -49,7 +49,6 @@ public:
     virtual void action(Widget *sender, int actionType,
                         event_manager::GameControlEvent *event);
 protected:
-    AIPlayer *opponentcontroller;
     int faceTicks;
     StoryWidget opponent;
     CheatCodeManager killLeftCheat, killRightCheat;
@@ -64,7 +63,6 @@ private:
     RandomSystem attachedRandom;
     LocalGameFactory attachedGameFactory;
     GameView areaA, areaB;
-    CombinedEventPlayer playercontroller;
 };
 
 class StoryModeLevelsDefinition {

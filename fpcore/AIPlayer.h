@@ -71,7 +71,7 @@ typedef struct {
 
 typedef unsigned char GridState[IA_TABLEDIMX][IA_TABLEDIMY];
 
-class AIPlayer : public virtual GamePlayer {
+class AIPlayer : public GamePlayer {
 
   public:
     AIPlayer(int level, GameView &targetView);

@@ -174,16 +174,12 @@ protected:
 class GameWidget2P : public GameWidget, CycledComponent
 {
 public:
-    GameWidget2P(GameOptions options = GameOptions(), bool withGUI = true);
+    GameWidget2P(GameOptions options = GameOptions());
     virtual ~GameWidget2P();
 public:
     void setGameOptions(GameOptions options);
     void initWithGUI(GameView &areaA, GameView &areaB,
-                     GamePlayer &controllerA, GamePlayer &controllerB,
                      LevelTheme &levelTheme,
-                     gameui::Action *gameOverAction = NULL);
-    void initWithoutGUI(GameView &areaA, GameView &areaB,
-                     GamePlayer &controllerA, GamePlayer &controllerB,
                      gameui::Action *gameOverAction = NULL);
     // Specific methods
     bool backPressed();
@@ -224,11 +220,10 @@ public:
     virtual void actionAfterGameOver(bool fromControls, int actionType);
 
 protected:
-
-    bool withGUI;
+    std::auto_ptr<GamePlayer> controllerA, controllerB;
+protected:
     DrawTarget &painter;
     GameView *areaA, *areaB;
-    GamePlayer *controllerA, *controllerB;
     FloboGame *attachedGameA, *attachedGameB;
     int cyclesBeforeGameCycle;
     int cyclesBeforeSpeedIncreases; // time between speed increases in units of 20ms

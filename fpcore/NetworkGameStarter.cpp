@@ -62,13 +62,13 @@ void NetworkGameWidget::initWithGUI(FloboSetTheme &floboSetTheme, LevelTheme &le
         localArea = std::auto_ptr<NetworkGameView>(new NetworkGameView(attachedLocalGameFactory.get(), 0, attachedFloboThemeSet, &levelTheme, &mbox, gameId));
     }
     networkArea = std::auto_ptr<GameView>(new GameView(attachedNetworkGameFactory.get(), 1, attachedFloboThemeSet, &levelTheme));
-    playercontroller = std::auto_ptr<GamePlayer>(createLocalPlayer());
-    dummyPlayerController = std::auto_ptr<GameNullPlayer>(new GameNullPlayer(*networkArea));
     this->mbox->addListener(this);
     chatBox = std::auto_ptr<ChatBox>(new ChatBox(*this));
     brokenNetworkWidget = std::auto_ptr<StoryWidget>(new StoryWidget("etherdown.gsl"));
     networkIsBroken = false;
-    GameWidget2P::initWithGUI(*localArea, *networkArea, *playercontroller, *dummyPlayerController, levelTheme, gameOverAction);
+    GameWidget2P::initWithGUI(*localArea, *networkArea, levelTheme, gameOverAction);
+    controllerA.reset(createLocalPlayer());
+    controllerB.reset(new GameNullPlayer(*networkArea));
     setLives(-1);
 }
 
@@ -102,8 +102,7 @@ void NetworkGameWidget::cycle()
     // (what to do when the network stops responding?)
     if (curDate - lastMessageDate > m_networkTimeoutWarning) {
         if (!networkIsBroken) {
-            if (withGUI)
-                associatedScreen->add(brokenNetworkWidget.get());
+            associatedScreen->add(brokenNetworkWidget.get());
             networkIsBroken = true;
         }
         else if (curDate - lastMessageDate > m_networkTimeoutError) {
@@ -113,8 +112,7 @@ void NetworkGameWidget::cycle()
         }
     }
     else if (networkIsBroken == true) {
-        if (withGUI)
-            associatedScreen->remove(brokenNetworkWidget.get());
+        associatedScreen->remove(brokenNetworkWidget.get());
         networkIsBroken = false;
     }
     // Let the game behave

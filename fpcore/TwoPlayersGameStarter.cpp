@@ -30,13 +30,13 @@ TwoPlayersGameWidget::TwoPlayersGameWidget(FloboSetTheme &floboSetTheme, LevelTh
                                                      attachedRandom(5), attachedGameFactory(&attachedRandom),
                                                      areaA(&attachedGameFactory, 0, &attachedFloboThemeSet, &levelTheme),
                                                      areaB(&attachedGameFactory, 1, &attachedFloboThemeSet, &levelTheme),
-                                                     playercontrollerA(areaA, kPlayer1Down, kPlayer1Left, kPlayer1Right,
-                                                     kPlayer1TurnLeft, kPlayer1TurnRight),
-                                                     playercontrollerB(areaB, kPlayer2Down, kPlayer2Left, kPlayer2Right,
-                                                     kPlayer2TurnLeft, kPlayer2TurnRight),
                                                      opponentFace(aiFace)
 {
-    initWithGUI(areaA, areaB, playercontrollerA, playercontrollerB, levelTheme, gameOverAction);
+    controllerA.reset(new EventPlayer(areaA, kPlayer1Down, kPlayer1Left, kPlayer1Right,
+                                      kPlayer1TurnLeft, kPlayer1TurnRight));
+    controllerB.reset(new EventPlayer(areaB, kPlayer2Down, kPlayer2Left, kPlayer2Right,
+                                      kPlayer2TurnLeft, kPlayer2TurnRight));
+    initWithGUI(areaA, areaB, levelTheme, gameOverAction);
     setLives(-1);
 }
 

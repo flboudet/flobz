@@ -75,8 +75,6 @@ protected:
     std::auto_ptr<NetworkGameView> localArea;
     std::auto_ptr<GameView> networkArea;
 private:
-    std::auto_ptr<GamePlayer> playercontroller;
-    std::auto_ptr<GameNullPlayer> dummyPlayerController;
     double lastMessageDate, lastAliveMessageSentDate;
     // Chat zone
     std::auto_ptr<ChatBox> chatBox; // optional

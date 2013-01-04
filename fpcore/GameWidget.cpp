@@ -261,8 +261,8 @@ void GameWidget2P::setPlayerTwoName(String newName) {
     areaB->setPlayerNames(playerOneName, playerTwoName);
 }
 
-GameWidget2P::GameWidget2P(GameOptions game_options, bool withGUI)
-    : CycledComponent(TIME_BETWEEN_GAME_CYCLES), withGUI(withGUI),
+GameWidget2P::GameWidget2P(GameOptions game_options)
+    : CycledComponent(TIME_BETWEEN_GAME_CYCLES),
       painter(*(GameUIDefaults::GAME_LOOP->getDrawContext())), cyclesBeforeGameCycle(0),
       cyclesBeforeSpeedIncreases(game_options.CYCLES_BEFORE_SPEED_INCREASES),
       tickCounts(0), cycles(0),
@@ -274,30 +274,17 @@ GameWidget2P::GameWidget2P(GameOptions game_options, bool withGUI)
 {
 }
 
-void GameWidget2P::initWithGUI(GameView &areaA, GameView &areaB, GamePlayer &controllerA, GamePlayer &controllerB, LevelTheme &levelTheme, Action *gameOverAction)
+void GameWidget2P::initWithGUI(GameView &areaA, GameView &areaB, LevelTheme &levelTheme, Action *gameOverAction)
 {
     this->areaA = &areaA;
     this->areaB = &areaB;
     areaA.setPlayerNames(playerOneName, playerTwoName);
     areaB.setPlayerNames(playerOneName, playerTwoName);
-    this->controllerA = &controllerA;
-    this->controllerB = &controllerB;
     this->gameOverAction = gameOverAction;
     priv_initialize();
     setLevelTheme(&levelTheme);
     m_victoryDisplayA.reset(new VictoryDisplay(Vec3(levelTheme.getTrophyDisplayX(0), levelTheme.getTrophyDisplayY(0)), levelTheme.getTrophy()));
     m_victoryDisplayB.reset(new VictoryDisplay(Vec3(levelTheme.getTrophyDisplayX(1), levelTheme.getTrophyDisplayY(1)), levelTheme.getTrophy()));
-}
-void GameWidget2P::initWithoutGUI(GameView &areaA, GameView &areaB, GamePlayer &controllerA, GamePlayer &controllerB, Action *gameOverAction)
-{
-    this->areaA = &areaA;
-    this->areaB = &areaB;
-    areaA.setPlayerNames(playerOneName, playerTwoName);
-    areaB.setPlayerNames(playerOneName, playerTwoName);
-    this->controllerA = &controllerA;
-    this->controllerB = &controllerB;
-    this->gameOverAction = gameOverAction;
-    priv_initialize();
 }
 
 void GameWidget2P::priv_initialize()

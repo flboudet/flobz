@@ -40,7 +40,6 @@ private:
     RandomSystem attachedRandom;
     LocalGameFactory attachedGameFactory;
     GameView areaA, areaB;
-    EventPlayer playercontrollerA, playercontrollerB;
     StoryWidget opponentFace;
 };
 

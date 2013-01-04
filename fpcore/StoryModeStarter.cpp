@@ -32,8 +32,7 @@
 using namespace event_manager;
 
 StoryModeGameWidget::StoryModeGameWidget(int lifes, String aiFace)
-    : opponentcontroller(NULL),
-      faceTicks(0), opponent(aiFace),
+    : faceTicks(0), opponent(aiFace),
       killLeftCheat("killleft", this),
       killRightCheat("killright", this)
 {
@@ -41,7 +40,7 @@ StoryModeGameWidget::StoryModeGameWidget(int lifes, String aiFace)
 }
 
 void StoryModeGameWidget::initWithGUI(GameView &areaA, GameView &areaB,
-                                            GamePlayer &playercontroller,
+                                            GamePlayer *playercontroller,
                                             LevelTheme &levelTheme,
                                             int level,
                                             Action *gameOverAction)
@@ -50,9 +49,9 @@ void StoryModeGameWidget::initWithGUI(GameView &areaA, GameView &areaB,
     int corrected_level = level;
     if (level > 12) corrected_level = level + (3 - lives) / 2; // Half of medium level, make sure the player do not loose 3 times the same oponent.
     if (level >= 20) corrected_level = level + (3 - lives); // Easy level, make sure the player do always loose the same oponent.
-    opponentcontroller = new AIPlayer(corrected_level, areaB);
-
-    GameWidget2P::initWithGUI(areaA, areaB, playercontroller, *opponentcontroller,
+    controllerA.reset(playercontroller);
+    controllerB.reset(new AIPlayer(corrected_level, areaB));
+    GameWidget2P::initWithGUI(areaA, areaB,
                                levelTheme, gameOverAction);
     addSubWidget(&killLeftCheat);
     addSubWidget(&killRightCheat);
@@ -69,17 +68,13 @@ StoryModeStandardLayoutGameWidget::StoryModeStandardLayoutGameWidget(FloboSetThe
       attachedRandom(nColors),
       attachedGameFactory(&attachedRandom),
       areaA(&attachedGameFactory, 0, &attachedFloboThemeSet, &levelTheme),
-      areaB(&attachedGameFactory, 1, &attachedFloboThemeSet, &levelTheme),
-      playercontroller(areaA)
-
+      areaB(&attachedGameFactory, 1, &attachedFloboThemeSet, &levelTheme)
 {
-    initWithGUI(areaA, areaB, playercontroller, levelTheme, level, gameOverAction);
+    initWithGUI(areaA, areaB, new CombinedEventPlayer(areaA), levelTheme, level, gameOverAction);
 }
 
 StoryModeGameWidget::~StoryModeGameWidget()
 {
-    if (opponentcontroller != NULL)
-        delete opponentcontroller;
 }
 
 void StoryModeGameWidget::cycle()
@@ -99,6 +94,7 @@ void StoryModeGameWidget::cycle()
         ai.rotationMethod = opponent.getIntegerValue("@AI_RotationMethod");
         ai.fastDropDelta = opponent.getIntegerValue("@AI_FastDropDelta");
         ai.thinkDepth = opponent.getIntegerValue("@AI_ThinkDepth");
+        AIPlayer *opponentcontroller = static_cast<AIPlayer *>(controllerB.get());
         opponentcontroller->setAIParameters(ai);
 
 		opponent.setIntegerValue("@AI_PlayingLevel", opponentcontroller->getLevel());
