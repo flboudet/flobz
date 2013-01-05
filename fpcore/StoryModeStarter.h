@@ -274,6 +274,8 @@ public:
      */
     virtual void action(Widget *sender, int actionType,
 			event_manager::GameControlEvent *event);
+    // Own methods
+    void pauseGameIfPossible();
 protected:
     PlayerNameProvider *m_nameProvider;
     GameStateMachine m_stateMachine;

@@ -468,3 +468,11 @@ void StoryModeStarterAction::action(Widget *sender, int actionType,
     m_stateMachine.evaluate();
 }
 
+void StoryModeStarterAction::pauseGameIfPossible()
+{
+    if (m_playMatch->getMatchAssets() == NULL)
+        return;
+    if (m_playMatch->getMatchAssets()->m_gameScreen.get() == NULL)
+        return;
+    m_playMatch->getMatchAssets()->m_gameScreen->setPaused(true);
+}

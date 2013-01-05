@@ -156,6 +156,8 @@ public:
      */
     virtual void action(Widget *sender, int actionType,
 			event_manager::GameControlEvent *event);
+    // Own methods
+    void pauseGameIfPossible();
 protected:
     SoloGameSettings m_gameSettings;
     std::auto_ptr<SoloGameWidgetFactory>  m_gameWidgetFactory;

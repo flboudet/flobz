@@ -352,3 +352,8 @@ void SoloModeStarterAction::action(Widget *sender, int actionType,
     m_stateMachine.evaluate();
 }
 
+void SoloModeStarterAction::pauseGameIfPossible()
+{
+    if (m_sharedAssets.m_gameScreen.get() != NULL)
+        m_sharedAssets.m_gameScreen->setPaused(true);
+}
