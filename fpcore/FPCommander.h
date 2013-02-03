@@ -11,6 +11,7 @@
 #include "Theme.h"
 #include "FPResources.h"
 #include "PreferencesManager.h"
+#include "AchievementsManager.h"
 #include <memory>
 
 using namespace gameui;
@@ -82,6 +83,8 @@ class FPCommander
     const char * getLocalizedString(const char * originalString) const;
     // Preferences management
     PreferencesManager *getPreferencesManager() const { return m_preferencesManager; }
+    // Achievements management
+    virtual AchievementsManager *getAchievementsManager() const { return NULL; }
     // Common resources accessor
     const FramePicture *getWindowFramePicture() const { return m_windowFramePicture.get(); }
     const FramePicture *getButtonFramePicture() const { return m_buttonIdleFramePicture.get(); }

@@ -363,6 +363,10 @@ void StoryModeMatchState::action(Widget *sender, int actionType,
       //m_playerStat.total_points += m_gameWidget->getStatPlayerOne().points;
         if (m_sharedAssets.m_gameWidget->isGameARunning()) {
             m_nextState = m_victoriousState;
+            // Note achievement if available
+            std::string achievementName = std::string("victory_") + (const char *)(m_sharedGameAssets->levelDef->opponentName);
+            if (theCommander->getAchievementsManager() != NULL)
+                theCommander->getAchievementsManager()->declareAchievement(achievementName.c_str(), 100.);
         }
         else {
             if (m_sharedGameAssets->lifes == 0) {
