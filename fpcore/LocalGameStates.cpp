@@ -579,6 +579,11 @@ void ManageHiScoresState::enterState()
     int rank = m_scoreBoard->setHiScore(m_nameProvider->getPlayerName(0).c_str(),
                                         playerPoints.points +
                                         playerPoints.total_points);
+    // Declare score to the achievements manager
+    if (theCommander->getAchievementsManager() != NULL)
+        theCommander->getAchievementsManager()->declareScore(m_boardId.c_str(),
+                                                             playerPoints.points +
+                                                             playerPoints.total_points);
     // Updates the displayHallOfFame state
     m_displayHallOfFame->setHiScoreBoard(m_scoreBoard.get());
     m_displayHallOfFame->setFinalScore(m_nameProvider->getPlayerName(0).c_str(),

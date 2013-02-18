@@ -84,7 +84,8 @@ class FPCommander
     // Preferences management
     PreferencesManager *getPreferencesManager() const { return m_preferencesManager; }
     // Achievements management
-    virtual AchievementsManager *getAchievementsManager() const { return NULL; }
+    virtual AchievementsManager *getAchievementsManager() const { return m_achMgr; }
+    void setAchievementsManager(AchievementsManager *achMgr) { m_achMgr = achMgr; }
     // Common resources accessor
     const FramePicture *getWindowFramePicture() const { return m_windowFramePicture.get(); }
     const FramePicture *getButtonFramePicture() const { return m_buttonIdleFramePicture.get(); }
@@ -141,6 +142,7 @@ class FPCommander
     std::auto_ptr<LevelThemeResourceManager> m_levelThemeResManager;
     // Localization management
     LocalizedDictionary * locale;
+    AchievementsManager *m_achMgr;
   private:
 
     friend class SinglePlayerGameAction;

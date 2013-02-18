@@ -307,16 +307,20 @@ SoloModeStarterAction::SoloModeStarterAction(GameDifficulty difficulty, PlayerNa
       { -7.,    0.,      0.   }, // handicapDecreaseOnPhase1;
       {-40.,    0.,      0.   }  // handicapDecreaseAbovePhase1;
     };
+    std::string scoreBoardSuffix;
     switch (difficulty) {
     case EASY:
         m_gameSettings = easySettings;
+        scoreBoardSuffix = "easy";
         break;
     case MEDIUM:
         m_gameSettings = mediumSettings;
+        scoreBoardSuffix = "medium";
         break;
     case HARD:
     default:
         m_gameSettings = hardSettings;
+        scoreBoardSuffix = "hard";
         break;
     };
     // Creating the game widget factory
@@ -329,7 +333,7 @@ SoloModeStarterAction::SoloModeStarterAction(GameDifficulty difficulty, PlayerNa
     m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));
     m_matchIsOver.reset(new MatchIsOverState(m_sharedAssets));
     m_hallOfFame.reset(new ManageHiScoresState(&m_sharedAssets, nameProvider,
-                                                  SOLO_SCOREBOARD_ID,
+                                               (std::string(SOLO_SCOREBOARD_ID) + "." + scoreBoardSuffix).c_str(),
                                                   "gamewon_highscores_1p.gsl"));
     m_leaveGame.reset(new LeaveGameState(m_sharedAssets));
     // Linking the states together

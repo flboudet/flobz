@@ -39,6 +39,7 @@ FPCommander::FPCommander(DataPathManager *dataPathManager,
                          Jukebox *jukebox)
   : m_dataPathManager(dataPathManager),
     m_preferencesManager(preferencesManager),
+    m_achMgr(NULL),
     m_jukebox(jukebox),
     m_themeManager(new ThemeManagerImpl(*dataPathManager)),
     m_surfaceFactory(*dataPathManager),

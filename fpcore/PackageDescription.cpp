@@ -106,7 +106,6 @@ PackageDescription::PackageDescription(DataPathManager &dataPathManager,
            return;
            } */
         GoomSL * gsl = gsl_new();
-        GTLogTrace("GSL = 0x%x", gsl);
         if (!gsl) return;
         GSLFA_setupWrapper(gsl, &dataPathManager, &package);
         GTLogTrace("Wrapper Set");
