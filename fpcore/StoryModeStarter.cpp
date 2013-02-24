@@ -152,12 +152,12 @@ StoryModeLevelsDefinition::~StoryModeLevelsDefinition()
 void StoryModeLevelsDefinition::addLevelDefinition(String levelName, String introStory,
 					      String opponentStory, String opponentName,
 					      String opponent, String backgroundTheme,
-					      String gameLostStory, String gameOverStory,
+					      String gameLostStory, String gameWonStory, String gameOverStory,
 					      SelIA easySettings,
 					      SelIA mediumSettings, SelIA hardSettings)
 {
   levelDefinitions.add(new LevelDefinition(levelName, introStory, opponentStory, opponentName,
-					   opponent, backgroundTheme, gameLostStory, gameOverStory,
+					   opponent, backgroundTheme, gameLostStory, gameWonStory, gameOverStory,
 					   easySettings, mediumSettings, hardSettings));
 }
 
@@ -182,7 +182,12 @@ void StoryModeLevelsDefinition::end_level(GoomSL *gsl, GoomHash *global, GoomHas
   const char * opponent = (const char *) GSL_GLOBAL_PTR(gsl, "level.opponentAI");
   const char * backgroundTheme = (const char *) GSL_GLOBAL_PTR(gsl, "level.backgroundTheme");
   const char * gameLostStory = (const char *) GSL_GLOBAL_PTR(gsl, "level.gameLostStory");
+  const char * gameWonStory = (const char *) GSL_GLOBAL_PTR(gsl, "level.gameWonStory");
   const char * gameOverStory = (const char *) GSL_GLOBAL_PTR(gsl, "level.gameOverStory");
+  if (gameLostStory == NULL)
+      gameLostStory = "";
+  if (gameWonStory == NULL)
+      gameWonStory = "";
   SelIA easySettings(GSL_GLOBAL_INT(gsl, "level.easySetting.level"),
                      GSL_GLOBAL_INT(gsl, "level.easySetting.nColors"));
   SelIA mediumSettings(GSL_GLOBAL_INT(gsl, "level.mediumSetting.level"),
@@ -190,7 +195,7 @@ void StoryModeLevelsDefinition::end_level(GoomSL *gsl, GoomHash *global, GoomHas
   SelIA hardSettings(GSL_GLOBAL_INT(gsl, "level.hardSetting.level"),
                      GSL_GLOBAL_INT(gsl, "level.hardSetting.nColors"));
   currentDefinition->addLevelDefinition(levelName, introStory, opponentStory, opponentName,
-					opponent, backgroundTheme, gameLostStory, gameOverStory,
+					opponent, backgroundTheme, gameLostStory, gameWonStory, gameOverStory,
 					easySettings, mediumSettings, hardSettings);
 }
 
@@ -218,14 +223,24 @@ void StoryModeMatchIsOverState::enterState()
     GTLogTrace("StoryModeMatchIsOver::enterState()");
     m_aknowledged = false;
     if (m_sharedMatchAssets->m_gameWidget->isGameARunning()) {
-        m_aknowledged = true;
         m_sharedMatchAssets->m_leftVictories++;
+        if (m_sharedGameAssets->levelDef->gameWonStory == "")
+            m_aknowledged = true;
+        else {
+            m_gameLostWidget.reset(new StoryWidget(m_sharedGameAssets->levelDef->gameWonStory, this));
+            m_sharedMatchAssets->m_gameScreen->setOverlayStory(m_gameLostWidget.get());
+            m_sharedMatchAssets->m_gameScreen->addAction(this);
+        }
     }
     else {
-        m_gameLostWidget.reset(new StoryWidget(m_sharedGameAssets->levelDef->gameLostStory, this));
-        m_sharedMatchAssets->m_gameScreen->setOverlayStory(m_gameLostWidget.get());
         m_sharedMatchAssets->m_rightVictories++;
-        m_sharedMatchAssets->m_gameScreen->addAction(this);
+        if (m_sharedGameAssets->levelDef->gameLostStory == "")
+            m_aknowledged = true;
+        else {
+            m_gameLostWidget.reset(new StoryWidget(m_sharedGameAssets->levelDef->gameLostStory, this));
+            m_sharedMatchAssets->m_gameScreen->setOverlayStory(m_gameLostWidget.get());
+            m_sharedMatchAssets->m_gameScreen->addAction(this);
+        }
     }
     m_sharedMatchAssets->m_leftTotal  += m_sharedMatchAssets->m_gameWidget->getStatPlayerOne().points;
     m_sharedMatchAssets->m_rightTotal += m_sharedMatchAssets->m_gameWidget->getStatPlayerTwo().points;

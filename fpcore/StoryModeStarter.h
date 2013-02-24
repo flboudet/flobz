@@ -75,11 +75,12 @@ public:
     struct LevelDefinition {
         LevelDefinition(String levelName, String introStory,
                         String opponentStory, String opponentName, String opponent,
-                        String backgroundTheme, String gameLostStory, String gameOverStory,
+                        String backgroundTheme, String gameLostStory, String gameWonStory, String gameOverStory,
                         SelIA easySettings, SelIA mediumSettings, SelIA hardSettings)
             : levelName(levelName), introStory(introStory),
               opponentStory(opponentStory),  opponentName(opponentName), opponent(opponent),
-              backgroundTheme(backgroundTheme), gameLostStory(gameLostStory), gameOverStory(gameOverStory),
+              backgroundTheme(backgroundTheme), gameLostStory(gameLostStory), gameWonStory(gameWonStory),
+              gameOverStory(gameOverStory),
               easySettings(easySettings), mediumSettings(mediumSettings), hardSettings(hardSettings) {}
         String levelName;
         String introStory;
@@ -88,6 +89,7 @@ public:
         String opponent;
         String backgroundTheme;
         String gameLostStory;
+        String gameWonStory;
         String gameOverStory;
         SelIA easySettings;
         SelIA mediumSettings;
@@ -111,7 +113,7 @@ public:
 private:
     void addLevelDefinition(String levelName, String introStory,
 			    String opponentStory, String opponentName, String opponent,
-                String backgroundTheme, String gameLostStory, String gameOverStory,
+                String backgroundTheme, String gameLostStory, String gameWonStory, String gameOverStory,
 			    SelIA easySettings,
 			    SelIA mediumSettings, SelIA hardSettings);
     static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local);
