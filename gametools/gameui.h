@@ -536,7 +536,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       void setFont(IosFont *newFont) { font = newFont; }
       void boing(void);
 	  void setShadow(int x, int y);
-
+      void setColor(RGBA color) { m_color = color; }
       // Implements IdleComponent
       virtual void idle(double currentTime);
       virtual IdleComponent *getIdleComponent() { return this; }
