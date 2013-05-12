@@ -59,8 +59,8 @@ using std::string;
     }
 
     ///Create a display list coresponding to the give character.
-    void make_dlist ( FT_Face face, unsigned short ch, unsigned int h, GlyphData &glyphData) {
-
+    void GLFont::make_dlist( FT_Face face, unsigned short ch, unsigned int h, GlyphData &glyphData)
+    {
         //The first thing we do is get FreeType to render our character
         //into a bitmap.  This actually requires a couple of FreeType commands:
 
@@ -108,8 +108,8 @@ using std::string;
         GL_GET_ERROR();
         //Now we just setup some texture paramaters.
         glBindTexture( GL_TEXTURE_2D, glyphData.texture);
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
         GL_GET_ERROR();
         //Here we actually create the texture itself, notice
         //that we are using GL_LUMINANCE_ALPHA to indicate that
@@ -121,7 +121,9 @@ using std::string;
         delete [] expanded_data;
 
         float fx = bitmap_glyph->left;
-        float fy = (float)h-bitmap_glyph->top;
+        float fy = (float)m_glyphH-bitmap_glyph->top;
+        fx /= m_resMultiplier;
+        fy /= m_resMultiplier;
 
         //Now we need to account for the fact that many of
         //our textures are filled with empty padding space.
@@ -138,7 +140,6 @@ using std::string;
         //oriented quite like we would like it to be,
         //so we need to link the texture to the quad
         //so that the result will be properly aligned.
-
         glyphData.texcoord[0] = 0;
         glyphData.texcoord[1] = 0;
         glyphData.texcoord[2] = 0;
@@ -147,14 +148,22 @@ using std::string;
         glyphData.texcoord[5] = y;
         glyphData.texcoord[6] = x;
         glyphData.texcoord[7] = 0;
+
         glyphData.vertices[0] = fx + 0;
         glyphData.vertices[1] = fy;
         glyphData.vertices[2] = fx + 0;
-        glyphData.vertices[3] = fy + bitmap.rows;
-        glyphData.vertices[4] = fx + bitmap.width;
-        glyphData.vertices[5] = fy + bitmap.rows;
-        glyphData.vertices[6] = fx + bitmap.width;
+        glyphData.vertices[3] = fy + (bitmap.rows / m_resMultiplier);
+        glyphData.vertices[4] = fx + (bitmap.width / m_resMultiplier);
+        glyphData.vertices[5] = fy + (bitmap.rows / m_resMultiplier);
+        glyphData.vertices[6] = fx + (bitmap.width / m_resMultiplier);
         glyphData.vertices[7] = fy;
+
+        //for (int i = 0 ; i < 7 ; ++i)
+        //glyphData.vertices[4] /= m_resMultiplier;
+        //glyphData.vertices[5] /= m_resMultiplier;
+        //glyphData.vertices[6] /= m_resMultiplier;
+        //glyphData.vertices[7] /= m_resMultiplier;
+
         glyphData.faces[0] = 0;
         glyphData.faces[1] = 1;
         glyphData.faces[2] = 3;
@@ -167,11 +176,13 @@ using std::string;
 
 
 
-    void GLFont::init(void *data, int size, unsigned int h, float letter_spacing) {
+    void GLFont::init(void *data, int size, unsigned int h, float resMultiplier, float letter_spacing) {
         this->letter_spacing = letter_spacing;
         GLFONT_letter_spacing = letter_spacing;
 
-        this->h=h;
+        this->m_resMultiplier = resMultiplier;
+        this->m_glyphH = h * m_resMultiplier;
+        this->m_renderH = h;
 
         //Create and initilize a freetype font library.
         if (FT_Init_FreeType( &library ))
@@ -187,7 +198,7 @@ using std::string;
                                size, 0, &face ))
             throw std::runtime_error("FT_New_Face failed (there is probably a problem with your font file)");
         m_data = data;
-        FT_Set_Pixel_Sizes(face, h, h);
+        FT_Set_Pixel_Sizes(face, m_glyphH, m_glyphH);
     }
 
     void GLFont::clean() {
@@ -219,7 +230,7 @@ using std::string;
             }
             if (w > width) width = w;
         }
-		return width;
+		return width / m_resMultiplier;
     }
 
     void GLFont::printCenteredUnicode(float x, float y, const unsigned short *text)  {
@@ -240,31 +251,7 @@ using std::string;
         // print
         printUnicode(x - width/2.0, y/* - GLFONT_SCREEN_HEIGHT / 2.0f*/, text);
     }
-#ifdef DISABLED
-    ///Much like Nehe's glPrint function, but modified to work
-    ///with freetype fonts.
-    void GLFont::print(float x, float y, const wchar_t *fmt, ...)  {
-        // GLuint font=this->list_base;
-        float h=this->h/.63f;						//We make the height about 1.5* that of
 
-        wchar_t text[256];								// Holds Our String
-        va_list		ap;										// Pointer To List Of Arguments
-
-        if (fmt == NULL)									// If There's No Text
-            *text=0;											// Do Nothing
-
-        else {
-            va_start(ap, fmt);									// Parses The String For Variables
-#ifdef WIN32
-            vswprintf(text, fmt, ap);						// And Converts Symbols To Actual Numbers
-#else
-            vswprintf(text, 256, fmt, ap);						// And Converts Symbols To Actual Numbers
-#endif
-            va_end(ap);											// Results Are Stored In Text
-        }
-        printUnicode(x, y, (unsigned short *)text);
-    }
-#endif
     void GLFont::printUnicode(float x, float y, const unsigned short *text) {
         if (text == NULL)
             return;
@@ -288,7 +275,7 @@ using std::string;
 
         for(unsigned int i=0;i<lines.size();i++) {
             glPushMatrix();
-            glTranslatef(x,y+h*i,0);
+            glTranslatef(x,y+m_renderH*i,0);
             const Line &line = lines[i];
             for (unsigned int j=0; j<line.size(); ++j) {
                 unsigned short ch = line[j];
@@ -297,7 +284,7 @@ using std::string;
                 glTexCoordPointer(2, GL_FLOAT, 0, glyphData.texcoord);
                 glVertexPointer(2, GL_FLOAT, 0, glyphData.vertices);
                 glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, glyphData.faces);
-                glTranslatef(glyphData.letter_width,0,0);
+                glTranslatef(glyphData.letter_width / m_resMultiplier,0,0);
             }
             glPopMatrix();
         }

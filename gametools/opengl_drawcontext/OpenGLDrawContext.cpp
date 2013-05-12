@@ -395,14 +395,15 @@ static void iglBindFramebufferOES(GLuint i, GLfloat *matrix) {
 class OpenGLIosFont : public IosFont
 {
 private:
+    OpenGLDrawContext *m_owner;
     OpenGLBackendUtil *m_backendUtil;
 	GLFont *mCustomFont;
 	int mSize;
     unsigned short mWorkingBuffer[256];
 
 public:
-	OpenGLIosFont(OpenGLBackendUtil *backendUtil, const char *path, int size)
-    : m_backendUtil(backendUtil)
+	OpenGLIosFont(OpenGLDrawContext *owner, OpenGLBackendUtil *backendUtil, const char *path, int size)
+    : m_owner(owner), m_backendUtil(backendUtil)
     {
         std::auto_ptr<DataInputStream> fontFile(m_backendUtil->getdataPathManager()->openDataInputStream(path));
         // Read all the data file and store it in a buffer
@@ -421,7 +422,7 @@ public:
                 data = (char *)(realloc(data, dataSize));
             }
         } while (readSize == chunkSize);
-            mCustomFont = new GLFont(data, fsize, size, 0.0f);
+            mCustomFont = new GLFont(data, fsize, size, 1./m_owner->getPixelRatioX());
 		mSize = size;
 	}
 
@@ -597,23 +598,8 @@ private:
 #endif
         // Setup OpenGL projection
         glPushMatrix(); GL_GET_ERROR();
-        //glViewport(0, 0, this->m_w, this->m_h);
-        /*glLoadIdentity();
-         glOrthof(0.0, (GLfloat) this->m_w, (GLfloat) this->m_h, 0.0, 0.0, 1.0);*/
         glTranslatef(0.0f, 480.0f, 0.0f); GL_GET_ERROR();
         glScalef(m_owner->getPixelRatioX(),-m_owner->getPixelRatioY(),1); GL_GET_ERROR();
-#ifdef DISABLED
-        /*glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();*/
-        //glViewport(0, 0, m_w, m_h);
-#ifdef OPENGLES
-        glOrthof(0.0, (GLfloat) m_w, (GLfloat) m_h, 0.0, 0.0, 1.0); GL_GET_ERROR();
-#else
-        glOrtho(0.0, (GLfloat) m_w, (GLfloat) m_h, 0.0, 0.0, 1.0); GL_GET_ERROR();
-#endif
-#endif
         glGetFloatv(GL_MODELVIEW_MATRIX,&m_matrix[0]);
         glPopMatrix(); GL_GET_ERROR();
         return m_fbo;
@@ -673,8 +659,8 @@ OpenGLTexture::OpenGLTexture(OpenGLDrawContext *owner, GLint format, int w, int 
     g_texLib.registerTexture(this);
     m_h = h;
     m_w = w;
-    m_p2w = power_of_2(w);
-    m_p2h = power_of_2(h);
+    m_p2w = power_of_2(m_w);
+    m_p2h = power_of_2(m_h);
     m_texture = 0;
     m_textureOK = false;
     m_fbo = 0;
@@ -1114,16 +1100,17 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMod
         texcoord[7] = texcoord[5];
     }
     else {
-        texcoord[0] = (GLfloat)(pSrcRect->x) / m_ref->m_p2w;
-        texcoord[1] = (GLfloat)(pSrcRect->y) / m_ref->m_p2h;
-        texcoord[2] = (GLfloat)(pSrcRect->x+pSrcRect->w) / m_ref->m_p2w;
+        texcoord[0] = (GLfloat)(pSrcRect->x+0.5) / (GLfloat)(m_ref->m_p2w); // left
+        texcoord[1] = (GLfloat)(pSrcRect->y+0.5) / (GLfloat)(m_ref->m_p2h); // top
+        texcoord[2] = (GLfloat)(pSrcRect->x+pSrcRect->w-0.5) / (GLfloat)(m_ref->m_p2w); // right
         texcoord[3] = texcoord[1];
         texcoord[4] = texcoord[0];
-        texcoord[5] = (GLfloat)(pSrcRect->y+pSrcRect->h) / m_ref->m_p2h;
+        texcoord[5] = (GLfloat)(pSrcRect->y+pSrcRect->h-0.5) / (GLfloat)(m_ref->m_p2h); // bottom
         texcoord[6] = texcoord[2];
         texcoord[7] = texcoord[5];
     }
-    double dx = 0.25, dy = 0.25;
+    double dx = 0.5, dy = 0.5;
+    //double dx = 0, dy = 0;
     vertices[0] = pDstRect->x + dx;
     vertices[1] = pDstRect->y +dy;
     vertices[2] = pDstRect->x+pDstRect->w + dx;
@@ -1134,8 +1121,8 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMod
     vertices[7] = vertices[5];
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); GL_GET_ERROR();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); GL_GET_ERROR();
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); GL_GET_ERROR();
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); GL_GET_ERROR();
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); GL_GET_ERROR();
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); GL_GET_ERROR();
     glColor4f(1.0f,1.0f,1.0f,m_alpha); GL_GET_ERROR();
     glTexCoordPointer(2, GL_FLOAT, 0, &texcoord[0]); GL_GET_ERROR();
     glEnableClientState(GL_TEXTURE_COORD_ARRAY); GL_GET_ERROR();
@@ -1171,7 +1158,7 @@ IosSurface * OpenGLImageLibrary::loadImage(ImageType type, const char *path, Ima
 
 IosFont * OpenGLImageLibrary::createFont(const char *path, int size)
 {
-    return new OpenGLIosFont(m_backendUtil, path, size);
+    return new OpenGLIosFont(m_owner, m_backendUtil, path, size);
 }
 
 

@@ -34,15 +34,16 @@ namespace flobopop {
         unsigned short faces[4];
     };
 
-    void make_dlist ( FT_Face face, unsigned short ch, unsigned int h, GlyphData &glyphData);
-
     class GLFont {
 
     private:
         FT_Library library;
         FT_Face face;
 
-        float h;			///< Holds the height of the font.
+        float m_resMultiplier;
+        float m_glyphH;     ///< Holds the height of the font for the glyphes.
+        float m_renderH;    ///< Holds the height of the font for the rendering.
+
         //GLuint *textures;	///< Holds the texture id's
         GLuint  list_base;	///< Holds the first display list id
         //float letter_width[256];
@@ -59,6 +60,8 @@ namespace flobopop {
         // Font file data
         void *m_data;
 
+        void make_dlist ( FT_Face face, unsigned short ch, unsigned int h, GlyphData &glyphData);
+
         inline GlyphData & getGlyphData(unsigned short ch) {
             //if (ch < 256)
             //    return asciiGlyphes[ch];
@@ -66,7 +69,7 @@ namespace flobopop {
             if (iter != nonAsciiGlyphes.end())
                 return *(iter->second);
             GlyphData *newGlyph = new GlyphData();
-            make_dlist(face, ch, h, *newGlyph);
+            make_dlist(face, ch, m_glyphH, *newGlyph);
             nonAsciiGlyphes[ch] = newGlyph;
             return *newGlyph;
         }
@@ -101,7 +104,9 @@ namespace flobopop {
          * Note: data must be malloced, and GLFont takes ownership of this pointer.
          * Don't free() data on your own!
          */
-        GLFont(void *data, int size, unsigned int h, float letter_spacing) { init(data, size, h, letter_spacing); }
+        GLFont(void *data, int size, unsigned int h, float resMultiplier = 1., float letter_spacing = 0.) {
+            init(data, size, h, resMultiplier, letter_spacing);
+        }
         GLFont() {}
         ~GLFont() {}
 
@@ -109,7 +114,7 @@ namespace flobopop {
 
         //The init function will create a font of
         //of the height h from the file fname.
-        void init(void *data, int size, unsigned int h, float letter_spacing);
+        void init(void *data, int size, unsigned int h, float resMultiplier, float letter_spacing);
 
         //Free all the resources assosiated with the font.
         void clean();
@@ -120,9 +125,6 @@ namespace flobopop {
         void printUnicode(float x, float y, const unsigned short *text) ;
         void printCenteredUnicode(float x, float y, const unsigned short *text);
         float getWidthUnicode(const unsigned short *text);
-        //void print(float x, float y, const wchar_t *fmt, ...) ;
-        //void printCentered(float x, float y, const wchar_t *fmt, ...);
-        //float getWidth(const wchar_t *fmt, ...);
     };
 
     extern int GLFONT_SCREEN_HEIGHT; //Hack...
