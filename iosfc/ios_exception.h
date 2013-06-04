@@ -5,7 +5,7 @@
  * iosfc::Exception: contains a management handling class.
  *
  * - Exception:         A simple exception containing a string message.
- * 
+ *
  * This file is part of the iOS Foundation Classes project.
  *
  * authors:
@@ -27,14 +27,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
  */
- 
+
 #include <exception>
 #include <string>
 
 namespace ios_fc {
     class Exception : public std::exception {
         public:
-            Exception(const char *msg);
+            Exception(const char *format, ...);
             Exception(const Exception &e);
             void operator=(const Exception &e);
             ~Exception() throw();
@@ -70,7 +70,7 @@ static inline void IOS_ERROR(const char *msg)
 #else // DEBUG
 
 #define IOS_ASSERT(expr) (static_cast<void>(0))
-//#define IOS_ERROR(msg) throw ios_fc::Exception(msg); 
+//#define IOS_ERROR(msg) throw ios_fc::Exception(msg);
 static inline void IOS_ERROR(const char *msg)
 {
     throw ios_fc::Exception(msg);

@@ -18,6 +18,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <stdarg.h>
+
 #if defined(ANDROID)
 # define USE_UNWIND 1
 #endif
@@ -115,10 +117,15 @@ namespace ios_fc {
 
     const char *DBG_PRINT_PREFIX = "...";
 
-    Exception::Exception(const char *exception)
+    Exception::Exception(const char *format, ...)
     {
         stack = get_stack_trace();
-		message = strdup((std::string(exception)+std::string("\n")+stack).c_str());
+        char msg[512];
+        va_list ap;
+        va_start(ap, format);
+        vsnprintf(msg, 512, format, ap);
+        va_end(ap);
+		message = strdup((std::string(msg)+std::string("\n")+stack).c_str());
     }
 
     Exception::~Exception() throw ()

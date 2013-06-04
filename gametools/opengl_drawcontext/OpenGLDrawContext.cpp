@@ -1150,6 +1150,8 @@ IosSurface * OpenGLImageLibrary::createImage(ImageType type, int w, int h, Image
 IosSurface * OpenGLImageLibrary::loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility)
 {
     OpenGLRawImage *image = m_backendUtil->loadImage(type, path);
+    if (image == NULL)
+        throw ios_fc::Exception("loadImage failed: File not found: %s", path);
     OpenGLTexture *tex = new OpenGLTexture(m_owner, image, (specialAbility & IMAGE_READ));
     IosSurface *result = new IosGLSurfaceRef(m_owner, m_backendUtil, tex);
 	result->name = path;

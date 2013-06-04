@@ -408,6 +408,8 @@ IosSurface *FloboThemeImpl::getFloboSurfaceForValence(int valence, int compressi
                 IosSurfaceRef baseFace = theCommander->getSurface(IMAGE_RGBA,
                                                                   osstream.str().c_str(),
                                                                   opList);
+                if (baseFace == NULL)
+                    throw ios_fc::Exception("Unable to load file: %s", osstream.str().c_str());
                 uncompressed = baseFace.get()->shiftHue(m_desc.colorOffset);
                 m_surfaceBin.push_back(uncompressed);
             }
