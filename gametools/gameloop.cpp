@@ -103,6 +103,7 @@ void   CycledComponent::idle(double currentTime)
   if (requireCycle && (!paused)) {
     cycleNumber += 1.0;
     cycle();
+    idle(currentTime);
   }
 }
 
