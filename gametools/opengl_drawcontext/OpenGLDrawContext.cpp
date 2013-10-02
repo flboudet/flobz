@@ -567,10 +567,10 @@ private:
             glTexImage2D(GL_TEXTURE_2D, 0, m_format, m_p2w, m_p2h, 0, m_format, GL_UNSIGNED_BYTE, emptyData); GL_GET_ERROR();
             free(emptyData);
         }
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); GL_GET_ERROR();
-        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); GL_GET_ERROR();
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); GL_GET_ERROR();
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); GL_GET_ERROR();
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); GL_GET_ERROR();
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); GL_GET_ERROR();
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); GL_GET_ERROR();
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); GL_GET_ERROR();
         m_textureOK = true;
         return m_texture;
 	}
@@ -1109,7 +1109,7 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMod
         texcoord[6] = texcoord[2];
         texcoord[7] = texcoord[5];
     }
-    double dx = 0.5, dy = 0.5;
+    double dx = 0.25, dy = 0.25;
     //double dx = 0, dy = 0;
     vertices[0] = pDstRect->x + dx;
     vertices[1] = pDstRect->y +dy;
