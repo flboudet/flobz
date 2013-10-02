@@ -151,6 +151,7 @@ Vec2 global_sprite_get_position(GoomSL *gsl, const char *name)
 void styro_music(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
     const char *path = (const char *)GSL_LOCAL_PTR  (gsl, local, "command");
+    // fprintf(stderr, "STYROLYSE: music '%s'\n", path);
     styrolyse->client->music(styrolyse->client, path);
 }
 

@@ -98,6 +98,10 @@ void NetworkGameWidget::cycle()
             lastAliveMessageSentDate = curDate;
         }
     }
+    else {
+        // TODO: Check player's height
+        theCommander->playMusicTrack("level1");
+    }
     // Management of network timeouts
     // (what to do when the network stops responding?)
     if (curDate - lastMessageDate > m_networkTimeoutWarning) {
