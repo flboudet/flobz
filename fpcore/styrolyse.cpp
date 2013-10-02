@@ -371,12 +371,26 @@ void styrolyse_event(Styrolyse *_this, const char *event, float x, float y, int 
 
 void styrolyse_execute(Styrolyse *_this, int mode, float delta_t)
 {
-  /* mutexifier cette fonction si multi-thread */
-    if (delta_t > 0.04) delta_t = 0.04;
-    GSL_GLOBAL_INT(_this->gsl, "@mode") = mode;
-    GSL_GLOBAL_FLOAT(_this->gsl, "@delta_t") = delta_t;
+    /* mutexifier cette fonction si multi-thread */
+    if (delta_t > 1.0f) delta_t = 1.0f;
+    const float epsilon = 0.000001f;
+    const float minimum_dt = 0.04f;
+
     styrolyse = _this;
-    gsl_execute(_this->gsl);
+    GSL_GLOBAL_INT(_this->gsl, "@mode") = mode;
+
+    while (delta_t >= 0.0f) {
+
+        float dt;
+        if (delta_t > minimum_dt)
+            dt = minimum_dt;
+        else
+            dt = delta_t;
+        delta_t -= dt + epsilon;
+        
+        GSL_GLOBAL_FLOAT(_this->gsl, "@delta_t") = dt;
+        gsl_execute(_this->gsl);
+    }
 }
 
 void styrolyse_reload(Styrolyse *_this)
