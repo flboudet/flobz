@@ -104,6 +104,8 @@ void StoryModeGameWidget::cycle()
         opponent.setIntegerValue("@maxHeightAI", attachedGameB->getColumnHeigth(2));
         opponent.setIntegerValue("@neutralsForPlayer", attachedGameA->getNeutralFlobos());
         opponent.setIntegerValue("@neutralsForAI", attachedGameB->getNeutralFlobos());
+        opponent.setIntegerValue("@gameOverLeft",  !this->isGameARunning());
+        opponent.setIntegerValue("@gameOverRight", !this->isGameBRunning());
     }
     if (faceTicks == 100) {
         faceTicks = 0;
