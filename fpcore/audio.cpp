@@ -81,6 +81,7 @@ void AudioHelper::playSound(const char *fileName, float volume, float balance)
         && (currentTime - iter->second < TIMEMS_BETWEEN_SAME_SOUND))
         return;
     SoundRef sound   = theCommander->getSound(FilePath("sfx").combine(fileName));
+    cout << "volume: " << volume << endl;
     m_audioManager->playSound(sound, volume, balance);
     m_lastUsedTimestamp[fileName] = currentTime;
 }

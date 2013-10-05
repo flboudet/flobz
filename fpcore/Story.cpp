@@ -205,7 +205,7 @@ static void music(StyrolyseClient *_this, const char *name)
     theCommander->playMusicTrack(name);
 }
 
-static void playSound(StyrolyseClient *_this, const char *fileName, int volume)
+static void playSound(StyrolyseClient *_this, const char *fileName, float volume)
 {
     theCommander->playSound(fileName, volume);
 }

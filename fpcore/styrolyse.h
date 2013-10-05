@@ -21,7 +21,7 @@ struct _StyrolyseClient {
   void  (*putText)   (StyrolyseClient *_this, int x, int y, const char *text);
   const char *(*getText)   (StyrolyseClient *_this, const char *text);
   void (*music) (StyrolyseClient *_this, const char *command);
-  void (*playSound) (StyrolyseClient *_this, const char *fileName, int volume);
+  void (*playSound) (StyrolyseClient *_this, const char *fileName, float volume);
   char *(*resolveFilePath)(StyrolyseClient *_this, const char *file_name);
   void *(*openFile)(StyrolyseClient *_this, const char *file_name);
   void (*closeFile)(StyrolyseClient *_this, void *file);

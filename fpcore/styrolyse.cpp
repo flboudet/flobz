@@ -159,7 +159,7 @@ void styro_sound(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
     const char *path   = (const char *)GSL_LOCAL_PTR  (gsl, local, "file");
     float       volume = GSL_LOCAL_FLOAT (gsl, local, "volume");
-    styrolyse->client->playSound(styrolyse->client, path, (int)volume);
+    styrolyse->client->playSound(styrolyse->client, path, volume);
 }
 
 void styro_gettext(GoomSL *gsl, GoomHash *global, GoomHash *local)
@@ -388,7 +388,7 @@ void styrolyse_execute(Styrolyse *_this, int mode, float delta_t)
         else
             dt = delta_t;
         delta_t -= dt + epsilon;
-        
+
         GSL_GLOBAL_FLOAT(_this->gsl, "@delta_t") = dt;
         gsl_execute(_this->gsl);
     }

@@ -137,6 +137,6 @@ void SDL_AudioManager::playSound(Sound *sound, float volume, float balance)
         return;
     int channel = Mix_PlayChannel (-1, static_cast<SDL_AM_Sound *>(sound)->m_chunk, 0);
     Uint8 leftVolume = (Uint8)(255.*((-balance + 1.)/2.));
-    Mix_SetPanning(channel, leftVolume, 255-leftVolume);
+    Mix_SetPanning(channel, leftVolume * volume, (255-leftVolume) * volume);
 }
 
