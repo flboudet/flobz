@@ -345,25 +345,25 @@ void VanishAnimation::draw(int semiMove, DrawTarget *dt)
             shrinkingSurface = theme->getShrinkingSurfaceForIndex(shrinkingImage);
             explodingSurface = theme->getExplodingSurfaceForIndex(shrinkingImage);
 
-            drect.x = X;
-            drect.y = Y;
+            drect.x = X + (TSIZE >> 2) - (shrinkingSurface->w >> 2);
+            drect.y = Y + (TSIZE >> 2) - (shrinkingSurface->h >> 2);
             drect.w = shrinkingSurface->w;
             drect.h = shrinkingSurface->h;
 
             dt->draw(shrinkingSurface, NULL, &drect);
-            int xrectY = Y + (int)(2.5 * pow(iter - 16 - delay, 2) - 108);
+            int xrectY = Y  + (TSIZE >> 2) - (explodingSurface->h >> 2) + (int)(2.5 * pow(iter - 16 - delay, 2) - 108);
             xrect.w = explodingSurface->w;
             xrect.h = explodingSurface->h;
-            xrect.x = X - iter2 * iter2;
+            xrect.x = X  + (TSIZE >> 2) - (explodingSurface->w >> 2) - iter2 * iter2;
             xrect.y = xrectY;
             dt->draw(explodingSurface, NULL, &xrect);
-            xrect.x = X - iter2;
+            xrect.x = X  + (TSIZE >> 2) - (explodingSurface->w >> 2) - iter2;
             xrect.y = xrectY + iter2;
             dt->draw(explodingSurface, NULL, &xrect);
-            xrect.x = X + iter2;
+            xrect.x = X  + (TSIZE >> 2) - (explodingSurface->w >> 2) + iter2;
             xrect.y = xrectY + iter2;
             dt->draw(explodingSurface, NULL, &xrect);
-            xrect.x = X + iter2 * iter2;
+            xrect.x = X  + (TSIZE >> 2) - (explodingSurface->w >> 2) + iter2 * iter2;
             xrect.y = xrectY;
             dt->draw(explodingSurface, NULL, &xrect);
         }

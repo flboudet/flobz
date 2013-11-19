@@ -48,7 +48,8 @@ lanAction(&lanGameMenu, mainScreen),
 lanGameButton(theCommander->getLocalizedString("Local Area Network Game"), &lanAction)
 #endif
 #endif
-{}
+{
+}
 
 
 void MainRealMenu::build() {

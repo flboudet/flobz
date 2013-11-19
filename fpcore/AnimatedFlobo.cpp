@@ -155,14 +155,22 @@ void AnimatedFlobo::renderAt(int X, int Y, DrawTarget *dt)
         /* Eye management */
         if ((getFloboState() != FLOBO_NEUTRAL) && (m_displayEyes)) {
             int eyePhase = fmod((floboEyeState + ios_fc::getTimeMs()), 8192.);
+            IosSurface *s = NULL;
             if (eyePhase < 100)
-                dt->draw(attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState), NULL, &drect);
+                s = attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState);
             else if (eyePhase < 200)
-                dt->draw(attachedTheme->getEyeSurfaceForIndex(2, m_currentCompressedState), NULL, &drect);
+                s = attachedTheme->getEyeSurfaceForIndex(2, m_currentCompressedState);
             else if (eyePhase < 300)
-                dt->draw(attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState), NULL, &drect);
+                s = attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState);
             else
-                dt->draw(attachedTheme->getEyeSurfaceForIndex(0, m_currentCompressedState), NULL, &drect);
+                s = attachedTheme->getEyeSurfaceForIndex(0, m_currentCompressedState);
+            if (s != NULL) {
+                drect.x += attachedTheme->getEyeSurfaceOffsetX();
+                drect.y += attachedTheme->getEyeSurfaceOffsetY();
+                drect.w = s->w;
+                drect.h = s->h;
+                dt->draw(s, NULL, &drect);
+            }
         }
     }
 }
@@ -183,8 +191,8 @@ void AnimatedFlobo::renderShadowAt(int X, int Y, DrawTarget *dt)
         currentSurface = attachedTheme->getShadowSurface(m_currentCompressedState);
         if (currentSurface != NULL) {
             IosRect drect;
-            drect.x = X;
-            drect.y = Y;
+            drect.x = X + (TSIZE >> 2) - (currentSurface->w >> 2) + 3;
+            drect.y = Y + (TSIZE >> 2) - (currentSurface->h >> 2) + 3;
 
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;

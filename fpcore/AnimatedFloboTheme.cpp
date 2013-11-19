@@ -66,6 +66,22 @@ const char * ThemeManagerImpl::s_key_FloboEye[NUMBER_OF_FLOBOS_IN_SET] = {
     "floboset.P5.eye",
     "floboset.Neutral.face"
 };
+const char * ThemeManagerImpl::s_key_FloboEyeOffsetX[NUMBER_OF_FLOBOS_IN_SET] = {
+    "floboset.P1.eyeOffset.x",
+    "floboset.P2.eyeOffset.x",
+    "floboset.P3.eyeOffset.x",
+    "floboset.P4.eyeOffset.x",
+    "floboset.P5.eyeOffset.x",
+    "floboset.Neutral.face"
+};
+const char * ThemeManagerImpl::s_key_FloboEyeOffsetY[NUMBER_OF_FLOBOS_IN_SET] = {
+    "floboset.P1.eyeOffset.y",
+    "floboset.P2.eyeOffset.y",
+    "floboset.P3.eyeOffset.y",
+    "floboset.P4.eyeOffset.y",
+    "floboset.P5.eyeOffset.y",
+    "floboset.Neutral.face"
+};
 const char * ThemeManagerImpl::s_key_FloboColorOffset[NUMBER_OF_FLOBOS_IN_SET] = {
     "floboset.P1.offset",
     "floboset.P2.offset",
@@ -191,6 +207,8 @@ void ThemeManagerImpl::end_floboset(GoomSL *gsl, GoomHash *global,
         currentFloboThemeDescription.disappear = (const char *)GSL_GLOBAL_PTR(gsl, s_key_FloboDisappear[i]);
         currentFloboThemeDescription.explosion = (const char *)GSL_GLOBAL_PTR(gsl, s_key_FloboExplosion[i]);
         currentFloboThemeDescription.eye =       (const char *)GSL_GLOBAL_PTR(gsl, s_key_FloboEye[i]);
+        currentFloboThemeDescription.eyeOffsetX = GSL_GLOBAL_INT(gsl, s_key_FloboEyeOffsetX[i]);
+        currentFloboThemeDescription.eyeOffsetY = GSL_GLOBAL_INT(gsl, s_key_FloboEyeOffsetY[i]);
         currentFloboThemeDescription.colorOffset = GSL_GLOBAL_FLOAT(gsl, s_key_FloboColorOffset[i]);
     }
     themeMgr->m_floboSetThemeList.push_back(themeName);
@@ -458,6 +476,15 @@ IosSurface *FloboThemeImpl::getEyeSurfaceForIndex(int index, int compression) co
     return ref;
 }
 
+int FloboThemeImpl::getEyeSurfaceOffsetX() const
+{
+    return m_desc.eyeOffsetX;
+}
+int FloboThemeImpl::getEyeSurfaceOffsetY() const
+{
+    return m_desc.eyeOffsetY;
+}
+
 IosSurface *FloboThemeImpl::getCircleSurfaceForIndex(int index) const
 {
     IosSurface * &ref = m_circles[index];
@@ -511,7 +538,7 @@ IosSurface *FloboThemeImpl::getShrinkingSurfaceForIndex(int index) const
     IosSurface *ref = m_shrinking[index];
     if (ref == NULL) {
         ostringstream osstream;
-        osstream << m_path << "/" << m_desc.face << "-flobo-disappear-" << index << ".png";
+        osstream << m_path << "/" << m_desc.disappear << "-flobo-disappear-" << index << ".png";
         ImageOperationList opList;
         if (m_desc.colorOffset == 0) {
             m_baseShrinking[index] = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
@@ -534,7 +561,7 @@ IosSurface *FloboThemeImpl::getExplodingSurfaceForIndex(int index) const
     IosSurface *ref = m_explosion[index];
     if (ref == NULL) {
         ostringstream osstream;
-        osstream << m_path << "/" << m_desc.face << "-flobo-explosion-" << index << ".png";
+        osstream << m_path << "/" << m_desc.explosion << "-flobo-explosion-" << index << ".png";
         ImageOperationList opList;
         if (m_desc.colorOffset == 0) {
             m_baseExplosion[index] = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
@@ -594,7 +621,14 @@ IosSurface *NeutralFloboThemeImpl::getEyeSurfaceForIndex(int index, int compress
 {
     return NULL;
 }
-
+int NeutralFloboThemeImpl::getEyeSurfaceOffsetX() const
+{
+    return 0;
+}
+int NeutralFloboThemeImpl::getEyeSurfaceOffsetY() const
+{
+    return 0;
+}
 IosSurface *NeutralFloboThemeImpl::getCircleSurfaceForIndex(int index) const
 {
     return NULL;

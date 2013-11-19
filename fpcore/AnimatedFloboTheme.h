@@ -42,6 +42,7 @@ public:
     std::string explosion;
     std::string eye;
     float colorOffset;
+    int eyeOffsetX, eyeOffsetY;
 };
 
 class FloboSetThemeDescription {
@@ -134,6 +135,8 @@ public:
     virtual IosSurface *getShadowSurface(int compression = 0) const;
     virtual IosSurface *getShrinkingSurfaceForIndex(int index) const;
     virtual IosSurface *getExplodingSurfaceForIndex(int index) const;
+    virtual int getEyeSurfaceOffsetX() const;
+    virtual int getEyeSurfaceOffsetY() const;
 private:
     mutable IosSurface* m_faces[NUMBER_OF_FLOBO_FACES][MAX_COMPRESSED];
     mutable IosSurfaceRef m_baseFaces[NUMBER_OF_FLOBO_FACES];
@@ -165,6 +168,8 @@ public:
     virtual IosSurface *getShadowSurface(int compression = 0) const;
     virtual IosSurface *getShrinkingSurfaceForIndex(int index) const;
     virtual IosSurface *getExplodingSurfaceForIndex(int index) const;
+    virtual int getEyeSurfaceOffsetX() const;
+    virtual int getEyeSurfaceOffsetY() const;
 private:
     mutable IosSurface *m_faces[MAX_COMPRESSED];
     mutable IosSurfaceRef m_baseFace;
@@ -287,6 +292,8 @@ private:
     static const char *s_key_FloboDisappear[NUMBER_OF_FLOBOS_IN_SET];
     static const char *s_key_FloboExplosion[NUMBER_OF_FLOBOS_IN_SET];
     static const char *s_key_FloboEye[NUMBER_OF_FLOBOS_IN_SET];
+    static const char *s_key_FloboEyeOffsetX[NUMBER_OF_FLOBOS_IN_SET];
+    static const char *s_key_FloboEyeOffsetY[NUMBER_OF_FLOBOS_IN_SET];
     static const char *s_key_FloboColorOffset[NUMBER_OF_FLOBOS_IN_SET];
 
     DataPathManager &m_dataPathManager;

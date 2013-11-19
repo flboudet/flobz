@@ -217,7 +217,7 @@ public:
 class FloboDefaultIterator : public FloboIterator {
 public:
     FloboDefaultIterator(FloboGame *game)
-        : m_game(game), m_peek(NULL), m_x(0), m_y(0), m_finished(false) {
+        : m_game(game), m_peek(NULL), m_x(0), m_y(FLOBOBAN_DIMY-1), m_finished(false) {
         ++(*this);
     }
     Flobo *get() { return m_peek; }
@@ -226,9 +226,9 @@ public:
         do {
             m_peek = m_game->getFloboAt(m_x++, m_y);
             if (m_x == FLOBOBAN_DIMX) {
-                m_x = 0; ++m_y;
+                m_x = 0; --m_y;
             }
-            else if (m_y == FLOBOBAN_DIMY)
+            else if (m_y == -1)
                 m_finished = true;
         } while ((m_peek == NULL) && (! m_finished));
         return *this;

@@ -71,6 +71,8 @@ public:
     virtual IosSurface *getShadowSurface(int compression = 0) const = 0;
     virtual IosSurface *getShrinkingSurfaceForIndex(int index) const = 0;
     virtual IosSurface *getExplodingSurfaceForIndex(int index) const = 0;
+    virtual int getEyeSurfaceOffsetX() const = 0;
+    virtual int getEyeSurfaceOffsetY() const = 0;
 protected:
     FloboTheme() {}
 private:
