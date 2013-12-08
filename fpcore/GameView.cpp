@@ -237,7 +237,12 @@ void GameView::render(DrawTarget *dt)
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;
             dt->draw(currentSurface, NULL, &drect);
-            dt->draw(nextFloboTheme.getEyeSurfaceForIndex(0), NULL, &drect);
+            IosSurface *s = nextFloboTheme.getEyeSurfaceForIndex(0);
+            drect.x += nextFloboTheme.getEyeSurfaceOffsetX();
+            drect.y += nextFloboTheme.getEyeSurfaceOffsetY();
+            drect.w = s->w;
+            drect.h = s->h;
+            dt->draw(s, NULL, &drect);
         }
         const FloboTheme &nextCompanionTheme =
             attachedThemeSet->getFloboTheme(attachedGame->getNextCompanion());
@@ -248,7 +253,12 @@ void GameView::render(DrawTarget *dt)
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;
             dt->draw(currentSurface, NULL, &drect);
-            dt->draw(nextCompanionTheme.getEyeSurfaceForIndex(0), NULL, &drect);
+            IosSurface *s = nextCompanionTheme.getEyeSurfaceForIndex(0);
+            drect.x += nextCompanionTheme.getEyeSurfaceOffsetX();
+            drect.y += nextCompanionTheme.getEyeSurfaceOffsetY();
+            drect.w = s->w;
+            drect.h = s->h;
+            dt->draw(s, NULL, &drect);
         }
     }
 
@@ -275,7 +285,12 @@ void GameView::renderNeutral(DrawTarget *dt)
     IosSurface *neutral = attachedLevelTheme->getNeutralIndicator();
     IosSurface *bigNeutral = attachedLevelTheme->getBigNeutralIndicator();
     IosSurface *giantNeutral = attachedLevelTheme->getGiantNeutralIndicator();
-
+    if (neutral == NULL)
+        throw Exception(String("Neutral indicator not found!"));
+    if (bigNeutral == NULL)
+        throw Exception(String("Big neutral indicator not found!"));
+    if (giantNeutral == NULL)
+        throw Exception(String("Giant neutral indicator not found!"));
     for (int cpt = 0 ; cpt < numGiantNeutral ; cpt++) {
 		drect.x = drect_x;
 		drect.y = drect_y_base - giantNeutral->h;
