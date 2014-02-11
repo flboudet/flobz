@@ -12,9 +12,9 @@ namespace gameui {
     float        GameUIDefaults::SPACING          = 16.0f;
     IosFont      *GameUIDefaults::FONT             = NULL;
     IosFont      *GameUIDefaults::FONT_TEXT        = NULL;
-    RGBA          GameUIDefaults::FONT_COLOR;
+    RGBA          GameUIDefaults::FONT_COLOR = GT_BLACK;
     IosFont      *GameUIDefaults::FONT_INACTIVE    = NULL;
-    RGBA          GameUIDefaults::FONT_INACTIVE_COLOR;
+    RGBA          GameUIDefaults::FONT_INACTIVE_COLOR = GT_BLACK;
     IosFont      *GameUIDefaults::FONT_SMALL_ACTIVE= NULL;
     RGBA          GameUIDefaults::FONT_SMALL_COLOR = GT_WHITE;
     IosFont      *GameUIDefaults::FONT_SMALL_INFO  = NULL;
@@ -1568,6 +1568,7 @@ namespace gameui {
     void Button::lostFocus() {
         Text::lostFocus();
         font = fontInactive;
+        m_color = GameUIDefaults::FONT_INACTIVE_COLOR;
         requestDraw();
     }
 
@@ -1575,6 +1576,7 @@ namespace gameui {
         if (!haveFocus()) boing();// (boing may cause "mouse_up" not to be catched)
         Text::giveFocus();
         font = fontActive;
+        m_color = GameUIDefaults::FONT_COLOR;
         requestDraw();
     }
 
