@@ -1316,7 +1316,7 @@ void gsl_fast_iflow_free(FastInstructionFlow *fastiflow)
 typedef void * YY_BUFFER_STATE;
 YY_BUFFER_STATE yy_scan_string(const char *str);
 void yy_delete_buffer(YY_BUFFER_STATE buffer);
-void yyparse(void);
+int yyparse(void);
 void yy_switch_to_buffer (YY_BUFFER_STATE new_buffer  );
 YY_BUFFER_STATE yy_create_buffer (FILE *file,int size  );
 void yypush_buffer_state (YY_BUFFER_STATE new_buffer  );

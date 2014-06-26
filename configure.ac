@@ -9,12 +9,13 @@ AC_INIT([flobopop], [1.0], [flobo@ios-software.com])
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 AC_CONFIG_SRCDIR([fpcore/main.cpp])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
 ENABLE_AUDIO=true
+# TODO: remove ENABLE_TTF flag (obsolete)
 ENABLE_TTF=true
 #ENABLE_BENCHMARKS?=false
 
@@ -23,7 +24,9 @@ ENABLE_TTF=true
 # SDL_LIBS
 # SDL_CFLAGS
 # SDL_VERSION
-#
+# FREETYPE_CONFIG: path to the freetype-config tool. Ignored if FREETYPE_LIBS is supplied.
+# FREETYPE_LIBS
+# FREETYPE_CFLAGS
 
 
 AC_ARG_ENABLE(network,
@@ -64,6 +67,7 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_OBJC
+AM_PROG_AR
 AC_PROG_LEX
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
@@ -87,6 +91,7 @@ CXXFLAGS="$CXXFLAGS $FPCOMMON_FLAGS"
 CFLAGS="$CFLAGS $FPCOMMON_FLAGS"
 OBJCFLAGS="$OBJCFLAGS $FPCOMMON_FLAGS"
 
+# SDL is always required
 if test "x$SDL_LIBS" = "x"; then
    # Check for SDL_CONFIG
    if test "x$SDL_CONFIG" = "x"; then
@@ -118,6 +123,33 @@ You may correct the problem by either:
              fi
     esac
     fi
+fi
+
+# Freetype is only required for the OpenGL backend
+if test "x$ENABLE_OPENGL_GFX" = "xyes"; then
+if test "x$FREETYPE_LIBS" = "x"; then
+   # Check for FREETYPE_CONFIG
+   if test "x$FREETYPE_CONFIG" = "x"; then
+   case $host_os in
+     	 *)
+	     AC_PATH_PROGS([FREETYPE_CONFIG], [freetype-config], [none])
+             if test "x$FREETYPE_CONFIG" = "xnone"; then
+                 AC_MSG_ERROR([*** freetype-config not found!
+Either freetype-devel is not installed, or is installed in a different path.
+You may correct the problem by either:
+  - installing freetype-devel if it is not installed.
+  - setting the FREETYPE_CONFIG variable to the path of the freetype-config program
+  - setting the FREETYPE_LIBS variable to the compilation flags required to
+    link to the freetype libraries, and FREETYPE_CFLAGS to the compilation flags
+    required to compile with the freetype headers.])
+             else
+	       # use freetype-config to build FREETYPE_LIBS
+               FREETYPE_LIBS=`$FREETYPE_CONFIG --libs`
+               FREETYPE_CFLAGS=`$FREETYPE_CONFIG --cflags`
+             fi
+    esac
+    fi
+fi
 fi
 
 #######################################################################
@@ -173,6 +205,10 @@ AC_SEARCH_LIBS([Mix_OpenAudio],
 	     [AC_MSG_ERROR([*** SDL_mixer lib not found! Get SDL_mixer from
 http://www.libsdl.org/projects/SDL_mixer/index.html])])
 
+AC_SEARCH_LIBS([Player_GetModule],
+               [mikmod],,
+	     [AC_MSG_ERROR([*** mikmod lib not found!])])
+
 AC_SEARCH_LIBS([TTF_Init],
                [SDL_ttf],,
 	     [AC_MSG_ERROR([*** SDL_ttf lib not found! Get SDL_ttf from
@@ -185,6 +221,10 @@ AC_SEARCH_LIBS([png_set_read_fn], [png])
 AC_SEARCH_LIBS([jpeg_read_header], [jpeg])
 
 AC_SEARCH_LIBS([FT_Load_Glyph], [freetype])
+
+AC_SEARCH_LIBS([pthread_mutex_trylock],
+               [pthread],,
+	     [AC_MSG_ERROR([*** pthread lib not found!])])
 
 SDL_LIBS=$LIBS
 LIBS=$OLD_LIBS
@@ -255,6 +295,8 @@ AC_CHECK_HEADERS([GL/gl.h OpenGL/gl.h],
 if test "x$GL_H_FOUND" = "x"; then
     ENABLE_OPENGL_GFX=no
 fi
+# OpenGL support requires freetype2 headers, TODO: add proper check
+CXXFLAGS="$CXXFLAGS $FREETYPE_CFLAGS"
 AC_CHECK_HEADERS([GL/glext.h OpenGL/glext.h],
                  [GLEXT_H_FOUND=1; break], [],
                  [#ifdef HAVE_GL_GL_H
