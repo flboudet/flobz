@@ -142,7 +142,7 @@ void SoloGameWidget::cycle()
 {
     bool isGameOver = m_areaA->isGameOver() || getAborted();
     if ((!m_paused) && (!isGameOver)) {
-        theCommander->playMusicTrack("level1");
+        theCommander->playMusicTrack("herbert");
         // Game parameters
         m_cyclesDuration.step();
         m_levelIncrease.step();
