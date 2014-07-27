@@ -375,7 +375,10 @@ void MatchIsOverState::enterState()
 {
     GTLogTrace("MatchIsOver::enterState()");
     m_aknowledged = false;
-    if (m_sharedAssets.m_gameWidget->isGameARunning()) {
+    if (m_styrolyseName != "") {
+        m_gameLostWidget.reset(new StoryWidget(m_styrolyseName.c_str(), this));
+    }
+    else if (m_sharedAssets.m_gameWidget->isGameARunning()) {
         m_gameLostWidget.reset(new StoryWidget(m_sharedAssets.m_currentLevelTheme->getGameLostRightAnimation2P().c_str(), this));
         m_sharedAssets.m_leftVictories++;
     }
@@ -416,7 +419,7 @@ void MatchIsOverState::action(Widget *sender, int actionType,
     else if ((actionType == GameWidget::GAMEOVER_STARTPRESSED)
              || ((m_gameLostWidget.get() != NULL)
                  && (sender == (Widget *)(m_gameLostWidget->getParentScreen()))))
-        {
+    {
         GTLogTrace("MatchIsOver: acknowledged by screen action");
         m_gameLostWidget->getParentScreen()->removeAction(this);
         m_gameLostWidget.reset(NULL);

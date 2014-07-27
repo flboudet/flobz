@@ -278,8 +278,10 @@ public:
     void setNextState(GameState *nextState) {
         m_nextState = nextState;
     }
+    void setStyrolyse(std::string styrolyse) { m_styrolyseName = styrolyse; }
 private:
     SharedMatchAssets &m_sharedAssets;
+    std::string m_styrolyseName;
     std::auto_ptr<StoryWidget> m_gameLostWidget;
     bool m_aknowledged;
     GameState *m_nextState;
@@ -503,4 +505,3 @@ private:
 
 
 #endif // _LOCALGAMESTATES_H
-

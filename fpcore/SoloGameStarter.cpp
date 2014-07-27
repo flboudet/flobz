@@ -333,6 +333,7 @@ SoloModeStarterAction::SoloModeStarterAction(GameDifficulty difficulty, PlayerNa
     m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
     m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));
     m_matchIsOver.reset(new MatchIsOverState(m_sharedAssets));
+    m_matchIsOver->setStyrolyse("gamelost1p.gsl");
     m_hallOfFame.reset(new ManageHiScoresState(&m_sharedAssets, nameProvider,
                                                (std::string(SOLO_SCOREBOARD_ID) + "." + scoreBoardSuffix).c_str(),
                                                   "gamewon_highscores_1p.gsl"));
