@@ -201,6 +201,9 @@ void SoloGameWidget::draw(DrawTarget *dt)
     IosRect dtRect = { 0, 0, dt->w, dt->h };
     dt->draw(getLevelTheme()->getBackground(), &dtRect, &dtRect);
     m_areaA->render(dt);
+    // Rendering the foreground animation
+    if (m_styroPainter.get() != NULL)
+        m_styroPainter->draw(dt);
     // Rendering the combo meter
     m_comboMeter->setValue(m_comboHandicap / 100.);
     m_comboMeter->draw(dt);
@@ -213,9 +216,6 @@ void SoloGameWidget::draw(DrawTarget *dt)
                             getLevelTheme()->getNameDisplayX(0),
                             getLevelTheme()->getNameDisplayY(0),
                             m_playerName.c_str(), *color);
-    // Rendering the foreground animation
-    if (m_styroPainter.get() != NULL)
-        m_styroPainter->draw(dt);
     // Rendering the neutral puyos
     m_areaA->renderNeutral(dt);
 }
