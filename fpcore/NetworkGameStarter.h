@@ -49,7 +49,7 @@ public:
     };
 public:
     NetworkGameWidget();
-    void initWithGUI(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, FPServerIGPMessageBox *igpbox = NULL);
+    void initWithGUI(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, FPServerIGPMessageBox *igpbox = NULL, bool hasChatBox = true);
     void initWithoutGUI(ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction = NULL, FPServerIGPMessageBox *igpbox = NULL);
     void connectIA(int level);
     ~NetworkGameWidget();

@@ -47,7 +47,7 @@ GamePlayer *NetworkGameWidget::createLocalPlayer()
     return new CombinedEventPlayer(*localArea);
 }
 
-void NetworkGameWidget::initWithGUI(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, FPServerIGPMessageBox *igpbox)
+void NetworkGameWidget::initWithGUI(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, FPServerIGPMessageBox *igpbox, bool hasChatBox)
 {
     attachedFloboThemeSet = &floboSetTheme;
     attachedRandom = std::auto_ptr<RandomSystem>(new RandomSystem(randomSeed, 5));
@@ -63,7 +63,8 @@ void NetworkGameWidget::initWithGUI(FloboSetTheme &floboSetTheme, LevelTheme &le
     }
     networkArea = std::auto_ptr<GameView>(new GameView(attachedNetworkGameFactory.get(), 1, attachedFloboThemeSet, &levelTheme));
     this->mbox->addListener(this);
-    chatBox = std::auto_ptr<ChatBox>(new ChatBox(*this));
+    if (hasChatBox)
+        chatBox = std::auto_ptr<ChatBox>(new ChatBox(*this));
     brokenNetworkWidget = std::auto_ptr<StoryWidget>(new StoryWidget("etherdown.gsl"));
     networkIsBroken = false;
     GameWidget2P::initWithGUI(*localArea, *networkArea, levelTheme, gameOverAction);
@@ -147,7 +148,8 @@ void NetworkGameWidget::onMessage(Message &message)
             GameWidget2P::abort();
             break;
         case FPNetMessage::kGameChat:
-            chatBox->addChat(message.getString("NAME"), message.getString("TEXT"));
+            if (chatBox.get())
+                chatBox->addChat(message.getString("NAME"), message.getString("TEXT"));
             printf("%s: %s\n", (const char *)message.getString("NAME"), (const char *)message.getString("TEXT"));
             break;
         default:
@@ -213,14 +215,17 @@ void NetworkGameWidget::sendChat(String chatText)
     message->addString("TEXT",   chatText);
     message->addBoolProperty("RELIABLE", true);
     message->send();
-    chatBox->addChat(getPlayerOneName(), chatText);
+    if (chatBox.get())
+        chatBox->addChat(getPlayerOneName(), chatText);
     delete message;
 }
 
 void NetworkGameWidget::associatedScreenHasBeenSet(GameScreen *associatedScreen)
 {
-    associatedScreen->getPauseMenu().add(chatBox.get());
-    associatedScreen->getPauseMenu().pauseMenuTop = 5;
+    if (chatBox.get()) {
+        associatedScreen->getPauseMenu().add(chatBox.get());
+        associatedScreen->getPauseMenu().pauseMenuTop = 5;
+    }
 }
 
 void NetworkGameWidget::sendAliveMsg()
@@ -430,4 +435,3 @@ NetworkGameStateMachine::NetworkGameStateMachine(GameWidgetFactory  *gameWidgetF
     // Initializing the state machine
     setInitialState(m_pushGameScreen.get());
 }
-
