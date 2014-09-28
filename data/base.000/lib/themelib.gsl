@@ -33,7 +33,8 @@ struct <Flobo:
     string eye,
     string explosion,
     string disappear,
-    float offset>
+    float offset,
+    Point eyeOffset>
 
 struct <FloboSet:
     string name,
@@ -75,6 +76,7 @@ string  author
 
 external <end_floboset>
 external <end_level>
+external <getBoolPreference: string name, int default> : int
 
 <start_description>
     author = "iOS-Software"
@@ -88,26 +90,36 @@ external <end_level>
     floboset.P1.face      = "round"
     floboset.P1.offset    = 0.0
     floboset.P1.eye       = "normal"
+    floboset.P1.eyeOffset.x = 0
+    floboset.P1.eyeOffset.y = 0
     floboset.P1.explosion = "round"
     floboset.P1.disappear = "round"
     floboset.P2.face      = "round"
     floboset.P2.offset    = 72.0
     floboset.P2.eye       = "normal"
+    floboset.P2.eyeOffset.x = 0
+    floboset.P2.eyeOffset.y = 0
     floboset.P2.explosion = "round"
     floboset.P2.disappear = "round"
     floboset.P3.face      = "round"
     floboset.P3.offset    = 144.0
     floboset.P3.eye       = "normal"
+    floboset.P3.eyeOffset.x = 0
+    floboset.P3.eyeOffset.y = 0
     floboset.P3.explosion = "round"
     floboset.P3.disappear = "round"
     floboset.P4.face      = "round"
     floboset.P4.offset    = 216.0
     floboset.P4.eye       = "normal"
+    floboset.P4.eyeOffset.x = 0
+    floboset.P4.eyeOffset.y = 0
     floboset.P4.explosion = "round"
     floboset.P4.disappear = "round"
     floboset.P5.face      = "round"
     floboset.P5.offset    = 288.0
     floboset.P5.eye       = "normal"
+    floboset.P5.eyeOffset.x = 0
+    floboset.P5.eyeOffset.y = 0
     floboset.P5.explosion = "round"
     floboset.P5.disappear = "round"
     floboset.Neutral.face = "glass"

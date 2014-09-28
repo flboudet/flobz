@@ -24,6 +24,8 @@ int @neutralsForLeft
 int @neutralsForRight
 int @comboPhaseLeft
 int @comboPhaseRight
+int @gameOverLeft
+int @gameOverRight
 
 string @event_type
 int  @event_player
@@ -220,4 +222,5 @@ external <getBoolPreference: string name, int default> : int
     (@maxHeightRight <= @maxHeightLeft)? stress = @maxHeightLeft
     stress -= 4
     (stress < 0)? stress = 0
-
+    (@gameOverRight = 1)? stress = -1
+    (@gameOverLeft = 1)? stress = -2

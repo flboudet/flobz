@@ -33,10 +33,6 @@ SUBDIRS+=mac
 flobopop_LDADD+=mac/libfpmac.la
 endif
 
-if MOBILE
-SUBDIRS+=mobile
-endif
-
 # Mac OS X Targets
 
 bundle_name = $(abs_top_builddir)/FloboPop.app
@@ -93,4 +89,3 @@ win_zip_archive: win_binary_distribution
 	rm -f $(winziparchive)
 	cd `dirname $(windistdir)` \
 	&& zip -9 -r $(winziparchive) `basename $(windistdir)`
-

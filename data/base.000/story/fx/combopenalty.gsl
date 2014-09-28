@@ -1,0 +1,25 @@
+<init_fx>
+  Sprite @flash    = [new_sprite: image="combopenalty.png" x=160.0 y=100.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  float @show_flash = 0.0
+  @supported_fx = "combopenalty"
+
+<sprite_list>
+  (@show_flash > 0.0)? {
+      sprite::@flash display=@display
+  }
+
+<update>
+    @show_flash = @show_flash - @delta_t
+    (@show_flash >= 0.0)? {
+        @flash.alpha = @show_flash
+        (@flash.alpha > 1.) ?
+          @flash.alpha = 1.
+        @busy = true
+    }
+    (@show_flash < 0.0)?  @busy = false
+
+<event: string type, Vec2 pos, int player>
+    (pos.y > 1.5)? {
+        @show_flash = 1.5
+        @busy = true
+    }

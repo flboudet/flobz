@@ -13,6 +13,7 @@ struct <Level:
     string opponentAI,
     string backgroundTheme,
     string gameLostStory,
+    string gameWonStory,
     string gameOverStory,
     string fxStory,
     IASetting easySetting,
@@ -33,6 +34,7 @@ external <getBoolPreference: string name, int default> : int
     level.fxStory             = "game_fx.gsl"
     level.backgroundTheme     = "Prefs.DefaultTheme"
     level.gameLostStory       = "gamelost1p.gsl"
+    level.gameWonStory        = "matchwon1p.gsl"
     level.gameOverStory       = "gameover1p.gsl"
     level.easySetting.type    = "RANDOM"
     level.easySetting.level   = 350

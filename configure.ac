@@ -48,11 +48,6 @@ AC_ARG_ENABLE(null-backends,
                 [enables compilation of the game with null backends (no graphics, no sound, no inputs)])],
        [ENABLE_NULL_BACKENDS=$enableval], [ENABLE_NULL_BACKENDS=no])
 
-AC_ARG_ENABLE(mobile,
-       [AS_HELP_STRING([--enable-mobile],
-                [enables compilation of the game with its mobile look and feel.])],
-       [ENABLE_MOBILE=$enableval], [ENABLE_MOBILE=no])
-
 #AC_ARG_ENABLE([audio],
 #              [AS_HELP_STRING([--enable-audio],
 #              [enable audio support @<:@default=yes@:>@])],
@@ -423,7 +418,7 @@ case $host_os in
        WIN32=true
        LIBS="$LIBS -lws2_32"
 esac
-AM_CONDITIONAL([MOBILE], [test x$ENABLE_MOBILE = xtrue])
+
 AM_CONDITIONAL([MACOSX], [test x$MACOSX = xtrue])
 AM_CONDITIONAL([WIN32], [test x$WIN32 = xtrue])
 
@@ -506,6 +501,5 @@ data/reduced.001/theme/Reduced.fptheme/locale/en/Makefile
 data/reduced.001/theme/Reduced.fptheme/locale/fr/Makefile
 fpserver/Makefile
 mac/Makefile
-mobile/Makefile
 ])
 AC_OUTPUT
