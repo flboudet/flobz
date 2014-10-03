@@ -19,6 +19,6 @@ EXTRA_DIST=GTLog.h FramedButton.h FramedEditField.h Frame.h \
            CompositeDrawContext.h PreferencesManager.h \
 	   PosixPreferencesManager.h rgba.h ResourceManager.h \
 	   ThreadedResourceManager.h NullDrawContext.h NullAudioManager.h \
-	   SlaveEventManager.h
+	   SlaveEventManager.h AchievementsManager.h
 
 SUBDIRS=sdl_drawcontext opengl_drawcontext
