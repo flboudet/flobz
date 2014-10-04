@@ -11,8 +11,8 @@ import <interlevel.gsl>
   balloon::@offTalk display=@display
   
 <update>
-  music: command="level1"
-  move::@kaori fcycle=90.0  x=@KaoriLeft y=@picHeight-@marges-@enemy*(@marges+@icons)
-  move::@peak fcycle=90.0  x=0.0 y=@displayV - @picHeight
-  (@cycle = 90)?  show_balloon_with_text::@offTalk text="Prepare to fight!\n\n< PRESS FIRE >"
-  (@cycle = 1800)? @finished=1
+    music: command="buildup"
+    move::@kaori fcycle=90.0  x=@KaoriLeft y=@picHeight-@marges-@enemy*(@marges+@icons)
+    move::@peak fcycle=90.0  x=0.0 y=@displayV - @picHeight
+    (@cycle = 90)?  show_balloon_with_text::@offTalk text="Prepare to fight!\n\n< PRESS FIRE >"
+    (@cycle = 1800)? @finished=1

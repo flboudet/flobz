@@ -34,6 +34,18 @@ int @neutralsForAI
 
   int @AI_PlayingLevel = 0
 
+  # Allows to detect changes in stress level
+  int @oldstress = -1
+
+# Vary the music when under stress
+<AI_update_music: string slow, string fast>
+  int s = [stress]
+  (@oldstress != s)? {
+    @oldstress = s
+    (s = 0)? music: command=slow
+    (s > 2)? music: command=fast
+  }
+
 <AI_LevelRectif>
 	  (@AI_PlayingLevel >= 25)? {
 		@AI_FastDropDelta /= 4

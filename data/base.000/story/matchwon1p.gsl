@@ -1,0 +1,21 @@
+<init>
+  // Timing
+  float @kaoriArrived = 340.0
+  # Init function: called when script is loaded
+  Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
+  Sprite @kaori = [new_sprite: image="kaori_gamewon.png" x = 700.0 y=60.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
+  music: command="victory"
+  [sound: file="win.wav" volume=0.2]
+
+<sprite_list>
+  # Call the 'sprite' function for each sprite you want to update/draw
+  # This also allows you to specify the drawing order
+  sprite::@kaori display=@display
+
+<update>
+  # Update function: called every animation cycle
+  move::@kaori fcycle=10.0 x=@kaoriArrived y=@kaori.pos.y
+  move::@kaori fcycle=60.0 x=@kaori.pos.x y=@kaori.pos.y
+  move::@kaori fcycle=90.0 x=@kaori.pos.x y=800.0
+
+  (@kaori.pos.y > 200.0)? @finished = 1

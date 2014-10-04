@@ -18,9 +18,15 @@ import <libface.gsl>
     
     # mechapuyo is quick and drops everything quickly
     @AI_FastDropDelta = 12
+	(@AI_PlayingLevel >  5)? @AI_FastDropDelta = 10
+	(@AI_PlayingLevel > 20)? @AI_FastDropDelta = 9
 
     # mechapuyo takes some risk
     @AI_CriticalHeight = 10
+	(@AI_PlayingLevel >  5)? @AI_CriticalHeight = 9
+	(@AI_PlayingLevel > 20)? @AI_CriticalHeight = 8
+
+    (@AI_PlayingLevel > 20)? @AI_PotentialSuppression = 0
 
     # Init the sprite for the face lib with mechapuyo
     [face_init: name="introlevel/mechapuyo-mini.png"]
@@ -44,3 +50,4 @@ import <libface.gsl>
   (@maxHeightAI > 9) ? @AI_PotentialSuppression = 1
   (@maxHeightAI > 10) ? @AI_PotentialSuppression = 0
 
+  AI_update_music: slow="mechapuyo" fast="mechapuyo-fast"

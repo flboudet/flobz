@@ -1,17 +1,48 @@
 [start_music: path="music/pop.xm"]
-[define_track: key="menu"         pos=12]
-[define_track: key="credits"      pos=1 ]
-[define_track: key="network menu" pos=15]
-[define_track: key="level1"       pos=34]
-[define_track: key="level2"       pos=22]
-[define_track: key="level2-speed" pos=40]
-[define_track: key="level3"       pos=1 ]
-[define_track: key="level4"       pos=15]
-[define_track: key="level5"       pos=34]
-[define_track: key="level6"       pos=22]
-[define_track: key="level6-speed" pos=40]
-[define_track: key="level7"       pos=34]
-[define_track: key="level8"       pos=1 ]
-[define_track: key="level8-speed" pos=40]
-[define_track: key="level9"       pos=34]
+
+  int submenu   = 15
+  int game2slow = 1
+  int game3slow = 22
+  int game1slow = 34
+  int game1fast = 40
+  int menu      = 47
+  int victory   = 54
+  int defeat    = 65
+  int buildup   = 66
+
+  [define_track: key="menu"         pos=menu]
+  [define_track: key="credits"      pos=game2slow]
+  [define_track: key="network menu" pos=submenu]
+
+  [define_track: key="victory"      pos=victory]
+  [define_track: key="defeat"       pos=defeat]
+  [define_track: key="buildup"      pos=buildup]
+
+  [define_track: key="herbert"        pos=game1slow]
+  [define_track: key="herbert-fast"   pos=game1fast]
+
+  [define_track: key="dukebeary"      pos=game3slow]
+  [define_track: key="dukebeary-fast" pos=game3slow]
+
+  [define_track: key="orloff"         pos=game2slow]
+  [define_track: key="orloff-fast"    pos=game2slow]
+
+  [define_track: key="azrael"         pos=game1slow]
+  [define_track: key="azrael-fast"    pos=game1fast]
+
+  [define_track: key="monk"           pos=game3slow]
+  [define_track: key="monk-fast"      pos=game3slow]
+
+  [define_track: key="zklogh"         pos=game2slow]
+  [define_track: key="zklogh-fast"    pos=game2slow]
+
+  [define_track: key="frankenpuyo"      pos=game1slow]
+  [define_track: key="frankenpuyo-fast" pos=game1fast]
+
+  [define_track: key="mcflurry"       pos=game2slow]
+  [define_track: key="mcflurry-fast"  pos=game2slow]
+
+  [define_track: key="mechapuyo"      pos=game3slow]
+  [define_track: key="mechapuyo-fast" pos=game3slow]
+
 [end_music]

@@ -28,4 +28,5 @@ import <libface.gsl>
 # Update function: called every animation cycle
 <update>
   [face_update]
+  AI_update_music: slow="frankenpuyo" fast="frankenpuyo-fast"
 

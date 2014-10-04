@@ -30,8 +30,8 @@ import <libface.gsl>
 # Update function: called every animation cycle
 <update>
   [face_update]
-  # dukebeary doesn't has no patience and plays dumbly after 2 minutes
+  # dukebeary has no patience and plays dumbly after 2 minutes
   @AI_ThinkDepth = 1
   (@cycle > 3000) ? @AI_ThinkDepth = 0
-  ([stress] = 0)? music: command="level2"
-  ([stress] > 2)? music: command="level2-speed"
+
+  AI_update_music: slow="dukebeary" fast="dukebeary-fast"

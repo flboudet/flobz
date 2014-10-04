@@ -13,6 +13,6 @@ import <flying_flobo.gsl>
 <update>
   # Update function: called every animation cycle
 
-  music: command="game won"
+  music: command="victory"
   flying_flobo_update
   (@cycle = 1000)? @finished = 1

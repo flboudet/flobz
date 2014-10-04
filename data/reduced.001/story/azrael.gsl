@@ -32,5 +32,7 @@ import <libface.gsl>
 <update>
     [face_update]
 
-    # azrael isn't that clever and doesn't think far
-    @AI_ThinkDepth = 1
+  # azrael isn't that clever and doesn't think far
+  @AI_ThinkDepth = 1
+
+  AI_update_music: slow="azrael" fast="azrael-fast"

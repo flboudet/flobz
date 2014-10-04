@@ -8,3 +8,52 @@
 [define_crop: key="gfx/title/O2.png" x=161 y=244 w=62 h=72]
 [define_crop: key="gfx/title/O3.png" x=161 y=316 w=60 h=61]
 [end_graphic]
+
+[start_music: path="music/pop.xm"]
+
+  int submenu   = 15
+  int game2slow = 1
+  int game3slow = 22
+  int game1slow = 34
+  int game1fast = 40
+  int menu      = 47
+  int victory   = 54
+  int defeat    = 65
+  int buildup   = 66
+  
+  [define_track: key="menu"         pos=menu]
+  [define_track: key="credits"      pos=game2slow]
+  [define_track: key="network menu" pos=submenu]
+
+  [define_track: key="victory"      pos=victory]
+  [define_track: key="defeat"       pos=defeat]
+  [define_track: key="buildup"      pos=buildup]
+
+  [define_track: key="herbert"        pos=game1slow]
+  [define_track: key="herbert-fast"   pos=game1fast]
+
+  [define_track: key="dukebeary"      pos=game3slow]
+  [define_track: key="dukebeary-fast" pos=game3slow]
+
+  [define_track: key="orloff"         pos=game2slow]
+  [define_track: key="orloff-fast"    pos=game2slow]
+
+  [define_track: key="azrael"         pos=game1slow]
+  [define_track: key="azrael-fast"    pos=game1fast]
+
+  [define_track: key="monk"           pos=game3slow]
+  [define_track: key="monk-fast"      pos=game3slow]
+
+  [define_track: key="zklogh"         pos=game2slow]
+  [define_track: key="zklogh-fast"    pos=game2slow]
+
+  [define_track: key="frankenpuyo"      pos=game1slow]
+  [define_track: key="frankenpuyo-fast" pos=game1fast]
+
+  [define_track: key="mcflurry"       pos=game2slow]
+  [define_track: key="mcflurry-fast"  pos=game2slow]
+
+  [define_track: key="mechapuyo"      pos=game3slow]
+  [define_track: key="mechapuyo-fast" pos=game3slow]
+
+[end_music]

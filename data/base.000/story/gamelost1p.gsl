@@ -5,7 +5,7 @@
   Display @display  = [new_display: x=0.0 y=0.0 width=640.0 height=480.0]
 
   Sprite @kaori = [new_sprite: image="kaori_gamelost/kaori_gamelost.png" x = 720.0 y=40.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
-  Sprite @tears = [new_sprite: image="kaori_gamelost/tears1.png" x = -85.0 y=70.0 curframe=0.0 framespeed=0.5 nbframes=2.0]
+  Sprite @tears = [new_sprite: image="kaori_gamelost/tears1.png" x = 0.0 y=48.0 curframe=0.0 framespeed=0.5 nbframes=2.0]
   @tears.parent = "@kaori"
 
   Sprite @flobo      = [new_sprite: image="knockedflobo.png" x = 700.0 y=500.0 curframe=0.0 framespeed=0.2 nbframes=1.0]
@@ -16,7 +16,7 @@
   @blueStar.parent="@flobo"
   @greenStar.parent="@flobo"
 
-  music: command="game over"
+  music: command="defeat"
 
 <sprite_list>
   # Call the 'sprite' function for each sprite you want to update/draw

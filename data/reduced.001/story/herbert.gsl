@@ -41,6 +41,4 @@ import <libface.gsl>
   @AI_ThinkDepth = 1
   (@maxHeightAI > 6) ? @AI_ThinkDepth = 0
 
-  # Vary the music when herbert is under stress
-#([stress] = 0)? music: command="level1"
-#([stress] > 2)? music: command="level1-speed"
+  AI_update_music: slow="herbert" fast="herbert-fast"
