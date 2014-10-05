@@ -1,44 +1,44 @@
 ACLOCAL_AMFLAGS=-I m4
 
-bin_PROGRAMS=flobopop
-flobopop_SOURCES=
-flobopop_CXXFLAGS = -I$(top_srcdir)/iosfc -I$(top_srcdir)/gametools -I$(top_srcdir)/goomsl $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
-flobopop_OBJCFLAGS= $(SDL_CFLAGS)
-flobopop_LDADD=fpcore/libfpcore.la gametools/libgametools.la goomsl/libgoomsl.la iosfc/libiosfc.la
+bin_PROGRAMS=flobz
+flobz_SOURCES=
+flobz_CXXFLAGS = -I$(top_srcdir)/iosfc -I$(top_srcdir)/gametools -I$(top_srcdir)/goomsl $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
+flobz_OBJCFLAGS= $(SDL_CFLAGS)
+flobz_LDADD=fpcore/libfpcore.la gametools/libgametools.la goomsl/libgoomsl.la iosfc/libiosfc.la
 
 # Force the C++ linker
-nodist_EXTRA_flobopop_SOURCES=dummy.cpp
+nodist_EXTRA_flobz_SOURCES=dummy.cpp
 
 EXTRA_DIST=
 
 # Graphic backend configuration
 if ENABLE_SDL12_GFX
-flobopop_LDADD+=gametools/sdl_drawcontext/libsdl12_drawcontext.la
+flobz_LDADD+=gametools/sdl_drawcontext/libsdl12_drawcontext.la
 endif
 
 if ENABLE_SDL13_GFX
-flobopop_LDADD+=gametools/sdl_drawcontext/libsdl13_drawcontext.la
+flobz_LDADD+=gametools/sdl_drawcontext/libsdl13_drawcontext.la
 endif
 
 if ENABLE_OPENGL_GFX
-flobopop_LDADD+=gametools/opengl_drawcontext/libopengl_drawcontext.la
+flobz_LDADD+=gametools/opengl_drawcontext/libopengl_drawcontext.la
 endif
 
-flobopop_LDADD+=$(SDL_LIBS)
+flobz_LDADD+=$(SDL_LIBS)
 
 SUBDIRS = iosfc gametools goomsl common fpcore data fpserver
 
 if MACOSX
 SUBDIRS+=mac
-flobopop_LDADD+=mac/libfpmac.la
+flobz_LDADD+=mac/libfpmac.la
 endif
 
 # Mac OS X Targets
 
-bundle_name = $(abs_top_builddir)/FloboPop.app
-macimage_name=flobopop-$(VERSION)-mac$(REVISION)
+bundle_name = $(abs_top_builddir)/FlobZ.app
+macimage_name=flobz-$(VERSION)-mac$(REVISION)
 
-mac-bundle: flobopop
+mac-bundle: flobz
 	rm -Rf "$(bundle_name)"
 	mkdir -p "$(bundle_name)/Contents/MacOS"
 	mkdir -p "$(bundle_name)/Contents/Resources"
@@ -83,7 +83,7 @@ win_binary_distribution:
 win_installer: win_binary_distribution
 	cd $(windistdir) \
 	&& makensis -NOCD $(abs_top_srcdir)/win32/installer.nsi \
-	&& mv FloboPopSetup.exe $(wininstaller)
+	&& mv FlobZSetup.exe $(wininstaller)
 
 win_zip_archive: win_binary_distribution
 	rm -f $(winziparchive)

@@ -5,7 +5,7 @@
 # Configuration                                                       #
 #######################################################################
 
-AC_INIT([flobopop], [1.0], [flobo@ios-software.com])
+AC_INIT([flobz], [1.0], [flboudet+flobz@gmail.com])
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
