@@ -21,6 +21,9 @@ float @kaoriDestX
   Sprite @bigflobo = [new_sprite: image="happyflobo.png" x = 500.0 y=480.0 curframe=0.0 framespeed=0.15 nbframes=1.0]
   @isFullScreen = 1
   flying_flobo_init
+  @flying_flobo_TitleDisplayXBase = 450.0
+  @flying_flobo_TitleDisplayYBase = 160.0
+  @flying_flobo_AmplitudeWaveTitle = 10.0
   Sprite @appStore = [new_sprite: image="app_store.png" x=20.0 y=490.0 curframe=0.0  framespeed=0.15 nbframes=1.0]
 
   # Cache resources for future use

@@ -1,14 +1,3 @@
-[start_graphic: path="gfx/title/montage_title.png"]
-[define_crop: key="gfx/title/F.png"  x=0 y=0 w=108 h=167]
-[define_crop: key="gfx/title/L.png"  x=108 y=0 w=70 h=133]
-[define_crop: key="gfx/title/B.png"  x=178 y=0 w=70 h=142]
-[define_crop: key="gfx/title/P.png"  x=0 y=167 w=86 h=139]
-[define_crop: key="gfx/title/P2.png" x=86 y=167 w=75 h=155]
-[define_crop: key="gfx/title/O.png"  x=161 y=167 w=65 h=77]
-[define_crop: key="gfx/title/O2.png" x=161 y=244 w=62 h=72]
-[define_crop: key="gfx/title/O3.png" x=161 y=316 w=60 h=61]
-[end_graphic]
-
 [start_music: path="music/pop.xm"]
 
   int submenu   = 15
@@ -20,7 +9,7 @@
   int victory   = 54
   int defeat    = 65
   int buildup   = 66
-  
+
   [define_track: key="menu"         pos=menu]
   [define_track: key="credits"      pos=game2slow]
   [define_track: key="network menu" pos=submenu]
