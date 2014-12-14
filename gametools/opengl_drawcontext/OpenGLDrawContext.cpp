@@ -1109,8 +1109,8 @@ void IosGLSurfaceRef::drawToGL(IosRect *pSrcRect, IosRect *pDstRect, ToGlDrawMod
         texcoord[6] = texcoord[2];
         texcoord[7] = texcoord[5];
     }
-    double dx = 0.25, dy = 0.25;
-    //double dx = 0, dy = 0;
+    //double dx = 0.25, dy = 0.25;
+    double dx = 0, dy = 0;
     vertices[0] = pDstRect->x + dx;
     vertices[1] = pDstRect->y +dy;
     vertices[2] = pDstRect->x+pDstRect->w + dx;
