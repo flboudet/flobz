@@ -88,6 +88,11 @@ GameView::GameView(FloboGameFactory *attachedFloboGameFactory)
 
 GameView::~GameView()
 {
+    while (viewAnimations.size() > 0) {
+        Animation *currentAnimation = viewAnimations[0];
+        viewAnimations.removeAtKeepOrder(0);
+        delete currentAnimation;
+    }
     delete attachedGame;
 }
 
