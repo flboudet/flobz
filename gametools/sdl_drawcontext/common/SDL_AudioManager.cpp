@@ -90,7 +90,8 @@ void SDL_AudioManager::playMusic(Music *music)
 #ifdef SDLMIKMOD_WORKAROUND
         MODULE *mod;
         mod = Player_GetModule();
-        mod->loop = 1;
+        if (mod != NULL)
+            mod->loop = 1;
 #endif
     }
 }
@@ -139,4 +140,3 @@ void SDL_AudioManager::playSound(Sound *sound, float volume, float balance)
     Uint8 leftVolume = (Uint8)(255.*((-balance + 1.)/2.));
     Mix_SetPanning(channel, leftVolume * volume, (255-leftVolume) * volume);
 }
-
