@@ -63,6 +63,7 @@ class CycledComponent : public IdleComponent
 {
   public:
     CycledComponent(double cycleTime);
+    virtual ~CycledComponent();
 
     /// called 1 time every cycleTime seconds.
     virtual void cycle()             {}
@@ -83,6 +84,7 @@ class CycledComponent : public IdleComponent
 
     double cycleNumber;
     double firstCycleTime;
+    bool *_deleteToken;
 };
 
 class GarbageCollectableItem {
@@ -143,4 +145,3 @@ class GameLoop
 };
 
 #endif // _GAMELOOP_H
-

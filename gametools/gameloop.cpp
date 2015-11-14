@@ -68,9 +68,17 @@ bool IdleComponent::getPause() const
 // CYCLE COMPONENT
 
 CycledComponent::CycledComponent(double cycleTime)
-  : IdleComponent(), cycleTime(cycleTime)
+    : IdleComponent(), cycleTime(cycleTime), _deleteToken(NULL)
 {
   reset();
+}
+
+CycledComponent::~CycledComponent()
+{
+    // An ugly pattern leads CycledComponents to delete themselves
+    // Here is some kind of protection
+    if (_deleteToken != NULL)
+        *_deleteToken = true;
 }
 
 void   CycledComponent::setCycleTime(double time)
@@ -93,6 +101,10 @@ double CycledComponent::getCycleTime() const
 
 void   CycledComponent::idle(double currentTime)
 {
+  // An ugly pattern leads CycledComponents to delete themselves
+  // Here is some kind of protection
+  bool deleteToken = false;
+  _deleteToken = &deleteToken;
   if (cycleNumber < -0.5) {
     firstCycleTime = currentTime;
     cycleNumber = 0.0;
@@ -103,8 +115,11 @@ void   CycledComponent::idle(double currentTime)
   if (requireCycle && (!paused)) {
     cycleNumber += 1.0;
     cycle();
-    this->idle(currentTime);
+    if (! deleteToken)
+        this->idle(currentTime);
   }
+  if (! deleteToken)
+      _deleteToken = NULL;
 }
 
 void CycledComponent::setPause(bool paused)
@@ -328,5 +343,3 @@ bool GameLoop::moveToBack(DrawableComponent *gc)
 {
     return false;
 }
-
-
