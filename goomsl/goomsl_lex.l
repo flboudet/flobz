@@ -21,12 +21,12 @@ GoomSL *currentGoomSL;
 static int  string_size;
 static char string[1024];
 
-    
+
 #define YY_INPUT(buf,result,max_size) { \
     result = currentGoomSL->read_file_function(currentGoomSL, buf, currentGoomSL->current_file, max_size); \
     }\
     \
-    
+
 #define UP_INCLUDE_STACK() \
     if (yy_buffer_stack_top == 0) {\
         yyterminate(); \
@@ -87,11 +87,6 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
            goto endImport;
         }
 
-        /* free the imported file after use */
-        if ( fullName != NULL )
-        {
-           free( fullName );
-        }
         //GPI_LineNumber = (int*)(META_GTI_LineNumber+includeStackPtr);
         //(*GPI_LineNumber) = 1;
         currentGoomSL->current_file = newfile;
@@ -99,6 +94,11 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
         /* changement de buffer d'entree pour le bovin */
         b = yy_create_buffer( NULL, YY_BUF_SIZE );
         gsl_set_buffer_input_file(currentGoomSL, b, newfile, fullName);
+        /* free the imported file after use */
+        if ( fullName != NULL )
+        {
+           free( fullName );
+        }
         yypush_buffer_state(b);
 
         endImport:
@@ -166,4 +166,3 @@ ID       [a-zA-Z_@&][a-zA-Z0-9_\.]*
 
 
 int yywrap(void) { return 1; yyunput(0,0); }
-
