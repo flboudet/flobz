@@ -64,7 +64,7 @@ static void help()
     cout << "usage: ./flobopop [options]" << endl;
     cout << endl;
     cout << "options are:" << endl;
-    cout << "  -win                          enable windowed mode" << endl;
+    cout << "  -fs                           enable fullscreen mode" << endl;
     cout << "  -maxpack {n}                  use data pack n (0..2)" << endl;
     cout << "  -gsl {file}                   launch a gsl script" << endl;
     cout << "  -ia {name}:{server}:{port}    connect a bot to a server" << endl;
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 
 #endif
 
-    bool fs = true;
+    bool fs = false;
     const char *gsl_screen = NULL;
     const char *connect_ia = NULL;
 
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
         if ((strcmp(argv[i],"--help") == 0) || (strcmp(argv[i],"-h") == 0))
             help();
         // Fullscreen option
-        if (strcmp(argv[i],"-win") == 0) fs = false;
+        if (strcmp(argv[i],"-fs") == 0) fs = true;
         // Max data pack option
         if (strcmp(argv[i], "-maxpack") == 0) {
             if (++i < argc)
