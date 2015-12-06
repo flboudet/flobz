@@ -42,22 +42,22 @@ int SDL_IosFont::getLineSkip()
     return TTF_FontLineSkip(m_font);
 }
 
-IosSurface * SDL_IosFont::render(const char *text)
+IosSurface * SDL_IosFont::render(const char *text, const RGBA &color)
 {
-    IosSurface *result = getFromCache(text);
+    IosSurface *result = getFromCache(text, color);
     if (result == NULL) {
-        static const SDL_Colour white = {255,255,255};
+        const SDL_Colour white = {color.red, color.green, color.blue, color.alpha};
         SDL_Surface *image = TTF_RenderUTF8_Blended(m_font, text, white);
-        image = fontFX(image);
+        //image = fontFX(image);
         result = createSurface(image);
-        storeInCache(text, result);
+        storeInCache(text, color, result);
     }
     return result;
 }
 
-IosSurface * SDL_IosFont::getFromCache(const char *text)
+IosSurface * SDL_IosFont::getFromCache(const char *text, const RGBA &color)
 {
-    CachedSurfacesMap::iterator iter = m_cacheMap.find(text);
+    CachedSurfacesMap::iterator iter = m_cacheMap.find(CachedSurfaceKey(text, color));
     if (iter == m_cacheMap.end())
         return NULL;
     // Put the found cached surface in front of the cache list
@@ -65,12 +65,12 @@ IosSurface * SDL_IosFont::getFromCache(const char *text)
     return iter->second.surf;
 }
 
-void SDL_IosFont::storeInCache(const char *text, IosSurface *surf)
+void SDL_IosFont::storeInCache(const char *text, const RGBA &color, IosSurface *surf)
 {
     CachedSurfacesMap::iterator storedIter =
         (m_cacheMap.insert(
-            pair<std::string, CachedSurface>
-            (text, CachedSurface(surf)))).first;
+            pair<CachedSurfaceKey, CachedSurface>
+            (CachedSurfaceKey(text, color), CachedSurface(surf)))).first;
     storedIter->second.mapIter = storedIter;
     storedIter->second.listIter =
         m_cacheList.insert(m_cacheList.begin(), &(storedIter->second));
@@ -246,4 +246,3 @@ SDL_Surface *SDL_IosFont::fontFX(SDL_Surface *src)
     SDL_FreeSurface(src);
     return ret;
 }
-

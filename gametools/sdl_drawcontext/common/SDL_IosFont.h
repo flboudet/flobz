@@ -27,17 +27,40 @@ public:
     virtual int getTextWidth(const char *text);
     virtual int getHeight();
     virtual int getLineSkip();
-    IosSurface * render(const char *text);
+    IosSurface * render(const char *text, const RGBA &color);
 private:
-    IosSurface * getFromCache(const char *text);
-    void storeInCache(const char *text, IosSurface *surf);
+    IosSurface * getFromCache(const char *text, const RGBA &color);
+    void storeInCache(const char *text, const RGBA &color, IosSurface *surf);
     void precomputeFX();
     SDL_Surface *fontFX(SDL_Surface *src);
 protected:
     virtual IosSurface *createSurface(SDL_Surface *src) = 0;
 private:
     struct CachedSurface;
-    typedef std::map<std::string, CachedSurface> CachedSurfacesMap;
+    struct CachedSurfaceKey {
+        CachedSurfaceKey(const char *text, const RGBA &color)
+            : _text(text), _color(color) {}
+        bool operator<(const CachedSurfaceKey &k) const {
+            if (_text < k._text)
+                return true;
+            if (_text > k._text)
+                return false;
+            if (_color.red < k._color.red)
+                return true;
+            if (_color.red > k._color.red)
+                return false;
+            if (_color.green < k._color.green)
+                return true;
+            if (_color.green > k._color.green)
+                return false;
+            if (_color.blue < k._color.blue)
+                return true;
+            return false;
+        }
+        std::string _text;
+        RGBA _color;
+    };
+    typedef std::map<CachedSurfaceKey, CachedSurface> CachedSurfacesMap;
     typedef std::list<CachedSurface *> CachedSurfacesList;
     struct CachedSurface {
         CachedSurface(IosSurface *surf) : surf(surf) {}
@@ -54,4 +77,3 @@ private:
 };
 
 #endif // _SDL_IOSFONT_H_
-

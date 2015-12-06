@@ -20,6 +20,7 @@ public:
     virtual void setBlendMode(ImageBlendMode mode);
     virtual void fillRect(const IosRect *rect, const RGBA &color);
     virtual void putString(IosFont *font, int x, int y, const char *text, const RGBA &color);
+    virtual void putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text, const RGBA &color);
 public:
     // IosSurface implementation
     virtual bool isOpaque() const;
@@ -73,6 +74,7 @@ public:
     virtual void setBlendMode(ImageBlendMode mode);
     virtual void fillRect(const IosRect *rect, const RGBA &color);
     virtual void putString(IosFont *font, int x, int y, const char *text, const RGBA &color);
+    virtual void putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text, const RGBA &color);
     // Query for drawcontext abilities
     virtual ImageSpecialAbility guessRequiredImageAbility(const ImageOperationList &list);
     // Specific methods
@@ -89,4 +91,3 @@ private:
 };
 
 #endif // _SDL12_DRAWCONTEXT_H_
-

@@ -315,11 +315,19 @@ void SDL12_IosSurface::putString(IosFont *font, int x, int y, const char *text, 
          iter != lines.end() ; iter++) {
         if (strcmp(iter->c_str(), "") == 0)
             continue;
-        IosSurface *surf = sFont->render(iter->c_str());
+        IosSurface *surf = sFont->render(iter->c_str(), color);
         IosRect dstRect = { x, y, surf->w, surf->h };
         draw(surf, NULL, &dstRect);
         y += skip;
     }
+}
+
+void SDL12_IosSurface::putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text, const RGBA &color)
+{
+    static const RGBA black(0, 0, 0, 0xFF);
+    printf("Here\n");
+    putString(font, shadow_x, shadow_y, text, black);
+    putString(font, x, y, text, color);
 }
 
 // IIMLibrary implementation
@@ -510,10 +518,17 @@ void SDL12_DrawContext::putString(IosFont *font, int x, int y, const char *text,
          iter != lines.end() ; iter++) {
         if (strcmp(iter->c_str(), "") == 0)
             continue;
-        IosSurface *surf = sFont->render(iter->c_str());
+        IosSurface *surf = sFont->render(iter->c_str(), color);
         IosRect dstRect = { x, y, surf->w, surf->h };
         draw(surf, NULL, &dstRect);
         y += skip;
     }
 }
 
+void SDL12_DrawContext::putStringWithShadow(IosFont *font, int x, int y, int shadow_x, int shadow_y, const char *text, const RGBA &color)
+{
+    static const RGBA black(0, 0, 0, 0xFF);
+    printf("Here\n");
+    putString(font, shadow_x, shadow_y, text, black);
+    putString(font, x, y, text, color);
+}
