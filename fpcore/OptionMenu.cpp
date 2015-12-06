@@ -41,7 +41,7 @@ AudioPrefSwitch::AudioPrefSwitch()
 }
 
 FSPrefSwitch::FSPrefSwitch()
-: gameui::SwitchedButton(theCommander->getLocalizedString(kFullScreen), true,
+: gameui::SwitchedButton(theCommander->getLocalizedString(kFullScreen), false,
                          theCommander->getSwitchOnPicture(), theCommander->getSwitchOffPicture(),
                          String(theCommander->getFullScreenKey()), theCommander->getPreferencesManager())
 {
@@ -88,4 +88,3 @@ void OptionMenu::build() {
     buttonsBox.add(&backButton);
     add(&buttonsBox);
 }
-
