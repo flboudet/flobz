@@ -12,11 +12,22 @@ The game has nice graphics and animations as well  as  music  and sound effects.
 
 #### Linux
 
+If you are getting the sources from the git repository,
+you first need to generate the ./configure script.
+Note that this step is not necessary when you get the source tarball.
+
+```sh
+$ cd [path-to-the-source-folder-on-your-system]
+$ autoreconf -i
+```
+
+then
+
 ```sh
 $ cd [path-to-the-source-folder-on-your-system]
 $ ./configure
 $ make -j3
-$ ./flobopuyo
+$ ./flobz
 ```
 
 ### MacOS X
@@ -45,3 +56,16 @@ Install the cross-compiler somewhere
 Then type the following lines in a terminal:
 export SDL_CONFIG=<path to your win32 mingw32 sdlconfig>
 ./configure -prefix=/usr/local/i586-mingw32 --host=i586-mingw32msvc
+
+### Dependancies automake
+
+#### Linux
+
+- libtool
+- bison
+- flex
+- libsdl1.2-dev
+- libsdl-ttf2.0-dev
+- libsdl-image1.2-dev
+- libsdl-mixer1.2-dev
+- libmikmod-dev
