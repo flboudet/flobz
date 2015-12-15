@@ -186,14 +186,15 @@ GameControlEvent *SDL12_EventManager::createGameControlEvent() const
 bool SDL12_EventManager::pollEvent(GameControlEvent &controlEvent)
 {
     SDL_Event e;
-    bool result = SDL_PollEvent(&e);
+    if (SDL_PollEvent(&e) == 0)
+        return false;
     // Try to translate the SDL event into a game event
     // Try to translate the SDL event into a cursor event
     // Try to translate the SDL event into a keyboard event
     getControlEvent(e, &controlEvent);
     // Try to translate the SDL event into a mouse event
     translateMouseEvent(e, controlEvent);
-    return result;
+    return true;
 }
 
 void SDL12_EventManager::pushMouseEvent(int x, int y,
