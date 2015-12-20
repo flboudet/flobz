@@ -1,28 +1,32 @@
 #ifndef _NOTIFYCENTER_H
 #define _NOTIFYCENTER_H
 
-#include "gameui.h"
-#include "ios_hash.h"
+#include <string>
+#include <map>
+#include <set>
 
 namespace gameui {
-    
+
     class NotificationResponder {
     public:
-        virtual void notificationOccured(String identifier, void * context) {};
+        virtual void notificationOccured(const char *identifier, void * context) {};
         virtual ~NotificationResponder() {};
     };
-    
-    class NotifyCenter: HashMap {
+
+    class NotifyCenter {
     public:
         NotifyCenter() {};
         virtual ~NotifyCenter() {};
-        void addListener(String identifier, NotificationResponder * listener);
-        void removeListener(String identifier, NotificationResponder * listener);
-        void notify(String identifier, void * context);
+        void addListener(const char *identifier, NotificationResponder * listener);
+        void removeListener(const char *identifier, NotificationResponder * listener);
+        void notify(const char *identifier, void * context);
+    private:
+        typedef std::map<std::string, std::set<NotificationResponder *> > NotifyCenterListeners;
+        NotifyCenterListeners m_listeners;
     };
-    
+
     extern NotifyCenter GlobalNotificationCenter;
-    
+
 }
 
 
