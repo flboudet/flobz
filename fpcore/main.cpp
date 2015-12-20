@@ -13,7 +13,7 @@
 #include "ios_filepath.h"
 
 #ifndef DATADIR
-static char *DATADIR = "data";
+static const char *DATADIR = "data";
 #endif
 
 using namespace ios_fc;
