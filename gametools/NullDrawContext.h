@@ -79,6 +79,7 @@ public:
     virtual void flip() {}
     virtual int getHeight() const { return h; }
     virtual int getWidth() const  { return w; }
+    virtual void resize(int w, int h, bool fullscreen) {}
     virtual ImageLibrary &getImageLibrary() {
         return m_imageLibrary;
     }
@@ -94,10 +95,10 @@ public:
     virtual void drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect *dstRect) {}
     virtual void drawRotatedCentered(IosSurface *surf, int angle, int x, int y) {}
 	virtual void fillRect(const IosRect *rect, const RGBA &color) {}
-    virtual void putString(IosFont *font, int x, int y, const char *text) {}
+
+    virtual void putString(IosFont *font, int x, int y, const char *text, const RGBA &color) {}
 private:
     NullImageLibrary m_imageLibrary;
 };
 
 #endif // _NULLDRAWCONTEXT_H_
-
