@@ -26,7 +26,8 @@
 #ifndef _PUYOLOCALIZEDDICTIONARY
 #define _PUYOLOCALIZEDDICTIONARY
 
-#include "ios_hash.h"
+#include <map>
+#include <memory>
 #include "DataPathManager.h"
 
 using namespace ios_fc;
@@ -37,7 +38,11 @@ public:
     const char * getLocalizedString(const char * originalString,  bool copyIfNotThere = false);
     ~LocalizedDictionary();
 private:
-    void * dictionary;
+    typedef std::map<std::string, std::string> str_dictionnary;
+    typedef std::map<std::string, std::shared_ptr<str_dictionnary> > str_dictionnary_cache;
+    static str_dictionnary_cache dictionaries;
+private:
+    std::shared_ptr<str_dictionnary> dictionary;
     String stdName;
     const DataPathManager &datapathManager;
 };
@@ -47,4 +52,3 @@ extern char *PreferedLocales[];
 extern int PreferedLocalesCount;
 
 #endif // _PUYOLOCALIZEDDICTIONARY
-
