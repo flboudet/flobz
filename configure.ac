@@ -200,10 +200,6 @@ AC_SEARCH_LIBS([Mix_OpenAudio],
 	     [AC_MSG_ERROR([*** SDL_mixer lib not found! Get SDL_mixer from
 http://www.libsdl.org/projects/SDL_mixer/index.html])])
 
-AC_SEARCH_LIBS([Player_GetModule],
-               [mikmod],,
-	     [AC_MSG_ERROR([*** mikmod lib not found!])])
-
 AC_SEARCH_LIBS([TTF_Init],
                [SDL_ttf],,
 	     [AC_MSG_ERROR([*** SDL_ttf lib not found! Get SDL_ttf from
