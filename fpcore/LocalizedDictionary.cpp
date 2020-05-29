@@ -270,7 +270,10 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
   std::string stdName(FilePath::combine(dictionaryDirectory, dictionaryName));
   std::shared_ptr<str_dictionnary> myDictEntry;
   auto found = dictionaries.find(stdName);
-  if (found == dictionaries.end()) {
+  if (found != dictionaries.end()) {
+      myDictEntry = found->second;
+  }
+  else {
       // Dictionary is not cached, create it
       myDictEntry = std::make_shared<str_dictionnary>();
       dictionaries[stdName] = myDictEntry;
