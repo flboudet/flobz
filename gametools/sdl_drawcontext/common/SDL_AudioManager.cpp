@@ -87,11 +87,13 @@ void SDL_AudioManager::playMusic(Music *music)
     Mix_HaltMusic();
     if (music != NULL) {
         Mix_PlayMusic(static_cast<SDL_AM_Music *>(music)->m_music, -1);
+#ifdef DISABLED
 #ifdef SDLMIKMOD_WORKAROUND
         MODULE *mod;
         mod = Player_GetModule();
         if (mod != NULL)
             mod->loop = 1;
+#endif
 #endif
     }
 }
