@@ -65,7 +65,7 @@ class ValueCharArray : public Value<Buffer<char> > {
 
 /* class BaseMessage */
 
-BaseMessage::BaseMessage() : datas(), intProperties()
+BaseMessage::BaseMessage() : datas()
 {
 }
 
@@ -112,12 +112,12 @@ void BaseMessage::addCharArray  (const String &key, const Buffer<char> &value)
 
 void BaseMessage::addIntProperty   (const String &key, int value)
 {
-  intProperties.put(key, value);
+    intProperties[(const char *)key] = value;
 }
 
 void BaseMessage::addBoolProperty  (const String &key, bool property)
 {
-  intProperties.put(key, (int)property);
+    intProperties[(const char *)key] = (property ? 1 : 0);
 }
 
 static ValueInterface *getInterfaceAndCheckType(const HashMap &datas,
@@ -261,29 +261,32 @@ const Buffer<char> BaseMessage::getCharArray (const String &key) const
 
 int BaseMessage::getIntProperty(const String &key) const
 {
-  HashValue *hval = intProperties.get(key);
-  if (hval == NULL)
-    throw PropertyException(String("No such property '") + key + "'");
-  return hval->i;
+    auto hval = intProperties.find((const char *)key);
+    if (hval == intProperties.end()) {
+        throw PropertyException(String("No such property '") + key + "'");
+    }
+    return hval->second;
 }
 
-bool         BaseMessage::getBoolProperty   (const String &key) const
+bool BaseMessage::getBoolProperty(const String &key) const
 {
-  HashValue *hval = intProperties.get(key);
-  if (hval == NULL)
-    throw PropertyException(String("No such property '") + key + "'");
-  return hval->i;
+    auto hval = intProperties.find((const char *)key);
+    if (hval == intProperties.end()) {
+        throw PropertyException(String("No such property '") + key + "'");
+    }
+    return (hval->second == 1);
 }
 
 bool BaseMessage::hasIntProperty    (const String &key) const
 {
-  return intProperties.get(key) != NULL;
+    auto hval = intProperties.find((const char *)key);
+    return (hval != intProperties.end());
 }
 
 bool BaseMessage::hasBoolProperty   (const String &key) const
 {
-  return intProperties.get(key) != NULL;
+    auto hval = intProperties.find((const char *)key);
+    return (hval != intProperties.end());
 }
 
 }
-

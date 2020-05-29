@@ -4,6 +4,7 @@
 #include "ios_memory.h"
 #include "ios_message.h"
 #include "ios_hash.h"
+#include <map>
 
 namespace ios_fc {
 
@@ -54,10 +55,9 @@ class BaseMessage : public Message
 
   private:
     HashMap datas;
-    HashMap intProperties;
+    std::map<std::string, int> intProperties;
 };
 
 }
 
 #endif
-
