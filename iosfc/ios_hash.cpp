@@ -1,7 +1,7 @@
 #include "ios_hash.h"
 
-#include "google/dense_hash_map" // Time efficient hashmap
-using google::dense_hash_map;
+#include <string>
+#include <unordered_map>
 
 #include <string.h>
 #include <stdint.h>
@@ -82,10 +82,11 @@ struct EqualString {
                 (s2 != EMPTY_KEY) && strcmp(s1, s2) == 0);
     }
 };
-typedef dense_hash_map<const char*, HashValue, SuperFastHashString, EqualString> gg_str_hashmap;
+
+typedef std::unordered_map<std::string, HashValue> gg_str_hashmap;
 
 struct IOS_HASH {
-    gg_str_hashmap root;
+    std::unordered_map<std::string, HashValue> root;
 };
 
 /**
@@ -94,26 +95,16 @@ struct IOS_HASH {
 
 IosHash *ios_hash_new(unsigned int initial_size) {
 	IosHash *_this = new IOS_HASH;
-    _this->root.set_empty_key((const char*)1);
-    _this->root.set_deleted_key(NULL);
 	return _this;
 }
 
 void ios_hash_free(IosHash *_this) {
-    gg_str_hashmap::iterator it = _this->root.begin();
-    while (it != _this->root.end()) {
-        free((void*)(*it).first);
-        ++ it;
-    }
 	delete _this;
 }
 
 void ios_hash_put(IosHash *_this, const char *key, HashValue value) {
     if (_this == NULL) return;
-    int len    = strlen(key);
-	char *key2 = (char*)malloc(len+1);
-	memcpy(key2,key,len+1);
-    _this->root[key2] = value;
+    _this->root[key] = value;
 }
 
 HashValue *ios_hash_get(IosHash *_this, const char *key) {
@@ -121,18 +112,13 @@ HashValue *ios_hash_get(IosHash *_this, const char *key) {
     gg_str_hashmap::iterator it = _this->root.find(key);
     if (it == _this->root.end())
         return NULL;
-    else if ((*it).first == DELETED_KEY)
-        return NULL;
-    else if ((*it).first == EMPTY_KEY)
-        return NULL;
     else
         return &((*it).second);
 }
 
 void ios_hash_remove (IosHash *_this, const char *key) {
     gg_str_hashmap::iterator it = _this->root.find(key);
-    if ((it != _this->root.end()) && ((*it).first != DELETED_KEY) && ((*it).first != EMPTY_KEY)) {
-        free((void*)(*it).first);
+    if (it != _this->root.end()) {
         _this->root.erase(it);
     }
 }
