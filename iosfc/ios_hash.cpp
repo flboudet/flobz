@@ -155,19 +155,7 @@ void ios_hash_put_ptr(IosHash *_this, const char *key, void *ptr) {
     ios_hash_put(_this,key,value);
 }
 
-void ios_hash_foreach(IosHash *_this, HashMapAction *action)
-{
-    gg_str_hashmap::iterator it = _this->root.begin();
-    while (it != _this->root.end()) {
-        action->action(&((*it).second));
-        ++ it;
-    }
-}
 
-void HashMap::foreach(HashMapAction *action)
-{
-  ios_hash_foreach(hash, action);
-}
 
 }
 
@@ -274,20 +262,6 @@ void ios_hash_iput_ptr(IosHash *_this, int key, void *ptr) {
     ios_hash_iput(_this,key,value);
 }
 
-void ios_hash_foreach(IosHash *_this, HashMapAction *action)
-{
-    iter i = {0,0};
-    HashValue *value;
-    while (hashmap_iterate(&_this->root, &i, (void**)&value)) {
-        action->action(value);
-    }
-}
-
-void HashMap::foreach(HashMapAction *action)
-{
-  ios_hash_foreach(hash, action);
-}
 
 }
 #endif
-

@@ -28,38 +28,7 @@ void ios_hash_put_int  (IosHash *_this,  const char *key, int i);
 void ios_hash_put_float(IosHash *_this,  const char *key, float f);
 void ios_hash_put_ptr  (IosHash *_this,  const char *key, void *ptr);
 
-class HashMapAction {
-  public:
-    virtual void action(HashValue *value) = 0;
-    virtual ~HashMapAction() {};
-};
 
-// A Hashmap where keys are strings.
-class HashMap {
-    private:
-        IosHash *hash;
-    public:
-        HashMap() : hash(ios_hash_new()) {}
-        ~HashMap() { ios_hash_free(hash); }
-
-        void put(const char *key, void *value) { ios_hash_put_ptr  (hash, key, value); }
-        void put(const char *key, int   value) { ios_hash_put_int  (hash, key, value); }
-        void put(const char *key, float value) { ios_hash_put_float(hash, key, value); }
-
-        HashValue *get     (const char *key) const { return ios_hash_get(hash, key);      }
-        /* HashValue *get_like(const char *key) const { return ios_hash_get_like(hash, key); } */
-        void       remove  (const char *key)       { ios_hash_remove(hash, key);          }
-
-        void foreach(HashMapAction *action);
-
-    private:
-        HashMap(const HashMap& hmap):hash(0){}
-        HashMap& operator=(const HashMap& hmap)
-        {
-            hash=0;
-            return *this;
-        }
-};
 
 } // namespace ios_fc
 
