@@ -3,7 +3,6 @@
 
 #include "ios_memory.h"
 #include "ios_message.h"
-#include "ios_hash.h"
 #include <map>
 
 namespace ios_fc {
@@ -53,8 +52,29 @@ class BaseMessage : public Message
   protected:
     BaseMessage();
 
-  private:
-    HashMap datas;
+public:
+    enum ValueType {
+        INTEGER    = 1,
+        BOOLEAN    = 2,
+        STRING     = 3,
+        INT_ARRAY  = 4,
+        CHAR_ARRAY = 5,
+        FLOAT      = 6
+    };
+
+    class ValueInterface
+    {
+    protected:
+        ValueType type;
+    public:
+        ValueInterface() {}
+        virtual ~ValueInterface() {}
+        ValueInterface(ValueType t) : type(t) {}
+        ValueType getType() const { return type; }
+    };
+
+private:
+    std::map<std::string, ValueInterface> datas;
     std::map<std::string, int> intProperties;
 };
 

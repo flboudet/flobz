@@ -4,29 +4,11 @@
 
 namespace ios_fc {
 
-enum ValueType {
-  INTEGER    = 1,
-  BOOLEAN    = 2,
-  STRING     = 3,
-  INT_ARRAY  = 4,
-  CHAR_ARRAY = 5,
-  FLOAT      = 6
-};
-
-class ValueInterface
-{
-  protected:
-    ValueType type;
-  public:
-    virtual ~ValueInterface() {}
-    ValueInterface(ValueType t) : type(t) {}
-    ValueType getType() const { return type; }
-};
-
-template <typename T> class Value : public ValueInterface
+template <typename T> class Value : public BaseMessage::ValueInterface
 {
   public:
-    Value (const T t, ValueType type) : ValueInterface(type), t(t) {}
+    Value (const T t, BaseMessage::ValueType type)
+        : ValueInterface(type), t(t) {}
     virtual ~Value<T>() {}
     const T  getValue() const { return this->t; }
   private:
@@ -35,139 +17,128 @@ template <typename T> class Value : public ValueInterface
 
 class ValueInt : public Value<int> {
   public:
-    ValueInt(int i) : Value<int>(i, INTEGER) {}
+    ValueInt(int i) : Value<int>(i, BaseMessage::INTEGER) {}
 };
 
 class ValueBool : public Value<bool> {
   public:
-    ValueBool(int b) : Value<bool>(b, BOOLEAN) {}
+    ValueBool(int b) : Value<bool>(b, BaseMessage::BOOLEAN) {}
 };
 
 class ValueFloat : public Value<double> {
   public:
-    ValueFloat(double f) : Value<double>(f, FLOAT) {}
+    ValueFloat(double f) : Value<double>(f, BaseMessage::FLOAT) {}
 };
 
 class ValueString : public Value<String> {
   public:
-    ValueString(const String s) : Value<String>(s, STRING) {}
+    ValueString(const String s) : Value<String>(s, BaseMessage::STRING) {}
 };
 
 class ValueIntArray : public Value<Buffer<int> > {
   public:
-    ValueIntArray(const Buffer<int> array) : Value<Buffer<int> >(array, INT_ARRAY) {}
+    ValueIntArray(const Buffer<int> array) : Value<Buffer<int> >(array, BaseMessage::INT_ARRAY) {}
 };
 
 class ValueCharArray : public Value<Buffer<char> > {
   public:
-    ValueCharArray(const Buffer<char> array) : Value<Buffer<char> >(array, CHAR_ARRAY) {}
+    ValueCharArray(const Buffer<char> array) : Value<Buffer<char> >(array, BaseMessage::CHAR_ARRAY) {}
 };
 
 /* class BaseMessage */
 
-BaseMessage::BaseMessage() : datas()
+BaseMessage::BaseMessage()
 {
 }
-
-class DeleteAction : public HashMapAction {
-  public:
-    void action(HashValue *value) { delete static_cast<ValueInterface*>(value->ptr); }
-};
 
 BaseMessage::~BaseMessage()
 {
-  DeleteAction act;
-  datas.foreach(&act);
 }
 
-void BaseMessage::addInt       (const String &key, int value)
+void BaseMessage::addInt(const String &key, int value)
 {
-  datas.put(key, new ValueInt(value));
+    datas[(const char *)key] = ValueInt(value);
 }
 
-void BaseMessage::addBool      (const String &key, bool value)
+void BaseMessage::addBool(const String &key, bool value)
 {
-  datas.put(key, new ValueBool(value));
+    datas[(const char *)key] = ValueBool(value);
 }
 
-void BaseMessage::addFloat      (const String &key, double value)
+void BaseMessage::addFloat(const String &key, double value)
 {
-  datas.put(key, new ValueFloat(value));
+    datas[(const char *)key] = ValueFloat(value);
 }
 
-void BaseMessage::addString    (const String &key, const String &value)
+void BaseMessage::addString(const String &key, const String &value)
 {
-  datas.put(key, new ValueString(value));
+    datas[(const char *)key] = ValueString(value);
 }
 
-void BaseMessage::addIntArray  (const String &key, const Buffer<int> &value)
+void BaseMessage::addIntArray(const String &key, const Buffer<int> &value)
 {
-  datas.put(key, new ValueIntArray(value));
+    datas[(const char *)key] = ValueIntArray(value);
 }
 
-void BaseMessage::addCharArray  (const String &key, const Buffer<char> &value)
+void BaseMessage::addCharArray(const String &key, const Buffer<char> &value)
 {
-  datas.put(key, new ValueCharArray(value));
+    datas[(const char *)key] = ValueCharArray(value);
 }
 
-void BaseMessage::addIntProperty   (const String &key, int value)
+void BaseMessage::addIntProperty(const String &key, int value)
 {
     intProperties[(const char *)key] = value;
 }
 
-void BaseMessage::addBoolProperty  (const String &key, bool property)
+void BaseMessage::addBoolProperty(const String &key, bool property)
 {
     intProperties[(const char *)key] = (property ? 1 : 0);
 }
 
-static ValueInterface *getInterfaceAndCheckType(const HashMap &datas,
-                                                const String key,
-                                                ValueType type,
-                                                const String stype)
+static const BaseMessage::ValueInterface *getInterfaceAndCheckType(const std::map<std::string, BaseMessage::ValueInterface>  &datas,
+                                                      const String key,
+                                                      BaseMessage::ValueType type,
+                                                      const String stype)
 {
-  HashValue *hval = datas.get(key);
-  if (hval == NULL)
-    throw BaseMessage::DataException(key + " does not exists");
+    auto hval = datas.find((const char *)key);
+    if (hval == datas.end()) {
+        throw BaseMessage::DataException(key + " does not exists");
+    }
 
-  ValueInterface *val_interface = static_cast<ValueInterface*>(hval->ptr);
-
-  if (val_interface == NULL)
-    throw BaseMessage::DataException(key + " has no value");
-
-  if (val_interface->getType() != type)
-    throw BaseMessage::DataException(key + " is not " + stype);
-
-  return val_interface;
+    if (hval->second.getType() != type) {
+        throw BaseMessage::DataException(key + " is not " + stype);
+    }
+    return &(hval->second);
 }
 
-bool BaseMessage::hasInt   (const String &key) const
+bool BaseMessage::hasInt(const String &key) const
 {
-  return datas.get(key) != NULL;
+    return datas.find((const char *)key) != datas.end();
 }
 
-bool BaseMessage::hasBool      (const String &key) const
+bool BaseMessage::hasBool(const String &key) const
 {
-  return datas.get(key) != NULL;
+    return datas.find((const char *)key) != datas.end();
 }
 
-bool BaseMessage::hasFloat      (const String &key) const
+bool BaseMessage::hasFloat(const String &key) const
 {
-  return datas.get(key) != NULL;
+    return datas.find((const char *)key) != datas.end();
 }
 
-bool BaseMessage::hasString    (const String &key) const
+bool BaseMessage::hasString(const String &key) const
 {
-  return datas.get(key) != NULL;
+    return datas.find((const char *)key) != datas.end();
 }
 
-bool BaseMessage::hasIntArray  (const String &key) const
+bool BaseMessage::hasIntArray(const String &key) const
 {
-  return datas.get(key) != NULL;
+    return datas.find((const char *)key) != datas.end();
 }
 
-bool BaseMessage::hasCharArray  (const String &key) const
+bool BaseMessage::hasCharArray(const String &key) const
 {
-  return datas.get(key) != NULL;
+    return datas.find((const char *)key) != datas.end();
 }
 
 
@@ -194,9 +165,9 @@ bool BaseMessage::hasString    (const String key, String value) const
 
 int BaseMessage::getInt      (const String &key) const
 {
-  ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, INTEGER, "Integer");
+  const ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, INTEGER, "Integer");
 
-  ValueInt* val_int = dynamic_cast<ValueInt*>(val_interface);
+  const ValueInt* val_int = dynamic_cast<const ValueInt*>(val_interface);
   if (val_int == NULL)
     throw DataException(key + " is not an INTEGER");
 
@@ -205,9 +176,9 @@ int BaseMessage::getInt      (const String &key) const
 
 bool BaseMessage::getBool     (const String &key) const
 {
-  ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, BOOLEAN, "Boolean");
+  const ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, BOOLEAN, "Boolean");
 
-  ValueBool* val_bool = dynamic_cast<ValueBool*>(val_interface);
+  const ValueBool* val_bool = dynamic_cast<const ValueBool*>(val_interface);
   if (val_bool == NULL)
     throw DataException(key + " is not a BOOLEAN");
 
@@ -216,9 +187,9 @@ bool BaseMessage::getBool     (const String &key) const
 
 double BaseMessage::getFloat     (const String &key) const
 {
-  ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, FLOAT, "Floatean");
+  const ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, FLOAT, "Floatean");
 
-  ValueFloat* val_double = dynamic_cast<ValueFloat*>(val_interface);
+  const ValueFloat* val_double = dynamic_cast<const ValueFloat*>(val_interface);
   if (val_double == NULL)
     throw DataException(key + " is not a FLOAT");
 
@@ -227,9 +198,9 @@ double BaseMessage::getFloat     (const String &key) const
 
 const String BaseMessage::getString   (const String &key) const
 {
-  ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, STRING, "String");
+  const ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, STRING, "String");
 
-  ValueString* val_string = dynamic_cast<ValueString*>(val_interface);
+  const ValueString* val_string = dynamic_cast<const ValueString*>(val_interface);
   if (val_string == NULL)
     throw DataException(key + " is not a STRING");
 
@@ -238,9 +209,9 @@ const String BaseMessage::getString   (const String &key) const
 
 const Buffer<int> BaseMessage::getIntArray (const String &key) const
 {
-  ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, INT_ARRAY, "IntArray");
+  const ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, INT_ARRAY, "IntArray");
 
-  ValueIntArray* val_intarray = dynamic_cast<ValueIntArray*>(val_interface);
+  const ValueIntArray* val_intarray = dynamic_cast<const ValueIntArray*>(val_interface);
   if (val_intarray == NULL)
     throw DataException(key + " is not an IntArray");
 
@@ -249,9 +220,9 @@ const Buffer<int> BaseMessage::getIntArray (const String &key) const
 
 const Buffer<char> BaseMessage::getCharArray (const String &key) const
 {
-  ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, CHAR_ARRAY, "CharArray");
+  const ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, CHAR_ARRAY, "CharArray");
 
-  ValueCharArray* val_chararray = dynamic_cast<ValueCharArray*>(val_interface);
+  const ValueCharArray* val_chararray = dynamic_cast<const ValueCharArray*>(val_interface);
   if (val_chararray == NULL)
     throw DataException(key + " is not a CharArray");
 

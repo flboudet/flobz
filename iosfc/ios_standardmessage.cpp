@@ -4,22 +4,22 @@
 
 namespace ios_fc {
 
-  static const String INTEGER    = "I";
-  static const String BOOLEAN    = "B";
-  static const String FLOAT      = "F";
-  static const String STRING     = "S";
-  static const String INT_ARRAY  = "A";
-  static const String CHAR_ARRAY  = "C";
-  static const String PARAM_INTEGER = "PI";
-  static const String PARAM_BOOLEAN = "PB";
+  static const String _INTEGER    = "I";
+  static const String _BOOLEAN    = "B";
+  static const String _FLOAT      = "F";
+  static const String _STRING     = "S";
+  static const String _INT_ARRAY  = "A";
+  static const String _CHAR_ARRAY  = "C";
+  static const String _PARAM_INTEGER = "PI";
+  static const String _PARAM_BOOLEAN = "PB";
 
-  static const String SERIAL_ID   = "SID";
-  static const String IS_RELIABLE = "RELIABLE";
+  static const String _SERIAL_ID   = "SID";
+  static const String _IS_RELIABLE = "RELIABLE";
 
   StandardMessage::StandardMessage(int serialID)
     : serialized()
   {
-    addIntProperty(SERIAL_ID, serialID);
+    addIntProperty(_SERIAL_ID, serialID);
   }
 
   StandardMessage::~StandardMessage()
@@ -31,31 +31,31 @@ namespace ios_fc {
   void StandardMessage::addInt(const String &key, int value)
   {
     BaseMessage::addInt(key,value);
-    serialized.add(new String(key + ":" + INTEGER + ":" + value));
+    serialized.add(new String(key + ":" + _INTEGER + ":" + value));
   }
 
   void StandardMessage::addBool(const String &key, bool value)
   {
     BaseMessage::addBool(key,value);
-    serialized.add(new String(key + ":" + BOOLEAN + ":" + value));
+    serialized.add(new String(key + ":" + _BOOLEAN + ":" + value));
   }
 
   void StandardMessage::addFloat(const String &key, double value)
   {
     BaseMessage::addFloat(key,value);
-    serialized.add(new String(key + ":" + FLOAT + ":" + value));
+    serialized.add(new String(key + ":" + _FLOAT + ":" + value));
   }
 
   void StandardMessage::addString(const String &key, const String &value)
   {
     BaseMessage::addString(key,value);
-    serialized.add(new String(key + ":" + STRING + ":" + value));
+    serialized.add(new String(key + ":" + _STRING + ":" + value));
   }
 
   void StandardMessage::addIntArray(const String &key, const Buffer<int> &value)
   {
     BaseMessage::addIntArray(key,value);
-    String *s = new String(key + ":" + INT_ARRAY + ":" + value.size());
+    String *s = new String(key + ":" + _INT_ARRAY + ":" + value.size());
     for (int i=0;i<value.size();++i) {
       s->operator+=(String(",") + value[i]);
     }
@@ -65,7 +65,7 @@ namespace ios_fc {
   void StandardMessage::addCharArray(const String &key, const Buffer<char> &value)
   {
     BaseMessage::addCharArray(key,value);
-    String *s = new String(key + ":" + CHAR_ARRAY + ":" + value.size() + ",");
+    String *s = new String(key + ":" + _CHAR_ARRAY + ":" + value.size() + ",");
     for (int i=0;i<value.size();++i)
     {
       static const char *hex16[16] =
@@ -79,13 +79,13 @@ namespace ios_fc {
   void StandardMessage::addIntProperty   (const String &key, int value)
   {
     BaseMessage::addIntProperty(key,value);
-    serialized.add(new String(key + ":" + PARAM_INTEGER + ":" + value));
+    serialized.add(new String(key + ":" + _PARAM_INTEGER + ":" + value));
   }
 
   void StandardMessage::addBoolProperty  (const String &key, bool value)
   {
     BaseMessage::addBoolProperty(key,value);
-    serialized.add(new String(key + ":" + PARAM_BOOLEAN + ":" + value));
+    serialized.add(new String(key + ":" + _PARAM_BOOLEAN + ":" + value));
   }
 
   VoidBuffer StandardMessage::serialize()
@@ -132,13 +132,14 @@ namespace ios_fc {
       String type  = line.substring(itype+1, ival);
       String value = line.substring(ival+1, line.length());
 
-      if (type == INTEGER) addInt(key, atoi(value));
-      else if (type == BOOLEAN) addBool(key, atoi(value));
-      else if (type == FLOAT) addFloat(key, (double)atof(value));
-      else if (type == STRING)  addString(key, value);
-      else if (type == PARAM_INTEGER) addIntProperty(key, atoi(value));
-      else if (type == PARAM_BOOLEAN) addBoolProperty(key, atoi(value));
-      else if (type == INT_ARRAY) {
+      if (type == _INTEGER)
+          addInt(key, atoi(value));
+      else if (type == _BOOLEAN) addBool(key, atoi(value));
+      else if (type == _FLOAT) addFloat(key, (double)atof(value));
+      else if (type == _STRING)  addString(key, value);
+      else if (type == _PARAM_INTEGER) addIntProperty(key, atoi(value));
+      else if (type == _PARAM_BOOLEAN) addBoolProperty(key, atoi(value));
+      else if (type == _INT_ARRAY) {
         Buffer<int> buffer(atoi(value));
         int index = 0;
         for (int i=0; i<buffer.size(); ++i) {
@@ -150,7 +151,7 @@ namespace ios_fc {
         }
         addIntArray(key, buffer);
       }
-      else if (type == CHAR_ARRAY) {
+      else if (type == _CHAR_ARRAY) {
         Buffer<char> buffer(atoi(value));
         int index = 0;
         while(value[index] && (value[index] != ',')) index++;
@@ -179,9 +180,8 @@ namespace ios_fc {
 
   void StandardMessage::checkMessage() throw(InvalidMessageException)
   {
-    if (!hasIntProperty(SERIAL_ID))
+    if (!hasIntProperty(_SERIAL_ID))
       throw InvalidMessageException();
   }
 
 }
-
