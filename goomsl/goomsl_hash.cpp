@@ -1,7 +1,7 @@
 #include "goomsl_hash.h"
 
-#include "google/dense_hash_map" // Time efficient hashmap
-using google::dense_hash_map;
+#include <unordered_map>
+#include <string>
 
 #include <string.h>
 #include <stdint.h>
@@ -78,7 +78,8 @@ struct EqualString {
                 (s2 != EMPTY_KEY) && strcmp(s1, s2) == 0);
     }
 };
-typedef dense_hash_map<const char*, GHashValue, SuperFastHashString, EqualString> gg_str_hashmap;
+
+typedef std::unordered_map<std::string, GHashValue> gg_str_hashmap;
 
 struct GOOM_HASH {
     gg_str_hashmap root;
@@ -90,16 +91,10 @@ struct GOOM_HASH {
 
 GoomHash *goom_hash_new() {
 	GoomHash *_this = new GOOM_HASH;
-    _this->root.set_empty_key(EMPTY_KEY);
 	return _this;
 }
 
 void goom_hash_free(GoomHash *_this) {
-    gg_str_hashmap::iterator it = _this->root.begin();
-    while (it != _this->root.end()) {
-        free((void*)(*it).first);
-        ++ it;
-    }
 	delete _this;
 }
 
@@ -109,28 +104,14 @@ void goom_hash_clear(GoomHash *_this) {
 
 void goom_hash_put(GoomHash *_this, const char *key, GHashValue value) {
     if (_this == NULL) return;
-    gg_str_hashmap::iterator it = _this->root.find(key);
-    if (it == _this->root.end()) {
-        int len    = strlen(key);
-        char *key2 = (char*)malloc(len+1);
-        memcpy(key2,key,len+1);
-        key2[len] = 0;
-        _this->root[key2] = value;
-    }
-    else {
-        _this->root[key] = value;
-    }
+    _this->root[key] = value;
 }
 
 GHashValue *goom_hash_get(GoomHash *_this, const char *key) {
     if (_this == NULL) return NULL;
     gg_str_hashmap::iterator it = _this->root.find(key);
-    if (it == _this->root.end()) {
+    if (it == _this->root.end())
         return NULL;
-    }
-    else if ((*it).first == EMPTY_KEY) {
-        return NULL;
-    }
     else
         return &((*it).second);
 }
@@ -157,7 +138,7 @@ void goom_hash_for_each(GoomHash *_this, GH_Func func)
 {
     gg_str_hashmap::iterator it = _this->root.begin();
     while (it != _this->root.end()) {
-        func(_this, (*it).first, &((*it).second));
+        func(_this, (*it).first.c_str(), &((*it).second));
         ++ it;
     }
 }
