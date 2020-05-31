@@ -12,7 +12,7 @@ struct HiScoreEntry {
     HiScoreEntry(std::string name, int score)
         : name(name), score(score) {}
     HiScoreEntry() : score(0) {}
-    bool operator < (const HiScoreEntry &c)
+    bool operator < (const HiScoreEntry &c) const
     { return score < c.score; }
 };
 
