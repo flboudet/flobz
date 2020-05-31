@@ -169,7 +169,7 @@ void VictoryDisplay::draw(DrawTarget *dt)
     if (m_victories == 0)
         return;
     int offx = (m_trophy->w * m_victories) / 2;
-    IosRect dst = { m_position.x - offx, m_position.y, m_trophy->w, m_trophy->h };
+    IosRect dst = { (int)m_position.x - offx, (int)m_position.y, m_trophy->w, m_trophy->h };
     for (int i = 0 ; i < m_victories ; ++i) {
         dt->draw(m_trophy, NULL, &dst);
         dst.x += m_trophy->w;
@@ -601,5 +601,3 @@ void EventFX(const char *name, float x, float y, int player)
         fx->postEvent(name, x, y, player);
     }
 }
-
-

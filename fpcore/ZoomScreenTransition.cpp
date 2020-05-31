@@ -36,9 +36,8 @@ void ZoomScreenTransitionWidget::draw(DrawTarget *dt)
     IosSurface *ds = s->setAlpha(m_alpha);
     double h = dt->h * m_zoom;
     double w = dt->w * m_zoom;
-    IosRect r = {(dt->w - w)/2., (dt->h - h)/2., w, h};
+    IosRect r = {(int)((dt->w - w)/2.), (int)((dt->h - h)/2.), (int)w, (int)h};
     dt->draw(ds, NULL, &r);
     delete ds;
 
 }
-
