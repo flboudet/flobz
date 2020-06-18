@@ -57,6 +57,7 @@ FPMain::~FPMain()
 
 void FPMain::initWithGUI()
 {
+    std::cout << "Initing SDL!\n";
     initSDL();
     loop = GameUIDefaults::GAME_LOOP;
     // Create the Preferences Manager
@@ -71,6 +72,7 @@ void FPMain::initWithGUI()
     // TODO: a better path for WIN32
     prefFilePath = "./.flobopoprc";
 #endif
+    std::cout << "prefmgr!\n";
     m_preferencesManager = new PosixPreferencesManager(prefFilePath.c_str());
     // Create the DrawContext
     int requestedWidth = m_preferencesManager->getIntPreference(kScreenWidthPref, 640);
@@ -81,17 +83,22 @@ void FPMain::initWithGUI()
                                           m_preferencesManager->getBoolPreference(kFullScreenPref, m_fullscreen),
                                           "FloboPop by iOS-Software");
 #else
+    std::cout << "drawcontext!\n";
     m_nativeDrawContext = new SDL12_DrawContext(m_dataPathManager, 640, 480,
                                           m_preferencesManager->getBoolPreference(kFullScreenPref, m_fullscreen),
                                           "FloboPop by iOS-Software");
+    std::cout << "drawcontext2!\n";
 #endif
     //PackageDescription *packDesc = new PackageDescription(m_dataPathManager, *cDC);
     //IosRect cropRect = {0,0,32,32};
     //cDC->declareCompositeSurface("data/base.000/theme/Classic.fptheme/fat-flobo-0000.png",
     //                             "data/base.000/theme/Classic.fptheme/montage_1.png",
     //                             cropRect);
+    std::cout << "eventmanager\n";
     m_eventManager = new SDL12_EventManager(m_preferencesManager);
+    std::cout << "audiomanager\n";
     m_audioManager = new SDL_AudioManager();
+    std::cout << "audiomanager2\n";
 #endif
 #ifdef SDL13_GFX
     m_nativeDrawContext = new SDL13_DrawContext(640, 480,
@@ -105,6 +112,7 @@ void FPMain::initWithGUI()
     m_eventManager = new SlaveEventManager();
     m_audioManager = new NullAudioManager();
 #endif
+    std::cout << "compositedrawcontext!\n";
     m_drawContext = new CompositeDrawContext(m_nativeDrawContext);
     // Give the DrawContext to the GameLoop
     loop->setDrawContext(m_drawContext);
@@ -112,20 +120,26 @@ void FPMain::initWithGUI()
     loop->setEventManager(m_eventManager);
     // Give the AudioManager to the GameLoop
     loop->setAudioManager(m_audioManager);
+    std::cout << "suite!\n";
     // Register data packages
     m_dataPathManager.registerDataPackages(m_drawContext, &m_jukebox);
     // Create the FPCommander singleton
     FPCommander *pc = new FPCommander(&m_dataPathManager, m_preferencesManager, &m_jukebox);
-
+    std::cout << "fpcommander!\n";
     pc->initWithGUI(m_fullscreen);
+    std::cout << "fpcommander2!\n";
     initMenus();
+    std::cout << "fpcommander3!\n";
     cursor = new GameCursor("gfx/cursor.png");
+    std::cout << "fpcommander4!\n";
     loop->addDrawable(cursor);
     loop->addIdle(cursor);
+    std::cout << "idle!\n";
     if (dynamic_cast<CycledComponent *>(m_eventManager) != NULL)
         loop->addIdle(dynamic_cast<CycledComponent *>(m_eventManager));
     theCommander->registerCursor(cursor);
     gameui::GlobalNotificationCenter.addListener(theCommander->getFullScreenKey(),this);
+    std::cout << "done!\n";
 }
 
 #ifdef SDL13_GFX
@@ -172,9 +186,11 @@ void FPMain::initSDL()
 
 void FPMain::run()
 {
+    std::cout << "fpmain run()\n";
   initWithGUI();
+  std::cout << "Initialized!\n";
   GameUIDefaults::SCREEN_STACK->push(mainScreen);
-  GameUIDefaults::GAME_LOOP->run();
+  std::cout << "Pushed!\n";
 }
 
 void FPMain::debug_gsl(String gsl_script)
@@ -228,12 +244,16 @@ void FPMain::connect_ia(String param)
 
 void FPMain::initMenus()
 {
+    std::cout << "InitMenus!\n";
   DBG_PRINT("initMenus()\n");
   //
   // Create the structures.
   StoryWidget *fgStory = new StoryWidget("title_fg.gsl");
+  std::cout << "story!\n";
   StoryWidget *bgStory = new StoryWidget("title_bg.gsl");
+  std::cout << "story2!\n";
   mainScreen = new MainScreen(fgStory, bgStory);
+  std::cout << "mainScreen!\n";
   MainRealMenu *trubudu = new MainRealMenu(mainScreen);
   trubudu->build();
   mainScreen->pushMenu(trubudu);
@@ -255,4 +275,3 @@ void FPMain::notificationOccured(String identifier, void * context)
 #endif
     }
 }
-

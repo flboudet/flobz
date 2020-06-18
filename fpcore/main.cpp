@@ -132,8 +132,10 @@ int main(int argc, char *argv[])
             fp.debug_gsl(gsl_screen);
         else if (connect_ia != NULL)
             fp.connect_ia(connect_ia);
-        else
+        else {
             fp.run();
+            GameUIDefaults::GAME_LOOP->run();
+        }
     }
     catch (Exception e) { displayExceptionMessage(e.what()); }
     catch (char * str) { displayExceptionMessage(str); }
