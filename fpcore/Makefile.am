@@ -2,7 +2,7 @@ noinst_LTLIBRARIES=libfpcore.la
 
 libfpcore_la_SOURCES=audio.cpp HiScores.cpp FPResources.cpp FPCommander.cpp \
           MainMenu.cpp MainScreen.cpp FPMain.cpp \
-          main.cpp FPDataPathManager.cpp FloboGame.cpp DoomMelt.cpp \
+          FPDataPathManager.cpp FloboGame.cpp DoomMelt.cpp \
           GameView.cpp FloboAnimations.cpp AnimatedFlobo.cpp AIPlayer.cpp \
           styrolyse.cpp Story.cpp ChatBox.cpp LocalizedDictionary.cpp \
           EventPlayer.cpp PauseMenu.cpp CheatCodeManager.cpp \
@@ -21,6 +21,12 @@ libfpcore_la_SOURCES+=NetworkGameStarter.cpp NetworkGameView.cpp NetworkGame.cpp
           NetworkMenu.cpp InternetMenu.cpp InternetBot.cpp NetCenterMenu.cpp \
           NetGameCenter.cpp InternetGameCenter.cpp LanGameCenter.cpp\
           NatTraversal.cpp FPNetMessageDef.cpp
+endif
+
+if ENABLE_EMSCRIPTEN
+libfpcore_la_SOURCES+=main_emscripten.cpp
+else
+libfpcore_la_SOURCES+=main.cpp
 endif
 
 libfpcore_la_CXXFLAGS = -I$(top_srcdir)/common -I$(top_srcdir)/iosfc -I$(top_srcdir)/goomsl -I$(top_srcdir)/gametools $(SDL_CFLAGS) $(AM_CXXFLAGS) $(FPFEATURES)
@@ -45,4 +51,3 @@ EXTRA_DIST=EventPlayer.h NetworkGameView.h FPResources.h \
            FPDataPathManager.h NetworkMenu.h \
            DoomMelt.h NetworkGameStarter.h PackageDescription.h \
            Theme.h GSLFileAccessWrapper.h PlayerNameUtils.h ZoomScreenTransition.h
-
