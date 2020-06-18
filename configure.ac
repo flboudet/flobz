@@ -48,6 +48,11 @@ AC_ARG_ENABLE(null-backends,
                 [enables compilation of the game with null backends (no graphics, no sound, no inputs)])],
        [ENABLE_NULL_BACKENDS=$enableval], [ENABLE_NULL_BACKENDS=no])
 
+AC_ARG_ENABLE(emscripten,
+       [AS_HELP_STRING([--enable-emscripten],
+                [enables compilation of the game with null backends (no graphics, no sound, no inputs)])],
+       [ENABLE_EMSCRIPTEN=$enableval], [ENABLE_EMSCRIPTEN=no])
+
 #AC_ARG_ENABLE([audio],
 #              [AS_HELP_STRING([--enable-audio],
 #              [enable audio support @<:@default=yes@:>@])],
@@ -425,6 +430,8 @@ AM_CONDITIONAL([ENABLE_NETWORK], [test x$ENABLE_NETWORK = xyes])
 AM_CONDITIONAL([ENABLE_NETWORK_INTERNET], [test x$ENABLE_NETWORK_INTERNET = xyes])
 AM_CONDITIONAL([ENABLE_NETWORK_SERVER], [test x$ENABLE_SQLITE = xtrue])
 AM_CONDITIONAL([ENABLE_MAC_RECEIPT], [test x$ENABLE_MAC_RECEIPT = xyes])
+
+AM_CONDITIONAL([ENABLE_EMSCRIPTEN], [test x$ENABLE_EMSCRIPTEN = xyes])
 
 AC_SUBST([SYSTEM_ROOT])
 AC_SUBST([FPFEATURES])

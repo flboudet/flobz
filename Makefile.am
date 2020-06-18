@@ -24,6 +24,10 @@ if ENABLE_OPENGL_GFX
 flobz_LDADD+=gametools/opengl_drawcontext/libopengl_drawcontext.la
 endif
 
+if ENABLE_EMSCRIPTEN
+flobz_LDFLAGS= --preload-file $(top_srcdir)/data@/data --use-preload-plugins -s ALLOW_MEMORY_GROWTH=1
+endif
+
 flobz_LDADD+=$(SDL_LIBS)
 
 SUBDIRS = iosfc gametools goomsl common fpcore data fpserver
