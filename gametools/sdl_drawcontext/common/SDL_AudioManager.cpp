@@ -2,10 +2,11 @@
 #include "SDL_AudioManager.h"
 #include "ios_exception.h"
 #include "GTLog.h"
+#include <iostream>
 
 // Workaround for a sdl_mixer bug
 // http://bugzilla.libsdl.org/show_bug.cgi?id=1499
-#define SDLMIKMOD_WORKAROUND
+//#define SDLMIKMOD_WORKAROUND
 #ifdef SDLMIKMOD_WORKAROUND
 #include <mikmod.h>
 #endif
@@ -39,7 +40,7 @@ SDL_AudioManager::SDL_AudioManager()
     m_audio_supported = (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 2048) == 0);
     if (!m_audio_supported)
         return;
-    Mix_QuerySpec(&m_audio_rate, &m_audio_format, &m_audio_channels);
+    //Mix_QuerySpec(&m_audio_rate, &m_audio_format, &m_audio_channels);
     Mix_AllocateChannels(16);
 
 }
@@ -105,7 +106,7 @@ void SDL_AudioManager::stopMusic()
 
 void SDL_AudioManager::setMusicPosition(double position)
 {
-    Mix_SetMusicPosition(position);
+    //Mix_SetMusicPosition(position);
 }
 
 void SDL_AudioManager::setSoundEnabled(bool enabled)
