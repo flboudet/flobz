@@ -239,8 +239,13 @@ IosSurface * CompositeImageLibrary::createImage(ImageType type, int w, int h, Im
 IosSurface * CompositeImageLibrary::loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility)
 {
     CompositeSurfaceDefinition *def = m_owner.getCompositeSurfaceDefinition(path);
-    if (def == NULL)
-        return new CompositeSurface(*this, m_baseImageLibrary.loadImage(type, path, specialAbility));
+    if (def == NULL) {
+        IosSurface *newSurface = m_baseImageLibrary.loadImage(type, path, specialAbility);
+        if (newSurface == NULL) {
+            return NULL;
+        }
+        return new CompositeSurface(*this, newSurface);
+    }
     SharedPtr<IosSurface> baseSurface;
     BaseSurfaceMap::iterator existingBaseSurface = m_baseSurfaceMap.find(def->getPath());
     if (existingBaseSurface == m_baseSurfaceMap.end()) {
@@ -382,4 +387,3 @@ CompositeSurfaceDefinition *CompositeDrawContext::getCompositeSurfaceDefinition(
         return NULL;
     return &(iter->second);
 }
-
