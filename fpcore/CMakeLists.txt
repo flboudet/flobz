@@ -52,5 +52,22 @@ TARGET_INCLUDE_DIRECTORIES(fpcore PRIVATE
                            ${CMAKE_SOURCE_DIR}/goomsl
                           )
 
+IF (ENABLE_NULL_BACKENDS)
+TARGET_COMPILE_DEFINITIONS(fpcore PRIVATE
+                           NULL_BACKENDS)
+ENDIF (ENABLE_NULL_BACKENDS)
+
+IF (ENABLE_SDL12_BACKENDS)
+
 TARGET_COMPILE_DEFINITIONS(fpcore PRIVATE
                            SDL12_GFX)
+
+# TODO: avoid exposing too much of SDL
+TARGET_INCLUDE_DIRECTORIES(fpcore PRIVATE
+                           ${SDL_INCLUDE_DIR}
+)
+
+TARGET_COMPILE_DEFINITIONS(fpcore PRIVATE
+                           HAVE_SDL_SDL_MIXER_H
+)
+ENDIF (ENABLE_SDL12_BACKENDS)
