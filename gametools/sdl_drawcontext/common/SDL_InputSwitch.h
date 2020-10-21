@@ -78,7 +78,7 @@ class KeyInputSwitch : public InputSwitch
 
   private:
     int keysym;
-#if SDL_VERSION_ATLEAST(1, 3, 0)
+#if SDL_VERSION_ATLEAST(2, 0, 0)
     Uint16 keymod;
 #else
     SDLMod keymod;

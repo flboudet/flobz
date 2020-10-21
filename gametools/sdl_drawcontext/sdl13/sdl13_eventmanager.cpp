@@ -48,11 +48,11 @@ static void getControlEvent(SDL_Event e, InputSwitch *input, GameControlEvent *r
             break;
         case SDL_KEYDOWN:
             result->keyboardEvent = kKeyboardDown;
-            result->unicodeKeySym = e.key.keysym.unicode;
+            result->unicodeKeySym = e.key.keysym.sym;
             break;
         case SDL_KEYUP:
             result->keyboardEvent = kKeyboardUp;
-            result->unicodeKeySym = e.key.keysym.unicode;
+            result->unicodeKeySym = e.key.keysym.sym;
             break;
         default:
             break;
@@ -121,6 +121,15 @@ static void getControlEvent(SDL_Event e, GameControlEvent *result)
         delete input;
 }
 
+SDL_GameControlEvent::SDL_GameControlEvent()
+{
+}
+
+GameControlEvent *SDL_GameControlEvent::clone()
+{
+    return new SDL_GameControlEvent(*this);
+}
+
 ios_fc::String SDL13_EventManager::getControlName(int controlType, bool alternate)
 {
     ios_fc::String controlName("           ");
@@ -153,7 +162,12 @@ SDL13_EventManager::SDL13_EventManager()
     : CycledComponent(0.01), m_idleDx(0), m_idleDy(0),
       m_mouseX(0), m_mouseY(0)
 {
-	SDL_EnableUNICODE(1);
+	//SDL_EnableUNICODE(1);
+}
+
+GameControlEvent *SDL13_EventManager::createGameControlEvent() const
+{
+    return new SDL_GameControlEvent();
 }
 
 bool SDL13_EventManager::pollEvent(GameControlEvent &controlEvent)
@@ -178,6 +192,11 @@ void SDL13_EventManager::pushMouseEvent(int x, int y,
     mouseEvent.user.code = type;
     mouseEvent.user.data1 = new CursorEventArg(x, y);
     SDL_PushEvent(&mouseEvent);
+}
+
+void SDL13_EventManager::setEnableJoyMouseEmulation(bool enabled)
+{
+    //m_disableJoyMouseEmulation = !enabled;
 }
 
 void SDL13_EventManager::translateMouseEvent(const SDL_Event &sdl_event,

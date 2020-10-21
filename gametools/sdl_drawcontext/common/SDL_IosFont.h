@@ -5,14 +5,12 @@
 #include <map>
 #include <list>
 
-#include "config.h"
-
 #include "drawcontext.h"
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #ifdef HAVE_SDL_SDL_TTF_H
-#include <SDL/SDL_ttf.h>
+#include <SDL_ttf.h>
 #else
 #ifdef HAVE_SDL_TTF_SDL_TTF_H
 #include <SDL_ttf/SDL_ttf.h>

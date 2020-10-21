@@ -1,11 +1,11 @@
 #ifndef _SDL_AUDIOMANAGER_H_
 #define _SDL_AUDIOMANAGER_H_
 
-#include "config.h"
+//#include "config.h"
 #include "audiomanager.h"
 
 #ifdef HAVE_SDL_SDL_MIXER_H
-#include <SDL/SDL_mixer.h>
+#include <SDL_mixer.h>
 #else
 #ifdef HAVE_SDL_MIXER_SDL_MIXER_H
 #include <SDL_mixer/SDL_mixer.h>
@@ -60,4 +60,3 @@ private:
 };
 
 #endif // _SDL_AUDIOMANAGER_H_
-

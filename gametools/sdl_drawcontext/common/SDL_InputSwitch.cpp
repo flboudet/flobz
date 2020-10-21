@@ -20,6 +20,18 @@ static const SdlKeyName sdlKeyDictionnary[] = {
   { SDLK_ESCAPE,    "Escape"     },
   { SDLK_SPACE,     "Space"      },
   { SDLK_DELETE,    "Delete"     },
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+  { SDLK_KP_0,      "KP 0"       },
+  { SDLK_KP_1,      "KP 1"       },
+  { SDLK_KP_2,      "KP 2"       },
+  { SDLK_KP_3,      "KP 3"       },
+  { SDLK_KP_4,      "KP 4"       },
+  { SDLK_KP_5,      "KP 5"       },
+  { SDLK_KP_6,      "KP 6"       },
+  { SDLK_KP_7,      "KP 7"       },
+  { SDLK_KP_8,      "KP 8"       },
+  { SDLK_KP_9,      "KP 9"       },
+#else
   { SDLK_KP0,       "KP 0"       },
   { SDLK_KP1,       "KP 1"       },
   { SDLK_KP2,       "KP 2"       },
@@ -30,6 +42,7 @@ static const SdlKeyName sdlKeyDictionnary[] = {
   { SDLK_KP7,       "KP 7"       },
   { SDLK_KP8,       "KP 8"       },
   { SDLK_KP9,       "KP 9"       },
+#endif
   { SDLK_UP,        "Up Arrow"   },
   { SDLK_DOWN,      "Down Arrow" },
   { SDLK_LEFT,      "Left Arrow" },
@@ -54,9 +67,14 @@ static const SdlKeyName sdlKeyDictionnary[] = {
   { SDLK_F13,        "F13"       },
   { SDLK_F14,        "F14"       },
   { SDLK_F15,        "F15"       },
-  { SDLK_NUMLOCK,    "Num Lock"  },
   { SDLK_CAPSLOCK,   "Caps Lock" },
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+  { SDLK_NUMLOCKCLEAR, "Num Lock"  },
+  { SDLK_SCROLLLOCK, "Scroll Lock"},
+#else
+  { SDLK_NUMLOCK,    "Num Lock"  },
   { SDLK_SCROLLOCK,  "Scroll Lock"},
+#endif
   { SDLK_RSHIFT,     "Right Shift"},
   { SDLK_LSHIFT,     "Left Shift" },
   { SDLK_RCTRL,     "Right Ctrl" },
@@ -71,12 +89,14 @@ static const SdlKeyName sdlKeyDictionnary[] = {
 #endif
   { SDLK_MODE,     "Mode Shift" },
   { SDLK_HELP,     "Help" },
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+  { SDLK_PRINTSCREEN, "Print Screen" },
+#else
   { SDLK_PRINT,     "Print Screen" },
+#endif
   { SDLK_SYSREQ,     "Sys Rq" },
-  { SDLK_BREAK,     "Break" },
   { SDLK_MENU,     "Menu" },
   { SDLK_POWER,     "Power" },
-  { SDLK_EURO,     "Euro" }
 };
 
 static const int sdlKeyDictionnarySize = sizeof(sdlKeyDictionnary) / sizeof(SdlKeyName);

@@ -47,7 +47,7 @@ IosSurface * SDL_IosFont::render(const char *text, const RGBA &color)
     IosSurface *result = getFromCache(text, color);
     if (result == NULL) {
         const SDL_Colour white = {color.red, color.green, color.blue, color.alpha};
-        SDL_Surface *image = TTF_RenderUTF8_Blended(m_font, text, white);
+        SDL_Surface *image = TTF_RenderText_Blended(m_font, text, white);
         //image = fontFX(image);
         result = createSurface(image);
         storeInCache(text, color, result);

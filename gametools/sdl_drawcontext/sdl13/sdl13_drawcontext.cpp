@@ -147,15 +147,15 @@ inline static void fillRect_(SDL_Surface *surf, const IosRect *rect, const RGBA 
 class SDL13_IosFont : public SDL_IosFont
 {
 public:
-    SDL13_IosFont(const char *path, int size, IosFontFx fx, SDL13_DrawContext &drawContext);
+    SDL13_IosFont(const char *path, int size, SDL13_DrawContext &drawContext);
 protected:
     virtual IosSurface *createSurface(SDL_Surface *src);
 private:
     SDL13_DrawContext &m_drawContext;
 };
 
-SDL13_IosFont::SDL13_IosFont(const char *path, int size, IosFontFx fx, SDL13_DrawContext &drawContext)
-  : SDL_IosFont(path, size, fx), m_drawContext(drawContext)
+SDL13_IosFont::SDL13_IosFont(const char *path, int size, SDL13_DrawContext &drawContext)
+  : SDL_IosFont(path, size), m_drawContext(drawContext)
 {}
 
 IosSurface *SDL13_IosFont::createSurface(SDL_Surface *src)
@@ -190,11 +190,11 @@ SDL13_IosSurface::~SDL13_IosSurface()
         SDL_FreeSurface(m_surf);
 }
 
-SDL_TextureID SDL13_IosSurface::getTexture()
+SDL_Texture * SDL13_IosSurface::getTexture()
 {
     if (m_tex == 0) {
         m_tex = SDL_CreateTextureFromSurface(
-            m_alpha ? SDL_PIXELFORMAT_ABGR8888/*SDL_PIXELFORMAT_ARGB8888*/ : /*SDL_PIXELFORMAT_RGB888*/SDL_PIXELFORMAT_BGR24,
+            m_drawContext.m_renderer,
             m_surf);
         SDL_SetTextureBlendMode(
             m_tex, m_alpha ? SDL_BLENDMODE_BLEND : SDL_BLENDMODE_NONE);
@@ -202,26 +202,26 @@ SDL_TextureID SDL13_IosSurface::getTexture()
     return m_tex;
 }
 
-SDL_TextureID SDL13_IosSurface::getFlippedTexture()
+SDL_Texture * SDL13_IosSurface::getFlippedTexture()
 {
     if (m_texFlipped == 0) {
         if (m_flippedSurf == NULL) {
             m_flippedSurf = iim_sdlsurface_mirror_h(m_surf);
         }
-        m_texFlipped = SDL_CreateTextureFromSurface(SDL_PIXELFORMAT_ABGR8888/*SDL_PIXELFORMAT_ARGB8888*/, m_flippedSurf);
+        m_texFlipped = SDL_CreateTextureFromSurface(m_drawContext.m_renderer, m_flippedSurf);
         SDL_SetTextureBlendMode(m_texFlipped, SDL_BLENDMODE_BLEND);
     }
     return m_texFlipped;
 }
 
-SDL_TextureID SDL13_IosSurface::getTexture(int angle)
+SDL_Texture * SDL13_IosSurface::getTexture(int angle)
 {
     if (m_texRotated[angle] == 0) {
         if (!m_rotated[angle]) {
             // Generated rotated image.
             m_rotated[angle] = iim_sdlsurface_rotate(m_surf, angle * 10);
         }
-        m_texRotated[angle] = SDL_CreateTextureFromSurface(SDL_PIXELFORMAT_ABGR8888/*SDL_PIXELFORMAT_ARGB8888*/, m_rotated[angle]);
+        m_texRotated[angle] = SDL_CreateTextureFromSurface(m_drawContext.m_renderer, m_rotated[angle]);
         SDL_SetTextureBlendMode(m_texRotated[angle], SDL_BLENDMODE_BLEND);
     }
     return m_texRotated[angle];
@@ -270,6 +270,11 @@ IosSurface * SDL13_IosSurface::shiftHSV(float h, float s, float v)
 IosSurface * SDL13_IosSurface::setValue(float value)
 {
     return new SDL13_IosSurface(iim_sdlsurface_set_value(m_surf, value), m_drawContext);
+}
+
+IosSurface *SDL13_IosSurface::setAlpha(float alpha)
+{
+    return new SDL13_IosSurface(iim_sdlsurface_set_alpha(m_surf, alpha), m_drawContext);
 }
 
 IosSurface * SDL13_IosSurface::resizeAlpha(int width, int height)
@@ -323,7 +328,7 @@ void SDL13_IosSurface::fillRect(const IosRect *rect, const RGBA &color)
     fillRect_(m_surf, rect, color);
 }
 
-void SDL13_IosSurface::putString(IosFont *font, int x, int y, const char *text)
+void SDL13_IosSurface::putString(IosFont *font, int x, int y, const char *text, const RGBA &color)
 {
     releaseTexture();
     SDL13_IosFont *sFont = static_cast<SDL13_IosFont *>(font);
@@ -334,7 +339,7 @@ void SDL13_IosSurface::putString(IosFont *font, int x, int y, const char *text)
          iter != lines.end() ; iter++) {
         if (strcmp(iter->c_str(), "") == 0)
             continue;
-        IosSurface *surf = sFont->render(iter->c_str());
+        IosSurface *surf = sFont->render(iter->c_str(), color);
         IosRect dstRect = { x, y, surf->w, surf->h };
         draw(surf, NULL, &dstRect);
         y += skip;
@@ -342,6 +347,12 @@ void SDL13_IosSurface::putString(IosFont *font, int x, int y, const char *text)
 }
 
 // IIMLibrary implementation
+
+SDL13_IIMLibrary::SDL13_IIMLibrary(DataPathManager &dataPathManager, SDL13_DrawContext &drawContext)
+    : m_dataPathManager(dataPathManager)
+    , m_drawContext(drawContext)
+{
+}
 
 IosSurface * SDL13_IIMLibrary::createImage(ImageType type, int w, int h, ImageSpecialAbility specialAbility)
 {
@@ -357,15 +368,26 @@ IosSurface * SDL13_IIMLibrary::createImage(ImageType type, int w, int h, ImageSp
 IosSurface * SDL13_IIMLibrary::loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility)
 {
     SDL_Surface *tmpsurf, *retsurf;
-    tmpsurf = IMG_Load (path);
+
+    std::cout << "SDL13_ImageLibrary::loadImage " << path << std::endl;
+    String fullPath;
+    try {
+        fullPath = m_dataPathManager.getPath(path);
+    }
+    catch (Exception &e) {
+        return NULL;
+    }
+    std::cout << "SDL13_ImageLibrary::loadImage fullpath " << (const char *)fullPath << std::endl;
+
+    tmpsurf = IMG_Load (fullPath);
     if (tmpsurf==NULL) {
         return NULL;
     }
-#define ENABLE_WORKAROUND
+//#define ENABLE_WORKAROUND
 #ifdef ENABLE_WORKAROUND
     retsurf = iim_sdlsurface_create_rgba(tmpsurf->w, tmpsurf->h);
-    if (tmpsurf->format->Amask != 0)
-        SDL_SetAlpha(tmpsurf, 0, SDL_ALPHA_OPAQUE);
+    //if (tmpsurf->format->Amask != 0)
+    //    SDL_SetAlpha(tmpsurf, 0, SDL_ALPHA_OPAQUE);
     SDL_BlitSurface(tmpsurf, NULL, retsurf, NULL);
     if (retsurf==NULL) {
         perror("Texture conversion failed (is Display initialized?)\n");
@@ -378,21 +400,24 @@ IosSurface * SDL13_IIMLibrary::loadImage(ImageType type, const char *path, Image
     retsurf = tmpsurf;
 #endif
     SDL_SetSurfaceBlendMode(retsurf, SDL_BLENDMODE_BLEND);
-    SDL_SetSurfaceScaleMode(retsurf, SDL_TEXTURESCALEMODE_FAST);
     return new SDL13_IosSurface(retsurf, m_drawContext);
 }
 
-IosFont *SDL13_IIMLibrary::createFont(const char *path, int size, IosFontFx fx)
+IosFont *SDL13_IIMLibrary::createFont(const char *path, int size)
 {
-    IosFont *result = new SDL13_IosFont(path, size, fx, m_drawContext);
+    String fullPath = m_dataPathManager.getPath(path);
+    IosFont *result = new SDL13_IosFont(fullPath, size, m_drawContext);
     DBG_FONT = result;
     return result;
 }
 
 // DrawContext implementation
 
-SDL13_DrawContext::SDL13_DrawContext(int w, int h, bool fullscreen, const char *caption)
-    : m_iimLib(*this), m_clipRectPtr(NULL)
+SDL13_DrawContext::SDL13_DrawContext(DataPathManager &dataPathManager,
+                                     int w, int h, bool fullscreen, const char *caption)
+    : m_dataPathManager(dataPathManager)
+    , m_iimLib(dataPathManager, *this)
+    , m_clipRectPtr(NULL)
 {
     cerr << "Building DrawContext..." << endl;
     SDL_DisplayMode wishedMode, possibleMode;
@@ -401,34 +426,29 @@ SDL13_DrawContext::SDL13_DrawContext(int w, int h, bool fullscreen, const char *
     wishedMode.h = h;
     wishedMode.refresh_rate = 0;
     wishedMode.driverdata = NULL;
-    if (SDL_GetClosestDisplayMode(&wishedMode, &possibleMode) == NULL) {
+    if (SDL_GetClosestDisplayMode(0, &wishedMode, &possibleMode) == NULL) {
         cout << "Impossible display mode" << endl;
         exit(0);
     }
     cerr << "Building DrawContext 2..." << endl;
-    SDL_SetFullscreenDisplayMode(&possibleMode);
+    //SDL_SetFullscreenDisplayMode(&possibleMode);
     cerr << "Building DrawContext 3..." << endl;
     wid = SDL_CreateWindow("Test SDL 1.3",
                                         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                         w, h, SDL_WINDOW_OPENGL);
     cerr << "Building DrawContext 3,5..." << endl;
-    SDL_CreateRenderer(wid, 1,
+    m_renderer = SDL_CreateRenderer(wid, -1,
                        SDL_RENDERER_PRESENTVSYNC |
-                       SDL_RENDERER_PRESENTFLIP3 |
                        SDL_RENDERER_ACCELERATED);
     cerr << "Building DrawContext 3,7..." << endl;
     SDL_ShowWindow(wid);
-    if (SDL_SelectRenderer(wid) != 0) {
-        cout << "Window doesn't have a renderer" << endl;
-        exit(0);
-    }
     cerr << "Building DrawContext 4..." << endl;
     SDL_GetWindowSize(wid, &(this->w), &(this->h));
     atexit(SDL_Quit);
     SDL_ShowCursor(SDL_DISABLE);
     SDL_SetWindowTitle(wid, caption);
-    SDL_SetRenderDrawBlendMode(SDL_BLENDMODE_BLEND);
-    SDL_GetDisplayMode(SDL_GetCurrentVideoDisplay(), &m_mode);
+    SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+    //SDL_GetDisplayMode(SDL_GetCurrentVideoDisplay(), &m_mode);
     cerr << "Building DrawContext 5..." << endl;
     TTF_Init();
 }
@@ -467,7 +487,7 @@ void SDL13_DrawContext::flip()
       putString (DBG_FONT, 16, 16, fps);
   }
 #endif
-  SDL_RenderPresent();
+  SDL_RenderPresent(m_renderer);
 }
 
 int SDL13_DrawContext::getHeight() const
@@ -485,7 +505,8 @@ ImageLibrary & SDL13_DrawContext::getImageLibrary()
     return m_iimLib;
 }
 
-static void mySDL_RenderCopy(SDL_TextureID id, SDL_Rect *srcRect, SDL_Rect *dstRect,
+#ifdef DISABLED
+static void mySDL_RenderCopy(SDL_Texture * id, SDL_Rect *srcRect, SDL_Rect *dstRect,
                              IosRect *isrcRect, IosRect *idstRect)
 {
     cout << "RenderCopy " << id << endl;
@@ -504,6 +525,7 @@ static void mySDL_RenderCopy(SDL_TextureID id, SDL_Rect *srcRect, SDL_Rect *dstR
     }
     SDL_RenderCopy(id, srcRect, dstRect);
 }
+#endif
 
 #define MAX(a, b) ( a < b ? b : a)
 #define MIN(a, b) ( a < b ? a : b)
@@ -514,7 +536,7 @@ void SDL13_DrawContext::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRec
     SDL_Rect sSrcRect, sDstRect;
     SDL13_IosSurface *sSurf = static_cast<SDL13_IosSurface *>(surf);
     if (m_clipRectPtr == NULL) {
-        SDL_RenderCopy(sSurf->getTexture(),
+        SDL_RenderCopy(m_renderer, sSurf->getTexture(),
                        IOSRECTPTR_TO_SDL(srcRect, sSrcRect),
                        IOSRECTPTR_TO_SDL(dstRect, sDstRect));
     }
@@ -543,7 +565,7 @@ void SDL13_DrawContext::draw(IosSurface *surf, IosRect *srcRect, IosRect *dstRec
         SDL_Rect sDstResult;
         if (! SDL_IntersectRect(&sDstRect, &m_clipRect, &sDstResult))
             return;
-        SDL_RenderCopy(sSurf->getTexture(), &sSrcResult, &sDstResult);
+        SDL_RenderCopy(m_renderer, sSurf->getTexture(), &sSrcResult, &sDstResult);
     }
 }
 
@@ -551,7 +573,7 @@ void SDL13_DrawContext::drawHFlipped(IosSurface *surf, IosRect *srcRect, IosRect
 {
     SDL13_IosSurface *sSurf = static_cast<SDL13_IosSurface *>(surf);
     SDL_Rect sSrcRect, sDstRect;
-    SDL_RenderCopy(sSurf->getFlippedTexture(),
+    SDL_RenderCopy(m_renderer, sSurf->getFlippedTexture(),
                    IOSRECTPTR_TO_SDL(srcRect, sSrcRect),
                    IOSRECTPTR_TO_SDL(dstRect, sDstRect));
 }
@@ -569,14 +591,14 @@ void SDL13_DrawContext::drawRotatedCentered(IosSurface *surf, int angle, int x, 
     rect.y = y;
     rect.w = surf->w;
     rect.h = surf->h;
-    SDL_RenderCopy(sSurf->getTexture(angle), NULL, &rect);
+    SDL_RenderCopy(m_renderer, sSurf->getTexture(angle), NULL, &rect);
 }
 
 void SDL13_DrawContext::fillRect(const IosRect *rect, const RGBA &color)
 {
     SDL_Rect sRect;
-    SDL_SetRenderDrawColor(color.red, color.green, color.blue, color.alpha);
-    SDL_RenderFill(IOSRECTPTR_TO_SDL(rect, sRect));
+    SDL_SetRenderDrawColor(m_renderer, color.red, color.green, color.blue, color.alpha);
+    SDL_RenderFillRect(m_renderer, IOSRECTPTR_TO_SDL(rect, sRect));
 }
 
 void SDL13_DrawContext::setClipRect(IosRect *rect)
@@ -589,7 +611,7 @@ void SDL13_DrawContext::setBlendMode(ImageBlendMode mode)
     m_blendMode = mode;
 }
 
-void SDL13_DrawContext::putString(IosFont *font, int x, int y, const char *text)
+void SDL13_DrawContext::putString(IosFont *font, int x, int y, const char *text, const RGBA &color)
 {
     SDL13_IosFont *sFont = static_cast<SDL13_IosFont *>(font);
     vector<string> lines;
@@ -599,9 +621,22 @@ void SDL13_DrawContext::putString(IosFont *font, int x, int y, const char *text)
          iter != lines.end() ; iter++) {
         if (strcmp(iter->c_str(), "") == 0)
             continue;
-        IosSurface *surf = sFont->render(iter->c_str());
+        IosSurface *surf = sFont->render(iter->c_str(), color);
         IosRect dstRect = { x, y, surf->w, surf->h };
         draw(surf, NULL, &dstRect);
         y += skip;
     }
+}
+
+ImageSpecialAbility SDL13_DrawContext::guessRequiredImageAbility(const ImageOperationList &list)
+{
+    /*shiftHue;
+     bool shiftHSV;
+     bool setValue;
+     bool resizeAlpha;
+     bool mirrorH;
+     bool convertToGray;*/
+    if ((list.shiftHue) || (list.shiftHSV))
+        return IMAGE_READ;
+    return IMAGE_NO_ABILITY;
 }

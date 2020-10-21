@@ -1,9 +1,10 @@
+#include <stdio.h>
 #include "IosImgProcess.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h> // Conforms to ANSI "C 89", is that OK?
-#include "config.h"
+
 #ifdef HAVE_SDL_SDL_IMAGE_H
 #include <SDL_image.h>
 #else
@@ -716,11 +717,12 @@ SDL_Surface *iim_sdlsurface_create_rgba(int width, int height)
     bmask = 0x00ff0000;
     amask = 0xff000000;
 #endif
-    tmp = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, width, height, 32,
-                                       rmask, gmask, bmask, amask);
-#if SDL_VERSION_ATLEAST(1, 3, 0)
-    ret = tmp;
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+    ret = SDL_CreateRGBSurface(0, width, height, 32,
+                               rmask, gmask, bmask, amask);
 #else
+    tmp = SDL_CreateRGBSurface(SDL_SWSURFACE | SDL_SRCALPHA, width, height, 32,
+                               rmask, gmask, bmask, amask);
     ret = SDL_DisplayFormatAlpha(tmp);
     SDL_FreeSurface(tmp);
 #endif
@@ -772,8 +774,12 @@ IIM_Surface * IIM_Load_Absolute_DisplayFormat (const char *path)
   if (tmpsurf==NULL) {
     return NULL;
   }
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+  retsurf = tmpsurf;
+#else
   retsurf = SDL_DisplayFormat (tmpsurf);
   SDL_FreeSurface (tmpsurf);
+#endif
   return IIM_RegisterImg(retsurf, false);
 }
 
@@ -784,14 +790,18 @@ IIM_Surface * IIM_Load_Absolute_DisplayFormatAlpha (const char * path)
   if (tmpsurf==NULL) {
     return NULL;
   }
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+  retsurf = tmpsurf;
+#else
   retsurf = SDL_DisplayFormatAlpha (tmpsurf);
   if (retsurf==NULL) {
-    perror("Texture conversion failed (is Display initialized?)\n");
+      //perror("Texture conversion failed (is Display initialized?)\n");
     SDL_FreeSurface (tmpsurf);
     return NULL;
   }
   SDL_SetAlpha (retsurf, SDL_SRCALPHA | (useGL?0:SDL_RLEACCEL), SDL_ALPHA_OPAQUE);
   SDL_FreeSurface (tmpsurf);
+#endif
   return IIM_RegisterImg(retsurf, true);
 }
 
@@ -832,7 +842,7 @@ IIM_Surface * IIM_RegisterImg(SDL_Surface *img, bool isAlpha)
             }
         }
         if (_this == NULL) {
-            fprintf(stderr,"Pictures array limit exceeded, aborting...\n");
+            printf("Pictures array limit exceeded, aborting...\n");
             exit(0);
         }
     }
@@ -849,6 +859,7 @@ IIM_Surface * IIM_RegisterImg(SDL_Surface *img, bool isAlpha)
 
 void IIM_ReConvertAll(void)
 {
+#if not SDL_VERSION_ATLEAST(2, 0, 0)
   for (int i=0; i<imgListSize; ++i)
   {
     if (imgList[i].surf)
@@ -868,6 +879,7 @@ void IIM_ReConvertAll(void)
       }
     }
   }
+#endif
 }
 
 // Image processing
@@ -933,7 +945,11 @@ IIM_Surface *iim_surface_mirror_h(IIM_Surface *isrc)
  */
 IIM_Surface *iim_surface_duplicate(IIM_Surface *isrc)
 {
+#if not SDL_VERSION_ATLEAST(2, 0, 0)
     return IIM_RegisterImg(SDL_DisplayFormatAlpha(isrc->surf), true);
+#else
+    return IIM_RegisterImg(SDL_ConvertSurfaceFormat(isrc->surf, SDL_PIXELFORMAT_RGBA32, 0), true);
+#endif
 }
 
 /**
@@ -968,7 +984,9 @@ void IIM_BlitSurfaceAlpha(IIM_Surface *src, IIM_Rect *src_rect, SDL_Surface *dst
 {
   assert(src != NULL);
   assert(src->surf != NULL);
+#if not SDL_VERSION_ATLEAST(2, 0, 0)
   SDL_SetAlpha(src->surf, SDL_SRCALPHA|(useGL?0:SDL_RLEACCEL), alpha);
+#endif
   SDL_BlitSurface(src->surf, src_rect, dst, dst_rect);
 }
 
@@ -999,4 +1017,3 @@ void IIM_BlitRotatedSurfaceCentered(IIM_Surface *src, int degrees, SDL_Surface *
   rect.h = src->h;
   IIM_BlitSurface(src->rotated[degrees], NULL, dst, &rect);
 }
-

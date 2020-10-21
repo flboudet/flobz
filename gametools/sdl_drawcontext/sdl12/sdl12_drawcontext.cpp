@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "config.h"
+
 #include "drawcontext.h"
 #include "sdl12_drawcontext.h"
 #include "IosImgProcess.h"
@@ -350,26 +350,39 @@ IosSurface * SDL12_ImageLibrary::createImage(ImageType type, int w, int h, Image
 
 IosSurface * SDL12_ImageLibrary::loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility)
 {
+    std::cout << "SDL12_ImageLibrary::loadImage " << path << std::endl;
     SDL_Surface *tmpsurf, *retsurf;
-    String fullPath = m_dataPathManager.getPath(path);
+    String fullPath;
+    try {
+        fullPath = m_dataPathManager.getPath(path);
+    }
+    catch (Exception &e) {
+        return NULL;
+    }
+    std::cout << "SDL12_ImageLibrary::loadImage fullpath " << (const char *)fullPath << std::endl;
     tmpsurf = IMG_Load (fullPath);
     if (tmpsurf==NULL) {
+        std::cout << "SDL12_ImageLibrary::loadImage failed\n";
         return NULL;
     }
     switch (type) {
     case IMAGE_RGB:
-        retsurf = SDL_DisplayFormat(tmpsurf);
+        retsurf = SDL_DisplayFormatAlpha(tmpsurf);
+        //retsurf = SDL_DisplayFormat(tmpsurf);
         break;
     case IMAGE_RGBA:
     default:
         retsurf = SDL_DisplayFormatAlpha(tmpsurf);
     }
+    std::cout << "SDL12_ImageLibrary::loadImage 0\n";
     if (retsurf==NULL) {
         perror("Texture conversion failed (is Display initialized?)\n");
         SDL_FreeSurface (tmpsurf);
         return NULL;
     }
+    std::cout << "SDL12_ImageLibrary::loadImage 2\n";
     SDL_SetAlpha (retsurf, SDL_SRCALPHA | SDL_RLEACCEL, SDL_ALPHA_OPAQUE);
+    std::cout << "SDL12_ImageLibrary::loadImage 3\n";
     SDL_FreeSurface (tmpsurf);
     return new SDL12_IosSurface(retsurf);
 }
@@ -392,6 +405,8 @@ SDL12_DrawContext::SDL12_DrawContext(DataPathManager &dataPathManager,
     this->h = h;
     this->w = w;
     initDisplay(fullscreen);
+    int flags=IMG_INIT_JPG|IMG_INIT_PNG;
+    IMG_Init(flags);
     TTF_Init();
 }
 
