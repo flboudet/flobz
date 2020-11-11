@@ -45,7 +45,6 @@ ADD_LIBRARY(fpcore STATIC
             ZoomScreenTransition.cpp
            )
 
-
 TARGET_INCLUDE_DIRECTORIES(fpcore PRIVATE
                            ${CMAKE_SOURCE_DIR}/iosfc
                            ${CMAKE_SOURCE_DIR}/gametools
@@ -71,3 +70,18 @@ TARGET_COMPILE_DEFINITIONS(fpcore PRIVATE
                            HAVE_SDL_SDL_MIXER_H
 )
 ENDIF (ENABLE_SDL12_BACKENDS)
+
+IF (ENABLE_SDL2_BACKENDS)
+
+TARGET_COMPILE_DEFINITIONS(fpcore PRIVATE
+                           SDL2_GFX)
+
+# TODO: avoid exposing too much of SDL
+TARGET_INCLUDE_DIRECTORIES(fpcore PRIVATE
+                           ${SDL2_INCLUDE_DIRS}
+)
+
+TARGET_COMPILE_DEFINITIONS(fpcore PRIVATE
+                           HAVE_SDL_SDL_MIXER_H
+)
+ENDIF (ENABLE_SDL2_BACKENDS)
