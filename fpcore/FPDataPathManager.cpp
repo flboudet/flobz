@@ -61,6 +61,7 @@ FPDataPackage::FPDataPackage(FPDataPathManager *owner,
 
 std::string FPDataPackage::getPath(const char *shortPath) const
 {
+    std::cout << "DataPackage Get path " << shortPath << std::endl;
     String ret = (m_owner->getPathInPack(shortPath, m_packageNumber));
     if (ret != "")
         return (const char *) ret;
@@ -142,12 +143,15 @@ bool FPDataPathManager::hasFile(String shortPath) const
 
 String FPDataPathManager::getPath(String shortPath) const
 {
+    std::cout << "DataPathMgr Get path " << shortPath << std::endl;
     for (int i = 0 ; i < m_dataPaths.size() ; i++) {
         FilePath testPath(m_dataPaths[i].combine(shortPath));
         if (testPath.exists())
             return testPath.getPathString();
     }
-    throw Exception(String("File ") + shortPath + " not found !");
+    std::cout << "DataPathMgr file not found" << std::endl;
+    return "";
+    //throw Exception(String("File ") + shortPath + " not found !");
 }
 
 String FPDataPathManager::getPathInPack(String shortPath, int packPathIndex) const
@@ -194,4 +198,3 @@ DataInputStream *FPDataPathManager::openDataInputStream(const char *shortPath) c
     String path = getPath(shortPath);
     return new FPDataInputStream(path);
 }
-
