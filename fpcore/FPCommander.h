@@ -90,7 +90,6 @@ class FPCommander
     const FramePicture *getWindowFramePicture() const { return m_windowFramePicture.get(); }
     const FramePicture *getButtonFramePicture() const { return m_buttonIdleFramePicture.get(); }
     const FramePicture *getButtonDownFramePicture() const { return m_buttonDownFramePicture.get(); }
-    const FramePicture *getButtonSpecialFramePicture() const { return m_buttonSpecialFramePicture.get(); }
     const FramePicture *getButtonOverFramePicture() const { return m_buttonOverFramePicture.get(); }
     const FramePicture *getEditFieldFramePicture() const { return m_textFieldIdleFramePicture.get(); }
     const FramePicture *getEditFieldOverFramePicture() const { return m_textFieldIdleFramePicture.get(); }
@@ -158,7 +157,7 @@ class FPCommander
     Jukebox *m_jukebox;
 protected:
     IosSurfaceRef m_frameImage;
-    IosSurfaceRef m_buttonIdleImage, m_buttonDownImage, m_buttonOverImage, m_buttonSpecialImage;
+    IosSurfaceRef m_buttonIdleImage, m_buttonDownImage, m_buttonOverImage;
     IosSurfaceRef m_textFieldIdleImage;
     IosSurfaceRef m_separatorImage;
     IosSurfaceRef m_listIdleImage;
@@ -168,7 +167,6 @@ protected:
     std::auto_ptr<FramePicture> m_windowFramePicture;
     std::auto_ptr<FramePicture> m_buttonIdleFramePicture;
     std::auto_ptr<FramePicture> m_buttonDownFramePicture;
-    std::auto_ptr<FramePicture> m_buttonSpecialFramePicture;
     std::auto_ptr<FramePicture> m_buttonOverFramePicture;
     std::auto_ptr<FramePicture> m_textFieldIdleFramePicture;
     std::auto_ptr<FramePicture> m_separatorFramePicture;
