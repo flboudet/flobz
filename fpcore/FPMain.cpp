@@ -12,7 +12,7 @@
 #include "sdl_drawcontext/sdl12/sdl12_eventmanager.h"
 #include "sdl_drawcontext/common/SDL_AudioManager.h"
 #endif
-#ifdef SDL13_GFX
+#ifdef SDL2_GFX
 #include "sdl_drawcontext/sdl13/sdl13_drawcontext.h"
 #include "sdl_drawcontext/sdl13/sdl13_eventmanager.h"
 #include "sdl_drawcontext/common/SDL_AudioManager.h"
@@ -100,8 +100,8 @@ void FPMain::initWithGUI()
     m_audioManager = new SDL_AudioManager();
     std::cout << "audiomanager2\n";
 #endif
-#ifdef SDL13_GFX
-    m_nativeDrawContext = new SDL13_DrawContext(640, 480,
+#ifdef SDL2_GFX
+    m_nativeDrawContext = new SDL13_DrawContext(m_dataPathManager, 640, 480,
                                           m_preferencesManager->getBoolPreference(kFullScreenPref, m_fullscreen),
                                           "FloboPop by iOS-Software");
     m_eventManager = new SDL13_EventManager();
@@ -142,7 +142,7 @@ void FPMain::initWithGUI()
     std::cout << "done!\n";
 }
 
-#ifdef SDL13_GFX
+#ifdef SDL2_GFX
 #define SDL_GFX
 #endif
 #ifdef SDL12_GFX
@@ -270,7 +270,7 @@ void FPMain::notificationOccured(String identifier, void * context)
         static_cast<SDL12_DrawContext *>(m_nativeDrawContext)->setFullScreen(*(bool *)context);
 #endif
 #endif
-#ifdef SDL13_GFX
+#ifdef SDL2_GFX
         static_cast<SDL13_DrawContext *>(m_nativeDrawContext)->setFullScreen(*(bool *)context);
 #endif
     }
