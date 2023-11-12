@@ -34,7 +34,6 @@
 #endif
 #include "windows.h"
 #endif
-#include "config.h"
 #include "GTLog.h"
 #include "LocalizedDictionary.h"
 #include "ios_memory.h"
