@@ -44,7 +44,7 @@ class UDPMessage : public virtual UDPMessageInterface, public T {
 public:
     UDPMessage(int serialID, UDPMessageBoxBase &owner, SocketAddress address, int port);
     UDPMessage(int serialID, UDPMessageBoxBase &owner, const PeerAddress &address);
-    UDPMessage(const VoidBuffer &serialized, UDPMessageBoxBase &owner, SocketAddress address, int port) throw(Message::InvalidMessageException);
+    UDPMessage(const VoidBuffer &serialized, UDPMessageBoxBase &owner, SocketAddress address, int port);
     virtual ~UDPMessage() {}
     // Message implementation
     virtual void send();
@@ -86,7 +86,7 @@ UDPMessage<T>::UDPMessage(int serialID, UDPMessageBoxBase &owner, const PeerAddr
 }
 
 template <typename T>
-UDPMessage<T>::UDPMessage(const VoidBuffer &serialized, UDPMessageBoxBase &owner, SocketAddress address, int port)  throw(Message::InvalidMessageException)
+UDPMessage<T>::UDPMessage(const VoidBuffer &serialized, UDPMessageBoxBase &owner, SocketAddress address, int port)
 : T(serialized), owner(owner),
   peerAddressImpl(new UDPPeerAddressImpl(address, port)),
   peerAddress(peerAddressImpl)

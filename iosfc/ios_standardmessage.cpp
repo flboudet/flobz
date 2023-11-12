@@ -98,7 +98,7 @@ namespace ios_fc {
     return VoidBuffer((const char*)out, out.length());
   }
 
-  StandardMessage::StandardMessage(const Buffer<char> raw)  throw(InvalidMessageException)
+  StandardMessage::StandardMessage(const Buffer<char> raw)
     : serialized()
   {
     Buffer<char> tmp_buf = raw.dup();
@@ -178,7 +178,7 @@ namespace ios_fc {
     }
   }
 
-  void StandardMessage::checkMessage() throw(InvalidMessageException)
+  void StandardMessage::checkMessage()
   {
     if (!hasIntProperty(_SERIAL_ID))
       throw InvalidMessageException();

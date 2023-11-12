@@ -36,7 +36,7 @@ namespace ios_fc {
     class IgpMessage : public T, public Dirigeable {
     public:
         IgpMessage(int serialID, int igpPeerIdent);
-        IgpMessage(const Buffer<char> serialized, int igpPeerIdent) throw (Message::InvalidMessageException);
+        IgpMessage(const Buffer<char> serialized, int igpPeerIdent);
         // Dirigeable
         PeerAddress getPeerAddress();
         PeerAddress getBroadcastAddress();
@@ -74,7 +74,7 @@ namespace ios_fc {
     }
     
     template <typename T>
-    IgpMessage<T>::IgpMessage(const Buffer<char> serialized, int igpPeerIdent) throw(Message::InvalidMessageException)
+    IgpMessage<T>::IgpMessage(const Buffer<char> serialized, int igpPeerIdent)
     : T(serialized), igpPeerIdent(igpPeerIdent)
     {
     }

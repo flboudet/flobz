@@ -61,7 +61,7 @@ template <typename T>
 class IgpVirtualPeerMessage : public IgpMessage<T> {
 public:
     IgpVirtualPeerMessage(int serialID, IgpVirtualPeerMessageBox<T> &owner, int igpPeerIdent);
-    IgpVirtualPeerMessage(const Buffer<char> serialized, IgpVirtualPeerMessageBox<T> &owner, int igpPeerIdent) throw(Message::InvalidMessageException);
+    IgpVirtualPeerMessage(const Buffer<char> serialized, IgpVirtualPeerMessageBox<T> &owner, int igpPeerIdent);
     virtual void send();
     bool isReliable() const {
         if (T::hasBoolProperty("RELIABLE"))
@@ -78,7 +78,7 @@ IgpVirtualPeerMessage<T>::IgpVirtualPeerMessage(int serialID, IgpVirtualPeerMess
 }
 
 template <typename T>
-IgpVirtualPeerMessage<T>::IgpVirtualPeerMessage(const Buffer<char> serialized, IgpVirtualPeerMessageBox<T> &owner, int igpPeerIdent) throw(Message::InvalidMessageException)
+IgpVirtualPeerMessage<T>::IgpVirtualPeerMessage(const Buffer<char> serialized, IgpVirtualPeerMessageBox<T> &owner, int igpPeerIdent)
     : IgpMessage<T>(serialized, igpPeerIdent), owner(owner)
 {
 }
