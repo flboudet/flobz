@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
-ADD_LIBRARY(iosfc STATIC
+add_library(iosfc STATIC
             ios_basemessage.cpp
             ios_serversocket.cpp
             ios_datagramsocket.cpp

@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
-ADD_LIBRARY(gametools STATIC
+add_library(gametools STATIC
             GTLog.cpp
             GameCursor.cpp
             gameloop.cpp
@@ -22,18 +22,18 @@ ADD_LIBRARY(gametools STATIC
             DataPathManager.cpp
            )
 
-TARGET_INCLUDE_DIRECTORIES(gametools PRIVATE
+target_include_directories(gametools PRIVATE
                            ${CMAKE_SOURCE_DIR}/iosfc
                           )
 
-IF (ENABLE_NULL_BACKENDS)
+if (ENABLE_NULL_BACKENDS)
 
 ENDIF (ENABLE_NULL_BACKENDS)
 
-IF (ENABLE_SDL12_BACKENDS)
-ADD_SUBDIRECTORY(sdl_drawcontext)
-ENDIF (ENABLE_SDL12_BACKENDS)
+if (ENABLE_SDL12_BACKENDS)
+add_subdirectory(sdl_drawcontext)
+endif (ENABLE_SDL12_BACKENDS)
 
 IF (ENABLE_SDL2_BACKENDS)
-ADD_SUBDIRECTORY(sdl_drawcontext)
-ENDIF (ENABLE_SDL2_BACKENDS)
+add_subdirectory(sdl_drawcontext)
+endif (ENABLE_SDL2_BACKENDS)

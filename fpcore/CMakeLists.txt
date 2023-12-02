@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
-ADD_LIBRARY(fpcore STATIC
+add_library(fpcore STATIC
             audio.cpp
             HiScores.cpp
             FPResources.cpp
@@ -45,43 +45,43 @@ ADD_LIBRARY(fpcore STATIC
             ZoomScreenTransition.cpp
            )
 
-TARGET_INCLUDE_DIRECTORIES(fpcore PRIVATE
+target_include_directories(fpcore PRIVATE
                            ${CMAKE_SOURCE_DIR}/iosfc
                            ${CMAKE_SOURCE_DIR}/gametools
                            ${CMAKE_SOURCE_DIR}/goomsl
                           )
 
-IF (ENABLE_NULL_BACKENDS)
-TARGET_COMPILE_DEFINITIONS(fpcore PRIVATE
+if (ENABLE_NULL_BACKENDS)
+target_compile_definitions(fpcore PRIVATE
                            NULL_BACKENDS)
-ENDIF (ENABLE_NULL_BACKENDS)
+endif (ENABLE_NULL_BACKENDS)
 
-IF (ENABLE_SDL12_BACKENDS)
+if (ENABLE_SDL12_BACKENDS)
 
-TARGET_COMPILE_DEFINITIONS(fpcore PRIVATE
+target_compile_definitions(fpcore PRIVATE
                            SDL12_GFX)
 
 # TODO: avoid exposing too much of SDL
-TARGET_INCLUDE_DIRECTORIES(fpcore PRIVATE
+target_include_directories(fpcore PRIVATE
                            ${SDL_INCLUDE_DIR}
 )
 
-TARGET_COMPILE_DEFINITIONS(fpcore PRIVATE
+target_compile_definitions(fpcore PRIVATE
                            HAVE_SDL_SDL_MIXER_H
 )
-ENDIF (ENABLE_SDL12_BACKENDS)
+endif (ENABLE_SDL12_BACKENDS)
 
-IF (ENABLE_SDL2_BACKENDS)
+if (ENABLE_SDL2_BACKENDS)
 
-TARGET_COMPILE_DEFINITIONS(fpcore PRIVATE
+target_compile_definitions(fpcore PRIVATE
                            SDL2_GFX)
 
 # TODO: avoid exposing too much of SDL
-TARGET_INCLUDE_DIRECTORIES(fpcore PRIVATE
+target_include_directories(fpcore PRIVATE
                            ${SDL2_INCLUDE_DIRS}
 )
 
-TARGET_COMPILE_DEFINITIONS(fpcore PRIVATE
+target_compile_definitions(fpcore PRIVATE
                            HAVE_SDL_SDL_MIXER_H
 )
-ENDIF (ENABLE_SDL2_BACKENDS)
+endif (ENABLE_SDL2_BACKENDS)

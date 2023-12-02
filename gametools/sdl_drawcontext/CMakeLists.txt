@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
-IF (ENABLE_SDL12_BACKENDS)
-ADD_LIBRARY(sdl_drawcontext STATIC
+if (ENABLE_SDL12_BACKENDS)
+add_library(sdl_drawcontext STATIC
             common/SDL_IosFont.cpp
             common/SDL_AudioManager.cpp
             common/SDL_InputSwitch.cpp
@@ -10,7 +10,7 @@ ADD_LIBRARY(sdl_drawcontext STATIC
             sdl12/sdl12_eventmanager.cpp
 )
 
-TARGET_INCLUDE_DIRECTORIES(sdl_drawcontext PRIVATE
+target_include_directories(sdl_drawcontext PRIVATE
                            .
                            common
                            ${CMAKE_SOURCE_DIR}/iosfc
@@ -18,16 +18,16 @@ TARGET_INCLUDE_DIRECTORIES(sdl_drawcontext PRIVATE
                            ${SDL_INCLUDE_DIR}
 )
 
-TARGET_COMPILE_DEFINITIONS(sdl_drawcontext PRIVATE
+target_compile_definitions(sdl_drawcontext PRIVATE
                            HAVE_SDL_SDL_MIXER_H
                            HAVE_SDL_SDL_TTF_H
                            HAVE_SDL_SDL_IMAGE_H
 )
 
-ENDIF (ENABLE_SDL12_BACKENDS)
+endif (ENABLE_SDL12_BACKENDS)
 
-IF (ENABLE_SDL2_BACKENDS)
-ADD_LIBRARY(sdl_drawcontext STATIC
+if (ENABLE_SDL2_BACKENDS)
+add_library(sdl_drawcontext STATIC
             common/SDL_IosFont.cpp
             common/SDL_AudioManager.cpp
             common/SDL_InputSwitch.cpp
@@ -36,7 +36,7 @@ ADD_LIBRARY(sdl_drawcontext STATIC
             sdl13/sdl13_eventmanager.cpp
 )
 
-TARGET_INCLUDE_DIRECTORIES(sdl_drawcontext PRIVATE
+target_include_directories(sdl_drawcontext PRIVATE
                            .
                            common
                            ${CMAKE_SOURCE_DIR}/iosfc
@@ -44,10 +44,11 @@ TARGET_INCLUDE_DIRECTORIES(sdl_drawcontext PRIVATE
                            ${SDL2_INCLUDE_DIRS}
 )
 
-TARGET_COMPILE_DEFINITIONS(sdl_drawcontext PRIVATE
+target_compile_definitions(sdl_drawcontext PRIVATE
                            HAVE_SDL_SDL_MIXER_H
                            HAVE_SDL_SDL_TTF_H
                            HAVE_SDL_SDL_IMAGE_H
 )
 
-ENDIF (ENABLE_SDL2_BACKENDS)
+endif (ENABLE_SDL2_BACKENDS)
+
