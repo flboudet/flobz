@@ -123,13 +123,13 @@ protected:
     GameParameter m_handicapDecreaseAbovePhase1;
     FloboSetTheme &attachedFloboThemeSet;
     RandomSystem attachedRandom;
-    std::auto_ptr<LocalGameFactory> m_gameFactory;
-    std::auto_ptr<GameView>        m_areaA;
-    std::auto_ptr<GamePlayer> m_playerController;
+    std::unique_ptr<LocalGameFactory> m_gameFactory;
+    std::unique_ptr<GameView>        m_areaA;
+    std::unique_ptr<GamePlayer> m_playerController;
     GameOptions m_options;
     int m_cyclesBeforeGameCycle;
     double m_cyclesBeforeLevelRaise;
-    std::auto_ptr<VuMeter> m_comboMeter;
+    std::unique_ptr<VuMeter> m_comboMeter;
     double m_comboHandicap;
     bool m_comboHandicap75, m_comboHandicap85, m_comboHandicap100;
     std::string m_playerName;
@@ -160,18 +160,18 @@ public:
     void pauseGameIfPossible();
 protected:
     SoloGameSettings m_gameSettings;
-    std::auto_ptr<SoloGameWidgetFactory>  m_gameWidgetFactory;
+    std::unique_ptr<SoloGameWidgetFactory>  m_gameWidgetFactory;
     GameStateMachine m_stateMachine;
     SharedMatchAssets m_sharedAssets;
     SharedGetReadyAssets        m_sharedGetReadyAssets;
-    std::auto_ptr<PushScreenState>        m_pushGameScreen;
-    std::auto_ptr<SetupMatchState>        m_setupMatch;
-    std::auto_ptr<EnterPlayerReadyState>  m_enterPlayersReady;
-    std::auto_ptr<ExitPlayerReadyState>   m_exitPlayersReady;
-    std::auto_ptr<MatchPlayingState>      m_matchPlaying;
-    std::auto_ptr<MatchIsOverState>       m_matchIsOver;
-    std::auto_ptr<ManageHiScoresState>    m_hallOfFame;
-    std::auto_ptr<LeaveGameState>         m_leaveGame;
+    std::unique_ptr<PushScreenState>        m_pushGameScreen;
+    std::unique_ptr<SetupMatchState>        m_setupMatch;
+    std::unique_ptr<EnterPlayerReadyState>  m_enterPlayersReady;
+    std::unique_ptr<ExitPlayerReadyState>   m_exitPlayersReady;
+    std::unique_ptr<MatchPlayingState>      m_matchPlaying;
+    std::unique_ptr<MatchIsOverState>       m_matchIsOver;
+    std::unique_ptr<ManageHiScoresState>    m_hallOfFame;
+    std::unique_ptr<LeaveGameState>         m_leaveGame;
 };
 
 #endif // _SOLOGAMESTARTER_H_

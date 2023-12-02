@@ -405,7 +405,7 @@ public:
 	OpenGLIosFont(OpenGLDrawContext *owner, OpenGLBackendUtil *backendUtil, const char *path, int size)
     : m_owner(owner), m_backendUtil(backendUtil)
     {
-        std::auto_ptr<DataInputStream> fontFile(m_backendUtil->getdataPathManager()->openDataInputStream(path));
+        std::unique_ptr<DataInputStream> fontFile(m_backendUtil->getdataPathManager()->openDataInputStream(path));
         // Read all the data file and store it in a buffer
         int chunkSize = 4096;
         int dataSize = chunkSize;

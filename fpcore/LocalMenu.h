@@ -42,14 +42,14 @@ public:
     void build() {}
 private:
     VBox m_buttonsBox;
-    std::auto_ptr<EditFieldWithLabel> m_editPlayerName;
-    std::auto_ptr<Frame> m_screenTitleFrame;
-    std::auto_ptr<Text> m_screenTitle;
-    std::auto_ptr<Button> m_easy, m_medium, m_hard, m_back;
-    std::auto_ptr<SoloModeStarterAction> m_easyAction;
-    std::auto_ptr<SoloModeStarterAction> m_mediumAction;
-    std::auto_ptr<SoloModeStarterAction> m_hardAction;
-    std::auto_ptr<PopMainScreenMenuAction> m_popAction;
+    std::unique_ptr<EditFieldWithLabel> m_editPlayerName;
+    std::unique_ptr<Frame> m_screenTitleFrame;
+    std::unique_ptr<Text> m_screenTitle;
+    std::unique_ptr<Button> m_easy, m_medium, m_hard, m_back;
+    std::unique_ptr<SoloModeStarterAction> m_easyAction;
+    std::unique_ptr<SoloModeStarterAction> m_mediumAction;
+    std::unique_ptr<SoloModeStarterAction> m_hardAction;
+    std::unique_ptr<PopMainScreenMenuAction> m_popAction;
 };
 
 class LocalGameMenu : public MainScreenMenu, public PlayerNameProvider {

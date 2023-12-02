@@ -161,7 +161,7 @@ public:
 private:
     SharedGameAssets *m_sharedGameAssets;
     SharedMatchAssets *m_sharedMatchAssets;
-    std::auto_ptr<StoryWidget> m_gameLostWidget;
+    std::unique_ptr<StoryWidget> m_gameLostWidget;
     bool m_aknowledged;
     GameState *m_nextState;
 };
@@ -225,16 +225,16 @@ private:
     GameState *m_abortedState, *m_victoriousState;
     GameState *m_gameLostState, *m_humiliatedState;
 
-    std::auto_ptr<DisplayStoryScreenState> m_introStoryScreen;
-    std::auto_ptr<DisplayStoryScreenState> m_opponentStoryScreen;
-    std::auto_ptr<SetupMatchState>       m_setupMatch;
-    std::auto_ptr<EnterPlayerReadyState> m_enterPlayersReady;
-    std::auto_ptr<ExitPlayerReadyState>  m_exitPlayersReady;
-    std::auto_ptr<MatchPlayingState>     m_matchPlaying;
-    std::auto_ptr<StoryModeMatchIsOverState> m_matchIsOver;
-    std::auto_ptr<DisplayStatsState>     m_displayStats;
-    std::auto_ptr<CallActionState>       m_abortGame;
-    std::auto_ptr<CallActionState>       m_leaveMatch;
+    std::unique_ptr<DisplayStoryScreenState> m_introStoryScreen;
+    std::unique_ptr<DisplayStoryScreenState> m_opponentStoryScreen;
+    std::unique_ptr<SetupMatchState>       m_setupMatch;
+    std::unique_ptr<EnterPlayerReadyState> m_enterPlayersReady;
+    std::unique_ptr<ExitPlayerReadyState>  m_exitPlayersReady;
+    std::unique_ptr<MatchPlayingState>     m_matchPlaying;
+    std::unique_ptr<StoryModeMatchIsOverState> m_matchIsOver;
+    std::unique_ptr<DisplayStatsState>     m_displayStats;
+    std::unique_ptr<CallActionState>       m_abortGame;
+    std::unique_ptr<CallActionState>       m_leaveMatch;
 };
 
 /**
@@ -257,7 +257,7 @@ public:
     }
     void reset();
 private:
-    static std::auto_ptr<StoryModeLevelsDefinition> m_levelDefProvider;
+    static std::unique_ptr<StoryModeLevelsDefinition> m_levelDefProvider;
     SharedGameAssets *m_sharedGameAssets;
     int m_currentLevel;
     GameState *m_nextMatchState, *m_gameWonState;
@@ -283,13 +283,13 @@ protected:
     GameStateMachine m_stateMachine;
     SharedGameAssets     m_sharedGameAssets;
 
-    std::auto_ptr<PushScreenState> m_pushGameScreen;
-    std::auto_ptr<StoryModePrepareNextMatchState> m_prepareNextMatch;
-    std::auto_ptr<StoryModeMatchState>  m_playMatch;
-    std::auto_ptr<DisplayStoryScreenState> m_gameWon;
-    std::auto_ptr<ManageHiScoresState>     m_gameLostHoF;
-    std::auto_ptr<ManageHiScoresState>     m_gameWonHoF;
-    std::auto_ptr<LeaveGameState>          m_leaveGame;
+    std::unique_ptr<PushScreenState> m_pushGameScreen;
+    std::unique_ptr<StoryModePrepareNextMatchState> m_prepareNextMatch;
+    std::unique_ptr<StoryModeMatchState>  m_playMatch;
+    std::unique_ptr<DisplayStoryScreenState> m_gameWon;
+    std::unique_ptr<ManageHiScoresState>     m_gameLostHoF;
+    std::unique_ptr<ManageHiScoresState>     m_gameWonHoF;
+    std::unique_ptr<LeaveGameState>          m_leaveGame;
 };
 
 #endif // _STORYMODESTARTER_H_

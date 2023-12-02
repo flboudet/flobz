@@ -634,7 +634,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       bool repeat;
       double repeat_date;
       double repeat_speed;
-      std::auto_ptr<event_manager::GameControlEvent> repeatEvent;
+      std::unique_ptr<event_manager::GameControlEvent> repeatEvent;
   };
 
   class ControlInputWidget : public Text {

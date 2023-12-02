@@ -45,7 +45,7 @@ protected:
     IosSurface *getFromSurface() const { return m_fromSurface.get(); }
     void releaseFromSurface() { m_fromSurface.reset(NULL); }
 private:
-    std::auto_ptr<IosSurface> m_fromSurface;
+    std::unique_ptr<IosSurface> m_fromSurface;
 };
 
 /**

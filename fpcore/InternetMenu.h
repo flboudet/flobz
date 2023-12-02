@@ -65,9 +65,9 @@ public:
     virtual void idle(double currentTime);
     bool answeredToPing() const;
 private:
-    std::auto_ptr<ios_fc::DatagramSocket> m_pingSocket;
-    std::auto_ptr<FPServerMessageBox> m_pingBox;
-    std::auto_ptr<ios_fc::IGPClient> m_igpclient;
+    std::unique_ptr<ios_fc::DatagramSocket> m_pingSocket;
+    std::unique_ptr<FPServerMessageBox> m_pingBox;
+    std::unique_ptr<ios_fc::IGPClient> m_igpclient;
     IGPClient::PingTransaction *m_pingTransaction;
     PingableFPServerResponder *m_responder;
     bool m_alreadyReported;

@@ -67,19 +67,19 @@ protected:
 private:
     void sendAliveMsg();
     FloboSetTheme *attachedFloboThemeSet; // optional
-    std::auto_ptr<RandomSystem> attachedRandom;
+    std::unique_ptr<RandomSystem> attachedRandom;
     ios_fc::MessageBox *mbox;
-    std::auto_ptr<LocalGameFactory> attachedLocalGameFactory;
-    std::auto_ptr<NetworkGameFactory> attachedNetworkGameFactory;
+    std::unique_ptr<LocalGameFactory> attachedLocalGameFactory;
+    std::unique_ptr<NetworkGameFactory> attachedNetworkGameFactory;
 protected:
-    std::auto_ptr<NetworkGameView> localArea;
-    std::auto_ptr<GameView> networkArea;
+    std::unique_ptr<NetworkGameView> localArea;
+    std::unique_ptr<GameView> networkArea;
 private:
     double lastMessageDate, lastAliveMessageSentDate;
     // Chat zone
-    std::auto_ptr<ChatBox> chatBox; // optional
+    std::unique_ptr<ChatBox> chatBox; // optional
     // Network broken animation
-    std::auto_ptr<StoryWidget> brokenNetworkWidget; // optional
+    std::unique_ptr<StoryWidget> brokenNetworkWidget; // optional
     bool networkIsBroken;
     double m_networkTimeoutWarning, m_networkTimeoutError;
 };
@@ -156,21 +156,21 @@ public:
 private:
     SharedMatchAssets           m_sharedAssets;
     SharedGetReadyAssets        m_sharedGetReadyAssets;
-    std::auto_ptr<PushScreenState>         m_pushGameScreen;
-    std::auto_ptr<SetupMatchState>         m_setupMatch;
-    std::auto_ptr<EnterPlayerReadyState>   m_enterPlayersReady;
-    std::auto_ptr<NetSynchronizeState>     m_synchroGetReady;
-    std::auto_ptr<ExitPlayerReadyState>    m_exitPlayersReady;
-    std::auto_ptr<NetSynchronizeState>     m_synchroBeforeStart;
-    std::auto_ptr<NetMatchPlayingState>    m_matchPlaying;
-    std::auto_ptr<MatchIsOverState>        m_matchIsOver;
-    std::auto_ptr<DisplayStatsState>       m_displayStats;
-    std::auto_ptr<ManageMultiSetsState>    m_manageMultiSets;
-    std::auto_ptr<DisplayStoryScreenState> m_podium;
-    std::auto_ptr<NetSynchronizeState>     m_synchroAfterStats;
-    std::auto_ptr<DisplayStoryScreenState> m_networkErrorScreen;
-    std::auto_ptr<NetSynchronizeState>     m_synchroOnAbort;
-    std::auto_ptr<LeaveGameState>          m_leaveGame;
+    std::unique_ptr<PushScreenState>         m_pushGameScreen;
+    std::unique_ptr<SetupMatchState>         m_setupMatch;
+    std::unique_ptr<EnterPlayerReadyState>   m_enterPlayersReady;
+    std::unique_ptr<NetSynchronizeState>     m_synchroGetReady;
+    std::unique_ptr<ExitPlayerReadyState>    m_exitPlayersReady;
+    std::unique_ptr<NetSynchronizeState>     m_synchroBeforeStart;
+    std::unique_ptr<NetMatchPlayingState>    m_matchPlaying;
+    std::unique_ptr<MatchIsOverState>        m_matchIsOver;
+    std::unique_ptr<DisplayStatsState>       m_displayStats;
+    std::unique_ptr<ManageMultiSetsState>    m_manageMultiSets;
+    std::unique_ptr<DisplayStoryScreenState> m_podium;
+    std::unique_ptr<NetSynchronizeState>     m_synchroAfterStats;
+    std::unique_ptr<DisplayStoryScreenState> m_networkErrorScreen;
+    std::unique_ptr<NetSynchronizeState>     m_synchroOnAbort;
+    std::unique_ptr<LeaveGameState>          m_leaveGame;
 };
 
 #endif // _NETWORKGAMESTARTER_H_

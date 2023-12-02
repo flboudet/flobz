@@ -5,17 +5,23 @@
 #include <fstream>
 #include "FPMain.h"
 
+static volatile bool entered = false;
+
 // Our "main loop" function. This callback receives the current time as
 // reported by the browser, and the user data we provide in the call to
 // emscripten_request_animation_frame_loop().
 EM_BOOL one_iter(double time, void* userData) {
+    if (entered)
+        return EM_TRUE;
+    entered = true;
     // Can render to the screen here, etc.
 
     double currentTime = GameLoop::getCurrentTime();
     GameUIDefaults::GAME_LOOP->idle(currentTime);
-    GameUIDefaults::GAME_LOOP->draw(false);
+    if (GameUIDefaults::GAME_LOOP->drawRequested())
+        GameUIDefaults::GAME_LOOP->draw();
     //return GameUIDefaults::GAME_LOOP->drawRequested();
-
+    entered = false;
     // Return true to keep the loop running.
     return EM_TRUE;
 }
@@ -31,6 +37,7 @@ int main() {
 #ifdef __EMSCRIPTEN__
   // Receives a function to call and some user data to provide it.
   emscripten_request_animation_frame_loop(one_iter, 0);
+    //emscripten_set_main_loop(one_iter, 60, false);
   std::cout << "done\n";
 #else
   while (1) {

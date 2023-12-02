@@ -278,7 +278,7 @@ void UDPMessageBoxBase::idle()
         //printf("message UDP recu dans l'UDP Message Box de %s:%d !\n", (const char *)(receivedDatagram.getAddress().asString()), receivedDatagram.getPortNum());
         try {
             if (receivedDatagram.getSize() > 0) {
-                auto_ptr<UDPMessageInterface> incomingMessage(createMessageFromSerialized(Buffer<char>((char *)(receivedDatagram.getMessage()), receivedDatagram.getSize()),
+                unique_ptr<UDPMessageInterface> incomingMessage(createMessageFromSerialized(Buffer<char>((char *)(receivedDatagram.getMessage()), receivedDatagram.getSize()),
                                            receivedDatagram.getAddress(), receivedDatagram.getPortNum()));
                 int messageSerialID = incomingMessage->getSerialID();
 

@@ -187,7 +187,7 @@ public:
     virtual const FloboTheme & getFloboTheme(FloboState state) const;
 private:
     const FloboSetThemeDescription &m_desc;
-    std::auto_ptr<FloboTheme> m_floboThemes[NUMBER_OF_FLOBOS_IN_SET];
+    std::unique_ptr<FloboTheme> m_floboThemes[NUMBER_OF_FLOBOS_IN_SET];
     FloboSetTheme *m_defaultTheme;
 };
 
@@ -303,13 +303,13 @@ private:
     std::vector<std::string> m_levelThemeList;
     std::map<std::string, FloboSetThemeDescription> m_floboSetThemeDescriptions;
     std::map<std::string, LevelThemeDescription> m_levelThemeDescriptions;
-    std::auto_ptr<LocalizedDictionary> m_localeDictionary;
+    std::unique_ptr<LocalizedDictionary> m_localeDictionary;
 
     std::string m_defaultFloboSetThemeName;
-    std::auto_ptr<FloboSetTheme> m_defaultFloboSetTheme;
+    std::unique_ptr<FloboSetTheme> m_defaultFloboSetTheme;
 
     std::string m_defaultLevelThemeName;
-    std::auto_ptr<LevelThemeImpl> m_defaultLevelTheme;
+    std::unique_ptr<LevelThemeImpl> m_defaultLevelTheme;
 };
 
 

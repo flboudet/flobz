@@ -142,7 +142,7 @@ public:
 private:
     OpenGLBackendUtil *m_backendUtil;
 private:
-    std::auto_ptr<OpenGLImageLibrary> iimLib;
+    std::unique_ptr<OpenGLImageLibrary> iimLib;
     IosRect m_clipRect, *m_clipRectPtr;
     int m_viewportWidth, m_viewportHeight;
     GLfloat m_offsetX, m_offsetY;

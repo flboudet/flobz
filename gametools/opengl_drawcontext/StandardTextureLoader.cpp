@@ -109,7 +109,7 @@ OpenGLRawImage * StandardTextureLoader::loadImagePNG(ImageType type, const char 
         GTLogTrace("ERROR: PNG FILE %s NOT FOUND", path);
         return NULL;
     }
-    std::auto_ptr<DataInputStream> pngfile(m_dataPathManager->openDataInputStream(path));
+    std::unique_ptr<DataInputStream> pngfile(m_dataPathManager->openDataInputStream(path));
     if (pngfile.get() == NULL)
         return NULL;
     png_structp pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
@@ -268,7 +268,7 @@ OpenGLRawImage * StandardTextureLoader::loadImageJPG(ImageType type, const char 
         GTLogTrace("ERROR: JPG FILE %s NOT FOUND", path);
         return NULL;
     }
-    std::auto_ptr<DataInputStream> jpgfile(m_dataPathManager->openDataInputStream(path));
+    std::unique_ptr<DataInputStream> jpgfile(m_dataPathManager->openDataInputStream(path));
     if (jpgfile.get() == NULL)
         return NULL;
     struct jpeg_decompress_struct cinfo;

@@ -17,8 +17,8 @@ class InternetBot : public IdleComponent
 
   private:
     int m_level;
-    std::auto_ptr<InternetGameCenter> gameCenter;
-    std::auto_ptr<PIBNGCListener> gameCenterListener;
+    std::unique_ptr<InternetGameCenter> gameCenter;
+    std::unique_ptr<PIBNGCListener> gameCenterListener;
 };
 
 #endif

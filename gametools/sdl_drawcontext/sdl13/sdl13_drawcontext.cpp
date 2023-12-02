@@ -369,7 +369,6 @@ IosSurface * SDL13_IIMLibrary::loadImage(ImageType type, const char *path, Image
 {
     SDL_Surface *tmpsurf, *retsurf;
 
-    std::cout << "SDL13_ImageLibrary::loadImage " << path << std::endl;
     String fullPath;
     try {
         fullPath = m_dataPathManager.getPath(path);
@@ -377,7 +376,6 @@ IosSurface * SDL13_IIMLibrary::loadImage(ImageType type, const char *path, Image
     catch (Exception &e) {
         return NULL;
     }
-    std::cout << "SDL13_ImageLibrary::loadImage fullpath " << (const char *)fullPath << std::endl;
 
     tmpsurf = IMG_Load (fullPath);
     if (tmpsurf==NULL) {

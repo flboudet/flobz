@@ -16,7 +16,7 @@ class SDL_GameControlEvent : public event_manager::GameControlEvent
 public:
     SDL_GameControlEvent();
     virtual GameControlEvent *clone();
-    std::auto_ptr<InputSwitch> m_inputSwitch;
+    std::unique_ptr<InputSwitch> m_inputSwitch;
 };
 
 class SDL12_EventManager : public event_manager::EventManager,

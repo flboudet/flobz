@@ -692,7 +692,7 @@ namespace gameui {
 
     bool Box::giveFocusToActiveWidget()
     {
-        auto_ptr<GameControlEvent> ev(getGameLoop()->getEventManager()->createGameControlEvent());
+        unique_ptr<GameControlEvent> ev(getGameLoop()->getEventManager()->createGameControlEvent());
 
         Widget *child = getChild(activeWidget);
         if (child->isDead()) return false;
@@ -1122,7 +1122,7 @@ namespace gameui {
         }
         while (!childHaveFocus);
         arrangeWidgets();
-        auto_ptr<GameControlEvent> ev;
+        unique_ptr<GameControlEvent> ev;
         ev->cursorEvent = kStart;
         getChild(activeWidget)->eventOccured(ev.get());
     }

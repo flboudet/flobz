@@ -163,7 +163,7 @@ class GameView : public GameListener {
     int cycleAllowance;
     int delayBeforeGameOver;
     bool newMetaCycleStart;
-    std::auto_ptr<PlayerGameStatDisplay> m_scoreDisplay;
+    std::unique_ptr<PlayerGameStatDisplay> m_scoreDisplay;
 
     void initCommon(FloboGameFactory *attachedFloboGameFactory);
     bool haveDisplay;

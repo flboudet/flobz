@@ -154,7 +154,7 @@ protected:
     void setLevelTheme(LevelTheme *levelTheme);
     LevelTheme *getLevelTheme() const { return m_levelTheme; }
 protected:
-    std::auto_ptr<StyrolysePainterClient> m_styroPainter;
+    std::unique_ptr<StyrolysePainterClient> m_styroPainter;
 private:
     LevelTheme *m_levelTheme;
 protected:
@@ -220,7 +220,7 @@ public:
     virtual void actionAfterGameOver(bool fromControls, int actionType);
 
 protected:
-    std::auto_ptr<GamePlayer> controllerA, controllerB;
+    std::unique_ptr<GamePlayer> controllerA, controllerB;
 protected:
     DrawTarget &painter;
     GameView *areaA, *areaB;
@@ -243,7 +243,7 @@ protected:
     bool m_displayPlayerOneName, m_displayPlayerTwoName;
     void priv_initialize();
 private:
-    std::auto_ptr<VictoryDisplay> m_victoryDisplayA, m_victoryDisplayB;
+    std::unique_ptr<VictoryDisplay> m_victoryDisplayA, m_victoryDisplayB;
 };
 
 // Should be moved elsewhere

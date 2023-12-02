@@ -60,8 +60,8 @@ struct SharedMatchAssets
     }
     FloboSetThemeRef m_currentFloboSetTheme;
     LevelThemeRef m_currentLevelTheme;
-    std::auto_ptr<GameWidget> m_gameWidget;
-    std::auto_ptr<GameScreen> m_gameScreen;
+    std::unique_ptr<GameWidget> m_gameWidget;
+    std::unique_ptr<GameScreen> m_gameScreen;
     int m_leftVictories, m_leftTotal;
     int m_rightVictories, m_rightTotal;
     void release() {
@@ -98,7 +98,7 @@ public:
     }
 private:
     class GhostScreen;
-    std::auto_ptr<GhostScreen> m_ghostScreen;
+    std::unique_ptr<gameui::Screen> m_ghostScreen;
     GameState *m_nextState;
 };
 
@@ -149,7 +149,7 @@ private:
 };
 struct SharedGetReadyAssets
 {
-    auto_ptr<StoryWidget> m_getReadyWidget;
+    unique_ptr<StoryWidget> m_getReadyWidget;
 };
 
 /**
@@ -226,7 +226,7 @@ public:
 private:
     SharedMatchAssets &m_sharedAssets;
     bool m_playersAreReady;
-    auto_ptr<StoryWidget> m_getReadyWidget;
+    unique_ptr<StoryWidget> m_getReadyWidget;
     GameState *m_nextState;
 };
 
@@ -282,7 +282,7 @@ public:
 private:
     SharedMatchAssets &m_sharedAssets;
     std::string m_styrolyseName;
-    std::auto_ptr<StoryWidget> m_gameLostWidget;
+    std::unique_ptr<StoryWidget> m_gameLostWidget;
     bool m_aknowledged;
     GameState *m_nextState;
 };
@@ -311,7 +311,7 @@ private:
     SharedMatchAssets &m_sharedAssets;
     bool m_aknowledged;
     StatsWidgetDimensions m_dimensions;
-    auto_ptr<TwoPlayersStatsWidget> m_statsWidget;
+    unique_ptr<TwoPlayersStatsWidget> m_statsWidget;
     GameState *m_nextState;
 };
 
@@ -352,7 +352,7 @@ public:
 private:
     std::string m_screenName;
     bool m_acknowledged;
-    std::auto_ptr<StoryScreen> m_storyScreen;
+    std::unique_ptr<StoryScreen> m_storyScreen;
     GameState *m_nextState;
     StoryScreenValuesProvider *m_vp;
 };
@@ -391,7 +391,7 @@ private:
     std::string m_storyName;
     StoryNameProvider  *m_storyNameProvider;
     GameState *m_nextState;
-    std::auto_ptr<GameOverScreen> m_gameOverScreen;
+    std::unique_ptr<GameOverScreen> m_gameOverScreen;
     HiScoreBoard *m_scoreBoard;
     std::string m_playerName;
     int m_playerScore;
@@ -464,11 +464,11 @@ private:
     bool m_finished;
 
     GameState *m_nextState;
-    std::auto_ptr<DisplayStoryScreenState> m_newHiScore;
-    std::auto_ptr<DisplayHallOfFameState> m_displayHallOfFame;
-    std::auto_ptr<CallActionState> m_endOfStateMachine;
+    std::unique_ptr<DisplayStoryScreenState> m_newHiScore;
+    std::unique_ptr<DisplayHallOfFameState> m_displayHallOfFame;
+    std::unique_ptr<CallActionState> m_endOfStateMachine;
     GameStateMachine m_stateMachine;
-    std::auto_ptr<LocalStorageHiScoreBoard> m_scoreBoard;
+    std::unique_ptr<LocalStorageHiScoreBoard> m_scoreBoard;
     HiScoreDefaultBoard m_defaultScoreBoard;
 };
 

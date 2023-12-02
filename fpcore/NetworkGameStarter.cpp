@@ -50,22 +50,22 @@ GamePlayer *NetworkGameWidget::createLocalPlayer()
 void NetworkGameWidget::initWithGUI(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, FPServerIGPMessageBox *igpbox, bool hasChatBox)
 {
     attachedFloboThemeSet = &floboSetTheme;
-    attachedRandom = std::auto_ptr<RandomSystem>(new RandomSystem(randomSeed, 5));
+    attachedRandom = std::unique_ptr<RandomSystem>(new RandomSystem(randomSeed, 5));
     this->mbox = &mbox;
-    attachedLocalGameFactory   = std::auto_ptr<LocalGameFactory>(new LocalGameFactory(attachedRandom.get()));
-    attachedNetworkGameFactory = std::auto_ptr<NetworkGameFactory>(new NetworkGameFactory(attachedRandom.get(), mbox, gameId));
+    attachedLocalGameFactory   = std::unique_ptr<LocalGameFactory>(new LocalGameFactory(attachedRandom.get()));
+    attachedNetworkGameFactory = std::unique_ptr<NetworkGameFactory>(new NetworkGameFactory(attachedRandom.get(), mbox, gameId));
     if (igpbox != NULL) {
-        localArea = std::auto_ptr<NetworkGameView>(new InternetGameView(attachedLocalGameFactory.get(), 0, attachedFloboThemeSet, &levelTheme,
+        localArea = std::unique_ptr<NetworkGameView>(new InternetGameView(attachedLocalGameFactory.get(), 0, attachedFloboThemeSet, &levelTheme,
                                             &mbox, gameId, igpbox));
     }
     else {
-        localArea = std::auto_ptr<NetworkGameView>(new NetworkGameView(attachedLocalGameFactory.get(), 0, attachedFloboThemeSet, &levelTheme, &mbox, gameId));
+        localArea = std::unique_ptr<NetworkGameView>(new NetworkGameView(attachedLocalGameFactory.get(), 0, attachedFloboThemeSet, &levelTheme, &mbox, gameId));
     }
-    networkArea = std::auto_ptr<GameView>(new GameView(attachedNetworkGameFactory.get(), 1, attachedFloboThemeSet, &levelTheme));
+    networkArea = std::unique_ptr<GameView>(new GameView(attachedNetworkGameFactory.get(), 1, attachedFloboThemeSet, &levelTheme));
     this->mbox->addListener(this);
     if (hasChatBox)
-        chatBox = std::auto_ptr<ChatBox>(new ChatBox(*this));
-    brokenNetworkWidget = std::auto_ptr<StoryWidget>(new StoryWidget("etherdown.gsl"));
+        chatBox = std::unique_ptr<ChatBox>(new ChatBox(*this));
+    brokenNetworkWidget = std::unique_ptr<StoryWidget>(new StoryWidget("etherdown.gsl"));
     networkIsBroken = false;
     GameWidget2P::initWithGUI(*localArea, *networkArea, levelTheme, gameOverAction);
     controllerA.reset(createLocalPlayer());
@@ -317,7 +317,7 @@ void NetSynchronizeState::cycle()
 
 void NetSynchronizeState::sendSyncMessage()
 {
-    auto_ptr<ios_fc::Message> message(m_mbox->createMessage());
+    unique_ptr<ios_fc::Message> message(m_mbox->createMessage());
     message->addInt     (FPNetMessage::TYPE,   FPNetMessage::kGameSync);
     message->addInt     ("SynID", m_synID);
     message->send();
@@ -325,7 +325,7 @@ void NetSynchronizeState::sendSyncMessage()
 
 void NetSynchronizeState::sendAckMessage()
 {
-    auto_ptr<ios_fc::Message> message(m_mbox->createMessage());
+    unique_ptr<ios_fc::Message> message(m_mbox->createMessage());
     message->addInt     (FPNetMessage::TYPE,   FPNetMessage::kGameAck);
     message->addInt     ("SynID", m_synID);
     message->addBoolProperty("RELIABLE", true);

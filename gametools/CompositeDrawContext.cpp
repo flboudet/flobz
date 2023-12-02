@@ -71,7 +71,7 @@ RGBA CompositeSurface::readRGBA(int x, int y)
 IosSurface *CompositeSurface::shiftHue(float hue_offset, IosSurface *mask)
 {
     IosSurface *srcSurface = m_baseSurface.get();
-    auto_ptr<IosSurface> tempSurface;
+    unique_ptr<IosSurface> tempSurface;
     if (m_isCropped) {
         DrawContext &baseDC = m_ownerImageLibrary.getBaseDrawContext();
         tempSurface.reset(baseDC.getImageLibrary().createImage(IMAGE_RGBA, m_cropRect.w, m_cropRect.h, IMAGE_READ));
@@ -96,7 +96,7 @@ IosSurface *CompositeSurface::shiftHSV(float h, float s, float v)
 IosSurface *CompositeSurface::setValue(float value)
 {
     IosSurface *srcSurface = m_baseSurface.get();
-    auto_ptr<IosSurface> tempSurface;
+    unique_ptr<IosSurface> tempSurface;
     if (m_isCropped) {
         DrawContext &baseDC = m_ownerImageLibrary.getBaseDrawContext();
         tempSurface.reset(baseDC.getImageLibrary().createImage(IMAGE_RGBA, m_cropRect.w, m_cropRect.h, IMAGE_READ));
@@ -111,7 +111,7 @@ IosSurface *CompositeSurface::setValue(float value)
 IosSurface *CompositeSurface::setAlpha(float alpha)
 {
     IosSurface *srcSurface = m_baseSurface.get();
-    auto_ptr<IosSurface> tempSurface;
+    unique_ptr<IosSurface> tempSurface;
     if (m_isCropped) {
         DrawContext &baseDC = m_ownerImageLibrary.getBaseDrawContext();
         tempSurface.reset(baseDC.getImageLibrary().createImage(IMAGE_RGBA, m_cropRect.w, m_cropRect.h, IMAGE_READ));
@@ -129,7 +129,7 @@ IosSurface * CompositeSurface::resizeAlpha(int width, int height)
     // create a new surface with the rescaled graphics
     if (! m_ownerImageLibrary.getBaseDrawContext().hasScaleAbility()) {
         IosSurface *srcSurface = m_baseSurface.get();
-        auto_ptr<IosSurface> tempSurface;
+        unique_ptr<IosSurface> tempSurface;
         if (m_isCropped) {
             DrawContext &baseDC = m_ownerImageLibrary.getBaseDrawContext();
             tempSurface.reset(baseDC.getImageLibrary().createImage(IMAGE_RGBA, m_cropRect.w, m_cropRect.h, IMAGE_READ));

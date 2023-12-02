@@ -126,19 +126,19 @@ class FPCommander
     DataPathManager *m_dataPathManager;
     PreferencesManager *m_preferencesManager;
     // Resource Managers
-    std::auto_ptr<ThemeManager> m_themeManager;
+    std::unique_ptr<ThemeManager> m_themeManager;
     IosSurfaceFactory m_surfaceFactory;
-    std::auto_ptr<IosSurfaceResourceManager> m_surfaceResManager;
+    std::unique_ptr<IosSurfaceResourceManager> m_surfaceResManager;
     IosFontFactory m_fontFactory;
-    std::auto_ptr<IosFontResourceManager> m_fontResManager;
+    std::unique_ptr<IosFontResourceManager> m_fontResManager;
     SoundFactory m_soundFactory;
-    std::auto_ptr<SoundResourceManager> m_soundResManager;
+    std::unique_ptr<SoundResourceManager> m_soundResManager;
     MusicFactory m_musicFactory;
-    std::auto_ptr<MusicResourceManager> m_musicResManager;
+    std::unique_ptr<MusicResourceManager> m_musicResManager;
     FloboSetThemeFactory m_floboSetThemeFactory;
-    std::auto_ptr<FloboSetThemeResourceManager> m_floboSetThemeResManager;
+    std::unique_ptr<FloboSetThemeResourceManager> m_floboSetThemeResManager;
     LevelThemeFactory m_levelThemeFactory;
-    std::auto_ptr<LevelThemeResourceManager> m_levelThemeResManager;
+    std::unique_ptr<LevelThemeResourceManager> m_levelThemeResManager;
     // Localization management
     LocalizedDictionary * locale;
     AchievementsManager *m_achMgr;
@@ -153,7 +153,7 @@ class FPCommander
     void initAudio();
 
     GameLoop   *loop;
-    auto_ptr<AudioHelper> m_audioHelper;
+    unique_ptr<AudioHelper> m_audioHelper;
     Jukebox *m_jukebox;
 protected:
     IosSurfaceRef m_frameImage;
@@ -164,13 +164,13 @@ protected:
     IosSurfaceRef m_switchOnImage, m_switchOffImage;
     IosSurfaceRef m_radioOnImage, m_radioOffImage;
     IosSurfaceRef m_upArrow, m_downArrow, m_leftArrow, m_rightArrow;
-    std::auto_ptr<FramePicture> m_windowFramePicture;
-    std::auto_ptr<FramePicture> m_buttonIdleFramePicture;
-    std::auto_ptr<FramePicture> m_buttonDownFramePicture;
-    std::auto_ptr<FramePicture> m_buttonOverFramePicture;
-    std::auto_ptr<FramePicture> m_textFieldIdleFramePicture;
-    std::auto_ptr<FramePicture> m_separatorFramePicture;
-    std::auto_ptr<FramePicture> m_listFramePicture;
+    std::unique_ptr<FramePicture> m_windowFramePicture;
+    std::unique_ptr<FramePicture> m_buttonIdleFramePicture;
+    std::unique_ptr<FramePicture> m_buttonDownFramePicture;
+    std::unique_ptr<FramePicture> m_buttonOverFramePicture;
+    std::unique_ptr<FramePicture> m_textFieldIdleFramePicture;
+    std::unique_ptr<FramePicture> m_separatorFramePicture;
+    std::unique_ptr<FramePicture> m_listFramePicture;
 
     String m_localizedFontName;
     IosFontRef m_darkFont;

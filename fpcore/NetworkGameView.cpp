@@ -297,7 +297,7 @@ void InternetGameView::sendGameResultToServer(int winner)
     if (igpbox == NULL) return;
     SaveIgpBound saveIgpBound(igpbox);
     igpbox->bind(1);
-    std::auto_ptr<Message> message (igpbox->createMessage());
+    std::unique_ptr<Message> message (igpbox->createMessage());
     message->addInt   ("CMD",   FLOBO_IGP_GAME_OVER);
     message->addInt   ("WINNER", winner);
     message->addInt   ("GAMEID", gameId);
@@ -319,7 +319,7 @@ void InternetGameView::sendGameResultToServer(int winner)
 
     message->addBoolProperty("RELIABLE", true);
     message->send();
-    // delete message; auto_ptr will delete it! (even if exception is thrown, which is nice of him)
+    // delete message; unique_ptr will delete it! (even if exception is thrown, which is nice of him)
     // SaveIgpBound restore bound peer.
 }
 

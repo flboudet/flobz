@@ -4,7 +4,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include "SDL_main.h"
 #else
-#include <SDL_main.h>
+//#include <SDL_main.h>
 #endif
 
 #include "FPMain.h"

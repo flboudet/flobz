@@ -67,13 +67,13 @@ void FPCommander::initWithGUI(bool fs)
 {
   GTLogTrace("FPCommander::initWithGUI() entered");
 
-  m_windowFramePicture = std::auto_ptr<FramePicture>(new FramePicture(25, 28, 25, 19, 26, 23));
-  m_buttonIdleFramePicture = std::auto_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
-  m_buttonDownFramePicture = std::auto_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
-  m_buttonOverFramePicture = std::auto_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
-  m_textFieldIdleFramePicture = std::auto_ptr<FramePicture>(new FramePicture(5, 23, 4, 6, 10, 3));
-  m_separatorFramePicture = std::auto_ptr<FramePicture>(new FramePicture(63, 2, 63, 2, 4, 2));
-  m_listFramePicture = std::auto_ptr<FramePicture>(new FramePicture(5, 23, 4, 6, 10, 3));
+  m_windowFramePicture = std::unique_ptr<FramePicture>(new FramePicture(25, 28, 25, 19, 26, 23));
+  m_buttonIdleFramePicture = std::unique_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
+  m_buttonDownFramePicture = std::unique_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
+  m_buttonOverFramePicture = std::unique_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
+  m_textFieldIdleFramePicture = std::unique_ptr<FramePicture>(new FramePicture(5, 23, 4, 6, 10, 3));
+  m_separatorFramePicture = std::unique_ptr<FramePicture>(new FramePicture(63, 2, 63, 2, 4, 2));
+  m_listFramePicture = std::unique_ptr<FramePicture>(new FramePicture(5, 23, 4, 6, 10, 3));
 
   GTLogTrace("FPCommander::initWithGUI() init locales");
 

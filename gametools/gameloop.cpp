@@ -245,7 +245,7 @@ void GameLoop::idle(double currentTime)
   //Vector<IdleComponent> idlesCpy = idles.dup();
 
   // 1- process events
-  auto_ptr<GameControlEvent> controlEvent(m_em->createGameControlEvent());
+  unique_ptr<GameControlEvent> controlEvent(m_em->createGameControlEvent());
   while (m_em->pollEvent(*controlEvent)) {
     for (i=0; i < idles_size_at_start; ++i) {
       if (idles[i]) {

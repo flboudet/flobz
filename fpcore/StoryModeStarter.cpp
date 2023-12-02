@@ -406,7 +406,7 @@ void StoryModeMatchState::action(Widget *sender, int actionType,
 //---------------------------------
 // StoryModePrepareNextMatchState
 //---------------------------------
-std::auto_ptr<StoryModeLevelsDefinition> StoryModePrepareNextMatchState::m_levelDefProvider;
+std::unique_ptr<StoryModeLevelsDefinition> StoryModePrepareNextMatchState::m_levelDefProvider;
 StoryModePrepareNextMatchState::StoryModePrepareNextMatchState(SharedGameAssets *sharedGameAssets)
     : m_sharedGameAssets(sharedGameAssets)
 {

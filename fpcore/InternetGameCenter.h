@@ -58,12 +58,12 @@ private:
     static const int fpipVersion;
     const String hostName;
     int portNum;
-    std::auto_ptr<DatagramSocket>          m_udpSocket;
-    std::auto_ptr<FPServerMessageBox>      m_udpmbox;
-    std::auto_ptr<FPServerIGPMessageBox>   m_igpmbox;
-    std::auto_ptr<DatagramSocket>          m_p2pSocket;
-    std::auto_ptr<FPInternetP2PMessageBox> m_p2pmbox;
-    std::auto_ptr<NatTraversal>            m_p2pNatTraversal;
+    std::unique_ptr<DatagramSocket>          m_udpSocket;
+    std::unique_ptr<FPServerMessageBox>      m_udpmbox;
+    std::unique_ptr<FPServerIGPMessageBox>   m_igpmbox;
+    std::unique_ptr<DatagramSocket>          m_p2pSocket;
+    std::unique_ptr<FPInternetP2PMessageBox> m_p2pmbox;
+    std::unique_ptr<NatTraversal>            m_p2pNatTraversal;
     String p2pPunchName;
     bool tryNatTraversal;
     const String name;

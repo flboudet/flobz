@@ -43,13 +43,13 @@ public:
     IosSurfaceRef rope_elt;
     IosSurfaceRef ring_left;
     IosSurfaceRef originalFloboLeft[4];
-    std::auto_ptr<IosSurface> ring_right;
+    std::unique_ptr<IosSurface> ring_right;
     IosSurface * flobo_right[4][4];
     IosSurface *flobo_left[4][4];
     IosSurfaceRef flobo_left_mask;
-    std::auto_ptr<IosSurface> flobo_right_mask;
+    std::unique_ptr<IosSurface> flobo_right_mask;
     IosSurfaceRef stats_bg_winner;
-    std::auto_ptr<IosSurface> stats_bg_loser;
+    std::unique_ptr<IosSurface> stats_bg_loser;
     IosSurfaceRef titleImage;
     IosSurfaceRef comboImage[MAX_DISPLAYED_COMBOS];
 public:

@@ -77,7 +77,7 @@ private:
     bool paused;
     PauseMenu pauseMenu;
     GameWidget &gameWidget;
-    std::auto_ptr<ScreenTransitionWidget> transitionWidget;
+    std::unique_ptr<ScreenTransitionWidget> transitionWidget;
     StoryWidget *overlayStory;
 };
 
