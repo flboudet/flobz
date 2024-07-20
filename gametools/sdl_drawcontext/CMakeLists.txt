@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5)
 
 if (ENABLE_SDL12_BACKENDS)
 add_library(sdl_drawcontext STATIC
