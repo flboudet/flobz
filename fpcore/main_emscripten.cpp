@@ -10,9 +10,9 @@ static volatile bool entered = false;
 // Our "main loop" function. This callback receives the current time as
 // reported by the browser, and the user data we provide in the call to
 // emscripten_request_animation_frame_loop().
-EM_BOOL one_iter(double time, void* userData) {
+void one_iter() {
     if (entered)
-        return EM_TRUE;
+        return;
     entered = true;
     // Can render to the screen here, etc.
 
@@ -22,8 +22,6 @@ EM_BOOL one_iter(double time, void* userData) {
         GameUIDefaults::GAME_LOOP->draw();
     //return GameUIDefaults::GAME_LOOP->drawRequested();
     entered = false;
-    // Return true to keep the loop running.
-    return EM_TRUE;
 }
 
 int main() {
@@ -36,9 +34,12 @@ int main() {
     std::cout << "fpmain initialized\n";
 #ifdef __EMSCRIPTEN__
   // Receives a function to call and some user data to provide it.
-  emscripten_request_animation_frame_loop(one_iter, 0);
-    //emscripten_set_main_loop(one_iter, 60, false);
+  //emscripten_set_main_loop(one_iter, 60, false);
+  emscripten_set_main_loop(one_iter, 0, 1);
+  //emscripten_request_animation_frame_loop(one_iter, 0);
+  
   std::cout << "done\n";
+  return 0;
 #else
   while (1) {
     one_iter();
