@@ -94,7 +94,7 @@ void InternetBot::connect(String server, int port, String name, String password)
         gameCenter->idle();
         if (gameCenter->isDenied()) {
             std::cout << "Denied: " << gameCenter->getDenyString() << std::endl;
-            gameCenter = std::unique_ptr<InternetGameCenter>(NULL);
+            gameCenter = std::unique_ptr<InternetGameCenter>();
             return;
         }
     }

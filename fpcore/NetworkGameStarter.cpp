@@ -35,8 +35,8 @@ FloboGame *NetworkGameFactory::createFloboGame(FloboFactory *attachedFloboFactor
 }
 
 NetworkGameWidget::NetworkGameWidget()
-    : chatBox(NULL),
-      brokenNetworkWidget(NULL), networkIsBroken(false),
+    : chatBox(),
+      brokenNetworkWidget(), networkIsBroken(false),
       m_networkTimeoutWarning(5000.),
       m_networkTimeoutError(15000.)
 {
