@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 
+project(iosfc)
+
+add_subdirectory(posix)
+
 add_library(iosfc STATIC
             ios_basemessage.cpp
             ios_serversocket.cpp
@@ -30,3 +34,5 @@ add_library(iosfc STATIC
             ios_selector.cpp
             ios_server.cpp
            )
+
+target_link_libraries(iosfc iosfc_posix)

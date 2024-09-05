@@ -9,8 +9,6 @@ BISON_TARGET(goomslParser goomsl_yacc.y ${CMAKE_CURRENT_BINARY_DIR}/goomsl_yacc.
 add_library(goomsl STATIC
             goomsl.c
             goomsl_heap.c
-            jitc_test.c
-            jitc_x86.c
             goomsl_hash.cpp
             ${FLEX_goomslScanner_OUTPUTS}
             ${BISON_goomslParser_OUTPUTS}

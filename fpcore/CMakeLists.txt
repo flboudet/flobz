@@ -51,6 +51,21 @@ target_include_directories(fpcore PRIVATE
                            ${CMAKE_SOURCE_DIR}/goomsl
                           )
 
+if (ENABLE_NETWORK)
+    target_compile_definitions(fpcore PRIVATE ENABLE_NETWORK)
+
+    target_sources(fpcore PRIVATE
+            NetworkGameStarter.cpp NetworkGameView.cpp NetworkGame.cpp
+            NetworkMenu.cpp InternetMenu.cpp InternetBot.cpp NetCenterMenu.cpp
+            NetGameCenter.cpp InternetGameCenter.cpp LanGameCenter.cpp
+            NatTraversal.cpp FPNetMessageDef.cpp
+    )
+    
+    target_include_directories(fpcore PRIVATE
+    ${CMAKE_SOURCE_DIR}/common
+    )
+endif()
+
 if (ENABLE_NULL_BACKENDS)
 target_compile_definitions(fpcore PRIVATE
                            NULL_BACKENDS)

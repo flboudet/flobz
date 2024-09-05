@@ -9,6 +9,8 @@ option(ENABLE_SDL2_BACKENDS "Enable SDL 2 backends" OFF)
 option(ENABLE_SDL12_BACKENDS "Enable SDL 1.2 backends" OFF)
 option(ENABLE_NULL_BACKENDS  "Enable NULL backends" OFF)
 
+option(ENABLE_NETWORK  "Enable Network support" ON)
+
 if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
    set(SDL2_IMAGE_LIBRARIES)
    set(SDL2_TTF_LIBRARIES)
@@ -50,7 +52,6 @@ else ()
                    )
 endif ()
 
-
 target_include_directories(flobz PRIVATE
                            fpcore
                            gametools
@@ -63,7 +64,6 @@ target_link_libraries(flobz PRIVATE
                       goomsl
                       iosfc
                      )
-
 if (ENABLE_SDL12_BACKENDS)
 target_link_libraries(flobz PRIVATE
                       sdl_drawcontext
@@ -72,7 +72,7 @@ target_link_libraries(flobz PRIVATE
                       ${SDL_MIXER_LIBRARIES}
                       ${SDL_LIBRARY}
                      )
-ENDIF (ENABLE_SDL12_BACKENDS)
+endif (ENABLE_SDL12_BACKENDS)
 
 if (ENABLE_SDL2_BACKENDS)
 target_link_libraries(flobz PRIVATE
@@ -85,6 +85,6 @@ target_link_libraries(flobz PRIVATE
 endif (ENABLE_SDL2_BACKENDS)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
-   set_target_properties(flobz PROPERTIES LINK_FLAGS "--preload-file ${CMAKE_SOURCE_DIR}/data@/data --use-preload-plugins -s ALLOW_MEMORY_GROWTH=1 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_SDL_MIXER=2 -s USE_SDL_TTF=2")
+   set_target_properties(flobz PROPERTIES LINK_FLAGS "--preload-file ${CMAKE_SOURCE_DIR}/data@/data --use-preload-plugins --sASYNCIFY -sSTACK_SIZE=1000000 -s ALLOW_MEMORY_GROWTH=1 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_SDL_MIXER=2 -s USE_SDL_TTF=2")
    set_target_properties(flobz PROPERTIES SUFFIX ".html")
 endif ()
