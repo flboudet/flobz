@@ -128,9 +128,9 @@ void ScrollWidget::draw(DrawTarget *dt)
 // ListViewEntry
 //
 
-void ListViewEntry::setText(String text)
+void ListViewEntry::setText(const std::string &text)
 {
-    m_text = text;
+    m_text = text; // TODO string
     if (m_owner != NULL)
         m_owner->resyncLabels();
 }

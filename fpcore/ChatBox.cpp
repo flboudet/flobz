@@ -29,7 +29,7 @@
 
 using namespace ios_fc;
 
-void ChatBox::addChat(String name, String text)
+void ChatBox::addChat(const std::string & name, const std::string & text)
 {
     suspendLayout();
     float nameLen, maxNameLen = 0.0f;
@@ -114,7 +114,7 @@ ChatBox::~ChatBox()
 
 void ChatBox::ChatAction::action()
 {
-    String chatString = attachedEditField->getValue();
+    std::string chatString = attachedEditField->getValue();
     attachedEditField->setValue("");
     owner->delegate.sendChat(chatString);
 }

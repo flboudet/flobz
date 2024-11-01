@@ -39,7 +39,7 @@ enum {
     FLOBO_UDP_GAME_CANCEL
 };
 
-LanGameCenter::LanGameCenter(int portNum, const String name)
+LanGameCenter::LanGameCenter(int portNum, const std::string &name)
     : socket(portNum), mbox(&socket), name(name),
       timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages),
       timeMsBetweenTwoNetworkInterfacesDetection(10000.), lastNetworkInterfacesDetection(getTimeMs()),
@@ -68,7 +68,7 @@ void LanGameCenter::onMessage(Message &msg)
       switch (msg.getInt("CMD")) {
       case FLOBO_UDP_CHAT:
 	for (int i = 0, j = listeners.size() ; i < j ; i++) {
-	  listeners[i]->onChatMessage(msg.getString("NAME"), msg.getString("MSG"));
+	  listeners[i]->onChatMessage(msg.getString("NAME").c_str(), msg.getString("MSG").c_str());
 	}
 	break;
       case FLOBO_UDP_ALIVE: {
@@ -79,13 +79,13 @@ void LanGameCenter::onMessage(Message &msg)
           if (uuid == m_uuid) {
               self = true;
           }
-          NetGameCenter::connectPeer(dir.getPeerAddress(), msg.getString("NAME"), status, -1, self);
+          NetGameCenter::connectPeer(dir.getPeerAddress(), msg.getString("NAME").c_str(), status, -1, self);
       }
 	break;
       case FLOBO_UDP_DISCONNECT: {
           Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
           //printf("Message de deconnexion recu de %s...\n", (const char *)(msg.getString("NAME")));
-          NetGameCenter::disconnectPeer(dir.getPeerAddress(), msg.getString("NAME"));
+          NetGameCenter::disconnectPeer(dir.getPeerAddress(), msg.getString("NAME").c_str());
       }
 	break;
         case FLOBO_UDP_GAME_REQUEST: {
@@ -116,7 +116,7 @@ void LanGameCenter::onMessage(Message &msg)
 	break;
       case FLOBO_UDP_GAME_CANCEL:  {
           Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-	  receivedGameCanceledWithPeer(msg.getString("ORGNAME"), dir.getPeerAddress());
+	  receivedGameCanceledWithPeer(msg.getString("ORGNAME").c_str(), dir.getPeerAddress());
         }
 	break;
       default:
@@ -130,10 +130,10 @@ void LanGameCenter::onMessage(Message &msg)
 
 void LanGameCenter::onPeerDisconnect(const PeerAddress &address)
 {
-  disconnectPeer(address, String("Unknown"));
+  disconnectPeer(address, "Unknown");
 }
 
-void LanGameCenter::sendMessage(const String msgText)
+void LanGameCenter::sendMessage(const std::string &msgText)
 {
   for (int i = 0, j = getPeerCount() ; i < j ; i++) {
     Message *msg = mbox.createMessage();
@@ -142,8 +142,8 @@ void LanGameCenter::sendMessage(const String msgText)
 
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("CMD", FLOBO_UDP_CHAT);
-    msg->addString("NAME", name);
-    msg->addString("MSG", msgText);
+    msg->addString("NAME", name.c_str());
+    msg->addString("MSG", msgText.c_str());
     msg->send();
     delete msg;
   }
@@ -175,12 +175,12 @@ void LanGameCenter::setStatus(int status)
     sendAliveMessage();
 }
 
-String LanGameCenter::getSelfName()
+const std::string &LanGameCenter::getSelfName()
 {
     return name;
 }
 
-String LanGameCenter::getOpponentName()
+const std::string &LanGameCenter::getOpponentName()
 {
     return opponentName;
 }
@@ -198,7 +198,7 @@ void LanGameCenter::sendAliveMessage()
             dirMsg->setPeerAddress(mcastPeerAddress);
 
             msg->addInt("CMD", FLOBO_UDP_ALIVE);
-            msg->addString("NAME", name);
+            msg->addString("NAME", name.c_str());
             msg->addInt("STATUS", status);
             msg->addInt("UUID", m_uuid);
             msg->send();
@@ -224,7 +224,7 @@ void LanGameCenter::sendDisconnectMessage()
         dirMsg->setPeerAddress(mcastPeerAddress);
 
         msg->addInt("CMD", FLOBO_UDP_DISCONNECT);
-        msg->addString("NAME", name);
+        msg->addString("NAME", name.c_str());
         msg->send();
         //printf("Message de deconnexion envoye...\n");
         delete msg;
@@ -240,8 +240,8 @@ void LanGameCenter::sendGameRequest(FloboGameInvitation &invitation)
 
   msg->addBoolProperty("RELIABLE", true);
   msg->addInt("CMD", FLOBO_UDP_GAME_REQUEST);
-  msg->addString("ORGNAME", name);
-  msg->addString("DSTNAME", invitation.opponentName);
+  msg->addString("ORGNAME", name.c_str());
+  msg->addString("DSTNAME", invitation.opponentName.c_str());
   msg->addInt("RNDSEED", invitation.gameRandomSeed);
   msg->addInt("SPEED", invitation.gameSpeed);
   msg->addInt("GSETS", invitation.gameNbSets);
@@ -259,8 +259,8 @@ void LanGameCenter::sendGameAcceptInvitation(FloboGameInvitation &invitation)
 
   msg->addBoolProperty("RELIABLE", true);
   msg->addInt("CMD", FLOBO_UDP_GAME_ACCEPT);
-  msg->addString("ORGNAME", name);
-  msg->addString("DSTNAME", invitation.opponentName);
+  msg->addString("ORGNAME", name.c_str());
+  msg->addString("DSTNAME", invitation.opponentName.c_str());
   msg->send();
   delete msg;
   gameGranted = true;
@@ -281,13 +281,13 @@ void LanGameCenter::sendGameCancelInvitation(FloboGameInvitation &invitation)
 
   msg->addBoolProperty("RELIABLE", true);
   msg->addInt("CMD", FLOBO_UDP_GAME_CANCEL);
-  msg->addString("ORGNAME", name);
-  msg->addString("DSTNAME", invitation.opponentName);
+  msg->addString("ORGNAME", name.c_str());
+  msg->addString("DSTNAME", invitation.opponentName.c_str());
   msg->send();
   delete msg;
 }
 
-void LanGameCenter::onPlayerConnect(String playerName, PeerAddress playerAddress)
+void LanGameCenter::onPlayerConnect(const std::string &playerName, PeerAddress playerAddress)
 {
     // When a new player connects, send an alive message
     sendAliveMessage();

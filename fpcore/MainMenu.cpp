@@ -45,7 +45,7 @@ networkGameButton(theCommander->getLocalizedString(kNetGame), &networkGameAction
 #else
 , lanGameMenu(mainScreen),
 lanAction(&lanGameMenu, mainScreen),
-lanGameButton(theCommander->getLocalizedString("Local Area Network Game"), &lanAction)
+lanGameButton(theCommander->getLocalizedString("Local Area Network Game").c_str(), &lanAction) // TODO: string
 #endif
 #endif
 {

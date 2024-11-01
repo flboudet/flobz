@@ -99,7 +99,7 @@ void *StyrolysePainterClient::styro_loadImage(StyrolyseClient *_this, const char
 {
     StyroImage *image;
     image = new StyroImage(_this,
-        FilePath(((ExtendedClient *)_this)->m_theme->getThemeRootPath().c_str())
+        FilePath(((ExtendedClient *)_this)->m_theme->getThemeRootPath())
       .combine(path), true);
     return image;
 }
@@ -250,12 +250,12 @@ void GameWidget2P::setVictories(int left, int right)
     m_victoryDisplayB->setValue(right);
 }
 
-void GameWidget2P::setPlayerOneName(String newName) {
+void GameWidget2P::setPlayerOneName(const std::string & newName) {
     playerOneName = newName;
     areaA->setPlayerNames(playerOneName, playerTwoName);
     areaB->setPlayerNames(playerOneName, playerTwoName);
 }
-void GameWidget2P::setPlayerTwoName(String newName) {
+void GameWidget2P::setPlayerTwoName(const std::string &newName) {
     playerTwoName = newName;
     areaA->setPlayerNames(playerOneName, playerTwoName);
     areaB->setPlayerNames(playerOneName, playerTwoName);
@@ -509,12 +509,12 @@ void GameWidget2P::draw(DrawTarget *dt)
         dt->putStringCenteredXY(font,
                                 getLevelTheme()->getNameDisplayX(0),
                                 getLevelTheme()->getNameDisplayY(0),
-                                playerOneName, *color);
+                                playerOneName.c_str(), *color);
     if (m_displayPlayerTwoName)
         dt->putStringCenteredXY(font,
                                 getLevelTheme()->getNameDisplayX(1),
                                 getLevelTheme()->getNameDisplayY(1),
-                                playerTwoName, *color);
+                                playerTwoName.c_str(), *color);
     // Rendering the opponent if it is in front
     if (! getLevelTheme()->getOpponentIsBehind()) {
         if (getOpponent() != NULL)

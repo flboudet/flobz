@@ -116,7 +116,7 @@ private:
     public:
         ComboLine(StatsResources &res);
         virtual ~ComboLine() {}
-        void setComboLineInfos(StatsDirection dir, int tag, String comboText,
+        void setComboLineInfos(StatsDirection dir, int tag, const std::string &comboText,
                                int numberOfCombos, int vsNumberOfCombos,
                                int totalNumOfCombos, gameui::Action *progressionCompleteAction);
         void setDimensions(StatsWidgetDimensions &dimensions) {

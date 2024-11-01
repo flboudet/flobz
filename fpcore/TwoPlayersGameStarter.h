@@ -31,7 +31,7 @@
 
 class TwoPlayersGameWidget : public GameWidget2P {
 public:
-    TwoPlayersGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, String aiFace, Action *gameOverAction = NULL);
+    TwoPlayersGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, const std::string & aiFace, Action *gameOverAction = NULL);
     bool didPlayerWon() const { return isGameARunning(); }
     void cycle();
     StoryWidget *getOpponent();
@@ -45,7 +45,7 @@ private:
 
 class LocalTwoPlayersGameWidgetFactory : public GameWidgetFactory {
 public:
-    GameWidget *createGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
+    GameWidget *createGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, const std::string & centerFace, Action *gameOverAction)
     {
         return new TwoPlayersGameWidget(floboSetTheme, levelTheme, centerFace, gameOverAction);
     }

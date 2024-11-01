@@ -12,19 +12,19 @@ public:
     PIBNGCListener(InternetGameCenter &gc, int level) : m_gc(gc), m_level(level), m_opponent(NULL) {
     }
 
-    virtual void onChatMessage(const String &msgAuthor, const String &msg) {
+    virtual void onChatMessage(const std::string &msgAuthor, const std::string &msg) {
         std::cout << "onChatMessage" << std::endl;
     }
 
-    virtual void onPlayerConnect(String playerName, PeerAddress playerAddress) {
+    virtual void onPlayerConnect(const std::string & playerName, PeerAddress playerAddress) {
         std::cout << "onPlayerConnect" << std::endl;
     }
 
-    virtual void onPlayerDisconnect(String playerName, PeerAddress playerAddress) {
+    virtual void onPlayerDisconnect(const std::string & playerName, PeerAddress playerAddress) {
         std::cout << "onPlayerDisconnect" << std::endl;
     }
 
-    virtual void onPlayerUpdated(String playerName, PeerAddress playerAddress) {
+    virtual void onPlayerUpdated(const std::string & playerName, PeerAddress playerAddress) {
         std::cout << "onPlayerUpdated" << std::endl;
     }
 
@@ -84,7 +84,7 @@ InternetBot::InternetBot(int level)
     : m_level(level)
 {}
 
-void InternetBot::connect(String server, int port, String name, String password)
+void InternetBot::connect(const std::string & server, int port, const std::string & name, const std::string & password)
 {
     gameCenter = std::unique_ptr<InternetGameCenter>(new InternetGameCenter(server, port, name, password));
     gameCenterListener = std::unique_ptr<PIBNGCListener>(new PIBNGCListener(*gameCenter, m_level));

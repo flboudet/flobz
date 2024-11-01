@@ -33,18 +33,18 @@
 
 class InternetGameCenter : public NetGameCenter, public MessageListener {
 public:
-    InternetGameCenter(const String hostName, int portNum, const String name, const String password);
-    void sendMessage(const String msgText);
+    InternetGameCenter(const std::string &hostName, int portNum, const std::string &name, const std::string &password);
+    void sendMessage(const std::string &msgText);
     void idle();
     void onMessage(Message &msg);
     void setStatus(int status);
-    String getSelfName();
-    String getOpponentName();
+    const std::string & getSelfName();
+    const std::string & getOpponentName();
     bool isConnected() const;
     bool isAccepted() const;
     bool isDenied() const;
-    String getDenyString() const { return m_denyString; }
-    String getDenyStringMore() const { return m_denyStringMore; }
+    std::string getDenyString() const { return m_denyString; }
+    std::string getDenyStringMore() const { return m_denyStringMore; }
     virtual FPServerIGPMessageBox *getIgpBox() { return m_igpmbox.get(); }
     // Temporaire
     void punch();
@@ -56,7 +56,7 @@ private:
     void sendAliveMessage();
     
     static const int fpipVersion;
-    const String hostName;
+    std::string hostName;
     int portNum;
     std::unique_ptr<DatagramSocket>          m_udpSocket;
     std::unique_ptr<FPServerMessageBox>      m_udpmbox;
@@ -64,10 +64,10 @@ private:
     std::unique_ptr<DatagramSocket>          m_p2pSocket;
     std::unique_ptr<FPInternetP2PMessageBox> m_p2pmbox;
     std::unique_ptr<NatTraversal>            m_p2pNatTraversal;
-    String p2pPunchName;
+    std::string p2pPunchName;
     bool tryNatTraversal;
-    const String name;
-    const String password;
+    std::string name;
+    std::string password;
     int status;
     double timeMsBetweenTwoAliveMessages, lastAliveMessage;
     FloboGameInvitation grantedInvitation;
@@ -79,10 +79,10 @@ private:
         GAMESTATUS_GRANTED_IGP
     };
     GameStatus gameGrantedStatus;
-    String opponentName;
+    std::string opponentName;
     bool m_isAccepted, m_isDenied;
-    String m_denyString;
-    String m_denyStringMore;
+    std::string m_denyString;
+    std::string m_denyStringMore;
 };
 
 #endif // _PUYOINTERNETGAMECENTER_H

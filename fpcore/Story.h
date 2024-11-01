@@ -41,29 +41,29 @@ using namespace gameui;
 class StyroImage
 {
 public:
-    String path;
+    std::string path;
     IosSurfaceRef surfaceRef;
     IosSurface   *surface;
     IosSurface   *alphaSurface[10];
     StyroImage(StyrolyseClient *_this,
-               const char *path, bool removePrefix=false);
+               const std::string &path, bool removePrefix=false);
 };
 
 class StoryWidget : public Widget, public IdleComponent {
 public:
-    StoryWidget(String screenName, Action *finishedAction = NULL, bool fxMode = false);
+    StoryWidget(const std::string &screenName, Action *finishedAction = NULL, bool fxMode = false);
     ~StoryWidget();
     void reset();
     void idle(double currentTime);
     void draw(DrawTarget *dt);
     IdleComponent *getIdleComponent() { return this; }
-    void setIntegerValue(String varName, int value);
-    int getIntegerValue(String varName) const;
-    void setFloatValue(String varName, float value);
-    float getFloatValue(String varName) const;
-    void setStringValue(String varName, const char * value);
-    std::string getStringValue(String varName) const;
-    const char *getText(const char *text) const;
+    void setIntegerValue(const std::string & varName, int value);
+    int getIntegerValue(const std::string & varName) const;
+    void setFloatValue(const std::string & varName, float value);
+    float getFloatValue(const std::string & varName) const;
+    void setStringValue(const std::string & varName, const char * value);
+    std::string getStringValue(const std::string & varName) const;
+    const std::string &getText(const std::string &text) const;
     void freeMemory();
 
     void render(DrawTarget *dt);
@@ -85,13 +85,13 @@ protected:
     StoryStyrolyseClient client;
     double last_time;
     bool fxMode;
-    String fullPath;
+    std::string fullPath;
     bool m_renderEnabled;
 };
 
 class VisualFX : public StoryWidget {
 public:
-    VisualFX(String fxName, const FloboSetTheme &floboSetTheme);
+    VisualFX(const std::string & fxName, const FloboSetTheme &floboSetTheme);
     void postEvent(const char *name, float x, float y, int player);
     bool busy() const;
     bool supportFX(const char *str) const;
@@ -100,13 +100,13 @@ public:
     void setGameScreen(GameScreen *screen) { this->screen = screen; }
     GameScreen *getGameScreen() const { return screen; }
 private:
-    String fxName;
+    std::string fxName;
     GameScreen *screen;
 };
 
 class StoryScreen : public Screen {
 public:
-    StoryScreen(String screenName, Action *finishedAction = NULL, bool shouldAddTransition = true);
+    StoryScreen(const std::string & screenName, Action *finishedAction = NULL, bool shouldAddTransition = true);
     virtual ~StoryScreen();
     // Screen implementation
     virtual void onEvent(event_manager::GameControlEvent *cevent);

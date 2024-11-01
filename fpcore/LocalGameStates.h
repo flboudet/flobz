@@ -34,7 +34,7 @@
 
 class PlayerNameProvider {
 public:
-    virtual String getPlayerName(int playerNumber) const = 0;
+    virtual std::string getPlayerName(int playerNumber) const = 0;
     virtual ~PlayerNameProvider() {};
 };
 
@@ -48,7 +48,7 @@ class GameWidgetFactory {
 public:
     virtual GameWidget *createGameWidget(FloboSetTheme &floboSetTheme,
                                          LevelTheme &levelTheme,
-                                         String centerFace,
+                                         const std::string & centerFace,
                                          Action *gameOverAction) = 0;
     virtual ~GameWidgetFactory() {};
 };
@@ -333,7 +333,7 @@ public:
 class DisplayStoryScreenState : public GameState, public Action
 {
 public:
-    DisplayStoryScreenState(const char *screenName);
+    DisplayStoryScreenState(const std::string &screenName);
     // GameState implementation
     virtual void enterState();
     virtual void exitState();

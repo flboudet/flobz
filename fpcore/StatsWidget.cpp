@@ -43,7 +43,7 @@ StatsResources::StatsResources()
     titleImage = theCommander->getSurface(IMAGE_RGBA, "gfx/stats_title.png");
     for (int numCombo = 0 ; numCombo < MAX_DISPLAYED_COMBOS ; numCombo++) {
         String pictureName = String("gfx/combo") + (numCombo+1) + "x_stat.png";
-        comboImage[numCombo] = theCommander->getSurface(IMAGE_RGBA, pictureName);
+        comboImage[numCombo] = theCommander->getSurface(IMAGE_RGBA, pictureName.c_str());
     }
     stats_bg_winner = theCommander->getSurface(IMAGE_RGBA, "gfx/stats-bg.png", IMAGE_READ);
     stats_bg_loser.reset(stats_bg_winner.get()->shiftHue(180));
@@ -306,7 +306,7 @@ void StatsWidget::action(Widget *sender, int actionType, GameControlEvent *event
         return;
     int currentComboIndex = m_statsFormat.m_comboIndirection[comboIndirectionIndex];
     if (currentComboIndex != -1)
-        m_comboLines[comboIndirectionIndex]->setComboLineInfos(m_dir, comboIndirectionIndex, String(""),
+        m_comboLines[comboIndirectionIndex]->setComboLineInfos(m_dir, comboIndirectionIndex, "",
                                                         m_stats.combo_count[currentComboIndex],
                                                         m_opponentStats.combo_count[currentComboIndex],
                                                         m_maxCombo, this);
@@ -316,7 +316,7 @@ void StatsWidget::startAnimation()
 {
     int currentComboIndex = m_statsFormat.m_comboIndirection[0];
     if (currentComboIndex != -1)
-        m_comboLines[0]->setComboLineInfos(m_dir, 0, String(""),
+        m_comboLines[0]->setComboLineInfos(m_dir, 0, "",
                                           m_stats.combo_count[currentComboIndex],
                                           m_opponentStats.combo_count[currentComboIndex],
                                           m_maxCombo, this);
@@ -330,7 +330,7 @@ StatsWidget::ComboLine::ComboLine(StatsResources &res)
     //add(&m_comboLabel);
 }
 
-void StatsWidget::ComboLine::setComboLineInfos(StatsDirection dir, int tag, String comboText,
+void StatsWidget::ComboLine::setComboLineInfos(StatsDirection dir, int tag, const std::string &comboText,
                                                    int numberOfCombos, int vsNumberOfCombos,
                                                    int totalNumOfCombos, Action *progressionCompleteAction)
 {
@@ -373,15 +373,15 @@ void StatsWidget::idle(double currentTime)
     const double duration = MAX_DISPLAYED_COMBOS * LINE_DURATION + 0.5;
     int points = m_stats.points * sin(1.5708 * (currentTime-m_startTime) / duration);
     if (currentTime-m_startTime > duration) points = m_stats.points;
-    m_score.setValue(String() + points);
-    m_globalScore.setValue(String() + (m_stats.total_points + points));
+    m_score.setValue(std::to_string(points));
+    m_globalScore.setValue(std::to_string(m_stats.total_points + points));
 }
 
 void StatsWidget::ComboLine::action(Widget *sender, int actionType, GameControlEvent *event)
 {
     switch (actionType) {
         case ProgressBarWidget::VALUE_CHANGED:
-            m_currentValue.setValue(String("") + (int)(m_progressBar.getValue() * (float)m_totalNumOfCombos) + " ");
+            //m_currentValue.setValue(std::string("") + (int)(m_progressBar.getValue() * (float)m_totalNumOfCombos) + " "); // TODO: string
             break;
         case ProgressBarWidget::PROGRESSION_COMPLETE:
             m_progressionCompleteAction->action(this, m_tag, event);

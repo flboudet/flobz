@@ -60,7 +60,7 @@ public:
     void setScreenToResumed(bool fromControls);
     void abort();
     void actionAfterGameOver(bool fromControls, int actionType);
-    virtual void sendChat(String chatText);
+    virtual void sendChat(const std::string &chatText);
 protected:
     void associatedScreenHasBeenSet(GameScreen *associatedScreen);
     virtual GamePlayer *createLocalPlayer();

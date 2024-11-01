@@ -37,7 +37,7 @@
 
 class StoryModeGameWidget : public GameWidget2P, public Action {
 public:
-    StoryModeGameWidget(int lifes, String aiFace);
+    StoryModeGameWidget(int lifes, const std::string & aiFace);
     void initWithGUI(GameView &areaA, GameView &areaB, GamePlayer *playercontroller, LevelTheme &levelTheme, int level, Action *gameOverAction);
     virtual ~StoryModeGameWidget();
     bool didPlayerWon() const { return isGameARunning(); }
@@ -57,7 +57,7 @@ protected:
 class StoryModeStandardLayoutGameWidget : public StoryModeGameWidget
 {
 public:
-    StoryModeStandardLayoutGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction = NULL);
+    StoryModeStandardLayoutGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, int level, int nColors, int lifes, const std::string & aiFace, Action *gameOverAction = NULL);
 private:
     FloboSetTheme &attachedFloboThemeSet;
     RandomSystem attachedRandom;
@@ -73,24 +73,24 @@ public:
         int nColors;
     };
     struct LevelDefinition {
-        LevelDefinition(String levelName, String introStory,
-                        String opponentStory, String opponentName, String opponent,
-                        String backgroundTheme, String gameLostStory, String gameWonStory, String gameOverStory,
+        LevelDefinition(const std::string & levelName, const std::string & introStory,
+                        const std::string & opponentStory, const std::string & opponentName, const std::string & opponent,
+                        const std::string & backgroundTheme, const std::string & gameLostStory, const std::string & gameWonStory, const std::string & gameOverStory,
                         SelIA easySettings, SelIA mediumSettings, SelIA hardSettings)
             : levelName(levelName), introStory(introStory),
               opponentStory(opponentStory),  opponentName(opponentName), opponent(opponent),
               backgroundTheme(backgroundTheme), gameLostStory(gameLostStory), gameWonStory(gameWonStory),
               gameOverStory(gameOverStory),
               easySettings(easySettings), mediumSettings(mediumSettings), hardSettings(hardSettings) {}
-        String levelName;
-        String introStory;
-        String opponentStory;
-        String opponentName;
-        String opponent;
-        String backgroundTheme;
-        String gameLostStory;
-        String gameWonStory;
-        String gameOverStory;
+        std::string levelName;
+        std::string introStory;
+        std::string opponentStory;
+        std::string opponentName;
+        std::string opponent;
+        std::string backgroundTheme;
+        std::string gameLostStory;
+        std::string gameWonStory;
+        std::string gameOverStory;
         SelIA easySettings;
         SelIA mediumSettings;
         SelIA hardSettings;
@@ -106,14 +106,14 @@ public:
             }
         }
     };
-    StoryModeLevelsDefinition(String levelDefinitionFile);
+    StoryModeLevelsDefinition(const std::string &levelDefinitionFile);
     LevelDefinition *getLevelDefinition(int levelNumber) { return levelDefinitions[levelNumber]; }
     int getNumLevels() const { return levelDefinitions.size(); }
     virtual ~StoryModeLevelsDefinition();
 private:
-    void addLevelDefinition(String levelName, String introStory,
-			    String opponentStory, String opponentName, String opponent,
-                String backgroundTheme, String gameLostStory, String gameWonStory, String gameOverStory,
+    void addLevelDefinition(const std::string & levelName, const std::string & introStory,
+			    const std::string & opponentStory, const std::string & opponentName, const std::string & opponent,
+                const std::string & backgroundTheme, const std::string & gameLostStory, const std::string & gameWonStory, const std::string & gameOverStory,
 			    SelIA easySettings,
 			    SelIA mediumSettings, SelIA hardSettings);
     static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local);
@@ -133,7 +133,7 @@ public:
 public:
     virtual std::string getStoryName() const
     {
-        return (const char *)(levelDef->gameOverStory);
+        return levelDef->gameOverStory;
     }
 };
 
@@ -183,11 +183,11 @@ public:
     virtual bool evaluate();
     virtual GameState *getNextState();
     // PlayerNameProvider implementation
-    virtual String getPlayerName(int playerNumber) const;
+    virtual std::string getPlayerName(int playerNumber) const;
     // GameWidgetFactory implementation
     virtual GameWidget *createGameWidget(FloboSetTheme &floboSetTheme,
                                          LevelTheme &levelTheme,
-                                         String centerFace,
+                                         const std::string & centerFace,
                                          Action *gameOverAction);
     // Action implementation
     virtual void action(Widget *sender, int actionType,

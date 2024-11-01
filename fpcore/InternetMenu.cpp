@@ -32,16 +32,16 @@
 using namespace std;
 using namespace event_manager;
 
-static const char * kInternetMetaServerKey = "Menu.Internet.MetaServer.";
-static const char * kInternetMetaServerPathKey = "Menu.Internet.MetaServer.Path.";
-static const char * kInternetMetaServerPortKey = "Menu.Internet.MetaServer.Port.";
-static const char * kInternetMetaServerNumberKey = "Menu.Internet.MetaServer.Number.";
+static const std::string kInternetMetaServerKey = "Menu.Internet.MetaServer.";
+static const std::string kInternetMetaServerPathKey = "Menu.Internet.MetaServer.Path.";
+static const std::string kInternetMetaServerPortKey = "Menu.Internet.MetaServer.Port.";
+static const std::string kInternetMetaServerNumberKey = "Menu.Internet.MetaServer.Number.";
 
-static const char * kInternetPasswordKey = "Menu.Internet.Password";
-static const char * kInternetCurrentServerKey = "Menu.Internet.CurrentServer";
-static const char * kInternetCurrentServerDefaultValue = "aley.fovea.cc";
-static const char * kInternetCurrentServerPortKey = "Menu.Internet.CurrentServer.Port";
-static const char * kInternetCurrentServerPortDefaultValue = "4567";
+static const std::string kInternetPasswordKey = "Menu.Internet.Password";
+static const std::string kInternetCurrentServerKey = "Menu.Internet.CurrentServer";
+static const std::string kInternetCurrentServerDefaultValue = "aley.fovea.cc";
+static const std::string kInternetCurrentServerPortKey = "Menu.Internet.CurrentServer.Port";
+static const std::string kInternetCurrentServerPortDefaultValue = "4567";
 
 AbstractMetaFPServerConnection::AbstractMetaFPServerConnection(MetaFPServerConnectionResponder *responder)
   : m_responder(responder)
@@ -71,7 +71,7 @@ vector<FPServer> DummyMetaServerConnection::getServers() const
     return result;
 }
 
-HttpMetaServerConnection::HttpMetaServerConnection(String hostName, String hostPath, int portNum, MetaFPServerConnectionResponder *responder)
+HttpMetaServerConnection::HttpMetaServerConnection(const std::string &hostName, const std::string & hostPath, int portNum, MetaFPServerConnectionResponder *responder)
   : AbstractMetaFPServerConnection(responder), m_doc(NULL),
     m_hostName(hostName), m_hostPath(hostPath), m_portNum(portNum), m_nErrors(0)
 {
@@ -93,7 +93,7 @@ void HttpMetaServerConnection::fetch()
     }
     try {
         m_servers.clear();
-        m_doc = new HttpDocument(m_hostName, m_hostPath, m_portNum);
+        m_doc = new HttpDocument(m_hostName.c_str(), m_hostPath.c_str(), m_portNum);
     } catch (Exception e) {
         e.printMessage();
         m_nErrors += 1;
@@ -110,8 +110,8 @@ void HttpMetaServerConnection::idle(double currentTime)
 {
     if (m_nErrors > 5) {
         GameUIDefaults::GAME_LOOP->removeIdle(this);
-        m_servers.push_back(FPServer("aley.fovea.cc", 4567, String("")));
-        m_servers.push_back(FPServer("localhost", 4567, String("")));
+        m_servers.push_back(FPServer("aley.fovea.cc", 4567, ""));
+        m_servers.push_back(FPServer("localhost", 4567, ""));
         onServerListHasChanged();
         return;
     }
@@ -123,10 +123,10 @@ void HttpMetaServerConnection::idle(double currentTime)
             for (int i = 0 ; i < nbServers ; i++) {
                 char tmpStr[256];
                 sprintf(tmpStr, "SERVNAME%.2d", i);
-                String serverName = msg.getString(tmpStr);
+                std::string serverName = msg.getString(tmpStr).c_str(); // TODO string
                 sprintf(tmpStr, "PORTNUM%.2d", i);
                 int portNum = msg.getInt(tmpStr);
-                m_servers.push_back(FPServer(serverName, portNum, String("")));
+                m_servers.push_back(FPServer(serverName, portNum, ""));
             }
             delete m_doc;
             m_doc = NULL;
@@ -152,10 +152,10 @@ FPServerList::FPServerList(FPServerListResponder *responder)
     nbserv = theCommander->getPreferencesManager()->getIntPreference(kInternetMetaServerNumberKey, 1);
     for (int i = 1; i <= nbserv; i++)
     {
-        servname = theCommander->getPreferencesManager()->getStrPreference(String(kInternetMetaServerKey)+i, i==1?"aley.fovea.cc":"Error");
-        servpath = theCommander->getPreferencesManager()->getStrPreference (String(kInternetMetaServerPathKey)+i, i==1?"/flobopop/fpservers":"/fpservers");
+        servname = theCommander->getPreferencesManager()->getStrPreference(kInternetMetaServerKey+std::to_string(i), i==1?"aley.fovea.cc":"Error");
+        servpath = theCommander->getPreferencesManager()->getStrPreference (kInternetMetaServerPathKey+std::to_string(i), i==1?"/flobopop/fpservers":"/fpservers");
         m_metaservers.push_back(new HttpMetaServerConnection(servname.c_str(), servpath.c_str(),
-                                                             theCommander->getPreferencesManager()->getIntPreference(String(kInternetMetaServerPortKey)+i, 80), this));
+                                                             theCommander->getPreferencesManager()->getIntPreference(kInternetMetaServerPortKey+std::to_string(i), 80), this));
   }
 }
 
@@ -193,7 +193,7 @@ void FPServerList::metaFPServerListHasChanged(AbstractMetaFPServerConnection &me
     vector<FPServer> servers = metaServerConnection.getServers();
     for (std::vector<FPServer>::iterator iter = servers.begin() ;
          iter != servers.end() ; iter++) {
-         printf("List: %s:%d\n", (const char *)(iter->hostName), iter->portNum);
+         printf("List: %s:%d\n", iter->hostName.c_str(), iter->portNum);
          m_servers.push_back(new PingableFPServer(iter->hostName, iter->portNum, iter->hostPath, this));
     }
 }
@@ -216,12 +216,12 @@ void FPServerList::fpServerDidPing(PingableFPServer &server)
 
 
 
-PingableFPServer::PingableFPServer(String hostName, int portNum, String path, PingableFPServerResponder *responder)
+PingableFPServer::PingableFPServer(const std::string & hostName, int portNum, const std::string & path, PingableFPServerResponder *responder)
   : FPServer(hostName, portNum, path),
     m_responder(responder), m_alreadyReported(false)
 {
     m_pingSocket.reset(new DatagramSocket());
-    m_pingSocket->connect(hostName, portNum);
+    m_pingSocket->connect(String(hostName.c_str()), portNum);
     m_pingBox.reset(new FPServerMessageBox(m_pingSocket.get()));
     m_igpclient.reset(new IGPClient(*m_pingBox, false));
     GameUIDefaults::GAME_LOOP->addIdle(this);
@@ -253,14 +253,14 @@ bool PingableFPServer::answeredToPing() const
 // Actions
 class ServerSelectAction : public Action {
 public:
-    ServerSelectAction(InternetGameMenu &igm, String serverName, int portNum)
+    ServerSelectAction(InternetGameMenu &igm, const std::string & serverName, int portNum)
       : gameMenu(igm), serverName(serverName), portNum(portNum) {}
     void action() {
         gameMenu.setSelectedServer(serverName, portNum);
     }
 private:
     InternetGameMenu &gameMenu;
-    String serverName;
+    std::string serverName;
     int portNum;
 };
 
@@ -293,10 +293,10 @@ InternetGameMenu::InternetGameMenu(MainScreen * mainScreen)
                theCommander->getPreferencesManager(),
 	       theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
     backAction(mainScreen),
-    joinButton(theCommander->getLocalizedString("Join"), this,
+    joinButton(theCommander->getLocalizedString("Join").c_str(), this,
 	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
-    backButton(theCommander->getLocalizedString("Back"), &backAction,
-	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture())
+    backButton(theCommander->getLocalizedString("Back").c_str(), &backAction,
+	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()) // TODO string
 {
     //this->setBorderVisible(false);
     servers.fetch();
@@ -363,7 +363,7 @@ void InternetGameMenu::build()
 class InternetDialog : public SliderContainer, public SliderContainerListener
 {
 public:
-    InternetDialog(String dialogTitle);
+    InternetDialog(const std::string &dialogTitle);
     virtual ~InternetDialog();
     virtual void onSlideInside(SliderContainer &slider);
     void close();
@@ -377,7 +377,7 @@ private:
     bool m_closing, m_closed;
 };
 
-InternetDialog::InternetDialog(String dialogTitle)
+InternetDialog::InternetDialog(const std::string &dialogTitle)
   : SliderContainer(), m_dialogFrame(theCommander->getWindowFramePicture()),
     m_titleFrame(theCommander->getSeparatorFramePicture()),
     m_titleText(dialogTitle), m_closing(false), m_closed(false)
@@ -421,7 +421,7 @@ void InternetDialog::idle(double v)
 class InternetErrorDialog : public InternetDialog, public Action
 {
 public:
-    InternetErrorDialog(String errorMessageL1, String errorMessageL2);
+    InternetErrorDialog(const std::string &errorMessageL1, const std::string &errorMessageL2);
     virtual ~InternetErrorDialog();
     virtual void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
@@ -431,9 +431,9 @@ private:
     Image m_errorIcon;
 };
 
-InternetErrorDialog::InternetErrorDialog(String errorMessageL1, String errorMessageL2)
-  : InternetDialog(theCommander->getLocalizedString("Error")), m_errorMessageL1(errorMessageL1),
-    m_errorMessageL2(errorMessageL2), m_okButton(theCommander->getLocalizedString("OK"), this,
+InternetErrorDialog::InternetErrorDialog(const std::string &errorMessageL1, const std::string &errorMessageL2)
+  : InternetDialog(theCommander->getLocalizedString("Error").c_str()), m_errorMessageL1(errorMessageL1),
+    m_errorMessageL2(errorMessageL2), m_okButton(theCommander->getLocalizedString("OK").c_str(), this, // TODO string
 	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
     m_errorIconImage(theCommander->getSurface(IMAGE_RGBA, "gfx/erroricon.png")),
     m_errorIcon(m_errorIconImage)
@@ -461,7 +461,7 @@ void InternetErrorDialog::action(Widget *sender, int actionType, GameControlEven
 class InternetConnectDialog : public InternetDialog, public Action
 {
 public:
-    InternetConnectDialog(String serverName, InternetGameCenter *gameCenter, InternetGameMenu *owner);
+    InternetConnectDialog(const std::string &serverName, InternetGameCenter *gameCenter, InternetGameMenu *owner);
     virtual ~InternetConnectDialog();
     virtual void idle(double currentTime);
     void action(Widget *sender, int actionType, GameControlEvent *event);
@@ -477,10 +477,10 @@ private:
 
 const double InternetConnectDialog::CONNECT_TIMEOUT = 5.;
 
-InternetConnectDialog::InternetConnectDialog(String serverName, InternetGameCenter *gameCenter, InternetGameMenu *owner)
+InternetConnectDialog::InternetConnectDialog(const std::string &serverName, InternetGameCenter *gameCenter, InternetGameMenu *owner)
     : InternetDialog("Connecting"),
       m_messageL1("Connecting to server"), m_messageL2(serverName),
-      m_cancelButton(theCommander->getLocalizedString("Cancel"), this,
+      m_cancelButton(theCommander->getLocalizedString("Cancel").c_str(), this, // TODO: string
 		     theCommander->getButtonFramePicture(),
 		     theCommander->getButtonOverFramePicture()),
       m_gameCenter(gameCenter), m_owner(owner), m_startTime(0.), m_timeout(false)
@@ -499,7 +499,7 @@ InternetConnectDialog::~InternetConnectDialog()
     else if ((m_gameCenter->isDenied()) || (m_timeout)) {
         InternetErrorDialog *errorDialog;
 	if (m_timeout)
-	  errorDialog = new InternetErrorDialog(String("Server didn't answered"), m_messageL2.getValue());
+	  errorDialog = new InternetErrorDialog("Server didn't answered", m_messageL2.getValue());
 	else
 	    errorDialog = new InternetErrorDialog(m_gameCenter->getDenyString(), m_gameCenter->getDenyStringMore());
         m_owner->getParentScreen()->add(errorDialog);
@@ -535,7 +535,7 @@ void InternetConnectDialog::action(Widget *sender, int actionType, GameControlEv
 void InternetGameMenu::enterNetCenterMenu(InternetGameCenter *gameCenter)
 {
     NetCenterMenu *newNetCenterMenu = new NetCenterMenu(mainScreen, gameCenter,
-                      theCommander->getLocalizedString("Internet Game Center"));
+                      theCommander->getLocalizedString("Internet Game Center").c_str()); // TODO: string
     newNetCenterMenu->build();
     mainScreen->pushMenu(newNetCenterMenu, true);
 }
@@ -545,8 +545,8 @@ void InternetGameMenu::action(Widget *sender, int actionType, GameControlEvent *
     if (sender == this->joinButton.getButton()) {
         try {
             InternetGameCenter *gameCenter = new InternetGameCenter(serverName.getEditField().getValue(),
-                                                                            atoi(serverPort.getEditField().getValue()), playerName.getEditField().getValue(), password.getEditField().getValue());
-            InternetConnectDialog *connectionDialog = new InternetConnectDialog(serverName.getEditField().getValue(), gameCenter, this);
+                                                                            atoi(serverPort.getEditField().getValue().c_str()), playerName.getEditField().getValue(), password.getEditField().getValue());
+            InternetConnectDialog *connectionDialog = new InternetConnectDialog(serverName.getEditField().getValue().c_str(), gameCenter, this);
             this->getParentScreen()->add(connectionDialog);
             this->getParentScreen()->grabEventsOnWidget(connectionDialog);
         } catch (Exception e) {
@@ -585,7 +585,7 @@ void InternetGameMenu::idle(double currentTime)
     }*/
 }
 
-void InternetGameMenu::setSelectedServer(const String &serverName, int portNum)
+void InternetGameMenu::setSelectedServer(const std::string &serverName, int portNum)
 {
     char sportNum[256];
     sprintf(sportNum, "%d", portNum);

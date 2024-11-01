@@ -25,6 +25,7 @@
 #ifndef _PUYOCHATBOX
 #define _PUYOCHATBOX
 
+#include <string>
 #include "Frame.h"
 #include "FramedEditField.h"
 #include "ios_memory.h"
@@ -37,7 +38,7 @@ using namespace gameui;
 class ChatBoxDelegate
 {
 public:
-    virtual void sendChat(String chatText) = 0;
+    virtual void sendChat(const std::string &chatText) = 0;
     virtual ~ChatBoxDelegate() {};
 };
 
@@ -46,7 +47,7 @@ class ChatBox : public Frame
 public:
     ChatBox(ChatBoxDelegate &delegate);
     virtual ~ChatBox();
-    void addChat(String name, String message);
+    void addChat(const std::string & name, const std::string & message);
 private:
     class ChatAction : public Action {
     public:

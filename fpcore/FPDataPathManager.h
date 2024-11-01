@@ -26,6 +26,7 @@
 #ifndef _PUYODATAPATHMANAGER_H
 #define _PUYODATAPATHMANAGER_H
 
+#include <string>
 #include "CompositeDrawContext.h"
 #include "audio.h"
 #include "DataPathManager.h"
@@ -38,12 +39,12 @@ class FPDataPathManager;
 class FPDataPackage : public DataPackage {
 public:
     FPDataPackage(FPDataPathManager *owner,
-                  const char *packagePath,
+                  const std::string &packagePath,
                   int packageNumber);
-    virtual bool hasFile(const char *shortPath) const;
-    virtual std::string getPath(const char *shortPath) const;
+    virtual bool hasFile(const std::string &shortPath) const;
+    virtual std::string getPath(const std::string &shortPath) const;
     virtual std::string getName() const;
-    virtual DataInputStream *openDataInputStream(const char *shortPath) const;
+    virtual DataInputStream *openDataInputStream(const std::string &shortPath) const;
 private:
     FPDataPathManager *m_owner;
     int m_packageNumber;
@@ -52,7 +53,7 @@ private:
 
 class FPDataInputStream : public DataInputStream {
 public:
-    FPDataInputStream(const char *fname);
+    FPDataInputStream(const std::string &fname);
     virtual ~FPDataInputStream();
     virtual int streamRead(void *buffer, int size);
 private:
@@ -67,14 +68,14 @@ public:
 
 class FPDataPathManager : public AbstractFPDataPathManager {
 public:
-    FPDataPathManager(String coreDataPath);
-    virtual bool hasFile(String shortPath) const;
-    virtual String getPath(String shortPath) const;
-    virtual SelfVector<String> getEntriesAtPath(String shortPath) const;
-    virtual DataInputStream *openDataInputStream(const char *shortPath) const;
+    FPDataPathManager(const std::string &coreDataPath);
+    virtual bool hasFile(const std::string & shortPath) const;
+    virtual std::string getPath(const std::string & shortPath) const;
+    virtual SelfVector<std::string> getEntriesAtPath(const std::string & shortPath) const;
+    virtual DataInputStream *openDataInputStream(const std::string &shortPath) const;
     virtual void registerDataPackages(CompositeDrawContext *cDC, Jukebox *jukebox = NULL);
     // Own methods
-    String getPathInPack(String shortPath, int packPathIndex) const;
+    std::string getPathInPack(const std::string & shortPath, int packPathIndex) const;
     int getNumPacks() const { return m_dataPaths.size(); }
     void setMaxPackNumber(int maxPackNumber);
 private:

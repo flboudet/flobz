@@ -31,7 +31,7 @@
 
 using namespace event_manager;
 
-StoryModeGameWidget::StoryModeGameWidget(int lifes, String aiFace)
+StoryModeGameWidget::StoryModeGameWidget(int lifes, const std::string & aiFace)
     : faceTicks(0), opponent(aiFace),
       killLeftCheat("killleft", this),
       killRightCheat("killright", this)
@@ -62,7 +62,7 @@ void StoryModeGameWidget::initWithGUI(GameView &areaA, GameView &areaB,
 	areaB.getAttachedGame()->setScoringLevel(scoringLevel);
 }
 
-StoryModeStandardLayoutGameWidget::StoryModeStandardLayoutGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, int level, int nColors, int lifes, String aiFace, Action *gameOverAction)
+StoryModeStandardLayoutGameWidget::StoryModeStandardLayoutGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, int level, int nColors, int lifes, const std::string & aiFace, Action *gameOverAction)
   : StoryModeGameWidget(lifes, aiFace),
       attachedFloboThemeSet(floboSetTheme),
       attachedRandom(nColors),
@@ -129,13 +129,13 @@ void StoryModeGameWidget::action(Widget *sender, int actionType,
 
 StoryModeLevelsDefinition *StoryModeLevelsDefinition::currentDefinition = NULL;
 
-StoryModeLevelsDefinition::StoryModeLevelsDefinition(String levelDefinitionFile)
+StoryModeLevelsDefinition::StoryModeLevelsDefinition(const std::string & levelDefinitionFile)
 {
     GoomSL * gsl = gsl_new();
     if (!gsl) return;
     GSLFA_setupWrapper(gsl, &(theCommander->getDataPathManager()));
     gsl_push_file(gsl, "/lib/levellib.gsl");
-    gsl_push_file(gsl, levelDefinitionFile);
+    gsl_push_file(gsl, levelDefinitionFile.c_str());
     gsl_compile(gsl);
     currentDefinition = this;
     gsl_bind_function(gsl, "end_level",  StoryModeLevelsDefinition::end_level);
@@ -151,10 +151,10 @@ StoryModeLevelsDefinition::~StoryModeLevelsDefinition()
   }
 }
 
-void StoryModeLevelsDefinition::addLevelDefinition(String levelName, String introStory,
-					      String opponentStory, String opponentName,
-					      String opponent, String backgroundTheme,
-					      String gameLostStory, String gameWonStory, String gameOverStory,
+void StoryModeLevelsDefinition::addLevelDefinition(const std::string & levelName, const std::string & introStory,
+					      const std::string & opponentStory, const std::string & opponentName,
+					      const std::string & opponent, const std::string & backgroundTheme,
+					      const std::string & gameLostStory, const std::string & gameWonStory, const std::string & gameOverStory,
 					      SelIA easySettings,
 					      SelIA mediumSettings, SelIA hardSettings)
 {
@@ -342,7 +342,7 @@ GameState *StoryModeMatchState::getNextState()
     return m_nextState;
 }
 
-String StoryModeMatchState::getPlayerName(int playerNumber) const
+std::string StoryModeMatchState::getPlayerName(int playerNumber) const
 {
     switch (playerNumber) {
     case 0:
@@ -356,14 +356,14 @@ String StoryModeMatchState::getPlayerName(int playerNumber) const
 
 GameWidget *StoryModeMatchState::createGameWidget(FloboSetTheme &floboSetTheme,
                                          LevelTheme &levelTheme,
-                                         String centerFace,
+                                         const std::string & centerFace,
                                          Action *gameOverAction)
 {
     m_sharedAssets.m_currentFloboSetTheme = theCommander->getPreferedFloboSetTheme();
     if (m_sharedGameAssets->levelDef->backgroundTheme == "Prefs.DefaultTheme")
         m_sharedAssets.m_currentLevelTheme = theCommander->getPreferedLevelTheme();
     else
-        m_sharedAssets.m_currentLevelTheme = theCommander->getLevelTheme(m_sharedGameAssets->levelDef->backgroundTheme);
+        m_sharedAssets.m_currentLevelTheme = theCommander->getLevelTheme(m_sharedGameAssets->levelDef->backgroundTheme.c_str()); // TODO string
     return new StoryModeStandardLayoutGameWidget(*(m_sharedAssets.m_currentFloboSetTheme),
                                                     *(m_sharedAssets.m_currentLevelTheme),
                                                     m_sharedGameAssets->levelDef->getAISettings(m_sharedGameAssets->difficulty).level,
@@ -381,7 +381,7 @@ void StoryModeMatchState::action(Widget *sender, int actionType,
         if (m_sharedAssets.m_gameWidget->isGameARunning()) {
             m_nextState = m_victoriousState;
             // Note achievement if available
-            std::string achievementName = std::string("victory_") + (const char *)(m_sharedGameAssets->levelDef->opponentName);
+            std::string achievementName = std::string("victory_") + m_sharedGameAssets->levelDef->opponentName;
             if (theCommander->getAchievementsManager() != NULL)
                 theCommander->getAchievementsManager()->declareAchievement(achievementName.c_str(), 100.);
         }

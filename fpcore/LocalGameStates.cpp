@@ -498,7 +498,7 @@ void DisplayStatsState::action(Widget *sender, int actionType,
 //---------------------------------
 // DisplayStoryScreenState
 //---------------------------------
-DisplayStoryScreenState::DisplayStoryScreenState(const char *screenName)
+DisplayStoryScreenState::DisplayStoryScreenState(const std::string &screenName)
     : m_screenName(screenName), m_vp(NULL)
 {
 }

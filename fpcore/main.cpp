@@ -76,7 +76,7 @@ static void help()
 int main(int argc, char *argv[])
 {
     int i;
-    String dataDir;
+    std::string dataDir;
     int maxPackNumber = -1;
 
 #ifdef MACOSX

@@ -42,12 +42,12 @@ private:
 
 class ListViewEntry {
 public:
-    ListViewEntry(String text, Action *action = NULL) : m_text(text), m_action(action), m_owner(NULL), m_enabled(true) {}
-    String getText() const { return m_text; }
-    void setText(String text);
+    ListViewEntry(const std::string &text, Action *action = NULL) : m_text(text), m_action(action), m_owner(NULL), m_enabled(true) {}
+    std::string getText() const { return m_text; }
+    void setText(const std::string &text);
     void setEnabled(bool enabled) { m_enabled = enabled; }
 private:
-    String m_text;
+    std::string m_text;
     Action *m_action;
     ListView *m_owner;
     bool m_enabled;

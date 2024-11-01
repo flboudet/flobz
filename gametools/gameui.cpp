@@ -1321,28 +1321,28 @@ namespace gameui {
           m_autoSize(true), mdontMove(true), m_slideSound(GameUIDefaults::SLIDE_SOUND), m_color(GameUIDefaults::FONT_COLOR), m_shadow(false)
     {
         this->font = GameUIDefaults::FONT_TEXT;
-        setPreferedSize(Vec3(m_autoSize?this->font->getTextWidth(label):0.0f, this->font->getHeight(), 1.0));
+        setPreferedSize(Vec3(m_autoSize?this->font->getTextWidth(label.c_str()):0.0f, this->font->getHeight(), 1.0));
         moving = false;
         startMoving = false;
     }
 
-    Text::Text(const String &label, IosFont *font, bool autosize)
-        : font(font), label(label), offset(0.0,0.0,0.0),
+    Text::Text(const std::string &label, IosFont *font, bool autosize)
+        : font(font), label(label.c_str()), offset(0.0,0.0,0.0),
           m_textAlign(TEXT_LEFT_ALIGN), m_autoSize(autosize),
           mdontMove(true), m_slideSound(GameUIDefaults::SLIDE_SOUND), m_color(GameUIDefaults::FONT_COLOR), m_shadow(false)
     {
         if (font == NULL) this->font = GameUIDefaults::FONT_TEXT;
-        setPreferedSize(Vec3(m_autoSize?this->font->getTextWidth(label):0.0f, this->font->getHeight(), 1.0));
+        setPreferedSize(Vec3(m_autoSize?this->font->getTextWidth(label.c_str()):0.0f, this->font->getHeight(), 1.0));
         moving = false;
         startMoving = false;
     }
 
-    void Text::setValue(String value)
+    void Text::setValue(const std::string &value)
     {
         label = value;
         requestDraw();
         if (m_autoSize)
-            setPreferedSize(Vec3(font->getTextWidth(label), font->getHeight(), 1.0f));
+            setPreferedSize(Vec3(font->getTextWidth(label.c_str()), font->getHeight(), 1.0f));
         if (parent)
             parent->arrangeWidgets();
     }
@@ -1371,11 +1371,11 @@ namespace gameui {
 		  int y;
           switch (m_textAlign) {
               case TEXT_CENTERED:
-                  x = (int)(offset.x + getPosition().x + (getSize().x-(font->getTextWidth(label)))/2.0f);
+                  x = (int)(offset.x + getPosition().x + (getSize().x-(font->getTextWidth(label.c_str())))/2.0f);
 				  y = (int)(offset.y + getPosition().y + (getSize().y-(font->getHeight()))/2.0f);
                   break;
               case TEXT_RIGHT_ALIGN:
-                  x = (int)(offset.x + getPosition().x + getSize().x-(font->getTextWidth(label)));
+                  x = (int)(offset.x + getPosition().x + getSize().x-(font->getTextWidth(label.c_str())));
                   y = (int)(offset.y + getPosition().y + (getSize().y-(font->getHeight()))/2.0f);
                   break;
               case TEXT_LEFT_ALIGN:
@@ -1384,9 +1384,9 @@ namespace gameui {
                   break;
           }
 		  if (m_shadow)
-			  dt->putStringWithShadow(font, x, y, m_shadow_x, m_shadow_y, (const char*)label, m_color);
+			  dt->putStringWithShadow(font, x, y, m_shadow_x, m_shadow_y, label.c_str(), m_color);
 		  else
-			  dt->putString(font, x, y, (const char*)label, m_color);
+			  dt->putString(font, x, y, label.c_str(), m_color);
       }
     }
 
@@ -1530,14 +1530,14 @@ namespace gameui {
 		setReceiveUpEvents(true);
     }
 
-    Button::Button(const String &label, IosFont *fontActive, IosFont *fontInactive)
+    Button::Button(const std::string &label, IosFont *fontActive, IosFont *fontInactive)
         : Text(label, fontInactive)
     {
         init(fontActive, fontInactive);
         setValue(label);
     }
 
-    Button::Button(const String &label, Action *action)
+    Button::Button(const std::string &label, Action *action)
         : Text(label, NULL)
     {
         init(NULL,NULL);
@@ -1600,15 +1600,15 @@ namespace gameui {
         setReceiveUpEvents(true);
     }
 
-    EditField::EditField(const String &defaultText, const String &persistentID, PreferencesManager *prefMgr)
+    EditField::EditField(const std::string &defaultText, const std::string &persistentID, PreferencesManager *prefMgr)
         : m_prefMgr(prefMgr), Text(defaultText, NULL, false), persistence(persistentID), editOnFocus(false)
     {
-        std::string mytext = m_prefMgr->getStrPreference(persistentID, defaultText);
+        std::string mytext = m_prefMgr->getStrPreference(persistentID.c_str(), defaultText);
         setValue(mytext.c_str());
         init(NULL,NULL);
     }
 
-    EditField::EditField(const String &defaultText,  Action *action)
+    EditField::EditField(const std::string &defaultText,  Action *action)
         : m_prefMgr(NULL), Text(defaultText, NULL, false), persistence(""), editOnFocus(false)
     {
         init(NULL,NULL);
@@ -1616,7 +1616,7 @@ namespace gameui {
             setAction(ON_ACTION, action);
     }
 
-    void EditField::setValue(String value, bool persistent)
+    void EditField::setValue(const std::string &value, bool persistent)
     {
         Text::setValue(value);
         if (persistent && (persistence != "")) m_prefMgr->setStrPreference(persistence, getValue());
@@ -1694,7 +1694,7 @@ namespace gameui {
             }
             else {
                 editionMode = true;
-                setValue(getValue().substring(0, getValue().length() - 1));
+                setValue(getValue().substr(0, getValue().length() - 1));
                 editionMode = false;
                 Action *action = getAction(ON_ACTION);
                 if (action)
@@ -1736,7 +1736,7 @@ namespace gameui {
                 }
                 // International character
                 else {
-                    String newValue = getValue();
+                    std::string newValue = getValue();
                     uint16_t unicode = event->unicodeKeySym;
                     char utf8[5];
                     int nchars = utf16_to_utf8(unicode, utf8);
@@ -1753,13 +1753,13 @@ namespace gameui {
                         int last=getValue().length() - 2;
                         while ((getValue()[last] & 0xc0) == 0x80)
                             last--;
-                        String newValue = getValue().substring(0, last);
+                        std::string newValue = getValue().substr(0, last);
                         newValue += "_";
                         setValue(newValue,false);
                     }
                 }
                 else if (ch) {
-                    String newValue = getValue();
+                    std::string newValue = getValue();
                     newValue[newValue.length() - 1] = ch;
                     newValue += "_";
                     setValue(newValue,false);
@@ -1781,7 +1781,7 @@ namespace gameui {
         bool handled = false;
         // kUp => Change last char of the entry (forward)
         if (event->cursorEvent == kUp) {
-            String newValue = getValue();
+            std::string newValue = getValue();
             while (newValue.length() <= 1)
                 newValue += '_';
             char ch = newValue[newValue.length() - 2];
@@ -1806,7 +1806,7 @@ namespace gameui {
         }
         // kDown => Change last char of the entry (downward)
         else if (event->cursorEvent == kDown) {
-            String newValue = getValue();
+            std::string newValue = getValue();
             while (newValue.length() <= 1)
                 newValue += '_';
             char ch = newValue[newValue.length() - 2];
@@ -1837,7 +1837,7 @@ namespace gameui {
                 while ((getValue()[last] & 0xc0) == 0x80)
                     last--;
 #endif
-                String newValue = getValue().substring(0, last);
+                std::string newValue = getValue().substr(0, last);
                 newValue += "_";
                 setValue(newValue,false);
                 repeat = true;
@@ -1848,7 +1848,7 @@ namespace gameui {
         }
         // kRight => Duplicate last char
         else if (event->cursorEvent == kRight) {
-            String newValue = getValue();
+            std::string newValue = getValue();
             newValue[newValue.length() - 1] = newValue[newValue.length() - 2];
             newValue += "_";
             setValue(newValue,false);
@@ -1864,7 +1864,7 @@ namespace gameui {
         Text::lostFocus();
         font = fontInactive;
         if (editionMode == true && !editOnFocus)  {
-            setValue(getValue().substring(0, getValue().length() - 1));
+            setValue(getValue().substr(0, getValue().length() - 1));
             editionMode = false;
             Action *action = getAction(ON_ACTION);
             if (action)
@@ -1911,7 +1911,7 @@ namespace gameui {
         : Text("<Not set>", NULL), control(control), alternate(alternate)
     {
         init(NULL,NULL);
-        String controlName = GameUIDefaults::GAME_LOOP->getEventManager()->getControlName(control, alternate);
+        std::string controlName = GameUIDefaults::GAME_LOOP->getEventManager()->getControlName(control, alternate).c_str(); // TODO: string
         setValue(controlName);
         if (action != NULL)
             setAction(ON_ACTION, action);
@@ -1938,7 +1938,7 @@ namespace gameui {
     {
         EventManager * evm = GameUIDefaults::GAME_LOOP->getEventManager();
         if (evm->changeControl(control, alternate, *event)) {
-            String controlName = evm->getControlName(control, alternate);
+            std::string controlName = evm->getControlName(control, alternate).c_str(); // TODO: string
             setValue(controlName);
             editionMode = false;
             GameUIDefaults::GAME_LOOP->getEventManager()->setEnableJoyMouseEmulation(true);
@@ -1997,7 +1997,7 @@ namespace gameui {
     // ToggleButton
     //
 
-    ToggleButton::ToggleButton(const String &label, const String &offState, const String &onState, bool initialState, Action *action) : Button(label + "  " + (initialState ? onState : offState), action), unmodifiedLabel(label), onState(onState), offState(offState)
+    ToggleButton::ToggleButton(const std::string &label, const std::string &offState, const std::string &onState, bool initialState, Action *action) : Button(label + "  " + (initialState ? onState : offState), action), unmodifiedLabel(label), onState(onState), offState(offState)
     {
     }
 

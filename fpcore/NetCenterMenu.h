@@ -41,7 +41,7 @@ class NetCenterMenu;
 
 class NetCenterDialogMenu : public SliderContainer {
 public:
-    NetCenterDialogMenu(NetCenterMenu *targetMenu, FloboGameInvitation &associatedInvitation, String title, String message, String optLine, bool hasAcceptButton, bool hasCancelButton=true);
+    NetCenterDialogMenu(NetCenterMenu *targetMenu, FloboGameInvitation &associatedInvitation, const std::string &title, const std::string &message, const std::string &optLine, bool hasAcceptButton, bool hasCancelButton=true);
     virtual ~NetCenterDialogMenu();
     void build();
     // Notification
@@ -72,27 +72,27 @@ class NetCenterPlayerList : public ListView {
 public:
     NetCenterPlayerList(int size, NetCenterMenu *targetMenu, IosSurface *upArrow, IosSurface *downArrow, GameLoop *loop = NULL);
     virtual ~NetCenterPlayerList();
-    void addNewPlayer(String playerName, PeerAddress playerAddress, const PeerInfo &info);
+    void addNewPlayer(const std::string & playerName, PeerAddress playerAddress, const PeerInfo &info);
     void removePlayer(PeerAddress playerAddress);
-    void updatePlayer(String playerName, PeerAddress playerAddress, const PeerInfo &info);
+    void updatePlayer(const std::string & playerName, PeerAddress playerAddress, const PeerInfo &info);
 private:
     class PlayerSelectedAction : public Action {
     public:
-        PlayerSelectedAction(NetCenterMenu *targetMenu, PeerAddress address, String playerName)
+        PlayerSelectedAction(NetCenterMenu *targetMenu, PeerAddress address, const std::string &playerName)
         : targetMenu(targetMenu), address(address), playerName(playerName) {}
         void action();
     private:
         PeerAddress address;
         NetCenterMenu *targetMenu;
-        String playerName;
+        std::string playerName;
     };
     class PlayerEntry : public ListViewEntry {
     public:
-        PlayerEntry(String playerName, PeerAddress playerAddress, const PeerInfo &info, Action *action)
+        PlayerEntry(const std::string &playerName, PeerAddress playerAddress, const PeerInfo &info, Action *action)
         : ListViewEntry(getRankString(info.rank) + playerName + getStatusString(info.status), action),
         playerAddress(playerAddress), status(info.status), rank(info.rank), action(action) {}
         ~PlayerEntry() { delete action; }
-        void updateEntry(String playerName, const PeerInfo &info) {
+        void updateEntry(const std::string &playerName, const PeerInfo &info) {
             setText(getRankString(info.rank) + playerName + getStatusString(info.status));
             this->status = status;
             this->rank = rank;
@@ -102,8 +102,8 @@ private:
         int rank;
     private:
         Action *action;
-        static String getStatusString(int status);
-        static String getRankString(int rank);
+        static std::string getStatusString(int status);
+        static std::string getRankString(int rank);
     };
     Vector<PlayerEntry> entries;
     NetCenterMenu *targetMenu;
@@ -114,7 +114,7 @@ class NetCenterMenu;
 class NetCenterTwoNameProvider : public PlayerNameProvider {
 public:
     NetCenterTwoNameProvider(NetGameCenter &netCenter) : netCenter(netCenter) {}
-    String getPlayerName(int playerNumber) const;
+    std::string getPlayerName(int playerNumber) const;
 private:
     NetGameCenter &netCenter;
 };
@@ -122,13 +122,13 @@ private:
 class NetCenterMenu : public MainScreenMenu, NetGameCenterListener, ChatBoxDelegate {
 public:
     NetCenterMenu(MainScreen *mainScreen, NetGameCenter *netCenter,
-                  String title, GameLoop *loop = NULL);
+                  const std::string &title, GameLoop *loop = NULL);
     ~NetCenterMenu();
     virtual void build();
-    void onChatMessage(const String &msgAuthor, const String &msg);
-    void onPlayerConnect(String playerName, PeerAddress playerAddress);
-    void onPlayerDisconnect(String playerName, PeerAddress playerAddress);
-    void onPlayerUpdated(String playerName, PeerAddress playerAddress);
+    void onChatMessage(const std::string &msgAuthor, const std::string &msg);
+    void onPlayerConnect(const std::string &playerName, PeerAddress playerAddress);
+    void onPlayerDisconnect(const std::string &playerName, PeerAddress playerAddress);
+    void onPlayerUpdated(const std::string &playerName, PeerAddress playerAddress);
     void onGameInvitationReceived(FloboGameInvitation &invitation);
     void onGameInvitationCanceledReceived(FloboGameInvitation &invitation);
     void onGameAcceptedNegociationPending(FloboGameInvitation &invitation);
@@ -136,9 +136,9 @@ public:
     void grantCurrentGame();
     void cancelCurrentGame();
     void cycle();
-    void playerSelected(PeerAddress playerAddress, String playerName);
+    void playerSelected(PeerAddress playerAddress, const std::string &playerName);
     void selfDestroy() { shouldSelfDestroy = true; }
-    virtual void sendChat(String chatText);
+    virtual void sendChat(const std::string &chatText);
     // Notification
     virtual void eventOccured(event_manager::GameControlEvent *event);
     virtual void onWidgetVisibleChanged(bool visible);

@@ -39,7 +39,7 @@ public:
 
     void action()
     {
-        LanGameCenter *gameCenter = new LanGameCenter(atoi(serverPort->getValue()), userName->getValue());
+        LanGameCenter *gameCenter = new LanGameCenter(atoi(serverPort->getValue().c_str()), userName->getValue());
         NetCenterMenu *newNetCenterMenu =
 	  new NetCenterMenu(mainScreen, gameCenter,
 			    theCommander->getLocalizedString("LAN Game Center"));

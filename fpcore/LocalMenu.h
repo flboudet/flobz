@@ -38,7 +38,7 @@ class SoloGameMenu : public MainScreenMenu, public PlayerNameProvider {
 public:
     SoloGameMenu(MainScreen *mainScreen);
     // PlayerNameProvider implementation
-    virtual String getPlayerName(int playerNumber) const;
+    virtual std::string getPlayerName(int playerNumber) const;
     void build() {}
 private:
     VBox m_buttonsBox;
@@ -57,7 +57,7 @@ public:
     LocalGameMenu(MainScreen *mainScreen);
     void build();
     // PlayerNameProvider implementation
-    virtual String getPlayerName(int playerNumber) const;
+    virtual std::string getPlayerName(int playerNumber) const;
 private:
     VBox buttonsBox;
     LocalizedDictionary locale;
@@ -75,7 +75,7 @@ class Local2PlayersGameMenu : public MainScreenMenu, public PlayerNameProvider {
 public:
     Local2PlayersGameMenu(MainScreen *mainScreen);
     void build();
-    String getPlayerName(int playerNumber) const;
+    std::string getPlayerName(int playerNumber) const;
 private:
     VBox buttonsBox;
     LocalizedDictionary locale;

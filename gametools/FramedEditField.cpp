@@ -4,21 +4,21 @@ using namespace event_manager;
 
 namespace gameui {
 
-FramedEditField::FramedEditField(const String &label, Action *action,
+FramedEditField::FramedEditField(const std::string &label, Action *action,
 				 const FramePicture *framePicture, const FramePicture *focusedPicture)
   : Frame(framePicture), m_editField(label, action)
 {
   initFramedEditField(framePicture, focusedPicture);
 }
 
-FramedEditField::FramedEditField(const String &defaultText, const String &persistentID, PreferencesManager *prefMgr,
+FramedEditField::FramedEditField(const std::string &defaultText, const std::string &persistentID, PreferencesManager *prefMgr,
 				 const FramePicture *framePicture, const FramePicture *focusedPicture)
   : Frame(framePicture), m_editField(defaultText, persistentID, prefMgr)
 {
   initFramedEditField(framePicture, focusedPicture);
 }
 
-void FramedEditField::setValue(String value)
+void FramedEditField::setValue(const std::string &value)
 {
   m_editField.setValue(value);
 }
@@ -64,7 +64,7 @@ void FramedEditField::initFramedEditField(const FramePicture *framePicture, cons
 // EditFieldWithLabel
 //
 
-EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, Action *action,
+EditFieldWithLabel::EditFieldWithLabel(const std::string & label, const std::string & defaultValue, Action *action,
 				       const FramePicture *framePicture, const FramePicture *focusedPicture,
 				       int width)
   : m_editField(defaultValue, action, framePicture, focusedPicture),
@@ -77,7 +77,7 @@ EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, Action
   add(&m_editField);
 }
 
-EditFieldWithLabel::EditFieldWithLabel(String label, String defaultValue, String persistentID, PreferencesManager *prefMgr,
+EditFieldWithLabel::EditFieldWithLabel(const std::string &label, const std::string & defaultValue, const std::string & persistentID, PreferencesManager *prefMgr,
 				       const FramePicture *framePicture, const FramePicture *focusedPicture,
 				       int width)
   : m_editField(defaultValue, persistentID, prefMgr, framePicture, focusedPicture),

@@ -259,7 +259,7 @@ struct EqualString {
 /*************************************************************************************/
 LocalizedDictionary::str_dictionnary_cache LocalizedDictionary::dictionaries;
 
-LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager, const char *dictionaryDirectory, const char *dictionaryName) : dictionary(NULL), datapathManager(datapathManager)
+LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager, const std::string &dictionaryDirectory, const std::string &dictionaryName) : dictionary(NULL), datapathManager(datapathManager)
 {
   signed int i;
 
@@ -282,9 +282,9 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
       for (i = PreferedLocalesCount - 1; i >= 0 ; i--) {
 
           /* try to open the dictionary for the selected locale */
-          String locale(PreferedLocales[i]);
-          String directoryName = FilePath::combine(dictionaryDirectory, locale);
-          String dictFilePath = FilePath::combine(directoryName, dictionaryName) + ".dic";
+          std::string locale(PreferedLocales[i]);
+          std::string directoryName = FilePath::combine(dictionaryDirectory, locale);
+          std::string dictFilePath = FilePath::combine(directoryName, dictionaryName) + ".dic";
           DataInputStream *dictionaryStream = NULL;
           if (datapathManager.hasDataInputStream(dictFilePath))
               dictionaryStream = datapathManager.openDataInputStream(dictFilePath);
@@ -326,9 +326,9 @@ LocalizedDictionary::~LocalizedDictionary()
 {
 }
 
-const char * LocalizedDictionary::getLocalizedString(const char * originalString, bool copyIfNotThere)
+std::string LocalizedDictionary::getLocalizedString(const std::string &originalString, bool copyIfNotThere)
 {
-    auto result = dictionary->find(originalString);
+    auto result = dictionary->find(originalString.c_str());
     if (result != dictionary->end()) {
         return result->second.c_str();
     }

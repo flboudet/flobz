@@ -369,7 +369,7 @@ IosSurface * SDL13_IIMLibrary::loadImage(ImageType type, const char *path, Image
 {
     SDL_Surface *tmpsurf, *retsurf;
 
-    String fullPath;
+    std::string fullPath;
     try {
         fullPath = m_dataPathManager.getPath(path);
     }
@@ -377,7 +377,7 @@ IosSurface * SDL13_IIMLibrary::loadImage(ImageType type, const char *path, Image
         return NULL;
     }
 
-    tmpsurf = IMG_Load (fullPath);
+    tmpsurf = IMG_Load (fullPath.c_str());
     if (tmpsurf==NULL) {
         return NULL;
     }
@@ -403,8 +403,8 @@ IosSurface * SDL13_IIMLibrary::loadImage(ImageType type, const char *path, Image
 
 IosFont *SDL13_IIMLibrary::createFont(const char *path, int size)
 {
-    String fullPath = m_dataPathManager.getPath(path);
-    IosFont *result = new SDL13_IosFont(fullPath, size, m_drawContext);
+    const std::string &fullPath = m_dataPathManager.getPath(path);
+    IosFont *result = new SDL13_IosFont(fullPath.c_str(), size, m_drawContext);
     DBG_FONT = result;
     return result;
 }

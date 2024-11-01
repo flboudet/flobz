@@ -9,12 +9,12 @@ namespace gameui {
 
 class FramedButton : public Frame {
 public:
-  FramedButton(const String &label, Action *action,
+  FramedButton(const std::string &label, Action *action,
 	           const FramePicture *btnPicture, const FramePicture *focusedPicture,
                IosFont *fontActive = NULL, IosFont *fontInactive = NULL,
                IosSurface *image = NULL);
   virtual ~FramedButton() {}
-  virtual void setValue(String value);
+  virtual void setValue(const std::string & value);
   Button *getButton() { return &m_button; }
   void eventOccured(event_manager::GameControlEvent *event);
 private:

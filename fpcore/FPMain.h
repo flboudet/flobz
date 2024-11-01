@@ -1,6 +1,7 @@
 #ifndef _FLOBO_MAIN_H_
 #define _FLOBO_MAIN_H_
 
+#include <string>
 #include "MainScreen.h"
 #include "FPCommander.h"
 #include "PreferencesManager.h"
@@ -12,19 +13,19 @@
 class FPMain : NotificationResponder
 {
 public:
-    FPMain(String dataDir, bool fullscreen, int maxDataPackNumber=-1);
+    FPMain(const std::string & dataDir, bool fullscreen, int maxDataPackNumber=-1);
     virtual ~FPMain();
     void run();
-    void connect_ia(String params);
-    void debug_gsl(String gsl_script);
+    void connect_ia(const std::string & params);
+    void debug_gsl(const std::string & gsl_script);
 protected:
-    void notificationOccured(String identifier, void * context);
+    void notificationOccured(const std::string & identifier, void * context);
 private:
     void initWithGUI();
     void initMenus();
     void initSDL();
 
-    String m_dataDir;
+    std::string m_dataDir;
     bool m_fullscreen;
     int m_maxDataPackNumber;
 

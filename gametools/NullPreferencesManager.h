@@ -15,13 +15,13 @@ class NullPreferencesManager : public PreferencesManager
 {
 public:
     // Getters
-    virtual bool getBoolPreference(const char *identifier, bool defaultVal) const { return defaultVal; }
-    virtual int getIntPreference(const char *identifier, int defaultVal) const    { return defaultVal; }
-    virtual std::string getStrPreference(const char *identifier, const char *defaultVal) const { return defaultVal; }
+    virtual bool getBoolPreference(const std::string &identifier, bool defaultVal) const { return defaultVal; }
+    virtual int getIntPreference(const std::string &identifier, int defaultVal) const    { return defaultVal; }
+    virtual std::string getStrPreference(const std::string &identifier, const std::string &defaultVal) const { return defaultVal; }
     // Setters
-    virtual void setBoolPreference(const char *identifier, bool value) {}
-    virtual void setIntPreference(const char *identifier, int value)   {}
-    virtual void setStrPreference(const char *identifier, const char *value) {}
+    virtual void setBoolPreference(const std::string &identifier, bool value) {}
+    virtual void setIntPreference(const std::string &identifier, int value)   {}
+    virtual void setStrPreference(const std::string &identifier, const std::string &value) {}
 };
 
 #endif

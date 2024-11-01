@@ -12,6 +12,7 @@
 #include "FPResources.h"
 #include "PreferencesManager.h"
 #include "AchievementsManager.h"
+#include <string>
 #include <memory>
 
 using namespace gameui;
@@ -42,7 +43,7 @@ class FPCommander
 
     virtual ~FPCommander();
 
-    String getFullScreenKey(void) const;
+    std::string getFullScreenKey(void) const;
 
     // Cursor management
     void registerCursor(AbstractCursor *cursor);
@@ -52,27 +53,27 @@ class FPCommander
     virtual ScreenTransitionWidget *createScreenTransition(Screen &fromScreen) const;
 
     // Resource managers
-    void cacheSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0);
-    IosSurfaceRef getSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility = 0);
-    IosSurfaceRef getSurface(ImageType type, const char *path, const ImageOperationList &list);
-    void cacheFont(const char *path, int size);
-    IosFontRef getFont(const char *path, int size);
-    void cacheSound(const char *path);
-    SoundRef getSound(const char *path);
-    void cacheMusic(const char *path);
-    MusicRef getMusic(const char *path);
+    void cacheSurface(ImageType type, const std::string &path, ImageSpecialAbility specialAbility = 0);
+    IosSurfaceRef getSurface(ImageType type, const std::string &path, ImageSpecialAbility specialAbility = 0);
+    IosSurfaceRef getSurface(ImageType type, const std::string &path, const ImageOperationList &list);
+    void cacheFont(const std::string &path, int size);
+    IosFontRef getFont(const std::string &path, int size);
+    void cacheSound(const std::string &path);
+    SoundRef getSound(const std::string &path);
+    void cacheMusic(const std::string &path);
+    MusicRef getMusic(const std::string &path);
 
-    FloboSetThemeRef getFloboSetTheme(const char *name);
+    FloboSetThemeRef getFloboSetTheme(const std::string &name);
     FloboSetThemeRef getPreferedFloboSetTheme();
     const std::string &getPreferedFloboSetThemeName() const;
-    void setPreferedFloboSetThemeName(const char *name);
+    void setPreferedFloboSetThemeName(const std::string &name);
     const std::vector<std::string> &getFloboSetThemeList() const;
     virtual const std::string getDefaultFloboSetThemeName() const;
 
-    LevelThemeRef getLevelTheme(const char *name);
+    LevelThemeRef getLevelTheme(const std::string &name);
     LevelThemeRef getPreferedLevelTheme(int nbPlayers = 2);
     const std::string getPreferedLevelThemeName(int nbPlayers = 2) const;
-    void setPreferedLevelThemeName(const char *name, int nbPlayers = 2);
+    void setPreferedLevelThemeName(const std::string &name, int nbPlayers = 2);
     std::vector<std::string> getLevelThemeList(int nbPlayers = 2) const;
     virtual const std::string getDefaultLevelThemeName(int nbPlayers = 2) const;
 
@@ -80,7 +81,7 @@ class FPCommander
 
     // Data path management
     const DataPathManager &getDataPathManager() { return *m_dataPathManager; }
-    const char * getLocalizedString(const char * originalString) const;
+    std::string getLocalizedString(const std::string & originalString) const;
     // Preferences management
     PreferencesManager *getPreferencesManager() const { return m_preferencesManager; }
     // Achievements management
@@ -105,11 +106,11 @@ class FPCommander
     IosSurface * getRightArrow() { return m_rightArrow; }
     audio_manager::Sound * getWhipSound() const { return m_whipSound; }
     audio_manager::Sound * getWhopSound() const { return m_whopSound; }
-    const String &getLocalizedFontName() const { return m_localizedFontName; }
+    const std::string &getLocalizedFontName() const { return m_localizedFontName; }
 
-    void playMusicTrack(const char *trackName);
+    void playMusicTrack(const std::string &trackName);
     void playMusicTrack();
-    void playSound(const char *sName, float volume = 1.0, float balance = 0.0f);
+    void playSound(const std::string &sName, float volume = 1.0, float balance = 0.0f);
 
 	// Application state
 	const FPApplicationState &appState() const { return m_appState; }
@@ -172,7 +173,7 @@ protected:
     std::unique_ptr<FramePicture> m_separatorFramePicture;
     std::unique_ptr<FramePicture> m_listFramePicture;
 
-    String m_localizedFontName;
+    std::string m_localizedFontName;
     IosFontRef m_darkFont;
     IosFontRef m_menuFont;
     IosFontRef m_smallFont;

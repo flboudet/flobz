@@ -250,7 +250,7 @@ void NetworkGameView::sendEndOfGameMessage(int messageType)
     Message *message = mbox->createMessage();
     message->addInt     (FPNetMessage::GAMEID, gameId);
     message->addInt     (FPNetMessage::TYPE,   messageType);
-    message->addString  (FPNetMessage::NAME,   p1name);
+    message->addString  (FPNetMessage::NAME,   p1name.c_str());
     PlayerGameStat &gameStat = attachedGame->getGameStat();
     message->addInt(FPNetMessage::SCORE, gameStat.points);
     message->addInt(FPNetMessage::TOTAL_SCORE, gameStat.total_points);
@@ -301,8 +301,8 @@ void InternetGameView::sendGameResultToServer(int winner)
     message->addInt   ("CMD",   FLOBO_IGP_GAME_OVER);
     message->addInt   ("WINNER", winner);
     message->addInt   ("GAMEID", gameId);
-    message->addString("NAME1",  p1name);
-    message->addString("NAME2",  p2name);
+    message->addString("NAME1",  p1name.c_str());
+    message->addString("NAME2",  p2name.c_str());
     PlayerGameStat &gameStat = attachedGame->getGameStat();
     message->addInt("SCORE", gameStat.points);
     message->addInt("TOTAL_SCORE", gameStat.total_points);

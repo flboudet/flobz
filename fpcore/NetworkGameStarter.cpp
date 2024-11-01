@@ -149,7 +149,7 @@ void NetworkGameWidget::onMessage(Message &message)
             break;
         case FPNetMessage::kGameChat:
             if (chatBox.get())
-                chatBox->addChat(message.getString("NAME"), message.getString("TEXT"));
+                chatBox->addChat(message.getString("NAME").c_str(), message.getString("TEXT").c_str()); // TODO: string
             printf("%s: %s\n", (const char *)message.getString("NAME"), (const char *)message.getString("TEXT"));
             break;
         default:
@@ -207,12 +207,12 @@ void NetworkGameWidget::actionAfterGameOver(bool fromControls, int actionType)
     GameWidget2P::actionAfterGameOver(fromControls, actionType);
 }
 
-void NetworkGameWidget::sendChat(String chatText)
+void NetworkGameWidget::sendChat(const std::string &chatText)
 {
     ios_fc::Message *message = mbox->createMessage();
     message->addInt(FPNetMessage::TYPE,   FPNetMessage::kGameChat);
-    message->addString("NAME",   getPlayerOneName());
-    message->addString("TEXT",   chatText);
+    message->addString("NAME",   String(getPlayerOneName().c_str()));
+    message->addString("TEXT",   String(chatText.c_str())); // TODO string
     message->addBoolProperty("RELIABLE", true);
     message->send();
     if (chatBox.get())

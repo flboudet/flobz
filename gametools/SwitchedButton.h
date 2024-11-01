@@ -9,12 +9,12 @@ namespace gameui {
 
     class SwitchedButton : public HBox, Action, NotificationResponder {
     public:
-        SwitchedButton(String label, bool defaultValue,
+        SwitchedButton(const std::string &label, bool defaultValue,
                        IosSurface *trueSurface, IosSurface *falseSurface,
-                       String prefKey, PreferencesManager *prefMgr, Action * altResponder=NULL);
+                       const std::string & prefKey, PreferencesManager *prefMgr, Action * altResponder=NULL);
         virtual ~SwitchedButton();
         virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
-        void notificationOccured(String identifier, void * context);
+        void notificationOccured(const std::string & identifier, void * context);
         bool getState();
         void setState(bool _state);
         void lostFocus();
@@ -27,7 +27,7 @@ namespace gameui {
         IosSurface * imageTrue;
         IosSurface * imageFalse;
         Button text;
-        String key, notifKey;
+        std::string key, notifKey;
         bool stateValue, persistant;
         Action * m_altResponder;
     };

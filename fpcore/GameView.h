@@ -82,7 +82,7 @@ class GameView : public GameListener {
     GameView(FloboGameFactory *attachedFloboGameFactory);
 
     void setupLayout(int playerId);
-    void setPlayerNames(const char *p1, const char *p2) { p1name = p1; p2name = p2; }
+    void setPlayerNames(const std::string &p1, const std::string &p2) { p1name = p1; p2name = p2; }
 
     virtual ~GameView();
     void setEnemyGame(FloboGame *enemyGame);
@@ -147,7 +147,7 @@ class GameView : public GameListener {
     }
   protected:
     int m_playerId;
-    String p1name, p2name;
+    std::string p1name, p2name;
     bool cycleAllowed();
     bool m_showNextFlobos, m_showShadows, m_showEyes;
     bool skippedCycle;

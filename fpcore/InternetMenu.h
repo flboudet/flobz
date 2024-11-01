@@ -42,10 +42,10 @@ using namespace ios_fc;
 
 class FPServer {
 public:
-    FPServer(String hostName, int portNum, String path) : hostName(hostName), hostPath(path), portNum(portNum) {}
+    FPServer(const std::string & hostName, int portNum, const std::string & path) : hostName(hostName), hostPath(path), portNum(portNum) {}
     virtual ~FPServer() {}
-    String hostName;
-    String hostPath;
+    std::string hostName;
+    std::string hostPath;
     int portNum;
 };
 
@@ -59,7 +59,7 @@ public:
 
 class PingableFPServer : public FPServer, public IdleComponent {
 public:
-    PingableFPServer(String hostName, int portNum, String path, PingableFPServerResponder *responder);
+    PingableFPServer(const std::string & hostName, int portNum, const std::string & path, PingableFPServerResponder *responder);
     virtual ~PingableFPServer();
     // IdleComponent implementation
     virtual void idle(double currentTime);
@@ -103,7 +103,7 @@ public:
 
 class HttpMetaServerConnection : public AbstractMetaFPServerConnection, public IdleComponent {
 public:
-    HttpMetaServerConnection(String hostName, String hostPath, int portNum, MetaFPServerConnectionResponder *responder);
+    HttpMetaServerConnection(const std::string & hostName, const std::string & hostPath, int portNum, MetaFPServerConnectionResponder *responder);
     virtual ~HttpMetaServerConnection();
     virtual void fetch();
     virtual std::vector<FPServer> getServers() const;
@@ -112,7 +112,7 @@ public:
     virtual bool failed() const { return m_nErrors > 5; }
 private:
     HttpDocument *m_doc;
-    String m_hostName, m_hostPath;
+    std::string m_hostName, m_hostPath;
     int m_portNum;
     std::vector<FPServer> m_servers;
     int m_nErrors;
@@ -153,7 +153,7 @@ public:
     virtual ~InternetGameMenu();
     void build();
     virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
-    void setSelectedServer(const String &s, int port);
+    void setSelectedServer(const std::string &s, int port);
     virtual void idle(double currentTime);
     virtual IdleComponent *getIdleComponent() { return this; }
     void enterNetCenterMenu(InternetGameCenter *gameCenter);

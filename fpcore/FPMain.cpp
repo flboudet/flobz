@@ -41,7 +41,7 @@ static const char * kScreenWidthPref = "Config.ScreenWidth";
 static const char * kScreenHeightPref = "Config.ScreenHeight";
 
 
-FPMain::FPMain(String dataDir, bool fullscreen, int maxDataPackNumber)
+FPMain::FPMain(const std::string &dataDir, bool fullscreen, int maxDataPackNumber)
 : m_dataDir(dataDir), m_fullscreen(fullscreen),
   m_maxDataPackNumber(maxDataPackNumber),
   m_dataPathManager(dataDir)
@@ -193,7 +193,7 @@ void FPMain::run()
   std::cout << "Pushed!\n";
 }
 
-void FPMain::debug_gsl(String gsl_script)
+void FPMain::debug_gsl(const std::string &gsl_script)
 {
   initWithGUI();
   GameUIDefaults::SCREEN_STACK->push(mainScreen);
@@ -202,11 +202,11 @@ void FPMain::debug_gsl(String gsl_script)
   GameUIDefaults::GAME_LOOP->run();
 }
 
-void FPMain::connect_ia(String param)
+void FPMain::connect_ia(const std::string & param)
 {
 #ifdef ENABLE_NETWORK_INTERNET
-  String name   = "Herbert";
-  String server = "aley.fovea.cc";
+  std::string & name   = "Herbert";
+  std::string & server = "aley.fovea.cc";
   int port      = 4567;
   int what = 1;
   int first = 0;
@@ -229,7 +229,7 @@ void FPMain::connect_ia(String param)
   }
   std::cout << name.c_str() << ":" << server.c_str() << ":" << port << std::endl;
   int level     = 1;
-  String password = "";
+  std::string & password = "";
 
   //initWithoutGUI();
 
@@ -259,7 +259,7 @@ void FPMain::initMenus()
   mainScreen->pushMenu(trubudu);
 }
 
-void FPMain::notificationOccured(String identifier, void * context)
+void FPMain::notificationOccured(const std::string & identifier, void * context)
 {
     if (identifier == theCommander->getFullScreenKey()) {
         theCommander->getPreferencesManager()->setBoolPreference(kFullScreenPref, *(bool *)context);

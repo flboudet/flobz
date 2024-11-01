@@ -5,9 +5,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-const char * PosixPreferencesManager::m_sep = "\n\r";
+const std::string PosixPreferencesManager::m_sep = "\n\r";
 
-PosixPreferencesManager::PosixPreferencesManager(const char *fileName)
+PosixPreferencesManager::PosixPreferencesManager(const std::string &fileName)
     : m_fileName(fileName), m_fileContent(NULL)
 {
 }
@@ -18,12 +18,12 @@ PosixPreferencesManager::~PosixPreferencesManager()
         free(m_fileContent);
 }
 
-bool PosixPreferencesManager::getBoolPreference(const char *identifier, bool defaultVal) const
+bool PosixPreferencesManager::getBoolPreference(const std::string &identifier, bool defaultVal) const
 {
     return getIntPreference(identifier, defaultVal ? 1 : 0) ? true : false;
 }
 
-int PosixPreferencesManager::getIntPreference(const char *identifier, int defaultVal) const
+int PosixPreferencesManager::getIntPreference(const std::string &identifier, int defaultVal) const
 {
     std::string sresult = getStrPreference(identifier, "");
     if (sresult == "")
@@ -31,27 +31,23 @@ int PosixPreferencesManager::getIntPreference(const char *identifier, int defaul
     return atoi(sresult.c_str());
 }
 
-void PosixPreferencesManager::setBoolPreference(const char *identifier, bool value)
+void PosixPreferencesManager::setBoolPreference(const std::string &identifier, bool value)
 {
     setIntPreference(identifier, (int)value);
 }
 
-void PosixPreferencesManager::setIntPreference(const char *identifier, int value)
+void PosixPreferencesManager::setIntPreference(const std::string &identifier, int value)
 {
     char var[256];
     sprintf(var, "%d", value);
     setStrPreference(identifier, var);
 }
 
-std::string PosixPreferencesManager::getStrPreference(const char *identifier, const char *defaultVal) const
+std::string PosixPreferencesManager::getStrPreference(const std::string &identifier, const std::string &defaultVal) const
 {
     char * key, *copiedfile;
     int tmplen;
-    std::string result;
-    if (identifier == NULL)
-        return result;
-    if (defaultVal != NULL)
-        result = defaultVal;
+    std::string result(defaultVal);
     fetchFile();
     if (m_fileContent == NULL)
         return result;
@@ -61,7 +57,7 @@ std::string PosixPreferencesManager::getStrPreference(const char *identifier, co
     copiedfile = strdup(m_fileContent);
     if (copiedfile == NULL) return result;
 
-    for (key = strtok(copiedfile, m_sep); key; key = strtok(NULL, m_sep))
+    for (key = strtok(copiedfile, m_sep.c_str()); key; key = strtok(NULL, m_sep.c_str()))
     {
         if (strncmp(key, tmp, tmplen) == 0)
         {
@@ -76,39 +72,35 @@ std::string PosixPreferencesManager::getStrPreference(const char *identifier, co
     return result;
 }
 
-void PosixPreferencesManager::setStrPreference(const char *identifier, const char *value)
+void PosixPreferencesManager::setStrPreference(const std::string &identifier, const std::string &value)
 {
     char * key;
     char * prefs;
-    // if no name given, ignore
-    if (identifier == NULL)
-        return;
-    // if no value given, use an empty string
-    if (value == NULL) value = "";
+
     // Read current value to check if file update is really needed
     // If equal, ignore request
     std::string oldValue = getStrPreference(identifier, "core.preferences.fakeoldvalue");
-    if (!strcmp(oldValue.c_str(),value) && strlen(oldValue.c_str()) == strlen(value)) {
+    if (oldValue == value) {
         return;
     }
     // Not equal... we should update the memory image and the file
     // No memory image available, return...
     if (m_fileContent == NULL) return;
     // Allocate a new mem image or die
-    prefs = (char *)calloc(1, strlen(m_fileContent) + strlen(identifier) + strlen(value) + strlen("=\n") + 1);
+    prefs = (char *)calloc(1, strlen(m_fileContent) + identifier.length() + value.length() + strlen("=\n") + 1);
     if (prefs == NULL)
         return;
     // Copy the old image to the new, updating the right line...
     int l = 0;
-    for (key = strtok(m_fileContent, m_sep); key; key = strtok(NULL, m_sep))
+    for (key = strtok(m_fileContent, m_sep.c_str()); key; key = strtok(NULL, m_sep.c_str()))
     {
-        if (strstr(key, identifier) != key)
+        if (strstr(key, identifier.c_str()) != key)
         {
           sprintf(prefs+l,"%s\n",key);
           l += strlen(key)+1;
         }
     }
-    sprintf(prefs+l,"%s=%s\n", identifier,value);
+    sprintf(prefs+l,"%s=%s\n", identifier.c_str(),value);
     free(m_fileContent);
     m_fileContent = prefs;
     // Finally try to store the file

@@ -244,7 +244,7 @@ void sprite_draw(GoomSL *gsl, GoomHash *global, GoomHash *local)
         char txt[1024];
         char tmp[1024];
         strcpy(tmp,path);
-        sprintf(txt, "IMAGE NOT FOUND:\n%s", (const char *)ios_fc::FilePath(tmp).basename());
+        sprintf(txt, "IMAGE NOT FOUND:\n%s", ios_fc::FilePath(tmp).basename().c_str());
         styrolyse->client->putText(styrolyse->client,x,y,txt);
     }
     else {

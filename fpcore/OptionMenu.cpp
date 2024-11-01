@@ -29,21 +29,21 @@
 MusicPrefSwitch::MusicPrefSwitch()
 : gameui::SwitchedButton(theCommander->getLocalizedString(kMusic), true,
                          theCommander->getSwitchOnPicture(), theCommander->getSwitchOffPicture(),
-                         String(AudioHelper::musicOnOffKey()), theCommander->getPreferencesManager())
+                         AudioHelper::musicOnOffKey(), theCommander->getPreferencesManager())
 {
 }
 
 AudioPrefSwitch::AudioPrefSwitch()
 : gameui::SwitchedButton(theCommander->getLocalizedString(kAudioFX), true,
                          theCommander->getSwitchOnPicture(), theCommander->getSwitchOffPicture(),
-                         String(AudioHelper::soundOnOffKey()), theCommander->getPreferencesManager())
+                         AudioHelper::soundOnOffKey(), theCommander->getPreferencesManager())
 {
 }
 
 FSPrefSwitch::FSPrefSwitch()
 : gameui::SwitchedButton(theCommander->getLocalizedString(kFullScreen), false,
                          theCommander->getSwitchOnPicture(), theCommander->getSwitchOffPicture(),
-                         String(theCommander->getFullScreenKey()), theCommander->getPreferencesManager())
+                         theCommander->getFullScreenKey(), theCommander->getPreferencesManager())
 {
 }
 

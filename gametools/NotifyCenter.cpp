@@ -12,20 +12,20 @@ namespace gameui {
     // NotifyCenter
     //
 
-    void NotifyCenter::addListener(const char *identifier, NotificationResponder * listener)
+    void NotifyCenter::addListener(const std::string &identifier, NotificationResponder * listener)
     {
         std::set<NotificationResponder *> &listeners = m_listeners[identifier];
         // add the listener (even if already present)
         listeners.insert(listener);
     }
 
-    void NotifyCenter::removeListener(const char *identifier, NotificationResponder * listener)
+    void NotifyCenter::removeListener(const std::string &identifier, NotificationResponder * listener)
     {
         std::set<NotificationResponder *> &listeners = m_listeners[identifier];
         listeners.erase(listener);
     }
 
-    void NotifyCenter::notify(const char *identifier, void * context)
+    void NotifyCenter::notify(const std::string &identifier, void * context)
     {
         // Get the listener list for this notification
         std::set<NotificationResponder *> &listeners = m_listeners[identifier];

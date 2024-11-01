@@ -60,11 +60,11 @@ audio_manager::Sound * SoundFactory::create(const std::string &path)
 #endif
         if (m_dataPathManager.hasFile(path.c_str())) {
 #ifdef ANDROID
-            String fullPath = path.c_str(); // On Android, the AudioManager will use the datapathmanager...
+            std::string fullPath = path; // On Android, the AudioManager will use the datapathmanager...
 #else
-            String fullPath = m_dataPathManager.getPath(path.c_str());
+            std::string fullPath = m_dataPathManager.getPath(path);
 #endif
-            audio_manager::Sound *newSound = GameUIDefaults::GAME_LOOP->getAudioManager()->loadSound(fullPath);
+            audio_manager::Sound *newSound = GameUIDefaults::GAME_LOOP->getAudioManager()->loadSound(fullPath.c_str());
             return newSound;
         }
     }
@@ -86,11 +86,11 @@ audio_manager::Music * MusicFactory::create(const std::string &path)
 #endif
         if (m_dataPathManager.hasFile(path.c_str())) {
 #ifdef ANDROID
-            String fullPath = path.c_str(); // On Android, the AudioManager will use the datapathmanager...
+            std::string fullPath = path; // On Android, the AudioManager will use the datapathmanager...
 #else
-            String fullPath = m_dataPathManager.getPath(path.c_str());
+            std::string fullPath = m_dataPathManager.getPath(path);
 #endif
-            audio_manager::Music *newMusic = GameUIDefaults::GAME_LOOP->getAudioManager()->loadMusic(fullPath);
+            audio_manager::Music *newMusic = GameUIDefaults::GAME_LOOP->getAudioManager()->loadMusic(fullPath.c_str());
             return newMusic;
         }
     }

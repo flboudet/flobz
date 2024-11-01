@@ -13,12 +13,12 @@
 class Jukebox
 {
 public:
-    void registerTrack(const char *fileName, const char *trackName, int position = 0);
-    void playTrack(const char *trackName);
+    void registerTrack(const std::string &fileName, const std::string &trackName, int position = 0);
+    void playTrack(const std::string &trackName);
     void playTrack();
 private:
     struct JukeboxTrack {
-        JukeboxTrack(const char *fileName, int position)
+        JukeboxTrack(const std::string &fileName, int position)
             : fileName(fileName), position(position) {}
         JukeboxTrack() {}
         std::string fileName;
@@ -45,7 +45,7 @@ public:
     AudioHelper();
     ~AudioHelper();
     // Helper functions
-    void playSound(const char *sName, float volume = 1.0, float balance = 0.0f);
+    void playSound(const std::string &sName, float volume = 1.0, float balance = 0.0f);
     // NotificationResponder implementation
     void notificationOccured(String identifier, void * context);
 

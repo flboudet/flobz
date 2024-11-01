@@ -11,22 +11,22 @@
 class PosixPreferencesManager : public PreferencesManager
 {
 public:
-    PosixPreferencesManager(const char *fileName);
+    PosixPreferencesManager(const std::string &fileName);
     virtual ~PosixPreferencesManager();
 public:
     // Getters
-    virtual bool getBoolPreference(const char *identifier, bool defaultVal) const;
-    virtual int getIntPreference(const char *identifier, int defaultVal) const;
-    virtual std::string getStrPreference(const char *identifier, const char *defaultVal) const;
+    virtual bool getBoolPreference(const std::string &identifier, bool defaultVal) const;
+    virtual int getIntPreference(const std::string &identifier, int defaultVal) const;
+    virtual std::string getStrPreference(const std::string &identifier, const std::string &defaultVal) const;
     // Setters
-    virtual void setBoolPreference(const char *identifier, bool value);
-    virtual void setIntPreference(const char *identifier, int value);
-    virtual void setStrPreference(const char *identifier, const char *value);
+    virtual void setBoolPreference(const std::string &identifier, bool value);
+    virtual void setIntPreference(const std::string &identifier, int value);
+    virtual void setStrPreference(const std::string &identifier, const std::string &value);
 private:
     void fetchFile() const;
     void storeFile();
 private:
-    static const char * m_sep;
+    static const std::string m_sep;
     std::string m_fileName;
     mutable char *m_fileContent;
 };

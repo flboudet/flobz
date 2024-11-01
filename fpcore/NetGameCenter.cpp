@@ -35,9 +35,9 @@ FloboGameInvitation::FloboGameInvitation()
 
 class NetGameCenter::GamerPeer {
 public:
-    GamerPeer(String name, PeerAddress address, int status = PEER_NORMAL, int rank = -1, bool self=false) :
+    GamerPeer(const std::string & name, PeerAddress address, int status = PEER_NORMAL, int rank = -1, bool self=false) :
         name(name), address(address), status(status), rank(rank), self(self) {}
-    String name;
+    std::string name;
     PeerAddress address;
     int status;
     int rank;
@@ -67,7 +67,7 @@ void NetGameCenter::idle()
     }
 }
 
-void NetGameCenter::connectPeer(PeerAddress addr, const String name, int status, int rank, bool self)
+void NetGameCenter::connectPeer(PeerAddress addr, const std::string &name, int status, int rank, bool self)
 {
     //printf("%s vient de se connecter!\n", (const char *)name);
     for (int i = 0, j = peers.size() ; i < j ; i++) {
@@ -90,7 +90,7 @@ void NetGameCenter::connectPeer(PeerAddress addr, const String name, int status,
     }
 }
 
-void NetGameCenter::disconnectPeer(PeerAddress addr, const String name)
+void NetGameCenter::disconnectPeer(PeerAddress addr, const std::string &name)
 {
     //printf("%s vient de se deconnecter! (parait il)\n", (const char *)name);
     for (int i = 0, j = peers.size() ; i < j ; i++) {
@@ -119,7 +119,7 @@ void NetGameCenter::disconnectPeer(PeerAddress addr, const String name)
     //printf("Pas de peer trouve au nom %s\n", (const char *)name);
 }
 
-String NetGameCenter::getPeerNameAtIndex(int i) const
+const std::string & NetGameCenter::getPeerNameAtIndex(int i) const
 {
     return peers[i]->name;
 }
@@ -129,7 +129,7 @@ PeerAddress NetGameCenter::getPeerAddressAtIndex(int i) const
     return peers[i]->address;
 }
 
-PeerAddress NetGameCenter::getPeerAddressForPeerName(String peerName) const
+PeerAddress NetGameCenter::getPeerAddressForPeerName(const std::string & peerName) const
 {
     int i;
     for (i = 0 ; i < peers.size() ; i++) {
@@ -243,7 +243,7 @@ void NetGameCenter::receivedGameInvitation(FloboGameInvitation &invitation)
     }
 }
 
-void NetGameCenter::receivedGameCanceledWithPeer(String playerName, PeerAddress addr)
+void NetGameCenter::receivedGameCanceledWithPeer(const std::string & playerName, PeerAddress addr)
 {
     // Retrieving the peer
     GamerPeer *peer = getPeerForAddress(addr);

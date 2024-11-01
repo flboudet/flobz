@@ -31,19 +31,19 @@
 
 namespace ios_fc {
 
-    FilePath::FilePath(const String &path) : path(path)
+    FilePath::FilePath(const std::string &path) : _path(path)
     {
     }
 
-    SelfVector<String> FilePath::listFiles()
+    SelfVector<std::string> FilePath::listFiles()
     {
         struct	dirent	*dptr;
         DIR	*dirp;
-        SelfVector<String> result;
-        if((dirp=opendir(path))==NULL) {
+        SelfVector<std::string> result;
+        if((dirp=opendir(_path.c_str()))==NULL) {
             std::string errorMessage("Error opening ");
             perror("dirlist");
-            throw Exception((errorMessage + (const char *)path).c_str());
+            throw Exception((errorMessage + _path).c_str());
         }
         dptr = readdir(dirp);
         while(dptr != NULL) {
@@ -54,39 +54,39 @@ namespace ios_fc {
         return result;
     }
 
-    String FilePath::combine(const String &path) const
+    std::string FilePath::combine(const std::string &path) const
     {
-        return combine(this->path, path);
+        return combine(this->_path, path);
     }
 
-    String FilePath::combine(const String &path1, const String &path2)
+    std::string FilePath::combine(const std::string &path1, const std::string &path2)
     {
-        return String(path1 + "/" + path2);
+        return std::string(path1 + "/" + path2);
     }
 
     bool FilePath::exists() const
     {
         struct stat s;
-        if (stat(path, &s) == -1) {
+        if (stat(_path.c_str(), &s) == -1) {
             if (errno == ENOENT)
                 return false;
         }
         return true;
     }
 
-    String FilePath::basename(void) const
+    std::string FilePath::basename(void) const
     {
-      int size = this->path.size();
+      int size = this->_path.size();
       int i;
       for (i=size; i>=0; i--)
       {
-        if (this->path[i] == '/')
+        if (this->_path[i] == '/')
         {
           i++;
           break;
         }
       }
-      return this->path.substring(i);
+      return this->_path.substr(i);
     }
 }
 

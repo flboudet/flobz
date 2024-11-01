@@ -12,7 +12,7 @@ class InternetBot : public IdleComponent
   public:
     InternetBot(int level);
 
-    void connect(String server, int port, String name, String password);
+    void connect(const std::string & server, int port, const std::string & name, const std::string & password);
     void idle(double currentTime);
 
   private:

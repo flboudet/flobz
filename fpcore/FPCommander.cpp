@@ -140,9 +140,9 @@ void FPCommander::initLocale()
 }
 
 /* Global translator */
-const char * FPCommander::getLocalizedString(const char * originalString) const
+std::string FPCommander::getLocalizedString(const std::string & originalString) const
 {
-  return locale->getLocalizedString(originalString);
+  return locale->getLocalizedString(originalString.c_str());
 }
 
 /* Initialize the audio if necessary */
@@ -159,7 +159,7 @@ void FPCommander::initAudio()
 void FPCommander::initFonts()
 {
     Locales_Init(); // Make sure locales are detected.
-    String fontName, funnyFontName;
+    std::string fontName, funnyFontName;
     fontName = locale->getLocalizedString("__FONT__");
     m_localizedFontName = fontName;
     funnyFontName = "gfx/zill_spills.ttf";
@@ -207,9 +207,9 @@ void FPCommander::initThemes()
 #endif
 }
 
-String FPCommander::getFullScreenKey(void) const
+std::string FPCommander::getFullScreenKey(void) const
 {
-    return String(kFullScreenPref);
+    return kFullScreenPref;
 }
 
 ScreenTransitionWidget *FPCommander::createScreenTransition(Screen &fromScreen) const
@@ -218,53 +218,53 @@ ScreenTransitionWidget *FPCommander::createScreenTransition(Screen &fromScreen) 
 }
 
 // Resource management
-void FPCommander::cacheSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility)
+void FPCommander::cacheSurface(ImageType type, const std::string &path, ImageSpecialAbility specialAbility)
 {
     m_surfaceResManager->cacheResource(IosSurfaceResourceKey(type, path, specialAbility));
 }
 
-IosSurfaceRef FPCommander::getSurface(ImageType type, const char *path, ImageSpecialAbility specialAbility)
+IosSurfaceRef FPCommander::getSurface(ImageType type, const std::string &path, ImageSpecialAbility specialAbility)
 {
     return m_surfaceResManager->getResource(IosSurfaceResourceKey(type, path, specialAbility));
 }
 
-IosSurfaceRef FPCommander::getSurface(ImageType type, const char *path, const ImageOperationList &list)
+IosSurfaceRef FPCommander::getSurface(ImageType type, const std::string &path, const ImageOperationList &list)
 {
     ImageSpecialAbility specialAbility = GameUIDefaults::GAME_LOOP->getDrawContext()->guessRequiredImageAbility(list);
     return m_surfaceResManager->getResource(IosSurfaceResourceKey(type, path, specialAbility));
 }
 
-void FPCommander::cacheFont(const char *path, int size)
+void FPCommander::cacheFont(const std::string &path, int size)
 {
     m_fontResManager->cacheResource(IosFontResourceKey(path, size));
 }
 
-IosFontRef FPCommander::getFont(const char *path, int size)
+IosFontRef FPCommander::getFont(const std::string &path, int size)
 {
     return m_fontResManager->getResource(IosFontResourceKey(path, size));
 }
 
-void FPCommander::cacheSound(const char *path)
+void FPCommander::cacheSound(const std::string &path)
 {
     m_soundResManager->cacheResource(path);
 }
 
-SoundRef FPCommander::getSound(const char *path)
+SoundRef FPCommander::getSound(const std::string &path)
 {
     return m_soundResManager->getResource(path);
 }
 
-void FPCommander::cacheMusic(const char *path)
+void FPCommander::cacheMusic(const std::string &path)
 {
     m_musicResManager->cacheResource(path);
 }
 
-MusicRef FPCommander::getMusic(const char *path)
+MusicRef FPCommander::getMusic(const std::string &path)
 {
     return m_musicResManager->getResource(path);
 }
 
-FloboSetThemeRef FPCommander::getFloboSetTheme(const char *name)
+FloboSetThemeRef FPCommander::getFloboSetTheme(const std::string &name)
 {
     return m_floboSetThemeResManager->getResource(name);
 }
@@ -290,10 +290,10 @@ const std::string FPCommander::getDefaultFloboSetThemeName() const
 }
 
 
-void FPCommander::setPreferedFloboSetThemeName(const char *name)
+void FPCommander::setPreferedFloboSetThemeName(const std::string &name)
 {
     m_defaultFloboSetThemeName = name;
-    m_preferencesManager->setStrPreference ("floboset_theme", name);
+    m_preferencesManager->setStrPreference ("floboset_theme", name.c_str());
 }
 
 const std::vector<std::string> &FPCommander::getFloboSetThemeList() const
@@ -301,7 +301,7 @@ const std::vector<std::string> &FPCommander::getFloboSetThemeList() const
     return m_themeManager->getFloboSetThemeList();
 }
 
-LevelThemeRef FPCommander::getLevelTheme(const char *name)
+LevelThemeRef FPCommander::getLevelTheme(const std::string &name)
 {
     return m_levelThemeResManager->getResource(name);
 }
@@ -327,11 +327,11 @@ const std::string FPCommander::getDefaultLevelThemeName(int nbPlayers) const
     return result[0];
 }
 
-void FPCommander::setPreferedLevelThemeName(const char *name, int nbPlayers)
+void FPCommander::setPreferedLevelThemeName(const std::string &name, int nbPlayers)
 {
     ostringstream osstream;
     osstream << "level_theme_" << nbPlayers;
-    m_preferencesManager->setStrPreference (osstream.str().c_str(), name);
+    m_preferencesManager->setStrPreference (osstream.str().c_str(), name.c_str());
 }
 
 std::vector<std::string> FPCommander::getLevelThemeList(int nbPlayers) const
@@ -377,7 +377,7 @@ void FPCommander::createResourceManagers()
     GTLogTrace("--");
 }
 
-void FPCommander::playMusicTrack(const char *trackName)
+void FPCommander::playMusicTrack(const std::string &trackName)
 {
     m_jukebox->playTrack(trackName);
 }
@@ -387,7 +387,7 @@ void FPCommander::playMusicTrack()
     m_jukebox->playTrack();
 }
 
-void FPCommander::playSound(const char *sName, float volume, float balance)
+void FPCommander::playSound(const std::string &sName, float volume, float balance)
 {
     m_audioHelper->playSound(sName, volume, balance);
 }

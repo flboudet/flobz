@@ -32,8 +32,8 @@ void cacheMusic(StyrolyseClient *_this, const char *path)
 static char *pathResolverFunction (StyrolyseClient *_this, const char *path)
 {
   try {
-    String rsvPath = FilePath("/story").combine(path);
-    return strdup((const char *)rsvPath);
+    std::string rsvPath = FilePath("/story").combine(path);
+    return strdup(rsvPath.c_str());
   }
   catch (Exception e) {
     return strdup(path);
@@ -88,7 +88,7 @@ int extract_state_and_type(const char *s, int *state, int *type)
 
 
 StyroImage::StyroImage(StyrolyseClient *_this,
-                       const char *path, bool removePrefix)
+                       const std::string &path, bool removePrefix)
     : path(path), surface(NULL)
 {
     for (int i = 0 ; i < 10 ; ++i)
@@ -98,7 +98,7 @@ StyroImage::StyroImage(StyrolyseClient *_this,
         int type = 0;
         const FloboSetTheme *attachedTheme = ((StoryWidget::StoryStyrolyseClient *)_this)->attachedTheme;
         if ((attachedTheme != NULL)
-            && (extract_state_and_type(path,&state,&type)==0)) {
+            && (extract_state_and_type(path.c_str(),&state,&type)==0)) {
             const FloboTheme &theme = attachedTheme->getFloboTheme((FloboState)state);
             switch (type) {
             case 0: // FLOBO_FACES
@@ -124,11 +124,11 @@ StyroImage::StyroImage(StyrolyseClient *_this,
         }
     }
     else {
-        String imgPath = (removePrefix ? String(path)
+        std::string imgPath = (removePrefix ? path
                           : FilePath("gfx").combine(path));
         surfaceRef = theCommander->getSurface(IMAGE_RGBA, imgPath);
         if (surfaceRef.empty())
-            throw Exception(String("Image ") + imgPath + " not found!");
+            throw Exception((std::string("Image ") + imgPath + " not found!").c_str());
         surface = surfaceRef;
     }
 }
@@ -197,7 +197,7 @@ static void putText (StyrolyseClient *_this, int x, int y, const char *text)
 
 static const char *getText(StyrolyseClient *_this, const char *text)
 {
-    return ((StoryWidget::StoryStyrolyseClient *)_this)->widget->getText(text);
+    return ((StoryWidget::StoryStyrolyseClient *)_this)->widget->getText(text).c_str();
 }
 
 static void music(StyrolyseClient *_this, const char *name)
@@ -212,7 +212,7 @@ static void playSound(StyrolyseClient *_this, const char *fileName, float volume
 
 bool StoryWidget::classInitialized = false;
 
-StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
+StoryWidget::StoryWidget(const std::string & screenName, Action *finishedAction, bool fxMode)
     : IdleComponent(), localeDictionary(NULL), finishedAction(finishedAction), once(false), last_time(-1.), fxMode(fxMode), m_renderEnabled(true)
 {
     // GTLogTrace("StoryWidget::StoryWidget(%s)", (const char *)screenName);
@@ -222,18 +222,18 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
         GTLogTrace("StoryWidget::StoryWidget() locale error");
     }
     if (!classInitialized) {
-        String path0 = "/lib/styrolyse.gsl";
-        String path1 = "/lib/nofx.gsl";
-        String path2 = "/lib/fx.gsl";
+        std::string path0 = "/lib/styrolyse.gsl";
+        std::string path1 = "/lib/nofx.gsl";
+        std::string path2 = "/lib/fx.gsl";
         styrolyse_init(path0.c_str(), path1.c_str(), path2.c_str());
         classInitialized = true;
     }
-    fullPath = String("/story/") + screenName;
+    fullPath = std::string("/story/") + screenName;
     if (!theCommander->getDataPathManager().hasFile(fullPath)) {
-        printf("GSL NOT FOUND: %s (%s)\n", screenName.c_str(), (const char *)fullPath);
+        printf("GSL NOT FOUND: %s (%s)\n", screenName.c_str(), fullPath.c_str());
         fullPath = "/story/error.gsl";
     }
-    String storyLocalePath;
+    std::string storyLocalePath;
 
     // Initializing the styrolyse client
     client.styroClient.loadImage = loadImage;
@@ -253,7 +253,7 @@ StoryWidget::StoryWidget(String screenName, Action *finishedAction, bool fxMode)
     client.widget = this;
     // GTLogTrace("StoryWidget::StoryWidget() styrolyse_new(%s)", (const char *)fullPath);
     client.attachedTheme = NULL;
-    currentStory = styrolyse_new((const char *)fullPath, (StyrolyseClient *)(&client), fxMode);
+    currentStory = styrolyse_new(fullPath.c_str(), (StyrolyseClient *)(&client), fxMode);
     // GTLogTrace("StoryWidget::StoryWidget() styrolyse_new finished");
 }
 
@@ -267,7 +267,7 @@ StoryWidget::~StoryWidget()
 void StoryWidget::reset()
 {
     styrolyse_free(currentStory);
-    currentStory = styrolyse_new((const char *)fullPath, (StyrolyseClient *)(&client), fxMode);
+    currentStory = styrolyse_new(fullPath.c_str(), (StyrolyseClient *)(&client), fxMode);
 }
 
 void StoryWidget::idle(double currentTime)
@@ -301,37 +301,37 @@ void StoryWidget::render(DrawTarget *dt)
     dt->setClipRect(NULL);
 }
 
-void StoryWidget::setIntegerValue(String varName, int value)
+void StoryWidget::setIntegerValue(const std::string & varName, int value)
 {
-    styrolyse_setint(currentStory, varName, value);
+    styrolyse_setint(currentStory, varName.c_str(), value);
 }
 
-int StoryWidget::getIntegerValue(String varName) const
+int StoryWidget::getIntegerValue(const std::string & varName) const
 {
-    return styrolyse_secured_getint(currentStory, varName);
+    return styrolyse_secured_getint(currentStory, varName.c_str());
 }
 
-void StoryWidget::setFloatValue(String varName, float value)
+void StoryWidget::setFloatValue(const std::string & varName, float value)
 {
-    styrolyse_setfloat(currentStory, varName, value);
+    styrolyse_setfloat(currentStory, varName.c_str(), value);
 }
 
-float StoryWidget::getFloatValue(String varName) const
+float StoryWidget::getFloatValue(const std::string & varName) const
 {
-    return styrolyse_secured_getfloat(currentStory, varName);
+    return styrolyse_secured_getfloat(currentStory, varName.c_str());
 }
 
-void StoryWidget::setStringValue(String varName, const char * value)
+void StoryWidget::setStringValue(const std::string & varName, const char * value)
 {
-    styrolyse_setstr(currentStory, varName, value);
+    styrolyse_setstr(currentStory, varName.c_str(), value);
 }
 
-std::string StoryWidget::getStringValue(String varName) const
+std::string StoryWidget::getStringValue(const std::string & varName) const
 {
-    return styrolyse_secured_getstr(currentStory, varName);
+    return styrolyse_secured_getstr(currentStory, varName.c_str());
 }
 
-const char *StoryWidget::getText(const char *text) const
+const std::string &StoryWidget::getText(const std::string &text) const
 {
     if (localeDictionary == NULL)
         return text;
@@ -343,7 +343,7 @@ void StoryWidget::freeMemory()
     styrolyse_reduce_memory(currentStory);
 }
 
-StoryScreen::StoryScreen(String screenName, Action *finishedAction, bool shouldAddTransition)
+StoryScreen::StoryScreen(const std::string & screenName, Action *finishedAction, bool shouldAddTransition)
     : Screen(), storyWidget(screenName, finishedAction),
       transitionWidget(NULL), finishedAction(finishedAction)
 {
@@ -395,7 +395,7 @@ void StoryScreen::onScreenVisibleChanged(bool visible)
 }
 
 
-VisualFX::VisualFX(String fxName, const FloboSetTheme &floboSetTheme)
+VisualFX::VisualFX(const std::string & fxName, const FloboSetTheme &floboSetTheme)
     : StoryWidget(fxName,NULL,true), fxName(fxName)
 {
     client.attachedTheme = &floboSetTheme;
@@ -408,10 +408,10 @@ bool VisualFX::busy() const
 
 bool VisualFX::supportFX(const char *fx) const
 {
-    String haystack(styrolyse_getstr(currentStory, "@supported_fx"));
-    String needle(fx);
-    haystack = String(",") + haystack + ",";
-    needle = String(",") + needle + ",";
+    std::string haystack(styrolyse_getstr(currentStory, "@supported_fx"));
+    std::string needle(fx);
+    haystack = std::string(",") + haystack + ",";
+    needle = std::string(",") + needle + ",";
     return (strstr(haystack.c_str(), needle.c_str()) != NULL);
 }
 

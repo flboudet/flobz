@@ -98,15 +98,15 @@ ThemeManagerImpl::ThemeManagerImpl(DataPathManager &dataPathManager)
 {
     // List the themes in the various pack folders
     if (dataPathManager.hasFile("theme")) {
-        SelfVector<String> themeFolders = dataPathManager.getEntriesAtPath("theme");
+        SelfVector<std::string> themeFolders = dataPathManager.getEntriesAtPath("theme");
         // Load the themes from the list (only those matching the correct extension)
         for (int i = 0 ; i < themeFolders.size() ; i++) {
             if (themeFolders[i].size() < 8)
                 continue;
-            if (themeFolders[i].substring(themeFolders[i].size() - 8)
+            if (themeFolders[i].substr(themeFolders[i].size() - 8)
                 == s_themeFolderExtension) {
                 //cout << "Theme to be loaded: " << (const char *)(themeFolders[i]) << endl;
-                loadThemePack((const char *)themeFolders[i]);
+                loadThemePack(themeFolders[i].c_str());
             }
         }
     }
@@ -161,7 +161,7 @@ std::vector<std::string> ThemeManagerImpl::getLevelThemeList(int nbPlayers)
 void ThemeManagerImpl::loadThemePack(const std::string &path)
 {
     FilePath themePath(path.c_str());
-	String themeDictionaryPath = FilePath::combine(FilePath::combine("theme",themePath.basename()),"locale");
+	std::string themeDictionaryPath = FilePath::combine(FilePath::combine("theme",themePath.basename()),"locale");
 	m_localeDictionary.reset(new LocalizedDictionary(m_dataPathManager, themeDictionaryPath, "theme"));
     m_themePackLoadingPath = path;
 
@@ -172,7 +172,7 @@ void ThemeManagerImpl::loadThemePack(const std::string &path)
     GSLFA_setupWrapper(gsl, &m_dataPathManager);
     gsl_push_file(gsl, "/lib/themelib.gsl");
     gsl_push_file(gsl, "/lib/packagelib.gsl");
-    gsl_push_file(gsl, themePath.combine("Description.gsl"));
+    gsl_push_file(gsl, themePath.combine("Description.gsl").c_str());
     gsl_compile(gsl);
     gsl_bind_function(gsl, "end_floboset",     ThemeManagerImpl::end_floboset);
     gsl_bind_function(gsl, "end_level",       ThemeManagerImpl::end_level);
@@ -193,8 +193,8 @@ void ThemeManagerImpl::end_floboset(GoomSL *gsl, GoomHash *global,
                                           GoomHash *local)
 {
     ThemeManagerImpl *themeMgr = (ThemeManagerImpl *)GSL_GET_USERDATA_PTR(gsl);
-	const char * themeName  = (const char *) GSL_GLOBAL_PTR(gsl, "floboset.name");
-	const char * localizedThemeName = themeMgr->m_localeDictionary->getLocalizedString(themeName,true);
+	std::string themeName  = (const char *) GSL_GLOBAL_PTR(gsl, "floboset.name");
+    std::string localizedThemeName = themeMgr->m_localeDictionary->getLocalizedString(themeName,true);
     FloboSetThemeDescription &newThemeDescription = themeMgr->m_floboSetThemeDescriptions[themeName];
     newThemeDescription.name = themeName;
     newThemeDescription.localizedName = localizedThemeName;
@@ -219,8 +219,8 @@ void ThemeManagerImpl::end_floboset(GoomSL *gsl, GoomHash *global,
 void ThemeManagerImpl::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
     ThemeManagerImpl *themeMgr = (ThemeManagerImpl *)GSL_GET_USERDATA_PTR(gsl);
-    const char * themeName  = (const char *) GSL_GLOBAL_PTR(gsl, "level.name");
-    const char * localizedThemeName = themeMgr->m_localeDictionary->getLocalizedString(themeName,true);
+    std::string themeName  = (const char *) GSL_GLOBAL_PTR(gsl, "level.name");
+    std::string localizedThemeName = themeMgr->m_localeDictionary->getLocalizedString(themeName,true);
     LevelThemeDescription &newThemeDescription = themeMgr->m_levelThemeDescriptions[themeName];
     newThemeDescription.name = themeName;
     newThemeDescription.localizedName = localizedThemeName;

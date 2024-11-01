@@ -526,13 +526,13 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
   class Text : public Widget, public IdleComponent {
     public:
       Text();
-      Text(const String &label, IosFont *font = NULL, bool autosize = true);
+      Text(const std::string &label, IosFont *font = NULL, bool autosize = true);
       void setTextAlign(TextAlign align) { m_textAlign = align; }
       TextAlign getTextAlign() const { return m_textAlign; }
       void setAutoSize(bool autoSize) { m_autoSize = autoSize; }
       bool getAutoSize() const { return m_autoSize; }
-      void setValue(String value);
-      String getValue() const { return label; }
+      void setValue(const std::string &value);
+      const std::string &getValue() const { return label; }
       void setFont(IosFont *newFont) { font = newFont; }
       void boing(void);
 	  void setShadow(int x, int y);
@@ -548,7 +548,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       bool startMoving;
 
     private:
-      String label;
+      std::string label;
       Vec3 offset;
       double startTime;
       bool moving;
@@ -590,8 +590,8 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
 
   class Button : public Text {
     public:
-      Button(const String &label, IosFont *fontActive = NULL, IosFont *fontInactive = NULL);
-      Button(const String &label, Action *action);
+      Button(const std::string &label, IosFont *fontActive = NULL, IosFont *fontInactive = NULL);
+      Button(const std::string &label, Action *action);
 
       void eventOccured(event_manager::GameControlEvent *event);
 
@@ -607,12 +607,12 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
 
   class EditField : public Text {
     public:
-      EditField(const String &defaultText, Action *action = NULL);
-      EditField(const String &defaultText, const String &persistentID, PreferencesManager *prefMgr);
+      EditField(const std::string &defaultText, Action *action = NULL);
+      EditField(const std::string &defaultText, const std::string &persistentID, PreferencesManager *prefMgr);
 
       void eventOccured(event_manager::GameControlEvent *event);
       bool handleJoystickEdit(event_manager::GameControlEvent *event);
-      void setValue(String value, bool persistent = true);
+      void setValue(const std::string & value, bool persistent = true);
 
       void lostFocus();
       void giveFocus();
@@ -625,8 +625,8 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       IosFont *fontActive;
       IosFont *fontInactive;
       bool editionMode;
-      String persistence;
-      String previousValue;
+      std::string persistence;
+      std::string previousValue;
       void init(IosFont *fontActive, IosFont *fontInactive);
 	  bool editOnFocus;
 
@@ -652,7 +652,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       IosFont *fontActive;
       IosFont *fontInactive;
       bool editionMode;
-      String previousValue;
+      std::string previousValue;
       void init(IosFont *fontActive, IosFont *fontInactive);
 
       void press(event_manager::GameControlEvent *event);
@@ -662,10 +662,10 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
 
   class ToggleButton : public Button {
   public:
-    ToggleButton(const String &label, const String &offState, const String &onState, bool initialState, Action *action);
+    ToggleButton(const std::string &label, const std::string &offState, const std::string &onState, bool initialState, Action *action);
     void setToggle(bool toggleValue);
   private:
-    String unmodifiedLabel, onState, offState;
+    std::string unmodifiedLabel, onState, offState;
   };
 
 

@@ -81,7 +81,7 @@ target_include_directories(fpcore PRIVATE
                            ${SDL_INCLUDE_DIR}
 )
 
-target_compile_definitions(fpcore PRIVATE
+target_compile_definitions(fpcore PUBLIC
                            HAVE_SDL_SDL_MIXER_H
 )
 endif (ENABLE_SDL12_BACKENDS)
@@ -96,7 +96,7 @@ target_include_directories(fpcore PRIVATE
                            ${SDL2_INCLUDE_DIRS}
 )
 
-target_compile_definitions(fpcore PRIVATE
+target_compile_definitions(fpcore PUBLIC
                            HAVE_SDL_SDL_MIXER_H
 )
 endif (ENABLE_SDL2_BACKENDS)

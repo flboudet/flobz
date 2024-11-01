@@ -4,7 +4,7 @@ using namespace event_manager;
 
 namespace gameui {
 
-FramedButton::FramedButton(const String &label, Action *action,
+FramedButton::FramedButton(const std::string &label, Action *action,
 			   const FramePicture *btnPicture, const FramePicture *focusedPicture,
                IosFont *fontActive, IosFont *fontInactive, IosSurface *image)
   : Frame(btnPicture), m_button(label, fontActive, fontInactive)
@@ -28,7 +28,7 @@ FramedButton::FramedButton(const String &label, Action *action,
   setPreferedSize(preferedSize);
 }
 
-void FramedButton::setValue(String value)
+void FramedButton::setValue(const std::string & value)
 {
   m_button.setValue(value);
 }

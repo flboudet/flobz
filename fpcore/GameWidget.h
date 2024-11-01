@@ -140,8 +140,8 @@ public:
     virtual StoryWidget *getOpponent() = 0;
     //
     // TODO: Make this N-players generic (N from 1 to +inf)
-    virtual void setPlayerOneName(String newName) = 0;
-    virtual void setPlayerTwoName(String newName) = 0;
+    virtual void setPlayerOneName(const std::string & newName) = 0;
+    virtual void setPlayerTwoName(const std::string & newName) = 0;
     virtual void setVictories(int left, int right) {};
     virtual PlayerGameStat &getStatPlayerOne() = 0;
     virtual PlayerGameStat &getStatPlayerTwo()  = 0;
@@ -188,9 +188,9 @@ public:
     void setVictories(int left, int right);
     bool isGameARunning() const { return attachedGameA->isGameRunning(); }
     bool isGameBRunning() const { return attachedGameB->isGameRunning(); }
-    void setPlayerOneName(String newName);
-    void setPlayerTwoName(String newName);
-    String getPlayerOneName() const { return playerOneName; }
+    void setPlayerOneName(const std::string & newName);
+    void setPlayerTwoName(const std::string & newName);
+    const std::string &getPlayerOneName() const { return playerOneName; }
     PlayerGameStat &getStatPlayerOne() { return attachedGameA->getGameStat(); }
     PlayerGameStat &getStatPlayerTwo() { return attachedGameB->getGameStat(); }
     void setStatPlayerOne(PlayerGameStat &gameStat) { attachedGameA->setGameStat(gameStat); }
@@ -236,7 +236,7 @@ protected:
     int gameSpeed; // from 0 (MinSpeed) to 20 (MaxSpeed)
     int MinSpeed,MaxSpeed; // in units of 20ms
     int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
-    String playerOneName, playerTwoName;
+    std::string playerOneName, playerTwoName;
     std::vector<gameui::Widget *> m_subwidgets;
     bool skipGameCycleA, skipGameCycleB;
     double gameOverDate;

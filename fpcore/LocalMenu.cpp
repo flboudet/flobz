@@ -35,7 +35,7 @@ class NoNameAction : public Action {
 
 
     virtual void action() {
-            String s = field.getValue();
+            std::string s = field.getValue();
             if (s == "") {
                 s = locale.getLocalizedString("NoName");
                 field.setValue(s);
@@ -79,10 +79,9 @@ SoloGameMenu::SoloGameMenu(MainScreen *mainScreen)
     add(&m_buttonsBox);
 }
 
-String SoloGameMenu::getPlayerName(int playerNumber) const
+std::string SoloGameMenu::getPlayerName(int playerNumber) const
 {
-    String playerName = m_editPlayerName->getEditField().getValue();
-    return playerName;
+    return m_editPlayerName->getEditField().getValue();
 }
 
 LocalGameMenu::LocalGameMenu(MainScreen *mainScreen)
@@ -122,10 +121,9 @@ void LocalGameMenu::build() {
     add(&buttonsBox);
 }
 
-String LocalGameMenu::getPlayerName(int playerNumber) const
+std::string LocalGameMenu::getPlayerName(int playerNumber) const
 {
-  String playerName = editPlayerName.getEditField().getValue();
-  return playerName;
+  return editPlayerName.getEditField().getValue();
 }
 
 Local2PlayersGameMenu::Local2PlayersGameMenu(MainScreen *mainScreen)
@@ -169,17 +167,15 @@ void Local2PlayersGameMenu::build()
     add(&buttonsBox);
 }
 
-String Local2PlayersGameMenu::getPlayerName(int playerNumber) const
+std::string Local2PlayersGameMenu::getPlayerName(int playerNumber) const
 {
   switch (playerNumber) {
   case 0:  {
-    String player0Name = editPlayer1Name.getEditField().getValue();
-    return player0Name;
+    return editPlayer1Name.getEditField().getValue();
   }
   case 1:
   default: {
-    String player1Name = editPlayer2Name.getEditField().getValue();
-    return player1Name;
+    return editPlayer2Name.getEditField().getValue();
   }
   }
 }

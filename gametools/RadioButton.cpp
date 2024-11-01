@@ -8,7 +8,7 @@ namespace gameui {
     // RadioButton
     //
 
-    RadioButton::RadioButton(int defaultValue, IosSurface *trueSurface, IosSurface *falseSurface, String prefKey, PreferencesManager *prefMgr)
+    RadioButton::RadioButton(int defaultValue, IosSurface *trueSurface, IosSurface *falseSurface, const std::string & prefKey, PreferencesManager *prefMgr)
     : m_prefMgr(prefMgr), imageTrue(trueSurface), imageFalse(falseSurface),
     key(prefKey), persistant(true)
     {
@@ -17,11 +17,11 @@ namespace gameui {
             char tmp[2+sizeof(void *)*2+1];
             snprintf(tmp,sizeof(tmp),"%p",this);
 	    tmp[sizeof(tmp)-1] = 0;
-            notifKey = String("UI.radio.") + tmp;
+            notifKey = std::string("UI.radio.") + tmp;
             stateValue = defaultValue;
             persistant = false;
         } else {
-            stateValue = prefMgr->getIntPreference(key, defaultValue);
+            stateValue = prefMgr->getIntPreference(key.c_str(), defaultValue);
             persistant = true;
             notifKey = key;
         }
@@ -41,10 +41,10 @@ namespace gameui {
         VBox::draw(screen);
     };
     */
-    void RadioButton::addButton(String _label)
+    void RadioButton::addButton(const std::string &_label)
     {
         bool value = (stateValue == (int)buttons.size()+1);
-        SwitchedButton * newButton = new SwitchedButton(_label, value, imageTrue, imageFalse, String(""), m_prefMgr, this);
+        SwitchedButton * newButton = new SwitchedButton(_label, value, imageTrue, imageFalse, "", m_prefMgr, this);
         HBox * mySpacer = new HBox();
         HBox * myContainer = new HBox();
         buttons.push_back(newButton);
@@ -82,12 +82,12 @@ namespace gameui {
          gameui::GlobalNotificationCenter.notify(notifKey, &_value);
     }
 
-    void RadioButton::notificationOccured(String identifier, void * context)
+    void RadioButton::notificationOccured(const std::string & identifier, void * context)
     {
         if (!(identifier == notifKey))
         {
-            fprintf(stderr, "Something weird has occured, RadioButton registered for notification '%s',\n",(const char *)notifKey);
-            fprintf(stderr, "but received one for '%s'... ignoring...\n",(const char *)identifier);
+            fprintf(stderr, "Something weird has occured, RadioButton registered for notification '%s',\n", notifKey.c_str());
+            fprintf(stderr, "but received one for '%s'... ignoring...\n", identifier.c_str());
             return;
         }
 
@@ -97,9 +97,9 @@ namespace gameui {
                 buttons[i-1]->setState(stateValue==i);
             }
         } else {
-            fprintf(stderr, "RadioButton received out of bound notification '%s' item %d for size %d,\n",(const char *)notifKey, stateValue, (int)buttons.size());
+            fprintf(stderr, "RadioButton received out of bound notification '%s' item %d for size %d,\n",notifKey.c_str(), stateValue, (int)buttons.size());
         }
-        if (persistant) m_prefMgr->setIntPreference((const char*)key, (int)stateValue);
+        if (persistant) m_prefMgr->setIntPreference(key.c_str(), (int)stateValue);
     }
 
     int RadioButton::getState()

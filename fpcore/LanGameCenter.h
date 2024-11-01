@@ -32,21 +32,21 @@
 
 class LanGameCenter : public NetGameCenter, public MessageListener, public SessionListener, NetGameCenterListener {
 public:
-    LanGameCenter(int portNum, const String name);
+    LanGameCenter(int portNum, const std::string & name);
     virtual ~LanGameCenter();
-    void sendMessage(const String msgText);
+    void sendMessage(const std::string & msgText);
     void idle();
     void setStatus(int status);
     void onMessage(Message &msg);
     void onPeerConnect(const PeerAddress &address) {}
     void onPeerDisconnect(const PeerAddress &address);
-    String getSelfName();
-    String getOpponentName();
+    const std::string & getSelfName();
+    const std::string & getOpponentName();
 // NetGameCenterListener implementation
-    virtual void onChatMessage(const String &msgAuthor, const String &msg) {}
-    virtual void onPlayerConnect(String playerName, PeerAddress playerAddress);
-    virtual void onPlayerDisconnect(String playerName, PeerAddress playerAddress) {}
-    virtual void onPlayerUpdated(String playerName, PeerAddress playerAddress) {}
+    virtual void onChatMessage(const std::string &msgAuthor, const std::string &msg) {}
+    virtual void onPlayerConnect(const std::string & playerName, PeerAddress playerAddress);
+    virtual void onPlayerDisconnect(const std::string & playerName, PeerAddress playerAddress) {}
+    virtual void onPlayerUpdated(const std::string & playerName, PeerAddress playerAddress) {}
     virtual void onGameInvitationReceived(FloboGameInvitation &invitation) {}
     virtual void onGameInvitationCanceledReceived(FloboGameInvitation &invitation) {}
     virtual void onGameGrantedWithMessagebox(MessageBox *mbox, FloboGameInvitation &invitation) {}
@@ -60,14 +60,14 @@ private:
     void grantGame(FloboGameInvitation &invitation);
     DatagramSocket socket;
     FPLANMessageBox mbox;
-    const String name;
+    std::string name;
     int m_uuid;
     double timeMsBetweenTwoAliveMessages, lastAliveMessage;
     double timeMsBetweenTwoNetworkInterfacesDetection, lastNetworkInterfacesDetection;
     bool gameGranted;
     FloboGameInvitation grantedInvitation;
     int status;
-    String opponentName;
+    std::string opponentName;
 
     SocketAddress multicastAddress, loopbackAddress;
     NetworkInterfaceRequester requester;

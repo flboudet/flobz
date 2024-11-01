@@ -257,11 +257,11 @@ StoryWidget *SoloGameWidget::getOpponent()
 {
     return NULL;
 }
-void SoloGameWidget::setPlayerOneName(String newName)
+void SoloGameWidget::setPlayerOneName(const std::string & newName)
 {
     m_playerName = newName;
 }
-void SoloGameWidget::setPlayerTwoName(String newName)
+void SoloGameWidget::setPlayerTwoName(const std::string & newName)
 {}
 PlayerGameStat &SoloGameWidget::getStatPlayerOne()
 {

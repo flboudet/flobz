@@ -8,8 +8,8 @@ namespace gameui {
     // SwitchedButton
     //
 
-    SwitchedButton::SwitchedButton(String label, bool defaultValue,
-                                   IosSurface *trueSurface, IosSurface *falseSurface, String prefKey,
+    SwitchedButton::SwitchedButton(const std::string & label, bool defaultValue,
+                                   IosSurface *trueSurface, IosSurface *falseSurface, const std::string & prefKey,
                                    PreferencesManager *prefMgr,
                                    Action * altResponder)
     : m_prefMgr(prefMgr), stateImage(), imageTrue(trueSurface), imageFalse(falseSurface),
@@ -21,11 +21,11 @@ namespace gameui {
             char tmp[2+sizeof(void *)*2+1];
             snprintf(tmp,sizeof(tmp),"%p",this);
 	    tmp[sizeof(tmp)-1] = 0;
-            notifKey = String("UI.button.") + tmp;
+            notifKey = std::string("UI.button.") + tmp;
             stateValue = defaultValue;
             persistant = false;
         } else {
-            stateValue = prefMgr->getBoolPreference(key, defaultValue);
+            stateValue = prefMgr->getBoolPreference(key.c_str(), defaultValue);
             persistant = true;
             notifKey = key;
         }
@@ -72,17 +72,17 @@ namespace gameui {
         }
     }
 
-    void SwitchedButton::notificationOccured(String identifier, void * context)
+    void SwitchedButton::notificationOccured(const std::string & identifier, void * context)
     {
         if (!(identifier == notifKey))
         {
-            fprintf(stderr, "Something weird has occured, SwitchedButton registered for notification '%s',\n",(const char *)notifKey);
-            fprintf(stderr, "but received one for '%s'... ignoring...\n",(const char *)identifier);
+            fprintf(stderr, "Something weird has occured, SwitchedButton registered for notification '%s',\n", notifKey.c_str());
+            fprintf(stderr, "but received one for '%s'... ignoring...\n", identifier.c_str());
             return;
         }
         stateValue = *(bool*)(context);
         stateImage.setImage(stateValue ? imageTrue : imageFalse);
-        if (persistant) m_prefMgr->setBoolPreference((const char*)key, (bool)stateValue);
+        if (persistant) m_prefMgr->setBoolPreference(key.c_str(), (bool)stateValue);
         autoSetPreferedSize();
     }
 

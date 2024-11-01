@@ -99,8 +99,8 @@ public:
     //
     virtual StoryWidget *getOpponent();
     // TODO: Make this N-players generic (N from 1 to +inf)
-    virtual void setPlayerOneName(String newName);
-    virtual void setPlayerTwoName(String newName);
+    virtual void setPlayerOneName(const std::string & newName);
+    virtual void setPlayerTwoName(const std::string & newName);
     virtual PlayerGameStat &getStatPlayerOne();
     virtual PlayerGameStat &getStatPlayerTwo();
     virtual void addGameAHandicap(int handicap);
@@ -139,7 +139,7 @@ class SoloGameWidgetFactory : public GameWidgetFactory {
 public:
     SoloGameWidgetFactory(SoloGameSettings &gameSettings)
         : m_gameSettings(gameSettings) {}
-    GameWidget *createGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, String centerFace, Action *gameOverAction)
+    GameWidget *createGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, const std::string & centerFace, Action *gameOverAction)
     {
         return new SoloGameWidget(m_gameSettings, floboSetTheme, levelTheme, gameOverAction);
     }

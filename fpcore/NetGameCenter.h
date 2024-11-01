@@ -26,6 +26,7 @@
 #ifndef _PUYONETGAMECENTER_H
 #define _PUYONETGAMECENTER_H
 
+#include <string>
 #include "ios_memory.h"
 #include "ios_dirigeable.h"
 #include "ios_messagebox.h"
@@ -38,7 +39,7 @@ public:
     FloboGameInvitation();
 public:
     PeerAddress initiatorAddress;
-    String opponentName;
+    std::string opponentName;
     PeerAddress opponentAddress;
     unsigned long gameRandomSeed;
     int gameSpeed;
@@ -47,10 +48,10 @@ public:
 
 class NetGameCenterListener {
 public:
-    virtual void onChatMessage(const String &msgAuthor, const String &msg) = 0;
-    virtual void onPlayerConnect(String playerName, PeerAddress playerAddress) = 0;
-    virtual void onPlayerDisconnect(String playerName, PeerAddress playerAddress) = 0;
-    virtual void onPlayerUpdated(String playerName, PeerAddress playerAddress) = 0;
+    virtual void onChatMessage(const std::string &msgAuthor, const std::string &msg) = 0;
+    virtual void onPlayerConnect(const std::string & playerName, PeerAddress playerAddress) = 0;
+    virtual void onPlayerDisconnect(const std::string & playerName, PeerAddress playerAddress) = 0;
+    virtual void onPlayerUpdated(const std::string & playerName, PeerAddress playerAddress) = 0;
     virtual void onGameInvitationReceived(FloboGameInvitation &invitation) = 0;
     virtual void onGameInvitationCanceledReceived(FloboGameInvitation &invitation) = 0;
     virtual void onGameAcceptedNegociationPending(FloboGameInvitation &invitation) {}
@@ -73,7 +74,7 @@ class NetGameCenter {
 public:
     NetGameCenter() : pendingGameTimeout(30000.) {}
     virtual ~NetGameCenter() {}
-    virtual void sendMessage(const String msgText) = 0;
+    virtual void sendMessage(const std::string &msgText) = 0;
     // Request a new game
     void requestGame(FloboGameInvitation &invitation);
     // Accept a game invitation
@@ -81,19 +82,19 @@ public:
     // Cancel a game invitation
     void cancelGameInvitation(FloboGameInvitation &invitation);
     virtual void idle();
-    String getPeerNameAtIndex(int i) const;
+    const std::string & getPeerNameAtIndex(int i) const;
     PeerAddress getPeerAddressAtIndex(int i) const;
-    PeerAddress getPeerAddressForPeerName(String peerName) const;
+    PeerAddress getPeerAddressForPeerName(const std::string & peerName) const;
     PeerInfo getPeerInfoForAddress(PeerAddress &addr) const;
     int getPeerStatusForAddress(PeerAddress &addr) const;
     int getPeerCount() const;
     void addListener(NetGameCenterListener *r) { listeners.add(r); }
     void removeListener(NetGameCenterListener *r) { listeners.remove(r); }
-    void connectPeer(PeerAddress addr, const String name, int status = PEER_NORMAL, int rank = -1, bool self = false);
-    void disconnectPeer(PeerAddress addr, const String name);
+    void connectPeer(PeerAddress addr, const std::string & name, int status = PEER_NORMAL, int rank = -1, bool self = false);
+    void disconnectPeer(PeerAddress addr, const std::string & name);
     virtual void setStatus(int status) {}
-    virtual String getSelfName() { return "Myself"; }
-    virtual String getOpponentName() { return "Opponent"; }
+    virtual const std::string & getSelfName() { return "Myself"; }
+    virtual const std::string & getOpponentName() { return "Opponent"; }
     // Get the undelying message box (default: NULL)
     virtual MessageBox *getMessageBox() { return NULL; }
     // Optional server managing the game center.
@@ -107,7 +108,7 @@ protected:
     GamerPeer *getPeerForAddress(PeerAddress addr);
     // Should be called by implementations when an invitation is received
     void receivedGameInvitation(FloboGameInvitation &invitation);
-    void receivedGameCanceledWithPeer(String playerName, PeerAddress addr);
+    void receivedGameCanceledWithPeer(const std::string & playerName, PeerAddress addr);
     // Implement the sending of the game request
     virtual void sendGameRequest(FloboGameInvitation &invitation) = 0;
     // Implement the sending of the acceptation of a game

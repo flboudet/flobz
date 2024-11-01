@@ -11,13 +11,13 @@ static const char * kSoundVolume = "AudioManager.FX.Volume";
 static const char * kMusic       = "AudioManager.Music.State";
 static const char * kSound       = "AudioManager.FX.State";
 
-void Jukebox::registerTrack(const char *trackName, const char *fileName, int position)
+void Jukebox::registerTrack(const std::string &trackName, const std::string &fileName, int position)
 {
     GTLogTrace("Registering track %s, file %s, position %d", trackName, fileName, position);
     m_regTracks[trackName] = JukeboxTrack(fileName, position);
 }
 
-void Jukebox::playTrack(const char *name)
+void Jukebox::playTrack(const std::string &name)
 {
     if (m_playingMusicName == name)
         return;
@@ -48,10 +48,10 @@ void Jukebox::playTrack()
 AudioHelper::AudioHelper()
 {
     // Listen to notifications
-    GlobalNotificationCenter.addListener(String(kMusicVolume), this);
-    GlobalNotificationCenter.addListener(String(kSoundVolume), this);
-    GlobalNotificationCenter.addListener(String(kMusic), this);
-    GlobalNotificationCenter.addListener(String(kSound), this);
+    GlobalNotificationCenter.addListener((kMusicVolume), this);
+    GlobalNotificationCenter.addListener((kSoundVolume), this);
+    GlobalNotificationCenter.addListener((kMusic), this);
+    GlobalNotificationCenter.addListener((kSound), this);
     // Initialize preferences
     m_audioManager = GameUIDefaults::GAME_LOOP->getAudioManager();
     m_music_on = theCommander->getPreferencesManager()->getBoolPreference(kMusic,true);
@@ -66,13 +66,13 @@ AudioHelper::AudioHelper()
 
 AudioHelper::~AudioHelper()
 {
-    GlobalNotificationCenter.removeListener(String(kMusicVolume), this);
-    GlobalNotificationCenter.removeListener(String(kSoundVolume), this);
-    GlobalNotificationCenter.removeListener(String(kMusic), this);
-    GlobalNotificationCenter.removeListener(String(kSound), this);
+    GlobalNotificationCenter.removeListener((kMusicVolume), this);
+    GlobalNotificationCenter.removeListener((kSoundVolume), this);
+    GlobalNotificationCenter.removeListener((kMusic), this);
+    GlobalNotificationCenter.removeListener((kSound), this);
 }
 
-void AudioHelper::playSound(const char *fileName, float volume, float balance)
+void AudioHelper::playSound(const std::string &fileName, float volume, float balance)
 {
     double currentTime = ios_fc::getTimeMs();
     std::map<std::string, double>::iterator iter =
