@@ -91,8 +91,7 @@ FPDataPathManager::FPDataPathManager(const std::string &coreDataPath)
     std::vector<std::string> dataFiles = m_coreDataPath.listFiles();
     std::vector<std::string> wellFormattedNames;
     AdvancedBuffer<int> wellFormattedNumbers;
-    for (int i = 0 ; i < static_cast<int>(dataFiles.size()) ; i++) {
-        std::string currentFile = dataFiles[i];
+    for (auto const &currentFile : dataFiles) {
         int len = currentFile.length();
         if ((len > 3) && (currentFile[len - 4] == '.')
                 && isnum(currentFile[len - 3])
@@ -101,7 +100,6 @@ FPDataPathManager::FPDataPathManager(const std::string &coreDataPath)
             wellFormattedNames.push_back(currentFile);
             wellFormattedNumbers.add(atoi(currentFile.substr(currentFile.length() - 3).c_str()));
         }
-
     }
     // Now let's sort the names found
     while (wellFormattedNames.size() > 0) {
@@ -124,16 +122,17 @@ FPDataPathManager::FPDataPathManager(const std::string &coreDataPath)
 void FPDataPathManager::registerDataPackages(CompositeDrawContext *cDC, Jukebox *jukebox)
 {
     // Now iterate through the datapaths to build PackageDescription
-    for (int i = 0 ; i < static_cast<int>(m_dataPaths.size()) ; i++) {
-        FPDataPackage currentPackage(this, m_dataPaths[i]->getPathString(), i);
+    int packageIndex = 0;
+    for (auto const &path : m_dataPaths) {
+        FPDataPackage currentPackage(this, path->getPathString(), packageIndex++);
         PackageDescription packDesc(*this, currentPackage, cDC, jukebox);
     }
 }
 
 bool FPDataPathManager::hasFile(const std::string & shortPath) const
 {
-    for (int i = 0 ; i < static_cast<int>(m_dataPaths.size()) ; i++) {
-        FilePath testPath(m_dataPaths[i]->combine(shortPath));
+    for (auto const &path : m_dataPaths) {
+        FilePath testPath(path->combine(shortPath));
         if (testPath.exists())
             return true;
     }
@@ -142,8 +141,8 @@ bool FPDataPathManager::hasFile(const std::string & shortPath) const
 
 std::string FPDataPathManager::getPath(const std::string &shortPath) const
 {
-    for (int i = 0 ; i < static_cast<int>(m_dataPaths.size()) ; i++) {
-        FilePath testPath(m_dataPaths[i]->combine(shortPath));
+    for (auto const &path : m_dataPaths) {
+        FilePath testPath(path->combine(shortPath));
         if (testPath.exists())
             return testPath.getPathString();
     }
@@ -165,13 +164,12 @@ std::vector<std::string> FPDataPathManager::getEntriesAtPath(const std::string &
     std::vector<std::string> result;
     if (hasFile(shortPath)) {
         FilePath rshortPath(shortPath);
-        for (int i = 0 ; i < static_cast<int>(m_dataPaths.size()) ; i++) {
-            FilePath testPath(m_dataPaths[i]->combine(shortPath));
+        for (auto const &path : m_dataPaths) {
+            FilePath testPath(path->combine(shortPath));
             if (testPath.exists()) {
                 std::vector<std::string> existingFilesInPack = testPath.listFiles();
-                for (int j = 0 ; j < static_cast<int>(existingFilesInPack.size()) ; j++)
-                {
-                    result.push_back(rshortPath.combine(existingFilesInPack[j]));
+                for (auto const &fileName : existingFilesInPack) {
+                    result.push_back(rshortPath.combine(fileName));
                 }
             }
         }
@@ -181,11 +179,13 @@ std::vector<std::string> FPDataPathManager::getEntriesAtPath(const std::string &
 
 void FPDataPathManager::setMaxPackNumber(int maxPackNumber)
 {
-    for (int i = static_cast<int>(m_dataPaths.size()) - 1 ; i >= 0 ; i--) {
-        const std::string &currentFile = m_dataPaths[i]->getPathString();
+    for (auto it = m_dataPaths.begin(); it != m_dataPaths.end(); ) {
+        const std::string &currentFile = (*it)->getPathString();
         int currentNumber = atoi(currentFile.substr(currentFile.length() - 3).c_str());
         if (currentNumber > maxPackNumber)
-            m_dataPaths.erase(m_dataPaths.begin() + i);
+            it = m_dataPaths.erase(it);
+        else
+            ++it;
     }
 }
 
