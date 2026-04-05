@@ -130,9 +130,9 @@ GameControlEvent *SDL_GameControlEvent::clone()
     return new SDL_GameControlEvent(*this);
 }
 
-ios_fc::String SDL13_EventManager::getControlName(int controlType, bool alternate)
+std::string SDL13_EventManager::getControlName(int controlType, bool alternate)
 {
-    ios_fc::String controlName("           ");
+    std::string controlName("           ");
     if (alternate) {
         if (keyAlternateControls[controlType])
             controlName = keyAlternateControls[controlType]->name();

@@ -46,7 +46,7 @@ void UnixSocketImpl::connect(const String hostName, int portID)
 {
     struct hostent *hp;
     /* go find out about the desired host machine */
-    if ((hp = gethostbyname2(hostName, AF_INET)) == 0) {
+    if ((hp = gethostbyname2(hostName.c_str(), AF_INET)) == 0) {
         //if ((hp = gethostbyaddr(hostName, 32, 0)) == 0)
         throw std::runtime_error("IosSocket: gethostbyname error");
     }

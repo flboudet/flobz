@@ -16,7 +16,7 @@ private:
     class GamePeer;
     
     GamePeer * getPeer(ios_fc::PeerAddress &addr) const;
-    void connectPeer(ios_fc::PeerAddress addr, int fpipVersion, const ios_fc::String name, int status);
+    void connectPeer(ios_fc::PeerAddress addr, int fpipVersion, const std::string name, int status);
     void updatePeer(GamePeer *peer, int status);
 
     ios_fc::MessageBox &mbox;
@@ -27,9 +27,9 @@ private:
 
 class PuyoServerV1::GamePeer {
 public:
-    GamePeer(ios_fc::PeerAddress addr, const ios_fc::String name) : addr(addr), name(name), status(0) {}
+    GamePeer(ios_fc::PeerAddress addr, const std::string name) : addr(addr), name(name), status(0) {}
     ios_fc::PeerAddress addr;
-    const ios_fc::String name;
+    const std::string name;
     double lastUpdate;
     int status;
 };

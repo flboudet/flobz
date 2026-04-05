@@ -8,7 +8,6 @@
  * - VoidBuffer:        simulate a (void*) pointer. provide garbage collection!
  * - Buffer<T>:         simulate a (T*) buffer using VoidBuffer.
  * - AdvancedBuffer<T>: a vector implemented as a Buffer<T>.
- * - String             a string.
  *
  * This file is part of the iOS Foundation Classes project.
  *
@@ -35,6 +34,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
+#include <string>
 
 #include "ios_exception.h"
 
@@ -46,6 +46,15 @@
 //
 
 namespace ios_fc {
+
+    // String is now an alias for std::string for backward compatibility
+    typedef std::string String;
+
+    // Helper function to mimic old String::substring(start, end) behavior
+    inline String substring(const std::string &str, size_t start, size_t end = std::string::npos) {
+        if (end == std::string::npos) end = str.length();
+        return str.substr(start, end - start);
+    }
 
     /**
      * Overide memory management methods to allow easy debugging.
@@ -478,141 +487,6 @@ namespace ios_fc {
             AdvancedBuffer<T> buffer;
     };
 
-    class String {
-        public:
-            String() : buffer(1) { buffer[0]=0; }
-            String(const char *str) : buffer(str, strlen(str)+1) {}
-            String(const String &s) : buffer(s.buffer.dup())    {}
-
-            String &operator=(const String &s) {
-                buffer = s.buffer;
-                return *this;
-            }
-            ~String() {}
-
-            String operator+(const String &s) const {
-                String ret = this->dup();
-                // buffer.size() + s.buffer.size() - 1);
-                // strcpy(ret.buffer, buffer);
-                // strcat(ret.buffer, s.buffer);
-                ret += s;
-                return ret;
-            }
-
-            String dup() const {
-                return String (buffer.dup());
-            }
-
-            // WARNING USE ONLY FOR PRIMITIVE TYPE (int, float, ...)
-            template<typename T>
-            String concat(const char *format, const T t) const {
-                static char txt[64];
-                sprintf(txt, format, t);
-                String ret(txt);
-                return *this + ret;
-            }
-
-            String operator+(int i)    const { return concat<int>("%d", i); }
-            String operator+(float f)  const { return concat<float>("%f", f); }
-            String operator+(double d) const { return concat<double>("%f", d); }
-            String operator+(unsigned long i) const { return concat<int>("%u", i); }
-            String operator+(unsigned int  i) const { return concat<int>("%u", i); }
-
-            bool operator==(const char *s) const {
-                return !strcmp(buffer, s);
-            }
-
-            bool operator==(const String &s) const {
-                return !strcmp(buffer, s.buffer);
-            }
-
-            bool operator!=(const String &s) const {
-              return strcmp(buffer, s.buffer);
-            }
-
-            bool operator!=(const char *s) const {
-              return strcmp(buffer, s);
-            }
-
-            const String& operator+=(const String &s) {
-                buffer.grow(s.size()+1);
-                strcat(buffer, s.buffer);
-                return *this;
-            }
-
-            template<typename T>
-            void append(const char *format, const T t) {
-                char txt[128];
-                sprintf(txt, format, t);
-                buffer.grow(strlen(txt));
-                strcat(buffer, txt);
-            }
-
-            const String& operator+=(char c)   { append<char>   ("%c",c); return *this; }
-            const String& operator+=(int i)    { append<int>   ("%d", i); return *this; }
-            const String& operator+=(float f)  { append<float> ("%f", f); return *this; }
-            const String& operator+=(double d) { append<double>("%d", d); return *this; }
-
-            void add(char c)      {
-                if (c == '\0') fprintf(stderr, "WARNING: YOU'RE NOT ALLOWED TO ADD \\0 INTO A STRING!");
-                int size = this->size();
-                buffer[size] = c;
-                buffer.grow(1);
-                buffer[size+1] = 0;
-            }
-            void removeLastChar() { buffer[size()-1]=0; buffer.reduce(1); }
-
-            /*int   size() const { return buffer.size() - 1; }
-            int length() const { return buffer.size() - 1; }*/
-            int   size() const { return strlen(buffer); }
-            int length() const { return strlen(buffer); }
-
-            const String substring(int i) const {
-                String ret;
-                ret.buffer = this->buffer + i;
-                return ret;
-            }
-
-            String substring(int first, int last) const {
-#ifdef DEBUG
-                if (last < first) fprintf(stderr, "BAD SUBSTRING. %d >= %d\n", first, last);
-                if (last > size()) fprintf(stderr, "BAD SUBSTRING %d > size(%d)\n", last, size());
-#endif
-                String ret = substring(first).dup();
-                ret.buffer.realloc(last-first+1);
-                ret.buffer[ret.buffer.size() - 1] = 0;
-                return ret;
-            }
-
-            const char *c_str() const     { return (const char*)buffer; }
-            operator const char *() const { return (const char*)buffer; }
-            char  operator[] (int i) const { return buffer[i]; }
-            char &operator[] (int i)       { return buffer[i]; }
-
-            inline int getOffset() const { return buffer.getOffset(); }
-
-/*            inline AdvancedBuffer<String*> tokenize(char delim)
-            {
-              Vector<String> vector;
-              int prev = 0;
-              int _size = size();
-              int i = 0;
-              for (; i<_size; ++i)
-                if (buffer[i] == delim) {
-                  vector.add(new String(substring(prev, i)));
-                  prev = i + 1;
-                }
-              vector.add = new String(substring(prev, i));
-              return vector;
-            }*/
-
-        protected:
-            Buffer<char> buffer;
-
-        private:
-            String(int size) : buffer(size) {}
-            String(Buffer<char> buf) : buffer(buf) {}
-    };
 }
 
 #include "ios_exception.h"

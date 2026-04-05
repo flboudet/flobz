@@ -31,19 +31,19 @@ namespace ios_fc {
   void StandardMessage::addInt(const String &key, int value)
   {
     BaseMessage::addInt(key,value);
-    serialized.add(new String(key + ":" + _INTEGER + ":" + value));
+    serialized.add(new String(key + ":" + _INTEGER + ":" + std::to_string(value)));
   }
 
   void StandardMessage::addBool(const String &key, bool value)
   {
     BaseMessage::addBool(key,value);
-    serialized.add(new String(key + ":" + _BOOLEAN + ":" + value));
+    serialized.add(new String(key + ":" + _BOOLEAN + ":" + (value ? "1" : "0")));
   }
 
   void StandardMessage::addFloat(const String &key, double value)
   {
     BaseMessage::addFloat(key,value);
-    serialized.add(new String(key + ":" + _FLOAT + ":" + value));
+    serialized.add(new String(key + ":" + _FLOAT + ":" + std::to_string(value)));
   }
 
   void StandardMessage::addString(const String &key, const String &value)
@@ -55,9 +55,9 @@ namespace ios_fc {
   void StandardMessage::addIntArray(const String &key, const Buffer<int> &value)
   {
     BaseMessage::addIntArray(key,value);
-    String *s = new String(key + ":" + _INT_ARRAY + ":" + value.size());
+    String *s = new String(key + ":" + _INT_ARRAY + ":" + std::to_string(value.size()));
     for (int i=0;i<value.size();++i) {
-      s->operator+=(String(",") + value[i]);
+      s->operator+=(String(",") + std::to_string(value[i]));
     }
     serialized.add(s);
   }
@@ -65,7 +65,7 @@ namespace ios_fc {
   void StandardMessage::addCharArray(const String &key, const Buffer<char> &value)
   {
     BaseMessage::addCharArray(key,value);
-    String *s = new String(key + ":" + _CHAR_ARRAY + ":" + value.size() + ",");
+    String *s = new String(key + ":" + _CHAR_ARRAY + ":" + std::to_string(value.size()) + ",");
     for (int i=0;i<value.size();++i)
     {
       static const char *hex16[16] =
@@ -79,13 +79,13 @@ namespace ios_fc {
   void StandardMessage::addIntProperty   (const String &key, int value)
   {
     BaseMessage::addIntProperty(key,value);
-    serialized.add(new String(key + ":" + _PARAM_INTEGER + ":" + value));
+    serialized.add(new String(key + ":" + _PARAM_INTEGER + ":" + std::to_string(value)));
   }
 
   void StandardMessage::addBoolProperty  (const String &key, bool value)
   {
     BaseMessage::addBoolProperty(key,value);
-    serialized.add(new String(key + ":" + _PARAM_BOOLEAN + ":" + value));
+    serialized.add(new String(key + ":" + _PARAM_BOOLEAN + ":" + (value ? "1" : "0")));
   }
 
   VoidBuffer StandardMessage::serialize()
@@ -95,7 +95,7 @@ namespace ios_fc {
     {
       out += *serialized[i] + "\n";
     }
-    return VoidBuffer((const char*)out, out.length());
+    return VoidBuffer(out.c_str(), out.length());
   }
 
   StandardMessage::StandardMessage(const Buffer<char> raw)
@@ -104,7 +104,7 @@ namespace ios_fc {
     Buffer<char> tmp_buf = raw.dup();
     tmp_buf.grow(1);
     tmp_buf[raw.size()] = 0;
-    String sraw((const char *)tmp_buf);
+    String sraw(tmp_buf.ptr());
     int    start = 0;
     int    end   = 0;
 
@@ -114,7 +114,7 @@ namespace ios_fc {
       while (sraw[end] && (sraw[end] != '\n'))
         end ++;
 
-      String line = sraw.substring(start, end);
+      String line = ios_fc::substring(sraw, start, end);
 
       if (line.length() <= 1) { checkMessage(); return; }
 
@@ -128,31 +128,31 @@ namespace ios_fc {
       while (line[ival] && (line[ival] != ':')) { ival++; }
       if (!line[ival]) { checkMessage(); return; }
 
-      String key   = line.substring(0,itype);
-      String type  = line.substring(itype+1, ival);
-      String value = line.substring(ival+1, line.length());
+      String key   = ios_fc::substring(line, 0, itype);
+      String type  = ios_fc::substring(line, itype+1, ival);
+      String value = ios_fc::substring(line, ival+1, line.length());
 
       if (type == _INTEGER)
-          addInt(key, atoi(value));
-      else if (type == _BOOLEAN) addBool(key, atoi(value));
-      else if (type == _FLOAT) addFloat(key, (double)atof(value));
+          addInt(key, atoi(value.c_str()));
+      else if (type == _BOOLEAN) addBool(key, atoi(value.c_str()));
+      else if (type == _FLOAT) addFloat(key, (double)atof(value.c_str()));
       else if (type == _STRING)  addString(key, value);
-      else if (type == _PARAM_INTEGER) addIntProperty(key, atoi(value));
-      else if (type == _PARAM_BOOLEAN) addBoolProperty(key, atoi(value));
+      else if (type == _PARAM_INTEGER) addIntProperty(key, atoi(value.c_str()));
+      else if (type == _PARAM_BOOLEAN) addBoolProperty(key, atoi(value.c_str()));
       else if (type == _INT_ARRAY) {
-        Buffer<int> buffer(atoi(value));
+        Buffer<int> buffer(atoi(value.c_str()));
         int index = 0;
         for (int i=0; i<buffer.size(); ++i) {
           while(value[index] && (value[index] != ',')) index++;
           if (value[index] == 0)
             throw InvalidMessageException();
           index++;
-          buffer[i] = atoi(value.substring(index));
+          buffer[i] = atoi(ios_fc::substring(value, index).c_str());
         }
         addIntArray(key, buffer);
       }
       else if (type == _CHAR_ARRAY) {
-        Buffer<char> buffer(atoi(value));
+        Buffer<char> buffer(atoi(value.c_str()));
         int index = 0;
         while(value[index] && (value[index] != ',')) index++;
         if (value[index] == 0)

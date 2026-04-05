@@ -76,7 +76,7 @@ Accept-Language: en\r\n\
 HttpDocument::HttpDocument(String hostName,  String path, int portNum)
     : httpSocket(hostName, portNum), httpInputStream(httpSocket.getInputStream()), msgSize(-1)
 {
-    String request = rqPart[0] + path + rqPart[1] + hostName + rqPart[2] + portNum + rqPart[3];
+    String request = rqPart[0] + path + rqPart[1] + hostName + rqPart[2] + std::to_string(portNum) + rqPart[3];
     //printf("request:%s\n", (const char *)request);
     httpSocket.getOutputStream()->streamWrite(VoidBuffer(request, strlen(request)));
     String currentLine;

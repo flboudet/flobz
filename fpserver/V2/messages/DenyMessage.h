@@ -11,7 +11,7 @@ class DenyMessage
 private:
     ios_fc::Message *msg;
 public:
-    DenyMessage(ios_fc::MessageBox &mbox, const ios_fc::String &errorString, const ios_fc::String &errorStringMore) {
+    DenyMessage(ios_fc::MessageBox &mbox, const std::string &errorString, const std::string &errorStringMore) {
         msg = mbox.createMessage();
         msg->addBoolProperty("RELIABLE", true);
         msg->addInt("CMD", FLOBO_IGP_DENY);

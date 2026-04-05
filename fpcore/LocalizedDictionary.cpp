@@ -60,7 +60,7 @@ static bool readLine(DataInputStream *dictionaryFile, String &lineRead)
 
     // Converting the escape sequences
     if (result) {
-        const char *text = newLineRead;
+        const char *text = newLineRead.c_str();
         lineRead = "";
         char previousChar = text[0];
         for (unsigned int i = 0 ; i < strlen(text) ; i++) {
@@ -297,7 +297,7 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
               while (fileOk) {
                   fileOk = readLine(dictionaryStream, valueString);
                   if (fileOk) {
-                      std::string key((const char *)keyString);
+                      std::string key(keyString.c_str());
                       (*myDictEntry)[key] = valueString;
                       do {
                           fileOk = readLine(dictionaryStream, keyString);

@@ -29,7 +29,7 @@ UnixSocketAddressImpl::UnixSocketAddressImpl(String hostName)
     struct hostent *ht;
     
     /* go find out about the desired host machine */
-    if ((ht = gethostbyname(hostName)) == 0) {
+    if ((ht = gethostbyname(hostName.c_str())) == 0) {
         throw std::runtime_error("IosSocketAddress: gethostbyname error");
     }
     address = ntohl(((struct in_addr *)(ht->h_addr))->s_addr);

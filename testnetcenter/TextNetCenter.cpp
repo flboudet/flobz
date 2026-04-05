@@ -66,19 +66,19 @@ static void finish(int sig)
 
 void decodeMessage(PuyoNetGameCenter &myCenter, String msgBuf)
 {
-    if (msgBuf.substring(0, 6) == "/start") {
-        String against = msgBuf.substring(7);
+    if (ios_fc::substring(msgBuf, 0, 6) == "/start") {
+        String against = ios_fc::substring(msgBuf, 7);
         wprintw(chatArea, "### Asking to start a game against %s\n", (const char *)against);
         wrefresh(chatArea);
         myCenter.requestGameWith(myCenter.getPeerAddressForPeerName(against));
     }
-    else if (msgBuf.substring(0, 7) == "/cancel") {
-        String against = msgBuf.substring(8);
+    else if (ios_fc::substring(msgBuf, 0, 7) == "/cancel") {
+        String against = ios_fc::substring(msgBuf, 8);
         wprintw(chatArea, "### Asking to cancel a game against %s\n", (const char *)against);
         wrefresh(chatArea);
         myCenter.cancelGameWith(myCenter.getPeerAddressForPeerName(against));
     }
-    else if (msgBuf.substring(0, 6) == "/punch") {
+    else if (ios_fc::substring(msgBuf, 0, 6) == "/punch") {
 	PuyoInternetGameCenter &myInternetCenter = dynamic_cast<PuyoInternetGameCenter &>(myCenter);
 	myInternetCenter.punch();
     }

@@ -42,7 +42,7 @@ StatsResources::StatsResources()
 	}
     titleImage = theCommander->getSurface(IMAGE_RGBA, "gfx/stats_title.png");
     for (int numCombo = 0 ; numCombo < MAX_DISPLAYED_COMBOS ; numCombo++) {
-        String pictureName = String("gfx/combo") + (numCombo+1) + "x_stat.png";
+        String pictureName = String("gfx/combo") + std::to_string(numCombo+1) + "x_stat.png";
         comboImage[numCombo] = theCommander->getSurface(IMAGE_RGBA, pictureName.c_str());
     }
     stats_bg_winner = theCommander->getSurface(IMAGE_RGBA, "gfx/stats-bg.png", IMAGE_READ);

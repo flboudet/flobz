@@ -143,8 +143,8 @@ void NatTraversal::onMessage(Message &msg)
             peerLocalAddressString = msg.getString("LSOCKADDR");
             peerPortNum = msg.getInt("PORTNUM");
             peerLocalPortNum = msg.getInt("LPORTNUM");
-            printf("Peer:    %s:%d\n", (const char *)peerAddressString, peerPortNum);
-            printf("Peer(L): %s:%d\n", (const char *)peerLocalAddressString, peerLocalPortNum);
+            printf("Peer:    %s:%d\n", peerAddressString.c_str(), peerPortNum);
+            printf("Peer(L): %s:%d\n", peerLocalAddressString.c_str(), peerLocalPortNum);
 
             // Destroy the igp messagebox
             //delete igpmbox;

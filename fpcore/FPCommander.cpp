@@ -198,7 +198,7 @@ void FPCommander::initThemes()
     std::vector<String> themeFolders = getDataPathManager().getEntriesAtPath("theme");
     // Load the themes from the list (only those matching the correct extension)
     for (int i = 0 ; i < static_cast<int>(themeFolders.size()) ; i++) {
-        if (themeFolders[i].substring(themeFolders[i].size() - 8)
+        if (ios_fc::substring(themeFolders[i], themeFolders[i].size() - 8)
             == themeFolderExtension) {
             cout << "Theme to be loaded: " << (const char *)(themeFolders[i]); << endl;
             //loadTheme(themeFolders[i]);

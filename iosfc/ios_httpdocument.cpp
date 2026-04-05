@@ -31,8 +31,8 @@ HttpDocument::HttpHeaderElement::HttpHeaderElement(String rawElement)
         name = rawElement;
     }
     else {
-        name = rawElement.substring(0, sep);
-        content = rawElement.substring(sep+2, rawElement.length());
+        name = ios_fc::substring(rawElement, 0, sep);
+        content = ios_fc::substring(rawElement, sep+2, rawElement.length());
     }
 }
 
@@ -60,8 +60,8 @@ bool HttpDocument::documentIsReady()
         if (httpSocket.isConnected()) {
             socketIsConnected = true;
             httpSocket.setNonBlockingMode(false);
-            String request = rqPart[0] + path + rqPart[1] + hostName + rqPart[2] + portNum + rqPart[3];
-            httpSocket.getOutputStream()->streamWrite(VoidBuffer(request, strlen(request)));
+            String request = rqPart[0] + path + rqPart[1] + hostName + rqPart[2] + std::to_string(portNum) + rqPart[3];
+            httpSocket.getOutputStream()->streamWrite(VoidBuffer(request.c_str(), request.length()));
         }
         else return false;
     }
@@ -73,7 +73,7 @@ bool HttpDocument::documentIsReady()
             //printf("Current line:%s\n", (const char *)currentLine);
             HttpHeaderElement currentHeader(currentLine);
             if (currentHeader.name == contentLength) {
-                msgSize = atoi((const char *)currentHeader.content);
+                msgSize = atoi(currentHeader.content.c_str());
                 //printf("Taille doc: %d\n", msgSize);
             }
         } while (currentLine.length() > 0);

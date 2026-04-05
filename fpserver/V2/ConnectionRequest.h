@@ -9,7 +9,7 @@ namespace v2 {
 class ConnectionRequest
 {
 public:
-    ConnectionRequest(Database &db, const PeersList &peers, ios_fc::PeerAddress addr, int fpipVersion, const ios_fc::String name, const ios_fc::String password, int status)
+    ConnectionRequest(Database &db, const PeersList &peers, ios_fc::PeerAddress addr, int fpipVersion, const std::string name, const std::string password, int status)
     : mPeers(peers), mAddr(addr), mFpipVersion(fpipVersion), mName(name), mPassword(password), mStatus(status), mUserExists(false), mPasswordCorrect(false)
     {
         db.checkLogin(mName.c_str(), mPassword.c_str(), mUserExists, mUserExpired, mPasswordCorrect);
@@ -18,18 +18,18 @@ public:
     // Return true if the connection can be accepted
     bool isAcceptable() const;
     // Return the reason for denying connection
-    const ios_fc::String &getDenyErrorString() const { return mDenyErrorString; }
-    const ios_fc::String &getDenyErrorStringMore() const { return mDenyErrorStringMore; }
+    const std::string &getDenyErrorString() const { return mDenyErrorString; }
+    const std::string &getDenyErrorStringMore() const { return mDenyErrorStringMore; }
 
 private:
     const PeersList &mPeers;
     ios_fc::PeerAddress mAddr;
     int mFpipVersion;
-    const ios_fc::String mName;
-    const ios_fc::String mPassword;
+    const std::string mName;
+    const std::string mPassword;
     int mStatus;
-    mutable ios_fc::String mDenyErrorString;
-    mutable ios_fc::String mDenyErrorStringMore;
+    mutable std::string mDenyErrorString;
+    mutable std::string mDenyErrorStringMore;
     bool mUserExists;
     bool mUserExpired;
     bool mPasswordCorrect;

@@ -208,9 +208,9 @@ void SDL12_EventManager::pushMouseEvent(int x, int y,
     SDL_PushEvent(&mouseEvent);
 }
 
-ios_fc::String SDL12_EventManager::getControlName(int controlType, bool alternate)
+std::string SDL12_EventManager::getControlName(int controlType, bool alternate)
 {
-    ios_fc::String controlName("           ");
+    std::string controlName("           ");
     if (alternate) {
         if (keyAlternateControls[controlType])
             controlName = keyAlternateControls[controlType]->name();

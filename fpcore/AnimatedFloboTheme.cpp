@@ -273,23 +273,23 @@ void ThemeManagerImpl::end_description(GoomSL *gsl, GoomHash *global, GoomHash *
 
 void ThemeManagerImpl::loadFlobobanDefinition(GoomSL *gsl, int playerId, FlobobanThemeDefinition &floboban)
 {
-    String variablePrefix = String("level.floboban_p") + (playerId+1);
-    floboban.displayX = GSL_GLOBAL_INT(gsl, variablePrefix + ".display.x");
-    floboban.displayY = GSL_GLOBAL_INT(gsl, variablePrefix + ".display.y");
-    floboban.nextX = GSL_GLOBAL_INT(gsl, variablePrefix + ".next.x");
-    floboban.nextY = GSL_GLOBAL_INT(gsl, variablePrefix + ".next.y");
-    floboban.neutralDisplayX = GSL_GLOBAL_INT(gsl, variablePrefix + ".neutral_display.x");
-    floboban.neutralDisplayY = GSL_GLOBAL_INT(gsl, variablePrefix + ".neutral_display.y");
-    floboban.nameDisplayX = GSL_GLOBAL_INT(gsl, variablePrefix + ".name_display.x");
-    floboban.nameDisplayY = GSL_GLOBAL_INT(gsl, variablePrefix + ".name_display.y");
-    floboban.scoreDisplayX = GSL_GLOBAL_INT(gsl, variablePrefix + ".score_display.x");
-    floboban.scoreDisplayY = GSL_GLOBAL_INT(gsl, variablePrefix + ".score_display.y");
-    floboban.shouldDisplayNext = GSL_GLOBAL_INT(gsl, variablePrefix + ".should_display_next");
-    floboban.shouldDisplayShadow = GSL_GLOBAL_INT(gsl, variablePrefix + ".should_display_shadows");
-    floboban.shouldDisplayEyes = GSL_GLOBAL_INT(gsl, variablePrefix + ".should_display_eyes");
-    floboban.scale = GSL_GLOBAL_FLOAT(gsl, variablePrefix + ".scale");
-    floboban.trophyDisplayX = GSL_GLOBAL_INT(gsl, variablePrefix + ".trophy_display.x");
-    floboban.trophyDisplayY = GSL_GLOBAL_INT(gsl, variablePrefix + ".trophy_display.y");
+    String variablePrefix = String("level.floboban_p") + std::to_string(playerId+1);
+    floboban.displayX = GSL_GLOBAL_INT(gsl, (variablePrefix + ".display.x").c_str());
+    floboban.displayY = GSL_GLOBAL_INT(gsl, (variablePrefix + ".display.y").c_str());
+    floboban.nextX = GSL_GLOBAL_INT(gsl, (variablePrefix + ".next.x").c_str());
+    floboban.nextY = GSL_GLOBAL_INT(gsl, (variablePrefix + ".next.y").c_str());
+    floboban.neutralDisplayX = GSL_GLOBAL_INT(gsl, (variablePrefix + ".neutral_display.x").c_str());
+    floboban.neutralDisplayY = GSL_GLOBAL_INT(gsl, (variablePrefix + ".neutral_display.y").c_str());
+    floboban.nameDisplayX = GSL_GLOBAL_INT(gsl, (variablePrefix + ".name_display.x").c_str());
+    floboban.nameDisplayY = GSL_GLOBAL_INT(gsl, (variablePrefix + ".name_display.y").c_str());
+    floboban.scoreDisplayX = GSL_GLOBAL_INT(gsl, (variablePrefix + ".score_display.x").c_str());
+    floboban.scoreDisplayY = GSL_GLOBAL_INT(gsl, (variablePrefix + ".score_display.y").c_str());
+    floboban.shouldDisplayNext = GSL_GLOBAL_INT(gsl, (variablePrefix + ".should_display_next").c_str());
+    floboban.shouldDisplayShadow = GSL_GLOBAL_INT(gsl, (variablePrefix + ".should_display_shadows").c_str());
+    floboban.shouldDisplayEyes = GSL_GLOBAL_INT(gsl, (variablePrefix + ".should_display_eyes").c_str());
+    floboban.scale = GSL_GLOBAL_FLOAT(gsl, (variablePrefix + ".scale").c_str());
+    floboban.trophyDisplayX = GSL_GLOBAL_INT(gsl, (variablePrefix + ".trophy_display.x").c_str());
+    floboban.trophyDisplayY = GSL_GLOBAL_INT(gsl, (variablePrefix + ".trophy_display.y").c_str());
 }
 
 void ThemeManagerImpl::loadFontDefinition(GoomSL *gsl, const char *fontName, FontDefinition &font)

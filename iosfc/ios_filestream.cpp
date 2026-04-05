@@ -14,7 +14,7 @@ namespace ios_fc {
 
 FileInputStream::FileInputStream (const String path, const bool istext) {
 	const char *flags = istext?"rt":"r";
-	file = (void*)fopen(path,flags);
+	file = (void*)fopen(path.c_str(),flags);
 	if (!file)
 		throw std::runtime_error("Unable to open the file");
 	//fd = fileno((FILE*)file);
@@ -37,7 +37,7 @@ int FileInputStream::streamRead(VoidBuffer buffer) {
 
 FileOutputStream::FileOutputStream (const String path, const bool istext) {
 	const char *flags = istext?"wt":"w";
-	file = (void*)fopen(path,flags);
+	file = (void*)fopen(path.c_str(),flags);
 	if (!file)
 		throw std::runtime_error("Unable to open the file");
 	//fd = fileno((FILE*)file);

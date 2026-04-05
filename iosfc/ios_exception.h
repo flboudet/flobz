@@ -58,7 +58,7 @@ static inline void IOS_ERROR(const char *msg)
 	throw std::runtime_error(msg);
 }
 
-#define IOS_ASSERT(expr) if (!(expr)) IOS_ERROR(ios_fc::String("Assertion '" #expr "' failed\n  location: " __FILE__ ":") + __LINE__ + ", " + __PRETTY_FUNCTION__); else;
+#define IOS_ASSERT(expr) if (!(expr)) IOS_ERROR(std::string("Assertion '" #expr "' failed\n  location: " __FILE__ ":") + std::to_string(__LINE__) + ", " + __PRETTY_FUNCTION__); else;
 
 #else // DEBUG
 

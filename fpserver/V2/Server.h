@@ -7,8 +7,8 @@ namespace v2 {
 
 struct GameResultInPool {
     int gameid;
-    ios_fc::String name1;
-    ios_fc::String name2;
+    std::string name1;
+    std::string name2;
     int winner;
     int explode_count;
     int drop_count;
@@ -41,7 +41,7 @@ public:
 
 private:
     // Called when a peer connects
-    void onPeerConnect(ios_fc::PeerAddress addr, int fpipVersion, const ios_fc::String name, const ios_fc::String password, int status);
+    void onPeerConnect(ios_fc::PeerAddress addr, int fpipVersion, const std::string name, const std::string password, int status);
     // Called when a peer updates its status
     void onPeerUpdate(Peer *peer, int status);
     // Called when a peer is disconnected
@@ -81,9 +81,9 @@ void Server::onIgpAlive(ios_fc::Message &msg, ios_fc::PeerAddress &address)
 #endif
         int protocolVersion = msg.getInt("V"); // version of the FPIP protocol used by the client
         int status = msg.getInt("STATUS");
-        ios_fc::String name = msg.getString("NAME");
-        printf("Name = %s\n", (const char*)name);
-        ios_fc::String pass;
+        std::string name = msg.getString("NAME");
+        printf("Name = %s\n", name.c_str());
+        std::string pass;
         if (msg.hasString("PASSWD"))
             pass = msg.getString("PASSWD");
         else
@@ -117,7 +117,7 @@ void Server::onIgpChat(ios_fc::Message &msg)
     delete newMsg;
 }
 
-void Server::onPeerConnect(ios_fc::PeerAddress addr, int fpipVersion, const ios_fc::String name, const ios_fc::String password, int status)
+void Server::onPeerConnect(ios_fc::PeerAddress addr, int fpipVersion, const std::string name, const std::string password, int status)
 {
     ConnectionRequest request(mDB, mPeers, addr, fpipVersion, name, password, status);
     bool accept = request.isAcceptable();
@@ -224,13 +224,13 @@ struct PlayerGameStat
 void Server::onIgpGameOver(ios_fc::Message &msg) {
     int winner = msg.getInt("WINNER");
     int gameId = msg.getInt("GAMEID");
-    ios_fc::String name1 = msg.getString("NAME1");
-    ios_fc::String name2 = msg.getString("NAME2");
+    std::string name1 = msg.getString("NAME1");
+    std::string name2 = msg.getString("NAME2");
     PlayerGameStat gameStat;
     gameStat.points = msg.getInt("SCORE");
     gameStat.total_points = msg.getInt("TOTAL_SCORE");
     for (int i = 0 ; i < 24 ; i++) {
-        ios_fc::String messageName = ios_fc::String("COMBO_COUNT") + i;
+        std::string messageName = std::string("COMBO_COUNT") + std::to_string(i);
         gameStat.combo_count[i] = msg.getInt(messageName);
     }
     gameStat.explode_count = msg.getInt("EXPLODE_COUNT");

@@ -73,7 +73,7 @@ void NetworkGame::onMessage(Message &message)
                 gameStat.total_points = message.getInt(TOTAL_SCORE);
                 GTCheckInterval(gameStat.total_points, 0, 999999999, "total_points is invalid");
                 for (int i = 0 ; i < 24 ; i++) {
-                    String messageName = String(COMBO_COUNT) + i;
+                    String messageName = String(COMBO_COUNT) + std::to_string(i);
                     gameStat.combo_count[i] = message.getInt(messageName);
                     GTCheckInterval(gameStat.combo_count[i], 0, 999, "combo_count is invalid");
                 }

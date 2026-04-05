@@ -150,7 +150,7 @@ void NetworkGameWidget::onMessage(Message &message)
         case FPNetMessage::kGameChat:
             if (chatBox.get())
                 chatBox->addChat(message.getString("NAME").c_str(), message.getString("TEXT").c_str()); // TODO: string
-            printf("%s: %s\n", (const char *)message.getString("NAME"), (const char *)message.getString("TEXT"));
+            printf("%s: %s\n", message.getString("NAME").c_str(), message.getString("TEXT").c_str());
             break;
         default:
             break;

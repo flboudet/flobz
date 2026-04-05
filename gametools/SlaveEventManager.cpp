@@ -50,7 +50,7 @@ void SlaveEventManager::pushMouseEvent(int x, int y, CursorEventType type)
 }
 
 // Control settings handling
-ios_fc::String SlaveEventManager::getControlName(int controlType, bool alternate)
+std::string SlaveEventManager::getControlName(int controlType, bool alternate)
 {
     return "Null";
 }

@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
     }
     catch (const std::exception &e) { displayExceptionMessage(e.what()); }
     catch (char * str) { displayExceptionMessage(str); }
-    catch (String str) { displayExceptionMessage(str); }
+    catch (String str) { displayExceptionMessage(str.c_str()); }
     catch (...) { displayExceptionMessage("The exception is unknown."); }
     return 0;
 }

@@ -57,42 +57,42 @@ BaseMessage::~BaseMessage()
 
 void BaseMessage::addInt(const String &key, int value)
 {
-    datas[(const char *)key] = ValueInt(value);
+    datas[key] = ValueInt(value);
 }
 
 void BaseMessage::addBool(const String &key, bool value)
 {
-    datas[(const char *)key] = ValueBool(value);
+    datas[key] = ValueBool(value);
 }
 
 void BaseMessage::addFloat(const String &key, double value)
 {
-    datas[(const char *)key] = ValueFloat(value);
+    datas[key] = ValueFloat(value);
 }
 
 void BaseMessage::addString(const String &key, const String &value)
 {
-    datas[(const char *)key] = ValueString(value);
+    datas[key] = ValueString(value);
 }
 
 void BaseMessage::addIntArray(const String &key, const Buffer<int> &value)
 {
-    datas[(const char *)key] = ValueIntArray(value);
+    datas[key] = ValueIntArray(value);
 }
 
 void BaseMessage::addCharArray(const String &key, const Buffer<char> &value)
 {
-    datas[(const char *)key] = ValueCharArray(value);
+    datas[key] = ValueCharArray(value);
 }
 
 void BaseMessage::addIntProperty(const String &key, int value)
 {
-    intProperties[(const char *)key] = value;
+    intProperties[key] = value;
 }
 
 void BaseMessage::addBoolProperty(const String &key, bool property)
 {
-    intProperties[(const char *)key] = (property ? 1 : 0);
+    intProperties[key] = (property ? 1 : 0);
 }
 
 static const BaseMessage::ValueInterface *getInterfaceAndCheckType(const std::map<std::string, BaseMessage::ValueInterface>  &datas,
@@ -100,7 +100,7 @@ static const BaseMessage::ValueInterface *getInterfaceAndCheckType(const std::ma
                                                       BaseMessage::ValueType type,
                                                       const String stype)
 {
-    auto hval = datas.find((const char *)key);
+    auto hval = datas.find(key);
     if (hval == datas.end()) {
         throw BaseMessage::DataException(key + " does not exists");
     }
@@ -113,32 +113,32 @@ static const BaseMessage::ValueInterface *getInterfaceAndCheckType(const std::ma
 
 bool BaseMessage::hasInt(const String &key) const
 {
-    return datas.find((const char *)key) != datas.end();
+    return datas.find(key) != datas.end();
 }
 
 bool BaseMessage::hasBool(const String &key) const
 {
-    return datas.find((const char *)key) != datas.end();
+    return datas.find(key) != datas.end();
 }
 
 bool BaseMessage::hasFloat(const String &key) const
 {
-    return datas.find((const char *)key) != datas.end();
+    return datas.find(key) != datas.end();
 }
 
 bool BaseMessage::hasString(const String &key) const
 {
-    return datas.find((const char *)key) != datas.end();
+    return datas.find(key) != datas.end();
 }
 
 bool BaseMessage::hasIntArray(const String &key) const
 {
-    return datas.find((const char *)key) != datas.end();
+    return datas.find(key) != datas.end();
 }
 
 bool BaseMessage::hasCharArray(const String &key) const
 {
-    return datas.find((const char *)key) != datas.end();
+    return datas.find(key) != datas.end();
 }
 
 
@@ -232,7 +232,7 @@ const Buffer<char> BaseMessage::getCharArray (const String &key) const
 
 int BaseMessage::getIntProperty(const String &key) const
 {
-    auto hval = intProperties.find((const char *)key);
+    auto hval = intProperties.find(key.c_str());
     if (hval == intProperties.end()) {
         throw PropertyException(String("No such property '") + key + "'");
     }
@@ -241,7 +241,7 @@ int BaseMessage::getIntProperty(const String &key) const
 
 bool BaseMessage::getBoolProperty(const String &key) const
 {
-    auto hval = intProperties.find((const char *)key);
+    auto hval = intProperties.find(key.c_str());
     if (hval == intProperties.end()) {
         throw PropertyException(String("No such property '") + key + "'");
     }
@@ -250,13 +250,13 @@ bool BaseMessage::getBoolProperty(const String &key) const
 
 bool BaseMessage::hasIntProperty    (const String &key) const
 {
-    auto hval = intProperties.find((const char *)key);
+    auto hval = intProperties.find(key.c_str());
     return (hval != intProperties.end());
 }
 
 bool BaseMessage::hasBoolProperty   (const String &key) const
 {
-    auto hval = intProperties.find((const char *)key);
+    auto hval = intProperties.find(key.c_str());
     return (hval != intProperties.end());
 }
 
