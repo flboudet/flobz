@@ -100,13 +100,13 @@ ThemeManagerImpl::ThemeManagerImpl(DataPathManager &dataPathManager)
     if (dataPathManager.hasFile("theme")) {
         std::vector<std::string> themeFolders = dataPathManager.getEntriesAtPath("theme");
         // Load the themes from the list (only those matching the correct extension)
-        for (int i = 0 ; i < static_cast<int>(themeFolders.size()) ; i++) {
-            if (themeFolders[i].size() < 8)
+        for (const auto& themeFolder : themeFolders) {
+            if (themeFolder.size() < 8)
                 continue;
-            if (themeFolders[i].substr(themeFolders[i].size() - 8)
+            if (themeFolder.substr(themeFolder.size() - 8)
                 == s_themeFolderExtension) {
-                //cout << "Theme to be loaded: " << (const char *)(themeFolders[i]) << endl;
-                loadThemePack(themeFolders[i].c_str());
+                //cout << "Theme to be loaded: " << (const char *)(themeFolder) << endl;
+                loadThemePack(themeFolder.c_str());
             }
         }
     }
@@ -150,10 +150,9 @@ const std::vector<std::string> & ThemeManagerImpl::getFloboSetThemeList()
 std::vector<std::string> ThemeManagerImpl::getLevelThemeList(int nbPlayers)
 {
     std::vector<std::string> result;
-    for (std::vector<std::string>::const_iterator iter = m_levelThemeList.begin() ;
-         iter != m_levelThemeList.end() ; ++iter) {
-        if (m_levelThemeDescriptions[*iter].nbPlayers == nbPlayers)
-            result.push_back(*iter);
+    for (const auto& themeName : m_levelThemeList) {
+        if (m_levelThemeDescriptions[themeName].nbPlayers == nbPlayers)
+            result.push_back(themeName);
     }
     return result;
 }
@@ -374,9 +373,8 @@ BaseFloboThemeImpl::BaseFloboThemeImpl(const FloboThemeDescription &desc,
 
 BaseFloboThemeImpl::~BaseFloboThemeImpl()
 {
-    for (std::vector<IosSurface *>::iterator iter = m_surfaceBin.begin() ;
-         iter != m_surfaceBin.end() ; iter++) {
-        delete (*iter);
+    for (auto surface : m_surfaceBin) {
+        delete surface;
     }
 }
 
