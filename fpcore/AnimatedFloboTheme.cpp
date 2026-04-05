@@ -98,9 +98,9 @@ ThemeManagerImpl::ThemeManagerImpl(DataPathManager &dataPathManager)
 {
     // List the themes in the various pack folders
     if (dataPathManager.hasFile("theme")) {
-        SelfVector<std::string> themeFolders = dataPathManager.getEntriesAtPath("theme");
+        std::vector<std::string> themeFolders = dataPathManager.getEntriesAtPath("theme");
         // Load the themes from the list (only those matching the correct extension)
-        for (int i = 0 ; i < themeFolders.size() ; i++) {
+        for (int i = 0 ; i < static_cast<int>(themeFolders.size()) ; i++) {
             if (themeFolders[i].size() < 8)
                 continue;
             if (themeFolders[i].substr(themeFolders[i].size() - 8)

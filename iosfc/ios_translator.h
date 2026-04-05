@@ -1,6 +1,7 @@
 #ifndef _IOS_GETTEXT
 #define _IOS_GETTEXT
 
+#include <vector>
 #include "ios_memory.h"
 
 namespace ios_fc
@@ -23,7 +24,7 @@ namespace ios_fc
       void deleteDictionaries();
 
     private:
-      Vector<TranslationDictionary*> dictonaries;
+      std::vector<TranslationDictionary*> dictonaries;
   };
 };
 

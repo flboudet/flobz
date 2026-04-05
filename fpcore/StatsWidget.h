@@ -140,7 +140,7 @@ private:
     int m_maxCombo;
     gameui::Text m_score, m_globalScore;
     double m_startTime;
-    SelfVector<Widget*> widgetAutoReleasePool;
+    std::vector<std::unique_ptr<Widget>> widgetAutoReleasePool;
 };
 
 class StatsLegendWidget : public gameui::Frame, public gameui::Action {
@@ -178,7 +178,7 @@ private:
     StatsLegendWidget m_legend;
     StatsWidget m_leftStats, m_rightStats;
     float m_height, m_legendWidth;
-    SelfVector<Widget*> widgetAutoReleasePool;
+    std::vector<std::unique_ptr<Widget>> widgetAutoReleasePool;
 };
 
 #endif // _FLOBO_STATS_WIDGET_H

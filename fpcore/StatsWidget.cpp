@@ -237,7 +237,7 @@ StatsWidget::StatsWidget(StatsResources &res, StatsFormat &statsFormat,
         ComboLine *newComboLine = new ComboLine(res);
         newComboLine->setDimensions(dimensions);
         add(newComboLine);
-        widgetAutoReleasePool.add(newComboLine);
+        widgetAutoReleasePool.emplace_back(newComboLine);
         m_comboLines.push_back(newComboLine);
     }
     Separator *sep = new Separator();
@@ -275,16 +275,16 @@ StatsWidget::StatsWidget(StatsResources &res, StatsFormat &statsFormat,
     add(box);
 
     // Prepare un-allocation
-    widgetAutoReleasePool.add(sep);
-    widgetAutoReleasePool.add(sep1);
-    widgetAutoReleasePool.add(img1);
-    widgetAutoReleasePool.add(img2);
-    widgetAutoReleasePool.add(txt);
-    widgetAutoReleasePool.add(score);
-    widgetAutoReleasePool.add(globalScore);
-    widgetAutoReleasePool.add(scorebox);
-    widgetAutoReleasePool.add(totalscorebox);
-    widgetAutoReleasePool.add(box);
+    widgetAutoReleasePool.emplace_back(sep);
+    widgetAutoReleasePool.emplace_back(sep1);
+    widgetAutoReleasePool.emplace_back(img1);
+    widgetAutoReleasePool.emplace_back(img2);
+    widgetAutoReleasePool.emplace_back(txt);
+    widgetAutoReleasePool.emplace_back(score);
+    widgetAutoReleasePool.emplace_back(globalScore);
+    widgetAutoReleasePool.emplace_back(scorebox);
+    widgetAutoReleasePool.emplace_back(totalscorebox);
+    widgetAutoReleasePool.emplace_back(box);
 
     // Looking for the biggest combo
     for (int i = 0 ; i < 24 ; i++) {
@@ -480,17 +480,17 @@ TwoPlayersStatsWidget::TwoPlayersStatsWidget(PlayerGameStat &leftPlayerStats, Pl
     m_legendSlider.addListener(*this);
     m_rightSlider.addListener(*this);
 
-    widgetAutoReleasePool.add(backBox);
-    widgetAutoReleasePool.add(v1);
-    widgetAutoReleasePool.add(v2);
-    widgetAutoReleasePool.add(v3);
-    widgetAutoReleasePool.add(sep1);
-    widgetAutoReleasePool.add(sep2);
-    widgetAutoReleasePool.add(sep3);
-    widgetAutoReleasePool.add(frontBox);
-    widgetAutoReleasePool.add(f1);
-    widgetAutoReleasePool.add(f2);
-    widgetAutoReleasePool.add(f3);
+    widgetAutoReleasePool.emplace_back(backBox);
+    widgetAutoReleasePool.emplace_back(v1);
+    widgetAutoReleasePool.emplace_back(v2);
+    widgetAutoReleasePool.emplace_back(v3);
+    widgetAutoReleasePool.emplace_back(sep1);
+    widgetAutoReleasePool.emplace_back(sep2);
+    widgetAutoReleasePool.emplace_back(sep3);
+    widgetAutoReleasePool.emplace_back(frontBox);
+    widgetAutoReleasePool.emplace_back(f1);
+    widgetAutoReleasePool.emplace_back(f2);
+    widgetAutoReleasePool.emplace_back(f3);
 }
 
 void TwoPlayersStatsWidget::onWidgetVisibleChanged(bool visible)

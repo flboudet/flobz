@@ -27,8 +27,10 @@
 #define _DATAPATHMANAGER_H
 
 #include <stdint.h>
+#include <vector>
+#include <string>
+#include "ios_memory.h"
 #include "ios_filepath.h"
-#include <stdint.h>
 
 using namespace ios_fc;
 
@@ -74,7 +76,7 @@ class DataPathManager : public DataProvider {
 public:
     virtual bool hasFile(const std::string & shortPath) const = 0;
     virtual std::string getPath(const std::string & shortPath) const = 0;
-    virtual SelfVector<std::string> getEntriesAtPath(const std::string & shortPath) const = 0;
+    virtual std::vector<std::string> getEntriesAtPath(const std::string & shortPath) const = 0;
     // DataProvider
     virtual bool hasDataInputStream(const std::string &shortPath) const { return hasFile(shortPath); }
 };

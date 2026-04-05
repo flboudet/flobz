@@ -26,9 +26,8 @@
 #ifndef _IOS_FILEPATH_H
 #define _IOS_FILEPATH_H
 
-#include "ios_memory.h"
-#include "ios_vector.h"
 #include <string>
+#include <vector>
 
 namespace ios_fc {
 
@@ -39,7 +38,7 @@ public:
     std::string combine(const std::string &path) const;
     std::string basename(void) const;
     static std::string combine(const std::string &path1, const std::string &path2);
-    SelfVector<std::string> listFiles();
+    std::vector<std::string> listFiles();
     bool exists() const;
     const std::string &getPathString() const { return _path; }
 private:

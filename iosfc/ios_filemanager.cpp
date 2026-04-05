@@ -1,7 +1,10 @@
 
+#include <vector>
 #include "ios_filemanager.h"
 
 namespace ios_fc {
+
+static std::vector<FileLoader*> loaders;
 
 class FSLoader : public FileLoader
 {
@@ -33,9 +36,6 @@ class FSLoader : public FileLoader
     }
 };
 
-
-Vector<FileLoader> loaders;
-
 static void initHandlers()
 {
   static bool firstTime = true;
@@ -48,7 +48,7 @@ static void initHandlers()
 static FileLoader *findHandler(const String &type)
 {
   printf("Looking for %s-loader\n", (const char *)type);
-  for (int i = 0; i < loaders.size(); ++i) {
+  for (int i = 0; i < static_cast<int>(loaders.size()); ++i) {
     if (loaders[i]->isSupportedType(type))
       return loaders[i];
   }
@@ -58,7 +58,7 @@ static FileLoader *findHandler(const String &type)
 
 void FileLoader::addHandler(FileLoader *loader)
 {
-  loaders.add(loader);
+  loaders.push_back(loader);
 }
 
 Buffer<char> FileLoader::loadFrom(const String &url) 

@@ -22,81 +22,106 @@
 #ifndef _IOS_VECTOR_H
 #define _IOS_VECTOR_H
 
-#include "ios_memory.h"
+#include <vector>
+#include <memory>
 
 namespace ios_fc {
-    
+
 template <typename T>
-class Vector : public AdvancedBuffer<T *>
-{
-    public:
-        Vector<T> dup() const {
-            Vector<T> buf;
-            for (int i=0; i<this->size(); ++i) buf.add(this->get(i));
-            return buf;
+class Vector {
+public:
+    Vector() = default;
+    Vector(const Vector<T> &other) = default;
+    Vector<T> &operator=(const Vector<T> &other) = default;
+
+    void add(T *element) { data.push_back(element); }
+    int size() const { return static_cast<int>(data.size()); }
+    T *&operator[](int index) { return data[index]; }
+    T *const &operator[](int index) const { return data[index]; }
+    T *&get(int index) { return data[index]; }
+    T *const &get(int index) const { return data[index]; }
+
+    int remove(const T *element) {
+        for (int i = static_cast<int>(data.size()) - 1; i >= 0; --i) {
+            if (data[i] == element) {
+                data.erase(data.begin() + i);
+                return i;
+            }
         }
+        return -1;
+    }
+
+    void removeAt(int index) {
+        data.erase(data.begin() + index);
+    }
+
+    void removeAtKeepOrder(int index) {
+        data.erase(data.begin() + index);
+    }
+
+    void clear() { data.clear(); }
+
+    Vector<T> dup() const {
+        Vector<T> buf;
+        buf.data = data;
+        return buf;
+    }
+
+    typename std::vector<T *>::iterator begin() { return data.begin(); }
+    typename std::vector<T *>::const_iterator begin() const { return data.begin(); }
+    typename std::vector<T *>::iterator end() { return data.end(); }
+    typename std::vector<T *>::const_iterator end() const { return data.end(); }
+
+private:
+    std::vector<T *> data;
 };
 
 template <typename T>
-class SelfVector : public AdvancedBuffer<T *>
-{
+class SelfVector {
 public:
-    SelfVector() :  AdvancedBuffer<T*>::AdvancedBuffer(), instanceCounter(new int) {
-        *instanceCounter = 0;
-    }
-    
-    SelfVector(const SelfVector &origin)
-        : AdvancedBuffer<T*>::AdvancedBuffer(origin), instanceCounter(origin.instanceCounter) {
-        (*instanceCounter)++;
-    }
-    
-    virtual ~SelfVector() {
-        if (*instanceCounter == 0) {
-            for (int i=0; i < this->size(); ++i) {
-                delete this->get(i);
+    SelfVector() = default;
+    SelfVector(const SelfVector<T> &other) = default;
+    SelfVector<T> &operator=(const SelfVector<T> &other) = default;
+
+    void add(const T &element) { data.emplace_back(std::make_shared<T>(element)); }
+    void add(T *element) { data.emplace_back(element); }
+
+    int size() const { return static_cast<int>(data.size()); }
+
+    T &operator[](int index) { return *data[index]; }
+    const T &operator[](int index) const { return *data[index]; }
+
+    int remove(const T *element) {
+        for (int i = static_cast<int>(data.size()) - 1; i >= 0; --i) {
+            if (data[i].get() == element) {
+                data.erase(data.begin() + i);
+                return i;
             }
-            delete instanceCounter;
         }
-        else
-         (*instanceCounter)--;
+        return -1;
     }
-    
-    inline void add(const T &element) { AdvancedBuffer<T*>::add(new T(element)); }
-    inline void add(T *element) { AdvancedBuffer<T*>::add(element); }
-    
-    inline T &operator[] (int i)             {return *(AdvancedBuffer<T*>::operator[](i));}
-    
-    inline const T &operator[] (int i) const {return *(AdvancedBuffer<T*>::operator[](i));}
-    
-    inline int  remove(const T *t)
-    {
-      // WARNING: I do this cause I know AdvancedBuffer's implementation...
-      // (this is bad)
-      int i = AdvancedBuffer<T*>::remove(t);
-      delete this->get(this->size());
-      return i;
+
+    void remove() {
+        if (!data.empty()) {
+            data.pop_back();
+        }
     }
-    
-    inline void remove()
-    {
-      AdvancedBuffer<T*>::remove();
-      // WARNING: I do this cause I know AdvancedBuffer's implementation...
-      // (this is bad)
-      delete this->get(this->size());
+
+    void removeAt(int index) {
+        data.erase(data.begin() + index);
     }
-  
-    inline void removeAt(int i) {
-      delete this->get(i);
-      AdvancedBuffer<T*>::removeAt(i);
+
+    void removeAtKeepOrder(int index) {
+        data.erase(data.begin() + index);
     }
-    
-    inline void removeAtKeepOrder(int i) {
-        delete this->get(i);
-        AdvancedBuffer<T*>::removeAtKeepOrder(i);
-    }
-  
+
+    typename std::vector<std::shared_ptr<T>>::iterator begin() { return data.begin(); }
+    typename std::vector<std::shared_ptr<T>>::const_iterator begin() const { return data.begin(); }
+    typename std::vector<std::shared_ptr<T>>::iterator end() { return data.end(); }
+    typename std::vector<std::shared_ptr<T>>::const_iterator end() const { return data.end(); }
+
 private:
-    int *instanceCounter;
+    std::vector<std::shared_ptr<T>> data;
 };
 
 }

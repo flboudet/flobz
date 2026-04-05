@@ -27,6 +27,8 @@
 #define _PUYODATAPATHMANAGER_H
 
 #include <string>
+#include <vector>
+#include <memory>
 #include "CompositeDrawContext.h"
 #include "audio.h"
 #include "DataPathManager.h"
@@ -71,17 +73,17 @@ public:
     FPDataPathManager(const std::string &coreDataPath);
     virtual bool hasFile(const std::string & shortPath) const;
     virtual std::string getPath(const std::string & shortPath) const;
-    virtual SelfVector<std::string> getEntriesAtPath(const std::string & shortPath) const;
+    virtual std::vector<std::string> getEntriesAtPath(const std::string & shortPath) const;
     virtual DataInputStream *openDataInputStream(const std::string &shortPath) const;
     virtual void registerDataPackages(CompositeDrawContext *cDC, Jukebox *jukebox = NULL);
     // Own methods
     std::string getPathInPack(const std::string & shortPath, int packPathIndex) const;
-    int getNumPacks() const { return m_dataPaths.size(); }
+    int getNumPacks() const { return static_cast<int>(m_dataPaths.size()); }
     void setMaxPackNumber(int maxPackNumber);
 private:
     FPDataPathManager(FPDataPathManager &mgr) : m_coreDataPath(mgr.m_coreDataPath) {}
     FilePath m_coreDataPath;
-    SelfVector<FilePath> m_dataPaths;
+    std::vector<std::unique_ptr<FilePath>> m_dataPaths;
 };
 
 #endif // _PUYODATAPATHMANAGER_H

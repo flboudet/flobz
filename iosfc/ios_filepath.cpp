@@ -23,6 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
  */
 
+#include <stdexcept>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <errno.h>
@@ -35,11 +36,11 @@ namespace ios_fc {
     {
     }
 
-    SelfVector<std::string> FilePath::listFiles()
+    std::vector<std::string> FilePath::listFiles()
     {
         struct	dirent	*dptr;
         DIR	*dirp;
-        SelfVector<std::string> result;
+        std::vector<std::string> result;
         if((dirp=opendir(_path.c_str()))==NULL) {
             std::string errorMessage("Error opening ");
             perror("dirlist");
@@ -47,7 +48,7 @@ namespace ios_fc {
         }
         dptr = readdir(dirp);
         while(dptr != NULL) {
-            result.add(dptr->d_name);
+            result.push_back(dptr->d_name);
             dptr = readdir(dirp);
         }
         closedir(dirp);
