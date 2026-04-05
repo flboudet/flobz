@@ -65,7 +65,7 @@ std::string FPDataPackage::getPath(const std::string &shortPath) const
     if (ret != "")
         return ret;
     else
-        throw Exception((std::string("File ") + shortPath + " not found !").c_str());
+        throw std::runtime_error((std::string("File ") + shortPath + " not found !").c_str());
 }
 
 bool FPDataPackage::hasFile(const std::string &shortPath) const
@@ -157,7 +157,7 @@ std::string FPDataPathManager::getPathInPack(const std::string & shortPath, int 
         return testPath.getPathString();
     else
         return "";
-    // throw Exception(String("File ") + shortPath + " not found !");
+    // throw std::runtime_error(String("File ") + shortPath + " not found !");
 }
 
 SelfVector<std::string> FPDataPathManager::getEntriesAtPath(const std::string &shortPath) const

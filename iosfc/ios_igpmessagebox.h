@@ -121,8 +121,8 @@ void IgpMessageBox<T>::onMessage(VoidBuffer message, int origIdent, int destIden
             IgpMessageBoxMessage<T> incomingMessage(message, *this, origIdent);
             propagateMessageToListeners(incomingMessage);
         }
-        catch (Exception e) {
-            e.printMessage();
+        catch (const std::exception & e) {
+            ios_fc::printException(e);
         }
     }
 }

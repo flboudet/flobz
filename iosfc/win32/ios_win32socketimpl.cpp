@@ -31,7 +31,7 @@ void Win32SocketImpl::create()
 {
     /* grab an Internet domain socket */
     if ((socketFd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-        throw Exception("IosSocket: Socket creation failed");
+        throw std::runtime_error("IosSocket: Socket creation failed");
     }
 }
 
@@ -41,7 +41,7 @@ void Win32SocketImpl::connect(const String hostName, int portID)
     /* go find out about the desired host machine */
     if ((hp = gethostbyname(hostName)) == 0) {
         //if ((hp = gethostbyaddr(hostName, 32, 0)) == 0)
-        throw Exception("IosSocket: gethostbyname error");
+        throw std::runtime_error("IosSocket: gethostbyname error");
     }
 
     /* fill in the socket structure with host information */
@@ -57,7 +57,7 @@ void Win32SocketImpl::connect(const String hostName, int portID)
             // Not really an error, the socket is non-blocking
             break;
         default:
-            throw Exception("IosSocket: Socket connection failed");
+            throw std::runtime_error("IosSocket: Socket connection failed");
 	}
     }
     inputStream = new SocketInputStream(socketFd);
@@ -75,10 +75,10 @@ void Win32SocketImpl::socketReceive(void *buffer, int size)
 {
 	int opResult = recv(socketFd, (char *)buffer, size, 0);
 	if ((opResult == 0) && (size > 0)) {
-		throw Exception("IosSocket: Socket disconnected");
+		throw std::runtime_error("IosSocket: Socket disconnected");
 	}
 	else if (opResult < 0) {
-		throw Exception("IosSocket: Socket receive error");
+		throw std::runtime_error("IosSocket: Socket receive error");
 	}
 }
 
@@ -86,10 +86,10 @@ void Win32SocketImpl::socketSend(const void *buffer, int size)
 {
 	int opResult = send(socketFd, (char *)buffer, size, 0);
 	if ((opResult == 0) && (size > 0)) {
-		throw Exception("IosSocket: Socket disconnected");
+		throw std::runtime_error("IosSocket: Socket disconnected");
 	}
 	else if (opResult < 0) {
-		throw Exception("IosSocket: Socket send error");
+		throw std::runtime_error("IosSocket: Socket send error");
 	}
 }
 
@@ -104,7 +104,7 @@ bool Win32SocketImpl::isConnected() const
     FD_SET(socketFd, &writefds);
     int sresult = select(socketFd+1, NULL, &writefds, NULL, &timeout);
     if (sresult == -1)
-        throw Exception("IosSystemStreamSelect error");
+        throw std::runtime_error("IosSystemStreamSelect error");
     else if (sresult == 0)
         return false;
     return true;
@@ -114,7 +114,7 @@ void Win32SocketImpl::setNonBlockingMode(bool mode)
 {
     int arg = (mode == false ? 0 : 1);
     if (ioctlsocket(socketFd, FIONBIO, (u_long *)&arg) == -1) {
-        throw Exception("IosSocket: ioctl error");
+        throw std::runtime_error("IosSocket: ioctl error");
     }
 }
 
@@ -141,7 +141,7 @@ int Win32SocketImpl::SocketInputStream::streamAvailable()
 {
 	u_long result = 0;
 	if (ioctlsocket(socketFd, FIONREAD, &result) == -1) {
-		throw Exception("IosSocketStream: ioctl error");
+		throw std::runtime_error("IosSocketStream: ioctl error");
 	}
 	return result;
 }
@@ -150,10 +150,10 @@ int Win32SocketImpl::SocketInputStream::streamRead(VoidBuffer buffer, int size)
 {
 	int opResult = recv(socketFd, (char *)(buffer.ptr()), size, 0);
 	if ((opResult == 0) && (size > 0)) {
-		throw Exception("IosSocket: Socket disconnected");
+		throw std::runtime_error("IosSocket: Socket disconnected");
 	}
 	else if (opResult < 0) {
-		throw Exception("IosSocket: Socket receive error");
+		throw std::runtime_error("IosSocket: Socket receive error");
 	}
     return opResult;
 }
@@ -171,10 +171,10 @@ int Win32SocketImpl::SocketOutputStream::streamWrite(VoidBuffer buffer, int size
 {
 	int opResult = send(socketFd, (char *)(buffer.ptr()), size, 0);
 	if ((opResult == 0) && (size > 0)) {
-		throw Exception("IosSocket: Socket disconnected");
+		throw std::runtime_error("IosSocket: Socket disconnected");
 	}
 	else if (opResult < 0) {
-		throw Exception("IosSocket: Socket send error");
+		throw std::runtime_error("IosSocket: Socket send error");
 	}
     return opResult;
 }

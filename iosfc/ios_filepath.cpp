@@ -43,7 +43,7 @@ namespace ios_fc {
         if((dirp=opendir(_path.c_str()))==NULL) {
             std::string errorMessage("Error opening ");
             perror("dirlist");
-            throw Exception((errorMessage + _path).c_str());
+            throw std::runtime_error((errorMessage + _path).c_str());
         }
         dptr = readdir(dirp);
         while(dptr != NULL) {

@@ -36,7 +36,7 @@ void UnixSelectorImpl::addSelectable(Selectable *s)
 {
     UnixSelectableImpl *impl = dynamic_cast<UnixSelectableImpl *>(s->getSelectableImpl());
     if (impl == NULL)
-        throw Exception("Selectable is not compatible with selector implementation");
+        throw std::runtime_error("Selectable is not compatible with selector implementation");
     selectableList.add(s);
 }
 
@@ -44,7 +44,7 @@ void UnixSelectorImpl::removeSelectable(Selectable *s)
 {
     UnixSelectableImpl *impl = dynamic_cast<UnixSelectableImpl *>(s->getSelectableImpl());
     if (impl == NULL)
-        throw Exception("Selectable is not compatible with selector implementation");
+        throw std::runtime_error("Selectable is not compatible with selector implementation");
     selectableList.remove(s);
 }
 
@@ -69,7 +69,7 @@ void UnixSelectorImpl::doSelect(struct timeval *timeout)
         FD_SET(impl->getFd(), &readfds);
     }
     if (select(FD_SETSIZE, &readfds, NULL, NULL, timeout) == -1)
-        throw Exception("IosSystemStreamSelect error");
+        throw std::runtime_error("IosSystemStreamSelect error");
 }
 
 Buffer<Selectable *> UnixSelectorImpl::getSelected()

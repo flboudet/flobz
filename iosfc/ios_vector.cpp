@@ -55,14 +55,14 @@ void Vector::addElement(void *element)
 void * Vector::getElementAt(const int index) const
 {
 	if (index >= vectorSize)
-		throw new Exception("Vector index out of bounds");
+		throw std::runtime_error("Vector index out of bounds");
 	return vectorData[index];
 }
 
 void Vector::removeElementAt(const int index)
 {
 	if (index >= vectorSize)
-		throw new Exception("Vector index out of bounds");
+		throw std::runtime_error("Vector index out of bounds");
 	vectorSize--;
 	if (index == vectorSize)
 		return;

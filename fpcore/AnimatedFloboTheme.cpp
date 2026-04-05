@@ -429,7 +429,7 @@ IosSurface *FloboThemeImpl::getFloboSurfaceForValence(int valence, int compressi
                                                                   osstream.str().c_str(),
                                                                   opList);
                 if (baseFace == NULL)
-                    throw ios_fc::Exception("Unable to load file: %s", osstream.str().c_str());
+                    throw std::runtime_error(std::string("Unable to load file: ") + osstream.str());
                 uncompressed = baseFace.get()->shiftHue(m_desc.colorOffset);
                 m_surfaceBin.push_back(uncompressed);
             }

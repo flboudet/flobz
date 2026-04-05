@@ -99,7 +99,7 @@ namespace ios_fc {
         if (newPeerAddressImpl != NULL) {
             igpPeerIdent = newPeerAddressImpl->getIgpIdent();
         }
-        else throw Exception("Incompatible peer address type!");
+        else throw std::runtime_error("Incompatible peer address type!");
     }
     
     template <typename T>
@@ -109,7 +109,7 @@ namespace ios_fc {
         if (peerAddressImpl != NULL) {
             T::addInt(key, peerAddressImpl->getIgpIdent());
         }
-        else throw Exception("Incompatible peer address type!");
+        else throw std::runtime_error("Incompatible peer address type!");
     }
     
     template <typename T>

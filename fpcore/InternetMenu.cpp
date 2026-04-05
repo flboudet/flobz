@@ -94,8 +94,8 @@ void HttpMetaServerConnection::fetch()
     try {
         m_servers.clear();
         m_doc = new HttpDocument(m_hostName.c_str(), m_hostPath.c_str(), m_portNum);
-    } catch (Exception e) {
-        e.printMessage();
+    } catch (const std::exception &e) {
+        ios_fc::printException(e);
         m_nErrors += 1;
         m_doc = NULL;
     }
@@ -132,8 +132,8 @@ void HttpMetaServerConnection::idle(double currentTime)
             m_doc = NULL;
             onServerListHasChanged();
         }
-    } catch (Exception e) { // Erreur dans la reception du fichier
-        e.printMessage();
+    } catch (const std::exception &e) { // Erreur dans la reception du fichier
+        ios_fc::printException(e);
         m_nErrors += 1;
     }
 }
@@ -549,9 +549,9 @@ void InternetGameMenu::action(Widget *sender, int actionType, GameControlEvent *
             InternetConnectDialog *connectionDialog = new InternetConnectDialog(serverName.getEditField().getValue().c_str(), gameCenter, this);
             this->getParentScreen()->add(connectionDialog);
             this->getParentScreen()->grabEventsOnWidget(connectionDialog);
-        } catch (Exception e) {
+        } catch (const std::exception &e) {
             fprintf(stderr, "Error while connecting to %s\n", serverName.getEditField().getValue().c_str());
-            e.printMessage();
+            ios_fc::printException(e);
             InternetErrorDialog *errorDialog = new InternetErrorDialog("Cannot connect to", serverName.getEditField().getValue());
             this->getParentScreen()->add(errorDialog);
             this->getParentScreen()->grabEventsOnWidget(errorDialog);

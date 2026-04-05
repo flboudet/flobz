@@ -120,9 +120,9 @@ void IgpVirtualPeerMessageBox<T>::messageReceived(VoidBuffer message, int origIg
         IgpVirtualPeerMessage<T> incomingMessage(message, *this, origIgpIdent);
         propagateMessageToListeners(incomingMessage);
     }
-    catch (Exception e) {
+    catch (const std::exception & e) {
         fprintf(stderr, "Exception occured. We consider that the peer is corrupted!\n");
-        e.printMessage();
+        ios_fc::printException(e);
         m_isCorrupted = true;
     }
 }
@@ -143,7 +143,7 @@ void IgpVirtualPeerMessageBox<T>::bind(PeerAddress addr)
     if (peerAddressImpl != NULL) {
         destIdent = peerAddressImpl->getIgpIdent();
     }
-    else throw Exception("Incompatible peer address type!");
+    else throw std::runtime_error("Incompatible peer address type!");
 }
 
 }

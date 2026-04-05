@@ -1151,7 +1151,7 @@ IosSurface * OpenGLImageLibrary::loadImage(ImageType type, const char *path, Ima
 {
     OpenGLRawImage *image = m_backendUtil->loadImage(type, path);
     if (image == NULL)
-        throw ios_fc::Exception("loadImage failed: File not found: %s", path);
+        throw std::runtime_error(std::string("loadImage failed: File not found: ") + path);
     OpenGLTexture *tex = new OpenGLTexture(m_owner, image, (specialAbility & IMAGE_READ));
     IosSurface *result = new IosGLSurfaceRef(m_owner, m_backendUtil, tex);
 	result->name = path;

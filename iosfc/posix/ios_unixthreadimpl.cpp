@@ -46,7 +46,7 @@ UnixThreadImpl::~UnixThreadImpl()
 void UnixThreadImpl::launch()
 {
     if (pthread_create(&threadRef, NULL, execThreadInObject, (void *)this) != 0)
-        throw Exception("Thread creation error!");
+        throw std::runtime_error("Thread creation error!");
 }
 
 void UnixThreadImpl::cancel()

@@ -166,7 +166,7 @@ void FPCommander::initFonts()
     /*try {
      font = dataPathManager.getPath(locale->getLocalizedString("__FONT__"));
      }
-     catch (ios_fc::Exception) {
+     catch (const std::exception &) {
      fprintf(stderr,"Font %s not found.\n", (const char *)font);
      font = dataPathManager.getPath("gfx/font.ttf");
      fprintf(stderr,"Using default font %s.\n", (const char *)font);

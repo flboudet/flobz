@@ -159,7 +159,7 @@ Server::~Server()
 void Server::addListeningPort(int portID, ServerPortManager *manager)
 {
     if (getListeningPort(portID) != NULL)
-        throw Exception("Port already listening");
+        throw std::runtime_error("Port already listening");
     ListeningPort *newPort = new ListeningPort(portID, manager, &selector);
     listeningPorts.add(newPort);
 }
@@ -203,7 +203,7 @@ void Server::run()
                 }
                 else try {
                     client->getListeningPort()->getManager()->dataFromSocket(client);
-                } catch (Exception e) { // erreur -> deconnection
+                } catch (const std::exception & e) { // erreur -> deconnection
                     client->getListeningPort()->getManager()->deconnectionFromSocket(client);
                     delete client;
                 }

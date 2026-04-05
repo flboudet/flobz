@@ -43,7 +43,7 @@ void UnixDatagramSocketImpl::create(int localPortNum)
 {
     /* grab an Internet domain socket */
     if ((socketFd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
-        throw Exception("IosDatagramSocket: Socket creation failed");
+        throw std::runtime_error("IosDatagramSocket: Socket creation failed");
     }
     
     bzero((char *) &boundAddr, sizeof(boundAddr));
@@ -53,7 +53,7 @@ void UnixDatagramSocketImpl::create(int localPortNum)
     
     // bind the socket as appropriate
     if (bind(socketFd, (struct sockaddr *) &boundAddr, sizeof(boundAddr)) == -1) {
-        throw Exception("Socket binding error");
+        throw std::runtime_error("Socket binding error");
     }
     
     // enable broadcast on the socket
@@ -70,7 +70,7 @@ void UnixDatagramSocketImpl::send(Datagram &sendDatagram)
     if (!isConnected) {
         UnixSocketAddressImpl *impl = dynamic_cast<UnixSocketAddressImpl *>(sendDatagram.getAddress().getImpl());
         if (impl == NULL)
-            throw Exception("Dest address is not compatible with datagramsocket implementation");
+            throw std::runtime_error("Dest address is not compatible with datagramsocket implementation");
         
         struct sockaddr_in outAddr;
         bzero((char *) &outAddr, sizeof(outAddr));
@@ -93,7 +93,7 @@ Datagram UnixDatagramSocketImpl::receive(VoidBuffer buffer)
     
     int res = recvfrom(socketFd, buffer.ptr(), buffer.size(), 0, (struct sockaddr *) &resultAddress, &fromlen);
     if (res == -1)
-        throw Exception("Reception error");
+        throw std::runtime_error("Reception error");
     
     return Datagram(SocketAddress(new UnixSocketAddressImpl(ntohl(resultAddress.sin_addr.s_addr))), ntohs(resultAddress.sin_port), buffer, res);
 }
@@ -102,7 +102,7 @@ int UnixDatagramSocketImpl::available() const
 {
     int result = 0;
 	if (ioctl(socketFd, FIONREAD, &result) == -1) {
-		throw Exception("IosSocketStream: ioctl error");
+		throw std::runtime_error("IosSocketStream: ioctl error");
 	}
 	return result;
 }
@@ -111,7 +111,7 @@ void UnixDatagramSocketImpl::connect(SocketAddress addr, int portNum)
 {
     UnixSocketAddressImpl *impl = dynamic_cast<UnixSocketAddressImpl *>(addr.getImpl());
     if (impl == NULL)
-        throw Exception("Address is not compatible with datagramsocket implementation");
+        throw std::runtime_error("Address is not compatible with datagramsocket implementation");
     
     struct sockaddr_in connectAddr;
     bzero((char *) &connectAddr, sizeof(connectAddr));
@@ -119,7 +119,7 @@ void UnixDatagramSocketImpl::connect(SocketAddress addr, int portNum)
     connectAddr.sin_addr.s_addr = htonl(impl->getAddress());
     connectAddr.sin_port = htons(portNum);
     if (::connect(socketFd, (struct sockaddr *) &connectAddr, (socklen_t)sizeof(connectAddr)) == -1) {
-        throw Exception("Socket connect error");
+        throw std::runtime_error("Socket connect error");
     }
     isConnected = true;
     connectedAddress = addr;
@@ -134,7 +134,7 @@ void UnixDatagramSocketImpl::disconnect()
     socklen_t namelen = sizeof(struct sockaddr_in);
     int result = getsockname(socketFd, (struct sockaddr *) &boundAddr, &namelen);
     if (result != 0) {
-        throw Exception("getsockname error");
+        throw std::runtime_error("getsockname error");
     }
 #endif
 
@@ -149,7 +149,7 @@ void UnixDatagramSocketImpl::disconnect()
 #ifdef LINUX
     // We have to rebind the socket to its previous port, because Linux unbinds the socket when disconnecting
     if (bind(socketFd, (struct sockaddr *) &boundAddr, sizeof(boundAddr)) == -1) {
-        throw Exception("Socket binding error");
+        throw std::runtime_error("Socket binding error");
     }
 #endif
     isConnected = false;
@@ -169,7 +169,7 @@ void UnixDatagramSocketImpl::setMulticastInterface(SocketAddress interfaceAddres
     UnixSocketAddressImpl *addrImpl = dynamic_cast<ios_fc::UnixSocketAddressImpl *>(interfaceAddress.getImpl());
     in_addr_t interface_addr = htonl(addrImpl->getAddress());
     if (setsockopt (socketFd, IPPROTO_IP, IP_MULTICAST_IF, &interface_addr, sizeof(in_addr)) != 0)
-        throw Exception("setMulticastInterface: setsockopt failed!\n");
+        throw std::runtime_error("setMulticastInterface: setsockopt failed!\n");
 }
 
 SocketAddress UnixDatagramSocketImpl::getSocketAddress() const
@@ -179,7 +179,7 @@ SocketAddress UnixDatagramSocketImpl::getSocketAddress() const
     
     int result = getsockname(socketFd, (struct sockaddr *) &name, &namelen);
     if (result != 0) {
-        throw Exception("getsockname error");
+        throw std::runtime_error("getsockname error");
     }
     return SocketAddress(new UnixSocketAddressImpl(ntohl(name.sin_addr.s_addr)));
 }
@@ -191,7 +191,7 @@ int UnixDatagramSocketImpl::getSocketPortNum() const
     
     int result = getsockname(socketFd, (struct sockaddr *) &name, &namelen);
     if (result != 0) {
-        throw Exception("getsockname error");
+        throw std::runtime_error("getsockname error");
     }
     return ntohs(name.sin_port);
 }

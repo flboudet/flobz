@@ -369,7 +369,7 @@ void UDPMessageBoxBase::bind(PeerAddress addr)
         defaultAddress = newPeerAddressImpl->getAddress();
         defaultPort = newPeerAddressImpl->getPortNum();
     }
-    else throw Exception("Incompatible peer address type!");
+    else throw std::runtime_error("Incompatible peer address type!");
 }
 
 PeerAddress UDPMessageBoxBase::getBound() const

@@ -162,8 +162,8 @@ int main()
         for (int i = 0 ; i < toto.getNumServer() ; i++) {
             printf("Serveur %d: %s:%d\n", i, (const char *)toto.getServerNameAtIndex(i), toto.getServerPortAtIndex(i));
         }
-    } catch (Exception e) {
-        printf("Exception:%s\n", (const char *)(e.getMessage()));
+    } catch (const std::exception & e) {
+        printf("Exception:%s\n", (const char *)(e.what()));
     }
     return 0;
 }

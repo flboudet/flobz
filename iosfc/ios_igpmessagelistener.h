@@ -109,7 +109,7 @@ public:
     IgpVirtualPeer(IgpMessageListener *pool, int igpIdent) : IgpPeer(pool) {
         if (igpIdValidAndUnique(igpIdent))
             setIgpIdent(igpIdent);
-        else throw Exception("IGP ident already registered!");
+        else throw std::runtime_error("IGP ident already registered!");
     }
     IgpVirtualPeer(IgpMessageListener *pool) : IgpPeer(pool) {
         setIgpIdent(getUniqueIGPId());

@@ -78,27 +78,27 @@ namespace ios_fc {
             impl->launch();
             threadRunning = true;
         }
-        else throw Exception("Thread already running...");
+        else throw std::runtime_error("Thread already running...");
     }
 
     void Thread::cancel()
     {
         if (!threadRunning)
-            throw Exception("Thread was not running...");
+            throw std::runtime_error("Thread was not running...");
         impl->cancel();
     }
 
     void Thread::detach()
     {
         if (!threadRunning)
-            throw Exception("Thread was not running...");
+            throw std::runtime_error("Thread was not running...");
         impl->detach();
     }
 
     void Thread::join()
     {
         if (!threadRunning)
-            throw Exception("Thread was not running...");
+            throw std::runtime_error("Thread was not running...");
         impl->join();
     }
 

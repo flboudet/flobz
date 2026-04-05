@@ -33,8 +33,8 @@ int main(int argc, char *argv[])
         }
         //ios_fc::OutputStream *output = testSocket.getOutputStream();
         //output->streamWrite(ios_fc::VoidBuffer("Hello", 5));
-    } catch (ios_fc::Exception e) {
-        e.printMessage();
+    } catch (const std::exception & e) {
+        ios_fc::printException(e);
     }
     return 0;
 }

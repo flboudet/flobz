@@ -120,7 +120,7 @@ void UDPMessage<T>::setPeerAddress(PeerAddress newPeerAddress)
         peerAddress = newPeerAddress;
         peerAddressImpl = newPeerAddressImpl;
     }
-    else throw Exception("Incompatible peer address type!");
+    else throw std::runtime_error("Incompatible peer address type!");
 }
 
 template <typename T>
@@ -131,7 +131,7 @@ void UDPMessage<T>::addPeerAddress(const String key, const PeerAddress &value)
         T::addInt(key + "_PN", peerAddressImpl->getPortNum());
         T::addString(key + "_A", peerAddressImpl->getAddress().asString());
     }
-    else throw Exception("Incompatible peer address type!");
+    else throw std::runtime_error("Incompatible peer address type!");
 }
 
 template <typename T>

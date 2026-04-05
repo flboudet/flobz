@@ -123,7 +123,7 @@ void LanGameCenter::onMessage(Message &msg)
 	break;
       }
     }
-    catch (Exception e) {
+    catch (const std::exception &e) {
         printf("Une putain d'exception est survenue: %s\n", e.what());
     }
 }
@@ -205,7 +205,7 @@ void LanGameCenter::sendAliveMessage()
             delete msg;
         }
     }
-    catch (Exception ex) {
+    catch (const std::exception &ex) {
         // If we have an exception there, it is probably because we are attempting to use
         // a network interface which has just disappeared. Redetect the interfaces.
         networkInterfaces = requester.getInterfaces();

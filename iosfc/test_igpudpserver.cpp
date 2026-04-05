@@ -202,13 +202,13 @@ int main()
             try {
                 messageBox.idle();
             }
-            catch (ios_fc::Exception e) {
-                e.printMessage();
+            catch (const std::exception & e) {
+                ios_fc::printException(e);
             }
         }
     }
-    catch (ios_fc::Exception e) {
-        e.printMessage();
+    catch (const std::exception & e) {
+        ios_fc::printException(e);
     }
     return 0;
 }

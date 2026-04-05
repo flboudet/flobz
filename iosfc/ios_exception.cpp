@@ -117,46 +117,6 @@ namespace ios_fc {
 
     const char *DBG_PRINT_PREFIX = "...";
 
-    Exception::Exception(const char *format, ...)
-    {
-        stack = get_stack_trace();
-        char msg[512];
-        va_list ap;
-        va_start(ap, format);
-        vsnprintf(msg, 512, format, ap);
-        va_end(ap);
-		message = strdup((std::string(msg)+std::string("\n")+stack).c_str());
-    }
-
-    Exception::~Exception() throw ()
-    {
-        free(message);
-    }
-
-    Exception::Exception(const Exception &e)
-    {
-        std::stringstream newstack;
-        newstack << get_stack_trace();
-        newstack << "  Which was caused by:\n";
-        newstack << e.stack;
-        stack = newstack.str();
-		message = strdup((std::string(e.message)+std::string("\n")+stack).c_str());
-    }
-
-    const char *Exception::what() const throw () {
-        return message;
-    }
-
-    const char *Exception::getStackTrace() const
-    {
-        return stack.c_str();
-    }
-
-    void Exception::printMessage() const {
-        fprintf(stderr, "Exception thrown: %s\n", message);
-        fprintf(stderr, "From:\n%s\n", stack.c_str());
-    }
-
 #ifdef GENERATE_BACKTRACE
     void signal_handler(int sig) {
         static volatile unsigned long _new = 0;

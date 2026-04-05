@@ -28,24 +28,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
  */
 
+#include <cstdio>
 #include <exception>
+#include <stdexcept>
 #include <string>
 
 namespace ios_fc {
-    class Exception : public std::exception {
-        public:
-            Exception(const char *format, ...);
-            Exception(const Exception &e);
-            void operator=(const Exception &e);
-            ~Exception() throw();
-            void  printMessage()      const;
-            const char *what()        const throw();
-            const char *getStackTrace() const;
 
-        private:
-            char *message;
-            std::string stack;
-    };
+static inline void printException(const std::exception &e)
+{
+    std::fprintf(stderr, "Exception thrown: %s\n", e.what());
+}
 
 std::string get_stack_trace();
 void catch_signals();
@@ -62,7 +55,7 @@ static inline void IOS_ERROR(const char *msg)
 {
 	std::fprintf(stderr,"[DEBUG] ios_error: %s\n", msg);
 	std::fflush(stderr);
-	throw ios_fc::Exception(msg);
+	throw std::runtime_error(msg);
 }
 
 #define IOS_ASSERT(expr) if (!(expr)) IOS_ERROR(ios_fc::String("Assertion '" #expr "' failed\n  location: " __FILE__ ":") + __LINE__ + ", " + __PRETTY_FUNCTION__); else;
@@ -70,10 +63,10 @@ static inline void IOS_ERROR(const char *msg)
 #else // DEBUG
 
 #define IOS_ASSERT(expr) (static_cast<void>(0))
-//#define IOS_ERROR(msg) throw ios_fc::Exception(msg);
+//#define IOS_ERROR(msg) throw std::runtime_error(msg);
 static inline void IOS_ERROR(const char *msg)
 {
-    throw ios_fc::Exception(msg);
+    throw std::runtime_error(msg);
 }
 
 #endif // DEBUG

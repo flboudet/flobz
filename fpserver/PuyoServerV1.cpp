@@ -61,14 +61,14 @@ void PuyoServerV1::onMessage(Message &msg)
                         dirNew->setPeerAddress(peers[i]->addr);
                         newMsg->send();
                     }
-                } catch (Exception e) {}
+                } catch (const std::exception &e) {}
                 delete newMsg;
             }
                 break;
             default:
                 break;
         }
-    } catch (Exception e) {}
+    } catch (const std::exception &e) {}
 }
 
 void PuyoServerV1::idle()

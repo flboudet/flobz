@@ -373,7 +373,7 @@ IosSurface * SDL13_IIMLibrary::loadImage(ImageType type, const char *path, Image
     try {
         fullPath = m_dataPathManager.getPath(path);
     }
-    catch (Exception &e) {
+    catch (const std::exception &e) {
         return NULL;
     }
 

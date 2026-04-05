@@ -34,7 +34,7 @@ public:
     bool isConnected() const { throwError(); return false; }
     void setNonBlockingMode(bool mode) { throwError(); }
 private:
-    void throwError() const { throw Exception("Invalid socket, no socket backend set"); }
+    void throwError() const { throw std::runtime_error("Invalid socket, no socket backend set"); }
 };
 
 class DefaultSocketFactory : public SocketFactory {

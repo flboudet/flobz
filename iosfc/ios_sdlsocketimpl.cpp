@@ -28,13 +28,13 @@ void SdlSocketImpl::create(const String hostName, int portID)
 {
 	/* go find out about the desired host machine */
 	if (SDLNet_ResolveHost(&ip, hostName, portID) == -1) {
-        throw Exception("IosSocket: gethostbyname error");
+        throw std::runtime_error("IosSocket: gethostbyname error");
 	}
 
 	/* connect */
     tcpsock = SDLNet_TCP_Open(&ip);
 	if (!tcpsock) {
-		throw Exception("IosSocket: Socket connection failed");
+		throw std::runtime_error("IosSocket: Socket connection failed");
 	}
 	inputStream = new SocketInputStream(tcpsock);
 	outputStream = new SocketOutputStream(tcpsock);
@@ -76,10 +76,10 @@ int SdlSocketImpl::SocketInputStream::streamRead(VoidBuffer buffer)
     int size = buffer.size();
 	int opResult = SDLNet_TCP_Recv(tcpsock, buffer.ptr(), size);
 	if ((opResult == 0) && (size > 0)) {
-		throw Exception("IosSocket: Socket disconnected");
+		throw std::runtime_error("IosSocket: Socket disconnected");
 	}
 	else if (opResult < 0) {
-		throw Exception("IosSocket: Socket receive error");
+		throw std::runtime_error("IosSocket: Socket receive error");
 	}
     return opResult;
 }
@@ -97,10 +97,10 @@ int SdlSocketImpl::SocketOutputStream::streamWrite(VoidBuffer buffer)
     int size = buffer.size();
 	int opResult = SDLNet_TCP_Send(tcpsock, buffer.ptr(), size);
 	if ((opResult == 0) && (size > 0)) {
-		throw Exception("IosSocket: Socket disconnected");
+		throw std::runtime_error("IosSocket: Socket disconnected");
 	}
 	else if (opResult < 0) {
-		throw Exception("IosSocket: Socket send error");
+		throw std::runtime_error("IosSocket: Socket send error");
 	}
     return opResult;
 }

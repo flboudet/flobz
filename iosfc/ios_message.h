@@ -3,6 +3,8 @@
 
 #include "ios_memory.h"
 #include "ios_hash.h"
+#include <string>
+#include <stdexcept>
 
 namespace ios_fc {
 
@@ -11,19 +13,19 @@ class Message
 {
 public:
 
-    class DataException : public Exception {
+    class DataException : public std::runtime_error {
     public:
-        DataException(const String name) : Exception(String("Error in Message Data '") + name + "'") {}
+        DataException(const String name) : std::runtime_error(std::string("Error in Message Data '") + name.c_str() + "'") {}
     };
 
-    class PropertyException : public Exception {
+    class PropertyException : public std::runtime_error {
     public:
-        PropertyException(const String name) : Exception(String("Error in Message Property ") + name + "'") {}
+        PropertyException(const String name) : std::runtime_error(std::string("Error in Message Property ") + name.c_str() + "'") {}
     };
 
-    class InvalidMessageException : public Exception {
+    class InvalidMessageException : public std::runtime_error {
     public:
-        InvalidMessageException() : Exception("Invalid Message") {}
+        InvalidMessageException() : std::runtime_error("Invalid Message") {}
     };
 
     virtual ~Message() {}

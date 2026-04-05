@@ -29,7 +29,7 @@ public:
     SocketImpl *acceptClientImpl() { throwError(); return NULL; }
     SelectableImpl *getSelectableImpl() { return NULL; }
 private:
-    void throwError() { throw Exception("Invalid socket, no socket backend set"); }
+    void throwError() { throw std::runtime_error("Invalid socket, no socket backend set"); }
 };
 
 class DefaultServerSocketFactory : public ServerSocketFactory {

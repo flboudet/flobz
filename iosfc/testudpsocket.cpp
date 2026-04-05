@@ -13,8 +13,8 @@ int main()
         printf("Recu:%s du port %d\n", (const void *)(result.getMessage()), result.getPortNum());
         ios_fc::Datagram titi2(result.getAddress(), result.getPortNum(), ios_fc::VoidBuffer("Tiens", 5), 5);
         toto.send(titi2);
-    } catch (ios_fc::Exception e) {
-        e.printMessage();
+    } catch (const std::exception & e) {
+        ios_fc::printException(e);
     }
     return 0;
 }

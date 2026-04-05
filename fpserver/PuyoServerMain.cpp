@@ -52,13 +52,13 @@ int main(int argc, const char * argv[])
                 responder->idle();
                 natPuncher.idle();
             }
-            catch (ios_fc::Exception e) {
-                e.printMessage();
+            catch (const std::exception &e) {
+                ios_fc::printException(e);
             }
         }
     }
-    catch (ios_fc::Exception e) {
-        e.printMessage();
+    catch (const std::exception &e) {
+        ios_fc::printException(e);
     }
     return 0;
 }

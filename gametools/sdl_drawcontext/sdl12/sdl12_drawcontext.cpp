@@ -356,7 +356,7 @@ IosSurface * SDL12_ImageLibrary::loadImage(ImageType type, const char *path, Ima
     try {
         fullPath = m_dataPathManager.getPath(path);
     }
-    catch (Exception &e) {
+    catch (const std::exception &e) {
         return NULL;
     }
     std::cout << "SDL12_ImageLibrary::loadImage fullpath " << (const char *)fullPath << std::endl;

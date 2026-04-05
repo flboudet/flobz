@@ -97,7 +97,7 @@ PackageDescription::PackageDescription(DataPathManager &dataPathManager,
     GTLogTrace("++");
     if (package.hasFile("Description.gsl")) {
         /*
-           catch (ios_fc::Exception e) {
+           catch (const std::exception &e) {
            GTLogTrace("Warning: No description file in package %s", package.getName().c_str());
            return;
            }

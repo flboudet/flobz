@@ -111,7 +111,7 @@ void Server::onIgpChat(ios_fc::Message &msg)
             dirNew->setPeerAddress(mPeers[i]->addr);
             newMsg->send();
         }
-    } catch (ios_fc::Exception e) {
+    } catch (const std::exception & e) {
         // TODO: something here
     }
     delete newMsg;

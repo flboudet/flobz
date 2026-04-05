@@ -330,7 +330,7 @@ void InternetGameCenter::onMessage(Message &msg)
                 break;
         }
     }
-    catch (Exception e) {
+    catch (const std::exception &e) {
         printf("Message invalide 3!\n");
     }
 }

@@ -35,7 +35,7 @@ static char *pathResolverFunction (StyrolyseClient *_this, const char *path)
     std::string rsvPath = FilePath("/story").combine(path);
     return strdup(rsvPath.c_str());
   }
-  catch (Exception e) {
+  catch (const std::exception &e) {
     return strdup(path);
   }
 }
@@ -128,7 +128,7 @@ StyroImage::StyroImage(StyrolyseClient *_this,
                           : FilePath("gfx").combine(path));
         surfaceRef = theCommander->getSurface(IMAGE_RGBA, imgPath);
         if (surfaceRef.empty())
-            throw Exception((std::string("Image ") + imgPath + " not found!").c_str());
+            throw std::runtime_error((std::string("Image ") + imgPath + " not found!").c_str());
         surface = surfaceRef;
     }
 }
@@ -138,7 +138,7 @@ static void *loadImage (StyrolyseClient *_this, const char *path)
   try {
       return new StyroImage(_this, path);
   }
-  catch (Exception e) {
+  catch (const std::exception &e) {
     return NULL;
   }
 }

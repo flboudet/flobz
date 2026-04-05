@@ -15,7 +15,7 @@ SocketAddress UDPPeerAddress::getSocketAddress() const
     if (peerAddressImpl != NULL) {
         return peerAddressImpl->getAddress();
     }
-    else throw Exception("Incompatible peer address type!");
+    else throw std::runtime_error("Incompatible peer address type!");
 }
 
 int UDPPeerAddress::getPortNum() const
@@ -24,7 +24,7 @@ int UDPPeerAddress::getPortNum() const
     if (peerAddressImpl != NULL) {
         return peerAddressImpl->getPortNum();
     }
-    else throw Exception("Incompatible peer address type!");
+    else throw std::runtime_error("Incompatible peer address type!");
 }
 
 }

@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
             GameUIDefaults::GAME_LOOP->run();
         }
     }
-    catch (Exception e) { displayExceptionMessage(e.what()); }
+    catch (const std::exception &e) { displayExceptionMessage(e.what()); }
     catch (char * str) { displayExceptionMessage(str); }
     catch (String str) { displayExceptionMessage(str); }
     catch (...) { displayExceptionMessage("The exception is unknown."); }

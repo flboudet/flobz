@@ -66,7 +66,7 @@ void UnixServerSocketImpl::createServerSocket()
 {
     /* get an internet domain socket */
     if ((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-        throw Exception("Socket creation error");
+        throw std::runtime_error("Socket creation error");
     }
     
     /* complete the socket structure */
@@ -77,12 +77,12 @@ void UnixServerSocketImpl::createServerSocket()
     
     /* bind the socket to the port number */
     if (bind(sd, (struct sockaddr *) &sin, sizeof(sin)) == -1) {
-        throw Exception("Socket binding error");
+        throw std::runtime_error("Socket binding error");
     }
     
     /* show that we are willing to listen */
     if (listen(sd, 5) == -1) {
-        throw Exception("Socket listening error");
+        throw std::runtime_error("Socket listening error");
     }
 }
 
@@ -90,7 +90,7 @@ SocketImpl *UnixServerSocketImpl::acceptClientImpl()
 {
     int sd_client;
     if ((sd_client = accept(sd, (struct sockaddr *)  &pin, (socklen_t *)(&addrlen))) == -1) {
-        throw Exception("Socket waiting client error");
+        throw std::runtime_error("Socket waiting client error");
     }
     UnixSocketImpl *newImpl = new UnixSocketImpl();
     newImpl->create(sd_client);

@@ -97,7 +97,7 @@ void NetworkGame::onMessage(Message &message)
                 break;
         }
     }
-    catch (Exception e) {
+    catch (const std::exception &e) {
         GTLogTrace("Invalid Message...");
     }
 }

@@ -94,7 +94,7 @@ void SetupMatchState::enterState()
     // Prepare 1st run
     m_sharedAssets->m_currentLevelTheme = theCommander->getPreferedLevelTheme(m_nbPlayers);
     if (m_sharedAssets->m_currentLevelTheme.get() == NULL)
-        throw ios_fc::Exception("No matching level theme");
+        throw std::runtime_error("No matching level theme");
     m_sharedAssets->m_currentFloboSetTheme = theCommander->getPreferedFloboSetTheme();
     // Create the gamewidget and register as the gamewidget's action
     GameWidget *newGameWidget =

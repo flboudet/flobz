@@ -59,7 +59,7 @@ int main(int argc, char **argv)
     return 0;
   }
   catch (Message::DataException e) {
-    e.printMessage();
+    ios_fc::printException(e);
     return 1;
   }
 }

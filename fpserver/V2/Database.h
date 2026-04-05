@@ -13,7 +13,7 @@ public:
             std::string err = sqlite3_errmsg(mDB);
             sqlite3_close(mDB);
             mDB = NULL;
-            throw ios_fc::Exception((std::string("Can't open database data/base/sqlite.db: ") + err).c_str());
+            throw std::runtime_error((std::string("Can't open database data/base/sqlite.db: ") + err).c_str());
         }
         else {
             printf("SQLite database opened.\n");
@@ -75,7 +75,7 @@ private:
             std::stringstream error; error << "SQL error:" << zErrMsg;
             if (zErrMsg != (char*)NULL)
                     free((void*)zErrMsg);
-            throw ios_fc::Exception(error.str().c_str());
+            throw std::runtime_error(error.str().c_str());
         }
 
         if( rc == SQLITE_OK ){

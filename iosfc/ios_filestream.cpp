@@ -16,7 +16,7 @@ FileInputStream::FileInputStream (const String path, const bool istext) {
 	const char *flags = istext?"rt":"r";
 	file = (void*)fopen(path,flags);
 	if (!file)
-		throw new Exception ("Unable to open the file");
+		throw std::runtime_error("Unable to open the file");
 	//fd = fileno((FILE*)file);
 }
 
@@ -31,7 +31,7 @@ int FileInputStream::streamAvailable() {
 int FileInputStream::streamRead(VoidBuffer buffer) {
 	size_t s = fread (buffer, 1, buffer.size(), (FILE*)file);
 	if (s<0)
-		throw new Exception ("File Read error");
+		throw std::runtime_error("File Read error");
 	return s;
 }
 
@@ -39,7 +39,7 @@ FileOutputStream::FileOutputStream (const String path, const bool istext) {
 	const char *flags = istext?"wt":"w";
 	file = (void*)fopen(path,flags);
 	if (!file)
-		throw new Exception ("Unable to open the file");
+		throw std::runtime_error("Unable to open the file");
 	//fd = fileno((FILE*)file);
 }
 

@@ -138,7 +138,7 @@ public:
     IosSurface() : m_enableExceptionOnDeletion(false) {}
     ~IosSurface() {
         if (m_enableExceptionOnDeletion)
-            throw ios_fc::Exception("IosSurface forbidden deletion");
+            throw std::runtime_error("IosSurface forbidden deletion");
     }
 public:
 	virtual bool isOpaque() const = 0;

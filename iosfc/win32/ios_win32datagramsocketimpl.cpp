@@ -39,7 +39,7 @@ void Win32DatagramSocketImpl::create(int localPortNum)
 {
     /* grab an Internet domain socket */
     if ((socketFd = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
-        throw Exception("IosDatagramSocket: Socket creation failed");
+        throw std::runtime_error("IosDatagramSocket: Socket creation failed");
     }
 
     memset((char *) &boundAddr, 0, sizeof(boundAddr));
@@ -49,7 +49,7 @@ void Win32DatagramSocketImpl::create(int localPortNum)
     
     // bind the socket as appropriate
     if (bind(socketFd, (struct sockaddr *) &boundAddr, sizeof(boundAddr)) == -1) {
-        throw Exception("Socket binding error");
+        throw std::runtime_error("Socket binding error");
     }
     
     // enable broadcast on the socket
@@ -66,7 +66,7 @@ void Win32DatagramSocketImpl::send(Datagram &sendDatagram)
     if (!isConnected) {
         Win32SocketAddressImpl *impl = dynamic_cast<Win32SocketAddressImpl *>(sendDatagram.getAddress().getImpl());
         if (impl == NULL)
-            throw Exception("Dest address is not compatible with datagramsocket implementation");
+            throw std::runtime_error("Dest address is not compatible with datagramsocket implementation");
         
         struct sockaddr_in outAddr;
         memset((char *) &outAddr, 0, sizeof(outAddr));
@@ -89,13 +89,13 @@ Datagram Win32DatagramSocketImpl::receive(VoidBuffer buffer)
     
     int res = recvfrom(socketFd, (char *)(buffer.ptr()), buffer.size(), 0, (struct sockaddr *) &resultAddress, &fromlen);
     if (res == -1)
-        throw Exception("Reception error");
+        throw std::runtime_error("Reception error");
     
     return Datagram(SocketAddress(new Win32SocketAddressImpl(ntohl(resultAddress.sin_addr.s_addr))), ntohs(resultAddress.sin_port), buffer, res);
 /*
     int res = recv(socketFd, buffer.ptr(), buffer.size(), 0);
     if (res == -1)
-        throw Exception("Reception error");
+        throw std::runtime_error("Reception error");
     return Datagram(connectedAddress, ntohs(connectedPort), buffer, res);
     */
 }
@@ -104,7 +104,7 @@ int Win32DatagramSocketImpl::available() const
 {
     u_long result = 0;
 	if (ioctlsocket(socketFd, FIONREAD, &result) == -1) {
-		throw Exception("IosSocketStream: ioctl error");
+		throw std::runtime_error("IosSocketStream: ioctl error");
 	}
 	return (int)result;
 return 0;
@@ -114,7 +114,7 @@ void Win32DatagramSocketImpl::connect(SocketAddress addr, int portNum)
 {
     Win32SocketAddressImpl *impl = dynamic_cast<Win32SocketAddressImpl *>(addr.getImpl());
     if (impl == NULL)
-        throw Exception("Address is not compatible with datagramsocket implementation");
+        throw std::runtime_error("Address is not compatible with datagramsocket implementation");
     
     struct sockaddr_in connectAddr;
     memset((char *) &connectAddr, 0, sizeof(connectAddr));
@@ -122,7 +122,7 @@ void Win32DatagramSocketImpl::connect(SocketAddress addr, int portNum)
     connectAddr.sin_addr.s_addr = htonl(impl->getAddress());
     connectAddr.sin_port = htons(portNum);
     if (::connect(socketFd, (struct sockaddr *) &connectAddr, sizeof(connectAddr)) == -1) {
-        throw Exception("Socket connect error");
+        throw std::runtime_error("Socket connect error");
     }
     isConnected = true;
     connectedAddress = addr;
@@ -155,7 +155,7 @@ void Win32DatagramSocketImpl::setMulticastInterface(SocketAddress interfaceAddre
     in_addr interface_addr;
     interface_addr.s_addr = htonl(addrImpl->getAddress());
     if (setsockopt (socketFd, IPPROTO_IP, IP_MULTICAST_IF, (const char *) &interface_addr, sizeof(in_addr)) != 0)
-        throw Exception("setMulticastInterface: setsockopt failed!\n");
+        throw std::runtime_error("setMulticastInterface: setsockopt failed!\n");
 }
 
 SocketAddress Win32DatagramSocketImpl::getSocketAddress() const
@@ -165,7 +165,7 @@ SocketAddress Win32DatagramSocketImpl::getSocketAddress() const
     
     int result = getsockname(socketFd, (struct sockaddr *) &name, &namelen);
     if (result != 0) {
-        throw Exception("getsockname error");
+        throw std::runtime_error("getsockname error");
     }
     return SocketAddress(new Win32SocketAddressImpl(ntohl(name.sin_addr.s_addr)));
 }
@@ -177,7 +177,7 @@ int Win32DatagramSocketImpl::getSocketPortNum() const
     
     int result = getsockname(socketFd, (struct sockaddr *) &name, &namelen);
     if (result != 0) {
-        throw Exception("getsockname error");
+        throw std::runtime_error("getsockname error");
     }
     return ntohs(name.sin_port);
 }

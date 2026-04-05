@@ -58,7 +58,7 @@ namespace ios_fc {
         if (peerAddressImpl != NULL) {
             destIdent = peerAddressImpl->getIgpIdent();
         }
-        else throw Exception("Incompatible peer address type!");
+        else throw std::runtime_error("Incompatible peer address type!");
     }
 
     PeerAddress IgpMessageBoxBase::getSelfAddress() const

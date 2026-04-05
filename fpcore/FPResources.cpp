@@ -20,7 +20,7 @@ IosSurface *IosSurfaceFactory::create(const IosSurfaceResourceKey &resourceKey)
             newSurface->enableExceptionOnDeletion(true);
         return newSurface;
     }
-    catch (Exception e) {
+    catch (const std::exception &e) {
         return NULL;
     }
 }
@@ -42,7 +42,7 @@ IosFont *IosFontFactory::create(const IosFontResourceKey &resourceKey)
         IosFont *newFont = iimLib.createFont(resourceKey.path.c_str(), resourceKey.size);
         return newFont;
     }
-    catch (Exception e) {
+    catch (const std::exception &e) {
         return NULL;
     }
 }
@@ -68,7 +68,7 @@ audio_manager::Sound * SoundFactory::create(const std::string &path)
             return newSound;
         }
     }
-    catch (Exception e) {
+    catch (const std::exception &e) {
     }
     return NULL;
 }
@@ -94,7 +94,7 @@ audio_manager::Music * MusicFactory::create(const std::string &path)
             return newMusic;
         }
     }
-    catch (Exception e) {
+    catch (const std::exception &e) {
     }
     return NULL;
 }
