@@ -36,7 +36,6 @@
 #include <cstring>
 #include <cstdio>
 
-#include "ios_ptr.h"
 #include "ios_exception.h"
 
 // #define DEBUG_MEMORY

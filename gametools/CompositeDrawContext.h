@@ -3,8 +3,8 @@
 
 #include <string>
 #include <map>
+#include <memory>
 #include "drawcontext.h"
-#include "ios_ptr.h"
 
 class CompositeDrawContext;
 class CompositeImageLibrary;
@@ -90,9 +90,9 @@ class CompositeSurface : public IosSurface
 {
 public:
     CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
-                     ios_fc::SharedPtr<IosSurface> baseSurface);
+                     std::shared_ptr<IosSurface> baseSurface);
     CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
-                     ios_fc::SharedPtr<IosSurface> baseSurface, const IosRect &cropRect, int w = -1, int h = -1);
+                     std::shared_ptr<IosSurface> baseSurface, const IosRect &cropRect, int w = -1, int h = -1);
     virtual ~CompositeSurface();
     // IosSurface methods
     virtual bool isOpaque() const;
@@ -116,7 +116,7 @@ public:
     virtual void putString(IosFont *font, int x, int y, const char *text, const RGBA &color);
 private:
     CompositeImageLibrary &m_ownerImageLibrary;
-    ios_fc::SharedPtr<IosSurface> m_baseSurface;
+    std::shared_ptr<IosSurface> m_baseSurface;
     bool m_isCropped;
     IosRect m_cropRect;
     ImageBlendMode m_blendMode;
@@ -137,7 +137,7 @@ private:
     CompositeDrawContext &m_owner;
     DrawContext  &m_baseDrawContext;
     ImageLibrary &m_baseImageLibrary;
-    typedef std::map<std::string, ios_fc::SharedPtr<IosSurface> > BaseSurfaceMap;
+    typedef std::map<std::string, std::shared_ptr<IosSurface> > BaseSurfaceMap;
     BaseSurfaceMap m_baseSurfaceMap;
 };
 

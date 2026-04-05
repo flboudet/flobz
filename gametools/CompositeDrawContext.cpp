@@ -11,7 +11,7 @@ using namespace ios_fc;
  */
 
 CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
-                                   SharedPtr<IosSurface> baseSurface)
+                                   std::shared_ptr<IosSurface> baseSurface)
     : m_ownerImageLibrary(ownerImageLibrary),
       m_baseSurface(baseSurface), m_isCropped(false), m_blendMode(IMAGE_COPY)
 {
@@ -20,7 +20,7 @@ CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
 }
 
 CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
-                                   SharedPtr<IosSurface> baseSurface,
+                                   std::shared_ptr<IosSurface> baseSurface,
                                    const IosRect &cropRect,
                                    int w, int h)
     : m_ownerImageLibrary(ownerImageLibrary),
@@ -39,7 +39,7 @@ CompositeSurface::CompositeSurface(CompositeImageLibrary &ownerImageLibrary,
 CompositeSurface::~CompositeSurface()
 {
     // Me and the ImageLibrary
-    if (m_baseSurface.refcount() == 2) {
+    if (m_baseSurface.use_count() == 2) {
         m_ownerImageLibrary.unregisterImage(m_baseSurface.get());
     }
 }
@@ -81,16 +81,16 @@ IosSurface *CompositeSurface::shiftHue(float hue_offset, IosSurface *mask)
     }
     if (mask == NULL)
         return new CompositeSurface(m_ownerImageLibrary,
-                                    srcSurface->shiftHue(hue_offset, NULL));
+                                    std::shared_ptr<IosSurface>(srcSurface->shiftHue(hue_offset, NULL)));
     CompositeSurface *m = static_cast<CompositeSurface *>(mask);
     return new CompositeSurface(m_ownerImageLibrary,
-                                srcSurface->shiftHue(hue_offset, m->m_baseSurface.get()));
+                                std::shared_ptr<IosSurface>(srcSurface->shiftHue(hue_offset, m->m_baseSurface.get())));
 }
 
 IosSurface *CompositeSurface::shiftHSV(float h, float s, float v)
 {
     return new CompositeSurface(m_ownerImageLibrary,
-                                m_baseSurface->shiftHSV(h, s, v));
+                                std::shared_ptr<IosSurface>(m_baseSurface->shiftHSV(h, s, v)));
 }
 
 IosSurface *CompositeSurface::setValue(float value)
@@ -105,7 +105,7 @@ IosSurface *CompositeSurface::setValue(float value)
         srcSurface = tempSurface.get();
     }
     return new CompositeSurface(m_ownerImageLibrary,
-                                srcSurface->setValue(value));
+                                std::shared_ptr<IosSurface>(srcSurface->setValue(value)));
 }
 
 IosSurface *CompositeSurface::setAlpha(float alpha)
@@ -120,7 +120,7 @@ IosSurface *CompositeSurface::setAlpha(float alpha)
         srcSurface = tempSurface.get();
     }
     return new CompositeSurface(m_ownerImageLibrary,
-                                srcSurface->setAlpha(alpha));
+                                std::shared_ptr<IosSurface>(srcSurface->setAlpha(alpha)));
 }
 
 IosSurface * CompositeSurface::resizeAlpha(int width, int height)
@@ -138,7 +138,7 @@ IosSurface * CompositeSurface::resizeAlpha(int width, int height)
             srcSurface = tempSurface.get();
         }
         return new CompositeSurface(m_ownerImageLibrary,
-                                    srcSurface->resizeAlpha(width, height));
+                                    std::shared_ptr<IosSurface>(srcSurface->resizeAlpha(width, height)));
     }
     // Otherwise, just create a new CompositeSurface with the same croprect
     // and base surface, and change its dimensions
@@ -152,7 +152,7 @@ IosSurface * CompositeSurface::resizeAlpha(int width, int height)
 IosSurface * CompositeSurface::mirrorH()
 {
     return new CompositeSurface(m_ownerImageLibrary,
-                                m_baseSurface->mirrorH());
+                                std::shared_ptr<IosSurface>(m_baseSurface->mirrorH()));
 }
 
 void CompositeSurface::convertToGray()
@@ -233,7 +233,7 @@ DrawContext & CompositeImageLibrary::getBaseDrawContext() const
 
 IosSurface * CompositeImageLibrary::createImage(ImageType type, int w, int h, ImageSpecialAbility specialAbility)
 {
-    return new CompositeSurface(*this, m_baseImageLibrary.createImage(type, w, h, specialAbility));
+    return new CompositeSurface(*this, std::shared_ptr<IosSurface>(m_baseImageLibrary.createImage(type, w, h, specialAbility)));
 }
 
 IosSurface * CompositeImageLibrary::loadImage(ImageType type, const char *path, ImageSpecialAbility specialAbility)
@@ -244,12 +244,12 @@ IosSurface * CompositeImageLibrary::loadImage(ImageType type, const char *path, 
         if (newSurface == NULL) {
             return NULL;
         }
-        return new CompositeSurface(*this, newSurface);
+        return new CompositeSurface(*this, std::shared_ptr<IosSurface>(newSurface));
     }
-    SharedPtr<IosSurface> baseSurface;
+    std::shared_ptr<IosSurface> baseSurface;
     BaseSurfaceMap::iterator existingBaseSurface = m_baseSurfaceMap.find(def->getPath());
     if (existingBaseSurface == m_baseSurfaceMap.end()) {
-        baseSurface = SharedPtr<IosSurface>(m_baseImageLibrary.loadImage(type, def->getPath(), specialAbility));
+        baseSurface = std::shared_ptr<IosSurface>(m_baseImageLibrary.loadImage(type, def->getPath(), specialAbility));
         m_baseSurfaceMap[def->getPath()] = baseSurface;
     }
     else {

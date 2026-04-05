@@ -8,6 +8,7 @@
 
 #include <math.h>
 #include <string>
+#include <memory>
 #include "OpenGLDrawContext.h"
 #include "GTLog.h"
 #include "ios_mutex.h"
@@ -510,7 +511,7 @@ public:
 private:
 	friend class IosGLSurfaceRef;
     OpenGLDrawContext *m_owner;
-    ios_fc::SharedPtr<OpenGLRawImage> m_rawImage;
+    std::shared_ptr<OpenGLRawImage> m_rawImage;
     bool m_preserveRawData;
     GLuint m_fbo;
 	int m_nRef;
@@ -552,7 +553,7 @@ private:
                 GL_GET_ERROR();
             }
             if (! m_preserveRawData)
-                m_rawImage = NULL;
+                m_rawImage.reset();
         }
         else {
             GLubyte *emptyData;
