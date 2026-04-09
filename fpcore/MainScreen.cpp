@@ -59,8 +59,8 @@ MainScreen::~MainScreen()
 
 void MainScreen::pushMenu(MainScreenMenu *menu, bool fullScreen)
 {
-    menuStack.push(container.getContentWidget());
-    fullScreenStack.push(fullScreen);
+    menuStack.push_back(container.getContentWidget());
+    fullScreenStack.push_back(fullScreen);
     nextFullScreen = fullScreen;
     container.transitionToContent(menu);
     if (fgStory != NULL)
@@ -71,10 +71,10 @@ void MainScreen::popMenu()
 {
     if (menuStack.size() == 1)
         return;
-    fullScreenStack.pop();
-    nextFullScreen = fullScreenStack.top();
-    container.transitionToContent(menuStack.top());
-    menuStack.pop();
+    fullScreenStack.pop_back();
+    nextFullScreen = fullScreenStack.back();
+    container.transitionToContent(menuStack.back());
+    menuStack.pop_back();
 }
 
 void MainScreen::onTransitionFromScreen(Screen &fromScreen)

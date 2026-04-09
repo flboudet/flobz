@@ -2036,24 +2036,24 @@ namespace gameui {
     {
         checkLoop();
         if (stack.size() > 0) {
-            screen->onTransitionFromScreen(*(stack.top()));
-            stack.top()->removeFromGameLoopActive();
-            stack.top()->hide();
+            screen->onTransitionFromScreen(*(stack.back()));
+            stack.back()->removeFromGameLoopActive();
+            stack.back()->hide();
         }
         screen->show();
         screen->giveFocus();
         screen->addToGameLoop(screen->getGameLoop());
-        stack.push(screen);
+        stack.push_back(screen);
     }
 
     void ScreenStack::pop()
     {
-        Screen *topScreen = stack.top();
+        Screen *topScreen = stack.back();
         topScreen->removeFromGameLoopActive();
-        stack.pop();
-        stack.top()->show();
-        stack.top()->addToGameLoop(stack.top()->getGameLoop());
-        stack.top()->onTransitionFromScreen(*topScreen);
+        stack.pop_back();
+        stack.back()->show();
+        stack.back()->addToGameLoop(stack.back()->getGameLoop());
+        stack.back()->onTransitionFromScreen(*topScreen);
         topScreen->hide();
     }
 
@@ -2061,15 +2061,15 @@ namespace gameui {
     {
         checkLoop();
         if (stack.size() > 0) {
-            screen->onTransitionFromScreen(*(stack.top()));
-            stack.top()->removeFromGameLoopActive();
-            stack.top()->hide();
+            screen->onTransitionFromScreen(*(stack.back()));
+            stack.back()->removeFromGameLoopActive();
+            stack.back()->hide();
         }
         screen->show();
         screen->giveFocus();
         screen->addToGameLoop(screen->getGameLoop());
-        stack.pop();
-        stack.push(screen);
+        stack.pop_back();
+        stack.push_back(screen);
     }
 
     //

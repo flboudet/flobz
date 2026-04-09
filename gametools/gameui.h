@@ -693,6 +693,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       VBox listBox;
   };
 #endif
+#include <vector>
 
   // Manage a stack of screens.
   class ScreenStack
@@ -704,10 +705,10 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       void push(Screen *screen);
       void pop();
       void swap(Screen *screen);
-      Screen * top() const {return stack.top();}
+      Screen * top() const {return stack.back();}
 
     private:
-      Stack<Screen*> stack;
+      std::vector<Screen*> stack;
       GameLoop *loop;
 
       void checkLoop();

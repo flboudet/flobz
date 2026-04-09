@@ -52,8 +52,8 @@ class MainScreen : public gameui::Screen, public gameui::SliderContainerListener
     void setMenuDimensions();
     SliderContainer container;
     StoryWidget *fgStory, *bgStory;
-    Stack<Widget*> menuStack;
-    Stack<bool> fullScreenStack;
+    std::vector<Widget*> menuStack;
+    std::vector<bool> fullScreenStack;
     ScreenTransitionWidget *transition;
     bool nextFullScreen;
 };
