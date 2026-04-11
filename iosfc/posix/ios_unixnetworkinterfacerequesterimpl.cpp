@@ -67,7 +67,7 @@ vector<NetworkInterface> UnixNetworkInterfaceRequesterImpl::getInterfaces()
     while (remaining) {
         struct sockaddr_in *addr = (struct sockaddr_in *)&(curIf->ifr_addr);
         if (addr->sin_family == AF_INET) {
-            result.push_back(NetworkInterface(String(curIf->ifr_name), SocketAddress(inet_ntoa(addr->sin_addr))));
+            result.push_back(NetworkInterface(std::string(curIf->ifr_name), SocketAddress(inet_ntoa(addr->sin_addr))));
         }
 #ifdef HAVE_STRUCT_SOCKADDR_SA_LEN
         int current = curIf->ifr_addr.sa_len + IFNAMSIZ;

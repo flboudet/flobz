@@ -14,40 +14,40 @@ class BaseMessage : public Message
 
     virtual ~BaseMessage();
 
-    virtual void addInt       (const String &key, int value);
-    virtual void addBool      (const String &key, bool value);
-    virtual void addFloat     (const String &key, double value);
-    virtual void addString    (const String &key, const String &value);
-    virtual void addIntArray  (const String &key, const Buffer<int> &value);
-    virtual void addCharArray (const String &key, const Buffer<char> &value);
+    virtual void addInt       (const std::string&key, int value);
+    virtual void addBool      (const std::string &key, bool value);
+    virtual void addFloat     (const std::string &key, double value);
+    virtual void addString    (const std::string &key, const std::string &value);
+    virtual void addIntArray  (const std::string &key, const Buffer<int> &value);
+    virtual void addCharArray (const std::string &key, const Buffer<char> &value);
 
-    bool hasInt       (const String &key) const;
-    bool hasBool      (const String &key) const;
-    bool hasFloat     (const String &key) const;
-    bool hasString    (const String &key) const;
-    bool hasIntArray  (const String &key) const;
-    bool hasCharArray (const String &key) const;
+    bool hasInt       (const std::string &key) const;
+    bool hasBool      (const std::string &key) const;
+    bool hasFloat     (const std::string &key) const;
+    bool hasString    (const std::string &key) const;
+    bool hasIntArray  (const std::string &key) const;
+    bool hasCharArray (const std::string &key) const;
 
-    bool hasInt       (const String key, int value)    const;
-    bool hasBool      (const String key, bool value)   const;
-    bool hasFloat     (const String key, double value)  const;
-    bool hasString    (const String key, String value) const;
+    bool hasInt       (const std::string &key, int value)    const;
+    bool hasBool      (const std::string &key, bool value)   const;
+    bool hasFloat     (const std::string &key, double value)  const;
+    bool hasString    (const std::string &key, const std::string & value) const;
 
-    int                getInt       (const String &key) const;
-    bool               getBool      (const String &key) const;
-    double             getFloat     (const String &key) const;
-    const String       getString    (const String &key) const;
-    const Buffer<int>  getIntArray  (const String &key) const;
-    const Buffer<char> getCharArray (const String &key) const;
+    int                getInt       (const std::string &key) const;
+    bool               getBool      (const std::string &key) const;
+    double             getFloat     (const std::string &key) const;
+    const std::string  getString    (const std::string &key) const;
+    const Buffer<int>  getIntArray  (const std::string &key) const;
+    const Buffer<char> getCharArray (const std::string &key) const;
 
-    virtual void addIntProperty   (const String &key, int value);
-    virtual void addBoolProperty  (const String &key, bool value);
+    virtual void addIntProperty   (const std::string &key, int value);
+    virtual void addBoolProperty  (const std::string &key, bool value);
 
-    bool hasIntProperty   (const String &key) const;
-    bool hasBoolProperty  (const String &key) const;
+    bool hasIntProperty   (const std::string &key) const;
+    bool hasBoolProperty  (const std::string &key) const;
 
-    int  getIntProperty   (const String &key) const;
-    bool getBoolProperty  (const String &key) const;
+    int  getIntProperty   (const std::string &key) const;
+    bool getBoolProperty  (const std::string &key) const;
 
   protected:
     BaseMessage();

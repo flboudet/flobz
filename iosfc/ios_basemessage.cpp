@@ -30,9 +30,9 @@ class ValueFloat : public Value<double> {
     ValueFloat(double f) : Value<double>(f, BaseMessage::FLOAT) {}
 };
 
-class ValueString : public Value<String> {
+class ValueString : public Value<std::string> {
   public:
-    ValueString(const String s) : Value<String>(s, BaseMessage::STRING) {}
+    ValueString(const std::string &s) : Value<std::string>(s, BaseMessage::STRING) {}
 };
 
 class ValueIntArray : public Value<Buffer<int> > {
@@ -55,50 +55,50 @@ BaseMessage::~BaseMessage()
 {
 }
 
-void BaseMessage::addInt(const String &key, int value)
+void BaseMessage::addInt(const std::string &key, int value)
 {
     datas[key] = ValueInt(value);
 }
 
-void BaseMessage::addBool(const String &key, bool value)
+void BaseMessage::addBool(const std::string &key, bool value)
 {
     datas[key] = ValueBool(value);
 }
 
-void BaseMessage::addFloat(const String &key, double value)
+void BaseMessage::addFloat(const std::string &key, double value)
 {
     datas[key] = ValueFloat(value);
 }
 
-void BaseMessage::addString(const String &key, const String &value)
+void BaseMessage::addString(const std::string &key, const std::string &value)
 {
     datas[key] = ValueString(value);
 }
 
-void BaseMessage::addIntArray(const String &key, const Buffer<int> &value)
+void BaseMessage::addIntArray(const std::string &key, const Buffer<int> &value)
 {
     datas[key] = ValueIntArray(value);
 }
 
-void BaseMessage::addCharArray(const String &key, const Buffer<char> &value)
+void BaseMessage::addCharArray(const std::string &key, const Buffer<char> &value)
 {
     datas[key] = ValueCharArray(value);
 }
 
-void BaseMessage::addIntProperty(const String &key, int value)
+void BaseMessage::addIntProperty(const std::string &key, int value)
 {
     intProperties[key] = value;
 }
 
-void BaseMessage::addBoolProperty(const String &key, bool property)
+void BaseMessage::addBoolProperty(const std::string &key, bool property)
 {
     intProperties[key] = (property ? 1 : 0);
 }
 
 static const BaseMessage::ValueInterface *getInterfaceAndCheckType(const std::map<std::string, BaseMessage::ValueInterface>  &datas,
-                                                      const String key,
+                                                      const std::string &key,
                                                       BaseMessage::ValueType type,
-                                                      const String stype)
+                                                      const std::string &stype)
 {
     auto hval = datas.find(key);
     if (hval == datas.end()) {
@@ -111,59 +111,59 @@ static const BaseMessage::ValueInterface *getInterfaceAndCheckType(const std::ma
     return &(hval->second);
 }
 
-bool BaseMessage::hasInt(const String &key) const
+bool BaseMessage::hasInt(const std::string &key) const
 {
     return datas.find(key) != datas.end();
 }
 
-bool BaseMessage::hasBool(const String &key) const
+bool BaseMessage::hasBool(const std::string &key) const
 {
     return datas.find(key) != datas.end();
 }
 
-bool BaseMessage::hasFloat(const String &key) const
+bool BaseMessage::hasFloat(const std::string &key) const
 {
     return datas.find(key) != datas.end();
 }
 
-bool BaseMessage::hasString(const String &key) const
+bool BaseMessage::hasString(const std::string &key) const
 {
     return datas.find(key) != datas.end();
 }
 
-bool BaseMessage::hasIntArray(const String &key) const
+bool BaseMessage::hasIntArray(const std::string &key) const
 {
     return datas.find(key) != datas.end();
 }
 
-bool BaseMessage::hasCharArray(const String &key) const
+bool BaseMessage::hasCharArray(const std::string &key) const
 {
     return datas.find(key) != datas.end();
 }
 
 
-bool BaseMessage::hasInt       (const String key, int value)    const
+bool BaseMessage::hasInt       (const std::string &key, int value)    const
 {
     return hasInt(key) && (getInt(key) == value);
 }
 
-bool BaseMessage::hasFloat      (const String key, double value)   const
+bool BaseMessage::hasFloat      (const std::string &key, double value)   const
 {
     return hasFloat(key) && (getFloat(key) == value);
 }
 
-bool BaseMessage::hasBool      (const String key, bool value)   const
+bool BaseMessage::hasBool      (const std::string &key, bool value)   const
 {
     return hasBool(key) && (getBool(key) == value);
 }
 
-bool BaseMessage::hasString    (const String key, String value) const
+bool BaseMessage::hasString    (const std::string &key, const std::string &value) const
 {
     return hasString(key) && (getString(key) == value);
 }
 
 
-int BaseMessage::getInt      (const String &key) const
+int BaseMessage::getInt      (const std::string &key) const
 {
   const ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, INTEGER, "Integer");
 
@@ -174,7 +174,7 @@ int BaseMessage::getInt      (const String &key) const
   return val_int->getValue();
 }
 
-bool BaseMessage::getBool     (const String &key) const
+bool BaseMessage::getBool     (const std::string &key) const
 {
   const ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, BOOLEAN, "Boolean");
 
@@ -185,18 +185,18 @@ bool BaseMessage::getBool     (const String &key) const
   return val_bool->getValue();
 }
 
-double BaseMessage::getFloat     (const String &key) const
+double BaseMessage::getFloat     (const std::string &key) const
 {
-  const ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, FLOAT, "Floatean");
+  const ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, FLOAT, "Float");
 
   const ValueFloat* val_double = dynamic_cast<const ValueFloat*>(val_interface);
   if (val_double == NULL)
-    throw DataException(key + " is not a FLOAT");
+    throw DataException(key + " is not a FLOAT");   
 
   return val_double->getValue();
 }
 
-const String BaseMessage::getString   (const String &key) const
+const std::string BaseMessage::getString   (const std::string &key) const
 {
   const ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, STRING, "String");
 
@@ -207,7 +207,7 @@ const String BaseMessage::getString   (const String &key) const
   return val_string->getValue();
 }
 
-const Buffer<int> BaseMessage::getIntArray (const String &key) const
+const Buffer<int> BaseMessage::getIntArray (const std::string   &key) const
 {
   const ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, INT_ARRAY, "IntArray");
 
@@ -218,7 +218,7 @@ const Buffer<int> BaseMessage::getIntArray (const String &key) const
   return val_intarray->getValue();
 }
 
-const Buffer<char> BaseMessage::getCharArray (const String &key) const
+const Buffer<char> BaseMessage::getCharArray (const std::string &key) const
 {
   const ValueInterface *val_interface = getInterfaceAndCheckType(datas, key, CHAR_ARRAY, "CharArray");
 
@@ -230,31 +230,31 @@ const Buffer<char> BaseMessage::getCharArray (const String &key) const
 }
 
 
-int BaseMessage::getIntProperty(const String &key) const
+int BaseMessage::getIntProperty(const std::string &key) const
 {
     auto hval = intProperties.find(key.c_str());
     if (hval == intProperties.end()) {
-        throw PropertyException(String("No such property '") + key + "'");
+        throw PropertyException(std::string("No such property '") + key + "'");
     }
     return hval->second;
 }
 
-bool BaseMessage::getBoolProperty(const String &key) const
+bool BaseMessage::getBoolProperty(const std::string &key) const
 {
     auto hval = intProperties.find(key.c_str());
     if (hval == intProperties.end()) {
-        throw PropertyException(String("No such property '") + key + "'");
+        throw PropertyException(std::string("No such property '") + key + "'");
     }
     return (hval->second == 1);
 }
 
-bool BaseMessage::hasIntProperty    (const String &key) const
+bool BaseMessage::hasIntProperty    (const std::string &key) const
 {
     auto hval = intProperties.find(key.c_str());
     return (hval != intProperties.end());
 }
 
-bool BaseMessage::hasBoolProperty   (const String &key) const
+bool BaseMessage::hasBoolProperty   (const std::string &key) const
 {
     auto hval = intProperties.find(key.c_str());
     return (hval != intProperties.end());

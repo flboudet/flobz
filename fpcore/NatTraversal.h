@@ -26,6 +26,7 @@
 #ifndef _PUYONATTRAVERSAL_H
 #define _PUYONATTRAVERSAL_H
 
+#include <string>
 #include "ios_udpmessagebox.h"
 #include "ios_igpmessagebox.h"
 #include "ios_udpmessage.h"
@@ -39,7 +40,7 @@ class NatTraversal : public MessageListener {
 public:
     NatTraversal(UDPMessageBoxBase &udpmbox, double punchInfoTimeout = 3000., double strategyTimeout = 2000.);
     virtual ~NatTraversal();
-    void punch(const String punchPoolName);
+    void punch(const std::string &punchPoolName);
     void idle();
     void onMessage(Message &message);
     inline bool hasFailed() { return (currentStrategy == FAILED); }
@@ -50,7 +51,7 @@ private:
 
     UDPMessageBoxBase &udpmbox;
     IgpMessageBoxBase *igpmbox;
-    String peerAddressString, peerLocalAddressString;
+    std::string peerAddressString, peerLocalAddressString;
     int peerPortNum, peerLocalPortNum;
     enum {
         TRY_NONE = 0,
@@ -65,7 +66,7 @@ private:
     double punchInfoTimeout, strategyTimeout, timeToPunchInfo, timeToNextStrategy;
     int receivedGarbage;
     bool gettingPunchInfo;
-    String punchPoolName;
+    std::string punchPoolName;
     PeerAddress udpPeerAddress;
     SocketAddress udpSocketAddress;
     int udpSocketPortNum;

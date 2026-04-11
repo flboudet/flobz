@@ -27,35 +27,35 @@ public:
     virtual ~FastMessage();
 
     virtual VoidBuffer serialize();
-    virtual void addInt(const String &key, int value);
-    virtual void addBool(const String &key, bool value);
-    virtual void addFloat(const String &key, double value);
-    virtual void addString(const String &key, const String &value);
-    virtual void addIntArray(const String &key, const Buffer<int> &value);
-    virtual void addCharArray(const String &key, const Buffer<char> &value);
+    virtual void addInt(const std::string &key, int value);
+    virtual void addBool(const std::string &key, bool value);
+    virtual void addFloat(const std::string &key, double value);
+    virtual void addString(const std::string &key, const std::string &value);
+    virtual void addIntArray(const std::string &key, const Buffer<int> &value);
+    virtual void addCharArray(const std::string &key, const Buffer<char> &value);
 
-    virtual int    getInt(const String &key) const;
-    virtual bool   getBool(const String &key) const;
-    virtual double getFloat(const String &key) const;
-    virtual const String       getString    (const String &key) const;
-    virtual const Buffer<int>  getIntArray  (const String &key) const;
-    virtual const Buffer<char> getCharArray (const String &key) const;
+    virtual int    getInt(const std::string &key) const;
+    virtual bool   getBool(const std::string &key) const;
+    virtual double getFloat(const std::string &key) const;
+    virtual const std::string       getString    (const std::string &key) const;
+    virtual const Buffer<int>  getIntArray  (const std::string &key) const;
+    virtual const Buffer<char> getCharArray (const std::string &key) const;
 
-    virtual bool hasInt       (const String &key) const;
-    virtual bool hasBool      (const String &key) const;
-    virtual bool hasFloat     (const String &key) const;
-    virtual bool hasString    (const String &key) const;
-    virtual bool hasIntArray  (const String &key) const;
-    virtual bool hasCharArray (const String &key) const;
+    virtual bool hasInt       (const std::string &key) const;
+    virtual bool hasBool      (const std::string &key) const;
+    virtual bool hasFloat     (const std::string &key) const;
+    virtual bool hasString    (const std::string &key) const;
+    virtual bool hasIntArray  (const std::string &key) const;
+    virtual bool hasCharArray (const std::string &key) const;
 
-    virtual void addIntProperty (const String &key, int value);
-    virtual void addBoolProperty(const String &key, bool value);
+    virtual void addIntProperty (const std::string &key, int value);
+    virtual void addBoolProperty(const std::string &key, bool value);
 
-    virtual bool hasIntProperty   (const String &key) const;
-    virtual bool hasBoolProperty  (const String &key) const;
+    virtual bool hasIntProperty   (const std::string &key) const;
+    virtual bool hasBoolProperty  (const std::string &key) const;
 
-    virtual int  getIntProperty   (const String &key) const;
-    virtual bool getBoolProperty  (const String &key) const;
+    virtual int  getIntProperty   (const std::string &key) const;
+    virtual bool getBoolProperty  (const std::string &key) const;
 
 private:
     enum ValueType {
@@ -137,7 +137,7 @@ private:
                 return (char *)m_data + currentRecord.valOffset;
         }
         if (throwNotFound)
-            throw DataException(String("Data not found: ") + key);
+            throw DataException(std::string("Data not found: ") + key);
         return NULL;
     }
 private:

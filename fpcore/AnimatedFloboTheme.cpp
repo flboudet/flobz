@@ -273,7 +273,7 @@ void ThemeManagerImpl::end_description(GoomSL *gsl, GoomHash *global, GoomHash *
 
 void ThemeManagerImpl::loadFlobobanDefinition(GoomSL *gsl, int playerId, FlobobanThemeDefinition &floboban)
 {
-    String variablePrefix = String("level.floboban_p") + std::to_string(playerId+1);
+    std::string variablePrefix = std::string("level.floboban_p") + std::to_string(playerId+1);
     floboban.displayX = GSL_GLOBAL_INT(gsl, (variablePrefix + ".display.x").c_str());
     floboban.displayY = GSL_GLOBAL_INT(gsl, (variablePrefix + ".display.y").c_str());
     floboban.nextX = GSL_GLOBAL_INT(gsl, (variablePrefix + ".next.x").c_str());

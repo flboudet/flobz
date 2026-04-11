@@ -45,12 +45,12 @@
 #include <string>
 #include <stdint.h>
 
-static bool readLine(DataInputStream *dictionaryFile, String &lineRead)
+static bool readLine(DataInputStream *dictionaryFile, std::string &lineRead)
 {
     bool result = true;
     char newChar[2];
     newChar[1] = 0;
-    String newLineRead;
+    std::string newLineRead;
     do {
         if (dictionaryFile->streamRead(newChar, 1) != 1)
             result = false;
@@ -291,7 +291,7 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
           if (dictionaryStream != NULL)
           {
               /* Read all the entries in the dictionary file */
-              String keyString, valueString;
+              std::string keyString, valueString;
               bool fileOk;
               fileOk = readLine(dictionaryStream, keyString);
               while (fileOk) {

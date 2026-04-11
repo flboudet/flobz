@@ -51,10 +51,10 @@ public:
     // Dirigeable implementation
     PeerAddress getPeerAddress()
     { return peerAddress; }
-    PeerAddress getPeerAddress(const String key);
+    PeerAddress getPeerAddress(const std::string &key);
     PeerAddress getBroadcastAddress();
     void setPeerAddress(PeerAddress);
-    void addPeerAddress(const String key, const PeerAddress &value);
+    void addPeerAddress(const std::string &key, const PeerAddress &value);
     // UDPMessageInterface implementation
     int  getSerialID() const;
     bool isReliable() const;
@@ -101,7 +101,7 @@ void UDPMessage<T>::send()
 }
 
 template <typename T>
-PeerAddress UDPMessage<T>::getPeerAddress(const String key)
+PeerAddress UDPMessage<T>::getPeerAddress(const std::string &key)
 {
     return PeerAddress(new UDPPeerAddressImpl(SocketAddress(T::getString(key + "_A")), T::getInt(key + "_PN")));
 }
@@ -124,7 +124,7 @@ void UDPMessage<T>::setPeerAddress(PeerAddress newPeerAddress)
 }
 
 template <typename T>
-void UDPMessage<T>::addPeerAddress(const String key, const PeerAddress &value)
+void UDPMessage<T>::addPeerAddress(const std::string &key, const PeerAddress &value)
 {
     UDPPeerAddressImpl *peerAddressImpl = dynamic_cast<UDPPeerAddressImpl *>(value.getImpl());
     if (peerAddressImpl != NULL) {

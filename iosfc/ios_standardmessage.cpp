@@ -4,17 +4,17 @@
 
 namespace ios_fc {
 
-  static const String _INTEGER    = "I";
-  static const String _BOOLEAN    = "B";
-  static const String _FLOAT      = "F";
-  static const String _STRING     = "S";
-  static const String _INT_ARRAY  = "A";
-  static const String _CHAR_ARRAY  = "C";
-  static const String _PARAM_INTEGER = "PI";
-  static const String _PARAM_BOOLEAN = "PB";
+  static const std::string _INTEGER    = "I";
+  static const std::string _BOOLEAN    = "B";
+  static const std::string _FLOAT      = "F";
+  static const std::string _STRING     = "S";
+  static const std::string _INT_ARRAY  = "A";
+  static const std::string _CHAR_ARRAY  = "C";
+  static const std::string _PARAM_INTEGER = "PI";
+  static const std::string _PARAM_BOOLEAN = "PB";
 
-  static const String _SERIAL_ID   = "SID";
-  static const String _IS_RELIABLE = "RELIABLE";
+  static const std::string _SERIAL_ID   = "SID";
+  static const std::string _IS_RELIABLE = "RELIABLE";
 
   StandardMessage::StandardMessage(int serialID)
     : serialized()
@@ -28,44 +28,44 @@ namespace ios_fc {
       delete serialized[i];
   }
 
-  void StandardMessage::addInt(const String &key, int value)
+  void StandardMessage::addInt(const std::string &key, int value)
   {
     BaseMessage::addInt(key,value);
-    serialized.add(new String(key + ":" + _INTEGER + ":" + std::to_string(value)));
+    serialized.add(new std::string(key + ":" + _INTEGER + ":" + std::to_string(value)));
   }
 
-  void StandardMessage::addBool(const String &key, bool value)
+  void StandardMessage::addBool(const std::string &key, bool value)
   {
     BaseMessage::addBool(key,value);
-    serialized.add(new String(key + ":" + _BOOLEAN + ":" + (value ? "1" : "0")));
+    serialized.add(new std::string(key + ":" + _BOOLEAN + ":" + (value ? "1" : "0")));
   }
 
-  void StandardMessage::addFloat(const String &key, double value)
+  void StandardMessage::addFloat(const std::string &key, double value)
   {
     BaseMessage::addFloat(key,value);
-    serialized.add(new String(key + ":" + _FLOAT + ":" + std::to_string(value)));
+    serialized.add(new std::string(key + ":" + _FLOAT + ":" + std::to_string(value)));
   }
 
-  void StandardMessage::addString(const String &key, const String &value)
+  void StandardMessage::addString(const std::string &key, const std::string &value)
   {
     BaseMessage::addString(key,value);
-    serialized.add(new String(key + ":" + _STRING + ":" + value));
+    serialized.add(new std::string(key + ":" + _STRING + ":" + value));
   }
 
-  void StandardMessage::addIntArray(const String &key, const Buffer<int> &value)
+  void StandardMessage::addIntArray(const std::string &key, const Buffer<int> &value)
   {
     BaseMessage::addIntArray(key,value);
-    String *s = new String(key + ":" + _INT_ARRAY + ":" + std::to_string(value.size()));
+    std::string *s = new std::string(key + ":" + _INT_ARRAY + ":" + std::to_string(value.size()));
     for (int i=0;i<value.size();++i) {
-      s->operator+=(String(",") + std::to_string(value[i]));
+      s->operator+=(std::string(",") + std::to_string(value[i]));
     }
     serialized.add(s);
   }
 
-  void StandardMessage::addCharArray(const String &key, const Buffer<char> &value)
+  void StandardMessage::addCharArray(const std::string &key, const Buffer<char> &value)
   {
     BaseMessage::addCharArray(key,value);
-    String *s = new String(key + ":" + _CHAR_ARRAY + ":" + std::to_string(value.size()) + ",");
+    std::string *s = new std::string(key + ":" + _CHAR_ARRAY + ":" + std::to_string(value.size()) + ",");
     for (int i=0;i<value.size();++i)
     {
       static const char *hex16[16] =
@@ -76,21 +76,21 @@ namespace ios_fc {
     serialized.add(s);
   }
 
-  void StandardMessage::addIntProperty   (const String &key, int value)
+  void StandardMessage::addIntProperty   (const std::string &key, int value)
   {
     BaseMessage::addIntProperty(key,value);
-    serialized.add(new String(key + ":" + _PARAM_INTEGER + ":" + std::to_string(value)));
+    serialized.add(new std::string(key + ":" + _PARAM_INTEGER + ":" + std::to_string(value)));
   }
 
-  void StandardMessage::addBoolProperty  (const String &key, bool value)
+  void StandardMessage::addBoolProperty  (const std::string &key, bool value)
   {
     BaseMessage::addBoolProperty(key,value);
-    serialized.add(new String(key + ":" + _PARAM_BOOLEAN + ":" + (value ? "1" : "0")));
+    serialized.add(new std::string(key + ":" + _PARAM_BOOLEAN + ":" + (value ? "1" : "0")));
   }
 
   VoidBuffer StandardMessage::serialize()
   {
-    String out = "";
+    std::string out = "";
     for (int i=0;i<serialized.size();++i)
     {
       out += *serialized[i] + "\n";
@@ -104,7 +104,7 @@ namespace ios_fc {
     Buffer<char> tmp_buf = raw.dup();
     tmp_buf.grow(1);
     tmp_buf[raw.size()] = 0;
-    String sraw(tmp_buf.ptr());
+    std::string sraw(tmp_buf.ptr());
     int    start = 0;
     int    end   = 0;
 
@@ -114,7 +114,7 @@ namespace ios_fc {
       while (sraw[end] && (sraw[end] != '\n'))
         end ++;
 
-      String line = ios_fc::substring(sraw, start, end);
+      std::string line = sraw.substr(start, end - start);
 
       if (line.length() <= 1) { checkMessage(); return; }
 
@@ -128,9 +128,9 @@ namespace ios_fc {
       while (line[ival] && (line[ival] != ':')) { ival++; }
       if (!line[ival]) { checkMessage(); return; }
 
-      String key   = ios_fc::substring(line, 0, itype);
-      String type  = ios_fc::substring(line, itype+1, ival);
-      String value = ios_fc::substring(line, ival+1, line.length());
+      std::string key   = line.substr(0, itype);
+      std::string type  = line.substr(itype+1, ival - itype - 1);
+      std::string value = line.substr(ival+1, line.length() - ival - 1);
 
       if (type == _INTEGER)
           addInt(key, atoi(value.c_str()));
@@ -147,7 +147,7 @@ namespace ios_fc {
           if (value[index] == 0)
             throw InvalidMessageException();
           index++;
-          buffer[i] = atoi(ios_fc::substring(value, index).c_str());
+          buffer[i] = atoi(value.substr(index).c_str());
         }
         addIntArray(key, buffer);
       }

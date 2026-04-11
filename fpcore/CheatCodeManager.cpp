@@ -32,13 +32,13 @@ void CheatCodeManager::eventOccured(GameControlEvent *event)
 {
     if (event->keyboardEvent != kKeyboardDown)
         return;
-    if (event->unicodeKeySym == cheatCode[currentPosition])
-        currentPosition++;
+    if (event->unicodeKeySym == _cheatCode[_currentPosition])
+        _currentPosition++;
     else
-        currentPosition = 0;
-    if (currentPosition == cheatCodeLength) {
-        cheatAction->action(this, 0, event);
-        currentPosition = 0;
+        _currentPosition = 0;
+    if (_currentPosition == _cheatCodeLength) {
+        _cheatAction->action(this, 0, event);
+        _currentPosition = 0;
     }
 }
 

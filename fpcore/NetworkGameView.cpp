@@ -255,7 +255,7 @@ void NetworkGameView::sendEndOfGameMessage(int messageType)
     message->addInt(FPNetMessage::SCORE, gameStat.points);
     message->addInt(FPNetMessage::TOTAL_SCORE, gameStat.total_points);
     for (int i = 0 ; i < 24 ; i++) {
-        String messageName = String(FPNetMessage::COMBO_COUNT) + std::to_string(i);
+        std::string messageName = std::string(FPNetMessage::COMBO_COUNT) + std::to_string(i);
         message->addInt(messageName, gameStat.combo_count[i]);
     }
     message->addInt(FPNetMessage::EXPLODE_COUNT, gameStat.explode_count);
@@ -307,7 +307,7 @@ void InternetGameView::sendGameResultToServer(int winner)
     message->addInt("SCORE", gameStat.points);
     message->addInt("TOTAL_SCORE", gameStat.total_points);
     for (int i = 0 ; i < 24 ; i++) {
-        String messageName = String("COMBO_COUNT") + std::to_string(i);
+        std::string messageName = std::string("COMBO_COUNT") + std::to_string(i);
         message->addInt(messageName, gameStat.combo_count[i]);
     }
     message->addInt("EXPLODE_COUNT", gameStat.explode_count);

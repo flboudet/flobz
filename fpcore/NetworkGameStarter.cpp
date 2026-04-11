@@ -211,8 +211,8 @@ void NetworkGameWidget::sendChat(const std::string &chatText)
 {
     ios_fc::Message *message = mbox->createMessage();
     message->addInt(FPNetMessage::TYPE,   FPNetMessage::kGameChat);
-    message->addString("NAME",   String(getPlayerOneName().c_str()));
-    message->addString("TEXT",   String(chatText.c_str())); // TODO string
+    message->addString("NAME",   getPlayerOneName());
+    message->addString("TEXT",   chatText);
     message->addBoolProperty("RELIABLE", true);
     message->send();
     if (chatBox.get())

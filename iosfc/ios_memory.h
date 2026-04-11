@@ -47,15 +47,6 @@
 
 namespace ios_fc {
 
-    // String is now an alias for std::string for backward compatibility
-    typedef std::string String;
-
-    // Helper function to mimic old String::substring(start, end) behavior
-    inline String substring(const std::string &str, size_t start, size_t end = std::string::npos) {
-        if (end == std::string::npos) end = str.length();
-        return str.substr(start, end - start);
-    }
-
     /**
      * Overide memory management methods to allow easy debugging.
      */

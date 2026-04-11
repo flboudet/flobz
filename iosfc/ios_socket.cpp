@@ -27,7 +27,7 @@ namespace ios_fc {
 class DefaultSocket : public SocketImpl {
 public:
     void create() {}
-    void connect(const String hostName, int portID) {}
+    void connect(const std::string &hostName, int portID) {}
     InputStream *getInputStream() { throwError(); return NULL; }
     OutputStream *getOutputStream() { throwError(); return NULL; }
     SelectableImpl *getSelectableImpl() { return NULL; }
@@ -50,7 +50,7 @@ DefaultSocketFactory defaultSocketFactory;
 SocketFactory *Socket::factory = &defaultSocketFactory;
 #endif
 
-Socket::Socket(const String hostName, int portID, bool nonblocking)
+Socket::Socket(const std::string &hostName, int portID, bool nonblocking)
 {
     impl = factory->createSocket();
     impl->create();

@@ -35,7 +35,7 @@ namespace ios_fc {
 
     class FileInputStream : public InputStream {
         public:
-            FileInputStream (const String path, const bool istext);
+            FileInputStream (const std::string &path, const bool istext);
             virtual ~FileInputStream();
             int streamAvailable();
             int streamRead(VoidBuffer buffer);
@@ -46,7 +46,7 @@ namespace ios_fc {
 
     class FileOutputStream : public OutputStream {
         public:
-            FileOutputStream (const String path, const bool istext);
+            FileOutputStream (const std::string &path, const bool istext);
             virtual ~FileOutputStream ();
             int streamWrite(VoidBuffer buffer);
         private:

@@ -9,12 +9,12 @@ static std::vector<FileLoader*> loaders;
 class FSLoader : public FileLoader
 {
   public:
-    bool isSupportedType(const String &type) const
+    bool isSupportedType(const std::string &type) const
     {
       return type == "file";
     }
 
-    Buffer<char> load(const String &param) const
+    Buffer<char> load(const std::string &param) const
     {
       printf("Loading %s\n", param.c_str());
       int step   = 128;
@@ -45,7 +45,7 @@ static void initHandlers()
   }
 }
 
-static FileLoader *findHandler(const String &type)
+static FileLoader *findHandler(const std::string &type)
 {
   printf("Looking for %s-loader\n", type.c_str());
   for (int i = 0; i < static_cast<int>(loaders.size()); ++i) {
@@ -61,14 +61,14 @@ void FileLoader::addHandler(FileLoader *loader)
   loaders.push_back(loader);
 }
 
-Buffer<char> FileLoader::loadFrom(const String &url) 
+Buffer<char> FileLoader::loadFrom(const std::string &url) 
 {
   initHandlers();
 
   int i = 0;
   while((url[i]!=':') && (i<url.size())) i++;
-  String type  = ios_fc::substring(url, 0, i);
-  String param = ios_fc::substring(url, i+3);
+  std::string type  = url.substr(0, i);
+  std::string param = url.substr(i+3);
   FileLoader *loader = findHandler(type);
   if (loader)
     return loader->load(param);

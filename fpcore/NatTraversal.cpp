@@ -41,13 +41,13 @@ NatTraversal::~NatTraversal()
     udpmbox.removeListener(this);
 }
 
-void NatTraversal::punch(const String punchPoolName)
+void NatTraversal::punch(const std::string &punchPoolName)
 {
     this->punchPoolName = punchPoolName;
     int prevBound = igpmbox->getBound();
     igpmbox->bind(1);
     Message *punchMsg = igpmbox->createMessage();
-    String localSocketAddress = udpmbox.getDatagramSocket()->getSocketAddress().asString();
+    std::string localSocketAddress = udpmbox.getDatagramSocket()->getSocketAddress().asString();
     int localPortNum = udpmbox.getDatagramSocket()->getSocketPortNum();
 
     punchMsg->addInt("CMD", FLOBO_IGP_NAT_TRAVERSAL);

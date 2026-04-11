@@ -54,7 +54,10 @@ private:
         ChatAction(ChatBox *owner) : owner(owner) {}
         void setEditField(EditField *attachedEditField) { this->attachedEditField = attachedEditField; }
         void action();
-        void addChat(String name, String text);
+        /// @brief 
+        /// @param name 
+        /// @param text 
+        void addChat(const std::string &name, const std::string &text);
     private:
         ChatBox *owner;
         EditField *attachedEditField;

@@ -47,7 +47,7 @@ class LevelThemePicturePreview : public Widget, public IdleComponent {
       void updatePicture(DrawTarget *dt);
 
     private:
-      String label;
+      std::string label;
       std::unique_ptr<IosSurface> picture;
       std::unique_ptr<IosSurface> lilback;
       double offsetX;

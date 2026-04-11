@@ -40,20 +40,20 @@ namespace ios_fc {
         virtual ~SocketAddressImpl() {}
         virtual bool operator == (const SocketAddressImpl &) const = 0;
         virtual bool operator < (const SocketAddressImpl &a) const = 0;
-	virtual String asString() const = 0;
+	virtual std::string asString() const = 0;
     private:
         int usage;
     };
 
     class SocketAddressFactory {
     public:
-        virtual SocketAddressImpl * createSocketAddress(String hostName) = 0;
+        virtual SocketAddressImpl * createSocketAddress(const std::string &hostName) = 0;
         virtual ~SocketAddressFactory() {};
     };
 
     class SocketAddress {
     public:
-        SocketAddress(String hostName) : impl(factory->createSocketAddress(hostName)) { impl->incrementUsage(); }
+        SocketAddress(const std::string &  hostName) : impl(factory->createSocketAddress(hostName)) { impl->incrementUsage(); }
         SocketAddress(SocketAddressImpl *impl) : impl(impl) { impl->incrementUsage(); }
         SocketAddress(const SocketAddress &s) : impl(s.impl) { impl->incrementUsage(); }
         ~SocketAddress() { impl->decrementUsage(); }
@@ -70,7 +70,7 @@ namespace ios_fc {
             return (*impl < *(a.impl));
         } 
         SocketAddressImpl *getImpl() const { return impl; }
-	String asString() const { return impl->asString(); }
+	std::string asString() const { return impl->asString(); }
         static void setFactory(SocketAddressFactory *factory) { SocketAddress::factory = factory; }
     private:
         static SocketAddressFactory *factory;

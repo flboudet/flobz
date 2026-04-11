@@ -291,11 +291,11 @@ void GameView::renderNeutral(DrawTarget *dt)
     IosSurface *bigNeutral = attachedLevelTheme->getBigNeutralIndicator();
     IosSurface *giantNeutral = attachedLevelTheme->getGiantNeutralIndicator();
     if (neutral == NULL)
-        throw std::runtime_error(String("Neutral indicator not found!"));
+        throw std::runtime_error("Neutral indicator not found!");
     if (bigNeutral == NULL)
-        throw std::runtime_error(String("Big neutral indicator not found!"));
+        throw std::runtime_error("Big neutral indicator not found!");
     if (giantNeutral == NULL)
-        throw std::runtime_error(String("Giant neutral indicator not found!"));
+        throw std::runtime_error("Giant neutral indicator not found!");
     for (int cpt = 0 ; cpt < numGiantNeutral ; cpt++) {
 		drect.x = drect_x;
 		drect.y = drect_y_base - giantNeutral->h;

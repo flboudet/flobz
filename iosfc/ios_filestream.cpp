@@ -12,7 +12,7 @@
 
 namespace ios_fc {
 
-FileInputStream::FileInputStream (const String path, const bool istext) {
+FileInputStream::FileInputStream (const std::string &path, const bool istext) {
 	const char *flags = istext?"rt":"r";
 	file = (void*)fopen(path.c_str(),flags);
 	if (!file)
@@ -35,7 +35,7 @@ int FileInputStream::streamRead(VoidBuffer buffer) {
 	return s;
 }
 
-FileOutputStream::FileOutputStream (const String path, const bool istext) {
+FileOutputStream::FileOutputStream (const std::string &path, const bool istext) {
 	const char *flags = istext?"wt":"w";
 	file = (void*)fopen(path.c_str(),flags);
 	if (!file)

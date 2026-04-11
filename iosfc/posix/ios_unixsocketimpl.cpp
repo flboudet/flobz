@@ -42,7 +42,7 @@ void UnixSocketImpl::create()
     }
 }
 
-void UnixSocketImpl::connect(const String hostName, int portID)
+void UnixSocketImpl::connect(const std::string &hostName, int portID)
 {
     struct hostent *hp;
     /* go find out about the desired host machine */

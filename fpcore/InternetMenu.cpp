@@ -221,7 +221,7 @@ PingableFPServer::PingableFPServer(const std::string & hostName, int portNum, co
     m_responder(responder), m_alreadyReported(false)
 {
     m_pingSocket.reset(new DatagramSocket());
-    m_pingSocket->connect(String(hostName.c_str()), portNum);
+    m_pingSocket->connect(hostName, portNum);
     m_pingBox.reset(new FPServerMessageBox(m_pingSocket.get()));
     m_igpclient.reset(new IGPClient(*m_pingBox, false));
     GameUIDefaults::GAME_LOOP->addIdle(this);

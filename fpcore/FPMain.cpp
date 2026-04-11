@@ -213,15 +213,15 @@ void FPMain::connect_ia(const std::string & param)
   for (int i=0; i<=param.length(); ++i) {
       if ((param[i] == 0) || (param[i] == ':')) {
           if (what == 1) {
-              name = ios_fc::substring(param, first, i);
+              name = param.substr(first, i - first);
               first = i+1;
               what++;
           } else if (what == 2) {
-              server = ios_fc::substring(param, first, i);
+              server = param.substr(first, i - first);
               first = i+1;
               what++;
           } else if (what == 3) {
-              port = atoi(ios_fc::substring(param, first, i).c_str());
+              port = atoi(param.substr(first, i - first).c_str());
               first = i+1;
               what++;
           }

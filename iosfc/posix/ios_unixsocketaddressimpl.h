@@ -32,19 +32,19 @@ namespace ios_fc {
 
     class UnixSocketAddressImpl : public SocketAddressImpl {
     public:
-        UnixSocketAddressImpl(String hostName);
+        UnixSocketAddressImpl(const std::string &hostName);
         UnixSocketAddressImpl(in_addr_t address);
         in_addr_t getAddress() const { return address; }
         bool operator == (const SocketAddressImpl &) const;
         bool operator < (const SocketAddressImpl &) const;
-	String asString() const;
+	std::string asString() const;
     private:
         in_addr_t address;
     };
 
     class UnixSocketAddressFactory : public SocketAddressFactory {
     public:
-        SocketAddressImpl * createSocketAddress(String hostName);
+        SocketAddressImpl * createSocketAddress(const std::string &hostName);
     };
 
 }

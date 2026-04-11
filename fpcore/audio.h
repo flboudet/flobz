@@ -47,7 +47,7 @@ public:
     // Helper functions
     void playSound(const std::string &sName, float volume = 1.0, float balance = 0.0f);
     // NotificationResponder implementation
-    void notificationOccured(String identifier, void * context);
+    void notificationOccured(const std::string &identifier, void * context);
 
 private:
     audio_manager::AudioManager *m_audioManager;

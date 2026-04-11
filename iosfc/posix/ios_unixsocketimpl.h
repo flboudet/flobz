@@ -34,7 +34,7 @@ namespace ios_fc {
 class UnixSocketImpl : public SocketImpl, public UnixSelectableImpl {
 public:
     void create();
-    void connect(String hostName, int portID);
+    void connect(const std::string &hostName, int portID);
     void create(int fd);
     ~UnixSocketImpl();
 

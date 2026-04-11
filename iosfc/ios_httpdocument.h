@@ -28,14 +28,14 @@ namespace ios_fc {
 
 class HttpDocument {
 public:
-    HttpDocument(String hostName, String path, int portNum);
+    HttpDocument(const std::string &hostName, const std::string &path, int portNum);
     VoidBuffer getDocumentContent() const { return docContent; }
     bool documentIsReady();
 
 private:
     bool getLine();
-    static const String contentLength;
-    static const String rqPart[];
+    static const std::string contentLength;
+    static const std::string rqPart[];
     class HttpHeaderElement;
     bool socketIsConnected;
     bool docIsReady;
@@ -45,17 +45,17 @@ private:
     int msgSize;
     Buffer<char> docContent;
     int docContentOffset;
-    String path;
-    String hostName;
+    std::string path;
+    std::string hostName;
     int portNum;
-    String currentLine;
+    std::string currentLine;
 };
 
 class HttpDocument::HttpHeaderElement {
 public:
-    HttpHeaderElement(String rawElement);
-    String name;
-    String content;
+    HttpHeaderElement(const std::string &rawElement);
+    std::string name;
+    std::string content;
 };
 
 

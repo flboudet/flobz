@@ -33,7 +33,7 @@ namespace ios_fc {
         SocketImpl() {}
         virtual ~SocketImpl() {}
         virtual void create() = 0;
-        virtual void connect(const String hostName, int portID) = 0;
+        virtual void connect(const std::string &hostName, int portID) = 0;
         virtual InputStream *getInputStream() = 0;
         virtual OutputStream *getOutputStream() = 0;
         virtual SelectableImpl *getSelectableImpl() = 0;
@@ -49,7 +49,7 @@ namespace ios_fc {
     
     class Socket : public Selectable {
     public:
-        Socket(const String hostName, int portID, bool nonblocking=false);
+        Socket(const std::string &hostName, int portID, bool nonblocking=false);
         Socket(SocketImpl *impl);
         virtual ~Socket();
         virtual InputStream *getInputStream() const;

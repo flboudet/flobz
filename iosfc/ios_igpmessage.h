@@ -41,8 +41,8 @@ namespace ios_fc {
         PeerAddress getPeerAddress();
         PeerAddress getBroadcastAddress();
         void setPeerAddress(PeerAddress);
-        void addPeerAddress(const String key, const PeerAddress &value);
-        PeerAddress getPeerAddress(const String key);
+        void addPeerAddress(const std::string &key, const PeerAddress &value);
+        PeerAddress getPeerAddress(const std::string & key);
     protected:
         int igpPeerIdent;
         static const char * SERIAL_ID;//   = "SID";
@@ -103,7 +103,7 @@ namespace ios_fc {
     }
     
     template <typename T>
-    void IgpMessage<T>::addPeerAddress(const String key, const PeerAddress &value)
+    void IgpMessage<T>::addPeerAddress(const std::string &key, const PeerAddress &value)
     {
         IgpPeerAddressImpl *peerAddressImpl = dynamic_cast<IgpPeerAddressImpl *>(value.getImpl());
         if (peerAddressImpl != NULL) {
@@ -113,7 +113,7 @@ namespace ios_fc {
     }
     
     template <typename T>
-    PeerAddress IgpMessage<T>::getPeerAddress(const String key)
+    PeerAddress IgpMessage<T>::getPeerAddress(const std::string &key)
     {
         return PeerAddress(new IgpPeerAddressImpl(T::getInt(key)));
     }

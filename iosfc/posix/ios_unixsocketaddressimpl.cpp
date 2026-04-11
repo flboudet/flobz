@@ -24,7 +24,7 @@
 
 namespace ios_fc {
 
-UnixSocketAddressImpl::UnixSocketAddressImpl(String hostName)
+UnixSocketAddressImpl::UnixSocketAddressImpl(const std::string &hostName)
 {
     struct hostent *ht;
     
@@ -51,9 +51,9 @@ bool UnixSocketAddressImpl::operator < (const SocketAddressImpl &a) const
     return (address < comp.address);
 }
 
-String UnixSocketAddressImpl::asString() const
+std::string UnixSocketAddressImpl::asString() const
 {
-  String result;
+  std::string result;
   result += (int)((address & 0xFF000000) >> 24);
   result += ".";
   result += (int)((address & 0x00FF0000) >> 16);
@@ -64,7 +64,7 @@ String UnixSocketAddressImpl::asString() const
   return result;
 }
 
-SocketAddressImpl * UnixSocketAddressFactory::createSocketAddress(String hostName)
+SocketAddressImpl * UnixSocketAddressFactory::createSocketAddress(const std::string &hostName)
 {
     return new UnixSocketAddressImpl(hostName);
 }

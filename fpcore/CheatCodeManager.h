@@ -26,19 +26,20 @@
 #ifndef _FLOBO_CHEAT_CODE_MANAGER_H
 #define _FLOBO_CHEAT_CODE_MANAGER_H
 
+#include <string>
 #include "gameui.h"
 #include "GameControls.h"
 
 class CheatCodeManager : public gameui::Widget {
 public:
-    CheatCodeManager(String cheatCode, gameui::Action *cheatAction)
-      : cheatCode(cheatCode), cheatAction(cheatAction), cheatCodeLength(cheatCode.length()), currentPosition(0) {}
+    CheatCodeManager(const std::string &cheatCode, gameui::Action *cheatAction)
+      : _cheatCode(cheatCode), _cheatAction(cheatAction), _cheatCodeLength(cheatCode.length()), _currentPosition(0) {}
     void eventOccured(event_manager::GameControlEvent *event);
 private:
-    String cheatCode;
-    gameui::Action *cheatAction;
-    int cheatCodeLength;
-    int currentPosition;
+    std::string _cheatCode;
+    gameui::Action *_cheatAction;
+    int _cheatCodeLength;
+    int _currentPosition;
 };
 
 #endif // _FLOBO_CHEAT_CODE_MANAGER_H

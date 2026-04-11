@@ -7,11 +7,11 @@ namespace ios_fc {
 
 class FileLoader {
   public:
-    virtual Buffer<char> load(const String &param)   const = 0;
-    virtual bool isSupportedType(const String &type) const = 0;
+    virtual Buffer<char> load(const std::string &param)   const = 0;
+    virtual bool isSupportedType(const std::string &type) const = 0;
 
     static void addHandler(FileLoader *loader);
-    static Buffer<char> loadFrom(const String &url);
+    static Buffer<char> loadFrom(const std::string &url);
   
     virtual ~FileLoader() {};
 };

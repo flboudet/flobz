@@ -35,12 +35,12 @@ namespace ios_fc {
 
 class NetworkInterface {
 public:
-    NetworkInterface(String interfaceName, SocketAddress address) : ifName(interfaceName), ifAddress(address) {}
-    virtual String getName() const { return ifName; }
+    NetworkInterface(const std::string &interfaceName, SocketAddress address) : ifName(interfaceName), ifAddress(address) {}
+    virtual std::string getName() const { return ifName; }
     virtual SocketAddress getAddress() { return ifAddress; }
     virtual ~NetworkInterface() {};
 private:
-    String ifName;
+    std::string ifName;
     SocketAddress ifAddress;
 };
 

@@ -12,7 +12,7 @@ WINDOW *rootWin, *plyList, *chatArea, *inputArea;
 class MyNetGameCenterListener : public PuyoNetGameCenterListener {
 public:
     MyNetGameCenterListener(PuyoNetGameCenter &owner) : currentLine(0), owner(owner), chatLine(1) {}
-    void onChatMessage(const String &msgAuthor, const String &msg) {
+    void onChatMessage(const std::string &msgAuthor, const std::string &msg) {
         wprintw(chatArea, "%s: %s\n", (const char *)msgAuthor, (const char *)msg);
         //if (chatLine > 10) wscrl(chatArea, 10);
         wrefresh(chatArea);
@@ -31,24 +31,24 @@ public:
         //mvwprintw(plyList, 1 + currentLine++, 1, "%s", (const char *)playerName);
     }
     
-    void onPlayerConnect(String playerName, PeerAddress playerAddress) {
+    void onPlayerConnect(const std::string &playerName, const PeerAddress &playerAddress) {
         drawPeers();
     }
     
-    void onPlayerDisconnect(String playerName, PeerAddress playerAddress) {
+    void onPlayerDisconnect(const std::string &playerName, const PeerAddress &playerAddress) {
         drawPeers();
     }
     
-    void gameInvitationAgainst(String playerName, PeerAddress playerAddress) {
+    void gameInvitationAgainst(const std::string &playerName, const PeerAddress &playerAddress) {
         wprintw(chatArea, "### %s wants to play against you\n", (const char *)playerName);
         wrefresh(chatArea);
     }
-    void gameCanceledAgainst(String playerName, PeerAddress playerAddress) {
+    void gameCanceledAgainst(const std::string &playerName, const PeerAddress &playerAddress) {
         wprintw(chatArea, "### The game against %s has been canceled\n", (const char *)playerName);
         wrefresh(chatArea);
     }
     void gameGrantedWithMessagebox(MessageBox *mbox) {}
-    void onPlayerUpdated(String playerName, PeerAddress playerAddress) {}
+    void onPlayerUpdated(const std::string &playerName, const PeerAddress &playerAddress) {}
 private:
     int currentLine;
     PuyoNetGameCenter &owner;
@@ -64,21 +64,21 @@ static void finish(int sig)
     exit(0);
 }
 
-void decodeMessage(PuyoNetGameCenter &myCenter, String msgBuf)
+void decodeMessage(PuyoNetGameCenter &myCenter, const std::string &msgBuf)
 {
-    if (ios_fc::substring(msgBuf, 0, 6) == "/start") {
-        String against = ios_fc::substring(msgBuf, 7);
+    if (msgBuf.substr(0, 6) == "/start") {
+        std::string against = msgBuf.substr(7);
         wprintw(chatArea, "### Asking to start a game against %s\n", (const char *)against);
         wrefresh(chatArea);
         myCenter.requestGameWith(myCenter.getPeerAddressForPeerName(against));
     }
-    else if (ios_fc::substring(msgBuf, 0, 7) == "/cancel") {
-        String against = ios_fc::substring(msgBuf, 8);
+    else if (msgBuf.substr(0, 7) == "/cancel") {
+        std::string against = msgBuf.substr(8);
         wprintw(chatArea, "### Asking to cancel a game against %s\n", (const char *)against);
         wrefresh(chatArea);
         myCenter.cancelGameWith(myCenter.getPeerAddressForPeerName(against));
     }
-    else if (ios_fc::substring(msgBuf, 0, 6) == "/punch") {
+    else if (msgBuf.substr(0, 6) == "/punch") {
 	PuyoInternetGameCenter &myInternetCenter = dynamic_cast<PuyoInternetGameCenter &>(myCenter);
 	myInternetCenter.punch();
     }
@@ -91,8 +91,8 @@ int main(int argc, char *argv[])
     char msgBuf[256];
     signal(SIGINT, finish);
 
-    String serverName = "durandal.homeunix.com";
-    String login;
+    std::string serverName = "durandal.homeunix.com";
+    std::string login;
     int portNum = 4567;
     bool showHelp = false;
     bool lanMode = false;
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 	break;
       switch (LI_Cr) {
       case 's':
-	serverName = String(optarg);
+	serverName = std::string(optarg);
 	break;
       case 'p':
 	portNum = atoi(optarg);
@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
       }
     }
     if (optind < argc)
-      login = String(argv[optind]);
+      login = std::string(argv[optind]);
     else showHelp = true;
 
     if (showHelp) {

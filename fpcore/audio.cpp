@@ -85,7 +85,7 @@ void AudioHelper::playSound(const std::string &fileName, float volume, float bal
     m_lastUsedTimestamp[fileName] = currentTime;
 }
 
-void AudioHelper::notificationOccured(String identifier, void * context)
+void AudioHelper::notificationOccured(const std::string &identifier, void * context)
 {
     if (identifier == kMusicVolume) {
         m_audioManager->setMusicVolume((float)*(int *)context);

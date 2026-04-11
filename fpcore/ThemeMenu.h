@@ -46,7 +46,7 @@ class FloboThemePicturePreview : public Widget, public IdleComponent {
       void draw(DrawTarget *dt);
 
     private:
-      String label;
+      std::string label;
       FloboSetTheme * curTheme;
       double offsetX;
       double offsetY;
@@ -94,4 +94,4 @@ private:
     FloboThemeSelectionBox themeList;
 };
 
-#endif
+#endif // _THEME_MENU_H

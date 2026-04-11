@@ -23,7 +23,7 @@
 
 namespace ios_fc {
 
-HttpDocument::HttpHeaderElement::HttpHeaderElement(String rawElement)
+HttpDocument::HttpHeaderElement::HttpHeaderElement(const std::string &rawElement)
 {
     int sep = 0;
     while ((sep < rawElement.length()) && (rawElement[sep] != ':')) { sep++; }
@@ -31,13 +31,13 @@ HttpDocument::HttpHeaderElement::HttpHeaderElement(String rawElement)
         name = rawElement;
     }
     else {
-        name = ios_fc::substring(rawElement, 0, sep);
-        content = ios_fc::substring(rawElement, sep+2, rawElement.length());
+        name = rawElement.substr(0, sep);
+        content = rawElement.substr(sep+2, rawElement.length());
     }
 }
 
-const String HttpDocument::contentLength = "Content-Length";
-const String HttpDocument::rqPart[] =
+const std::string HttpDocument::contentLength = "Content-Length";
+const std::string HttpDocument::rqPart[] =
 {"GET ", " HTTP/1.0\r\n\
 Host: ", ":", "\r\n\
 User-Agent: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.7.5) Gecko/20050105 Epiphany/1.4.7\r\n\
@@ -45,7 +45,7 @@ Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plai
 Accept-Language: en\r\n\
 \r\n"};
 
-HttpDocument::HttpDocument(String hostName,  String path, int portNum)
+HttpDocument::HttpDocument(const std::string &hostName, const std::string &path, int portNum)
     : socketIsConnected(false), docIsReady(false), headerIsDone(false), httpSocket(hostName, portNum, true),
       httpInputStream(httpSocket.getInputStream()), msgSize(-1), docContentOffset(0), path(path),
       hostName(hostName), portNum(portNum)
@@ -60,7 +60,7 @@ bool HttpDocument::documentIsReady()
         if (httpSocket.isConnected()) {
             socketIsConnected = true;
             httpSocket.setNonBlockingMode(false);
-            String request = rqPart[0] + path + rqPart[1] + hostName + rqPart[2] + std::to_string(portNum) + rqPart[3];
+            std::string request = rqPart[0] + path + rqPart[1] + hostName + rqPart[2] + std::to_string(portNum) + rqPart[3];
             httpSocket.getOutputStream()->streamWrite(VoidBuffer(request.c_str(), request.length()));
         }
         else return false;
