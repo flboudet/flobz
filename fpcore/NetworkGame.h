@@ -41,11 +41,11 @@ public:
 
     virtual void cycle();
 
-    virtual Flobo *getFloboAt(int X, int Y) const;
+    virtual std::shared_ptr<Flobo> getFloboAt(int X, int Y) const;
 
     // List access to the Flobo objects
     virtual int getFloboCount() const;
-    //virtual Flobo *getFloboAtIndex(int index) const;
+    //virtual std::shared_ptr<Flobo> getFloboAtIndex(int index) const;
 
     virtual FloboState getNextFalling();
     virtual FloboState getNextCompanion();
@@ -56,7 +56,7 @@ public:
     virtual int getFallingY() const;
 
     virtual int getFallingCompanionDir() const;
-    virtual Flobo *getFallingFlobo() const;
+    virtual std::shared_ptr<Flobo> getFallingFlobo() const;
 
     virtual void increaseNeutralFlobos(int incr);
     virtual int getNeutralFlobos() const;
@@ -70,17 +70,17 @@ public:
     virtual int  getComboPhase() const { return comboPhase; }
 private:
     void synchronizeState(Message &message);
-    void setFloboAt(int X, int Y, Flobo *newFlobo);
+    void setFloboAt(int X, int Y, std::shared_ptr<Flobo> newFlobo);
     void synchronizeFlobo(Buffer<int> buffer);
-    Flobo *findFlobo(int floboID);
-    Flobo *floboCells[FLOBOBAN_DIMX * (FLOBOBAN_DIMY+1)];
+    std::shared_ptr<Flobo> findFlobo(int floboID);
+    std::shared_ptr<Flobo> floboCells[FLOBOBAN_DIMX * (FLOBOBAN_DIMY+1)];
     FloboState nextFalling, nextCompanion;
-    Flobo *fakeFlobo;
+    std::shared_ptr<Flobo> fakeFlobo;
     MessageBox *msgBox;
     int gameId;
-    typedef std::list<Flobo *> FloboPtrList;
+    typedef std::list<std::shared_ptr<Flobo>> FloboPtrList;
     FloboPtrList m_floboList;
-    std::map<int, Flobo *> m_floboMap;
+    std::map<int, std::shared_ptr<Flobo>> m_floboMap;
     int semiMove;
     int neutralFlobos, sentBadFlobos;
     bool gameRunning;

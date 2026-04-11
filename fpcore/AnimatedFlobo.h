@@ -83,7 +83,7 @@ class AnimatedFloboFactory : public FloboFactory {
 public:
     AnimatedFloboFactory(GameView *attachedView);
     virtual ~AnimatedFloboFactory();
-    virtual Flobo *createFlobo(FloboState state);
+    virtual std::shared_ptr<Flobo> createFlobo(FloboState state);
     virtual void deleteFlobo(Flobo *target);
     void renderWalhalla(DrawTarget *dt);
     void cycleWalhalla();

@@ -57,7 +57,7 @@ Message *NetworkGameView::createStateMessage(bool sendFullMessage)
         AdvancedBuffer<int> buffer(floboCount * 4);
         for (FloboDefaultIterator iter(attachedGame) ;
              ! iter.end() ; ++iter) {
-            Flobo *currentFlobo = iter.get();
+            auto currentFlobo = iter.get();
             buffer.add(currentFlobo->getID());
             buffer.add(currentFlobo->getFloboState());
             buffer.add(currentFlobo->getFloboX());
@@ -136,7 +136,7 @@ void NetworkGameView::rotateRight()
 }
 
 // GameListener methods
-void NetworkGameView::fallingsDidMoveLeft(Flobo *fallingFlobo, Flobo *companionFlobo)
+void NetworkGameView::fallingsDidMoveLeft(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo)
 {
     GameView::fallingsDidMoveLeft(fallingFlobo, companionFlobo);
     moveLeftBuffer.add(fallingFlobo->getID());
@@ -149,7 +149,7 @@ void NetworkGameView::fallingsDidMoveLeft(Flobo *fallingFlobo, Flobo *companionF
     moveLeftBuffer.add(companionFlobo->getFloboY());
 }
 
-void NetworkGameView::fallingsDidMoveRight(Flobo *fallingFlobo, Flobo *companionFlobo)
+void NetworkGameView::fallingsDidMoveRight(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo)
 {
     GameView::fallingsDidMoveRight(fallingFlobo, companionFlobo);
     moveRightBuffer.add(fallingFlobo->getID());
@@ -162,7 +162,7 @@ void NetworkGameView::fallingsDidMoveRight(Flobo *fallingFlobo, Flobo *companion
     moveRightBuffer.add(companionFlobo->getFloboY());
 }
 
-void NetworkGameView::fallingsDidFallingStep(Flobo *fallingFlobo, Flobo *companionFlobo)
+void NetworkGameView::fallingsDidFallingStep(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo)
 {
     GameView::fallingsDidFallingStep(fallingFlobo, companionFlobo);
     fallingStepBuffer.add(fallingFlobo->getID());
@@ -175,7 +175,7 @@ void NetworkGameView::fallingsDidFallingStep(Flobo *fallingFlobo, Flobo *compani
     fallingStepBuffer.add(companionFlobo->getFloboY());
 }
 
-void NetworkGameView::gameDidAddNeutral(Flobo *neutralFlobo, int neutralIndex, int totalNeutral)
+void NetworkGameView::gameDidAddNeutral(std::shared_ptr<Flobo> neutralFlobo, int neutralIndex, int totalNeutral)
 {
     GameView::gameDidAddNeutral(neutralFlobo, neutralIndex, totalNeutral);
     neutralsBuffer.add(neutralFlobo->getID());
@@ -194,7 +194,7 @@ void NetworkGameView::gameDidEndCycle()
     sendStateMessage(true);
 }
 
-void NetworkGameView::companionDidTurn(Flobo *companionFlobo, Flobo *fallingFlobo, bool counterclockwise)
+void NetworkGameView::companionDidTurn(std::shared_ptr<Flobo> companionFlobo, std::shared_ptr<Flobo> fallingFlobo, bool counterclockwise)
 {
     GameView::companionDidTurn(companionFlobo, fallingFlobo, counterclockwise);
     compTurnBuffer.add(fallingFlobo->getID());
@@ -208,7 +208,7 @@ void NetworkGameView::companionDidTurn(Flobo *companionFlobo, Flobo *fallingFlob
     compTurnBuffer.add(counterclockwise);
 }
 
-void NetworkGameView::floboDidFall(Flobo *flobo, int originX, int originY, int nFalledBelow)
+void NetworkGameView::floboDidFall(std::shared_ptr<Flobo> flobo, int originX, int originY, int nFalledBelow)
 {
     GameView::floboDidFall(flobo, originX, originY, nFalledBelow);
     didFallBuffer.add(flobo->getID());
@@ -220,7 +220,7 @@ void NetworkGameView::floboDidFall(Flobo *flobo, int originX, int originY, int n
     didFallBuffer.add(nFalledBelow);
 }
 
-void NetworkGameView::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase)
+void NetworkGameView::floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, int groupNum, int phase)
 {
     GameView::floboWillVanish(floboGroup, groupNum, phase);
     willVanishBuffer.add(phase);
@@ -228,7 +228,7 @@ void NetworkGameView::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int g
     willVanishBuffer.add(floboGroup.size());
     for (int i = 0 ; i < floboGroup.size() ; i++)
     {
-        Flobo *currentFlobo = floboGroup[i];
+        Flobo *currentFlobo = floboGroup[i].get();
         willVanishBuffer.add(currentFlobo->getID());
     }
 }

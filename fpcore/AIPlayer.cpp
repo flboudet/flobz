@@ -626,8 +626,8 @@ void AIPlayer::extractGrid(void)
     int height = 0;
     for (int j = 0; j < IA_FLOBOBAN_DIMY; j++)
     {
-      Flobo * theFlobo = attachedGame->getFloboAt(i,(FLOBOBAN_DIMY-1)-j);
-      if (theFlobo != NULL)
+      auto theFlobo = attachedGame->getFloboAt(i,(FLOBOBAN_DIMY-1)-j);
+      if (theFlobo != nullptr)
       {
         FloboState state = theFlobo->getFloboState();
         if (state >= FLOBO_STILL)

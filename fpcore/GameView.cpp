@@ -107,15 +107,15 @@ int GameView::getValenceForFlobo(Flobo *flobo) const
     int i = flobo->getFloboX();
     int j = flobo->getFloboY();
     FloboState currentFloboState = flobo->getFloboState();
-    AnimatedFlobo *down  = (AnimatedFlobo *)(attachedGame->getFloboAt(i, j+1));
-    AnimatedFlobo *right = (AnimatedFlobo *)(attachedGame->getFloboAt(i+1, j));
-    AnimatedFlobo *up    = (AnimatedFlobo *)(attachedGame->getFloboAt(i, j-1));
-    AnimatedFlobo *left  = (AnimatedFlobo *)(attachedGame->getFloboAt(i-1, j));
+    AnimatedFlobo *down  = (AnimatedFlobo *)(attachedGame->getFloboAt(i, j+1).get());
+    AnimatedFlobo *right = (AnimatedFlobo *)(attachedGame->getFloboAt(i+1, j).get());
+    AnimatedFlobo *up    = (AnimatedFlobo *)(attachedGame->getFloboAt(i, j-1).get());
+    AnimatedFlobo *left  = (AnimatedFlobo *)(attachedGame->getFloboAt(i-1, j).get());
 
-    FloboState downState = (down == NULL) || (down->isRenderingAnimation()) ? FLOBO_EMPTY : down->getFloboState();
-    FloboState rightState = (right == NULL) || (right->isRenderingAnimation()) ? FLOBO_EMPTY : right->getFloboState();
-    FloboState upState = (up == NULL) || (up->isRenderingAnimation()) ? FLOBO_EMPTY : up->getFloboState();
-    FloboState leftState = (left == NULL)   || (left->isRenderingAnimation()) ? FLOBO_EMPTY : left->getFloboState();
+    FloboState downState = (down == nullptr) || (down->isRenderingAnimation()) ? FLOBO_EMPTY : down->getFloboState();
+    FloboState rightState = (right == nullptr) || (right->isRenderingAnimation()) ? FLOBO_EMPTY : right->getFloboState();
+    FloboState upState = (up == nullptr) || (up->isRenderingAnimation()) ? FLOBO_EMPTY : up->getFloboState();
+    FloboState leftState = (left == nullptr)   || (left->isRenderingAnimation()) ? FLOBO_EMPTY : left->getFloboState();
 
 	return (leftState  == currentFloboState ? 0x8 : 0) | (upState  == currentFloboState ? 0x4 : 0) |
 	       (rightState == currentFloboState ? 0x2 : 0) | (downState == currentFloboState ? 0x1 : 0);
@@ -139,7 +139,7 @@ void GameView::cycleAnimation(void)
         // Cycling every flobo's animation
         for (FloboDefaultIterator iter(attachedGame) ;
              ! iter.end() ; ++iter) {
-            static_cast<AnimatedFlobo *>(iter.get())->cycleAnimation();
+            static_cast<AnimatedFlobo *>(iter.get().get())->cycleAnimation();
         }
         // Cycling dead flobo's animations
         attachedFloboFactory.cycleWalhalla();
@@ -209,19 +209,19 @@ void GameView::render(DrawTarget *dt)
     if (m_showShadows) {
         for (FloboDefaultIterator iter(attachedGame) ;
              ! iter.end() ; ++iter) {
-            AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(iter.get());
+            AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(iter.get().get());
             if (displayFallings || !currentFlobo->isFalling()) currentFlobo->renderShadow(dt);
         }
         for (FloboDefaultIterator iter(attachedGame) ;
              ! iter.end() ; ++iter) {
-            AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(iter.get());
+            AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(iter.get().get());
             if (displayFallings || !currentFlobo->isFalling()) currentFlobo->renderShadow(dt);
         }
     }
     // Render flobos
     for (FloboDefaultIterator iter(attachedGame) ;
          ! iter.end() ; ++iter) {
-        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(iter.get());
+        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(iter.get().get());
         if (displayFallings || !currentFlobo->isFalling()) currentFlobo->render(dt);
     }
     // drawing the walhalla
@@ -327,15 +327,16 @@ void GameView::renderScore(DrawTarget *dt)
     m_scoreDisplay->draw(dt);
 }
 
-void GameView::gameDidAddNeutral(Flobo *neutralFlobo, int neutralIndex, int totalNeutral) {
+void GameView::gameDidAddNeutral(std::shared_ptr<Flobo> neutralFlobo, int neutralIndex, int totalNeutral) {
     if (!haveDisplay) return;
     int x = neutralFlobo->getFloboX();
     int y = neutralFlobo->getFloboY();
     AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
-    ((AnimatedFlobo *)neutralFlobo)->addAnimation(new NeutralAnimation(*((AnimatedFlobo *)neutralFlobo), neutralIndex * 2, synchronizer));
+    auto animatedNeutral = std::static_pointer_cast<AnimatedFlobo>(neutralFlobo);
+    animatedNeutral->addAnimation(new NeutralAnimation(*animatedNeutral, neutralIndex * 2, synchronizer));
     for (int i = y ; i < FLOBOBAN_DIMY ; i++) {
-        AnimatedFlobo *belowFlobo = (AnimatedFlobo *)(attachedGame->getFloboAt(x, i));
-        if (belowFlobo != NULL) {
+        auto belowFlobo = std::static_pointer_cast<AnimatedFlobo>(attachedGame->getFloboAt(x, i));
+        if (belowFlobo != nullptr) {
             belowFlobo->addAnimation(new SmoothBounceAnimation(*belowFlobo, synchronizer));
         }
     }
@@ -350,59 +351,59 @@ void GameView::gameDidAddNeutral(Flobo *neutralFlobo, int neutralIndex, int tota
     }
 }
 
-void GameView::fallingsDidMoveLeft(Flobo *fallingFlobo, Flobo *companionFlobo)
+void GameView::fallingsDidMoveLeft(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo)
 {
     if (!haveDisplay) return;
-    ((AnimatedFlobo *)fallingFlobo)->flushAnimations(ANIMATION_H);
-    ((AnimatedFlobo *)companionFlobo)->flushAnimations(ANIMATION_H);
-	((AnimatedFlobo *)fallingFlobo)->addAnimation(new MovingHAnimation(*(AnimatedFlobo *)fallingFlobo, TSIZE, 4));
-    ((AnimatedFlobo *)companionFlobo)->addAnimation(new MovingHAnimation(*(AnimatedFlobo *)companionFlobo, TSIZE, 4));
+    std::static_pointer_cast<AnimatedFlobo>(fallingFlobo)->flushAnimations(ANIMATION_H);
+    std::static_pointer_cast<AnimatedFlobo>(companionFlobo)->flushAnimations(ANIMATION_H);
+	std::static_pointer_cast<AnimatedFlobo>(fallingFlobo)->addAnimation(new MovingHAnimation(*std::static_pointer_cast<AnimatedFlobo>(fallingFlobo), TSIZE, 4));
+    std::static_pointer_cast<AnimatedFlobo>(companionFlobo)->addAnimation(new MovingHAnimation(*std::static_pointer_cast<AnimatedFlobo>(companionFlobo), TSIZE, 4));
 }
 
-void GameView::fallingsDidMoveRight(Flobo *fallingFlobo, Flobo *companionFlobo)
+void GameView::fallingsDidMoveRight(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo)
 {
     if (!haveDisplay) return;
-    ((AnimatedFlobo *)fallingFlobo)->flushAnimations(ANIMATION_H);
-    ((AnimatedFlobo *)companionFlobo)->flushAnimations(ANIMATION_H);
-	((AnimatedFlobo *)fallingFlobo)->addAnimation(new MovingHAnimation(*(AnimatedFlobo *)fallingFlobo, -TSIZE, 4));
-    ((AnimatedFlobo *)companionFlobo)->addAnimation(new MovingHAnimation(*(AnimatedFlobo *)companionFlobo, -TSIZE, 4));
+    std::static_pointer_cast<AnimatedFlobo>(fallingFlobo)->flushAnimations(ANIMATION_H);
+    std::static_pointer_cast<AnimatedFlobo>(companionFlobo)->flushAnimations(ANIMATION_H);
+	std::static_pointer_cast<AnimatedFlobo>(fallingFlobo)->addAnimation(new MovingHAnimation(*std::static_pointer_cast<AnimatedFlobo>(fallingFlobo), -TSIZE, 4));
+    std::static_pointer_cast<AnimatedFlobo>(companionFlobo)->addAnimation(new MovingHAnimation(*std::static_pointer_cast<AnimatedFlobo>(companionFlobo), -TSIZE, 4));
 }
 
-void GameView::fallingsDidFallingStep(Flobo *fallingFlobo, Flobo *companionFlobo)
+void GameView::fallingsDidFallingStep(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo)
 {
     if (!haveDisplay) return;
-    ((AnimatedFlobo *)fallingFlobo)->flushAnimations(ANIMATION_V);
-    ((AnimatedFlobo *)companionFlobo)->flushAnimations(ANIMATION_V);
-	((AnimatedFlobo *)fallingFlobo)->addAnimation(new MovingVAnimation(*(AnimatedFlobo *)fallingFlobo, -TSIZE/2, 4));
-    ((AnimatedFlobo *)companionFlobo)->addAnimation(new MovingVAnimation(*(AnimatedFlobo *)companionFlobo, -TSIZE/2, 4));
+    std::static_pointer_cast<AnimatedFlobo>(fallingFlobo)->flushAnimations(ANIMATION_V);
+    std::static_pointer_cast<AnimatedFlobo>(companionFlobo)->flushAnimations(ANIMATION_V);
+	std::static_pointer_cast<AnimatedFlobo>(fallingFlobo)->addAnimation(new MovingVAnimation(*std::static_pointer_cast<AnimatedFlobo>(fallingFlobo), -TSIZE/2, 4));
+    std::static_pointer_cast<AnimatedFlobo>(companionFlobo)->addAnimation(new MovingVAnimation(*std::static_pointer_cast<AnimatedFlobo>(companionFlobo), -TSIZE/2, 4));
 }
 
-void GameView::companionDidTurn(Flobo *companionFlobo, Flobo *fallingFlobo, bool counterclockwise)
+void GameView::companionDidTurn(std::shared_ptr<Flobo> companionFlobo, std::shared_ptr<Flobo> fallingFlobo, bool counterclockwise)
 {
     if (!haveDisplay) return;
-    if ((companionFlobo != NULL) && (fallingFlobo != NULL)) { // Just to be sure of what we get if data comes from network
-        ((AnimatedFlobo *)companionFlobo)->setPartner(((AnimatedFlobo *)fallingFlobo));
-        ((AnimatedFlobo *)companionFlobo)->flushAnimations(ANIMATION_ROTATE);
-        ((AnimatedFlobo *)companionFlobo)->addAnimation(new TurningAnimation(*(AnimatedFlobo *)companionFlobo,
+    if ((companionFlobo != nullptr) && (fallingFlobo != nullptr)) { // Just to be sure of what we get if data comes from network
+        std::static_pointer_cast<AnimatedFlobo>(companionFlobo)->setPartner(std::static_pointer_cast<AnimatedFlobo>(fallingFlobo).get());
+        std::static_pointer_cast<AnimatedFlobo>(companionFlobo)->flushAnimations(ANIMATION_ROTATE);
+        std::static_pointer_cast<AnimatedFlobo>(companionFlobo)->addAnimation(new TurningAnimation(*std::static_pointer_cast<AnimatedFlobo>(companionFlobo),
                                                                            counterclockwise));
     }
 }
 
-void GameView::floboDidFall(Flobo *flobo, int originX, int originY, int nFalledBelow)
+void GameView::floboDidFall(std::shared_ptr<Flobo> flobo, int originX, int originY, int nFalledBelow)
 {
     if (!haveDisplay) return;
-    ((AnimatedFlobo *)flobo)->flushAnimations();
-    ((AnimatedFlobo *)flobo)->addAnimation(new FallingAnimation(*(AnimatedFlobo *)flobo, originY, m_xOffset, m_yOffset, nFalledBelow));
+    std::static_pointer_cast<AnimatedFlobo>(flobo)->flushAnimations();
+    std::static_pointer_cast<AnimatedFlobo>(flobo)->addAnimation(new FallingAnimation(*std::static_pointer_cast<AnimatedFlobo>(flobo), originY, m_xOffset, m_yOffset, nFalledBelow));
 }
 
-void GameView::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase)
+void GameView::floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, int groupNum, int phase)
 {
     if (!haveDisplay) return;
     double groupPadding = 0.;
     // Exploding flobo animation
     AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
     for (int i = 0, j = floboGroup.size() ; i < j ; i++) {
-        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(floboGroup[i]);
+        AnimatedFlobo *currentFlobo = std::static_pointer_cast<AnimatedFlobo>(floboGroup[i]).get();
         FloboAnimation *newAnimation;
         if (currentFlobo->getFloboState() != FLOBO_NEUTRAL)
             newAnimation = new VanishAnimation(*currentFlobo, i*2 , m_xOffset, m_yOffset, synchronizer, i, floboGroup.size(), groupNum, phase);
@@ -476,8 +477,8 @@ void GameView::gameLost()
     if (!haveDisplay) return;
     for (int i = 0 ; i <= FLOBOBAN_DIMX ; i++) {
         for (int j = 0 ; j <= FLOBOBAN_DIMY ; j++) {
-            if (attachedGame->getFloboAt(i, j) != NULL) {
-                AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(attachedGame->getFloboAt(i, j));
+            if (attachedGame->getFloboAt(i, j) != nullptr) {
+                AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(attachedGame->getFloboAt(i, j).get());
                 currentFlobo->addAnimation(new GameOverFallAnimation(*currentFlobo, (j - FLOBOBAN_DIMY) + abs((FLOBOBAN_DIMX / 2) - i) * 5));
             }
         }

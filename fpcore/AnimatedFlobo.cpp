@@ -147,7 +147,7 @@ void AnimatedFlobo::renderAt(int X, int Y, DrawTarget *dt)
 
         /* Main flobo show */
         /* TODO: Investigate why, during network game, the falling flobo starts by being neutral */
-        if ((this == attachedGame->getFallingFlobo())
+        if ((this == attachedGame->getFallingFlobo().get())
             && (getFloboState() != FLOBO_NEUTRAL)
             && (m_currentCompressedState == 0))
             dt->draw(attachedTheme->getCircleSurfaceForIndex((smallTicksCount >> 2) & 0x1F), NULL, &drect);
@@ -252,11 +252,11 @@ AnimatedFloboFactory::~AnimatedFloboFactory()
     }
 }
 
-Flobo *AnimatedFloboFactory::createFlobo(FloboState state)
+std::shared_ptr<Flobo> AnimatedFloboFactory::createFlobo(FloboState state)
 {
     AnimatedFlobo *result = new AnimatedFlobo(state, attachedThemeSet, attachedView);
     result->setShowEyes(m_showEyes);
-    return result;
+    return std::shared_ptr<Flobo>(result, [this](Flobo *target) { deleteFlobo(target); });
 }
 
 void AnimatedFloboFactory::deleteFlobo(Flobo *target)

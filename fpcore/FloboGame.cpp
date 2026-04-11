@@ -26,9 +26,18 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <algorithm>
 #include "FloboGame.h"
 #include "audio.h"
 #include "mt19937ar.h"
+
+static void removeFloboFromVector(std::vector<std::shared_ptr<Flobo>> &container, std::shared_ptr<Flobo> flobo)
+{
+    auto it = std::find(container.begin(), container.end(), flobo);
+    if (it != container.end()) {
+        container.erase(it);
+    }
+}
 
 static int fallingTable[FLOBOBAN_DIMX] = {0, 3, 1, 4, 2, 5};
 
@@ -46,7 +55,7 @@ FloboState RandomSystem::getFloboStateForSequence(int sequence)
 {
     if (sequenceItems.size() <= sequence) {
         int newItem = (genrand_int32() % numColors) + FLOBO_FALLINGBLUE;
-        sequenceItems.add(newItem);
+        sequenceItems.push_back(newItem);
         return (FloboState)newItem;
     }
     else
@@ -94,7 +103,7 @@ void FloboLocalGame::InitGame(RandomSystem *attachedRandom)
             if (j == FLOBOBAN_DIMY)
                 setFloboAt(i, j, unmoveableFlobo);
             else
-                setFloboAt(i, j, NULL);
+                setFloboAt(i, j, nullptr);
         }
     }
     this->attachedRandom = attachedRandom;
@@ -111,10 +120,7 @@ void FloboLocalGame::InitGame(RandomSystem *attachedRandom)
 
 FloboLocalGame::~FloboLocalGame()
 {
-    delete unmoveableFlobo;
-    for (int i = 0 ; i < floboVector.size() ; i++) {
-        delete floboVector[i];
-    }
+    // unmoveableFlobo and floboVector objects are cleaned up automatically by shared_ptr.
 }
 
 void FloboLocalGame::cycle()
@@ -181,14 +187,14 @@ void FloboLocalGame::cycle()
 // Get the state of the flobo at the indicated coordinates
 FloboState FloboLocalGame::getFloboCellAt(int X, int Y) const
 {
-    Flobo *theFlobo = getFloboAt(X, Y);
+    auto theFlobo = getFloboAt(X, Y);
     if (theFlobo)
         return theFlobo->getFloboState();
     return FLOBO_EMPTY;
 }
 
 // Get the flobo at the indicated coordinates
-Flobo *FloboLocalGame::getFloboAt(int X, int Y) const
+std::shared_ptr<Flobo> FloboLocalGame::getFloboAt(int X, int Y) const
 {
     if ((X >= FLOBOBAN_DIMX) || (Y >= FLOBOBAN_DIMY) || (X < 0) || (Y < 0))
         return unmoveableFlobo;
@@ -207,7 +213,7 @@ int FloboLocalGame::getFloboCount() const
     return floboVector.size();
 }
 
-Flobo *FloboLocalGame::getFloboAtIndex(int index) const
+std::shared_ptr<Flobo> FloboLocalGame::getFloboAtIndex(int index) const
 {
     return floboVector[index];
 }
@@ -335,10 +341,10 @@ void FloboLocalGame::setFloboCellAt(int X, int Y, FloboState value)
 };
 
 // Set the flobo at the indicated coordinates
-void FloboLocalGame::setFloboAt(int X, int Y, Flobo *newFlobo)
+void FloboLocalGame::setFloboAt(int X, int Y, std::shared_ptr<Flobo> newFlobo)
 {
     floboCells[X + Y * FLOBOBAN_DIMX] = newFlobo;
-    if (newFlobo != NULL)
+    if (newFlobo != nullptr)
         newFlobo->setFloboXY(X, Y);
 }
 
@@ -369,8 +375,8 @@ void FloboLocalGame::dropNeutrals()
         if (getFloboCellAt(posX, posY) != FLOBO_EMPTY)
             continue;
         // Creating a new neutral flobo
-        Flobo *newNeutral = attachedFactory->createFlobo(FLOBO_NEUTRAL);
-        floboVector.add(newNeutral);
+        auto newNeutral = attachedFactory->createFlobo(FLOBO_NEUTRAL);
+        floboVector.push_back(newNeutral);
         setFloboAt(posX, posY, newNeutral);
         for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
              iter != m_listeners.end() ; ++iter)
@@ -393,9 +399,9 @@ void FloboLocalGame::addNeutralLayer()
     // Raise everything up
     for (int j = 1 ; j < FLOBOBAN_DIMY ; ++j) {
         for (int i = 0 ; i < FLOBOBAN_DIMX ; ++i) {
-            Flobo *currentFlobo = getFloboAt(i, j);
-            if (currentFlobo != NULL) {
-                setFloboAt(i, j, NULL);
+            auto currentFlobo = getFloboAt(i, j);
+            if (currentFlobo != nullptr) {
+                setFloboAt(i, j, nullptr);
                 setFloboAt(i, j-1, currentFlobo);
                 for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                      iter != m_listeners.end() ; ++iter)
@@ -404,8 +410,8 @@ void FloboLocalGame::addNeutralLayer()
         }
     }
     for (int i = 0 ; i < FLOBOBAN_DIMX ; ++i) {
-        Flobo *newNeutral = attachedFactory->createFlobo(FLOBO_NEUTRAL);
-        floboVector.add(newNeutral);
+        auto newNeutral = attachedFactory->createFlobo(FLOBO_NEUTRAL);
+        floboVector.push_back(newNeutral);
         setFloboAt(i, FLOBOBAN_DIMY-1, newNeutral);
         for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
              iter != m_listeners.end() ; ++iter)
@@ -434,12 +440,14 @@ void FloboLocalGame::setFallingAtTop(bool gameConstruction)
     fallingX = (FLOBOBAN_DIMX-1)/2;
     fallingY = 1;
     fallingCompanion = 2;
-    fallingFlobo = attachedFactory->createFlobo(attachedRandom->getFloboStateForSequence(sequenceNr++));
-    companionFlobo = attachedFactory->createFlobo(attachedRandom->getFloboStateForSequence(sequenceNr++));
+    auto fallingPtr = attachedFactory->createFlobo(attachedRandom->getFloboStateForSequence(sequenceNr++));
+    auto companionPtr = attachedFactory->createFlobo(attachedRandom->getFloboStateForSequence(sequenceNr++));
+    fallingFlobo = fallingPtr;
+    companionFlobo = companionPtr;
     fallingFlobo->setFloboXY(fallingX, fallingY);
     companionFlobo->setFloboXY(getFallingCompanionX(), getFallingCompanionY());
-    floboVector.add(fallingFlobo);
-    floboVector.add(companionFlobo);
+    floboVector.push_back(fallingPtr);
+    floboVector.push_back(companionPtr);
 
     endOfCycle = false;
     semiMove = 0;
@@ -547,7 +555,7 @@ int FloboLocalGame::getSameFloboAround(int X, int Y, FloboState color)
 
 void FloboLocalGame::markFloboAt(int X, int Y, bool mark, bool includeNeutral)
 {
-    Flobo *currentFlobo = getFloboAt(X, Y);
+    auto currentFlobo = getFloboAt(X, Y);
     if (currentFlobo->isMarked() == mark)
         return;
     FloboState currentFloboState = getFloboCellAt(X, Y);
@@ -575,16 +583,12 @@ void FloboLocalGame::markFloboAt(int X, int Y, bool mark, bool includeNeutral)
 // delete the marked flobos and the neutral next to them
 void FloboLocalGame::deleteMarkedFlobosAt(int X, int Y)
 {
-  floboVector.remove(getFloboAt(X, Y));
+  removeFloboFromVector(floboVector, getFloboAt(X, Y));
   if (getFloboAt(X,Y) == companionFlobo) {
-    attachedFactory->deleteFlobo(getFloboAt(X, Y));
-    companionFlobo = NULL;
+    companionFlobo = nullptr;
   }
   else if (getFloboAt(X,Y) == fallingFlobo) {
-    attachedFactory->deleteFlobo(getFloboAt(X, Y));
-    fallingFlobo = NULL;
-  } else {
-    attachedFactory->deleteFlobo(getFloboAt(X, Y));
+    fallingFlobo = nullptr;
   }
   setFloboAt(X, Y, NULL);
     if (getFloboAt(X-1, Y)->isMarked())
@@ -596,23 +600,19 @@ void FloboLocalGame::deleteMarkedFlobosAt(int X, int Y)
     if (getFloboAt(X, Y+1)->isMarked())
         deleteMarkedFlobosAt(X, Y+1);
     if (getFloboCellAt(X-1, Y) == FLOBO_NEUTRAL) {
-        floboVector.remove(getFloboAt(X-1, Y));
-        attachedFactory->deleteFlobo(getFloboAt(X-1, Y));
+        removeFloboFromVector(floboVector, getFloboAt(X-1, Y));
         setFloboAt(X-1, Y, NULL);
     }
     if (getFloboCellAt(X+1, Y) == FLOBO_NEUTRAL) {
-        floboVector.remove(getFloboAt(X+1, Y));
-        attachedFactory->deleteFlobo(getFloboAt(X+1, Y));
+        removeFloboFromVector(floboVector, getFloboAt(X+1, Y));
         setFloboAt(X+1, Y, NULL);
     }
     if (getFloboCellAt(X, Y-1) == FLOBO_NEUTRAL) {
-        floboVector.remove(getFloboAt(X, Y-1));
-        attachedFactory->deleteFlobo(getFloboAt(X, Y-1));
+        removeFloboFromVector(floboVector, getFloboAt(X, Y-1));
         setFloboAt(X, Y-1, NULL);
     }
     if (getFloboCellAt(X, Y+1) == FLOBO_NEUTRAL) {
-        floboVector.remove(getFloboAt(X, Y+1));
-        attachedFactory->deleteFlobo(getFloboAt(X, Y+1));
+        removeFloboFromVector(floboVector, getFloboAt(X, Y+1));
         setFloboAt(X, Y+1, NULL);
     }
 }
@@ -650,8 +650,8 @@ int FloboLocalGame::removeFlobos()
             if ((currentFloboState >= FLOBO_BLUE) && (currentFloboState <= FLOBO_NEUTRAL)) {
                 int newJ = getFallY(i, j);
                 if (newJ != j) {
-                    Flobo *currentFlobo = getFloboAt(i, j);
-                    setFloboAt(i, j, NULL);
+                    auto currentFlobo = getFloboAt(i, j);
+                    setFloboAt(i, j, nullptr);
                     setFloboAt(i, newJ, currentFlobo);
                     for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                          iter != m_listeners.end() ; ++iter) {
@@ -668,7 +668,7 @@ int FloboLocalGame::removeFlobos()
 
 void FloboLocalGame::notifyReductions()
 {
-    AdvancedBuffer<Flobo *> removedFlobos;
+    std::vector<std::shared_ptr<Flobo>> removedFlobos;
     // Clearing every flobo's flag
     for (int i = 0, j = getFloboCount() ; i < j ; i++) {
         getFloboAtIndex(i)->unsetFlag();
@@ -677,9 +677,9 @@ void FloboLocalGame::notifyReductions()
     int floboGroupNumber = 0;
     for (int j = 0 ; j < FLOBOBAN_DIMY ; j++) {
         for (int i = 0 ; i <= FLOBOBAN_DIMX ; i++) {
-            Flobo *floboToMark = getFloboAt(i, j);
+            auto floboToMark = getFloboAt(i, j);
             // If the flobo exists and is not flagged, then
-            if ((floboToMark != NULL) && (! floboToMark->getFlag())) {
+            if ((floboToMark != nullptr) && (! floboToMark->getFlag())) {
                 FloboState initialFloboState = floboToMark->getFloboState();
                 // I really would have liked to skip this stupid test
                 if ((initialFloboState >= FLOBO_BLUE) && (initialFloboState <= FLOBO_YELLOW)) {
@@ -689,10 +689,10 @@ void FloboLocalGame::notifyReductions()
                     removedFlobos.clear();
                     int removedCount = 0;
                     for (int u = 0, v = floboVector.size() ; u < v ; u++) {
-                        Flobo *markedFlobo = floboVector[u];
+                        auto markedFlobo = floboVector[u];
                         if (markedFlobo->isMarked()) {
                             markedFlobo->setFlag();
-                            removedFlobos.add(markedFlobo);
+                            removedFlobos.push_back(markedFlobo);
                             if (markedFlobo->getFloboState() != FLOBO_NEUTRAL)
                                 removedCount++;
                         }

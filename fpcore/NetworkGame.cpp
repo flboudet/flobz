@@ -107,19 +107,19 @@ void NetworkGame::synchronizeFlobo(Buffer<int> buffer) {
     int floboState = buffer[1]; GTCheckInterval(floboState, 0, 20, "floboState is invalid");
     int posX       = buffer[2]; GTCheckInterval(posX, 0, FLOBOBAN_DIMX, "Flobo X is invalid");
     int posY       = buffer[3]; GTCheckInterval(posY, 0, FLOBOBAN_DIMY, "Flobo Y is invalid");
-    Flobo *flobo = findFlobo(floboID);
-    if (flobo == NULL) {
-        flobo = attachedFactory->createFlobo((FloboState)floboState);
-        flobo->setID(floboID);
-        m_floboList.push_back(flobo);
-        m_floboMap[floboID] = flobo;
+    auto floboPtr = findFlobo(floboID);
+    if (floboPtr == nullptr) {
+        floboPtr = attachedFactory->createFlobo((FloboState)floboState);
+        floboPtr->setID(floboID);
+        m_floboList.push_back(floboPtr);
+        m_floboMap[floboID] = floboPtr;
     }
     else {
-        flobo->setFloboState((FloboState)floboState);
+        floboPtr->setFloboState((FloboState)floboState);
     }
-    setFloboAt(flobo->getFloboX(), flobo->getFloboY(), NULL);
-    setFloboAt(posX, posY, flobo);
-    flobo->setFlag(); // TODO: return flobo and to this in synchromessage
+    setFloboAt(floboPtr->getFloboX(), floboPtr->getFloboY(), nullptr);
+    setFloboAt(posX, posY, floboPtr);
+    floboPtr->setFlag(); // TODO: return flobo and to this in synchromessage
 }
 
 void NetworkGame::synchronizeState(Message &message)
@@ -140,16 +140,16 @@ void NetworkGame::synchronizeState(Message &message)
         // Remove the flobos that were not flagged.
         for (FloboPtrList::iterator iter  = m_floboList.begin() ;
              iter != m_floboList.end() ; ++iter) {
-            Flobo *currentFlobo = *iter;
-            if (currentFlobo->getFlag()) {
-                currentFlobo->unsetFlag();
+            std::shared_ptr<Flobo> currentFlobo = *iter;
+            Flobo *currentFloboPtr = currentFlobo.get();
+            if (currentFloboPtr->getFlag()) {
+                currentFloboPtr->unsetFlag();
             }
             else {
-                setFloboAt(currentFlobo->getFloboX(), currentFlobo->getFloboY(), NULL);
+                setFloboAt(currentFloboPtr->getFloboX(), currentFloboPtr->getFloboY(), NULL);
                 FloboPtrList::iterator removed = iter--;
                 m_floboList.erase(removed);
-                m_floboMap.erase(currentFlobo->getID());
-                attachedFactory->deleteFlobo(currentFlobo);
+                m_floboMap.erase(currentFloboPtr->getID());
             }
         }
     }
@@ -160,8 +160,8 @@ void NetworkGame::synchronizeState(Message &message)
         if (addNeutrals.size() > 0) {
             for (int i = 0, j = addNeutrals.size() ; i+5 < j ; i += 6) {
                 synchronizeFlobo(addNeutrals+i);
-                Flobo *neutral = findFlobo(addNeutrals[i]);
-                if (neutral != NULL)
+                auto neutral = findFlobo(addNeutrals[i]);
+                if (neutral != nullptr)
                     for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                          iter != m_listeners.end() ; ++iter)
                         (*iter)->gameDidAddNeutral(neutral, addNeutrals[i+4], addNeutrals[i+5]);
@@ -174,9 +174,9 @@ void NetworkGame::synchronizeState(Message &message)
             for (int i = 0, j = moveLeftBuffer.size() ; i+7 < j ; i += 8) {
                 synchronizeFlobo(moveLeftBuffer+i);
                 synchronizeFlobo(moveLeftBuffer+i+4);
-                Flobo *falling = findFlobo(moveLeftBuffer[i]);
-                Flobo *companion = findFlobo(moveLeftBuffer[i+4]);
-                if ((falling != NULL) && (companion != NULL)) {
+                auto falling = findFlobo(moveLeftBuffer[i]);
+                auto companion = findFlobo(moveLeftBuffer[i+4]);
+                if ((falling != nullptr) && (companion != nullptr)) {
                     for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                          iter != m_listeners.end() ; ++iter)
                         (*iter)->fallingsDidMoveLeft(falling, companion);
@@ -190,9 +190,9 @@ void NetworkGame::synchronizeState(Message &message)
             for (int i = 0, j = moveRightBuffer.size() ; i+7 < j ; i += 8) {
                 synchronizeFlobo(moveRightBuffer+i);
                 synchronizeFlobo(moveRightBuffer+i+4);
-                Flobo *falling = findFlobo(moveRightBuffer[i]);
-                Flobo *companion = findFlobo(moveRightBuffer[i+4]);
-                if ((falling != NULL) && (companion != NULL)) {
+                auto falling = findFlobo(moveRightBuffer[i]);
+                auto companion = findFlobo(moveRightBuffer[i+4]);
+                if ((falling != nullptr) && (companion != nullptr)) {
                     for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                          iter != m_listeners.end() ; ++iter)
                         (*iter)->fallingsDidMoveRight(falling, companion);
@@ -206,9 +206,9 @@ void NetworkGame::synchronizeState(Message &message)
             for (int i = 0, j = fallingStepBuffer.size() ; i+7 < j ; i += 8) {
                 synchronizeFlobo(fallingStepBuffer+i);
                 synchronizeFlobo(fallingStepBuffer+i+4);
-                Flobo *fallingFlobo = findFlobo(fallingStepBuffer[i]);
-                Flobo *companionFlobo = findFlobo(fallingStepBuffer[i+4]);
-                if ((fallingFlobo != NULL) && (companionFlobo != NULL))
+                auto fallingFlobo = findFlobo(fallingStepBuffer[i]);
+                auto companionFlobo = findFlobo(fallingStepBuffer[i+4]);
+                if ((fallingFlobo != nullptr) && (companionFlobo != nullptr))
                     for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                          iter != m_listeners.end() ; ++iter)
                         (*iter)->fallingsDidFallingStep(fallingFlobo, companionFlobo);
@@ -221,9 +221,9 @@ void NetworkGame::synchronizeState(Message &message)
             for (int i = 0, j = turnBuffer.size() ; i+8 < j ; i += 9) {
                 synchronizeFlobo(turnBuffer+i);
                 synchronizeFlobo(turnBuffer+i+4);
-                Flobo *fallingFlobo = findFlobo(turnBuffer[i]);
-                Flobo *companionFlobo = findFlobo(turnBuffer[i+4]);
-                if ((fallingFlobo != NULL) && (companionFlobo != NULL))
+                auto fallingFlobo = findFlobo(turnBuffer[i]);
+                auto companionFlobo = findFlobo(turnBuffer[i+4]);
+                if ((fallingFlobo != nullptr) && (companionFlobo != nullptr))
                     for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                          iter != m_listeners.end() ; ++iter)
                         (*iter)->companionDidTurn(companionFlobo, fallingFlobo, turnBuffer[i+8]);
@@ -235,8 +235,8 @@ void NetworkGame::synchronizeState(Message &message)
         if (didFall.size() > 0) {
             for (int i = 0, j = didFall.size() ; i+6 < j ; i += 7) {
                 synchronizeFlobo(didFall+i);
-                Flobo *didFallFlobo = findFlobo(didFall[i]);
-                if (didFallFlobo != NULL)
+                auto didFallFlobo = findFlobo(didFall[i]);
+                if (didFallFlobo != nullptr)
                     for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                          iter != m_listeners.end() ; ++iter)
                         (*iter)->floboDidFall(didFallFlobo, didFall[i+4], didFall[i+5], didFall[i+6]);
@@ -247,16 +247,16 @@ void NetworkGame::synchronizeState(Message &message)
         Buffer<int> willVanish= message.getIntArray(WILL_VANISH);
         if (willVanish.size() > 0) {
             int i = 0;
-            AdvancedBuffer<Flobo *> temporaryGroup;
+            std::vector<std::shared_ptr<Flobo>> temporaryGroup;
             while (i < willVanish.size()) {
                 temporaryGroup.clear();
                 int numPhase = willVanish[i++];
                 int groupNumber = willVanish[i++];
                 int numberOfFlobosInGroup = willVanish[i++];
                 for (int index = 0 ; index < numberOfFlobosInGroup ; index++) {
-                    Flobo *vanishedFlobo = findFlobo(willVanish[i + index]);
-                    if (vanishedFlobo != NULL)
-                        temporaryGroup.add(vanishedFlobo);
+                    auto vanishedFlobo = findFlobo(willVanish[i + index]);
+                    if (vanishedFlobo != nullptr)
+                        temporaryGroup.push_back(vanishedFlobo);
                 }
                 for (GameListenerPtrVector::iterator iter = m_listeners.begin() ;
                      iter != m_listeners.end() ; ++iter)
@@ -279,11 +279,11 @@ void NetworkGame::synchronizeState(Message &message)
     neutralFlobos = message.getInt(CURRENT_NEUTRALS);
 }
 
-inline Flobo *NetworkGame::findFlobo(int floboID)
+inline std::shared_ptr<Flobo> NetworkGame::findFlobo(int floboID)
 {
-    std::map<int, Flobo *>::iterator found = m_floboMap.find(floboID);
+    std::map<int, std::shared_ptr<Flobo> >::iterator found = m_floboMap.find(floboID);
     if (found == m_floboMap.end())
-        return NULL;
+        return nullptr;
     return found->second;
 }
 
@@ -291,17 +291,17 @@ void NetworkGame::cycle()
 {
 }
 
-Flobo *NetworkGame::getFloboAt(int X, int Y) const
+std::shared_ptr<Flobo> NetworkGame::getFloboAt(int X, int Y) const
 {
     if ((X >= FLOBOBAN_DIMX) || (Y >= FLOBOBAN_DIMY) || (X < 0) || (Y < 0))
-		return NULL;
+		return nullptr;
     return floboCells[X + Y * FLOBOBAN_DIMX];
 }
 
-void NetworkGame::setFloboAt(int X, int Y, Flobo *newFlobo)
+void NetworkGame::setFloboAt(int X, int Y, std::shared_ptr<Flobo> newFlobo)
 {
     floboCells[X + Y * FLOBOBAN_DIMX] = newFlobo;
-    if (newFlobo != NULL)
+    if (newFlobo != nullptr)
         newFlobo->setFloboXY(X, Y);
 }
 
@@ -312,9 +312,10 @@ int NetworkGame::getFloboCount() const
 }
 
 #ifdef DISABLED
-Flobo *NetworkGame::getFloboAtIndex(int index) const
+std::shared_ptr<Flobo> NetworkGame::getFloboAtIndex(int index) const
 {
-    return m_floboVector[index];
+    // TODO: implement properly for list
+    return nullptr;
 }
 #endif
 
@@ -353,7 +354,7 @@ int NetworkGame::getFallingCompanionDir() const
     return 1;
 }
 
-Flobo *NetworkGame::getFallingFlobo() const
+std::shared_ptr<Flobo> NetworkGame::getFallingFlobo() const
 {
     return fakeFlobo;
 }

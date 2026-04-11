@@ -27,6 +27,7 @@
 
 #include "ios_memory.h"
 #include <vector>
+#include <memory>
 
 using namespace ios_fc;
 
@@ -68,7 +69,7 @@ public:
 	FloboState getFloboStateForSequence(int sequence);
 private:
     int numColors;
-	AdvancedBuffer<int> sequenceItems;
+	std::vector<int> sequenceItems;
 };
 
 // A Flobo is an entity of the game
@@ -117,29 +118,28 @@ private:
 // The flobos must be created by a factory to ensure custom flobo creation
 class FloboFactory {
  public:
-  virtual Flobo *createFlobo(FloboState state) = 0;
-  virtual void deleteFlobo(Flobo *target) { delete target; }
+  virtual std::shared_ptr<Flobo> createFlobo(FloboState state) = 0;
   virtual ~FloboFactory() {};
 };
 
 class FloboDefaultFactory : public FloboFactory {
  public:
-  Flobo *createFlobo(FloboState state) {
-    return new Flobo(state);
+  std::shared_ptr<Flobo> createFlobo(FloboState state) {
+    return std::make_shared<Flobo>(state);
   }
 };
 
 class GameListener {
 public:
-  virtual void gameDidAddNeutral(Flobo *neutralFlobo, int neutralIndex, int totalNeutral) {}
-  virtual void companionDidTurn(Flobo *companionFlobo,
-				Flobo *fallingFlobo,
+  virtual void gameDidAddNeutral(std::shared_ptr<Flobo> neutralFlobo, int neutralIndex, int totalNeutral) {}
+  virtual void companionDidTurn(std::shared_ptr<Flobo> companionFlobo,
+				std::shared_ptr<Flobo> fallingFlobo,
 				bool counterclockwise) {}
-  virtual void fallingsDidMoveLeft(Flobo *fallingFlobo, Flobo *companionFlobo) {}
-  virtual void fallingsDidMoveRight(Flobo *fallingFlobo, Flobo *companionFlobo) {}
-  virtual void fallingsDidFallingStep(Flobo *fallingFlobo, Flobo *companionFlobo) {}
-  virtual void floboDidFall(Flobo *flobo, int originX, int originY, int nFalledBelow) {}
-  virtual void floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase) {}
+  virtual void fallingsDidMoveLeft(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo) {}
+  virtual void fallingsDidMoveRight(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo) {}
+  virtual void fallingsDidFallingStep(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo) {}
+  virtual void floboDidFall(std::shared_ptr<Flobo> flobo, int originX, int originY, int nFalledBelow) {}
+  virtual void floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, int groupNum, int phase) {}
   virtual void gameDidEndCycle() {}
   virtual void gameLost() {}
   virtual ~GameListener() {};
@@ -163,11 +163,11 @@ public: // Controls
     virtual void rotateRight() {}
 public: // Accessors
     // Get the flobo at the indicated coordinates
-    virtual Flobo *getFloboAt(int X, int Y) const = 0;
+    virtual std::shared_ptr<Flobo> getFloboAt(int X, int Y) const = 0;
 
     // List access to the Flobo objects
     virtual int getFloboCount() const = 0;
-    //virtual Flobo *getFloboAtIndex(int index) const = 0;
+    //virtual std::shared_ptr<Flobo> getFloboAtIndex(int index) const = 0;
 
     virtual FloboState getNextFalling() = 0;
     virtual FloboState getNextCompanion() = 0;
@@ -178,7 +178,7 @@ public: // Accessors
     virtual int getFallingY() const = 0;
 
     virtual int getFallingCompanionDir() const = 0;
-    virtual Flobo *getFallingFlobo() const = 0;
+    virtual std::shared_ptr<Flobo> getFallingFlobo() const = 0;
 
     virtual void increaseNeutralFlobos(int incr) = 0;
     virtual int  getNeutralFlobos() const = 0;
@@ -209,7 +209,7 @@ protected:
 
 class FloboIterator {
 public:
-    virtual Flobo *get() = 0;
+    virtual std::shared_ptr<Flobo> get() = 0;
     virtual bool end() = 0;
     virtual FloboIterator & operator ++() = 0;
 };
@@ -217,10 +217,10 @@ public:
 class FloboDefaultIterator : public FloboIterator {
 public:
     FloboDefaultIterator(FloboGame *game)
-        : m_game(game), m_peek(NULL), m_x(0), m_y(FLOBOBAN_DIMY-1), m_finished(false) {
+        : m_game(game), m_peek(nullptr), m_x(0), m_y(FLOBOBAN_DIMY-1), m_finished(false) {
         ++(*this);
     }
-    Flobo *get() { return m_peek; }
+    std::shared_ptr<Flobo> get() { return m_peek; }
     bool end() { return m_finished; }
     FloboIterator & operator ++() {
         do {
@@ -230,12 +230,12 @@ public:
             }
             else if (m_y == -1)
                 m_finished = true;
-        } while ((m_peek == NULL) && (! m_finished));
+        } while ((m_peek == nullptr) && (! m_finished));
         return *this;
     }
 private:
     FloboGame *m_game;
-    Flobo *m_peek;
+    std::shared_ptr<Flobo> m_peek;
     bool m_finished;
     int m_x, m_y;
 };
@@ -248,11 +248,11 @@ public:
     void cycle();
 
     // Get the flobo at the indicated coordinates
-    Flobo *getFloboAt(int X, int Y) const;
+    std::shared_ptr<Flobo> getFloboAt(int X, int Y) const;
 
     // List access to the Flobo objects
     int getFloboCount() const;
-    Flobo *getFloboAtIndex(int index) const;
+    std::shared_ptr<Flobo> getFloboAtIndex(int index) const;
 
     void moveLeft();
     void moveRight();
@@ -271,7 +271,7 @@ public:
     int getFallingCompanionX() const;
     int getFallingCompanionY() const;
     int getFallingCompanionDir() const { return fallingCompanion; }
-    Flobo *getFallingFlobo() const { return fallingFlobo; }
+    std::shared_ptr<Flobo> getFallingFlobo() const { return fallingFlobo; }
 
     void increaseNeutralFlobos(int incr);
     int getNeutralFlobos() const;
@@ -297,7 +297,7 @@ private:
     // Set the state of the flobo at the indicated coordinates (not recommanded)
     void setFloboCellAt(int X, int Y, FloboState value);
     // Set the flobo at the indicated coordinates
-    void setFloboAt(int X, int Y, Flobo *newFlobo);
+    void setFloboAt(int X, int Y, std::shared_ptr<Flobo> newFlobo);
 
     void setFallingAtTop(bool gameConstruction = false);
     int getFallY(int X, int Y) const;
@@ -312,14 +312,14 @@ private:
 
     // The falling is the flobo you couldn't control,
     // whereas you can make the companion turn around the falling flobo
-    Flobo *fallingFlobo, *companionFlobo;
+    std::shared_ptr<Flobo> fallingFlobo, companionFlobo;
     int fallingX, fallingY;
 
     // Position of the companion is relative of the falling flobo
     // 0 = up 1 = left 2 = down 3 = up
     unsigned char fallingCompanion;
 
-    Flobo *floboCells[FLOBOBAN_DIMX * (FLOBOBAN_DIMY+1)];
+    std::shared_ptr<Flobo> floboCells[FLOBOBAN_DIMX * (FLOBOBAN_DIMY+1)];
     RandomSystem *attachedRandom;
     int sequenceNr;
     int phaseReady;
@@ -328,10 +328,10 @@ private:
     int semiMove;
 
     // This is not really a flobo, it is instead an indicator for the edges of the game
-    Flobo *unmoveableFlobo;
+    std::shared_ptr<Flobo> unmoveableFlobo;
 
     // We are keeping a list of current flobos
-    AdvancedBuffer<Flobo *> floboVector;
+    std::vector<std::shared_ptr<Flobo>> floboVector;
     int nbFalled;
 
     // Game level for points calculation

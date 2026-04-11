@@ -108,7 +108,7 @@ public:
     virtual bool isGameARunning() const;
     // GameListener implementation
     virtual void gameDidEndCycle();
-    virtual void floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase);
+    virtual void floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, int groupNum, int phase);
     // CycledComponent implementation
     virtual void cycle();
     // Widget methods

@@ -117,7 +117,7 @@ void SoloGameWidget::gameDidEndCycle()
     }
 }
 
-void SoloGameWidget::floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase)
+void SoloGameWidget::floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, int groupNum, int phase)
 {
     double prevComboHandicap = m_comboHandicap;
     if (phase == 1)

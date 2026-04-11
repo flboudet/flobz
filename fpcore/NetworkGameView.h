@@ -55,14 +55,14 @@ class NetworkGameView : public GameView {
     void rotateRight();
 
     // GameListener methods
-    virtual void fallingsDidMoveLeft(Flobo *fallingFlobo, Flobo *companionFlobo);
-	virtual void fallingsDidMoveRight(Flobo *fallingFlobo, Flobo *companionFlobo);
-	virtual void fallingsDidFallingStep(Flobo *fallingFlobo, Flobo *companionFlobo);
-    void gameDidAddNeutral(Flobo *neutralFlobo, int neutralIndex, int totalNeutral);
+    virtual void fallingsDidMoveLeft(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo);
+	virtual void fallingsDidMoveRight(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo);
+	virtual void fallingsDidFallingStep(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo);
+    void gameDidAddNeutral(std::shared_ptr<Flobo> neutralFlobo, int neutralIndex, int totalNeutral);
     void gameDidEndCycle();
-    void companionDidTurn(Flobo *companionFlobo, Flobo *fallingFlobo, bool counterclockwise);
-    void floboDidFall(Flobo *flobo, int originX, int originY, int nFalledBelow);
-    void floboWillVanish(AdvancedBuffer<Flobo *> &floboGroup, int groupNum, int phase);
+    void companionDidTurn(std::shared_ptr<Flobo> companionFlobo, std::shared_ptr<Flobo> fallingFlobo, bool counterclockwise);
+    void floboDidFall(std::shared_ptr<Flobo> flobo, int originX, int originY, int nFalledBelow);
+    void floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, int groupNum, int phase);
     virtual void gameWin();
     virtual void gameLost();
 
