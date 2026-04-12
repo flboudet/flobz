@@ -141,8 +141,6 @@ void GameView::cycleAnimation(void)
              ! iter.end() ; ++iter) {
             static_cast<AnimatedFlobo *>(iter.get().get())->cycleAnimation();
         }
-        // Cycling dead flobo's animations
-        _attachedFloboFactory.cycleWalhalla();
 
         // Cycling view's animations
         if (_viewAnimations.size() > 0) {
@@ -224,8 +222,6 @@ void GameView::render(DrawTarget *dt)
         AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(iter.get().get());
         if (displayFallings || !currentFlobo->isFalling()) currentFlobo->render(dt);
     }
-    // drawing the walhalla
-    _attachedFloboFactory.renderWalhalla(dt);
 
     if (_showNextFlobos) {
         drect.x = _nXOffset;

@@ -85,12 +85,8 @@ public:
     AnimatedFloboFactory(GameView *attachedView);
     virtual ~AnimatedFloboFactory();
     virtual std::shared_ptr<Flobo> createFlobo(FloboState state);
-    virtual void deleteFlobo(Flobo *target);
-    void renderWalhalla(DrawTarget *dt);
-    void cycleWalhalla();
     void setShowEyes(bool show) { _showEyes = show; }
 private:
-    std::vector<Flobo *> _floboWalhalla;
     GameView *_attachedView;
     FloboSetTheme *_attachedThemeSet;
     bool _showEyes;

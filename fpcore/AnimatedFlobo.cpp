@@ -26,6 +26,7 @@
 #include "AnimatedFlobo.h"
 #include "GameView.h"
 #include "Theme.h"
+#include <iostream>
 
 AnimatedFlobo::AnimatedFlobo(FloboState state, FloboSetTheme *themeSet, GameView *attachedView)
     : Flobo(state), _smallTicksCount(0), _attachedTheme(themeSet != NULL ? &(themeSet->getFloboTheme(state)) : NULL),
@@ -38,6 +39,7 @@ AnimatedFlobo::AnimatedFlobo(FloboState state, FloboSetTheme *themeSet, GameView
 
 AnimatedFlobo::~AnimatedFlobo()
 {
+    std::cout << "AnimatedFlobo::~AnimatedFlobo() called for flobo id " << getID() << std::endl;
     while (!_animationQueue.empty())
            removeCurrentAnimation();
 }
@@ -245,44 +247,14 @@ AnimatedFloboFactory::AnimatedFloboFactory(GameView *attachedView)
 
 AnimatedFloboFactory::~AnimatedFloboFactory()
 {
-    while (!_floboWalhalla.empty()) {
-        Flobo *currentFlobo = _floboWalhalla.back();
-        _floboWalhalla.pop_back();
-        delete currentFlobo;
-    }
 }
 
 std::shared_ptr<Flobo> AnimatedFloboFactory::createFlobo(FloboState state)
 {
-    AnimatedFlobo *result = new AnimatedFlobo(state, _attachedThemeSet, _attachedView);
+    std::shared_ptr<AnimatedFlobo> result = std::make_shared<AnimatedFlobo>(state, _attachedThemeSet, _attachedView);
     result->setShowEyes(_showEyes);
-    return std::shared_ptr<Flobo>(result, [this](Flobo *target) { deleteFlobo(target); });
-}
-
-void AnimatedFloboFactory::deleteFlobo(Flobo *target)
-{
-    _floboWalhalla.push_back(target);
+    return result;
 }
 
 
-void AnimatedFloboFactory::renderWalhalla(DrawTarget *dt)
-{
-    for (auto it = _floboWalhalla.rbegin(); it != _floboWalhalla.rend(); ++it) {
-        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(*it);
-        currentFlobo->render(dt);
-    }
-}
-
-void AnimatedFloboFactory::cycleWalhalla()
-{
-    for (int i = int(_floboWalhalla.size()) - 1 ; i >= 0 ; i--) {
-        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(_floboWalhalla[i]);
-        if (currentFlobo->getCurrentAnimation() != nullptr) {
-            currentFlobo->cycleAnimation();
-        } else {
-            _floboWalhalla.erase(_floboWalhalla.begin() + i);
-            delete currentFlobo;
-        }
-    }
-}
 
