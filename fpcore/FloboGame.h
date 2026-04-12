@@ -27,6 +27,7 @@
 
 #include "ios_memory.h"
 #include <vector>
+#include <set>
 #include <memory>
 
 using namespace ios_fc;
@@ -252,7 +253,6 @@ public:
 
     // List access to the Flobo objects
     int getFloboCount() const;
-    std::shared_ptr<Flobo> getFloboAtIndex(int index) const;
 
     void moveLeft();
     void moveRight();
@@ -331,7 +331,7 @@ private:
     std::shared_ptr<Flobo> _unmoveableFlobo;
 
     // We are keeping a list of current flobos
-    std::vector<std::shared_ptr<Flobo>> _floboVector;
+    std::set<std::shared_ptr<Flobo>> _floboVector;
     int _nbFalled;
 
     // Game level for points calculation
