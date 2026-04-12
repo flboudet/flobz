@@ -53,30 +53,30 @@ public:
     void renderShadow(DrawTarget *dt);
     void renderShadowAt(int X, int Y, DrawTarget *dt);
     bool isRenderingAnimation() const;
-    void setVisible(bool flag) { visibilityFlag = flag; }
-    bool getVisible() const { return visibilityFlag; }
-    GameView *getAttachedView() const { return attachedView; }
+    void setVisible(bool flag) { _visibilityFlag = flag; }
+    bool getVisible() const { return _visibilityFlag; }
+    GameView *getAttachedView() const { return _attachedView; }
     int getScreenCoordinateX() const;
     int getScreenCoordinateY() const;
-    const FloboTheme *getAttachedTheme() const { return attachedTheme; }
-    void setAnimatedState(int animatedState) { m_currentCompressedState = animatedState; }
-    void setPartner(AnimatedFlobo *partner) { m_partner = partner; }
-    void setOffsetX(int offsetX) { m_offsetX = offsetX; }
-    void setOffsetY(int offsetY) { m_offsetY = offsetY; }
-    void setRotation(float angle) { m_angle = angle; }
-    void setShowEyes(bool show) { m_displayEyes = show; }
+    const FloboTheme *getAttachedTheme() const { return _attachedTheme; }
+    void setAnimatedState(int animatedState) { _currentCompressedState = animatedState; }
+    void setPartner(AnimatedFlobo *partner) { _partner = partner; }
+    void setOffsetX(int offsetX) { _offsetX = offsetX; }
+    void setOffsetY(int offsetY) { _offsetY = offsetY; }
+    void setRotation(float angle) { _angle = angle; }
+    void setShowEyes(bool show) { _displayEyes = show; }
 private:
-    AdvancedBuffer<FloboAnimation *> animationQueue;
-    int floboEyeState;
-    unsigned int smallTicksCount;
-    bool visibilityFlag;
-    GameView *attachedView;
-	const FloboTheme *attachedTheme;
-    int m_currentCompressedState;
-    AnimatedFlobo *m_partner;
-    int m_offsetX, m_offsetY;
-    float m_angle;
-    bool m_displayEyes;
+    AdvancedBuffer<FloboAnimation *> _animationQueue;
+    int _floboEyeState;
+    unsigned int _smallTicksCount;
+    bool _visibilityFlag;
+    GameView *_attachedView;
+	const FloboTheme *_attachedTheme;
+    int _currentCompressedState;
+    AnimatedFlobo *_partner;
+    int _offsetX, _offsetY;
+    float _angle;
+    bool _displayEyes;
 };
 
 class AnimatedFloboFactory : public FloboFactory {
@@ -87,12 +87,12 @@ public:
     virtual void deleteFlobo(Flobo *target);
     void renderWalhalla(DrawTarget *dt);
     void cycleWalhalla();
-    void setShowEyes(bool show) { m_showEyes = show; }
+    void setShowEyes(bool show) { _showEyes = show; }
 private:
-    AdvancedBuffer<Flobo *> floboWalhalla;
-    GameView *attachedView;
-    FloboSetTheme *attachedThemeSet;
-    bool m_showEyes;
+    AdvancedBuffer<Flobo *> _floboWalhalla;
+    GameView *_attachedView;
+    FloboSetTheme *_attachedThemeSet;
+    bool _showEyes;
 };
 
 

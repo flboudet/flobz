@@ -28,38 +28,38 @@
 #include "Theme.h"
 
 AnimatedFlobo::AnimatedFlobo(FloboState state, FloboSetTheme *themeSet, GameView *attachedView)
-    : Flobo(state), smallTicksCount(0), attachedTheme(themeSet != NULL ? &(themeSet->getFloboTheme(state)) : NULL),
-      m_currentCompressedState(0), m_partner(NULL), m_offsetX(0), m_offsetY(0), m_angle(0), m_displayEyes(true)
+    : Flobo(state), _smallTicksCount(0), _attachedTheme(themeSet != NULL ? &(themeSet->getFloboTheme(state)) : NULL),
+      _currentCompressedState(0), _partner(NULL), _offsetX(0), _offsetY(0), _angle(0), _displayEyes(true)
 {
-    floboEyeState = random() % 8192;
-    visibilityFlag = true;
-    this->attachedView = attachedView;
+    _floboEyeState = random() % 8192;
+    _visibilityFlag = true;
+    this->_attachedView = attachedView;
 }
 
 AnimatedFlobo::~AnimatedFlobo()
 {
-    while (animationQueue.size() > 0)
+    while (_animationQueue.size() > 0)
            removeCurrentAnimation();
 }
 
 void AnimatedFlobo::addAnimation(FloboAnimation *animation)
 {
-    animationQueue.add(animation);
+    _animationQueue.add(animation);
 }
 
 FloboAnimation * AnimatedFlobo::getCurrentAnimation() const
 {
-    if (animationQueue.size() == 0)
+    if (_animationQueue.size() == 0)
         return NULL;
-    return animationQueue[0];
+    return _animationQueue[0];
 }
 
 void AnimatedFlobo::removeCurrentAnimation()
 {
-    if (animationQueue.size() == 0)
+    if (_animationQueue.size() == 0)
         return;
-    FloboAnimation *animationToRemove = animationQueue[0];
-    animationQueue.removeKeepOrder(animationToRemove);
+    FloboAnimation *animationToRemove = _animationQueue[0];
+    _animationQueue.removeKeepOrder(animationToRemove);
     delete animationToRemove;
 }
 
@@ -67,17 +67,17 @@ void AnimatedFlobo::flushAnimations()
 {
     while (getCurrentAnimation() != NULL)
         removeCurrentAnimation();
-    m_angle = 0.;
-    m_offsetX = 0;
-    m_offsetY = 0;
+    _angle = 0.;
+    _offsetX = 0;
+    _offsetY = 0;
 }
 
 void AnimatedFlobo::flushAnimations(int animationTag)
 {
-    for (int i = animationQueue.size() - 1 ; i >= 0 ; i--) {
-        FloboAnimation *anim = animationQueue[i];
+    for (int i = _animationQueue.size() - 1 ; i >= 0 ; i--) {
+        FloboAnimation *anim = _animationQueue[i];
         if (anim->getTag() == animationTag) {
-            animationQueue.removeKeepOrder(anim);
+            _animationQueue.removeKeepOrder(anim);
             delete anim;
         }
     }
@@ -86,14 +86,14 @@ void AnimatedFlobo::flushAnimations(int animationTag)
 void AnimatedFlobo::cycleAnimation()
 {
     bool exclusive = false;
-    smallTicksCount+=2;
-    for (int i = 0 ; (i < animationQueue.size()) && (!exclusive) ; i++) {
-        FloboAnimation *animation = animationQueue[i];
+    _smallTicksCount+=2;
+    for (int i = 0 ; (i < _animationQueue.size()) && (!exclusive) ; i++) {
+        FloboAnimation *animation = _animationQueue[i];
         exclusive = animation->getExclusive();
         if ((!exclusive) || (i == 0)) {
             animation->cycle();
             if (animation->isFinished()) {
-                animationQueue.removeKeepOrder(animation);
+                _animationQueue.removeKeepOrder(animation);
                 delete animation;
                 i--;
                 exclusive = false;
@@ -112,7 +112,7 @@ bool AnimatedFlobo::isRenderingAnimation() const
 
 void AnimatedFlobo::render(DrawTarget *dt)
 {
-    FloboGame *attachedGame = attachedView->getAttachedGame();
+    FloboGame *attachedGame = _attachedView->getAttachedGame();
     FloboAnimation *animation = getCurrentAnimation();
     if (!isRenderingAnimation()) {
         renderAt(getScreenCoordinateX(), getScreenCoordinateY(), dt);
@@ -126,17 +126,17 @@ void AnimatedFlobo::render(DrawTarget *dt)
 
 void AnimatedFlobo::renderAt(int X, int Y, DrawTarget *dt)
 {
-    if (attachedView == NULL)
+    if (_attachedView == NULL)
         return;
-    if (!visibilityFlag)
+    if (!_visibilityFlag)
         return;
-    FloboGame *attachedGame = attachedView->getAttachedGame();
+    FloboGame *attachedGame = _attachedView->getAttachedGame();
 
     IosRect drect;
 
     IosSurface *currentSurface;
 
-    currentSurface = attachedTheme->getFloboSurfaceForValence(attachedView->getValenceForFlobo(this), m_currentCompressedState);
+    currentSurface = _attachedTheme->getFloboSurfaceForValence(_attachedView->getValenceForFlobo(this), _currentCompressedState);
     if (currentSurface != NULL) {
         drect.x = X;
         drect.y = Y;
@@ -149,24 +149,24 @@ void AnimatedFlobo::renderAt(int X, int Y, DrawTarget *dt)
         /* TODO: Investigate why, during network game, the falling flobo starts by being neutral */
         if ((this == attachedGame->getFallingFlobo().get())
             && (getFloboState() != FLOBO_NEUTRAL)
-            && (m_currentCompressedState == 0))
-            dt->draw(attachedTheme->getCircleSurfaceForIndex((smallTicksCount >> 2) & 0x1F), NULL, &drect);
+            && (_currentCompressedState == 0))
+            dt->draw(_attachedTheme->getCircleSurfaceForIndex((_smallTicksCount >> 2) & 0x1F), NULL, &drect);
 
         /* Eye management */
-        if ((getFloboState() != FLOBO_NEUTRAL) && (m_displayEyes)) {
-            int eyePhase = fmod((floboEyeState + ios_fc::getTimeMs()), 8192.);
+        if ((getFloboState() != FLOBO_NEUTRAL) && (_displayEyes)) {
+            int eyePhase = fmod((_floboEyeState + ios_fc::getTimeMs()), 8192.);
             IosSurface *s = NULL;
             if (eyePhase < 100)
-                s = attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState);
+                s = _attachedTheme->getEyeSurfaceForIndex(1, _currentCompressedState);
             else if (eyePhase < 200)
-                s = attachedTheme->getEyeSurfaceForIndex(2, m_currentCompressedState);
+                s = _attachedTheme->getEyeSurfaceForIndex(2, _currentCompressedState);
             else if (eyePhase < 300)
-                s = attachedTheme->getEyeSurfaceForIndex(1, m_currentCompressedState);
+                s = _attachedTheme->getEyeSurfaceForIndex(1, _currentCompressedState);
             else
-                s = attachedTheme->getEyeSurfaceForIndex(0, m_currentCompressedState);
+                s = _attachedTheme->getEyeSurfaceForIndex(0, _currentCompressedState);
             if (s != NULL) {
-                drect.x += attachedTheme->getEyeSurfaceOffsetX();
-                drect.y += attachedTheme->getEyeSurfaceOffsetY();
+                drect.x += _attachedTheme->getEyeSurfaceOffsetX();
+                drect.y += _attachedTheme->getEyeSurfaceOffsetY();
                 drect.w = s->w;
                 drect.h = s->h;
                 dt->draw(s, NULL, &drect);
@@ -177,7 +177,7 @@ void AnimatedFlobo::renderAt(int X, int Y, DrawTarget *dt)
 
 void AnimatedFlobo::renderShadow(DrawTarget *dt)
 {
-    if (!visibilityFlag)
+    if (!_visibilityFlag)
         return;
     if (!isRenderingAnimation()) {
         renderShadowAt(getScreenCoordinateX(), getScreenCoordinateY(), dt);
@@ -188,7 +188,7 @@ void AnimatedFlobo::renderShadowAt(int X, int Y, DrawTarget *dt)
 {
     if (getFloboState() != FLOBO_NEUTRAL) {
         IosSurface *currentSurface;
-        currentSurface = attachedTheme->getShadowSurface(m_currentCompressedState);
+        currentSurface = _attachedTheme->getShadowSurface(_currentCompressedState);
         if (currentSurface != NULL) {
             IosRect drect;
             drect.x = X + (TSIZE >> 2) - (currentSurface->w >> 2) + 3;
@@ -203,84 +203,84 @@ void AnimatedFlobo::renderShadowAt(int X, int Y, DrawTarget *dt)
 
 int AnimatedFlobo::getScreenCoordinateX() const
 {
-    if ((m_angle == 0.) || (m_partner == NULL))
-        return attachedView->getScreenCoordinateX(getFloboX()) + m_offsetX;
-    if (m_partner->getFloboX() == getFloboX()) {
-        if (m_partner->getFloboY() < getFloboY())
-            return (m_partner->getScreenCoordinateX()) - sin(m_angle) * TSIZE;
+    if ((_angle == 0.) || (_partner == NULL))
+        return _attachedView->getScreenCoordinateX(getFloboX()) + _offsetX;
+    if (_partner->getFloboX() == getFloboX()) {
+        if (_partner->getFloboY() < getFloboY())
+            return (_partner->getScreenCoordinateX()) - sin(_angle) * TSIZE;
         else
-            return (m_partner->getScreenCoordinateX()) + sin(m_angle) * TSIZE;
+            return (_partner->getScreenCoordinateX()) + sin(_angle) * TSIZE;
     }
-    else if (m_partner->getFloboX() < getFloboX())
-        return (m_partner->getScreenCoordinateX()) + cos(m_angle) * TSIZE;
+    else if (_partner->getFloboX() < getFloboX())
+        return (_partner->getScreenCoordinateX()) + cos(_angle) * TSIZE;
     else
-        return (m_partner->getScreenCoordinateX()) - cos(m_angle) * TSIZE;
+        return (_partner->getScreenCoordinateX()) - cos(_angle) * TSIZE;
 }
 
 int AnimatedFlobo::getScreenCoordinateY() const
 {
-    if ((m_angle == 0.) || (m_partner == NULL)) {
+    if ((_angle == 0.) || (_partner == NULL)) {
         if (getFloboState() < FLOBO_EMPTY)
-            if (attachedView->getAttachedGame()->getSemiMove())
-                return (attachedView->getScreenCoordinateY(getFloboY()) -  TSIZE / 2) + m_offsetY;
-        return attachedView->getScreenCoordinateY(getFloboY()) + m_offsetY;
+            if (_attachedView->getAttachedGame()->getSemiMove())
+                return (_attachedView->getScreenCoordinateY(getFloboY()) -  TSIZE / 2) + _offsetY;
+        return _attachedView->getScreenCoordinateY(getFloboY()) + _offsetY;
     }
-    if (m_partner->getFloboY() == getFloboY()) {
-        if (m_partner->getFloboX() < getFloboX())
-            return (m_partner->getScreenCoordinateY()) + sin(m_angle) * TSIZE;
+    if (_partner->getFloboY() == getFloboY()) {
+        if (_partner->getFloboX() < getFloboX())
+            return (_partner->getScreenCoordinateY()) + sin(_angle) * TSIZE;
         else
-            return (m_partner->getScreenCoordinateY()) - sin(m_angle) * TSIZE;
+            return (_partner->getScreenCoordinateY()) - sin(_angle) * TSIZE;
     }
-    else if (m_partner->getFloboY() < getFloboY())
-        return (m_partner->getScreenCoordinateY()) + cos(m_angle) * TSIZE;
+    else if (_partner->getFloboY() < getFloboY())
+        return (_partner->getScreenCoordinateY()) + cos(_angle) * TSIZE;
     else
-        return (m_partner->getScreenCoordinateY()) - cos(m_angle) * TSIZE;
+        return (_partner->getScreenCoordinateY()) - cos(_angle) * TSIZE;
 }
 
 AnimatedFloboFactory::AnimatedFloboFactory(GameView *attachedView)
-  : attachedView(attachedView), m_showEyes(true)
+  : _attachedView(attachedView), _showEyes(true)
 {
-    this->attachedThemeSet = attachedView->getFloboSetTheme();
+    this->_attachedThemeSet = attachedView->getFloboSetTheme();
 }
 
 AnimatedFloboFactory::~AnimatedFloboFactory()
 {
-    while (floboWalhalla.size() > 0) {
-        Flobo *currentFlobo = floboWalhalla[0];
-        floboWalhalla.removeAt(0);
+    while (_floboWalhalla.size() > 0) {
+        Flobo *currentFlobo = _floboWalhalla[0];
+        _floboWalhalla.removeAt(0);
         delete currentFlobo;
     }
 }
 
 std::shared_ptr<Flobo> AnimatedFloboFactory::createFlobo(FloboState state)
 {
-    AnimatedFlobo *result = new AnimatedFlobo(state, attachedThemeSet, attachedView);
-    result->setShowEyes(m_showEyes);
+    AnimatedFlobo *result = new AnimatedFlobo(state, _attachedThemeSet, _attachedView);
+    result->setShowEyes(_showEyes);
     return std::shared_ptr<Flobo>(result, [this](Flobo *target) { deleteFlobo(target); });
 }
 
 void AnimatedFloboFactory::deleteFlobo(Flobo *target)
 {
-    floboWalhalla.add(target);
+    _floboWalhalla.add(target);
 }
 
 
 void AnimatedFloboFactory::renderWalhalla(DrawTarget *dt)
 {
-    for (int i = floboWalhalla.size() - 1 ; i >= 0 ; i--) {
-        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(floboWalhalla[i]);
+    for (int i = _floboWalhalla.size() - 1 ; i >= 0 ; i--) {
+        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(_floboWalhalla[i]);
         currentFlobo->render(dt);
     }
 }
 
 void AnimatedFloboFactory::cycleWalhalla()
 {
-    for (int i = floboWalhalla.size() - 1 ; i >= 0 ; i--) {
-        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(floboWalhalla[i]);
+    for (int i = _floboWalhalla.size() - 1 ; i >= 0 ; i--) {
+        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(_floboWalhalla[i]);
         if (currentFlobo->getCurrentAnimation() != NULL) {
             currentFlobo->cycleAnimation();
         } else {
-            floboWalhalla.removeAt(i);
+            _floboWalhalla.removeAt(i);
             delete currentFlobo;
         }
     }
