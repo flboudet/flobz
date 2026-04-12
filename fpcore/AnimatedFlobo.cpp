@@ -38,34 +38,34 @@ AnimatedFlobo::AnimatedFlobo(FloboState state, FloboSetTheme *themeSet, GameView
 
 AnimatedFlobo::~AnimatedFlobo()
 {
-    while (_animationQueue.size() > 0)
+    while (!_animationQueue.empty())
            removeCurrentAnimation();
 }
 
 void AnimatedFlobo::addAnimation(FloboAnimation *animation)
 {
-    _animationQueue.add(animation);
+    _animationQueue.push_back(animation);
 }
 
 FloboAnimation * AnimatedFlobo::getCurrentAnimation() const
 {
-    if (_animationQueue.size() == 0)
-        return NULL;
+    if (_animationQueue.empty())
+        return nullptr;
     return _animationQueue[0];
 }
 
 void AnimatedFlobo::removeCurrentAnimation()
 {
-    if (_animationQueue.size() == 0)
+    if (_animationQueue.empty())
         return;
-    FloboAnimation *animationToRemove = _animationQueue[0];
-    _animationQueue.removeKeepOrder(animationToRemove);
+    FloboAnimation *animationToRemove = _animationQueue.front();
+    _animationQueue.erase(_animationQueue.begin());
     delete animationToRemove;
 }
 
 void AnimatedFlobo::flushAnimations()
 {
-    while (getCurrentAnimation() != NULL)
+    while (getCurrentAnimation() != nullptr)
         removeCurrentAnimation();
     _angle = 0.;
     _offsetX = 0;
@@ -74,10 +74,10 @@ void AnimatedFlobo::flushAnimations()
 
 void AnimatedFlobo::flushAnimations(int animationTag)
 {
-    for (int i = _animationQueue.size() - 1 ; i >= 0 ; i--) {
+    for (int i = int(_animationQueue.size()) - 1 ; i >= 0 ; i--) {
         FloboAnimation *anim = _animationQueue[i];
         if (anim->getTag() == animationTag) {
-            _animationQueue.removeKeepOrder(anim);
+            _animationQueue.erase(_animationQueue.begin() + i);
             delete anim;
         }
     }
@@ -86,14 +86,14 @@ void AnimatedFlobo::flushAnimations(int animationTag)
 void AnimatedFlobo::cycleAnimation()
 {
     bool exclusive = false;
-    _smallTicksCount+=2;
-    for (int i = 0 ; (i < _animationQueue.size()) && (!exclusive) ; i++) {
+    _smallTicksCount += 2;
+    for (int i = 0 ; (i < int(_animationQueue.size())) && !exclusive ; i++) {
         FloboAnimation *animation = _animationQueue[i];
         exclusive = animation->getExclusive();
         if ((!exclusive) || (i == 0)) {
             animation->cycle();
             if (animation->isFinished()) {
-                _animationQueue.removeKeepOrder(animation);
+                _animationQueue.erase(_animationQueue.begin() + i);
                 delete animation;
                 i--;
                 exclusive = false;
@@ -105,7 +105,7 @@ void AnimatedFlobo::cycleAnimation()
 bool AnimatedFlobo::isRenderingAnimation() const
 {
     FloboAnimation *animation = getCurrentAnimation();
-    if (animation == NULL)
+    if (animation == nullptr)
         return false;
     return animation->isEnabled();
 }
@@ -245,9 +245,9 @@ AnimatedFloboFactory::AnimatedFloboFactory(GameView *attachedView)
 
 AnimatedFloboFactory::~AnimatedFloboFactory()
 {
-    while (_floboWalhalla.size() > 0) {
-        Flobo *currentFlobo = _floboWalhalla[0];
-        _floboWalhalla.removeAt(0);
+    while (!_floboWalhalla.empty()) {
+        Flobo *currentFlobo = _floboWalhalla.back();
+        _floboWalhalla.pop_back();
         delete currentFlobo;
     }
 }
@@ -261,26 +261,26 @@ std::shared_ptr<Flobo> AnimatedFloboFactory::createFlobo(FloboState state)
 
 void AnimatedFloboFactory::deleteFlobo(Flobo *target)
 {
-    _floboWalhalla.add(target);
+    _floboWalhalla.push_back(target);
 }
 
 
 void AnimatedFloboFactory::renderWalhalla(DrawTarget *dt)
 {
-    for (int i = _floboWalhalla.size() - 1 ; i >= 0 ; i--) {
-        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(_floboWalhalla[i]);
+    for (auto it = _floboWalhalla.rbegin(); it != _floboWalhalla.rend(); ++it) {
+        AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(*it);
         currentFlobo->render(dt);
     }
 }
 
 void AnimatedFloboFactory::cycleWalhalla()
 {
-    for (int i = _floboWalhalla.size() - 1 ; i >= 0 ; i--) {
+    for (int i = int(_floboWalhalla.size()) - 1 ; i >= 0 ; i--) {
         AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(_floboWalhalla[i]);
-        if (currentFlobo->getCurrentAnimation() != NULL) {
+        if (currentFlobo->getCurrentAnimation() != nullptr) {
             currentFlobo->cycleAnimation();
         } else {
-            _floboWalhalla.removeAt(i);
+            _floboWalhalla.erase(_floboWalhalla.begin() + i);
             delete currentFlobo;
         }
     }

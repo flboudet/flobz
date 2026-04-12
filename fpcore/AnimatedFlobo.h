@@ -26,6 +26,7 @@
 #ifndef _ANIMATEDPUYO
 #define _ANIMATEDPUYO
 
+#include <vector>
 #include "ios_memory.h"
 #include "FloboGame.h"
 #include "FloboAnimations.h"
@@ -66,7 +67,7 @@ public:
     void setRotation(float angle) { _angle = angle; }
     void setShowEyes(bool show) { _displayEyes = show; }
 private:
-    AdvancedBuffer<FloboAnimation *> _animationQueue;
+    std::vector<FloboAnimation *> _animationQueue;
     int _floboEyeState;
     unsigned int _smallTicksCount;
     bool _visibilityFlag;
@@ -89,7 +90,7 @@ public:
     void cycleWalhalla();
     void setShowEyes(bool show) { _showEyes = show; }
 private:
-    AdvancedBuffer<Flobo *> _floboWalhalla;
+    std::vector<Flobo *> _floboWalhalla;
     GameView *_attachedView;
     FloboSetTheme *_attachedThemeSet;
     bool _showEyes;
