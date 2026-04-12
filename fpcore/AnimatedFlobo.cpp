@@ -44,12 +44,12 @@ AnimatedFlobo::~AnimatedFlobo()
            removeCurrentAnimation();
 }
 
-void AnimatedFlobo::addAnimation(FloboAnimation *animation)
+void AnimatedFlobo::addAnimation(const std::shared_ptr<FloboAnimation> &animation)
 {
     _animationQueue.push_back(animation);
 }
 
-FloboAnimation * AnimatedFlobo::getCurrentAnimation() const
+std::shared_ptr<FloboAnimation> AnimatedFlobo::getCurrentAnimation() const
 {
     if (_animationQueue.empty())
         return nullptr;
@@ -60,9 +60,7 @@ void AnimatedFlobo::removeCurrentAnimation()
 {
     if (_animationQueue.empty())
         return;
-    FloboAnimation *animationToRemove = _animationQueue.front();
     _animationQueue.erase(_animationQueue.begin());
-    delete animationToRemove;
 }
 
 void AnimatedFlobo::flushAnimations()
@@ -77,10 +75,9 @@ void AnimatedFlobo::flushAnimations()
 void AnimatedFlobo::flushAnimations(int animationTag)
 {
     for (int i = int(_animationQueue.size()) - 1 ; i >= 0 ; i--) {
-        FloboAnimation *anim = _animationQueue[i];
+        auto anim = _animationQueue[i];
         if (anim->getTag() == animationTag) {
             _animationQueue.erase(_animationQueue.begin() + i);
-            delete anim;
         }
     }
 }
@@ -90,13 +87,12 @@ void AnimatedFlobo::cycleAnimation()
     bool exclusive = false;
     _smallTicksCount += 2;
     for (int i = 0 ; (i < int(_animationQueue.size())) && !exclusive ; i++) {
-        FloboAnimation *animation = _animationQueue[i];
+        auto animation = _animationQueue[i];
         exclusive = animation->getExclusive();
         if ((!exclusive) || (i == 0)) {
             animation->cycle();
             if (animation->isFinished()) {
                 _animationQueue.erase(_animationQueue.begin() + i);
-                delete animation;
                 i--;
                 exclusive = false;
             }
@@ -106,7 +102,7 @@ void AnimatedFlobo::cycleAnimation()
 
 bool AnimatedFlobo::isRenderingAnimation() const
 {
-    FloboAnimation *animation = getCurrentAnimation();
+    auto animation = getCurrentAnimation();
     if (animation == nullptr)
         return false;
     return animation->isEnabled();
@@ -115,7 +111,7 @@ bool AnimatedFlobo::isRenderingAnimation() const
 void AnimatedFlobo::render(DrawTarget *dt)
 {
     FloboGame *attachedGame = _attachedView->getAttachedGame();
-    FloboAnimation *animation = getCurrentAnimation();
+    auto animation = getCurrentAnimation();
     if (!isRenderingAnimation()) {
         renderAt(getScreenCoordinateX(), getScreenCoordinateY(), dt);
     }

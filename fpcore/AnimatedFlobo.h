@@ -26,6 +26,7 @@
 #ifndef _ANIMATEDPUYO
 #define _ANIMATEDPUYO
 
+#include <memory>
 #include <vector>
 #include "ios_memory.h"
 #include "FloboGame.h"
@@ -43,8 +44,8 @@ public:
     };
     AnimatedFlobo(FloboState state, FloboSetTheme *themeSet, GameView *attachedView);
     virtual ~AnimatedFlobo();
-    void addAnimation(FloboAnimation *animation);
-    FloboAnimation * getCurrentAnimation() const;
+    void addAnimation(const std::shared_ptr<FloboAnimation> &animation);
+    std::shared_ptr<FloboAnimation> getCurrentAnimation() const;
     void removeCurrentAnimation();
     void flushAnimations();
     void flushAnimations(int animationTag);
@@ -67,7 +68,7 @@ public:
     void setRotation(float angle) { _angle = angle; }
     void setShowEyes(bool show) { _displayEyes = show; }
 private:
-    std::vector<FloboAnimation *> _animationQueue;
+    std::vector<std::shared_ptr<FloboAnimation>> _animationQueue;
     int _floboEyeState;
     unsigned int _smallTicksCount;
     bool _visibilityFlag;
