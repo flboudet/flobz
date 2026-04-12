@@ -52,22 +52,22 @@ public:
     bool isEnabled() const;
     virtual void cycle() = 0;
     virtual void draw(int semiMove, DrawTarget *dt) {}
-    int getTag() const { return m_tag; }
-    bool getExclusive() const { return m_exclusive; }
+    int getTag() const { return _tag; }
+    bool getExclusive() const { return _exclusive; }
 protected:
-    bool finishedFlag;
-    bool enabled;
-    bool m_exclusive;
-    int m_tag;
+    bool _finishedFlag;
+    bool _enabled;
+    bool _exclusive;
+    int _tag;
 };
 
 /* Abstract animation class for flobos */
 class FloboAnimation : public Animation{
 public:
-    FloboAnimation(std::shared_ptr<AnimatedFlobo> flobo):attachedFlobo(flobo) {}
+    FloboAnimation(std::shared_ptr<AnimatedFlobo> flobo):_attachedFlobo(flobo) {}
     float getSoundPadding() const;
 protected:
-    std::shared_ptr<AnimatedFlobo> attachedFlobo;
+    std::shared_ptr<AnimatedFlobo> _attachedFlobo;
 };
 
 /* Animation synchronization helper */
@@ -80,8 +80,8 @@ public:
     void incrementUsage();
     void decrementUsage();
 private:
-    int currentCounter;
-    int currentUsage;
+    int _currentCounter;
+    int _currentUsage;
 };
 
 /* Neutral falling animation */
@@ -92,10 +92,10 @@ class NeutralAnimation : public FloboAnimation {
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
   private:
-    int X, Y, currentY;
-    float step;
-    int delay;
-    AnimationSynchronizer *synchronizer;
+    int _X, _Y, _currentY;
+    float _step;
+    int _delay;
+    AnimationSynchronizer *_synchronizer;
 };
 
 /* Companion turning around main flobo animation */
@@ -104,10 +104,10 @@ public:
     TurningAnimation(std::shared_ptr<AnimatedFlobo> companionFlobo, bool counterclockwise);
     void cycle();
 private:
-    int cpt;
-    float angle;
-    float step;
-    const int NUMSTEPS;
+    int _cpt;
+    float _angle;
+    float _step;
+    const int _NUMSTEPS;
 };
 
 /* Flobo moving from one place to another, horizontal axis */
@@ -116,8 +116,8 @@ public:
     MovingHAnimation(std::shared_ptr<AnimatedFlobo> flobo, int hOffset, int step);
     void cycle();
 private:
-    int m_cpt, m_hOffset, m_step;
-    float m_hOffsetByStep;
+    int _cpt, _hOffset, _step;
+    float _hOffsetByStep;
 };
 
 /* Flobo moving from one place to another, vertical axis */
@@ -126,8 +126,8 @@ public:
     MovingVAnimation(std::shared_ptr<AnimatedFlobo> flobo, int vOffset, int step);
     void cycle();
 private:
-    int m_cpt, m_vOffset, m_step;
-    float m_vOffsetByStep;
+    int _cpt, _vOffset, _step;
+    float _vOffsetByStep;
 };
 
 /* Flobo falling and bouncing animation */
@@ -138,12 +138,12 @@ public:
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
 private:
-    int xOffset, yOffset, step, off;
-    int X, Y;
-    int bouncing;
-    static const int BOUNCING_OFFSET_NUM;
-    static const int BOUNCING_OFFSET[];
-    bool m_once;
+    int _xOffset, _yOffset, _step, _off;
+    int _X, _Y;
+    int _bouncing;
+    static const int _BOUNCING_OFFSET_NUM;
+    static const int _BOUNCING_OFFSET[];
+    bool _once;
 };
 
 /* Flobo exploding and vanishing animation */
@@ -154,16 +154,16 @@ public:
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
 private:
-    int xOffset, yOffset;
-    int X, Y, iter, color;
-    AnimationSynchronizer *synchronizer;
-    bool once;
-    int delay;
+    int _xOffset, _yOffset;
+    int _X, _Y, _iter, _color;
+    AnimationSynchronizer *_synchronizer;
+    bool _once;
+    int _delay;
 
-    int floboNum;
-    int groupSize;
-    int groupNum;
-    int phase;
+    int _floboNum;
+    int _groupSize;
+    int _groupNum;
+    int _phase;
 };
 
 class VanishSoundAnimation : public Animation {
@@ -173,11 +173,11 @@ public:
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
 private:
-    int phase;
-    int step;
-    bool once;
-    AnimationSynchronizer *synchronizer;
-    float soundPadding;
+    int _phase;
+    int _step;
+    bool _once;
+    AnimationSynchronizer *_synchronizer;
+    float _soundPadding;
 };
 
 class NeutralPopAnimation : public FloboAnimation {
@@ -187,11 +187,11 @@ public:
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
 private:
-    AnimationSynchronizer *synchronizer;
-    int iter, delay;
-    bool once;
-    int X, Y;
-    IosSurface *neutralPop[3];
+    AnimationSynchronizer *_synchronizer;
+    int _iter, _delay;
+    bool _once;
+    int _X, _Y;
+    IosSurface *_neutralPop[3];
 };
 
 class SmoothBounceAnimation : public FloboAnimation {
@@ -201,9 +201,9 @@ public:
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
 private:
-    int bounceOffset, bouncePhase, bounceMax;
-    int origX, origY;
-    AnimationSynchronizer *synchronizer;
+    int _bounceOffset, _bouncePhase, _bounceMax;
+    int _origX, _origY;
+    AnimationSynchronizer *_synchronizer;
 };
 
 class GameOverFallAnimation : public FloboAnimation {
@@ -213,9 +213,9 @@ public:
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
 private:
-    int delay;
-    int Y;
-    int yAccel;
+    int _delay;
+    int _Y;
+    int _yAccel;
 };
 
 class ScreenShakingAnimation : public Animation {
@@ -228,14 +228,14 @@ public:
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
 private:
-    int m_iter;
-    int m_duration, m_shakeCount;
-    float m_amplX, m_amplY;
-    float m_smoothFactor;
-    AnimationSynchronizer *m_synchronizer;
-    float m_sineStep;
-    float m_sine;
-    DrawContext *m_dc;
+    int _iter;
+    int _duration, _shakeCount;
+    float _amplX, _amplY;
+    float _smoothFactor;
+    AnimationSynchronizer *_synchronizer;
+    float _sineStep;
+    float _sine;
+    DrawContext *_dc;
 };
 
 #endif // _FLOBOANIMATIONS_H_
