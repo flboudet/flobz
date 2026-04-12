@@ -64,7 +64,7 @@ protected:
 /* Abstract animation class for flobos */
 class FloboAnimation : public Animation{
 public:
-    FloboAnimation(std::shared_ptr<AnimatedFlobo> flobo):_attachedFlobo(flobo) {}
+    FloboAnimation(const std::shared_ptr<AnimatedFlobo> &flobo):_attachedFlobo(flobo) {}
     float getSoundPadding() const;
 protected:
     std::shared_ptr<AnimatedFlobo> _attachedFlobo;
@@ -87,7 +87,7 @@ private:
 /* Neutral falling animation */
 class NeutralAnimation : public FloboAnimation {
   public:
-    NeutralAnimation(std::shared_ptr<AnimatedFlobo> flobo, int delay, AnimationSynchronizer *synchronizer);
+    NeutralAnimation(const std::shared_ptr<AnimatedFlobo> &flobo, int delay, AnimationSynchronizer *synchronizer);
     virtual ~NeutralAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
@@ -101,7 +101,7 @@ class NeutralAnimation : public FloboAnimation {
 /* Companion turning around main flobo animation */
 class TurningAnimation : public FloboAnimation {
 public:
-    TurningAnimation(std::shared_ptr<AnimatedFlobo> companionFlobo, bool counterclockwise);
+    TurningAnimation(const std::shared_ptr<AnimatedFlobo> &companionFlobo, bool counterclockwise);
     void cycle();
 private:
     int _cpt;
@@ -113,7 +113,7 @@ private:
 /* Flobo moving from one place to another, horizontal axis */
 class MovingHAnimation : public FloboAnimation {
 public:
-    MovingHAnimation(std::shared_ptr<AnimatedFlobo> flobo, int hOffset, int step);
+    MovingHAnimation(const std::shared_ptr<AnimatedFlobo> &flobo, int hOffset, int step);
     void cycle();
 private:
     int _cpt, _hOffset, _step;
@@ -123,7 +123,7 @@ private:
 /* Flobo moving from one place to another, vertical axis */
 class MovingVAnimation : public FloboAnimation {
 public:
-    MovingVAnimation(std::shared_ptr<AnimatedFlobo> flobo, int vOffset, int step);
+    MovingVAnimation(const std::shared_ptr<AnimatedFlobo> &flobo, int vOffset, int step);
     void cycle();
 private:
     int _cpt, _vOffset, _step;
@@ -133,7 +133,7 @@ private:
 /* Flobo falling and bouncing animation */
 class FallingAnimation : public FloboAnimation {
 public:
-    FallingAnimation(std::shared_ptr<AnimatedFlobo> flobo,
+    FallingAnimation(const std::shared_ptr<AnimatedFlobo> &flobo,
                      int originY, int xOffset, int yOffset, int step);
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
@@ -149,7 +149,7 @@ private:
 /* Flobo exploding and vanishing animation */
 class VanishAnimation : public FloboAnimation {
 public:
-    VanishAnimation(std::shared_ptr<AnimatedFlobo> flobo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int floboNum, int groupSize, int groupNum, int phase);
+    VanishAnimation(const std::shared_ptr<AnimatedFlobo> &flobo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int floboNum, int groupSize, int groupNum, int phase);
     virtual ~VanishAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);

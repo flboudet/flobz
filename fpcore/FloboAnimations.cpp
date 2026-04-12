@@ -53,7 +53,7 @@ float FloboAnimation::getSoundPadding() const
 }
 
 /* Neutral falling animation */
-NeutralAnimation::NeutralAnimation(std::shared_ptr<AnimatedFlobo> flobo, int delay, AnimationSynchronizer *synchronizer) : FloboAnimation(flobo)
+NeutralAnimation::NeutralAnimation(const std::shared_ptr<AnimatedFlobo> &flobo, int delay, AnimationSynchronizer *synchronizer) : FloboAnimation(flobo)
 {
     this->_X = _attachedFlobo->getScreenCoordinateX();
     this->_Y = _attachedFlobo->getScreenCoordinateY();
@@ -137,7 +137,7 @@ void AnimationSynchronizer::decrementUsage()
 }
 
 /* Companion turning around main flobo animation */
-TurningAnimation::TurningAnimation(std::shared_ptr<AnimatedFlobo> companionFlobo,
+TurningAnimation::TurningAnimation(const std::shared_ptr<AnimatedFlobo> &companionFlobo,
                                    bool counterclockwise) : FloboAnimation(companionFlobo), _NUMSTEPS(6)
 {
     _enabled = false;
@@ -172,7 +172,7 @@ void TurningAnimation::cycle()
 }
 
 /* Flobo moving from one place to another in the horizontal axis */
-MovingHAnimation::MovingHAnimation(std::shared_ptr<AnimatedFlobo> flobo, int hOffset, int step)
+MovingHAnimation::MovingHAnimation(const std::shared_ptr<AnimatedFlobo> &flobo, int hOffset, int step)
   : FloboAnimation(flobo), _cpt(0), _hOffset(hOffset), _step(step),
     _hOffsetByStep((float)hOffset/(float)step)
 {
@@ -194,7 +194,7 @@ void MovingHAnimation::cycle()
 }
 
 /* Flobo moving from one place to another in the vertical axis */
-MovingVAnimation::MovingVAnimation(std::shared_ptr<AnimatedFlobo> flobo, int vOffset, int step)
+MovingVAnimation::MovingVAnimation(const std::shared_ptr<AnimatedFlobo> &flobo, int vOffset, int step)
   : FloboAnimation(flobo), _cpt(0), _vOffset(vOffset), _step(step),
     _vOffsetByStep((float)vOffset/(float)step)
 {
@@ -219,7 +219,7 @@ void MovingVAnimation::cycle()
 const int FallingAnimation::_BOUNCING_OFFSET_NUM = 9;
 const int FallingAnimation::_BOUNCING_OFFSET[] = {-3, -4, -3, 0, 3, 6, 8, 6, 3};
 
-FallingAnimation::FallingAnimation(std::shared_ptr<AnimatedFlobo> flobo, int originY, int xOffset, int yOffset, int off) : FloboAnimation(flobo), _once(false)
+FallingAnimation::FallingAnimation(const std::shared_ptr<AnimatedFlobo> &flobo, int originY, int xOffset, int yOffset, int off) : FloboAnimation(flobo), _once(false)
 {
     this->_xOffset = xOffset;
     this->_yOffset = yOffset;
@@ -276,7 +276,7 @@ void FallingAnimation::draw(int semiMove, DrawTarget *dt)
 }
 
 /* Flobo exploding and vanishing animation */
-VanishAnimation::VanishAnimation(std::shared_ptr<AnimatedFlobo> flobo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int floboNum, int groupSize, int groupNum, int phase) : FloboAnimation(flobo), _floboNum(floboNum), _groupSize(groupSize), _groupNum(groupNum), _phase(phase)
+VanishAnimation::VanishAnimation(const std::shared_ptr<AnimatedFlobo> &flobo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int floboNum, int groupSize, int groupNum, int phase) : FloboAnimation(flobo), _floboNum(floboNum), _groupSize(groupSize), _groupNum(groupNum), _phase(phase)
 {
     this->_xOffset = xOffset;
     this->_yOffset = yOffset;
