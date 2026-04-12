@@ -82,7 +82,7 @@ class GameView : public GameListener {
     GameView(FloboGameFactory *attachedFloboGameFactory);
 
     void setupLayout(int playerId);
-    void setPlayerNames(const std::string &p1, const std::string &p2) { p1name = p1; p2name = p2; }
+    void setPlayerNames(const std::string &p1, const std::string &p2) { _p1name = p1; _p2name = p2; }
 
     virtual ~GameView();
     void setEnemyGame(FloboGame *enemyGame);
@@ -91,8 +91,8 @@ class GameView : public GameListener {
     void renderScore(DrawTarget *dt);
     void cycleAnimation();
     virtual void cycleGame();
-    void allowCycle() { cycleAllowance++; }
-    void disallowCycle() { cycleAllowance--; }
+    void allowCycle() { _cycleAllowance++; }
+    void disallowCycle() { _cycleAllowance--; }
 
     virtual void moveLeft();
     virtual void moveRight();
@@ -104,13 +104,13 @@ class GameView : public GameListener {
 
     bool isGameOver() const;
 
-    int getScreenCoordinateX(int X) const { return X * TSIZE + m_xOffset; }
-    int getScreenCoordinateY(int Y) const { return Y * TSIZE + m_yOffset; }
+    int getScreenCoordinateX(int X) const { return X * TSIZE + _xOffset; }
+    int getScreenCoordinateY(int Y) const { return Y * TSIZE + _yOffset; }
 
-    FloboSetTheme *getFloboSetTheme() const { return attachedThemeSet; }
+    FloboSetTheme *getFloboSetTheme() const { return _attachedThemeSet; }
 
-    bool isNewMetaCycleStart() { return newMetaCycleStart; }
-    void clearMetaCycleStart() { newMetaCycleStart = false; }
+    bool isNewMetaCycleStart() { return _newMetaCycleStart; }
+    void clearMetaCycleStart() { _newMetaCycleStart = false; }
 
     // GameListener methods
 	virtual void fallingsDidMoveLeft(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo);
@@ -124,49 +124,49 @@ class GameView : public GameListener {
     virtual void gameLost();
 
     // Accessors
-    int getPlayerId() const { return m_playerId; }
-    void setPlayerId(int playerId) { m_playerId = playerId; }
+    int getPlayerId() const { return _playerId; }
+    void setPlayerId(int playerId) { _playerId = playerId; }
     virtual void gameWin();
-    void setShowNextFlobos(bool show) { m_showNextFlobos = show; }
-    void setShowShadows(bool show) { m_showShadows = show; }
-    void setShowEyes(bool show) { attachedFloboFactory.setShowEyes(show); }
+    void setShowNextFlobos(bool show) { _showNextFlobos = show; }
+    void setShowShadows(bool show) { _showShadows = show; }
+    void setShowEyes(bool show) { _attachedFloboFactory.setShowEyes(show); }
     void setNeutralFlobosDisplayPosition(int x, int y) {
-        neutralXOffset = x;
-        neutralYOffset = y;
+        _neutralXOffset = x;
+        _neutralYOffset = y;
     }
     void setPosition(int x, int y) {
-        this->m_xOffset = x;
-        this->m_yOffset = y - TSIZE;
+        this->_xOffset = x;
+        this->_yOffset = y - TSIZE;
     }
     void setNextFlobosPosition(int x, int y) {
-        this->m_nXOffset = x;
-        this->m_nYOffset = y;
+        this->_nXOffset = x;
+        this->_nYOffset = y;
     }
     void setScoreDisplayPosition(int x, int y) {
-        m_scoreDisplay->setPosition(x, y);
+        _scoreDisplay->setPosition(x, y);
     }
   protected:
-    int m_playerId;
-    std::string p1name, p2name;
+    int _playerId;
+    std::string _p1name, _p2name;
     bool cycleAllowed();
-    bool m_showNextFlobos, m_showShadows, m_showEyes;
-    bool skippedCycle;
-    bool gameRunning;
-    int m_xOffset, m_yOffset;
-    int m_nXOffset, m_nYOffset;
-    int neutralXOffset, neutralYOffset;
-    FloboSetTheme *attachedThemeSet;
-    LevelTheme *attachedLevelTheme;
-    AnimatedFloboFactory attachedFloboFactory;
-    FloboGame *attachedGame, *enemyGame;
-    AdvancedBuffer<Animation *> viewAnimations;
-    int cycleAllowance;
-    int delayBeforeGameOver;
-    bool newMetaCycleStart;
-    std::unique_ptr<PlayerGameStatDisplay> m_scoreDisplay;
+    bool _showNextFlobos, _showShadows, m_showEyes;
+    bool _skippedCycle;
+    bool _gameRunning;
+    int _xOffset, _yOffset;
+    int _nXOffset, _nYOffset;
+    int _neutralXOffset, _neutralYOffset;
+    FloboSetTheme *_attachedThemeSet;
+    LevelTheme *_attachedLevelTheme;
+    AnimatedFloboFactory _attachedFloboFactory;
+    FloboGame *attachedGame, *_enemyGame;
+    AdvancedBuffer<Animation *> _viewAnimations;
+    int _cycleAllowance;
+    int _delayBeforeGameOver;
+    bool _newMetaCycleStart;
+    std::unique_ptr<PlayerGameStatDisplay> _scoreDisplay;
 
     void initCommon(FloboGameFactory *attachedFloboGameFactory);
-    bool haveDisplay;
+    bool _haveDisplay;
 };
 
 #endif // _FLOBOVIEW_H_

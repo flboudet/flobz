@@ -39,58 +39,58 @@ GameView::GameView(FloboGameFactory *attachedFloboGameFactory,
                    int playerId,
                    FloboSetTheme *attachedThemeSet,
                    LevelTheme *attachedLevelTheme)
-  : m_playerId(playerId), m_showNextFlobos(true), m_showShadows(true),
-    attachedThemeSet(attachedThemeSet), attachedLevelTheme(attachedLevelTheme),
-    attachedFloboFactory(this), delayBeforeGameOver(60), haveDisplay(true),
-    m_xOffset(0), m_yOffset(- TSIZE), m_nXOffset(0), m_nYOffset(0),
-    neutralXOffset(-1), neutralYOffset(-1)
+  : _playerId(playerId), _showNextFlobos(true), _showShadows(true),
+    _attachedThemeSet(attachedThemeSet), _attachedLevelTheme(attachedLevelTheme),
+    _attachedFloboFactory(this), _delayBeforeGameOver(60), _haveDisplay(true),
+    _xOffset(0), _yOffset(- TSIZE), _nXOffset(0), _nYOffset(0),
+    _neutralXOffset(-1), _neutralYOffset(-1)
 {
     setupLayout(playerId);
     initCommon(attachedFloboGameFactory);
     setScoreDisplayPosition(attachedLevelTheme->getScoreDisplayX(playerId),
                             attachedLevelTheme->getScoreDisplayY(playerId));
-    m_scoreDisplay->setFont(attachedLevelTheme->getScoreFont());
+    _scoreDisplay->setFont(attachedLevelTheme->getScoreFont());
 }
 
 void GameView::setupLayout(int playerId)
 {
     setPlayerId(playerId);
-    setPosition(attachedLevelTheme->getFlobobanX(playerId),
-                attachedLevelTheme->getFlobobanY(playerId));
-    setNextFlobosPosition(attachedLevelTheme->getNextFlobosX(playerId),
-                         attachedLevelTheme->getNextFlobosY(playerId));
-    setNeutralFlobosDisplayPosition(attachedLevelTheme->getNeutralDisplayX(playerId),
-                                   attachedLevelTheme->getNeutralDisplayY(playerId));
-    setShowNextFlobos(attachedLevelTheme->getShouldDisplayNext(playerId));
-    setShowShadows(attachedLevelTheme->getShouldDisplayShadows(playerId));
-    setShowEyes(attachedLevelTheme->getShouldDisplayEyes(playerId));
+    setPosition(_attachedLevelTheme->getFlobobanX(playerId),
+                _attachedLevelTheme->getFlobobanY(playerId));
+    setNextFlobosPosition(_attachedLevelTheme->getNextFlobosX(playerId),
+                         _attachedLevelTheme->getNextFlobosY(playerId));
+    setNeutralFlobosDisplayPosition(_attachedLevelTheme->getNeutralDisplayX(playerId),
+                                   _attachedLevelTheme->getNeutralDisplayY(playerId));
+    setShowNextFlobos(_attachedLevelTheme->getShouldDisplayNext(playerId));
+    setShowShadows(_attachedLevelTheme->getShouldDisplayShadows(playerId));
+    setShowEyes(_attachedLevelTheme->getShouldDisplayEyes(playerId));
 }
 
 void GameView::initCommon(FloboGameFactory *attachedFloboGameFactory)
 {
-	attachedGame = attachedFloboGameFactory->createFloboGame(&attachedFloboFactory);
-    m_scoreDisplay.reset(new PlayerGameStatDisplay(attachedGame->getGameStat()));
+	attachedGame = attachedFloboGameFactory->createFloboGame(&_attachedFloboFactory);
+    _scoreDisplay.reset(new PlayerGameStatDisplay(attachedGame->getGameStat()));
     attachedGame->addGameListener(this);
-	gameRunning = true;
-	enemyGame = NULL;
-    skippedCycle = false;
-    cycleAllowance = 0;
-    newMetaCycleStart = false;
+	_gameRunning = true;
+	_enemyGame = NULL;
+    _skippedCycle = false;
+    _cycleAllowance = 0;
+    _newMetaCycleStart = false;
 }
 
 GameView::GameView(FloboGameFactory *attachedFloboGameFactory)
-  : attachedThemeSet(NULL), attachedLevelTheme(NULL),
-    attachedFloboFactory(this), delayBeforeGameOver(60), haveDisplay(false),
-    neutralXOffset(-1), neutralYOffset(-1)
+  : _attachedThemeSet(NULL), _attachedLevelTheme(NULL),
+    _attachedFloboFactory(this), _delayBeforeGameOver(60), _haveDisplay(false),
+    _neutralXOffset(-1), _neutralYOffset(-1)
 {
     initCommon(attachedFloboGameFactory);
 }
 
 GameView::~GameView()
 {
-    while (viewAnimations.size() > 0) {
-        Animation *currentAnimation = viewAnimations[0];
-        viewAnimations.removeAtKeepOrder(0);
+    while (_viewAnimations.size() > 0) {
+        Animation *currentAnimation = _viewAnimations[0];
+        _viewAnimations.removeAtKeepOrder(0);
         delete currentAnimation;
     }
     delete attachedGame;
@@ -98,12 +98,12 @@ GameView::~GameView()
 
 void GameView::setEnemyGame(FloboGame *enemyGame)
 {
-	this->enemyGame = enemyGame;
+	this->_enemyGame = enemyGame;
 }
 
 int GameView::getValenceForFlobo(Flobo *flobo) const
 {
-    if (!haveDisplay) return 0;
+    if (!_haveDisplay) return 0;
     int i = flobo->getFloboX();
     int j = flobo->getFloboY();
     FloboState currentFloboState = flobo->getFloboState();
@@ -123,17 +123,17 @@ int GameView::getValenceForFlobo(Flobo *flobo) const
 
 bool GameView::isGameOver() const
 {
-    if ((!gameRunning) && (delayBeforeGameOver < 0))
+    if ((!_gameRunning) && (_delayBeforeGameOver < 0))
         return true;
     return false;
 }
 
 void GameView::cycleAnimation(void)
 {
-    if (haveDisplay) {
+    if (_haveDisplay) {
         // Handle end of game
-        if (!gameRunning) {
-            delayBeforeGameOver--;
+        if (!_gameRunning) {
+            _delayBeforeGameOver--;
         }
 
         // Cycling every flobo's animation
@@ -142,13 +142,13 @@ void GameView::cycleAnimation(void)
             static_cast<AnimatedFlobo *>(iter.get().get())->cycleAnimation();
         }
         // Cycling dead flobo's animations
-        attachedFloboFactory.cycleWalhalla();
+        _attachedFloboFactory.cycleWalhalla();
 
         // Cycling view's animations
-        if (viewAnimations.size() > 0) {
-            Animation *currentAnimation = viewAnimations[0];
+        if (_viewAnimations.size() > 0) {
+            Animation *currentAnimation = _viewAnimations[0];
             if (currentAnimation->isFinished()) {
-                viewAnimations.removeKeepOrder(currentAnimation);
+                _viewAnimations.removeKeepOrder(currentAnimation);
                 delete currentAnimation;
             }
             else {
@@ -158,18 +158,18 @@ void GameView::cycleAnimation(void)
     }
 
     // If there is a skipped cycle to do, do it
-    if (attachedGame->isEndOfCycle() && attachedGame->isGameRunning() && !newMetaCycleStart) cycleGame();
+    if (attachedGame->isEndOfCycle() && attachedGame->isGameRunning() && !_newMetaCycleStart) cycleGame();
 }
 
 void GameView::cycleGame()
 {
     // If we are not allowed to cycle the game, mark it
     if (cycleAllowed()) {
-        skippedCycle = false;
+        _skippedCycle = false;
         attachedGame->cycle();
     }
     else {
-        skippedCycle = true;
+        _skippedCycle = true;
     }
 }
 
@@ -196,17 +196,17 @@ void GameView::rotateRight()
 
 void GameView::render(DrawTarget *dt)
 {
-    if (!haveDisplay) return;
+    if (!_haveDisplay) return;
 	IosRect drect;
     IosRect vrect;
-	vrect.x = m_xOffset;
-	vrect.y = m_yOffset;
+	vrect.x = _xOffset;
+	vrect.y = _yOffset;
 	vrect.w = TSIZE * FLOBOBAN_DIMX;
 	vrect.h = TSIZE * FLOBOBAN_DIMY;
 
     bool displayFallings = this->cycleAllowed();
     // Render shadows
-    if (m_showShadows) {
+    if (_showShadows) {
         for (FloboDefaultIterator iter(attachedGame) ;
              ! iter.end() ; ++iter) {
             AnimatedFlobo *currentFlobo = static_cast<AnimatedFlobo *>(iter.get().get());
@@ -225,20 +225,20 @@ void GameView::render(DrawTarget *dt)
         if (displayFallings || !currentFlobo->isFalling()) currentFlobo->render(dt);
     }
     // drawing the walhalla
-    attachedFloboFactory.renderWalhalla(dt);
+    _attachedFloboFactory.renderWalhalla(dt);
 
-    if (m_showNextFlobos) {
-        drect.x = m_nXOffset;
-        drect.y = m_nYOffset;
+    if (_showNextFlobos) {
+        drect.x = _nXOffset;
+        drect.y = _nYOffset;
         drect.w = TSIZE;
         drect.h = TSIZE * 2;
         // Drawing next flobos
         const FloboTheme &nextFloboTheme =
-            attachedThemeSet->getFloboTheme(attachedGame->getNextFalling());
+            _attachedThemeSet->getFloboTheme(attachedGame->getNextFalling());
         IosSurface *currentSurface = nextFloboTheme.getFloboSurfaceForValence(0);
         if (currentSurface != NULL) {
-            drect.x = m_nXOffset;
-            drect.y = m_nYOffset + TSIZE;
+            drect.x = _nXOffset;
+            drect.y = _nYOffset + TSIZE;
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;
             dt->draw(currentSurface, NULL, &drect);
@@ -250,11 +250,11 @@ void GameView::render(DrawTarget *dt)
             dt->draw(s, NULL, &drect);
         }
         const FloboTheme &nextCompanionTheme =
-            attachedThemeSet->getFloboTheme(attachedGame->getNextCompanion());
+            _attachedThemeSet->getFloboTheme(attachedGame->getNextCompanion());
         currentSurface = nextCompanionTheme.getFloboSurfaceForValence(0);
         if (currentSurface != NULL) {
-            drect.x = m_nXOffset;
-            drect.y = m_nYOffset;
+            drect.x = _nXOffset;
+            drect.y = _nYOffset;
             drect.w = currentSurface->w;
             drect.h = currentSurface->h;
             dt->draw(currentSurface, NULL, &drect);
@@ -268,8 +268,8 @@ void GameView::render(DrawTarget *dt)
     }
 
     // Drawing the view animation
-    if (viewAnimations.size() > 0) {
-        Animation *currentAnimation = viewAnimations[0];
+    if (_viewAnimations.size() > 0) {
+        Animation *currentAnimation = _viewAnimations[0];
         if (!currentAnimation->isFinished()) {
             currentAnimation->draw(0, dt);
         }
@@ -278,18 +278,18 @@ void GameView::render(DrawTarget *dt)
 
 void GameView::renderNeutral(DrawTarget *dt)
 {
-    if (!haveDisplay) return;
+    if (!_haveDisplay) return;
 	IosRect drect;
     int neutralFlobos = attachedGame->getNeutralFlobos();
     int numGiantNeutral = (neutralFlobos / FLOBOBAN_DIMX) / 4;
     int numBigNeutral = (neutralFlobos / FLOBOBAN_DIMX) % 4;
 	int numNeutral = neutralFlobos % FLOBOBAN_DIMX;
-    int drect_x = (neutralXOffset == -1 ? m_xOffset : neutralXOffset);
-    int drect_y_base =  (neutralYOffset == -1 ?
-                         m_yOffset + 3 + TSIZE + TSIZE : neutralYOffset);
-    IosSurface *neutral = attachedLevelTheme->getNeutralIndicator();
-    IosSurface *bigNeutral = attachedLevelTheme->getBigNeutralIndicator();
-    IosSurface *giantNeutral = attachedLevelTheme->getGiantNeutralIndicator();
+    int drect_x = (_neutralXOffset == -1 ? _xOffset : _neutralXOffset);
+    int drect_y_base =  (_neutralYOffset == -1 ?
+                         _yOffset + 3 + TSIZE + TSIZE : _neutralYOffset);
+    IosSurface *neutral = _attachedLevelTheme->getNeutralIndicator();
+    IosSurface *bigNeutral = _attachedLevelTheme->getBigNeutralIndicator();
+    IosSurface *giantNeutral = _attachedLevelTheme->getGiantNeutralIndicator();
     if (neutral == NULL)
         throw std::runtime_error("Neutral indicator not found!");
     if (bigNeutral == NULL)
@@ -324,11 +324,11 @@ void GameView::renderNeutral(DrawTarget *dt)
 
 void GameView::renderScore(DrawTarget *dt)
 {
-    m_scoreDisplay->draw(dt);
+    _scoreDisplay->draw(dt);
 }
 
 void GameView::gameDidAddNeutral(std::shared_ptr<Flobo> neutralFlobo, int neutralIndex, int totalNeutral) {
-    if (!haveDisplay) return;
+    if (!_haveDisplay) return;
     int x = neutralFlobo->getFloboX();
     int y = neutralFlobo->getFloboY();
     AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
@@ -347,13 +347,13 @@ void GameView::gameDidAddNeutral(std::shared_ptr<Flobo> neutralFlobo, int neutra
         int shakeCount = totalNeutral / 4.f;
         float amplY = totalNeutral * 2.f;
         Animation *shakingAnimation = new ScreenShakingAnimation(duration, shakeCount, 0.f, amplY, 1.0f, synchronizer);
-        viewAnimations.add(shakingAnimation);
+        _viewAnimations.add(shakingAnimation);
     }
 }
 
 void GameView::fallingsDidMoveLeft(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo)
 {
-    if (!haveDisplay) return;
+    if (!_haveDisplay) return;
     std::static_pointer_cast<AnimatedFlobo>(fallingFlobo)->flushAnimations(ANIMATION_H);
     std::static_pointer_cast<AnimatedFlobo>(companionFlobo)->flushAnimations(ANIMATION_H);
 	std::static_pointer_cast<AnimatedFlobo>(fallingFlobo)->addAnimation(new MovingHAnimation(*std::static_pointer_cast<AnimatedFlobo>(fallingFlobo), TSIZE, 4));
@@ -362,7 +362,7 @@ void GameView::fallingsDidMoveLeft(std::shared_ptr<Flobo> fallingFlobo, std::sha
 
 void GameView::fallingsDidMoveRight(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo)
 {
-    if (!haveDisplay) return;
+    if (!_haveDisplay) return;
     std::static_pointer_cast<AnimatedFlobo>(fallingFlobo)->flushAnimations(ANIMATION_H);
     std::static_pointer_cast<AnimatedFlobo>(companionFlobo)->flushAnimations(ANIMATION_H);
 	std::static_pointer_cast<AnimatedFlobo>(fallingFlobo)->addAnimation(new MovingHAnimation(*std::static_pointer_cast<AnimatedFlobo>(fallingFlobo), -TSIZE, 4));
@@ -371,7 +371,7 @@ void GameView::fallingsDidMoveRight(std::shared_ptr<Flobo> fallingFlobo, std::sh
 
 void GameView::fallingsDidFallingStep(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo)
 {
-    if (!haveDisplay) return;
+    if (!_haveDisplay) return;
     std::static_pointer_cast<AnimatedFlobo>(fallingFlobo)->flushAnimations(ANIMATION_V);
     std::static_pointer_cast<AnimatedFlobo>(companionFlobo)->flushAnimations(ANIMATION_V);
 	std::static_pointer_cast<AnimatedFlobo>(fallingFlobo)->addAnimation(new MovingVAnimation(*std::static_pointer_cast<AnimatedFlobo>(fallingFlobo), -TSIZE/2, 4));
@@ -380,7 +380,7 @@ void GameView::fallingsDidFallingStep(std::shared_ptr<Flobo> fallingFlobo, std::
 
 void GameView::companionDidTurn(std::shared_ptr<Flobo> companionFlobo, std::shared_ptr<Flobo> fallingFlobo, bool counterclockwise)
 {
-    if (!haveDisplay) return;
+    if (!_haveDisplay) return;
     if ((companionFlobo != nullptr) && (fallingFlobo != nullptr)) { // Just to be sure of what we get if data comes from network
         std::static_pointer_cast<AnimatedFlobo>(companionFlobo)->setPartner(std::static_pointer_cast<AnimatedFlobo>(fallingFlobo).get());
         std::static_pointer_cast<AnimatedFlobo>(companionFlobo)->flushAnimations(ANIMATION_ROTATE);
@@ -391,14 +391,14 @@ void GameView::companionDidTurn(std::shared_ptr<Flobo> companionFlobo, std::shar
 
 void GameView::floboDidFall(std::shared_ptr<Flobo> flobo, int originX, int originY, int nFalledBelow)
 {
-    if (!haveDisplay) return;
+    if (!_haveDisplay) return;
     std::static_pointer_cast<AnimatedFlobo>(flobo)->flushAnimations();
-    std::static_pointer_cast<AnimatedFlobo>(flobo)->addAnimation(new FallingAnimation(*std::static_pointer_cast<AnimatedFlobo>(flobo), originY, m_xOffset, m_yOffset, nFalledBelow));
+    std::static_pointer_cast<AnimatedFlobo>(flobo)->addAnimation(new FallingAnimation(*std::static_pointer_cast<AnimatedFlobo>(flobo), originY, _xOffset, _yOffset, nFalledBelow));
 }
 
 void GameView::floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, int groupNum, int phase)
 {
-    if (!haveDisplay) return;
+    if (!_haveDisplay) return;
     double groupPadding = 0.;
     // Exploding flobo animation
     AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
@@ -406,14 +406,14 @@ void GameView::floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, 
         AnimatedFlobo *currentFlobo = std::static_pointer_cast<AnimatedFlobo>(floboGroup[i]).get();
         FloboAnimation *newAnimation;
         if (currentFlobo->getFloboState() != FLOBO_NEUTRAL)
-            newAnimation = new VanishAnimation(*currentFlobo, i*2 , m_xOffset, m_yOffset, synchronizer, i, floboGroup.size(), groupNum, phase);
+            newAnimation = new VanishAnimation(*currentFlobo, i*2 , _xOffset, _yOffset, synchronizer, i, floboGroup.size(), groupNum, phase);
         else
             newAnimation = new NeutralPopAnimation(*currentFlobo, i*2, synchronizer);
         currentFlobo->addAnimation(newAnimation);
         // Compute the center of the vanishing flobos padding
         groupPadding += newAnimation->getSoundPadding();
     }
-    viewAnimations.add(new VanishSoundAnimation(phase, synchronizer, groupPadding / floboGroup.size()));
+    _viewAnimations.add(new VanishSoundAnimation(phase, synchronizer, groupPadding / floboGroup.size()));
     // "pastaga" management
     if (groupNum == 0) {
       static const char * sound_yahoohoo[7] = {
@@ -446,20 +446,20 @@ void GameView::floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, 
 
 void GameView::gameDidEndCycle()
 {
-	if (enemyGame != NULL) {
+	if (_enemyGame != NULL) {
 		if (attachedGame->getNeutralFlobos() < 0)
-			enemyGame->increaseNeutralFlobos(- attachedGame->getNeutralFlobos());
+			_enemyGame->increaseNeutralFlobos(- attachedGame->getNeutralFlobos());
 	}
     GTLogTrace("NewMetaCycleStart");
-    newMetaCycleStart = true;
+    _newMetaCycleStart = true;
 }
 
 bool GameView::cycleAllowed()
 {
-    if (enemyGame != NULL)
-        if (!enemyGame->isGameRunning())
+    if (_enemyGame != NULL)
+        if (!_enemyGame->isGameRunning())
             return false;
-    if (cycleAllowance < 0)
+    if (_cycleAllowance < 0)
         return false;
     return true;
 }
@@ -467,14 +467,14 @@ bool GameView::cycleAllowed()
 void GameView::gameWin()
 {
     attachedGame->getGameStat().is_winner = true;
-    gameRunning = false;
+    _gameRunning = false;
 }
 
 void GameView::gameLost()
 {
     attachedGame->getGameStat().is_winner = false;
-    gameRunning = false;
-    if (!haveDisplay) return;
+    _gameRunning = false;
+    if (!_haveDisplay) return;
     for (int i = 0 ; i <= FLOBOBAN_DIMX ; i++) {
         for (int j = 0 ; j <= FLOBOBAN_DIMY ; j++) {
             if (attachedGame->getFloboAt(i, j) != nullptr) {
@@ -484,7 +484,7 @@ void GameView::gameLost()
         }
     }
     Animation *shakingAnimation = new ScreenShakingAnimation(80, 12, 10.f, 5.f, 1.f);
-    viewAnimations.add(shakingAnimation);
+    _viewAnimations.add(shakingAnimation);
     theCommander->playSound("earthquake.wav", 1.0);
 }
 
