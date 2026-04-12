@@ -107,10 +107,10 @@ int GameView::getValenceForFlobo(Flobo *flobo) const
     int i = flobo->getFloboX();
     int j = flobo->getFloboY();
     FloboState currentFloboState = flobo->getFloboState();
-    AnimatedFlobo *down  = (AnimatedFlobo *)(attachedGame->getFloboAt(i, j+1).get());
-    AnimatedFlobo *right = (AnimatedFlobo *)(attachedGame->getFloboAt(i+1, j).get());
-    AnimatedFlobo *up    = (AnimatedFlobo *)(attachedGame->getFloboAt(i, j-1).get());
-    AnimatedFlobo *left  = (AnimatedFlobo *)(attachedGame->getFloboAt(i-1, j).get());
+    auto down  = std::static_pointer_cast<AnimatedFlobo>(attachedGame->getFloboAt(i, j+1));
+    auto right = std::static_pointer_cast<AnimatedFlobo>(attachedGame->getFloboAt(i+1, j));
+    auto up    = std::static_pointer_cast<AnimatedFlobo>(attachedGame->getFloboAt(i, j-1));
+    auto left  = std::static_pointer_cast<AnimatedFlobo>(attachedGame->getFloboAt(i-1, j));
 
     FloboState downState = (down == nullptr) || (down->isRenderingAnimation()) ? FLOBO_EMPTY : down->getFloboState();
     FloboState rightState = (right == nullptr) || (right->isRenderingAnimation()) ? FLOBO_EMPTY : right->getFloboState();
