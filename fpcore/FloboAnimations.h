@@ -30,6 +30,7 @@ void EventFX(const char *name, float x, float y, int player);
 
 #include <stdlib.h>
 #include <math.h>
+#include <memory>
 #include "drawcontext.h"
 #include "FloboGame.h"
 
@@ -63,10 +64,10 @@ protected:
 /* Abstract animation class for flobos */
 class FloboAnimation : public Animation{
 public:
-    FloboAnimation(AnimatedFlobo &flobo):attachedFlobo(flobo) {}
+    FloboAnimation(std::shared_ptr<AnimatedFlobo> flobo):attachedFlobo(flobo) {}
     float getSoundPadding() const;
 protected:
-    AnimatedFlobo &attachedFlobo;
+    std::shared_ptr<AnimatedFlobo> attachedFlobo;
 };
 
 /* Animation synchronization helper */
@@ -86,7 +87,7 @@ private:
 /* Neutral falling animation */
 class NeutralAnimation : public FloboAnimation {
   public:
-    NeutralAnimation(AnimatedFlobo &flobo, int delay, AnimationSynchronizer *synchronizer);
+    NeutralAnimation(std::shared_ptr<AnimatedFlobo> flobo, int delay, AnimationSynchronizer *synchronizer);
     virtual ~NeutralAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
@@ -100,7 +101,7 @@ class NeutralAnimation : public FloboAnimation {
 /* Companion turning around main flobo animation */
 class TurningAnimation : public FloboAnimation {
 public:
-    TurningAnimation(AnimatedFlobo &companionFlobo, bool counterclockwise);
+    TurningAnimation(std::shared_ptr<AnimatedFlobo> companionFlobo, bool counterclockwise);
     void cycle();
 private:
     int cpt;
@@ -112,7 +113,7 @@ private:
 /* Flobo moving from one place to another, horizontal axis */
 class MovingHAnimation : public FloboAnimation {
 public:
-    MovingHAnimation(AnimatedFlobo &flobo, int hOffset, int step);
+    MovingHAnimation(std::shared_ptr<AnimatedFlobo> flobo, int hOffset, int step);
     void cycle();
 private:
     int m_cpt, m_hOffset, m_step;
@@ -122,7 +123,7 @@ private:
 /* Flobo moving from one place to another, vertical axis */
 class MovingVAnimation : public FloboAnimation {
 public:
-    MovingVAnimation(AnimatedFlobo &flobo, int vOffset, int step);
+    MovingVAnimation(std::shared_ptr<AnimatedFlobo> flobo, int vOffset, int step);
     void cycle();
 private:
     int m_cpt, m_vOffset, m_step;
@@ -132,7 +133,7 @@ private:
 /* Flobo falling and bouncing animation */
 class FallingAnimation : public FloboAnimation {
 public:
-    FallingAnimation(AnimatedFlobo &flobo,
+    FallingAnimation(std::shared_ptr<AnimatedFlobo> flobo,
                      int originY, int xOffset, int yOffset, int step);
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
@@ -148,7 +149,7 @@ private:
 /* Flobo exploding and vanishing animation */
 class VanishAnimation : public FloboAnimation {
 public:
-    VanishAnimation(AnimatedFlobo &flobo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int floboNum, int groupSize, int groupNum, int phase);
+    VanishAnimation(std::shared_ptr<AnimatedFlobo> flobo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int floboNum, int groupSize, int groupNum, int phase);
     virtual ~VanishAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
@@ -181,7 +182,7 @@ private:
 
 class NeutralPopAnimation : public FloboAnimation {
 public:
-    NeutralPopAnimation(AnimatedFlobo &flobo, int delay, AnimationSynchronizer *synchronizer);
+    NeutralPopAnimation(std::shared_ptr<AnimatedFlobo> flobo, int delay, AnimationSynchronizer *synchronizer);
     virtual ~NeutralPopAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
@@ -195,7 +196,7 @@ private:
 
 class SmoothBounceAnimation : public FloboAnimation {
 public:
-    SmoothBounceAnimation(AnimatedFlobo &flobo, AnimationSynchronizer *synchronizer, int depth = 10);
+    SmoothBounceAnimation(std::shared_ptr<AnimatedFlobo> flobo, AnimationSynchronizer *synchronizer, int depth = 10);
     virtual ~SmoothBounceAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
@@ -207,7 +208,7 @@ private:
 
 class GameOverFallAnimation : public FloboAnimation {
 public:
-    GameOverFallAnimation(AnimatedFlobo &flobo, int delay);
+    GameOverFallAnimation(std::shared_ptr<AnimatedFlobo> flobo, int delay);
     virtual ~GameOverFallAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
