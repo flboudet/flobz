@@ -64,55 +64,55 @@ enum FloboState {
 
 class RandomSystem {
 public:
-	RandomSystem(int numColors);
-    RandomSystem(unsigned long seed, int numColors);
+	RandomSystem(int _numColors);
+    RandomSystem(unsigned long seed, int _numColors);
 	FloboState getFloboStateForSequence(int sequence);
 private:
-    int numColors;
-	std::vector<int> sequenceItems;
+    int _numColors;
+	std::vector<int> _sequenceItems;
 };
 
 // A Flobo is an entity of the game
 class Flobo {
 public:
-    Flobo(FloboState state) : floboID(lastID++), state(state), X(0), Y(0), flag(false), bmark(false) {}
+    Flobo(FloboState state) : _floboID(_lastID++), _state(state), _x(0), _y(0), _flag(false), _bmark(false) {}
     virtual ~Flobo() {};
     inline FloboState getFloboState() const {
         if (this != NULL)
-            return state;
+            return _state;
         return FLOBO_EMPTY;
     }
-    inline void setFloboState(FloboState state) { if (this != NULL) this->state = state; }
-    inline bool isFalling() { return (state < FLOBO_EMPTY); }
+    inline void setFloboState(FloboState state) { if (this != NULL) this->_state = state; }
+    inline bool isFalling() { return (_state < FLOBO_EMPTY); }
     inline int getFloboX() const {
         if (this != NULL)
-            return X;
+            return _x;
         return 0;
     }
     inline int getFloboY() const {
         if (this != NULL)
-            return Y;
+            return _y;
         return 0;
     }
     inline void setFloboXY(int X, int Y) {
         if (this != NULL)
-            this->X = X; this->Y = Y;
+            this->_x = X; this->_y = Y;
     }
-    inline void setFlag() { flag = true; }
-    inline void unsetFlag() { flag = false; }
-    inline bool getFlag() const { return flag; }
-    inline int  getID() const { return floboID; }
-    inline void setID(int id) { floboID = id; }
-    inline void mark() { if (this != NULL) bmark = true; }
-    inline void unmark() { if (this != NULL) bmark = false; }
-    inline void setMark(bool pmark) { if (this != NULL) bmark = pmark; }
-    inline bool isMarked() const { if (this != NULL) return bmark; return false; }
+    inline void setFlag() { _flag = true; }
+    inline void unsetFlag() { _flag = false; }
+    inline bool getFlag() const { return _flag; }
+    inline int  getID() const { return _floboID; }
+    inline void setID(int id) { _floboID = id; }
+    inline void mark() { if (this != NULL) _bmark = true; }
+    inline void unmark() { if (this != NULL) _bmark = false; }
+    inline void setMark(bool pmark) { if (this != NULL) _bmark = pmark; }
+    inline bool isMarked() const { if (this != NULL) return _bmark; return false; }
 private:
-    int floboID;
-    static int lastID;
-    FloboState state;
-    int X, Y;
-    bool flag, bmark;
+    int _floboID;
+    static int _lastID;
+    FloboState _state;
+    int _x, _y;
+    bool _flag, _bmark;
 };
 
 // The flobos must be created by a factory to ensure custom flobo creation
@@ -132,14 +132,14 @@ class FloboDefaultFactory : public FloboFactory {
 class GameListener {
 public:
   virtual void gameDidAddNeutral(std::shared_ptr<Flobo> neutralFlobo, int neutralIndex, int totalNeutral) {}
-  virtual void companionDidTurn(std::shared_ptr<Flobo> companionFlobo,
-				std::shared_ptr<Flobo> fallingFlobo,
+  virtual void companionDidTurn(std::shared_ptr<Flobo> _companionFlobo,
+				std::shared_ptr<Flobo> _fallingFlobo,
 				bool counterclockwise) {}
-  virtual void fallingsDidMoveLeft(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo) {}
-  virtual void fallingsDidMoveRight(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo) {}
-  virtual void fallingsDidFallingStep(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo) {}
+  virtual void fallingsDidMoveLeft(std::shared_ptr<Flobo> _fallingFlobo, std::shared_ptr<Flobo> _companionFlobo) {}
+  virtual void fallingsDidMoveRight(std::shared_ptr<Flobo> _fallingFlobo, std::shared_ptr<Flobo> _companionFlobo) {}
+  virtual void fallingsDidFallingStep(std::shared_ptr<Flobo> _fallingFlobo, std::shared_ptr<Flobo> _companionFlobo) {}
   virtual void floboDidFall(std::shared_ptr<Flobo> flobo, int originX, int originY, int nFalledBelow) {}
-  virtual void floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, int groupNum, int phase) {}
+  virtual void floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, int groupNum, int _phase) {}
   virtual void gameDidEndCycle() {}
   virtual void gameLost() {}
   virtual ~GameListener() {};
@@ -147,7 +147,7 @@ public:
 
 class FloboGame {
 public:
-    FloboGame(FloboFactory *attachedFactory);
+    FloboGame(FloboFactory *_attachedFactory);
     FloboGame();
     virtual ~FloboGame() {}
 public: // Listeners management
@@ -194,17 +194,17 @@ public: // Accessors
 
     virtual bool isPhaseReady(void) { return true; }
 
-    virtual PlayerGameStat &getGameStat() { return gameStat; }
-    virtual void setGameStat(PlayerGameStat &stat) { gameStat = stat; }
+    virtual PlayerGameStat &getGameStat() { return _gameStat; }
+    virtual void setGameStat(PlayerGameStat &stat) { _gameStat = stat; }
 
-	virtual void setScoringLevel(int gameLevel) {}
+	virtual void setScoringLevel(int _gameLevel) {}
 
     virtual void addNeutralLayer() {}
 protected:
     typedef std::vector<GameListener *> GameListenerPtrVector;
-    GameListenerPtrVector m_listeners;
-    FloboFactory *attachedFactory;
-    PlayerGameStat gameStat;
+    GameListenerPtrVector _listeners;
+    FloboFactory *_attachedFactory;
+    PlayerGameStat _gameStat;
 };
 
 class FloboIterator {
@@ -217,33 +217,33 @@ public:
 class FloboDefaultIterator : public FloboIterator {
 public:
     FloboDefaultIterator(FloboGame *game)
-        : m_game(game), m_peek(nullptr), m_x(0), m_y(FLOBOBAN_DIMY-1), m_finished(false) {
+        : _game(game), _peek(nullptr), _x(0), _y(FLOBOBAN_DIMY-1), _finished(false) {
         ++(*this);
     }
-    std::shared_ptr<Flobo> get() { return m_peek; }
-    bool end() { return m_finished; }
+    std::shared_ptr<Flobo> get() { return _peek; }
+    bool end() { return _finished; }
     FloboIterator & operator ++() {
         do {
-            m_peek = m_game->getFloboAt(m_x++, m_y);
-            if (m_x == FLOBOBAN_DIMX) {
-                m_x = 0; --m_y;
+            _peek = _game->getFloboAt(_x++, _y);
+            if (_x == FLOBOBAN_DIMX) {
+                _x = 0; --_y;
             }
-            else if (m_y == -1)
-                m_finished = true;
-        } while ((m_peek == nullptr) && (! m_finished));
+            else if (_y == -1)
+                _finished = true;
+        } while ((_peek == nullptr) && (! _finished));
         return *this;
     }
 private:
-    FloboGame *m_game;
-    std::shared_ptr<Flobo> m_peek;
-    bool m_finished;
-    int m_x, m_y;
+    FloboGame *_game;
+    std::shared_ptr<Flobo> _peek;
+    bool _finished;
+    int _x, _y;
 };
 
 class FloboLocalGame : public FloboGame {
 public:
-    FloboLocalGame(RandomSystem *attachedRandom, FloboFactory *attachedFactory);
-    FloboLocalGame(RandomSystem *attachedRandom);
+    FloboLocalGame(RandomSystem *_attachedRandom, FloboFactory *_attachedFactory);
+    FloboLocalGame(RandomSystem *_attachedRandom);
     virtual ~FloboLocalGame();
     void cycle();
 
@@ -261,37 +261,37 @@ public:
     void rotateRight();
     FloboState getNextFalling();
     FloboState getNextCompanion();
-    FloboState getCompanionState() const { return companionFlobo->getFloboState(); }
-    FloboState getFallingState() const { return fallingFlobo->getFloboState(); }
+    FloboState getCompanionState() const { return _companionFlobo->getFloboState(); }
+    FloboState getFallingState() const { return _fallingFlobo->getFloboState(); }
 
-    int getFallingX() const { return fallingFlobo->getFloboX(); }
-    int getFallingY() const { return fallingFlobo->getFloboY(); }
-    int getCompanionX() const { return companionFlobo->getFloboX(); }
-    int getCompanionY() const { return companionFlobo->getFloboY(); }
+    int getFallingX() const { return _fallingFlobo->getFloboX(); }
+    int getFallingY() const { return _fallingFlobo->getFloboY(); }
+    int getCompanionX() const { return _companionFlobo->getFloboX(); }
+    int getCompanionY() const { return _companionFlobo->getFloboY(); }
     int getFallingCompanionX() const;
     int getFallingCompanionY() const;
-    int getFallingCompanionDir() const { return fallingCompanion; }
-    std::shared_ptr<Flobo> getFallingFlobo() const { return fallingFlobo; }
+    int getFallingCompanionDir() const { return _fallingCompanion; }
+    std::shared_ptr<Flobo> getFallingFlobo() const { return _fallingFlobo; }
 
     void increaseNeutralFlobos(int incr);
     int getNeutralFlobos() const;
     int getGameTotalNeutralFlobos() const;
     void dropNeutrals();
-    bool isGameRunning() const { return gameRunning; }
-    bool isEndOfCycle() const { return endOfCycle; }
+    bool isGameRunning() const { return _gameRunning; }
+    bool isEndOfCycle() const { return _endOfCycle; }
     int getColumnHeigth(int colNum) const;
     int getMaxColumnHeight() const;
     int getSameFloboAround(int X, int Y, FloboState color);
-    int  getComboPhase() const {return phase; }
+    int  getComboPhase() const {return _phase; }
 
-    int getSemiMove() const { return semiMove; }
+    int getSemiMove() const { return _semiMove; }
     bool isPhaseReady(void);
 
-    void setScoringLevel(int gameLevel) { this->gameLevel = gameLevel; }
+    void setScoringLevel(int _gameLevel) { this->_gameLevel = _gameLevel; }
 
     virtual void addNeutralLayer();
 private:
-    void InitGame(RandomSystem *attachedRandom);
+    void InitGame(RandomSystem *_attachedRandom);
     // Get the state of the flobo at the indicated coordinates
     FloboState getFloboCellAt(int X, int Y) const;
     // Set the state of the flobo at the indicated coordinates (not recommanded)
@@ -307,35 +307,35 @@ private:
     int removeFlobos();
     void notifyReductions();
 
-    bool gameRunning;
-    bool endOfCycle;
+    bool _gameRunning;
+    bool _endOfCycle;
 
     // The falling is the flobo you couldn't control,
     // whereas you can make the companion turn around the falling flobo
-    std::shared_ptr<Flobo> fallingFlobo, companionFlobo;
-    int fallingX, fallingY;
+    std::shared_ptr<Flobo> _fallingFlobo, _companionFlobo;
+    int _fallingX, _fallingY;
 
     // Position of the companion is relative of the falling flobo
     // 0 = up 1 = left 2 = down 3 = up
-    unsigned char fallingCompanion;
+    unsigned char _fallingCompanion;
 
-    std::shared_ptr<Flobo> floboCells[FLOBOBAN_DIMX * (FLOBOBAN_DIMY+1)];
-    RandomSystem *attachedRandom;
-    int sequenceNr;
-    int phaseReady;
-    int neutralFlobos;
-    int phase;
-    int semiMove;
+    std::shared_ptr<Flobo> _floboCells[FLOBOBAN_DIMX * (FLOBOBAN_DIMY+1)];
+    RandomSystem *_attachedRandom;
+    int _sequenceNr;
+    int _phaseReady;
+    int _neutralFlobos;
+    int _phase;
+    int _semiMove;
 
     // This is not really a flobo, it is instead an indicator for the edges of the game
-    std::shared_ptr<Flobo> unmoveableFlobo;
+    std::shared_ptr<Flobo> _unmoveableFlobo;
 
     // We are keeping a list of current flobos
-    std::vector<std::shared_ptr<Flobo>> floboVector;
-    int nbFalled;
+    std::vector<std::shared_ptr<Flobo>> _floboVector;
+    int _nbFalled;
 
     // Game level for points calculation
-    int gameLevel;
+    int _gameLevel;
 };
 
 #endif // FLOBOGAME_H

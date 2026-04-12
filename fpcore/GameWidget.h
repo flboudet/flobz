@@ -193,8 +193,8 @@ public:
     const std::string &getPlayerOneName() const { return playerOneName; }
     PlayerGameStat &getStatPlayerOne() { return attachedGameA->getGameStat(); }
     PlayerGameStat &getStatPlayerTwo() { return attachedGameB->getGameStat(); }
-    void setStatPlayerOne(PlayerGameStat &gameStat) { attachedGameA->setGameStat(gameStat); }
-    void setStatPlayerTwo(PlayerGameStat &gameStat) { attachedGameB->setGameStat(gameStat); }
+    void setStatPlayerOne(PlayerGameStat &_gameStat) { attachedGameA->setGameStat(_gameStat); }
+    void setStatPlayerTwo(PlayerGameStat &_gameStat) { attachedGameB->setGameStat(_gameStat); }
     virtual StoryWidget *getOpponent() { return NULL; }
     void addGameAHandicap(int handicap) {attachedGameA->increaseNeutralFlobos((handicap>10?10:handicap) * FLOBOBAN_DIMX); attachedGameA->dropNeutrals();}
     void addGameBHandicap(int handicap) {attachedGameB->increaseNeutralFlobos((handicap>10?10:handicap) * FLOBOBAN_DIMX); attachedGameB->dropNeutrals();}

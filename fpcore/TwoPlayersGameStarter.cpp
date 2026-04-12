@@ -27,7 +27,7 @@
 using namespace event_manager;
 
 TwoPlayersGameWidget::TwoPlayersGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, const std::string & aiFace, Action *gameOverAction) : attachedFloboThemeSet(floboSetTheme),
-                                                     attachedRandom(5), attachedGameFactory(&attachedRandom),
+                                                     _attachedRandom(5), attachedGameFactory(&_attachedRandom),
                                                      areaA(&attachedGameFactory, 0, &attachedFloboThemeSet, &levelTheme),
                                                      areaB(&attachedGameFactory, 1, &attachedFloboThemeSet, &levelTheme),
                                                      opponentFace(aiFace)

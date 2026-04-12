@@ -37,7 +37,7 @@ public:
     StoryWidget *getOpponent();
 private:
     FloboSetTheme &attachedFloboThemeSet;
-    RandomSystem attachedRandom;
+    RandomSystem _attachedRandom;
     LocalGameFactory attachedGameFactory;
     GameView areaA, areaB;
     StoryWidget opponentFace;

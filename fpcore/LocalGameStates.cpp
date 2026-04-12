@@ -574,7 +574,7 @@ ManageHiScoresState::ManageHiScoresState(SharedMatchAssets  *sharedMatchAssets,
 
 void ManageHiScoresState::enterState()
 {
-    m_finished = false;
+    _finished = false;
     // Initializes the score board
     const PlayerGameStat &playerPoints = m_sharedMatchAssets->m_gameWidget->getStatPlayerOne();
     m_scoreBoard.reset(new LocalStorageHiScoreBoard(m_boardId.c_str(), theCommander->getPreferencesManager(), m_defaultScoreBoard));
@@ -609,7 +609,7 @@ void ManageHiScoresState::exitState()
 
 bool ManageHiScoresState::evaluate()
 {
-    return m_finished;
+    return _finished;
 }
 
 GameState *ManageHiScoresState::getNextState()
@@ -620,7 +620,7 @@ GameState *ManageHiScoresState::getNextState()
 void ManageHiScoresState::action(Widget *sender, int actionType,
                                  event_manager::GameControlEvent *event)
 {
-    m_finished = true;
+    _finished = true;
     evaluateStateMachine();
 }
 

@@ -461,7 +461,7 @@ private:
     std::string m_boardId;
     SharedMatchAssets  *m_sharedMatchAssets;
     PlayerNameProvider *m_nameProvider;
-    bool m_finished;
+    bool _finished;
 
     GameState *m_nextState;
     std::unique_ptr<DisplayStoryScreenState> m_newHiScore;

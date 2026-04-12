@@ -50,10 +50,10 @@ GamePlayer *NetworkGameWidget::createLocalPlayer()
 void NetworkGameWidget::initWithGUI(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, FPServerIGPMessageBox *igpbox, bool hasChatBox)
 {
     attachedFloboThemeSet = &floboSetTheme;
-    attachedRandom = std::unique_ptr<RandomSystem>(new RandomSystem(randomSeed, 5));
+    _attachedRandom = std::unique_ptr<RandomSystem>(new RandomSystem(randomSeed, 5));
     this->mbox = &mbox;
-    attachedLocalGameFactory   = std::unique_ptr<LocalGameFactory>(new LocalGameFactory(attachedRandom.get()));
-    attachedNetworkGameFactory = std::unique_ptr<NetworkGameFactory>(new NetworkGameFactory(attachedRandom.get(), mbox, gameId));
+    attachedLocalGameFactory   = std::unique_ptr<LocalGameFactory>(new LocalGameFactory(_attachedRandom.get()));
+    attachedNetworkGameFactory = std::unique_ptr<NetworkGameFactory>(new NetworkGameFactory(_attachedRandom.get(), mbox, gameId));
     if (igpbox != NULL) {
         localArea = std::unique_ptr<NetworkGameView>(new InternetGameView(attachedLocalGameFactory.get(), 0, attachedFloboThemeSet, &levelTheme,
                                             &mbox, gameId, igpbox));

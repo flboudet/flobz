@@ -69,11 +69,11 @@ SoloGameWidget::SoloGameWidget(SoloGameSettings &gameSettings, FloboSetTheme &fl
       m_handicapIncrease(gameSettings.handicapIncrease),
       m_handicapDecreaseOnPhase1(gameSettings.handicapDecreaseOnPhase1),
       m_handicapDecreaseAbovePhase1(gameSettings.handicapDecreaseAbovePhase1),
-      attachedFloboThemeSet(floboSetTheme), attachedRandom(5),
+      attachedFloboThemeSet(floboSetTheme), _attachedRandom(5),
       m_cyclesBeforeGameCycle(0), m_cyclesBeforeLevelRaise(1000.),
       m_comboHandicap(0.), m_comboHandicap75(false), m_comboHandicap85(false), m_comboHandicap100(false)
 {
-    m_gameFactory.reset(new LocalGameFactory(&attachedRandom));
+    m_gameFactory.reset(new LocalGameFactory(&_attachedRandom));
     m_areaA.reset(new GameView(m_gameFactory.get(), 0, &floboSetTheme, &levelTheme));
     m_playerController.reset(new CombinedEventPlayer(*m_areaA));
     //initWithGUI(*m_areaA, NULL, *m_playerController, NULL, levelTheme, gameOverAction);
@@ -117,15 +117,15 @@ void SoloGameWidget::gameDidEndCycle()
     }
 }
 
-void SoloGameWidget::floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, int groupNum, int phase)
+void SoloGameWidget::floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, int groupNum, int _phase)
 {
     double prevComboHandicap = m_comboHandicap;
-    if (phase == 1)
+    if (_phase == 1)
         m_comboHandicap += m_handicapDecreaseOnPhase1.getValue();
-    if (phase >= 2) {
+    if (_phase >= 2) {
         m_comboHandicap += m_handicapDecreaseAbovePhase1.getValue();
     }
-    if (phase == 4)
+    if (_phase == 4)
         m_comboHandicap = 0.;
     if (m_comboHandicap <= 0.) {
         m_comboHandicap = 0.;

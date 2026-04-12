@@ -108,7 +108,7 @@ public:
     virtual bool isGameARunning() const;
     // GameListener implementation
     virtual void gameDidEndCycle();
-    virtual void floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, int groupNum, int phase);
+    virtual void floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, int groupNum, int _phase);
     // CycledComponent implementation
     virtual void cycle();
     // Widget methods
@@ -122,7 +122,7 @@ protected:
     GameParameter m_handicapDecreaseOnPhase1;
     GameParameter m_handicapDecreaseAbovePhase1;
     FloboSetTheme &attachedFloboThemeSet;
-    RandomSystem attachedRandom;
+    RandomSystem _attachedRandom;
     std::unique_ptr<LocalGameFactory> m_gameFactory;
     std::unique_ptr<GameView>        m_areaA;
     std::unique_ptr<GamePlayer> m_playerController;

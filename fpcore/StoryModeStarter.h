@@ -60,7 +60,7 @@ public:
     StoryModeStandardLayoutGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, int level, int nColors, int lifes, const std::string & aiFace, Action *gameOverAction = NULL);
 private:
     FloboSetTheme &attachedFloboThemeSet;
-    RandomSystem attachedRandom;
+    RandomSystem _attachedRandom;
     LocalGameFactory attachedGameFactory;
     GameView areaA, areaB;
 };

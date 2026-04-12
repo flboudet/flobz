@@ -57,12 +57,12 @@ public:
 
 class LocalGameFactory : public FloboGameFactory {
 public:
-    LocalGameFactory(RandomSystem *attachedRandom): attachedRandom(attachedRandom) {}
+    LocalGameFactory(RandomSystem *_attachedRandom): _attachedRandom(_attachedRandom) {}
     FloboGame *createFloboGame(FloboFactory *attachedFloboFactory) {
-        return new FloboLocalGame(attachedRandom, attachedFloboFactory);
+        return new FloboLocalGame(_attachedRandom, attachedFloboFactory);
     }
 private:
-    RandomSystem *attachedRandom;
+    RandomSystem *_attachedRandom;
 };
 
 /**
@@ -113,14 +113,14 @@ class GameView : public GameListener {
     void clearMetaCycleStart() { newMetaCycleStart = false; }
 
     // GameListener methods
-	virtual void fallingsDidMoveLeft(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo);
-	virtual void fallingsDidMoveRight(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo);
-	virtual void fallingsDidFallingStep(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo);
+	virtual void fallingsDidMoveLeft(std::shared_ptr<Flobo> _fallingFlobo, std::shared_ptr<Flobo> _companionFlobo);
+	virtual void fallingsDidMoveRight(std::shared_ptr<Flobo> _fallingFlobo, std::shared_ptr<Flobo> _companionFlobo);
+	virtual void fallingsDidFallingStep(std::shared_ptr<Flobo> _fallingFlobo, std::shared_ptr<Flobo> _companionFlobo);
     void gameDidAddNeutral(std::shared_ptr<Flobo> neutralFlobo, int neutralIndex, int totalNeutral);
     void gameDidEndCycle();
-    void companionDidTurn(std::shared_ptr<Flobo> companionFlobo, std::shared_ptr<Flobo> fallingFlobo, bool counterclockwise);
+    void companionDidTurn(std::shared_ptr<Flobo> _companionFlobo, std::shared_ptr<Flobo> _fallingFlobo, bool counterclockwise);
     void floboDidFall(std::shared_ptr<Flobo> flobo, int originX, int originY, int nFalledBelow);
-    void floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, int groupNum, int phase);
+    void floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, int groupNum, int _phase);
     virtual void gameLost();
 
     // Accessors
@@ -151,7 +151,7 @@ class GameView : public GameListener {
     bool cycleAllowed();
     bool m_showNextFlobos, m_showShadows, m_showEyes;
     bool skippedCycle;
-    bool gameRunning;
+    bool _gameRunning;
     int m_xOffset, m_yOffset;
     int m_nXOffset, m_nYOffset;
     int neutralXOffset, neutralYOffset;

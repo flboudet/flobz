@@ -33,11 +33,11 @@
 
 class NetworkGameFactory : public FloboGameFactory {
 public:
-    NetworkGameFactory(RandomSystem *attachedRandom, MessageBox &msgBox, int gameId): attachedRandom(attachedRandom), msgBox(msgBox), gameId(gameId) {}
+    NetworkGameFactory(RandomSystem *_attachedRandom, MessageBox &msgBox, int gameId): _attachedRandom(_attachedRandom), msgBox(msgBox), gameId(gameId) {}
     FloboGame *createFloboGame(FloboFactory *attachedFloboFactory);
     int getGameId() { return gameId; }
 private:
-    RandomSystem *attachedRandom;
+    RandomSystem *_attachedRandom;
     MessageBox &msgBox;
     int gameId;
 };
@@ -67,7 +67,7 @@ protected:
 private:
     void sendAliveMsg();
     FloboSetTheme *attachedFloboThemeSet; // optional
-    std::unique_ptr<RandomSystem> attachedRandom;
+    std::unique_ptr<RandomSystem> _attachedRandom;
     ios_fc::MessageBox *mbox;
     std::unique_ptr<LocalGameFactory> attachedLocalGameFactory;
     std::unique_ptr<NetworkGameFactory> attachedNetworkGameFactory;

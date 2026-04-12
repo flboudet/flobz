@@ -97,7 +97,7 @@ void NeutralAnimation::cycle()
     }
 }
 
-void NeutralAnimation::draw(int semiMove, DrawTarget *dt)
+void NeutralAnimation::draw(int _semiMove, DrawTarget *dt)
 {
     attachedFlobo.renderAt(X, currentY, dt);
 }
@@ -137,8 +137,8 @@ void AnimationSynchronizer::decrementUsage()
 }
 
 /* Companion turning around main flobo animation */
-TurningAnimation::TurningAnimation(AnimatedFlobo &companionFlobo,
-                                   bool counterclockwise) : FloboAnimation(companionFlobo), NUMSTEPS(6)
+TurningAnimation::TurningAnimation(AnimatedFlobo &_companionFlobo,
+                                   bool counterclockwise) : FloboAnimation(_companionFlobo), NUMSTEPS(6)
 {
     enabled = false;
     m_exclusive = false;
@@ -260,7 +260,7 @@ void FallingAnimation::cycle()
     }
 }
 
-void FallingAnimation::draw(int semiMove, DrawTarget *dt)
+void FallingAnimation::draw(int _semiMove, DrawTarget *dt)
 {
     IosRect drect;
     drect.x = X;
@@ -276,7 +276,7 @@ void FallingAnimation::draw(int semiMove, DrawTarget *dt)
 }
 
 /* Flobo exploding and vanishing animation */
-VanishAnimation::VanishAnimation(AnimatedFlobo &flobo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int floboNum, int groupSize, int groupNum, int phase) : FloboAnimation(flobo), floboNum(floboNum), groupSize(groupSize), groupNum(groupNum), phase(phase)
+VanishAnimation::VanishAnimation(AnimatedFlobo &flobo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int floboNum, int groupSize, int groupNum, int _phase) : FloboAnimation(flobo), floboNum(floboNum), groupSize(groupSize), groupNum(groupNum), _phase(_phase)
 {
     this->xOffset = xOffset;
     this->yOffset = yOffset;
@@ -318,7 +318,7 @@ void VanishAnimation::cycle()
         if (iter == 20 + delay) {
             attachedFlobo.getAttachedView()->allowCycle();
             if ((groupNum == 0) && (floboNum == 0))
-                EventFX("vanish_phase", groupSize,phase, attachedFlobo.getAttachedView()->getPlayerId());
+                EventFX("vanish_phase", groupSize,_phase, attachedFlobo.getAttachedView()->getPlayerId());
         }
         else if (iter == 50 + delay) {
             finishedFlag = true;
@@ -327,7 +327,7 @@ void VanishAnimation::cycle()
     }
 }
 
-void VanishAnimation::draw(int semiMove, DrawTarget *dt)
+void VanishAnimation::draw(int _semiMove, DrawTarget *dt)
 {
     if (iter < (10 + delay)) {
         if (iter % 2 == 0) {
@@ -370,8 +370,8 @@ void VanishAnimation::draw(int semiMove, DrawTarget *dt)
     }
 }
 
-VanishSoundAnimation::VanishSoundAnimation(int phase, AnimationSynchronizer *synchronizer, float soundPadding)
-  : phase(phase), step(0), once(false), synchronizer(synchronizer), soundPadding(soundPadding)
+VanishSoundAnimation::VanishSoundAnimation(int _phase, AnimationSynchronizer *synchronizer, float soundPadding)
+  : _phase(_phase), step(0), once(false), synchronizer(synchronizer), soundPadding(soundPadding)
 {
     synchronizer->incrementUsage();
     synchronizer->push();
@@ -396,13 +396,13 @@ void VanishSoundAnimation::cycle()
     else if (synchronizer->isSynchronized()) {
         step++;
         if (step == 1) {
-            theCommander->playSound(sound_splash[phase-1>7?7:phase-1], sound_splash_volume, soundPadding);
+            theCommander->playSound(sound_splash[_phase-1>7?7:_phase-1], sound_splash_volume, soundPadding);
             finishedFlag = true;
         }
     }
 }
 
-void VanishSoundAnimation::draw(int semiMove, DrawTarget *dt)
+void VanishSoundAnimation::draw(int _semiMove, DrawTarget *dt)
 {
     // do nothing
 }
@@ -448,7 +448,7 @@ void NeutralPopAnimation::cycle()
     }
 }
 
-void NeutralPopAnimation::draw(int semiMove, DrawTarget *dt)
+void NeutralPopAnimation::draw(int _semiMove, DrawTarget *dt)
 {
     IosRect drect;
     drect.x = X;
@@ -505,7 +505,7 @@ void SmoothBounceAnimation::cycle()
     }
 }
 
-void SmoothBounceAnimation::draw(int semiMove, DrawTarget *dt)
+void SmoothBounceAnimation::draw(int _semiMove, DrawTarget *dt)
 {
     attachedFlobo.renderAt(origX, origY + bounceOffset, dt);
 }
@@ -533,7 +533,7 @@ void GameOverFallAnimation::cycle()
     else delay--;
 }
 
-void GameOverFallAnimation::draw(int semiMove, DrawTarget *dt)
+void GameOverFallAnimation::draw(int _semiMove, DrawTarget *dt)
 {
     attachedFlobo.renderAt(attachedFlobo.getScreenCoordinateX(), Y, dt);
 }
@@ -580,7 +580,7 @@ void ScreenShakingAnimation::cycle()
     m_sine += m_sineStep;
 }
 
-void ScreenShakingAnimation::draw(int semiMove, DrawTarget *dt)
+void ScreenShakingAnimation::draw(int _semiMove, DrawTarget *dt)
 {
     if (finishedFlag)
         return;

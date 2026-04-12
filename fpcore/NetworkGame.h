@@ -34,7 +34,7 @@ using namespace ios_fc;
 
 class NetworkGame : public FloboGame, MessageListener {
 public:
-    NetworkGame(FloboFactory *attachedFactory, MessageBox *msgBox, int gameId = 0);
+    NetworkGame(FloboFactory *_attachedFactory, MessageBox *msgBox, int gameId = 0);
     ~NetworkGame();
 
     virtual void onMessage(Message &);
@@ -72,8 +72,8 @@ private:
     void synchronizeState(Message &message);
     void setFloboAt(int X, int Y, std::shared_ptr<Flobo> newFlobo);
     void synchronizeFlobo(Buffer<int> buffer);
-    std::shared_ptr<Flobo> findFlobo(int floboID);
-    std::shared_ptr<Flobo> floboCells[FLOBOBAN_DIMX * (FLOBOBAN_DIMY+1)];
+    std::shared_ptr<Flobo> findFlobo(int _floboID);
+    std::shared_ptr<Flobo> _floboCells[FLOBOBAN_DIMX * (FLOBOBAN_DIMY+1)];
     FloboState nextFalling, nextCompanion;
     std::shared_ptr<Flobo> fakeFlobo;
     MessageBox *msgBox;
@@ -81,9 +81,9 @@ private:
     typedef std::list<std::shared_ptr<Flobo>> FloboPtrList;
     FloboPtrList m_floboList;
     std::map<int, std::shared_ptr<Flobo>> m_floboMap;
-    int semiMove;
-    int neutralFlobos, sentBadFlobos;
-    bool gameRunning;
+    int _semiMove;
+    int _neutralFlobos, sentBadFlobos;
+    bool _gameRunning;
     int comboPhase;
 };
 

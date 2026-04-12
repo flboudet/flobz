@@ -65,8 +65,8 @@ void StoryModeGameWidget::initWithGUI(GameView &areaA, GameView &areaB,
 StoryModeStandardLayoutGameWidget::StoryModeStandardLayoutGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, int level, int nColors, int lifes, const std::string & aiFace, Action *gameOverAction)
   : StoryModeGameWidget(lifes, aiFace),
       attachedFloboThemeSet(floboSetTheme),
-      attachedRandom(nColors),
-      attachedGameFactory(&attachedRandom),
+      _attachedRandom(nColors),
+      attachedGameFactory(&_attachedRandom),
       areaA(&attachedGameFactory, 0, &attachedFloboThemeSet, &levelTheme),
       areaB(&attachedGameFactory, 1, &attachedFloboThemeSet, &levelTheme)
 {

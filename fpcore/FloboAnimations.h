@@ -50,7 +50,7 @@ public:
     bool isFinished() const;
     bool isEnabled() const;
     virtual void cycle() = 0;
-    virtual void draw(int semiMove, DrawTarget *dt) {}
+    virtual void draw(int _semiMove, DrawTarget *dt) {}
     int getTag() const { return m_tag; }
     bool getExclusive() const { return m_exclusive; }
 protected:
@@ -89,7 +89,7 @@ class NeutralAnimation : public FloboAnimation {
     NeutralAnimation(AnimatedFlobo &flobo, int delay, AnimationSynchronizer *synchronizer);
     virtual ~NeutralAnimation();
     void cycle();
-    void draw(int semiMove, DrawTarget *dt);
+    void draw(int _semiMove, DrawTarget *dt);
   private:
     int X, Y, currentY;
     float step;
@@ -100,7 +100,7 @@ class NeutralAnimation : public FloboAnimation {
 /* Companion turning around main flobo animation */
 class TurningAnimation : public FloboAnimation {
 public:
-    TurningAnimation(AnimatedFlobo &companionFlobo, bool counterclockwise);
+    TurningAnimation(AnimatedFlobo &_companionFlobo, bool counterclockwise);
     void cycle();
 private:
     int cpt;
@@ -135,7 +135,7 @@ public:
     FallingAnimation(AnimatedFlobo &flobo,
                      int originY, int xOffset, int yOffset, int step);
     void cycle();
-    void draw(int semiMove, DrawTarget *dt);
+    void draw(int _semiMove, DrawTarget *dt);
 private:
     int xOffset, yOffset, step, off;
     int X, Y;
@@ -148,10 +148,10 @@ private:
 /* Flobo exploding and vanishing animation */
 class VanishAnimation : public FloboAnimation {
 public:
-    VanishAnimation(AnimatedFlobo &flobo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int floboNum, int groupSize, int groupNum, int phase);
+    VanishAnimation(AnimatedFlobo &flobo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int floboNum, int groupSize, int groupNum, int _phase);
     virtual ~VanishAnimation();
     void cycle();
-    void draw(int semiMove, DrawTarget *dt);
+    void draw(int _semiMove, DrawTarget *dt);
 private:
     int xOffset, yOffset;
     int X, Y, iter, color;
@@ -162,17 +162,17 @@ private:
     int floboNum;
     int groupSize;
     int groupNum;
-    int phase;
+    int _phase;
 };
 
 class VanishSoundAnimation : public Animation {
 public:
-    VanishSoundAnimation(int phase, AnimationSynchronizer *synchronizer, float soundPadding);
+    VanishSoundAnimation(int _phase, AnimationSynchronizer *synchronizer, float soundPadding);
     virtual ~VanishSoundAnimation();
     void cycle();
-    void draw(int semiMove, DrawTarget *dt);
+    void draw(int _semiMove, DrawTarget *dt);
 private:
-    int phase;
+    int _phase;
     int step;
     bool once;
     AnimationSynchronizer *synchronizer;
@@ -184,7 +184,7 @@ public:
     NeutralPopAnimation(AnimatedFlobo &flobo, int delay, AnimationSynchronizer *synchronizer);
     virtual ~NeutralPopAnimation();
     void cycle();
-    void draw(int semiMove, DrawTarget *dt);
+    void draw(int _semiMove, DrawTarget *dt);
 private:
     AnimationSynchronizer *synchronizer;
     int iter, delay;
@@ -198,7 +198,7 @@ public:
     SmoothBounceAnimation(AnimatedFlobo &flobo, AnimationSynchronizer *synchronizer, int depth = 10);
     virtual ~SmoothBounceAnimation();
     void cycle();
-    void draw(int semiMove, DrawTarget *dt);
+    void draw(int _semiMove, DrawTarget *dt);
 private:
     int bounceOffset, bouncePhase, bounceMax;
     int origX, origY;
@@ -210,7 +210,7 @@ public:
     GameOverFallAnimation(AnimatedFlobo &flobo, int delay);
     virtual ~GameOverFallAnimation();
     void cycle();
-    void draw(int semiMove, DrawTarget *dt);
+    void draw(int _semiMove, DrawTarget *dt);
 private:
     int delay;
     int Y;
@@ -225,7 +225,7 @@ public:
                            AnimationSynchronizer *synchronizer = NULL);
     virtual ~ScreenShakingAnimation();
     void cycle();
-    void draw(int semiMove, DrawTarget *dt);
+    void draw(int _semiMove, DrawTarget *dt);
 private:
     int m_iter;
     int m_duration, m_shakeCount;
