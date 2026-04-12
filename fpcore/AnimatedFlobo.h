@@ -62,7 +62,7 @@ public:
     int getScreenCoordinateY() const;
     const FloboTheme *getAttachedTheme() const { return _attachedTheme; }
     void setAnimatedState(int animatedState) { _currentCompressedState = animatedState; }
-    void setPartner(AnimatedFlobo *partner) { _partner = partner; }
+    void setPartner(const std::shared_ptr<AnimatedFlobo> &partner) { _partner = partner; }
     void setOffsetX(int offsetX) { _offsetX = offsetX; }
     void setOffsetY(int offsetY) { _offsetY = offsetY; }
     void setRotation(float angle) { _angle = angle; }
@@ -75,7 +75,7 @@ private:
     GameView *_attachedView;
 	const FloboTheme *_attachedTheme;
     int _currentCompressedState;
-    AnimatedFlobo *_partner;
+    std::shared_ptr<AnimatedFlobo> _partner;
     int _offsetX, _offsetY;
     float _angle;
     bool _displayEyes;
