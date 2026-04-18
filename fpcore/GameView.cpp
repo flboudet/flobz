@@ -88,11 +88,7 @@ GameView::GameView(FloboGameFactory *attachedFloboGameFactory)
 
 GameView::~GameView()
 {
-    while (_viewAnimations.size() > 0) {
-        Animation *currentAnimation = _viewAnimations[0];
-        _viewAnimations.removeAtKeepOrder(0);
-        delete currentAnimation;
-    }
+    _viewAnimations.clear();
     delete attachedGame;
 }
 
@@ -144,10 +140,9 @@ void GameView::cycleAnimation(void)
 
         // Cycling view's animations
         if (_viewAnimations.size() > 0) {
-            Animation *currentAnimation = _viewAnimations[0];
+            auto currentAnimation = _viewAnimations[0];
             if (currentAnimation->isFinished()) {
-                _viewAnimations.removeKeepOrder(currentAnimation);
-                delete currentAnimation;
+                _viewAnimations.erase(_viewAnimations.begin());
             }
             else {
                 currentAnimation->cycle();
@@ -265,7 +260,7 @@ void GameView::render(DrawTarget *dt)
 
     // Drawing the view animation
     if (_viewAnimations.size() > 0) {
-        Animation *currentAnimation = _viewAnimations[0];
+        auto currentAnimation = _viewAnimations[0];
         if (!currentAnimation->isFinished()) {
             currentAnimation->draw(0, dt);
         }
@@ -342,8 +337,7 @@ void GameView::gameDidAddNeutral(std::shared_ptr<Flobo> neutralFlobo, int neutra
         int duration = totalNeutral * 3;
         int shakeCount = totalNeutral / 4.f;
         float amplY = totalNeutral * 2.f;
-        Animation *shakingAnimation = new ScreenShakingAnimation(duration, shakeCount, 0.f, amplY, 1.0f, synchronizer);
-        _viewAnimations.add(shakingAnimation);
+        _viewAnimations.push_back(std::make_shared<ScreenShakingAnimation>(duration, shakeCount, 0.f, amplY, 1.0f, synchronizer));
     }
 }
 
@@ -418,7 +412,7 @@ void GameView::floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, 
         // Compute the center of the vanishing flobos padding
         groupPadding += newAnimation->getSoundPadding();
     }
-    _viewAnimations.add(new VanishSoundAnimation(phase, synchronizer, groupPadding / floboGroup.size()));
+    _viewAnimations.push_back(std::make_shared<VanishSoundAnimation>(phase, synchronizer, groupPadding / floboGroup.size()));
     // "pastaga" management
     if (groupNum == 0) {
       static const char * sound_yahoohoo[7] = {
@@ -488,8 +482,7 @@ void GameView::gameLost()
             }
         }
     }
-    Animation *shakingAnimation = new ScreenShakingAnimation(80, 12, 10.f, 5.f, 1.f);
-    _viewAnimations.add(shakingAnimation);
+    _viewAnimations.push_back(std::make_shared<ScreenShakingAnimation>(80, 12, 10.f, 5.f, 1.f));
     theCommander->playSound("earthquake.wav", 1.0);
 }
 

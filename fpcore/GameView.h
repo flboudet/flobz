@@ -27,6 +27,7 @@
 #define _FLOBOVIEW_H_
 
 #include <memory>
+#include <vector>
 #include "FloboGame.h"
 #include "FloboAnimations.h"
 #include "AnimatedFlobo.h"
@@ -159,7 +160,7 @@ class GameView : public GameListener {
     LevelTheme *_attachedLevelTheme;
     AnimatedFloboFactory _attachedFloboFactory;
     FloboGame *attachedGame, *_enemyGame;
-    AdvancedBuffer<Animation *> _viewAnimations;
+    std::vector<std::shared_ptr<Animation>> _viewAnimations;
     int _cycleAllowance;
     int _delayBeforeGameOver;
     bool _newMetaCycleStart;
