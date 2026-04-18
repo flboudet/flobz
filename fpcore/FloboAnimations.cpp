@@ -49,18 +49,19 @@ bool Animation::isEnabled() const
 
 float FloboAnimation::getSoundPadding() const
 {
-    return ((float)_attachedFlobo->getScreenCoordinateX() / 640.)*2. - 1.;
+    return ((float)_attachedFlobo.lock()->getScreenCoordinateX() / 640.)*2. - 1.;
 }
 
 /* Neutral falling animation */
-NeutralAnimation::NeutralAnimation(const std::shared_ptr<AnimatedFlobo> &flobo, int delay, AnimationSynchronizer *synchronizer) : FloboAnimation(flobo)
+NeutralAnimation::NeutralAnimation(const std::weak_ptr<AnimatedFlobo> &flobo, int delay, AnimationSynchronizer *synchronizer) : FloboAnimation(flobo)
 {
-    this->_X = _attachedFlobo->getScreenCoordinateX();
-    this->_Y = _attachedFlobo->getScreenCoordinateY();
-    this->_currentY = _attachedFlobo->getAttachedView()->getScreenCoordinateY(0);
+    auto attachedFlobo = _attachedFlobo.lock();
+    this->_X = attachedFlobo->getScreenCoordinateX();
+    this->_Y = attachedFlobo->getScreenCoordinateY();
+    this->_currentY = attachedFlobo->getAttachedView()->getScreenCoordinateY(0);
     _step = 0;
     this->_delay = delay;
-    _attachedFlobo->getAttachedView()->disallowCycle();
+    attachedFlobo->getAttachedView()->disallowCycle();
     this->_synchronizer = synchronizer;
     synchronizer->incrementUsage();
     synchronizer->push();
@@ -91,7 +92,7 @@ void NeutralAnimation::cycle()
                 attachedFlobo->getAttachedView()->getPlayerId());*/
             theCommander->playSound(sound_bim[choosenSound], sound_bim_volume[choosenSound], getSoundPadding());
             _finishedFlag = true;
-            _attachedFlobo->getAttachedView()->allowCycle();
+            _attachedFlobo.lock()->getAttachedView()->allowCycle();
             _synchronizer->pop();
         }
     }
@@ -99,7 +100,7 @@ void NeutralAnimation::cycle()
 
 void NeutralAnimation::draw(int semiMove, DrawTarget *dt)
 {
-    _attachedFlobo->renderAt(_X, _currentY, dt);
+    _attachedFlobo.lock()->renderAt(_X, _currentY, dt);
 }
 
 /* Animation synchronization helper */
@@ -137,7 +138,7 @@ void AnimationSynchronizer::decrementUsage()
 }
 
 /* Companion turning around main flobo animation */
-TurningAnimation::TurningAnimation(const std::shared_ptr<AnimatedFlobo> &companionFlobo,
+TurningAnimation::TurningAnimation(const std::weak_ptr<AnimatedFlobo> &companionFlobo,
                                    bool counterclockwise) : FloboAnimation(companionFlobo), _NUMSTEPS(6)
 {
     _enabled = false;
@@ -153,26 +154,27 @@ void TurningAnimation::cycle()
 {
     static const char * sound_fff = "fff.wav";
     static const float  sound_fff_volume = .35;
-
+    auto attachedFlobo = _attachedFlobo.lock();
+    
     if (_cpt == 0) {
         theCommander->playSound(sound_fff, sound_fff_volume, getSoundPadding());
         EventFX("turning",
-                _attachedFlobo->getScreenCoordinateX() + TSIZE/2,
-                _attachedFlobo->getScreenCoordinateY() + TSIZE/2,
-                _attachedFlobo->getAttachedView()->getPlayerId());
+                attachedFlobo->getScreenCoordinateX() + TSIZE/2,
+                attachedFlobo->getScreenCoordinateY() + TSIZE/2,
+                attachedFlobo->getAttachedView()->getPlayerId());
     }
     _cpt++;
     _angle += _step;
     if (_cpt == _NUMSTEPS) {
         _finishedFlag = true;
-        _attachedFlobo->setRotation(0.);
+        attachedFlobo->setRotation(0.);
     }
     else
-        _attachedFlobo->setRotation(_angle);
+        attachedFlobo->setRotation(_angle);
 }
 
 /* Flobo moving from one place to another in the horizontal axis */
-MovingHAnimation::MovingHAnimation(const std::shared_ptr<AnimatedFlobo> &flobo, int hOffset, int step)
+MovingHAnimation::MovingHAnimation(const std::weak_ptr<AnimatedFlobo> &flobo, int hOffset, int step)
   : FloboAnimation(flobo), _cpt(0), _hOffset(hOffset), _step(step),
     _hOffsetByStep((float)hOffset/(float)step)
 {
@@ -186,15 +188,16 @@ MovingHAnimation::MovingHAnimation(const std::shared_ptr<AnimatedFlobo> &flobo, 
 void MovingHAnimation::cycle()
 {
     _cpt++;
-    _attachedFlobo->setOffsetX(_hOffset - _hOffsetByStep*_cpt);
+    auto attachedFlobo = _attachedFlobo.lock();
+    attachedFlobo->setOffsetX(_hOffset - _hOffsetByStep*_cpt);
     if (_cpt == _step) {
         _finishedFlag = true;
-        _attachedFlobo->setOffsetX(0);
+        attachedFlobo->setOffsetX(0);
     }
 }
 
 /* Flobo moving from one place to another in the vertical axis */
-MovingVAnimation::MovingVAnimation(const std::shared_ptr<AnimatedFlobo> &flobo, int vOffset, int step)
+MovingVAnimation::MovingVAnimation(const std::weak_ptr<AnimatedFlobo> &flobo, int vOffset, int step)
   : FloboAnimation(flobo), _cpt(0), _vOffset(vOffset), _step(step),
     _vOffsetByStep((float)vOffset/(float)step)
 {
@@ -207,10 +210,11 @@ MovingVAnimation::MovingVAnimation(const std::shared_ptr<AnimatedFlobo> &flobo, 
 void MovingVAnimation::cycle()
 {
     _cpt++;
-    _attachedFlobo->setOffsetY(_vOffset - _vOffsetByStep*_cpt);
+    auto attachedFlobo = _attachedFlobo.lock();
+    attachedFlobo->setOffsetY(_vOffset - _vOffsetByStep*_cpt);
     if (_cpt == _step) {
         _finishedFlag = true;
-        _attachedFlobo->setOffsetY(0);
+        attachedFlobo->setOffsetY(0);
     }
 }
 
@@ -219,49 +223,52 @@ void MovingVAnimation::cycle()
 const int FallingAnimation::_BOUNCING_OFFSET_NUM = 9;
 const int FallingAnimation::_BOUNCING_OFFSET[] = {-3, -4, -3, 0, 3, 6, 8, 6, 3};
 
-FallingAnimation::FallingAnimation(const std::shared_ptr<AnimatedFlobo> &flobo, int originY, int xOffset, int yOffset, int off) : FloboAnimation(flobo), _once(false)
+FallingAnimation::FallingAnimation(const std::weak_ptr<AnimatedFlobo> &flobo, int originY, int xOffset, int yOffset, int off) : FloboAnimation(flobo), _once(false)
 {
+    auto attachedFlobo = _attachedFlobo.lock();
     this->_xOffset = xOffset;
     this->_yOffset = yOffset;
     this->_off     = off;
     this->_step    = 0;
-    this->_X  = (_attachedFlobo->getFloboX()*TSIZE) + xOffset;
+    this->_X  = (attachedFlobo->getFloboX()*TSIZE) + xOffset;
     this->_Y  = (originY*TSIZE) + yOffset;
     _bouncing = _BOUNCING_OFFSET_NUM + off;
-    _attachedFlobo->getAttachedView()->disallowCycle();
-    EventFX("start_falling", _X+TSIZE/2, _Y+TSIZE/2, flobo->getAttachedView()->getPlayerId());
+    attachedFlobo->getAttachedView()->disallowCycle();
+    EventFX("start_falling", _X+TSIZE/2, _Y+TSIZE/2, attachedFlobo->getAttachedView()->getPlayerId());
 }
 
 void FallingAnimation::cycle()
 {
+    auto attachedFlobo = _attachedFlobo.lock();
     _Y += _step++;
 
-    if (_Y >= (_attachedFlobo->getFloboY()*TSIZE) + _yOffset)
+    if (_Y >= (attachedFlobo->getFloboY()*TSIZE) + _yOffset)
     {
         if (!_once) {
             theCommander->playSound("bam1.wav", .3, getSoundPadding());
             _once = true;
         }
-        _Y = (_attachedFlobo->getFloboY()*TSIZE) + _yOffset;
-        if (_bouncing == _BOUNCING_OFFSET_NUM + _off) _attachedFlobo->getAttachedView()->allowCycle();
+        _Y = (attachedFlobo->getFloboY()*TSIZE) + _yOffset;
+        if (_bouncing == _BOUNCING_OFFSET_NUM + _off) attachedFlobo->getAttachedView()->allowCycle();
 
         _bouncing--;
 
         if (_bouncing < 0) {
             _finishedFlag = true;
-            _attachedFlobo->setAnimatedState(0);
+            attachedFlobo->setAnimatedState(0);
         }
         else if ((_bouncing < _BOUNCING_OFFSET_NUM) && (_BOUNCING_OFFSET[_bouncing] > 0)) {
-            _attachedFlobo->setAnimatedState(_BOUNCING_OFFSET[_bouncing]);
+            attachedFlobo->setAnimatedState(_BOUNCING_OFFSET[_bouncing]);
         }
         else
-            _attachedFlobo->setAnimatedState(0);
+            attachedFlobo->setAnimatedState(0);
 
     }
 }
 
 void FallingAnimation::draw(int semiMove, DrawTarget *dt)
 {
+    auto attachedFlobo = _attachedFlobo.lock();
     IosRect drect;
     drect.x = _X;
     int coordY = _Y;
@@ -271,18 +278,19 @@ void FallingAnimation::draw(int semiMove, DrawTarget *dt)
             if (i>=0)
                 coordY += _BOUNCING_OFFSET[i];
     }
-    _attachedFlobo->renderShadowAt(_X, coordY, dt);
-    _attachedFlobo->renderAt(_X, coordY, dt);
+    attachedFlobo->renderShadowAt(_X, coordY, dt);
+    attachedFlobo->renderAt(_X, coordY, dt);
 }
 
 /* Flobo exploding and vanishing animation */
-VanishAnimation::VanishAnimation(const std::shared_ptr<AnimatedFlobo> &flobo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int floboNum, int groupSize, int groupNum, int phase) : FloboAnimation(flobo), _floboNum(floboNum), _groupSize(groupSize), _groupNum(groupNum), _phase(phase)
+VanishAnimation::VanishAnimation(const std::weak_ptr<AnimatedFlobo> &flobo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int floboNum, int groupSize, int groupNum, int phase) : FloboAnimation(flobo), _floboNum(floboNum), _groupSize(groupSize), _groupNum(groupNum), _phase(phase)
 {
+    auto attachedFlobo = _attachedFlobo.lock();
     this->_xOffset = xOffset;
     this->_yOffset = yOffset;
-    this->_X = (_attachedFlobo->getFloboX()*TSIZE) + xOffset;
-    this->_Y = (_attachedFlobo->getFloboY()*TSIZE) + yOffset;
-    this->_color = _attachedFlobo->getFloboState();
+    this->_X = (attachedFlobo->getFloboX()*TSIZE) + xOffset;
+    this->_Y = (attachedFlobo->getFloboY()*TSIZE) + yOffset;
+    this->_color = attachedFlobo->getFloboState();
     if (_color > FLOBO_EMPTY)
         _color -= FLOBO_BLUE;
     _iter = 0;
@@ -292,7 +300,7 @@ VanishAnimation::VanishAnimation(const std::shared_ptr<AnimatedFlobo> &flobo, in
     synchronizer->incrementUsage();
     synchronizer->push();
     this->_delay = delay;
-    _attachedFlobo->getAttachedView()->disallowCycle();
+    attachedFlobo->getAttachedView()->disallowCycle();
 }
 
 VanishAnimation::~VanishAnimation()
@@ -302,6 +310,7 @@ VanishAnimation::~VanishAnimation()
 
 void VanishAnimation::cycle()
 {
+    auto attachedFlobo = _attachedFlobo.lock();
     if (_once == false) {
         _once = true;
         _synchronizer->pop();
@@ -311,31 +320,32 @@ void VanishAnimation::cycle()
         _iter ++;
         if (_iter == 1) {
             EventFX("vanish",
-                    _attachedFlobo->getScreenCoordinateX() + TSIZE/2,
-                    _attachedFlobo->getScreenCoordinateY() + TSIZE/2,
-                    _attachedFlobo->getAttachedView()->getPlayerId());
+                    attachedFlobo->getScreenCoordinateX() + TSIZE/2,
+                    attachedFlobo->getScreenCoordinateY() + TSIZE/2,
+                    attachedFlobo->getAttachedView()->getPlayerId());
         }
         if (_iter == 20 + _delay) {
-            _attachedFlobo->getAttachedView()->allowCycle();
+            attachedFlobo->getAttachedView()->allowCycle();
             if ((_groupNum == 0) && (_floboNum == 0))
-                EventFX("vanish_phase", _groupSize,_phase, _attachedFlobo->getAttachedView()->getPlayerId());
+                EventFX("vanish_phase", _groupSize,_phase, attachedFlobo->getAttachedView()->getPlayerId());
         }
         else if (_iter == 50 + _delay) {
             _finishedFlag = true;
-            _attachedFlobo->setVisible(false);
+            attachedFlobo->setVisible(false);
         }
     }
 }
 
 void VanishAnimation::draw(int semiMove, DrawTarget *dt)
 {
+    auto attachedFlobo = _attachedFlobo.lock();
     if (_iter < (10 + _delay)) {
         if (_iter % 2 == 0) {
-            _attachedFlobo->renderAt(_X, _Y, dt);
+            attachedFlobo->renderAt(_X, _Y, dt);
         }
     }
     else {
-		const FloboTheme *theme = _attachedFlobo->getAttachedTheme();
+		const FloboTheme *theme = attachedFlobo->getAttachedTheme();
 
         IosRect drect, xrect;
         int iter2 = _iter - 10 - _delay;
@@ -407,13 +417,16 @@ void VanishSoundAnimation::draw(int semiMove, DrawTarget *dt)
     // do nothing
 }
 
-NeutralPopAnimation::NeutralPopAnimation(std::shared_ptr<AnimatedFlobo> flobo, int delay, AnimationSynchronizer *synchronizer)
-    : FloboAnimation(flobo), _synchronizer(synchronizer), _iter(0), _delay(delay), _once(false),
-      _X(_attachedFlobo->getScreenCoordinateX()), _Y(_attachedFlobo->getScreenCoordinateY())
+NeutralPopAnimation::NeutralPopAnimation(std::weak_ptr<AnimatedFlobo> flobo, int delay, AnimationSynchronizer *synchronizer)
+    : FloboAnimation(flobo), _synchronizer(synchronizer), _iter(0), _delay(delay), _once(false)
 {
+    auto attachedFlobo = _attachedFlobo.lock();
+    _X = attachedFlobo->getScreenCoordinateX();
+    _Y = attachedFlobo->getScreenCoordinateY();
+
     synchronizer->push();
     synchronizer->incrementUsage();
-    const FloboTheme *attachedTheme = _attachedFlobo->getAttachedTheme();
+    const FloboTheme *attachedTheme = attachedFlobo->getAttachedTheme();
     _neutralPop[0] = attachedTheme->getExplodingSurfaceForIndex(0);
     _neutralPop[1] = attachedTheme->getExplodingSurfaceForIndex(1);
     _neutralPop[2] = attachedTheme->getExplodingSurfaceForIndex(2);
@@ -427,6 +440,7 @@ NeutralPopAnimation::~NeutralPopAnimation()
 
 void NeutralPopAnimation::cycle()
 {
+    auto attachedFlobo = _attachedFlobo.lock();
     if (_once == false) {
         _once = true;
         _synchronizer->pop();
@@ -436,13 +450,13 @@ void NeutralPopAnimation::cycle()
         if (_iter == 17 + _delay) {
             theCommander->playSound("pop.wav", .25, getSoundPadding());
             EventFX("neutral_pop",
-                    _attachedFlobo->getScreenCoordinateX() + TSIZE/2,
-                    _attachedFlobo->getScreenCoordinateY() + TSIZE/2,
-                    _attachedFlobo->getAttachedView()->getPlayerId());
+                    attachedFlobo->getScreenCoordinateX() + TSIZE/2,
+                    attachedFlobo->getScreenCoordinateY() + TSIZE/2,
+                    attachedFlobo->getAttachedView()->getPlayerId());
             _enabled = true;
         }
         else if (_iter == 30 + _delay) {
-            _attachedFlobo->setVisible(false);
+            attachedFlobo->setVisible(false);
             _finishedFlag = true;
         }
     }
@@ -466,15 +480,17 @@ void NeutralPopAnimation::draw(int semiMove, DrawTarget *dt)
     }
 }
 
-SmoothBounceAnimation::SmoothBounceAnimation(std::shared_ptr<AnimatedFlobo> flobo, AnimationSynchronizer *synchronizer, int depth) :
+SmoothBounceAnimation::SmoothBounceAnimation(std::weak_ptr<AnimatedFlobo> flobo, AnimationSynchronizer *synchronizer, int depth) :
     FloboAnimation(flobo), _bounceMax(depth)
 {
+    auto attachedFlobo = _attachedFlobo.lock();
+
     _bounceOffset = 0;
     _bouncePhase = 0;
     this->_synchronizer = synchronizer;
     synchronizer->incrementUsage();
-    _origX = _attachedFlobo->getScreenCoordinateX();
-    _origY = _attachedFlobo->getScreenCoordinateY();
+    _origX = attachedFlobo->getScreenCoordinateX();
+    _origY = attachedFlobo->getScreenCoordinateY();
     _enabled = false;
 }
 
@@ -507,11 +523,11 @@ void SmoothBounceAnimation::cycle()
 
 void SmoothBounceAnimation::draw(int semiMove, DrawTarget *dt)
 {
-    _attachedFlobo->renderAt(_origX, _origY + _bounceOffset, dt);
+    _attachedFlobo.lock()->renderAt(_origX, _origY + _bounceOffset, dt);
 }
 
-GameOverFallAnimation::GameOverFallAnimation(std::shared_ptr<AnimatedFlobo> flobo, int delay)
-    : FloboAnimation(flobo), _delay(delay), _Y(_attachedFlobo->getScreenCoordinateY()), _yAccel(10)
+GameOverFallAnimation::GameOverFallAnimation(std::weak_ptr<AnimatedFlobo> flobo, int delay)
+    : FloboAnimation(flobo), _delay(delay), _Y(_attachedFlobo.lock()->getScreenCoordinateY()), _yAccel(10)
 {
 }
 
@@ -526,7 +542,7 @@ void GameOverFallAnimation::cycle()
             _yAccel -= 1;
         _Y -= _yAccel;
         if (_Y > 480) {
-            _attachedFlobo->setVisible(false);
+            _attachedFlobo.lock()->setVisible(false);
             _finishedFlag = true;
         }
     }
@@ -535,7 +551,8 @@ void GameOverFallAnimation::cycle()
 
 void GameOverFallAnimation::draw(int semiMove, DrawTarget *dt)
 {
-    _attachedFlobo->renderAt(_attachedFlobo->getScreenCoordinateX(), _Y, dt);
+    auto attachedFlobo = _attachedFlobo.lock();
+    attachedFlobo->renderAt(attachedFlobo->getScreenCoordinateX(), _Y, dt);
 }
 
 
