@@ -327,7 +327,7 @@ void GameView::gameDidAddNeutral(std::shared_ptr<Flobo> neutralFlobo, int neutra
     if (!_haveDisplay) return;
     int x = neutralFlobo->getFloboX();
     int y = neutralFlobo->getFloboY();
-    AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
+    auto synchronizer = std::make_shared<AnimationSynchronizer>();
     auto animatedNeutral = std::static_pointer_cast<AnimatedFlobo>(neutralFlobo);
     animatedNeutral->addAnimation(std::make_shared<NeutralAnimation>(animatedNeutral, neutralIndex * 2, synchronizer));
     for (int i = y ; i < FLOBOBAN_DIMY ; i++) {
@@ -406,7 +406,7 @@ void GameView::floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, 
     if (!_haveDisplay) return;
     double groupPadding = 0.;
     // Exploding flobo animation
-    AnimationSynchronizer *synchronizer = new AnimationSynchronizer();
+    auto synchronizer = std::make_shared<AnimationSynchronizer>();
     for (int i = 0, j = floboGroup.size() ; i < j ; i++) {
         auto currentFlobo = std::static_pointer_cast<AnimatedFlobo>(floboGroup[i]);
         std::shared_ptr<FloboAnimation> newAnimation;

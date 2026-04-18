@@ -77,17 +77,14 @@ public:
     void push();
     void pop();
     bool isSynchronized();
-    void incrementUsage();
-    void decrementUsage();
 private:
     int _currentCounter;
-    int _currentUsage;
 };
 
 /* Neutral falling animation */
 class NeutralAnimation : public FloboAnimation {
   public:
-    NeutralAnimation(const std::weak_ptr<AnimatedFlobo> &flobo, int delay, AnimationSynchronizer *synchronizer);
+    NeutralAnimation(const std::weak_ptr<AnimatedFlobo> &flobo, int delay, const std::shared_ptr<AnimationSynchronizer> &synchronizer);
     virtual ~NeutralAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
@@ -95,7 +92,7 @@ class NeutralAnimation : public FloboAnimation {
     int _X, _Y, _currentY;
     float _step;
     int _delay;
-    AnimationSynchronizer *_synchronizer;
+    std::shared_ptr<AnimationSynchronizer> _synchronizer;
 };
 
 /* Companion turning around main flobo animation */
@@ -149,14 +146,14 @@ private:
 /* Flobo exploding and vanishing animation */
 class VanishAnimation : public FloboAnimation {
 public:
-    VanishAnimation(const std::weak_ptr<AnimatedFlobo> &flobo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int floboNum, int groupSize, int groupNum, int phase);
+    VanishAnimation(const std::weak_ptr<AnimatedFlobo> &flobo, int delay, int xOffset, int yOffset, const std::shared_ptr<AnimationSynchronizer> &synchronizer, int floboNum, int groupSize, int groupNum, int phase);
     virtual ~VanishAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
 private:
     int _xOffset, _yOffset;
     int _X, _Y, _iter, _color;
-    AnimationSynchronizer *_synchronizer;
+    std::shared_ptr<AnimationSynchronizer> _synchronizer;
     bool _once;
     int _delay;
 
@@ -168,7 +165,7 @@ private:
 
 class VanishSoundAnimation : public Animation {
 public:
-    VanishSoundAnimation(int phase, AnimationSynchronizer *synchronizer, float soundPadding);
+    VanishSoundAnimation(int phase, const std::shared_ptr<AnimationSynchronizer> &synchronizer, float soundPadding);
     virtual ~VanishSoundAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
@@ -176,18 +173,18 @@ private:
     int _phase;
     int _step;
     bool _once;
-    AnimationSynchronizer *_synchronizer;
+    std::shared_ptr<AnimationSynchronizer> _synchronizer;
     float _soundPadding;
 };
 
 class NeutralPopAnimation : public FloboAnimation {
 public:
-    NeutralPopAnimation(std::weak_ptr<AnimatedFlobo> flobo, int delay, AnimationSynchronizer *synchronizer);
+    NeutralPopAnimation(std::weak_ptr<AnimatedFlobo> flobo, int delay, const std::shared_ptr<AnimationSynchronizer> &synchronizer);
     virtual ~NeutralPopAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
 private:
-    AnimationSynchronizer *_synchronizer;
+    std::shared_ptr<AnimationSynchronizer> _synchronizer;
     int _iter, _delay;
     bool _once;
     int _X, _Y;
@@ -196,14 +193,14 @@ private:
 
 class SmoothBounceAnimation : public FloboAnimation {
 public:
-    SmoothBounceAnimation(std::weak_ptr<AnimatedFlobo> flobo, AnimationSynchronizer *synchronizer, int depth = 10);
+    SmoothBounceAnimation(std::weak_ptr<AnimatedFlobo> flobo, const std::shared_ptr<AnimationSynchronizer> &synchronizer, int depth = 10);
     virtual ~SmoothBounceAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
 private:
     int _bounceOffset, _bouncePhase, _bounceMax;
     int _origX, _origY;
-    AnimationSynchronizer *_synchronizer;
+    std::shared_ptr<AnimationSynchronizer> _synchronizer;
 };
 
 class GameOverFallAnimation : public FloboAnimation {
@@ -223,7 +220,7 @@ public:
     ScreenShakingAnimation(int duration, int shakeCount,
                            float amplX, float amplY,
                            float smoothFactor,
-                           AnimationSynchronizer *synchronizer = NULL);
+                           const std::shared_ptr<AnimationSynchronizer> &synchronizer = nullptr);
     virtual ~ScreenShakingAnimation();
     void cycle();
     void draw(int semiMove, DrawTarget *dt);
@@ -232,7 +229,7 @@ private:
     int _duration, _shakeCount;
     float _amplX, _amplY;
     float _smoothFactor;
-    AnimationSynchronizer *_synchronizer;
+    std::shared_ptr<AnimationSynchronizer> _synchronizer;
     float _sineStep;
     float _sine;
     DrawContext *_dc;

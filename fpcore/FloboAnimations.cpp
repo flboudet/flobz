@@ -53,7 +53,7 @@ float FloboAnimation::getSoundPadding() const
 }
 
 /* Neutral falling animation */
-NeutralAnimation::NeutralAnimation(const std::weak_ptr<AnimatedFlobo> &flobo, int delay, AnimationSynchronizer *synchronizer) : FloboAnimation(flobo)
+NeutralAnimation::NeutralAnimation(const std::weak_ptr<AnimatedFlobo> &flobo, int delay, const std::shared_ptr<AnimationSynchronizer> &synchronizer) : FloboAnimation(flobo)
 {
     auto attachedFlobo = _attachedFlobo.lock();
     this->_X = attachedFlobo->getScreenCoordinateX();
@@ -63,13 +63,11 @@ NeutralAnimation::NeutralAnimation(const std::weak_ptr<AnimatedFlobo> &flobo, in
     this->_delay = delay;
     attachedFlobo->getAttachedView()->disallowCycle();
     this->_synchronizer = synchronizer;
-    synchronizer->incrementUsage();
     synchronizer->push();
 }
 
 NeutralAnimation::~NeutralAnimation()
 {
-    _synchronizer->decrementUsage();
 }
 
 static const char *sound_bim[2] =        { "bim1.wav", "bim2.wav" };
@@ -107,7 +105,6 @@ void NeutralAnimation::draw(int semiMove, DrawTarget *dt)
 AnimationSynchronizer::AnimationSynchronizer()
 {
     _currentCounter = 0;
-    _currentUsage = 0;
 }
 
 void AnimationSynchronizer::push()
@@ -123,18 +120,6 @@ void AnimationSynchronizer::pop()
 bool AnimationSynchronizer::isSynchronized()
 {
     return (_currentCounter <= 0);
-}
-
-void AnimationSynchronizer::incrementUsage()
-{
-    _currentUsage++;
-}
-
-void AnimationSynchronizer::decrementUsage()
-{
-    _currentUsage--;
-    if (_currentUsage == 0)
-        delete this;
 }
 
 /* Companion turning around main flobo animation */
@@ -283,7 +268,7 @@ void FallingAnimation::draw(int semiMove, DrawTarget *dt)
 }
 
 /* Flobo exploding and vanishing animation */
-VanishAnimation::VanishAnimation(const std::weak_ptr<AnimatedFlobo> &flobo, int delay, int xOffset, int yOffset, AnimationSynchronizer *synchronizer, int floboNum, int groupSize, int groupNum, int phase) : FloboAnimation(flobo), _floboNum(floboNum), _groupSize(groupSize), _groupNum(groupNum), _phase(phase)
+VanishAnimation::VanishAnimation(const std::weak_ptr<AnimatedFlobo> &flobo, int delay, int xOffset, int yOffset, const std::shared_ptr<AnimationSynchronizer> &synchronizer, int floboNum, int groupSize, int groupNum, int phase) : FloboAnimation(flobo), _floboNum(floboNum), _groupSize(groupSize), _groupNum(groupNum), _phase(phase)
 {
     auto attachedFlobo = _attachedFlobo.lock();
     this->_xOffset = xOffset;
@@ -297,7 +282,6 @@ VanishAnimation::VanishAnimation(const std::weak_ptr<AnimatedFlobo> &flobo, int 
     _once = false;
     _enabled = false;
     this->_synchronizer = synchronizer;
-    synchronizer->incrementUsage();
     synchronizer->push();
     this->_delay = delay;
     attachedFlobo->getAttachedView()->disallowCycle();
@@ -305,7 +289,6 @@ VanishAnimation::VanishAnimation(const std::weak_ptr<AnimatedFlobo> &flobo, int 
 
 VanishAnimation::~VanishAnimation()
 {
-    _synchronizer->decrementUsage();
 }
 
 void VanishAnimation::cycle()
@@ -380,16 +363,14 @@ void VanishAnimation::draw(int semiMove, DrawTarget *dt)
     }
 }
 
-VanishSoundAnimation::VanishSoundAnimation(int phase, AnimationSynchronizer *synchronizer, float soundPadding)
+VanishSoundAnimation::VanishSoundAnimation(int phase, const std::shared_ptr<AnimationSynchronizer> &synchronizer, float soundPadding)
   : _phase(phase), _step(0), _once(false), _synchronizer(synchronizer), _soundPadding(soundPadding)
 {
-    synchronizer->incrementUsage();
     synchronizer->push();
 }
 
 VanishSoundAnimation::~VanishSoundAnimation()
 {
-    _synchronizer->decrementUsage();
 }
 
 static const char *sound_splash[8] = {
@@ -417,7 +398,7 @@ void VanishSoundAnimation::draw(int semiMove, DrawTarget *dt)
     // do nothing
 }
 
-NeutralPopAnimation::NeutralPopAnimation(std::weak_ptr<AnimatedFlobo> flobo, int delay, AnimationSynchronizer *synchronizer)
+NeutralPopAnimation::NeutralPopAnimation(std::weak_ptr<AnimatedFlobo> flobo, int delay, const std::shared_ptr<AnimationSynchronizer> &synchronizer)
     : FloboAnimation(flobo), _synchronizer(synchronizer), _iter(0), _delay(delay), _once(false)
 {
     auto attachedFlobo = _attachedFlobo.lock();
@@ -425,7 +406,6 @@ NeutralPopAnimation::NeutralPopAnimation(std::weak_ptr<AnimatedFlobo> flobo, int
     _Y = attachedFlobo->getScreenCoordinateY();
 
     synchronizer->push();
-    synchronizer->incrementUsage();
     const FloboTheme *attachedTheme = attachedFlobo->getAttachedTheme();
     _neutralPop[0] = attachedTheme->getExplodingSurfaceForIndex(0);
     _neutralPop[1] = attachedTheme->getExplodingSurfaceForIndex(1);
@@ -435,7 +415,6 @@ NeutralPopAnimation::NeutralPopAnimation(std::weak_ptr<AnimatedFlobo> flobo, int
 
 NeutralPopAnimation::~NeutralPopAnimation()
 {
-    _synchronizer->decrementUsage();
 }
 
 void NeutralPopAnimation::cycle()
@@ -480,7 +459,7 @@ void NeutralPopAnimation::draw(int semiMove, DrawTarget *dt)
     }
 }
 
-SmoothBounceAnimation::SmoothBounceAnimation(std::weak_ptr<AnimatedFlobo> flobo, AnimationSynchronizer *synchronizer, int depth) :
+SmoothBounceAnimation::SmoothBounceAnimation(std::weak_ptr<AnimatedFlobo> flobo, const std::shared_ptr<AnimationSynchronizer> &synchronizer, int depth) :
     FloboAnimation(flobo), _bounceMax(depth)
 {
     auto attachedFlobo = _attachedFlobo.lock();
@@ -488,7 +467,6 @@ SmoothBounceAnimation::SmoothBounceAnimation(std::weak_ptr<AnimatedFlobo> flobo,
     _bounceOffset = 0;
     _bouncePhase = 0;
     this->_synchronizer = synchronizer;
-    synchronizer->incrementUsage();
     _origX = attachedFlobo->getScreenCoordinateX();
     _origY = attachedFlobo->getScreenCoordinateY();
     _enabled = false;
@@ -496,7 +474,6 @@ SmoothBounceAnimation::SmoothBounceAnimation(std::weak_ptr<AnimatedFlobo> flobo,
 
 SmoothBounceAnimation::~SmoothBounceAnimation()
 {
-    _synchronizer->decrementUsage();
 }
 
 void SmoothBounceAnimation::cycle()
@@ -559,7 +536,7 @@ void GameOverFallAnimation::draw(int semiMove, DrawTarget *dt)
 ScreenShakingAnimation::ScreenShakingAnimation(int duration, int shakeCount,
                                                float amplX, float amplY,
                                                float smoothFactor,
-                                               AnimationSynchronizer *synchronizer)
+                                               const std::shared_ptr<AnimationSynchronizer> &synchronizer)
     : _iter(0),
       _duration(duration), _shakeCount(shakeCount),
       _amplX(amplX), _amplY(amplY),
@@ -569,8 +546,6 @@ ScreenShakingAnimation::ScreenShakingAnimation(int duration, int shakeCount,
       _dc(NULL)
 {
     _sineStep = (M_PI * _shakeCount * 2) / _duration;
-    if (_synchronizer != NULL)
-        _synchronizer->incrementUsage();
     _exclusive = false;
 }
 
@@ -579,15 +554,12 @@ ScreenShakingAnimation::~ScreenShakingAnimation()
     if (_dc != NULL) {
         _dc->setOffset(0, 0);
     }
-    if (_synchronizer != NULL)
-        _synchronizer->decrementUsage();
 }
 
 void ScreenShakingAnimation::cycle()
 {
-    if (_synchronizer != NULL)
-        if (! _synchronizer->isSynchronized())
-            return;
+    if (_synchronizer && ! _synchronizer->isSynchronized())
+        return;
     ++_iter;
     if (_iter > _duration) {
         if (_dc != NULL)
@@ -601,9 +573,8 @@ void ScreenShakingAnimation::draw(int semiMove, DrawTarget *dt)
 {
     if (_finishedFlag)
         return;
-    if (_synchronizer != NULL)
-        if (! _synchronizer->isSynchronized())
-            return;
+    if (_synchronizer && ! _synchronizer->isSynchronized())
+        return;
     DrawContext *dc = dynamic_cast<DrawContext *>(dt);
     if (dc != NULL) {
         _dc = dc;
