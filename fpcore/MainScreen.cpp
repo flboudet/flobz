@@ -35,56 +35,56 @@ using namespace event_manager;
 #define MENU_Y 225
 
 MainScreen::MainScreen(StoryWidget *fgStory, StoryWidget *bgStory)
-    : Screen(0,0,WIDTH,HEIGHT), fgStory(fgStory), bgStory(bgStory),
-      transition(NULL), nextFullScreen(false)
+    : Screen(0,0,WIDTH,HEIGHT), _fgStory(fgStory), _bgStory(bgStory),
+      _transition(NULL), _nextFullScreen(false)
 {
-    if (bgStory != NULL)
-        add(bgStory);
-    add(&container);
-    if (fgStory != NULL) {
-        add(fgStory);
+    if (_bgStory != NULL)
+        add(_bgStory);
+    add(&_container);
+    if (_fgStory != NULL) {
+        add(_fgStory);
 	}
     setMenuDimensions();
-    container.addListener(*this);
-    container.setWhipSound(theCommander->getWhipSound());
-    container.setWhopSound(theCommander->getWhopSound());
+    _container.addListener(*this);
+    _container.setWhipSound(theCommander->getWhipSound());
+    _container.setWhopSound(theCommander->getWhopSound());
 }
 
 MainScreen::~MainScreen()
 {
-    if (transition != NULL) {
-        delete(transition);
+    if (_transition != NULL) {
+        delete(_transition);
     }
 }
 
 void MainScreen::pushMenu(MainScreenMenu *menu, bool fullScreen)
 {
-    menuStack.push_back(container.getContentWidget());
-    fullScreenStack.push_back(fullScreen);
-    nextFullScreen = fullScreen;
-    container.transitionToContent(menu);
-    if (fgStory != NULL)
-        fgStory->setIntegerValue("@inNetGameCenter", fullScreen ? 1 : 0);
+    _menuStack.push_back(_container.getContentWidget());
+    _fullScreenStack.push_back(fullScreen);
+    _nextFullScreen = fullScreen;
+    _container.transitionToContent(menu);
+    if (_fgStory != NULL)
+        _fgStory->setIntegerValue("@inNetGameCenter", fullScreen ? 1 : 0);
 }
 
 void MainScreen::popMenu()
 {
-    if (menuStack.size() == 1)
+    if (_menuStack.size() == 1)
         return;
-    fullScreenStack.pop_back();
-    nextFullScreen = fullScreenStack.back();
-    container.transitionToContent(menuStack.back());
-    menuStack.pop_back();
+    _fullScreenStack.pop_back();
+    _nextFullScreen = _fullScreenStack.back();
+    _container.transitionToContent(_menuStack.back());
+    _menuStack.pop_back();
 }
 
 void MainScreen::onTransitionFromScreen(Screen &fromScreen)
 {
-    if (transition != NULL) {
-        remove(transition);
-        delete(transition);
+    if (_transition != NULL) {
+        remove(_transition);
+        delete(_transition);
     }
-    transition = theCommander->createScreenTransition(fromScreen);
-    add(transition);
+    _transition = theCommander->createScreenTransition(fromScreen);
+    add(_transition);
     setMenuDimensions();
 }
 
@@ -114,29 +114,29 @@ void MainScreen::onSlideOutside(SliderContainer &slider)
 void MainScreen::setMenuDimensions()
 {
 	Vec3 menuPos;
-    if (nextFullScreen) {
+    if (_nextFullScreen) {
         menuPos.y = 0;
         menuPos.x = 0;
-        container.setPosition(menuPos);
-        container.setSize(Vec3(WIDTH, HEIGHT, 0));
-        container.setBackgroundVisible(false);
-        if (fgStory != NULL)
-            fgStory->setIntegerValue("@inNetGameCenter", 1);
+        _container.setPosition(menuPos);
+        _container.setSize(Vec3(WIDTH, HEIGHT, 0));
+        _container.setBackgroundVisible(false);
+        if (_fgStory != NULL)
+            _fgStory->setIntegerValue("@inNetGameCenter", 1);
     }
     else {
         menuPos.y = MENU_Y;
         menuPos.x = MENU_X;
-        container.setPosition(menuPos);
-        container.setSize(Vec3(400, 250, 0)); // TODO: mettre dimensions dans GSL
-        container.setBackgroundVisible(true);
-        if (fgStory != NULL)
-            fgStory->setIntegerValue("@inNetGameCenter", 0);
+        _container.setPosition(menuPos);
+        _container.setSize(Vec3(400, 250, 0)); // TODO: mettre dimensions dans GSL
+        _container.setBackgroundVisible(true);
+        if (_fgStory != NULL)
+            _fgStory->setIntegerValue("@inNetGameCenter", 0);
     }
 }
 
 MainScreenMenu::MainScreenMenu(MainScreen *mainScreen, GameLoop *loop)
   : Frame(theCommander->getWindowFramePicture(), loop),
-    mainScreen(mainScreen)
+    _mainScreen(mainScreen)
 {
     setPolicy(USE_MAX_SIZE);
 }
@@ -144,12 +144,12 @@ MainScreenMenu::MainScreenMenu(MainScreen *mainScreen, GameLoop *loop)
 
 void PushMainScreenMenuAction::action()
 {
-    mainScreen->pushMenu(menu, m_fullScreen);
+    _mainScreen->pushMenu(_menu, _fullScreen);
 }
 
 void PopMainScreenMenuAction::action()
 {
-    mainScreen->popMenu();
+    _mainScreen->popMenu();
 }
 
 

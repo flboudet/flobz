@@ -50,12 +50,12 @@ class MainScreen : public gameui::Screen, public gameui::SliderContainerListener
     virtual void onSlideOutside(SliderContainer &slider);
   protected:
     void setMenuDimensions();
-    SliderContainer container;
-    StoryWidget *fgStory, *bgStory;
-    std::vector<Widget*> menuStack;
-    std::vector<bool> fullScreenStack;
-    ScreenTransitionWidget *transition;
-    bool nextFullScreen;
+    SliderContainer _container;
+    StoryWidget *_fgStory, *_bgStory;
+    std::vector<Widget*> _menuStack;
+    std::vector<bool> _fullScreenStack;
+    ScreenTransitionWidget *_transition;
+    bool _nextFullScreen;
 };
 
 class MainScreenMenu : public gameui::Frame {
@@ -66,28 +66,28 @@ public:
     virtual void onMainScreenMenuPushed() {}
     virtual void onMainScreenMenuPoped() {}
 protected:
-    MainScreen *mainScreen;
+    MainScreen *_mainScreen;
 };
 
 class PushMainScreenMenuAction : public Action
 {
 public:
     PushMainScreenMenuAction(MainScreenMenu *menu, MainScreen *mainScreen, bool fullScreen = false)
-      : mainScreen(mainScreen), menu(menu), m_fullScreen(fullScreen) {}
+      : _mainScreen(mainScreen), _menu(menu), _fullScreen(fullScreen) {}
     void action();
 private:
-    MainScreen *mainScreen;
-    MainScreenMenu *menu;
-    bool m_fullScreen;
+    MainScreen *_mainScreen;
+    MainScreenMenu *_menu;
+    bool _fullScreen;
 };
 
 class PopMainScreenMenuAction : public Action
 {
 public:
-    PopMainScreenMenuAction(MainScreen *mainScreen) : mainScreen(mainScreen) {}
+    PopMainScreenMenuAction(MainScreen *mainScreen) : _mainScreen(mainScreen) {}
     void action();
 private:
-    MainScreen *mainScreen;
+    MainScreen *_mainScreen;
 };
 
 #endif // _MAIN_SCREEN_H_
