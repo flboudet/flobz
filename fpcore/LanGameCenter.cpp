@@ -214,7 +214,7 @@ void LanGameCenter::sendAliveMessage()
 
 void LanGameCenter::sendDisconnectMessage()
 {
-    for (int i = 0 ; i < networkInterfaces.size() ; i++) {
+    for (size_t i = 0 ; i < networkInterfaces.size() ; i++) {
         NetworkInterface &ifs = networkInterfaces[i];
         if (ifs.getAddress() == loopbackAddress)
             continue;
