@@ -32,13 +32,13 @@
 
 class GamePlayer {
 public:
-    GamePlayer(GameView &view) : targetView(view), attachedGame(view.getAttachedGame()) {}
+    GamePlayer(GameView &view) : _targetView(view), _attachedGame(view.getAttachedGame()) {}
     virtual void eventOccured(event_manager::GameControlEvent *event) {}
     virtual void cycle() {}
     virtual ~GamePlayer() {}
 protected:
-    GameView &targetView;
-    FloboGame *attachedGame;
+    GameView &_targetView;
+    FloboGame *_attachedGame;
 };
 
 class GameNullPlayer : public GamePlayer {
