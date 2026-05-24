@@ -337,20 +337,6 @@ InputSwitch *switchForEvent(SDL_Event *e)
       prevaxis = axisSave[e->jaxis.which][e->jaxis.axis];
       axisSave[e->jaxis.which][e->jaxis.axis] = e->jaxis.value;
 
-      // Find the dominant axis
-      int axis = -1;
-      int max = 0;
-      for (int i=0;i<16;++i) {
-          int v = abs(axisSave[e->jaxis.which][i]);
-          if (v > max) {
-              max = v;
-              axis = i;
-          }
-      }
-      // If the dominant axis is not the moved axis, do not send event
-      //if (e->jaxis.axis != axis)
-      //  return NULL;
-
       if ((e->jaxis.value > JOYSTICK_THRESHOLD) && (prevaxis <= JOYSTICK_THRESHOLD))
           return new JoystickAxisSwitch(e->jaxis.which, e->jaxis.axis, true, false);
       if ((e->jaxis.value <= JOYSTICK_THRESHOLD) && (prevaxis > JOYSTICK_THRESHOLD))

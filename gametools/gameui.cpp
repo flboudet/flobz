@@ -569,14 +569,7 @@ namespace gameui {
 
     void Box::handleMouseFocus(GameControlEvent *event)
     {
-        Vec3 ref(1.0f,2.0f,3.0f);
-        float axis = getSortingAxe(ref);
-        // If the box is a zbox, don't perform mouse management
-        //if (axis == 3.0f)
-        //     return;
-		//printf("Focus is in a box (axis=%d). y=%d sy=%d\n", (int)axis, (int)getPosition().y, (int)getSize().y);
-
-		// Find the widget beneath the cursor.
+        // Find the widget beneath the cursor.
 		Widget *focusedWidget = NULL;
 		for (int i = 0 ; i < this->getNumberOfChilds() ; i++) {
 			Widget *wid = this->getChild(i);

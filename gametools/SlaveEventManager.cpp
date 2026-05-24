@@ -42,8 +42,6 @@ void SlaveEventManager::pushMouseEvent(int x, int y, CursorEventType type)
     if (type == kGameMouseUp)
         newEvent.isUp = true;
     else newEvent.isUp = false;
-    newEvent.isJoystick;
-	newEvent.caught;
     newEvent.x = x; newEvent.y = y;
     newEvent.unicodeKeySym = 0;
     m_eventQueue.push_back(newEvent);

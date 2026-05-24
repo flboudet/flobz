@@ -333,7 +333,7 @@ void SDL13_IosSurface::putString(IosFont *font, int x, int y, const char *text, 
     releaseTexture();
     SDL13_IosFont *sFont = static_cast<SDL13_IosFont *>(font);
         vector<string> lines;
-    int num = SplitString(text, '\n', lines, true);
+    SplitString(text, '\n', lines, true);
     int skip = sFont->getLineSkip();
     for (vector<string>::iterator iter = lines.begin() ;
          iter != lines.end() ; iter++) {
@@ -613,7 +613,7 @@ void SDL13_DrawContext::putString(IosFont *font, int x, int y, const char *text,
 {
     SDL13_IosFont *sFont = static_cast<SDL13_IosFont *>(font);
     vector<string> lines;
-    int num = SplitString(text, '\n', lines, true);
+    SplitString(text, '\n', lines, true);
     int skip = sFont->getLineSkip();
     for (vector<string>::iterator iter = lines.begin() ;
          iter != lines.end() ; iter++) {
