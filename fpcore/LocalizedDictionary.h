@@ -35,7 +35,7 @@ using namespace ios_fc;
 class LocalizedDictionary {
 public:
     LocalizedDictionary(const DataPathManager &datapathManager, const std::string &dictionaryDirectory, const std::string &dictionaryName);
-    std::string getLocalizedString(const std::string &originalString,  bool copyIfNotThere = false);
+    const std::string &getLocalizedString(const std::string &originalString,  bool copyIfNotThere = false);
     ~LocalizedDictionary();
 private:
     typedef std::map<std::string, std::string> str_dictionnary;

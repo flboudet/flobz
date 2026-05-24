@@ -326,15 +326,15 @@ LocalizedDictionary::~LocalizedDictionary()
 {
 }
 
-std::string LocalizedDictionary::getLocalizedString(const std::string &originalString, bool copyIfNotThere)
+const std::string &LocalizedDictionary::getLocalizedString(const std::string &originalString, bool copyIfNotThere)
 {
     auto result = dictionary->find(originalString.c_str());
     if (result != dictionary->end()) {
-        return result->second.c_str();
+        return result->second;
     }
     else if (copyIfNotThere) {
         (*dictionary)[originalString] = originalString;
-        return (*dictionary)[originalString].c_str();
-	}
+        return (*dictionary)[originalString];
+    }
     return originalString;
 }
