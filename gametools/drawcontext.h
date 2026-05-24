@@ -5,6 +5,7 @@
 #include "rgba.h"
 #include <stdlib.h>
 #include <string>
+#include <cassert>
 
 enum ImageType {
 	IMAGE_RGBA = 1,
@@ -138,7 +139,7 @@ public:
     IosSurface() : m_enableExceptionOnDeletion(false) {}
     ~IosSurface() {
         if (m_enableExceptionOnDeletion)
-            throw std::runtime_error("IosSurface forbidden deletion");
+            assert(false && "IosSurface forbidden deletion");
     }
 public:
 	virtual bool isOpaque() const = 0;
