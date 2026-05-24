@@ -52,7 +52,7 @@ std::string PosixPreferencesManager::getStrPreference(const std::string &identif
     if (m_fileContent == NULL)
         return result;
     char tmp[256];
-    sprintf(tmp,"%s=", identifier);
+    sprintf(tmp,"%s=", identifier.c_str());
     tmplen = strlen(tmp);
     copiedfile = strdup(m_fileContent);
     if (copiedfile == NULL) return result;
@@ -100,7 +100,7 @@ void PosixPreferencesManager::setStrPreference(const std::string &identifier, co
           l += strlen(key)+1;
         }
     }
-    sprintf(prefs+l,"%s=%s\n", identifier.c_str(),value);
+    sprintf(prefs+l,"%s=%s\n", identifier.c_str(), value.c_str());
     free(m_fileContent);
     m_fileContent = prefs;
     // Finally try to store the file
