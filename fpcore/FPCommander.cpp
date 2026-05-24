@@ -37,29 +37,29 @@ void SinglePlayerGameAction::action()
 FPCommander::FPCommander(DataPathManager *dataPathManager,
                          PreferencesManager *preferencesManager,
                          Jukebox *jukebox)
-  : m_dataPathManager(dataPathManager),
-    m_preferencesManager(preferencesManager),
-    m_themeManager(new ThemeManagerImpl(*dataPathManager)),
-    m_surfaceFactory(*dataPathManager),
-    m_fontFactory(*dataPathManager),
-    m_soundFactory(*dataPathManager),
-    m_musicFactory(*dataPathManager),
-    m_floboSetThemeFactory(*m_themeManager),
-    m_levelThemeFactory(*m_themeManager),
-    m_achMgr(NULL),
-    m_jukebox(jukebox),
-    m_cursor(NULL)
+  : _dataPathManager(dataPathManager),
+    _preferencesManager(preferencesManager),
+    _themeManager(new ThemeManagerImpl(*dataPathManager)),
+    _surfaceFactory(*dataPathManager),
+    _fontFactory(*dataPathManager),
+    _soundFactory(*dataPathManager),
+    _musicFactory(*dataPathManager),
+    _floboSetThemeFactory(*_themeManager),
+    _levelThemeFactory(*_themeManager),
+    _achMgr(NULL),
+    _jukebox(jukebox),
+    _cursor(NULL)
 {
   GTLogTrace("++");
 #ifdef PRODUCE_CACHE_FILE
   cacheOutputGsl = fopen("cache.gsl", "w");
 #endif
-  loop = GameUIDefaults::GAME_LOOP;
+  _loop = GameUIDefaults::GAME_LOOP;
   theCommander = this;
 
   createResourceManagers();
   GTLogTrace("audioHelper");
-  m_audioHelper.reset(new AudioHelper());
+  _audioHelper.reset(new AudioHelper());
   GTLogTrace("--");
 }
 
@@ -67,13 +67,13 @@ void FPCommander::initWithGUI(bool fs)
 {
   GTLogTrace("FPCommander::initWithGUI() entered");
 
-  m_windowFramePicture = std::unique_ptr<FramePicture>(new FramePicture(25, 28, 25, 19, 26, 23));
-  m_buttonIdleFramePicture = std::unique_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
-  m_buttonDownFramePicture = std::unique_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
-  m_buttonOverFramePicture = std::unique_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
-  m_textFieldIdleFramePicture = std::unique_ptr<FramePicture>(new FramePicture(5, 23, 4, 6, 10, 3));
-  m_separatorFramePicture = std::unique_ptr<FramePicture>(new FramePicture(63, 2, 63, 2, 4, 2));
-  m_listFramePicture = std::unique_ptr<FramePicture>(new FramePicture(5, 23, 4, 6, 10, 3));
+  _windowFramePicture = std::unique_ptr<FramePicture>(new FramePicture(25, 28, 25, 19, 26, 23));
+  _buttonIdleFramePicture = std::unique_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
+  _buttonDownFramePicture = std::unique_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
+  _buttonOverFramePicture = std::unique_ptr<FramePicture>(new FramePicture(13, 10, 13, 12, 7, 13));
+  _textFieldIdleFramePicture = std::unique_ptr<FramePicture>(new FramePicture(5, 23, 4, 6, 10, 3));
+  _separatorFramePicture = std::unique_ptr<FramePicture>(new FramePicture(63, 2, 63, 2, 4, 2));
+  _listFramePicture = std::unique_ptr<FramePicture>(new FramePicture(5, 23, 4, 6, 10, 3));
 
   GTLogTrace("FPCommander::initWithGUI() init locales");
 
@@ -91,32 +91,32 @@ void FPCommander::initWithGUI(bool fs)
 
 
   // Loading the frame images, and setting up the frames
-  m_switchOnImage = getSurface(IMAGE_RGBA, "gfx/switch-on.png");
-  m_switchOffImage = getSurface(IMAGE_RGBA, "gfx/switch-off.png");
-  m_radioOnImage = getSurface(IMAGE_RGBA, "gfx/radio-on.png");
-  m_radioOffImage = getSurface(IMAGE_RGBA, "gfx/radio-off.png");
-  m_upArrow = getSurface(IMAGE_RGBA, "gfx/uparrow.png");
-  m_downArrow = getSurface(IMAGE_RGBA, "gfx/downarrow.png");
-  m_leftArrow = getSurface(IMAGE_RGBA, "gfx/leftarrow.png");
-  m_rightArrow = getSurface(IMAGE_RGBA, "gfx/rightarrow.png");
+  _switchOnImage = getSurface(IMAGE_RGBA, "gfx/switch-on.png");
+  _switchOffImage = getSurface(IMAGE_RGBA, "gfx/switch-off.png");
+  _radioOnImage = getSurface(IMAGE_RGBA, "gfx/radio-on.png");
+  _radioOffImage = getSurface(IMAGE_RGBA, "gfx/radio-off.png");
+  _upArrow = getSurface(IMAGE_RGBA, "gfx/uparrow.png");
+  _downArrow = getSurface(IMAGE_RGBA, "gfx/downarrow.png");
+  _leftArrow = getSurface(IMAGE_RGBA, "gfx/leftarrow.png");
+  _rightArrow = getSurface(IMAGE_RGBA, "gfx/rightarrow.png");
 
-  m_frameImage = getSurface(IMAGE_RGBA, "gfx/frame.png");
-  m_buttonIdleImage = getSurface(IMAGE_RGBA, "gfx/button.png");
-  m_buttonDownImage = getSurface(IMAGE_RGBA, "gfx/buttondown.png");
-  m_buttonOverImage = getSurface(IMAGE_RGBA, "gfx/buttonover.png");
-  m_textFieldIdleImage = getSurface(IMAGE_RGBA, "gfx/editfield.png");
-  m_separatorImage = getSurface(IMAGE_RGBA, "gfx/separator.png");
-  m_listIdleImage = getSurface(IMAGE_RGBA, "gfx/listborder.png");
+  _frameImage = getSurface(IMAGE_RGBA, "gfx/frame.png");
+  _buttonIdleImage = getSurface(IMAGE_RGBA, "gfx/button.png");
+  _buttonDownImage = getSurface(IMAGE_RGBA, "gfx/buttondown.png");
+  _buttonOverImage = getSurface(IMAGE_RGBA, "gfx/buttonover.png");
+  _textFieldIdleImage = getSurface(IMAGE_RGBA, "gfx/editfield.png");
+  _separatorImage = getSurface(IMAGE_RGBA, "gfx/separator.png");
+  _listIdleImage = getSurface(IMAGE_RGBA, "gfx/listborder.png");
 
   GTLogTrace("FPCommander::initWithGUI() configuring frames");
 
-  m_windowFramePicture->setFrameSurface(m_frameImage);
-  m_buttonIdleFramePicture->setFrameSurface(m_buttonIdleImage);
-  m_buttonDownFramePicture->setFrameSurface(m_buttonDownImage);
-  m_buttonOverFramePicture->setFrameSurface(m_buttonOverImage);
-  m_textFieldIdleFramePicture->setFrameSurface(m_textFieldIdleImage);
-  m_separatorFramePicture->setFrameSurface(m_separatorImage);
-  m_listFramePicture->setFrameSurface(m_listIdleImage);
+  _windowFramePicture->setFrameSurface(_frameImage);
+  _buttonIdleFramePicture->setFrameSurface(_buttonIdleImage);
+  _buttonDownFramePicture->setFrameSurface(_buttonDownImage);
+  _buttonOverFramePicture->setFrameSurface(_buttonOverImage);
+  _textFieldIdleFramePicture->setFrameSurface(_textFieldIdleImage);
+  _separatorFramePicture->setFrameSurface(_separatorImage);
+  _listFramePicture->setFrameSurface(_listIdleImage);
   GTLogTrace("FPCommander::initWithGUI() completed");
 
 }
@@ -136,22 +136,22 @@ extern char *dataFolder;
 /* Initialise the default dictionnary */
 void FPCommander::initLocale()
 {
-  locale = new LocalizedDictionary(*m_dataPathManager, "locale", "main");
+  _locale = new LocalizedDictionary(*_dataPathManager, "locale", "main");
 }
 
 /* Global translator */
 std::string FPCommander::getLocalizedString(const std::string & originalString) const
 {
-  return locale->getLocalizedString(originalString.c_str());
+  return _locale->getLocalizedString(originalString.c_str());
 }
 
 /* Initialize the audio if necessary */
 void FPCommander::initAudio()
 {
-    m_slideSound = getSound(FilePath("sfx").combine("slide.wav"));
-    m_whipSound = getSound(FilePath("sfx").combine("whip.wav"));
-    m_whopSound = getSound(FilePath("sfx").combine("whop.wav"));
-    GameUIDefaults::SLIDE_SOUND = m_slideSound;
+    _slideSound = getSound(FilePath("sfx").combine("slide.wav"));
+    _whipSound = getSound(FilePath("sfx").combine("whip.wav"));
+    _whopSound = getSound(FilePath("sfx").combine("whop.wav"));
+    GameUIDefaults::SLIDE_SOUND = _slideSound;
 }
 
 
@@ -160,8 +160,8 @@ void FPCommander::initFonts()
 {
     Locales_Init(); // Make sure locales are detected.
     std::string fontName, funnyFontName;
-    fontName = locale->getLocalizedString("__FONT__");
-    m_localizedFontName = fontName;
+    fontName = _locale->getLocalizedString("__FONT__");
+    _localizedFontName = fontName;
     funnyFontName = "gfx/zill_spills.ttf";
     /*try {
      font = dataPathManager.getPath(locale->getLocalizedString("__FONT__"));
@@ -173,20 +173,20 @@ void FPCommander::initFonts()
      }
      funny_path = getDataPathManager().getPath("gfx/zill_spills.ttf");*/
 
-    m_darkFont = getFont(fontName, 17);
-    m_menuFont = getFont(fontName, 17);
-    m_smallFont = getFont(fontName, 12);
-    m_smallFontInfo = getFont(fontName, 12);
-    m_textFont = getFont(fontName, 17);
-    m_funnyFont = getFont(funnyFontName, 24);
+    _darkFont = getFont(fontName, 17);
+    _menuFont = getFont(fontName, 17);
+    _smallFont = getFont(fontName, 12);
+    _smallFontInfo = getFont(fontName, 12);
+    _textFont = getFont(fontName, 17);
+    _funnyFont = getFont(funnyFontName, 24);
     storyFont = getFont(fontName, 17);
 
-    GameUIDefaults::FONT              = m_menuFont;
-    GameUIDefaults::FONT_TEXT         = m_textFont;
-    GameUIDefaults::FONT_INACTIVE     = m_darkFont;
-    GameUIDefaults::FONT_SMALL_INFO   = m_smallFontInfo;
-    GameUIDefaults::FONT_SMALL_ACTIVE = m_smallFont;
-    GameUIDefaults::FONT_FUNNY        = m_funnyFont;
+    GameUIDefaults::FONT              = _menuFont;
+    GameUIDefaults::FONT_TEXT         = _textFont;
+    GameUIDefaults::FONT_INACTIVE     = _darkFont;
+    GameUIDefaults::FONT_SMALL_INFO   = _smallFontInfo;
+    GameUIDefaults::FONT_SMALL_ACTIVE = _smallFont;
+    GameUIDefaults::FONT_FUNNY        = _funnyFont;
     GameUIDefaults::FONT_COLOR = RGBA(0xff, 0xf9, 0xa6, 0xff);
     GameUIDefaults::FONT_INACTIVE_COLOR = RGBA(0xad, 0xa1, 0x50, 0xff);
 }
@@ -220,53 +220,53 @@ ScreenTransitionWidget *FPCommander::createScreenTransition(Screen &fromScreen) 
 // Resource management
 void FPCommander::cacheSurface(ImageType type, const std::string &path, ImageSpecialAbility specialAbility)
 {
-    m_surfaceResManager->cacheResource(IosSurfaceResourceKey(type, path, specialAbility));
+    _surfaceResManager->cacheResource(IosSurfaceResourceKey(type, path, specialAbility));
 }
 
 IosSurfaceRef FPCommander::getSurface(ImageType type, const std::string &path, ImageSpecialAbility specialAbility)
 {
-    return m_surfaceResManager->getResource(IosSurfaceResourceKey(type, path, specialAbility));
+    return _surfaceResManager->getResource(IosSurfaceResourceKey(type, path, specialAbility));
 }
 
 IosSurfaceRef FPCommander::getSurface(ImageType type, const std::string &path, const ImageOperationList &list)
 {
     ImageSpecialAbility specialAbility = GameUIDefaults::GAME_LOOP->getDrawContext()->guessRequiredImageAbility(list);
-    return m_surfaceResManager->getResource(IosSurfaceResourceKey(type, path, specialAbility));
+    return _surfaceResManager->getResource(IosSurfaceResourceKey(type, path, specialAbility));
 }
 
 void FPCommander::cacheFont(const std::string &path, int size)
 {
-    m_fontResManager->cacheResource(IosFontResourceKey(path, size));
+    _fontResManager->cacheResource(IosFontResourceKey(path, size));
 }
 
 IosFontRef FPCommander::getFont(const std::string &path, int size)
 {
-    return m_fontResManager->getResource(IosFontResourceKey(path, size));
+    return _fontResManager->getResource(IosFontResourceKey(path, size));
 }
 
 void FPCommander::cacheSound(const std::string &path)
 {
-    m_soundResManager->cacheResource(path);
+    _soundResManager->cacheResource(path);
 }
 
 SoundRef FPCommander::getSound(const std::string &path)
 {
-    return m_soundResManager->getResource(path);
+    return _soundResManager->getResource(path);
 }
 
 void FPCommander::cacheMusic(const std::string &path)
 {
-    m_musicResManager->cacheResource(path);
+    _musicResManager->cacheResource(path);
 }
 
 MusicRef FPCommander::getMusic(const std::string &path)
 {
-    return m_musicResManager->getResource(path);
+    return _musicResManager->getResource(path);
 }
 
 FloboSetThemeRef FPCommander::getFloboSetTheme(const std::string &name)
 {
-    return m_floboSetThemeResManager->getResource(name);
+    return _floboSetThemeResManager->getResource(name);
 }
 
 FloboSetThemeRef FPCommander::getPreferedFloboSetTheme()
@@ -276,34 +276,34 @@ FloboSetThemeRef FPCommander::getPreferedFloboSetTheme()
 
 const std::string &FPCommander::getPreferedFloboSetThemeName() const
 {
-    if (m_defaultFloboSetThemeName == "") {
-        m_defaultFloboSetThemeName = m_preferencesManager->getStrPreference ("floboset_theme", getDefaultFloboSetThemeName().c_str());
+    if (_defaultFloboSetThemeName == "") {
+        _defaultFloboSetThemeName = _preferencesManager->getStrPreference ("floboset_theme", getDefaultFloboSetThemeName().c_str());
     }
-    return m_defaultFloboSetThemeName;
+    return _defaultFloboSetThemeName;
 }
 
 const std::string FPCommander::getDefaultFloboSetThemeName() const
 {
     // TODO: provide a way to set the default theme in the data
-    //return m_themeManager->getFloboSetThemeList()[0];
-    return m_themeManager->getFloboSetThemeList()[m_themeManager->getFloboSetThemeList().size() - 1];
+    //return _themeManager->getFloboSetThemeList()[0];
+    return _themeManager->getFloboSetThemeList()[_themeManager->getFloboSetThemeList().size() - 1];
 }
 
 
 void FPCommander::setPreferedFloboSetThemeName(const std::string &name)
 {
-    m_defaultFloboSetThemeName = name;
-    m_preferencesManager->setStrPreference ("floboset_theme", name.c_str());
+    _defaultFloboSetThemeName = name;
+    _preferencesManager->setStrPreference ("floboset_theme", name.c_str());
 }
 
 const std::vector<std::string> &FPCommander::getFloboSetThemeList() const
 {
-    return m_themeManager->getFloboSetThemeList();
+    return _themeManager->getFloboSetThemeList();
 }
 
 LevelThemeRef FPCommander::getLevelTheme(const std::string &name)
 {
-    return m_levelThemeResManager->getResource(name);
+    return _levelThemeResManager->getResource(name);
 }
 
 LevelThemeRef FPCommander::getPreferedLevelTheme(int nbPlayers)
@@ -315,13 +315,13 @@ const std::string FPCommander::getPreferedLevelThemeName(int nbPlayers) const
 {
     ostringstream osstream;
     osstream << "level_theme_" << nbPlayers;
-    std::string result = m_preferencesManager->getStrPreference(osstream.str().c_str(), getDefaultLevelThemeName(nbPlayers).c_str());
+    std::string result = _preferencesManager->getStrPreference(osstream.str().c_str(), getDefaultLevelThemeName(nbPlayers).c_str());
     return result;
 }
 
 const std::string FPCommander::getDefaultLevelThemeName(int nbPlayers) const
 {
-    std::vector<std::string> result = m_themeManager->getLevelThemeList(nbPlayers);
+    std::vector<std::string> result = _themeManager->getLevelThemeList(nbPlayers);
     if (result.size() == 0)
         return "";
     return result[0];
@@ -331,63 +331,63 @@ void FPCommander::setPreferedLevelThemeName(const std::string &name, int nbPlaye
 {
     ostringstream osstream;
     osstream << "level_theme_" << nbPlayers;
-    m_preferencesManager->setStrPreference (osstream.str().c_str(), name.c_str());
+    _preferencesManager->setStrPreference (osstream.str().c_str(), name.c_str());
 }
 
 std::vector<std::string> FPCommander::getLevelThemeList(int nbPlayers) const
 {
-    return m_themeManager->getLevelThemeList(nbPlayers);
+    return _themeManager->getLevelThemeList(nbPlayers);
 }
 
 void FPCommander::freeUnusedResources()
 {
-    m_surfaceResManager->freeUnusedResources();
-    //m_fontResManager->freeUnusedResources();
-    m_soundResManager->freeUnusedResources();
-    //m_musicResManager->freeUnusedResources();
+    _surfaceResManager->freeUnusedResources();
+    //_fontResManager->freeUnusedResources();
+    _soundResManager->freeUnusedResources();
+    //_musicResManager->freeUnusedResources();
 }
 
 void FPCommander::registerCursor(AbstractCursor *cursor)
 {
-    m_cursor = cursor;
+    _cursor = cursor;
 }
 
 void FPCommander::setCursorVisible(bool visible)
 {
-    if (m_cursor != NULL)
-        m_cursor->setVisible(visible);
+    if (_cursor != NULL)
+        _cursor->setVisible(visible);
 }
 
 void FPCommander::createResourceManagers()
 {
     GTLogTrace("++");
 #ifdef THREADED_RESOURCE_MANAGER
-    m_surfaceResManager.reset(new ThreadedResourceManager<IosSurface, IosSurfaceResourceKey>(m_surfaceFactory));
-    m_fontResManager.reset(new ThreadedResourceManager<IosFont, IosFontResourceKey>(m_fontFactory));
-    m_soundResManager.reset(new ThreadedResourceManager<audio_manager::Sound>(m_soundFactory));
-    m_musicResManager.reset(new ThreadedResourceManager<audio_manager::Music>(m_musicFactory));
+    _surfaceResManager.reset(new ThreadedResourceManager<IosSurface, IosSurfaceResourceKey>(_surfaceFactory));
+    _fontResManager.reset(new ThreadedResourceManager<IosFont, IosFontResourceKey>(_fontFactory));
+    _soundResManager.reset(new ThreadedResourceManager<audio_manager::Sound>(_soundFactory));
+    _musicResManager.reset(new ThreadedResourceManager<audio_manager::Music>(_musicFactory));
 #else
-    m_surfaceResManager.reset(new SimpleResourceManager<IosSurface, IosSurfaceResourceKey>(m_surfaceFactory));
-    m_fontResManager.reset(new SimpleResourceManager<IosFont, IosFontResourceKey>(m_fontFactory));
-    m_soundResManager.reset(new SimpleResourceManager<audio_manager::Sound>(m_soundFactory));
-    m_musicResManager.reset(new SimpleResourceManager<audio_manager::Music>(m_musicFactory));
-    m_floboSetThemeResManager.reset(new SimpleResourceManager<FloboSetTheme>(m_floboSetThemeFactory));
-    m_levelThemeResManager.reset(new SimpleResourceManager<LevelTheme>(m_levelThemeFactory));
+    _surfaceResManager.reset(new SimpleResourceManager<IosSurface, IosSurfaceResourceKey>(_surfaceFactory));
+    _fontResManager.reset(new SimpleResourceManager<IosFont, IosFontResourceKey>(_fontFactory));
+    _soundResManager.reset(new SimpleResourceManager<audio_manager::Sound>(_soundFactory));
+    _musicResManager.reset(new SimpleResourceManager<audio_manager::Music>(_musicFactory));
+    _floboSetThemeResManager.reset(new SimpleResourceManager<FloboSetTheme>(_floboSetThemeFactory));
+    _levelThemeResManager.reset(new SimpleResourceManager<LevelTheme>(_levelThemeFactory));
 #endif
     GTLogTrace("--");
 }
 
 void FPCommander::playMusicTrack(const std::string &trackName)
 {
-    m_jukebox->playTrack(trackName);
+    _jukebox->playTrack(trackName);
 }
 
 void FPCommander::playMusicTrack()
 {
-    m_jukebox->playTrack();
+    _jukebox->playTrack();
 }
 
 void FPCommander::playSound(const std::string &sName, float volume, float balance)
 {
-    m_audioHelper->playSound(sName, volume, balance);
+    _audioHelper->playSound(sName, volume, balance);
 }

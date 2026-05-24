@@ -24,12 +24,12 @@ public:
     enum UIState {
 		IN_GAME, IN_MENU
 	};
-	FPApplicationState() : ui(IN_MENU), difficulty(0), level(0), playerScore(0) {}
+	FPApplicationState() : _ui(IN_MENU), _difficulty(0), _level(0), _playerScore(0) {}
 
-	UIState ui;
-	int difficulty;
-	int level;
-	int playerScore;
+	UIState _ui;
+	int _difficulty;
+	int _level;
+	int _playerScore;
 };
 
 class FPCommander
@@ -80,41 +80,41 @@ class FPCommander
     void freeUnusedResources();
 
     // Data path management
-    const DataPathManager &getDataPathManager() { return *m_dataPathManager; }
+    const DataPathManager &getDataPathManager() { return *_dataPathManager; }
     std::string getLocalizedString(const std::string & originalString) const;
     // Preferences management
-    PreferencesManager *getPreferencesManager() const { return m_preferencesManager; }
+    PreferencesManager *getPreferencesManager() const { return _preferencesManager; }
     // Achievements management
-    virtual AchievementsManager *getAchievementsManager() const { return m_achMgr; }
-    void setAchievementsManager(AchievementsManager *achMgr) { m_achMgr = achMgr; }
+    virtual AchievementsManager *getAchievementsManager() const { return _achMgr; }
+    void setAchievementsManager(AchievementsManager *achMgr) { _achMgr = achMgr; }
     // Common resources accessor
-    const FramePicture *getWindowFramePicture() const { return m_windowFramePicture.get(); }
-    const FramePicture *getButtonFramePicture() const { return m_buttonIdleFramePicture.get(); }
-    const FramePicture *getButtonDownFramePicture() const { return m_buttonDownFramePicture.get(); }
-    const FramePicture *getButtonOverFramePicture() const { return m_buttonOverFramePicture.get(); }
-    const FramePicture *getEditFieldFramePicture() const { return m_textFieldIdleFramePicture.get(); }
-    const FramePicture *getEditFieldOverFramePicture() const { return m_textFieldIdleFramePicture.get(); }
-    const FramePicture *getSeparatorFramePicture() const { return m_separatorFramePicture.get(); }
-    const FramePicture *getListFramePicture() const { return m_listFramePicture.get(); }
-    IosSurface * getSwitchOnPicture() { return m_switchOnImage; }
-    IosSurface * getSwitchOffPicture() { return m_switchOffImage; }
-    IosSurface * getRadioOnPicture() { return m_radioOnImage; }
-    IosSurface * getRadioOffPicture() { return m_radioOffImage; }
-    IosSurface * getUpArrow() { return m_upArrow; }
-    IosSurface * getDownArrow() { return m_downArrow; }
-    IosSurface * getLeftArrow() { return m_leftArrow; }
-    IosSurface * getRightArrow() { return m_rightArrow; }
-    audio_manager::Sound * getWhipSound() const { return m_whipSound; }
-    audio_manager::Sound * getWhopSound() const { return m_whopSound; }
-    const std::string &getLocalizedFontName() const { return m_localizedFontName; }
+    const FramePicture *getWindowFramePicture() const { return _windowFramePicture.get(); }
+    const FramePicture *getButtonFramePicture() const { return _buttonIdleFramePicture.get(); }
+    const FramePicture *getButtonDownFramePicture() const { return _buttonDownFramePicture.get(); }
+    const FramePicture *getButtonOverFramePicture() const { return _buttonOverFramePicture.get(); }
+    const FramePicture *getEditFieldFramePicture() const { return _textFieldIdleFramePicture.get(); }
+    const FramePicture *getEditFieldOverFramePicture() const { return _textFieldIdleFramePicture.get(); }
+    const FramePicture *getSeparatorFramePicture() const { return _separatorFramePicture.get(); }
+    const FramePicture *getListFramePicture() const { return _listFramePicture.get(); }
+    IosSurface * getSwitchOnPicture() { return _switchOnImage; }
+    IosSurface * getSwitchOffPicture() { return _switchOffImage; }
+    IosSurface * getRadioOnPicture() { return _radioOnImage; }
+    IosSurface * getRadioOffPicture() { return _radioOffImage; }
+    IosSurface * getUpArrow() { return _upArrow; }
+    IosSurface * getDownArrow() { return _downArrow; }
+    IosSurface * getLeftArrow() { return _leftArrow; }
+    IosSurface * getRightArrow() { return _rightArrow; }
+    audio_manager::Sound * getWhipSound() const { return _whipSound; }
+    audio_manager::Sound * getWhopSound() const { return _whopSound; }
+    const std::string &getLocalizedFontName() const { return _localizedFontName; }
 
     void playMusicTrack(const std::string &trackName);
     void playMusicTrack();
     void playSound(const std::string &sName, float volume = 1.0, float balance = 0.0f);
 
 	// Application state
-	const FPApplicationState &appState() const { return m_appState; }
-	FPApplicationState &appState() { return m_appState; }
+	const FPApplicationState &appState() const { return _appState; }
+	FPApplicationState &appState() { return _appState; }
 
   protected:
     // Resource manager factory
@@ -124,25 +124,25 @@ class FPCommander
     // Theme initialisation function
     virtual void initThemes();
     // Data path management
-    DataPathManager *m_dataPathManager;
-    PreferencesManager *m_preferencesManager;
+    DataPathManager *_dataPathManager;
+    PreferencesManager *_preferencesManager;
     // Resource Managers
-    std::unique_ptr<ThemeManager> m_themeManager;
-    IosSurfaceFactory m_surfaceFactory;
-    std::unique_ptr<IosSurfaceResourceManager> m_surfaceResManager;
-    IosFontFactory m_fontFactory;
-    std::unique_ptr<IosFontResourceManager> m_fontResManager;
-    SoundFactory m_soundFactory;
-    std::unique_ptr<SoundResourceManager> m_soundResManager;
-    MusicFactory m_musicFactory;
-    std::unique_ptr<MusicResourceManager> m_musicResManager;
-    FloboSetThemeFactory m_floboSetThemeFactory;
-    std::unique_ptr<FloboSetThemeResourceManager> m_floboSetThemeResManager;
-    LevelThemeFactory m_levelThemeFactory;
-    std::unique_ptr<LevelThemeResourceManager> m_levelThemeResManager;
+    std::unique_ptr<ThemeManager> _themeManager;
+    IosSurfaceFactory _surfaceFactory;
+    std::unique_ptr<IosSurfaceResourceManager> _surfaceResManager;
+    IosFontFactory _fontFactory;
+    std::unique_ptr<IosFontResourceManager> _fontResManager;
+    SoundFactory _soundFactory;
+    std::unique_ptr<SoundResourceManager> _soundResManager;
+    MusicFactory _musicFactory;
+    std::unique_ptr<MusicResourceManager> _musicResManager;
+    FloboSetThemeFactory _floboSetThemeFactory;
+    std::unique_ptr<FloboSetThemeResourceManager> _floboSetThemeResManager;
+    LevelThemeFactory _levelThemeFactory;
+    std::unique_ptr<LevelThemeResourceManager> _levelThemeResManager;
     // Localization management
-    LocalizedDictionary * locale;
-    AchievementsManager *m_achMgr;
+    LocalizedDictionary * _locale;
+    AchievementsManager *_achMgr;
   private:
 
     friend class SinglePlayerGameAction;
@@ -153,42 +153,42 @@ class FPCommander
     void initLocale();
     void initAudio();
 
-    GameLoop   *loop;
-    unique_ptr<AudioHelper> m_audioHelper;
-    Jukebox *m_jukebox;
+    GameLoop   *_loop;
+    unique_ptr<AudioHelper> _audioHelper;
+    Jukebox *_jukebox;
 protected:
-    IosSurfaceRef m_frameImage;
-    IosSurfaceRef m_buttonIdleImage, m_buttonDownImage, m_buttonOverImage;
-    IosSurfaceRef m_textFieldIdleImage;
-    IosSurfaceRef m_separatorImage;
-    IosSurfaceRef m_listIdleImage;
-    IosSurfaceRef m_switchOnImage, m_switchOffImage;
-    IosSurfaceRef m_radioOnImage, m_radioOffImage;
-    IosSurfaceRef m_upArrow, m_downArrow, m_leftArrow, m_rightArrow;
-    std::unique_ptr<FramePicture> m_windowFramePicture;
-    std::unique_ptr<FramePicture> m_buttonIdleFramePicture;
-    std::unique_ptr<FramePicture> m_buttonDownFramePicture;
-    std::unique_ptr<FramePicture> m_buttonOverFramePicture;
-    std::unique_ptr<FramePicture> m_textFieldIdleFramePicture;
-    std::unique_ptr<FramePicture> m_separatorFramePicture;
-    std::unique_ptr<FramePicture> m_listFramePicture;
+    IosSurfaceRef _frameImage;
+    IosSurfaceRef _buttonIdleImage, _buttonDownImage, _buttonOverImage;
+    IosSurfaceRef _textFieldIdleImage;
+    IosSurfaceRef _separatorImage;
+    IosSurfaceRef _listIdleImage;
+    IosSurfaceRef _switchOnImage, _switchOffImage;
+    IosSurfaceRef _radioOnImage, _radioOffImage;
+    IosSurfaceRef _upArrow, _downArrow, _leftArrow, _rightArrow;
+    std::unique_ptr<FramePicture> _windowFramePicture;
+    std::unique_ptr<FramePicture> _buttonIdleFramePicture;
+    std::unique_ptr<FramePicture> _buttonDownFramePicture;
+    std::unique_ptr<FramePicture> _buttonOverFramePicture;
+    std::unique_ptr<FramePicture> _textFieldIdleFramePicture;
+    std::unique_ptr<FramePicture> _separatorFramePicture;
+    std::unique_ptr<FramePicture> _listFramePicture;
 
-    std::string m_localizedFontName;
-    IosFontRef m_darkFont;
-    IosFontRef m_menuFont;
-    IosFontRef m_smallFont;
-    IosFontRef m_smallFontInfo;
-    IosFontRef m_textFont;
-    IosFontRef m_funnyFont;
+    std::string _localizedFontName;
+    IosFontRef _darkFont;
+    IosFontRef _menuFont;
+    IosFontRef _smallFont;
+    IosFontRef _smallFontInfo;
+    IosFontRef _textFont;
+    IosFontRef _funnyFont;
 
-    SoundRef m_slideSound;
-    SoundRef m_whipSound;
-    SoundRef m_whopSound;
+    SoundRef _slideSound;
+    SoundRef _whipSound;
+    SoundRef _whopSound;
 
-    AbstractCursor *m_cursor;
-	FPApplicationState m_appState;
+    AbstractCursor *_cursor;
+	FPApplicationState _appState;
 
-    mutable std::string m_defaultFloboSetThemeName;
+    mutable std::string _defaultFloboSetThemeName;
 };
 
 extern class FPCommander *theCommander;
