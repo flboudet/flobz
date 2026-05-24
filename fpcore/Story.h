@@ -41,10 +41,10 @@ using namespace gameui;
 class StyroImage
 {
 public:
-    std::string path;
-    IosSurfaceRef surfaceRef;
-    IosSurface   *surface;
-    IosSurface   *alphaSurface[10];
+    std::string _path;
+    IosSurfaceRef _surfaceRef;
+    IosSurface   *_surface;
+    IosSurface   *_alphaSurface[10];
     StyroImage(StyrolyseClient *_this,
                const std::string &path, bool removePrefix=false);
 };
@@ -67,7 +67,7 @@ public:
     void freeMemory();
 
     void render(DrawTarget *dt);
-    void setRenderEnabled(bool enabled=true) { m_renderEnabled = enabled; }
+    void setRenderEnabled(bool enabled=true) { _renderEnabled = enabled; }
 
     struct StoryStyrolyseClient {
         StyrolyseClient styroClient;
@@ -77,16 +77,16 @@ public:
 protected:
 
     /* dictionnary for locale translations */
-    LocalizedDictionary *localeDictionary;
-    Styrolyse *currentStory;
-    Action *finishedAction;
-    bool once;
-    static bool classInitialized;
-    StoryStyrolyseClient client;
-    double last_time;
-    bool fxMode;
-    std::string fullPath;
-    bool m_renderEnabled;
+    LocalizedDictionary *_localeDictionary;
+    Styrolyse *_currentStory;
+    Action *_finishedAction;
+    bool _once;
+    static bool _classInitialized;
+    StoryStyrolyseClient _client;
+    double _last_time;
+    bool _fxMode;
+    std::string _fullPath;
+    bool _renderEnabled;
 };
 
 class VisualFX : public StoryWidget {
@@ -97,11 +97,11 @@ public:
     bool supportFX(const char *str) const;
     VisualFX *clone() const;
 
-    void setGameScreen(GameScreen *screen) { this->screen = screen; }
-    GameScreen *getGameScreen() const { return screen; }
+    void setGameScreen(GameScreen *screen) { this->_screen = screen; }
+    GameScreen *getGameScreen() const { return _screen; }
 private:
-    std::string fxName;
-    GameScreen *screen;
+    std::string _fxName;
+    GameScreen *_screen;
 };
 
 class StoryScreen : public Screen {
@@ -115,13 +115,13 @@ public:
      * @param visible  true if the scren is visible, otherwise false
      */
     virtual void onScreenVisibleChanged(bool visible);
-    const StoryWidget * getStoryWidget() const { return &storyWidget; }
-    StoryWidget * getStoryWidget() { return &storyWidget; }
+    const StoryWidget * getStoryWidget() const { return &_storyWidget; }
+    StoryWidget * getStoryWidget() { return &_storyWidget; }
 protected:
-    StoryWidget storyWidget;
-    ScreenTransitionWidget *transitionWidget;
+    StoryWidget _storyWidget;
+    ScreenTransitionWidget *_transitionWidget;
 private:
-    Action *finishedAction;
+    Action *_finishedAction;
 };
 
 #endif

@@ -47,18 +47,18 @@ void GameOverScreen::setScoreBoard(HiScoreBoard *scoreBoard)
 void GameOverScreen::refresh()
 {
     Vec3 titlePos = m_titleBox.getPosition();
-    titlePos.x = storyWidget.getIntegerValue("@hiScoreTopBox.x");
-    titlePos.y = storyWidget.getIntegerValue("@hiScoreTopBox.y");
+    titlePos.x = _storyWidget.getIntegerValue("@hiScoreTopBox.x");
+    titlePos.y = _storyWidget.getIntegerValue("@hiScoreTopBox.y");
     m_titleBox.setPosition(titlePos);
-    m_titleBox.setSize(Vec3(storyWidget.getIntegerValue("@hiScoreTopBox.w"),
-                            storyWidget.getIntegerValue("@hiScoreTopBox.h"), 0));
+    m_titleBox.setSize(Vec3(_storyWidget.getIntegerValue("@hiScoreTopBox.w"),
+                            _storyWidget.getIntegerValue("@hiScoreTopBox.h"), 0));
     Vec3 hiScorePos = m_hiScoreBox.getPosition();
-    hiScorePos.x = storyWidget.getIntegerValue("@hiScoreBox.x");
-    hiScorePos.y = storyWidget.getIntegerValue("@hiScoreBox.y");
+    hiScorePos.x = _storyWidget.getIntegerValue("@hiScoreBox.x");
+    hiScorePos.y = _storyWidget.getIntegerValue("@hiScoreBox.y");
     m_hiScoreBox.setPosition(hiScorePos);
 
-    m_hiScoreBox.setSize(Vec3(storyWidget.getIntegerValue("@hiScoreBox.w"),
-                              storyWidget.getIntegerValue("@hiScoreBox.h"), 0));
+    m_hiScoreBox.setSize(Vec3(_storyWidget.getIntegerValue("@hiScoreBox.w"),
+                              _storyWidget.getIntegerValue("@hiScoreBox.h"), 0));
 }
 
 void GameOverScreen::setFinalScore(const char *playerName, int points)

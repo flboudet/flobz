@@ -112,21 +112,21 @@ void StyrolysePainterClient::styro_drawImage(StyrolyseClient *_this,
     IosRect  rect, cliprect;
     rect.x = x;
     rect.y = y;
-    rect.h = surf->surface->h;
-    rect.w = surf->surface->w;
+    rect.h = surf->_surface->h;
+    rect.w = surf->_surface->w;
     cliprect.x = clipx;
     cliprect.y = clipy;
     cliprect.w = clipw;
     cliprect.h = cliph;
     ((ExtendedClient *)_this)->m_painter->setClipRect(&cliprect);
     if (flipped)
-		((ExtendedClient *)_this)->m_painter->drawHFlipped(surf->surface, NULL, &rect);
+		((ExtendedClient *)_this)->m_painter->drawHFlipped(surf->_surface, NULL, &rect);
     else {
         if (fabs(scaleX - 1.0f) > 0.001f) {
             rect.w *= scaleX;
             rect.h *= scaleY;
         }
-        ((ExtendedClient *)_this)->m_painter->draw(surf->surface, NULL, &rect);
+        ((ExtendedClient *)_this)->m_painter->draw(surf->_surface, NULL, &rect);
     }
 }
 
