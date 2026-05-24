@@ -61,45 +61,45 @@ static int readFileFunction(StyrolyseClient *_this, void *buffer, void *file, in
 StyrolysePainterClient::StyrolysePainterClient(LevelTheme *theme)
 {
     // Initializing the styrolyse client
-    m_client.m_styroClient.loadImage = styro_loadImage;
-    m_client.m_styroClient.drawImage = styro_drawImage;
-    m_client.m_styroClient.freeImage = styro_freeImage;
-    m_client.m_styroClient.putText   = NULL;
-    m_client.m_styroClient.getText   = NULL;
-    m_client.m_styroClient.music = NULL;
-    m_client.m_styroClient.playSound = NULL;
-    m_client.m_styroClient.resolveFilePath = NULL;
-    m_client.m_styroClient.openFile = openFileFunction;
-    m_client.m_styroClient.closeFile = closeFileFunction;
-    m_client.m_styroClient.readFile = readFileFunction;
-    m_client.m_painter = NULL;
-    m_client.m_theme = theme;
+    _client._styroClient.loadImage = styro_loadImage;
+    _client._styroClient.drawImage = styro_drawImage;
+    _client._styroClient.freeImage = styro_freeImage;
+    _client._styroClient.putText   = NULL;
+    _client._styroClient.getText   = NULL;
+    _client._styroClient.music = NULL;
+    _client._styroClient.playSound = NULL;
+    _client._styroClient.resolveFilePath = NULL;
+    _client._styroClient.openFile = openFileFunction;
+    _client._styroClient.closeFile = closeFileFunction;
+    _client._styroClient.readFile = readFileFunction;
+    _client._painter = NULL;
+    _client._theme = theme;
     // Initialize the animation
-    m_animation = styrolyse_new(theme->getForegroundAnimation().c_str(),
-                                &(m_client.m_styroClient), false);
+    _animation = styrolyse_new(theme->getForegroundAnimation().c_str(),
+                                &(_client._styroClient), false);
 }
 
 StyrolysePainterClient::~StyrolysePainterClient()
 {
-    styrolyse_free(m_animation);
+    styrolyse_free(_animation);
 }
 
 void StyrolysePainterClient::update()
 {
-    styrolyse_update(m_animation, 0.);
+    styrolyse_update(_animation, 0.);
 }
 
 void StyrolysePainterClient::draw(DrawTarget *dt)
 {
-    m_client.m_painter = dt;
-    styrolyse_draw(m_animation);
+    _client._painter = dt;
+    styrolyse_draw(_animation);
 }
 
 void *StyrolysePainterClient::styro_loadImage(StyrolyseClient *_this, const char *path)
 {
     StyroImage *image;
     image = new StyroImage(_this,
-        FilePath(((ExtendedClient *)_this)->m_theme->getThemeRootPath())
+        FilePath(((ExtendedClient *)_this)->_theme->getThemeRootPath())
       .combine(path), true);
     return image;
 }
@@ -118,15 +118,15 @@ void StyrolysePainterClient::styro_drawImage(StyrolyseClient *_this,
     cliprect.y = clipy;
     cliprect.w = clipw;
     cliprect.h = cliph;
-    ((ExtendedClient *)_this)->m_painter->setClipRect(&cliprect);
+    ((ExtendedClient *)_this)->_painter->setClipRect(&cliprect);
     if (flipped)
-		((ExtendedClient *)_this)->m_painter->drawHFlipped(surf->_surface, NULL, &rect);
+		((ExtendedClient *)_this)->_painter->drawHFlipped(surf->_surface, NULL, &rect);
     else {
         if (fabs(scaleX - 1.0f) > 0.001f) {
             rect.w *= scaleX;
             rect.h *= scaleY;
         }
-        ((ExtendedClient *)_this)->m_painter->draw(surf->_surface, NULL, &rect);
+        ((ExtendedClient *)_this)->_painter->draw(surf->_surface, NULL, &rect);
     }
 }
 
@@ -143,93 +143,93 @@ GameOptions GameOptions::fromDifficulty(GameDifficulty difficulty) {
     GameOptions go;
     switch(difficulty) {
     case EASY:
-        go.MIN_SPEED = 4;
-        go.MAX_SPEED = 20;
+        go._MIN_SPEED = 4;
+        go._MAX_SPEED = 20;
         break;
     case MEDIUM:
-        go.MIN_SPEED = 2;
-        go.MAX_SPEED = 15;
+        go._MIN_SPEED = 2;
+        go._MAX_SPEED = 15;
         break;
     case HARD:
     default:
-        go.MIN_SPEED = 1;
-        go.MAX_SPEED = 8;
+        go._MIN_SPEED = 1;
+        go._MAX_SPEED = 8;
         break;
     }
     return go;
 }
 
 VictoryDisplay::VictoryDisplay(Vec3 position, IosSurface *trophy, int victories)
-  : m_position(position), m_trophy(trophy), m_victories(victories)
+  : _position(position), _trophy(trophy), _victories(victories)
 {
 }
 
 void VictoryDisplay::draw(DrawTarget *dt)
 {
-    if (m_victories == 0)
+    if (_victories == 0)
         return;
-    int offx = (m_trophy->w * m_victories) / 2;
-    IosRect dst = { (int)m_position.x - offx, (int)m_position.y, m_trophy->w, m_trophy->h };
-    for (int i = 0 ; i < m_victories ; ++i) {
-        dt->draw(m_trophy, NULL, &dst);
-        dst.x += m_trophy->w;
+    int offx = (_trophy->w * _victories) / 2;
+    IosRect dst = { (int)_position.x - offx, (int)_position.y, _trophy->w, _trophy->h };
+    for (int i = 0 ; i < _victories ; ++i) {
+        dt->draw(_trophy, NULL, &dst);
+        dst.x += _trophy->w;
     }
 }
 
 GameWidget::GameWidget()
-  : m_levelTheme(NULL),
-    gameOverAction(NULL), associatedScreen(NULL),
-    m_paused(false), m_obscureScreenOnPause(true),
-    m_abortedFlag(false)
+  : _levelTheme(NULL),
+    _gameOverAction(NULL), _associatedScreen(NULL),
+    _paused(false), _obscureScreenOnPause(true),
+    _abortedFlag(false)
 {
     ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
-    m_painterGameScreen = iimLib.createImage(IMAGE_RGB, GameUIDefaults::GAME_LOOP->getDrawContext()->w, GameUIDefaults::GAME_LOOP->getDrawContext()->h);
+    _painterGameScreen = iimLib.createImage(IMAGE_RGB, GameUIDefaults::GAME_LOOP->getDrawContext()->w, GameUIDefaults::GAME_LOOP->getDrawContext()->h);
 }
 
 GameWidget::~GameWidget()
 {
-    for (unsigned int i=0; i<m_visualFX.size(); ++i)
-        delete m_visualFX[i];
+    for (unsigned int i=0; i<_visualFX.size(); ++i)
+        delete _visualFX[i];
 }
 
 void GameWidget::setScreenToPaused(bool fromControls)
 {
-    if (associatedScreen != NULL)
-        associatedScreen->setPaused(fromControls);
+    if (_associatedScreen != NULL)
+        _associatedScreen->setPaused(fromControls);
 }
 
 void GameWidget::setScreenToResumed(bool fromControls)
 {
-  if (associatedScreen != NULL)
+  if (_associatedScreen != NULL)
     if (!fromControls)
-      associatedScreen->getPauseMenu().backPressed(false);
+      _associatedScreen->getPauseMenu().backPressed(false);
 }
 
 void GameWidget::setLevelTheme(LevelTheme *levelTheme)
 {
-    m_levelTheme = levelTheme;
-    if (m_levelTheme->getForegroundAnimation() != "")
-        m_styroPainter.reset(new StyrolysePainterClient(levelTheme));
+    _levelTheme = levelTheme;
+    if (_levelTheme->getForegroundAnimation() != "")
+        _styroPainter.reset(new StyrolysePainterClient(levelTheme));
 }
 
 void GameWidget::pause(bool obscureScreen)
 {
     // Call draw on offscreen surface before setting the game to paused
     if (obscureScreen) {
-        draw(m_painterGameScreen);
+        draw(_painterGameScreen);
     }
-    m_paused = true;
-    m_obscureScreenOnPause = obscureScreen;
+    _paused = true;
+    _obscureScreenOnPause = obscureScreen;
     // Draw the obscured screen on display
-    if (m_obscureScreenOnPause) {
-        m_painterGameScreen->convertToGray();
+    if (_obscureScreenOnPause) {
+        _painterGameScreen->convertToGray();
         requestDraw();
     }
 }
 
 void GameWidget::resume()
 {
-    m_paused = false;
+    _paused = false;
     setFocusable(true);
 }
 
@@ -239,66 +239,66 @@ void GameWidget::resume()
 
 void GameWidget2P::setGameOptions(GameOptions game_options)
 {
-    cyclesBeforeSpeedIncreases = game_options.CYCLES_BEFORE_SPEED_INCREASES;
-    MinSpeed = game_options.MIN_SPEED;
-    MaxSpeed = game_options.MAX_SPEED;
+    _cyclesBeforeSpeedIncreases = game_options._CYCLES_BEFORE_SPEED_INCREASES;
+    _MinSpeed = game_options._MIN_SPEED;
+    _MaxSpeed = game_options._MAX_SPEED;
 }
 
 void GameWidget2P::setVictories(int left, int right)
 {
-    m_victoryDisplayA->setValue(left);
-    m_victoryDisplayB->setValue(right);
+    _victoryDisplayA->setValue(left);
+    _victoryDisplayB->setValue(right);
 }
 
 void GameWidget2P::setPlayerOneName(const std::string & newName) {
-    playerOneName = newName;
-    areaA->setPlayerNames(playerOneName, playerTwoName);
-    areaB->setPlayerNames(playerOneName, playerTwoName);
+    _playerOneName = newName;
+    _areaA->setPlayerNames(_playerOneName, _playerTwoName);
+    _areaB->setPlayerNames(_playerOneName, _playerTwoName);
 }
 void GameWidget2P::setPlayerTwoName(const std::string &newName) {
-    playerTwoName = newName;
-    areaA->setPlayerNames(playerOneName, playerTwoName);
-    areaB->setPlayerNames(playerOneName, playerTwoName);
+    _playerTwoName = newName;
+    _areaA->setPlayerNames(_playerOneName, _playerTwoName);
+    _areaB->setPlayerNames(_playerOneName, _playerTwoName);
 }
 
 GameWidget2P::GameWidget2P(GameOptions game_options)
     : CycledComponent(TIME_BETWEEN_GAME_CYCLES),
-      painter(*(GameUIDefaults::GAME_LOOP->getDrawContext())), cyclesBeforeGameCycle(0),
-      cyclesBeforeSpeedIncreases(game_options.CYCLES_BEFORE_SPEED_INCREASES),
-      tickCounts(0), cycles(0),
-      displayLives(true), lives(3), gameSpeed(0),
-      MinSpeed(game_options.MIN_SPEED), MaxSpeed(game_options.MAX_SPEED),
-      blinkingPointsA(0), blinkingPointsB(0), savePointsA(0), savePointsB(0),
-      playerOneName(p1name), playerTwoName(p2name),
-      m_displayPlayerOneName(true), m_displayPlayerTwoName(true)
+      _painter(*(GameUIDefaults::GAME_LOOP->getDrawContext())), _cyclesBeforeGameCycle(0),
+      _cyclesBeforeSpeedIncreases(game_options._CYCLES_BEFORE_SPEED_INCREASES),
+      _tickCounts(0), _cycles(0),
+      _displayLives(true), _lives(3), _gameSpeed(0),
+      _MinSpeed(game_options._MIN_SPEED), _MaxSpeed(game_options._MAX_SPEED),
+      _blinkingPointsA(0), _blinkingPointsB(0), _savePointsA(0), _savePointsB(0),
+      _playerOneName(p1name), _playerTwoName(p2name),
+      _displayPlayerOneName(true), _displayPlayerTwoName(true)
 {
 }
 
 void GameWidget2P::initWithGUI(GameView &areaA, GameView &areaB, LevelTheme &levelTheme, Action *gameOverAction)
 {
-    this->areaA = &areaA;
-    this->areaB = &areaB;
-    areaA.setPlayerNames(playerOneName, playerTwoName);
-    areaB.setPlayerNames(playerOneName, playerTwoName);
-    this->gameOverAction = gameOverAction;
+    this->_areaA = &areaA;
+    this->_areaB = &areaB;
+    areaA.setPlayerNames(_playerOneName, _playerTwoName);
+    areaB.setPlayerNames(_playerOneName, _playerTwoName);
+    this->_gameOverAction = gameOverAction;
     priv_initialize();
     setLevelTheme(&levelTheme);
-    m_victoryDisplayA.reset(new VictoryDisplay(Vec3(levelTheme.getTrophyDisplayX(0), levelTheme.getTrophyDisplayY(0)), levelTheme.getTrophy()));
-    m_victoryDisplayB.reset(new VictoryDisplay(Vec3(levelTheme.getTrophyDisplayX(1), levelTheme.getTrophyDisplayY(1)), levelTheme.getTrophy()));
+    _victoryDisplayA.reset(new VictoryDisplay(Vec3(levelTheme.getTrophyDisplayX(0), levelTheme.getTrophyDisplayY(0)), levelTheme.getTrophy()));
+    _victoryDisplayB.reset(new VictoryDisplay(Vec3(levelTheme.getTrophyDisplayX(1), levelTheme.getTrophyDisplayY(1)), levelTheme.getTrophy()));
 }
 
 void GameWidget2P::priv_initialize()
 {
-    once = false;
-    gameover = false;
-    skipGameCycleA = false;
-    skipGameCycleB = false;
+    _once = false;
+    _gameover = false;
+    _skipGameCycleA = false;
+    _skipGameCycleB = false;
 
     // Setting up games
-    attachedGameA = this->areaA->getAttachedGame();
-    attachedGameB = this->areaB->getAttachedGame();
-    this->areaA->setEnemyGame(attachedGameB);
-    this->areaB->setEnemyGame(attachedGameA);
+    _attachedGameA = this->_areaA->getAttachedGame();
+    _attachedGameB = this->_areaB->getAttachedGame();
+    this->_areaA->setEnemyGame(_attachedGameB);
+    this->_areaB->setEnemyGame(_attachedGameA);
 
     setReceiveUpEvents(true);
     setFocusable(true);
@@ -306,9 +306,9 @@ void GameWidget2P::priv_initialize()
     // TODO: move elsewhere
     // Load and preload a few FX for the game
     for (int i=0; i<3; ++i)
-        m_visualFX.push_back(new VisualFX("fx/vanish.gsl", *(areaA->getFloboSetTheme())));
+        _visualFX.push_back(new VisualFX("fx/vanish.gsl", *(_areaA->getFloboSetTheme())));
     for (int i=0; i<3; ++i)
-        m_visualFX.push_back(new VisualFX("fx/combo.gsl", *(areaA->getFloboSetTheme())));
+        _visualFX.push_back(new VisualFX("fx/combo.gsl", *(_areaA->getFloboSetTheme())));
 }
 
 GameWidget2P::~GameWidget2P()
@@ -318,52 +318,52 @@ GameWidget2P::~GameWidget2P()
 
 void GameWidget2P::cycle()
 {
-  if (!m_paused) {
-    tickCounts++;
-    cycles++;
+  if (!_paused) {
+    _tickCounts++;
+    _cycles++;
 
-    int animCyclesBeforeGameCycles = (MaxSpeed + (((MinSpeed - MaxSpeed) * gameSpeed) / 20));
+    int animCyclesBeforeGameCycles = (_MaxSpeed + (((_MinSpeed - _MaxSpeed) * _gameSpeed) / 20));
 
     // Cycling through the foreground animation
-    if (m_styroPainter.get() != NULL)
-        m_styroPainter->update();
+    if (_styroPainter.get() != NULL)
+        _styroPainter->update();
 
     // Controls
-    controllerA->cycle();
-    controllerB->cycle();
+    _controllerA->cycle();
+    _controllerB->cycle();
 
-    if (!skipGameCycleA && areaA->isNewMetaCycleStart() && (cyclesBeforeGameCycle < animCyclesBeforeGameCycles/2))
-      skipGameCycleA = true;
-    if (!skipGameCycleB && areaB->isNewMetaCycleStart() && (cyclesBeforeGameCycle < animCyclesBeforeGameCycles/2))
-      skipGameCycleB = true;
+    if (!_skipGameCycleA && _areaA->isNewMetaCycleStart() && (_cyclesBeforeGameCycle < animCyclesBeforeGameCycles/2))
+      _skipGameCycleA = true;
+    if (!_skipGameCycleB && _areaB->isNewMetaCycleStart() && (_cyclesBeforeGameCycle < animCyclesBeforeGameCycles/2))
+      _skipGameCycleB = true;
 
     // Animations
-    areaA->cycleAnimation();
-    areaB->cycleAnimation();
+    _areaA->cycleAnimation();
+    _areaB->cycleAnimation();
 
-    if (!skipGameCycleA && areaA->isNewMetaCycleStart() && (cyclesBeforeGameCycle < animCyclesBeforeGameCycles/2))
-      skipGameCycleA = true;
-    if (!skipGameCycleB && areaB->isNewMetaCycleStart() && (cyclesBeforeGameCycle < animCyclesBeforeGameCycles/2))
-      skipGameCycleB = true;
+    if (!_skipGameCycleA && _areaA->isNewMetaCycleStart() && (_cyclesBeforeGameCycle < animCyclesBeforeGameCycles/2))
+      _skipGameCycleA = true;
+    if (!_skipGameCycleB && _areaB->isNewMetaCycleStart() && (_cyclesBeforeGameCycle < animCyclesBeforeGameCycles/2))
+      _skipGameCycleB = true;
 
     // Game cycles
-    if (cyclesBeforeGameCycle == 0) {
+    if (_cyclesBeforeGameCycle == 0) {
 
-      areaA->clearMetaCycleStart();
-      areaB->clearMetaCycleStart();
+      _areaA->clearMetaCycleStart();
+      _areaB->clearMetaCycleStart();
 
-      cyclesBeforeGameCycle = animCyclesBeforeGameCycles;
-      if (!skipGameCycleA)
+      _cyclesBeforeGameCycle = animCyclesBeforeGameCycles;
+      if (!_skipGameCycleA)
       {
-        areaA->cycleGame();
+        _areaA->cycleGame();
       }
-      else skipGameCycleA = false;
+      else _skipGameCycleA = false;
 
-      if (!skipGameCycleB)
+      if (!_skipGameCycleB)
       {
-        areaB->cycleGame();
+        _areaB->cycleGame();
       }
-      else skipGameCycleB = false;
+      else _skipGameCycleB = false;
 
       // Blinking point animation
       // TODO
@@ -374,10 +374,10 @@ void GameWidget2P::cycle()
         blinkingPointsB = 10;
         */
 
-      if (blinkingPointsA > 0)
-        blinkingPointsA--;
-      if (blinkingPointsB > 0)
-        blinkingPointsB--;
+      if (_blinkingPointsA > 0)
+        _blinkingPointsA--;
+      if (_blinkingPointsB > 0)
+        _blinkingPointsB--;
 
       /*
       savePointsB = attachedGameB->getPoints();
@@ -389,27 +389,27 @@ void GameWidget2P::cycle()
       // end of the blinking point animation code
     }
 
-    cyclesBeforeGameCycle--;
+    _cyclesBeforeGameCycle--;
 
-    if (tickCounts == (unsigned int)cyclesBeforeSpeedIncreases)
+    if (_tickCounts == (unsigned int)_cyclesBeforeSpeedIncreases)
     {
-      tickCounts = 0;
-      if (gameSpeed < 20) gameSpeed++;
-      cyclesBeforeSpeedIncreases = cyclesBeforeSpeedIncreases * (20 + gameSpeed) / 20;
+      _tickCounts = 0;
+      if (_gameSpeed < 20) _gameSpeed++;
+      _cyclesBeforeSpeedIncreases = _cyclesBeforeSpeedIncreases * (20 + _gameSpeed) / 20;
       //printf("Changing speed: %d (next in %d)\n", gameSpeed, cyclesBeforeSpeedIncreases);
     }
     requestDraw();
   }
-  gameover = (areaA->isGameOver() || areaB->isGameOver());
-  if ((gameover || getAborted()) && !once) {
-    once = true;
-    gameOverDate = ios_fc::getTimeMs();
-    if (areaA->isGameOver())
-      areaB->gameWin();
-    if (areaB->isGameOver())
-      areaA->gameWin();
-    if (gameOverAction)
-      gameOverAction->action(this, GAME_IS_OVER, NULL);
+  _gameover = (_areaA->isGameOver() || _areaB->isGameOver());
+  if ((_gameover || getAborted()) && !_once) {
+    _once = true;
+    _gameOverDate = ios_fc::getTimeMs();
+    if (_areaA->isGameOver())
+      _areaB->gameWin();
+    if (_areaB->isGameOver())
+      _areaA->gameWin();
+    if (_gameOverAction)
+      _gameOverAction->action(this, GAME_IS_OVER, NULL);
   }
 }
 
@@ -421,20 +421,20 @@ void GameWidget2P::drawBackground(DrawTarget *dt)
 
 void GameWidget2P::drawGameAreas(DrawTarget *dt)
 {
-    areaA->render(dt);
-    areaB->render(dt);
+    _areaA->render(dt);
+    _areaB->render(dt);
 }
 
 void GameWidget2P::drawGameNeutrals(DrawTarget *dt)
 {
-    areaA->renderNeutral(dt);
-    areaB->renderNeutral(dt);
+    _areaA->renderNeutral(dt);
+    _areaB->renderNeutral(dt);
 }
 
 void GameWidget2P::draw(DrawTarget *dt)
 {
-    if ((m_paused) && (m_obscureScreenOnPause)) {
-        dt->draw(m_painterGameScreen, NULL, NULL);
+    if ((_paused) && (_obscureScreenOnPause)) {
+        dt->draw(_painterGameScreen, NULL, NULL);
         return;
     }
     // Render the background
@@ -462,14 +462,14 @@ void GameWidget2P::draw(DrawTarget *dt)
         dt->draw(grid, NULL, &drect);
     }
     // Rendering the foreground animation
-    if (m_styroPainter.get() != NULL)
-        m_styroPainter->draw(dt);
+    if (_styroPainter.get() != NULL)
+        _styroPainter->draw(dt);
     // Rendering the neutral flobos
     drawGameNeutrals(dt);
     // Rendering the lives
-    if (displayLives && (lives>=0) && (lives<=3))
+    if (_displayLives && (_lives>=0) && (_lives<=3))
     {
-        IosSurface * liveImage = getLevelTheme()->getLifeForIndex(lives);
+        IosSurface * liveImage = getLevelTheme()->getLifeForIndex(_lives);
         drect.x = getLevelTheme()->getLifeDisplayX();
         drect.y = getLevelTheme()->getLifeDisplayY();
         drect.w = liveImage->w;
@@ -477,15 +477,15 @@ void GameWidget2P::draw(DrawTarget *dt)
         dt->draw(liveImage, NULL, &drect);
     }
     // Rendering the victories
-    m_victoryDisplayA->draw(dt);
-    m_victoryDisplayB->draw(dt);
+    _victoryDisplayA->draw(dt);
+    _victoryDisplayB->draw(dt);
     // Rendering the game speed meter
     IosRect speedRect;
     IosSurface * speedFront = getLevelTheme()->getSpeedMeter(true);
     IosSurface * speedBack  = getLevelTheme()->getSpeedMeter(false);
     speedRect.x = 0;
     speedRect.w = speedFront->w;
-    speedRect.h = gameSpeed * 6;
+    speedRect.h = _gameSpeed * 6;
     speedRect.y = speedFront->h - speedRect.h;
     drect.x = getLevelTheme()->getSpeedMeterX() - speedRect.w / 2;
     drect.y = getLevelTheme()->getSpeedMeterY() - speedRect.h;
@@ -500,21 +500,21 @@ void GameWidget2P::draw(DrawTarget *dt)
     dt->draw(speedBack,&speedBlackRect,&drectBlack);
     dt->draw(speedFront,&speedRect, &drect);
     // Rendering the scores
-    areaA->renderScore(dt);
-    areaB->renderScore(dt);
+    _areaA->renderScore(dt);
+    _areaB->renderScore(dt);
     // Rendering the player names
     IosFont *font = getLevelTheme()->getPlayerNameFont();
     const RGBA *color = getLevelTheme()->getPlayerNameColor();
-    if (m_displayPlayerOneName)
+    if (_displayPlayerOneName)
         dt->putStringCenteredXY(font,
                                 getLevelTheme()->getNameDisplayX(0),
                                 getLevelTheme()->getNameDisplayY(0),
-                                playerOneName.c_str(), *color);
-    if (m_displayPlayerTwoName)
+                                _playerOneName.c_str(), *color);
+    if (_displayPlayerTwoName)
         dt->putStringCenteredXY(font,
                                 getLevelTheme()->getNameDisplayX(1),
                                 getLevelTheme()->getNameDisplayY(1),
-                                playerTwoName.c_str(), *color);
+                                _playerTwoName.c_str(), *color);
     // Rendering the opponent if it is in front
     if (! getLevelTheme()->getOpponentIsBehind()) {
         if (getOpponent() != NULL)
@@ -524,18 +524,18 @@ void GameWidget2P::draw(DrawTarget *dt)
 
 void GameWidget2P::addSubWidget(Widget *subWidget)
 {
-  m_subwidgets.push_back(subWidget);
+  _subwidgets.push_back(subWidget);
 }
 
 void GameWidget2P::eventOccured(GameControlEvent *event)
 {
-    if (m_paused)
+    if (_paused)
         lostFocus();
     else {
-        controllerA->eventOccured(event);
-        controllerB->eventOccured(event);
-        for (std::vector<gameui::Widget *>::iterator iter = m_subwidgets.begin() ;
-             iter != m_subwidgets.end() ; iter++) {
+        _controllerA->eventOccured(event);
+        _controllerB->eventOccured(event);
+        for (std::vector<gameui::Widget *>::iterator iter = _subwidgets.begin() ;
+             iter != _subwidgets.end() ; iter++) {
             (*iter)->eventOccured(event);
         }
     }
@@ -543,11 +543,11 @@ void GameWidget2P::eventOccured(GameControlEvent *event)
 
 bool GameWidget2P::startPressed()
 {
-    if ((gameover || getAborted()) && once && (ios_fc::getTimeMs() > gameOverDate + 500)) {
+    if ((_gameover || getAborted()) && _once && (ios_fc::getTimeMs() > _gameOverDate + 500)) {
         actionAfterGameOver(true, GAMEOVER_STARTPRESSED);
         return true;
     }
-    else if (m_paused) {
+    else if (_paused) {
         actionAfterGameOver(true, PAUSED_STARTPRESSED);
     }
     return false;
@@ -555,7 +555,7 @@ bool GameWidget2P::startPressed()
 
 bool GameWidget2P::backPressed()
 {
-    if ((gameover || getAborted()) && once) {
+    if ((_gameover || getAborted()) && _once) {
         actionAfterGameOver(true, GAMEOVER_STARTPRESSED);
         return true;
     }
@@ -564,8 +564,8 @@ bool GameWidget2P::backPressed()
 
 void GameWidget2P::actionAfterGameOver(bool fromControls, int actionType)
 {
-    if (gameOverAction)
-      gameOverAction->action(this, actionType, NULL);
+    if (_gameOverAction)
+      _gameOverAction->action(this, actionType, NULL);
 }
 
 

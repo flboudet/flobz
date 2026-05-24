@@ -41,12 +41,12 @@ class StyrolysePainterClient
     void draw(DrawTarget *dt);
 private:
     struct ExtendedClient {
-        StyrolyseClient m_styroClient;
-        DrawTarget *m_painter;
-        LevelTheme *m_theme;
+        StyrolyseClient _styroClient;
+        DrawTarget *_painter;
+        LevelTheme *_theme;
     };
-    ExtendedClient m_client;
-    Styrolyse *m_animation;
+    ExtendedClient _client;
+    Styrolyse *_animation;
 private:
     // Styrolyse methods
     static void *styro_loadImage(StyrolyseClient *_this, const char *path);
@@ -73,16 +73,16 @@ typedef enum GameDifficulty {
 struct GameOptions
 {
     GameOptions() {
-        MIN_SPEED = 2;
-        MAX_SPEED = 20;
-        CYCLES_BEFORE_SPEED_INCREASES = 240;
+        _MIN_SPEED = 2;
+        _MAX_SPEED = 20;
+        _CYCLES_BEFORE_SPEED_INCREASES = 240;
     }
 
     static GameOptions fromDifficulty(GameDifficulty difficulty);
 
-    int MIN_SPEED;
-    int MAX_SPEED;
-    int CYCLES_BEFORE_SPEED_INCREASES;
+    int _MIN_SPEED;
+    int _MAX_SPEED;
+    int _CYCLES_BEFORE_SPEED_INCREASES;
 };
 
 class VictoryDisplay {
@@ -90,11 +90,11 @@ public:
     VictoryDisplay(Vec3 position, IosSurface *trophy, int victories = 0);
     virtual ~VictoryDisplay() {}
     void draw(DrawTarget *dt);
-    void setValue(int victories) { m_victories = victories; }
+    void setValue(int victories) { _victories = victories; }
 private:
-    Vec3 m_position;
-    IosSurface *m_trophy;
-    int m_victories;
+    Vec3 _position;
+    IosSurface *_trophy;
+    int _victories;
 };
 
 /**
@@ -115,27 +115,27 @@ public:
     virtual ~GameWidget();
 public:
     // A deplacer
-    void setAssociatedScreen(GameScreen *associatedScreen) { this->associatedScreen = associatedScreen; associatedScreenHasBeenSet(associatedScreen); };
+    void setAssociatedScreen(GameScreen *associatedScreen) { this->_associatedScreen = associatedScreen; associatedScreenHasBeenSet(associatedScreen); };
     virtual void associatedScreenHasBeenSet(GameScreen *associatedScreen) {}
     virtual void setGameOverAction(gameui::Action *gameOverAction) {
-        this->gameOverAction = gameOverAction;
+        this->_gameOverAction = gameOverAction;
     }
     //
-    virtual std::vector<VisualFX*> &getVisualFX()  { return m_visualFX; }
+    virtual std::vector<VisualFX*> &getVisualFX()  { return _visualFX; }
 public:
     virtual void setGameOptions(GameOptions options) = 0;
     //
     virtual void pause(bool obscureScreen = true);
     virtual void resume();
-    bool isPaused() const { return m_paused; }
+    bool isPaused() const { return _paused; }
     // A deplacer
     virtual void setScreenToPaused(bool fromControls);
     virtual void setScreenToResumed(bool fromControls);
     // Callbacks
     virtual bool backPressed()  {return false;}
     virtual bool startPressed() {return false;}
-    virtual void abort() { m_abortedFlag = true; }
-    virtual bool getAborted() const { return m_abortedFlag; }
+    virtual void abort() { _abortedFlag = true; }
+    virtual bool getAborted() const { return _abortedFlag; }
     //
     virtual StoryWidget *getOpponent() = 0;
     //
@@ -149,22 +149,22 @@ public:
     virtual void addGameBHandicap(int handicap) = 0;
     virtual bool isGameARunning() const = 0;
     // Widget methods
-    bool isFocusable() const { return !m_paused; }
+    bool isFocusable() const { return !_paused; }
 protected:
     void setLevelTheme(LevelTheme *levelTheme);
-    LevelTheme *getLevelTheme() const { return m_levelTheme; }
+    LevelTheme *getLevelTheme() const { return _levelTheme; }
 protected:
-    std::unique_ptr<StyrolysePainterClient> m_styroPainter;
+    std::unique_ptr<StyrolysePainterClient> _styroPainter;
 private:
-    LevelTheme *m_levelTheme;
+    LevelTheme *_levelTheme;
 protected:
-    gameui::Action *gameOverAction;
-    GameScreen *associatedScreen;
-    std::vector<VisualFX*> m_visualFX;
+    gameui::Action *_gameOverAction;
+    GameScreen *_associatedScreen;
+    std::vector<VisualFX*> _visualFX;
 protected:
-    bool m_paused, m_obscureScreenOnPause;
-    IosSurface *m_painterGameScreen;
-    bool m_abortedFlag;
+    bool _paused, _obscureScreenOnPause;
+    IosSurface *_painterGameScreen;
+    bool _abortedFlag;
 };
 
 /**
@@ -184,24 +184,24 @@ public:
     // Specific methods
     bool backPressed();
     bool startPressed();
-    void setLives(int l) { lives = l; }
+    void setLives(int l) { _lives = l; }
     void setVictories(int left, int right);
-    bool isGameARunning() const { return attachedGameA->isGameRunning(); }
-    bool isGameBRunning() const { return attachedGameB->isGameRunning(); }
+    bool isGameARunning() const { return _attachedGameA->isGameRunning(); }
+    bool isGameBRunning() const { return _attachedGameB->isGameRunning(); }
     void setPlayerOneName(const std::string & newName);
     void setPlayerTwoName(const std::string & newName);
-    const std::string &getPlayerOneName() const { return playerOneName; }
-    PlayerGameStat &getStatPlayerOne() { return attachedGameA->getGameStat(); }
-    PlayerGameStat &getStatPlayerTwo() { return attachedGameB->getGameStat(); }
-    void setStatPlayerOne(PlayerGameStat &gameStat) { attachedGameA->setGameStat(gameStat); }
-    void setStatPlayerTwo(PlayerGameStat &gameStat) { attachedGameB->setGameStat(gameStat); }
+    const std::string &getPlayerOneName() const { return _playerOneName; }
+    PlayerGameStat &getStatPlayerOne() { return _attachedGameA->getGameStat(); }
+    PlayerGameStat &getStatPlayerTwo() { return _attachedGameB->getGameStat(); }
+    void setStatPlayerOne(PlayerGameStat &gameStat) { _attachedGameA->setGameStat(gameStat); }
+    void setStatPlayerTwo(PlayerGameStat &gameStat) { _attachedGameB->setGameStat(gameStat); }
     virtual StoryWidget *getOpponent() { return NULL; }
-    void addGameAHandicap(int handicap) {attachedGameA->increaseNeutralFlobos((handicap>10?10:handicap) * FLOBOBAN_DIMX); attachedGameA->dropNeutrals();}
-    void addGameBHandicap(int handicap) {attachedGameB->increaseNeutralFlobos((handicap>10?10:handicap) * FLOBOBAN_DIMX); attachedGameB->dropNeutrals();}
+    void addGameAHandicap(int handicap) {_attachedGameA->increaseNeutralFlobos((handicap>10?10:handicap) * FLOBOBAN_DIMX); _attachedGameA->dropNeutrals();}
+    void addGameBHandicap(int handicap) {_attachedGameB->increaseNeutralFlobos((handicap>10?10:handicap) * FLOBOBAN_DIMX); _attachedGameB->dropNeutrals();}
     void addSubWidget(Widget *subWidget);
     // Display player names properties
-    void setDisplayPlayerOneName(bool display) { m_displayPlayerOneName = display; }
-    void setDisplayPlayerTwoName(bool display) { m_displayPlayerTwoName = display; }
+    void setDisplayPlayerOneName(bool display) { _displayPlayerOneName = display; }
+    void setDisplayPlayerTwoName(bool display) { _displayPlayerTwoName = display; }
 
     // CycledComponent methods
     void cycle();
@@ -220,30 +220,30 @@ public:
     virtual void actionAfterGameOver(bool fromControls, int actionType);
 
 protected:
-    std::unique_ptr<GamePlayer> controllerA, controllerB;
+    std::unique_ptr<GamePlayer> _controllerA, _controllerB;
 protected:
-    DrawTarget &painter;
-    GameView *areaA, *areaB;
-    FloboGame *attachedGameA, *attachedGameB;
-    int cyclesBeforeGameCycle;
-    int cyclesBeforeSpeedIncreases; // time between speed increases in units of 20ms
-    unsigned int tickCounts;
-    unsigned long long cycles;
-    bool displayLives;
-    int lives;
-    bool once;
-    bool gameover;
-    int gameSpeed; // from 0 (MinSpeed) to 20 (MaxSpeed)
-    int MinSpeed,MaxSpeed; // in units of 20ms
-    int blinkingPointsA, blinkingPointsB, savePointsA, savePointsB;
-    std::string playerOneName, playerTwoName;
-    std::vector<gameui::Widget *> m_subwidgets;
-    bool skipGameCycleA, skipGameCycleB;
-    double gameOverDate;
-    bool m_displayPlayerOneName, m_displayPlayerTwoName;
+    DrawTarget &_painter;
+    GameView *_areaA, *_areaB;
+    FloboGame *_attachedGameA, *_attachedGameB;
+    int _cyclesBeforeGameCycle;
+    int _cyclesBeforeSpeedIncreases; // time between speed increases in units of 20ms
+    unsigned int _tickCounts;
+    unsigned long long _cycles;
+    bool _displayLives;
+    int _lives;
+    bool _once;
+    bool _gameover;
+    int _gameSpeed; // from 0 (MinSpeed) to 20 (MaxSpeed)
+    int _MinSpeed,_MaxSpeed; // in units of 20ms
+    int _blinkingPointsA, _blinkingPointsB, _savePointsA, _savePointsB;
+    std::string _playerOneName, _playerTwoName;
+    std::vector<gameui::Widget *> _subwidgets;
+    bool _skipGameCycleA, _skipGameCycleB;
+    double _gameOverDate;
+    bool _displayPlayerOneName, _displayPlayerTwoName;
     void priv_initialize();
 private:
-    std::unique_ptr<VictoryDisplay> m_victoryDisplayA, m_victoryDisplayB;
+    std::unique_ptr<VictoryDisplay> _victoryDisplayA, _victoryDisplayB;
 };
 
 // Should be moved elsewhere
