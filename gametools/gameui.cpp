@@ -482,6 +482,7 @@ namespace gameui {
                 default:
                     fprintf(stderr,"Layout policy %d not implemented, using USE_MAX_SIZE", policy);
                     policy = USE_MAX_SIZE;
+                    // fall through
                 case USE_MAX_SIZE: // dispatch everyone to fill space
                     if (numAnyChildren > 0) offsetPosition = spaceLeft / ( 2.0f * (float)(numAnyChildren) );
                     break;
@@ -1311,8 +1312,9 @@ namespace gameui {
     //
 
     Text::Text()
-        : label(""), offset(0.0,0.0,0.0), m_textAlign(TEXT_LEFT_ALIGN),
-          m_autoSize(true), mdontMove(true), m_slideSound(GameUIDefaults::SLIDE_SOUND), m_color(GameUIDefaults::FONT_COLOR), m_shadow(false)
+        : m_color(GameUIDefaults::FONT_COLOR), label(""), offset(0.0,0.0,0.0),
+          m_textAlign(TEXT_LEFT_ALIGN), m_autoSize(true),
+          m_slideSound(GameUIDefaults::SLIDE_SOUND), m_shadow(false), mdontMove(true)
     {
         this->font = GameUIDefaults::FONT_TEXT;
         setPreferedSize(Vec3(m_autoSize?this->font->getTextWidth(label.c_str()):0.0f, this->font->getHeight(), 1.0));
@@ -1321,9 +1323,9 @@ namespace gameui {
     }
 
     Text::Text(const std::string &label, IosFont *font, bool autosize)
-        : font(font), label(label.c_str()), offset(0.0,0.0,0.0),
+        : font(font), m_color(GameUIDefaults::FONT_COLOR), label(label.c_str()), offset(0.0,0.0,0.0),
           m_textAlign(TEXT_LEFT_ALIGN), m_autoSize(autosize),
-          mdontMove(true), m_slideSound(GameUIDefaults::SLIDE_SOUND), m_color(GameUIDefaults::FONT_COLOR), m_shadow(false)
+          m_slideSound(GameUIDefaults::SLIDE_SOUND), m_shadow(false), mdontMove(true)
     {
         if (font == NULL) this->font = GameUIDefaults::FONT_TEXT;
         setPreferedSize(Vec3(m_autoSize?this->font->getTextWidth(label.c_str()):0.0f, this->font->getHeight(), 1.0));
@@ -1595,7 +1597,7 @@ namespace gameui {
     }
 
     EditField::EditField(const std::string &defaultText, const std::string &persistentID, PreferencesManager *prefMgr)
-        : m_prefMgr(prefMgr), Text(defaultText, NULL, false), persistence(persistentID), editOnFocus(false)
+        : Text(defaultText, NULL, false), m_prefMgr(prefMgr), persistence(persistentID), editOnFocus(false)
     {
         std::string mytext = m_prefMgr->getStrPreference(persistentID.c_str(), defaultText);
         setValue(mytext.c_str());
@@ -1603,7 +1605,7 @@ namespace gameui {
     }
 
     EditField::EditField(const std::string &defaultText,  Action *action)
-        : m_prefMgr(NULL), Text(defaultText, NULL, false), persistence(""), editOnFocus(false)
+        : Text(defaultText, NULL, false), m_prefMgr(NULL), persistence(""), editOnFocus(false)
     {
         init(NULL,NULL);
         if (action != NULL)
