@@ -614,9 +614,10 @@ namespace gameui {
             lostFocus();
             return;
         }
-        if (!haveFocus())
+        if (!haveFocus()) {
             if (isPrevEvent(event)) { activeWidget = getNumberOfChilds(); direction = -1; }
             else if (isNextEvent(event)) { activeWidget = -1; direction = 1; }
+        }
         if (direction != 0)
         {
             int possibleNewWidget = activeWidget;
