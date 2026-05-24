@@ -58,7 +58,7 @@ ChatBox::ChatBox(ChatBoxDelegate &delegate)
     chatInputFrameSurface(theCommander->getSurface(IMAGE_RGBA, "gfx/chatzone.png")),
     chatInputFramePicture(chatInputFrameSurface, 31, 10, 25, 9, 6, 15),
     chatInputContainerFrame(&chatInputFramePicture),
-    height(8), lines(new (HBox *[height])), names(new (Text *[height])), texts(new (Text *[height]))
+    height(8), lines(new HBox *[height]), names(new Text *[height]), texts(new Text *[height])
 {
     Vec3 lineSize(0.0f, GameUIDefaults::FONT_TEXT->getHeight(), 1.0f);
 
