@@ -79,7 +79,7 @@ private:
     class PlayerSelectedAction : public Action {
     public:
         PlayerSelectedAction(NetCenterMenu *targetMenu, PeerAddress address, const std::string &playerName)
-        : targetMenu(targetMenu), address(address), playerName(playerName) {}
+        : address(address), targetMenu(targetMenu), playerName(playerName) {}
         void action();
     private:
         PeerAddress address;

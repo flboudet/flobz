@@ -219,7 +219,7 @@ public:
 class FloboDefaultIterator : public FloboIterator {
 public:
     FloboDefaultIterator(FloboGame *game)
-        : _game(game), _peek(nullptr), _x(0), _y(FLOBOBAN_DIMY-1), _finished(false) {
+        : _game(game), _peek(nullptr), _finished(false), _x(0), _y(FLOBOBAN_DIMY-1) {
         ++(*this);
     }
     std::shared_ptr<Flobo> get() { return _peek; }

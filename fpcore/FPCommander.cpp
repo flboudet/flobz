@@ -39,8 +39,6 @@ FPCommander::FPCommander(DataPathManager *dataPathManager,
                          Jukebox *jukebox)
   : m_dataPathManager(dataPathManager),
     m_preferencesManager(preferencesManager),
-    m_achMgr(NULL),
-    m_jukebox(jukebox),
     m_themeManager(new ThemeManagerImpl(*dataPathManager)),
     m_surfaceFactory(*dataPathManager),
     m_fontFactory(*dataPathManager),
@@ -48,6 +46,8 @@ FPCommander::FPCommander(DataPathManager *dataPathManager,
     m_musicFactory(*dataPathManager),
     m_floboSetThemeFactory(*m_themeManager),
     m_levelThemeFactory(*m_themeManager),
+    m_achMgr(NULL),
+    m_jukebox(jukebox),
     m_cursor(NULL)
 {
   GTLogTrace("++");
