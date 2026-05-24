@@ -37,7 +37,7 @@ class NetworkGameView : public GameView {
   public:
     NetworkGameView(FloboGameFactory *attachedFloboGameFactory, MessageBox *mbox, int gameId)
         : GameView(attachedFloboGameFactory),
-          mbox(mbox), gameId(gameId), badFlobos(0), lastFullMessage(-1) {}
+          _mbox(mbox), _gameId(gameId), _badFlobos(0), _lastFullMessage(-1) {}
 
     NetworkGameView(FloboGameFactory *attachedFloboGameFactory,
             int playerId,
@@ -45,7 +45,7 @@ class NetworkGameView : public GameView {
             LevelTheme *attachedLevelTheme,
 		    MessageBox *mbox, int gameId)
         : GameView(attachedFloboGameFactory, playerId, attachedFloboThemeSet, attachedLevelTheme),
-          mbox(mbox), gameId(gameId), badFlobos(0), lastFullMessage(-1) {}
+          _mbox(mbox), _gameId(gameId), _badFlobos(0), _lastFullMessage(-1) {}
 
     void cycleGame();
 
@@ -71,18 +71,18 @@ class NetworkGameView : public GameView {
 protected:
     void sendEndOfGameMessage(int messageType);
 
-    MessageBox *mbox;
-    int gameId;
+    MessageBox *_mbox;
+    int _gameId;
     Message *createStateMessage(bool sendFullMessage);
-    AdvancedBuffer<int> neutralsBuffer;
-    AdvancedBuffer<int> moveLeftBuffer;
-    AdvancedBuffer<int> moveRightBuffer;
-    AdvancedBuffer<int> fallingStepBuffer;
-    AdvancedBuffer<int> compTurnBuffer;
-    AdvancedBuffer<int> didFallBuffer;
-    AdvancedBuffer<int> willVanishBuffer;
-    int badFlobos;
-    double lastFullMessage;
+    AdvancedBuffer<int> _neutralsBuffer;
+    AdvancedBuffer<int> _moveLeftBuffer;
+    AdvancedBuffer<int> _moveRightBuffer;
+    AdvancedBuffer<int> _fallingStepBuffer;
+    AdvancedBuffer<int> _compTurnBuffer;
+    AdvancedBuffer<int> _didFallBuffer;
+    AdvancedBuffer<int> _willVanishBuffer;
+    int _badFlobos;
+    double _lastFullMessage;
 };
 
 class InternetGameView : public NetworkGameView {
@@ -90,7 +90,7 @@ class InternetGameView : public NetworkGameView {
         InternetGameView(FloboGameFactory *attachedFloboGameFactory, MessageBox *mbox, int gameId,
                                 FPServerIGPMessageBox *igpbox)
           : NetworkGameView(attachedFloboGameFactory, mbox, gameId)
-          , igpbox(igpbox)
+          , _igpbox(igpbox)
         {}
 
         InternetGameView(FloboGameFactory *attachedFloboGameFactory,
@@ -104,12 +104,12 @@ class InternetGameView : public NetworkGameView {
                              attachedFloboThemeSet,
                              attachedLevelTheme,
                              mbox, gameId),
-          igpbox(igpbox) {}
+          _igpbox(igpbox) {}
         virtual void gameWin();
         virtual void gameLost();
     private:
         void sendGameResultToServer(int winner);
-        FPServerIGPMessageBox *igpbox;
+        FPServerIGPMessageBox *_igpbox;
 };
 
 #endif // _PUYONETWORKVIEW

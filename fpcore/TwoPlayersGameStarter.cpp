@@ -26,33 +26,33 @@
 #include "TwoPlayersGameStarter.h"
 using namespace event_manager;
 
-TwoPlayersGameWidget::TwoPlayersGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, const std::string & aiFace, Action *gameOverAction) : attachedFloboThemeSet(floboSetTheme),
-                                                     attachedRandom(5), attachedGameFactory(&attachedRandom),
-                                                     areaA(&attachedGameFactory, 0, &attachedFloboThemeSet, &levelTheme),
-                                                     areaB(&attachedGameFactory, 1, &attachedFloboThemeSet, &levelTheme),
-                                                     opponentFace(aiFace)
+TwoPlayersGameWidget::TwoPlayersGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, const std::string & aiFace, Action *gameOverAction) : _attachedFloboThemeSet(floboSetTheme),
+                                                     _attachedRandom(5), _attachedGameFactory(&_attachedRandom),
+                                                     _areaA(&_attachedGameFactory, 0, &_attachedFloboThemeSet, &levelTheme),
+                                                     _areaB(&_attachedGameFactory, 1, &_attachedFloboThemeSet, &levelTheme),
+                                                     _opponentFace(aiFace)
 {
-    _controllerA.reset(new EventPlayer(areaA, kPlayer1Down, kPlayer1Left, kPlayer1Right,
+    _controllerA.reset(new EventPlayer(_areaA, kPlayer1Down, kPlayer1Left, kPlayer1Right,
                                       kPlayer1TurnLeft, kPlayer1TurnRight));
-    _controllerB.reset(new EventPlayer(areaB, kPlayer2Down, kPlayer2Left, kPlayer2Right,
+    _controllerB.reset(new EventPlayer(_areaB, kPlayer2Down, kPlayer2Left, kPlayer2Right,
                                       kPlayer2TurnLeft, kPlayer2TurnRight));
-    initWithGUI(areaA, areaB, levelTheme, gameOverAction);
+    initWithGUI(_areaA, _areaB, levelTheme, gameOverAction);
     setLives(-1);
 }
 
 StoryWidget *TwoPlayersGameWidget::getOpponent()
 {
-    return &opponentFace;
+    return &_opponentFace;
 }
 
 void TwoPlayersGameWidget::cycle()
 {
-    opponentFace.setIntegerValue("@maxHeightLeft", _attachedGameA->getColumnHeigth(2));
-    opponentFace.setIntegerValue("@maxHeightRight", _attachedGameB->getColumnHeigth(2));
-    opponentFace.setIntegerValue("@neutralsForLeft", _attachedGameA->getNeutralFlobos());
-    opponentFace.setIntegerValue("@neutralsForRight", _attachedGameB->getNeutralFlobos());
-    opponentFace.setIntegerValue("@comboPhaseLeft", _attachedGameA->getComboPhase());
-    opponentFace.setIntegerValue("@comboPhaseRight", _attachedGameB->getComboPhase());
+    _opponentFace.setIntegerValue("@maxHeightLeft", _attachedGameA->getColumnHeigth(2));
+    _opponentFace.setIntegerValue("@maxHeightRight", _attachedGameB->getColumnHeigth(2));
+    _opponentFace.setIntegerValue("@neutralsForLeft", _attachedGameA->getNeutralFlobos());
+    _opponentFace.setIntegerValue("@neutralsForRight", _attachedGameB->getNeutralFlobos());
+    _opponentFace.setIntegerValue("@comboPhaseLeft", _attachedGameA->getComboPhase());
+    _opponentFace.setIntegerValue("@comboPhaseRight", _attachedGameB->getComboPhase());
     GameWidget2P::cycle();
 }
 
@@ -62,44 +62,44 @@ void TwoPlayersGameWidget::cycle()
 AltTwoPlayersStarterAction::AltTwoPlayersStarterAction(GameDifficulty difficulty, GameWidgetFactory *gameWidgetFactory, PlayerNameProvider *nameProvider, int nbSets)
 {
     // Creating the different game states
-    m_pushGameScreen.reset(new PushScreenState());
-    m_setupMatch.reset(new SetupMatchState(gameWidgetFactory, GameOptions::fromDifficulty(difficulty), nameProvider, &m_sharedAssets));
-    m_enterPlayersReady.reset(new EnterPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
-    m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
-    m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));
-    m_matchIsOver.reset(new MatchIsOverState(m_sharedAssets));
-    m_displayStats.reset(new DisplayStatsState(m_sharedAssets));
-    m_manageMultiSets.reset(new ManageMultiSetsState(&m_sharedAssets, nbSets, nameProvider));
-    m_podium.reset(new DisplayStoryScreenState("end_of_multiset.gsl"));
-    m_leaveGame.reset(new LeaveGameState(m_sharedAssets));
+    _pushGameScreen.reset(new PushScreenState());
+    _setupMatch.reset(new SetupMatchState(gameWidgetFactory, GameOptions::fromDifficulty(difficulty), nameProvider, &_sharedAssets));
+    _enterPlayersReady.reset(new EnterPlayerReadyState(_sharedAssets, _sharedGetReadyAssets));
+    _exitPlayersReady.reset(new ExitPlayerReadyState(_sharedAssets, _sharedGetReadyAssets));
+    _matchPlaying.reset(new MatchPlayingState(_sharedAssets));
+    _matchIsOver.reset(new MatchIsOverState(_sharedAssets));
+    _displayStats.reset(new DisplayStatsState(_sharedAssets));
+    _manageMultiSets.reset(new ManageMultiSetsState(&_sharedAssets, nbSets, nameProvider));
+    _podium.reset(new DisplayStoryScreenState("end_of_multiset.gsl"));
+    _leaveGame.reset(new LeaveGameState(_sharedAssets));
     // Linking the states together
-    m_pushGameScreen->setNextState(m_setupMatch.get());
-    m_setupMatch->setNextState(m_enterPlayersReady.get());
-    m_enterPlayersReady->setNextState(m_exitPlayersReady.get());
-    m_exitPlayersReady->setNextState(m_matchPlaying.get());
-    m_matchPlaying->setNextState(m_matchIsOver.get());
-    m_matchPlaying->setAbortedState(m_leaveGame.get());
-    m_matchIsOver->setNextState(m_displayStats.get());
+    _pushGameScreen->setNextState(_setupMatch.get());
+    _setupMatch->setNextState(_enterPlayersReady.get());
+    _enterPlayersReady->setNextState(_exitPlayersReady.get());
+    _exitPlayersReady->setNextState(_matchPlaying.get());
+    _matchPlaying->setNextState(_matchIsOver.get());
+    _matchPlaying->setAbortedState(_leaveGame.get());
+    _matchIsOver->setNextState(_displayStats.get());
     if (nbSets > 0) {
-        m_displayStats->setNextState(m_manageMultiSets.get());
-        m_manageMultiSets->setNextSetState(m_setupMatch.get());
-        m_manageMultiSets->setEndOfGameState(m_podium.get());
-        m_podium->setNextState(m_leaveGame.get());
-        m_setupMatch->setHandicapOnVictorious(false);
-        m_setupMatch->setDisplayVictories(true);
-        m_podium->setStoryScreenValuesProvider(m_manageMultiSets.get());
+        _displayStats->setNextState(_manageMultiSets.get());
+        _manageMultiSets->setNextSetState(_setupMatch.get());
+        _manageMultiSets->setEndOfGameState(_podium.get());
+        _podium->setNextState(_leaveGame.get());
+        _setupMatch->setHandicapOnVictorious(false);
+        _setupMatch->setDisplayVictories(true);
+        _podium->setStoryScreenValuesProvider(_manageMultiSets.get());
     }
     else {
-        m_displayStats->setNextState(m_setupMatch.get());
+        _displayStats->setNextState(_setupMatch.get());
     }
     // Initializing the state machine
-    m_stateMachine.setInitialState(m_pushGameScreen.get());
+    _stateMachine.setInitialState(_pushGameScreen.get());
 }
 
 void AltTwoPlayersStarterAction::action(Widget *sender, int actionType,
                                         event_manager::GameControlEvent *event)
 {
-    m_stateMachine.reset();
-    m_stateMachine.evaluate();
+    _stateMachine.reset();
+    _stateMachine.evaluate();
 }
 

@@ -10,7 +10,7 @@
 using namespace std;
 
 LocalStorageHiScoreBoard::LocalStorageHiScoreBoard(const char *boardId, PreferencesManager *prefsMgr, HiScoreBoard &defaultScores)
-    : m_prefsMgr(prefsMgr), m_boardId(boardId)
+    : _prefsMgr(prefsMgr), _boardId(boardId)
 {
     std::list<HiScoreEntry> entries;
     for (int i=0; i < defaultScores.getMaxRank(); ++i)
@@ -20,54 +20,54 @@ LocalStorageHiScoreBoard::LocalStorageHiScoreBoard(const char *boardId, Preferen
         ostringstream hiScoreNameKey, hiScoreValKey;
         hiScoreNameKey << "score." << boardId << ".name." << i;
         hiScoreValKey << "score." << boardId << ".val." << i;
-        entry.name = prefsMgr->getStrPreference(hiScoreNameKey.str().c_str(), defaultEntry.name.c_str());
-        entry.score = prefsMgr->getIntPreference(hiScoreValKey.str().c_str(), defaultEntry.score);
+        entry._name = prefsMgr->getStrPreference(hiScoreNameKey.str().c_str(), defaultEntry._name.c_str());
+        entry._score = prefsMgr->getIntPreference(hiScoreValKey.str().c_str(), defaultEntry._score);
         entries.push_back(entry);
     }
     entries.sort();
     entries.reverse();
-    m_entries.resize(entries.size());
+    _entries.resize(entries.size());
     entries.reverse();
-    copy(entries.begin(), entries.end(), m_entries.begin());
+    copy(entries.begin(), entries.end(), _entries.begin());
 }
 
 const HiScoreEntry & LocalStorageHiScoreBoard::getEntry(int rank) const
 {
-    return m_entries[rank];
+    return _entries[rank];
 }
 
 int LocalStorageHiScoreBoard::getMaxRank() const
 {
-    return m_entries.size();
+    return _entries.size();
 }
 
 int LocalStorageHiScoreBoard::setHiScore(std::string name, int score)
 {
     HiScoreEntry entry(name, score);
     std::list<HiScoreEntry> entries;
-    entries.resize(m_entries.size());
-    copy(m_entries.begin(), m_entries.end(), entries.begin());
+    entries.resize(_entries.size());
+    copy(_entries.begin(), _entries.end(), entries.begin());
     entries.push_back(entry);
     std::list<HiScoreEntry>::iterator newScore = entries.end();
     --newScore;
     entries.sort();
     entries.reverse();
-    entries.resize(m_entries.size());
+    entries.resize(_entries.size());
     entries.reverse();
     // Find rank and save entries
     int rank = -1;
     int i = 0;
     for (std::list<HiScoreEntry>::iterator iter = entries.begin();
          iter != entries.end() ; ++i, ++iter) {
-        GTLogTrace("%s %d", iter->name.c_str(), iter->score);
+        GTLogTrace("%s %d", iter->_name.c_str(), iter->_score);
         if (iter == newScore)
             rank = i;
-        m_entries[i] = *iter;
+        _entries[i] = *iter;
         ostringstream hiScoreNameKey, hiScoreValKey;
-        hiScoreNameKey << "score." << m_boardId << ".name." << i;
-        hiScoreValKey << "score." << m_boardId << ".val." << i;
-        m_prefsMgr->setStrPreference(hiScoreNameKey.str().c_str(), iter->name.c_str());
-        m_prefsMgr->setIntPreference(hiScoreValKey.str().c_str(), iter->score);
+        hiScoreNameKey << "score." << _boardId << ".name." << i;
+        hiScoreValKey << "score." << _boardId << ".val." << i;
+        _prefsMgr->setStrPreference(hiScoreNameKey.str().c_str(), iter->_name.c_str());
+        _prefsMgr->setIntPreference(hiScoreValKey.str().c_str(), iter->_score);
     }
     GTLogTrace("Rank: %d", rank);
     return rank;

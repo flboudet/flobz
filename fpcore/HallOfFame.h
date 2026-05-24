@@ -21,26 +21,26 @@ public:
     void highlightRank(int rank);
     virtual ~GameOverScreen();
 private:
-	HBox m_titleBox;
-	Text m_titleText;
-	Text m_titleScore;
-    Text *m_names, *m_points;
-    VBox m_hiScoreNameBox, m_hiScorePointBox;
-    HBox m_hiScoreBox;
-    HiScoreBoard *m_scoreBoard;
+	HBox _titleBox;
+	Text _titleText;
+	Text _titleScore;
+    Text *_names, *_points;
+    VBox _hiScoreNameBox, _hiScorePointBox;
+    HBox _hiScoreBox;
+    HiScoreBoard *_scoreBoard;
 };
 
 class HiScoreDefaultBoard : public HiScoreBoard {
 public:
     HiScoreDefaultBoard();
     virtual const HiScoreEntry &getEntry(int rank) const
-    { return m_entries[rank]; }
+    { return _entries[rank]; }
     virtual int getMaxRank() const
-    { return m_entries.size(); }
+    { return _entries.size(); }
     virtual int setHiScore(std::string name, int score)
     { return -1; }
 private:
-    std::vector<HiScoreEntry> m_entries;
+    std::vector<HiScoreEntry> _entries;
 };
 
 class HallOfFameScreen : public GameOverScreen {
@@ -68,15 +68,15 @@ class PushHallOfFameAction : public Action
 {
     public:
         PushHallOfFameAction(HallOfFameScreen *storyScreen)
-            : storyScreen(storyScreen)
+            : _storyScreen(storyScreen)
         {}
         void action() {
-            GameUIDefaults::SCREEN_STACK->push(storyScreen);
-            storyScreen->refresh();
+            GameUIDefaults::SCREEN_STACK->push(_storyScreen);
+            _storyScreen->refresh();
         }
     private:
-        HallOfFameScreen *storyScreen;
-        Screen *fromScreen;
+        HallOfFameScreen *_storyScreen;
+        Screen *_fromScreen;
 };
 
 /// Action to open a story screen with a transition
@@ -84,15 +84,15 @@ class PushStoryScreenAction : public Action
 {
     public:
         PushStoryScreenAction(StoryScreen *storyScreen, Screen *fromScreen)
-            : storyScreen(storyScreen), fromScreen(fromScreen)
+            : _storyScreen(storyScreen), _fromScreen(fromScreen)
         {}
         void action() {
-            storyScreen->getStoryWidget()->reset();
-            GameUIDefaults::SCREEN_STACK->push(storyScreen);
+            _storyScreen->getStoryWidget()->reset();
+            GameUIDefaults::SCREEN_STACK->push(_storyScreen);
         }
     private:
-        StoryScreen *storyScreen;
-        Screen *fromScreen;
+        StoryScreen *_storyScreen;
+        Screen *_fromScreen;
 };
 
 #endif

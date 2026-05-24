@@ -92,9 +92,9 @@ const char * ThemeManagerImpl::s_key_FloboColorOffset[NUMBER_OF_FLOBOS_IN_SET] =
 };
 
 ThemeManagerImpl::ThemeManagerImpl(DataPathManager &dataPathManager)
-    : m_dataPathManager(dataPathManager),
-      m_defaultFloboSetThemeName("Classic"),
-      m_defaultLevelThemeName("Basic level")
+    : _dataPathManager(dataPathManager),
+      _defaultFloboSetThemeName("Classic"),
+      _defaultLevelThemeName("Basic level")
 {
     // List the themes in the various pack folders
     if (dataPathManager.hasFile("theme")) {
@@ -116,42 +116,42 @@ FloboSetTheme * ThemeManagerImpl::createFloboSetTheme(const std::string &themeNa
 {
     //cout << "Creating floboset theme impl " << themeName << endl;
     std::map<std::string, FloboSetThemeDescription>::iterator iter
-        = m_floboSetThemeDescriptions.find(themeName);
-    if (iter == m_floboSetThemeDescriptions.end())
+        = _floboSetThemeDescriptions.find(themeName);
+    if (iter == _floboSetThemeDescriptions.end())
         return NULL;
-    if (themeName == m_defaultFloboSetThemeName)
+    if (themeName == _defaultFloboSetThemeName)
         return new FloboSetThemeImpl(iter->second);
-    if (m_defaultFloboSetTheme.get() == NULL) {
-        m_defaultFloboSetTheme.reset(new FloboSetThemeImpl(m_floboSetThemeDescriptions[m_defaultFloboSetThemeName]));
+    if (_defaultFloboSetTheme.get() == NULL) {
+        _defaultFloboSetTheme.reset(new FloboSetThemeImpl(_floboSetThemeDescriptions[_defaultFloboSetThemeName]));
     }
-    return new FloboSetThemeImpl(iter->second, m_defaultFloboSetTheme.get());
+    return new FloboSetThemeImpl(iter->second, _defaultFloboSetTheme.get());
 }
 
 LevelTheme   * ThemeManagerImpl::createLevelTheme(const std::string &themeName)
 {
     //cout << "Creating level theme impl " << themeName << endl;
     std::map<std::string, LevelThemeDescription>::iterator iter
-        = m_levelThemeDescriptions.find(themeName);
-    if (iter == m_levelThemeDescriptions.end())
+        = _levelThemeDescriptions.find(themeName);
+    if (iter == _levelThemeDescriptions.end())
         return NULL;
-    if (themeName == m_defaultLevelThemeName)
-        return new LevelThemeImpl(iter->second, m_dataPathManager);
-    if (m_defaultLevelTheme.get() == NULL) {
-        m_defaultLevelTheme.reset(new LevelThemeImpl(m_levelThemeDescriptions[m_defaultLevelThemeName], m_dataPathManager));
+    if (themeName == _defaultLevelThemeName)
+        return new LevelThemeImpl(iter->second, _dataPathManager);
+    if (_defaultLevelTheme.get() == NULL) {
+        _defaultLevelTheme.reset(new LevelThemeImpl(_levelThemeDescriptions[_defaultLevelThemeName], _dataPathManager));
     }
-    return new LevelThemeImpl(iter->second, m_dataPathManager, m_defaultLevelTheme.get());
+    return new LevelThemeImpl(iter->second, _dataPathManager, _defaultLevelTheme.get());
 }
 
 const std::vector<std::string> & ThemeManagerImpl::getFloboSetThemeList()
 {
-    return m_floboSetThemeList;
+    return _floboSetThemeList;
 }
 
 std::vector<std::string> ThemeManagerImpl::getLevelThemeList(int nbPlayers)
 {
     std::vector<std::string> result;
-    for (const auto& themeName : m_levelThemeList) {
-        if (m_levelThemeDescriptions[themeName].nbPlayers == nbPlayers)
+    for (const auto& themeName : _levelThemeList) {
+        if (_levelThemeDescriptions[themeName].nbPlayers == nbPlayers)
             result.push_back(themeName);
     }
     return result;
@@ -161,14 +161,14 @@ void ThemeManagerImpl::loadThemePack(const std::string &path)
 {
     FilePath themePath(path.c_str());
 	std::string themeDictionaryPath = FilePath::combine(FilePath::combine("theme",themePath.basename()),"locale");
-	m_localeDictionary.reset(new LocalizedDictionary(m_dataPathManager, themeDictionaryPath, "theme"));
-    m_themePackLoadingPath = path;
+	_localeDictionary.reset(new LocalizedDictionary(_dataPathManager, themeDictionaryPath, "theme"));
+    _themePackLoadingPath = path;
 
     GoomSL * gsl = gsl_new();
     if (!gsl) return;
-    //String libPath = m_dataPathManager.getPath("lib/themelib.gsl");
-    //String packageLibPath = m_dataPathManager.getPath("lib/packagelib.gsl");
-    GSLFA_setupWrapper(gsl, &m_dataPathManager);
+    //String libPath = _dataPathManager.getPath("lib/themelib.gsl");
+    //String packageLibPath = _dataPathManager.getPath("lib/packagelib.gsl");
+    GSLFA_setupWrapper(gsl, &_dataPathManager);
     gsl_push_file(gsl, "/lib/themelib.gsl");
     gsl_push_file(gsl, "/lib/packagelib.gsl");
     gsl_push_file(gsl, themePath.combine("Description.gsl").c_str());
@@ -185,7 +185,7 @@ void ThemeManagerImpl::loadThemePack(const std::string &path)
     GSL_SET_USERDATA_PTR(gsl, this);
     gsl_execute(gsl);
     gsl_free(gsl);
-    m_localeDictionary.reset(NULL);
+    _localeDictionary.reset(NULL);
 }
 
 void ThemeManagerImpl::end_floboset(GoomSL *gsl, GoomHash *global,
@@ -193,14 +193,14 @@ void ThemeManagerImpl::end_floboset(GoomSL *gsl, GoomHash *global,
 {
     ThemeManagerImpl *themeMgr = (ThemeManagerImpl *)GSL_GET_USERDATA_PTR(gsl);
 	std::string themeName  = (const char *) GSL_GLOBAL_PTR(gsl, "floboset.name");
-    std::string localizedThemeName = themeMgr->m_localeDictionary->getLocalizedString(themeName,true);
-    FloboSetThemeDescription &newThemeDescription = themeMgr->m_floboSetThemeDescriptions[themeName];
+    std::string localizedThemeName = themeMgr->_localeDictionary->getLocalizedString(themeName,true);
+    FloboSetThemeDescription &newThemeDescription = themeMgr->_floboSetThemeDescriptions[themeName];
     newThemeDescription.name = themeName;
     newThemeDescription.localizedName = localizedThemeName;
     newThemeDescription.author = (const char *)(GSL_GLOBAL_PTR(gsl, "author"));
     newThemeDescription.description = (const char *)(GSL_GLOBAL_PTR(gsl, "floboset.description"));
-    newThemeDescription.localizedDescription = themeMgr->m_localeDictionary->getLocalizedString(newThemeDescription.description.c_str(),true);
-    newThemeDescription.path = themeMgr->m_themePackLoadingPath;
+    newThemeDescription.localizedDescription = themeMgr->_localeDictionary->getLocalizedString(newThemeDescription.description.c_str(),true);
+    newThemeDescription.path = themeMgr->_themePackLoadingPath;
     for (int i = 0 ; i < NUMBER_OF_FLOBOS_IN_SET ; i++) {
         FloboThemeDescription &currentFloboThemeDescription =
             newThemeDescription.floboThemeDescriptions[i];
@@ -212,22 +212,22 @@ void ThemeManagerImpl::end_floboset(GoomSL *gsl, GoomHash *global,
         currentFloboThemeDescription.eyeOffsetY = GSL_GLOBAL_INT(gsl, s_key_FloboEyeOffsetY[i]);
         currentFloboThemeDescription.colorOffset = GSL_GLOBAL_FLOAT(gsl, s_key_FloboColorOffset[i]);
     }
-    themeMgr->m_floboSetThemeList.push_back(themeName);
+    themeMgr->_floboSetThemeList.push_back(themeName);
 }
 
 void ThemeManagerImpl::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
 {
     ThemeManagerImpl *themeMgr = (ThemeManagerImpl *)GSL_GET_USERDATA_PTR(gsl);
     std::string themeName  = (const char *) GSL_GLOBAL_PTR(gsl, "level.name");
-    std::string localizedThemeName = themeMgr->m_localeDictionary->getLocalizedString(themeName,true);
-    LevelThemeDescription &newThemeDescription = themeMgr->m_levelThemeDescriptions[themeName];
+    std::string localizedThemeName = themeMgr->_localeDictionary->getLocalizedString(themeName,true);
+    LevelThemeDescription &newThemeDescription = themeMgr->_levelThemeDescriptions[themeName];
     newThemeDescription.name = themeName;
     newThemeDescription.localizedName = localizedThemeName;
     newThemeDescription.author = (const char *)(GSL_GLOBAL_PTR(gsl, "author"));
     newThemeDescription.description = (const char *)(GSL_GLOBAL_PTR(gsl, "level.description"));
-    newThemeDescription.localizedDescription = themeMgr->m_localeDictionary->getLocalizedString(newThemeDescription.description.c_str(),true);
+    newThemeDescription.localizedDescription = themeMgr->_localeDictionary->getLocalizedString(newThemeDescription.description.c_str(),true);
     newThemeDescription.nbPlayers = GSL_GLOBAL_INT(gsl, "level.nbPlayers");
-    newThemeDescription.path = themeMgr->m_themePackLoadingPath;
+    newThemeDescription.path = themeMgr->_themePackLoadingPath;
 
     newThemeDescription.lives = (const char *) GSL_GLOBAL_PTR(gsl, "level.lives");
     newThemeDescription.trophy = (const char *) GSL_GLOBAL_PTR(gsl, "level.trophy");
@@ -263,7 +263,7 @@ void ThemeManagerImpl::end_level(GoomSL *gsl, GoomHash *global, GoomHash *local)
     for (int i = 0 ; i < NUMBER_OF_FLOBOBANS_IN_LEVEL ; i++)
         loadFlobobanDefinition(gsl, i, newThemeDescription.floboban[i]);
 
-    themeMgr->m_levelThemeList.push_back(themeName);
+    themeMgr->_levelThemeList.push_back(themeName);
 }
 
 void ThemeManagerImpl::end_description(GoomSL *gsl, GoomHash *global, GoomHash *local)
@@ -305,40 +305,40 @@ void ThemeManagerImpl::loadFontDefinition(GoomSL *gsl, const char *fontName, Fon
 
 FloboSetThemeImpl::FloboSetThemeImpl(const FloboSetThemeDescription &desc,
                                    FloboSetTheme *defaultTheme)
-    : m_desc(desc), m_defaultTheme(defaultTheme)
+    : _desc(desc), _defaultTheme(defaultTheme)
 {
     for (int i = 0 ; i < NUMBER_OF_FLOBOS_IN_SET-1 ; i++) {
-        if (m_defaultTheme == NULL)
-            m_floboThemes[i].reset(new FloboThemeImpl(desc.floboThemeDescriptions[i], desc.path));
+        if (_defaultTheme == NULL)
+            _floboThemes[i].reset(new FloboThemeImpl(desc.floboThemeDescriptions[i], desc.path));
         else {
-            m_floboThemes[i].reset(new FloboThemeImpl(desc.floboThemeDescriptions[i], desc.path, &(m_defaultTheme->getFloboTheme((FloboState)i))));
+            _floboThemes[i].reset(new FloboThemeImpl(desc.floboThemeDescriptions[i], desc.path, &(_defaultTheme->getFloboTheme((FloboState)i))));
         }
     }
     // Neutral flobo is a special case
-    if (m_defaultTheme == NULL)
-        m_floboThemes[NUMBER_OF_FLOBOS_IN_SET-1].reset(new NeutralFloboThemeImpl(desc.floboThemeDescriptions[NUMBER_OF_FLOBOS_IN_SET-1], desc.path));
+    if (_defaultTheme == NULL)
+        _floboThemes[NUMBER_OF_FLOBOS_IN_SET-1].reset(new NeutralFloboThemeImpl(desc.floboThemeDescriptions[NUMBER_OF_FLOBOS_IN_SET-1], desc.path));
     else
-        m_floboThemes[NUMBER_OF_FLOBOS_IN_SET-1].reset(new NeutralFloboThemeImpl(desc.floboThemeDescriptions[NUMBER_OF_FLOBOS_IN_SET-1], desc.path, &(m_defaultTheme->getFloboTheme(FLOBO_NEUTRAL))));
+        _floboThemes[NUMBER_OF_FLOBOS_IN_SET-1].reset(new NeutralFloboThemeImpl(desc.floboThemeDescriptions[NUMBER_OF_FLOBOS_IN_SET-1], desc.path, &(_defaultTheme->getFloboTheme(FLOBO_NEUTRAL))));
 }
 
 const std::string & FloboSetThemeImpl::getName() const
 {
-    return m_desc.name;
+    return _desc.name;
 }
 
 const std::string & FloboSetThemeImpl::getLocalizedName() const
 {
-    return m_desc.localizedName;
+    return _desc.localizedName;
 }
 
 const std::string & FloboSetThemeImpl::getAuthor() const
 {
-    return m_desc.author;
+    return _desc.author;
 }
 
 const std::string & FloboSetThemeImpl::getComments() const
 {
-    return m_desc.description;
+    return _desc.description;
 }
 
 const FloboTheme & FloboSetThemeImpl::getFloboTheme(FloboState state) const
@@ -346,21 +346,21 @@ const FloboTheme & FloboSetThemeImpl::getFloboTheme(FloboState state) const
     switch (state) {
     case FLOBO_FALLINGBLUE:
     case FLOBO_BLUE:
-        return *m_floboThemes[0];
+        return *_floboThemes[0];
     case FLOBO_FALLINGRED:
     case FLOBO_RED:
-        return *m_floboThemes[1];
+        return *_floboThemes[1];
     case FLOBO_FALLINGGREEN:
     case FLOBO_GREEN:
-        return *m_floboThemes[2];
+        return *_floboThemes[2];
     case FLOBO_FALLINGVIOLET:
     case FLOBO_VIOLET:
-        return *m_floboThemes[3];
+        return *_floboThemes[3];
     case FLOBO_FALLINGYELLOW:
     case FLOBO_YELLOW:
-        return *m_floboThemes[4];
+        return *_floboThemes[4];
     default:
-        return *m_floboThemes[5];
+        return *_floboThemes[5];
     }
 }
 
@@ -368,12 +368,12 @@ const FloboTheme & FloboSetThemeImpl::getFloboTheme(FloboState state) const
 BaseFloboThemeImpl::BaseFloboThemeImpl(const FloboThemeDescription &desc,
                                      const std::string &path,
                                      const FloboTheme *defaultTheme)
-    : m_desc(desc), m_path(path), m_defaultTheme(defaultTheme)
+    : _desc(desc), _path(path), _defaultTheme(defaultTheme)
 {}
 
 BaseFloboThemeImpl::~BaseFloboThemeImpl()
 {
-    for (auto surface : m_surfaceBin) {
+    for (auto surface : _surfaceBin) {
         delete surface;
     }
 }
@@ -386,40 +386,40 @@ FloboThemeImpl::FloboThemeImpl(const FloboThemeDescription &desc,
     // Initializing the arrays of pointers
     for (int i = 0 ; i < NUMBER_OF_FLOBO_FACES ; ++i)
         for (int j = 0 ; j < MAX_COMPRESSED ; ++j)
-            m_faces[i][j] = NULL;
+            _faces[i][j] = NULL;
     for (int i = 0 ; i < NUMBER_OF_FLOBO_EYES ; ++i)
         for (int j = 0 ; j < MAX_COMPRESSED ; ++j)
-            m_eyes[i][j] = NULL;
+            _eyes[i][j] = NULL;
     for (int i = 0 ; i < NUMBER_OF_FLOBO_CIRCLES ; ++i)
-            m_circles[i] = NULL;
+            _circles[i] = NULL;
     for (int j = 0 ; j < MAX_COMPRESSED ; ++j)
-        m_shadows[j] = NULL;
+        _shadows[j] = NULL;
     for (int i = 0 ; i < NUMBER_OF_FLOBO_DISAPPEAR ; ++i)
-        m_shrinking[i] = NULL;
+        _shrinking[i] = NULL;
     for (int i = 0 ; i < NUMBER_OF_FLOBO_EXPLOSIONS ; ++i)
-        m_explosion[i] = NULL;
+        _explosion[i] = NULL;
 }
 
 IosSurface *FloboThemeImpl::getFloboSurfaceForValence(int valence, int compression) const
 {
-    IosSurface * &ref = m_faces[valence][compression];
+    IosSurface * &ref = _faces[valence][compression];
     if (ref == NULL) {
-        IosSurface * &uncompressed = m_faces[valence][0];
+        IosSurface * &uncompressed = _faces[valence][0];
         // Do we need to load the uncompressed image?
         if (uncompressed == NULL) {
             ostringstream osstream;
-            osstream << m_path << "/" << m_desc.face << "-flobo-"
+            osstream << _path << "/" << _desc.face << "-flobo-"
                      << ((valence&8)>>3)
                      << ((valence&4)>>2)
                      << ((valence&2)>>1)
                      << (valence&1) << ".png";
             ImageOperationList opList;
             opList.resizeAlpha = true;
-            if (m_desc.colorOffset == 0) {
-                m_baseFaces[valence] = theCommander->getSurface(IMAGE_RGBA,
+            if (_desc.colorOffset == 0) {
+                _baseFaces[valence] = theCommander->getSurface(IMAGE_RGBA,
                                                                 osstream.str().c_str(),
                                                                 opList);
-                uncompressed = m_baseFaces[valence];
+                uncompressed = _baseFaces[valence];
             }
             else {
                 opList.shiftHue = true;
@@ -428,8 +428,8 @@ IosSurface *FloboThemeImpl::getFloboSurfaceForValence(int valence, int compressi
                                                                   opList);
                 if (baseFace == NULL)
                     throw std::runtime_error(std::string("Unable to load file: ") + osstream.str());
-                uncompressed = baseFace.get()->shiftHue(m_desc.colorOffset);
-                m_surfaceBin.push_back(uncompressed);
+                uncompressed = baseFace.get()->shiftHue(_desc.colorOffset);
+                _surfaceBin.push_back(uncompressed);
             }
         }
         // Create the compressed image
@@ -437,145 +437,145 @@ IosSurface *FloboThemeImpl::getFloboSurfaceForValence(int valence, int compressi
             if (compression != 0) {
                 ref = uncompressed->resizeAlpha(uncompressed->w,
                                                 uncompressed->h - compression);
-                m_surfaceBin.push_back(ref);
+                _surfaceBin.push_back(ref);
             }
         }
     }
-    if ((ref == NULL) && (m_defaultTheme != NULL))
-        return m_defaultTheme->getFloboSurfaceForValence(valence, compression);
+    if ((ref == NULL) && (_defaultTheme != NULL))
+        return _defaultTheme->getFloboSurfaceForValence(valence, compression);
     return ref;
 }
 
 IosSurface *FloboThemeImpl::getEyeSurfaceForIndex(int index, int compression) const
 {
-    IosSurface * &ref = m_eyes[index][compression];
+    IosSurface * &ref = _eyes[index][compression];
     if (ref == NULL) {
-        IosSurface * &uncompressed = m_eyes[index][0];
+        IosSurface * &uncompressed = _eyes[index][0];
         // Do we need to load the uncompressed image?
         if (uncompressed == NULL) {
             ostringstream osstream;
-            osstream << m_path << "/" << m_desc.eye << "-flobo-eye-" << index << ".png";
+            osstream << _path << "/" << _desc.eye << "-flobo-eye-" << index << ".png";
             ImageOperationList opList;
             opList.resizeAlpha = true;
-            m_baseEyes[index] = theCommander->getSurface(IMAGE_RGBA,
+            _baseEyes[index] = theCommander->getSurface(IMAGE_RGBA,
                                                          osstream.str().c_str(),
                                                          opList);
-            uncompressed = m_baseEyes[index];
+            uncompressed = _baseEyes[index];
         }
         if (uncompressed != NULL) {
             // Create the compressed image
             if (compression != 0) {
                 ref = uncompressed->resizeAlpha(uncompressed->w,
                                                 uncompressed->h - compression);
-                m_surfaceBin.push_back(ref);
+                _surfaceBin.push_back(ref);
             }
         }
     }
-    if ((ref == NULL) && (m_defaultTheme != NULL))
-        return m_defaultTheme->getEyeSurfaceForIndex(index, compression);
+    if ((ref == NULL) && (_defaultTheme != NULL))
+        return _defaultTheme->getEyeSurfaceForIndex(index, compression);
     return ref;
 }
 
 int FloboThemeImpl::getEyeSurfaceOffsetX() const
 {
-    return m_desc.eyeOffsetX;
+    return _desc.eyeOffsetX;
 }
 int FloboThemeImpl::getEyeSurfaceOffsetY() const
 {
-    return m_desc.eyeOffsetY;
+    return _desc.eyeOffsetY;
 }
 
 IosSurface *FloboThemeImpl::getCircleSurfaceForIndex(int index) const
 {
-    IosSurface * &ref = m_circles[index];
+    IosSurface * &ref = _circles[index];
     if (ref == NULL) {
         // Do we need to load the reference image?
-        if (m_baseCircle.get() == NULL) {
+        if (_baseCircle.get() == NULL) {
             ostringstream osstream;
-            osstream << m_path << "/" << m_desc.face << "-flobo-border.png";
+            osstream << _path << "/" << _desc.face << "-flobo-border.png";
             ImageOperationList opList;
             opList.setValue = true;
-            m_baseCircle = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
+            _baseCircle = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
         }
-        ref = m_baseCircle.get()->setAlpha(sin(3.14f/2.0f+index*3.14f/64.0f)*0.6f+0.2f);
-        m_surfaceBin.push_back(ref);
+        ref = _baseCircle.get()->setAlpha(sin(3.14f/2.0f+index*3.14f/64.0f)*0.6f+0.2f);
+        _surfaceBin.push_back(ref);
     }
-    if ((ref == NULL) && (m_defaultTheme != NULL))
-        return m_defaultTheme->getCircleSurfaceForIndex(index);
+    if ((ref == NULL) && (_defaultTheme != NULL))
+        return _defaultTheme->getCircleSurfaceForIndex(index);
     return ref;
 }
 
 IosSurface *FloboThemeImpl::getShadowSurface(int compression) const
 {
-    IosSurface * &ref = m_shadows[compression];
+    IosSurface * &ref = _shadows[compression];
     if (ref == NULL) {
-        IosSurface * &uncompressed = m_shadows[0];
+        IosSurface * &uncompressed = _shadows[0];
         // Do we need to load the uncompressed image?
         if (uncompressed == NULL) {
             ostringstream osstream;
-            osstream << m_path << "/" << m_desc.face << "-flobo-shadow.png";
+            osstream << _path << "/" << _desc.face << "-flobo-shadow.png";
             ImageOperationList opList;
             opList.resizeAlpha = true;
-            m_baseShadow = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
-            uncompressed = m_baseShadow;
+            _baseShadow = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
+            uncompressed = _baseShadow;
         }
         // Create the compressed image
         if (uncompressed != NULL) {
             if (compression != 0) {
                 ref = uncompressed->resizeAlpha(uncompressed->w,
                                                 uncompressed->h - compression);
-                m_surfaceBin.push_back(ref);
+                _surfaceBin.push_back(ref);
             }
         }
     }
-    if ((ref == NULL) && (m_defaultTheme != NULL))
-        return m_defaultTheme->getShadowSurface(compression);
+    if ((ref == NULL) && (_defaultTheme != NULL))
+        return _defaultTheme->getShadowSurface(compression);
     return ref;
 }
 
 IosSurface *FloboThemeImpl::getShrinkingSurfaceForIndex(int index) const
 {
-    IosSurface *ref = m_shrinking[index];
+    IosSurface *ref = _shrinking[index];
     if (ref == NULL) {
         ostringstream osstream;
-        osstream << m_path << "/" << m_desc.disappear << "-flobo-disappear-" << index << ".png";
+        osstream << _path << "/" << _desc.disappear << "-flobo-disappear-" << index << ".png";
         ImageOperationList opList;
-        if (m_desc.colorOffset == 0) {
-            m_baseShrinking[index] = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
-            ref = m_baseShrinking[index];
+        if (_desc.colorOffset == 0) {
+            _baseShrinking[index] = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
+            ref = _baseShrinking[index];
         }
         else {
             opList.shiftHue = true;
             IosSurfaceRef base = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
-            ref = base.get()->shiftHue(m_desc.colorOffset);
-            m_surfaceBin.push_back(ref);
+            ref = base.get()->shiftHue(_desc.colorOffset);
+            _surfaceBin.push_back(ref);
         }
     }
-    if ((ref == NULL) && (m_defaultTheme != NULL))
-        return m_defaultTheme->getShrinkingSurfaceForIndex(index);
+    if ((ref == NULL) && (_defaultTheme != NULL))
+        return _defaultTheme->getShrinkingSurfaceForIndex(index);
     return ref;
 }
 
 IosSurface *FloboThemeImpl::getExplodingSurfaceForIndex(int index) const
 {
-    IosSurface *ref = m_explosion[index];
+    IosSurface *ref = _explosion[index];
     if (ref == NULL) {
         ostringstream osstream;
-        osstream << m_path << "/" << m_desc.explosion << "-flobo-explosion-" << index << ".png";
+        osstream << _path << "/" << _desc.explosion << "-flobo-explosion-" << index << ".png";
         ImageOperationList opList;
-        if (m_desc.colorOffset == 0) {
-            m_baseExplosion[index] = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
-            ref = m_baseExplosion[index];
+        if (_desc.colorOffset == 0) {
+            _baseExplosion[index] = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
+            ref = _baseExplosion[index];
         }
         else {
             opList.shiftHue = true;
             IosSurfaceRef base = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
-            ref = base.get()->shiftHue(m_desc.colorOffset);
-            m_surfaceBin.push_back(ref);
+            ref = base.get()->shiftHue(_desc.colorOffset);
+            _surfaceBin.push_back(ref);
         }
     }
-    if ((ref == NULL) && (m_defaultTheme != NULL))
-        return m_defaultTheme->getExplodingSurfaceForIndex(index);
+    if ((ref == NULL) && (_defaultTheme != NULL))
+        return _defaultTheme->getExplodingSurfaceForIndex(index);
     return ref;
 }
 
@@ -586,34 +586,34 @@ NeutralFloboThemeImpl::NeutralFloboThemeImpl(const FloboThemeDescription &desc,
 {
     // Initializing the arrays of pointers
     for (int j = 0 ; j < MAX_COMPRESSED ; j++)
-        m_faces[j] = NULL;
+        _faces[j] = NULL;
 }
 
 IosSurface *NeutralFloboThemeImpl::getFloboSurfaceForValence(int valence, int compression) const
 {
-    IosSurface * &ref = m_faces[compression];
+    IosSurface * &ref = _faces[compression];
     if (ref == NULL) {
-        IosSurface * &uncompressed = m_faces[0];
+        IosSurface * &uncompressed = _faces[0];
         // Do we need to load the uncompressed image?
         if (uncompressed == NULL) {
             ostringstream osstream;
-            osstream << m_path << "/" << m_desc.face << ".png";
+            osstream << _path << "/" << _desc.face << ".png";
             ImageOperationList opList;
             opList.resizeAlpha = true;
-            m_baseFace = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
-            uncompressed = m_baseFace;
+            _baseFace = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
+            uncompressed = _baseFace;
         }
         // Create the compressed image
         if (uncompressed != NULL) {
             if (compression != 0) {
                 ref = uncompressed->resizeAlpha(uncompressed->w,
                                                 uncompressed->h - compression);
-                m_surfaceBin.push_back(ref);
+                _surfaceBin.push_back(ref);
             }
         }
     }
-    if ((ref == NULL) && (m_defaultTheme != NULL))
-        return m_defaultTheme->getFloboSurfaceForValence(valence, compression);
+    if ((ref == NULL) && (_defaultTheme != NULL))
+        return _defaultTheme->getFloboSurfaceForValence(valence, compression);
     return ref;
 }
 
@@ -641,15 +641,15 @@ IosSurface *NeutralFloboThemeImpl::getShadowSurface(int compression) const
 
 IosSurface *NeutralFloboThemeImpl::getShrinkingSurfaceForIndex(int index) const
 {
-    IosSurfaceRef &ref = m_shrinking[index];
+    IosSurfaceRef &ref = _shrinking[index];
     if (ref == NULL) {
         ostringstream osstream;
-        osstream << m_path << "/" << m_desc.face << "-neutral-" << index << ".png";
+        osstream << _path << "/" << _desc.face << "-neutral-" << index << ".png";
         ImageOperationList opList;
         ref = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
     }
-    if ((ref == NULL) && (m_defaultTheme != NULL))
-        return m_defaultTheme->getShrinkingSurfaceForIndex(index);
+    if ((ref == NULL) && (_defaultTheme != NULL))
+        return _defaultTheme->getShrinkingSurfaceForIndex(index);
     return ref;
 }
 
@@ -666,45 +666,45 @@ IosSurface *NeutralFloboThemeImpl::getExplodingSurfaceForIndex(int index) const
 LevelThemeImpl::LevelThemeImpl(const LevelThemeDescription &desc,
                                DataPathManager &dataPathManager,
                                LevelThemeImpl *defaultTheme)
-    : m_desc(desc), m_path(desc.path), m_dataPathManager(dataPathManager), m_defaultTheme(defaultTheme)
+    : _desc(desc), _path(desc.path), _dataPathManager(dataPathManager), _defaultTheme(defaultTheme)
 {
 }
 
 const std::string & LevelThemeImpl::getName() const
 {
-    return m_desc.name;
+    return _desc.name;
 }
 
 const std::string & LevelThemeImpl::getLocalizedName() const
 {
-    return m_desc.localizedName;
+    return _desc.localizedName;
 }
 
 const std::string & LevelThemeImpl::getAuthor() const
 {
-    return m_desc.author;
+    return _desc.author;
 }
 
 const std::string & LevelThemeImpl::getComments() const
 {
-    return m_desc.description;
+    return _desc.description;
 }
 
 int LevelThemeImpl::getNbPlayers() const
 {
-    return m_desc.nbPlayers;
+    return _desc.nbPlayers;
 }
 
 IosSurface * LevelThemeImpl::getLifeForIndex(int index) const
 {
-    IosSurfaceRef &result = m_lifes[index];
+    IosSurfaceRef &result = _lifes[index];
     if (result.empty()) {
         ostringstream osstream;
-        osstream << m_path << "/" << m_desc.lives << "-lives-" << index << ".png";
+        osstream << _path << "/" << _desc.lives << "-lives-" << index << ".png";
         ImageOperationList opList;
         result = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
-        if ((result.empty()) && (m_defaultTheme != NULL)) {
-            return m_defaultTheme->getLifeForIndex(index);
+        if ((result.empty()) && (_defaultTheme != NULL)) {
+            return _defaultTheme->getLifeForIndex(index);
         }
     }
     return result;
@@ -714,11 +714,11 @@ IosSurfaceRef &LevelThemeImpl::getResource(IosSurfaceRef &ref, const std::string
 {
     if (ref.empty()) {
         ostringstream osstream;
-        osstream << m_path << "/" << resName << resSuffix;
+        osstream << _path << "/" << resName << resSuffix;
         ImageOperationList opList;
         ref = theCommander->getSurface(IMAGE_RGBA, osstream.str().c_str(), opList);
-        if ((ref.empty()) && (m_defaultTheme != NULL)) {
-            ref = m_defaultTheme->getResource(ref, resName, resSuffix);
+        if ((ref.empty()) && (_defaultTheme != NULL)) {
+            ref = _defaultTheme->getResource(ref, resName, resSuffix);
         }
     }
     return ref;
@@ -726,179 +726,179 @@ IosSurfaceRef &LevelThemeImpl::getResource(IosSurfaceRef &ref, const std::string
 
 IosSurface * LevelThemeImpl::getBackground() const
 {
-    IosSurfaceRef &result = getResource(m_background, m_desc.background, "");
+    IosSurfaceRef &result = getResource(_background, _desc.background, "");
     return result;
 }
 
 IosSurface * LevelThemeImpl::getGrid() const
 {
-    if (m_desc.grid == "")
+    if (_desc.grid == "")
         return NULL;
-    IosSurfaceRef &result = getResource(m_grid, m_desc.grid, "-background-grid.png");
+    IosSurfaceRef &result = getResource(_grid, _desc.grid, "-background-grid.png");
     return result;
 }
 
 IosSurface * LevelThemeImpl::getSpeedMeter(bool front) const
 {
     if (front)
-        return getResource(m_speedMeterFront, m_desc.speedMeter, "-background-meter-above.png");
-    return getResource(m_speedMeterBack, m_desc.speedMeter, "-background-meter-below.png");
+        return getResource(_speedMeterFront, _desc.speedMeter, "-background-meter-above.png");
+    return getResource(_speedMeterBack, _desc.speedMeter, "-background-meter-below.png");
 }
 
 IosSurface * LevelThemeImpl::getNeutralIndicator() const
 {
-    return getResource(m_neutralIndicator, m_desc.neutralIndicator, "-small.png");
+    return getResource(_neutralIndicator, _desc.neutralIndicator, "-small.png");
 }
 
 IosSurface * LevelThemeImpl::getBigNeutralIndicator() const
 {
-    return getResource(m_bigNeutralIndicator, m_desc.neutralIndicator, ".png");
+    return getResource(_bigNeutralIndicator, _desc.neutralIndicator, ".png");
 }
 
 IosSurface * LevelThemeImpl::getGiantNeutralIndicator() const
 {
-    return getResource(m_giantNeutralIndicator, m_desc.neutralIndicator, "-giant.png");
+    return getResource(_giantNeutralIndicator, _desc.neutralIndicator, "-giant.png");
 }
 
 IosSurface * LevelThemeImpl::getTrophy() const
 {
-    return getResource(m_trophy, m_desc.trophy, "");
+    return getResource(_trophy, _desc.trophy, "");
 }
 
 IosFont *LevelThemeImpl::getPlayerNameFont() const
 {
-    if (m_playerNameFont.empty()) {
-        string fontPath = m_desc.playerNameFont.fontPath;
+    if (_playerNameFont.empty()) {
+        string fontPath = _desc.playerNameFont.fontPath;
         if (fontPath == "__FONT__") {
             fontPath = theCommander->getLocalizedFontName();
         }
-        m_playerNameFont = theCommander->getFont(fontPath.c_str(), m_desc.playerNameFont.fontSize);
+        _playerNameFont = theCommander->getFont(fontPath.c_str(), _desc.playerNameFont.fontSize);
     }
-    return m_playerNameFont;
+    return _playerNameFont;
 }
 
 IosFont *LevelThemeImpl::getScoreFont() const
 {
-    if (m_scoreFont.empty()) {
-        string fontPath = m_desc.scoreFont.fontPath;
+    if (_scoreFont.empty()) {
+        string fontPath = _desc.scoreFont.fontPath;
         if (fontPath == "__FONT__") {
             fontPath = theCommander->getLocalizedFontName();
         }
-        m_scoreFont = theCommander->getFont(fontPath.c_str(), m_desc.scoreFont.fontSize);
+        _scoreFont = theCommander->getFont(fontPath.c_str(), _desc.scoreFont.fontSize);
     }
-    return m_scoreFont;
+    return _scoreFont;
 }
 
 int LevelThemeImpl::getSpeedMeterX() const
-{ return m_desc.speedMeterX; }
+{ return _desc.speedMeterX; }
 
 int LevelThemeImpl::getSpeedMeterY() const
-{ return m_desc.speedMeterY; }
+{ return _desc.speedMeterY; }
 
 int LevelThemeImpl::getLifeDisplayX() const
-{ return m_desc.lifeDisplayX; }
+{ return _desc.lifeDisplayX; }
 
 int LevelThemeImpl::getLifeDisplayY() const
-{ return m_desc.lifeDisplayY; }
+{ return _desc.lifeDisplayY; }
 
 int LevelThemeImpl::getFlobobanX(int playerId) const
-{ return m_desc.floboban[playerId].displayX; }
+{ return _desc.floboban[playerId].displayX; }
 
 int LevelThemeImpl::getFlobobanY(int playerId) const
-{ return m_desc.floboban[playerId].displayY; }
+{ return _desc.floboban[playerId].displayY; }
 
 int LevelThemeImpl::getNextFlobosX(int playerId) const
-{ return m_desc.floboban[playerId].nextX; }
+{ return _desc.floboban[playerId].nextX; }
 
 int LevelThemeImpl::getNextFlobosY(int playerId) const
-{ return m_desc.floboban[playerId].nextY; }
+{ return _desc.floboban[playerId].nextY; }
 
 int LevelThemeImpl::getNeutralDisplayX(int playerId) const
-{ return m_desc.floboban[playerId].neutralDisplayX; }
+{ return _desc.floboban[playerId].neutralDisplayX; }
 
 int LevelThemeImpl::getNeutralDisplayY(int playerId) const
-{ return m_desc.floboban[playerId].neutralDisplayY; }
+{ return _desc.floboban[playerId].neutralDisplayY; }
 
 int LevelThemeImpl::getNameDisplayX(int playerId) const
-{ return m_desc.floboban[playerId].nameDisplayX; }
+{ return _desc.floboban[playerId].nameDisplayX; }
 
 int LevelThemeImpl::getNameDisplayY(int playerId) const
-{ return m_desc.floboban[playerId].nameDisplayY; }
+{ return _desc.floboban[playerId].nameDisplayY; }
 
 int LevelThemeImpl::getScoreDisplayX(int playerId) const
-{ return m_desc.floboban[playerId].scoreDisplayX; }
+{ return _desc.floboban[playerId].scoreDisplayX; }
 
 int LevelThemeImpl::getScoreDisplayY(int playerId) const
-{ return m_desc.floboban[playerId].scoreDisplayY; }
+{ return _desc.floboban[playerId].scoreDisplayY; }
 
 float LevelThemeImpl::getFlobobanScale(int playerId) const
-{ return m_desc.floboban[playerId].scale; }
+{ return _desc.floboban[playerId].scale; }
 
 int LevelThemeImpl::getTrophyDisplayX(int playerId) const
-{ return m_desc.floboban[playerId].trophyDisplayX; }
+{ return _desc.floboban[playerId].trophyDisplayX; }
 
 int LevelThemeImpl::getTrophyDisplayY(int playerId) const
-{ return m_desc.floboban[playerId].trophyDisplayY; }
+{ return _desc.floboban[playerId].trophyDisplayY; }
 
 bool LevelThemeImpl::getShouldDisplayNext(int playerId) const
-{ return m_desc.floboban[playerId].shouldDisplayNext; }
+{ return _desc.floboban[playerId].shouldDisplayNext; }
 
 bool LevelThemeImpl::getShouldDisplayShadows(int playerId) const
-{ return m_desc.floboban[playerId].shouldDisplayShadow; }
+{ return _desc.floboban[playerId].shouldDisplayShadow; }
 
 bool LevelThemeImpl::getShouldDisplayEyes(int playerId) const
-{ return m_desc.floboban[playerId].shouldDisplayEyes; }
+{ return _desc.floboban[playerId].shouldDisplayEyes; }
 
 bool LevelThemeImpl::getOpponentIsBehind() const
-{ return m_desc.opponentIsBehind; }
+{ return _desc.opponentIsBehind; }
 
 int LevelThemeImpl::getStatsHeight() const
-{ return m_desc.statsHeight; }
+{ return _desc.statsHeight; }
 
 int LevelThemeImpl::getStatsLegendWidth() const
-{ return m_desc.statsLegendWidth; }
+{ return _desc.statsLegendWidth; }
 
 int LevelThemeImpl::getStatsComboLineValueWidth() const
-{ return m_desc.statsComboLineValueWidth; }
+{ return _desc.statsComboLineValueWidth; }
 
 int LevelThemeImpl::getStatsLeftBackgroundOffsetX() const
-{ return m_desc.statsLeftBackgroundOffsetX; }
+{ return _desc.statsLeftBackgroundOffsetX; }
 
 int LevelThemeImpl::getStatsLeftBackgroundOffsetY() const
-{ return m_desc.statsLeftBackgroundOffsetY; }
+{ return _desc.statsLeftBackgroundOffsetY; }
 
 int LevelThemeImpl::getStatsRightBackgroundOffsetX() const
-{ return m_desc.statsRightBackgroundOffsetX; }
+{ return _desc.statsRightBackgroundOffsetX; }
 
 int LevelThemeImpl::getStatsRightBackgroundOffsetY() const
-{ return m_desc.statsRightBackgroundOffsetY; }
+{ return _desc.statsRightBackgroundOffsetY; }
 
 const std::string LevelThemeImpl::getGameLostLeftAnimation2P() const
 {
-    return m_desc.gameLostLeft2PAnimation;
+    return _desc.gameLostLeft2PAnimation;
 }
 
 const std::string LevelThemeImpl::getGameLostRightAnimation2P() const
 {
-    return m_desc.gameLostRight2PAnimation;
+    return _desc.gameLostRight2PAnimation;
 }
 
 const std::string LevelThemeImpl::getCentralAnimation2P() const
 {
-    return m_desc.animation;
+    return _desc.animation;
 }
 
 const std::string LevelThemeImpl::getForegroundAnimation() const
 {
-    if (m_desc.fgAnimation == "")
+    if (_desc.fgAnimation == "")
         return "";
-    return  m_path + "/" + m_desc.fgAnimation;
+    return  _path + "/" + _desc.fgAnimation;
 }
 
 const std::string LevelThemeImpl::getReadyAnimation2P() const
 {
-    return m_desc.getReadyAnimation;
+    return _desc.getReadyAnimation;
 }
 
 const std::string LevelThemeImpl::getThemeRootPath() const
-{ return m_path; }
+{ return _path; }

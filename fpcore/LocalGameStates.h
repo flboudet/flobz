@@ -58,21 +58,21 @@ struct SharedMatchAssets
     SharedMatchAssets() {
         release();
     }
-    FloboSetThemeRef m_currentFloboSetTheme;
-    LevelThemeRef m_currentLevelTheme;
-    std::unique_ptr<GameWidget> m_gameWidget;
-    std::unique_ptr<GameScreen> m_gameScreen;
-    int m_leftVictories, m_leftTotal;
-    int m_rightVictories, m_rightTotal;
+    FloboSetThemeRef _currentFloboSetTheme;
+    LevelThemeRef _currentLevelTheme;
+    std::unique_ptr<GameWidget> _gameWidget;
+    std::unique_ptr<GameScreen> _gameScreen;
+    int _leftVictories, _leftTotal;
+    int _rightVictories, _rightTotal;
     void release() {
-        m_currentFloboSetTheme.release();
-        m_currentLevelTheme.release();
-        m_gameWidget.reset(NULL);
-        m_gameScreen.reset(NULL);
-        m_leftVictories = 0;
-        m_rightVictories = 0;
-        m_leftTotal = 0;
-        m_rightTotal = 0;
+        _currentFloboSetTheme.release();
+        _currentLevelTheme.release();
+        _gameWidget.reset(NULL);
+        _gameScreen.reset(NULL);
+        _leftVictories = 0;
+        _rightVictories = 0;
+        _leftTotal = 0;
+        _rightTotal = 0;
     }
 };
 
@@ -94,12 +94,12 @@ public:
     virtual GameState *getNextState();
     // Own methods
     void setNextState(GameState *nextState) {
-        m_nextState = nextState;
+        _nextState = nextState;
     }
 private:
     class GhostScreen;
-    std::unique_ptr<gameui::Screen> m_ghostScreen;
-    GameState *m_nextState;
+    std::unique_ptr<gameui::Screen> _ghostScreen;
+    GameState *_nextState;
 };
 
 /**
@@ -122,34 +122,34 @@ public:
                         event_manager::GameControlEvent *event);
     // Own methods
     void setNextState(GameState *nextState) {
-        m_nextState = nextState;
+        _nextState = nextState;
     }
     void setHandicapOnVictorious(bool enable) {
-        m_handicapOnVictorious = enable;
+        _handicapOnVictorious = enable;
     }
     void setDisplayVictories(bool enable) {
-        m_displayVictories = enable;
+        _displayVictories = enable;
     }
     void setAccountTotalOnPlayerB(bool enable) {
-        m_accountTotalOnPlayerB = enable;
+        _accountTotalOnPlayerB = enable;
     }
     void setGameWidgetFactory(GameWidgetFactory *factory) {
-        m_gameWidgetFactory = factory;
+        _gameWidgetFactory = factory;
     }
 private:
-    int m_nbPlayers;
-    GameWidgetFactory  *m_gameWidgetFactory;
-    GameOptions         m_gameOptions;
-    PlayerNameProvider *m_nameProvider;
-    SharedMatchAssets  *m_sharedAssets;
-    GameState *m_nextState;
-    bool m_handicapOnVictorious;
-    bool m_displayVictories;
-    bool m_accountTotalOnPlayerB;
+    int _nbPlayers;
+    GameWidgetFactory  *_gameWidgetFactory;
+    GameOptions         _gameOptions;
+    PlayerNameProvider *_nameProvider;
+    SharedMatchAssets  *_sharedAssets;
+    GameState *_nextState;
+    bool _handicapOnVictorious;
+    bool _displayVictories;
+    bool _accountTotalOnPlayerB;
 };
 struct SharedGetReadyAssets
 {
-    unique_ptr<StoryWidget> m_getReadyWidget;
+    unique_ptr<StoryWidget> _getReadyWidget;
 };
 
 /**
@@ -173,13 +173,13 @@ public:
     virtual void onEvent(event_manager::GameControlEvent *cevent);
     // Own methods
     void setNextState(GameState *nextState) {
-        m_nextState = nextState;
+        _nextState = nextState;
     }
 private:
-    SharedMatchAssets &m_sharedAssets;
-    SharedGetReadyAssets &m_sharedGetReadyAssets;
-    bool m_getReadyDisplayed;
-    GameState *m_nextState;
+    SharedMatchAssets &_sharedAssets;
+    SharedGetReadyAssets &_sharedGetReadyAssets;
+    bool _getReadyDisplayed;
+    GameState *_nextState;
 };
 
 /**
@@ -196,12 +196,12 @@ public:
     virtual GameState *getNextState();
     // Own methods
     void setNextState(GameState *nextState) {
-        m_nextState = nextState;
+        _nextState = nextState;
     }
 private:
-    SharedMatchAssets &m_sharedAssets;
-    SharedGetReadyAssets &m_sharedGetReadyAssets;
-    GameState *m_nextState;
+    SharedMatchAssets &_sharedAssets;
+    SharedGetReadyAssets &_sharedGetReadyAssets;
+    GameState *_nextState;
 };
 
 /**
@@ -221,13 +221,13 @@ public:
                         event_manager::GameControlEvent *event);
     // Own methods
     void setNextState(GameState *nextState) {
-        m_nextState = nextState;
+        _nextState = nextState;
     }
 private:
-    SharedMatchAssets &m_sharedAssets;
-    bool m_playersAreReady;
-    unique_ptr<StoryWidget> m_getReadyWidget;
-    GameState *m_nextState;
+    SharedMatchAssets &_sharedAssets;
+    bool _playersAreReady;
+    unique_ptr<StoryWidget> _getReadyWidget;
+    GameState *_nextState;
 };
 
 /**
@@ -247,15 +247,15 @@ public:
                         event_manager::GameControlEvent *event);
     // Own methods
     void setNextState(GameState *nextState) {
-        m_nextState = nextState;
+        _nextState = nextState;
     }
     void setAbortedState(GameState *abortedState) {
-        m_abortedState = abortedState;
+        _abortedState = abortedState;
     }
 private:
-    SharedMatchAssets &m_sharedAssets;
-    bool m_gameIsOver;
-    GameState *m_nextState, *m_abortedState;
+    SharedMatchAssets &_sharedAssets;
+    bool _gameIsOver;
+    GameState *_nextState, *_abortedState;
 };
 
 /**
@@ -276,15 +276,15 @@ public:
                         event_manager::GameControlEvent *event);
     // Own methods
     void setNextState(GameState *nextState) {
-        m_nextState = nextState;
+        _nextState = nextState;
     }
-    void setStyrolyse(std::string styrolyse) { m_styrolyseName = styrolyse; }
+    void setStyrolyse(std::string styrolyse) { _styrolyseName = styrolyse; }
 private:
-    SharedMatchAssets &m_sharedAssets;
-    std::string m_styrolyseName;
-    std::unique_ptr<StoryWidget> m_gameLostWidget;
-    bool m_aknowledged;
-    GameState *m_nextState;
+    SharedMatchAssets &_sharedAssets;
+    std::string _styrolyseName;
+    std::unique_ptr<StoryWidget> _gameLostWidget;
+    bool _aknowledged;
+    GameState *_nextState;
 };
 
 /**
@@ -305,14 +305,14 @@ public:
                         event_manager::GameControlEvent *event);
     // Own methods
     void setNextState(GameState *nextState) {
-        m_nextState = nextState;
+        _nextState = nextState;
     }
 private:
-    SharedMatchAssets &m_sharedAssets;
-    bool m_aknowledged;
-    StatsWidgetDimensions m_dimensions;
-    unique_ptr<TwoPlayersStatsWidget> m_statsWidget;
-    GameState *m_nextState;
+    SharedMatchAssets &_sharedAssets;
+    bool _aknowledged;
+    StatsWidgetDimensions _dimensions;
+    unique_ptr<TwoPlayersStatsWidget> _statsWidget;
+    GameState *_nextState;
 };
 
 /**
@@ -344,17 +344,17 @@ public:
                         event_manager::GameControlEvent *event);
     // Own methods
     void setNextState(GameState *nextState) {
-        m_nextState = nextState;
+        _nextState = nextState;
     }
     void setStoryScreenValuesProvider(StoryScreenValuesProvider *vp) {
-        m_vp = vp;
+        _vp = vp;
     }
 private:
-    std::string m_screenName;
-    bool m_acknowledged;
-    std::unique_ptr<StoryScreen> m_storyScreen;
-    GameState *m_nextState;
-    StoryScreenValuesProvider *m_vp;
+    std::string _screenName;
+    bool _acknowledged;
+    std::unique_ptr<StoryScreen> _storyScreen;
+    GameState *_nextState;
+    StoryScreenValuesProvider *_vp;
 };
 
 /**
@@ -372,31 +372,31 @@ public:
     virtual GameState *getNextState();
     // Own methods
     void setNextState(GameState *nextState) {
-        m_nextState = nextState;
+        _nextState = nextState;
     }
     void setHiScoreBoard(HiScoreBoard *board) {
-        m_scoreBoard = board;
+        _scoreBoard = board;
     }
     void setFinalScore(const char *playerName, int score) {
-        m_playerName = playerName;
-        m_playerScore = score;
+        _playerName = playerName;
+        _playerScore = score;
     }
     void setRank(int rank) {
-        m_rank = rank;
+        _rank = rank;
     }
     // Action implementation
     virtual void action(Widget *sender, int actionType,
                         event_manager::GameControlEvent *event);
 private:
-    std::string m_storyName;
-    StoryNameProvider  *m_storyNameProvider;
-    GameState *m_nextState;
-    std::unique_ptr<GameOverScreen> m_gameOverScreen;
-    HiScoreBoard *m_scoreBoard;
-    std::string m_playerName;
-    int m_playerScore;
-    int m_rank;
-    bool m_acknowledged;
+    std::string _storyName;
+    StoryNameProvider  *_storyNameProvider;
+    GameState *_nextState;
+    std::unique_ptr<GameOverScreen> _gameOverScreen;
+    HiScoreBoard *_scoreBoard;
+    std::string _playerName;
+    int _playerScore;
+    int _rank;
+    bool _acknowledged;
 };
 
 /**
@@ -413,8 +413,8 @@ public:
     virtual bool evaluate();
     virtual GameState *getNextState();
 private:
-    SharedMatchAssets &m_sharedAssets;
-    Action *m_actionToCallWhenLeft;
+    SharedMatchAssets &_sharedAssets;
+    Action *_actionToCallWhenLeft;
 };
 
 /**
@@ -430,8 +430,8 @@ public:
     virtual bool evaluate();
     virtual GameState *getNextState();
 private:
-    Action *m_actionToCall;
-    int     m_actionType;
+    Action *_actionToCall;
+    int     _actionType;
 };
 
 /**
@@ -455,21 +455,21 @@ public:
                         event_manager::GameControlEvent *event);
     // Own methods
     void setNextState(GameState *nextState) {
-        m_nextState = nextState;
+        _nextState = nextState;
     }
 private:
-    std::string m_boardId;
-    SharedMatchAssets  *m_sharedMatchAssets;
-    PlayerNameProvider *m_nameProvider;
-    bool m_finished;
+    std::string _boardId;
+    SharedMatchAssets  *_sharedMatchAssets;
+    PlayerNameProvider *_nameProvider;
+    bool _finished;
 
-    GameState *m_nextState;
-    std::unique_ptr<DisplayStoryScreenState> m_newHiScore;
-    std::unique_ptr<DisplayHallOfFameState> m_displayHallOfFame;
-    std::unique_ptr<CallActionState> m_endOfStateMachine;
-    GameStateMachine m_stateMachine;
-    std::unique_ptr<LocalStorageHiScoreBoard> m_scoreBoard;
-    HiScoreDefaultBoard m_defaultScoreBoard;
+    GameState *_nextState;
+    std::unique_ptr<DisplayStoryScreenState> _newHiScore;
+    std::unique_ptr<DisplayHallOfFameState> _displayHallOfFame;
+    std::unique_ptr<CallActionState> _endOfStateMachine;
+    GameStateMachine _stateMachine;
+    std::unique_ptr<LocalStorageHiScoreBoard> _scoreBoard;
+    HiScoreDefaultBoard _defaultScoreBoard;
 };
 
 /**
@@ -490,17 +490,17 @@ public:
     virtual std::map<std::string, std::string> getStringValues() const;
     // Own methods
     void setNextSetState(GameState *nextSetState) {
-        m_nextSetState = nextSetState;
+        _nextSetState = nextSetState;
     }
     void setEndOfGameState(GameState *endOfGameState) {
-        m_endOfGameState = endOfGameState;
+        _endOfGameState = endOfGameState;
     }
 private:
-    SharedMatchAssets  *m_sharedAssets;
-    PlayerNameProvider *m_nameProvider;
-    int m_nbSets;
-    GameState *m_nextSetState;
-    GameState *m_endOfGameState;
+    SharedMatchAssets  *_sharedAssets;
+    PlayerNameProvider *_nameProvider;
+    int _nbSets;
+    GameState *_nextSetState;
+    GameState *_endOfGameState;
 };
 
 

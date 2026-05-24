@@ -36,203 +36,203 @@ using namespace ios_fc;
 const int InternetGameCenter::fpipVersion = 0x00000001;
 
 InternetGameCenter::InternetGameCenter(const std::string &hostName, int portNum, const std::string &name, const std::string &password)
-  : hostName(hostName), portNum(portNum), tryNatTraversal(true),
-    name(name), password(password), status(PEER_NORMAL),
-    timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages), gameGrantedStatus(GAMESTATUS_IDLE),
-    m_isAccepted(false), m_isDenied(false), m_denyString(""), m_denyStringMore("")
+  : _hostName(hostName), _portNum(portNum), _tryNatTraversal(true),
+    _name(name), _password(password), _status(PEER_NORMAL),
+    _timeMsBetweenTwoAliveMessages(3000.), _lastAliveMessage(getTimeMs() - _timeMsBetweenTwoAliveMessages), _gameGrantedStatus(GAMESTATUS_IDLE),
+    _isAccepted(false), _isDenied(false), _denyString(""), _denyStringMore("")
 {
-    m_udpSocket.reset(new DatagramSocket());
-    m_udpSocket->connect(SocketAddress(hostName.c_str()), portNum);
-    m_udpmbox.reset(new FPServerMessageBox(m_udpSocket.get()));
-    m_igpmbox.reset(new FPServerIGPMessageBox(m_udpmbox.get()));
-    m_igpmbox->addListener(this);
+    _udpSocket.reset(new DatagramSocket());
+    _udpSocket->connect(SocketAddress(_hostName.c_str()), _portNum);
+    _udpmbox.reset(new FPServerMessageBox(_udpSocket.get()));
+    _igpmbox.reset(new FPServerIGPMessageBox(_udpmbox.get()));
+    _igpmbox->addListener(this);
     sendAliveMessage();
 }
 
 void InternetGameCenter::sendAliveMessage()
 {
-    int prevBound = m_igpmbox->getBound();
-    m_igpmbox->bind(1);
-    Message *msg = m_igpmbox->createMessage();
+    int prevBound = _igpmbox->getBound();
+    _igpmbox->bind(1);
+    Message *msg = _igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("V", fpipVersion);
     msg->addInt("CMD", FLOBO_IGP_ALIVE);
-    msg->addString("NAME", name.c_str());
-    msg->addString("PASSWD", password.c_str());
-    msg->addInt("STATUS", status);
+    msg->addString("NAME", _name.c_str());
+    msg->addString("PASSWD", _password.c_str());
+    msg->addInt("STATUS", _status);
     msg->send();
     delete msg;
-    m_igpmbox->bind(prevBound);
+    _igpmbox->bind(prevBound);
 }
 
 void InternetGameCenter::sendMessage(const std::string &msgText)
 {
     //printf("Envoi du msg:%s\n", (const char *)msgText);
-    int prevBound = m_igpmbox->getBound();
-    m_igpmbox->bind(1);
-    Message *msg = m_igpmbox->createMessage();
+    int prevBound = _igpmbox->getBound();
+    _igpmbox->bind(1);
+    Message *msg = _igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("V", fpipVersion);
     msg->addInt("CMD", FLOBO_IGP_CHAT);
-    msg->addString("NAME", name.c_str());
+    msg->addString("NAME", _name.c_str());
     msg->addString("MSG", msgText.c_str());
     msg->send();
     delete msg;
-    m_igpmbox->bind(prevBound);
+    _igpmbox->bind(prevBound);
 }
 
 void InternetGameCenter::sendGameRequest(FloboGameInvitation &invitation)
 {
-    opponentName = invitation.opponentName;
-    invitation.initiatorAddress = m_igpmbox->getSelfAddress();
-    Message *msg = m_igpmbox->createMessage();
+    _opponentName = invitation._opponentName;
+    invitation._initiatorAddress = _igpmbox->getSelfAddress();
+    Message *msg = _igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("CMD", FLOBO_IGP_GAME_REQUEST);
-    msg->addString("ORGNAME", name.c_str());
-    msg->addString("DSTNAME", invitation.opponentName.c_str());
-    msg->addInt("RNDSEED", invitation.gameRandomSeed);
-    msg->addInt("SPEED", invitation.gameSpeed);
-    msg->addInt("GSETS", invitation.gameNbSets);
+    msg->addString("ORGNAME", _name.c_str());
+    msg->addString("DSTNAME", invitation._opponentName.c_str());
+    msg->addInt("RNDSEED", invitation._gameRandomSeed);
+    msg->addInt("SPEED", invitation._gameSpeed);
+    msg->addInt("GSETS", invitation._gameNbSets);
     Dirigeable *dirNew = dynamic_cast<Dirigeable *>(msg);
-    dirNew->setPeerAddress(invitation.opponentAddress);
+    dirNew->setPeerAddress(invitation._opponentAddress);
     msg->send();
     delete msg;
-    grantedInvitation = invitation;
+    _grantedInvitation = invitation;
 }
 
 void InternetGameCenter::sendGameAcceptInvitation(FloboGameInvitation &invitation)
 {
-    opponentName = invitation.opponentName;
-    Message *msg = m_igpmbox->createMessage();
+    _opponentName = invitation._opponentName;
+    Message *msg = _igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("CMD", FLOBO_IGP_GAME_ACCEPT);
-    msg->addString("ORGNAME", name.c_str());
-    msg->addString("DSTNAME", invitation.opponentName.c_str());
+    msg->addString("ORGNAME", _name.c_str());
+    msg->addString("DSTNAME", invitation._opponentName.c_str());
     Dirigeable *dirNew = dynamic_cast<Dirigeable *>(msg);
-    dirNew->setPeerAddress(invitation.opponentAddress);
+    dirNew->setPeerAddress(invitation._opponentAddress);
     msg->send();
     delete msg;
-    if (tryNatTraversal)
-        gameGrantedStatus = GAMESTATUS_STARTTRAVERSAL;
+    if (_tryNatTraversal)
+        _gameGrantedStatus = GAMESTATUS_STARTTRAVERSAL;
     else
-        gameGrantedStatus = GAMESTATUS_GRANTED_IGP;
-    grantedInvitation = invitation;
+        _gameGrantedStatus = GAMESTATUS_GRANTED_IGP;
+    _grantedInvitation = invitation;
 }
 
 void InternetGameCenter::sendGameCancelInvitation(FloboGameInvitation &invitation)
 {
-    Message *msg = m_igpmbox->createMessage();
+    Message *msg = _igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("CMD", FLOBO_IGP_GAME_CANCEL);
-    msg->addString("ORGNAME", name.c_str());
-    msg->addString("DSTNAME", invitation.opponentName.c_str());
+    msg->addString("ORGNAME", _name.c_str());
+    msg->addString("DSTNAME", invitation._opponentName.c_str());
     Dirigeable *dirNew = dynamic_cast<Dirigeable *>(msg);
-    dirNew->setPeerAddress(invitation.opponentAddress);
+    dirNew->setPeerAddress(invitation._opponentAddress);
     msg->send();
     delete msg;
 }
 
 void InternetGameCenter::idle()
 {
-    switch (gameGrantedStatus) {
+    switch (_gameGrantedStatus) {
         case GAMESTATUS_STARTTRAVERSAL:
             // The game has been accepted, negociation is pending
-            for (int i = 0, j = listeners.size() ; i < j ; i++) {
-                listeners[i]->onGameAcceptedNegociationPending(grantedInvitation);
+            for (int i = 0, j = _listeners.size() ; i < j ; i++) {
+                _listeners[i]->onGameAcceptedNegociationPending(_grantedInvitation);
             }
-            m_p2pSocket.reset(new DatagramSocket());
-            m_p2pSocket->connect(SocketAddress(hostName.c_str()), portNum);
-            m_p2pmbox.reset(new FPInternetP2PMessageBox(m_p2pSocket.get()));
-            //printf("grantedAddr:%d\n", static_cast<IgpMessage::IgpPeerAddressImpl *>(grantedInvitation.opponentAddress.getImpl())->getIgpIdent());
+            _p2pSocket.reset(new DatagramSocket());
+            _p2pSocket->connect(SocketAddress(_hostName.c_str()), _portNum);
+            _p2pmbox.reset(new FPInternetP2PMessageBox(_p2pSocket.get()));
+            //printf("grantedAddr:%d\n", static_cast<IgpMessage::IgpPeerAddressImpl *>(_grantedInvitation._opponentAddress.getImpl())->getIgpIdent());
 
             int initiatorIgpIdent, guestIgpIdent;
-            if (grantedInvitation.initiatorAddress == grantedInvitation.opponentAddress) {
+            if (_grantedInvitation._initiatorAddress == _grantedInvitation._opponentAddress) {
                 // The opponent invited me
-                initiatorIgpIdent = static_cast<IgpPeerAddressImpl *>(grantedInvitation.initiatorAddress.getImpl())->getIgpIdent();
-                guestIgpIdent = static_cast<IgpPeerAddressImpl *>(m_igpmbox->getSelfAddress().getImpl())->getIgpIdent();
+                initiatorIgpIdent = static_cast<IgpPeerAddressImpl *>(_grantedInvitation._initiatorAddress.getImpl())->getIgpIdent();
+                guestIgpIdent = static_cast<IgpPeerAddressImpl *>(_igpmbox->getSelfAddress().getImpl())->getIgpIdent();
             }
             else {
                 // I invited the opponent
-                initiatorIgpIdent = static_cast<IgpPeerAddressImpl *>(grantedInvitation.initiatorAddress.getImpl())->getIgpIdent();
-                guestIgpIdent = static_cast<IgpPeerAddressImpl *>(grantedInvitation.opponentAddress.getImpl())->getIgpIdent();
+                initiatorIgpIdent = static_cast<IgpPeerAddressImpl *>(_grantedInvitation._initiatorAddress.getImpl())->getIgpIdent();
+                guestIgpIdent = static_cast<IgpPeerAddressImpl *>(_grantedInvitation._opponentAddress.getImpl())->getIgpIdent();
             }
-            p2pPunchName = std::string("punch:") + std::to_string(initiatorIgpIdent) + "vs" + std::to_string(guestIgpIdent) + ":" + std::to_string(grantedInvitation.gameRandomSeed);
-            m_p2pNatTraversal.reset(new NatTraversal(*m_p2pmbox));
-            m_p2pNatTraversal->punch(p2pPunchName.c_str());
-            gameGrantedStatus = GAMESTATUS_WAITTRAVERSAL;
+            _p2pPunchName = std::string("punch:") + std::to_string(initiatorIgpIdent) + "vs" + std::to_string(guestIgpIdent) + ":" + std::to_string(_grantedInvitation._gameRandomSeed);
+            _p2pNatTraversal.reset(new NatTraversal(*_p2pmbox));
+            _p2pNatTraversal->punch(_p2pPunchName.c_str());
+            _gameGrantedStatus = GAMESTATUS_WAITTRAVERSAL;
             break;
         case GAMESTATUS_WAITTRAVERSAL:
-            m_p2pNatTraversal->idle();
-            if (m_p2pNatTraversal->hasFailed()) {
-                m_p2pNatTraversal.reset();
-                m_p2pmbox.reset();
-                gameGrantedStatus = GAMESTATUS_GRANTED_IGP;
+            _p2pNatTraversal->idle();
+            if (_p2pNatTraversal->hasFailed()) {
+                _p2pNatTraversal.reset();
+                _p2pmbox.reset();
+                _gameGrantedStatus = GAMESTATUS_GRANTED_IGP;
                 GTLogTrace("NAT traversal failed, falling back to IGP");
             }
-            else if (m_p2pNatTraversal->hasSucceeded()) {
-                m_p2pNatTraversal.reset();
-                gameGrantedStatus = GAMESTATUS_GRANTED_P2P;
+            else if (_p2pNatTraversal->hasSucceeded()) {
+                _p2pNatTraversal.reset();
+                _gameGrantedStatus = GAMESTATUS_GRANTED_P2P;
                 GTLogTrace("NAT traversal succeeded, going peer-to-peer");
             }
             break;
         case GAMESTATUS_GRANTED_P2P:
-            grantGameWithMessageBox(grantedInvitation, *m_p2pmbox);
-            gameGrantedStatus = GAMESTATUS_IDLE;
+            grantGameWithMessageBox(_grantedInvitation, *_p2pmbox);
+            _gameGrantedStatus = GAMESTATUS_IDLE;
             break;
         case GAMESTATUS_GRANTED_IGP:
-            m_igpmbox->bind(grantedInvitation.opponentAddress);
-            grantGameWithMessageBox(grantedInvitation, *m_p2pmbox);
-            gameGrantedStatus = GAMESTATUS_IDLE;
+            _igpmbox->bind(_grantedInvitation._opponentAddress);
+            grantGameWithMessageBox(_grantedInvitation, *_p2pmbox);
+            _gameGrantedStatus = GAMESTATUS_IDLE;
             break;
         case GAMESTATUS_IDLE:
         default:
             break;
     }
-    m_igpmbox->idle();
+    _igpmbox->idle();
     double time_ms = getTimeMs();
-    if ((time_ms - lastAliveMessage) >= timeMsBetweenTwoAliveMessages) {
+    if ((time_ms - _lastAliveMessage) >= _timeMsBetweenTwoAliveMessages) {
         sendAliveMessage();
-        lastAliveMessage = time_ms;
+        _lastAliveMessage = time_ms;
     }
     NetGameCenter::idle();
 }
 
 void InternetGameCenter::setStatus(int status)
 {
-    this->status = status;
+    this->_status = status;
     sendAliveMessage();
 }
 
 const std::string & InternetGameCenter::getSelfName()
 {
-    return name;
+    return _name;
 }
 
 const std::string &InternetGameCenter::getOpponentName()
 {
-    return opponentName;
+    return _opponentName;
 }
 
 bool InternetGameCenter::isConnected() const
 {
-    return (m_igpmbox->isConnected()) && (m_isAccepted);
+    return (_igpmbox->isConnected()) && (_isAccepted);
 }
 
 bool InternetGameCenter::isDenied() const
 {
-    return (m_igpmbox->isConnected()) && (m_isDenied);
+    return (_igpmbox->isConnected()) && (_isDenied);
 }
 
 void InternetGameCenter::punch()
 {
-    int prevBound = m_igpmbox->getBound();
-    m_igpmbox->bind(1);
-    Message *msg = m_igpmbox->createMessage();
+    int prevBound = _igpmbox->getBound();
+    _igpmbox->bind(1);
+    Message *msg = _igpmbox->createMessage();
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("CMD", FLOBO_IGP_NAT_TRAVERSAL);
     msg->send();
     delete msg;
-    m_igpmbox->bind(prevBound);
+    _igpmbox->bind(prevBound);
 }
 
 void InternetGameCenter::onMessage(Message &msg)
@@ -243,19 +243,19 @@ void InternetGameCenter::onMessage(Message &msg)
             return;
         switch (msg.getInt("CMD")) {
             case FLOBO_IGP_ACCEPT:
-                m_isAccepted = true;
+                _isAccepted = true;
                 break;
             case FLOBO_IGP_DENY:
-                m_isDenied = true;
-                m_denyString = msg.getString("MSG").c_str();
+                _isDenied = true;
+                _denyString = msg.getString("MSG").c_str();
                 if (msg.hasString("MSG_MORE"))
-                    m_denyStringMore = msg.getString("MSG_MORE").c_str();
+                    _denyStringMore = msg.getString("MSG_MORE").c_str();
                 else
-                    m_denyStringMore = "";
+                    _denyStringMore = "";
                 break;
             case FLOBO_IGP_CHAT:
-                for (int i = 0, j = listeners.size() ; i < j ; i++) {
-                    listeners[i]->onChatMessage(msg.getString("NAME").c_str(), msg.getString("MSG").c_str());
+                for (int i = 0, j = _listeners.size() ; i < j ; i++) {
+                    _listeners[i]->onChatMessage(msg.getString("NAME").c_str(), msg.getString("MSG").c_str());
                 }
                 break;
             case FLOBO_IGP_CONNECT:
@@ -265,7 +265,7 @@ void InternetGameCenter::onMessage(Message &msg)
                 if (msg.hasInt("RANK"))
                     rank = msg.getInt("RANK");
                 PeerAddress peerAddress = dir.getPeerAddress("ADDR");
-                PeerAddress selfAddress = m_igpmbox->getSelfAddress();
+                PeerAddress selfAddress = _igpmbox->getSelfAddress();
                 connectPeer(peerAddress, msg.getString("NAME").c_str(), msg.getInt("STATUS"), rank, peerAddress == selfAddress);
             }
                 break;
@@ -289,21 +289,21 @@ void InternetGameCenter::onMessage(Message &msg)
                 //printf("Une partie contre %s?\n", (const char *)msg.getString("ORGNAME"));
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
                 FloboGameInvitation invitation;
-                invitation.initiatorAddress = dir.getPeerAddress();
-                invitation.opponentAddress = dir.getPeerAddress();
-                invitation.opponentName = msg.getString("ORGNAME").c_str();
+                invitation._initiatorAddress = dir.getPeerAddress();
+                invitation._opponentAddress = dir.getPeerAddress();
+                invitation._opponentName = msg.getString("ORGNAME").c_str();
                 if (msg.hasInt("RNDSEED"))
-                    invitation.gameRandomSeed = msg.getInt("RNDSEED");
+                    invitation._gameRandomSeed = msg.getInt("RNDSEED");
                 else
-                    invitation.gameRandomSeed = 0; // When there is no seed, fall back to 0 (better than crashing)
+                    invitation._gameRandomSeed = 0; // When there is no seed, fall back to 0 (better than crashing)
                 if (msg.hasInt("SPEED"))
-                    invitation.gameSpeed = msg.getInt("SPEED");
+                    invitation._gameSpeed = msg.getInt("SPEED");
                 else
-                    invitation.gameSpeed = 1; // When there is no seed, fall back to 1 (better than crashing)
+                    invitation._gameSpeed = 1; // When there is no seed, fall back to 1 (better than crashing)
                 if (msg.hasInt("GSETS"))
-                    invitation.gameNbSets = msg.getInt("GSETS");
+                    invitation._gameNbSets = msg.getInt("GSETS");
                 else
-                    invitation.gameNbSets = 0;
+                    invitation._gameNbSets = 0;
                 receivedGameInvitation(invitation);
             }
                 break;
@@ -312,12 +312,12 @@ void InternetGameCenter::onMessage(Message &msg)
                 //printf("%s accepte la partie!\n", (const char *)msg.getString("ORGNAME"));
     	        setStatus(PEER_PLAYING);
                 Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-                if (!(grantedInvitation.opponentAddress == dir.getPeerAddress()))
+                if (!(_grantedInvitation._opponentAddress == dir.getPeerAddress()))
                     break;
-                if (tryNatTraversal)
-                    gameGrantedStatus = GAMESTATUS_STARTTRAVERSAL;
+                if (_tryNatTraversal)
+                    _gameGrantedStatus = GAMESTATUS_STARTTRAVERSAL;
                 else
-                    gameGrantedStatus = GAMESTATUS_GRANTED_IGP;
+                    _gameGrantedStatus = GAMESTATUS_GRANTED_IGP;
             }
                 break;
             case FLOBO_IGP_GAME_CANCEL:

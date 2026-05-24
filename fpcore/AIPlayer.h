@@ -78,7 +78,7 @@ class AIPlayer : public GamePlayer {
     virtual ~AIPlayer();
     virtual void cycle();
     void setAIParameters(const AIParameters &ai);
-	int getLevel() const { return this->level; }
+	int getLevel() const { return this->_level; }
 	
   private:
     FloboState extractColor(FloboState A) const;
@@ -89,24 +89,24 @@ class AIPlayer : public GamePlayer {
     int makeEvaluation(const GridEvaluation * const referenceOne, const FloboBinom flobos, const GridState * const grid);
     bool selectIfBetterEvaluation(int * const referenceOne, const GridEvaluation * const newOne, const FloboBinom flobos, const GridState * const grid);
 
-    GridState * internalGrid;
-    int decisionMade;
-    bool shouldRedecide;
-    int lastNumberOfBadFlobos;
-    int totalNumberOfBadFlobos;
-    FloboBinom objective;
-    int lastLineSeen;
-    int currentCycle;
-    bool readyToDrop;
+    GridState * _internalGrid;
+    int _decisionMade;
+    bool _shouldRedecide;
+    int _lastNumberOfBadFlobos;
+    int _totalNumberOfBadFlobos;
+    FloboBinom _objective;
+    int _lastLineSeen;
+    int _currentCycle;
+    bool _readyToDrop;
 
-    AIParameters params;
-	int level;
+    AIParameters _params;
+	int _level;
   
-    FloboBinom current, next;
-    unsigned int bestl1;
-    bool foundOne;
-    FloboBinom originalFlobo;
-    int bestEvaluation;
+    FloboBinom _current, _next;
+    unsigned int _bestl1;
+    bool _foundOne;
+    FloboBinom _originalFlobo;
+    int _bestEvaluation;
   
 };
 

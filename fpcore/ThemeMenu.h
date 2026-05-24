@@ -46,12 +46,12 @@ class FloboThemePicturePreview : public Widget, public IdleComponent {
       void draw(DrawTarget *dt);
 
     private:
-      std::string label;
-      FloboSetTheme * curTheme;
-      double offsetX;
-      double offsetY;
-      int eyes[NUMBER_OF_FLOBOS];
-      double lastTime;
+      std::string _label;
+      FloboSetTheme * _curTheme;
+      double _offsetX;
+      double _offsetY;
+      int _eyes[NUMBER_OF_FLOBOS];
+      double _lastTime;
 };
 
 class FloboThemePreview : public VBox {
@@ -63,10 +63,10 @@ class FloboThemePreview : public VBox {
         void themeSelected(const std::string &themeName);
 
     private:
-        Text name;
-        Text author;
-        FloboThemePicturePreview picture;
-        Text description;
+        Text _name;
+        Text _author;
+        FloboThemePicturePreview _picture;
+        Text _description;
 };
 
 class FloboThemeSelectionBox : public HBox, public Action {
@@ -76,9 +76,9 @@ public:
     void build();
     void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
 private:
-    FloboThemePreview themePreview;
-    Image *prevButton, *nextButton;
-    ZBox Spacer0, Spacer1, Spacer2, Spacer3;
+    FloboThemePreview _themePreview;
+    Image *_prevButton, *_nextButton;
+    ZBox _Spacer0, _Spacer1, _Spacer2, _Spacer3;
 };
 
 class ThemeMenu : public MainScreenMenu {
@@ -86,12 +86,12 @@ public:
     ThemeMenu(MainScreen *mainScreen);
     void build();
 private:
-    Frame screenTitleFrame;
-    Text themeMenuTitle;
-    VBox buttonsBox;
-    PopMainScreenMenuAction popAction;
-    Button backButton;
-    FloboThemeSelectionBox themeList;
+    Frame _screenTitleFrame;
+    Text _themeMenuTitle;
+    VBox _buttonsBox;
+    PopMainScreenMenuAction _popAction;
+    Button _backButton;
+    FloboThemeSelectionBox _themeList;
 };
 
 #endif // _THEME_MENU_H

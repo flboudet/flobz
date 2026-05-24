@@ -30,40 +30,40 @@ using namespace event_manager;
 using namespace gameui;
 
 PauseMenu::PauseMenu(Action *pauseAction)
-    : topSeparator(0, 10), pauseVBox(theCommander->getWindowFramePicture()),
-      pauseTitleFrame(theCommander->getSeparatorFramePicture()),
-      menuTitle(theCommander->getLocalizedString("Pause")),
-      continueButton(theCommander->getLocalizedString("Continue game"), this,
+    : _topSeparator(0, 10), _pauseVBox(theCommander->getWindowFramePicture()),
+      _pauseTitleFrame(theCommander->getSeparatorFramePicture()),
+      _menuTitle(theCommander->getLocalizedString("Pause")),
+      _continueButton(theCommander->getLocalizedString("Continue game"), this,
                      theCommander->getButtonFramePicture(),
                      theCommander->getButtonOverFramePicture()),
       //optionsButton(theCommander->getLocalizedString("Options"), this),
       //audioButton(),
       //musicButton(),
       //fullScreenButton(),
-      abortButton(theCommander->getLocalizedString("Abort game"), this,
+      _abortButton(theCommander->getLocalizedString("Abort game"), this,
                   theCommander->getButtonFramePicture(),
                   theCommander->getButtonOverFramePicture()),
-      optionsBox(theCommander->getWindowFramePicture()),
-      optionsTitleFrame(theCommander->getSeparatorFramePicture()),
-      optionsTitle(theCommander->getLocalizedString("Options")),
-      optionsBack(theCommander->getLocalizedString("Back"), this),
-      m_pauseAction(pauseAction)
+      _optionsBox(theCommander->getWindowFramePicture()),
+      _optionsTitleFrame(theCommander->getSeparatorFramePicture()),
+      _optionsTitle(theCommander->getLocalizedString("Options")),
+      _optionsBack(theCommander->getLocalizedString("Back"), this),
+      _pauseAction(pauseAction)
 {
     setPolicy(USE_MIN_SIZE);
-    pauseTitleFrame.add(&menuTitle);
-    pauseTitleFrame.setPreferedSize(Vec3(0, 20));
-    pauseVBox.add(&pauseTitleFrame);
-    buttonsBox.add(&continueButton);
+    _pauseTitleFrame.add(&_menuTitle);
+    _pauseTitleFrame.setPreferedSize(Vec3(0, 20));
+    _pauseVBox.add(&_pauseTitleFrame);
+    _buttonsBox.add(&_continueButton);
     //buttonsBox.add(&optionsButton);
-    buttonsBox.add(&abortButton);
-    pauseVBox.add(&buttonsBox);
-    pauseContainer.addListener(*this);
-    pauseContainer.setPreferedSize(Vec3(350, 250));
-    pauseContainer.setPosition(Vec3((640-350)/2., (480-250)/2.));
-    topBox.add(&pauseContainer);
-    add(&topSeparator);
-    add(&topBox);
-
+    _buttonsBox.add(&_abortButton);
+    _pauseVBox.add(&_buttonsBox);
+    _pauseContainer.addListener(*this);
+    _pauseContainer.setPreferedSize(Vec3(350, 250));
+    _pauseContainer.setPosition(Vec3((640-350)/2., (480-250)/2.));
+    _topBox.add(&_pauseContainer);
+    add(&_topSeparator);
+    add(&_topBox);
+    
     // Options menu
     /*optionsTitleFrame.add(&optionsTitle);
     optionsTitleFrame.setPreferedSize(Vec3(0, 20));
@@ -82,40 +82,40 @@ PauseMenu::~PauseMenu()
 void PauseMenu::action(Widget *sender, int actionType, GameControlEvent *event)
 {
   /*if (sender == &optionsButton) {
-    pauseContainer.transitionToContent(&optionsBox);
+    _pauseContainer.transitionToContent(&_optionsBox);
   }
-  else if (sender == &optionsBack) {
-    pauseContainer.transitionToContent(&pauseVBox);
+  else if (sender == &_optionsBack) {
+    _pauseContainer.transitionToContent(&_pauseVBox);
   }*/
-  if (sender == continueButton.getButton()) {
-      pauseContainer.transitionToContent(NULL);
-      m_pauseAction->action(this, KPauseMenuClosing_Continue, event);
+  if (sender == _continueButton.getButton()) {
+      _pauseContainer.transitionToContent(NULL);
+      _pauseAction->action(this, KPauseMenuClosing_Continue, event);
   }
-  else if (sender == abortButton.getButton()) {
-      pauseContainer.transitionToContent(NULL);
-      m_pauseAction->action(this, KPauseMenuClosing_Abort, event);
+  else if (sender == _abortButton.getButton()) {
+      _pauseContainer.transitionToContent(NULL);
+      _pauseAction->action(this, KPauseMenuClosing_Abort, event);
   }
 }
 
 void PauseMenu::backPressed(bool fromControls)
 {
-  if (!fromControls || (pauseContainer.getContentWidget() == &pauseVBox)) {
-    pauseContainer.transitionToContent(NULL);
+  if (!fromControls || (_pauseContainer.getContentWidget() == &_pauseVBox)) {
+    _pauseContainer.transitionToContent(NULL);
   }
-  if (pauseContainer.getContentWidget() == &optionsBox) {
-    pauseContainer.transitionToContent(&pauseVBox);
+  if (_pauseContainer.getContentWidget() == &_optionsBox) {
+    _pauseContainer.transitionToContent(&_pauseVBox);
   }
 }
 
 void PauseMenu::onSlideInside(SliderContainer &slider)
 {
   if (slider.getContentWidget() == NULL) {
-      m_pauseAction->action(this, KPauseMenuClosed_Continue, NULL);
+      _pauseAction->action(this, KPauseMenuClosed_Continue, NULL);
   }
 }
 
 void PauseMenu::onWidgetAdded(WidgetContainer *parent)
 {
-  pauseContainer.transitionToContent(&pauseVBox);
+  _pauseContainer.transitionToContent(&_pauseVBox);
 }
 

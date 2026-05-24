@@ -118,10 +118,10 @@ public:
                       const FloboTheme *defaultTheme = NULL);
     virtual ~BaseFloboThemeImpl();
 protected:
-    const FloboThemeDescription &m_desc;
-    const std::string &m_path;
-    const FloboTheme *m_defaultTheme;
-    mutable std::vector<IosSurface *> m_surfaceBin;
+    const FloboThemeDescription &_desc;
+    const std::string &_path;
+    const FloboTheme *_defaultTheme;
+    mutable std::vector<IosSurface *> _surfaceBin;
 };
 
 class FloboThemeImpl : public BaseFloboThemeImpl {
@@ -138,23 +138,23 @@ public:
     virtual int getEyeSurfaceOffsetX() const;
     virtual int getEyeSurfaceOffsetY() const;
 private:
-    mutable IosSurface* m_faces[NUMBER_OF_FLOBO_FACES][MAX_COMPRESSED];
-    mutable IosSurfaceRef m_baseFaces[NUMBER_OF_FLOBO_FACES];
+    mutable IosSurface* _faces[NUMBER_OF_FLOBO_FACES][MAX_COMPRESSED];
+    mutable IosSurfaceRef _baseFaces[NUMBER_OF_FLOBO_FACES];
 
-    mutable IosSurface* m_eyes[NUMBER_OF_FLOBO_EYES][MAX_COMPRESSED];
-    mutable IosSurfaceRef m_baseEyes[NUMBER_OF_FLOBO_EYES];
+    mutable IosSurface* _eyes[NUMBER_OF_FLOBO_EYES][MAX_COMPRESSED];
+    mutable IosSurfaceRef _baseEyes[NUMBER_OF_FLOBO_EYES];
 
-    mutable IosSurface* m_circles[NUMBER_OF_FLOBO_CIRCLES];
-    mutable IosSurfaceRef m_baseCircle;
+    mutable IosSurface* _circles[NUMBER_OF_FLOBO_CIRCLES];
+    mutable IosSurfaceRef _baseCircle;
 
-    mutable IosSurface *m_shadows[MAX_COMPRESSED];
-    mutable IosSurfaceRef m_baseShadow;
+    mutable IosSurface *_shadows[MAX_COMPRESSED];
+    mutable IosSurfaceRef _baseShadow;
 
-    mutable IosSurface *m_shrinking[NUMBER_OF_FLOBO_DISAPPEAR];
-    mutable IosSurfaceRef m_baseShrinking[NUMBER_OF_FLOBO_DISAPPEAR];
+    mutable IosSurface *_shrinking[NUMBER_OF_FLOBO_DISAPPEAR];
+    mutable IosSurfaceRef _baseShrinking[NUMBER_OF_FLOBO_DISAPPEAR];
 
-    mutable IosSurface *m_explosion[NUMBER_OF_FLOBO_EXPLOSIONS];
-    mutable IosSurfaceRef m_baseExplosion[NUMBER_OF_FLOBO_EXPLOSIONS];
+    mutable IosSurface *_explosion[NUMBER_OF_FLOBO_EXPLOSIONS];
+    mutable IosSurfaceRef _baseExplosion[NUMBER_OF_FLOBO_EXPLOSIONS];
 };
 
 class NeutralFloboThemeImpl : public BaseFloboThemeImpl {
@@ -171,9 +171,9 @@ public:
     virtual int getEyeSurfaceOffsetX() const;
     virtual int getEyeSurfaceOffsetY() const;
 private:
-    mutable IosSurface *m_faces[MAX_COMPRESSED];
-    mutable IosSurfaceRef m_baseFace;
-    mutable IosSurfaceRef m_shrinking[NUMBER_OF_FLOBO_DISAPPEAR];
+    mutable IosSurface *_faces[MAX_COMPRESSED];
+    mutable IosSurfaceRef _baseFace;
+    mutable IosSurfaceRef _shrinking[NUMBER_OF_FLOBO_DISAPPEAR];
 };
 
 class FloboSetThemeImpl : public FloboSetTheme {
@@ -186,9 +186,9 @@ public:
     virtual const std::string & getComments() const;
     virtual const FloboTheme & getFloboTheme(FloboState state) const;
 private:
-    const FloboSetThemeDescription &m_desc;
-    std::unique_ptr<FloboTheme> m_floboThemes[NUMBER_OF_FLOBOS_IN_SET];
-    FloboSetTheme *m_defaultTheme;
+    const FloboSetThemeDescription &_desc;
+    std::unique_ptr<FloboTheme> _floboThemes[NUMBER_OF_FLOBOS_IN_SET];
+    FloboSetTheme *_defaultTheme;
 };
 
 class LevelThemeImpl : public LevelTheme {
@@ -211,9 +211,9 @@ public:
     virtual IosSurface * getTrophy() const;
     // Fonts
     virtual IosFont *getPlayerNameFont() const ;
-    virtual const RGBA *getPlayerNameColor() const { return &m_desc.playerNameFont.fontColor; }
+    virtual const RGBA *getPlayerNameColor() const { return &_desc.playerNameFont.fontColor; }
     virtual IosFont *getScoreFont() const;
-    virtual const RGBA *getScoreColor() const { return &m_desc.scoreFont.fontColor; }
+    virtual const RGBA *getScoreColor() const { return &_desc.scoreFont.fontColor; }
     // Positions and dimensions of the Floboban
     virtual int getSpeedMeterX() const;
     virtual int getSpeedMeterY() const;
@@ -257,17 +257,17 @@ private:
     inline IosSurfaceRef & getResource(IosSurfaceRef &ref,
                                     const std::string &resName,
                                     const char *resSuffix) const;
-    const LevelThemeDescription &m_desc;
-    const std::string &m_path;
-    DataPathManager &m_dataPathManager;
-    LevelThemeImpl *m_defaultTheme;
-    mutable IosSurfaceRef m_lifes[NUMBER_OF_LIVES];
-    mutable IosSurfaceRef m_background;
-    mutable IosSurfaceRef m_grid;
-    mutable IosSurfaceRef m_speedMeterFront, m_speedMeterBack;
-    mutable IosSurfaceRef m_neutralIndicator, m_bigNeutralIndicator, m_giantNeutralIndicator;
-    mutable IosSurfaceRef m_trophy;
-    mutable IosFontRef    m_playerNameFont, m_scoreFont;
+    const LevelThemeDescription &_desc;
+    const std::string &_path;
+    DataPathManager &_dataPathManager;
+    LevelThemeImpl *_defaultTheme;
+    mutable IosSurfaceRef _lifes[NUMBER_OF_LIVES];
+    mutable IosSurfaceRef _background;
+    mutable IosSurfaceRef _grid;
+    mutable IosSurfaceRef _speedMeterFront, _speedMeterBack;
+    mutable IosSurfaceRef _neutralIndicator, _bigNeutralIndicator, _giantNeutralIndicator;
+    mutable IosSurfaceRef _trophy;
+    mutable IosFontRef    _playerNameFont, _scoreFont;
 };
 
 class ThemeManagerImpl : public ThemeManager {
@@ -296,20 +296,20 @@ private:
     static const char *s_key_FloboEyeOffsetY[NUMBER_OF_FLOBOS_IN_SET];
     static const char *s_key_FloboColorOffset[NUMBER_OF_FLOBOS_IN_SET];
 
-    DataPathManager &m_dataPathManager;
-    std::string m_themePackLoadingPath;
+    DataPathManager &_dataPathManager;
+    std::string _themePackLoadingPath;
 
-    std::vector<std::string> m_floboSetThemeList;
-    std::vector<std::string> m_levelThemeList;
-    std::map<std::string, FloboSetThemeDescription> m_floboSetThemeDescriptions;
-    std::map<std::string, LevelThemeDescription> m_levelThemeDescriptions;
-    std::unique_ptr<LocalizedDictionary> m_localeDictionary;
+    std::vector<std::string> _floboSetThemeList;
+    std::vector<std::string> _levelThemeList;
+    std::map<std::string, FloboSetThemeDescription> _floboSetThemeDescriptions;
+    std::map<std::string, LevelThemeDescription> _levelThemeDescriptions;
+    std::unique_ptr<LocalizedDictionary> _localeDictionary;
 
-    std::string m_defaultFloboSetThemeName;
-    std::unique_ptr<FloboSetTheme> m_defaultFloboSetTheme;
+    std::string _defaultFloboSetThemeName;
+    std::unique_ptr<FloboSetTheme> _defaultFloboSetTheme;
 
-    std::string m_defaultLevelThemeName;
-    std::unique_ptr<LevelThemeImpl> m_defaultLevelTheme;
+    std::string _defaultLevelThemeName;
+    std::unique_ptr<LevelThemeImpl> _defaultLevelTheme;
 };
 
 

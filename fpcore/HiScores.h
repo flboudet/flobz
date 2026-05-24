@@ -6,14 +6,14 @@
 #include "PreferencesManager.h"
 
 struct HiScoreEntry {
-    std::string name;
-    int  score;
+    std::string _name;
+    int  _score;
 
     HiScoreEntry(std::string name, int score)
-        : name(name), score(score) {}
-    HiScoreEntry() : score(0) {}
+        : _name(name), _score(score) {}
+    HiScoreEntry() : _score(0) {}
     bool operator < (const HiScoreEntry &c) const
-    { return score < c.score; }
+    { return _score < c._score; }
 };
 
 class HiScoreBoard {
@@ -32,9 +32,9 @@ public:
     virtual int getMaxRank() const;
     virtual int setHiScore(std::string name, int score);
 private:
-    PreferencesManager *m_prefsMgr;
-    std::string m_boardId;
-    std::vector<HiScoreEntry> m_entries;
+    PreferencesManager *_prefsMgr;
+    std::string _boardId;
+    std::vector<HiScoreEntry> _entries;
 };
 
 #endif // _HISCORE

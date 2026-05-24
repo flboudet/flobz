@@ -14,9 +14,9 @@ public:
     void draw(DrawTarget *dt);
     IdleComponent *getIdleComponent() { return this; }
 private:
-    double m_initialTime, m_duration, m_finalTime;
-    double m_alpha;
-    double m_zoom;
+    double _initialTime, _duration, _finalTime;
+    double _alpha;
+    double _zoom;
 };
 
 #endif // _ROTATESCREENTRANSITION_H_

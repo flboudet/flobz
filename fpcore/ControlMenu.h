@@ -15,29 +15,29 @@ private:
     class BackSaveAction : public Action
     {
     public:
-        BackSaveAction(MainScreen *mainScreen) : mainScreen(mainScreen) {}
+        BackSaveAction(MainScreen *mainScreen) : _mainScreen(mainScreen) {}
         void action();
     private:
-        MainScreen *mainScreen;
+        MainScreen *_mainScreen;
     };
-    Frame screenTitleFrame;
-    Frame playerOneTitleFrame, playerTwoTitleFrame;
-    Frame playerOneFrame, playerTwoFrame;
-    Text title, playerOneTitle, playerTwoTitle;
-    Separator titleSeparator, playersSeparator, bottomSeparator;
-    BackSaveAction backAction;
-    FramedButton backButton;
-    HBox playerOneBox, playerTwoBox;
-    VBox label1pBox, key1pBox, alternateKey1pBox;
-    VBox label2pBox, key2pBox, alternateKey2pBox;
-    Text label1pTitle, key1pTitle, alternateKey1pTitle;
-    Text label2pTitle, key2pTitle, alternateKey2pTitle;
-    Text lbl1PLeft, lbl1PRight, lbl1PDown, lbl1PTurnRight, lbl1PTurnLeft;
-    Text lbl2PLeft, lbl2PRight, lbl2PDown, lbl2PTurnRight, lbl2PTurnLeft;
-    ControlInputWidget p1Left, p1Right, p1Down, p1TurnRight, p1TurnLeft;
-    ControlInputWidget ap1Left, ap1Right, ap1Down, ap1TurnRight, ap1TurnLeft;
-    ControlInputWidget p2Left, p2Right, p2Down, p2TurnRight, p2TurnLeft;
-    ControlInputWidget ap2Left, ap2Right, ap2Down, ap2TurnRight, ap2TurnLeft;
+    Frame _screenTitleFrame;
+    Frame _playerOneTitleFrame, _playerTwoTitleFrame;
+    Frame _playerOneFrame, _playerTwoFrame;
+    Text _title, _playerOneTitle, _playerTwoTitle;
+    Separator _titleSeparator, _playersSeparator, _bottomSeparator;
+    BackSaveAction _backAction;
+    FramedButton _backButton;
+    HBox _playerOneBox, _playerTwoBox;
+    VBox _label1pBox, _key1pBox, _alternateKey1pBox;
+    VBox _label2pBox, _key2pBox, _alternateKey2pBox;
+    Text _label1pTitle, _key1pTitle, _alternateKey1pTitle;
+    Text _label2pTitle, _key2pTitle, _alternateKey2pTitle;
+    Text _lbl1PLeft, _lbl1PRight, _lbl1PDown, _lbl1PTurnRight, _lbl1PTurnLeft;
+    Text _lbl2PLeft, _lbl2PRight, _lbl2PDown, _lbl2PTurnRight, _lbl2PTurnLeft;
+    ControlInputWidget _p1Left, _p1Right, _p1Down, _p1TurnRight, _p1TurnLeft;
+    ControlInputWidget _ap1Left, _ap1Right, _ap1Down, _ap1TurnRight, _ap1TurnLeft;
+    ControlInputWidget _p2Left, _p2Right, _p2Down, _p2TurnRight, _p2TurnLeft;
+    ControlInputWidget _ap2Left, _ap2Right, _ap2Down, _ap2TurnRight, _ap2TurnLeft;
 };
 
 #endif

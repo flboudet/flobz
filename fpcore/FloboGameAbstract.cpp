@@ -15,7 +15,7 @@ PlayerGameStat::PlayerGameStat(int p)
 }
 
 PlayerGameStatDisplay::PlayerGameStatDisplay(PlayerGameStat &stat)
-    : stat(stat), m_x(0), m_y(0), m_font(GameUIDefaults::FONT_FUNNY), m_color(GT_WHITE)
+    : _stat(stat), _x(0), _y(0), _font(GameUIDefaults::FONT_FUNNY), _color(GT_WHITE)
 {
 }
 
@@ -26,7 +26,7 @@ PlayerGameStatDisplay::~PlayerGameStatDisplay()
 void PlayerGameStatDisplay::draw(DrawTarget *dt) const
 {
     char txt[4096];
-    sprintf(txt, "%d", stat.points);
+    sprintf(txt, "%d", _stat.points);
     dt->setClipRect(NULL);
-    dt->putStringCenteredXY(m_font, m_x, m_y, txt, m_color);
+    dt->putStringCenteredXY(_font, _x, _y, txt, _color);
 }

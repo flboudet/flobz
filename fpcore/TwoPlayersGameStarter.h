@@ -36,11 +36,11 @@ public:
     void cycle();
     StoryWidget *getOpponent();
 private:
-    FloboSetTheme &attachedFloboThemeSet;
-    RandomSystem attachedRandom;
-    LocalGameFactory attachedGameFactory;
-    GameView areaA, areaB;
-    StoryWidget opponentFace;
+    FloboSetTheme &_attachedFloboThemeSet;
+    RandomSystem _attachedRandom;
+    LocalGameFactory _attachedGameFactory;
+    GameView _areaA, _areaB;
+    StoryWidget _opponentFace;
 };
 
 class LocalTwoPlayersGameWidgetFactory : public GameWidgetFactory {
@@ -61,19 +61,19 @@ public:
     virtual void action(Widget *sender, int actionType,
 			event_manager::GameControlEvent *event);
 private:
-    GameStateMachine m_stateMachine;
-    SharedMatchAssets m_sharedAssets;
-    SharedGetReadyAssets        m_sharedGetReadyAssets;
-    std::unique_ptr<PushScreenState>         m_pushGameScreen;
-    std::unique_ptr<SetupMatchState>         m_setupMatch;
-    std::unique_ptr<EnterPlayerReadyState>   m_enterPlayersReady;
-    std::unique_ptr<ExitPlayerReadyState>    m_exitPlayersReady;
-    std::unique_ptr<MatchPlayingState>       m_matchPlaying;
-    std::unique_ptr<MatchIsOverState>        m_matchIsOver;
-    std::unique_ptr<DisplayStatsState>       m_displayStats;
-    std::unique_ptr<ManageMultiSetsState>    m_manageMultiSets;
-    std::unique_ptr<DisplayStoryScreenState> m_podium;
-    std::unique_ptr<LeaveGameState>          m_leaveGame;
+    GameStateMachine _stateMachine;
+    SharedMatchAssets _sharedAssets;
+    SharedGetReadyAssets        _sharedGetReadyAssets;
+    std::unique_ptr<PushScreenState>         _pushGameScreen;
+    std::unique_ptr<SetupMatchState>         _setupMatch;
+    std::unique_ptr<EnterPlayerReadyState>   _enterPlayersReady;
+    std::unique_ptr<ExitPlayerReadyState>    _exitPlayersReady;
+    std::unique_ptr<MatchPlayingState>       _matchPlaying;
+    std::unique_ptr<MatchIsOverState>        _matchIsOver;
+    std::unique_ptr<DisplayStatsState>       _displayStats;
+    std::unique_ptr<ManageMultiSetsState>    _manageMultiSets;
+    std::unique_ptr<DisplayStoryScreenState> _podium;
+    std::unique_ptr<LeaveGameState>          _leaveGame;
 };
 
 #endif // _TWOPLAYERSGAMESTARTER_H_

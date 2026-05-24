@@ -31,27 +31,27 @@ ScreenTransitionWidget::ScreenTransitionWidget(Screen &fromScreen,
                                                ImageType fromScreenImageType)
 {
     DrawContext *dc = GameUIDefaults::GAME_LOOP->getDrawContext();
-    m_fromSurface.reset(dc->getImageLibrary().createImage(fromScreenImageType, dc->getWidth(), dc->getHeight()));
-    fromScreen.drawAnyway(m_fromSurface.get());
+    _fromSurface.reset(dc->getImageLibrary().createImage(fromScreenImageType, dc->getWidth(), dc->getHeight()));
+    fromScreen.drawAnyway(_fromSurface.get());
 }
 
 DoomMeltScreenTransitionWidget::DoomMeltScreenTransitionWidget(Screen &fromScreen)
     : ScreenTransitionWidget(fromScreen),
       CycledComponent(.03)
 {
-    melt = doom_melt_new();
-    doom_melt_start(melt, getFromSurface());
+    _melt = doom_melt_new();
+    doom_melt_start(_melt, getFromSurface());
 }
 
 DoomMeltScreenTransitionWidget::~DoomMeltScreenTransitionWidget()
 {
-    doom_melt_delete(melt);
+    doom_melt_delete(_melt);
 }
 
 void DoomMeltScreenTransitionWidget::cycle()
 {
-    if (!doom_melt_finished(melt)) {
-        doom_melt_update(melt);
+    if (!doom_melt_finished(_melt)) {
+        doom_melt_update(_melt);
         requestDraw();
     }
     else {
@@ -63,6 +63,6 @@ void DoomMeltScreenTransitionWidget::cycle()
 void DoomMeltScreenTransitionWidget::draw(DrawTarget *dt)
 {
     dt->setClipRect(NULL);
-    doom_melt_display(melt, dt);
+    doom_melt_display(_melt, dt);
 }
 

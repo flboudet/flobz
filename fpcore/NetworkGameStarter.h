@@ -33,13 +33,13 @@
 
 class NetworkGameFactory : public FloboGameFactory {
 public:
-    NetworkGameFactory(RandomSystem *attachedRandom, MessageBox &msgBox, int gameId): attachedRandom(attachedRandom), msgBox(msgBox), gameId(gameId) {}
+    NetworkGameFactory(RandomSystem *attachedRandom, MessageBox &msgBox, int gameId): _attachedRandom(attachedRandom), _msgBox(msgBox), _gameId(gameId) {}
     FloboGame *createFloboGame(FloboFactory *attachedFloboFactory);
-    int getGameId() { return gameId; }
+    int getGameId() { return _gameId; }
 private:
-    RandomSystem *attachedRandom;
-    MessageBox &msgBox;
-    int gameId;
+    RandomSystem *_attachedRandom;
+    MessageBox &_msgBox;
+    int _gameId;
 };
 
 class NetworkGameWidget : public GameWidget2P, MessageListener, ChatBoxDelegate {
@@ -66,22 +66,22 @@ protected:
     virtual GamePlayer *createLocalPlayer();
 private:
     void sendAliveMsg();
-    FloboSetTheme *attachedFloboThemeSet; // optional
-    std::unique_ptr<RandomSystem> attachedRandom;
-    ios_fc::MessageBox *mbox;
-    std::unique_ptr<LocalGameFactory> attachedLocalGameFactory;
-    std::unique_ptr<NetworkGameFactory> attachedNetworkGameFactory;
+    FloboSetTheme *_attachedFloboThemeSet; // optional
+    std::unique_ptr<RandomSystem> _attachedRandom;
+    ios_fc::MessageBox *_mbox;
+    std::unique_ptr<LocalGameFactory> _attachedLocalGameFactory;
+    std::unique_ptr<NetworkGameFactory> _attachedNetworkGameFactory;
 protected:
-    std::unique_ptr<NetworkGameView> localArea;
-    std::unique_ptr<GameView> networkArea;
+    std::unique_ptr<NetworkGameView> _localArea;
+    std::unique_ptr<GameView> _networkArea;
 private:
-    double lastMessageDate, lastAliveMessageSentDate;
+    double _lastMessageDate, _lastAliveMessageSentDate;
     // Chat zone
-    std::unique_ptr<ChatBox> chatBox; // optional
+    std::unique_ptr<ChatBox> _chatBox; // optional
     // Network broken animation
-    std::unique_ptr<StoryWidget> brokenNetworkWidget; // optional
-    bool networkIsBroken;
-    double m_networkTimeoutWarning, m_networkTimeoutError;
+    std::unique_ptr<StoryWidget> _brokenNetworkWidget; // optional
+    bool _networkIsBroken;
+    double _networkTimeoutWarning, _networkTimeoutError;
 };
 
 /**
@@ -103,22 +103,22 @@ public:
     virtual void cycle();
     // Own methods
     void setNextState(GameState *nextState) {
-        m_nextState = nextState;
+        _nextState = nextState;
     }
     void setFailedState(GameState *failedState) {
-        m_failedState = failedState;
+        _failedState = failedState;
     }
 private:
     void sendSyncMessage();
     void sendAckMessage();
 private:
-    ios_fc::MessageBox *m_mbox;
-    int m_synID;
-    int m_cyclesTimeout;
-    int m_cyclesCounter;
-    bool m_synchronized, m_failed;
-    bool m_ackSent;
-    GameState *m_nextState, *m_failedState;
+    ios_fc::MessageBox *_mbox;
+    int _synID;
+    int _cyclesTimeout;
+    int _cyclesCounter;
+    bool _synchronized, _failed;
+    bool _ackSent;
+    GameState *_nextState, *_failedState;
 };
 
 /**
@@ -137,11 +137,11 @@ public:
     virtual void action(Widget *sender, int actionType,
                         event_manager::GameControlEvent *event);
     void setNetworkFailedState(GameState *netfailState) {
-        m_netfailState = netfailState;
+        _netfailState = netfailState;
     }
 private:
-    bool m_networkFailure;
-    GameState *m_netfailState;
+    bool _networkFailure;
+    GameState *_netfailState;
 };
 
 class NetworkGameStateMachine : public GameStateMachine
@@ -154,23 +154,23 @@ public:
                             Action *endOfSessionAction = NULL,
                             int nbSets = 0);
 private:
-    SharedMatchAssets           m_sharedAssets;
-    SharedGetReadyAssets        m_sharedGetReadyAssets;
-    std::unique_ptr<PushScreenState>         m_pushGameScreen;
-    std::unique_ptr<SetupMatchState>         m_setupMatch;
-    std::unique_ptr<EnterPlayerReadyState>   m_enterPlayersReady;
-    std::unique_ptr<NetSynchronizeState>     m_synchroGetReady;
-    std::unique_ptr<ExitPlayerReadyState>    m_exitPlayersReady;
-    std::unique_ptr<NetSynchronizeState>     m_synchroBeforeStart;
-    std::unique_ptr<NetMatchPlayingState>    m_matchPlaying;
-    std::unique_ptr<MatchIsOverState>        m_matchIsOver;
-    std::unique_ptr<DisplayStatsState>       m_displayStats;
-    std::unique_ptr<ManageMultiSetsState>    m_manageMultiSets;
-    std::unique_ptr<DisplayStoryScreenState> m_podium;
-    std::unique_ptr<NetSynchronizeState>     m_synchroAfterStats;
-    std::unique_ptr<DisplayStoryScreenState> m_networkErrorScreen;
-    std::unique_ptr<NetSynchronizeState>     m_synchroOnAbort;
-    std::unique_ptr<LeaveGameState>          m_leaveGame;
+    SharedMatchAssets           _sharedAssets;
+    SharedGetReadyAssets        _sharedGetReadyAssets;
+    std::unique_ptr<PushScreenState>         _pushGameScreen;
+    std::unique_ptr<SetupMatchState>         _setupMatch;
+    std::unique_ptr<EnterPlayerReadyState>   _enterPlayersReady;
+    std::unique_ptr<NetSynchronizeState>     _synchroGetReady;
+    std::unique_ptr<ExitPlayerReadyState>    _exitPlayersReady;
+    std::unique_ptr<NetSynchronizeState>     _synchroBeforeStart;
+    std::unique_ptr<NetMatchPlayingState>    _matchPlaying;
+    std::unique_ptr<MatchIsOverState>        _matchIsOver;
+    std::unique_ptr<DisplayStatsState>       _displayStats;
+    std::unique_ptr<ManageMultiSetsState>    _manageMultiSets;
+    std::unique_ptr<DisplayStoryScreenState> _podium;
+    std::unique_ptr<NetSynchronizeState>     _synchroAfterStats;
+    std::unique_ptr<DisplayStoryScreenState> _networkErrorScreen;
+    std::unique_ptr<NetSynchronizeState>     _synchroOnAbort;
+    std::unique_ptr<LeaveGameState>          _leaveGame;
 };
 
 #endif // _NETWORKGAMESTARTER_H_

@@ -51,29 +51,29 @@ public:
 private:
     class ChatAction : public Action {
     public:
-        ChatAction(ChatBox *owner) : owner(owner) {}
-        void setEditField(EditField *attachedEditField) { this->attachedEditField = attachedEditField; }
+        ChatAction(ChatBox *owner) : _owner(owner) {}
+        void setEditField(EditField *attachedEditField) { this->_attachedEditField = attachedEditField; }
         void action();
         /// @brief 
         /// @param name 
         /// @param text 
         void addChat(const std::string &name, const std::string &text);
     private:
-        ChatBox *owner;
-        EditField *attachedEditField;
+        ChatBox *_owner;
+        EditField *_attachedEditField;
     };
-    ChatBoxDelegate &delegate;
-    ChatAction chatAction;
-    Text chatInputLabel;
-    FramedEditField chatInput;
-    IosSurfaceRef chatInputFrameSurface;
-    FramePicture chatInputFramePicture;
-    Frame chatInputContainerFrame;
-    HBox chatInputContainer;
-    int height;
-    HBox **lines;
-    Text **names;
-    Text **texts;
+    ChatBoxDelegate &_delegate;
+    ChatAction _chatAction;
+    Text _chatInputLabel;
+    FramedEditField _chatInput;
+    IosSurfaceRef _chatInputFrameSurface;
+    FramePicture _chatInputFramePicture;
+    Frame _chatInputContainerFrame;
+    HBox _chatInputContainer;
+    int _height;
+    HBox **_lines;
+    Text **_names;
+    Text **_texts;
 };
 
 #endif // _PUYOCHATBOX

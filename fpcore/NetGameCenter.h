@@ -38,12 +38,12 @@ class FloboGameInvitation {
 public:
     FloboGameInvitation();
 public:
-    PeerAddress initiatorAddress;
-    std::string opponentName;
-    PeerAddress opponentAddress;
-    unsigned long gameRandomSeed;
-    int gameSpeed;
-    int gameNbSets;
+    PeerAddress _initiatorAddress;
+    std::string _opponentName;
+    PeerAddress _opponentAddress;
+    unsigned long _gameRandomSeed;
+    int _gameSpeed;
+    int _gameNbSets;
 };
 
 class NetGameCenterListener {
@@ -65,14 +65,14 @@ enum PeerStatus {
 };
 
 struct PeerInfo {
-    int status;
-    int rank;
-    bool self;
+    int _status;
+    int _rank;
+    bool _self;
 };
 
 class NetGameCenter {
 public:
-    NetGameCenter() : pendingGameTimeout(30000.) {}
+    NetGameCenter() : _pendingGameTimeout(30000.) {}
     virtual ~NetGameCenter() {}
     virtual void sendMessage(const std::string &msgText) = 0;
     // Request a new game
@@ -88,8 +88,8 @@ public:
     PeerInfo getPeerInfoForAddress(PeerAddress &addr) const;
     int getPeerStatusForAddress(PeerAddress &addr) const;
     int getPeerCount() const;
-    void addListener(NetGameCenterListener *r) { listeners.add(r); }
-    void removeListener(NetGameCenterListener *r) { listeners.remove(r); }
+    void addListener(NetGameCenterListener *r) { _listeners.add(r); }
+    void removeListener(NetGameCenterListener *r) { _listeners.remove(r); }
     void connectPeer(PeerAddress addr, const std::string & name, int status = PEER_NORMAL, int rank = -1, bool self = false);
     void disconnectPeer(PeerAddress addr, const std::string & name);
     virtual void setStatus(int status) {}
@@ -100,11 +100,11 @@ public:
     // Optional server managing the game center.
     virtual FPServerIGPMessageBox *getIgpBox() { return NULL; }
 protected:
-    AdvancedBuffer<NetGameCenterListener *> listeners;
+    AdvancedBuffer<NetGameCenterListener *> _listeners;
     class GamerPeer;
-    AdvancedBuffer<GamerPeer *> peers;
+    AdvancedBuffer<GamerPeer *> _peers;
     class PendingGame;
-    AdvancedBuffer<PendingGame *> pendingGames;
+    AdvancedBuffer<PendingGame *> _pendingGames;
     GamerPeer *getPeerForAddress(PeerAddress addr);
     // Should be called by implementations when an invitation is received
     void receivedGameInvitation(FloboGameInvitation &invitation);
@@ -117,7 +117,7 @@ protected:
     virtual void sendGameCancelInvitation(FloboGameInvitation &invitation) = 0;
     // Grant the game with a message box
     void grantGameWithMessageBox(FloboGameInvitation &invitation, MessageBox &thembox);
-    double pendingGameTimeout;
+    double _pendingGameTimeout;
 };
 
 #endif // _PUYONETGAMECENTER_H

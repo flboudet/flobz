@@ -58,21 +58,21 @@ private:
     void sendAliveMessage();
     void sendDisconnectMessage();
     void grantGame(FloboGameInvitation &invitation);
-    DatagramSocket socket;
-    FPLANMessageBox mbox;
-    std::string name;
-    int m_uuid;
-    double timeMsBetweenTwoAliveMessages, lastAliveMessage;
-    double timeMsBetweenTwoNetworkInterfacesDetection, lastNetworkInterfacesDetection;
-    bool gameGranted;
-    FloboGameInvitation grantedInvitation;
-    int status;
-    std::string opponentName;
+    DatagramSocket _socket;
+    FPLANMessageBox _mbox;
+    std::string _name;
+    int _uuid;
+    double _timeMsBetweenTwoAliveMessages, _lastAliveMessage;
+    double _timeMsBetweenTwoNetworkInterfacesDetection, _lastNetworkInterfacesDetection;
+    bool _gameGranted;
+    FloboGameInvitation _grantedInvitation;
+    int _status;
+    std::string _opponentName;
 
-    SocketAddress multicastAddress, loopbackAddress;
-    NetworkInterfaceRequester requester;
-    std::vector<NetworkInterface> networkInterfaces;
-    UDPPeerAddress mcastPeerAddress;
+    SocketAddress _multicastAddress, _loopbackAddress;
+    NetworkInterfaceRequester _requester;
+    std::vector<NetworkInterface> _networkInterfaces;
+    UDPPeerAddress _mcastPeerAddress;
 };
 
 #endif // _PUYOLANGAMECENTER_H

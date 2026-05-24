@@ -44,41 +44,41 @@ public:
     void build();
 
 private:
-    SoloGameMenu          soloGameMenu;
-    LocalGameMenu         localGameMenu;
-    Local2PlayersGameMenu local2PlayersGameMenu;
-    OptionMenu            optionMenu;
+    SoloGameMenu          _soloGameMenu;
+    LocalGameMenu         _localGameMenu;
+    Local2PlayersGameMenu _local2PlayersGameMenu;
+    OptionMenu            _optionMenu;
 
-    PopToMainScreenAction popFromHallScreenAction, popFromCreditsAction;
-    HiScoreDefaultBoard   defaultHiScores;
-    LocalStorageHiScoreBoard hiScores;
-    HallOfFameScreen      hallOfFameScreen; // Comes from StoryModeStarter.cpp
-    StoryScreen           creditsScreen;
-    PushMainScreenMenuAction    soloGameAction;
-    PushMainScreenMenuAction    singlePlayerGameAction;
-    PushMainScreenMenuAction    twoPlayersGameAction;
-    PushMainScreenMenuAction    optionAction;
-    PushHallOfFameAction  hallOfFameAction;
-    PushStoryScreenAction creditsAction;
-    ExitAction exitAction;
+    PopToMainScreenAction _popFromHallScreenAction, _popFromCreditsAction;
+    HiScoreDefaultBoard   _defaultHiScores;
+    LocalStorageHiScoreBoard _hiScores;
+    HallOfFameScreen      _hallOfFameScreen; // Comes from StoryModeStarter.cpp
+    StoryScreen           _creditsScreen;
+    PushMainScreenMenuAction    _soloGameAction;
+    PushMainScreenMenuAction    _singlePlayerGameAction;
+    PushMainScreenMenuAction    _twoPlayersGameAction;
+    PushMainScreenMenuAction    _optionAction;
+    PushHallOfFameAction  _hallOfFameAction;
+    PushStoryScreenAction _creditsAction;
+    ExitAction _exitAction;
 
-    Button soloGameButton;
-    Button singlePlayerGameButton;
-    Button twoPlayersGameButton;
-    Button optionButton;
-    Button hallOfFameButton;
-    Button creditsButton;
-    Button exitButton;
+    Button _soloGameButton;
+    Button _singlePlayerGameButton;
+    Button _twoPlayersGameButton;
+    Button _optionButton;
+    Button _hallOfFameButton;
+    Button _creditsButton;
+    Button _exitButton;
 
 #ifdef ENABLE_NETWORK
 #ifdef ENABLE_NETWORK_INTERNET
-    NetworkGameMenu       networkGameMenu;
-    PushMainScreenMenuAction    networkGameAction;
-    Button                networkGameButton;
+    NetworkGameMenu       _networkGameMenu;
+    PushMainScreenMenuAction    _networkGameAction;
+    Button                _networkGameButton;
 #else
-    LANGameMenu           lanGameMenu;
-    PushMainScreenMenuAction    lanAction;
-    Button                lanGameButton;
+    LANGameMenu           _lanGameMenu;
+    PushMainScreenMenuAction    _lanAction;
+    Button                _lanGameButton;
 #endif
 #endif
 };

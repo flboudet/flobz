@@ -55,22 +55,22 @@ public:
     OptionMenu(MainScreen *mainScreen);
     void build();
 private:
-    Frame screenTitleFrame;
-    Text optionTitle;
-    VBox buttonsBox;
-    AudioPrefSwitch audioButton;
-    MusicPrefSwitch musicButton;
-    FSPrefSwitch fullScreenButton;
-    ControlMenu controlMenu;
-    ThemeMenu themeMenu;
-    LevelThemeMenu m_soloLevelMenu, m_duoLevelMenu;
-    PushMainScreenMenuAction changeThemeAction, m_changeSoloLevelAction, m_changeDuoLevelAction, changeControlsAction;
-    Button changeFloboThemeButton;
-    Button changeSoloLevelThemeButton;
-    Button changeDuoLevelThemeButton;
-    Button changeControlsButton;
-    PopMainScreenMenuAction backAction;
-    Button backButton;
+    Frame _screenTitleFrame;
+    Text _optionTitle;
+    VBox _buttonsBox;
+    AudioPrefSwitch _audioButton;
+    MusicPrefSwitch _musicButton;
+    FSPrefSwitch _fullScreenButton;
+    ControlMenu _controlMenu;
+    ThemeMenu _themeMenu;
+    LevelThemeMenu _soloLevelMenu, _duoLevelMenu;
+    PushMainScreenMenuAction _changeThemeAction, _changeSoloLevelAction, _changeDuoLevelAction, _changeControlsAction;
+    Button _changeFloboThemeButton;
+    Button _changeSoloLevelThemeButton;
+    Button _changeDuoLevelThemeButton;
+    Button _changeControlsButton;
+    PopMainScreenMenuAction _backAction;
+    Button _backButton;
 };
 
 #endif // _PUYOOPTIONMENU

@@ -44,12 +44,12 @@ static const std::string kInternetCurrentServerPortKey = "Menu.Internet.CurrentS
 static const std::string kInternetCurrentServerPortDefaultValue = "4567";
 
 AbstractMetaFPServerConnection::AbstractMetaFPServerConnection(MetaFPServerConnectionResponder *responder)
-  : m_responder(responder)
+  : _responder(responder)
 {}
 
 void AbstractMetaFPServerConnection::onServerListHasChanged()
 {
-    m_responder->metaFPServerListHasChanged(*this);
+    _responder->metaFPServerListHasChanged(*this);
 }
 
 DummyMetaServerConnection::DummyMetaServerConnection(MetaFPServerConnectionResponder *responder)
@@ -72,8 +72,8 @@ vector<FPServer> DummyMetaServerConnection::getServers() const
 }
 
 HttpMetaServerConnection::HttpMetaServerConnection(const std::string &hostName, const std::string & hostPath, int portNum, MetaFPServerConnectionResponder *responder)
-  : AbstractMetaFPServerConnection(responder), m_doc(NULL),
-    m_hostName(hostName), m_hostPath(hostPath), m_portNum(portNum), m_nErrors(0)
+  : AbstractMetaFPServerConnection(responder), _doc(NULL),
+    _hostName(hostName), _hostPath(hostPath), _portNum(portNum), _nErrors(0)
 {
     GameUIDefaults::GAME_LOOP->addIdle(this);
 }
@@ -81,44 +81,44 @@ HttpMetaServerConnection::HttpMetaServerConnection(const std::string &hostName, 
 HttpMetaServerConnection::~HttpMetaServerConnection()
 {
     GameUIDefaults::GAME_LOOP->removeIdle(this);
-    if (m_doc != NULL)
-        delete m_doc;
+    if (_doc != NULL)
+        delete _doc;
 }
 
 void HttpMetaServerConnection::fetch()
 {
-    if (m_nErrors > 5) {
+    if (_nErrors > 5) {
         GameUIDefaults::GAME_LOOP->removeIdle(this);
         return;
     }
     try {
-        m_servers.clear();
-        m_doc = new HttpDocument(m_hostName.c_str(), m_hostPath.c_str(), m_portNum);
+        _servers.clear();
+        _doc = new HttpDocument(_hostName.c_str(), _hostPath.c_str(), _portNum);
     } catch (const std::exception &e) {
         ios_fc::printException(e);
-        m_nErrors += 1;
-        m_doc = NULL;
+        _nErrors += 1;
+        _doc = NULL;
     }
 }
 
 std::vector<FPServer> HttpMetaServerConnection::getServers() const
 {
-    return m_servers;
+    return _servers;
 }
 
 void HttpMetaServerConnection::idle(double currentTime)
 {
-    if (m_nErrors > 5) {
+    if (_nErrors > 5) {
         GameUIDefaults::GAME_LOOP->removeIdle(this);
-        m_servers.push_back(FPServer("aley.fovea.cc", 4567, ""));
-        m_servers.push_back(FPServer("localhost", 4567, ""));
+        _servers.push_back(FPServer("aley.fovea.cc", 4567, ""));
+        _servers.push_back(FPServer("localhost", 4567, ""));
         onServerListHasChanged();
         return;
     }
-    if (m_doc == NULL) return;
+    if (_doc == NULL) return;
     try {
-		if (m_doc->documentIsReady()) {
-            StandardMessage msg(m_doc->getDocumentContent());
+		if (_doc->documentIsReady()) {
+            StandardMessage msg(_doc->getDocumentContent());
             int nbServers = msg.getInt("NBSERV");
             for (int i = 0 ; i < nbServers ; i++) {
                 char tmpStr[256];
@@ -126,27 +126,27 @@ void HttpMetaServerConnection::idle(double currentTime)
                 std::string serverName = msg.getString(tmpStr).c_str(); // TODO string
                 sprintf(tmpStr, "PORTNUM%.2d", i);
                 int portNum = msg.getInt(tmpStr);
-                m_servers.push_back(FPServer(serverName, portNum, ""));
+                _servers.push_back(FPServer(serverName, portNum, ""));
             }
-            delete m_doc;
-            m_doc = NULL;
+            delete _doc;
+            _doc = NULL;
             onServerListHasChanged();
         }
     } catch (const std::exception &e) { // Erreur dans la reception du fichier
         ios_fc::printException(e);
-        m_nErrors += 1;
+        _nErrors += 1;
     }
 }
 
 FPServerList::FPServerList(FPServerListResponder *responder)
-  : m_responder(responder)
+  : _responder(responder)
 {
     std::string servname;
     std::string servpath;
     int nbserv;
 
     // For debugging purpose
-    //m_metaservers.push_back(new DummyMetaServerConnection(this));
+    //_metaservers.push_back(new DummyMetaServerConnection(this));
 
     // Making a meta-server list from prefs
     nbserv = theCommander->getPreferencesManager()->getIntPreference(kInternetMetaServerNumberKey, 1);
@@ -154,19 +154,19 @@ FPServerList::FPServerList(FPServerListResponder *responder)
     {
         servname = theCommander->getPreferencesManager()->getStrPreference(kInternetMetaServerKey+std::to_string(i), i==1?"aley.fovea.cc":"Error");
         servpath = theCommander->getPreferencesManager()->getStrPreference (kInternetMetaServerPathKey+std::to_string(i), i==1?"/flobopop/fpservers":"/fpservers");
-        m_metaservers.push_back(new HttpMetaServerConnection(servname.c_str(), servpath.c_str(),
+        _metaservers.push_back(new HttpMetaServerConnection(servname.c_str(), servpath.c_str(),
                                                              theCommander->getPreferencesManager()->getIntPreference(kInternetMetaServerPortKey+std::to_string(i), 80), this));
   }
 }
 
 FPServerList::~FPServerList()
 {
-    for (std::vector<AbstractMetaFPServerConnection *>::iterator iter = m_metaservers.begin() ;
-         iter != m_metaservers.end() ; iter++) {
+    for (std::vector<AbstractMetaFPServerConnection *>::iterator iter = _metaservers.begin() ;
+         iter != _metaservers.end() ; iter++) {
          delete *iter;
     }
-    for (std::vector<PingableFPServer *>::iterator iter = m_servers.begin() ;
-         iter != m_servers.end() ; iter++) {
+    for (std::vector<PingableFPServer *>::iterator iter = _servers.begin() ;
+         iter != _servers.end() ; iter++) {
          delete *iter;
     }
 }
@@ -174,16 +174,16 @@ FPServerList::~FPServerList()
 void FPServerList::fetch()
 {
     // Delete all the already found servers
-    for (std::vector<PingableFPServer *>::iterator iter = m_servers.begin() ;
-         iter != m_servers.end() ; iter++) {
+    for (std::vector<PingableFPServer *>::iterator iter = _servers.begin() ;
+         iter != _servers.end() ; iter++) {
          delete *iter;
     }
-    m_servers.clear();
+    _servers.clear();
     // Notify the responder that we have a clear list now
-    m_responder->FPServerListHasChanged(*this);
+    _responder->FPServerListHasChanged(*this);
     // Launch the fetching process
-    for (std::vector<AbstractMetaFPServerConnection *>::iterator iter = m_metaservers.begin() ;
-         iter != m_metaservers.end() ; iter++) {
+    for (std::vector<AbstractMetaFPServerConnection *>::iterator iter = _metaservers.begin() ;
+         iter != _metaservers.end() ; iter++) {
          (*iter)->fetch();
     }
 }
@@ -193,113 +193,113 @@ void FPServerList::metaFPServerListHasChanged(AbstractMetaFPServerConnection &me
     vector<FPServer> servers = metaServerConnection.getServers();
     for (std::vector<FPServer>::iterator iter = servers.begin() ;
          iter != servers.end() ; iter++) {
-         printf("List: %s:%d\n", iter->hostName.c_str(), iter->portNum);
-         m_servers.push_back(new PingableFPServer(iter->hostName, iter->portNum, iter->hostPath, this));
+         printf("List: %s:%d\n", iter->_hostName.c_str(), iter->_portNum);
+         _servers.push_back(new PingableFPServer(iter->_hostName, iter->_portNum, iter->_hostPath, this));
     }
 }
 
 std::vector<FPServer> FPServerList::getServers()
 {
     std::vector<FPServer> result;
-    for (std::vector<PingableFPServer *>::iterator iter = m_servers.begin() ;
-         iter != m_servers.end() ; iter++) {
+    for (std::vector<PingableFPServer *>::iterator iter = _servers.begin() ;
+         iter != _servers.end() ; iter++) {
          if ((*iter)->answeredToPing())
-            result.push_back(FPServer((*iter)->hostName, (*iter)->portNum, (*iter)->hostPath));
+            result.push_back(FPServer((*iter)->_hostName, (*iter)->_portNum, (*iter)->_hostPath));
     }
     return result;
 }
 
 void FPServerList::fpServerDidPing(PingableFPServer &server)
 {
-    m_responder->FPServerListHasChanged(*this);
+    _responder->FPServerListHasChanged(*this);
 }
 
 
 
 PingableFPServer::PingableFPServer(const std::string & hostName, int portNum, const std::string & path, PingableFPServerResponder *responder)
   : FPServer(hostName, portNum, path),
-    m_responder(responder), m_alreadyReported(false)
+    _responder(responder), _alreadyReported(false)
 {
-    m_pingSocket.reset(new DatagramSocket());
-    m_pingSocket->connect(hostName, portNum);
-    m_pingBox.reset(new FPServerMessageBox(m_pingSocket.get()));
-    m_igpclient.reset(new IGPClient(*m_pingBox, false));
+    _pingSocket.reset(new DatagramSocket());
+    _pingSocket->connect(hostName, portNum);
+    _pingBox.reset(new FPServerMessageBox(_pingSocket.get()));
+    _igpclient.reset(new IGPClient(*_pingBox, false));
     GameUIDefaults::GAME_LOOP->addIdle(this);
-    m_pingTransaction = m_igpclient->ping(10000., 1000.);
+    _pingTransaction = _igpclient->ping(10000., 1000.);
 }
 
 PingableFPServer::~PingableFPServer()
 {
-    delete m_pingTransaction;
+    delete _pingTransaction;
 }
 
 void PingableFPServer::idle(double currentTime)
 {
-    if (!m_pingTransaction->completed())
-        m_igpclient->idle();
+    if (!_pingTransaction->completed())
+        _igpclient->idle();
     else {
-        if ((!m_alreadyReported) && (m_pingTransaction->success())) {
-            m_alreadyReported = true;
-            m_responder->fpServerDidPing(*this);
+        if ((!_alreadyReported) && (_pingTransaction->success())) {
+            _alreadyReported = true;
+            _responder->fpServerDidPing(*this);
         }
     }
 }
 
 bool PingableFPServer::answeredToPing() const
 {
-    return m_alreadyReported;
+    return _alreadyReported;
 }
 
 // Actions
 class ServerSelectAction : public Action {
 public:
     ServerSelectAction(InternetGameMenu &igm, const std::string & serverName, int portNum)
-      : gameMenu(igm), serverName(serverName), portNum(portNum) {}
+      : _gameMenu(igm), _serverName(serverName), _portNum(portNum) {}
     void action() {
-        gameMenu.setSelectedServer(serverName, portNum);
+        _gameMenu.setSelectedServer(_serverName, _portNum);
     }
 private:
-    InternetGameMenu &gameMenu;
-    std::string serverName;
-    int portNum;
+    InternetGameMenu &_gameMenu;
+    std::string _serverName;
+    int _portNum;
 };
 
 InternetGameMenu::InternetGameMenu(MainScreen * mainScreen)
   : MainScreenMenu(mainScreen),
-    screenTitleFrame(theCommander->getSeparatorFramePicture()),
-    internetGameText(theCommander->getLocalizedString("Internet Game")),
-    servers(this),
-    //serverSelectionPanel(theCommander->getWindowFramePicture()),
-    serverListPanel(20, theCommander->getUpArrow(), theCommander->getDownArrow(), theCommander->getListFramePicture()),
-    serverListText(theCommander->getLocalizedString("Server List")),
-    updating(theCommander->getLocalizedString("Update"), this, theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
-    //rightPanel(theCommander->getWindowFramePicture()),
-    separator1_1(1,1), separator1_2(1,1), separator1_3(1, 1), separator10_1(10,10), //separator10_2(10,10),
-    nicknameText(theCommander->getLocalizedString("Nickname"), NULL, false),
-    passwordText(theCommander->getLocalizedString("Password"), NULL, false),
-    serverText(theCommander->getLocalizedString("Server"), NULL, false),
-    portText(theCommander->getLocalizedString("Port"), NULL, false),
-    container(),
-    playerName(PlayerNameUtils::getPlayerName(-2).c_str(), PlayerNameUtils::getDefaultPlayerKey(-2).c_str(),
+    _screenTitleFrame(theCommander->getSeparatorFramePicture()),
+    _internetGameText(theCommander->getLocalizedString("Internet Game")),
+    _servers(this),
+    //_serverSelectionPanel(theCommander->getWindowFramePicture()),
+    _serverListPanel(20, theCommander->getUpArrow(), theCommander->getDownArrow(), theCommander->getListFramePicture()),
+    _serverListText(theCommander->getLocalizedString("Server List")),
+    _updating(theCommander->getLocalizedString("Update"), this, theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
+    //_rightPanel(theCommander->getWindowFramePicture()),
+    _separator1_1(1,1), _separator1_2(1,1), _separator1_3(1, 1), _separator10_1(10,10), //_separator10_2(10,10),
+    _nicknameText(theCommander->getLocalizedString("Nickname"), NULL, false),
+    _passwordText(theCommander->getLocalizedString("Password"), NULL, false),
+    _serverText(theCommander->getLocalizedString("Server"), NULL, false),
+    _portText(theCommander->getLocalizedString("Port"), NULL, false),
+    _container(),
+    _playerName(PlayerNameUtils::getPlayerName(-2).c_str(), PlayerNameUtils::getDefaultPlayerKey(-2).c_str(),
                theCommander->getPreferencesManager(),
                theCommander->getEditFieldFramePicture(),
                theCommander->getEditFieldOverFramePicture()),
-    password("", kInternetPasswordKey, theCommander->getPreferencesManager(),
+    _password("", kInternetPasswordKey, theCommander->getPreferencesManager(),
 	       theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
-    serverName(kInternetCurrentServerDefaultValue,kInternetCurrentServerKey,
+    _serverName(kInternetCurrentServerDefaultValue,kInternetCurrentServerKey,
                theCommander->getPreferencesManager(),
                theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
-    serverPort(kInternetCurrentServerPortDefaultValue,kInternetCurrentServerPortKey,
+    _serverPort(kInternetCurrentServerPortDefaultValue,kInternetCurrentServerPortKey,
                theCommander->getPreferencesManager(),
 	       theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
-    backAction(mainScreen),
-    joinButton(theCommander->getLocalizedString("Join").c_str(), this,
+    _backAction(mainScreen),
+    _joinButton(theCommander->getLocalizedString("Join").c_str(), this,
 	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
-    backButton(theCommander->getLocalizedString("Back").c_str(), &backAction,
+    _backButton(theCommander->getLocalizedString("Back").c_str(), &_backAction,
 	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()) // TODO string
 {
     //this->setBorderVisible(false);
-    servers.fetch();
+    _servers.fetch();
 }
 
 InternetGameMenu::~InternetGameMenu()
@@ -308,56 +308,56 @@ InternetGameMenu::~InternetGameMenu()
 
 void InternetGameMenu::build()
 {
-    screenTitleFrame.setPreferedSize(Vec3(0, 20));
-    screenTitleFrame.add(&internetGameText);
-    add(&screenTitleFrame);
+    _screenTitleFrame.setPreferedSize(Vec3(0, 20));
+    _screenTitleFrame.add(&_internetGameText);
+    add(&_screenTitleFrame);
 
-    add(&menu);
-    //add(&container);
-    //container.add(&menu);
+    add(&_menu);
+    //add(&_container);
+    //_container.add(&_menu);
 
-    //container.setPosition(Vec3(5,195));
-    //container.setSize(Vec3(menuBG_wide->w, menuBG_wide->h, 0));
+    //_container.setPosition(Vec3(5,195));
+    //_container.setSize(Vec3(menuBG_wide->w, menuBG_wide->h, 0));
 
-    serverSelectionPanel.setInnerMargin(10);
-    serverSelectionPanel.setPolicy(USE_MIN_SIZE);
-    serverSelectionPanel.add(&serverListText);
-    serverSelectionPanel.add(&serverListPanel);
-    serverSelectionPanel.add(&updating);
+    _serverSelectionPanel.setInnerMargin(10);
+    _serverSelectionPanel.setPolicy(USE_MIN_SIZE);
+    _serverSelectionPanel.add(&_serverListText);
+    _serverSelectionPanel.add(&_serverListPanel);
+    _serverSelectionPanel.add(&_updating);
 
-    rightPanel.setInnerMargin(10);
-    rightPanel.add(&separator1_1);
+    _rightPanel.setInnerMargin(10);
+    _rightPanel.add(&_separator1_1);
 
-    rightPanel.add(&separator1_2);
-    nicknameText.setTextAlign(TEXT_LEFT_ALIGN);
-    rightPanel.add(&nicknameText);
-    rightPanel.add(&playerName);
-    passwordText.setTextAlign(TEXT_LEFT_ALIGN);
-    rightPanel.add(&passwordText);
-    rightPanel.add(&password);
-    rightPanel.add(&separator10_1);
-    serverText.setTextAlign(TEXT_LEFT_ALIGN);
-    rightPanel.add(&serverText);
-    rightPanel.add(&serverName);
-    portText.setTextAlign(TEXT_LEFT_ALIGN);
-    rightPanel.add(&portText);
-    rightPanel.add(&serverPort);
-    rightPanel.add(&separator10_2);
-    hbox.setPreferedSize(Vec3(0, joinButton.getPreferedSize().y + 20));
-    hbox.add(&rightPanelSeparator);
-    hbox.add(&joinButton);
+    _rightPanel.add(&_separator1_2);
+    _nicknameText.setTextAlign(TEXT_LEFT_ALIGN);
+    _rightPanel.add(&_nicknameText);
+    _rightPanel.add(&_playerName);
+    _passwordText.setTextAlign(TEXT_LEFT_ALIGN);
+    _rightPanel.add(&_passwordText);
+    _rightPanel.add(&_password);
+    _rightPanel.add(&_separator10_1);
+    _serverText.setTextAlign(TEXT_LEFT_ALIGN);
+    _rightPanel.add(&_serverText);
+    _rightPanel.add(&_serverName);
+    _portText.setTextAlign(TEXT_LEFT_ALIGN);
+    _rightPanel.add(&_portText);
+    _rightPanel.add(&_serverPort);
+    _rightPanel.add(&_separator10_2);
+    _hbox.setPreferedSize(Vec3(0, _joinButton.getPreferedSize().y + 20));
+    _hbox.add(&_rightPanelSeparator);
+    _hbox.add(&_joinButton);
 
-    rightPanel.add(&hbox);
-    rightPanel.add(&separator1_3);
-    menu.add(&serverSelectionPanel);
-    menu.add(&rightPanel);
+    _rightPanel.add(&_hbox);
+    _rightPanel.add(&_separator1_3);
+    _menu.add(&_serverSelectionPanel);
+    _menu.add(&_rightPanel);
 
-    bottomPanel.setInnerMargin(10);
-    bottomPanel.setPreferedSize(Vec3(0, backButton.getPreferedSize().y + 20));
-    bottomPanel.setPolicy(USE_MIN_SIZE);
-    bottomPanel.add(&bottomPanelSeparator);
-    bottomPanel.add(&backButton);
-    add(&bottomPanel);
+    _bottomPanel.setInnerMargin(10);
+    _bottomPanel.setPreferedSize(Vec3(0, _backButton.getPreferedSize().y + 20));
+    _bottomPanel.setPolicy(USE_MIN_SIZE);
+    _bottomPanel.add(&_bottomPanelSeparator);
+    _bottomPanel.add(&_backButton);
+    add(&_bottomPanel);
 }
 
 class InternetDialog : public SliderContainer, public SliderContainerListener
@@ -369,28 +369,28 @@ public:
     void close();
     void idle(double v);
 protected:
-    VBox m_contentBox;
+    VBox _contentBox;
 private:
-    Frame m_dialogFrame;
-    Frame m_titleFrame;
-    Text m_titleText;
-    bool m_closing, m_closed;
+    Frame _dialogFrame;
+    Frame _titleFrame;
+    Text _titleText;
+    bool _closing, _closed;
 };
 
 InternetDialog::InternetDialog(const std::string &dialogTitle)
-  : SliderContainer(), m_dialogFrame(theCommander->getWindowFramePicture()),
-    m_titleFrame(theCommander->getSeparatorFramePicture()),
-    m_titleText(dialogTitle), m_closing(false), m_closed(false)
+  : SliderContainer(), _dialogFrame(theCommander->getWindowFramePicture()),
+    _titleFrame(theCommander->getSeparatorFramePicture()),
+    _titleText(dialogTitle), _closing(false), _closed(false)
 {
-    m_titleFrame.add(&m_titleText);
-    m_titleFrame.setPreferedSize(Vec3(0.0f, 20.0f));
-    m_dialogFrame.add(&m_titleFrame);
-    m_dialogFrame.add(&m_contentBox);
+    _titleFrame.add(&_titleText);
+    _titleFrame.setPreferedSize(Vec3(0.0f, 20.0f));
+    _dialogFrame.add(&_titleFrame);
+    _dialogFrame.add(&_contentBox);
     setPreferedSize(Vec3(450.0f, 200.0f));
     setSize(getPreferedSize());
     setPosition(Vec3(95.0f, 150.0f));
     this->addListener(*this);
-    transitionToContent(&m_dialogFrame);
+    transitionToContent(&_dialogFrame);
 }
 
 InternetDialog::~InternetDialog()
@@ -400,22 +400,22 @@ InternetDialog::~InternetDialog()
 
 void InternetDialog::onSlideInside(SliderContainer &slider)
 {
-    if (!m_closing)
+    if (!_closing)
         return;
     //this->getParentScreen()->remove(this);
-    m_closed = true;
+    _closed = true;
 }
 
 void InternetDialog::close()
 {
-    m_closing = true;
+    _closing = true;
     transitionToContent(NULL);
 }
 
 void InternetDialog::idle(double v)
 {
     SliderContainer::idle(v);
-    if (m_closed) delete this;
+    if (_closed) delete this;
 }
 
 class InternetErrorDialog : public InternetDialog, public Action
@@ -425,25 +425,25 @@ public:
     virtual ~InternetErrorDialog();
     virtual void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
-    Text m_errorMessageL1, m_errorMessageL2;
-    FramedButton m_okButton;
-    IosSurfaceRef m_errorIconImage;
-    Image m_errorIcon;
+    Text _errorMessageL1, _errorMessageL2;
+    FramedButton _okButton;
+    IosSurfaceRef _errorIconImage;
+    Image _errorIcon;
 };
 
 InternetErrorDialog::InternetErrorDialog(const std::string &errorMessageL1, const std::string &errorMessageL2)
-  : InternetDialog(theCommander->getLocalizedString("Error").c_str()), m_errorMessageL1(errorMessageL1),
-    m_errorMessageL2(errorMessageL2), m_okButton(theCommander->getLocalizedString("OK").c_str(), this, // TODO string
+  : InternetDialog(theCommander->getLocalizedString("Error").c_str()), _errorMessageL1(errorMessageL1),
+    _errorMessageL2(errorMessageL2), _okButton(theCommander->getLocalizedString("OK").c_str(), this, // TODO string
 	       theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
-    m_errorIconImage(theCommander->getSurface(IMAGE_RGBA, "gfx/erroricon.png")),
-    m_errorIcon(m_errorIconImage)
+    _errorIconImage(theCommander->getSurface(IMAGE_RGBA, "gfx/erroricon.png")),
+    _errorIcon(_errorIconImage)
 {
-    m_contentBox.setInnerMargin(10);
-    m_contentBox.setPolicy(USE_MAX_SIZE);
-    m_contentBox.add(&m_errorIcon);
-    m_contentBox.add(&m_errorMessageL1);
-    m_contentBox.add(&m_errorMessageL2);
-    m_contentBox.add(&m_okButton);
+    _contentBox.setInnerMargin(10);
+    _contentBox.setPolicy(USE_MAX_SIZE);
+    _contentBox.add(&_errorIcon);
+    _contentBox.add(&_errorMessageL1);
+    _contentBox.add(&_errorMessageL2);
+    _contentBox.add(&_okButton);
     setSize(Vec3(450.0f, 200.0f));
 }
 
@@ -453,7 +453,7 @@ InternetErrorDialog::~InternetErrorDialog()
 
 void InternetErrorDialog::action(Widget *sender, int actionType, GameControlEvent *event)
 {
-    if (sender == m_okButton.getButton()) {
+    if (sender == _okButton.getButton()) {
         close();
     }
 }
@@ -466,12 +466,12 @@ public:
     virtual void idle(double currentTime);
     void action(Widget *sender, int actionType, GameControlEvent *event);
 private:
-    Text m_messageL1, m_messageL2;
-    FramedButton m_cancelButton;
-    InternetGameCenter *m_gameCenter;
-    InternetGameMenu *m_owner;
-    double m_startTime;
-    bool m_timeout;
+    Text _messageL1, _messageL2;
+    FramedButton _cancelButton;
+    InternetGameCenter *_gameCenter;
+    InternetGameMenu *_owner;
+    double _startTime;
+    bool _timeout;
     static const double CONNECT_TIMEOUT;
 };
 
@@ -479,55 +479,55 @@ const double InternetConnectDialog::CONNECT_TIMEOUT = 5.;
 
 InternetConnectDialog::InternetConnectDialog(const std::string &serverName, InternetGameCenter *gameCenter, InternetGameMenu *owner)
     : InternetDialog("Connecting"),
-      m_messageL1("Connecting to server"), m_messageL2(serverName),
-      m_cancelButton(theCommander->getLocalizedString("Cancel").c_str(), this, // TODO: string
+      _messageL1("Connecting to server"), _messageL2(serverName),
+      _cancelButton(theCommander->getLocalizedString("Cancel").c_str(), this, // TODO: string
 		     theCommander->getButtonFramePicture(),
 		     theCommander->getButtonOverFramePicture()),
-      m_gameCenter(gameCenter), m_owner(owner), m_startTime(0.), m_timeout(false)
+      _gameCenter(gameCenter), _owner(owner), _startTime(0.), _timeout(false)
 {
-    m_contentBox.add(&m_messageL1);
-    m_contentBox.add(&m_messageL2);
-    m_contentBox.add(&m_cancelButton);
+    _contentBox.add(&_messageL1);
+    _contentBox.add(&_messageL2);
+    _contentBox.add(&_cancelButton);
 }
 
 InternetConnectDialog::~InternetConnectDialog()
 {
-    if (m_gameCenter->isConnected()) {
-        m_owner->enterNetCenterMenu(m_gameCenter);
+    if (_gameCenter->isConnected()) {
+        _owner->enterNetCenterMenu(_gameCenter);
 	return;
     }
-    else if ((m_gameCenter->isDenied()) || (m_timeout)) {
+    else if ((_gameCenter->isDenied()) || (_timeout)) {
         InternetErrorDialog *errorDialog;
-	if (m_timeout)
-	  errorDialog = new InternetErrorDialog("Server didn't answered", m_messageL2.getValue());
+	if (_timeout)
+	  errorDialog = new InternetErrorDialog("Server didn't answered", _messageL2.getValue());
 	else
-	    errorDialog = new InternetErrorDialog(m_gameCenter->getDenyString(), m_gameCenter->getDenyStringMore());
-        m_owner->getParentScreen()->add(errorDialog);
-        m_owner->getParentScreen()->grabEventsOnWidget(errorDialog);
+	    errorDialog = new InternetErrorDialog(_gameCenter->getDenyString(), _gameCenter->getDenyStringMore());
+        _owner->getParentScreen()->add(errorDialog);
+        _owner->getParentScreen()->grabEventsOnWidget(errorDialog);
         theCommander->playSound("ebenon.wav", 0.5);
     }
-    delete m_gameCenter;
+    delete _gameCenter;
 }
 
 void InternetConnectDialog::idle(double currentTime)
 {
-    if (m_startTime == 0.)
-        m_startTime = currentTime;
-    if (currentTime - m_startTime > CONNECT_TIMEOUT) {
+    if (_startTime == 0.)
+        _startTime = currentTime;
+    if (currentTime - _startTime > CONNECT_TIMEOUT) {
         close();
-	m_timeout = true;
+	_timeout = true;
 	InternetDialog::idle(currentTime);
-	m_startTime = 0.;
+	_startTime = 0.;
     }
-    m_gameCenter->idle();
-    if ((m_gameCenter->isConnected()) || (m_gameCenter->isDenied()))
+    _gameCenter->idle();
+    if ((_gameCenter->isConnected()) || (_gameCenter->isDenied()))
         close();
     InternetDialog::idle(currentTime);
 }
 
 void InternetConnectDialog::action(Widget *sender, int actionType, GameControlEvent *event)
 {
-  if (sender == m_cancelButton.getButton()) {
+  if (sender == _cancelButton.getButton()) {
     close();
   }
 }
@@ -542,30 +542,30 @@ void InternetGameMenu::enterNetCenterMenu(InternetGameCenter *gameCenter)
 
 void InternetGameMenu::action(Widget *sender, int actionType, GameControlEvent *event)
 {
-    if (sender == this->joinButton.getButton()) {
+    if (sender == this->_joinButton.getButton()) {
         try {
-            InternetGameCenter *gameCenter = new InternetGameCenter(serverName.getEditField().getValue(),
-                                                                            atoi(serverPort.getEditField().getValue().c_str()), playerName.getEditField().getValue(), password.getEditField().getValue());
-            InternetConnectDialog *connectionDialog = new InternetConnectDialog(serverName.getEditField().getValue().c_str(), gameCenter, this);
+            InternetGameCenter *gameCenter = new InternetGameCenter(_serverName.getEditField().getValue(),
+                                                                            atoi(_serverPort.getEditField().getValue().c_str()), _playerName.getEditField().getValue(), _password.getEditField().getValue());
+            InternetConnectDialog *connectionDialog = new InternetConnectDialog(_serverName.getEditField().getValue().c_str(), gameCenter, this);
             this->getParentScreen()->add(connectionDialog);
             this->getParentScreen()->grabEventsOnWidget(connectionDialog);
         } catch (const std::exception &e) {
-            fprintf(stderr, "Error while connecting to %s\n", serverName.getEditField().getValue().c_str());
+            fprintf(stderr, "Error while connecting to %s\n", _serverName.getEditField().getValue().c_str());
             ios_fc::printException(e);
-            InternetErrorDialog *errorDialog = new InternetErrorDialog("Cannot connect to", serverName.getEditField().getValue());
+            InternetErrorDialog *errorDialog = new InternetErrorDialog("Cannot connect to", _serverName.getEditField().getValue());
             this->getParentScreen()->add(errorDialog);
             this->getParentScreen()->grabEventsOnWidget(errorDialog);
             theCommander->playSound("ebenon.wav", 0.5);
         }
     }
-    else if (sender == this->updating.getButton()) {
-        this->servers.fetch();
+    else if (sender == this->_updating.getButton()) {
+        this->_servers.fetch();
     }
 }
 
 void InternetGameMenu::idle(double currentTime)
 {
-    /*int state = servers.fetchingNewData();
+    /*int state = _servers.fetchingNewData();
     if (state > 0)
     {
         int X = (int)(currentTime*3) % 6;
@@ -577,11 +577,11 @@ void InternetGameMenu::idle(double currentTime)
             "...Loading......",
             "......Loading..."
         };
-        updating.setValue(txt[X]);
+        _updating.setValue(txt[X]);
     }
     else if (state < 0)
     {
-      updating.setValue("Update");
+      _updating.setValue("Update");
     }*/
 }
 
@@ -589,25 +589,25 @@ void InternetGameMenu::setSelectedServer(const std::string &serverName, int port
 {
     char sportNum[256];
     sprintf(sportNum, "%d", portNum);
-    this->serverName.setValue(serverName);
-    this->serverPort.setValue(sportNum);
-    this->portNum = portNum;
+    this->_serverName.setValue(serverName);
+    this->_serverPort.setValue(sportNum);
+    this->_portNum = portNum;
 }
 
 void InternetGameMenu::FPServerListHasChanged(FPServerList &serverList)
 {
-    while (serverListPanel.getFullSize() > 0) {
-        ListViewEntry *entry = serverListPanel.getEntryAt(0);
-        serverListPanel.removeEntry(entry);
+    while (_serverListPanel.getFullSize() > 0) {
+        ListViewEntry *entry = _serverListPanel.getEntryAt(0);
+        _serverListPanel.removeEntry(entry);
         delete entry;
     }
     std::vector<FPServer> servers = serverList.getServers();
     for (std::vector<FPServer>::iterator iter = servers.begin() ;
          iter != servers.end() ; iter++) {
-         serverListPanel.addEntry(new ListViewEntry(iter->hostName,
-                                                   new ServerSelectAction(*this, iter->hostName,
-                                                                          iter->portNum)));
+         _serverListPanel.addEntry(new ListViewEntry(iter->_hostName,
+                                                    new ServerSelectAction(*this, iter->_hostName,
+                                                                           iter->_portNum)));
     }
-    updating.setValue(theCommander->getLocalizedString("Update"));
+    _updating.setValue(theCommander->getLocalizedString("Update"));
 }
 

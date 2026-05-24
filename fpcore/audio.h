@@ -24,9 +24,9 @@ private:
         std::string fileName;
         int position;
     };
-    std::map<std::string, JukeboxTrack> m_regTracks;
-    MusicRef m_playingMusic;
-    std::string m_playingMusicName;
+    std::map<std::string, JukeboxTrack> _regTracks;
+    MusicRef _playingMusic;
+    std::string _playingMusicName;
 };
 
 /**
@@ -50,12 +50,12 @@ public:
     void notificationOccured(const std::string &identifier, void * context);
 
 private:
-    audio_manager::AudioManager *m_audioManager;
-    float m_sound_volume;
-    float m_music_volume;
-    bool m_sound_on;
-    bool m_music_on;
-    std::map<std::string, double> m_lastUsedTimestamp;
+    audio_manager::AudioManager *_audioManager;
+    float _sound_volume;
+    float _music_volume;
+    bool _sound_on;
+    bool _music_on;
+    std::map<std::string, double> _lastUsedTimestamp;
 };
 
 

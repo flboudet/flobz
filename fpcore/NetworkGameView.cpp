@@ -32,19 +32,19 @@ Message *NetworkGameView::createStateMessage(bool sendFullMessage)
 {
     // preparation des infos */
 
-    neutralsBuffer.flush(); // TODO: Voir ce que deviennent ces flush
-    moveLeftBuffer.flush();
-    moveRightBuffer.flush();
-    fallingStepBuffer.flush();
-    compTurnBuffer.flush();
-    didFallBuffer.flush();
-    willVanishBuffer.flush();
+    _neutralsBuffer.flush(); // TODO: Voir ce que deviennent ces flush
+    _moveLeftBuffer.flush();
+    _moveRightBuffer.flush();
+    _fallingStepBuffer.flush();
+    _compTurnBuffer.flush();
+    _didFallBuffer.flush();
+    _willVanishBuffer.flush();
 
     // Create the message
-    Message *message = mbox->createMessage();
+    Message *message = _mbox->createMessage();
 
     // TODO: Send some of those only in full messages
-    message->addInt     (FPNetMessage::GAMEID, gameId);
+    message->addInt     (FPNetMessage::GAMEID, _gameId);
     message->addInt     (FPNetMessage::TYPE,   FPNetMessage::kGameState);
     message->addInt     (FPNetMessage::SCORE,  _attachedGame->getGameStat().points);
     message->addInt     (FPNetMessage::NEXT_F, _attachedGame->getNextFalling());
@@ -67,31 +67,31 @@ Message *NetworkGameView::createStateMessage(bool sendFullMessage)
     }
 
     // TODO: Add those only if not empty
-    if (neutralsBuffer.size() > 0)
-        message->addIntArray(FPNetMessage::ADD_NEUTRALS,  neutralsBuffer);
-    if (moveLeftBuffer.size() > 0)
-        message->addIntArray(FPNetMessage::MV_L,moveLeftBuffer);
-    if (moveRightBuffer.size() > 0)
-        message->addIntArray(FPNetMessage::MV_R,moveRightBuffer);
-    if (fallingStepBuffer.size() > 0)
-        message->addIntArray(FPNetMessage::MV_D,fallingStepBuffer);
-    if (compTurnBuffer.size() > 0)
-        message->addIntArray(FPNetMessage::COMPANION_TURN,compTurnBuffer);
-    if (didFallBuffer.size() > 0)
-        message->addIntArray(FPNetMessage::DID_FALL, didFallBuffer);
-    if (willVanishBuffer.size() > 0)
-        message->addIntArray(FPNetMessage::WILL_VANISH,   willVanishBuffer);
+    if (_neutralsBuffer.size() > 0)
+        message->addIntArray(FPNetMessage::ADD_NEUTRALS,  _neutralsBuffer);
+    if (_moveLeftBuffer.size() > 0)
+        message->addIntArray(FPNetMessage::MV_L,_moveLeftBuffer);
+    if (_moveRightBuffer.size() > 0)
+        message->addIntArray(FPNetMessage::MV_R,_moveRightBuffer);
+    if (_fallingStepBuffer.size() > 0)
+        message->addIntArray(FPNetMessage::MV_D,_fallingStepBuffer);
+    if (_compTurnBuffer.size() > 0)
+        message->addIntArray(FPNetMessage::COMPANION_TURN,_compTurnBuffer);
+    if (_didFallBuffer.size() > 0)
+        message->addIntArray(FPNetMessage::DID_FALL, _didFallBuffer);
+    if (_willVanishBuffer.size() > 0)
+        message->addIntArray(FPNetMessage::WILL_VANISH,   _willVanishBuffer);
 
-    message->addInt     (FPNetMessage::NUMBER_BAD_FLOBOS, badFlobos);
+    message->addInt     (FPNetMessage::NUMBER_BAD_FLOBOS, _badFlobos);
 
     // Clear the buffers after they have been sent
-    neutralsBuffer.clear();
-    moveLeftBuffer.clear();
-    moveRightBuffer.clear();
-    fallingStepBuffer.clear();
-    compTurnBuffer.clear();
-    didFallBuffer.clear();
-    willVanishBuffer.clear();
+    _neutralsBuffer.clear();
+    _moveLeftBuffer.clear();
+    _moveRightBuffer.clear();
+    _fallingStepBuffer.clear();
+    _compTurnBuffer.clear();
+    _didFallBuffer.clear();
+    _willVanishBuffer.clear();
     return message;
 }
 
@@ -139,97 +139,97 @@ void NetworkGameView::rotateRight()
 void NetworkGameView::fallingsDidMoveLeft(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo)
 {
     GameView::fallingsDidMoveLeft(fallingFlobo, companionFlobo);
-    moveLeftBuffer.add(fallingFlobo->getID());
-    moveLeftBuffer.add(fallingFlobo->getFloboState());
-    moveLeftBuffer.add(fallingFlobo->getFloboX());
-    moveLeftBuffer.add(fallingFlobo->getFloboY());
-    moveLeftBuffer.add(companionFlobo->getID());
-    moveLeftBuffer.add(companionFlobo->getFloboState());
-    moveLeftBuffer.add(companionFlobo->getFloboX());
-    moveLeftBuffer.add(companionFlobo->getFloboY());
+    _moveLeftBuffer.add(fallingFlobo->getID());
+    _moveLeftBuffer.add(fallingFlobo->getFloboState());
+    _moveLeftBuffer.add(fallingFlobo->getFloboX());
+    _moveLeftBuffer.add(fallingFlobo->getFloboY());
+    _moveLeftBuffer.add(companionFlobo->getID());
+    _moveLeftBuffer.add(companionFlobo->getFloboState());
+    _moveLeftBuffer.add(companionFlobo->getFloboX());
+    _moveLeftBuffer.add(companionFlobo->getFloboY());
 }
 
 void NetworkGameView::fallingsDidMoveRight(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo)
 {
     GameView::fallingsDidMoveRight(fallingFlobo, companionFlobo);
-    moveRightBuffer.add(fallingFlobo->getID());
-    moveRightBuffer.add(fallingFlobo->getFloboState());
-    moveRightBuffer.add(fallingFlobo->getFloboX());
-    moveRightBuffer.add(fallingFlobo->getFloboY());
-    moveRightBuffer.add(companionFlobo->getID());
-    moveRightBuffer.add(companionFlobo->getFloboState());
-    moveRightBuffer.add(companionFlobo->getFloboX());
-    moveRightBuffer.add(companionFlobo->getFloboY());
+    _moveRightBuffer.add(fallingFlobo->getID());
+    _moveRightBuffer.add(fallingFlobo->getFloboState());
+    _moveRightBuffer.add(fallingFlobo->getFloboX());
+    _moveRightBuffer.add(fallingFlobo->getFloboY());
+    _moveRightBuffer.add(companionFlobo->getID());
+    _moveRightBuffer.add(companionFlobo->getFloboState());
+    _moveRightBuffer.add(companionFlobo->getFloboX());
+    _moveRightBuffer.add(companionFlobo->getFloboY());
 }
 
 void NetworkGameView::fallingsDidFallingStep(std::shared_ptr<Flobo> fallingFlobo, std::shared_ptr<Flobo> companionFlobo)
 {
     GameView::fallingsDidFallingStep(fallingFlobo, companionFlobo);
-    fallingStepBuffer.add(fallingFlobo->getID());
-    fallingStepBuffer.add(fallingFlobo->getFloboState());
-    fallingStepBuffer.add(fallingFlobo->getFloboX());
-    fallingStepBuffer.add(fallingFlobo->getFloboY());
-    fallingStepBuffer.add(companionFlobo->getID());
-    fallingStepBuffer.add(companionFlobo->getFloboState());
-    fallingStepBuffer.add(companionFlobo->getFloboX());
-    fallingStepBuffer.add(companionFlobo->getFloboY());
+    _fallingStepBuffer.add(fallingFlobo->getID());
+    _fallingStepBuffer.add(fallingFlobo->getFloboState());
+    _fallingStepBuffer.add(fallingFlobo->getFloboX());
+    _fallingStepBuffer.add(fallingFlobo->getFloboY());
+    _fallingStepBuffer.add(companionFlobo->getID());
+    _fallingStepBuffer.add(companionFlobo->getFloboState());
+    _fallingStepBuffer.add(companionFlobo->getFloboX());
+    _fallingStepBuffer.add(companionFlobo->getFloboY());
 }
 
 void NetworkGameView::gameDidAddNeutral(std::shared_ptr<Flobo> neutralFlobo, int neutralIndex, int totalNeutral)
 {
     GameView::gameDidAddNeutral(neutralFlobo, neutralIndex, totalNeutral);
-    neutralsBuffer.add(neutralFlobo->getID());
-    neutralsBuffer.add(neutralFlobo->getFloboState());
-    neutralsBuffer.add(neutralFlobo->getFloboX());
-    neutralsBuffer.add(neutralFlobo->getFloboY());
-    neutralsBuffer.add(neutralIndex);
-    neutralsBuffer.add(totalNeutral);
+    _neutralsBuffer.add(neutralFlobo->getID());
+    _neutralsBuffer.add(neutralFlobo->getFloboState());
+    _neutralsBuffer.add(neutralFlobo->getFloboX());
+    _neutralsBuffer.add(neutralFlobo->getFloboY());
+    _neutralsBuffer.add(neutralIndex);
+    _neutralsBuffer.add(totalNeutral);
 }
 
 void NetworkGameView::gameDidEndCycle()
 {
     GameView::gameDidEndCycle();
     if (_attachedGame->getNeutralFlobos() < 0)
-        badFlobos -= _attachedGame->getNeutralFlobos();
+        _badFlobos -= _attachedGame->getNeutralFlobos();
     sendStateMessage(true);
 }
 
 void NetworkGameView::companionDidTurn(std::shared_ptr<Flobo> companionFlobo, std::shared_ptr<Flobo> fallingFlobo, bool counterclockwise)
 {
     GameView::companionDidTurn(companionFlobo, fallingFlobo, counterclockwise);
-    compTurnBuffer.add(fallingFlobo->getID());
-    compTurnBuffer.add(fallingFlobo->getFloboState());
-    compTurnBuffer.add(fallingFlobo->getFloboX());
-    compTurnBuffer.add(fallingFlobo->getFloboY());
-    compTurnBuffer.add(companionFlobo->getID());
-    compTurnBuffer.add(companionFlobo->getFloboState());
-    compTurnBuffer.add(companionFlobo->getFloboX());
-    compTurnBuffer.add(companionFlobo->getFloboY());
-    compTurnBuffer.add(counterclockwise);
+    _compTurnBuffer.add(fallingFlobo->getID());
+    _compTurnBuffer.add(fallingFlobo->getFloboState());
+    _compTurnBuffer.add(fallingFlobo->getFloboX());
+    _compTurnBuffer.add(fallingFlobo->getFloboY());
+    _compTurnBuffer.add(companionFlobo->getID());
+    _compTurnBuffer.add(companionFlobo->getFloboState());
+    _compTurnBuffer.add(companionFlobo->getFloboX());
+    _compTurnBuffer.add(companionFlobo->getFloboY());
+    _compTurnBuffer.add(counterclockwise);
 }
 
 void NetworkGameView::floboDidFall(std::shared_ptr<Flobo> flobo, int originX, int originY, int nFalledBelow)
 {
     GameView::floboDidFall(flobo, originX, originY, nFalledBelow);
-    didFallBuffer.add(flobo->getID());
-    didFallBuffer.add(flobo->getFloboState());
-    didFallBuffer.add(flobo->getFloboX());
-    didFallBuffer.add(flobo->getFloboY());
-    didFallBuffer.add(originX);
-    didFallBuffer.add(originY);
-    didFallBuffer.add(nFalledBelow);
+    _didFallBuffer.add(flobo->getID());
+    _didFallBuffer.add(flobo->getFloboState());
+    _didFallBuffer.add(flobo->getFloboX());
+    _didFallBuffer.add(flobo->getFloboY());
+    _didFallBuffer.add(originX);
+    _didFallBuffer.add(originY);
+    _didFallBuffer.add(nFalledBelow);
 }
 
 void NetworkGameView::floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, int groupNum, int phase)
 {
     GameView::floboWillVanish(floboGroup, groupNum, phase);
-    willVanishBuffer.add(phase);
-    willVanishBuffer.add(groupNum);
-    willVanishBuffer.add(floboGroup.size());
+    _willVanishBuffer.add(phase);
+    _willVanishBuffer.add(groupNum);
+    _willVanishBuffer.add(floboGroup.size());
     for (int i = 0 ; i < floboGroup.size() ; i++)
     {
         Flobo *currentFlobo = floboGroup[i].get();
-        willVanishBuffer.add(currentFlobo->getID());
+        _willVanishBuffer.add(currentFlobo->getID());
     }
 }
 
@@ -247,8 +247,8 @@ void NetworkGameView::gameLost()
 
 void NetworkGameView::sendEndOfGameMessage(int messageType)
 {
-    Message *message = mbox->createMessage();
-    message->addInt     (FPNetMessage::GAMEID, gameId);
+    Message *message = _mbox->createMessage();
+    message->addInt     (FPNetMessage::GAMEID, _gameId);
     message->addInt     (FPNetMessage::TYPE,   messageType);
     message->addString  (FPNetMessage::NAME,   _p1name.c_str());
     PlayerGameStat &gameStat = _attachedGame->getGameStat();
@@ -294,13 +294,13 @@ class SaveIgpBound {
 
 void InternetGameView::sendGameResultToServer(int winner)
 {
-    if (igpbox == NULL) return;
-    SaveIgpBound saveIgpBound(igpbox);
-    igpbox->bind(1);
-    std::unique_ptr<Message> message (igpbox->createMessage());
+    if (_igpbox == NULL) return;
+    SaveIgpBound saveIgpBound(_igpbox);
+    _igpbox->bind(1);
+    std::unique_ptr<Message> message (_igpbox->createMessage());
     message->addInt   ("CMD",   FLOBO_IGP_GAME_OVER);
     message->addInt   ("WINNER", winner);
-    message->addInt   ("GAMEID", gameId);
+    message->addInt   ("GAMEID", _gameId);
     message->addString("NAME1",  _p1name.c_str());
     message->addString("NAME2",  _p2name.c_str());
     PlayerGameStat &gameStat = _attachedGame->getGameStat();

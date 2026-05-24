@@ -45,14 +45,14 @@
 #include <string>
 #include <stdint.h>
 
-static bool readLine(DataInputStream *dictionaryFile, std::string &lineRead)
+static bool readLine(DataInputStream *_dictionaryFile, std::string &lineRead)
 {
     bool result = true;
     char newChar[2];
     newChar[1] = 0;
     std::string newLineRead;
     do {
-        if (dictionaryFile->streamRead(newChar, 1) != 1)
+        if (_dictionaryFile->streamRead(newChar, 1) != 1)
             result = false;
         if (result && (newChar[0] != 10) && (newChar[0] != 13))
             newLineRead += newChar;
@@ -259,14 +259,14 @@ struct EqualString {
 /*************************************************************************************/
 LocalizedDictionary::str_dictionnary_cache LocalizedDictionary::dictionaries;
 
-LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager, const std::string &dictionaryDirectory, const std::string &dictionaryName) : dictionary(NULL), datapathManager(datapathManager)
+LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager, const std::string &_dictionaryDirectory, const std::string &_dictionaryName) : _dictionary(NULL), _datapathManager(datapathManager)
 {
   signed int i;
 
   /* First create the prefered languages list whenever needed */
   Locales_Init();
 
-  std::string stdName(FilePath::combine(dictionaryDirectory, dictionaryName));
+  std::string stdName(FilePath::combine(_dictionaryDirectory, _dictionaryName));
   std::shared_ptr<str_dictionnary> myDictEntry;
   auto found = dictionaries.find(stdName);
   if (found != dictionaries.end()) {
@@ -277,36 +277,36 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
       myDictEntry = std::make_shared<str_dictionnary>();
       dictionaries[stdName] = myDictEntry;
 
-      /* Get the first matching dictionary */
+      /* Get the first matching _dictionary */
       bool found = false;
       for (i = PreferedLocalesCount - 1; i >= 0 ; i--) {
 
-          /* try to open the dictionary for the selected locale */
+          /* try to open the _dictionary for the selected locale */
           std::string locale(PreferedLocales[i]);
-          std::string directoryName = FilePath::combine(dictionaryDirectory, locale);
-          std::string dictFilePath = FilePath::combine(directoryName, dictionaryName) + ".dic";
-          DataInputStream *dictionaryStream = NULL;
+          std::string directoryName = FilePath::combine(_dictionaryDirectory, locale);
+          std::string dictFilePath = FilePath::combine(directoryName, _dictionaryName) + ".dic";
+          DataInputStream *_dictionaryStream = NULL;
           if (datapathManager.hasDataInputStream(dictFilePath))
-              dictionaryStream = datapathManager.openDataInputStream(dictFilePath);
-          if (dictionaryStream != NULL)
+              _dictionaryStream = datapathManager.openDataInputStream(dictFilePath);
+          if (_dictionaryStream != NULL)
           {
-              /* Read all the entries in the dictionary file */
+              /* Read all the entries in the _dictionary file */
               std::string keyString, valueString;
               bool fileOk;
-              fileOk = readLine(dictionaryStream, keyString);
+              fileOk = readLine(_dictionaryStream, keyString);
               while (fileOk) {
-                  fileOk = readLine(dictionaryStream, valueString);
+                  fileOk = readLine(_dictionaryStream, valueString);
                   if (fileOk) {
                       std::string key(keyString.c_str());
                       (*myDictEntry)[key] = valueString;
                       do {
-                          fileOk = readLine(dictionaryStream, keyString);
+                          fileOk = readLine(_dictionaryStream, keyString);
                       } while (fileOk && (keyString == ""));
                   }
               }
-              delete dictionaryStream;
+              delete _dictionaryStream;
 //#ifdef DEBUG
-//            fprintf(stdout,"Found dictionary %s\n",(const char *)datapathManager.getPath(dictFilePath));
+//            fprintf(stdout,"Found _dictionary %s\n",(const char *)datapathManager.getPath(dictFilePath));
 //#endif
             found = true;
         }
@@ -314,11 +314,11 @@ LocalizedDictionary::LocalizedDictionary(const DataPathManager &datapathManager,
     // Should we look for any eligible dictionnary now?
     // By now we don't bother since english (en) should be there or we return the original strings anyway.
 //#ifdef DEBUG
-//    if (!found) fprintf(stdout,"No dictionary found in %s for %s\n",(const char *)datapathManager.getPath(dictionaryDirectory),dictionaryName);
+//    if (!found) fprintf(stdout,"No _dictionary found in %s for %s\n",(const char *)datapathManager.getPath(_dictionaryDirectory),_dictionaryName);
 //#endif
   }
 
-  dictionary = myDictEntry;
+  _dictionary = myDictEntry;
   //fprintf(stderr,"-----Refcount++ = %d (%s)\n",myDictEntry->refcount,(const char *)stdName);
 }
 
@@ -328,13 +328,13 @@ LocalizedDictionary::~LocalizedDictionary()
 
 const std::string &LocalizedDictionary::getLocalizedString(const std::string &originalString, bool copyIfNotThere)
 {
-    auto result = dictionary->find(originalString.c_str());
-    if (result != dictionary->end()) {
+    auto result = _dictionary->find(originalString.c_str());
+    if (result != _dictionary->end()) {
         return result->second;
     }
     else if (copyIfNotThere) {
-        (*dictionary)[originalString] = originalString;
-        return (*dictionary)[originalString];
+        (*_dictionary)[originalString] = originalString;
+        return (*_dictionary)[originalString];
     }
     return originalString;
 }

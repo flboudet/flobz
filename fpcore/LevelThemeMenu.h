@@ -47,14 +47,14 @@ class LevelThemePicturePreview : public Widget, public IdleComponent {
       void updatePicture(DrawTarget *dt);
 
     private:
-      std::string label;
-      std::unique_ptr<IosSurface> picture;
-      std::unique_ptr<IosSurface> lilback;
-      double offsetX;
-      double offsetY;
-      bool shouldRecache;
-      bool shouldResize;
-      LevelTheme * curTheme;
+      std::string _label;
+      std::unique_ptr<IosSurface> _picture;
+      std::unique_ptr<IosSurface> _lilback;
+      double _offsetX;
+      double _offsetY;
+      bool _shouldRecache;
+      bool _shouldResize;
+      LevelTheme * _curTheme;
 };
 
 class LevelThemePreview : public VBox {
@@ -66,10 +66,10 @@ class LevelThemePreview : public VBox {
         void setSelectedTheme(std::string themeName);
 
     private:
-        Text name;
+        Text _name;
         //Text author;
-        LevelThemePicturePreview picture;
-        Text description;
+        LevelThemePicturePreview _picture;
+        Text _description;
 };
 
 class LevelThemeSelectionBox : public HBox, public Action {
@@ -79,10 +79,10 @@ public:
     void build();
     void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
 private:
-    int m_nbPlayers;
-    LevelThemePreview themePreview;
-    Image *prevButton, *nextButton;
-    ZBox Spacer0, Spacer1, Spacer2, Spacer3;
+    int _nbPlayers;
+    LevelThemePreview _themePreview;
+    Image *_prevButton, *_nextButton;
+    ZBox _Spacer0, _Spacer1, _Spacer2, _Spacer3;
 };
 
 class LevelThemeMenu : public MainScreenMenu {
@@ -90,12 +90,12 @@ public:
     LevelThemeMenu(MainScreen *mainScreen, int nbPlayers = 2);
     void build();
 private:
-    Frame screenTitleFrame;
-    Text themeMenuTitle;
-    VBox buttonsBox;
-    PopMainScreenMenuAction popAction;
-    Button backButton;
-    LevelThemeSelectionBox themeList;
+    Frame _screenTitleFrame;
+    Text _themeMenuTitle;
+    VBox _buttonsBox;
+    PopMainScreenMenuAction _popAction;
+    Button _backButton;
+    LevelThemeSelectionBox _themeList;
 };
 
 #endif

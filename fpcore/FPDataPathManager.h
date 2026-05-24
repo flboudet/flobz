@@ -48,9 +48,9 @@ public:
     virtual std::string getName() const;
     virtual DataInputStream *openDataInputStream(const std::string &shortPath) const;
 private:
-    FPDataPathManager *m_owner;
-    int m_packageNumber;
-    std::string m_name;
+    FPDataPathManager *_owner;
+    int _packageNumber;
+    std::string _name;
 };
 
 class FPDataInputStream : public DataInputStream {
@@ -59,7 +59,7 @@ public:
     virtual ~FPDataInputStream();
     virtual int streamRead(void *buffer, int size);
 private:
-    FILE *m_f;
+    FILE *_f;
 };
 
 class AbstractFPDataPathManager : public DataPathManager
@@ -78,12 +78,12 @@ public:
     virtual void registerDataPackages(CompositeDrawContext *cDC, Jukebox *jukebox = NULL);
     // Own methods
     std::string getPathInPack(const std::string & shortPath, int packPathIndex) const;
-    int getNumPacks() const { return static_cast<int>(m_dataPaths.size()); }
+    int getNumPacks() const { return static_cast<int>(_dataPaths.size()); }
     void setMaxPackNumber(int maxPackNumber);
 private:
-    FPDataPathManager(FPDataPathManager &mgr) : m_coreDataPath(mgr.m_coreDataPath) {}
-    FilePath m_coreDataPath;
-    std::vector<std::unique_ptr<FilePath>> m_dataPaths;
+    FPDataPathManager(FPDataPathManager &mgr) : _coreDataPath(mgr._coreDataPath) {}
+    FilePath _coreDataPath;
+    std::vector<std::unique_ptr<FilePath>> _dataPaths;
 };
 
 #endif // _PUYODATAPATHMANAGER_H

@@ -32,9 +32,9 @@
 using namespace event_manager;
 
 StoryModeGameWidget::StoryModeGameWidget(int lifes, const std::string & aiFace)
-    : faceTicks(0), opponent(aiFace),
-      killLeftCheat("killleft", this),
-      killRightCheat("killright", this)
+    : _faceTicks(0), _opponent(aiFace),
+      _killLeftCheat("killleft", this),
+      _killRightCheat("killright", this)
 {
     setLives(lifes);
 }
@@ -53,8 +53,8 @@ void StoryModeGameWidget::initWithGUI(GameView &areaA, GameView &areaB,
     _controllerB.reset(new AIPlayer(corrected_level, areaB));
     GameWidget2P::initWithGUI(areaA, areaB,
                                levelTheme, gameOverAction);
-    addSubWidget(&killLeftCheat);
-    addSubWidget(&killRightCheat);
+    addSubWidget(&_killLeftCheat);
+    addSubWidget(&_killRightCheat);
 	int scoringLevel = 30/level;
 	if (scoringLevel < 1) scoringLevel = 1;
 	if (scoringLevel > 10) scoringLevel = 10;
@@ -64,13 +64,13 @@ void StoryModeGameWidget::initWithGUI(GameView &areaA, GameView &areaB,
 
 StoryModeStandardLayoutGameWidget::StoryModeStandardLayoutGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, int level, int nColors, int lifes, const std::string & aiFace, Action *gameOverAction)
   : StoryModeGameWidget(lifes, aiFace),
-      attachedFloboThemeSet(floboSetTheme),
-      attachedRandom(nColors),
-      attachedGameFactory(&attachedRandom),
-      areaA(&attachedGameFactory, 0, &attachedFloboThemeSet, &levelTheme),
-      areaB(&attachedGameFactory, 1, &attachedFloboThemeSet, &levelTheme)
+      _attachedFloboThemeSet(floboSetTheme),
+      _attachedRandom(nColors),
+      _attachedGameFactory(&_attachedRandom),
+      _areaA(&_attachedGameFactory, 0, &_attachedFloboThemeSet, &levelTheme),
+      _areaB(&_attachedGameFactory, 1, &_attachedFloboThemeSet, &levelTheme)
 {
-    initWithGUI(areaA, areaB, new CombinedEventPlayer(areaA), levelTheme, level, gameOverAction);
+    initWithGUI(_areaA, _areaB, new CombinedEventPlayer(_areaA), levelTheme, level, gameOverAction);
 }
 
 StoryModeGameWidget::~StoryModeGameWidget()
@@ -79,55 +79,55 @@ StoryModeGameWidget::~StoryModeGameWidget()
 
 void StoryModeGameWidget::cycle()
 {
-    faceTicks += 1;
-    if (faceTicks == 1) {
+    _faceTicks += 1;
+    if (_faceTicks == 1) {
         AIParameters ai;
-        ai.realSuppressionValue = opponent.getIntegerValue("@AI_RealSuppression");
-        ai.potentialSuppressionValue = opponent.getIntegerValue("@AI_PotentialSuppression");
-        ai.criticalHeight = opponent.getIntegerValue("@AI_CriticalHeight");
-        ai.columnScalar[0] = opponent.getIntegerValue("@AI_Column1");
-        ai.columnScalar[1] = opponent.getIntegerValue("@AI_Column2");
-        ai.columnScalar[2] = opponent.getIntegerValue("@AI_Column3");
-        ai.columnScalar[3] = opponent.getIntegerValue("@AI_Column4");
-        ai.columnScalar[4] = opponent.getIntegerValue("@AI_Column5");
-        ai.columnScalar[5] = opponent.getIntegerValue("@AI_Column6");
-        ai.rotationMethod = opponent.getIntegerValue("@AI_RotationMethod");
-        ai.fastDropDelta = opponent.getIntegerValue("@AI_FastDropDelta");
-        ai.thinkDepth = opponent.getIntegerValue("@AI_ThinkDepth");
+        ai.realSuppressionValue = _opponent.getIntegerValue("@AI_RealSuppression");
+        ai.potentialSuppressionValue = _opponent.getIntegerValue("@AI_PotentialSuppression");
+        ai.criticalHeight = _opponent.getIntegerValue("@AI_CriticalHeight");
+        ai.columnScalar[0] = _opponent.getIntegerValue("@AI_Column1");
+        ai.columnScalar[1] = _opponent.getIntegerValue("@AI_Column2");
+        ai.columnScalar[2] = _opponent.getIntegerValue("@AI_Column3");
+        ai.columnScalar[3] = _opponent.getIntegerValue("@AI_Column4");
+        ai.columnScalar[4] = _opponent.getIntegerValue("@AI_Column5");
+        ai.columnScalar[5] = _opponent.getIntegerValue("@AI_Column6");
+        ai.rotationMethod = _opponent.getIntegerValue("@AI_RotationMethod");
+        ai.fastDropDelta = _opponent.getIntegerValue("@AI_FastDropDelta");
+        ai.thinkDepth = _opponent.getIntegerValue("@AI_ThinkDepth");
         AIPlayer *opponentcontroller = static_cast<AIPlayer *>(_controllerB.get());
         opponentcontroller->setAIParameters(ai);
 
-		opponent.setIntegerValue("@AI_PlayingLevel", opponentcontroller->getLevel());
-        opponent.setIntegerValue("@maxHeightLeft", _attachedGameA->getColumnHeigth(2));
-        opponent.setIntegerValue("@maxHeightRight", _attachedGameB->getColumnHeigth(2));
-        opponent.setIntegerValue("@maxHeightPlayer", _attachedGameA->getColumnHeigth(2));
-        opponent.setIntegerValue("@maxHeightAI", _attachedGameB->getColumnHeigth(2));
-        opponent.setIntegerValue("@neutralsForPlayer", _attachedGameA->getNeutralFlobos());
-        opponent.setIntegerValue("@neutralsForAI", _attachedGameB->getNeutralFlobos());
-        opponent.setIntegerValue("@gameOverLeft",  !this->isGameARunning());
-        opponent.setIntegerValue("@gameOverRight", !this->isGameBRunning());
+		_opponent.setIntegerValue("@AI_PlayingLevel", opponentcontroller->getLevel());
+        _opponent.setIntegerValue("@maxHeightLeft", _attachedGameA->getColumnHeigth(2));
+        _opponent.setIntegerValue("@maxHeightRight", _attachedGameB->getColumnHeigth(2));
+        _opponent.setIntegerValue("@maxHeightPlayer", _attachedGameA->getColumnHeigth(2));
+        _opponent.setIntegerValue("@maxHeightAI", _attachedGameB->getColumnHeigth(2));
+        _opponent.setIntegerValue("@neutralsForPlayer", _attachedGameA->getNeutralFlobos());
+        _opponent.setIntegerValue("@neutralsForAI", _attachedGameB->getNeutralFlobos());
+        _opponent.setIntegerValue("@gameOverLeft",  !this->isGameARunning());
+        _opponent.setIntegerValue("@gameOverRight", !this->isGameBRunning());
     }
-    if (faceTicks == 100) {
-        faceTicks = 0;
+    if (_faceTicks == 100) {
+        _faceTicks = 0;
     }
     GameWidget2P::cycle();
 }
 
 StoryWidget *StoryModeGameWidget::getOpponent()
 {
-    return &opponent;
+    return &_opponent;
 }
 
 void StoryModeGameWidget::action(Widget *sender, int actionType,
                                         GameControlEvent *event)
 {
-    if (sender == static_cast<Widget *>(&killLeftCheat))
+    if (sender == static_cast<Widget *>(&_killLeftCheat))
         addGameAHandicap(FLOBOBAN_DIMY);
-    else if (sender == static_cast<Widget *>(&killRightCheat))
+    else if (sender == static_cast<Widget *>(&_killRightCheat))
         addGameBHandicap(FLOBOBAN_DIMY);
 }
 
-StoryModeLevelsDefinition *StoryModeLevelsDefinition::currentDefinition = NULL;
+StoryModeLevelsDefinition *StoryModeLevelsDefinition::_currentDefinition = NULL;
 
 StoryModeLevelsDefinition::StoryModeLevelsDefinition(const std::string & levelDefinitionFile)
 {
@@ -137,7 +137,7 @@ StoryModeLevelsDefinition::StoryModeLevelsDefinition(const std::string & levelDe
     gsl_push_file(gsl, "/lib/levellib.gsl");
     gsl_push_file(gsl, levelDefinitionFile.c_str());
     gsl_compile(gsl);
-    currentDefinition = this;
+    _currentDefinition = this;
     gsl_bind_function(gsl, "end_level",  StoryModeLevelsDefinition::end_level);
     gsl_bind_function(gsl, "getBoolPreference", StoryModeLevelsDefinition::get_BoolPreference);
     gsl_execute(gsl);
@@ -146,8 +146,8 @@ StoryModeLevelsDefinition::StoryModeLevelsDefinition(const std::string & levelDe
 
 StoryModeLevelsDefinition::~StoryModeLevelsDefinition()
 {
-  for (int i = 0 ; i < levelDefinitions.size() ; i++) {
-    delete levelDefinitions[i];
+  for (int i = 0 ; i < _levelDefinitions.size() ; i++) {
+    delete _levelDefinitions[i];
   }
 }
 
@@ -158,12 +158,12 @@ void StoryModeLevelsDefinition::addLevelDefinition(const std::string & levelName
 					      SelIA easySettings,
 					      SelIA mediumSettings, SelIA hardSettings)
 {
-  levelDefinitions.add(new LevelDefinition(levelName, introStory, opponentStory, opponentName,
+  _levelDefinitions.add(new LevelDefinition(levelName, introStory, opponentStory, opponentName,
 					   opponent, backgroundTheme, gameLostStory, gameWonStory, gameOverStory,
 					   easySettings, mediumSettings, hardSettings));
 }
 
-StoryModeLevelsDefinition::SelIA::SelIA(int level, int nColors) : level(level), nColors(nColors)
+StoryModeLevelsDefinition::SelIA::SelIA(int level, int nColors) : _level(level), _nColors(nColors)
 {
 }
 
@@ -196,7 +196,7 @@ void StoryModeLevelsDefinition::end_level(GoomSL *gsl, GoomHash *global, GoomHas
                        GSL_GLOBAL_INT(gsl, "level.mediumSetting.nColors"));
   SelIA hardSettings(GSL_GLOBAL_INT(gsl, "level.hardSetting.level"),
                      GSL_GLOBAL_INT(gsl, "level.hardSetting.nColors"));
-  currentDefinition->addLevelDefinition(levelName, introStory, opponentStory, opponentName,
+  _currentDefinition->addLevelDefinition(levelName, introStory, opponentStory, opponentName,
 					opponent, backgroundTheme, gameLostStory, gameWonStory, gameOverStory,
 					easySettings, mediumSettings, hardSettings);
 }
@@ -206,73 +206,73 @@ void StoryModeLevelsDefinition::end_level(GoomSL *gsl, GoomHash *global, GoomHas
 //---------------------------------
 StoryModeMatchIsOverState::StoryModeMatchIsOverState(SharedGameAssets *sharedGameAssets,
                                                            SharedMatchAssets *sharedMatchAssets)
-    : m_sharedGameAssets(sharedGameAssets),
-      m_sharedMatchAssets(sharedMatchAssets),
-      m_aknowledged(false)
+    : _sharedGameAssets(sharedGameAssets),
+      _sharedMatchAssets(sharedMatchAssets),
+      _aknowledged(false)
 {
 }
 
 StoryModeMatchIsOverState::~StoryModeMatchIsOverState()
 {
-    if (m_gameLostWidget.get() != NULL) {
-        m_gameLostWidget->getParentScreen()->removeAction(this);
-        m_gameLostWidget.reset(NULL);
+    if (_gameLostWidget.get() != NULL) {
+        _gameLostWidget->getParentScreen()->removeAction(this);
+        _gameLostWidget.reset(NULL);
     }
 }
 
 void StoryModeMatchIsOverState::enterState()
 {
     GTLogTrace("StoryModeMatchIsOver::enterState()");
-    m_aknowledged = false;
-    if (m_sharedMatchAssets->m_gameWidget->isGameARunning()) {
-        m_sharedMatchAssets->m_leftVictories++;
-        if (m_sharedGameAssets->levelDef->gameWonStory == "")
-            m_aknowledged = true;
+    _aknowledged = false;
+    if (_sharedMatchAssets->_gameWidget->isGameARunning()) {
+        _sharedMatchAssets->_leftVictories++;
+        if (_sharedGameAssets->_levelDef->_gameWonStory == "")
+            _aknowledged = true;
         else {
-            m_gameLostWidget.reset(new StoryWidget(m_sharedGameAssets->levelDef->gameWonStory, this));
-            m_sharedMatchAssets->m_gameScreen->setOverlayStory(m_gameLostWidget.get());
-            m_sharedMatchAssets->m_gameScreen->addAction(this);
+            _gameLostWidget.reset(new StoryWidget(_sharedGameAssets->_levelDef->_gameWonStory, this));
+            _sharedMatchAssets->_gameScreen->setOverlayStory(_gameLostWidget.get());
+            _sharedMatchAssets->_gameScreen->addAction(this);
         }
     }
     else {
-        m_sharedMatchAssets->m_rightVictories++;
-        if (m_sharedGameAssets->levelDef->gameLostStory == "")
-            m_aknowledged = true;
+        _sharedMatchAssets->_rightVictories++;
+        if (_sharedGameAssets->_levelDef->_gameLostStory == "")
+            _aknowledged = true;
         else {
-            m_gameLostWidget.reset(new StoryWidget(m_sharedGameAssets->levelDef->gameLostStory, this));
-            m_sharedMatchAssets->m_gameScreen->setOverlayStory(m_gameLostWidget.get());
-            m_sharedMatchAssets->m_gameScreen->addAction(this);
+            _gameLostWidget.reset(new StoryWidget(_sharedGameAssets->_levelDef->_gameLostStory, this));
+            _sharedMatchAssets->_gameScreen->setOverlayStory(_gameLostWidget.get());
+            _sharedMatchAssets->_gameScreen->addAction(this);
         }
     }
-    m_sharedMatchAssets->m_leftTotal  += m_sharedMatchAssets->m_gameWidget->getStatPlayerOne().points;
-    m_sharedMatchAssets->m_rightTotal += m_sharedMatchAssets->m_gameWidget->getStatPlayerTwo().points;
-    m_sharedMatchAssets->m_gameWidget->setGameOverAction(this);
+    _sharedMatchAssets->_leftTotal  += _sharedMatchAssets->_gameWidget->getStatPlayerOne().points;
+    _sharedMatchAssets->_rightTotal += _sharedMatchAssets->_gameWidget->getStatPlayerTwo().points;
+    _sharedMatchAssets->_gameWidget->setGameOverAction(this);
 }
 
 void StoryModeMatchIsOverState::exitState()
 {
-    m_sharedMatchAssets->m_gameWidget->setGameOverAction(NULL);
+    _sharedMatchAssets->_gameWidget->setGameOverAction(NULL);
 }
 
 bool StoryModeMatchIsOverState::evaluate()
 {
-    return m_aknowledged;
+    return _aknowledged;
 }
 
 GameState *StoryModeMatchIsOverState::getNextState()
 {
-    return m_nextState;
+    return _nextState;
 }
 
 void StoryModeMatchIsOverState::action(Widget *sender, int actionType,
                         event_manager::GameControlEvent *event)
 {
-    if (sender == (Widget *)(m_gameLostWidget->getParentScreen())) {
-        m_gameLostWidget->getParentScreen()->removeAction(this);
-        m_gameLostWidget.reset(NULL);
+    if (sender == (Widget *)(_gameLostWidget->getParentScreen())) {
+        _gameLostWidget->getParentScreen()->removeAction(this);
+        _gameLostWidget.reset(NULL);
         return;
     }
-    m_aknowledged = true;
+    _aknowledged = true;
     evaluateStateMachine();
 }
 
@@ -280,50 +280,50 @@ void StoryModeMatchIsOverState::action(Widget *sender, int actionType,
 // StoryModeMatchState
 //---------------------------------
 StoryModeMatchState::StoryModeMatchState(SharedGameAssets *sharedGameAssets)
-    : m_sharedGameAssets(sharedGameAssets),
-      m_gameWidgetFactory(this)
+    : _sharedGameAssets(sharedGameAssets),
+      _gameWidgetFactory(this)
 {
 }
 
 void StoryModeMatchState::enterState()
 {
-    m_nextState = NULL;
+    _nextState = NULL;
     // Creating the different game states
-    if (m_sharedGameAssets->levelDef->introStory == "")
-        m_introStoryScreen.reset(NULL);
+    if (_sharedGameAssets->_levelDef->_introStory == "")
+        _introStoryScreen.reset(NULL);
     else
-        m_introStoryScreen.reset(new DisplayStoryScreenState(m_sharedGameAssets->levelDef->introStory));
-    m_opponentStoryScreen.reset(new DisplayStoryScreenState(m_sharedGameAssets->levelDef->opponentStory));
-    m_setupMatch.reset(new SetupMatchState(m_gameWidgetFactory, m_sharedGameAssets->gameOptions, this, &m_sharedAssets));
-    m_enterPlayersReady.reset(new EnterPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
-    m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
-    m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));
-    m_matchIsOver.reset(new StoryModeMatchIsOverState(m_sharedGameAssets, &m_sharedAssets));
-    m_displayStats.reset(new DisplayStatsState(m_sharedAssets));
-    m_leaveMatch.reset(new CallActionState(this, LEAVE_MATCH));
-    m_abortGame.reset(new CallActionState(this, ABORT_GAME));
+        _introStoryScreen.reset(new DisplayStoryScreenState(_sharedGameAssets->_levelDef->_introStory));
+    _opponentStoryScreen.reset(new DisplayStoryScreenState(_sharedGameAssets->_levelDef->_opponentStory));
+    _setupMatch.reset(new SetupMatchState(_gameWidgetFactory, _sharedGameAssets->_gameOptions, this, &_sharedAssets));
+    _enterPlayersReady.reset(new EnterPlayerReadyState(_sharedAssets, _sharedGetReadyAssets));
+    _exitPlayersReady.reset(new ExitPlayerReadyState(_sharedAssets, _sharedGetReadyAssets));
+    _matchPlaying.reset(new MatchPlayingState(_sharedAssets));
+    _matchIsOver.reset(new StoryModeMatchIsOverState(_sharedGameAssets, &_sharedAssets));
+    _displayStats.reset(new DisplayStatsState(_sharedAssets));
+    _leaveMatch.reset(new CallActionState(this, LEAVE_MATCH));
+    _abortGame.reset(new CallActionState(this, ABORT_GAME));
     // Additional state setup
-    m_setupMatch->setHandicapOnVictorious(false);
-    m_setupMatch->setAccountTotalOnPlayerB(false);
+    _setupMatch->setHandicapOnVictorious(false);
+    _setupMatch->setAccountTotalOnPlayerB(false);
     // Linking the states together
-    if (m_introStoryScreen.get() != NULL)
-        m_introStoryScreen->setNextState(m_opponentStoryScreen.get());
-    m_opponentStoryScreen->setNextState(m_setupMatch.get());
-    m_setupMatch->setNextState(m_enterPlayersReady.get());
-    m_enterPlayersReady->setNextState(m_exitPlayersReady.get());
-    m_exitPlayersReady->setNextState(m_matchPlaying.get());
-    m_matchPlaying->setNextState(m_matchIsOver.get());
-    m_matchPlaying->setAbortedState(m_abortGame.get());
-    m_matchIsOver->setNextState(m_displayStats.get());
-    m_displayStats->setNextState(m_leaveMatch.get());
+    if (_introStoryScreen.get() != NULL)
+        _introStoryScreen->setNextState(_opponentStoryScreen.get());
+    _opponentStoryScreen->setNextState(_setupMatch.get());
+    _setupMatch->setNextState(_enterPlayersReady.get());
+    _enterPlayersReady->setNextState(_exitPlayersReady.get());
+    _exitPlayersReady->setNextState(_matchPlaying.get());
+    _matchPlaying->setNextState(_matchIsOver.get());
+    _matchPlaying->setAbortedState(_abortGame.get());
+    _matchIsOver->setNextState(_displayStats.get());
+    _displayStats->setNextState(_leaveMatch.get());
     // Initializing the state machine
-    if (m_introStoryScreen.get() != NULL)
-        m_stateMachine.setInitialState(m_introStoryScreen.get());
+    if (_introStoryScreen.get() != NULL)
+        _stateMachine.setInitialState(_introStoryScreen.get());
     else
-        m_stateMachine.setInitialState(m_opponentStoryScreen.get());
+        _stateMachine.setInitialState(_opponentStoryScreen.get());
     // Run the state machine
-    m_stateMachine.reset();
-    m_stateMachine.evaluate();
+    _stateMachine.reset();
+    _stateMachine.evaluate();
 }
 
 void StoryModeMatchState::exitState()
@@ -332,25 +332,25 @@ void StoryModeMatchState::exitState()
 
 bool StoryModeMatchState::evaluate()
 {
-    if (m_nextState == NULL)
+    if (_nextState == NULL)
         return false;
     return true;
 }
 
 GameState *StoryModeMatchState::getNextState()
 {
-    return m_nextState;
+    return _nextState;
 }
 
 std::string StoryModeMatchState::getPlayerName(int playerNumber) const
 {
     switch (playerNumber) {
     case 0:
-      return m_sharedGameAssets->playerName.c_str();
+      return _sharedGameAssets->_playerName.c_str();
 	break;
     case 1:
     default:
-        return m_sharedGameAssets->levelDef->opponentName;
+        return _sharedGameAssets->_levelDef->_opponentName;
     }
 }
 
@@ -359,17 +359,17 @@ GameWidget *StoryModeMatchState::createGameWidget(FloboSetTheme &floboSetTheme,
                                          const std::string & centerFace,
                                          Action *gameOverAction)
 {
-    m_sharedAssets.m_currentFloboSetTheme = theCommander->getPreferedFloboSetTheme();
-    if (m_sharedGameAssets->levelDef->backgroundTheme == "Prefs.DefaultTheme")
-        m_sharedAssets.m_currentLevelTheme = theCommander->getPreferedLevelTheme();
+    _sharedAssets._currentFloboSetTheme = theCommander->getPreferedFloboSetTheme();
+    if (_sharedGameAssets->_levelDef->_backgroundTheme == "Prefs.DefaultTheme")
+        _sharedAssets._currentLevelTheme = theCommander->getPreferedLevelTheme();
     else
-        m_sharedAssets.m_currentLevelTheme = theCommander->getLevelTheme(m_sharedGameAssets->levelDef->backgroundTheme.c_str()); // TODO string
-    return new StoryModeStandardLayoutGameWidget(*(m_sharedAssets.m_currentFloboSetTheme),
-                                                    *(m_sharedAssets.m_currentLevelTheme),
-                                                    m_sharedGameAssets->levelDef->getAISettings(m_sharedGameAssets->difficulty).level,
-                                                    m_sharedGameAssets->levelDef->getAISettings(m_sharedGameAssets->difficulty).nColors,
-                                                    m_sharedGameAssets->lifes,
-                                                    m_sharedGameAssets->levelDef->opponent, gameOverAction);
+        _sharedAssets._currentLevelTheme = theCommander->getLevelTheme(_sharedGameAssets->_levelDef->_backgroundTheme.c_str()); // TODO string
+    return new StoryModeStandardLayoutGameWidget(*(_sharedAssets._currentFloboSetTheme),
+                                                    *(_sharedAssets._currentLevelTheme),
+                                                    _sharedGameAssets->_levelDef->getAISettings(_sharedGameAssets->_difficulty)._level,
+                                                    _sharedGameAssets->_levelDef->getAISettings(_sharedGameAssets->_difficulty)._nColors,
+                                                    _sharedGameAssets->_lifes,
+                                                    _sharedGameAssets->_levelDef->_opponent, gameOverAction);
 }
 
 void StoryModeMatchState::action(Widget *sender, int actionType,
@@ -377,27 +377,27 @@ void StoryModeMatchState::action(Widget *sender, int actionType,
 {
     switch (actionType) {
     case LEAVE_MATCH:
-      //m_playerStat.total_points += m_gameWidget->getStatPlayerOne().points;
-        if (m_sharedAssets.m_gameWidget->isGameARunning()) {
-            m_nextState = m_victoriousState;
+      //_playerStat.total_points += _gameWidget->getStatPlayerOne().points;
+        if (_sharedAssets._gameWidget->isGameARunning()) {
+            _nextState = _victoriousState;
             // Note achievement if available
-            std::string achievementName = std::string("victory_") + m_sharedGameAssets->levelDef->opponentName;
+            std::string achievementName = std::string("victory_") + _sharedGameAssets->_levelDef->_opponentName;
             if (theCommander->getAchievementsManager() != NULL)
                 theCommander->getAchievementsManager()->declareAchievement(achievementName.c_str(), 100.);
         }
         else {
-            if (m_sharedGameAssets->lifes == 0) {
-                m_nextState = m_gameLostState;
+            if (_sharedGameAssets->_lifes == 0) {
+                _nextState = _gameLostState;
             }
             else {
-                m_nextState = m_humiliatedState;
-                m_sharedGameAssets->lifes--;
+                _nextState = _humiliatedState;
+                _sharedGameAssets->_lifes--;
             }
         }
         break;
     case ABORT_GAME:
     default:
-        m_nextState = m_abortedState;
+        _nextState = _abortedState;
         break;
     }
     evaluateStateMachine();
@@ -406,24 +406,24 @@ void StoryModeMatchState::action(Widget *sender, int actionType,
 //---------------------------------
 // StoryModePrepareNextMatchState
 //---------------------------------
-std::unique_ptr<StoryModeLevelsDefinition> StoryModePrepareNextMatchState::m_levelDefProvider;
+std::unique_ptr<StoryModeLevelsDefinition> StoryModePrepareNextMatchState::_levelDefProvider;
 StoryModePrepareNextMatchState::StoryModePrepareNextMatchState(SharedGameAssets *sharedGameAssets)
-    : m_sharedGameAssets(sharedGameAssets)
+    : _sharedGameAssets(sharedGameAssets)
 {
     reset();
 }
 
 void StoryModePrepareNextMatchState::enterState()
 {
-    if (m_levelDefProvider.get() == NULL)
-        m_levelDefProvider.reset(new StoryModeLevelsDefinition("/story/levels.gsl"));
-    ++m_currentLevel;
-    if (m_levelDefProvider->getNumLevels() > m_currentLevel) {
-        m_sharedGameAssets->levelDef = m_levelDefProvider->getLevelDefinition(m_currentLevel);
-        m_nextState = m_nextMatchState;
+    if (_levelDefProvider.get() == NULL)
+        _levelDefProvider.reset(new StoryModeLevelsDefinition("/story/levels.gsl"));
+    ++_currentLevel;
+    if (_levelDefProvider->getNumLevels() > _currentLevel) {
+        _sharedGameAssets->_levelDef = _levelDefProvider->getLevelDefinition(_currentLevel);
+        _nextState = _nextMatchState;
     }
     else { // The game is won, there is no more levels
-        m_nextState = m_gameWonState;
+        _nextState = _gameWonState;
     }
 }
 
@@ -434,12 +434,12 @@ bool StoryModePrepareNextMatchState::evaluate()
 
 GameState *StoryModePrepareNextMatchState::getNextState()
 {
-    return m_nextState;
+    return _nextState;
 }
 
 void StoryModePrepareNextMatchState::reset()
 {
-    m_currentLevel = -1;
+    _currentLevel = -1;
 }
 
 //---------------------------------
@@ -448,52 +448,52 @@ void StoryModePrepareNextMatchState::reset()
 
 StoryModeStarterAction::StoryModeStarterAction(GameDifficulty difficulty,
                                                            PlayerNameProvider *nameProvider)
-    : m_nameProvider(nameProvider)
+    : _nameProvider(nameProvider)
 {
     // Initializing the shared game assets
-    m_sharedGameAssets.difficulty = difficulty;
-    m_sharedGameAssets.gameOptions = GameOptions::fromDifficulty(difficulty);
+    _sharedGameAssets._difficulty = difficulty;
+    _sharedGameAssets._gameOptions = GameOptions::fromDifficulty(difficulty);
     // Creating the different game states
-    m_pushGameScreen.reset(new PushScreenState());
-    m_prepareNextMatch.reset(new StoryModePrepareNextMatchState(&m_sharedGameAssets));
-    m_playMatch.reset(new StoryModeMatchState(&m_sharedGameAssets));
-    m_gameWon.reset(new DisplayStoryScreenState("gamewon_1p.gsl"));
-    m_gameLostHoF.reset(new ManageHiScoresState(m_playMatch->getMatchAssets(), nameProvider, STORY_SCOREBOARD_ID, "", &m_sharedGameAssets));
-    m_gameWonHoF.reset(new ManageHiScoresState(m_playMatch->getMatchAssets(), nameProvider, STORY_SCOREBOARD_ID, "gamewon_highscores_1p.gsl"));
-    m_leaveGame.reset(new LeaveGameState(*(m_playMatch->getMatchAssets())));
+    _pushGameScreen.reset(new PushScreenState());
+    _prepareNextMatch.reset(new StoryModePrepareNextMatchState(&_sharedGameAssets));
+    _playMatch.reset(new StoryModeMatchState(&_sharedGameAssets));
+    _gameWon.reset(new DisplayStoryScreenState("gamewon_1p.gsl"));
+    _gameLostHoF.reset(new ManageHiScoresState(_playMatch->getMatchAssets(), nameProvider, STORY_SCOREBOARD_ID, "", &_sharedGameAssets));
+    _gameWonHoF.reset(new ManageHiScoresState(_playMatch->getMatchAssets(), nameProvider, STORY_SCOREBOARD_ID, "gamewon_highscores_1p.gsl"));
+    _leaveGame.reset(new LeaveGameState(*(_playMatch->getMatchAssets())));
     // Linking the states together
-    m_pushGameScreen->setNextState(m_prepareNextMatch.get());
-    m_prepareNextMatch->setNextMatchState(m_playMatch.get());
-    m_prepareNextMatch->setGameWonState(m_gameWon.get());
-    m_playMatch->setVictoriousState(m_prepareNextMatch.get());
-    m_playMatch->setHumiliatedState(m_playMatch.get());
-    m_playMatch->setGameLostState(m_gameLostHoF.get());
-    m_playMatch->setAbortedState(m_leaveGame.get());
-    m_gameWon->setNextState(m_gameWonHoF.get());
-    m_gameWonHoF->setNextState(m_leaveGame.get());
-    m_gameLostHoF->setNextState(m_leaveGame.get());
+    _pushGameScreen->setNextState(_prepareNextMatch.get());
+    _prepareNextMatch->setNextMatchState(_playMatch.get());
+    _prepareNextMatch->setGameWonState(_gameWon.get());
+    _playMatch->setVictoriousState(_prepareNextMatch.get());
+    _playMatch->setHumiliatedState(_playMatch.get());
+    _playMatch->setGameLostState(_gameLostHoF.get());
+    _playMatch->setAbortedState(_leaveGame.get());
+    _gameWon->setNextState(_gameWonHoF.get());
+    _gameWonHoF->setNextState(_leaveGame.get());
+    _gameLostHoF->setNextState(_leaveGame.get());
     // Initializing the state machine
-    m_stateMachine.setInitialState(m_pushGameScreen.get());
+    _stateMachine.setInitialState(_pushGameScreen.get());
 }
 
 void StoryModeStarterAction::action(Widget *sender, int actionType,
                                     event_manager::GameControlEvent *event)
 {
-    if (m_nameProvider == NULL)
-        m_sharedGameAssets.playerName = "Player";
+    if (_nameProvider == NULL)
+        _sharedGameAssets._playerName = "Player";
     else
-        m_sharedGameAssets.playerName = m_nameProvider->getPlayerName(0);
-    m_sharedGameAssets.lifes = 3;
-    m_prepareNextMatch->reset();
-    m_stateMachine.reset();
-    m_stateMachine.evaluate();
+        _sharedGameAssets._playerName = _nameProvider->getPlayerName(0);
+    _sharedGameAssets._lifes = 3;
+    _prepareNextMatch->reset();
+    _stateMachine.reset();
+    _stateMachine.evaluate();
 }
 
 void StoryModeStarterAction::pauseGameIfPossible()
 {
-    if (m_playMatch->getMatchAssets() == NULL)
+    if (_playMatch->getMatchAssets() == NULL)
         return;
-    if (m_playMatch->getMatchAssets()->m_gameScreen.get() == NULL)
+    if (_playMatch->getMatchAssets()->_gameScreen.get() == NULL)
         return;
-    m_playMatch->getMatchAssets()->m_gameScreen->setPaused(true);
+    _playMatch->getMatchAssets()->_gameScreen->setPaused(true);
 }

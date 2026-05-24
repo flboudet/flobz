@@ -35,13 +35,13 @@ public:
     virtual ~VuMeter() {}
     void draw(DrawTarget *dt);
     void step();
-    void setValue(double value) { m_targetValue = value; }
+    void setValue(double value) { _targetValue = value; }
 private:
-    Vec3 m_position;
-    IosSurface *m_front;
-    IosSurface *m_back;
-    double m_targetValue;
-    double m_value;
+    Vec3 _position;
+    IosSurface *_front;
+    IosSurface *_back;
+    double _targetValue;
+    double _value;
 };
 
 struct GameParameterSetting {
@@ -61,31 +61,31 @@ struct SoloGameSettings {
 class GameParameter {
 public:
     GameParameter(GameParameterSetting &setting)
-        : setting(setting), value(setting.initialValue), m_steps(0), m_noEvo(false)
+        : _setting(setting), _value(setting.initialValue), _steps(0), _noEvo(false)
     {
         if (setting.evolution != 0.)
-            m_steps = (setting.finalValue - setting.initialValue) / setting.evolution;
+            _steps = (setting.finalValue - setting.initialValue) / setting.evolution;
         else
-            m_noEvo = true;
+            _noEvo = true;
     }
-    double getValue() const { return value; }
+    double getValue() const { return _value; }
     void step() {
-        if (m_noEvo)
+        if (_noEvo)
             return;
-        if (m_steps <= 0) {
-            value = setting.finalValue;
-            m_noEvo = true;
+        if (_steps <= 0) {
+            _value = _setting.finalValue;
+            _noEvo = true;
         }
         else {
-            value += setting.evolution;
-            --m_steps;
+            _value += _setting.evolution;
+            --_steps;
         }
     }
 private:
-    GameParameterSetting setting;
-    double value;
-    int m_steps;
-    bool m_noEvo;
+    GameParameterSetting _setting;
+    double _value;
+    int _steps;
+    bool _noEvo;
 };
 
 class SoloGameWidget : public GameWidget, GameListener, CycledComponent {
@@ -116,35 +116,35 @@ public:
     IdleComponent *getIdleComponent() { return this; }
     void eventOccured(event_manager::GameControlEvent *event);
 protected:
-    GameParameter m_cyclesDuration;
-    GameParameter m_levelIncrease;
-    GameParameter m_handicapIncrease;
-    GameParameter m_handicapDecreaseOnPhase1;
-    GameParameter m_handicapDecreaseAbovePhase1;
-    FloboSetTheme &attachedFloboThemeSet;
-    RandomSystem attachedRandom;
-    std::unique_ptr<LocalGameFactory> m_gameFactory;
-    std::unique_ptr<GameView>        m_areaA;
-    std::unique_ptr<GamePlayer> m_playerController;
-    GameOptions m_options;
-    int m_cyclesBeforeGameCycle;
-    double m_cyclesBeforeLevelRaise;
-    std::unique_ptr<VuMeter> m_comboMeter;
-    double m_comboHandicap;
-    bool m_comboHandicap75, m_comboHandicap85, m_comboHandicap100;
-    std::string m_playerName;
+    GameParameter _cyclesDuration;
+    GameParameter _levelIncrease;
+    GameParameter _handicapIncrease;
+    GameParameter _handicapDecreaseOnPhase1;
+    GameParameter _handicapDecreaseAbovePhase1;
+    FloboSetTheme &_attachedFloboThemeSet;
+    RandomSystem _attachedRandom;
+    std::unique_ptr<LocalGameFactory> _gameFactory;
+    std::unique_ptr<GameView>        _areaA;
+    std::unique_ptr<GamePlayer> _playerController;
+    GameOptions _options;
+    int _cyclesBeforeGameCycle;
+    double _cyclesBeforeLevelRaise;
+    std::unique_ptr<VuMeter> _comboMeter;
+    double _comboHandicap;
+    bool _comboHandicap75, _comboHandicap85, _comboHandicap100;
+    std::string _playerName;
 };
 
 class SoloGameWidgetFactory : public GameWidgetFactory {
 public:
     SoloGameWidgetFactory(SoloGameSettings &gameSettings)
-        : m_gameSettings(gameSettings) {}
+        : _gameSettings(gameSettings) {}
     GameWidget *createGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, const std::string & centerFace, Action *gameOverAction)
     {
-        return new SoloGameWidget(m_gameSettings, floboSetTheme, levelTheme, gameOverAction);
+        return new SoloGameWidget(_gameSettings, floboSetTheme, levelTheme, gameOverAction);
     }
 private:
-    SoloGameSettings m_gameSettings;
+    SoloGameSettings _gameSettings;
 };
 
 class SoloModeStarterAction : public Action {
@@ -159,19 +159,19 @@ public:
     // Own methods
     void pauseGameIfPossible();
 protected:
-    SoloGameSettings m_gameSettings;
-    std::unique_ptr<SoloGameWidgetFactory>  m_gameWidgetFactory;
-    GameStateMachine m_stateMachine;
-    SharedMatchAssets m_sharedAssets;
-    SharedGetReadyAssets        m_sharedGetReadyAssets;
-    std::unique_ptr<PushScreenState>        m_pushGameScreen;
-    std::unique_ptr<SetupMatchState>        m_setupMatch;
-    std::unique_ptr<EnterPlayerReadyState>  m_enterPlayersReady;
-    std::unique_ptr<ExitPlayerReadyState>   m_exitPlayersReady;
-    std::unique_ptr<MatchPlayingState>      m_matchPlaying;
-    std::unique_ptr<MatchIsOverState>       m_matchIsOver;
-    std::unique_ptr<ManageHiScoresState>    m_hallOfFame;
-    std::unique_ptr<LeaveGameState>         m_leaveGame;
+    SoloGameSettings _gameSettings;
+    std::unique_ptr<SoloGameWidgetFactory>  _gameWidgetFactory;
+    GameStateMachine _stateMachine;
+    SharedMatchAssets _sharedAssets;
+    SharedGetReadyAssets        _sharedGetReadyAssets;
+    std::unique_ptr<PushScreenState>        _pushGameScreen;
+    std::unique_ptr<SetupMatchState>        _setupMatch;
+    std::unique_ptr<EnterPlayerReadyState>  _enterPlayersReady;
+    std::unique_ptr<ExitPlayerReadyState>   _exitPlayersReady;
+    std::unique_ptr<MatchPlayingState>      _matchPlaying;
+    std::unique_ptr<MatchIsOverState>       _matchIsOver;
+    std::unique_ptr<ManageHiScoresState>    _hallOfFame;
+    std::unique_ptr<LeaveGameState>         _leaveGame;
 };
 
 #endif // _SOLOGAMESTARTER_H_

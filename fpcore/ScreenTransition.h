@@ -42,10 +42,10 @@ public:
                            ImageType fromScreenImageType = IMAGE_RGB);
     virtual ~ScreenTransitionWidget() {}
 protected:
-    IosSurface *getFromSurface() const { return m_fromSurface.get(); }
-    void releaseFromSurface() { m_fromSurface.reset(NULL); }
+    IosSurface *getFromSurface() const { return _fromSurface.get(); }
+    void releaseFromSurface() { _fromSurface.reset(NULL); }
 private:
-    std::unique_ptr<IosSurface> m_fromSurface;
+    std::unique_ptr<IosSurface> _fromSurface;
 };
 
 /**
@@ -59,7 +59,7 @@ public:
     void draw(DrawTarget *dt);
     IdleComponent *getIdleComponent() { return this; }
 private:
-    DoomMelt *melt;
+    DoomMelt *_melt;
 };
 
 #endif // _FLOBOSCREENTRANSITION

@@ -49,9 +49,9 @@ public:
     virtual void action(Widget *sender, int actionType,
                         event_manager::GameControlEvent *event);
 protected:
-    int faceTicks;
-    StoryWidget opponent;
-    CheatCodeManager killLeftCheat, killRightCheat;
+    int _faceTicks;
+    StoryWidget _opponent;
+    CheatCodeManager _killLeftCheat, _killRightCheat;
 };
 
 class StoryModeStandardLayoutGameWidget : public StoryModeGameWidget
@@ -59,56 +59,56 @@ class StoryModeStandardLayoutGameWidget : public StoryModeGameWidget
 public:
     StoryModeStandardLayoutGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, int level, int nColors, int lifes, const std::string & aiFace, Action *gameOverAction = NULL);
 private:
-    FloboSetTheme &attachedFloboThemeSet;
-    RandomSystem attachedRandom;
-    LocalGameFactory attachedGameFactory;
-    GameView areaA, areaB;
+    FloboSetTheme &_attachedFloboThemeSet;
+    RandomSystem _attachedRandom;
+    LocalGameFactory _attachedGameFactory;
+    GameView _areaA, _areaB;
 };
 
 class StoryModeLevelsDefinition {
 public:
     struct SelIA {
         SelIA(int level, int nColors);
-        int level;
-        int nColors;
+        int _level;
+        int _nColors;
     };
     struct LevelDefinition {
         LevelDefinition(const std::string & levelName, const std::string & introStory,
                         const std::string & opponentStory, const std::string & opponentName, const std::string & opponent,
                         const std::string & backgroundTheme, const std::string & gameLostStory, const std::string & gameWonStory, const std::string & gameOverStory,
                         SelIA easySettings, SelIA mediumSettings, SelIA hardSettings)
-            : levelName(levelName), introStory(introStory),
-              opponentStory(opponentStory),  opponentName(opponentName), opponent(opponent),
-              backgroundTheme(backgroundTheme), gameLostStory(gameLostStory), gameWonStory(gameWonStory),
-              gameOverStory(gameOverStory),
-              easySettings(easySettings), mediumSettings(mediumSettings), hardSettings(hardSettings) {}
-        std::string levelName;
-        std::string introStory;
-        std::string opponentStory;
-        std::string opponentName;
-        std::string opponent;
-        std::string backgroundTheme;
-        std::string gameLostStory;
-        std::string gameWonStory;
-        std::string gameOverStory;
-        SelIA easySettings;
-        SelIA mediumSettings;
-        SelIA hardSettings;
+            : _levelName(levelName), _introStory(introStory),
+              _opponentStory(opponentStory),  _opponentName(opponentName), _opponent(opponent),
+              _backgroundTheme(backgroundTheme), _gameLostStory(gameLostStory), _gameWonStory(gameWonStory),
+              _gameOverStory(gameOverStory),
+              _easySettings(easySettings), _mediumSettings(mediumSettings), _hardSettings(hardSettings) {}
+        std::string _levelName;
+        std::string _introStory;
+        std::string _opponentStory;
+        std::string _opponentName;
+        std::string _opponent;
+        std::string _backgroundTheme;
+        std::string _gameLostStory;
+        std::string _gameWonStory;
+        std::string _gameOverStory;
+        SelIA _easySettings;
+        SelIA _mediumSettings;
+        SelIA _hardSettings;
         const SelIA & getAISettings(GameDifficulty difficulty) const {
             switch (difficulty) {
             case EASY:
-                return easySettings;
+                return _easySettings;
             case MEDIUM:
-                return mediumSettings;
+                return _mediumSettings;
             case HARD:
             default:
-                return hardSettings;
+                return _hardSettings;
             }
         }
     };
     StoryModeLevelsDefinition(const std::string &levelDefinitionFile);
-    LevelDefinition *getLevelDefinition(int levelNumber) { return levelDefinitions[levelNumber]; }
-    int getNumLevels() const { return levelDefinitions.size(); }
+    LevelDefinition *getLevelDefinition(int levelNumber) { return _levelDefinitions[levelNumber]; }
+    int getNumLevels() const { return _levelDefinitions.size(); }
     virtual ~StoryModeLevelsDefinition();
 private:
     void addLevelDefinition(const std::string & levelName, const std::string & introStory,
@@ -118,22 +118,22 @@ private:
 			    SelIA mediumSettings, SelIA hardSettings);
     static void end_level(GoomSL *gsl, GoomHash *global, GoomHash *local);
     static void get_BoolPreference(GoomSL *gsl, GoomHash *global, GoomHash *local);
-    static StoryModeLevelsDefinition *currentDefinition;
-    AdvancedBuffer<LevelDefinition *> levelDefinitions;
+    static StoryModeLevelsDefinition *_currentDefinition;
+    AdvancedBuffer<LevelDefinition *> _levelDefinitions;
 };
 
 class SharedGameAssets : public StoryNameProvider
 {
 public:
-    std::string    playerName;
-    GameDifficulty difficulty;
-    GameOptions    gameOptions;
-    int            lifes;
-    StoryModeLevelsDefinition::LevelDefinition *levelDef;
+    std::string    _playerName;
+    GameDifficulty _difficulty;
+    GameOptions    _gameOptions;
+    int            _lifes;
+    StoryModeLevelsDefinition::LevelDefinition *_levelDef;
 public:
     virtual std::string getStoryName() const
     {
-        return levelDef->gameOverStory;
+        return _levelDef->_gameOverStory;
     }
 };
 
@@ -156,14 +156,14 @@ public:
                         event_manager::GameControlEvent *event);
     // Own methods
     void setNextState(GameState *nextState) {
-        m_nextState = nextState;
+        _nextState = nextState;
     }
 private:
-    SharedGameAssets *m_sharedGameAssets;
-    SharedMatchAssets *m_sharedMatchAssets;
-    std::unique_ptr<StoryWidget> m_gameLostWidget;
-    bool m_aknowledged;
-    GameState *m_nextState;
+    SharedGameAssets *_sharedGameAssets;
+    SharedMatchAssets *_sharedMatchAssets;
+    std::unique_ptr<StoryWidget> _gameLostWidget;
+    bool _aknowledged;
+    GameState *_nextState;
 };
 
 /**
@@ -194,47 +194,47 @@ public:
                         event_manager::GameControlEvent *event);
     // Own methods
     void setAbortedState(GameState *abortedState) {
-        m_abortedState = abortedState;
+        _abortedState = abortedState;
     }
     void setVictoriousState(GameState *victoriousState) {
-        m_victoriousState = victoriousState;
+        _victoriousState = victoriousState;
     }
     void setHumiliatedState(GameState *humiliatedState) {
-        m_humiliatedState = humiliatedState;
+        _humiliatedState = humiliatedState;
     }
     void setGameLostState(GameState *gameLostState) {
-        m_gameLostState = gameLostState;
+        _gameLostState = gameLostState;
     }
     void setGameWidgetFactory(GameWidgetFactory *factory) {
-        m_gameWidgetFactory = factory;
+        _gameWidgetFactory = factory;
     }
     SharedMatchAssets *getMatchAssets() {
-        return &m_sharedAssets;
+        return &_sharedAssets;
     }
 private:
     enum {
         LEAVE_MATCH,
         ABORT_GAME
     };
-    GameStateMachine m_stateMachine;
-    SharedGameAssets *m_sharedGameAssets;
-    SharedMatchAssets m_sharedAssets;
-    SharedGetReadyAssets m_sharedGetReadyAssets;
-    GameWidgetFactory *m_gameWidgetFactory;
-    GameState *m_nextState;
-    GameState *m_abortedState, *m_victoriousState;
-    GameState *m_gameLostState, *m_humiliatedState;
+    GameStateMachine _stateMachine;
+    SharedGameAssets *_sharedGameAssets;
+    SharedMatchAssets _sharedAssets;
+    SharedGetReadyAssets _sharedGetReadyAssets;
+    GameWidgetFactory *_gameWidgetFactory;
+    GameState *_nextState;
+    GameState *_abortedState, *_victoriousState;
+    GameState *_gameLostState, *_humiliatedState;
 
-    std::unique_ptr<DisplayStoryScreenState> m_introStoryScreen;
-    std::unique_ptr<DisplayStoryScreenState> m_opponentStoryScreen;
-    std::unique_ptr<SetupMatchState>       m_setupMatch;
-    std::unique_ptr<EnterPlayerReadyState> m_enterPlayersReady;
-    std::unique_ptr<ExitPlayerReadyState>  m_exitPlayersReady;
-    std::unique_ptr<MatchPlayingState>     m_matchPlaying;
-    std::unique_ptr<StoryModeMatchIsOverState> m_matchIsOver;
-    std::unique_ptr<DisplayStatsState>     m_displayStats;
-    std::unique_ptr<CallActionState>       m_abortGame;
-    std::unique_ptr<CallActionState>       m_leaveMatch;
+    std::unique_ptr<DisplayStoryScreenState> _introStoryScreen;
+    std::unique_ptr<DisplayStoryScreenState> _opponentStoryScreen;
+    std::unique_ptr<SetupMatchState>       _setupMatch;
+    std::unique_ptr<EnterPlayerReadyState> _enterPlayersReady;
+    std::unique_ptr<ExitPlayerReadyState>  _exitPlayersReady;
+    std::unique_ptr<MatchPlayingState>     _matchPlaying;
+    std::unique_ptr<StoryModeMatchIsOverState> _matchIsOver;
+    std::unique_ptr<DisplayStatsState>     _displayStats;
+    std::unique_ptr<CallActionState>       _abortGame;
+    std::unique_ptr<CallActionState>       _leaveMatch;
 };
 
 /**
@@ -250,18 +250,18 @@ public:
     virtual GameState *getNextState();
     // Own methods
     void setNextMatchState(GameState *nextMatchState) {
-        m_nextMatchState = nextMatchState;
+        _nextMatchState = nextMatchState;
     }
     void setGameWonState(GameState *gameWonState) {
-        m_gameWonState = gameWonState;
+        _gameWonState = gameWonState;
     }
     void reset();
 private:
-    static std::unique_ptr<StoryModeLevelsDefinition> m_levelDefProvider;
-    SharedGameAssets *m_sharedGameAssets;
-    int m_currentLevel;
-    GameState *m_nextMatchState, *m_gameWonState;
-    GameState *m_nextState;
+    static std::unique_ptr<StoryModeLevelsDefinition> _levelDefProvider;
+    SharedGameAssets *_sharedGameAssets;
+    int _currentLevel;
+    GameState *_nextMatchState, *_gameWonState;
+    GameState *_nextState;
 };
 
 
@@ -279,17 +279,17 @@ public:
     // Own methods
     void pauseGameIfPossible();
 protected:
-    PlayerNameProvider *m_nameProvider;
-    GameStateMachine m_stateMachine;
-    SharedGameAssets     m_sharedGameAssets;
+    PlayerNameProvider *_nameProvider;
+    GameStateMachine _stateMachine;
+    SharedGameAssets     _sharedGameAssets;
 
-    std::unique_ptr<PushScreenState> m_pushGameScreen;
-    std::unique_ptr<StoryModePrepareNextMatchState> m_prepareNextMatch;
-    std::unique_ptr<StoryModeMatchState>  m_playMatch;
-    std::unique_ptr<DisplayStoryScreenState> m_gameWon;
-    std::unique_ptr<ManageHiScoresState>     m_gameLostHoF;
-    std::unique_ptr<ManageHiScoresState>     m_gameWonHoF;
-    std::unique_ptr<LeaveGameState>          m_leaveGame;
+    std::unique_ptr<PushScreenState> _pushGameScreen;
+    std::unique_ptr<StoryModePrepareNextMatchState> _prepareNextMatch;
+    std::unique_ptr<StoryModeMatchState>  _playMatch;
+    std::unique_ptr<DisplayStoryScreenState> _gameWon;
+    std::unique_ptr<ManageHiScoresState>     _gameLostHoF;
+    std::unique_ptr<ManageHiScoresState>     _gameWonHoF;
+    std::unique_ptr<LeaveGameState>          _leaveGame;
 };
 
 #endif // _STORYMODESTARTER_H_

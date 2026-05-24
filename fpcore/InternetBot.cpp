@@ -5,11 +5,11 @@
 
 class PIBNGCListener : public NetGameCenterListener {
 private:
-    InternetGameCenter &m_gc;
-    int m_level;
-    MessageBox *m_opponent;
+    InternetGameCenter &_gc;
+    int _level;
+    MessageBox *_opponent;
 public:
-    PIBNGCListener(InternetGameCenter &gc, int level) : m_gc(gc), m_level(level), m_opponent(NULL) {
+    PIBNGCListener(InternetGameCenter &gc, int level) : _gc(gc), _level(level), _opponent(NULL) {
     }
 
     virtual void onChatMessage(const std::string &msgAuthor, const std::string &msg) {
@@ -30,8 +30,8 @@ public:
 
     virtual void onGameInvitationReceived(FloboGameInvitation &invitation) {
         std::cout << "onGameInvitationReceived" << std::endl;
-        if (m_opponent == NULL)
-            m_gc.acceptGameInvitation(invitation);
+        if (_opponent == NULL)
+            _gc.acceptGameInvitation(invitation);
     }
 
     virtual void onGameInvitationCanceledReceived(FloboGameInvitation &invitation) {
@@ -39,37 +39,37 @@ public:
     }
 
     /*
-    std::unique_ptr<RandomSystem> m_myRandom;
-    std::unique_ptr<LocalGameFactory> m_myGameFactory;
-    std::unique_ptr<InternetGameView> m_myView;
-    std::unique_ptr<AIPlayer> m_myAI;
+    std::unique_ptr<RandomSystem> _myRandom;
+    std::unique_ptr<LocalGameFactory> _myGameFactory;
+    std::unique_ptr<InternetGameView> _myView;
+    std::unique_ptr<AIPlayer> _myAI;
 
-    std::unique_ptr<RandomSystem> m_opRandom;
-    std::unique_ptr<NetworkGameFactory> m_opGameFactory;
-    std::unique_ptr<GameView> m_opView;
+    std::unique_ptr<RandomSystem> _opRandom;
+    std::unique_ptr<NetworkGameFactory> _opGameFactory;
+    std::unique_ptr<GameView> _opView;
     */
-    std::unique_ptr<NetworkGameWidget> m_Negawi; // the NEtwork GAme WIdget
+    std::unique_ptr<NetworkGameWidget> _Negawi; // the NEtwork GAme WIdget
 
     virtual void onGameGrantedWithMessagebox(MessageBox *mbox, FloboGameInvitation &invitation) {
         std::cout << "onGameGrantedWithMessagebox" << std::endl;
         int gameId = 0;
-        FPServerIGPMessageBox *igpbox = m_gc.getIgpBox();
+        FPServerIGPMessageBox *igpbox = _gc.getIgpBox();
         /*
         // My view
-        m_opponent = mbox;
-        m_myRandom = std::unique_ptr<RandomSystem>(new RandomSystem(5, invitation.gameRandomSeed));
-        m_myGameFactory = std::unique_ptr<LocalGameFactory>(new LocalGameFactory(m_myRandom.get()));
-        m_myView = std::unique_ptr<InternetGameView>(new InternetGameView(m_myGameFactory.get(), mbox, gameId, igpbox));
-        m_myAI = std::unique_ptr<AIPlayer>(new AIPlayer(m_level, *m_myView));
+        _opponent = mbox;
+        _myRandom = std::unique_ptr<RandomSystem>(new RandomSystem(5, invitation._gameRandomSeed));
+        _myGameFactory = std::unique_ptr<LocalGameFactory>(new LocalGameFactory(_myRandom.get()));
+        _myView = std::unique_ptr<InternetGameView>(new InternetGameView(_myGameFactory.get(), mbox, gameId, igpbox));
+        _myAI = std::unique_ptr<AIPlayer>(new AIPlayer(_level, *_myView));
         // Remote view
         // TODO
-        m_opRandom = std::unique_ptr<RandomSystem>(new RandomSystem(5, invitation.gameRandomSeed));
-        m_opGameFactory = std::unique_ptr<NetworkGameFactory>(new NetworkGameFactory(m_opRandom.get(), *mbox, gameId));
-        m_opView = std::unique_ptr<GameView>(new GameView(m_opGameFactory.get()));
+        _opRandom = std::unique_ptr<RandomSystem>(new RandomSystem(5, invitation._gameRandomSeed));
+        _opGameFactory = std::unique_ptr<NetworkGameFactory>(new NetworkGameFactory(_opRandom.get(), *mbox, gameId));
+        _opView = std::unique_ptr<GameView>(new GameView(_opGameFactory.get()));
         */
-        m_Negawi = std::unique_ptr<NetworkGameWidget>(new NetworkGameWidget());
-        m_Negawi->initWithoutGUI(*mbox, gameId, invitation.gameRandomSeed, NULL, igpbox);
-        m_Negawi->connectIA(m_level);
+        _Negawi = std::unique_ptr<NetworkGameWidget>(new NetworkGameWidget());
+        _Negawi->initWithoutGUI(*mbox, gameId, invitation._gameRandomSeed, NULL, igpbox);
+        _Negawi->connectIA(_level);
     }
 
     virtual void idle(double currentTime) {
@@ -81,20 +81,20 @@ public:
 };
 
 InternetBot::InternetBot(int level)
-    : m_level(level)
+    : _level(level)
 {}
 
 void InternetBot::connect(const std::string & server, int port, const std::string & name, const std::string & password)
 {
-    gameCenter = std::unique_ptr<InternetGameCenter>(new InternetGameCenter(server, port, name, password));
-    gameCenterListener = std::unique_ptr<PIBNGCListener>(new PIBNGCListener(*gameCenter, m_level));
-    gameCenter->addListener(gameCenterListener.get());
+    _gameCenter = std::unique_ptr<InternetGameCenter>(new InternetGameCenter(server, port, name, password));
+    _gameCenterListener = std::unique_ptr<PIBNGCListener>(new PIBNGCListener(*_gameCenter, _level));
+    _gameCenter->addListener(_gameCenterListener.get());
     std::cout << "Trying to connect..." << std::endl;
-    while (!gameCenter->isConnected()) {
-        gameCenter->idle();
-        if (gameCenter->isDenied()) {
-            std::cout << "Denied: " << gameCenter->getDenyString() << std::endl;
-            gameCenter = std::unique_ptr<InternetGameCenter>();
+    while (!_gameCenter->isConnected()) {
+        _gameCenter->idle();
+        if (_gameCenter->isDenied()) {
+            std::cout << "Denied: " << _gameCenter->getDenyString() << std::endl;
+            _gameCenter = std::unique_ptr<InternetGameCenter>();
             return;
         }
     }
@@ -103,8 +103,8 @@ void InternetBot::connect(const std::string & server, int port, const std::strin
 
 void InternetBot::idle(double currentTime)
 {
-  if (gameCenter.get() == NULL) return;
-  gameCenter->idle();
-  gameCenterListener->idle(currentTime);
+  if (_gameCenter.get() == NULL) return;
+  _gameCenter->idle();
+  _gameCenterListener->idle(currentTime);
 }
 

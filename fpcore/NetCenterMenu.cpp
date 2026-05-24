@@ -34,47 +34,47 @@ using namespace event_manager;
 class NetworkTwoPlayerGameWidgetFactory : public GameWidgetFactory {
 public:
     NetworkTwoPlayerGameWidgetFactory(ios_fc::MessageBox &mbox, unsigned int randomSeed, FPServerIGPMessageBox *igpbox/* = NULL */)
-      : mbox(mbox), randomSeed(randomSeed), igpbox(igpbox), gameId(0) {}
+      : _mbox(mbox), _randomSeed(randomSeed), _igpbox(igpbox), _gameId(0) {}
     GameWidget *createGameWidget(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, const std::string & centerFace, Action *gameOverAction)
     {
         NetworkGameWidget *negawi = new NetworkGameWidget();
-        negawi->initWithGUI(floboSetTheme, levelTheme, mbox, gameId++, randomSeed++, gameOverAction, igpbox);
+        negawi->initWithGUI(floboSetTheme, levelTheme, _mbox, _gameId++, _randomSeed++, gameOverAction, _igpbox);
         return negawi;
     }
 private:
-    ios_fc::MessageBox &mbox;
-    unsigned int randomSeed;
-    FPServerIGPMessageBox *igpbox;
-    int gameId;
+    ios_fc::MessageBox &_mbox;
+    unsigned int _randomSeed;
+    FPServerIGPMessageBox *_igpbox;
+    int _gameId;
 };
 
 void NetCenterDialogMenu::NetCenterDialogMenuAction::action()
 {
-    if (! isCancelAction)
-        targetMenu->grantCurrentGame();
-    else targetMenu->cancelCurrentGame();
+    if (! _isCancelAction)
+        _targetMenu->grantCurrentGame();
+    else _targetMenu->cancelCurrentGame();
 }
 
 NetCenterDialogMenu::NetCenterDialogMenu(NetCenterMenu *targetMenu, FloboGameInvitation &associatedInvitation,
                        const std::string &title, const std::string &message, const std::string &optLine,
                        bool hasAcceptButton, bool hasCancelButton)
-    : associatedInvitation(associatedInvitation),
-      menu(theCommander->getWindowFramePicture()),
-      cancelAction(targetMenu, true), acceptAction(targetMenu, false),
-      hasAcceptButton(hasAcceptButton), hasCancelButton(hasCancelButton),
-      titleFrame(theCommander->getSeparatorFramePicture()),
-      dialogTitle(title), dialogMsg(message), optMsg(NULL),
-      acceptButton(theCommander->getLocalizedString("Accept"), &acceptAction,
+    : _associatedInvitation(associatedInvitation),
+      _menu(theCommander->getWindowFramePicture()),
+      _cancelAction(targetMenu, true), _acceptAction(targetMenu, false),
+      _hasAcceptButton(hasAcceptButton), _hasCancelButton(hasCancelButton),
+      _titleFrame(theCommander->getSeparatorFramePicture()),
+      _dialogTitle(title), _dialogMsg(message), _optMsg(NULL),
+      _acceptButton(theCommander->getLocalizedString("Accept"), &_acceptAction,
 		   theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
-      cancelButton(theCommander->getLocalizedString("Cancel"), &cancelAction,
+      _cancelButton(theCommander->getLocalizedString("Cancel"), &_cancelAction,
 		   theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture())
 {
-    if (optLine != "") optMsg = new Text(optLine);
+    if (optLine != "") _optMsg = new Text(optLine);
 }
 
 NetCenterDialogMenu::~NetCenterDialogMenu()
 {
-    if (optMsg != NULL) delete optMsg;
+    if (_optMsg != NULL) delete _optMsg;
 }
 
 void NetCenterDialogMenu::build()
@@ -84,23 +84,23 @@ void NetCenterDialogMenu::build()
     dialogPos.y = 195;
     setPosition(dialogPos);
     setSize(Vec3(350., 200.));
-    menu.setPolicy(USE_MIN_SIZE);
-    titleFrame.setPreferedSize(Vec3(0, 20));
-    titleFrame.add(&dialogTitle);
-    menu.add(&titleFrame);
-    menu.add(&sep1);
-    menu.add(&dialogMsg);
-    if (optMsg != NULL) {
-        menu.add(&sep2);
-        menu.add(optMsg);
+    _menu.setPolicy(USE_MIN_SIZE);
+    _titleFrame.setPreferedSize(Vec3(0, 20));
+    _titleFrame.add(&_dialogTitle);
+    _menu.add(&_titleFrame);
+    _menu.add(&_sep1);
+    _menu.add(&_dialogMsg);
+    if (_optMsg != NULL) {
+        _menu.add(&_sep2);
+        _menu.add(_optMsg);
     }
-    if (hasAcceptButton)
-        buttons.add(&acceptButton);
-    if (hasCancelButton)
-        buttons.add(&cancelButton);
-    menu.add(&buttons);
+    if (_hasAcceptButton)
+        _buttons.add(&_acceptButton);
+    if (_hasCancelButton)
+        _buttons.add(&_cancelButton);
+    _menu.add(&_buttons);
     getParentScreen()->grabEventsOnWidget(this);
-    transitionToContent(&menu);
+    transitionToContent(&_menu);
 }
 
 void NetCenterDialogMenu::eventOccured(GameControlEvent *event)
@@ -110,7 +110,7 @@ void NetCenterDialogMenu::eventOccured(GameControlEvent *event)
     switch (event->cursorEvent) {
         case kBack:
             event->caught = true;
-            cancelAction.action();
+            _cancelAction.action();
             break;
         default:
             break;
@@ -143,7 +143,7 @@ std::string NetCenterPlayerList::PlayerEntry::getStatusString(int status)
 
 NetCenterPlayerList::NetCenterPlayerList(int size, NetCenterMenu *targetMenu, IosSurface *upArrow, IosSurface *downArrow, GameLoop *loop)
     : ListView(size, upArrow, downArrow, theCommander->getListFramePicture(), loop),
-      targetMenu(targetMenu)
+      _targetMenu(targetMenu)
 {}
 
 NetCenterPlayerList::~NetCenterPlayerList()
@@ -152,21 +152,21 @@ NetCenterPlayerList::~NetCenterPlayerList()
 
 void NetCenterPlayerList::addNewPlayer(const std::string & playerName, PeerAddress playerAddress, const PeerInfo &info)
 {
-    Action *playerSelectedAction = new PlayerSelectedAction(targetMenu, playerAddress, playerName);
+    Action *playerSelectedAction = new PlayerSelectedAction(_targetMenu, playerAddress, playerName);
     PlayerEntry *newEntry = new PlayerEntry(playerName, playerAddress, info, playerSelectedAction);
-    if (info.self)
+    if (info._self)
         newEntry->setEnabled(false);
-    entries.add(newEntry);
+    _entries.add(newEntry);
     addEntry(newEntry);
 }
 
 void NetCenterPlayerList::removePlayer(PeerAddress playerAddress)
 {
-    for (int i = 0 ; i < entries.size() ; i++) {
-        if (entries[i]->playerAddress == playerAddress) {
-            PlayerEntry *currentEntry = entries[i];
+    for (int i = 0 ; i < _entries.size() ; i++) {
+        if (_entries[i]->_playerAddress == playerAddress) {
+            PlayerEntry *currentEntry = _entries[i];
             removeEntry(currentEntry);
-            entries.removeAt(i);
+            _entries.removeAt(i);
             delete currentEntry;
             return;
         }
@@ -175,9 +175,9 @@ void NetCenterPlayerList::removePlayer(PeerAddress playerAddress)
 
 void NetCenterPlayerList::updatePlayer(const std::string & playerName, PeerAddress playerAddress, const PeerInfo &info)
 {
-    for (int i = 0 ; i < entries.size() ; i++) {
-        if (entries[i]->playerAddress == playerAddress) {
-            PlayerEntry *currentEntry = entries[i];
+    for (int i = 0 ; i < _entries.size() ; i++) {
+        if (_entries[i]->_playerAddress == playerAddress) {
+            PlayerEntry *currentEntry = _entries[i];
             currentEntry->updateEntry(playerName, info);
             return;
         }
@@ -186,57 +186,57 @@ void NetCenterPlayerList::updatePlayer(const std::string & playerName, PeerAddre
 
 void NetCenterPlayerList::PlayerSelectedAction::action()
 {
-    targetMenu->playerSelected(address, playerName);
+    _targetMenu->playerSelected(_address, _playerName);
 }
 
 class SayAction : public Action {
 public:
-    SayAction(NetGameCenter *netCenter, Text *message) : netCenter(netCenter), message(message) {}
+    SayAction(NetGameCenter *netCenter, Text *message) : _netCenter(netCenter), _message(message) {}
     void action() {
-      netCenter->sendMessage(message->getValue());
+      _netCenter->sendMessage(_message->getValue());
     }
 private:
-    NetGameCenter *netCenter;
-    Text *message;
+    NetGameCenter *_netCenter;
+    Text *_message;
 };
 
 std::string NetCenterTwoNameProvider::getPlayerName(int playerNumber) const
 {
     switch (playerNumber) {
     case 0:
-        return netCenter.getSelfName();
+        return _netCenter.getSelfName();
     case 1:
     default:
-	return netCenter.getOpponentName();
+	return _netCenter.getOpponentName();
     }
 }
 
 NetCenterMenu::NetCenterMenu(MainScreen *mainScreen, NetGameCenter *netCenter,
                              const std::string &title, GameLoop *loop)
     : MainScreenMenu(mainScreen, loop),
-      topFrame(theCommander->getWindowFramePicture()),
-      titleFrame(theCommander->getSeparatorFramePicture()),
-      title(title),
-      playerListText(theCommander->getLocalizedString("Player List")),
-      chatAreaText(theCommander->getLocalizedString("Chat Area")),
-      cancelButton(theCommander->getLocalizedString("Disconnect"), &backAction,
+      _topFrame(theCommander->getWindowFramePicture()),
+      _titleFrame(theCommander->getSeparatorFramePicture()),
+      _title(title),
+      _playerListText(theCommander->getLocalizedString("Player List")),
+      _chatAreaText(theCommander->getLocalizedString("Chat Area")),
+      _cancelButton(theCommander->getLocalizedString("Disconnect"), &_backAction,
 		   theCommander->getButtonFramePicture(), theCommander->getButtonOverFramePicture()),
-      backAction(mainScreen),
-      playerList(5, this, theCommander->getUpArrow(), theCommander->getDownArrow()), cycled(this),
-      netCenter(netCenter), onScreenDialog(NULL),
-      shouldSelfDestroy(false), nameProvider(*netCenter),
-      chatBox(*this),
-      topSeparator(0, 5), middleSeparator(0, 5), bottomSeparator(0, 5),
-      m_speedSelector(1, theCommander->getRadioOnPicture(), theCommander->getRadioOffPicture(), "Config.TwoPlayerGameDifficulty", theCommander->getPreferencesManager())
+      _backAction(mainScreen),
+      _playerList(5, this, theCommander->getUpArrow(), theCommander->getDownArrow()), _cycled(this),
+      _netCenter(netCenter), _onScreenDialog(NULL),
+      _shouldSelfDestroy(false), _nameProvider(*netCenter),
+      _chatBox(*this),
+      _topSeparator(0, 5), _middleSeparator(0, 5), _bottomSeparator(0, 5),
+      _speedSelector(1, theCommander->getRadioOnPicture(), theCommander->getRadioOffPicture(), "Config.TwoPlayerGameDifficulty", theCommander->getPreferencesManager())
 {
-    GameUIDefaults::GAME_LOOP->addIdle(&cycled);
+    GameUIDefaults::GAME_LOOP->addIdle(&_cycled);
     this->setBorderVisible(false);
-    netCenter->addListener(this);
+    _netCenter->addListener(this);
     // Adding all the already connected peers to the list
-    for (int i = 0 ; i < netCenter->getPeerCount() ; i++) {
-        PeerAddress curPeerAddress = netCenter->getPeerAddressAtIndex(i);
-        PeerInfo curPeerInfo = netCenter->getPeerInfoForAddress(curPeerAddress);
-        playerList.addNewPlayer(netCenter->getPeerNameAtIndex(i), curPeerAddress, curPeerInfo);
+    for (int i = 0 ; i < _netCenter->getPeerCount() ; i++) {
+        PeerAddress curPeerAddress = _netCenter->getPeerAddressAtIndex(i);
+        PeerInfo curPeerInfo = _netCenter->getPeerInfoForAddress(curPeerAddress);
+        _playerList.addNewPlayer(_netCenter->getPeerNameAtIndex(i), curPeerAddress, curPeerInfo);
     }
 }
 
@@ -246,54 +246,54 @@ NetCenterMenu::~NetCenterMenu()
     printf("Deleting the net center\n");
 #endif
     // Delete the network center because no one else would do it
-    delete netCenter;
+    delete _netCenter;
 }
 
 void NetCenterMenu::cycle()
 {
-    netCenter->idle();
+    _netCenter->idle();
 }
 
 void NetCenterMenu::build()
 {
-    add(&container);
+    add(&_container);
 
-    menu.setPolicy(USE_MAX_SIZE);
-    mainBox.setPolicy(USE_MAX_SIZE);
-    topbox.setPolicy(USE_MAX_SIZE);
-    playerbox.setPolicy(USE_MAX_SIZE);
+    _menu.setPolicy(USE_MAX_SIZE);
+    _mainBox.setPolicy(USE_MAX_SIZE);
+    _topbox.setPolicy(USE_MAX_SIZE);
+    _playerbox.setPolicy(USE_MAX_SIZE);
 
-    container.add(&mainBox);
+    _container.add(&_mainBox);
 
-    m_speedSelector.addButton(theCommander->getLocalizedString("Beginner"));
-    m_speedSelector.addButton(theCommander->getLocalizedString("Normal"));
-    m_speedSelector.addButton(theCommander->getLocalizedString("Expert"));
-    menu.add(&m_speedSelector);
-    menu.add(&cancelButton);
+    _speedSelector.addButton(theCommander->getLocalizedString("Beginner"));
+    _speedSelector.addButton(theCommander->getLocalizedString("Normal"));
+    _speedSelector.addButton(theCommander->getLocalizedString("Expert"));
+    _menu.add(&_speedSelector);
+    _menu.add(&_cancelButton);
 
-    playerbox.add(&playerListText);
-    playerbox.add(&playerList);
+    _playerbox.add(&_playerListText);
+    _playerbox.add(&_playerList);
 
-    topbox.setInnerMargin(10.);
-    topbox.add(&playerbox);
-    topbox.add(&menu);
+    _topbox.setInnerMargin(10.);
+    _topbox.add(&_playerbox);
+    _topbox.add(&_menu);
 
-    titleFrame.setPreferedSize(Vec3(0, 20));
-    titleFrame.add(&title);
+    _titleFrame.setPreferedSize(Vec3(0, 20));
+    _titleFrame.add(&_title);
 
-    topFrame.setPreferedSize(Vec3(0, 240));
-    topFrame.add(&titleFrame);
-    topFrame.add(&topbox);
+    _topFrame.setPreferedSize(Vec3(0, 240));
+    _topFrame.add(&_titleFrame);
+    _topFrame.add(&_topbox);
 
-    mainBox.add(&topSeparator);
-    mainBox.add(&topFrame);
-    mainBox.add(&middleSeparator);
-    mainBox.add(&chatBox);
+    _mainBox.add(&_topSeparator);
+    _mainBox.add(&_topFrame);
+    _mainBox.add(&_middleSeparator);
+    _mainBox.add(&_chatBox);
 }
 
 void NetCenterMenu::sendChat(const std::string &chatText)
 {
-    netCenter->sendMessage(chatText);
+    _netCenter->sendMessage(chatText);
 }
 
 void NetCenterMenu::onChatMessage(const std::string &msgAuthor, const std::string &msg)
@@ -301,36 +301,36 @@ void NetCenterMenu::onChatMessage(const std::string &msgAuthor, const std::strin
 #ifdef DEBUG
     printf("%s:%s\n", (const char *)msgAuthor, (const char *)msg);
 #endif
-    chatBox.addChat(msgAuthor, msg);
+    _chatBox.addChat(msgAuthor, msg);
 }
 
 void NetCenterMenu::onPlayerConnect(const std::string &playerName, PeerAddress playerAddress)
 {
-    PeerInfo info = netCenter->getPeerInfoForAddress(playerAddress);
-    playerList.addNewPlayer(playerName, playerAddress, info);
+    PeerInfo info = _netCenter->getPeerInfoForAddress(playerAddress);
+    _playerList.addNewPlayer(playerName, playerAddress, info);
 }
 
 void NetCenterMenu::onPlayerDisconnect(const std::string &playerName, PeerAddress playerAddress)
 {
-    playerList.removePlayer(playerAddress);
+    _playerList.removePlayer(playerAddress);
 }
 
 void NetCenterMenu::onPlayerUpdated(const std::string &playerName, PeerAddress playerAddress)
 {
-    PeerInfo info = netCenter->getPeerInfoForAddress(playerAddress);
-    playerList.updatePlayer(playerName, playerAddress, info);
+    PeerInfo info = _netCenter->getPeerInfoForAddress(playerAddress);
+    _playerList.updatePlayer(playerName, playerAddress, info);
 }
 
 void NetCenterMenu::onGameInvitationReceived(FloboGameInvitation &invitation)
 {
     // If already waiting for a game, cancel the invitation
-    if (this->onScreenDialog != NULL) {
-        netCenter->cancelGameInvitation(invitation);
+    if (this->_onScreenDialog != NULL) {
+        _netCenter->cancelGameInvitation(invitation);
     }
     else {
         std::string levelSpeed = theCommander->getLocalizedString("Game speed:");
         levelSpeed += " ";
-        switch (invitation.gameSpeed) {
+        switch (invitation._gameSpeed) {
             default:
             case 0:
                 levelSpeed += theCommander->getLocalizedString("Beginner");
@@ -342,13 +342,13 @@ void NetCenterMenu::onGameInvitationReceived(FloboGameInvitation &invitation)
                 levelSpeed += theCommander->getLocalizedString("Expert");
                 break;
         }
-        onScreenDialog = new NetCenterDialogMenu(this, invitation, theCommander->getLocalizedString("Invitation for a game").c_str(),
-                                                 invitation.opponentName + theCommander->getLocalizedString(" invited you to play").c_str(),
+        _onScreenDialog = new NetCenterDialogMenu(this, invitation, theCommander->getLocalizedString("Invitation for a game").c_str(),
+                                                 invitation._opponentName + theCommander->getLocalizedString(" invited you to play").c_str(),
                                                  levelSpeed.c_str(),
                                                  true);
-        container.add(onScreenDialog);
-        onScreenDialog->build();
-        this->focus(onScreenDialog);
+        _container.add(_onScreenDialog);
+        _onScreenDialog->build();
+        this->focus(_onScreenDialog);
     }
 }
 
@@ -373,7 +373,7 @@ void NetCenterMenu::onWidgetVisibleChanged(bool visible)
     printf("netcentermenu visible: %s\n", visible ? "true" : "false");
 #endif
     if (visible)
-        netCenter->setStatus(PEER_NORMAL);
+        _netCenter->setStatus(PEER_NORMAL);
 }
 
 void NetCenterMenu::onWidgetRemoved(WidgetContainer *parent)
@@ -386,67 +386,67 @@ void NetCenterMenu::onWidgetRemoved(WidgetContainer *parent)
 
 void NetCenterMenu::grantCurrentGame()
 {
-    if (this->onScreenDialog != NULL) {
-        netCenter->acceptGameInvitation(onScreenDialog->associatedInvitation);
+    if (this->_onScreenDialog != NULL) {
+        _netCenter->acceptGameInvitation(_onScreenDialog->_associatedInvitation);
     }
 }
 
 void NetCenterMenu::cancelCurrentGame()
 {
-    if (this->onScreenDialog != NULL) {
-        netCenter->cancelGameInvitation(onScreenDialog->associatedInvitation);
+    if (this->_onScreenDialog != NULL) {
+        _netCenter->cancelGameInvitation(_onScreenDialog->_associatedInvitation);
     }
 }
 
 void NetCenterMenu::onGameAcceptedNegociationPending(FloboGameInvitation &invitation)
 {
-    container.remove(onScreenDialog);
-    delete onScreenDialog;
-    onScreenDialog = new NetCenterDialogMenu(this, invitation, theCommander->getLocalizedString("Negociating game"),
+    _container.remove(_onScreenDialog);
+    delete _onScreenDialog;
+    _onScreenDialog = new NetCenterDialogMenu(this, invitation, theCommander->getLocalizedString("Negociating game"),
                                              theCommander->getLocalizedString("A game is being prepared with"),
-                                             invitation.opponentName.c_str(), false, false);
-    container.add(onScreenDialog);
-    onScreenDialog->build();
-    this->focus(onScreenDialog);
+                                             invitation._opponentName.c_str(), false, false);
+    _container.add(_onScreenDialog);
+    _onScreenDialog->build();
+    this->focus(_onScreenDialog);
 }
 
 void NetCenterMenu::onGameInvitationCanceledReceived(FloboGameInvitation &invitation)
 {
-    if (this->onScreenDialog != NULL) {
-        if (invitation.opponentAddress == onScreenDialog->associatedInvitation.opponentAddress) {
-            container.remove(onScreenDialog);
-            delete onScreenDialog;
-            onScreenDialog = NULL;
+    if (this->_onScreenDialog != NULL) {
+        if (invitation._opponentAddress == _onScreenDialog->_associatedInvitation._opponentAddress) {
+            _container.remove(_onScreenDialog);
+            delete _onScreenDialog;
+            _onScreenDialog = NULL;
         }
     }
 }
 
 void NetCenterMenu::onGameGrantedWithMessagebox(MessageBox *mbox, FloboGameInvitation &invitation)
 {
-    NetworkTwoPlayerGameWidgetFactory *factory = new NetworkTwoPlayerGameWidgetFactory(*mbox, invitation.gameRandomSeed, netCenter->getIgpBox());
-    NetworkGameStateMachine *starter = new NetworkGameStateMachine(factory, mbox, (GameDifficulty)(invitation.gameSpeed), &nameProvider);
+    NetworkTwoPlayerGameWidgetFactory *factory = new NetworkTwoPlayerGameWidgetFactory(*mbox, invitation._gameRandomSeed, _netCenter->getIgpBox());
+    NetworkGameStateMachine *starter = new NetworkGameStateMachine(factory, mbox, (GameDifficulty)(invitation._gameSpeed), &_nameProvider);
     starter->evaluate();
 
-    if (this->onScreenDialog != NULL) {
-        container.remove(onScreenDialog);
-        delete(onScreenDialog);
-        onScreenDialog = NULL;
+    if (this->_onScreenDialog != NULL) {
+        _container.remove(_onScreenDialog);
+        delete(_onScreenDialog);
+        _onScreenDialog = NULL;
     }
 }
 
 void NetCenterMenu::playerSelected(PeerAddress playerAddress, const std::string &playerName)
 {
     FloboGameInvitation invitation;
-    invitation.gameRandomSeed = (unsigned long)(fmod(getTimeMs(), (double)0xFFFFFFFF));
-    invitation.opponentAddress = playerAddress;
-    invitation.gameSpeed = m_speedSelector.getState() - 1;
-    invitation.gameNbSets = 0; // TODO: allow multisets games
-    onScreenDialog = new NetCenterDialogMenu(this, invitation, theCommander->getLocalizedString("Asking for a game"), (theCommander->getLocalizedString("Waiting ") + playerName.c_str() + theCommander->getLocalizedString(" for confirmation")).c_str(), "", false); // TODO string
-    container.add(onScreenDialog);
-    onScreenDialog->build();
-    this->focus(onScreenDialog);
+    invitation._gameRandomSeed = (unsigned long)(fmod(getTimeMs(), (double)0xFFFFFFFF));
+    invitation._opponentAddress = playerAddress;
+    invitation._gameSpeed = _speedSelector.getState() - 1;
+    invitation._gameNbSets = 0; // TODO: allow multisets games
+    _onScreenDialog = new NetCenterDialogMenu(this, invitation, theCommander->getLocalizedString("Asking for a game"), (theCommander->getLocalizedString("Waiting ") + playerName.c_str() + theCommander->getLocalizedString(" for confirmation")).c_str(), "", false); // TODO string
+    _container.add(_onScreenDialog);
+    _onScreenDialog->build();
+    this->focus(_onScreenDialog);
 
-    netCenter->requestGame(invitation);
+    _netCenter->requestGame(invitation);
 }
 
 

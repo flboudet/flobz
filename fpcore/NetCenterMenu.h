@@ -47,25 +47,25 @@ public:
     // Notification
     virtual void eventOccured(event_manager::GameControlEvent *event);
 public:
-    FloboGameInvitation associatedInvitation;
+    FloboGameInvitation _associatedInvitation;
 private:
     class NetCenterDialogMenuAction : public Action {
     public:
         NetCenterDialogMenuAction(NetCenterMenu *targetMenu, bool isCancelAction)
-        : targetMenu(targetMenu), isCancelAction(isCancelAction) {}
+        : _targetMenu(targetMenu), _isCancelAction(isCancelAction) {}
         void action();
     private:
-        NetCenterMenu *targetMenu;
-        bool isCancelAction;
+        NetCenterMenu *_targetMenu;
+        bool _isCancelAction;
     };
-    Frame menu;
-    NetCenterDialogMenuAction cancelAction, acceptAction;
-    bool hasAcceptButton, hasCancelButton;
-    HBox buttons;
-    Frame titleFrame;
-    Text dialogTitle, dialogMsg, * optMsg;
-    Text sep1, sep2;
-    FramedButton acceptButton, cancelButton;
+    Frame _menu;
+    NetCenterDialogMenuAction _cancelAction, _acceptAction;
+    bool _hasAcceptButton, _hasCancelButton;
+    HBox _buttons;
+    Frame _titleFrame;
+    Text _dialogTitle, _dialogMsg, * _optMsg;
+    Text _sep1, _sep2;
+    FramedButton _acceptButton, _cancelButton;
 };
 
 class NetCenterPlayerList : public ListView {
@@ -79,44 +79,44 @@ private:
     class PlayerSelectedAction : public Action {
     public:
         PlayerSelectedAction(NetCenterMenu *targetMenu, PeerAddress address, const std::string &playerName)
-        : address(address), targetMenu(targetMenu), playerName(playerName) {}
+        : _address(address), _targetMenu(targetMenu), _playerName(playerName) {}
         void action();
     private:
-        PeerAddress address;
-        NetCenterMenu *targetMenu;
-        std::string playerName;
+        PeerAddress _address;
+        NetCenterMenu *_targetMenu;
+        std::string _playerName;
     };
     class PlayerEntry : public ListViewEntry {
     public:
         PlayerEntry(const std::string &playerName, PeerAddress playerAddress, const PeerInfo &info, Action *action)
-        : ListViewEntry(getRankString(info.rank) + playerName + getStatusString(info.status), action),
-        playerAddress(playerAddress), status(info.status), rank(info.rank), action(action) {}
-        ~PlayerEntry() { delete action; }
+        : ListViewEntry(getRankString(info._rank) + playerName + getStatusString(info._status), action),
+        _playerAddress(playerAddress), _status(info._status), _rank(info._rank), _action(action) {}
+        ~PlayerEntry() { delete _action; }
         void updateEntry(const std::string &playerName, const PeerInfo &info) {
-            setText(getRankString(info.rank) + playerName + getStatusString(info.status));
-            this->status = status;
-            this->rank = rank;
+            setText(getRankString(info._rank) + playerName + getStatusString(info._status));
+            this->_status = _status;
+            this->_rank = _rank;
         }
-        PeerAddress playerAddress;
-        int status;
-        int rank;
+        PeerAddress _playerAddress;
+        int _status;
+        int _rank;
     private:
-        Action *action;
+        Action *_action;
         static std::string getStatusString(int status);
         static std::string getRankString(int rank);
     };
-    Vector<PlayerEntry> entries;
-    NetCenterMenu *targetMenu;
+    Vector<PlayerEntry> _entries;
+    NetCenterMenu *_targetMenu;
 };
 
 class NetCenterMenu;
 
 class NetCenterTwoNameProvider : public PlayerNameProvider {
 public:
-    NetCenterTwoNameProvider(NetGameCenter &netCenter) : netCenter(netCenter) {}
+    NetCenterTwoNameProvider(NetGameCenter &netCenter) : _netCenter(netCenter) {}
     std::string getPlayerName(int playerNumber) const;
 private:
-    NetGameCenter &netCenter;
+    NetGameCenter &_netCenter;
 };
 
 class NetCenterMenu : public MainScreenMenu, NetGameCenterListener, ChatBoxDelegate {
@@ -137,7 +137,7 @@ public:
     void cancelCurrentGame();
     void cycle();
     void playerSelected(PeerAddress playerAddress, const std::string &playerName);
-    void selfDestroy() { shouldSelfDestroy = true; }
+    void selfDestroy() { _shouldSelfDestroy = true; }
     virtual void sendChat(const std::string &chatText);
     // Notification
     virtual void eventOccured(event_manager::GameControlEvent *event);
@@ -146,32 +146,32 @@ public:
 private:
     class NetCenterCycled : public CycledComponent {
     public:
-        NetCenterMenu *netCenter;
-        NetCenterCycled(NetCenterMenu *netCenter) : CycledComponent(0.02), netCenter(netCenter) {}
+        NetCenterMenu *_netCenter;
+        NetCenterCycled(NetCenterMenu *netCenter) : CycledComponent(0.02), _netCenter(netCenter) {}
         void cycle() {
-            netCenter->cycle();
+            _netCenter->cycle();
         }
     };
-    VBox mainBox;
-    Frame topFrame;
-    Frame titleFrame;
-    Text title;
-    HBox topbox;
-    VBox menu;
-    VBox playerbox;
-    Text playerListText, chatAreaText;
-    FramedButton cancelButton;
-    PopMainScreenMenuAction backAction;
-    NetCenterPlayerList playerList;
-    NetCenterCycled cycled;
-    NetGameCenter *netCenter;
-    ZBox container;
-    NetCenterDialogMenu *onScreenDialog;
-    bool shouldSelfDestroy;
-    NetCenterTwoNameProvider nameProvider;
-    ChatBox chatBox;
-    Separator topSeparator, middleSeparator, bottomSeparator;
-    RadioButton m_speedSelector;
+    VBox _mainBox;
+    Frame _topFrame;
+    Frame _titleFrame;
+    Text _title;
+    HBox _topbox;
+    VBox _menu;
+    VBox _playerbox;
+    Text _playerListText, _chatAreaText;
+    FramedButton _cancelButton;
+    PopMainScreenMenuAction _backAction;
+    NetCenterPlayerList _playerList;
+    NetCenterCycled _cycled;
+    NetGameCenter *_netCenter;
+    ZBox _container;
+    NetCenterDialogMenu *_onScreenDialog;
+    bool _shouldSelfDestroy;
+    NetCenterTwoNameProvider _nameProvider;
+    ChatBox _chatBox;
+    Separator _topSeparator, _middleSeparator, _bottomSeparator;
+    RadioButton _speedSelector;
 };
 
 #endif // _PUYONETCENTERMENU

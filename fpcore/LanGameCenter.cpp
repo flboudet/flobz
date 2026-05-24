@@ -40,16 +40,16 @@ enum {
 };
 
 LanGameCenter::LanGameCenter(int portNum, const std::string &name)
-    : socket(portNum), mbox(&socket), name(name),
-      timeMsBetweenTwoAliveMessages(3000.), lastAliveMessage(getTimeMs() - timeMsBetweenTwoAliveMessages),
-      timeMsBetweenTwoNetworkInterfacesDetection(10000.), lastNetworkInterfacesDetection(getTimeMs()),
-      gameGranted(false), status(PEER_NORMAL), multicastAddress(MULTICASTGROUP), loopbackAddress("127.0.0.1"),
-      networkInterfaces(requester.getInterfaces()), mcastPeerAddress(multicastAddress, portNum)
+    : _socket(portNum), _mbox(&_socket), _name(name),
+      _timeMsBetweenTwoAliveMessages(3000.), _lastAliveMessage(getTimeMs() - _timeMsBetweenTwoAliveMessages),
+      _timeMsBetweenTwoNetworkInterfacesDetection(10000.), _lastNetworkInterfacesDetection(getTimeMs()),
+      _gameGranted(false), _status(PEER_NORMAL), _multicastAddress(MULTICASTGROUP), _loopbackAddress("127.0.0.1"),
+      _networkInterfaces(_requester.getInterfaces()), _mcastPeerAddress(_multicastAddress, portNum)
 {
-    m_uuid = (int)((int64_t)getTimeMs() % 0xFFFFFFFF);
-    socket.joinGroup(multicastAddress);
-    mbox.addListener(this);
-    SessionManager &mboxSession = dynamic_cast<SessionManager &>(mbox);
+    _uuid = (int)((int64_t)getTimeMs() % 0xFFFFFFFF);
+    _socket.joinGroup(_multicastAddress);
+    _mbox.addListener(this);
+    SessionManager &mboxSession = dynamic_cast<SessionManager &>(_mbox);
     mboxSession.addSessionListener(this);
     addListener(this);
     sendAliveMessage();
@@ -67,8 +67,8 @@ void LanGameCenter::onMessage(Message &msg)
             return;
       switch (msg.getInt("CMD")) {
       case FLOBO_UDP_CHAT:
-	for (int i = 0, j = listeners.size() ; i < j ; i++) {
-	  listeners[i]->onChatMessage(msg.getString("NAME").c_str(), msg.getString("MSG").c_str());
+	for (int i = 0, j = _listeners.size() ; i < j ; i++) {
+	  _listeners[i]->onChatMessage(msg.getString("NAME").c_str(), msg.getString("MSG").c_str());
 	}
 	break;
       case FLOBO_UDP_ALIVE: {
@@ -76,7 +76,7 @@ void LanGameCenter::onMessage(Message &msg)
           int uuid = msg.getInt("UUID");
           int status = msg.getInt("STATUS");
           bool self = false;
-          if (uuid == m_uuid) {
+          if (uuid == _uuid) {
               self = true;
           }
           NetGameCenter::connectPeer(dir.getPeerAddress(), msg.getString("NAME").c_str(), status, -1, self);
@@ -91,27 +91,27 @@ void LanGameCenter::onMessage(Message &msg)
         case FLOBO_UDP_GAME_REQUEST: {
             Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
             FloboGameInvitation invitation;
-            invitation.opponentAddress = dir.getPeerAddress();
-            invitation.opponentName = msg.getString("ORGNAME");
+            invitation._opponentAddress = dir.getPeerAddress();
+            invitation._opponentName = msg.getString("ORGNAME");
             if (msg.hasInt("RNDSEED"))
-                invitation.gameRandomSeed = msg.getInt("RNDSEED");
+                invitation._gameRandomSeed = msg.getInt("RNDSEED");
             else
-                invitation.gameRandomSeed = 0; // When there is no seed, fall back to 0 (better than crashing)
+                invitation._gameRandomSeed = 0; // When there is no seed, fall back to 0 (better than crashing)
             if (msg.hasInt("SPEED"))
-                invitation.gameSpeed = msg.getInt("SPEED");
+                invitation._gameSpeed = msg.getInt("SPEED");
             else
-                invitation.gameSpeed = 1; // When there is no seed, fall back to 1 (better than crashing)
+                invitation._gameSpeed = 1; // When there is no seed, fall back to 1 (better than crashing)
             if (msg.hasInt("GSETS"))
-                    invitation.gameNbSets = msg.getInt("GSETS");
+                    invitation._gameNbSets = msg.getInt("GSETS");
                 else
-                    invitation.gameNbSets = 0;
+                    invitation._gameNbSets = 0;
             receivedGameInvitation(invitation);
         }
 	break;
       case FLOBO_UDP_GAME_ACCEPT: {
           Dirigeable &dir = dynamic_cast<Dirigeable &>(msg);
-          if (grantedInvitation.opponentAddress == dir.getPeerAddress())
-            grantGame(grantedInvitation);
+          if (_grantedInvitation._opponentAddress == dir.getPeerAddress())
+            grantGame(_grantedInvitation);
       }
 	break;
       case FLOBO_UDP_GAME_CANCEL:  {
@@ -136,13 +136,13 @@ void LanGameCenter::onPeerDisconnect(const PeerAddress &address)
 void LanGameCenter::sendMessage(const std::string &msgText)
 {
   for (int i = 0, j = getPeerCount() ; i < j ; i++) {
-    Message *msg = mbox.createMessage();
+    Message *msg = _mbox.createMessage();
     Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
     dirMsg->setPeerAddress(getPeerAddressAtIndex(i));
 
     msg->addBoolProperty("RELIABLE", true);
     msg->addInt("CMD", FLOBO_UDP_CHAT);
-    msg->addString("NAME", name.c_str());
+    msg->addString("NAME", _name.c_str());
     msg->addString("MSG", msgText.c_str());
     msg->send();
     delete msg;
@@ -151,56 +151,56 @@ void LanGameCenter::sendMessage(const std::string &msgText)
 
 void LanGameCenter::idle()
 {
-    if (gameGranted) {
-      grantGame(grantedInvitation);
-      gameGranted = false;
+    if (_gameGranted) {
+      grantGame(_grantedInvitation);
+      _gameGranted = false;
       return;
     }
-    mbox.idle();
+    _mbox.idle();
     double time_ms = getTimeMs();
-    if ((time_ms - lastAliveMessage) >= timeMsBetweenTwoAliveMessages) {
+    if ((time_ms - _lastAliveMessage) >= _timeMsBetweenTwoAliveMessages) {
         sendAliveMessage();
-        lastAliveMessage = time_ms;
+        _lastAliveMessage = time_ms;
     }
-    if ((time_ms - lastNetworkInterfacesDetection) >= timeMsBetweenTwoNetworkInterfacesDetection) {
-        networkInterfaces = requester.getInterfaces();
-        lastNetworkInterfacesDetection = time_ms;
+    if ((time_ms - _lastNetworkInterfacesDetection) >= _timeMsBetweenTwoNetworkInterfacesDetection) {
+        _networkInterfaces = _requester.getInterfaces();
+        _lastNetworkInterfacesDetection = time_ms;
     }
     NetGameCenter::idle();
 }
 
 void LanGameCenter::setStatus(int status)
 {
-    this->status = status;
+    this->_status = status;
     sendAliveMessage();
 }
 
 const std::string &LanGameCenter::getSelfName()
 {
-    return name;
+    return _name;
 }
 
 const std::string &LanGameCenter::getOpponentName()
 {
-    return opponentName;
+    return _opponentName;
 }
 
 void LanGameCenter::sendAliveMessage()
 {
     try {
-        for (unsigned int i = 0 ; i < networkInterfaces.size() ; i++) {
-            NetworkInterface &ifs = networkInterfaces[i];
-            if (ifs.getAddress() == loopbackAddress)
+        for (unsigned int i = 0 ; i < _networkInterfaces.size() ; i++) {
+            NetworkInterface &ifs = _networkInterfaces[i];
+            if (ifs.getAddress() == _loopbackAddress)
                 continue;
-            socket.setMulticastInterface(ifs.getAddress());
-            Message *msg = mbox.createMessage();
+            _socket.setMulticastInterface(ifs.getAddress());
+            Message *msg = _mbox.createMessage();
             Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
-            dirMsg->setPeerAddress(mcastPeerAddress);
+            dirMsg->setPeerAddress(_mcastPeerAddress);
 
             msg->addInt("CMD", FLOBO_UDP_ALIVE);
-            msg->addString("NAME", name.c_str());
-            msg->addInt("STATUS", status);
-            msg->addInt("UUID", m_uuid);
+            msg->addString("NAME", _name.c_str());
+            msg->addInt("STATUS", _status);
+            msg->addInt("UUID", _uuid);
             msg->send();
             delete msg;
         }
@@ -208,23 +208,23 @@ void LanGameCenter::sendAliveMessage()
     catch (const std::exception &ex) {
         // If we have an exception there, it is probably because we are attempting to use
         // a network interface which has just disappeared. Redetect the interfaces.
-        networkInterfaces = requester.getInterfaces();
+        _networkInterfaces = _requester.getInterfaces();
     }
 }
 
 void LanGameCenter::sendDisconnectMessage()
 {
-    for (size_t i = 0 ; i < networkInterfaces.size() ; i++) {
-        NetworkInterface &ifs = networkInterfaces[i];
-        if (ifs.getAddress() == loopbackAddress)
+    for (size_t i = 0 ; i < _networkInterfaces.size() ; i++) {
+        NetworkInterface &ifs = _networkInterfaces[i];
+        if (ifs.getAddress() == _loopbackAddress)
             continue;
-        socket.setMulticastInterface(ifs.getAddress());
-        Message *msg = mbox.createMessage();
+        _socket.setMulticastInterface(ifs.getAddress());
+        Message *msg = _mbox.createMessage();
         Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
-        dirMsg->setPeerAddress(mcastPeerAddress);
+        dirMsg->setPeerAddress(_mcastPeerAddress);
 
         msg->addInt("CMD", FLOBO_UDP_DISCONNECT);
-        msg->addString("NAME", name.c_str());
+        msg->addString("NAME", _name.c_str());
         msg->send();
         //printf("Message de deconnexion envoye...\n");
         delete msg;
@@ -233,56 +233,56 @@ void LanGameCenter::sendDisconnectMessage()
 
 void LanGameCenter::sendGameRequest(FloboGameInvitation &invitation)
 {
-  opponentName = invitation.opponentName;
-  Message *msg = mbox.createMessage();
+  _opponentName = invitation._opponentName;
+  Message *msg = _mbox.createMessage();
   Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
-  dirMsg->setPeerAddress(invitation.opponentAddress);
+  dirMsg->setPeerAddress(invitation._opponentAddress);
 
   msg->addBoolProperty("RELIABLE", true);
   msg->addInt("CMD", FLOBO_UDP_GAME_REQUEST);
-  msg->addString("ORGNAME", name.c_str());
-  msg->addString("DSTNAME", invitation.opponentName.c_str());
-  msg->addInt("RNDSEED", invitation.gameRandomSeed);
-  msg->addInt("SPEED", invitation.gameSpeed);
-  msg->addInt("GSETS", invitation.gameNbSets);
+  msg->addString("ORGNAME", _name.c_str());
+  msg->addString("DSTNAME", invitation._opponentName.c_str());
+  msg->addInt("RNDSEED", invitation._gameRandomSeed);
+  msg->addInt("SPEED", invitation._gameSpeed);
+  msg->addInt("GSETS", invitation._gameNbSets);
   msg->send();
   delete msg;
-  grantedInvitation = invitation;
+  _grantedInvitation = invitation;
 }
 
 void LanGameCenter::sendGameAcceptInvitation(FloboGameInvitation &invitation)
 {
-  opponentName = invitation.opponentName;
-  Message *msg = mbox.createMessage();
+  _opponentName = invitation._opponentName;
+  Message *msg = _mbox.createMessage();
   Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
-  dirMsg->setPeerAddress(invitation.opponentAddress);
+  dirMsg->setPeerAddress(invitation._opponentAddress);
 
   msg->addBoolProperty("RELIABLE", true);
   msg->addInt("CMD", FLOBO_UDP_GAME_ACCEPT);
-  msg->addString("ORGNAME", name.c_str());
-  msg->addString("DSTNAME", invitation.opponentName.c_str());
+  msg->addString("ORGNAME", _name.c_str());
+  msg->addString("DSTNAME", invitation._opponentName.c_str());
   msg->send();
   delete msg;
-  gameGranted = true;
-  grantedInvitation = invitation;
+  _gameGranted = true;
+  _grantedInvitation = invitation;
 }
 
 void LanGameCenter::grantGame(FloboGameInvitation &invitation)
 {
-    mbox.bind(invitation.opponentAddress);
-    grantGameWithMessageBox(invitation, mbox);
+    _mbox.bind(invitation._opponentAddress);
+    grantGameWithMessageBox(invitation, _mbox);
 }
 
 void LanGameCenter::sendGameCancelInvitation(FloboGameInvitation &invitation)
 {
-  Message *msg = mbox.createMessage();
+  Message *msg = _mbox.createMessage();
   Dirigeable *dirMsg = dynamic_cast<Dirigeable *>(msg);
-  dirMsg->setPeerAddress(invitation.opponentAddress);
+  dirMsg->setPeerAddress(invitation._opponentAddress);
 
   msg->addBoolProperty("RELIABLE", true);
   msg->addInt("CMD", FLOBO_UDP_GAME_CANCEL);
-  msg->addString("ORGNAME", name.c_str());
-  msg->addString("DSTNAME", invitation.opponentName.c_str());
+  msg->addString("ORGNAME", _name.c_str());
+  msg->addString("DSTNAME", invitation._opponentName.c_str());
   msg->send();
   delete msg;
 }

@@ -25,33 +25,33 @@ struct StatsWidgetDimensions {
     StatsWidgetDimensions(float height, float legendWidth,
                           float comboLineValueWidth,
                           Vec3 leftBackgroundOffset, Vec3 rightBackgroundOffset)
-        : m_height(height), m_legendWidth(legendWidth),
-          m_comboLineValueWidth(comboLineValueWidth),
-          m_leftBackgroundOffset(leftBackgroundOffset),
-          m_rightBackgroundOffset(rightBackgroundOffset) {}
+        : _height(height), _legendWidth(legendWidth),
+          _comboLineValueWidth(comboLineValueWidth),
+          _leftBackgroundOffset(leftBackgroundOffset),
+          _rightBackgroundOffset(rightBackgroundOffset) {}
     StatsWidgetDimensions()
-        : m_height(0), m_legendWidth(0),
-          m_comboLineValueWidth(0) {}
-    float m_height, m_legendWidth;
-    float m_comboLineValueWidth;
-    Vec3  m_leftBackgroundOffset, m_rightBackgroundOffset;
+        : _height(0), _legendWidth(0),
+          _comboLineValueWidth(0) {}
+    float _height, _legendWidth;
+    float _comboLineValueWidth;
+    Vec3  _leftBackgroundOffset, _rightBackgroundOffset;
 };
 
 #define MAX_DISPLAYED_COMBOS 5 // TODO: More
 class StatsResources {
 public:
-    IosSurfaceRef rope_elt;
-    IosSurfaceRef ring_left;
-    IosSurfaceRef originalFloboLeft[4];
-    std::unique_ptr<IosSurface> ring_right;
-    IosSurface * flobo_right[4][4];
-    IosSurface *flobo_left[4][4];
-    IosSurfaceRef flobo_left_mask;
-    std::unique_ptr<IosSurface> flobo_right_mask;
-    IosSurfaceRef stats_bg_winner;
-    std::unique_ptr<IosSurface> stats_bg_loser;
-    IosSurfaceRef titleImage;
-    IosSurfaceRef comboImage[MAX_DISPLAYED_COMBOS];
+    IosSurfaceRef _rope_elt;
+    IosSurfaceRef _ring_left;
+    IosSurfaceRef _originalFloboLeft[4];
+    std::unique_ptr<IosSurface> _ring_right;
+    IosSurface * _flobo_right[4][4];
+    IosSurface *_flobo_left[4][4];
+    IosSurfaceRef _flobo_left_mask;
+    std::unique_ptr<IosSurface> _flobo_right_mask;
+    IosSurfaceRef _stats_bg_winner;
+    std::unique_ptr<IosSurface> _stats_bg_loser;
+    IosSurfaceRef _titleImage;
+    IosSurfaceRef _comboImage[MAX_DISPLAYED_COMBOS];
 public:
     StatsResources();
     ~StatsResources();
@@ -65,32 +65,32 @@ public:
     void idle(double currentTime);
     IdleComponent *getIdleComponent() { return this; }
     void setValue(float value, bool progressive = false);
-    float getValue() const { return m_value; }
+    float getValue() const { return _value; }
     void setVisible(bool visible);
     void setDirection(StatsDirection dir);
-    void setPositiveAttitude(bool positiveAttitude) { m_positiveAttitude = positiveAttitude; }
-    void setColorIndex(int colorIndex) { m_colorIndex = colorIndex; }
+    void setPositiveAttitude(bool positiveAttitude) { _positiveAttitude = positiveAttitude; }
+    void setColorIndex(int colorIndex) { _colorIndex = colorIndex; }
     enum {
         VALUE_CHANGED,
         PROGRESSION_COMPLETE
     };
 private:
-    StatsResources &m_res;
-    StatsDirection m_dir;
-    float m_value, m_fromValue, m_targetValue;
-    bool m_progressive;
-    double m_targetBaseTime;
-    double m_progressiveDuration;
-    bool m_visible;
-    gameui::Action *m_associatedAction;
-    double m_t;
-    bool m_positiveAttitude;
-    int m_colorIndex;
+    StatsResources &_res;
+    StatsDirection _dir;
+    float _value, _fromValue, _targetValue;
+    bool _progressive;
+    double _targetBaseTime;
+    double _progressiveDuration;
+    bool _visible;
+    gameui::Action *_associatedAction;
+    double _t;
+    bool _positiveAttitude;
+    int _colorIndex;
 };
 
 struct StatsFormat {
     StatsFormat(PlayerGameStat &playerAStats, PlayerGameStat &playerBStats);
-    int m_comboIndirection[MAX_DISPLAYED_COMBOS+1];
+    int _comboIndirection[MAX_DISPLAYED_COMBOS+1];
 };
 
 class StatsWidget : public gameui::VBox, gameui::Action, IdleComponent {
@@ -106,12 +106,12 @@ public:
     void startAnimation();
     virtual void idle(double currentTime);
     virtual IdleComponent *getIdleComponent() { return this; }
-    bool isWinner() const { return m_stats.is_winner; }
+    bool isWinner() const { return _stats.is_winner; }
 private:
-    StatsResources &m_res;
-    StatsDirection m_dir;
-    bool m_showGlobalScore;
-    gameui::Action *m_action;
+    StatsResources &_res;
+    StatsDirection _dir;
+    bool _showGlobalScore;
+    gameui::Action *_action;
     class ComboLine : public gameui::HBox, gameui::Action {
     public:
         ComboLine(StatsResources &res);
@@ -120,27 +120,27 @@ private:
                                int numberOfCombos, int vsNumberOfCombos,
                                int totalNumOfCombos, gameui::Action *progressionCompleteAction);
         void setDimensions(StatsWidgetDimensions &dimensions) {
-            m_dimensions = dimensions;
+            _dimensions = dimensions;
         }
         virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
     private:
-        StatsWidgetDimensions m_dimensions;
-        StatsDirection m_dir;
-        int m_tag;
-        gameui::Text m_comboLabel;
-        Action *m_progressionCompleteAction;
-        ProgressBarWidget m_progressBar;
-        gameui::Text m_currentValue;
-        int m_totalNumOfCombos;
+        StatsWidgetDimensions _dimensions;
+        StatsDirection _dir;
+        int _tag;
+        gameui::Text _comboLabel;
+        Action *_progressionCompleteAction;
+        ProgressBarWidget _progressBar;
+        gameui::Text _currentValue;
+        int _totalNumOfCombos;
     };
-    StatsFormat &m_statsFormat;
-    PlayerGameStat &m_stats, &m_opponentStats;
-    gameui::Text m_statTitle;
-    std::vector<ComboLine *> m_comboLines;
-    int m_maxCombo;
-    gameui::Text m_score, m_globalScore;
-    double m_startTime;
-    std::vector<std::unique_ptr<Widget>> widgetAutoReleasePool;
+    StatsFormat &_statsFormat;
+    PlayerGameStat &_stats, &_opponentStats;
+    gameui::Text _statTitle;
+    std::vector<ComboLine *> _comboLines;
+    int _maxCombo;
+    gameui::Text _score, _globalScore;
+    double _startTime;
+    std::vector<std::unique_ptr<Widget>> _widgetAutoReleasePool;
 };
 
 class StatsLegendWidget : public gameui::Frame, public gameui::Action {
@@ -151,13 +151,13 @@ public:
   virtual void onWidgetVisibleChanged(bool visible);
   virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
 private:
-  gameui::Image m_statsImage;
-  StatsFormat &m_statsFormat;
-  StatsWidget &m_guideWidget;
-  gameui::Separator m_barSeparator, m_bottomSeparator;
-  gameui::SliderContainer m_legendSlider[MAX_DISPLAYED_COMBOS];
-  gameui::HBox m_legendCell[MAX_DISPLAYED_COMBOS];
-  gameui::Image m_legendImage[MAX_DISPLAYED_COMBOS];
+  gameui::Image _statsImage;
+  StatsFormat &_statsFormat;
+  StatsWidget &_guideWidget;
+  gameui::Separator _barSeparator, _bottomSeparator;
+  gameui::SliderContainer _legendSlider[MAX_DISPLAYED_COMBOS];
+  gameui::HBox _legendCell[MAX_DISPLAYED_COMBOS];
+  gameui::Image _legendImage[MAX_DISPLAYED_COMBOS];
 };
 
 class TwoPlayersStatsWidget : public gameui::ZBox, gameui::SliderContainerListener {
@@ -172,13 +172,13 @@ public:
      */
     virtual void onSlideInside(gameui::SliderContainer &slider);
 private:
-    StatsResources m_res;
-    StatsFormat m_statsFormat;
-    gameui::SliderContainer m_leftSlider, m_rightSlider, m_legendSlider;
-    StatsLegendWidget m_legend;
-    StatsWidget m_leftStats, m_rightStats;
-    float m_height, m_legendWidth;
-    std::vector<std::unique_ptr<Widget>> widgetAutoReleasePool;
+    StatsResources _res;
+    StatsFormat _statsFormat;
+    gameui::SliderContainer _leftSlider, _rightSlider, _legendSlider;
+    StatsLegendWidget _legend;
+    StatsWidget _leftStats, _rightStats;
+    float _height, _legendWidth;
+    std::vector<std::unique_ptr<Widget>> _widgetAutoReleasePool;
 };
 
 #endif // _FLOBO_STATS_WIDGET_H

@@ -467,12 +467,12 @@ int AIPlayer::makeEvaluation(const GridEvaluation * const referenceOne, const Fl
   int rR,rP;
   
   rR = (2 * referenceOne->floboSuppressed + 2 * referenceOne->neutralSuppressed + referenceOne->floboGrouped);
-  rR *= params.realSuppressionValue;
+  rR *= _params.realSuppressionValue;
 
-  if (params.criticalHeight > referenceOne->height)
+  if (_params.criticalHeight > referenceOne->height)
   {
     rP = (referenceOne->neutralSuppressedPotential + referenceOne->floboSuppressedPotential);
-    rP *= params.potentialSuppressionValue;
+    rP *= _params.potentialSuppressionValue;
   }
   else
   {
@@ -497,18 +497,18 @@ int AIPlayer::makeEvaluation(const GridEvaluation * const referenceOne, const Fl
   
   int c = 0;
   
-  if (params.criticalHeight > referenceOne->height)
+  if (_params.criticalHeight > referenceOne->height)
   {
 
   for (int x = 0;  x < IA_FLOBOBAN_DIMX; x++)
   {
-    c += IA_FLOBOBAN_DIMY - abs(params.columnScalar[x] - (int)(*grid)[x][HEIGHTS_ROW]);
+    c += IA_FLOBOBAN_DIMY - abs(_params.columnScalar[x] - (int)(*grid)[x][HEIGHTS_ROW]);
   }
   c*=IA_FLOBOBAN_DIMX;
   }
   else c = IA_FLOBOBAN_DIMY * IA_FLOBOBAN_DIMX * IA_FLOBOBAN_DIMX + 2 * IA_FLOBOBAN_DIMY;
-    c += params.columnScalar[pos1] - (int)(*grid)[pos1][HEIGHTS_ROW];
-    c += params.columnScalar[pos2] - (int)(*grid)[pos2][HEIGHTS_ROW];
+    c += _params.columnScalar[pos1] - (int)(*grid)[pos1][HEIGHTS_ROW];
+    c += _params.columnScalar[pos2] - (int)(*grid)[pos2][HEIGHTS_ROW];
 
   int r = c * (1+rR+rP);
   return r;
@@ -527,47 +527,47 @@ bool AIPlayer::selectIfBetterEvaluation(int * const best, const GridEvaluation *
 }
 
 
-AIPlayer::AIPlayer(int level, GameView &targetView)
+AIPlayer::AIPlayer(int _level, GameView &targetView)
 : GamePlayer(targetView)
 {
-  internalGrid = NULL;
-  decisionMade = 0;
-  shouldRedecide = false;
-  lastNumberOfBadFlobos = 0;
-  totalNumberOfBadFlobos = 0;
+  _internalGrid = NULL;
+  _decisionMade = 0;
+  _shouldRedecide = false;
+  _lastNumberOfBadFlobos = 0;
+  _totalNumberOfBadFlobos = 0;
   _attachedGame =         _targetView.getAttachedGame();
-  objective = nullBinom;
-  lastLineSeen = FLOBOBAN_DIMY+1;
-  currentCycle = 0;
-  readyToDrop = false;
+  _objective = nullBinom;
+  _lastLineSeen = FLOBOBAN_DIMY+1;
+  _currentCycle = 0;
+  _readyToDrop = false;
 
-  params.realSuppressionValue = 1;
-  params.potentialSuppressionValue = 3;
-  params.criticalHeight = 10;
-  params.columnScalar[5] = 1;
-  params.columnScalar[0] = 1;
-  params.columnScalar[1] = 1;
-  params.columnScalar[2] = 1;
-  params.columnScalar[3] = 1;
-  params.columnScalar[4] = 1;
-  params.columnScalar[5] = 1;
-  params.rotationMethod = 0; // negative (right), null (shortest), positive(left)
-  params.fastDropDelta = FLOBOBAN_DIMY; // flobo height relative to column height before fast drop
-  params.thinkDepth = 2;
-  params.speedFactor = level>0?level:1;
-  this->level = level;
+  _params.realSuppressionValue = 1;
+  _params.potentialSuppressionValue = 3;
+  _params.criticalHeight = 10;
+  _params.columnScalar[5] = 1;
+  _params.columnScalar[0] = 1;
+  _params.columnScalar[1] = 1;
+  _params.columnScalar[2] = 1;
+  _params.columnScalar[3] = 1;
+  _params.columnScalar[4] = 1;
+  _params.columnScalar[5] = 1;
+  _params.rotationMethod = 0; // negative (right), null (shortest), positive(left)
+  _params.fastDropDelta = FLOBOBAN_DIMY; // flobo height relative to column height before fast drop
+  _params.thinkDepth = 2;
+  _params.speedFactor = _level>0?_level:1;
+  this->_level = _level;
 }
 
 void AIPlayer::setAIParameters(const AIParameters &ai)
 {
-  int a = params.speedFactor;
-  params = ai;
-  params.speedFactor = a;
+  int a = _params.speedFactor;
+  _params = ai;
+  _params.speedFactor = a;
 }
 
 AIPlayer::~AIPlayer()
 {
-  if (internalGrid != NULL) free(internalGrid);
+  if (_internalGrid != NULL) free(_internalGrid);
 }
 
 FloboState AIPlayer::extractColor(FloboState A) const
@@ -618,7 +618,7 @@ int AIPlayer::revertOrientation(FloboOrientation D) const
 void AIPlayer::extractGrid(void)
 {
   // Alloc a grid if not already done
-  if (internalGrid == NULL) internalGrid = (GridState *)malloc(sizeof(GridState));
+  if (_internalGrid == NULL) _internalGrid = (GridState *)malloc(sizeof(GridState));
 
   // Fill the grid with current data
   for (int i = 0; i < IA_FLOBOBAN_DIMX; i++)
@@ -632,20 +632,20 @@ void AIPlayer::extractGrid(void)
         FloboState state = theFlobo->getFloboState();
         if (state >= FLOBO_STILL)
         {
-          (* internalGrid)[i][j] = state;
+          (* _internalGrid)[i][j] = state;
           height++;
-        } else (* internalGrid)[i][j] = FLOBO_EMPTY;
+        } else (* _internalGrid)[i][j] = FLOBO_EMPTY;
       }
       else
       {
-        (* internalGrid)[i][j] = FLOBO_EMPTY;
+        (* _internalGrid)[i][j] = FLOBO_EMPTY;
       }
     }
-    (* internalGrid)[i][HEIGHTS_ROW] = height;
+    (* _internalGrid)[i][HEIGHTS_ROW] = height;
   }
 }
 
-bool canReach(const FloboBinom binom, const FloboBinom dest, GridState * const internalGrid, int duration)
+bool canReach(const FloboBinom binom, const FloboBinom dest, GridState * const _internalGrid, int duration)
 {
   int minBinomY = binom.position.y;
   int minBinomX = binom.position.x;
@@ -683,10 +683,10 @@ bool canReach(const FloboBinom binom, const FloboBinom dest, GridState * const i
   }
   
   if (minBinomX < maxDestX)
-    for (int i = minBinomX;  i <= maxDestX; i++) if ((*internalGrid)[i][minBinomY] != FLOBO_EMPTY) return false;
+    for (int i = minBinomX;  i <= maxDestX; i++) if ((*_internalGrid)[i][minBinomY] != FLOBO_EMPTY) return false;
   
   if (maxBinomX > minDestX)
-    for (int i = minDestX;  i <= maxBinomX; i++) if ((*internalGrid)[i][minBinomY] != FLOBO_EMPTY) return false;
+    for (int i = minDestX;  i <= maxBinomX; i++) if ((*_internalGrid)[i][minBinomY] != FLOBO_EMPTY) return false;
   
   return true;
 }
@@ -700,25 +700,25 @@ void AIPlayer::decide(int partial, int depth)
     FloboState etat;
     etat = _attachedGame->getFallingState();
     if (etat == FLOBO_EMPTY) return;
-    current.falling     = extractColor(etat);
+    _current.falling     = extractColor(etat);
     etat = _attachedGame->getCompanionState();
     if (etat == FLOBO_EMPTY) return;
-    current.companion   = extractColor(etat);
-    current.orientation = extractOrientation(_attachedGame->getFallingCompanionDir());
-    current.position.x  = _attachedGame->getFallingX();
-    current.position.y  = FLOBOBAN_DIMY - _attachedGame->getFallingY();
+    _current.companion   = extractColor(etat);
+    _current.orientation = extractOrientation(_attachedGame->getFallingCompanionDir());
+    _current.position.x  = _attachedGame->getFallingX();
+    _current.position.y  = FLOBOBAN_DIMY - _attachedGame->getFallingY();
     
-    originalFlobo = current;
+    _originalFlobo = _current;
     
-    next.falling        = extractColor(_attachedGame->getNextFalling());
-    next.companion      = extractColor(_attachedGame->getNextCompanion());
-    next.orientation    = Left;
-    next.position.x     = 0;
-    next.position.y     = IA_FLOBOBAN_DIMY+1;
+    _next.falling        = extractColor(_attachedGame->getNextFalling());
+    _next.companion      = extractColor(_attachedGame->getNextCompanion());
+    _next.orientation    = Left;
+    _next.position.x     = 0;
+    _next.position.y     = IA_FLOBOBAN_DIMY+1;
 
-    bestl1=1;
-    foundOne = false;
-    bestEvaluation = 0;
+    _bestl1=1;
+    _foundOne = false;
+    _bestEvaluation = 0;
   }
   
   switch (depth)
@@ -727,7 +727,7 @@ void AIPlayer::decide(int partial, int depth)
       for (unsigned int l1 = 1+partial; l1 <= MAXCOMBINATION; l1+=DISPATCHCYCLES)
       {
         // set position of binom 1
-        serialPosition(l1,&current);
+        serialPosition(l1,&_current);
         
         // reset evaluation
         GridEvaluation evaluation1 = nullEvaluation;
@@ -735,26 +735,26 @@ void AIPlayer::decide(int partial, int depth)
         GridState state1;
         
         // drop the binom (including destroying eligible groups) and continue if game not lost
-        if (canReach(originalFlobo, current, internalGrid, 1) && dropBinom(current, internalGrid, &state1, &evaluation1))
+        if (canReach(_originalFlobo, _current, _internalGrid, 1) && dropBinom(_current, _internalGrid, &state1, &evaluation1))
         {
           evalWith(&state1, &nullEvaluation, &evaluation1);
           
-          if (foundOne == false || selectIfBetterEvaluation(&bestEvaluation, &evaluation1, current, &state1))
+          if (_foundOne == false || selectIfBetterEvaluation(&_bestEvaluation, &evaluation1, _current, &state1))
           {
-            bestl1 = l1;
+            _bestl1 = l1;
           }
-          foundOne = true;
+          _foundOne = true;
         }
       }
-      if (foundOne) serialPosition(bestl1,&current);
-      objective = current;
+      if (_foundOne) serialPosition(_bestl1,&_current);
+      _objective = _current;
       break;
       
     case 2:
       for (unsigned int l1 = 1+partial; l1 <= MAXCOMBINATION; l1+=DISPATCHCYCLES)
       {
         // set position of binom 1
-        serialPosition(l1,&current);
+        serialPosition(l1,&_current);
         
         // reset evaluation
         GridEvaluation evaluation1 = nullEvaluation;
@@ -762,12 +762,12 @@ void AIPlayer::decide(int partial, int depth)
         GridState state1;
         
         // drop the binom (including destroying eligible groups) and continue if game not lost
-        if (canReach(originalFlobo, current, internalGrid, 1) && dropBinom(current, internalGrid, &state1, &evaluation1))
+        if (canReach(_originalFlobo, _current, _internalGrid, 1) && dropBinom(_current, _internalGrid, &state1, &evaluation1))
         {
           for (unsigned int l2 = 1; l2 <= MAXCOMBINATION; l2++)
           {
             // set position of binom 1
-            serialPosition(l2,&next);
+            serialPosition(l2,&_next);
             
             // copy evaluation
             GridEvaluation evaluation2 = evaluation1;
@@ -775,29 +775,29 @@ void AIPlayer::decide(int partial, int depth)
             GridState state1bis;
             GridState state2;
             
-            dropNeutrals(lastNumberOfBadFlobos-evaluation1.floboSuppressed, totalNumberOfBadFlobos, &state1bis, &state1);  
+            dropNeutrals(_lastNumberOfBadFlobos-evaluation1.floboSuppressed, _totalNumberOfBadFlobos, &state1bis, &state1);  
             
             // drop the binom (including destroying eligible groups) and eval board if game not lost
-            if (canReach(originalFlobo, next, &state1bis, 1) && dropBinom(next, &state1bis, &state2, &evaluation2))
+            if (canReach(_originalFlobo, _next, &state1bis, 1) && dropBinom(_next, &state1bis, &state2, &evaluation2))
             {
               evalWith(&state2, &evaluation1, &evaluation2);
               
-              if (foundOne == false || selectIfBetterEvaluation(&bestEvaluation, &evaluation2, current, &state2))
+              if (_foundOne == false || selectIfBetterEvaluation(&_bestEvaluation, &evaluation2, _current, &state2))
               {
-                bestl1 = l1;
+                _bestl1 = l1;
               }
-              foundOne = true;
+              _foundOne = true;
             }
           }
         }
       }
-      if (foundOne) serialPosition(bestl1,&current);
-      objective = current;
+      if (_foundOne) serialPosition(_bestl1,&_current);
+      _objective = _current;
       break;
       
     default:
-      objective.position.x = (random() % IA_FLOBOBAN_DIMX);
-      objective.orientation = (FloboOrientation)(random() % 4);
+      _objective.position.x = (random() % IA_FLOBOBAN_DIMX);
+      _objective.orientation = (FloboOrientation)(random() % 4);
       break;
   }
 
@@ -826,25 +826,25 @@ void AIPlayer::cycle()
   {
     //fprintf(stderr, "Thinking\n");
     // Reset the cycle counter
-    currentCycle = 0;
+    _currentCycle = 0;
     // Save we did make any decision yet
-    decisionMade = 0;
+    _decisionMade = 0;
     // Should not decide again if we didn't decide yet !
-    shouldRedecide = false;
-    lastNumberOfBadFlobos = currentNumberOfBadFlobos;
-    totalNumberOfBadFlobos = currentTotalNumberOfBadFlobos;
+    _shouldRedecide = false;
+    _lastNumberOfBadFlobos = currentNumberOfBadFlobos;
+    _totalNumberOfBadFlobos = currentTotalNumberOfBadFlobos;
   } else {
       // If we did not start, test if we should restart because new bad flobos arrived
-      if (currentNumberOfBadFlobos != lastNumberOfBadFlobos) {
+      if (currentNumberOfBadFlobos != _lastNumberOfBadFlobos) {
           //fprintf(stderr, "RE-Thinking\n");
           // Reset the cycle counter
-          currentCycle = 0;
+          _currentCycle = 0;
           // Save we did make any decision yet
-          decisionMade = 0;
+          _decisionMade = 0;
           // Should not decide again if we didn't decide yet !
-          shouldRedecide = true;
-          lastNumberOfBadFlobos = currentNumberOfBadFlobos;
-          totalNumberOfBadFlobos = currentTotalNumberOfBadFlobos;
+          _shouldRedecide = true;
+          _lastNumberOfBadFlobos = currentNumberOfBadFlobos;
+          _totalNumberOfBadFlobos = currentTotalNumberOfBadFlobos;
       }
   }
 
@@ -852,39 +852,39 @@ void AIPlayer::cycle()
 
   
   // increment the cycle counter
-  currentCycle++;
+  _currentCycle++;
   
   // Test if we have to decide where to play
-  if (decisionMade < DISPATCHCYCLES)
+  if (_decisionMade < DISPATCHCYCLES)
   {
     // if so update the internal grid the first time
-    if (decisionMade == 0 && !shouldRedecide) extractGrid();
+    if (_decisionMade == 0 && !_shouldRedecide) extractGrid();
 
     // then start to think
-    decide(decisionMade, params.thinkDepth);
+    decide(_decisionMade, _params.thinkDepth);
  
     // remember what we decided
-    decisionMade++;
+    _decisionMade++;
     
     // don't drop yet!!
-    readyToDrop = false;
+    _readyToDrop = false;
     
     // Do not move until we are sure
-    //if (decisionMade < DISPATCHCYCLES) return;
-      //if (decisionMade == DISPATCHCYCLES) fprintf(stderr, "Thought\n");
+    //if (_decisionMade < DISPATCHCYCLES) return;
+      //if (_decisionMade == DISPATCHCYCLES) fprintf(stderr, "Thought\n");
   }
 
   // Now move to the position we decided :
 
   // If we can drop, then go on
-  if (readyToDrop)
+  if (_readyToDrop)
   {
-    if (internalGrid == NULL) extractGrid();
-    if ((FLOBOBAN_DIMY-1-currentLine) - ((* internalGrid)[currentColumn][HEIGHTS_ROW] + (objective.orientation == Below)?1:0) <= params.fastDropDelta) _targetView.cycleGame();
+    if (_internalGrid == NULL) extractGrid();
+    if ((FLOBOBAN_DIMY-1-currentLine) - ((* _internalGrid)[currentColumn][HEIGHTS_ROW] + (_objective.orientation == Below)?1:0) <= _params.fastDropDelta) _targetView.cycleGame();
   }
   
   // Else try to move at the specified frequency
-  else if ((currentCycle % params.speedFactor) == 0)
+  else if ((_currentCycle % _params.speedFactor) == 0)
   {
     bool shouldMove;
     bool shouldRotate;
@@ -897,19 +897,19 @@ void AIPlayer::cycle()
     // should we move or rotate
     if (random()%2 == 0)
     {
-      shouldMove = (currentColumn != objective.position.x);
-      shouldRotate = (!shouldMove) && (extractOrientation(curOrientation) != objective.orientation);
+      shouldMove = (currentColumn != _objective.position.x);
+      shouldRotate = (!shouldMove) && (extractOrientation(curOrientation) != _objective.orientation);
     } else {
-      shouldRotate = (extractOrientation(curOrientation) != objective.orientation);
-      shouldMove = (!shouldRotate) && (currentColumn != objective.position.x);
+      shouldRotate = (extractOrientation(curOrientation) != _objective.orientation);
+      shouldMove = (!shouldRotate) && (currentColumn != _objective.position.x);
     }
     // if no need to move or rotate we're ready to drop
-    readyToDrop = !(shouldMove || shouldRotate);
+    _readyToDrop = !(shouldMove || shouldRotate);
     
     // Move if useful
     if (shouldMove)
     {
-      if (currentColumn < objective.position.x) _targetView.moveRight();
+      if (currentColumn < _objective.position.x) _targetView.moveRight();
       else _targetView.moveLeft();
 
       // or decide again if not possible
@@ -919,16 +919,16 @@ void AIPlayer::cycle()
     // Rotate if useful
     if (shouldRotate)
     {
-      if (params.rotationMethod == 0)
+      if (_params.rotationMethod == 0)
       {
-        if (rotationMatrix[revertOrientation(objective.orientation)][curOrientation] > 0)
+        if (rotationMatrix[revertOrientation(_objective.orientation)][curOrientation] > 0)
           _targetView.rotateRight();
         else
           _targetView.rotateLeft();
         
       }
-      else if (params.rotationMethod < 0) _targetView.rotateRight();
-      else if (params.rotationMethod > 0) _targetView.rotateLeft();
+      else if (_params.rotationMethod < 0) _targetView.rotateRight();
+      else if (_params.rotationMethod > 0) _targetView.rotateLeft();
         
       // or decide again if not possible
       couldntRotate = (curOrientation == _attachedGame->getFallingCompanionDir());
@@ -936,9 +936,9 @@ void AIPlayer::cycle()
 
     // if need to move but impossible, decide again
       if (couldntMove) {
-          decisionMade = 0;
+          _decisionMade = 0;
           //fprintf(stderr, "ReThink because couldn't move\n");;
       }
   }
-  lastLineSeen = currentLine;
+  _lastLineSeen = currentLine;
 }

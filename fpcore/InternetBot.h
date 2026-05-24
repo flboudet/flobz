@@ -16,9 +16,9 @@ class InternetBot : public IdleComponent
     void idle(double currentTime);
 
   private:
-    int m_level;
-    std::unique_ptr<InternetGameCenter> gameCenter;
-    std::unique_ptr<PIBNGCListener> gameCenterListener;
+    int _level;
+    std::unique_ptr<InternetGameCenter> _gameCenter;
+    std::unique_ptr<PIBNGCListener> _gameCenterListener;
 };
 
 #endif

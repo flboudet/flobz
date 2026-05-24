@@ -30,63 +30,63 @@
 using namespace event_manager;
 
 LevelThemeSelectionBox::LevelThemeSelectionBox(int nbPlayers)
-    : m_nbPlayers(nbPlayers),
-      themePreview(), Spacer0(), Spacer1(), Spacer2(), Spacer3()
+    : _nbPlayers(nbPlayers),
+      _themePreview(), _Spacer0(), _Spacer1(), _Spacer2(), _Spacer3()
 {
-    prevButton = new Image(theCommander->getLeftArrow());
-    nextButton = new Image(theCommander->getRightArrow());
+    _prevButton = new Image(theCommander->getLeftArrow());
+    _nextButton = new Image(theCommander->getRightArrow());
 
-    Spacer0.setPreferedSize(Vec3(15.0f, 0.0f));
-    Spacer1.setPreferedSize(Vec3(0.0f, 0.0f));
-    Spacer2.setPreferedSize(Vec3(0.0f, 0.0f));
-    Spacer3.setPreferedSize(Vec3(15.0f, 0.0f));
+    _Spacer0.setPreferedSize(Vec3(15.0f, 0.0f));
+    _Spacer1.setPreferedSize(Vec3(0.0f, 0.0f));
+    _Spacer2.setPreferedSize(Vec3(0.0f, 0.0f));
+    _Spacer3.setPreferedSize(Vec3(15.0f, 0.0f));
 
     setPolicy(USE_MAX_SIZE_NO_MARGIN);
 }
 
 LevelThemeSelectionBox::~LevelThemeSelectionBox()
 {
-    delete prevButton;
-    delete nextButton;
+    delete _prevButton;
+    delete _nextButton;
 }
 
 void LevelThemeSelectionBox::build()
 {
-    themePreview.build();
-    std::vector<std::string> themes = theCommander->getLevelThemeList(m_nbPlayers);
-    std::string pref = theCommander->getPreferedLevelThemeName(m_nbPlayers);
+    _themePreview.build();
+    std::vector<std::string> themes = theCommander->getLevelThemeList(_nbPlayers);
+    std::string pref = theCommander->getPreferedLevelThemeName(_nbPlayers);
     int size = themes.size();
     bool found = false;
     for (std::vector<std::string>::const_iterator iter
              = themes.begin() ; iter != themes.end() ; iter++) {
         if (pref == *iter)
         {
-            themePreview.setSelectedTheme(pref);
+            _themePreview.setSelectedTheme(pref);
             found = true;
         }
     }
 
-    add(&Spacer0);
+    add(&_Spacer0);
 
-    prevButton->setFocusable(size > 1);
-    prevButton->setOnAction(this);
-    prevButton->setInvertedFocus(true);
-    add(prevButton);
+    _prevButton->setFocusable(size > 1);
+    _prevButton->setOnAction(this);
+    _prevButton->setInvertedFocus(true);
+    add(_prevButton);
 
-    add(&Spacer1);
+    add(&_Spacer1);
     if (found == false && size > 0)
     {
-        themePreview.setSelectedTheme(themes[0]);
+        _themePreview.setSelectedTheme(themes[0]);
     }
-    add(&themePreview);
-    add(&Spacer2);
+    add(&_themePreview);
+    add(&_Spacer2);
 
-    nextButton->setFocusable(size > 1);
-    nextButton->setOnAction(this);
-    nextButton->setInvertedFocus(true);
-    add(nextButton);
+    _nextButton->setFocusable(size > 1);
+    _nextButton->setOnAction(this);
+    _nextButton->setInvertedFocus(true);
+    add(_nextButton);
 
-    add(&Spacer3);
+    add(&_Spacer3);
 }
 
 void LevelThemeSelectionBox::action(Widget *sender, int actionType, GameControlEvent *event)
@@ -105,14 +105,14 @@ void LevelThemeSelectionBox::action(Widget *sender, int actionType, GameControlE
             break;
         }
     }
-    if (sender == prevButton) {
+    if (sender == _prevButton) {
         (currentTheme <= 0) ? currentTheme = size - 1 : currentTheme--;
-        themePreview.setSelectedTheme(themes[currentTheme]);
+        _themePreview.setSelectedTheme(themes[currentTheme]);
         theCommander->setPreferedLevelThemeName(themes[currentTheme].c_str());
     }
-    else if (sender == nextButton) {
+    else if (sender == _nextButton) {
         currentTheme = (currentTheme+1)%size;
-        themePreview.setSelectedTheme(themes[currentTheme]);
+        _themePreview.setSelectedTheme(themes[currentTheme]);
         theCommander->setPreferedLevelThemeName(themes[currentTheme].c_str());
     }
 }
@@ -124,10 +124,10 @@ void LevelThemeSelectionBox::action(Widget *sender, int actionType, GameControlE
 
 LevelThemePicturePreview::LevelThemePicturePreview()
 {
-      offsetX = offsetY = 0.;
-      shouldRecache = true;
-      shouldResize = true;
-      curTheme = NULL;
+      _offsetX = _offsetY = 0.;
+      _shouldRecache = true;
+      _shouldResize = true;
+      _curTheme = NULL;
       setPreferedSize(Vec3(ONELEVELX, ONELEVELY, 1.0));
 }
 
@@ -138,64 +138,64 @@ LevelThemePicturePreview::~LevelThemePicturePreview()
 void LevelThemePicturePreview::draw(DrawTarget *dt)
 {
 	updatePicture(dt);
-    if (lilback.get() != NULL)
+    if (_lilback.get() != NULL)
     {
       IosRect r;
       Vec3 size = getSize();
       Vec3 pos = getPosition();
-      r.x = (int16_t)(pos.x+offsetX);
-      r.y = (int16_t)(pos.y+offsetY);
+      r.x = (int16_t)(pos.x+_offsetX);
+      r.y = (int16_t)(pos.y+_offsetY);
       r.w = (int16_t)(size.x);
       r.h = (int16_t)(size.y);
-      dt->draw(lilback.get(), NULL, &r);
+      dt->draw(_lilback.get(), NULL, &r);
     }
 }
 
 void LevelThemePicturePreview::updatePicture(DrawTarget *dt)
 {
-    if ((curTheme != NULL) && (shouldRecache == true)) {
+    if ((_curTheme != NULL) && (_shouldRecache == true)) {
         ImageLibrary &iimLib = GameUIDefaults::GAME_LOOP->getDrawContext()->getImageLibrary();
-        IosSurface *background = curTheme->getBackground();
-        picture.reset(iimLib.createImage(IMAGE_RGB, background->w, background->h));
+        IosSurface *background = _curTheme->getBackground();
+        _picture.reset(iimLib.createImage(IMAGE_RGB, background->w, background->h));
         // Draw background
-        picture->draw(background, NULL, NULL);
+        _picture->draw(background, NULL, NULL);
         // Draw Grids
         IosRect r;
-        IosSurface *grid = curTheme->getGrid();
+        IosSurface *grid = _curTheme->getGrid();
         if (grid != NULL) {
             r.x = 21;
             r.y = -1;
             r.w = grid->w;
             r.h = grid->h;
-            picture->draw(grid, NULL, &r);
+            _picture->draw(grid, NULL, &r);
             r.x = 407;
             r.y = -1;
-            picture->draw(grid, NULL, &r);
+            _picture->draw(grid, NULL, &r);
         }
         // Speed meter
-        IosSurface *speedFront = curTheme->getSpeedMeter(true);
-        IosSurface *speedBack  = curTheme->getSpeedMeter(false);
-        r.x = curTheme->getSpeedMeterX() - speedBack->w / 2;
-        r.y = curTheme->getSpeedMeterY() - speedBack->h;
+        IosSurface *speedFront = _curTheme->getSpeedMeter(true);
+        IosSurface *speedBack  = _curTheme->getSpeedMeter(false);
+        r.x = _curTheme->getSpeedMeterX() - speedBack->w / 2;
+        r.y = _curTheme->getSpeedMeterY() - speedBack->h;
         r.w = speedBack->w;
         r.h = speedBack->h;
         IosRect r2;
-        picture->draw(speedBack, NULL, &r);
+        _picture->draw(speedBack, NULL, &r);
         r2.x = 0;
         r2.y = speedFront->h/2;
         r2.w = speedFront->w;
         r2.h = speedFront->h/2;
         r.y += speedFront->h/2;
-        picture->draw(speedFront, &r2, &r);
+        _picture->draw(speedFront, &r2, &r);
         // Set status indicators
-        shouldRecache = false;
-        shouldResize = true;
+        _shouldRecache = false;
+        _shouldResize = true;
     }
-    if ((shouldResize) && (picture.get() != NULL)) {
+    if ((_shouldResize) && (_picture.get() != NULL)) {
         // Scale down
         Vec3 s=getSize();
-        lilback.reset(picture->resizeAlpha((int)s.x,(int)s.y));
-        shouldResize = false;
+        _lilback.reset(_picture->resizeAlpha((int)s.x,(int)s.y));
+        _shouldResize = false;
     }
 }
 
@@ -203,8 +203,8 @@ void LevelThemePicturePreview::themeSelected(LevelTheme * theme)
 {
     if (theme != NULL)
     {
-      curTheme = theme;
-      shouldRecache = true;
+      _curTheme = theme;
+      _shouldRecache = true;
     }
 }
 
@@ -214,16 +214,16 @@ void LevelThemePicturePreview::setSize(const Vec3 &v3)
 	if ((s.x/s.y) < (ONELEVELX/ONELEVELY))
 	{
 		s.y=s.x*ONELEVELY/ONELEVELX;
-		offsetX=0.0; offsetY=(v3.y-s.y)/2.0;
+		_offsetX=0.0; _offsetY=(v3.y-s.y)/2.0;
 	}
 	else
 	{
 		s.x=s.y*ONELEVELX/ONELEVELY;
-		offsetY=0.0; offsetX=(v3.x-s.x)/2.0;
+		_offsetY=0.0; _offsetX=(v3.x-s.x)/2.0;
 	}
 	if ((getSize().x != s.x) || (getSize().y != s.y))
 	{
-    	shouldResize = true;
+    	_shouldResize = true;
 		Widget::setSize(s);
 	}
 }
@@ -236,13 +236,13 @@ void LevelThemePicturePreview::idle(double currentTime) { }
 LevelThemePreview::LevelThemePreview() {}
 
 void LevelThemePreview::build() {
-    name.setFont(GameUIDefaults::FONT_TEXT);
+    _name.setFont(GameUIDefaults::FONT_TEXT);
     //author.setFont(GameUIDefaults::FONT_SMALL_INFO);
-    description.setFont(GameUIDefaults::FONT_SMALL_INFO);
-    add(&name);
+    _description.setFont(GameUIDefaults::FONT_SMALL_INFO);
+    add(&_name);
     //add(&author);
-    add(&picture);
-    add(&description);
+    add(&_picture);
+    add(&_description);
 }
 
 LevelThemePreview::~LevelThemePreview() {}
@@ -252,38 +252,38 @@ void LevelThemePreview::setSelectedTheme(std::string themeName)
 #define _ComputeVZoneSize(A,B) Vec3(A.x>B.x?A.x:B.x,A.y+B.y+GameUIDefaults::SPACING,1.0)
     LevelTheme * curTheme = theCommander->getLevelTheme(themeName.c_str());
     if (curTheme->getAuthor() == "iOS-Software")
-        name.setValue(curTheme->getLocalizedName().c_str());
+        _name.setValue(curTheme->getLocalizedName().c_str());
     else
-        name.setValue((themeName+" ("+curTheme->getAuthor()+")").c_str());
+        _name.setValue((themeName+" ("+curTheme->getAuthor()+")").c_str());
     //author.setValue(curTheme->getAuthor());
-    description.setValue(curTheme->getComments().c_str());
-    Vec3 one=_ComputeVZoneSize(name.getPreferedSize(),description.getPreferedSize());
-    setPreferedSize(_ComputeVZoneSize(one,picture.getPreferedSize()));
+    _description.setValue(curTheme->getComments().c_str());
+    Vec3 one=_ComputeVZoneSize(_name.getPreferedSize(),_description.getPreferedSize());
+    setPreferedSize(_ComputeVZoneSize(one,_picture.getPreferedSize()));
     if (parent)
       parent->arrangeWidgets();
-    picture.themeSelected(curTheme);
+    _picture.themeSelected(curTheme);
 }
 
 /*****************************************************************************/
 
 LevelThemeMenu::LevelThemeMenu(MainScreen *mainScreen, int nbPlayers)
     : MainScreenMenu(mainScreen),
-      screenTitleFrame(theCommander->getSeparatorFramePicture()),
-      themeMenuTitle(theCommander->getLocalizedString("Level theme")), popAction(mainScreen),
-      backButton(theCommander->getLocalizedString("Back"), &popAction),
-      themeList(nbPlayers)
+      _screenTitleFrame(theCommander->getSeparatorFramePicture()),
+      _themeMenuTitle(theCommander->getLocalizedString("Level theme")), _popAction(mainScreen),
+      _backButton(theCommander->getLocalizedString("Back"), &_popAction),
+      _themeList(nbPlayers)
 {
 }
 
 void LevelThemeMenu::build() {
     setPolicy(USE_MIN_SIZE);
-    screenTitleFrame.setPreferedSize(Vec3(0, 20));
-    screenTitleFrame.add(&themeMenuTitle);
-    add(&screenTitleFrame);
-    buttonsBox.add(&themeList);
-    buttonsBox.add(&backButton);
-    add(&buttonsBox);
-    themeList.build();
+    _screenTitleFrame.setPreferedSize(Vec3(0, 20));
+    _screenTitleFrame.add(&_themeMenuTitle);
+    add(&_screenTitleFrame);
+    _buttonsBox.add(&_themeList);
+    _buttonsBox.add(&_backButton);
+    add(&_buttonsBox);
+    _themeList.build();
 }
 
 

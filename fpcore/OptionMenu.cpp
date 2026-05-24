@@ -48,43 +48,43 @@ FSPrefSwitch::FSPrefSwitch()
 }
 
 OptionMenu::OptionMenu(MainScreen *mainScreen) : MainScreenMenu(mainScreen),
-    screenTitleFrame(theCommander->getSeparatorFramePicture()),
-    optionTitle(theCommander->getLocalizedString("Options")),
-    audioButton(),
-    musicButton(),
-    fullScreenButton(),
-    controlMenu(mainScreen), themeMenu(mainScreen),
-    m_soloLevelMenu(mainScreen, 1), m_duoLevelMenu(mainScreen, 2),
-    changeThemeAction(&themeMenu, mainScreen),
-    m_changeSoloLevelAction(&m_soloLevelMenu, mainScreen),
-    m_changeDuoLevelAction(&m_duoLevelMenu, mainScreen),
-    changeControlsAction(&controlMenu, mainScreen, true),
-    changeFloboThemeButton(theCommander->getLocalizedString(kChangeFloboTheme), &changeThemeAction),
-    changeSoloLevelThemeButton(theCommander->getLocalizedString(kChangeLevelTheme), &m_changeSoloLevelAction),
-    changeDuoLevelThemeButton(theCommander->getLocalizedString(kChangeLevelTheme), &m_changeDuoLevelAction),
-    changeControlsButton(theCommander->getLocalizedString(kControls), &changeControlsAction), backAction(mainScreen), backButton(theCommander->getLocalizedString("Back"), &backAction)
+    _screenTitleFrame(theCommander->getSeparatorFramePicture()),
+    _optionTitle(theCommander->getLocalizedString("Options")),
+    _audioButton(),
+    _musicButton(),
+    _fullScreenButton(),
+    _controlMenu(mainScreen), _themeMenu(mainScreen),
+    _soloLevelMenu(mainScreen, 1), _duoLevelMenu(mainScreen, 2),
+    _changeThemeAction(&_themeMenu, mainScreen),
+    _changeSoloLevelAction(&_soloLevelMenu, mainScreen),
+    _changeDuoLevelAction(&_duoLevelMenu, mainScreen),
+    _changeControlsAction(&_controlMenu, mainScreen, true),
+    _changeFloboThemeButton(theCommander->getLocalizedString(kChangeFloboTheme), &_changeThemeAction),
+    _changeSoloLevelThemeButton(theCommander->getLocalizedString(kChangeLevelTheme), &_changeSoloLevelAction),
+    _changeDuoLevelThemeButton(theCommander->getLocalizedString(kChangeLevelTheme), &_changeDuoLevelAction),
+    _changeControlsButton(theCommander->getLocalizedString(kControls), &_changeControlsAction), _backAction(mainScreen), _backButton(theCommander->getLocalizedString("Back"), &_backAction)
 {
 }
 
 void OptionMenu::build() {
-    controlMenu.build();
-    themeMenu.build();
-    m_soloLevelMenu.build();
-    m_duoLevelMenu.build();
+    _controlMenu.build();
+    _themeMenu.build();
+    _soloLevelMenu.build();
+    _duoLevelMenu.build();
     setPolicy(USE_MIN_SIZE);
-    screenTitleFrame.setPreferedSize(Vec3(0, 20));
-    screenTitleFrame.add(&optionTitle);
-    add(&screenTitleFrame);
-    buttonsBox.add(&audioButton);
-    buttonsBox.add(&musicButton);
-    buttonsBox.add(&fullScreenButton);
+    _screenTitleFrame.setPreferedSize(Vec3(0, 20));
+    _screenTitleFrame.add(&_optionTitle);
+    add(&_screenTitleFrame);
+    _buttonsBox.add(&_audioButton);
+    _buttonsBox.add(&_musicButton);
+    _buttonsBox.add(&_fullScreenButton);
     if (theCommander->getFloboSetThemeList().size() > 1)
-        buttonsBox.add(&changeFloboThemeButton);
+        _buttonsBox.add(&_changeFloboThemeButton);
     if (theCommander->getLevelThemeList(1).size() > 1)
-        buttonsBox.add(&changeSoloLevelThemeButton);
+        _buttonsBox.add(&_changeSoloLevelThemeButton);
     if (theCommander->getLevelThemeList(2).size() > 1)
-        buttonsBox.add(&changeDuoLevelThemeButton);
-    buttonsBox.add(&changeControlsButton);
-    buttonsBox.add(&backButton);
-    add(&buttonsBox);
+        _buttonsBox.add(&_changeDuoLevelThemeButton);
+    _buttonsBox.add(&_changeControlsButton);
+    _buttonsBox.add(&_backButton);
+    add(&_buttonsBox);
 }

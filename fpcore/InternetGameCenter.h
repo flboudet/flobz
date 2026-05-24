@@ -43,9 +43,9 @@ public:
     bool isConnected() const;
     bool isAccepted() const;
     bool isDenied() const;
-    std::string getDenyString() const { return m_denyString; }
-    std::string getDenyStringMore() const { return m_denyStringMore; }
-    virtual FPServerIGPMessageBox *getIgpBox() { return m_igpmbox.get(); }
+    std::string getDenyString() const { return _denyString; }
+    std::string getDenyStringMore() const { return _denyStringMore; }
+    virtual FPServerIGPMessageBox *getIgpBox() { return _igpmbox.get(); }
     // Temporaire
     void punch();
 protected:
@@ -56,21 +56,21 @@ private:
     void sendAliveMessage();
     
     static const int fpipVersion;
-    std::string hostName;
-    int portNum;
-    std::unique_ptr<DatagramSocket>          m_udpSocket;
-    std::unique_ptr<FPServerMessageBox>      m_udpmbox;
-    std::unique_ptr<FPServerIGPMessageBox>   m_igpmbox;
-    std::unique_ptr<DatagramSocket>          m_p2pSocket;
-    std::unique_ptr<FPInternetP2PMessageBox> m_p2pmbox;
-    std::unique_ptr<NatTraversal>            m_p2pNatTraversal;
-    std::string p2pPunchName;
-    bool tryNatTraversal;
-    std::string name;
-    std::string password;
-    int status;
-    double timeMsBetweenTwoAliveMessages, lastAliveMessage;
-    FloboGameInvitation grantedInvitation;
+    std::string _hostName;
+    int _portNum;
+    std::unique_ptr<DatagramSocket>          _udpSocket;
+    std::unique_ptr<FPServerMessageBox>      _udpmbox;
+    std::unique_ptr<FPServerIGPMessageBox>   _igpmbox;
+    std::unique_ptr<DatagramSocket>          _p2pSocket;
+    std::unique_ptr<FPInternetP2PMessageBox> _p2pmbox;
+    std::unique_ptr<NatTraversal>            _p2pNatTraversal;
+    std::string _p2pPunchName;
+    bool _tryNatTraversal;
+    std::string _name;
+    std::string _password;
+    int _status;
+    double _timeMsBetweenTwoAliveMessages, _lastAliveMessage;
+    FloboGameInvitation _grantedInvitation;
     enum GameStatus {
         GAMESTATUS_IDLE,
         GAMESTATUS_STARTTRAVERSAL,
@@ -78,11 +78,11 @@ private:
         GAMESTATUS_GRANTED_P2P,
         GAMESTATUS_GRANTED_IGP
     };
-    GameStatus gameGrantedStatus;
-    std::string opponentName;
-    bool m_isAccepted, m_isDenied;
-    std::string m_denyString;
-    std::string m_denyStringMore;
+    GameStatus _gameGrantedStatus;
+    std::string _opponentName;
+    bool _isAccepted, _isDenied;
+    std::string _denyString;
+    std::string _denyStringMore;
 };
 
 #endif // _PUYOINTERNETGAMECENTER_H

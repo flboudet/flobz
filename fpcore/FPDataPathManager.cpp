@@ -35,33 +35,33 @@ using namespace std;
 
 FPDataInputStream::FPDataInputStream(const std::string &fname)
 {
-    m_f = fopen(fname.c_str(), "r");
+    _f = fopen(fname.c_str(), "r");
 }
 
 FPDataInputStream::~FPDataInputStream()
 {
-    fclose(m_f);
+    fclose(_f);
 }
 
 int FPDataInputStream::streamRead(void *buffer, int size)
 {
-    return fread(buffer, 1, size, m_f);
+    return fread(buffer, 1, size, _f);
 }
 
 
 FPDataPackage::FPDataPackage(FPDataPathManager *owner,
                              const std::string &packagePath,
                              int packageNumber)
-    : m_owner(owner), m_packageNumber(packageNumber)
+    : _owner(owner), _packageNumber(packageNumber)
 {
     std::stringstream sstream;
     sstream << packagePath;
-    m_name = sstream.str();
+    _name = sstream.str();
 }
 
 std::string FPDataPackage::getPath(const std::string &shortPath) const
 {
-    std::string ret = (m_owner->getPathInPack(shortPath, m_packageNumber));
+    std::string ret = (_owner->getPathInPack(shortPath, _packageNumber));
     if (ret != "")
         return ret;
     else
@@ -70,13 +70,13 @@ std::string FPDataPackage::getPath(const std::string &shortPath) const
 
 bool FPDataPackage::hasFile(const std::string &shortPath) const
 {
-    std::string ret(m_owner->getPathInPack(shortPath, m_packageNumber));
+    std::string ret(_owner->getPathInPack(shortPath, _packageNumber));
     return (ret != "");
 }
 
 std::string FPDataPackage::getName() const
 {
-    return m_name;
+    return _name;
 }
 
 DataInputStream *FPDataPackage::openDataInputStream(const std::string &shortPath) const
@@ -86,9 +86,9 @@ DataInputStream *FPDataPackage::openDataInputStream(const std::string &shortPath
 }
 
 FPDataPathManager::FPDataPathManager(const std::string &coreDataPath)
-    : m_coreDataPath(coreDataPath)
+    : _coreDataPath(coreDataPath)
 {
-    std::vector<std::string> dataFiles = m_coreDataPath.listFiles();
+    std::vector<std::string> dataFiles = _coreDataPath.listFiles();
     std::vector<std::string> wellFormattedNames;
     AdvancedBuffer<int> wellFormattedNumbers;
     for (auto const &currentFile : dataFiles) {
@@ -112,7 +112,7 @@ FPDataPathManager::FPDataPathManager(const std::string &coreDataPath)
             }
         }
         if (biggestFileIndex != -1) {
-            m_dataPaths.emplace_back(new FilePath(m_coreDataPath.combine(wellFormattedNames[biggestFileIndex])));
+            _dataPaths.emplace_back(new FilePath(_coreDataPath.combine(wellFormattedNames[biggestFileIndex])));
             wellFormattedNumbers.removeAt(biggestFileIndex);
             wellFormattedNames.erase(wellFormattedNames.begin() + biggestFileIndex);
         }
@@ -123,7 +123,7 @@ void FPDataPathManager::registerDataPackages(CompositeDrawContext *cDC, Jukebox 
 {
     // Now iterate through the datapaths to build PackageDescription
     int packageIndex = 0;
-    for (auto const &path : m_dataPaths) {
+    for (auto const &path : _dataPaths) {
         FPDataPackage currentPackage(this, path->getPathString(), packageIndex++);
         PackageDescription packDesc(*this, currentPackage, cDC, jukebox);
     }
@@ -131,7 +131,7 @@ void FPDataPathManager::registerDataPackages(CompositeDrawContext *cDC, Jukebox 
 
 bool FPDataPathManager::hasFile(const std::string & shortPath) const
 {
-    for (auto const &path : m_dataPaths) {
+    for (auto const &path : _dataPaths) {
         FilePath testPath(path->combine(shortPath));
         if (testPath.exists())
             return true;
@@ -141,7 +141,7 @@ bool FPDataPathManager::hasFile(const std::string & shortPath) const
 
 std::string FPDataPathManager::getPath(const std::string &shortPath) const
 {
-    for (auto const &path : m_dataPaths) {
+    for (auto const &path : _dataPaths) {
         FilePath testPath(path->combine(shortPath));
         if (testPath.exists())
             return testPath.getPathString();
@@ -151,7 +151,7 @@ std::string FPDataPathManager::getPath(const std::string &shortPath) const
 
 std::string FPDataPathManager::getPathInPack(const std::string & shortPath, int packPathIndex) const
 {
-    FilePath testPath(m_dataPaths[packPathIndex]->combine(shortPath));
+    FilePath testPath(_dataPaths[packPathIndex]->combine(shortPath));
     if (testPath.exists())
         return testPath.getPathString();
     else
@@ -164,7 +164,7 @@ std::vector<std::string> FPDataPathManager::getEntriesAtPath(const std::string &
     std::vector<std::string> result;
     if (hasFile(shortPath)) {
         FilePath rshortPath(shortPath);
-        for (auto const &path : m_dataPaths) {
+        for (auto const &path : _dataPaths) {
             FilePath testPath(path->combine(shortPath));
             if (testPath.exists()) {
                 std::vector<std::string> existingFilesInPack = testPath.listFiles();
@@ -179,11 +179,11 @@ std::vector<std::string> FPDataPathManager::getEntriesAtPath(const std::string &
 
 void FPDataPathManager::setMaxPackNumber(int maxPackNumber)
 {
-    for (auto it = m_dataPaths.begin(); it != m_dataPaths.end(); ) {
+    for (auto it = _dataPaths.begin(); it != _dataPaths.end(); ) {
         const std::string &currentFile = (*it)->getPathString();
         int currentNumber = atoi(currentFile.substr(currentFile.length() - 3).c_str());
         if (currentNumber > maxPackNumber)
-            it = m_dataPaths.erase(it);
+            it = _dataPaths.erase(it);
         else
             ++it;
     }

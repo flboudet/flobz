@@ -39,9 +39,9 @@ public:
     void cycle();
 private:
     bool keyShouldRepeat(int &key);
-    const int downEvent, leftEvent, rightEvent, turnLeftEvent, turnRightEvent;
-    int fpKey_Down, fpKey_Left, fpKey_Right, fpKey_TurnLeft, fpKey_TurnRight;
-    int fpKey_Repeat, fpKey_Delay;
+    const int _downEvent, _leftEvent, _rightEvent, _turnLeftEvent, _turnRightEvent;
+    int _fpKey_Down, _fpKey_Left, _fpKey_Right, _fpKey_TurnLeft, _fpKey_TurnRight;
+    int _fpKey_Repeat, _fpKey_Delay;
 };
 
 /**
@@ -57,8 +57,8 @@ public:
     void eventOccured(event_manager::GameControlEvent *event);
     void cycle();
 private:
-    EventPlayer player1controller;
-    EventPlayer player2controller;
+    EventPlayer _player1controller;
+    EventPlayer _player2controller;
 };
 
 #endif // _FLOBO_EVENT_PLAYER_H

@@ -42,21 +42,21 @@ public:
     LANGameMenu(MainScreen * mainScreen);
     void build();
 private:
-    Frame titleFrame;
-    Text lanTitle;
-    VBox buttonsBox;
-    EditFieldWithLabel playerNameLabel, portNumLabel;
-    PopMainScreenMenuAction cancelAction;
-    Button startButton, cancelButton;
+    Frame _titleFrame;
+    Text _lanTitle;
+    VBox _buttonsBox;
+    EditFieldWithLabel _playerNameLabel, _portNumLabel;
+    PopMainScreenMenuAction _cancelAction;
+    Button _startButton, _cancelButton;
 };
 
 class NetworkInternetAction : public Action {
 public:
-    NetworkInternetAction(MainScreen * mainScreen, InternetGameMenu **menuToCreate) : mainScreen(mainScreen), menuToCreate(menuToCreate) {}
+    NetworkInternetAction(MainScreen * mainScreen, InternetGameMenu **menuToCreate) : _mainScreen(mainScreen), _menuToCreate(menuToCreate) {}
     void action();
 private:
-    MainScreen * mainScreen;
-    InternetGameMenu **menuToCreate;
+    MainScreen * _mainScreen;
+    InternetGameMenu ** _menuToCreate;
 };
 
 class NetworkGameMenu : public MainScreenMenu {
@@ -64,16 +64,16 @@ public:
     NetworkGameMenu(MainScreen * mainScreen);
     void build();
 private:
-    LocalizedDictionary locale;
-    LANGameMenu  lanGameMenu;
-    InternetGameMenu *internetGameMenu;
-    NetworkInternetAction internetAction;
-    PushMainScreenMenuAction lanAction;
-    PopMainScreenMenuAction mainScreenPopAction;
-    Frame titleFrame;
-    Text networkTitleText;
-    VBox buttonsBox;
-    Button lanGameButton, internetGameButton, cancelButton;
+    LocalizedDictionary _locale;
+    LANGameMenu  _lanGameMenu;
+    InternetGameMenu *_internetGameMenu;
+    NetworkInternetAction _internetAction;
+    PushMainScreenMenuAction _lanAction;
+    PopMainScreenMenuAction _mainScreenPopAction;
+    Frame _titleFrame;
+    Text _networkTitleText;
+    VBox _buttonsBox;
+    Button _lanGameButton, _internetGameButton, _cancelButton;
 };
 
 #endif // _PUYONETWORKMENU

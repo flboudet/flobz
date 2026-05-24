@@ -33,18 +33,18 @@ using namespace FPNetMessage;
 
 NetworkGame::~NetworkGame()
 {
-  msgBox->removeListener(this);
+  _msgBox->removeListener(this);
 }
 
 NetworkGame::NetworkGame(FloboFactory *attachedFactory, MessageBox *msgBox, int gameId)
-  : FloboGame(attachedFactory), nextFalling(FLOBO_BLUE), nextCompanion(FLOBO_BLUE),
-    msgBox(msgBox), gameId(gameId), gameRunning(true), comboPhase(0)
+  : FloboGame(attachedFactory), _nextFalling(FLOBO_BLUE), _nextCompanion(FLOBO_BLUE),
+    _msgBox(msgBox), _gameId(gameId), _gameRunning(true), _comboPhase(0)
 {
-    fakeFlobo = attachedFactory->createFlobo(FLOBO_FALLINGRED);
-    msgBox->addListener(this);
-    semiMove = 0;
-    neutralFlobos = 0;
-    sentBadFlobos = 0;
+    _fakeFlobo = attachedFactory->createFlobo(FLOBO_FALLINGRED);
+    _msgBox->addListener(this);
+    _semiMove = 0;
+    _neutralFlobos = 0;
+    _sentBadFlobos = 0;
     for (int i = 0 ; i < FLOBOBAN_DIMX ; i++) {
 		for (int j = 0 ; j <= FLOBOBAN_DIMY ; j++) {
             setFloboAt(i, j, NULL);
@@ -59,7 +59,7 @@ void NetworkGame::onMessage(Message &message)
             return;
         // Check if the message matches the gameid
         int gid = message.getInt(GAMEID);
-        if (gid != gameId)
+        if (gid != _gameId)
             return;
         int msgType = message.getInt(TYPE);
         switch (msgType) {
@@ -86,7 +86,7 @@ void NetworkGame::onMessage(Message &message)
                 _gameStat.time_left = message.getFloat(TIME_LEFT);
                 _gameStat.is_dead = message.getBool(IS_DEAD);
                 _gameStat.is_winner = message.getBool(IS_WINNER);
-                gameRunning = false;
+                _gameRunning = false;
                 if (msgType == kGameOverLost)
                     for (GameListenerPtrVector::iterator iter = _listeners.begin() ;
                          iter != _listeners.end() ; ++iter)
@@ -111,8 +111,8 @@ void NetworkGame::synchronizeFlobo(Buffer<int> buffer) {
     if (floboPtr == nullptr) {
         floboPtr = _attachedFactory->createFlobo((FloboState)floboState);
         floboPtr->setID(floboID);
-        m_floboList.push_back(floboPtr);
-        m_floboMap[floboID] = floboPtr;
+        _floboList.push_back(floboPtr);
+        _floboMap[floboID] = floboPtr;
     }
     else {
         floboPtr->setFloboState((FloboState)floboState);
@@ -126,11 +126,11 @@ void NetworkGame::synchronizeState(Message &message)
 {
     _gameStat.points = message.getInt(SCORE);
     GTCheckInterval(_gameStat.points, 0, 999999999, "points is invalid");
-    nextFalling = (FloboState)(message.getInt(NEXT_F));
-    GTCheckInterval(nextFalling, 0, 20, "nextFalling is invalid");
-    nextCompanion = (FloboState)(message.getInt(NEXT_C));
-    GTCheckInterval(nextCompanion, 0, 20, "nextCompanion is invalid");
-    semiMove = message.getInt(SEMI_MOVE);
+    _nextFalling = (FloboState)(message.getInt(NEXT_F));
+    GTCheckInterval(_nextFalling, 0, 20, "nextFalling is invalid");
+    _nextCompanion = (FloboState)(message.getInt(NEXT_C));
+    GTCheckInterval(_nextCompanion, 0, 20, "nextCompanion is invalid");
+    _semiMove = message.getInt(SEMI_MOVE);
 
     if (message.hasIntArray(FLOBOS)) {
         Buffer<int> flobos = message.getIntArray(FLOBOS);
@@ -138,8 +138,8 @@ void NetworkGame::synchronizeState(Message &message)
             synchronizeFlobo(flobos+i);
 
         // Remove the flobos that were not flagged.
-        for (FloboPtrList::iterator iter  = m_floboList.begin() ;
-             iter != m_floboList.end() ; ++iter) {
+        for (FloboPtrList::iterator iter  = _floboList.begin() ;
+             iter != _floboList.end() ; ++iter) {
             std::shared_ptr<Flobo> currentFlobo = *iter;
             Flobo *currentFloboPtr = currentFlobo.get();
             if (currentFloboPtr->getFlag()) {
@@ -148,8 +148,8 @@ void NetworkGame::synchronizeState(Message &message)
             else {
                 setFloboAt(currentFloboPtr->getFloboX(), currentFloboPtr->getFloboY(), NULL);
                 FloboPtrList::iterator removed = iter--;
-                m_floboList.erase(removed);
-                m_floboMap.erase(currentFloboPtr->getID());
+                _floboList.erase(removed);
+                _floboMap.erase(currentFloboPtr->getID());
             }
         }
     }
@@ -266,23 +266,23 @@ void NetworkGame::synchronizeState(Message &message)
         }
     }
     int badFlobos = message.getInt(NUMBER_BAD_FLOBOS);
-    if (badFlobos > sentBadFlobos) {
-        neutralFlobos = sentBadFlobos - badFlobos;
+    if (badFlobos > _sentBadFlobos) {
+        _neutralFlobos = _sentBadFlobos - badFlobos;
         for (GameListenerPtrVector::iterator iter = _listeners.begin() ;
              iter != _listeners.end() ; ++iter) {
             (*iter)->gameDidEndCycle();
         }
-        neutralFlobos = 0;
-        sentBadFlobos = badFlobos;
+        _neutralFlobos = 0;
+        _sentBadFlobos = badFlobos;
     }
 
-    neutralFlobos = message.getInt(CURRENT_NEUTRALS);
+    _neutralFlobos = message.getInt(CURRENT_NEUTRALS);
 }
 
 inline std::shared_ptr<Flobo> NetworkGame::findFlobo(int floboID)
 {
-    std::map<int, std::shared_ptr<Flobo> >::iterator found = m_floboMap.find(floboID);
-    if (found == m_floboMap.end())
+    std::map<int, std::shared_ptr<Flobo> >::iterator found = _floboMap.find(floboID);
+    if (found == _floboMap.end())
         return nullptr;
     return found->second;
 }
@@ -295,12 +295,12 @@ std::shared_ptr<Flobo> NetworkGame::getFloboAt(int X, int Y) const
 {
     if ((X >= FLOBOBAN_DIMX) || (Y >= FLOBOBAN_DIMY) || (X < 0) || (Y < 0))
 		return nullptr;
-    return floboCells[X + Y * FLOBOBAN_DIMX];
+    return _floboCells[X + Y * FLOBOBAN_DIMX];
 }
 
 void NetworkGame::setFloboAt(int X, int Y, std::shared_ptr<Flobo> newFlobo)
 {
-    floboCells[X + Y * FLOBOBAN_DIMX] = newFlobo;
+    _floboCells[X + Y * FLOBOBAN_DIMX] = newFlobo;
     if (newFlobo != nullptr)
         newFlobo->setFloboXY(X, Y);
 }
@@ -308,7 +308,7 @@ void NetworkGame::setFloboAt(int X, int Y, std::shared_ptr<Flobo> newFlobo)
 // List access to the Flobo objects
 int NetworkGame::getFloboCount() const
 {
-    return m_floboMap.size();
+    return _floboMap.size();
 }
 
 #ifdef DISABLED
@@ -321,12 +321,12 @@ std::shared_ptr<Flobo> NetworkGame::getFloboAtIndex(int index) const
 
 FloboState NetworkGame::getNextFalling()
 {
-    return nextFalling;
+    return _nextFalling;
 }
 
 FloboState NetworkGame::getNextCompanion()
 {
-    return nextCompanion;
+    return _nextCompanion;
 }
 
 FloboState NetworkGame::getCompanionState() const
@@ -356,7 +356,7 @@ int NetworkGame::getFallingCompanionDir() const
 
 std::shared_ptr<Flobo> NetworkGame::getFallingFlobo() const
 {
-    return fakeFlobo;
+    return _fakeFlobo;
 }
 
 void NetworkGame::increaseNeutralFlobos(int incr)
@@ -365,7 +365,7 @@ void NetworkGame::increaseNeutralFlobos(int incr)
 
 int NetworkGame::getNeutralFlobos() const
 {
-    return neutralFlobos;
+    return _neutralFlobos;
 }
 
 void NetworkGame::dropNeutrals()
@@ -374,7 +374,7 @@ void NetworkGame::dropNeutrals()
 
 bool NetworkGame::isGameRunning() const
 {
-    return gameRunning;
+    return _gameRunning;
 }
 
 bool NetworkGame::isEndOfCycle() const
@@ -399,6 +399,6 @@ int NetworkGame::getSameFloboAround(int X, int Y, FloboState color)
 
 int NetworkGame::getSemiMove() const
 {
-    return semiMove;
+    return _semiMove;
 }
 

@@ -30,10 +30,10 @@ using namespace event_manager;
 EventPlayer::EventPlayer(GameView &view,
 						     int downEvent, int leftEvent, int rightEvent,
 						     int turnLeftEvent, int turnRightEvent)
-  : GamePlayer(view), downEvent(downEvent), leftEvent(leftEvent), rightEvent(rightEvent),
-    turnLeftEvent(turnLeftEvent), turnRightEvent(turnRightEvent),
-    fpKey_Down(0), fpKey_Left(0), fpKey_Right(0), fpKey_TurnLeft(0), fpKey_TurnRight(0),
-    fpKey_Repeat(7), fpKey_Delay(5)
+  : GamePlayer(view), _downEvent(downEvent), _leftEvent(leftEvent), _rightEvent(rightEvent),
+    _turnLeftEvent(turnLeftEvent), _turnRightEvent(turnRightEvent),
+    _fpKey_Down(0), _fpKey_Left(0), _fpKey_Right(0), _fpKey_TurnLeft(0), _fpKey_TurnRight(0),
+    _fpKey_Repeat(7), _fpKey_Delay(5)
 {
 }
 
@@ -41,41 +41,41 @@ void EventPlayer::eventOccured(GameControlEvent *event)
 {
     int curGameEvent = event->gameEvent;
     if (event->isUp) {
-        if (curGameEvent == downEvent) {
-	    fpKey_Down = 0;
+        if (curGameEvent == _downEvent) {
+	    _fpKey_Down = 0;
 	}
-	else if (curGameEvent == leftEvent) {
-	    fpKey_Left = 0;
+	else if (curGameEvent == _leftEvent) {
+	    _fpKey_Left = 0;
 	}
-	else if (curGameEvent == rightEvent) {
-	    fpKey_Right = 0;
+	else if (curGameEvent == _rightEvent) {
+	    _fpKey_Right = 0;
 	}
-	else if (curGameEvent == turnLeftEvent) {
-	    fpKey_TurnLeft = 0;
+	else if (curGameEvent == _turnLeftEvent) {
+	    _fpKey_TurnLeft = 0;
 	}
-	else if (curGameEvent == turnRightEvent) {
-	    fpKey_TurnRight = 0;
+	else if (curGameEvent == _turnRightEvent) {
+	    _fpKey_TurnRight = 0;
 	}
     }
     else {
-        if (curGameEvent == downEvent) {
-	    fpKey_Down++;
+        if (curGameEvent == _downEvent) {
+	    _fpKey_Down++;
 	}
-	else if (curGameEvent == leftEvent) {
+	else if (curGameEvent == _leftEvent) {
 	    _targetView.moveLeft();
-	    fpKey_Left++;
+	    _fpKey_Left++;
 	}
-	else if (curGameEvent == rightEvent) {
+	else if (curGameEvent == _rightEvent) {
 	    _targetView.moveRight();
-	    fpKey_Right++;
+	    _fpKey_Right++;
 	}
-	else if (curGameEvent == turnLeftEvent) {
+	else if (curGameEvent == _turnLeftEvent) {
 	    _targetView.rotateLeft();
-	    fpKey_TurnLeft++;
+	    _fpKey_TurnLeft++;
 	}
-	else if (curGameEvent == turnRightEvent) {
+	else if (curGameEvent == _turnRightEvent) {
 	    _targetView.rotateRight();
-	    fpKey_TurnRight++;
+	    _fpKey_TurnRight++;
 	}
     }
 }
@@ -83,24 +83,24 @@ void EventPlayer::eventOccured(GameControlEvent *event)
 void EventPlayer::cycle()
 {
     // Key repetition
-    if (fpKey_Down) {
+    if (_fpKey_Down) {
     if (_attachedGame->isEndOfCycle())
-        fpKey_Down = 0;
+        _fpKey_Down = 0;
     else
         _targetView.cycleGame();
     }
-    if (keyShouldRepeat(fpKey_Left))
+    if (keyShouldRepeat(_fpKey_Left))
         _targetView.moveLeft();
-    if (keyShouldRepeat(fpKey_Right))
+    if (keyShouldRepeat(_fpKey_Right))
         _targetView.moveRight();
-    if (keyShouldRepeat(fpKey_TurnLeft)) {
+    if (keyShouldRepeat(_fpKey_TurnLeft)) {
         if (_attachedGame->isEndOfCycle())
-	    fpKey_TurnLeft = 0;
+	    _fpKey_TurnLeft = 0;
 	_targetView.rotateLeft();
     }
-    if (keyShouldRepeat(fpKey_TurnRight)) {
+    if (keyShouldRepeat(_fpKey_TurnRight)) {
         if (_attachedGame->isEndOfCycle())
-	    fpKey_TurnRight = 0;
+	    _fpKey_TurnRight = 0;
 	_targetView.rotateRight();
     }
 }
@@ -109,19 +109,19 @@ bool EventPlayer::keyShouldRepeat(int &key)
 {
     if (key == 0) return false;
     key++;
-    return ((key - fpKey_Delay) > 0) && ((key - fpKey_Delay) % fpKey_Repeat == 0);
+    return ((key - _fpKey_Delay) > 0) && ((key - _fpKey_Delay) % _fpKey_Repeat == 0);
 }
 
 
 CombinedEventPlayer::CombinedEventPlayer(GameView &view)
     : GamePlayer(view),
-      player1controller(view,
+      _player1controller(view,
                         kPlayer1Down,
                         kPlayer1Left,
                         kPlayer1Right,
                         kPlayer1TurnLeft,
                         kPlayer1TurnRight),
-      player2controller(view,
+      _player2controller(view,
                         kPlayer2Down,
                         kPlayer2Left,
                         kPlayer2Right,
@@ -132,13 +132,13 @@ CombinedEventPlayer::CombinedEventPlayer(GameView &view)
 
 void CombinedEventPlayer::eventOccured(GameControlEvent *event)
 {
-    player1controller.eventOccured(event);
-    player2controller.eventOccured(event);
+    _player1controller.eventOccured(event);
+    _player2controller.eventOccured(event);
 }
 
 void CombinedEventPlayer::cycle()
 {
-    player1controller.cycle();
-    player2controller.cycle();
+    _player1controller.cycle();
+    _player2controller.cycle();
 }
 

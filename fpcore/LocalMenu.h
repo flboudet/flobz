@@ -41,15 +41,15 @@ public:
     virtual std::string getPlayerName(int playerNumber) const;
     void build() {}
 private:
-    VBox m_buttonsBox;
-    std::unique_ptr<EditFieldWithLabel> m_editPlayerName;
-    std::unique_ptr<Frame> m_screenTitleFrame;
-    std::unique_ptr<Text> m_screenTitle;
-    std::unique_ptr<Button> m_easy, m_medium, m_hard, m_back;
-    std::unique_ptr<SoloModeStarterAction> m_easyAction;
-    std::unique_ptr<SoloModeStarterAction> m_mediumAction;
-    std::unique_ptr<SoloModeStarterAction> m_hardAction;
-    std::unique_ptr<PopMainScreenMenuAction> m_popAction;
+    VBox _buttonsBox;
+    std::unique_ptr<EditFieldWithLabel> _editPlayerName;
+    std::unique_ptr<Frame> _screenTitleFrame;
+    std::unique_ptr<Text> _screenTitle;
+    std::unique_ptr<Button> _easy, _medium, _hard, _back;
+    std::unique_ptr<SoloModeStarterAction> _easyAction;
+    std::unique_ptr<SoloModeStarterAction> _mediumAction;
+    std::unique_ptr<SoloModeStarterAction> _hardAction;
+    std::unique_ptr<PopMainScreenMenuAction> _popAction;
 };
 
 class LocalGameMenu : public MainScreenMenu, public PlayerNameProvider {
@@ -59,16 +59,16 @@ public:
     // PlayerNameProvider implementation
     virtual std::string getPlayerName(int playerNumber) const;
 private:
-    VBox buttonsBox;
-    LocalizedDictionary locale;
-    EditFieldWithLabel editPlayerName;
-    Frame screenTitleFrame;
-    Text screenTitle;
-    StoryModeStarterAction easyAction;
-    StoryModeStarterAction mediumAction;
-    StoryModeStarterAction hardAction;
-    PopMainScreenMenuAction popAction;
-    Button easy, medium, hard, back;
+    VBox _buttonsBox;
+    LocalizedDictionary _locale;
+    EditFieldWithLabel _editPlayerName;
+    Frame _screenTitleFrame;
+    Text _screenTitle;
+    StoryModeStarterAction _easyAction;
+    StoryModeStarterAction _mediumAction;
+    StoryModeStarterAction _hardAction;
+    PopMainScreenMenuAction _popAction;
+    Button _easy, _medium, _hard, _back;
 };
 
 class Local2PlayersGameMenu : public MainScreenMenu, public PlayerNameProvider {
@@ -77,17 +77,17 @@ public:
     void build();
     std::string getPlayerName(int playerNumber) const;
 private:
-    VBox buttonsBox;
-    LocalizedDictionary locale;
-    LocalTwoPlayersGameWidgetFactory gameWidgetFactory;
-    EditFieldWithLabel editPlayer1Name, editPlayer2Name;
-    Frame screenTitleFrame;
-    Text screenTitle;
-    AltTwoPlayersStarterAction easyAction;
-    AltTwoPlayersStarterAction mediumAction;
-    AltTwoPlayersStarterAction hardAction;
-    PopMainScreenMenuAction popAction;
-    Button easy, medium, hard, back;
+    VBox _buttonsBox;
+    LocalizedDictionary _locale;
+    LocalTwoPlayersGameWidgetFactory _gameWidgetFactory;
+    EditFieldWithLabel _editPlayer1Name, _editPlayer2Name;
+    Frame _screenTitleFrame;
+    Text _screenTitle;
+    AltTwoPlayersStarterAction _easyAction;
+    AltTwoPlayersStarterAction _mediumAction;
+    AltTwoPlayersStarterAction _hardAction;
+    PopMainScreenMenuAction _popAction;
+    Button _easy, _medium, _hard, _back;
 };
 
 #endif // _PUYOLOCALMENU

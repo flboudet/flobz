@@ -29,8 +29,8 @@
 using namespace event_manager;
 
 VuMeter::VuMeter(Vec3 position, IosSurface *front, IosSurface *back)
-    : m_position(position), m_front(front), m_back(back),
-      m_targetValue(0.), m_value(0.)
+    : _position(position), _front(front), _back(back),
+      _targetValue(0.), _value(0.)
 {
 }
 
@@ -38,51 +38,51 @@ void VuMeter::draw(DrawTarget *dt)
 {
     IosRect meterRect, drect;
     meterRect.x = 0;
-    meterRect.w = m_front->w;
-    meterRect.h = m_front->h * m_value;
-    meterRect.y = m_front->h - meterRect.h;
-    drect.x = m_position.x - meterRect.w / 2;
-    drect.y = m_position.y - meterRect.h;
+    meterRect.w = _front->w;
+    meterRect.h = _front->h * _value;
+    meterRect.y = _front->h - meterRect.h;
+    drect.x = _position.x - meterRect.w / 2;
+    drect.y = _position.y - meterRect.h;
     drect.w = meterRect.w;
     drect.h = meterRect.h;
     IosRect meterBlackRect = meterRect;
     IosRect drectBlack     = drect;
-    meterBlackRect.h = m_front->h - meterRect.h;
+    meterBlackRect.h = _front->h - meterRect.h;
     meterBlackRect.y = 0;
-    drectBlack.y = m_position.y - m_front->h;
+    drectBlack.y = _position.y - _front->h;
     drectBlack.h = meterBlackRect.h;
-    dt->draw(m_back,&meterBlackRect,&drectBlack);
-    dt->draw(m_front,&meterRect, &drect);
+    dt->draw(_back,&meterBlackRect,&drectBlack);
+    dt->draw(_front,&meterRect, &drect);
 }
 
 void VuMeter::step()
 {
-    m_value += (m_targetValue - m_value)/10.;
+    _value += (_targetValue - _value)/10.;
 }
 
 #define TIME_BETWEEN_GAME_CYCLES 0.02
 
 SoloGameWidget::SoloGameWidget(SoloGameSettings &gameSettings, FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, Action *_gameOverAction)
     : CycledComponent(TIME_BETWEEN_GAME_CYCLES),
-      m_cyclesDuration(gameSettings.cyclesDuration),
-      m_levelIncrease(gameSettings.levelIncrease),
-      m_handicapIncrease(gameSettings.handicapIncrease),
-      m_handicapDecreaseOnPhase1(gameSettings.handicapDecreaseOnPhase1),
-      m_handicapDecreaseAbovePhase1(gameSettings.handicapDecreaseAbovePhase1),
-      attachedFloboThemeSet(floboSetTheme), attachedRandom(5),
-      m_cyclesBeforeGameCycle(0), m_cyclesBeforeLevelRaise(1000.),
-      m_comboHandicap(0.), m_comboHandicap75(false), m_comboHandicap85(false), m_comboHandicap100(false)
+      _cyclesDuration(gameSettings.cyclesDuration),
+      _levelIncrease(gameSettings.levelIncrease),
+      _handicapIncrease(gameSettings.handicapIncrease),
+      _handicapDecreaseOnPhase1(gameSettings.handicapDecreaseOnPhase1),
+      _handicapDecreaseAbovePhase1(gameSettings.handicapDecreaseAbovePhase1),
+      _attachedFloboThemeSet(floboSetTheme), _attachedRandom(5),
+      _cyclesBeforeGameCycle(0), _cyclesBeforeLevelRaise(1000.),
+      _comboHandicap(0.), _comboHandicap75(false), _comboHandicap85(false), _comboHandicap100(false)
 {
-    m_gameFactory.reset(new LocalGameFactory(&attachedRandom));
-    m_areaA.reset(new GameView(m_gameFactory.get(), 0, &floboSetTheme, &levelTheme));
-    m_playerController.reset(new CombinedEventPlayer(*m_areaA));
-    //initWithGUI(*m_areaA, NULL, *m_playerController, NULL, levelTheme, _gameOverAction);
+    _gameFactory.reset(new LocalGameFactory(&_attachedRandom));
+    _areaA.reset(new GameView(_gameFactory.get(), 0, &floboSetTheme, &levelTheme));
+    _playerController.reset(new CombinedEventPlayer(*_areaA));
+    //initWithGUI(*_areaA, NULL, *_playerController, NULL, levelTheme, _gameOverAction);
     //setLives(-1);
     setReceiveUpEvents(true);
     setFocusable(true);
-    m_areaA->getAttachedGame()->addGameListener(this);
+    _areaA->getAttachedGame()->addGameListener(this);
     setLevelTheme(&levelTheme);
-    m_comboMeter.reset(new VuMeter(Vec3(levelTheme.getSpeedMeterX(),
+    _comboMeter.reset(new VuMeter(Vec3(levelTheme.getSpeedMeterX(),
                                         levelTheme.getSpeedMeterY()),
                                    levelTheme.getSpeedMeter(true),
                                    levelTheme.getSpeedMeter(false)));
@@ -90,99 +90,99 @@ SoloGameWidget::SoloGameWidget(SoloGameSettings &gameSettings, FloboSetTheme &fl
     // TODO: move elsewhere
     // Load and preload a few FX for the game
     for (int i=0; i<3; ++i)
-        _visualFX.push_back(new VisualFX("fx/vanish.gsl", *(m_areaA->getFloboSetTheme())));
+        _visualFX.push_back(new VisualFX("fx/vanish.gsl", *(_areaA->getFloboSetTheme())));
     for (int i=0; i<3; ++i)
-        _visualFX.push_back(new VisualFX("fx/combo.gsl", *(m_areaA->getFloboSetTheme())));
+        _visualFX.push_back(new VisualFX("fx/combo.gsl", *(_areaA->getFloboSetTheme())));
     for (int i=0; i<1; ++i)
-        _visualFX.push_back(new VisualFX("fx/starvedcombo.gsl", *(m_areaA->getFloboSetTheme())));
+        _visualFX.push_back(new VisualFX("fx/starvedcombo.gsl", *(_areaA->getFloboSetTheme())));
     for (int i=0; i<1; ++i)
-        _visualFX.push_back(new VisualFX("fx/penaltycleared.gsl", *(m_areaA->getFloboSetTheme())));
+        _visualFX.push_back(new VisualFX("fx/penaltycleared.gsl", *(_areaA->getFloboSetTheme())));
     for (int i=0; i<1; ++i)
-        _visualFX.push_back(new VisualFX("fx/combopenalty.gsl", *(m_areaA->getFloboSetTheme())));
+        _visualFX.push_back(new VisualFX("fx/combopenalty.gsl", *(_areaA->getFloboSetTheme())));
 }
 
 void SoloGameWidget::gameDidEndCycle()
 {
-    if (m_cyclesBeforeLevelRaise <= 0.) {
-        m_areaA->getAttachedGame()->addNeutralLayer();
-        m_cyclesBeforeLevelRaise = 1000.;
+    if (_cyclesBeforeLevelRaise <= 0.) {
+        _areaA->getAttachedGame()->addNeutralLayer();
+        _cyclesBeforeLevelRaise = 1000.;
     }
-    if (m_comboHandicap100) {
-        m_comboHandicap75 = false;
-        m_comboHandicap85 = false;
-        m_comboHandicap100 = false;
-        m_comboHandicap = 0.;
-        if (m_areaA->getAttachedGame()->getNeutralFlobos() > 0)
+    if (_comboHandicap100) {
+        _comboHandicap75 = false;
+        _comboHandicap85 = false;
+        _comboHandicap100 = false;
+        _comboHandicap = 0.;
+        if (_areaA->getAttachedGame()->getNeutralFlobos() > 0)
             EventFX("combopenalty", 20, 20, 1);
     }
 }
 
 void SoloGameWidget::floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboGroup, int groupNum, int phase)
 {
-    double prevComboHandicap = m_comboHandicap;
+    double prevComboHandicap = _comboHandicap;
     if (phase == 1)
-        m_comboHandicap += m_handicapDecreaseOnPhase1.getValue();
+        _comboHandicap += _handicapDecreaseOnPhase1.getValue();
     if (phase >= 2) {
-        m_comboHandicap += m_handicapDecreaseAbovePhase1.getValue();
+        _comboHandicap += _handicapDecreaseAbovePhase1.getValue();
     }
     if (phase == 4)
-        m_comboHandicap = 0.;
-    if (m_comboHandicap <= 0.) {
-        m_comboHandicap = 0.;
-        m_comboHandicap75 = false;
-        m_comboHandicap85 = false;
-        m_comboHandicap100 = false;
+        _comboHandicap = 0.;
+    if (_comboHandicap <= 0.) {
+        _comboHandicap = 0.;
+        _comboHandicap75 = false;
+        _comboHandicap85 = false;
+        _comboHandicap100 = false;
     }
-    if ((m_comboHandicap <= 0.) && (prevComboHandicap >= 50.)) {
+    if ((_comboHandicap <= 0.) && (prevComboHandicap >= 50.)) {
         EventFX("penaltycleared", 20, 20, 1);
     }
 }
 
 void SoloGameWidget::cycle()
 {
-    bool isGameOver = m_areaA->isGameOver() || getAborted();
+    bool isGameOver = _areaA->isGameOver() || getAborted();
     if ((!_paused) && (!isGameOver)) {
         theCommander->playMusicTrack("herbert");
         // Game parameters
-        m_cyclesDuration.step();
-        m_levelIncrease.step();
-        m_handicapIncrease.step();
-        m_handicapDecreaseOnPhase1.step();
-        m_handicapDecreaseAbovePhase1.step();
+        _cyclesDuration.step();
+        _levelIncrease.step();
+        _handicapIncrease.step();
+        _handicapDecreaseOnPhase1.step();
+        _handicapDecreaseAbovePhase1.step();
         // Controls
-        m_playerController->cycle();
+        _playerController->cycle();
         // Cycling through the foreground animation
         if (_styroPainter.get() != NULL)
             _styroPainter->update();
         // Animations
-        m_comboMeter->step();
-        m_areaA->cycleAnimation();
-        if (m_cyclesBeforeGameCycle == 0) {
-            if (! m_areaA->isNewMetaCycleStart())
-                m_areaA->cycleGame();
-            m_areaA->clearMetaCycleStart();
-            m_cyclesBeforeGameCycle = m_cyclesDuration.getValue();
+        _comboMeter->step();
+        _areaA->cycleAnimation();
+        if (_cyclesBeforeGameCycle == 0) {
+            if (! _areaA->isNewMetaCycleStart())
+                _areaA->cycleGame();
+            _areaA->clearMetaCycleStart();
+            _cyclesBeforeGameCycle = _cyclesDuration.getValue();
         }
-        if (m_cyclesBeforeLevelRaise <= 0.) {
+        if (_cyclesBeforeLevelRaise <= 0.) {
         }
         else {
-            m_cyclesBeforeLevelRaise -= m_levelIncrease.getValue();
+            _cyclesBeforeLevelRaise -= _levelIncrease.getValue();
         }
-        m_cyclesBeforeGameCycle--;
-        if (m_comboHandicap < 100.)
-            m_comboHandicap += m_handicapIncrease.getValue();
+        _cyclesBeforeGameCycle--;
+        if (_comboHandicap < 100.)
+            _comboHandicap += _handicapIncrease.getValue();
         // Warning events on handicap
-        if ((m_comboHandicap > 75.) && (!m_comboHandicap75)) {
+        if ((_comboHandicap > 75.) && (!_comboHandicap75)) {
             EventFX("starvedcombo", 20, 20, 1);
-            m_comboHandicap75 = true;
+            _comboHandicap75 = true;
         }
-        if ((m_comboHandicap > 85.) && (!m_comboHandicap85)) {
+        if ((_comboHandicap > 85.) && (!_comboHandicap85)) {
             // EventFX("starvedcombo", 20, 20, 1);
-            m_comboHandicap85 = true;
+            _comboHandicap85 = true;
         }
-        if ((m_comboHandicap >= 100.) && (!m_comboHandicap100)) {
-            m_areaA->getAttachedGame()->increaseNeutralFlobos(6);
-            m_comboHandicap100 = true;
+        if ((_comboHandicap >= 100.) && (!_comboHandicap100)) {
+            _areaA->getAttachedGame()->increaseNeutralFlobos(6);
+            _comboHandicap100 = true;
         }
         requestDraw();
     }
@@ -200,24 +200,24 @@ void SoloGameWidget::draw(DrawTarget *dt)
     }
     IosRect dtRect = { 0, 0, dt->w, dt->h };
     dt->draw(getLevelTheme()->getBackground(), &dtRect, &dtRect);
-    m_areaA->render(dt);
+    _areaA->render(dt);
     // Rendering the foreground animation
     if (_styroPainter.get() != NULL)
         _styroPainter->draw(dt);
     // Rendering the combo meter
-    m_comboMeter->setValue(m_comboHandicap / 100.);
-    m_comboMeter->draw(dt);
+    _comboMeter->setValue(_comboHandicap / 100.);
+    _comboMeter->draw(dt);
     // Rendering the scores
-    m_areaA->renderScore(dt);
+    _areaA->renderScore(dt);
     // Rendering the player names
     IosFont *font = getLevelTheme()->getPlayerNameFont();
     const RGBA *color = getLevelTheme()->getPlayerNameColor();
     dt->putStringCenteredXY(font,
                             getLevelTheme()->getNameDisplayX(0),
                             getLevelTheme()->getNameDisplayY(0),
-                            m_playerName.c_str(), *color);
+                            _playerName.c_str(), *color);
     // Rendering the neutral puyos
-    m_areaA->renderNeutral(dt);
+    _areaA->renderNeutral(dt);
 }
 
 void SoloGameWidget::eventOccured(GameControlEvent *event)
@@ -225,9 +225,9 @@ void SoloGameWidget::eventOccured(GameControlEvent *event)
     if (_paused)
         lostFocus();
     else {
-        m_playerController->eventOccured(event);
-        //for (std::vector<gameui::Widget *>::iterator iter = m_subwidgets.begin() ;
-        //     iter != m_subwidgets.end() ; iter++) {
+        _playerController->eventOccured(event);
+        //for (std::vector<gameui::Widget *>::iterator iter = _subwidgets.begin() ;
+        //     iter != _subwidgets.end() ; iter++) {
         //    (*iter)->eventOccured(event);
         //}
     }
@@ -235,11 +235,11 @@ void SoloGameWidget::eventOccured(GameControlEvent *event)
 
 void SoloGameWidget::setGameOptions(GameOptions options)
 {
-    m_options = options;
+    _options = options;
 }
 bool SoloGameWidget::backPressed()
 {
-    if (m_areaA->isGameOver() || getAborted()) {
+    if (_areaA->isGameOver() || getAborted()) {
         _gameOverAction->action(this, GAMEOVER_STARTPRESSED, NULL);
         return true;
     }
@@ -247,7 +247,7 @@ bool SoloGameWidget::backPressed()
 }
 bool SoloGameWidget::startPressed()
 {
-    if (m_areaA->isGameOver() || getAborted()) {
+    if (_areaA->isGameOver() || getAborted()) {
         _gameOverAction->action(this, GAMEOVER_STARTPRESSED, NULL);
         return true;
     }
@@ -259,17 +259,17 @@ StoryWidget *SoloGameWidget::getOpponent()
 }
 void SoloGameWidget::setPlayerOneName(const std::string & newName)
 {
-    m_playerName = newName;
+    _playerName = newName;
 }
 void SoloGameWidget::setPlayerTwoName(const std::string & newName)
 {}
 PlayerGameStat &SoloGameWidget::getStatPlayerOne()
 {
-    return m_areaA->getAttachedGame()->getGameStat();
+    return _areaA->getAttachedGame()->getGameStat();
 }
 PlayerGameStat &SoloGameWidget::getStatPlayerTwo()
 {
-    return m_areaA->getAttachedGame()->getGameStat();
+    return _areaA->getAttachedGame()->getGameStat();
 }
 void SoloGameWidget::addGameAHandicap(int handicap)
 {}
@@ -277,7 +277,7 @@ void SoloGameWidget::addGameBHandicap(int handicap)
 {}
 bool SoloGameWidget::isGameARunning() const
 {
-    return ! m_areaA->isGameOver();
+    return ! _areaA->isGameOver();
 }
 
 
@@ -311,55 +311,55 @@ SoloModeStarterAction::SoloModeStarterAction(GameDifficulty difficulty, PlayerNa
     std::string scoreBoardSuffix;
     switch (difficulty) {
     case EASY:
-        m_gameSettings = easySettings;
+        _gameSettings = easySettings;
         scoreBoardSuffix = "easy";
         break;
     case MEDIUM:
-        m_gameSettings = mediumSettings;
+        _gameSettings = mediumSettings;
         scoreBoardSuffix = "medium";
         break;
     case HARD:
     default:
-        m_gameSettings = hardSettings;
+        _gameSettings = hardSettings;
         scoreBoardSuffix = "hard";
         break;
     };
     // Creating the game widget factory
-    m_gameWidgetFactory.reset(new SoloGameWidgetFactory(m_gameSettings));
+    _gameWidgetFactory.reset(new SoloGameWidgetFactory(_gameSettings));
     // Creating the different game states
-    m_pushGameScreen.reset(new PushScreenState());
-    m_setupMatch.reset(new SetupMatchState(m_gameWidgetFactory.get(), GameOptions::fromDifficulty(difficulty), nameProvider, &m_sharedAssets, 1));
-    m_enterPlayersReady.reset(new EnterPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
-    m_exitPlayersReady.reset(new ExitPlayerReadyState(m_sharedAssets, m_sharedGetReadyAssets));
-    m_matchPlaying.reset(new MatchPlayingState(m_sharedAssets));
-    m_matchIsOver.reset(new MatchIsOverState(m_sharedAssets));
-    m_matchIsOver->setStyrolyse("gamelost1p.gsl");
-    m_hallOfFame.reset(new ManageHiScoresState(&m_sharedAssets, nameProvider,
+    _pushGameScreen.reset(new PushScreenState());
+    _setupMatch.reset(new SetupMatchState(_gameWidgetFactory.get(), GameOptions::fromDifficulty(difficulty), nameProvider, &_sharedAssets, 1));
+    _enterPlayersReady.reset(new EnterPlayerReadyState(_sharedAssets, _sharedGetReadyAssets));
+    _exitPlayersReady.reset(new ExitPlayerReadyState(_sharedAssets, _sharedGetReadyAssets));
+    _matchPlaying.reset(new MatchPlayingState(_sharedAssets));
+    _matchIsOver.reset(new MatchIsOverState(_sharedAssets));
+    _matchIsOver->setStyrolyse("gamelost1p.gsl");
+    _hallOfFame.reset(new ManageHiScoresState(&_sharedAssets, nameProvider,
                                                (std::string(SOLO_SCOREBOARD_ID) + "." + scoreBoardSuffix).c_str(),
                                                   "gamewon_highscores_1p.gsl"));
-    m_leaveGame.reset(new LeaveGameState(m_sharedAssets));
+    _leaveGame.reset(new LeaveGameState(_sharedAssets));
     // Linking the states together
-    m_pushGameScreen->setNextState(m_setupMatch.get());
-    m_setupMatch->setNextState(m_enterPlayersReady.get());
-    m_enterPlayersReady->setNextState(m_exitPlayersReady.get());
-    m_exitPlayersReady->setNextState(m_matchPlaying.get());
-    m_matchPlaying->setNextState(m_matchIsOver.get());
-    m_matchPlaying->setAbortedState(m_leaveGame.get());
-    m_matchIsOver->setNextState(m_hallOfFame.get());
-    m_hallOfFame->setNextState(m_leaveGame.get());
+    _pushGameScreen->setNextState(_setupMatch.get());
+    _setupMatch->setNextState(_enterPlayersReady.get());
+    _enterPlayersReady->setNextState(_exitPlayersReady.get());
+    _exitPlayersReady->setNextState(_matchPlaying.get());
+    _matchPlaying->setNextState(_matchIsOver.get());
+    _matchPlaying->setAbortedState(_leaveGame.get());
+    _matchIsOver->setNextState(_hallOfFame.get());
+    _hallOfFame->setNextState(_leaveGame.get());
     // Initializing the state machine
-    m_stateMachine.setInitialState(m_pushGameScreen.get());
+    _stateMachine.setInitialState(_pushGameScreen.get());
 }
 
 void SoloModeStarterAction::action(Widget *sender, int actionType,
                                    event_manager::GameControlEvent *event)
 {
-    m_stateMachine.reset();
-    m_stateMachine.evaluate();
+    _stateMachine.reset();
+    _stateMachine.evaluate();
 }
 
 void SoloModeStarterAction::pauseGameIfPossible()
 {
-    if (m_sharedAssets.m_gameScreen.get() != NULL)
-        m_sharedAssets.m_gameScreen->setPaused(true);
+    if (_sharedAssets._gameScreen.get() != NULL)
+        _sharedAssets._gameScreen->setPaused(true);
 }

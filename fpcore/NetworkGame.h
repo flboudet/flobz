@@ -67,24 +67,24 @@ public:
     virtual int getMaxColumnHeight() const;
     virtual int getSameFloboAround(int X, int Y, FloboState color);
     virtual int getSemiMove() const;
-    virtual int  getComboPhase() const { return comboPhase; }
+    virtual int  getComboPhase() const { return _comboPhase; }
 private:
     void synchronizeState(Message &message);
     void setFloboAt(int X, int Y, std::shared_ptr<Flobo> newFlobo);
     void synchronizeFlobo(Buffer<int> buffer);
     std::shared_ptr<Flobo> findFlobo(int floboID);
-    std::shared_ptr<Flobo> floboCells[FLOBOBAN_DIMX * (FLOBOBAN_DIMY+1)];
-    FloboState nextFalling, nextCompanion;
-    std::shared_ptr<Flobo> fakeFlobo;
-    MessageBox *msgBox;
-    int gameId;
+    std::shared_ptr<Flobo> _floboCells[FLOBOBAN_DIMX * (FLOBOBAN_DIMY+1)];
+    FloboState _nextFalling, _nextCompanion;
+    std::shared_ptr<Flobo> _fakeFlobo;
+    MessageBox *_msgBox;
+    int _gameId;
     typedef std::list<std::shared_ptr<Flobo>> FloboPtrList;
-    FloboPtrList m_floboList;
-    std::map<int, std::shared_ptr<Flobo>> m_floboMap;
-    int semiMove;
-    int neutralFlobos, sentBadFlobos;
-    bool gameRunning;
-    int comboPhase;
+    FloboPtrList _floboList;
+    std::map<int, std::shared_ptr<Flobo>> _floboMap;
+    int _semiMove;
+    int _neutralFlobos, _sentBadFlobos;
+    bool _gameRunning;
+    int _comboPhase;
 };
 
 

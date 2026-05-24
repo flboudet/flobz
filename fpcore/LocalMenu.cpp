@@ -30,152 +30,152 @@
 class NoNameAction : public Action {
     public:
         NoNameAction(LocalizedDictionary &locale, EditField &field)
-          : locale(locale), field(field)
+          : _locale(locale), _field(field)
         {}
 
 
     virtual void action() {
-            std::string s = field.getValue();
+            std::string s = _field.getValue();
             if (s == "") {
-                s = locale.getLocalizedString("NoName");
-                field.setValue(s);
+                s = _locale.getLocalizedString("NoName");
+                _field.setValue(s);
             }
         }
     private:
-        LocalizedDictionary locale;
-        EditField &field;
+        LocalizedDictionary _locale;
+        EditField &_field;
 };
 
 SoloGameMenu::SoloGameMenu(MainScreen *mainScreen)
   : MainScreenMenu(mainScreen)
 {
-    m_editPlayerName.reset(new EditFieldWithLabel(
+    _editPlayerName.reset(new EditFieldWithLabel(
                                theCommander->getLocalizedString("Player:"),
                                PlayerNameUtils::getDefaultPlayerName(0).c_str(),
                                PlayerNameUtils::getDefaultPlayerKey(0).c_str(),
                                theCommander->getPreferencesManager(),
                                theCommander->getEditFieldFramePicture(),
                                theCommander->getEditFieldOverFramePicture(), 150));
-    m_screenTitleFrame.reset(new Frame(theCommander->getSeparatorFramePicture()));
-    m_screenTitle.reset(new Text(theCommander->getLocalizedString("Choose Game Level")));
-    m_easyAction.reset(new SoloModeStarterAction(EASY, this));
-    m_mediumAction.reset(new SoloModeStarterAction(MEDIUM, this));
-    m_hardAction.reset(new SoloModeStarterAction(HARD,   this));
-    m_popAction.reset(new PopMainScreenMenuAction(mainScreen));
-    m_easy.reset(new   Button(theCommander->getLocalizedString("Beginner"), m_easyAction.get()));
-    m_medium.reset(new Button(theCommander->getLocalizedString("Normal"), m_mediumAction.get()));
-    m_hard.reset(new   Button(theCommander->getLocalizedString("Expert"), m_hardAction.get()));
-    m_back.reset(new   Button(theCommander->getLocalizedString("Back"), m_popAction.get()));
+    _screenTitleFrame.reset(new Frame(theCommander->getSeparatorFramePicture()));
+    _screenTitle.reset(new Text(theCommander->getLocalizedString("Choose Game Level")));
+    _easyAction.reset(new SoloModeStarterAction(EASY, this));
+    _mediumAction.reset(new SoloModeStarterAction(MEDIUM, this));
+    _hardAction.reset(new SoloModeStarterAction(HARD,   this));
+    _popAction.reset(new PopMainScreenMenuAction(mainScreen));
+    _easy.reset(new   Button(theCommander->getLocalizedString("Beginner"), _easyAction.get()));
+    _medium.reset(new Button(theCommander->getLocalizedString("Normal"), _mediumAction.get()));
+    _hard.reset(new   Button(theCommander->getLocalizedString("Expert"), _hardAction.get()));
+    _back.reset(new   Button(theCommander->getLocalizedString("Back"), _popAction.get()));
 
     setPolicy(USE_MIN_SIZE);
-    m_screenTitleFrame->add(m_screenTitle.get());
-    add(m_screenTitleFrame.get());
-    m_screenTitleFrame->setPreferedSize(Vec3(0, 20));
-    m_buttonsBox.add(m_easy.get());
-    m_buttonsBox.add(m_medium.get());
-    m_buttonsBox.add(m_hard.get());
-    m_buttonsBox.add(m_editPlayerName.get());
-    m_buttonsBox.add(m_back.get());
-    add(&m_buttonsBox);
+    _screenTitleFrame->add(_screenTitle.get());
+    add(_screenTitleFrame.get());
+    _screenTitleFrame->setPreferedSize(Vec3(0, 20));
+    _buttonsBox.add(_easy.get());
+    _buttonsBox.add(_medium.get());
+    _buttonsBox.add(_hard.get());
+    _buttonsBox.add(_editPlayerName.get());
+    _buttonsBox.add(_back.get());
+    add(&_buttonsBox);
 }
 
 std::string SoloGameMenu::getPlayerName(int playerNumber) const
 {
-    return m_editPlayerName->getEditField().getValue();
+    return _editPlayerName->getEditField().getValue();
 }
 
 LocalGameMenu::LocalGameMenu(MainScreen *mainScreen)
     : MainScreenMenu(mainScreen),
-      locale(theCommander->getDataPathManager(), "locale", "main"),
-      editPlayerName(locale.getLocalizedString("Player:"),
+      _locale(theCommander->getDataPathManager(), "locale", "main"),
+      _editPlayerName(_locale.getLocalizedString("Player:"),
 		     PlayerNameUtils::getDefaultPlayerName(0).c_str(),
 		     PlayerNameUtils::getDefaultPlayerKey(0).c_str(),
              theCommander->getPreferencesManager(),
 		     theCommander->getEditFieldFramePicture(),
 		     theCommander->getEditFieldOverFramePicture(), 150),
-      screenTitleFrame(theCommander->getSeparatorFramePicture()),
-      screenTitle(locale.getLocalizedString("Choose Game Level")),
-      easyAction(EASY, this),
-      mediumAction(MEDIUM, this),
-      hardAction(HARD,   this),
-      popAction(mainScreen),
-      easy(locale.getLocalizedString("Beginner"), &easyAction),
-      medium(locale.getLocalizedString("Normal"), &mediumAction),
-      hard(locale.getLocalizedString("Expert"), &hardAction),
-      back(locale.getLocalizedString("Back"), &popAction)
+      _screenTitleFrame(theCommander->getSeparatorFramePicture()),
+      _screenTitle(_locale.getLocalizedString("Choose Game Level")),
+      _easyAction(EASY, this),
+      _mediumAction(MEDIUM, this),
+      _hardAction(HARD,   this),
+      _popAction(mainScreen),
+      _easy(_locale.getLocalizedString("Beginner"), &_easyAction),
+      _medium(_locale.getLocalizedString("Normal"), &_mediumAction),
+      _hard(_locale.getLocalizedString("Expert"), &_hardAction),
+      _back(_locale.getLocalizedString("Back"), &_popAction)
 {
-    EditField &editName = editPlayerName.getEditField();
-    editName.setAction(ON_ACTION, new NoNameAction(locale, editName));
+    EditField &editName = _editPlayerName.getEditField();
+    editName.setAction(ON_ACTION, new NoNameAction(_locale, editName));
 }
 
 void LocalGameMenu::build() {
     setPolicy(USE_MIN_SIZE);
-    screenTitleFrame.add(&screenTitle);
-    add(&screenTitleFrame);
-    screenTitleFrame.setPreferedSize(Vec3(0, 20));
-    buttonsBox.add(&easy);
-    buttonsBox.add(&medium);
-    buttonsBox.add(&hard);
-    buttonsBox.add(&editPlayerName);
-    buttonsBox.add(&back);
-    add(&buttonsBox);
+    _screenTitleFrame.add(&_screenTitle);
+    add(&_screenTitleFrame);
+    _screenTitleFrame.setPreferedSize(Vec3(0, 20));
+    _buttonsBox.add(&_easy);
+    _buttonsBox.add(&_medium);
+    _buttonsBox.add(&_hard);
+    _buttonsBox.add(&_editPlayerName);
+    _buttonsBox.add(&_back);
+    add(&_buttonsBox);
 }
 
 std::string LocalGameMenu::getPlayerName(int playerNumber) const
 {
-  return editPlayerName.getEditField().getValue();
+  return _editPlayerName.getEditField().getValue();
 }
 
 Local2PlayersGameMenu::Local2PlayersGameMenu(MainScreen *mainScreen)
     : MainScreenMenu(mainScreen),
-      locale(theCommander->getDataPathManager(), "locale", "main"),
-      editPlayer1Name(locale.getLocalizedString("Player 1:"),
+      _locale(theCommander->getDataPathManager(), "locale", "main"),
+      _editPlayer1Name(_locale.getLocalizedString("Player 1:"),
 		      PlayerNameUtils::getDefaultPlayerName(1).c_str(),
 		      PlayerNameUtils::getDefaultPlayerKey(1).c_str(),
               theCommander->getPreferencesManager(),
 		      theCommander->getEditFieldFramePicture(),
 		      theCommander->getEditFieldOverFramePicture(), 150),
-      editPlayer2Name(locale.getLocalizedString("Player 2:"),
+      _editPlayer2Name(_locale.getLocalizedString("Player 2:"),
 		      PlayerNameUtils::getDefaultPlayerName(2).c_str(),
 		      PlayerNameUtils::getDefaultPlayerKey(2).c_str(),
               theCommander->getPreferencesManager(),
 		      theCommander->getEditFieldFramePicture(),
 		      theCommander->getEditFieldOverFramePicture(), 150),
-      screenTitleFrame(theCommander->getSeparatorFramePicture()),
-      screenTitle(locale.getLocalizedString("Choose Game Level")),
-      easyAction(EASY, &gameWidgetFactory, this, 3),
-      mediumAction(MEDIUM, &gameWidgetFactory, this),
-      hardAction(HARD, &gameWidgetFactory, this), popAction(mainScreen),
-      easy(locale.getLocalizedString("Easy"), &easyAction),
-      medium(locale.getLocalizedString("Medium"), &mediumAction),
-      hard(locale.getLocalizedString("Hard"), &hardAction),
-      back(locale.getLocalizedString("Back"), &popAction)
+      _screenTitleFrame(theCommander->getSeparatorFramePicture()),
+      _screenTitle(_locale.getLocalizedString("Choose Game Level")),
+      _easyAction(EASY, &_gameWidgetFactory, this, 3),
+      _mediumAction(MEDIUM, &_gameWidgetFactory, this),
+      _hardAction(HARD, &_gameWidgetFactory, this), _popAction(mainScreen),
+      _easy(_locale.getLocalizedString("Easy"), &_easyAction),
+      _medium(_locale.getLocalizedString("Medium"), &_mediumAction),
+      _hard(_locale.getLocalizedString("Hard"), &_hardAction),
+      _back(_locale.getLocalizedString("Back"), &_popAction)
 {}
 
 void Local2PlayersGameMenu::build()
 {
     setPolicy(USE_MIN_SIZE);
-    screenTitleFrame.add(&screenTitle);
-    add(&screenTitleFrame);
-    screenTitleFrame.setPreferedSize(Vec3(0, 20));
-    buttonsBox.add(&easy);
-    buttonsBox.add(&medium);
-    buttonsBox.add(&hard);
-    buttonsBox.add(&editPlayer1Name);
-    buttonsBox.add(&editPlayer2Name);
-    buttonsBox.add(&back);
-    add(&buttonsBox);
+    _screenTitleFrame.add(&_screenTitle);
+    add(&_screenTitleFrame);
+    _screenTitleFrame.setPreferedSize(Vec3(0, 20));
+    _buttonsBox.add(&_easy);
+    _buttonsBox.add(&_medium);
+    _buttonsBox.add(&_hard);
+    _buttonsBox.add(&_editPlayer1Name);
+    _buttonsBox.add(&_editPlayer2Name);
+    _buttonsBox.add(&_back);
+    add(&_buttonsBox);
 }
 
 std::string Local2PlayersGameMenu::getPlayerName(int playerNumber) const
 {
   switch (playerNumber) {
   case 0:  {
-    return editPlayer1Name.getEditField().getValue();
+    return _editPlayer1Name.getEditField().getValue();
   }
   case 1:
   default: {
-    return editPlayer2Name.getEditField().getValue();
+    return _editPlayer2Name.getEditField().getValue();
   }
   }
 }

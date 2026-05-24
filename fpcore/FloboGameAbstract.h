@@ -26,14 +26,14 @@ public:
     ~PlayerGameStatDisplay();
     void draw(DrawTarget *dt) const;
     // Accessors
-    void setPosition(int x, int y) { m_x = x; m_y = y; }
-    void setFont(IosFont *font) { m_font = font; }
+    void setPosition(int x, int y) { _x = x; _y = y; }
+    void setFont(IosFont *font) { _font = font; }
 private:
-    PlayerGameStat &stat;
-    int m_x, m_y;
-    IosFont *m_font;
-    RGBA m_color;
-    int player;
+    PlayerGameStat &_stat;
+    int _x, _y;
+    IosFont *_font;
+    RGBA _color;
+    int _player;
 };
 
 

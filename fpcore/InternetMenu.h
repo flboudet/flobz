@@ -42,11 +42,11 @@ using namespace ios_fc;
 
 class FPServer {
 public:
-    FPServer(const std::string & hostName, int portNum, const std::string & path) : hostName(hostName), hostPath(path), portNum(portNum) {}
+    FPServer(const std::string & hostName, int portNum, const std::string & path) : _hostName(hostName), _hostPath(path), _portNum(portNum) {}
     virtual ~FPServer() {}
-    std::string hostName;
-    std::string hostPath;
-    int portNum;
+    std::string _hostName;
+    std::string _hostPath;
+    int _portNum;
 };
 
 class PingableFPServer;
@@ -65,12 +65,12 @@ public:
     virtual void idle(double currentTime);
     bool answeredToPing() const;
 private:
-    std::unique_ptr<ios_fc::DatagramSocket> m_pingSocket;
-    std::unique_ptr<FPServerMessageBox> m_pingBox;
-    std::unique_ptr<ios_fc::IGPClient> m_igpclient;
-    IGPClient::PingTransaction *m_pingTransaction;
-    PingableFPServerResponder *m_responder;
-    bool m_alreadyReported;
+    std::unique_ptr<ios_fc::DatagramSocket> _pingSocket;
+    std::unique_ptr<FPServerMessageBox> _pingBox;
+    std::unique_ptr<ios_fc::IGPClient> _igpclient;
+    IGPClient::PingTransaction *_pingTransaction;
+    PingableFPServerResponder *_responder;
+    bool _alreadyReported;
 };
 
 class AbstractMetaFPServerConnection;
@@ -91,7 +91,7 @@ public:
 protected:
     virtual void onServerListHasChanged();
 private:
-    MetaFPServerConnectionResponder *m_responder;
+    MetaFPServerConnectionResponder *_responder;
 };
 
 class DummyMetaServerConnection : public AbstractMetaFPServerConnection {
@@ -109,13 +109,13 @@ public:
     virtual std::vector<FPServer> getServers() const;
     // IdleComponent implementation
     virtual void idle(double currentTime);
-    virtual bool failed() const { return m_nErrors > 5; }
+    virtual bool failed() const { return _nErrors > 5; }
 private:
-    HttpDocument *m_doc;
-    std::string m_hostName, m_hostPath;
-    int m_portNum;
-    std::vector<FPServer> m_servers;
-    int m_nErrors;
+    HttpDocument *_doc;
+    std::string _hostName, _hostPath;
+    int _portNum;
+    std::vector<FPServer> _servers;
+    int _nErrors;
 };
 
 
@@ -139,11 +139,11 @@ public:
     // PingableFPServerResponder implementation
     virtual void fpServerDidPing(PingableFPServer &server);
 private:
-    std::vector<AbstractMetaFPServerConnection *> m_metaservers;
-    std::vector<PingableFPServer *> m_servers;
-    FPServerListResponder *m_responder;
-	int fetching;
-	bool firstTime;
+    std::vector<AbstractMetaFPServerConnection *> _metaservers;
+    std::vector<PingableFPServer *> _servers;
+    FPServerListResponder *_responder;
+	int _fetching;
+	bool _firstTime;
 };
 
 
@@ -160,25 +160,25 @@ public:
     // FPServerListResponder implementation
     virtual void FPServerListHasChanged(FPServerList &serverList);
 private:
-    Frame screenTitleFrame;
-    Text internetGameText;
-    FPServerList servers;
-    VBox serverSelectionPanel;
-    ListView serverListPanel;
-    Text serverListText;
-    FramedButton updating;
-    VBox rightPanel;
-    Separator separator1_1, separator1_2, separator1_3,  separator10_1, separator10_2;
-    Text nicknameText, passwordText, serverText, portText;
-    HBox hbox, menu;
-    HBox bottomPanel;
-    Separator bottomPanelSeparator, rightPanelSeparator;
-    SliderContainer container;
-    FramedEditField playerName, password;
-    FramedEditField serverName, serverPort;
-    int portNum;
-    PopMainScreenMenuAction backAction;
-    FramedButton joinButton, backButton;
+    Frame _screenTitleFrame;
+    Text _internetGameText;
+    FPServerList _servers;
+    VBox _serverSelectionPanel;
+    ListView _serverListPanel;
+    Text _serverListText;
+    FramedButton _updating;
+    VBox _rightPanel;
+    Separator _separator1_1, _separator1_2, _separator1_3,  _separator10_1, _separator10_2;
+    Text _nicknameText, _passwordText, _serverText, _portText;
+    HBox _hbox, _menu;
+    HBox _bottomPanel;
+    Separator _bottomPanelSeparator, _rightPanelSeparator;
+    SliderContainer _container;
+    FramedEditField _playerName, _password;
+    FramedEditField _serverName, _serverPort;
+    int _portNum;
+    PopMainScreenMenuAction _backAction;
+    FramedButton _joinButton, _backButton;
 };
 
 #endif // _INTERNETMENU_H_

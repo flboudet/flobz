@@ -6,131 +6,131 @@ using namespace event_manager;
 void ControlMenu::BackSaveAction::action()
 {
     GameUIDefaults::GAME_LOOP->getEventManager()->saveControls();
-    mainScreen->popMenu();
+    _mainScreen->popMenu();
 }
 
 ControlMenu::ControlMenu(MainScreen *mainScreen)
     : MainScreenMenu(mainScreen),
-      screenTitleFrame(theCommander->getSeparatorFramePicture()),
-      playerOneTitleFrame(theCommander->getSeparatorFramePicture()),
-      playerTwoTitleFrame(theCommander->getSeparatorFramePicture()),
-      playerOneFrame(theCommander->getWindowFramePicture()),
-      playerTwoFrame(theCommander->getWindowFramePicture()),
-      title(theCommander->getLocalizedString("Change Controls")),
-      playerOneTitle(theCommander->getLocalizedString("Player 1 Controls")),
-      playerTwoTitle(theCommander->getLocalizedString("Player 2 Controls")),
-      titleSeparator(0., 10.), playersSeparator(0., 10.), bottomSeparator(0., 10.),
-      backAction(mainScreen),
-      backButton(theCommander->getLocalizedString("Back"), &backAction,
+      _screenTitleFrame(theCommander->getSeparatorFramePicture()),
+      _playerOneTitleFrame(theCommander->getSeparatorFramePicture()),
+      _playerTwoTitleFrame(theCommander->getSeparatorFramePicture()),
+      _playerOneFrame(theCommander->getWindowFramePicture()),
+      _playerTwoFrame(theCommander->getWindowFramePicture()),
+      _title(theCommander->getLocalizedString("Change Controls")),
+      _playerOneTitle(theCommander->getLocalizedString("Player 1 Controls")),
+      _playerTwoTitle(theCommander->getLocalizedString("Player 2 Controls")),
+      _titleSeparator(0., 10.), _playersSeparator(0., 10.), _bottomSeparator(0., 10.),
+      _backAction(mainScreen),
+      _backButton(theCommander->getLocalizedString("Back"), &_backAction,
 		 theCommander->getButtonFramePicture(),
 		 theCommander->getButtonOverFramePicture()),
-      label1pTitle(theCommander->getLocalizedString("Controls")),
-      key1pTitle(theCommander->getLocalizedString("Primary")),
-      alternateKey1pTitle(theCommander->getLocalizedString("Alternate")),
-      label2pTitle(theCommander->getLocalizedString("Controls")),
-      key2pTitle(theCommander->getLocalizedString("Primary")),
-      alternateKey2pTitle(theCommander->getLocalizedString("Alternate")),
-      lbl1PLeft(theCommander->getLocalizedString(kSPlayer1Left)),
-      lbl1PRight(theCommander->getLocalizedString(kSPlayer1Right)),
-      lbl1PDown(theCommander->getLocalizedString(kSPlayer1Down)),
-      lbl1PTurnRight(theCommander->getLocalizedString(kSPlayer1Clockwise)),
-      lbl1PTurnLeft(theCommander->getLocalizedString(kSPlayer1Counterclockwise)),
-      lbl2PLeft(theCommander->getLocalizedString(kSPlayer2Left)),
-      lbl2PRight(theCommander->getLocalizedString(kSPlayer2Right)),
-      lbl2PDown(theCommander->getLocalizedString(kSPlayer2Down)),
-      lbl2PTurnRight(theCommander->getLocalizedString(kSPlayer2Clockwise)),
-      lbl2PTurnLeft(theCommander->getLocalizedString(kSPlayer2Counterclockwise)),
-      p1Left(0, false), p1Right(1, false), p1Down(2, false), p1TurnRight(3, false), p1TurnLeft(4, false),
-      ap1Left(0, true), ap1Right(1, true), ap1Down(2, true), ap1TurnRight(3, true), ap1TurnLeft(4, true),
-      p2Left(5, false), p2Right(6, false), p2Down(7, false), p2TurnRight(8, false), p2TurnLeft(9, false),
-      ap2Left(5, true), ap2Right(6, true), ap2Down(7, true), ap2TurnRight(8, true), ap2TurnLeft(9, true)
+      _label1pTitle(theCommander->getLocalizedString("Controls")),
+      _key1pTitle(theCommander->getLocalizedString("Primary")),
+      _alternateKey1pTitle(theCommander->getLocalizedString("Alternate")),
+      _label2pTitle(theCommander->getLocalizedString("Controls")),
+      _key2pTitle(theCommander->getLocalizedString("Primary")),
+      _alternateKey2pTitle(theCommander->getLocalizedString("Alternate")),
+      _lbl1PLeft(theCommander->getLocalizedString(kSPlayer1Left)),
+      _lbl1PRight(theCommander->getLocalizedString(kSPlayer1Right)),
+      _lbl1PDown(theCommander->getLocalizedString(kSPlayer1Down)),
+      _lbl1PTurnRight(theCommander->getLocalizedString(kSPlayer1Clockwise)),
+      _lbl1PTurnLeft(theCommander->getLocalizedString(kSPlayer1Counterclockwise)),
+      _lbl2PLeft(theCommander->getLocalizedString(kSPlayer2Left)),
+      _lbl2PRight(theCommander->getLocalizedString(kSPlayer2Right)),
+      _lbl2PDown(theCommander->getLocalizedString(kSPlayer2Down)),
+      _lbl2PTurnRight(theCommander->getLocalizedString(kSPlayer2Clockwise)),
+      _lbl2PTurnLeft(theCommander->getLocalizedString(kSPlayer2Counterclockwise)),
+      _p1Left(0, false), _p1Right(1, false), _p1Down(2, false), _p1TurnRight(3, false), _p1TurnLeft(4, false),
+      _ap1Left(0, true), _ap1Right(1, true), _ap1Down(2, true), _ap1TurnRight(3, true), _ap1TurnLeft(4, true),
+      _p2Left(5, false), _p2Right(6, false), _p2Down(7, false), _p2TurnRight(8, false), _p2TurnLeft(9, false),
+      _ap2Left(5, true), _ap2Right(6, true), _ap2Down(7, true), _ap2TurnRight(8, true), _ap2TurnLeft(9, true)
 {
-    lbl1PLeft.setFont(GameUIDefaults::FONT_SMALL_INFO);
-    lbl1PRight.setFont(GameUIDefaults::FONT_SMALL_INFO);
-    lbl1PDown.setFont(GameUIDefaults::FONT_SMALL_INFO);
-    lbl1PTurnRight.setFont(GameUIDefaults::FONT_SMALL_INFO);
-    lbl1PTurnLeft.setFont(GameUIDefaults::FONT_SMALL_INFO);
+    _lbl1PLeft.setFont(GameUIDefaults::FONT_SMALL_INFO);
+    _lbl1PRight.setFont(GameUIDefaults::FONT_SMALL_INFO);
+    _lbl1PDown.setFont(GameUIDefaults::FONT_SMALL_INFO);
+    _lbl1PTurnRight.setFont(GameUIDefaults::FONT_SMALL_INFO);
+    _lbl1PTurnLeft.setFont(GameUIDefaults::FONT_SMALL_INFO);
 
-    lbl2PLeft.setFont(GameUIDefaults::FONT_SMALL_INFO);
-    lbl2PRight.setFont(GameUIDefaults::FONT_SMALL_INFO);
-    lbl2PDown.setFont(GameUIDefaults::FONT_SMALL_INFO);
-    lbl2PTurnRight.setFont(GameUIDefaults::FONT_SMALL_INFO);
-    lbl2PTurnLeft.setFont(GameUIDefaults::FONT_SMALL_INFO);
+    _lbl2PLeft.setFont(GameUIDefaults::FONT_SMALL_INFO);
+    _lbl2PRight.setFont(GameUIDefaults::FONT_SMALL_INFO);
+    _lbl2PDown.setFont(GameUIDefaults::FONT_SMALL_INFO);
+    _lbl2PTurnRight.setFont(GameUIDefaults::FONT_SMALL_INFO);
+    _lbl2PTurnLeft.setFont(GameUIDefaults::FONT_SMALL_INFO);
 
     this->setBorderVisible(false);
 }
 
 void ControlMenu::build() {
     setPolicy(USE_MIN_SIZE);
-    screenTitleFrame.setPreferedSize(Vec3(0, 20));
-    screenTitleFrame.add(&title);
-    add(&screenTitleFrame);
-    add(&titleSeparator);
+    _screenTitleFrame.setPreferedSize(Vec3(0, 20));
+    _screenTitleFrame.add(&_title);
+    add(&_screenTitleFrame);
+    add(&_titleSeparator);
 
-    playerOneTitleFrame.setPreferedSize(Vec3(0, 20));
-    playerTwoTitleFrame.setPreferedSize(Vec3(0, 20));
-    playerOneTitleFrame.add(&playerOneTitle);
-    playerTwoTitleFrame.add(&playerTwoTitle);
+    _playerOneTitleFrame.setPreferedSize(Vec3(0, 20));
+    _playerTwoTitleFrame.setPreferedSize(Vec3(0, 20));
+    _playerOneTitleFrame.add(&_playerOneTitle);
+    _playerTwoTitleFrame.add(&_playerTwoTitle);
 
-    label1pBox.add(&label1pTitle);
-    key1pBox.add(&key1pTitle);
-    alternateKey1pBox.add(&alternateKey1pTitle);
+    _label1pBox.add(&_label1pTitle);
+    _key1pBox.add(&_key1pTitle);
+    _alternateKey1pBox.add(&_alternateKey1pTitle);
 
-    label2pBox.add(&label2pTitle);
-    key2pBox.add(&key2pTitle);
-    alternateKey2pBox.add(&alternateKey2pTitle);
+    _label2pBox.add(&_label2pTitle);
+    _key2pBox.add(&_key2pTitle);
+    _alternateKey2pBox.add(&_alternateKey2pTitle);
 
-    label1pBox.add(&lbl1PLeft);
-    label1pBox.add(&lbl1PRight);
-    label1pBox.add(&lbl1PDown);
-    label1pBox.add(&lbl1PTurnRight);
-    label1pBox.add(&lbl1PTurnLeft);
+    _label1pBox.add(&_lbl1PLeft);
+    _label1pBox.add(&_lbl1PRight);
+    _label1pBox.add(&_lbl1PDown);
+    _label1pBox.add(&_lbl1PTurnRight);
+    _label1pBox.add(&_lbl1PTurnLeft);
 
-    key1pBox.add(&p1Left);
-    key1pBox.add(&p1Right);
-    key1pBox.add(&p1Down);
-    key1pBox.add(&p1TurnRight);
-    key1pBox.add(&p1TurnLeft);
+    _key1pBox.add(&_p1Left);
+    _key1pBox.add(&_p1Right);
+    _key1pBox.add(&_p1Down);
+    _key1pBox.add(&_p1TurnRight);
+    _key1pBox.add(&_p1TurnLeft);
 
-    alternateKey1pBox.add(&ap1Left);
-    alternateKey1pBox.add(&ap1Right);
-    alternateKey1pBox.add(&ap1Down);
-    alternateKey1pBox.add(&ap1TurnRight);
-    alternateKey1pBox.add(&ap1TurnLeft);
+    _alternateKey1pBox.add(&_ap1Left);
+    _alternateKey1pBox.add(&_ap1Right);
+    _alternateKey1pBox.add(&_ap1Down);
+    _alternateKey1pBox.add(&_ap1TurnRight);
+    _alternateKey1pBox.add(&_ap1TurnLeft);
 
-    label2pBox.add(&lbl2PLeft);
-    label2pBox.add(&lbl2PRight);
-    label2pBox.add(&lbl2PDown);
-    label2pBox.add(&lbl2PTurnRight);
-    label2pBox.add(&lbl2PTurnLeft);
+    _label2pBox.add(&_lbl2PLeft);
+    _label2pBox.add(&_lbl2PRight);
+    _label2pBox.add(&_lbl2PDown);
+    _label2pBox.add(&_lbl2PTurnRight);
+    _label2pBox.add(&_lbl2PTurnLeft);
 
-    key2pBox.add(&p2Left);
-    key2pBox.add(&p2Right);
-    key2pBox.add(&p2Down);
-    key2pBox.add(&p2TurnRight);
-    key2pBox.add(&p2TurnLeft);
+    _key2pBox.add(&_p2Left);
+    _key2pBox.add(&_p2Right);
+    _key2pBox.add(&_p2Down);
+    _key2pBox.add(&_p2TurnRight);
+    _key2pBox.add(&_p2TurnLeft);
 
-    alternateKey2pBox.add(&ap2Left);
-    alternateKey2pBox.add(&ap2Right);
-    alternateKey2pBox.add(&ap2Down);
-    alternateKey2pBox.add(&ap2TurnRight);
-    alternateKey2pBox.add(&ap2TurnLeft);
+    _alternateKey2pBox.add(&_ap2Left);
+    _alternateKey2pBox.add(&_ap2Right);
+    _alternateKey2pBox.add(&_ap2Down);
+    _alternateKey2pBox.add(&_ap2TurnRight);
+    _alternateKey2pBox.add(&_ap2TurnLeft);
 
-    playerOneBox.add(&label1pBox);
-    playerOneBox.add(&key1pBox);
-    playerOneBox.add(&alternateKey1pBox);
+    _playerOneBox.add(&_label1pBox);
+    _playerOneBox.add(&_key1pBox);
+    _playerOneBox.add(&_alternateKey1pBox);
 
-    playerTwoBox.add(&label2pBox);
-    playerTwoBox.add(&key2pBox);
-    playerTwoBox.add(&alternateKey2pBox);
+    _playerTwoBox.add(&_label2pBox);
+    _playerTwoBox.add(&_key2pBox);
+    _playerTwoBox.add(&_alternateKey2pBox);
 
-    playerOneFrame.add(&playerOneBox);
-    playerTwoFrame.add(&playerTwoBox);
-    add(&playerOneTitleFrame);
-    add(&playerOneFrame);
-    add(&playersSeparator);
-    add(&playerTwoTitleFrame);
-    add(&playerTwoFrame);
-    add(&bottomSeparator);
-    add(&backButton);
+    _playerOneFrame.add(&_playerOneBox);
+    _playerTwoFrame.add(&_playerTwoBox);
+    add(&_playerOneTitleFrame);
+    add(&_playerOneFrame);
+    add(&_playersSeparator);
+    add(&_playerTwoTitleFrame);
+    add(&_playerTwoFrame);
+    add(&_bottomSeparator);
+    add(&_backButton);
 }

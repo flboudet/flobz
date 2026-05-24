@@ -30,28 +30,28 @@
 using namespace event_manager;
 
 FloboThemeSelectionBox::FloboThemeSelectionBox()
-    : themePreview(), Spacer0(), Spacer1(), Spacer2(), Spacer3()
+    : _themePreview(), _Spacer0(), _Spacer1(), _Spacer2(), _Spacer3()
 {
-    prevButton = new Image(theCommander->getLeftArrow());
-    nextButton = new Image(theCommander->getRightArrow());
+    _prevButton = new Image(theCommander->getLeftArrow());
+    _nextButton = new Image(theCommander->getRightArrow());
 
-    Spacer0.setPreferedSize(Vec3(15.0f, 0.0f));
-    Spacer1.setPreferedSize(Vec3(0.0f, 0.0f));
-    Spacer2.setPreferedSize(Vec3(0.0f, 0.0f));
-    Spacer3.setPreferedSize(Vec3(15.0f, 0.0f));
+    _Spacer0.setPreferedSize(Vec3(15.0f, 0.0f));
+    _Spacer1.setPreferedSize(Vec3(0.0f, 0.0f));
+    _Spacer2.setPreferedSize(Vec3(0.0f, 0.0f));
+    _Spacer3.setPreferedSize(Vec3(15.0f, 0.0f));
 
     setPolicy(USE_MAX_SIZE_NO_MARGIN);
 }
 
 FloboThemeSelectionBox::~FloboThemeSelectionBox()
 {
-    delete prevButton;
-    delete nextButton;
+    delete _prevButton;
+    delete _nextButton;
 }
 
 void FloboThemeSelectionBox::build()
 {
-    themePreview.build();
+    _themePreview.build();
     const std::vector<std::string> &themes = theCommander->getFloboSetThemeList();
     int size = themes.size();
     std::string preferedTheme = theCommander->getPreferedFloboSetThemeName();
@@ -59,26 +59,26 @@ void FloboThemeSelectionBox::build()
     bool found = false;
     for (std::vector<std::string>::const_iterator iter = themes.begin() ;
          (iter != themes.end()) && (!found); iter ++) {
-        themePreview.themeSelected(preferedTheme);
+        _themePreview.themeSelected(preferedTheme);
         found = true;
     }
     if (!found) {
-        themePreview.themeSelected(themes[0]);
+        _themePreview.themeSelected(themes[0]);
         theCommander->setPreferedFloboSetThemeName(themes[0].c_str());
     }
-    add(&Spacer0);
-    prevButton->setFocusable(size > 1);
-    prevButton->setOnAction(this);
-    prevButton->setInvertedFocus(true);
-    add(prevButton);
-    add(&Spacer1);
-    add(&themePreview);
-    add(&Spacer2);
-    nextButton->setFocusable(size > 1);
-    nextButton->setOnAction(this);
-    nextButton->setInvertedFocus(true);
-    add(nextButton);
-    add(&Spacer3);
+    add(&_Spacer0);
+    _prevButton->setFocusable(size > 1);
+    _prevButton->setOnAction(this);
+    _prevButton->setInvertedFocus(true);
+    add(_prevButton);
+    add(&_Spacer1);
+    add(&_themePreview);
+    add(&_Spacer2);
+    _nextButton->setFocusable(size > 1);
+    _nextButton->setOnAction(this);
+    _nextButton->setInvertedFocus(true);
+    add(_nextButton);
+    add(&_Spacer3);
 }
 
 void FloboThemeSelectionBox::action(Widget *sender, int actionType, GameControlEvent *event)
@@ -95,14 +95,14 @@ void FloboThemeSelectionBox::action(Widget *sender, int actionType, GameControlE
     {
         if (pref == themes[currentTheme]) break;
     }
-    if (sender == prevButton) {
+    if (sender == _prevButton) {
         (currentTheme <= 0) ? currentTheme = size - 1 : currentTheme--;
-        themePreview.themeSelected(themes[currentTheme]);
+        _themePreview.themeSelected(themes[currentTheme]);
         theCommander->setPreferedFloboSetThemeName(themes[currentTheme].c_str());
     }
-    else if (sender == nextButton) {
+    else if (sender == _nextButton) {
         currentTheme = (currentTheme+1)%size;
-        themePreview.themeSelected(themes[currentTheme]);
+        _themePreview.themeSelected(themes[currentTheme]);
         theCommander->setPreferedFloboSetThemeName(themes[currentTheme].c_str());
     }
 }
@@ -115,13 +115,13 @@ void FloboThemeSelectionBox::action(Widget *sender, int actionType, GameControlE
 FloboThemePicturePreview::FloboThemePicturePreview()
 {
       setPreferedSize(Vec3(NUMBER_OF_FLOBOS*ONEPUYO-(NUMBER_OF_FLOBOS-1)*ONEPUYO/4.0, ONEPUYO, 1.0));
-      offsetX = offsetY = 0.;
-      curTheme = NULL;
+      _offsetX = _offsetY = 0.;
+      _curTheme = NULL;
       for (int i=0; i<NUMBER_OF_FLOBOS; i++)
       {
-        eyes[i] = 0;
+        _eyes[i] = 0;
       }
-      lastTime = 0.;
+      _lastTime = 0.;
 }
 
 static int imageForIndex(int i)
@@ -132,7 +132,7 @@ static int imageForIndex(int i)
 
 void FloboThemePicturePreview::draw(DrawTarget *dt)
 {
-    if (curTheme != NULL)
+    if (_curTheme != NULL)
     {
       IosRect r;
       Vec3 size = getSize();
@@ -144,17 +144,17 @@ void FloboThemePicturePreview::draw(DrawTarget *dt)
       {
         IosRect rect = r;
         rect.x += (int16_t)((i*3*ONEPUYO)/4);
-        const FloboTheme &t = curTheme->getFloboTheme((FloboState)(FLOBO_BLUE+i));
+        const FloboTheme &t = _curTheme->getFloboTheme((FloboState)(FLOBO_BLUE+i));
         dt->draw(t.getShadowSurface(), NULL, &rect);
         dt->draw(t.getFloboSurfaceForValence(0), NULL, &rect);
-        dt->draw(t.getEyeSurfaceForIndex(imageForIndex(eyes[i])), NULL, &rect);
+        dt->draw(t.getEyeSurfaceForIndex(imageForIndex(_eyes[i])), NULL, &rect);
       }
     }
 }
 
 void FloboThemePicturePreview::themeSelected(FloboSetTheme *  theme)
 {
-    curTheme = theme;
+    _curTheme = theme;
     //requestDraw();
 }
 
@@ -162,26 +162,26 @@ void FloboThemePicturePreview::idle(double currentTime)
 {
     bool refresh = false;
 
-    if ((currentTime - lastTime) > 0.1)
+    if ((currentTime - _lastTime) > 0.1)
     {
       for (int i=0; i<NUMBER_OF_FLOBOS; i++)
       {
-        if(eyes[i]>0)
+        if(_eyes[i]>0)
         {
             refresh = true;
-            eyes[i]++;
-            if (eyes[i] > 2*(NUMBER_OF_FLOBO_EYES-1)) eyes[i] = 0;
+            _eyes[i]++;
+            if (_eyes[i] > 2*(NUMBER_OF_FLOBO_EYES-1)) _eyes[i] = 0;
         }
         else
         {
             if ((random() % 50) == 0)
             {
               refresh = true;
-              eyes[i] = 1;
+              _eyes[i] = 1;
             }
         }
       }
-      lastTime = currentTime;
+      _lastTime = currentTime;
     }
     if (refresh) requestDraw();
 }
@@ -194,10 +194,10 @@ void FloboThemePicturePreview::idle(double currentTime)
 FloboThemePreview::FloboThemePreview() {}
 
 void FloboThemePreview::build() {
-    add(&name);
-    add(&author);
-    add(&picture);
-    add(&description);
+    add(&_name);
+    add(&_author);
+    add(&_picture);
+    add(&_description);
 }
 
 FloboThemePreview::~FloboThemePreview() {}
@@ -206,17 +206,17 @@ void FloboThemePreview::themeSelected(const std::string &themeName)
 {
 #define _ComputeVZoneSize(A,B) Vec3(A.x>B.x?A.x:B.x,A.y+B.y+GameUIDefaults::SPACING,1.0)
     FloboSetThemeRef curTheme = theCommander->getFloboSetTheme(themeName.c_str());
-    name.setFont(GameUIDefaults::FONT_TEXT);
-    name.setValue(curTheme->getLocalizedName().c_str());
-    author.setFont(GameUIDefaults::FONT_SMALL_INFO);
-    author.setValue(curTheme->getAuthor().c_str());
-    description.setFont(GameUIDefaults::FONT_SMALL_INFO);
-    description.setValue(curTheme->getComments().c_str());
-    picture.themeSelected(curTheme);
+    _name.setFont(GameUIDefaults::FONT_TEXT);
+    _name.setValue(curTheme->getLocalizedName().c_str());
+    _author.setFont(GameUIDefaults::FONT_SMALL_INFO);
+    _author.setValue(curTheme->getAuthor().c_str());
+    _description.setFont(GameUIDefaults::FONT_SMALL_INFO);
+    _description.setValue(curTheme->getComments().c_str());
+    _picture.themeSelected(curTheme);
     Vec3 marges(0.0,MARGIN,0.0);
-    Vec3 one=_ComputeVZoneSize(name.getPreferedSize(),author.getPreferedSize());
-    one=_ComputeVZoneSize(one,description.getPreferedSize());
-    setPreferedSize(_ComputeVZoneSize(one,picture.getPreferedSize()));
+    Vec3 one=_ComputeVZoneSize(_name.getPreferedSize(),_author.getPreferedSize());
+    one=_ComputeVZoneSize(one,_description.getPreferedSize());
+    setPreferedSize(_ComputeVZoneSize(one,_picture.getPreferedSize()));
     if (parent)
       parent->arrangeWidgets();
 }
@@ -226,20 +226,20 @@ void FloboThemePreview::themeSelected(const std::string &themeName)
 
 ThemeMenu::ThemeMenu(MainScreen *mainScreen)
     : MainScreenMenu(mainScreen),
-      screenTitleFrame(theCommander->getSeparatorFramePicture()),
-      themeMenuTitle(theCommander->getLocalizedString("Flobo theme")), popAction(mainScreen),
-      backButton(theCommander->getLocalizedString("Back"), &popAction),
-      themeList()
+      _screenTitleFrame(theCommander->getSeparatorFramePicture()),
+      _themeMenuTitle(theCommander->getLocalizedString("Flobo theme")), _popAction(mainScreen),
+      _backButton(theCommander->getLocalizedString("Back"), &_popAction),
+      _themeList()
 {
 }
 
 void ThemeMenu::build() {
     setPolicy(USE_MIN_SIZE);
-    screenTitleFrame.setPreferedSize(Vec3(0, 20));
-    screenTitleFrame.add(&themeMenuTitle);
-    add(&screenTitleFrame);
-    buttonsBox.add(&themeList);
-    buttonsBox.add(&backButton);
-    add(&buttonsBox);
-    themeList.build();
+    _screenTitleFrame.setPreferedSize(Vec3(0, 20));
+    _screenTitleFrame.add(&_themeMenuTitle);
+    add(&_screenTitleFrame);
+    _buttonsBox.add(&_themeList);
+    _buttonsBox.add(&_backButton);
+    add(&_buttonsBox);
+    _themeList.build();
 }

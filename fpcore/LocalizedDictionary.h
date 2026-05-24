@@ -42,8 +42,8 @@ private:
     typedef std::map<std::string, std::shared_ptr<str_dictionnary> > str_dictionnary_cache;
     static str_dictionnary_cache dictionaries;
 private:
-    std::shared_ptr<str_dictionnary> dictionary;
-    const DataPathManager &datapathManager;
+    std::shared_ptr<str_dictionnary> _dictionary;
+    const DataPathManager &_datapathManager;
 };
 
 void Locales_Init();

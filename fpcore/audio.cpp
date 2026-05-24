@@ -14,35 +14,35 @@ static const char * kSound       = "AudioManager.FX.State";
 void Jukebox::registerTrack(const std::string &trackName, const std::string &fileName, int position)
 {
     GTLogTrace("Registering track %s, file %s, position %d", trackName, fileName, position);
-    m_regTracks[trackName] = JukeboxTrack(fileName, position);
+    _regTracks[trackName] = JukeboxTrack(fileName, position);
 }
 
 void Jukebox::playTrack(const std::string &name)
 {
-    if (m_playingMusicName == name)
+    if (_playingMusicName == name)
         return;
     GTLogTrace("Playing track %s", name);
     MusicRef music;
     int pos = 0;
-    std::map<std::string, JukeboxTrack>::const_iterator iter = m_regTracks.find(name);
-    if (iter != m_regTracks.end()) {
+    std::map<std::string, JukeboxTrack>::const_iterator iter = _regTracks.find(name);
+    if (iter != _regTracks.end()) {
         music = theCommander->getMusic(iter->second.fileName.c_str());
         pos = iter->second.position;
     }
     else
         music = theCommander->getMusic(name);
-    if (music.get() != m_playingMusic.get()) {
+    if (music.get() != _playingMusic.get()) {
         GameUIDefaults::GAME_LOOP->getAudioManager()->playMusic(music);
-        m_playingMusic = music;
+        _playingMusic = music;
     }
     GameUIDefaults::GAME_LOOP->getAudioManager()->setMusicPosition(pos);
-    m_playingMusicName = name;
+    _playingMusicName = name;
 }
 
 void Jukebox::playTrack()
 {
     playTrack("");
-    playTrack(m_playingMusicName.c_str());
+    playTrack(_playingMusicName.c_str());
 }
 
 AudioHelper::AudioHelper()
@@ -53,15 +53,15 @@ AudioHelper::AudioHelper()
     GlobalNotificationCenter.addListener((kMusic), this);
     GlobalNotificationCenter.addListener((kSound), this);
     // Initialize preferences
-    m_audioManager = GameUIDefaults::GAME_LOOP->getAudioManager();
-    m_music_on = theCommander->getPreferencesManager()->getBoolPreference(kMusic,true);
-    m_sound_on = theCommander->getPreferencesManager()->getBoolPreference(kSound,true);
-    m_music_volume = ((float)(theCommander->getPreferencesManager()->getIntPreference(kMusicVolume, 100)))/100.0f;
-    m_sound_volume = ((float)(theCommander->getPreferencesManager()->getIntPreference(kSoundVolume, 100)))/100.0f;
-    m_audioManager->setSoundEnabled(m_sound_on);
-    m_audioManager->setMusicEnabled(m_music_on);
-    m_audioManager->setSoundVolume(m_sound_volume);
-    m_audioManager->setMusicVolume(m_music_volume);
+    _audioManager = GameUIDefaults::GAME_LOOP->getAudioManager();
+    _music_on = theCommander->getPreferencesManager()->getBoolPreference(kMusic,true);
+    _sound_on = theCommander->getPreferencesManager()->getBoolPreference(kSound,true);
+    _music_volume = ((float)(theCommander->getPreferencesManager()->getIntPreference(kMusicVolume, 100)))/100.0f;
+    _sound_volume = ((float)(theCommander->getPreferencesManager()->getIntPreference(kSoundVolume, 100)))/100.0f;
+    _audioManager->setSoundEnabled(_sound_on);
+    _audioManager->setMusicEnabled(_music_on);
+    _audioManager->setSoundVolume(_sound_volume);
+    _audioManager->setMusicVolume(_music_volume);
 }
 
 AudioHelper::~AudioHelper()
@@ -76,32 +76,32 @@ void AudioHelper::playSound(const std::string &fileName, float volume, float bal
 {
     double currentTime = ios_fc::getTimeMs();
     std::map<std::string, double>::iterator iter =
-        m_lastUsedTimestamp.find(fileName);
-    if ((iter != m_lastUsedTimestamp.end())
+        _lastUsedTimestamp.find(fileName);
+    if ((iter != _lastUsedTimestamp.end())
         && (currentTime - iter->second < TIMEMS_BETWEEN_SAME_SOUND))
         return;
     SoundRef sound   = theCommander->getSound(FilePath("sfx").combine(fileName));
-    m_audioManager->playSound(sound, volume, balance);
-    m_lastUsedTimestamp[fileName] = currentTime;
+    _audioManager->playSound(sound, volume, balance);
+    _lastUsedTimestamp[fileName] = currentTime;
 }
 
 void AudioHelper::notificationOccured(const std::string &identifier, void * context)
 {
     if (identifier == kMusicVolume) {
-        m_audioManager->setMusicVolume((float)*(int *)context);
+        _audioManager->setMusicVolume((float)*(int *)context);
     }
     else if (identifier == kSoundVolume) {
-        m_audioManager->setSoundVolume((float)*(int *)context);
+        _audioManager->setSoundVolume((float)*(int *)context);
     }
     else if (identifier == kMusic) {
         bool enabled = *(bool *)context;
-        m_audioManager->setMusicEnabled(enabled);
+        _audioManager->setMusicEnabled(enabled);
         if (enabled) {
             theCommander->playMusicTrack();
         }
     }
     else if (identifier == kSound) {
-        m_audioManager->setSoundEnabled(*(bool *)context);
+        _audioManager->setSoundEnabled(*(bool *)context);
     }
 }
 

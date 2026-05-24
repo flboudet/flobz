@@ -40,7 +40,7 @@ class PauseMenu : public gameui::VBox,
 public:
     PauseMenu(gameui::Action *pauseAction);
     virtual ~PauseMenu();
-    int pauseMenuTop, pauseMenuLeft;
+    int _pauseMenuTop, _pauseMenuLeft;
     void backPressed(bool fromControls = true);
     // Action handler
     virtual void action(gameui::Widget *sender, int actionType, event_manager::GameControlEvent *event);
@@ -58,25 +58,25 @@ public:
         KPauseMenuClosed_Continue
     };
 private:
-    gameui::SliderContainer pauseContainer;
-    gameui::Separator topSeparator;
-    gameui::HBox topBox;
-    gameui::Frame pauseVBox;
-    gameui::Frame pauseTitleFrame;
-    gameui::Text menuTitle;
-    gameui::VBox buttonsBox;
-    gameui::FramedButton continueButton;
+    gameui::SliderContainer _pauseContainer;
+    gameui::Separator _topSeparator;
+    gameui::HBox _topBox;
+    gameui::Frame _pauseVBox;
+    gameui::Frame _pauseTitleFrame;
+    gameui::Text _menuTitle;
+    gameui::VBox _buttonsBox;
+    gameui::FramedButton _continueButton;
     //Button optionsButton;
     //AudioPrefSwitch audioButton;
     //MusicPrefSwitch musicButton;
     //FSPrefSwitch fullScreenButton;
-    gameui::FramedButton abortButton;
-    gameui::Frame optionsBox;
-    gameui::Frame optionsTitleFrame;
-    gameui::Text optionsTitle;
-    gameui::VBox optionsButtonsBox;
-    gameui::Button optionsBack;
-    gameui::Action *m_pauseAction;
+    gameui::FramedButton _abortButton;
+    gameui::Frame _optionsBox;
+    gameui::Frame _optionsTitleFrame;
+    gameui::Text _optionsTitle;
+    gameui::VBox _optionsButtonsBox;
+    gameui::Button _optionsBack;
+    gameui::Action *_pauseAction;
 };
 
 #endif // _FLOBO_PAUSE_MENU_H

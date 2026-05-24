@@ -30,39 +30,39 @@
 using namespace ios_fc;
 
 FloboGameInvitation::FloboGameInvitation()
-    : gameRandomSeed(0), gameSpeed(0), gameNbSets(0)
+    : _gameRandomSeed(0), _gameSpeed(0), _gameNbSets(0)
 {}
 
 class NetGameCenter::GamerPeer {
 public:
     GamerPeer(const std::string & name, PeerAddress address, int status = PEER_NORMAL, int rank = -1, bool self=false) :
-        name(name), address(address), status(status), rank(rank), self(self) {}
-    std::string name;
-    PeerAddress address;
-    int status;
-    int rank;
-    bool self;
+        _name(name), _address(address), _status(status), _rank(rank), _self(self) {}
+    std::string _name;
+    PeerAddress _address;
+    int _status;
+    int _rank;
+    bool _self;
 };
 
 class NetGameCenter::PendingGame {
 public:
-    PendingGame(GamerPeer *peer, FloboGameInvitation &invitation) : peer(peer), invitation(invitation), initiateTime(getTimeMs()) {}
-    GamerPeer *peer;
-    FloboGameInvitation invitation;
-    double initiateTime;
+    PendingGame(GamerPeer *peer, FloboGameInvitation &invitation) : _peer(peer), _invitation(invitation), _initiateTime(getTimeMs()) {}
+    GamerPeer *_peer;
+    FloboGameInvitation _invitation;
+    double _initiateTime;
 };
 
 void NetGameCenter::idle()
 {
     double time_ms = getTimeMs();
-    for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
-        if (time_ms - pendingGames[i]->initiateTime > pendingGameTimeout) {
-            for (int u = 0, v = listeners.size() ; u < v ; u++) {
-                listeners[u]->onGameInvitationCanceledReceived(pendingGames[i]->invitation);
+    for (int i = _pendingGames.size() - 1 ; i >= 0 ; i--) {
+        if (time_ms - _pendingGames[i]->_initiateTime > _pendingGameTimeout) {
+            for (int u = 0, v = _listeners.size() ; u < v ; u++) {
+                _listeners[u]->onGameInvitationCanceledReceived(_pendingGames[i]->_invitation);
             }
-            sendGameCancelInvitation(pendingGames[i]->invitation);
-            delete pendingGames[i];
-            pendingGames.removeAt(i);
+            sendGameCancelInvitation(_pendingGames[i]->_invitation);
+            delete _pendingGames[i];
+            _pendingGames.removeAt(i);
         }
     }
 }
@@ -70,47 +70,47 @@ void NetGameCenter::idle()
 void NetGameCenter::connectPeer(PeerAddress addr, const std::string &name, int status, int rank, bool self)
 {
     //printf("%s vient de se connecter!\n", (const char *)name);
-    for (int i = 0, j = peers.size() ; i < j ; i++) {
-        if (peers[i]->address == addr) {
-            if (peers[i]->status != status) {
-                peers[i]->status = status;
-                peers[i]->rank = rank;
-                peers[i]->self = self;
-                for (int i = 0, j = listeners.size() ; i < j ; i++) {
-                    listeners[i]->onPlayerUpdated(name, addr);
+    for (int i = 0, j = _peers.size() ; i < j ; i++) {
+        if (_peers[i]->_address == addr) {
+            if (_peers[i]->_status != status) {
+                _peers[i]->_status = status;
+                _peers[i]->_rank = rank;
+                _peers[i]->_self = self;
+                for (int i = 0, j = _listeners.size() ; i < j ; i++) {
+                    _listeners[i]->onPlayerUpdated(name, addr);
                 }
             }
             return;
         }
     }
     // Peer is not known. Add to list
-    peers.add(new GamerPeer(name, addr, status, rank, self));
-    for (int i = 0, j = listeners.size() ; i < j ; i++) {
-        listeners[i]->onPlayerConnect(name, addr);
+    _peers.add(new GamerPeer(name, addr, status, rank, self));
+    for (int i = 0, j = _listeners.size() ; i < j ; i++) {
+        _listeners[i]->onPlayerConnect(name, addr);
     }
 }
 
 void NetGameCenter::disconnectPeer(PeerAddress addr, const std::string &name)
 {
     //printf("%s vient de se deconnecter! (parait il)\n", (const char *)name);
-    for (int i = 0, j = peers.size() ; i < j ; i++) {
-        GamerPeer *currentPeer = peers[i];
-        if (currentPeer->address == addr) {
+    for (int i = 0, j = _peers.size() ; i < j ; i++) {
+        GamerPeer *currentPeer = _peers[i];
+        if (currentPeer->_address == addr) {
             //printf("Peer trouve au nom %s\n", (const char *)name);
             // Cancels all games from this peer
-            for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
-                if (pendingGames[i]->peer == currentPeer) {
-                    for (int u = 0, v = listeners.size() ; u < v ; u++) {
-                        listeners[u]->onGameInvitationCanceledReceived(pendingGames[i]->invitation);
+            for (int i = _pendingGames.size() - 1 ; i >= 0 ; i--) {
+                if (_pendingGames[i]->_peer == currentPeer) {
+                    for (int u = 0, v = _listeners.size() ; u < v ; u++) {
+                        _listeners[u]->onGameInvitationCanceledReceived(_pendingGames[i]->_invitation);
                     }
-                    delete pendingGames[i];
-                    pendingGames.removeAt(i);
+                    delete _pendingGames[i];
+                    _pendingGames.removeAt(i);
                 }
             }
             // Delete the disconnected peer
-            peers.remove(currentPeer);
-            for (int u = 0, v = listeners.size() ; u < v ; u++) {
-                listeners[u]->onPlayerDisconnect(currentPeer->name, currentPeer->address);
+            _peers.remove(currentPeer);
+            for (int u = 0, v = _listeners.size() ; u < v ; u++) {
+                _listeners[u]->onPlayerDisconnect(currentPeer->_name, currentPeer->_address);
             }
             delete currentPeer;
             return;
@@ -121,36 +121,36 @@ void NetGameCenter::disconnectPeer(PeerAddress addr, const std::string &name)
 
 const std::string & NetGameCenter::getPeerNameAtIndex(int i) const
 {
-    return peers[i]->name;
+    return _peers[i]->_name;
 }
 
 PeerAddress NetGameCenter::getPeerAddressAtIndex(int i) const
 {
-    return peers[i]->address;
+    return _peers[i]->_address;
 }
 
 PeerAddress NetGameCenter::getPeerAddressForPeerName(const std::string & peerName) const
 {
     int i;
-    for (i = 0 ; i < peers.size() ; i++) {
-        if (peers[i]->name == peerName)
-            return peers[i]->address;
+    for (i = 0 ; i < _peers.size() ; i++) {
+        if (_peers[i]->_name == peerName)
+            return _peers[i]->_address;
     }
     // hum...
-    return peers[i]->address;
+    return _peers[i]->_address;
 }
 
 PeerInfo NetGameCenter::getPeerInfoForAddress(PeerAddress &addr) const
 {
     PeerInfo info;
-    info.status = 0;
-    info.rank = -1;
-    info.self = false;
-    for (int i = 0 ; i < peers.size() ; i++) {
-        if (peers[i]->address == addr) {
-            info.status = peers[i]->status;
-            info.rank = peers[i]->rank;
-            info.self = peers[i]->self;
+    info._status = 0;
+    info._rank = -1;
+    info._self = false;
+    for (int i = 0 ; i < _peers.size() ; i++) {
+        if (_peers[i]->_address == addr) {
+            info._status = _peers[i]->_status;
+            info._rank = _peers[i]->_rank;
+            info._self = _peers[i]->_self;
             return info;
         }
     }
@@ -159,36 +159,36 @@ PeerInfo NetGameCenter::getPeerInfoForAddress(PeerAddress &addr) const
 
 int NetGameCenter::getPeerStatusForAddress(PeerAddress &addr) const
 {
-    for (int i = 0 ; i < peers.size() ; i++) {
-        if (peers[i]->address == addr)
-            return peers[i]->status;
+    for (int i = 0 ; i < _peers.size() ; i++) {
+        if (_peers[i]->_address == addr)
+            return _peers[i]->_status;
     }
     return 0;
 }
 
 int NetGameCenter::getPeerCount() const
 {
-    return peers.size();
+    return _peers.size();
 }
 
 void NetGameCenter::requestGame(FloboGameInvitation &invitation)
 {
-    GamerPeer *myPeer = getPeerForAddress(invitation.opponentAddress);
+    GamerPeer *myPeer = getPeerForAddress(invitation._opponentAddress);
     if (myPeer != NULL) {
         // Checks if there is already an active game with this peer
-        for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
-            if (pendingGames[i]->peer == myPeer)
+        for (int i = _pendingGames.size() - 1 ; i >= 0 ; i--) {
+            if (_pendingGames[i]->_peer == myPeer)
                 return;
         }
-        invitation.opponentName = myPeer->name;
-        pendingGames.add(new PendingGame(myPeer, invitation));
+        invitation._opponentName = myPeer->_name;
+        _pendingGames.add(new PendingGame(myPeer, invitation));
         sendGameRequest(invitation);
     }
 }
 
 void NetGameCenter::acceptGameInvitation(FloboGameInvitation &invitation)
 {
-    GamerPeer *myPeer = getPeerForAddress(invitation.opponentAddress);
+    GamerPeer *myPeer = getPeerForAddress(invitation._opponentAddress);
     if (myPeer != NULL) {
         sendGameAcceptInvitation(invitation);
     }
@@ -196,13 +196,13 @@ void NetGameCenter::acceptGameInvitation(FloboGameInvitation &invitation)
 
 void NetGameCenter::cancelGameInvitation(FloboGameInvitation &invitation)
 {
-    GamerPeer *myPeer = getPeerForAddress(invitation.opponentAddress);
+    GamerPeer *myPeer = getPeerForAddress(invitation._opponentAddress);
     if (myPeer != NULL) {
-        for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
-            if (pendingGames[i]->peer == myPeer) {
+        for (int i = _pendingGames.size() - 1 ; i >= 0 ; i--) {
+            if (_pendingGames[i]->_peer == myPeer) {
                 // We won't call gameCanceledAgainst yet to avoid objects destructing themselves
                 // but instead set the game in timeout
-                pendingGames[i]->initiateTime = getTimeMs() - pendingGameTimeout;
+                _pendingGames[i]->_initiateTime = getTimeMs() - _pendingGameTimeout;
             }
         }
     }
@@ -210,35 +210,35 @@ void NetGameCenter::cancelGameInvitation(FloboGameInvitation &invitation)
 
 void NetGameCenter::grantGameWithMessageBox(FloboGameInvitation &invitation, MessageBox &thembox)
 {
-    GamerPeer *myPeer = getPeerForAddress(invitation.opponentAddress);
+    GamerPeer *myPeer = getPeerForAddress(invitation._opponentAddress);
     if (myPeer != NULL) {
         // Remove from pending games
-        for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
-            if (pendingGames[i]->peer == myPeer)
-                pendingGames.removeAt(i);
+        for (int i = _pendingGames.size() - 1 ; i >= 0 ; i--) {
+            if (_pendingGames[i]->_peer == myPeer)
+                _pendingGames.removeAt(i);
         }
     }
     setStatus(PEER_PLAYING);
-    for (int i = 0, j = listeners.size() ; i < j ; i++) {
-        listeners[i]->onGameGrantedWithMessagebox(&thembox, invitation);
+    for (int i = 0, j = _listeners.size() ; i < j ; i++) {
+        _listeners[i]->onGameGrantedWithMessagebox(&thembox, invitation);
     }
 }
 
 void NetGameCenter::receivedGameInvitation(FloboGameInvitation &invitation)
 {
     // Retrieving the peer
-    GamerPeer *peer = getPeerForAddress(invitation.opponentAddress);
+    GamerPeer *peer = getPeerForAddress(invitation._opponentAddress);
     if (peer != NULL) {
         // Check if the game doesn't exists
-        for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
-            if (pendingGames[i]->peer == peer)
+        for (int i = _pendingGames.size() - 1 ; i >= 0 ; i--) {
+            if (_pendingGames[i]->_peer == peer)
                 return;
         }
         // Create the game
-        pendingGames.add(new PendingGame(peer, invitation));
+        _pendingGames.add(new PendingGame(peer, invitation));
         // notifies invitation
-        for (int i = 0, j = listeners.size() ; i < j ; i++) {
-            listeners[i]->onGameInvitationReceived(invitation);
+        for (int i = 0, j = _listeners.size() ; i < j ; i++) {
+            _listeners[i]->onGameInvitationReceived(invitation);
         }
     }
 }
@@ -249,14 +249,14 @@ void NetGameCenter::receivedGameCanceledWithPeer(const std::string & playerName,
     GamerPeer *peer = getPeerForAddress(addr);
     if (peer != NULL) {
         // Check if the game doesn't exists
-        for (int i = pendingGames.size() - 1 ; i >= 0 ; i--) {
-            if (pendingGames[i]->peer == peer) {
+        for (int i = _pendingGames.size() - 1 ; i >= 0 ; i--) {
+            if (_pendingGames[i]->_peer == peer) {
                 // Cancel the game
-                for (int u = 0, v = listeners.size() ; u < v ; u++) {
-                    listeners[u]->onGameInvitationCanceledReceived(pendingGames[i]->invitation);
+                for (int u = 0, v = _listeners.size() ; u < v ; u++) {
+                    _listeners[u]->onGameInvitationCanceledReceived(_pendingGames[i]->_invitation);
                 }
-                delete pendingGames[i];
-                pendingGames.removeAt(i);
+                delete _pendingGames[i];
+                _pendingGames.removeAt(i);
             }
         }
     }
@@ -264,9 +264,9 @@ void NetGameCenter::receivedGameCanceledWithPeer(const std::string & playerName,
 
 NetGameCenter::GamerPeer *NetGameCenter::getPeerForAddress(PeerAddress addr)
 {
-    for (int i = 0 ; i < peers.size() ; i++) {
-        if (peers[i]->address == addr) {
-            return peers[i];
+    for (int i = 0 ; i < _peers.size() ; i++) {
+        if (_peers[i]->_address == addr) {
+            return _peers[i];
         }
     }
     return NULL;

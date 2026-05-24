@@ -36,28 +36,28 @@ class PushScreenState::GhostScreen : public gameui::Screen
 public:
     GhostScreen(GameLoop *loop = NULL)
         : gameui::Screen(loop),
-          m_parentScreen(GameUIDefaults::SCREEN_STACK->top()) {}
+          _parentScreen(GameUIDefaults::SCREEN_STACK->top()) {}
     void drawAnyway(DrawTarget *dt) {
-        m_parentScreen->addToGameLoop(m_parentScreen->getGameLoop());
-        m_parentScreen->show();
-        m_parentScreen->drawAnyway(dt);
-        m_parentScreen->hide();
-        m_parentScreen->removeFromGameLoopActive();
+        _parentScreen->addToGameLoop(_parentScreen->getGameLoop());
+        _parentScreen->show();
+        _parentScreen->drawAnyway(dt);
+        _parentScreen->hide();
+        _parentScreen->removeFromGameLoopActive();
     }
     void draw(DrawTarget *dt) {
-        m_parentScreen->draw(dt);
+        _parentScreen->draw(dt);
     }
 private:
-    gameui::Screen *m_parentScreen;
+    gameui::Screen *_parentScreen;
 };
 void PushScreenState::enterState()
 {
-    m_ghostScreen.reset(new GhostScreen());
-    GameUIDefaults::SCREEN_STACK->push(m_ghostScreen.get());
+    _ghostScreen.reset(new GhostScreen());
+    GameUIDefaults::SCREEN_STACK->push(_ghostScreen.get());
 }
 void PushScreenState::exitState()
 {
-    GameUIDefaults::GAME_LOOP->garbageCollect(m_ghostScreen.release());
+    GameUIDefaults::GAME_LOOP->garbageCollect(_ghostScreen.release());
 }
 bool PushScreenState::evaluate()
 {
@@ -65,7 +65,7 @@ bool PushScreenState::evaluate()
 }
 GameState *PushScreenState::getNextState()
 {
-    return m_nextState;
+    return _nextState;
 }
 
 //---------------------------------
@@ -76,15 +76,15 @@ SetupMatchState::SetupMatchState(GameWidgetFactory  *gameWidgetFactory,
                                  PlayerNameProvider *nameProvider,
                                  SharedMatchAssets  *sharedMatchAssets,
                                  int nbPlayers)
-  : m_nbPlayers(nbPlayers),
-    m_gameWidgetFactory(gameWidgetFactory),
-    m_gameOptions(gameOptions),
-    m_nameProvider(nameProvider),
-    m_sharedAssets(sharedMatchAssets),
-    m_nextState(NULL),
-    m_handicapOnVictorious(true),
-    m_displayVictories(false),
-    m_accountTotalOnPlayerB(true)
+  : _nbPlayers(nbPlayers),
+    _gameWidgetFactory(gameWidgetFactory),
+    _gameOptions(gameOptions),
+    _nameProvider(nameProvider),
+    _sharedAssets(sharedMatchAssets),
+    _nextState(NULL),
+    _handicapOnVictorious(true),
+    _displayVictories(false),
+    _accountTotalOnPlayerB(true)
 {
 }
 
@@ -92,30 +92,30 @@ void SetupMatchState::enterState()
 {
     GTLogTrace("SetupMatchState::enterState()");
     // Prepare 1st run
-    m_sharedAssets->m_currentLevelTheme = theCommander->getPreferedLevelTheme(m_nbPlayers);
-    if (m_sharedAssets->m_currentLevelTheme.get() == NULL)
+    _sharedAssets->_currentLevelTheme = theCommander->getPreferedLevelTheme(_nbPlayers);
+    if (_sharedAssets->_currentLevelTheme.get() == NULL)
         throw std::runtime_error("No matching level theme");
-    m_sharedAssets->m_currentFloboSetTheme = theCommander->getPreferedFloboSetTheme();
+    _sharedAssets->_currentFloboSetTheme = theCommander->getPreferedFloboSetTheme();
     // Create the gamewidget and register as the gamewidget's action
     GameWidget *newGameWidget =
-        m_gameWidgetFactory->createGameWidget(*(m_sharedAssets->m_currentFloboSetTheme),
-                                              *(m_sharedAssets->m_currentLevelTheme),
-                                              m_sharedAssets->m_currentLevelTheme->getCentralAnimation2P().c_str(), NULL);
-    newGameWidget->setGameOptions(m_gameOptions);
-    if (m_nameProvider != NULL) {
-        newGameWidget->setPlayerOneName(m_nameProvider->getPlayerName(0));
-        newGameWidget->setPlayerTwoName(m_nameProvider->getPlayerName(1));
+        _gameWidgetFactory->createGameWidget(*(_sharedAssets->_currentFloboSetTheme),
+                                              *(_sharedAssets->_currentLevelTheme),
+                                              _sharedAssets->_currentLevelTheme->getCentralAnimation2P().c_str(), NULL);
+    newGameWidget->setGameOptions(_gameOptions);
+    if (_nameProvider != NULL) {
+        newGameWidget->setPlayerOneName(_nameProvider->getPlayerName(0));
+        newGameWidget->setPlayerTwoName(_nameProvider->getPlayerName(1));
     }
     // Setup total points
-    newGameWidget->getStatPlayerOne().total_points = m_sharedAssets->m_leftTotal;
-    if (m_accountTotalOnPlayerB)
-        newGameWidget->getStatPlayerTwo().total_points = m_sharedAssets->m_rightTotal;
+    newGameWidget->getStatPlayerOne().total_points = _sharedAssets->_leftTotal;
+    if (_accountTotalOnPlayerB)
+        newGameWidget->getStatPlayerTwo().total_points = _sharedAssets->_rightTotal;
     // Optionnaly setup victories
-    if (m_displayVictories)
-        newGameWidget->setVictories(m_sharedAssets->m_leftVictories, m_sharedAssets->m_rightVictories);
+    if (_displayVictories)
+        newGameWidget->setVictories(_sharedAssets->_leftVictories, _sharedAssets->_rightVictories);
     // Optionnaly setup handicap
-    if (m_handicapOnVictorious) {
-        int victoriesDelta = m_sharedAssets->m_leftVictories - m_sharedAssets->m_rightVictories;
+    if (_handicapOnVictorious) {
+        int victoriesDelta = _sharedAssets->_leftVictories - _sharedAssets->_rightVictories;
         if (victoriesDelta > 0) {
             newGameWidget->addGameAHandicap(victoriesDelta);
         }
@@ -125,15 +125,15 @@ void SetupMatchState::enterState()
     }
     GameScreen *newGameScreen = new GameScreen(*(newGameWidget));
     // Handle eventual game enchainment
-    if (m_sharedAssets->m_gameScreen.get() != NULL) {
-        GameUIDefaults::GAME_LOOP->garbageCollect(m_sharedAssets->m_gameWidget.release());
-        GameUIDefaults::GAME_LOOP->garbageCollect(m_sharedAssets->m_gameScreen.release());
+    if (_sharedAssets->_gameScreen.get() != NULL) {
+        GameUIDefaults::GAME_LOOP->garbageCollect(_sharedAssets->_gameWidget.release());
+        GameUIDefaults::GAME_LOOP->garbageCollect(_sharedAssets->_gameScreen.release());
     }
-    m_sharedAssets->m_gameWidget.reset(newGameWidget);
+    _sharedAssets->_gameWidget.reset(newGameWidget);
     GameUIDefaults::SCREEN_STACK->swap(newGameScreen);
-    m_sharedAssets->m_gameScreen.reset(newGameScreen);
+    _sharedAssets->_gameScreen.reset(newGameScreen);
     // Set the game initially paused
-    m_sharedAssets->m_gameScreen->setSuspended(true);
+    _sharedAssets->_gameScreen->setSuspended(true);
 }
 
 bool SetupMatchState::evaluate()
@@ -145,7 +145,7 @@ bool SetupMatchState::evaluate()
 
 GameState *SetupMatchState::getNextState()
 {
-    return m_nextState;
+    return _nextState;
 }
 
 void SetupMatchState::action(Widget *sender, int actionType,
@@ -158,58 +158,58 @@ void SetupMatchState::action(Widget *sender, int actionType,
 //---------------------------------
 EnterPlayerReadyState::EnterPlayerReadyState(SharedMatchAssets &sharedMatchAssets,
                                              SharedGetReadyAssets &sharedGetReadyAssets)
-: CycledComponent(0.1), m_sharedAssets(sharedMatchAssets),
-m_sharedGetReadyAssets(sharedGetReadyAssets),
-m_getReadyDisplayed(false), m_nextState(NULL)
+: CycledComponent(0.1), _sharedAssets(sharedMatchAssets),
+_sharedGetReadyAssets(sharedGetReadyAssets),
+_getReadyDisplayed(false), _nextState(NULL)
 {
 }
 
 void EnterPlayerReadyState::enterState()
 {
     GTLogTrace("EnterPlayerReadyState::enterState()");
-    if (m_sharedAssets.m_currentLevelTheme->getReadyAnimation2P() == "") {
+    if (_sharedAssets._currentLevelTheme->getReadyAnimation2P() == "") {
         return;
     }
-    m_getReadyDisplayed = false;
-    m_sharedGetReadyAssets.m_getReadyWidget.reset(new StoryWidget(m_sharedAssets.m_currentLevelTheme->getReadyAnimation2P().c_str(), this));
-    m_sharedAssets.m_gameWidget->setGameOverAction(this);
-    m_sharedAssets.m_gameScreen->setOverlayStory(m_sharedGetReadyAssets.m_getReadyWidget.get());
+    _getReadyDisplayed = false;
+    _sharedGetReadyAssets._getReadyWidget.reset(new StoryWidget(_sharedAssets._currentLevelTheme->getReadyAnimation2P().c_str(), this));
+    _sharedAssets._gameWidget->setGameOverAction(this);
+    _sharedAssets._gameScreen->setOverlayStory(_sharedGetReadyAssets._getReadyWidget.get());
     GameUIDefaults::GAME_LOOP->addIdle(this);
 }
 
 void EnterPlayerReadyState::exitState()
 {
-    m_sharedAssets.m_gameWidget->setGameOverAction(NULL);
+    _sharedAssets._gameWidget->setGameOverAction(NULL);
     GameUIDefaults::GAME_LOOP->removeIdle(this);
 }
 
 bool EnterPlayerReadyState::evaluate()
 {
-    return m_getReadyDisplayed;
+    return _getReadyDisplayed;
 }
 
 GameState *EnterPlayerReadyState::getNextState()
 {
-    return m_nextState;
+    return _nextState;
 }
 
 void EnterPlayerReadyState::action(Widget *sender, int actionType,
                                    event_manager::GameControlEvent *event)
 {
-    if (sender == m_sharedGetReadyAssets.m_getReadyWidget.get()) {
-        m_sharedGetReadyAssets.m_getReadyWidget.reset(NULL);
+    if (sender == _sharedGetReadyAssets._getReadyWidget.get()) {
+        _sharedGetReadyAssets._getReadyWidget.reset(NULL);
     }
     else {
-        //m_getReadyDisplayed = true;
+        //_getReadyDisplayed = true;
     }
     evaluateStateMachine();
 }
 
 void EnterPlayerReadyState::cycle()
 {
-    StoryWidget *story = m_sharedGetReadyAssets.m_getReadyWidget.get();
+    StoryWidget *story = _sharedGetReadyAssets._getReadyWidget.get();
     if (story->getIntegerValue("@getready_displayed") == 1) {
-        m_getReadyDisplayed = true;
+        _getReadyDisplayed = true;
         evaluateStateMachine();
     }
 }
@@ -219,7 +219,7 @@ void EnterPlayerReadyState::onEvent(GameControlEvent *cevent)
     if (!cevent->isUp) {
         switch (cevent->cursorEvent) {
             case kStart:
-                m_getReadyDisplayed = true;
+                _getReadyDisplayed = true;
                 evaluateStateMachine();
                 break;
             default:
@@ -233,18 +233,18 @@ void EnterPlayerReadyState::onEvent(GameControlEvent *cevent)
 //---------------------------------
 ExitPlayerReadyState::ExitPlayerReadyState(SharedMatchAssets &sharedMatchAssets,
                                            SharedGetReadyAssets &sharedGetReadyAssets)
-: m_sharedAssets(sharedMatchAssets),
-m_sharedGetReadyAssets(sharedGetReadyAssets),
-m_nextState(NULL)
+: _sharedAssets(sharedMatchAssets),
+_sharedGetReadyAssets(sharedGetReadyAssets),
+_nextState(NULL)
 {
 }
 
 void ExitPlayerReadyState::enterState()
 {
     GTLogTrace("ExitPlayerReadyState::enterState()");
-    if (m_sharedGetReadyAssets.m_getReadyWidget.get() == NULL)
+    if (_sharedGetReadyAssets._getReadyWidget.get() == NULL)
         return;
-    m_sharedGetReadyAssets.m_getReadyWidget->setIntegerValue("@start_pressed", 1);
+    _sharedGetReadyAssets._getReadyWidget->setIntegerValue("@start_pressed", 1);
 }
 
 bool ExitPlayerReadyState::evaluate()
@@ -254,57 +254,57 @@ bool ExitPlayerReadyState::evaluate()
 
 GameState *ExitPlayerReadyState::getNextState()
 {
-    return m_nextState;
+    return _nextState;
 }
 
 //---------------------------------
 // WaitPlayersReadyState
 //---------------------------------
 WaitPlayersReadyState::WaitPlayersReadyState(SharedMatchAssets &sharedMatchAssets)
-    : m_sharedAssets(sharedMatchAssets),
-      m_playersAreReady(false),
-      m_nextState(NULL)
+    : _sharedAssets(sharedMatchAssets),
+      _playersAreReady(false),
+      _nextState(NULL)
 {
 }
 
 void WaitPlayersReadyState::enterState()
 {
     GTLogTrace("WaitPlayersReadyState::enterState()");
-    m_playersAreReady = false;
-    if (m_sharedAssets.m_currentLevelTheme->getReadyAnimation2P() == "") {
-        m_playersAreReady = true;
+    _playersAreReady = false;
+    if (_sharedAssets._currentLevelTheme->getReadyAnimation2P() == "") {
+        _playersAreReady = true;
         return;
     }
-    m_getReadyWidget.reset(new StoryWidget(m_sharedAssets.m_currentLevelTheme->getReadyAnimation2P().c_str(), this));
-    m_sharedAssets.m_gameScreen->setOverlayStory(m_getReadyWidget.get());
-    m_sharedAssets.m_gameWidget->setGameOverAction(this);
+    _getReadyWidget.reset(new StoryWidget(_sharedAssets._currentLevelTheme->getReadyAnimation2P().c_str(), this));
+    _sharedAssets._gameScreen->setOverlayStory(_getReadyWidget.get());
+    _sharedAssets._gameWidget->setGameOverAction(this);
 }
 
 void WaitPlayersReadyState::exitState()
 {
-    m_sharedAssets.m_gameWidget->setGameOverAction(NULL);
+    _sharedAssets._gameWidget->setGameOverAction(NULL);
 }
 
 bool WaitPlayersReadyState::evaluate()
 {
-    return m_playersAreReady;
+    return _playersAreReady;
 }
 
 GameState *WaitPlayersReadyState::getNextState()
 {
-    return m_nextState;
+    return _nextState;
 }
 
 void WaitPlayersReadyState::action(Widget *sender, int actionType,
                         event_manager::GameControlEvent *event)
 {
-    if (sender == m_getReadyWidget.get()) {
-        m_getReadyWidget.reset(NULL);
+    if (sender == _getReadyWidget.get()) {
+        _getReadyWidget.reset(NULL);
     }
-    if (m_getReadyWidget.get() != NULL) {
-        m_getReadyWidget->setIntegerValue("@start_pressed", 1);
+    if (_getReadyWidget.get() != NULL) {
+        _getReadyWidget->setIntegerValue("@start_pressed", 1);
     }
-    m_playersAreReady = true;
+    _playersAreReady = true;
     evaluateStateMachine();
 }
 
@@ -312,44 +312,44 @@ void WaitPlayersReadyState::action(Widget *sender, int actionType,
 // MatchPlayingState
 //---------------------------------
 MatchPlayingState::MatchPlayingState(SharedMatchAssets &sharedMatchAssets)
-    : m_sharedAssets(sharedMatchAssets),
-      m_gameIsOver(false),
-      m_nextState(NULL),
-      m_abortedState(NULL)
+    : _sharedAssets(sharedMatchAssets),
+      _gameIsOver(false),
+      _nextState(NULL),
+      _abortedState(NULL)
 {
 }
 
 void MatchPlayingState::enterState()
 {
     GTLogTrace("MatchPlaying::enterState()");
-    m_gameIsOver = false;
-    m_sharedAssets.m_gameWidget->setGameOverAction(this);
+    _gameIsOver = false;
+    _sharedAssets._gameWidget->setGameOverAction(this);
     // Resume the game
-    m_sharedAssets.m_gameScreen->setSuspended(false);
+    _sharedAssets._gameScreen->setSuspended(false);
 }
 
 void MatchPlayingState::exitState()
 {
-    m_sharedAssets.m_gameWidget->setGameOverAction(NULL);
+    _sharedAssets._gameWidget->setGameOverAction(NULL);
 }
 
 bool MatchPlayingState::evaluate()
 {
-    return m_gameIsOver;
+    return _gameIsOver;
 }
 
 GameState *MatchPlayingState::getNextState()
 {
-    if (m_sharedAssets.m_gameWidget->getAborted())
-        return m_abortedState;
-    return m_nextState;
+    if (_sharedAssets._gameWidget->getAborted())
+        return _abortedState;
+    return _nextState;
 }
 
 void MatchPlayingState::action(Widget *sender, int actionType,
                         event_manager::GameControlEvent *event)
 {
     if (actionType == GameWidget::GAME_IS_OVER) {
-        m_gameIsOver = true;
+        _gameIsOver = true;
         evaluateStateMachine();
     }
 }
@@ -358,75 +358,75 @@ void MatchPlayingState::action(Widget *sender, int actionType,
 // MatchIsOverState
 //---------------------------------
 MatchIsOverState::MatchIsOverState(SharedMatchAssets &sharedMatchAssets)
-    : m_sharedAssets(sharedMatchAssets),
-      m_aknowledged(false)
+    : _sharedAssets(sharedMatchAssets),
+      _aknowledged(false)
 {
 }
 
 MatchIsOverState::~MatchIsOverState()
 {
-    if (m_gameLostWidget.get() != NULL) {
-        m_gameLostWidget->getParentScreen()->removeAction(this);
-        m_gameLostWidget.reset(NULL);
+    if (_gameLostWidget.get() != NULL) {
+        _gameLostWidget->getParentScreen()->removeAction(this);
+        _gameLostWidget.reset(NULL);
     }
 }
 
 void MatchIsOverState::enterState()
 {
     GTLogTrace("MatchIsOver::enterState()");
-    m_aknowledged = false;
-    if (m_styrolyseName != "") {
-        m_gameLostWidget.reset(new StoryWidget(m_styrolyseName.c_str(), this));
+    _aknowledged = false;
+    if (_styrolyseName != "") {
+        _gameLostWidget.reset(new StoryWidget(_styrolyseName.c_str(), this));
     }
-    else if (m_sharedAssets.m_gameWidget->isGameARunning()) {
-        m_gameLostWidget.reset(new StoryWidget(m_sharedAssets.m_currentLevelTheme->getGameLostRightAnimation2P().c_str(), this));
-        m_sharedAssets.m_leftVictories++;
+    else if (_sharedAssets._gameWidget->isGameARunning()) {
+        _gameLostWidget.reset(new StoryWidget(_sharedAssets._currentLevelTheme->getGameLostRightAnimation2P().c_str(), this));
+        _sharedAssets._leftVictories++;
     }
     else {
-        m_gameLostWidget.reset(new StoryWidget(m_sharedAssets.m_currentLevelTheme->getGameLostLeftAnimation2P().c_str(), this));
-        m_sharedAssets.m_rightVictories++;
+        _gameLostWidget.reset(new StoryWidget(_sharedAssets._currentLevelTheme->getGameLostLeftAnimation2P().c_str(), this));
+        _sharedAssets._rightVictories++;
     }
-    m_sharedAssets.m_leftTotal  += m_sharedAssets.m_gameWidget->getStatPlayerOne().points;
-    m_sharedAssets.m_rightTotal += m_sharedAssets.m_gameWidget->getStatPlayerTwo().points;
-    m_sharedAssets.m_gameWidget->setGameOverAction(this);
-    m_sharedAssets.m_gameScreen->setOverlayStory(m_gameLostWidget.get());
-    m_sharedAssets.m_gameScreen->addAction(this);
+    _sharedAssets._leftTotal  += _sharedAssets._gameWidget->getStatPlayerOne().points;
+    _sharedAssets._rightTotal += _sharedAssets._gameWidget->getStatPlayerTwo().points;
+    _sharedAssets._gameWidget->setGameOverAction(this);
+    _sharedAssets._gameScreen->setOverlayStory(_gameLostWidget.get());
+    _sharedAssets._gameScreen->addAction(this);
 }
 
 void MatchIsOverState::exitState()
 {
     GTLogTrace("MatchIsOver::exitState()");
-    m_sharedAssets.m_gameWidget->setGameOverAction(NULL);
+    _sharedAssets._gameWidget->setGameOverAction(NULL);
 }
 
 bool MatchIsOverState::evaluate()
 {
-    return m_aknowledged;
+    return _aknowledged;
 }
 
 GameState *MatchIsOverState::getNextState()
 {
-    return m_nextState;
+    return _nextState;
 }
 
 void MatchIsOverState::action(Widget *sender, int actionType,
                         event_manager::GameControlEvent *event)
 {
-    if (sender == m_gameLostWidget.get()) {
+    if (sender == _gameLostWidget.get()) {
         GTLogTrace("MatchIsOver: acknowledged by animation widget");
-        m_gameLostWidget.reset(NULL);
+        _gameLostWidget.reset(NULL);
     }
     else if ((actionType == GameWidget::GAMEOVER_STARTPRESSED)
-             || ((m_gameLostWidget.get() != NULL)
-                 && (sender == (Widget *)(m_gameLostWidget->getParentScreen()))))
+             || ((_gameLostWidget.get() != NULL)
+                 && (sender == (Widget *)(_gameLostWidget->getParentScreen()))))
     {
         GTLogTrace("MatchIsOver: acknowledged by screen action");
-        m_gameLostWidget->getParentScreen()->removeAction(this);
-        m_gameLostWidget.reset(NULL);
+        _gameLostWidget->getParentScreen()->removeAction(this);
+        _gameLostWidget.reset(NULL);
     }
     else
         return;
-    m_aknowledged = true;
+    _aknowledged = true;
     evaluateStateMachine();
 }
 
@@ -434,26 +434,26 @@ void MatchIsOverState::action(Widget *sender, int actionType,
 // DisplayStatsState
 //---------------------------------
 DisplayStatsState::DisplayStatsState(SharedMatchAssets &sharedMatchAssets)
-    : m_sharedAssets(sharedMatchAssets),
-      m_aknowledged(false),
-      m_dimensions(416, 194, 50, Vec3(0, 0), Vec3(0, 0))
+    : _sharedAssets(sharedMatchAssets),
+      _aknowledged(false),
+      _dimensions(416, 194, 50, Vec3(0, 0), Vec3(0, 0))
 {
 }
 
 DisplayStatsState::~DisplayStatsState()
 {
-    if (m_statsWidget.get() != NULL) {
-        m_statsWidget->getParentScreen()->removeAction(this);
-        m_statsWidget.reset(NULL);
+    if (_statsWidget.get() != NULL) {
+        _statsWidget->getParentScreen()->removeAction(this);
+        _statsWidget.reset(NULL);
     }
 }
 
 void DisplayStatsState::enterState()
 {
     GTLogTrace("DisplayStats::enterState()");
-    m_aknowledged = false;
-    LevelTheme *lvlTheme = m_sharedAssets.m_currentLevelTheme;
-    m_dimensions = StatsWidgetDimensions(
+    _aknowledged = false;
+    LevelTheme *lvlTheme = _sharedAssets._currentLevelTheme;
+    _dimensions = StatsWidgetDimensions(
         lvlTheme->getStatsHeight(),
         lvlTheme->getStatsLegendWidth(),
         lvlTheme->getStatsComboLineValueWidth(),
@@ -461,36 +461,36 @@ void DisplayStatsState::enterState()
              lvlTheme->getStatsLeftBackgroundOffsetY()),
         Vec3(lvlTheme->getStatsRightBackgroundOffsetX(),
              lvlTheme->getStatsRightBackgroundOffsetY()));
-    m_sharedAssets.m_gameWidget->setGameOverAction(this);
-    m_statsWidget.reset(new TwoPlayersStatsWidget(m_sharedAssets.m_gameWidget->getStatPlayerOne(), m_sharedAssets.m_gameWidget->getStatPlayerTwo(), true, true, theCommander->getWindowFramePicture(), m_dimensions));
-    m_sharedAssets.m_gameScreen->add(m_statsWidget.get());
-    m_sharedAssets.m_gameScreen->addAction(this);
+    _sharedAssets._gameWidget->setGameOverAction(this);
+    _statsWidget.reset(new TwoPlayersStatsWidget(_sharedAssets._gameWidget->getStatPlayerOne(), _sharedAssets._gameWidget->getStatPlayerTwo(), true, true, theCommander->getWindowFramePicture(), _dimensions));
+    _sharedAssets._gameScreen->add(_statsWidget.get());
+    _sharedAssets._gameScreen->addAction(this);
 }
 
 void DisplayStatsState::exitState()
 {
-    m_sharedAssets.m_gameWidget->setGameOverAction(NULL);
+    _sharedAssets._gameWidget->setGameOverAction(NULL);
 }
 
 bool DisplayStatsState::evaluate()
 {
-    return m_aknowledged;
+    return _aknowledged;
 }
 
 GameState *DisplayStatsState::getNextState()
 {
-    return m_nextState;
+    return _nextState;
 }
 
 void DisplayStatsState::action(Widget *sender, int actionType,
                         event_manager::GameControlEvent *event)
 {
-    if (sender == (Widget *)(m_statsWidget->getParentScreen())) {
-        m_statsWidget->getParentScreen()->removeAction(this);
-        m_statsWidget.reset(NULL);
+    if (sender == (Widget *)(_statsWidget->getParentScreen())) {
+        _statsWidget->getParentScreen()->removeAction(this);
+        _statsWidget.reset(NULL);
     }
     else {
-        m_aknowledged = true;
+        _aknowledged = true;
         evaluateStateMachine();
     }
 }
@@ -499,57 +499,57 @@ void DisplayStatsState::action(Widget *sender, int actionType,
 // DisplayStoryScreenState
 //---------------------------------
 DisplayStoryScreenState::DisplayStoryScreenState(const std::string &screenName)
-    : m_screenName(screenName), m_vp(NULL)
+    : _screenName(screenName), _vp(NULL)
 {
 }
 
 void DisplayStoryScreenState::enterState()
 {
-    GTLogTrace("DisplayStoryScreenState(%s)::enterState()", m_screenName.c_str());
-    m_storyScreen.reset(new StoryScreen(m_screenName.c_str(),
+    GTLogTrace("DisplayStoryScreenState(%s)::enterState()", _screenName.c_str());
+    _storyScreen.reset(new StoryScreen(_screenName.c_str(),
                                         this));
     // Setup variables value if necessary
-    if (m_vp != NULL) {
-        std::map<std::string, int> ivalues = m_vp->getIntValues();
+    if (_vp != NULL) {
+        std::map<std::string, int> ivalues = _vp->getIntValues();
         for (std::map<std::string, int>::iterator iter = ivalues.begin() ;
              iter != ivalues.end() ; ++iter) {
-            m_storyScreen->getStoryWidget()->setIntegerValue(iter->first.c_str(), iter->second);
+            _storyScreen->getStoryWidget()->setIntegerValue(iter->first.c_str(), iter->second);
         }
-        std::map<std::string, float> fvalues = m_vp->getFloatValues();
+        std::map<std::string, float> fvalues = _vp->getFloatValues();
         for (std::map<std::string, float>::iterator iter = fvalues.begin() ;
              iter != fvalues.end() ; ++iter) {
-            m_storyScreen->getStoryWidget()->setFloatValue(iter->first.c_str(), iter->second);
+            _storyScreen->getStoryWidget()->setFloatValue(iter->first.c_str(), iter->second);
         }
-        std::map<std::string, std::string> svalues = m_vp->getStringValues();
+        std::map<std::string, std::string> svalues = _vp->getStringValues();
         for (std::map<std::string, std::string>::iterator iter = svalues.begin() ;
              iter != svalues.end() ; ++iter) {
-            m_storyScreen->getStoryWidget()->setStringValue(iter->first.c_str(), iter->second.c_str());
+            _storyScreen->getStoryWidget()->setStringValue(iter->first.c_str(), iter->second.c_str());
         }
     }
     // Put the story screen on top of the screen stack
-    GameUIDefaults::SCREEN_STACK->swap(m_storyScreen.get());
-    m_acknowledged = false;
+    GameUIDefaults::SCREEN_STACK->swap(_storyScreen.get());
+    _acknowledged = false;
 }
 
 void DisplayStoryScreenState::exitState()
 {
-    GameUIDefaults::GAME_LOOP->garbageCollect(m_storyScreen.release());
+    GameUIDefaults::GAME_LOOP->garbageCollect(_storyScreen.release());
 }
 
 bool DisplayStoryScreenState::evaluate()
 {
-    return m_acknowledged;
+    return _acknowledged;
 }
 
 GameState *DisplayStoryScreenState::getNextState()
 {
-    return m_nextState;
+    return _nextState;
 }
 
 void DisplayStoryScreenState::action(Widget *sender, int actionType,
                                      event_manager::GameControlEvent *event)
 {
-    m_acknowledged = true;
+    _acknowledged = true;
     evaluateStateMachine();
 }
 
@@ -561,46 +561,46 @@ ManageHiScoresState::ManageHiScoresState(SharedMatchAssets  *sharedMatchAssets,
                                          const char         *scoreBoardId,
                                          const char         *storyName,
                                          StoryNameProvider  *storyNameProvider)
-    : m_boardId(scoreBoardId),
-      m_sharedMatchAssets(sharedMatchAssets),
-      m_nameProvider(nameProvider)
+    : _boardId(scoreBoardId),
+      _sharedMatchAssets(sharedMatchAssets),
+      _nameProvider(nameProvider)
 {
-    m_newHiScore.reset(new DisplayStoryScreenState("new_hiscore.gsl"));
-    m_displayHallOfFame.reset(new DisplayHallOfFameState(storyName, storyNameProvider));
-    m_endOfStateMachine.reset(new CallActionState(this, 0));
-    m_newHiScore->setNextState(m_displayHallOfFame.get());
-    m_displayHallOfFame->setNextState(m_endOfStateMachine.get());
+    _newHiScore.reset(new DisplayStoryScreenState("new_hiscore.gsl"));
+    _displayHallOfFame.reset(new DisplayHallOfFameState(storyName, storyNameProvider));
+    _endOfStateMachine.reset(new CallActionState(this, 0));
+    _newHiScore->setNextState(_displayHallOfFame.get());
+    _displayHallOfFame->setNextState(_endOfStateMachine.get());
 }
 
 void ManageHiScoresState::enterState()
 {
-    m_finished = false;
+    _finished = false;
     // Initializes the score board
-    const PlayerGameStat &playerPoints = m_sharedMatchAssets->m_gameWidget->getStatPlayerOne();
-    m_scoreBoard.reset(new LocalStorageHiScoreBoard(m_boardId.c_str(), theCommander->getPreferencesManager(), m_defaultScoreBoard));
+    const PlayerGameStat &playerPoints = _sharedMatchAssets->_gameWidget->getStatPlayerOne();
+    _scoreBoard.reset(new LocalStorageHiScoreBoard(_boardId.c_str(), theCommander->getPreferencesManager(), _defaultScoreBoard));
     // Adds the latest score
-    int rank = m_scoreBoard->setHiScore(m_nameProvider->getPlayerName(0).c_str(),
+    int rank = _scoreBoard->setHiScore(_nameProvider->getPlayerName(0).c_str(),
                                         playerPoints.points +
                                         playerPoints.total_points);
     // Declare score to the achievements manager
     if (theCommander->getAchievementsManager() != NULL)
-        theCommander->getAchievementsManager()->declareScore(m_boardId.c_str(),
+        theCommander->getAchievementsManager()->declareScore(_boardId.c_str(),
                                                              playerPoints.points +
                                                              playerPoints.total_points);
     // Updates the displayHallOfFame state
-    m_displayHallOfFame->setHiScoreBoard(m_scoreBoard.get());
-    m_displayHallOfFame->setFinalScore(m_nameProvider->getPlayerName(0).c_str(),
+    _displayHallOfFame->setHiScoreBoard(_scoreBoard.get());
+    _displayHallOfFame->setFinalScore(_nameProvider->getPlayerName(0).c_str(),
                                        playerPoints.points +
                                        playerPoints.total_points);
-    m_displayHallOfFame->setRank(rank);
+    _displayHallOfFame->setRank(rank);
     // Initializing the state machine
     if (rank == -1)
-        m_stateMachine.setInitialState(m_displayHallOfFame.get());
+        _stateMachine.setInitialState(_displayHallOfFame.get());
     else
-        m_stateMachine.setInitialState(m_newHiScore.get());
+        _stateMachine.setInitialState(_newHiScore.get());
     // Run the state machine
-    m_stateMachine.reset();
-    m_stateMachine.evaluate();
+    _stateMachine.reset();
+    _stateMachine.evaluate();
 }
 
 void ManageHiScoresState::exitState()
@@ -609,18 +609,18 @@ void ManageHiScoresState::exitState()
 
 bool ManageHiScoresState::evaluate()
 {
-    return m_finished;
+    return _finished;
 }
 
 GameState *ManageHiScoresState::getNextState()
 {
-    return m_nextState;
+    return _nextState;
 }
 
 void ManageHiScoresState::action(Widget *sender, int actionType,
                                  event_manager::GameControlEvent *event)
 {
-    m_finished = true;
+    _finished = true;
     evaluateStateMachine();
 }
 
@@ -629,48 +629,48 @@ void ManageHiScoresState::action(Widget *sender, int actionType,
 //---------------------------------
 DisplayHallOfFameState::DisplayHallOfFameState(const char         *storyName,
                                                StoryNameProvider  *storyNameProvider)
-    : m_storyName(storyName),
-      m_storyNameProvider(storyNameProvider)
+    : _storyName(storyName),
+      _storyNameProvider(storyNameProvider)
 {
 }
 
 void DisplayHallOfFameState::enterState()
 {
-    if (m_storyNameProvider != NULL)
-        m_storyName = m_storyNameProvider->getStoryName();
-    GTLogTrace("StoryModeDisplayHallOfFameState(%s)::enterState()", m_storyName.c_str());
-    m_gameOverScreen.reset(new GameOverScreen(m_storyName.c_str(),
+    if (_storyNameProvider != NULL)
+        _storyName = _storyNameProvider->getStoryName();
+    GTLogTrace("StoryModeDisplayHallOfFameState(%s)::enterState()", _storyName.c_str());
+    _gameOverScreen.reset(new GameOverScreen(_storyName.c_str(),
                                               this));
 
-    //const PlayerGameStat &playerPoints = m_sharedMatchAssets->m_gameWidget->getStatPlayerOne();
+    //const PlayerGameStat &playerPoints = _sharedMatchAssets->_gameWidget->getStatPlayerOne();
 
-    m_gameOverScreen->setScoreBoard(m_scoreBoard);
-    m_gameOverScreen->setFinalScore(m_playerName.c_str(), m_playerScore);
-    m_gameOverScreen->highlightRank(m_rank);
-    GameUIDefaults::SCREEN_STACK->swap(m_gameOverScreen.get());
-    m_gameOverScreen->refresh();
-    m_acknowledged = false;
+    _gameOverScreen->setScoreBoard(_scoreBoard);
+    _gameOverScreen->setFinalScore(_playerName.c_str(), _playerScore);
+    _gameOverScreen->highlightRank(_rank);
+    GameUIDefaults::SCREEN_STACK->swap(_gameOverScreen.get());
+    _gameOverScreen->refresh();
+    _acknowledged = false;
 }
 
 void DisplayHallOfFameState::exitState()
 {
-    GameUIDefaults::GAME_LOOP->garbageCollect(m_gameOverScreen.release());
+    GameUIDefaults::GAME_LOOP->garbageCollect(_gameOverScreen.release());
 }
 
 bool DisplayHallOfFameState::evaluate()
 {
-    return m_acknowledged;
+    return _acknowledged;
 }
 
 GameState *DisplayHallOfFameState::getNextState()
 {
-    return m_nextState;
+    return _nextState;
 }
 
 void DisplayHallOfFameState::action(Widget *sender, int actionType,
                         event_manager::GameControlEvent *event)
 {
-    m_acknowledged = true;
+    _acknowledged = true;
     evaluateStateMachine();
 }
 
@@ -679,8 +679,8 @@ void DisplayHallOfFameState::action(Widget *sender, int actionType,
 //---------------------------------
 LeaveGameState::LeaveGameState(SharedMatchAssets &sharedMatchAssets,
                                Action *actionToCallWhenLeft)
-    : m_sharedAssets(sharedMatchAssets),
-      m_actionToCallWhenLeft(actionToCallWhenLeft)
+    : _sharedAssets(sharedMatchAssets),
+      _actionToCallWhenLeft(actionToCallWhenLeft)
 {
 }
 
@@ -690,10 +690,10 @@ void LeaveGameState::enterState()
     GameUIDefaults::SCREEN_STACK->pop();
     //MainScreen *menuScreen = dynamic_cast<MainScreen *>(GameUIDefaults::SCREEN_STACK->top());
     //if (menuScreen != NULL)
-    //    menuScreen->transitionFromScreen(*(m_sharedAssets.m_gameScreen));
-    m_sharedAssets.release();
-    if (m_actionToCallWhenLeft != NULL)
-        m_actionToCallWhenLeft->action(NULL, 0, NULL);
+    //    menuScreen->transitionFromScreen(*(_sharedAssets._gameScreen));
+    _sharedAssets.release();
+    if (_actionToCallWhenLeft != NULL)
+        _actionToCallWhenLeft->action(NULL, 0, NULL);
 }
 
 bool LeaveGameState::evaluate()
@@ -710,14 +710,14 @@ GameState *LeaveGameState::getNextState()
 // CallActionState
 //---------------------------------
 CallActionState::CallActionState(Action *actionToCall, int actionType)
-    : m_actionToCall(actionToCall), m_actionType(actionType)
+    : _actionToCall(actionToCall), _actionType(actionType)
 {
 }
 
 void CallActionState::enterState()
 {
     GTLogTrace("CallAction::enterState()");
-    m_actionToCall->action(NULL, m_actionType, NULL);
+    _actionToCall->action(NULL, _actionType, NULL);
 }
 
 bool CallActionState::evaluate()
@@ -734,7 +734,7 @@ GameState *CallActionState::getNextState()
 // ManageMultiSetsState
 //---------------------------------
 ManageMultiSetsState::ManageMultiSetsState(SharedMatchAssets  *sharedMatchAssets, int nbSets, PlayerNameProvider *nameProvider)
-    : m_sharedAssets(sharedMatchAssets), m_nameProvider(nameProvider), m_nbSets(nbSets)
+    : _sharedAssets(sharedMatchAssets), _nameProvider(nameProvider), _nbSets(nbSets)
 {
 }
 
@@ -753,10 +753,10 @@ bool ManageMultiSetsState::evaluate()
 
 GameState *ManageMultiSetsState::getNextState()
 {
-    if ((m_sharedAssets->m_leftVictories >= m_nbSets)
-        || (m_sharedAssets->m_rightVictories >= m_nbSets))
-        return m_endOfGameState;
-    return m_nextSetState;
+    if ((_sharedAssets->_leftVictories >= _nbSets)
+        || (_sharedAssets->_rightVictories >= _nbSets))
+        return _endOfGameState;
+    return _nextSetState;
 }
 
 std::map<std::string, int> ManageMultiSetsState::getIntValues() const
@@ -768,17 +768,17 @@ std::map<std::string, int> ManageMultiSetsState::getIntValues() const
 std::map<std::string, float> ManageMultiSetsState::getFloatValues() const
 {
     std::map<std::string, float> result;
-    result["@leftVictories"] = m_sharedAssets->m_leftVictories;
-    result["@rightVictories"] = m_sharedAssets->m_rightVictories;
+    result["@leftVictories"] = _sharedAssets->_leftVictories;
+    result["@rightVictories"] = _sharedAssets->_rightVictories;
     return result;
 }
 
 std::map<std::string, std::string> ManageMultiSetsState::getStringValues() const
 {
     std::map<std::string, std::string> result;
-    if (m_nameProvider != NULL) {
-        result["@leftName"] = m_nameProvider->getPlayerName(0);
-        result["@rightName"] = m_nameProvider->getPlayerName(1);
+    if (_nameProvider != NULL) {
+        result["@leftName"] = _nameProvider->getPlayerName(0);
+        result["@rightName"] = _nameProvider->getPlayerName(1);
     }
     return result;
 }

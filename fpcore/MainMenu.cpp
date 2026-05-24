@@ -13,39 +13,39 @@
 MainRealMenu::MainRealMenu(MainScreen * mainScreen) :
 // Create sub screens
 MainScreenMenu(mainScreen),
-soloGameMenu      (mainScreen),
-localGameMenu     (mainScreen),
-local2PlayersGameMenu(mainScreen),
-optionMenu        (mainScreen),
-popFromHallScreenAction(),
-popFromCreditsAction(),
-hiScores("StoryMode", theCommander->getPreferencesManager(), defaultHiScores),
-hallOfFameScreen(&popFromHallScreenAction),
-creditsScreen("credits.gsl", &popFromCreditsAction, false),
+_soloGameMenu      (mainScreen),
+_localGameMenu     (mainScreen),
+_local2PlayersGameMenu(mainScreen),
+_optionMenu        (mainScreen),
+_popFromHallScreenAction(),
+_popFromCreditsAction(),
+_hiScores("StoryMode", theCommander->getPreferencesManager(), _defaultHiScores),
+_hallOfFameScreen(&_popFromHallScreenAction),
+_creditsScreen("credits.gsl", &_popFromCreditsAction, false),
 // Create action for buttons
-soloGameAction(&soloGameMenu, mainScreen),
-singlePlayerGameAction(&localGameMenu, mainScreen),
-twoPlayersGameAction(&local2PlayersGameMenu, mainScreen),
-optionAction(&optionMenu, mainScreen),
-hallOfFameAction(&hallOfFameScreen),
-creditsAction(&creditsScreen, mainScreen),
+_soloGameAction(&_soloGameMenu, mainScreen),
+_singlePlayerGameAction(&_localGameMenu, mainScreen),
+_twoPlayersGameAction(&_local2PlayersGameMenu, mainScreen),
+_optionAction(&_optionMenu, mainScreen),
+_hallOfFameAction(&_hallOfFameScreen),
+_creditsAction(&_creditsScreen, mainScreen),
 // Create buttons
-soloGameButton(theCommander->getLocalizedString("Solo Game"), &soloGameAction),
-singlePlayerGameButton(theCommander->getLocalizedString("Story-Mode Game"), &singlePlayerGameAction),
-twoPlayersGameButton(theCommander->getLocalizedString("Two Players Game"), &twoPlayersGameAction),
-optionButton(theCommander->getLocalizedString("Options"), &optionAction),
-hallOfFameButton(theCommander->getLocalizedString(kHighScores), &hallOfFameAction),
-creditsButton(theCommander->getLocalizedString("Credits"), &creditsAction),
-exitButton(theCommander->getLocalizedString(kExit), &exitAction)
+_soloGameButton(theCommander->getLocalizedString("Solo Game"), &_soloGameAction),
+_singlePlayerGameButton(theCommander->getLocalizedString("Story-Mode Game"), &_singlePlayerGameAction),
+_twoPlayersGameButton(theCommander->getLocalizedString("Two Players Game"), &_twoPlayersGameAction),
+_optionButton(theCommander->getLocalizedString("Options"), &_optionAction),
+_hallOfFameButton(theCommander->getLocalizedString(kHighScores), &_hallOfFameAction),
+_creditsButton(theCommander->getLocalizedString("Credits"), &_creditsAction),
+_exitButton(theCommander->getLocalizedString(kExit), &_exitAction)
 #ifdef ENABLE_NETWORK
 #ifdef ENABLE_NETWORK_INTERNET
-, networkGameMenu   (mainScreen),
-networkGameAction(&networkGameMenu, mainScreen),
-networkGameButton(theCommander->getLocalizedString(kNetGame), &networkGameAction)
+, _networkGameMenu   (mainScreen),
+_networkGameAction(&_networkGameMenu, mainScreen),
+_networkGameButton(theCommander->getLocalizedString(kNetGame), &_networkGameAction)
 #else
-, lanGameMenu(mainScreen),
-lanAction(&lanGameMenu, mainScreen),
-lanGameButton(theCommander->getLocalizedString("Local Area Network Game").c_str(), &lanAction) // TODO: string
+, _lanGameMenu(mainScreen),
+_lanAction(&_lanGameMenu, mainScreen),
+_lanGameButton(theCommander->getLocalizedString("Local Area Network Game").c_str(), &_lanAction) // TODO: string
 #endif
 #endif
 {
@@ -53,25 +53,25 @@ lanGameButton(theCommander->getLocalizedString("Local Area Network Game").c_str(
 
 
 void MainRealMenu::build() {
-  localGameMenu.build();
-  local2PlayersGameMenu.build();
-  optionMenu.build();
-  add(&soloGameButton);
-  add(&singlePlayerGameButton);
-  add(&twoPlayersGameButton);
+  _localGameMenu.build();
+  _local2PlayersGameMenu.build();
+  _optionMenu.build();
+  add(&_soloGameButton);
+  add(&_singlePlayerGameButton);
+  add(&_twoPlayersGameButton);
 #ifdef ENABLE_NETWORK
 #ifdef ENABLE_NETWORK_INTERNET
-  networkGameMenu.build();
-  add(&networkGameButton);
+  _networkGameMenu.build();
+  add(&_networkGameButton);
 #else
-  lanGameMenu.build();
-  add(&lanGameButton);
+  _lanGameMenu.build();
+  add(&_lanGameButton);
 #endif
 #endif
-  add(&optionButton);
+  add(&_optionButton);
   // Hall of Fame should be improved to handle multiple boards
-  //add(&hallOfFameButton);
-  add(&creditsButton);
-  add(&exitButton);
+  //add(&_hallOfFameButton);
+  add(&_creditsButton);
+  add(&_exitButton);
 }
 

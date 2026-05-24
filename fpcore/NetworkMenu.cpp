@@ -35,85 +35,85 @@ class PushLanNetCenterMenuAction : public Action
 {
 public:
     PushLanNetCenterMenuAction(MainScreen * mainScreen, EditField *serverPort, EditField *userName)
-        : mainScreen(mainScreen), serverPort(serverPort), userName(userName) {}
+        : _mainScreen(mainScreen), _serverPort(serverPort), _userName(userName) {}
 
     void action()
     {
-        LanGameCenter *gameCenter = new LanGameCenter(atoi(serverPort->getValue().c_str()), userName->getValue());
+        LanGameCenter *gameCenter = new LanGameCenter(atoi(_serverPort->getValue().c_str()), _userName->getValue());
         NetCenterMenu *newNetCenterMenu =
-	  new NetCenterMenu(mainScreen, gameCenter,
+	  new NetCenterMenu(_mainScreen, gameCenter,
 			    theCommander->getLocalizedString("LAN Game Center"));
         newNetCenterMenu->build();
-        mainScreen->pushMenu(newNetCenterMenu, true);
+        _mainScreen->pushMenu(newNetCenterMenu, true);
     }
 private:
-    MainScreen * mainScreen;
-    EditField *serverPort;
-    EditField *userName;
+    MainScreen * _mainScreen;
+    EditField * _serverPort;
+    EditField * _userName;
 };
 
 
 LANGameMenu::LANGameMenu(MainScreen * mainScreen)
   : MainScreenMenu(mainScreen),
-    titleFrame(theCommander->getSeparatorFramePicture()),
-    lanTitle(theCommander->getLocalizedString("LAN Game")),
-    playerNameLabel(theCommander->getLocalizedString("Player name:"),
+    _titleFrame(theCommander->getSeparatorFramePicture()),
+    _lanTitle(theCommander->getLocalizedString("LAN Game")),
+    _playerNameLabel(theCommander->getLocalizedString("Player name:"),
                     PlayerNameUtils::getDefaultPlayerName(-1).c_str(), PlayerNameUtils::getDefaultPlayerKey(-1).c_str(),
                     theCommander->getPreferencesManager(),
                     theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
-    portNumLabel(theCommander->getLocalizedString("Port number:"), "6581", NULL,
+    _portNumLabel(theCommander->getLocalizedString("Port number:"), "6581", NULL,
                  theCommander->getEditFieldFramePicture(), theCommander->getEditFieldOverFramePicture()),
-    cancelAction(mainScreen),
-    startButton(theCommander->getLocalizedString("Start!"),
-                new PushLanNetCenterMenuAction(mainScreen, &(portNumLabel.getEditField()),
-					       &(playerNameLabel.getEditField()))),
-    cancelButton(theCommander->getLocalizedString("Back"), &cancelAction)
+    _cancelAction(mainScreen),
+    _startButton(theCommander->getLocalizedString("Start!"),
+                new PushLanNetCenterMenuAction(mainScreen, &(_portNumLabel.getEditField()),
+					       &(_playerNameLabel.getEditField()))),
+    _cancelButton(theCommander->getLocalizedString("Back"), &_cancelAction)
 {
 }
 
 void LANGameMenu::build() {
     setPolicy(USE_MIN_SIZE);
-    titleFrame.add(&lanTitle);
-    titleFrame.setPreferedSize(Vec3(0, 20));
-    add(&titleFrame);
-    buttonsBox.add(&startButton);
-    buttonsBox.add(&playerNameLabel);
-    buttonsBox.add(&portNumLabel);
-    buttonsBox.add(&cancelButton);
-    add(&buttonsBox);
+    _titleFrame.add(&_lanTitle);
+    _titleFrame.setPreferedSize(Vec3(0, 20));
+    add(&_titleFrame);
+    _buttonsBox.add(&_startButton);
+    _buttonsBox.add(&_playerNameLabel);
+    _buttonsBox.add(&_portNumLabel);
+    _buttonsBox.add(&_cancelButton);
+    add(&_buttonsBox);
 }
 
 void NetworkInternetAction::action()
 {
-    if (*menuToCreate == NULL) {
-        *menuToCreate = new InternetGameMenu(mainScreen);
-        (*menuToCreate)->build();
+    if (*_menuToCreate == NULL) {
+        *_menuToCreate = new InternetGameMenu(_mainScreen);
+        (*_menuToCreate)->build();
     }
-    mainScreen->pushMenu(*menuToCreate, true);
+    _mainScreen->pushMenu(*_menuToCreate, true);
 }
 
 
 NetworkGameMenu::NetworkGameMenu(MainScreen * mainScreen)
     : MainScreenMenu(mainScreen),
-      locale(theCommander->getDataPathManager(), "locale", "main"),
-      lanGameMenu(mainScreen),
-      internetGameMenu(NULL), internetAction(mainScreen, &internetGameMenu),
-      lanAction(&lanGameMenu, mainScreen), mainScreenPopAction(mainScreen),
-      titleFrame(theCommander->getSeparatorFramePicture()),
-      networkTitleText(locale.getLocalizedString("Network Game")),
-      lanGameButton(locale.getLocalizedString("Local Area Network Game"), &lanAction),
-      internetGameButton(locale.getLocalizedString("Internet Game"), &internetAction),
-      cancelButton(locale.getLocalizedString("Back"), &mainScreenPopAction)
+      _locale(theCommander->getDataPathManager(), "locale", "main"),
+      _lanGameMenu(mainScreen),
+      _internetGameMenu(NULL), _internetAction(mainScreen, &_internetGameMenu),
+      _lanAction(&_lanGameMenu, mainScreen), _mainScreenPopAction(mainScreen),
+      _titleFrame(theCommander->getSeparatorFramePicture()),
+      _networkTitleText(_locale.getLocalizedString("Network Game")),
+      _lanGameButton(_locale.getLocalizedString("Local Area Network Game"), &_lanAction),
+      _internetGameButton(_locale.getLocalizedString("Internet Game"), &_internetAction),
+      _cancelButton(_locale.getLocalizedString("Back"), &_mainScreenPopAction)
 {}
 
 void NetworkGameMenu::build() {
   setPolicy(USE_MIN_SIZE);
-  lanGameMenu.build();
-  titleFrame.add(&networkTitleText);
-  titleFrame.setPreferedSize(Vec3(0, 20));
-  add(&titleFrame);
-  buttonsBox.add(&lanGameButton);
-  buttonsBox.add(&internetGameButton);
-  buttonsBox.add(&cancelButton);
-  add(&buttonsBox);
+  _lanGameMenu.build();
+  _titleFrame.add(&_networkTitleText);
+  _titleFrame.setPreferedSize(Vec3(0, 20));
+  add(&_titleFrame);
+  _buttonsBox.add(&_lanGameButton);
+  _buttonsBox.add(&_internetGameButton);
+  _buttonsBox.add(&_cancelButton);
+  add(&_buttonsBox);
 }
