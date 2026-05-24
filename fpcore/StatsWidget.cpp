@@ -63,7 +63,7 @@ StatsResources::~StatsResources()
 ProgressBarWidget::ProgressBarWidget(StatsResources &res, Action *associatedAction)
   : m_res(res), m_value(0.), m_targetValue(0.), m_progressive(false),
     m_progressiveDuration(LINE_DURATION), m_visible(true),
-    m_associatedAction(associatedAction), m_positiveAttitude(true)
+    m_associatedAction(associatedAction), m_positiveAttitude(true), m_t(0.)
 {
     setPreferedSize(Vec3(0, 32));
 }
