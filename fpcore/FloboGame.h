@@ -96,8 +96,9 @@ public:
         return 0;
     }
     inline void setFloboXY(int X, int Y) {
-        if (this != NULL)
+        if (this != NULL) {
             this->_X = X; this->_Y = Y;
+        }
     }
     inline void setFlag() { _flag = true; }
     inline void unsetFlag() { _flag = false; }
