@@ -104,7 +104,10 @@ void   CycledComponent::idle(double currentTime)
   // An ugly pattern leads CycledComponents to delete themselves
   // Here is some kind of protection
   bool deleteToken = false;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdangling-pointer="
   _deleteToken = &deleteToken;
+#pragma GCC diagnostic pop
   if (cycleNumber < -0.5) {
     firstCycleTime = currentTime;
     cycleNumber = 0.0;
