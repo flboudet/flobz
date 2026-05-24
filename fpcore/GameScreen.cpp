@@ -30,10 +30,10 @@ using namespace ios_fc;
 using namespace event_manager;
 
 GameScreen::GameScreen(GameWidget &gameWidget)
-    : Screen(), paused(false),
-      pauseMenu(this),
-      gameWidget(gameWidget),
-      overlayStory(NULL)
+    : Screen(), _paused(false),
+      _pauseMenu(this),
+      _gameWidget(gameWidget),
+      _overlayStory(NULL)
 {
 #ifdef DEBUG_GAMELOOP
   printf("GameScreen %x created\n", this);
@@ -41,17 +41,17 @@ GameScreen::GameScreen(GameWidget &gameWidget)
 	 dynamic_cast<IdleComponent *>(this),
 	 dynamic_cast<DrawableComponent *>(this));
 #endif
-    add(&gameWidget);
-    if (gameWidget.getOpponent() != NULL) {
-        gameWidget.getOpponent()->setRenderEnabled(false);
-        add(gameWidget.getOpponent());
+    add(&_gameWidget);
+    if (_gameWidget.getOpponent() != NULL) {
+        _gameWidget.getOpponent()->setRenderEnabled(false);
+        add(_gameWidget.getOpponent());
     }
-    activeFX = &gameWidget.getVisualFX();
+    activeFX = &_gameWidget.getVisualFX();
     for (unsigned int i=0; i<activeFX->size(); ++i) {
         add((*activeFX)[i]);
         (*activeFX)[i]->setGameScreen(this);
     }
-    gameWidget.setAssociatedScreen(this);
+    _gameWidget.setAssociatedScreen(this);
 }
 
 GameScreen::~GameScreen()
@@ -91,55 +91,55 @@ void GameScreen::onEvent(GameControlEvent *cevent)
 
 void GameScreen::onTransitionFromScreen(Screen &fromScreen)
 {
-    transitionWidget.reset(theCommander->createScreenTransition(fromScreen));
-    add(transitionWidget.get());
+    _transitionWidget.reset(theCommander->createScreenTransition(fromScreen));
+    add(_transitionWidget.get());
 }
 
 bool GameScreen::startPressed()
 {
-    return gameWidget.startPressed();
+    return _gameWidget.startPressed();
 }
 
 bool GameScreen::backPressed()
 {
-    if (gameWidget.backPressed())
+    if (_gameWidget.backPressed())
         return true;
-    if (!paused) {
+    if (!_paused) {
         // Seems complicated.
         // The pause method is called from the game widget
         // because this method is virtual and can be overloaded
         // (see NetworkGameWidget)
-        gameWidget.setScreenToPaused(true);
+        _gameWidget.setScreenToPaused(true);
     }
     else {
       // Same as for pause
-      pauseMenu.backPressed();
+      _pauseMenu.backPressed();
     }
     return false;
 }
 
 void GameScreen::setSuspended(bool suspended)
 {
-    if (paused)
+    if (_paused)
         return;
     if (suspended)
-        gameWidget.pause(false);
+        _gameWidget.pause(false);
     else
-        gameWidget.resume();
+        _gameWidget.resume();
 }
 
 void GameScreen::setPaused(bool fromControls)
 {
     GTLogTrace("GameScreen::setPaused()");
-    if (!paused) {
-        std::vector<VisualFX*> fx = gameWidget.getVisualFX();
+    if (!_paused) {
+        std::vector<VisualFX*> fx = _gameWidget.getVisualFX();
         for (unsigned int i=0; i<fx.size(); ++i)
             fx[i]->hide();
-        this->add(&pauseMenu);
-        pauseMenu.giveFocus();
-        grabEventsOnWidget(&pauseMenu);
-        paused = true;
-        gameWidget.pause();
+        this->add(&_pauseMenu);
+        _pauseMenu.giveFocus();
+        grabEventsOnWidget(&_pauseMenu);
+        _paused = true;
+        _gameWidget.pause();
         theCommander->setCursorVisible(true);
     }
 }
@@ -147,30 +147,30 @@ void GameScreen::setPaused(bool fromControls)
 void GameScreen::setResumed(bool fromControls)
 {
     GTLogTrace("GameScreen::setResumed()");
-    if (paused) {
-        paused = false;
-        if (gameWidget.getOpponent() != NULL)
-            gameWidget.getOpponent()->show();
-        std::vector<VisualFX*> fx = gameWidget.getVisualFX();
+    if (_paused) {
+        _paused = false;
+        if (_gameWidget.getOpponent() != NULL)
+            _gameWidget.getOpponent()->show();
+        std::vector<VisualFX*> fx = _gameWidget.getVisualFX();
         for (unsigned int i=0; i<fx.size(); ++i)
             fx[i]->show();
-        ungrabEventsOnWidget(&pauseMenu);
-        this->remove(&pauseMenu);
-        this->focus(&gameWidget);
-        gameWidget.resume();
+        ungrabEventsOnWidget(&_pauseMenu);
+        this->remove(&_pauseMenu);
+        this->focus(&_gameWidget);
+        _gameWidget.resume();
         theCommander->setCursorVisible(false);
-        gameWidget.setScreenToResumed(fromControls);
+        _gameWidget.setScreenToResumed(fromControls);
     }
 }
 
 void GameScreen::abort()
 {
-    gameWidget.abort();
+    _gameWidget.abort();
 }
 
 void GameScreen::setOverlayStory(StoryWidget *story)
 {
-  overlayStory = story;
+  _overlayStory = story;
   this->add(story);
 }
 
@@ -182,7 +182,7 @@ void GameScreen::onScreenVisibleChanged(bool visible)
 
 void GameScreen::action(Widget *sender, int actionType, GameControlEvent *event)
 {
-  if (sender == &pauseMenu) {
+  if (sender == &_pauseMenu) {
     switch (actionType) {
     case PauseMenu::KPauseMenuClosing_Abort:
       abort();

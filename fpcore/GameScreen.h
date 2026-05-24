@@ -64,7 +64,7 @@ public:
     virtual void setResumed(bool fromControls);
     /** Returns the ingame pause menu widget
      */
-    PauseMenu & getPauseMenu() { return pauseMenu; }
+    PauseMenu & getPauseMenu() { return _pauseMenu; }
     /** Notification on screen visibility change
      * @param visible  true if the scren is visible, otherwise false
      */
@@ -74,11 +74,11 @@ public:
      */
     virtual void action(Widget *sender, int actionType, event_manager::GameControlEvent *event);
 private:
-    bool paused;
-    PauseMenu pauseMenu;
-    GameWidget &gameWidget;
-    std::unique_ptr<ScreenTransitionWidget> transitionWidget;
-    StoryWidget *overlayStory;
+    bool _paused;
+    PauseMenu _pauseMenu;
+    GameWidget &_gameWidget;
+    std::unique_ptr<ScreenTransitionWidget> _transitionWidget;
+    StoryWidget *_overlayStory;
 };
 
 #endif // _GAMESCREEN_H_
