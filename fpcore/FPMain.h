@@ -25,23 +25,23 @@ private:
     void initMenus();
     void initSDL();
 
-    std::string m_dataDir;
-    bool m_fullscreen;
-    int m_maxDataPackNumber;
+    std::string _dataDir;
+    bool _fullscreen;
+    int _maxDataPackNumber;
 
-    PreferencesManager *m_preferencesManager;
-    CompositeDrawContext *m_drawContext;
-    DrawContext *m_nativeDrawContext;
-    event_manager::EventManager *m_eventManager;
-    audio_manager::AudioManager *m_audioManager;
+    PreferencesManager *_preferencesManager;
+    CompositeDrawContext *_drawContext;
+    DrawContext *_nativeDrawContext;
+    event_manager::EventManager *_eventManager;
+    audio_manager::AudioManager *_audioManager;
 
-    Jukebox m_jukebox;
+    Jukebox _jukebox;
 
-    FPDataPathManager m_dataPathManager;
+    FPDataPathManager _dataPathManager;
 
-    GameLoop   *loop;
-    MainScreen *mainScreen;
-    GameCursor *cursor;
+    GameLoop   *_loop;
+    MainScreen *_mainScreen;
+    GameCursor *_cursor;
 };
 
 #endif // _FLOBO_MAIN_H_

@@ -42,12 +42,12 @@ static const char * kScreenHeightPref = "Config.ScreenHeight";
 
 
 FPMain::FPMain(const std::string &dataDir, bool fullscreen, int maxDataPackNumber)
-: m_dataDir(dataDir), m_fullscreen(fullscreen),
-  m_maxDataPackNumber(maxDataPackNumber),
-  m_dataPathManager(dataDir)
+: _dataDir(dataDir), _fullscreen(fullscreen),
+  _maxDataPackNumber(maxDataPackNumber),
+  _dataPathManager(dataDir)
 {
     if (maxDataPackNumber != -1)
-        m_dataPathManager.setMaxPackNumber(maxDataPackNumber);
+        _dataPathManager.setMaxPackNumber(maxDataPackNumber);
 }
 
 FPMain::~FPMain()
@@ -59,7 +59,7 @@ void FPMain::initWithGUI()
 {
     std::cout << "Initing SDL!\n";
     initSDL();
-    loop = GameUIDefaults::GAME_LOOP;
+    _loop = GameUIDefaults::GAME_LOOP;
     // Create the Preferences Manager
     std::string prefFilePath;
 #ifndef _WIN32
@@ -73,71 +73,71 @@ void FPMain::initWithGUI()
     prefFilePath = "./.flobopoprc";
 #endif
     std::cout << "prefmgr!\n";
-    m_preferencesManager = new PosixPreferencesManager(prefFilePath.c_str());
+    _preferencesManager = new PosixPreferencesManager(prefFilePath.c_str());
     // Create the DrawContext
-    int requestedWidth = m_preferencesManager->getIntPreference(kScreenWidthPref, 640);
-    int requestedHeight = m_preferencesManager->getIntPreference(kScreenHeightPref, 480);
+    int requestedWidth = _preferencesManager->getIntPreference(kScreenWidthPref, 640);
+    int requestedHeight = _preferencesManager->getIntPreference(kScreenHeightPref, 480);
 #ifdef SDL12_GFX
 #ifdef OPENGL_GFX
-    m_nativeDrawContext = new SDL12_OpenGL_DrawContext(&m_dataPathManager, 640, 480,
-                                          m_preferencesManager->getBoolPreference(kFullScreenPref, m_fullscreen),
+    _nativeDrawContext = new SDL12_OpenGL_DrawContext(&_dataPathManager, 640, 480,
+                                          _preferencesManager->getBoolPreference(kFullScreenPref, _fullscreen),
                                           "FloboPop by iOS-Software");
 #else
     std::cout << "drawcontext!\n";
-    m_nativeDrawContext = new SDL12_DrawContext(m_dataPathManager, 640, 480,
-                                          m_preferencesManager->getBoolPreference(kFullScreenPref, m_fullscreen),
+    _nativeDrawContext = new SDL12_DrawContext(_dataPathManager, 640, 480,
+                                          _preferencesManager->getBoolPreference(kFullScreenPref, _fullscreen),
                                           "FloboPop by iOS-Software");
     std::cout << "drawcontext2!\n";
 #endif
-    //PackageDescription *packDesc = new PackageDescription(m_dataPathManager, *cDC);
+    //PackageDescription *packDesc = new PackageDescription(_dataPathManager, *cDC);
     //IosRect cropRect = {0,0,32,32};
     //cDC->declareCompositeSurface("data/base.000/theme/Classic.fptheme/fat-flobo-0000.png",
     //                             "data/base.000/theme/Classic.fptheme/montage_1.png",
     //                             cropRect);
     std::cout << "eventmanager\n";
-    m_eventManager = new SDL12_EventManager(m_preferencesManager);
+    _eventManager = new SDL12_EventManager(_preferencesManager);
     std::cout << "audiomanager\n";
-    m_audioManager = new SDL_AudioManager();
+    _audioManager = new SDL_AudioManager();
     std::cout << "audiomanager2\n";
 #endif
 #ifdef SDL2_GFX
-    m_nativeDrawContext = new SDL13_DrawContext(m_dataPathManager, 640, 480,
-                                          m_preferencesManager->getBoolPreference(kFullScreenPref, m_fullscreen),
+    _nativeDrawContext = new SDL13_DrawContext(_dataPathManager, 640, 480,
+                                          _preferencesManager->getBoolPreference(kFullScreenPref, _fullscreen),
                                           "FloboPop by iOS-Software");
-    m_eventManager = new SDL13_EventManager();
-    m_audioManager = new SDL_AudioManager();
+    _eventManager = new SDL13_EventManager();
+    _audioManager = new SDL_AudioManager();
 #endif
 #ifdef NULL_BACKENDS
-    m_nativeDrawContext = new NullDrawContext(640, 480);
-    m_eventManager = new SlaveEventManager();
-    m_audioManager = new NullAudioManager();
+    _nativeDrawContext = new NullDrawContext(640, 480);
+    _eventManager = new SlaveEventManager();
+    _audioManager = new NullAudioManager();
 #endif
     std::cout << "compositedrawcontext!\n";
-    m_drawContext = new CompositeDrawContext(m_nativeDrawContext);
+    _drawContext = new CompositeDrawContext(_nativeDrawContext);
     // Give the DrawContext to the GameLoop
-    loop->setDrawContext(m_drawContext);
+    _loop->setDrawContext(_drawContext);
     // Give the EventManager to the GameLoop
-    loop->setEventManager(m_eventManager);
+    _loop->setEventManager(_eventManager);
     // Give the AudioManager to the GameLoop
-    loop->setAudioManager(m_audioManager);
+    _loop->setAudioManager(_audioManager);
     std::cout << "suite!\n";
     // Register data packages
-    m_dataPathManager.registerDataPackages(m_drawContext, &m_jukebox);
+    _dataPathManager.registerDataPackages(_drawContext, &_jukebox);
     // Create the FPCommander singleton
-    FPCommander *pc = new FPCommander(&m_dataPathManager, m_preferencesManager, &m_jukebox);
+    FPCommander *pc = new FPCommander(&_dataPathManager, _preferencesManager, &_jukebox);
     std::cout << "fpcommander!\n";
-    pc->initWithGUI(m_fullscreen);
+    pc->initWithGUI(_fullscreen);
     std::cout << "fpcommander2!\n";
     initMenus();
     std::cout << "fpcommander3!\n";
-    cursor = new GameCursor("gfx/cursor.png");
+    _cursor = new GameCursor("gfx/cursor.png");
     std::cout << "fpcommander4!\n";
-    loop->addDrawable(cursor);
-    loop->addIdle(cursor);
+    _loop->addDrawable(_cursor);
+    _loop->addIdle(_cursor);
     std::cout << "idle!\n";
-    if (dynamic_cast<CycledComponent *>(m_eventManager) != NULL)
-        loop->addIdle(dynamic_cast<CycledComponent *>(m_eventManager));
-    theCommander->registerCursor(cursor);
+    if (dynamic_cast<CycledComponent *>(_eventManager) != NULL)
+        _loop->addIdle(dynamic_cast<CycledComponent *>(_eventManager));
+    theCommander->registerCursor(_cursor);
     gameui::GlobalNotificationCenter.addListener(theCommander->getFullScreenKey(),this);
     std::cout << "done!\n";
 }
@@ -158,7 +158,7 @@ void FPMain::initSDL()
 
 #ifdef USE_DGA
   /* This Hack Allows Hardware Surface on Linux */
-  if (fullscreen)
+  if (_fullscreen)
     setenv("SDL_VIDEODRIVER","dga",0);
 
   if (SDL_Init(init_flags) < 0) {
@@ -189,14 +189,14 @@ void FPMain::run()
     std::cout << "fpmain run()\n";
   initWithGUI();
   std::cout << "Initialized!\n";
-  GameUIDefaults::SCREEN_STACK->push(mainScreen);
+  GameUIDefaults::SCREEN_STACK->push(_mainScreen);
   std::cout << "Pushed!\n";
 }
 
 void FPMain::debug_gsl(const std::string &gsl_script)
 {
   initWithGUI();
-  GameUIDefaults::SCREEN_STACK->push(mainScreen);
+  GameUIDefaults::SCREEN_STACK->push(_mainScreen);
   StoryScreen story_screen(gsl_script);
   GameUIDefaults::SCREEN_STACK->push(&story_screen);
   GameUIDefaults::GAME_LOOP->run();
@@ -252,11 +252,11 @@ void FPMain::initMenus()
   std::cout << "story!\n";
   StoryWidget *bgStory = new StoryWidget("title_bg.gsl");
   std::cout << "story2!\n";
-  mainScreen = new MainScreen(fgStory, bgStory);
-  std::cout << "mainScreen!\n";
-  MainRealMenu *trubudu = new MainRealMenu(mainScreen);
+  _mainScreen = new MainScreen(fgStory, bgStory);
+  std::cout << "_mainScreen!\n";
+  MainRealMenu *trubudu = new MainRealMenu(_mainScreen);
   trubudu->build();
-  mainScreen->pushMenu(trubudu);
+  _mainScreen->pushMenu(trubudu);
 }
 
 void FPMain::notificationOccured(const std::string & identifier, void * context)
@@ -265,13 +265,13 @@ void FPMain::notificationOccured(const std::string & identifier, void * context)
         theCommander->getPreferencesManager()->setBoolPreference(kFullScreenPref, *(bool *)context);
 #ifdef SDL12_GFX
 #ifdef OPENGL_GFX
-        static_cast<SDL12_OpenGL_DrawContext *>(m_nativeDrawContext)->setFullScreen(*(bool *)context);
+        static_cast<SDL12_OpenGL_DrawContext *>(_nativeDrawContext)->setFullScreen(*(bool *)context);
 #else
-        static_cast<SDL12_DrawContext *>(m_nativeDrawContext)->setFullScreen(*(bool *)context);
+        static_cast<SDL12_DrawContext *>(_nativeDrawContext)->setFullScreen(*(bool *)context);
 #endif
 #endif
 #ifdef SDL2_GFX
-        static_cast<SDL13_DrawContext *>(m_nativeDrawContext)->setFullScreen(*(bool *)context);
+        static_cast<SDL13_DrawContext *>(_nativeDrawContext)->setFullScreen(*(bool *)context);
 #endif
     }
 }
