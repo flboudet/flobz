@@ -93,8 +93,8 @@ public:
     void connectPeer(PeerAddress addr, const std::string & name, int status = PEER_NORMAL, int rank = -1, bool self = false);
     void disconnectPeer(PeerAddress addr, const std::string & name);
     virtual void setStatus(int status) {}
-    virtual const std::string & getSelfName() { return "Myself"; }
-    virtual const std::string & getOpponentName() { return "Opponent"; }
+    virtual const std::string & getSelfName() { static const std::string s("Myself"); return s; }
+    virtual const std::string & getOpponentName() { static const std::string s("Opponent"); return s; }
     // Get the undelying message box (default: NULL)
     virtual MessageBox *getMessageBox() { return NULL; }
     // Optional server managing the game center.
