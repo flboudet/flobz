@@ -149,7 +149,7 @@ public:
     virtual void addGameBHandicap(int handicap) = 0;
     virtual bool isGameARunning() const = 0;
     // Widget methods
-    bool isFocusable() { return !m_paused; }
+    bool isFocusable() const { return !m_paused; }
 protected:
     void setLevelTheme(LevelTheme *levelTheme);
     LevelTheme *getLevelTheme() const { return m_levelTheme; }
