@@ -46,16 +46,16 @@ Message *NetworkGameView::createStateMessage(bool sendFullMessage)
     // TODO: Send some of those only in full messages
     message->addInt     (FPNetMessage::GAMEID, gameId);
     message->addInt     (FPNetMessage::TYPE,   FPNetMessage::kGameState);
-    message->addInt     (FPNetMessage::SCORE,  attachedGame->getGameStat().points);
-    message->addInt     (FPNetMessage::NEXT_F, attachedGame->getNextFalling());
-    message->addInt     (FPNetMessage::NEXT_C, attachedGame->getNextCompanion());
-    message->addInt     (FPNetMessage::SEMI_MOVE, attachedGame->getSemiMove());
-    message->addInt     (FPNetMessage::CURRENT_NEUTRALS, attachedGame->getNeutralFlobos());
+    message->addInt     (FPNetMessage::SCORE,  _attachedGame->getGameStat().points);
+    message->addInt     (FPNetMessage::NEXT_F, _attachedGame->getNextFalling());
+    message->addInt     (FPNetMessage::NEXT_C, _attachedGame->getNextCompanion());
+    message->addInt     (FPNetMessage::SEMI_MOVE, _attachedGame->getSemiMove());
+    message->addInt     (FPNetMessage::CURRENT_NEUTRALS, _attachedGame->getNeutralFlobos());
 
     if (sendFullMessage) {
-        int floboCount = attachedGame->getFloboCount();
+        int floboCount = _attachedGame->getFloboCount();
         AdvancedBuffer<int> buffer(floboCount * 4);
-        for (FloboDefaultIterator iter(attachedGame) ;
+        for (FloboDefaultIterator iter(_attachedGame) ;
              ! iter.end() ; ++iter) {
             auto currentFlobo = iter.get();
             buffer.add(currentFlobo->getID());
@@ -189,8 +189,8 @@ void NetworkGameView::gameDidAddNeutral(std::shared_ptr<Flobo> neutralFlobo, int
 void NetworkGameView::gameDidEndCycle()
 {
     GameView::gameDidEndCycle();
-    if (attachedGame->getNeutralFlobos() < 0)
-        badFlobos -= attachedGame->getNeutralFlobos();
+    if (_attachedGame->getNeutralFlobos() < 0)
+        badFlobos -= _attachedGame->getNeutralFlobos();
     sendStateMessage(true);
 }
 
@@ -251,7 +251,7 @@ void NetworkGameView::sendEndOfGameMessage(int messageType)
     message->addInt     (FPNetMessage::GAMEID, gameId);
     message->addInt     (FPNetMessage::TYPE,   messageType);
     message->addString  (FPNetMessage::NAME,   _p1name.c_str());
-    PlayerGameStat &gameStat = attachedGame->getGameStat();
+    PlayerGameStat &gameStat = _attachedGame->getGameStat();
     message->addInt(FPNetMessage::SCORE, gameStat.points);
     message->addInt(FPNetMessage::TOTAL_SCORE, gameStat.total_points);
     for (int i = 0 ; i < 24 ; i++) {
@@ -303,7 +303,7 @@ void InternetGameView::sendGameResultToServer(int winner)
     message->addInt   ("GAMEID", gameId);
     message->addString("NAME1",  _p1name.c_str());
     message->addString("NAME2",  _p2name.c_str());
-    PlayerGameStat &gameStat = attachedGame->getGameStat();
+    PlayerGameStat &gameStat = _attachedGame->getGameStat();
     message->addInt("SCORE", gameStat.points);
     message->addInt("TOTAL_SCORE", gameStat.total_points);
     for (int i = 0 ; i < 24 ; i++) {

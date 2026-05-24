@@ -47,10 +47,10 @@ void StoryModeGameWidget::initWithGUI(GameView &areaA, GameView &areaB,
 {
     // Jeko's corrected_level ensures easier games on easiest levels
     int corrected_level = level;
-    if (level > 12) corrected_level = level + (3 - lives) / 2; // Half of medium level, make sure the player do not loose 3 times the same oponent.
-    if (level >= 20) corrected_level = level + (3 - lives); // Easy level, make sure the player do always loose the same oponent.
-    controllerA.reset(playercontroller);
-    controllerB.reset(new AIPlayer(corrected_level, areaB));
+    if (level > 12) corrected_level = level + (3 - _lives) / 2; // Half of medium level, make sure the player do not loose 3 times the same oponent.
+    if (level >= 20) corrected_level = level + (3 - _lives); // Easy level, make sure the player do always loose the same oponent.
+    _controllerA.reset(playercontroller);
+    _controllerB.reset(new AIPlayer(corrected_level, areaB));
     GameWidget2P::initWithGUI(areaA, areaB,
                                levelTheme, gameOverAction);
     addSubWidget(&killLeftCheat);
@@ -94,16 +94,16 @@ void StoryModeGameWidget::cycle()
         ai.rotationMethod = opponent.getIntegerValue("@AI_RotationMethod");
         ai.fastDropDelta = opponent.getIntegerValue("@AI_FastDropDelta");
         ai.thinkDepth = opponent.getIntegerValue("@AI_ThinkDepth");
-        AIPlayer *opponentcontroller = static_cast<AIPlayer *>(controllerB.get());
+        AIPlayer *opponentcontroller = static_cast<AIPlayer *>(_controllerB.get());
         opponentcontroller->setAIParameters(ai);
 
 		opponent.setIntegerValue("@AI_PlayingLevel", opponentcontroller->getLevel());
-        opponent.setIntegerValue("@maxHeightLeft", attachedGameA->getColumnHeigth(2));
-        opponent.setIntegerValue("@maxHeightRight", attachedGameB->getColumnHeigth(2));
-        opponent.setIntegerValue("@maxHeightPlayer", attachedGameA->getColumnHeigth(2));
-        opponent.setIntegerValue("@maxHeightAI", attachedGameB->getColumnHeigth(2));
-        opponent.setIntegerValue("@neutralsForPlayer", attachedGameA->getNeutralFlobos());
-        opponent.setIntegerValue("@neutralsForAI", attachedGameB->getNeutralFlobos());
+        opponent.setIntegerValue("@maxHeightLeft", _attachedGameA->getColumnHeigth(2));
+        opponent.setIntegerValue("@maxHeightRight", _attachedGameB->getColumnHeigth(2));
+        opponent.setIntegerValue("@maxHeightPlayer", _attachedGameA->getColumnHeigth(2));
+        opponent.setIntegerValue("@maxHeightAI", _attachedGameB->getColumnHeigth(2));
+        opponent.setIntegerValue("@neutralsForPlayer", _attachedGameA->getNeutralFlobos());
+        opponent.setIntegerValue("@neutralsForAI", _attachedGameB->getNeutralFlobos());
         opponent.setIntegerValue("@gameOverLeft",  !this->isGameARunning());
         opponent.setIntegerValue("@gameOverRight", !this->isGameBRunning());
     }

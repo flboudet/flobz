@@ -534,10 +534,10 @@ void InternetConnectDialog::action(Widget *sender, int actionType, GameControlEv
 
 void InternetGameMenu::enterNetCenterMenu(InternetGameCenter *gameCenter)
 {
-    NetCenterMenu *newNetCenterMenu = new NetCenterMenu(mainScreen, gameCenter,
+    NetCenterMenu *newNetCenterMenu = new NetCenterMenu(_mainScreen, gameCenter,
                       theCommander->getLocalizedString("Internet Game Center").c_str()); // TODO: string
     newNetCenterMenu->build();
-    mainScreen->pushMenu(newNetCenterMenu, true);
+    _mainScreen->pushMenu(newNetCenterMenu, true);
 }
 
 void InternetGameMenu::action(Widget *sender, int actionType, GameControlEvent *event)

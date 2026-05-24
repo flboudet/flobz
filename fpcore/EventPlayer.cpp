@@ -62,19 +62,19 @@ void EventPlayer::eventOccured(GameControlEvent *event)
 	    fpKey_Down++;
 	}
 	else if (curGameEvent == leftEvent) {
-	    targetView.moveLeft();
+	    _targetView.moveLeft();
 	    fpKey_Left++;
 	}
 	else if (curGameEvent == rightEvent) {
-	    targetView.moveRight();
+	    _targetView.moveRight();
 	    fpKey_Right++;
 	}
 	else if (curGameEvent == turnLeftEvent) {
-	    targetView.rotateLeft();
+	    _targetView.rotateLeft();
 	    fpKey_TurnLeft++;
 	}
 	else if (curGameEvent == turnRightEvent) {
-	    targetView.rotateRight();
+	    _targetView.rotateRight();
 	    fpKey_TurnRight++;
 	}
     }
@@ -84,24 +84,24 @@ void EventPlayer::cycle()
 {
     // Key repetition
     if (fpKey_Down) {
-    if (attachedGame->isEndOfCycle())
+    if (_attachedGame->isEndOfCycle())
         fpKey_Down = 0;
     else
-        targetView.cycleGame();
+        _targetView.cycleGame();
     }
     if (keyShouldRepeat(fpKey_Left))
-        targetView.moveLeft();
+        _targetView.moveLeft();
     if (keyShouldRepeat(fpKey_Right))
-        targetView.moveRight();
+        _targetView.moveRight();
     if (keyShouldRepeat(fpKey_TurnLeft)) {
-        if (attachedGame->isEndOfCycle())
+        if (_attachedGame->isEndOfCycle())
 	    fpKey_TurnLeft = 0;
-	targetView.rotateLeft();
+	_targetView.rotateLeft();
     }
     if (keyShouldRepeat(fpKey_TurnRight)) {
-        if (attachedGame->isEndOfCycle())
+        if (_attachedGame->isEndOfCycle())
 	    fpKey_TurnRight = 0;
-	targetView.rotateRight();
+	_targetView.rotateRight();
     }
 }
 

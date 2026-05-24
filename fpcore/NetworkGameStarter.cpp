@@ -47,7 +47,7 @@ GamePlayer *NetworkGameWidget::createLocalPlayer()
     return new CombinedEventPlayer(*localArea);
 }
 
-void NetworkGameWidget::initWithGUI(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, FPServerIGPMessageBox *igpbox, bool hasChatBox)
+void NetworkGameWidget::initWithGUI(FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *_gameOverAction, FPServerIGPMessageBox *igpbox, bool hasChatBox)
 {
     attachedFloboThemeSet = &floboSetTheme;
     attachedRandom = std::unique_ptr<RandomSystem>(new RandomSystem(randomSeed, 5));
@@ -67,16 +67,16 @@ void NetworkGameWidget::initWithGUI(FloboSetTheme &floboSetTheme, LevelTheme &le
         chatBox = std::unique_ptr<ChatBox>(new ChatBox(*this));
     brokenNetworkWidget = std::unique_ptr<StoryWidget>(new StoryWidget("etherdown.gsl"));
     networkIsBroken = false;
-    GameWidget2P::initWithGUI(*localArea, *networkArea, levelTheme, gameOverAction);
-    controllerA.reset(createLocalPlayer());
-    controllerB.reset(new GameNullPlayer(*networkArea));
+    GameWidget2P::initWithGUI(*localArea, *networkArea, levelTheme, _gameOverAction);
+    _controllerA.reset(createLocalPlayer());
+    _controllerB.reset(new GameNullPlayer(*networkArea));
     setLives(-1);
 }
 
-void NetworkGameWidget::initWithoutGUI(ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *gameOverAction, FPServerIGPMessageBox *igpbox)
+void NetworkGameWidget::initWithoutGUI(ios_fc::MessageBox &mbox, int gameId, unsigned long randomSeed, Action *_gameOverAction, FPServerIGPMessageBox *igpbox)
 {
     this->mbox->addListener(this);
-    //GameWidget::initWithoutGUI(*localArea, networkArea, playercontroller, dummyPlayerController, levelTheme, gameOverAction);
+    //GameWidget::initWithoutGUI(*localArea, networkArea, playercontroller, dummyPlayerController, levelTheme, _gameOverAction);
     setLives(-1);
 }
 
@@ -93,7 +93,7 @@ NetworkGameWidget::~NetworkGameWidget()
 void NetworkGameWidget::cycle()
 {
     double curDate = ios_fc::getTimeMs();
-    if (m_paused) {
+    if (_paused) {
         if (curDate - lastAliveMessageSentDate > 2000.) {
             sendAliveMsg();
             lastAliveMessageSentDate = curDate;
@@ -107,17 +107,17 @@ void NetworkGameWidget::cycle()
     // (what to do when the network stops responding?)
     if (curDate - lastMessageDate > m_networkTimeoutWarning) {
         if (!networkIsBroken) {
-            associatedScreen->add(brokenNetworkWidget.get());
+            _associatedScreen->add(brokenNetworkWidget.get());
             networkIsBroken = true;
         }
         else if (curDate - lastMessageDate > m_networkTimeoutError) {
             // Call network failure action
-            if (gameOverAction)
-                gameOverAction->action(this, NETWORK_FAILURE, NULL);
+            if (_gameOverAction)
+                _gameOverAction->action(this, NETWORK_FAILURE, NULL);
         }
     }
     else if (networkIsBroken == true) {
-        associatedScreen->remove(brokenNetworkWidget.get());
+        _associatedScreen->remove(brokenNetworkWidget.get());
         networkIsBroken = false;
     }
     // Let the game behave
@@ -223,8 +223,8 @@ void NetworkGameWidget::sendChat(const std::string &chatText)
 void NetworkGameWidget::associatedScreenHasBeenSet(GameScreen *associatedScreen)
 {
     if (chatBox.get()) {
-        associatedScreen->getPauseMenu().add(chatBox.get());
-        associatedScreen->getPauseMenu().pauseMenuTop = 5;
+        _associatedScreen->getPauseMenu().add(chatBox.get());
+        _associatedScreen->getPauseMenu().pauseMenuTop = 5;
     }
 }
 

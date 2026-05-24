@@ -535,7 +535,7 @@ AIPlayer::AIPlayer(int level, GameView &targetView)
   shouldRedecide = false;
   lastNumberOfBadFlobos = 0;
   totalNumberOfBadFlobos = 0;
-  attachedGame = targetView.getAttachedGame();
+  _attachedGame =         _targetView.getAttachedGame();
   objective = nullBinom;
   lastLineSeen = FLOBOBAN_DIMY+1;
   currentCycle = 0;
@@ -589,7 +589,7 @@ FloboState AIPlayer::extractColor(FloboState A) const
     case FLOBO_YELLOW:
       return FLOBO_YELLOW;
     default:
-      fprintf(stderr,"Error in AI : unknown flobo color %d %d!!\nExiting...\n",(int)A,(int)attachedGame->isGameRunning());
+      fprintf(stderr,"Error in AI : unknown flobo color %d %d!!\nExiting...\n",(int)A,(int)_attachedGame->isGameRunning());
       exit(0);
   }
   return FLOBO_EMPTY;
@@ -626,7 +626,7 @@ void AIPlayer::extractGrid(void)
     int height = 0;
     for (int j = 0; j < IA_FLOBOBAN_DIMY; j++)
     {
-      auto theFlobo = attachedGame->getFloboAt(i,(FLOBOBAN_DIMY-1)-j);
+      auto theFlobo = _attachedGame->getFloboAt(i,(FLOBOBAN_DIMY-1)-j);
       if (theFlobo != nullptr)
       {
         FloboState state = theFlobo->getFloboState();
@@ -698,20 +698,20 @@ void AIPlayer::decide(int partial, int depth)
   {
     // get flobo binoms to drop
     FloboState etat;
-    etat = attachedGame->getFallingState();
+    etat = _attachedGame->getFallingState();
     if (etat == FLOBO_EMPTY) return;
     current.falling     = extractColor(etat);
-    etat = attachedGame->getCompanionState();
+    etat = _attachedGame->getCompanionState();
     if (etat == FLOBO_EMPTY) return;
     current.companion   = extractColor(etat);
-    current.orientation = extractOrientation(attachedGame->getFallingCompanionDir());
-    current.position.x  = attachedGame->getFallingX();
-    current.position.y  = FLOBOBAN_DIMY - attachedGame->getFallingY();
+    current.orientation = extractOrientation(_attachedGame->getFallingCompanionDir());
+    current.position.x  = _attachedGame->getFallingX();
+    current.position.y  = FLOBOBAN_DIMY - _attachedGame->getFallingY();
     
     originalFlobo = current;
     
-    next.falling        = extractColor(attachedGame->getNextFalling());
-    next.companion      = extractColor(attachedGame->getNextCompanion());
+    next.falling        = extractColor(_attachedGame->getNextFalling());
+    next.companion      = extractColor(_attachedGame->getNextCompanion());
     next.orientation    = Left;
     next.position.x     = 0;
     next.position.y     = IA_FLOBOBAN_DIMY+1;
@@ -811,18 +811,18 @@ static const signed char rotationMatrix[4 /*target*/][4 /*current*/] = {{0,-1,2,
 void AIPlayer::cycle()
 {
   // If no falling flobo, no need to play
-  if (attachedGame->getFallingFlobo() == NULL || !attachedGame->isGameRunning()) 
+  if (_attachedGame->getFallingFlobo() == NULL || !_attachedGame->isGameRunning()) 
   {
     return;
   }
   
-  int currentLine = attachedGame->getFallingY();
-  int currentColumn = attachedGame->getFallingX();
-  int currentNumberOfBadFlobos = attachedGame->getNeutralFlobos();
-  int currentTotalNumberOfBadFlobos = attachedGame->getGameTotalNeutralFlobos();
+  int currentLine = _attachedGame->getFallingY();
+  int currentColumn = _attachedGame->getFallingX();
+  int currentNumberOfBadFlobos = _attachedGame->getNeutralFlobos();
+  int currentTotalNumberOfBadFlobos = _attachedGame->getGameTotalNeutralFlobos();
     
   // If we start with new flobos or restart because new bad Flobos came
-  if (attachedGame->isPhaseReady())
+  if (_attachedGame->isPhaseReady())
   {
     //fprintf(stderr, "Thinking\n");
     // Reset the cycle counter
@@ -880,7 +880,7 @@ void AIPlayer::cycle()
   if (readyToDrop)
   {
     if (internalGrid == NULL) extractGrid();
-    if ((FLOBOBAN_DIMY-1-currentLine) - ((* internalGrid)[currentColumn][HEIGHTS_ROW] + (objective.orientation == Below)?1:0) <= params.fastDropDelta) targetView.cycleGame();
+    if ((FLOBOBAN_DIMY-1-currentLine) - ((* internalGrid)[currentColumn][HEIGHTS_ROW] + (objective.orientation == Below)?1:0) <= params.fastDropDelta) _targetView.cycleGame();
   }
   
   // Else try to move at the specified frequency
@@ -892,7 +892,7 @@ void AIPlayer::cycle()
     bool couldntMove = false;
     bool couldntRotate = false;
   
-    int curOrientation = attachedGame->getFallingCompanionDir();
+    int curOrientation = _attachedGame->getFallingCompanionDir();
 
     // should we move or rotate
     if (random()%2 == 0)
@@ -909,11 +909,11 @@ void AIPlayer::cycle()
     // Move if useful
     if (shouldMove)
     {
-      if (currentColumn < objective.position.x) targetView.moveRight();
-      else targetView.moveLeft();
+      if (currentColumn < objective.position.x) _targetView.moveRight();
+      else _targetView.moveLeft();
 
       // or decide again if not possible
-      couldntMove = (currentColumn == attachedGame->getFallingX());
+      couldntMove = (currentColumn == _attachedGame->getFallingX());
     }
     
     // Rotate if useful
@@ -922,16 +922,16 @@ void AIPlayer::cycle()
       if (params.rotationMethod == 0)
       {
         if (rotationMatrix[revertOrientation(objective.orientation)][curOrientation] > 0)
-          targetView.rotateRight();
+          _targetView.rotateRight();
         else
-          targetView.rotateLeft();
+          _targetView.rotateLeft();
         
       }
-      else if (params.rotationMethod < 0) targetView.rotateRight();
-      else if (params.rotationMethod > 0) targetView.rotateLeft();
+      else if (params.rotationMethod < 0) _targetView.rotateRight();
+      else if (params.rotationMethod > 0) _targetView.rotateLeft();
         
       // or decide again if not possible
-      couldntRotate = (curOrientation == attachedGame->getFallingCompanionDir());
+      couldntRotate = (curOrientation == _attachedGame->getFallingCompanionDir());
     }
 
     // if need to move but impossible, decide again

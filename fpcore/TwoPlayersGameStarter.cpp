@@ -32,9 +32,9 @@ TwoPlayersGameWidget::TwoPlayersGameWidget(FloboSetTheme &floboSetTheme, LevelTh
                                                      areaB(&attachedGameFactory, 1, &attachedFloboThemeSet, &levelTheme),
                                                      opponentFace(aiFace)
 {
-    controllerA.reset(new EventPlayer(areaA, kPlayer1Down, kPlayer1Left, kPlayer1Right,
+    _controllerA.reset(new EventPlayer(areaA, kPlayer1Down, kPlayer1Left, kPlayer1Right,
                                       kPlayer1TurnLeft, kPlayer1TurnRight));
-    controllerB.reset(new EventPlayer(areaB, kPlayer2Down, kPlayer2Left, kPlayer2Right,
+    _controllerB.reset(new EventPlayer(areaB, kPlayer2Down, kPlayer2Left, kPlayer2Right,
                                       kPlayer2TurnLeft, kPlayer2TurnRight));
     initWithGUI(areaA, areaB, levelTheme, gameOverAction);
     setLives(-1);
@@ -47,12 +47,12 @@ StoryWidget *TwoPlayersGameWidget::getOpponent()
 
 void TwoPlayersGameWidget::cycle()
 {
-    opponentFace.setIntegerValue("@maxHeightLeft", attachedGameA->getColumnHeigth(2));
-    opponentFace.setIntegerValue("@maxHeightRight", attachedGameB->getColumnHeigth(2));
-    opponentFace.setIntegerValue("@neutralsForLeft", attachedGameA->getNeutralFlobos());
-    opponentFace.setIntegerValue("@neutralsForRight", attachedGameB->getNeutralFlobos());
-    opponentFace.setIntegerValue("@comboPhaseLeft", attachedGameA->getComboPhase());
-    opponentFace.setIntegerValue("@comboPhaseRight", attachedGameB->getComboPhase());
+    opponentFace.setIntegerValue("@maxHeightLeft", _attachedGameA->getColumnHeigth(2));
+    opponentFace.setIntegerValue("@maxHeightRight", _attachedGameB->getColumnHeigth(2));
+    opponentFace.setIntegerValue("@neutralsForLeft", _attachedGameA->getNeutralFlobos());
+    opponentFace.setIntegerValue("@neutralsForRight", _attachedGameB->getNeutralFlobos());
+    opponentFace.setIntegerValue("@comboPhaseLeft", _attachedGameA->getComboPhase());
+    opponentFace.setIntegerValue("@comboPhaseRight", _attachedGameB->getComboPhase());
     GameWidget2P::cycle();
 }
 

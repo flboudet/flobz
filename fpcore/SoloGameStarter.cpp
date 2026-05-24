@@ -62,7 +62,7 @@ void VuMeter::step()
 
 #define TIME_BETWEEN_GAME_CYCLES 0.02
 
-SoloGameWidget::SoloGameWidget(SoloGameSettings &gameSettings, FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, Action *gameOverAction)
+SoloGameWidget::SoloGameWidget(SoloGameSettings &gameSettings, FloboSetTheme &floboSetTheme, LevelTheme &levelTheme, Action *_gameOverAction)
     : CycledComponent(TIME_BETWEEN_GAME_CYCLES),
       m_cyclesDuration(gameSettings.cyclesDuration),
       m_levelIncrease(gameSettings.levelIncrease),
@@ -76,7 +76,7 @@ SoloGameWidget::SoloGameWidget(SoloGameSettings &gameSettings, FloboSetTheme &fl
     m_gameFactory.reset(new LocalGameFactory(&attachedRandom));
     m_areaA.reset(new GameView(m_gameFactory.get(), 0, &floboSetTheme, &levelTheme));
     m_playerController.reset(new CombinedEventPlayer(*m_areaA));
-    //initWithGUI(*m_areaA, NULL, *m_playerController, NULL, levelTheme, gameOverAction);
+    //initWithGUI(*m_areaA, NULL, *m_playerController, NULL, levelTheme, _gameOverAction);
     //setLives(-1);
     setReceiveUpEvents(true);
     setFocusable(true);
@@ -90,15 +90,15 @@ SoloGameWidget::SoloGameWidget(SoloGameSettings &gameSettings, FloboSetTheme &fl
     // TODO: move elsewhere
     // Load and preload a few FX for the game
     for (int i=0; i<3; ++i)
-        m_visualFX.push_back(new VisualFX("fx/vanish.gsl", *(m_areaA->getFloboSetTheme())));
+        _visualFX.push_back(new VisualFX("fx/vanish.gsl", *(m_areaA->getFloboSetTheme())));
     for (int i=0; i<3; ++i)
-        m_visualFX.push_back(new VisualFX("fx/combo.gsl", *(m_areaA->getFloboSetTheme())));
+        _visualFX.push_back(new VisualFX("fx/combo.gsl", *(m_areaA->getFloboSetTheme())));
     for (int i=0; i<1; ++i)
-        m_visualFX.push_back(new VisualFX("fx/starvedcombo.gsl", *(m_areaA->getFloboSetTheme())));
+        _visualFX.push_back(new VisualFX("fx/starvedcombo.gsl", *(m_areaA->getFloboSetTheme())));
     for (int i=0; i<1; ++i)
-        m_visualFX.push_back(new VisualFX("fx/penaltycleared.gsl", *(m_areaA->getFloboSetTheme())));
+        _visualFX.push_back(new VisualFX("fx/penaltycleared.gsl", *(m_areaA->getFloboSetTheme())));
     for (int i=0; i<1; ++i)
-        m_visualFX.push_back(new VisualFX("fx/combopenalty.gsl", *(m_areaA->getFloboSetTheme())));
+        _visualFX.push_back(new VisualFX("fx/combopenalty.gsl", *(m_areaA->getFloboSetTheme())));
 }
 
 void SoloGameWidget::gameDidEndCycle()
@@ -141,7 +141,7 @@ void SoloGameWidget::floboWillVanish(std::vector<std::shared_ptr<Flobo>> &floboG
 void SoloGameWidget::cycle()
 {
     bool isGameOver = m_areaA->isGameOver() || getAborted();
-    if ((!m_paused) && (!isGameOver)) {
+    if ((!_paused) && (!isGameOver)) {
         theCommander->playMusicTrack("herbert");
         // Game parameters
         m_cyclesDuration.step();
@@ -152,8 +152,8 @@ void SoloGameWidget::cycle()
         // Controls
         m_playerController->cycle();
         // Cycling through the foreground animation
-        if (m_styroPainter.get() != NULL)
-            m_styroPainter->update();
+        if (_styroPainter.get() != NULL)
+            _styroPainter->update();
         // Animations
         m_comboMeter->step();
         m_areaA->cycleAnimation();
@@ -187,23 +187,23 @@ void SoloGameWidget::cycle()
         requestDraw();
     }
     if (isGameOver) {
-        if (gameOverAction)
-            gameOverAction->action(this, GAME_IS_OVER, NULL);
+        if (_gameOverAction)
+            _gameOverAction->action(this, GAME_IS_OVER, NULL);
     }
 }
 
 void SoloGameWidget::draw(DrawTarget *dt)
 {
-    if ((m_paused) && (m_obscureScreenOnPause)) {
-        dt->draw(m_painterGameScreen, NULL, NULL);
+    if ((_paused) && (_obscureScreenOnPause)) {
+        dt->draw(_painterGameScreen, NULL, NULL);
         return;
     }
     IosRect dtRect = { 0, 0, dt->w, dt->h };
     dt->draw(getLevelTheme()->getBackground(), &dtRect, &dtRect);
     m_areaA->render(dt);
     // Rendering the foreground animation
-    if (m_styroPainter.get() != NULL)
-        m_styroPainter->draw(dt);
+    if (_styroPainter.get() != NULL)
+        _styroPainter->draw(dt);
     // Rendering the combo meter
     m_comboMeter->setValue(m_comboHandicap / 100.);
     m_comboMeter->draw(dt);
@@ -222,7 +222,7 @@ void SoloGameWidget::draw(DrawTarget *dt)
 
 void SoloGameWidget::eventOccured(GameControlEvent *event)
 {
-    if (m_paused)
+    if (_paused)
         lostFocus();
     else {
         m_playerController->eventOccured(event);
@@ -240,7 +240,7 @@ void SoloGameWidget::setGameOptions(GameOptions options)
 bool SoloGameWidget::backPressed()
 {
     if (m_areaA->isGameOver() || getAborted()) {
-        gameOverAction->action(this, GAMEOVER_STARTPRESSED, NULL);
+        _gameOverAction->action(this, GAMEOVER_STARTPRESSED, NULL);
         return true;
     }
     return false;
@@ -248,7 +248,7 @@ bool SoloGameWidget::backPressed()
 bool SoloGameWidget::startPressed()
 {
     if (m_areaA->isGameOver() || getAborted()) {
-        gameOverAction->action(this, GAMEOVER_STARTPRESSED, NULL);
+        _gameOverAction->action(this, GAMEOVER_STARTPRESSED, NULL);
         return true;
     }
     return false;
