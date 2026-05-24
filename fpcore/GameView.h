@@ -58,12 +58,12 @@ public:
 
 class LocalGameFactory : public FloboGameFactory {
 public:
-    LocalGameFactory(RandomSystem *attachedRandom): attachedRandom(attachedRandom) {}
+    LocalGameFactory(RandomSystem *attachedRandom): _attachedRandom(attachedRandom) {}
     FloboGame *createFloboGame(FloboFactory *attachedFloboFactory) {
-        return new FloboLocalGame(attachedRandom, attachedFloboFactory);
+        return new FloboLocalGame(_attachedRandom, attachedFloboFactory);
     }
 private:
-    RandomSystem *attachedRandom;
+    RandomSystem *_attachedRandom;
 };
 
 /**
@@ -101,7 +101,7 @@ class GameView : public GameListener {
     virtual void rotateRight();
 
     int getValenceForFlobo(Flobo *flobo) const;
-    FloboGame *getAttachedGame() const { return attachedGame; }
+    FloboGame *getAttachedGame() const { return _attachedGame; }
 
     bool isGameOver() const;
 
@@ -150,7 +150,7 @@ class GameView : public GameListener {
     int _playerId;
     std::string _p1name, _p2name;
     bool cycleAllowed();
-    bool _showNextFlobos, _showShadows, m_showEyes;
+    bool _showNextFlobos, _showShadows, _showEyes;
     bool _skippedCycle;
     bool _gameRunning;
     int _xOffset, _yOffset;
@@ -159,7 +159,7 @@ class GameView : public GameListener {
     FloboSetTheme *_attachedThemeSet;
     LevelTheme *_attachedLevelTheme;
     AnimatedFloboFactory _attachedFloboFactory;
-    FloboGame *attachedGame, *_enemyGame;
+    FloboGame *_attachedGame, *_enemyGame;
     std::vector<std::shared_ptr<Animation>> _viewAnimations;
     int _cycleAllowance;
     int _delayBeforeGameOver;
