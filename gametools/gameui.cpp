@@ -1,4 +1,5 @@
 #include "gameui.h"
+#include <algorithm>
 #include "audiomanager.h"
 
 #define MIN_REPEAT_TIME 100.0
@@ -166,14 +167,14 @@ namespace gameui {
 
     WidgetContainer::~WidgetContainer()
     {
-        for (int i = childs.size()-1 ; i >= 0 ; i--) {
-            remove(childs[i]);
+        while (!childs.empty()) {
+            remove(childs.back());
         }
     }
 
     void WidgetContainer::add (Widget *child)
     {
-        childs.add(child);
+        childs.push_back(child);
         child->setParent(this);
         if (addedToGameLoop)
             child->addToGameLoop(loop);
@@ -185,7 +186,7 @@ namespace gameui {
 
     void WidgetContainer::remove (Widget *child)
     {
-        childs.remove(child);
+        childs.erase(std::remove(childs.begin(), childs.end(), child), childs.end());
 
         // Ensures the removed children doesn't grabs the screen events
         Screen *childScreen = getParentScreen();
@@ -282,7 +283,7 @@ namespace gameui {
 
         bool changed = false;
 
-        for (int i = 0; i < childs.size() - itNumber; ++i) {
+        for (size_t i = 0; i + itNumber < childs.size(); ++i) {
             Vec3 v1 = childs[i]->getPosition();
             Vec3 v2 = childs[i+1]->getPosition();
             if (v1.z > v2.z) {
@@ -311,8 +312,8 @@ namespace gameui {
         }
         else {
             Vec3 v3offset = v3 - position;
-            int s = childs.size();
-            for (int i = 0; i < s ; i++) {
+            size_t s = childs.size();
+            for (size_t i = 0; i < s ; i++) {
                 Widget * c = childs[i];
                 c->setSize(c->getSize()+v3offset);
             }
@@ -329,8 +330,8 @@ namespace gameui {
         }
         else {
             Vec3 v3offset = v3 - position;
-            int s = childs.size();
-            for (int i = 0; i < s ; i++) {
+            size_t s = childs.size();
+            for (size_t i = 0; i < s ; i++) {
                 Widget * c = childs[i];
                 c->setPosition(c->getPosition()+v3offset);
             }
@@ -342,8 +343,8 @@ namespace gameui {
     {
         layoutSuspended = true;
 
-        int s = childs.size();
-        for (int i = 0; i < s ; i++) {
+        size_t s = childs.size();
+        for (size_t i = 0; i < s ; i++) {
             childs[i]->suspendLayout();
         }
     }
@@ -352,15 +353,15 @@ namespace gameui {
     {
         layoutSuspended = false;
 
-        int s = childs.size();
-        for (int i = 0; i < s ; i++) {
+        size_t s = childs.size();
+        for (size_t i = 0; i < s ; i++) {
             childs[i]->resumeLayout();
         }
     }
 
     void WidgetContainer::hide()
     {
-        for (int i = 0; i < childs.size() ; i++) {
+        for (size_t i = 0; i < childs.size() ; i++) {
             childs[i]->hide();
         }
         Widget::hide();
@@ -368,7 +369,7 @@ namespace gameui {
 
     void WidgetContainer::show()
     {
-        for (int i = 0; i < childs.size() ; i++) {
+        for (size_t i = 0; i < childs.size() ; i++) {
             childs[i]->show();
         }
         Widget::show();

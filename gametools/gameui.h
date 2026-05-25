@@ -217,7 +217,7 @@ bool isDirectionEvent(event_manager::GameControlEvent *event);
       bool    layoutSuspended;
 
     private:
-      Vector<Widget> childs;
+      std::vector<Widget*> childs;
       bool bubbleSortZ_iteration(int itNumber);
       GameLoop *loop;
       bool addedToGameLoop;

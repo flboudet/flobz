@@ -2,11 +2,10 @@
 #define _GAMELOOP_H
 
 #include "ios_fc.h"
+#include <vector>
 #include "drawcontext.h"
 #include "audiomanager.h"
 #include "GameControls.h"
-
-using namespace ios_fc;
 
 class GameLoop;
 
@@ -138,9 +137,9 @@ class GameLoop
     double timeDrift;
     double lastDrawTime, deltaDrawTimeMax;
 
-    Vector<DrawableComponent> drawables;
-    Vector<IdleComponent>     idles;
-    Vector<GarbageCollectableItem> garbageCollector;
+    std::vector<DrawableComponent*> drawables;
+    std::vector<IdleComponent*>     idles;
+    std::vector<GarbageCollectableItem*> garbageCollector;
     bool finished;
 };
 

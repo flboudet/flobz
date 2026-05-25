@@ -154,32 +154,32 @@ GameLoop::GameLoop() : timeDrift(0), lastDrawTime(getCurrentTime()), deltaDrawTi
 
 void GameLoop::addDrawable(DrawableComponent *gc)
 {
-  for (int i = 0; i < drawables.size(); ++i)
+  for (size_t i = 0; i < drawables.size(); ++i)
     if (drawables[i] == gc) return;
 
 #ifdef DEBUG_GAMELOOP
   printf("Drawable %x added to gameloop!\n", gc);
 #endif
-  drawables.add(gc);
+  drawables.push_back(gc);
   gc->parentLoop = this;
   gc->onDrawableVisibleChanged(true);
 }
 
 void GameLoop::addIdle(IdleComponent *gc)
 {
-  for (int i = 0; i < idles.size(); ++i)
+  for (size_t i = 0; i < idles.size(); ++i)
     if (idles[i] == gc) return;
 
 #ifdef DEBUG_GAMELOOP
   printf("Idle %x added to gameloop!\n", gc);
 #endif
-  idles.add(gc);
+  idles.push_back(gc);
   gc->parentLoop = this;
 }
 
 void GameLoop::removeDrawable(DrawableComponent *gc)
 {
-  for (int i = 0; i < drawables.size(); ++i) {
+  for (size_t i = 0; i < drawables.size(); ++i) {
     if (gc == drawables[i]) {
 #ifdef DEBUG_GAMELOOP
       printf("Drawable %x removed from gameloop!\n", gc);
@@ -193,7 +193,7 @@ void GameLoop::removeDrawable(DrawableComponent *gc)
 
 void GameLoop::removeIdle(IdleComponent *gc)
 {
-  for (int i = 0; i < idles.size(); ++i) {
+  for (size_t i = 0; i < idles.size(); ++i) {
     if (gc == idles[i]) {
 #ifdef DEBUG_GAMELOOP
       printf("Idle %x removed from gameloop!\n", gc);
@@ -206,7 +206,7 @@ void GameLoop::removeIdle(IdleComponent *gc)
 
 void GameLoop::garbageCollect(GarbageCollectableItem *item)
 {
-    garbageCollector.add(item);
+    garbageCollector.push_back(item);
 }
 
 #include <unistd.h>
@@ -235,13 +235,13 @@ void GameLoop::garbageCollectNow() {
     printf("GARBAGE COLLECTABLE REMOVED\n");
 #endif
     delete garbageCollector[0];
-    garbageCollector.removeAt(0);
+    garbageCollector.erase(garbageCollector.begin());
   }
 }
 
 void GameLoop::idle(double currentTime)
 {
-  int i, idles_size_at_start;
+  size_t i, idles_size_at_start;
 
   idles_size_at_start = idles.size();
 
@@ -277,9 +277,9 @@ void GameLoop::idle(double currentTime)
     IdleComponent *gc = idles[i];
     if (gc == NULL) {
 #ifdef DEBUG_GAMELOOP
-      printf("IDLE %d REMOVED############\n", i);
+      printf("IDLE %zu REMOVED############\n", i);
 #endif
-      idles.removeAt(i);
+      idles.erase(idles.begin() + i);
     }
     else i++;
   }
@@ -287,9 +287,9 @@ void GameLoop::idle(double currentTime)
     DrawableComponent *gc = drawables[i];
     if (gc == NULL) {
 #ifdef DEBUG_GAMELOOP
-    printf("DRAWABLE %d REMOVED############\n", i);
+    printf("DRAWABLE %zu REMOVED############\n", i);
 #endif
-      drawables.removeAt(i);
+      drawables.erase(drawables.begin() + i);
     }
     else i++;
   }
@@ -300,7 +300,7 @@ void GameLoop::idle(double currentTime)
 
 bool GameLoop::drawRequested() const
 {
-  for (int i = 0; i < drawables.size(); ++i) {
+  for (size_t i = 0; i < drawables.size(); ++i) {
     if ((drawables[i] != NULL) && (drawables[i]->drawRequested()))
       return true;
   }
@@ -309,7 +309,7 @@ bool GameLoop::drawRequested() const
 
 bool GameLoop::isLate(double currentTime) const
 {
-  for (int i = 0; i < idles.size(); ++i) {
+  for (size_t i = 0; i < idles.size(); ++i) {
     if (idles[i] == NULL) continue;
     if (idles[i]->isLate(currentTime))
       return true;
@@ -322,7 +322,7 @@ void GameLoop::draw(bool flip)
   DrawContext *dc = getDrawContext();
   if (dc == NULL) return;
 
-  for (int i = 0; i < drawables.size(); ++i) {
+  for (size_t i = 0; i < drawables.size(); ++i) {
     if (drawables[i] != NULL)
         drawables[i]->doDraw(dc);
     else
