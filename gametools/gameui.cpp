@@ -312,9 +312,8 @@ namespace gameui {
         }
         else {
             Vec3 v3offset = v3 - position;
-            size_t s = childs.size();
-            for (size_t i = 0; i < s ; i++) {
-                Widget * c = childs[i];
+            for (auto it = childs.begin(); it != childs.end(); ++it) {
+                Widget * c = *it;
                 c->setSize(c->getSize()+v3offset);
             }
             Widget::setSize(v3);
@@ -330,9 +329,8 @@ namespace gameui {
         }
         else {
             Vec3 v3offset = v3 - position;
-            size_t s = childs.size();
-            for (size_t i = 0; i < s ; i++) {
-                Widget * c = childs[i];
+            for (auto it = childs.begin(); it != childs.end(); ++it) {
+                Widget * c = *it;
                 c->setPosition(c->getPosition()+v3offset);
             }
             Widget::setPosition(v3);
@@ -343,9 +341,8 @@ namespace gameui {
     {
         layoutSuspended = true;
 
-        size_t s = childs.size();
-        for (size_t i = 0; i < s ; i++) {
-            childs[i]->suspendLayout();
+        for (auto it = childs.begin(); it != childs.end(); ++it) {
+            (*it)->suspendLayout();
         }
     }
 
@@ -353,24 +350,23 @@ namespace gameui {
     {
         layoutSuspended = false;
 
-        size_t s = childs.size();
-        for (size_t i = 0; i < s ; i++) {
-            childs[i]->resumeLayout();
+        for (auto it = childs.begin(); it != childs.end(); ++it) {
+            (*it)->resumeLayout();
         }
     }
 
     void WidgetContainer::hide()
     {
-        for (size_t i = 0; i < childs.size() ; i++) {
-            childs[i]->hide();
+        for (auto it = childs.begin(); it != childs.end(); ++it) {
+            (*it)->hide();
         }
         Widget::hide();
     }
 
     void WidgetContainer::show()
     {
-        for (size_t i = 0; i < childs.size() ; i++) {
-            childs[i]->show();
+        for (auto it = childs.begin(); it != childs.end(); ++it) {
+            (*it)->show();
         }
         Widget::show();
     }
