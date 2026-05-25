@@ -527,7 +527,7 @@ bool AIPlayer::selectIfBetterEvaluation(int * const best, const GridEvaluation *
 }
 
 
-AIPlayer::AIPlayer(int _level, GameView &targetView)
+AIPlayer::AIPlayer(int level, GameView &targetView)
 : GamePlayer(targetView)
 {
   _internalGrid = NULL;
@@ -554,8 +554,8 @@ AIPlayer::AIPlayer(int _level, GameView &targetView)
   _params.rotationMethod = 0; // negative (right), null (shortest), positive(left)
   _params.fastDropDelta = FLOBOBAN_DIMY; // flobo height relative to column height before fast drop
   _params.thinkDepth = 2;
-  _params.speedFactor = _level>0?_level:1;
-  this->_level = _level;
+  _params.speedFactor = level>0?level:1;
+  this->_level = level;
 }
 
 void AIPlayer::setAIParameters(const AIParameters &ai)
